@@ -51,7 +51,7 @@ void satin::delsac(unsigned int formIndex) {
 			while (source < SatinGuideIndex) {
 				SatinGuides[destination++] = SatinGuides[source++];
 			}
-			for (auto iForm = formIndex + 1; iForm < FormIndex; iForm++) {
+			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
 				if (formList[iForm].type == SAT && formList[iForm].satinGuideCount) {
 					formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 				}
@@ -288,7 +288,7 @@ bool satin::internal::satselfn() {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto&      form      = (*FormList)[iForm];
 		const auto layerCode = (form.attribute & FRMLMSK) >> 1;
 		if (!ActiveLayer || !layerCode || layerCode == ActiveLayer) {
@@ -586,7 +586,7 @@ void satin::delspnt() {
 				}
 				SelectedForm->satinGuideCount--;
 				SatinGuideIndex--;
-				for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+				for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 					auto& form = (*FormList)[iForm];
 					if (form.type == SAT && form.satinGuideCount) {
 						form.satinOrAngle.guide++;
@@ -611,7 +611,7 @@ void satin::delspnt() {
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1;
 	}
 	StateMap.set(StateFlag::FRMPSEL);
-	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex--;
 	}

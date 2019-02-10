@@ -390,7 +390,7 @@ void form::setfrm() {
 	auto point = fPOINT{};
 
 	fi::rats();
-	ClosestFormToCursor = FormIndex;
+	ClosestFormToCursor = FormList->size();
 	form::fvars(ClosestFormToCursor);
 	fi::px2stchf((*FormLines)[0], point);
 	auto       vertexIt          = FormVertices->begin() + CurrentVertexIndex;
@@ -953,7 +953,7 @@ void form::flipv() {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			auto& formIter            = (*FormList)[iForm];
 			formIter.rectangle.bottom = midpoint + midpoint - formIter.rectangle.bottom;
 			formIter.rectangle.top    = midpoint + midpoint - formIter.rectangle.top;
@@ -962,7 +962,7 @@ void form::flipv() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		auto formMap = boost::dynamic_bitset<>{ FormIndex };
+		auto formMap = boost::dynamic_bitset<>{ FormList->size() };
 
 		auto rectangle = fRECTANGLE{};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
@@ -5321,7 +5321,7 @@ void form::rstfrm() {
 }
 
 void form::clrfills() {
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter                   = (*FormList)[iForm];
 		formIter.clipEntries             = 0;
 		formIter.lengthOrCount.clipCount = 0;
@@ -5480,7 +5480,7 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter = (*FormList)[iForm];
 		if (!ActiveLayer || ((formIter.attribute & FRMLMSK) >> 1) == ActiveLayer || !(formIter.attribute & FRMLMSK)) {
 			CurrentVertexIndex    = formIter.vertexIndex;
@@ -5608,7 +5608,7 @@ void form::unfil() {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		auto formMap = boost::dynamic_bitset<>(FormIndex);
+		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
 			SelectedForm = &((*FormList)[selectedForm]);
 			if (SelectedForm->fillType || SelectedForm->edgeType) {
@@ -5910,7 +5910,7 @@ void form::setap() {
 void form::internal::getbig() {
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		const auto& trct = (*FormList)[iForm].rectangle;
 		if (trct.bottom < AllItemsRect.bottom) {
 			AllItemsRect.bottom = trct.bottom;
@@ -6101,7 +6101,7 @@ void form::setstrtch() {
 			return;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				auto& formIter      = (*FormList)[iForm];
 				CurrentVertexIndex = formIter.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentVertexIndex;
@@ -6157,7 +6157,7 @@ void form::setstrtch() {
 			return;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				auto& formIter      = (*FormList)[iForm];
 				CurrentVertexIndex = formIter.vertexIndex;
 				auto vertexIt       = FormVertices->begin() + CurrentVertexIndex;
@@ -6338,7 +6338,7 @@ void form::setexpand(double xyRatio) {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			form::fvars(iForm);
 			auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 			for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -6795,7 +6795,7 @@ void form::fliph() {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			auto& rect = (*FormList)[iForm].rectangle;
 			rect.left  = midpoint + midpoint - rect.left;
 			rect.right = midpoint + midpoint - rect.right;
@@ -6805,7 +6805,7 @@ void form::fliph() {
 	}
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		auto formMap = boost::dynamic_bitset<>(FormIndex);
+		auto formMap = boost::dynamic_bitset<>(FormList->size());
 
 		auto rectangle = fRECTANGLE{};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
@@ -7452,7 +7452,7 @@ void form::movlayr(unsigned codedLayer) {
 
 	if (!SelectedFormList->empty()) {
 		thred::savdo();
-		auto formMap = boost::dynamic_bitset<>(FormIndex);
+		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
 			auto& formAttr = (*FormList)[selectedForm].attribute;
 			formAttr       = gsl::narrow<unsigned char>((formAttr & NFRMLMSK) | codedLayer);
@@ -7501,7 +7501,7 @@ void form::join() {
 	const auto savedFormIndex = ClosestFormToCursor;
 
 	StateMap.set(StateFlag::FRMSAM);
-	if (FormIndex > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
+	if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
 		const auto& formIter   = (*FormList)[ClosestFormToCursor];
 		auto        vertexList = std::vector<fPOINT>{};
 		vertexList.resize(formIter.vertexCount);
@@ -7554,7 +7554,7 @@ void form::refilal() {
 	const auto savedFormIndex = ClosestFormToCursor;
 
 	thred::savdo();
-	for (ClosestFormToCursor = 0; ClosestFormToCursor < FormIndex; ClosestFormToCursor++) {
+	for (ClosestFormToCursor = 0; ClosestFormToCursor < FormList->size(); ClosestFormToCursor++) {
 		form::refilfn();
 	}
 	ClosestFormToCursor = savedFormIndex;
@@ -7596,7 +7596,7 @@ void form::frmadj(unsigned int formIndex) {
 }
 
 void form::frmsadj() {
-	auto formMap = boost::dynamic_bitset<>(FormIndex);
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto selectedForm : (*SelectedFormList)) {
 		formMap.set(selectedForm);
 	}
@@ -8049,7 +8049,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 		auto sourceForm          = 0u;
 
 		auto tempFormList = std::vector<FRMHED>{};
-		tempFormList.resize(FormIndex);
+		tempFormList.resize(FormList->size());
 		auto tempFormVertices = std::vector<fPOINT>{};
 		tempFormVertices.resize(FormVertices->size());
 		auto tempGuides = std::vector<SATCON>{};
@@ -8059,7 +8059,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 
 		auto formSourceIndex = 0u;
 		satin::clearGuideSize();
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			if (iForm == newFormIndex) {
 				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex, formSourceIndex);
 			}
@@ -8108,12 +8108,12 @@ constexpr unsigned form::internal::duat(unsigned attribute) {
 void form::internal::srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish) {
 	if (start != finish) {
 		auto stitchHistogram = std::vector<unsigned>{};
-		stitchHistogram.resize(gsl::narrow<size_t>(FormIndex) << 2);
+		stitchHistogram.resize(gsl::narrow<size_t>(FormList->size()) << 2);
 		for (auto iStitch = start; iStitch < finish; iStitch++) {
 			stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++;
 		}
 		auto stitchAccumulator = start;
-		for (auto iForm = 0u; iForm < FormIndex << 2; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size() << 2; iForm++) {
 			auto value             = stitchHistogram[iForm];
 			stitchHistogram[iForm] = stitchAccumulator;
 			stitchAccumulator += value;
@@ -8282,7 +8282,7 @@ void form::centir() {
 		(*FormVertices)[iVertex].x += delta.x;
 		(*FormVertices)[iVertex].y += delta.y;
 	}
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		form::frmout(iForm);
 	}
 	xt::setfchk();
@@ -8541,7 +8541,7 @@ void form::stchs2frm() {
 			vertexIt[iVertex].x   = StitchBuffer[iStitch].x;
 			vertexIt[iVertex++].y = StitchBuffer[iStitch].y;
 		}
-		form::frmout(FormIndex);
+		form::frmout(FormList->size());
 		FormIndex++;
 		if (ClosestPointIndex > GroupStitchIndex) {
 			if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
@@ -8801,7 +8801,7 @@ void form::col2frm() {
 	auto colorChangedCount = 0u;
 
 	if (!FormList->empty()) {
-		const auto formColorPermutations = FormIndex << 4; // total number of form and color combinations
+		const auto formColorPermutations = FormList->size() << 4; // total number of form and color combinations
 		auto       fillColorHistogram    = std::vector<unsigned>{};
 		fillColorHistogram.resize(formColorPermutations);
 		auto borderColorHistogram = std::vector<unsigned>{};
@@ -8835,7 +8835,7 @@ void form::col2frm() {
 		}
 		auto startColorOffset = 0u;
 		auto endColorOffset   = 16u;
-		for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0ul; iForm < FormList->size(); iForm++) {
 			auto& formIter = (*FormList)[iForm];
 			if (formIter.fillType) {
 				auto count         = 0u;
@@ -9033,7 +9033,7 @@ void form::filclpx() {
 
 void form::srtfrm() {
 	auto histogram = std::vector<unsigned>{};
-	histogram.resize(FormIndex);
+	histogram.resize(FormList->size());
 
 	if (PCSHeader.stitchCount) {
 		thred::savdo();

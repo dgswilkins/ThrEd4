@@ -95,7 +95,7 @@ unsigned int clip::internal::findclp(unsigned int formIndex) {
 
 void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
 	auto& formList = *FormList;
-	for (auto iForm = fpnt + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = fpnt + 1; iForm < FormList->size(); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip -= cnt;
 		}
@@ -155,12 +155,12 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 	const auto it  = ClipPoints->begin() + find;
 	const auto val = fPOINT{};
 	ClipPoints->insert(it, count, val);
-	for (auto iform = currentForm; iform < FormIndex; iform++) {
+	for (auto iform = currentForm; iform < FormList->size(); iform++) {
 		if (clip::iseclpx(iform)) {
 			formList[iform].borderClipData += count;
 		}
 	}
-	for (auto iform = currentForm + 1; iform < FormIndex; iform++) {
+	for (auto iform = currentForm + 1; iform < FormList->size(); iform++) {
 		if (clip::isclp(iform)) {
 			formList[iform].angleOrClipData.clip += count;
 		}
@@ -180,7 +180,7 @@ unsigned int clip::numclp() {
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		formList[ClosestFormToCursor].borderClipData += clipSize;
 	}
-	for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip += clipSize;
 		}

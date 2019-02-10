@@ -968,8 +968,8 @@ void xt::chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleave
 }
 
 void xt::selalfrm() {
-	SelectedFormList->reserve(FormIndex);
-	for (auto formIndex = 0u; formIndex < FormIndex; formIndex++) {
+	SelectedFormList->reserve(FormList->size());
+	for (auto formIndex = 0u; formIndex < FormList->size(); formIndex++) {
 		SelectedFormList->push_back(formIndex);
 	}
 	StateMap.set(StateFlag::RESTCH);
@@ -1045,7 +1045,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter = std::vector<unsigned>{};
-	formFillCounter.resize(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormIndex) + 2u) << 2u));
+	formFillCounter.resize(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormList->size()) + 2u) << 2u));
 	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
@@ -2586,7 +2586,7 @@ void xt::nudsiz() {
 				displayText::hsizmsg();
 			}
 			form::centir();
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				form::frmout(iForm);
 			}
 		}

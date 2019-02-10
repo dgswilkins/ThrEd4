@@ -1014,7 +1014,7 @@ void texture::deltx() {
 				}
 			}
 		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				auto& formIter = (*FormList)[iForm];
 				if (formIter.fillInfo.texture.index == currentIndex) {
@@ -1039,7 +1039,7 @@ void texture::deltx() {
 					iBuffer += fillInfo.texture.count;
 				}
 			}
-			for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+			for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = TexturePointsBuffer->cbegin() + fillInfo.texture.index;
@@ -1089,7 +1089,7 @@ void texture::internal::nutx() {
 			auto destination = startSource + tempPointCount;
 			auto _           = std::copy(startSource, endSource, destination);
 		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormIndex; iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				(*FormList)[iForm].fillInfo.texture.index += gsl::narrow<unsigned short>(tempPointCount);
 			}

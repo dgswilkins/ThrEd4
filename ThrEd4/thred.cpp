@@ -1947,7 +1947,7 @@ void thred::internal::hupfn() {
 				(*FormVertices)[iVertex].x += delta.x;
 				(*FormVertices)[iVertex].y += delta.y;
 			}
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				auto& form = (*FormList)[iForm];
 				form.rectangle.left += delta.x;
 				form.rectangle.right += delta.x;
@@ -2428,7 +2428,7 @@ void thred::internal::chknum() {
 					}
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
-							if (value < FormIndex) {
+							if (value < FormList->size()) {
 								form::frmnumfn(dToUI(value));
 							}
 							else {
@@ -2986,7 +2986,7 @@ void thred::internal::delsmal(unsigned startStitch, unsigned endStitch) {
 
 void thred::internal::duzero() {
 	if (!SelectedFormList->empty()) {
-		auto formMap = boost::dynamic_bitset<>(FormIndex);
+		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
 			formMap.set(selectedForm);
 		}
@@ -3529,6 +3529,7 @@ void thred::internal::redbal() {
 
 	PCSHeader.stitchCount = 0u;
 	FormIndex             = 0u;
+	FormList->clear();
 
 	auto balaradFile = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (balaradFile != INVALID_HANDLE_VALUE) {
@@ -4566,7 +4567,7 @@ void thred::internal::auxmen() {
 }
 
 void thred::internal::savAs() {
-	if (PCSHeader.stitchCount || FormIndex || *PCSBMPFileName) {
+	if (PCSHeader.stitchCount || !FormList->empty() || *PCSBMPFileName) {
 		wchar_t szFileName[_MAX_PATH] = { 0 };
 		wchar_t lpszBuffer[_MAX_PATH] = { 0 };
 		auto    workingFileStr        = WorkingFileName->wstring();
@@ -5287,6 +5288,7 @@ void thred::internal::prtred() {
 	CloseHandle(FileHandle);
 	StateMap.reset(StateFlag::INIT);
 	FormIndex = 0;
+	FormList->clear();
 	displayText::tabmsg(IDS_PRT);
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -5652,10 +5654,6 @@ void thred::internal::nuFil() {
 						ThreadSize[iThread][0] = threadSizeBufW[iThread];
 					}
 					FormIndex = thredHeader.formCount;
-					if (thredHeader.formCount > MAXFORMS) {
-						FormIndex             = MAXFORMS;
-						thredHeader.formCount = MAXFORMS;
-					}
 					if (thredHeader.formCount != 0) {
 						StateMap.reset(StateFlag::BADFIL);
 						ClipPoints->clear();
@@ -5665,11 +5663,13 @@ void thred::internal::nuFil() {
 						auto bytesToRead = DWORD{ 0 };
 						if (version < 2) {
 							auto formListOriginal = std::vector<FRMHEDO>{};
-							formListOriginal.resize(FormIndex);
-							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(formListOriginal[0]));
+							formListOriginal.resize(thredHeader.formCount);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(formListOriginal[0]));
 							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
-							if (BytesRead != FormIndex * sizeof(formListOriginal[0])) {
-								FormIndex = BytesRead / sizeof(formListOriginal[0]);
+							if (BytesRead != thredHeader.formCount * sizeof(formListOriginal[0])) {
+								thredHeader.formCount = BytesRead / sizeof(formListOriginal[0]);
+								FormIndex = thredHeader.formCount;
+								formListOriginal.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : formListOriginal) {
@@ -5678,11 +5678,13 @@ void thred::internal::nuFil() {
 						}
 						else {
 							auto inFormList = std::vector<FRMHEDOUT>{};
-							inFormList.resize(FormIndex);
-							bytesToRead = gsl::narrow<DWORD>(FormIndex * sizeof(inFormList.back()));
+							inFormList.resize(thredHeader.formCount);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(inFormList.back()));
 							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								FormIndex = BytesRead / sizeof(inFormList[0]);
+								thredHeader.formCount = BytesRead / sizeof(inFormList[0]);
+								FormIndex = thredHeader.formCount;
+								inFormList.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto form : inFormList) {
@@ -5747,7 +5749,7 @@ void thred::internal::nuFil() {
 						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
 						auto guideOffset = 0u;
-						for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+						for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 							auto& form       = (*FormList)[iForm];
 							form.vertexIndex = vertexOffset;
 							vertexOffset += form.vertexCount;
@@ -7475,7 +7477,7 @@ void thred::internal::duclip() {
 					}
 				}
 				CloseClipboard();
-				auto formMap = boost::dynamic_bitset<>(FormIndex);
+				auto formMap = boost::dynamic_bitset<>(FormList->size());
 				for (auto& selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
 				}
@@ -7702,8 +7704,8 @@ void thred::internal::delsfrms(unsigned code) {
 	if (code) {
 		if (!FormList->empty()) {
 			auto formIndices = std::vector<unsigned>{};
-			formIndices.resize(FormIndex);
-			auto formMap = boost::dynamic_bitset<>(FormIndex);
+			formIndices.resize(FormList->size());
+			auto formMap = boost::dynamic_bitset<>(FormList->size());
 			for (auto selectedForm : (*SelectedFormList)) {
 				ClosestFormToCursor = selectedForm;
 				formMap.set(ClosestFormToCursor);
@@ -7712,7 +7714,7 @@ void thred::internal::delsfrms(unsigned code) {
 			}
 			auto deletedFormCount = 0u;
 			auto firstForm        = FormList->begin();
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				if (!formMap.test(iForm)) {
 					formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
 				}
@@ -8151,6 +8153,7 @@ void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	TextureIndex = 0;
 	FormIndex = 0;
+	FormList->clear();
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
 	satin::clearGuideSize();
@@ -8171,7 +8174,7 @@ bool thred::internal::wastch() noexcept {
 }
 
 bool thred::internal::frmstch() {
-	auto formMap = boost::dynamic_bitset<>(FormIndex);
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
 
 	for (auto form : (*SelectedFormList)) {
 		formMap.set(form);
@@ -8275,7 +8278,7 @@ void thred::internal::delet() {
 			}
 			return;
 		}
-		if (StateMap.test(StateFlag::FORMSEL) && FormIndex) {
+		if (StateMap.test(StateFlag::FORMSEL) && FormList->size()) {
 			if (wastch()) {
 				StateMap.set(StateFlag::DELFRM);
 				displayText::tabmsg(IDS_FDEL);
@@ -8376,8 +8379,8 @@ void thred::internal::delet() {
 			if (!satinFlag) {
 				satin::delspnt();
 			}
-			if (ClosestFormToCursor > FormIndex - 1) {
-				ClosestFormToCursor = FormIndex - 1;
+			if (ClosestFormToCursor > FormList->size() - 1) {
+				ClosestFormToCursor = FormList->size() - 1;
 			}
 			if (!FormList->empty()) {
 				form::frmout(ClosestFormToCursor);
@@ -8653,7 +8656,7 @@ void thred::internal::insfil() {
 					if (version) {
 						gethand(StitchBuffer, PCSHeader.stitchCount);
 						// ToDo - replace constants with sizes of data structures?
-						homscor = (FormIndex)*FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
+						homscor = FormList->size() * FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
 						          + FormVertices->size() * FRMPW + PCSHeader.stitchCount * STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
@@ -8672,7 +8675,7 @@ void thred::internal::insfil() {
 					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					auto insertedRectangle = fRECTANGLE{ 1e-9f, 1e9f, 1e-9f, 1e9f };
 					InsertedVertexIndex    = FormVertices->size();
-					InsertedFormIndex      = FormIndex;
+					InsertedFormIndex      = FormList->size();
 					if (fileHeader.formCount) {
 						auto newFormVertexIndex = FormVertices->size();
 						auto newSatinGuideIndex = satin::getGuideSize();
@@ -8687,10 +8690,8 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							if (FormIndex + fileHeader.formCount < MAXFORMS) {
-								for (auto form : inFormList) {
-									FormList->push_back(FRMHED{ form });
-								}
+							for (auto form : inFormList) {
+								FormList->push_back(FRMHED{ form });
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
 						}
@@ -8762,7 +8763,7 @@ void thred::internal::insfil() {
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
 						// update the form pointer variables
-						for (auto iFormList = InsertedFormIndex; iFormList < FormIndex; iFormList++) {
+						for (auto iFormList = InsertedFormIndex; iFormList < FormList->size(); iFormList++) {
 							auto& formIter       = (*FormList)[iFormList];
 							formIter.vertexIndex = vertexOffset;
 							vertexOffset += formIter.vertexCount;
@@ -9204,7 +9205,7 @@ void thred::chkrng(fPOINT& range) {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (StitchBuffer[iStitch].attribute & NOTFRM
 			    || ((StitchBuffer[iStitch].attribute & TYPMSK)
-			        && ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT < FormIndex))) {
+			        && ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT < FormList->size()))) {
 				StitchBuffer[stitchCount] = StitchBuffer[iStitch];
 				if (StitchBuffer[stitchCount].x > range.x) {
 					StitchBuffer[stitchCount].x = range.x - 1;
@@ -9328,7 +9329,7 @@ void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			thi::rotstch(&StitchBuffer[iStitch], rotationAngle, rotationCenter);
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			form::frmout(iForm);
 		}
 		form::selal();
@@ -9524,7 +9525,7 @@ void thred::internal::selup() {
 	if (GetKeyState(VK_SHIFT) & 0x8000) {
 		StateMap.reset(StateFlag::SELBOX);
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-			if (ClosestFormToCursor < FormIndex - 1) {
+			if (ClosestFormToCursor < FormList->size() - 1) {
 				SelectedFormList->push_back(ClosestFormToCursor);
 				LastFormSelected = ClosestFormToCursor + 1;
 				SelectedFormList->push_back(LastFormSelected);
@@ -9535,7 +9536,7 @@ void thred::internal::selup() {
 		}
 		else {
 			if (!SelectedFormList->empty()) {
-				if (LastFormSelected < FormIndex - 1) {
+				if (LastFormSelected < FormList->size() - 1) {
 					LastFormSelected++;
 					dufsel();
 				}
@@ -9560,7 +9561,7 @@ void thred::internal::selup() {
 		else {
 			if (!FormList->empty()) {
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
-					if (ClosestFormToCursor < gsl::narrow<unsigned>(FormIndex) - 1) {
+					if (ClosestFormToCursor < gsl::narrow<unsigned>(FormList->size()) - 1) {
 						ClosestFormToCursor++;
 					}
 				}
@@ -9618,7 +9619,7 @@ void thred::internal::seldwn() {
 					}
 				}
 				else {
-					ClosestFormToCursor = FormIndex - 1;
+					ClosestFormToCursor = FormList->size() - 1;
 				}
 				displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
 				StateMap.set(StateFlag::RESTCH);
@@ -10166,7 +10167,7 @@ void thred::internal::selalstch() {
 void thred::internal::duinsfil() {
 	thred::px2stch();
 	const auto offset = fPOINT{ SelectedPoint.x - InsertCenter.x, SelectedPoint.y - InsertCenter.y };
-	for (auto iForm = InsertedFormIndex; iForm < FormIndex; iForm++) {
+	for (auto iForm = InsertedFormIndex; iForm < FormList->size(); iForm++) {
 		auto& formRectangle = (*FormList)[iForm].rectangle;
 		formRectangle.bottom += offset.y;
 		formRectangle.top += offset.y;
@@ -10246,7 +10247,7 @@ void thred::internal::rngal() {
 }
 
 void thred::internal::nucols() {
-	auto formMap = boost::dynamic_bitset<>(FormIndex);
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto selectedForm : (*SelectedFormList)) {
 		formMap.set(selectedForm);
 		SelectedForm = &((*FormList)[selectedForm]);
@@ -10341,7 +10342,7 @@ void thred::internal::desiz() {
 		thred::frmrct(rectangle);
 		const auto xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		const auto ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
-		info += fmt::format(stringTable[STR_FORMS], FormIndex, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		info += fmt::format(stringTable[STR_FORMS], FormList->size(), xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount) {
@@ -11210,7 +11211,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		thred::savdo();
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			SelectedForm = &((*FormList)[iForm]);
 			frmpos(deltaX, deltaY);
 		}
@@ -11227,7 +11228,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		return;
 	}
 	if (!SelectedFormList->empty()) {
-		auto formMap = boost::dynamic_bitset<>(FormIndex);
+		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
 			formMap.set(selectedForm);
 		}
@@ -11379,7 +11380,7 @@ void thred::internal::movchk() {
 						}
 					}
 				}
-				for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+				for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 					auto& formIter = (*FormList)[iForm];
 					if (formIter.fillType) {
 						if (formIter.fillColor == VerticalIndex) {
@@ -11448,7 +11449,7 @@ void thred::internal::inscol() {
 					StitchBuffer[iStitch].attribute |= color + 1;
 				}
 			}
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				auto& formIter = (*FormList)[iForm];
 				if (formIter.fillType) {
 					if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
@@ -11499,7 +11500,7 @@ void thred::internal::delcol() {
 					StitchBuffer[iStitch].attribute |= color - 1;
 				}
 			}
-			for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 				auto formIter = (*FormList)[iForm];
 				if (formIter.fillType) {
 					if (formIter.fillColor > VerticalIndex) {
@@ -12227,7 +12228,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			else {
 				if (StateMap.test(StateFlag::BIGBOX)) {
 					thred::savdo();
-					for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+					for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 						form::frmadj(iForm);
 					}
 					for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -12341,9 +12342,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					SelectedFormList->clear();
 					// We potentially reserve too much memory, but the cost of reallocatioon is higher than the small
 					// amount overallocated
-					SelectedFormList->reserve(FormIndex);
+					SelectedFormList->reserve(FormList->size());
 					StateMap.reset(StateFlag::FORMSEL);
-					for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+					for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 						if (finrng(iForm)) {
 							SelectedFormList->push_back(iForm);
 						}
@@ -12906,6 +12907,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			thred::px2stch();
 			FormMoveDelta.x = SelectedPoint.x - ((formsRect.right - formsRect.left) / 2.0f + formsRect.left);
 			FormMoveDelta.y = SelectedPoint.y - ((formsRect.top - formsRect.bottom) / 2.0f + formsRect.bottom);
+			// ToDo - This is probably broken
 			for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
 				ClosestFormToCursor = FormIndex + iForm;
 				form::fvars(ClosestFormToCursor);
@@ -13978,7 +13980,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			form::refil();
 			StateMap.reset(StateFlag::FUNCLP);
 			if (StateMap.testAndReset(StateFlag::FPSEL)) {
-				form::frmout(FormIndex - 1);
+				form::frmout(FormList->size() - 1);
 			}
 			StateMap.set(StateFlag::RESTCH);
 			return true;
@@ -18677,7 +18679,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 }
 
 void thred::internal::sachk() {
-	for (auto iForm = 0ul; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0ul; iForm < FormList->size(); iForm++) {
 		const auto& form = (*FormList)[iForm];
 		if (form.type == SAT && form.satinGuideCount) {
 			auto guideIt = SatinGuides->cbegin() + form.satinOrAngle.guide;

@@ -51,7 +51,7 @@ void repair::internal::adbad(std::wstring& repairMessage, unsigned code, unsigne
 void repair::lodchk() {
 	thred::delinf();
 	auto& formList = *FormList;
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		SelectedForm = &formList[iForm];
 		if (!SelectedForm->type) {
 			SelectedForm->type = FRMFPOLY;
@@ -72,7 +72,7 @@ void repair::lodchk() {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 		}
 	}
-	auto formMap = boost::dynamic_bitset<>(FormIndex);
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		const auto attribute = StitchBuffer[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
@@ -86,7 +86,7 @@ void repair::lodchk() {
 			}
 		}
 	}
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (!formMap.test(iForm)) {
 			form.fillType = 0;
@@ -99,7 +99,7 @@ void repair::lodchk() {
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
 		}
 	}
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (!formMap.test(iForm)) {
 			form.edgeType = 0;
@@ -129,7 +129,7 @@ unsigned repair::internal::frmchkfn() {
 	auto badData = BADCNTS{};
 
 	if (!FormList->empty()) {
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			const auto& form = (*FormList)[iForm];
 			if (!(badData.attribute & BADFLT)) {
 				if (!form.vertexCount) {
@@ -207,7 +207,7 @@ void repair::internal::bcup(unsigned int find, BADCNTS& badData) {
 }
 
 void repair::internal::chkfstch() noexcept {
-	const auto codedFormIndex = FormIndex << FRMSHFT;
+	const auto codedFormIndex = FormList->size() << FRMSHFT;
 
 	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex) {
@@ -222,7 +222,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto  badData      = BADCNTS{};
 	auto& formList     = *FormList;
 
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (formList[iForm].vertexCount) {
 			formList[iDestination++] = formList[iForm];
 			vertexCount += formList[iForm].vertexCount;
@@ -232,7 +232,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto vertexPoint = std::vector<fPOINT>{};
 	auto iVertex     = 0u;
 	auto flag        = true;
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = formList[iForm];
 		// ToDo - find a better way than pointer arithmetic
 		const auto vertexDifference = form.vertexIndex;
@@ -282,7 +282,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	auto clipCount    = 0u;
 
 	auto clipPoint = std::vector<fPOINT>{};
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form           = (*FormList)[iForm];
 		auto  clipDifference = 0u;
 		if (clip::isclp(iForm)) {
@@ -357,7 +357,7 @@ void repair::internal::repsat() {
 	auto guideCount = 0u;
 	auto badData    = BADCNTS{};
 
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			// ToDo - pointer arithmetic to be fixed
@@ -394,7 +394,7 @@ void repair::internal::reptx() {
 	auto textureCount = 0u;
 	auto badData      = BADCNTS{};
 
-	for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
 			if (gsl::narrow<unsigned short>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {

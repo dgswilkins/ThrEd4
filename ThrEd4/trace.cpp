@@ -1066,7 +1066,7 @@ void trace::blak() {
 		if (!StateMap.test(StateFlag::WASTRAC)) {
 			ti::getrmap();
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			form::fvars(iForm);
 			ti::bfrm();
 		}

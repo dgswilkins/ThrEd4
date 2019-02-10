@@ -264,7 +264,7 @@ bool displayText::clpmsgs(unsigned code) {
 }
 
 void displayText::frm1pnt() {
-	if (FormIndex == 1) {
+	if (FormList->size() == 1) {
 		StateMap.set(StateFlag::FORMSEL);
 		ClosestFormToCursor = 0;
 	}

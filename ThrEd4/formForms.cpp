@@ -676,7 +676,7 @@ void formForms::frmnum() {
 
 	displayText::loadString(fmtStr, IDS_FRML);
 	if (!FormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
-		displayText::shoMsg(fmt::format(fmtStr, FormIndex));
+		displayText::shoMsg(fmt::format(fmtStr, FormList->size()));
 		StateMap.set(StateFlag::NUMIN);
 		StateMap.set(StateFlag::ENTRFNUM);
 		displayText::numWnd();
@@ -1094,7 +1094,7 @@ void formForms::setear() {
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(FormIndex);
+		form::frmout(FormList->size());
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			vertexIt[iVertex].x -= SelectedForm->rectangle.left;
 			vertexIt[iVertex].y -= SelectedForm->rectangle.bottom;
