@@ -5658,7 +5658,7 @@ void thred::internal::nuFil() {
 						StateMap.reset(StateFlag::BADFIL);
 						ClipPoints->clear();
 						FormVertices->clear();
-						satin::clearGuideSize();
+						SatinGuides->clear();
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
 						if (version < 2) {
@@ -6804,7 +6804,7 @@ void thred::internal::newFil() {
 	TexturePointsBuffer->clear();
 	TextureIndex = 0;
 	ClipPoints->clear();
-	satin::clearGuideSize();
+	SatinGuides->clear();
 	FormList->clear();
 	FormIndex    = 0;
 	ColorChanges = 0;
@@ -8156,7 +8156,7 @@ void thred::internal::deltot() {
 	FormList->clear();
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
-	satin::clearGuideSize();
+	SatinGuides->clear();
 	StateMap.reset(StateFlag::GMRK);
 	rstAll();
 	thred::coltab();

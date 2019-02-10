@@ -28,7 +28,6 @@
 namespace satin {
 
 unsigned int adsatk(unsigned int count) noexcept;
-void         clearGuideSize() noexcept;
 void         cpySat(const FRMHED& formHeader);
 void         delcon(unsigned GuideIndex);
 void         delsac(unsigned int formIndex);

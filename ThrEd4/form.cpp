@@ -545,7 +545,7 @@ void form::delfrms() {
 	FormVertices->clear();
 	ClipPoints->clear();
 	FormList->clear();
-	satin::clearGuideSize();
+	SatinGuides->clear();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].attribute &= NFRM_NTYP;
 		StitchBuffer[iStitch].attribute |= NOTFRM;
@@ -8053,7 +8053,7 @@ void form::frmnumfn(unsigned newFormIndex) {
 		tempClipPoints.reserve(ClipPoints->size());
 
 		auto formSourceIndex = 0u;
-		satin::clearGuideSize();
+		SatinGuides->clear();
 		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			if (iForm == newFormIndex) {
 				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex, formSourceIndex);
