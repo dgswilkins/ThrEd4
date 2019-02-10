@@ -7997,11 +7997,11 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	destination.vertexIndex = formSourceIndex;
 	formSourceIndex += destination.vertexCount;
 	if (destination.satinGuideCount) {
-		auto guideStart = std::next(SatinGuides->begin(), destination.satinOrAngle.guide);
-		auto guideEnd = std::next(guideStart, destination.satinGuideCount);
-		std::copy(guideStart, guideEnd, std::next(tempGuides.begin(), SatinGuides->size()));
-		destination.satinOrAngle.guide = SatinGuides->size();
-		satin::setGuideSize(SatinGuides->size() + destination.satinGuideCount);
+		auto guideStart = SatinGuides->cbegin() + destination.satinOrAngle.guide;
+		auto guideEnd = guideStart + destination.satinGuideCount;
+		tempGuides.insert(tempGuides.end(), guideStart, guideEnd);
+
+		destination.satinOrAngle.guide = tempGuides.size() - destination.satinGuideCount;
 	}
 	if (clip::iseclpx(formIndex)) {
 		const auto sourceStart = ClipPoints->begin() + destination.borderClipData;
@@ -8053,7 +8053,6 @@ void form::frmnumfn(unsigned newFormIndex) {
 		tempClipPoints.reserve(ClipPoints->size());
 
 		auto formSourceIndex = 0u;
-		SatinGuides->clear();
 		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			if (iForm == newFormIndex) {
 				fi::dufdat(tempClipPoints, tempGuides, tempFormVertices, tempFormList, ClosestFormToCursor, formRelocationIndex, formSourceIndex);
