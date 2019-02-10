@@ -180,7 +180,7 @@ unsigned repair::internal::frmchkfn() {
 		if (badData.clip != ClipPoints->size()) {
 			badData.attribute |= BADCLP;
 		}
-		if (badData.guideCount != satin::getGuideSize()) {
+		if (badData.guideCount != SatinGuides->size()) {
 			badData.attribute |= BADSAT;
 		}
 		if (badData.tx != TextureIndex) {

@@ -1347,8 +1347,8 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-	                  + sizeof((*FormVertices)[0]) * FormVertices->size() + sizeof((*ClipPoints)[0]) * ClipPoints->size()
-	                  + sizeof(SatinGuides[0]) * satin::getGuideSize() + sizeof(UserColor)
+	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size() + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
+	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	auto backupData                  = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
@@ -1382,7 +1382,7 @@ void thred::internal::dudat() {
 			          stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
 		}
 		backupData->clipPointCount = ClipPoints->size();
-		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[satin::getGuideSize()]);
+		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 		if (!ClipPoints->empty()) {
 			std::copy(ClipPoints->cbegin(),
 			          ClipPoints->cend(),
@@ -8678,7 +8678,7 @@ void thred::internal::insfil() {
 					InsertedFormIndex      = FormList->size();
 					if (fileHeader.formCount) {
 						auto newFormVertexIndex = FormVertices->size();
-						auto newSatinGuideIndex = satin::getGuideSize();
+						auto newSatinGuideIndex = SatinGuides->size();
 						auto clipOffset         = ClipPoints->size();
 						auto textureOffset      = TexturePointsBuffer->size();
 						if (version < 2) {
@@ -8789,7 +8789,7 @@ void thred::internal::insfil() {
 						if (newFormVertexIndex != FormVertices->size()) {
 							StateMap.set(StateFlag::BADFIL);
 						}
-						if (newSatinGuideIndex != satin::getGuideSize()) {
+						if (newSatinGuideIndex != SatinGuides->size()) {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						if (clipOffset != ClipPoints->size()) {

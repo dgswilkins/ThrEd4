@@ -1493,10 +1493,6 @@ void satin::cpySat(const FRMHED& formHeader) {
 	}
 }
 
-unsigned int satin::getGuideSize() noexcept {
-	return SatinGuideIndex;
-}
-
 void satin::clearGuideSize() noexcept {
 	SatinGuideIndex = 0;
 }
