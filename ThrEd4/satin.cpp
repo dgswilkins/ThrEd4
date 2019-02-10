@@ -1490,7 +1490,3 @@ void satin::cpySat(const FRMHED& formHeader) {
 		std::copy(sourceStart, sourceEnd, destination);
 	}
 }
-
-void satin::setGuideSize(unsigned int newGuideSize) noexcept {
-	SatinGuideIndex = newGuideSize;
-}

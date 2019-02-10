@@ -261,7 +261,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			else {
 				FormIndex = iForm;
 				ClipPoints->resize(badData.clip);
-				satin::setGuideSize(badData.guideCount);
+				SatinGuides->resize(badData.guideCount);
 				TextureIndex = badData.tx;
 				ri::chkfstch();
 				ri::adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
@@ -360,7 +360,6 @@ void repair::internal::repsat() {
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
-			// ToDo - pointer arithmetic to be fixed
 			const auto guideDifference = form.satinOrAngle.guide;
 			if (FormVertices->size() > guideDifference + form.vertexCount) {
 				auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
@@ -387,7 +386,7 @@ void repair::internal::repsat() {
 			}
 		}
 	}
-	satin::setGuideSize(guideCount);
+	SatinGuides->resize(guideCount);
 }
 
 void repair::internal::reptx() {

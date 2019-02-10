@@ -46,7 +46,6 @@ void         satpnt1();
 void         satsel();
 void         satzum();
 void         sbrd();
-void         setGuideSize(unsigned int newGuideSize) noexcept;
 void         slbrd();
 void         spltsat(SATCON currentGuide);
 
