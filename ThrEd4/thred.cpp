@@ -8692,7 +8692,7 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto form : inFormList) {
+							for (auto& form : inFormList) {
 								FormList->push_back(FRMHED{ form });
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -8706,7 +8706,7 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(inFormList[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto form : inFormList) {
+							for (auto& form : inFormList) {
 								FormList->push_back(FRMHED{ form });
 							}
 							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
@@ -8727,6 +8727,7 @@ void thred::internal::insfil() {
 						else {
 							StateMap.set(StateFlag::BADFIL);
 						}
+						auto guideOffset = SatinGuides->size();
 						if (fileHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>{};
 							inSatinGuides.resize(fileHeader.dlineCount);
@@ -8736,7 +8737,9 @@ void thred::internal::insfil() {
 								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							std::copy(inSatinGuides.cbegin(), inSatinGuides.cend(), SatinGuides->begin());
+							for (auto& guide : inSatinGuides) {
+								SatinGuides->push_back(SATCON{ guide });
+							}
 							newSatinGuideIndex += gsl::narrow<unsigned int>(inSatinGuides.size());
 						}
 						if (fileHeader.clipDataCount) {
@@ -8771,7 +8774,8 @@ void thred::internal::insfil() {
 							vertexOffset += formIter.vertexCount;
 							if (formIter.type == SAT) {
 								if (formIter.satinGuideCount) {
-									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
+									formIter.satinOrAngle.guide = guideOffset;
+									guideOffset += formIter.satinGuideCount;
 								}
 							}
 							if (clip::isclp(iFormList)) {
