@@ -1347,7 +1347,8 @@ void thred::internal::dudat() {
 	const auto     formCount = formList.size();
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
-	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size() + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
+	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
+	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
 	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
@@ -3797,7 +3798,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			}
 			if (srcForm.type == SAT) {
 				outForms.back().satinGuideCount = gsl::narrow<unsigned short>(srcForm.satinGuideCount);
-				auto guideIt = SatinGuides->cbegin() + srcForm.satinOrAngle.guide;
+				auto guideIt                    = SatinGuides->cbegin() + srcForm.satinOrAngle.guide;
 				for (auto iGuide = 0u; iGuide < srcForm.satinGuideCount; iGuide++) {
 					guides.push_back(SATCONOUT{ guideIt[iGuide] });
 				}
@@ -5668,7 +5669,7 @@ void thred::internal::nuFil() {
 							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != thredHeader.formCount * sizeof(formListOriginal[0])) {
 								thredHeader.formCount = BytesRead / sizeof(formListOriginal[0]);
-								FormIndex = thredHeader.formCount;
+								FormIndex             = thredHeader.formCount;
 								formListOriginal.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5683,7 +5684,7 @@ void thred::internal::nuFil() {
 							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								thredHeader.formCount = BytesRead / sizeof(inFormList[0]);
-								FormIndex = thredHeader.formCount;
+								FormIndex             = thredHeader.formCount;
 								inFormList.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
@@ -5748,7 +5749,7 @@ void thred::internal::nuFil() {
 						// now re-create all the pointers/indexes in the form data
 						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
-						auto guideOffset = 0u;
+						auto guideOffset  = 0u;
 						for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 							auto& form       = (*FormList)[iForm];
 							form.vertexIndex = vertexOffset;
@@ -8154,7 +8155,7 @@ void thred::internal::setsped() {
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
 	TextureIndex = 0;
-	FormIndex = 0;
+	FormIndex    = 0;
 	FormList->clear();
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
@@ -8196,21 +8197,21 @@ void thred::internal::delet() {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
 		// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
-		auto vertexMap = boost::dynamic_bitset<>(VertexCount);
+		auto vertexMap         = boost::dynamic_bitset<>(VertexCount);
 		auto currentFormVertex = SelectedFormVertices.start;
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			vertexMap.set(currentFormVertex);
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt     = FormVertices->begin() + CurrentVertexIndex;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
 		auto eraseStart = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + currentFormVertex);
-		auto eraseEnd = eraseStart + (VertexCount - currentFormVertex);
+		auto eraseEnd   = eraseStart + (VertexCount - currentFormVertex);
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		const auto nextForm = gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1;
 		for (auto iForm = std::next(FormList->begin(), nextForm); iForm < FormList->end(); iForm++) {
@@ -8222,13 +8223,13 @@ void thred::internal::delet() {
 			// Make sure the end guides are still valid
 			if (vertexMap.test(0) || vertexMap.test(1)) {
 				SelectedForm->wordParam = 0;
-				SatinEndGuide = 0;
+				SatinEndGuide           = 0;
 				SelectedForm->attribute &= 0xfe;
 			}
 			const auto iNext = SelectedForm->wordParam + 1;
 			if (vertexMap.test(SelectedForm->wordParam) || vertexMap.test(iNext)) {
 				SelectedForm->wordParam = 0;
-				SatinEndGuide = 0;
+				SatinEndGuide           = 0;
 			}
 
 			// ToDo - Is there a better way to do this than iterating through?
@@ -8716,7 +8717,7 @@ void thred::internal::insfil() {
 							auto inFormVertices = std::vector<fPOINT>{};
 							inFormVertices.resize(fileHeader.vertexCount);
 							auto bytesToRead
-								= gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inFormVertices.back())));
+							    = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inFormVertices.back())));
 							ReadFile(InsertedFileHandle, inFormVertices.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
 								inFormVertices.resize(BytesRead / sizeof(decltype(inFormVertices.back())));
@@ -8804,10 +8805,10 @@ void thred::internal::insfil() {
 
 						TextureIndex = textureOffset;
 						if (fileHeader.formCount) {
-							insertedRectangle.left = (*FormVertices)[InsertedVertexIndex].x;
-							insertedRectangle.right = (*FormVertices)[InsertedVertexIndex].x;
+							insertedRectangle.left   = (*FormVertices)[InsertedVertexIndex].x;
+							insertedRectangle.right  = (*FormVertices)[InsertedVertexIndex].x;
 							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
-							insertedRectangle.top = (*FormVertices)[InsertedVertexIndex].y;
+							insertedRectangle.top    = (*FormVertices)[InsertedVertexIndex].y;
 							for (auto iVertex = InsertedVertexIndex + 1; iVertex < FormVertices->size(); iVertex++) {
 								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
 									insertedRectangle.left = (*FormVertices)[iVertex].x;
@@ -15292,7 +15293,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[FormIndex + iForm]);
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
-									auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
+									auto guideIt                     = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 									for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 										guideIt[iGuide] = guides[currentGuide++];
 									}
@@ -18844,11 +18845,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.push_back(L"");
 		}
-		PreviousNames                    = &private_PreviousNames;
-		auto private_DesignerName        = std::wstring{};
-		DesignerName                     = &private_DesignerName;
-		auto private_SatinGuides = std::vector<SATCON>{};
-		SatinGuides = &private_SatinGuides;
+		PreviousNames             = &private_PreviousNames;
+		auto private_DesignerName = std::wstring{};
+		DesignerName              = &private_DesignerName;
+		auto private_SatinGuides  = std::vector<SATCON>{};
+		SatinGuides               = &private_SatinGuides;
 
 		auto private_AuxName             = fs::path{};
 		auto private_ThrName             = fs::path{};

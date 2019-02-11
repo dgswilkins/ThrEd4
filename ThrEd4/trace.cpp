@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentVertexIndex  = FormVertices->size();
+		CurrentVertexIndex   = FormVertices->size();
 		auto vertexIt        = FormVertices->begin() + CurrentVertexIndex;
 		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
 		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;

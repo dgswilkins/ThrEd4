@@ -139,9 +139,9 @@ extern fPOINT       FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
-extern HPEN      FormPen3px;
-extern HPEN      FormPen;
-extern HPEN      FormSelectedPen;
+extern HPEN FormPen3px;
+extern HPEN FormPen;
+extern HPEN FormSelectedPen;
 
 extern std::vector<fPOINT>* FormVertices;
 
@@ -208,15 +208,15 @@ extern std::vector<POINT>* RubberBandLine;
 
 extern unsigned int SatinEndGuide;
 
-extern std::vector<SATCON>*       SatinGuides;
+extern std::vector<SATCON>* SatinGuides;
 
-extern RECT         scRct;
-extern unsigned*    screenDPI;
-extern int*         ScrollSize;
-extern unsigned     SearchLineIndex;
-extern HPEN         SelectAllPen;
-extern FRMHED*      SelectedForm;
-extern unsigned     SelectedFormControlVertex;
+extern RECT      scRct;
+extern unsigned* screenDPI;
+extern int*      ScrollSize;
+extern unsigned  SearchLineIndex;
+extern HPEN      SelectAllPen;
+extern FRMHED*   SelectedForm;
+extern unsigned  SelectedFormControlVertex;
 
 extern std::vector<unsigned int>* SelectedFormList;
 extern FORMVERTICES               SelectedFormVertices;

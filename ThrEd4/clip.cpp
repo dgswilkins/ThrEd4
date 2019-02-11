@@ -134,9 +134,9 @@ void clip::deleclp(unsigned int iForm) {
 			auto eraseEnd   = eraseStart + form.clipEntries;
 			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
-			form.clipEntries = 0;
+			form.clipEntries    = 0;
 			form.borderClipData = 0;
-			form.edgeType = 0;
+			form.edgeType       = 0;
 		}
 	}
 }
@@ -229,7 +229,7 @@ void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
 
 void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	if (!ClipBuffer->empty()) {
-		const auto midpoint = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
+		const auto midpoint   = (ClipRect.right - ClipRect.left) / 2 + ClipRect.left;
 		auto&      clipBuffer = *ClipBuffer;
 
 		if (clipBuffer[0].x > midpoint) {

@@ -51,8 +51,8 @@ void         spltsat(SATCON currentGuide);
 
 namespace internal {
 
-	bool     chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
-	void     filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex);
+	bool chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
+	void filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex);
 
 	unsigned int nusac(unsigned int formIndex, unsigned guideCount);
 

@@ -242,7 +242,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertexIndex          = iVertex;
+			form.vertexIndex       = iVertex;
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
@@ -270,7 +270,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			}
 		}
 	}
-	//ToDo - is this needed?
+	// ToDo - is this needed?
 	if (flag) {
 		FormVertices->resize(iVertex);
 	}
@@ -363,7 +363,7 @@ void repair::internal::repsat() {
 			const auto guideDifference = form.satinOrAngle.guide;
 			if (FormVertices->size() > guideDifference + form.vertexCount) {
 				auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
-				auto       sourceEnd = sourceStart + form.satinGuideCount;
+				auto       sourceEnd   = sourceStart + form.satinGuideCount;
 				const auto destination = SatinGuides->begin() + guideCount;
 				std::copy(sourceStart, sourceEnd, destination);
 				form.satinOrAngle.guide = guideCount;
@@ -372,9 +372,9 @@ void repair::internal::repsat() {
 			}
 			else {
 				if (guideDifference < SatinGuides->size()) {
-					form.satinGuideCount = gsl::narrow<unsigned short>(SatinGuides->size() - guideDifference);
+					form.satinGuideCount   = gsl::narrow<unsigned short>(SatinGuides->size() - guideDifference);
 					auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
-					auto       sourceEnd = sourceStart + form.satinGuideCount;
+					auto       sourceEnd   = sourceStart + form.satinGuideCount;
 					const auto destination = SatinGuides->begin() + guideCount;
 					std::copy(sourceStart, sourceEnd, destination);
 					ri::bcup(iForm, badData);

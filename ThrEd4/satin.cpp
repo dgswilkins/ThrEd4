@@ -47,7 +47,7 @@ void satin::delsac(unsigned int formIndex) {
 	if (!SatinGuides->empty()) {
 		if (formList[formIndex].type == SAT && (formList[formIndex].satinGuideCount != 0u)) {
 			auto eraseStart = SatinGuides->cbegin() + formList[formIndex].satinOrAngle.guide;
-			auto eraseEnd = eraseStart + formList[formIndex].satinGuideCount;
+			auto eraseEnd   = eraseStart + formList[formIndex].satinGuideCount;
 			SatinGuides->erase(eraseStart, eraseEnd);
 			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
 				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0u)) {
@@ -92,12 +92,12 @@ void satin::spltsat(SATCON currentGuide) {
 	auto& formList = *FormList;
 
 	auto& srcForm = formList[ClosestFormToCursor];
-	auto  dest = std::next(formList.begin(), ClosestFormToCursor);
+	auto  dest    = std::next(formList.begin(), ClosestFormToCursor);
 	formList.insert(dest, srcForm);
 	form::fvars(ClosestFormToCursor);
 	FormIndex++;
-	const auto maxForm = formList.size();
-	auto position = std::next(FormVertices->begin(), CurrentVertexIndex + VertexCount);
+	const auto maxForm  = formList.size();
+	auto       position = std::next(FormVertices->begin(), CurrentVertexIndex + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		formList[iForm].vertexIndex += 2;
@@ -141,7 +141,7 @@ void satin::spltsat(SATCON currentGuide) {
 	form::frmout(ClosestFormToCursor + 1);
 	auto iNewGuide = 1;
 	iNewGuide += currentGuide.start - currentGuide.finish;
-	auto iGuide = 0u;
+	auto iGuide  = 0u;
 	auto guideIt = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 	for (iGuide = 0u; iGuide < ActivePointIndex; iGuide++) {
 		guideIt[iGuide].finish += iNewGuide;
@@ -159,10 +159,10 @@ void satin::spltsat(SATCON currentGuide) {
 		nextForm.wordParam -= (currentGuide.start - 1);
 	}
 	const auto offset = SelectedForm->satinOrAngle.guide + iNewGuide - 1;
-	auto       pos = std::next(SatinGuides->begin(), offset);
+	auto       pos    = std::next(SatinGuides->begin(), offset);
 	SatinGuides->erase(pos);
-	nextForm.satinOrAngle.guide = SelectedForm->satinOrAngle.guide + ActivePointIndex;
-	nextForm.satinGuideCount = SelectedForm->satinGuideCount - ActivePointIndex - 1;
+	nextForm.satinOrAngle.guide   = SelectedForm->satinOrAngle.guide + ActivePointIndex;
+	nextForm.satinGuideCount      = SelectedForm->satinGuideCount - ActivePointIndex - 1;
 	SelectedForm->satinGuideCount = ActivePointIndex;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		auto& formIter = formList[iForm];
@@ -321,7 +321,7 @@ void satin::satsel() {
 
 void satin::internal::satcpy(const std::vector<SATCON>& source, unsigned int size) {
 	auto eraseStart = SatinGuides->cbegin() + CurrentFormGuides;
-	auto eraseEnd = eraseStart + (CurrentFormGuidesCount - size);
+	auto eraseEnd   = eraseStart + (CurrentFormGuidesCount - size);
 	SatinGuides->erase(eraseStart, eraseEnd);
 	auto guideIt = SatinGuides->begin() + CurrentFormGuides; // iterator may be invalidated by erase
 	std::copy(source.begin(), source.end(), guideIt);
@@ -336,7 +336,7 @@ void satin::satadj() {
 	auto satinMap        = ExtendedBitSet<>(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
-	auto       guideIt = SatinGuides->begin() + CurrentFormGuides;
+	auto guideIt = SatinGuides->begin() + CurrentFormGuides;
 	for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 		const auto endCount = (VertexCount - 1);
 		if (guideIt[iGuide].finish > endCount) {
@@ -398,7 +398,7 @@ void satin::satadj() {
 				OutputDebugString(fmt::format(L"Removed {} reversed guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
 				si::satcpy(interiorGuides, iDestination);
 				SelectedForm->satinGuideCount = iDestination;
-				CurrentFormGuidesCount = iDestination;
+				CurrentFormGuidesCount        = iDestination;
 			}
 		}
 	}
@@ -442,7 +442,7 @@ void satin::satadj() {
 				}
 			}
 		}
-		auto iGuide = 0u;
+		auto iGuide  = 0u;
 		auto iVertex = 0u;
 		do {
 			iVertex = gsl::narrow<unsigned int>(satinMap.getFirst());
@@ -464,7 +464,7 @@ void satin::satadj() {
 				if (iForward < VertexCount - 1) {
 					iForward++;
 				}
-				if (iReverse > (SatinEndGuide) +1) {
+				if (iReverse > (SatinEndGuide) + 1) {
 					iReverse--;
 				}
 				while (satinMap.test(iForward) && iForward < VertexCount - 1) {
@@ -494,7 +494,7 @@ void satin::satadj() {
 				}
 			}
 		}
-		iGuide = 0u;
+		iGuide        = 0u;
 		auto iReverse = 0u;
 		do {
 			iReverse = gsl::narrow<unsigned int>(satinMap.getLast());
@@ -532,7 +532,7 @@ void satin::satadj() {
 
 void satin::delcon(unsigned GuideIndex) {
 	const auto offset = SelectedForm->satinOrAngle.guide + GuideIndex;
-	auto       guide = SatinGuides->cbegin() + offset;
+	auto       guide  = SatinGuides->cbegin() + offset;
 
 	SatinGuides->erase(guide);
 	for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
@@ -1468,9 +1468,9 @@ bool satin::internal::chkbak(const std::vector<dPOINT>& satinBackup, const dPOIN
 }
 
 unsigned int satin::adsatk(unsigned int count) noexcept {
-	auto iSatinConnect = gsl::narrow<unsigned int>(SatinGuides->size());
-	const auto it = SatinGuides->end();
-	const auto val = SATCON{};
+	auto       iSatinConnect = gsl::narrow<unsigned int>(SatinGuides->size());
+	const auto it            = SatinGuides->end();
+	const auto val           = SATCON{};
 	SatinGuides->insert(it, count, val);
 
 	return iSatinConnect;
@@ -1481,7 +1481,7 @@ void satin::cpySat(const FRMHED& formHeader) {
 		SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 
 		auto       sourceStart = SatinGuides->cbegin() + formHeader.satinOrAngle.guide;
-		auto       sourceEnd = sourceStart + SelectedForm->satinGuideCount;
+		auto       sourceEnd   = sourceStart + SelectedForm->satinGuideCount;
 		const auto destination = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
 		std::copy(sourceStart, sourceEnd, destination);
 	}

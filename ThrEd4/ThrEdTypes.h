@@ -1065,13 +1065,13 @@ public:
 };
 
 inline SATCON::SATCON() noexcept {
-	start = 0u;
+	start  = 0u;
 	finish = 0u;
 }
 
 inline SATCON::SATCON(unsigned int rStart, unsigned int rFinish) noexcept
-	: start(rStart)
-	, finish(rFinish) {
+    : start(rStart)
+    , finish(rFinish) {
 }
 
 class SATCONOUT
@@ -1108,12 +1108,12 @@ inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
 }
 
 inline SATCON::SATCON(const SATCONOUT& rhs) noexcept {
-	start = rhs.start;
+	start  = rhs.start;
 	finish = rhs.finish;
 }
 
 inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
-	start = rhs.start;
+	start  = rhs.start;
 	finish = rhs.finish;
 
 	return *this;
@@ -1224,7 +1224,7 @@ union SATINANGLEOUT;
 union SATINANGLE {
 public:
 	unsigned int guide;
-	float   angle;
+	float        angle;
 
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };

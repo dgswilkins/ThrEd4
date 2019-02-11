@@ -76,23 +76,23 @@ CLPSTCH*   ClipStitchData; // for pcs clipboard data
 
 unsigned ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
-unsigned int    ClosestFormToCursor;    // closest form to the cursor
-unsigned        ClosestPointIndex;      // index of closest point
-unsigned int    ClosestVertexToCursor;  // formOrigin closest to the cursor
-int*            ColorBarSize;           // Color bar width scaled for DPI
-HCURSOR         CrossCursor;            // cross
-unsigned int    CurrentFormGuides;      // guide index in the currently selected form
-unsigned int    CurrentFormGuidesCount; // number of guides in the currently selected form
-unsigned int    CurrentVertexIndex;     // points in the currently selected form
+unsigned int ClosestFormToCursor;    // closest form to the cursor
+unsigned     ClosestPointIndex;      // index of closest point
+unsigned int ClosestVertexToCursor;  // formOrigin closest to the cursor
+int*         ColorBarSize;           // Color bar width scaled for DPI
+HCURSOR      CrossCursor;            // cross
+unsigned int CurrentFormGuides;      // guide index in the currently selected form
+unsigned int CurrentFormGuidesCount; // number of guides in the currently selected form
+unsigned int CurrentVertexIndex;     // points in the currently selected form
 
-std::vector<HWND>*            DefaultColorWin;    // default color windows
+std::vector<HWND>* DefaultColorWin; // default color windows
 
-HWND            DeleteStitchesDialog;   // asking user if they want to delete the sitches associated with a form
-std::wstring*   DesignerName;           // designer name in clear
-HWND            DiscardButton;          // discard button
-DRAWITEMSTRUCT* DrawItem;               // for owner-draw windows
-POINT           EndPointCross;          // point to draw at the end cross for form select points
-HMENU           FillMenu;               // fill submenu
+HWND            DeleteStitchesDialog; // asking user if they want to delete the sitches associated with a form
+std::wstring*   DesignerName;         // designer name in clear
+HWND            DiscardButton;        // discard button
+DRAWITEMSTRUCT* DrawItem;             // for owner-draw windows
+POINT           EndPointCross;        // point to draw at the end cross for form select points
+HMENU           FillMenu;             // fill submenu
 
 std::vector<double>* FormAngles;        // angles of a form for satin border fills
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
@@ -106,24 +106,24 @@ fPOINT               FormMoveDelta;           // offset for moving forms
 
 std::wstring* FormOnOff;
 
-HPEN      FormPen;                // form pen
-HPEN      FormPen3px;             // three-pixel form pen
-HPEN      FormSelectedPen;        // form select pen
+HPEN FormPen;         // form pen
+HPEN FormPen3px;      // three-pixel form pen
+HPEN FormSelectedPen; // form select pen
 
 std::vector<fPOINT>* FormVertices; // form points
 
-HWND      GeneralNumberInputBox;  // general number input box
-HPEN      GridPen;                // pen for stitch grid
-unsigned  GroupEndStitch;         // higher end of selected stitches
-unsigned  GroupStartStitch;       // lower end of selected stitches
-unsigned  GroupStitchIndex;       // last point selected in group
-fs::path* HomeDirectory;          // directory from which thred was executed
-double    HorizontalLength;       // horizontal length of a clipboard fill
-double    HorizontalLength2;      // horizontal length of a clipboard fill/2
-double    HorizontalRatio;        // horizontal ratio between the zoom window and the entire stitch space
-HWND      HorizontalScrollBar;    // horizontal scroll bar
-INIFILE   IniFile;                // initialization file
-POINT     InsertLine[3];          // the insert line
+HWND      GeneralNumberInputBox; // general number input box
+HPEN      GridPen;               // pen for stitch grid
+unsigned  GroupEndStitch;        // higher end of selected stitches
+unsigned  GroupStartStitch;      // lower end of selected stitches
+unsigned  GroupStitchIndex;      // last point selected in group
+fs::path* HomeDirectory;         // directory from which thred was executed
+double    HorizontalLength;      // horizontal length of a clipboard fill
+double    HorizontalLength2;     // horizontal length of a clipboard fill/2
+double    HorizontalRatio;       // horizontal ratio between the zoom window and the entire stitch space
+HWND      HorizontalScrollBar;   // horizontal scroll bar
+INIFILE   IniFile;               // initialization file
+POINT     InsertLine[3];         // the insert line
 
 std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
 std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
@@ -173,17 +173,17 @@ fRECTANGLE     RotationRect;                      // rotation rectangle
 
 std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
-unsigned int SatinEndGuide;             // satin end guide for the currently selected form
+unsigned int SatinEndGuide; // satin end guide for the currently selected form
 
-std::vector<SATCON>*       SatinGuides;       // satin form connects
+std::vector<SATCON>* SatinGuides; // satin form connects
 
-RECT         scRct;                     //
-unsigned*    screenDPI;                 // screen DPI
-int*         ScrollSize;                // Scroll bar width scaled for DPI
-unsigned     SearchLineIndex = 0;       // pointer for drawing stitch select lines
-HPEN         SelectAllPen;              // pen for drawing large boxes
-FRMHED*      SelectedForm;              // pointer to selected form
-unsigned     SelectedFormControlVertex; // user selected form control formOrigin
+RECT      scRct;                     //
+unsigned* screenDPI;                 // screen DPI
+int*      ScrollSize;                // Scroll bar width scaled for DPI
+unsigned  SearchLineIndex = 0;       // pointer for drawing stitch select lines
+HPEN      SelectAllPen;              // pen for drawing large boxes
+FRMHED*   SelectedForm;              // pointer to selected form
+unsigned  SelectedFormControlVertex; // user selected form control formOrigin
 
 std::vector<unsigned int>* SelectedFormList;     // a list of selected forms
 FORMVERTICES               SelectedFormVertices; // selected form vertices

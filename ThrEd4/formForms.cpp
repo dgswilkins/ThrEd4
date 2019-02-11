@@ -1171,9 +1171,9 @@ void formForms::wavfrm() {
 		// reuse regular polygon code to build the template for points
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
-		auto iPoint     = 0u;
-		auto waveIndex  = IniFile.waveStart;
-		auto vertexIt   = FormVertices->begin() + CurrentVertexIndex;
+		auto iPoint    = 0u;
+		auto waveIndex = IniFile.waveStart;
+		auto vertexIt  = FormVertices->begin() + CurrentVertexIndex;
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
