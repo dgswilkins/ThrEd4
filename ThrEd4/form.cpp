@@ -7497,11 +7497,11 @@ void form::join() {
 
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
-		const auto& formIter   = (*FormList)[ClosestFormToCursor];
+		auto formIter = FormList->begin() + ClosestFormToCursor;
 		auto        vertexList = std::vector<fPOINT>{};
-		vertexList.resize(formIter.vertexCount);
-		auto vertexIt = FormVertices->begin() + formIter.vertexIndex;
-		for (auto iVertex = 0u; iVertex < formIter.vertexCount; iVertex++) {
+		vertexList.resize(formIter->vertexCount);
+		auto vertexIt = FormVertices->cbegin() + formIter->vertexIndex;
+		for (auto iVertex = 0u; iVertex < formIter->vertexCount; iVertex++) {
 			vertexList[iVertex]   = vertexIt[ClosestVertexToCursor];
 			ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
 		}
@@ -7513,31 +7513,15 @@ void form::join() {
 		else {
 			ClosestFormToCursor = savedFormIndex;
 		}
-		const auto insertedVertex = formIter.vertexIndex + formIter.vertexCount;
-		form::fltspac(insertedVertex, formIter.vertexCount);
-		SelectedForm->vertexCount += formIter.vertexCount;
-		vertexIt = FormVertices->begin() + insertedVertex;
-		for (auto iVertex = 0u; iVertex < formIter.vertexCount; iVertex++) {
-			vertexIt[iVertex] = vertexList[iVertex];
-		}
+		formIter = FormList->begin() + ClosestFormToCursor; // formIter possibly invalidated by frmdel
+		const auto insertionPoint = formIter->vertexIndex + formIter->vertexCount;
+		form::fltspac(formIter->vertexCount, vertexList.size());
+		auto dest = FormVertices->begin() + insertionPoint;
+		std::copy(vertexList.begin(), vertexList.end(), dest);
 		SelectedForm = &((*FormList)[ClosestFormToCursor]);
-		vertexIt                     = FormVertices->begin() + SelectedForm->vertexIndex;
-		SelectedForm->rectangle.left = SelectedForm->rectangle.right = vertexIt[0].x;
-		SelectedForm->rectangle.top = SelectedForm->rectangle.bottom = vertexIt[0].y;
-		for (auto iVertex = 1u; iVertex < SelectedForm->vertexCount; iVertex++) {
-			if (vertexIt[iVertex].x < SelectedForm->rectangle.left) {
-				SelectedForm->rectangle.left = vertexIt[iVertex].x;
-			}
-			if (vertexIt[iVertex].x > SelectedForm->rectangle.right) {
-				SelectedForm->rectangle.right = vertexIt[iVertex].x;
-			}
-			if (vertexIt[iVertex].y > SelectedForm->rectangle.top) {
-				SelectedForm->rectangle.top = vertexIt[iVertex].y;
-			}
-			if (vertexIt[iVertex].y < SelectedForm->rectangle.bottom) {
-				SelectedForm->rectangle.bottom = vertexIt[iVertex].y;
-			}
-		}
+		vertexIt = FormVertices->cbegin() + SelectedForm->vertexIndex;
+		SelectedForm->vertexCount += vertexList.size();
+		form::frmout(ClosestFormToCursor);
 		form::refil();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
