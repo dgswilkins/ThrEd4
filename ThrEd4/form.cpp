@@ -8519,7 +8519,7 @@ void form::stchs2frm() {
 			vertexIt[iVertex].x   = StitchBuffer[iStitch].x;
 			vertexIt[iVertex++].y = StitchBuffer[iStitch].y;
 		}
-		form::frmout(FormList->size());
+		form::frmout(FormList->size() - 1u);
 		FormIndex++;
 		if (ClosestPointIndex > GroupStitchIndex) {
 			if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
