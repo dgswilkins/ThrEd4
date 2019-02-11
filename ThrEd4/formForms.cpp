@@ -1094,7 +1094,7 @@ void formForms::setear() {
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(FormList->size());
+		form::frmout(FormList->size() - 1u);
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			vertexIt[iVertex].x -= SelectedForm->rectangle.left;
 			vertexIt[iVertex].y -= SelectedForm->rectangle.bottom;
