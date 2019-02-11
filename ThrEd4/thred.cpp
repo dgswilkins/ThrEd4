@@ -6859,8 +6859,10 @@ void thred::internal::rebox() {
 void thred::delstchm() {
 	thred::rngadj();
 	auto destination = GroupStartStitch;
-	for (auto iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-		StitchBuffer[destination++] = StitchBuffer[iStitch];
+	if ((GroupEndStitch + 1u) < PCSHeader.stitchCount) {
+		for (auto iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
+			StitchBuffer[destination++] = StitchBuffer[iStitch];
+		}
 	}
 	PCSHeader.stitchCount = gsl::narrow<unsigned short>(destination);
 }
