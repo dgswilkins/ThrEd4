@@ -23,38 +23,38 @@
 #include "switches.h"
 #include "wrappers.h"
 
-void PolylineInt(HDC hdc, CONST POINT* apt, unsigned int cpt) {
+void PolylineInt(HDC hdc, CONST POINT* apt, unsigned int cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int>(cpt));
 }
 
-void WriteFileInt(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) {
+void WriteFileInt(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-bool ReadFileInt(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) {
+bool ReadFileInt(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
 	return ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped);
 }
 
-void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) {
+void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) noexcept {
 	GetTextExtentPoint32(hdc, lpString, gsl::narrow<int>(c), lpSize);
 }
 
-void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString) {
+void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString) noexcept {
 	TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int>(cchString));
 }
 
-void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) {
+void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept {
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
 
-long dToL(double invar) {
+long dToL(double invar) noexcept {
 	return gsl::narrow<long>(std::round(invar));
 }
-unsigned int dToUI(double invar) {
+unsigned int dToUI(double invar) noexcept {
 	return gsl::narrow<unsigned int>(std::round(invar));
 }
 
-long fToL(float invar) {
+long fToL(float invar) noexcept {
 	return gsl::narrow<long>(std::round(invar));
 }
 

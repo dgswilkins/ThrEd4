@@ -299,7 +299,7 @@ void texture::dutxtfil() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
+void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) noexcept {
 	screenPoint.x = dToL((static_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
 	                     / TextureScreen.editToPixelRatio);
 	screenPoint.y
@@ -332,7 +332,7 @@ void texture::internal::dutxtx(unsigned int index, unsigned short offsetPixels) 
 	txi::txtxfn(ref, offsetPixels);
 }
 
-void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
+void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) noexcept {
 	auto texturePoint = TXPNT{ textureRect.top, textureRect.left };
 	auto point        = POINT{};
 
@@ -346,7 +346,7 @@ void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
 	rectangle.bottom = point.y + IniFile.textureEditorSize;
 }
 
-void texture::internal::ed2px(const fPOINT& editPoint, POINT& point) {
+void texture::internal::ed2px(const fPOINT& editPoint, POINT& point) noexcept {
 	point.x = dToL(editPoint.x / TextureScreen.editToPixelRatio);
 	point.y = dToL(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
 }
@@ -671,7 +671,7 @@ void texture::internal::stxlin() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
+void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) noexcept {
 	auto point = fPOINT{};
 
 	txi::px2ed(offset, point);
@@ -1175,7 +1175,7 @@ void texture::internal::dutxfn(unsigned textureType) {
 void texture::internal::dutxmir() {
 	if (!TempTexturePoints->empty()) {
 		const auto centerLine = (TextureScreen.lines + 1u) >> 1;
-		auto       evenOffset = 1u - (TextureScreen.lines & 1);
+		const auto evenOffset = 1u - (TextureScreen.lines & 1);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
 		auto iPoint = TempTexturePoints->size() - 1;
@@ -1377,7 +1377,7 @@ void texture::internal::txgro(FRMHED& textureForm) {
 	txi::txsiz(1 / TXTRAT, textureForm);
 }
 
-bool texture::internal::txdig(unsigned keyCode, char& character) {
+bool texture::internal::txdig(unsigned keyCode, char& character) noexcept {
 	if (isdigit(keyCode)) {
 		character = gsl::narrow<char>(keyCode);
 		return true;

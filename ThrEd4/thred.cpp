@@ -1266,7 +1266,7 @@ void thred::internal::fndknt() noexcept {
 	}
 }
 
-void thred::coltab() {
+void thred::coltab() noexcept {
 	ColorChanges   = 0;
 	auto endStitch = PCSHeader.stitchCount;
 	if (endStitch) {
@@ -1781,13 +1781,13 @@ void thred::shft(const fPOINT& delta) noexcept {
 	thi::zRctAdj();
 }
 
-void thred::internal::stch2px1(unsigned iStitch) {
+void thred::internal::stch2px1(unsigned iStitch) noexcept {
 	StitchCoordinatesPixels.x = dToL((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5);
 	StitchCoordinatesPixels.y
 	    = dToL(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
 }
 
-void thred::internal::shft2box() {
+void thred::internal::shft2box() noexcept {
 	SelectedPoint = StitchBuffer[ClosestPointIndex];
 	thred::shft(SelectedPoint);
 	stch2px1(ClosestPointIndex);
@@ -3064,7 +3064,7 @@ void thred::internal::pgrit() {
 	}
 }
 
-void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
+void thred::internal::selin(unsigned start, unsigned end, HDC dc) noexcept {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (SearchLineIndex) {
@@ -3084,7 +3084,7 @@ void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SetROP2(dc, R2_COPYPEN);
 }
 
-void thred::internal::cros(unsigned iStitch) {
+void thred::internal::cros(unsigned iStitch) noexcept {
 	const auto armLength = BoxOffset[0];
 
 	stch2px1(iStitch);
@@ -3351,7 +3351,7 @@ void thred::internal::dubox() {
 	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 }
 
-bool thred::internal::stch2px(unsigned iStitch) {
+bool thred::internal::stch2px(unsigned iStitch) noexcept {
 	StitchCoordinatesPixels
 	    = { dToL((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		    dToL(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
@@ -3359,7 +3359,7 @@ bool thred::internal::stch2px(unsigned iStitch) {
 	       && StitchCoordinatesPixels.y >= 0 && StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom;
 }
 
-void thred::stch2pxr(const fPOINT& stitchCoordinate) {
+void thred::stch2pxr(const fPOINT& stitchCoordinate) noexcept {
 	StitchCoordinatesPixels
 	    = { dToL((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		    dToL(StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
@@ -4818,7 +4818,7 @@ void thred::internal::sidmsg(HWND window, std::wstring* const strings, unsigned 
 	}
 }
 
-void thred::internal::centr() {
+void thred::internal::centr() noexcept {
 	const auto center = POINT{ dToL((ZoomRect.right - ZoomRect.left) / 2.0), dToL((ZoomRect.top - ZoomRect.bottom) / 2.0) };
 
 	SelectedPoint.x = ZoomRect.left + center.x;
@@ -4891,7 +4891,7 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 	return false;
 }
 
-void thred::internal::delstch1(unsigned iStitch) {
+void thred::internal::delstch1(unsigned iStitch) noexcept {
 	if (PCSHeader.stitchCount) {
 		while (iStitch <= PCSHeader.stitchCount) {
 			StitchBuffer[iStitch] = StitchBuffer[iStitch + 1];
@@ -5027,7 +5027,7 @@ void thred::internal::bak() {
 	redbak();
 }
 
-void thred::internal::bitsiz() {
+void thred::internal::bitsiz() noexcept {
 	const auto screenAspectRatio = gsl::narrow<double>(UnzoomedRect.x) / UnzoomedRect.y;
 	const auto bitmapAspectRatio = gsl::narrow<double>(BitmapWidth) / BitmapHeight;
 
@@ -6857,7 +6857,7 @@ void thred::internal::rebox() {
 	}
 }
 
-void thred::delstchm() {
+void thred::delstchm() noexcept {
 	thred::rngadj();
 	auto destination = GroupStartStitch;
 	if ((GroupEndStitch + 1u) < PCSHeader.stitchCount) {
@@ -6973,7 +6973,7 @@ void thred::internal::rSelbox() {
 	dusel(StitchWindowDC);
 }
 
-void thred::internal::duSelbox() {
+void thred::internal::duSelbox() noexcept {
 	thred::px2stch();
 	SelectBoxSize   = { fToL(StitchRangeRect.right - StitchRangeRect.left), fToL(StitchRangeRect.top - StitchRangeRect.bottom) };
 	SelectBoxOffset = { fToL(SelectedPoint.x - StitchRangeRect.left), fToL(SelectedPoint.y - StitchRangeRect.bottom) };
@@ -6985,7 +6985,7 @@ void thred::internal::setbak(unsigned penWidth) noexcept {
 	}
 }
 
-void thred::internal::stchbox(unsigned iStitch, HDC dc) {
+void thred::internal::stchbox(unsigned iStitch, HDC dc) noexcept {
 	POINT      line[5] = {};
 	const auto layer   = (StitchBuffer[iStitch].attribute & LAYMSK) >> LAYSHFT;
 	const auto offset  = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
@@ -7001,12 +7001,12 @@ void thred::internal::stchbox(unsigned iStitch, HDC dc) {
 	}
 }
 
-void thred::sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) {
+void thred::sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) noexcept {
 	pixelCoordinate = { dToL((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		                dToL(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5) };
 }
 
-void thred::internal::sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate) {
+void thred::internal::sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate) noexcept {
 	pixelCoordinate = { dToL((stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		                dToL(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y + 0.5) };
 }
@@ -7039,7 +7039,7 @@ void thred::internal::unrotu() {
 	}
 }
 
-void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) {
+void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept {
 	auto       distanceToCenter = 0.0;
 	auto       newAngle         = 0.0;
 	const auto dx               = unrotatedPoint.x - rotationCenter.x;
@@ -7241,7 +7241,7 @@ void thred::internal::rot(dPOINT& rotationCenter) {
 	ritrot(0, rotationCenter);
 }
 
-void thred::internal::savclp(unsigned int destination, unsigned int source) {
+void thred::internal::savclp(unsigned int destination, unsigned int source) noexcept {
 	auto integer = 0.0;
 
 	ClipStitchData[destination].led  = StitchBuffer[source].attribute & COLMSK;
@@ -7632,7 +7632,7 @@ void thred::internal::duclip() {
 	}
 }
 
-void thred::delfstchs() {
+void thred::delfstchs() noexcept {
 	auto iDestinationStitch = 0u;
 
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
@@ -7871,7 +7871,7 @@ void thred::internal::strtknt(unsigned start) noexcept {
 	}
 }
 
-void thred::internal::delknt() {
+void thred::internal::delknt() noexcept {
 	auto newStitchCount = 0u;
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -7900,7 +7900,7 @@ void thred::internal::delknot() {
 	}
 }
 
-unsigned thred::internal::kjmp(unsigned start) {
+unsigned thred::internal::kjmp(unsigned start) noexcept {
 	while (start < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1 && stlen(start) > KNOTLEN) {
 		thred::mvstch(OutputIndex++, start++);
 	}
@@ -8128,7 +8128,7 @@ void thred::internal::stchout() {
 	}
 }
 
-void thred::internal::setsped() {
+void thred::internal::setsped() noexcept {
 	auto elapsedTimePerFrame = 0u;
 
 	if (!MovieTimeStep) {
@@ -8535,7 +8535,7 @@ constexpr unsigned thred::internal::nxtcrnr(unsigned corner) {
 	return (corner + 1) & 3;
 }
 
-void thred::internal::drwmrk(HDC dc) {
+void thred::internal::drwmrk(HDC dc) noexcept {
 	auto       markCoordinates = POINT{};
 	POINT      markLine[2]     = {};
 	const auto markOffset      = gsl::narrow<long>(MulDiv(6, *screenDPI, 96));
@@ -8680,7 +8680,7 @@ void thred::internal::insfil() {
 					InsertedVertexIndex    = FormVertices->size();
 					InsertedFormIndex      = FormList->size();
 					if (fileHeader.formCount) {
-						auto newFormVertexIndex = FormVertices->size();
+						const auto newFormVertexIndex = FormVertices->size();
 						auto newSatinGuideIndex = SatinGuides->size();
 						auto clipOffset         = ClipPoints->size();
 						auto textureOffset      = TexturePointsBuffer->size();
@@ -9194,7 +9194,7 @@ void thred::internal::infadj(float* xCoordinate, float* yCoordinate) noexcept {
 	}
 }
 
-void thred::delinf() noexcept {
+void thred::delinf() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		thi::infadj(&StitchBuffer[iStitch].x, &StitchBuffer[iStitch].y);
 	}
@@ -9730,7 +9730,7 @@ void thred::internal::colchk() noexcept {
 	}
 }
 
-unsigned thred::internal::makbig(unsigned start, unsigned finish) {
+unsigned thred::internal::makbig(unsigned start, unsigned finish) noexcept {
 	auto destination = MAXITEMS;
 	auto adcnt       = 0u;
 
@@ -10311,7 +10311,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void thred::frmrct(fRECTANGLE& rectangle) noexcept {
+void thred::frmrct(fRECTANGLE& rectangle) {
 	rectangle.left = rectangle.right = (*FormVertices)[0].x;
 	rectangle.top = rectangle.bottom = (*FormVertices)[0].y;
 	for (auto iVertex = 0u; iVertex < FormVertices->size(); iVertex++) {
@@ -10974,7 +10974,7 @@ void thred::internal::stchsnap(unsigned start, unsigned finish) noexcept {
 	}
 }
 
-void thred::internal::frmsnap(unsigned int start, unsigned int count) noexcept {
+void thred::internal::frmsnap(unsigned int start, unsigned int count) {
 	auto vertexIt = FormVertices->begin() + start;
 
 	for (auto i = 0u; i < count; i++) {
@@ -11200,7 +11200,7 @@ void thred::internal::filclos() {
 	}
 }
 
-void thred::internal::frmpos(float deltaX, float deltaY) noexcept {
+void thred::internal::frmpos(float deltaX, float deltaY) {
 	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		vertexIt[iVertex].x += deltaX;
@@ -11581,7 +11581,7 @@ void thred::internal::selfrmx() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::setpclp() {
+void thred::internal::setpclp() noexcept {
 	auto point = POINT{};
 
 	form::sfCor2px(InterleaveSequence[0], point);
@@ -11596,7 +11596,7 @@ void thred::internal::setpclp() {
 	FormVerticesAsLine[OutputIndex - 1] = point;
 }
 
-void thred::internal::dupclp() {
+void thred::internal::dupclp() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	PolylineInt(StitchWindowDC, FormVerticesAsLine, OutputIndex);
@@ -16870,12 +16870,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 }
 
 // return the width of a text item
-long thred::txtWid(const wchar_t* string) {
+long thred::txtWid(const wchar_t* string) noexcept {
 	GetTextExtentPoint32Int(ThredDC, string, gsl::narrow<unsigned int>(wcslen(string)), &TextSize);
 	return TextSize.cx;
 }
 
-void thred::internal::makCol() noexcept {
+void thred::internal::makCol() {
 	wchar_t buffer[3] = { 0 };
 
 	buffer[1] = L'0';
@@ -17588,7 +17588,7 @@ bool thred::internal::bitar() {
 	return true;
 }
 
-inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) {
+inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) noexcept {
 	// ToDo - is 0.5 still required with dToL?
 	point = { dToL((stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		      dToL(StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
@@ -17623,7 +17623,7 @@ void thred::internal::drwknot() {
 	}
 }
 
-void thred::internal::dugrid() {
+void thred::internal::dugrid() noexcept {
 	if (ZoomFactor < ShowStitchThreshold || !ShowStitchThreshold) {
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
 		SelectObject(StitchWindowMemDC, GridPen);

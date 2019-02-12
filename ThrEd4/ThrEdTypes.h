@@ -1086,8 +1086,8 @@ public:
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
 	//~SATCONOUT() = default;
 
-	explicit SATCONOUT(const SATCON& rhs);
-	inline SATCONOUT& operator=(const SATCON& rhs);
+	explicit SATCONOUT(const SATCON& rhs) noexcept;
+	inline SATCONOUT& operator=(const SATCON& rhs) noexcept;
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
@@ -1095,12 +1095,12 @@ inline SATCONOUT::SATCONOUT() noexcept {
 	finish = 0u;
 }
 
-inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
+inline SATCONOUT::SATCONOUT(const SATCON& rhs) noexcept {
 	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 }
 
-inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
+inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
 	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 
@@ -1601,8 +1601,8 @@ public:
 	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
 	//~FRMHEDOUT() = default;
 
-	explicit inline FRMHEDOUT(const FRMHED& rhs);
-	inline FRMHEDOUT& operator=(const FRMHED& rhs);
+	explicit inline FRMHEDOUT(const FRMHED& rhs) noexcept;
+	inline FRMHEDOUT& operator=(const FRMHED& rhs) noexcept;
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
@@ -1645,7 +1645,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	cres                = 0;
 }
 
-inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
+inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
 	type            = rhs.type;
@@ -1685,7 +1685,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	cres                = rhs.cres;
 }
 
-inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
+inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
 	type            = rhs.type;

@@ -27,7 +27,7 @@
 
 namespace satin {
 
-unsigned int adsatk(unsigned int count) noexcept;
+unsigned int adsatk(unsigned int count);
 void         cpySat(const FRMHED& formHeader);
 void         delcon(unsigned GuideIndex);
 void         delsac(unsigned int formIndex);

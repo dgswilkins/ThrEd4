@@ -983,7 +983,7 @@ void trace::dutrnum1() {
 	}
 }
 
-unsigned trace::internal::ducolm() {
+unsigned trace::internal::ducolm() noexcept {
 	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth)) {
 		return 0;
 	}
@@ -1194,7 +1194,7 @@ void trace::tracpar() {
 	}
 }
 
-void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
+void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	const unsigned NumeralWidth = thred::txtWid(L"0");
 
 	wchar_t buffer[11] = { 0 };
@@ -1208,11 +1208,11 @@ void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, bufferLength);
 }
 
-void trace::internal::upnum(unsigned iRGB) {
+void trace::internal::upnum(unsigned iRGB) noexcept {
 	ti::trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
-void trace::internal::dwnum(unsigned iRGB) {
+void trace::internal::dwnum(unsigned iRGB) noexcept {
 	ti::trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 

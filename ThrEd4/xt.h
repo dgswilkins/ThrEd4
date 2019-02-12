@@ -119,7 +119,7 @@ namespace internal {
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
-	void     chkuseq(unsigned interleaveSequenceIndex2);
+	void     chkuseq(unsigned interleaveSequenceIndex2) noexcept;
 	void     delwlk(unsigned int code);
 
 #ifdef _DEBUG
@@ -177,9 +177,9 @@ namespace internal {
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
-	void ritcwlk(unsigned& interleaveSequenceIndex2);
-	void ritund(unsigned& interleaveSequenceIndex2);
-	void ritwlk(unsigned& interleaveSequenceIndex2);
+	void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept;
+	void ritund(unsigned& interleaveSequenceIndex2) noexcept;
+	void ritwlk(unsigned& interleaveSequenceIndex2) noexcept;
 	void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 

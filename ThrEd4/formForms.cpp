@@ -49,7 +49,7 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
+void formForms::maxtsiz(const std::wstring& label, POINT& textSize) noexcept {
 	auto labelSize = SIZE{};
 
 	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), gsl::narrow<unsigned int>(label.size()), &labelSize);
@@ -686,7 +686,7 @@ void formForms::frmnum() {
 	}
 }
 
-void formForms::internal::chkdaz() {
+void formForms::internal::chkdaz() noexcept {
 	if (!IniFile.daisyPetalPoints) {
 		IniFile.daisyPetalPoints = 1;
 	}

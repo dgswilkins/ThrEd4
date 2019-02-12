@@ -179,7 +179,7 @@ void satin::spltsat(SATCON currentGuide) {
 }
 
 void satin::internal::satclos() {
-	auto initialGuideCount = SelectedForm->satinGuideCount;
+	const auto initialGuideCount = SelectedForm->satinGuideCount;
 	auto minimumLength     = 1e99;
 
 	form::uninsf();
@@ -332,7 +332,7 @@ void satin::satadj() {
 
 	auto interiorGuides = std::vector<SATCON>{};
 	interiorGuides.reserve(CurrentFormGuidesCount);
-	auto savedGuideCount = SelectedForm->satinGuideCount;
+	const auto savedGuideCount = SelectedForm->satinGuideCount;
 	auto satinMap        = ExtendedBitSet<>(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
@@ -1467,7 +1467,7 @@ bool satin::internal::chkbak(const std::vector<dPOINT>& satinBackup, const dPOIN
 	return false;
 }
 
-unsigned int satin::adsatk(unsigned int count) noexcept {
+unsigned int satin::adsatk(unsigned int count) {
 	auto       iSatinConnect = gsl::narrow<unsigned int>(SatinGuides->size());
 	const auto it            = SatinGuides->end();
 	const auto val           = SATCON{};

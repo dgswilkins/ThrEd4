@@ -35,14 +35,14 @@ unsigned int adflt(unsigned int count);
 void     bBox() noexcept;
 void     chkmen() noexcept;
 void     chkrng(fPOINT& range);
-void     coltab();
-void     delfstchs();
-void     delinf() noexcept;
-void     delstchm();
+void     coltab() noexcept;
+void     delfstchs() noexcept;
+void     delinf();
+void     delstchm() noexcept;
 unsigned duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
 void     frmdel();
-void     frmrct(fRECTANGLE& rectangle) noexcept;
+void     frmrct(fRECTANGLE& rectangle);
 HBITMAP  getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ unsigned int** ppvBits);
 void     grpAdj();
 void     hidbit();
@@ -67,16 +67,16 @@ void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, double rotation
 void rotflt(fPOINT& point, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotfn(double rotationAngle, const dPOINT& rotationCenter);
 void rtclpfn(unsigned int destination, unsigned int source);
-void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
+void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) noexcept;
 void savdo();
 void save();
 void selRct(fRECTANGLE& sourceRect) noexcept;
 void setpsel();
 void shft(const fPOINT& delta) noexcept;
-void stch2pxr(const fPOINT& stitchCoordinate);
+void stch2pxr(const fPOINT& stitchCoordinate) noexcept;
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
-long txtWid(const wchar_t* string);
+long txtWid(const wchar_t* string) noexcept;
 void unbBox();
 void unbsho();
 void undat() noexcept;
@@ -97,7 +97,7 @@ namespace internal {
 	bool   binv(const std::vector<unsigned char>& monoBitmapData, unsigned bitmapWidthInBytes);
 	bool   bitar();
 	void   bitlin(const unsigned char* source, unsigned int* destination, COLORREF foreground, COLORREF background);
-	void   bitsiz();
+	void   bitsiz() noexcept;
 	void   box(unsigned iNearest, HDC dc) noexcept;
 	void   boxs() noexcept;
 	void   bsavmen();
@@ -105,7 +105,7 @@ namespace internal {
 
 	unsigned long long bufTou64(wchar_t* buffer);
 
-	void     centr();
+	void     centr() noexcept;
 	void     chk1col();
 	bool     chkMsg(std::vector<POINT>& stretchBoxLine,
 	                double&             xyRatio,
@@ -140,7 +140,7 @@ namespace internal {
 
 	bool     colfil();
 	unsigned colmatch(COLORREF color) noexcept;
-	void     cros(unsigned iStitch);
+	void     cros(unsigned iStitch) noexcept;
 	void     crtcurs() noexcept;
 	void     cut();
 	void     defNam(const fs::path& fileName);
@@ -153,12 +153,12 @@ namespace internal {
 	void     delet();
 	void     delfre();
 	void     delknot();
-	void     delknt();
+	void     delknt() noexcept;
 	void     delmap();
 	void     delsfrms(unsigned code);
 	void     delsmal(unsigned startStitch, unsigned endStitch);
 	void     delstch();
-	void     delstch1(unsigned iStitch);
+	void     delstch1(unsigned iStitch) noexcept;
 	void     deltot();
 	void     desiz();
 	BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
@@ -167,7 +167,7 @@ namespace internal {
 	void drwStch();
 	void drwknot();
 	void drwlstch(unsigned finish);
-	void drwmrk(HDC dc);
+	void drwmrk(HDC dc) noexcept;
 	void dstcurs() noexcept;
 	void dstin(unsigned number, POINT& pout) noexcept;
 	void dstran(std::vector<DSTREC>& DSTData);
@@ -176,7 +176,7 @@ namespace internal {
 
 	void duClos(unsigned startStitch, unsigned stitchCount) noexcept;
 	void duIns();
-	void duSelbox();
+	void duSelbox() noexcept;
 	void duar();
 	void dubar();
 	void dubox();
@@ -191,7 +191,7 @@ namespace internal {
 
 	void dufdef() noexcept;
 	void dufsel();
-	void dugrid();
+	void dugrid() noexcept;
 	void duhbit(unsigned cod) noexcept;
 	void duhom();
 	void duinsfil();
@@ -200,7 +200,7 @@ namespace internal {
 	void dumrk(double xCoord, double yCoord);
 	void dun();
 	bool dunum(unsigned code) noexcept;
-	void dupclp();
+	void dupclp() noexcept;
 	void duprct();
 	void durcntr(dPOINT& rotationCenter) noexcept;
 	void durit(char** destination, const void* source, unsigned int count) noexcept;
@@ -234,8 +234,8 @@ namespace internal {
 	unsigned frmcnt(unsigned int iForm, unsigned& formFirstStitchIndex) noexcept;
 	void     frmcurmen();
 	void     frmcursel(unsigned cursorType);
-	void     frmpos(float deltaX, float deltaY) noexcept;
-	void     frmsnap(unsigned int start, unsigned int count) noexcept;
+	void     frmpos(float deltaX, float deltaY);
+	void     frmsnap(unsigned int start, unsigned int count);
 	bool     frmstch();
 	COLORREF fswap(COLORREF color) noexcept;
 
@@ -269,7 +269,7 @@ namespace internal {
 	bool     isknots() noexcept;
 	void     istch();
 	bool     isthr(const wchar_t* filename);
-	unsigned kjmp(unsigned start);
+	unsigned kjmp(unsigned start) noexcept;
 	void     knotmen();
 	void     ladj();
 	void     lenCalc();
@@ -283,8 +283,8 @@ namespace internal {
 	void     lodbmp();
 	void     lodclp(unsigned iStitch);
 	void     longer();
-	void     makCol() noexcept;
-	unsigned makbig(unsigned start, unsigned finish);
+	void     makCol();
+	unsigned makbig(unsigned start, unsigned finish) noexcept;
 	void     mark();
 	void     movbak(char source, char destination);
 	void     movbox();
@@ -377,7 +377,7 @@ namespace internal {
 	void   ritrot(double rotationAngle, const dPOINT& rotationCenter);
 	void   rngal();
 	void   rot(dPOINT& rotationCenter);
-	void   rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter);
+	void   rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 
 	void     rotauxmen();
 	void     rotauxsel(unsigned stat);
@@ -394,11 +394,11 @@ namespace internal {
 	void     sachk();
 	void     sav();
 	void     savAs();
-	void     savclp(unsigned int destination, unsigned int source);
+	void     savclp(unsigned int destination, unsigned int source) noexcept;
 	bool     savcmp() noexcept;
 	void     savdst(std::vector<DSTREC>& DSTRecords, unsigned data);
 	void     savmap();
-	void     sdCor2px(fPOINTATTR stitchPoint, POINT& pixelCoordinate);
+	void     sdCor2px(fPOINTATTR stitchPoint, POINT& pixelCoordinate) noexcept;
 	void     segentr(double rotationAngle);
 	void     selCol();
 	void     selalstch();
@@ -406,7 +406,7 @@ namespace internal {
 	void     selfpnt();
 	void     selfrm0();
 	void     selfrmx();
-	void     selin(unsigned start, unsigned end, HDC dc);
+	void     selin(unsigned start, unsigned end, HDC dc) noexcept;
 	void     selup();
 	void     set1knot();
 	bool     setRmap(boost::dynamic_bitset<>& stitchMap, const fPOINTATTR& stitchPoint);
@@ -416,11 +416,11 @@ namespace internal {
 	void     setknots();
 	void     setknt();
 	void     setmov();
-	void     setpclp();
+	void     setpclp() noexcept;
 	void     setpcs();
-	void     setsped();
+	void     setsped() noexcept;
 	void     setsrch(unsigned stitch);
-	void     shft2box();
+	void     shft2box() noexcept;
 	void     shftflt(fPOINT point) noexcept;
 	void     shoknot();
 	void     shorter();
@@ -433,12 +433,12 @@ namespace internal {
 	void         sizstch(fRECTANGLE& rectangle, const fPOINTATTR* stitches) noexcept;
 	void         srchk();
 	unsigned     srchknot(unsigned source) noexcept;
-	inline void  stCor2px(const fPOINTATTR& stitch, POINT& point);
-	bool         stch2px(unsigned iStitch);
-	void         stch2px1(unsigned iStitch);
+	inline void  stCor2px(const fPOINTATTR& stitch, POINT& point) noexcept;
+	bool         stch2px(unsigned iStitch) noexcept;
+	void         stch2px1(unsigned iStitch) noexcept;
 	void         stchPars();
 	void         stchWnd();
-	void         stchbox(unsigned iStitch, HDC dc);
+	void         stchbox(unsigned iStitch, HDC dc) noexcept;
 	void         stchout();
 	void         stchsnap(unsigned start, unsigned finish) noexcept;
 	double       stlen(unsigned iStitch) noexcept;

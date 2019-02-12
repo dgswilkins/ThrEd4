@@ -612,7 +612,7 @@ void xt::internal::delwlk(unsigned int code) {
 	}
 }
 
-void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
+void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 #if BUGBAK
 	unsigned index;
 
@@ -658,7 +658,7 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 #endif
 }
 
-void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = WLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -668,7 +668,7 @@ void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
 	}
 }
 
-void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) noexcept {
 	if (OutputIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = CWLKMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
@@ -776,7 +776,7 @@ void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) 
 	ritwlk(interleaveSequenceIndex2);
 }
 
-void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritund(unsigned& interleaveSequenceIndex2) noexcept {
 	if (SequenceIndex) {
 		InterleaveSequenceIndices[interleaveSequenceIndex2].code  = UNDMSK;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequenceIndex;
