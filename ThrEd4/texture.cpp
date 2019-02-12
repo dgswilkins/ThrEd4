@@ -1145,7 +1145,9 @@ void texture::internal::dutxfn(unsigned textureType) {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		txi::altx();
 		clip::delmclp(ClosestFormToCursor);
-		satin::delsac(ClosestFormToCursor);
+		if (SelectedForm->satinGuideCount != 0u) {
+			satin::delsac(ClosestFormToCursor);
+		}
 		texture::deltx();
 		texture::savtxt();
 		txi::nutx();
