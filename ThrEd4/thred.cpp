@@ -13541,6 +13541,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				if (Msg.hwnd == SideWindow[3]) { // angle fill
 					SelectedForm->type = FRMFPOLY;
 					if (SelectedForm->fillType) {
+						if (SelectedForm->satinGuideCount != 0u) {
+							satin::delsac(ClosestFormToCursor);
+						}
 						respac();
 						// ToDo - should we be using the angle information already present
 						SelectedForm->fillType              = ANGF;
@@ -13554,6 +13557,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				}
 				if (Msg.hwnd == SideWindow[4]) { // fan fill
 					SelectedForm->type = SAT;
+					if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
+						SelectedForm->satinOrAngle.guide = 0;
+					}
 					if (SelectedForm->fillType) {
 						respac();
 						SelectedForm->fillType = SATF;
@@ -13567,6 +13573,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				}
 				if (Msg.hwnd == SideWindow[5]) { // fan clip
 					SelectedForm->type = SAT;
+					if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
+						SelectedForm->satinOrAngle.guide = 0;
+					}
 					form::clpfil();
 					break;
 				}
@@ -13603,6 +13612,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				}
 				if (Msg.hwnd == SideWindow[9]) { // angle clip
 					if (sidclp()) {
+						if (SelectedForm->satinGuideCount != 0u) {
+							satin::delsac(ClosestFormToCursor);
+						}
 						form::angsclp();
 					}
 					StateMap.reset(StateFlag::CLPSHO);
@@ -13611,6 +13623,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					break;
 				}
 				if (Msg.hwnd == SideWindow[10]) { // feather fill
+					if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
+						SelectedForm->satinOrAngle.guide = 0;
+					}
 					xt::fethrf();
 					StateMap.set(StateFlag::INIT);
 					thred::coltab();
