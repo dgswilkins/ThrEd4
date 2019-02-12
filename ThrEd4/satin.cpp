@@ -938,10 +938,12 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line1Step   = dPOINT{ line1Delta.x / line1Count, line1Delta.y / line1Count };
 		auto line2Step   = dPOINT{ line2Delta.x / line2Count, line2Delta.y / line2Count };
 		bool flag        = false;
+		auto loop = 0u;
 		auto iLine1Count = 1u;
 		auto iLine2Count = 1u;
 		do {
 			flag = false;
+			loop++;
 			if (StateMap.test(StateFlag::FTHR)) {
 				while (line1Count && line2Count) {
 					line1Point.x += line1Step.x;
@@ -1036,7 +1038,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					flag = true;
 				}
 			}
-		} while (flag);
+		} while (flag && (loop < 20000u));
 	}
 }
 
