@@ -2422,7 +2422,9 @@ void thred::internal::chknum() {
 			}
 			else {
 				if (wcslen(MsgBuffer)) {
+					OutputDebugString(fmt::format(L"MsgBuffer:[{}]\n", MsgBuffer).c_str());
 					value = bufToDouble(MsgBuffer);
+					OutputDebugString(fmt::format(L"Value:[{}]\n", value).c_str());
 					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
 					for (auto i = 0u; i < 64; i++) {
 						MsgBuffer[i] = 0x0;
