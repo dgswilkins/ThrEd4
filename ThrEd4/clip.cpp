@@ -261,7 +261,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 	const auto cosAngle = cos(clipAngle);
 
 	auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
-	moveToCoords  = vertexIt[currentSide + 2];
+	moveToCoords  = vertexIt[gsl::narrow_cast<size_t>(currentSide) + 2u];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
@@ -281,7 +281,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) noexcept {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(clipFillData.size(), SequenceIndex)) {
+	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), SequenceIndex)) {
 		return true;
 	}
 	for (auto& data : clipFillData) {
@@ -320,7 +320,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             const dPOINT&              rotationCenter,
                             unsigned int               currentSide) {
 	auto        vertexIt  = FormVertices->begin() + CurrentVertexIndex;
-	const auto& point     = vertexIt[currentSide + 1];
+	const auto& point     = vertexIt[gsl::narrow_cast<size_t>(currentSide) + 1u];
 	const auto  delta     = fPOINT{ (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto  length    = hypot(delta.x, delta.y);
 	const auto  clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));

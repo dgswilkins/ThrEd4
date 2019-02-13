@@ -804,8 +804,10 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
 		if (SelectedForm->wordParam) {
 			const auto iVertex       = SelectedForm->wordParam;
-			OSequence[OutputIndex].x = form::midl(vertexIt[iVertex].x, vertexIt[iVertex + 1].x);
-			OSequence[OutputIndex].y = form::midl(vertexIt[iVertex].y, vertexIt[iVertex + 1].y);
+			auto&      thisVertex    = vertexIt[iVertex];
+			auto&      nextVertex    = vertexIt[gsl::narrow_cast<size_t>(iVertex) + 1u];
+			OSequence[OutputIndex].x = form::midl(thisVertex.x, nextVertex.x);
+			OSequence[OutputIndex].y = form::midl(thisVertex.y, nextVertex.y);
 			OutputIndex++;
 		}
 		auto guideIt = SatinGuides->cbegin() + SelectedForm->satinOrAngle.guide;

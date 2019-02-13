@@ -97,7 +97,7 @@ void satin::spltsat(SATCON currentGuide) {
 	form::fvars(ClosestFormToCursor);
 	FormIndex++;
 	const auto maxForm  = formList.size();
-	auto       position = std::next(FormVertices->begin(), CurrentVertexIndex + VertexCount);
+	auto       position = std::next(FormVertices->begin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		formList[iForm].vertexIndex += 2;
@@ -134,7 +134,7 @@ void satin::spltsat(SATCON currentGuide) {
 		vertexIt[iVertex] = vertexBuffer[iVertex];
 	}
 	SelectedForm->vertexCount = iOldVertex;
-	auto& nextForm            = formList[ClosestFormToCursor + 1];
+	auto& nextForm            = formList[gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1u];
 	nextForm.vertexCount      = iNewVertex - iOldVertex;
 	nextForm.vertexIndex      = CurrentVertexIndex + iOldVertex;
 	form::frmout(ClosestFormToCursor);
@@ -577,7 +577,7 @@ void satin::delspnt() {
 			if (iGuide < SelectedForm->satinGuideCount
 			    && (guideIt[iGuide].start == ClosestVertexToCursor || guideIt[iGuide].finish == ClosestVertexToCursor)) {
 				while (iGuide < SelectedForm->satinGuideCount) {
-					guideIt[iGuide] = guideIt[iGuide + 1];
+					guideIt[iGuide] = guideIt[gsl::narrow_cast<size_t>(iGuide) + 1u];
 					iGuide++;
 				}
 				SelectedForm->satinGuideCount--;
@@ -793,13 +793,13 @@ void satin::ribon() {
 					guideIt[iGuide].finish = form.vertexCount - iGuide - 1;
 				}
 				FormIndex++;
-				ClosestFormToCursor = FormList->size() - 1;
+				ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 				form::frmout(ClosestFormToCursor);
 				form::refilfn();
 				ClosestFormToCursor = savedFormIndex;
 				StateMap.set(StateFlag::DELTO);
 				thred::frmdel();
-				ClosestFormToCursor = FormList->size() - 1;
+				ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 				StateMap.set(StateFlag::FORMSEL);
 				StateMap.set(StateFlag::INIT);
 				StateMap.set(StateFlag::RESTCH);
@@ -1055,7 +1055,9 @@ void satin::internal::satmf(const std::vector<double>& lengths) {
 		endGuide--;
 	}
 	for (auto iGuide = 0u; iGuide < endGuide; iGuide++) {
-		si::satfn(lengths, guideIt[iGuide].start, guideIt[iGuide + 1].start, guideIt[iGuide].finish, guideIt[iGuide + 1].finish);
+		auto& thisGuide = guideIt[iGuide];
+		auto& nextGuide = guideIt[gsl::narrow_cast<size_t>(iGuide) + 1u];
+		si::satfn(lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
 	}
 	if (SatinEndGuide) {
 		si::satfn(lengths, guideIt[endGuide].start, SatinEndGuide, guideIt[endGuide].finish, SatinEndGuide + 1);
@@ -1186,7 +1188,7 @@ void satin::satfix() {
 		}
 		TempPolygon->clear();
 		form.vertexCount = vertexCount;
-		form::frmout(FormList->size() - 1);
+		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		form.satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::INIT);

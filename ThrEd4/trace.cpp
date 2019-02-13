@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentVertexIndex   = FormVertices->size();
+		CurrentVertexIndex   = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
 		auto vertexIt        = FormVertices->begin() + CurrentVertexIndex;
 		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
 		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
@@ -818,7 +818,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout(FormList->size() - 1);
+		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
 		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);

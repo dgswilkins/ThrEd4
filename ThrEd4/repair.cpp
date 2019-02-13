@@ -236,7 +236,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		auto& form = formList[iForm];
 		// ToDo - find a better way than pointer arithmetic
 		const auto vertexDifference = form.vertexIndex;
-		if (FormVertices->size() >= vertexDifference + form.vertexCount) {
+		if (FormVertices->size() >= gsl::narrow_cast<size_t>(vertexDifference) + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
 			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
@@ -288,7 +288,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = form.angleOrClipData.clip;
-			if (clipDifference + form.lengthOrCount.clipCount < ClipPoints->size()) {
+			if (gsl::narrow_cast<size_t>(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 				auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
 				auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
@@ -318,7 +318,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 		if (clip::iseclp(iForm)) {
 			clipDifference = form.borderClipData;
-			if (clipDifference + form.clipEntries < ClipPoints->size()) {
+			if (gsl::narrow_cast<size_t>(clipDifference) + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
 				auto sourceStart = ClipPoints->begin() + form.borderClipData;
 				auto sourceEnd   = sourceStart + form.clipEntries;
@@ -361,7 +361,7 @@ void repair::internal::repsat() {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			const auto guideDifference = form.satinOrAngle.guide;
-			if (FormVertices->size() > guideDifference + form.vertexCount) {
+			if (FormVertices->size() > gsl::narrow_cast<size_t>(guideDifference) + form.vertexCount) {
 				auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
 				auto       sourceEnd   = sourceStart + form.satinGuideCount;
 				const auto destination = SatinGuides->begin() + guideCount;

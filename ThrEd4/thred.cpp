@@ -1194,7 +1194,7 @@ unsigned int thred::adflt(unsigned int count) {
 }
 
 unsigned int thred::adclp(unsigned int count) {
-	const auto iClipPoint = ClipPoints->size();
+	const auto iClipPoint = gsl::narrow<unsigned int>(ClipPoints->size());
 	const auto it         = ClipPoints->end();
 	const auto val        = fPOINT{};
 	ClipPoints->insert(it, count, val);
@@ -1344,7 +1344,7 @@ void thred::internal::dudat() {
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	const auto&    formList  = *FormList;
-	const auto     formCount = formList.size();
+	const auto     formCount = gsl::narrow<unsigned int>(formList.size());
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
@@ -1368,21 +1368,21 @@ void thred::internal::dudat() {
 			          StitchBuffer + PCSHeader.stitchCount,
 			          stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
 		}
-		backupData->vertexCount = FormVertices->size();
+		backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
 		if (!FormVertices->empty()) {
 			std::copy(FormVertices->cbegin(),
 			          FormVertices->cend(),
 			          stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
 		}
-		backupData->guideCount = SatinGuides->size();
+		backupData->guideCount = gsl::narrow<decltype(backupData->guideCount)>(SatinGuides->size());
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 		if (!SatinGuides->empty()) {
 			std::copy(SatinGuides->cbegin(),
 			          SatinGuides->cend(),
 			          stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
 		}
-		backupData->clipPointCount = ClipPoints->size();
+		backupData->clipPointCount = gsl::narrow<decltype(backupData->clipPointCount)>(ClipPoints->size());
 		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 		if (!ClipPoints->empty()) {
 			std::copy(ClipPoints->cbegin(),
@@ -5667,10 +5667,10 @@ void thred::internal::nuFil() {
 						if (version < 2) {
 							auto formListOriginal = std::vector<FRMHEDO>{};
 							formListOriginal.resize(thredHeader.formCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(formListOriginal[0]));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
 							ReadFileInt(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
-							if (BytesRead != thredHeader.formCount * sizeof(formListOriginal[0])) {
-								thredHeader.formCount = BytesRead / sizeof(formListOriginal[0]);
+							if (BytesRead != thredHeader.formCount * sizeof(decltype(formListOriginal.back()))) {
+								thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(BytesRead / sizeof(decltype(formListOriginal.back())));
 								FormIndex             = thredHeader.formCount;
 								formListOriginal.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
@@ -5682,10 +5682,10 @@ void thred::internal::nuFil() {
 						else {
 							auto inFormList = std::vector<FRMHEDOUT>{};
 							inFormList.resize(thredHeader.formCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(inFormList.back()));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(inFormList.back())));
 							ReadFileInt(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								thredHeader.formCount = BytesRead / sizeof(inFormList[0]);
+								thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(BytesRead / sizeof(decltype(inFormList.back())));
 								FormIndex             = thredHeader.formCount;
 								inFormList.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
@@ -5696,10 +5696,10 @@ void thred::internal::nuFil() {
 						}
 						if (thredHeader.vertexCount) {
 							FormVertices->resize(thredHeader.vertexCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(FormVertices->back()));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
 							ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								FormVertices->resize(BytesRead / sizeof((*FormVertices)[0]));
+								FormVertices->resize(BytesRead / sizeof(decltype(FormVertices->back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
@@ -5723,20 +5723,20 @@ void thred::internal::nuFil() {
 						}
 						if (thredHeader.clipDataCount) {
 							ClipPoints->resize(thredHeader.clipDataCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(ClipPoints->back()));
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
 							ReadFile(FileHandle, ClipPoints->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								ClipPoints->resize(BytesRead / sizeof((*ClipPoints)[0]));
+								ClipPoints->resize(BytesRead / sizeof(decltype(ClipPoints->back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
 						if (ExtendedHeader.texturePointCount) {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
 							bytesToRead
-							    = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount * sizeof((*TexturePointsBuffer)[0]));
+							    = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount * sizeof(decltype(TexturePointsBuffer->back())));
 							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								TexturePointsBuffer->resize(BytesRead / sizeof((*TexturePointsBuffer)[0]));
+								TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							TextureIndex = gsl::narrow<unsigned int>(TexturePointsBuffer->size());
@@ -7729,7 +7729,7 @@ void thred::internal::delsfrms(unsigned code) {
 					deletedFormCount++;
 				}
 			}
-			FormIndex = FormList->size();
+			FormIndex = gsl::narrow<decltype(FormIndex)>(FormList->size());
 			if (StateMap.test(StateFlag::DELTO)) {
 				auto validStitchCount = 0u;
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8384,8 +8384,8 @@ void thred::internal::delet() {
 			if (!satinFlag) {
 				satin::delspnt();
 			}
-			if (ClosestFormToCursor > FormList->size() - 1) {
-				ClosestFormToCursor = FormList->size() - 1;
+			if (ClosestFormToCursor > FormList->size() - 1u) {
+				ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 			}
 			if (!FormList->empty()) {
 				form::frmout(ClosestFormToCursor);
@@ -8661,8 +8661,9 @@ void thred::internal::insfil() {
 					if (version) {
 						gethand(StitchBuffer, PCSHeader.stitchCount);
 						// ToDo - replace constants with sizes of data structures?
-						homscor = FormList->size() * FRMW + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
-						          + FormVertices->size() * FRMPW + PCSHeader.stitchCount * STCHW;
+						homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW
+						          + gethand(StitchBuffer, PCSHeader.stitchCount) * HANDW
+						          + gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW + PCSHeader.stitchCount * STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
 					thred::savdo();
@@ -8679,20 +8680,20 @@ void thred::internal::insfil() {
 					                            + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					auto insertedRectangle = fRECTANGLE{ 1e-9f, 1e9f, 1e-9f, 1e9f };
-					InsertedVertexIndex    = FormVertices->size();
-					InsertedFormIndex      = FormList->size();
+					InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
+					InsertedFormIndex      = gsl::narrow<decltype(InsertedFormIndex)>(FormList->size());
 					if (fileHeader.formCount) {
-						const auto newFormVertexIndex = FormVertices->size();
-						auto newSatinGuideIndex = SatinGuides->size();
-						auto clipOffset         = ClipPoints->size();
-						auto textureOffset      = TexturePointsBuffer->size();
+						const auto newFormVertexIndex = gsl::narrow<unsigned int>(FormVertices->size());
+						auto newSatinGuideIndex = gsl::narrow<unsigned int>(SatinGuides->size());
+						auto clipOffset         = gsl::narrow<unsigned int>(ClipPoints->size());
+						auto textureOffset      = gsl::narrow<unsigned int>(TexturePointsBuffer->size());
 						if (version < 2) {
 							auto inFormList = std::vector<FRMHEDO>{};
 							inFormList.resize(fileHeader.formCount);
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
 							ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
-							if (BytesRead != fileHeader.formCount * sizeof(inFormList[0])) {
-								inFormList.resize(BytesRead / sizeof(inFormList[0]));
+							if (BytesRead != fileHeader.formCount * sizeof(decltype(inFormList.back()))) {
+								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto& form : inFormList) {
@@ -8706,15 +8707,15 @@ void thred::internal::insfil() {
 							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
 							ReadFileInt(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								inFormList.resize(BytesRead / sizeof(inFormList[0]));
+								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto& form : inFormList) {
 								FormList->push_back(FRMHED{ form });
 							}
-							FormIndex += gsl::narrow<unsigned int>(inFormList.size());
+							FormIndex += gsl::narrow<decltype(FormIndex)>(inFormList.size());
 						}
-						auto vertexOffset = FormVertices->size();
+						auto vertexOffset = gsl::narrow<unsigned int>(FormVertices->size());
 						if (fileHeader.vertexCount != 0u) {
 							auto inFormVertices = std::vector<fPOINT>{};
 							inFormVertices.resize(fileHeader.vertexCount);
@@ -8730,7 +8731,7 @@ void thred::internal::insfil() {
 						else {
 							StateMap.set(StateFlag::BADFIL);
 						}
-						auto guideOffset = SatinGuides->size();
+						auto guideOffset = gsl::narrow<unsigned int>(SatinGuides->size());
 						if (fileHeader.dlineCount) {
 							auto inSatinGuides = std::vector<SATCONOUT>{};
 							inSatinGuides.resize(fileHeader.dlineCount);
@@ -9628,7 +9629,7 @@ void thred::internal::seldwn() {
 					}
 				}
 				else {
-					ClosestFormToCursor = FormList->size() - 1;
+					ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 				}
 				displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
 				StateMap.set(StateFlag::RESTCH);
@@ -11693,18 +11694,18 @@ void thred::internal::qcode() {
 	// ToDo - do we need to erase vertices and textures when aborting?
 	if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
 		FormList->pop_back();
-		ClosestFormToCursor = FormList->size() - 1;
+		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	};
 	if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 		FormList->pop_back();
-		ClosestFormToCursor = FormList->size() - 1;
+		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	}
 	if (StateMap.testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 		for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
 			FormList->pop_back();
 		}
 		SelectedFormList->clear();
-		ClosestFormToCursor = FormList->size() - 1;
+		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	}
 	if (!UserFlagMap.test(UserFlag::MARQ)) {
 		StateMap.reset(StateFlag::GMRK);
@@ -14004,7 +14005,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			form::refil();
 			StateMap.reset(StateFlag::FUNCLP);
 			if (StateMap.testAndReset(StateFlag::FPSEL)) {
-				form::frmout(FormList->size() - 1);
+				form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 			}
 			StateMap.set(StateFlag::RESTCH);
 			return true;
@@ -15263,7 +15264,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
 								FormList->push_back(FRMHED{});
-								ClosestFormToCursor  = FormList->size() - 1;
+								ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 								auto& formIter       = FormList->back();
 								formIter.type        = FRMLINE;
 								formIter.vertexCount = ClipFormVerticesData->vertexCount + 1;
@@ -15297,7 +15298,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto formVertices  = convert_ptr<fPOINT*>(&forms[iForm]);
 							auto currentVertex = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm              = &((*FormList)[FormIndex + iForm]);
+								SelectedForm              = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
 								SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
 								auto vertexIt             = FormVertices->begin() + SelectedForm->vertexIndex;
 								for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -15307,7 +15308,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
 							auto currentGuide = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm = &((*FormList)[FormIndex + iForm]);
+								SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
 								if (SelectedForm->type == SAT && SelectedForm->satinGuideCount) {
 									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 									auto guideIt                     = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
@@ -15319,7 +15320,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto clipData    = convert_ptr<fPOINT*>(&guides[currentGuide]);
 							auto currentClip = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm = &((*FormList)[FormIndex + iForm]);
+								SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
 								if (clip::isclpx(FormIndex + iForm)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
 									auto offsetStart                   = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
@@ -15341,7 +15342,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto textureCount  = 0;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 								if (texture::istx(FormIndex + iForm)) {
-									SelectedForm = &((*FormList)[FormIndex + iForm]);
+									SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
 									textureCount += SelectedForm->fillInfo.texture.count;
 									SelectedForm->fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
 								}
@@ -15382,7 +15383,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								FormMoveDelta.y = 0.0f;
 								StateMap.set(StateFlag::FUNCLP);
 								FormList->push_back(ClipFormHeader->form);
-								ClosestFormToCursor = FormList->size() - 1;
+								ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 								form::fvars(ClosestFormToCursor);
 								auto& formIter = FormList->back();
 								formIter.attribute
