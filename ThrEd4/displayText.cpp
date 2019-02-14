@@ -429,14 +429,14 @@ void displayText::savdisc() {
 
 #pragma warning(push)
 #pragma warning(disable : 26493) // we use c style casts as this is a C API
+BOOL CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) {
+	SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
+	return TRUE;
+}
+
 void displayText::updateWinFont(HWND hWnd) noexcept {
 	const auto* hFont = displayText::getThrEdFont(400);
-	EnumChildWindows(hWnd,
-	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
-		                 SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
-		                 return TRUE;
-	                 },
-	                 (LPARAM)hFont);
+	EnumChildWindows(hWnd, EnumChildProc, (LPARAM)hFont);
 }
 #pragma warning(pop)
 
