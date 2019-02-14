@@ -61,7 +61,7 @@ bool texture::internal::txnam(wchar_t* name, int sizeName) {
 	auto texturePath = fs::path(ArgList[0]);
 
 	texturePath.replace_filename(L"thred.txr");
-	return !wcscpy_s(name, sizeName, texturePath.c_str());
+	return wcscpy_s(name, sizeName, texturePath.c_str()) == 0;
 }
 
 void texture::txdun() {
@@ -111,7 +111,7 @@ void texture::txdun() {
 void texture::internal::redtbak() {
 	OutputDebugString(fmt::format(L"retrieving texture history {}\n", TextureHistoryIndex).c_str());
 	const auto* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
-	if (textureHistoryItem) {
+	if (textureHistoryItem != nullptr) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
 		TextureScreen.width      = textureHistoryItem->width;
 		TextureScreen.spacing    = textureHistoryItem->spacing;
@@ -137,9 +137,9 @@ void texture::redtx() {
 		if (handle != INVALID_HANDLE_VALUE) {
 			auto bytesRead = DWORD{ 0 };
 			char sig[4]    = { 0 };
-			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr)) {
-				if (!strcmp(sig, "txh")) {
-					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
+			if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr) != 0) {
+				if (strcmp(sig, "txh") == 0) {
+					if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
 						auto historyBytesRead = DWORD{ 0 };
 						if (ReadFileInt(handle,
 						                textureHistoryBuffer.data(),
@@ -150,7 +150,7 @@ void texture::redtx() {
 								TextureHistory[index].height  = textureHistoryBuffer[index].height;
 								TextureHistory[index].width   = textureHistoryBuffer[index].width;
 								TextureHistory[index].spacing = textureHistoryBuffer[index].spacing;
-								if (textureHistoryBuffer[index].count) {
+								if (textureHistoryBuffer[index].count != 0u) {
 									TextureHistory[index].texturePoints.resize(textureHistoryBuffer[index].count);
 									if (!ReadFileInt(handle,
 									                 TextureHistory[index].texturePoints.data(),
@@ -198,7 +198,7 @@ void texture::internal::txrfor() noexcept {
 }
 
 bool texture::internal::chktxh(_In_ const TXHST* historyItem) {
-	if (historyItem) {
+	if (historyItem != nullptr) {
 		if (historyItem->texturePoints.size() != TempTexturePoints->size()) {
 			return true;
 		}
@@ -254,16 +254,16 @@ void texture::internal::txrbak() noexcept {
 }
 
 void texture::dutxtfil() {
-	if (!IniFile.textureHeight) {
+	if (IniFile.textureHeight == 0.0f) {
 		IniFile.textureHeight = ITXHI;
 	}
-	if (!IniFile.textureWidth) {
+	if (IniFile.textureWidth == 0.0f) {
 		IniFile.textureWidth = ITXWID;
 	}
-	if (!IniFile.textureSpacing) {
+	if (IniFile.textureSpacing == 0.0f) {
 		IniFile.textureSpacing = static_cast<float>(ITXSPAC);
 	}
-	if (!IniFile.textureEditorSize) {
+	if (IniFile.textureEditorSize == 0u) {
 		IniFile.textureEditorSize = ITXPIX;
 	}
 	StateMap.set(StateFlag::TXTRED);
@@ -278,13 +278,13 @@ void texture::dutxtfil() {
 	SideWindowButton = nullptr;
 	if (StateMap.test(StateFlag::WASTXBAK)) {
 		txi::redtbak();
-		if (!TextureScreen.areaHeight) {
+		if (TextureScreen.areaHeight == 0.0f) {
 			TextureScreen.areaHeight = IniFile.textureHeight;
 		}
-		if (!TextureScreen.spacing) {
+		if (TextureScreen.spacing == 0.0f) {
 			TextureScreen.spacing = IniFile.underlaySpacing;
 		}
-		if (!TextureScreen.width) {
+		if (TextureScreen.width == 0.0f) {
 			TextureScreen.width = IniFile.textureWidth;
 		}
 		StateMap.set(StateFlag::LASTXBAK);
@@ -517,7 +517,7 @@ void texture::txtrbut() {
 }
 
 bool texture::internal::txtclos(unsigned int& closestTexturePoint) {
-	if (closestTexturePoint) {
+	if (closestTexturePoint != 0u) {
 		auto minimumLength = 1e99;
 		auto reference     = POINT{};
 		auto point         = POINT{};
@@ -823,9 +823,9 @@ void texture::internal::setxfrm() {
 void texture::internal::txtclp(FRMHED& textureForm) {
 	ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 	ClipMemory = GetClipboardData(ThrEdClip);
-	if (ClipMemory) {
+	if (ClipMemory != nullptr) {
 		ClipFormHeader = static_cast<FORMCLIP*>(GlobalLock(ClipMemory));
-		if (ClipFormHeader) {
+		if (ClipFormHeader != nullptr) {
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm     = &ClipFormHeader->form;
 				auto vertices    = convert_ptr<fPOINT*>(&SelectedForm[1]);
@@ -895,7 +895,7 @@ void texture::internal::chktxnum() {
 	if (!TextureInputBuffer->empty()) {
 		value = std::stof(*TextureInputBuffer);
 	}
-	if (value) {
+	if (value != 0.0f) {
 		TextureInputBuffer->clear();
 		value *= PFGRAN;
 		switch (TextureWindowId) {
@@ -1004,7 +1004,7 @@ void texture::deltx() {
 
 	const auto currentIndex = (*FormList)[ClosestFormToCursor].fillInfo.texture.index;
 
-	if (TextureIndex && texture::istx(ClosestFormToCursor) && SelectedForm->fillInfo.texture.count) {
+	if ((TextureIndex != 0u) && texture::istx(ClosestFormToCursor) && (SelectedForm->fillInfo.texture.count != 0u)) {
 		// First check to see if the texture is shared between forms
 		for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
 			if (texture::istx(iForm)) {
@@ -1084,7 +1084,7 @@ void texture::internal::nutx() {
 		TexturePointsBuffer->resize(TexturePointsBuffer->size() + tempPointCount);
 		TextureIndex += tempPointCount;
 		auto startSource = TexturePointsBuffer->begin() + index;
-		if (pointCount) {
+		if (pointCount != 0u) {
 			auto endSource   = startSource + pointCount;
 			auto destination = startSource + tempPointCount;
 			auto _           = std::copy(startSource, endSource, destination);
@@ -1288,7 +1288,7 @@ void texture::internal::txbak() {
 		SelectedTexturePointsList->clear();
 		auto flag = false;
 		for (auto iHistory = 0u; iHistory < ITXBUFLEN; iHistory++) {
-			if (TextureHistory[TextureHistoryIndex].width) {
+			if (TextureHistory[TextureHistoryIndex].width != 0.0f) {
 				flag = true;
 				break;
 			}
@@ -1306,7 +1306,7 @@ void texture::internal::nxbak() {
 		auto flag = false;
 		for (auto iHistory = 0u; iHistory < ITXBUFLEN; iHistory++) {
 			txi::txrfor();
-			if (TextureHistory[TextureHistoryIndex].width) {
+			if (TextureHistory[TextureHistoryIndex].width != 0.0f) {
 				flag = true;
 				break;
 			}
@@ -1380,7 +1380,7 @@ void texture::internal::txgro(FRMHED& textureForm) {
 }
 
 bool texture::internal::txdig(unsigned keyCode, char& character) noexcept {
-	if (isdigit(keyCode)) {
+	if (isdigit(keyCode) != 0) {
 		character = gsl::narrow<char>(keyCode);
 		return true;
 	}
@@ -1397,7 +1397,7 @@ bool texture::internal::txdig(unsigned keyCode, char& character) noexcept {
 
 void texture::internal::txnudg(int deltaX, float deltaY) {
 	if (!SelectedTexturePointsList->empty()) {
-		if (deltaY) {
+		if (deltaY != 0.0f) {
 			const auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 			for (auto point : *SelectedTexturePointsList) {
 				const auto yCoord = (*TempTexturePoints)[point].y + screenDeltaY;
@@ -1434,7 +1434,7 @@ void texture::internal::txnudg(int deltaX, float deltaY) {
 void texture::txsnap() {
 	const auto txpntSize = TempTexturePoints->size();
 
-	if (txpntSize) {
+	if (txpntSize != 0u) {
 		texture::savtxt();
 		const auto halfGrid = IniFile.gridSize / 2;
 		if (!SelectedTexturePointsList->empty()) {
@@ -1458,7 +1458,7 @@ void texture::txsnap() {
 void texture::txtkey(unsigned keyCode, FRMHED& textureForm) {
 	char character = {};
 
-	if (SideWindowButton) {
+	if (SideWindowButton != nullptr) {
 		auto flag = true;
 		switch (keyCode) {
 		case VK_RETURN: {
@@ -1546,7 +1546,7 @@ void texture::txtkey(unsigned keyCode, FRMHED& textureForm) {
 		return;
 	}
 	case 'V': {
-		if (OpenClipboard(ThrEdWindow)) {
+		if (OpenClipboard(ThrEdWindow) != 0) {
 			txi::txtclp(textureForm);
 		}
 		break;
@@ -1561,7 +1561,7 @@ void texture::txtkey(unsigned keyCode, FRMHED& textureForm) {
 	}
 	case 'D':
 	case VK_DELETE: {
-		if (GetKeyState(VK_SHIFT) & GetKeyState(VK_CONTROL) & 0x8000) {
+		if ((GetKeyState(VK_SHIFT) & GetKeyState(VK_CONTROL) & 0x8000) != 0) {
 			txi::txdelal();
 		}
 		else {
@@ -1606,10 +1606,10 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 	StateMap.set(StateFlag::TXFIL);
 	ClipRectSize.cx = SelectedForm->fillSpacing;
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
-	if (currentCount) {
+	if (currentCount != 0u) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
 			const auto currentPoint = TexturePointsBuffer->at(gsl::narrow<size_t>(currentIndex) + iTexturePoint);
-			if (currentPoint.line) {
+			if (currentPoint.line != 0u) {
 				const auto iSegment = currentPoint.line - 1;
 
 				textureSegments[iSegment].line = iTexturePoint;

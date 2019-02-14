@@ -41,7 +41,7 @@ void         chain();
 void         chan();
 void         chkcont();
 bool         chkdel() noexcept;
-unsigned     chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+bool     chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 bool         chkmax(unsigned int arg0, unsigned int arg1) noexcept;
 void         chkseq(bool border);
 bool         cisin(float xCoordinate, float yCoordinate);
@@ -49,7 +49,7 @@ unsigned int closflt(float xCoordinate, float yCoordinate);
 bool         closfrm();
 void         clpfil();
 void         clpspac(unsigned insertPoint, unsigned int count);
-void         clrfills();
+void         clrfills() noexcept;
 void         cntrx();
 void         col2frm();
 void         contfil();
@@ -94,7 +94,7 @@ unsigned     find1st();
 void         fliph();
 void         flipv();
 void         flpord();
-void         fltspac(unsigned int start, unsigned int count);
+void         fltspac(unsigned int vertexOffset, unsigned int count);
 void         form();
 void         frm0();
 void         frmadj(unsigned int formIndex);
@@ -132,8 +132,6 @@ constexpr float midl(float high, float low);
 
 void movlayr(unsigned codedLayer);
 void munfrm();
-void mvfltsb(fPOINT* destination, const fPOINT* source, unsigned int count) noexcept;
-void mvfrmsb(FRMHED* destination, const FRMHED* source, unsigned int count) noexcept;
 bool notfstch(unsigned attribute) noexcept;
 void nubrdcol(unsigned color) noexcept;
 void nufilcol(unsigned color) noexcept;
@@ -316,7 +314,7 @@ namespace internal {
 	void  fshor();
 	void  fspic();
 	void  fsvrt();
-	void  getbig();
+	void  getbig() noexcept;
 	float getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	             const std::vector<double>& lengths,
 	             unsigned                   iPoint,

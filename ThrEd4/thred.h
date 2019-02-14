@@ -34,10 +34,10 @@ unsigned int adflt(unsigned int count);
 
 void     bBox() noexcept;
 void     chkmen() noexcept;
-void     chkrng(fPOINT& range);
+void     chkrng(fPOINT& range) noexcept;
 void     coltab() noexcept;
 void     delfstchs() noexcept;
-void     delinf();
+void     delinf() noexcept;
 void     delstchm() noexcept;
 unsigned duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;

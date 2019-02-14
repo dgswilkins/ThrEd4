@@ -70,7 +70,7 @@ void trace::initColorRef() noexcept {
 }
 
 void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
-	if (window) {
+	if (window != nullptr) {
 		*window = CreateWindow(L"STATIC",
 		                       L"",
 		                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
@@ -125,7 +125,7 @@ void trace::internal::trcratnum() {
 }
 
 bool trace::internal::trcin(COLORREF color) {
-	if (color) {
+	if (color != 0u) {
 		ti::trcols(color);
 		if (StateMap.test(StateFlag::TRCRED)) {
 			if (PixelColors[0] > HighColors[0]) {
@@ -169,7 +169,7 @@ void trace::internal::getrmap() {
 	info.bmiHeader       = header;
 	TraceBitmap          = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
 	TraceDC              = CreateCompatibleDC(StitchWindowDC);
-	if (TraceBitmap && TraceDC) {
+	if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
 		SelectObject(TraceDC, TraceBitmap);
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 		StateMap.set(StateFlag::WASTRAC);
@@ -232,7 +232,7 @@ static inline void trace::internal::difsub(const unsigned source, unsigned shift
 void trace::internal::difbits(unsigned shift, unsigned* point) noexcept {
 	auto testPoint = point;
 
-	if (testPoint) {
+	if (testPoint != nullptr) {
 		ti::difsub(*testPoint, shift, TraceAdjacentColors[0]);
 
 		testPoint -= BitmapWidth;
@@ -310,14 +310,14 @@ void trace::untrace() {
 }
 
 void trace::trdif() {
-	if (!PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] == 0) {
 		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
 	StateMap.reset(StateFlag::TRSET);
 	StateMap.reset(StateFlag::HIDMAP);
 	trace::untrace();
-	if (BitmapHeight * BitmapWidth) {
+	if ((BitmapHeight * BitmapWidth) != 0u) {
 		auto differenceBitmap = std::vector<unsigned>{};
 		differenceBitmap.resize(gsl::narrow<size_t>(BitmapHeight) * BitmapWidth);
 
@@ -350,7 +350,7 @@ void trace::trdif() {
 			const auto ratio = (255.0) / (colorSumMaximum - colorSumMinimum);
 			for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
-				if (differenceBitmap[iPixel]) {
+				if (differenceBitmap[iPixel] != 0u) {
 					const auto adjustedColorSum = dToUI((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
@@ -364,7 +364,7 @@ void trace::trdif() {
 }
 
 void trace::trace() {
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		trace::untrace();
 		ti::tracwnd();
 		ti::getrmap();
@@ -541,7 +541,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 	}
 	case TRCD: {
 		pixelIndex -= (BitmapWidth + 1);
-		if (!CurrentTracePoint.y) {
+		if (CurrentTracePoint.y == 0) {
 			traceDirection = TRCR;
 		}
 		else {
@@ -564,7 +564,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 	}
 	case TRCL: {
 		pixelIndex += (BitmapWidth - 1);
-		if (!CurrentTracePoint.x) {
+		if (CurrentTracePoint.x == 0) {
 			traceDirection = TRCD;
 		}
 		else {
@@ -620,7 +620,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 }
 
 void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {
-	if (point) {
+	if (point != nullptr) {
 		traceDiff.x = point[1].x - point[0].x;
 		// ToDo - this is likely incorrect
 		traceDiff.y = point[1].y - point[0].y;
@@ -699,7 +699,7 @@ void trace::internal::dutrac() {
 			}
 			auto flag                = 0u;
 			auto minimumEdgeDistance = 0x7fffffff;
-			if (findRectangle.left) {
+			if (findRectangle.left != 0) {
 				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 				flag                = TRCL;
 			}
@@ -710,7 +710,7 @@ void trace::internal::dutrac() {
 					flag                = TRCR;
 				}
 			}
-			if (findRectangle.bottom) {
+			if (findRectangle.bottom != 0) {
 				const auto edgeDistance = CurrentTracePoint.y - findRectangle.bottom;
 				if (edgeDistance < minimumEdgeDistance) {
 					minimumEdgeDistance = edgeDistance;
@@ -830,7 +830,7 @@ void trace::internal::dutrac() {
 void trace::trinit() {
 	unsigned histogramData[3][256] = { 0 };
 
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		if (!StateMap.test(StateFlag::TRSET)) {
 			StateMap.set(StateFlag::TRCRED);
 			StateMap.set(StateFlag::TRCGRN);
@@ -883,7 +883,7 @@ void trace::trinit() {
 			}
 			InvertDownColor = 0;
 			for (auto iRGB = 0u; iRGB < 3; iRGB++) {
-				if (componentPeak[iRGB]) {
+				if (componentPeak[iRGB] != 0u) {
 					componentPeak[iRGB]--;
 				}
 				InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
@@ -901,7 +901,7 @@ void trace::trinit() {
 }
 
 void trace::trcsel() {
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		StateMap.set(StateFlag::WASTRCOL);
 		StateMap.set(StateFlag::TRCRED);
 		StateMap.set(StateFlag::TRCBLU);
@@ -935,7 +935,7 @@ void trace::trcsel() {
 }
 
 void trace::internal::ritrcol(COLORREF* color, unsigned number) noexcept {
-	if (color) {
+	if (color != nullptr) {
 		*color &= TraceRGBMask[ColumnColor];
 		number &= 0xff;
 		*color |= (number << TraceShift[ColumnColor]);
@@ -1043,7 +1043,7 @@ void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 }
 
 void trace::internal::bfrm() {
-	if (VertexCount) {
+	if (VertexCount != 0u) {
 		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 			ti::pxlin(iVertex, iVertex + 1);
 		}
@@ -1054,7 +1054,7 @@ void trace::internal::bfrm() {
 }
 
 void trace::blak() {
-	if (!PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] == 0) {
 		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
@@ -1095,7 +1095,7 @@ void trace::tracpar() {
 		ColumnColor = ti::ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
 			do {
-				if (GetKeyState(VK_SHIFT) & 0x8000) {
+				if ((GetKeyState(VK_SHIFT) & 0x8000) != 0) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;
@@ -1234,7 +1234,7 @@ void trace::internal::durct(unsigned    shift,
 	traceMiddleMask.bottom = dToL(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
-	if (lowerColor) {
+	if (lowerColor != 0u) {
 		StateMap.set(StateFlag::DULO);
 		traceLowMask.bottom = traceMiddleMask.top;
 		traceLowMask.top    = 0;
