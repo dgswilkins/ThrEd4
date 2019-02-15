@@ -129,8 +129,8 @@ void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feathe
 	}
 	else {
 		feather.ratioLocal       = feather.minStitch / stitchLength;
-		const auto adjustedPoint = fPOINT{ duxrat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal),
-			                               duxrat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal) };
+		const auto adjustedPoint = fPOINT{ durat(BSequence[iSequence + 1].x, BSequence[iSequence].x, feather.ratioLocal),
+			                               durat(BSequence[iSequence + 1].y, BSequence[iSequence].y, feather.ratioLocal) };
 
 		point.x = durat(adjustedPoint.x, BSequence[iSequence].x, feather.ratio);
 		point.y = durat(adjustedPoint.y, BSequence[iSequence].y, feather.ratio);
