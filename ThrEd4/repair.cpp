@@ -228,15 +228,12 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			vertexCount += formList[iForm].vertexCount;
 		}
 	}
-	FormIndex        = iDestination;
 	auto vertexPoint = std::vector<fPOINT>{};
 	auto iVertex     = 0u;
 	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = formList[iForm];
-		// ToDo - find a better way than pointer arithmetic
-		const auto vertexDifference = form.vertexIndex;
-		if (FormVertices->size() >= gsl::narrow_cast<size_t>(vertexDifference) + form.vertexCount) {
+		if (FormVertices->size() >= gsl::narrow_cast<size_t>(form.vertexIndex) + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
 			auto       sourceStart = FormVertices->cbegin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
@@ -247,24 +244,23 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			ri::bcup(iForm, badData);
 		}
 		else {
-			if (vertexDifference < FormVertices->size()) {
-				form.vertexCount = gsl::narrow<unsigned short>(FormVertices->size() - vertexDifference);
+			if (form.vertexIndex < FormVertices->size()) {
+				form.vertexCount = gsl::narrow<unsigned short>(FormVertices->size() - form.vertexIndex);
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
-				auto sourceStart = FormVertices->cbegin() + form.vertexIndex;
-				auto sourceEnd   = sourceStart + form.vertexCount;
-				auto destination = vertexPoint.begin() + iVertex;
-				auto _           = std::copy(sourceStart, sourceEnd, destination);
+				auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
+				auto sourceEnd = std::next(sourceStart, form.vertexCount);
+				vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
 				ri::bcup(iForm, badData);
 			}
 			else {
-				FormIndex = iForm;
+				FormList->resize(iForm);
 				ClipPoints->resize(badData.clip);
 				SatinGuides->resize(badData.guideCount);
 				TextureIndex = badData.tx;
 				ri::chkfstch();
-				ri::adbad(repairMessage, IDS_FRMDAT, FormIndex - iForm + 1);
+				ri::adbad(repairMessage, IDS_FRMDAT, gsl::narrow<unsigned int>(FormList->size()));
 				flag = false;
 				break;
 			}

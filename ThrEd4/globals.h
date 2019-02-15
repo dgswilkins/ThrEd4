@@ -129,7 +129,6 @@ extern std::vector<double>* FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
 extern HWND         FormDataSheet;
-extern unsigned int FormIndex;
 
 extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;

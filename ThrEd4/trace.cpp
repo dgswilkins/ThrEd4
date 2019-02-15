@@ -820,7 +820,6 @@ void trace::internal::dutrac() {
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
-		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
 		form::tglfrm();

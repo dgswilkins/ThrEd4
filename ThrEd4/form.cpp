@@ -413,7 +413,6 @@ void form::setfrm() {
 			SelectedForm->rectangle.bottom = vertexIt[iVertex].y;
 		}
 	}
-	FormIndex++;
 	StateMap.reset(StateFlag::FORMIN);
 	StateMap.set(StateFlag::INIT);
 	StateMap.set(StateFlag::RESTCH);
@@ -540,7 +539,6 @@ void form::ritfrct(unsigned int iForm, HDC dc) {
 
 void form::delfrms() {
 	thred::savdo();
-	FormIndex = 0;
 	FormVertices->clear();
 	ClipPoints->clear();
 	FormList->clear();
@@ -7352,8 +7350,7 @@ void form::rotdup() {
 
 void form::internal::adfrm(unsigned int iForm) {
 	FormList->push_back((*FormList)[iForm]);
-	FormIndex++;
-
+	
 	auto& formHeader = FormList->back();
 
 	SelectedForm           = &((*FormList)[iForm]);
@@ -7400,7 +7397,6 @@ void form::internal::duprotfs(double rotationAngle) {
 		adfrm(selectedForm);
 		thred::rotfn(rotationAngle, rotationCenter);
 	}
-	FormIndex = gsl::narrow<unsigned int>(FormList->size());
 }
 
 void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter) {
@@ -7440,7 +7436,6 @@ void form::internal::cplayfn(unsigned int iForm, unsigned play) {
 	SelectedForm->attribute |= play;
 	SelectedForm->extendedAttribute = 0;
 	form::dusqr();
-	FormIndex++;
 }
 
 void form::cpylayr(unsigned codedLayer) {
@@ -8476,7 +8471,6 @@ bool form::internal::spltlin() {
 	auto& srcForm = (*FormList)[ClosestFormToCursor];
 	auto  it      = FormList->cbegin() + ClosestFormToCursor;
 	it            = FormList->insert(it, srcForm);
-	FormIndex++;
 	srcForm       = (*FormList)[ClosestFormToCursor];
 	auto& dstForm = (*FormList)[gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1u];
 
@@ -8559,7 +8553,6 @@ void form::stchs2frm() {
 			vertexIt[iVertex++].y = StitchBuffer[iStitch].y;
 		}
 		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
-		FormIndex++;
 		if (ClosestPointIndex > GroupStitchIndex) {
 			if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 				ClosestPointIndex++;

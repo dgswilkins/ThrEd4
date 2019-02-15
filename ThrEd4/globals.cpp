@@ -98,7 +98,6 @@ std::vector<double>* FormAngles;        // angles of a form for satin border fil
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
 
 HWND                 FormDataSheet = nullptr; // form data sheet
-unsigned int         FormIndex     = 0u;      // index into the list of forms
 std::vector<POINT>*  FormLines;               // used in the form drawing routines
 std::vector<FRMHED>* FormList;                // a list of form headers
 unsigned int         FormMenuChoice = 0u;     // data type for form data form numerical entry

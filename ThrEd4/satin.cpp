@@ -95,7 +95,6 @@ void satin::spltsat(SATCON currentGuide) {
 	auto  dest    = std::next(formList.begin(), ClosestFormToCursor);
 	formList.insert(dest, srcForm);
 	form::fvars(ClosestFormToCursor);
-	FormIndex++;
 	const auto maxForm  = formList.size();
 	auto       position = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
@@ -792,7 +791,6 @@ void satin::ribon() {
 					guideIt[iGuide].start  = iGuide + 2;
 					guideIt[iGuide].finish = form.vertexCount - iGuide - 1;
 				}
-				FormIndex++;
 				ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 				form::frmout(ClosestFormToCursor);
 				form::refilfn();
@@ -1190,7 +1188,6 @@ void satin::satfix() {
 		form.vertexCount = vertexCount;
 		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		form.satinGuideCount = 0;
-		FormIndex++;
 		StateMap.set(StateFlag::INIT);
 	}
 	else {
