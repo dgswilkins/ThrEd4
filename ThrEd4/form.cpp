@@ -590,7 +590,10 @@ void form::fselrct(unsigned int iForm) {
 	if (line[5].y > SelectedFormsRect.bottom) {
 		SelectedFormsRect.bottom = line[5].y;
 	}
-	Polyline(StitchWindowMemDC, line, 5);
+	if (OutLineEverySelectedForm)
+	{
+		Polyline(StitchWindowMemDC, line, 5);
+	}
 }
 
 void form::rct2sel(const RECT& rectangle, std::vector<POINT>& line) {

@@ -188,6 +188,7 @@ extern unsigned     NearestCount;
 extern unsigned int NewFormVertexCount;
 extern HWND         OKButton;
 extern fPOINT       OSequence[OSEQLEN];
+extern bool		    OutLineEverySelectedForm;
 extern unsigned int OutputIndex;
 
 extern std::vector<fPOINT>* OutsidePointList;
