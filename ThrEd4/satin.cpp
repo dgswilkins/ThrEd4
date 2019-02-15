@@ -97,7 +97,7 @@ void satin::spltsat(SATCON currentGuide) {
 	form::fvars(ClosestFormToCursor);
 	FormIndex++;
 	const auto maxForm  = formList.size();
-	auto       position = std::next(FormVertices->begin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + VertexCount);
+	auto       position = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + VertexCount);
 	FormVertices->insert(position, 2, fPOINT{});
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		formList[iForm].vertexIndex += 2;
@@ -159,7 +159,7 @@ void satin::spltsat(SATCON currentGuide) {
 		nextForm.wordParam -= (currentGuide.start - 1);
 	}
 	const auto offset = SelectedForm->satinOrAngle.guide + iNewGuide - 1;
-	auto       pos    = std::next(SatinGuides->begin(), offset);
+	auto       pos    = std::next(SatinGuides->cbegin(), offset);
 	SatinGuides->erase(pos);
 	nextForm.satinOrAngle.guide   = SelectedForm->satinOrAngle.guide + ActivePointIndex;
 	nextForm.satinGuideCount      = SelectedForm->satinGuideCount - ActivePointIndex - 1;
@@ -184,7 +184,7 @@ void satin::internal::satclos() {
 
 	form::uninsf();
 	thred::px2stch();
-	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
+	auto vertexIt = FormVertices->cbegin() + SelectedForm->vertexIndex;
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		const auto deltaX = SelectedPoint.x - vertexIt[iVertex].x;
 		const auto deltaY = SelectedPoint.y - vertexIt[iVertex].y;
@@ -288,7 +288,7 @@ bool satin::internal::satselfn() {
 		auto&      form      = (*FormList)[iForm];
 		const auto layerCode = (form.attribute & FRMLMSK) >> 1;
 		if ((ActiveLayer == 0u) || (layerCode == 0u) || layerCode == ActiveLayer) {
-			auto vertexIt = FormVertices->begin() + form.vertexIndex;
+			auto vertexIt = FormVertices->cbegin() + form.vertexIndex;
 			for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {
 				const auto deltaX = SelectedPoint.x - vertexIt[iVertex].x;
 				const auto deltaY = SelectedPoint.y - vertexIt[iVertex].y;
@@ -309,7 +309,7 @@ void satin::satsel() {
 		form::fvars(ClosestFormToCursor);
 		thred::duzrat();
 		StartPoint    = ClosestVertexToCursor;
-		auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
+		auto vertexIt = FormVertices->cbegin() + SelectedForm->vertexIndex;
 		form::sfCor2px(vertexIt[ClosestVertexToCursor], (*FormLines)[0]);
 		StateMap.reset(StateFlag::SHOCON);
 		StateMap.set(StateFlag::SATCNKT);
@@ -324,7 +324,7 @@ void satin::internal::satcpy(const std::vector<SATCON>& source, unsigned int siz
 	auto eraseEnd   = eraseStart + (CurrentFormGuidesCount - size);
 	SatinGuides->erase(eraseStart, eraseEnd);
 	auto guideIt = SatinGuides->begin() + CurrentFormGuides; // iterator may be invalidated by erase
-	std::copy(source.begin(), source.end(), guideIt);
+	std::copy(source.cbegin(), source.cend(), guideIt);
 }
 
 void satin::satadj() {
@@ -610,7 +610,7 @@ void satin::delspnt() {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex--;
 	}
-	auto vertexIt = FormVertices->begin() + SelectedForm->vertexIndex;
+	auto vertexIt = FormVertices->cbegin() + SelectedForm->vertexIndex;
 	thred::ritfcor(vertexIt[ClosestVertexToCursor]);
 	displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	form::frmout(ClosestFormToCursor);
@@ -679,14 +679,14 @@ void satin::internal::satends(unsigned isBlunt) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		auto vertexIt         = FormVertices->begin() + SelectedForm->vertexIndex;
+		auto vertexIt         = FormVertices->cbegin() + SelectedForm->vertexIndex;
 		(*InsidePoints)[0].x  = vertexIt[0].x + step.x;
 		(*InsidePoints)[0].y  = vertexIt[0].y - step.y;
 		(*OutsidePoints)[0].x = vertexIt[0].x - step.x;
 		(*OutsidePoints)[0].y = vertexIt[0].y + step.y;
 	}
 	else {
-		auto vertexIt      = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt      = FormVertices->cbegin() + CurrentVertexIndex;
 		(*InsidePoints)[0] = (*OutsidePoints)[0] = vertexIt[0];
 	}
 	if ((isBlunt & FBLNT) != 0u) {
@@ -696,14 +696,14 @@ void satin::internal::satends(unsigned isBlunt) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		auto vertexIt                       = FormVertices->begin() + SelectedForm->vertexIndex;
+		auto vertexIt                       = FormVertices->cbegin() + SelectedForm->vertexIndex;
 		(*InsidePoints)[VertexCount - 1].x  = vertexIt[VertexCount - 1].x + step.x;
 		(*InsidePoints)[VertexCount - 1].y  = vertexIt[VertexCount - 1].y - step.y;
 		(*OutsidePoints)[VertexCount - 1].x = vertexIt[VertexCount - 1].x - step.x;
 		(*OutsidePoints)[VertexCount - 1].y = vertexIt[VertexCount - 1].y + step.y;
 	}
 	else {
-		auto vertexIt                    = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt                    = FormVertices->cbegin() + CurrentVertexIndex;
 		(*InsidePoints)[VertexCount - 1] = (*OutsidePoints)[VertexCount - 1] = vertexIt[VertexCount - 1];
 	}
 }
@@ -866,7 +866,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					}
 				}
 				else {
-					auto vertexIt              = FormVertices->begin() + CurrentVertexIndex;
+					auto vertexIt              = FormVertices->cbegin() + CurrentVertexIndex;
 					SelectedPoint              = vertexIt[line1Start];
 					OSequence[SequenceIndex++] = SelectedPoint;
 				}
@@ -911,7 +911,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 			iVertex     = form::prv(iNextVertex);
 		}
 		line2StitchCounts.push_back(stitchCount - segmentStitchCount);
-		auto vertexIt      = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt      = FormVertices->cbegin() + CurrentVertexIndex;
 		auto line1Point    = dPOINT(vertexIt[line1Start]);
 		auto line1Next     = form::nxt(line1Start);
 		auto line2Previous = form::prv(line2Start);
@@ -1101,7 +1101,7 @@ void satin::satfil() {
 	lengths.reserve(gsl::narrow<size_t>(VertexCount) + 1);
 	auto length = 0.0;
 	lengths.push_back(length);
-	auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+	auto vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 		const auto delta = dPOINT{ vertexIt[iVertex].x - vertexIt[iVertex - 1].x, vertexIt[iVertex].y - vertexIt[iVertex - 1].y };
 		length += hypot(delta.x, delta.y);
@@ -1453,7 +1453,7 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	auto vertexIt              = FormVertices->begin() + CurrentVertexIndex;
+	auto vertexIt              = FormVertices->cbegin() + CurrentVertexIndex;
 	(*InsidePoints)[finish].x  = vertexIt[finish].x - xOffset;
 	(*InsidePoints)[finish].y  = vertexIt[finish].y - yOffset;
 	(*OutsidePoints)[finish].x = vertexIt[finish].x + xOffset;

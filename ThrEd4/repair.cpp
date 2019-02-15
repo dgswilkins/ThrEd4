@@ -238,7 +238,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		const auto vertexDifference = form.vertexIndex;
 		if (FormVertices->size() >= gsl::narrow_cast<size_t>(vertexDifference) + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
-			auto       sourceStart = FormVertices->begin() + form.vertexIndex;
+			auto       sourceStart = FormVertices->cbegin() + form.vertexIndex;
 			auto       sourceEnd   = sourceStart + form.vertexCount;
 			auto       destination = vertexPoint.begin() + iVertex;
 			const auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -252,7 +252,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
-				auto sourceStart = FormVertices->begin() + form.vertexIndex;
+				auto sourceStart = FormVertices->cbegin() + form.vertexIndex;
 				auto sourceEnd   = sourceStart + form.vertexCount;
 				auto destination = vertexPoint.begin() + iVertex;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -290,7 +290,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			clipDifference = form.angleOrClipData.clip;
 			if (gsl::narrow_cast<size_t>(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-				auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
+				auto sourceStart = ClipPoints->cbegin() + form.angleOrClipData.clip;
 				auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
 				auto destination = clipPoint.begin() + clipCount;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -302,7 +302,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				if (clipDifference < ClipPoints->size()) {
 					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-					auto sourceStart = ClipPoints->begin() + form.angleOrClipData.clip;
+					auto sourceStart = ClipPoints->cbegin() + form.angleOrClipData.clip;
 					auto sourceEnd   = sourceStart + form.lengthOrCount.clipCount;
 					auto destination = clipPoint.begin() + clipCount;
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -320,7 +320,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			clipDifference = form.borderClipData;
 			if (gsl::narrow_cast<size_t>(clipDifference) + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
-				auto sourceStart = ClipPoints->begin() + form.borderClipData;
+				auto sourceStart = ClipPoints->cbegin() + form.borderClipData;
 				auto sourceEnd   = sourceStart + form.clipEntries;
 				auto destination = clipPoint.begin() + clipCount;
 				auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -332,7 +332,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				if (clipDifference < ClipPoints->size()) {
 					form.clipEntries = gsl::narrow<unsigned short>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.clipEntries);
-					auto sourceStart = ClipPoints->begin() + form.borderClipData;
+					auto sourceStart = ClipPoints->cbegin() + form.borderClipData;
 					auto sourceEnd   = sourceStart + form.clipEntries;
 					auto destination = clipPoint.begin() + clipCount;
 					auto _           = std::copy(sourceStart, sourceEnd, destination);
@@ -362,7 +362,7 @@ void repair::internal::repsat() {
 		if (form.type == SAT) {
 			const auto guideDifference = form.satinOrAngle.guide;
 			if (FormVertices->size() > gsl::narrow_cast<size_t>(guideDifference) + form.vertexCount) {
-				auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
+				auto       sourceStart = SatinGuides->cbegin() + form.satinOrAngle.guide;
 				auto       sourceEnd   = sourceStart + form.satinGuideCount;
 				const auto destination = SatinGuides->begin() + guideCount;
 				std::copy(sourceStart, sourceEnd, destination);
@@ -373,7 +373,7 @@ void repair::internal::repsat() {
 			else {
 				if (guideDifference < SatinGuides->size()) {
 					form.satinGuideCount   = gsl::narrow<unsigned short>(SatinGuides->size() - guideDifference);
-					auto       sourceStart = SatinGuides->begin() + form.satinOrAngle.guide;
+					auto       sourceStart = SatinGuides->cbegin() + form.satinOrAngle.guide;
 					auto       sourceEnd   = sourceStart + form.satinGuideCount;
 					const auto destination = SatinGuides->begin() + guideCount;
 					std::copy(sourceStart, sourceEnd, destination);

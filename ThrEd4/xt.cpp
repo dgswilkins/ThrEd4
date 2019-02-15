@@ -575,14 +575,14 @@ void xt::pes2crd() {
 		}
 	}
 	auto p2cName = utf::Utf16ToUtf8(std::wstring(programName));
-	std::copy(p2cName.begin(), p2cName.end(), IniFile.p2cName);
+	std::copy(p2cName.cbegin(), p2cName.cend(), IniFile.p2cName);
 	xi::fil2crd(*AuxName);
 }
 
 std::vector<fPOINT>& xt::insid() {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
-		auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			if (!form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				(*InsidePoints)[iVertex] = vertexIt[iVertex];
@@ -801,7 +801,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
 	if (SelectedForm->satinGuideCount != 0u) {
-		auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 		if (SelectedForm->wordParam != 0u) {
 			const auto iVertex       = SelectedForm->wordParam;
 			auto&      thisVertex    = vertexIt[iVertex];
@@ -827,7 +827,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 			start = SelectedForm->fillStart;
 		}
-		auto vertexIt          = FormVertices->begin() + CurrentVertexIndex;
+		auto vertexIt          = FormVertices->cbegin() + CurrentVertexIndex;
 		OSequence[OutputIndex] = vertexIt[start];
 		OutputIndex++;
 		auto finish = form::prv(start);
@@ -858,7 +858,7 @@ void xt::srtcol() {
 		histogram[StitchBuffer[iStitch].attribute & COLMSK]++;
 	}
 	auto startStitch = 0u;
-	auto it          = histogram.begin();
+	auto it          = histogram.cbegin();
 	for (auto& stitchColor : colorStartStitch) {
 		stitchColor = startStitch;
 		startStitch += *it;
@@ -1516,7 +1516,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 	if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-			auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+			auto vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 			ilData.output += gucon(vertexIt[SelectedForm->fillStart],
 			                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
 			                       ilData.output + offset,
@@ -1558,7 +1558,7 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
 		if ((SelectedForm->extendedAttribute & AT_END) != 0u) {
-			auto vertexIt = FormVertices->begin() + CurrentVertexIndex;
+			auto vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 			ilData.output += gucon(
 			    InterleaveSequence[InterleaveSequenceIndex - 1], vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
 		}
@@ -1644,7 +1644,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 	else {
 		const auto offset   = 0;
 		auto       code     = 0u;
-		auto       vertexIt = FormVertices->begin() + CurrentVertexIndex;
+		auto       vertexIt = FormVertices->cbegin() + CurrentVertexIndex;
 		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | InterleaveSequenceIndices[iSequence].code
 			                                 | InterleaveSequenceIndices[iSequence].color);

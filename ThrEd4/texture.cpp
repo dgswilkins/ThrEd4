@@ -1340,7 +1340,7 @@ void texture::internal::txtdel() {
 	}
 	auto iClosestPoint = 0u;
 	if (!TempTexturePoints->empty() && txi::txtclos(iClosestPoint)) {
-		auto it = TempTexturePoints->begin();
+		auto it = TempTexturePoints->cbegin();
 		std::advance(it, iClosestPoint);
 		it = TempTexturePoints->erase(it);
 		StateMap.set(StateFlag::RESTCH);

@@ -61,7 +61,7 @@ inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 	GSL_SUPPRESS(26490) {
 		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 			sDest.resize(len);
-			auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
+			std::copy(pBuf, pBuf + len, sDest.begin());
 		}
 	}
 }
