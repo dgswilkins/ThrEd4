@@ -11678,6 +11678,8 @@ void thred::internal::esccode() {
 	StateMap.reset(StateFlag::GTWLKLEN);
 	DestroyWindow(SpeedScrollBar);
 	StateMap.reset(StateFlag::GMRK);
+	StateMap.reset(StateFlag::FORMSEL);
+	SelectedFormList->clear();
 }
 
 void thred::internal::qcode() {
