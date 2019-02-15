@@ -1350,7 +1350,7 @@ void thred::internal::dudat() {
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
 	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
-	                  + sizeof((*TexturePointsBuffer)[0]) * TextureIndex;
+	                  + sizeof(decltype(TexturePointsBuffer->back())) * TextureIndex;
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<unsigned[]>(size);
 	auto backupData                  = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData != nullptr) {
@@ -3540,8 +3540,8 @@ void thred::internal::redbal() {
 		if (bytesRead == sizeof(balaradHeader)) {
 			auto balaradStitch = std::vector<BALSTCH>{};
 			balaradStitch.resize(MAXITEMS);
-			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(balaradStitch[0]), &bytesRead, nullptr);
-			const auto stitchCount  = bytesRead / sizeof(balaradStitch[0]);
+			ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(decltype(balaradStitch.back())), &bytesRead, nullptr);
+			const auto stitchCount  = bytesRead / sizeof(decltype(balaradStitch.back()));
 			BackgroundColor         = balaradHeader.backgroundColor;
 			IniFile.backgroundColor = balaradHeader.backgroundColor;
 			BackgroundPen           = nuPen(BackgroundPen, 1, BackgroundColor);
@@ -3640,7 +3640,7 @@ void thred::internal::ritbal() {
 				balaradStitch[iOutput++].flag = gsl::narrow<unsigned char>(color);
 			}
 		}
-		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(balaradStitch[0]), &bytesWritten, nullptr);
+		WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(decltype(balaradStitch.back())), &bytesWritten, nullptr);
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		WriteFileInt(balaradFile,
@@ -3759,8 +3759,8 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 		vtxLen = USHRT_MAX;
 	}
 	stitchHeader.vertexLen   = gsl::narrow<unsigned short>(vtxLen);
-	stitchHeader.dlineLen    = gsl::narrow<unsigned short>(sizeof((*FormVertices)[0]) * vertexCount);
-	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof((*ClipPoints)[0]) * clipDataCount);
+	stitchHeader.dlineLen    = gsl::narrow<unsigned short>(sizeof(decltype(FormVertices->back())) * vertexCount);
+	stitchHeader.clipDataLen = gsl::narrow<unsigned short>(sizeof(decltype(ClipPoints->back())) * clipDataCount);
 	durit(&output, &stitchHeader, sizeof(stitchHeader));
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
@@ -3821,21 +3821,21 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			}
 		}
 		if (!outForms.empty()) {
-			durit(&output, outForms.data(), gsl::narrow<unsigned int>(outForms.size() * sizeof(outForms[0])));
+			durit(&output, outForms.data(), gsl::narrow<unsigned int>(outForms.size() * sizeof(decltype(outForms.back()))));
 		}
 		if (!vertices.empty()) {
-			durit(&output, vertices.data(), gsl::narrow<unsigned int>(vertices.size() * sizeof(vertices[0])));
+			durit(&output, vertices.data(), gsl::narrow<unsigned int>(vertices.size() * sizeof(decltype(vertices.back()))));
 		}
 		if (!guides.empty()) {
-			durit(&output, guides.data(), gsl::narrow<unsigned int>(guides.size() * sizeof(guides[0])));
+			durit(&output, guides.data(), gsl::narrow<unsigned int>(guides.size() * sizeof(decltype(guides.back()))));
 		}
 		if (!points.empty()) {
-			durit(&output, points.data(), gsl::narrow<unsigned int>(points.size() * sizeof(points[0])));
+			durit(&output, points.data(), gsl::narrow<unsigned int>(points.size() * sizeof(decltype(points.back()))));
 		}
 		if (!TexturePointsBuffer->empty()) {
 			durit(&output,
 			      TexturePointsBuffer->data(),
-			      gsl::narrow<unsigned int>(TextureIndex * sizeof((*TexturePointsBuffer)[0])));
+			      gsl::narrow<unsigned int>(TextureIndex * sizeof(decltype(TexturePointsBuffer->back()))));
 		}
 	}
 	// ToDo - find a better way than pointer arithmetic
@@ -4042,7 +4042,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			WriteFileInt(colorFile,
 			             &colorData[0],
-			             gsl::narrow<unsigned int>(colorData.size() * sizeof(colorData[0])),
+			             gsl::narrow<unsigned int>(colorData.size() * sizeof(decltype(colorData.data()))),
 			             &bytesWritten,
 			             nullptr);
 		}
@@ -4051,7 +4051,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			WriteFileInt(colorFile,
 			             &colorData[2],
-			             gsl::narrow<unsigned int>((colorData.size() - 2) * sizeof(colorData[0])),
+			             gsl::narrow<unsigned int>((colorData.size() - 2) * sizeof(decltype(colorData.data()))),
 			             &bytesWritten,
 			             nullptr);
 		}
@@ -4341,7 +4341,7 @@ void thred::internal::sav() {
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
 			WriteFileInt(PCSFileHandle,
 			             DSTRecords.data(),
-			             gsl::narrow<unsigned int>(sizeof(DSTRecords[0]) * DSTRecords.size()),
+			             gsl::narrow<unsigned int>(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
 			             &bytesWritten,
 			             nullptr);
 			break;
@@ -4481,7 +4481,7 @@ void thred::internal::sav() {
 					PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<short>(integerPart);
 				}
 				if (WriteFile(
-				        PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(PCSStitchBuffer[0]), &bytesWritten, nullptr) == 0) {
+				        PCSFileHandle, PCSStitchBuffer.data(), iPCSstitch * sizeof(decltype(PCSStitchBuffer.back())), &bytesWritten, nullptr) == 0) {
 					displayText::riter();
 					flag = false;
 					break;
@@ -5310,10 +5310,10 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 			auto colorFileSize = LARGE_INTEGER{};
 			GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-			colors.resize(colorFileSize.u.LowPart / sizeof(colors[0]));
+			colors.resize(colorFileSize.u.LowPart / sizeof(decltype(colors.back())));
 			ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr);
 			CloseHandle(colorFile);
-			if (bytesRead > (sizeof(colors[0]) * 2)) {
+			if (bytesRead > (sizeof(decltype(colors.back())) * 2)) {
 				if (colors[0] == COLVER) {
 					BackgroundColor = colors[1];
 					ColorChanges    = 0;
@@ -5324,7 +5324,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 
 	auto iColor = 2u;
 	auto color  = 0u;
-	if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(colors[0]))) {
+	if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(decltype(colors.back())))) {
 		color = colmatch(colors[iColor++]);
 	}
 	else {
@@ -5336,7 +5336,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	auto iStitch           = 0u;
 	for (auto& record : DSTData) {
 		if ((record.nd & 0x40) != 0) {
-			if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(colors[0]))) {
+			if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(decltype(colors.back())))) {
 				color = colmatch(colors[iColor++]);
 			}
 			else {
@@ -7328,7 +7328,7 @@ unsigned thred::internal::frmcnt(unsigned int iForm, unsigned& formFirstStitchIn
 }
 
 unsigned int thred::internal::sizclp(unsigned& formFirstStitchIndex, unsigned& formStitchCount) {
-	FileSize    = sizeof(*ClipFormHeader) + VertexCount * sizeof((*FormVertices)[0]);
+	FileSize    = sizeof(*ClipFormHeader) + VertexCount * sizeof(decltype(FormVertices->back()));
 	auto length = FileSize;
 	if (SelectedForm->type == SAT) {
 		FileSize += SelectedForm->satinGuideCount * sizeof(decltype(SatinGuides->back()));
@@ -8734,10 +8734,10 @@ void thred::internal::insfil() {
 						if (fileHeader.dlineCount != 0u) {
 							auto inSatinGuides = std::vector<SATCONOUT>{};
 							inSatinGuides.resize(fileHeader.dlineCount);
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(inSatinGuides[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
 							ReadFile(InsertedFileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								inSatinGuides.resize(BytesRead / sizeof(inSatinGuides[0]));
+								inSatinGuides.resize(BytesRead / sizeof(decltype(inSatinGuides.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							for (auto& guide : inSatinGuides) {
@@ -8748,10 +8748,10 @@ void thred::internal::insfil() {
 						if (fileHeader.clipDataCount != 0u) {
 							auto tempClipPoints = std::vector<fPOINT>{};
 							tempClipPoints.resize(fileHeader.clipDataCount);
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof((*ClipPoints)[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
 							ReadFile(InsertedFileHandle, tempClipPoints.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								tempClipPoints.resize(BytesRead / sizeof(tempClipPoints[0]));
+								tempClipPoints.resize(BytesRead / sizeof(decltype(tempClipPoints.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							ClipPoints->insert(ClipPoints->end(), tempClipPoints.begin(), tempClipPoints.end());
@@ -8759,10 +8759,10 @@ void thred::internal::insfil() {
 						if (thredHeader.texturePointCount != 0u) {
 							auto tempTextureBuffer = std::vector<TXPNT>{};
 							tempTextureBuffer.resize(thredHeader.texturePointCount);
-							auto bytesToRead = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(tempTextureBuffer[0]));
+							auto bytesToRead = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(decltype(tempTextureBuffer.back())));
 							ReadFile(InsertedFileHandle, tempTextureBuffer.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								tempTextureBuffer.resize(BytesRead / sizeof(tempTextureBuffer[0]));
+								tempTextureBuffer.resize(BytesRead / sizeof(decltype(tempTextureBuffer.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
 							TexturePointsBuffer->insert(
@@ -8892,7 +8892,7 @@ void thred::internal::insfil() {
 					pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
 					ReadFile(InsertedFileHandle,
 					         pcsStitchBuffer.data(),
-					         pcsFileHeader.stitchCount * sizeof(pcsStitchBuffer[0]),
+					         pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())),
 					         &BytesRead,
 					         nullptr);
 					auto iStitch      = PCSHeader.stitchCount;
@@ -15227,7 +15227,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							thred::duzrat();
 							auto byteCount
 							    = sizeof(*ClipFormVerticesData)
-							      + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof((*FormVertices)[0]);
+							      + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1) * sizeof(decltype(FormVertices->back()));
 							auto clipCopyBuffer = std::vector<unsigned char>{};
 							clipCopyBuffer.resize(byteCount);
 							auto clipPointer = static_cast<unsigned char*>(ClipPointer);
@@ -18151,7 +18151,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					colors.resize(16);
 					ReadFileInt(thrEdFile,
 					            colors.data(),
-					            gsl::narrow<unsigned int>(colors.size() * sizeof(colors[0])),
+					            gsl::narrow<unsigned int>(colors.size() * sizeof(decltype(colors.back()))),
 					            &BytesRead,
 					            nullptr);
 					auto brush = CreateSolidBrush(brushColor);
@@ -18202,7 +18202,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					if (fileTypeVersion < 2) {
 						auto formListOriginal = std::vector<FRMHEDO>{};
 						formListOriginal.resize(stitchHeader.formCount);
-						const auto bytesToRead = stitchHeader.formCount * gsl::narrow<unsigned int>(sizeof(formListOriginal[0]));
+						const auto bytesToRead = stitchHeader.formCount * gsl::narrow<unsigned int>(sizeof(decltype(formListOriginal.back())));
 						ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead) {
 							break;
@@ -18212,14 +18212,14 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					else {
 						auto inFormList = std::vector<FRMHEDOUT>{};
 						inFormList.resize(stitchHeader.formCount);
-						const auto bytesToRead = gsl::narrow<unsigned int>(stitchHeader.formCount * sizeof(inFormList[0]));
+						const auto bytesToRead = gsl::narrow<unsigned int>(stitchHeader.formCount * sizeof(decltype(inFormList.back())));
 						ReadFileInt(thrEdFile, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 						if (BytesRead != bytesToRead) {
 							break;
 						}
 						std::copy(inFormList.cbegin(), inFormList.cend(), formList.begin());
 					}
-					const auto bytesToRead = stitchHeader.vertexCount * gsl::narrow<unsigned int>(sizeof(vertexList[0]));
+					const auto bytesToRead = stitchHeader.vertexCount * gsl::narrow<unsigned int>(sizeof(decltype(vertexList.back())));
 					ReadFile(thrEdFile, vertexList.data(), bytesToRead, &BytesRead, nullptr);
 					if (BytesRead != bytesToRead) {
 						break;

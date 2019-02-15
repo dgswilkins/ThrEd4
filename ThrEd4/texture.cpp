@@ -97,7 +97,7 @@ void texture::txdun() {
 						WriteFileInt(
 						    handle,
 						    item.texturePoints.data(),
-						    gsl::narrow<unsigned int>(item.texturePoints.size() * sizeof(TextureHistory[0].texturePoints[0])),
+						    gsl::narrow<unsigned int>(item.texturePoints.size() * sizeof(decltype(TextureHistory[0].texturePoints.back()))),
 						    &bytesWritten,
 						    nullptr);
 					}
@@ -146,7 +146,7 @@ void texture::redtx() {
 						                gsl::narrow<unsigned int>(textureHistoryBuffer.size() * ITXBUFLEN),
 						                &historyBytesRead,
 						                nullptr)) {
-							for (auto index = 0u; index < (historyBytesRead / sizeof(textureHistoryBuffer[0])); index++) {
+							for (auto index = 0u; index < (historyBytesRead / sizeof(decltype(textureHistoryBuffer.back()))); index++) {
 								TextureHistory[index].height  = textureHistoryBuffer[index].height;
 								TextureHistory[index].width   = textureHistoryBuffer[index].width;
 								TextureHistory[index].spacing = textureHistoryBuffer[index].spacing;
@@ -154,7 +154,7 @@ void texture::redtx() {
 									TextureHistory[index].texturePoints.resize(textureHistoryBuffer[index].count);
 									if (!ReadFileInt(handle,
 									                 TextureHistory[index].texturePoints.data(),
-									                 sizeof(TextureHistory[0].texturePoints[0])
+									                 sizeof(decltype(TextureHistory[0].texturePoints.back()))
 									                     * textureHistoryBuffer[index].count,
 									                 &bytesRead,
 									                 nullptr)) {
