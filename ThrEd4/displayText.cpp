@@ -429,7 +429,7 @@ void displayText::savdisc() {
 
 #pragma warning(push)
 #pragma warning(disable : 26493) // we use c style casts as this is a C API
-BOOL CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) {
+BOOL CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept {
 	SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
 	return TRUE;
 }
