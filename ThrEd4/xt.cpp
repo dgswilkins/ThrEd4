@@ -158,11 +158,11 @@ void xt::internal::nurat(FEATHER& feather) {
 		if (feather.upCount != 0u) {
 			if (feather.countUp != 0u) {
 				feather.ratio
-				    = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+				    = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 				feather.countUp--;
 			}
 			else {
-				feather.ratio = (static_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
 				if (feather.countDown != 0u) {
 					feather.countDown--;
 				}
@@ -174,7 +174,7 @@ void xt::internal::nurat(FEATHER& feather) {
 			}
 		}
 		else {
-			feather.ratio = (static_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+			feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 		}
 		feather.ratio *= feather.formRatio;
 		break;
@@ -356,8 +356,8 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	}
 	feather.globalPosition       = 0;
 	feather.globalStep           = 4.0 / SequenceIndex * ind;
-	feather.globalPhase          = static_cast<float>(SequenceIndex) / ind;
-	feather.globalRatio          = static_cast<float>(feather.countUp) / feather.phaseIndex;
+	feather.globalPhase          = gsl::narrow_cast<float>(SequenceIndex) / ind;
+	feather.globalRatio          = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
 	feather.globalUp             = feather.globalPhase * feather.globalRatio;
 	feather.globalDown           = feather.globalPhase - feather.globalUp;
 	SelectedForm->fillType       = FTHF;
@@ -1040,7 +1040,7 @@ bool xt::internal::chkrdun(const std::vector<unsigned>& formFillCounter,
 double
 xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
 	auto currentRegion = sortRecord.currentRegion;
-	auto currentStitch = static_cast<fPOINTATTR*>(nullptr);
+	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter = std::vector<unsigned>{};
@@ -1260,7 +1260,7 @@ void xt::fsort() {
 					if (jumps < minimumJumps) {
 						minimumJumps     = jumps;
 						minimumIndex     = iRegion;
-						minimumDirection = static_cast<unsigned int>(sortRecord.direction);
+						minimumDirection = gsl::narrow_cast<unsigned int>(sortRecord.direction);
 					}
 				}
 				GetSystemTimeAsFileTime(&fileTime);
@@ -1834,7 +1834,7 @@ void xt::internal::uangfn(unsigned int find, float angle) {
 
 void xt::dufang(float angle) {
 	thred::savdo();
-	angle *= static_cast<float>(PI) / 180;
+	angle *= gsl::narrow_cast<float>(PI) / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::uangfn(ClosestFormToCursor, angle);
 	}
@@ -1970,7 +1970,7 @@ void xt::internal::fangfn(unsigned int find, float angle) {
 
 void xt::dufxang(float angle) {
 	thred::savdo();
-	angle *= static_cast<float>(PI) / 180;
+	angle *= gsl::narrow_cast<float>(PI) / 180;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fangfn(ClosestFormToCursor, angle);
 	}
@@ -2417,7 +2417,7 @@ void xt::internal::rtrclpfn() {
 			Clip        = RegisterClipboardFormat(PcdClipFormat);
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
 			if (ClipPointer != nullptr) {
-				ClipStitchData = *(static_cast<CLPSTCH**>(ClipPointer));
+				ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 				thred::rtclpfn(0, 0);
 				ClipStitchData[0].led = count;
 				for (auto iStitch = 1u; iStitch < count; iStitch++) {
@@ -2470,7 +2470,7 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		setstxt(IDC_DESWID, DesignSize.x, designSizeDialog);
 		setstxt(IDC_DESHI, DesignSize.y, designSizeDialog);
-		CheckDlgButton(hwndlg, IDC_REFILF, static_cast<UINT>(UserFlagMap.test(UserFlag::CHREF)));
+		CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap.test(UserFlag::CHREF)));
 		break;
 	}
 	case WM_COMMAND: {

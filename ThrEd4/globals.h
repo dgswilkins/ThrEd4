@@ -18,7 +18,7 @@
 #pragma warning(disable : 26446) // bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator
 //#pragma warning(disable : 26451) // io.2		Arithmetic overflow
 //#pragma warning(disable:26461)	// con.3	The pointer argument can be marked as a pointer to const
-//#pragma warning(disable:26472)	// type.1	Don't use a static_cast for arithmetic conversions
+//#pragma warning(disable:26472)	// type.1	Don't use a gsl::narrow_cast for arithmetic conversions
 //#pragma warning(disable:26474)	// type.1	Don't cast between pointer types when the conversion could be implicit
 #pragma warning(disable : 26481) // bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable : 26482) // bounds.2	Only index into arrays using constant expressions

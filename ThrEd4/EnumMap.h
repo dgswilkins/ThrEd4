@@ -28,39 +28,39 @@ public:
 	    : mask_(i_val) {
 	}
 	inline bool test(const EnumType i_key) const {
-		return mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		return mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
 	inline void set() {
 		mask_.set();
 	}
 	inline void set(const EnumType i_key, bool i_val = true) {
-		mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
+		mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 	}
 	inline bool testAndSet(const EnumType i_key, bool i_val = true) {
-		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
-		mask_.set(static_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
+		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 		return val;
 	}
 	inline void reset() noexcept {
 		mask_.reset();
 	}
 	inline void reset(const EnumType i_key) {
-		mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
 	inline bool testAndReset(const EnumType i_key) {
-		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
-		mask_.reset(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
 	inline void flip() {
 		mask_.flip();
 	}
 	inline void flip(const EnumType i_key) {
-		mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
 	inline bool testAndFlip(const EnumType i_key) {
-		const bool val = mask_.test(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
-		mask_.flip(static_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+		mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
 	inline unsigned long to_ulong() {
@@ -81,10 +81,10 @@ public:
 	inline bool all() const {
 		return mask_.all();
 	}
-	inline std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask() const {
+	inline std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask() const {
 		return mask_;
 	}
-	inline void mask(const std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) {
+	inline void mask(const std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) {
 		mask_ = i_mask;
 	}
 
@@ -124,5 +124,5 @@ public:
 	}
 
 private:
-	std::bitset<static_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask_;
+	std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask_;
 };

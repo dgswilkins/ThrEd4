@@ -1227,9 +1227,9 @@ void trace::internal::durct(unsigned    shift,
 	traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
-	auto ratio             = static_cast<double>(lowerColor) / 255;
+	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255;
 	traceMiddleMask.top    = dToL(controlHeight * ratio + traceControlRect.top);
-	ratio                  = static_cast<double>(upperColor) / 255;
+	ratio                  = gsl::narrow_cast<double>(upperColor) / 255;
 	traceMiddleMask.bottom = dToL(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);

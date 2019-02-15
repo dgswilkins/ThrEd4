@@ -210,7 +210,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 			valueWindow[LUANG] = ffi::txtrwin(
-			    fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)), ValueWindowCoords);
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 	}
@@ -305,13 +305,13 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LFRMANG] = ffi::numwin(
-			    fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)), ValueWindowCoords);
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LSACANG] = ffi::numwin(
-			    fmt::format(L"{:.2f}", (static_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)), ValueWindowCoords);
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
@@ -892,7 +892,7 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DRAMP: {
-				distanceFromDaisyCenter = diameter + (static_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter = diameter + (gsl::narrow_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DSAW: {
@@ -904,13 +904,13 @@ void formForms::dasyfrm() {
 					sawPointCount = iPoint;
 				}
 				distanceFromDaisyCenter
-				    = diameter + (static_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
+				    = diameter + (gsl::narrow_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DRAG: {
 				distanceFromDaisyCenter
 				    = diameter
-				      + (static_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
+				      + (gsl::narrow_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DCOG: {

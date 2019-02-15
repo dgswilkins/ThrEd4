@@ -922,13 +922,13 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line2Delta = dPOINT{};
 		auto line2Point = dPOINT{};
 		if (iLine2Vertex == VertexCount) {
-			line2Delta.x = static_cast<double>(vertexIt[line2Previous].x) - vertexIt[0].x;
-			line2Delta.y = static_cast<double>(vertexIt[line2Previous].y) - vertexIt[0].y;
+			line2Delta.x = gsl::narrow_cast<double>(vertexIt[line2Previous].x) - vertexIt[0].x;
+			line2Delta.y = gsl::narrow_cast<double>(vertexIt[line2Previous].y) - vertexIt[0].y;
 			line2Point   = vertexIt[0];
 		}
 		else {
-			line2Delta.x = static_cast<double>(vertexIt[line2Previous].x) - vertexIt[iLine2Vertex].x;
-			line2Delta.y = static_cast<double>(vertexIt[line2Previous].y) - vertexIt[iLine2Vertex].y;
+			line2Delta.x = gsl::narrow_cast<double>(vertexIt[line2Previous].x) - vertexIt[iLine2Vertex].x;
+			line2Delta.y = gsl::narrow_cast<double>(vertexIt[line2Previous].y) - vertexIt[iLine2Vertex].y;
 			line2Point   = vertexIt[iLine2Vertex];
 		}
 		iLine1Vertex     = form::nxt(iLine1Vertex);
@@ -949,10 +949,10 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						BSequence[SequenceIndex++] = { static_cast<float>(line1Point.x), static_cast<float>(line1Point.y), 0 };
+						BSequence[SequenceIndex++] = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
 					}
 					else {
-						BSequence[SequenceIndex++] = { static_cast<float>(line2Point.x), static_cast<float>(line2Point.y), 1 };
+						BSequence[SequenceIndex++] = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
 					}
 					if (SequenceIndex > MAXITEMS - 6) {
 						SequenceIndex = MAXITEMS - 6;
@@ -971,15 +971,15 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 							BSequence[SequenceIndex++]
-							    = { static_cast<float>(line1Point.x), static_cast<float>(line1Point.y), 0 };
+							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
 							BSequence[SequenceIndex++]
-							    = { static_cast<float>(line2Point.x), static_cast<float>(line2Point.y), 1 };
+							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
 						}
 						else {
 							BSequence[SequenceIndex++]
-							    = { static_cast<float>(line2Point.x), static_cast<float>(line2Point.y), 2 };
+							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 2 };
 							BSequence[SequenceIndex++]
-							    = { static_cast<float>(line1Point.x), static_cast<float>(line1Point.y), 3 };
+							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 3 };
 						}
 						if (SequenceIndex > MAXITEMS - 6) {
 							SequenceIndex = MAXITEMS - 6;
@@ -1016,8 +1016,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if ((line1Count == 0u) && iLine1Count < line1StitchCounts.size()) {
 					line1Count   = line1StitchCounts[iLine1Count++];
 					line1Next    = form::nxt(iLine1Vertex);
-					line1Delta.x = static_cast<double>(vertexIt[line1Next].x) - vertexIt[iLine1Vertex].x;
-					line1Delta.y = static_cast<double>(vertexIt[line1Next].y) - vertexIt[iLine1Vertex].y;
+					line1Delta.x = gsl::narrow_cast<double>(vertexIt[line1Next].x) - vertexIt[iLine1Vertex].x;
+					line1Delta.y = gsl::narrow_cast<double>(vertexIt[line1Next].y) - vertexIt[iLine1Vertex].y;
 					iLine1Vertex = form::nxt(iLine1Vertex);
 					line1Step.x  = line1Delta.x / line1Count;
 					line1Step.y  = line1Delta.y / line1Count;
@@ -1026,8 +1026,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if ((line2Count == 0u) && iLine2Count < line2StitchCounts.size()) {
 					line2Count    = line2StitchCounts[iLine2Count++];
 					line2Previous = form::prv(iLine2Vertex);
-					line2Delta.x  = static_cast<double>(vertexIt[line2Previous].x) - vertexIt[iLine2Vertex].x;
-					line2Delta.y  = static_cast<double>(vertexIt[line2Previous].y) - vertexIt[iLine2Vertex].y;
+					line2Delta.x  = gsl::narrow_cast<double>(vertexIt[line2Previous].x) - vertexIt[iLine2Vertex].x;
+					line2Delta.y  = gsl::narrow_cast<double>(vertexIt[line2Previous].y) - vertexIt[iLine2Vertex].y;
 					iLine2Vertex  = form::prv(iLine2Vertex);
 					line2Step.x   = line2Delta.x / line2Count;
 					line2Step.y   = line2Delta.y / line2Count;
@@ -1161,7 +1161,7 @@ void satin::satfil() {
 			iVertex++;
 		}
 		const auto deltaA = lengths[iVertex] - length;
-		const auto deltaB = length - lengths[static_cast<size_t>(iVertex) - 1u];
+		const auto deltaB = length - lengths[gsl::narrow_cast<size_t>(iVertex) - 1u];
 		if (deltaB > deltaA) {
 			iVertex--;
 		}

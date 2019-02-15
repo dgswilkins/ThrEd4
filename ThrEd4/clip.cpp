@@ -856,12 +856,12 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = static_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].x) - chainEndPoints[finish].x;
-		delta.y = static_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].y) - chainEndPoints[finish].y;
+		delta.x = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].x) - chainEndPoints[finish].x;
+		delta.y = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].y) - chainEndPoints[finish].y;
 	}
 	else {
-		delta.x = static_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;
-		delta.y = static_cast<double>(chainEndPoints[finish].y) - chainEndPoints[finish - 1].y;
+		delta.x = gsl::narrow_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;
+		delta.y = gsl::narrow_cast<double>(chainEndPoints[finish].y) - chainEndPoints[finish - 1].y;
 	}
 	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0;
 	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0;

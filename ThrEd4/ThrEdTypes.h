@@ -2708,7 +2708,7 @@ using LENINFO = struct _lengthInfo;
 template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
 	GSL_SUPPRESS(26474) {
 		if (pointer) {
-			return static_cast<T2>(static_cast<void*>(pointer));
+			return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
 		}
 
 		throw;

@@ -262,7 +262,7 @@ void texture::dutxtfil() {
 		IniFile.textureWidth = ITXWID;
 	}
 	if (IniFile.textureSpacing == 0.0f) {
-		IniFile.textureSpacing = static_cast<float>(ITXSPAC);
+		IniFile.textureSpacing = gsl::narrow_cast<float>(ITXSPAC);
 	}
 	if (IniFile.textureEditorSize == 0u) {
 		IniFile.textureEditorSize = ITXPIX;
@@ -301,11 +301,11 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) noexcept {
-	screenPoint.x = dToL((static_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
+	screenPoint.x = dToL((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
 	                     / TextureScreen.editToPixelRatio);
 	screenPoint.y
-	    = dToL(static_cast<double>(TextureScreen.height)
-	           - texturePoint.y / static_cast<double>(TextureScreen.areaHeight) * TextureScreen.height + TextureScreen.top);
+	    = dToL(gsl::narrow_cast<double>(TextureScreen.height)
+	           - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height + TextureScreen.top);
 }
 
 void texture::internal::txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept {
@@ -390,7 +390,7 @@ void texture::drwtxtr() {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
 		yOffset                        = StitchWindowClientRect.bottom >> 2;
 		TextureScreen.xOffset          = (TextureScreen.editToPixelRatio * StitchWindowClientRect.right
-                                 - static_cast<double>(TextureScreen.spacing) * (static_cast<double>(TextureScreen.lines) + 2.0))
+                                 - gsl::narrow_cast<double>(TextureScreen.spacing) * (gsl::narrow_cast<double>(TextureScreen.lines) + 2.0))
 		                        / 2.0;
 	}
 	TextureScreen.top          = yOffset;
@@ -419,7 +419,7 @@ void texture::drwtxtr() {
 	line[0].y = 0;
 	line[1].y = StitchWindowClientRect.bottom;
 	for (auto iVertical = 1u; iVertical < TextureScreen.lines + 1u; iVertical++) {
-		line[0].x = line[1].x = dToL((static_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
+		line[0].x = line[1].x = dToL((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
 		                             / TextureScreen.editToPixelRatio);
 		Polyline(StitchWindowMemDC, line, 2);
 	}
@@ -476,7 +476,7 @@ bool texture::internal::px2txt(const POINT& offset) {
 			return false;
 		}
 		tmp.y = TextureScreen.areaHeight
-		        - ((static_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+		        - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 		TempTexturePoints->push_back(tmp);
 		return true;
 	}
@@ -682,7 +682,7 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) noexce
 	}
 	textureRecord.line = gsl::narrow<unsigned short>(std::round(val));
 	textureRecord.y    = TextureScreen.areaHeight
-	                  - ((static_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+	                  - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
 
 void texture::txtrup() {
@@ -695,7 +695,7 @@ void texture::txtrup() {
 		offset.y -= SelectTexturePointsOrigin.y;
 		const auto Xmagnitude = abs(offset.x);
 		auto       textureOffset
-		    = TXOFF{ static_cast<float>(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
+		    = TXOFF{ gsl::narrow_cast<float>(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
 			         gsl::narrow<int>(std::ceil(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing)) };
 		if (offset.x < 0) {
 			textureOffset.line = -textureOffset.line;
@@ -825,7 +825,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 	ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 	ClipMemory = GetClipboardData(ThrEdClip);
 	if (ClipMemory != nullptr) {
-		ClipFormHeader = static_cast<FORMCLIP*>(GlobalLock(ClipMemory));
+		ClipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
 		if (ClipFormHeader != nullptr) {
 			if (ClipFormHeader->clipType == CLP_FRM) {
 				SelectedForm     = &ClipFormHeader->form;
@@ -994,7 +994,7 @@ void texture::internal::txang() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->fillType              = TXANGF;
-			SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
+			SelectedForm->angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
 			txi::txpar();
 		}
 	}
