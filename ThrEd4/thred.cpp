@@ -7665,7 +7665,7 @@ void thred::internal::f1del() {
 	clip::delmclp(ClosestFormToCursor);
 	satin::delsac(ClosestFormToCursor);
 	form::delflt(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 }
 
 void thred::frmdel() {

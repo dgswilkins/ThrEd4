@@ -169,7 +169,7 @@ void form::internal::delfil(unsigned attribute) {
 
 void form::delmfil() {
 	if (texture::istx(ClosestFormToCursor)) {
-		texture::deltx();
+		texture::deltx(ClosestFormToCursor);
 	}
 	clip::delmclp(ClosestFormToCursor);
 	auto iDestination = 0;
@@ -5146,7 +5146,7 @@ void form::internal::makpoli() {
 
 void form::internal::fsvrt() {
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	makpoli();
 	SelectedForm->fillType  = VRTF;
 	SelectedForm->type      = FRMFPOLY;
@@ -5188,7 +5188,7 @@ void form::filvrt() {
 
 void form::internal::fshor() {
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	makpoli();
 	SelectedForm->fillType  = HORF;
 	SelectedForm->fillColor = gsl::narrow<decltype(SelectedForm->fillColor)>(ActiveColor);
@@ -5228,7 +5228,7 @@ void form::filhor() {
 
 void form::internal::fsangl() {
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	makpoli();
 	SelectedForm->fillType              = ANGF;
 	SelectedForm->angleOrClipData.angle = static_cast<float>(IniFile.fillAngle);
@@ -5466,7 +5466,7 @@ void form::rotfrm(unsigned int newStartVertex) {
 
 void form::internal::filsfn() {
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	SelectedForm->type = SAT;
 	form::fsizpar();
 	SelectedForm->fillType    = SATF;
@@ -5641,7 +5641,7 @@ void form::unfil() {
 			SelectedForm = &((*FormList)[selectedForm]);
 			if ((SelectedForm->fillType != 0u) || (SelectedForm->edgeType != 0u)) {
 				clip::delclps(selectedForm);
-				texture::deltx();
+				texture::deltx(selectedForm);
 				formMap.set(selectedForm);
 				SelectedForm->fillType = 0;
 				SelectedForm->edgeType = 0;
@@ -5681,7 +5681,7 @@ void form::unfil() {
 				}
 			}
 			clip::delclps(ClosestFormToCursor);
-			texture::deltx();
+			texture::deltx(ClosestFormToCursor);
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
@@ -7051,7 +7051,7 @@ void form::flpord() {
 }
 
 void form::internal::filsclp() {
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	form::fvars(ClosestFormToCursor);
 	if (SelectedForm->type != SAT) {
 		SelectedForm->wordParam = 0;
@@ -7873,7 +7873,7 @@ bool form::internal::contsf(unsigned int formIndex) {
 	form::fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
 		clip::delclps(ClosestFormToCursor);
-		texture::deltx();
+		texture::deltx(ClosestFormToCursor);
 		form::chkcont();
 		SelectedForm->fillSpacing = LineSpacing;
 		SelectedForm->fillColor   = gsl::narrow<unsigned char>(ActiveColor);
@@ -8577,7 +8577,7 @@ void form::stchs2frm() {
 void form::vrtsclp() {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	SelectedForm->lengthOrCount.clipCount = gsl::narrow<decltype(SelectedForm->lengthOrCount.clipCount)>(ClipBuffer->size());
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->wordParam               = IniFile.fillPhase;
@@ -8642,7 +8642,7 @@ void form::vrtclp() {
 void form::horsclp() {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	const auto clipSize                   = gsl::narrow<unsigned int>(ClipBuffer->size());
 	SelectedForm->lengthOrCount.clipCount = clipSize;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
@@ -8710,7 +8710,7 @@ void form::horclp() {
 void form::angsclp() {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
-	texture::deltx();
+	texture::deltx(ClosestFormToCursor);
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = gsl::narrow<decltype(SelectedForm->lengthOrCount.clipCount)>(ClipBuffer->size());
 	SelectedForm->wordParam               = IniFile.fillPhase;

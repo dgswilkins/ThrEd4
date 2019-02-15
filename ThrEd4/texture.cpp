@@ -999,14 +999,14 @@ void texture::internal::txang() {
 	}
 }
 
-void texture::deltx() {
+void texture::deltx(unsigned int formIndex) {
 	auto flag = false;
 
-	const auto currentIndex = (*FormList)[ClosestFormToCursor].fillInfo.texture.index;
+	const auto currentIndex = (*FormList)[formIndex].fillInfo.texture.index;
 
-	if ((TextureIndex != 0u) && texture::istx(ClosestFormToCursor) && (SelectedForm->fillInfo.texture.count != 0u)) {
+	if ((TextureIndex != 0u) && texture::istx(formIndex) && (SelectedForm->fillInfo.texture.count != 0u)) {
 		// First check to see if the texture is shared between forms
-		for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
+		for (auto iForm = 0u; iForm < formIndex; iForm++) {
 			if (texture::istx(iForm)) {
 				auto& formIter = (*FormList)[iForm];
 				if (formIter.fillInfo.texture.index == currentIndex) {
@@ -1014,7 +1014,7 @@ void texture::deltx() {
 				}
 			}
 		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
+		for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				auto& formIter = (*FormList)[iForm];
 				if (formIter.fillInfo.texture.index == currentIndex) {
@@ -1027,7 +1027,7 @@ void texture::deltx() {
 			auto textureBuffer = std::vector<TXPNT>{};
 			textureBuffer.reserve(TextureIndex);
 			auto iBuffer = 0u;
-			for (auto iForm = 0u; iForm < ClosestFormToCursor; iForm++) {
+			for (auto iForm = 0u; iForm < formIndex; iForm++) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = TexturePointsBuffer->cbegin() + fillInfo.texture.index;
@@ -1039,7 +1039,7 @@ void texture::deltx() {
 					iBuffer += fillInfo.texture.count;
 				}
 			}
-			for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
+			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = TexturePointsBuffer->cbegin() + fillInfo.texture.index;
@@ -1054,7 +1054,7 @@ void texture::deltx() {
 			TextureIndex         = iBuffer;
 			*TexturePointsBuffer = textureBuffer;
 		}
-		(*FormList)[ClosestFormToCursor].fillType = 0;
+		(*FormList)[formIndex].fillType = 0;
 	}
 }
 
@@ -1066,7 +1066,7 @@ void texture::internal::nutx() {
 		if (texture::istx(ClosestFormToCursor)) {
 			const auto& texture = (*FormList)[ClosestFormToCursor].fillInfo.texture;
 			index               = texture.index;
-			texture::deltx();
+			texture::deltx(ClosestFormToCursor);
 		}
 		else {
 			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
@@ -1148,7 +1148,7 @@ void texture::internal::dutxfn(unsigned textureType) {
 		if (SelectedForm->satinGuideCount != 0u) {
 			satin::delsac(ClosestFormToCursor);
 		}
-		texture::deltx();
+		texture::deltx(ClosestFormToCursor);
 		texture::savtxt();
 		txi::nutx();
 		form::dusqr();

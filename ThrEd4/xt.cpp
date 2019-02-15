@@ -419,7 +419,7 @@ void xt::fethrf() {
 	if (!FormList->empty()) {
 		form::fvars(ClosestFormToCursor);
 		clip::delmclp(ClosestFormToCursor);
-		texture::deltx();
+		texture::deltx(ClosestFormToCursor);
 		SelectedForm->type                           = SAT;
 		SelectedForm->fillInfo.feather.ratio         = IniFile.featherRatio;
 		SelectedForm->fillInfo.feather.upCount       = IniFile.featherUpCount;
