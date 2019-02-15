@@ -136,8 +136,6 @@ namespace internal {
 	void     durec(OREC& record) noexcept;
 	unsigned dutyp(unsigned attribute) noexcept;
 
-	constexpr float duxrat(float strt, float fin, float featherRatioLocal);
-
 	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept;
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;

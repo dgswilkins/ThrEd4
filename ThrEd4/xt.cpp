@@ -114,13 +114,9 @@ constexpr float xt::internal::durat(float start, float finish, float featherRati
 	return (finish - start) * featherRatio + start;
 }
 
-constexpr float xt::internal::duxrat(float strt, float fin, float featherRatioLocal) {
-	return (fin - strt) * featherRatioLocal + strt;
-}
-
 void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept {
-	point.x = duxrat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
-	point.y = duxrat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
+	point.x = durat(BSequence[finish].x, BSequence[start].x, featherRatioLocal);
+	point.y = durat(BSequence[finish].y, BSequence[start].y, featherRatioLocal);
 }
 
 void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept {
