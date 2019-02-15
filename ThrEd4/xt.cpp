@@ -283,7 +283,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	midPoint                 = midpnt(currentPoint, nextPoint);
 	OSequence[OutputIndex++] = BSequence[iSequence];
 	OSequence[OutputIndex++] = midPoint;
-	featherSequence.emplace_back( BSequence[iSequence + 1].x, BSequence[iSequence + 1].y );
+	featherSequence.emplace_back(BSequence[iSequence + 1].x, BSequence[iSequence + 1].y);
 	featherSequence.push_back(midPoint);
 }
 
@@ -878,7 +878,8 @@ void xt::dubit(unsigned bit) {
 	if (SelectedForm->type == FRMLINE) {
 		SelectedForm->type = FRMFPOLY;
 	}
-	if (((SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0u) && ((bit & (AT_UND | AT_WALK | AT_CWLK)) != 0u)) {
+	if (((SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0u)
+	    && ((bit & (AT_UND | AT_WALK | AT_CWLK)) != 0u)) {
 		if (SelectedForm->fillType != 0u) {
 			SelectedForm->underlayColor = SelectedForm->fillColor;
 		}

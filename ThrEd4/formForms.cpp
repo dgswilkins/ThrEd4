@@ -1185,7 +1185,8 @@ void formForms::wavfrm() {
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
-			points.emplace_back( -vertexIt[iNextVertex].x + vertexIt[waveIndex].x, -vertexIt[iNextVertex].y + vertexIt[waveIndex].y );
+			points.emplace_back(-vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
+			                    -vertexIt[iNextVertex].y + vertexIt[waveIndex].y);
 			iPoint++;
 			waveIndex = iNextVertex;
 		}

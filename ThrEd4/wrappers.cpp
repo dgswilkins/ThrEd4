@@ -27,7 +27,11 @@ void PolylineInt(HDC hdc, CONST POINT* apt, unsigned int cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int>(cpt));
 }
 
-void WriteFileInt(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
+void WriteFileInt(HANDLE       file,
+                  LPCVOID      buffer,
+                  unsigned int bytesToWrite,
+                  LPDWORD      bytesWritten,
+                  LPOVERLAPPED overlapped) noexcept {
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 

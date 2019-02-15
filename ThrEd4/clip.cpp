@@ -663,12 +663,12 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	if (SelectedForm->type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
 		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back( clip.x, (-clip.y + pivot) );
+			tempClipPoints.emplace_back(clip.x, (-clip.y + pivot));
 		}
 	}
 	else {
 		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back( clip.x, (-clip.y) );
+			tempClipPoints.emplace_back(clip.x, (-clip.y));
 		}
 	}
 }

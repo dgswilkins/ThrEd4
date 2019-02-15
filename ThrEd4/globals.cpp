@@ -155,7 +155,7 @@ unsigned     NearestCount;                        // number of boxes selected
 unsigned int NewFormVertexCount;                  // points in the new form
 HWND         OKButton;                            // ok button
 fPOINT       OSequence[OSEQLEN];                  // temporary storage for sequencing
-bool		 OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
+bool         OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
 unsigned int OutputIndex;                         // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills

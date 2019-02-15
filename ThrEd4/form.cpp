@@ -590,8 +590,7 @@ void form::fselrct(unsigned int iForm) {
 	if (line[5].y > SelectedFormsRect.bottom) {
 		SelectedFormsRect.bottom = line[5].y;
 	}
-	if (OutLineEverySelectedForm)
-	{
+	if (OutLineEverySelectedForm) {
 		Polyline(StitchWindowMemDC, line, 5);
 	}
 }
@@ -949,14 +948,14 @@ void form::flipv() {
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		const auto midpoint = (AllItemsRect.top - AllItemsRect.bottom) / 2.0f + AllItemsRect.bottom;
-		for (auto & FormVertice : *FormVertices) {
+		for (auto& FormVertice : *FormVertices) {
 			FormVertice.y = midpoint + midpoint - FormVertice.y;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
 		}
-		for (auto & formIter : *FormList) {
-				formIter.rectangle.bottom = midpoint + midpoint - formIter.rectangle.bottom;
+		for (auto& formIter : *FormList) {
+			formIter.rectangle.bottom = midpoint + midpoint - formIter.rectangle.bottom;
 			formIter.rectangle.top    = midpoint + midpoint - formIter.rectangle.top;
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -2688,13 +2687,13 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>* currentFormVe
 unsigned form::internal::leftsid(std::vector<fPOINT>* currentFormVertices) {
 	auto leftVertex = 0u;
 	if (currentFormVertices != nullptr) {
-		auto iVertex = 0u;
+		auto iVertex  = 0u;
 		auto minimumX = 1e9f;
 
 		auto vertexIt = currentFormVertices->cbegin();
 		for (iVertex = 0; iVertex < currentFormVertices->size(); iVertex++) {
 			if (vertexIt[iVertex].x < minimumX) {
-				minimumX = vertexIt[iVertex].x;
+				minimumX   = vertexIt[iVertex].x;
 				leftVertex = iVertex;
 			}
 		}
@@ -2732,7 +2731,7 @@ bool form::internal::isin(std::vector<VCLPX>&  regionCrossingData,
 		auto vertexIt = currentFormVertices->cbegin();
 		for (auto iRegion = regionCrossingStart; iRegion < regionCrossingEnd; iRegion++) {
 			const auto startVertex = regionCrossingData[iRegion].vertex;
-			const auto endVertex = form::nxt(startVertex);
+			const auto endVertex   = form::nxt(startVertex);
 			if (projv(xCoordinate, vertexIt[startVertex], vertexIt[endVertex], point)) {
 				if (point.y > yCoordinate) {
 					if (vertexIt[startVertex].x != xCoordinate && vertexIt[endVertex].x != xCoordinate) {
@@ -2755,9 +2754,8 @@ bool form::internal::isin(std::vector<VCLPX>&  regionCrossingData,
 		}
 		return (count & 1) != 0u;
 	}
-	
-		return false;
-	
+
+	return false;
 }
 
 void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
@@ -2776,12 +2774,12 @@ bool form::internal::isect(unsigned int         vertex0,
                            const fPOINT&        lineSegmentEnd,
                            std::vector<fPOINT>* currentFormVertices) {
 	if (currentFormVertices != nullptr) {
-		const auto delta = dPOINT{ (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
-		const auto point = dPOINT{ (lineSegmentStart.x), (lineSegmentStart.y) };
+		const auto delta            = dPOINT{ (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
+		const auto point            = dPOINT{ (lineSegmentStart.x), (lineSegmentStart.y) };
 		auto       tempIntersection = dPOINT{};
-		auto       flag = false;
-		auto       left = 0.0f;
-		auto       right = 0.0f;
+		auto       flag             = false;
+		auto       left             = 0.0f;
+		auto       right            = 0.0f;
 
 		auto vertexIt = currentFormVertices->cbegin();
 		if ((delta.x != 0.0) && (delta.y != 0.0)) {
@@ -2797,17 +2795,17 @@ bool form::internal::isect(unsigned int         vertex0,
 				}
 				else if (vertexIt[vertex0].y == lineSegmentStart.y && vertexIt[vertex1].y == lineSegmentStart.y) {
 					if (vertexIt[vertex0].x < vertexIt[vertex1].x) {
-						left = vertexIt[vertex0].x;
+						left  = vertexIt[vertex0].x;
 						right = vertexIt[vertex1].x;
 					}
 					else {
-						left = vertexIt[vertex1].x;
+						left  = vertexIt[vertex1].x;
 						right = vertexIt[vertex0].x;
 					}
 					if (lineSegmentStart.x > left && lineSegmentStart.x < right) {
 						intersection.x = lineSegmentStart.x;
 						intersection.y = lineSegmentStart.y;
-						length = 0;
+						length         = 0;
 						return true;
 					}
 					return false;
@@ -2825,14 +2823,13 @@ bool form::internal::isect(unsigned int         vertex0,
 		}
 		intersection.x = static_cast<float>(tempIntersection.x);
 		intersection.y = static_cast<float>(tempIntersection.y);
-		length = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
+		length         = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
 		// ToDo - should length be determined from start or end?
 		//	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
 		return flag;
 	}
-	
-		return false;
-	
+
+	return false;
 }
 
 bool form::internal::lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept {
@@ -2926,7 +2923,7 @@ float form::internal::getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	if (currentFormVertices != nullptr) {
 		clipStitchPoints[iPoint].vertexIndex %= currentFormVertices->size();
 		auto vertexIt = currentFormVertices->cbegin();
-		retval = lengths[clipStitchPoints[iPoint].vertexIndex]
+		retval        = lengths[clipStitchPoints[iPoint].vertexIndex]
 		         + hypot(vertexIt[clipStitchPoints[iPoint].vertexIndex].x - clipStitchPoints[iPoint].x,
 		                 vertexIt[clipStitchPoints[iPoint].vertexIndex].y - clipStitchPoints[iPoint].y);
 	}
@@ -2955,21 +2952,21 @@ bool form::internal::lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
 void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide, std::vector<fPOINT>* currentFormVertices) {
 	if (currentFormVertices != nullptr) {
 		if (clipIntersectSide != vertexIndex) {
-			auto vertexIt = currentFormVertices->cbegin();
+			auto       vertexIt    = currentFormVertices->cbegin();
 			const auto vertexCount = currentFormVertices->size();
 			if ((vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount >> 1)) {
 				auto       iVertex = form::nxt(clipIntersectSide);
-				const auto limit = form::nxt(vertexIndex);
+				const auto limit   = form::nxt(vertexIndex);
 				while (iVertex != limit) {
 					OSequence[SequenceIndex++] = vertexIt[iVertex];
-					iVertex = form::nxt(iVertex);
+					iVertex                    = form::nxt(iVertex);
 				}
 			}
 			else {
 				auto iVertex = clipIntersectSide;
 				while (iVertex != vertexIndex) {
 					OSequence[SequenceIndex++] = vertexIt[iVertex];
-					iVertex = form::prv(iVertex);
+					iVertex                    = form::prv(iVertex);
 				}
 			}
 		}
@@ -3078,7 +3075,7 @@ bool form::internal::vscmp(unsigned index1, unsigned index2) noexcept {
 
 void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>* currentFormVertices) {
 	const auto currentVertexCount = currentFormVertices->size();
-	auto formOffset         = 0.0f;
+	auto       formOffset         = 0.0f;
 	duflt(formOffset, currentFormVertices);
 	auto clipWidth = ClipRectSize.cx + SelectedForm->fillSpacing;
 	if (StateMap.test(StateFlag::ISUND)) {
@@ -4326,12 +4323,12 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
 		const auto lineCount = gsl::narrow<unsigned int>(sortedLines.size());
 		auto       regions   = std::vector<REGION>{};
-		regions.emplace_back( 0u, 0u, 0u, 0u );
+		regions.emplace_back(0u, 0u, 0u, 0u);
 		auto breakLine = sortedLines[0]->line;
 		for (auto iLine = 0u; iLine < lineCount; iLine++) {
 			if (breakLine != sortedLines[iLine]->line) {
 				regions.back().end = iLine - 1;
-				regions.emplace_back( iLine, 0u, 0u, 0u );
+				regions.emplace_back(iLine, 0u, 0u, 0u);
 				breakLine = sortedLines[iLine]->line;
 			}
 		}
@@ -5515,7 +5512,8 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter = (*FormList)[iForm];
-		if ((ActiveLayer == 0u) || ((formIter.attribute & FRMLMSK) >> 1) == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0u)) {
+		if ((ActiveLayer == 0u) || ((formIter.attribute & FRMLMSK) >> 1) == ActiveLayer
+		    || ((formIter.attribute & FRMLMSK) == 0u)) {
 			CurrentVertexIndex     = formIter.vertexIndex;
 			const auto savedVertex = VertexCount;
 			VertexCount            = formIter.vertexCount;
@@ -5566,9 +5564,9 @@ void form::internal::nufpnt(unsigned int vertex, FRMHED* formForInsert) {
 	if (formForInsert != nullptr) {
 		form::fltspac(vertex + 1, 1);
 		formForInsert->vertexCount++;
-		auto vertexIt        = FormVertices->begin() + formForInsert->vertexIndex;
+		auto vertexIt                                   = FormVertices->begin() + formForInsert->vertexIndex;
 		vertexIt[gsl::narrow_cast<size_t>(vertex) + 1u] = SelectedPoint;
-		auto guideIt         = SatinGuides->begin() + formForInsert->satinOrAngle.guide;
+		auto guideIt                                    = SatinGuides->begin() + formForInsert->satinOrAngle.guide;
 		for (auto ind = 0u; ind < formForInsert->satinGuideCount; ind++) {
 			if (guideIt[ind].start > vertex) {
 				guideIt[ind].start++;
@@ -5681,7 +5679,8 @@ void form::unfil() {
 			const auto codedForm    = ClosestFormToCursor << FRMSHFT;
 			auto       iDestination = 0u;
 			for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-				if ((StitchBuffer[iSource].attribute & FRMSK) != codedForm || ((StitchBuffer[iSource].attribute & NOTFRM) != 0u)) {
+				if ((StitchBuffer[iSource].attribute & FRMSK) != codedForm
+				    || ((StitchBuffer[iSource].attribute & NOTFRM) != 0u)) {
 					StitchBuffer[iDestination++] = StitchBuffer[iSource];
 				}
 			}
@@ -5943,7 +5942,7 @@ void form::setap() {
 void form::internal::getbig() noexcept {
 	AllItemsRect.bottom = AllItemsRect.left = 1e9;
 	AllItemsRect.top = AllItemsRect.right = 0;
-	for (auto & iForm : *FormList) {
+	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
 		if (trct.bottom < AllItemsRect.bottom) {
 			AllItemsRect.bottom = trct.bottom;
@@ -6730,8 +6729,8 @@ void form::dulens(unsigned sides) {
 	}
 	SelectedForm->vertexCount
 	    = gsl::narrow<decltype(SelectedForm->vertexCount)>(FormVertices->size() - SelectedForm->vertexIndex);
-	NewFormVertexCount        = SelectedForm->vertexCount + 1;
-	SelectedForm->type        = FRMFPOLY;
+	NewFormVertexCount = SelectedForm->vertexCount + 1;
+	SelectedForm->type = FRMFPOLY;
 	form::frmout(ClosestFormToCursor);
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	StateMap.set(StateFlag::POLIMOV);
@@ -6823,13 +6822,13 @@ void form::fliph() {
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
 		const auto midpoint = (AllItemsRect.right - AllItemsRect.left) / 2 + AllItemsRect.left;
-		for (auto & FormVertice : *FormVertices) {
+		for (auto& FormVertice : *FormVertices) {
 			FormVertice.x = midpoint + midpoint - FormVertice.x;
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			StitchBuffer[iStitch].x = midpoint + midpoint - StitchBuffer[iStitch].x;
 		}
-		for (auto & iForm : *FormList) {
+		for (auto& iForm : *FormList) {
 			auto& rect = iForm.rectangle;
 			rect.left  = midpoint + midpoint - rect.left;
 			rect.right = midpoint + midpoint - rect.right;
@@ -7613,7 +7612,8 @@ void form::frmsadj() {
 		formMap.set(selectedForm);
 	}
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((StitchBuffer[iStitch].attribute & ALTYPMSK) != 0u) && formMap.test((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT)) {
+		if (((StitchBuffer[iStitch].attribute & ALTYPMSK) != 0u)
+		    && formMap.test((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT)) {
 			StitchBuffer[iStitch].x += FormMoveDelta.x;
 			StitchBuffer[iStitch].y -= FormMoveDelta.y;
 		}
@@ -7787,7 +7787,8 @@ void form::fcntr() {
 			form::frmout(selectedForm);
 			auto codedForm = (selectedForm << FRMSHFT);
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((StitchBuffer[iStitch].attribute & FRMSK) == codedForm && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
+				if ((StitchBuffer[iStitch].attribute & FRMSK) == codedForm
+				    && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
 					StitchBuffer[iStitch].x += delta.x;
 					StitchBuffer[iStitch].y += delta.y;
 				}
@@ -8305,7 +8306,7 @@ void form::centir() {
 		StitchBuffer[iStitch].x += delta.x;
 		StitchBuffer[iStitch].y += delta.y;
 	}
-	for (auto & FormVertice : *FormVertices) {
+	for (auto& FormVertice : *FormVertices) {
 		FormVertice.x += delta.x;
 		FormVertice.y += delta.y;
 	}
@@ -8476,8 +8477,8 @@ bool form::internal::spltlin() {
 	auto  it      = FormList->cbegin() + ClosestFormToCursor;
 	it            = FormList->insert(it, srcForm);
 	FormIndex++;
-	srcForm                   = (*FormList)[ClosestFormToCursor];
-	auto& dstForm             = (*FormList)[gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1u];
+	srcForm       = (*FormList)[ClosestFormToCursor];
+	auto& dstForm = (*FormList)[gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1u];
 
 	SelectedForm->vertexCount = ClosestVertexToCursor;
 	dstForm.vertexCount -= ClosestVertexToCursor;
@@ -8851,8 +8852,8 @@ void form::col2frm() {
 		}
 		auto startColorOffset = 0u;
 		auto endColorOffset   = 16u;
-		for (auto & formIter : *FormList) {
-				if (formIter.fillType != 0u) {
+		for (auto& formIter : *FormList) {
+			if (formIter.fillType != 0u) {
 				auto count         = 0u;
 				auto majorityColor = 0u;
 				for (auto iColor = startColorOffset; iColor < endColorOffset; iColor++) {

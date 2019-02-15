@@ -41,7 +41,7 @@ void         chain();
 void         chan();
 void         chkcont();
 bool         chkdel() noexcept;
-bool     chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+bool         chkfrm(std::vector<POINT>& stretchBoxLine, double& xyRatio);
 bool         chkmax(unsigned int arg0, unsigned int arg1) noexcept;
 void         chkseq(bool border);
 bool         cisin(float xCoordinate, float yCoordinate);

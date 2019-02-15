@@ -180,7 +180,7 @@ void satin::spltsat(SATCON currentGuide) {
 
 void satin::internal::satclos() {
 	const auto initialGuideCount = SelectedForm->satinGuideCount;
-	auto minimumLength     = 1e99;
+	auto       minimumLength     = 1e99;
 
 	form::uninsf();
 	thred::px2stch();
@@ -333,7 +333,7 @@ void satin::satadj() {
 	auto interiorGuides = std::vector<SATCON>{};
 	interiorGuides.reserve(CurrentFormGuidesCount);
 	const auto savedGuideCount = SelectedForm->satinGuideCount;
-	auto satinMap        = ExtendedBitSet<>(VertexCount);
+	auto       satinMap        = ExtendedBitSet<>(VertexCount);
 
 	// ensure all guide endpoints are on valid vertices
 	auto guideIt = SatinGuides->begin() + CurrentFormGuides;
@@ -938,7 +938,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line1Step   = dPOINT{ line1Delta.x / line1Count, line1Delta.y / line1Count };
 		auto line2Step   = dPOINT{ line2Delta.x / line2Count, line2Delta.y / line2Count };
 		bool flag        = false;
-		auto loop = 0u;
+		auto loop        = 0u;
 		auto iLine1Count = 1u;
 		auto iLine2Count = 1u;
 		do {
