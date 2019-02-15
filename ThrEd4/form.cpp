@@ -2682,7 +2682,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>* currentFormVe
 	}
 }
 
-unsigned form::internal::leftsid(std::vector<fPOINT>* currentFormVertices) {
+unsigned form::internal::leftsid(const std::vector<fPOINT>* currentFormVertices) {
 	auto leftVertex = 0u;
 	if (currentFormVertices != nullptr) {
 		auto iVertex  = 0u;
@@ -2709,7 +2709,7 @@ bool form::internal::isin(std::vector<VCLPX>&  regionCrossingData,
                           unsigned             regionCrossingStart,
                           unsigned             regionCrossingEnd,
                           const fRECTANGLE&    boundingRect,
-                          std::vector<fPOINT>* currentFormVertices) {
+                          const std::vector<fPOINT>* currentFormVertices) {
 	if (currentFormVertices != nullptr) {
 		auto count = 0u;
 		auto point = dPOINT{};
@@ -2770,7 +2770,7 @@ bool form::internal::isect(unsigned int         vertex0,
                            float&               length,
                            const fPOINT&        lineSegmentStart,
                            const fPOINT&        lineSegmentEnd,
-                           std::vector<fPOINT>* currentFormVertices) {
+                           const std::vector<fPOINT>* currentFormVertices) {
 	if (currentFormVertices != nullptr) {
 		const auto delta            = dPOINT{ (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
 		const auto point            = dPOINT{ (lineSegmentStart.x), (lineSegmentStart.y) };
@@ -2850,7 +2850,7 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
                                 unsigned                  regionCrossingEnd,
                                 const fPOINT&             lineSegmentStart,
                                 const fPOINT&             lineSegmentEnd,
-                                std::vector<fPOINT>*      currentFormVertices) {
+                                const std::vector<fPOINT>*      currentFormVertices) {
 	auto  iRegions        = 0u;
 	auto  iIntersection   = 0u;
 	auto  count           = 0u;
@@ -2916,7 +2916,7 @@ unsigned form::internal::insect(std::vector<CLIPSORT>&    clipIntersectData,
 float form::internal::getlen(std::vector<CLIPNT>&       clipStitchPoints,
                              const std::vector<double>& lengths,
                              unsigned                   iPoint,
-                             std::vector<fPOINT>*       currentFormVertices) {
+                             const std::vector<fPOINT>*       currentFormVertices) {
 	auto retval = 0.0f;
 	if (currentFormVertices != nullptr) {
 		clipStitchPoints[iPoint].vertexIndex %= currentFormVertices->size();
@@ -2933,7 +2933,7 @@ unsigned form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
                                  const std::vector<double>& lengths,
                                  unsigned                   start,
                                  unsigned                   finish,
-                                 std::vector<fPOINT>*       currentFormVertices) {
+                                 const std::vector<fPOINT>*       currentFormVertices) {
 	const auto clipSegment = CLPSEG{ start,  getlen(clipStitchPoints, lengths, start, currentFormVertices),
 		                             0u,     clipStitchPoints[start].vertexIndex,
 		                             finish, getlen(clipStitchPoints, lengths, finish, currentFormVertices),
@@ -2947,7 +2947,7 @@ bool form::internal::lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
 	return (arg1.length < arg2.length);
 }
 
-void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide, std::vector<fPOINT>* currentFormVertices) {
+void form::internal::chksid(unsigned int vertexIndex, unsigned clipIntersectSide, const std::vector<fPOINT>* currentFormVertices) {
 	if (currentFormVertices != nullptr) {
 		if (clipIntersectSide != vertexIndex) {
 			auto       vertexIt    = currentFormVertices->cbegin();
@@ -2975,7 +2975,7 @@ void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
                             std::vector<CLPSEG>&       clipSegments,
                             const unsigned             currentSegmentIndex,
                             unsigned&                  clipIntersectSide,
-                            std::vector<fPOINT>*       currentFormVertices) {
+                            const std::vector<fPOINT>*       currentFormVertices) {
 	auto isPointedEnd = true;
 
 	if ((SelectedForm->extendedAttribute & AT_SQR) != 0u) {
