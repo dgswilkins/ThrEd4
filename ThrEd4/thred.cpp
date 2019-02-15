@@ -3208,7 +3208,7 @@ void thred::grpAdj() {
 				if (newSize.x < TINY) {
 					newSize.x = 1;
 				}
-				coordinate = MINZUM / newSize.x;
+				coordinate = gsl::narrow_cast<decltype(coordinate)>(MINZUM) / newSize.x;
 				newSize    = { MINZUM, dToL(coordinate * newSize.y) };
 			}
 			if (newSize.x > newSize.y) {
@@ -6943,7 +6943,7 @@ void thred::internal::lodclp(unsigned iStitch) {
 void thred::internal::rSelbox() {
 	const auto ratio = static_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	const auto adjustedSelectSize
-	    = SIZE{ static_cast<LONG>(SelectBoxSize.cx * ratio + 0.5), static_cast<LONG>(SelectBoxSize.cy * ratio + 0.5) };
+	    = SIZE{ gsl::narrow_cast<LONG>(lround(SelectBoxSize.cx * ratio)), gsl::narrow_cast<LONG>(lround(SelectBoxSize.cy * ratio)) };
 
 	unsel();
 	thred::px2stch();
@@ -7278,18 +7278,18 @@ void thred::rtclpfn(unsigned int destination, unsigned int source) {
 }
 
 unsigned int thred::internal::sizfclp() {
-	auto clipSize = gsl::narrow<unsigned int>(sizeof(*ClipFormHeader) + VertexCount * sizeof((*FormVertices)[0]));
+	auto clipSize = gsl::narrow<unsigned int>(sizeof(decltype(*ClipFormHeader)) + VertexCount * sizeof(decltype(FormVertices->back())));
 	if (SelectedForm->type == SAT) {
-		clipSize += SelectedForm->satinGuideCount * sizeof(SatinGuides[0]);
+		clipSize += SelectedForm->satinGuideCount * sizeof(decltype(SatinGuides->back()));
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
-		clipSize += SelectedForm->clipEntries * sizeof((*ClipPoints)[0]);
+		clipSize += SelectedForm->clipEntries * sizeof(decltype(ClipPoints->back()));
 	}
 	if (clip::isclpx(ClosestFormToCursor)) {
-		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof((*ClipPoints)[0]);
+		clipSize += SelectedForm->lengthOrCount.clipCount * sizeof(decltype(ClipPoints->back()));
 	}
 	if (texture::istx(ClosestFormToCursor)) {
-		clipSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
+		clipSize += SelectedForm->fillInfo.texture.count * sizeof(decltype(TexturePointsBuffer->back()));
 	}
 	return clipSize;
 }
@@ -7331,7 +7331,7 @@ unsigned int thred::internal::sizclp(unsigned& formFirstStitchIndex, unsigned& f
 	FileSize    = sizeof(*ClipFormHeader) + VertexCount * sizeof((*FormVertices)[0]);
 	auto length = FileSize;
 	if (SelectedForm->type == SAT) {
-		FileSize += SelectedForm->satinGuideCount * sizeof(SatinGuides[0]);
+		FileSize += SelectedForm->satinGuideCount * sizeof(decltype(SatinGuides->back()));
 	}
 	if ((SelectedForm->fillType != 0u) || (SelectedForm->edgeType != 0u)) {
 		formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
@@ -7339,13 +7339,13 @@ unsigned int thred::internal::sizclp(unsigned& formFirstStitchIndex, unsigned& f
 		FileSize += length * sizeof(StitchBuffer[0]);
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
-		FileSize += SelectedForm->clipEntries * sizeof((*ClipPoints)[0]);
+		FileSize += SelectedForm->clipEntries * sizeof(decltype(ClipPoints->back()));
 	}
 	if (clip::isclpx(ClosestFormToCursor)) {
-		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof((*ClipPoints)[0]);
+		FileSize += SelectedForm->lengthOrCount.clipCount * sizeof(decltype(ClipPoints->back()));
 	}
 	if (texture::istx(ClosestFormToCursor)) {
-		FileSize += SelectedForm->fillInfo.texture.count * sizeof(TexturePointsBuffer[0]);
+		FileSize += SelectedForm->fillInfo.texture.count * sizeof(decltype(TexturePointsBuffer->back()));
 	}
 
 	return length;
@@ -15798,7 +15798,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 			else {
 				if ((GetKeyState(VK_SHIFT) & 0x8000) != 0) {
-					dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
+					dumrk(gsl::narrow_cast<double>(UnzoomedRect.x) / 2.0, gsl::narrow_cast<double>(UnzoomedRect.y) / 2.0);
 				}
 				else {
 					if (thred::px2stch()) {
@@ -16318,7 +16318,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 		case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-			dumrk(UnzoomedRect.x / 2, UnzoomedRect.y / 2);
+			dumrk(gsl::narrow_cast<double>(UnzoomedRect.x) / 2.0, gsl::narrow_cast<double>(UnzoomedRect.y) / 2.0);
 			StateMap.set(StateFlag::RESTCH);
 			break;
 		}

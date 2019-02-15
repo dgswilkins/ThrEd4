@@ -859,7 +859,7 @@ void form::durpoli(unsigned vertexCount) {
 	}
 	const auto stepAngle = PI * 2 / vertexCount;
 	// ToDo - why 500?
-	const auto length = 500u / vertexCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
+	const auto length = 500.0 / vertexCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (static_cast<double>(LHUPX) + LHUPY);
 	auto newForm        = FRMHED{};
 	newForm.vertexIndex = thred::adflt(vertexCount);
@@ -1422,7 +1422,7 @@ void form::savblen(float fLength) {
 float form::getplen() noexcept {
 	const auto value = SelectedForm->picoLength;
 
-	return (static_cast<float>(value >> 8) + (value & 0xff) / 256);
+	return (static_cast<float>(value >> 8) + (value & 0xff) / 256.0f);
 }
 
 void form::savplen(float length) {
@@ -6569,7 +6569,7 @@ void form::duspir(unsigned stepCount) {
 	}
 	const auto stepAngle = PI * 2.0 / stepCount;
 	// ToDo - Why 800?
-	const auto length = 800u / stepCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
+	const auto length = 800.0 / stepCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (static_cast<double>(LHUPX) + LHUPY);
 	auto newForm        = FRMHED{};
 	auto vertexCount    = gsl::narrow<unsigned int>(std::round(stepCount * SpiralWrap));
@@ -6633,7 +6633,7 @@ void form::duhart(unsigned sideCount) {
 	thred::px2stch();
 	auto       point     = dPOINT{ SelectedPoint };
 	auto       stepAngle = PI * 2.0 / sideCount;
-	const auto length    = 300 / sideCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
+	const auto length    = 300.0 / sideCount * ZoomFactor * (static_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (static_cast<double>(LHUPX) + LHUPY);
 	auto angle    = PI * 0.28;
 	auto iVertex  = 0u;
