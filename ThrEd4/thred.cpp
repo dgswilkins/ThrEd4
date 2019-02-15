@@ -4988,6 +4988,7 @@ void thred::internal::bak() {
 	StateMap.reset(StateFlag::FPSEL);
 	StateMap.reset(StateFlag::FRMPSEL);
 	StateMap.reset(StateFlag::BIGBOX);
+	SelectedFormList->clear();
 	thred::undat();
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		StateMap.reset(StateFlag::WASRT);
@@ -11693,13 +11694,11 @@ void thred::internal::qcode() {
 		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	};
 	if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
-		FormList->pop_back();
+		thi::bak();
 		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	}
 	if (StateMap.testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
-		for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
-			FormList->pop_back();
-		}
+		thi::bak();
 		SelectedFormList->clear();
 		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	}
@@ -12905,8 +12904,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 			return true;
 		}
-		if (StateMap.testAndReset(StateFlag::FUNSCLP)) {
-			thred::savdo();
+		if (StateMap.test(StateFlag::FUNSCLP)) {
 			StateMap.reset(StateFlag::MOVFRMS);
 			auto formsRect = fRECTANGLE{};
 			form::pxrct2stch(SelectedFormsRect, formsRect);
@@ -12926,6 +12924,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				form::refil();
 			}
 			FormIndex += ClipFormsCount;
+			StateMap.reset(StateFlag::FUNSCLP);
 			StateMap.set(StateFlag::RESTCH);
 			return true;
 		}
@@ -13993,7 +13992,6 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			return true;
 		}
 		if (StateMap.test(StateFlag::FUNCLP)) {
-			thred::savdo();
 			FormIndex++;
 			StateMap.set(StateFlag::INIT);
 			form::rstfrm();
@@ -14109,7 +14107,6 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 			if (StateMap.test(StateFlag::INIT)) {
 				unlin();
-				thred::savdo();
 				if (StateMap.test(StateFlag::INSRT) && PCSHeader.stitchCount < MAXITEMS) {
 					thred::px2stch();
 					auto code = (ActiveColor | USMSK | (ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
@@ -15217,6 +15214,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		case 'V': {
 			if (((GetKeyState(VK_CONTROL) & 0x8000) != 0) && (OpenClipboard(ThrEdWindow) != 0)) {
+				thred::savdo();
 				ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 				ClipMemory = GetClipboardData(ThrEdClip);
 				if (ClipMemory != nullptr) {
@@ -15284,6 +15282,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto iForm     = 0u;
 							ClipFormsCount = ClipFormsHeader->formCount;
 							auto forms     = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
+							const auto formOffset = gsl::narrow<unsigned int>(FormList->size());
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 								FormList->push_back(FRMHED{});
 								auto& formIter = FormList->back();
@@ -15294,7 +15293,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto formVertices  = convert_ptr<fPOINT*>(&forms[iForm]);
 							auto currentVertex = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm              = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
+								auto offset = formOffset + iForm;
+								SelectedForm = &((*FormList)[offset]);
 								SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
 								auto vertexIt             = FormVertices->begin() + SelectedForm->vertexIndex;
 								for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
@@ -15304,7 +15304,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
 							auto currentGuide = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
+								auto offset = formOffset + iForm;
+								SelectedForm = &((*FormList)[offset]);
 								if (SelectedForm->type == SAT && (SelectedForm->satinGuideCount != 0u)) {
 									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 									auto guideIt                     = SatinGuides->begin() + SelectedForm->satinOrAngle.guide;
@@ -15316,8 +15317,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto clipData    = convert_ptr<fPOINT*>(&guides[currentGuide]);
 							auto currentClip = 0u;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
-								if (clip::isclpx(FormIndex + iForm)) {
+								auto offset = formOffset + iForm;
+								SelectedForm = &((*FormList)[offset]);
+								if (clip::isclpx(offset)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
 									auto offsetStart                   = ClipPoints->begin() + SelectedForm->angleOrClipData.clip;
 									for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
@@ -15325,7 +15327,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 										offsetStart++;
 									}
 								}
-								if (clip::iseclpx(FormIndex + iForm)) {
+								if (clip::iseclpx(offset)) {
 									SelectedForm->borderClipData = thred::adclp(SelectedForm->clipEntries);
 									auto offsetStart             = ClipPoints->begin() + SelectedForm->borderClipData;
 									for (auto iClip = 0u; iClip < SelectedForm->clipEntries; iClip++) {
@@ -15337,7 +15339,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							auto textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
 							auto textureCount  = 0;
 							for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-								if (texture::istx(FormIndex + iForm)) {
+								if (texture::istx(formOffset + iForm)) {
 									SelectedForm = &((*FormList)[gsl::narrow_cast<size_t>(FormIndex) + iForm]);
 									textureCount += SelectedForm->fillInfo.texture.count;
 									SelectedForm->fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
@@ -15351,10 +15353,11 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 							SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 							form::ratsr();
+							SelectedFormList->clear();
 							SelectedFormList->reserve(ClipFormsCount);
 							for (OutputIndex = 0; OutputIndex < (ClipFormsCount); OutputIndex++) {
-								form::fselrct(OutputIndex + FormIndex);
-								SelectedFormList->push_back(OutputIndex + FormIndex);
+								form::fselrct(OutputIndex + formOffset);
+								SelectedFormList->push_back(OutputIndex + formOffset);
 							}
 							SelectedFormsSize.x = gsl::narrow<float>(SelectedFormsRect.right - SelectedFormsRect.left);
 							SelectedFormsSize.y = gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);

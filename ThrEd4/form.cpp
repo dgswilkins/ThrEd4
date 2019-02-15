@@ -4833,7 +4833,9 @@ void form::refilfn() {
 	if (SelectedForm->type == FRMLINE) {
 		SelectedForm->underlayIndent = 0;
 	}
-	thred::savdo();
+	if (!(StateMap.test(StateFlag::FUNCLP) || StateMap.test(StateFlag::FUNSCLP))) {
+		thred::savdo();
+	}
 	auto fillStartsData = FILLSTARTS{}; // fill start data for refill
 	auto fillStartsMap  = 0u;           // fill starts bitmap
 	xt::fdelstch(fillStartsData, fillStartsMap);
@@ -4847,7 +4849,7 @@ void form::refilfn() {
 	if (!clip::isclp(ClosestFormToCursor)) {
 		UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
 	}
-	if (!StateMap.test(StateFlag::WASDO)) {
+	if (!(StateMap.test(StateFlag::WASDO) || StateMap.test(StateFlag::FUNCLP) || StateMap.test(StateFlag::FUNSCLP))) {
 		thred::savdo();
 	}
 	StateMap.reset(StateFlag::WASDO);
