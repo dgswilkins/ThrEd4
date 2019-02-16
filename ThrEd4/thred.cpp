@@ -4115,7 +4115,7 @@ bool thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) {
 		delta.y = -boundingRect.bottom;
 	}
 	if ((delta.x != 0.0f) || (delta.y != 0.0f)) {
-		for (auto offsetStitch : stitches) {
+		for (auto& offsetStitch : stitches) {
 			offsetStitch.x += delta.x;
 			offsetStitch.y += delta.y;
 		}

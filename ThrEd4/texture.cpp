@@ -645,7 +645,7 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 	}
 	editorOffset.y -= TextureScreen.formCenter.y;
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x += editorOffset.x;
 		vertex.y += editorOffset.y;
 	}
@@ -804,7 +804,7 @@ void texture::internal::setxfrm() {
 
 	txi::angrct(angleRect);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x -= angleRect.left;
 		vertex.y -= angleRect.bottom;
 	}
@@ -812,7 +812,7 @@ void texture::internal::setxfrm() {
 	const auto height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
 		const auto ratio = TextureScreen.areaHeight / height * 0.95;
-		for (auto vertex : angledFormVertices) {
+		for (auto& vertex : angledFormVertices) {
 			vertex.x *= ratio;
 			vertex.y *= ratio;
 		}
@@ -1362,7 +1362,7 @@ void texture::internal::txcntrv(const FRMHED& textureForm) {
 void texture::internal::txsiz(double ratio, FRMHED& textureForm) {
 	txi::ritxfrm(textureForm);
 	auto& angledFormVertices = *AngledFormVertices;
-	for (auto vertex : angledFormVertices) {
+	for (auto& vertex : angledFormVertices) {
 		vertex.x *= ratio;
 		vertex.y *= ratio;
 	}
