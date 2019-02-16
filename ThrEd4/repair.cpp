@@ -250,7 +250,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
 				auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
-				auto sourceEnd = std::next(sourceStart, form.vertexCount);
+				auto sourceEnd   = std::next(sourceStart, form.vertexCount);
 				vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
 				ri::bcup(iForm, badData);
 			}

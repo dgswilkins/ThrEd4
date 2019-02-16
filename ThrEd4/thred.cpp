@@ -5813,10 +5813,10 @@ void thred::internal::nuFil() {
 									color                                        = NOTFRM | PCSDataBuffer[iPCSstitch++].fx;
 								}
 								else {
-									StitchBuffer[iStitch].x
-									    = PCSDataBuffer[iPCSstitch].x + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256.0;
-									StitchBuffer[iStitch].y
-									    = PCSDataBuffer[iPCSstitch].y + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0;
+									StitchBuffer[iStitch].x = PCSDataBuffer[iPCSstitch].x
+									                          + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256.0;
+									StitchBuffer[iStitch].y = PCSDataBuffer[iPCSstitch].y
+									                          + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0;
 									StitchBuffer[iStitch++].attribute = color;
 									iPCSstitch++;
 								}
@@ -6142,8 +6142,8 @@ void thred::internal::zumin() {
 				}
 				SelectedPoint.x
 				    = (gsl::narrow_cast<double>(SelectedFormsRect.right) - SelectedFormsRect.left) / 2.0 + SelectedFormsRect.left;
-				SelectedPoint.y
-				    = (gsl::narrow_cast<double>(SelectedFormsRect.top) - SelectedFormsRect.bottom) / 2.0 + SelectedFormsRect.bottom;
+				SelectedPoint.y = (gsl::narrow_cast<double>(SelectedFormsRect.top) - SelectedFormsRect.bottom) / 2.0
+				                  + SelectedFormsRect.bottom;
 				break;
 			}
 			if (!thred::px2stch()) {
@@ -8500,9 +8500,10 @@ void thred::redclp() {
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
-			clipBuffer.push_back(fPOINTATTR{ ClipStitchData[iStitch].x + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
-			                                 ClipStitchData[iStitch].y + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
-			                                 (ClipStitchData[iStitch].led & 0xf) | codedLayer });
+			clipBuffer.push_back(
+			    fPOINTATTR{ ClipStitchData[iStitch].x + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
+			                ClipStitchData[iStitch].y + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
+			                (ClipStitchData[iStitch].led & 0xf) | codedLayer });
 
 #if CLPBUG
 			OutputDebugString(
@@ -8908,9 +8909,10 @@ void thred::internal::insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						}
 						else {
-							StitchBuffer[iStitch]
-							    = { pcsStitchBuffer[iPCSStitch].x + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								    pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f };
+							StitchBuffer[iStitch] = {
+								pcsStitchBuffer[iPCSStitch].x + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
+								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f
+							};
 							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
@@ -11614,7 +11616,8 @@ void thred::internal::unpclp() {
 }
 
 void thred::internal::fixpclp() {
-	const auto point = POINT{ (Msg.pt.x + gsl::narrow_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + gsl::narrow_cast<LONG>(FormMoveDelta.y)) };
+	const auto point
+	    = POINT{ (Msg.pt.x + gsl::narrow_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + gsl::narrow_cast<LONG>(FormMoveDelta.y)) };
 
 	thred::pxCor2stch(point);
 	const auto offset = fPOINT{ SelectedPoint.x - InterleaveSequence[1].x, SelectedPoint.y - InterleaveSequence[1].y };
@@ -15315,7 +15318,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[offset]);
 								if (SelectedForm->type == SAT && (SelectedForm->satinGuideCount != 0u)) {
 									SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
-									auto guideIt                     = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
+									auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
 									for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 										guideIt[iGuide] = guides[currentGuide++];
 									}
@@ -15328,7 +15331,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								SelectedForm = &((*FormList)[offset]);
 								if (clip::isclpx(offset)) {
 									SelectedForm->angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
-									auto offsetStart                   = std::next(ClipPoints->begin(), SelectedForm->angleOrClipData.clip);
+									auto offsetStart = std::next(ClipPoints->begin(), SelectedForm->angleOrClipData.clip);
 									for (auto iClip = 0u; iClip < SelectedForm->lengthOrCount.clipCount; iClip++) {
 										*offsetStart = clipData[currentClip++];
 										offsetStart++;
@@ -15406,7 +15409,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 									          std::next(SatinGuides->begin(), formIter.satinOrAngle.guide));
 								}
 								auto       clipData      = convert_ptr<fPOINT*>(&guides[0]);
-								auto clipCount = 0u;
+								auto       clipCount     = 0u;
 								const auto lastFormIndex = gsl::narrow<unsigned int>(FormList->size() - 1u);
 								if (clip::isclpx(lastFormIndex)) {
 									formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
@@ -15685,8 +15688,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							form::fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
 							displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							auto        vertexIt = std::next(FormVertices->cbegin(), (*FormList)[ClosestFormToCursor].vertexIndex);
-							const auto& vertex   = vertexIt[ClosestVertexToCursor];
+							auto vertexIt      = std::next(FormVertices->cbegin(), (*FormList)[ClosestFormToCursor].vertexIndex);
+							const auto& vertex = vertexIt[ClosestVertexToCursor];
 							thred::ritfcor(vertex);
 							shftflt(vertex);
 							StateMap.set(StateFlag::RESTCH);
@@ -15772,8 +15775,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							form::fvars(ClosestFormToCursor);
 							ClosestVertexToCursor = form::prv(ClosestVertexToCursor);
 							displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-							auto        vertexIt = std::next(FormVertices->cbegin(), (*FormList)[ClosestFormToCursor].vertexIndex);
-							const auto& vertex   = vertexIt[ClosestVertexToCursor];
+							auto vertexIt      = std::next(FormVertices->cbegin(), (*FormList)[ClosestFormToCursor].vertexIndex);
+							const auto& vertex = vertexIt[ClosestVertexToCursor];
 							thred::ritfcor(vertex);
 							shftflt(vertex);
 							StateMap.set(StateFlag::RESTCH);
@@ -18077,8 +18080,9 @@ void thred::internal::dubar() {
 	POINT indicatorLine[2] = {};
 
 	for (auto iColorChange = 0u; iColorChange < ColorChanges; iColorChange++) {
-		const auto barSectionHeight = gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1].stitchIndex) / PCSHeader.stitchCount;
-		colorBarRect.bottom         = dToL(barSectionHeight * DrawItem->rcItem.bottom);
+		const auto barSectionHeight
+		    = gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1].stitchIndex) / PCSHeader.stitchCount;
+		colorBarRect.bottom = dToL(barSectionHeight * DrawItem->rcItem.bottom);
 		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 		colorBarRect.top = colorBarRect.bottom;
 	}

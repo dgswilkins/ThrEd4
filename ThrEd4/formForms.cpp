@@ -209,8 +209,9 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
-			valueWindow[LUANG] = ffi::txtrwin(
-			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)), ValueWindowCoords);
+			valueWindow[LUANG]
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)),
+			                   ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 	}
@@ -304,14 +305,16 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 		ffi::nxtlin(formMenuEntryCount);
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-			valueWindow[LFRMANG] = ffi::numwin(
-			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)), ValueWindowCoords);
+			valueWindow[LFRMANG]
+			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)),
+			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-			valueWindow[LSACANG] = ffi::numwin(
-			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)), ValueWindowCoords);
+			valueWindow[LSACANG]
+			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)),
+			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == VCLPF || SelectedForm->fillType == HCLPF || SelectedForm->fillType == ANGCLPF) {
@@ -908,9 +911,9 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DRAG: {
-				distanceFromDaisyCenter
-				    = diameter
-				      + (gsl::narrow_cast<double>(form::psg() % IniFile.daisyPetalPoints) / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter = diameter
+				                          + (gsl::narrow_cast<double>(form::psg() % IniFile.daisyPetalPoints)
+				                             / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DCOG: {

@@ -389,9 +389,10 @@ void texture::drwtxtr() {
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
 		yOffset                        = StitchWindowClientRect.bottom >> 2;
-		TextureScreen.xOffset          = (TextureScreen.editToPixelRatio * StitchWindowClientRect.right
-                                 - gsl::narrow_cast<double>(TextureScreen.spacing) * (gsl::narrow_cast<double>(TextureScreen.lines) + 2.0))
-		                        / 2.0;
+		TextureScreen.xOffset
+		    = (TextureScreen.editToPixelRatio * StitchWindowClientRect.right
+		       - gsl::narrow_cast<double>(TextureScreen.spacing) * (gsl::narrow_cast<double>(TextureScreen.lines) + 2.0))
+		      / 2.0;
 	}
 	TextureScreen.top          = yOffset;
 	TextureScreen.bottom       = StitchWindowClientRect.bottom - yOffset;
@@ -681,8 +682,9 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) noexce
 		val = 0.0f;
 	}
 	textureRecord.line = gsl::narrow<unsigned short>(std::round(val));
-	textureRecord.y    = TextureScreen.areaHeight
-	                  - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
+	textureRecord.y
+	    = TextureScreen.areaHeight
+	      - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
 }
 
 void texture::txtrup() {

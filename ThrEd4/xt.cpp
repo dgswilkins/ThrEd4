@@ -162,7 +162,8 @@ void xt::internal::nurat(FEATHER& feather) {
 				feather.countUp--;
 			}
 			else {
-				feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
+				feather.ratio
+				    = (gsl::narrow_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
 				if (feather.countDown != 0u) {
 					feather.countDown--;
 				}
@@ -174,7 +175,8 @@ void xt::internal::nurat(FEATHER& feather) {
 			}
 		}
 		else {
-			feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+			feather.ratio
+			    = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
 		}
 		feather.ratio *= feather.formRatio;
 		break;

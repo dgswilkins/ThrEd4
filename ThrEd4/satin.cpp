@@ -949,10 +949,12 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						BSequence[SequenceIndex++] = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
+						BSequence[SequenceIndex++]
+						    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
 					}
 					else {
-						BSequence[SequenceIndex++] = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
+						BSequence[SequenceIndex++]
+						    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
 					}
 					if (SequenceIndex > MAXITEMS - 6) {
 						SequenceIndex = MAXITEMS - 6;
