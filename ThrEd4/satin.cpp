@@ -47,7 +47,7 @@ void satin::delsac(unsigned int formIndex) {
 	if (!SatinGuides->empty()) {
 		if (formList[formIndex].type == SAT && (formList[formIndex].satinGuideCount != 0u)) {
 			auto eraseStart = std::next(SatinGuides->cbegin(), formList[formIndex].satinOrAngle.guide);
-			auto eraseEnd   = eraseStart + formList[formIndex].satinGuideCount;
+			auto eraseEnd   = std::next(eraseStart, formList[formIndex].satinGuideCount);
 			SatinGuides->erase(eraseStart, eraseEnd);
 			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
 				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0u)) {
@@ -320,7 +320,7 @@ void satin::satsel() {
 
 void satin::internal::satcpy(const std::vector<SATCON>& source, unsigned int size) {
 	auto eraseStart = std::next(SatinGuides->cbegin(), CurrentFormGuides);
-	auto eraseEnd   = eraseStart + (CurrentFormGuidesCount - size);
+	auto eraseEnd   = std::next(eraseStart, (CurrentFormGuidesCount - size));
 	SatinGuides->erase(eraseStart, eraseEnd);
 	auto guideIt = std::next(SatinGuides->begin(), CurrentFormGuides); // iterator may be invalidated by erase
 	std::copy(source.cbegin(), source.cend(), guideIt);
@@ -1482,7 +1482,7 @@ void satin::cpySat(const FRMHED& formHeader) {
 		SelectedForm->satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 
 		auto       sourceStart = std::next(SatinGuides->cbegin(), formHeader.satinOrAngle.guide);
-		auto       sourceEnd   = sourceStart + SelectedForm->satinGuideCount;
+		auto       sourceEnd   = std::next(sourceStart, SelectedForm->satinGuideCount);
 		const auto destination = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
 		std::copy(sourceStart, sourceEnd, destination);
 	}

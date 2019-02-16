@@ -4972,7 +4972,7 @@ void form::refilfn() {
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(SelectedForm->vertexCount);
 				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = startVertex + SelectedForm->vertexCount;
+				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
 				fi::fnvrt(WorkingFormVertices, groupIndexSequence, lineEndpoints);
 				break;
@@ -4983,7 +4983,7 @@ void form::refilfn() {
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(angledForm.vertexCount);
 				auto startVertex = std::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-				auto endVertex   = startVertex + angledForm.vertexCount;
+				auto endVertex   = std::next(startVertex, angledForm.vertexCount);
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
 				break;
 			}
@@ -4993,7 +4993,7 @@ void form::refilfn() {
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(angledForm.vertexCount);
 				auto startVertex = std::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
-				auto endVertex   = startVertex + angledForm.vertexCount;
+				auto endVertex   = std::next(startVertex, angledForm.vertexCount);
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
 				break;
 			}
@@ -5003,7 +5003,7 @@ void form::refilfn() {
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(SelectedForm->vertexCount);
 				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = startVertex + SelectedForm->vertexCount;
+				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
 				fi::clpcon(textureSegments, WorkingFormVertices);
 				doFill = false;
@@ -5027,7 +5027,7 @@ void form::refilfn() {
 				WorkingFormVertices->clear();
 				WorkingFormVertices->reserve(SelectedForm->vertexCount);
 				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = startVertex + SelectedForm->vertexCount;
+				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
 				WorkingFormVertices->insert(WorkingFormVertices->end(), startVertex, endVertex);
 				fi::clpcon(textureSegments, WorkingFormVertices);
 				doFill = false;
@@ -7357,12 +7357,12 @@ void form::internal::adfrm(unsigned int iForm) {
 	ClosestFormToCursor    = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	formHeader.vertexIndex = thred::adflt(SelectedForm->vertexCount);
 	auto vertexIt          = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-	std::copy(vertexIt, vertexIt + SelectedForm->vertexCount, FormVertices->begin() + formHeader.vertexIndex);
+	std::copy(vertexIt, std::next(vertexIt, SelectedForm->vertexCount), std::next(FormVertices->begin(), formHeader.vertexIndex));
 	formHeader.vertexCount = SelectedForm->vertexCount;
 	if (SelectedForm->type == SAT && (SelectedForm->satinGuideCount != 0u)) {
 		formHeader.satinOrAngle.guide = satin::adsatk(SelectedForm->satinGuideCount);
 		auto guideStart               = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
-		auto guideEnd                 = guideStart + SelectedForm->satinGuideCount;
+		auto guideEnd                 = std::next(guideStart, SelectedForm->satinGuideCount);
 		auto guideDest                = std::next(SatinGuides->begin(), formHeader.satinOrAngle.guide);
 		std::copy(guideStart, guideEnd, guideDest);
 	}
@@ -7370,12 +7370,12 @@ void form::internal::adfrm(unsigned int iForm) {
 		formHeader.borderClipData = thred::adclp(SelectedForm->clipEntries);
 		auto offsetStart          = std::next(ClipPoints->cbegin(), SelectedForm->borderClipData);
 		auto destination          = std::next(ClipPoints->begin(), formHeader.borderClipData);
-		std::copy(offsetStart, offsetStart + SelectedForm->clipEntries, destination);
+		std::copy(offsetStart, std::next(offsetStart, SelectedForm->clipEntries), destination);
 	}
 	if (clip::isclpx(iForm)) {
 		formHeader.angleOrClipData.clip = thred::adclp(SelectedForm->lengthOrCount.clipCount);
 		auto       sourceStart          = std::next(ClipPoints->cbegin(), SelectedForm->angleOrClipData.clip);
-		auto       sourceEnd            = sourceStart + SelectedForm->lengthOrCount.clipCount;
+		auto       sourceEnd            = std::next(sourceStart, SelectedForm->lengthOrCount.clipCount);
 		const auto destination          = std::next(ClipPoints->begin(), formHeader.angleOrClipData.clip);
 		std::copy(sourceStart, sourceEnd, destination);
 	}
@@ -7425,7 +7425,7 @@ void form::internal::cplayfn(unsigned int iForm, unsigned play) {
 	form::fvars(lastForm);
 	SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
 	auto vertexIt             = std::next(FormVertices->cbegin(), (*FormList)[iForm].vertexIndex);
-	std::copy(vertexIt, vertexIt + VertexCount, FormVertices->begin() + SelectedForm->vertexIndex);
+	std::copy(vertexIt, std::next(vertexIt, VertexCount), std::next(FormVertices->begin(), SelectedForm->vertexIndex));
 	satin::cpySat((*FormList)[iForm]);
 	SelectedForm->clipEntries             = 0;
 	SelectedForm->fillType                = 0;
@@ -8007,7 +8007,7 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	destinationFormList[formRelocationIndex++] = (*FormList)[formIndex];
 
 	auto       vertexIt = std::next(FormVertices->cbegin(), destination.vertexIndex);
-	const auto res = std::copy(vertexIt, vertexIt + destination.vertexCount, destinationFormVertices.begin() + formSourceIndex);
+	const auto res = std::copy(vertexIt, std::next(vertexIt, destination.vertexCount), std::next(destinationFormVertices.begin(), formSourceIndex));
 	destination.vertexIndex = formSourceIndex;
 	formSourceIndex += destination.vertexCount;
 	if (destination.satinGuideCount != 0u) {
@@ -8020,7 +8020,7 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	}
 	if (clip::iseclpx(formIndex)) {
 		const auto sourceStart = std::next(ClipPoints->cbegin(), destination.borderClipData);
-		auto       sourceEnd   = sourceStart + destination.clipEntries;
+		auto       sourceEnd   = std::next(sourceStart, destination.clipEntries);
 		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
 
 		destination.borderClipData
@@ -8028,7 +8028,7 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	}
 	if (clip::isclpx(formIndex)) {
 		auto sourceStart = std::next(ClipPoints->cbegin(), destination.angleOrClipData.clip);
-		auto sourceEnd   = sourceStart + destination.lengthOrCount.clipCount;
+		auto sourceEnd   = std::next(sourceStart, destination.lengthOrCount.clipCount);
 		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
 
 		destination.angleOrClipData.clip = gsl::narrow<decltype(destination.angleOrClipData.clip)>(
@@ -8438,7 +8438,7 @@ void form::debean() {
 
 void form::clpspac(const unsigned insertPoint, unsigned int count) {
 	auto sourceStart = std::next(ClipPoints->cbegin(), insertPoint);
-	auto sourceEnd   = sourceStart + count;
+	auto sourceEnd   = std::next(sourceStart, count);
 	ClipPoints->insert(sourceStart, sourceStart, sourceEnd);
 }
 

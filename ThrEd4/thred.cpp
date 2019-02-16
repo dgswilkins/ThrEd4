@@ -7476,7 +7476,7 @@ void thred::internal::duclip() {
 							SelectedForm = &((*FormList)[selectedForm]);
 							if (texture::istx(selectedForm)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
-								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
+								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
 								std::copy(startPoint,
 								          endPoint,
 								          stdext::make_checked_array_iterator(&textures[textureCount],
@@ -7574,7 +7574,7 @@ void thred::internal::duclip() {
 							auto textures = convert_ptr<TXPNT*>(&points[iClip]);
 							if (texture::istx(ClosestFormToCursor)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
-								auto endPoint   = startPoint + SelectedForm->fillInfo.texture.count;
+								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
 								std::copy(startPoint,
 								          endPoint,
 								          stdext::make_checked_array_iterator(textures, SelectedForm->fillInfo.texture.count));
@@ -7680,7 +7680,7 @@ void thred::frmdel() {
 	form::fvars(ClosestFormToCursor);
 	thi::f1del();
 	auto firstForm = FormList->cbegin();
-	FormList->erase(firstForm + ClosestFormToCursor);
+	FormList->erase(std::next(firstForm, ClosestFormToCursor));
 	if (StateMap.testAndReset(StateFlag::DELTO)) {
 		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u) {
@@ -7730,7 +7730,7 @@ void thred::internal::delsfrms(unsigned code) {
 					formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
 				}
 				else {
-					FormList->erase(firstForm + iForm - deletedFormCount);
+					FormList->erase(std::next(firstForm, (iForm - deletedFormCount)));
 					firstForm = FormList->cbegin(); // the erase invalidates firstForm
 					deletedFormCount++;
 				}
@@ -8217,7 +8217,7 @@ void thred::internal::delet() {
 			}
 		}
 		auto eraseStart = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + currentFormVertex);
-		auto eraseEnd   = eraseStart + (VertexCount - currentFormVertex);
+		auto eraseEnd   = std::next(eraseStart, (VertexCount - currentFormVertex));
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		const auto nextForm = gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1;
 		for (auto iForm = std::next(FormList->begin(), nextForm); iForm < FormList->end(); iForm++) {
@@ -15403,9 +15403,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 									formIter.satinOrAngle.guide = satin::adsatk(formIter.satinGuideCount);
 									std::copy(guides,
 									          guides + formIter.satinGuideCount,
-									          SatinGuides->begin() + formIter.satinOrAngle.guide);
+									          std::next(SatinGuides->begin(), formIter.satinOrAngle.guide));
 								}
-								auto clipData  = convert_ptr<fPOINT*>(&guides[0]);
+								auto       clipData      = convert_ptr<fPOINT*>(&guides[0]);
 								auto clipCount = 0u;
 								const auto lastFormIndex = gsl::narrow<unsigned int>(FormList->size() - 1u);
 								if (clip::isclpx(lastFormIndex)) {

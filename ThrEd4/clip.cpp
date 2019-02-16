@@ -111,7 +111,7 @@ void clip::delmclp(unsigned int iForm) {
 			auto&      form       = (*FormList)[iForm];
 			const auto destIndex  = ci::findclp(iForm);
 			auto       eraseStart = std::next(ClipPoints->cbegin(), destIndex);
-			auto       eraseEnd   = eraseStart + form.lengthOrCount.clipCount;
+			auto       eraseEnd   = std::next(eraseStart, form.lengthOrCount.clipCount);
 			ClipPoints->erase(eraseStart, eraseEnd);
 			if (clip::iseclp(iForm)) {
 				form.borderClipData -= form.lengthOrCount.clipCount;
@@ -131,7 +131,7 @@ void clip::deleclp(unsigned int iForm) {
 				destIndex += form.lengthOrCount.clipCount;
 			}
 			auto eraseStart = std::next(ClipPoints->cbegin(), destIndex);
-			auto eraseEnd   = eraseStart + form.clipEntries;
+			auto eraseEnd   = std::next(eraseStart, form.clipEntries);
 			ClipPoints->erase(eraseStart, eraseEnd);
 			ci::clpsub(iForm, form.clipEntries);
 			form.clipEntries    = 0;
@@ -350,7 +350,7 @@ void clip::clpout() {
 		// ToDo - insert should be replaced with this line once vertices is a std::vector * as a copy will not be
 		// required  InsidePoints = SelectedForm->vertices;
 		auto srcStart = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		auto srcEnd   = srcStart + VertexCount;
+		auto srcEnd   = std::next(srcStart, VertexCount);
 		InsidePointList->insert(InsidePointList->end(), srcStart, srcEnd);
 		InsidePoints = InsidePointList;
 	}

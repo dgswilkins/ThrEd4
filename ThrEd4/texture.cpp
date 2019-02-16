@@ -1032,7 +1032,7 @@ void texture::deltx(unsigned int formIndex) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-					auto  endSource   = startSource + fillInfo.texture.count;
+					auto  endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 					auto destination       = std::next(textureBuffer.begin(), iBuffer);
 					auto _                 = std::copy(startSource, endSource, destination);
@@ -1044,7 +1044,7 @@ void texture::deltx(unsigned int formIndex) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-					auto  endSource   = startSource + fillInfo.texture.count;
+					auto  endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 					auto destination       = std::next(textureBuffer.begin(), iBuffer);
 					auto _                 = std::copy(startSource, endSource, destination);
@@ -1086,8 +1086,8 @@ void texture::internal::nutx() {
 		TextureIndex += tempPointCount;
 		auto startSource = std::next(TexturePointsBuffer->begin(), index);
 		if (pointCount != 0u) {
-			auto endSource   = startSource + pointCount;
-			auto destination = startSource + tempPointCount;
+			auto endSource   = std::next(startSource, pointCount);
+			auto destination = std::next(startSource, tempPointCount);
 			auto _           = std::copy(startSource, endSource, destination);
 		}
 		for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
@@ -1632,7 +1632,7 @@ void texture::rtrtx() {
 		}
 		TempTexturePoints->resize(currentCount);
 		auto startSource         = std::next(TexturePointsBuffer->cbegin(), currentIndex);
-		auto endSource           = startSource + currentCount;
+		auto endSource           = std::next(startSource, currentCount);
 		auto _                   = std::copy(startSource, endSource, TempTexturePoints->begin());
 		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
 		TextureScreen.spacing    = SelectedForm->fillSpacing;
