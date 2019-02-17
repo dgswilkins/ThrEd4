@@ -88,7 +88,7 @@ unsigned int satin::internal::nusac(unsigned int formIndex, unsigned guideCount)
 void satin::spltsat(SATCON currentGuide) {
 	// We are adding two additional vertices when splitting the form
 	auto vertexBuffer = std::vector<fPOINT>{};
-	vertexBuffer.resize(gsl::narrow<size_t>(VertexCount) + 2);
+	vertexBuffer.resize(gsl::narrow_cast<size_t>(VertexCount) + 2u);
 	auto& formList = *FormList;
 
 	auto& srcForm = formList[ClosestFormToCursor];
@@ -367,7 +367,7 @@ void satin::satadj() {
 		}
 		if (SatinEndGuide != 0u) {
 			satinMap.set(SatinEndGuide);
-			satinMap.set(gsl::narrow<size_t>(SatinEndGuide) + 1);
+			satinMap.set(gsl::narrow_cast<size_t>(SatinEndGuide) + 1u);
 		}
 		// check to see if any of the current guides are end guides and add to interiorGuides if not
 		interiorGuides.clear();
@@ -1103,7 +1103,7 @@ void satin::satfil() {
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
 	auto lengths           = std::vector<double>{};
-	lengths.reserve(gsl::narrow<size_t>(VertexCount) + 1);
+	lengths.reserve(gsl::narrow_cast<size_t>(VertexCount) + 1u);
 	auto length = 0.0;
 	lengths.push_back(length);
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);

@@ -619,7 +619,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
 	auto listSINEs = std::vector<double>{};
-	listSINEs.reserve(gsl::narrow<size_t>(VertexCount) + 1);
+	listSINEs.reserve(gsl::narrow_cast<size_t>(VertexCount) + 1u);
 	auto listCOSINEs = std::vector<double>{};
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -856,8 +856,8 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].x) - chainEndPoints[finish].x;
-		delta.y = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow<size_t>(finish) + 1].y) - chainEndPoints[finish].y;
+		delta.x = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow_cast<size_t>(finish) + 1u].x) - chainEndPoints[finish].x;
+		delta.y = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow_cast<size_t>(finish) + 1u].y) - chainEndPoints[finish].y;
 	}
 	else {
 		delta.x = gsl::narrow_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;

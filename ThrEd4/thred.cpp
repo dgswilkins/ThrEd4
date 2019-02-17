@@ -3628,7 +3628,7 @@ void thred::internal::ritbal() {
 		BalaradOffset.x    = IniFile.hoopSizeX / 2.0f;
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
 		auto balaradStitch = std::vector<BALSTCH>{};
-		balaradStitch.resize(gsl::narrow<size_t>(PCSHeader.stitchCount) + 2u);
+		balaradStitch.resize(gsl::narrow_cast<size_t>(PCSHeader.stitchCount) + 2u);
 		color = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
@@ -4291,7 +4291,7 @@ void thred::internal::sav() {
 		auto flag       = true;
 		auto DSTRecords = std::vector<DSTREC>{};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
-		DSTRecords.reserve(gsl::narrow<size_t>(PCSHeader.stitchCount) + 128);
+		DSTRecords.reserve(gsl::narrow_cast<size_t>(PCSHeader.stitchCount) + 128u);
 		auto DSTOffsetData   = DSTOffsets{};
 		auto PCSStitchBuffer = std::vector<PCSTCH>{};
 		auto auxName         = utf::Utf16ToUtf8(*AuxName);
@@ -4467,7 +4467,7 @@ void thred::internal::sav() {
 				}
 				auto iPCSstitch = 0u;
 				auto savcol     = 0xffu;
-				PCSStitchBuffer.resize(gsl::narrow<size_t>(PCSHeader.stitchCount) + ColorChanges + 2);
+				PCSStitchBuffer.resize(gsl::narrow_cast<size_t>(PCSHeader.stitchCount) + ColorChanges + 2u);
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if ((saveStitches[iStitch].attribute & COLMSK) != savcol) {
 						savcol                           = saveStitches[iStitch].attribute & COLMSK;
@@ -5062,8 +5062,8 @@ bool thred::internal::binv(const std::vector<unsigned char>& monoBitmapData, uns
 
 	for (auto iHeight = 0u; iHeight < BitmapHeight; iHeight++) {
 		GSL_SUPPRESS(26429) {
-			if ((gsl::narrow<size_t>(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
-				const auto bcpnt = &monoBitmapData[gsl::narrow<size_t>(bitmapWidthInBytes) * iHeight];
+			if ((gsl::narrow_cast<size_t>(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
+				const auto bcpnt = &monoBitmapData[gsl::narrow_cast<size_t>(bitmapWidthInBytes) * iHeight];
 				for (auto iBytes = 0u; iBytes < byteCount; iBytes++) {
 					if (bcpnt[iBytes] == 0u) {
 						blackBits++;
@@ -5153,7 +5153,7 @@ void thred::internal::savmap() {
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, nullptr);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, nullptr);
 			auto buffer = std::vector<unsigned char>{};
-			buffer.resize((gsl::narrow<size_t>(BitmapWidth) * BitmapHeight * 3) + 1);
+			buffer.resize((gsl::narrow_cast<size_t>(BitmapWidth) * BitmapHeight * 3u) + 1u);
 			movmap(BitmapWidth * BitmapHeight, buffer.data());
 			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
 			CloseHandle(BitmapFileHandle);
@@ -5256,8 +5256,8 @@ void thred::internal::bfil() {
 				GdiFlush();
 				if (bits != nullptr) {
 					for (auto iHeight = 0u; iHeight < BitmapHeight; iHeight++) {
-						bitlin(&monoBitmapData[gsl::narrow<size_t>(iHeight) * bitmapWidthBytes],
-						       &bits[gsl::narrow<size_t>(iHeight) * BitmapWidth],
+						bitlin(&monoBitmapData[gsl::narrow_cast<size_t>(iHeight) * bitmapWidthBytes],
+						       &bits[gsl::narrow_cast<size_t>(iHeight) * BitmapWidth],
 						       background,
 						       foreground);
 					}
@@ -5330,7 +5330,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 
 	auto iColor = 2u;
 	auto color  = 0u;
-	if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(decltype(colors.back())))) {
+	if (bytesRead >= ((gsl::narrow_cast<size_t>(iColor) + 1u) * sizeof(decltype(colors.back())))) {
 		color = colmatch(colors[iColor++]);
 	}
 	else {
@@ -5342,7 +5342,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	auto iStitch           = 0u;
 	for (auto& record : DSTData) {
 		if ((record.nd & 0x40) != 0) {
-			if (bytesRead >= ((gsl::narrow<size_t>(iColor) + 1) * sizeof(decltype(colors.back())))) {
+			if (bytesRead >= ((gsl::narrow_cast<size_t>(iColor) + 1u) * sizeof(decltype(colors.back())))) {
 				color = colmatch(colors[iColor++]);
 			}
 			else {
@@ -7365,7 +7365,7 @@ void thred::internal::duclip() {
 			EmptyClipboard();
 			ThrEdClip        = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-			                               (gsl::narrow<size_t>(SelectedFormVertices.vertexCount) + 1) * sizeof(fPOINT)
+			                               (gsl::narrow_cast<size_t>(SelectedFormVertices.vertexCount) + 1u) * sizeof(fPOINT)
 			                                   + sizeof(FORMVERTEXCLIP));
 			GSL_SUPPRESS(26429) {
 				if (ThrEdClipPointer != nullptr) {
@@ -7413,7 +7413,7 @@ void thred::internal::duclip() {
 					length += sizfclp();
 					msiz += FileSize;
 				}
-				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, gsl::narrow<size_t>(msiz) + length);
+				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, gsl::narrow_cast<size_t>(msiz) + length);
 				GSL_SUPPRESS(26429) {
 					if (ThrEdClipPointer != nullptr) {
 						ClipFormsHeader            = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
@@ -8219,7 +8219,7 @@ void thred::internal::delet() {
 		auto eraseStart = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(CurrentVertexIndex) + currentFormVertex);
 		auto eraseEnd   = std::next(eraseStart, (VertexCount - currentFormVertex));
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
-		const auto nextForm = gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1;
+		const auto nextForm = gsl::narrow_cast<size_t>(ClosestFormToCursor) + 1u;
 		for (auto iForm = std::next(FormList->begin(), nextForm); iForm < FormList->end(); iForm++) {
 			iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1;
 		}
@@ -9460,12 +9460,12 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio
 	auto& formLines = *FormLines;
 	formLines.resize(5);
 	for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-		formLines[iCorner] = (*SelectedFormsLine)[gsl::narrow<size_t>(iCorner) << 1];
+		formLines[iCorner] = (*SelectedFormsLine)[gsl::narrow_cast<size_t>(iCorner) << 1];
 	}
 	formLines[4] = formLines[0];
 	if (minimumLength < CLOSENUF) {
 		for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-			stretchBoxLine[iCorner] = (*SelectedFormsLine)[gsl::narrow<size_t>(iCorner) << 1];
+			stretchBoxLine[iCorner] = (*SelectedFormsLine)[gsl::narrow_cast<size_t>(iCorner) << 1];
 		}
 		stretchBoxLine[4] = stretchBoxLine[0];
 		thred::strtchbox(stretchBoxLine);
@@ -9530,7 +9530,7 @@ void thred::internal::dufsel() {
 		finish = ClosestFormToCursor;
 	}
 	SelectedFormList->clear();
-	SelectedFormList->reserve(gsl::narrow<size_t>(finish) - start + 1);
+	SelectedFormList->reserve(gsl::narrow_cast<size_t>(finish) - start + 1u);
 	while (start <= finish) {
 		SelectedFormList->push_back(start);
 		start++;
@@ -10388,7 +10388,7 @@ void thred::internal::sidhup() {
 	                                 nullptr);
 	for (auto iHoop = 0u; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(L"STATIC",
-		                                 (*StringTable)[gsl::narrow<size_t>(iHoop) + STR_HUP0].c_str(),
+		                                 (*StringTable)[gsl::narrow_cast<size_t>(iHoop) + STR_HUP0].c_str(),
 		                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                 3,
 		                                 ButtonHeight * iHoop + 3,
@@ -13064,7 +13064,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			auto& controlPoint = *FormControlPoints;
 			if (iselpnt()) {
 				for (auto iSide = 0u; iSide < 4; iSide++) {
-					stretchBoxLine[iSide] = controlPoint[gsl::narrow<size_t>(iSide) << 1];
+					stretchBoxLine[iSide] = controlPoint[gsl::narrow_cast<size_t>(iSide) << 1];
 				}
 				stretchBoxLine[4] = stretchBoxLine[0];
 				if ((SelectedFormControlVertex & 1) != 0u) {
@@ -15234,7 +15234,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 						if (ClipFormVerticesData->clipType == CLP_FRMPS) {
 							thred::duzrat();
 							auto byteCount = sizeof(*ClipFormVerticesData)
-							                 + (gsl::narrow<size_t>(ClipFormVerticesData->vertexCount) + 1)
+							                 + (gsl::narrow_cast<size_t>(ClipFormVerticesData->vertexCount) + 1u)
 							                       * sizeof(decltype(FormVertices->back()));
 							auto clipCopyBuffer = std::vector<unsigned char>{};
 							clipCopyBuffer.resize(byteCount);
@@ -17710,7 +17710,7 @@ void thred::internal::drwStch() {
 		}
 	}
 	auto linePoints = std::vector<POINT>{};
-	linePoints.resize(gsl::narrow<size_t>(stitchCount) + 2);
+	linePoints.resize(gsl::narrow_cast<size_t>(stitchCount) + 2u);
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	thred::duzrat();
 	if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
