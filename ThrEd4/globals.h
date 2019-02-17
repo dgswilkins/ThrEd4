@@ -72,7 +72,9 @@ extern unsigned  AppliqueColor;
 extern LPWSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
-extern BSEQPNT   BSequence[BSEQLEN];
+
+extern std::vector<BSEQPNT>*   BSequence;
+
 extern HBRUSH    BackgroundBrush;
 extern unsigned  BeanCount; // number of stitches added by convert to bean
 extern HDC       BitmapDC;

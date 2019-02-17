@@ -853,7 +853,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 	if (line1Start != line1End && line2Start != line2End) {
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
 			if (StateMap.test(StateFlag::FTHR)) {
-				BSequence[SequenceIndex].attribute = 0;
+				(*BSequence)[SequenceIndex].attribute = 0;
 				form::ritseq1(line1Start % VertexCount);
 			}
 			else {
@@ -949,11 +949,11 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						BSequence[SequenceIndex++]
+						(*BSequence)[SequenceIndex++]
 						    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
 					}
 					else {
-						BSequence[SequenceIndex++]
+						(*BSequence)[SequenceIndex++]
 						    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
 					}
 					if (SequenceIndex > MAXITEMS - 6) {
@@ -972,15 +972,15 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.x += line2Step.x;
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-							BSequence[SequenceIndex++]
+							(*BSequence)[SequenceIndex++]
 							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
-							BSequence[SequenceIndex++]
+							(*BSequence)[SequenceIndex++]
 							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
 						}
 						else {
-							BSequence[SequenceIndex++]
+							(*BSequence)[SequenceIndex++]
 							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 2 };
-							BSequence[SequenceIndex++]
+							(*BSequence)[SequenceIndex++]
 							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 3 };
 						}
 						if (SequenceIndex > MAXITEMS - 6) {

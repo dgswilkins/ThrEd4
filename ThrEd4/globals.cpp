@@ -40,7 +40,9 @@ unsigned  AppliqueColor = 15;   // underlay color
 LPWSTR*   ArgList;              // command line argument array
 HCURSOR   ArrowCursor;          // arrow
 fs::path* AuxName;              //
-BSEQPNT   BSequence[BSEQLEN];   //
+
+std::vector<BSEQPNT>*   BSequence;   //
+
 HBRUSH    BackgroundBrush;      // background color brush
 unsigned  BeanCount;            // number of stitches added by convert to bean
 HDC       BitmapDC;             // bitmap device context

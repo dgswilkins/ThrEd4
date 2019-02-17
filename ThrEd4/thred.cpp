@@ -18831,6 +18831,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		MenuInfo                      = &private_MenuInfo;
 		auto private_TempPolygon      = std::vector<fPOINT>{};
 		TempPolygon                   = &private_TempPolygon;
+		auto private_BSequence        = std::vector<BSEQPNT>{};
+		private_BSequence.resize(BSEQLEN);
+		BSequence                     = &private_BSequence;
 		auto private_ClipBuffer       = std::vector<fPOINTATTR>{};
 		ClipBuffer                    = &private_ClipBuffer;
 		auto private_ClipPoints       = std::vector<fPOINT>{};
