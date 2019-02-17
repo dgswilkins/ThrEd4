@@ -132,11 +132,11 @@ namespace internal {
 
 	constexpr float durat(float start, float finish, float featherRatio);
 
-	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept;
+	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather);
 	void     durec(OREC& record) noexcept;
 	unsigned dutyp(unsigned attribute) noexcept;
 
-	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept;
+	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal);
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
@@ -171,7 +171,7 @@ namespace internal {
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
-	void ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept;
+	void ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio);
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();

@@ -114,12 +114,12 @@ constexpr float xt::internal::durat(float start, float finish, float featherRati
 	return (finish - start) * featherRatio + start;
 }
 
-void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept {
+void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) {
 	point.x = durat((*BSequence)[finish].x, (*BSequence)[start].x, featherRatioLocal);
 	point.y = durat((*BSequence)[finish].y, (*BSequence)[start].y, featherRatioLocal);
 }
 
-void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept {
+void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) {
 	const auto stitchLength
 	    = hypot((*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x, (*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y);
 
@@ -235,7 +235,7 @@ void xt::internal::fthfn(unsigned int iSequence, FEATHER& feather) {
 	durats(iSequence, OSequence[iSequence], feather);
 }
 
-void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept {
+void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) {
 	point.x = ((*BSequence)[iNextPoint].x - (*BSequence)[iPoint].x) * featherRatio + (*BSequence)[iPoint].x;
 	point.y = ((*BSequence)[iNextPoint].y - (*BSequence)[iPoint].y) * featherRatio + (*BSequence)[iPoint].y;
 }

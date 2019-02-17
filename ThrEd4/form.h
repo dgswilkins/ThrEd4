@@ -226,7 +226,7 @@ namespace internal {
 	bool closat(intersectionStyles& inOutFlag);
 	bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void clpcon(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>* currentFormVertices);
-	void clpfm() noexcept;
+	void clpfm();
 
 	unsigned clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	                 std::vector<CLPSEG>&       clipSegments,
@@ -275,9 +275,9 @@ namespace internal {
 	           boost::dynamic_bitset<>&      sequenceMap,
 	           unsigned&                     lastGroup,
 	           SMALPNTL*                     sequenceLines);
-	void duseq1(const SMALPNTL* sequenceLines) noexcept;
+	void duseq1(const SMALPNTL* sequenceLines);
 
-	SMALPNTL* duseq2(SMALPNTL* sequenceLines) noexcept;
+	SMALPNTL* duseq2(SMALPNTL* sequenceLines);
 
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
@@ -432,7 +432,7 @@ namespace internal {
 	              const std::vector<fPOINT>*       currentFormVertices);
 	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
-	void   rspnt(float xCoordinate, float yCoordinate) noexcept;
+	void   rspnt(float xCoordinate, float yCoordinate);
 	void   sapliq();
 
 	void sbold();

@@ -3877,7 +3877,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 	}
 }
 
-void form::internal::rspnt(float xCoordinate, float yCoordinate) noexcept {
+void form::internal::rspnt(float xCoordinate, float yCoordinate) {
 	BSequence->emplace_back(xCoordinate, yCoordinate, 0);
 	OutputIndex++;
 }
@@ -3889,7 +3889,7 @@ void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 	StateMap.set(StateFlag::BRKFIX);
 }
 
-void form::internal::duseq1(const SMALPNTL* sequenceLines) noexcept {
+void form::internal::duseq1(const SMALPNTL* sequenceLines) {
 	if (sequenceLines != nullptr) {
 		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
 		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
@@ -3997,7 +3997,7 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
 	lastGroup = sortedLines[finish][0].group;
 }
 
-SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) noexcept {
+SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) {
 	if (sequenceLines != nullptr) {
 		rspnt((sequenceLines[1].x - sequenceLines[0].x) / 2 + sequenceLines[0].x,
 		      (sequenceLines[1].y - sequenceLines[0].y) / 2 + sequenceLines[0].y);
@@ -4762,7 +4762,7 @@ void form::internal::trfrm(const dPOINT& bottomLeftPoint,
 	}
 }
 
-void form::internal::clpfm() noexcept {
+void form::internal::clpfm() {
 	ActivePointIndex = 0;
 	for (auto iSequence = 0u; iSequence < SequenceIndex - 2; iSequence += 2) {
 		const auto leftLength
