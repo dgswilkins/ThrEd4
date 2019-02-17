@@ -4562,14 +4562,13 @@ void form::internal::bakseq() {
 	}
 	while (iSequence > 0) {
 		const auto rcnt = iSequence % RITSIZ;
-		if (SequenceIndex > MAXITEMS) {
-			SequenceIndex = MAXITEMS - 1;
-			return;
-		}
 		const auto StitchSpacing2 = LineSpacing * 2;
 		const auto rit            = gsl::narrow<unsigned int>(std::round((*BSequence)[iSequence].x / StitchSpacing2));
+		auto&      bPrevious = (*BSequence)[iSequence - 1u];
+		auto&      bCurrent = (*BSequence)[iSequence];
+		auto&      bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
 		auto       delta
-		    = dPOINT{ (*BSequence)[iSequence].x - (*BSequence)[iSequence + 1].x, (*BSequence)[iSequence].y - (*BSequence)[iSequence + 1].y };
+		    = dPOINT{ bCurrent.x - bNext.x, bCurrent.y - bNext.y };
 		auto slope = 1e99;
 		if (delta.y != 0.0) {
 			slope = delta.x / delta.y;
@@ -4577,80 +4576,80 @@ void form::internal::bakseq() {
 
 		const auto UserStitchLength9 = UserStitchLength / 9;
 
-		switch ((*BSequence)[iSequence].attribute) {
+		switch (bCurrent.attribute) {
 		case SEQTOP: {
 			if ((SelectedForm->extendedAttribute & AT_SQR) != 0u) {
 				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-					OSequence[SequenceIndex++] = (*BSequence)[iSequence - 1];
-					auto count                 = ceil((*BSequence)[iSequence].y / UserStitchLength);
+					OSequence[SequenceIndex++] = bPrevious;
+					auto count                 = ceil(bCurrent.y / UserStitchLength);
 					do {
 						OSequence[SequenceIndex].y = count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9;
-						if (OSequence[SequenceIndex].y > (*BSequence)[iSequence].y) {
+						if (OSequence[SequenceIndex].y > bCurrent.y) {
 							break;
 						}
-						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - (*BSequence)[iSequence].y;
-						OSequence[SequenceIndex++].x = (*BSequence)[iSequence].x;
+						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bCurrent.y;
+						OSequence[SequenceIndex++].x = bCurrent.x;
 						count++;
 					} while (true);
-					OSequence[SequenceIndex++] = (*BSequence)[iSequence];
+					OSequence[SequenceIndex++] = bCurrent;
 				}
 				else {
-					OSequence[SequenceIndex++] = (*BSequence)[iSequence];
-					auto count                 = gsl::narrow<unsigned int>(std::floor((*BSequence)[iSequence].y / UserStitchLength));
+					OSequence[SequenceIndex++] = bCurrent;
+					auto count                 = gsl::narrow<unsigned int>(std::floor(bCurrent.y / UserStitchLength));
 					do {
 						OSequence[SequenceIndex].y = count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9;
-						if (OSequence[SequenceIndex].y < (*BSequence)[iSequence - 1].y) {
+						if (OSequence[SequenceIndex].y < bPrevious.y) {
 							break;
 						}
-						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - (*BSequence)[iSequence - 1].y;
-						OSequence[SequenceIndex++].x = (*BSequence)[iSequence].x;
+						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bPrevious.y;
+						OSequence[SequenceIndex++].x = bCurrent.x;
 						count--;
 					} while (true);
-					OSequence[SequenceIndex++] = (*BSequence)[iSequence - 1];
+					OSequence[SequenceIndex++] = bPrevious;
 				}
 			}
 			else {
-				auto count = gsl::narrow<unsigned int>(std::ceil((*BSequence)[iSequence + 1].y / UserStitchLength));
+				auto count = gsl::narrow<unsigned int>(std::ceil(bNext.y / UserStitchLength));
 				do {
 					OSequence[SequenceIndex].y = count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9;
-					if (OSequence[SequenceIndex].y > (*BSequence)[iSequence].y) {
+					if (OSequence[SequenceIndex].y > bCurrent.y) {
 						break;
 					}
-					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - (*BSequence)[iSequence + 1].y;
+					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
 					delta.x = slope * delta.y;
-					OSequence[SequenceIndex++].x = (*BSequence)[iSequence + 1].x + delta.x;
+					OSequence[SequenceIndex++].x = bNext.x + delta.x;
 					count++;
 				} while (true);
-				OSequence[SequenceIndex++] = (*BSequence)[iSequence];
+				OSequence[SequenceIndex++] = bCurrent;
 			}
 			break;
 		}
 		case SEQBOT: {
 			if ((SelectedForm->extendedAttribute & AT_SQR) == 0u) {
-				auto count = gsl::narrow<unsigned int>(std::floor((*BSequence)[iSequence + 1].y / UserStitchLength));
+				auto count = gsl::narrow<unsigned int>(std::floor(bNext.y / UserStitchLength));
 				do {
 					OSequence[SequenceIndex].y = count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9;
-					if (OSequence[SequenceIndex].y < (*BSequence)[iSequence].y) {
+					if (OSequence[SequenceIndex].y < bCurrent.y) {
 						break;
 					}
-					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - (*BSequence)[iSequence + 1].y;
+					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
 					delta.x = slope * delta.y;
-					OSequence[SequenceIndex++].x = (*BSequence)[iSequence + 1].x + delta.x;
+					OSequence[SequenceIndex++].x = bNext.x + delta.x;
 					count--;
 				} while (true);
-				OSequence[SequenceIndex++] = (*BSequence)[iSequence];
+				OSequence[SequenceIndex++] = bCurrent;
 			}
 			break;
 		}
 		case 0: {
-			delta = dPOINT{ gsl::narrow_cast<double>((*BSequence)[iSequence].x) - (*BSequence)[iSequence + 1].x,
-				            gsl::narrow_cast<double>((*BSequence)[iSequence].y) - (*BSequence)[iSequence + 1].y };
+			delta = dPOINT{ gsl::narrow_cast<double>(bCurrent.x) - bNext.x,
+				            gsl::narrow_cast<double>(bCurrent.y) - bNext.y };
 			StateMap.reset(StateFlag::FILDIR);
 			const auto length = hypot(delta.x, delta.y);
 			if (length != 0.0) {
 				const auto UserStitchLength2 = UserStitchLength * 2;
 				if (length > UserStitchLength2) {
-					auto point = (*BSequence)[iSequence + 1];
+					auto point = bNext;
 					auto count = gsl::narrow<unsigned int>(std::round(length / UserStitchLength - 1));
 					if (form::chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3) {
 						return;
@@ -4664,7 +4663,7 @@ void form::internal::bakseq() {
 					}
 				}
 			}
-			OSequence[SequenceIndex++] = (*BSequence)[iSequence];
+			OSequence[SequenceIndex++] = bCurrent;
 		}
 		}
 		iSequence--;
@@ -4765,14 +4764,14 @@ void form::internal::trfrm(const dPOINT& bottomLeftPoint,
 void form::internal::clpfm() {
 	ActivePointIndex = 0;
 	for (auto iSequence = 0u; iSequence < SequenceIndex - 2; iSequence += 2) {
-		const auto leftLength
-		    = hypot((*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x, (*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y);
-		const auto rightLength = hypot((*BSequence)[iSequence + 3].x - (*BSequence)[iSequence + 2].x,
-		                               (*BSequence)[iSequence + 3].y - (*BSequence)[iSequence + 2].y);
-		const auto leftDelta
-		    = dPOINT{ (*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x, (*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y };
-		const auto rightDelta = dPOINT{ (*BSequence)[iSequence + 2].x - (*BSequence)[iSequence + 3].x,
-			                            (*BSequence)[iSequence + 2].y - (*BSequence)[iSequence + 3].y };
+		auto& bSeq0 = (*BSequence)[iSequence];
+		auto& bSeq1 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1];
+		auto& bSeq2 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 2];
+		auto& bSeq3 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 3];
+		const auto leftLength  = hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
+		const auto rightLength = hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
+		const auto leftDelta   = dPOINT{ bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y };
+		const auto rightDelta  = dPOINT{ bSeq2.x - bSeq3.x, bSeq2.y - bSeq3.y };
 		auto       count      = 0u;
 		if (rightLength > leftLength) {
 			count = gsl::narrow<decltype(count)>(std::round(leftLength / ClipRectSize.cy));
@@ -4785,8 +4784,8 @@ void form::internal::clpfm() {
 		}
 		const auto leftStep  = dPOINT{ leftDelta.x / count, leftDelta.y / count };
 		const auto rightStep = dPOINT{ rightDelta.x / count, rightDelta.y / count };
-		auto       topLeft   = dPOINT{ (*BSequence)[iSequence].x, (*BSequence)[iSequence].y };
-		auto       topRight  = dPOINT{ (*BSequence)[iSequence + 3].x, (*BSequence)[iSequence + 3].y };
+		auto       topLeft   = dPOINT{ bSeq0.x, bSeq0.y };
+		auto       topRight  = dPOINT{ bSeq3.x, bSeq3.y };
 		for (auto iStep = 0u; iStep < count; iStep++) {
 			const auto bottomLeft  = topLeft;
 			const auto bottomRight = topRight;

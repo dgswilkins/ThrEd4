@@ -120,20 +120,21 @@ void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& poin
 }
 
 void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) {
-	const auto stitchLength
-	    = hypot((*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x, (*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y);
+	auto&      bCurrent = (*BSequence)[iSequence];
+	auto&      bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+	const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
 	if (stitchLength < feather.minStitch) {
-		point.x = (*BSequence)[iSequence].x;
-		point.y = (*BSequence)[iSequence].y;
+		point.x = bCurrent.x;
+		point.y = bCurrent.y;
 	}
 	else {
-		feather.ratioLocal       = feather.minStitch / stitchLength;
-		const auto adjustedPoint = fPOINT{ durat((*BSequence)[iSequence + 1].x, (*BSequence)[iSequence].x, feather.ratioLocal),
-			                               durat((*BSequence)[iSequence + 1].y, (*BSequence)[iSequence].y, feather.ratioLocal) };
+		feather.ratioLocal = feather.minStitch / stitchLength;
+		const auto adjustedPoint
+		    = fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
 
-		point.x = durat(adjustedPoint.x, (*BSequence)[iSequence].x, feather.ratio);
-		point.y = durat(adjustedPoint.y, (*BSequence)[iSequence].y, feather.ratio);
+		point.x = durat(adjustedPoint.x, bCurrent.x, feather.ratio);
+		point.y = durat(adjustedPoint.y, bCurrent.y, feather.ratio);
 	}
 }
 
@@ -253,9 +254,10 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	auto currentPoint = fPOINT{};
 	auto nextPoint    = fPOINT{};
 	auto midPoint     = fPOINT{};
-
+	auto& bCurrent = (*BSequence)[iSequence];
+	auto& bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
 	const auto length
-	    = hypot((*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y, (*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x);
+	    = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
 	if (length < (2.0 * feather.minStitch)) {
@@ -279,19 +281,20 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
 	midPoint                 = midpnt(currentPoint, nextPoint);
-	OSequence[OutputIndex++] = (*BSequence)[iSequence];
+	OSequence[OutputIndex++] = bCurrent;
 	OSequence[OutputIndex++] = midPoint;
-	featherSequence.emplace_back((*BSequence)[iSequence + 1].x, (*BSequence)[iSequence + 1].y);
+	featherSequence.emplace_back(bNext.x, bNext.y);
 	featherSequence.push_back(midPoint);
 }
 
 void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
-	const auto length
-	    = hypot((*BSequence)[iSequence + 1].y - (*BSequence)[iSequence].y, (*BSequence)[iSequence + 1].x - (*BSequence)[iSequence].x);
+	auto&      bCurrent = (*BSequence)[iSequence];
+	auto&      bNext    = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+	const auto length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
-	OSequence[iSequence]     = (*BSequence)[iSequence];
-	OSequence[iSequence + 1] = (*BSequence)[iSequence + 1];
+	OSequence[iSequence]     = bCurrent;
+	OSequence[iSequence + 1] = bNext;
 	if (length > feather.minStitch) {
 		auto adjustedPoint = fPOINT{};
 		auto currentPoint  = fPOINT{};

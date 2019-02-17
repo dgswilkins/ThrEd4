@@ -597,7 +597,7 @@ void satin::delspnt() {
 			}
 		}
 	}
-	auto closestVertexIt = std::next(FormVertices->cbegin(), (SelectedForm->vertexIndex) + ClosestVertexToCursor);
+	auto closestVertexIt = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
 	FormVertices->erase(closestVertexIt);
 	SelectedForm->vertexCount--;
 	form::fvars(ClosestFormToCursor);
