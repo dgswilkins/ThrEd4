@@ -841,7 +841,21 @@ public:
 	float x;
 	float y;
 	char  attribute;
+
+	inline BSEQPNT() noexcept = default;
+	inline BSEQPNT(double rhsX, double rhsY, int rhsAttr) noexcept;
+	// BSEQPNT(BSEQPNT&&) = default;
+	// BSEQPNT& operator=(const BSEQPNT& rhs) = default;
+	// BSEQPNT& operator=(BSEQPNT&&) = default;
+	//~BSEQPNT() = default;
+
 };
+
+inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int rhsAttr) noexcept {
+	x = gsl::narrow_cast<float>(rhsX);
+	y = gsl::narrow_cast<float>(rhsY);
+	attribute = gsl::narrow_cast<char>(rhsAttr);
+}
 
 inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
