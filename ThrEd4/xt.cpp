@@ -619,7 +619,7 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 	unsigned index;
 
 	for (index = 0; index < OutputIndex; index++) {
-		InterleaveSequence[index] = OSequence[index];
+		(*InterleaveSequence)[index] = OSequence[index];
 	}
 	InterleaveSequenceIndex                                   = index;
 	InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
@@ -642,18 +642,18 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 				const auto step  = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
 				auto       point = OSequence[iSequence];
 				for (auto index = 0u; index < stitchCount; index++) {
-					InterleaveSequence[InterleaveSequenceIndex] = point;
+					(*InterleaveSequence)[InterleaveSequenceIndex] = point;
 					InterleaveSequenceIndex++;
 					point.x += step.x;
 					point.y += step.y;
 				}
 			}
 			else {
-				InterleaveSequence[InterleaveSequenceIndex] = OSequence[iSequence];
+				(*InterleaveSequence)[InterleaveSequenceIndex] = OSequence[iSequence];
 				InterleaveSequenceIndex++;
 			}
 		}
-		InterleaveSequence[InterleaveSequenceIndex] = OSequence[OutputIndex - 1];
+		(*InterleaveSequence)[InterleaveSequenceIndex] = OSequence[OutputIndex - 1];
 		InterleaveSequenceIndex++;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
 	}
@@ -1498,7 +1498,7 @@ bool xt::internal::lastcol(unsigned index, fPOINT& point) noexcept {
 	while (index != 0u) {
 		index--;
 		if (InterleaveSequenceIndices[index].color == color) {
-			point = InterleaveSequence[InterleaveSequenceIndices[index + 1].index - 1];
+			point = (*InterleaveSequence)[InterleaveSequenceIndices[index + 1].index - 1];
 			return true;
 		}
 	}
@@ -1521,7 +1521,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 			ilData.output += gucon(vertexIt[SelectedForm->fillStart],
-			                       InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
+			                       (*InterleaveSequence)[InterleaveSequenceIndices[ilData.pins].index],
 			                       ilData.output + offset,
 			                       code);
 		}
@@ -1529,13 +1529,13 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 	auto point = fPOINT{};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output
-		    += gucon(point, InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index], ilData.output + MAXITEMS, code);
+		    += gucon(point, (*InterleaveSequence)[InterleaveSequenceIndices[ilData.pins].index], ilData.output + MAXITEMS, code);
 	}
 	for (auto iSequence = InterleaveSequenceIndices[ilData.pins].index;
 	     iSequence < InterleaveSequenceIndices[ilData.pins + 1].index;
 	     iSequence++) {
-		ilData.highStitchBuffer[ilData.output].x         = InterleaveSequence[iSequence].x;
-		ilData.highStitchBuffer[ilData.output].y         = InterleaveSequence[iSequence].y;
+		ilData.highStitchBuffer[ilData.output].x         = (*InterleaveSequence)[iSequence].x;
+		ilData.highStitchBuffer[ilData.output].y         = (*InterleaveSequence)[iSequence].y;
 		ilData.highStitchBuffer[ilData.output].attribute = code;
 		if (ilData.highStitchBuffer[ilData.output].x != ilData.highStitchBuffer[ilData.output - 1].x
 		    || ilData.highStitchBuffer[ilData.output].y != ilData.highStitchBuffer[ilData.output - 1].y) {
@@ -1563,7 +1563,7 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 		if ((SelectedForm->extendedAttribute & AT_END) != 0u) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 			ilData.output += gucon(
-			    InterleaveSequence[InterleaveSequenceIndex - 1], vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
+			    (*InterleaveSequence)[InterleaveSequenceIndex - 1], vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
 		}
 	}
 }
@@ -1654,7 +1654,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 					ilData.output += xi::gucon(vertexIt[SelectedForm->fillStart],
-					                           InterleaveSequence[InterleaveSequenceIndices[ilData.pins].index],
+					                           (*InterleaveSequence)[InterleaveSequenceIndices[ilData.pins].index],
 					                           ilData.output + offset,
 					                           code);
 				}
@@ -1662,11 +1662,11 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 			auto colpnt = fPOINT{};
 			if (xi::lastcol(iSequence, colpnt)) {
 				ilData.output
-				    += xi::gucon(colpnt, InterleaveSequence[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
+				    += xi::gucon(colpnt, (*InterleaveSequence)[InterleaveSequenceIndices[iSequence].index], ilData.output, code);
 			}
 			for (auto ine = InterleaveSequenceIndices[iSequence].index; ine < InterleaveSequenceIndices[iSequence + 1].index;
 			     ine++) {
-				StitchBuffer[ilData.output] = { InterleaveSequence[ine].x, InterleaveSequence[ine].y, code };
+				StitchBuffer[ilData.output] = { (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code };
 				if (ilData.output > 0) {
 					if (StitchBuffer[ilData.output].x != StitchBuffer[ilData.output - 1].x
 					    || StitchBuffer[ilData.output].y != StitchBuffer[ilData.output - 1].y) {

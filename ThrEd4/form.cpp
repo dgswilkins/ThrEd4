@@ -1192,7 +1192,7 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 	const auto delta  = dPOINT{ finish.x - start.x, finish.y - start.y };
 	const auto length = hypot(delta.x, delta.y);
 
-	InterleaveSequence[InterleaveSequenceIndex++] = start;
+	(*InterleaveSequence)[InterleaveSequenceIndex++] = start;
 	if (length > MaxStitchLen) {
 		auto count = gsl::narrow<unsigned int>(std::ceil(length / userStitchLen));
 		if (count == 0u) {
@@ -1209,7 +1209,7 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 					InterleaveSequenceIndex = MAXITEMS - 2;
 					return false;
 				}
-				InterleaveSequence[InterleaveSequenceIndex++] = point;
+				(*InterleaveSequence)[InterleaveSequenceIndex++] = point;
 				point.x += step.x;
 				point.y += step.y;
 			}
@@ -1241,7 +1241,7 @@ void form::chkseq(bool border) {
 #if BUGBAK
 
 	for (auto index = 0u; index < SequenceIndex; index++) {
-		InterleaveSequence[index] = OSequence[index];
+		(*InterleaveSequence)[index] = OSequence[index];
 	}
 	InterleaveSequenceIndex = SequenceIndex;
 #else
@@ -1287,17 +1287,17 @@ void form::chkseq(bool border) {
 		}
 	}
 	if (flag) {
-		InterleaveSequence[InterleaveSequenceIndex++] = OSequence[SequenceIndex - 1];
+		(*InterleaveSequence)[InterleaveSequenceIndex++] = OSequence[SequenceIndex - 1];
 	}
 	if (minimumStitchLength == 0.0f) {
 		return;
 	}
 	auto destination = savedIndex + 1;
 	for (auto iSequence = savedIndex + 1; iSequence < InterleaveSequenceIndex; iSequence++) {
-		const auto len = hypot(InterleaveSequence[iSequence].x - InterleaveSequence[iSequence - 1].x,
-		                       InterleaveSequence[iSequence].y - InterleaveSequence[iSequence - 1].y);
+		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1].x,
+		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
 		if (len > minimumStitchLength) {
-			InterleaveSequence[destination] = InterleaveSequence[iSequence];
+			(*InterleaveSequence)[destination] = (*InterleaveSequence)[iSequence];
 			destination++;
 		}
 	}
@@ -1340,7 +1340,7 @@ void form::internal::ritfil(unsigned& interleaveSequenceIndex2) {
 
 bool form::lastch() noexcept {
 	if (InterleaveSequenceIndex != 0u) {
-		LastPoint = InterleaveSequence[InterleaveSequenceIndex - 1];
+		LastPoint = (*InterleaveSequence)[InterleaveSequenceIndex - 1];
 		return true;
 	}
 	{ return false; }

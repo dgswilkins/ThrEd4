@@ -11590,15 +11590,15 @@ void thred::internal::selfrmx() {
 void thred::internal::setpclp() noexcept {
 	auto point = POINT{};
 
-	form::sfCor2px(InterleaveSequence[0], point);
+	form::sfCor2px((*InterleaveSequence)[0], point);
 	FormVerticesAsLine[0] = point;
-	form::sfCor2px(InterleaveSequence[1], point);
+	form::sfCor2px((*InterleaveSequence)[1], point);
 	const auto offset = POINT{ Msg.pt.x - StitchWindowOrigin.x - point.x, Msg.pt.y - StitchWindowOrigin.y - point.y };
 	for (auto ine = 1u; ine < OutputIndex - 1; ine++) {
-		form::sfCor2px(InterleaveSequence[ine], point);
+		form::sfCor2px((*InterleaveSequence)[ine], point);
 		FormVerticesAsLine[ine] = { point.x + offset.x, point.y + offset.y };
 	}
-	form::sfCor2px(InterleaveSequence[OutputIndex - 1], point);
+	form::sfCor2px((*InterleaveSequence)[OutputIndex - 1], point);
 	FormVerticesAsLine[OutputIndex - 1] = point;
 }
 
@@ -11620,15 +11620,15 @@ void thred::internal::fixpclp() {
 	    = POINT{ (Msg.pt.x + gsl::narrow_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + gsl::narrow_cast<LONG>(FormMoveDelta.y)) };
 
 	thred::pxCor2stch(point);
-	const auto offset = fPOINT{ SelectedPoint.x - InterleaveSequence[1].x, SelectedPoint.y - InterleaveSequence[1].y };
+	const auto offset = fPOINT{ SelectedPoint.x - (*InterleaveSequence)[1].x, SelectedPoint.y - (*InterleaveSequence)[1].y };
 	auto       iNext  = form::nxt(ClosestVertexToCursor);
 	const auto count  = OutputIndex - 2;
 	form::fltspac(iNext, count);
 	SelectedForm->vertexCount += gsl::narrow<unsigned short>(count);
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iOutput = 1u; iOutput < OutputIndex - 1; iOutput++) {
-		vertexIt[iNext].x = InterleaveSequence[iOutput].x + offset.x;
-		vertexIt[iNext].y = InterleaveSequence[iOutput].y + offset.y;
+		vertexIt[iNext].x = (*InterleaveSequence)[iOutput].x + offset.x;
+		vertexIt[iNext].y = (*InterleaveSequence)[iOutput].y + offset.y;
 		iNext++;
 	}
 	form::refil();
@@ -15246,18 +15246,18 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
 								auto vertexIt         = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-								InterleaveSequence[0] = vertexIt[ClosestVertexToCursor];
+								(*InterleaveSequence)[0] = vertexIt[ClosestVertexToCursor];
 								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
 								auto iVertex = 0u;
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
-									InterleaveSequence[iVertex + 1] = clipData[iVertex];
+									(*InterleaveSequence)[iVertex + 1] = clipData[iVertex];
 								}
 								const auto nextVertex = form::nxt(ClosestVertexToCursor);
 								iVertex++;
-								InterleaveSequence[iVertex] = vertexIt[nextVertex];
+								(*InterleaveSequence)[iVertex] = vertexIt[nextVertex];
 								OutputIndex                 = iVertex + 1;
-								FormVerticesAsLine          = convert_ptr<POINT*>(&InterleaveSequence[OutputIndex]);
+								FormVerticesAsLine          = convert_ptr<POINT*>(&(*InterleaveSequence)[OutputIndex]);
 								setpclp();
 								StateMap.set(StateFlag::FPUNCLP);
 								StateMap.set(StateFlag::SHOP);
@@ -18870,6 +18870,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		SelectedPointsLine               = &private_SelectedPointsLine;
 		auto private_FormAngles          = std::vector<double>{};
 		FormAngles                       = &private_FormAngles;
+		auto private_InterleaveSequence  = std::vector<fPOINT>{};
+		private_InterleaveSequence.resize(MAXITEMS);
+		InterleaveSequence               = &private_InterleaveSequence;
 		auto private_AngledFormVertices  = std::vector<fPOINT>{};
 		AngledFormVertices               = &private_AngledFormVertices;
 		auto private_textureInputBuffer  = std::wstring{};

@@ -164,8 +164,8 @@ extern std::vector<fPOINT>* InsidePoints;
 
 extern unsigned InterleaveSequenceIndex;
 extern INSREC   InterleaveSequenceIndices[10];
-extern fPOINT   InterleaveSequence[MAXITEMS];
 
+extern std::vector<fPOINT>*   InterleaveSequence;
 extern std::vector<HWND>* LabelWindow;
 
 extern fPOINT LastPoint;

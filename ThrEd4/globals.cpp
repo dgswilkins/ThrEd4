@@ -131,8 +131,8 @@ std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline p
 
 unsigned InterleaveSequenceIndex;       // index into the interleave sequence
 INSREC   InterleaveSequenceIndices[10]; // indices into interleave points
-fPOINT   InterleaveSequence[MAXITEMS];  // storage for interleave points
 
+std::vector<fPOINT>*   InterleaveSequence;  // storage for interleave points
 std::vector<HWND>* LabelWindow; // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
