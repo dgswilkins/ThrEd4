@@ -364,11 +364,12 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	feather.globalDown           = feather.globalPhase - feather.globalUp;
 	SelectedForm->fillType       = FTHF;
 	feather.phase                = 1;
-	(*BSequence)[SequenceIndex]     = (*BSequence)[SequenceIndex - 2];
-	(*BSequence)[SequenceIndex + 1] = (*BSequence)[SequenceIndex - 1];
+	BSequence->push_back((*BSequence)[SequenceIndex - 2]);
+	BSequence->push_back((*BSequence)[SequenceIndex - 1]);
+	SequenceIndex += 2;
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0u) {
 		OutputIndex = 0;
-		for (ind = 0; ind < SequenceIndex; ind++) {
+		for (ind = 0; ind < SequenceIndex - 2; ind++) {
 			if ((*BSequence)[ind].attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
@@ -376,7 +377,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	}
 	else {
 		if ((SelectedForm->extendedAttribute & AT_FTHBTH) != 0u) {
-			for (ind = 0; ind <= SequenceIndex; ind++) {
+			for (ind = 0; ind <= SequenceIndex - 2; ind++) {
 				if ((*BSequence)[ind].attribute == 0) {
 					xi::fthdfn(ind, feather);
 				}
@@ -384,7 +385,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 			ind--;
 		}
 		else {
-			for (ind = 0; ind <= SequenceIndex; ind++) {
+			for (ind = 0; ind <= SequenceIndex - 2; ind++) {
 				if ((*BSequence)[ind].attribute != 0) {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0u) {
 						xi::fthfn(ind, feather);

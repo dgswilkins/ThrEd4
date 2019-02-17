@@ -3878,9 +3878,8 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 }
 
 void form::internal::rspnt(float xCoordinate, float yCoordinate) noexcept {
-	(*BSequence)[OutputIndex].x           = xCoordinate;
-	(*BSequence)[OutputIndex].y           = yCoordinate;
-	(*BSequence)[OutputIndex++].attribute = 0;
+	BSequence->emplace_back(xCoordinate, yCoordinate, 0);
+	OutputIndex++;
 }
 
 void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish) {
@@ -3900,16 +3899,12 @@ void form::internal::duseq1(const SMALPNTL* sequenceLines) noexcept {
 void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int ind) {
 	auto lineEndPoint = sortedLines[ind];
 
-	(*BSequence)[OutputIndex].attribute = SEQBOT;
-	(*BSequence)[OutputIndex].x         = lineEndPoint->x;
-	(*BSequence)[OutputIndex].y         = lineEndPoint->y;
+	BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQBOT);
 	OutputIndex++;
 	// Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
 	//             and not the next entry in sortedLines
 	lineEndPoint++;
-	(*BSequence)[OutputIndex].attribute = SEQTOP;
-	(*BSequence)[OutputIndex].x         = lineEndPoint->x;
-	(*BSequence)[OutputIndex].y         = lineEndPoint->y;
+	BSequence->emplace_back(lineEndPoint->x, lineEndPoint->y, SEQTOP);
 	OutputIndex++;
 }
 
@@ -4385,6 +4380,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(index);
 #else
 		OutputIndex = 0;
+		BSequence->clear();
 
 		auto mapIndexSequence = std::vector<unsigned>{};
 		mapIndexSequence.reserve(gsl::narrow_cast<size_t>(regionCount) + 1);
@@ -4674,13 +4670,6 @@ void form::internal::bakseq() {
 		iSequence--;
 	}
 #endif
-}
-
-void form::ritseq1(unsigned int ind) {
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	(*BSequence)[SequenceIndex].x = vertexIt[ind].x;
-	(*BSequence)[SequenceIndex].y = vertexIt[ind].y;
-	SequenceIndex++;
 }
 
 void form::filinu(const dPOINT& inPoint) {

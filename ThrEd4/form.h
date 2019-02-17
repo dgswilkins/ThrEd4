@@ -158,7 +158,6 @@ void     refilal();
 void     refilfn();
 void     rinfrm();
 void     ritfrct(unsigned int iForm, HDC dc);
-void     ritseq1(unsigned int ind);
 void     rotagain();
 void     rotcmd();
 void     rotdup();

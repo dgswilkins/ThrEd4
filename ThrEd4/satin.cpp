@@ -851,20 +851,25 @@ void satin::internal::satfn(const std::vector<double>& lengths,
                             unsigned int               line2Start,
                             unsigned int               line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
+		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
 			if (StateMap.test(StateFlag::FTHR)) {
-				(*BSequence)[SequenceIndex].attribute = 0;
-				form::ritseq1(line1Start % VertexCount);
+				auto vertex = vertexIt[line1Start % VertexCount];
+				BSequence->emplace_back(vertex.x, vertex.y, 0);
+				SequenceIndex++;
 			}
 			else {
 				if (StateMap.test(StateFlag::BARSAT)) {
 					if (VertexCount != 0u) {
-						form::ritseq1(line1Start % VertexCount);
-						form::ritseq1(line2Start % VertexCount);
+						auto vertex = vertexIt[line1Start % VertexCount];
+						BSequence->emplace_back(vertex.x, vertex.y, 0);
+						SequenceIndex++;
+						vertex = vertexIt[line2Start % VertexCount];
+						BSequence->emplace_back(vertex.x, vertex.y, 0);
+						SequenceIndex++;
 					}
 				}
 				else {
-					auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 					SelectedPoint              = vertexIt[line1Start];
 					OSequence[SequenceIndex++] = SelectedPoint;
 				}
@@ -909,7 +914,6 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 			iVertex     = form::prv(iNextVertex);
 		}
 		line2StitchCounts.push_back(stitchCount - segmentStitchCount);
-		auto vertexIt      = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		auto line1Point    = dPOINT(vertexIt[line1Start]);
 		auto line1Next     = form::nxt(line1Start);
 		auto line2Previous = form::prv(line2Start);
@@ -949,12 +953,12 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						(*BSequence)[SequenceIndex++]
-						    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
+						BSequence->emplace_back(line1Point.x, line1Point.y, 0);
+						SequenceIndex++;
 					}
 					else {
-						(*BSequence)[SequenceIndex++]
-						    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
+						BSequence->emplace_back(line2Point.x, line2Point.y, 1);
+						SequenceIndex++;
 					}
 					if (SequenceIndex > MAXITEMS - 6) {
 						SequenceIndex = MAXITEMS - 6;
@@ -972,16 +976,16 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.x += line2Step.x;
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-							(*BSequence)[SequenceIndex++]
-							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 0 };
-							(*BSequence)[SequenceIndex++]
-							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 1 };
+							BSequence->emplace_back(line1Point.x, line1Point.y, 0);
+							SequenceIndex++;
+							BSequence->emplace_back(line2Point.x, line2Point.y, 1);
+							SequenceIndex++;
 						}
 						else {
-							(*BSequence)[SequenceIndex++]
-							    = { gsl::narrow_cast<float>(line2Point.x), gsl::narrow_cast<float>(line2Point.y), 2 };
-							(*BSequence)[SequenceIndex++]
-							    = { gsl::narrow_cast<float>(line1Point.x), gsl::narrow_cast<float>(line1Point.y), 3 };
+							BSequence->emplace_back(line2Point.x, line2Point.y, 2);
+							SequenceIndex++;
+							BSequence->emplace_back(line1Point.x, line1Point.y, 3);
+							SequenceIndex++;
 						}
 						if (SequenceIndex > MAXITEMS - 6) {
 							SequenceIndex = MAXITEMS - 6;
@@ -1094,6 +1098,7 @@ void satin::satfil() {
 	satin::satadj();
 	LineSpacing /= 2;
 	SequenceIndex = 0;
+	BSequence->clear();
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
