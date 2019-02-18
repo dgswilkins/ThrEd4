@@ -30,7 +30,7 @@ namespace formForms {
 void dazdef();
 void dasyfrm();
 void frmnum();
-void maxtsiz(const std::wstring& label, POINT& textSize);
+void maxtsiz(const std::wstring& label, POINT& textSize) noexcept;
 auto maxwid(unsigned start, unsigned finish);
 void prfmsg();
 void prfsid(HWND wnd) noexcept;
@@ -41,7 +41,7 @@ void wavfrm();
 
 namespace internal {
 
-	void chkdaz();
+	void chkdaz() noexcept;
 
 	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 

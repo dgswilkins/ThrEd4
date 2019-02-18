@@ -18,7 +18,7 @@
 #pragma warning(disable : 26446) // bounds.4 Prefer to use gsl::at() instead of unchecked subscript operator
 //#pragma warning(disable : 26451) // io.2		Arithmetic overflow
 //#pragma warning(disable:26461)	// con.3	The pointer argument can be marked as a pointer to const
-//#pragma warning(disable:26472)	// type.1	Don't use a static_cast for arithmetic conversions
+//#pragma warning(disable:26472)	// type.1	Don't use a gsl::narrow_cast for arithmetic conversions
 //#pragma warning(disable:26474)	// type.1	Don't cast between pointer types when the conversion could be implicit
 #pragma warning(disable : 26481) // bounds.1	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable : 26482) // bounds.2	Only index into arrays using constant expressions
@@ -72,7 +72,9 @@ extern unsigned  AppliqueColor;
 extern LPWSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
-extern BSEQPNT   BSequence[BSEQLEN];
+
+extern std::vector<BSEQPNT>*   BSequence;
+
 extern HBRUSH    BackgroundBrush;
 extern unsigned  BeanCount; // number of stitches added by convert to bean
 extern HDC       BitmapDC;
@@ -111,9 +113,9 @@ extern unsigned     ClosestPointIndex;
 extern unsigned int ClosestVertexToCursor;
 extern int*         ColorBarSize;
 extern HCURSOR      CrossCursor;
-extern SATCON*      CurrentFormGuides;
+extern unsigned int CurrentFormGuides;
 extern unsigned int CurrentFormGuidesCount;
-extern unsigned int FormVertexIndex;
+extern unsigned int CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
 
@@ -129,7 +131,6 @@ extern std::vector<double>* FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
 extern HWND         FormDataSheet;
-extern unsigned int FormIndex;
 
 extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;
@@ -163,8 +164,8 @@ extern std::vector<fPOINT>* InsidePoints;
 
 extern unsigned InterleaveSequenceIndex;
 extern INSREC   InterleaveSequenceIndices[10];
-extern fPOINT   InterleaveSequence[MAXITEMS];
 
+extern std::vector<fPOINT>*   InterleaveSequence;
 extern std::vector<HWND>* LabelWindow;
 
 extern fPOINT LastPoint;
@@ -188,6 +189,7 @@ extern unsigned     NearestCount;
 extern unsigned int NewFormVertexCount;
 extern HWND         OKButton;
 extern fPOINT       OSequence[OSEQLEN];
+extern bool         OutLineEverySelectedForm;
 extern unsigned int OutputIndex;
 
 extern std::vector<fPOINT>* OutsidePointList;
@@ -207,15 +209,16 @@ extern fRECTANGLE     RotationRect;
 extern std::vector<POINT>* RubberBandLine;
 
 extern unsigned int SatinEndGuide;
-extern unsigned int SatinGuideIndex;
-extern SATCON       SatinGuides[MAXSAC];
-extern RECT         scRct;
-extern unsigned*    screenDPI;
-extern int*         ScrollSize;
-extern unsigned     SearchLineIndex;
-extern HPEN         SelectAllPen;
-extern FRMHED*      SelectedForm;
-extern unsigned     SelectedFormControlVertex;
+
+extern std::vector<SATCON>* SatinGuides;
+
+extern RECT      scRct;
+extern unsigned* screenDPI;
+extern int*      ScrollSize;
+extern unsigned  SearchLineIndex;
+extern HPEN      SelectAllPen;
+extern FRMHED*   SelectedForm;
+extern unsigned  SelectedFormControlVertex;
 
 extern std::vector<unsigned int>* SelectedFormList;
 extern FORMVERTICES               SelectedFormVertices;

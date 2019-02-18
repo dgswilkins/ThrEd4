@@ -119,7 +119,7 @@ namespace internal {
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
-	void     chkuseq(unsigned interleaveSequenceIndex2);
+	void     chkuseq(unsigned interleaveSequenceIndex2) noexcept;
 	void     delwlk(unsigned int code);
 
 #ifdef _DEBUG
@@ -132,13 +132,11 @@ namespace internal {
 
 	constexpr float durat(float start, float finish, float featherRatio);
 
-	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) noexcept;
+	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather);
 	void     durec(OREC& record) noexcept;
 	unsigned dutyp(unsigned attribute) noexcept;
 
-	constexpr float duxrat(float strt, float fin, float featherRatioLocal);
-
-	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal) noexcept;
+	void duxrats(unsigned int start, unsigned int finish, fPOINT& point, float featherRatioLocal);
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
@@ -173,13 +171,13 @@ namespace internal {
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
-	void ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) noexcept;
+	void ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio);
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
-	void ritcwlk(unsigned& interleaveSequenceIndex2);
-	void ritund(unsigned& interleaveSequenceIndex2);
-	void ritwlk(unsigned& interleaveSequenceIndex2);
+	void ritcwlk(unsigned& interleaveSequenceIndex2) noexcept;
+	void ritund(unsigned& interleaveSequenceIndex2) noexcept;
+	void ritwlk(unsigned& interleaveSequenceIndex2) noexcept;
 	void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 

@@ -56,12 +56,12 @@ unsigned short LoadStringList[] = {
 };
 
 inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
-	auto pBuf = static_cast<wchar_t*>(nullptr);
+	auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
 		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
 			sDest.resize(len);
-			auto _ = std::copy(pBuf, pBuf + len, sDest.begin());
+			std::copy(pBuf, pBuf + len, sDest.begin());
 		}
 	}
 }
@@ -208,7 +208,7 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 			}
 		}
 		else {
-			SetWindowText((*ButtonWin)[iButton], (*StringTable)[gsl::narrow<size_t>(iButton) - 4u + STR_TRC0].c_str());
+			SetWindowText((*ButtonWin)[iButton], (*StringTable)[gsl::narrow_cast<size_t>(iButton) - 4u + STR_TRC0].c_str());
 		}
 	}
 	else {
@@ -264,7 +264,7 @@ bool displayText::clpmsgs(unsigned code) {
 }
 
 void displayText::frm1pnt() {
-	if (FormIndex == 1) {
+	if (FormList->size() == 1) {
 		StateMap.set(StateFlag::FORMSEL);
 		ClosestFormToCursor = 0;
 	}
@@ -429,14 +429,14 @@ void displayText::savdisc() {
 
 #pragma warning(push)
 #pragma warning(disable : 26493) // we use c style casts as this is a C API
+BOOL CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept {
+	SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
+	return TRUE;
+}
+
 void displayText::updateWinFont(HWND hWnd) noexcept {
 	const auto* hFont = displayText::getThrEdFont(400);
-	EnumChildWindows(hWnd,
-	                 [](HWND p_hWnd, LPARAM lParam) noexcept->BOOL {
-		                 SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
-		                 return TRUE;
-	                 },
-	                 (LPARAM)hFont);
+	EnumChildWindows(hWnd, EnumChildProc, (LPARAM)hFont);
 }
 #pragma warning(pop)
 

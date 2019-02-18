@@ -70,7 +70,7 @@ void trace::initColorRef() noexcept {
 }
 
 void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
-	if (window) {
+	if (window != nullptr) {
 		*window = CreateWindow(L"STATIC",
 		                       L"",
 		                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
@@ -125,7 +125,7 @@ void trace::internal::trcratnum() {
 }
 
 bool trace::internal::trcin(COLORREF color) {
-	if (color) {
+	if (color != 0u) {
 		ti::trcols(color);
 		if (StateMap.test(StateFlag::TRCRED)) {
 			if (PixelColors[0] > HighColors[0]) {
@@ -169,7 +169,7 @@ void trace::internal::getrmap() {
 	info.bmiHeader       = header;
 	TraceBitmap          = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
 	TraceDC              = CreateCompatibleDC(StitchWindowDC);
-	if (TraceBitmap && TraceDC) {
+	if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
 		SelectObject(TraceDC, TraceBitmap);
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 		StateMap.set(StateFlag::WASTRAC);
@@ -232,7 +232,7 @@ static inline void trace::internal::difsub(const unsigned source, unsigned shift
 void trace::internal::difbits(unsigned shift, unsigned* point) noexcept {
 	auto testPoint = point;
 
-	if (testPoint) {
+	if (testPoint != nullptr) {
 		ti::difsub(*testPoint, shift, TraceAdjacentColors[0]);
 
 		testPoint -= BitmapWidth;
@@ -310,15 +310,16 @@ void trace::untrace() {
 }
 
 void trace::trdif() {
-	if (!PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] == 0) {
 		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
 	StateMap.reset(StateFlag::TRSET);
 	StateMap.reset(StateFlag::HIDMAP);
 	trace::untrace();
-	if (BitmapHeight * BitmapWidth) {
-		auto differenceBitmap = std::vector<unsigned>(gsl::narrow<size_t>(BitmapHeight) * BitmapWidth);
+	if ((BitmapHeight * BitmapWidth) != 0u) {
+		auto differenceBitmap = std::vector<unsigned>{};
+		differenceBitmap.resize(gsl::narrow_cast<size_t>(BitmapHeight) * BitmapWidth);
 
 		auto colorSumMaximum = 0u;
 		auto colorSumMinimum = 0xffffffffu;
@@ -349,7 +350,7 @@ void trace::trdif() {
 			const auto ratio = (255.0) / (colorSumMaximum - colorSumMinimum);
 			for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
-				if (differenceBitmap[iPixel]) {
+				if (differenceBitmap[iPixel] != 0u) {
 					const auto adjustedColorSum = dToUI((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
@@ -363,7 +364,7 @@ void trace::trdif() {
 }
 
 void trace::trace() {
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		trace::untrace();
 		ti::tracwnd();
 		ti::getrmap();
@@ -468,14 +469,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(gsl::narrow<size_t>(pixelIndex) - 1);
+					TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - 1u);
 					flag = false;
 				}
 			}
 			pixelIndex++;
 		}
 		if (flag) {
-			TracedEdges->set(gsl::narrow<size_t>(pixelIndex) - 1);
+			TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - 1u);
 		}
 	}
 	for (auto iWidth = 0u; iWidth < BitmapWidth; iWidth++) {
@@ -490,14 +491,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(gsl::narrow<size_t>(pixelIndex) - BitmapWidth);
+					TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - BitmapWidth);
 					flag = false;
 				}
 			}
 			pixelIndex += BitmapWidth;
 		}
 		if (flag) {
-			TracedEdges->set(gsl::narrow<size_t>(pixelIndex) - BitmapWidth);
+			TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - BitmapWidth);
 		}
 	}
 	for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
@@ -540,7 +541,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 	}
 	case TRCD: {
 		pixelIndex -= (BitmapWidth + 1);
-		if (!CurrentTracePoint.y) {
+		if (CurrentTracePoint.y == 0) {
 			traceDirection = TRCR;
 		}
 		else {
@@ -563,7 +564,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 	}
 	case TRCL: {
 		pixelIndex += (BitmapWidth - 1);
-		if (!CurrentTracePoint.x) {
+		if (CurrentTracePoint.x == 0) {
 			traceDirection = TRCD;
 		}
 		else {
@@ -619,7 +620,7 @@ bool trace::internal::trcbit(const unsigned initialDirection, unsigned& traceDir
 }
 
 void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {
-	if (point) {
+	if (point != nullptr) {
 		traceDiff.x = point[1].x - point[0].x;
 		// ToDo - this is likely incorrect
 		traceDiff.y = point[1].y - point[0].y;
@@ -698,7 +699,7 @@ void trace::internal::dutrac() {
 			}
 			auto flag                = 0u;
 			auto minimumEdgeDistance = 0x7fffffff;
-			if (findRectangle.left) {
+			if (findRectangle.left != 0) {
 				minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 				flag                = TRCL;
 			}
@@ -709,7 +710,7 @@ void trace::internal::dutrac() {
 					flag                = TRCR;
 				}
 			}
-			if (findRectangle.bottom) {
+			if (findRectangle.bottom != 0) {
 				const auto edgeDistance = CurrentTracePoint.y - findRectangle.bottom;
 				if (edgeDistance < minimumEdgeDistance) {
 					minimumEdgeDistance = edgeDistance;
@@ -770,12 +771,11 @@ void trace::internal::dutrac() {
 				decimatedLine.push_back(tracedPoints[iPoint]);
 			}
 		}
-		const auto maxPoints = decimatedLine.size();
 		tracedPoints.clear();
-		tracedPoints.reserve(maxPoints);
+		tracedPoints.reserve(decimatedLine.size());
 		tracedPoints.push_back(decimatedLine[0]);
 		auto iNext = 0u;
-		for (auto iCurrent = 1u; iCurrent < maxPoints; iCurrent++) {
+		for (auto iCurrent = 1u; iCurrent < decimatedLine.size(); iCurrent++) {
 			const auto traceLength
 			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
@@ -786,11 +786,13 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		FormList->emplace_back(FRMHED{});
+		FormList->push_back(FRMHED{});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		FormVertexIndex = FormVertices->size();
-		FormVertices->emplace_back(fPOINT{ tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
+		CurrentVertexIndex   = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
+		auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
+		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
+		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
 		iNext                = 0;
 		OutputIndex          = 0;
 		auto traceLengthSum  = 0.0;
@@ -804,25 +806,20 @@ void trace::internal::dutrac() {
 			const auto traceLength
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				FormVertices->emplace_back(fPOINT{ tracedPoints[iCurrent - 1].x * StitchBmpRatio.x,
-				                                   tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
+				vertexIt[OutputIndex].x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
+				vertexIt[OutputIndex].y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
 				traceLengthSum = 0.0;
 			}
 		}
-		if (FormVertices->size() + OutputIndex > MAXITEMS) {
-			displayText::tabmsg(IDS_FRMOVR);
-			return;
-		}
-		SelectedForm->vertexIndex = FormVertexIndex;
+		SelectedForm->vertexIndex = thred::adflt(OutputIndex);
 		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout(FormList->size() - 1);
+		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
-		FormIndex++;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
 		form::tglfrm();
@@ -832,7 +829,7 @@ void trace::internal::dutrac() {
 void trace::trinit() {
 	unsigned histogramData[3][256] = { 0 };
 
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		if (!StateMap.test(StateFlag::TRSET)) {
 			StateMap.set(StateFlag::TRCRED);
 			StateMap.set(StateFlag::TRCGRN);
@@ -885,7 +882,7 @@ void trace::trinit() {
 			}
 			InvertDownColor = 0;
 			for (auto iRGB = 0u; iRGB < 3; iRGB++) {
-				if (componentPeak[iRGB]) {
+				if (componentPeak[iRGB] != 0u) {
 					componentPeak[iRGB]--;
 				}
 				InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
@@ -903,7 +900,7 @@ void trace::trinit() {
 }
 
 void trace::trcsel() {
-	if (PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] != 0) {
 		StateMap.set(StateFlag::WASTRCOL);
 		StateMap.set(StateFlag::TRCRED);
 		StateMap.set(StateFlag::TRCBLU);
@@ -937,7 +934,7 @@ void trace::trcsel() {
 }
 
 void trace::internal::ritrcol(COLORREF* color, unsigned number) noexcept {
-	if (color) {
+	if (color != nullptr) {
 		*color &= TraceRGBMask[ColumnColor];
 		number &= 0xff;
 		*color |= (number << TraceShift[ColumnColor]);
@@ -985,7 +982,7 @@ void trace::dutrnum1() {
 	}
 }
 
-unsigned trace::internal::ducolm() {
+unsigned trace::internal::ducolm() noexcept {
 	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth)) {
 		return 0;
 	}
@@ -1035,7 +1032,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 	POINT line[2];
 
-	auto vertexIt = std::next(FormVertices->begin(), FormVertexIndex);
+	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);
@@ -1045,7 +1042,7 @@ void trace::internal::pxlin(unsigned int start, unsigned int finish) {
 }
 
 void trace::internal::bfrm() {
-	if (VertexCount) {
+	if (VertexCount != 0u) {
 		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 			ti::pxlin(iVertex, iVertex + 1);
 		}
@@ -1056,7 +1053,7 @@ void trace::internal::bfrm() {
 }
 
 void trace::blak() {
-	if (!PCSBMPFileName[0]) {
+	if (PCSBMPFileName[0] == 0) {
 		displayText::tabmsg(IDS_MAPLOD);
 		return;
 	}
@@ -1068,7 +1065,7 @@ void trace::blak() {
 		if (!StateMap.test(StateFlag::WASTRAC)) {
 			ti::getrmap();
 		}
-		for (auto iForm = 0u; iForm < FormIndex; iForm++) {
+		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			form::fvars(iForm);
 			ti::bfrm();
 		}
@@ -1097,7 +1094,7 @@ void trace::tracpar() {
 		ColumnColor = ti::ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int>(ButtonHeight) * 15) {
 			do {
-				if (GetKeyState(VK_SHIFT) & 0x8000) {
+				if ((GetKeyState(VK_SHIFT) & 0x8000) != 0) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;
@@ -1196,7 +1193,7 @@ void trace::tracpar() {
 	}
 }
 
-void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
+void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept {
 	const unsigned NumeralWidth = thred::txtWid(L"0");
 
 	wchar_t buffer[11] = { 0 };
@@ -1210,11 +1207,11 @@ void trace::internal::trcnum(unsigned shift, COLORREF color, unsigned iRGB) {
 	TextOutInt(DrawItem->hDC, xPosition, 1, buffer, bufferLength);
 }
 
-void trace::internal::upnum(unsigned iRGB) {
+void trace::internal::upnum(unsigned iRGB) noexcept {
 	ti::trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
-void trace::internal::dwnum(unsigned iRGB) {
+void trace::internal::dwnum(unsigned iRGB) noexcept {
 	ti::trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 
@@ -1230,13 +1227,13 @@ void trace::internal::durct(unsigned    shift,
 	traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
-	auto ratio             = static_cast<double>(lowerColor) / 255;
+	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255;
 	traceMiddleMask.top    = dToL(controlHeight * ratio + traceControlRect.top);
-	ratio                  = static_cast<double>(upperColor) / 255;
+	ratio                  = gsl::narrow_cast<double>(upperColor) / 255;
 	traceMiddleMask.bottom = dToL(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
-	if (lowerColor) {
+	if (lowerColor != 0u) {
 		StateMap.set(StateFlag::DULO);
 		traceLowMask.bottom = traceMiddleMask.top;
 		traceLowMask.top    = 0;

@@ -841,7 +841,21 @@ public:
 	float x;
 	float y;
 	char  attribute;
+
+	inline BSEQPNT() noexcept = default;
+	inline BSEQPNT(double rhsX, double rhsY, int rhsAttr) noexcept;
+	// BSEQPNT(BSEQPNT&&) = default;
+	// BSEQPNT& operator=(const BSEQPNT& rhs) = default;
+	// BSEQPNT& operator=(BSEQPNT&&) = default;
+	//~BSEQPNT() = default;
+
 };
+
+inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int rhsAttr) noexcept {
+	x = gsl::narrow_cast<float>(rhsX);
+	y = gsl::narrow_cast<float>(rhsY);
+	attribute = gsl::narrow_cast<char>(rhsAttr);
+}
 
 inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
@@ -1053,8 +1067,26 @@ public:
 	unsigned int start;
 	unsigned int finish;
 
+	SATCON() noexcept;
+	// SATCON(SATCON&&) = default;
+	// SATCON& operator=(const SATCON& rhs) = default;
+	// SATCON& operator=(SATCON&&) = default;
+	//~SATCON() = default;
+
+	explicit SATCON(const SATCONOUT& rhs) noexcept;
+	inline SATCON(unsigned int rStart, unsigned int rFinish) noexcept;
 	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
 };
+
+inline SATCON::SATCON() noexcept {
+	start  = 0u;
+	finish = 0u;
+}
+
+inline SATCON::SATCON(unsigned int rStart, unsigned int rFinish) noexcept
+    : start(rStart)
+    , finish(rFinish) {
+}
 
 class SATCONOUT
 {
@@ -1068,8 +1100,8 @@ public:
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
 	//~SATCONOUT() = default;
 
-	explicit SATCONOUT(const SATCON& rhs);
-	inline SATCONOUT& operator=(const SATCON& rhs);
+	explicit SATCONOUT(const SATCON& rhs) noexcept;
+	inline SATCONOUT& operator=(const SATCON& rhs) noexcept;
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
@@ -1077,16 +1109,21 @@ inline SATCONOUT::SATCONOUT() noexcept {
 	finish = 0u;
 }
 
-inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
+inline SATCONOUT::SATCONOUT(const SATCON& rhs) noexcept {
 	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 }
 
-inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
+inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
 	start  = gsl::narrow<unsigned short>(rhs.start);
 	finish = gsl::narrow<unsigned short>(rhs.finish);
 
 	return *this;
+}
+
+inline SATCON::SATCON(const SATCONOUT& rhs) noexcept {
+	start  = rhs.start;
+	finish = rhs.finish;
 }
 
 inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
@@ -1104,8 +1141,18 @@ public:
 	unsigned int clip; // pointer to start of fill clipboard data
 	SATCON       guide;
 
+	FANGCLP() noexcept;
+	// FANGCLP(FANGCLP&&) = default;
+	// FANGCLP& operator=(const FANGCLP& rhs) = default;
+	// FANGCLP& operator=(FANGCLP&&) = default;
+	//~FANGCLP() = default;
+
 	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
 };
+
+inline FANGCLP::FANGCLP() noexcept {
+	clip = 0;
+}
 
 union FANGCLPOUT {
 public:
@@ -1190,8 +1237,8 @@ union SATINANGLEOUT;
 
 union SATINANGLE {
 public:
-	SATCON* guide;
-	float   angle;
+	unsigned int guide;
+	float        angle;
 
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };
@@ -1568,8 +1615,8 @@ public:
 	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
 	//~FRMHEDOUT() = default;
 
-	explicit inline FRMHEDOUT(const FRMHED& rhs);
-	inline FRMHEDOUT& operator=(const FRMHED& rhs);
+	explicit inline FRMHEDOUT(const FRMHED& rhs) noexcept;
+	inline FRMHEDOUT& operator=(const FRMHED& rhs) noexcept;
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
@@ -1612,7 +1659,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	cres                = 0;
 }
 
-inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
+inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
 	type            = rhs.type;
@@ -1652,7 +1699,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	cres                = rhs.cres;
 }
 
-inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
+inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<unsigned short>(rhs.vertexCount);
 	type            = rhs.type;
@@ -2675,7 +2722,7 @@ using LENINFO = struct _lengthInfo;
 template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
 	GSL_SUPPRESS(26474) {
 		if (pointer) {
-			return static_cast<T2>(static_cast<void*>(pointer));
+			return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
 		}
 
 		throw;

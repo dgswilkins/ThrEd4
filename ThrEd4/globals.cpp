@@ -40,7 +40,9 @@ unsigned  AppliqueColor = 15;   // underlay color
 LPWSTR*   ArgList;              // command line argument array
 HCURSOR   ArrowCursor;          // arrow
 fs::path* AuxName;              //
-BSEQPNT   BSequence[BSEQLEN];   //
+
+std::vector<BSEQPNT>*   BSequence;   //
+
 HBRUSH    BackgroundBrush;      // background color brush
 unsigned  BeanCount;            // number of stitches added by convert to bean
 HDC       BitmapDC;             // bitmap device context
@@ -81,9 +83,9 @@ unsigned     ClosestPointIndex;      // index of closest point
 unsigned int ClosestVertexToCursor;  // formOrigin closest to the cursor
 int*         ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR      CrossCursor;            // cross
-SATCON*      CurrentFormGuides;      // connections in the currently selecteed form
-unsigned int CurrentFormGuidesCount; // number of connections in the currently selected form
-unsigned int FormVertexIndex;        // points in the currently selected form
+unsigned int CurrentFormGuides;      // guide index in the currently selected form
+unsigned int CurrentFormGuidesCount; // number of guides in the currently selected form
+unsigned int CurrentVertexIndex;     // points in the currently selected form
 
 std::vector<HWND>* DefaultColorWin; // default color windows
 
@@ -98,7 +100,6 @@ std::vector<double>* FormAngles;        // angles of a form for satin border fil
 std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
 
 HWND                 FormDataSheet = nullptr; // form data sheet
-unsigned int         FormIndex     = 0u;      // index into the list of forms
 std::vector<POINT>*  FormLines;               // used in the form drawing routines
 std::vector<FRMHED>* FormList;                // a list of form headers
 unsigned int         FormMenuChoice = 0u;     // data type for form data form numerical entry
@@ -130,8 +131,8 @@ std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline p
 
 unsigned InterleaveSequenceIndex;       // index into the interleave sequence
 INSREC   InterleaveSequenceIndices[10]; // indices into interleave points
-fPOINT   InterleaveSequence[MAXITEMS];  // storage for interleave points
 
+std::vector<fPOINT>*   InterleaveSequence;  // storage for interleave points
 std::vector<HWND>* LabelWindow; // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
@@ -155,6 +156,7 @@ unsigned     NearestCount;                        // number of boxes selected
 unsigned int NewFormVertexCount;                  // points in the new form
 HWND         OKButton;                            // ok button
 fPOINT       OSequence[OSEQLEN];                  // temporary storage for sequencing
+bool         OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
 unsigned int OutputIndex;                         // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
@@ -173,16 +175,17 @@ fRECTANGLE     RotationRect;                      // rotation rectangle
 
 std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
-unsigned int SatinEndGuide;             // satin end guide for the currently selected form
-unsigned int SatinGuideIndex;           // next index to append satin connect points
-SATCON       SatinGuides[MAXSAC];       // satin form connects
-RECT         scRct;                     //
-unsigned*    screenDPI;                 // screen DPI
-int*         ScrollSize;                // Scroll bar width scaled for DPI
-unsigned     SearchLineIndex = 0;       // pointer for drawing stitch select lines
-HPEN         SelectAllPen;              // pen for drawing large boxes
-FRMHED*      SelectedForm;              // pointer to selected form
-unsigned     SelectedFormControlVertex; // user selected form control formOrigin
+unsigned int SatinEndGuide; // satin end guide for the currently selected form
+
+std::vector<SATCON>* SatinGuides; // satin form connects
+
+RECT      scRct;                     //
+unsigned* screenDPI;                 // screen DPI
+int*      ScrollSize;                // Scroll bar width scaled for DPI
+unsigned  SearchLineIndex = 0;       // pointer for drawing stitch select lines
+HPEN      SelectAllPen;              // pen for drawing large boxes
+FRMHED*   SelectedForm;              // pointer to selected form
+unsigned  SelectedFormControlVertex; // user selected form control formOrigin
 
 std::vector<unsigned int>* SelectedFormList;     // a list of selected forms
 FORMVERTICES               SelectedFormVertices; // selected form vertices

@@ -39,13 +39,13 @@ namespace internal {
 	static inline void difsub(unsigned source, unsigned shift, unsigned& destination) noexcept;
 
 	void     dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
-	unsigned ducolm();
+	unsigned ducolm() noexcept;
 
 	void durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 	void dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept;
 	void dutrac();
 	void dutrnum0(unsigned color);
-	void dwnum(unsigned iRGB);
+	void dwnum(unsigned iRGB) noexcept;
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
 
@@ -56,7 +56,7 @@ namespace internal {
 	void tracwnd();
 	bool trcbit(unsigned initialDirection, unsigned& traceDirection, std::vector<TRCPNT>& tracedPoints);
 	bool trcin(COLORREF color);
-	void trcnum(unsigned shift, COLORREF color, unsigned iRGB);
+	void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept;
 	void trcols(COLORREF color) noexcept;
 	void trcratnum();
 	void trcstpnum();
@@ -65,6 +65,6 @@ namespace internal {
 
 	unsigned trsum() noexcept;
 
-	void upnum(unsigned iRGB);
+	void upnum(unsigned iRGB) noexcept;
 } // namespace internal
 } // namespace trace
