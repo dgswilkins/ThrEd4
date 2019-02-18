@@ -13912,6 +13912,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				if (Msg.hwnd == (*ValueWindow)[LBRDUND] || Msg.hwnd == (*LabelWindow)[LBRDUND]) {
 					SelectedForm->edgeType ^= EGUND;
 					form::refil();
+					formForms::refrm();
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LSACANG] || Msg.hwnd == (*LabelWindow)[LSACANG]) {
