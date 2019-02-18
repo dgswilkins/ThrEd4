@@ -312,12 +312,12 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 
 void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ TYPFRM, SelectedForm->fillColor, InterleaveSequence->size(), I_FIL };
+		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL };
 		form::chkseq(false);
 		interleaveSequenceIndex2++;
 		if (((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u)
 		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-			InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ FTHMSK, SelectedForm->fillInfo.feather.color, InterleaveSequence->size(), I_FTH };
+			InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ FTHMSK, SelectedForm->fillInfo.feather.color, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FTH };
 
 			const auto sequenceMax      = gsl::narrow<unsigned int>(featherSequence.size());
 			auto       iReverseSequence = sequenceMax - 1;
@@ -653,7 +653,7 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 
 void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
 	if (OutputIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ WLKMSK, SelectedForm->underlayColor, InterleaveSequence->size(),I_FIL };
+		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ WLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()),I_FIL };
 		chkuseq(interleaveSequenceIndex2);
 		interleaveSequenceIndex2++;
 	}
@@ -661,7 +661,7 @@ void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
 
 void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) {
 	if (OutputIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ CWLKMSK, SelectedForm->underlayColor, InterleaveSequence->size(), I_FIL };
+		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ CWLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL };
 		chkuseq(interleaveSequenceIndex2);
 		interleaveSequenceIndex2++;
 	}
@@ -767,7 +767,7 @@ void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) 
 
 void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ UNDMSK, SelectedForm->underlayColor, InterleaveSequence->size(), I_FIL };
+		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ UNDMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL };
 		chkuseq(interleaveSequenceIndex2);
 		interleaveSequenceIndex2++;
 	}
@@ -1558,7 +1558,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 
 	StateMap.reset(StateFlag::ISEND);
 	form::fvars(ClosestFormToCursor);
-	InterleaveSequenceIndices[interleaveSequenceIndex2].index = InterleaveSequence->size();
+	InterleaveSequenceIndices[interleaveSequenceIndex2].index = gsl::narrow<unsigned int>(InterleaveSequence->size());
 	ilData.layerIndex
 	    = (gsl::narrow<unsigned int>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
