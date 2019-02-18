@@ -642,18 +642,18 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) noexcept {
 				const auto step  = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
 				auto       point = OSequence[iSequence];
 				for (auto index = 0u; index < stitchCount; index++) {
-					(*InterleaveSequence)[InterleaveSequenceIndex] = point;
+					InterleaveSequence->push_back(point);
 					InterleaveSequenceIndex++;
 					point.x += step.x;
 					point.y += step.y;
 				}
 			}
 			else {
-				(*InterleaveSequence)[InterleaveSequenceIndex] = OSequence[iSequence];
+				InterleaveSequence->push_back(OSequence[iSequence]);
 				InterleaveSequenceIndex++;
 			}
 		}
-		(*InterleaveSequence)[InterleaveSequenceIndex] = OSequence[OutputIndex - 1];
+		InterleaveSequence->push_back(OSequence[OutputIndex - 1]);
 		InterleaveSequenceIndex++;
 		InterleaveSequenceIndices[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
 	}

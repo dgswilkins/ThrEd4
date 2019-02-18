@@ -1192,7 +1192,8 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 	const auto delta  = dPOINT{ finish.x - start.x, finish.y - start.y };
 	const auto length = hypot(delta.x, delta.y);
 
-	(*InterleaveSequence)[InterleaveSequenceIndex++] = start;
+	InterleaveSequence->push_back(start);
+	InterleaveSequenceIndex++;
 	if (length > MaxStitchLen) {
 		auto count = gsl::narrow<unsigned int>(std::ceil(length / userStitchLen));
 		if (count == 0u) {
@@ -1209,7 +1210,8 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 					InterleaveSequenceIndex = MAXITEMS - 2;
 					return false;
 				}
-				(*InterleaveSequence)[InterleaveSequenceIndex++] = point;
+				InterleaveSequence->push_back(point);
+				InterleaveSequenceIndex++;
 				point.x += step.x;
 				point.y += step.y;
 			}
@@ -1241,7 +1243,7 @@ void form::chkseq(bool border) {
 #if BUGBAK
 
 	for (auto index = 0u; index < SequenceIndex; index++) {
-		(*InterleaveSequence)[index] = OSequence[index];
+		InterleaveSequence->push_back((*OSequence)[index]);
 	}
 	InterleaveSequenceIndex = SequenceIndex;
 #else
@@ -1287,7 +1289,8 @@ void form::chkseq(bool border) {
 		}
 	}
 	if (flag) {
-		(*InterleaveSequence)[InterleaveSequenceIndex++] = OSequence[SequenceIndex - 1];
+		InterleaveSequence->push_back(OSequence[SequenceIndex - 1]);
+		InterleaveSequenceIndex++;
 	}
 	if (minimumStitchLength == 0.0f) {
 		return;
@@ -1295,13 +1298,17 @@ void form::chkseq(bool border) {
 	auto destination = savedIndex + 1;
 	for (auto iSequence = savedIndex + 1; iSequence < InterleaveSequenceIndex; iSequence++) {
 		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1].x,
-		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
+			(*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
 		if (len > minimumStitchLength) {
 			(*InterleaveSequence)[destination] = (*InterleaveSequence)[iSequence];
 			destination++;
 		}
 	}
-	InterleaveSequenceIndex = destination;
+	auto newSize = gsl::narrow_cast<size_t>(destination);
+	if (newSize != InterleaveSequence->size()) {
+		InterleaveSequence->resize(newSize);
+		InterleaveSequenceIndex = newSize;
+	}
 #endif
 }
 
@@ -4850,6 +4857,7 @@ void form::refilfn() {
 		SelectedForm->type = FRMFPOLY;
 	}
 	InterleaveSequenceIndex       = 0;
+	InterleaveSequence->clear();
 	auto interleaveSequenceIndex2 = 0u; // index into interleave indices
 	StateMap.reset(StateFlag::ISUND);
 	auto textureSegments = std::vector<RNGCNT>{};

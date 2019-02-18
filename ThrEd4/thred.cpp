@@ -124,7 +124,9 @@ POINT         SideWindowSize;                // size of the side message window
 std::wstring* SideWindowsStrings;            // string array displayed in sidmsg
 dPOINT        CellSize;                      // size of an stitchMap cell for drawing stitch boxes
 unsigned      DraggedColor;                  // color being dragged
-POINT*        FormVerticesAsLine;            // form vertex clipboard paste into form line
+
+std::vector<POINT>* FormVerticesAsLine; // form vertex clipboard paste into form line
+
 unsigned int  LastFormSelected;              // end point of selected range of forms
 
 std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
@@ -11589,23 +11591,23 @@ void thred::internal::selfrmx() {
 
 void thred::internal::setpclp() noexcept {
 	auto point = POINT{};
-
+	FormVerticesAsLine->clear();
 	form::sfCor2px((*InterleaveSequence)[0], point);
-	FormVerticesAsLine[0] = point;
+	FormVerticesAsLine->push_back(point);
 	form::sfCor2px((*InterleaveSequence)[1], point);
 	const auto offset = POINT{ Msg.pt.x - StitchWindowOrigin.x - point.x, Msg.pt.y - StitchWindowOrigin.y - point.y };
 	for (auto ine = 1u; ine < OutputIndex - 1; ine++) {
 		form::sfCor2px((*InterleaveSequence)[ine], point);
-		FormVerticesAsLine[ine] = { point.x + offset.x, point.y + offset.y };
+		FormVerticesAsLine->push_back(POINT{ point.x + offset.x, point.y + offset.y });
 	}
 	form::sfCor2px((*InterleaveSequence)[OutputIndex - 1], point);
-	FormVerticesAsLine[OutputIndex - 1] = point;
+	FormVerticesAsLine->push_back(point);
 }
 
 void thred::internal::dupclp() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	PolylineInt(StitchWindowDC, FormVerticesAsLine, OutputIndex);
+	PolylineInt(StitchWindowDC, FormVerticesAsLine->data(), OutputIndex);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -15246,18 +15248,17 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
 								auto vertexIt         = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-								(*InterleaveSequence)[0] = vertexIt[ClosestVertexToCursor];
+								InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
 								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
 								auto iVertex = 0u;
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
-									(*InterleaveSequence)[iVertex + 1] = clipData[iVertex];
+									InterleaveSequence->push_back(clipData[iVertex]);
 								}
 								const auto nextVertex = form::nxt(ClosestVertexToCursor);
 								iVertex++;
-								(*InterleaveSequence)[iVertex] = vertexIt[nextVertex];
+								InterleaveSequence->push_back(vertexIt[nextVertex]);
 								OutputIndex                 = iVertex + 1;
-								FormVerticesAsLine          = convert_ptr<POINT*>(&(*InterleaveSequence)[OutputIndex]);
 								setpclp();
 								StateMap.set(StateFlag::FPUNCLP);
 								StateMap.set(StateFlag::SHOP);
@@ -18859,6 +18860,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_FormVertices = std::vector<fPOINT>{};
 		private_FormVertices.reserve(MAXITEMS);
 		FormVertices                = &private_FormVertices;
+		auto private_FormVerticesAsLine = std::vector<POINT>{};
+		FormVerticesAsLine = &private_FormVerticesAsLine;
 		auto private_RubberBandLine = std::vector<POINT>{};
 		private_RubberBandLine.resize(3);
 		RubberBandLine                 = &private_RubberBandLine;
@@ -18871,7 +18874,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_FormAngles          = std::vector<double>{};
 		FormAngles                       = &private_FormAngles;
 		auto private_InterleaveSequence  = std::vector<fPOINT>{};
-		private_InterleaveSequence.resize(MAXITEMS);
+		//private_InterleaveSequence.resize(MAXITEMS);
 		InterleaveSequence               = &private_InterleaveSequence;
 		auto private_AngledFormVertices  = std::vector<fPOINT>{};
 		AngledFormVertices               = &private_AngledFormVertices;
