@@ -129,7 +129,6 @@ POINT     InsertLine[3];         // the insert line
 std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
 std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
 
-unsigned InterleaveSequenceIndex;       // index into the interleave sequence
 INSREC   InterleaveSequenceIndices[10]; // indices into interleave points
 
 std::vector<fPOINT>*   InterleaveSequence;  // storage for interleave points

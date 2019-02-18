@@ -11589,7 +11589,7 @@ void thred::internal::selfrmx() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::setpclp() noexcept {
+void thred::internal::setpclp() {
 	auto point = POINT{};
 	FormVerticesAsLine->clear();
 	form::sfCor2px((*InterleaveSequence)[0], point);

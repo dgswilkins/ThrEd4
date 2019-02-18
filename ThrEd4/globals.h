@@ -162,7 +162,6 @@ extern POINT     InsertLine[3];
 extern std::vector<fPOINT>* InsidePointList;
 extern std::vector<fPOINT>* InsidePoints;
 
-extern unsigned InterleaveSequenceIndex;
 extern INSREC   InterleaveSequenceIndices[10];
 
 extern std::vector<fPOINT>*   InterleaveSequence;

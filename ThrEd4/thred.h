@@ -416,7 +416,7 @@ namespace internal {
 	void     setknots();
 	void     setknt();
 	void     setmov();
-	void     setpclp() noexcept;
+	void     setpclp();
 	void     setpcs();
 	void     setsped() noexcept;
 	void     setsrch(unsigned stitch);

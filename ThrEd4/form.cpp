@@ -1188,12 +1188,11 @@ void form::makspac(unsigned start, unsigned count) {
 	}
 }
 
-bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) noexcept {
+bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) {
 	const auto delta  = dPOINT{ finish.x - start.x, finish.y - start.y };
 	const auto length = hypot(delta.x, delta.y);
 
 	InterleaveSequence->push_back(start);
-	InterleaveSequenceIndex++;
 	if (length > MaxStitchLen) {
 		auto count = gsl::narrow<unsigned int>(std::ceil(length / userStitchLen));
 		if (count == 0u) {
@@ -1202,23 +1201,12 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 		while (length / count > MaxStitchLen) {
 			count++;
 		}
-		if (!form::chkmax(InterleaveSequenceIndex, count)) {
-			const auto step  = dPOINT{ delta.x / count, delta.y / count };
-			auto       point = fPOINT{ start.x + step.x, start.y + step.y };
-			for (auto iStep = 0u; iStep < count - 1; iStep++) {
-				if ((InterleaveSequenceIndex & MAXMSK) != 0u) {
-					InterleaveSequenceIndex = MAXITEMS - 2;
-					return false;
-				}
-				InterleaveSequence->push_back(point);
-				InterleaveSequenceIndex++;
-				point.x += step.x;
-				point.y += step.y;
-			}
-		}
-		else {
-			SequenceIndex = MAXITEMS - 2;
-			return false;
+		const auto step  = dPOINT{ delta.x / count, delta.y / count };
+		auto       point = fPOINT{ start.x + step.x, start.y + step.y };
+		for (auto iStep = 0u; iStep < count - 1; iStep++) {
+			InterleaveSequence->push_back(point);
+			point.x += step.x;
+			point.y += step.y;
 		}
 	}
 	return true;
@@ -1251,7 +1239,7 @@ void form::chkseq(bool border) {
 	auto minimumStitchLength = 0.0f;
 	auto userStitchLen       = 0.0f;
 
-	const auto savedIndex = InterleaveSequenceIndex;
+	const auto savedIndex = InterleaveSequence->size();
 	if (border) {
 		if (SelectedForm->maxBorderStitchLen == 0.0f) {
 			SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
@@ -1290,15 +1278,14 @@ void form::chkseq(bool border) {
 	}
 	if (flag) {
 		InterleaveSequence->push_back(OSequence[SequenceIndex - 1]);
-		InterleaveSequenceIndex++;
 	}
 	if (minimumStitchLength == 0.0f) {
 		return;
 	}
 	auto destination = savedIndex + 1;
-	for (auto iSequence = savedIndex + 1; iSequence < InterleaveSequenceIndex; iSequence++) {
+	for (auto iSequence = savedIndex + 1; iSequence < InterleaveSequence->size(); iSequence++) {
 		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1].x,
-			(*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
+		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
 		if (len > minimumStitchLength) {
 			(*InterleaveSequence)[destination] = (*InterleaveSequence)[iSequence];
 			destination++;
@@ -1307,14 +1294,14 @@ void form::chkseq(bool border) {
 	auto newSize = gsl::narrow_cast<size_t>(destination);
 	if (newSize != InterleaveSequence->size()) {
 		InterleaveSequence->resize(newSize);
-		InterleaveSequenceIndex = newSize;
 	}
 #endif
 }
 
 void form::internal::ritbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ TYPBRD, SelectedForm->borderColor & COLMSK, InterleaveSequenceIndex, I_BRD };
+		InterleaveSequenceIndices[interleaveSequenceIndex2]
+		    = INSREC{ TYPBRD, gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK, InterleaveSequence->size(), I_BRD };
 		form::chkseq(true);
 		interleaveSequenceIndex2++;
 	}
@@ -1322,7 +1309,8 @@ void form::internal::ritbrd(unsigned& interleaveSequenceIndex2) {
 
 void form::internal::ritapbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ TYPMSK, gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4, InterleaveSequenceIndex, I_AP };
+		InterleaveSequenceIndices[interleaveSequenceIndex2]
+		    = INSREC{ TYPMSK, gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4, InterleaveSequence->size(), I_AP };
 		form::chkseq(true);
 		interleaveSequenceIndex2++;
 	}
@@ -1330,15 +1318,16 @@ void form::internal::ritapbrd(unsigned& interleaveSequenceIndex2) {
 
 void form::internal::ritfil(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2] = INSREC{ TYPFRM, SelectedForm->fillColor, InterleaveSequenceIndex, I_FIL };
+		InterleaveSequenceIndices[interleaveSequenceIndex2]
+		    = INSREC{ TYPFRM, SelectedForm->fillColor, InterleaveSequence->size(), I_FIL };
 		form::chkseq(false);
 		interleaveSequenceIndex2++;
 	}
 }
 
-bool form::lastch() noexcept {
-	if (InterleaveSequenceIndex != 0u) {
-		LastPoint = (*InterleaveSequence)[InterleaveSequenceIndex - 1];
+bool form::lastch() {
+	if (!InterleaveSequence->empty()) {
+		LastPoint = InterleaveSequence->back();
 		return true;
 	}
 	{ return false; }
@@ -4559,15 +4548,14 @@ void form::internal::bakseq() {
 		iSequence--;
 	}
 	while (iSequence > 0) {
-		const auto rcnt = iSequence % RITSIZ;
+		const auto rcnt           = iSequence % RITSIZ;
 		const auto StitchSpacing2 = LineSpacing * 2;
 		const auto rit            = gsl::narrow<unsigned int>(std::round((*BSequence)[iSequence].x / StitchSpacing2));
-		auto&      bPrevious = (*BSequence)[iSequence - 1u];
-		auto&      bCurrent = (*BSequence)[iSequence];
-		auto&      bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
-		auto       delta
-		    = dPOINT{ bCurrent.x - bNext.x, bCurrent.y - bNext.y };
-		auto slope = 1e99;
+		auto&      bPrevious      = (*BSequence)[iSequence - 1u];
+		auto&      bCurrent       = (*BSequence)[iSequence];
+		auto&      bNext          = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+		auto       delta          = dPOINT{ bCurrent.x - bNext.x, bCurrent.y - bNext.y };
+		auto       slope          = 1e99;
 		if (delta.y != 0.0) {
 			slope = delta.x / delta.y;
 		}
@@ -4585,7 +4573,7 @@ void form::internal::bakseq() {
 						if (OSequence[SequenceIndex].y > bCurrent.y) {
 							break;
 						}
-						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bCurrent.y;
+						delta.y                      = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bCurrent.y;
 						OSequence[SequenceIndex++].x = bCurrent.x;
 						count++;
 					} while (true);
@@ -4599,7 +4587,7 @@ void form::internal::bakseq() {
 						if (OSequence[SequenceIndex].y < bPrevious.y) {
 							break;
 						}
-						delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bPrevious.y;
+						delta.y                      = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bPrevious.y;
 						OSequence[SequenceIndex++].x = bCurrent.x;
 						count--;
 					} while (true);
@@ -4613,8 +4601,8 @@ void form::internal::bakseq() {
 					if (OSequence[SequenceIndex].y > bCurrent.y) {
 						break;
 					}
-					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
-					delta.x = slope * delta.y;
+					delta.y                      = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
+					delta.x                      = slope * delta.y;
 					OSequence[SequenceIndex++].x = bNext.x + delta.x;
 					count++;
 				} while (true);
@@ -4630,8 +4618,8 @@ void form::internal::bakseq() {
 					if (OSequence[SequenceIndex].y < bCurrent.y) {
 						break;
 					}
-					delta.y = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
-					delta.x = slope * delta.y;
+					delta.y                      = gsl::narrow_cast<double>(OSequence[SequenceIndex].y) - bNext.y;
+					delta.x                      = slope * delta.y;
 					OSequence[SequenceIndex++].x = bNext.x + delta.x;
 					count--;
 				} while (true);
@@ -4640,8 +4628,7 @@ void form::internal::bakseq() {
 			break;
 		}
 		case 0: {
-			delta = dPOINT{ gsl::narrow_cast<double>(bCurrent.x) - bNext.x,
-				            gsl::narrow_cast<double>(bCurrent.y) - bNext.y };
+			delta = dPOINT{ gsl::narrow_cast<double>(bCurrent.x) - bNext.x, gsl::narrow_cast<double>(bCurrent.y) - bNext.y };
 			StateMap.reset(StateFlag::FILDIR);
 			const auto length = hypot(delta.x, delta.y);
 			if (length != 0.0) {
@@ -4762,15 +4749,15 @@ void form::internal::trfrm(const dPOINT& bottomLeftPoint,
 void form::internal::clpfm() {
 	ActivePointIndex = 0;
 	for (auto iSequence = 0u; iSequence < SequenceIndex - 2; iSequence += 2) {
-		auto& bSeq0 = (*BSequence)[iSequence];
-		auto& bSeq1 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
-		auto& bSeq2 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 2u];
-		auto& bSeq3 = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 3u];
+		auto&      bSeq0       = (*BSequence)[iSequence];
+		auto&      bSeq1       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+		auto&      bSeq2       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 2u];
+		auto&      bSeq3       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 3u];
 		const auto leftLength  = hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
 		const auto rightLength = hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
 		const auto leftDelta   = dPOINT{ bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y };
 		const auto rightDelta  = dPOINT{ bSeq2.x - bSeq3.x, bSeq2.y - bSeq3.y };
-		auto       count      = 0u;
+		auto       count       = 0u;
 		if (rightLength > leftLength) {
 			count = gsl::narrow<decltype(count)>(std::round(leftLength / ClipRectSize.cy));
 		}
@@ -4847,7 +4834,6 @@ void form::refilfn() {
 	    && SelectedForm->fillType != CONTF) {
 		SelectedForm->type = FRMFPOLY;
 	}
-	InterleaveSequenceIndex       = 0;
 	InterleaveSequence->clear();
 	auto interleaveSequenceIndex2 = 0u; // index into interleave indices
 	StateMap.reset(StateFlag::ISUND);

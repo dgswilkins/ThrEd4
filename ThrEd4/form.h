@@ -123,7 +123,7 @@ void infrm();
 void insat();
 void ispcdclp();
 void join();
-bool lastch() noexcept;
+bool lastch();
 bool linx(const std::vector<fPOINT>& points, unsigned int start, unsigned int finish, dPOINT& intersection);
 void makspac(unsigned start, unsigned count);
 void mdufrm();
@@ -424,7 +424,7 @@ namespace internal {
 	void   ritapbrd(unsigned& interleaveSequenceIndex2);
 	void   ritbrd(unsigned& interleaveSequenceIndex2);
 	void   ritfil(unsigned& interleaveSequenceIndex2);
-	bool   ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) noexcept;
+	bool   ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen);
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
 	              unsigned                   currentSegmentIndex,
