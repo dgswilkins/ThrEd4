@@ -8423,7 +8423,13 @@ void thred::internal::delet() {
 }
 
 void thred::internal::movi() {
-	rstAll();
+	if (StateMap.test(StateFlag::GRPSEL)) {
+		rstAll();
+		StateMap.set(StateFlag::GRPSEL);
+	}
+	else {
+		rstAll();
+	}
 	if (PCSHeader.stitchCount != 0u) {
 		if (MsgWindow != nullptr) {
 			DestroyWindow(MsgWindow);
@@ -14655,7 +14661,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 		}
 		if (code == 'I') {
-			movi();
+			thi::movi();
 			LastKeyCode = 'I';
 			return true;
 		}
@@ -16745,7 +16751,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 		case ID_RUNPAT: { // view / Movie
-			movi();
+			thi::movi();
 			break;
 		}
 		case ID_LENDEF: { // Todo - No menu item in thred.rc for this option
