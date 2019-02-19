@@ -18797,145 +18797,145 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
-		auto private_TracedMap   = boost::dynamic_bitset<>{};
-		TracedMap                = &private_TracedMap;
-		auto private_TracedEdges = boost::dynamic_bitset<>{};
-		TracedEdges              = &private_TracedEdges;
-		auto private_Thumbnails  = std::vector<std::wstring>{};
-		Thumbnails               = &private_Thumbnails;
-		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
-		UndoBuffer                             = &private_UndoBuffer;
-		auto private_TempTexturePoints         = std::vector<TXPNT>{};
-		auto private_SelectedTexturePointsList = std::vector<unsigned int>{};
-		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
-		auto private_StringTable = std::vector<std::wstring>{};
-		private_StringTable.resize(STR_LEN);
-		StringTable            = &private_StringTable;
-		auto private_ButtonWin = std::vector<HWND>{};
-		ButtonWin              = &private_ButtonWin;
-		auto private_FormOnOff = std::wstring{};
-		FormOnOff              = &private_FormOnOff;
+		auto private_AngledFormVertices        = std::vector<fPOINT>{};
+		auto private_AuxName                   = fs::path{};
+		auto private_BSequence                 = std::vector<BSEQPNT>{};
+		auto private_BalaradName0              = fs::path{};
+		auto private_BalaradName1              = fs::path{};
+		auto private_BalaradName2              = fs::path{};
+		auto private_ButtonWin                 = std::vector<HWND>{};
+		auto private_ClipBuffer                = std::vector<fPOINTATTR>{};
+		auto private_ClipPoints                = std::vector<fPOINT>{};
+		auto private_ColorFileName             = fs::path{};
+		auto private_DefaultBMPDirectory       = fs::path{};
+		auto private_DefaultColorWin           = std::vector<HWND>{};
+		auto private_DefaultDirectory          = fs::path{};
+		auto private_DesignerName              = std::wstring{};
+		auto private_FormAngles                = std::vector<double>{};
+		auto private_FormControlPoints         = std::vector<POINT>{};
+		auto private_FormLines                 = std::vector<POINT>{};
+		auto private_FormList                  = std::vector<FRMHED>{};
+		auto private_FormOnOff                 = std::wstring{};
+		auto private_FormVertices              = std::vector<fPOINT>{};
+		auto private_FormVerticesAsLine        = std::vector<POINT>{};
+		auto private_GeName                    = fs::path{};
+		auto private_HomeDirectory             = fs::path{};
+		auto private_IniFileName               = fs::path{};
+		auto private_InsidePointList           = std::vector<fPOINT>{};
+		auto private_InterleaveSequence        = std::vector<fPOINT>{};
+		auto private_InterleaveSequenceIndices = std::vector<INSREC>{};
+		auto private_LabelWindow               = std::vector<HWND>{};
 #pragma warning(push)
 #pragma warning(disable : 26465) // supress warning for casting away the const
 		auto formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
 #pragma warning(pop)
 
-		auto private_MenuInfo = MENUITEMINFO {
+		auto private_MenuInfo = MENUITEMINFO{
 			sizeof(MENUITEMINFO), // Size
-			    MIIM_TYPE,        // Mask
-			    MFT_STRING,       // Type
-			    0,                // State
-			    0,                // ID
-			    nullptr,          // SubMenu
-			    nullptr,          // bmpChecked
-			    nullptr,          // bmpUnchecked
-			    0,                // ItemData
-			    formOnOff,        // TypeData
-			    16,               // cch
+				MIIM_TYPE,        // Mask
+				MFT_STRING,       // Type
+				0,                // State
+				0,                // ID
+				nullptr,          // SubMenu
+				nullptr,          // bmpChecked
+				nullptr,          // bmpUnchecked
+				0,                // ItemData
+				formOnOff,        // TypeData
+				16,               // cch
 #if (WINVER >= 0x0500)
-			    nullptr // bmpItem
+				nullptr // bmpItem
 #endif                  /* WINVER >= 0x0500 */
 		};
-		MenuInfo                      = &private_MenuInfo;
-		auto private_TempPolygon      = std::vector<fPOINT>{};
-		TempPolygon                   = &private_TempPolygon;
-		auto private_BSequence        = std::vector<BSEQPNT>{};
-		BSequence                     = &private_BSequence;
-		auto private_ClipBuffer       = std::vector<fPOINTATTR>{};
-		ClipBuffer                    = &private_ClipBuffer;
-		auto private_ClipPoints       = std::vector<fPOINT>{};
-		ClipPoints                    = &private_ClipPoints;
-		auto private_OutsidePointList = std::vector<fPOINT>{};
-		OutsidePointList              = &private_OutsidePointList;
-		auto private_InsidePointList  = std::vector<fPOINT>{};
-		InsidePointList               = &private_InsidePointList;
-		auto private_ValueWindow      = std::vector<HWND>{};
-		private_ValueWindow.resize(LASTLIN);
-		ValueWindow              = &private_ValueWindow;
-		auto private_LabelWindow = std::vector<HWND>{};
-		private_LabelWindow.resize(LASTLIN);
-		LabelWindow                    = &private_LabelWindow;
-		auto private_SelectedFormList  = std::vector<unsigned int>{};
-		SelectedFormList               = &private_SelectedFormList;
-		auto private_FormControlPoints = std::vector<POINT>{};
+		auto private_OutsidePointList          = std::vector<fPOINT>{};
+		auto private_PreviousNames             = std::vector<fs::path>{};
+		auto private_RGBFileName               = fs::path{};
+		auto private_RubberBandLine            = std::vector<POINT>{};
+		auto private_SatinGuides               = std::vector<SATCON>{};
+		auto private_SearchName                = fs::path{};
+		auto private_SelectedFormList          = std::vector<unsigned int>{};
+		auto private_SelectedFormsLine         = std::vector<POINT>{};
+		auto private_SelectedPointsLine        = std::vector<POINT>{};
+		auto private_SelectedTexturePointsList = std::vector<unsigned int>{};
+		auto private_StringTable               = std::vector<std::wstring>{};
+		auto private_TempPolygon               = std::vector<fPOINT>{};
+		auto private_TempTexturePoints         = std::vector<TXPNT>{};
+		auto private_TexturePointsBuffer       = std::vector<TXPNT>{};
+		auto private_ThrName                   = fs::path{};
+		auto private_Thumbnails                = std::vector<std::wstring>{};
+		auto private_TracedEdges               = boost::dynamic_bitset<>{};
+		auto private_TracedMap                 = boost::dynamic_bitset<>{};
+		auto private_UndoBuffer                = std::vector<std::unique_ptr<unsigned[]>>{};
+		auto private_UserBMPFileName           = fs::path{};
+		auto private_ValueWindow               = std::vector<HWND>{};
+		auto private_WorkingFileName           = fs::path{};
+		auto private_textureInputBuffer        = std::wstring{};
+
+		private_DefaultColorWin.resize(16);
 		private_FormControlPoints.resize(10);
-		FormControlPoints         = &private_FormControlPoints;
-		auto private_FormLines    = std::vector<POINT>{};
-		FormLines                 = &private_FormLines;
-		auto private_FormList     = std::vector<FRMHED>{};
-		FormList                  = &private_FormList;
-		auto private_FormVertices = std::vector<fPOINT>{};
 		private_FormVertices.reserve(MAXITEMS);
-		FormVertices                = &private_FormVertices;
-		auto private_FormVerticesAsLine = std::vector<POINT>{};
-		FormVerticesAsLine = &private_FormVerticesAsLine;
-		auto private_InterleaveSequenceIndices = std::vector<INSREC>{};
-		InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
-		auto private_RubberBandLine = std::vector<POINT>{};
-		private_RubberBandLine.resize(3);
-		RubberBandLine                 = &private_RubberBandLine;
-		auto private_SelectedFormsLine = std::vector<POINT>{};
-		private_SelectedFormsLine.resize(9);
-		SelectedFormsLine               = &private_SelectedFormsLine;
-		auto private_SelectedPointsLine = std::vector<POINT>{};
-		private_SelectedPointsLine.resize(9);
-		SelectedPointsLine               = &private_SelectedPointsLine;
-		auto private_FormAngles          = std::vector<double>{};
-		FormAngles                       = &private_FormAngles;
-		auto private_InterleaveSequence  = std::vector<fPOINT>{};
-		//private_InterleaveSequence.resize(MAXITEMS);
-		InterleaveSequence               = &private_InterleaveSequence;
-		auto private_AngledFormVertices  = std::vector<fPOINT>{};
-		AngledFormVertices               = &private_AngledFormVertices;
-		auto private_textureInputBuffer  = std::wstring{};
-		TextureInputBuffer               = &private_textureInputBuffer;
-		auto private_TexturePointsBuffer = std::vector<TXPNT>{};
-		TexturePointsBuffer              = &private_TexturePointsBuffer;
-		auto private_PreviousNames       = std::vector<fs::path>{};
+		private_LabelWindow.resize(LASTLIN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
 		}
-		PreviousNames             = &private_PreviousNames;
-		auto private_DesignerName = std::wstring{};
+		private_RubberBandLine.resize(3);
+		private_SelectedFormsLine.resize(9);
+		private_SelectedPointsLine.resize(9);
+		private_StringTable.resize(STR_LEN);
+		private_UndoBuffer.resize(16);
+		private_ValueWindow.resize(LASTLIN);
+
+		AngledFormVertices        = &private_AngledFormVertices;
+		AuxName                   = &private_AuxName;
+		BSequence                 = &private_BSequence;
+		BalaradName0              = &private_BalaradName0;
+		BalaradName1              = &private_BalaradName1;
+		BalaradName2              = &private_BalaradName2;
+		ButtonWin                 = &private_ButtonWin;
+		ClipBuffer                = &private_ClipBuffer;
+		ClipPoints                = &private_ClipPoints;
+		ColorFileName             = &private_ColorFileName;
+		DefaultBMPDirectory       = &private_DefaultBMPDirectory;
+		DefaultColorWin           = &private_DefaultColorWin;
+		DefaultDirectory          = &private_DefaultDirectory;
 		DesignerName              = &private_DesignerName;
-		auto private_SatinGuides  = std::vector<SATCON>{};
+		FormAngles                = &private_FormAngles;
+		FormControlPoints         = &private_FormControlPoints;
+		FormLines                 = &private_FormLines;
+		FormList                  = &private_FormList;
+		FormOnOff                 = &private_FormOnOff;
+		FormVertices              = &private_FormVertices;
+		FormVerticesAsLine        = &private_FormVerticesAsLine;
+		GeName                    = &private_GeName;
+		HomeDirectory             = &private_HomeDirectory;
+		IniFileName               = &private_IniFileName;
+		InsidePointList           = &private_InsidePointList;
+		InterleaveSequence        = &private_InterleaveSequence;
+		InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
+		LabelWindow               = &private_LabelWindow;
+		MenuInfo                  = &private_MenuInfo;
+		OutsidePointList          = &private_OutsidePointList;
+		PreviousNames             = &private_PreviousNames;
+		RGBFileName               = &private_RGBFileName;
+		RubberBandLine            = &private_RubberBandLine;
 		SatinGuides               = &private_SatinGuides;
+		SearchName                = &private_SearchName;
+		SelectedFormList          = &private_SelectedFormList;
+		SelectedFormsLine         = &private_SelectedFormsLine;
+		SelectedPointsLine        = &private_SelectedPointsLine;
+		StringTable               = &private_StringTable;
+		TempPolygon               = &private_TempPolygon;
+		TextureInputBuffer        = &private_textureInputBuffer;
+		TexturePointsBuffer       = &private_TexturePointsBuffer;
+		ThrName                   = &private_ThrName;
+		Thumbnails                = &private_Thumbnails;
+		TracedEdges               = &private_TracedEdges;
+		TracedMap                 = &private_TracedMap;
+		UndoBuffer                = &private_UndoBuffer;
+		UserBMPFileName           = &private_UserBMPFileName;
+		ValueWindow               = &private_ValueWindow;
+		WorkingFileName           = &private_WorkingFileName;
 
-		auto private_AuxName             = fs::path{};
-		auto private_ThrName             = fs::path{};
-		auto private_WorkingFileName     = fs::path{};
-		auto private_GeName              = fs::path{};
-		auto private_ColorFileName       = fs::path{};
-		auto private_RGBFileName         = fs::path{};
-		auto private_DefaultDirectory    = fs::path{};
-		auto private_SearchName          = fs::path{};
-		auto private_DefaultBMPDirectory = fs::path{};
-		auto private_BalaradName0        = fs::path{};
-		auto private_BalaradName1        = fs::path{};
-		auto private_BalaradName2        = fs::path{};
-		auto private_HomeDirectory       = fs::path{};
-		auto private_UserBMPFileName     = fs::path{};
-		auto private_IniFileName         = fs::path{};
-
-		AuxName             = &private_AuxName;
-		WorkingFileName     = &private_WorkingFileName;
-		ThrName             = &private_ThrName;
-		GeName              = &private_GeName;
-		ColorFileName       = &private_ColorFileName;
-		RGBFileName         = &private_RGBFileName;
-		DefaultDirectory    = &private_DefaultDirectory;
-		SearchName          = &private_SearchName;
-		DefaultBMPDirectory = &private_DefaultBMPDirectory;
-		BalaradName0        = &private_BalaradName0;
-		BalaradName1        = &private_BalaradName1;
-		BalaradName2        = &private_BalaradName2;
-		HomeDirectory       = &private_HomeDirectory;
-		UserBMPFileName     = &private_UserBMPFileName;
-		IniFileName         = &private_IniFileName;
-
-		auto private_DefaultColorWin = std::vector<HWND>{};
-		private_DefaultColorWin.resize(16);
-		DefaultColorWin = &private_DefaultColorWin;
+		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 
 		thi::redini();
 
