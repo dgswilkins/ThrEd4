@@ -24,9 +24,9 @@ namespace xt {
 
 void chgchk(unsigned char code);
 void chgwrn();
-void chkcwlk(unsigned& interleaveSequenceIndex2);
-void chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2);
-void chkwlk(unsigned& interleaveSequenceIndex2);
+void chkcwlk();
+void chkund(const std::vector<RNGCNT>& textureSegments);
+void chkwlk();
 void clrstch() noexcept;
 
 #ifdef _DEBUG
@@ -58,11 +58,11 @@ void fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap);
 void fethr();
 void fethrf();
 void fsort();
-void fthrfn(unsigned& interleaveSequenceIndex2);
+void fthrfn();
 
 std::vector<fPOINT>& insid();
 
-void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, unsigned interleaveSequenceIndex2);
+void intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap);
 void mvshft();
 void notcwlk();
 void notund();
@@ -119,7 +119,7 @@ namespace internal {
 	void     chkend(unsigned offset, unsigned code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<unsigned>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
-	void     chkuseq(unsigned interleaveSequenceIndex2);
+	void     chkuseq();
 	void     delwlk(unsigned int code);
 
 #ifdef _DEBUG
@@ -148,10 +148,10 @@ namespace internal {
 	void  flenfn(unsigned int find, float length);
 	void  fmaxfn(unsigned int find, float length);
 	void  fminfn(unsigned int find, float length);
-	void  fncwlk(unsigned& interleaveSequenceIndex2);
-	void  fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, unsigned& interleaveSequenceIndex2);
-	void  fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2);
-	void  fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2);
+	void  fncwlk();
+	void  fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find);
+	void  fnwlk(unsigned int find);
+	void  fritfil(std::vector<fPOINT>& featherSequence);
 	void  fspacfn(unsigned int find, float spacing);
 	void  fthdfn(unsigned int iSequence, FEATHER& feather);
 	void  fthfn(unsigned int iSequence, FEATHER& feather);
@@ -175,9 +175,9 @@ namespace internal {
 	bool recmp(const OREC* record1, const OREC* record2) noexcept;
 	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
-	void ritcwlk(unsigned& interleaveSequenceIndex2);
-	void ritund(unsigned& interleaveSequenceIndex2);
-	void ritwlk(unsigned& interleaveSequenceIndex2);
+	void ritcwlk();
+	void ritund();
+	void ritwlk();
 	void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 

@@ -310,11 +310,10 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	}
 }
 
-void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 	if (SequenceIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
-		interleaveSequenceIndex2++;
 		if (((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u)
 		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
 			InterleaveSequenceIndices->emplace_back(INSREC{ FTHMSK, SelectedForm->fillInfo.feather.color, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FTH });
@@ -327,12 +326,11 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence, unsigned& inter
 			}
 			SequenceIndex = sequenceMax;
 			form::chkseq(false);
-			interleaveSequenceIndex2++;
 		}
 	}
 }
 
-void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
+void xt::fthrfn() {
 	const auto savedSpacing = LineSpacing;
 	auto       feather      = FEATHER{};
 
@@ -408,7 +406,7 @@ void xt::fthrfn(unsigned& interleaveSequenceIndex2) {
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
 	SequenceIndex = OutputIndex;
-	xi::fritfil(featherSequence, interleaveSequenceIndex2);
+	xi::fritfil(featherSequence);
 }
 
 void xt::fethrf() {
@@ -608,14 +606,14 @@ void xt::internal::delwlk(unsigned int code) {
 	}
 }
 
-void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
+void xt::internal::chkuseq() {
 #if BUGBAK
 	unsigned index;
 
 	for (index = 0; index < OutputIndex; index++) {
 		InterleaveSequence->push_back(OSequence[index]);
 	}
-	(*InterleaveSequenceIndices)[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
+	InterleaveSequenceIndices->back().color = SelectedForm->underlayColor;
 #else
 
 	if (OutputIndex != 0u) {
@@ -645,24 +643,22 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 			}
 		}
 		InterleaveSequence->push_back(OSequence[OutputIndex - 1]);
-		(*InterleaveSequenceIndices)[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
+		InterleaveSequenceIndices->front().color = SelectedForm->underlayColor;
 	}
 #endif
 }
 
-void xt::internal::ritwlk(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ WLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()),I_FIL });
-		chkuseq(interleaveSequenceIndex2);
-		interleaveSequenceIndex2++;
+		chkuseq();
 	}
 }
 
-void xt::internal::ritcwlk(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritcwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ CWLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
-		chkuseq(interleaveSequenceIndex2);
-		interleaveSequenceIndex2++;
+		chkuseq();
 	}
 }
 
@@ -740,7 +736,7 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 	return iStitch - destination;
 }
 
-void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fnwlk(unsigned int find) {
 	form::fvars(find);
 	if (SelectedForm->type == FRMLINE) {
 		SelectedForm->type = FRMFPOLY;
@@ -761,14 +757,13 @@ void xt::internal::fnwlk(unsigned int find, unsigned& interleaveSequenceIndex2) 
 		OutputIndex++;
 		count--;
 	}
-	ritwlk(interleaveSequenceIndex2);
+	ritwlk();
 }
 
-void xt::internal::ritund(unsigned& interleaveSequenceIndex2) {
+void xt::internal::ritund() {
 	if (SequenceIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ UNDMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
-		chkuseq(interleaveSequenceIndex2);
-		interleaveSequenceIndex2++;
+		chkuseq();
 	}
 }
 
@@ -783,7 +778,7 @@ void xt::internal::undclp() {
 	clipBuffer.push_back(fPOINTATTR{ 0, SelectedForm->underlayStitchLen, 0 });
 }
 
-void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
+void xt::internal::fncwlk() {
 	OutputIndex = 0;
 	SelectedForm->extendedAttribute |= AT_CWLK;
 	if (SelectedForm->satinGuideCount != 0u) {
@@ -830,7 +825,7 @@ void xt::internal::fncwlk(unsigned& interleaveSequenceIndex2) {
 		OSequence[OutputIndex] = vertexIt[start];
 		OutputIndex++;
 	}
-	ritcwlk(interleaveSequenceIndex2);
+	ritcwlk();
 }
 
 void xt::srtcol() {
@@ -910,25 +905,25 @@ void xt::setulen() {
 	displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
-void xt::chkcwlk(unsigned& interleaveSequenceIndex2) {
+void xt::chkcwlk() {
 	if ((SelectedForm->extendedAttribute & AT_CWLK) != 0u) {
-		xi::fncwlk(interleaveSequenceIndex2);
+		xi::fncwlk();
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
 	}
 }
 
-void xt::chkwlk(unsigned& interleaveSequenceIndex2) {
+void xt::chkwlk() {
 	if ((SelectedForm->extendedAttribute & AT_WALK) != 0u) {
-		xi::fnwlk(ClosestFormToCursor, interleaveSequenceIndex2);
+		xi::fnwlk(ClosestFormToCursor);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 	}
 }
 
-void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, unsigned& interleaveSequenceIndex2) {
+void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find) {
 	const auto savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -942,14 +937,14 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned in
 	StateMap.set(StateFlag::ISUND);
 	form::angclpfn(textureSegments);
 	OutputIndex = SequenceIndex;
-	ritund(interleaveSequenceIndex2);
+	ritund();
 	form::fvars(find);
 	UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(const std::vector<RNGCNT>& textureSegments, unsigned& interleaveSequenceIndex2) {
+void xt::chkund(const std::vector<RNGCNT>& textureSegments) {
 	if ((SelectedForm->extendedAttribute & AT_UND) != 0u) {
-		xi::fnund(textureSegments, ClosestFormToCursor, interleaveSequenceIndex2);
+		xi::fnund(textureSegments, ClosestFormToCursor);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
@@ -1552,7 +1547,7 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 	}
 }
 
-void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const unsigned interleaveSequenceIndex2) {
+void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
 	auto ilData = INTINF{};
 
 	StateMap.reset(StateFlag::ISEND);
@@ -1566,7 +1561,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		// Todo - Allocate memory locally for ilData.highStitchBuffer
 		ilData.highStitchBuffer = &StitchBuffer[MAXITEMS];
 		auto code               = 0u;
-		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
+		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			ilData.pins = iSequence;
 			switch ((*InterleaveSequenceIndices)[iSequence].seq) {
 			case I_AP: {
@@ -1632,7 +1627,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap, const u
 		const auto offset   = 0;
 		auto       code     = 0u;
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		for (auto iSequence = 0u; iSequence < interleaveSequenceIndex2; iSequence++) {
+		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			code = gsl::narrow<unsigned int>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
 			                                 | (*InterleaveSequenceIndices)[iSequence].color);
 			if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {

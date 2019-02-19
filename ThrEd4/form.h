@@ -221,7 +221,7 @@ namespace internal {
 	            unsigned&                     lastGroup,
 	            SMALPNTL*                     sequenceLines);
 	bool chk2of();
-	void chkbrd(unsigned& interleaveSequenceIndex2);
+	void chkbrd();
 	void chksid(unsigned int vertexIndex, unsigned clipIntersectSide, const std::vector<fPOINT>* currentFormVertices);
 	bool closat(intersectionStyles& inOutFlag);
 	bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
@@ -421,9 +421,9 @@ namespace internal {
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
 	              const std::vector<REGION>&    regionsList);
-	void   ritapbrd(unsigned& interleaveSequenceIndex2);
-	void   ritbrd(unsigned& interleaveSequenceIndex2);
-	void   ritfil(unsigned& interleaveSequenceIndex2);
+	void   ritapbrd();
+	void   ritbrd();
+	void   ritfil();
 	bool   ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen);
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
