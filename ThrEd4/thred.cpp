@@ -18863,6 +18863,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		FormVertices                = &private_FormVertices;
 		auto private_FormVerticesAsLine = std::vector<POINT>{};
 		FormVerticesAsLine = &private_FormVerticesAsLine;
+		auto private_InterleaveSequenceIndices = std::vector<INSREC>{};
+		InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
 		auto private_RubberBandLine = std::vector<POINT>{};
 		private_RubberBandLine.resize(3);
 		RubberBandLine                 = &private_RubberBandLine;

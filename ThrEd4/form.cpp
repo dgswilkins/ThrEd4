@@ -1300,8 +1300,7 @@ void form::chkseq(bool border) {
 
 void form::internal::ritbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2]
-		    = INSREC{ TYPBRD, gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_BRD };
+		InterleaveSequenceIndices->emplace_back(INSREC{ TYPBRD, gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_BRD });
 		form::chkseq(true);
 		interleaveSequenceIndex2++;
 	}
@@ -1309,8 +1308,7 @@ void form::internal::ritbrd(unsigned& interleaveSequenceIndex2) {
 
 void form::internal::ritapbrd(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2]
-		    = INSREC{ TYPMSK, gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_AP };
+		InterleaveSequenceIndices->emplace_back(INSREC{ TYPMSK, gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_AP });
 		form::chkseq(true);
 		interleaveSequenceIndex2++;
 	}
@@ -1318,8 +1316,7 @@ void form::internal::ritapbrd(unsigned& interleaveSequenceIndex2) {
 
 void form::internal::ritfil(unsigned& interleaveSequenceIndex2) {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices[interleaveSequenceIndex2]
-		    = INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL };
+		InterleaveSequenceIndices->emplace_back(INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
 		interleaveSequenceIndex2++;
 	}
@@ -4835,6 +4832,7 @@ void form::refilfn() {
 		SelectedForm->type = FRMFPOLY;
 	}
 	InterleaveSequence->clear();
+	InterleaveSequenceIndices->clear();
 	auto interleaveSequenceIndex2 = 0u; // index into interleave indices
 	StateMap.reset(StateFlag::ISUND);
 	auto textureSegments = std::vector<RNGCNT>{};
