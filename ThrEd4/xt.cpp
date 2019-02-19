@@ -613,10 +613,9 @@ void xt::internal::chkuseq(const unsigned interleaveSequenceIndex2) {
 	unsigned index;
 
 	for (index = 0; index < OutputIndex; index++) {
-		(*InterleaveSequence)[index] = OSequence[index];
+		InterleaveSequence->push_back(OSequence[index]);
 	}
-	InterleaveSequenceIndex                                   = index;
-	(*InterleaveSequenceIndices)[interleaveSequenceIndex2].color = SelectedForm->UnderlayColor;
+	(*InterleaveSequenceIndices)[interleaveSequenceIndex2].color = SelectedForm->underlayColor;
 #else
 
 	if (OutputIndex != 0u) {

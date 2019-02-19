@@ -1231,9 +1231,8 @@ void form::chkseq(bool border) {
 #if BUGBAK
 
 	for (auto index = 0u; index < SequenceIndex; index++) {
-		InterleaveSequence->push_back((*OSequence)[index]);
+		InterleaveSequence->push_back(OSequence[index]);
 	}
-	InterleaveSequenceIndex = SequenceIndex;
 #else
 
 	auto minimumStitchLength = 0.0f;
