@@ -643,6 +643,7 @@ void xt::internal::chkuseq() {
 			}
 		}
 		InterleaveSequence->push_back(OSequence[OutputIndex - 1]);
+		// ToDo - should this be front or (back - 1) ?
 		InterleaveSequenceIndices->front().color = SelectedForm->underlayColor;
 	}
 #endif
