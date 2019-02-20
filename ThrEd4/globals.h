@@ -187,7 +187,9 @@ extern HPEN         MultiFormPen;
 extern unsigned     NearestCount;
 extern unsigned int NewFormVertexCount;
 extern HWND         OKButton;
-extern fPOINT       OSequence[OSEQLEN];
+
+extern std::vector<fPOINT>* OSequence;
+
 extern bool         OutLineEverySelectedForm;
 extern unsigned int OutputIndex;
 

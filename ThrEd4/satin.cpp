@@ -871,7 +871,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				}
 				else {
 					SelectedPoint              = vertexIt[line1Start];
-					OSequence[SequenceIndex++] = SelectedPoint;
+					(*OSequence)[SequenceIndex++] = SelectedPoint;
 				}
 			}
 		}
@@ -1139,7 +1139,7 @@ void satin::satfil() {
 			length       = (length - lengths[1]) / 2;
 			auto iVertex = 1u;
 			if (!StateMap.test(StateFlag::BARSAT)) {
-				OSequence[0] = SelectedPoint = vertexIt[1];
+				(*OSequence)[0] = SelectedPoint = vertexIt[1];
 				SequenceIndex                = 1;
 			}
 			while ((iVertex < (VertexCount + 1)) && (length > lengths[iVertex])) {
@@ -1161,7 +1161,7 @@ void satin::satfil() {
 		length /= 2;
 		auto iVertex = 0;
 		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
-			OSequence[0] = SelectedPoint = vertexIt[0];
+			(*OSequence)[0] = SelectedPoint = vertexIt[0];
 			SequenceIndex                = 1;
 		}
 		while (length > lengths[iVertex]) {
@@ -1364,7 +1364,7 @@ void satin::internal::sfn(unsigned int startVertex) {
 		si::sbfn(*InsidePoints, startVertex, nextVertex);
 		startVertex = nextVertex;
 	}
-	OSequence[0] = OSequence[SequenceIndex - 1];
+	(*OSequence)[0] = (*OSequence)[SequenceIndex - 1];
 	if (SequenceIndex > MAXITEMS - 2) {
 		SequenceIndex = MAXITEMS - 2;
 	}

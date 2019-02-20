@@ -154,7 +154,9 @@ HPEN         MultiFormPen;                        // multiple selected forms pen
 unsigned     NearestCount;                        // number of boxes selected
 unsigned int NewFormVertexCount;                  // points in the new form
 HWND         OKButton;                            // ok button
-fPOINT       OSequence[OSEQLEN];                  // temporary storage for sequencing
+
+std::vector<fPOINT>* OSequence; // temporary storage for sequencing
+
 bool         OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
 unsigned int OutputIndex;                         // output pointer for sequencing
 

@@ -18846,6 +18846,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				nullptr // bmpItem
 #endif                  /* WINVER >= 0x0500 */
 		};
+		auto private_OSequence                 = std::vector<fPOINT>{};
 		auto private_OutsidePointList          = std::vector<fPOINT>{};
 		auto private_PreviousNames             = std::vector<fs::path>{};
 		auto private_RGBFileName               = fs::path{};
@@ -18874,6 +18875,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_FormControlPoints.resize(10);
 		private_FormVertices.reserve(MAXITEMS);
 		private_LabelWindow.resize(LASTLIN);
+		private_OSequence.resize(OSEQLEN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
 		}
@@ -18913,6 +18915,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
 		LabelWindow               = &private_LabelWindow;
 		MenuInfo                  = &private_MenuInfo;
+		OSequence                 = &private_OSequence;
 		OutsidePointList          = &private_OutsidePointList;
 		PreviousNames             = &private_PreviousNames;
 		RGBFileName               = &private_RGBFileName;
