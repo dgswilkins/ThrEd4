@@ -4089,19 +4089,19 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 	auto        sequenceMap   = boost::dynamic_bitset<>(lineCount);
 	auto        nextGroup     = sequencePath[pthi].nextGroup;
 	const auto  iRegion       = sequencePath[pthi].node;
-	const auto* currentRegion = &regionsList[iRegion];
-	const auto  sequenceStart = currentRegion->start;
-	const auto  sequenceEnd   = currentRegion->end;
+	const auto& currentRegion = regionsList[iRegion];
+	const auto  sequenceStart = currentRegion.start;
+	const auto  sequenceEnd   = currentRegion.end;
 	if (sequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
 		if ((*BSequence)[OutputIndex - 1].attribute != SEQBOT) {
 			rspnt((*BSequence)[OutputIndex - 2].x, (*BSequence)[OutputIndex - 2].y);
 		}
 		const auto  firstLine     = sortedLines[sequenceStart]->line;
-		const auto* bpnt          = &(*BSequence)[OutputIndex - 1];
+		const auto& bpnt          = (*BSequence)[OutputIndex - 1];
 		auto        minimumLength = 1e99;
 		auto        mindif        = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-			const auto length = hypot(bpnt->x - (*WorkingFormVertices)[iVertex].x, bpnt->y - (*WorkingFormVertices)[iVertex].y);
+			const auto length = hypot(bpnt.x - (*WorkingFormVertices)[iVertex].x, bpnt.y - (*WorkingFormVertices)[iVertex].y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				mindif        = iVertex;
@@ -4136,8 +4136,8 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		dun = false;
 		visitedRegions.set(iRegion);
 	}
-	const auto groupStart = sortedLines[currentRegion->start]->group;
-	const auto groupEnd   = sortedLines[currentRegion->end]->group;
+	const auto groupStart = sortedLines[currentRegion.start]->group;
+	const auto groupEnd   = sortedLines[currentRegion.end]->group;
 	auto       seql       = 0u;
 	if (groupEnd != groupStart) {
 		const auto intermediate
@@ -4219,7 +4219,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		}
 	}
 	auto sequenceLines = gsl::narrow_cast<SMALPNTL*>(nullptr);
-	if (currentRegion->breakCount != 0u) {
+	if (currentRegion.breakCount != 0u) {
 		if (dun) {
 			brkdun(sortedLines, seql, seqn);
 		}
