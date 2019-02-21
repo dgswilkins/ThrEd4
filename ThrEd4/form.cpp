@@ -4344,7 +4344,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		// Note - this debug code only works for vertical fill on a single form
 		auto bugColor = 0u;
 		auto index    = 0u;
-		for (auto iRegion = 0u; iRegion < RegionCount; iRegion++) {
+		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
 				auto lineGroupPoint           = &*sortedLines[iLine];
 				StitchBuffer[index].attribute = bugColor;
@@ -4442,8 +4442,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				}
 			}
 			if (dontSkip) {
-				pathMap[pathMapIndex].node      = leftRegion;
-				pathMap[pathMapIndex].nextGroup = 0;
+				pathMap.push_back(RCON{ leftRegion, 0, 0 });
 				inPath                          = pathMapIndex;
 			}
 			// set the first entry in the temporary path to the leftmost region
