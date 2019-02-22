@@ -4348,12 +4348,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
 				auto lineGroupPoint           = &*sortedLines[iLine];
-				StitchBuffer[index].attribute = bugColor;
-				StitchBuffer[index].x         = lineGroupPoint[0].x;
-				StitchBuffer[index++].y       = lineGroupPoint[0].y;
-				StitchBuffer[index].attribute = bugColor;
-				StitchBuffer[index].x         = lineGroupPoint[1].x;
-				StitchBuffer[index++].y       = lineGroupPoint[1].y;
+				StitchBuffer[index++] = (fPOINTATTR{ lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
+				StitchBuffer[index++] = (fPOINTATTR{ lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
 			}
 			bugColor++;
 			bugColor &= 0xf;

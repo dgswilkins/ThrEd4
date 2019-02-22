@@ -821,9 +821,17 @@ public:
 class fPOINTATTR
 {
 public:
-	float    x;
-	float    y;
-	unsigned attribute;
+	float    x{ 0.0f };
+	float    y{ 0.0f };
+	unsigned attribute{ 0u };
+
+	constexpr fPOINTATTR() noexcept = default;
+	inline fPOINTATTR(double rhsX, double rhsY, unsigned rhsA) noexcept;
+	inline fPOINTATTR(float rhsX, float rhsY, unsigned rhsA) noexcept;
+	// fPOINTATTR(fPOINTATTR&&) = default;
+	// fPOINTATTR& operator=(const fPOINTATTR& rhs) = default;
+	// fPOINTATTR& operator=(fPOINTATTR&&) = default;
+	//~fPOINTATTR() = default;
 };
 
 class SMALPNTL
@@ -901,6 +909,18 @@ inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
+}
+
+inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, unsigned rhsA) noexcept
+	: x(rhsX)
+	, y(rhsY)
+	, attribute(rhsA) {
+}
+
+inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, unsigned rhsA) noexcept {
+	x = gsl::narrow_cast<float>(rhsX);
+	y = gsl::narrow_cast<float>(rhsY);
+	attribute = rhsA;
 }
 
 inline dPOINT::dPOINT(const fPOINT& rhs) noexcept

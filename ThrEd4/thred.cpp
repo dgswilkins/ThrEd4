@@ -8917,11 +8917,11 @@ void thred::internal::insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						}
 						else {
-							StitchBuffer[iStitch] = {
+							StitchBuffer[iStitch++] = {
 								pcsStitchBuffer[iPCSStitch].x + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f
+								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+								newAttribute
 							};
-							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
 					const auto newStitchCount = iStitch;

@@ -366,7 +366,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto& begin              = vertexIt[start];
 	const auto  delta              = fPOINT{ (end.x - begin.x), (end.y - begin.y) };
 	const auto  length             = hypot(delta.x, delta.y);
-	const auto  clipReferencePoint = fPOINTATTR{ ClipRect.left, ClipRect.bottom };
+	const auto  clipReferencePoint = fPOINTATTR{ ClipRect.left, ClipRect.bottom, 0u };
 	const auto  rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
@@ -722,7 +722,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 			            (*InsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
-	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
+	const auto referencePoint = fPOINTATTR{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top, 0u };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
@@ -752,7 +752,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto       delta    = dPOINT{ (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto       length   = hypot(delta.x, delta.y);
-	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top };
+	const fPOINTATTR referencePoint = { ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left), ClipRect.top, 0u };
 
 	auto       rotationAngle = atan2(-delta.x, delta.y);
 	const auto outerStep = dPOINT{ SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
