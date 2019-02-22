@@ -1229,6 +1229,7 @@ unsigned int form::closflt(float xCoordinate, float yCoordinate) {
 
 void form::chkseq(bool border) {
 #if BUGBAK
+	UNREFERENCED_PARAMETER(border);
 
 	for (auto index = 0u; index < SequenceIndex; index++) {
 		InterleaveSequence->push_back((*OSequence)[index]);
@@ -3700,7 +3701,7 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 		previousLevel--;
 	}
 
-	const auto regionPath = &tempPath[sequencePathIndex];
+	const auto regionPath = std::next(tempPath.begin(), sequencePathIndex);
 	regionPath[0].pcon    = mapIndexSequence[doneRegion];
 	regionPath[0].count   = mapIndexSequence[gsl::narrow_cast<size_t>(doneRegion) + 1u] - regionPath[0].pcon;
 	for (auto iPath = 1u; iPath < level; iPath++) {
