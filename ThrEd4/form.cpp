@@ -3829,7 +3829,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 			return;
 		}
 	}
-	const auto regionPath = &tempPath[sequencePathIndex];
+	auto regionPath = std::next(tempPath.begin(), sequencePathIndex);
 	for (auto iPath = 0u; iPath < pathLength; iPath++) {
 		tempPath[sequencePathIndex].skp    = false;
 		tempPath[sequencePathIndex++].pcon = regionPath[iPath].pcon;
