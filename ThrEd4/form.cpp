@@ -140,7 +140,7 @@ bool form::internal::chk2of() {
 	return true;
 }
 
-void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept {
+void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) {
 	for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
 		thred::rotflt((*OSequence)[iSequence], rotationAngle, rotationCenter);
 	}
@@ -1347,7 +1347,7 @@ unsigned int form::getlast() {
 	{ return 0; }
 }
 
-void form::filinsb(const dPOINT& point) noexcept {
+void form::filinsb(const dPOINT& point) {
 	const auto delta  = dPOINT{ (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / MAXSTCH + 1));
@@ -1988,7 +1988,7 @@ void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	}
 }
 
-void form::internal::prsmal() noexcept {
+void form::internal::prsmal() {
 	auto iOutput       = 0u;
 	auto minimumLength = USPAC * 0.8;
 
@@ -2378,7 +2378,7 @@ void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	duromb(prct[VertexCount - 4].bipnt, prct[VertexCount - 4].dipnt, prct[VertexCount - 4].bopnt, prct[VertexCount - 4].dopnt);
 }
 
-void form::internal::plbak(unsigned int backPoint) noexcept {
+void form::internal::plbak(unsigned int backPoint) {
 	if (backPoint < ((sizeof(OSequence) / sizeof((*OSequence)[0])) - 1)) {
 		auto iSequence = SequenceIndex;
 		if (iSequence != 0u) {
@@ -3047,7 +3047,7 @@ bool form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
 	return true;
 }
 
-bool form::internal::vscmp(unsigned index1, unsigned index2) noexcept {
+bool form::internal::vscmp(unsigned index1, unsigned index2) {
 	if ((*OSequence)[index1].x != (*OSequence)[index2].x) {
 		return true;
 	}
@@ -4711,7 +4711,7 @@ void form::internal::dudif(const dPOINT& start, const dPOINT& finish, dPOINT& de
 void form::internal::trfrm(const dPOINT& bottomLeftPoint,
                            const dPOINT& topLeftPoint,
                            const dPOINT& bottomRightPoint,
-                           const dPOINT& topRightPoint) noexcept {
+                           const dPOINT& topRightPoint) {
 	auto topDelta    = dPOINT{};
 	auto bottomDelta = dPOINT{};
 	auto leftDelta   = dPOINT{};

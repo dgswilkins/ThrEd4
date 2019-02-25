@@ -86,7 +86,7 @@ void         filangl();
 void         filclpx();
 void         filhor();
 void         filin(dPOINT currentPoint);
-void         filinsb(const dPOINT& point) noexcept;
+void         filinsb(const dPOINT& point);
 void         filinu(const dPOINT& inPoint);
 void         filsat();
 void         filvrt();
@@ -396,7 +396,7 @@ namespace internal {
 	         const std::vector<VRCT2>& fillVerticalRect,
 	         unsigned int              startVertex,
 	         const std::vector<VRCT2>& vrct);
-	void plbak(unsigned int backPoint) noexcept;
+	void plbak(unsigned int backPoint);
 	void plbrd(double edgeSpacing, FRMHED& angledForm);
 	void plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
@@ -406,7 +406,7 @@ namespace internal {
 	bool projh(double yCoordinate, const fPOINT& point0, const fPOINT& point1, dPOINT& intersection) noexcept;
 	bool projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection) noexcept;
 	void prpsbrd();
-	void prsmal() noexcept;
+	void prsmal();
 	void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
 	void rats();
 	bool regclos(std::vector<unsigned>&        groupIndexSequence,
@@ -430,7 +430,7 @@ namespace internal {
 	              unsigned                   currentSegmentIndex,
 	              unsigned&                  clipIntersectSide,
 	              const std::vector<fPOINT>*       currentFormVertices);
-	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	void   rotbak(double rotationAngle, const dPOINT& rotationCenter);
 	void   rotentr(double rotationAngle);
 	void   rspnt(float xCoordinate, float yCoordinate);
 	void   sapliq();
@@ -465,13 +465,13 @@ namespace internal {
 	void trfrm(const dPOINT& bottomLeftPoint,
 	           const dPOINT& topLeftPoint,
 	           const dPOINT& bottomRightPoint,
-	           const dPOINT& topRightPoint) noexcept;
+	           const dPOINT& topRightPoint);
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 
 	unsigned leftsid(const std::vector<fPOINT>* currentFormVertices);
 
 	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& visitedIndex);
-	bool vscmp(unsigned index1, unsigned index2) noexcept;
+	bool vscmp(unsigned index1, unsigned index2);
 } // namespace internal
 } // namespace form
