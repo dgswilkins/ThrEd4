@@ -13883,11 +13883,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					const auto code = SelectedForm->attribute & SBLNT;
 					if (code != 0u) {
 						SelectedForm->attribute &= NSBLNT;
+						SetWindowText((*ValueWindow)[LBSTRT], (*StringTable)[STR_TAPR].c_str());
 					}
 					else {
 						SelectedForm->attribute |= SBLNT;
+						SetWindowText((*ValueWindow)[LBSTRT], (*StringTable)[STR_BLUNT].c_str());
 					}
-					formForms::refrm();
 					form::refil();
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
@@ -13897,11 +13898,12 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					const auto code = SelectedForm->attribute & FBLNT;
 					if (code != 0u) {
 						SelectedForm->attribute &= NFBLNT;
+						SetWindowText((*ValueWindow)[LBFIN], (*StringTable)[STR_TAPR].c_str());
 					}
 					else {
 						SelectedForm->attribute |= FBLNT;
+						SetWindowText((*ValueWindow)[LBFIN], (*StringTable)[STR_BLUNT].c_str());
 					}
-					formForms::refrm();
 					form::refil();
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
@@ -13920,7 +13922,13 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				if (Msg.hwnd == (*ValueWindow)[LBRDUND] || Msg.hwnd == (*LabelWindow)[LBRDUND]) {
 					SelectedForm->edgeType ^= EGUND;
 					form::refil();
-					formForms::refrm();
+					const auto code = SelectedForm->edgeType & EGUND;
+					if (code != 0u) {
+						SetWindowText((*ValueWindow)[LBRDUND], (*StringTable)[STR_ON].c_str());
+					}
+					else {
+						SetWindowText((*ValueWindow)[LBRDUND], (*StringTable)[STR_OFF].c_str());
+					}
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LSACANG] || Msg.hwnd == (*LabelWindow)[LSACANG]) {
