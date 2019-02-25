@@ -2379,7 +2379,7 @@ void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
 }
 
 void form::internal::plbak(unsigned int backPoint) {
-	if (backPoint < ((sizeof(OSequence) / sizeof((*OSequence)[0])) - 1)) {
+	if (backPoint < (OSequence->size() - 1)) {
 		auto iSequence = SequenceIndex;
 		if (iSequence != 0u) {
 			iSequence--;
