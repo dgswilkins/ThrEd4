@@ -13887,6 +13887,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					else {
 						SelectedForm->attribute |= SBLNT;
 					}
+					formForms::refrm();
 					form::refil();
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
@@ -13900,6 +13901,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					else {
 						SelectedForm->attribute |= FBLNT;
 					}
+					formForms::refrm();
 					form::refil();
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
