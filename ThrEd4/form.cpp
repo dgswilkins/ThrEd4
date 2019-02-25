@@ -1536,7 +1536,7 @@ void form::internal::bold(double size) {
 void form::duangs() {
 	FormAngles->clear();
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	if (SelectedForm->type == FRMLINE) {
+	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
 	}
 	for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
@@ -1588,7 +1588,7 @@ bool form::cisin(float xCoordinate, float yCoordinate) {
 	auto count        = 0u;
 	auto intersection = dPOINT{};
 	auto vertexIt     = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	if (SelectedForm->type == FRMLINE) {
+	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
 	}
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -1705,7 +1705,7 @@ void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, unsigned start,
 	auto*      verticalRect = &fillVerticalRect[start];
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	if (SelectedForm->type == FRMLINE) {
+	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
 	}
 	if ((delta.x != 0.0) && (delta.y != 0.0)) {
@@ -2418,7 +2418,7 @@ void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm) {
 	sprct(fillVerticalRect, (VertexCount - 1), 0);
 	spurct(underlayVerticalRect, fillVerticalRect, (VertexCount - 1));
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-	if (SelectedForm->type == FRMLINE) {
+	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), SelectedForm->vertexIndex);
 	}
 	if ((SelectedForm->attribute & SBLNT) == 0u) {

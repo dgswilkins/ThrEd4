@@ -1458,7 +1458,7 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 		yOffset = length * sin(angle);
 	}
 	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	if (SelectedForm->type == FRMLINE) {
+	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
 	}
 	(*InsidePoints)[finish].x  = vertexIt[finish].x - xOffset;
