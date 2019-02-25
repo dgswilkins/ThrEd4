@@ -1300,21 +1300,28 @@ void form::chkseq(bool border) {
 
 void form::internal::ritbrd() {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices->emplace_back(INSREC{ TYPBRD, gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_BRD });
+		InterleaveSequenceIndices->emplace_back(INSREC{ TYPBRD,
+		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK,
+		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
+		                                                I_BRD });
 		form::chkseq(true);
 	}
 }
 
 void form::internal::ritapbrd() {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices->emplace_back(INSREC{ TYPMSK, gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_AP });
+		InterleaveSequenceIndices->emplace_back(INSREC{ TYPMSK,
+		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4,
+		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
+		                                                I_AP });
 		form::chkseq(true);
 	}
 }
 
 void form::internal::ritfil() {
 	if (SequenceIndex != 0u) {
-		InterleaveSequenceIndices->emplace_back(INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
+		InterleaveSequenceIndices->emplace_back(
+		    INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
 	}
 }
@@ -1370,8 +1377,8 @@ void form::filinsb(const dPOINT& point) {
 	}
 	(*OSequence)[SequenceIndex].x   = point.x;
 	(*OSequence)[SequenceIndex++].y = point.y;
-	SelectedPoint.x              = point.x;
-	SelectedPoint.y              = point.y;
+	SelectedPoint.x                 = point.x;
+	SelectedPoint.y                 = point.y;
 }
 
 void form::internal::linrutb(unsigned start) {
@@ -1462,8 +1469,8 @@ void form::internal::brdfil(double pd_Size) {
 	else {
 		currentVertex = form::getlast();
 	}
-	SequenceIndex              = 0;
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	SequenceIndex                 = 0;
+	auto vertexIt                 = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	(*OSequence)[SequenceIndex++] = vertexIt[currentVertex];
 	for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 		const auto nextVertex = form::nxt(currentVertex);
@@ -1510,8 +1517,8 @@ void form::internal::bold(double size) {
 	auto iNextLine = form::getlast();
 	auto iLine     = iNextLine;
 
-	SequenceIndex              = 0;
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	SequenceIndex                 = 0;
+	auto vertexIt                 = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	(*OSequence)[SequenceIndex++] = vertexIt[iLine];
 	for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 		iNextLine = form::nxt(iLine);
@@ -1523,14 +1530,14 @@ void form::internal::bold(double size) {
 		boldlin(iLine, iNextLine, size);
 	}
 	for (auto iSequence = 0u; iSequence < SequenceIndex - 1; iSequence++) {
-		const auto length
-		    = hypot((*OSequence)[iSequence + 1].x - (*OSequence)[iSequence].x, (*OSequence)[iSequence + 1].y - (*OSequence)[iSequence].y);
+		const auto length = hypot((*OSequence)[iSequence + 1].x - (*OSequence)[iSequence].x,
+		                          (*OSequence)[iSequence + 1].y - (*OSequence)[iSequence].y);
 		if (length > TINY) {
 			(*OSequence)[iOutput++] = (*OSequence)[iSequence];
 		}
 	}
 	(*OSequence)[iOutput++] = vertexIt[iNextLine];
-	SequenceIndex        = iOutput;
+	SequenceIndex           = iOutput;
 }
 
 void form::duangs() {
@@ -2006,12 +2013,12 @@ void form::internal::prsmal() {
 	}
 	auto iReference = 0u;
 	for (auto iSequence = 1u; iSequence < SequenceIndex; iSequence++) {
-		const auto delta
-		    = dPOINT{ (*OSequence)[iSequence].x - (*OSequence)[iReference].x, (*OSequence)[iSequence].y - (*OSequence)[iReference].y };
+		const auto delta  = dPOINT{ (*OSequence)[iSequence].x - (*OSequence)[iReference].x,
+                                   (*OSequence)[iSequence].y - (*OSequence)[iReference].y };
 		const auto length = hypot(delta.x, delta.y);
 		if (length > minimumLength) {
 			(*OSequence)[iOutput++] = (*OSequence)[iSequence];
-			iReference           = iSequence;
+			iReference              = iSequence;
 		}
 	}
 	SequenceIndex = iOutput;
@@ -2058,8 +2065,8 @@ void form::internal::pbrd(double edgeSpacing) {
 void form::internal::apbrd() {
 	auto currentVertex = 0u;
 
-	SequenceIndex              = 0;
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	SequenceIndex                 = 0;
+	auto vertexIt                 = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	(*OSequence)[SequenceIndex++] = vertexIt[currentVertex];
 	for (auto iVertex = 0u; iVertex < VertexCount << 1; iVertex++) {
 		const auto nextVertex = form::nxt(currentVertex);
@@ -2080,8 +2087,8 @@ void form::internal::bhfn(unsigned int start, unsigned int finish, double spacin
 	const auto outerStep = dPOINT{ SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	if (count != 0u) {
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
-			const auto firstPoint      = dPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
-			const auto outerPoint      = dPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
+			const auto firstPoint         = dPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
+			const auto outerPoint         = dPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
 			(*OSequence)[SequenceIndex++] = firstPoint;
 			(*OSequence)[SequenceIndex++] = innerPoint;
 			(*OSequence)[SequenceIndex++] = firstPoint;
@@ -2092,7 +2099,7 @@ void form::internal::bhfn(unsigned int start, unsigned int finish, double spacin
 			innerPoint.x += step.x;
 			innerPoint.y += step.y;
 		}
-		const auto firstPoint      = dPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
+		const auto firstPoint         = dPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
 		(*OSequence)[SequenceIndex++] = firstPoint;
 		(*OSequence)[SequenceIndex++] = innerPoint;
 	}
@@ -2115,7 +2122,7 @@ void form::internal::bhcrnr(unsigned int vertex) {
 	const auto ratio  = ButtonholeCornerLength / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	const auto point           = dPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
+	const auto point              = dPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
 	(*OSequence)[SequenceIndex++] = vertexIt[nextVertex];
 	(*OSequence)[SequenceIndex++] = point;
 	(*OSequence)[SequenceIndex++] = vertexIt[nextVertex];
@@ -2126,8 +2133,8 @@ void form::internal::bhcrnr(unsigned int vertex) {
 void form::internal::bhbrd(double spacing) {
 	auto vertex = form::getlast();
 
-	SequenceIndex              = 0;
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	SequenceIndex                 = 0;
+	auto vertexIt                 = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	(*OSequence)[SequenceIndex++] = vertexIt[vertex];
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		const auto nextVertex = form::nxt(vertex);
@@ -2481,8 +2488,8 @@ void form::internal::lapbrd() {
 }
 
 void form::internal::blbrd(double spacing) {
-	SequenceIndex              = 0;
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	SequenceIndex                 = 0;
+	auto vertexIt                 = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	(*OSequence)[SequenceIndex++] = vertexIt[0];
 	for (auto iVertex = 0u; iVertex < VertexCount - 2; iVertex++) {
 		bhfn(iVertex, iVertex + 1, spacing);
@@ -2614,8 +2621,8 @@ void form::internal::contf() {
 				(*OSequence)[SequenceIndex].y = lowPoint.y;
 				SequenceIndex++;
 				for (auto iVertex = 0u; iVertex < (selectedVertexCount - 1); iVertex++) {
-					const auto length          = pols[iVertex].length * poldif.length;
-					const auto angle           = pols[iVertex].angle + poldif.angle;
+					const auto length             = pols[iVertex].length * poldif.length;
+					const auto angle              = pols[iVertex].angle + poldif.angle;
 					(*OSequence)[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 					(*OSequence)[SequenceIndex].y = lowPoint.y + sin(angle) * length;
 					SequenceIndex++;
@@ -2626,8 +2633,8 @@ void form::internal::contf() {
 				(*OSequence)[SequenceIndex].y = highPoint.y;
 				SequenceIndex++;
 				for (auto iVertex = selectedVertexCount - 1; iVertex != 0; iVertex--) {
-					const auto length          = pols[iVertex - 1].length * poldif.length;
-					const auto angle           = pols[iVertex - 1].angle + poldif.angle;
+					const auto length             = pols[iVertex - 1].length * poldif.length;
+					const auto angle              = pols[iVertex - 1].angle + poldif.angle;
 					(*OSequence)[SequenceIndex].x = lowPoint.x + cos(angle) * length;
 					(*OSequence)[SequenceIndex].y = lowPoint.y + sin(angle) * length;
 					SequenceIndex++;
@@ -2953,14 +2960,14 @@ void form::internal::chksid(unsigned int               vertexIndex,
 				const auto limit   = form::nxt(vertexIndex);
 				while (iVertex != limit) {
 					(*OSequence)[SequenceIndex++] = vertexIt[iVertex];
-					iVertex                    = form::nxt(iVertex);
+					iVertex                       = form::nxt(iVertex);
 				}
 			}
 			else {
 				auto iVertex = clipIntersectSide;
 				while (iVertex != vertexIndex) {
 					(*OSequence)[SequenceIndex++] = vertexIt[iVertex];
-					iVertex                    = form::prv(iVertex);
+					iVertex                       = form::prv(iVertex);
 				}
 			}
 		}
@@ -4359,7 +4366,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 		auto index    = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
-				auto lineGroupPoint           = &*sortedLines[iLine];
+				auto lineGroupPoint   = &*sortedLines[iLine];
 				StitchBuffer[index++] = (fPOINTATTR{ lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
 				StitchBuffer[index++] = (fPOINTATTR{ lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
 			}
@@ -4452,7 +4459,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			}
 			if (dontSkip) {
 				pathMap.push_back(RCON{ leftRegion, 0, 0 });
-				inPath                          = pathMapIndex;
+				inPath = pathMapIndex;
 			}
 			// set the first entry in the temporary path to the leftmost region
 			tempPath[0].pcon  = inPath;
@@ -4568,13 +4575,13 @@ void form::internal::bakseq() {
 			if ((SelectedForm->extendedAttribute & AT_SQR) != 0u) {
 				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 					(*OSequence)[SequenceIndex++] = bPrevious;
-					auto count                 = ceil(bCurrent.y / UserStitchLength);
+					auto count                    = ceil(bCurrent.y / UserStitchLength);
 					do {
 						(*OSequence)[SequenceIndex].y = count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9;
 						if ((*OSequence)[SequenceIndex].y > bCurrent.y) {
 							break;
 						}
-						delta.y                      = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bCurrent.y;
+						delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bCurrent.y;
 						(*OSequence)[SequenceIndex++].x = bCurrent.x;
 						count++;
 					} while (true);
@@ -4582,13 +4589,13 @@ void form::internal::bakseq() {
 				}
 				else {
 					(*OSequence)[SequenceIndex++] = bCurrent;
-					auto count                 = gsl::narrow<unsigned int>(std::floor(bCurrent.y / UserStitchLength));
+					auto count                    = gsl::narrow<unsigned int>(std::floor(bCurrent.y / UserStitchLength));
 					do {
 						(*OSequence)[SequenceIndex].y = count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9;
 						if ((*OSequence)[SequenceIndex].y < bPrevious.y) {
 							break;
 						}
-						delta.y                      = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bPrevious.y;
+						delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bPrevious.y;
 						(*OSequence)[SequenceIndex++].x = bCurrent.x;
 						count--;
 					} while (true);
@@ -4602,8 +4609,8 @@ void form::internal::bakseq() {
 					if ((*OSequence)[SequenceIndex].y > bCurrent.y) {
 						break;
 					}
-					delta.y                      = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
-					delta.x                      = slope * delta.y;
+					delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
+					delta.x                         = slope * delta.y;
 					(*OSequence)[SequenceIndex++].x = bNext.x + delta.x;
 					count++;
 				} while (true);
@@ -4619,8 +4626,8 @@ void form::internal::bakseq() {
 					if ((*OSequence)[SequenceIndex].y < bCurrent.y) {
 						break;
 					}
-					delta.y                      = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
-					delta.x                      = slope * delta.y;
+					delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
+					delta.x                         = slope * delta.y;
 					(*OSequence)[SequenceIndex++].x = bNext.x + delta.x;
 					count--;
 				} while (true);

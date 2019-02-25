@@ -84,7 +84,8 @@ public:
 	inline std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask() const {
 		return mask_;
 	}
-	inline void mask(const std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) {
+	inline void
+	mask(const std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) {
 		mask_ = i_mask;
 	}
 

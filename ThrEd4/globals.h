@@ -73,22 +73,22 @@ extern LPWSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
 
-extern std::vector<BSEQPNT>*   BSequence;
+extern std::vector<BSEQPNT>* BSequence;
 
-extern HBRUSH    BackgroundBrush;
-extern unsigned  BeanCount; // number of stitches added by convert to bean
-extern HDC       BitmapDC;
-extern RECT      BitmapDstRect;
-extern unsigned  BitmapHeight;
-extern POINT     BitmapPoint;
-extern dPOINT    BitmapSizeinStitches;
-extern RECT      BitmapSrcRect;
-extern dPOINT    BmpStitchRatio;
-extern unsigned  BitmapWidth;
-extern double    BorderWidth;
-extern unsigned  ButtonHeight;
-extern unsigned  ButtonWidth;
-extern unsigned  ButtonWidthX3;
+extern HBRUSH   BackgroundBrush;
+extern unsigned BeanCount; // number of stitches added by convert to bean
+extern HDC      BitmapDC;
+extern RECT     BitmapDstRect;
+extern unsigned BitmapHeight;
+extern POINT    BitmapPoint;
+extern dPOINT   BitmapSizeinStitches;
+extern RECT     BitmapSrcRect;
+extern dPOINT   BmpStitchRatio;
+extern unsigned BitmapWidth;
+extern double   BorderWidth;
+extern unsigned ButtonHeight;
+extern unsigned ButtonWidth;
+extern unsigned ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 
@@ -130,7 +130,7 @@ extern HMENU           FillMenu;
 extern std::vector<double>* FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
-extern HWND         FormDataSheet;
+extern HWND FormDataSheet;
 
 extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;
@@ -161,11 +161,9 @@ extern POINT     InsertLine[3];
 
 extern std::vector<fPOINT>* InsidePointList;
 extern std::vector<fPOINT>* InsidePoints;
-
-extern std::vector<INSREC>*   InterleaveSequenceIndices;
-
-extern std::vector<fPOINT>*   InterleaveSequence;
-extern std::vector<HWND>* LabelWindow;
+extern std::vector<INSREC>* InterleaveSequenceIndices;
+extern std::vector<fPOINT>* InterleaveSequence;
+extern std::vector<HWND>*   LabelWindow;
 
 extern fPOINT LastPoint;
 extern HPEN   LayerPen[6];

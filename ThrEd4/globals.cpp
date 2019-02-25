@@ -36,27 +36,27 @@ fRECTANGLE AllItemsRect;     // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
-unsigned  AppliqueColor = 15;   // underlay color
-LPWSTR*   ArgList;              // command line argument array
-HCURSOR   ArrowCursor;          // arrow
-fs::path* AuxName;              //
+unsigned  AppliqueColor = 15; // underlay color
+LPWSTR*   ArgList;            // command line argument array
+HCURSOR   ArrowCursor;        // arrow
+fs::path* AuxName;            //
 
-std::vector<BSEQPNT>*   BSequence;   //
+std::vector<BSEQPNT>* BSequence; //
 
-HBRUSH    BackgroundBrush;      // background color brush
-unsigned  BeanCount;            // number of stitches added by convert to bean
-HDC       BitmapDC;             // bitmap device context
-RECT      BitmapDstRect;        // stitch window destination rectangle for zooomed view
-unsigned  BitmapHeight;         // bitmap height
-POINT     BitmapPoint;          // a point on the bitmap
-dPOINT    BitmapSizeinStitches; // bitmap end points in stitch points
-RECT      BitmapSrcRect;        // bitmap source rectangle for zoomed view
-dPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
-unsigned  BitmapWidth;          // bitmap width
-double    BorderWidth = BRDWID; // border width for satin borders
-unsigned  ButtonHeight;         // button height
-unsigned  ButtonWidth;          // button width
-unsigned  ButtonWidthX3;        // button width times 3
+HBRUSH   BackgroundBrush;      // background color brush
+unsigned BeanCount;            // number of stitches added by convert to bean
+HDC      BitmapDC;             // bitmap device context
+RECT     BitmapDstRect;        // stitch window destination rectangle for zooomed view
+unsigned BitmapHeight;         // bitmap height
+POINT    BitmapPoint;          // a point on the bitmap
+dPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
+RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
+dPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
+unsigned BitmapWidth;          // bitmap width
+double   BorderWidth = BRDWID; // border width for satin borders
+unsigned ButtonHeight;         // button height
+unsigned ButtonWidth;          // button width
+unsigned ButtonWidthX3;        // button width times 3
 
 std::vector<HWND>* ButtonWin; // button windows
 
@@ -126,13 +126,11 @@ HWND      HorizontalScrollBar;   // horizontal scroll bar
 INIFILE   IniFile;               // initialization file
 POINT     InsertLine[3];         // the insert line
 
-std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
-
-std::vector<INSREC>*   InterleaveSequenceIndices; // indices into interleave points
-
-std::vector<fPOINT>*   InterleaveSequence;  // storage for interleave points
-std::vector<HWND>* LabelWindow; // text handles for the form data sheet
+std::vector<fPOINT>* InsidePointList;           // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>* InsidePoints;              // pointer to the list of inside outline points
+std::vector<INSREC>* InterleaveSequenceIndices; // indices into interleave points
+std::vector<fPOINT>* InterleaveSequence;        // storage for interleave points
+std::vector<HWND>*   LabelWindow;               // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
 HPEN   LayerPen[6];                     //
@@ -157,8 +155,8 @@ HWND         OKButton;                            // ok button
 
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
 
-bool         OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
-unsigned int OutputIndex;                         // output pointer for sequencing
+bool         OutLineEverySelectedForm = false; // When selecting multiple forms, should we outline every form?
+unsigned int OutputIndex;                      // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points

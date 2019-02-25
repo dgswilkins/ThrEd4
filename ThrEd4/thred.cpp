@@ -127,7 +127,7 @@ unsigned      DraggedColor;                  // color being dragged
 
 std::vector<POINT>* FormVerticesAsLine; // form vertex clipboard paste into form line
 
-unsigned int  LastFormSelected;              // end point of selected range of forms
+unsigned int LastFormSelected; // end point of selected range of forms
 
 std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
 
@@ -15264,9 +15264,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
-								auto vertexIt         = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+								auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 								InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
-								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+								auto clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
 								auto iVertex = 0u;
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
@@ -15275,7 +15275,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								const auto nextVertex = form::nxt(ClosestVertexToCursor);
 								iVertex++;
 								InterleaveSequence->push_back(vertexIt[nextVertex]);
-								OutputIndex                 = iVertex + 1;
+								OutputIndex = iVertex + 1;
 								setpclp();
 								StateMap.set(StateFlag::FPUNCLP);
 								StateMap.set(StateFlag::SHOP);
@@ -18840,20 +18840,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
 #pragma warning(pop)
 
-		auto private_MenuInfo = MENUITEMINFO{
+		auto private_MenuInfo = MENUITEMINFO {
 			sizeof(MENUITEMINFO), // Size
-				MIIM_TYPE,        // Mask
-				MFT_STRING,       // Type
-				0,                // State
-				0,                // ID
-				nullptr,          // SubMenu
-				nullptr,          // bmpChecked
-				nullptr,          // bmpUnchecked
-				0,                // ItemData
-				formOnOff,        // TypeData
-				16,               // cch
+			    MIIM_TYPE,        // Mask
+			    MFT_STRING,       // Type
+			    0,                // State
+			    0,                // ID
+			    nullptr,          // SubMenu
+			    nullptr,          // bmpChecked
+			    nullptr,          // bmpUnchecked
+			    0,                // ItemData
+			    formOnOff,        // TypeData
+			    16,               // cch
 #if (WINVER >= 0x0500)
-				nullptr // bmpItem
+			    nullptr // bmpItem
 #endif                  /* WINVER >= 0x0500 */
 		};
 		auto private_OSequence                 = std::vector<fPOINT>{};

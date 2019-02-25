@@ -856,12 +856,11 @@ public:
 	// BSEQPNT& operator=(const BSEQPNT& rhs) = default;
 	// BSEQPNT& operator=(BSEQPNT&&) = default;
 	//~BSEQPNT() = default;
-
 };
 
 inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int rhsAttr) noexcept {
-	x = gsl::narrow_cast<float>(rhsX);
-	y = gsl::narrow_cast<float>(rhsY);
+	x         = gsl::narrow_cast<float>(rhsX);
+	y         = gsl::narrow_cast<float>(rhsY);
 	attribute = gsl::narrow_cast<char>(rhsAttr);
 }
 
@@ -912,14 +911,14 @@ inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
 }
 
 inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, unsigned rhsA) noexcept
-	: x(rhsX)
-	, y(rhsY)
-	, attribute(rhsA) {
+    : x(rhsX)
+    , y(rhsY)
+    , attribute(rhsA) {
 }
 
 inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, unsigned rhsA) noexcept {
-	x = gsl::narrow_cast<float>(rhsX);
-	y = gsl::narrow_cast<float>(rhsY);
+	x         = gsl::narrow_cast<float>(rhsX);
+	y         = gsl::narrow_cast<float>(rhsY);
 	attribute = rhsA;
 }
 

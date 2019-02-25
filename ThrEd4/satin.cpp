@@ -597,7 +597,8 @@ void satin::delspnt() {
 			}
 		}
 	}
-	auto closestVertexIt = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
+	auto closestVertexIt
+	    = std::next(FormVertices->cbegin(), gsl::narrow_cast<size_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
 	FormVertices->erase(closestVertexIt);
 	SelectedForm->vertexCount--;
 	form::fvars(ClosestFormToCursor);
@@ -870,7 +871,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					}
 				}
 				else {
-					SelectedPoint              = vertexIt[line1Start];
+					SelectedPoint                 = vertexIt[line1Start];
 					(*OSequence)[SequenceIndex++] = SelectedPoint;
 				}
 			}
@@ -1140,7 +1141,7 @@ void satin::satfil() {
 			auto iVertex = 1u;
 			if (!StateMap.test(StateFlag::BARSAT)) {
 				(*OSequence)[0] = SelectedPoint = vertexIt[1];
-				SequenceIndex                = 1;
+				SequenceIndex                   = 1;
 			}
 			while ((iVertex < (VertexCount + 1)) && (length > lengths[iVertex])) {
 				iVertex++;
@@ -1162,7 +1163,7 @@ void satin::satfil() {
 		auto iVertex = 0;
 		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
 			(*OSequence)[0] = SelectedPoint = vertexIt[0];
-			SequenceIndex                = 1;
+			SequenceIndex                   = 1;
 		}
 		while (length > lengths[iVertex]) {
 			iVertex++;
@@ -1457,7 +1458,7 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
 	}

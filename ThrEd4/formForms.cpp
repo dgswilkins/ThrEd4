@@ -216,7 +216,8 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 		}
 	}
 	labelWindow[LFRMFIL] = ffi::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
-	valueWindow[LFRMFIL] = ffi::txtrwin(stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
+	valueWindow[LFRMFIL]
+	    = ffi::txtrwin(stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->fillType != 0u) {
 		labelWindow[LFRMCOL] = ffi::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
@@ -227,8 +228,9 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 			valueWindow[LFTHCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
-			valueWindow[LFTHTYP] = ffi::numwin(
-			    stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0], ValueWindowCoords);
+			valueWindow[LFTHTYP]
+			    = ffi::numwin(stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0],
+			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if ((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u) {
