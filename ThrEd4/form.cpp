@@ -3693,10 +3693,10 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
                             const std::vector<RCON>&       pathMap,
                             const std::vector<unsigned>&   mapIndexSequence,
                             const boost::dynamic_bitset<>& visitedRegions,
-                            unsigned                       level,
+                            unsigned                       pathLength,
                             unsigned                       doneRegion,
                             unsigned                       sequencePathIndex) {
-	auto previousLevel = level;
+	auto previousLevel = pathLength;
 	if (previousLevel != 0u) {
 		previousLevel--;
 	}
@@ -3704,7 +3704,7 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 	const auto regionPath = std::next(tempPath.begin(), sequencePathIndex);
 	regionPath[0].pcon    = mapIndexSequence[doneRegion];
 	regionPath[0].count   = mapIndexSequence[gsl::narrow_cast<size_t>(doneRegion) + 1u] - regionPath[0].pcon;
-	for (auto iPath = 1u; iPath < level; iPath++) {
+	for (auto iPath = 1u; iPath < pathLength; iPath++) {
 		regionPath[iPath].pcon = mapIndexSequence[pathMap[regionPath[iPath - 1].pcon].node];
 		regionPath[iPath].count
 		    = mapIndexSequence[gsl::narrow_cast<size_t>(pathMap[regionPath[gsl::narrow_cast<size_t>(iPath) - 1u].pcon].node) + 1u]
@@ -3790,7 +3790,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 	auto pathLength = 1u; // length of the path to the region
 	while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 		pathLength++;
-		if (pathLength > 8) {
+		if (pathLength > tempPath.size() - sequencePathIndex) {
 			auto* lineEndPoint = sortedLines[regionsList[doneRegion].start];
 			if (lineEndPoint != nullptr) {
 				lastRegionCorners[0] = lineEndPoint[0];
