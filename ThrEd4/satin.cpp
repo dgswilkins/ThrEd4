@@ -1405,7 +1405,7 @@ void satin::satout(double satinWidth) {
 		}
 		si::outfn(VertexCount - 1, 0, satinWidth);
 		StateMap.reset(StateFlag::INDIR);
-		if (count<VertexCount>> 1) {
+		if (count < (VertexCount >> 1)) {
 			StateMap.set(StateFlag::INDIR);
 			OutsidePoints = InsidePointList;
 			InsidePoints  = OutsidePointList;
