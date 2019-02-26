@@ -132,7 +132,7 @@ namespace internal {
 
 	constexpr float durat(float start, float finish, float featherRatio);
 
-	void     durats(unsigned int iSequence, fPOINT& point, FEATHER& feather);
+	void     durats(unsigned int iSequence, std::vector<fPOINT>* sequence, FEATHER& feather);
 	void     durec(OREC& record) noexcept;
 	unsigned dutyp(unsigned attribute) noexcept;
 

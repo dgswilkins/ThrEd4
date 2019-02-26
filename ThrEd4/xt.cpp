@@ -119,22 +119,20 @@ void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& poin
 	point.y = durat((*BSequence)[finish].y, (*BSequence)[start].y, featherRatioLocal);
 }
 
-void xt::internal::durats(unsigned int iSequence, fPOINT& point, FEATHER& feather) {
+void xt::internal::durats(unsigned int iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
 	auto&      bCurrent     = (*BSequence)[iSequence];
 	auto&      bNext        = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
 	const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
 	if (stitchLength < feather.minStitch) {
-		point.x = bCurrent.x;
-		point.y = bCurrent.y;
+		sequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
 	}
 	else {
 		feather.ratioLocal = feather.minStitch / stitchLength;
 		const auto adjustedPoint
 		    = fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
 
-		point.x = durat(adjustedPoint.x, bCurrent.x, feather.ratio);
-		point.y = durat(adjustedPoint.y, bCurrent.y, feather.ratio);
+		sequence->push_back(fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
 	}
 }
 
@@ -233,7 +231,7 @@ void xt::internal::nurat(FEATHER& feather) {
 
 void xt::internal::fthfn(unsigned int iSequence, FEATHER& feather) {
 	nurat(feather);
-	durats(iSequence, (*OSequence)[iSequence], feather);
+	durats(iSequence, OSequence, feather);
 }
 
 void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& point, float featherRatio) {
@@ -280,8 +278,10 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
 	midPoint                    = midpnt(currentPoint, nextPoint);
-	(*OSequence)[OutputIndex++] = bCurrent;
-	(*OSequence)[OutputIndex++] = midPoint;
+	OSequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
+	OutputIndex++;
+	OSequence->push_back(midPoint);
+	OutputIndex++;
 	featherSequence.emplace_back(bNext.x, bNext.y);
 	featherSequence.push_back(midPoint);
 }
@@ -292,8 +292,8 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	const auto length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
-	(*OSequence)[iSequence]     = bCurrent;
-	(*OSequence)[iSequence + 1] = bNext;
+	OSequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
+	OSequence->push_back(fPOINT{ bNext.x, bNext.y });
 	if (length > feather.minStitch) {
 		auto adjustedPoint = fPOINT{};
 		auto currentPoint  = fPOINT{};
@@ -378,7 +378,6 @@ void xt::fthrfn() {
 					xi::fthdfn(ind, feather);
 				}
 			}
-			ind--;
 		}
 		else {
 			for (ind = 0; ind <= SequenceIndex - 2; ind++) {
@@ -387,19 +386,18 @@ void xt::fthrfn() {
 						xi::fthfn(ind, feather);
 					}
 					else {
-						(*OSequence)[ind] = (*BSequence)[ind];
+						OSequence->push_back(fPOINT{ (*BSequence)[ind].x, (*BSequence)[ind].y });
 					}
 				}
 				else {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0u) {
-						(*OSequence)[ind] = (*BSequence)[ind];
+						OSequence->push_back(fPOINT{ (*BSequence)[ind].x, (*BSequence)[ind].y });
 					}
 					else {
 						xi::fthfn(ind, feather);
 					}
 				}
 			}
-			ind--;
 		}
 		OutputIndex = ind;
 	}
