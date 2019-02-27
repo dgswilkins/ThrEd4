@@ -1170,7 +1170,9 @@ public:
 };
 
 inline FANGCLP::FANGCLP() noexcept {
-	clip = 0;
+	guide.start = 0u;
+	guide.finish = 0u;
+
 }
 
 union FANGCLPOUT {
@@ -1204,6 +1206,7 @@ inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) noexcept {
 
 inline FANGCLP& FANGCLP::operator=(const FANGCLPOUT& rhs) noexcept {
 	angle = rhs.angle;
+	guide.finish = rhs.guide.finish;
 	return *this;
 }
 
