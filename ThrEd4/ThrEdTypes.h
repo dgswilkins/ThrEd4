@@ -1187,19 +1187,21 @@ public:
 	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
 	//~FANGCLPOUT() = default;
 
-	explicit FANGCLPOUT(const FANGCLP& rhs) noexcept;
-	inline FANGCLPOUT& operator=(const FANGCLP& rhs) noexcept;
+	explicit FANGCLPOUT(const FANGCLP& rhs);
+	inline FANGCLPOUT& operator=(const FANGCLP& rhs);
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
 	clip = 0;
 }
 
-inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) noexcept {
+inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) {
+	guide.finish = gsl::narrow<decltype(guide.finish)>(rhs.guide.finish);
 	angle = rhs.angle;
 }
 
-inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) noexcept {
+inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) {
+	guide.finish = gsl::narrow<decltype(guide.finish)>(rhs.guide.finish);
 	angle = rhs.angle;
 	return *this;
 }
