@@ -662,6 +662,294 @@ enum featherStyles
 	FTHFAZ      // phase
 };
 
+// edge fill types
+enum edgeFillStyles
+{
+	EDGELINE = 1, // Line
+	EDGEBEAN,     // Bean
+	EDGECLIP,     // Clipboard
+	EDGEANGSAT,   // Angle Satin
+	EDGEAPPL,     // Applique
+	EDGEPROPSAT,  // Proportional Satin
+	EDGEBHOL,     // Buttonhole
+	EDGEPICOT,    // Picot
+	EDGEDOUBLE,   // Double
+	EDGELCHAIN,   // Line Chain
+	EDGEOCHAIN,   // Open Chain
+	EDGECLIPX,    // Even Clipboard
+	EDGELAST      // must always be the last value
+};
+
+// form types
+enum formStyles
+{
+	FRMLINE = 1u, // Line form
+	FRMFPOLY,     // Freehand polygon form
+	FRMRPOLY,     // Regular polygon form
+	FRMSTAR,      // Star form
+	FRMSPIRAL,    // Spiral Form
+	SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
+	FRMHEART,     // Heart Form
+	FRMLENS,      // Lens form
+	FRMEGG,       // Egg form
+	FRMTEAR,      // Teardrop form
+	FRMZIGZAG,    // Zig-Zag form
+	FRMWAVE,      // Wave Form
+	FRMDAISY,     // Daisy form
+};
+
+// main menu items
+enum mainMenuItems
+{
+	M_FILE,
+	M_VIEW,
+	M_FORM,
+	M_EDIT,
+	M_IN,
+	M_OUT,
+	M_UNDO,
+	M_REDO,
+	M_ROT,
+	M_PREF,
+	M_FILL,
+	M_ADD,
+	M_FRM,
+	M_ALL,
+	M_1,
+	M_2,
+	M_3,
+	M_4,
+	M_HELP,
+};
+
+// view menu items
+enum viewMenuItems
+{
+	MVW_MOVIE,
+	MVW_SET,
+	MVW_BACK,
+	MVW_ZOOM,
+	MVW_THRD,
+	MVW_SHWT,
+	MVW_SHWTCOL,
+	MVW_DSGN,
+	MVW_KNOT,
+	MVW_MARK,
+	MVW_ABOUT,
+};
+
+// fill menu items
+enum fillMenuItems
+{
+	MFIL_SAT,
+	MFIL_FTH,
+	MFIL_VERT,
+	MFIL_HOR,
+	MFIL_ANG,
+	MFIL_CLP,
+	MFIL_CONT,
+	MFIL_TED,
+	MFIL_BORD,
+	MFIL_UNFIL
+};
+
+// clipboard data types
+enum clipDataType
+{
+	CLP_STCH = 1,
+	CLP_FRM,
+	CLP_FRMS,
+	CLP_FRMPS,
+};
+
+// edge underlay bit
+#define EGUND 0x80u
+#define NEGUND 0x7fu
+
+// form data lines
+enum formData
+{
+	LFRM,       // form 0
+	LLAYR,      // layer 1
+	LFRMFIL,    // form fill 2
+	LFRMCOL,    // form fill color 3
+	LFRMSPAC,   // form fill space 4
+	LFRMLEN,    // form stitch length 5
+	LFRMANG,    // angle of angle fill 6
+	LBRD,       // border 7
+	LBRDCOL,    // border color 8
+	LBRDSPAC,   // border space 9
+	LBRDLEN,    // border stitch length 10
+	LBRDSIZ,    // border size 11
+	LAPCOL,     // applique color 12
+	LBCSIZ,     // buttonhole corner size 13
+	LBSTRT,     // form start style 14
+	LBFIN,      // form end style 15
+	LBRDPIC,    // pico border spacing 16
+	LBRDUND,    // border underlay 17
+	LSACANG,    // angle clipboard angle 18
+	LFRMFAZ,    // clipboard phase 19
+	LBRDPOS,    // chain position 20
+	LBFILSQR,   // square/pointed fill ends 21
+	LMAXFIL,    // maximum fill stitch length 22
+	LMINFIL,    // minimum fill stitch length 23
+	LMAXBRD,    // maximum border stitch length 24
+	LMINBRD,    // minimum border stitch length 25
+	LFTHCOL,    // feather color 26
+	LFTHTYP,    // feather fill type
+	LFTHBLND,   // feather blend
+	LFTHBTH,    // feather both up and down
+	LFTHUP,     // feather up or down
+	LFTHUPCNT,  // feather up count
+	LFTHDWNCNT, // feather down count
+	LFTHSIZ,    // feather size
+	LFTHNUM,    // feather number
+	LFTHFLR,    // feather floor
+	LFSTRT,     // form fill start on/off
+	LDSTRT,     // form fill start data
+	LFEND,      // form fill end on/off
+	LDEND,      // form fill end data
+	LCWLK,      // center walk
+	LWALK,      // edge walk
+	LWLKIND,    // edge walk/underlay indent
+	LUND,       // underlay
+	LULEN,      // underaly stitch length
+	LUANG,      // underlay angle
+	LUSPAC,     // underlay spacing
+	LUNDCOL,    // underlay color
+	LTXOF,      // texture fill spacing
+	LASTLIN     // must be the last entry
+};
+
+// fill types
+enum fillStyles
+{
+	VRTF = 1, // Vertical fill
+	HORF,     // Horizontal fill
+	ANGF,     // Angle fill
+	SATF,     // Fan fill ?
+	CLPF,     // Fan clip Fill
+	CONTF,    // Contour fill
+	VCLPF,    // Vertical clip fill
+	HCLPF,    // Horizontal clip fill
+	ANGCLPF,  // Angle clip fill
+	FTHF,     // Feather fill
+	TXVRTF,   // Vertical texture fill
+	TXHORF,   // Horizontal texture fill
+	TXANGF,   // Angle texture fill
+};
+#define MCLPF 1 << CLPF
+#define MVCLPF 1 << VCLPF
+#define MHCLPF 1 << HCLPF
+#define MANGCLPF 1 << ANGCLPF
+
+// preference window
+enum preferenceItems
+{
+	PSPAC,  // 0
+	PANGL,  // 1
+	PSQR,   // 2
+	PSAT,   // 3
+	PMAX,   // 4
+	PUSE,   // 5
+	PMIN,   // 6
+	PSHO,   // 7
+	PBOX,   // 8
+	PSMAL,  // 9
+	PAP,    // 10
+	PSNP,   // 11
+	PSTAR,  // 12
+	PSPIR,  // 13
+	PBUT,   // 14
+	PBLNT,  // 15
+	PPIC,   // 16
+	PHUP,   // 17
+	PHUPX,  // 18
+	PUND,   // 19
+	PGRD,   // 20
+	PCLPOF, // 21
+	PFAZ,   // 22
+	PCHN,   // 23
+	PCHRAT, // 24
+	PNUDG,  // 25
+	PEG,    // 26
+	PHUPY,  // 27
+};
+
+// file menu items
+enum fileMenuItems
+{
+	FM_NEW,
+	FM_OPEN,
+	FM_CLOS,
+	FM_THUMB,
+	FM_OPNPCS,
+	FM_INSRT,
+	FM_OVRLAY,
+	FM_SAV,
+	FM_SAVAS,
+	FM_LODBIT,
+	FM_SAVBIT,
+	FM_HIDBIT,
+	FM_RMVBIT,
+	FM_PURG,
+	FM_LOCK,
+	FM_ONAM0,
+	FM_ONAM1,
+	FM_ONAM2,
+	FM_ONAM3
+};
+
+// fill message codes
+enum fillMessageCodes
+{
+	FMM_FAN,
+	FMM_VRT,
+	FMM_HOR,
+	FMM_ANG,
+	FMM_CLP,
+	FMM_FTH,
+	FML_LIN = 0x100,
+	FML_BLD,
+	FML_ANGS,
+	FML_PRPS,
+	FML_APLQ,
+	FML_BHOL,
+	FML_CLP,
+	FML_PIC,
+	FMX_UNF,
+	FML_CONT,
+	FML_CHAIN,
+};
+
+// button windows
+enum stitchButtons
+{
+	HBOXSEL,
+	HUPTO,
+	HHID,
+	HNUM,
+	HTOT,
+	HMINLEN,
+	HMAXLEN,
+	HCOR,
+	HLAYR
+};
+
+enum textureButtons
+{ // text button windows
+	HTXCLR,
+	HTXHI,
+	HTXWID,
+	HTXSPAC,
+	HTXVRT,
+	HTXHOR,
+	HTXANG,
+	HTXMIR,
+};
+
+#define HLIN HNUM
+
 #pragma pack(1)
 
 // pcs file header structure
@@ -1166,7 +1454,7 @@ public:
 	// FANGCLP& operator=(FANGCLP&&) = default;
 	//~FANGCLP() = default;
 
-	inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
+	//inline FANGCLP& operator=(const FANGCLPOUT& rhs) noexcept;
 };
 
 inline FANGCLP::FANGCLP() noexcept {
@@ -1187,30 +1475,36 @@ public:
 	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
 	//~FANGCLPOUT() = default;
 
-	explicit FANGCLPOUT(const FANGCLP& rhs);
-	inline FANGCLPOUT& operator=(const FANGCLP& rhs);
+	//explicit FANGCLPOUT(const FANGCLP& rhs);
+	//inline FANGCLPOUT& operator=(const FANGCLP& rhs);
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
 	clip = 0;
 }
 
+/*
 inline FANGCLPOUT::FANGCLPOUT(const FANGCLP& rhs) {
 	guide.finish = gsl::narrow<decltype(guide.finish)>(rhs.guide.finish);
 	angle = rhs.angle;
 }
+*/
 
+/*
 inline FANGCLPOUT& FANGCLPOUT::operator=(const FANGCLP& rhs) {
 	guide.finish = gsl::narrow<decltype(guide.finish)>(rhs.guide.finish);
 	angle = rhs.angle;
 	return *this;
 }
+*/
 
+/*
 inline FANGCLP& FANGCLP::operator=(const FANGCLPOUT& rhs) noexcept {
 	angle = rhs.angle;
 	guide.finish = rhs.guide.finish;
 	return *this;
 }
+*/
 
 union FLENCNTOUT;
 
@@ -1544,7 +1838,22 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = rhs.angleOrClipData.guide.start;
+				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -1584,7 +1893,22 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = rhs.angleOrClipData.guide.start;
+				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -1700,7 +2024,22 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
+				angleOrClipData.guide.finish = gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -1740,7 +2079,22 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
+				angleOrClipData.guide.finish = gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -1782,7 +2136,22 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = rhs.angleOrClipData.guide.start;
+				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -1822,7 +2191,22 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	angleOrClipData = rhs.angleOrClipData;
+	//angleOrClipData = rhs.angleOrClipData;
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u)) || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+		angleOrClipData.clip = rhs.angleOrClipData.clip;
+	}
+	else {
+		if (type == FRMLINE) {
+			if (fillType == CONTF) {
+				angleOrClipData.guide.start = rhs.angleOrClipData.guide.start;
+				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+			}
+		}
+		else {
+			angleOrClipData.angle = rhs.angleOrClipData.angle;
+		}
+	}
+
 	borderSize      = rhs.borderSize;
 	edgeSpacing     = rhs.edgeSpacing;
 	edgeStitchLen   = rhs.edgeStitchLen;
@@ -2274,294 +2658,6 @@ struct _grdcod {
 using GRDCOD = struct _grdcod;
 
 #pragma pack()
-
-// form types
-enum formStyles
-{
-	FRMLINE = 1u, // Line form
-	FRMFPOLY,     // Freehand polygon form
-	FRMRPOLY,     // Regular polygon form
-	FRMSTAR,      // Star form
-	FRMSPIRAL,    // Spiral Form
-	SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
-	FRMHEART,     // Heart Form
-	FRMLENS,      // Lens form
-	FRMEGG,       // Egg form
-	FRMTEAR,      // Teardrop form
-	FRMZIGZAG,    // Zig-Zag form
-	FRMWAVE,      // Wave Form
-	FRMDAISY,     // Daisy form
-};
-
-// main menu items
-enum mainMenuItems
-{
-	M_FILE,
-	M_VIEW,
-	M_FORM,
-	M_EDIT,
-	M_IN,
-	M_OUT,
-	M_UNDO,
-	M_REDO,
-	M_ROT,
-	M_PREF,
-	M_FILL,
-	M_ADD,
-	M_FRM,
-	M_ALL,
-	M_1,
-	M_2,
-	M_3,
-	M_4,
-	M_HELP,
-};
-
-// view menu items
-enum viewMenuItems
-{
-	MVW_MOVIE,
-	MVW_SET,
-	MVW_BACK,
-	MVW_ZOOM,
-	MVW_THRD,
-	MVW_SHWT,
-	MVW_SHWTCOL,
-	MVW_DSGN,
-	MVW_KNOT,
-	MVW_MARK,
-	MVW_ABOUT,
-};
-
-// fill menu items
-enum fillMenuItems
-{
-	MFIL_SAT,
-	MFIL_FTH,
-	MFIL_VERT,
-	MFIL_HOR,
-	MFIL_ANG,
-	MFIL_CLP,
-	MFIL_CONT,
-	MFIL_TED,
-	MFIL_BORD,
-	MFIL_UNFIL
-};
-
-// clipboard data types
-enum clipDataType
-{
-	CLP_STCH = 1,
-	CLP_FRM,
-	CLP_FRMS,
-	CLP_FRMPS,
-};
-
-// edge fill types
-enum edgeFillStyles
-{
-	EDGELINE = 1, // Line
-	EDGEBEAN,     // Bean
-	EDGECLIP,     // Clipboard
-	EDGEANGSAT,   // Angle Satin
-	EDGEAPPL,     // Applique
-	EDGEPROPSAT,  // Proportional Satin
-	EDGEBHOL,     // Buttonhole
-	EDGEPICOT,    // Picot
-	EDGEDOUBLE,   // Double
-	EDGELCHAIN,   // Line Chain
-	EDGEOCHAIN,   // Open Chain
-	EDGECLIPX,    // Even Clipboard
-	EDGELAST      // must always be the last value
-};
-
-// edge underlay bit
-#define EGUND 0x80u
-#define NEGUND 0x7fu
-
-// form data lines
-enum formData
-{
-	LFRM,       // form 0
-	LLAYR,      // layer 1
-	LFRMFIL,    // form fill 2
-	LFRMCOL,    // form fill color 3
-	LFRMSPAC,   // form fill space 4
-	LFRMLEN,    // form stitch length 5
-	LFRMANG,    // angle of angle fill 6
-	LBRD,       // border 7
-	LBRDCOL,    // border color 8
-	LBRDSPAC,   // border space 9
-	LBRDLEN,    // border stitch length 10
-	LBRDSIZ,    // border size 11
-	LAPCOL,     // applique color 12
-	LBCSIZ,     // buttonhole corner size 13
-	LBSTRT,     // form start style 14
-	LBFIN,      // form end style 15
-	LBRDPIC,    // pico border spacing 16
-	LBRDUND,    // border underlay 17
-	LSACANG,    // angle clipboard angle 18
-	LFRMFAZ,    // clipboard phase 19
-	LBRDPOS,    // chain position 20
-	LBFILSQR,   // square/pointed fill ends 21
-	LMAXFIL,    // maximum fill stitch length 22
-	LMINFIL,    // minimum fill stitch length 23
-	LMAXBRD,    // maximum border stitch length 24
-	LMINBRD,    // minimum border stitch length 25
-	LFTHCOL,    // feather color 26
-	LFTHTYP,    // feather fill type
-	LFTHBLND,   // feather blend
-	LFTHBTH,    // feather both up and down
-	LFTHUP,     // feather up or down
-	LFTHUPCNT,  // feather up count
-	LFTHDWNCNT, // feather down count
-	LFTHSIZ,    // feather size
-	LFTHNUM,    // feather number
-	LFTHFLR,    // feather floor
-	LFSTRT,     // form fill start on/off
-	LDSTRT,     // form fill start data
-	LFEND,      // form fill end on/off
-	LDEND,      // form fill end data
-	LCWLK,      // center walk
-	LWALK,      // edge walk
-	LWLKIND,    // edge walk/underlay indent
-	LUND,       // underlay
-	LULEN,      // underaly stitch length
-	LUANG,      // underlay angle
-	LUSPAC,     // underlay spacing
-	LUNDCOL,    // underlay color
-	LTXOF,      // texture fill spacing
-	LASTLIN     // must be the last entry
-};
-
-// fill types
-enum fillStyles
-{
-	VRTF = 1, // Vertical fill
-	HORF,     // Horizontal fill
-	ANGF,     // Angle fill
-	SATF,     // Fan fill ?
-	CLPF,     // Fan clip Fill
-	CONTF,    // Contour fill
-	VCLPF,    // Vertical clip fill
-	HCLPF,    // Horizontal clip fill
-	ANGCLPF,  // Angle clip fill
-	FTHF,     // Feather fill
-	TXVRTF,   // Vertical texture fill
-	TXHORF,   // Horizontal texture fill
-	TXANGF,   // Angle texture fill
-};
-#define MCLPF 1 << CLPF
-#define MVCLPF 1 << VCLPF
-#define MHCLPF 1 << HCLPF
-#define MANGCLPF 1 << ANGCLPF
-
-// preference window
-enum preferenceItems
-{
-	PSPAC,  // 0
-	PANGL,  // 1
-	PSQR,   // 2
-	PSAT,   // 3
-	PMAX,   // 4
-	PUSE,   // 5
-	PMIN,   // 6
-	PSHO,   // 7
-	PBOX,   // 8
-	PSMAL,  // 9
-	PAP,    // 10
-	PSNP,   // 11
-	PSTAR,  // 12
-	PSPIR,  // 13
-	PBUT,   // 14
-	PBLNT,  // 15
-	PPIC,   // 16
-	PHUP,   // 17
-	PHUPX,  // 18
-	PUND,   // 19
-	PGRD,   // 20
-	PCLPOF, // 21
-	PFAZ,   // 22
-	PCHN,   // 23
-	PCHRAT, // 24
-	PNUDG,  // 25
-	PEG,    // 26
-	PHUPY,  // 27
-};
-
-// file menu items
-enum fileMenuItems
-{
-	FM_NEW,
-	FM_OPEN,
-	FM_CLOS,
-	FM_THUMB,
-	FM_OPNPCS,
-	FM_INSRT,
-	FM_OVRLAY,
-	FM_SAV,
-	FM_SAVAS,
-	FM_LODBIT,
-	FM_SAVBIT,
-	FM_HIDBIT,
-	FM_RMVBIT,
-	FM_PURG,
-	FM_LOCK,
-	FM_ONAM0,
-	FM_ONAM1,
-	FM_ONAM2,
-	FM_ONAM3
-};
-
-// fill message codes
-enum fillMessageCodes
-{
-	FMM_FAN,
-	FMM_VRT,
-	FMM_HOR,
-	FMM_ANG,
-	FMM_CLP,
-	FMM_FTH,
-	FML_LIN = 0x100,
-	FML_BLD,
-	FML_ANGS,
-	FML_PRPS,
-	FML_APLQ,
-	FML_BHOL,
-	FML_CLP,
-	FML_PIC,
-	FMX_UNF,
-	FML_CONT,
-	FML_CHAIN,
-};
-
-// button windows
-enum stitchButtons
-{
-	HBOXSEL,
-	HUPTO,
-	HHID,
-	HNUM,
-	HTOT,
-	HMINLEN,
-	HMAXLEN,
-	HCOR,
-	HLAYR
-};
-
-enum textureButtons
-{ // text button windows
-	HTXCLR,
-	HTXHI,
-	HTXWID,
-	HTXSPAC,
-	HTXVRT,
-	HTXHOR,
-	HTXANG,
-	HTXMIR,
-};
-
-#define HLIN HNUM
 
 struct _orec {
 	unsigned    start;
