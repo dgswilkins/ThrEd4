@@ -820,6 +820,7 @@ void satin::slbrd() {
 	const auto savedSpacing = LineSpacing;
 
 	SequenceIndex = 0;
+	OSequence->clear();
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		HorizontalLength2 = SelectedForm->borderSize * URAT;
 		satin::satout(HorizontalLength2);
@@ -1134,8 +1135,9 @@ void satin::satfil() {
 			length       = (length - lengths[1]) / 2;
 			auto iVertex = 1u;
 			if (!StateMap.test(StateFlag::BARSAT)) {
-				(*OSequence)[0] = SelectedPoint = vertexIt[1];
-				SequenceIndex                   = 1;
+				SelectedPoint = vertexIt[1];
+				OSequence->push_back(SelectedPoint);
+				SequenceIndex++;
 			}
 			while ((iVertex < (VertexCount + 1)) && (length > lengths[iVertex])) {
 				iVertex++;
@@ -1361,9 +1363,6 @@ void satin::internal::sfn(unsigned int startVertex) {
 		startVertex = nextVertex;
 	}
 	(*OSequence)[0] = (*OSequence)[SequenceIndex - 1];
-	if (SequenceIndex > MAXITEMS - 2) {
-		SequenceIndex = MAXITEMS - 2;
-	}
 }
 
 void satin::satzum() {
@@ -1415,7 +1414,10 @@ void satin::sbrd() {
 
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
-	SequenceIndex = 1;
+	SequenceIndex = 0;
+	OSequence->clear();
+	OSequence->push_back(fPOINT{ 0.0,0.0 });
+	SequenceIndex++;
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		LineSpacing = USPAC;
 		satin::satout(HorizontalLength2 * URAT);

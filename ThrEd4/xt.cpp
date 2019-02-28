@@ -754,9 +754,9 @@ void xt::internal::fnwlk(unsigned int find) {
 	const auto& walkPoints = xt::insid();
 	OutputIndex            = 0;
 	while (count != 0u) {
-		(*OSequence)[OutputIndex] = walkPoints[start];
-		start                     = form::nxt(start);
+		OSequence->push_back(walkPoints[start]);
 		OutputIndex++;
+		start                     = form::nxt(start);
 		count--;
 	}
 	ritwlk();
@@ -783,6 +783,7 @@ void xt::internal::undclp() {
 
 void xt::internal::fncwlk() {
 	OutputIndex = 0;
+	OSequence->clear();
 	SelectedForm->extendedAttribute |= AT_CWLK;
 	if (SelectedForm->satinGuideCount != 0u) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -790,21 +791,18 @@ void xt::internal::fncwlk() {
 			const auto iVertex          = SelectedForm->wordParam;
 			auto&      thisVertex       = vertexIt[iVertex];
 			auto&      nextVertex       = vertexIt[gsl::narrow_cast<size_t>(iVertex) + 1u];
-			(*OSequence)[OutputIndex].x = form::midl(thisVertex.x, nextVertex.x);
-			(*OSequence)[OutputIndex].y = form::midl(thisVertex.y, nextVertex.y);
+			OSequence->push_back(fPOINT{ form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
 			OutputIndex++;
 		}
 		auto guideIt = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
 		for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
-			(*OSequence)[OutputIndex].x
-			    = form::midl(vertexIt[guideIt[iGuide - 1].finish].x, vertexIt[guideIt[iGuide - 1].start].x);
-			(*OSequence)[OutputIndex].y
-			    = form::midl(vertexIt[guideIt[iGuide - 1].finish].y, vertexIt[guideIt[iGuide - 1].start].y);
+			OSequence->push_back(
+			    fPOINT{ form::midl(vertexIt[guideIt[iGuide - 1].finish].x, vertexIt[guideIt[iGuide - 1].start].x),
+			            form::midl(vertexIt[guideIt[iGuide - 1].finish].y, vertexIt[guideIt[iGuide - 1].start].y) });
 			OutputIndex++;
 		}
 		if ((SelectedForm->attribute & FRMEND) != 0u) {
-			(*OSequence)[OutputIndex].x = form::midl(vertexIt[0].x, vertexIt[1].x);
-			(*OSequence)[OutputIndex].y = form::midl(vertexIt[0].y, vertexIt[1].y);
+			OSequence->push_back(fPOINT{ form::midl(vertexIt[0].x, vertexIt[1].x), form::midl(vertexIt[0].y, vertexIt[1].y) });
 			OutputIndex++;
 		}
 	}
@@ -814,20 +812,20 @@ void xt::internal::fncwlk() {
 			start = SelectedForm->fillStart;
 		}
 		auto vertexIt             = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		(*OSequence)[OutputIndex] = vertexIt[start];
+		OSequence->push_back(vertexIt[start]);
 		OutputIndex++;
 		auto finish = form::prv(start);
 		start       = form::nxt(start);
 		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
-			(*OSequence)[OutputIndex].x = form::midl(vertexIt[finish].x, vertexIt[start].x);
-			(*OSequence)[OutputIndex].y = form::midl(vertexIt[finish].y, vertexIt[start].y);
-			if (form::cisin((*OSequence)[OutputIndex].x, (*OSequence)[OutputIndex].y)) {
+			OSequence->push_back(
+			    fPOINT{ form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
+			if (form::cisin(OSequence->back().x, OSequence->back().y)) {
 				OutputIndex++;
 			}
 			start  = form::nxt(start);
 			finish = form::prv(finish);
 		}
-		(*OSequence)[OutputIndex] = vertexIt[start];
+		OSequence->push_back(vertexIt[start]);
 		OutputIndex++;
 	}
 	ritcwlk();

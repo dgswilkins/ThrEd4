@@ -687,7 +687,8 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	for (auto& clip : tempClipPoints) {
 		auto point = clip;
 		thred::rotflt(point, rotationAngle, rotationCenter);
-		(*OSequence)[SequenceIndex++] = fPOINT{ chainEndPoint.x + point.x, chainEndPoint.y + point.y };
+		OSequence->push_back(fPOINT{ chainEndPoint.x + point.x, chainEndPoint.y + point.y });
+		SequenceIndex++;
 	}
 }
 
@@ -700,13 +701,15 @@ void clip::duxclp() {
 	tempClipPoints.reserve(ClipBuffer->size());
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	SequenceIndex = 0;
+	OSequence->clear();
 	// ToDo - does this make sense?
 	const auto rotationCenter = dPOINT{};
 	for (auto iPoint = 1u; iPoint < chainEndPoints.size(); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
-		(*OSequence)[SequenceIndex++] = chainEndPoints[0];
+		OSequence->push_back(chainEndPoints[0]);
+		SequenceIndex++;
 	}
 }
 
@@ -736,13 +739,19 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	delta.x *= ratio;
 	delta.y *= ratio;
 	const auto point              = fPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
-	(*OSequence)[SequenceIndex++] = vertexIt[nextVertex];
-	(*OSequence)[SequenceIndex++] = point;
-	(*OSequence)[SequenceIndex++] = vertexIt[nextVertex];
-	(*OSequence)[SequenceIndex++] = point;
+	OSequence->push_back(vertexIt[nextVertex]);
+	SequenceIndex++;
+	OSequence->push_back(point);
+	SequenceIndex++;
+	OSequence->push_back(vertexIt[nextVertex]);
+	SequenceIndex++;
+	OSequence->push_back(point);
+	SequenceIndex++;
 	if (!ci::ritclp(clipFillData, point)) {
-		(*OSequence)[SequenceIndex++] = point;
-		(*OSequence)[SequenceIndex++] = vertexIt[nextVertex];
+		OSequence->push_back(point);
+		SequenceIndex++;
+		OSequence->push_back(vertexIt[nextVertex]);
+		SequenceIndex++;
 	}
 }
 
@@ -779,24 +788,34 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
 			const auto firstPoint         = fPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
 			const auto outerPoint         = fPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
-			(*OSequence)[SequenceIndex++] = firstPoint;
-			(*OSequence)[SequenceIndex++] = innerPoint;
-			(*OSequence)[SequenceIndex++] = firstPoint;
-			(*OSequence)[SequenceIndex++] = outerPoint;
-			(*OSequence)[SequenceIndex++] = firstPoint;
-			(*OSequence)[SequenceIndex++] = outerPoint;
+			OSequence->push_back(firstPoint);
+			SequenceIndex++;
+			OSequence->push_back(innerPoint);
+			SequenceIndex++;
+			OSequence->push_back(firstPoint);
+			SequenceIndex++;
+			OSequence->push_back(outerPoint);
+			SequenceIndex++;
+			OSequence->push_back(firstPoint);
+			SequenceIndex++;
+			OSequence->push_back(outerPoint);
+			SequenceIndex++;
 			if (ci::ritclp(clipFillData, outerPoint)) {
 				flag = false;
 				break;
 			}
-			(*OSequence)[SequenceIndex++] = outerPoint;
-			(*OSequence)[SequenceIndex++] = firstPoint;
+			OSequence->push_back(outerPoint);
+			SequenceIndex++;
+			OSequence->push_back(firstPoint);
+			SequenceIndex++;
 			innerPoint.x += step.x;
 			innerPoint.y += step.y;
 		}
 		if (flag) {
-			(*OSequence)[SequenceIndex++] = vertexIt[finish];
-			(*OSequence)[SequenceIndex++] = innerPoint;
+			OSequence->push_back(vertexIt[finish]);
+			SequenceIndex++;
+			OSequence->push_back(innerPoint);
+			SequenceIndex++;
 		}
 	}
 }
@@ -809,6 +828,7 @@ void clip::clpic() {
 		                                ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
 
 	SequenceIndex = 0;
+	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
 	HorizontalLength  = ClipRectSize.cx;
@@ -825,7 +845,8 @@ void clip::clpic() {
 	else {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (SelectedForm->fillType == 0u) {
-			(*OSequence)[SequenceIndex++] = vertexIt[0];
+			OSequence->push_back(vertexIt[0]);
+			SequenceIndex++;
 		}
 		auto currentVertex = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -834,7 +855,8 @@ void clip::clpic() {
 			ci::clpcrnr(clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
 		}
-		(*OSequence)[SequenceIndex++] = vertexIt[currentVertex];
+		OSequence->push_back(vertexIt[currentVertex]);
+		SequenceIndex++;
 	}
 }
 
