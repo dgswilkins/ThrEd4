@@ -31,7 +31,6 @@ namespace fs = std::experimental::filesystem;
 
 unsigned   ActiveColor = 0;  // active color selector
 unsigned   ActiveLayer = 0;  // active layer
-unsigned   ActivePointIndex; // pointer to the active form in the sequencing algorithm
 fRECTANGLE AllItemsRect;     // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills

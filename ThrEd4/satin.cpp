@@ -85,14 +85,15 @@ unsigned int satin::internal::nusac(unsigned int formIndex, unsigned guideCount)
 	return guideIndex;
 }
 
-void satin::spltsat(SATCON currentGuide) {
+void satin::spltsat(unsigned guideIndex) {
+	auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
 	// We are adding two additional vertices when splitting the form
 	auto vertexBuffer = std::vector<fPOINT>{};
 	vertexBuffer.resize(gsl::narrow_cast<size_t>(VertexCount) + 2u);
 	auto& formList = *FormList;
 
 	auto& srcForm = formList[ClosestFormToCursor];
-	auto  dest    = std::next(formList.begin(), ClosestFormToCursor);
+	auto  dest    = std::next(formList.cbegin(), ClosestFormToCursor);
 	formList.insert(dest, srcForm);
 	form::fvars(ClosestFormToCursor);
 	const auto maxForm  = formList.size();
@@ -102,6 +103,7 @@ void satin::spltsat(SATCON currentGuide) {
 		formList[iForm].vertexIndex += 2;
 	}
 	auto       iOldVertex    = 0u;
+	auto currentGuide = guideIt[guideIndex];
 	const auto oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1;
 	auto       iNewVertex    = oldLastVertex + 1;
 	auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
@@ -141,8 +143,7 @@ void satin::spltsat(SATCON currentGuide) {
 	auto iNewGuide = 1;
 	iNewGuide += currentGuide.start - currentGuide.finish;
 	auto iGuide  = 0u;
-	auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
-	for (iGuide = 0u; iGuide < ActivePointIndex; iGuide++) {
+	for (iGuide = 0u; iGuide < guideIndex; iGuide++) {
 		guideIt[iGuide].finish += iNewGuide;
 	}
 	if (SelectedForm->wordParam != 0u) {
@@ -160,9 +161,9 @@ void satin::spltsat(SATCON currentGuide) {
 	const auto offset = SelectedForm->satinOrAngle.guide + iNewGuide - 1;
 	auto       pos    = std::next(SatinGuides->cbegin(), offset);
 	SatinGuides->erase(pos);
-	nextForm.satinOrAngle.guide   = SelectedForm->satinOrAngle.guide + ActivePointIndex;
-	nextForm.satinGuideCount      = SelectedForm->satinGuideCount - ActivePointIndex - 1;
-	SelectedForm->satinGuideCount = ActivePointIndex;
+	nextForm.satinOrAngle.guide   = SelectedForm->satinOrAngle.guide + guideIndex;
+	nextForm.satinGuideCount      = SelectedForm->satinGuideCount - guideIndex - 1;
+	SelectedForm->satinGuideCount = guideIndex;
 	for (auto iForm = ClosestFormToCursor + 2; iForm < maxForm; iForm++) {
 		auto& formIter = formList[iForm];
 		formIter.satinOrAngle.guide--;

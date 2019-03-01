@@ -63,7 +63,6 @@ namespace fs = std::experimental::filesystem;
 
 extern unsigned   ActiveColor;
 extern unsigned   ActiveLayer;
-extern unsigned   ActivePointIndex;
 extern fRECTANGLE AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;

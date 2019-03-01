@@ -7955,20 +7955,21 @@ void thred::internal::setknt() {
 }
 
 unsigned thred::internal::srchknot(unsigned source) noexcept {
-	while (ActivePointIndex < KnotCount && Knots[ActivePointIndex] < source) {
-		ActivePointIndex++;
+	auto knotIndex = 0u;
+	while (knotIndex < KnotCount && Knots[knotIndex] < source) {
+		knotIndex++;
 	}
-	ActivePointIndex--;
-	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
-		ActivePointIndex++;
-		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
+	knotIndex--;
+	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
+		knotIndex++;
+		if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
 			return 0;
 		}
 		return 2;
 	}
 
-	ActivePointIndex++;
-	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
+	knotIndex++;
+	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
 		return 1;
 	}
 	return 3;

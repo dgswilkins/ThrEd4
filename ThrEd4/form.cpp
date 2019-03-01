@@ -3182,7 +3182,6 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 	}
 	iclpx.push_back(gsl::narrow<unsigned int>(regionCrossingData.size()));
-	ActivePointIndex      = 0;
 	auto clipStitchPoints = std::vector<CLIPNT>{};
 	// Reserve some memory, but probably not enough
 	clipStitchPoints.reserve(1000);
@@ -4724,12 +4723,10 @@ void form::internal::trfrm(const dPOINT& bottomLeftPoint,
 		auto middleDelta = dPOINT{};
 		dudif(bottomMidpoint, topMidpoint, middleDelta);
 		OSequence->push_back(fPOINT{ clipRatio.y * middleDelta.x + bottomMidpoint.x, clipRatio.y * middleDelta.y + bottomMidpoint.y });
-		ActivePointIndex++;
 	}
 }
 
 void form::internal::clpfm() {
-	ActivePointIndex = 0;
 	for (auto iSequence = 0u; iSequence < BSequence->size() - 2; iSequence += 2) {
 		auto&      bSeq0       = (*BSequence)[iSequence];
 		auto&      bSeq1       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
@@ -8463,10 +8460,10 @@ void form::spltfrm() {
 				SelectedForm->edgeType = 0;
 				*/
 				auto guideIt = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
-				for (ActivePointIndex = 0; ActivePointIndex < SelectedForm->satinGuideCount; ActivePointIndex++) {
-					if (guideIt[ActivePointIndex].start == ClosestVertexToCursor
-					    || guideIt[ActivePointIndex].finish == ClosestVertexToCursor) {
-						satin::spltsat(guideIt[ActivePointIndex]);
+				for (auto guideIndex = 0u; guideIndex < SelectedForm->satinGuideCount; guideIndex++) {
+					if (guideIt[guideIndex].start == ClosestVertexToCursor
+					    || guideIt[guideIndex].finish == ClosestVertexToCursor) {
+						satin::spltsat(guideIndex);
 						return;
 					}
 				}
