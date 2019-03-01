@@ -7959,7 +7959,9 @@ unsigned thred::internal::srchknot(unsigned source) noexcept {
 	while (knotIndex < KnotCount && Knots[knotIndex] < source) {
 		knotIndex++;
 	}
-	knotIndex--;
+	if (knotIndex != 0u) {
+		knotIndex--;
+	}
 	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
 		knotIndex++;
 		if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
