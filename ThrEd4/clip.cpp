@@ -281,7 +281,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), OSequence->size())) {
+	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), gsl::narrow<unsigned int>(OSequence->size()))) {
 		return true;
 	}
 	for (auto& data : clipFillData) {

@@ -1366,7 +1366,7 @@ void form::filinsb(const dPOINT& point) {
 
 	if (length > MAXSTCH) {
 		count--;
-		if (form::chkmax(count, OSequence->size())) {
+		if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
 			return;
 		}
 		while (count != 0u) {
@@ -2451,7 +2451,7 @@ void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm) {
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
 		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
-		const auto savedIndex = OSequence->size();
+		const auto savedIndex = gsl::narrow<unsigned int>(OSequence->size());
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint = vertexIt[0];
 		StateMap.set(StateFlag::FILDIR);
@@ -4624,7 +4624,7 @@ void form::internal::bakseq() {
 				if (length > UserStitchLength2) {
 					auto point = bNext;
 					auto count = gsl::narrow<unsigned int>(std::round(length / UserStitchLength - 1));
-					if (form::chkmax(count, OSequence->size())) {
+					if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
 						return;
 					}
 					const auto step = dPOINT{ delta.x / count, delta.y / count };
@@ -4650,7 +4650,7 @@ void form::filinu(const dPOINT& inPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, OSequence->size())) {
+	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
 		return;
 	}
 	if (count != 0u) {
@@ -4677,7 +4677,7 @@ void form::filin(dPOINT currentPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, OSequence->size())) {
+	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
 		return;
 	}
 	if (count != 0u) {
