@@ -141,7 +141,7 @@ bool form::internal::chk2of() {
 }
 
 void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) {
-	for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
+	for (auto iSequence = 0u; iSequence < OSequence->size(); iSequence++) {
 		thred::rotflt((*OSequence)[iSequence], rotationAngle, rotationCenter);
 	}
 }
@@ -1274,7 +1274,7 @@ void form::chkseq(bool border) {
 		userStitchLen = MaxStitchLen;
 	}
 	bool flag = true;
-	for (auto iSequence = 0u; iSequence < SequenceIndex - 1; iSequence++) {
+	for (auto iSequence = 0u; iSequence < OSequence->size() - 1; iSequence++) {
 		if (!fi::ritlin((*OSequence)[iSequence], (*OSequence)[iSequence + 1], userStitchLen)) {
 			flag = false;
 			break;
@@ -1303,7 +1303,7 @@ void form::chkseq(bool border) {
 }
 
 void form::internal::ritbrd() {
-	if (SequenceIndex != 0u) {
+	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ TYPBRD,
 		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK,
 		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
@@ -1313,7 +1313,7 @@ void form::internal::ritbrd() {
 }
 
 void form::internal::ritapbrd() {
-	if (SequenceIndex != 0u) {
+	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ TYPMSK,
 		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4,
 		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
@@ -1323,7 +1323,7 @@ void form::internal::ritapbrd() {
 }
 
 void form::internal::ritfil() {
-	if (SequenceIndex != 0u) {
+	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
@@ -1366,7 +1366,7 @@ void form::filinsb(const dPOINT& point) {
 
 	if (length > MAXSTCH) {
 		count--;
-		if (form::chkmax(count, SequenceIndex)) {
+		if (form::chkmax(count, OSequence->size())) {
 			return;
 		}
 		while (count != 0u) {
@@ -1544,7 +1544,7 @@ void form::internal::bold(double size) {
 		iNextLine = form::nxt(iLine);
 		boldlin(iLine, iNextLine, size);
 	}
-	for (auto iSequence = 0u; iSequence < SequenceIndex - 1; iSequence++) {
+	for (auto iSequence = 0u; iSequence < OSequence->size() - 1; iSequence++) {
 		const auto length = hypot((*OSequence)[iSequence + 1].x - (*OSequence)[iSequence].x,
 		                          (*OSequence)[iSequence + 1].y - (*OSequence)[iSequence].y);
 		if (length > TINY) {
@@ -2028,7 +2028,7 @@ void form::internal::prsmal() {
 		minimumLength = HorizontalLength2 * 0.9;
 	}
 	auto iReference = 0u;
-	for (auto iSequence = 1u; iSequence < SequenceIndex; iSequence++) {
+	for (auto iSequence = 1u; iSequence < OSequence->size(); iSequence++) {
 		const auto delta  = dPOINT{ (*OSequence)[iSequence].x - (*OSequence)[iReference].x,
                                    (*OSequence)[iSequence].y - (*OSequence)[iReference].y };
 		const auto length = hypot(delta.x, delta.y);
@@ -2037,6 +2037,7 @@ void form::internal::prsmal() {
 			iReference              = iSequence;
 		}
 	}
+	OSequence->resize(iOutput);
 	SequenceIndex = iOutput;
 }
 
@@ -2181,8 +2182,8 @@ void form::internal::bhbrd(double spacing) {
 
 void form::internal::dubfn() {
 	brdfil(SelectedForm->edgeStitchLen);
-	auto iForward = SequenceIndex;
-	for (auto iBackward = SequenceIndex; iBackward != 0; iBackward--) {
+	auto iForward = OSequence->size();
+	for (auto iBackward = OSequence->size(); iBackward != 0; iBackward--) {
 		OSequence->push_back((*OSequence)[iBackward - 1]);
 		iForward++;
 	}
@@ -2431,7 +2432,7 @@ void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
 
 void form::internal::plbak(unsigned int backPoint) {
 	if (backPoint < (OSequence->size() - 1)) {
-		auto iSequence = SequenceIndex;
+		auto iSequence = OSequence->size();
 		if (iSequence != 0u) {
 			iSequence--;
 		}
@@ -2490,15 +2491,15 @@ void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm) {
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
 		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
-		const auto savedIndex = SequenceIndex;
+		const auto savedIndex = OSequence->size();
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint = vertexIt[0];
 		StateMap.set(StateFlag::FILDIR);
 		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
 		plbak(savedIndex);
 		prsmal();
-		if (SequenceIndex != 0u) { // ensure that we can do a valid read from OSequence
-			SelectedPoint = (*OSequence)[SequenceIndex - 1];
+		if (!OSequence->empty()) { // ensure that we can do a valid read from OSequence
+			SelectedPoint = OSequence->back();
 		}
 	}
 	StateMap.reset(StateFlag::UND);
@@ -3461,7 +3462,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 		chksid(0, clipIntersectSide, currentFormVertices);
 		auto index = 0u;
-		for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
+		for (auto iSequence = 0u; iSequence < OSequence->size(); iSequence++) {
 			if (vscmp(iSequence, index)) {
 				index++;
 				(*OSequence)[index] = (*OSequence)[iSequence];
@@ -3470,7 +3471,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		OSequence->resize(index);
 		SequenceIndex = index;
 		if (StateMap.test(StateFlag::WASNEG)) {
-			for (auto iSequence = 0u; iSequence < SequenceIndex; iSequence++) {
+			for (auto iSequence = 0u; iSequence < OSequence->size(); iSequence++) {
 				(*OSequence)[iSequence].x -= formOffset;
 			}
 			for (auto iVertex = 0u; iVertex < currentVertexCount; iVertex++) {
@@ -4620,7 +4621,7 @@ void form::internal::bakseq() {
 						if (OSequence->back().y > bCurrent.y) {
 							break;
 						}
-						delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bCurrent.y;
+						delta.y                         = gsl::narrow_cast<double>(OSequence->back().y) - bCurrent.y;
 						OSequence->back().x = bCurrent.x;
 						SequenceIndex++;
 						count++;
@@ -4637,7 +4638,7 @@ void form::internal::bakseq() {
 						if (OSequence->back().y < bPrevious.y) {
 							break;
 						}
-						delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bPrevious.y;
+						delta.y                         = gsl::narrow_cast<double>(OSequence->back().y) - bPrevious.y;
 						OSequence->back().x = bCurrent.x;
 						SequenceIndex++;
 						count--;
@@ -4653,7 +4654,7 @@ void form::internal::bakseq() {
 					if (OSequence->back().y > bCurrent.y) {
 						break;
 					}
-					delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
+					delta.y                         = gsl::narrow_cast<double>(OSequence->back().y) - bNext.y;
 					delta.x                         = slope * delta.y;
 					OSequence->back().x = bNext.x + delta.x;
 					SequenceIndex++;
@@ -4672,7 +4673,7 @@ void form::internal::bakseq() {
 					if (OSequence->back().y < bCurrent.y) {
 						break;
 					}
-					delta.y                         = gsl::narrow_cast<double>((*OSequence)[SequenceIndex].y) - bNext.y;
+					delta.y                         = gsl::narrow_cast<double>(OSequence->back().y) - bNext.y;
 					delta.x                         = slope * delta.y;
 					OSequence->back().x = bNext.x + delta.x;
 					SequenceIndex++;
@@ -4692,7 +4693,7 @@ void form::internal::bakseq() {
 				if (length > UserStitchLength2) {
 					auto point = bNext;
 					auto count = gsl::narrow<unsigned int>(std::round(length / UserStitchLength - 1));
-					if (form::chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3) {
+					if (form::chkmax(count, OSequence->size())) {
 						return;
 					}
 					const auto step = dPOINT{ delta.x / count, delta.y / count };
@@ -4720,7 +4721,7 @@ void form::filinu(const dPOINT& inPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, SequenceIndex) || count + SequenceIndex > MAXITEMS - 3) {
+	if (form::chkmax(count, OSequence->size())) {
 		return;
 	}
 	if (count != 0u) {
@@ -4749,7 +4750,7 @@ void form::filin(dPOINT currentPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, SequenceIndex) || (count + SequenceIndex) > MAXITEMS - 3) {
+	if (form::chkmax(count, OSequence->size())) {
 		return;
 	}
 	if (count != 0u) {
@@ -4805,7 +4806,7 @@ void form::internal::trfrm(const dPOINT& bottomLeftPoint,
 
 void form::internal::clpfm() {
 	ActivePointIndex = 0;
-	for (auto iSequence = 0u; iSequence < SequenceIndex - 2; iSequence += 2) {
+	for (auto iSequence = 0u; iSequence < BSequence->size() - 2; iSequence += 2) {
 		auto&      bSeq0       = (*BSequence)[iSequence];
 		auto&      bSeq1       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
 		auto&      bSeq2       = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 2u];

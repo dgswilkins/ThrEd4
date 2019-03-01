@@ -281,7 +281,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), SequenceIndex)) {
+	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), OSequence->size())) {
 		return true;
 	}
 	for (auto& data : clipFillData) {
@@ -915,8 +915,8 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 			if (StateMap.test(StateFlag::LINCHN)) {
 				backupAt--;
 			}
-			if ((SequenceIndex >= backupAt)) {
-				(*OSequence)[SequenceIndex - backupAt] = chainEndPoints[chainLength];
+			if ((OSequence->size() >= backupAt)) {
+				(*OSequence)[OSequence->size() - backupAt] = chainEndPoints[chainLength];
 			}
 			OSequence->push_back(chainEndPoints[chainLength]);
 			SequenceIndex++;

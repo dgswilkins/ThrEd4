@@ -1308,7 +1308,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	if (count == 0u) {
 		count = 1;
 	}
-	if (form::chkmax(count, SequenceIndex)) {
+	if (form::chkmax(count, OSequence->size())) {
 		return;
 	}
 	const auto innerStep        = dPOINT{ innerDelta.x / count, innerDelta.y / count };
@@ -1362,7 +1362,7 @@ void satin::internal::sfn(unsigned int startVertex) {
 		si::sbfn(*InsidePoints, startVertex, nextVertex);
 		startVertex = nextVertex;
 	}
-	(*OSequence)[0] = (*OSequence)[SequenceIndex - 1];
+	(*OSequence)[0] = OSequence->back();
 }
 
 void satin::satzum() {

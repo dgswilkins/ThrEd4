@@ -310,7 +310,7 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 }
 
 void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
-	if (SequenceIndex != 0u) {
+	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
@@ -325,6 +325,7 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 				(*OSequence)[iSequence] = featherSequence[iReverseSequence];
 				iReverseSequence--;
 			}
+			OSequence->resize(sequenceMax);
 			SequenceIndex = sequenceMax;
 			form::chkseq(false);
 		}
@@ -347,25 +348,25 @@ void xt::fthrfn() {
 	if (feather.phaseIndex == 0u) {
 		feather.phaseIndex = 1;
 	}
-	auto       ind = SequenceIndex / (feather.phaseIndex << 2);
-	const auto res = SequenceIndex % (feather.phaseIndex << 2);
+	auto       ind = BSequence->size() / (feather.phaseIndex << 2);
+	const auto res = BSequence->size() % (feather.phaseIndex << 2);
 	if (res > (feather.phaseIndex << 1)) {
 		ind++;
 	}
 	feather.globalPosition = 0;
-	feather.globalStep     = 4.0 / SequenceIndex * ind;
-	feather.globalPhase    = gsl::narrow_cast<float>(SequenceIndex) / ind;
+	feather.globalStep     = 4.0 / BSequence->size() * ind;
+	feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / ind;
 	feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
 	feather.globalUp       = feather.globalPhase * feather.globalRatio;
 	feather.globalDown     = feather.globalPhase - feather.globalUp;
 	SelectedForm->fillType = FTHF;
 	feather.phase          = 1;
-	BSequence->push_back((*BSequence)[SequenceIndex - 2]);
-	BSequence->push_back((*BSequence)[SequenceIndex - 1]);
+	BSequence->push_back((*BSequence)[BSequence->size() - 2]);
+	BSequence->push_back((*BSequence)[BSequence->size() - 1]);
 	SequenceIndex += 2;
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0u) {
 		OutputIndex = 0;
-		for (ind = 0; ind < SequenceIndex - 2; ind++) {
+		for (ind = 0; ind < BSequence->size() - 2; ind++) {
 			if ((*BSequence)[ind].attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
@@ -373,14 +374,14 @@ void xt::fthrfn() {
 	}
 	else {
 		if ((SelectedForm->extendedAttribute & AT_FTHBTH) != 0u) {
-			for (ind = 0; ind <= SequenceIndex - 2; ind++) {
+			for (ind = 0; ind <= BSequence->size() - 2; ind++) {
 				if ((*BSequence)[ind].attribute == 0) {
 					xi::fthdfn(ind, feather);
 				}
 			}
 		}
 		else {
-			for (ind = 0; ind <= SequenceIndex - 2; ind++) {
+			for (ind = 0; ind <= BSequence->size() - 2; ind++) {
 				if ((*BSequence)[ind].attribute != 0) {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0u) {
 						xi::fthfn(ind, feather);
@@ -763,7 +764,7 @@ void xt::internal::fnwlk(unsigned int find) {
 }
 
 void xt::internal::ritund() {
-	if (SequenceIndex != 0u) {
+	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC{ UNDMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
 		chkuseq();
@@ -939,7 +940,7 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned in
 	undclp();
 	StateMap.set(StateFlag::ISUND);
 	form::angclpfn(textureSegments);
-	OutputIndex = SequenceIndex;
+	OutputIndex = OSequence->size();
 	ritund();
 	form::fvars(find);
 	UserStitchLength = savedStitchSize;
