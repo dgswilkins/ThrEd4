@@ -229,15 +229,15 @@ extern fPOINT SelectedPoint;
 
 extern std::vector<POINT>* SelectedPointsLine;
 
-extern fRECTANGLE   SelectedVerticesRect;
-extern double       ShowStitchThreshold;
-extern HWND         SideMessageWindow;
-extern wchar_t      SideWindowEntryBuffer[11];
-extern HWND         SideWindow[16];
-extern double       SmallStitchLength;
-extern double       SnapLength;
-extern double       SpiralWrap;
-extern double       StarRatio;
+extern fRECTANGLE SelectedVerticesRect;
+extern double     ShowStitchThreshold;
+extern HWND       SideMessageWindow;
+extern wchar_t    SideWindowEntryBuffer[11];
+extern HWND       SideWindow[16];
+extern double     SmallStitchLength;
+extern double     SnapLength;
+extern double     SpiralWrap;
+extern double     StarRatio;
 
 extern EnumMap<StateFlag> StateMap;
 

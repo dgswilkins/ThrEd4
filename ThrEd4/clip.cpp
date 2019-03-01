@@ -733,7 +733,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	const auto ratio  = form::getplen() / length;
 	delta.x *= ratio;
 	delta.y *= ratio;
-	const auto point              = fPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
+	const auto point = fPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
 	OSequence->push_back(vertexIt[nextVertex]);
 	OSequence->push_back(point);
 	OSequence->push_back(vertexIt[nextVertex]);
@@ -775,8 +775,8 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 		auto flag       = true;
 		auto innerPoint = fPOINT{ vertexIt[start].x, vertexIt[start].y };
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
-			const auto firstPoint         = fPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
-			const auto outerPoint         = fPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
+			const auto firstPoint = fPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
+			const auto outerPoint = fPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
 			OSequence->push_back(firstPoint);
 			OSequence->push_back(innerPoint);
 			OSequence->push_back(firstPoint);

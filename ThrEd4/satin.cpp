@@ -103,7 +103,7 @@ void satin::spltsat(unsigned guideIndex) {
 		formList[iForm].vertexIndex += 2;
 	}
 	auto       iOldVertex    = 0u;
-	auto currentGuide = guideIt[guideIndex];
+	auto       currentGuide  = guideIt[guideIndex];
 	const auto oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1;
 	auto       iNewVertex    = oldLastVertex + 1;
 	auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
@@ -142,7 +142,7 @@ void satin::spltsat(unsigned guideIndex) {
 	form::frmout(ClosestFormToCursor + 1);
 	auto iNewGuide = 1;
 	iNewGuide += currentGuide.start - currentGuide.finish;
-	auto iGuide  = 0u;
+	auto iGuide = 0u;
 	for (iGuide = 0u; iGuide < guideIndex; iGuide++) {
 		guideIt[iGuide].finish += iNewGuide;
 	}
@@ -869,7 +869,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					}
 				}
 				else {
-					SelectedPoint                 = vertexIt[line1Start];
+					SelectedPoint = vertexIt[line1Start];
 					OSequence->push_back(SelectedPoint);
 				}
 			}
@@ -1402,7 +1402,7 @@ void satin::sbrd() {
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
 	OSequence->clear();
-	OSequence->push_back(fPOINT{ 0.0,0.0 });
+	OSequence->push_back(fPOINT{ 0.0, 0.0 });
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		LineSpacing = USPAC;
 		satin::satout(HorizontalLength2 * URAT);

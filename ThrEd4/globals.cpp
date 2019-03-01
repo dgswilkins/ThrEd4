@@ -29,9 +29,9 @@
 
 namespace fs = std::experimental::filesystem;
 
-unsigned   ActiveColor = 0;  // active color selector
-unsigned   ActiveLayer = 0;  // active layer
-fRECTANGLE AllItemsRect;     // rectangle enclosing all forms and stitches
+unsigned   ActiveColor = 0; // active color selector
+unsigned   ActiveLayer = 0; // active layer
+fRECTANGLE AllItemsRect;    // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
@@ -196,15 +196,15 @@ fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordin
 
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
-fRECTANGLE   SelectedVerticesRect;                   // rectangle enclosing selected form verticess
-double       ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
-HWND         SideMessageWindow   = nullptr;          // main side message window
-wchar_t      SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
-HWND         SideWindow[16];                         // side message windows
-double       SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-double       SnapLength        = SNPLEN * PFGRAN;    // snap together length
-double       SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
-double       StarRatio         = STARAT;             // star formOrigin to body ratio
+fRECTANGLE SelectedVerticesRect;                   // rectangle enclosing selected form verticess
+double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
+HWND       SideMessageWindow   = nullptr;          // main side message window
+wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
+HWND       SideWindow[16];                         // side message windows
+double     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
+double     SnapLength        = SNPLEN * PFGRAN;    // snap together length
+double     SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
+double     StarRatio         = STARAT;             // star formOrigin to body ratio
 
 EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
 

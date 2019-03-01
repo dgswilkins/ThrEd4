@@ -132,7 +132,8 @@ void xt::internal::durats(unsigned int iSequence, std::vector<fPOINT>* sequence,
 		const auto adjustedPoint
 		    = fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
 
-		sequence->push_back(fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
+		sequence->push_back(
+		    fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
 	}
 }
 
@@ -277,7 +278,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		xratf(currentLowPoint, currentHighPoint, currentPoint, feather.ratioLocal);
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
-	midPoint                    = midpnt(currentPoint, nextPoint);
+	midPoint = midpnt(currentPoint, nextPoint);
 	OSequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
 	OutputIndex++;
 	OSequence->push_back(midPoint);
@@ -402,7 +403,7 @@ void xt::fthrfn() {
 	}
 	StateMap.reset(StateFlag::FTHR);
 	StateMap.reset(StateFlag::BARSAT);
-	LineSpacing   = savedSpacing;
+	LineSpacing = savedSpacing;
 	xi::fritfil(featherSequence);
 }
 
@@ -754,7 +755,7 @@ void xt::internal::fnwlk(unsigned int find) {
 	while (count != 0u) {
 		OSequence->push_back(walkPoints[start]);
 		OutputIndex++;
-		start                     = form::nxt(start);
+		start = form::nxt(start);
 		count--;
 	}
 	ritwlk();
@@ -786,9 +787,9 @@ void xt::internal::fncwlk() {
 	if (SelectedForm->satinGuideCount != 0u) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (SelectedForm->wordParam != 0u) {
-			const auto iVertex          = SelectedForm->wordParam;
-			auto&      thisVertex       = vertexIt[iVertex];
-			auto&      nextVertex       = vertexIt[gsl::narrow_cast<size_t>(iVertex) + 1u];
+			const auto iVertex    = SelectedForm->wordParam;
+			auto&      thisVertex = vertexIt[iVertex];
+			auto&      nextVertex = vertexIt[gsl::narrow_cast<size_t>(iVertex) + 1u];
 			OSequence->push_back(fPOINT{ form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
 			OutputIndex++;
 		}
@@ -809,7 +810,7 @@ void xt::internal::fncwlk() {
 		if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 			start = SelectedForm->fillStart;
 		}
-		auto vertexIt             = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		OSequence->push_back(vertexIt[start]);
 		OutputIndex++;
 		auto finish = form::prv(start);
