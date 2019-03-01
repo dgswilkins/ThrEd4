@@ -4536,7 +4536,7 @@ void form::internal::bakseq() {
 	while (iSequence > 0) {
 		const auto rcnt           = iSequence % RITSIZ;
 		const auto StitchSpacing2 = LineSpacing * 2;
-		const auto rit            = gsl::narrow<unsigned int>(std::round((*BSequence)[iSequence].x / StitchSpacing2));
+		const auto rit            = gsl::narrow<int>(std::round((*BSequence)[iSequence].x / StitchSpacing2));
 		auto&      bPrevious      = (*BSequence)[iSequence - 1u];
 		auto&      bCurrent       = (*BSequence)[iSequence];
 		auto&      bNext          = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
