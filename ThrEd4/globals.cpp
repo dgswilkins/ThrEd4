@@ -198,7 +198,6 @@ fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordin
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
 fRECTANGLE   SelectedVerticesRect;                   // rectangle enclosing selected form verticess
-unsigned int SequenceIndex;                          // sequencing pointer
 double       ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
 HWND         SideMessageWindow   = nullptr;          // main side message window
 wchar_t      SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers

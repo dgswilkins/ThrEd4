@@ -819,7 +819,6 @@ void satin::ribon() {
 void satin::slbrd() {
 	const auto savedSpacing = LineSpacing;
 
-	SequenceIndex = 0;
 	OSequence->clear();
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		HorizontalLength2 = SelectedForm->borderSize * URAT;
@@ -858,23 +857,19 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 			if (StateMap.test(StateFlag::FTHR)) {
 				auto vertex = vertexIt[line1Start % VertexCount];
 				BSequence->emplace_back(vertex.x, vertex.y, 0);
-				SequenceIndex++;
 			}
 			else {
 				if (StateMap.test(StateFlag::BARSAT)) {
 					if (VertexCount != 0u) {
 						auto vertex = vertexIt[line1Start % VertexCount];
 						BSequence->emplace_back(vertex.x, vertex.y, 0);
-						SequenceIndex++;
 						vertex = vertexIt[line2Start % VertexCount];
 						BSequence->emplace_back(vertex.x, vertex.y, 0);
-						SequenceIndex++;
 					}
 				}
 				else {
 					SelectedPoint                 = vertexIt[line1Start];
 					OSequence->push_back(SelectedPoint);
-					SequenceIndex++;
 				}
 			}
 		}
@@ -957,11 +952,9 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 						BSequence->emplace_back(line1Point.x, line1Point.y, 0);
-						SequenceIndex++;
 					}
 					else {
 						BSequence->emplace_back(line2Point.x, line2Point.y, 1);
-						SequenceIndex++;
 					}
 					line1Count--;
 					line2Count--;
@@ -976,15 +969,11 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 							BSequence->emplace_back(line1Point.x, line1Point.y, 0);
-							SequenceIndex++;
 							BSequence->emplace_back(line2Point.x, line2Point.y, 1);
-							SequenceIndex++;
 						}
 						else {
 							BSequence->emplace_back(line2Point.x, line2Point.y, 2);
-							SequenceIndex++;
 							BSequence->emplace_back(line1Point.x, line1Point.y, 3);
-							SequenceIndex++;
 						}
 						line1Count--;
 						line2Count--;
@@ -1092,7 +1081,6 @@ void satin::satfil() {
 	form::fvars(ClosestFormToCursor);
 	satin::satadj();
 	LineSpacing /= 2;
-	SequenceIndex = 0;
 	OSequence->clear();
 	BSequence->clear();
 	StateMap.reset(StateFlag::SAT1);
@@ -1137,7 +1125,6 @@ void satin::satfil() {
 			if (!StateMap.test(StateFlag::BARSAT)) {
 				SelectedPoint = vertexIt[1];
 				OSequence->push_back(SelectedPoint);
-				SequenceIndex++;
 			}
 			while ((iVertex < (VertexCount + 1)) && (length > lengths[iVertex])) {
 				iVertex++;
@@ -1160,7 +1147,6 @@ void satin::satfil() {
 		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
 			SelectedPoint = vertexIt[0];
 			OSequence->push_back(SelectedPoint);
-			SequenceIndex++;
 		}
 		while (length > lengths[iVertex]) {
 			iVertex++;
@@ -1414,10 +1400,8 @@ void satin::sbrd() {
 
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
-	SequenceIndex = 0;
 	OSequence->clear();
 	OSequence->push_back(fPOINT{ 0.0,0.0 });
-	SequenceIndex++;
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		LineSpacing = USPAC;
 		satin::satout(HorizontalLength2 * URAT);

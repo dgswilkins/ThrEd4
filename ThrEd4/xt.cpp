@@ -326,7 +326,6 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 				iReverseSequence--;
 			}
 			OSequence->resize(sequenceMax);
-			SequenceIndex = sequenceMax;
 			form::chkseq(false);
 		}
 	}
@@ -363,7 +362,6 @@ void xt::fthrfn() {
 	feather.phase          = 1;
 	BSequence->push_back((*BSequence)[BSequence->size() - 2]);
 	BSequence->push_back((*BSequence)[BSequence->size() - 1]);
-	SequenceIndex += 2;
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0u) {
 		OutputIndex = 0;
 		for (ind = 0; ind < BSequence->size() - 2; ind++) {
@@ -405,7 +403,6 @@ void xt::fthrfn() {
 	StateMap.reset(StateFlag::FTHR);
 	StateMap.reset(StateFlag::BARSAT);
 	LineSpacing   = savedSpacing;
-	SequenceIndex = OutputIndex;
 	xi::fritfil(featherSequence);
 }
 

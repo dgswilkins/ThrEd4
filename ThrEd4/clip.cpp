@@ -286,7 +286,6 @@ bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOIN
 	}
 	for (auto& data : clipFillData) {
 		OSequence->push_back(fPOINT{ data.x + adjustedPoint.x, data.y + adjustedPoint.y });
-		SequenceIndex++;
 	}
 	return false;
 }
@@ -405,7 +404,6 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 void clip::clpbrd(unsigned int startVertex) {
 	auto moveToCoords = dPOINT{}; // moving formOrigin for clipboard fill
 
-	SequenceIndex = 0;
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2          = ClipRectSize.cx / 2;
@@ -688,7 +686,6 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 		auto point = clip;
 		thred::rotflt(point, rotationAngle, rotationCenter);
 		OSequence->push_back(fPOINT{ chainEndPoint.x + point.x, chainEndPoint.y + point.y });
-		SequenceIndex++;
 	}
 }
 
@@ -700,7 +697,6 @@ void clip::duxclp() {
 	auto tempClipPoints = std::vector<fPOINT>{};
 	tempClipPoints.reserve(ClipBuffer->size());
 	ci::clpxadj(tempClipPoints, chainEndPoints);
-	SequenceIndex = 0;
 	OSequence->clear();
 	// ToDo - does this make sense?
 	const auto rotationCenter = dPOINT{};
@@ -709,7 +705,6 @@ void clip::duxclp() {
 	}
 	if (SelectedForm->type != FRMLINE) {
 		OSequence->push_back(chainEndPoints[0]);
-		SequenceIndex++;
 	}
 }
 
@@ -740,18 +735,12 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 	delta.y *= ratio;
 	const auto point              = fPOINT{ vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
 	OSequence->push_back(vertexIt[nextVertex]);
-	SequenceIndex++;
 	OSequence->push_back(point);
-	SequenceIndex++;
 	OSequence->push_back(vertexIt[nextVertex]);
-	SequenceIndex++;
 	OSequence->push_back(point);
-	SequenceIndex++;
 	if (!ci::ritclp(clipFillData, point)) {
 		OSequence->push_back(point);
-		SequenceIndex++;
 		OSequence->push_back(vertexIt[nextVertex]);
-		SequenceIndex++;
 	}
 }
 
@@ -789,33 +778,23 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 			const auto firstPoint         = fPOINT{ innerPoint.x + step.x, innerPoint.y + step.y };
 			const auto outerPoint         = fPOINT{ firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
 			OSequence->push_back(firstPoint);
-			SequenceIndex++;
 			OSequence->push_back(innerPoint);
-			SequenceIndex++;
 			OSequence->push_back(firstPoint);
-			SequenceIndex++;
 			OSequence->push_back(outerPoint);
-			SequenceIndex++;
 			OSequence->push_back(firstPoint);
-			SequenceIndex++;
 			OSequence->push_back(outerPoint);
-			SequenceIndex++;
 			if (ci::ritclp(clipFillData, outerPoint)) {
 				flag = false;
 				break;
 			}
 			OSequence->push_back(outerPoint);
-			SequenceIndex++;
 			OSequence->push_back(firstPoint);
-			SequenceIndex++;
 			innerPoint.x += step.x;
 			innerPoint.y += step.y;
 		}
 		if (flag) {
 			OSequence->push_back(vertexIt[finish]);
-			SequenceIndex++;
 			OSequence->push_back(innerPoint);
-			SequenceIndex++;
 		}
 	}
 }
@@ -827,7 +806,6 @@ void clip::clpic() {
 	const auto rotationCenter = dPOINT{ ((ClipRect.right - ClipRect.left) / 2 + ClipRect.left),
 		                                ((ClipRect.top - ClipRect.bottom) / 2 + ClipRect.bottom) };
 
-	SequenceIndex = 0;
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2;
@@ -846,7 +824,6 @@ void clip::clpic() {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (SelectedForm->fillType == 0u) {
 			OSequence->push_back(vertexIt[0]);
-			SequenceIndex++;
 		}
 		auto currentVertex = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -856,7 +833,6 @@ void clip::clpic() {
 			currentVertex = nextVertex;
 		}
 		OSequence->push_back(vertexIt[currentVertex]);
-		SequenceIndex++;
 	}
 }
 
@@ -896,12 +872,10 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	// ToDo - Should this be an insert?
 	for (auto iChain = 0u; iChain < chainCount; iChain++) {
 		OSequence->push_back(chainPoint[chainSequence[iChain]]);
-		SequenceIndex++;
 	}
 }
 
 void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
-	SequenceIndex    = 0;
 	OSequence->clear();
 	auto chainLength = gsl::narrow<unsigned int>(chainEndPoints.size());
 	if (chainLength > 2u) {
@@ -919,12 +893,10 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 				(*OSequence)[OSequence->size() - backupAt] = chainEndPoints[chainLength];
 			}
 			OSequence->push_back(chainEndPoints[chainLength]);
-			SequenceIndex++;
 		}
 		else {
 			ci::duchfn(chainEndPoints, chainLength - 1, 0);
 			OSequence->push_back(chainEndPoints[chainLength]);
-			SequenceIndex++;
 		}
 	}
 	else {
@@ -940,6 +912,5 @@ void clip::chnfn() {
 	clip::deleclp(ClosestFormToCursor);
 	ci::dufxlen(chainEndPoints);
 	ci::dulast(chainEndPoints);
-	SequenceIndex = 0;
 	ci::duch(chainEndPoints);
 }

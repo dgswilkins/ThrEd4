@@ -231,7 +231,6 @@ extern fPOINT SelectedPoint;
 extern std::vector<POINT>* SelectedPointsLine;
 
 extern fRECTANGLE   SelectedVerticesRect;
-extern unsigned int SequenceIndex;
 extern double       ShowStitchThreshold;
 extern HWND         SideMessageWindow;
 extern wchar_t      SideWindowEntryBuffer[11];
