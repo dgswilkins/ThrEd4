@@ -120,20 +120,22 @@ void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& poin
 }
 
 void xt::internal::durats(unsigned int iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
-	auto&      bCurrent     = (*BSequence)[iSequence];
-	auto&      bNext        = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
-	const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
+	if (sequence != nullptr) {
+		auto&      bCurrent = (*BSequence)[iSequence];
+		auto&      bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+		const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
-	if (stitchLength < feather.minStitch) {
-		sequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
-	}
-	else {
-		feather.ratioLocal = feather.minStitch / stitchLength;
-		const auto adjustedPoint
-		    = fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
+		if (stitchLength < feather.minStitch) {
+			sequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
+		}
+		else {
+			feather.ratioLocal = feather.minStitch / stitchLength;
+			const auto adjustedPoint
+				= fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
 
-		sequence->push_back(
-		    fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
+			sequence->push_back(
+				fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
+		}
 	}
 }
 
