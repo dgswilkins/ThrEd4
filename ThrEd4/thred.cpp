@@ -5531,6 +5531,7 @@ void thred::internal::nuFil() {
 			StateMap.reset(StateFlag::MOVSET);
 			form::frmon();
 			SelectedFormList->clear();
+			SelectedFormList->shrink_to_fit();
 			if (StateMap.testAndReset(StateFlag::PRFACT)) {
 				DestroyWindow(PreferencesWindow);
 				StateMap.reset(StateFlag::WASRT);
@@ -5663,9 +5664,6 @@ void thred::internal::nuFil() {
 					}
 					if (thredHeader.formCount != 0) {
 						StateMap.reset(StateFlag::BADFIL);
-						ClipPoints->clear();
-						FormVertices->clear();
-						SatinGuides->clear();
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
 						if (version < 2) {
@@ -5698,6 +5696,7 @@ void thred::internal::nuFil() {
 								FormList->push_back(FRMHED{ form });
 							}
 						}
+						FormList->shrink_to_fit();
 						if (thredHeader.vertexCount != 0u) {
 							FormVertices->resize(thredHeader.vertexCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
@@ -5712,6 +5711,7 @@ void thred::internal::nuFil() {
 							prtred();
 							return;
 						}
+						FormVertices->shrink_to_fit();
 						if (thredHeader.dlineCount != 0u) {
 							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
@@ -5725,6 +5725,7 @@ void thred::internal::nuFil() {
 								SatinGuides->push_back(SATCON{ guide });
 							}
 						}
+						SatinGuides->shrink_to_fit();
 						if (thredHeader.clipDataCount != 0u) {
 							ClipPoints->resize(thredHeader.clipDataCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
@@ -5734,6 +5735,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
+						ClipPoints->shrink_to_fit();
 						if (ExtendedHeader.texturePointCount != 0u) {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
 							bytesToRead = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount
@@ -5749,6 +5751,7 @@ void thred::internal::nuFil() {
 							TextureIndex = 0;
 							TexturePointsBuffer->clear();
 						}
+						TexturePointsBuffer->shrink_to_fit();
 						if (StateMap.testAndReset(StateFlag::BADFIL)) {
 							displayText::bfilmsg();
 						}
@@ -6808,11 +6811,16 @@ void thred::internal::newFil() {
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
+	FormVertices->shrink_to_fit();
 	TexturePointsBuffer->clear();
+	TexturePointsBuffer->shrink_to_fit();
 	TextureIndex = 0;
 	ClipPoints->clear();
+	ClipPoints->shrink_to_fit();
 	SatinGuides->clear();
+	SatinGuides->shrink_to_fit();
 	FormList->clear();
+	FormList->shrink_to_fit();
 	ColorChanges = 0;
 	KnotCount    = 0;
 	WorkingFileName->clear();
