@@ -196,7 +196,6 @@ std::bitset<32> DisplayedColorBitmap(0);               // Map of color numbers i
 double          GapToNearest[NERCNT];                  // distances of the closest points
                                                        // to a mouse click
 long       NearestPoint[NERCNT];                       // indices of the closest points
-POINT      SearchLine[MAXITEMS];                       // stitch select line
 fPOINT     StitchRangeSize;                            // form check ranges
 unsigned   MoveAnchor;                                 // for resequencing stitches
 double     RotateAngle;                                // angle for pixel rotate
@@ -2783,7 +2782,8 @@ void thred::internal::rstAll() {
 	StateMap.reset(StateFlag::FORMSEL);
 	StateMap.reset(StateFlag::FRMPSEL);
 	thred::unmsg();
-	SearchLineIndex = 0;
+	SearchLine->clear();
+	SearchLine->shrink_to_fit();
 	FirstWin        = nullptr;
 	while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0) != 0) {
 	}
@@ -3073,20 +3073,19 @@ void thred::internal::pgrit() {
 void thred::internal::selin(unsigned start, unsigned end, HDC dc) noexcept {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	if (SearchLineIndex != 0u) {
-		PolylineInt(dc, SearchLine, SearchLineIndex);
+	if (!SearchLine->empty()) {
+		PolylineInt(dc, SearchLine->data(), SearchLine->size());
 	}
 	if (start > end) {
 		std::swap(start, end);
 	}
-	SearchLineIndex = 0;
+	SearchLine->clear();
 	for (auto iStitch = start; iStitch <= end; iStitch++) {
-		auto coordinate               = ((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5);
-		SearchLine[SearchLineIndex].x = dToL(coordinate);
-		coordinate = (StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
-		SearchLine[SearchLineIndex++].y = dToL(coordinate);
+		SearchLine->push_back(
+		    POINT{ dToL(((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5)),
+		           dToL((StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)) });
 	}
-	PolylineInt(dc, SearchLine, SearchLineIndex);
+	PolylineInt(dc, SearchLine->data(), SearchLine->size());
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -5538,11 +5537,10 @@ void thred::internal::nuFil() {
 				PreferenceIndex = 0;
 			}
 			PCSBMPFileName[0] = 0;
-			if (SearchLineIndex != 0u) {
-				SearchLineIndex = 0;
-			}
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
+			SearchLine->clear();
+			SearchLine->shrink_to_fit();
 			StateMap.reset(StateFlag::BZUMIN);
 			rstdu();
 			thred::unmsg();
@@ -6854,7 +6852,8 @@ void thred::internal::rebox() {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
-			SearchLineIndex = 0;
+			SearchLine->clear();
+			SearchLine->shrink_to_fit();
 			StateMap.set(StateFlag::RESTCH);
 			for (auto& window : UserColorWin) {
 				thred::redraw(window);
@@ -18016,7 +18015,7 @@ void thred::internal::drwStch() {
 				cros(ClosestPointIndex);
 			}
 			else {
-				SearchLineIndex = 0;
+				SearchLine->clear();
 				ducros(StitchWindowMemDC);
 			}
 			thred::selRct(StitchRangeRect);
@@ -18865,6 +18864,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_RGBFileName               = fs::path{};
 		auto private_RubberBandLine            = std::vector<POINT>{};
 		auto private_SatinGuides               = std::vector<SATCON>{};
+		auto private_SearchLine                = std::vector<POINT>{};
 		auto private_SearchName                = fs::path{};
 		auto private_SelectedFormList          = std::vector<unsigned int>{};
 		auto private_SelectedFormsLine         = std::vector<POINT>{};
@@ -18933,6 +18933,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		RGBFileName               = &private_RGBFileName;
 		RubberBandLine            = &private_RubberBandLine;
 		SatinGuides               = &private_SatinGuides;
+		SearchLine                = &private_SearchLine;
 		SearchName                = &private_SearchName;
 		SelectedFormList          = &private_SelectedFormList;
 		SelectedFormsLine         = &private_SelectedFormsLine;

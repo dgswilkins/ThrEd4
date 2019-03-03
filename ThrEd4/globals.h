@@ -213,7 +213,9 @@ extern std::vector<SATCON>* SatinGuides;
 extern RECT      scRct;
 extern unsigned* screenDPI;
 extern int*      ScrollSize;
-extern unsigned  SearchLineIndex;
+
+extern std::vector<POINT>* SearchLine;                       // stitch select line
+
 extern HPEN      SelectAllPen;
 extern FRMHED*   SelectedForm;
 extern unsigned  SelectedFormControlVertex;

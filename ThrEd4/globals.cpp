@@ -180,7 +180,9 @@ std::vector<SATCON>* SatinGuides; // satin form connects
 RECT      scRct;                     //
 unsigned* screenDPI;                 // screen DPI
 int*      ScrollSize;                // Scroll bar width scaled for DPI
-unsigned  SearchLineIndex = 0;       // pointer for drawing stitch select lines
+
+std::vector<POINT>* SearchLine;      // stitch select line
+
 HPEN      SelectAllPen;              // pen for drawing large boxes
 FRMHED*   SelectedForm;              // pointer to selected form
 unsigned  SelectedFormControlVertex; // user selected form control formOrigin
