@@ -1295,7 +1295,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	if (count == 0u) {
 		count = 1;
 	}
-	if (form::chkmax(count, OSequence->size())) {
+	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
 		return;
 	}
 	const auto innerStep        = dPOINT{ innerDelta.x / count, innerDelta.y / count };

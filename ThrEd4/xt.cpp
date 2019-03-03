@@ -305,10 +305,10 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
 		xratf(adjustedPoint, (*OSequence)[iSequence], currentPoint, feather.ratioLocal);
-		xratf(adjustedPoint, (*OSequence)[iSequence + 1], nextPoint, feather.ratioLocal);
+		xratf(adjustedPoint, (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], nextPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.ratio;
 		xratf(currentPoint, (*OSequence)[iSequence], (*OSequence)[iSequence], feather.ratioLocal);
-		xratf(nextPoint, (*OSequence)[iSequence + 1], (*OSequence)[iSequence + 1], feather.ratioLocal);
+		xratf(nextPoint, (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], feather.ratioLocal);
 	}
 }
 
@@ -350,8 +350,8 @@ void xt::fthrfn() {
 	if (feather.phaseIndex == 0u) {
 		feather.phaseIndex = 1;
 	}
-	auto       ind = BSequence->size() / (feather.phaseIndex << 2);
-	const auto res = BSequence->size() % (feather.phaseIndex << 2);
+	auto       ind = gsl::narrow_cast<unsigned int>(BSequence->size()) / (feather.phaseIndex << 2);
+	const auto res = gsl::narrow_cast<unsigned int>(BSequence->size()) % (feather.phaseIndex << 2);
 	if (res > (feather.phaseIndex << 1)) {
 		ind++;
 	}
@@ -367,7 +367,7 @@ void xt::fthrfn() {
 	BSequence->push_back((*BSequence)[BSequence->size() - 1]);
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0u) {
 		OutputIndex = 0;
-		for (ind = 0; ind < BSequence->size() - 2; ind++) {
+		for (ind = 0; ind < gsl::narrow<unsigned int>(BSequence->size()) - 2; ind++) {
 			if ((*BSequence)[ind].attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
@@ -625,8 +625,8 @@ void xt::internal::chkuseq() {
 		}
 		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
 		for (auto iSequence = 0u; iSequence < OutputIndex - 1; iSequence++) {
-			const auto delta       = fPOINT{ (*OSequence)[iSequence + 1].x - (*OSequence)[iSequence].x,
-                                       (*OSequence)[iSequence + 1].y - (*OSequence)[iSequence].y };
+			const auto delta       = fPOINT{ (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1].x - (*OSequence)[iSequence].x,
+                                       (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1].y - (*OSequence)[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
 			const auto stitchCount = dToUI(length / underlayStitchLength);
 			if (stitchCount != 0u) {
@@ -940,7 +940,7 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned in
 	undclp();
 	StateMap.set(StateFlag::ISUND);
 	form::angclpfn(textureSegments);
-	OutputIndex = OSequence->size();
+	OutputIndex = gsl::narrow<unsigned int>(OSequence->size());
 	ritund();
 	form::fvars(find);
 	UserStitchLength = savedStitchSize;
@@ -1481,7 +1481,7 @@ bool xt::internal::lastcol(unsigned index, fPOINT& point) {
 	while (index != 0u) {
 		index--;
 		if ((*InterleaveSequenceIndices)[index].color == color) {
-			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[index + 1].index - 1];
+			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(index) + 1].index - 1];
 			return true;
 		}
 	}
@@ -1515,7 +1515,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 		    point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output + MAXITEMS, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
-	     iSequence < (*InterleaveSequenceIndices)[ilData.pins + 1].index;
+	     iSequence < (*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(ilData.pins) + 1].index;
 	     iSequence++) {
 		ilData.highStitchBuffer[ilData.output].x         = (*InterleaveSequence)[iSequence].x;
 		ilData.highStitchBuffer[ilData.output].y         = (*InterleaveSequence)[iSequence].y;
@@ -1647,7 +1647,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
 				    colpnt, (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index], ilData.output, code);
 			}
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
-			     ine < (*InterleaveSequenceIndices)[iSequence + 1].index;
+			     ine < (*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(iSequence) + 1].index;
 			     ine++) {
 				StitchBuffer[ilData.output] = { (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code };
 				if (ilData.output > 0) {

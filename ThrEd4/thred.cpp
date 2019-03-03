@@ -3074,7 +3074,7 @@ void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (!SearchLine->empty()) {
-		PolylineInt(dc, SearchLine->data(), SearchLine->size());
+		PolylineInt(dc, SearchLine->data(), gsl::narrow<unsigned int>(SearchLine->size()));
 	}
 	if (start > end) {
 		std::swap(start, end);
@@ -3085,7 +3085,7 @@ void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 		    POINT{ dToL(((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5)),
 		           dToL((StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)) });
 	}
-	PolylineInt(dc, SearchLine->data(), SearchLine->size());
+	PolylineInt(dc, SearchLine->data(), gsl::narrow<unsigned int>(SearchLine->size()));
 	SetROP2(dc, R2_COPYPEN);
 }
 
