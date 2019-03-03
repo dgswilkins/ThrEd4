@@ -3070,7 +3070,7 @@ void thred::internal::pgrit() {
 	}
 }
 
-void thred::internal::selin(unsigned start, unsigned end, HDC dc) noexcept {
+void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (!SearchLine->empty()) {
