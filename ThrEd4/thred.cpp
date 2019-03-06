@@ -127,7 +127,7 @@ unsigned      DraggedColor;                  // color being dragged
 
 std::vector<POINT>* FormVerticesAsLine; // form vertex clipboard paste into form line
 
-unsigned int  LastFormSelected;              // end point of selected range of forms
+unsigned int LastFormSelected; // end point of selected range of forms
 
 std::vector<std::unique_ptr<unsigned[]>>* UndoBuffer; // backup data
 
@@ -196,7 +196,6 @@ std::bitset<32> DisplayedColorBitmap(0);               // Map of color numbers i
 double          GapToNearest[NERCNT];                  // distances of the closest points
                                                        // to a mouse click
 long       NearestPoint[NERCNT];                       // indices of the closest points
-POINT      SearchLine[MAXITEMS];                       // stitch select line
 fPOINT     StitchRangeSize;                            // form check ranges
 unsigned   MoveAnchor;                                 // for resequencing stitches
 double     RotateAngle;                                // angle for pixel rotate
@@ -2783,7 +2782,8 @@ void thred::internal::rstAll() {
 	StateMap.reset(StateFlag::FORMSEL);
 	StateMap.reset(StateFlag::FRMPSEL);
 	thred::unmsg();
-	SearchLineIndex = 0;
+	SearchLine->clear();
+	SearchLine->shrink_to_fit();
 	FirstWin        = nullptr;
 	while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0) != 0) {
 	}
@@ -3070,23 +3070,22 @@ void thred::internal::pgrit() {
 	}
 }
 
-void thred::internal::selin(unsigned start, unsigned end, HDC dc) noexcept {
+void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	if (SearchLineIndex != 0u) {
-		PolylineInt(dc, SearchLine, SearchLineIndex);
+	if (!SearchLine->empty()) {
+		PolylineInt(dc, SearchLine->data(), gsl::narrow<unsigned int>(SearchLine->size()));
 	}
 	if (start > end) {
 		std::swap(start, end);
 	}
-	SearchLineIndex = 0;
+	SearchLine->clear();
 	for (auto iStitch = start; iStitch <= end; iStitch++) {
-		auto coordinate               = ((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5);
-		SearchLine[SearchLineIndex].x = dToL(coordinate);
-		coordinate = (StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
-		SearchLine[SearchLineIndex++].y = dToL(coordinate);
+		SearchLine->push_back(
+		    POINT{ dToL(((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5)),
+		           dToL((StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)) });
 	}
-	PolylineInt(dc, SearchLine, SearchLineIndex);
+	PolylineInt(dc, SearchLine->data(), gsl::narrow<unsigned int>(SearchLine->size()));
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -5532,17 +5531,17 @@ void thred::internal::nuFil() {
 			StateMap.reset(StateFlag::MOVSET);
 			form::frmon();
 			SelectedFormList->clear();
+			SelectedFormList->shrink_to_fit();
 			if (StateMap.testAndReset(StateFlag::PRFACT)) {
 				DestroyWindow(PreferencesWindow);
 				StateMap.reset(StateFlag::WASRT);
 				PreferenceIndex = 0;
 			}
 			PCSBMPFileName[0] = 0;
-			if (SearchLineIndex != 0u) {
-				SearchLineIndex = 0;
-			}
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
+			SearchLine->clear();
+			SearchLine->shrink_to_fit();
 			StateMap.reset(StateFlag::BZUMIN);
 			rstdu();
 			thred::unmsg();
@@ -5665,9 +5664,6 @@ void thred::internal::nuFil() {
 					}
 					if (thredHeader.formCount != 0) {
 						StateMap.reset(StateFlag::BADFIL);
-						ClipPoints->clear();
-						FormVertices->clear();
-						SatinGuides->clear();
 						MsgBuffer[0]     = 0;
 						auto bytesToRead = DWORD{ 0 };
 						if (version < 2) {
@@ -5700,6 +5696,7 @@ void thred::internal::nuFil() {
 								FormList->push_back(FRMHED{ form });
 							}
 						}
+						FormList->shrink_to_fit();
 						if (thredHeader.vertexCount != 0u) {
 							FormVertices->resize(thredHeader.vertexCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
@@ -5714,6 +5711,7 @@ void thred::internal::nuFil() {
 							prtred();
 							return;
 						}
+						FormVertices->shrink_to_fit();
 						if (thredHeader.dlineCount != 0u) {
 							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
@@ -5727,6 +5725,7 @@ void thred::internal::nuFil() {
 								SatinGuides->push_back(SATCON{ guide });
 							}
 						}
+						SatinGuides->shrink_to_fit();
 						if (thredHeader.clipDataCount != 0u) {
 							ClipPoints->resize(thredHeader.clipDataCount);
 							bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
@@ -5736,6 +5735,7 @@ void thred::internal::nuFil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 						}
+						ClipPoints->shrink_to_fit();
 						if (ExtendedHeader.texturePointCount != 0u) {
 							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
 							bytesToRead = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount
@@ -5751,6 +5751,7 @@ void thred::internal::nuFil() {
 							TextureIndex = 0;
 							TexturePointsBuffer->clear();
 						}
+						TexturePointsBuffer->shrink_to_fit();
 						if (StateMap.testAndReset(StateFlag::BADFIL)) {
 							displayText::bfilmsg();
 						}
@@ -6810,11 +6811,16 @@ void thred::internal::newFil() {
 	PCSBMPFileName[0]     = 0;
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
+	FormVertices->shrink_to_fit();
 	TexturePointsBuffer->clear();
+	TexturePointsBuffer->shrink_to_fit();
 	TextureIndex = 0;
 	ClipPoints->clear();
+	ClipPoints->shrink_to_fit();
 	SatinGuides->clear();
+	SatinGuides->shrink_to_fit();
 	FormList->clear();
+	FormList->shrink_to_fit();
 	ColorChanges = 0;
 	KnotCount    = 0;
 	WorkingFileName->clear();
@@ -6854,7 +6860,8 @@ void thred::internal::rebox() {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			StateMap.reset(StateFlag::SCROS);
 			StateMap.reset(StateFlag::ECROS);
-			SearchLineIndex = 0;
+			SearchLine->clear();
+			SearchLine->shrink_to_fit();
 			StateMap.set(StateFlag::RESTCH);
 			for (auto& window : UserColorWin) {
 				thred::redraw(window);
@@ -7955,20 +7962,23 @@ void thred::internal::setknt() {
 }
 
 unsigned thred::internal::srchknot(unsigned source) noexcept {
-	while (ActivePointIndex < KnotCount && Knots[ActivePointIndex] < source) {
-		ActivePointIndex++;
+	auto knotIndex = 0u;
+	while (knotIndex < KnotCount && Knots[knotIndex] < source) {
+		knotIndex++;
 	}
-	ActivePointIndex--;
-	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
-		ActivePointIndex++;
-		if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
+	if (knotIndex != 0u) {
+		knotIndex--;
+	}
+	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
+		knotIndex++;
+		if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
 			return 0;
 		}
 		return 2;
 	}
 
-	ActivePointIndex++;
-	if (((Knots[ActivePointIndex] > source) ? (Knots[ActivePointIndex] - source) : (source - Knots[ActivePointIndex])) < 5) {
+	knotIndex++;
+	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < 5) {
 		return 1;
 	}
 	return 3;
@@ -8423,7 +8433,13 @@ void thred::internal::delet() {
 }
 
 void thred::internal::movi() {
-	rstAll();
+	if (StateMap.test(StateFlag::GRPSEL)) {
+		rstAll();
+		StateMap.set(StateFlag::GRPSEL);
+	}
+	else {
+		rstAll();
+	}
 	if (PCSHeader.stitchCount != 0u) {
 		if (MsgWindow != nullptr) {
 			DestroyWindow(MsgWindow);
@@ -8911,11 +8927,11 @@ void thred::internal::insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						}
 						else {
-							StitchBuffer[iStitch] = {
+							StitchBuffer[iStitch++] = {
 								pcsStitchBuffer[iPCSStitch].x + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f
+								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+								newAttribute
 							};
-							StitchBuffer[iStitch++].attribute = newAttribute;
 						}
 					}
 					const auto newStitchCount = iStitch;
@@ -13877,9 +13893,11 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					const auto code = SelectedForm->attribute & SBLNT;
 					if (code != 0u) {
 						SelectedForm->attribute &= NSBLNT;
+						SetWindowText((*ValueWindow)[LBSTRT], (*StringTable)[STR_TAPR].c_str());
 					}
 					else {
 						SelectedForm->attribute |= SBLNT;
+						SetWindowText((*ValueWindow)[LBSTRT], (*StringTable)[STR_BLUNT].c_str());
 					}
 					form::refil();
 					thred::coltab();
@@ -13890,9 +13908,11 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					const auto code = SelectedForm->attribute & FBLNT;
 					if (code != 0u) {
 						SelectedForm->attribute &= NFBLNT;
+						SetWindowText((*ValueWindow)[LBFIN], (*StringTable)[STR_TAPR].c_str());
 					}
 					else {
 						SelectedForm->attribute |= FBLNT;
+						SetWindowText((*ValueWindow)[LBFIN], (*StringTable)[STR_BLUNT].c_str());
 					}
 					form::refil();
 					thred::coltab();
@@ -13912,7 +13932,13 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				if (Msg.hwnd == (*ValueWindow)[LBRDUND] || Msg.hwnd == (*LabelWindow)[LBRDUND]) {
 					SelectedForm->edgeType ^= EGUND;
 					form::refil();
-					formForms::refrm();
+					const auto code = SelectedForm->edgeType & EGUND;
+					if (code != 0u) {
+						SetWindowText((*ValueWindow)[LBRDUND], (*StringTable)[STR_ON].c_str());
+					}
+					else {
+						SetWindowText((*ValueWindow)[LBRDUND], (*StringTable)[STR_OFF].c_str());
+					}
 					break;
 				}
 				if (Msg.hwnd == (*ValueWindow)[LSACANG] || Msg.hwnd == (*LabelWindow)[LSACANG]) {
@@ -14655,7 +14681,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 		}
 		if (code == 'I') {
-			movi();
+			thi::movi();
 			LastKeyCode = 'I';
 			return true;
 		}
@@ -15248,9 +15274,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 							ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 							if (StateMap.test(StateFlag::FRMPSEL)) {
 								form::fvars(ClosestFormToCursor);
-								auto vertexIt         = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+								auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 								InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
-								auto clipData         = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+								auto clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 								// Todo - localize iVertex into the loop
 								auto iVertex = 0u;
 								for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
@@ -15259,7 +15285,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 								const auto nextVertex = form::nxt(ClosestVertexToCursor);
 								iVertex++;
 								InterleaveSequence->push_back(vertexIt[nextVertex]);
-								OutputIndex                 = iVertex + 1;
+								OutputIndex = iVertex + 1;
 								setpclp();
 								StateMap.set(StateFlag::FPUNCLP);
 								StateMap.set(StateFlag::SHOP);
@@ -16745,7 +16771,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			break;
 		}
 		case ID_RUNPAT: { // view / Movie
-			movi();
+			thi::movi();
 			break;
 		}
 		case ID_LENDEF: { // Todo - No menu item in thred.rc for this option
@@ -17997,7 +18023,7 @@ void thred::internal::drwStch() {
 				cros(ClosestPointIndex);
 			}
 			else {
-				SearchLineIndex = 0;
+				SearchLine->clear();
 				ducros(StitchWindowMemDC);
 			}
 			thred::selRct(StitchRangeRect);
@@ -18791,24 +18817,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
-		auto private_TracedMap   = boost::dynamic_bitset<>{};
-		TracedMap                = &private_TracedMap;
-		auto private_TracedEdges = boost::dynamic_bitset<>{};
-		TracedEdges              = &private_TracedEdges;
-		auto private_Thumbnails  = std::vector<std::wstring>{};
-		Thumbnails               = &private_Thumbnails;
-		std::vector<std::unique_ptr<unsigned[]>> private_UndoBuffer(16);
-		UndoBuffer                             = &private_UndoBuffer;
-		auto private_TempTexturePoints         = std::vector<TXPNT>{};
-		auto private_SelectedTexturePointsList = std::vector<unsigned int>{};
-		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
-		auto private_StringTable = std::vector<std::wstring>{};
-		private_StringTable.resize(STR_LEN);
-		StringTable            = &private_StringTable;
-		auto private_ButtonWin = std::vector<HWND>{};
-		ButtonWin              = &private_ButtonWin;
-		auto private_FormOnOff = std::wstring{};
-		FormOnOff              = &private_FormOnOff;
+		auto private_AngledFormVertices        = std::vector<fPOINT>{};
+		auto private_AuxName                   = fs::path{};
+		auto private_BSequence                 = std::vector<BSEQPNT>{};
+		auto private_BalaradName0              = fs::path{};
+		auto private_BalaradName1              = fs::path{};
+		auto private_BalaradName2              = fs::path{};
+		auto private_ButtonWin                 = std::vector<HWND>{};
+		auto private_ClipBuffer                = std::vector<fPOINTATTR>{};
+		auto private_ClipPoints                = std::vector<fPOINT>{};
+		auto private_ColorFileName             = fs::path{};
+		auto private_DefaultBMPDirectory       = fs::path{};
+		auto private_DefaultColorWin           = std::vector<HWND>{};
+		auto private_DefaultDirectory          = fs::path{};
+		auto private_DesignerName              = std::wstring{};
+		auto private_FormAngles                = std::vector<double>{};
+		auto private_FormControlPoints         = std::vector<POINT>{};
+		auto private_FormLines                 = std::vector<POINT>{};
+		auto private_FormList                  = std::vector<FRMHED>{};
+		auto private_FormOnOff                 = std::wstring{};
+		auto private_FormVertices              = std::vector<fPOINT>{};
+		auto private_FormVerticesAsLine        = std::vector<POINT>{};
+		auto private_GeName                    = fs::path{};
+		auto private_HomeDirectory             = fs::path{};
+		auto private_IniFileName               = fs::path{};
+		auto private_InsidePointList           = std::vector<fPOINT>{};
+		auto private_InterleaveSequence        = std::vector<fPOINT>{};
+		auto private_InterleaveSequenceIndices = std::vector<INSREC>{};
+		auto private_LabelWindow               = std::vector<HWND>{};
 #pragma warning(push)
 #pragma warning(disable : 26465) // supress warning for casting away the const
 		auto formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
@@ -18830,104 +18866,100 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			    nullptr // bmpItem
 #endif                  /* WINVER >= 0x0500 */
 		};
-		MenuInfo                      = &private_MenuInfo;
-		auto private_TempPolygon      = std::vector<fPOINT>{};
-		TempPolygon                   = &private_TempPolygon;
-		auto private_BSequence        = std::vector<BSEQPNT>{};
-		BSequence                     = &private_BSequence;
-		auto private_ClipBuffer       = std::vector<fPOINTATTR>{};
-		ClipBuffer                    = &private_ClipBuffer;
-		auto private_ClipPoints       = std::vector<fPOINT>{};
-		ClipPoints                    = &private_ClipPoints;
-		auto private_OutsidePointList = std::vector<fPOINT>{};
-		OutsidePointList              = &private_OutsidePointList;
-		auto private_InsidePointList  = std::vector<fPOINT>{};
-		InsidePointList               = &private_InsidePointList;
-		auto private_ValueWindow      = std::vector<HWND>{};
-		private_ValueWindow.resize(LASTLIN);
-		ValueWindow              = &private_ValueWindow;
-		auto private_LabelWindow = std::vector<HWND>{};
-		private_LabelWindow.resize(LASTLIN);
-		LabelWindow                    = &private_LabelWindow;
-		auto private_SelectedFormList  = std::vector<unsigned int>{};
-		SelectedFormList               = &private_SelectedFormList;
-		auto private_FormControlPoints = std::vector<POINT>{};
+		auto private_OSequence                 = std::vector<fPOINT>{};
+		auto private_OutsidePointList          = std::vector<fPOINT>{};
+		auto private_PreviousNames             = std::vector<fs::path>{};
+		auto private_RGBFileName               = fs::path{};
+		auto private_RubberBandLine            = std::vector<POINT>{};
+		auto private_SatinGuides               = std::vector<SATCON>{};
+		auto private_SearchLine                = std::vector<POINT>{};
+		auto private_SearchName                = fs::path{};
+		auto private_SelectedFormList          = std::vector<unsigned int>{};
+		auto private_SelectedFormsLine         = std::vector<POINT>{};
+		auto private_SelectedPointsLine        = std::vector<POINT>{};
+		auto private_SelectedTexturePointsList = std::vector<unsigned int>{};
+		auto private_StringTable               = std::vector<std::wstring>{};
+		auto private_TempPolygon               = std::vector<fPOINT>{};
+		auto private_TempTexturePoints         = std::vector<TXPNT>{};
+		auto private_TexturePointsBuffer       = std::vector<TXPNT>{};
+		auto private_ThrName                   = fs::path{};
+		auto private_Thumbnails                = std::vector<std::wstring>{};
+		auto private_TracedEdges               = boost::dynamic_bitset<>{};
+		auto private_TracedMap                 = boost::dynamic_bitset<>{};
+		auto private_UndoBuffer                = std::vector<std::unique_ptr<unsigned[]>>{};
+		auto private_UserBMPFileName           = fs::path{};
+		auto private_ValueWindow               = std::vector<HWND>{};
+		auto private_WorkingFileName           = fs::path{};
+		auto private_textureInputBuffer        = std::wstring{};
+
+		private_DefaultColorWin.resize(16);
 		private_FormControlPoints.resize(10);
-		FormControlPoints         = &private_FormControlPoints;
-		auto private_FormLines    = std::vector<POINT>{};
-		FormLines                 = &private_FormLines;
-		auto private_FormList     = std::vector<FRMHED>{};
-		FormList                  = &private_FormList;
-		auto private_FormVertices = std::vector<fPOINT>{};
 		private_FormVertices.reserve(MAXITEMS);
-		FormVertices                = &private_FormVertices;
-		auto private_FormVerticesAsLine = std::vector<POINT>{};
-		FormVerticesAsLine = &private_FormVerticesAsLine;
-		auto private_RubberBandLine = std::vector<POINT>{};
-		private_RubberBandLine.resize(3);
-		RubberBandLine                 = &private_RubberBandLine;
-		auto private_SelectedFormsLine = std::vector<POINT>{};
-		private_SelectedFormsLine.resize(9);
-		SelectedFormsLine               = &private_SelectedFormsLine;
-		auto private_SelectedPointsLine = std::vector<POINT>{};
-		private_SelectedPointsLine.resize(9);
-		SelectedPointsLine               = &private_SelectedPointsLine;
-		auto private_FormAngles          = std::vector<double>{};
-		FormAngles                       = &private_FormAngles;
-		auto private_InterleaveSequence  = std::vector<fPOINT>{};
-		//private_InterleaveSequence.resize(MAXITEMS);
-		InterleaveSequence               = &private_InterleaveSequence;
-		auto private_AngledFormVertices  = std::vector<fPOINT>{};
-		AngledFormVertices               = &private_AngledFormVertices;
-		auto private_textureInputBuffer  = std::wstring{};
-		TextureInputBuffer               = &private_textureInputBuffer;
-		auto private_TexturePointsBuffer = std::vector<TXPNT>{};
-		TexturePointsBuffer              = &private_TexturePointsBuffer;
-		auto private_PreviousNames       = std::vector<fs::path>{};
+		private_LabelWindow.resize(LASTLIN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
 		}
-		PreviousNames             = &private_PreviousNames;
-		auto private_DesignerName = std::wstring{};
+		private_RubberBandLine.resize(3);
+		private_SelectedFormsLine.resize(9);
+		private_SelectedPointsLine.resize(9);
+		private_StringTable.resize(STR_LEN);
+		private_UndoBuffer.resize(16);
+		private_ValueWindow.resize(LASTLIN);
+
+		AngledFormVertices        = &private_AngledFormVertices;
+		AuxName                   = &private_AuxName;
+		BSequence                 = &private_BSequence;
+		BalaradName0              = &private_BalaradName0;
+		BalaradName1              = &private_BalaradName1;
+		BalaradName2              = &private_BalaradName2;
+		ButtonWin                 = &private_ButtonWin;
+		ClipBuffer                = &private_ClipBuffer;
+		ClipPoints                = &private_ClipPoints;
+		ColorFileName             = &private_ColorFileName;
+		DefaultBMPDirectory       = &private_DefaultBMPDirectory;
+		DefaultColorWin           = &private_DefaultColorWin;
+		DefaultDirectory          = &private_DefaultDirectory;
 		DesignerName              = &private_DesignerName;
-		auto private_SatinGuides  = std::vector<SATCON>{};
+		FormAngles                = &private_FormAngles;
+		FormControlPoints         = &private_FormControlPoints;
+		FormLines                 = &private_FormLines;
+		FormList                  = &private_FormList;
+		FormOnOff                 = &private_FormOnOff;
+		FormVertices              = &private_FormVertices;
+		FormVerticesAsLine        = &private_FormVerticesAsLine;
+		GeName                    = &private_GeName;
+		HomeDirectory             = &private_HomeDirectory;
+		IniFileName               = &private_IniFileName;
+		InsidePointList           = &private_InsidePointList;
+		InterleaveSequence        = &private_InterleaveSequence;
+		InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
+		LabelWindow               = &private_LabelWindow;
+		MenuInfo                  = &private_MenuInfo;
+		OSequence                 = &private_OSequence;
+		OutsidePointList          = &private_OutsidePointList;
+		PreviousNames             = &private_PreviousNames;
+		RGBFileName               = &private_RGBFileName;
+		RubberBandLine            = &private_RubberBandLine;
 		SatinGuides               = &private_SatinGuides;
+		SearchLine                = &private_SearchLine;
+		SearchName                = &private_SearchName;
+		SelectedFormList          = &private_SelectedFormList;
+		SelectedFormsLine         = &private_SelectedFormsLine;
+		SelectedPointsLine        = &private_SelectedPointsLine;
+		StringTable               = &private_StringTable;
+		TempPolygon               = &private_TempPolygon;
+		TextureInputBuffer        = &private_textureInputBuffer;
+		TexturePointsBuffer       = &private_TexturePointsBuffer;
+		ThrName                   = &private_ThrName;
+		Thumbnails                = &private_Thumbnails;
+		TracedEdges               = &private_TracedEdges;
+		TracedMap                 = &private_TracedMap;
+		UndoBuffer                = &private_UndoBuffer;
+		UserBMPFileName           = &private_UserBMPFileName;
+		ValueWindow               = &private_ValueWindow;
+		WorkingFileName           = &private_WorkingFileName;
 
-		auto private_AuxName             = fs::path{};
-		auto private_ThrName             = fs::path{};
-		auto private_WorkingFileName     = fs::path{};
-		auto private_GeName              = fs::path{};
-		auto private_ColorFileName       = fs::path{};
-		auto private_RGBFileName         = fs::path{};
-		auto private_DefaultDirectory    = fs::path{};
-		auto private_SearchName          = fs::path{};
-		auto private_DefaultBMPDirectory = fs::path{};
-		auto private_BalaradName0        = fs::path{};
-		auto private_BalaradName1        = fs::path{};
-		auto private_BalaradName2        = fs::path{};
-		auto private_HomeDirectory       = fs::path{};
-		auto private_UserBMPFileName     = fs::path{};
-		auto private_IniFileName         = fs::path{};
-
-		AuxName             = &private_AuxName;
-		WorkingFileName     = &private_WorkingFileName;
-		ThrName             = &private_ThrName;
-		GeName              = &private_GeName;
-		ColorFileName       = &private_ColorFileName;
-		RGBFileName         = &private_RGBFileName;
-		DefaultDirectory    = &private_DefaultDirectory;
-		SearchName          = &private_SearchName;
-		DefaultBMPDirectory = &private_DefaultBMPDirectory;
-		BalaradName0        = &private_BalaradName0;
-		BalaradName1        = &private_BalaradName1;
-		BalaradName2        = &private_BalaradName2;
-		HomeDirectory       = &private_HomeDirectory;
-		UserBMPFileName     = &private_UserBMPFileName;
-		IniFileName         = &private_IniFileName;
-
-		auto private_DefaultColorWin = std::vector<HWND>{};
-		private_DefaultColorWin.resize(16);
-		DefaultColorWin = &private_DefaultColorWin;
+		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 
 		thi::redini();
 

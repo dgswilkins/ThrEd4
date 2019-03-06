@@ -47,7 +47,7 @@ void         satsel();
 void         satzum();
 void         sbrd();
 void         slbrd();
-void         spltsat(SATCON currentGuide);
+void         spltsat(unsigned guideIndex);
 
 namespace internal {
 

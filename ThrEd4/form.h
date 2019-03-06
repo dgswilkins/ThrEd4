@@ -86,7 +86,7 @@ void         filangl();
 void         filclpx();
 void         filhor();
 void         filin(dPOINT currentPoint);
-void         filinsb(const dPOINT& point) noexcept;
+void         filinsb(const dPOINT& point);
 void         filinu(const dPOINT& inPoint);
 void         filsat();
 void         filvrt();
@@ -221,7 +221,7 @@ namespace internal {
 	            unsigned&                     lastGroup,
 	            SMALPNTL*                     sequenceLines);
 	bool chk2of();
-	void chkbrd(unsigned& interleaveSequenceIndex2);
+	void chkbrd();
 	void chksid(unsigned int vertexIndex, unsigned clipIntersectSide, const std::vector<fPOINT>* currentFormVertices);
 	bool closat(intersectionStyles& inOutFlag);
 	bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
@@ -233,7 +233,7 @@ namespace internal {
 	                 const std::vector<double>& lengths,
 	                 unsigned                   start,
 	                 unsigned                   finish,
-	                 const std::vector<fPOINT>*       currentFormVertices);
+	                 const std::vector<fPOINT>* currentFormVertices);
 
 	bool clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned sind);
 	bool comp(const dPOINTLINE& point1, const dPOINTLINE& point2) noexcept;
@@ -317,34 +317,34 @@ namespace internal {
 	float getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	             const std::vector<double>& lengths,
 	             unsigned                   iPoint,
-	             const std::vector<fPOINT>*       currentFormVertices);
+	             const std::vector<fPOINT>* currentFormVertices);
 	void  horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED& angledForm);
 
-	unsigned insect(std::vector<CLIPSORT>&    clipIntersectData,
-	                const std::vector<VCLPX>& regionCrossingData,
-	                std::vector<CLIPSORT*>&   arrayOfClipIntersectData,
-	                unsigned                  regionCrossingStart,
-	                unsigned                  regionCrossingEnd,
-	                const fPOINT&             lineSegmentStart,
-	                const fPOINT&             lineSegmentEnd,
-	                const std::vector<fPOINT>*      currentFormVertices);
+	unsigned insect(std::vector<CLIPSORT>&     clipIntersectData,
+	                const std::vector<VCLPX>&  regionCrossingData,
+	                std::vector<CLIPSORT*>&    arrayOfClipIntersectData,
+	                unsigned                   regionCrossingStart,
+	                unsigned                   regionCrossingEnd,
+	                const fPOINT&              lineSegmentStart,
+	                const fPOINT&              lineSegmentEnd,
+	                const std::vector<fPOINT>* currentFormVertices);
 
 	void inspnt(std::vector<CLIPNT>& clipStitchPoints);
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
-	bool isect(unsigned int         vertex0,
-	           unsigned int         vertex1,
-	           fPOINT&              intersection,
-	           float&               length,
-	           const fPOINT&        lineSegmentStart,
-	           const fPOINT&        lineSegmentEnd,
+	bool isect(unsigned int               vertex0,
+	           unsigned int               vertex1,
+	           fPOINT&                    intersection,
+	           float&                     length,
+	           const fPOINT&              lineSegmentStart,
+	           const fPOINT&              lineSegmentEnd,
 	           const std::vector<fPOINT>* currentFormVertices);
-	bool isin(std::vector<VCLPX>&  regionCrossingData,
-	          float                xCoordinate,
-	          float                yCoordinate,
-	          unsigned             regionCrossingStart,
-	          unsigned             regionCrossingEnd,
-	          const fRECTANGLE&    boundingRect,
+	bool isin(std::vector<VCLPX>&        regionCrossingData,
+	          float                      xCoordinate,
+	          float                      yCoordinate,
+	          unsigned                   regionCrossingStart,
+	          unsigned                   regionCrossingEnd,
+	          const fRECTANGLE&          boundingRect,
 	          const std::vector<fPOINT>* currentFormVertices);
 	void lapbrd();
 	void lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
@@ -396,7 +396,7 @@ namespace internal {
 	         const std::vector<VRCT2>& fillVerticalRect,
 	         unsigned int              startVertex,
 	         const std::vector<VRCT2>& vrct);
-	void plbak(unsigned int backPoint) noexcept;
+	void plbak(unsigned int backPoint);
 	void plbrd(double edgeSpacing, FRMHED& angledForm);
 	void plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
@@ -406,7 +406,7 @@ namespace internal {
 	bool projh(double yCoordinate, const fPOINT& point0, const fPOINT& point1, dPOINT& intersection) noexcept;
 	bool projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection) noexcept;
 	void prpsbrd();
-	void prsmal() noexcept;
+	void prsmal();
 	void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
 	void rats();
 	bool regclos(std::vector<unsigned>&        groupIndexSequence,
@@ -421,16 +421,16 @@ namespace internal {
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
 	              const std::vector<REGION>&    regionsList);
-	void   ritapbrd(unsigned& interleaveSequenceIndex2);
-	void   ritbrd(unsigned& interleaveSequenceIndex2);
-	void   ritfil(unsigned& interleaveSequenceIndex2);
+	void   ritapbrd();
+	void   ritbrd();
+	void   ritfil();
 	bool   ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen);
 	void   ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	              std::vector<CLPSEG>&       clipSegments,
 	              unsigned                   currentSegmentIndex,
 	              unsigned&                  clipIntersectSide,
-	              const std::vector<fPOINT>*       currentFormVertices);
-	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	              const std::vector<fPOINT>* currentFormVertices);
+	void   rotbak(double rotationAngle, const dPOINT& rotationCenter);
 	void   rotentr(double rotationAngle);
 	void   rspnt(float xCoordinate, float yCoordinate);
 	void   sapliq();
@@ -462,16 +462,14 @@ namespace internal {
 	bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, unsigned start, unsigned finish);
 	void stchfrm(unsigned formIndex, unsigned* attribute) noexcept;
-	void trfrm(const dPOINT& bottomLeftPoint,
-	           const dPOINT& topLeftPoint,
-	           const dPOINT& bottomRightPoint,
-	           const dPOINT& topRightPoint) noexcept;
+	void
+	     trfrm(const dPOINT& bottomLeftPoint, const dPOINT& topLeftPoint, const dPOINT& bottomRightPoint, const dPOINT& topRightPoint);
 	void unbean(unsigned start, unsigned finish);
 	void uncon();
 
 	unsigned leftsid(const std::vector<fPOINT>* currentFormVertices);
 
 	bool unvis(const boost::dynamic_bitset<>& visitedRegions, unsigned& visitedIndex);
-	bool vscmp(unsigned index1, unsigned index2) noexcept;
+	bool vscmp(unsigned index1, unsigned index2);
 } // namespace internal
 } // namespace form

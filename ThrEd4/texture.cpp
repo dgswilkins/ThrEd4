@@ -1666,10 +1666,9 @@ void texture::setshft() {
 	texture::savtxt();
 	thred::unbBox();
 	StateMap.reset(StateFlag::BZUMIN);
-	thred::pxCor2stch(ZoomBoxLine[0]);
-	selectionRect.top  = SelectedPoint.y;
-	selectionRect.left = SelectedPoint.x;
-	thred::pxCor2stch(ZoomBoxLine[2]);
+	selectionRect.top  = ZoomBoxOrigin.y;
+	selectionRect.left = ZoomBoxOrigin.x;
+	thred::pxCor2stch(POINT{ ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y });
 	selectionRect.bottom = SelectedPoint.y;
 	selectionRect.right  = SelectedPoint.x;
 	StateMap.reset(StateFlag::TXIN);

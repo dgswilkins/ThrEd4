@@ -63,7 +63,6 @@ namespace fs = std::experimental::filesystem;
 
 extern unsigned   ActiveColor;
 extern unsigned   ActiveLayer;
-extern unsigned   ActivePointIndex;
 extern fRECTANGLE AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
@@ -73,22 +72,22 @@ extern LPWSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
 
-extern std::vector<BSEQPNT>*   BSequence;
+extern std::vector<BSEQPNT>* BSequence;
 
-extern HBRUSH    BackgroundBrush;
-extern unsigned  BeanCount; // number of stitches added by convert to bean
-extern HDC       BitmapDC;
-extern RECT      BitmapDstRect;
-extern unsigned  BitmapHeight;
-extern POINT     BitmapPoint;
-extern dPOINT    BitmapSizeinStitches;
-extern RECT      BitmapSrcRect;
-extern dPOINT    BmpStitchRatio;
-extern unsigned  BitmapWidth;
-extern double    BorderWidth;
-extern unsigned  ButtonHeight;
-extern unsigned  ButtonWidth;
-extern unsigned  ButtonWidthX3;
+extern HBRUSH   BackgroundBrush;
+extern unsigned BeanCount; // number of stitches added by convert to bean
+extern HDC      BitmapDC;
+extern RECT     BitmapDstRect;
+extern unsigned BitmapHeight;
+extern POINT    BitmapPoint;
+extern dPOINT   BitmapSizeinStitches;
+extern RECT     BitmapSrcRect;
+extern dPOINT   BmpStitchRatio;
+extern unsigned BitmapWidth;
+extern double   BorderWidth;
+extern unsigned ButtonHeight;
+extern unsigned ButtonWidth;
+extern unsigned ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 
@@ -130,7 +129,7 @@ extern HMENU           FillMenu;
 extern std::vector<double>* FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
-extern HWND         FormDataSheet;
+extern HWND FormDataSheet;
 
 extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;
@@ -161,11 +160,9 @@ extern POINT     InsertLine[3];
 
 extern std::vector<fPOINT>* InsidePointList;
 extern std::vector<fPOINT>* InsidePoints;
-
-extern INSREC   InterleaveSequenceIndices[10];
-
-extern std::vector<fPOINT>*   InterleaveSequence;
-extern std::vector<HWND>* LabelWindow;
+extern std::vector<INSREC>* InterleaveSequenceIndices;
+extern std::vector<fPOINT>* InterleaveSequence;
+extern std::vector<HWND>*   LabelWindow;
 
 extern fPOINT LastPoint;
 extern HPEN   LayerPen[6];
@@ -187,7 +184,9 @@ extern HPEN         MultiFormPen;
 extern unsigned     NearestCount;
 extern unsigned int NewFormVertexCount;
 extern HWND         OKButton;
-extern fPOINT       OSequence[OSEQLEN];
+
+extern std::vector<fPOINT>* OSequence;
+
 extern bool         OutLineEverySelectedForm;
 extern unsigned int OutputIndex;
 
@@ -214,7 +213,9 @@ extern std::vector<SATCON>* SatinGuides;
 extern RECT      scRct;
 extern unsigned* screenDPI;
 extern int*      ScrollSize;
-extern unsigned  SearchLineIndex;
+
+extern std::vector<POINT>* SearchLine;                       // stitch select line
+
 extern HPEN      SelectAllPen;
 extern FRMHED*   SelectedForm;
 extern unsigned  SelectedFormControlVertex;
@@ -230,16 +231,15 @@ extern fPOINT SelectedPoint;
 
 extern std::vector<POINT>* SelectedPointsLine;
 
-extern fRECTANGLE   SelectedVerticesRect;
-extern unsigned int SequenceIndex;
-extern double       ShowStitchThreshold;
-extern HWND         SideMessageWindow;
-extern wchar_t      SideWindowEntryBuffer[11];
-extern HWND         SideWindow[16];
-extern double       SmallStitchLength;
-extern double       SnapLength;
-extern double       SpiralWrap;
-extern double       StarRatio;
+extern fRECTANGLE SelectedVerticesRect;
+extern double     ShowStitchThreshold;
+extern HWND       SideMessageWindow;
+extern wchar_t    SideWindowEntryBuffer[11];
+extern HWND       SideWindow[16];
+extern double     SmallStitchLength;
+extern double     SnapLength;
+extern double     SpiralWrap;
+extern double     StarRatio;
 
 extern EnumMap<StateFlag> StateMap;
 

@@ -406,7 +406,7 @@ namespace internal {
 	void     selfpnt();
 	void     selfrm0();
 	void     selfrmx();
-	void     selin(unsigned start, unsigned end, HDC dc) noexcept;
+	void     selin(unsigned start, unsigned end, HDC dc);
 	void     selup();
 	void     set1knot();
 	bool     setRmap(boost::dynamic_bitset<>& stitchMap, const fPOINTATTR& stitchPoint);

@@ -29,34 +29,33 @@
 
 namespace fs = std::experimental::filesystem;
 
-unsigned   ActiveColor = 0;  // active color selector
-unsigned   ActiveLayer = 0;  // active layer
-unsigned   ActivePointIndex; // pointer to the active form in the sequencing algorithm
-fRECTANGLE AllItemsRect;     // rectangle enclosing all forms and stitches
+unsigned   ActiveColor = 0; // active color selector
+unsigned   ActiveLayer = 0; // active layer
+fRECTANGLE AllItemsRect;    // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
-unsigned  AppliqueColor = 15;   // underlay color
-LPWSTR*   ArgList;              // command line argument array
-HCURSOR   ArrowCursor;          // arrow
-fs::path* AuxName;              //
+unsigned  AppliqueColor = 15; // underlay color
+LPWSTR*   ArgList;            // command line argument array
+HCURSOR   ArrowCursor;        // arrow
+fs::path* AuxName;            //
 
-std::vector<BSEQPNT>*   BSequence;   //
+std::vector<BSEQPNT>* BSequence; //
 
-HBRUSH    BackgroundBrush;      // background color brush
-unsigned  BeanCount;            // number of stitches added by convert to bean
-HDC       BitmapDC;             // bitmap device context
-RECT      BitmapDstRect;        // stitch window destination rectangle for zooomed view
-unsigned  BitmapHeight;         // bitmap height
-POINT     BitmapPoint;          // a point on the bitmap
-dPOINT    BitmapSizeinStitches; // bitmap end points in stitch points
-RECT      BitmapSrcRect;        // bitmap source rectangle for zoomed view
-dPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
-unsigned  BitmapWidth;          // bitmap width
-double    BorderWidth = BRDWID; // border width for satin borders
-unsigned  ButtonHeight;         // button height
-unsigned  ButtonWidth;          // button width
-unsigned  ButtonWidthX3;        // button width times 3
+HBRUSH   BackgroundBrush;      // background color brush
+unsigned BeanCount;            // number of stitches added by convert to bean
+HDC      BitmapDC;             // bitmap device context
+RECT     BitmapDstRect;        // stitch window destination rectangle for zooomed view
+unsigned BitmapHeight;         // bitmap height
+POINT    BitmapPoint;          // a point on the bitmap
+dPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
+RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
+dPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
+unsigned BitmapWidth;          // bitmap width
+double   BorderWidth = BRDWID; // border width for satin borders
+unsigned ButtonHeight;         // button height
+unsigned ButtonWidth;          // button width
+unsigned ButtonWidthX3;        // button width times 3
 
 std::vector<HWND>* ButtonWin; // button windows
 
@@ -126,13 +125,11 @@ HWND      HorizontalScrollBar;   // horizontal scroll bar
 INIFILE   IniFile;               // initialization file
 POINT     InsertLine[3];         // the insert line
 
-std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
-
-INSREC   InterleaveSequenceIndices[10]; // indices into interleave points
-
-std::vector<fPOINT>*   InterleaveSequence;  // storage for interleave points
-std::vector<HWND>* LabelWindow; // text handles for the form data sheet
+std::vector<fPOINT>* InsidePointList;           // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>* InsidePoints;              // pointer to the list of inside outline points
+std::vector<INSREC>* InterleaveSequenceIndices; // indices into interleave points
+std::vector<fPOINT>* InterleaveSequence;        // storage for interleave points
+std::vector<HWND>*   LabelWindow;               // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
 HPEN   LayerPen[6];                     //
@@ -154,9 +151,11 @@ HPEN         MultiFormPen;                        // multiple selected forms pen
 unsigned     NearestCount;                        // number of boxes selected
 unsigned int NewFormVertexCount;                  // points in the new form
 HWND         OKButton;                            // ok button
-fPOINT       OSequence[OSEQLEN];                  // temporary storage for sequencing
-bool         OutLineEverySelectedForm = false;    // When selecting multiple forms, should we outline every form?
-unsigned int OutputIndex;                         // output pointer for sequencing
+
+std::vector<fPOINT>* OSequence; // temporary storage for sequencing
+
+bool         OutLineEverySelectedForm = false; // When selecting multiple forms, should we outline every form?
+unsigned int OutputIndex;                      // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points
@@ -181,7 +180,9 @@ std::vector<SATCON>* SatinGuides; // satin form connects
 RECT      scRct;                     //
 unsigned* screenDPI;                 // screen DPI
 int*      ScrollSize;                // Scroll bar width scaled for DPI
-unsigned  SearchLineIndex = 0;       // pointer for drawing stitch select lines
+
+std::vector<POINT>* SearchLine;      // stitch select line
+
 HPEN      SelectAllPen;              // pen for drawing large boxes
 FRMHED*   SelectedForm;              // pointer to selected form
 unsigned  SelectedFormControlVertex; // user selected form control formOrigin
@@ -197,16 +198,15 @@ fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordin
 
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
-fRECTANGLE   SelectedVerticesRect;                   // rectangle enclosing selected form verticess
-unsigned int SequenceIndex;                          // sequencing pointer
-double       ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
-HWND         SideMessageWindow   = nullptr;          // main side message window
-wchar_t      SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
-HWND         SideWindow[16];                         // side message windows
-double       SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-double       SnapLength        = SNPLEN * PFGRAN;    // snap together length
-double       SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
-double       StarRatio         = STARAT;             // star formOrigin to body ratio
+fRECTANGLE SelectedVerticesRect;                   // rectangle enclosing selected form verticess
+double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
+HWND       SideMessageWindow   = nullptr;          // main side message window
+wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
+HWND       SideWindow[16];                         // side message windows
+double     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
+double     SnapLength        = SNPLEN * PFGRAN;    // snap together length
+double     SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
+double     StarRatio         = STARAT;             // star formOrigin to body ratio
 
 EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
 
