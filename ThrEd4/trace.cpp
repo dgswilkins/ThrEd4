@@ -790,11 +790,10 @@ void trace::internal::dutrac() {
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
 		CurrentVertexIndex   = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
-		auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
-		vertexIt[0].x        = tracedPoints[0].x * StitchBmpRatio.x;
-		vertexIt[0].y        = tracedPoints[0].y * StitchBmpRatio.y;
+		OutputIndex = 0;
+		FormVertices->push_back(fPOINT{ tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
+		OutputIndex++;
 		iNext                = 0;
-		OutputIndex          = 0;
 		auto traceLengthSum  = 0.0;
 		auto landscapeOffset = 0.0;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
@@ -806,16 +805,15 @@ void trace::internal::dutrac() {
 			const auto traceLength
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				vertexIt[OutputIndex].x = tracedPoints[iCurrent - 1].x * StitchBmpRatio.x;
-				vertexIt[OutputIndex].y = tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset;
+				FormVertices->push_back(fPOINT{ tracedPoints[iCurrent - 1].x * StitchBmpRatio.x, tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
 				traceLengthSum = 0.0;
 			}
 		}
-		SelectedForm->vertexIndex = thred::adflt(OutputIndex);
-		SelectedForm->vertexCount = gsl::narrow<unsigned short>(OutputIndex);
+		SelectedForm->vertexIndex = CurrentVertexIndex;
+		SelectedForm->vertexCount = gsl::narrow<decltype(SelectedForm->vertexCount)>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
 		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
