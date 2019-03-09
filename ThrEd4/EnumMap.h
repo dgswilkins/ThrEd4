@@ -10,11 +10,11 @@ template <class T> struct has_enum_count {
 	using yes = char;
 	using no  = yes (&)[2];
 
-	template <class U> static yes test(decltype(U::EnumCount)*);
+	template <class U> static yes test(decltype(U::EnumCount)*); // NOLINT
 	template <class U> static no  test(...);
 
 	// SFINAE magic.
-	static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes);
+	static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes); // NOLINT
 };
 
 template <typename EnumType> class EnumMap
@@ -24,7 +24,7 @@ template <typename EnumType> class EnumMap
 	              "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
 public:
-	explicit constexpr EnumMap(unsigned i_val)
+	explicit constexpr EnumMap(unsigned i_val) // NOLINT
 	    : mask_(i_val) {
 	}
 	inline bool test(const EnumType i_key) const {
