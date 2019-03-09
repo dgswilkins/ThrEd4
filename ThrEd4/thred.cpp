@@ -104,7 +104,9 @@ unsigned LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently u
 unsigned      UndoBufferWriteIndex = 0;      // undo storage pointer
 unsigned      UndoBufferReadIndex  = 0;      // undo retrieval pointers
 unsigned      LastKeyCode          = 0xffff; // last key code
-fs::path      VersionNames[OLDVER];          // temporary storage for old file version names
+
+std::vector<fs::path>* VersionNames; // temporary storage for old file version names
+
 char          FileVersionIndex;              // points to old version to be read
 unsigned      LayerIndex;                    // active layer code
 unsigned      ClipFormsCount;                // number of forms the on the clipboard
@@ -3710,8 +3712,8 @@ bool thred::internal::chkattr(const fs::path& filename) {
 
 void thred::internal::duver(const fs::path& name) {
 	auto version = tolower(name.extension().wstring().back()) - 'r';
-	if (version >= 0 && version <= (OLDVER - 1)) {
-		VersionNames[version] = name;
+	if (version >= 0 && version < gsl::narrow<decltype(version)>(VersionNames->size())) {
+		(*VersionNames)[version] = name;
 	}
 }
 
@@ -3854,7 +3856,7 @@ void thred::internal::thrsav() {
 		auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 		if (file != INVALID_HANDLE_VALUE) {
 			StateMap.reset(StateFlag::CMPDO);
-			for (auto& version : VersionNames) {
+			for (auto& version : *VersionNames) {
 				version.clear();
 			}
 			duver(*DefaultDirectory / fileData.cFileName);
@@ -3862,14 +3864,14 @@ void thred::internal::thrsav() {
 				duver(*DefaultDirectory / fileData.cFileName);
 			}
 			FindClose(file);
-			fs::remove(VersionNames[OLDVER - 1]);
-			for (auto iBackup = OLDVER - 2; iBackup >= 0; iBackup--) {
-				if (!VersionNames[iBackup].empty()) {
-					auto newFileName = VersionNames[iBackup];
+			fs::remove(VersionNames->back());
+			for (auto iBackup = VersionNames->size() - 2u; iBackup >= 0; iBackup--) {
+				if (!(*VersionNames)[iBackup].empty()) {
+					auto newFileName = (*VersionNames)[iBackup];
 					auto ext         = newFileName.extension().wstring();
-					ext.back()       = iBackup + 's';
+					ext.back()       = gsl::narrow<wchar_t>(iBackup) + 's';
 					newFileName.replace_extension(ext);
-					fs::rename(VersionNames[iBackup], newFileName);
+					fs::rename((*VersionNames)[iBackup], newFileName);
 				}
 			}
 		}
@@ -19213,7 +19215,7 @@ int handle_program_memory_depletion(unsigned int) {
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                       _In_opt_ HINSTANCE hPrevInstance,
-                      _In_ LPWSTR lpCmdLine,
+                      _In_ LPWSTR lpCmdLine, //NOLINT
                       _In_ int    nShowCmd) { // NOLINT
 	UNREFERENCED_PARAMETER(nShowCmd);
 
@@ -19323,6 +19325,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_UndoBuffer                = std::vector<std::unique_ptr<unsigned[]>>{};
 		auto private_UserBMPFileName           = fs::path{};
 		auto private_ValueWindow               = std::vector<HWND>{};
+		auto private_VersionNames              = std::vector<fs::path>{};
 		auto private_WorkingFileName           = fs::path{};
 		auto private_textureInputBuffer        = std::wstring{};
 
@@ -19332,6 +19335,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_LabelWindow.resize(LASTLIN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
+		}
+		for (auto iVersion = 0; iVersion < OLDVER; iVersion++) {
+			private_VersionNames.emplace_back(L"");
 		}
 		private_RubberBandLine.resize(3);
 		private_SelectedFormsLine.resize(9);
@@ -19391,6 +19397,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		UndoBuffer                = &private_UndoBuffer;
 		UserBMPFileName           = &private_UserBMPFileName;
 		ValueWindow               = &private_ValueWindow;
+		VersionNames              = &private_VersionNames;
 		WorkingFileName           = &private_WorkingFileName;
 
 		texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
