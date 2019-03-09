@@ -3865,13 +3865,13 @@ void thred::internal::thrsav() {
 			}
 			FindClose(file);
 			fs::remove(VersionNames->back());
-			for (auto iBackup = VersionNames->size() - 2u; iBackup >= 0; iBackup--) {
-				if (!(*VersionNames)[iBackup].empty()) {
-					auto newFileName = (*VersionNames)[iBackup];
+			for (auto iBackup = VersionNames->size() - 1u; iBackup > 0; iBackup--) {
+				if (!(*VersionNames)[iBackup - 1].empty()) {
+					auto newFileName = (*VersionNames)[iBackup - 1];
 					auto ext         = newFileName.extension().wstring();
-					ext.back()       = gsl::narrow<wchar_t>(iBackup) + 's';
+					ext.back()       = gsl::narrow<wchar_t>(iBackup - 1) + 's';
 					newFileName.replace_extension(ext);
-					fs::rename((*VersionNames)[iBackup], newFileName);
+					fs::rename((*VersionNames)[iBackup - 1], newFileName);
 				}
 			}
 		}
@@ -19331,7 +19331,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		private_DefaultColorWin.resize(16);
 		private_FormControlPoints.resize(10);
-		private_FormVertices.reserve(MAXITEMS);
 		private_LabelWindow.resize(LASTLIN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
