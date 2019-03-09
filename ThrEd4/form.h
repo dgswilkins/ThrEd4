@@ -365,7 +365,7 @@ namespace internal {
 	            const std::vector<RCON>&       pathMap,
 	            const std::vector<unsigned>&   mapIndexSequence,
 	            const boost::dynamic_bitset<>& visitedRegions,
-	            unsigned                       level,
+	            unsigned                       pathLength,
 	            unsigned                       doneRegion,
 	            unsigned                       sequencePathIndex);
 	bool notsel() noexcept;
@@ -430,7 +430,7 @@ namespace internal {
 	              unsigned                   currentSegmentIndex,
 	              unsigned&                  clipIntersectSide,
 	              const std::vector<fPOINT>* currentFormVertices);
-	void   rotbak(double rotationAngle, const dPOINT& rotationCenter);
+	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
 	void   rspnt(float xCoordinate, float yCoordinate);
 	void   sapliq();

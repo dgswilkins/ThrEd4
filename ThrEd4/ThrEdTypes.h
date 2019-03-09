@@ -1812,7 +1812,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -1867,7 +1867,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -1998,7 +1998,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2054,7 +2054,7 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2112,7 +2112,7 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2167,7 +2167,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || (((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u)) {
+	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {

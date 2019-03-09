@@ -36,7 +36,7 @@ void hlp::help() {
 
 	displayText::loadString(helpFileName, IDS_HELPFN);
 	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
-	if (!HelpWindow) {
+	if (HelpWindow == nullptr) {
 		displayText::tabmsg(IDS_NOHLP);
 	}
 }

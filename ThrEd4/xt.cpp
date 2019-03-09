@@ -778,8 +778,8 @@ void xt::internal::undclp() {
 	clipBuffer.reserve(2);
 	ClipRectSize = FLSIZ{ 0, SelectedForm->underlayStitchLen };
 	ClipRect     = fRECTANGLE{ SelectedForm->underlayStitchLen, 0, 0, 0 };
-	clipBuffer.push_back(fPOINTATTR{ 0.0f, 00.0f, 0u });
-	clipBuffer.push_back(fPOINTATTR{ 0.0f, SelectedForm->underlayStitchLen, 0u });
+	clipBuffer.emplace_back( 0.0f, 00.0f, 0u );
+	clipBuffer.emplace_back( 0.0f, SelectedForm->underlayStitchLen, 0u );
 }
 
 void xt::internal::fncwlk() {

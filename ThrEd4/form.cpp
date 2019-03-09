@@ -140,9 +140,9 @@ bool form::internal::chk2of() {
 	return true;
 }
 
-void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) {
-	for (auto iSequence = 0u; iSequence < OSequence->size(); iSequence++) {
-		thred::rotflt((*OSequence)[iSequence], rotationAngle, rotationCenter);
+void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept {
+	for (auto & iSequence : *OSequence) {
+		thred::rotflt(iSequence, rotationAngle, rotationCenter);
 	}
 }
 
@@ -3413,8 +3413,8 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 		OSequence->resize(index);
 		if (StateMap.test(StateFlag::WASNEG)) {
-			for (auto iSequence = 0u; iSequence < OSequence->size(); iSequence++) {
-				(*OSequence)[iSequence].x -= formOffset;
+			for (auto & iSequence : *OSequence) {
+				iSequence.x -= formOffset;
 			}
 			for (auto iVertex = 0u; iVertex < currentVertexCount; iVertex++) {
 				vertexIt[iVertex].x -= formOffset;
@@ -4438,7 +4438,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 				}
 			}
 			if (dontSkip) {
-				pathMap.push_back(RCON{ leftRegion, 0, 0 });
+				pathMap.push_back(RCON{ leftRegion, false, 0 });
 				inPath = pathMapIndex;
 			}
 			// set the first entry in the temporary path to the leftmost region

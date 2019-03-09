@@ -8508,9 +8508,9 @@ void thred::redclp() {
 		clipBuffer.clear();
 		clipBuffer.reserve(clipSize);
 
-		clipBuffer.push_back(fPOINTATTR{ ClipStitchData[0].x + gsl::narrow_cast<float>(ClipStitchData[0].fx) / 256.0f,
-		                                 ClipStitchData[0].y + gsl::narrow_cast<float>(ClipStitchData[0].fy) / 256.0f,
-		                                 0u });
+		clipBuffer.emplace_back(ClipStitchData[0].x + gsl::narrow_cast<float>(ClipStitchData[0].fx) / 256.0f,
+		                        ClipStitchData[0].y + gsl::narrow_cast<float>(ClipStitchData[0].fy) / 256.0f,
+		                        0u);
 
 #if CLPBUG
 		OutputDebugString(fmt::format("interator: 0 x: {:6.2f},y: {:6.2f}\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
@@ -8518,10 +8518,9 @@ void thred::redclp() {
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
-			clipBuffer.push_back(
-			    fPOINTATTR{ ClipStitchData[iStitch].x + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
-			                ClipStitchData[iStitch].y + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
-			                (ClipStitchData[iStitch].led & 0xf) | codedLayer });
+			clipBuffer.emplace_back(ClipStitchData[iStitch].x + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
+			                        ClipStitchData[iStitch].y + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
+			                        (ClipStitchData[iStitch].led & 0xf) | codedLayer);
 
 #if CLPBUG
 			OutputDebugString(
