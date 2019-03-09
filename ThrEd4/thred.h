@@ -163,6 +163,7 @@ namespace internal {
 	void     desiz();
 	BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
+	bool doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag);
 	void drwLin(std::vector<POINT>& linePoints, unsigned currentStitch, unsigned length, HPEN hPen);
 	void drwStch();
 	void drwknot();
@@ -253,8 +254,36 @@ namespace internal {
 	void     gselrng();
 	void     gsnap();
 	bool     gudtyp(WORD bitCount) noexcept;
-	void     hidknot();
-	void     hupfn();
+
+	bool handleEditMenu(const WORD& wParameter);
+	bool handleEitherButtonDown(bool& retflag);
+	bool handleEndKey(int& retflag);
+	bool handleFileMenu(const WORD& wParameter);
+	bool handleFillMenu(const WORD& wParameter);
+	bool handleFormDataSheet();
+	bool handleHomeKey(bool& retflag);
+	bool handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
+	                          double&             xyRatio,
+	                          double              rotationAngle,
+	                          const FRMHED&       textureForm,
+	                          bool&               retflag);
+	bool handleLeftButtonUp(double xyRatio, double rotationAngle, const dPOINT& rotationCenter, bool& retflag);
+	bool handleLeftKey(bool& retflag);
+	bool handleMainMenu(const WORD& wParameter, dPOINT& rotationCenter);
+	bool handleMainWinKeys(const unsigned int& code, dPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);
+	bool handleMouseMove(std::vector<POINT>& stretchBoxLine,
+	                     double              xyRatio,
+	                     double&             rotationAngle,
+	                     const dPOINT&       rotationCenter,
+	                     FRMHED&             textureForm);
+	bool handleNumericInput(const unsigned int& code, bool& retflag);
+	bool handleRightButtonDown();
+	bool handleRightKey(bool& retflag);
+	bool handleSideWindowActive();
+	bool handleViewMenu(const WORD& wParameter);
+	void hidknot();
+	void hupfn();
+
 	void     ilin() noexcept;
 	void     ilin1() noexcept;
 	void     infadj(float* xCoordinate, float* yCoordinate) noexcept;
@@ -467,6 +496,9 @@ namespace internal {
 	void   unstrtch(std::vector<POINT>& stretchBoxLine);
 	double unthrsh(unsigned level) noexcept;
 	void   unthum();
+	bool   updateHoopSize();
+	bool   updateFillColor();
+	bool   updatePreferences();
 	bool   usedcol() noexcept;
 	void   vubak();
 	void   vuselthr();
