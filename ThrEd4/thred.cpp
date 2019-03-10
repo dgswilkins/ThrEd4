@@ -11609,22 +11609,25 @@ void thred::internal::selfrmx() {
 void thred::internal::setpclp() {
 	auto point = POINT{};
 	FormVerticesAsLine->clear();
-	form::sfCor2px((*InterleaveSequence)[0], point);
+	auto it = InterleaveSequence->begin();
+	form::sfCor2px(*it, point);
+	it++;
 	FormVerticesAsLine->push_back(point);
-	form::sfCor2px((*InterleaveSequence)[1], point);
+	form::sfCor2px(*it, point);
 	const auto offset = POINT{ Msg.pt.x - StitchWindowOrigin.x - point.x, Msg.pt.y - StitchWindowOrigin.y - point.y };
-	for (auto ine = 1u; ine < OutputIndex - 1; ine++) {
-		form::sfCor2px((*InterleaveSequence)[ine], point);
+	for (auto ine = 1u; ine < InterleaveSequence->size() - 1; ine++) {
+		form::sfCor2px(*it, point);
+		it++;
 		FormVerticesAsLine->push_back(POINT{ point.x + offset.x, point.y + offset.y });
 	}
-	form::sfCor2px((*InterleaveSequence)[OutputIndex - 1], point);
+	form::sfCor2px(InterleaveSequence->back(), point);
 	FormVerticesAsLine->push_back(point);
 }
 
 void thred::internal::dupclp() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	PolylineInt(StitchWindowDC, FormVerticesAsLine->data(), OutputIndex);
+	PolylineInt(StitchWindowDC, FormVerticesAsLine->data(), FormVerticesAsLine->size());
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -11635,20 +11638,19 @@ void thred::internal::unpclp() {
 }
 
 void thred::internal::fixpclp() {
-	const auto point
-	    = POINT{ (Msg.pt.x + gsl::narrow_cast<LONG>(FormMoveDelta.x)), (Msg.pt.y + gsl::narrow_cast<LONG>(FormMoveDelta.y)) };
-
+	const auto point = POINT{ (Msg.pt.x + gsl::narrow_cast<decltype(Msg.pt.x)>(FormMoveDelta.x)),
+		                      (Msg.pt.y + gsl::narrow_cast<decltype(Msg.pt.y)>(FormMoveDelta.y)) };
+	auto it = std::next(InterleaveSequence->begin(), 1);
 	thred::pxCor2stch(point);
-	const auto offset = fPOINT{ SelectedPoint.x - (*InterleaveSequence)[1].x, SelectedPoint.y - (*InterleaveSequence)[1].y };
-	auto       iNext  = form::nxt(ClosestVertexToCursor);
-	const auto count  = OutputIndex - 2;
-	form::fltspac(iNext, count);
-	SelectedForm->vertexCount += gsl::narrow<unsigned short>(count);
+	const auto offset = fPOINT{ SelectedPoint.x - it->x, SelectedPoint.y - it->y };
+	const auto count  = InterleaveSequence->size() - 2;
+	form::fltspac(form::nxt(ClosestVertexToCursor), count);
+	SelectedForm->vertexCount += gsl::narrow<decltype(SelectedForm->vertexCount)>(count);
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
-	for (auto iOutput = 1u; iOutput < OutputIndex - 1; iOutput++) {
-		vertexIt[iNext].x = (*InterleaveSequence)[iOutput].x + offset.x;
-		vertexIt[iNext].y = (*InterleaveSequence)[iOutput].y + offset.y;
-		iNext++;
+	for (auto iOutput = 1u; iOutput < InterleaveSequence->size() - 1; iOutput++) {
+		*vertexIt = fPOINT{ it->x + offset.x, it->y + offset.y };
+		vertexIt++;
+		it++;
 	}
 	form::refil();
 	thred::coltab();
@@ -14500,6 +14502,8 @@ bool thred::internal::doPaste(std::vector<POINT> & stretchBoxLine, bool &retflag
 				if (StateMap.test(StateFlag::FRMPSEL)) {
 					form::fvars(ClosestFormToCursor);
 					auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+					InterleaveSequence->clear();
+					InterleaveSequence->reserve(ClipFormVerticesData->vertexCount + 3u);
 					InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
 					auto clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 					// Todo - localize iVertex into the loop
@@ -14508,9 +14512,7 @@ bool thred::internal::doPaste(std::vector<POINT> & stretchBoxLine, bool &retflag
 						InterleaveSequence->push_back(clipData[iVertex]);
 					}
 					const auto nextVertex = form::nxt(ClosestVertexToCursor);
-					iVertex++;
 					InterleaveSequence->push_back(vertexIt[nextVertex]);
-					OutputIndex = iVertex + 1;
 					setpclp();
 					StateMap.set(StateFlag::FPUNCLP);
 					StateMap.set(StateFlag::SHOP);
