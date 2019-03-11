@@ -5404,15 +5404,15 @@ unsigned thred::internal::tripl(char* dat) {
 	return (*convert_ptr<unsigned*>(dat)) & 0xffffff;
 }
 
-unsigned thred::internal::dupcol() noexcept {
+unsigned thred::internal::dupcol(unsigned activeColor) noexcept {
 	const auto color = PESColorTranslate[PEScolors[PEScolorIndex++]];
-	for (auto iColor = 0u; iColor < ActivePointIndex; iColor++) {
+	for (auto iColor = 0u; iColor < activeColor; iColor++) {
 		if (UserColor[iColor] == color)
 			return iColor;
 	}
 	auto minimumDistance = 0xffffffu;
 	auto matchIndex      = 0u;
-	for (auto iColor = 1u; iColor < ActivePointIndex; iColor++) {
+	for (auto iColor = 1u; iColor < activeColor; iColor++) {
 		const auto matchDistance = pesmtch(color, PEScolors[iColor]);
 		if (matchDistance < minimumDistance) {
 			minimumDistance = matchDistance;
@@ -5879,16 +5879,15 @@ void thred::internal::nuFil() {
 						}
 						auto pecof         = tripl(pesHeader->off);
 						PESstitch          = fileBuffer + (pecof + 532);
-						ActivePointIndex   = 0;
 						auto pesColorCount = convert_ptr<unsigned char*>(&l_peschr[pecof + 48]);
 						PEScolors          = &pesColorCount[1];
 						// allow all the colors described by a char
 						auto colorMap    = boost::dynamic_bitset<>(256);
-						ActivePointIndex = 0;
+						auto activeColor = 0u;
 						for (auto iColor = 0u; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
 							if (!colorMap.test_set(PEScolors[iColor])) {
-								UserColor[ActivePointIndex++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
-								if (ActivePointIndex >= 16)
+								UserColor[activeColor++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
+								if (activeColor >= 16)
 									break;
 							}
 						}
@@ -5904,7 +5903,7 @@ void thred::internal::nuFil() {
 							if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
 								break;
 							if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
-								color = dupcol();
+								color = dupcol(activeColor);
 								iPESstitch += 2;
 							}
 							else {

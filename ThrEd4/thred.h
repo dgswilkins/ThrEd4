@@ -516,7 +516,7 @@ namespace internal {
 
 #if PESACT
 	double   dubl(unsigned char* pnt) noexcept;
-	unsigned dupcol() noexcept;
+	unsigned dupcol(unsigned activeColor) noexcept;
 	void     pecdat(unsigned char* buffer);
 	unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept;
 	unsigned pesnam() noexcept;
