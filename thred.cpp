@@ -5518,7 +5518,7 @@ unsigned pesmtch(COLORREF rcol,unsigned char pcol){
 	rval=0;
 	for(ind=0;ind<3;ind++){
 
-		rval+=abs((rcol&0xff)-(tcol&0xff));
+		rval+= (rcol & 0xff) > (tcol & 0xff) ? (rcol&0xff)-(tcol&0xff) : (tcol & 0xff) - (rcol & 0xff);
 		tcol>>=8;
 		rcol>>=8;
 	}

@@ -1,5 +1,5 @@
 //compile switches
-#define		PESACT		0		//compile pes code
+#define		PESACT		1		//compile pes code
 #define		BUGBAK		0		//turn bakseq off
 
 #define		TRCMTH		1		//0=brightness compard,1=color compare
