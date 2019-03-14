@@ -4152,49 +4152,16 @@ void thred::internal::ritpcol(unsigned char colorIndex) noexcept {
 	PESstitches[OutputIndex++].y = 0;
 }
 
-unsigned thred::internal::pesnam() noexcept {
-	// ToDo - (PES) Complete translation from assembler
-#if RASM 
-#else
-_asm {
-		mov		ebx, offset AuxName
-		mov		ecx, _MAX_PATH
-		mov		edx, ebx
-peslup0:
-		mov		al, [ebx]
-		or		al, al
-		je		short peslup1
-		cmp		al, '\\'
-		jne		short peslup0a
-		mov		edx, ebx
-peslup0a:
-		inc		ebx
-		loop	peslup0
-peslup1:
-		mov		ebx, edx
-		cmp		byte ptr[ebx], '\\'
-		jne		short peslup1a
-		inc		ebx
-peslup1a:
-		xor		ecx, ecx
-		mov		cl, 17
-		mov		edi, offset BSequence
-		mov		dword ptr[edi], ':AL'
-		add		edi, 3
-peslup:
-		mov		al, [ebx]
-		inc		ebx
-		cmp		al, '.'
-		je		pesnamx
-		mov		[edi], al
-		inc		edi
-		loop	peslup
-pesnamx:
-		mov		eax, edi
-		sub		eax, offset BSequence
-	}
-#endif
+#pragma warning(push)
+#pragma warning(disable : 4996)
+unsigned thred::internal::pesnam(unsigned char* pchr) noexcept {
+	strncpy((char *)pchr, "LA:", 3);
+	auto fileStem = utf::Utf16ToUtf8(AuxName->stem());
+	strncpy((char*)(pchr + 3), fileStem.c_str(), fileStem.size());
+	return fileStem.size() + 3;
+	
 }
+#pragma warning(pop)
 
 void thred::internal::rpcrd(float stitchDelta) {
 	auto pesDelta = gsl::narrow<int>(std::round(stitchDelta * 5 / 3));
@@ -4413,7 +4380,7 @@ void thred::internal::sav() {
 			// ToDo - (PES) is there a better estimate for data size?
 			pchr = new unsigned char[MAXITEMS * 4];
 			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
-			auto iHeader = pesnam();
+			auto iHeader = pesnam(pchr);
 			while (iHeader < 512)
 				pchr[iHeader++] = ' ';
 			pchr[19] = 13;

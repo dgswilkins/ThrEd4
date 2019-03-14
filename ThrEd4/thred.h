@@ -519,7 +519,7 @@ namespace internal {
 	unsigned dupcol(unsigned activeColor) noexcept;
 	void     pecdat(unsigned char* buffer);
 	unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept;
-	unsigned pesnam() noexcept;
+	unsigned pesnam(unsigned char* pchr) noexcept;
 	void     ritpcol(unsigned char colorIndex) noexcept;
 	void     ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
 	void     rpcrd(float stitchDelta);
