@@ -4154,7 +4154,9 @@ void thred::internal::ritpcol(unsigned char colorIndex) noexcept {
 
 unsigned thred::internal::pesnam() noexcept {
 	// ToDo - (PES) Complete translation from assembler
-	_asm {
+#if RASM 
+#else
+_asm {
 		mov		ebx, offset AuxName
 		mov		ecx, _MAX_PATH
 		mov		edx, ebx
@@ -4191,6 +4193,7 @@ pesnamx:
 		mov		eax, edi
 		sub		eax, offset BSequence
 	}
+#endif
 }
 
 void thred::internal::rpcrd(float stitchDelta) {
@@ -5413,6 +5416,8 @@ unsigned thred::internal::dupcol(unsigned activeColor) noexcept {
 }
 
 double thred::internal::dubl(unsigned char* pnt) noexcept {
+#if RASM 
+#else
 	unsigned tdat = 0;
 
 	_asm {
@@ -5439,6 +5444,7 @@ dubl2 :
 		mov		tdat, ecx
 		fild	tdat
 	}
+#endif
 }
 #endif
 
