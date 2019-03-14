@@ -4148,18 +4148,8 @@ void thred::internal::ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& st
 }
 
 void thred::internal::ritpcol(unsigned char colorIndex) noexcept {
-	// ToDo - (PES) Complete translation from assembler
-	_asm {
-		mov		ebx, OutputIndex
-		mov		eax, ebx
-		inc		eax
-		mov		OutputIndex, eax
-		shl		ebx, 2
-		add		ebx, PESstitches
-		xor		eax, eax
-		mov		al, colorIndex
-		mov[ebx], eax
-	}
+	PESstitches[OutputIndex].x = gsl::narrow_cast<decltype(PESstitches[OutputIndex].x)>(colorIndex);
+	PESstitches[OutputIndex++].y = 0;
 }
 
 unsigned thred::internal::pesnam() noexcept {
