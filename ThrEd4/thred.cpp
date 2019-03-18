@@ -4336,7 +4336,6 @@ void thred::internal::sav() {
 #if PESACT
 		case AUXPES: {
 			auto pesHeader = PESHED{};
-			auto pchr      = convert_ptr<unsigned char*>(&pesHeader);
 			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
 			pesHeader.celn = 7;
 			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
@@ -4424,7 +4423,7 @@ void thred::internal::sav() {
 			WriteFile(PCSFileHandle, pesStitchBuffer, bufferIndex, &bytesWritten, nullptr);
 			delete[] pesStitchBuffer;
 			// ToDo - (PES) is there a better estimate for data size?
-			pchr            = new unsigned char[MAXITEMS * 4];
+			auto pchr            = new unsigned char[MAXITEMS * 4];
 			auto* pecHeader = convert_ptr<PECHDR*>(pchr);
 			pecnam(pchr);
 			auto fstart = &pchr[sizeof(pecHeader->label)];
