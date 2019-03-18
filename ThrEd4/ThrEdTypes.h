@@ -1453,7 +1453,6 @@ public:
 	// FANGCLP& operator=(const FANGCLP& rhs) = default;
 	// FANGCLP& operator=(FANGCLP&&) = default;
 	//~FANGCLP() = default;
-
 };
 
 inline FANGCLP::FANGCLP() noexcept {
@@ -1472,7 +1471,6 @@ public:
 	// FANGCLPOUT& operator=(const FANGCLPOUT& rhs) = default;
 	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
 	//~FANGCLPOUT() = default;
-
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
@@ -2609,7 +2607,7 @@ struct _peshed {
 	float    atfm6;   // 43-46  Affine transform Bottom_Pos
 	uint16_t ukn1;    // 47,48  unknown (1)
 	int16_t  xtrn;    // 49,4a  CSewSeg x coordinate translation (0)
-	int16_t  ytrn;    // 4b,4c  CSewSeg y coordinate translation (0) 
+	int16_t  ytrn;    // 4b,4c  CSewSeg y coordinate translation (0)
 	int16_t  xsiz;    // 4d,4e  CSewSeg width
 	int16_t  ysiz;    // 4f,50  CSewSeg height
 	char     ukn2[8]; // 51,58  unknown (0)
@@ -2617,8 +2615,8 @@ struct _peshed {
 	char     hnd2[4]; // 5b-5e  header end (FF FF 00 00)
 	uint16_t cslen;   // 5f,60  CSewSeg length (7)
 	char     cs[7];   // 61-67  CSewSeg identification (CSewSeg)
-	//uint16_t styp1;   // 68,69  Stitch type (0)
-	//uint16_t scol;    // 6a,6b  Stitch Palette thread index 
+	                  // uint16_t styp1;   // 68,69  Stitch type (0)
+	// uint16_t scol;    // 6a,6b  Stitch Palette thread index
 };
 
 using PESHED = struct _peshed;
