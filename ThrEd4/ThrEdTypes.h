@@ -2585,28 +2585,88 @@ struct _pesled {
 using PESLED = struct _pesled;
 
 struct _peshed {
-	char  led[8];
-	char  off[3];
-	char  m1[13];
-	char  ce[6];
-	char  m2[47];
-	short xsiz;
-	short ysiz;
-	char  m3[16];
-	char  cs[6];
-	char  m4[3];
-	char  scol;
-	char  m5[3];
+	char     led[8];  //   0-7  Identification and version (#PES0001)
+	uint32_t off;     //   8-b  Absolute PEC section byte offset
+	uint16_t hpsz;    //   c,d  Hoopsize (0)0 = 100x100mm, 1 = 130x180mm
+	uint16_t usdn;    //   e,f  Use existing design area (1)
+	uint16_t blct;    // 10,11  CSewSeg segment block count (1)
+	char     hnd1[4]; // 12-15  header end (FF FF 00 00)
+	uint16_t celn;    // 16,17  Length of following string (7)
+	char     ce[7];   // 18-1e  CEmbOne identification (CEmbOne)
+	int16_t  xlft;    // 1f,20  Extent left
+	int16_t  xtop;    // 21,22  Extent top
+	int16_t  xrht;    // 23,24  Extent right
+	int16_t  xbot;    // 25,26  Extent bottom
+	int16_t  plft;    // 27,28  Extent left position
+	int16_t  ptop;    // 29,2a  Extent top position
+	int16_t  prht;    // 2b,2c  Extent right position
+	int16_t  pbot;    // 2d,2e  Extent bottom position
+	float    atfm1;   // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
+	float    atfm2;   // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
+	float    atfm3;   // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
+	float    atfm4;   // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
+	float    atfm5;   // 3f-42  Affine transform Left_Pos
+	float    atfm6;   // 43-46  Affine transform Bottom_Pos
+	uint16_t ukn1;    // 47,48  unknown (1)
+	int16_t  xtrn;    // 49,4a  CSewSeg x coordinate translation (0)
+	int16_t  ytrn;    // 4b,4c  CSewSeg y coordinate translation (0) 
+	int16_t  xsiz;    // 4d,4e  CSewSeg width
+	int16_t  ysiz;    // 4f,50  CSewSeg height
+	char     ukn2[8]; // 51,58  unknown (0)
+	uint16_t bcnt;    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+	char     hnd2[4]; // 5b-5e  header end (FF FF 00 00)
+	uint16_t cslen;   // 5f,60  CSewSeg length (7)
+	char     cs[7];   // 61-67  CSewSeg identification (CSewSeg)
+	//uint16_t styp1;   // 68,69  Stitch type (0)
+	//uint16_t scol;    // 6a,6b  Stitch Palette thread index 
 };
 
 using PESHED = struct _peshed;
 
 struct _pestch {
-	short x;
-	short y;
+	int16_t x;
+	int16_t y;
 };
 
 using PESTCH = struct _pestch;
+
+struct _pesstitchlist {
+	uint16_t stitchtype;
+	uint16_t threadIndex;
+	uint16_t stitchcount;
+};
+
+using PESSTCHLST = struct _pesstitchlist;
+
+struct _pecheader {
+	char     label[19];  // Label string prefixed with "LA:" and padded with space (0x20)
+	char     labnd;      // carriage return character
+	uint8_t  ukn1[11];   // Unknown (' ')
+	uint8_t  ukn2;       // Unknown
+	uint16_t hnd1;       // Unknown (0x00ff)
+	uint8_t  thumbWidth; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+	                     // Thus, 6 would mean 6×8 = 48 pixels per line
+	uint8_t thumbHeight; // Thumbnail image height in pixels (38)
+	uint8_t ukn3[12];    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
+	uint8_t colorCount;  // Number of colors minus one, 0xFF means 0 colors
+	uint8_t pad[463];    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20
+};
+
+using PECHDR = struct _pecheader;
+
+struct _pecheader2 {
+	uint16_t unknown1;        // typical 0x0000
+	uint16_t thumbnailOffset; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
+	uint16_t unknown2;        // typical 0x3100
+	uint16_t unknown3;        // typical 0xf0ff
+	int16_t  width;           // Width
+	int16_t  height;          // height
+	uint16_t unknown4;        // typical 0x01e0
+	uint16_t unknown5;        // typical 0x01b0
+	uint8_t  unknown6[4];     // --
+};
+
+using PECHDR2 = struct _pecheader2;
 
 #endif
 

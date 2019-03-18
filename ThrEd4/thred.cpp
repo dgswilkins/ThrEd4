@@ -4142,9 +4142,15 @@ unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIn
 	return colorDistance;
 }
 
-void thred::internal::ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches) {
-	PESstitches[OutputIndex].x   = -stitches[iStitch].x * 3 / 5 + PESstitchCenterOffset.x;
-	PESstitches[OutputIndex++].y = stitches[iStitch].y * 3 / 5 - PESstitchCenterOffset.y;
+void thred::internal::ritpes(unsigned char *buffer, unsigned int& bufferIndex, unsigned iStitch, const std::vector<fPOINTATTR>& stitches) {
+	if (buffer != nullptr) {
+		const auto factor = 3.0f / 5.0f;
+		auto* pesStitch = convert_ptr<PESTCH*>(&buffer[bufferIndex]);
+		pesStitch->x = -stitches[iStitch].x * factor + PESstitchCenterOffset.x;
+		pesStitch->y = stitches[iStitch].y * factor - PESstitchCenterOffset.y;
+		bufferIndex += sizeof(*pesStitch);
+		OutputIndex++;
+	}
 }
 
 void thred::internal::ritpcol(unsigned char colorIndex) noexcept {
@@ -4152,67 +4158,82 @@ void thred::internal::ritpcol(unsigned char colorIndex) noexcept {
 	PESstitches[OutputIndex++].y = 0;
 }
 
+// Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
-unsigned thred::internal::pesnam(unsigned char* pchr) noexcept {
-	strncpy((char *)pchr, "LA:", 3);
-	auto fileStem = utf::Utf16ToUtf8(AuxName->stem());
-	strncpy((char*)(pchr + 3), fileStem.c_str(), fileStem.size());
-	return fileStem.size() + 3;
-	
+void thred::internal::pecnam(unsigned char* pchr) {
+	strncpy(convert_ptr<char *>(pchr), "LA:", 3);
+	const auto lblSize  = sizeof(((PECHDR*)0)->label) - 3;
+	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
+	if (fileStem.size() < lblSize) {
+		fileStem += std::string(lblSize - fileStem.size(), ' ');
+	}
+	strncpy(convert_ptr<char *>(pchr + 3), fileStem.c_str(), lblSize);
 }
 #pragma warning(pop)
 
-void thred::internal::rpcrd(float stitchDelta) {
-	auto pesDelta = gsl::narrow<int>(std::round(stitchDelta * 5 / 3));
-	if (pesDelta < 0) {
-		if (pesDelta > -64) {
-			PESdata[OutputIndex] = pesDelta - 128;
-			OutputIndex++;
-		}
-		else {
-			PESdata[OutputIndex] = pesDelta >> 8;
-			OutputIndex++;
-			PESdata[OutputIndex] = pesDelta & 0x8f;
-			OutputIndex++;
-		}
+void thred::internal::pecEncodeLong(int delta) noexcept {
+	auto outputVal = abs(delta) & 0x7FF;
+	if (delta < 0)
+	{
+		outputVal = delta + 0x1000 & 0x7FF;
+		outputVal |= 0x800;
+	}
+	PESdata[OutputIndex] = ((outputVal >> 8) & 0x0F) | 0x80;
+	OutputIndex++;
+	PESdata[OutputIndex] = outputVal & 0xff;
+	OutputIndex++;
+}
+
+void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept {
+	auto deltaX = gsl::narrow<int>(std::round(srcX * 5 / 3));
+	auto deltaY = -gsl::narrow<int>(std::round(srcY * 5 / 3));
+	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
+		PESdata[OutputIndex] = (deltaX < 0) ? deltaX - 128 : deltaX;
+		OutputIndex++;
+		PESdata[OutputIndex] = (deltaY < 0) ? deltaY - 128 : deltaY;
+		OutputIndex++;
 	}
 	else {
-		if (pesDelta < 64) {
-			PESdata[OutputIndex] = pesDelta;
-			OutputIndex++;
-		}
-		else {
-			PESdata[OutputIndex] = (pesDelta >> 8) | 0x80;
-			OutputIndex++;
-			PESdata[OutputIndex] = pesDelta & 0xff;
-			OutputIndex++;
-		}
+		pecEncodeLong(deltaX);
+		pecEncodeLong(deltaY);
+	}
+	thisStitch.x += deltaX * 0.6f;
+	thisStitch.y += -deltaY * 0.6f;
+}
+
+inline void thred::internal::pecEncodeStop(unsigned char* buffer, unsigned char val) noexcept {
+	if (buffer != nullptr) {
+		buffer[OutputIndex] = 0xfe;
+		OutputIndex++;
+		buffer[OutputIndex] = 0xb0;
+		OutputIndex++;
+		buffer[OutputIndex] = val;
+		OutputIndex++;
 	}
 }
 
+
 void thred::internal::pecdat(unsigned char* buffer) {
-	OutputIndex = 532;
+	OutputIndex = sizeof(PECHDR) + sizeof(PECHDR2);
+	auto* pecHeader = convert_ptr<PECHDR*>(buffer);
 	PESdata     = buffer;
-	PEScolors   = convert_ptr<unsigned char*>(&PESdata[49]);
-	rpcrd(StitchBuffer[0].x);
-	rpcrd(-StitchBuffer[0].y);
+	PEScolors   = pecHeader->pad;
+	auto thisStitch = fPOINT{};
+	rpcrd(thisStitch, StitchBuffer[0].x, StitchBuffer[0].y);
 	auto iColor = 1u;
 	auto color  = StitchBuffer[0].attribute & COLMSK;
+	PEScolors[0] = PESequivColors[color];
 	for (auto iStitch = 0u; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & COLMSK) != color) {
 			color                = StitchBuffer[iStitch].attribute & COLMSK;
-			PESdata[OutputIndex] = 254;
-			OutputIndex++;
-			PESdata[OutputIndex] = 176;
-			OutputIndex++;
-			PESdata[OutputIndex] = iColor;
-			OutputIndex++;
-			PEScolors[iColor] = PESequivColors[color];
+			pecEncodeStop(PESdata, (iColor % 2) + 1);
+			PEScolors[iColor] = PESequivColors[iColor];
 			iColor++;
 		}
-		rpcrd(StitchBuffer[iStitch + 1].x - StitchBuffer[iStitch].x);
-		rpcrd(-StitchBuffer[iStitch + 1].y + StitchBuffer[iStitch].y);
+		const auto xDelta = StitchBuffer[iStitch + 1].x - thisStitch.x;
+		const auto yDelta = StitchBuffer[iStitch + 1].y - thisStitch.y;
+		rpcrd(thisStitch, xDelta, yDelta);
 	}
 	PESdata[OutputIndex++] = 0xff;
 	PESdata[OutputIndex++] = 0;
@@ -4316,13 +4337,15 @@ void thred::internal::sav() {
 			auto pesHeader = PESHED{};
 			auto pchr      = convert_ptr<unsigned char*>(&pesHeader);
 			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
+			pesHeader.celn = 7;
 			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
+			pesHeader.cslen = 7;
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
 			auto matchIndex = 0u;
 			for (auto iColor = 0u; iColor < 16; iColor++) {
 				auto matchMin = 0xffffffffu;
 				for (auto iColorMatch = 0u; iColorMatch < (sizeof(PESColorTranslate) >> 2); iColorMatch++) {
-					auto match = pesmtch(UserColor[iColor], iColorMatch);
+					const auto match = pesmtch(UserColor[iColor], iColorMatch);
 					if (match < matchMin) {
 						matchIndex = iColorMatch;
 						matchMin   = match;
@@ -4339,75 +4362,89 @@ void thred::internal::sav() {
 			pesHeader.ysiz          = boundingRect.top - boundingRect.bottom;
 			OutputIndex             = 0;
 			// There cannot be more color changes than stitches
-			PESstitches = new PESTCH[PCSHeader.stitchCount * 2];
-			ritpes(0, saveStitches);
-			PESstitches[OutputIndex].x   = -32765; // 0x8003
-			PESstitches[OutputIndex++].y = 0;
-			ritpcol(PESequivColors[color]);
-			ritpes(0, saveStitches);
+			// ToDo - convert to vector
+			auto* pesStitchBuffer = new unsigned char[PCSHeader.stitchCount * 8];
+			auto bufferIndex = 0u;
+			auto* blockHeader = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
+			blockHeader->stitchtype = 1; // first block is a jump
+			blockHeader->threadIndex = 0;
+			blockHeader->stitchcount = 2;
+			bufferIndex += sizeof(*blockHeader);
+			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
+			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
+			auto* contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+			*contCode = 0x8003;
+			bufferIndex += sizeof(*contCode);
 			auto pesColorCount = 0u;
+			blockHeader = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+			blockHeader->stitchtype = 0; // normal stitch
+			blockHeader->threadIndex = pesColorCount;
+			bufferIndex += sizeof(*blockHeader);
+			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (color == (StitchBuffer[iStitch].attribute & COLMSK))
-					ritpes(iStitch, saveStitches);
+					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
 				else {
-					ritpes(iStitch, saveStitches);
-					PESstitches[OutputIndex].x   = -32767; // 0x8001
-					PESstitches[OutputIndex++].y = 0;
-					ritpcol(PESequivColors[color]);
-					color = StitchBuffer[iStitch].attribute & COLMSK;
-					ritpes(iStitch++, saveStitches);
-					ritpes(iStitch, saveStitches);
-					PESstitches[OutputIndex].x   = -32765; // 0x8003
-					PESstitches[OutputIndex++].y = 0;
-					ritpcol(PESequivColors[color]);
-					ritpes(iStitch, saveStitches);
+					contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+					*contCode = 0x8003;
+					bufferIndex += sizeof(*contCode);
+					blockHeader->stitchcount = OutputIndex;
+					OutputIndex = 0;
 					pesColorCount++;
+					blockHeader = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+					blockHeader->stitchtype = 1; // normal stitch
+					blockHeader->threadIndex = pesColorCount;
+					bufferIndex += sizeof(*blockHeader);
+					color = StitchBuffer[iStitch].attribute & COLMSK;
+					ritpes(pesStitchBuffer, bufferIndex, iStitch++, saveStitches);
+					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
 				}
 			}
-			PESstitches[OutputIndex].x   = (sizeof(PESColorTranslate) >> 2);
-			PESstitches[OutputIndex++].y = 0;
-			auto pesOffset               = convert_ptr<unsigned*>(&pesHeader.off);
-			*pesOffset                   = (OutputIndex << 2) + sizeof(pesHeader);
-			*pesHeader.m1                = 0x20;
-			GroupStartStitch             = 0;
-			GroupEndStitch               = PCSHeader.stitchCount - 1;
-			pesHeader.xsiz               = 10000;
-			pesHeader.ysiz               = 10000;
+			blockHeader->stitchcount = OutputIndex;
+			auto* colorIndex = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+			*colorIndex = pesColorCount;
+			bufferIndex += sizeof(*colorIndex);
+			// ToDo - This is not correct. Colors may repeat in blocks
+			for (auto paletteIndex = 0u; paletteIndex < pesColorCount; paletteIndex++) {
+				auto* colorEntry = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+				*colorEntry = paletteIndex;
+				colorEntry++;
+				*colorEntry = PESequivColors[paletteIndex];
+				bufferIndex += 2 * sizeof(*colorEntry);
+			}
+			pesHeader.off    = bufferIndex + sizeof(pesHeader);
+			pesHeader.blct   = 1;
+			pesHeader.bcnt   = pesColorCount;
+			pesHeader.hpsz   = 1;
+			GroupStartStitch = 0;
+			GroupEndStitch   = PCSHeader.stitchCount - 1;
 			auto bytesWritten            = DWORD{ 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
-			WriteFile(PCSFileHandle, PESstitches, OutputIndex * sizeof(PESstitches[0]), &bytesWritten, nullptr);
-			delete[] PESstitches;
+			WriteFile(PCSFileHandle, pesStitchBuffer, bufferIndex, &bytesWritten, nullptr);
+			delete[] pesStitchBuffer;
 			// ToDo - (PES) is there a better estimate for data size?
 			pchr = new unsigned char[MAXITEMS * 4];
-			// ToDo - (PES) Add buffer parameter and remove use of BSequence in pesname
-			auto iHeader = pesnam(pchr);
-			while (iHeader < 512)
-				pchr[iHeader++] = ' ';
-			pchr[19] = 13;
-			pchr[48] = gsl::narrow<unsigned char>(pesColorCount);
+			auto* pecHeader = convert_ptr<PECHDR *>(pchr);
+			pecnam(pchr);
+			auto fstart = &pchr[sizeof(pecHeader->label)];
+			auto fend = &pchr[sizeof(*pecHeader)];
+			std::fill(fstart, fend, ' ');
+			pecHeader->labnd = 13; // 13 = carriage return
+			pecHeader->colorCount = gsl::narrow<unsigned char>(pesColorCount);
 			pecdat(pchr);
-			auto upnt = convert_ptr<unsigned*>(&pchr[514]);
-			*upnt     = OutputIndex - 512;
-			pchr[517] = 0x20;
-			pchr[518] = 0xff;
-			pchr[519] = 0xef;
-			auto psiz = convert_ptr<short*>(&pchr[520]);
-			*psiz     = pesHeader.xsiz;
-			psiz++;
-			*psiz = pesHeader.ysiz;
-			psiz++;
-			*psiz      = 480;
-			pesOffset  = convert_ptr<unsigned*>(psiz);
-			*pesOffset = 11534816;
-			//			pchr[527]=(char)0x0;
-			//			pchr[528]=(char)0x90;
-			//			pchr[529]=(char)0x0;
-			//			pchr[530]=(char)0x8f;
-			pchr[527] = 0x00;
-			pchr[528] = 0x80; // hor msb
-			pchr[529] = 0x80; // hor lsb
-			pchr[530] = 0x82; // vert msb
-			pchr[531] = 0xff; // vert lsb
+			auto* pecHeader2 = convert_ptr<PECHDR2 *>(&pchr[sizeof(PECHDR)]);
+			pecHeader2->unknown1 = 0;
+			pecHeader2->thumbnailOffset = OutputIndex - 512;
+			pecHeader2->unknown2 = 0x3100;
+			pecHeader2->unknown3 = 0xf0ff;
+			pecHeader2->width = pesHeader.xsiz;
+			pecHeader2->height = pesHeader.ysiz;
+			pecHeader2->unknown4 = 0x01e0;
+			pecHeader2->unknown5 = 0x01b0;
+			pecHeader2->unknown6[0] = 0x80; // hor msb
+			pecHeader2->unknown6[1] = 0x80; // hor lsb
+			pecHeader2->unknown6[2] = 0x82; // vert msb
+			pecHeader2->unknown6[3] = 0xff; // vert lsb
 			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
 			delete[] pchr;
 			break;
@@ -5833,21 +5870,21 @@ void thred::internal::nuFil() {
 						auto fileBuffer = new unsigned char[MAXITEMS * 8];
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, nullptr);
 						auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
-						auto l_peschr  = convert_ptr<char*>(pesHeader);
 						if (strncmp(pesHeader->led, "#PES00", 6)) {
 							auto fmtStr = std::wstring{};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 							return;
 						}
-						auto pecof         = tripl(pesHeader->off);
-						PESstitch          = fileBuffer + (pecof + 532);
-						auto pesColorCount = convert_ptr<unsigned char*>(&l_peschr[pecof + 48]);
-						PEScolors          = &pesColorCount[1];
+						auto pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
+						auto pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+						PESstitch          = &fileBuffer[pecOffset];
+						const auto pesColorCount = pecHeader->colorCount + 1u;
+						PEScolors = pecHeader->pad;
 						// allow all the colors described by a char
 						auto colorMap    = boost::dynamic_bitset<>(256);
 						auto activeColor = 0u;
-						for (auto iColor = 0u; iColor < gsl::narrow<unsigned>(*pesColorCount + 1); iColor++) {
+						for (auto iColor = 0u; iColor < pesColorCount; iColor++) {
 							if (!colorMap.test_set(PEScolors[iColor])) {
 								UserColor[activeColor++] = PESColorTranslate[PEScolors[iColor] & PESCMSK];
 								if (activeColor >= 16)
@@ -5861,8 +5898,9 @@ void thred::internal::nuFil() {
 						auto iPESstitch         = 0u;
 						auto iActualPESstitches = 1u;
 						StitchBuffer[0].x       = StitchBuffer[0].y;
-						auto locof              = 0.0;
-						while (iPESstitch < BytesRead - pecof - 529) {
+						auto locof              = 0.0f;
+						const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
+						while (iPESstitch < pecCount) {
 							if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
 								break;
 							if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
@@ -5875,12 +5913,12 @@ void thred::internal::nuFil() {
 									iPESstitch++;
 								}
 								else {
-									if (PESstitch[iPESstitch] & 0x40)
+									if (PESstitch[iPESstitch] > 0x3f)
 										locof = PESstitch[iPESstitch] - 128;
 									else
 										locof = PESstitch[iPESstitch];
 								}
-								locof *= 0.6;
+								locof *= 0.6f;
 								// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 								if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 									loc.y -= locof;

@@ -518,11 +518,13 @@ namespace internal {
 	double   dubl(unsigned char* pnt) noexcept;
 	unsigned dupcol(unsigned activeColor) noexcept;
 	void     pecdat(unsigned char* buffer);
+	void     pecEncodeLong(int deltaY) noexcept;
+	void     pecEncodeStop(unsigned char* buffer, unsigned char val) noexcept;
 	unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept;
-	unsigned pesnam(unsigned char* pchr) noexcept;
+	void     pecnam(unsigned char* pchr);
 	void     ritpcol(unsigned char colorIndex) noexcept;
-	void     ritpes(unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
-	void     rpcrd(float stitchDelta);
+	void     ritpes(unsigned char* buffer, unsigned int& bufferIndex, unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
+	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept;
 	void     setpes();
 	unsigned tripl(char* dat);
 #endif
