@@ -515,7 +515,6 @@ namespace internal {
 	void zumshft();
 
 #if PESACT
-	double   dubl(unsigned char* pnt) noexcept;
 	unsigned dupcol(unsigned activeColor) noexcept;
 	void     pecdat(unsigned char* buffer);
 	void     pecEncodeLong(int deltaY) noexcept;

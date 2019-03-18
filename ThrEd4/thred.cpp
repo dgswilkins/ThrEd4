@@ -5419,37 +5419,6 @@ unsigned thred::internal::dupcol(unsigned activeColor) noexcept {
 	return matchIndex;
 }
 
-double thred::internal::dubl(unsigned char* pnt) noexcept {
-#if RASM
-#else
-	unsigned tdat = 0;
-
-	_asm {
-		mov		ecx, pnt
-		mov		ecx, [ecx]
-		movzx	ebx, ch
-		test	cl, 8
-		je		short dubl1
-		mov		ch, 15
-		and		cl, ch
-		sub		ch, cl
-		movzx	ecx, ch
-		shl		ecx, 8
-		mov		eax, 256
-		sub		eax, ebx
-		add		ecx, eax
-		neg		ecx
-		jmp		short dubl2
-dubl1 :
-		and		ecx, 0x7
-		shl		ecx, 8
-		add		ecx, ebx
-dubl2 :
-		mov		tdat, ecx
-		fild	tdat
-	}
-#endif
-}
 #endif
 
 void thred::internal::unthum() {
@@ -5874,6 +5843,7 @@ void thred::internal::nuFil() {
 							auto fmtStr = std::wstring{};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+							delete[] fileBuffer;
 							return;
 						}
 						auto pecHeader           = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
@@ -5899,42 +5869,56 @@ void thred::internal::nuFil() {
 						auto iActualPESstitches = 1u;
 						StitchBuffer[0].x       = StitchBuffer[0].y;
 						auto       locof        = 0.0f;
-						const auto pecCount     = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
-						while (iPESstitch < pecCount) {
-							if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
-								break;
-							if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
-								color = dupcol(activeColor);
-								iPESstitch += 2;
-							}
-							else {
-								if (PESstitch[iPESstitch] & 0x80) {
-									locof = dubl(&PESstitch[iPESstitch]);
-									iPESstitch++;
+						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3)) {
+							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
+							while (iPESstitch < pecCount) {
+								if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
+									break;
+								if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
+									color = dupcol(activeColor);
+									iPESstitch += 2;
 								}
 								else {
-									if (PESstitch[iPESstitch] > 0x3f)
-										locof = PESstitch[iPESstitch] - 128;
+									if (PESstitch[iPESstitch] & 0x80) {
+										auto pesVal = ((PESstitch[iPESstitch] & 0x0F) << 8) + PESstitch[iPESstitch + 1];
+										if (pesVal & 0x800)
+										{
+											pesVal -= 0x1000;
+										}
+										locof = gsl::narrow_cast<decltype(locof)>(pesVal);
+										iPESstitch++;
+									}
+									else {
+										if (PESstitch[iPESstitch] > 0x3f)
+											locof = PESstitch[iPESstitch] - 128;
+										else
+											locof = PESstitch[iPESstitch];
+									}
+									locof *= 0.6f;
+									// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
+									if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+										loc.y -= locof;
+										StitchBuffer[iActualPESstitches].x = loc.x;
+										StitchBuffer[iActualPESstitches].y = loc.y;
+										StitchBuffer[iActualPESstitches].attribute = color;
+										iActualPESstitches++;
+									}
 									else
-										locof = PESstitch[iPESstitch];
+										loc.x += locof;
 								}
-								locof *= 0.6f;
-								// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
-								if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-									loc.y -= locof;
-									StitchBuffer[iActualPESstitches].x         = loc.x;
-									StitchBuffer[iActualPESstitches].y         = loc.y;
-									StitchBuffer[iActualPESstitches].attribute = color;
-									iActualPESstitches++;
-								}
-								else
-									loc.x += locof;
+								iPESstitch++;
 							}
-							iPESstitch++;
+							PCSHeader.stitchCount = iActualPESstitches;
+							// IniFile.auxFileType=AUXPES;
+							hupfn();
 						}
-						PCSHeader.stitchCount = iActualPESstitches;
-						// IniFile.auxFileType=AUXPES;
-						hupfn();
+						else {
+							auto fmtStr = std::wstring{};
+							displayText::loadString(fmtStr, IDS_NOTPES);
+							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+							delete[] fileBuffer;
+							return;
+						}
 						delete[] fileBuffer;
 					}
 #endif
