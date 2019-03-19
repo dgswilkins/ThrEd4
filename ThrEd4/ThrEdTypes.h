@@ -136,7 +136,6 @@
 #define BALJUMP 0x81              // balarad jump stitch
 #define BALSTOP 0                 // balarad stop
 #define COLVER 0x776874           // color file version
-#define PESCMSK 0x3f              // pes color mask
 #define REDCOL 0xff               // code for the color red
 #define GRNCOL 0xff00             // code for the color green
 #define BLUCOL 0xff0000           // code for the color blue
@@ -2868,6 +2867,24 @@ struct _lengthInfo {
 };
 
 using LENINFO = struct _lengthInfo;
+
+struct _pecColor
+{
+	unsigned char r;
+	unsigned char g;
+	unsigned char b;
+};
+
+using PECCOLOR = struct _pecColor;
+
+struct _thread
+{
+	PECCOLOR color;
+	const char* description;
+	const char* catalogNumber;
+};
+
+using THREAD = struct _thread;
 
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30

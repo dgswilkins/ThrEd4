@@ -135,9 +135,7 @@ namespace internal {
 	void     clpradj(fPOINTATTR stitch) noexcept;
 	bool     cmpstch(unsigned iStitchA, unsigned iStitchB) noexcept;
 	void     colchk() noexcept;
-
-	constexpr DWORD coldis(COLORREF colorA, COLORREF colorB);
-
+	DWORD    coldis(COLORREF colorA, COLORREF colorB);
 	bool     colfil();
 	unsigned colmatch(COLORREF color) noexcept;
 	void     cros(unsigned iStitch) noexcept;
