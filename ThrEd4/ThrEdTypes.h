@@ -12,20 +12,7 @@
 
 #define TRCMTH 1 // 0=brightness compare,1=color compare
 
-#define RUTVALID 1
-#define COMVALID 2
-#define REGVALID 4
-
-#define RUTSED 1232323232
-#define COMSED 1323232323
-#define TIMSED 1313131313
-#define TIMSIG 2211221122      // time signature for trial operation
-#define DAY1 864000000000      // file time ticks in a day
-#define DAY31 26784000000000   // file time ticks in 31 days
-#define DAY400 345600000000000 // file time ticks in 400 days
-#define TRILIM 100             // expired trial clipboard limit
 #define SRTIM 20000000         // sort time limit in 100 ns intervals
-// end of trial version codes
 
 // daisy codes
 #define DAZPETS 5  // petals
@@ -112,7 +99,6 @@
 #define SPEDLIN 30                // speed change for line message on speed scroll bar
 #define SPEDPAG 120               // speed change for page message on speed scroll bar
 #define KNOTLEN 54                // set knots for stitches longer than this
-#define MAXSAC 10000              // maximum number of satin guidelines
 #define MAXKNOTS 16384            // maximum nuber of knots
 #define IBFCLEN (4 * PFGRAN)      // initial buttonhole fill corner length
 #define IPICSPAC 6                // initial picot border space
@@ -120,7 +106,6 @@
 #define EDGETYPS 12               // number of border fill types
 #define SEED 3037000499           // pseudo-random-sequence seed
 #define FSED 1340007303           // feather sequence seed
-#define NAMSED 2222222222         // trial version psg seed
 #define DSTRAT 0.8333333333333333 // ratio of dst stitch points to PFAFF stitch points
 #define HUPS 5u                   // number of hoops the user can select
 #define NORDSED 0x5a5a5a5a        // name order seed
@@ -136,8 +121,8 @@
 #define BALJUMP 0x81              // balarad jump stitch
 #define BALSTOP 0                 // balarad stop
 #define COLVER 0x776874           // color file version
-#define REDCOL 0xff               // code for the color red
-#define GRNCOL 0xff00             // code for the color green
+#define REDCOL 0x0000ff           // code for the color red
+#define GRNCOL 0x00ff00           // code for the color green
 #define BLUCOL 0xff0000           // code for the color blue
 #define REDMSK 0xffff00           // mask for the color red
 #define GRNMSK 0xff00ff           // mask for the color green
