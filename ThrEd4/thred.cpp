@@ -3491,7 +3491,7 @@ DWORD thred::internal::coldis(COLORREF colorA, COLORREF colorB) {
 	auto color1 = PECCOLOR{ GetRValue(colorA),GetGValue(colorA),GetBValue(colorA) };
 	auto color2 = PECCOLOR{ GetRValue(colorB),GetGValue(colorB),GetBValue(colorB) };
 
-	auto meanR = (gsl::narrow_cast<int>(color1.r) + gsl::narrow_cast<int>(color2.r)) / 2;
+	const auto meanR = (gsl::narrow_cast<int>(color1.r) + gsl::narrow_cast<int>(color2.r)) / 2;
 	auto deltaR = gsl::narrow_cast<int>(color1.r) - gsl::narrow_cast<int>(color2.r);
 	auto deltaG = gsl::narrow_cast<int>(color1.g) - gsl::narrow_cast<int>(color2.g);
 	auto deltaB = gsl::narrow_cast<int>(color1.b) - gsl::narrow_cast<int>(color2.b);
@@ -3506,7 +3506,7 @@ void thred::internal::bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned dest
 	    = { balaradStitch[source].x * IBALRAT + BalaradOffset.x, balaradStitch[source].y * IBALRAT + BalaradOffset.y, code };
 }
 
-unsigned thred::internal::colmatch(COLORREF color) noexcept {
+unsigned thred::internal::colmatch(COLORREF color) {
 	if (ColorChanges < 16) {
 		for (auto iColor = 0u; iColor < ColorChanges; iColor++) {
 			if (color == UserColor[iColor]) {
@@ -4130,11 +4130,11 @@ bool thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) {
 #if PESACT
 
 
-unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept {          
+unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIndex) {          
 	auto color = PECCOLOR{ GetRValue(referenceColor),GetGValue(referenceColor),GetBValue(referenceColor) };
 	auto translatedColor = PECCOLOR{ PESThread[colorIndex].color.r, PESThread[colorIndex].color.g, PESThread[colorIndex].color.b };
 
-	auto meanR = (gsl::narrow_cast<int>(color.r) + gsl::narrow_cast<int>(translatedColor.r)) / 2;
+	const auto meanR = (gsl::narrow_cast<int>(color.r) + gsl::narrow_cast<int>(translatedColor.r)) / 2;
 	auto deltaR = gsl::narrow_cast<int>(color.r) - gsl::narrow_cast<int>(translatedColor.r);
 	auto deltaG = gsl::narrow_cast<int>(color.g) - gsl::narrow_cast<int>(translatedColor.g);
 	auto deltaB = gsl::narrow_cast<int>(color.b) - gsl::narrow_cast<int>(translatedColor.b);
@@ -5404,9 +5404,9 @@ unsigned thred::internal::tripl(char* dat) {
 	return (*convert_ptr<unsigned*>(dat)) & 0xffffff;
 }
 
-unsigned thred::internal::dupcol(unsigned activeColor) noexcept {
+unsigned thred::internal::dupcol(unsigned activeColor) {
 	const auto threadSize = sizeof(PESThread) / sizeof(PESThread[0]);
-	auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
+	const auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
 	const auto color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 	for (auto iColor = 0u; iColor < activeColor; iColor++) {
 		if (UserColor[iColor] == color)
@@ -5863,15 +5863,15 @@ void thred::internal::nuFil() {
 						for (auto iColor = 0u; iColor < pesColorCount; iColor++) {
 							if (PEScolors[iColor] < threadCount) {
 								if (!colorMap.test_set(PEScolors[iColor])) {
-									auto threadColor = PESThread[PEScolors[iColor]];
-									auto color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+									const auto threadColor = PESThread[PEScolors[iColor]];
+									const auto color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 									UserColor[activeColor++] = color;
 									if (activeColor >= 16)
 										break;
 								}
 							}
 							else {
-								auto color = RGB(PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // color unknown
+								const auto color = RGB(PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // color unknown
 								UserColor[activeColor++] = color;
 							}
 						}

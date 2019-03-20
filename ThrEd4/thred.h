@@ -137,7 +137,7 @@ namespace internal {
 	void     colchk() noexcept;
 	DWORD    coldis(COLORREF colorA, COLORREF colorB);
 	bool     colfil();
-	unsigned colmatch(COLORREF color) noexcept;
+	unsigned colmatch(COLORREF color);
 	void     cros(unsigned iStitch) noexcept;
 	void     crtcurs() noexcept;
 	void     cut();
@@ -513,11 +513,11 @@ namespace internal {
 	void zumshft();
 
 #if PESACT
-	unsigned dupcol(unsigned activeColor) noexcept;
+	unsigned dupcol(unsigned activeColor);
 	void     pecdat(unsigned char* buffer);
 	void     pecEncodeLong(int deltaY) noexcept;
 	void     pecEncodeStop(unsigned char* buffer, unsigned char val) noexcept;
-	unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex) noexcept;
+	unsigned pesmtch(COLORREF referenceColor, unsigned char colorIndex);
 	void     pecnam(unsigned char* pchr);
 	void     ritpcol(unsigned char colorIndex) noexcept;
 	void     ritpes(unsigned char* buffer, unsigned int& bufferIndex, unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
