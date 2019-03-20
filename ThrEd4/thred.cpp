@@ -857,71 +857,71 @@ unsigned Ydst[] = {
 
 #if PESACT
 THREAD PESThread[] = {
-{{0x00, 0x00, 0x00}, "Unknown",           ""      }, //Index  00
-{{0x1a, 0x0a, 0x94}, "Prussian Blue",     "ETP007"}, // Index 01
-{{0x0f, 0x75, 0xff}, "Blue",              "ETP405"}, // Index 02
-{{0x00, 0x93, 0x4c}, "Teal Green",        "ETP534"}, // Index 03
-{{0xba, 0xbd, 0xfe}, "Corn Flower Blue",  "ETP070"}, // Index 04
-{{0xec, 0x00, 0x00}, "Red",               "ETP800"}, // Index 05
-{{0xe4, 0x99, 0x5a}, "Reddish Brown",     "ETP337"}, // Index 06
-{{0xcc, 0x48, 0xab}, "Magenta",           "ETP620"}, // Index 07
-{{0xfd, 0xc4, 0xfa}, "Light Lilac",       "ETP810"}, // Index 08
-{{0xdd, 0x84, 0xcd}, "Lilac",             "ETP612"}, // Index 09
-{{0x6b, 0xd3, 0x8a}, "Mint Green",        "ETP502"}, // Index 10
-{{0xe4, 0xa9, 0x45}, "Deep Gold",         "ETP214"}, // Index 11
-{{0xff, 0xbd, 0x42}, "Orange",            "ETP208"}, // Index 12
-{{0xff, 0xe6, 0x00}, "Yellow",            "ETP205"}, // Index 13
-{{0x6c, 0xd9, 0x00}, "Lime Green",        "ETP513"}, // Index 14
-{{0xc1, 0xa9, 0x41}, "Brass",             "ETP328"}, // Index 15
-{{0xb5, 0xad, 0x97}, "Silver",            "ETP005"}, // Index 16
-{{0xba, 0x9c, 0x5f}, "Russet Brown",      "ETP330"}, // Index 17
-{{0xfa, 0xf5, 0x9e}, "Cream Brown",       "ETP010"}, // Index 18
-{{0x80, 0x80, 0x80}, "Pewter",            "ETP704"}, // Index 19
-{{0x00, 0x00, 0x00}, "Black",             "ETP900"}, // Index 20
-{{0x00, 0x1c, 0xdf}, "Ultramarine",       "ETP406"}, // Index 21
-{{0xdf, 0x00, 0xb8}, "Royal Purple",      "ETP869"}, // Index 22
-{{0x62, 0x62, 0x62}, "Dark Gray",         "ETP707"}, // Index 23
-{{0x69, 0x26, 0x0d}, "Dark Brown",        "ETP058"}, // Index 24
-{{0xff, 0x00, 0x60}, "Deep Rose",         "ETP086"}, // Index 25
-{{0xbf, 0x82, 0x00}, "Light Brown",       "ETP323"}, // Index 26
-{{0xf3, 0x91, 0x78}, "Salmon Pink",       "ETP079"}, // Index 27
-{{0xff, 0x68, 0x05}, "Vermilion",         "ETP030"}, // Index 28
-{{0xf0, 0xf0, 0xf0}, "White",             "ETP001"}, // Index 29
-{{0xc8, 0x32, 0xcd}, "Violet",            "ETP613"}, // Index 30
-{{0xb0, 0xbf, 0x9b}, "Seacrest",          "ETP542"}, // Index 31
-{{0x65, 0xbf, 0xeb}, "Sky Blue",          "ETP019"}, // Index 32
-{{0xff, 0xba, 0x04}, "Pumpkin",           "ETP126"}, // Index 33
-{{0xff, 0xf0, 0x6c}, "Cream Yellow",      "ETP010"}, // Index 34
-{{0xfe, 0xca, 0x15}, "Khaki",             "ETP348"}, // Index 35
-{{0xf3, 0x81, 0x01}, "Clay Brown",        "ETP339"}, // Index 36
-{{0x37, 0xa9, 0x23}, "Leaf Green",        "ETP509"}, // Index 37
-{{0x23, 0x46, 0x5f}, "Peacock Blue",      "ETP405"}, // Index 38
-{{0xa6, 0xa6, 0x95}, "Gray",              "ETP707"}, // Index 39
-{{0xce, 0xbf, 0xa6}, "Warm Gray",         "ETP399"}, // Index 40
-{{0x96, 0xaa, 0x02}, "Dark Olive",        "ETP517"}, // Index 41
-{{0xff, 0xe3, 0xc6}, "Linen",             "ETP307"}, // Index 42
-{{0xff, 0x99, 0xd7}, "Pink",              "ETP085"}, // Index 43
-{{0x00, 0x70, 0x04}, "Deep Green",        "ETP808"}, // Index 44
-{{0xed, 0xcc, 0xfb}, "Lavender",          "ETP804"}, // Index 45
-{{0xc0, 0x89, 0xd8}, "Wisteria Violet",   "ETP607"}, // Index 46
-{{0xe7, 0xd9, 0xb4}, "Beige",             "ETP843"}, // Index 47
-{{0xe9, 0x0e, 0x86}, "Carmine",           "ETP807"}, // Index 48
-{{0xcf, 0x68, 0x29}, "Amber Red",         "ETP333"}, // Index 49
-{{0x40, 0x86, 0x15}, "Olive Green",       "ETP519"}, // Index 50
-{{0xdb, 0x17, 0x97}, "Dark Fuchsia",      "ETP107"}, // Index 51
-{{0xff, 0xa7, 0x04}, "Tangerine",         "ETP209"}, // Index 52
-{{0xb9, 0xff, 0xff}, "Light Blue",        "ETP017"}, // Index 53
-{{0x22, 0x89, 0x27}, "Emerald Green",     "ETP507"}, // Index 54
-{{0xb6, 0x12, 0xcd}, "Purple",            "ETP614"}, // Index 55
-{{0x00, 0xaa, 0x00}, "Moss Green",        "ETP515"}, // Index 56
-{{0xfe, 0xa9, 0xdc}, "Flesh Pink",        "ETP124"}, // Index 57
-{{0xfe, 0xd5, 0x10}, "Harvest Gold",      "ETP206"}, // Index 58
-{{0x00, 0x97, 0xdf}, "Electric Blue",     "ETP420"}, // Index 59
-{{0xff, 0xff, 0x84}, "Lemon Yellow",      "ETP205"}, // Index 60
-{{0xcf, 0xe7, 0x74}, "Fresh Green",       "ETP027"}, // Index 61
-{{0xff, 0xc8, 0x64}, "Applique Material", ""      }, // Index 62
-{{0xff, 0xc8, 0xc8}, "Applique Position", ""      }, // Index 63
-{{0xff, 0xc8, 0xc8}, "Applique",          ""      }  // Index 64
+	{ { 0x00, 0x00, 0x00 }, "Unknown", "" },                // Index  00
+	{ { 0x1a, 0x0a, 0x94 }, "Prussian Blue", "ETP007" },    // Index 01
+	{ { 0x0f, 0x75, 0xff }, "Blue", "ETP405" },             // Index 02
+	{ { 0x00, 0x93, 0x4c }, "Teal Green", "ETP534" },       // Index 03
+	{ { 0xba, 0xbd, 0xfe }, "Corn Flower Blue", "ETP070" }, // Index 04
+	{ { 0xec, 0x00, 0x00 }, "Red", "ETP800" },              // Index 05
+	{ { 0xe4, 0x99, 0x5a }, "Reddish Brown", "ETP337" },    // Index 06
+	{ { 0xcc, 0x48, 0xab }, "Magenta", "ETP620" },          // Index 07
+	{ { 0xfd, 0xc4, 0xfa }, "Light Lilac", "ETP810" },      // Index 08
+	{ { 0xdd, 0x84, 0xcd }, "Lilac", "ETP612" },            // Index 09
+	{ { 0x6b, 0xd3, 0x8a }, "Mint Green", "ETP502" },       // Index 10
+	{ { 0xe4, 0xa9, 0x45 }, "Deep Gold", "ETP214" },        // Index 11
+	{ { 0xff, 0xbd, 0x42 }, "Orange", "ETP208" },           // Index 12
+	{ { 0xff, 0xe6, 0x00 }, "Yellow", "ETP205" },           // Index 13
+	{ { 0x6c, 0xd9, 0x00 }, "Lime Green", "ETP513" },       // Index 14
+	{ { 0xc1, 0xa9, 0x41 }, "Brass", "ETP328" },            // Index 15
+	{ { 0xb5, 0xad, 0x97 }, "Silver", "ETP005" },           // Index 16
+	{ { 0xba, 0x9c, 0x5f }, "Russet Brown", "ETP330" },     // Index 17
+	{ { 0xfa, 0xf5, 0x9e }, "Cream Brown", "ETP010" },      // Index 18
+	{ { 0x80, 0x80, 0x80 }, "Pewter", "ETP704" },           // Index 19
+	{ { 0x00, 0x00, 0x00 }, "Black", "ETP900" },            // Index 20
+	{ { 0x00, 0x1c, 0xdf }, "Ultramarine", "ETP406" },      // Index 21
+	{ { 0xdf, 0x00, 0xb8 }, "Royal Purple", "ETP869" },     // Index 22
+	{ { 0x62, 0x62, 0x62 }, "Dark Gray", "ETP707" },        // Index 23
+	{ { 0x69, 0x26, 0x0d }, "Dark Brown", "ETP058" },       // Index 24
+	{ { 0xff, 0x00, 0x60 }, "Deep Rose", "ETP086" },        // Index 25
+	{ { 0xbf, 0x82, 0x00 }, "Light Brown", "ETP323" },      // Index 26
+	{ { 0xf3, 0x91, 0x78 }, "Salmon Pink", "ETP079" },      // Index 27
+	{ { 0xff, 0x68, 0x05 }, "Vermilion", "ETP030" },        // Index 28
+	{ { 0xf0, 0xf0, 0xf0 }, "White", "ETP001" },            // Index 29
+	{ { 0xc8, 0x32, 0xcd }, "Violet", "ETP613" },           // Index 30
+	{ { 0xb0, 0xbf, 0x9b }, "Seacrest", "ETP542" },         // Index 31
+	{ { 0x65, 0xbf, 0xeb }, "Sky Blue", "ETP019" },         // Index 32
+	{ { 0xff, 0xba, 0x04 }, "Pumpkin", "ETP126" },          // Index 33
+	{ { 0xff, 0xf0, 0x6c }, "Cream Yellow", "ETP010" },     // Index 34
+	{ { 0xfe, 0xca, 0x15 }, "Khaki", "ETP348" },            // Index 35
+	{ { 0xf3, 0x81, 0x01 }, "Clay Brown", "ETP339" },       // Index 36
+	{ { 0x37, 0xa9, 0x23 }, "Leaf Green", "ETP509" },       // Index 37
+	{ { 0x23, 0x46, 0x5f }, "Peacock Blue", "ETP405" },     // Index 38
+	{ { 0xa6, 0xa6, 0x95 }, "Gray", "ETP707" },             // Index 39
+	{ { 0xce, 0xbf, 0xa6 }, "Warm Gray", "ETP399" },        // Index 40
+	{ { 0x96, 0xaa, 0x02 }, "Dark Olive", "ETP517" },       // Index 41
+	{ { 0xff, 0xe3, 0xc6 }, "Linen", "ETP307" },            // Index 42
+	{ { 0xff, 0x99, 0xd7 }, "Pink", "ETP085" },             // Index 43
+	{ { 0x00, 0x70, 0x04 }, "Deep Green", "ETP808" },       // Index 44
+	{ { 0xed, 0xcc, 0xfb }, "Lavender", "ETP804" },         // Index 45
+	{ { 0xc0, 0x89, 0xd8 }, "Wisteria Violet", "ETP607" },  // Index 46
+	{ { 0xe7, 0xd9, 0xb4 }, "Beige", "ETP843" },            // Index 47
+	{ { 0xe9, 0x0e, 0x86 }, "Carmine", "ETP807" },          // Index 48
+	{ { 0xcf, 0x68, 0x29 }, "Amber Red", "ETP333" },        // Index 49
+	{ { 0x40, 0x86, 0x15 }, "Olive Green", "ETP519" },      // Index 50
+	{ { 0xdb, 0x17, 0x97 }, "Dark Fuchsia", "ETP107" },     // Index 51
+	{ { 0xff, 0xa7, 0x04 }, "Tangerine", "ETP209" },        // Index 52
+	{ { 0xb9, 0xff, 0xff }, "Light Blue", "ETP017" },       // Index 53
+	{ { 0x22, 0x89, 0x27 }, "Emerald Green", "ETP507" },    // Index 54
+	{ { 0xb6, 0x12, 0xcd }, "Purple", "ETP614" },           // Index 55
+	{ { 0x00, 0xaa, 0x00 }, "Moss Green", "ETP515" },       // Index 56
+	{ { 0xfe, 0xa9, 0xdc }, "Flesh Pink", "ETP124" },       // Index 57
+	{ { 0xfe, 0xd5, 0x10 }, "Harvest Gold", "ETP206" },     // Index 58
+	{ { 0x00, 0x97, 0xdf }, "Electric Blue", "ETP420" },    // Index 59
+	{ { 0xff, 0xff, 0x84 }, "Lemon Yellow", "ETP205" },     // Index 60
+	{ { 0xcf, 0xe7, 0x74 }, "Fresh Green", "ETP027" },      // Index 61
+	{ { 0xff, 0xc8, 0x64 }, "Applique Material", "" },      // Index 62
+	{ { 0xff, 0xc8, 0xc8 }, "Applique Position", "" },      // Index 63
+	{ { 0xff, 0xc8, 0xc8 }, "Applique", "" }                // Index 64
 };
 
 #endif
@@ -3488,15 +3488,16 @@ void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, unsigned dest
 }
 
 DWORD thred::internal::coldis(COLORREF colorA, COLORREF colorB) {
-	auto color1 = PECCOLOR{ GetRValue(colorA),GetGValue(colorA),GetBValue(colorA) };
-	auto color2 = PECCOLOR{ GetRValue(colorB),GetGValue(colorB),GetBValue(colorB) };
+	auto color1 = PECCOLOR{ GetRValue(colorA), GetGValue(colorA), GetBValue(colorA) };
+	auto color2 = PECCOLOR{ GetRValue(colorB), GetGValue(colorB), GetBValue(colorB) };
 
-	const auto meanR = (gsl::narrow_cast<int>(color1.r) + gsl::narrow_cast<int>(color2.r)) / 2;
-	auto deltaR = gsl::narrow_cast<int>(color1.r) - gsl::narrow_cast<int>(color2.r);
-	auto deltaG = gsl::narrow_cast<int>(color1.g) - gsl::narrow_cast<int>(color2.g);
-	auto deltaB = gsl::narrow_cast<int>(color1.b) - gsl::narrow_cast<int>(color2.b);
+	const auto meanR  = (gsl::narrow_cast<int>(color1.r) + gsl::narrow_cast<int>(color2.r)) / 2;
+	auto       deltaR = gsl::narrow_cast<int>(color1.r) - gsl::narrow_cast<int>(color2.r);
+	auto       deltaG = gsl::narrow_cast<int>(color1.g) - gsl::narrow_cast<int>(color2.g);
+	auto       deltaB = gsl::narrow_cast<int>(color1.b) - gsl::narrow_cast<int>(color2.b);
 	// From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-	return gsl::narrow<DWORD>(std::round(std::sqrt((((512 + meanR)*deltaR*deltaR) >> 8) + 4 * deltaG*deltaG + (((767 - meanR)*deltaB*deltaB) >> 8))));
+	return gsl::narrow<DWORD>(std::round(
+	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8))));
 }
 
 void thred::internal::bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code) {
@@ -4129,17 +4130,18 @@ bool thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) {
 
 #if PESACT
 
+unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIndex) {
+	auto color = PECCOLOR{ GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor) };
+	auto translatedColor
+	    = PECCOLOR{ PESThread[colorIndex].color.r, PESThread[colorIndex].color.g, PESThread[colorIndex].color.b };
 
-unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIndex) {          
-	auto color = PECCOLOR{ GetRValue(referenceColor),GetGValue(referenceColor),GetBValue(referenceColor) };
-	auto translatedColor = PECCOLOR{ PESThread[colorIndex].color.r, PESThread[colorIndex].color.g, PESThread[colorIndex].color.b };
-
-	const auto meanR = (gsl::narrow_cast<int>(color.r) + gsl::narrow_cast<int>(translatedColor.r)) / 2;
-	auto deltaR = gsl::narrow_cast<int>(color.r) - gsl::narrow_cast<int>(translatedColor.r);
-	auto deltaG = gsl::narrow_cast<int>(color.g) - gsl::narrow_cast<int>(translatedColor.g);
-	auto deltaB = gsl::narrow_cast<int>(color.b) - gsl::narrow_cast<int>(translatedColor.b);
+	const auto meanR  = (gsl::narrow_cast<int>(color.r) + gsl::narrow_cast<int>(translatedColor.r)) / 2;
+	auto       deltaR = gsl::narrow_cast<int>(color.r) - gsl::narrow_cast<int>(translatedColor.r);
+	auto       deltaG = gsl::narrow_cast<int>(color.g) - gsl::narrow_cast<int>(translatedColor.g);
+	auto       deltaB = gsl::narrow_cast<int>(color.b) - gsl::narrow_cast<int>(translatedColor.b);
 	// From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-	return gsl::narrow<unsigned>(std::round(std::sqrt((((512 + meanR)*deltaR*deltaR) >> 8) + 4 * deltaG*deltaG + (((767 - meanR)*deltaB*deltaB) >> 8))));
+	return gsl::narrow<unsigned>(std::round(
+	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8))));
 }
 
 void thred::internal::ritpes(unsigned char*                 buffer,
@@ -4343,7 +4345,7 @@ void thred::internal::sav() {
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
 			auto matchIndex = 0u;
 			for (auto iColor = 0u; iColor < 16; iColor++) {
-				auto matchMin = 0xffffffffu;
+				auto       matchMin    = 0xffffffffu;
 				const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1u; iColorMatch < threadCount; iColorMatch++) {
 					const auto match = pesmtch(UserColor[iColor], iColorMatch);
@@ -4367,7 +4369,7 @@ void thred::internal::sav() {
 			auto* pesStitchBuffer    = new unsigned char[PCSHeader.stitchCount * 8];
 			auto  bufferIndex        = 0u;
 			auto* blockHeader        = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
-			auto threadList = std::vector<decltype(blockHeader->threadIndex)>{};
+			auto  threadList         = std::vector<decltype(blockHeader->threadIndex)>{};
 			blockHeader->stitchtype  = 1; // first block is a jump
 			blockHeader->threadIndex = 0;
 			blockHeader->stitchcount = 2;
@@ -4378,7 +4380,7 @@ void thred::internal::sav() {
 			auto* contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
 			*contCode      = 0x8003;
 			bufferIndex += sizeof(*contCode);
-			auto pesThreadCount       = 0u;
+			auto pesThreadCount      = 0u;
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 0; // normal stitch
 			blockHeader->threadIndex = pesThreadCount;
@@ -4426,7 +4428,7 @@ void thred::internal::sav() {
 			WriteFile(PCSFileHandle, pesStitchBuffer, bufferIndex, &bytesWritten, nullptr);
 			delete[] pesStitchBuffer;
 			// ToDo - (PES) is there a better estimate for data size?
-			auto pchr            = new unsigned char[MAXITEMS * 4];
+			auto  pchr      = new unsigned char[MAXITEMS * 4];
 			auto* pecHeader = convert_ptr<PECHDR*>(pchr);
 			pecnam(pchr);
 			auto fstart = &pchr[sizeof(pecHeader->label)];
@@ -5405,9 +5407,9 @@ unsigned thred::internal::tripl(char* dat) {
 }
 
 unsigned thred::internal::dupcol(unsigned activeColor) {
-	const auto threadSize = sizeof(PESThread) / sizeof(PESThread[0]);
+	const auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
 	const auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
-	const auto color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+	const auto color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 	for (auto iColor = 0u; iColor < activeColor; iColor++) {
 		if (UserColor[iColor] == color)
 			return iColor;
@@ -5856,22 +5858,22 @@ void thred::internal::nuFil() {
 						PESstitch                = &fileBuffer[pecOffset];
 						const auto pesColorCount = pecHeader->colorCount + 1u;
 						PEScolors                = pecHeader->pad;
-						// allow all the colors described by a char
 						const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
-						auto colorMap    = boost::dynamic_bitset<>(threadCount);
-						auto activeColor = 0u;
+						auto       colorMap    = boost::dynamic_bitset<>(threadCount);
+						auto       activeColor = 0u;
 						for (auto iColor = 0u; iColor < pesColorCount; iColor++) {
 							if (PEScolors[iColor] < threadCount) {
 								if (!colorMap.test_set(PEScolors[iColor])) {
-									const auto threadColor = PESThread[PEScolors[iColor]];
-									const auto color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+									const auto threadColor   = PESThread[PEScolors[iColor]];
+									const auto color         = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 									UserColor[activeColor++] = color;
 									if (activeColor >= 16)
 										break;
 								}
 							}
 							else {
-								const auto color = RGB(PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // color unknown
+								const auto color
+								    = RGB(PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // color unknown
 								UserColor[activeColor++] = color;
 							}
 						}
@@ -5882,7 +5884,7 @@ void thred::internal::nuFil() {
 						auto iPESstitch         = 0u;
 						auto iActualPESstitches = 1u;
 						StitchBuffer[0].x       = StitchBuffer[0].y;
-						auto       locof        = 0.0f;
+						auto locof              = 0.0f;
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3)) {
 							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
 							while (iPESstitch < pecCount) {
@@ -5895,8 +5897,7 @@ void thred::internal::nuFil() {
 								else {
 									if (PESstitch[iPESstitch] & 0x80) {
 										auto pesVal = ((PESstitch[iPESstitch] & 0x0F) << 8) + PESstitch[iPESstitch + 1];
-										if (pesVal & 0x800)
-										{
+										if (pesVal & 0x800) {
 											pesVal -= 0x1000;
 										}
 										locof = gsl::narrow_cast<decltype(locof)>(pesVal);
@@ -5912,8 +5913,8 @@ void thred::internal::nuFil() {
 									// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 									if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 										loc.y -= locof;
-										StitchBuffer[iActualPESstitches].x = loc.x;
-										StitchBuffer[iActualPESstitches].y = loc.y;
+										StitchBuffer[iActualPESstitches].x         = loc.x;
+										StitchBuffer[iActualPESstitches].y         = loc.y;
 										StitchBuffer[iActualPESstitches].attribute = color;
 										iActualPESstitches++;
 									}

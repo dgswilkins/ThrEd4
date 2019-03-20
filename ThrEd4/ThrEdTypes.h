@@ -12,7 +12,7 @@
 
 #define TRCMTH 1 // 0=brightness compare,1=color compare
 
-#define SRTIM 20000000         // sort time limit in 100 ns intervals
+#define SRTIM 20000000 // sort time limit in 100 ns intervals
 
 // daisy codes
 #define DAZPETS 5  // petals
@@ -2600,7 +2600,7 @@ struct _peshed {
 	uint16_t cslen;   // 5f,60  CSewSeg length (7)
 	char     cs[7];   // 61-67  CSewSeg identification (CSewSeg)
 	                  // uint16_t styp1;   // 68,69  Stitch type (0)
-	// uint16_t scol;    // 6a,6b  Stitch Palette thread index
+	                  // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 };
 
 using PESHED = struct _peshed;
@@ -2853,8 +2853,7 @@ struct _lengthInfo {
 
 using LENINFO = struct _lengthInfo;
 
-struct _pecColor
-{
+struct _pecColor {
 	unsigned char r;
 	unsigned char g;
 	unsigned char b;
@@ -2862,9 +2861,8 @@ struct _pecColor
 
 using PECCOLOR = struct _pecColor;
 
-struct _thread
-{
-	PECCOLOR color;
+struct _thread {
+	PECCOLOR    color;
 	const char* description;
 	const char* catalogNumber;
 };
