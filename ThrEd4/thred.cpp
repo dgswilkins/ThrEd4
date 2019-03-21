@@ -4361,8 +4361,8 @@ void thred::internal::sav() {
 			sizstch(boundingRect, StitchBuffer);
 			PESstitchCenterOffset.x = form::midl(boundingRect.right, boundingRect.left);
 			PESstitchCenterOffset.y = form::midl(boundingRect.top, boundingRect.bottom);
-			pesHeader.xsiz          = boundingRect.right - boundingRect.left;
-			pesHeader.ysiz          = boundingRect.top - boundingRect.bottom;
+			pesHeader.xsiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.right - boundingRect.left) * (5.0f / 3.0f)));
+			pesHeader.ysiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f)));
 			OutputIndex             = 0;
 			// There cannot be more color changes than stitches
 			// ToDo - convert to vector
