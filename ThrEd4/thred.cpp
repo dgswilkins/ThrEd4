@@ -4364,14 +4364,13 @@ void thred::internal::sav() {
 			pesHeader.xsiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.right - boundingRect.left) * (5.0f / 3.0f)));
 			pesHeader.ysiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f)));
 			OutputIndex             = 0;
-			// There cannot be more color changes than stitches
-			// ToDo - convert to vector
+			// ToDo - convert to vector ?
 			auto* pesStitchBuffer    = new unsigned char[PCSHeader.stitchCount * 8];
-			auto  bufferIndex        = 0u;
+			auto  bufferIndex        = 0u; // Index into the unsigned char array
 			auto* blockHeader        = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
 			auto  threadList         = std::vector<decltype(blockHeader->threadIndex)>{};
-			blockHeader->stitchtype  = 1; // first block is a jump
-			blockHeader->threadIndex = 0;
+			blockHeader->stitchtype  = 1; // first block is a jump in place
+			blockHeader->threadIndex = PESequivColors[color];
 			blockHeader->stitchcount = 2;
 			threadList.push_back(PESequivColors[color]);
 			bufferIndex += sizeof(*blockHeader);
@@ -4380,6 +4379,27 @@ void thred::internal::sav() {
 			auto* contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
 			*contCode      = 0x8003;
 			bufferIndex += sizeof(*contCode);
+			blockHeader = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+			blockHeader->stitchtype = 0; // then a normal stitch in place
+			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->stitchcount = 2;
+			bufferIndex += sizeof(*blockHeader);
+			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
+			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
+			contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+			*contCode = 0x8003;
+			bufferIndex += sizeof(*contCode);
+			blockHeader = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+			blockHeader->stitchtype = 1; // then a jump to the first location
+			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->stitchcount = 2;
+			bufferIndex += sizeof(*blockHeader);
+			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
+			ritpes(pesStitchBuffer, bufferIndex, 1, saveStitches);
+			contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+			*contCode = 0x8003;
+			bufferIndex += sizeof(*contCode);
+			// now stitch out. 
 			auto pesThreadCount      = 0u;
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 0; // normal stitch
@@ -4396,11 +4416,22 @@ void thred::internal::sav() {
 					blockHeader->stitchcount = OutputIndex;
 					OutputIndex              = 0;
 					pesThreadCount++;
-					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-					blockHeader->stitchtype  = 1; // normal stitch
-					blockHeader->threadIndex = pesThreadCount;
-					bufferIndex += sizeof(*blockHeader);
 					color = StitchBuffer[iStitch].attribute & COLMSK;
+					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+					blockHeader->stitchtype = 1; // jump stitch
+					blockHeader->threadIndex = PESequivColors[color];
+					blockHeader->stitchcount = 2;
+					bufferIndex += sizeof(*blockHeader);
+					ritpes(pesStitchBuffer, bufferIndex, iStitch - 1, saveStitches);
+					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
+					contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+					*contCode = 0x8003;
+					bufferIndex += sizeof(*contCode);
+					OutputIndex = 0;
+					blockHeader = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
+					blockHeader->stitchtype = 0; // normal stitch
+					blockHeader->threadIndex = PESequivColors[color];
+					bufferIndex += sizeof(*blockHeader);
 					threadList.push_back(PESequivColors[color]);
 					ritpes(pesStitchBuffer, bufferIndex, iStitch++, saveStitches);
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
