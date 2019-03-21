@@ -4228,8 +4228,8 @@ void thred::internal::pecdat(unsigned char* buffer) {
 	auto color   = StitchBuffer[0].attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
 	for (auto iStitch = 0u; iStitch < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute & COLMSK) != color) {
-			color = StitchBuffer[iStitch].attribute & COLMSK;
+		if ((StitchBuffer[iStitch + 1].attribute & COLMSK) != color) {
+			color = StitchBuffer[iStitch + 1].attribute & COLMSK;
 			pecEncodeStop(PESdata, (iColor % 2) + 1);
 			PEScolors[iColor] = PESequivColors[color];
 			iColor++;
