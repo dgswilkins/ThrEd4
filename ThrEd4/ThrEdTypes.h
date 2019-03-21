@@ -2645,7 +2645,8 @@ struct _pecheader2 {
 	int16_t  height;          // height
 	uint16_t unknown4;        // typical 0x01e0
 	uint16_t unknown5;        // typical 0x01b0
-	uint8_t  unknown6[4];     // --
+	uint16_t xMin;            // starting X val (Bigendian)
+	uint16_t yMin;            // starting Y val (Bigendian)
 };
 
 using PECHDR2 = struct _pecheader2;

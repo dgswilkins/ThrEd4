@@ -4446,10 +4446,13 @@ void thred::internal::sav() {
 			pecHeader2->height          = pesHeader.ysiz;
 			pecHeader2->unknown4        = 0x01e0;
 			pecHeader2->unknown5        = 0x01b0;
-			pecHeader2->unknown6[0]     = 0x80; // hor msb
-			pecHeader2->unknown6[1]     = 0x80; // hor lsb
-			pecHeader2->unknown6[2]     = 0x82; // vert msb
-			pecHeader2->unknown6[3]     = 0xff; // vert lsb
+
+			auto xInt16_le = gsl::narrow_cast<uint16_t>(std::round(boundingRect.left * (5.0f / 3.0f)));
+			auto yInt16_le = gsl::narrow_cast<uint16_t>(std::round(boundingRect.bottom * (5.0f / 3.0f)));
+			xInt16_le |= gsl::narrow_cast<uint16_t>(0x9000);
+			yInt16_le |= gsl::narrow<uint16_t>(0x9000u);
+			pecHeader2->xMin = ((xInt16_le & 0xff00) >> 8) | ((xInt16_le & 0x00ff) << 8);
+			pecHeader2->yMin = ((yInt16_le & 0xff00) >> 8) | ((yInt16_le & 0x00ff) << 8);
 			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
 			delete[] pchr;
 			break;
@@ -5883,7 +5886,8 @@ void thred::internal::nuFil() {
 						StateMap.reset(StateFlag::FILDIR);
 						auto iPESstitch         = 0u;
 						auto iActualPESstitches = 1u;
-						StitchBuffer[0].x       = StitchBuffer[0].y;
+						StitchBuffer[0].x       = 0;
+						StitchBuffer[0].y       = 0;
 						auto locof              = 0.0f;
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3)) {
 							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
