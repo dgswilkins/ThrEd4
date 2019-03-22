@@ -2862,6 +2862,13 @@ struct _pecColor {
 
 using PECCOLOR = struct _pecColor;
 
+struct _colorchange {
+	uint16_t blockIndex;
+	uint16_t colorIndex;
+};
+
+using PESCOLORLIST = struct _colorchange;
+
 struct _thread {
 	PECCOLOR    color;
 	const char* description;

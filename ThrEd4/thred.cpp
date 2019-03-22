@@ -4368,12 +4368,14 @@ void thred::internal::sav() {
 			auto* pesStitchBuffer    = new unsigned char[PCSHeader.stitchCount * 8];
 			auto  bufferIndex        = 0u; // Index into the unsigned char array
 			auto* blockHeader        = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
-			auto  threadList         = std::vector<decltype(blockHeader->threadIndex)>{};
+			auto  threadList         = std::vector<PESCOLORLIST>{};
+			auto blockIndex = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
+			threadList.push_back(PESCOLORLIST{ blockIndex,PESequivColors[color] });
 			blockHeader->stitchtype  = 1; // first block is a jump in place
 			blockHeader->threadIndex = PESequivColors[color];
 			blockHeader->stitchcount = 2;
-			threadList.push_back(PESequivColors[color]);
 			bufferIndex += sizeof(*blockHeader);
+			blockIndex++;
 			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
 			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
 			auto* contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
@@ -4384,6 +4386,7 @@ void thred::internal::sav() {
 			blockHeader->threadIndex = PESequivColors[color];
 			blockHeader->stitchcount = 2;
 			bufferIndex += sizeof(*blockHeader);
+			blockIndex++;
 			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
 			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
 			contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
@@ -4394,6 +4397,7 @@ void thred::internal::sav() {
 			blockHeader->threadIndex = PESequivColors[color];
 			blockHeader->stitchcount = 2;
 			bufferIndex += sizeof(*blockHeader);
+			blockIndex++;
 			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
 			ritpes(pesStitchBuffer, bufferIndex, 1, saveStitches);
 			contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
@@ -4403,8 +4407,9 @@ void thred::internal::sav() {
 			auto pesThreadCount      = 0u;
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 0; // normal stitch
-			blockHeader->threadIndex = pesThreadCount;
+			blockHeader->threadIndex = PESequivColors[color];
 			bufferIndex += sizeof(*blockHeader);
+			blockIndex++;
 			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (color == (StitchBuffer[iStitch].attribute & COLMSK))
@@ -4417,11 +4422,13 @@ void thred::internal::sav() {
 					OutputIndex              = 0;
 					pesThreadCount++;
 					color = StitchBuffer[iStitch].attribute & COLMSK;
+					threadList.push_back(PESCOLORLIST{ blockIndex, PESequivColors[color] });
 					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 					blockHeader->stitchtype = 1; // jump stitch
 					blockHeader->threadIndex = PESequivColors[color];
 					blockHeader->stitchcount = 2;
 					bufferIndex += sizeof(*blockHeader);
+					blockIndex++;
 					ritpes(pesStitchBuffer, bufferIndex, iStitch - 1, saveStitches);
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
 					contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
@@ -4432,8 +4439,7 @@ void thred::internal::sav() {
 					blockHeader->stitchtype = 0; // normal stitch
 					blockHeader->threadIndex = PESequivColors[color];
 					bufferIndex += sizeof(*blockHeader);
-					threadList.push_back(PESequivColors[color]);
-					ritpes(pesStitchBuffer, bufferIndex, iStitch++, saveStitches);
+					blockIndex++;
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
 				}
 			}
@@ -4443,9 +4449,9 @@ void thred::internal::sav() {
 			bufferIndex += sizeof(*colorIndex);
 			for (auto paletteIndex = 0u; paletteIndex < pesThreadCount; paletteIndex++) {
 				auto* colorEntry = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-				*colorEntry      = paletteIndex;
+				*colorEntry = threadList[paletteIndex].blockIndex;
 				colorEntry++;
-				*colorEntry = threadList[paletteIndex];
+				*colorEntry = threadList[paletteIndex].colorIndex;
 				bufferIndex += 2 * sizeof(*colorEntry);
 			}
 			pesHeader.off     = bufferIndex + sizeof(pesHeader);
