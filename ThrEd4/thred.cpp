@@ -924,6 +924,47 @@ THREAD PESThread[] = {
 	{ { 0xff, 0xc8, 0xc8 }, "Applique", "" }                // Index 64
 };
 
+const char imageWithFrame[ThumbHeight][ThumbWidth] = {
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+{0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0},
+{0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0},
+{0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0},
+{0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,0,0,0},
+{0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0},
+{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+};
+
 #endif
 
 unsigned FillTypes[] = // fill type array for side window display
@@ -4242,6 +4283,26 @@ void thred::internal::pecdat(unsigned char* buffer) {
 	PESdata[OutputIndex++] = 0;
 }
 
+void thred::internal::writeThumbnail(unsigned char* pchr, unsigned char const (*image)[ThumbHeight][ThumbWidth]) noexcept {
+	if (pchr != nullptr && image != nullptr) {
+		for (auto i = 0u; i < ThumbHeight; i++) {
+			for (auto j = 0u; j < 6; j++) {
+				const auto offset = j * 8;
+				unsigned char output = 0u;
+				output |= ((*image)[i][offset] != 0);
+				output |= ((*image)[i][offset + 1] != 0u) << 1;
+				output |= ((*image)[i][offset + 2] != 0u) << 2;
+				output |= ((*image)[i][offset + 3] != 0u) << 3;
+				output |= ((*image)[i][offset + 4] != 0u) << 4;
+				output |= ((*image)[i][offset + 5] != 0u) << 5;
+				output |= ((*image)[i][offset + 6] != 0u) << 6;
+				output |= ((*image)[i][offset + 7] != 0u) << 7;
+				pchr[OutputIndex++] = output;
+			}
+		}
+	}
+}
+
 #endif
 
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
@@ -4457,7 +4518,7 @@ void thred::internal::sav() {
 			pesHeader.off     = bufferIndex + sizeof(pesHeader);
 			pesHeader.blct    = 1;
 			pesHeader.bcnt    = pesThreadCount;
-			pesHeader.hpsz    = 1;
+			pesHeader.hpsz    = 0;
 			GroupStartStitch  = 0;
 			GroupEndStitch    = PCSHeader.stitchCount - 1;
 			auto bytesWritten = DWORD{ 0 };
@@ -4473,6 +4534,8 @@ void thred::internal::sav() {
 			std::fill(fstart, fend, ' ');
 			pecHeader->labnd      = 13; // 13 = carriage return
 			pecHeader->colorCount = gsl::narrow<unsigned char>(pesThreadCount);
+			pecHeader->thumbHeight = ThumbHeight;
+			pecHeader->thumbWidth = ThumbWidth / 8;
 			pecdat(pchr);
 			auto* pecHeader2            = convert_ptr<PECHDR2*>(&pchr[sizeof(PECHDR)]);
 			pecHeader2->unknown1        = 0;
@@ -4490,6 +4553,39 @@ void thred::internal::sav() {
 			yInt16_le |= gsl::narrow<uint16_t>(0x9000u);
 			pecHeader2->xMin = ((xInt16_le & 0xff00) >> 8) | ((xInt16_le & 0x00ff) << 8);
 			pecHeader2->yMin = ((yInt16_le & 0xff00) >> 8) | ((yInt16_le & 0x00ff) << 8);
+
+			unsigned char thumbnail[ThumbHeight][ThumbWidth] = {};
+			unsigned char const (*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
+			
+			const auto yFactor = 31.0f / IniFile.hoopSizeY;
+			const auto xFactor = 40.0f / IniFile.hoopSizeX;
+
+			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+				auto x = gsl::narrow_cast<uint16_t>(std::floor((StitchBuffer[iStitch].x) * xFactor)) + 4;
+				auto y = gsl::narrow_cast<uint16_t>(std::floor((StitchBuffer[iStitch].y) * yFactor)) + 5;
+				y = ThumbHeight - y;
+				thumbnail[y][x] = 1u;
+			}
+			thi::writeThumbnail(pchr, p_thumbnail);
+
+			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+			color = (StitchBuffer[0].attribute & COLMSK);
+			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
+				auto x = gsl::narrow_cast<uint16_t>(std::round((StitchBuffer[iStitch].x) * xFactor)) + 3;
+				auto y = gsl::narrow_cast<uint16_t>(std::round((StitchBuffer[iStitch].y) * yFactor)) + 3;
+				y = ThumbHeight - y;
+				if (color == (StitchBuffer[iStitch].attribute & COLMSK)) {
+					thumbnail[y][x] = 1;
+				}
+				else {
+					thi::writeThumbnail(pchr, p_thumbnail);
+					std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+					color = (StitchBuffer[iStitch].attribute & COLMSK);
+					thumbnail[y][x] = 1;
+				}
+			}
+			thi::writeThumbnail(pchr, p_thumbnail);
 			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
 			delete[] pchr;
 			break;
@@ -5894,6 +5990,7 @@ void thred::internal::nuFil() {
 							return;
 						}
 						auto pecHeader           = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
+						//auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
 						auto pecOffset           = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
 						PESstitch                = &fileBuffer[pecOffset];
 						const auto pesColorCount = pecHeader->colorCount + 1u;

@@ -2636,6 +2636,9 @@ struct _pecheader {
 
 using PECHDR = struct _pecheader;
 
+static const uint8_t ThumbHeight = 38u;
+static const uint8_t ThumbWidth = 48u;
+
 struct _pecheader2 {
 	uint16_t unknown1;        // typical 0x0000
 	uint16_t thumbnailOffset; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
