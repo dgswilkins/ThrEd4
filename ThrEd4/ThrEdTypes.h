@@ -2569,7 +2569,7 @@ using PESLED = struct _pesled;
 struct _peshed {
 	char     led[8];  //   0-7  Identification and version (#PES0001)
 	uint32_t off;     //   8-b  Absolute PEC section byte offset
-	uint16_t hpsz;    //   c,d  Hoopsize (0)0 = 100x100mm, 1 = 130x180mm
+	uint16_t hpsz;    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
 	uint16_t usdn;    //   e,f  Use existing design area (1)
 	uint16_t blct;    // 10,11  CSewSeg segment block count (1)
 	char     hnd1[4]; // 12-15  header end (FF FF 00 00)
