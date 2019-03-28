@@ -10722,7 +10722,7 @@ void thred::internal::defpref() {
 	IniFile.formBoxSizePixels    = DEFBPIX;
 	IniFile.textureHeight        = ITXHI;
 	IniFile.textureWidth         = ITXWID;
-	IniFile.textureSpacing       = gsl::narrow_cast<float>(ITXSPAC);
+	IniFile.textureSpacing       = ITXSPAC;
 }
 
 void thred::internal::dumrk(double xCoord, double yCoord) {

@@ -262,7 +262,7 @@ void texture::dutxtfil() {
 		IniFile.textureWidth = ITXWID;
 	}
 	if (IniFile.textureSpacing == 0.0f) {
-		IniFile.textureSpacing = gsl::narrow_cast<float>(ITXSPAC);
+		IniFile.textureSpacing = ITXSPAC;
 	}
 	if (IniFile.textureEditorSize == 0u) {
 		IniFile.textureEditorSize = ITXPIX;
