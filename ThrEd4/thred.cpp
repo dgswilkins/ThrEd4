@@ -8634,8 +8634,6 @@ void thred::internal::movi() {
 	}
 }
 
-#define CLPBUG 0
-
 void thred::redclp() {
 	const auto codedLayer = ActiveLayer << LAYSHFT;
 

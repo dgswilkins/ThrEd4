@@ -3316,8 +3316,6 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 	}
 
-#define CLPVU 0
-
 #if CLPVU == 0
 	StateMap.reset(StateFlag::FILDIR);
 	auto previousPoint = 0u;
@@ -4284,8 +4282,6 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		}
 	}
 }
-
-#define BUGSEQ 0
 
 void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints) {
 #if BUGSEQ
