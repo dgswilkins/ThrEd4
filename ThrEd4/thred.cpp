@@ -9121,6 +9121,7 @@ void thred::internal::insfil() {
 }
 
 void thred::internal::getbak() {
+	//auto thumbSpan = gsl::span<unsigned int, 4>{ ThumbnailsSelected };
 	if (StateMap.test(StateFlag::THUMSHO)) {
 		if (ThumbnailsSelected[FileVersionIndex] != 0u) {
 			if (StateMap.test(StateFlag::RBUT)) {
