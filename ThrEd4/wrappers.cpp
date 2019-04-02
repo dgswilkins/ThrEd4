@@ -10,6 +10,7 @@
 
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
+#include <iostream>
 
 // Open Source headers
 #include "warnings.h"
@@ -51,15 +52,41 @@ void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPS
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
 
+float dToF(double invar) {
+	auto result = 0.0f;
+	try {
+		result = gsl::narrow<float>(invar);
+	}
+	catch (const gsl::narrowing_error& e) { //check if we are seeing a rounding error
+		auto var = gsl::narrow_cast<float>(invar);
+		auto diff = abs(invar - var);
+		if (diff < 4e-5) {
+			result = var;
+		}
+		else {
+			throw;
+		}
+	}
+	catch (...) { // otherwise throw
+		throw;
+	}
+	return result;
+}
+
 long dToL(double invar) noexcept {
 	return gsl::narrow<long>(std::round(invar));
 }
-unsigned int dToUI(double invar) noexcept {
+
+uint32_t dToUI(double invar) noexcept {
 	return gsl::narrow<unsigned int>(std::round(invar));
 }
 
 long fToL(float invar) noexcept {
 	return gsl::narrow<long>(std::round(invar));
+}
+
+float lToF(long invar){
+	return gsl::narrow<float>(invar);
 }
 
 void setCursorInt(HCURSOR hCursor) noexcept {
