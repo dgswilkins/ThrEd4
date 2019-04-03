@@ -122,7 +122,7 @@ void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& poin
 void xt::internal::durats(unsigned int iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
 	if (sequence != nullptr) {
 		auto&      bCurrent = (*BSequence)[iSequence];
-		auto&      bNext = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+		auto&      bNext = (*BSequence)[uiToSz(iSequence) + 1u];
 		const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
 		if (stitchLength < feather.minStitch) {
@@ -256,7 +256,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 	auto       nextPoint    = fPOINT{};
 	auto       midPoint     = fPOINT{};
 	auto&      bCurrent     = (*BSequence)[iSequence];
-	auto&      bNext        = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+	auto&      bNext        = (*BSequence)[uiToSz(iSequence) + 1u];
 	const auto length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
@@ -291,7 +291,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 
 void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	auto&      bCurrent = (*BSequence)[iSequence];
-	auto&      bNext    = (*BSequence)[gsl::narrow_cast<size_t>(iSequence) + 1u];
+	auto&      bNext    = (*BSequence)[uiToSz(iSequence) + 1u];
 	const auto length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
@@ -305,10 +305,10 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
 		xratf(adjustedPoint, (*OSequence)[iSequence], currentPoint, feather.ratioLocal);
-		xratf(adjustedPoint, (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], nextPoint, feather.ratioLocal);
+		xratf(adjustedPoint, (*OSequence)[uiToSz(iSequence) + 1], nextPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.ratio;
 		xratf(currentPoint, (*OSequence)[iSequence], (*OSequence)[iSequence], feather.ratioLocal);
-		xratf(nextPoint, (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1], feather.ratioLocal);
+		xratf(nextPoint, (*OSequence)[uiToSz(iSequence) + 1], (*OSequence)[uiToSz(iSequence) + 1], feather.ratioLocal);
 	}
 }
 
@@ -625,8 +625,8 @@ void xt::internal::chkuseq() {
 		}
 		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
 		for (auto iSequence = 0u; iSequence < OutputIndex - 1; iSequence++) {
-			const auto delta       = fPOINT{ (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1].x - (*OSequence)[iSequence].x,
-                                       (*OSequence)[gsl::narrow_cast<size_t>(iSequence) + 1].y - (*OSequence)[iSequence].y };
+			const auto delta       = fPOINT{ (*OSequence)[uiToSz(iSequence) + 1].x - (*OSequence)[iSequence].x,
+                                       (*OSequence)[uiToSz(iSequence) + 1].y - (*OSequence)[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
 			const auto stitchCount = dToUI(length / underlayStitchLength);
 			if (stitchCount != 0u) {
@@ -791,7 +791,7 @@ void xt::internal::fncwlk() {
 		if (SelectedForm->wordParam != 0u) {
 			const auto iVertex    = SelectedForm->wordParam;
 			auto&      thisVertex = vertexIt[iVertex];
-			auto&      nextVertex = vertexIt[gsl::narrow_cast<size_t>(iVertex) + 1u];
+			auto&      nextVertex = vertexIt[uiToSz(iVertex) + 1u];
 			OSequence->push_back(fPOINT{ form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
 			OutputIndex++;
 		}
@@ -1481,7 +1481,7 @@ bool xt::internal::lastcol(unsigned index, fPOINT& point) {
 	while (index != 0u) {
 		index--;
 		if ((*InterleaveSequenceIndices)[index].color == color) {
-			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(index) + 1].index - 1];
+			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[uiToSz(index) + 1].index - 1];
 			return true;
 		}
 	}
@@ -1515,7 +1515,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 		    point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output + MAXITEMS, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
-	     iSequence < (*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(ilData.pins) + 1].index;
+	     iSequence < (*InterleaveSequenceIndices)[uiToSz(ilData.pins) + 1].index;
 	     iSequence++) {
 		ilData.highStitchBuffer[ilData.output].x         = (*InterleaveSequence)[iSequence].x;
 		ilData.highStitchBuffer[ilData.output].y         = (*InterleaveSequence)[iSequence].y;
@@ -1647,7 +1647,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
 				    colpnt, (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index], ilData.output, code);
 			}
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
-			     ine < (*InterleaveSequenceIndices)[gsl::narrow_cast<size_t>(iSequence) + 1].index;
+			     ine < (*InterleaveSequenceIndices)[uiToSz(iSequence) + 1].index;
 			     ine++) {
 				StitchBuffer[ilData.output] = { (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code };
 				if (ilData.output > 0) {

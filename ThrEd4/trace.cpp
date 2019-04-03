@@ -319,7 +319,7 @@ void trace::trdif() {
 	trace::untrace();
 	if ((BitmapHeight * BitmapWidth) != 0u) {
 		auto differenceBitmap = std::vector<unsigned>{};
-		differenceBitmap.resize(gsl::narrow_cast<size_t>(BitmapHeight) * BitmapWidth);
+		differenceBitmap.resize(uiToSz(BitmapHeight) * BitmapWidth);
 
 		auto colorSumMaximum = 0u;
 		auto colorSumMinimum = 0xffffffffu;
@@ -469,14 +469,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - 1u);
+					TracedEdges->set(uiToSz(pixelIndex) - 1u);
 					flag = false;
 				}
 			}
 			pixelIndex++;
 		}
 		if (flag) {
-			TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - 1u);
+			TracedEdges->set(uiToSz(pixelIndex) - 1u);
 		}
 	}
 	for (auto iWidth = 0u; iWidth < BitmapWidth; iWidth++) {
@@ -491,14 +491,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - BitmapWidth);
+					TracedEdges->set(uiToSz(pixelIndex) - BitmapWidth);
 					flag = false;
 				}
 			}
 			pixelIndex += BitmapWidth;
 		}
 		if (flag) {
-			TracedEdges->set(gsl::narrow_cast<size_t>(pixelIndex) - BitmapWidth);
+			TracedEdges->set(uiToSz(pixelIndex) - BitmapWidth);
 		}
 	}
 	for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {

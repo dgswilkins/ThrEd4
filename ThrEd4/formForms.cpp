@@ -217,7 +217,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 	}
 	labelWindow[LFRMFIL] = ffi::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
 	valueWindow[LFRMFIL]
-	    = ffi::txtrwin(stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
+	    = ffi::txtrwin(stringTable[uiToSz(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->fillType != 0u) {
 		labelWindow[LFRMCOL] = ffi::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
@@ -229,7 +229,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
 			valueWindow[LFTHTYP]
-			    = ffi::numwin(stringTable[gsl::narrow_cast<size_t>(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0],
+			    = ffi::numwin(stringTable[uiToSz(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0],
 			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
@@ -373,7 +373,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 	}
 	const auto iEdge = edgeFillType - 1u;
 
-	valueWindow[LBRD] = ffi::txtrwin(stringTable[gsl::narrow_cast<size_t>(edgeFillType) + STR_EDG0], ValueWindowCoords);
+	valueWindow[LBRD] = ffi::txtrwin(stringTable[uiToSz(edgeFillType) + STR_EDG0], ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (edgeFillType != 0u) {
 		labelWindow[LBRDCOL] = ffi::txtwin(stringTable[STR_TXT8], LabelWindowCoords);
@@ -645,7 +645,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	form::sethup();
-	ffi::prflin(fmt::format(L"{}", (*StringTable)[gsl::narrow_cast<size_t>(IniFile.hoopType) - 1u + STR_HUP0]), STR_PRF17);
+	ffi::prflin(fmt::format(L"{}", (*StringTable)[uiToSz(IniFile.hoopType) - 1u + STR_HUP0]), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
@@ -1053,11 +1053,11 @@ void formForms::setear() {
 		form::durpoli(IniFile.formSides);
 		form::fvars(gsl::narrow<unsigned int>(FormList->size() - 1u));
 		auto       vertexIt         = std::next(FormVertices->begin(), CurrentVertexIndex);
-		const auto count            = gsl::narrow_cast<size_t>(VertexCount) / 4u;
+		const auto count            = uiToSz(VertexCount) / 4u;
 		const auto middle           = (vertexIt[1].x - vertexIt[0].x) / 2.0f + vertexIt[0].x;
 		auto       step             = vertexIt[count + 1].y - vertexIt[count].y;
 		auto       verticalPosition = vertexIt[count + 1].y;
-		auto       iLeftVertices    = gsl::narrow_cast<size_t>(VertexCount) - count;
+		auto       iLeftVertices    = uiToSz(VertexCount) - count;
 		auto       iRightVertices   = count + 1u;
 		for (auto iStep = 0u; iStep < count; iStep++) {
 			vertexIt[iLeftVertices].y  = verticalPosition;

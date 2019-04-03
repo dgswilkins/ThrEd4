@@ -261,7 +261,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 	const auto cosAngle = cos(clipAngle);
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	moveToCoords  = vertexIt[gsl::narrow_cast<size_t>(currentSide) + 2u];
+	moveToCoords  = vertexIt[uiToSz(currentSide) + 2u];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
@@ -320,7 +320,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             const dPOINT&              rotationCenter,
                             unsigned int               currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	const auto& point     = vertexIt[gsl::narrow_cast<size_t>(currentSide) + 1u];
+	const auto& point     = vertexIt[uiToSz(currentSide) + 1u];
 	const auto  delta     = fPOINT{ (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto  length    = hypot(delta.x, delta.y);
 	const auto  clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
@@ -619,7 +619,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
 	auto listSINEs = std::vector<double>{};
-	listSINEs.reserve(gsl::narrow_cast<size_t>(VertexCount) + 1u);
+	listSINEs.reserve(uiToSz(VertexCount) + 1u);
 	auto listCOSINEs = std::vector<double>{};
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -856,8 +856,8 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow_cast<size_t>(finish) + 1u].x) - chainEndPoints[finish].x;
-		delta.y = gsl::narrow_cast<double>(chainEndPoints[gsl::narrow_cast<size_t>(finish) + 1u].y) - chainEndPoints[finish].y;
+		delta.x = gsl::narrow_cast<double>(chainEndPoints[uiToSz(finish) + 1u].x) - chainEndPoints[finish].x;
+		delta.y = gsl::narrow_cast<double>(chainEndPoints[uiToSz(finish) + 1u].y) - chainEndPoints[finish].y;
 	}
 	else {
 		delta.x = gsl::narrow_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;

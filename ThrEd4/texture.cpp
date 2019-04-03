@@ -782,7 +782,7 @@ void texture::internal::ritxfrm(FRMHED& textureForm) {
 	offset.x        = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
 	offset.y        = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
 	auto& formLines = *FormLines;
-	formLines.resize(gsl::narrow_cast<size_t>(textureForm.vertexCount) + 1u);
+	formLines.resize(uiToSz(textureForm.vertexCount) + 1u);
 	auto&      angledFormVertices = *AngledFormVertices;
 	const auto maxVertex          = gsl::narrow<unsigned int>(angledFormVertices.size());
 	for (auto iVertex = 0u; iVertex < maxVertex; iVertex++) {
@@ -1106,7 +1106,7 @@ void texture::internal::nutx() {
 
 // Ensure all lines in the texture have at least 1 point
 void texture::internal::altx() {
-	auto txtLines = boost::dynamic_bitset<>(gsl::narrow_cast<size_t>(TextureScreen.lines) + 1u);
+	auto txtLines = boost::dynamic_bitset<>(uiToSz(TextureScreen.lines) + 1u);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto halfHeight = TextureScreen.areaHeight / 2.0f;
 		for (auto& texturePoint : *TempTexturePoints) {
@@ -1611,7 +1611,7 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
 	if (currentCount != 0u) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
-			const auto currentPoint = TexturePointsBuffer->at(gsl::narrow_cast<size_t>(currentIndex) + iTexturePoint);
+			const auto currentPoint = TexturePointsBuffer->at(uiToSz(currentIndex) + iTexturePoint);
 			if (currentPoint.line != 0u) {
 				const auto iSegment = currentPoint.line - 1;
 

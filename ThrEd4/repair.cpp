@@ -233,7 +233,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = formList[iForm];
-		if (FormVertices->size() >= gsl::narrow_cast<size_t>(form.vertexIndex) + form.vertexCount) {
+		if (FormVertices->size() >= uiToSz(form.vertexIndex) + form.vertexCount) {
 			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
 			auto       sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
 			auto       sourceEnd   = std::next(sourceStart, form.vertexCount);
@@ -284,7 +284,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		if (clip::isclp(iForm)) {
 			// ToDo - pointer arithmetic to be fixed
 			clipDifference = form.angleOrClipData.clip;
-			if (gsl::narrow_cast<size_t>(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
+			if (uiToSz(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 				auto sourceStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 				auto sourceEnd   = std::next(sourceStart, form.lengthOrCount.clipCount);
@@ -314,7 +314,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 		if (clip::iseclp(iForm)) {
 			clipDifference = form.borderClipData;
-			if (gsl::narrow_cast<size_t>(clipDifference) + form.clipEntries < ClipPoints->size()) {
+			if (uiToSz(clipDifference) + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
 				auto sourceStart = std::next(ClipPoints->cbegin(), form.borderClipData);
 				auto sourceEnd   = std::next(sourceStart, form.clipEntries);
@@ -357,7 +357,7 @@ void repair::internal::repsat() {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			const auto guideDifference = form.satinOrAngle.guide;
-			if (FormVertices->size() > gsl::narrow_cast<size_t>(guideDifference) + form.vertexCount) {
+			if (FormVertices->size() > uiToSz(guideDifference) + form.vertexCount) {
 				auto       sourceStart = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 				auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
 				const auto destination = std::next(SatinGuides->begin(), guideCount);
