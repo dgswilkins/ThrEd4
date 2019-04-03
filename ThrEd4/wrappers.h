@@ -18,11 +18,15 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
-long     dToL(double invar) noexcept;
-uint32_t dToUI(double invar) noexcept;
 float    dToF(double invar);
-long     fToL(float invar) noexcept;
-float    lToF(long invar);
+long     dToL(double invar);
+uint32_t dToUI(double invar);
+double   fToD(float invar);
+long     fToL(float invar);
+double   lToD(long invar) noexcept;
+float    lToF(long invar) noexcept;
+uint32_t szToUI(size_t invar);
+size_t   uiToSz(uint32_t invar) noexcept;
 
 void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) noexcept;
 void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept;

@@ -57,9 +57,9 @@ float dToF(double invar) {
 	try {
 		result = gsl::narrow<float>(invar);
 	}
-	catch (const gsl::narrowing_error& e) { //check if we are seeing a rounding error
-		auto var = gsl::narrow_cast<float>(invar);
-		auto diff = abs(invar - var);
+	catch (const gsl::narrowing_error& e) { // check if we are seeing a rounding error
+		const auto var  = gsl::narrow_cast<float>(invar);
+		const auto diff = abs(invar - var);
 		if (diff < 4e-5) {
 			result = var;
 		}
@@ -73,20 +73,36 @@ float dToF(double invar) {
 	return result;
 }
 
-long dToL(double invar) noexcept {
+long dToL(double invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
 
-uint32_t dToUI(double invar) noexcept {
-	return gsl::narrow<unsigned int>(std::round(invar));
+uint32_t dToUI(double invar) {
+	return gsl::narrow<uint32_t>(std::round(invar));
 }
 
-long fToL(float invar) noexcept {
+double fToD(float invar) {
+	return gsl::narrow_cast<double>(invar);
+}
+
+long fToL(float invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
 
-float lToF(long invar){
-	return gsl::narrow<float>(invar);
+float lToF(long invar) noexcept {
+	return gsl::narrow_cast<float>(invar);
+}
+
+double lToD(long invar) noexcept {
+	return gsl::narrow_cast<double>(invar);
+}
+
+uint32_t szToUI(size_t invar) {
+	return gsl::narrow<uint32_t>(invar);
+}
+
+size_t uiToSz(uint32_t invar) noexcept {
+	return gsl::narrow_cast<size_t>(invar);
 }
 
 void setCursorInt(HCURSOR hCursor) noexcept {
