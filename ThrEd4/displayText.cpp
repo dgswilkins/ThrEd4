@@ -86,7 +86,7 @@ void displayText::shoMsg(const std::wstring& message) {
 		auto textSize    = SIZE{};
 		auto messageSize = SIZE{};
 		for (auto& string : strings) {
-			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), gsl::narrow<unsigned int>(string.size()), &textSize);
+			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), szToUI(string.size()), &textSize);
 			if (textSize.cx > messageSize.cx) {
 				messageSize.cx = textSize.cx;
 			}
@@ -447,7 +447,7 @@ void displayText::tomsg() {
 	GetWindowRect(OKButton, &OKrect);
 	GetTextExtentPoint32Int(GetDC(ThrEdWindow),
 	                        (*StringTable)[STR_DELST2].c_str(),
-	                        gsl::narrow<unsigned int>((*StringTable)[STR_DELST2].size()),
+	                        szToUI((*StringTable)[STR_DELST2].size()),
 	                        &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),

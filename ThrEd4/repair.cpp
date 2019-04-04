@@ -260,7 +260,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				SatinGuides->resize(badData.guideCount);
 				TextureIndex = badData.tx;
 				ri::chkfstch();
-				ri::adbad(repairMessage, IDS_FRMDAT, gsl::narrow<unsigned int>(FormList->size()));
+				ri::adbad(repairMessage, IDS_FRMDAT, szToUI(FormList->size()));
 				flag = false;
 				break;
 			}
@@ -296,7 +296,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPoints->size()) {
-					form.lengthOrCount.clipCount = gsl::narrow<unsigned int>(FormVertices->size() - clipDifference);
+					form.lengthOrCount.clipCount = szToUI(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 					auto sourceStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 					auto sourceEnd   = std::next(sourceStart, form.lengthOrCount.clipCount);

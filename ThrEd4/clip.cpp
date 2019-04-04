@@ -169,7 +169,7 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 }
 
 unsigned int clip::numclp() {
-	auto       clipSize = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto clipSize = szToUI(ClipBuffer->size());
 	const auto find     = ci::findclp(ClosestFormToCursor);
 	const auto it       = std::next(ClipPoints->cbegin(), find);
 	const auto val      = fPOINT{};
@@ -281,7 +281,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const auto adjustedPoint = fPOINT{ (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(gsl::narrow<unsigned int>(clipFillData.size()), gsl::narrow<unsigned int>(OSequence->size()))) {
+	if (form::chkmax(szToUI(clipFillData.size()), szToUI(OSequence->size()))) {
 		return true;
 	}
 	for (auto& data : clipFillData) {
@@ -865,7 +865,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	}
 	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0;
 	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0;
-	auto chainCount = gsl::narrow<unsigned int>(chainSequence.size());
+	auto chainCount = szToUI(chainSequence.size());
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
 	}
@@ -877,7 +877,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 
 void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	OSequence->clear();
-	auto chainLength = gsl::narrow<unsigned int>(chainEndPoints.size());
+	auto chainLength = szToUI(chainEndPoints.size());
 	if (chainLength > 2u) {
 		chainLength--;
 		for (auto iPoint = 0u; iPoint < chainLength - 1; iPoint++) {

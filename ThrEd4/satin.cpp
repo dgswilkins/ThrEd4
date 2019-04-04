@@ -353,7 +353,7 @@ void satin::satadj() {
 			interiorGuides.push_back(guideIt[iSource]);
 		}
 	}
-	auto iDestination = gsl::narrow<unsigned int>(interiorGuides.size());
+	auto iDestination = szToUI(interiorGuides.size());
 	if (CurrentFormGuidesCount > iDestination) {
 		OutputDebugString(fmt::format(L"Removed {} zero distance guides\n", (CurrentFormGuidesCount - iDestination)).c_str());
 		si::satcpy(interiorGuides, iDestination);
@@ -445,7 +445,7 @@ void satin::satadj() {
 		auto iGuide  = 0u;
 		auto iVertex = 0u;
 		do {
-			iVertex = gsl::narrow<unsigned int>(satinMap.getFirst());
+			iVertex = szToUI(satinMap.getFirst());
 			if (iVertex < VertexCount) {
 				guideIt[iGuide++].start = iVertex;
 			}
@@ -497,7 +497,7 @@ void satin::satadj() {
 		iGuide        = 0u;
 		auto iReverse = 0u;
 		do {
-			iReverse = gsl::narrow<unsigned int>(satinMap.getLast());
+			iReverse = szToUI(satinMap.getLast());
 			if (iReverse < VertexCount) {
 				guideIt[iGuide++].finish = iReverse;
 			}
@@ -1164,7 +1164,7 @@ void satin::satfil() {
 }
 
 void satin::satfix() {
-	const auto vertexCount = gsl::narrow<unsigned int>(TempPolygon->size());
+	const auto vertexCount = szToUI(TempPolygon->size());
 	auto&      form        = FormList->back();
 	auto       minSize     = 1u;
 	if (form.type == FRMFPOLY) {
@@ -1178,7 +1178,7 @@ void satin::satfix() {
 		}
 		TempPolygon->clear();
 		form.vertexCount = vertexCount;
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		form.satinGuideCount = 0;
 		StateMap.set(StateFlag::INIT);
 	}
@@ -1295,7 +1295,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	if (count == 0u) {
 		count = 1;
 	}
-	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
+	if (form::chkmax(count, szToUI(OSequence->size()))) {
 		return;
 	}
 	const auto innerStep        = dPOINT{ innerDelta.x / count, innerDelta.y / count };
@@ -1355,7 +1355,7 @@ void satin::internal::sfn(unsigned int startVertex) {
 void satin::satzum() {
 	StateMap.reset(StateFlag::SHOSAT);
 	thred::duzrat();
-	const auto vertexCount = gsl::narrow<unsigned int>(TempPolygon->size());
+	const auto vertexCount = szToUI(TempPolygon->size());
 	VertexCount            = vertexCount;
 	form::frmlin(*TempPolygon);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -1462,7 +1462,7 @@ bool satin::internal::chkbak(const std::vector<dPOINT>& satinBackup, const dPOIN
 }
 
 unsigned int satin::adsatk(unsigned int count) {
-	auto       iSatinConnect = gsl::narrow<unsigned int>(SatinGuides->size());
+	const auto iSatinConnect = szToUI(SatinGuides->size());
 	const auto it            = SatinGuides->end();
 	const auto val           = SATCON{};
 	SatinGuides->insert(it, count, val);

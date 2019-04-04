@@ -315,14 +315,14 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ TYPFRM, SelectedForm->fillColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
+		    INSREC{ TYPFRM, SelectedForm->fillColor, szToUI(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
 		if (((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u)
 		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
 			InterleaveSequenceIndices->emplace_back(INSREC{
-			    FTHMSK, SelectedForm->fillInfo.feather.color, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FTH });
+			    FTHMSK, SelectedForm->fillInfo.feather.color, szToUI(InterleaveSequence->size()), I_FTH });
 
-			const auto sequenceMax      = gsl::narrow<unsigned int>(featherSequence.size());
+			const auto sequenceMax      = szToUI(featherSequence.size());
 			auto       iReverseSequence = sequenceMax - 1;
 			for (auto iSequence = 0u; iSequence < sequenceMax; iSequence++) {
 				(*OSequence)[iSequence] = featherSequence[iReverseSequence];
@@ -367,7 +367,7 @@ void xt::fthrfn() {
 	BSequence->push_back((*BSequence)[BSequence->size() - 1]);
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0u) {
 		OutputIndex = 0;
-		for (ind = 0; ind < gsl::narrow<unsigned int>(BSequence->size()) - 2; ind++) {
+		for (ind = 0; ind < szToUI(BSequence->size()) - 2; ind++) {
 			if ((*BSequence)[ind].attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
@@ -573,6 +573,8 @@ void xt::pes2crd() {
 	xi::fil2crd(*AuxName);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 26487)
 std::vector<fPOINT>& xt::insid() {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
@@ -586,7 +588,9 @@ std::vector<fPOINT>& xt::insid() {
 	}
 
 	return *OutsidePoints;
+	
 }
+#pragma warning(pop)
 
 void xt::internal::delwlk(unsigned int code) {
 	if (PCSHeader.stitchCount != 0u) {
@@ -652,7 +656,7 @@ void xt::internal::chkuseq() {
 void xt::internal::ritwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ WLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
+		    INSREC{ WLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -660,7 +664,7 @@ void xt::internal::ritwlk() {
 void xt::internal::ritcwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ CWLKMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
+		    INSREC{ CWLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -766,7 +770,7 @@ void xt::internal::fnwlk(unsigned int find) {
 void xt::internal::ritund() {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ UNDMSK, SelectedForm->underlayColor, gsl::narrow<unsigned int>(InterleaveSequence->size()), I_FIL });
+		    INSREC{ UNDMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -940,7 +944,7 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned in
 	undclp();
 	StateMap.set(StateFlag::ISUND);
 	form::angclpfn(textureSegments);
-	OutputIndex = gsl::narrow<unsigned int>(OSequence->size());
+	OutputIndex = szToUI(OSequence->size());
 	ritund();
 	form::fvars(find);
 	UserStitchLength = savedStitchSize;
@@ -1033,7 +1037,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter = std::vector<unsigned>{};
-	formFillCounter.resize(gsl::narrow<unsigned int>((gsl::narrow_cast<unsigned long>(FormList->size()) + 2u) << 2u));
+	formFillCounter.resize((FormList->size() + 2u) << 2u);
 	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
@@ -1555,7 +1559,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
 
 	StateMap.reset(StateFlag::ISEND);
 	form::fvars(ClosestFormToCursor);
-	InterleaveSequenceIndices->emplace_back(INSREC{ 0, 0, gsl::narrow<unsigned int>(InterleaveSequence->size()), 0 });
+	InterleaveSequenceIndices->emplace_back(INSREC{ 0, 0, szToUI(InterleaveSequence->size()), 0 });
 	ilData.layerIndex
 	    = (gsl::narrow<unsigned int>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);

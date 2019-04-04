@@ -58,6 +58,8 @@ float dToF(double invar) {
 		result = gsl::narrow<float>(invar);
 	}
 	catch (const gsl::narrowing_error& e) { // check if we are seeing a rounding error
+		UNREFERENCED_PARAMETER(e);
+
 		const auto var  = gsl::narrow_cast<float>(invar);
 		const auto diff = abs(invar - var);
 		if (diff < 4e-5) {
@@ -73,6 +75,9 @@ float dToF(double invar) {
 	return result;
 }
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 long dToL(double invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
@@ -81,12 +86,17 @@ uint32_t dToUI(double invar) {
 	return gsl::narrow<uint32_t>(std::round(invar));
 }
 
-double fToD(float invar) {
-	return gsl::narrow_cast<double>(invar);
-}
-
 long fToL(float invar) {
 	return gsl::narrow<long>(std::round(invar));
+}
+
+uint32_t szToUI(size_t invar) {
+	return gsl::narrow<uint32_t>(invar);
+}
+#pragma warning(pop)
+
+double fToD(float invar) noexcept {
+	return gsl::narrow_cast<double>(invar);
 }
 
 float lToF(long invar) noexcept {
@@ -95,10 +105,6 @@ float lToF(long invar) noexcept {
 
 double lToD(long invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
-}
-
-uint32_t szToUI(size_t invar) {
-	return gsl::narrow<uint32_t>(invar);
 }
 
 size_t uiToSz(uint32_t invar) noexcept {

@@ -49,10 +49,10 @@ unsigned short DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
-void formForms::maxtsiz(const std::wstring& label, POINT& textSize) noexcept {
+void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 	auto labelSize = SIZE{};
 
-	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), gsl::narrow<unsigned int>(label.size()), &labelSize);
+	GetTextExtentPoint32Int(GetDC(ThrEdWindow), label.data(), szToUI(label.size()), &labelSize);
 	textSize.y = labelSize.cy;
 	if (labelSize.cx > textSize.x) {
 		textSize.x = labelSize.cx;
@@ -958,7 +958,7 @@ void formForms::dasyfrm() {
 		SelectedForm->attribute = 1;
 	}
 	StateMap.set(StateFlag::INIT);
-	form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+	form::frmout(szToUI(FormList->size() - 1u));
 	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
 		vertexIt[iMacroPetal].x -= SelectedForm->rectangle.left;
 		vertexIt[iMacroPetal].y -= SelectedForm->rectangle.bottom;
@@ -1051,7 +1051,7 @@ void formForms::setear() {
 		thred::savdo();
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
-		form::fvars(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::fvars(szToUI(FormList->size() - 1u));
 		auto       vertexIt         = std::next(FormVertices->begin(), CurrentVertexIndex);
 		const auto count            = uiToSz(VertexCount) / 4u;
 		const auto middle           = (vertexIt[1].x - vertexIt[0].x) / 2.0f + vertexIt[0].x;
@@ -1086,8 +1086,8 @@ void formForms::setear() {
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
 		StateMap.set(StateFlag::FORMSEL);
-		form::fvars(gsl::narrow<unsigned int>(FormList->size() - 1u));
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::fvars(szToUI(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto size = fPOINT{ SelectedForm->rectangle.right - SelectedForm->rectangle.left,
@@ -1107,7 +1107,7 @@ void formForms::setear() {
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			vertexIt[iVertex].x -= SelectedForm->rectangle.left;
 			vertexIt[iVertex].y -= SelectedForm->rectangle.bottom;
@@ -1228,7 +1228,7 @@ void formForms::wavfrm() {
 		}
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto selectedSize    = fPOINT{ SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                           SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
@@ -1246,7 +1246,7 @@ void formForms::wavfrm() {
 				vertexIt[index].y = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		for (auto index = 0u; index < vertexCount; index++) {
 			vertexIt[index].x -= SelectedForm->rectangle.left;
 			vertexIt[index].y -= SelectedForm->rectangle.bottom;

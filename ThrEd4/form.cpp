@@ -286,7 +286,7 @@ void form::frmout(unsigned int formIndex) {
 	}
 }
 
-void form::sfCor2px(const fPOINT& stitchPoint, POINT& screen) noexcept {
+void form::sfCor2px(const fPOINT& stitchPoint, POINT& screen) {
 	screen.x = dToL((stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5);
 	screen.y = dToL(StitchWindowClientRect.bottom - (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
 }
@@ -640,7 +640,7 @@ void form::unpsel() {
 	}
 }
 
-void form::sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept {
+void form::sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	screenRect.left   = dToL((stitchRect.left - ZoomRect.left) * ZoomRatio.x + 0.5);
 	screenRect.right  = dToL((stitchRect.right - ZoomRect.left) * ZoomRatio.x + 0.5);
 	screenRect.top    = dToL((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5);
@@ -1287,7 +1287,7 @@ void form::chkseq(bool border) {
 	if (minimumStitchLength == 0.0f) {
 		return;
 	}
-	auto destination = savedIndex + 1;
+	auto destination = szToUI(savedIndex + 1u);
 	for (auto iSequence = savedIndex + 1; iSequence < InterleaveSequence->size(); iSequence++) {
 		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1].x,
 		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1].y);
@@ -1296,7 +1296,7 @@ void form::chkseq(bool border) {
 			destination++;
 		}
 	}
-	auto newSize = destination;
+	const auto newSize = uiToSz(destination);
 	if (newSize != InterleaveSequence->size()) {
 		InterleaveSequence->resize(newSize);
 	}
@@ -1307,7 +1307,7 @@ void form::internal::ritbrd() {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ TYPBRD,
 		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) & COLMSK,
-		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
+		                                                szToUI(InterleaveSequence->size()),
 		                                                I_BRD });
 		form::chkseq(true);
 	}
@@ -1317,7 +1317,7 @@ void form::internal::ritapbrd() {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(INSREC{ TYPMSK,
 		                                                gsl::narrow<unsigned int>(SelectedForm->borderColor) >> 4,
-		                                                gsl::narrow<unsigned int>(InterleaveSequence->size()),
+		                                                szToUI(InterleaveSequence->size()),
 		                                                I_AP });
 		form::chkseq(true);
 	}
@@ -1367,7 +1367,7 @@ void form::filinsb(const dPOINT& point) {
 
 	if (length > MAXSTCH) {
 		count--;
-		if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
+		if (form::chkmax(count, szToUI(OSequence->size()))) {
 			return;
 		}
 		while (count != 0u) {
@@ -2279,7 +2279,7 @@ void form::internal::fnvrt(std::vector<fPOINT>*   currentFillVertices,
 		}
 		if (iPoint > 1) {
 			const auto evenPointCount = iPoint &= 0xfffffffe;
-			groupIndexSequence.push_back(gsl::narrow<unsigned int>(lineEndpoints.size()));
+			groupIndexSequence.push_back(szToUI(lineEndpoints.size()));
 			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
 			iPoint                    = 0;
 			const auto savedLineCount = lineEndpoints.size();
@@ -2298,7 +2298,7 @@ void form::internal::fnvrt(std::vector<fPOINT>*   currentFillVertices,
 			}
 		}
 	}
-	groupIndexSequence.push_back(gsl::narrow<unsigned int>(lineEndpoints.size()));
+	groupIndexSequence.push_back(szToUI(lineEndpoints.size()));
 }
 
 void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
@@ -2452,7 +2452,7 @@ void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm) {
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
 		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
-		const auto savedIndex = gsl::narrow<unsigned int>(OSequence->size());
+		const auto savedIndex = szToUI(OSequence->size());
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint = vertexIt[0];
 		StateMap.set(StateFlag::FILDIR);
@@ -3008,7 +3008,7 @@ void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 
 bool form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, unsigned sind) {
 	auto       index        = 1u;
-	const auto indexDoubled = gsl::narrow<unsigned int>(clipSegments.size()) << 1;
+	const auto indexDoubled = szToUI(clipSegments.size()) << 1;
 
 	StateMap.reset(StateFlag::FILDIR);
 	while (index < clipSegments.size()) {
@@ -3182,7 +3182,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 			regionSegment = regionCrossingData[iSegment].segment;
 		}
 	}
-	iclpx.push_back(gsl::narrow<unsigned int>(regionCrossingData.size()));
+	iclpx.push_back(szToUI(regionCrossingData.size()));
 	auto clipStitchPoints = std::vector<CLIPNT>{};
 	// Reserve some memory, but probably not enough
 	clipStitchPoints.reserve(1000);
@@ -4296,7 +4296,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
 		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
-		const auto lineCount = gsl::narrow<unsigned int>(sortedLines.size());
+		const auto lineCount = szToUI(sortedLines.size());
 		auto       regions   = std::vector<REGION>{};
 		regions.emplace_back(0u, 0u, 0u, 0u);
 		auto breakLine = sortedLines[0]->line;
@@ -4308,7 +4308,7 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			}
 		}
 		regions.back().end = lineCount - 1;
-		auto regionCount   = regions.size();
+		const auto regionCount   = szToUI(regions.size());
 		auto regionsList   = std::vector<REGION>{};
 		regionsList.resize(regionCount);
 		auto visitedRegions = boost::dynamic_bitset<>(regionCount);
@@ -4621,7 +4621,7 @@ void form::internal::bakseq() {
 				if (length > UserStitchLength2) {
 					auto point = bNext;
 					auto count = gsl::narrow<unsigned int>(std::round(length / UserStitchLength - 1));
-					if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
+					if (form::chkmax(count, szToUI(OSequence->size()))) {
 						return;
 					}
 					const auto step = dPOINT{ delta.x / count, delta.y / count };
@@ -4647,7 +4647,7 @@ void form::filinu(const dPOINT& inPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
+	if (form::chkmax(count, szToUI(OSequence->size()))) {
 		return;
 	}
 	if (count != 0u) {
@@ -4674,7 +4674,7 @@ void form::filin(dPOINT currentPoint) {
 	const auto length = hypot(delta.x, delta.y);
 	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
 
-	if (form::chkmax(count, gsl::narrow<unsigned int>(OSequence->size()))) {
+	if (form::chkmax(count, szToUI(OSequence->size()))) {
 		return;
 	}
 	if (count != 0u) {
@@ -5764,7 +5764,7 @@ void form::bord() {
 
 void form::internal::fsclp() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize          = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto clipSize          = szToUI(ClipBuffer->size());
 	SelectedForm->edgeType       = EDGECLIP;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
@@ -5923,7 +5923,7 @@ void form::internal::getbig() noexcept {
 	}
 }
 
-void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) noexcept {
+void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	auto stitchCoord = dPOINT{ stitchRect.left, stitchRect.top };
 	auto screenCoord = POINT{};
 
@@ -6505,7 +6505,7 @@ void form::dustar(unsigned starCount, double length) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - center.x) * StarRatio + center.x;
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - center.y) * StarRatio + center.y;
 	}
-	form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+	form::frmout(szToUI(FormList->size() - 1u));
 	FormMoveDelta      = fPOINT{ 0.0f, 0.0f };
 	NewFormVertexCount = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
@@ -6536,7 +6536,7 @@ void form::duspir(unsigned stepCount) {
 	firstSpiral.resize(stepCount);
 	auto centeredSpiral = std::vector<fPOINT>{};
 	centeredSpiral.resize(stepCount);
-	form::fvars(gsl::narrow<unsigned int>(FormList->size() - 1u));
+	form::fvars(szToUI(FormList->size() - 1u));
 	thred::px2stch();
 	auto point = dPOINT{ SelectedPoint };
 	auto angle = 0.0;
@@ -6562,7 +6562,7 @@ void form::duspir(unsigned stepCount) {
 		ratio += stepRatio;
 	}
 	SelectedForm->type = FRMLINE;
-	form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+	form::frmout(szToUI(FormList->size() - 1u));
 	FormMoveDelta.x = FormMoveDelta.y = 0;
 	NewFormVertexCount                = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
@@ -7013,7 +7013,7 @@ void form::internal::filsclp() {
 	SelectedForm->type                    = SAT;
 	SelectedForm->fillType                = CLPF;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
-	SelectedForm->lengthOrCount.clipCount = gsl::narrow<unsigned int>(ClipBuffer->size());
+	SelectedForm->lengthOrCount.clipCount = szToUI(ClipBuffer->size());
 	auto offsetStart                      = std::next(ClipPoints->begin(), SelectedForm->angleOrClipData.clip);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
@@ -7373,7 +7373,7 @@ void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter)
 
 void form::internal::cplayfn(unsigned int iForm, unsigned play) {
 	FormList->push_back((*FormList)[iForm]);
-	const auto lastForm = gsl::narrow<unsigned int>(FormList->size() - 1u);
+	const auto lastForm = szToUI(FormList->size() - 1u);
 	form::fvars(lastForm);
 	SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
 	auto vertexIt             = std::next(FormVertices->cbegin(), (*FormList)[iForm].vertexIndex);
@@ -7494,7 +7494,7 @@ void form::join() {
 		}
 		formIter                  = std::next(FormList->cbegin(), ClosestFormToCursor); // formIter possibly invalidated by frmdel
 		const auto insertionPoint = formIter->vertexIndex + formIter->vertexCount;
-		form::fltspac(formIter->vertexCount, gsl::narrow<unsigned int>(vertexList.size()));
+		form::fltspac(formIter->vertexCount, szToUI(vertexList.size()));
 		auto dest = std::next(FormVertices->begin(), insertionPoint);
 		std::copy(vertexList.cbegin(), vertexList.cend(), dest);
 		SelectedForm = &((*FormList)[ClosestFormToCursor]);
@@ -7763,7 +7763,7 @@ void form::boxsel() {
 
 void form::internal::fspic() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize          = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto clipSize          = szToUI(ClipBuffer->size());
 	SelectedForm->edgeType       = EDGEPICOT;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
@@ -8509,7 +8509,7 @@ void form::stchs2frm() {
 			vertexIt[iVertex].x   = StitchBuffer[iStitch].x;
 			vertexIt[iVertex++].y = StitchBuffer[iStitch].y;
 		}
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		if (ClosestPointIndex > GroupStitchIndex) {
 			if (ClosestPointIndex < gsl::narrow<unsigned>(PCSHeader.stitchCount) - 1) {
 				ClosestPointIndex++;
@@ -8599,7 +8599,7 @@ void form::horsclp() {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	const auto clipSize                   = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto clipSize                   = szToUI(ClipBuffer->size());
 	SelectedForm->lengthOrCount.clipCount = clipSize;
 	SelectedForm->angleOrClipData.clip    = clip::numclp();
 	SelectedForm->lengthOrCount.clipCount = clipSize;
@@ -8935,7 +8935,7 @@ void form::crop() {
 
 void form::internal::fsclpx() {
 	clip::deleclp(ClosestFormToCursor);
-	const auto clipSize          = gsl::narrow<unsigned int>(ClipBuffer->size());
+	const auto clipSize          = szToUI(ClipBuffer->size());
 	SelectedForm->edgeType       = EDGECLIPX;
 	SelectedForm->clipEntries    = clipSize;
 	SelectedForm->borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);

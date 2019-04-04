@@ -30,7 +30,7 @@ namespace formForms {
 void dazdef();
 void dasyfrm();
 void frmnum();
-void maxtsiz(const std::wstring& label, POINT& textSize) noexcept;
+void maxtsiz(const std::wstring& label, POINT& textSize);
 auto maxwid(unsigned start, unsigned finish);
 void prfmsg();
 void prfsid(HWND wnd) noexcept;

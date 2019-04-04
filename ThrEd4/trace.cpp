@@ -69,7 +69,9 @@ void trace::initColorRef() noexcept {
 	InvertDownColor = 0x808080;
 }
 
-void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
+#pragma warning(push)
+#pragma warning(disable : 26487)
+void trace::internal::trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept {
 	if (window != nullptr) {
 		*window = CreateWindow(L"STATIC",
 		                       L"",
@@ -84,6 +86,7 @@ void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned b
 		                       nullptr);
 	}
 }
+#pragma warning(pop)
 
 void trace::initTraceWindows() noexcept {
 	TraceStepWin = CreateWindow(L"STATIC",
@@ -98,10 +101,10 @@ void trace::initTraceWindows() noexcept {
 	                            ThrEdInstance,
 	                            nullptr);
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {
-		trcsub(&TraceControlWindow[iRGB], ButtonWidth * iRGB, 0, ButtonHeight * 15);
-		trcsub(&TraceSelectWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 15, ButtonHeight);
-		trcsub(&TraceUpWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 16, ButtonHeight);
-		trcsub(&TraceDownWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 17, ButtonHeight);
+		ti::trcsub(&TraceControlWindow[iRGB], ButtonWidth * iRGB, 0, ButtonHeight * 15);
+		ti::trcsub(&TraceSelectWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 15, ButtonHeight);
+		ti::trcsub(&TraceUpWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 16, ButtonHeight);
+		ti::trcsub(&TraceDownWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 17, ButtonHeight);
 		TraceBrush[iRGB] = CreateSolidBrush(TraceRGB[iRGB]);
 	}
 }
@@ -816,7 +819,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<decltype(SelectedForm->vertexCount)>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout(gsl::narrow<unsigned int>(FormList->size() - 1u));
+		form::frmout(szToUI(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);

@@ -21,7 +21,7 @@
 float    dToF(double invar);
 long     dToL(double invar);
 uint32_t dToUI(double invar);
-double   fToD(float invar);
+double   fToD(float invar) noexcept;
 long     fToL(float invar);
 double   lToD(long invar) noexcept;
 float    lToF(long invar) noexcept;
