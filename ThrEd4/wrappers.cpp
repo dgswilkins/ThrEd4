@@ -52,7 +52,7 @@ void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, unsigned int cbString, 
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
 
-float wrap::dToF(double invar) {
+float wrap::toFloat(double invar) {
 	auto result = 0.0f;
 	try {
 		result = gsl::narrow<float>(invar);
@@ -75,39 +75,39 @@ float wrap::dToF(double invar) {
 	return result;
 }
 
+float wrap::toFloat(long invar) noexcept {
+	return gsl::narrow_cast<float>(invar);
+}
+
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-long wrap::dToL(double invar) {
+long wrap::toLong(double invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
 
-uint32_t wrap::dToUI(double invar) {
+long wrap::toLong(float invar) {
+	return gsl::narrow<long>(std::round(invar));
+}
+
+uint32_t wrap::toUnsigned(double invar) {
 	return gsl::narrow<uint32_t>(std::round(invar));
 }
 
-long wrap::fToL(float invar) {
-	return gsl::narrow<long>(std::round(invar));
-}
-
-uint32_t wrap::szToUI(size_t invar) {
+uint32_t wrap::toUnsigned(size_t invar) {
 	return gsl::narrow<uint32_t>(invar);
 }
 #pragma warning(pop)
 
-double wrap::fToD(float invar) noexcept {
+double wrap::toDouble(float invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
-float wrap::lToF(long invar) noexcept {
-	return gsl::narrow_cast<float>(invar);
-}
-
-double wrap::lToD(long invar) noexcept {
+double wrap::toDouble(long invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
-size_t wrap::uiToSz(uint32_t invar) noexcept {
+size_t wrap::toSize(uint32_t invar) noexcept {
 	return gsl::narrow_cast<size_t>(invar);
 }
 

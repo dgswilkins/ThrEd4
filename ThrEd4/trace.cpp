@@ -322,7 +322,7 @@ void trace::trdif() {
 	trace::untrace();
 	if ((BitmapHeight * BitmapWidth) != 0u) {
 		auto differenceBitmap = std::vector<unsigned> {};
-		differenceBitmap.resize(wrap::uiToSz(BitmapHeight) * BitmapWidth);
+		differenceBitmap.resize(wrap::toSize(BitmapHeight) * BitmapWidth);
 
 		auto colorSumMaximum = 0u;
 		auto colorSumMinimum = 0xffffffffu;
@@ -354,7 +354,7 @@ void trace::trdif() {
 			for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 				if (differenceBitmap[iPixel] != 0u) {
-					const auto adjustedColorSum = wrap::dToUI((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
+					const auto adjustedColorSum = wrap::toUnsigned((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
 			}
@@ -375,8 +375,8 @@ void trace::trace() {
 			if (StateMap.test(StateFlag::LANDSCAP)) {
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			}
-			BitmapPoint.x    = wrap::dToL(BmpStitchRatio.x * SelectedPoint.x);
-			BitmapPoint.y    = wrap::dToL(BmpStitchRatio.y * SelectedPoint.y - 1.0);
+			BitmapPoint.x    = wrap::toLong(BmpStitchRatio.x * SelectedPoint.x);
+			BitmapPoint.y    = wrap::toLong(BmpStitchRatio.y * SelectedPoint.y - 1.0);
 			const auto color = TraceBitmapData[BitmapPoint.y * BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (StateMap.test(StateFlag::TRCUP)) {
 				UpPixelColor   = color;
@@ -472,14 +472,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(wrap::uiToSz(pixelIndex) - 1u);
+					TracedEdges->set(wrap::toSize(pixelIndex) - 1u);
 					flag = false;
 				}
 			}
 			pixelIndex++;
 		}
 		if (flag) {
-			TracedEdges->set(wrap::uiToSz(pixelIndex) - 1u);
+			TracedEdges->set(wrap::toSize(pixelIndex) - 1u);
 		}
 	}
 	for (auto iWidth = 0u; iWidth < BitmapWidth; iWidth++) {
@@ -494,14 +494,14 @@ void trace::tracedg() {
 			}
 			else {
 				if (flag) {
-					TracedEdges->set(wrap::uiToSz(pixelIndex) - BitmapWidth);
+					TracedEdges->set(wrap::toSize(pixelIndex) - BitmapWidth);
 					flag = false;
 				}
 			}
 			pixelIndex += BitmapWidth;
 		}
 		if (flag) {
-			TracedEdges->set(wrap::uiToSz(pixelIndex) - BitmapWidth);
+			TracedEdges->set(wrap::toSize(pixelIndex) - BitmapWidth);
 		}
 	}
 	for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
@@ -640,8 +640,8 @@ void trace::internal::dutrac() {
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 		}
-		CurrentTracePoint.x = wrap::dToL(BmpStitchRatio.x * SelectedPoint.x);
-		CurrentTracePoint.y = wrap::dToL(BmpStitchRatio.y * SelectedPoint.y);
+		CurrentTracePoint.x = wrap::toLong(BmpStitchRatio.x * SelectedPoint.x);
+		CurrentTracePoint.y = wrap::toLong(BmpStitchRatio.y * SelectedPoint.y);
 		if (CurrentTracePoint.x > gsl::narrow<long>(BitmapWidth)) {
 			CurrentTracePoint.x = BitmapWidth;
 		}
@@ -820,7 +820,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexCount = gsl::narrow<decltype(SelectedForm->vertexCount)>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
 		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
-		form::frmout(wrap::szToUI(FormList->size() - 1u));
+		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
@@ -1027,8 +1027,8 @@ void trace::internal::stch2bit(fPOINT& point) {
 	if (StateMap.test(StateFlag::LANDSCAP)) {
 		point.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	}
-	BitmapPoint.x = wrap::dToL(BmpStitchRatio.x * point.x);
-	BitmapPoint.y = wrap::dToL(BitmapHeight - BmpStitchRatio.y * point.y);
+	BitmapPoint.x = wrap::toLong(BmpStitchRatio.x * point.x);
+	BitmapPoint.y = wrap::toLong(BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
@@ -1102,7 +1102,7 @@ void trace::tracpar() {
 					break;
 				}
 				const auto ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-				const auto position      = wrap::dToUI(std::floor(ratio * 255.0));
+				const auto position      = wrap::toUnsigned(std::floor(ratio * 255.0));
 				auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
 				const auto tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
 				if (tracePosition < traceColor) {
@@ -1129,7 +1129,7 @@ void trace::tracpar() {
 			trace::trace();
 		}
 		else {
-			const auto position = wrap::dToUI(std::floor(TraceMsgPoint.y / ButtonHeight));
+			const auto position = wrap::toUnsigned(std::floor(TraceMsgPoint.y / ButtonHeight));
 			if (position < 16) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
 				thred::redraw(TraceSelectWindow[ColumnColor]);
@@ -1230,9 +1230,9 @@ void trace::internal::durct(unsigned    shift,
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
 	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255;
-	traceMiddleMask.top    = wrap::dToL(controlHeight * ratio + traceControlRect.top);
+	traceMiddleMask.top    = wrap::toLong(controlHeight * ratio + traceControlRect.top);
 	ratio                  = gsl::narrow_cast<double>(upperColor) / 255;
-	traceMiddleMask.bottom = wrap::dToL(controlHeight * ratio + traceControlRect.top);
+	traceMiddleMask.bottom = wrap::toLong(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor != 0u) {

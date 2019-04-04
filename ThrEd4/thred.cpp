@@ -1268,7 +1268,7 @@ void thred::internal::dstin(unsigned number, POINT& pout) noexcept {
 }
 
 unsigned int thred::adflt(unsigned int count) {
-	const auto startVertex = wrap::szToUI(FormVertices->size());
+	const auto startVertex = wrap::toUnsigned(FormVertices->size());
 	const auto it          = FormVertices->end();
 	const auto val         = fPOINT {};
 	FormVertices->insert(it, count, val);
@@ -1276,7 +1276,7 @@ unsigned int thred::adflt(unsigned int count) {
 }
 
 unsigned int thred::adclp(unsigned int count) {
-	const auto iClipPoint = wrap::szToUI(ClipPoints->size());
+	const auto iClipPoint = wrap::toUnsigned(ClipPoints->size());
 	const auto it         = ClipPoints->end();
 	const auto val        = fPOINT {};
 	ClipPoints->insert(it, count, val);
@@ -1427,7 +1427,7 @@ void thred::internal::dudat() {
 
 	undoBuffer[UndoBufferWriteIndex].reset(nullptr);
 	const auto&    formList  = *FormList;
-	const auto     formCount = wrap::szToUI(formList.size());
+	const auto     formCount = wrap::toUnsigned(formList.size());
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
 	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(StitchBuffer[0]) * PCSHeader.stitchCount
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
@@ -1643,11 +1643,11 @@ void thred::internal::unboxs() noexcept {
 void thred::internal::stchPars() {
 	AspectRatio = gsl::narrow_cast<double>(UnzoomedRect.x) / gsl::narrow_cast<double>(UnzoomedRect.y);
 	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-		StitchWindowSize.x = wrap::dToL(
+		StitchWindowSize.x = wrap::toLong(
 		    (gsl::narrow_cast<double>(ThredWindowRect.bottom) - (gsl::narrow<long long>(*ScrollSize) << 1)) * AspectRatio);
 	}
 	else {
-		StitchWindowSize.x = wrap::dToL((gsl::narrow_cast<double>(ThredWindowRect.bottom) - *ScrollSize) * AspectRatio);
+		StitchWindowSize.x = wrap::toLong((gsl::narrow_cast<double>(ThredWindowRect.bottom) - *ScrollSize) * AspectRatio);
 	}
 
 	if ((StitchWindowSize.x + gsl::narrow<long>(ButtonWidthX3) + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
@@ -1662,10 +1662,10 @@ void thred::internal::stchPars() {
 		StitchWindowSize = { gsl::narrow<LONG>(ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize),
 			                 ThredWindowRect.bottom - ThredWindowRect.top };
 		if (gsl::narrow_cast<double>(StitchWindowSize.x) / gsl::narrow_cast<double>(StitchWindowSize.y) > AspectRatio) {
-			StitchWindowSize.x = wrap::dToL(StitchWindowSize.y * AspectRatio);
+			StitchWindowSize.x = wrap::toLong(StitchWindowSize.y * AspectRatio);
 		}
 		else {
-			StitchWindowSize.y = wrap::dToL(StitchWindowSize.x / AspectRatio);
+			StitchWindowSize.y = wrap::toLong(StitchWindowSize.x / AspectRatio);
 		}
 	}
 }
@@ -1865,9 +1865,9 @@ void thred::shft(const fPOINT& delta) noexcept {
 }
 
 void thred::internal::stch2px1(unsigned iStitch) {
-	StitchCoordinatesPixels.x = wrap::dToL((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5);
+	StitchCoordinatesPixels.x = wrap::toLong((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5);
 	StitchCoordinatesPixels.y
-	    = wrap::dToL(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
+	    = wrap::toLong(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5);
 }
 
 void thred::internal::shft2box() {
@@ -2037,7 +2037,7 @@ void thred::internal::hupfn() {
 				form.rectangle.top += delta.y;
 				form.rectangle.bottom += delta.y;
 			}
-			UnzoomedRect = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+			UnzoomedRect = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 			ZoomMin      = gsl::narrow_cast<double>(MINZUM) / UnzoomedRect.x;
 			thred::zumhom();
 		}
@@ -2514,7 +2514,7 @@ void thred::internal::chknum() {
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
 							if (value < FormList->size()) {
-								form::frmnumfn(wrap::dToUI(value));
+								form::frmnumfn(wrap::toUnsigned(value));
 							}
 							else {
 								displayText::tabmsg(IDS_FRMN1);
@@ -2644,15 +2644,15 @@ void thred::internal::chknum() {
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
-							xt::dubcol(wrap::dToUI(value));
+							xt::dubcol(wrap::toUnsigned(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
-							xt::dufcol(wrap::dToUI(value));
+							xt::dufcol(wrap::toUnsigned(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETUCOL)) {
-							xt::dundcol(wrap::dToUI(value));
+							xt::dundcol(wrap::toUnsigned(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETFANG)) {
@@ -2873,7 +2873,7 @@ void thred::internal::rstAll() {
 
 void thred::ritot(unsigned number) {
 	auto txt         = fmt::format((*StringTable)[STR_TOT], number);
-	BufferDigitCount = wrap::szToUI(txt.size());
+	BufferDigitCount = wrap::toUnsigned(txt.size());
 	displayText::butxt(HTOT, txt);
 }
 
@@ -3002,8 +3002,8 @@ void thred::internal::delsmal(unsigned startStitch, unsigned endStitch) {
 						iNextStitch = iStitch;
 					}
 					else {
-						const auto delta = POINT { wrap::fToL(StitchBuffer[iStitch].x - StitchBuffer[iNextStitch].x),
-							                       wrap::fToL(StitchBuffer[iStitch].y - StitchBuffer[iNextStitch].y) };
+						const auto delta = POINT { wrap::toLong(StitchBuffer[iStitch].x - StitchBuffer[iNextStitch].x),
+							                       wrap::toLong(StitchBuffer[iStitch].y - StitchBuffer[iNextStitch].y) };
 						stitchSize       = hypot(delta.x, delta.y);
 					}
 					iStitch++;
@@ -3021,8 +3021,8 @@ void thred::internal::delsmal(unsigned startStitch, unsigned endStitch) {
 						if (((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)
 						    && (StitchBuffer[iStitch].attribute & FRMSK) == codedAttribute
 						    && ((StitchBuffer[iStitch].attribute & KNOTMSK) == 0u)) {
-							const auto delta = POINT { wrap::fToL(StitchBuffer[iNextStitch].x - StitchBuffer[iStitch].x),
-								                       wrap::fToL(StitchBuffer[iNextStitch++].y - StitchBuffer[iStitch].y) };
+							const auto delta = POINT { wrap::toLong(StitchBuffer[iNextStitch].x - StitchBuffer[iStitch].x),
+								                       wrap::toLong(StitchBuffer[iNextStitch++].y - StitchBuffer[iStitch].y) };
 							stitchSize       = hypot(delta.x, delta.y);
 						}
 						else {
@@ -3050,8 +3050,8 @@ void thred::internal::delsmal(unsigned startStitch, unsigned endStitch) {
 				thred::mvstch(iNextStitch++, inf);
 			}
 			else {
-				const auto delta = POINT { wrap::fToL(StitchBuffer[inf].x - SelectedPoint.x),
-					                       wrap::fToL(StitchBuffer[inf].y - SelectedPoint.y) };
+				const auto delta = POINT { wrap::toLong(StitchBuffer[inf].x - SelectedPoint.x),
+					                       wrap::toLong(StitchBuffer[inf].y - SelectedPoint.y) };
 				stitchSize       = hypot(delta.x, delta.y);
 				if (stitchSize > SmallStitchLength) {
 					thred::mvstch(iNextStitch++, inf);
@@ -3126,28 +3126,28 @@ void thred::internal::rshft(const POINT& shiftPoint) {
 
 void thred::internal::pgdwn() {
 	if (StateMap.test(StateFlag::ZUMED)) {
-		const auto scrollPosition = POINT { 0, wrap::dToL((ZoomRect.top - ZoomRect.bottom) * PAGSCROL) };
+		const auto scrollPosition = POINT { 0, wrap::toLong((ZoomRect.top - ZoomRect.bottom) * PAGSCROL) };
 		rshft(scrollPosition);
 	}
 }
 
 void thred::internal::pgup() {
 	if (StateMap.test(StateFlag::ZUMED)) {
-		const auto scrollPosition = POINT { 0, wrap::dToL(-(ZoomRect.top - ZoomRect.bottom) * PAGSCROL) };
+		const auto scrollPosition = POINT { 0, wrap::toLong(-(ZoomRect.top - ZoomRect.bottom) * PAGSCROL) };
 		rshft(scrollPosition);
 	}
 }
 
 void thred::internal::pglft() {
 	if (StateMap.test(StateFlag::ZUMED)) {
-		const auto scrollPosition = POINT { wrap::dToL((ZoomRect.right - ZoomRect.left) * PAGSCROL), 0 };
+		const auto scrollPosition = POINT { wrap::toLong((ZoomRect.right - ZoomRect.left) * PAGSCROL), 0 };
 		rshft(scrollPosition);
 	}
 }
 
 void thred::internal::pgrit() {
 	if (StateMap.test(StateFlag::ZUMED)) {
-		const auto scrollPosition = POINT { wrap::dToL(-(ZoomRect.right - ZoomRect.left) * PAGSCROL), 0 };
+		const auto scrollPosition = POINT { wrap::toLong(-(ZoomRect.right - ZoomRect.left) * PAGSCROL), 0 };
 		rshft(scrollPosition);
 	}
 }
@@ -3156,7 +3156,7 @@ void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SelectObject(dc, GroupSelectPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (!SearchLine->empty()) {
-		wrap::Polyline(dc, SearchLine->data(), wrap::szToUI(SearchLine->size()));
+		wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
 	}
 	if (start > end) {
 		std::swap(start, end);
@@ -3164,10 +3164,10 @@ void thred::internal::selin(unsigned start, unsigned end, HDC dc) {
 	SearchLine->clear();
 	for (auto iStitch = start; iStitch <= end; iStitch++) {
 		SearchLine->push_back(POINT {
-		    wrap::dToL(((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5)),
-		    wrap::dToL((StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)) });
+		    wrap::toLong(((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5)),
+		    wrap::toLong((StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)) });
 	}
-	wrap::Polyline(dc, SearchLine->data(), wrap::szToUI(SearchLine->size()));
+	wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -3248,7 +3248,7 @@ void thred::selRct(fRECTANGLE& sourceRect) noexcept {
 void thred::internal::dusel(HDC dc) {
 	SetROP2(dc, R2_NOTXORPEN);
 	SelectObject(dc, LinePen);
-	wrap::Polyline(dc, FormControlPoints->data(), wrap::szToUI(FormControlPoints->size() - 1));
+	wrap::Polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1));
 	for (auto iPoint = 0u; iPoint < 8; iPoint++) {
 		form::selsqr((*FormControlPoints)[iPoint], dc);
 	}
@@ -3286,8 +3286,8 @@ void thred::grpAdj() {
 	if (StateMap.test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
 		if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1
 		    || StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
-			auto newSize    = POINT { wrap::fToL(StitchRangeRect.right - StitchRangeRect.left),
-                                   wrap::fToL(StitchRangeRect.top - StitchRangeRect.bottom) };
+			auto newSize    = POINT { wrap::toLong(StitchRangeRect.right - StitchRangeRect.left),
+                                   wrap::toLong(StitchRangeRect.top - StitchRangeRect.bottom) };
 			auto coordinate = 0.0;
 			if (newSize.x < MINZUM) {
 				// ToDo - we are comparing an integer to a small float here - does that make sense?
@@ -3295,19 +3295,19 @@ void thred::grpAdj() {
 					newSize.x = 1;
 				}
 				coordinate = gsl::narrow_cast<decltype(coordinate)>(MINZUM) / newSize.x;
-				newSize    = { MINZUM, wrap::dToL(coordinate * newSize.y) };
+				newSize    = { MINZUM, wrap::toLong(coordinate * newSize.y) };
 			}
 			if (newSize.x > newSize.y) {
 				coordinate = newSize.x * ZMARGIN;
-				newSize.x += wrap::dToL(coordinate);
+				newSize.x += wrap::toLong(coordinate);
 				coordinate = newSize.x / StitchWindowAspectRatio;
-				newSize.y  = wrap::dToL(coordinate);
+				newSize.y  = wrap::toLong(coordinate);
 			}
 			else {
 				coordinate = newSize.y * ZMARGIN;
-				newSize.y  = wrap::dToL(coordinate);
+				newSize.y  = wrap::toLong(coordinate);
 				coordinate = newSize.y * StitchWindowAspectRatio;
-				newSize.x  = wrap::dToL(coordinate);
+				newSize.x  = wrap::toLong(coordinate);
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
 				ZoomRect.left = ZoomRect.bottom = 0.0;
@@ -3373,7 +3373,7 @@ void thred::internal::ritlayr() {
 	}
 	else {
 		auto txt         = fmt::format((*StringTable)[STR_LAYR], layer);
-		BufferDigitCount = wrap::szToUI(txt.size());
+		BufferDigitCount = wrap::toUnsigned(txt.size());
 		displayText::butxt(HLAYR, txt);
 	}
 }
@@ -3403,8 +3403,8 @@ void thred::internal::rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, c
 	const auto distanceToCenter = hypot(dx, dy);
 	const auto newAngle         = atan2(dy, dx) - RotateAngle;
 
-	rotatedPoint = { wrap::dToL(rotationCenterPixels.x + distanceToCenter * cos(newAngle)),
-		             wrap::dToL(rotationCenterPixels.y + distanceToCenter * sin(newAngle)) };
+	rotatedPoint = { wrap::toLong(rotationCenterPixels.x + distanceToCenter * cos(newAngle)),
+		             wrap::toLong(rotationCenterPixels.y + distanceToCenter * sin(newAngle)) };
 }
 
 void thred::internal::duar() {
@@ -3440,16 +3440,16 @@ void thred::internal::dubox() {
 
 bool thred::internal::stch2px(unsigned iStitch) {
 	StitchCoordinatesPixels
-	    = { wrap::dToL((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-		    wrap::dToL(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
+	    = { wrap::toLong((StitchBuffer[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+		    wrap::toLong(StitchWindowClientRect.bottom - (StitchBuffer[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
 	return StitchCoordinatesPixels.x >= 0 && StitchCoordinatesPixels.x <= StitchWindowClientRect.right
 	       && StitchCoordinatesPixels.y >= 0 && StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom;
 }
 
 void thred::stch2pxr(const fPOINT& stitchCoordinate) {
 	StitchCoordinatesPixels
-	    = { wrap::dToL((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
-		    wrap::dToL(StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
+	    = { wrap::toLong((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
+		    wrap::toLong(StitchWindowClientRect.bottom - (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
 }
 
 void thred::internal::getDocsFolder(fs::path* directory) {
@@ -3637,7 +3637,7 @@ void thred::internal::redbal() {
 			constexpr auto IBALRAT = 0.6f;
 			IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
 			IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
-			UnzoomedRect           = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+			UnzoomedRect           = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 			BalaradOffset.x        = IniFile.hoopSizeX / 2.0;
 			BalaradOffset.y        = IniFile.hoopSizeY / 2.0;
 			PCSHeader.hoopType     = CUSTHUP;
@@ -3712,7 +3712,7 @@ void thred::internal::ritbal() {
 		BalaradOffset.x    = IniFile.hoopSizeX / 2.0f;
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
 		auto balaradStitch = std::vector<BALSTCH> {};
-		balaradStitch.resize(wrap::uiToSz(PCSHeader.stitchCount) + 2u);
+		balaradStitch.resize(wrap::toSize(PCSHeader.stitchCount) + 2u);
 		color = StitchBuffer[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
@@ -3730,7 +3730,7 @@ void thred::internal::ritbal() {
 		CloseHandle(balaradFile);
 		balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		wrap::WriteFile(
-		    balaradFile, outputName.wstring().c_str(), wrap::szToUI(outputName.wstring().size() + 1), &bytesWritten, nullptr);
+		    balaradFile, outputName.wstring().c_str(), wrap::toUnsigned(outputName.wstring().size() + 1), &bytesWritten, nullptr);
 		CloseHandle(balaradFile);
 	}
 	else {
@@ -3867,7 +3867,7 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 	MsgBuffer[threadLength] = 0;
 	auto threadSizeBufW     = std::wstring(MsgBuffer);
 	auto threadSizeBuf      = utf::Utf16ToUtf8(threadSizeBufW);
-	durit(&output, threadSizeBuf.c_str(), wrap::szToUI(threadSizeBuf.size() * sizeof(threadSizeBuf[0])));
+	durit(&output, threadSizeBuf.c_str(), wrap::toUnsigned(threadSizeBuf.size() * sizeof(threadSizeBuf[0])));
 	if (!FormList->empty()) {
 		auto outForms = std::vector<FRMHEDOUT> {};
 		outForms.reserve(FormList->size());
@@ -3907,16 +3907,16 @@ void thred::internal::dubuf(char* const buffer, unsigned& count) {
 			}
 		}
 		if (!outForms.empty()) {
-			durit(&output, outForms.data(), wrap::szToUI(outForms.size() * sizeof(decltype(outForms.back()))));
+			durit(&output, outForms.data(), wrap::toUnsigned(outForms.size() * sizeof(decltype(outForms.back()))));
 		}
 		if (!vertices.empty()) {
-			durit(&output, vertices.data(), wrap::szToUI(vertices.size() * sizeof(decltype(vertices.back()))));
+			durit(&output, vertices.data(), wrap::toUnsigned(vertices.size() * sizeof(decltype(vertices.back()))));
 		}
 		if (!guides.empty()) {
-			durit(&output, guides.data(), wrap::szToUI(guides.size() * sizeof(decltype(guides.back()))));
+			durit(&output, guides.data(), wrap::toUnsigned(guides.size() * sizeof(decltype(guides.back()))));
 		}
 		if (!points.empty()) {
-			durit(&output, points.data(), wrap::szToUI(points.size() * sizeof(decltype(points.back()))));
+			durit(&output, points.data(), wrap::toUnsigned(points.size() * sizeof(decltype(points.back()))));
 		}
 		if (!TexturePointsBuffer->empty()) {
 			durit(&output,
@@ -4061,12 +4061,12 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		}
 	}
 	auto centerCoordinate
-	    = POINT { wrap::dToL((gsl::narrow_cast<double>(boundingRect.right) - boundingRect.left) / 2.0 + boundingRect.left),
-		          wrap::dToL((gsl::narrow_cast<double>(boundingRect.top) - boundingRect.bottom) / 2.0 + boundingRect.bottom) };
-	DSTOffsetData.Positive.x = wrap::fToL(boundingRect.right - centerCoordinate.x + 1);
-	DSTOffsetData.Positive.y = wrap::fToL(boundingRect.top - centerCoordinate.y + 1);
-	DSTOffsetData.Negative.x = wrap::fToL(centerCoordinate.x - boundingRect.left - 1);
-	DSTOffsetData.Negative.y = wrap::fToL(centerCoordinate.y - boundingRect.bottom - 1);
+	    = POINT { wrap::toLong((gsl::narrow_cast<double>(boundingRect.right) - boundingRect.left) / 2.0 + boundingRect.left),
+		          wrap::toLong((gsl::narrow_cast<double>(boundingRect.top) - boundingRect.bottom) / 2.0 + boundingRect.bottom) };
+	DSTOffsetData.Positive.x = wrap::toLong(boundingRect.right - centerCoordinate.x + 1);
+	DSTOffsetData.Positive.y = wrap::toLong(boundingRect.top - centerCoordinate.y + 1);
+	DSTOffsetData.Negative.x = wrap::toLong(centerCoordinate.x - boundingRect.left - 1);
+	DSTOffsetData.Negative.y = wrap::toLong(centerCoordinate.y - boundingRect.bottom - 1);
 	auto color               = dstStitchBuffer[0].attribute & 0xf;
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (color != (dstStitchBuffer[iStitch].attribute & 0xf)) {
@@ -4074,8 +4074,8 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 			color = dstStitchBuffer[iStitch].attribute & 0xf;
 			colorData.push_back(UserColor[color]);
 		}
-		auto       lengths = POINT { wrap::dToL(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].x) - centerCoordinate.x),
-                               wrap::dToL(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].y) - centerCoordinate.y) };
+		auto       lengths = POINT { wrap::toLong(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].x) - centerCoordinate.x),
+                               wrap::toLong(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].y) - centerCoordinate.y) };
 		const auto absoluteLengths = POINT { abs(lengths.x), abs(lengths.y) };
 		auto       count           = 0u;
 		if (absoluteLengths.x > absoluteLengths.y) {
@@ -4128,7 +4128,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			wrap::WriteFile(colorFile,
 			                &colorData[0],
-			                wrap::szToUI(colorData.size() * sizeof(decltype(colorData.data()))),
+			                wrap::toUnsigned(colorData.size() * sizeof(decltype(colorData.data()))),
 			                &bytesWritten,
 			                nullptr);
 		}
@@ -4137,7 +4137,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		if (colorFile != INVALID_HANDLE_VALUE) {
 			wrap::WriteFile(colorFile,
 			                &colorData[2],
-			                wrap::szToUI((colorData.size() - 2) * sizeof(decltype(colorData.data()))),
+			                wrap::toUnsigned((colorData.size() - 2) * sizeof(decltype(colorData.data()))),
 			                &bytesWritten,
 			                nullptr);
 		}
@@ -4377,7 +4377,7 @@ void thred::internal::sav() {
 		auto flag       = true;
 		auto DSTRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
-		DSTRecords.reserve(wrap::uiToSz(PCSHeader.stitchCount) + 128u);
+		DSTRecords.reserve(wrap::toSize(PCSHeader.stitchCount) + 128u);
 		auto DSTOffsetData   = DSTOffsets {};
 		auto PCSStitchBuffer = std::vector<PCSTCH> {};
 		auto auxName         = utf::Utf16ToUtf8(*AuxName);
@@ -4429,7 +4429,7 @@ void thred::internal::sav() {
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
 			wrap::WriteFile(PCSFileHandle,
 			                DSTRecords.data(),
-			                wrap::szToUI(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
+			                wrap::toUnsigned(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
 			                &bytesWritten,
 			                nullptr);
 			break;
@@ -4464,7 +4464,7 @@ void thred::internal::sav() {
 			pesHeader.ysiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f)));
 			OutputIndex    = 0;
 			// ToDo - convert to vector ?
-			auto* pesStitchBuffer = new unsigned char[wrap::uiToSz(PCSHeader.stitchCount * 8u)];
+			auto* pesStitchBuffer = new unsigned char[wrap::toSize(PCSHeader.stitchCount * 8u)];
 			auto  bufferIndex     = 0u; // Index into the unsigned char array
 			auto* blockHeader     = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
 			auto  threadList      = std::vector<PESCOLORLIST> {};
@@ -4653,7 +4653,7 @@ void thred::internal::sav() {
 				}
 				auto iPCSstitch = 0u;
 				auto savcol     = 0xffu;
-				PCSStitchBuffer.resize(wrap::uiToSz(PCSHeader.stitchCount) + ColorChanges + 2u);
+				PCSStitchBuffer.resize(wrap::toSize(PCSHeader.stitchCount) + ColorChanges + 2u);
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 					if ((saveStitches[iStitch].attribute & COLMSK) != savcol) {
 						savcol                           = saveStitches[iStitch].attribute & COLMSK;
@@ -5013,7 +5013,7 @@ void thred::internal::sidmsg(HWND window, std::wstring* const strings, unsigned 
 
 void thred::internal::centr() {
 	const auto center
-	    = POINT { wrap::dToL((ZoomRect.right - ZoomRect.left) / 2.0), wrap::dToL((ZoomRect.top - ZoomRect.bottom) / 2.0) };
+	    = POINT { wrap::toLong((ZoomRect.right - ZoomRect.left) / 2.0), wrap::toLong((ZoomRect.top - ZoomRect.bottom) / 2.0) };
 
 	SelectedPoint.x = ZoomRect.left + center.x;
 	SelectedPoint.y = ZoomRect.bottom + center.y;
@@ -5249,8 +5249,8 @@ bool thred::internal::binv(const std::vector<unsigned char>& monoBitmapData, uns
 
 	for (auto iHeight = 0u; iHeight < BitmapHeight; iHeight++) {
 		GSL_SUPPRESS(26429) {
-			if ((wrap::uiToSz(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
-				const auto bcpnt = &monoBitmapData[wrap::uiToSz(bitmapWidthInBytes) * iHeight];
+			if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
+				const auto bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
 				for (auto iBytes = 0u; iBytes < byteCount; iBytes++) {
 					if (bcpnt[iBytes] == 0u) {
 						blackBits++;
@@ -5340,7 +5340,7 @@ void thred::internal::savmap() {
 			WriteFile(BitmapFileHandle, &BitmapFileHeader, 14, &bytesWritten, nullptr);
 			WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14, &bytesWritten, nullptr);
 			auto buffer = std::vector<unsigned char> {};
-			buffer.resize((wrap::uiToSz(BitmapWidth) * BitmapHeight * 3u) + 1u);
+			buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3u) + 1u);
 			movmap(BitmapWidth * BitmapHeight, buffer.data());
 			WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
 			CloseHandle(BitmapFileHandle);
@@ -5443,8 +5443,8 @@ void thred::internal::bfil() {
 				GdiFlush();
 				if (bits != nullptr) {
 					for (auto iHeight = 0u; iHeight < BitmapHeight; iHeight++) {
-						bitlin(&monoBitmapData[wrap::uiToSz(iHeight) * bitmapWidthBytes],
-						       &bits[wrap::uiToSz(iHeight) * BitmapWidth],
+						bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
+						       &bits[wrap::toSize(iHeight) * BitmapWidth],
 						       background,
 						       foreground);
 					}
@@ -5517,7 +5517,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 
 	auto iColor = 2u;
 	auto color  = 0u;
-	if (bytesRead >= ((wrap::uiToSz(iColor) + 1u) * sizeof(decltype(colors.back())))) {
+	if (bytesRead >= ((wrap::toSize(iColor) + 1u) * sizeof(decltype(colors.back())))) {
 		color = colmatch(colors[iColor++]);
 	}
 	else {
@@ -5529,7 +5529,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	auto iStitch           = 0u;
 	for (auto& record : DSTData) {
 		if ((record.nd & 0x40) != 0) {
-			if (bytesRead >= ((wrap::uiToSz(iColor) + 1u) * sizeof(decltype(colors.back())))) {
+			if (bytesRead >= ((wrap::toSize(iColor) + 1u) * sizeof(decltype(colors.back())))) {
 				color = colmatch(colors[iColor++]);
 			}
 			else {
@@ -5563,11 +5563,11 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	PCSHeader.stitchCount = gsl::narrow<unsigned short>(iStitch);
 	const auto dstSize    = fPOINT { maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y };
 	IniFile.hoopType      = CUSTHUP;
-	UnzoomedRect          = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+	UnzoomedRect          = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 	if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
 		IniFile.hoopSizeX = dstSize.x * 1.1f;
 		IniFile.hoopSizeY = dstSize.y * 1.1f;
-		UnzoomedRect      = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+		UnzoomedRect      = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 		displayText::hsizmsg();
 	}
 	const auto delta = fPOINT { (UnzoomedRect.x - dstSize.x) / 2 - mimimumCoordinate.x,
@@ -5764,7 +5764,7 @@ void thred::internal::nuFil() {
 						}
 						IniFile.hoopSizeX = ExtendedHeader.hoopSizeX;
 						IniFile.hoopSizeY = ExtendedHeader.hoopSizeY;
-						UnzoomedRect      = { wrap::fToL(ExtendedHeader.hoopSizeX), wrap::fToL(ExtendedHeader.hoopSizeY) };
+						UnzoomedRect      = { wrap::toLong(ExtendedHeader.hoopSizeX), wrap::toLong(ExtendedHeader.hoopSizeY) };
 						redfnam(*DesignerName);
 						break;
 					}
@@ -5777,7 +5777,7 @@ void thred::internal::nuFil() {
 					ZoomRect.left         = 0;
 					ZoomRect.right        = IniFile.hoopSizeX;
 					ZoomRect.top          = IniFile.hoopSizeY;
-					UnzoomedRect          = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+					UnzoomedRect          = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					auto stitchesRead     = DWORD { 0 };
 					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]), &stitchesRead, nullptr);
@@ -5905,7 +5905,7 @@ void thred::internal::nuFil() {
 								TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							TextureIndex = wrap::szToUI(TexturePointsBuffer->size());
+							TextureIndex = wrap::toUnsigned(TexturePointsBuffer->size());
 						}
 						else {
 							TextureIndex = 0;
@@ -6152,7 +6152,7 @@ void thred::internal::nuFil() {
 			thred::ritot(PCSHeader.stitchCount);
 			// BufferIndex     = 0;
 			ZoomRect     = { IniFile.hoopSizeY, 0, 0, IniFile.hoopSizeX };
-			UnzoomedRect = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+			UnzoomedRect = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 			thred::movStch();
 			thred::coltab();
 			StateMap.reset(StateFlag::ZUMED);
@@ -6312,23 +6312,23 @@ void thred::internal::zumin() {
 			if (!SelectedFormList->empty()) {
 				auto        firstForm = SelectedFormList->front();
 				const auto& firstRect = (*FormList)[firstForm].rectangle;
-				SelectedFormsRect     = { wrap::fToL(firstRect.left),
-                                      wrap::fToL(firstRect.top),
-                                      wrap::fToL(firstRect.right),
-                                      wrap::fToL(firstRect.bottom) };
+				SelectedFormsRect     = { wrap::toLong(firstRect.left),
+                                      wrap::toLong(firstRect.top),
+                                      wrap::toLong(firstRect.right),
+                                      wrap::toLong(firstRect.bottom) };
 				for (auto selectedForm : (*SelectedFormList)) {
 					const auto& rect = (*FormList)[selectedForm].rectangle;
 					if (rect.bottom < SelectedFormsRect.bottom) {
-						SelectedFormsRect.bottom = wrap::fToL(rect.bottom);
+						SelectedFormsRect.bottom = wrap::toLong(rect.bottom);
 					}
 					if (rect.top > SelectedFormsRect.top) {
-						SelectedFormsRect.top = wrap::fToL(rect.top);
+						SelectedFormsRect.top = wrap::toLong(rect.top);
 					}
 					if (rect.left < SelectedFormsRect.left) {
-						SelectedFormsRect.left = wrap::fToL(rect.left);
+						SelectedFormsRect.left = wrap::toLong(rect.left);
 					}
 					if (rect.right > SelectedFormsRect.right) {
-						SelectedFormsRect.right = wrap::fToL(rect.right);
+						SelectedFormsRect.right = wrap::toLong(rect.right);
 					}
 				}
 				SelectedPoint.x
@@ -6770,8 +6770,8 @@ unsigned thred::internal::closlin() {
 					const auto layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
 					if ((ActiveLayer == 0u) || (layer == 0u) || (layer == ActiveLayer)) {
 						auto       boundingRect = dRECTANGLE {};
-						const auto xba          = wrap::fToL(stitches[iStitch + 1].x - stitches[iStitch].x);
-						const auto yab          = wrap::fToL(stitches[iStitch].y - stitches[iStitch + 1].y);
+						const auto xba          = wrap::toLong(stitches[iStitch + 1].x - stitches[iStitch].x);
+						const auto yab          = wrap::toLong(stitches[iStitch].y - stitches[iStitch + 1].y);
 						if (xba > 0) {
 							boundingRect.left  = gsl::narrow_cast<double>(stitches[iStitch].x) - tolerance;
 							boundingRect.right = gsl::narrow_cast<double>(stitches[iStitch + 1].x) + tolerance;
@@ -7093,11 +7093,11 @@ void thred::internal::clpbox() {
 	if (SelectedPoint.y + ClipRectSize.cy > UnzoomedRect.y) {
 		SelectedPoint.y = UnzoomedRect.y - ClipRectSize.cy;
 	}
-	ClipOrigin              = { wrap::fToL(SelectedPoint.x), wrap::fToL(SelectedPoint.y) };
-	const auto adjustedSize = SIZE { wrap::dToL(ClipRectSize.cx * ratio + 0.5), wrap::dToL(ClipRectSize.cy * ratio + 0.5) };
+	ClipOrigin              = { wrap::toLong(SelectedPoint.x), wrap::toLong(SelectedPoint.y) };
+	const auto adjustedSize = SIZE { wrap::toLong(ClipRectSize.cx * ratio + 0.5), wrap::toLong(ClipRectSize.cy * ratio + 0.5) };
 	StitchCoordinatesPixels
-	    = { wrap::dToL((SelectedPoint.x - ZoomRect.left) * ratio + 0.5),
-		    wrap::dToL(StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom) * ratio + 0.5 - adjustedSize.cy) };
+	    = { wrap::toLong((SelectedPoint.x - ZoomRect.left) * ratio + 0.5),
+		    wrap::toLong(StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom) * ratio + 0.5 - adjustedSize.cy) };
 	ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = StitchCoordinatesPixels.x;
 	ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = StitchCoordinatesPixels.y;
 	ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + adjustedSize.cx;
@@ -7112,7 +7112,7 @@ void thred::internal::lodclp(unsigned iStitch) {
 	if (PCSHeader.stitchCount != 0u) {
 		source--;
 	}
-	const auto clipSize    = wrap::szToUI(ClipBuffer->size());
+	const auto clipSize    = wrap::toUnsigned(ClipBuffer->size());
 	auto       destination = PCSHeader.stitchCount + clipSize;
 	if ((PCSHeader.stitchCount != 0u) || (clipSize != 0u)) {
 		destination--;
@@ -7161,8 +7161,8 @@ void thred::internal::rSelbox() {
 		SelectedPoint.y = SelectBoxOffset.y;
 	}
 	StitchCoordinatesPixels
-	    = { wrap::dToL((SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio + 0.5),
-		    wrap::dToL(StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio + 0.5
+	    = { wrap::toLong((SelectedPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio + 0.5),
+		    wrap::toLong(StitchWindowClientRect.bottom - (SelectedPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio + 0.5
 		               - adjustedSelectSize.cy) };
 	auto& formControls = *FormControlPoints;
 	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = StitchCoordinatesPixels.x;
@@ -7178,9 +7178,9 @@ void thred::internal::rSelbox() {
 void thred::internal::duSelbox() {
 	thred::px2stch();
 	SelectBoxSize
-	    = { wrap::fToL(StitchRangeRect.right - StitchRangeRect.left), wrap::fToL(StitchRangeRect.top - StitchRangeRect.bottom) };
+	    = { wrap::toLong(StitchRangeRect.right - StitchRangeRect.left), wrap::toLong(StitchRangeRect.top - StitchRangeRect.bottom) };
 	SelectBoxOffset
-	    = { wrap::fToL(SelectedPoint.x - StitchRangeRect.left), wrap::fToL(SelectedPoint.y - StitchRangeRect.bottom) };
+	    = { wrap::toLong(SelectedPoint.x - StitchRangeRect.left), wrap::toLong(SelectedPoint.y - StitchRangeRect.bottom) };
 }
 
 void thred::internal::setbak(unsigned penWidth) noexcept {
@@ -7206,13 +7206,13 @@ void thred::internal::stchbox(unsigned iStitch, HDC dc) {
 }
 
 void thred::sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) {
-	pixelCoordinate = { wrap::dToL((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
-		                wrap::dToL(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5) };
+	pixelCoordinate = { wrap::toLong((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
+		                wrap::toLong(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5) };
 }
 
 void thred::internal::sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate) {
-	pixelCoordinate = { wrap::dToL((stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5),
-		                wrap::dToL(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y + 0.5) };
+	pixelCoordinate = { wrap::toLong((stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5),
+		                wrap::toLong(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y + 0.5) };
 }
 
 void thred::internal::durot() noexcept {
@@ -7562,7 +7562,7 @@ void thred::internal::duclip() {
 			ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 			ThrEdClipPointer
 			    = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-			                  (wrap::uiToSz(SelectedFormVertices.vertexCount) + 1u) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
+			                  (wrap::toSize(SelectedFormVertices.vertexCount) + 1u) * sizeof(fPOINT) + sizeof(FORMVERTEXCLIP));
 			GSL_SUPPRESS(26429) {
 				if (ThrEdClipPointer != nullptr) {
 					auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
@@ -7609,7 +7609,7 @@ void thred::internal::duclip() {
 					length += sizfclp();
 					msiz += FileSize;
 				}
-				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::uiToSz(msiz) + length);
+				ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length);
 				GSL_SUPPRESS(26429) {
 					if (ThrEdClipPointer != nullptr) {
 						ClipFormsHeader            = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
@@ -8415,10 +8415,10 @@ void thred::internal::delet() {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		auto eraseStart = std::next(FormVertices->cbegin(), wrap::uiToSz(CurrentVertexIndex) + currentFormVertex);
+		auto eraseStart = std::next(FormVertices->cbegin(), wrap::toSize(CurrentVertexIndex) + currentFormVertex);
 		auto eraseEnd   = std::next(eraseStart, (VertexCount - currentFormVertex));
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
-		const auto nextForm = wrap::uiToSz(ClosestFormToCursor) + 1u;
+		const auto nextForm = wrap::toSize(ClosestFormToCursor) + 1u;
 		for (auto iForm = std::next(FormList->begin(), nextForm); iForm < FormList->end(); iForm++) {
 			iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1;
 		}
@@ -8892,10 +8892,10 @@ void thred::internal::insfil() {
 					InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
 					InsertedFormIndex      = gsl::narrow<decltype(InsertedFormIndex)>(FormList->size());
 					if (fileHeader.formCount != 0u) {
-						const auto newFormVertexIndex = wrap::szToUI(FormVertices->size());
-						auto       newSatinGuideIndex = wrap::szToUI(SatinGuides->size());
-						auto       clipOffset         = wrap::szToUI(ClipPoints->size());
-						auto       textureOffset      = wrap::szToUI(TexturePointsBuffer->size());
+						const auto newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
+						auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
+						auto       clipOffset         = wrap::toUnsigned(ClipPoints->size());
+						auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
 						if (version < 2) {
 							auto inFormList = std::vector<FRMHEDO> {};
 							inFormList.resize(fileHeader.formCount);
@@ -8922,7 +8922,7 @@ void thred::internal::insfil() {
 								FormList->push_back(FRMHED { form });
 							}
 						}
-						auto vertexOffset = wrap::szToUI(FormVertices->size());
+						auto vertexOffset = wrap::toUnsigned(FormVertices->size());
 						if (fileHeader.vertexCount != 0u) {
 							auto inFormVertices = std::vector<fPOINT> {};
 							inFormVertices.resize(fileHeader.vertexCount);
@@ -8938,7 +8938,7 @@ void thred::internal::insfil() {
 						else {
 							StateMap.set(StateFlag::BADFIL);
 						}
-						auto guideOffset = wrap::szToUI(SatinGuides->size());
+						auto guideOffset = wrap::toUnsigned(SatinGuides->size());
 						if (fileHeader.dlineCount != 0u) {
 							auto inSatinGuides = std::vector<SATCONOUT> {};
 							inSatinGuides.resize(fileHeader.dlineCount);
@@ -8951,7 +8951,7 @@ void thred::internal::insfil() {
 							for (auto& guide : inSatinGuides) {
 								SatinGuides->push_back(SATCON { guide });
 							}
-							newSatinGuideIndex += wrap::szToUI(inSatinGuides.size());
+							newSatinGuideIndex += wrap::toUnsigned(inSatinGuides.size());
 						}
 						if (fileHeader.clipDataCount != 0u) {
 							auto tempClipPoints = std::vector<fPOINT> {};
@@ -9080,9 +9080,9 @@ void thred::internal::insfil() {
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 						                               insertedRectangle.top - insertedRectangle.bottom };
 					form::ratsr();
-					InsertSize.x = wrap::dToL(insertedSize.x * HorizontalRatio);
+					InsertSize.x = wrap::toLong(insertedSize.x * HorizontalRatio);
 					// ToDo - Should this be vertical ratio?
-					InsertSize.y = wrap::dToL(insertedSize.y * HorizontalRatio);
+					InsertSize.y = wrap::toLong(insertedSize.y * HorizontalRatio);
 					const auto initialInsertPoint
 					    = POINT { StitchWindowClientRect.right >> 1, StitchWindowClientRect.bottom >> 1 };
 					insflin(initialInsertPoint);
@@ -9149,9 +9149,9 @@ void thred::internal::insfil() {
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 						                               insertedRectangle.top - insertedRectangle.bottom };
 					form::ratsr();
-					InsertSize.x = wrap::dToL(insertedSize.x * HorizontalRatio);
+					InsertSize.x = wrap::toLong(insertedSize.x * HorizontalRatio);
 					// ToDo - Should this be vertical ratio?
-					InsertSize.y = wrap::dToL(insertedSize.y * HorizontalRatio);
+					InsertSize.y = wrap::toLong(insertedSize.y * HorizontalRatio);
 					const auto initialInsertPoint
 					    = POINT { StitchWindowClientRect.right >> 1, StitchWindowClientRect.bottom >> 1 };
 					insflin(initialInsertPoint);
@@ -9665,12 +9665,12 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio
 	auto& formLines = *FormLines;
 	formLines.resize(5);
 	for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-		formLines[iCorner] = (*SelectedFormsLine)[wrap::uiToSz(iCorner) << 1];
+		formLines[iCorner] = (*SelectedFormsLine)[wrap::toSize(iCorner) << 1];
 	}
 	formLines[4] = formLines[0];
 	if (minimumLength < CLOSENUF) {
 		for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-			stretchBoxLine[iCorner] = (*SelectedFormsLine)[wrap::uiToSz(iCorner) << 1];
+			stretchBoxLine[iCorner] = (*SelectedFormsLine)[wrap::toSize(iCorner) << 1];
 		}
 		stretchBoxLine[4] = stretchBoxLine[0];
 		thred::strtchbox(stretchBoxLine);
@@ -9735,7 +9735,7 @@ void thred::internal::dufsel() {
 		finish = ClosestFormToCursor;
 	}
 	SelectedFormList->clear();
-	SelectedFormList->reserve(wrap::uiToSz(finish) - start + 1u);
+	SelectedFormList->reserve(wrap::toSize(finish) - start + 1u);
 	while (start <= finish) {
 		SelectedFormList->push_back(start);
 		start++;
@@ -10593,7 +10593,7 @@ void thred::internal::sidhup() {
 	                                 nullptr);
 	for (auto iHoop = 0u; iHoop < HUPS; iHoop++) {
 		SideWindow[iHoop] = CreateWindow(L"STATIC",
-		                                 (*StringTable)[wrap::uiToSz(iHoop) + STR_HUP0].c_str(),
+		                                 (*StringTable)[wrap::toSize(iHoop) + STR_HUP0].c_str(),
 		                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                 3,
 		                                 ButtonHeight * iHoop + 3,
@@ -10754,8 +10754,8 @@ void thred::internal::defpref() {
 	UserFlagMap.set(UserFlag::FIL2OF);
 	fil2men();
 	BackgroundColor              = 0xa8c4b1;
-	UnzoomedRect.x               = wrap::fToL(IniFile.hoopSizeX);
-	UnzoomedRect.y               = wrap::fToL(IniFile.hoopSizeY);
+	UnzoomedRect.x               = wrap::toLong(IniFile.hoopSizeX);
+	UnzoomedRect.y               = wrap::toLong(IniFile.hoopSizeY);
 	IniFile.waveEnd              = IWAVEND;
 	IniFile.wavePoints           = IWAVPNTS;
 	IniFile.waveLobes            = IWAVS;
@@ -11813,7 +11813,7 @@ void thred::internal::setpclp() {
 void thred::internal::dupclp() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	wrap::Polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::szToUI(FormVerticesAsLine->size()));
+	wrap::Polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -11829,7 +11829,7 @@ void thred::internal::fixpclp() {
 	auto       it    = std::next(InterleaveSequence->begin(), 1);
 	thred::pxCor2stch(point);
 	const auto offset = fPOINT { SelectedPoint.x - it->x, SelectedPoint.y - it->y };
-	const auto count  = wrap::szToUI(InterleaveSequence->size() - 2u);
+	const auto count  = wrap::toUnsigned(InterleaveSequence->size() - 2u);
 	form::fltspac(form::nxt(ClosestVertexToCursor), count);
 	SelectedForm->vertexCount += count;
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
@@ -11950,8 +11950,8 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, unsigned currentSti
 			const auto layer = (activeStitch[iOffset].attribute & LAYMSK) >> LAYSHFT;
 			if ((ActiveLayer == 0u) || (layer == 0u) || (layer == ActiveLayer)) {
 				linePoints[LineIndex++]
-				    = { wrap::dToL((activeStitch[iOffset].x - ZoomRect.left) * ZoomRatio.x),
-					    wrap::dToL(StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom) * ZoomRatio.y) };
+				    = { wrap::toLong((activeStitch[iOffset].x - ZoomRect.left) * ZoomRatio.x),
+					    wrap::toLong(StitchWindowClientRect.bottom - (activeStitch[iOffset].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 		}
 		SelectObject(StitchWindowMemDC, hPen);
@@ -11977,14 +11977,14 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, unsigned currentSti
 		const auto layer = (activeStitch[iOffset].attribute & LAYMSK) >> LAYSHFT;
 		if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
 			if (iOffset != 0u) {
-				linePoints[0] = { wrap::dToL((activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x),
-					              wrap::dToL(StitchWindowClientRect.bottom
+				linePoints[0] = { wrap::toLong((activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x),
+					              wrap::toLong(StitchWindowClientRect.bottom
 					                         - (activeStitch[iOffset - 1].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 			else {
 				linePoints[0]
-				    = { wrap::dToL((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
-					    wrap::dToL(StitchWindowClientRect.bottom - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
+				    = { wrap::toLong((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
+					    wrap::toLong(StitchWindowClientRect.bottom - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 		}
 	}
@@ -12190,13 +12190,13 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.test(StateFlag::MOVFRMS)) {
 			unstrtch(stretchBoxLine);
 			stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x
-			    = Msg.pt.x - wrap::fToL(FormMoveDelta.x) - StitchWindowOrigin.x;
+			    = Msg.pt.x - wrap::toLong(FormMoveDelta.x) - StitchWindowOrigin.x;
 			stretchBoxLine[1].x = stretchBoxLine[2].x
-			    = Msg.pt.x + wrap::fToL(SelectedFormsSize.x) - wrap::fToL(FormMoveDelta.x) - StitchWindowOrigin.x;
+			    = Msg.pt.x + wrap::toLong(SelectedFormsSize.x) - wrap::toLong(FormMoveDelta.x) - StitchWindowOrigin.x;
 			stretchBoxLine[0].y = stretchBoxLine[1].y = stretchBoxLine[4].y
-			    = Msg.pt.y - wrap::fToL(FormMoveDelta.y) - StitchWindowOrigin.y;
+			    = Msg.pt.y - wrap::toLong(FormMoveDelta.y) - StitchWindowOrigin.y;
 			stretchBoxLine[2].y = stretchBoxLine[3].y
-			    = Msg.pt.y + wrap::fToL(SelectedFormsSize.y) - wrap::fToL(FormMoveDelta.y) - StitchWindowOrigin.y;
+			    = Msg.pt.y + wrap::toLong(SelectedFormsSize.y) - wrap::toLong(FormMoveDelta.y) - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOSTRTCH);
 			thred::strtchbox(stretchBoxLine);
 			return true;
@@ -12224,12 +12224,12 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 					    = (gsl::narrow_cast<double>(stretchBoxLine[iSide].x) - newSize.x) / xyRatio + stretchBoxLine[iSide].y;
 				}
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].y = wrap::dToL(newSize.y);
+				stretchBoxLine[iSide].y = wrap::toLong(newSize.y);
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].x = wrap::dToL(newSize.x);
-				stretchBoxLine[iSide].y = wrap::dToL(newSize.y);
+				stretchBoxLine[iSide].x = wrap::toLong(newSize.x);
+				stretchBoxLine[iSide].y = wrap::toLong(newSize.y);
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].x = wrap::dToL(newSize.x);
+				stretchBoxLine[iSide].x = wrap::toLong(newSize.x);
 			}
 			else {
 				if (ratio < xyRatio) {
@@ -12240,12 +12240,12 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 					    = (gsl::narrow_cast<double>(newSize.x) - stretchBoxLine[iSide].x) / xyRatio + stretchBoxLine[iSide].y;
 				}
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].x = wrap::dToL(newSize.x);
+				stretchBoxLine[iSide].x = wrap::toLong(newSize.x);
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].x = wrap::dToL(newSize.x);
-				stretchBoxLine[iSide].y = wrap::dToL(newSize.y);
+				stretchBoxLine[iSide].x = wrap::toLong(newSize.x);
+				stretchBoxLine[iSide].y = wrap::toLong(newSize.y);
 				iSide                   = nxtcrnr(iSide);
-				stretchBoxLine[iSide].y = wrap::dToL(newSize.y);
+				stretchBoxLine[iSide].y = wrap::toLong(newSize.y);
 			}
 			stretchBoxLine[4] = stretchBoxLine[0];
 			StateMap.set(StateFlag::SHOSTRTCH);
@@ -12429,8 +12429,8 @@ bool thred::internal::handleLeftButtonUp(double xyRatio, double rotationAngle, c
 	movchk();
 	if (StateMap.testAndReset(StateFlag::MOVFRMS)) {
 		thred::savdo();
-		const auto point = POINT { (Msg.pt.x - wrap::dToL(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
-			                       (Msg.pt.y - wrap::dToL(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top };
+		const auto point = POINT { (Msg.pt.x - wrap::toLong(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
+			                       (Msg.pt.y - wrap::toLong(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top };
 		form::ratsr();
 		FormMoveDelta.x = point.x / HorizontalRatio;
 		FormMoveDelta.y = point.y / VerticalRatio;
@@ -12726,14 +12726,14 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 		if (Msg.message == WM_RBUTTONDOWN) {
 			if (((Msg.wParam & MK_SHIFT) != 0u) && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 				unbox();
-				GroupStitchIndex = wrap::dToUI(colorBarPosition * PCSHeader.stitchCount);
+				GroupStitchIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
 				StateMap.set(StateFlag::GRPSEL);
 				thred::grpAdj();
 				nuAct(GroupStitchIndex);
 				StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-				ClosestPointIndex = wrap::dToUI(colorBarPosition * PCSHeader.stitchCount);
+				ClosestPointIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
 				nuAct(ClosestPointIndex);
 				movbox();
 				if (StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -12744,7 +12744,7 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 			}
 		}
 		else {
-			ClosestPointIndex = wrap::dToUI(colorBarPosition * PCSHeader.stitchCount);
+			ClosestPointIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
 			nuAct(ClosestPointIndex);
 			rstAll();
 			StateMap.set(StateFlag::SELBOX);
@@ -13039,7 +13039,7 @@ bool thred::internal::updateHoopSize() {
 				break;
 			}
 			}
-			UnzoomedRect = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+			UnzoomedRect = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 			form::sethup();
 			chkhup();
 			break;
@@ -14028,7 +14028,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		auto& controlPoint = *FormControlPoints;
 		if (iselpnt()) {
 			for (auto iSide = 0u; iSide < 4; iSide++) {
-				stretchBoxLine[iSide] = controlPoint[wrap::uiToSz(iSide) << 1];
+				stretchBoxLine[iSide] = controlPoint[wrap::toSize(iSide) << 1];
 			}
 			stretchBoxLine[4] = stretchBoxLine[0];
 			if ((SelectedFormControlVertex & 1) != 0u) {
@@ -14258,7 +14258,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		form::refil();
 		StateMap.reset(StateFlag::FUNCLP);
 		if (StateMap.testAndReset(StateFlag::FPSEL)) {
-			form::frmout(wrap::szToUI(FormList->size() - 1u));
+			form::frmout(wrap::toUnsigned(FormList->size() - 1u));
 		}
 		StateMap.set(StateFlag::RESTCH);
 		return true;
@@ -14332,12 +14332,12 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			auto formsRect = fRECTANGLE {};
 			thred::selRct(formsRect);
 			auto& formControls = *FormControlPoints;
-			formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = wrap::fToL(formsRect.left);
-			formControls[1].x = formControls[5].x = wrap::fToL(form::midl(formsRect.right, formsRect.left));
-			formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = wrap::fToL(formsRect.top);
-			formControls[3].y = formControls[7].y = wrap::fToL(form::midl(formsRect.top, formsRect.bottom));
-			formControls[4].y = formControls[5].y = formControls[6].y = wrap::fToL(formsRect.bottom);
-			formControls[2].x = formControls[3].x = formControls[4].x = wrap::fToL(formsRect.right);
+			formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = wrap::toLong(formsRect.left);
+			formControls[1].x = formControls[5].x = wrap::toLong(form::midl(formsRect.right, formsRect.left));
+			formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = wrap::toLong(formsRect.top);
+			formControls[3].y = formControls[7].y = wrap::toLong(form::midl(formsRect.top, formsRect.bottom));
+			formControls[4].y = formControls[5].y = formControls[6].y = wrap::toLong(formsRect.bottom);
+			formControls[2].x = formControls[3].x = formControls[4].x = wrap::toLong(formsRect.right);
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 			return true;
@@ -14669,7 +14669,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				thred::duzrat();
 				auto byteCount
 				    = sizeof(*ClipFormVerticesData)
-				      + (wrap::uiToSz(ClipFormVerticesData->vertexCount) + 1u) * sizeof(decltype(FormVertices->back()));
+				      + (wrap::toSize(ClipFormVerticesData->vertexCount) + 1u) * sizeof(decltype(FormVertices->back()));
 				auto clipCopyBuffer = std::vector<unsigned char> {};
 				clipCopyBuffer.resize(byteCount);
 				auto clipPointer = gsl::narrow_cast<unsigned char*>(ClipPointer);
@@ -14681,7 +14681,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					form::fvars(ClosestFormToCursor);
 					auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 					InterleaveSequence->clear();
-					InterleaveSequence->reserve(wrap::uiToSz(ClipFormVerticesData->vertexCount) + 3u);
+					InterleaveSequence->reserve(wrap::toSize(ClipFormVerticesData->vertexCount) + 3u);
 					InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
 					auto clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 					// Todo - localize iVertex into the loop
@@ -14725,7 +14725,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				auto iForm            = 0u;
 				ClipFormsCount        = ClipFormsHeader->formCount;
 				auto       forms      = convert_ptr<FRMHED*>(&ClipFormsHeader[1]);
-				const auto formOffset = wrap::szToUI(FormList->size());
+				const auto formOffset = wrap::toUnsigned(FormList->size());
 				for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 					FormList->push_back(FRMHED {});
 					auto& formIter     = FormList->back();
@@ -14782,7 +14782,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				auto textureCount  = 0;
 				for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 					if (texture::istx(formOffset + iForm)) {
-						SelectedForm = &((*FormList)[wrap::uiToSz(formOffset) + iForm]);
+						SelectedForm = &((*FormList)[wrap::toSize(formOffset) + iForm]);
 						textureCount += SelectedForm->fillInfo.texture.count;
 						SelectedForm->fillInfo.texture.index += gsl::narrow<unsigned short>(TextureIndex);
 					}
@@ -14841,7 +14841,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					}
 					auto       clipData      = convert_ptr<fPOINT*>(&guides[0]);
 					auto       clipCount     = 0u;
-					const auto lastFormIndex = wrap::szToUI(FormList->size() - 1u);
+					const auto lastFormIndex = wrap::toUnsigned(FormList->size() - 1u);
 					if (clip::isclpx(lastFormIndex)) {
 						formIter.angleOrClipData.clip = thred::adclp(formIter.lengthOrCount.clipCount);
 						auto destination              = std::next(ClipPoints->begin(), formIter.angleOrClipData.clip);
@@ -17377,7 +17377,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				break;
 			}
 			case VK_END: {
-				ThumbnailIndex = wrap::szToUI(Thumbnails->size());
+				ThumbnailIndex = wrap::toUnsigned(Thumbnails->size());
 				nuthbak(4);
 				break;
 			}
@@ -17609,7 +17609,7 @@ void thred::internal::ritloc() {
 		if (lockFile != INVALID_HANDLE_VALUE) {
 			auto bytesWritten = DWORD { 0 };
 			auto value        = utf::Utf16ToUtf8(*HomeDirectory);
-			wrap::WriteFile(lockFile, value.data(), wrap::szToUI(value.size() + 1), &bytesWritten, nullptr);
+			wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size() + 1), &bytesWritten, nullptr);
 			CloseHandle(lockFile);
 		}
 	}
@@ -17858,7 +17858,7 @@ void thred::internal::redini() {
 			IniFile.hoopSizeY = LHUPY;
 		}
 		}
-		UnzoomedRect = { wrap::fToL(IniFile.hoopSizeX), wrap::fToL(IniFile.hoopSizeY) };
+		UnzoomedRect = { wrap::toLong(IniFile.hoopSizeX), wrap::toLong(IniFile.hoopSizeY) };
 		PicotSpacing = IniFile.picotSpace;
 	}
 	if (IniFile.gridColor == 0u) {
@@ -18127,7 +18127,7 @@ void thred::internal::init() {
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
 	wrap::GetTextExtentPoint32(
-	    ThredDC, (*StringTable)[STR_PIKOL].c_str(), wrap::szToUI((*StringTable)[STR_PIKOL].size()), &PickColorMsgSize);
+	    ThredDC, (*StringTable)[STR_PIKOL].c_str(), wrap::toUnsigned((*StringTable)[STR_PIKOL].size()), &PickColorMsgSize);
 	auxmen();
 	fnamtabs();
 	ritfnam(*DesignerName);
@@ -18251,17 +18251,17 @@ bool thred::internal::bitar() {
 	    = dPOINT { gsl::narrow_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
 		           gsl::narrow_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom) };
 
-	BitmapDstRect = { wrap::dToL(differenceRect.left * bitmapStitchRatio.x),
-		              wrap::dToL(differenceRect.top * bitmapStitchRatio.y),
-		              wrap::dToL(StitchWindowClientRect.right - differenceRect.right * bitmapStitchRatio.x),
-		              wrap::dToL(StitchWindowClientRect.bottom - differenceRect.bottom * bitmapStitchRatio.y) };
+	BitmapDstRect = { wrap::toLong(differenceRect.left * bitmapStitchRatio.x),
+		              wrap::toLong(differenceRect.top * bitmapStitchRatio.y),
+		              wrap::toLong(StitchWindowClientRect.right - differenceRect.right * bitmapStitchRatio.x),
+		              wrap::toLong(StitchWindowClientRect.bottom - differenceRect.bottom * bitmapStitchRatio.y) };
 	return true;
 }
 
 inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) {
-	// ToDo - is 0.5 still required with dToL?
-	point = { wrap::dToL((stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5),
-		      wrap::dToL(StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
+	// ToDo - is 0.5 still required with toLong?
+	point = { wrap::toLong((stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5),
+		      wrap::toLong(StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5) };
 }
 
 void thred::internal::drwknot() {
@@ -18306,7 +18306,7 @@ void thred::internal::dugrid() {
 		gridLine[1].x          = StitchWindowClientRect.right;
 		for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; iGrid++) {
 			gridLine[0].y = gridLine[1].y
-			    = wrap::dToL(StitchWindowClientRect.bottom
+			    = wrap::toLong(StitchWindowClientRect.bottom
 			                 - (gsl::narrow_cast<double>(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
@@ -18314,7 +18314,7 @@ void thred::internal::dugrid() {
 		gridLine[1].y = StitchWindowClientRect.bottom;
 		for (auto iGrid = gridRect.left; iGrid <= gridRect.right; iGrid++) {
 			gridLine[0].x = gridLine[1].x
-			    = wrap::dToL((gsl::narrow_cast<double>(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5);
+			    = wrap::toLong((gsl::narrow_cast<double>(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -18352,7 +18352,7 @@ void thred::internal::drwStch() {
 		}
 	}
 	auto linePoints = std::vector<POINT> {};
-	linePoints.resize(wrap::uiToSz(stitchCount) + 2u);
+	linePoints.resize(wrap::toSize(stitchCount) + 2u);
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	thred::duzrat();
 	if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
@@ -18381,11 +18381,11 @@ void thred::internal::drwStch() {
 			ScrollInfo.fMask  = SIF_ALL;
 			ScrollInfo.nMax   = UnzoomedRect.y;
 			ScrollInfo.nMin   = 0;
-			ScrollInfo.nPage  = wrap::dToL(ZoomRect.top - ZoomRect.bottom);
+			ScrollInfo.nPage  = wrap::toLong(ZoomRect.top - ZoomRect.bottom);
 			ScrollInfo.nPos   = gsl::narrow<decltype(ScrollInfo.nPos)>(std::round(UnzoomedRect.y - ZoomRect.top));
 			SetScrollInfo(VerticalScrollBar, SB_CTL, &ScrollInfo, TRUE);
 			ScrollInfo.nMax  = UnzoomedRect.x;
-			ScrollInfo.nPage = wrap::dToL(ZoomRect.right - ZoomRect.left);
+			ScrollInfo.nPage = wrap::toLong(ZoomRect.right - ZoomRect.left);
 			ScrollInfo.nPos  = gsl::narrow<decltype(ScrollInfo.nPos)>(std::round(ZoomRect.left));
 			SetScrollInfo(HorizontalScrollBar, SB_CTL, &ScrollInfo, TRUE);
 			ShowWindow(HorizontalScrollBar, TRUE);
@@ -18466,29 +18466,29 @@ void thred::internal::drwStch() {
 								if (StateMap.testAndSet(StateFlag::LINED)) {
 									if (StateMap.testAndSet(StateFlag::LININ)) {
 										linePoints[LineIndex++]
-										    = { wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-											    wrap::dToL(maxYcoord
+										    = { wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+											    wrap::toLong(maxYcoord
 											               - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 											               + 0.5) };
 									}
 									else {
 										if (iStitch == 0) {
 											linePoints[LineIndex++]
-											    = { wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-												    wrap::dToL(maxYcoord
+											    = { wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+												    wrap::toLong(maxYcoord
 												               - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 												               + 0.5) };
 										}
 										else {
 											linePoints[LineIndex++] = {
-												wrap::dToL((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-												wrap::dToL(maxYcoord
+												wrap::toLong((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+												wrap::toLong(maxYcoord
 												           - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y
 												           + 0.5)
 											};
 											linePoints[LineIndex++]
-											    = { wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-												    wrap::dToL(maxYcoord
+											    = { wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+												    wrap::toLong(maxYcoord
 												               - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 												               + 0.5) };
 										}
@@ -18497,21 +18497,21 @@ void thred::internal::drwStch() {
 								else {
 									if (iStitch == 0) {
 										linePoints[0]
-										    = { wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-											    wrap::dToL(maxYcoord
+										    = { wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+											    wrap::toLong(maxYcoord
 											               - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 											               + 0.5) };
 										LineIndex = 1;
 									}
 									else {
 										linePoints[0]
-										    = { wrap::dToL((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-											    wrap::dToL(maxYcoord
+										    = { wrap::toLong((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+											    wrap::toLong(maxYcoord
 											               - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y
 											               + 0.5) };
 										linePoints[1]
-										    = { wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-											    wrap::dToL(maxYcoord
+										    = { wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+											    wrap::toLong(maxYcoord
 											               - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 											               + 0.5) };
 										LineIndex = 2;
@@ -18522,8 +18522,8 @@ void thred::internal::drwStch() {
 							else {
 								if (StateMap.testAndReset(StateFlag::LININ)) {
 									linePoints[LineIndex++] = {
-										wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-										wrap::dToL(maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)
+										wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+										wrap::toLong(maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5)
 									};
 									wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 									LineIndex = 0;
@@ -18541,15 +18541,15 @@ void thred::internal::drwStch() {
 											auto gapToEdge = offset - slope * ZoomRect.top;
 											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 												stitchLine[0] = {
-													wrap::dToL((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
+													wrap::toLong((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
 													           + 0.5),
-													wrap::dToL(maxYcoord
+													wrap::toLong(maxYcoord
 													           - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.x
 													           + 0.5)
 												};
 												stitchLine[1] = {
-													wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-													wrap::dToL(maxYcoord
+													wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+													wrap::toLong(maxYcoord
 													           - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.x
 													           + 0.5)
 												};
@@ -18560,15 +18560,15 @@ void thred::internal::drwStch() {
 											gapToEdge = offset - slope * ZoomRect.bottom;
 											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
 												stitchLine[0] = {
-													wrap::dToL((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
+													wrap::toLong((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
 													           + 0.5),
-													wrap::dToL(maxYcoord
+													wrap::toLong(maxYcoord
 													           - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y
 													           + 0.5)
 												};
 												stitchLine[1] = {
-													wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
-													wrap::dToL(maxYcoord
+													wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5),
+													wrap::toLong(maxYcoord
 													           - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 													           + 0.5)
 												};
@@ -18580,17 +18580,17 @@ void thred::internal::drwStch() {
 												gapToEdge = (offset - ZoomRect.left) / slope;
 												if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
 													stitchLine[0] = {
-														wrap::dToL((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
+														wrap::toLong((currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x
 														           + 0.5),
-														wrap::dToL(maxYcoord
+														wrap::toLong(maxYcoord
 														           - (currentStitches[iStitch - 1].y - ZoomRect.bottom)
 														                 * ZoomRatio.y
 														           + 0.5)
 													};
 													stitchLine[1] = {
-														wrap::dToL((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x
+														wrap::toLong((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x
 														           + 0.5),
-														wrap::dToL(maxYcoord
+														wrap::toLong(maxYcoord
 														           - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
 														           + 0.5)
 													};
@@ -18740,13 +18740,13 @@ void thred::internal::dubar() {
 	for (auto iColorChange = 0u; iColorChange < ColorChanges; iColorChange++) {
 		const auto barSectionHeight
 		    = gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1].stitchIndex) / PCSHeader.stitchCount;
-		colorBarRect.bottom = wrap::dToL(barSectionHeight * DrawItem->rcItem.bottom);
+		colorBarRect.bottom = wrap::toLong(barSectionHeight * DrawItem->rcItem.bottom);
 		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 		colorBarRect.top = colorBarRect.bottom;
 	}
 	if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL)) {
 		auto selectedIndicator = gsl::narrow_cast<double>(ClosestPointIndex) / PCSHeader.stitchCount;
-		indicatorLine[0].y = indicatorLine[1].y = wrap::dToL(colorBarRect.bottom * selectedIndicator + 0.5);
+		indicatorLine[0].y = indicatorLine[1].y = wrap::toLong(colorBarRect.bottom * selectedIndicator + 0.5);
 		indicatorLine[0].x                      = colorBarRect.left;
 		indicatorLine[1].x                      = colorBarRect.right;
 		SelectObject(DrawItem->hDC, CrossPen);
@@ -18754,7 +18754,7 @@ void thred::internal::dubar() {
 		Polyline(DrawItem->hDC, indicatorLine, 2);
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			selectedIndicator  = gsl::narrow_cast<double>(GroupStitchIndex) / PCSHeader.stitchCount;
-			indicatorLine[0].y = indicatorLine[1].y = wrap::dToL(colorBarRect.bottom * selectedIndicator + 0.5);
+			indicatorLine[0].y = indicatorLine[1].y = wrap::toLong(colorBarRect.bottom * selectedIndicator + 0.5);
 			indicatorLine[0].x                      = colorBarRect.left;
 			indicatorLine[1].x                      = colorBarRect.right;
 			Polyline(DrawItem->hDC, indicatorLine, 2);
@@ -18824,7 +18824,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					colors.resize(16);
 					wrap::ReadFile(thrEdFile,
 					               colors.data(),
-					               wrap::szToUI(colors.size() * sizeof(decltype(colors.back()))),
+					               wrap::toUnsigned(colors.size() * sizeof(decltype(colors.back()))),
 					               &BytesRead,
 					               nullptr);
 					auto brush = CreateSolidBrush(brushColor);
@@ -18835,8 +18835,8 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					auto iLine  = 0u;
 					for (auto iStitch = 0u; iStitch < stitchHeader.stitchCount; iStitch++) {
 						if ((stitchesToDraw[iStitch].attribute & 0xf) == iColor) {
-							lines[iLine++] = { wrap::dToL(stitchesToDraw[iStitch].x * ratio),
-								               wrap::dToL(drawingDestinationSize.y - stitchesToDraw[iStitch].y * ratio) };
+							lines[iLine++] = { wrap::toLong(stitchesToDraw[iStitch].x * ratio),
+								               wrap::toLong(drawingDestinationSize.y - stitchesToDraw[iStitch].y * ratio) };
 						}
 						else {
 							pen = nuPen(pen, 1, colors[iColor]);
@@ -18906,12 +18906,12 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						for (auto iVertexInForm = 0u;
 						     (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
 						     iVertexInForm++) {
-							lines[iVertexInForm] = { wrap::dToL(vertexList[iVertex].x * ratio),
-								                     wrap::dToL(drawingDestinationSize.y - vertexList[iVertex++].y * ratio) };
+							lines[iVertexInForm] = { wrap::toLong(vertexList[iVertex].x * ratio),
+								                     wrap::toLong(drawingDestinationSize.y - vertexList[iVertex++].y * ratio) };
 						}
 						lines[formList[iForm].vertexCount]
-						    = { wrap::dToL(vertexList[iLine].x * ratio),
-							    wrap::dToL(drawingDestinationSize.y - vertexList[iLine].y * ratio) };
+						    = { wrap::toLong(vertexList[iLine].x * ratio),
+							    wrap::toLong(drawingDestinationSize.y - vertexList[iLine].y * ratio) };
 						SelectObject(drawItem->hDC, FormPen);
 						SetROP2(drawItem->hDC, R2_XORPEN);
 						if (formList[iForm].type == FRMLINE) {
@@ -18978,7 +18978,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 			else {
 				auto scrollPoint = POINT {}; // for scroll bar functions
-				scrollPoint.x    = wrap::dToL((ZoomRect.right - ZoomRect.left) * LINSCROL);
+				scrollPoint.x    = wrap::toLong((ZoomRect.right - ZoomRect.left) * LINSCROL);
 				if (scrollPoint.x == 0) {
 					scrollPoint.x = 1;
 				}
@@ -18997,7 +18997,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 			else {
 				auto scrollPoint = POINT {}; // for scroll bar functions
-				scrollPoint.x    = wrap::dToL(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
+				scrollPoint.x    = wrap::toLong(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
 				if (scrollPoint.x == 0) {
 					scrollPoint.x = -1;
 				}
@@ -19067,7 +19067,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		switch (LOWORD(wParam)) {
 		case SB_LINEDOWN: {
 			auto scrollPoint = POINT {};
-			scrollPoint.y    = wrap::dToL((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
+			scrollPoint.y    = wrap::toLong((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 			if (scrollPoint.y == 0) {
 				scrollPoint.y = 1;
 			}
@@ -19076,7 +19076,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		}
 		case SB_LINEUP: {
 			auto scrollPoint = POINT {};
-			scrollPoint.y    = wrap::dToL(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
+			scrollPoint.y    = wrap::toLong(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 			if (scrollPoint.y == 0) {
 				scrollPoint.y = -1;
 			}
@@ -19196,7 +19196,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				              position,
 				              1,
 				              (*StringTable)[STR_PIKOL].c_str(),
-				              wrap::szToUI((*StringTable)[STR_PIKOL].size()));
+				              wrap::toUnsigned((*StringTable)[STR_PIKOL].size()));
 			}
 			return 1;
 		}
@@ -19213,9 +19213,9 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 					SetTextColor(DrawItem->hDC, defTxt(iColor));
 					auto colorNum = std::wstring(fmt::format(L"{}", iColor + 1));
 					auto textSize = SIZE {};
-					wrap::GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), wrap::szToUI(colorNum.size()), &textSize);
+					wrap::GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 					wrap::TextOut(
-					    DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), wrap::szToUI(colorNum.size()));
+					    DrawItem->hDC, (ButtonWidth - textSize.cx) >> 1, 0, colorNum.c_str(), wrap::toUnsigned(colorNum.size()));
 				}
 				return 1;
 			}
