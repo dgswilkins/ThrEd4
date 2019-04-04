@@ -169,7 +169,7 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 }
 
 unsigned int clip::numclp() {
-	const auto clipSize = szToUI(ClipBuffer->size());
+	const auto clipSize = wrap::szToUI(ClipBuffer->size());
 	const auto find     = ci::findclp(ClosestFormToCursor);
 	const auto it       = std::next(ClipPoints->cbegin(), find);
 	const auto val      = fPOINT {};
@@ -261,7 +261,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 	const auto cosAngle = cos(clipAngle);
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	moveToCoords  = vertexIt[uiToSz(currentSide) + 2u];
+	moveToCoords  = vertexIt[wrap::uiToSz(currentSide) + 2u];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
@@ -281,7 +281,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
 	const auto adjustedPoint = fPOINT { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
-	if (form::chkmax(szToUI(clipFillData.size()), szToUI(OSequence->size()))) {
+	if (form::chkmax(wrap::szToUI(clipFillData.size()), wrap::szToUI(OSequence->size()))) {
 		return true;
 	}
 	for (auto& data : clipFillData) {
@@ -320,7 +320,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             const dPOINT&              rotationCenter,
                             unsigned int               currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	const auto& point     = vertexIt[uiToSz(currentSide) + 1u];
+	const auto& point     = vertexIt[wrap::uiToSz(currentSide) + 1u];
 	const auto  delta     = fPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto  length    = hypot(delta.x, delta.y);
 	const auto  clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
@@ -619,7 +619,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
 	auto listSINEs = std::vector<double> {};
-	listSINEs.reserve(uiToSz(VertexCount) + 1u);
+	listSINEs.reserve(wrap::uiToSz(VertexCount) + 1u);
 	auto listCOSINEs = std::vector<double> {};
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -857,8 +857,8 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = gsl::narrow_cast<double>(chainEndPoints[uiToSz(finish) + 1u].x) - chainEndPoints[finish].x;
-		delta.y = gsl::narrow_cast<double>(chainEndPoints[uiToSz(finish) + 1u].y) - chainEndPoints[finish].y;
+		delta.x = gsl::narrow_cast<double>(chainEndPoints[wrap::uiToSz(finish) + 1u].x) - chainEndPoints[finish].x;
+		delta.y = gsl::narrow_cast<double>(chainEndPoints[wrap::uiToSz(finish) + 1u].y) - chainEndPoints[finish].y;
 	}
 	else {
 		delta.x = gsl::narrow_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;
@@ -866,7 +866,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	}
 	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0;
 	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0;
-	auto chainCount = szToUI(chainSequence.size());
+	auto chainCount = wrap::szToUI(chainSequence.size());
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
 	}
@@ -878,7 +878,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 
 void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	OSequence->clear();
-	auto chainLength = szToUI(chainEndPoints.size());
+	auto chainLength = wrap::szToUI(chainEndPoints.size());
 	if (chainLength > 2u) {
 		chainLength--;
 		for (auto iPoint = 0u; iPoint < chainLength - 1; iPoint++) {

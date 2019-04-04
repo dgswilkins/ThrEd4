@@ -86,7 +86,7 @@ void displayText::shoMsg(const std::wstring& message) {
 		auto textSize    = SIZE {};
 		auto messageSize = SIZE {};
 		for (auto& string : strings) {
-			GetTextExtentPoint32Int(GetDC(ThrEdWindow), string.c_str(), szToUI(string.size()), &textSize);
+			wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::szToUI(string.size()), &textSize);
 			if (textSize.cx > messageSize.cx) {
 				messageSize.cx = textSize.cx;
 			}
@@ -208,7 +208,7 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 			}
 		}
 		else {
-			SetWindowText((*ButtonWin)[iButton], (*StringTable)[uiToSz(iButton) - 4u + STR_TRC0].c_str());
+			SetWindowText((*ButtonWin)[iButton], (*StringTable)[wrap::uiToSz(iButton) - 4u + STR_TRC0].c_str());
 		}
 	}
 	else {
@@ -445,8 +445,8 @@ void displayText::tomsg() {
 	auto textSize = SIZE {};
 
 	GetWindowRect(OKButton, &OKrect);
-	GetTextExtentPoint32Int(
-	    GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), szToUI((*StringTable)[STR_DELST2].size()), &textSize);
+	wrap::GetTextExtentPoint32(
+	    GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), wrap::szToUI((*StringTable)[STR_DELST2].size()), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC",
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,

@@ -24,35 +24,35 @@
 #include "switches.h"
 #include "wrappers.h"
 
-void PolylineInt(HDC hdc, CONST POINT* apt, unsigned int cpt) noexcept {
+void wrap::Polyline(HDC hdc, CONST POINT* apt, unsigned int cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int>(cpt));
 }
 
-void WriteFileInt(HANDLE       file,
-                  LPCVOID      buffer,
-                  unsigned int bytesToWrite,
-                  LPDWORD      bytesWritten,
-                  LPOVERLAPPED overlapped) noexcept {
+void wrap::WriteFile(HANDLE       file,
+                     LPCVOID      buffer,
+                     unsigned int bytesToWrite,
+                     LPDWORD      bytesWritten,
+                     LPOVERLAPPED overlapped) noexcept {
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-bool ReadFileInt(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
+bool wrap::ReadFile(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
 	return (ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped) == TRUE);
 }
 
-void GetTextExtentPoint32Int(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) noexcept {
+void wrap::GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) noexcept {
 	GetTextExtentPoint32(hdc, lpString, gsl::narrow<int>(c), lpSize);
 }
 
-void TextOutInt(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString) noexcept {
+void wrap::TextOut(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString) noexcept {
 	TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int>(cchString));
 }
 
-void GetTextExtentPointInt(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept {
+void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept {
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
 }
 
-float dToF(double invar) {
+float wrap::dToF(double invar) {
 	auto result = 0.0f;
 	try {
 		result = gsl::narrow<float>(invar);
@@ -78,40 +78,40 @@ float dToF(double invar) {
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-long dToL(double invar) {
+long wrap::dToL(double invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
 
-uint32_t dToUI(double invar) {
+uint32_t wrap::dToUI(double invar) {
 	return gsl::narrow<uint32_t>(std::round(invar));
 }
 
-long fToL(float invar) {
+long wrap::fToL(float invar) {
 	return gsl::narrow<long>(std::round(invar));
 }
 
-uint32_t szToUI(size_t invar) {
+uint32_t wrap::szToUI(size_t invar) {
 	return gsl::narrow<uint32_t>(invar);
 }
 #pragma warning(pop)
 
-double fToD(float invar) noexcept {
+double wrap::fToD(float invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
-float lToF(long invar) noexcept {
+float wrap::lToF(long invar) noexcept {
 	return gsl::narrow_cast<float>(invar);
 }
 
-double lToD(long invar) noexcept {
+double wrap::lToD(long invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
-size_t uiToSz(uint32_t invar) noexcept {
+size_t wrap::uiToSz(uint32_t invar) noexcept {
 	return gsl::narrow_cast<size_t>(invar);
 }
 
-void setCursorInt(HCURSOR hCursor) noexcept {
+void wrap::setCursor(HCURSOR hCursor) noexcept {
 	static HCURSOR saveCursor = nullptr;
 	if (saveCursor != hCursor) {
 		SetCursor(hCursor);
@@ -119,7 +119,7 @@ void setCursorInt(HCURSOR hCursor) noexcept {
 	}
 }
 
-HPEN CreatePenInt(int iStyle, unsigned width, COLORREF color) noexcept {
+HPEN wrap::CreatePen(int iStyle, unsigned width, COLORREF color) noexcept {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
-	return CreatePen(iStyle, scaledWidth, color);
+	return ::CreatePen(iStyle, scaledWidth, color);
 }
