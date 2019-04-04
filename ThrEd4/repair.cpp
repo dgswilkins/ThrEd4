@@ -40,7 +40,7 @@
 namespace ri = repair::internal;
 
 void repair::internal::adbad(std::wstring& repairMessage, unsigned code, unsigned int count) {
-	auto fmtStr = std::wstring{};
+	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, code);
 	repairMessage += fmtStr;
@@ -126,7 +126,7 @@ void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexc
 }
 
 unsigned repair::internal::frmchkfn() {
-	auto badData = BADCNTS{};
+	auto badData = BADCNTS {};
 
 	if (!FormList->empty()) {
 		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
@@ -219,7 +219,7 @@ void repair::internal::chkfstch() noexcept {
 void repair::internal::repflt(std::wstring& repairMessage) {
 	auto  iDestination = 0u;
 	auto  vertexCount  = 0u;
-	auto  badData      = BADCNTS{};
+	auto  badData      = BADCNTS {};
 	auto& formList     = *FormList;
 
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
@@ -228,7 +228,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			vertexCount += formList[iForm].vertexCount;
 		}
 	}
-	auto vertexPoint = std::vector<fPOINT>{};
+	auto vertexPoint = std::vector<fPOINT> {};
 	auto iVertex     = 0u;
 	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
@@ -277,7 +277,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	auto badClipCount = 0u;
 	auto clipCount    = 0u;
 
-	auto clipPoint = std::vector<fPOINT>{};
+	auto clipPoint = std::vector<fPOINT> {};
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form           = (*FormList)[iForm];
 		auto  clipDifference = 0u;
@@ -351,7 +351,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 
 void repair::internal::repsat() {
 	auto guideCount = 0u;
-	auto badData    = BADCNTS{};
+	auto badData    = BADCNTS {};
 
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = (*FormList)[iForm];
@@ -387,7 +387,7 @@ void repair::internal::repsat() {
 
 void repair::internal::reptx() {
 	auto textureCount = 0u;
-	auto badData      = BADCNTS{};
+	auto badData      = BADCNTS {};
 
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (texture::istx(iForm)) {
@@ -423,7 +423,7 @@ void repair::internal::reptx() {
 }
 
 void repair::repar() {
-	auto       repairMessage = std::wstring{};
+	auto       repairMessage = std::wstring {};
 	const auto repairType    = ri::frmchkfn();
 
 	thred::savdo();

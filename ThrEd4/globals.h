@@ -214,11 +214,11 @@ extern RECT      scRct;
 extern unsigned* screenDPI;
 extern int*      ScrollSize;
 
-extern std::vector<POINT>* SearchLine;                       // stitch select line
+extern std::vector<POINT>* SearchLine;
 
-extern HPEN      SelectAllPen;
-extern FRMHED*   SelectedForm;
-extern unsigned  SelectedFormControlVertex;
+extern HPEN     SelectAllPen;
+extern FRMHED*  SelectedForm;
+extern unsigned SelectedFormControlVertex;
 
 extern std::vector<unsigned int>* SelectedFormList;
 extern FORMVERTICES               SelectedFormVertices;

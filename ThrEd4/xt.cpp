@@ -121,20 +121,20 @@ void xt::internal::duxrats(unsigned int start, unsigned int finish, fPOINT& poin
 
 void xt::internal::durats(unsigned int iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
 	if (sequence != nullptr) {
-		auto&      bCurrent = (*BSequence)[iSequence];
-		auto&      bNext = (*BSequence)[uiToSz(iSequence) + 1u];
+		auto&      bCurrent     = (*BSequence)[iSequence];
+		auto&      bNext        = (*BSequence)[uiToSz(iSequence) + 1u];
 		const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
 		if (stitchLength < feather.minStitch) {
-			sequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
+			sequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
 		}
 		else {
 			feather.ratioLocal = feather.minStitch / stitchLength;
 			const auto adjustedPoint
-				= fPOINT{ durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
+			    = fPOINT { durat(bNext.x, bCurrent.x, feather.ratioLocal), durat(bNext.y, bCurrent.y, feather.ratioLocal) };
 
 			sequence->push_back(
-				fPOINT{ durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
+			    fPOINT { durat(adjustedPoint.x, bCurrent.x, feather.ratio), durat(adjustedPoint.y, bCurrent.y, feather.ratio) });
 		}
 	}
 }
@@ -252,9 +252,9 @@ void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOIN
 }
 
 void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
-	auto       currentPoint = fPOINT{};
-	auto       nextPoint    = fPOINT{};
-	auto       midPoint     = fPOINT{};
+	auto       currentPoint = fPOINT {};
+	auto       nextPoint    = fPOINT {};
+	auto       midPoint     = fPOINT {};
 	auto&      bCurrent     = (*BSequence)[iSequence];
 	auto&      bNext        = (*BSequence)[uiToSz(iSequence) + 1u];
 	const auto length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
@@ -266,10 +266,10 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
 	}
 	else {
-		auto currentHighPoint = fPOINT{};
-		auto currentLowPoint  = fPOINT{};
-		auto nextHighPoint    = fPOINT{};
-		auto nextLowPoint     = fPOINT{};
+		auto currentHighPoint = fPOINT {};
+		auto currentLowPoint  = fPOINT {};
+		auto nextHighPoint    = fPOINT {};
+		auto nextLowPoint     = fPOINT {};
 		feather.ratioLocal    = feather.minStitch / length;
 		duxrats(iSequence, iSequence + 1, currentLowPoint, feather.ratioLocal);
 		duxrats(iSequence + 3, iSequence + 2, nextLowPoint, feather.ratioLocal);
@@ -281,7 +281,7 @@ void xt::internal::fthrbfn(unsigned int iSequence, FEATHER& feather, std::vector
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
 	midPoint = midpnt(currentPoint, nextPoint);
-	OSequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
+	OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
 	OutputIndex++;
 	OSequence->push_back(midPoint);
 	OutputIndex++;
@@ -295,12 +295,12 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 	const auto length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
-	OSequence->push_back(fPOINT{ bCurrent.x, bCurrent.y });
-	OSequence->push_back(fPOINT{ bNext.x, bNext.y });
+	OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
+	OSequence->push_back(fPOINT { bNext.x, bNext.y });
 	if (length > feather.minStitch) {
-		auto adjustedPoint = fPOINT{};
-		auto currentPoint  = fPOINT{};
-		auto nextPoint     = fPOINT{};
+		auto adjustedPoint = fPOINT {};
+		auto currentPoint  = fPOINT {};
+		auto nextPoint     = fPOINT {};
 		feather.ratioLocal = 0.5;
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
@@ -315,12 +315,12 @@ void xt::internal::fthdfn(unsigned int iSequence, FEATHER& feather) {
 void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ TYPFRM, SelectedForm->fillColor, szToUI(InterleaveSequence->size()), I_FIL });
+		    INSREC { TYPFRM, SelectedForm->fillColor, szToUI(InterleaveSequence->size()), I_FIL });
 		form::chkseq(false);
 		if (((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u)
 		    && ~(SelectedForm->extendedAttribute & (AT_FTHUP | AT_FTHBTH)) != (AT_FTHUP | AT_FTHBTH)) {
-			InterleaveSequenceIndices->emplace_back(INSREC{
-			    FTHMSK, SelectedForm->fillInfo.feather.color, szToUI(InterleaveSequence->size()), I_FTH });
+			InterleaveSequenceIndices->emplace_back(
+			    INSREC { FTHMSK, SelectedForm->fillInfo.feather.color, szToUI(InterleaveSequence->size()), I_FTH });
 
 			const auto sequenceMax      = szToUI(featherSequence.size());
 			auto       iReverseSequence = sequenceMax - 1;
@@ -336,9 +336,9 @@ void xt::internal::fritfil(std::vector<fPOINT>& featherSequence) {
 
 void xt::fthrfn() {
 	const auto savedSpacing = LineSpacing;
-	auto       feather      = FEATHER{};
+	auto       feather      = FEATHER {};
 
-	auto featherSequence = std::vector<fPOINT>{};
+	auto featherSequence = std::vector<fPOINT> {};
 
 	// ToDo - what does this function do
 	PseudoRandomValue = FSED;
@@ -388,12 +388,12 @@ void xt::fthrfn() {
 						xi::fthfn(ind, feather);
 					}
 					else {
-						OSequence->push_back(fPOINT{ (*BSequence)[ind].x, (*BSequence)[ind].y });
+						OSequence->push_back(fPOINT { (*BSequence)[ind].x, (*BSequence)[ind].y });
 					}
 				}
 				else {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0u) {
-						OSequence->push_back(fPOINT{ (*BSequence)[ind].x, (*BSequence)[ind].y });
+						OSequence->push_back(fPOINT { (*BSequence)[ind].x, (*BSequence)[ind].y });
 					}
 					else {
 						xi::fthfn(ind, feather);
@@ -452,7 +452,7 @@ void xt::fethr() {
 }
 
 constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
-	auto op = ULARGE_INTEGER{ { 0, 0 } };
+	auto op = ULARGE_INTEGER { { 0, 0 } };
 
 	op.LowPart  = time.dwLowDateTime;
 	op.HighPart = time.dwHighDateTime;
@@ -460,8 +460,8 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 }
 
 int xt::internal::fil2crd(const fs::path& fileName) {
-	auto    startupInfo = STARTUPINFO{};
-	auto    processInfo = PROCESS_INFORMATION{};
+	auto    startupInfo = STARTUPINFO {};
+	auto    processInfo = PROCESS_INFORMATION {};
 	auto    errorCode   = 0;
 	wchar_t command[_MAX_PATH * 2 + 1 + 4];
 
@@ -498,12 +498,12 @@ bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 void xt::pes2crd() {
 	constexpr auto P2CBUFSIZ = 256;
 
-	auto          registryKey            = HKEY{};
+	auto          registryKey            = HKEY {};
 	wchar_t       programName[_MAX_PATH] = { 0 };
 	const wchar_t filter[]               = L"ComputerService (Lind2PC.exe)\0LinkP2C.exe\0\0";
 	wchar_t       message[P2CBUFSIZ]     = { 0 };
 	wchar_t       caption[P2CBUFSIZ]     = { 0 };
-	auto          openFileName           = OPENFILENAME{
+	auto          openFileName           = OPENFILENAME {
         sizeof(OPENFILENAME), // lStructsize
         ThrEdWindow,          // hwndOwner
         ThrEdInstance,        // hInstance
@@ -540,8 +540,8 @@ void xt::pes2crd() {
 	*IniFile.p2cName = 0;
 	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
 	    == ERROR_SUCCESS) {
-		auto size    = DWORD{ _MAX_PATH };
-		auto keyType = DWORD{ REG_SZ };
+		auto size    = DWORD { _MAX_PATH };
+		auto keyType = DWORD { REG_SZ };
 		if (RegQueryValueEx(
 		        registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<unsigned char*>(programName), &size)
 		    == ERROR_SUCCESS) {
@@ -588,13 +588,12 @@ std::vector<fPOINT>& xt::insid() {
 	}
 
 	return *OutsidePoints;
-	
 }
 #pragma warning(pop)
 
 void xt::internal::delwlk(unsigned int code) {
 	if (PCSHeader.stitchCount != 0u) {
-		auto highStitchBuffer = std::vector<fPOINTATTR>{};
+		auto highStitchBuffer = std::vector<fPOINTATTR> {};
 		highStitchBuffer.reserve(PCSHeader.stitchCount);
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if ((StitchBuffer[iStitch].attribute & WLKFMSK) != code) {
@@ -629,12 +628,12 @@ void xt::internal::chkuseq() {
 		}
 		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
 		for (auto iSequence = 0u; iSequence < OutputIndex - 1; iSequence++) {
-			const auto delta       = fPOINT{ (*OSequence)[uiToSz(iSequence) + 1].x - (*OSequence)[iSequence].x,
-                                       (*OSequence)[uiToSz(iSequence) + 1].y - (*OSequence)[iSequence].y };
+			const auto delta       = fPOINT { (*OSequence)[uiToSz(iSequence) + 1].x - (*OSequence)[iSequence].x,
+                                        (*OSequence)[uiToSz(iSequence) + 1].y - (*OSequence)[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
 			const auto stitchCount = dToUI(length / underlayStitchLength);
 			if (stitchCount != 0u) {
-				const auto step  = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
+				const auto step  = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
 				auto       point = (*OSequence)[iSequence];
 				for (auto index = 0u; index < stitchCount; index++) {
 					InterleaveSequence->push_back(point);
@@ -656,7 +655,7 @@ void xt::internal::chkuseq() {
 void xt::internal::ritwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ WLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
+		    INSREC { WLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -664,7 +663,7 @@ void xt::internal::ritwlk() {
 void xt::internal::ritcwlk() {
 	if (OutputIndex != 0u) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ CWLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
+		    INSREC { CWLKMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -716,14 +715,14 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 		else {
 			intermediateVertex = form::nxt(startVertex);
 		}
-		const auto delta = fPOINT{ indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
-			                       indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
+		const auto delta = fPOINT { indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
+			                        indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
 		length           = hypot(delta.x, delta.y);
 
 		const auto stitchCount = dToUI(length / UserStitchLength);
 		if (stitchCount > 1) {
-			const auto step       = fPOINT{ delta.x / stitchCount, delta.y / stitchCount };
-			auto       localPoint = fPOINT{ indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
+			const auto step       = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
+			auto       localPoint = fPOINT { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
 			for (auto iStep = 0u; iStep < stitchCount - 1; iStep++) {
 				StitchBuffer[iStitch] = { localPoint.x, localPoint.y, code };
 				iStitch++;
@@ -770,7 +769,7 @@ void xt::internal::fnwlk(unsigned int find) {
 void xt::internal::ritund() {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
-		    INSREC{ UNDMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
+		    INSREC { UNDMSK, SelectedForm->underlayColor, szToUI(InterleaveSequence->size()), I_FIL });
 		chkuseq();
 	}
 }
@@ -780,10 +779,10 @@ void xt::internal::undclp() {
 	auto& clipBuffer = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(2);
-	ClipRectSize = FLSIZ{ 0, SelectedForm->underlayStitchLen };
-	ClipRect     = fRECTANGLE{ SelectedForm->underlayStitchLen, 0, 0, 0 };
-	clipBuffer.emplace_back( 0.0f, 00.0f, 0u );
-	clipBuffer.emplace_back( 0.0f, SelectedForm->underlayStitchLen, 0u );
+	ClipRectSize = FLSIZ { 0, SelectedForm->underlayStitchLen };
+	ClipRect     = fRECTANGLE { SelectedForm->underlayStitchLen, 0, 0, 0 };
+	clipBuffer.emplace_back(0.0f, 00.0f, 0u);
+	clipBuffer.emplace_back(0.0f, SelectedForm->underlayStitchLen, 0u);
 }
 
 void xt::internal::fncwlk() {
@@ -796,18 +795,18 @@ void xt::internal::fncwlk() {
 			const auto iVertex    = SelectedForm->wordParam;
 			auto&      thisVertex = vertexIt[iVertex];
 			auto&      nextVertex = vertexIt[uiToSz(iVertex) + 1u];
-			OSequence->push_back(fPOINT{ form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
+			OSequence->push_back(fPOINT { form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
 			OutputIndex++;
 		}
 		auto guideIt = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
 		for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
 			OSequence->push_back(
-			    fPOINT{ form::midl(vertexIt[guideIt[iGuide - 1].finish].x, vertexIt[guideIt[iGuide - 1].start].x),
-			            form::midl(vertexIt[guideIt[iGuide - 1].finish].y, vertexIt[guideIt[iGuide - 1].start].y) });
+			    fPOINT { form::midl(vertexIt[guideIt[iGuide - 1].finish].x, vertexIt[guideIt[iGuide - 1].start].x),
+			             form::midl(vertexIt[guideIt[iGuide - 1].finish].y, vertexIt[guideIt[iGuide - 1].start].y) });
 			OutputIndex++;
 		}
 		if ((SelectedForm->attribute & FRMEND) != 0u) {
-			OSequence->push_back(fPOINT{ form::midl(vertexIt[0].x, vertexIt[1].x), form::midl(vertexIt[0].y, vertexIt[1].y) });
+			OSequence->push_back(fPOINT { form::midl(vertexIt[0].x, vertexIt[1].x), form::midl(vertexIt[0].y, vertexIt[1].y) });
 			OutputIndex++;
 		}
 	}
@@ -823,7 +822,7 @@ void xt::internal::fncwlk() {
 		start       = form::nxt(start);
 		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
 			OSequence->push_back(
-			    fPOINT{ form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
+			    fPOINT { form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
 			if (form::cisin(OSequence->back().x, OSequence->back().y)) {
 				OutputIndex++;
 			}
@@ -838,9 +837,9 @@ void xt::internal::fncwlk() {
 
 void xt::srtcol() {
 	const auto colorSize = 16;
-	auto       histogram = std::vector<unsigned>{};
+	auto       histogram = std::vector<unsigned> {};
 	histogram.resize(colorSize);
-	auto colorStartStitch = std::vector<unsigned>{};
+	auto colorStartStitch = std::vector<unsigned> {};
 	colorStartStitch.resize(colorSize);
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -853,7 +852,7 @@ void xt::srtcol() {
 		startStitch += *it;
 		const auto _ = it++;
 	}
-	auto highStitchBuffer = std::vector<fPOINTATTR>{};
+	auto highStitchBuffer = std::vector<fPOINTATTR> {};
 	highStitchBuffer.resize(PCSHeader.stitchCount);
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		highStitchBuffer[colorStartStitch[StitchBuffer[iStitch].attribute & COLMSK]++] = StitchBuffer[iStitch];
@@ -968,8 +967,8 @@ void xt::selalfrm() {
 }
 
 unsigned xt::internal::dutyp(unsigned attribute) noexcept {
-	auto       result          = char{ 0 };
-	auto       bit             = DWORD{ 0 };
+	auto       result          = char { 0 };
+	auto       bit             = DWORD { 0 };
 	const auto maskedAttribute = attribute & SRTYPMSK;
 
 	// ToDo - replace
@@ -1036,7 +1035,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
 
-	auto formFillCounter = std::vector<unsigned>{};
+	auto formFillCounter = std::vector<unsigned> {};
 	formFillCounter.resize((FormList->size() + 2u) << 2u);
 	auto totalJumps = 0u;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
@@ -1155,7 +1154,7 @@ void xt::fsort() {
 
 	// There cannot be more records than stitches
 	// ToDo - convert this to a reserve/pushback
-	auto stitchRegion = std::vector<OREC>{};
+	auto stitchRegion = std::vector<OREC> {};
 	stitchRegion.resize(PCSHeader.stitchCount);
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
@@ -1184,9 +1183,9 @@ void xt::fsort() {
 	stitchRegion[index].finish    = PCSHeader.stitchCount;
 	index++;
 	const auto lastRegion = index;
-	auto       pRecs      = std::vector<OREC*>{};
+	auto       pRecs      = std::vector<OREC*> {};
 	pRecs.resize(lastRegion);
-	auto pFRecs = std::vector<OREC*>{};
+	auto pFRecs = std::vector<OREC*> {};
 	pFRecs.resize(lastRegion);
 	for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
 		xi::durec(stitchRegion[iRegion]);
@@ -1200,7 +1199,7 @@ void xt::fsort() {
 #endif
 	auto badForm = 0u;
 	if (xi::srtchk(pFRecs, lastRegion, badForm)) {
-		auto stitchRange = std::vector<RANGE>{};
+		auto stitchRange = std::vector<RANGE> {};
 		stitchRange.resize(lastRegion);
 		stitchRange[0].start = 0;
 		attribute            = pRecs[0]->color;
@@ -1230,18 +1229,18 @@ void xt::fsort() {
 		}
 		stitchRange[iRange].finish  = lastRegion;
 		const auto lastRange        = ++iRange;
-		auto       tempStitchBuffer = std::vector<fPOINTATTR>{};
+		auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
 		tempStitchBuffer.resize(PCSHeader.stitchCount);
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
-			auto sortRecord   = SRTREC{};
+			auto sortRecord   = SRTREC {};
 			sortRecord.start  = stitchRange[iRange].start;
 			sortRecord.finish = stitchRange[iRange].finish;
 			sortRecord.count  = sortRecord.finish - sortRecord.start;
 			auto minimumJumps = 0xffffffffu;
 			// timeout used to put an upper bound on the number of sorting permutations checked
-			auto fileTime = FILETIME{};
+			auto fileTime = FILETIME {};
 			GetSystemTimeAsFileTime(&fileTime);
 			const auto startTime        = xi::tim2int(fileTime);
 			auto       minimumIndex     = 0u;
@@ -1273,7 +1272,7 @@ void xt::fsort() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
-		auto str = std::wstring{};
+		auto str = std::wstring {};
 		displayText::loadString(str, IDS_SRTER);
 		displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
@@ -1294,11 +1293,11 @@ using ATFLD = struct _atfld;
 void xt::internal::duatf(unsigned ind) {
 	const auto attribute = StitchBuffer[ind].attribute;
 
-	auto attributeFields = ATFLD{ (attribute & COLMSK),
-		                          ((attribute & FRMSK) >> FRMSHFT),
-		                          gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
-		                          ((attribute >> LAYSHFT) & 7),
-		                          0 };
+	auto attributeFields = ATFLD { (attribute & COLMSK),
+		                           ((attribute & FRMSK) >> FRMSHFT),
+		                           gsl::narrow<unsigned>(StitchTypes[dutyp(attribute)]),
+		                           ((attribute >> LAYSHFT) & 7),
+		                           0 };
 
 	if ((attribute & 0x80000000) != 0u) {
 		attributeFields.user = 1;
@@ -1513,7 +1512,7 @@ void xt::internal::duint(unsigned offset, unsigned code, INTINF& ilData) {
 			                       code);
 		}
 	}
-	auto point = fPOINT{};
+	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output += gucon(
 		    point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output + MAXITEMS, code);
@@ -1555,11 +1554,11 @@ void xt::internal::chkend(unsigned offset, unsigned code, INTINF& ilData) {
 }
 
 void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
-	auto ilData = INTINF{};
+	auto ilData = INTINF {};
 
 	StateMap.reset(StateFlag::ISEND);
 	form::fvars(ClosestFormToCursor);
-	InterleaveSequenceIndices->emplace_back(INSREC{ 0, 0, szToUI(InterleaveSequence->size()), 0 });
+	InterleaveSequenceIndices->emplace_back(INSREC { 0, 0, szToUI(InterleaveSequence->size()), 0 });
 	ilData.layerIndex
 	    = (gsl::narrow<unsigned int>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
@@ -1645,7 +1644,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, unsigned fillStartsMap) {
 					                           code);
 				}
 			}
-			auto colpnt = fPOINT{};
+			auto colpnt = fPOINT {};
 			if (xi::lastcol(iSequence, colpnt)) {
 				ilData.output += xi::gucon(
 				    colpnt, (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index], ilData.output, code);
@@ -2498,7 +2497,7 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		}
 		case IDC_DUASP: {
 			const auto designAspectRatio = DesignSize.y / DesignSize.x;
-			auto       designSize        = fPOINT{};
+			auto       designSize        = fPOINT {};
 			if (!chkasp(designSize, designAspectRatio, designSizeDialog)) {
 				if (StateMap.test(StateFlag::DESCHG)) {
 					setstxt(IDC_DESWID, designSize.y / designAspectRatio, designSizeDialog);
@@ -2526,8 +2525,8 @@ void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fREC
 }
 
 void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
-	const auto newSize = fPOINT{ (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
-	const auto designSizeRatio = dPOINT{ (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
+	const auto newSize = fPOINT { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
+	const auto designSizeRatio = dPOINT { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	}
@@ -2539,7 +2538,7 @@ void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 
 void xt::nudsiz() {
 	auto flag           = 0;
-	auto designSizeRect = fRECTANGLE{}; // design size rectangle
+	auto designSizeRect = fRECTANGLE {}; // design size rectangle
 
 	thred::savdo();
 	flag = 0;

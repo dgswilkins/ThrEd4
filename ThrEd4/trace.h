@@ -60,7 +60,7 @@ namespace internal {
 	void trcols(COLORREF color) noexcept;
 	void trcratnum();
 	void trcstpnum();
-	void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept ;
+	void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept;
 	void trnumwnd0(int position) noexcept;
 	void trnumwnd1(int position) noexcept;
 

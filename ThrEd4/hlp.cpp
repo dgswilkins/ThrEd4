@@ -32,7 +32,7 @@
 HWND HelpWindow; // help window
 
 void hlp::help() {
-	auto helpFileName = std::wstring{};
+	auto helpFileName = std::wstring {};
 
 	displayText::loadString(helpFileName, IDS_HELPFN);
 	HelpWindow = HtmlHelp(ThrEdWindow, fmt::format(L"{}{}", HomeDirectory->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);

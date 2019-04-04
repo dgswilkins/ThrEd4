@@ -116,13 +116,13 @@ void trace::internal::trcols(COLORREF color) noexcept {
 }
 
 void trace::internal::trcstpnum() {
-	auto fmtStr = std::wstring{};
+	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_TRCSTP);
 	SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
 }
 
 void trace::internal::trcratnum() {
-	auto fmtStr = std::wstring{};
+	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_TRCRAT);
 	displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
 }
@@ -160,8 +160,8 @@ bool trace::internal::trcin(COLORREF color) {
 }
 
 void trace::internal::getrmap() {
-	auto info   = BITMAPINFO{};
-	auto header = BITMAPINFOHEADER{};
+	auto info   = BITMAPINFO {};
+	auto header = BITMAPINFOHEADER {};
 
 	header.biSize        = sizeof(header);
 	header.biWidth       = BitmapWidth;
@@ -321,7 +321,7 @@ void trace::trdif() {
 	StateMap.reset(StateFlag::HIDMAP);
 	trace::untrace();
 	if ((BitmapHeight * BitmapWidth) != 0u) {
-		auto differenceBitmap = std::vector<unsigned>{};
+		auto differenceBitmap = std::vector<unsigned> {};
 		differenceBitmap.resize(uiToSz(BitmapHeight) * BitmapWidth);
 
 		auto colorSumMaximum = 0u;
@@ -651,7 +651,7 @@ void trace::internal::dutrac() {
 		const auto savedPoint     = CurrentTracePoint.y * BitmapWidth + CurrentTracePoint.x;
 		auto       traceDirection = 0u;
 		if (!TracedEdges->test(savedPoint)) {
-			auto findRectangle = RECT{};
+			auto findRectangle = RECT {};
 			auto point         = savedPoint;
 			auto limit         = (CurrentTracePoint.y + 1) * BitmapWidth;
 			while (point < limit && !TracedEdges->test(point)) {
@@ -752,7 +752,7 @@ void trace::internal::dutrac() {
 			}
 		}
 		const unsigned initialDirection = traceDirection;
-		auto           tracedPoints     = std::vector<TRCPNT>{};
+		auto           tracedPoints     = std::vector<TRCPNT> {};
 		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
 		while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) {
 			;
@@ -761,7 +761,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRM2L);
 			return;
 		}
-		auto decimatedLine = std::vector<TRCPNT>{};
+		auto decimatedLine = std::vector<TRCPNT> {};
 		decimatedLine.reserve(tracedPoints.size());
 		TRCPNT traceDiff[2] = {};
 		decimatedLine.push_back(tracedPoints[0]);
@@ -789,12 +789,12 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		FormList->push_back(FRMHED{});
+		FormList->push_back(FRMHED {});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
-		CurrentVertexIndex   = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
-		OutputIndex = 0;
-		FormVertices->push_back(fPOINT{ tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
+		CurrentVertexIndex = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
+		OutputIndex        = 0;
+		FormVertices->push_back(fPOINT { tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
 		OutputIndex++;
 		iNext                = 0;
 		auto traceLengthSum  = 0.0;
@@ -808,7 +808,8 @@ void trace::internal::dutrac() {
 			const auto traceLength
 			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				FormVertices->push_back(fPOINT{ tracedPoints[iCurrent - 1].x * StitchBmpRatio.x, tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
+				FormVertices->push_back(fPOINT { tracedPoints[iCurrent - 1].x * StitchBmpRatio.x,
+				                                 tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
@@ -1256,9 +1257,9 @@ void trace::internal::dublk(HDC dc, const RECT& traceHighMask, const RECT& trace
 }
 
 void trace::wasTrace() {
-	auto       traceHighMaskRect   = RECT{};              // high trace mask rectangle
-	auto       traceMiddleMaskRect = RECT{};              // middle trace mask rectangle
-	auto       traceLowMaskRect    = RECT{};              // low trace mask rectangle
+	auto       traceHighMaskRect   = RECT {};             // high trace mask rectangle
+	auto       traceMiddleMaskRect = RECT {};             // middle trace mask rectangle
+	auto       traceLowMaskRect    = RECT {};             // low trace mask rectangle
 	const auto BlackBrush          = CreateSolidBrush(0); // black brush
 
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {

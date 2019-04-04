@@ -48,7 +48,7 @@ inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 		return utf16;
 	}
 
-	utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.from_bytes(utf8);
+	utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.from_bytes(utf8);
 
 	return utf16;
 }
@@ -61,7 +61,7 @@ inline std::string Utf16ToUtf8(const std::wstring& utf16) {
 		return utf8;
 	}
 
-	utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t>{}.to_bytes(utf16);
+	utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.to_bytes(utf16);
 
 	return utf8;
 }

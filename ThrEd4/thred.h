@@ -506,7 +506,7 @@ namespace internal {
 
 	bool wastch() noexcept;
 	void xlin();
-	void xlin1();	
+	void xlin1();
 	void zRctAdj() noexcept;
 	void zumin();
 	void zumout();
@@ -524,7 +524,7 @@ namespace internal {
 	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept;
 	void     setpes();
 	unsigned tripl(char* dat);
-	void     writeThumbnail(unsigned char * pchr, unsigned char const (*image)[ThumbHeight][ThumbWidth]) noexcept;
+	void     writeThumbnail(unsigned char* pchr, unsigned char const (*image)[ThumbHeight][ThumbWidth]) noexcept;
 #endif
 
 #ifdef ALLOCFAILURE

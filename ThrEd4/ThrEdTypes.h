@@ -1059,8 +1059,8 @@ class BSEQPNT;
 class dPOINT
 {
 public:
-	double x{ 0.0 };
-	double y{ 0.0 };
+	double x { 0.0 };
+	double y { 0.0 };
 
 	constexpr dPOINT() noexcept = default;
 	explicit inline dPOINT(const fPOINT& rhs) noexcept;
@@ -1074,8 +1074,8 @@ public:
 class fPOINT
 {
 public:
-	float x{ 0.0f };
-	float y{ 0.0f };
+	float x { 0.0f };
+	float y { 0.0f };
 
 	constexpr fPOINT() noexcept = default;
 	inline fPOINT(double rhsX, double rhsY) noexcept;
@@ -1091,9 +1091,9 @@ public:
 class fPOINTATTR
 {
 public:
-	float    x{ 0.0f };
-	float    y{ 0.0f };
-	uint32_t attribute{ 0u };
+	float    x { 0.0f };
+	float    y { 0.0f };
+	uint32_t attribute { 0u };
 
 	constexpr fPOINTATTR() noexcept = default;
 	inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
@@ -1445,7 +1445,7 @@ inline FANGCLP::FANGCLP() noexcept { // NOLINT
 union FANGCLPOUT {
 public:
 	float     angle;
-	DWORD     clip{}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	DWORD     clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	SATCONOUT guide;
 
 	FANGCLPOUT() noexcept;
@@ -1471,7 +1471,7 @@ public:
 
 union FLENCNTOUT {
 public:
-	float    stitchLength{};
+	float    stitchLength {};
 	uint32_t clipCount;
 
 	FLENCNTOUT() noexcept;
@@ -1516,7 +1516,7 @@ public:
 
 union SATINANGLEOUT {
 public:
-	DWORD guide{};
+	DWORD guide {};
 	float angle;
 
 	SATINANGLEOUT() noexcept;
@@ -1640,7 +1640,7 @@ public:
 	DWORD         borderClipData;  // border clipboard data
 	uint16_t      satinGuideCount; // number of satin guidelines
 	uint16_t      wordParam;       // word parameter
-	fRECTANGLE    rectangle{};     // rectangle
+	fRECTANGLE    rectangle {};    // rectangle
 	uint8_t       fillType;        // fill type
 	uint8_t       edgeType;        // edge type
 	float         fillSpacing;     // fill spacing
@@ -1683,34 +1683,34 @@ class FRMHEDOUT;
 class FRMHED
 {
 public:
-	uint8_t    attribute;         // attribute
-	uint32_t   vertexCount;       // number of sides
-	uint8_t    type;              // type
-	uint8_t    fillColor;         // fill color
-	uint8_t    borderColor;       // border color
-	uint32_t   clipEntries;       // number of border clipboard entries
-	uint32_t   vertexIndex;       // index into FormVertices
-	SATINANGLE satinOrAngle{};    // satin guidelines or angle clipboard fill angle
-	uint32_t   borderClipData;    // pointer to start of border clipboard data
-	uint32_t   satinGuideCount;   // number of satin guidelines
-	uint32_t   wordParam;         // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle{};       // rectangle
-	uint8_t    fillType;          // fill type
-	uint8_t    edgeType;          // edge type
-	float      fillSpacing;       // fill spacing
-	FLENCNT    lengthOrCount{};   // fill stitch length or clipboard count
-	FANGCLP    angleOrClipData{}; // fill angle or clipboard data pointer
-	float      borderSize;        // border size
-	float      edgeSpacing;       // edge spacing
-	float      edgeStitchLen;     // edge stitch length
-	uint16_t   picoLength;        // pico length
+	uint8_t    attribute;          // attribute
+	uint32_t   vertexCount;        // number of sides
+	uint8_t    type;               // type
+	uint8_t    fillColor;          // fill color
+	uint8_t    borderColor;        // border color
+	uint32_t   clipEntries;        // number of border clipboard entries
+	uint32_t   vertexIndex;        // index into FormVertices
+	SATINANGLE satinOrAngle {};    // satin guidelines or angle clipboard fill angle
+	uint32_t   borderClipData;     // pointer to start of border clipboard data
+	uint32_t   satinGuideCount;    // number of satin guidelines
+	uint32_t   wordParam;          // clipboard/textured fill phase or satin end guide
+	fRECTANGLE rectangle {};       // rectangle
+	uint8_t    fillType;           // fill type
+	uint8_t    edgeType;           // edge type
+	float      fillSpacing;        // fill spacing
+	FLENCNT    lengthOrCount {};   // fill stitch length or clipboard count
+	FANGCLP    angleOrClipData {}; // fill angle or clipboard data pointer
+	float      borderSize;         // border size
+	float      edgeSpacing;        // edge spacing
+	float      edgeStitchLen;      // edge stitch length
+	uint16_t   picoLength;         // pico length
 
 	uint32_t extendedAttribute;   // attribute extension
 	float    maxFillStitchLen;    // maximum fill stitch length
 	float    minFillStitchLen;    // minimum fill stitch length
 	float    maxBorderStitchLen;  // maximum border stitch length
 	float    minBorderStitchLen;  // minimum border stitch length
-	TFINFO   fillInfo{};          // feather/texture info
+	TFINFO   fillInfo {};         // feather/texture info
 	uint32_t fillStart;           // fill start point
 	uint32_t fillEnd;             // fill end point
 	float    underlaySpacing;     // underlay spacing
@@ -1883,7 +1883,7 @@ public:
 	DWORD      borderClipData;  // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
 	uint16_t   satinGuideCount; // number of satin guidelines
 	uint16_t   wordParam;       // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle{};     // rectangle
+	fRECTANGLE rectangle {};    // rectangle
 	uint8_t    fillType;        // fill type
 	uint8_t    edgeType;        // edge type
 	float      fillSpacing;     // fill spacing
@@ -1899,7 +1899,7 @@ public:
 	float    minFillStitchLen;    // minimum fill stitch length
 	float    maxBorderStitchLen;  // maximum border stitch length
 	float    minBorderStitchLen;  // minimum border stitch length
-	TFINFO   fillInfo{};          // feather/texture info
+	TFINFO   fillInfo {};         // feather/texture info
 	uint16_t fillStart;           // fill start point
 	uint16_t fillEnd;             // fill end point
 	float    underlaySpacing;     // underlay spacing
@@ -2223,8 +2223,8 @@ constexpr uint32_t FRECONT  = 0x80u;
 constexpr uint32_t NFRECONT = 0x7fu;
 
 struct _frmclp {
-	uint32_t clipType{};
-	uint32_t reserved{};
+	uint32_t clipType {};
+	uint32_t reserved {};
 	FRMHED   form;
 };
 
@@ -2411,10 +2411,10 @@ using RANGE = struct _range;
 class REGION // region for sequencing vertical fills
 {
 public:
-	uint32_t start{ 0u };       // start line of region
-	uint32_t end{ 0u };         // end line of region
-	uint32_t regionBreak{ 0u }; // ToDo - Is this member needed?
-	uint32_t breakCount{ 0u };
+	uint32_t start { 0u };       // start line of region
+	uint32_t end { 0u };         // end line of region
+	uint32_t regionBreak { 0u }; // ToDo - Is this member needed?
+	uint32_t breakCount { 0u };
 
 	constexpr REGION() noexcept = default;
 	inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
@@ -2530,9 +2530,9 @@ using CLPSEG = struct _clpseg;
 class CLIPSORT
 {
 public:
-	float    segmentLength{ 0.0f };
-	float    sideLength{ 0.0f };
-	uint32_t vertexIndex{ 0 };
+	float    segmentLength { 0.0f };
+	float    sideLength { 0.0f };
+	uint32_t vertexIndex { 0 };
 	fPOINT   point;
 
 	constexpr CLIPSORT() noexcept = default;
@@ -2763,19 +2763,19 @@ using INTINF = struct _intinf;
 class TXTSCR
 {
 public:
-	int32_t  top{};                   // pixel top line
-	int32_t  bottom{};                // pixel bottom line
-	int32_t  height{};                // pixel height of area
-	int32_t  halfHeight{};            // pixel middle of area
-	float    xOffset{ 0.0f };         // edit x offset of area
-	float    yOffset{ 0.0f };         // edit y offset of area
-	float    areaHeight{ 0.0f };      // edit height of area
-	float    screenHeight{ 0.0f };    // edit height of screen
-	float    width{ 0.0f };           // edit width of area
-	float    spacing{ 0.0f };         // edit space between lines
-	uint16_t lines{ 0 };              // number of lines
-	double   editToPixelRatio{ 0.0 }; // edit to pixel ratio
-	fPOINT   formCenter;              // middle of the form
+	int32_t  top {};                   // pixel top line
+	int32_t  bottom {};                // pixel bottom line
+	int32_t  height {};                // pixel height of area
+	int32_t  halfHeight {};            // pixel middle of area
+	float    xOffset { 0.0f };         // edit x offset of area
+	float    yOffset { 0.0f };         // edit y offset of area
+	float    areaHeight { 0.0f };      // edit height of area
+	float    screenHeight { 0.0f };    // edit height of screen
+	float    width { 0.0f };           // edit width of area
+	float    spacing { 0.0f };         // edit space between lines
+	uint16_t lines { 0 };              // number of lines
+	double   editToPixelRatio { 0.0 }; // edit to pixel ratio
+	fPOINT   formCenter;               // middle of the form
 
 	constexpr TXTSCR() noexcept = default;
 };
