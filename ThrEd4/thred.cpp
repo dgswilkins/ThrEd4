@@ -2129,13 +2129,13 @@ void thred::internal::chknum() {
 			}
 			case LDSTRT: {
 				thred::savdo();
-				SelectedForm->fillStart = gsl::narrow<unsigned int>(std::round(value / PFGRAN));
+				SelectedForm->fillStart = wrap::round<uint32_t>(value / PFGRAN);
 				SelectedForm->fillStart %= VertexCount;
 				break;
 			}
 			case LDEND: {
 				thred::savdo();
-				SelectedForm->fillEnd = gsl::narrow<unsigned int>(std::round(value / PFGRAN));
+				SelectedForm->fillEnd = wrap::round<uint32_t>(value / PFGRAN);
 				SelectedForm->fillEnd %= VertexCount;
 				break;
 			}
@@ -2145,7 +2145,7 @@ void thred::internal::chknum() {
 				if (value > 255.0) {
 					value = 255.0;
 				}
-				SelectedForm->fillInfo.feather.upCount = gsl::narrow<unsigned char>(std::round(value));
+				SelectedForm->fillInfo.feather.upCount = wrap::round<uint8_t>(value);
 				break;
 			}
 			case LFTHCOL: {
@@ -2269,7 +2269,7 @@ void thred::internal::chknum() {
 					}
 					case LFTHNUM: {
 						thred::savdo();
-						SelectedForm->fillInfo.feather.count = gsl::narrow<unsigned short>(std::round(value / PFGRAN));
+						SelectedForm->fillInfo.feather.count = wrap::round<uint16_t>(value / PFGRAN);
 						break;
 					}
 					case LFTHFLR: {
@@ -2283,7 +2283,7 @@ void thred::internal::chknum() {
 						if (value > 255.0) {
 							value = 255.0;
 						}
-						SelectedForm->fillInfo.feather.downCount = gsl::narrow<unsigned char>(std::round(value));
+						SelectedForm->fillInfo.feather.downCount = wrap::round<uint8_t>(value);
 						break;
 					}
 					case LFRMSPAC: {
@@ -2336,7 +2336,7 @@ void thred::internal::chknum() {
 					case LAPCOL: {
 						thred::savdo();
 						SelectedForm->borderColor &= COLMSK;
-						auto borderColor = gsl::narrow_cast<unsigned char>(std::round(value / PFGRAN));
+						auto borderColor = wrap::round<uint8_t>(value / PFGRAN);
 						if (borderColor != 0u) {
 							borderColor--;
 						}
@@ -2368,7 +2368,7 @@ void thred::internal::chknum() {
 				}
 				case PNUDG: {
 					IniFile.cursorNudgeStep = value;
-					IniFile.nudgePixels     = gsl::narrow<unsigned short>(std::round(pxchk(value)));
+					IniFile.nudgePixels     = wrap::round<uint16_t>(pxchk(value));
 					SetWindowText((*ValueWindow)[PNUDG], fmt::format(L"{:.2f}", value).c_str());
 					break;
 				}
@@ -2433,7 +2433,7 @@ void thred::internal::chknum() {
 							break;
 						}
 						case PAP: {
-							AppliqueColor = gsl::narrow<unsigned>(std::round(value - 1)) % 16;
+							AppliqueColor = wrap::round<uint32_t>(value - 1) % 16;
 							SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", (AppliqueColor + 1)).c_str());
 							break;
 						}
@@ -2560,19 +2560,19 @@ void thred::internal::chknum() {
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::PIXIN)) {
-							IniFile.nudgePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
+							IniFile.nudgePixels = wrap::round<uint16_t>(pxchk(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::STPXIN)) {
-							IniFile.stitchSizePixels = gsl::narrow<unsigned short>(std::round(pxchk(value)));
+							IniFile.stitchSizePixels = wrap::round<uint16_t>(pxchk(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FRMPXIN)) {
-							IniFile.formVertexSizePixels = gsl::narrow<unsigned short>(std::round(value));
+							IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FRMBOXIN)) {
-							IniFile.formBoxSizePixels = gsl::narrow<unsigned short>(std::round(value));
+							IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::GETMIN)) {
@@ -3575,8 +3575,8 @@ DWORD thred::internal::coldis(COLORREF colorA, COLORREF colorB) {
 	auto       deltaG = gsl::narrow_cast<int>(color1.g) - gsl::narrow_cast<int>(color2.g);
 	auto       deltaB = gsl::narrow_cast<int>(color1.b) - gsl::narrow_cast<int>(color2.b);
 	// From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-	return gsl::narrow<DWORD>(std::round(
-	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8))));
+	return wrap::round<DWORD>(
+	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8)));
 }
 
 void thred::internal::bal2thr(std::vector<BALSTCH>& balaradStitch, unsigned destination, unsigned source, unsigned code) {
@@ -4219,8 +4219,8 @@ unsigned thred::internal::pesmtch(COLORREF referenceColor, unsigned char colorIn
 	auto       deltaG = gsl::narrow_cast<int>(color.g) - gsl::narrow_cast<int>(translatedColor.g);
 	auto       deltaB = gsl::narrow_cast<int>(color.b) - gsl::narrow_cast<int>(translatedColor.b);
 	// From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-	return gsl::narrow<unsigned>(std::round(
-	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8))));
+	return wrap::round<uint32_t>(
+	    std::sqrt((((512 + meanR) * deltaR * deltaR) >> 8) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) >> 8)));
 }
 
 void thred::internal::ritpes(unsigned char*                 buffer,
@@ -4269,8 +4269,8 @@ void thred::internal::pecEncodeLong(int delta) noexcept {
 }
 
 void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept {
-	auto deltaX = gsl::narrow<int>(std::round(srcX * 5 / 3));
-	auto deltaY = -gsl::narrow<int>(std::round(srcY * 5 / 3));
+	auto deltaX = wrap::round<int>(srcX * 5 / 3);
+	auto deltaY = -wrap::round<int>(srcY * 5 / 3);
 	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
 		PESdata[OutputIndex] = (deltaX < 0) ? deltaX - 128 : deltaX;
 		OutputIndex++;
@@ -4460,8 +4460,8 @@ void thred::internal::sav() {
 			sizstch(boundingRect, StitchBuffer);
 			PESstitchCenterOffset.x = form::midl(boundingRect.right, boundingRect.left);
 			PESstitchCenterOffset.y = form::midl(boundingRect.top, boundingRect.bottom);
-			pesHeader.xsiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.right - boundingRect.left) * (5.0f / 3.0f)));
-			pesHeader.ysiz = gsl::narrow_cast<uint16_t>(std::round((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f)));
+			pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0f / 3.0f));
+			pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex    = 0;
 			// ToDo - convert to vector ?
 			auto* pesStitchBuffer = new unsigned char[wrap::toSize(PCSHeader.stitchCount * 8u)];
@@ -4585,8 +4585,8 @@ void thred::internal::sav() {
 			pecHeader2->unknown4        = 0x01e0;
 			pecHeader2->unknown5        = 0x01b0;
 
-			auto xInt16_le = gsl::narrow_cast<uint16_t>(std::round(boundingRect.left * (5.0f / 3.0f)));
-			auto yInt16_le = gsl::narrow_cast<uint16_t>(std::round(boundingRect.bottom * (5.0f / 3.0f)));
+			auto xInt16_le = wrap::round<uint16_t>(boundingRect.left * (5.0f / 3.0f));
+			auto yInt16_le = wrap::round<uint16_t>(boundingRect.bottom * (5.0f / 3.0f));
 			xInt16_le |= gsl::narrow_cast<uint16_t>(0x9000);
 			yInt16_le |= gsl::narrow<uint16_t>(0x9000u);
 			pecHeader2->xMin = ((xInt16_le & 0xff00) >> 8) | ((xInt16_le & 0x00ff) << 8);
@@ -4615,8 +4615,8 @@ void thred::internal::sav() {
 			          stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
 			color = (StitchBuffer[0].attribute & COLMSK);
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				auto x = gsl::narrow_cast<uint16_t>(std::round((StitchBuffer[iStitch].x) * xFactor)) + 3;
-				auto y = gsl::narrow_cast<uint16_t>(std::round((StitchBuffer[iStitch].y) * yFactor)) + 3;
+				auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
+				auto y = wrap::round<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 3u;
 				y      = ThumbHeight - y;
 				if (color == (StitchBuffer[iStitch].attribute & COLMSK)) {
 					thumbnail[y][x] = 1;
@@ -8343,13 +8343,13 @@ void thred::internal::setsped() noexcept {
 	const auto userTimePerFrame = gsl::narrow_cast<double>(MovieTimeStep) / 10;
 	if (userTimePerFrame < 10) {
 		elapsedTimePerFrame = 100; // units are millseconds
-		StitchesPerFrame    = gsl::narrow<unsigned>(std::round(elapsedTimePerFrame / userTimePerFrame));
+		StitchesPerFrame    = wrap::round<uint32_t>(elapsedTimePerFrame / userTimePerFrame);
 		if (StitchesPerFrame > 99) {
 			StitchesPerFrame = 99;
 		}
 	}
 	else {
-		elapsedTimePerFrame = gsl::narrow<unsigned>(std::round(userTimePerFrame));
+		elapsedTimePerFrame = wrap::round<uint32_t>(userTimePerFrame);
 		StitchesPerFrame    = 2;
 	}
 	if (StitchesPerFrame < 2) {
@@ -8662,7 +8662,7 @@ void thred::internal::movi() {
 			stepCount = PCSHeader.stitchCount;
 		}
 		if (!StateMap.test(StateFlag::WASPAT)) {
-			MovieTimeStep = gsl::narrow<decltype(MovieTimeStep)>(std::round(10000.0 * MOVITIM / stepCount));
+			MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0 * MOVITIM / stepCount);
 		}
 		if (MovieTimeStep < MINDELAY) {
 			MovieTimeStep = MINDELAY;
@@ -18382,11 +18382,11 @@ void thred::internal::drwStch() {
 			ScrollInfo.nMax   = UnzoomedRect.y;
 			ScrollInfo.nMin   = 0;
 			ScrollInfo.nPage  = wrap::round<long>(ZoomRect.top - ZoomRect.bottom);
-			ScrollInfo.nPos   = gsl::narrow<decltype(ScrollInfo.nPos)>(std::round(UnzoomedRect.y - ZoomRect.top));
+			ScrollInfo.nPos   = wrap::round<decltype(ScrollInfo.nPos)>(UnzoomedRect.y - ZoomRect.top);
 			SetScrollInfo(VerticalScrollBar, SB_CTL, &ScrollInfo, TRUE);
 			ScrollInfo.nMax  = UnzoomedRect.x;
 			ScrollInfo.nPage = wrap::round<long>(ZoomRect.right - ZoomRect.left);
-			ScrollInfo.nPos  = gsl::narrow<decltype(ScrollInfo.nPos)>(std::round(ZoomRect.left));
+			ScrollInfo.nPos  = wrap::round<decltype(ScrollInfo.nPos)>(ZoomRect.left);
 			SetScrollInfo(HorizontalScrollBar, SB_CTL, &ScrollInfo, TRUE);
 			ShowWindow(HorizontalScrollBar, TRUE);
 			ShowWindow(VerticalScrollBar, TRUE);
@@ -18397,9 +18397,9 @@ void thred::internal::drwStch() {
 		}
 		thred::duzrat();
 		const auto dub6      = ZoomRatio.x * 6.0;
-		ThreadWidthPixels[0] = gsl::narrow<int>(std::round(dub6 * TSIZ30));
-		ThreadWidthPixels[1] = gsl::narrow<int>(std::round(dub6 * TSIZ40));
-		ThreadWidthPixels[2] = gsl::narrow<int>(std::round(dub6 * TSIZ60));
+		ThreadWidthPixels[0] = wrap::round<int>(dub6 * TSIZ30);
+		ThreadWidthPixels[1] = wrap::round<int>(dub6 * TSIZ40);
+		ThreadWidthPixels[2] = wrap::round<int>(dub6 * TSIZ60);
 		for (auto iColor = 0u; iColor < 16; iColor++) {
 			if (StateMap.test(StateFlag::THRDS)) {
 				nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);

@@ -758,7 +758,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	const auto outerStep
 	    = dPOINT { SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	spacing += ClipRectSize.cx;
-	const auto count = gsl::narrow<unsigned int>(std::round(length / spacing));
+	const auto count = wrap::round<uint32_t>(length / spacing);
 	rotationAngle    = atan2(delta.y, delta.x);
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count != 0u) {

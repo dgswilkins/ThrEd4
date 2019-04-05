@@ -1362,7 +1362,7 @@ unsigned int form::getlast() {
 void form::filinsb(const dPOINT& point) {
 	const auto delta  = dPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto length = hypot(delta.x, delta.y);
-	auto       count  = gsl::narrow<unsigned int>(std::round(length / MAXSTCH + 1));
+	auto       count  = wrap::round<uint32_t>(length / MAXSTCH + 1);
 	const auto step   = dPOINT { (delta.x / count), (delta.y / count) };
 
 	if (length > MAXSTCH) {
@@ -1402,7 +1402,7 @@ float form::getblen() {
 }
 
 void form::savblen(float fLength) {
-	auto  iLength = gsl::narrow<unsigned int>(std::round(fLength));
+	auto  iLength = wrap::round<uint32_t>(fLength);
 	auto& form    = (*FormList)[ClosestFormToCursor];
 
 	form.clipEntries = iLength >> 16;
@@ -1436,14 +1436,14 @@ void form::internal::bdrlin(unsigned int start, unsigned int finish, double stit
 	auto       step        = dPOINT {};
 
 	if (UserFlagMap.test(UserFlag::LINSPAC)) {
-		stitchCount = gsl::narrow<unsigned>(std::round(length / stitchSize + 0.5));
+		stitchCount = wrap::round<uint32_t>(length / stitchSize + 0.5);
 		if (stitchCount != 0u) {
 			step.x = delta.x / stitchCount;
 			step.y = delta.y / stitchCount;
 		}
 	}
 	else {
-		stitchCount      = gsl::narrow<unsigned>(std::round((length - stitchSize / 2.0) / stitchSize + 1.0));
+		stitchCount      = wrap::round<uint32_t>((length - stitchSize / 2.0) / stitchSize + 1.0);
 		const auto angle = atan2(delta.y, delta.x);
 		step.x           = cos(angle) * stitchSize;
 		step.y           = sin(angle) * stitchSize;
@@ -1488,7 +1488,7 @@ void form::internal::boldlin(unsigned int start, unsigned int finish, double siz
 	auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto delta    = dPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto length   = hypot(delta.x, delta.y);
-	auto       count    = gsl::narrow<unsigned>(std::round(length / size));
+	auto       count    = wrap::round<uint32_t>(length / size);
 
 	if (count != 0u) {
 		const auto step   = fPOINT { delta.x / count, delta.y / count };
@@ -1848,7 +1848,7 @@ void form::internal::duromb(const dPOINT& start0, const dPOINT& finish0, const d
 	const auto delta0  = dPOINT { finish0.x - start0.x, finish0.y - start0.y };
 	const auto delta1  = dPOINT { finish1.x - start1.x, finish1.y - start1.y };
 	const auto length0 = hypot(delta0.x, delta0.y);
-	auto       count   = gsl::narrow<unsigned int>(std::round(length0 / (LineSpacing / 2.0)));
+	auto       count   = wrap::round<uint32_t>(length0 / (LineSpacing / 2.0));
 	if (count == 0u) {
 		count++;
 	}
@@ -1924,7 +1924,7 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, unsigned 
 	}
 	const auto radius    = hypot(startDelta.x, startDelta.y);
 	const auto arc       = fabs(radius * deltaAngle);
-	auto       count     = gsl::narrow<unsigned int>(std::round(arc / LineSpacing));
+	auto       count     = wrap::round<uint32_t>(arc / LineSpacing);
 	const auto stepAngle = deltaAngle / count;
 	if (count == 0u) {
 		count = 1;
@@ -2081,7 +2081,7 @@ void form::internal::bhfn(unsigned int start, unsigned int finish, double spacin
 	auto       vertexIt   = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto delta      = dPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto length     = hypot(delta.x, delta.y);
-	const auto count      = gsl::narrow<unsigned int>(std::round(length / spacing));
+	const auto count      = wrap::round<uint32_t>(length / spacing);
 	const auto step       = dPOINT { (delta.x / count), (delta.y / count) };
 	auto       innerPoint = dPOINT { vertexIt[start].x, vertexIt[start].y };
 
@@ -2569,12 +2569,12 @@ void form::internal::contf() {
 		std::swap(highSpacing, lowSpacing);
 	}
 	for (auto iVertex = 0u; iVertex < lowVertexIndex; iVertex++) {
-		lowCounts[iVertex]  = gsl::narrow<unsigned int>(std::round(lowLengths[iVertex] / lowSpacing));
+		lowCounts[iVertex]  = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
 		lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
 		lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
 	}
 	for (auto iVertex = 0u; iVertex < highVertexIndex; iVertex++) {
-		highCounts[iVertex]  = gsl::narrow<unsigned int>(std::round(highLengths[iVertex] / highSpacing));
+		highCounts[iVertex]  = wrap::round<uint32_t>(highLengths[iVertex] / highSpacing);
 		highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
 		highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
 	}
@@ -3161,7 +3161,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 			std::swap(start, finish);
 		}
 		if (SelectedForm->fillSpacing < 0) {
-			finish += gsl::narrow<decltype(finish)>(std::round(ClipRectSize.cx / clipWidth));
+			finish += wrap::round<decltype(finish)>(ClipRectSize.cx / clipWidth);
 		}
 		if (finish > gsl::narrow<unsigned int>(clipGrid.right)) {
 			finish = gsl::narrow<unsigned int>(clipGrid.right);
@@ -4158,8 +4158,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		if (nextGroup == 0 || nextGroup < groupStart) {
 			nextGroup = groupStart;
 		}
-		seqn = gsl::narrow<decltype(seqn)>(
-		    std::round((gsl::narrow_cast<double>(nextGroup) - groupStart) / length + sequenceStart));
+		seqn = wrap::round<decltype(seqn)>((gsl::narrow_cast<double>(nextGroup) - groupStart) / length + sequenceStart);
 	}
 	if (seql < sequenceStart) {
 		seql = sequenceStart;
@@ -4532,7 +4531,7 @@ void form::internal::bakseq() {
 	while (iSequence > 0) {
 		const auto rcnt           = iSequence % RITSIZ;
 		const auto StitchSpacing2 = LineSpacing * 2;
-		const auto rit            = gsl::narrow<int>(std::round((*BSequence)[iSequence].x / StitchSpacing2));
+		const auto rit            = wrap::round<int>((*BSequence)[iSequence].x / StitchSpacing2);
 		auto&      bPrevious      = (*BSequence)[iSequence - 1u];
 		auto&      bCurrent       = (*BSequence)[iSequence];
 		auto&      bNext          = (*BSequence)[wrap::toSize(iSequence) + 1u];
@@ -4619,7 +4618,7 @@ void form::internal::bakseq() {
 				const auto UserStitchLength2 = UserStitchLength * 2;
 				if (length > UserStitchLength2) {
 					auto point = bNext;
-					auto count = gsl::narrow<unsigned int>(std::round(length / UserStitchLength - 1));
+					auto count = wrap::round<uint32_t>(length / UserStitchLength - 1);
 					if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
 						return;
 					}
@@ -4644,7 +4643,7 @@ void form::filinu(const dPOINT& inPoint) {
 	auto       point  = dPOINT { SelectedPoint.x, SelectedPoint.y };
 	const auto delta  = dPOINT { (inPoint.x - SelectedPoint.x), (inPoint.y - SelectedPoint.y) };
 	const auto length = hypot(delta.x, delta.y);
-	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
+	auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
 
 	if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
 		return;
@@ -4671,7 +4670,7 @@ void form::filin(dPOINT currentPoint) {
 	const auto delta  = dPOINT { (currentPoint.x - SelectedPoint.x), (currentPoint.y - SelectedPoint.y) };
 	auto       point  = dPOINT { SelectedPoint.x, SelectedPoint.y };
 	const auto length = hypot(delta.x, delta.y);
-	auto       count  = gsl::narrow<unsigned int>(std::round(length / UserStitchLength));
+	auto       count  = wrap::round<uint32_t>(length / UserStitchLength);
 
 	if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
 		return;
@@ -4737,10 +4736,10 @@ void form::internal::clpfm() {
 		const auto rightDelta  = dPOINT { bSeq2.x - bSeq3.x, bSeq2.y - bSeq3.y };
 		auto       count       = 0u;
 		if (rightLength > leftLength) {
-			count = gsl::narrow<decltype(count)>(std::round(leftLength / ClipRectSize.cy));
+			count = wrap::round<decltype(count)>(leftLength / ClipRectSize.cy);
 		}
 		else {
-			count = gsl::narrow<decltype(count)>(std::round(rightLength / ClipRectSize.cy));
+			count = wrap::round<decltype(count)>(rightLength / ClipRectSize.cy));
 		}
 		if (count == 0u) {
 			count = 1;
@@ -6525,7 +6524,7 @@ void form::duspir(unsigned stepCount) {
 	const auto length = 800.0 / stepCount * ZoomFactor * (gsl::narrow_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (gsl::narrow_cast<double>(LHUPX) + LHUPY);
 	auto newForm        = FRMHED {};
-	auto vertexCount    = gsl::narrow<unsigned int>(std::round(stepCount * SpiralWrap));
+	auto vertexCount    = wrap::round<uint32_t>(stepCount * SpiralWrap);
 	newForm.vertexIndex = thred::adflt(vertexCount);
 	newForm.vertexCount = vertexCount;
 	newForm.attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
@@ -6646,7 +6645,7 @@ void form::dulens(unsigned sides) {
 	}
 	const auto steps     = sides << 1;
 	const auto stepAngle = PI * 2.0 / steps;
-	auto       count     = gsl::narrow<unsigned int>(std::round(steps / 2.0 * 0.3));
+	auto       count     = wrap::round<uint32_t>(steps / 2.0 * 0.3);
 	auto       angle     = count * stepAngle;
 	const auto length    = 500.0 / steps * ZoomFactor * (gsl::narrow_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
 	                    / (gsl::narrow_cast<double>(LHUPX) + LHUPY);
@@ -7080,7 +7079,7 @@ void form::internal::snpfn(const std::vector<unsigned>& xPoints, unsigned start,
 }
 
 void form::internal::doTimeWindow(float rangeX, const std::vector<unsigned>& xPoints, const std::vector<unsigned>& xHistogram) {
-	auto checkLength = gsl::narrow<unsigned int>(std::round(SnapLength * 2.0 + 1.0));
+	auto checkLength = wrap::round<uint32_t>(SnapLength * 2.0 + 1.0);
 
 	auto timeWindow = CreateWindow(L"STATIC",
 	                               nullptr,
@@ -7121,7 +7120,7 @@ void form::internal::snp(unsigned start, unsigned finish) {
 	auto xPoints = std::vector<unsigned> {};
 	xPoints.resize(PCSHeader.stitchCount);
 	auto xHistogram = std::vector<unsigned> {};
-	xHistogram.resize(gsl::narrow<size_t>(std::round(range.x)) + 1u);
+	xHistogram.resize(wrap::round<size_t>(range.x) + 1u);
 
 	const auto attribute = (ClosestFormToCursor << 4) & FRMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
@@ -7139,7 +7138,7 @@ void form::internal::snp(unsigned start, unsigned finish) {
 		}
 	}
 	auto accumulator = 0u;
-	auto endColumn   = gsl::narrow<unsigned int>(std::round(range.x));
+	auto endColumn   = wrap::round<uint32_t>(range.x);
 	for (auto iColumn = 0u; iColumn < endColumn; iColumn++) {
 		auto value          = xHistogram[iColumn];
 		xHistogram[iColumn] = accumulator;

@@ -892,8 +892,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto segmentStitchCount = 0u;
 		for (auto iSegment = 0u; iSegment < line1Segments - 1; iSegment++) {
 			const auto nextVertex = form::nxt(iVertex);
-			const auto val        = gsl::narrow<unsigned int>(
-                std::round(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5));
+			const auto val        = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5);
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = form::nxt(iVertex);
@@ -904,8 +903,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		// auto iSegment           = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			const auto val = gsl::narrow<unsigned int>(
-			    std::round(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5));
+			const auto val = wrap::round<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5);
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = form::prv(iNextVertex);
@@ -1271,7 +1269,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 		sb.y = 1e12;
 	}
 	if (outerLength > innerLength) {
-		count     = gsl::narrow<unsigned int>(std::round(outerLength / LineSpacing));
+		count     = wrap::round<uint32_t>(outerLength / LineSpacing);
 		innerFlag = true;
 
 		dPOINT intersection = {};
@@ -1282,7 +1280,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 		}
 	}
 	else {
-		count     = gsl::narrow<unsigned int>(std::round(innerLength / LineSpacing));
+		count     = wrap::round<uint32_t>(innerLength / LineSpacing);
 		outerFlag = true;
 
 		dPOINT intersection = {};
@@ -1310,7 +1308,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 			if (innerFlag) {
 				const auto offsetDelta  = dPOINT { innerPoint.x - SelectedPoint.x, innerPoint.y - SelectedPoint.y };
 				const auto offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				auto       offsetCount  = gsl::narrow<unsigned int>(std::round(offsetLength / LineSpacing));
+				auto       offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 				const auto offsetStep   = dPOINT { offsetDelta.x / offsetCount, offsetDelta.y / offsetCount };
 				auto       offset       = innerPoint;
 				while (si::chkbak(satinBackup, offset)) {
@@ -1327,7 +1325,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 			if (outerFlag) {
 				const auto offsetDelta  = dPOINT { outerPoint.x - SelectedPoint.x, outerPoint.y - SelectedPoint.y };
 				const auto offsetLength = hypot(offsetDelta.x, offsetDelta.y);
-				auto       offsetCount  = gsl::narrow<unsigned int>(std::round(offsetLength / LineSpacing));
+				auto       offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 				const auto offsetStep   = dPOINT { offsetDelta.x / offsetCount, offsetDelta.y / offsetCount };
 				auto       offset       = outerPoint;
 				while (si::chkbak(satinBackup, offset)) {
