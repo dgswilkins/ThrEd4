@@ -375,8 +375,8 @@ void trace::trace() {
 			if (StateMap.test(StateFlag::LANDSCAP)) {
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			}
-			BitmapPoint.x    = wrap::toLong(BmpStitchRatio.x * SelectedPoint.x);
-			BitmapPoint.y    = wrap::toLong(BmpStitchRatio.y * SelectedPoint.y - 1.0);
+			BitmapPoint.x    = wrap::round<long>(BmpStitchRatio.x * SelectedPoint.x);
+			BitmapPoint.y    = wrap::round<long>(BmpStitchRatio.y * SelectedPoint.y - 1.0);
 			const auto color = TraceBitmapData[BitmapPoint.y * BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (StateMap.test(StateFlag::TRCUP)) {
 				UpPixelColor   = color;
@@ -640,8 +640,8 @@ void trace::internal::dutrac() {
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 		}
-		CurrentTracePoint.x = wrap::toLong(BmpStitchRatio.x * SelectedPoint.x);
-		CurrentTracePoint.y = wrap::toLong(BmpStitchRatio.y * SelectedPoint.y);
+		CurrentTracePoint.x = wrap::round<long>(BmpStitchRatio.x * SelectedPoint.x);
+		CurrentTracePoint.y = wrap::round<long>(BmpStitchRatio.y * SelectedPoint.y);
 		if (CurrentTracePoint.x > gsl::narrow<long>(BitmapWidth)) {
 			CurrentTracePoint.x = BitmapWidth;
 		}
@@ -1027,8 +1027,8 @@ void trace::internal::stch2bit(fPOINT& point) {
 	if (StateMap.test(StateFlag::LANDSCAP)) {
 		point.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	}
-	BitmapPoint.x = wrap::toLong(BmpStitchRatio.x * point.x);
-	BitmapPoint.y = wrap::toLong(BitmapHeight - BmpStitchRatio.y * point.y);
+	BitmapPoint.x = wrap::round<long>(BmpStitchRatio.x * point.x);
+	BitmapPoint.y = wrap::round<long>(BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
 void trace::internal::pxlin(unsigned int start, unsigned int finish) {
@@ -1102,7 +1102,7 @@ void trace::tracpar() {
 					break;
 				}
 				const auto ratio         = (TraceMsgPoint.y) / (ButtonHeight * 15.0);
-				const auto position      = wrap::toUnsigned(std::floor(ratio * 255.0));
+				const auto position      = wrap::floor<uint32_t>(ratio * 255.0);
 				auto       traceColor    = gsl::narrow_cast<COLORREF>(UpPixelColor & TraceRGB[2 - ColumnColor]);
 				const auto tracePosition = gsl::narrow_cast<COLORREF>(position << TraceShift[ColumnColor]);
 				if (tracePosition < traceColor) {
@@ -1129,7 +1129,8 @@ void trace::tracpar() {
 			trace::trace();
 		}
 		else {
-			const auto position = wrap::toUnsigned(std::floor(TraceMsgPoint.y / ButtonHeight));
+			// ToDo - Does this line make sense?
+			const auto position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
 			if (position < 16) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
 				thred::redraw(TraceSelectWindow[ColumnColor]);
@@ -1230,9 +1231,9 @@ void trace::internal::durct(unsigned    shift,
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
 	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255;
-	traceMiddleMask.top    = wrap::toLong(controlHeight * ratio + traceControlRect.top);
+	traceMiddleMask.top    = wrap::round<long>(controlHeight * ratio + traceControlRect.top);
 	ratio                  = gsl::narrow_cast<double>(upperColor) / 255;
-	traceMiddleMask.bottom = wrap::toLong(controlHeight * ratio + traceControlRect.top);
+	traceMiddleMask.bottom = wrap::round<long>(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
 	if (lowerColor != 0u) {

@@ -82,14 +82,6 @@ float wrap::toFloat(long invar) noexcept {
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-long wrap::toLong(double invar) {
-	return gsl::narrow<long>(std::round(invar));
-}
-
-long wrap::toLong(float invar) {
-	return gsl::narrow<long>(std::round(invar));
-}
-
 uint32_t wrap::toUnsigned(double invar) {
 	return gsl::narrow<uint32_t>(std::round(invar));
 }
@@ -123,3 +115,4 @@ HPEN wrap::CreatePen(int iStyle, unsigned width, COLORREF color) noexcept {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }
+

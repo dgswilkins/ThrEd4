@@ -301,9 +301,9 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
-	screenPoint.x = wrap::toLong((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
+	screenPoint.x = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
 	                           / TextureScreen.editToPixelRatio);
-	screenPoint.y = wrap::toLong(gsl::narrow_cast<double>(TextureScreen.height)
+	screenPoint.y = wrap::round<long>(gsl::narrow_cast<double>(TextureScreen.height)
 	                           - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height
 	                           + TextureScreen.top);
 }
@@ -348,8 +348,8 @@ void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
 }
 
 void texture::internal::ed2px(const fPOINT& editPoint, POINT& point) {
-	point.x = wrap::toLong(editPoint.x / TextureScreen.editToPixelRatio);
-	point.y = wrap::toLong(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
+	point.x = wrap::round<long>(editPoint.x / TextureScreen.editToPixelRatio);
+	point.y = wrap::round<long>(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
 }
 
 void texture::internal::px2ed(const POINT& point, fPOINT& editPoint) noexcept {
@@ -374,7 +374,7 @@ void texture::drwtxtr() {
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	const auto pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
-	TextureScreen.lines   = gsl::narrow<unsigned short>(std::floor(TextureScreen.width / TextureScreen.spacing));
+	TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
 	const auto extraWidth = TextureScreen.spacing * (TextureScreen.lines + 2);
 	if (StateMap.testAndReset(StateFlag::CHKTX)) {
 		txi::chktx();
@@ -402,7 +402,7 @@ void texture::drwtxtr() {
 	TextureScreen.yOffset      = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	SelectObject(StitchWindowMemDC, GridPen);
-	auto gridLineCount = gsl::narrow<unsigned int>(std::floor(TextureScreen.areaHeight / IniFile.gridSize + 1));
+	auto gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0f);
 	auto textureRecord = TXPNT {};
 	line[0].x          = 0;
 	line[1].x          = StitchWindowClientRect.right;
@@ -420,7 +420,7 @@ void texture::drwtxtr() {
 	line[0].y = 0;
 	line[1].y = StitchWindowClientRect.bottom;
 	for (auto iVertical = 1u; iVertical < TextureScreen.lines + 1u; iVertical++) {
-		line[0].x = line[1].x = wrap::toLong((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
+		line[0].x = line[1].x = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
 		                                   / TextureScreen.editToPixelRatio);
 		Polyline(StitchWindowMemDC, line, 2);
 	}
@@ -609,8 +609,8 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 	if (start > finish) {
 		std::swap(start, finish);
 	}
-	auto integerStart  = gsl::narrow<int>(std::ceil(start / TextureScreen.spacing));
-	auto integerFinish = gsl::narrow<int>(std::floor(finish / TextureScreen.spacing));
+	auto integerStart  = wrap::ceil<int>(start / TextureScreen.spacing);
+	auto integerFinish = wrap::floor<int>(finish / TextureScreen.spacing);
 	if (integerStart < 1) {
 		integerStart = 1;
 	}
@@ -697,8 +697,8 @@ void texture::txtrup() {
 		offset.y -= SelectTexturePointsOrigin.y;
 		const auto Xmagnitude = abs(offset.x);
 		auto       textureOffset
-		    = TXOFF { gsl::narrow_cast<float>(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
-			          gsl::narrow<int>(std::ceil(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing)) };
+		    = TXOFF { wrap::toFloat(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
+			          wrap::ceil<int>(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing) };
 		if (offset.x < 0) {
 			textureOffset.line = -textureOffset.line;
 		}

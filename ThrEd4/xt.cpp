@@ -2560,12 +2560,12 @@ void xt::nudsiz() {
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = DesignSize.x * 1.05;
-				UnzoomedRect.x    = wrap::toLong(IniFile.hoopSizeX);
+				UnzoomedRect.x    = wrap::round<long>(IniFile.hoopSizeX);
 				flag              = 1;
 			}
 			if (DesignSize.y > IniFile.hoopSizeY) {
 				IniFile.hoopSizeY = DesignSize.y * 1.05;
-				UnzoomedRect.y    = wrap::toLong(IniFile.hoopSizeY);
+				UnzoomedRect.y    = wrap::round<long>(IniFile.hoopSizeY);
 				flag              = 1;
 			}
 			xi::nudfn(designSizeRect);

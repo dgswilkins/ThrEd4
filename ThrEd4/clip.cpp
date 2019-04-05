@@ -323,7 +323,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 	const auto& point     = vertexIt[wrap::toSize(currentSide) + 1u];
 	const auto  delta     = fPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto  length    = hypot(delta.x, delta.y);
-	const auto  clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
+	const auto  clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
 
 	if (clipCount != 0u) {
 		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
@@ -373,7 +373,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	if (ClipRectSize.cx == 0.0f) {
 		return false;
 	}
-	const auto clipCount = gsl::narrow<unsigned int>(std::floor(length / ClipRectSize.cx));
+	const auto clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
 	if (clipCount != 0u) {
 		auto remainder = 0.0f;
 		if (clipCount > 1) {
@@ -483,7 +483,7 @@ void clip::internal::fxlit(const std::vector<double>& listSINEs,
 		BeanCount++;
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		const auto length   = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
-		const auto count    = gsl::narrow<unsigned int>(std::floor(length / AdjustedSpace));
+		const auto count    = wrap::floor<uint32_t>(length / AdjustedSpace);
 		const auto delta    = dPOINT { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
 		SelectedPoint.x += delta.x * count;
 		SelectedPoint.y += delta.y * count;
@@ -501,7 +501,7 @@ void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
 		chainEndPoints.push_back(SelectedPoint);
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		const auto length   = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
-		const auto count    = gsl::narrow<unsigned int>(std::floor(length / AdjustedSpace));
+		const auto count    = wrap::floor<uint32_t>(length / AdjustedSpace);
 		const auto delta    = dPOINT { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
 		for (auto iChain = 0u; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
