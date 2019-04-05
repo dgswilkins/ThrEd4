@@ -4739,7 +4739,7 @@ void form::internal::clpfm() {
 			count = wrap::round<decltype(count)>(leftLength / ClipRectSize.cy);
 		}
 		else {
-			count = wrap::round<decltype(count)>(rightLength / ClipRectSize.cy));
+			count = wrap::round<decltype(count)>(rightLength / ClipRectSize.cy);
 		}
 		if (count == 0u) {
 			count = 1;
