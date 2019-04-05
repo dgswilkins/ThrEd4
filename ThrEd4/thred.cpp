@@ -4268,7 +4268,7 @@ void thred::internal::pecEncodeLong(int delta) noexcept {
 	OutputIndex++;
 }
 
-void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept {
+void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) {
 	auto deltaX = wrap::round<int>(srcX * 5 / 3);
 	auto deltaY = -wrap::round<int>(srcY * 5 / 3);
 	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
@@ -8334,7 +8334,7 @@ void thred::internal::stchout() {
 	}
 }
 
-void thred::internal::setsped() noexcept {
+void thred::internal::setsped() {
 	auto elapsedTimePerFrame = 0u;
 
 	if (MovieTimeStep == 0) {

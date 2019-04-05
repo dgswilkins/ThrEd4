@@ -445,7 +445,7 @@ namespace internal {
 	void     setmov();
 	void     setpclp();
 	void     setpcs();
-	void     setsped() noexcept;
+	void     setsped();
 	void     setsrch(unsigned stitch);
 	void     shft2box();
 	void     shftflt(fPOINT point) noexcept;
@@ -521,7 +521,7 @@ namespace internal {
 	void     pecnam(unsigned char* pchr);
 	void     ritpcol(unsigned char colorIndex) noexcept;
 	void     ritpes(unsigned char* buffer, unsigned int& bufferIndex, unsigned iStitch, const std::vector<fPOINTATTR>& stitches);
-	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY) noexcept;
+	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY);
 	void     setpes();
 	unsigned tripl(char* dat);
 	void     writeThumbnail(unsigned char* pchr, unsigned char const (*image)[ThumbHeight][ThumbWidth]) noexcept;
