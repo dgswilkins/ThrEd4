@@ -632,7 +632,7 @@ void xt::internal::chkuseq() {
 			const auto delta       = fPOINT { (*OSequence)[wrap::toSize(iSequence) + 1].x - (*OSequence)[iSequence].x,
                                         (*OSequence)[wrap::toSize(iSequence) + 1].y - (*OSequence)[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
-			const auto stitchCount = wrap::toUnsigned(length / underlayStitchLength);
+			const auto stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
 			if (stitchCount != 0u) {
 				const auto step  = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
 				auto       point = (*OSequence)[iSequence];
@@ -720,7 +720,7 @@ unsigned xt::internal::gucon(const fPOINT& start, const fPOINT& finish, unsigned
 			                        indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y };
 		length           = hypot(delta.x, delta.y);
 
-		const auto stitchCount = wrap::toUnsigned(length / UserStitchLength);
+		const auto stitchCount = wrap::round<uint32_t>(length / UserStitchLength);
 		if (stitchCount > 1) {
 			const auto step       = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
 			auto       localPoint = fPOINT { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
@@ -1094,10 +1094,10 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 
 unsigned xt::internal::duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
 	sortRecord.direction = false;
-	const auto jumps0    = wrap::toUnsigned(precjmps(tempStitchBuffer, pRecs, sortRecord));
+	const auto jumps0    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
 
 	sortRecord.direction = true;
-	const auto jumps1    = wrap::toUnsigned(precjmps(tempStitchBuffer, pRecs, sortRecord));
+	const auto jumps1    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
 
 	if (jumps0 < jumps1) {
 		sortRecord.direction = false;

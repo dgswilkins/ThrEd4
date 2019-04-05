@@ -354,7 +354,7 @@ void trace::trdif() {
 			for (auto iPixel = 0u; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 				TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 				if (differenceBitmap[iPixel] != 0u) {
-					const auto adjustedColorSum = wrap::toUnsigned((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
+					const auto adjustedColorSum = wrap::round<uint32_t>((differenceBitmap[iPixel] - colorSumMinimum) * ratio);
 					TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 				}
 			}

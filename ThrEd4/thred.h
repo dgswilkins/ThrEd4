@@ -421,7 +421,7 @@ namespace internal {
 	void     sachk();
 	void     sav();
 	void     savAs();
-	void     savclp(unsigned int destination, unsigned int source) noexcept;
+	void     savclp(unsigned int destination, unsigned int source);
 	bool     savcmp() noexcept;
 	void     savdst(std::vector<DSTREC>& DSTRecords, unsigned data);
 	void     savmap();

@@ -3167,7 +3167,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 			finish = gsl::narrow<unsigned int>(clipGrid.right);
 		}
 		if (clipNegative) {
-			start -= wrap::toUnsigned(ClipRectSize.cx / clipWidth);
+			start -= wrap::round<uint32_t>(ClipRectSize.cx / clipWidth);
 		}
 		for (auto iSegment = start; iSegment <= finish; iSegment++) {
 			regionCrossingData.push_back({ iSegment, iVertex });

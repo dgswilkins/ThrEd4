@@ -877,10 +877,10 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto line2Length = lengths[line2Start] - lengths[line2End];
 		auto stitchCount = 0u;
 		if (fabs(line1Length) > fabs(line2Length)) {
-			stitchCount = wrap::toUnsigned(fabs(line2Length) / LineSpacing);
+			stitchCount = wrap::round<uint32_t>(fabs(line2Length) / LineSpacing);
 		}
 		else {
-			stitchCount = wrap::toUnsigned(fabs(line1Length) / LineSpacing);
+			stitchCount = wrap::round<uint32_t>(fabs(line1Length) / LineSpacing);
 		}
 		const auto line1Segments     = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		const auto line2Segments     = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));

@@ -31,10 +31,12 @@ double   toDouble(long invar) noexcept;
 float    toFloat(double invar);
 float    toFloat(long invar) noexcept;
 size_t   toSize(uint32_t invar) noexcept;
-uint32_t toUnsigned(double invar);
 uint32_t toUnsigned(size_t invar);
 void WriteFile(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 template <class outType, class inType> outType ceil(inType invar) {
 	return gsl::narrow<outType>(std::ceil(invar));
 }
@@ -46,4 +48,6 @@ template <class outType, class inType> outType floor(inType invar) {
 template <class outType, class inType> outType round(inType invar) {
 	return gsl::narrow<outType>(std::round(invar));
 }
+#pragma warning(pop)
+
 }

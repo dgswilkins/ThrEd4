@@ -2514,7 +2514,7 @@ void thred::internal::chknum() {
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
 							if (value < FormList->size()) {
-								form::frmnumfn(wrap::toUnsigned(value));
+								form::frmnumfn(wrap::round<uint32_t>(value));
 							}
 							else {
 								displayText::tabmsg(IDS_FRMN1);
@@ -2644,15 +2644,15 @@ void thred::internal::chknum() {
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
-							xt::dubcol(wrap::toUnsigned(value));
+							xt::dubcol(wrap::round<uint32_t>(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
-							xt::dufcol(wrap::toUnsigned(value));
+							xt::dufcol(wrap::round<uint32_t>(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETUCOL)) {
-							xt::dundcol(wrap::toUnsigned(value));
+							xt::dundcol(wrap::round<uint32_t>(value));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::FSETFANG)) {
@@ -7445,7 +7445,7 @@ void thred::internal::rot(dPOINT& rotationCenter) {
 	ritrot(0, rotationCenter);
 }
 
-void thred::internal::savclp(unsigned int destination, unsigned int source) noexcept {
+void thred::internal::savclp(unsigned int destination, unsigned int source) {
 	auto integer = 0.0;
 
 	ClipStitchData[destination].led  = StitchBuffer[source].attribute & COLMSK;
@@ -12726,14 +12726,14 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 		if (Msg.message == WM_RBUTTONDOWN) {
 			if (((Msg.wParam & MK_SHIFT) != 0u) && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 				unbox();
-				GroupStitchIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
+				GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
 				StateMap.set(StateFlag::GRPSEL);
 				thred::grpAdj();
 				nuAct(GroupStitchIndex);
 				StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-				ClosestPointIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
+				ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
 				nuAct(ClosestPointIndex);
 				movbox();
 				if (StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -12744,7 +12744,7 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 			}
 		}
 		else {
-			ClosestPointIndex = wrap::toUnsigned(colorBarPosition * PCSHeader.stitchCount);
+			ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
 			nuAct(ClosestPointIndex);
 			rstAll();
 			StateMap.set(StateFlag::SELBOX);

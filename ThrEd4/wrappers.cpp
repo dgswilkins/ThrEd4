@@ -82,10 +82,6 @@ float wrap::toFloat(long invar) noexcept {
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-uint32_t wrap::toUnsigned(double invar) {
-	return gsl::narrow<uint32_t>(std::round(invar));
-}
-
 uint32_t wrap::toUnsigned(size_t invar) {
 	return gsl::narrow<uint32_t>(invar);
 }
