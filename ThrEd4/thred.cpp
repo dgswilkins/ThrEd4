@@ -2083,6 +2083,9 @@ void thred::internal::chknum() {
 	auto value = 0.0;
 	if (wcslen(MsgBuffer) != 0u) {
 		value = bufToDouble(MsgBuffer);
+//		if (value > MAXINT32) {
+//			throw;
+//		}
 	}
 
 	xt::clrstch();
@@ -4775,6 +4778,7 @@ void thred::internal::savAs() {
 		OpenFileName.nFilterIndex    = 0;
 		if (GetSaveFileName(&OpenFileName)) {
 			WorkingFileName->assign(szFileName);
+			*DefaultDirectory = WorkingFileName->parent_path();
 			switch (OpenFileName.nFilterIndex) {
 			case 1: {
 				WorkingFileName->replace_extension(L".thr");
