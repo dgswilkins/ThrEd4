@@ -7921,7 +7921,8 @@ void thred::internal::delsfrms(unsigned code) {
 			}
 			auto deletedFormCount = 0u;
 			auto firstForm        = FormList->cbegin();
-			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+			const auto formCount = FormList->size();
+			for (auto iForm = 0u; iForm < formCount; iForm++) {
 				if (!formMap.test(iForm)) {
 					formIndices[iForm] = (iForm - deletedFormCount) << FRMSHFT;
 				}
