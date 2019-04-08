@@ -2430,7 +2430,7 @@ void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm, std::vector<f
 	spurct(underlayVerticalRect, fillVerticalRect, (VertexCount - 1));
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
-		vertexIt = std::next(AngledFormVertices->cbegin(), SelectedForm->vertexIndex);
+		vertexIt = std::next(angledFormVertices.cbegin(), SelectedForm->vertexIndex);
 	}
 	if ((SelectedForm->attribute & SBLNT) == 0u) {
 		const auto& val = vertexIt[1];
