@@ -2083,9 +2083,10 @@ void thred::internal::chknum() {
 	auto value = 0.0;
 	if (wcslen(MsgBuffer) != 0u) {
 		value = bufToDouble(MsgBuffer);
-//		if (value > MAXINT32) {
-//			throw;
-//		}
+		// Todo - remove this once the buffer overflow into MsgBuffer is resolved
+		if (value > MAXINT32) {
+			throw;
+		}
 	}
 
 	xt::clrstch();
