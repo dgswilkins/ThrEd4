@@ -58,7 +58,7 @@ namespace internal {
 	void   dutxtx(unsigned int index, unsigned short offsetPixels);
 	void   ed2px(const fPOINT& editPoint, POINT& point);
 	fPOINT ed2stch(const fPOINT& point) noexcept;
-	void   ed2txp(const POINT& offset, TXPNT& textureRecord) noexcept;
+	void   ed2txp(const POINT& offset, TXPNT& textureRecord);
 	bool   inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept;
 	void   nutx();
 	void   nxbak();

@@ -673,7 +673,7 @@ void texture::internal::stxlin() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) noexcept {
+void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
 	auto point = fPOINT {};
 
 	txi::px2ed(offset, point);
