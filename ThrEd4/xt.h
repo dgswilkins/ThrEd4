@@ -25,7 +25,7 @@ namespace xt {
 void chgchk(unsigned char code);
 void chgwrn();
 void chkcwlk();
-void chkund(const std::vector<RNGCNT>& textureSegments);
+void chkund(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
 void chkwlk();
 void clrstch() noexcept;
 
@@ -149,7 +149,7 @@ namespace internal {
 	void  fmaxfn(unsigned int find, float length);
 	void  fminfn(unsigned int find, float length);
 	void  fncwlk();
-	void  fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find);
+	void  fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, std::vector<fPOINT>& angledFormVertices);
 	void  fnwlk(unsigned int find);
 	void  fritfil(std::vector<fPOINT>& featherSequence);
 	void  fspacfn(unsigned int find, float spacing);

@@ -931,7 +931,7 @@ void xt::chkwlk() {
 	}
 }
 
-void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find) {
+void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, std::vector<fPOINT>& angledFormVertices) {
 	const auto savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e99;
@@ -943,16 +943,16 @@ void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned in
 	}
 	undclp();
 	StateMap.set(StateFlag::ISUND);
-	form::angclpfn(textureSegments);
+	form::angclpfn(textureSegments, angledFormVertices);
 	OutputIndex = wrap::toUnsigned(OSequence->size());
 	ritund();
 	form::fvars(find);
 	UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(const std::vector<RNGCNT>& textureSegments) {
+void xt::chkund(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
 	if ((SelectedForm->extendedAttribute & AT_UND) != 0u) {
-		xi::fnund(textureSegments, ClosestFormToCursor);
+		xi::fnund(textureSegments, ClosestFormToCursor, angledFormVertices);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
