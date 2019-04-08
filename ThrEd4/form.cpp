@@ -2229,13 +2229,13 @@ void form::internal::chkbrd() {
 	}
 }
 
-void form::internal::fnvrt(std::vector<fPOINT>*   currentFillVertices,
+void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
                            std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints) {
-	auto highX  = (*currentFillVertices)[0].x;
-	auto lowX   = (*currentFillVertices)[0].x;
-	VertexCount = gsl::narrow<decltype(VertexCount)>(currentFillVertices->size());
-	for (auto fillVertex = std::next(currentFillVertices->cbegin(), 1); fillVertex < currentFillVertices->end(); fillVertex++) {
+	auto highX  = currentFillVertices[0].x;
+	auto lowX   = currentFillVertices[0].x;
+	VertexCount = gsl::narrow<decltype(VertexCount)>(currentFillVertices.size());
+	for (auto fillVertex = std::next(currentFillVertices.cbegin(), 1); fillVertex < currentFillVertices.end(); fillVertex++) {
 		if (fillVertex->x > highX) {
 			highX = fillVertex->x;
 		}
@@ -2257,7 +2257,7 @@ void form::internal::fnvrt(std::vector<fPOINT>*   currentFillVertices,
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
 			auto       point       = dPOINT {};
-			if (projv(currentX, (*currentFillVertices)[iVertex], (*currentFillVertices)[iNextVertex], point)) {
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				iLineCounter++;
 			}
 		}
@@ -2276,7 +2276,7 @@ void form::internal::fnvrt(std::vector<fPOINT>*   currentFillVertices,
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto iNextVertex = (iVertex + 1) % VertexCount;
 			auto       point       = dPOINT {};
-			if (projv(currentX, (*currentFillVertices)[iVertex], (*currentFillVertices)[iNextVertex], point)) {
+			if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
 				const auto a = dPOINTLINE { point.x, point.y, gsl::narrow<unsigned short>(iVertex) };
 				projectedPoints.push_back(a);
 				iPoint++;
@@ -2310,21 +2310,22 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints,
                            double                 rotationAngle,
                            dPOINT&                rotationCenter,
-                           FRMHED&                angledForm) {
+                           FRMHED&                angledForm, 
+	                       std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter.x    = ((gsl::narrow_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((gsl::narrow_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
-	AngledFormVertices->clear();
-	AngledFormVertices->reserve(angledForm.vertexCount);
+	angledFormVertices.clear();
+	angledFormVertices.reserve(angledForm.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-		AngledFormVertices->push_back(vertexIt[iVertex]);
-		thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
+		angledFormVertices.push_back(vertexIt[iVertex]);
+		thred::rotflt(angledFormVertices.back(), rotationAngle, rotationCenter);
 	}
 	angledForm.vertexIndex = 0;
 	SelectedForm           = &angledForm;
-	fi::fnvrt(AngledFormVertices, groupIndexSequence, lineEndpoints);
+	fi::fnvrt(angledFormVertices, groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
 
@@ -2332,29 +2333,29 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints,
                            const double           rotationAngle,
                            dPOINT&                rotationCenter,
-                           FRMHED&                angledForm) {
+                           FRMHED&                angledForm,
+						   std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter.x    = ((gsl::narrow_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
 	rotationCenter.y    = ((gsl::narrow_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
-	AngledFormVertices->clear();
-	AngledFormVertices->reserve(angledForm.vertexCount);
+	angledFormVertices.clear();
+	angledFormVertices.reserve(angledForm.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
-		AngledFormVertices->push_back(vertexIt[iVertex]);
-		thred::rotflt(AngledFormVertices->back(), rotationAngle, rotationCenter);
+		angledFormVertices.push_back(vertexIt[iVertex]);
+		thred::rotflt(angledFormVertices.back(), rotationAngle, rotationCenter);
 	}
 	angledForm.vertexIndex = 0;
 	SelectedForm           = &angledForm;
-	fi::fnvrt(AngledFormVertices, groupIndexSequence, lineEndpoints);
+	fi::fnvrt(angledFormVertices, groupIndexSequence, lineEndpoints);
 	SelectedForm = &((*FormList)[ClosestFormToCursor]);
 }
 
-void form::internal::prebrd(FRMHED& angledForm) {
+void form::internal::prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
 	auto  vertexIt           = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	auto  delta              = fPOINT { (vertexIt[1].x - vertexIt[0].x), (vertexIt[1].y - vertexIt[0].y) };
 	auto  ratio              = 0.0;
-	auto& angledFormVertices = *AngledFormVertices;
 	angledFormVertices.resize(wrap::toSize(VertexCount) + 3u);
 	auto output = angledFormVertices.begin();
 	output++;
@@ -2411,13 +2412,13 @@ void form::internal::plbak(unsigned int backPoint) {
 	}
 }
 
-void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm) {
+void form::internal::plbrd(double edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
 	// Ensure that we have at least 4 array members
 	auto fillVerticalRect = std::vector<VRCT2> {};
 	fillVerticalRect.resize(wrap::toSize(VertexCount) + 3u);
 	auto underlayVerticalRect = std::vector<VRCT2> {};
 	underlayVerticalRect.resize(wrap::toSize(VertexCount) + 3u);
-	prebrd(angledForm);
+	prebrd(angledForm, angledFormVertices);
 	satin::satout(SelectedForm->borderSize);
 	InsidePoints->push_back((*InsidePoints)[0]);
 	OutsidePoints->push_back((*OutsidePoints)[0]);
@@ -4829,7 +4830,7 @@ void form::refilfn() {
 		case EDGEPROPSAT: {
 			if (SelectedForm->vertexCount > 2) {
 				StateMap.reset(StateFlag::SAT1);
-				fi::plbrd(SelectedForm->edgeSpacing, angledForm);
+				fi::plbrd(SelectedForm->edgeSpacing, angledForm, *AngledFormVertices);
 				fi::ritbrd();
 			}
 			break;
@@ -4911,12 +4912,12 @@ void form::refilfn() {
 				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
 				workingFormVertices.insert(workingFormVertices.end(), startVertex, endVertex);
-				fi::fnvrt(WorkingFormVertices, groupIndexSequence, lineEndpoints);
+				fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
 				break;
 			}
 			case HORF: {
 				rotationAngle = PI / 2;
-				fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm);
+				fi::fnhor(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 				workingFormVertices.clear();
 				workingFormVertices.reserve(angledForm.vertexCount);
 				auto startVertex = std::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);
@@ -4926,7 +4927,7 @@ void form::refilfn() {
 			}
 			case ANGF: {
 				rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
-				fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm);
+				fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 				workingFormVertices.clear();
 				workingFormVertices.reserve(angledForm.vertexCount);
 				auto startVertex = std::next(AngledFormVertices->cbegin(), angledForm.vertexIndex);

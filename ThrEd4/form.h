@@ -292,14 +292,16 @@ namespace internal {
 	            std::vector<SMALPNTL>& lineEndpoints,
 	            double                 rotationAngle,
 	            dPOINT&                rotationCenter,
-	            FRMHED&                angledForm);
+	            FRMHED&                angledForm, 
+		        std::vector<fPOINT>&   angledFormVertices);
 	void  fnhor(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
 	            double                 rotationAngle,
 	            dPOINT&                rotationCenter,
-	            FRMHED&                angledForm);
+	            FRMHED&                angledForm,
+	        	std::vector<fPOINT>&   angledFormVertices);
 	void  fnord();
-	void  fnvrt(std::vector<fPOINT>*   currentFillVertices,
+	void  fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	            std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints);
 	void  frmpnts(unsigned type) noexcept;
@@ -397,11 +399,11 @@ namespace internal {
 	         unsigned int              startVertex,
 	         const std::vector<VRCT2>& vrct);
 	void plbak(unsigned int backPoint);
-	void plbrd(double edgeSpacing, FRMHED& angledForm);
+	void plbrd(double edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	void plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
 	          const std::vector<VRCT2>& prct);
-	void prebrd(FRMHED& angledForm);
+	void prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	bool proj(const dPOINT& point, double slope, const fPOINT& point0, const fPOINT& point1, dPOINT& intersectionPoint) noexcept;
 	bool projh(double yCoordinate, const fPOINT& point0, const fPOINT& point1, dPOINT& intersection) noexcept;
 	bool projv(double xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, dPOINT& intersection) noexcept;
