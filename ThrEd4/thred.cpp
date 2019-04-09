@@ -7275,10 +7275,10 @@ void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double 
 
 void thred::rotang1(const fPOINTATTR& unrotatedPoint,
                     fPOINT&           rotatedPoint,
-                    double            rotationAngle,
-                    const dPOINT&     rotationCenter) noexcept {
-	auto       distanceToCenter = 0.0;
-	auto       newAngle         = 0.0;
+                    float             rotationAngle,
+                    const fPOINT&     rotationCenter) noexcept {
+	auto       distanceToCenter = 0.0f;
+	auto       newAngle         = 0.0f;
 	const auto dx               = unrotatedPoint.x - rotationCenter.x;
 	const auto dy               = unrotatedPoint.y - rotationCenter.y;
 
@@ -7290,11 +7290,11 @@ void thred::rotang1(const fPOINTATTR& unrotatedPoint,
 	else {
 		if (dy > 0.0) {
 			distanceToCenter = dy;
-			newAngle         = PI / 2 + rotationAngle;
+			newAngle         = PI_F / 2.0f + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle         = rotationAngle - PI / 2;
+			newAngle         = rotationAngle - PI_F / 2.0f;
 		}
 	}
 	rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
@@ -7303,10 +7303,10 @@ void thred::rotang1(const fPOINTATTR& unrotatedPoint,
 
 void thred::rotangf(const fPOINT& unrotatedPoint,
                     fPOINT&       rotatedPoint,
-                    double        rotationAngle,
-                    const dPOINT& rotationCenter) noexcept {
-	auto       distanceToCenter = 0.0;
-	auto       newAngle         = 0.0;
+                    float        rotationAngle,
+                    const fPOINT& rotationCenter) noexcept {
+	auto       distanceToCenter = 0.0f;
+	auto       newAngle         = 0.0f;
 	const auto dx               = unrotatedPoint.x - rotationCenter.x;
 	const auto dy               = unrotatedPoint.y - rotationCenter.y;
 
@@ -7318,11 +7318,11 @@ void thred::rotangf(const fPOINT& unrotatedPoint,
 	else {
 		if (dy > 0) {
 			distanceToCenter = dy;
-			newAngle         = PI / 2 + rotationAngle;
+			newAngle         = PI_F / 2.0f + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle         = rotationAngle - PI / 2;
+			newAngle         = rotationAngle - PI_F / 2.0f;
 		}
 	}
 	rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);

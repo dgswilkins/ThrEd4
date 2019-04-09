@@ -77,6 +77,7 @@ constexpr double   DEFSPACE   = 0.45;              // default stitch spacing
 constexpr double   DEFANG     = 0.785398163397448; // default fill angle, 45 degrees
 constexpr uint32_t MAXFRMLINS = 20000u;            // maximum lines in a form
 constexpr uint32_t MSGSIZ     = 8192;              // size of the message buffer
+constexpr float    PI_F       = 3.1415927f;        // PI to single precision
 constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
 constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"

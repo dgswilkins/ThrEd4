@@ -50,12 +50,12 @@ void oclp(unsigned int clipIndex, unsigned int clipEntries);
 
 namespace internal {
 
-	void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int vertex, const dPOINT& rotationCenter);
+	void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int vertex, const fPOINT& rotationCenter);
 	bool clpsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            unsigned int               start,
 	            unsigned int               finish,
-	            const dPOINT&              rotationCenter);
+	            const fPOINT&              rotationCenter);
 	void clpsub(unsigned int fpnt, unsigned int cnt);
 	void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 	void duch(std::vector<fPOINT>& chainEndPoints);
@@ -83,20 +83,20 @@ namespace internal {
 	             std::vector<fPOINT>&       clipFillData,
 	             double                     clipAngle,
 	             dPOINT&                    moveToCoords,
-	             const dPOINT&              rotationCenter,
+	             const fPOINT&              rotationCenter,
 	             unsigned int               currentSide);
 	void linsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
-	            double                     clipAngle,
+	            float                      clipAngle,
 	            const dPOINT&              vector0,
-	            const dPOINT&              rotationCenter,
+	            const fPOINT&              rotationCenter,
 	            unsigned int               currentSide);
 	bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide);
 	void picfn(std::vector<fPOINT>& clipFillData,
 	           unsigned int         start,
 	           unsigned int         finish,
 	           double               spacing,
-	           const dPOINT&        rotationCenter);
+	           const fPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
 	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,

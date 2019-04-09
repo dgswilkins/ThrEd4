@@ -61,8 +61,8 @@ void ritfcor(const fPOINT& point);
 void ritmov();
 void ritot(unsigned number);
 void rngadj() noexcept;
-void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
-void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) noexcept;
+void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
+void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 
 void rotflt(fPOINT& point, double rotationAngle, const dPOINT& rotationCenter) noexcept;
 void rotfn(double rotationAngle, const dPOINT& rotationCenter);
