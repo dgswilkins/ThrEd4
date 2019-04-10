@@ -243,7 +243,7 @@ void xt::internal::ratpnt(unsigned int iPoint, unsigned int iNextPoint, fPOINT& 
 }
 
 fPOINT xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
-	return { (endPoint.x - startPoint.x) * 0.5f + startPoint.x, (endPoint.y - startPoint.y) * 0.5f + startPoint.y };
+	return fPOINT{ form::midl(endPoint.x, startPoint.x), form::midl(endPoint.y, startPoint.y) };
 }
 
 void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept {

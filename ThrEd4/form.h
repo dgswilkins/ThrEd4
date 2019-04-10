@@ -128,7 +128,13 @@ bool linx(const std::vector<fPOINT>& points, unsigned int start, unsigned int fi
 void makspac(unsigned start, unsigned count);
 void mdufrm();
 
-constexpr float midl(float high, float low);
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
+template <class inType> float midl(inType high, inType low) noexcept {
+	return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0f + gsl::narrow_cast<float>(low);
+}
+#pragma warning (pop)
 
 void movlayr(unsigned codedLayer);
 void munfrm();

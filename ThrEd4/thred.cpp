@@ -4065,8 +4065,8 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		}
 	}
 	auto centerCoordinate
-	    = POINT { wrap::round<long>((gsl::narrow_cast<double>(boundingRect.right) - boundingRect.left) / 2.0 + boundingRect.left),
-		          wrap::round<long>((gsl::narrow_cast<double>(boundingRect.top) - boundingRect.bottom) / 2.0 + boundingRect.bottom) };
+	    = POINT { wrap::round<long>(form::midl(boundingRect.right, boundingRect.left)),
+		          wrap::round<long>(form::midl(boundingRect.top, boundingRect.bottom)) };
 	DSTOffsetData.Positive.x = wrap::round<long>(boundingRect.right - centerCoordinate.x + 1);
 	DSTOffsetData.Positive.y = wrap::round<long>(boundingRect.top - centerCoordinate.y + 1);
 	DSTOffsetData.Negative.x = wrap::round<long>(centerCoordinate.x - boundingRect.left - 1);
@@ -5575,8 +5575,8 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 		UnzoomedRect      = { wrap::round<long>(IniFile.hoopSizeX), wrap::round<long>(IniFile.hoopSizeY) };
 		displayText::hsizmsg();
 	}
-	const auto delta = fPOINT { (UnzoomedRect.x - dstSize.x) / 2 - mimimumCoordinate.x,
-		                        (UnzoomedRect.y - dstSize.y) / 2 - mimimumCoordinate.y };
+	const auto delta = fPOINT { (gsl::narrow_cast<float>(UnzoomedRect.x) - dstSize.x) / 2.0f - mimimumCoordinate.x,
+		                        (gsl::narrow_cast<float>(UnzoomedRect.y) - dstSize.y) / 2.0f - mimimumCoordinate.y };
 	for (iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		StitchBuffer[iStitch].x += delta.x;
 		StitchBuffer[iStitch].y += delta.y;
@@ -6277,8 +6277,8 @@ void thred::internal::zumin() {
 			if (StateMap.test(StateFlag::FORMSEL)) {
 				const auto& boundingRect = (*FormList)[ClosestFormToCursor].rectangle;
 
-				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2.0f) + boundingRect.left;
-				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2.0f) + boundingRect.bottom;
+				SelectedPoint = fPOINT { form::midl(boundingRect.right, boundingRect.left),
+					                     form::midl(boundingRect.top, boundingRect.bottom) };
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -6293,8 +6293,8 @@ void thred::internal::zumin() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				auto groupBoundingRect = fRECTANGLE {};
 				thred::selRct(groupBoundingRect);
-				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2.0f) + groupBoundingRect.left;
-				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2.0f) + groupBoundingRect.bottom;
+				SelectedPoint = fPOINT { form::midl(groupBoundingRect.right, groupBoundingRect.left),
+					                     form::midl(groupBoundingRect.top, groupBoundingRect.bottom) };
 				break;
 			}
 			if (StateMap.test(StateFlag::INSRT)) {
@@ -6307,10 +6307,9 @@ void thred::internal::zumin() {
 					}
 				}
 				else {
-					SelectedPoint.x = (StitchBuffer[ClosestPointIndex + 1].x - StitchBuffer[ClosestPointIndex].x) / 2.0f
-					                  + StitchBuffer[ClosestPointIndex].x;
-					SelectedPoint.y = (StitchBuffer[ClosestPointIndex + 1].y - StitchBuffer[ClosestPointIndex].y) / 2.0f
-					                  + StitchBuffer[ClosestPointIndex].y;
+					SelectedPoint
+					    = fPOINT { form::midl(StitchBuffer[ClosestPointIndex + 1].x, StitchBuffer[ClosestPointIndex].x),
+						           form::midl(StitchBuffer[ClosestPointIndex + 1].y, StitchBuffer[ClosestPointIndex].y) };
 				}
 				break;
 			}
@@ -6336,10 +6335,8 @@ void thred::internal::zumin() {
 						SelectedFormsRect.right = wrap::round<long>(rect.right);
 					}
 				}
-				SelectedPoint.x
-				    = (gsl::narrow_cast<double>(SelectedFormsRect.right) - SelectedFormsRect.left) / 2.0 + SelectedFormsRect.left;
-				SelectedPoint.y = (gsl::narrow_cast<double>(SelectedFormsRect.top) - SelectedFormsRect.bottom) / 2.0
-				                  + SelectedFormsRect.bottom;
+				SelectedPoint = fPOINT { form::midl(SelectedFormsRect.right, SelectedFormsRect.left),
+					                     form::midl(SelectedFormsRect.top, SelectedFormsRect.bottom) };
 				break;
 			}
 			if (!thred::px2stch()) {
@@ -6391,8 +6388,8 @@ void thred::internal::zumout() {
 			if (StateMap.test(StateFlag::FORMSEL)) {
 				const auto& boundingRect = (*FormList)[ClosestFormToCursor].rectangle;
 
-				SelectedPoint.x = ((boundingRect.right - boundingRect.left) / 2) + boundingRect.left;
-				SelectedPoint.y = ((boundingRect.top - boundingRect.bottom) / 2) + boundingRect.bottom;
+				SelectedPoint = fPOINT { form::midl(boundingRect.right, boundingRect.left),
+					                     form::midl(boundingRect.top, boundingRect.bottom) };
 				break;
 			}
 			if (StateMap.test(StateFlag::FRMPSEL)) {
@@ -6407,8 +6404,8 @@ void thred::internal::zumout() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				auto groupBoundingRect = fRECTANGLE {};
 				thred::selRct(groupBoundingRect);
-				SelectedPoint.x = ((groupBoundingRect.right - groupBoundingRect.left) / 2) + groupBoundingRect.left;
-				SelectedPoint.y = ((groupBoundingRect.top - groupBoundingRect.bottom) / 2) + groupBoundingRect.bottom;
+				SelectedPoint = fPOINT { form::midl(groupBoundingRect.right, groupBoundingRect.left),
+					                     form::midl(groupBoundingRect.top, groupBoundingRect.bottom) };
 				break;
 			}
 			if (StateMap.test(StateFlag::SELBOX)) {
@@ -9080,8 +9077,8 @@ void thred::internal::insfil() {
 							              fmt::format((*StringTable)[STR_THRDBY], ThrName->wstring(), *DesignerName).c_str());
 						}
 					}
-					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
-					InsertCenter.y = (insertedRectangle.top - insertedRectangle.bottom) / 2 + insertedRectangle.bottom;
+					InsertCenter = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
+						                    form::midl(insertedRectangle.top, insertedRectangle.bottom) };
 					PCSHeader.stitchCount += fileHeader.stitchCount;
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 						                               insertedRectangle.top - insertedRectangle.bottom };
@@ -9148,9 +9145,8 @@ void thred::internal::insfil() {
 						}
 						iStitch++;
 					}
-					InsertCenter.x = (insertedRectangle.right - insertedRectangle.left) / 2 + insertedRectangle.left;
-					InsertCenter.y = (insertedRectangle.top - insertedRectangle.bottom) / 2 + insertedRectangle.bottom;
-
+					InsertCenter = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
+						                    form::midl(insertedRectangle.top, insertedRectangle.bottom) };
 					PCSHeader.stitchCount   = newStitchCount;
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 						                               insertedRectangle.top - insertedRectangle.bottom };
@@ -10678,9 +10674,9 @@ void thred::internal::clpadj() {
 		if (StitchBuffer[iStitch].x > ClipRectAdjusted.right) {
 			ClipRectAdjusted.right = StitchBuffer[iStitch].x;
 		}
-		const auto clipMiddle            = (ClipRectAdjusted.right - ClipRectAdjusted.left) / 2 + ClipRectAdjusted.left;
+		const auto clipMiddle            = form::midl(ClipRectAdjusted.right, ClipRectAdjusted.left);
 		StitchBuffer[GroupStartStitch].y = StitchBuffer[GroupEndStitch].y
-		    = (ClipRectAdjusted.top - ClipRectAdjusted.bottom) / 2 + ClipRectAdjusted.bottom;
+		    = form::midl(ClipRectAdjusted.top, ClipRectAdjusted.bottom);
 		if (StitchBuffer[GroupStartStitch].x < clipMiddle) {
 			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.left;
 			StitchBuffer[GroupEndStitch].x   = ClipRectAdjusted.right;
@@ -12646,9 +12642,10 @@ bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, fP
 			zumin();
 			return true;
 		}
-		ZoomRect.left = ZoomRect.bottom = 0;
-		ZoomRect.right                  = newSize.x;
-		ZoomRect.top                    = newSize.y;
+		ZoomRect.left   = 0;
+		ZoomRect.bottom = 0;
+		ZoomRect.right  = newSize.x;
+		ZoomRect.top    = newSize.y;
 		thred::shft(SelectedPoint);
 		StateMap.reset(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::RESTCH);
@@ -13967,8 +13964,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		auto formsRect = fRECTANGLE {};
 		form::pxrct2stch(SelectedFormsRect, formsRect);
 		thred::px2stch();
-		FormMoveDelta.x = SelectedPoint.x - ((formsRect.right - formsRect.left) / 2.0f + formsRect.left);
-		FormMoveDelta.y = SelectedPoint.y - ((formsRect.top - formsRect.bottom) / 2.0f + formsRect.bottom);
+		FormMoveDelta.x = SelectedPoint.x - form::midl(formsRect.right,formsRect.left);
+		FormMoveDelta.y = SelectedPoint.y - form::midl(formsRect.top,formsRect.bottom);
 		for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
 			ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - iForm - 1u);
 			form::fvars(ClosestFormToCursor);
