@@ -249,7 +249,7 @@ void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	}
 }
 
-void clip::internal::setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0) {
+void clip::internal::setvct(unsigned int start, unsigned int finish, float& clipAngle, fPOINT& vector0) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	clipAngle     = atan2(vertexIt[finish].y - vertexIt[start].y, vertexIt[finish].x - vertexIt[start].x);
 	vector0.x     = ClipRectSize.cx * cos(clipAngle);
@@ -317,7 +317,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
 void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             std::vector<fPOINT>&       clipFillData,
                             float                      clipAngle,
-                            const dPOINT&              vector0,
+                            const fPOINT&              vector0,
                             const fPOINT&              rotationCenter,
                             unsigned int               currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -421,8 +421,8 @@ void clip::clpbrd(unsigned int startVertex) {
 	if (SelectedForm->type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		SelectedPoint  = vertexIt[0];
-		auto clipAngle = 0.0;       // for clipboard border fill
-		auto vector0   = dPOINT {}; // x size of the clipboard fill at the fill angle
+		auto clipAngle = 0.0f;       // for clipboard border fill
+		auto vector0   = fPOINT {}; // x size of the clipboard fill at the fill angle
 		ci::setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0
 		BorderClipReference.y = ClipRect.top / 2;

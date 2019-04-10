@@ -88,7 +88,7 @@ namespace internal {
 	void linsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            float                      clipAngle,
-	            const dPOINT&              vector0,
+	            const fPOINT&              vector0,
 	            const fPOINT&              rotationCenter,
 	            unsigned int               currentSide);
 	bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide);
@@ -98,7 +98,7 @@ namespace internal {
 	           double               spacing,
 	           const fPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
-	void setvct(unsigned int start, unsigned int finish, double& clipAngle, dPOINT& vector0);
+	void setvct(unsigned int start, unsigned int finish, float& clipAngle, fPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	            const std::vector<fPOINT>& chainEndPoints,
 	            unsigned                   start,
