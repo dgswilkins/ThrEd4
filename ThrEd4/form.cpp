@@ -6763,11 +6763,11 @@ void form::fliph() {
 		auto rectangle = fRECTANGLE {};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
 		const auto midpoint = form::midl(rectangle.right, rectangle.left);
-		auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			formMap.set(ClosestFormToCursor);
 			form::fvars(ClosestFormToCursor);
+			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 				vertexIt[iVertex].x = midpoint + midpoint - vertexIt[iVertex].x;
 			}
