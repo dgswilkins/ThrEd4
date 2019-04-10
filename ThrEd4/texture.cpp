@@ -94,12 +94,12 @@ void texture::txdun() {
 				                nullptr);
 				for (auto& item : TextureHistory) {
 					if (!item.texturePoints.empty()) {
-						wrap::WriteFile(
-						    handle,
-						    item.texturePoints.data(),
-						    wrap::toUnsigned(item.texturePoints.size() * sizeof(decltype(TextureHistory[0].texturePoints.back()))),
-						    &bytesWritten,
-						    nullptr);
+						wrap::WriteFile(handle,
+						                item.texturePoints.data(),
+						                wrap::toUnsigned(item.texturePoints.size()
+						                                 * sizeof(decltype(TextureHistory[0].texturePoints.back()))),
+						                &bytesWritten,
+						                nullptr);
 					}
 				}
 			}
@@ -301,11 +301,12 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
-	screenPoint.x = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
-	                           / TextureScreen.editToPixelRatio);
+	screenPoint.x
+	    = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
+	                        / TextureScreen.editToPixelRatio);
 	screenPoint.y = wrap::round<long>(gsl::narrow_cast<double>(TextureScreen.height)
-	                           - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height
-	                           + TextureScreen.top);
+	                                  - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height
+	                                  + TextureScreen.top);
 }
 
 void texture::internal::txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept {
@@ -384,7 +385,7 @@ void texture::drwtxtr() {
 		TextureScreen.xOffset          = 0;
 		TextureScreen.editToPixelRatio = extraWidth / StitchWindowClientRect.bottom;
 		yOffset                        = wrap::round<decltype(yOffset)>(
-		    (StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2.0);
+            (StitchWindowClientRect.bottom - TextureScreen.areaHeight / TextureScreen.editToPixelRatio) / 2.0);
 	}
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
@@ -420,8 +421,9 @@ void texture::drwtxtr() {
 	line[0].y = 0;
 	line[1].y = StitchWindowClientRect.bottom;
 	for (auto iVertical = 1u; iVertical < TextureScreen.lines + 1u; iVertical++) {
-		line[0].x = line[1].x = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
-		                                   / TextureScreen.editToPixelRatio);
+		line[0].x = line[1].x
+		    = wrap::round<long>((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
+		                        / TextureScreen.editToPixelRatio);
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	line[0].x = 0;
@@ -695,10 +697,9 @@ void texture::txtrup() {
 		txi::deorg(offset);
 		offset.x -= SelectTexturePointsOrigin.x;
 		offset.y -= SelectTexturePointsOrigin.y;
-		const auto Xmagnitude = abs(offset.x);
-		auto       textureOffset
-		    = TXOFF { wrap::toFloat(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
-			          wrap::ceil<int>(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing) };
+		const auto Xmagnitude    = abs(offset.x);
+		auto       textureOffset = TXOFF { wrap::toFloat(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
+                                     wrap::ceil<int>(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing) };
 		if (offset.x < 0) {
 			textureOffset.line = -textureOffset.line;
 		}

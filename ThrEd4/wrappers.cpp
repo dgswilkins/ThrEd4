@@ -111,4 +111,3 @@ HPEN wrap::CreatePen(int iStyle, unsigned width, COLORREF color) noexcept {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }
-

@@ -134,7 +134,7 @@ void mdufrm();
 template <class inType> float midl(inType high, inType low) noexcept {
 	return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0f + gsl::narrow_cast<float>(low);
 }
-#pragma warning (pop)
+#pragma warning(pop)
 
 void movlayr(unsigned codedLayer);
 void munfrm();
@@ -296,16 +296,16 @@ namespace internal {
 	void  fnagain(double rotationAngle);
 	void  fnang(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
-	            float                 rotationAngle,
-	            fPOINT&                rotationCenter,
-	            FRMHED&                angledForm, 
-		        std::vector<fPOINT>&   angledFormVertices);
-	void  fnhor(std::vector<unsigned>& groupIndexSequence,
-	            std::vector<SMALPNTL>& lineEndpoints,
-	            float                 rotationAngle,
+	            float                  rotationAngle,
 	            fPOINT&                rotationCenter,
 	            FRMHED&                angledForm,
-	        	std::vector<fPOINT>&   angledFormVertices);
+	            std::vector<fPOINT>&   angledFormVertices);
+	void  fnhor(std::vector<unsigned>& groupIndexSequence,
+	            std::vector<SMALPNTL>& lineEndpoints,
+	            float                  rotationAngle,
+	            fPOINT&                rotationCenter,
+	            FRMHED&                angledForm,
+	            std::vector<fPOINT>&   angledFormVertices);
 	void  fnord();
 	void  fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	            std::vector<unsigned>& groupIndexSequence,

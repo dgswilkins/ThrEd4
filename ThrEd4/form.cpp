@@ -985,7 +985,7 @@ void form::flipv() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			const auto midpoint = form::midl(SelectedForm->rectangle.top, SelectedForm->rectangle.bottom);
-			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
+			auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].y = midpoint + midpoint - vertexIt[iVertex].y;
 			}
@@ -2303,8 +2303,8 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints,
                            float                  rotationAngle,
                            fPOINT&                rotationCenter,
-                           FRMHED&                angledForm, 
-	                       std::vector<fPOINT>&   angledFormVertices) {
+                           FRMHED&                angledForm,
+                           std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter      = fPOINT { form::midl(angRect.right, angRect.left), form::midl(angRect.top, angRect.bottom) };
@@ -2326,7 +2326,7 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
                            const float            rotationAngle,
                            fPOINT&                rotationCenter,
                            FRMHED&                angledForm,
-						   std::vector<fPOINT>&   angledFormVertices) {
+                           std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
 	rotationCenter      = fPOINT { form::midl(angRect.right, angRect.left), form::midl(angRect.top, angRect.bottom) };
@@ -2344,9 +2344,9 @@ void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
 }
 
 void form::internal::prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
-	auto  vertexIt           = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	auto  delta              = fPOINT { (vertexIt[1].x - vertexIt[0].x), (vertexIt[1].y - vertexIt[0].y) };
-	auto  ratio              = 0.0;
+	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto delta    = fPOINT { (vertexIt[1].x - vertexIt[0].x), (vertexIt[1].y - vertexIt[0].y) };
+	auto ratio    = 0.0;
 	angledFormVertices.resize(wrap::toSize(VertexCount) + 3u);
 	auto output = angledFormVertices.begin();
 	output++;
@@ -3429,8 +3429,10 @@ void form::internal::angout(FRMHED& angledForm) {
 	}
 }
 
-void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
-	angledForm                    = (*FormList)[ClosestFormToCursor];
+void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments,
+                              FRMHED&                    angledForm,
+                              std::vector<fPOINT>&       angledFormVertices) {
+	angledForm                = (*FormList)[ClosestFormToCursor];
 	const auto rotationCenter = fPOINT { form::midl(angledForm.rectangle.right, angledForm.rectangle.left),
 		                                 form::midl(angledForm.rectangle.top, angledForm.rectangle.bottom) };
 	angledFormVertices.clear();
@@ -3452,7 +3454,7 @@ void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED
 void form::angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
 	auto rotationAngle = 0.0f;
 
-	auto       angledForm         = (*FormList)[ClosestFormToCursor];
+	auto       angledForm     = (*FormList)[ClosestFormToCursor];
 	const auto rotationCenter = fPOINT { form::midl(angledForm.rectangle.right, angledForm.rectangle.left),
 		                                 form::midl(angledForm.rectangle.top, angledForm.rectangle.bottom) };
 	angledFormVertices.clear();
@@ -3843,7 +3845,7 @@ void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, unsigned 
 
 void form::internal::duseq1(const SMALPNTL* sequenceLines) {
 	if (sequenceLines != nullptr) {
-		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x),form::midl(sequenceLines[1].y, sequenceLines[0].y));
+		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x), form::midl(sequenceLines[1].y, sequenceLines[0].y));
 	}
 }
 
@@ -3950,7 +3952,7 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
 
 SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) {
 	if (sequenceLines != nullptr) {
-		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x),form::midl(sequenceLines[1].y, sequenceLines[0].y));
+		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x), form::midl(sequenceLines[1].y, sequenceLines[0].y));
 	}
 	return sequenceLines;
 }
@@ -4941,7 +4943,7 @@ void form::refilfn() {
 			case ANGCLPF: {
 				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
-				form::angclpfn(textureSegments,*AngledFormVertices);
+				form::angclpfn(textureSegments, *AngledFormVertices);
 				doFill = false;
 				break;
 			}
@@ -6730,9 +6732,9 @@ void form::fliph() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		const auto midpoint = form::midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
-		auto currentVertex = SelectedFormVertices.start;
-		auto vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
+		const auto midpoint      = form::midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
+		auto       currentVertex = SelectedFormVertices.start;
+		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			vertexIt[currentVertex].x = midpoint + midpoint - vertexIt[currentVertex].x;
 			currentVertex             = form::pdir(currentVertex);
@@ -6785,7 +6787,7 @@ void form::fliph() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			thred::savdo();
 			const auto midpoint = form::midl(SelectedForm->rectangle.right, SelectedForm->rectangle.left);
-			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
+			auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = midpoint + midpoint - vertexIt[iVertex].x;
 			}

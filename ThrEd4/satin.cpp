@@ -892,7 +892,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto segmentStitchCount = 0u;
 		for (auto iSegment = 0u; iSegment < line1Segments - 1; iSegment++) {
 			const auto nextVertex = form::nxt(iVertex);
-			const auto val        = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5);
+			const auto val = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5);
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = form::nxt(iVertex);

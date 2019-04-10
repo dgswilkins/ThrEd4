@@ -262,8 +262,8 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int 
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	// ToDo - change moveToCoords to float
-	moveToCoords  = vertexIt[wrap::toSize(currentSide) + 2u];
-	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+	moveToCoords = vertexIt[wrap::toSize(currentSide) + 2u];
+	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
 			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
@@ -415,8 +415,8 @@ void clip::clpbrd(unsigned int startVertex) {
 	auto clipReversedData = std::vector<fPOINT> {};
 	clipReversedData.resize(clipStitchCount);
 	const auto rotationCenter = fPOINT { form::midl(ClipRect.right, ClipRect.left), form::midl(ClipRect.top, ClipRect.bottom) };
-	ClipReference.x = ClipRect.left;
-	ClipReference.y = rotationCenter.y;
+	ClipReference.x           = ClipRect.left;
+	ClipReference.y           = rotationCenter.y;
 	ci::durev(clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
