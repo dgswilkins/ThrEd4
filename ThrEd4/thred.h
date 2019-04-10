@@ -64,10 +64,10 @@ void rngadj() noexcept;
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 
-void rotflt(fPOINT& point, double rotationAngle, const dPOINT& rotationCenter) noexcept;
-void rotfn(double rotationAngle, const dPOINT& rotationCenter);
+void rotflt(fPOINT& point, float rotationAngle, const fPOINT& rotationCenter) noexcept;
+void rotfn(float rotationAngle, const fPOINT& rotationCenter);
 void rtclpfn(unsigned int destination, unsigned int source);
-void sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate);
+void sCor2px(const fPOINT& stitchCoordinate, POINT& pixelCoordinate);
 void savdo();
 void save();
 void selRct(fRECTANGLE& sourceRect) noexcept;
@@ -109,8 +109,8 @@ namespace internal {
 	void     chk1col();
 	bool     chkMsg(std::vector<POINT>& stretchBoxLine,
 	                double&             xyRatio,
-	                double&             rotationAngle,
-	                dPOINT&             rotationCenter,
+	                float&              rotationAngle,
+	                fPOINT&             rotationCenter,
 	                FRMHED&             textureForm);
 	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
 	bool     chkattr(const fs::path& filename);
@@ -265,14 +265,14 @@ namespace internal {
 	                          double              rotationAngle,
 	                          const FRMHED&       textureForm,
 	                          bool&               retflag);
-	bool handleLeftButtonUp(double xyRatio, double rotationAngle, const dPOINT& rotationCenter, bool& retflag);
+	bool handleLeftButtonUp(double xyRatio, float rotationAngle, const fPOINT& rotationCenter, bool& retflag);
 	bool handleLeftKey(bool& retflag);
-	bool handleMainMenu(const WORD& wParameter, dPOINT& rotationCenter);
-	bool handleMainWinKeys(const unsigned int& code, dPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);
+	bool handleMainMenu(const WORD& wParameter, fPOINT& rotationCenter);
+	bool handleMainWinKeys(const unsigned int& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);
 	bool handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	                     double              xyRatio,
-	                     double&             rotationAngle,
-	                     const dPOINT&       rotationCenter,
+	                     float&              rotationAngle,
+	                     const fPOINT&       rotationCenter,
 	                     const FRMHED&       textureForm);
 	bool handleNumericInput(const unsigned int& code, bool& retflag);
 	bool handleRightButtonDown();
@@ -401,10 +401,10 @@ namespace internal {
 	void   ritlayr();
 	void   ritloc();
 	void   ritlock(const WIN32_FIND_DATA* fileData, unsigned fileIndex, HWND hwndlg) noexcept;
-	void   ritrot(double rotationAngle, const dPOINT& rotationCenter);
+	void   ritrot(float rotationAngle, const fPOINT& rotationCenter);
 	void   rngal();
-	void   rot(dPOINT& rotationCenter);
-	void   rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter);
+	void   rot(fPOINT& rotationCenter);
+	void   rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter);
 
 	void     rotauxmen();
 	void     rotauxsel(unsigned stat);
@@ -412,7 +412,7 @@ namespace internal {
 	void     rotmrk();
 	void     rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, const POINT& rotationCenterPixels);
 	void     rotseg();
-	void     rotstch(fPOINTATTR* stitch, double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	void     rotstch(fPOINTATTR* stitch, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 	unsigned rsed() noexcept;
 	void     rshft(const POINT& shiftPoint);
 	void     rstAll();

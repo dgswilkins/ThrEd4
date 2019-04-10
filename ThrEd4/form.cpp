@@ -140,7 +140,7 @@ bool form::internal::chk2of() {
 	return true;
 }
 
-void form::internal::rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept {
+void form::internal::rotbak(float rotationAngle, const fPOINT& rotationCenter) noexcept {
 	for (auto& iSequence : *OSequence) {
 		thred::rotflt(iSequence, rotationAngle, rotationCenter);
 	}
@@ -693,10 +693,8 @@ void form::drwfrm() {
 				if (SelectedForm->type == FRMLINE) {
 					fi::frmpoly(FormLines->data(), VertexCount);
 					if (SelectedForm->fillType == CONTF) {
-						dPOINT point(vertexIt[SelectedForm->angleOrClipData.guide.start]);
-						thred::sCor2px(point, line[0]);
-						point = vertexIt[SelectedForm->angleOrClipData.guide.finish];
-						thred::sCor2px(point, line[1]);
+						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.start], line[0]);
+						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.finish], line[1]);
 						Polyline(StitchWindowMemDC, line, 2);
 					}
 				}
@@ -2308,14 +2306,14 @@ void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
 
 void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints,
-                           double                 rotationAngle,
-                           dPOINT&                rotationCenter,
+                           float                  rotationAngle,
+                           fPOINT&                rotationCenter,
                            FRMHED&                angledForm, 
 	                       std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
-	rotationCenter.x    = ((gsl::narrow_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
-	rotationCenter.y    = ((gsl::narrow_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
+	rotationCenter
+	    = fPOINT { ((angRect.right - angRect.left) / 2.0f + angRect.left), ((angRect.top - angRect.bottom) / 2.0f + angRect.bottom) };
 	angledFormVertices.clear();
 	angledFormVertices.reserve(angledForm.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
@@ -2331,14 +2329,14 @@ void form::internal::fnang(std::vector<unsigned>& groupIndexSequence,
 
 void form::internal::fnhor(std::vector<unsigned>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints,
-                           const double           rotationAngle,
-                           dPOINT&                rotationCenter,
+                           const float            rotationAngle,
+                           fPOINT&                rotationCenter,
                            FRMHED&                angledForm,
 						   std::vector<fPOINT>&   angledFormVertices) {
 	angledForm          = (*FormList)[ClosestFormToCursor];
 	const auto& angRect = angledForm.rectangle;
-	rotationCenter.x    = ((gsl::narrow_cast<double>(angRect.right) - angRect.left) / 2.0 + angRect.left);
-	rotationCenter.y    = ((gsl::narrow_cast<double>(angRect.top) - angRect.bottom) / 2.0 + angRect.bottom);
+	rotationCenter
+	    = fPOINT { ((angRect.right - angRect.left) / 2.0f + angRect.left), ((angRect.top - angRect.bottom) / 2.0f + angRect.bottom) };
 	angledFormVertices.clear();
 	angledFormVertices.reserve(angledForm.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
@@ -3440,38 +3438,38 @@ void form::internal::angout(FRMHED& angledForm) {
 
 void form::internal::horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
 	angledForm                    = (*FormList)[ClosestFormToCursor];
-	const auto rotationCenter     = dPOINT {
-        ((gsl::narrow_cast<double>(angledForm.rectangle.right) - angledForm.rectangle.left) / 2.0 + angledForm.rectangle.left),
-        ((gsl::narrow_cast<double>(angledForm.rectangle.top) - angledForm.rectangle.bottom) / 2.0 + angledForm.rectangle.bottom)
+	const auto rotationCenter     = fPOINT {
+        ((angledForm.rectangle.right - angledForm.rectangle.left) / 2.0f + angledForm.rectangle.left),
+        ((angledForm.rectangle.top - angledForm.rectangle.bottom) / 2.0f + angledForm.rectangle.bottom)
 	};
 	angledFormVertices.clear();
 	angledFormVertices.reserve(angledForm.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 	for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
 		angledFormVertices.push_back(vertexIt[iVertex]);
-		thred::rotflt(angledFormVertices.back(), (PI / 2), rotationCenter);
+		thred::rotflt(angledFormVertices.back(), (PI_F / 2.0f), rotationCenter);
 	}
 	angledForm.vertexIndex = 0;
 	angout(angledForm);
 	SelectedForm       = &angledForm;
 	CurrentVertexIndex = angledForm.vertexIndex;
 	clpcon(textureSegments, angledFormVertices);
-	rotbak((-PI / 2), rotationCenter);
+	rotbak((-PI_F / 2.0f), rotationCenter);
 	form::fvars(ClosestFormToCursor);
 }
 
 void form::angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
-	auto rotationAngle = 0.0;
+	auto rotationAngle = 0.0f;
 
 	auto       angledForm         = (*FormList)[ClosestFormToCursor];
-	const auto rotationCenter     = dPOINT {
-        ((gsl::narrow_cast<double>(angledForm.rectangle.right) - angledForm.rectangle.left) / 2.0 + angledForm.rectangle.left),
-        ((gsl::narrow_cast<double>(angledForm.rectangle.top) - angledForm.rectangle.bottom) / 2.0 + angledForm.rectangle.bottom)
+	const auto rotationCenter     = fPOINT {
+        ((angledForm.rectangle.right - angledForm.rectangle.left) / 2.0f + angledForm.rectangle.left),
+        ((angledForm.rectangle.top - angledForm.rectangle.bottom) / 2.0f + angledForm.rectangle.bottom)
 	};
 	angledFormVertices.clear();
 	angledFormVertices.reserve(angledForm.vertexCount);
 	if (StateMap.test(StateFlag::ISUND)) {
-		rotationAngle = PI / 2 - SelectedForm->underlayStitchAngle;
+		rotationAngle = PI_F / 2.0f - SelectedForm->underlayStitchAngle;
 
 		const auto& vertexList = xt::insid();
 		for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
@@ -3481,10 +3479,10 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOI
 	}
 	else {
 		if (StateMap.test(StateFlag::TXFIL)) {
-			rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
+			rotationAngle = PI_F / 2.0f - SelectedForm->angleOrClipData.angle;
 		}
 		else {
-			rotationAngle = PI / 2 - SelectedForm->satinOrAngle.angle;
+			rotationAngle = PI_F / 2.0f - SelectedForm->satinOrAngle.angle;
 		}
 		auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		for (auto iVertex = 0u; iVertex < angledForm.vertexCount; iVertex++) {
@@ -4902,7 +4900,7 @@ void form::refilfn() {
 			LineSpacing             = SelectedForm->fillSpacing;
 			auto lineEndpoints      = std::vector<SMALPNTL> {};
 			auto groupIndexSequence = std::vector<unsigned> {};
-			auto rotationCenter     = dPOINT {};
+			auto rotationCenter     = fPOINT {};
 			auto doFill             = true;
 			auto rotationAngle      = 0.0;
 			switch (SelectedForm->fillType) {
@@ -5910,7 +5908,7 @@ void form::internal::getbig() noexcept {
 }
 
 void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
-	auto stitchCoord = dPOINT { stitchRect.left, stitchRect.top };
+	auto stitchCoord = fPOINT { stitchRect.left, stitchRect.top };
 	auto screenCoord = POINT {};
 
 	thred::sCor2px(stitchCoord, screenCoord);
@@ -7164,7 +7162,7 @@ void form::snap() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void form::internal::dufcntr(dPOINT& center) {
+void form::internal::dufcntr(fPOINT& center) {
 	auto bigRect = (*FormList)[SelectedFormList->front()].rectangle;
 	for (auto selectedForm : (*SelectedFormList)) {
 		const auto formRect = (*FormList)[selectedForm].rectangle;
@@ -7181,12 +7179,12 @@ void form::internal::dufcntr(dPOINT& center) {
 			bigRect.top = formRect.top;
 		}
 	}
-	center.x = (gsl::narrow_cast<double>(bigRect.right) - bigRect.left) / 2.0 + bigRect.left;
-	center.y = (gsl::narrow_cast<double>(bigRect.top) - bigRect.bottom) / 2.0 + bigRect.bottom;
+	center.x = (bigRect.right - bigRect.left) / 2.0f + bigRect.left;
+	center.y = (bigRect.top - bigRect.bottom) / 2.0f + bigRect.bottom;
 }
 
-dPOINT form::rotpar() {
-	auto rotationCenter = dPOINT {};
+fPOINT form::rotpar() {
+	auto rotationCenter = fPOINT {};
 	if (StateMap.test(StateFlag::FPSEL)) {
 		rotationCenter.x = form::midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
 		rotationCenter.y = form::midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
@@ -7319,7 +7317,7 @@ void form::internal::adfrm(unsigned int iForm) {
 	}
 }
 
-void form::duprot(double rotationAngle) {
+void form::duprot(float rotationAngle) {
 	thred::savdo();
 	fi::adfrm(ClosestFormToCursor);
 	const auto rotationCenter = form::rotpar();
@@ -7329,7 +7327,7 @@ void form::duprot(double rotationAngle) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void form::internal::duprotfs(double rotationAngle) {
+void form::internal::duprotfs(float rotationAngle) {
 	const auto rotationCenter = form::rotpar();
 	for (auto selectedForm : (*SelectedFormList)) {
 		adfrm(selectedForm);
@@ -7337,7 +7335,7 @@ void form::internal::duprotfs(double rotationAngle) {
 	}
 }
 
-void form::internal::duprots(double rotationAngle, const dPOINT& rotationCenter) {
+void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) {
 	auto destination = PCSHeader.stitchCount;
 
 	thred::rngadj();
@@ -8142,7 +8140,7 @@ void form::cntrx() {
 	if (!SelectedFormList->empty()) {
 		flag = true;
 		thred::savdo();
-		auto selectedCenter = dPOINT {};
+		auto selectedCenter = fPOINT {};
 		fi::dufcntr(selectedCenter);
 		FormMoveDelta.x = markCenter.x - selectedCenter.x;
 		FormMoveDelta.y = -markCenter.y + selectedCenter.y;

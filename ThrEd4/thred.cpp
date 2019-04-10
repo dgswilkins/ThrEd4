@@ -7210,7 +7210,7 @@ void thred::internal::stchbox(unsigned iStitch, HDC dc) {
 	}
 }
 
-void thred::sCor2px(const dPOINT& stitchCoordinate, POINT& pixelCoordinate) {
+void thred::sCor2px(const fPOINT& stitchCoordinate, POINT& pixelCoordinate) {
 	pixelCoordinate = { wrap::round<long>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x + 0.5),
 		                wrap::round<long>(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y + 0.5) };
 }
@@ -7248,13 +7248,13 @@ void thred::internal::unrotu() {
 	}
 }
 
-void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double rotationAngle, const dPOINT& rotationCenter) {
-	auto       distanceToCenter = 0.0;
-	auto       newAngle         = 0.0;
+void thred::internal::rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) {
+	auto       distanceToCenter = 0.0f;
+	auto       newAngle         = 0.0f;
 	const auto dx               = unrotatedPoint.x - rotationCenter.x;
 	const auto dy               = unrotatedPoint.y - rotationCenter.y;
 
-	if (dx != 0.0) {
+	if (dx != 0.0f) {
 		distanceToCenter = hypot(dx, dy);
 		newAngle         = atan2(dy, dx);
 		newAngle += rotationAngle;
@@ -7262,14 +7262,14 @@ void thred::internal::rotang(dPOINT unrotatedPoint, POINT& rotatedPoint, double 
 	else {
 		distanceToCenter = abs(dy);
 		if (dy > 0) {
-			newAngle = PI / 2 + rotationAngle;
+			newAngle = PI_F / 2.0f + rotationAngle;
 		}
 		else {
-			newAngle = rotationAngle - PI / 2;
+			newAngle = rotationAngle - PI_F / 2.0f;
 		}
 	}
 	const auto point
-	    = dPOINT { rotationCenter.x + distanceToCenter * cos(newAngle), rotationCenter.y + distanceToCenter * sin(newAngle) };
+	    = fPOINT { rotationCenter.x + distanceToCenter * cos(newAngle), rotationCenter.y + distanceToCenter * sin(newAngle) };
 	thred::sCor2px(point, rotatedPoint);
 }
 
@@ -7329,13 +7329,13 @@ void thred::rotangf(const fPOINT& unrotatedPoint,
 	rotatedPoint.y = rotationCenter.y + distanceToCenter * sin(newAngle);
 }
 
-void thred::rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rotationCenter) noexcept {
-	auto       len      = 0.0;
-	auto       newAngle = 0.0;
+void thred::rotflt(fPOINT& point, const float rotationAngle, const fPOINT& rotationCenter) noexcept {
+	auto       len      = 0.0f;
+	auto       newAngle = 0.0f;
 	const auto dx       = point.x - rotationCenter.x;
 	const auto dy       = point.y - rotationCenter.y;
 
-	if (dx != 0.0) {
+	if (dx != 0.0f) {
 		len      = hypot(dx, dy);
 		newAngle = atan2(dy, dx);
 		newAngle += rotationAngle;
@@ -7343,22 +7343,22 @@ void thred::rotflt(fPOINT& point, const double rotationAngle, const dPOINT& rota
 	else {
 		if (dy > 0) {
 			len      = dy;
-			newAngle = PI / 2 + rotationAngle;
+			newAngle = PI_F / 2.0f + rotationAngle;
 		}
 		else {
 			len      = -dy;
-			newAngle = rotationAngle - PI / 2;
+			newAngle = rotationAngle - PI_F / 2.0f;
 		}
 	}
 	point.x = rotationCenter.x + len * cos(newAngle);
 	point.y = rotationCenter.y + len * sin(newAngle);
 }
 
-void thred::internal::rotstch(fPOINTATTR* stitch, const double rotationAngle, const dPOINT& rotationCenter) noexcept {
-	auto       distanceToCenter = 0.0;
-	auto       newAngle         = 0.0;
-	const auto dx               = gsl::narrow_cast<double>(stitch->x) - rotationCenter.x;
-	const auto dy               = gsl::narrow_cast<double>(stitch->y) - rotationCenter.y;
+void thred::internal::rotstch(fPOINTATTR* stitch, const float rotationAngle, const fPOINT& rotationCenter) noexcept {
+	auto       distanceToCenter = 0.0f;
+	auto       newAngle         = 0.0f;
+	const auto dx               = stitch->x - rotationCenter.x;
+	const auto dy               = stitch->y - rotationCenter.y;
 
 	if (dx != 0.0) {
 		distanceToCenter = hypot(dx, dy);
@@ -7368,20 +7368,20 @@ void thred::internal::rotstch(fPOINTATTR* stitch, const double rotationAngle, co
 	else {
 		if (dy > 0) {
 			distanceToCenter = dy;
-			newAngle         = PI / 2 + rotationAngle;
+			newAngle         = PI_F / 2.0f + rotationAngle;
 		}
 		else {
 			distanceToCenter = -dy;
-			newAngle         = rotationAngle - PI / 2;
+			newAngle         = rotationAngle - PI_F / 2.0f;
 		}
 	}
 	stitch->y = rotationCenter.y + distanceToCenter * sin(newAngle);
 	stitch->x = rotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
-void thred::internal::ritrot(double rotationAngle, const dPOINT& rotationCenter) {
+void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) {
 	auto rotated           = POINT {};
-	auto rotationReference = dPOINT { (RotationRect.left), (RotationRect.top) };
+	auto rotationReference = fPOINT { (RotationRect.left), (RotationRect.top) };
 
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
@@ -7416,7 +7416,7 @@ void thred::internal::durcntr(dPOINT& rotationCenter) noexcept {
 	rotationCenter.y = form::midl(RotationRect.top, RotationRect.bottom);
 }
 
-void thred::internal::rot(dPOINT& rotationCenter) {
+void thred::internal::rot(fPOINT& rotationCenter) {
 	do {
 		if (StateMap.test(StateFlag::FPSEL)) {
 			RotationRect = SelectedVerticesRect;
@@ -8757,7 +8757,7 @@ void thred::internal::drwmrk(HDC dc) {
 	POINT      markLine[2]     = {};
 	const auto markOffset      = gsl::narrow<long>(MulDiv(6, *screenDPI, 96));
 
-	thred::sCor2px(ZoomMarkPoint, markCoordinates);
+	thred::sCor2px(fPOINT{ ZoomMarkPoint }, markCoordinates);
 	SelectObject(dc, ZoomMarkPen);
 	SetROP2(dc, R2_XORPEN);
 	markLine[0] = { markCoordinates.x - markOffset, markCoordinates.y - markOffset };
@@ -9533,7 +9533,7 @@ void thred::setpsel() {
 	StateMap.set(StateFlag::FPSEL);
 }
 
-void thred::rotfn(double rotationAngle, const dPOINT& rotationCenter) {
+void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
 		form::fvars(ClosestFormToCursor);
@@ -12098,8 +12098,8 @@ void thred::internal::dufdef() noexcept {
 
 bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
                                       double              xyRatio,
-                                      double&             rotationAngle,
-                                      const dPOINT&       rotationCenter,
+                                      float&              rotationAngle,
+                                      const fPOINT&       rotationCenter,
                                       const FRMHED&       textureForm) {
 	if (StateMap.test(StateFlag::TXTMOV)) {
 		texture::txtrmov(textureForm);
@@ -12326,7 +12326,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.test(StateFlag::MOVCNTR)) {
 			unrot();
 			thred::px2stch();
-			ritrot(rotationAngle, dPOINT { SelectedPoint });
+			ritrot(rotationAngle, SelectedPoint);
 			return true;
 		}
 		if (StateMap.test(StateFlag::ROTCAPT)) {
@@ -12340,10 +12340,10 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 			}
 			else {
 				if (adjustedPoint.y > 0) {
-					rotationAngle = PI / 2;
+					rotationAngle = PI_F / 2.0f;
 				}
 				else {
-					rotationAngle = -PI / 2;
+					rotationAngle = -PI_F / 2.0f;
 				}
 			}
 			rotationAngle -= RotationHandleAngle;
@@ -12421,7 +12421,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	return true;
 }
 
-bool thred::internal::handleLeftButtonUp(double xyRatio, double rotationAngle, const dPOINT& rotationCenter, bool& retflag) {
+bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, const fPOINT& rotationCenter, bool& retflag) {
 	retflag = true;
 	if (((GetKeyState(VK_SHIFT) & 0x8000) != 0) && thred::px2stch()) {
 		texture::setshft();
@@ -12497,6 +12497,7 @@ bool thred::internal::handleLeftButtonUp(double xyRatio, double rotationAngle, c
 		return true;
 	}
 	if (StateMap.testAndReset(StateFlag::MOVCNTR)) {
+		// rotationCenter = SelectedPoint;
 		StateMap.set(StateFlag::ROTAT);
 		return true;
 	}
@@ -14304,7 +14305,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				thred::px2stch();
 				StateMap.set(StateFlag::MOVCNTR);
 				unrot();
-				ritrot(rotationAngle, dPOINT { SelectedPoint });
+				ritrot(rotationAngle, SelectedPoint);
 			}
 			else {
 				if (adjustedPoint.x != 0.0f) {
@@ -15233,7 +15234,7 @@ bool thred::internal::handleLeftKey(bool& retflag) {
 }
 
 bool thred::internal::handleMainWinKeys(const unsigned int& code,
-                                        dPOINT&             rotationCenter,
+                                        fPOINT&             rotationCenter,
                                         std::vector<POINT>& stretchBoxLine,
                                         bool&               retflag) {
 	retflag = true;
@@ -17064,7 +17065,7 @@ bool thred::internal::handleFillMenu(const WORD& wParameter) {
 	return flag;
 }
 
-bool thred::internal::handleMainMenu(const WORD& wParameter, dPOINT& rotationCenter) {
+bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCenter) {
 	auto flag = false;
 	switch (wParameter) {
 	case ID_HLP: { // help
@@ -17179,8 +17180,8 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, dPOINT& rotationCen
 
 bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
                              double&             xyRatio,
-                             double&             rotationAngle,
-                             dPOINT&             rotationCenter,
+                             float&              rotationAngle,
+                             fPOINT&             rotationCenter,
                              FRMHED&             textureForm) { // NOLINT
 	if (Msg.message == WM_MOUSEMOVE) {
 		return thi::handleMouseMove(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm);
@@ -19657,8 +19658,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 
 		auto xyRatio        = 0.0; // expand form aspect ratio
-		auto rotationAngle  = 0.0;
-		auto rotationCenter = dPOINT {};
+		auto rotationAngle  = 0.0f;
+		auto rotationCenter = fPOINT {};
 		auto textureForm    = FRMHED {};
 
 		auto stretchBoxLine = std::vector<POINT> {};

@@ -73,7 +73,7 @@ void         dufrm() noexcept;
 void         duhart(unsigned sideCount);
 void         dulens(unsigned sides);
 void         duinsf() noexcept;
-void         duprot(double rotationAngle);
+void         duprot(float rotationAngle);
 void         dupsel(HDC dc);
 void         durpoli(unsigned vertexCount);
 void         duspir(unsigned stepCount);
@@ -162,7 +162,7 @@ void     rotagain();
 void     rotcmd();
 void     rotdup();
 void     rotfrm(unsigned int newStartVertex);
-dPOINT   rotpar();
+fPOINT   rotpar();
 void     rstfrm();
 void     sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
 void     savblen(float fLength);
@@ -247,7 +247,7 @@ namespace internal {
 	void dubfn();
 	void ducon() noexcept;
 	void dudif(const dPOINT& start, const dPOINT& finish, dPOINT& delta) noexcept;
-	void dufcntr(dPOINT& center);
+	void dufcntr(fPOINT& center);
 	void dufdat(std::vector<fPOINT>& tempClipPoints,
 	            std::vector<SATCON>& tempGuides,
 	            std::vector<fPOINT>& destinationFormVertices,
@@ -258,8 +258,8 @@ namespace internal {
 	void duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices);
 	void dunseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int start, unsigned int finish, unsigned& lastGroup);
 	void dupfn(double rotationAngle);
-	void duprotfs(double rotationAngle);
-	void duprots(double rotationAngle, const dPOINT& rotationCenter);
+	void duprotfs(float rotationAngle);
+	void duprots(float rotationAngle, const fPOINT& rotationCenter);
 	void durgn(const std::vector<FSEQ>&      sequencePath,
 	           boost::dynamic_bitset<>&      visitedRegions,
 	           const std::vector<SMALPNTL*>& sortedLines,
@@ -290,14 +290,14 @@ namespace internal {
 	void  fnagain(double rotationAngle);
 	void  fnang(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
-	            double                 rotationAngle,
-	            dPOINT&                rotationCenter,
+	            float                 rotationAngle,
+	            fPOINT&                rotationCenter,
 	            FRMHED&                angledForm, 
 		        std::vector<fPOINT>&   angledFormVertices);
 	void  fnhor(std::vector<unsigned>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
-	            double                 rotationAngle,
-	            dPOINT&                rotationCenter,
+	            float                 rotationAngle,
+	            fPOINT&                rotationCenter,
 	            FRMHED&                angledForm,
 	        	std::vector<fPOINT>&   angledFormVertices);
 	void  fnord();
@@ -432,7 +432,7 @@ namespace internal {
 	              unsigned                   currentSegmentIndex,
 	              unsigned&                  clipIntersectSide,
 	              const std::vector<fPOINT>& currentFormVertices);
-	void   rotbak(double rotationAngle, const dPOINT& rotationCenter) noexcept;
+	void   rotbak(float rotationAngle, const fPOINT& rotationCenter) noexcept;
 	void   rotentr(double rotationAngle);
 	void   rspnt(float xCoordinate, float yCoordinate);
 	void   sapliq();

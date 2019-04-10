@@ -678,9 +678,9 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
                             const std::vector<fPOINT>& chainEndPoints,
                             unsigned                   start,
                             unsigned                   finish,
-                            const dPOINT&              rotationCenter) {
+                            const fPOINT&              rotationCenter) {
 	const auto delta
-	    = dPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
+	    = fPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto rotationAngle = atan2(delta.y, delta.x);
 	auto       chainEndPoint = chainEndPoints[start];
 	for (auto& clip : tempClipPoints) {
@@ -700,7 +700,7 @@ void clip::duxclp() {
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	OSequence->clear();
 	// ToDo - does this make sense?
-	const auto rotationCenter = dPOINT {};
+	const auto rotationCenter = fPOINT {};
 	for (auto iPoint = 1u; iPoint < chainEndPoints.size(); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}

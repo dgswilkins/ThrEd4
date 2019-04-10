@@ -103,6 +103,6 @@ namespace internal {
 	            const std::vector<fPOINT>& chainEndPoints,
 	            unsigned                   start,
 	            unsigned                   finish,
-	            const dPOINT&              rotationCenter);
+	            const fPOINT&              rotationCenter);
 } // namespace internal
 } // namespace clip
