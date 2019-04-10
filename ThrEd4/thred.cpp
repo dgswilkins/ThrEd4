@@ -12421,7 +12421,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	return true;
 }
 
-bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, const fPOINT& rotationCenter, bool& retflag) {
+bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) {
 	retflag = true;
 	if (((GetKeyState(VK_SHIFT) & 0x8000) != 0) && thred::px2stch()) {
 		texture::setshft();
@@ -12497,7 +12497,7 @@ bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, co
 		return true;
 	}
 	if (StateMap.testAndReset(StateFlag::MOVCNTR)) {
-		// rotationCenter = SelectedPoint;
+		rotationCenter = SelectedPoint;
 		StateMap.set(StateFlag::ROTAT);
 		return true;
 	}

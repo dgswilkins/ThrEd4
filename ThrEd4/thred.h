@@ -265,7 +265,7 @@ namespace internal {
 	                          double              rotationAngle,
 	                          const FRMHED&       textureForm,
 	                          bool&               retflag);
-	bool handleLeftButtonUp(double xyRatio, float rotationAngle, const fPOINT& rotationCenter, bool& retflag);
+	bool handleLeftButtonUp(double xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag);
 	bool handleLeftKey(bool& retflag);
 	bool handleMainMenu(const WORD& wParameter, fPOINT& rotationCenter);
 	bool handleMainWinKeys(const unsigned int& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);
