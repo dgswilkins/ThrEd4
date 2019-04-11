@@ -1426,7 +1426,7 @@ void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) 
 	else {
 		constexpr auto SATHRESH = 10.0;
 
-		auto angle  = ((*FormAngles)[finish] - (*FormAngles)[start]) / 2.0;
+		auto angle  = ((*FormAngles)[finish] - (*FormAngles)[start]) / 2.0f;
 		auto length = satinWidth / cos(angle);
 		if (length < -satinWidth * SATHRESH) {
 			length = -satinWidth * SATHRESH;
