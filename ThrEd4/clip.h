@@ -95,7 +95,7 @@ namespace internal {
 	void picfn(std::vector<fPOINT>& clipFillData,
 	           unsigned int         start,
 	           unsigned int         finish,
-	           double               spacing,
+	           float                spacing,
 	           const fPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
 	void setvct(unsigned int start, unsigned int finish, float& clipAngle, fPOINT& vector0);

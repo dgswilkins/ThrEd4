@@ -484,7 +484,7 @@ void clip::internal::fxlit(const std::vector<float>& listSINEs,
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		const auto length   = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
 		const auto count    = wrap::floor<uint32_t>(length / AdjustedSpace);
-		const auto delta    = dPOINT { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
+		const auto delta    = fPOINT { AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide] };
 		SelectedPoint.x += delta.x * count;
 		SelectedPoint.y += delta.y * count;
 		BeanCount += count;
@@ -502,7 +502,7 @@ void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		const auto length   = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
 		const auto count    = wrap::floor<uint32_t>(length / AdjustedSpace);
-		const auto delta    = dPOINT { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
+		const auto delta    = fPOINT { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
 		for (auto iChain = 0u; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
 			SelectedPoint.y += delta.y;
@@ -747,7 +747,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
                            unsigned int         start,
                            unsigned int         finish,
-                           double               spacing,
+                           float                spacing,
                            const fPOINT&        rotationCenter) {
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto       delta    = fPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
@@ -762,10 +762,10 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	rotationAngle    = atan2(delta.y, delta.x);
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	if (count != 0u) {
-		auto step = dPOINT {};
+		auto step = fPOINT {};
 		if (count > 1) {
 			const auto tdub = ((length - count * spacing) / (count - 1) + spacing) / length;
-			const auto val  = dPOINT { delta.x * tdub, delta.y * tdub };
+			const auto val  = fPOINT { delta.x * tdub, delta.y * tdub };
 			step            = val;
 		}
 		auto iClip = clipFillData.begin();
@@ -842,10 +842,10 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	auto chainPoint = std::vector<fPOINT> {};
 	chainPoint.resize(5);
 	auto delta
-	    = dPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
-	const auto lengthDelta  = dPOINT { (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
-	const auto angle        = atan2(delta.y, delta.x) + PI / 2;
-	const auto offset       = dPOINT { (cos(angle) * SelectedForm->borderSize), (sin(angle) * SelectedForm->borderSize) };
+	    = fPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
+	const auto lengthDelta  = fPOINT { (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
+	const auto angle        = atan2(delta.y, delta.x) + PI_F / 2.0f;
+	const auto offset       = fPOINT { (cos(angle) * SelectedForm->borderSize), (sin(angle) * SelectedForm->borderSize) };
 	const auto middleXcoord = chainEndPoints[start].x + lengthDelta.x;
 	const auto middleYcoord = chainEndPoints[start].y + lengthDelta.y;
 
@@ -856,15 +856,15 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = gsl::narrow_cast<double>(chainEndPoints[wrap::toSize(finish) + 1u].x) - chainEndPoints[finish].x;
-		delta.y = gsl::narrow_cast<double>(chainEndPoints[wrap::toSize(finish) + 1u].y) - chainEndPoints[finish].y;
+		delta.x = chainEndPoints[wrap::toSize(finish) + 1u].x - chainEndPoints[finish].x;
+		delta.y = chainEndPoints[wrap::toSize(finish) + 1u].y - chainEndPoints[finish].y;
 	}
 	else {
-		delta.x = gsl::narrow_cast<double>(chainEndPoints[finish].x) - chainEndPoints[finish - 1].x;
-		delta.y = gsl::narrow_cast<double>(chainEndPoints[finish].y) - chainEndPoints[finish - 1].y;
+		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1].x;
+		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1].y;
 	}
-	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0;
-	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0;
+	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0f;
+	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0f;
 	auto chainCount = wrap::toUnsigned(chainSequence.size());
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
