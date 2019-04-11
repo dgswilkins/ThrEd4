@@ -19474,7 +19474,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_DefaultColorWin           = std::vector<HWND> {};
 		auto private_DefaultDirectory          = fs::path {};
 		auto private_DesignerName              = std::wstring {};
-		auto private_FormAngles                = std::vector<double> {};
+		auto private_FormAngles                = std::vector<float> {};
 		auto private_FormControlPoints         = std::vector<POINT> {};
 		auto private_FormLines                 = std::vector<POINT> {};
 		auto private_FormList                  = std::vector<FRMHED> {};

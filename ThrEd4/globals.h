@@ -126,7 +126,7 @@ extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
 extern HMENU           FillMenu;
 
-extern std::vector<double>* FormAngles;
+extern std::vector<float>*  FormAngles;
 extern std::vector<POINT>*  FormControlPoints;
 
 extern HWND FormDataSheet;

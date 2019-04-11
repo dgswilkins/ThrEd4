@@ -41,7 +41,7 @@ namespace ci = clip::internal;
 
 fPOINT       ClipReference;       // clipboard reference formOrigin
 fPOINT       BorderClipReference; // reference for clipboard line border
-double       AdjustedSpace;       // adjusted space
+float        AdjustedSpace;       // adjusted space
 unsigned int NextStart;           // index of the endpoint of the line segment being processed
 
 bool clip::iseclp(unsigned int iForm) {
@@ -452,9 +452,9 @@ void clip::clpbrd(unsigned int startVertex) {
 	}
 }
 
-bool clip::internal::fxpnt(const std::vector<double>& listSINEs,
-                           const std::vector<double>& listCOSINEs,
-                           dPOINT&                    moveToCoords,
+bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
+                           const std::vector<float>& listCOSINEs,
+                           fPOINT&                    moveToCoords,
                            unsigned                   currentSide) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	moveToCoords  = vertexIt[NextStart];
@@ -474,9 +474,9 @@ bool clip::internal::fxpnt(const std::vector<double>& listSINEs,
 	return false;
 }
 
-void clip::internal::fxlit(const std::vector<double>& listSINEs,
-                           const std::vector<double>& listCOSINEs,
-                           dPOINT&                    moveToCoords,
+void clip::internal::fxlit(const std::vector<float>& listSINEs,
+                           const std::vector<float>& listCOSINEs,
+                           fPOINT&                    moveToCoords,
                            unsigned                   currentSide) {
 	if (ci::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
@@ -492,9 +492,9 @@ void clip::internal::fxlit(const std::vector<double>& listSINEs,
 }
 
 void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
-                           const std::vector<double>& ListSINEs,
-                           const std::vector<double>& ListCOSINEs,
-                           dPOINT&                    moveToCoords,
+                           const std::vector<float>&  ListSINEs,
+                           const std::vector<float>&  ListCOSINEs,
+                           fPOINT&                    moveToCoords,
                            unsigned                   currentSide) {
 	if (ci::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
@@ -511,12 +511,12 @@ void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
 	}
 }
 
-void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
-                           const std::vector<double>& listSINEs,
-                           const std::vector<double>& listCOSINEs) {
-	auto moveToCoords = dPOINT {}; // moving formOrigin for clipboard fill
+void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
+                           const std::vector<float>& listSINEs,
+                           const std::vector<float>& listCOSINEs) {
+	auto moveToCoords = fPOINT {}; // moving formOrigin for clipboard fill
 
-	AdjustedSpace = 0;
+	AdjustedSpace = 0.0f;
 	auto flag     = true;
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
@@ -537,13 +537,13 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 	}
 	AdjustedSpace              = SelectedForm->edgeSpacing;
 	auto       minimumSpacing  = SelectedForm->edgeSpacing;
-	const auto halfSpacing     = AdjustedSpace / 2;
-	auto       interval        = 1e9;
-	auto       minimumInterval = 1e9;
+	const auto halfSpacing     = AdjustedSpace / 2.0f;
+	auto       interval        = 1e9f;
+	auto       minimumInterval = 1e9f;
 	auto       loopCount       = 0u;
 	auto       initialCount    = 0u;
-	auto       smallestSpacing = 0.0;
-	auto       largestSpacing  = 1.0;
+	auto       smallestSpacing = 0.0f;
+	auto       largestSpacing  = 1.0f;
 	// loop at least 50 times to guarantee convergence
 	while (loopCount < 50 && (largestSpacing - smallestSpacing) > TINY) {
 		BeanCount        = 0;
@@ -567,7 +567,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 			interval        = minimumInterval;
 			minimumSpacing  = AdjustedSpace;
 			interval /= initialCount;
-			AdjustedSpace += interval / 2;
+			AdjustedSpace += interval / 2.0f;
 			largestSpacing = smallestSpacing + interval;
 		}
 		else {
@@ -618,9 +618,9 @@ void clip::internal::fxlen(std::vector<fPOINT>&       chainEndPoints,
 
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
-	auto listSINEs = std::vector<double> {};
+	auto listSINEs = std::vector<float> {};
 	listSINEs.reserve(wrap::toSize(VertexCount) + 1u);
-	auto listCOSINEs = std::vector<double> {};
+	auto listCOSINEs = std::vector<float> {};
 	listCOSINEs.reserve(VertexCount);
 	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));

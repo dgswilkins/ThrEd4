@@ -65,19 +65,19 @@ namespace internal {
 	void durev(std::vector<fPOINT>& clipReversedData);
 
 	unsigned int findclp(unsigned int formIndex);
-	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<double>& listSINEs, const std::vector<double>& listCOSINEs);
-	void fxlin(std::vector<fPOINT>&       chainEndPoints,
-	           const std::vector<double>& ListSINEs,
-	           const std::vector<double>& ListCOSINEs,
-	           dPOINT&                    moveToCoords,
+	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs);
+	void fxlin(std::vector<fPOINT>&      chainEndPoints,
+	           const std::vector<float>& ListSINEs,
+	           const std::vector<float>& ListCOSINEs,
+	           fPOINT&                   moveToCoords,
+	           unsigned                  currentSide);
+	void fxlit(const std::vector<float>& listSINEs,
+	           const std::vector<float>& listCOSINEs,
+	           fPOINT&                    moveToCoords,
 	           unsigned                   currentSide);
-	void fxlit(const std::vector<double>& listSINEs,
-	           const std::vector<double>& listCOSINEs,
-	           dPOINT&                    moveToCoords,
-	           unsigned                   currentSide);
-	bool fxpnt(const std::vector<double>& listSINEs,
-	           const std::vector<double>& listCOSINEs,
-	           dPOINT&                    moveToCoords,
+	bool fxpnt(const std::vector<float>& listSINEs,
+	           const std::vector<float>& listCOSINEs,
+	           fPOINT&                    moveToCoords,
 	           unsigned                   currentSide);
 	void lincrnr(const std::vector<fPOINT>& clipReversedData,
 	             std::vector<fPOINT>&       clipFillData,
