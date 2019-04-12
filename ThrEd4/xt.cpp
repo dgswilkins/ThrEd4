@@ -934,7 +934,7 @@ void xt::chkwlk() {
 void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, unsigned int find, std::vector<fPOINT>& angledFormVertices) {
 	const auto savedStitchSize = UserStitchLength;
 
-	UserStitchLength = 1e99;
+	UserStitchLength = 1e38f;
 	if (SelectedForm->underlaySpacing == 0.0f) {
 		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
 	}

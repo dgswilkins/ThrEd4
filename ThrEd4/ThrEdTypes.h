@@ -60,10 +60,10 @@ constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color b
 constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
 constexpr double   ZMARGIN    = 1.25;              // zoom margin for select zooms
 constexpr double   SMALSIZ    = 0.25;              // default small stitch size
-constexpr double   MINSIZ     = 0.1;               // default minimum stitch size
-constexpr double   USESIZ     = 3.5;               // user preferred size
+constexpr float    MINSIZ     = 0.1f;              // default minimum stitch size
+constexpr float    USESIZ     = 3.5f;              // user preferred size
 constexpr double   MAXSIZ     = 9.0;               // default maximum stitch size
-constexpr double   PFAFGRAN   = 6.0;               // pfaf stitch points per millimeter
+constexpr float    PFAFGRAN   = 6.0f;              // pfaf stitch points per millimeter
 constexpr int32_t  MINZUM     = 5;                 // minimum zoom in stitch points
 constexpr double   SHOPNTS    = 0.00;              // show stitch points when zoom below this
 constexpr double   STCHBOX    = 0.4226;            // show stitch boxes when zoom below this
@@ -82,7 +82,7 @@ constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
 constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
 constexpr double   USPAC      = 15.0;              // underlay fill spacing
-constexpr double   APSPAC     = 10.8;              // applique border spacing
+constexpr float    APSPAC     = 10.8f;             // applique border spacing
 constexpr uint32_t OSEQLEN    = 0x40000u;          // output sequence length
 constexpr uint32_t BSEQLEN    = OSEQLEN << 1;      // reverse sequence length
 constexpr double   URAT       = 0.75;              // ratio of underlay stitch to satin border size
@@ -960,7 +960,7 @@ struct _iniFil {
 	double   threadSize40;                           // millimeter size of 40 weight thread
 	double   threadSize60;                           // millimeter size of 60 weight thread
 	double   userStitchLength;                       // user stitch length
-	double   maxStitchLength;                        // maximum stitch length
+	float    maxStitchLength;                        // maximum stitch length
 	double   smallStitchLength;                      // small stitch size
 	double   stitchBoxesThreshold;                   // show sitch box level
 	double   stitchSpace;                            // stitch spacing between lines of stitches
@@ -2209,15 +2209,15 @@ constexpr uint32_t NOBLNT = 0x9fu;
 
 // frmhed extended attribute bits
 
-constexpr int32_t AT_SQR     = 0x001u; // square ends
-constexpr int32_t AT_FTHUP   = 0x002u; // feather up or down flag
-constexpr int32_t AT_FTHBTH  = 0x004u; // feather both up and down flag
-constexpr int32_t AT_FTHBLND = 0x008u; // feather blend flag
-constexpr int32_t AT_STRT    = 0x010u; // user set start flag
-constexpr int32_t AT_END     = 0x020u; // user set end flag
-constexpr int32_t AT_UND     = 0x040u; // underlay flag
-constexpr int32_t AT_WALK    = 0x080u; // edge walk
-constexpr int32_t AT_CWLK    = 0x100u; // center walk
+constexpr uint32_t AT_SQR     = 0x001u; // square ends
+constexpr uint32_t AT_FTHUP   = 0x002u; // feather up or down flag
+constexpr uint32_t AT_FTHBTH  = 0x004u; // feather both up and down flag
+constexpr uint32_t AT_FTHBLND = 0x008u; // feather blend flag
+constexpr uint32_t AT_STRT    = 0x010u; // user set start flag
+constexpr uint32_t AT_END     = 0x020u; // user set end flag
+constexpr uint32_t AT_UND     = 0x040u; // underlay flag
+constexpr uint32_t AT_WALK    = 0x080u; // edge walk
+constexpr uint32_t AT_CWLK    = 0x100u; // center walk
 
 // contour refil
 constexpr uint32_t FRECONT  = 0x80u;

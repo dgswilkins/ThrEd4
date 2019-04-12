@@ -164,7 +164,7 @@ void form::internal::delfil(unsigned attribute) {
 		}
 		iSource++;
 	}
-	PCSHeader.stitchCount = gsl::narrow<unsigned short>(iDestination);
+	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
 }
 
 void form::delmfil() {
@@ -185,7 +185,7 @@ void form::delmfil() {
 			thred::mvstch(iDestination++, iSource);
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<unsigned short>(iDestination);
+	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
 }
 
 void form::fsizpar() noexcept {
@@ -4525,7 +4525,7 @@ void form::internal::bakseq() {
 					OSequence->push_back(fPOINT { bPrevious.x, bPrevious.y });
 					auto count = ceil(bCurrent.y / UserStitchLength);
 					do {
-						OSequence->push_back(fPOINT { 0.0, count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9 });
+						OSequence->push_back(fPOINT { 0.0f, count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9 });
 						if (OSequence->back().y > bCurrent.y) {
 							break;
 						}
@@ -4540,7 +4540,7 @@ void form::internal::bakseq() {
 					auto count = wrap::floor<uint32_t>(bCurrent.y / UserStitchLength);
 					do {
 						OSequence->push_back(
-						    fPOINT { 0.0, count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
+						    fPOINT { 0.0f, count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
 						if (OSequence->back().y < bPrevious.y) {
 							break;
 						}
@@ -4554,7 +4554,7 @@ void form::internal::bakseq() {
 			else {
 				auto count = wrap::ceil<uint32_t>(bNext.y / UserStitchLength);
 				do {
-					OSequence->push_back(fPOINT { 0.0, count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9 });
+					OSequence->push_back(fPOINT { 0.0f, count * UserStitchLength + (rit % seqtab[rcnt]) * UserStitchLength9 });
 					if (OSequence->back().y > bCurrent.y) {
 						break;
 					}
@@ -4572,7 +4572,7 @@ void form::internal::bakseq() {
 				auto count = wrap::floor<uint32_t>(bNext.y / UserStitchLength);
 				do {
 					OSequence->push_back(
-					    fPOINT { 0.0, count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
+					    fPOINT { 0.0f, count * UserStitchLength - ((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
 					if (OSequence->back().y < bCurrent.y) {
 						break;
 					}

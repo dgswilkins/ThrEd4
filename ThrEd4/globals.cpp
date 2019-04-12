@@ -141,7 +141,7 @@ float  MaxStitchLen;                    // maximum stitch length
 
 MENUITEMINFO* MenuInfo;
 
-double       MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
+float        MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
 MSG          Msg;                                 // main message loop message
 wchar_t      MsgBuffer[MSGSIZ];                   // for user messages
 unsigned     MsgIndex;                            // pointer to the message buffer
@@ -245,7 +245,7 @@ COLORREF           UserColor[16];                        // user colors
 HWND               UserColorWin[16];                     // user color windows
 EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persistent binary variables set by the user
 HPEN               UserPen[16];                          // user color pens
-double             UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
+float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
 unsigned int       VertexCount;                          // sides of the selected form to fill
 double             VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space

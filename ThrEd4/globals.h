@@ -174,7 +174,7 @@ extern float  MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
-extern double       MinStitchLength;
+extern float        MinStitchLength;
 extern MSG          Msg;
 extern wchar_t      MsgBuffer[MSGSIZ];
 extern unsigned     MsgIndex;
@@ -280,7 +280,7 @@ extern HWND     UserColorWin[16];
 extern EnumMap<UserFlag> UserFlagMap;
 
 extern HPEN   UserPen[16];
-extern double UserStitchLength;
+extern float  UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
