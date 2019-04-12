@@ -55,11 +55,11 @@ bool clip::iseclp(const FRMHED& form) noexcept {
 
 bool clip::isclp(unsigned int iForm) {
 	auto& form = (*FormList)[iForm];
-	return ((1 << form.fillType) & ClipTypeMap) != 0;
+	return ((1u << form.fillType) & ClipTypeMap) != 0;
 }
 
 bool clip::isclp(const FRMHED& form) noexcept {
-	return ((1 << form.fillType) & ClipTypeMap) != 0;
+	return ((1u << form.fillType) & ClipTypeMap) != 0;
 }
 
 bool clip::isclpx(unsigned int iForm) {
