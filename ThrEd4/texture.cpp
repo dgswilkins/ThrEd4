@@ -389,7 +389,7 @@ void texture::drwtxtr() {
 	}
 	else {
 		TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2 / StitchWindowClientRect.bottom;
-		yOffset                        = StitchWindowClientRect.bottom >> 2;
+		yOffset                        = StitchWindowClientRect.bottom >> 2u;
 		TextureScreen.xOffset
 		    = (TextureScreen.editToPixelRatio * StitchWindowClientRect.right
 		       - gsl::narrow_cast<double>(TextureScreen.spacing) * (gsl::narrow_cast<double>(TextureScreen.lines) + 2.0))
@@ -398,7 +398,7 @@ void texture::drwtxtr() {
 	TextureScreen.top          = yOffset;
 	TextureScreen.bottom       = StitchWindowClientRect.bottom - yOffset;
 	TextureScreen.height       = TextureScreen.bottom - TextureScreen.top;
-	TextureScreen.halfHeight   = StitchWindowClientRect.bottom >> 1;
+	TextureScreen.halfHeight   = StitchWindowClientRect.bottom >> 1u;
 	TextureScreen.screenHeight = StitchWindowClientRect.bottom * TextureScreen.editToPixelRatio;
 	TextureScreen.yOffset      = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
@@ -453,7 +453,7 @@ void texture::drwtxtr() {
 	}
 	for (auto selectedPoint : *SelectedTexturePointsList) {
 		txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
-		txi::dutxtx(selectedPoint, IniFile.textureEditorSize << 1);
+		txi::dutxtx(selectedPoint, IniFile.textureEditorSize << 1u);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	displayText::drwtxbut(TextureScreen);
@@ -1180,7 +1180,7 @@ void texture::internal::dutxfn(unsigned textureType) {
 
 void texture::internal::dutxmir() {
 	if (!TempTexturePoints->empty()) {
-		const auto centerLine = (TextureScreen.lines + 1u) >> 1;
+		const auto centerLine = (TextureScreen.lines + 1u) >> 1u;
 		const auto evenOffset = 1u - (TextureScreen.lines & 1);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);

@@ -286,7 +286,7 @@ bool satin::internal::satselfn() {
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto&      form      = (*FormList)[iForm];
-		const auto layerCode = (form.attribute & FRMLMSK) >> 1;
+		const auto layerCode = (form.attribute & FRMLMSK) >> 1u;
 		if ((ActiveLayer == 0u) || (layerCode == 0u) || layerCode == ActiveLayer) {
 			auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {
@@ -737,7 +737,7 @@ void satin::ribon() {
 						isBlunt = 0;
 					}
 					si::satends(isBlunt);
-					form.vertexIndex         = thred::adflt(VertexCount << 1);
+					form.vertexIndex         = thred::adflt(VertexCount << 1u);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
 					vertexIt[0].x            = (*OutsidePoints)[0].x;
 					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;
@@ -749,7 +749,7 @@ void satin::ribon() {
 					}
 				}
 				else {
-					form.vertexIndex         = thred::adflt((VertexCount << 1) + 2);
+					form.vertexIndex         = thred::adflt((VertexCount << 1u) + 2);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
 					vertexIt[0].x            = (*OutsidePoints)[0].x;
 					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;
@@ -769,7 +769,7 @@ void satin::ribon() {
 				form.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 				form.vertexCount                = iNewVertex;
 				form.attribute                  = 1;
-				form.wordParam                  = iNewVertex >> 1;
+				form.wordParam                  = iNewVertex >> 1u;
 				form.satinGuideCount            = form.wordParam - 2;
 				form.satinOrAngle.guide         = adsatk(form.satinGuideCount);
 				if (StateMap.test(StateFlag::CNV2FTH)) {
@@ -1385,7 +1385,7 @@ void satin::satout(double satinWidth) {
 		}
 		si::outfn(VertexCount - 1, 0, satinWidth);
 		StateMap.reset(StateFlag::INDIR);
-		if (count < (VertexCount >> 1)) {
+		if (count < (VertexCount >> 1u)) {
 			StateMap.set(StateFlag::INDIR);
 			OutsidePoints = InsidePointList;
 			InsidePoints  = OutsidePointList;

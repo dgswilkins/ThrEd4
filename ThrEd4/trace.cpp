@@ -111,8 +111,8 @@ void trace::initTraceWindows() noexcept {
 
 void trace::internal::trcols(COLORREF color) noexcept {
 	PixelColors[0] = color & 0xff;
-	PixelColors[1] = (color & 0xff00) >> 8;
-	PixelColors[2] = (color & 0xff0000) >> 16;
+	PixelColors[1] = (color & 0xff00) >> 8u;
+	PixelColors[2] = (color & 0xff0000) >> 16u;
 }
 
 void trace::internal::trcstpnum() {
@@ -229,7 +229,7 @@ void trace::internal::blanklin(std::vector<unsigned>& differenceBitmap, unsigned
 
 // Check Translation
 static inline void trace::internal::difsub(const unsigned source, unsigned shift, unsigned& destination) noexcept {
-	destination = (source >> (shift & 0x0f)) & 0xff;
+	destination = (source >> (shift & 0x0fu)) & 0xffu;
 }
 
 void trace::internal::difbits(unsigned shift, unsigned* point) noexcept {
@@ -819,7 +819,7 @@ void trace::internal::dutrac() {
 		SelectedForm->vertexIndex = CurrentVertexIndex;
 		SelectedForm->vertexCount = gsl::narrow<decltype(SelectedForm->vertexCount)>(OutputIndex);
 		SelectedForm->type        = FRMFPOLY;
-		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
+		SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1u);
 		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
 		SelectedForm->satinGuideCount = 0;
 		StateMap.set(StateFlag::RESTCH);
@@ -861,7 +861,7 @@ void trace::trinit() {
 							PixelColors[iRGB]        = HighColors[iRGB];
 							HighColors[iRGB]         = swapComponent;
 						}
-						componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) >> 1) + PixelColors[iRGB];
+						componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) >> 1u) + PixelColors[iRGB];
 					}
 				}
 			}
@@ -988,7 +988,7 @@ unsigned trace::internal::ducolm() noexcept {
 	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth)) {
 		return 0;
 	}
-	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth) << 1) {
+	if (TraceMsgPoint.x < gsl::narrow<int>(ButtonWidth) << 1u) {
 		return 1;
 	}
 

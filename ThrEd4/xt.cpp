@@ -146,7 +146,7 @@ unsigned xt::internal::bpsg() noexcept {
 		PseudoRandomValue = FSED;
 	}
 	testValue = PseudoRandomValue & 0x40000008;
-	PseudoRandomValue >>= 1;
+	PseudoRandomValue >>= 1u;
 	if (testValue == 0x8 || testValue == 0x40000000) {
 		PseudoRandomValue |= 0x40000000;
 	}
@@ -351,9 +351,9 @@ void xt::fthrfn() {
 	if (feather.phaseIndex == 0u) {
 		feather.phaseIndex = 1;
 	}
-	auto       ind = gsl::narrow_cast<unsigned int>(BSequence->size()) / (feather.phaseIndex << 2);
-	const auto res = gsl::narrow_cast<unsigned int>(BSequence->size()) % (feather.phaseIndex << 2);
-	if (res > (feather.phaseIndex << 1)) {
+	auto       ind = gsl::narrow_cast<unsigned int>(BSequence->size()) / (feather.phaseIndex << 2u);
+	const auto res = gsl::narrow_cast<unsigned int>(BSequence->size()) % (feather.phaseIndex << 2u);
+	if (res > (feather.phaseIndex << 1u)) {
 		ind++;
 	}
 	feather.globalPosition = 0;
@@ -821,7 +821,7 @@ void xt::internal::fncwlk() {
 		OutputIndex++;
 		auto finish = form::prv(start);
 		start       = form::nxt(start);
-		for (auto iGuide = 1u; iGuide<VertexCount>> 1; iGuide++) {
+		for (auto iGuide = 1u; iGuide < (VertexCount >> 1u); iGuide++) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
 			if (form::cisin(OSequence->back().x, OSequence->back().y)) {
@@ -1338,7 +1338,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, unsigned& fillStartsMap) {
 	const auto codedFormIndex = (ClosestFormToCursor << FRMSHFT);
 	auto       bordercolor    = gsl::narrow<unsigned int>(SelectedForm->borderColor & COLMSK);
 
-	auto tapcol = gsl::narrow<unsigned int>(SelectedForm->borderColor >> 4);
+	auto tapcol = gsl::narrow<unsigned int>(SelectedForm->borderColor >> 4u);
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
@@ -2485,13 +2485,13 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 			return TRUE;
 		}
 		case IDC_DESWID: {
-			if ((wparam >> 16) == EN_CHANGE) {
+			if ((wparam >> 16u) == EN_CHANGE) {
 				StateMap.reset(StateFlag::DESCHG);
 			}
 			break;
 		}
 		case IDC_DESHI: {
-			if ((wparam >> 16) == EN_CHANGE) {
+			if ((wparam >> 16u) == EN_CHANGE) {
 				StateMap.set(StateFlag::DESCHG);
 			}
 			break;

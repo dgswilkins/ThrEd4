@@ -161,7 +161,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1)), ValueWindowCoords);
+	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1u)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
@@ -427,7 +427,7 @@ void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
 		}
 		if (edgeFillType == EDGEAPPL) {
 			labelWindow[LAPCOL] = ffi::txtwin(stringTable[STR_TXT12], LabelWindowCoords);
-			valueWindow[LAPCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4) + 1)), ValueWindowCoords);
+			valueWindow[LAPCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4u) + 1)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
@@ -835,7 +835,7 @@ void formForms::dasyfrm() {
 	SelectedForm              = &FormList->back();
 	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	SelectedForm->vertexIndex = gsl::narrow<decltype(SelectedForm->vertexIndex)>(FormVertices->size());
-	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1);
+	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1u);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
@@ -871,7 +871,7 @@ void formForms::dasyfrm() {
 	auto       petalPointCount  = IniFile.daisyPetalPoints;
 	const auto borderType       = IniFile.daisyBorderType;
 	if (borderType == DHART) {
-		petalPointCount  = (IniFile.daisyHeartCount + 1) << 1;
+		petalPointCount  = (IniFile.daisyHeartCount + 1) << 1u;
 		petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
 	}
 	const auto petalSegmentAngle = PI2 / petalVertexCount;
@@ -881,7 +881,7 @@ void formForms::dasyfrm() {
 		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1;
 		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
-	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1;
+	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1u;
 	auto       angle               = 0.0;
 	for (auto iMacroPetal = 0u; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
 		auto petalPointAngle         = 0.0;
@@ -1152,7 +1152,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 				IniFile.wavePoints = 3;
 			}
 			if (IniFile.waveStart == IniFile.waveEnd) {
-				IniFile.waveEnd += (IniFile.wavePoints >> 2);
+				IniFile.waveEnd += (IniFile.wavePoints >> 2u);
 			}
 			IniFile.waveStart %= IniFile.wavePoints;
 			IniFile.waveEnd %= IniFile.wavePoints;
