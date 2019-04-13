@@ -86,7 +86,7 @@ void wrnmen();
 void zumhom();
 
 namespace internal {
-	void   angdif(double angle) noexcept;
+	void   angdif(float angle) noexcept;
 	void   auxmen();
 	void   bak();
 	void   bakmrk();
@@ -338,7 +338,7 @@ namespace internal {
 	HPEN     nuPen(HPEN pen, unsigned width, COLORREF color) noexcept;
 	void     nuRct();
 	void     nuStchSiz(unsigned iColor, unsigned width) noexcept;
-	double   nuang(double yDelta, double xDelta) noexcept;
+	double   nuang(float yDelta, float xDelta) noexcept;
 	void     nucols();
 	void     nudgfn(float deltaX, float deltaY);
 	void     nulayr(unsigned play);
@@ -426,7 +426,7 @@ namespace internal {
 	void     savdst(std::vector<DSTREC>& DSTRecords, unsigned data);
 	void     savmap();
 	void     sdCor2px(fPOINTATTR stitchPoint, POINT& pixelCoordinate);
-	void     segentr(double rotationAngle);
+	void     segentr(float rotationAngle);
 	void     selCol();
 	void     selalstch();
 	void     seldwn();

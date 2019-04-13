@@ -674,7 +674,7 @@ void satin::satbrd() {
 
 void satin::internal::satends(unsigned isBlunt) {
 	if ((isBlunt & SBLNT) != 0u) {
-		auto step = fPOINT { sin((*FormAngles)[0]) * HorizontalLength2 / 2.0, cos((*FormAngles)[0]) * HorizontalLength2 / 2.0 };
+		auto step = fPOINT { sin((*FormAngles)[0]) * HorizontalLength2 / 2.0f, cos((*FormAngles)[0]) * HorizontalLength2 / 2.0f };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -690,8 +690,8 @@ void satin::internal::satends(unsigned isBlunt) {
 		(*InsidePoints)[0] = (*OutsidePoints)[0] = vertexIt[0];
 	}
 	if ((isBlunt & FBLNT) != 0u) {
-		auto step = fPOINT { sin((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2.0,
-			                 cos((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2.0 };
+		auto step = fPOINT { sin((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2.0f,
+			                 cos((*FormAngles)[VertexCount - 2]) * HorizontalLength2 / 2.0f };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
