@@ -40,7 +40,7 @@ void         satbrd();
 void         satfil();
 void         satfix();
 void         satknkt();
-void         satout(double satinWidth);
+void         satout(float satinWidth);
 void         satpnt0();
 void         satpnt1();
 void         satsel();
@@ -51,8 +51,8 @@ void         spltsat(unsigned guideIndex);
 
 namespace internal {
 
-	bool chkbak(const std::vector<dPOINT>& satinBackup, const dPOINT& pnt);
-	void filinsbw(std::vector<dPOINT>& satinBackup, const dPOINT& point, unsigned& satinBackupIndex);
+	bool chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt);
+	void filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, unsigned& satinBackupIndex);
 
 	unsigned int nusac(unsigned int formIndex, unsigned guideCount);
 

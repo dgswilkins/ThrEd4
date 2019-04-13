@@ -108,13 +108,13 @@ namespace internal {
 	void     centr();
 	void     chk1col();
 	bool     chkMsg(std::vector<POINT>& stretchBoxLine,
-	                double&             xyRatio,
+	                float&              xyRatio,
 	                float&              rotationAngle,
 	                fPOINT&             rotationCenter,
 	                FRMHED&             textureForm);
 	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
 	bool     chkattr(const fs::path& filename);
-	bool     chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio);
+	bool     chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio);
 	void     chkbit();
 	bool     chkdst(const DSTHED* dstHeader) noexcept;
 	bool     chkhid(unsigned colorToCheck);
@@ -261,11 +261,11 @@ namespace internal {
 	bool handleFormDataSheet();
 	bool handleHomeKey(bool& retflag);
 	bool handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
-	                          double&             xyRatio,
+	                          float&              xyRatio,
 	                          double              rotationAngle,
 	                          const FRMHED&       textureForm,
 	                          bool&               retflag);
-	bool handleLeftButtonUp(double xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag);
+	bool handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag);
 	bool handleLeftKey(bool& retflag);
 	bool handleMainMenu(const WORD& wParameter, fPOINT& rotationCenter);
 	bool handleMainWinKeys(const unsigned int& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);

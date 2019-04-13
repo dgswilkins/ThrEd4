@@ -39,7 +39,7 @@ constexpr uint16_t IWAVEND  = 26u;         // default wave end
 constexpr uint16_t IWAVS    = 5u;          // default wave lobes
 constexpr uint32_t THRLED0  = 0x746872u;   // lead dword value for thred file v 1.0
 constexpr uint32_t THRLED1  = 0x1746872u;  // lead dword value for thred file v 1.1
-constexpr double   ZUMFCT   = 0.65;        // zoom factor
+constexpr float    ZUMFCT   = 0.65f;        // zoom factor
 constexpr double   PAGSCROL = 0.9;         // page scroll factor
 constexpr double   LINSCROL = 0.05;        // line scroll factor
 constexpr uint32_t TXTSIDS  = 6u;          // extra pixels in a text box
@@ -73,8 +73,8 @@ constexpr double   FORMFCT    = 0.05;              // new forms part of screen
 constexpr int32_t  MAXDELAY   = 600;               // maximum movie time step
 constexpr int32_t  MINDELAY   = 1;                 // minimum movie time step
 constexpr int32_t  MOVITIM    = 12;                // default movie time
-constexpr double   DEFSPACE   = 0.45;              // default stitch spacing
-constexpr double   DEFANG     = 0.785398163397448; // default fill angle, 45 degrees
+constexpr float    DEFSPACE   = 0.45f;             // default stitch spacing
+constexpr float    DEFANG     = 0.7853981f;        // default fill angle, 45 degrees
 constexpr uint32_t MAXFRMLINS = 20000u;            // maximum lines in a form
 constexpr uint32_t MSGSIZ     = 8192;              // size of the message buffer
 constexpr float    PI_F       = 3.1415927f;        // PI to single precision
@@ -85,11 +85,11 @@ constexpr double   USPAC      = 15.0;              // underlay fill spacing
 constexpr float    APSPAC     = 10.8f;             // applique border spacing
 constexpr uint32_t OSEQLEN    = 0x40000u;          // output sequence length
 constexpr uint32_t BSEQLEN    = OSEQLEN << 1u;     // reverse sequence length
-constexpr double   URAT       = 0.75;              // ratio of underlay stitch to satin border size
+constexpr float   URAT       = 0.75f;              // ratio of underlay stitch to satin border size
 constexpr double   PURAT      = 0.6;               // for proportional satin corners
 
-constexpr double DIURAT = (1.0 - URAT) / 2.0;        //(1-URAT)/2
-constexpr double DOURAT = (1.0 - URAT) / 2.0 + URAT; //(1-URAT)/2+URAT
+constexpr float DIURAT = (1.0f - URAT) / 2.0f;       //(1-URAT)/2
+constexpr float DOURAT = (1.0f - URAT) / 2.0f + URAT; //(1-URAT)/2+URAT
 
 constexpr float    MINRCT    = 12.0f;           // minimum dimension of a form select rectangle
 constexpr uint32_t OLDNUM    = 4u;              // number of old filenames saved on file menu
@@ -111,10 +111,10 @@ constexpr uint32_t NCODSED   = 0x73ef5a7eu;     // name encoding seed
 constexpr uint8_t  NCODOF    = 80u;             // name encoding offset
 constexpr double   CLPMIN    = 0.5;             // if clipboard data less wide, then don't fill
 constexpr float    CLPMINAUT = 1.2f;            // for skinny vertical clips
-constexpr double   BRDWID    = 18.0;            // default satin border size
+constexpr float    BRDWID    = 18.0f;           // default satin border size
 constexpr double   SNPLEN    = 0.15;            // default snap together length size
-constexpr double   STARAT    = 0.4;             // default star ratio
-constexpr double   SPIRWRAP  = 1.52;            // default spiral wrap
+constexpr float    STARAT    = 0.4f;            // default star ratio
+constexpr float    SPIRWRAP  = 1.52f;           // default spiral wrap
 constexpr uint32_t BALNORM   = 0x80u;           // normal balarad stitch
 constexpr uint32_t BALJUMP   = 0x81u;           // balarad jump stitch
 constexpr uint32_t BALSTOP   = 0;               // balarad stop
@@ -964,14 +964,14 @@ struct _iniFil {
 	double   smallStitchLength;                      // small stitch size
 	double   stitchBoxesThreshold;                   // show sitch box level
 	double   stitchSpace;                            // stitch spacing between lines of stitches
-	double   fillAngle;                              // fill angle
+	float    fillAngle;                              // fill angle
 	uint32_t userFlagMap;                            // bitmap for user variables
-	double   borderWidth;                            // border width
+	float    borderWidth;                            // border width
 	uint32_t appliqueColor;                          // applique color
 	char     prevNames[OLDNUM][_MAX_PATH];           // last file names                     NOLINT
 	double   snapLength;                             // snap together length
-	double   starRatio;                              // star ratio
-	double   spiralWrap;                             // spiral wrap
+	float    starRatio;                              // star ratio
+	float    spiralWrap;                             // spiral wrap
 	COLORREF bitmapBackgroundColors[COLOR_COUNT];    // bitmap background color preferences NOLINT
 	double   buttonholeCornerLength;                 // buttonhole fill corner length
 	float    picotSpace;                             // space between border picots
@@ -979,7 +979,7 @@ struct _iniFil {
 	int8_t   auxFileType;                            // machine file type
 	float    hoopSizeX;                              // hoop x size
 	float    hoopSizeY;                              // hoop y size
-	double   rotationAngle;                          // rotation angle
+	float    rotationAngle;                          // rotation angle
 	float    gridSize;                               // grid size
 	float    clipOffset;                             // clipboard offset
 	RECT     initialWindowCoords;                    // initial window coordinates
@@ -1110,8 +1110,8 @@ class SMALPNTL
 public:
 	uint32_t line; // line and group must remain in this order for sort to work
 	uint32_t group;
-	double   x;
-	double   y;
+	float   x;
+	float   y;
 };
 
 class BSEQPNT
@@ -1122,17 +1122,22 @@ public:
 	int8_t attribute;
 
 	inline BSEQPNT() noexcept = default;
-	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) noexcept;
+	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
+	inline BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr);
 	// BSEQPNT(BSEQPNT&&) = default;
 	// BSEQPNT& operator=(const BSEQPNT& rhs) = default;
 	// BSEQPNT& operator=(BSEQPNT&&) = default;
 	//~BSEQPNT() = default;
 };
 
-inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) noexcept {
-	x         = gsl::narrow_cast<float>(rhsX);
-	y         = gsl::narrow_cast<float>(rhsY);
-	attribute = gsl::narrow_cast<int8_t>(rhsAttr);
+inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
+	x         = gsl::narrow<float>(rhsX);
+	y         = gsl::narrow<float>(rhsY);
+	attribute = gsl::narrow<int8_t>(rhsAttr);
+}
+
+inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
+	attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 
 inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
@@ -1223,13 +1228,13 @@ inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	return *this;
 }
 
-struct _doublePointLine {
-	double   x;
-	double   y;
+struct _floatPointLine {
+	float    x;
+	float    y;
 	uint16_t line;
 };
 
-using dPOINTLINE = struct _doublePointLine;
+using fPOINTLINE = struct _floatPointLine;
 
 struct _doublerectangle {
 	double top;
@@ -2467,14 +2472,14 @@ struct _pvec {
 using PVEC = struct _pvec;
 
 struct _vrct2 {
-	dPOINT aipnt;
-	dPOINT aopnt;
-	dPOINT bipnt;
-	dPOINT bopnt;
-	dPOINT cipnt;
-	dPOINT copnt;
-	dPOINT dipnt;
-	dPOINT dopnt;
+	fPOINT aipnt;
+	fPOINT aopnt;
+	fPOINT bipnt;
+	fPOINT bopnt;
+	fPOINT cipnt;
+	fPOINT copnt;
+	fPOINT dipnt;
+	fPOINT dopnt;
 };
 
 using VRCT2 = struct _vrct2;

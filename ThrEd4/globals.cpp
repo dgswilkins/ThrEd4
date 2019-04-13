@@ -52,7 +52,7 @@ dPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
 RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
 dPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
 unsigned BitmapWidth;          // bitmap width
-double   BorderWidth = BRDWID; // border width for satin borders
+float    BorderWidth = BRDWID; // border width for satin borders
 unsigned ButtonHeight;         // button height
 unsigned ButtonWidth;          // button width
 unsigned ButtonWidthX3;        // button width times 3
@@ -119,8 +119,8 @@ unsigned  GroupStartStitch;      // lower end of selected stitches
 unsigned  GroupStitchIndex;      // last point selected in group
 fs::path* HomeDirectory;         // directory from which thred was executed
 double    HorizontalLength;      // horizontal length of a clipboard fill
-double    HorizontalLength2;     // horizontal length of a clipboard fill/2
-double    HorizontalRatio;       // horizontal ratio between the zoom window and the entire stitch space
+float     HorizontalLength2;     // horizontal length of a clipboard fill/2
+float     HorizontalRatio;       // horizontal ratio between the zoom window and the entire stitch space
 HWND      HorizontalScrollBar;   // horizontal scroll bar
 INIFILE   IniFile;               // initialization file
 POINT     InsertLine[3];         // the insert line
@@ -133,7 +133,7 @@ std::vector<HWND>*   LabelWindow;               // text handles for the form dat
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
 HPEN   LayerPen[6];                     //
-double LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
+float  LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 fPOINT LowerLeftStitch;                 // lower left formOrigin in a form
 HMENU  MainMenu;                        // main menu
 HWND   MainStitchWin;                   // stitch window
@@ -205,8 +205,8 @@ wchar_t    SideWindowEntryBuffer[11];              // side window number for ent
 HWND       SideWindow[16];                         // side message windows
 double     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
 double     SnapLength        = SNPLEN * PFGRAN;    // snap together length
-double     SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
-double     StarRatio         = STARAT;             // star formOrigin to body ratio
+float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
+float      StarRatio         = STARAT;             // star formOrigin to body ratio
 
 EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
 
@@ -248,12 +248,12 @@ HPEN               UserPen[16];                          // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
 unsigned int       VertexCount;                          // sides of the selected form to fill
-double             VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
+float              VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
 HWND               VerticalScrollBar;                    // vertical scroll bar
 fs::path*          WorkingFileName;                      //
 POINT              ZoomBoxLine[5];                       // the zoom box
 fPOINT             ZoomBoxOrigin;                        // zoom box origin
-double             ZoomFactor = 1;                       // zoom factor
-dPOINT             ZoomMarkPoint;                        // stitch coordinates of the zoom mark
-dPOINT             ZoomRatio;                            // zoom ratio used to draw stitch window
-dRECTANGLE         ZoomRect;                             // zoom rectangle
+float              ZoomFactor = 1.0f;                    // zoom factor
+fPOINT             ZoomMarkPoint;                        // stitch coordinates of the zoom mark
+fPOINT             ZoomRatio;                            // zoom ratio used to draw stitch window
+fRECTANGLE         ZoomRect;                             // zoom rectangle

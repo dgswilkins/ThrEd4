@@ -80,7 +80,7 @@ unsigned        PrevGroupStartStitch;     // lower end of previous selection
 unsigned        PrevGroupEndStitch;       // higher end of previous selection
 unsigned int    BufferDigitCount;         // number of decimal digits in the number of stitches
 unsigned        LineIndex;                // line index for display routine
-double          StitchWindowAspectRatio;  // aspect ratio of the stitch window
+float           StitchWindowAspectRatio;  // aspect ratio of the stitch window
 FORMSCLIP*      ClipFormsHeader;          // multiple form clipboard header
 FORMVERTEXCLIP* ClipFormVerticesData;     // form points clipboard header
 void*           ThrEdClipPointer;         // for memory allocation for thred format clipboard data
@@ -1137,7 +1137,7 @@ int datcod[] = { ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG };
 void thred::chkmen() noexcept {
 	auto code = UINT { MF_CHECKED };
 
-	for (auto iCode = 0; iCode < (sizeof(datcod) / sizeof(datcod[0])); iCode++) {
+	for (auto iCode = 0u; iCode < (sizeof(datcod) / sizeof(datcod[0])); iCode++) {
 		code = MF_UNCHECKED;
 		if (iCode == IniFile.dataCheck) {
 			code = MF_CHECKED;
@@ -1147,14 +1147,14 @@ void thred::chkmen() noexcept {
 }
 
 void thred::duzrat() noexcept {
-	if (ZoomRect.right == 0.0) {
+	if (ZoomRect.right == 0.0f) {
 		ZoomRect.right = LHUPX;
 	}
-	if (ZoomRect.top == 0.0) {
+	if (ZoomRect.top == 0.0f) {
 		ZoomRect.top = LHUPY;
 	}
-	ZoomRatio.x = gsl::narrow_cast<double>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-	ZoomRatio.y = gsl::narrow_cast<double>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+	ZoomRatio.x = gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	ZoomRatio.y = gsl::narrow_cast<float>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 }
 
 unsigned thred::internal::rsed() noexcept {
@@ -1838,7 +1838,7 @@ void thred::internal::zRctAdj() noexcept {
 	}
 	if (ZoomRect.bottom < 0) {
 		ZoomRect.top -= ZoomRect.bottom;
-		ZoomRect.bottom = 0;
+		ZoomRect.bottom = 0.0f;
 	}
 	if (ZoomRect.right > UnzoomedRect.x) {
 		const auto adjustment = ZoomRect.right - UnzoomedRect.x;
@@ -1847,14 +1847,14 @@ void thred::internal::zRctAdj() noexcept {
 	}
 	if (ZoomRect.left < 0) {
 		ZoomRect.right -= ZoomRect.left;
-		ZoomRect.left = 0;
+		ZoomRect.left = 0.0f;
 	}
 }
 
 void thred::shft(const fPOINT& delta) noexcept {
-	const auto halfZoomRect = dPOINT { ((ZoomRect.right - ZoomRect.left) / 2), ((ZoomRect.top - ZoomRect.bottom) / 2) };
-	const auto center       = dPOINT { (ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y) };
-	const auto shift        = dPOINT { (center.x - delta.x), (center.y - delta.y) };
+	const auto halfZoomRect = fPOINT { ((ZoomRect.right - ZoomRect.left) / 2.0f), ((ZoomRect.top - ZoomRect.bottom) / 2.0f) };
+	const auto center       = fPOINT { (ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y) };
+	const auto shift        = fPOINT { (center.x - delta.x), (center.y - delta.y) };
 
 	ZoomRect.bottom -= shift.y;
 	ZoomRect.top -= shift.y;
@@ -1959,10 +1959,7 @@ void thred::internal::movins() {
 }
 
 void thred::zumhom() {
-	ZoomRect.bottom = 0;
-	ZoomRect.left   = 0;
-	ZoomRect.right  = UnzoomedRect.x;
-	ZoomRect.top    = UnzoomedRect.y;
+	ZoomRect = fRECTANGLE{ gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
 	ZoomFactor      = 1;
 	StateMap.reset(StateFlag::ZUMED);
 	thred::movStch();
@@ -2448,22 +2445,23 @@ void thred::internal::chknum() {
 						}
 						case PSTAR: {
 							StarRatio = value;
-							if (StarRatio > 1) {
-								StarRatio = 1;
+							if (StarRatio > 1.0f) {
+								StarRatio = 1.0f;
 							}
-							if (StarRatio < 0.05) {
-								StarRatio = 0.05;
+							if (StarRatio < 0.05f) {
+								StarRatio = 0.05f;
 							}
 							SetWindowText((*ValueWindow)[PSTAR], fmt::format(L"{:.2f}", StarRatio).c_str());
 							break;
 						}
 						case PSPIR: {
 							SpiralWrap = value;
-							if (StarRatio > 20) {
-								StarRatio = 20.;
+							// ToDo - Are these limits correct?
+							if (SpiralWrap > 20.0f) {
+								SpiralWrap = 20.0f;
 							}
-							if (StarRatio < 0.3) {
-								StarRatio = 0.3;
+							if (SpiralWrap < 0.3f) {
+								SpiralWrap = 0.3f;
 							}
 							SetWindowText((*ValueWindow)[PSPIR], fmt::format(L"{:.2f}", SpiralWrap).c_str());
 							break;
@@ -2534,8 +2532,8 @@ void thred::internal::chknum() {
 						if (StateMap.testAndReset(StateFlag::ENTRSTAR)) {
 							thred::savdo();
 							form::dustar(uintValue,
-							             250.0 / value * ZoomFactor * (gsl::narrow_cast<double>(UnzoomedRect.x) + UnzoomedRect.y)
-							                 / (gsl::narrow_cast<double>(LHUPX) + LHUPY));
+							             250.0f / gsl::narrow<float>(value) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
+							                 / (LHUPX + LHUPY));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRSPIR)) {
@@ -3121,9 +3119,9 @@ void thred::internal::duzero() {
 }
 
 void thred::internal::rshft(const POINT& shiftPoint) {
-	ZoomRect.right -= shiftPoint.x;
-	ZoomRect.left -= shiftPoint.x;
 	ZoomRect.top -= shiftPoint.y;
+	ZoomRect.left -= shiftPoint.x;
+	ZoomRect.right -= shiftPoint.x;
 	ZoomRect.bottom -= shiftPoint.y;
 	zRctAdj();
 	StateMap.set(StateFlag::RESTCH);
@@ -3315,7 +3313,7 @@ void thred::grpAdj() {
 				newSize.x  = wrap::round<long>(coordinate);
 			}
 			if (newSize.x > UnzoomedRect.x || newSize.y > UnzoomedRect.y) {
-				ZoomRect.left = ZoomRect.bottom = 0.0;
+				ZoomRect.left = ZoomRect.bottom = 0.0f;
 				ZoomRect.right                  = UnzoomedRect.x;
 				ZoomRect.top                    = UnzoomedRect.y;
 				StateMap.reset(StateFlag::ZUMED);
@@ -5405,7 +5403,7 @@ void thred::internal::bfil() {
 		BitmapWidth  = BitmapFileHeaderV4.bV4Width;
 		BitmapHeight = BitmapFileHeaderV4.bV4Height;
 		StateMap.set(StateFlag::INIT);
-		ZoomRect.left = ZoomRect.bottom = 0;
+		ZoomRect.left = ZoomRect.bottom = 0.0f;
 		ZoomRect.right                  = UnzoomedRect.x;
 		ZoomRect.top                    = UnzoomedRect.y;
 		BitmapDC                        = CreateCompatibleDC(StitchWindowDC);
@@ -5779,10 +5777,7 @@ void thred::internal::nuFil() {
 						return;
 					}
 					}
-					ZoomRect.bottom       = 0;
-					ZoomRect.left         = 0;
-					ZoomRect.right        = IniFile.hoopSizeX;
-					ZoomRect.top          = IniFile.hoopSizeY;
+					ZoomRect = fRECTANGLE{ IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
 					UnzoomedRect          = { wrap::round<long>(IniFile.hoopSizeX), wrap::round<long>(IniFile.hoopSizeY) };
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					auto stitchesRead     = DWORD { 0 };
@@ -6157,7 +6152,7 @@ void thred::internal::nuFil() {
 			}
 			thred::ritot(PCSHeader.stitchCount);
 			// BufferIndex     = 0;
-			ZoomRect     = { IniFile.hoopSizeY, 0, 0, IniFile.hoopSizeX };
+			ZoomRect     = fRECTANGLE { IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
 			UnzoomedRect = { wrap::round<long>(IniFile.hoopSizeX), wrap::round<long>(IniFile.hoopSizeY) };
 			thred::movStch();
 			thred::coltab();
@@ -6346,7 +6341,7 @@ void thred::internal::zumin() {
 		} while (false);
 	}
 	const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-	ZoomRect             = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
+	ZoomRect             = fRECTANGLE{ zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX)) {
@@ -6421,13 +6416,13 @@ void thred::internal::zumout() {
 		if (ZoomFactor > 0.98) {
 			ZoomFactor = 1;
 			StateMap.reset(StateFlag::ZUMED);
-			ZoomRect = { gsl::narrow<double>(UnzoomedRect.y), 0, 0, gsl::narrow<double>(UnzoomedRect.x) };
+			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x),0.0f };
 			thred::movStch();
 			NearestCount = 0;
 		}
 		else {
 			const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-			ZoomRect             = { zoomRight / StitchWindowAspectRatio, 0, 0, zoomRight };
+			ZoomRect             = fRECTANGLE { zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
 			thred::shft(SelectedPoint);
 		}
 		if (StateMap.test(StateFlag::RUNPAT)) {
@@ -9656,7 +9651,7 @@ void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
 	}
 }
 
-bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio) {
+bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 	auto       minimumLength = 1e99;
 	const auto pointToTest   = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 
@@ -9685,8 +9680,8 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, double& xyRatio
 		}
 		else {
 			StateMap.set(StateFlag::EXPAND);
-			xyRatio = (gsl::narrow_cast<double>(SelectedFormsRect.right) - SelectedFormsRect.left)
-			          / (gsl::narrow_cast<double>(SelectedFormsRect.bottom) - SelectedFormsRect.top);
+			xyRatio = gsl::narrow_cast<float>(SelectedFormsRect.right - SelectedFormsRect.left)
+			          / gsl::narrow_cast<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
 		}
 		SelectedFormControlVertex >>= 1u;
 		StateMap.set(StateFlag::SHOSTRTCH);
@@ -11984,13 +11979,13 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, unsigned currentSti
 		if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
 			if (iOffset != 0u) {
 				linePoints[0] = { wrap::round<long>((activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x),
-					              wrap::round<long>(StitchWindowClientRect.bottom
+					              wrap::round<long>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom)
 					                                - (activeStitch[iOffset - 1].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 			else {
 				linePoints[0]
 				    = { wrap::round<long>((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
-					    wrap::round<long>(StitchWindowClientRect.bottom - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
+					    wrap::round<long>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom) - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 		}
 	}
@@ -12421,7 +12416,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	return true;
 }
 
-bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) {
+bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) {
 	retflag = true;
 	if (((GetKeyState(VK_SHIFT) & 0x8000) != 0) && thred::px2stch()) {
 		texture::setshft();
@@ -12647,10 +12642,7 @@ bool thred::internal::handleLeftButtonUp(double xyRatio, float rotationAngle, fP
 			zumin();
 			return true;
 		}
-		ZoomRect.left   = 0;
-		ZoomRect.bottom = 0;
-		ZoomRect.right  = newSize.x;
-		ZoomRect.top    = newSize.y;
+		ZoomRect = fRECTANGLE{ newSize.y, 0.0f, newSize.x, 0.0f };
 		thred::shft(SelectedPoint);
 		StateMap.reset(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::RESTCH);
@@ -13876,7 +13868,7 @@ bool thred::internal::handleFormDataSheet() {
 }
 
 bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
-                                           double&             xyRatio,
+                                           float&              xyRatio,
                                            double              rotationAngle,
                                            const FRMHED&       textureForm,
                                            bool&               retflag) {
@@ -17181,7 +17173,7 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 }
 
 bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
-                             double&             xyRatio,
+                             float&              xyRatio,
                              float&              rotationAngle,
                              fPOINT&             rotationCenter,
                              FRMHED&             textureForm) { // NOLINT
@@ -17875,7 +17867,7 @@ void thred::internal::redini() {
 	}
 	CloseHandle(IniFileHandle);
 	if (IniFile.fillAngle == 0.0) {
-		IniFile.fillAngle = PI / 6;
+		IniFile.fillAngle = PI_F / 6.0f;
 	}
 	auto deviceContext = GetDC(nullptr);
 	ScreenSizePixels   = { GetDeviceCaps(deviceContext, HORZRES), GetDeviceCaps(deviceContext, VERTRES) };
@@ -18316,14 +18308,14 @@ void thred::internal::dugrid() {
 		for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; iGrid++) {
 			gridLine[0].y = gridLine[1].y
 			    = wrap::round<long>(StitchWindowClientRect.bottom
-			                        - (gsl::narrow_cast<double>(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5);
+			                        - (iGrid * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
 		for (auto iGrid = gridRect.left; iGrid <= gridRect.right; iGrid++) {
 			gridLine[0].x = gridLine[1].x
-			    = wrap::round<long>((gsl::narrow_cast<double>(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5);
+			    = wrap::round<long>((iGrid * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5f);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -18405,7 +18397,7 @@ void thred::internal::drwStch() {
 			ShowWindow(HorizontalScrollBar, FALSE);
 		}
 		thred::duzrat();
-		const auto dub6      = ZoomRatio.x * 6.0;
+		const auto dub6      = ZoomRatio.x * 6.0f;
 		ThreadWidthPixels[0] = wrap::round<int>(dub6 * TSIZ30);
 		ThreadWidthPixels[1] = wrap::round<int>(dub6 * TSIZ40);
 		ThreadWidthPixels[2] = wrap::round<int>(dub6 * TSIZ60);
@@ -19109,10 +19101,10 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		}
 		case SB_THUMBPOSITION: {
 			const auto zoomHeight = ZoomRect.top - ZoomRect.bottom;
-			ZoomRect.top          = gsl::narrow_cast<double>(UnzoomedRect.y) - gsl::narrow<long>(HIWORD(wParam));
+			ZoomRect.top          = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<long>(HIWORD(wParam));
 			ZoomRect.bottom       = ZoomRect.top - zoomHeight;
 			if (ZoomRect.bottom < 0) {
-				ZoomRect.bottom = 0;
+				ZoomRect.bottom = 0.0f;
 				ZoomRect.top    = zoomHeight;
 			}
 			StateMap.set(StateFlag::RESTCH);
@@ -19342,7 +19334,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 		}
 		else {
-			ZoomRect = { gsl::narrow<double>(UnzoomedRect.y), 0.0, 0.0, gsl::narrow<double>(UnzoomedRect.x) };
+			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x), 0.0f };
 		}
 		NearestCount = 0;
 		StateMap.set(StateFlag::RESTCH);
@@ -19666,7 +19658,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			thi::getdes();
 		}
 
-		auto xyRatio        = 0.0; // expand form aspect ratio
+		auto xyRatio        = 1.0f; // expand form aspect ratio
 		auto rotationAngle  = 0.0f;
 		auto rotationCenter = fPOINT {};
 		auto textureForm    = FRMHED {};
