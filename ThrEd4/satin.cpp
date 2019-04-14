@@ -847,10 +847,10 @@ void satin::slbrd() {
 }
 
 void satin::internal::satfn(const std::vector<double>& lengths,
-                            uint32_t               line1Start,
-                            uint32_t               line1End,
-                            uint32_t               line2Start,
-                            uint32_t               line2End) {
+                            uint32_t                   line1Start,
+                            uint32_t                   line1End,
+                            uint32_t                   line2Start,
+                            uint32_t                   line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {

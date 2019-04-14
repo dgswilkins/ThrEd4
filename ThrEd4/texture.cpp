@@ -39,18 +39,18 @@
 
 namespace txi = texture::internal;
 
-uint32_t                   TextureWindowId;           // id of the window being updated
-HWND                       SideWindowButton;          // button side window
-RECT                       TexturePixelRect;          // screen selected texture points rectangle
-TXTRCT                     TextureRect;               // selected texture points rectangle
-POINT                      SelectTexturePointsOrigin; // original location of selected texture points
-POINT                      TextureCursorLocation;     // texture editor move cursor location
-HPEN                       TextureCrossPen;           // texture editor cross pen
-TXHST                      TextureHistory[ITXBUFLEN]; // texture editor history headers
-int32_t                        TextureHistoryIndex;       // pointer to the next texture history buffer
-std::vector<TXPNT>*        TempTexturePoints;         // temporary storage for textured fill data
+uint32_t               TextureWindowId;           // id of the window being updated
+HWND                   SideWindowButton;          // button side window
+RECT                   TexturePixelRect;          // screen selected texture points rectangle
+TXTRCT                 TextureRect;               // selected texture points rectangle
+POINT                  SelectTexturePointsOrigin; // original location of selected texture points
+POINT                  TextureCursorLocation;     // texture editor move cursor location
+HPEN                   TextureCrossPen;           // texture editor cross pen
+TXHST                  TextureHistory[ITXBUFLEN]; // texture editor history headers
+int32_t                TextureHistoryIndex;       // pointer to the next texture history buffer
+std::vector<TXPNT>*    TempTexturePoints;         // temporary storage for textured fill data
 std::vector<uint32_t>* SelectedTexturePointsList; // list of selected points
-TXTSCR                     TextureScreen;             // texture editor layout parameters
+TXTSCR                 TextureScreen;             // texture editor layout parameters
 
 void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uint32_t>* ptrTexturePointsList) noexcept {
 	TempTexturePoints         = ptrTexturePoints;
@@ -303,10 +303,10 @@ void texture::dutxtfil() {
 void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
 	screenPoint.x
 	    = wrap::round<int32_t>((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
-	                        / TextureScreen.editToPixelRatio);
-	screenPoint.y = wrap::round<int32_t>(gsl::narrow_cast<double>(TextureScreen.height)
-	                                  - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height
-	                                  + TextureScreen.top);
+	                           / TextureScreen.editToPixelRatio);
+	screenPoint.y = wrap::round<int32_t>(
+	    gsl::narrow_cast<double>(TextureScreen.height)
+	    - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height + TextureScreen.top);
 }
 
 void texture::internal::txtxfn(const POINT& reference, uint16_t offsetPixels) noexcept {
@@ -423,7 +423,7 @@ void texture::drwtxtr() {
 	for (auto iVertical = 1u; iVertical < TextureScreen.lines + 1u; iVertical++) {
 		line[0].x = line[1].x
 		    = wrap::round<int32_t>((gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset)
-		                        / TextureScreen.editToPixelRatio);
+		                           / TextureScreen.editToPixelRatio);
 		Polyline(StitchWindowMemDC, line, 2);
 	}
 	line[0].x = 0;

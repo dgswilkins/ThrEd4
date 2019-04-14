@@ -140,25 +140,25 @@ namespace internal {
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
-	void  fangfn(uint32_t find, float angle);
-	void  fcolfn(uint32_t find, uint32_t color);
-	void  fhifn(uint32_t find, float length);
-	int32_t   fil2crd(const fs::path& fileName);
-	void  findfn(uint32_t find, float indent);
-	void  flenfn(uint32_t find, float length);
-	void  fmaxfn(uint32_t find, float length);
-	void  fminfn(uint32_t find, float length);
-	void  fncwlk();
-	void  fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices);
-	void  fnwlk(uint32_t find);
-	void  fritfil(std::vector<fPOINT>& featherSequence);
-	void  fspacfn(uint32_t find, float spacing);
-	void  fthdfn(uint32_t iSequence, FEATHER& feather);
-	void  fthfn(uint32_t iSequence, FEATHER& feather);
-	void  fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
-	void  fthvars(FEATHER& feather);
-	void  fwidfn(uint32_t find, float length);
-	float getstxt(uint32_t stringIndex, HWND dialog);
+	void    fangfn(uint32_t find, float angle);
+	void    fcolfn(uint32_t find, uint32_t color);
+	void    fhifn(uint32_t find, float length);
+	int32_t fil2crd(const fs::path& fileName);
+	void    findfn(uint32_t find, float indent);
+	void    flenfn(uint32_t find, float length);
+	void    fmaxfn(uint32_t find, float length);
+	void    fminfn(uint32_t find, float length);
+	void    fncwlk();
+	void    fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices);
+	void    fnwlk(uint32_t find);
+	void    fritfil(std::vector<fPOINT>& featherSequence);
+	void    fspacfn(uint32_t find, float spacing);
+	void    fthdfn(uint32_t iSequence, FEATHER& feather);
+	void    fthfn(uint32_t iSequence, FEATHER& feather);
+	void    fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
+	void    fthvars(FEATHER& feather);
+	void    fwidfn(uint32_t find, float length);
+	float   getstxt(uint32_t stringIndex, HWND dialog);
 
 	uint32_t gucon(const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
 

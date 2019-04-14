@@ -543,8 +543,7 @@ void xt::pes2crd() {
 	    == ERROR_SUCCESS) {
 		auto size    = DWORD { _MAX_PATH };
 		auto keyType = DWORD { REG_SZ };
-		if (RegQueryValueEx(
-		        registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<uint8_t*>(programName), &size)
+		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<uint8_t*>(programName), &size)
 		    == ERROR_SUCCESS) {
 			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 			if (!xi::chkp2cnam(programName)) {
@@ -1612,7 +1611,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			}
 			}
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[ilData.pins].code
-			                                 | (*InterleaveSequenceIndices)[ilData.pins].color);
+			                             | (*InterleaveSequenceIndices)[ilData.pins].color);
 			xi::duint(offset, code, ilData);
 		}
 		xi::chkend(MAXITEMS, code, ilData);
@@ -1636,7 +1635,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
-			                                 | (*InterleaveSequenceIndices)[iSequence].color);
+			                             | (*InterleaveSequenceIndices)[iSequence].color);
 			if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 					ilData.output += xi::gucon(vertexIt[SelectedForm->fillStart],

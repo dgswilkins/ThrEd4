@@ -78,10 +78,10 @@ CLPSTCH*   ClipStitchData; // for pcs clipboard data
 uint32_t ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
 uint32_t ClosestFormToCursor;    // closest form to the cursor
-uint32_t     ClosestPointIndex;      // index of closest point
+uint32_t ClosestPointIndex;      // index of closest point
 uint32_t ClosestVertexToCursor;  // formOrigin closest to the cursor
-int32_t*         ColorBarSize;           // Color bar width scaled for DPI
-HCURSOR      CrossCursor;            // cross
+int32_t* ColorBarSize;           // Color bar width scaled for DPI
+HCURSOR  CrossCursor;            // cross
 uint32_t CurrentFormGuides;      // guide index in the currently selected form
 uint32_t CurrentFormGuidesCount; // number of guides in the currently selected form
 uint32_t CurrentVertexIndex;     // points in the currently selected form
@@ -101,7 +101,7 @@ std::vector<POINT>* FormControlPoints; // form control rectangle in pixel coordi
 HWND                 FormDataSheet = nullptr; // form data sheet
 std::vector<POINT>*  FormLines;               // used in the form drawing routines
 std::vector<FRMHED>* FormList;                // a list of form headers
-uint32_t         FormMenuChoice = 0u;     // data type for form data form numerical entry
+uint32_t             FormMenuChoice = 0u;     // data type for form data form numerical entry
 fPOINT               FormMoveDelta;           // offset for moving forms
 
 std::wstring* FormOnOff;
@@ -141,20 +141,20 @@ float  MaxStitchLen;                    // maximum stitch length
 
 MENUITEMINFO* MenuInfo;
 
-float        MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
-MSG          Msg;                                 // main message loop message
-wchar_t      MsgBuffer[MSGSIZ];                   // for user messages
-uint32_t     MsgIndex;                            // pointer to the message buffer
-RECT         MsgRect;                             // rectangle containing the text message
-HWND         MsgWindow = nullptr;                 // message window
-HPEN         MultiFormPen;                        // multiple selected forms pen
-uint32_t     NearestCount;                        // number of boxes selected
+float    MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
+MSG      Msg;                                 // main message loop message
+wchar_t  MsgBuffer[MSGSIZ];                   // for user messages
+uint32_t MsgIndex;                            // pointer to the message buffer
+RECT     MsgRect;                             // rectangle containing the text message
+HWND     MsgWindow = nullptr;                 // message window
+HPEN     MultiFormPen;                        // multiple selected forms pen
+uint32_t NearestCount;                        // number of boxes selected
 uint32_t NewFormVertexCount;                  // points in the new form
-HWND         OKButton;                            // ok button
+HWND     OKButton;                            // ok button
 
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
 
-bool         OutLineEverySelectedForm = false; // When selecting multiple forms, should we outline every form?
+bool     OutLineEverySelectedForm = false; // When selecting multiple forms, should we outline every form?
 uint32_t OutputIndex;                      // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
@@ -165,9 +165,9 @@ PCSHEADER      PCSHeader;                         // pcs file header
 const wchar_t* PcdClipFormat   = L"PMust_Format"; //
 float          PicotSpacing    = IPICSPAC;        // space between border picots
 uint32_t       PreferenceIndex = 0;               // index to the active preference window
-int32_t           PreferenceWindowWidth;             // width of the preference window
+int32_t        PreferenceWindowWidth;             // width of the preference window
 HWND           PreferencesWindow;                 // preferences window
-uint32_t   PreviousFormIndex;                 // previously selected form
+uint32_t       PreviousFormIndex;                 // previously selected form
 uint32_t       PseudoRandomValue;                 // pseudo-random sequence register
 fRECTANGLE     RotationRect;                      // rotation rectangle
 
@@ -179,7 +179,7 @@ std::vector<SATCON>* SatinGuides; // satin form connects
 
 RECT      scRct;      //
 uint32_t* screenDPI;  // screen DPI
-int32_t*      ScrollSize; // Scroll bar width scaled for DPI
+int32_t*  ScrollSize; // Scroll bar width scaled for DPI
 
 std::vector<POINT>* SearchLine; // stitch select line
 
@@ -188,8 +188,8 @@ FRMHED*  SelectedForm;              // pointer to selected form
 uint32_t SelectedFormControlVertex; // user selected form control formOrigin
 
 std::vector<uint32_t>* SelectedFormList;     // a list of selected forms
-FORMVERTICES               SelectedFormVertices; // selected form vertices
-std::vector<POINT>*        SelectedFormsLine;    // line derived from the big rectangle
+FORMVERTICES           SelectedFormVertices; // selected form vertices
+std::vector<POINT>*    SelectedFormsLine;    // line derived from the big rectangle
 
 RECT   SelectedFormsRect;  // for multiple selections;
 fPOINT SelectedFormsSize;  // size of multiple select rectangle
@@ -224,7 +224,7 @@ POINT      StitchWindowSize;               // size of the stitch window in pixel
 std::vector<std::wstring>* StringTable; //
 std::vector<fPOINT>*       TempPolygon; // temporary storage when user is entering a polygon;
 
-uint32_t        TextureIndex;                   // next textured fill point index
+uint32_t            TextureIndex;                   // next textured fill point index
 std::wstring*       TextureInputBuffer;             // texture fill number buffer
 std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
 HWND                ThreadSizeWin[16];              // thread size windows
@@ -247,7 +247,7 @@ EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persi
 HPEN               UserPen[16];                          // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
-uint32_t       VertexCount;                          // sides of the selected form to fill
+uint32_t           VertexCount;                          // sides of the selected form to fill
 float              VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
 HWND               VerticalScrollBar;                    // vertical scroll bar
 fs::path*          WorkingFileName;                      //

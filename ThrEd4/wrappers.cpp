@@ -28,11 +28,7 @@ void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
-void wrap::WriteFile(HANDLE       file,
-                     LPCVOID      buffer,
-                     uint32_t bytesToWrite,
-                     LPDWORD      bytesWritten,
-                     LPOVERLAPPED overlapped) noexcept {
+void wrap::WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 

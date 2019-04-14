@@ -103,18 +103,18 @@ extern void*     ClipPointer;
 
 extern std::vector<fPOINT>* ClipPoints;
 
-extern fRECTANGLE   ClipRect;
-extern FLSIZ        ClipRectSize;
-extern CLPSTCH*     ClipStitchData;
-extern uint32_t     ClipTypeMap;
-extern uint32_t ClosestFormToCursor;
-extern uint32_t     ClosestPointIndex;
-extern uint32_t ClosestVertexToCursor;
-extern int32_t*         ColorBarSize;
-extern HCURSOR      CrossCursor;
-extern uint32_t CurrentFormGuides;
-extern uint32_t CurrentFormGuidesCount;
-extern uint32_t CurrentVertexIndex;
+extern fRECTANGLE ClipRect;
+extern FLSIZ      ClipRectSize;
+extern CLPSTCH*   ClipStitchData;
+extern uint32_t   ClipTypeMap;
+extern uint32_t   ClosestFormToCursor;
+extern uint32_t   ClosestPointIndex;
+extern uint32_t   ClosestVertexToCursor;
+extern int32_t*   ColorBarSize;
+extern HCURSOR    CrossCursor;
+extern uint32_t   CurrentFormGuides;
+extern uint32_t   CurrentFormGuidesCount;
+extern uint32_t   CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
 
@@ -135,7 +135,7 @@ extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;
 
 extern uint32_t FormMenuChoice;
-extern fPOINT       FormMoveDelta;
+extern fPOINT   FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
@@ -174,20 +174,20 @@ extern float  MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
-extern float        MinStitchLength;
-extern MSG          Msg;
-extern wchar_t      MsgBuffer[MSGSIZ];
-extern uint32_t     MsgIndex;
-extern RECT         MsgRect;
-extern HWND         MsgWindow;
-extern HPEN         MultiFormPen;
-extern uint32_t     NearestCount;
+extern float    MinStitchLength;
+extern MSG      Msg;
+extern wchar_t  MsgBuffer[MSGSIZ];
+extern uint32_t MsgIndex;
+extern RECT     MsgRect;
+extern HWND     MsgWindow;
+extern HPEN     MultiFormPen;
+extern uint32_t NearestCount;
 extern uint32_t NewFormVertexCount;
-extern HWND         OKButton;
+extern HWND     OKButton;
 
 extern std::vector<fPOINT>* OSequence;
 
-extern bool         OutLineEverySelectedForm;
+extern bool     OutLineEverySelectedForm;
 extern uint32_t OutputIndex;
 
 extern std::vector<fPOINT>* OutsidePointList;
@@ -198,9 +198,9 @@ extern PCSHEADER      PCSHeader;
 extern const wchar_t* PcdClipFormat;
 extern float          PicotSpacing;
 extern uint32_t       PreferenceIndex;
-extern int32_t           PreferenceWindowWidth;
+extern int32_t        PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
-extern uint32_t   PreviousFormIndex;
+extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
 extern fRECTANGLE     RotationRect;
 
@@ -212,7 +212,7 @@ extern std::vector<SATCON>* SatinGuides;
 
 extern RECT      scRct;
 extern uint32_t* screenDPI;
-extern int32_t*      ScrollSize;
+extern int32_t*  ScrollSize;
 
 extern std::vector<POINT>* SearchLine;
 
@@ -221,8 +221,8 @@ extern FRMHED*  SelectedForm;
 extern uint32_t SelectedFormControlVertex;
 
 extern std::vector<uint32_t>* SelectedFormList;
-extern FORMVERTICES               SelectedFormVertices;
-extern std::vector<POINT>*        SelectedFormsLine;
+extern FORMVERTICES           SelectedFormVertices;
+extern std::vector<POINT>*    SelectedFormsLine;
 
 extern RECT   SelectedFormsRect;
 extern fPOINT SelectedFormsSize;
@@ -257,7 +257,7 @@ extern POINT      StitchWindowSize;
 extern std::vector<std::wstring>* StringTable;
 
 extern std::vector<fPOINT>* TempPolygon;
-extern uint32_t         TextureIndex;
+extern uint32_t             TextureIndex;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 extern HWND                 ThreadSizeWin[16];
@@ -284,13 +284,13 @@ extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
-extern uint32_t VertexCount;
-extern float        VerticalRatio;
-extern HWND         VerticalScrollBar;
-extern fs::path*    WorkingFileName;
-extern POINT        ZoomBoxLine[5];
-extern fPOINT       ZoomBoxOrigin;
-extern float        ZoomFactor;
-extern fPOINT       ZoomMarkPoint;
-extern fPOINT       ZoomRatio;
-extern fRECTANGLE   ZoomRect;
+extern uint32_t   VertexCount;
+extern float      VerticalRatio;
+extern HWND       VerticalScrollBar;
+extern fs::path*  WorkingFileName;
+extern POINT      ZoomBoxLine[5];
+extern fPOINT     ZoomBoxOrigin;
+extern float      ZoomFactor;
+extern fPOINT     ZoomMarkPoint;
+extern fPOINT     ZoomRatio;
+extern fRECTANGLE ZoomRect;

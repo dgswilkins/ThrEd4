@@ -35,8 +35,8 @@ float    toFloat(double invar);
 float    toFloat(int32_t invar) noexcept;
 size_t   toSize(uint32_t invar) noexcept;
 uint32_t toUnsigned(size_t invar);
-float wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept;
-void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
+float    wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept;
+void     WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)

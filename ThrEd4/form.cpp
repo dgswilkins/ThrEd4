@@ -41,7 +41,7 @@
 
 namespace fi = form::internal;
 
-FRMHED*      FormForInsert;  // insert form vertex in this form
+FRMHED*  FormForInsert;  // insert form vertex in this form
 uint32_t FormVertexNext; // form vertex storage for form vertex insert
 uint32_t FormVertexPrev; // form vertex storage for form vertex insert
 
@@ -64,9 +64,8 @@ uint8_t Level13[] = { 6, 0, 1, 7, 2, 8, 3, 9, 4, 10, 5, 11, 6, 12 };
 uint8_t Level14[] = { 7, 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6 };
 uint8_t Level15[] = { 7, 0, 8, 1, 9, 2, 10, 3, 11, 4, 12, 5, 13, 6, 14, 7, 15 };
 
-uint8_t* Levels[]
-    = { &Level00,    &Level01,    &Level02[0], &Level03[0], &Level04[0], &Level05[0], &Level06[0], &Level07[0],
-	    &Level08[0], &Level09[0], &Level10[0], &Level11[0], &Level12[0], &Level13[0], &Level14[0], &Level15[0] };
+uint8_t* Levels[] = { &Level00,    &Level01,    &Level02[0], &Level03[0], &Level04[0], &Level05[0], &Level06[0], &Level07[0],
+	                  &Level08[0], &Level09[0], &Level10[0], &Level11[0], &Level12[0], &Level13[0], &Level14[0], &Level15[0] };
 
 void form::frmclr(FRMHED& destination) noexcept {
 	auto head   = FRMHED {};
@@ -449,7 +448,7 @@ void form::internal::frmsqr(uint32_t iVertex) {
 	adjustedPoint     = fPOINT { point.x - offset.x, point.y - offset.y };
 	thred::stch2pxr(adjustedPoint);
 	line[2] = StitchCoordinatesPixels;
-	Polyline(StitchWindowMemDC, static_cast<POINT *>(line), 4);
+	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
 }
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
@@ -464,7 +463,7 @@ void form::selsqr(const POINT& controlPoint, HDC dc) {
 	line[1].x = line[2].x = controlPoint.x + offset;
 	line[2].y = line[3].y = controlPoint.y + offset;
 	line[4].y             = controlPoint.y - offset;
-	Polyline(dc, static_cast<POINT *>(line), 5);
+	Polyline(dc, static_cast<POINT*>(line), 5);
 }
 
 void form::internal::frmsqr0(const POINT& controlPoint) {
@@ -477,7 +476,7 @@ void form::internal::frmsqr0(const POINT& controlPoint) {
 		line[1].x = line[2].x = controlPoint.x + offset + 1;
 		line[2].y = line[3].y = controlPoint.y + offset + 1;
 		line[4].y             = controlPoint.y - 1;
-		Polyline(StitchWindowMemDC, static_cast<POINT *>(line), 5);
+		Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 5);
 	}
 }
 
@@ -489,11 +488,11 @@ void form::internal::frmx(const POINT& controlPoint, HDC dc) {
 	line[0].x = line[1].x = controlPoint.x;
 	line[0].y             = controlPoint.y + offset;
 	line[1].y             = controlPoint.y - offset;
-	Polyline(dc, static_cast<POINT *>(line), 2);
+	Polyline(dc, static_cast<POINT*>(line), 2);
 	line[0].y = line[1].y = controlPoint.y;
 	line[0].x             = controlPoint.x - offset;
 	line[1].x             = controlPoint.x + offset;
-	Polyline(dc, static_cast<POINT *>(line), 2);
+	Polyline(dc, static_cast<POINT*>(line), 2);
 	SelectObject(dc, FormPen);
 }
 #pragma warning(pop)
@@ -528,7 +527,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 		form::sfCor2px(formOutline[controlPoint], pixelOutline[controlPoint]);
 	}
 	form::sfCor2px(formOutline[0], pixelOutline[8]);
-	Polyline(dc, static_cast<POINT *>(pixelOutline), 9);
+	Polyline(dc, static_cast<POINT*>(pixelOutline), 9);
 	for (auto controlPoint = 0u; controlPoint < 8; controlPoint++) {
 		form::selsqr(pixelOutline[controlPoint], dc);
 	}
@@ -593,7 +592,7 @@ void form::fselrct(uint32_t iForm) {
 		SelectedFormsRect.bottom = line[5].y;
 	}
 	if (OutLineEverySelectedForm) {
-		Polyline(StitchWindowMemDC, static_cast<POINT *>(line), 5);
+		Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 5);
 	}
 }
 
@@ -687,7 +686,7 @@ void form::drwfrm() {
 						form::sfCor2px(vertexIt[guideIt[iGuide].start], line[0]);
 						form::sfCor2px(vertexIt[guideIt[iGuide].finish], line[1]);
 						SelectObject(StitchWindowMemDC, FormPen);
-						Polyline(StitchWindowMemDC, static_cast<POINT *>(line), 2);
+						Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
 					}
 				}
 				SelectObject(StitchWindowMemDC, LayerPen[layer]);
@@ -696,7 +695,7 @@ void form::drwfrm() {
 					if (SelectedForm->fillType == CONTF) {
 						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.start], line[0]);
 						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.finish], line[1]);
-						Polyline(StitchWindowMemDC, static_cast<POINT *>(line), 2);
+						Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
 					}
 				}
 				else {
@@ -1185,7 +1184,8 @@ void form::makspac(uint32_t start, uint32_t count) {
 	if (!form::chkmax(PCSHeader.stitchCount, count)) {
 		std::copy(static_cast<fPOINTATTR*>(StitchBuffer) + start,
 		          static_cast<fPOINTATTR*>(StitchBuffer) + PCSHeader.stitchCount,
-		          stdext::make_checked_array_iterator(static_cast<fPOINTATTR *>(StitchBuffer) + start + count, MAXITEMS - (start + count)));
+		          stdext::make_checked_array_iterator(static_cast<fPOINTATTR*>(StitchBuffer) + start + count,
+		                                              MAXITEMS - (start + count)));
 		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
 	}
 }
@@ -1316,10 +1316,8 @@ void form::internal::ritbrd() {
 
 void form::internal::ritapbrd() {
 	if (!OSequence->empty()) {
-		InterleaveSequenceIndices->emplace_back(INSREC { TYPMSK,
-		                                                 gsl::narrow<uint32_t>(SelectedForm->borderColor) >> 4u,
-		                                                 wrap::toUnsigned(InterleaveSequence->size()),
-		                                                 I_AP });
+		InterleaveSequenceIndices->emplace_back(INSREC {
+		    TYPMSK, gsl::narrow<uint32_t>(SelectedForm->borderColor) >> 4u, wrap::toUnsigned(InterleaveSequence->size()), I_AP });
 		form::chkseq(true);
 	}
 }
@@ -1944,8 +1942,8 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t 
 
 void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
                             const std::vector<VRCT2>& fillVerticalRect,
-                            uint32_t              start,
-                            uint32_t              finish) {
+                            uint32_t                  start,
+                            uint32_t                  finish) {
 	if (StateMap.test(StateFlag::UND)) {
 		if (StateMap.test(StateFlag::UNDPHAS)) {
 			form::filinsb(underlayVerticalRect[start].copnt);
@@ -1987,7 +1985,7 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 
 void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
                          const std::vector<VRCT2>& fillVerticalRect,
-                         uint32_t              startVertex,
+                         uint32_t                  startVertex,
                          const std::vector<VRCT2>& vrct) {
 	auto currentVertex = startVertex;
 	auto nextVertex    = form::nxt(currentVertex);
@@ -2744,8 +2742,8 @@ void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-bool form::internal::isect(uint32_t               vertex0,
-                           uint32_t               vertex1,
+bool form::internal::isect(uint32_t                   vertex0,
+                           uint32_t                   vertex1,
                            fPOINT&                    intersection,
                            float&                     length,
                            const fPOINT&              lineSegmentStart,
@@ -2921,9 +2919,7 @@ bool form::internal::lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
 	return (arg1.length < arg2.length);
 }
 
-void form::internal::chksid(uint32_t               vertexIndex,
-                            uint32_t                   clipIntersectSide,
-                            const std::vector<fPOINT>& currentFormVertices) {
+void form::internal::chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices) {
 	if (clipIntersectSide != vertexIndex) {
 		auto       vertexIt    = currentFormVertices.cbegin();
 		const auto vertexCount = currentFormVertices.size();
@@ -3862,8 +3858,8 @@ void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t 
 }
 
 void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
-                            uint32_t                  start,
-                            uint32_t                  finish,
+                            uint32_t                      start,
+                            uint32_t                      finish,
                             boost::dynamic_bitset<>&      sequenceMap,
                             uint32_t&                     lastGroup,
                             SMALPNTL*                     sequenceLines) {
@@ -3927,10 +3923,7 @@ void form::internal::brkseq(const std::vector<SMALPNTL*>& sortedLines,
 	}
 }
 
-void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines,
-                            uint32_t                  start,
-                            uint32_t                  finish,
-                            uint32_t&                     lastGroup) {
+void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup) {
 	auto minimumY = 1e30f;
 
 	for (auto iLine = start; iLine <= finish; iLine++) {
@@ -3958,8 +3951,8 @@ SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) {
 }
 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
-                           uint32_t                  start,
-                           uint32_t                  finish,
+                           uint32_t                      start,
+                           uint32_t                      finish,
                            boost::dynamic_bitset<>&      sequenceMap,
                            uint32_t&                     lastGroup,
                            SMALPNTL*                     sequenceLines) {
@@ -4054,7 +4047,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
                            boost::dynamic_bitset<>&      visitedRegions,
                            const std::vector<SMALPNTL*>& sortedLines,
                            uint32_t                      pthi,
-                           uint32_t                  lineCount,
+                           uint32_t                      lineCount,
                            std::vector<REGION>&          regionsList,
                            uint32_t&                     lastGroup,
                            uint32_t                      sequencePathIndex) {
@@ -5319,7 +5312,7 @@ bool form::internal::scomp(const SATCON& arg1, const SATCON& arg2) noexcept {
 void form::duinsf() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC, static_cast<POINT *>(InsertLine), 2);
+	Polyline(StitchWindowDC, static_cast<POINT*>(InsertLine), 2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -7924,9 +7917,9 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
                             std::vector<SATCON>& tempGuides,
                             std::vector<fPOINT>& destinationFormVertices,
                             std::vector<FRMHED>& destinationFormList,
-                            uint32_t         formIndex,
-                            uint32_t&        formRelocationIndex,
-                            uint32_t&        formSourceIndex) {
+                            uint32_t             formIndex,
+                            uint32_t&            formRelocationIndex,
+                            uint32_t&            formSourceIndex) {
 	auto& destination = destinationFormList[formRelocationIndex];
 
 	destinationFormList[formRelocationIndex++] = (*FormList)[formIndex];
@@ -8991,8 +8984,9 @@ void form::srtfrm() {
 			auto       iHighStitch        = histogram[iForm]++;
 			highStitchBuffer[iHighStitch] = StitchBuffer[iStitch];
 		}
-		std::copy(
-		    highStitchBuffer.cbegin(), highStitchBuffer.cend(), stdext::make_checked_array_iterator(static_cast<fPOINTATTR *>(StitchBuffer), MAXITEMS));
+		std::copy(highStitchBuffer.cbegin(),
+		          highStitchBuffer.cend(),
+		          stdext::make_checked_array_iterator(static_cast<fPOINTATTR*>(StitchBuffer), MAXITEMS));
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
