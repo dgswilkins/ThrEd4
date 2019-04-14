@@ -41,7 +41,7 @@ void wavfrm();
 
 namespace internal {
 
-	void chkdaz() noexcept;
+	void chkdaz();
 
 	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 

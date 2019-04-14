@@ -99,6 +99,10 @@ size_t wrap::toSize(uint32_t invar) noexcept {
 	return gsl::narrow_cast<size_t>(invar);
 }
 
+float wrap::wcstof(wchar_t (&buffer)[HBUFSIZ]) noexcept {
+	return std::wcstof(static_cast<wchar_t*>(buffer), nullptr);
+}
+
 void wrap::setCursor(HCURSOR hCursor) noexcept {
 	static HCURSOR saveCursor = nullptr;
 	if (saveCursor != hCursor) {

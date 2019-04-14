@@ -45,7 +45,7 @@ POINT LabelWindowSize;   // size of the left windows in the form data sheet
 RECT  ValueWindowCoords; // location of right windows in the form data sheet
 POINT ValueWindowSize;   // size of the right windows in the form data sheet
 
-unsigned short DaisyTypeStrings[] = {
+uint16_t DaisyTypeStrings[] = {
 	IDS_DAZCRV, IDS_DAZSAW, IDS_DAZRMP, IDS_DAZRAG, IDS_DAZCOG, IDS_DAZHART,
 };
 
@@ -73,7 +73,7 @@ HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& loc
 		formForms::maxtsiz(windowName, LabelWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",
+	return CreateWindow(L"STATIC",// NOLINT
 	                    windowName.c_str(),
 	                    SS_NOTIFY | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -91,7 +91,7 @@ HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& locat
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",
+	return CreateWindow(L"STATIC",// NOLINT
 	                    winName.c_str(),
 	                    SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -109,7 +109,7 @@ HWND formForms::internal::numwin(const std::wstring& winName, const RECT& locati
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",
+	return CreateWindow(L"STATIC",// NOLINT
 	                    winName.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -135,7 +135,7 @@ void formForms::internal::nxtlinprf() noexcept {
 }
 
 void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
-	const unsigned short edgeArray[]
+	const uint16_t edgeArray[]
 	    = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
 
 	auto  choice      = std::wstring {};
@@ -488,7 +488,7 @@ void formForms::refrm() {
 	if (FormDataSheet != nullptr) {
 		DestroyWindow(FormDataSheet);
 	}
-	FormDataSheet = CreateWindow(L"STATIC",
+	FormDataSheet = CreateWindow(L"STATIC",// NOLINT
 	                             nullptr,
 	                             WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 3,
@@ -513,7 +513,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
-	SideMessageWindow = CreateWindow(L"STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",// NOLINT
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 MsgRect.right - ThredWindowOrigin.x + 3,
@@ -534,7 +534,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 	thred::unsid();
 	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
-	SideMessageWindow = CreateWindow(L"STATIC",
+	SideMessageWindow = CreateWindow(L"STATIC",// NOLINT
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 windowRect.right - ThredWindowOrigin.x + 6,
@@ -548,7 +548,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
-	CreateWindow(L"STATIC",
+	CreateWindow(L"STATIC",// NOLINT
 	             text.c_str(),
 	             WS_CHILD | WS_VISIBLE,
 	             LabelWindowCoords.left,
@@ -562,7 +562,7 @@ void formForms::internal::prftwin(const std::wstring& text) noexcept {
 }
 
 HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
-	return CreateWindow(L"STATIC",
+	return CreateWindow(L"STATIC",// NOLINT
 	                    text.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    ValueWindowCoords.left,
@@ -603,7 +603,7 @@ void formForms::prfmsg() {
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
 	const auto windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-	PreferencesWindow      = CreateWindow(L"STATIC",
+	PreferencesWindow      = CreateWindow(L"STATIC",// NOLINT
                                      nullptr,
                                      WS_CHILD | WS_VISIBLE | WS_BORDER,
                                      ButtonWidthX3 + 3,
@@ -689,18 +689,18 @@ void formForms::frmnum() {
 	}
 }
 
-void formForms::internal::chkdaz() noexcept {
+void formForms::internal::chkdaz() {
 	if (IniFile.daisyPetalPoints == 0u) {
-		IniFile.daisyPetalPoints = 1;
+		IniFile.daisyPetalPoints = 1u;
 	}
 	if (IniFile.daisyInnerCount == 0u) {
-		IniFile.daisyInnerCount = 1;
+		IniFile.daisyInnerCount = 1u;
 	}
 	if (IniFile.daisyPetalCount == 0u) {
-		IniFile.daisyPetalCount = 1;
+		IniFile.daisyPetalCount = 1u;
 	}
-	if (IniFile.daisyHeartCount > gsl::narrow<unsigned char>(IniFile.daisyPetalPoints)) {
-		IniFile.daisyHeartCount = gsl::narrow<unsigned char>(IniFile.daisyPetalPoints);
+	if (IniFile.daisyHeartCount > gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints)) {
+		IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
 	}
 }
 
@@ -740,7 +740,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	for (const auto DaisyTypeString : DaisyTypeStrings) {
 		displayText::loadString(daisyType, DaisyTypeString);
 		GSL_SUPPRESS(26490)
-		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));
+		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));// NOLINT
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -748,34 +748,34 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {
+	switch (umsg) {// NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::initdaz(hwndlg);
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {
+		switch (LOWORD(wparam)) {// NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer, HBUFSIZ);
-			IniFile.daisyPetalPoints = std::stoi(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer, HBUFSIZ);
-			IniFile.daisyHeartCount = gsl::narrow<unsigned short>(std::stoi(buffer));
-			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer, HBUFSIZ);
-			IniFile.daisyDiameter = std::stof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer, HBUFSIZ);
-			IniFile.daisyHoleDiameter = std::stof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer, HBUFSIZ);
-			IniFile.daisyInnerCount = std::stoi(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer, HBUFSIZ);
-			IniFile.daisyPetalCount = std::stoi(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer, HBUFSIZ);
-			IniFile.daisyPetalLen = std::stof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyPetalPoints = wrap::wcstoi<uint32_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyHeartCount = wrap::wcstoi<uint16_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyDiameter = wrap::wcstof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyHoleDiameter = wrap::wcstof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyInnerCount = wrap::wcstoi<uint32_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyPetalCount = wrap::wcstoi<uint32_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.daisyPetalLen = wrap::wcstof(buffer);
 			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0u) {
 				UserFlagMap.set(UserFlag::DAZHOL);
 			}
@@ -788,11 +788,11 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			else {
 				UserFlagMap.reset(UserFlag::DAZD);
 			}
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer, HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPWSTR>(buffer), HBUFSIZ);
 			wchar_t compareBuffer[HBUFSIZ] = { 0 };
 			for (unsigned char iType = 0; iType < 6; iType++) {
-				LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer, HBUFSIZ);
-				if (wcscmp(buffer, compareBuffer) == 0) {
+				LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPWSTR>(compareBuffer), HBUFSIZ);
+				if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 					IniFile.daisyBorderType = iType;
 					break;
 				}
@@ -826,16 +826,16 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 
 void formForms::dasyfrm() {
 	thred::unmsg();
-	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, (DLGPROC)ffi::dasyproc)) {
+	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, static_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT
 		StateMap.reset(StateFlag::FORMIN);
 		return;
 	}
 	const auto referencePoint = fPOINT { form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
 	FormList->push_back(FRMHED {});
 	SelectedForm              = &FormList->back();
-	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
-	SelectedForm->vertexIndex = gsl::narrow<decltype(SelectedForm->vertexIndex)>(FormVertices->size());
-	SelectedForm->attribute   = gsl::narrow<unsigned char>(ActiveLayer << 1u);
+	ClosestFormToCursor       = wrap::toUnsigned(FormList->size() - 1u);
+	SelectedForm->vertexIndex = wrap::toUnsigned(FormVertices->size());
+	SelectedForm->attribute   = gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1u);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
@@ -871,7 +871,7 @@ void formForms::dasyfrm() {
 	auto       petalPointCount  = IniFile.daisyPetalPoints;
 	const auto borderType       = IniFile.daisyBorderType;
 	if (borderType == DHART) {
-		petalPointCount  = (IniFile.daisyHeartCount + 1) << 1u;
+		petalPointCount  = (IniFile.daisyHeartCount + 1u) << 1u;
 		petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
 	}
 	const auto petalSegmentAngle = PI2 / petalVertexCount;
@@ -933,6 +933,9 @@ void formForms::dasyfrm() {
 				}
 				break;
 			}
+			default: {
+				throw;
+			}
 			}
 			FormVertices->push_back(fPOINT { referencePoint.x + cos(angle) * distanceFromDaisyCenter,
 			                                 referencePoint.y + sin(angle) * distanceFromDaisyCenter });
@@ -978,7 +981,7 @@ inline void formForms::internal::initTearDlg(HWND hwndlg) {
 bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {
+	switch (umsg) {// NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
@@ -1002,21 +1005,21 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {
+		switch (LOWORD(wparam)) {// NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer, HBUFSIZ);
-			IniFile.formSides = gsl::narrow<unsigned short>(std::stoi(buffer));
-			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer, HBUFSIZ);
-			IniFile.tearTailLength = std::stof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer, HBUFSIZ);
-			IniFile.tearTwistStep = std::stof(buffer) * PFGRAN;
-			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer, HBUFSIZ);
-			IniFile.tearTwistRatio = std::stof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.formSides = wrap::wcstoi<uint16_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.tearTailLength = wrap::wcstof(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.tearTwistStep = wrap::wcstof(buffer) * PFGRAN;
+			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.tearTwistRatio = wrap::wcstof(buffer);
 			EndDialog(hwndlg, 1);
 			break;
 		}
@@ -1044,7 +1047,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
 	thred::unmsg();
-	const auto nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, (DLGPROC)ffi::tearprc);
+	const auto nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));// NOLINT
 	if (nResult > 0) {
 		thred::savdo();
 		auto twistStep = IniFile.tearTwistStep;
@@ -1075,7 +1078,7 @@ void formForms::setear() {
 		FormVertices->push_back(vertexIt[0]);
 		vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex); // iterator invalidated by push_back
 		if (twistStep != 0.0f) {
-			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0;
+			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0f;
 		}
 		else {
 			vertexIt[0].x = middle;
@@ -1091,15 +1094,15 @@ void formForms::setear() {
 		const auto size = fPOINT { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
 			                       SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
 
-		auto horizontalRatio = UnzoomedRect.x / 4.0 / size.x;
-		if (horizontalRatio > 1.0) {
-			horizontalRatio = 1.0;
+		auto horizontalRatio = UnzoomedRect.x / 4.0f / size.x;
+		if (horizontalRatio > 1.0f) {
+			horizontalRatio = 1.0f;
 		}
-		const auto verticalRatio = UnzoomedRect.y / 4.0 / size.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0f / size.y;
 		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
 		}
-		if (horizontalRatio < 1.0) {
+		if (horizontalRatio < 1.0f) {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
@@ -1123,28 +1126,28 @@ inline void formForms::internal::wavinit(HWND hwndlg) {
 bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {
+	switch (umsg) {// NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::wavinit(hwndlg);
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {
+		switch (LOWORD(wparam)) {// NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer, HBUFSIZ);
-			IniFile.wavePoints = gsl::narrow<unsigned short>(std::stoi(buffer));
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer, HBUFSIZ);
-			IniFile.waveStart = gsl::narrow<unsigned short>(std::stoi(buffer));
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer, HBUFSIZ);
-			IniFile.waveEnd = gsl::narrow<unsigned char>(std::stoi(buffer));
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer, HBUFSIZ);
-			IniFile.waveLobes = gsl::narrow<unsigned char>(std::stoi(buffer));
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.wavePoints = wrap::wcstoi<uint16_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.waveStart = wrap::wcstoi<uint16_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer);
 			if (IniFile.wavePoints > 100) {
 				IniFile.wavePoints = 100;
 			}
@@ -1175,7 +1178,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
 	thred::unmsg();
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, (DLGPROC)ffi::wavprc)) {
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) {// NOLINT
 		thred::savdo();
 		auto points = std::vector<fPOINT> {};
 		points.reserve(IniFile.wavePoints);
@@ -1186,7 +1189,7 @@ void formForms::wavfrm() {
 		auto waveIndex = IniFile.waveStart;
 		auto vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
-			const unsigned short iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
+			const uint16_t iNextVertex = (waveIndex + 1) % IniFile.wavePoints;
 
 			points.emplace_back(-vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
 			                    -vertexIt[iNextVertex].y + vertexIt[waveIndex].y);
@@ -1201,7 +1204,7 @@ void formForms::wavfrm() {
 		FormVertices->resize(FormVertices->size() + formVerticesSize);
 		vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex); // resize may invalidate iterator
 		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
-			if ((iLobe & 1) != 0u) {
+			if ((iLobe & 1u) != 0u) {
 				for (auto index = 0u; index < count; index++) {
 					vertexIt[iVertex] = currentPosition;
 					iVertex++;
@@ -1230,15 +1233,15 @@ void formForms::wavfrm() {
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto selectedSize    = fPOINT { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                            SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
-		auto       horizontalRatio = UnzoomedRect.x / 4.0 / selectedSize.x;
+		auto       horizontalRatio = UnzoomedRect.x / 4.0f / selectedSize.x;
 		if (horizontalRatio > 1) {
-			horizontalRatio = 1.0;
+			horizontalRatio = 1.0f;
 		}
-		const auto verticalRatio = UnzoomedRect.y / 4.0 / selectedSize.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0f / selectedSize.y;
 		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
 		}
-		if (horizontalRatio < 1.0) {
+		if (horizontalRatio < 1.0f) {
 			for (auto index = 0u; index < vertexCount; index++) {
 				vertexIt[index].x = (vertexIt[index].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
 				vertexIt[index].y = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
@@ -1249,7 +1252,7 @@ void formForms::wavfrm() {
 			vertexIt[index].x -= SelectedForm->rectangle.left;
 			vertexIt[index].y -= SelectedForm->rectangle.bottom;
 		}
-		FormMoveDelta.x = FormMoveDelta.y = 0;
+		FormMoveDelta.x = FormMoveDelta.y = 0.0f;
 		NewFormVertexCount                = vertexCount + 1;
 		form::setmfrm();
 		form::mdufrm();

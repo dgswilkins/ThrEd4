@@ -18,6 +18,9 @@
 #include <gsl/gsl>
 #pragma warning(pop)
 
+// Local Headers
+#include "ThrEdTypes.h"
+
 namespace wrap {
 HPEN     CreatePen(int iStyle, unsigned width, COLORREF color) noexcept;
 void     GetTextExtentPoint(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept;
@@ -32,6 +35,7 @@ float    toFloat(double invar);
 float    toFloat(long invar) noexcept;
 size_t   toSize(uint32_t invar) noexcept;
 uint32_t toUnsigned(size_t invar);
+float wcstof(wchar_t (&buffer)[HBUFSIZ]) noexcept;
 void WriteFile(HANDLE file, LPCVOID buffer, unsigned int bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
@@ -48,6 +52,11 @@ template <class outType, class inType> outType floor(inType invar) {
 template <class outType, class inType> outType round(inType invar) {
 	return gsl::narrow<outType>(std::round(invar));
 }
+
+template <class outType> outType wcstoi(wchar_t (&buffer)[HBUFSIZ]) {
+	return gsl::narrow<outType>(std::wcstoul(static_cast<wchar_t*>(buffer), nullptr, 10));
+}
+
 #pragma warning(pop)
 
 }
