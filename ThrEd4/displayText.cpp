@@ -59,7 +59,7 @@ inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
 	auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
-		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) {
+		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) { // NOLINT
 			sDest.resize(len);
 			std::copy(pBuf, pBuf + len, sDest.begin());
 		}
@@ -100,7 +100,7 @@ void displayText::shoMsg(const std::wstring& message) {
 		auto xOffset = mainRect.left;
 		GetWindowRect(ThrEdWindow, &mainRect);
 		xOffset -= mainRect.left;
-		MsgWindow = CreateWindow(L"STATIC",
+		MsgWindow = CreateWindow(L"STATIC", // NOLINT
 		                         message.c_str(),
 		                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                         xOffset,
@@ -143,7 +143,7 @@ void displayText::numWnd() noexcept {
 	auto xOffset = wRect.left;
 	GetWindowRect(ThrEdWindow, &wRect);
 	xOffset -= wRect.left;
-	GeneralNumberInputBox = CreateWindow(L"STATIC",
+	GeneralNumberInputBox = CreateWindow(L"STATIC", // NOLINT
 	                                     nullptr,
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     xOffset + 5,
@@ -355,7 +355,7 @@ void displayText::datmsg(unsigned code) {
 void displayText::okcan() {
 	GetClientRect(MsgWindow, &MsgRect);
 
-	OKButton = CreateWindow(L"STATIC",
+	OKButton = CreateWindow(L"STATIC", // NOLINT
 	                        (*StringTable)[STR_OKENT].c_str(),
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
@@ -367,7 +367,7 @@ void displayText::okcan() {
 	                        ThrEdInstance,
 	                        nullptr);
 
-	CancelButton = CreateWindow(L"STATIC",
+	CancelButton = CreateWindow(L"STATIC", // NOLINT
 	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            ButtonWidth * 5,
@@ -389,7 +389,7 @@ void displayText::savdisc() {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	LoadString(ThrEdInstance, IDS_SAV, &buffer[0], HBUFSIZ);
-	OKButton = CreateWindow(L"STATIC",
+	OKButton = CreateWindow(L"STATIC", // NOLINT
 	                        &buffer[0],
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
@@ -402,7 +402,7 @@ void displayText::savdisc() {
 	                        nullptr);
 
 	LoadString(ThrEdInstance, IDS_DISC, &buffer[0], HBUFSIZ);
-	DiscardButton = CreateWindow(L"STATIC",
+	DiscardButton = CreateWindow(L"STATIC", // NOLINT
 	                             &buffer[0],
 	                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 15,
@@ -414,7 +414,7 @@ void displayText::savdisc() {
 	                             ThrEdInstance,
 	                             nullptr);
 
-	CancelButton = CreateWindow(L"STATIC",
+	CancelButton = CreateWindow(L"STATIC", // NOLINT
 	                            (*StringTable)[STR_CANCEL].c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            2 * ButtonWidthX3 + 25,
@@ -430,13 +430,13 @@ void displayText::savdisc() {
 #pragma warning(push)
 #pragma warning(disable : 26493) // we use c style casts as this is a C API
 BOOL CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept {
-	SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
+	SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0)); // NOLINT
 	return TRUE;
 }
 
-void displayText::updateWinFont(HWND hWnd) noexcept {
+GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
 	const auto* hFont = displayText::getThrEdFont(400);
-	EnumChildWindows(hWnd, EnumChildProc, (LPARAM)hFont);
+	EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont)); // NOLINT
 }
 #pragma warning(pop)
 
@@ -447,7 +447,7 @@ void displayText::tomsg() {
 	GetWindowRect(OKButton, &OKrect);
 	wrap::GetTextExtentPoint32(
 	    GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), wrap::toUnsigned((*StringTable)[STR_DELST2].size()), &textSize);
-	DeleteStitchesDialog = CreateWindow(L"STATIC",
+	DeleteStitchesDialog = CreateWindow(L"STATIC", // NOLINT
 	                                    (*StringTable)[STR_DELST2].c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                    3,
@@ -501,5 +501,5 @@ HFONT displayText::getThrEdFont(LONG weight) noexcept {
 }
 
 GSL_SUPPRESS(26490) GSL_SUPPRESS(26461) void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
-	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
+	SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0)); // NOLINT
 }
