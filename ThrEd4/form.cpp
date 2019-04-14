@@ -452,6 +452,9 @@ void form::internal::frmsqr(unsigned iVertex) {
 	Polyline(StitchWindowMemDC, line, 4);
 }
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 void form::selsqr(const POINT& controlPoint, HDC dc) {
 	POINT      line[5] = {};
 	const auto offset  = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), gsl::narrow<int32_t>(*screenDPI), 96);
@@ -493,6 +496,7 @@ void form::internal::frmx(const POINT& controlPoint, HDC dc) {
 	Polyline(dc, line, 2);
 	SelectObject(dc, FormPen);
 }
+#pragma warning(pop)
 
 void form::ratsr() {
 	if (StateMap.test(StateFlag::ZUMED)) {
@@ -6343,6 +6347,9 @@ void form::setexpand(float xyRatio) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 void form::nufilcol(unsigned color) {
 	if (SelectedForm->fillColor != gsl::narrow<unsigned char>(color)) {
 		SelectedForm->fillColor = gsl::narrow<unsigned char>(color);
@@ -6393,6 +6400,7 @@ void form::nulapcol(unsigned color) {
 		}
 	}
 }
+#pragma warning(pop)
 
 void form::internal::sbold() {
 	form::fvars(ClosestFormToCursor);
@@ -8235,6 +8243,9 @@ void form::centir() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 void form::internal::bean(unsigned start, unsigned finish) {
 	auto iSourceStitch = start;
 	auto iCopyStitch   = MAXITEMS;
@@ -8285,6 +8296,7 @@ void form::internal::bean(unsigned start, unsigned finish) {
 	}
 	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iOutputStitch);
 }
+#pragma warning(pop)
 
 void form::dubean() {
 	if (PCSHeader.stitchCount != 0u) {

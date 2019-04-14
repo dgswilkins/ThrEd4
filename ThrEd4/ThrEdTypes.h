@@ -1130,6 +1130,9 @@ public:
 	//~BSEQPNT() = default;
 };
 
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
 inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
 	x         = gsl::narrow<float>(rhsX);
 	y         = gsl::narrow<float>(rhsY);
@@ -1139,6 +1142,7 @@ inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
 inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
 	attribute = gsl::narrow<int8_t>(rhsAttr);
 }
+#pragma warning(pop)
 
 inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
