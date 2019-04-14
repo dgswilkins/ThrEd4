@@ -24,7 +24,7 @@ template <typename EnumType> class EnumMap
 	              "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
 public:
-	explicit constexpr EnumMap(unsigned i_val) // NOLINT
+	explicit constexpr EnumMap(uint32_t i_val)
 	    : mask_(i_val) {
 	}
 	inline bool test(const EnumType i_key) const {
@@ -63,7 +63,7 @@ public:
 		mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
-	inline unsigned long to_ulong() {
+	inline uint32_t to_ulong() {
 		return mask_.to_ulong();
 	}
 	inline size_t count() const {

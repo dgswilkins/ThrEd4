@@ -24,32 +24,32 @@
 #include "switches.h"
 #include "wrappers.h"
 
-void wrap::Polyline(HDC hdc, CONST POINT* apt, unsigned int cpt) noexcept {
-	Polyline(hdc, apt, gsl::narrow<int>(cpt));
+void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
+	Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
 void wrap::WriteFile(HANDLE       file,
                      LPCVOID      buffer,
-                     unsigned int bytesToWrite,
+                     uint32_t bytesToWrite,
                      LPDWORD      bytesWritten,
                      LPOVERLAPPED overlapped) noexcept {
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-bool wrap::ReadFile(HANDLE file, LPVOID buffer, unsigned int bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
+bool wrap::ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
 	return (ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped) == TRUE);
 }
 
-void wrap::GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, unsigned int c, LPSIZE lpSize) noexcept {
-	GetTextExtentPoint32(hdc, lpString, gsl::narrow<int>(c), lpSize);
+void wrap::GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept {
+	GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(c), lpSize);
 }
 
-void wrap::TextOut(HDC hdc, int nXStart, int nYStart, LPCTSTR lpString, unsigned int cchString) noexcept {
-	TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int>(cchString));
+void wrap::TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept {
+	TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
 
-void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, unsigned int cbString, LPSIZE lpSize) noexcept {
-	GetTextExtentPoint(hdc, lpString, gsl::narrow<int>(cbString), lpSize);
+void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept {
+	GetTextExtentPoint(hdc, lpString, gsl::narrow<int32_t>(cbString), lpSize);
 }
 
 float wrap::toFloat(double invar) {
@@ -75,7 +75,7 @@ float wrap::toFloat(double invar) {
 	return result;
 }
 
-float wrap::toFloat(long invar) noexcept {
+float wrap::toFloat(int32_t invar) noexcept {
 	return gsl::narrow_cast<float>(invar);
 }
 
@@ -91,7 +91,7 @@ double wrap::toDouble(float invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
-double wrap::toDouble(long invar) noexcept {
+double wrap::toDouble(int32_t invar) noexcept {
 	return gsl::narrow_cast<double>(invar);
 }
 
@@ -111,7 +111,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 	}
 }
 
-HPEN wrap::CreatePen(int iStyle, unsigned width, COLORREF color) noexcept {
+HPEN wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }

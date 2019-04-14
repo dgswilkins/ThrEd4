@@ -42,9 +42,9 @@ namespace ci = clip::internal;
 fPOINT       ClipReference;       // clipboard reference formOrigin
 fPOINT       BorderClipReference; // reference for clipboard line border
 float        AdjustedSpace;       // adjusted space
-unsigned int NextStart;           // index of the endpoint of the line segment being processed
+uint32_t NextStart;           // index of the endpoint of the line segment being processed
 
-bool clip::iseclp(unsigned int iForm) {
+bool clip::iseclp(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
@@ -53,7 +53,7 @@ bool clip::iseclp(const FRMHED& form) noexcept {
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
-bool clip::isclp(unsigned int iForm) {
+bool clip::isclp(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
 	return ((1u << form.fillType) & ClipTypeMap) != 0;
 }
@@ -62,7 +62,7 @@ bool clip::isclp(const FRMHED& form) noexcept {
 	return ((1u << form.fillType) & ClipTypeMap) != 0;
 }
 
-bool clip::isclpx(unsigned int iForm) {
+bool clip::isclpx(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
 	return clip::isclp(iForm) && (form.lengthOrCount.clipCount != 0u);
 }
@@ -71,7 +71,7 @@ bool clip::isclpx(const FRMHED& form) noexcept {
 	return clip::isclp(form) && (form.lengthOrCount.clipCount != 0u);
 }
 
-bool clip::iseclpx(unsigned int iForm) {
+bool clip::iseclpx(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
 	return clip::iseclp(iForm) && (form.clipEntries != 0u);
 }
@@ -80,7 +80,7 @@ bool clip::iseclpx(const FRMHED& form) noexcept {
 	return clip::iseclp(form) && (form.clipEntries != 0u);
 }
 
-unsigned int clip::internal::findclp(unsigned int formIndex) {
+uint32_t clip::internal::findclp(uint32_t formIndex) {
 	auto& formList = *FormList;
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1)) {
@@ -93,7 +93,7 @@ unsigned int clip::internal::findclp(unsigned int formIndex) {
 	return 0;
 }
 
-void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
+void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 	auto& formList = *FormList;
 	for (auto iForm = fpnt + 1; iForm < FormList->size(); iForm++) {
 		if (clip::isclpx(iForm)) {
@@ -105,7 +105,7 @@ void clip::internal::clpsub(unsigned int fpnt, unsigned int cnt) {
 	}
 }
 
-void clip::delmclp(unsigned int iForm) {
+void clip::delmclp(uint32_t iForm) {
 	if (!ClipPoints->empty()) {
 		if (clip::isclp(iForm)) {
 			auto&      form       = (*FormList)[iForm];
@@ -122,7 +122,7 @@ void clip::delmclp(unsigned int iForm) {
 	}
 }
 
-void clip::deleclp(unsigned int iForm) {
+void clip::deleclp(uint32_t iForm) {
 	if (!ClipPoints->empty()) {
 		if (clip::iseclp(iForm)) {
 			auto& form      = (*FormList)[iForm];
@@ -141,12 +141,12 @@ void clip::deleclp(unsigned int iForm) {
 	}
 }
 
-void clip::delclps(unsigned int iForm) {
+void clip::delclps(uint32_t iForm) {
 	clip::deleclp(iForm);
 	clip::delmclp(iForm);
 }
 
-unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
+uint32_t clip::nueclp(uint32_t currentForm, uint32_t count) {
 	auto  find     = ci::findclp(currentForm);
 	auto& formList = *FormList;
 	if (clip::isclp(currentForm)) {
@@ -168,7 +168,7 @@ unsigned int clip::nueclp(unsigned int currentForm, unsigned int count) {
 	return find;
 }
 
-unsigned int clip::numclp() {
+uint32_t clip::numclp() {
 	const auto clipSize = wrap::toUnsigned(ClipBuffer->size());
 	const auto find     = ci::findclp(ClosestFormToCursor);
 	const auto it       = std::next(ClipPoints->cbegin(), find);
@@ -191,7 +191,7 @@ unsigned int clip::numclp() {
 	return find;
 }
 
-void clip::oclp(unsigned int clipIndex, unsigned int clipEntries) {
+void clip::oclp(uint32_t clipIndex, uint32_t clipEntries) {
 	auto  clipIt     = std::next(ClipPoints->begin(), clipIndex);
 	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
@@ -249,14 +249,14 @@ void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
 	}
 }
 
-void clip::internal::setvct(unsigned int start, unsigned int finish, float& clipAngle, fPOINT& vector0) {
+void clip::internal::setvct(uint32_t start, uint32_t finish, float& clipAngle, fPOINT& vector0) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	clipAngle     = atan2(vertexIt[finish].y - vertexIt[start].y, vertexIt[finish].x - vertexIt[start].x);
 	vector0.x     = ClipRectSize.cx * cos(clipAngle);
 	vector0.y     = ClipRectSize.cx * sin(clipAngle);
 }
 
-bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide) {
+bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide) {
 	const auto sinAngle = sin(clipAngle);
 	const auto cosAngle = cos(clipAngle);
 
@@ -296,7 +296,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                              double                     clipAngle,
                              dPOINT&                    moveToCoords,
                              const fPOINT&              rotationCenter,
-                             unsigned int               currentSide) {
+                             uint32_t               currentSide) {
 	auto delta = dPOINT {};
 
 	if (ci::nupnt(clipAngle, moveToCoords, currentSide)) {
@@ -319,7 +319,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             float                      clipAngle,
                             const fPOINT&              vector0,
                             const fPOINT&              rotationCenter,
-                            unsigned int               currentSide) {
+                            uint32_t               currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto& point     = vertexIt[wrap::toSize(currentSide) + 1u];
 	const auto  delta     = fPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
@@ -359,8 +359,8 @@ void clip::clpout() {
 
 bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
                             std::vector<fPOINT>&       clipFillData,
-                            unsigned int               start,
-                            unsigned int               finish,
+                            uint32_t               start,
+                            uint32_t               finish,
                             const fPOINT&              rotationCenter) {
 	auto        vertexIt           = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto& end                = vertexIt[finish];
@@ -402,7 +402,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	return false;
 }
 
-void clip::clpbrd(unsigned int startVertex) {
+void clip::clpbrd(uint32_t startVertex) {
 	auto moveToCoords = dPOINT {}; // moving formOrigin for clipboard fill
 
 	OSequence->clear();
@@ -455,7 +455,7 @@ void clip::clpbrd(unsigned int startVertex) {
 bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
                            const std::vector<float>& listCOSINEs,
                            fPOINT&                   moveToCoords,
-                           unsigned                  currentSide) {
+                           uint32_t                  currentSide) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	moveToCoords  = vertexIt[NextStart];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
@@ -477,7 +477,7 @@ bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
 void clip::internal::fxlit(const std::vector<float>& listSINEs,
                            const std::vector<float>& listCOSINEs,
                            fPOINT&                   moveToCoords,
-                           unsigned                  currentSide) {
+                           uint32_t                  currentSide) {
 	if (ci::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		BeanCount++;
@@ -495,7 +495,7 @@ void clip::internal::fxlin(std::vector<fPOINT>&      chainEndPoints,
                            const std::vector<float>& ListSINEs,
                            const std::vector<float>& ListCOSINEs,
                            fPOINT&                   moveToCoords,
-                           unsigned                  currentSide) {
+                           uint32_t                  currentSide) {
 	if (ci::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		chainEndPoints.push_back(SelectedPoint);
@@ -675,8 +675,8 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 
 void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
                             const std::vector<fPOINT>& chainEndPoints,
-                            unsigned                   start,
-                            unsigned                   finish,
+                            uint32_t                   start,
+                            uint32_t                   finish,
                             const fPOINT&              rotationCenter) {
 	const auto delta
 	    = fPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
@@ -708,7 +708,7 @@ void clip::duxclp() {
 	}
 }
 
-void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int vertex, const fPOINT& rotationCenter) {
+void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter) {
 	const auto nextVertex = form::nxt(vertex);
 	auto       delta      = dPOINT {};
 
@@ -745,8 +745,8 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int ver
 }
 
 void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
-                           unsigned int         start,
-                           unsigned int         finish,
+                           uint32_t         start,
+                           uint32_t         finish,
                            float                spacing,
                            const fPOINT&        rotationCenter) {
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -836,8 +836,8 @@ void clip::clpic() {
 	}
 }
 
-void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned int start, unsigned int finish) {
-	const auto chainSequence = std::vector<unsigned> { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
+void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t start, uint32_t finish) {
+	const auto chainSequence = std::vector<uint32_t> { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
 	auto chainPoint = std::vector<fPOINT> {};
 	chainPoint.resize(5);

@@ -20,7 +20,7 @@ void initColorRef() noexcept;
 void initTraceWindows() noexcept;
 void trace();
 void tracedg();
-void traceNumberInput(unsigned NumericCode);
+void traceNumberInput(uint32_t NumericCode);
 void traceNumberReset() noexcept;
 void tracpar();
 void trcsel();
@@ -33,39 +33,39 @@ void wasTrace1();
 namespace internal {
 
 	void bfrm();
-	void blanklin(std::vector<unsigned>& differenceBitmap, unsigned lineStart);
-	void difbits(unsigned shift, unsigned* point) noexcept;
+	void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart);
+	void difbits(uint32_t shift, uint32_t* point) noexcept;
 
-	static inline void difsub(unsigned source, unsigned shift, unsigned& destination) noexcept;
+	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
 	void     dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
-	unsigned ducolm() noexcept;
+	uint32_t ducolm() noexcept;
 
-	void durct(unsigned shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
+	void durct(uint32_t shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 	void dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept;
 	void dutrac();
-	void dutrnum0(unsigned color);
-	void dwnum(unsigned iRGB) noexcept;
+	void dutrnum0(uint32_t color);
+	void dwnum(uint32_t iRGB) noexcept;
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
 
-	void pxlin(unsigned int start, unsigned int finish);
-	void ritrcol(COLORREF* color, unsigned number) noexcept;
+	void pxlin(uint32_t start, uint32_t finish);
+	void ritrcol(COLORREF* color, uint32_t number) noexcept;
 	void shownd(HWND hwnd) noexcept;
 	void stch2bit(fPOINT& point);
 	void tracwnd();
-	bool trcbit(unsigned initialDirection, unsigned& traceDirection, std::vector<TRCPNT>& tracedPoints);
+	bool trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints);
 	bool trcin(COLORREF color);
-	void trcnum(unsigned shift, COLORREF color, unsigned iRGB) noexcept;
+	void trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) noexcept;
 	void trcols(COLORREF color) noexcept;
 	void trcratnum();
 	void trcstpnum();
-	void trcsub(HWND* window, unsigned xCoordinate, unsigned yCoordinate, unsigned buttonHeight) noexcept;
-	void trnumwnd0(int position) noexcept;
-	void trnumwnd1(int position) noexcept;
+	void trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept;
+	void trnumwnd0(int32_t position) noexcept;
+	void trnumwnd1(int32_t position) noexcept;
 
-	unsigned trsum() noexcept;
+	uint32_t trsum() noexcept;
 
-	void upnum(unsigned iRGB) noexcept;
+	void upnum(uint32_t iRGB) noexcept;
 } // namespace internal
 } // namespace trace

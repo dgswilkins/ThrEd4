@@ -33,7 +33,7 @@
 
 namespace di = displayText::internal;
 
-unsigned short LoadStringList[] = {
+uint16_t LoadStringList[] = {
 	// strings to load into memory at init time
 	IDS_PIKOL,    IDS_UPON,      IDS_UPOF,   IDS_AUXTXT,  IDS_HUP0,    IDS_HUP1,    IDS_HUP2,    IDS_HUP3,   IDS_HUP4,
 	IDS_TRC0,     IDS_TRC1S,     IDS_TRC2,   IDS_TRC3,    IDS_TRC4,    IDS_TRC1H,   IDS_NUMPNT,  IDS_NUMFRM, IDS_NUMSCH,
@@ -55,7 +55,7 @@ unsigned short LoadStringList[] = {
 	IDS_UND,      IDS_ULEN,      IDS_FUANG,  IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,  IDS_FRMBOX,  IDS_TXOF,
 };
 
-inline void displayText::loadString(std::wstring& sDest, unsigned stringID) {
+inline void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 	auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
@@ -94,7 +94,7 @@ void displayText::shoMsg(const std::wstring& message) {
 				messageSize.cy = textSize.cy;
 			}
 		}
-		messageSize.cy *= gsl::narrow<LONG>(strings.size());
+		messageSize.cy *= gsl::narrow<int32_t>(strings.size());
 		auto mainRect = RECT {};
 		GetWindowRect(MainStitchWin, &mainRect);
 		auto xOffset = mainRect.left;
@@ -115,7 +115,7 @@ void displayText::shoMsg(const std::wstring& message) {
 	}
 }
 
-void displayText::tabmsg(unsigned code) {
+void displayText::tabmsg(uint32_t code) {
 	auto message = std::wstring {};
 	displayText::loadString(message, code);
 	displayText::shoMsg(message);
@@ -158,7 +158,7 @@ void displayText::numWnd() noexcept {
 	MsgBuffer[0]          = 0;
 }
 
-void displayText::msgflt(unsigned messageId, float value) {
+void displayText::msgflt(uint32_t messageId, float value) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, messageId);
@@ -183,7 +183,7 @@ void displayText::bfilmsg() {
 	displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
-void displayText::filnopn(unsigned code, const fs::path& fileName) {
+void displayText::filnopn(uint32_t code, const fs::path& fileName) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, code);
@@ -197,7 +197,7 @@ void displayText::crmsg(const fs::path& fileName) {
 	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
+void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5) {
 			if (StateMap.test(StateFlag::HIDMAP)) {
@@ -216,17 +216,17 @@ void displayText::butxt(unsigned iButton, const std::wstring& buttonText) {
 	}
 }
 
-void displayText::clrhbut(unsigned startButton) {
+void displayText::clrhbut(uint32_t startButton) {
 	for (auto iButton = startButton; iButton < 9u; iButton++) {
 		SetWindowText((*ButtonWin)[iButton], L"");
 	}
 }
 
-void displayText::ritnum(unsigned code, unsigned int value) {
+void displayText::ritnum(uint32_t code, uint32_t value) {
 	displayText::butxt(HNUM, fmt::format((*StringTable)[code], value));
 }
 
-void displayText::msgstr(unsigned code) noexcept {
+void displayText::msgstr(uint32_t code) noexcept {
 	LoadString(ThrEdInstance, code, &MsgBuffer[0], MSGSIZ);
 }
 
@@ -234,7 +234,7 @@ void displayText::riter() {
 	displayText::tabmsg(IDS_RITER);
 }
 
-void displayText::pntmsg(unsigned msgID) {
+void displayText::pntmsg(uint32_t msgID) {
 	auto fmtStr  = std::wstring {};
 	auto message = std::wstring {};
 
@@ -243,7 +243,7 @@ void displayText::pntmsg(unsigned msgID) {
 	displayText::shoMsg(fmt::format(fmtStr, message));
 }
 
-void displayText::shoseln(unsigned code0, unsigned code1) {
+void displayText::shoseln(uint32_t code0, uint32_t code1) {
 	auto fmtStr = std::wstring {};
 	auto msg0   = std::wstring {};
 	auto msg1   = std::wstring {};
@@ -254,7 +254,7 @@ void displayText::shoseln(unsigned code0, unsigned code1) {
 	displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
-bool displayText::clpmsgs(unsigned code) {
+bool displayText::clpmsgs(uint32_t code) {
 	form::ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
 		displayText::tabmsg(IDS_CLPS);
@@ -270,7 +270,7 @@ void displayText::frm1pnt() {
 	}
 }
 
-bool displayText::filmsgs(unsigned code) {
+bool displayText::filmsgs(uint32_t code) {
 	if (!SelectedFormList->empty()) {
 		return displayText::clpmsgs(code);
 	}
@@ -327,7 +327,7 @@ void displayText::spltmsg() {
 	displayText::shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
-void displayText::datmsg(unsigned code) {
+void displayText::datmsg(uint32_t code) {
 	auto dataErrorID = 0u;
 	auto dataError   = std::wstring {};
 
@@ -461,13 +461,13 @@ void displayText::tomsg() {
 	displayText::updateWinFont(MainStitchWin);
 }
 
-void displayText::internal::bxtxt(unsigned iButton, unsigned iMessage) {
+void displayText::internal::bxtxt(uint32_t iButton, uint32_t iMessage) {
 	auto message = std::wstring {};
 	displayText::loadString(message, iMessage);
 	SetWindowText((*ButtonWin)[iButton], message.c_str());
 }
 
-void displayText::internal::hlpflt(unsigned iButton, unsigned iMessage, float data) {
+void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, iMessage);
 	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
@@ -485,7 +485,7 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	SetWindowText((*ButtonWin)[HTXMIR + 1], L"");
 }
 
-HFONT displayText::getThrEdFont(LONG weight) noexcept {
+HFONT displayText::getThrEdFont(int32_t weight) noexcept {
 	auto lfText = LOGFONT {};
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);

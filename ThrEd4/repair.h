@@ -14,12 +14,12 @@ void repar();
 
 namespace internal {
 
-	void     adbad(std::wstring& repairMessage, unsigned code, unsigned int count);
-	void     bcup(unsigned int find, BADCNTS& badData);
+	void     adbad(std::wstring& repairMessage, uint32_t code, uint32_t count);
+	void     bcup(uint32_t find, BADCNTS& badData);
 	void     chkclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkfstch() noexcept;
-	unsigned frmchkfn();
+	uint32_t frmchkfn();
 	void     repclp(std::wstring& repairMessage);
 	void     repflt(std::wstring& repairMessage);
 	void     repsat();

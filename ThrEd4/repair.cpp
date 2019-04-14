@@ -39,7 +39,7 @@
 
 namespace ri = repair::internal;
 
-void repair::internal::adbad(std::wstring& repairMessage, unsigned code, unsigned int count) {
+void repair::internal::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, code);
@@ -125,7 +125,7 @@ void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexc
 	}
 }
 
-unsigned repair::internal::frmchkfn() {
+uint32_t repair::internal::frmchkfn() {
 	auto badData = BADCNTS {};
 
 	if (!FormList->empty()) {
@@ -190,7 +190,7 @@ unsigned repair::internal::frmchkfn() {
 	return badData.attribute;
 }
 
-void repair::internal::bcup(unsigned int find, BADCNTS& badData) {
+void repair::internal::bcup(uint32_t find, BADCNTS& badData) {
 	const auto& form = (*FormList)[find];
 	if (clip::isclp(find)) {
 		badData.clip += form.lengthOrCount.clipCount;
@@ -245,7 +245,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 		}
 		else {
 			if (form.vertexIndex < FormVertices->size()) {
-				form.vertexCount = gsl::narrow<unsigned short>(FormVertices->size() - form.vertexIndex);
+				form.vertexCount = gsl::narrow<uint16_t>(FormVertices->size() - form.vertexIndex);
 				satin::delsac(iForm);
 				// ToDo - do we need to increase the size of vertexPoint?
 				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
@@ -326,7 +326,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 			}
 			else {
 				if (clipDifference < ClipPoints->size()) {
-					form.clipEntries = gsl::narrow<unsigned short>(FormVertices->size() - clipDifference);
+					form.clipEntries = gsl::narrow<uint16_t>(FormVertices->size() - clipDifference);
 					clipPoint.resize(clipPoint.size() + form.clipEntries);
 					auto sourceStart = std::next(ClipPoints->cbegin(), form.borderClipData);
 					auto sourceEnd   = std::next(sourceStart, form.clipEntries);
@@ -368,7 +368,7 @@ void repair::internal::repsat() {
 			}
 			else {
 				if (guideDifference < SatinGuides->size()) {
-					form.satinGuideCount   = gsl::narrow<unsigned short>(SatinGuides->size() - guideDifference);
+					form.satinGuideCount   = gsl::narrow<uint16_t>(SatinGuides->size() - guideDifference);
 					auto       sourceStart = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 					auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
 					const auto destination = std::next(SatinGuides->begin(), guideCount);
@@ -392,24 +392,24 @@ void repair::internal::reptx() {
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
-			if (gsl::narrow<unsigned short>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {
+			if (gsl::narrow<uint16_t>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {
 				auto       sourceStart = &SatinGuides[form.fillInfo.texture.index];
 				auto       sourceEnd   = sourceStart + form.fillInfo.texture.count;
 				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
-				form.fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
+				form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 				textureCount += form.fillInfo.texture.count;
 				ri::bcup(iForm, badData);
 			}
 			else {
 				if (TextureIndex > form.fillInfo.texture.index) {
-					form.fillInfo.texture.count = gsl::narrow<unsigned short>(TextureIndex) - form.fillInfo.texture.index;
+					form.fillInfo.texture.count = gsl::narrow<uint16_t>(TextureIndex) - form.fillInfo.texture.index;
 					auto       sourceStart      = &SatinGuides[form.fillInfo.texture.index];
 					auto       sourceEnd        = sourceStart + form.fillInfo.texture.count;
 					const auto destination
 					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
-					form.fillInfo.texture.index = gsl::narrow<unsigned short>(textureCount);
+					form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 					ri::bcup(iForm, badData);
 					textureCount = badData.tx;
 				}

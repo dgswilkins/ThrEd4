@@ -59,7 +59,7 @@ void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 	}
 }
 
-auto formForms::maxwid(unsigned start, unsigned finish) {
+auto formForms::maxwid(uint32_t start, uint32_t finish) {
 	auto textSize = POINT {};
 
 	while (start <= finish) {
@@ -122,7 +122,7 @@ HWND formForms::internal::numwin(const std::wstring& winName, const RECT& locati
 	                    nullptr);
 }
 
-void formForms::internal::nxtlin(unsigned& formMenuEntryCount) noexcept {
+void formForms::internal::nxtlin(uint32_t& formMenuEntryCount) noexcept {
 	formMenuEntryCount++;
 	ffi::nxtlinprf();
 }
@@ -134,7 +134,7 @@ void formForms::internal::nxtlinprf() noexcept {
 	ValueWindowCoords.bottom += ValueWindowSize.y;
 }
 
-void formForms::internal::refrmfn(unsigned& formMenuEntryCount) {
+void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	const uint16_t edgeArray[]
 	    = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
 
@@ -575,7 +575,7 @@ HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
 	                    nullptr);
 }
 
-void formForms::internal::prflin(const std::wstring& msg, unsigned row) {
+void formForms::internal::prflin(const std::wstring& msg, uint32_t row) {
 	ffi::prftwin((*StringTable)[row]);
 	(*ValueWindow)[row - STR_PRF0] = ffi::prfnwin(msg);
 	ffi::nxtlinprf();
@@ -794,7 +794,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			}
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPWSTR>(buffer), HBUFSIZ);
 			wchar_t compareBuffer[HBUFSIZ] = { 0 };
-			for (unsigned char iType = 0; iType < 6; iType++) {
+			for (uint8_t iType = 0; iType < 6; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPWSTR>(compareBuffer), HBUFSIZ);
 				if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 					IniFile.daisyBorderType = iType;

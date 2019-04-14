@@ -40,9 +40,9 @@
 
 namespace si = satin::internal;
 
-unsigned int StartPoint; // starting formOrigin for a satin stitch guide-line
+uint32_t StartPoint; // starting formOrigin for a satin stitch guide-line
 
-void satin::delsac(unsigned int formIndex) {
+void satin::delsac(uint32_t formIndex) {
 	auto& formList = *FormList;
 	if (!SatinGuides->empty()) {
 		if (formList[formIndex].type == SAT && (formList[formIndex].satinGuideCount != 0u)) {
@@ -59,7 +59,7 @@ void satin::delsac(unsigned int formIndex) {
 	formList[formIndex].satinGuideCount = 0;
 }
 
-void satin::internal::sacspac(unsigned int startGuide, unsigned guideCount) {
+void satin::internal::sacspac(uint32_t startGuide, uint32_t guideCount) {
 	const auto val = SATCON {};
 	auto       pos = std::next(SatinGuides->cbegin(), startGuide);
 	SatinGuides->insert(pos, val);
@@ -71,7 +71,7 @@ void satin::internal::sacspac(unsigned int startGuide, unsigned guideCount) {
 	}
 }
 
-unsigned int satin::internal::nusac(unsigned int formIndex, unsigned guideCount) {
+uint32_t satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) {
 	auto  guideIndex = 0u;
 	auto& formList   = *FormList;
 
@@ -85,7 +85,7 @@ unsigned int satin::internal::nusac(unsigned int formIndex, unsigned guideCount)
 	return guideIndex;
 }
 
-void satin::spltsat(unsigned guideIndex) {
+void satin::spltsat(uint32_t guideIndex) {
 	auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
 	// We are adding two additional vertices when splitting the form
 	auto vertexBuffer = std::vector<fPOINT> {};
@@ -319,7 +319,7 @@ void satin::satsel() {
 	}
 }
 
-void satin::internal::satcpy(const std::vector<SATCON>& source, unsigned int size) {
+void satin::internal::satcpy(const std::vector<SATCON>& source, uint32_t size) {
 	auto eraseStart = std::next(SatinGuides->cbegin(), CurrentFormGuides);
 	auto eraseEnd   = std::next(eraseStart, (CurrentFormGuidesCount - size));
 	SatinGuides->erase(eraseStart, eraseEnd);
@@ -530,7 +530,7 @@ void satin::satadj() {
 	}
 }
 
-void satin::delcon(unsigned GuideIndex) {
+void satin::delcon(uint32_t GuideIndex) {
 	const auto offset = SelectedForm->satinOrAngle.guide + GuideIndex;
 	auto       guide  = std::next(SatinGuides->cbegin(), offset);
 
@@ -630,7 +630,7 @@ void satin::internal::satsbrd() {
 	form::bsizpar();
 	SelectedForm->borderSize  = BorderWidth;
 	SelectedForm->edgeSpacing = LineSpacing / 2;
-	SelectedForm->borderColor = gsl::narrow<unsigned char>(ActiveColor);
+	SelectedForm->borderColor = gsl::narrow<uint8_t>(ActiveColor);
 	form::refilfn();
 }
 
@@ -672,7 +672,7 @@ void satin::satbrd() {
 	}
 }
 
-void satin::internal::satends(unsigned isBlunt) {
+void satin::internal::satends(uint32_t isBlunt) {
 	if ((isBlunt & SBLNT) != 0u) {
 		auto step = fPOINT { sin((*FormAngles)[0]) * HorizontalLength2 / 2.0f, cos((*FormAngles)[0]) * HorizontalLength2 / 2.0f };
 		if (StateMap.test(StateFlag::INDIR)) {
@@ -764,7 +764,7 @@ void satin::ribon() {
 					}
 				}
 				form.type                       = SAT;
-				form.fillColor                  = gsl::narrow<unsigned char>(ActiveColor);
+				form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
 				form.fillSpacing                = LineSpacing;
 				form.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 				form.vertexCount                = iNewVertex;
@@ -847,10 +847,10 @@ void satin::slbrd() {
 }
 
 void satin::internal::satfn(const std::vector<double>& lengths,
-                            unsigned int               line1Start,
-                            unsigned int               line1End,
-                            unsigned int               line2Start,
-                            unsigned int               line2End) {
+                            uint32_t               line1Start,
+                            uint32_t               line1End,
+                            uint32_t               line2Start,
+                            uint32_t               line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
@@ -884,9 +884,9 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		}
 		const auto line1Segments     = ((line1End > line1Start) ? (line1End - line1Start) : (line1Start - line1End));
 		const auto line2Segments     = ((line2Start > line2End) ? (line2Start - line2End) : (line2End - line2Start));
-		auto       line1StitchCounts = std::vector<unsigned> {};
+		auto       line1StitchCounts = std::vector<uint32_t> {};
 		line1StitchCounts.reserve(line1Segments);
-		auto line2StitchCounts = std::vector<unsigned> {};
+		auto line2StitchCounts = std::vector<uint32_t> {};
 		line2StitchCounts.reserve(line2Segments);
 		auto iVertex            = line1Start;
 		auto segmentStitchCount = 0u;
@@ -1238,13 +1238,13 @@ void satin::satpnt1() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, unsigned& satinBackupIndex) {
+void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, uint32_t& satinBackupIndex) {
 	satinBackup[satinBackupIndex++] = point;
 	satinBackupIndex &= (satinBackup.size() - 1);
 	form::filinsb(point);
 }
 
-void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int start, unsigned int finish) {
+void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish) {
 	auto& outsidePoints = *OutsidePoints;
 	auto  satinBackup   = std::vector<fPOINT> {}; // backup stitches in satin fills
 	satinBackup.resize(8);
@@ -1341,7 +1341,7 @@ void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, unsigned int
 	}
 }
 
-void satin::internal::sfn(unsigned int startVertex) {
+void satin::internal::sfn(uint32_t startVertex) {
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		const auto nextVertex = form::nxt(startVertex);
 		si::sbfn(*InsidePoints, startVertex, nextVertex);
@@ -1415,7 +1415,7 @@ void satin::sbrd() {
 	LineSpacing = savedSpacing;
 }
 
-void satin::internal::outfn(unsigned start, unsigned finish, double satinWidth) {
+void satin::internal::outfn(uint32_t start, uint32_t finish, double satinWidth) {
 	auto xOffset = 0.0;
 	auto yOffset = 0.0;
 
@@ -1459,7 +1459,7 @@ bool satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOIN
 	return false;
 }
 
-unsigned int satin::adsatk(unsigned int count) {
+uint32_t satin::adsatk(uint32_t count) {
 	const auto iSatinConnect = wrap::toUnsigned(SatinGuides->size());
 	const auto it            = SatinGuides->end();
 	const auto val           = SATCON {};

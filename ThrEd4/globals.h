@@ -61,13 +61,13 @@
 
 namespace fs = std::experimental::filesystem;
 
-extern unsigned   ActiveColor;
-extern unsigned   ActiveLayer;
+extern uint32_t   ActiveColor;
+extern uint32_t   ActiveLayer;
 extern fRECTANGLE AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
-extern unsigned  AppliqueColor;
+extern uint32_t  AppliqueColor;
 extern LPWSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
@@ -75,25 +75,25 @@ extern fs::path* AuxName;
 extern std::vector<BSEQPNT>* BSequence;
 
 extern HBRUSH   BackgroundBrush;
-extern unsigned BeanCount; // number of stitches added by convert to bean
+extern uint32_t BeanCount; // number of stitches added by convert to bean
 extern HDC      BitmapDC;
 extern RECT     BitmapDstRect;
-extern unsigned BitmapHeight;
+extern uint32_t BitmapHeight;
 extern POINT    BitmapPoint;
 extern dPOINT   BitmapSizeinStitches;
 extern RECT     BitmapSrcRect;
 extern dPOINT   BmpStitchRatio;
-extern unsigned BitmapWidth;
+extern uint32_t BitmapWidth;
 extern float    BorderWidth;
-extern unsigned ButtonHeight;
-extern unsigned ButtonWidth;
-extern unsigned ButtonWidthX3;
+extern uint32_t ButtonHeight;
+extern uint32_t ButtonWidth;
+extern uint32_t ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 
 extern float    ButtonholeCornerLength;
 extern HWND     CancelButton;
-extern unsigned Clip;
+extern uint32_t Clip;
 
 extern std::vector<fPOINTATTR>* ClipBuffer;
 
@@ -106,15 +106,15 @@ extern std::vector<fPOINT>* ClipPoints;
 extern fRECTANGLE   ClipRect;
 extern FLSIZ        ClipRectSize;
 extern CLPSTCH*     ClipStitchData;
-extern unsigned     ClipTypeMap;
-extern unsigned int ClosestFormToCursor;
-extern unsigned     ClosestPointIndex;
-extern unsigned int ClosestVertexToCursor;
-extern int*         ColorBarSize;
+extern uint32_t     ClipTypeMap;
+extern uint32_t ClosestFormToCursor;
+extern uint32_t     ClosestPointIndex;
+extern uint32_t ClosestVertexToCursor;
+extern int32_t*         ColorBarSize;
 extern HCURSOR      CrossCursor;
-extern unsigned int CurrentFormGuides;
-extern unsigned int CurrentFormGuidesCount;
-extern unsigned int CurrentVertexIndex;
+extern uint32_t CurrentFormGuides;
+extern uint32_t CurrentFormGuidesCount;
+extern uint32_t CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
 
@@ -134,7 +134,7 @@ extern HWND FormDataSheet;
 extern std::vector<POINT>*  FormLines;
 extern std::vector<FRMHED>* FormList;
 
-extern unsigned int FormMenuChoice;
+extern uint32_t FormMenuChoice;
 extern fPOINT       FormMoveDelta;
 
 extern std::wstring* FormOnOff;
@@ -147,9 +147,9 @@ extern std::vector<fPOINT>* FormVertices;
 
 extern HWND      GeneralNumberInputBox;
 extern HPEN      GridPen;
-extern unsigned  GroupEndStitch;
-extern unsigned  GroupStartStitch;
-extern unsigned  GroupStitchIndex;
+extern uint32_t  GroupEndStitch;
+extern uint32_t  GroupStartStitch;
+extern uint32_t  GroupStitchIndex;
 extern fs::path* HomeDirectory;
 extern double    HorizontalLength;
 extern float     HorizontalLength2;
@@ -177,18 +177,18 @@ extern MENUITEMINFO* MenuInfo;
 extern float        MinStitchLength;
 extern MSG          Msg;
 extern wchar_t      MsgBuffer[MSGSIZ];
-extern unsigned     MsgIndex;
+extern uint32_t     MsgIndex;
 extern RECT         MsgRect;
 extern HWND         MsgWindow;
 extern HPEN         MultiFormPen;
-extern unsigned     NearestCount;
-extern unsigned int NewFormVertexCount;
+extern uint32_t     NearestCount;
+extern uint32_t NewFormVertexCount;
 extern HWND         OKButton;
 
 extern std::vector<fPOINT>* OSequence;
 
 extern bool         OutLineEverySelectedForm;
-extern unsigned int OutputIndex;
+extern uint32_t OutputIndex;
 
 extern std::vector<fPOINT>* OutsidePointList;
 extern std::vector<fPOINT>* OutsidePoints;
@@ -197,30 +197,30 @@ extern char           PCSBMPFileName[16];
 extern PCSHEADER      PCSHeader;
 extern const wchar_t* PcdClipFormat;
 extern float          PicotSpacing;
-extern unsigned       PreferenceIndex;
-extern long           PreferenceWindowWidth;
+extern uint32_t       PreferenceIndex;
+extern int32_t           PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
-extern unsigned int   PreviousFormIndex;
-extern unsigned       PseudoRandomValue;
+extern uint32_t   PreviousFormIndex;
+extern uint32_t       PseudoRandomValue;
 extern fRECTANGLE     RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
-extern unsigned int SatinEndGuide;
+extern uint32_t SatinEndGuide;
 
 extern std::vector<SATCON>* SatinGuides;
 
 extern RECT      scRct;
-extern unsigned* screenDPI;
-extern int*      ScrollSize;
+extern uint32_t* screenDPI;
+extern int32_t*      ScrollSize;
 
 extern std::vector<POINT>* SearchLine;
 
 extern HPEN     SelectAllPen;
 extern FRMHED*  SelectedForm;
-extern unsigned SelectedFormControlVertex;
+extern uint32_t SelectedFormControlVertex;
 
-extern std::vector<unsigned int>* SelectedFormList;
+extern std::vector<uint32_t>* SelectedFormList;
 extern FORMVERTICES               SelectedFormVertices;
 extern std::vector<POINT>*        SelectedFormsLine;
 
@@ -257,17 +257,17 @@ extern POINT      StitchWindowSize;
 extern std::vector<std::wstring>* StringTable;
 
 extern std::vector<fPOINT>* TempPolygon;
-extern unsigned int         TextureIndex;
+extern uint32_t         TextureIndex;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 extern HWND                 ThreadSizeWin[16];
-extern unsigned             ThrEdClip;
+extern uint32_t             ThrEdClip;
 extern const wchar_t*       ThrEdClipFormat;
 extern HINSTANCE            ThrEdInstance;
 extern HWND                 ThrEdWindow;
 extern fs::path*            ThrName;
 extern POINT                ThredWindowOrigin;
-extern unsigned*            TraceBitmapData;
+extern uint32_t*            TraceBitmapData;
 extern HDC                  TraceDC;
 
 extern boost::dynamic_bitset<>* TracedEdges;
@@ -284,7 +284,7 @@ extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
-extern unsigned int VertexCount;
+extern uint32_t VertexCount;
 extern float        VerticalRatio;
 extern HWND         VerticalScrollBar;
 extern fs::path*    WorkingFileName;

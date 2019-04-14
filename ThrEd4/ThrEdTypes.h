@@ -371,7 +371,7 @@ enum class StateFlag
 	ISUP,      // up stitch exists
 	WASLIN,    // a move stitch line has been drawn
 	CAPT,      // screen capture in effect
-	VCAPT,     // keep screen capture as long as the mouse cursor
+	VCAPT,     // keep screen capture as int32_t as the mouse cursor
 	           // is in the edit window
 	SELBOX,    // the select box is showing
 	ILIN,      // insert line is showing on the screen

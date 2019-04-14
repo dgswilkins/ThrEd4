@@ -8,7 +8,7 @@
 #include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
 
-template <typename Block = unsigned, typename Allocator = std::allocator<unsigned>>
+template <typename Block = uint32_t, typename Allocator = std::allocator<uint32_t>>
 class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 {
 	using super = boost::dynamic_bitset<Block, Allocator>;

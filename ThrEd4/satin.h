@@ -27,10 +27,10 @@
 
 namespace satin {
 
-unsigned int adsatk(unsigned int count);
+uint32_t adsatk(uint32_t count);
 void         cpySat(const FRMHED& formHeader);
-void         delcon(unsigned GuideIndex);
-void         delsac(unsigned int formIndex);
+void         delcon(uint32_t GuideIndex);
+void         delsac(uint32_t formIndex);
 void         delspnt();
 void         drwsat();
 void         dusat();
@@ -47,31 +47,31 @@ void         satsel();
 void         satzum();
 void         sbrd();
 void         slbrd();
-void         spltsat(unsigned guideIndex);
+void         spltsat(uint32_t guideIndex);
 
 namespace internal {
 
 	bool chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt);
-	void filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, unsigned& satinBackupIndex);
+	void filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, uint32_t& satinBackupIndex);
 
-	unsigned int nusac(unsigned int formIndex, unsigned guideCount);
+	uint32_t nusac(uint32_t formIndex, uint32_t guideCount);
 
-	void     outfn(unsigned start, unsigned finish, double satinWidth);
-	void     sacspac(unsigned int startGuide, unsigned guideCount);
+	void     outfn(uint32_t start, uint32_t finish, double satinWidth);
+	void     sacspac(uint32_t startGuide, uint32_t guideCount);
 	void     satclos();
-	void     satcpy(const std::vector<SATCON>& source, unsigned int size);
-	void     satends(unsigned isBlunt);
+	void     satcpy(const std::vector<SATCON>& source, uint32_t size);
+	void     satends(uint32_t isBlunt);
 	void     satfn(const std::vector<double>& lengths,
-	               unsigned int               line1Start,
-	               unsigned int               line1End,
-	               unsigned int               line2Start,
-	               unsigned int               line2End);
-	unsigned satind(const SATCON* guide) noexcept;
+	               uint32_t               line1Start,
+	               uint32_t               line1End,
+	               uint32_t               line2Start,
+	               uint32_t               line2End);
+	uint32_t satind(const SATCON* guide) noexcept;
 	void     satmf(const std::vector<double>& lengths);
 	void     satsbrd();
 	bool     satselfn();
-	void     sbfn(const std::vector<fPOINT>& insidePoints, unsigned int start, unsigned int finish);
-	void     sfn(unsigned int startVertex);
+	void     sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish);
+	void     sfn(uint32_t startVertex);
 	void     unsat();
 } // namespace internal
 } // namespace satin

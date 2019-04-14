@@ -27,78 +27,78 @@
 namespace clip {
 
 void chnfn();
-void clpbrd(unsigned int startVertex);
+void clpbrd(uint32_t startVertex);
 void clpic();
 void clpout();
-void delclps(unsigned int iForm);
-void deleclp(unsigned int iForm);
-void delmclp(unsigned int iForm);
+void delclps(uint32_t iForm);
+void deleclp(uint32_t iForm);
+void delmclp(uint32_t iForm);
 void duxclp();
-bool isclp(unsigned int iForm);
+bool isclp(uint32_t iForm);
 bool isclp(const FRMHED& form) noexcept;
-bool isclpx(unsigned int iForm);
+bool isclpx(uint32_t iForm);
 bool isclpx(const FRMHED& form) noexcept;
-bool iseclp(unsigned int iForm);
+bool iseclp(uint32_t iForm);
 bool iseclp(const FRMHED& form) noexcept;
-bool iseclpx(unsigned int iForm);
+bool iseclpx(uint32_t iForm);
 bool iseclpx(const FRMHED& form) noexcept;
 
-unsigned int nueclp(unsigned int currentForm, unsigned int count);
-unsigned int numclp();
+uint32_t nueclp(uint32_t currentForm, uint32_t count);
+uint32_t numclp();
 
-void oclp(unsigned int clipIndex, unsigned int clipEntries);
+void oclp(uint32_t clipIndex, uint32_t clipEntries);
 
 namespace internal {
 
-	void clpcrnr(std::vector<fPOINT>& clipFillData, unsigned int vertex, const fPOINT& rotationCenter);
+	void clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter);
 	bool clpsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
-	            unsigned int               start,
-	            unsigned int               finish,
+	            uint32_t               start,
+	            uint32_t               finish,
 	            const fPOINT&              rotationCenter);
-	void clpsub(unsigned int fpnt, unsigned int cnt);
+	void clpsub(uint32_t fpnt, uint32_t cnt);
 	void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 	void duch(std::vector<fPOINT>& chainEndPoints);
-	void duchfn(const std::vector<fPOINT>& chainEndPoints, unsigned int start, unsigned int finish);
+	void duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t start, uint32_t finish);
 	void dufxlen(std::vector<fPOINT>& chainEndPoints);
 	void dulast(std::vector<fPOINT>& chainEndPoints);
 	void durev(std::vector<fPOINT>& clipReversedData);
 
-	unsigned int findclp(unsigned int formIndex);
+	uint32_t findclp(uint32_t formIndex);
 	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs);
 	void fxlin(std::vector<fPOINT>&      chainEndPoints,
 	           const std::vector<float>& ListSINEs,
 	           const std::vector<float>& ListCOSINEs,
 	           fPOINT&                   moveToCoords,
-	           unsigned                  currentSide);
+	           uint32_t                  currentSide);
 	void
-	fxlit(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, unsigned currentSide);
+	fxlit(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, uint32_t currentSide);
 	bool
-	     fxpnt(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, unsigned currentSide);
+	     fxpnt(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, uint32_t currentSide);
 	void lincrnr(const std::vector<fPOINT>& clipReversedData,
 	             std::vector<fPOINT>&       clipFillData,
 	             double                     clipAngle,
 	             dPOINT&                    moveToCoords,
 	             const fPOINT&              rotationCenter,
-	             unsigned int               currentSide);
+	             uint32_t               currentSide);
 	void linsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            float                      clipAngle,
 	            const fPOINT&              vector0,
 	            const fPOINT&              rotationCenter,
-	            unsigned int               currentSide);
-	bool nupnt(double clipAngle, dPOINT& moveToCoords, unsigned int currentSide);
+	            uint32_t               currentSide);
+	bool nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide);
 	void picfn(std::vector<fPOINT>& clipFillData,
-	           unsigned int         start,
-	           unsigned int         finish,
+	           uint32_t         start,
+	           uint32_t         finish,
 	           float                spacing,
 	           const fPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
-	void setvct(unsigned int start, unsigned int finish, float& clipAngle, fPOINT& vector0);
+	void setvct(uint32_t start, uint32_t finish, float& clipAngle, fPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	            const std::vector<fPOINT>& chainEndPoints,
-	            unsigned                   start,
-	            unsigned                   finish,
+	            uint32_t                   start,
+	            uint32_t                   finish,
 	            const fPOINT&              rotationCenter);
 } // namespace internal
 } // namespace clip

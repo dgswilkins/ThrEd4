@@ -19,11 +19,11 @@
 
 namespace texture {
 
-void deltx(unsigned int formIndex);
+void deltx(uint32_t formIndex);
 void drwtxtr();
 void dutxtfil();
-void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<unsigned int>* ptrTexturePointsList) noexcept;
-bool istx(unsigned int iForm);
+void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uint32_t>* ptrTexturePointsList) noexcept;
+bool istx(uint32_t iForm);
 void redtx();
 void rstxt();
 void rtrtx();
@@ -33,29 +33,29 @@ void setxt(std::vector<RNGCNT>& textureSegments);
 void txdun();
 void txof();
 void txsnap();
-void txtkey(unsigned keyCode, FRMHED& textureForm);
+void txtkey(uint32_t keyCode, FRMHED& textureForm);
 void txtlbut(const FRMHED& textureForm);
 void txtrbut();
 void txtrmov(const FRMHED& textureForm);
 void txtrup();
-void writeScreenWidth(unsigned position);
+void writeScreenWidth(uint32_t position);
 
 namespace internal {
 
 	void   altx();
 	void   angrct(fRECTANGLE& rectangle);
-	void   butsid(unsigned windowId);
+	void   butsid(uint32_t windowId);
 	bool   chkbut();
 	void   chktx();
 	bool   chktxh(_In_ const TXHST* historyItem);
 	void   chktxnum();
 	void   deorg(POINT& point) noexcept;
-	void   dutxfn(unsigned textureType);
+	void   dutxfn(uint32_t textureType);
 	void   dutxlin(const fPOINT& point0in, const fPOINT& point1in);
 	void   dutxmir();
 	void   dutxrct(TXTRCT& textureRect);
 	void   dutxtlin() noexcept;
-	void   dutxtx(unsigned int index, unsigned short offsetPixels);
+	void   dutxtx(uint32_t index, uint16_t offsetPixels);
 	void   ed2px(const fPOINT& editPoint, POINT& point);
 	fPOINT ed2stch(const fPOINT& point) noexcept;
 	void   ed2txp(const POINT& offset, TXPNT& textureRecord);
@@ -77,11 +77,11 @@ namespace internal {
 	bool   txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept;
 	void   txcntrv(const FRMHED& textureForm);
 	void   txdelal();
-	bool   txdig(unsigned keyCode, char& character) noexcept;
+	bool   txdig(uint32_t keyCode, char& character) noexcept;
 	void   txgro(const FRMHED& textureForm);
 	void   txhor();
-	bool   txnam(wchar_t* name, int sizeName);
-	void   txnudg(int deltaX, float deltaY);
+	bool   txnam(wchar_t* name, int32_t sizeName);
+	void   txnudg(int32_t deltaX, float deltaY);
 	void   txpar();
 	void   txrbak() noexcept;
 	void   txrct2rct(const TXTRCT& textureRect, RECT& rectangle);
@@ -89,11 +89,11 @@ namespace internal {
 	void   txshrnk(const FRMHED& textureForm);
 	void   txsiz(double ratio, const FRMHED& textureForm);
 	void   txt2pix(const TXPNT& texturePoint, POINT& screenPoint);
-	bool   txtclos(unsigned int& closestTexturePoint);
+	bool   txtclos(uint32_t& closestTexturePoint);
 	void   txtclp(FRMHED& textureForm);
 	void   txtdel();
 	void   txtlin();
-	void   txtxfn(const POINT& reference, unsigned short offsetPixels) noexcept;
+	void   txtxfn(const POINT& reference, uint16_t offsetPixels) noexcept;
 	void   txvrt();
 } // namespace internal
 } // namespace texture

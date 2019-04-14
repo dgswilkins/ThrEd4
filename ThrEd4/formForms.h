@@ -31,7 +31,7 @@ void dazdef();
 void dasyfrm();
 void frmnum();
 void maxtsiz(const std::wstring& label, POINT& textSize);
-auto maxwid(unsigned start, unsigned finish);
+auto maxwid(uint32_t start, uint32_t finish);
 void prfmsg();
 void prfsid(HWND wnd) noexcept;
 void refrm();
@@ -50,12 +50,12 @@ namespace internal {
 	inline void initTearDlg(HWND hwndlg);
 
 	HWND numwin(const std::wstring& winName, const RECT& location);
-	void nxtlin(unsigned& formMenuEntryCount) noexcept;
+	void nxtlin(uint32_t& formMenuEntryCount) noexcept;
 	void nxtlinprf() noexcept;
-	void prflin(const std::wstring& msg, unsigned row);
+	void prflin(const std::wstring& msg, uint32_t row);
 	HWND prfnwin(const std::wstring& text) noexcept;
 	void prftwin(const std::wstring& text) noexcept;
-	void refrmfn(unsigned& formMenuEntryCount);
+	void refrmfn(uint32_t& formMenuEntryCount);
 
 	bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
