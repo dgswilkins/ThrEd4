@@ -26,7 +26,7 @@ constexpr uint32_t DAZTYP  = 5u;  // border type
 constexpr uint32_t DAZMCNT = 7u;  // mirror count
 // end of daisy codes
 
-constexpr double   TXTRAT   = 0.95;        // texture fill clipboard shrink/grow ratio
+constexpr float    TXTRAT   = 0.95f;       // texture fill clipboard shrink/grow ratio
 constexpr uint32_t MAXMSK   = 0xffff0000u; // for checking for greater than 65536
 constexpr uint16_t DEFBPIX  = 4u;          // default form box pixels
 constexpr float    MAXWLK   = 54.0f;       // max underlay/edge walk stitch length
@@ -954,12 +954,12 @@ struct _iniFil {
 	COLORREF backgroundPreferredColors[COLOR_COUNT]; // background preference colors        NOLINT
 	COLORREF backgroundColor;                        // background color
 	COLORREF bitmapColor;                            // bitmap color
-	double   minStitchLength;                        // minimum stitch length
+	float    minStitchLength;                        // minimum stitch length
 	double   showStitchThreshold;                    // show stitch points
 	double   threadSize30;                           // millimeter size of 30 weight thread
 	double   threadSize40;                           // millimeter size of 40 weight thread
 	double   threadSize60;                           // millimeter size of 60 weight thread
-	double   userStitchLength;                       // user stitch length
+	float    userStitchLength;                       // user stitch length
 	float    maxStitchLength;                        // maximum stitch length
 	double   smallStitchLength;                      // small stitch size
 	double   stitchBoxesThreshold;                   // show sitch box level
@@ -2775,19 +2775,19 @@ using INTINF = struct _intinf;
 class TXTSCR
 {
 public:
-	int32_t  top {};                   // pixel top line
-	int32_t  bottom {};                // pixel bottom line
-	int32_t  height {};                // pixel height of area
-	int32_t  halfHeight {};            // pixel middle of area
-	float    xOffset { 0.0f };         // edit x offset of area
-	float    yOffset { 0.0f };         // edit y offset of area
-	float    areaHeight { 0.0f };      // edit height of area
-	float    screenHeight { 0.0f };    // edit height of screen
-	float    width { 0.0f };           // edit width of area
-	float    spacing { 0.0f };         // edit space between lines
-	uint16_t lines { 0 };              // number of lines
-	double   editToPixelRatio { 0.0 }; // edit to pixel ratio
-	fPOINT   formCenter;               // middle of the form
+	int32_t  top {};                    // pixel top line
+	int32_t  bottom {};                 // pixel bottom line
+	int32_t  height {};                 // pixel height of area
+	int32_t  halfHeight {};             // pixel middle of area
+	float    xOffset { 0.0f };          // edit x offset of area
+	float    yOffset { 0.0f };          // edit y offset of area
+	float    areaHeight { 0.0f };       // edit height of area
+	float    screenHeight { 0.0f };     // edit height of screen
+	float    width { 0.0f };            // edit width of area
+	float    spacing { 0.0f };          // edit space between lines
+	uint16_t lines { 0 };               // number of lines
+	float    editToPixelRatio { 0.0f }; // edit to pixel ratio
+	fPOINT   formCenter;                // middle of the form
 
 	constexpr TXTSCR() noexcept = default;
 };

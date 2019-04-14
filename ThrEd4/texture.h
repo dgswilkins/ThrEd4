@@ -77,7 +77,7 @@ namespace internal {
 	bool   txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept;
 	void   txcntrv(const FRMHED& textureForm);
 	void   txdelal();
-	bool   txdig(uint32_t keyCode, char& character) noexcept;
+	bool   txdig(uint32_t keyCode, char& character);
 	void   txgro(const FRMHED& textureForm);
 	void   txhor();
 	bool   txnam(wchar_t* name, int32_t sizeName);
@@ -87,7 +87,7 @@ namespace internal {
 	void   txrct2rct(const TXTRCT& textureRect, RECT& rectangle);
 	void   txrfor() noexcept;
 	void   txshrnk(const FRMHED& textureForm);
-	void   txsiz(double ratio, const FRMHED& textureForm);
+	void   txsiz(float ratio, const FRMHED& textureForm);
 	void   txt2pix(const TXPNT& texturePoint, POINT& screenPoint);
 	bool   txtclos(uint32_t& closestTexturePoint);
 	void   txtclp(FRMHED& textureForm);

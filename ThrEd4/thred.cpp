@@ -17736,7 +17736,7 @@ void thred::internal::redini() {
 		if (IniFile.threadSize60 != 0.0) {
 			ThreadSize60 = IniFile.threadSize60;
 		}
-		if (IniFile.userStitchLength != 0.0) {
+		if (IniFile.userStitchLength != 0.0f) {
 			UserStitchLength = IniFile.userStitchLength;
 		}
 		if (IniFile.maxStitchLength == 0.0) {
