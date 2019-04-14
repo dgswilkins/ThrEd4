@@ -856,15 +856,15 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
 			if (StateMap.test(StateFlag::FTHR)) {
 				auto vertex = vertexIt[line1Start % VertexCount];
-				BSequence->emplace_back(BSEQPNT{ vertex.x, vertex.y, 0 });
+				BSequence->emplace_back(BSEQPNT { vertex.x, vertex.y, 0 });
 			}
 			else {
 				if (StateMap.test(StateFlag::BARSAT)) {
 					if (VertexCount != 0u) {
 						auto vertex = vertexIt[line1Start % VertexCount];
-						BSequence->emplace_back(BSEQPNT{ vertex.x, vertex.y, 0 });
+						BSequence->emplace_back(BSEQPNT { vertex.x, vertex.y, 0 });
 						vertex = vertexIt[line2Start % VertexCount];
-						BSequence->emplace_back(BSEQPNT{ vertex.x, vertex.y, 0 });
+						BSequence->emplace_back(BSEQPNT { vertex.x, vertex.y, 0 });
 					}
 				}
 				else {
@@ -949,10 +949,10 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 					line2Point.x += line2Step.x;
 					line2Point.y += line2Step.y;
 					if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-						BSequence->emplace_back(BSEQPNT{ line1Point.x, line1Point.y, 0 });
+						BSequence->emplace_back(BSEQPNT { line1Point.x, line1Point.y, 0 });
 					}
 					else {
-						BSequence->emplace_back(BSEQPNT{ line2Point.x, line2Point.y, 1 });
+						BSequence->emplace_back(BSEQPNT { line2Point.x, line2Point.y, 1 });
 					}
 					line1Count--;
 					line2Count--;
@@ -966,12 +966,12 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 						line2Point.x += line2Step.x;
 						line2Point.y += line2Step.y;
 						if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-							BSequence->emplace_back(BSEQPNT{ line1Point.x, line1Point.y, 0 });
-							BSequence->emplace_back(BSEQPNT{ line2Point.x, line2Point.y, 1 });
+							BSequence->emplace_back(BSEQPNT { line1Point.x, line1Point.y, 0 });
+							BSequence->emplace_back(BSEQPNT { line2Point.x, line2Point.y, 1 });
 						}
 						else {
-							BSequence->emplace_back(BSEQPNT{ line2Point.x, line2Point.y, 2 });
-							BSequence->emplace_back(BSEQPNT{ line1Point.x, line1Point.y, 3 });
+							BSequence->emplace_back(BSEQPNT { line2Point.x, line2Point.y, 2 });
+							BSequence->emplace_back(BSEQPNT { line1Point.x, line1Point.y, 3 });
 						}
 						line1Count--;
 						line2Count--;

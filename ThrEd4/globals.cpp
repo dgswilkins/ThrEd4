@@ -95,8 +95,8 @@ DRAWITEMSTRUCT* DrawItem;             // for owner-draw windows
 POINT           EndPointCross;        // point to draw at the end cross for form select points
 HMENU           FillMenu;             // fill submenu
 
-std::vector<float>*  FormAngles;        // angles of a form for satin border fills
-std::vector<POINT>*  FormControlPoints; // form control rectangle in pixel coordinates
+std::vector<float>* FormAngles;        // angles of a form for satin border fills
+std::vector<POINT>* FormControlPoints; // form control rectangle in pixel coordinates
 
 HWND                 FormDataSheet = nullptr; // form data sheet
 std::vector<POINT>*  FormLines;               // used in the form drawing routines

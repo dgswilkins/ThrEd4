@@ -71,14 +71,10 @@ namespace internal {
 	           const std::vector<float>& ListCOSINEs,
 	           fPOINT&                   moveToCoords,
 	           unsigned                  currentSide);
-	void fxlit(const std::vector<float>& listSINEs,
-	           const std::vector<float>& listCOSINEs,
-	           fPOINT&                    moveToCoords,
-	           unsigned                   currentSide);
-	bool fxpnt(const std::vector<float>& listSINEs,
-	           const std::vector<float>& listCOSINEs,
-	           fPOINT&                    moveToCoords,
-	           unsigned                   currentSide);
+	void
+	fxlit(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, unsigned currentSide);
+	bool
+	     fxpnt(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, unsigned currentSide);
 	void lincrnr(const std::vector<fPOINT>& clipReversedData,
 	             std::vector<fPOINT>&       clipFillData,
 	             double                     clipAngle,

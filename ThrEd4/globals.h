@@ -126,8 +126,8 @@ extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
 extern HMENU           FillMenu;
 
-extern std::vector<float>*  FormAngles;
-extern std::vector<POINT>*  FormControlPoints;
+extern std::vector<float>* FormAngles;
+extern std::vector<POINT>* FormControlPoints;
 
 extern HWND FormDataSheet;
 
@@ -152,7 +152,7 @@ extern unsigned  GroupStartStitch;
 extern unsigned  GroupStitchIndex;
 extern fs::path* HomeDirectory;
 extern double    HorizontalLength;
-extern float    HorizontalLength2;
+extern float     HorizontalLength2;
 extern float     HorizontalRatio;
 extern HWND      HorizontalScrollBar;
 extern INIFILE   IniFile;
@@ -279,13 +279,13 @@ extern HWND     UserColorWin[16];
 
 extern EnumMap<UserFlag> UserFlagMap;
 
-extern HPEN   UserPen[16];
-extern float  UserStitchLength;
+extern HPEN  UserPen[16];
+extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
 extern unsigned int VertexCount;
-extern float       VerticalRatio;
+extern float        VerticalRatio;
 extern HWND         VerticalScrollBar;
 extern fs::path*    WorkingFileName;
 extern POINT        ZoomBoxLine[5];

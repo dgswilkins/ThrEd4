@@ -105,13 +105,10 @@ namespace internal {
 
 	unsigned long long bufTou64(wchar_t* buffer);
 
-	void     centr();
-	void     chk1col();
-	bool     chkMsg(std::vector<POINT>& stretchBoxLine,
-	                float&              xyRatio,
-	                float&              rotationAngle,
-	                fPOINT&             rotationCenter,
-	                FRMHED&             textureForm);
+	void centr();
+	void chk1col();
+	bool
+	         chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& rotationAngle, fPOINT& rotationCenter, FRMHED& textureForm);
 	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
 	bool     chkattr(const fs::path& filename);
 	bool     chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio);

@@ -1959,8 +1959,8 @@ void thred::internal::movins() {
 }
 
 void thred::zumhom() {
-	ZoomRect = fRECTANGLE{ gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
-	ZoomFactor      = 1;
+	ZoomRect   = fRECTANGLE { gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
+	ZoomFactor = 1;
 	StateMap.reset(StateFlag::ZUMED);
 	thred::movStch();
 	NearestCount = 0;
@@ -2532,8 +2532,8 @@ void thred::internal::chknum() {
 						if (StateMap.testAndReset(StateFlag::ENTRSTAR)) {
 							thred::savdo();
 							form::dustar(uintValue,
-							             250.0f / gsl::narrow<float>(value) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
-							                 / (LHUPX + LHUPY));
+							             250.0f / gsl::narrow<float>(value) * ZoomFactor
+							                 * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 							break;
 						}
 						if (StateMap.testAndReset(StateFlag::ENTRSPIR)) {
@@ -5777,7 +5777,7 @@ void thred::internal::nuFil() {
 						return;
 					}
 					}
-					ZoomRect = fRECTANGLE{ IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
+					ZoomRect              = fRECTANGLE { IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
 					UnzoomedRect          = { wrap::round<long>(IniFile.hoopSizeX), wrap::round<long>(IniFile.hoopSizeY) };
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					auto stitchesRead     = DWORD { 0 };
@@ -6236,7 +6236,8 @@ COLORREF thred::internal::nuBit() noexcept {
 }
 
 void thred::pxCor2stch(const POINT& point) noexcept {
-	auto ratio      = gsl::narrow_cast<float>(point.x - StitchWindowAbsRect.left) / gsl::narrow_cast<float>(StitchWindowClientRect.right);
+	auto ratio
+	    = gsl::narrow_cast<float>(point.x - StitchWindowAbsRect.left) / gsl::narrow_cast<float>(StitchWindowClientRect.right);
 	SelectedPoint.x = ratio * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 	ratio           = (gsl::narrow_cast<double>(StitchWindowAbsRect.bottom) - point.y) / StitchWindowClientRect.bottom;
 	SelectedPoint.y = ratio * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
@@ -6245,7 +6246,8 @@ void thred::pxCor2stch(const POINT& point) noexcept {
 bool thred::px2stch() noexcept {
 	if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right && Msg.pt.y >= StitchWindowAbsRect.top
 	    && Msg.pt.y <= StitchWindowAbsRect.bottom) {
-		auto tdub       = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) / gsl::narrow_cast<float>(StitchWindowClientRect.right);
+		auto tdub = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowAbsRect.left)
+		            / gsl::narrow_cast<float>(StitchWindowClientRect.right);
 		SelectedPoint.x = tdub * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 		tdub            = (gsl::narrow_cast<double>(StitchWindowAbsRect.bottom) - Msg.pt.y) / StitchWindowClientRect.bottom;
 		SelectedPoint.y = tdub * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
@@ -6341,7 +6343,7 @@ void thred::internal::zumin() {
 		} while (false);
 	}
 	const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-	ZoomRect             = fRECTANGLE{ zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
+	ZoomRect             = fRECTANGLE { zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX)) {
@@ -6416,7 +6418,7 @@ void thred::internal::zumout() {
 		if (ZoomFactor > 0.98) {
 			ZoomFactor = 1;
 			StateMap.reset(StateFlag::ZUMED);
-			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x),0.0f };
+			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x), 0.0f };
 			thred::movStch();
 			NearestCount = 0;
 		}
@@ -11983,9 +11985,9 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, unsigned currentSti
 					                                - (activeStitch[iOffset - 1].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 			else {
-				linePoints[0]
-				    = { wrap::round<long>((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
-					    wrap::round<long>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom) - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
+				linePoints[0] = { wrap::round<long>((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
+					              wrap::round<long>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom)
+					                                - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 		}
 	}
@@ -12642,7 +12644,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 			zumin();
 			return true;
 		}
-		ZoomRect = fRECTANGLE{ newSize.y, 0.0f, newSize.x, 0.0f };
+		ZoomRect = fRECTANGLE { newSize.y, 0.0f, newSize.x, 0.0f };
 		thred::shft(SelectedPoint);
 		StateMap.reset(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::RESTCH);
@@ -18306,16 +18308,14 @@ void thred::internal::dugrid() {
 		gridLine[0].x          = 0;
 		gridLine[1].x          = StitchWindowClientRect.right;
 		for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; iGrid++) {
-			gridLine[0].y = gridLine[1].y
-			    = wrap::round<long>(StitchWindowClientRect.bottom
-			                        - (iGrid * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+			gridLine[0].y = gridLine[1].y = wrap::round<long>(
+			    StitchWindowClientRect.bottom - (iGrid * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
 		for (auto iGrid = gridRect.left; iGrid <= gridRect.right; iGrid++) {
-			gridLine[0].x = gridLine[1].x
-			    = wrap::round<long>((iGrid * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5f);
+			gridLine[0].x = gridLine[1].x = wrap::round<long>((iGrid * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5f);
 			Polyline(StitchWindowMemDC, gridLine, 2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -18528,8 +18528,9 @@ void thred::internal::drwStch() {
 								if (StateMap.testAndReset(StateFlag::LININ)) {
 									linePoints[LineIndex++]
 									    = { wrap::round<long>((currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
-										    wrap::round<long>(
-										        maxYcoord - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f) };
+										    wrap::round<long>(maxYcoord
+										                      - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y
+										                      + 0.5f) };
 									wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 									LineIndex = 0;
 								}
@@ -18545,13 +18546,13 @@ void thred::internal::drwStch() {
 											// does the line intersect with the top of the screen?
 											auto gapToEdge = offset - slope * ZoomRect.top;
 											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-												stitchLine[0]
-												    = { wrap::round<long>(
-													        (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
-													    wrap::round<long>(maxYcoord
-													                      - (currentStitches[iStitch - 1].y - ZoomRect.bottom)
-													                            * ZoomRatio.x
-													                      + 0.5f) };
+												stitchLine[0] = {
+													wrap::round<long>(
+													    (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
+													wrap::round<long>(
+													    maxYcoord
+													    - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.x + 0.5f)
+												};
 												stitchLine[1]
 												    = { wrap::round<long>(
 													        (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
@@ -18565,13 +18566,13 @@ void thred::internal::drwStch() {
 											// does the line intersect the bottom of the screen?
 											gapToEdge = offset - slope * ZoomRect.bottom;
 											if (gapToEdge >= ZoomRect.left && gapToEdge <= ZoomRect.right) {
-												stitchLine[0]
-												    = { wrap::round<long>(
-													        (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
-													    wrap::round<long>(maxYcoord
-													                      - (currentStitches[iStitch - 1].y - ZoomRect.bottom)
-													                            * ZoomRatio.y
-													                      + 0.5f) };
+												stitchLine[0] = {
+													wrap::round<long>(
+													    (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
+													wrap::round<long>(
+													    maxYcoord
+													    - (currentStitches[iStitch - 1].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)
+												};
 												stitchLine[1]
 												    = { wrap::round<long>(
 													        (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
@@ -18586,21 +18587,21 @@ void thred::internal::drwStch() {
 											if (slope != 0.0) {
 												gapToEdge = (offset - ZoomRect.left) / slope;
 												if (gapToEdge >= ZoomRect.bottom && gapToEdge <= ZoomRect.top) {
-													stitchLine[0] = {
-														wrap::round<long>(
-														    (currentStitches[iStitch - 1].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
-														wrap::round<long>(maxYcoord
-														                  - (currentStitches[iStitch - 1].y - ZoomRect.bottom)
-														                        * ZoomRatio.y
-														                  + 0.5f)
-													};
-													stitchLine[1]
-													    = { wrap::round<long>(
-														        (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
+													stitchLine[0]
+													    = { wrap::round<long>((currentStitches[iStitch - 1].x - ZoomRect.left)
+														                          * ZoomRatio.x
+														                      + 0.5f),
 														    wrap::round<long>(maxYcoord
-														                      - (currentStitches[iStitch].y - ZoomRect.bottom)
+														                      - (currentStitches[iStitch - 1].y - ZoomRect.bottom)
 														                            * ZoomRatio.y
 														                      + 0.5f) };
+													stitchLine[1] = {
+														wrap::round<long>(
+														    (currentStitches[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f),
+														wrap::round<long>(
+														    maxYcoord
+														    - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)
+													};
 													Polyline(StitchWindowMemDC, stitchLine, 2);
 												}
 											}

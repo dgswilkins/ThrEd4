@@ -73,7 +73,7 @@ HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& loc
 		formForms::maxtsiz(windowName, LabelWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",// NOLINT
+	return CreateWindow(L"STATIC", // NOLINT
 	                    windowName.c_str(),
 	                    SS_NOTIFY | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -91,7 +91,7 @@ HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& locat
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",// NOLINT
+	return CreateWindow(L"STATIC", // NOLINT
 	                    winName.c_str(),
 	                    SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -109,7 +109,7 @@ HWND formForms::internal::numwin(const std::wstring& winName, const RECT& locati
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
 	}
-	return CreateWindow(L"STATIC",// NOLINT
+	return CreateWindow(L"STATIC", // NOLINT
 	                    winName.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    location.left,
@@ -488,7 +488,7 @@ void formForms::refrm() {
 	if (FormDataSheet != nullptr) {
 		DestroyWindow(FormDataSheet);
 	}
-	FormDataSheet = CreateWindow(L"STATIC",// NOLINT
+	FormDataSheet = CreateWindow(L"STATIC", // NOLINT
 	                             nullptr,
 	                             WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 3,
@@ -513,7 +513,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 	FormMenuChoice = savedChoice;
 	GetWindowRect(wnd, &windowRect);
 	GetWindowRect(FormDataSheet, &MsgRect);
-	SideMessageWindow = CreateWindow(L"STATIC",// NOLINT
+	SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 MsgRect.right - ThredWindowOrigin.x + 3,
@@ -534,7 +534,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 	thred::unsid();
 	GetWindowRect(wnd, &windowRect);
 	GetClientRect(PreferencesWindow, &MsgRect);
-	SideMessageWindow = CreateWindow(L"STATIC",// NOLINT
+	SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
 	                                 nullptr,
 	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                 windowRect.right - ThredWindowOrigin.x + 6,
@@ -548,7 +548,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
-	CreateWindow(L"STATIC",// NOLINT
+	CreateWindow(L"STATIC", // NOLINT
 	             text.c_str(),
 	             WS_CHILD | WS_VISIBLE,
 	             LabelWindowCoords.left,
@@ -562,7 +562,7 @@ void formForms::internal::prftwin(const std::wstring& text) noexcept {
 }
 
 HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
-	return CreateWindow(L"STATIC",// NOLINT
+	return CreateWindow(L"STATIC", // NOLINT
 	                    text.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                    ValueWindowCoords.left,
@@ -603,7 +603,7 @@ void formForms::prfmsg() {
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
 	const auto windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-	PreferencesWindow      = CreateWindow(L"STATIC",// NOLINT
+	PreferencesWindow      = CreateWindow(L"STATIC", // NOLINT
                                      nullptr,
                                      WS_CHILD | WS_VISIBLE | WS_BORDER,
                                      ButtonWidthX3 + 3,
@@ -744,7 +744,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	for (const auto DaisyTypeString : DaisyTypeStrings) {
 		displayText::loadString(daisyType, DaisyTypeString);
 		GSL_SUPPRESS(26490)
-		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str()));// NOLINT
+		SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT
 	}
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -752,14 +752,14 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {// NOLINT
+	switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::initdaz(hwndlg);
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {// NOLINT
+		switch (LOWORD(wparam)) { // NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
@@ -937,9 +937,7 @@ void formForms::dasyfrm() {
 				}
 				break;
 			}
-			default: {
-				throw;
-			}
+			default: { throw; }
 			}
 			FormVertices->push_back(fPOINT { referencePoint.x + cos(angle) * distanceFromDaisyCenter,
 			                                 referencePoint.y + sin(angle) * distanceFromDaisyCenter });
@@ -985,7 +983,7 @@ inline void formForms::internal::initTearDlg(HWND hwndlg) {
 bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {// NOLINT
+	switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
@@ -1009,7 +1007,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {// NOLINT
+		switch (LOWORD(wparam)) { // NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
@@ -1051,7 +1049,8 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
 	thred::unmsg();
-	const auto nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));// NOLINT
+	const auto nResult
+	    = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT
 	if (nResult > 0) {
 		thred::savdo();
 		auto twistStep = IniFile.tearTwistStep;
@@ -1130,14 +1129,14 @@ inline void formForms::internal::wavinit(HWND hwndlg) {
 bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
 	UNREFERENCED_PARAMETER(lparam);
 
-	switch (umsg) {// NOLINT
+	switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		ffi::wavinit(hwndlg);
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {// NOLINT
+		switch (LOWORD(wparam)) { // NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
@@ -1182,7 +1181,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
 	thred::unmsg();
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) {// NOLINT
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { // NOLINT
 		thred::savdo();
 		auto points = std::vector<fPOINT> {};
 		points.reserve(IniFile.wavePoints);

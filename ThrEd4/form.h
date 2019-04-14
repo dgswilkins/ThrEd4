@@ -399,32 +399,32 @@ namespace internal {
 
 	double p2p(const fPOINT& point0, const fPOINT& point1) noexcept;
 
-	void pbrd(float edgeSpacing);
-	void pfn(const std::vector<VRCT2>& underlayVerticalRect,
-	         const std::vector<VRCT2>& fillVerticalRect,
-	         unsigned int              startVertex,
-	         const std::vector<VRCT2>& vrct);
-	void plbak(unsigned int backPoint);
-	void plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
-	void plfn(const std::vector<VRCT2>& underlayVerticalRect,
-	          const std::vector<VRCT2>& fillVerticalRect,
-	          const std::vector<VRCT2>& prct);
-	void prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
-	bool proj(const fPOINT& point, float slope, const fPOINT& point0, const fPOINT& point1, fPOINT& intersectionPoint) noexcept;
-	bool projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept;
-	bool projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept;
-	void prpsbrd();
-	void prsmal();
-	void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
-	void rats();
-	bool regclos(std::vector<unsigned>&        groupIndexSequence,
-	             std::vector<SMALPNTL>&        lineEndpoints,
-	             const std::vector<SMALPNTL*>& sortedLines,
-	             unsigned                      iRegion0,
-	             unsigned                      iRegion1,
-	             const std::vector<REGION>&    regionsList,
-	             double                        gapToClosestRegion,
-	             unsigned&                     nextGroup);
+	void   pbrd(float edgeSpacing);
+	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
+	           const std::vector<VRCT2>& fillVerticalRect,
+	           unsigned int              startVertex,
+	           const std::vector<VRCT2>& vrct);
+	void   plbak(unsigned int backPoint);
+	void   plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	void   plfn(const std::vector<VRCT2>& underlayVerticalRect,
+	            const std::vector<VRCT2>& fillVerticalRect,
+	            const std::vector<VRCT2>& prct);
+	void   prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	bool   proj(const fPOINT& point, float slope, const fPOINT& point0, const fPOINT& point1, fPOINT& intersectionPoint) noexcept;
+	bool   projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept;
+	bool   projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept;
+	void   prpsbrd();
+	void   prsmal();
+	void   px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
+	void   rats();
+	bool   regclos(std::vector<unsigned>&        groupIndexSequence,
+	               std::vector<SMALPNTL>&        lineEndpoints,
+	               const std::vector<SMALPNTL*>& sortedLines,
+	               unsigned                      iRegion0,
+	               unsigned                      iRegion1,
+	               const std::vector<REGION>&    regionsList,
+	               double                        gapToClosestRegion,
+	               unsigned&                     nextGroup);
 	double reglen(const std::vector<SMALPNTL*>& sortedLines,
 	              unsigned                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,

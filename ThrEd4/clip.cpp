@@ -421,7 +421,7 @@ void clip::clpbrd(unsigned int startVertex) {
 	if (SelectedForm->type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		SelectedPoint  = vertexIt[0];
-		auto clipAngle = 0.0f;       // for clipboard border fill
+		auto clipAngle = 0.0f;      // for clipboard border fill
 		auto vector0   = fPOINT {}; // x size of the clipboard fill at the fill angle
 		ci::setvct(0, 1, clipAngle, vector0);
 		// Since ClipRect.bottom is always 0
@@ -454,8 +454,8 @@ void clip::clpbrd(unsigned int startVertex) {
 
 bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
                            const std::vector<float>& listCOSINEs,
-                           fPOINT&                    moveToCoords,
-                           unsigned                   currentSide) {
+                           fPOINT&                   moveToCoords,
+                           unsigned                  currentSide) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	moveToCoords  = vertexIt[NextStart];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
@@ -476,8 +476,8 @@ bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
 
 void clip::internal::fxlit(const std::vector<float>& listSINEs,
                            const std::vector<float>& listCOSINEs,
-                           fPOINT&                    moveToCoords,
-                           unsigned                   currentSide) {
+                           fPOINT&                   moveToCoords,
+                           unsigned                  currentSide) {
 	if (ci::fxpnt(listSINEs, listCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		BeanCount++;
@@ -491,11 +491,11 @@ void clip::internal::fxlit(const std::vector<float>& listSINEs,
 	}
 }
 
-void clip::internal::fxlin(std::vector<fPOINT>&       chainEndPoints,
-                           const std::vector<float>&  ListSINEs,
-                           const std::vector<float>&  ListCOSINEs,
-                           fPOINT&                    moveToCoords,
-                           unsigned                   currentSide) {
+void clip::internal::fxlin(std::vector<fPOINT>&      chainEndPoints,
+                           const std::vector<float>& ListSINEs,
+                           const std::vector<float>& ListCOSINEs,
+                           fPOINT&                   moveToCoords,
+                           unsigned                  currentSide) {
 	if (ci::fxpnt(ListSINEs, ListCOSINEs, moveToCoords, currentSide)) {
 		SelectedPoint = moveToCoords;
 		chainEndPoints.push_back(SelectedPoint);

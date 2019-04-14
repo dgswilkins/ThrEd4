@@ -39,9 +39,9 @@ constexpr uint16_t IWAVEND  = 26u;         // default wave end
 constexpr uint16_t IWAVS    = 5u;          // default wave lobes
 constexpr uint32_t THRLED0  = 0x746872u;   // lead dword value for thred file v 1.0
 constexpr uint32_t THRLED1  = 0x1746872u;  // lead dword value for thred file v 1.1
-constexpr float    ZUMFCT   = 0.65f;        // zoom factor
-constexpr float    PAGSCROL = 0.9f;         // page scroll factor
-constexpr float    LINSCROL = 0.05f;        // line scroll factor
+constexpr float    ZUMFCT   = 0.65f;       // zoom factor
+constexpr float    PAGSCROL = 0.9f;        // page scroll factor
+constexpr float    LINSCROL = 0.05f;       // line scroll factor
 constexpr uint32_t TXTSIDS  = 6u;          // extra pixels in a text box
 constexpr uint32_t MAXITEMS = 0x10000u;    // maximum number of stitches, sequence items & clipboard points
 constexpr uint32_t MAXCHNG  = 10000u;      // maximum number of color changes
@@ -85,10 +85,10 @@ constexpr double   USPAC      = 15.0;              // underlay fill spacing
 constexpr float    APSPAC     = 10.8f;             // applique border spacing
 constexpr uint32_t OSEQLEN    = 0x40000u;          // output sequence length
 constexpr uint32_t BSEQLEN    = OSEQLEN << 1u;     // reverse sequence length
-constexpr float   URAT       = 0.75f;              // ratio of underlay stitch to satin border size
+constexpr float    URAT       = 0.75f;             // ratio of underlay stitch to satin border size
 constexpr double   PURAT      = 0.6;               // for proportional satin corners
 
-constexpr float DIURAT = (1.0f - URAT) / 2.0f;       //(1-URAT)/2
+constexpr float DIURAT = (1.0f - URAT) / 2.0f;        //(1-URAT)/2
 constexpr float DOURAT = (1.0f - URAT) / 2.0f + URAT; //(1-URAT)/2+URAT
 
 constexpr float    MINRCT    = 12.0f;           // minimum dimension of a form select rectangle
@@ -1110,8 +1110,8 @@ class SMALPNTL
 public:
 	uint32_t line; // line and group must remain in this order for sort to work
 	uint32_t group;
-	float   x;
-	float   y;
+	float    x;
+	float    y;
 };
 
 class BSEQPNT
@@ -1139,7 +1139,9 @@ inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
 	attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 
-inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
+inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr)
+    : x(rhsX)
+    , y(rhsY) {
 	attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 #pragma warning(pop)

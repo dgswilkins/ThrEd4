@@ -432,9 +432,9 @@ void form::internal::frmsqr(unsigned iVertex) {
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	thred::stch2pxr(vertexIt[iVertex]);
-	line[1] = StitchCoordinatesPixels;
-	const auto ratio
-	    = gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, gsl::narrow<int32_t>(*screenDPI), 96)) / StitchWindowClientRect.right;
+	line[1]          = StitchCoordinatesPixels;
+	const auto ratio = gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, gsl::narrow<int32_t>(*screenDPI), 96))
+	                   / StitchWindowClientRect.right;
 	auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0f;
 	const auto delta  = fPOINT { vertexIt[iVertex - 1].x - vertexIt[iVertex].x, vertexIt[iVertex - 1].y - vertexIt[iVertex].y };
 	auto       angle  = atan2(delta.y, delta.x);
@@ -645,7 +645,8 @@ void form::unpsel() {
 void form::sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	screenRect.left  = wrap::round<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x + 0.5f);
 	screenRect.right = wrap::round<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x + 0.5f);
-	screenRect.top = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+	screenRect.top
+	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 	screenRect.bottom
 	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 }
@@ -862,8 +863,8 @@ void form::durpoli(unsigned vertexCount) {
 	}
 	const auto stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(vertexCount);
 	// ToDo - why 500?
-	const auto length = 500.0f / gsl::narrow_cast<float>(vertexCount) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
-	                    / (LHUPX + LHUPY);
+	const auto length = 500.0f / gsl::narrow_cast<float>(vertexCount) * ZoomFactor
+	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto newForm        = FRMHED {};
 	newForm.vertexIndex = thred::adflt(vertexCount);
 	newForm.vertexCount = vertexCount;
@@ -1556,10 +1557,7 @@ void form::duangs() {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-bool form::internal::projv(float        xCoordinate,
-                           const fPOINT& lowerPoint,
-                           const fPOINT& upperPoint,
-                           fPOINT&       intersection) noexcept {
+bool form::internal::projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept {
 	const auto deltaX = upperPoint.x - lowerPoint.x;
 
 	intersection.x = xCoordinate;
@@ -1895,14 +1893,14 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, unsigned 
 	auto       finishDelta = fPOINT {};
 
 	if (outerLength > innerLength) {
-		pivot = fillVerticalRect[start].cipnt;
+		pivot         = fillVerticalRect[start].cipnt;
 		startDelta.x  = fillVerticalRect[start].copnt.x - pivot.x;
 		startDelta.y  = fillVerticalRect[start].copnt.y - pivot.y;
 		finishDelta.x = fillVerticalRect[finish].bopnt.x - pivot.x;
 		finishDelta.y = fillVerticalRect[finish].bopnt.y - pivot.y;
 	}
 	else {
-		pivot = fillVerticalRect[start].copnt;
+		pivot         = fillVerticalRect[start].copnt;
 		startDelta.x  = fillVerticalRect[start].cipnt.x - pivot.x;
 		startDelta.y  = fillVerticalRect[start].cipnt.y - pivot.y;
 		finishDelta.x = fillVerticalRect[finish].bipnt.x - pivot.x;
@@ -2084,7 +2082,7 @@ void form::internal::bhfn(unsigned int start, unsigned int finish, double spacin
 	auto       innerPoint = fPOINT { vertexIt[start].x, vertexIt[start].y };
 
 	const auto rotationAngle = atan2(-delta.x, delta.y);
-	const auto   outerStep
+	const auto outerStep
 	    = fPOINT { SelectedForm->borderSize * cos(rotationAngle), SelectedForm->borderSize * sin(rotationAngle) };
 	if (count != 0u) {
 		for (auto iStep = 0u; iStep < count - 1; iStep++) {
@@ -3854,12 +3852,12 @@ void form::internal::duseq1(const SMALPNTL* sequenceLines) {
 void form::internal::movseq(const std::vector<SMALPNTL*>& sortedLines, unsigned int ind) {
 	auto lineEndPoint = sortedLines[ind];
 
-	BSequence->emplace_back(BSEQPNT{ lineEndPoint->x, lineEndPoint->y, SEQBOT });
+	BSequence->emplace_back(BSEQPNT { lineEndPoint->x, lineEndPoint->y, SEQBOT });
 	OutputIndex++;
 	// Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
 	//             and not the next entry in sortedLines
 	lineEndPoint++;
-	BSequence->emplace_back(BSEQPNT{ lineEndPoint->x, lineEndPoint->y, SEQTOP });
+	BSequence->emplace_back(BSEQPNT { lineEndPoint->x, lineEndPoint->y, SEQTOP });
 	OutputIndex++;
 }
 
@@ -4434,8 +4432,8 @@ void form::internal::lcon(std::vector<unsigned>& groupIndexSequence, std::vector
 			auto count = 0xffffffffu;
 			sequencePath.reserve(sequencePathIndex);
 			for (auto iPath = 0u; iPath < sequencePathIndex; iPath++) {
-				const bool     tmpSkip = tempPath[iPath].skp;
-				uint16_t tmpNode = 0u;
+				const bool tmpSkip = tempPath[iPath].skp;
+				uint16_t   tmpNode = 0u;
 				if (tempPath[iPath].pcon == 0xffffffff) {
 					tmpNode = gsl::narrow<decltype(tmpNode)>(tempPath[iPath].count);
 					count   = tempPath[iPath].count;
@@ -4527,7 +4525,8 @@ void form::internal::bakseq() {
 					OSequence->push_back(fPOINT { bPrevious.x, bPrevious.y });
 					auto count = ceil(bCurrent.y / UserStitchLength);
 					do {
-						OSequence->push_back(fPOINT { 0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
+						OSequence->push_back(fPOINT {
+						    0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
 						if (OSequence->back().y > bCurrent.y) {
 							break;
 						}
@@ -4541,8 +4540,9 @@ void form::internal::bakseq() {
 					OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
 					auto count = wrap::floor<uint32_t>(bCurrent.y / UserStitchLength);
 					do {
-						OSequence->push_back(
-						    fPOINT { 0.0f, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
+						OSequence->push_back(fPOINT {
+						    0.0f,
+						    count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
 						if (OSequence->back().y < bPrevious.y) {
 							break;
 						}
@@ -4556,7 +4556,8 @@ void form::internal::bakseq() {
 			else {
 				auto count = wrap::ceil<uint32_t>(bNext.y / UserStitchLength);
 				do {
-					OSequence->push_back(fPOINT { 0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
+					OSequence->push_back(fPOINT {
+					    0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
 					if (OSequence->back().y > bCurrent.y) {
 						break;
 					}
@@ -4573,8 +4574,8 @@ void form::internal::bakseq() {
 			if ((SelectedForm->extendedAttribute & AT_SQR) == 0u) {
 				auto count = wrap::floor<uint32_t>(bNext.y / UserStitchLength);
 				do {
-					OSequence->push_back(
-					    fPOINT { 0.0f, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
+					OSequence->push_back(fPOINT {
+					    0.0f, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
 					if (OSequence->back().y < bCurrent.y) {
 						break;
 					}
@@ -5251,7 +5252,8 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 }
 
 void form::rstfrm() {
-	const auto point = POINT { (Msg.pt.x + wrap::round<int32_t>(FormMoveDelta.x)), (Msg.pt.y + wrap::round<int32_t>(FormMoveDelta.y)) };
+	const auto point
+	    = POINT { (Msg.pt.x + wrap::round<int32_t>(FormMoveDelta.x)), (Msg.pt.y + wrap::round<int32_t>(FormMoveDelta.y)) };
 	const auto attribute = ClosestFormToCursor << 4u;
 
 	form::setmfrm();
@@ -5918,8 +5920,8 @@ void form::selal() {
 	StateMap.reset(StateFlag::SELBOX);
 	StateMap.reset(StateFlag::GRPSEL);
 	fi::getbig();
-	ZoomRect = fRECTANGLE{ gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
-	ZoomFactor      = 1;
+	ZoomRect   = fRECTANGLE { gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
+	ZoomFactor = 1;
 	StateMap.reset(StateFlag::ZUMED);
 	thred::movStch();
 	NearestCount = 0;
@@ -5959,15 +5961,13 @@ void form::setstrtch() {
 		}
 		else {
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				reference = SelectedForm->rectangle.bottom;
-				ratio     = (SelectedPoint.y - reference)
-				        / (SelectedForm->rectangle.top - reference);
+				reference                   = SelectedForm->rectangle.bottom;
+				ratio                       = (SelectedPoint.y - reference) / (SelectedForm->rectangle.top - reference);
 				SelectedForm->rectangle.top = SelectedPoint.y;
 			}
 			else {
 				reference = StitchRangeRect.bottom;
-				ratio     = (SelectedPoint.y - reference)
-				        / (StitchRangeRect.top - reference);
+				ratio     = (SelectedPoint.y - reference) / (StitchRangeRect.top - reference);
 			}
 		}
 		break;
@@ -5981,15 +5981,13 @@ void form::setstrtch() {
 		}
 		else {
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				reference = SelectedForm->rectangle.left;
-				ratio     = (SelectedPoint.x - reference)
-				        / (SelectedForm->rectangle.right - reference);
+				reference                     = SelectedForm->rectangle.left;
+				ratio                         = (SelectedPoint.x - reference) / (SelectedForm->rectangle.right - reference);
 				SelectedForm->rectangle.right = SelectedPoint.x;
 			}
 			else {
 				reference = StitchRangeRect.left;
-				ratio     = (SelectedPoint.x - reference)
-				        / (StitchRangeRect.right - reference);
+				ratio     = (SelectedPoint.x - reference) / (StitchRangeRect.right - reference);
 			}
 		}
 		break;
@@ -6003,15 +6001,13 @@ void form::setstrtch() {
 		}
 		else {
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				reference = SelectedForm->rectangle.top;
-				ratio     = (SelectedPoint.y - reference)
-				        / (SelectedForm->rectangle.bottom - reference);
+				reference                      = SelectedForm->rectangle.top;
+				ratio                          = (SelectedPoint.y - reference) / (SelectedForm->rectangle.bottom - reference);
 				SelectedForm->rectangle.bottom = SelectedPoint.y;
 			}
 			else {
 				reference = StitchRangeRect.top;
-				ratio     = (SelectedPoint.y - reference)
-				        / (StitchRangeRect.bottom - reference);
+				ratio     = (SelectedPoint.y - reference) / (StitchRangeRect.bottom - reference);
 			}
 		}
 		break;
@@ -6025,15 +6021,13 @@ void form::setstrtch() {
 		}
 		else {
 			if (StateMap.test(StateFlag::FORMSEL)) {
-				reference = SelectedForm->rectangle.right;
-				ratio     = (SelectedPoint.x - reference)
-				        / (SelectedForm->rectangle.left - reference);
+				reference                    = SelectedForm->rectangle.right;
+				ratio                        = (SelectedPoint.x - reference) / (SelectedForm->rectangle.left - reference);
 				SelectedForm->rectangle.left = SelectedPoint.x;
 			}
 			else {
 				reference = StitchRangeRect.right;
-				ratio     = (SelectedPoint.x - reference)
-				        / (StitchRangeRect.left - reference);
+				ratio     = (SelectedPoint.x - reference) / (StitchRangeRect.left - reference);
 			}
 		}
 		break;
@@ -6276,7 +6270,7 @@ void form::setexpand(float xyRatio) {
 		break;
 	}
 	default: {
-		throw; //we should never reach here
+		throw; // we should never reach here
 	}
 	}
 	const auto integerReference = POINT { wrap::round<int32_t>(reference.x), wrap::round<int32_t>(reference.y) };
@@ -6505,8 +6499,8 @@ void form::duspir(unsigned stepCount) {
 	}
 	const auto stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(stepCount);
 	// ToDo - Why 800?
-	const auto length = 800.0f / gsl::narrow_cast<float>(stepCount) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
-	                    / (LHUPX + LHUPY);
+	const auto length = 800.0f / gsl::narrow_cast<float>(stepCount) * ZoomFactor
+	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto newForm        = FRMHED {};
 	auto vertexCount    = wrap::round<uint32_t>(gsl::narrow_cast<float>(stepCount) * SpiralWrap);
 	newForm.vertexIndex = thred::adflt(vertexCount);
@@ -6569,8 +6563,8 @@ void form::duhart(unsigned sideCount) {
 	thred::px2stch();
 	auto       point     = SelectedPoint;
 	auto       stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(sideCount);
-	const auto length    = 300.0f / gsl::narrow_cast<float>(sideCount) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
-	                    / (LHUPX + LHUPY);
+	const auto length    = 300.0f / gsl::narrow_cast<float>(sideCount) * ZoomFactor
+	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto angle    = PI_F * 0.28f;
 	auto iVertex  = 0u;
 	auto maximumX = 0.0f;
@@ -6631,8 +6625,8 @@ void form::dulens(unsigned sides) {
 	const auto stepAngle = PI_F * 2.0f / steps;
 	auto       count     = wrap::round<uint32_t>(steps / 2.0f * 0.3f);
 	auto       angle     = count * stepAngle;
-	const auto length    = 500.0f / gsl::narrow_cast<float>(steps) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y)
-	                    / (LHUPX + LHUPY);
+	const auto length    = 500.0f / gsl::narrow_cast<float>(steps) * ZoomFactor
+	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	FormList->push_back(FRMHED {});
 	SelectedForm              = &(FormList->back());
 	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
