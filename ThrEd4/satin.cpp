@@ -846,11 +846,11 @@ void satin::slbrd() {
 	LineSpacing = savedSpacing;
 }
 
-void satin::internal::satfn(const std::vector<double>& lengths,
-                            uint32_t                   line1Start,
-                            uint32_t                   line1End,
-                            uint32_t                   line2Start,
-                            uint32_t                   line2End) {
+void satin::internal::satfn(const std::vector<float>& lengths,
+                            uint32_t                  line1Start,
+                            uint32_t                  line1End,
+                            uint32_t                  line2Start,
+                            uint32_t                  line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
@@ -892,7 +892,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		auto segmentStitchCount = 0u;
 		for (auto iSegment = 0u; iSegment < line1Segments - 1; iSegment++) {
 			const auto nextVertex = form::nxt(iVertex);
-			const auto val = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5);
+			const auto val = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5f);
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = form::nxt(iVertex);
@@ -903,7 +903,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 		// auto iSegment           = 0;
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
-			const auto val = wrap::round<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5);
+			const auto val = wrap::round<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5f);
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = form::prv(iNextVertex);
@@ -1004,8 +1004,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if ((line1Count == 0u) && iLine1Count < line1StitchCounts.size()) {
 					line1Count   = line1StitchCounts[iLine1Count++];
 					line1Next    = form::nxt(iLine1Vertex);
-					line1Delta.x = gsl::narrow_cast<double>(vertexIt[line1Next].x) - vertexIt[iLine1Vertex].x;
-					line1Delta.y = gsl::narrow_cast<double>(vertexIt[line1Next].y) - vertexIt[iLine1Vertex].y;
+					line1Delta.x = vertexIt[line1Next].x - vertexIt[iLine1Vertex].x;
+					line1Delta.y = vertexIt[line1Next].y - vertexIt[iLine1Vertex].y;
 					iLine1Vertex = form::nxt(iLine1Vertex);
 					line1Step.x  = line1Delta.x / line1Count;
 					line1Step.y  = line1Delta.y / line1Count;
@@ -1014,8 +1014,8 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 				if ((line2Count == 0u) && iLine2Count < line2StitchCounts.size()) {
 					line2Count    = line2StitchCounts[iLine2Count++];
 					line2Previous = form::prv(iLine2Vertex);
-					line2Delta.x  = gsl::narrow_cast<double>(vertexIt[line2Previous].x) - vertexIt[iLine2Vertex].x;
-					line2Delta.y  = gsl::narrow_cast<double>(vertexIt[line2Previous].y) - vertexIt[iLine2Vertex].y;
+					line2Delta.x  = vertexIt[line2Previous].x - vertexIt[iLine2Vertex].x;
+					line2Delta.y  = vertexIt[line2Previous].y - vertexIt[iLine2Vertex].y;
 					iLine2Vertex  = form::prv(iLine2Vertex);
 					line2Step.x   = line2Delta.x / line2Count;
 					line2Step.y   = line2Delta.y / line2Count;
@@ -1028,7 +1028,7 @@ void satin::internal::satfn(const std::vector<double>& lengths,
 	}
 }
 
-void satin::internal::satmf(const std::vector<double>& lengths) {
+void satin::internal::satmf(const std::vector<float>& lengths) {
 	auto start = 0u;
 
 	if ((SelectedForm->attribute & FRMEND) != 0u) {
@@ -1084,18 +1084,18 @@ void satin::satfil() {
 	StateMap.reset(StateFlag::SAT1);
 	StateMap.reset(StateFlag::FILDIR);
 	SelectedForm->fillType = SATF;
-	auto lengths           = std::vector<double> {};
+	auto lengths           = std::vector<float> {};
 	lengths.reserve(wrap::toSize(VertexCount) + 1u);
-	auto length = 0.0;
+	auto length = 0.0f;
 	lengths.push_back(length);
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 		const auto delta
-		    = dPOINT { vertexIt[iVertex].x - vertexIt[iVertex - 1].x, vertexIt[iVertex].y - vertexIt[iVertex - 1].y };
+		    = fPOINT { vertexIt[iVertex].x - vertexIt[iVertex - 1].x, vertexIt[iVertex].y - vertexIt[iVertex - 1].y };
 		length += hypot(delta.x, delta.y);
 		lengths.push_back(length);
 	}
-	const auto lastDelta = dPOINT { vertexIt[0].x - vertexIt[VertexCount - 1].x, vertexIt[0].y - vertexIt[VertexCount - 1].y };
+	const auto lastDelta = fPOINT { vertexIt[0].x - vertexIt[VertexCount - 1].x, vertexIt[0].y - vertexIt[VertexCount - 1].y };
 	length += hypot(lastDelta.x, lastDelta.y);
 	lengths.push_back(length);
 	do {
@@ -1114,7 +1114,7 @@ void satin::satfil() {
 				break;
 			}
 
-			if (VertexCount == 3 && (((*FormList)[ClosestFormToCursor].attribute & 1) != 0)) {
+			if (VertexCount == 3 && (((*FormList)[ClosestFormToCursor].attribute & 1u) != 0)) {
 				si::satfn(lengths, 2, 3, 2, 1);
 				break;
 			}
@@ -1141,7 +1141,7 @@ void satin::satfil() {
 			si::satmf(lengths);
 			break;
 		}
-		length /= 2;
+		length /= 2.0f;
 		auto iVertex = 0;
 		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
 			SelectedPoint = vertexIt[0];
@@ -1371,7 +1371,7 @@ void satin::satout(float satinWidth) {
 		OutsidePoints = OutsidePointList;
 		InsidePoints  = InsidePointList;
 		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
-			si::outfn(iVertex, iVertex + 1, 0.1);
+			si::outfn(iVertex, iVertex + 1, 0.1f);
 		}
 		auto count = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -1379,7 +1379,7 @@ void satin::satout(float satinWidth) {
 				count++;
 			}
 		}
-		satinWidth /= 2;
+		satinWidth /= 2.0f;
 		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 			si::outfn(iVertex, iVertex + 1, satinWidth);
 		}
@@ -1415,12 +1415,12 @@ void satin::sbrd() {
 	LineSpacing = savedSpacing;
 }
 
-void satin::internal::outfn(uint32_t start, uint32_t finish, double satinWidth) {
-	auto xOffset = 0.0;
-	auto yOffset = 0.0;
+void satin::internal::outfn(uint32_t start, uint32_t finish, float satinWidth) {
+	auto xOffset = 0.0f;
+	auto yOffset = 0.0f;
 
 	if (fabs((*FormAngles)[start]) < TINY && fabs((*FormAngles)[finish]) < TINY) {
-		xOffset = 0.0;
+		xOffset = 0.0f;
 		yOffset = satinWidth;
 	}
 	else {
