@@ -378,7 +378,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	if (clipCount != 0u) {
 		auto remainder = 0.0f;
 		if (clipCount > 1) {
-			remainder = ((length - clipCount * ClipRectSize.cx) / (clipCount - 1) + ClipRectSize.cx) / length;
+			remainder = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) / (gsl::narrow_cast<float>(clipCount) - 1.0f) + ClipRectSize.cx) / length;
 		}
 		else {
 			remainder = (length - ClipRectSize.cx) / 2;
@@ -764,7 +764,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	if (count != 0u) {
 		auto step = fPOINT {};
 		if (count > 1) {
-			const auto tdub = ((length - count * spacing) / (count - 1) + spacing) / length;
+			const auto tdub = ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0f) + spacing) / length;
 			const auto val  = fPOINT { delta.x * tdub, delta.y * tdub };
 			step            = val;
 		}
