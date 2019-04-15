@@ -449,10 +449,8 @@ void form::internal::frmsqr(uint32_t iVertex) {
 	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-void form::selsqr(const POINT& controlPoint, HDC dc) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::selsqr(const POINT& controlPoint, HDC dc) {
 	POINT      line[5] = {};
 	const auto offset  = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), gsl::narrow<int32_t>(*screenDPI), 96);
 
@@ -464,7 +462,8 @@ void form::selsqr(const POINT& controlPoint, HDC dc) {
 	Polyline(dc, static_cast<POINT*>(line), 5);
 }
 
-void form::internal::frmsqr0(const POINT& controlPoint) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::internal::frmsqr0(const POINT& controlPoint) {
 	POINT      line[5] = {};
 	const auto offset  = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), gsl::narrow<int32_t>(*screenDPI), 96);
 
@@ -478,7 +477,8 @@ void form::internal::frmsqr0(const POINT& controlPoint) {
 	}
 }
 
-void form::internal::frmx(const POINT& controlPoint, HDC dc) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::internal::frmx(const POINT& controlPoint, HDC dc) {
 	POINT      line[2] = {};
 	const auto offset  = MulDiv(8, gsl::narrow<int32_t>(*screenDPI), 96);
 
@@ -493,7 +493,6 @@ void form::internal::frmx(const POINT& controlPoint, HDC dc) {
 	Polyline(dc, static_cast<POINT*>(line), 2);
 	SelectObject(dc, FormPen);
 }
-#pragma warning(pop)
 
 void form::ratsr() {
 	if (StateMap.test(StateFlag::ZUMED)) {
@@ -6329,10 +6328,8 @@ void form::setexpand(float xyRatio) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-void form::nufilcol(uint32_t color) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::nufilcol(uint32_t color) {
 	if (SelectedForm->fillColor != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillColor = gsl::narrow<uint8_t>(color);
 		const auto attribute    = (ClosestFormToCursor << 4u) | FRMFIL;
@@ -6345,7 +6342,8 @@ void form::nufilcol(uint32_t color) {
 	}
 }
 
-void form::nufthcol(uint32_t color) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::nufthcol(uint32_t color) {
 	if (SelectedForm->fillInfo.feather.color != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillInfo.feather.color = gsl::narrow<uint8_t>(color);
 		const auto attribute                 = (ClosestFormToCursor << 4u) | FTHMSK;
@@ -6358,7 +6356,8 @@ void form::nufthcol(uint32_t color) {
 	}
 }
 
-void form::nubrdcol(uint32_t color) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::nubrdcol(uint32_t color) {
 	SelectedForm->borderColor = gsl::narrow<uint8_t>(color);
 	const auto attribute      = (ClosestFormToCursor << 4u) | FRMBFIL;
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -6369,7 +6368,8 @@ void form::nubrdcol(uint32_t color) {
 	}
 }
 
-void form::nulapcol(uint32_t color) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::nulapcol(uint32_t color) {
 	if (gsl::narrow<uint32_t>(SelectedForm->borderColor >> 4u) != color) {
 		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4u;
@@ -6382,7 +6382,6 @@ void form::nulapcol(uint32_t color) {
 		}
 	}
 }
-#pragma warning(pop)
 
 void form::internal::sbold() {
 	form::fvars(ClosestFormToCursor);
@@ -8225,10 +8224,8 @@ void form::centir() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-void form::internal::bean(uint32_t start, uint32_t finish) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 	auto iSourceStitch = start;
 	auto iCopyStitch   = MAXITEMS;
 
@@ -8278,7 +8275,6 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
 	}
 	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iOutputStitch);
 }
-#pragma warning(pop)
 
 void form::dubean() {
 	if (PCSHeader.stitchCount != 0u) {

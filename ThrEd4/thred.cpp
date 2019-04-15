@@ -1348,7 +1348,8 @@ void thred::internal::fndknt() noexcept {
 	}
 }
 
-void thred::coltab() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::coltab() {
 	ColorChanges   = 0;
 	auto endStitch = PCSHeader.stitchCount;
 	if (endStitch != 0u) {
@@ -5092,7 +5093,7 @@ void thred::internal::delstch1(uint32_t iStitch) noexcept {
 			iStitch++;
 		}
 		PCSHeader.stitchCount--;
-		if (ClosestPointIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+		if (ClosestPointIndex > gsl::narrow_cast<uint32_t>(PCSHeader.stitchCount) - 1) {
 			ClosestPointIndex = PCSHeader.stitchCount - 1;
 		}
 	}
@@ -5222,7 +5223,8 @@ void thred::internal::bak() {
 	redbak();
 }
 
-void thred::internal::bitsiz() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::internal::bitsiz() {
 	const auto screenAspectRatio = gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);
 	const auto bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
 
@@ -7056,7 +7058,8 @@ void thred::internal::rebox() {
 	}
 }
 
-void thred::delstchm() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::delstchm() {
 	thred::rngadj();
 	auto destination = GroupStartStitch;
 	if ((GroupEndStitch + 1u) < PCSHeader.stitchCount) {
@@ -7837,7 +7840,8 @@ void thred::internal::duclip() {
 	}
 }
 
-void thred::delfstchs() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::delfstchs() {
 	auto iDestinationStitch = 0u;
 
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
@@ -8075,7 +8079,8 @@ void thred::internal::strtknt(uint32_t start) noexcept {
 	}
 }
 
-void thred::internal::delknt() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::internal::delknt() {
 	auto newStitchCount = 0u;
 
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8105,7 +8110,7 @@ void thred::internal::delknot() {
 }
 
 uint32_t thred::internal::kjmp(uint32_t start) noexcept {
-	while (start < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1 && stlen(start) > KNOTLEN) {
+	while (start < gsl::narrow_cast<uint32_t>(PCSHeader.stitchCount) - 1 && stlen(start) > KNOTLEN) {
 		thred::mvstch(OutputIndex++, start++);
 	}
 	strtknt(start);
@@ -9417,7 +9422,8 @@ void thred::delinf() noexcept {
 	}
 }
 
-void thred::chkrng(fPOINT& range) noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 	thred::delinf();
 	range.x = gsl::narrow<double>(UnzoomedRect.x);
 	range.y = gsl::narrow<double>(UnzoomedRect.y);
@@ -9944,7 +9950,8 @@ void thred::internal::colchk() noexcept {
 	}
 }
 
-uint32_t thred::internal::makbig(uint32_t start, uint32_t finish) noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t finish) {
 	auto destination = MAXITEMS;
 	auto adcnt       = 0u;
 

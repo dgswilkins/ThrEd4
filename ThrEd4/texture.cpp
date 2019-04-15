@@ -1384,10 +1384,8 @@ void texture::internal::txgro(const FRMHED& textureForm) {
 	txi::txsiz(1.0f / TXTRAT, textureForm);
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-bool texture::internal::txdig(uint32_t keyCode, char& character) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) bool texture::internal::txdig(uint32_t keyCode, char& character) {
 	if (isdigit(keyCode) != 0) {
 		character = gsl::narrow<char>(keyCode);
 		return true;
@@ -1402,7 +1400,6 @@ bool texture::internal::txdig(uint32_t keyCode, char& character) {
 	}
 	return false;
 }
-#pragma warning(pop)
 
 void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 	if (!SelectedTexturePointsList->empty()) {

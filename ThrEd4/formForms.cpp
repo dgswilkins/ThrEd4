@@ -689,10 +689,8 @@ void formForms::frmnum() {
 	}
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-void formForms::internal::chkdaz() {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void formForms::internal::chkdaz() {
 	if (IniFile.daisyPetalPoints == 0u) {
 		IniFile.daisyPetalPoints = 1u;
 	}
@@ -706,7 +704,6 @@ void formForms::internal::chkdaz() {
 		IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
 	}
 }
-#pragma warning(pop)
 
 void formForms::dazdef() {
 	IniFile.daisyPetalPoints  = DAZCNT;

@@ -34,11 +34,11 @@ uint32_t adflt(uint32_t count);
 
 void     bBox() noexcept;
 void     chkmen() noexcept;
-void     chkrng(fPOINT& range) noexcept;
-void     coltab() noexcept;
-void     delfstchs() noexcept;
+void     chkrng(fPOINT& range);
+void     coltab();
+void     delfstchs();
 void     delinf() noexcept;
-void     delstchm() noexcept;
+void     delstchm();
 uint32_t duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
 void     frmdel();
@@ -97,7 +97,7 @@ namespace internal {
 	bool   binv(const std::vector<uint8_t>& monoBitmapData, uint32_t bitmapWidthInBytes);
 	bool   bitar();
 	void   bitlin(const uint8_t* source, uint32_t* destination, COLORREF foreground, COLORREF background);
-	void   bitsiz() noexcept;
+	void   bitsiz();
 	void   box(uint32_t iNearest, HDC dc) noexcept;
 	void   boxs() noexcept;
 	void   bsavmen();
@@ -148,7 +148,7 @@ namespace internal {
 	void     delet();
 	void     delfre();
 	void     delknot();
-	void     delknt() noexcept;
+	void     delknt();
 	void     delmap();
 	void     delsfrms(uint32_t code);
 	void     delsmal(uint32_t startStitch, uint32_t endStitch);
@@ -308,7 +308,7 @@ namespace internal {
 	void     lodclp(uint32_t iStitch);
 	void     longer();
 	void     makCol();
-	uint32_t makbig(uint32_t start, uint32_t finish) noexcept;
+	uint32_t makbig(uint32_t start, uint32_t finish);
 	void     mark();
 	void     movbak(char source, char destination);
 	void     movbox();
