@@ -256,20 +256,19 @@ void form::frmout(uint32_t formIndex) {
 		auto& rectangle    = form.rectangle;
 		CurrentVertexIndex = form.vertexIndex;
 		auto vertexIt      = std::next(FormVertices->cbegin(), form.vertexIndex);
-		rectangle.left = rectangle.right = vertexIt[0].x;
-		rectangle.bottom = rectangle.top = vertexIt[0].y;
+		rectangle          = fRECTANGLE { vertexIt[0].x, vertexIt[0].y, vertexIt[0].x, vertexIt[0].y };
 		for (auto iVertex = 1u; iVertex < form.vertexCount; iVertex++) {
-			if (vertexIt[iVertex].x > rectangle.right) {
-				rectangle.right = vertexIt[iVertex].x;
-			}
 			if (vertexIt[iVertex].x < rectangle.left) {
 				rectangle.left = vertexIt[iVertex].x;
 			}
-			if (vertexIt[iVertex].y < rectangle.bottom) {
-				rectangle.bottom = vertexIt[iVertex].y;
-			}
 			if (vertexIt[iVertex].y > rectangle.top) {
 				rectangle.top = vertexIt[iVertex].y;
+			}
+			if (vertexIt[iVertex].x > rectangle.right) {
+				rectangle.right = vertexIt[iVertex].x;
+			}
+			if (vertexIt[iVertex].y < rectangle.bottom) {
+				rectangle.bottom = vertexIt[iVertex].y;
 			}
 		}
 		if (rectangle.top - rectangle.bottom < MINRCT) {
@@ -396,19 +395,18 @@ void form::setfrm() {
 	auto       vertexIt          = std::next(FormVertices->begin(), CurrentVertexIndex);
 	auto&      firstVertex       = vertexIt[0];
 	const auto delta             = fPOINT { point.x - firstVertex.x, point.y - firstVertex.y };
-	SelectedForm->rectangle.left = SelectedForm->rectangle.bottom = gsl::narrow_cast<float>(1e30);
-	SelectedForm->rectangle.right = SelectedForm->rectangle.top = 0;
+	SelectedForm->rectangle      = fRECTANGLE { 1e30f, 0.0f, 0.0f, 1e30f };
 	for (auto iVertex = 0u; iVertex < NewFormVertexCount - 1; iVertex++) {
 		vertexIt[iVertex].x += delta.x;
 		vertexIt[iVertex].y += delta.y;
 		if (vertexIt[iVertex].x < SelectedForm->rectangle.left) {
 			SelectedForm->rectangle.left = vertexIt[iVertex].x;
 		}
-		if (vertexIt[iVertex].x > SelectedForm->rectangle.right) {
-			SelectedForm->rectangle.right = vertexIt[iVertex].x;
-		}
 		if (vertexIt[iVertex].y > SelectedForm->rectangle.top) {
 			SelectedForm->rectangle.top = vertexIt[iVertex].y;
+		}
+		if (vertexIt[iVertex].x > SelectedForm->rectangle.right) {
+			SelectedForm->rectangle.right = vertexIt[iVertex].x;
 		}
 		if (vertexIt[iVertex].y < SelectedForm->rectangle.bottom) {
 			SelectedForm->rectangle.bottom = vertexIt[iVertex].y;
@@ -518,11 +516,11 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 	const auto& rectangle = (*FormList)[iForm].rectangle;
 	SelectObject(dc, FormSelectedPen);
 	formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
-	formOutline[1].x = formOutline[5].x = form::midl(rectangle.right, rectangle.left);
 	formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
-	formOutline[3].y = formOutline[7].y = form::midl(rectangle.top, rectangle.bottom);
-	formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
 	formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
+	formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
+	formOutline[1].x = formOutline[5].x = form::midl(rectangle.right, rectangle.left);
+	formOutline[3].y = formOutline[7].y = form::midl(rectangle.top, rectangle.bottom);
 	for (auto controlPoint = 0u; controlPoint < 8; controlPoint++) {
 		form::sfCor2px(formOutline[controlPoint], pixelOutline[controlPoint]);
 	}
@@ -558,8 +556,8 @@ void form::fselrct(uint32_t iForm) {
 	POINT       line[6]        = {};
 
 	formOutline[0].x = formOutline[3].x = formOutline[4].x = form.rectangle.left;
-	formOutline[1].x = formOutline[2].x = form.rectangle.right;
 	formOutline[0].y = formOutline[1].y = formOutline[4].y = form.rectangle.top;
+	formOutline[1].x = formOutline[2].x = form.rectangle.right;
 	formOutline[2].y = formOutline[3].y = form.rectangle.bottom;
 	for (auto iPoint = 0u; iPoint < 5; iPoint++) {
 		line[iPoint].x = wrap::round<int32_t>((formOutline[iPoint].x - ZoomRect.left) * HorizontalRatio);
@@ -567,11 +565,11 @@ void form::fselrct(uint32_t iForm) {
 		if (line[iPoint].x < SelectedFormsRect.left) {
 			SelectedFormsRect.left = line[iPoint].x;
 		}
-		if (line[iPoint].x > SelectedFormsRect.right) {
-			SelectedFormsRect.right = line[iPoint].x;
-		}
 		if (line[iPoint].y < SelectedFormsRect.top) {
 			SelectedFormsRect.top = line[iPoint].y;
+		}
+		if (line[iPoint].x > SelectedFormsRect.right) {
+			SelectedFormsRect.right = line[iPoint].x;
 		}
 		if (line[iPoint].y > SelectedFormsRect.bottom) {
 			SelectedFormsRect.bottom = line[iPoint].y;
@@ -582,11 +580,11 @@ void form::fselrct(uint32_t iForm) {
 	if (line[5].x < SelectedFormsRect.left) {
 		SelectedFormsRect.left = line[5].x;
 	}
-	if (line[5].x > SelectedFormsRect.right) {
-		SelectedFormsRect.right = line[5].x;
-	}
 	if (line[5].y < SelectedFormsRect.top) {
 		SelectedFormsRect.top = line[5].y;
+	}
+	if (line[5].x > SelectedFormsRect.right) {
+		SelectedFormsRect.right = line[5].x;
 	}
 	if (line[5].y > SelectedFormsRect.bottom) {
 		SelectedFormsRect.bottom = line[5].y;
@@ -598,11 +596,11 @@ void form::fselrct(uint32_t iForm) {
 
 void form::rct2sel(const RECT& rectangle, std::vector<POINT>& line) {
 	line[0].x = line[6].x = line[7].x = line[8].x = rectangle.left;
-	line[1].x = line[5].x = ((rectangle.right - rectangle.left) / 2) + rectangle.left;
-	line[2].x = line[3].x = line[4].x = rectangle.right;
 	line[0].y = line[1].y = line[2].y = line[8].y = rectangle.top;
-	line[3].y = line[7].y = ((rectangle.bottom - rectangle.top) / 2) + rectangle.top;
+	line[2].x = line[3].x = line[4].x = rectangle.right;
 	line[4].y = line[5].y = line[6].y = rectangle.bottom;
+	line[1].x = line[5].x = ((rectangle.right - rectangle.left) / 2) + rectangle.left;
+	line[3].y = line[7].y = ((rectangle.bottom - rectangle.top) / 2) + rectangle.top;
 }
 
 void form::dubig() {
@@ -643,9 +641,9 @@ void form::unpsel() {
 
 void form::sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	screenRect.left  = wrap::round<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x + 0.5f);
-	screenRect.right = wrap::round<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x + 0.5f);
 	screenRect.top
-	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+		= wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+	screenRect.right = wrap::round<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x + 0.5f);
 	screenRect.bottom
 	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 }
@@ -739,6 +737,7 @@ void form::drwfrm() {
 	if (!SelectedFormList->empty()) {
 		SelectObject(StitchWindowMemDC, MultiFormPen);
 		ratsr();
+		// ToDo - Does these numbers make sense?
 		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -2698,13 +2697,13 @@ bool form::internal::isin(std::vector<VCLPX>&        regionCrossingData,
 	if (xCoordinate < boundingRect.left) {
 		return false;
 	}
+	if (yCoordinate > boundingRect.top) {
+		return false;
+	}
 	if (xCoordinate > boundingRect.right) {
 		return false;
 	}
 	if (yCoordinate < boundingRect.bottom) {
-		return false;
-	}
-	if (yCoordinate > boundingRect.top) {
 		return false;
 	}
 	auto vertexIt = currentFormVertices.cbegin();
@@ -3082,25 +3081,25 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		totalLength += clipSideLengths[vertex];
 		vertex = nextVertex;
 	}
-	auto boundingRect = fRECTANGLE { vertexIt[0].y, vertexIt[0].x, vertexIt[0].x, vertexIt[0].y };
+	auto boundingRect = fRECTANGLE { vertexIt[0].x, vertexIt[0].y, vertexIt[0].x, vertexIt[0].y };
 	for (auto iVertex = 1u; iVertex < currentVertexCount; iVertex++) {
-		if (vertexIt[iVertex].x > boundingRect.right) {
-			boundingRect.right = vertexIt[iVertex].x;
-		}
 		if (vertexIt[iVertex].x < boundingRect.left) {
 			boundingRect.left = vertexIt[iVertex].x;
 		}
 		if (vertexIt[iVertex].y > boundingRect.top) {
 			boundingRect.top = vertexIt[iVertex].y;
 		}
+		if (vertexIt[iVertex].x > boundingRect.right) {
+			boundingRect.right = vertexIt[iVertex].x;
+		}
 		if (vertexIt[iVertex].y < boundingRect.bottom) {
 			boundingRect.bottom = vertexIt[iVertex].y;
 		}
 	}
 	auto clipGrid = RECT { wrap::floor<int32_t>(boundingRect.left / clipWidth),
-		                   wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1) + 2,
+		                   wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0f) + 2,
 		                   wrap::ceil<int32_t>(boundingRect.right / clipWidth),
-		                   wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1) };
+		                   wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0f) };
 
 	auto negativeOffset = 0l;
 	auto clipGridOffset = 0u;
@@ -5199,11 +5198,11 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 	form::sRct2px(SelectedForm->rectangle, rectangle);
 	auto& formControls = *FormControlPoints;
 	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
-	formControls[1].x = formControls[5].x = wrap::round<int32_t>(form::midl(rectangle.right, rectangle.left));
 	formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
-	formControls[3].y = formControls[7].y = wrap::round<int32_t>(form::midl(rectangle.top, rectangle.bottom));
-	formControls[4].y = formControls[5].y = formControls[6].y = rectangle.bottom;
 	formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;
+	formControls[4].y = formControls[5].y = formControls[6].y = rectangle.bottom;
+	formControls[1].x = formControls[5].x = wrap::round<int32_t>(form::midl(rectangle.right, rectangle.left));
+	formControls[3].y = formControls[7].y = wrap::round<int32_t>(form::midl(rectangle.top, rectangle.bottom));
 
 	auto minimumLength = 1e99;
 	for (auto iControl = 0u; iControl < 10; iControl++) {
@@ -5258,10 +5257,10 @@ void form::rstfrm() {
 		vertexIt[iVertex].x += offset.x;
 		vertexIt[iVertex].y += offset.y;
 	}
-	SelectedForm->rectangle.bottom += offset.y;
-	SelectedForm->rectangle.top += offset.y;
 	SelectedForm->rectangle.left += offset.x;
+	SelectedForm->rectangle.top += offset.y;
 	SelectedForm->rectangle.right += offset.x;
+	SelectedForm->rectangle.bottom += offset.y;
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & FRMSK) == attribute && ((StitchBuffer[iStitch].attribute & ALTYPMSK) != 0u)
 		    && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
@@ -5860,35 +5859,34 @@ void form::setap() {
 }
 
 void form::internal::getbig() noexcept {
-	AllItemsRect.bottom = AllItemsRect.left = 1e9;
-	AllItemsRect.top = AllItemsRect.right = 0;
+	AllItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
 	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
-		if (trct.bottom < AllItemsRect.bottom) {
-			AllItemsRect.bottom = trct.bottom;
-		}
 		if (trct.left < AllItemsRect.left) {
 			AllItemsRect.left = trct.left;
+		}
+		if (trct.top > AllItemsRect.top) {
+			AllItemsRect.top = trct.top;
 		}
 		if (trct.right > AllItemsRect.right) {
 			AllItemsRect.right = trct.right;
 		}
-		if (trct.top > AllItemsRect.top) {
-			AllItemsRect.top = trct.top;
+		if (trct.bottom < AllItemsRect.bottom) {
+			AllItemsRect.bottom = trct.bottom;
 		}
 	}
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (StitchBuffer[iStitch].x < AllItemsRect.left) {
 			AllItemsRect.left = StitchBuffer[iStitch].x;
 		}
+		if (StitchBuffer[iStitch].y > AllItemsRect.top) {
+			AllItemsRect.top = StitchBuffer[iStitch].y;
+		}
 		if (StitchBuffer[iStitch].x > AllItemsRect.right) {
 			AllItemsRect.right = StitchBuffer[iStitch].x;
 		}
 		if (StitchBuffer[iStitch].y < AllItemsRect.bottom) {
 			AllItemsRect.bottom = StitchBuffer[iStitch].y;
-		}
-		if (StitchBuffer[iStitch].y > AllItemsRect.top) {
-			AllItemsRect.top = StitchBuffer[iStitch].y;
 		}
 	}
 }
@@ -5913,7 +5911,7 @@ void form::selal() {
 	StateMap.reset(StateFlag::SELBOX);
 	StateMap.reset(StateFlag::GRPSEL);
 	fi::getbig();
-	ZoomRect   = fRECTANGLE { gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
+	ZoomRect   = fRECTANGLE { 0.0f, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
 	ZoomFactor = 1;
 	StateMap.reset(StateFlag::ZUMED);
 	thred::movStch();
@@ -5941,7 +5939,7 @@ void form::setstrtch() {
 		else {
 			form::fvars(ClosestFormToCursor);
 			thred::px2stch();
-			stitchRect.bottom = stitchRect.left = stitchRect.right = stitchRect.top = 0;
+			stitchRect = fRECTANGLE { 0.0f, 0.0f, 0.0f, 0.0f };
 		}
 	}
 	switch (SelectedFormControlVertex) {
@@ -6160,10 +6158,10 @@ void form::setexpand(float xyRatio) {
 
 	thred::savdo();
 	if (!SelectedFormList->empty() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-		rectangle.bottom = SelectedFormsRect.bottom;
-		rectangle.left   = SelectedFormsRect.left;
-		rectangle.right  = SelectedFormsRect.right;
-		rectangle.top    = SelectedFormsRect.top;
+		rectangle        = fRECTANGLE { gsl::narrow_cast<float>(SelectedFormsRect.left),
+                                 gsl::narrow_cast<float>(SelectedFormsRect.top),
+                                 gsl::narrow_cast<float>(SelectedFormsRect.right),
+                                 gsl::narrow_cast<float>(SelectedFormsRect.bottom) };
 		SelectedPoint.x  = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowOrigin.x);
 		SelectedPoint.y  = gsl::narrow_cast<float>(Msg.pt.y - StitchWindowOrigin.y);
 		size0.y          = rectangle.bottom - rectangle.top;
@@ -6175,10 +6173,7 @@ void form::setexpand(float xyRatio) {
 			rectangle = SelectedForm->rectangle;
 		}
 		else {
-			rectangle.bottom = StitchRangeRect.bottom;
-			rectangle.top    = StitchRangeRect.top;
-			rectangle.right  = StitchRangeRect.right;
-			rectangle.left   = StitchRangeRect.left;
+			rectangle = fRECTANGLE { StitchRangeRect.left, StitchRangeRect.top, StitchRangeRect.right, StitchRangeRect.bottom };
 		}
 		size0.y = rectangle.top - rectangle.bottom;
 	}
@@ -7152,14 +7147,14 @@ void form::internal::dufcntr(fPOINT& center) {
 		if (formRect.left < bigRect.left) {
 			bigRect.left = formRect.left;
 		}
+		if (formRect.top > bigRect.top) {
+			bigRect.top = formRect.top;
+		}
 		if (formRect.right > bigRect.right) {
 			bigRect.right = formRect.right;
 		}
 		if (formRect.bottom < bigRect.bottom) {
 			bigRect.bottom = formRect.bottom;
-		}
-		if (formRect.top > bigRect.top) {
-			bigRect.top = formRect.top;
 		}
 	}
 	center = fPOINT { form::midl(bigRect.right, bigRect.left), form::midl(bigRect.top, bigRect.bottom) };
@@ -8165,22 +8160,22 @@ void form::cntrx() {
 				flag = true;
 				thred::savdo();
 				thred::rngadj();
-				auto groupRect = fRECTANGLE { StitchBuffer[GroupStartStitch].y,
-					                          StitchBuffer[GroupStartStitch].x,
+				auto groupRect = fRECTANGLE { StitchBuffer[GroupStartStitch].x,
+					                          StitchBuffer[GroupStartStitch].y,
 					                          StitchBuffer[GroupStartStitch].x,
 					                          StitchBuffer[GroupStartStitch].y };
 				for (auto iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
 					if (StitchBuffer[iStitch].x < groupRect.left) {
 						groupRect.left = StitchBuffer[iStitch].x;
 					}
+					if (StitchBuffer[iStitch].y > groupRect.top) {
+						groupRect.top = StitchBuffer[iStitch].y;
+					}
 					if (StitchBuffer[iStitch].x > groupRect.right) {
 						groupRect.right = StitchBuffer[iStitch].x;
 					}
 					if (StitchBuffer[iStitch].y < groupRect.bottom) {
 						groupRect.bottom = StitchBuffer[iStitch].y;
-					}
-					if (StitchBuffer[iStitch].y > groupRect.top) {
-						groupRect.top = StitchBuffer[iStitch].y;
 					}
 				}
 				const auto selectedCenter

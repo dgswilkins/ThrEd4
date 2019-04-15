@@ -1344,8 +1344,8 @@ constexpr uint32_t FRMBFIL  = 0x40000000u;
 constexpr uint32_t FRMAPFIL = 0x60000000u;
 
 struct _floatRectangle {
-	float top;
 	float left;
+	float top;
 	float right;
 	float bottom;
 };

@@ -1959,7 +1959,7 @@ void thred::internal::movins() {
 }
 
 void thred::zumhom() {
-	ZoomRect   = fRECTANGLE { gsl::narrow_cast<float>(UnzoomedRect.y), 0.0f, gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
+	ZoomRect   = fRECTANGLE { 0.0f, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0f };
 	ZoomFactor = 1;
 	StateMap.reset(StateFlag::ZUMED);
 	thred::movStch();
@@ -4049,7 +4049,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		dstStitchBuffer[iStitch].y         = stitches[iStitch].y * 5 / 3;
 		dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
 	}
-	auto boundingRect = fRECTANGLE { dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].x, dstStitchBuffer[0].y };
+	auto boundingRect = fRECTANGLE { dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y };
 	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (dstStitchBuffer[iStitch].x > boundingRect.right) {
 			boundingRect.right = dstStitchBuffer[iStitch].x + 0.5;
@@ -5774,7 +5774,7 @@ void thred::internal::nuFil() {
 						return;
 					}
 					}
-					ZoomRect              = fRECTANGLE { IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
+					ZoomRect              = fRECTANGLE { 0.0f, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0f };
 					UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					auto stitchesRead     = DWORD { 0 };
@@ -6149,7 +6149,7 @@ void thred::internal::nuFil() {
 			}
 			thred::ritot(PCSHeader.stitchCount);
 			// BufferIndex     = 0;
-			ZoomRect     = fRECTANGLE { IniFile.hoopSizeY, 0.0f, IniFile.hoopSizeX, 0.0f };
+			ZoomRect     = fRECTANGLE { 0.0f, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0f };
 			UnzoomedRect = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
 			thred::movStch();
 			thred::coltab();
@@ -6340,7 +6340,7 @@ void thred::internal::zumin() {
 		} while (false);
 	}
 	const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-	ZoomRect             = fRECTANGLE { zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
+	ZoomRect             = fRECTANGLE { 0.0f, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0f };
 	thred::shft(SelectedPoint);
 	NearestCount = 0;
 	if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX)) {
@@ -6415,13 +6415,13 @@ void thred::internal::zumout() {
 		if (ZoomFactor > 0.98) {
 			ZoomFactor = 1;
 			StateMap.reset(StateFlag::ZUMED);
-			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x), 0.0f };
+			ZoomRect = fRECTANGLE { 0.0f, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0f };
 			thred::movStch();
 			NearestCount = 0;
 		}
 		else {
 			const auto zoomRight = UnzoomedRect.x * ZoomFactor;
-			ZoomRect             = fRECTANGLE { zoomRight / StitchWindowAspectRatio, 0.0f, zoomRight, 0.0f };
+			ZoomRect             = fRECTANGLE { 0.0f, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0f };
 			thred::shft(SelectedPoint);
 		}
 		if (StateMap.test(StateFlag::RUNPAT)) {
@@ -9123,8 +9123,8 @@ void thred::internal::insfil() {
 					}
 					const auto newStitchCount = iStitch;
 					iStitch                   = PCSHeader.stitchCount;
-					auto insertedRectangle    = fRECTANGLE { StitchBuffer[iPCSStitch].y,
-                                                          StitchBuffer[iPCSStitch].x,
+					auto insertedRectangle    = fRECTANGLE { StitchBuffer[iPCSStitch].x,
+                                                          StitchBuffer[iPCSStitch].y,
                                                           StitchBuffer[iPCSStitch].x,
                                                           StitchBuffer[iPCSStitch].y };
 					iPCSStitch++;
@@ -12641,7 +12641,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 			zumin();
 			return true;
 		}
-		ZoomRect = fRECTANGLE { newSize.y, 0.0f, newSize.x, 0.0f };
+		ZoomRect = fRECTANGLE { 0.0f, newSize.y, newSize.x, 0.0f };
 		thred::shft(SelectedPoint);
 		StateMap.reset(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::RESTCH);
@@ -18220,7 +18220,7 @@ uint32_t thred::internal::chkup(uint32_t count, uint32_t iStitch) {
 
 bool thred::internal::bitar() {
 	const auto zoomedInRect
-	    = fRECTANGLE { (UnzoomedRect.y - ZoomRect.top), ZoomRect.left, ZoomRect.right, (UnzoomedRect.y - ZoomRect.bottom) };
+	    = fRECTANGLE { ZoomRect.left, (UnzoomedRect.y - ZoomRect.top), ZoomRect.right, (UnzoomedRect.y - ZoomRect.bottom) };
 
 	if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 		return false;
@@ -19336,7 +19336,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 		}
 		else {
-			ZoomRect = fRECTANGLE { gsl::narrow<float>(UnzoomedRect.y), 0.0f, gsl::narrow<float>(UnzoomedRect.x), 0.0f };
+			ZoomRect = fRECTANGLE { 0.0f, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0f };
 		}
 		NearestCount = 0;
 		StateMap.set(StateFlag::RESTCH);

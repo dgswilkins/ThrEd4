@@ -539,15 +539,18 @@ void xt::pes2crd() {
 		return;
 	}
 	*IniFile.p2cName = 0;
+	// ToDo - fix registry handling
 	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
 	    == ERROR_SUCCESS) {
 		auto size    = DWORD { _MAX_PATH };
 		auto keyType = DWORD { REG_SZ };
-		if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<uint8_t*>(programName), &size)
-		    == ERROR_SUCCESS) {
-			wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
-			if (!xi::chkp2cnam(programName)) {
-				*programName = 0;
+		GSL_SUPPRESS(26490) {
+			if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size)
+				== ERROR_SUCCESS) {
+				wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
+				if (!xi::chkp2cnam(programName)) {
+					*programName = 0;
+				}
 			}
 		}
 	}
@@ -780,7 +783,7 @@ void xt::internal::undclp() {
 	clipBuffer.clear();
 	clipBuffer.reserve(2);
 	ClipRectSize = FLSIZ { 0, SelectedForm->underlayStitchLen };
-	ClipRect     = fRECTANGLE { SelectedForm->underlayStitchLen, 0, 0, 0 };
+	ClipRect     = fRECTANGLE { 0, SelectedForm->underlayStitchLen, 0, 0 };
 	clipBuffer.emplace_back(0.0f, 00.0f, 0u);
 	clipBuffer.emplace_back(0.0f, SelectedForm->underlayStitchLen, 0u);
 }
