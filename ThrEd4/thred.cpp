@@ -1370,20 +1370,20 @@ void thred::coltab() noexcept {
 		auto iColor  = 0u;
 		currentColor = 0xffffffff;
 		const auto range
-		    = dRECTANGLE { UnzoomedRect.y * 2.0, UnzoomedRect.y * -1.0, UnzoomedRect.x * -1.0, UnzoomedRect.x * 2.0 };
+		    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			auto* Stitch = &StitchBuffer[iStitch];
 			if (Stitch->x < range.left) {
-				Stitch->x = gsl::narrow_cast<float>(range.left);
+				Stitch->x = range.left;
 			}
 			if (Stitch->x > range.right) {
-				Stitch->x = gsl::narrow_cast<float>(range.right);
+				Stitch->x = range.right;
 			}
 			if (Stitch->y > range.top) {
-				Stitch->y = gsl::narrow_cast<float>(range.top);
+				Stitch->y = range.top;
 			}
 			if (Stitch->y < range.bottom) {
-				Stitch->y = gsl::narrow_cast<float>(range.bottom);
+				Stitch->y = range.bottom;
 			}
 			const auto nextColor = Stitch->attribute & COLMSK;
 			if (currentColor != nextColor) {
@@ -5223,16 +5223,16 @@ void thred::internal::bak() {
 }
 
 void thred::internal::bitsiz() noexcept {
-	const auto screenAspectRatio = gsl::narrow<double>(UnzoomedRect.x) / UnzoomedRect.y;
-	const auto bitmapAspectRatio = gsl::narrow<double>(BitmapWidth) / BitmapHeight;
+	const auto screenAspectRatio = gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);
+	const auto bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
 
 	if (bitmapAspectRatio > screenAspectRatio) {
-		BitmapSizeinStitches.x = gsl::narrow<double>(UnzoomedRect.x);
-		BitmapSizeinStitches.y = UnzoomedRect.x / bitmapAspectRatio;
+		BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.x);
+		BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.x) / bitmapAspectRatio;
 	}
 	else {
-		BitmapSizeinStitches.x = UnzoomedRect.y * bitmapAspectRatio;
-		BitmapSizeinStitches.y = gsl::narrow<double>(UnzoomedRect.y);
+		BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.y) * bitmapAspectRatio;
+		BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.y);
 	}
 	BmpStitchRatio.x = BitmapWidth / BitmapSizeinStitches.x;
 	BmpStitchRatio.y = BitmapHeight / BitmapSizeinStitches.y;
@@ -18237,15 +18237,15 @@ bool thred::internal::bitar() {
 		BitmapSrcRect.bottom = BitmapHeight;
 		StateMap.set(StateFlag::LANDSCAP);
 	}
-	const auto backingRect = dRECTANGLE { BitmapSrcRect.top * StitchBmpRatio.y,
-		                                  BitmapSrcRect.bottom * StitchBmpRatio.y,
-		                                  BitmapSrcRect.left * StitchBmpRatio.x,
-		                                  BitmapSrcRect.right * StitchBmpRatio.x };
+	const auto backingRect = fRECTANGLE { BitmapSrcRect.left * StitchBmpRatio.x,
+		                                  BitmapSrcRect.top * StitchBmpRatio.y,
+		                                  BitmapSrcRect.right * StitchBmpRatio.x,
+		                                  BitmapSrcRect.bottom * StitchBmpRatio.y };
 
-	const auto differenceRect = dRECTANGLE { backingRect.top - zoomedInRect.top,
-		                                     zoomedInRect.bottom - backingRect.bottom,
-		                                     backingRect.left - zoomedInRect.left,
-		                                     zoomedInRect.right - backingRect.right };
+	const auto differenceRect = fRECTANGLE { backingRect.left - zoomedInRect.left,
+		                                     backingRect.top - zoomedInRect.top,
+		                                     zoomedInRect.right - backingRect.right,
+		                                     zoomedInRect.bottom - backingRect.bottom };
 
 	const auto bitmapStitchRatio
 	    = fPOINT { gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),

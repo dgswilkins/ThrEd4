@@ -80,9 +80,9 @@ extern HDC      BitmapDC;
 extern RECT     BitmapDstRect;
 extern uint32_t BitmapHeight;
 extern POINT    BitmapPoint;
-extern dPOINT   BitmapSizeinStitches;
+extern fPOINT   BitmapSizeinStitches;
 extern RECT     BitmapSrcRect;
-extern dPOINT   BmpStitchRatio;
+extern fPOINT   BmpStitchRatio;
 extern uint32_t BitmapWidth;
 extern float    BorderWidth;
 extern uint32_t ButtonHeight;
@@ -243,7 +243,7 @@ extern float      StarRatio;
 
 extern EnumMap<StateFlag> StateMap;
 
-extern dPOINT     StitchBmpRatio;
+extern fPOINT     StitchBmpRatio;
 extern double     StitchBoxesThreshold;
 extern fPOINTATTR StitchBuffer[MAXITEMS * 2];
 extern POINT      StitchCoordinatesPixels;

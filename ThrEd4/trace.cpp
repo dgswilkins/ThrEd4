@@ -376,7 +376,7 @@ void trace::trace() {
 				SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 			}
 			BitmapPoint.x    = wrap::round<int32_t>(BmpStitchRatio.x * SelectedPoint.x);
-			BitmapPoint.y    = wrap::round<int32_t>(BmpStitchRatio.y * SelectedPoint.y - 1.0);
+			BitmapPoint.y    = wrap::round<int32_t>(BmpStitchRatio.y * SelectedPoint.y - 1.0f);
 			const auto color = TraceBitmapData[BitmapPoint.y * BitmapWidth + BitmapPoint.x] ^ 0xffffff;
 			if (StateMap.test(StateFlag::TRCUP)) {
 				UpPixelColor   = color;
@@ -798,7 +798,7 @@ void trace::internal::dutrac() {
 		OutputIndex++;
 		iNext                = 0;
 		auto traceLengthSum  = 0.0;
-		auto landscapeOffset = 0.0;
+		auto landscapeOffset = 0.0f;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
 		}

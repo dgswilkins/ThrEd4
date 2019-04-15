@@ -48,9 +48,9 @@ HDC      BitmapDC;             // bitmap device context
 RECT     BitmapDstRect;        // stitch window destination rectangle for zooomed view
 uint32_t BitmapHeight;         // bitmap height
 POINT    BitmapPoint;          // a point on the bitmap
-dPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
+fPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
 RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
-dPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
+fPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
 uint32_t BitmapWidth;          // bitmap width
 float    BorderWidth = BRDWID; // border width for satin borders
 uint32_t ButtonHeight;         // button height
@@ -210,7 +210,7 @@ float      StarRatio         = STARAT;             // star formOrigin to body ra
 
 EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
 
-dPOINT     StitchBmpRatio;                 // stitch hoop to bitmap ratios
+fPOINT     StitchBmpRatio;                 // stitch hoop to bitmap ratios
 double     StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
 fPOINTATTR StitchBuffer[MAXITEMS * 2];     // main stitch buffer
 POINT      StitchCoordinatesPixels;        // converted from stitch to pixel

@@ -830,7 +830,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 
 void formForms::dasyfrm() {
 	thred::unmsg();
-	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, static_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT
+	if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT
 		StateMap.reset(StateFlag::FORMIN);
 		return;
 	}
