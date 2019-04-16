@@ -2168,7 +2168,7 @@ void thred::internal::chknum() {
 				if (value != 0.0f) {
 					thred::savdo();
 					form::nufthcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
-					SetWindowText((*ValueWindow)[LFTHCOL], SideWindowEntryBuffer);
+					wrap::setSideWinVal(LFTHCOL);
 					thred::coltab();
 				}
 				thred::unsid();
@@ -2179,7 +2179,7 @@ void thred::internal::chknum() {
 				if (value != 0.0f) {
 					thred::savdo();
 					form::nufilcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
-					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
+					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
 				thred::unsid();
@@ -2190,7 +2190,7 @@ void thred::internal::chknum() {
 				if (value != 0.0f) {
 					thred::savdo();
 					SelectedForm->underlayColor = (bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu;
-					SetWindowText((*ValueWindow)[LUNDCOL], SideWindowEntryBuffer);
+					wrap::setSideWinVal(LUNDCOL);
 					form::refilfn();
 					thred::coltab();
 				}
@@ -2202,7 +2202,7 @@ void thred::internal::chknum() {
 				if (value != 0.0f) {
 					thred::savdo();
 					form::nubrdcol((bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu);
-					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
+					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
 				thred::unsid();
@@ -2213,7 +2213,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->edgeSpacing = value;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LBRDPIC], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LBRDPIC);
 				form::refil();
 				return;
 			}
@@ -2221,7 +2221,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->wordParam = wrap::floor<uint32_t>(value / PFGRAN);
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LFRMFAZ], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LFRMFAZ);
 				form::refil();
 				return;
 			}
@@ -2229,7 +2229,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->edgeStitchLen = value / PFGRAN;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LBRDPOS], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LBRDPOS);
 				form::refil();
 				return;
 			}
@@ -2237,7 +2237,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->maxFillStitchLen = value;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LMAXFIL], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LMAXFIL);
 				form::refil();
 				return;
 			}
@@ -2245,7 +2245,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->minFillStitchLen = value;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LMINFIL], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LMINFIL);
 				form::refil();
 				return;
 			}
@@ -2253,7 +2253,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->maxBorderStitchLen = value;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LMAXBRD], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LMAXBRD);
 				form::refil();
 				return;
 			}
@@ -2261,7 +2261,7 @@ void thred::internal::chknum() {
 				thred::savdo();
 				SelectedForm->minBorderStitchLen = value;
 				thred::unsid();
-				SetWindowText((*ValueWindow)[LMINBRD], SideWindowEntryBuffer);
+				wrap::setSideWinVal(LMINBRD);
 				form::refil();
 				return;
 			}

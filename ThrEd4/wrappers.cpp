@@ -115,3 +115,7 @@ HPEN wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }
+
+void wrap::setSideWinVal(int index){
+	SetWindowText((*ValueWindow)[index], static_cast<LPCWSTR>(SideWindowEntryBuffer));
+}

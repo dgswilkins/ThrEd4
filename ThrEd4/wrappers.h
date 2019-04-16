@@ -29,6 +29,7 @@ void     Polyline(HDC hdc, const POINT* apt, uint32_t cpt) noexcept;
 bool     pressed(int virtKey) noexcept;
 bool     ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept;
 void     setCursor(HCURSOR hCursor) noexcept;
+void     setSideWinVal(int index);
 void     TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 double   toDouble(float invar) noexcept;
 double   toDouble(int32_t invar) noexcept;
