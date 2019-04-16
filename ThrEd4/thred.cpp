@@ -1653,7 +1653,7 @@ void thred::internal::stchPars() {
 		StitchWindowSize.x = wrap::round<int32_t>(gsl::narrow_cast<float>(ThredWindowRect.bottom - *ScrollSize) * AspectRatio);
 	}
 
-	if ((StitchWindowSize.x + gsl::narrow<int32_t>(ButtonWidthX3) + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
+	if ((StitchWindowSize.x + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
 		if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 			StitchWindowSize.y = ThredWindowRect.bottom - (*ScrollSize * 2);
 		}
@@ -1662,7 +1662,7 @@ void thred::internal::stchPars() {
 		}
 	}
 	else {
-		StitchWindowSize = { gsl::narrow<int32_t>(ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize),
+		StitchWindowSize = { ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
 			                 ThredWindowRect.bottom - ThredWindowRect.top };
 		if ((gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(StitchWindowSize.y)) > AspectRatio) {
 			StitchWindowSize.x = wrap::round<int32_t>(StitchWindowSize.y * AspectRatio);
@@ -1729,7 +1729,7 @@ void thred::internal::nuRct() {
 }
 
 void thred::movStch() {
-	auto clientSize     = POINT { (ThredWindowRect.right - gsl::narrow<int32_t>(ButtonWidthX3) - (*ScrollSize + *ColorBarSize)),
+	auto clientSize     = POINT { (ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + *ColorBarSize)),
                               (ThredWindowRect.bottom) };
 	auto verticalOffset = 0;
 
@@ -4953,7 +4953,7 @@ void thred::internal::sidmsg(HWND window, std::wstring* const strings, uint32_t 
 			else {
 				if (FormMenuChoice == LFTHTYP) {
 					entryCount     = 5;
-					SideWindowSize = { gsl::narrow<int32_t>(ButtonWidthX3), gsl::narrow<int32_t>(ButtonHeight) };
+					SideWindowSize = { ButtonWidthX3, ButtonHeight };
 				}
 				else {
 					for (auto iEntry = 0u; iEntry < entries; iEntry++) {
@@ -11004,11 +11004,11 @@ void thred::internal::ritcur() noexcept {
 		uint8_t bitmapBits[64] = {};
 		GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
 		if (currentCursor == ArrowCursor) {
-			for (auto iRow = 0u; iRow < 32; iRow++) {
+			for (auto iRow = 0; iRow < 32; iRow++) {
 				const auto mask          = byteSwap(bitmapBits[iRow]);
 				const auto bitmapInverse = byteSwap(bitmapBits[iRow + 32]);
 				auto       bitMask       = 0x80000000u;
-				for (auto iPixel = 0u; iPixel < 32; iPixel++) {
+				for (auto iPixel = 0; iPixel < 32; iPixel++) {
 					if ((bitMask & mask) == 0u) {
 						auto pixelColor = 0u;
 						if ((bitMask & bitmapInverse) != 0u) {
@@ -11024,10 +11024,10 @@ void thred::internal::ritcur() noexcept {
 			}
 		}
 		else {
-			for (auto iRow = 0u; iRow < 32; iRow++) {
+			for (auto iRow = 0; iRow < 32; iRow++) {
 				const auto bitmapInverse = byteSwap(bitmapBits[iRow + 32]);
 				auto       bitMask       = 0x80000000u;
-				for (auto iPixel = 0u; iPixel < 32; iPixel++) {
+				for (auto iPixel = 0; iPixel < 32; iPixel++) {
 					if ((bitMask & bitmapInverse) != 0u) {
 						SetPixel(StitchWindowDC,
 						         cursorPosition.x + iPixel,

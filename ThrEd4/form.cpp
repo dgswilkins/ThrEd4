@@ -7062,7 +7062,7 @@ void form::internal::doTimeWindow(float rangeX, const std::vector<uint32_t>& xPo
 	auto&      formLines    = *FormLines;
 	formLines.clear();
 	formLines.push_back(POINT { 0, 0 });
-	formLines.push_back(POINT { 0, gsl::narrow<int32_t>(ButtonHeight) });
+	formLines.push_back(POINT { 0, ButtonHeight });
 	SelectObject(timeDC, UserPen[0]);
 	for (auto iColumn = 1u; iColumn < rangeX - checkLength - 1; iColumn++) {
 		snpfn(xPoints,

@@ -53,9 +53,9 @@ RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
 fPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
 uint32_t BitmapWidth;          // bitmap width
 float    BorderWidth = BRDWID; // border width for satin borders
-uint32_t ButtonHeight;         // button height
-uint32_t ButtonWidth;          // button width
-uint32_t ButtonWidthX3;        // button width times 3
+int32_t  ButtonHeight;         // button height
+int32_t  ButtonWidth;          // button width
+int32_t  ButtonWidthX3;        // button width times 3
 
 std::vector<HWND>* ButtonWin; // button windows
 

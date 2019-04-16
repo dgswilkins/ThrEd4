@@ -1089,12 +1089,12 @@ void trace::tracpar() {
 	}
 	TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
 	TraceMsgPoint.y = Msg.pt.y - ThredWindowOrigin.y;
-	if (TraceMsgPoint.x > gsl::narrow<int32_t>(ButtonWidthX3)) {
+	if (TraceMsgPoint.x > ButtonWidthX3) {
 		ti::dutrac();
 	}
 	else {
 		ColumnColor = ti::ducolm();
-		if (TraceMsgPoint.y < gsl::narrow<int32_t>(ButtonHeight) * 15) {
+		if (TraceMsgPoint.y < ButtonHeight * 15) {
 			do {
 				if (wrap::pressed(VK_SHIFT)) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
