@@ -5597,8 +5597,9 @@ uint32_t thred::internal::dupcol(uint32_t activeColor) {
 	const auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
 	const auto color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
 	for (auto iColor = 0u; iColor < activeColor; iColor++) {
-		if (UserColor[iColor] == color)
+		if (UserColor[iColor] == color) {
 			return iColor;
+		}
 	}
 	auto minimumDistance = 0xffffffu;
 	auto matchIndex      = 0u;
@@ -6075,8 +6076,9 @@ void thred::internal::nuFil() {
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3)) {
 							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
 							while (iPESstitch < pecCount) {
-								if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0)
+								if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1] == 0) {
 									break;
+								}
 								if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1] == 0xb0) {
 									color = dupcol(activeColor);
 									iPESstitch += 2;
@@ -6107,8 +6109,9 @@ void thred::internal::nuFil() {
 										StitchBuffer[iActualPESstitches].attribute = color;
 										iActualPESstitches++;
 									}
-									else
+									else {
 										loc.x += locof;
+									}
 								}
 								iPESstitch++;
 							}
