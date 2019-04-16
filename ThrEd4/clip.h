@@ -53,8 +53,8 @@ namespace internal {
 	void clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter);
 	bool clpsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
-	            uint32_t               start,
-	            uint32_t               finish,
+	            uint32_t                   start,
+	            uint32_t                   finish,
 	            const fPOINT&              rotationCenter);
 	void clpsub(uint32_t fpnt, uint32_t cnt);
 	void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
@@ -80,19 +80,15 @@ namespace internal {
 	             double                     clipAngle,
 	             dPOINT&                    moveToCoords,
 	             const fPOINT&              rotationCenter,
-	             uint32_t               currentSide);
+	             uint32_t                   currentSide);
 	void linsid(const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            float                      clipAngle,
 	            const fPOINT&              vector0,
 	            const fPOINT&              rotationCenter,
-	            uint32_t               currentSide);
+	            uint32_t                   currentSide);
 	bool nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide);
-	void picfn(std::vector<fPOINT>& clipFillData,
-	           uint32_t         start,
-	           uint32_t         finish,
-	           float                spacing,
-	           const fPOINT&        rotationCenter);
+	void picfn(std::vector<fPOINT>& clipFillData, uint32_t start, uint32_t finish, float spacing, const fPOINT& rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
 	void setvct(uint32_t start, uint32_t finish, float& clipAngle, fPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,

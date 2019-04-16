@@ -28,26 +28,26 @@
 namespace satin {
 
 uint32_t adsatk(uint32_t count);
-void         cpySat(const FRMHED& formHeader);
-void         delcon(uint32_t GuideIndex);
-void         delsac(uint32_t formIndex);
-void         delspnt();
-void         drwsat();
-void         dusat();
-void         ribon();
-void         satadj();
-void         satbrd();
-void         satfil();
-void         satfix();
-void         satknkt();
-void         satout(float satinWidth);
-void         satpnt0();
-void         satpnt1();
-void         satsel();
-void         satzum();
-void         sbrd();
-void         slbrd();
-void         spltsat(uint32_t guideIndex);
+void     cpySat(const FRMHED& formHeader);
+void     delcon(uint32_t GuideIndex);
+void     delsac(uint32_t formIndex);
+void     delspnt();
+void     drwsat();
+void     dusat();
+void     ribon();
+void     satadj();
+void     satbrd();
+void     satfil();
+void     satfix();
+void     satknkt();
+void     satout(float satinWidth);
+void     satpnt0();
+void     satpnt1();
+void     satsel();
+void     satzum();
+void     sbrd();
+void     slbrd();
+void     spltsat(uint32_t guideIndex);
 
 namespace internal {
 
@@ -56,16 +56,12 @@ namespace internal {
 
 	uint32_t nusac(uint32_t formIndex, uint32_t guideCount);
 
-	void     outfn(uint32_t start, uint32_t finish, float satinWidth);
-	void     sacspac(uint32_t startGuide, uint32_t guideCount);
-	void     satclos();
-	void     satcpy(const std::vector<SATCON>& source, uint32_t size);
-	void     satends(uint32_t isBlunt);
-	void     satfn(const std::vector<float>& lengths,
-	               uint32_t               line1Start,
-	               uint32_t               line1End,
-	               uint32_t               line2Start,
-	               uint32_t               line2End);
+	void outfn(uint32_t start, uint32_t finish, float satinWidth);
+	void sacspac(uint32_t startGuide, uint32_t guideCount);
+	void satclos();
+	void satcpy(const std::vector<SATCON>& source, uint32_t size);
+	void satends(uint32_t isBlunt);
+	void satfn(const std::vector<float>& lengths, uint32_t line1Start, uint32_t line1End, uint32_t line2Start, uint32_t line2End);
 	uint32_t satind(const SATCON* guide) noexcept;
 	void     satmf(const std::vector<float>& lengths);
 	void     satsbrd();

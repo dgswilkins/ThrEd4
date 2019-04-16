@@ -638,8 +638,8 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 	txi::deorg(screenOffset);
 	txi::px2ed(screenOffset, editorOffset);
 	if (StateMap.testAndReset(StateFlag::TXHCNTR)) {
-		editorOffset.x = (gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing) / 2.0f + TextureScreen.xOffset - TextureScreen.formCenter.x
-		                 + TextureScreen.spacing / 2.0f;
+		editorOffset.x = (gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing) / 2.0f + TextureScreen.xOffset
+		                 - TextureScreen.formCenter.x + TextureScreen.spacing / 2.0f;
 	}
 	else {
 		editorOffset.x -= TextureScreen.formCenter.x;
@@ -1644,7 +1644,7 @@ void texture::rtrtx() {
 		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
 		TextureScreen.spacing    = SelectedForm->fillSpacing;
 		TextureScreen.lines      = SelectedForm->fillInfo.texture.lines;
-		TextureScreen.width      = gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0f;
+		TextureScreen.width = gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0f;
 		texture::savtxt();
 	}
 }

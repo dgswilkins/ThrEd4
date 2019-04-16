@@ -85,9 +85,9 @@ extern RECT     BitmapSrcRect;
 extern fPOINT   BmpStitchRatio;
 extern uint32_t BitmapWidth;
 extern float    BorderWidth;
-extern int32_t ButtonHeight;
-extern int32_t ButtonWidth;
-extern int32_t ButtonWidthX3;
+extern int32_t  ButtonHeight;
+extern int32_t  ButtonWidth;
+extern int32_t  ButtonWidthX3;
 
 extern std::vector<HWND>* ButtonWin;
 

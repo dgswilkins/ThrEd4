@@ -546,7 +546,7 @@ void xt::pes2crd() {
 		auto keyType = DWORD { REG_SZ };
 		GSL_SUPPRESS(26490) {
 			if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size)
-				== ERROR_SUCCESS) {
+			    == ERROR_SUCCESS) {
 				wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 				if (!xi::chkp2cnam(programName)) {
 					*programName = 0;

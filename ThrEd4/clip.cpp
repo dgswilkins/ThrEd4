@@ -39,9 +39,9 @@
 
 namespace ci = clip::internal;
 
-fPOINT       ClipReference;       // clipboard reference formOrigin
-fPOINT       BorderClipReference; // reference for clipboard line border
-float        AdjustedSpace;       // adjusted space
+fPOINT   ClipReference;       // clipboard reference formOrigin
+fPOINT   BorderClipReference; // reference for clipboard line border
+float    AdjustedSpace;       // adjusted space
 uint32_t NextStart;           // index of the endpoint of the line segment being processed
 
 bool clip::iseclp(uint32_t iForm) {
@@ -296,7 +296,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                              double                     clipAngle,
                              dPOINT&                    moveToCoords,
                              const fPOINT&              rotationCenter,
-                             uint32_t               currentSide) {
+                             uint32_t                   currentSide) {
 	auto delta = dPOINT {};
 
 	if (ci::nupnt(clipAngle, moveToCoords, currentSide)) {
@@ -319,7 +319,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             float                      clipAngle,
                             const fPOINT&              vector0,
                             const fPOINT&              rotationCenter,
-                            uint32_t               currentSide) {
+                            uint32_t                   currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto& point     = vertexIt[wrap::toSize(currentSide) + 1u];
 	const auto  delta     = fPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
@@ -359,8 +359,8 @@ void clip::clpout() {
 
 bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
                             std::vector<fPOINT>&       clipFillData,
-                            uint32_t               start,
-                            uint32_t               finish,
+                            uint32_t                   start,
+                            uint32_t                   finish,
                             const fPOINT&              rotationCenter) {
 	auto        vertexIt           = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto& end                = vertexIt[finish];
@@ -377,8 +377,11 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
 	if (clipCount != 0u) {
 		auto remainder = 0.0f;
-		if (clipCount > 1) {
-			remainder = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) / (gsl::narrow_cast<float>(clipCount) - 1.0f) + ClipRectSize.cx) / length;
+		if (clipCount > 1u) {
+			remainder
+			    = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) / (gsl::narrow_cast<float>(clipCount) - 1.0f)
+			       + ClipRectSize.cx)
+			      / length;
 		}
 		else {
 			remainder = (length - ClipRectSize.cx) / 2;
@@ -745,8 +748,8 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex,
 }
 
 void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
-                           uint32_t         start,
-                           uint32_t         finish,
+                           uint32_t             start,
+                           uint32_t             finish,
                            float                spacing,
                            const fPOINT&        rotationCenter) {
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -764,9 +767,11 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	if (count != 0u) {
 		auto step = fPOINT {};
 		if (count > 1) {
-			const auto tdub = ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0f) + spacing) / length;
-			const auto val  = fPOINT { delta.x * tdub, delta.y * tdub };
-			step            = val;
+			const auto tdub
+			    = ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0f) + spacing)
+			      / length;
+			const auto val = fPOINT { delta.x * tdub, delta.y * tdub };
+			step           = val;
 		}
 		auto iClip = clipFillData.begin();
 		for (auto& clip : *ClipBuffer) {

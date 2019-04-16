@@ -1253,7 +1253,7 @@ void formForms::wavfrm() {
 			vertexIt[index].y -= SelectedForm->rectangle.bottom;
 		}
 		FormMoveDelta      = fPOINT {};
-		NewFormVertexCount                = vertexCount + 1;
+		NewFormVertexCount = vertexCount + 1;
 		form::setmfrm();
 		form::mdufrm();
 	}

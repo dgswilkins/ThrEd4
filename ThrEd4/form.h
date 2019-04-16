@@ -26,90 +26,90 @@
 
 namespace form {
 
-void         angclp();
-void         angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
-void         angsclp();
-void         apliq();
-void         bakagain();
-void         bakdup();
-void         bhol();
-void         boxsel();
-void         bord();
-void         bsizpar() noexcept;
-void         centir();
-void         chain();
-void         chan();
-void         chkcont();
-bool         chkdel() noexcept;
-bool         chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio);
-bool         chkmax(uint32_t arg0, uint32_t arg1) noexcept;
-void         chkseq(bool border);
-bool         cisin(float xCoordinate, float yCoordinate);
+void     angclp();
+void     angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
+void     angsclp();
+void     apliq();
+void     bakagain();
+void     bakdup();
+void     bhol();
+void     boxsel();
+void     bord();
+void     bsizpar() noexcept;
+void     centir();
+void     chain();
+void     chan();
+void     chkcont();
+bool     chkdel() noexcept;
+bool     chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio);
+bool     chkmax(uint32_t arg0, uint32_t arg1) noexcept;
+void     chkseq(bool border);
+bool     cisin(float xCoordinate, float yCoordinate);
 uint32_t closflt(float xCoordinate, float yCoordinate);
-bool         closfrm();
-void         clpfil();
-void         clpspac(uint32_t insertPoint, uint32_t count);
-void         clrfills() noexcept;
-void         cntrx();
-void         col2frm();
-void         contfil();
-void         cpylayr(uint32_t codedLayer);
-void         crop();
-void         debean();
-void         delflt(uint32_t formIndex);
-void         delfrms();
-void         delmfil();
-void         drwcon();
-void         drwfrm();
-void         duangs();
-void         dubean();
-void         dubfil();
-void         dubig();
-void         dubold();
-void         dubsfil();
-void         dueg(uint32_t sides);
-void         duform(uint32_t formType);
-void         dufrm() noexcept;
-void         duhart(uint32_t sideCount);
-void         dulens(uint32_t sides);
-void         duinsf() noexcept;
-void         duprot(float rotationAngle);
-void         dupsel(HDC dc);
-void         durpoli(uint32_t vertexCount);
-void         duspir(uint32_t stepCount);
-void         dusqr();
-void         dustar(uint32_t starCount, float length);
-void         duzig(uint32_t vertices);
-void         fclp();
-void         fcntr();
-void         filangl();
-void         filclpx();
-void         filhor();
-void         filin(fPOINT currentPoint);
-void         filinsb(const fPOINT& point);
-void         filinu(const fPOINT& inPoint);
-void         filsat();
-void         filvrt();
-uint32_t     find1st();
-void         fliph();
-void         flipv();
-void         flpord();
-void         fltspac(uint32_t vertexOffset, uint32_t count);
-void         form();
-void         frm0();
-void         frmadj(uint32_t formIndex);
-void         frmclr(FRMHED& destination) noexcept;
-void         frmlin(uint32_t vertices, uint32_t vertexCount);
-void         frmlin(const std::vector<fPOINT>& vertices);
-void         frmnumfn(uint32_t newFormIndex);
-void         frmon();
-void         frmout(uint32_t formIndex);
-void         frmovlin();
-bool         frmrng(uint32_t iForm, RANGE& range);
-void         frmsadj();
-void         fselrct(uint32_t iForm);
-void         fsizpar() noexcept;
-void         fvars(uint32_t iForm);
+bool     closfrm();
+void     clpfil();
+void     clpspac(uint32_t insertPoint, uint32_t count);
+void     clrfills() noexcept;
+void     cntrx();
+void     col2frm();
+void     contfil();
+void     cpylayr(uint32_t codedLayer);
+void     crop();
+void     debean();
+void     delflt(uint32_t formIndex);
+void     delfrms();
+void     delmfil();
+void     drwcon();
+void     drwfrm();
+void     duangs();
+void     dubean();
+void     dubfil();
+void     dubig();
+void     dubold();
+void     dubsfil();
+void     dueg(uint32_t sides);
+void     duform(uint32_t formType);
+void     dufrm() noexcept;
+void     duhart(uint32_t sideCount);
+void     dulens(uint32_t sides);
+void     duinsf() noexcept;
+void     duprot(float rotationAngle);
+void     dupsel(HDC dc);
+void     durpoli(uint32_t vertexCount);
+void     duspir(uint32_t stepCount);
+void     dusqr();
+void     dustar(uint32_t starCount, float length);
+void     duzig(uint32_t vertices);
+void     fclp();
+void     fcntr();
+void     filangl();
+void     filclpx();
+void     filhor();
+void     filin(fPOINT currentPoint);
+void     filinsb(const fPOINT& point);
+void     filinu(const fPOINT& inPoint);
+void     filsat();
+void     filvrt();
+uint32_t find1st();
+void     fliph();
+void     flipv();
+void     flpord();
+void     fltspac(uint32_t vertexOffset, uint32_t count);
+void     form();
+void     frm0();
+void     frmadj(uint32_t formIndex);
+void     frmclr(FRMHED& destination) noexcept;
+void     frmlin(uint32_t vertices, uint32_t vertexCount);
+void     frmlin(const std::vector<fPOINT>& vertices);
+void     frmnumfn(uint32_t newFormIndex);
+void     frmon();
+void     frmout(uint32_t formIndex);
+void     frmovlin();
+bool     frmrng(uint32_t iForm, RANGE& range);
+void     frmsadj();
+void     fselrct(uint32_t iForm);
+void     fsizpar() noexcept;
+void     fvars(uint32_t iForm);
 
 float getblen();
 
@@ -221,8 +221,8 @@ namespace internal {
 	void brdfil(float pd_Size);
 	void brkdun(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish);
 	void brkseq(const std::vector<SMALPNTL*>& sortedLines,
-	            uint32_t                  start,
-	            uint32_t                  finish,
+	            uint32_t                      start,
+	            uint32_t                      finish,
 	            boost::dynamic_bitset<>&      sequenceMap,
 	            uint32_t&                     lastGroup,
 	            SMALPNTL*                     sequenceLines);
@@ -258,9 +258,9 @@ namespace internal {
 	            std::vector<SATCON>& tempGuides,
 	            std::vector<fPOINT>& destinationFormVertices,
 	            std::vector<FRMHED>& destinationFormList,
-	            uint32_t         formIndex,
-	            uint32_t&        formRelocationIndex,
-	            uint32_t&        formSourceIndex);
+	            uint32_t             formIndex,
+	            uint32_t&            formRelocationIndex,
+	            uint32_t&            formSourceIndex);
 	void duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices);
 	void dunseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup);
 	void dupfn(float rotationAngle);
@@ -270,14 +270,14 @@ namespace internal {
 	           boost::dynamic_bitset<>&      visitedRegions,
 	           const std::vector<SMALPNTL*>& sortedLines,
 	           uint32_t                      pthi,
-	           uint32_t                  lineCount,
+	           uint32_t                      lineCount,
 	           std::vector<REGION>&          regionsList,
 	           uint32_t&                     lastGroup,
 	           uint32_t                      sequencePathIndex);
 	void duromb(const fPOINT& start0, const fPOINT& finish0, const fPOINT& start1, const fPOINT& finish1);
 	void duseq(const std::vector<SMALPNTL*>& sortedLines,
-	           uint32_t                  start,
-	           uint32_t                  finish,
+	           uint32_t                      start,
+	           uint32_t                      finish,
 	           boost::dynamic_bitset<>&      sequenceMap,
 	           uint32_t&                     lastGroup,
 	           SMALPNTL*                     sequenceLines);
@@ -287,8 +287,8 @@ namespace internal {
 
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
-	             uint32_t              start,
-	             uint32_t              finish);
+	             uint32_t                  start,
+	             uint32_t                  finish);
 	void  filsclp();
 	void  filsfn();
 	float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept;
@@ -340,8 +340,8 @@ namespace internal {
 	void inspnt(std::vector<CLIPNT>& clipStitchPoints);
 	bool isclos(const SMALPNTL* lineEndPoint0, const SMALPNTL* lineEndPoint1, double gapToClosestRegion) noexcept;
 
-	bool isect(uint32_t               vertex0,
-	           uint32_t               vertex1,
+	bool isect(uint32_t                   vertex0,
+	           uint32_t                   vertex1,
 	           fPOINT&                    intersection,
 	           float&                     length,
 	           const fPOINT&              lineSegmentStart,
@@ -402,7 +402,7 @@ namespace internal {
 	void   pbrd(float edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	           const std::vector<VRCT2>& fillVerticalRect,
-	           uint32_t              startVertex,
+	           uint32_t                  startVertex,
 	           const std::vector<VRCT2>& vrct);
 	void   plbak(uint32_t backPoint);
 	void   plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
