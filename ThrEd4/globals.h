@@ -236,8 +236,8 @@ extern double     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 extern wchar_t    SideWindowEntryBuffer[11];
 extern HWND       SideWindow[16];
-extern double     SmallStitchLength;
-extern double     SnapLength;
+extern float      SmallStitchLength;
+extern float      SnapLength;
 extern float      SpiralWrap;
 extern float      StarRatio;
 

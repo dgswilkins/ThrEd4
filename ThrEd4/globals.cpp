@@ -203,8 +203,8 @@ double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below thi
 HWND       SideMessageWindow   = nullptr;          // main side message window
 wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
 HWND       SideWindow[16];                         // side message windows
-double     SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
-double     SnapLength        = SNPLEN * PFGRAN;    // snap together length
+float      SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
+float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
 float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
 float      StarRatio         = STARAT;             // star formOrigin to body ratio
 

@@ -59,7 +59,7 @@ constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color b
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
 constexpr float    ZMARGIN    = 1.25f;             // zoom margin for select zooms
-constexpr double   SMALSIZ    = 0.25;              // default small stitch size
+constexpr float    SMALSIZ    = 0.25f;              // default small stitch size
 constexpr float    MINSIZ     = 0.1f;              // default minimum stitch size
 constexpr float    USESIZ     = 3.5f;              // user preferred size
 constexpr double   MAXSIZ     = 9.0;               // default maximum stitch size
@@ -112,7 +112,7 @@ constexpr uint8_t  NCODOF    = 80u;             // name encoding offset
 constexpr double   CLPMIN    = 0.5;             // if clipboard data less wide, then don't fill
 constexpr float    CLPMINAUT = 1.2f;            // for skinny vertical clips
 constexpr float    BRDWID    = 18.0f;           // default satin border size
-constexpr double   SNPLEN    = 0.15;            // default snap together length size
+constexpr float    SNPLEN    = 0.15f;            // default snap together length size
 constexpr float    STARAT    = 0.4f;            // default star ratio
 constexpr float    SPIRWRAP  = 1.52f;           // default spiral wrap
 constexpr uint32_t BALNORM   = 0x80u;           // normal balarad stitch
