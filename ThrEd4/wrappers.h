@@ -26,6 +26,7 @@ HPEN     CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept;
 void     GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void     GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
 void     Polyline(HDC hdc, const POINT* apt, uint32_t cpt) noexcept;
+bool     pressed(int virtKey) noexcept;
 bool     ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept;
 void     setCursor(HCURSOR hCursor) noexcept;
 void     TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;

@@ -1568,7 +1568,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	}
 	case 'D':
 	case VK_DELETE: {
-		if ((gsl::narrow<uint32_t>(GetKeyState(VK_SHIFT)) & gsl::narrow<uint32_t>(GetKeyState(VK_CONTROL)) & 0x8000u) != 0u) {
+		if (wrap::pressed(VK_SHIFT) && wrap::pressed(VK_CONTROL)) {
 			txi::txdelal();
 		}
 		else {

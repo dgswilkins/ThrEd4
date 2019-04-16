@@ -1096,7 +1096,7 @@ void trace::tracpar() {
 		ColumnColor = ti::ducolm();
 		if (TraceMsgPoint.y < gsl::narrow<int32_t>(ButtonHeight) * 15) {
 			do {
-				if ((GetKeyState(VK_SHIFT) & 0x8000) != 0) {
+				if (wrap::pressed(VK_SHIFT)) {
 					UpPixelColor &= TraceRGBMask[ColumnColor];
 					DownPixelColor |= TraceRGB[2 - ColumnColor];
 					break;
