@@ -963,7 +963,7 @@ struct _iniFil {
 	float    maxStitchLength;                        // maximum stitch length
 	double   smallStitchLength;                      // small stitch size
 	double   stitchBoxesThreshold;                   // show sitch box level
-	double   stitchSpace;                            // stitch spacing between lines of stitches
+	float    stitchSpace;                            // stitch spacing between lines of stitches
 	float    fillAngle;                              // fill angle
 	uint32_t userFlagMap;                            // bitmap for user variables
 	float    borderWidth;                            // border width
@@ -973,7 +973,7 @@ struct _iniFil {
 	float    starRatio;                              // star ratio
 	float    spiralWrap;                             // spiral wrap
 	COLORREF bitmapBackgroundColors[COLOR_COUNT];    // bitmap background color preferences NOLINT
-	double   buttonholeCornerLength;                 // buttonhole fill corner length
+	float    buttonholeCornerLength;                 // buttonhole fill corner length
 	float    picotSpace;                             // space between border picots
 	int8_t   hoopType;                               // hoop type
 	int8_t   auxFileType;                            // machine file type

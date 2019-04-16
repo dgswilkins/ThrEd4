@@ -102,6 +102,7 @@ namespace internal {
 	void   boxs() noexcept;
 	void   bsavmen();
 	double bufToDouble(wchar_t* buffer);
+	float  bufToFloat(wchar_t* buffer);
 
 	uint64_t bufTou64(wchar_t* buffer);
 
@@ -193,7 +194,7 @@ namespace internal {
 	void duinsfil();
 	void dulin();
 	void dumov();
-	void dumrk(double xCoord, double yCoord);
+	void dumrk(float xCoord, float yCoord);
 	void dun();
 	bool dunum(uint32_t code) noexcept;
 	void dupclp();
@@ -259,7 +260,7 @@ namespace internal {
 	bool handleHomeKey(bool& retflag);
 	bool handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	                          float&              xyRatio,
-	                          double              rotationAngle,
+	                          float               rotationAngle,
 	                          const FRMHED&       textureForm,
 	                          bool&               retflag);
 	bool handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag);
@@ -267,7 +268,7 @@ namespace internal {
 	bool handleMainMenu(const WORD& wParameter, fPOINT& rotationCenter);
 	bool handleMainWinKeys(const uint32_t& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag);
 	bool handleMouseMove(std::vector<POINT>& stretchBoxLine,
-	                     double              xyRatio,
+	                     float               xyRatio,
 	                     float&              rotationAngle,
 	                     const fPOINT&       rotationCenter,
 	                     const FRMHED&       textureForm);
@@ -335,7 +336,7 @@ namespace internal {
 	HPEN     nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept;
 	void     nuRct();
 	void     nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
-	double   nuang(float yDelta, float xDelta) noexcept;
+	float    nuang(float yDelta, float xDelta) noexcept;
 	void     nucols();
 	void     nudgfn(float deltaX, float deltaY);
 	void     nulayr(uint32_t play);
@@ -405,7 +406,7 @@ namespace internal {
 
 	void     rotauxmen();
 	void     rotauxsel(uint32_t stat);
-	void     rotfns(double rotationAngle);
+	void     rotfns(float rotationAngle);
 	void     rotmrk();
 	void     rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, const POINT& rotationCenterPixels);
 	void     rotseg();
