@@ -1040,6 +1040,8 @@ BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		}
 		}
 	}
+	default: {
+	}
 	}
 	return FALSE;
 }
@@ -2251,6 +2253,8 @@ void thred::internal::chknum() {
 				form::refil();
 				return;
 			}
+			default: {
+			}
 			}
 			if (FormMenuChoice == LBCSIZ) {
 				thred::savdo();
@@ -2345,6 +2349,8 @@ void thred::internal::chknum() {
 						borderColor &= COLMSK;
 						SelectedForm->borderColor |= (gsl::narrow_cast<uint32_t>(borderColor) << 4u);
 						break;
+					}
+					default: {
 					}
 					}
 				}
@@ -5306,6 +5312,8 @@ bool thred::internal::gudtyp(WORD bitCount) noexcept {
 		return true;
 	case 32:
 		return true;
+	default: {
+	}
 	}
 	return false;
 }
@@ -10253,6 +10261,8 @@ void thred::internal::rthumnam(uint32_t iThumbnail) {
 		barnam((*ButtonWin)[HMAXLEN], iThumbnail);
 		break;
 	}
+	default: {
+	}
 	}
 }
 
@@ -11365,6 +11375,8 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			}
 		}
 	}
+	default: {
+	}
 	}
 	return FALSE;
 }
@@ -12096,6 +12108,8 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 			break;
 		}
 		}
+	}
+	default: {
 	}
 	}
 	return FALSE;
@@ -14132,6 +14146,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			case 1: {
 				movbak('r', '0');
 			}
+			default: {
+			}
 			}
 			movbak('t', 'r');
 			thrBack = 't';
@@ -14244,6 +14260,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			case FRMEGG - 2:
 			case FRMZIGZAG - 2:
 				return true;
+			default: {
+			}
 			}
 		}
 		thred::unmsg();
@@ -15842,6 +15860,8 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		}
 		break;
 	}
+	default: {
+	}
 	}
 	retflag = false;
 	return {};
@@ -15898,6 +15918,8 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 			}
 		}
 		break;
+	}
+	default: {
 	}
 	}
 	retflag = false;
@@ -16480,6 +16502,8 @@ bool thred::internal::handleEditMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -16789,6 +16813,8 @@ bool thred::internal::handleViewMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -16897,6 +16923,8 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 		}
 		flag = true;
 		break;
+	}
+	default: {
 	}
 	}
 	return flag;
@@ -17069,6 +17097,8 @@ bool thred::internal::handleFillMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -17181,6 +17211,8 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 		bak();
 		flag = true;
 		break;
+	}
+	default: {
 	}
 	}
 	return flag;
@@ -17300,6 +17332,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			case 'D': {
 				form::duform(FRMDAISY - 2);
 				return true;
+			}
+			default: {
 			}
 			}
 		}
@@ -17465,6 +17499,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				FormMenuChoice  = 0;
 				PreferenceIndex = 0;
 				return true;
+			}
+			default: {
 			}
 			}
 		}
@@ -19338,6 +19374,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			ShowWindow(p_hWnd, SW_SHOW);
 			break;
 		}
+		default: {
+		}
 		}
 		GetClientRect(p_hWnd, &ThredWindowRect);
 		thred::movStch();
@@ -19395,6 +19433,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			return 1;
 		}
 		break;
+	}
+	default: {
 	}
 	}
 	return DefWindowProc(p_hWnd, message, wParam, lParam);
