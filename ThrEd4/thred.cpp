@@ -2116,7 +2116,7 @@ void thred::internal::chknum() {
 	}
 	if (MsgIndex != 0u) {
 		if (FormMenuChoice != 0u) {
-			value = bufToDouble(SideWindowEntryBuffer) * PFGRAN;
+			value = bufToFloat(SideWindowEntryBuffer) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF: {
 				thred::savdo();
@@ -2189,7 +2189,7 @@ void thred::internal::chknum() {
 			case LUNDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					SelectedForm->underlayColor = (bufTou64(SideWindowEntryBuffer) - 1) & 0xfu;
+					SelectedForm->underlayColor = (bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu;
 					SetWindowText((*ValueWindow)[LUNDCOL], SideWindowEntryBuffer);
 					form::refilfn();
 					thred::coltab();
@@ -2201,7 +2201,7 @@ void thred::internal::chknum() {
 			case LBRDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nubrdcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
+					form::nubrdcol((bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu);
 					SetWindowText((*ValueWindow)[LFRMCOL], SideWindowEntryBuffer);
 					thred::coltab();
 				}
@@ -4265,7 +4265,7 @@ void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(uint8_t* pchr) {
 	strncpy(convert_ptr<char*>(pchr), "LA:", 3);
-	const auto lblSize  = sizeof(((PECHDR*)nullptr)->label) - 3;
+	const auto lblSize  = sizeof((static_cast<PECHDR*>(nullptr))->label) - 3;
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
