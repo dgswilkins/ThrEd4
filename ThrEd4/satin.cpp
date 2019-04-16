@@ -737,7 +737,7 @@ void satin::ribon() {
 						isBlunt = 0;
 					}
 					si::satends(isBlunt);
-					form.vertexIndex         = thred::adflt(VertexCount << 1u);
+					form.vertexIndex         = thred::adflt(VertexCount * 2u);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
 					vertexIt[0].x            = (*OutsidePoints)[0].x;
 					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;
@@ -749,7 +749,7 @@ void satin::ribon() {
 					}
 				}
 				else {
-					form.vertexIndex         = thred::adflt((VertexCount << 1u) + 2);
+					form.vertexIndex         = thred::adflt((VertexCount * 2u) + 2);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
 					vertexIt[0].x            = (*OutsidePoints)[0].x;
 					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;

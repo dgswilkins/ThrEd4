@@ -2062,7 +2062,7 @@ void form::internal::apbrd() {
 	OSequence->clear();
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	OSequence->push_back(vertexIt[currentVertex]);
-	for (auto iVertex = 0u; iVertex < VertexCount << 1u; iVertex++) {
+	for (auto iVertex = 0u; iVertex < VertexCount * 2u; iVertex++) {
 		const auto nextVertex = form::nxt(currentVertex);
 		bdrlin(currentVertex, nextVertex, APSPAC);
 		currentVertex = nextVertex;
@@ -2983,7 +2983,7 @@ void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 
 bool form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t sind) {
 	auto       index        = 1u;
-	const auto indexDoubled = wrap::toUnsigned(clipSegments.size()) << 1u;
+	const auto indexDoubled = wrap::toUnsigned(clipSegments.size()) * 2u;
 
 	StateMap.reset(StateFlag::FILDIR);
 	while (index < clipSegments.size()) {
@@ -5213,7 +5213,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 		if (minimumLength < CLOSENUF) {
 			form::ritfrct(ClosestFormToCursor, StitchWindowDC);
 			for (auto iCorner = 0u; iCorner < 4; iCorner++) {
-				stretchBoxLine[iCorner] = formControls[wrap::toSize(iCorner) << 1u];
+				stretchBoxLine[iCorner] = formControls[wrap::toSize(iCorner) * 2u];
 			}
 			stretchBoxLine[4] = stretchBoxLine[0];
 			thred::strtchbox(stretchBoxLine);
@@ -6442,7 +6442,7 @@ void form::dustar(uint32_t starCount, float length) {
 	}
 	const auto stepAngle   = PI_F / gsl::narrow_cast<float>(starCount);
 	auto       angle       = stepAngle / 2.0f + PI_F;
-	const auto vertexCount = starCount << 1u;
+	const auto vertexCount = starCount * 2u;
 	auto       newForm     = FRMHED {};
 	newForm.vertexIndex    = thred::adflt(vertexCount);
 	newForm.vertexCount    = vertexCount;
@@ -6608,7 +6608,7 @@ void form::dulens(uint32_t sides) {
 	if (sides > 48) {
 		sides = 48;
 	}
-	const auto steps     = sides << 1u;
+	const auto steps     = sides * 2u;
 	const auto stepAngle = PI_F * 2.0f / steps;
 	auto       count     = wrap::round<uint32_t>(steps / 2.0f * 0.3f);
 	auto       angle     = count * stepAngle;

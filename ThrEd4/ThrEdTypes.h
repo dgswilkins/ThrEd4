@@ -84,7 +84,7 @@ constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch l
 constexpr double   USPAC      = 15.0;              // underlay fill spacing
 constexpr float    APSPAC     = 10.8f;             // applique border spacing
 constexpr uint32_t OSEQLEN    = 0x40000u;          // output sequence length
-constexpr uint32_t BSEQLEN    = OSEQLEN << 1u;     // reverse sequence length
+constexpr uint32_t BSEQLEN    = OSEQLEN * 2u;      // reverse sequence length
 constexpr float    URAT       = 0.75f;             // ratio of underlay stitch to satin border size
 constexpr double   PURAT      = 0.6;               // for proportional satin corners
 

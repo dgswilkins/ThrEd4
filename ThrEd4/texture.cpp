@@ -452,7 +452,7 @@ void texture::drwtxtr() {
 	}
 	for (auto selectedPoint : *SelectedTexturePointsList) {
 		txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
-		txi::dutxtx(selectedPoint, IniFile.textureEditorSize << 1u);
+		txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2u);
 	}
 	BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
 	displayText::drwtxbut(TextureScreen);

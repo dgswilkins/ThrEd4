@@ -872,7 +872,7 @@ void formForms::dasyfrm() {
 	auto       petalPointCount  = IniFile.daisyPetalPoints;
 	const auto borderType       = IniFile.daisyBorderType;
 	if (borderType == DHART) {
-		petalPointCount  = (IniFile.daisyHeartCount + 1u) << 1u;
+		petalPointCount  = (IniFile.daisyHeartCount + 1u) * 2u;
 		petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
 	}
 	const auto petalSegmentAngle = PI2 / petalVertexCount;
