@@ -1081,6 +1081,7 @@ public:
 	constexpr fPOINT() noexcept = default;
 	inline fPOINT(double rhsX, double rhsY) noexcept;
 	inline fPOINT(float rhsX, float rhsY) noexcept;
+	inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
 	explicit inline fPOINT(const dPOINT& rhs) noexcept;
 	inline bool    operator==(const fPOINT& rhs) const noexcept;
 	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
@@ -1153,6 +1154,10 @@ inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
 inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept
     : x(rhsX)
     , y(rhsY) {
+}
+inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
+	x = gsl::narrow_cast<float>(rhsX);
+	y = gsl::narrow_cast<float>(rhsY);
 }
 
 #pragma warning(push)

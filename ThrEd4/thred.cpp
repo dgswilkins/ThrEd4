@@ -7166,10 +7166,10 @@ void thred::internal::rSelbox() {
 	unsel();
 	thred::px2stch();
 	if (SelectedPoint.x - SelectBoxOffset.x + SelectBoxSize.cx >= UnzoomedRect.x) {
-		SelectedPoint.x = UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x;
+		SelectedPoint.x = gsl::narrow_cast<float>(UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x);
 	}
 	if (SelectedPoint.y - SelectBoxOffset.y + SelectBoxSize.cy >= UnzoomedRect.y) {
-		SelectedPoint.y = UnzoomedRect.y - SelectBoxSize.cy + SelectBoxOffset.y;
+		SelectedPoint.y = gsl::narrow_cast<float>(UnzoomedRect.y - SelectBoxSize.cy + SelectBoxOffset.y);
 	}
 	if (SelectedPoint.x - SelectBoxOffset.x < 0) {
 		SelectedPoint.x = SelectBoxOffset.x;
@@ -9710,11 +9710,10 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 	}
 	if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right
 	    && pointToTest.y >= SelectedFormsRect.top && pointToTest.y <= SelectedFormsRect.bottom) {
-		SelectedFormsSize.x = SelectedFormsRect.right - SelectedFormsRect.left;
-		SelectedFormsSize.y = SelectedFormsRect.bottom - SelectedFormsRect.top;
+		SelectedFormsSize
+		    = fPOINT { SelectedFormsRect.right - SelectedFormsRect.left, SelectedFormsRect.bottom - SelectedFormsRect.top };
 		StateMap.set(StateFlag::MOVFRMS);
-		FormMoveDelta.x = pointToTest.x - SelectedFormsRect.left;
-		FormMoveDelta.y = pointToTest.y - SelectedFormsRect.top;
+		FormMoveDelta = fPOINT { pointToTest.x - SelectedFormsRect.left, pointToTest.y - SelectedFormsRect.top };
 		StateMap.set(StateFlag::SHOSTRTCH);
 		thred::strtchbox(stretchBoxLine);
 		return true;
@@ -12462,8 +12461,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		    = POINT { (Msg.pt.x - wrap::round<int32_t>(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
 			          (Msg.pt.y - wrap::round<int32_t>(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top };
 		form::ratsr();
-		FormMoveDelta.x = point.x / HorizontalRatio;
-		FormMoveDelta.y = point.y / VerticalRatio;
+		FormMoveDelta = fPOINT { point.x / HorizontalRatio, point.y / VerticalRatio };
 		if (StateMap.test(StateFlag::FPSEL)) {
 			form::fvars(ClosestFormToCursor);
 			auto iSelectedVertex = SelectedFormVertices.start;
@@ -13989,8 +13987,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		auto formsRect = fRECTANGLE {};
 		form::pxrct2stch(SelectedFormsRect, formsRect);
 		thred::px2stch();
-		FormMoveDelta.x = SelectedPoint.x - form::midl(formsRect.right, formsRect.left);
-		FormMoveDelta.y = SelectedPoint.y - form::midl(formsRect.top, formsRect.bottom);
+		FormMoveDelta = fPOINT { SelectedPoint.x - form::midl(formsRect.right, formsRect.left),
+			                     SelectedPoint.y - form::midl(formsRect.top, formsRect.bottom) };
 		for (auto iForm = 0u; iForm < ClipFormsCount; iForm++) {
 			ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - iForm - 1u);
 			form::fvars(ClosestFormToCursor);
@@ -14730,8 +14728,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					dupclp();
 				}
 				else {
-					FormMoveDelta.x = 0.0f;
-					FormMoveDelta.y = 0.0f;
+					FormMoveDelta      = fPOINT {};
 					StateMap.set(StateFlag::FUNCLP);
 					FormList->push_back(FRMHED {});
 					ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
@@ -14845,16 +14842,15 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				formLines[2].y = formLines[3].y = SelectedFormsRect.bottom;
 				StateMap.set(StateFlag::SHOSTRTCH);
 				thred::strtchbox(stretchBoxLine);
-				FormMoveDelta.x = gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2);
-				FormMoveDelta.y = gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2);
+				FormMoveDelta = fPOINT { gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
+					                     gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2) };
 				StateMap.set(StateFlag::MOVFRMS);
 				StateMap.set(StateFlag::FUNSCLP);
 			}
 			else {
 				ClipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
 				if (ClipFormHeader->clipType == CLP_FRM) {
-					FormMoveDelta.x = 0.0f;
-					FormMoveDelta.y = 0.0f;
+					FormMoveDelta      = fPOINT {};
 					StateMap.set(StateFlag::FUNCLP);
 					FormList->push_back(ClipFormHeader->form);
 					ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);

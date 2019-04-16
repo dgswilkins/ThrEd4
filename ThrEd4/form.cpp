@@ -885,8 +885,7 @@ void form::durpoli(uint32_t vertexCount) {
 	// ToDo do I need to assign again?
 	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	form::frmout(ClosestFormToCursor);
-	FormMoveDelta.x    = 0;
-	FormMoveDelta.y    = 0;
+	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	setmfrm();
@@ -5234,8 +5233,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 		auto formOrigin = POINT {};
 		auto vertexIt   = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		form::sfCor2px(vertexIt[0], formOrigin);
-		FormMoveDelta.x = gsl::narrow<float>(formOrigin.x - point.x);
-		FormMoveDelta.y = gsl::narrow<float>(formOrigin.y - point.y);
+		FormMoveDelta = fPOINT{ formOrigin.x - point.x, formOrigin.y - point.y };
 		StateMap.set(StateFlag::FRMOV);
 		return true;
 	}
@@ -6469,7 +6467,7 @@ void form::dustar(uint32_t starCount, float length) {
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - center.y) * StarRatio + center.y;
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1u));
-	FormMoveDelta      = fPOINT { 0.0f, 0.0f };
+	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
@@ -6526,7 +6524,7 @@ void form::duspir(uint32_t stepCount) {
 	}
 	SelectedForm->type = FRMLINE;
 	form::frmout(wrap::toUnsigned(FormList->size() - 1u));
-	FormMoveDelta.x = FormMoveDelta.y = 0;
+	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount                = vertexCount + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
@@ -6592,7 +6590,7 @@ void form::duhart(uint32_t sideCount) {
 	SelectedForm->type        = FRMFPOLY;
 	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	form::frmout(ClosestFormToCursor);
-	FormMoveDelta.x = FormMoveDelta.y = 0;
+	FormMoveDelta      = fPOINT {};
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
 	StateMap.set(StateFlag::SHOFRM);
@@ -6645,7 +6643,7 @@ void form::dulens(uint32_t sides) {
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	SelectedForm->type = FRMFPOLY;
 	form::frmout(ClosestFormToCursor);
-	FormMoveDelta.x = FormMoveDelta.y = 0;
+	FormMoveDelta      = fPOINT {};
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
 	StateMap.set(StateFlag::SHOFRM);
@@ -6710,7 +6708,7 @@ void form::duzig(uint32_t vertices) {
 	// ToDo do I need to assign again?
 	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	form::frmout(ClosestFormToCursor);
-	FormMoveDelta.x = FormMoveDelta.y = 0;
+	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount                = vertices + 1;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
@@ -8116,13 +8114,12 @@ void form::cntrx() {
 		thred::savdo();
 		auto selectedCenter = fPOINT {};
 		fi::dufcntr(selectedCenter);
-		FormMoveDelta.x = markCenter.x - selectedCenter.x;
-		FormMoveDelta.y = -markCenter.y + selectedCenter.y;
+		FormMoveDelta = fPOINT { markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y };
 		if (StateMap.test(StateFlag::CNTRV)) {
-			FormMoveDelta.y = 0;
+			FormMoveDelta.y = 0.0f;
 		}
 		if (StateMap.test(StateFlag::CNTRH)) {
-			FormMoveDelta.x = 0;
+			FormMoveDelta.x = 0.0f;
 		}
 		for (auto selectedForm : (*SelectedFormList)) {
 			frmadj(selectedForm);
@@ -8137,13 +8134,12 @@ void form::cntrx() {
 
 			const auto selectedCenter
 			    = fPOINT { form::midl(formRect.right, formRect.left), form::midl(formRect.top, formRect.bottom) };
-			FormMoveDelta.x = markCenter.x - selectedCenter.x;
-			FormMoveDelta.y = -markCenter.y + selectedCenter.y;
+			FormMoveDelta = fPOINT{ markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y };
 			if (StateMap.test(StateFlag::CNTRV)) {
-				FormMoveDelta.y = 0;
+				FormMoveDelta.y = 0.0f;
 			}
 			if (StateMap.test(StateFlag::CNTRH)) {
-				FormMoveDelta.x = 0;
+				FormMoveDelta.x = 0.0f;
 			}
 			frmadj(ClosestFormToCursor);
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8179,13 +8175,12 @@ void form::cntrx() {
 				}
 				const auto selectedCenter
 				    = fPOINT { form::midl(groupRect.right, groupRect.left), form::midl(groupRect.top, groupRect.bottom) };
-				FormMoveDelta.x = markCenter.x - selectedCenter.x;
-				FormMoveDelta.y = -markCenter.y + selectedCenter.y;
+				FormMoveDelta = fPOINT { markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y };
 				if (StateMap.test(StateFlag::CNTRV)) {
-					FormMoveDelta.y = 0;
+					FormMoveDelta.y = 0.0f;
 				}
 				if (StateMap.test(StateFlag::CNTRH)) {
-					FormMoveDelta.x = 0;
+					FormMoveDelta.x = 0.0f;
 				}
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 					StitchBuffer[iStitch].x += FormMoveDelta.x;
