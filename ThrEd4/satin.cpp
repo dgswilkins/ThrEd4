@@ -769,7 +769,7 @@ void satin::ribon() {
 				form.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 				form.vertexCount                = iNewVertex;
 				form.attribute                  = 1;
-				form.wordParam                  = iNewVertex >> 1u;
+				form.wordParam                  = iNewVertex / 2;
 				form.satinGuideCount            = form.wordParam - 2;
 				form.satinOrAngle.guide         = adsatk(form.satinGuideCount);
 				if (StateMap.test(StateFlag::CNV2FTH)) {
@@ -1385,7 +1385,7 @@ void satin::satout(float satinWidth) {
 		}
 		si::outfn(VertexCount - 1, 0, satinWidth);
 		StateMap.reset(StateFlag::INDIR);
-		if (count < (VertexCount >> 1u)) {
+		if (count < (VertexCount / 2)) {
 			StateMap.set(StateFlag::INDIR);
 			OutsidePoints = InsidePointList;
 			InsidePoints  = OutsidePointList;

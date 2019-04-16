@@ -823,7 +823,7 @@ void xt::internal::fncwlk() {
 		OutputIndex++;
 		auto finish = form::prv(start);
 		start       = form::nxt(start);
-		for (auto iGuide = 1u; iGuide < (VertexCount >> 1u); iGuide++) {
+		for (auto iGuide = 1u; iGuide < (VertexCount / 2); iGuide++) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
 			if (form::cisin(OSequence->back().x, OSequence->back().y)) {

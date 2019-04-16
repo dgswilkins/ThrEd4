@@ -882,7 +882,7 @@ void formForms::dasyfrm() {
 		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1;
 		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
-	const auto halfPetalPointCount = IniFile.daisyPetalPoints >> 1u;
+	const auto halfPetalPointCount = IniFile.daisyPetalPoints / 2;
 	auto       angle               = 0.0;
 	for (auto iMacroPetal = 0u; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
 		auto petalPointAngle         = 0.0;

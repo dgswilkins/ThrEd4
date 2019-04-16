@@ -1181,7 +1181,7 @@ void texture::internal::dutxfn(uint32_t textureType) {
 
 void texture::internal::dutxmir() {
 	if (!TempTexturePoints->empty()) {
-		const auto centerLine = (TextureScreen.lines + 1u) >> 1u;
+		const auto centerLine = (TextureScreen.lines + 1u) / 2;
 		const auto evenOffset = 1u - (TextureScreen.lines & 1u);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);

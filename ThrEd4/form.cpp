@@ -2921,7 +2921,7 @@ void form::internal::chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, co
 	if (clipIntersectSide != vertexIndex) {
 		auto       vertexIt    = currentFormVertices.cbegin();
 		const auto vertexCount = currentFormVertices.size();
-		if ((vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount >> 1u)) {
+		if ((vertexIndex - clipIntersectSide + vertexCount) % vertexCount < (vertexCount / 2)) {
 			auto       iVertex = form::nxt(clipIntersectSide);
 			const auto limit   = form::nxt(vertexIndex);
 			while (iVertex != limit) {
@@ -3541,14 +3541,14 @@ bool form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
 		return false;
 	}
 	if (lineEndPoint0 != nullptr) {
-		auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1u] - groupIndexSequence[group0]) >> 1u;
+		auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1u] - groupIndexSequence[group0]) / 2;
 		auto index0 = 0u;
 		while ((count0 != 0u) && lineEndPoint0[index0].line != line0) {
 			count0--;
 			index0 += 2;
 		}
 		if (count0 != 0u) {
-			auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1u] - groupIndexSequence[group1]) >> 1u;
+			auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1u] - groupIndexSequence[group1]) / 2;
 			auto index1 = 0u;
 			if (const auto lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 				while ((count1 != 0u) && lineEndPoint1[index1].line != line1) {
@@ -4255,7 +4255,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 	if (!lineEndpoints.empty()) {
 		auto       sortedLines     = std::vector<SMALPNTL*> {};
 		const auto stitchLineCount = lineEndpoints.size();
-		sortedLines.reserve(stitchLineCount >> 1u);
+		sortedLines.reserve(stitchLineCount / 2);
 		for (auto iLine = 0u; iLine < stitchLineCount; iLine += 2) {
 			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
@@ -5431,7 +5431,7 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter = (*FormList)[iForm];
 		if ((ActiveLayer == 0u) || ((formIter.attribute & FRMLMSK) >> 1u) == ActiveLayer
-		    || ((formIter.attribute & FRMLMSK) == 0u)) {
+			|| ((formIter.attribute & FRMLMSK) == 0u)) {
 			CurrentVertexIndex     = formIter.vertexIndex;
 			const auto savedVertex = VertexCount;
 			VertexCount            = formIter.vertexCount;
@@ -6510,8 +6510,8 @@ void form::duspir(uint32_t stepCount) {
 		point.y += length * sin(angle);
 		angle += stepAngle;
 	}
-	const auto center = fPOINT { form::midl(firstSpiral[stepCount >> 1u].x, firstSpiral[0].x),
-		                         form::midl(firstSpiral[stepCount >> 1u].y, firstSpiral[0].y) };
+	const auto center = fPOINT { form::midl(firstSpiral[stepCount / 2].x, firstSpiral[0].x),
+		                         form::midl(firstSpiral[stepCount / 2].y, firstSpiral[0].y) };
 	for (auto iStep = 0u; iStep < stepCount; iStep++) {
 		centeredSpiral[iStep].x = firstSpiral[iStep].x - center.x;
 		centeredSpiral[iStep].y = firstSpiral[iStep].y - center.y;
@@ -6904,7 +6904,7 @@ void form::internal::fnord() {
 	form::fvars(ClosestFormToCursor);
 	SelectedForm  = &((*FormList)[ClosestFormToCursor]);
 	auto vertexIt = std::next(FormVertices->begin(), SelectedForm->vertexIndex);
-	for (auto iVertex = 0u; iVertex < (SelectedForm->vertexCount >> 1u); iVertex++) {
+	for (auto iVertex = 0u; iVertex < (SelectedForm->vertexCount / 2); iVertex++) {
 		std::swap(vertexIt[iVertex], vertexIt[SelectedForm->vertexCount - iVertex - 1]);
 	}
 	form::refil();
@@ -6922,7 +6922,7 @@ void form::flpord() {
 		start         = SelectedFormVertices.start;
 		finish        = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % VertexCount;
 		auto vertexIt = std::next(FormVertices->begin(), SelectedForm->vertexIndex);
-		for (iVertex = 0; iVertex <= (SelectedFormVertices.vertexCount >> 1u); iVertex++) {
+		for (iVertex = 0; iVertex <= (SelectedFormVertices.vertexCount / 2); iVertex++) {
 			std::swap(vertexIt[start], vertexIt[finish]);
 			start = form::pdir(start);
 			StateMap.flip(StateFlag::PSELDIR);
@@ -6953,7 +6953,7 @@ void form::flpord() {
 				thred::savdo();
 				thred::rngadj();
 				iForward             = GroupStartStitch;
-				const auto endStitch = ((GroupEndStitch - GroupStartStitch) >> 1u) + 1;
+				const auto endStitch = ((GroupEndStitch - GroupStartStitch) / 2) + 1;
 				for (auto iStitch = 0u; iStitch < endStitch; iStitch++) {
 					std::swap(StitchBuffer[iForward], StitchBuffer[GroupEndStitch - iStitch]);
 					iForward++;
