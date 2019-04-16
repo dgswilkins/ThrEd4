@@ -2082,7 +2082,7 @@ void thred::internal::chknum() {
 	if (wcslen(MsgBuffer) != 0u) {
 		value = bufToDouble(MsgBuffer);
 		// Todo - remove this once the buffer overflow into MsgBuffer is resolved
-		if (value > gsl::narrow_cast<double>(MAXINT32)) {
+		if (value > gsl::narrow_cast<double>(MAXINT32)) { // NOLINT
 			throw;
 		}
 	}
@@ -4249,7 +4249,7 @@ void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(uint8_t* pchr) {
 	strncpy(convert_ptr<char*>(pchr), "LA:", 3);
-	const auto lblSize  = sizeof(((PECHDR*)0)->label) - 3;
+	const auto lblSize  = sizeof(((PECHDR*)nullptr)->label) - 3;
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
