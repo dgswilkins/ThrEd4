@@ -8031,8 +8031,9 @@ bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept {
 }
 
 void thred::internal::ofstch(uint32_t iSource, char offset) noexcept {
-	StitchBuffer[OutputIndex++]
-	    = { StitchBuffer[iSource].x + KnotStep.x * offset, StitchBuffer[iSource].y + KnotStep.y * offset, KnotAttribute };
+	StitchBuffer[OutputIndex++] = { StitchBuffer[iSource].x + KnotStep.x * gsl::narrow_cast<float>(offset),
+		                            StitchBuffer[iSource].y + KnotStep.y * gsl::narrow_cast<float>(offset),
+		                            KnotAttribute };
 }
 
 void thred::internal::endknt(uint32_t finish) {
@@ -8678,7 +8679,7 @@ void thred::internal::movi() {
 		}
 		auto stepCount = 0.0f;
 		if (StateMap.test(StateFlag::ZUMED)) {
-			stepCount = PCSHeader.stitchCount * ZoomFactor * ZoomFactor;
+			stepCount = gsl::narrow_cast<float>(PCSHeader.stitchCount) * ZoomFactor * ZoomFactor;
 		}
 		else {
 			stepCount = PCSHeader.stitchCount;
@@ -8715,9 +8716,10 @@ void thred::redclp() {
 		clipBuffer.clear();
 		clipBuffer.reserve(clipSize);
 
-		clipBuffer.emplace_back(ClipStitchData[0].x + gsl::narrow_cast<float>(ClipStitchData[0].fx) / 256.0f,
-		                        ClipStitchData[0].y + gsl::narrow_cast<float>(ClipStitchData[0].fy) / 256.0f,
-		                        0u);
+		clipBuffer.emplace_back(
+		    gsl::narrow_cast<float>(ClipStitchData[0].x) + gsl::narrow_cast<float>(ClipStitchData[0].fx) / 256.0f,
+		    gsl::narrow_cast<float>(ClipStitchData[0].y) + gsl::narrow_cast<float>(ClipStitchData[0].fy) / 256.0f,
+		    0u);
 
 #if CLPBUG
 		OutputDebugString(
@@ -8726,9 +8728,10 @@ void thred::redclp() {
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
-			clipBuffer.emplace_back(ClipStitchData[iStitch].x + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
-			                        ClipStitchData[iStitch].y + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
-			                        (ClipStitchData[iStitch].led & 0xfu) | codedLayer);
+			clipBuffer.emplace_back(
+			    gsl::narrow_cast<float>(ClipStitchData[iStitch].x) + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
+			    gsl::narrow_cast<float>(ClipStitchData[iStitch].y) + gsl::narrow_cast<float>(ClipStitchData[iStitch].fy) / 256.0f,
+			    (ClipStitchData[iStitch].led & 0xfu) | codedLayer);
 
 #if CLPBUG
 			OutputDebugString(
@@ -9135,11 +9138,12 @@ void thred::internal::insfil() {
 							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
 						}
 						else {
-							StitchBuffer[iStitch++] = {
-								pcsStitchBuffer[iPCSStitch].x + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								pcsStitchBuffer[iPCSStitch].y + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
-								newAttribute
-							};
+							StitchBuffer[iStitch++]
+							    = fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
+								                   + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
+								               gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
+								                   + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+								               newAttribute };
 						}
 					}
 					const auto newStitchCount = iStitch;
