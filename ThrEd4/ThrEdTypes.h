@@ -1622,7 +1622,7 @@ struct _featherInfo {
 using FTHINFO = struct _featherInfo;
 
 struct _textureInfo {
-	short    lines;
+	int16_t    lines;
 	uint16_t index;
 	uint16_t count;
 	float    height;
@@ -2356,10 +2356,10 @@ using DSTOffsets = struct _dstoffsets;
 
 struct _pcstch {
 	uint8_t fx; // fractional part of x coord or color if tag = 3
-	short   x;  // integer part of x coord
+	int16_t   x;  // integer part of x coord
 	uint8_t nx;
 	uint8_t fy; // fractional part of y coord
-	short   y;  // integer part of y coord
+	int16_t   y;  // integer part of y coord
 	uint8_t ny;
 	uint8_t tag;
 };
@@ -2666,8 +2666,8 @@ using PECHDR2 = struct _pecheader2;
 #endif
 
 struct _trcpnt {
-	SHORT x;
-	SHORT y;
+	int16_t x;
+	int16_t y;
 };
 
 using TRCPNT = struct _trcpnt;

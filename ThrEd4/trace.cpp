@@ -613,7 +613,7 @@ bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDir
 	}
 	}
 	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
-		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
+		tracedPoints.push_back({ gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y) });
 		if (tracedPoints.size() >= 500000) {
 			return false;
 		}
@@ -753,7 +753,7 @@ void trace::internal::dutrac() {
 		}
 		const uint32_t initialDirection = traceDirection;
 		auto           tracedPoints     = std::vector<TRCPNT> {};
-		tracedPoints.push_back({ gsl::narrow<short>(CurrentTracePoint.x), gsl::narrow<short>(CurrentTracePoint.y) });
+		tracedPoints.push_back({ gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y) });
 		while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) {
 			;
 		}
@@ -861,7 +861,7 @@ void trace::trinit() {
 							PixelColors[iRGB]        = HighColors[iRGB];
 							HighColors[iRGB]         = swapComponent;
 						}
-						componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) >> 1u) + PixelColors[iRGB];
+						componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) / 2) + PixelColors[iRGB];
 					}
 				}
 			}
