@@ -4513,8 +4513,9 @@ void thred::internal::sav() {
 			blockIndex++;
 			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (color == (StitchBuffer[iStitch].attribute & COLMSK))
+				if (color == (StitchBuffer[iStitch].attribute & COLMSK)) {
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
+				}
 				else {
 					contCode  = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
 					*contCode = 0x8003;
@@ -6051,8 +6052,9 @@ void thred::internal::nuFil() {
 									const auto threadColor   = PESThread[PEScolors[iColor]];
 									const auto color         = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
 									UserColor[activeColor++] = color;
-									if (activeColor >= 16)
+									if (activeColor >= 16) {
 										break;
+									}
 								}
 							}
 							else {
@@ -6089,10 +6091,12 @@ void thred::internal::nuFil() {
 										iPESstitch++;
 									}
 									else {
-										if (PESstitch[iPESstitch] > 0x3f)
+										if (PESstitch[iPESstitch] > 0x3f) {
 											locof = PESstitch[iPESstitch] - 128;
-										else
+										}
+										else {
 											locof = PESstitch[iPESstitch];
+										}
 									}
 									locof *= 0.6f;
 									// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
@@ -18037,10 +18041,12 @@ void thred::internal::init() {
 	if (IniFile.tearTailLength == 0.0f) {
 		IniFile.tearTailLength = 1.4f;
 	}
-	if (IniFile.underlayStitchLen == 0.0f)
+	if (IniFile.underlayStitchLen == 0.0f) {
 		IniFile.underlayStitchLen = DEFULEN;
-	if (IniFile.underlaySpacing == 0.0f)
+	}
+	if (IniFile.underlaySpacing == 0.0f) {
 		IniFile.underlaySpacing = DEFUSPAC;
+	}
 	setgrd(IniFile.gridColor);
 	makCol(); // make the color change windows
 	ButtonWin->resize(9);
