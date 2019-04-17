@@ -4734,7 +4734,7 @@ void thred::internal::auxmen() {
 	}
 	}
 	GSL_SUPPRESS(26492) {
-		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str()); // NOLINT
+		filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT
 		SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	}
 	StateMap.set(StateFlag::DUMEN);
@@ -12052,11 +12052,11 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 				IniFile.featherType |= AT_FTHBTH;
 			}
 			wchar_t buf[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), static_cast<LPWSTR>(buf), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), static_cast<LPTSTR>(buf), HBUFSIZ);
 			IniFile.featherFillType = FDEFTYP;
 			wchar_t buf1[HBUFSIZ]   = { 0 };
 			for (auto iFeatherStyle = 0u; iFeatherStyle < 6; iFeatherStyle++) {
-				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, static_cast<LPWSTR>(buf1), HBUFSIZ);
+				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, static_cast<LPTSTR>(buf1), HBUFSIZ);
 				if (wcscmp(buf, buf1) == 0) {
 					IniFile.featherFillType = gsl::narrow<uint8_t>(iFeatherStyle + 1);
 					break;
@@ -17688,7 +17688,7 @@ void thred::internal::redini() {
 		getDocsFolder(DefaultDirectory);
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
-			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPWSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
 			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			getdes();
 		}
@@ -19421,7 +19421,7 @@ int32_t handle_program_memory_depletion(uint32_t) {
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
 int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                           _In_opt_ HINSTANCE hPrevInstance,
-                          _In_ LPWSTR lpCmdLine,   // NOLINT
+                          _In_ LPTSTR lpCmdLine,   // NOLINT
                           _In_ int32_t nShowCmd) { // NOLINT
 	UNREFERENCED_PARAMETER(nShowCmd);
 
@@ -19489,7 +19489,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_LabelWindow               = std::vector<HWND> {};
 #pragma warning(push)
 #pragma warning(disable : 26492) // supress warning for casting away the const
-		auto formOnOff = const_cast<LPWSTR>(private_FormOnOff.data());
+		auto formOnOff = const_cast<LPTSTR>(private_FormOnOff.data());
 #pragma warning(pop)
 
 		auto private_MenuInfo = MENUITEMINFO {
@@ -19660,7 +19660,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
-			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPWSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
 			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			thi::getdes();
 		}

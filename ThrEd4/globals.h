@@ -68,7 +68,7 @@ extern fRECTANGLE AllItemsRect;
 extern std::vector<fPOINT>* AngledFormVertices;
 
 extern uint32_t  AppliqueColor;
-extern LPWSTR*   ArgList; // command line argument array
+extern LPTSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
 

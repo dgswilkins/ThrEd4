@@ -41,7 +41,7 @@ float wrap::bufToFloat(wchar_t* buffer) {
 	auto value = 0.0f;
 
 	try {
-		value = std::stof(std::wstring(static_cast<const wchar_t*>(buffer)));
+		value = std::stof(std::wstring(buffer));
 	}
 	catch (...) {
 		OutputDebugString(fmt::format(L"bufToFloat:stof failed trying to convert '{}'\n", buffer).c_str());

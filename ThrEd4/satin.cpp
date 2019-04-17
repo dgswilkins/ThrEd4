@@ -1196,7 +1196,7 @@ void satin::dusat() {
 
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
-	Polyline(StitchWindowDC,static_cast<const POINT*>(line),2);
+	Polyline(StitchWindowDC,line,2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 

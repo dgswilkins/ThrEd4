@@ -59,7 +59,7 @@ inline void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 	auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
-		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPWSTR>(&pBuf), 0)) { // NOLINT
+		if (auto len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
 			sDest.resize(len);
 			std::copy(pBuf, pBuf + len, sDest.begin());
 		}

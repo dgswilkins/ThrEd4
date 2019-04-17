@@ -36,7 +36,7 @@ fRECTANGLE AllItemsRect;    // rectangle enclosing all forms and stitches
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
 uint32_t  AppliqueColor = 15; // underlay color
-LPWSTR*   ArgList;            // command line argument array
+LPTSTR*   ArgList;            // command line argument array
 HCURSOR   ArrowCursor;        // arrow
 fs::path* AuxName;            //
 

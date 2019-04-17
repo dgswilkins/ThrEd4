@@ -763,19 +763,19 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyPetalPoints = wrap::wcstoi<uint32_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyHeartCount = wrap::wcstoi<uint16_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyDiameter = wrap::wcstof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyHoleDiameter = wrap::wcstof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyInnerCount = wrap::wcstoi<uint32_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyPetalCount = wrap::wcstoi<uint32_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyPetalLen = wrap::wcstof(buffer);
 			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0u) {
 				UserFlagMap.set(UserFlag::DAZHOL);
@@ -789,10 +789,10 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			else {
 				UserFlagMap.reset(UserFlag::DAZD);
 			}
-			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			wchar_t compareBuffer[HBUFSIZ] = { 0 };
 			for (uint8_t iType = 0; iType < 6; iType++) {
-				LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPWSTR>(compareBuffer), HBUFSIZ);
+				LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPTSTR>(compareBuffer), HBUFSIZ);
 				if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 					IniFile.daisyBorderType = iType;
 					break;
@@ -1011,13 +1011,13 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.formSides = wrap::wcstoi<uint16_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.tearTailLength = wrap::wcstof(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.tearTwistStep = wrap::wcstof(buffer) * PFGRAN;
-			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.tearTwistRatio = wrap::wcstof(buffer);
 			EndDialog(hwndlg, 1);
 			break;
@@ -1140,13 +1140,13 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		}
 		case IDOK: {
 			wchar_t buffer[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.wavePoints = wrap::wcstoi<uint16_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.waveStart = wrap::wcstoi<uint16_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer);
-			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPWSTR>(buffer), HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer);
 			if (IniFile.wavePoints > 100) {
 				IniFile.wavePoints = 100;
