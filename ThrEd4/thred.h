@@ -101,11 +101,6 @@ namespace internal {
 	void   box(uint32_t iNearest, HDC dc) noexcept;
 	void   boxs() noexcept;
 	void   bsavmen();
-	double bufToDouble(wchar_t* buffer);
-	float  bufToFloat(wchar_t* buffer);
-
-	uint64_t bufTou64(wchar_t* buffer);
-
 	void centr();
 	void chk1col();
 	bool

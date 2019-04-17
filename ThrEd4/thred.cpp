@@ -2052,49 +2052,10 @@ void thred::internal::chkhup() {
 	xt::setfchk();
 }
 
-double thred::internal::bufToDouble(wchar_t* buffer) {
-	auto value = 0.0;
-
-	try {
-		value = std::stod(buffer);
-	}
-	catch (...) {
-		OutputDebugString(fmt::format(L"bufToDouble:stod failed trying to convert '{}'\n", buffer).c_str());
-		value = 0.0;
-	}
-	return value;
-}
-
-float thred::internal::bufToFloat(wchar_t* buffer) {
-	auto value = 0.0f;
-
-	try {
-		value = std::stof(buffer);
-	}
-	catch (...) {
-		OutputDebugString(fmt::format(L"bufToFloat:stof failed trying to convert '{}'\n", buffer).c_str());
-		value = 0.0f;
-	}
-	return value;
-}
-
-uint64_t thred::internal::bufTou64(wchar_t* buffer) {
-	auto value = 0ull;
-
-	try {
-		value = std::stoull(buffer);
-	}
-	catch (...) {
-		OutputDebugString(fmt::format(L"bufTou64:stoull failed trying to convert '{}'\n", buffer).c_str());
-		value = 0;
-	}
-	return value;
-}
-
 void thred::internal::chknum() {
 	auto value = 0.0f;
 	if (wcslen(MsgBuffer) != 0u) {
-		value = bufToFloat(MsgBuffer);
+		value = wrap::bufToFloat(MsgBuffer);
 		// Todo - remove this once the buffer overflow into MsgBuffer is resolved
 		if (value > gsl::narrow_cast<float>(MAXINT32)) { // NOLINT
 			throw;
@@ -2116,7 +2077,7 @@ void thred::internal::chknum() {
 	}
 	if (MsgIndex != 0u) {
 		if (FormMenuChoice != 0u) {
-			value = bufToFloat(SideWindowEntryBuffer) * PFGRAN;
+			value = wrap::bufToFloat(SideWindowEntryBuffer) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF: {
 				thred::savdo();
@@ -2167,7 +2128,7 @@ void thred::internal::chknum() {
 			case LFTHCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nufthcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
+					form::nufthcol((wrap::bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
 					wrap::setSideWinVal(LFTHCOL);
 					thred::coltab();
 				}
@@ -2178,7 +2139,7 @@ void thred::internal::chknum() {
 			case LFRMCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nufilcol((bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
+					form::nufilcol((wrap::bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
 					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
@@ -2189,7 +2150,7 @@ void thred::internal::chknum() {
 			case LUNDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					SelectedForm->underlayColor = (bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu;
+					SelectedForm->underlayColor = (wrap::bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu;
 					wrap::setSideWinVal(LUNDCOL);
 					form::refilfn();
 					thred::coltab();
@@ -2201,7 +2162,7 @@ void thred::internal::chknum() {
 			case LBRDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nubrdcol((bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu);
+					form::nubrdcol((wrap::bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu);
 					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
@@ -2377,7 +2338,7 @@ void thred::internal::chknum() {
 		}
 		else {
 			if (PreferenceIndex != 0u) {
-				value = bufToFloat(SideWindowEntryBuffer);
+				value = wrap::bufToFloat(SideWindowEntryBuffer);
 				switch (PreferenceIndex - 1) {
 				case PEG: {
 					IniFile.eggRatio = value;
@@ -2524,7 +2485,7 @@ void thred::internal::chknum() {
 			else {
 				if (wcslen(MsgBuffer) != 0u) {
 					OutputDebugString(fmt::format(L"chknum:MsgBuffer [{}]\n", MsgBuffer).c_str());
-					value = bufToDouble(MsgBuffer);
+					value = wrap::bufToDouble(MsgBuffer);
 					OutputDebugString(fmt::format(L"chknum:Value [{}]\n", value).c_str());
 					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
 					for (auto i = 0u; i < 64; i++) {
@@ -12102,7 +12063,7 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 				}
 			}
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
-			IniFile.featherRatio = std::stof(buf);
+			IniFile.featherRatio = wrap::wcstof(buf);
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
 			IniFile.featherUpCount = gsl::narrow<uint8_t>(std::stoi(buf));
 			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
@@ -17517,7 +17478,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
 			if (std::wcslen(MsgBuffer) != 0) {
-				const auto value = std::stof(MsgBuffer);
+				const auto value = wrap::bufToFloat(MsgBuffer);
 				if (value != 0.0f) {
 					IniFile.rotationAngle = value * PI_F / 180.0f;
 				}
@@ -17526,7 +17487,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		if (StateMap.testAndReset(StateFlag::ENTROT)) {
 			if (std::wcslen(MsgBuffer) != 0) {
-				const auto value = std::stof(MsgBuffer);
+				const auto value = wrap::bufToFloat(MsgBuffer);
 				if (value != 0.0) {
 					IniFile.rotationAngle = value * PI_F / 180.0f;
 				}
@@ -17698,7 +17659,7 @@ void thred::internal::ducmd() {
 							auto bytesRead = DWORD { 0 };
 							ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
 							if (bytesRead != 0u) {
-								BalaradName2->assign(readBuffer);
+								BalaradName2->assign(static_cast<const wchar_t*>(readBuffer));
 								redbal();
 							}
 							CloseHandle(BalaradFile);
@@ -17727,8 +17688,8 @@ void thred::internal::redini() {
 		getDocsFolder(DefaultDirectory);
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
-			LoadString(ThrEdInstance, IDS_UNAM, designerBuffer, sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-			DesignerName->assign(designerBuffer);
+			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPWSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			getdes();
 		}
 	}
@@ -17738,7 +17699,7 @@ void thred::internal::redini() {
 		if (bytesRead < sizeof(IniFile)) {
 			IniFile.formBoxSizePixels = DEFBPIX;
 		}
-		auto directory = utf::Utf8ToUtf16(IniFile.defaultDirectory);
+		auto directory = utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.defaultDirectory)));
 		DefaultDirectory->assign(directory);
 		DefaultBMPDirectory->assign(directory);
 		{
@@ -19699,8 +19660,8 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
-			LoadString(ThrEdInstance, IDS_UNAM, designerBuffer, sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-			DesignerName->assign(designerBuffer);
+			LoadString(ThrEdInstance, IDS_UNAM, static_cast<LPWSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			thi::getdes();
 		}
 

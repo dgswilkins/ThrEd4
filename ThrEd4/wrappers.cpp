@@ -24,6 +24,46 @@
 #include "switches.h"
 #include "wrappers.h"
 
+double wrap::bufToDouble(wchar_t* buffer) {
+	auto value = 0.0;
+
+	try {
+		value = std::stod(buffer);
+	}
+	catch (...) {
+		OutputDebugString(fmt::format(L"bufToDouble:stod failed trying to convert '{}'\n", buffer).c_str());
+		value = 0.0;
+	}
+	return value;
+}
+
+float wrap::bufToFloat(wchar_t* buffer) {
+	auto value = 0.0f;
+
+	try {
+		value = std::stof(std::wstring(static_cast<const wchar_t*>(buffer)));
+	}
+	catch (...) {
+		OutputDebugString(fmt::format(L"bufToFloat:stof failed trying to convert '{}'\n", buffer).c_str());
+		value = 0.0f;
+	}
+	return value;
+}
+
+uint64_t wrap::bufTou64(wchar_t* buffer) {
+	auto value = 0ull;
+
+	try {
+		value = std::stoull(buffer);
+	}
+	catch (...) {
+		OutputDebugString(fmt::format(L"bufTou64:stoull failed trying to convert '{}'\n", buffer).c_str());
+		value = 0;
+	}
+	return value;
+}
+
+
 void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }

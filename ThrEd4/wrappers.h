@@ -22,6 +22,11 @@
 #include "ThrEdTypes.h"
 
 namespace wrap {
+double bufToDouble(wchar_t* buffer);
+float  bufToFloat(wchar_t* buffer);
+
+uint64_t bufTou64(wchar_t* buffer);
+
 HPEN     CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept;
 void     GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void     GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
