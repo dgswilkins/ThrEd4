@@ -1039,8 +1039,8 @@ void trace::internal::pxlin(uint32_t start, uint32_t finish) {
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);
 	line[1] = BitmapPoint;
-	Polyline(BitmapDC, line, 2);
-	Polyline(TraceDC, line, 2);
+	Polyline(BitmapDC,static_cast<const POINT*>(line),2);
+	Polyline(TraceDC,static_cast<const POINT*>(line),2);
 }
 
 void trace::internal::bfrm() {

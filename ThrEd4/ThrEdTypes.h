@@ -961,7 +961,7 @@ struct _iniFil {
 	double   threadSize60;                           // millimeter size of 60 weight thread
 	float    userStitchLength;                       // user stitch length
 	float    maxStitchLength;                        // maximum stitch length
-	double   smallStitchLength;                      // small stitch size
+	float    smallStitchLength;                      // small stitch size
 	double   stitchBoxesThreshold;                   // show sitch box level
 	float    stitchSpace;                            // stitch spacing between lines of stitches
 	float    fillAngle;                              // fill angle
@@ -969,7 +969,7 @@ struct _iniFil {
 	float    borderWidth;                            // border width
 	uint32_t appliqueColor;                          // applique color
 	char     prevNames[OLDNUM][_MAX_PATH];           // last file names                     NOLINT
-	double   snapLength;                             // snap together length
+	float    snapLength;                             // snap together length
 	float    starRatio;                              // star ratio
 	float    spiralWrap;                             // spiral wrap
 	COLORREF bitmapBackgroundColors[COLOR_COUNT];    // bitmap background color preferences NOLINT

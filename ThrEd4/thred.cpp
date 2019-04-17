@@ -1046,7 +1046,7 @@ BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 }
 
 void thred::internal::getdes() noexcept {
-	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc);
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc); // NOLINT
 }
 
 bool thred::internal::isfclp() {
@@ -1523,7 +1523,7 @@ void thred::internal::redfils() {
 			}
 			else {
 				auto fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
-				if (fileHandle == INVALID_HANDLE_VALUE) {
+				if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 					previousNames[iLRU].clear();
 				}
 				else {
@@ -1624,7 +1624,7 @@ void thred::internal::box(uint32_t iNearest, HDC dc) noexcept {
 	line[2] = { NearestPixel[iNearest].x + boxWidth, NearestPixel[iNearest].y + boxWidth };
 	line[3] = { NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y + boxWidth };
 	line[4] = { NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y - boxWidth };
-	Polyline(dc, line, 5);
+	Polyline(dc,static_cast<const POINT*>(line),5);
 }
 
 void thred::internal::boxs() noexcept {
@@ -1882,7 +1882,7 @@ void thred::internal::unbox() {
 	if (StateMap.testAndReset(StateFlag::SELBOX)) {
 		SelectObject(StitchWindowDC, BoxPen[0]);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);
-		Polyline(StitchWindowDC, StitchArrow, 3);
+		Polyline(StitchWindowDC,static_cast<const POINT*>(StitchArrow),3);
 		SetROP2(StitchWindowDC, R2_COPYPEN);
 	}
 }
@@ -1890,13 +1890,13 @@ void thred::internal::unbox() {
 void thred::internal::ilin() noexcept {
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, InsertLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(InsertLine),2);
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	Polyline(StitchWindowDC, &InsertLine[1], 2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 	SelectObject(StitchWindowMemDC, LinePen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	Polyline(StitchWindowMemDC, InsertLine, 2);
+	Polyline(StitchWindowMemDC,static_cast<const POINT*>(InsertLine),2);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	Polyline(StitchWindowMemDC, &InsertLine[1], 2);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -1911,7 +1911,7 @@ void thred::internal::xlin() {
 void thred::internal::ilin1() noexcept {
 	SelectObject(StitchWindowDC, LinePen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, InsertLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(InsertLine),2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -3100,7 +3100,7 @@ void thred::internal::duzero() {
 		}
 		StateMap.reset(StateFlag::CONTIG);
 		auto iDestination  = 0u;
-		auto currentStitch = StitchBuffer;
+		auto currentStitch = &StitchBuffer[0];
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (((StitchBuffer[iStitch].attribute & TYPMSK) != 0u)
 			    && formMap.test((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT)) {
@@ -3200,19 +3200,19 @@ void thred::internal::cros(uint32_t iStitch) {
 	InsertLine[1] = { StitchCoordinatesPixels.x + armLength, StitchCoordinatesPixels.y };
 	SelectObject(StitchWindowDC, CrossPen);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowDC, InsertLine, 2);
+	Polyline(StitchWindowDC, static_cast<const POINT*>(InsertLine), 2);
 	SelectObject(StitchWindowMemDC, CrossPen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	Polyline(StitchWindowMemDC, InsertLine, 2);
+	Polyline(StitchWindowMemDC,static_cast<const POINT*>(InsertLine),2);
 	InsertLine[0] = { StitchCoordinatesPixels.x, StitchCoordinatesPixels.y - armLength };
 	InsertLine[1] = { StitchCoordinatesPixels.x, StitchCoordinatesPixels.y - 1 };
-	Polyline(StitchWindowDC, InsertLine, 2);
-	Polyline(StitchWindowMemDC, InsertLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(InsertLine),2);
+	Polyline(StitchWindowMemDC,static_cast<const POINT*>(InsertLine),2);
 	InsertLine[0].y = StitchCoordinatesPixels.y + 2;
 	InsertLine[1].y = StitchCoordinatesPixels.y + armLength;
-	Polyline(StitchWindowDC, InsertLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(InsertLine),2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
-	Polyline(StitchWindowMemDC, InsertLine, 2);
+	Polyline(StitchWindowMemDC,static_cast<const POINT*>(InsertLine),2);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
@@ -3441,8 +3441,8 @@ void thred::internal::duar() {
 	SelectObject(StitchWindowDC, BoxPen[0]);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	Polyline(StitchWindowMemDC, StitchArrow, 3);
-	Polyline(StitchWindowDC, StitchArrow, 3);
+	Polyline(StitchWindowMemDC,static_cast<const POINT*>(StitchArrow),3);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(StitchArrow),3);
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
@@ -3560,7 +3560,7 @@ void thred::internal::ritini() {
 	}
 	IniFileHandle = CreateFile(
 	    IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
-	if (IniFileHandle != INVALID_HANDLE_VALUE) {
+	if (IniFileHandle != INVALID_HANDLE_VALUE) { // NOLINT
 		WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, nullptr);
 	}
 	CloseHandle(IniFileHandle);
@@ -3641,7 +3641,7 @@ void thred::internal::redbal() {
 	FormList->clear();
 
 	auto balaradFile = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (balaradFile != INVALID_HANDLE_VALUE) {
+	if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT
 		auto bytesRead = DWORD { 0u };
 		ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 		if (bytesRead == sizeof(balaradHeader)) {
@@ -3709,7 +3709,7 @@ void thred::internal::ritbal() {
 		}
 		outputName.replace_extension(L".thv");
 		balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-		if (balaradFile == INVALID_HANDLE_VALUE) {
+		if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT
 			return;
 		}
 		auto color             = StitchBuffer[0].attribute & COLMSK;
@@ -3957,7 +3957,7 @@ void thred::internal::thrsav() {
 	if (!StateMap.testAndReset(StateFlag::IGNAM)) {
 		auto fileData = WIN32_FIND_DATA {};
 		auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
-		if (file != INVALID_HANDLE_VALUE) {
+		if (file != INVALID_HANDLE_VALUE) { // NOLINT
 			StateMap.reset(StateFlag::CMPDO);
 			for (auto& version : *VersionNames) {
 				version.clear();
@@ -3980,7 +3980,7 @@ void thred::internal::thrsav() {
 		}
 	}
 	FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) {
+	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 		displayText::crmsg(*ThrName);
 		FileHandle = nullptr;
 	}
@@ -4146,7 +4146,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 	if (colfil()) {
 		auto bytesWritten = DWORD { 0 };
 		auto colorFile    = CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-		if (colorFile != INVALID_HANDLE_VALUE) {
+		if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 			wrap::WriteFile(colorFile,
 			                &colorData[0],
 			                wrap::toUnsigned(colorData.size() * sizeof(decltype(colorData.data()))),
@@ -4155,7 +4155,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		}
 		CloseHandle(colorFile);
 		colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-		if (colorFile != INVALID_HANDLE_VALUE) {
+		if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 			wrap::WriteFile(colorFile,
 			                &colorData[2],
 			                wrap::toUnsigned((colorData.size() - 2) * sizeof(decltype(colorData.data()))),
@@ -4388,7 +4388,7 @@ void thred::internal::sav() {
 	}
 	PCSFileHandle
 	    = CreateFile(AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
-	if (PCSFileHandle == INVALID_HANDLE_VALUE) {
+	if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 		displayText::crmsg(*AuxName);
 		PCSFileHandle = nullptr;
 	}
@@ -4773,7 +4773,7 @@ void thred::internal::auxmen() {
 	}
 	}
 	GSL_SUPPRESS(26492) {
-		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
+		filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str()); // NOLINT
 		SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
 	}
 	StateMap.set(StateFlag::DUMEN);
@@ -5354,7 +5354,7 @@ void thred::internal::savmap() {
 		if (GetSaveFileName(&OpenBitmapName)) {
 			BitmapFileHandle
 			    = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-			if (IniFileHandle == INVALID_HANDLE_VALUE) {
+			if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 				displayText::crmsg(*UserBMPFileName);
 				return;
 			}
@@ -5376,7 +5376,7 @@ void thred::internal::savmap() {
 HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) {
 	GSL_SUPPRESS(26490) {
 		if (ppvBits != nullptr) {
-			auto bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0);
+			auto bitmap = CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
 			if (*ppvBits != nullptr) {
 				return bitmap;
 			}
@@ -5392,7 +5392,7 @@ HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uin
 void thred::internal::bfil() {
 	const auto InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (BitmapFileHandle == INVALID_HANDLE_VALUE) {
+	if (BitmapFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 		auto fmtStr = std::wstring {};
 		displayText::loadString(fmtStr, IDS_UNOPEN);
 		displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
@@ -5521,7 +5521,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 
 	if (colfil()) {
 		auto colorFile = CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-		if (colorFile != INVALID_HANDLE_VALUE) {
+		if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 			auto colorFileSize = LARGE_INTEGER {};
 			GetFileSizeEx(colorFile, &colorFileSize);
 			// There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
@@ -5692,7 +5692,7 @@ void thred::internal::nuFil() {
 		// ToDo - use ifstream?
 		// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 		FileHandle = CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-		if (FileHandle == INVALID_HANDLE_VALUE) {
+		if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 			if (GetLastError() == 32) {
 				displayText::filnopn(IDS_FNOPNA, *WorkingFileName);
 			}
@@ -6051,7 +6051,7 @@ void thred::internal::nuFil() {
 						auto fileBuffer = new uint8_t[MAXITEMS * 8];
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, nullptr);
 						auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
-						if (strncmp(pesHeader->led, "#PES00", 6)) {
+						if (strncmp(pesHeader->led, "#PES00", 6) != 0) {
 							auto fmtStr = std::wstring {};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
@@ -6080,8 +6080,8 @@ void thred::internal::nuFil() {
 								}
 							}
 							else {
-								const auto color = RGB(
-								    PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // NOLINT color unknown
+								const auto color = RGB( // NOLINT
+								    PESThread[0].color.r, PESThread[0].color.g, PESThread[0].color.b); // color unknown
 								UserColor[activeColor++] = color;
 							}
 						}
@@ -6105,9 +6105,9 @@ void thred::internal::nuFil() {
 									iPESstitch += 2;
 								}
 								else {
-									if (PESstitch[iPESstitch] & 0x80u) {
+									if ((PESstitch[iPESstitch] & 0x80u) != 0u) {
 										auto pesVal = ((PESstitch[iPESstitch] & 0x0Fu) << 8u) + PESstitch[iPESstitch + 1];
-										if (pesVal & 0x800u) {
+										if ((pesVal & 0x800u) != 0u) {
 											pesVal -= 0x1000;
 										}
 										locof = gsl::narrow_cast<decltype(locof)>(pesVal);
@@ -6190,7 +6190,7 @@ void thred::internal::nuFil() {
 				UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 				wcsncpy_s(buffer, ThreadSize[iColor], 2);
-				SetWindowText(ThreadSizeWin[iColor], buffer);
+				SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
 			}
 			for (auto& iColor : UserColorWin) {
 				thred::redraw(iColor);
@@ -6654,18 +6654,18 @@ void thred::internal::dulin() {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
 		if (StateMap.test(StateFlag::ISDWN)) {
-			Polyline(StitchWindowDC, MoveLine0, 2);
+			Polyline(StitchWindowDC,static_cast<const POINT*>(MoveLine0),2);
 		}
 		else {
-			Polyline(StitchWindowDC, MoveLine1, 2);
+			Polyline(StitchWindowDC,static_cast<const POINT*>(MoveLine1),2);
 		}
 	}
 	else {
 		if (StateMap.test(StateFlag::ISDWN)) {
-			Polyline(StitchWindowDC, MoveLine0, 2);
+			Polyline(StitchWindowDC,static_cast<const POINT*>(MoveLine0),2);
 		}
 		if (StateMap.test(StateFlag::ISUP)) {
-			Polyline(StitchWindowDC, MoveLine1, 2);
+			Polyline(StitchWindowDC,static_cast<const POINT*>(MoveLine1),2);
 		}
 	}
 	SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -7051,7 +7051,7 @@ void thred::internal::newFil() {
 void thred::bBox() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
-	Polyline(StitchWindowDC, ZoomBoxLine, 5);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(ZoomBoxLine),5);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -7102,7 +7102,7 @@ GSL_SUPPRESS(26440) void thred::delstchm() {
 void thred::internal::duclp() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
-	Polyline(StitchWindowDC, ClipInsertBoxLine, 5);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(ClipInsertBoxLine),5);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -7231,7 +7231,7 @@ void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
 		line[1].x = line[2].x = StitchCoordinatesPixels.x + offset;
 		line[2].y = line[3].y = StitchCoordinatesPixels.y + offset;
 		line[4].y             = StitchCoordinatesPixels.y - offset;
-		Polyline(dc, line, 5);
+		Polyline(dc,static_cast<const POINT*>(line),5);
 	}
 }
 
@@ -7250,9 +7250,9 @@ void thred::internal::sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordin
 void thred::internal::durot() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
-	Polyline(StitchWindowDC, RotateBoxOutline, 5);
-	Polyline(StitchWindowDC, RotateBoxCrossVertLine, 2);
-	Polyline(StitchWindowDC, RotateBoxCrossHorzLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(RotateBoxOutline),5);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(RotateBoxCrossVertLine),2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(RotateBoxCrossHorzLine),2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -7265,7 +7265,7 @@ void thred::internal::unrot() {
 void thred::internal::durotu() noexcept {
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	SelectObject(StitchWindowDC, LinePen);
-	Polyline(StitchWindowDC, RotateBoxToCursorLine, 2);
+	Polyline(StitchWindowDC,static_cast<const POINT*>(RotateBoxToCursorLine),2);
 	SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -8333,7 +8333,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 			}
 		}
 		SelectObject(StitchWindowDC, UserPen[color]);
-		wrap::Polyline(StitchWindowDC, MovieLine, iMovieFrame);
+		wrap::Polyline(StitchWindowDC, static_cast<const POINT*>(MovieLine), iMovieFrame);
 		if (!flag) {
 			RunPoint--;
 		}
@@ -8348,7 +8348,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 			MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
 		}
 		RunPoint--;
-		wrap::Polyline(StitchWindowDC, MovieLine, iMovieFrame);
+		wrap::Polyline(StitchWindowDC, static_cast<const POINT*>(MovieLine), iMovieFrame);
 	}
 	if ((StitchBuffer[RunPoint + 1].attribute & 0xfu) != color) {
 		RunPoint++;
@@ -8792,10 +8792,10 @@ void thred::internal::drwmrk(HDC dc) {
 	SetROP2(dc, R2_XORPEN);
 	markLine[0] = { markCoordinates.x - markOffset, markCoordinates.y - markOffset };
 	markLine[1] = { markCoordinates.x + markOffset, markCoordinates.y + markOffset };
-	Polyline(dc, markLine, 2);
+	Polyline(dc,static_cast<const POINT*>(markLine),2);
 	markLine[0] = { markCoordinates.x - markOffset, markCoordinates.y + markOffset };
 	markLine[1] = { markCoordinates.x + markOffset, markCoordinates.y - markOffset };
-	Polyline(dc, markLine, 2);
+	Polyline(dc,static_cast<const POINT*>(markLine),2);
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -8882,7 +8882,7 @@ void thred::internal::insfil() {
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
 		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-		if (InsertedFileHandle == INVALID_HANDLE_VALUE) {
+		if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 			displayText::filnopn(IDS_FNOPN, InsertedFileName);
 			FileHandle = nullptr;
 			CloseHandle(InsertedFileHandle);
@@ -10251,7 +10251,7 @@ void thred::internal::barnam(HWND window, uint32_t iThumbnail) {
 		SetWindowText(window, name.c_str());
 	}
 	else {
-		SetWindowText(window, L"");
+		SetWindowText(window, static_cast<LPCWSTR>(L""));
 	}
 }
 
@@ -10287,7 +10287,7 @@ void thred::internal::thumnail() {
 	fs::current_path(*DefaultDirectory);
 	*SearchName = *DefaultDirectory / L"*.thr";
 	auto file   = FindFirstFile(SearchName->wstring().c_str(), &fileData);
-	if (file == INVALID_HANDLE_VALUE) {
+	if (file == INVALID_HANDLE_VALUE) { // NOLINT
 		const auto dwError = GetLastError();
 		auto       fmtStr  = std::wstring {};
 		displayText::loadString(fmtStr, IDS_FFINDERR);
@@ -11279,12 +11279,12 @@ void thred::internal::ritlock(const WIN32_FIND_DATA* fileData, uint32_t fileInde
 		for (auto iFile = 0u; iFile < fileIndex; iFile++) {
 			if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0u) { // NOLINT
 				GSL_SUPPRESS(26490)
-				SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
+				SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
 			}
 			else {
 				GSL_SUPPRESS(26490)
 				SendMessage(
-				    GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName));
+				    GetDlgItem(hwndlg, IDC_UNLOCKED), LB_ADDSTRING, 0, reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
 			}
 		}
 	}
@@ -11297,11 +11297,11 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 	case WM_INITDIALOG: {
 		SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 		SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(lparam);
+		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
 		if (fileInfo != nullptr) {
 			auto searchName   = *DefaultDirectory / L"*.thr";
 			auto searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
-			if (searchResult == INVALID_HANDLE_VALUE) {
+			if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT
 				auto fmtStr = std::wstring {};
 				displayText::loadString(fmtStr, IDS_NOTHRFIL);
 				displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
@@ -11318,7 +11318,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		break;
 	}
 	case WM_COMMAND: {
-		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+		GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT
 		if (fileInfo != nullptr) {
 			switch (LOWORD(wparam)) { // NOLINT
 			case IDCANCEL: {
@@ -11400,7 +11400,7 @@ void thred::internal::lock() {
 	lockInfo.data = new WIN32_FIND_DATA[512];
 
 	GSL_SUPPRESS(26490)
-	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo));
+	DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT
 
 	delete[] lockInfo.data;
 }
@@ -12046,7 +12046,7 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		for (auto iFeatherStyle = 0u; iFeatherStyle < 6; iFeatherStyle++) {
 			displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
 			GSL_SUPPRESS(26490)
-			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str()));
+			SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT
 		}
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
 		auto state = 0u;
@@ -12091,11 +12091,11 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 				IniFile.featherType |= AT_FTHBTH;
 			}
 			wchar_t buf[HBUFSIZ] = { 0 };
-			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf, HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), static_cast<LPWSTR>(buf), HBUFSIZ);
 			IniFile.featherFillType = FDEFTYP;
 			wchar_t buf1[HBUFSIZ]   = { 0 };
 			for (auto iFeatherStyle = 0u; iFeatherStyle < 6; iFeatherStyle++) {
-				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1, HBUFSIZ);
+				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, static_cast<LPWSTR>(buf1), HBUFSIZ);
 				if (wcscmp(buf, buf1) == 0) {
 					IniFile.featherFillType = gsl::narrow<uint8_t>(iFeatherStyle + 1);
 					break;
@@ -12125,7 +12125,7 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
-	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, (DLGPROC)fthdefprc);
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, static_cast<DLGPROC>(fthdefprc)); // NOLINT
 }
 
 bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
@@ -12759,8 +12759,8 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 		const auto colorBarPosition = (gsl::narrow_cast<double>(Msg.pt.y) - ColorBarRect.top)
 		                              / (gsl::narrow_cast<double>(ColorBarRect.bottom) - ColorBarRect.top);
 		if (Msg.message == WM_RBUTTONDOWN) {
-			if (((Msg.wParam & MK_SHIFT) != 0u)
-			    && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) { // NOLINT
+			if (((Msg.wParam & MK_SHIFT) != 0u) // NOLINT
+			    && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 				unbox();
 				GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
 				StateMap.set(StateFlag::GRPSEL);
@@ -13119,7 +13119,7 @@ bool thred::internal::updateFillColor() {
 	} while (false);
 	MsgBuffer[0] = gsl::narrow<char>(VerticalIndex) + 0x30;
 	MsgBuffer[1] = 0;
-	SetWindowText((*ValueWindow)[LBRDCOL], MsgBuffer);
+	SetWindowText((*ValueWindow)[LBRDCOL], static_cast<LPCWSTR>(MsgBuffer));
 	thred::unsid();
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -14162,7 +14162,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			ThrName->replace_extension(thrExt);
 			FileHandle = CreateFile(
 			    ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr); // NOLINT
-			if (FileHandle == INVALID_HANDLE_VALUE) {
+			if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 				FileHandle = nullptr;
 			}
 			return true;
@@ -17650,7 +17650,7 @@ void thred::internal::ritloc() {
 		fs::create_directory(lockFilePath);
 		lockFilePath /= L"thredloc.txt";
 		auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-		if (lockFile != INVALID_HANDLE_VALUE) {
+		if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT
 			auto bytesWritten = DWORD { 0 };
 			auto value        = utf::Utf16ToUtf8(*HomeDirectory);
 			wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size() + 1), &bytesWritten, nullptr);
@@ -17661,13 +17661,13 @@ void thred::internal::ritloc() {
 }
 
 void thred::internal::crtcurs() noexcept {
-	FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));
-	DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));
-	NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));
-	NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown));
-	NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp));
-	NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));
-	NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));
+	FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form)); // NOLINT
+	DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN)); // NOLINT
+	NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright)); // NOLINT
+	NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown)); // NOLINT
+	NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp)); // NOLINT
+	NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown)); // NOLINT
+	NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp)); // NOLINT
 }
 
 void thred::internal::duhom() {
@@ -17682,7 +17682,7 @@ void thred::internal::ducmd() {
 		if (arg1.compare(0, 4, L"/F1:") == 0) {
 			auto balaradFileName = *HomeDirectory / arg1.substr(4);
 			BalaradFile = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-			if (BalaradFile != INVALID_HANDLE_VALUE) {
+			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
 				CloseHandle(BalaradFile);
 				*BalaradName0 = balaradFileName;
 				if (ArgCount > 2) {
@@ -17691,7 +17691,7 @@ void thred::internal::ducmd() {
 						balaradFileName = *HomeDirectory / arg2.substr(4);
 						BalaradFile
 						    = CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-						if (BalaradFile != INVALID_HANDLE_VALUE) {
+						if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
 							wchar_t readBuffer[_MAX_PATH + 1] = { 0 };
 
 							*BalaradName1  = balaradFileName;
@@ -17722,7 +17722,7 @@ void thred::internal::redini() {
 	*IniFileName = *HomeDirectory;
 	*IniFileName /= L"thred.ini";
 	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (IniFileHandle == INVALID_HANDLE_VALUE) {
+	if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 		defpref();
 		getDocsFolder(DefaultDirectory);
 		if (DesignerName->empty()) {
@@ -17754,7 +17754,7 @@ void thred::internal::redini() {
 				iVersion++;
 			}
 		}
-		DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
+		DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.designerName))));
 		for (auto iColor = 0u; iColor < 16; iColor++) {
 			UserColor[iColor]              = IniFile.stitchColors[iColor];
 			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
@@ -17786,7 +17786,7 @@ void thred::internal::redini() {
 		if (IniFile.maxStitchLength == 0.0) {
 			IniFile.maxStitchLength = MAXSIZ * PFGRAN;
 		}
-		if (IniFile.smallStitchLength != 0.0) {
+		if (IniFile.smallStitchLength != 0.0f) {
 			SmallStitchLength = IniFile.smallStitchLength;
 		}
 		StitchBoxesThreshold = IniFile.stitchBoxesThreshold;
@@ -17797,19 +17797,19 @@ void thred::internal::redini() {
 			const auto tmp = EnumMap<UserFlag>(IniFile.userFlagMap);
 			UserFlagMap    = tmp;
 		}
-		if (IniFile.borderWidth != 0.0) {
+		if (IniFile.borderWidth != 0.0f) {
 			BorderWidth = IniFile.borderWidth;
 		}
 		if (IniFile.appliqueColor != 0u) {
 			AppliqueColor = IniFile.appliqueColor & 0xfu;
 		}
-		if (IniFile.snapLength != 0.0) {
+		if (IniFile.snapLength != 0.0f) {
 			SnapLength = IniFile.snapLength;
 		}
-		if (IniFile.starRatio != 0.0) {
+		if (IniFile.starRatio != 0.0f) {
 			StarRatio = IniFile.starRatio;
 		}
-		if (IniFile.spiralWrap != 0.0) {
+		if (IniFile.spiralWrap != 0.0f) {
 			SpiralWrap = IniFile.spiralWrap;
 		}
 		if (IniFile.buttonholeCornerLength != 0.0f) {
@@ -17972,7 +17972,7 @@ void thred::internal::init() {
 
 	ReleaseDC(nullptr, deviceContext);
 	TextureIndex = 0;
-	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
+	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT
 	MainMenu   = GetMenu(ThrEdWindow);
 	auto wRect = RECT {};
 	GetWindowRect(ThrEdWindow, &wRect);
@@ -17996,8 +17996,8 @@ void thred::internal::init() {
 	ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
 	ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
 	qchk();
-	ArrowCursor = LoadCursor(nullptr, IDC_ARROW);
-	CrossCursor = LoadCursor(nullptr, IDC_CROSS);
+	ArrowCursor = LoadCursor(nullptr, IDC_ARROW); // NOLINT
+	CrossCursor = LoadCursor(nullptr, IDC_CROSS); // NOLINT
 	crtcurs();
 	redfils();
 	StateMap.reset(); // clear the bitmap
@@ -18244,7 +18244,7 @@ void thred::internal::dumov() {
 		rotpix(OffsetFromCenter, rotationOutline[3], rotationCenterPixels);
 		SelectObject(StitchWindowMemDC, FormPen);
 		SetROP2(StitchWindowMemDC, R2_XORPEN);
-		Polyline(StitchWindowMemDC, rotationOutline, 7);
+		Polyline(StitchWindowMemDC,static_cast<const POINT*>(rotationOutline),7);
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
 }
@@ -18329,11 +18329,11 @@ void thred::internal::drwknot() {
 			tlin[1].x = tlin[2].x = point.x + kOffset;
 			tlin[0].y = tlin[1].y = tlin[4].y = point.y + kOffset;
 			tlin[2].y = tlin[3].y = point.y - kOffset;
-			Polyline(StitchWindowMemDC, tlin, 5);
+			Polyline(StitchWindowMemDC,static_cast<const POINT*>(tlin),5);
 			tlin[0].x = point.x - kLine;
 			tlin[1].x = point.x + kLine;
 			tlin[0].y = tlin[1].y = point.y;
-			Polyline(StitchWindowMemDC, tlin, 2);
+			Polyline(StitchWindowMemDC,static_cast<const POINT*>(tlin),2);
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		}
 	}
@@ -18353,13 +18353,13 @@ void thred::internal::dugrid() {
 		for (auto iGrid = gridRect.bottom; iGrid <= gridRect.top; iGrid++) {
 			gridLine[0].y = gridLine[1].y = wrap::round<int32_t>(
 			    StitchWindowClientRect.bottom - (iGrid * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
-			Polyline(StitchWindowMemDC, gridLine, 2);
+			Polyline(StitchWindowMemDC,static_cast<const POINT*>(gridLine),2);
 		}
 		gridLine[0].y = 0;
 		gridLine[1].y = StitchWindowClientRect.bottom;
 		for (auto iGrid = gridRect.left; iGrid <= gridRect.right; iGrid++) {
 			gridLine[0].x = gridLine[1].x = wrap::round<int32_t>((iGrid * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x + 0.5f);
-			Polyline(StitchWindowMemDC, gridLine, 2);
+			Polyline(StitchWindowMemDC,static_cast<const POINT*>(gridLine),2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
@@ -18606,7 +18606,7 @@ void thred::internal::drwStch() {
 													                         - (currentStitches[iStitch].y - ZoomRect.bottom)
 													                               * ZoomRatio.x
 													                         + 0.5f) };
-												Polyline(StitchWindowMemDC, stitchLine, 2);
+												Polyline(StitchWindowMemDC,static_cast<const POINT*>(stitchLine),2);
 												break;
 											}
 											// does the line intersect the bottom of the screen?
@@ -18626,7 +18626,7 @@ void thred::internal::drwStch() {
 													                         - (currentStitches[iStitch].y - ZoomRect.bottom)
 													                               * ZoomRatio.y
 													                         + 0.5f) };
-												Polyline(StitchWindowMemDC, stitchLine, 2);
+												Polyline(StitchWindowMemDC,static_cast<const POINT*>(stitchLine),2);
 												break;
 											}
 											// does the line intersect the left side of the screen?
@@ -18648,7 +18648,7 @@ void thred::internal::drwStch() {
 														    maxYcoord
 														    - (currentStitches[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)
 													};
-													Polyline(StitchWindowMemDC, stitchLine, 2);
+													Polyline(StitchWindowMemDC,static_cast<const POINT*>(stitchLine),2);
 												}
 											}
 										} while (false);
@@ -18805,13 +18805,13 @@ void thred::internal::dubar() {
 		indicatorLine[1].x                      = colorBarRect.right;
 		SelectObject(DrawItem->hDC, CrossPen);
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-		Polyline(DrawItem->hDC, indicatorLine, 2);
+		Polyline(DrawItem->hDC,static_cast<const POINT*>(indicatorLine),2);
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			selectedIndicator  = gsl::narrow_cast<double>(GroupStitchIndex) / PCSHeader.stitchCount;
 			indicatorLine[0].y = indicatorLine[1].y = wrap::round<int32_t>(colorBarRect.bottom * selectedIndicator + 0.5);
 			indicatorLine[0].x                      = colorBarRect.left;
 			indicatorLine[1].x                      = colorBarRect.right;
-			Polyline(DrawItem->hDC, indicatorLine, 2);
+			Polyline(DrawItem->hDC,static_cast<const POINT*>(indicatorLine),2);
 		}
 		SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
@@ -18819,7 +18819,7 @@ void thred::internal::dubar() {
 
 void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem) {
 	auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (thrEdFile != INVALID_HANDLE_VALUE) {
+	if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT
 		auto stitchHeader = STRHED {};
 		ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
 		if (BytesRead == sizeof(stitchHeader)) {
@@ -19092,7 +19092,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		case SB_THUMBPOSITION: {
 			if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 				GSL_SUPPRESS(26490) {
-					if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
+					if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT
 						const auto position = HIWORD(wParam); // NOLINT
 						MovieTimeStep       = MAXDELAY - position;
 						setsped();
@@ -19102,7 +19102,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			}
 			else {
 				GSL_SUPPRESS(26490) {
-					if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) {
+					if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT
 						const auto zoomWidth = ZoomRect.right - ZoomRect.left;
 						ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
 						ZoomRect.right       = ZoomRect.left + zoomWidth;
@@ -19163,7 +19163,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 	}
 	case WM_DRAWITEM: {
 		// owner draw windows
-		GSL_SUPPRESS(26490) DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
+		GSL_SUPPRESS(26490) DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT
 		if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 			if (StateMap.test(StateFlag::TXTRED)) {
 				texture::drwtxtr();
@@ -19284,11 +19284,11 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 					line[0].x = line[1].x = DrawItem->rcItem.right / 2;
 					line[0].y             = 0;
 					line[1].y             = DrawItem->rcItem.bottom;
-					Polyline(DrawItem->hDC, line, 2);
+					Polyline(DrawItem->hDC,static_cast<const POINT*>(line),2);
 					line[0].y = line[1].y = DrawItem->rcItem.bottom / 2;
 					line[0].x             = 0;
 					line[1].x             = DrawItem->rcItem.right;
-					Polyline(DrawItem->hDC, line, 2);
+					Polyline(DrawItem->hDC,static_cast<const POINT*>(line),2);
 					SetROP2(StitchWindowMemDC, R2_COPYPEN);
 				}
 				return 1;
@@ -19448,10 +19448,6 @@ void thred::internal::sachk() {
 	}
 }
 
-#define BAD_FPU_EX (_EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID)
-#define COMMON_FPU_EX (_EM_INEXACT | _EM_UNDERFLOW | _EM_DENORMAL)
-#define ALL_FPU_EX (BAD_FPU_EX | COMMON_FPU_EX)
-
 #ifdef ALLOCFAILURE
 int32_t handle_program_memory_depletion(uint32_t) {
 	// ToDo - Make this handle the failure with more user notifiication
@@ -19485,16 +19481,16 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	wc.cbClsExtra  = 0;
 	wc.cbWndExtra  = 0;
 	wc.hInstance   = ThrEdInstance;
-	wc.hIcon       = gsl::narrow_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED));
+	wc.hIcon       = gsl::narrow_cast<HICON>(LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT
 	wc.hCursor     = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                          //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);
+	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT
 	wc.lpszClassName = L"thred";
 	wc.hIconSm       = nullptr;
 
 #if HIGHDPI
-	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
+	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT
 #endif
 
 	// to keep the compiler from complaining
