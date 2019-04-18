@@ -2128,7 +2128,7 @@ void thred::internal::chknum() {
 			case LFTHCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nufthcol((std::wcstol(&SideWindowEntryBuffer[0], nullptr,10) - 1) & 0xfu);
+					form::nufthcol(gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr,10) - 1)) & 0xfu);
 					wrap::setSideWinVal(LFTHCOL);
 					thred::coltab();
 				}
@@ -3465,24 +3465,27 @@ void thred::internal::defbNam() {
 
 void thred::internal::ritini() {
 	auto           directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+	const auto defaultDirectory = gsl::span<char>{ IniFile.defaultDirectory, sizeof(IniFile.defaultDirectory) };
 	constexpr char fillchar  = '\0';
-	std::fill(&IniFile.defaultDirectory[0], &IniFile.defaultDirectory[sizeof(IniFile.defaultDirectory)], fillchar);
-	std::copy(directory.cbegin(), directory.cend(), &IniFile.defaultDirectory[0]);
+	std::fill(defaultDirectory.begin(), defaultDirectory.end(), fillchar);
+	std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
 	const auto& previousNames = *PreviousNames;
 	{
 		auto iVersion = 0u;
 		for (auto& prevName : IniFile.prevNames) {
-			std::fill(&prevName[0], &prevName[sizeof(prevName)], fillchar);
+			const auto name = gsl::span<char>{ prevName, sizeof(prevName) };
+			std::fill(name.begin(), name.end(), fillchar);
 			if (!previousNames[iVersion].empty()) {
 				auto previous = utf::Utf16ToUtf8(previousNames[iVersion]);
-				std::copy(previous.cbegin(), previous.cend(), &prevName[0]);
+				std::copy(previous.cbegin(), previous.cend(), name.begin());
 			}
 			iVersion++;
 		}
 	}
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::fill(&IniFile.designerName[0], &IniFile.designerName[sizeof(IniFile.designerName)], fillchar);
-	std::copy(designer.cbegin(), designer.cend(), &IniFile.designerName[0]);
+	const auto designerName = gsl::span<char>{ IniFile.designerName, sizeof(IniFile.designerName) };
+	std::fill(designerName.begin(), designerName.end(), fillchar);
+	std::copy(designer.cbegin(), designer.cend(), designerName.begin());
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -3802,7 +3805,8 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto designer            = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.cbegin(), designer.cend(), &ExtendedHeader.modifierName[0]);
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	if (!FormList->empty()) {
 		for (auto& form : (*FormList)) {
 			vertexCount += form.vertexCount;
@@ -4447,7 +4451,8 @@ void thred::internal::sav() {
 			pesHeader.ysiz          = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex             = 0;
 			// ToDo - convert to vector ?
-			auto* pesStitchBuffer = new uint8_t[wrap::toSize(PCSHeader.stitchCount * 8u)];
+			auto pesBuffer = std::make_unique<uint8_t[]>(wrap::toSize(PCSHeader.stitchCount * 8u));
+			auto pesStitchBuffer = pesBuffer.get();
 			auto  bufferIndex     = 0u; // Index into the uint8_t array
 			auto* blockHeader     = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
 			auto  threadList      = std::vector<PESCOLORLIST> {};
@@ -4546,9 +4551,9 @@ void thred::internal::sav() {
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
 			WriteFile(PCSFileHandle, pesStitchBuffer, bufferIndex, &bytesWritten, nullptr);
-			delete[] pesStitchBuffer;
 			// ToDo - (PES) is there a better estimate for data size?
-			auto  pchr      = new uint8_t[MAXITEMS * 4];
+			auto pesChr = std::make_unique<uint8_t[]>(MAXITEMS * 4);
+			auto  pchr      = pesChr.get();
 			auto* pecHeader = convert_ptr<PECHDR*>(pchr);
 			pecnam(pchr);
 			auto fstart = &pchr[sizeof(pecHeader->label)];
@@ -4615,7 +4620,6 @@ void thred::internal::sav() {
 			}
 			thi::writeThumbnail(pchr, p_thumbnail);
 			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
-			delete[] pchr;
 			break;
 		}
 #endif
@@ -4745,19 +4749,24 @@ void thred::internal::auxmen() {
 
 void thred::internal::savAs() {
 	if ((PCSHeader.stitchCount != 0u) || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
-		wchar_t szFileName[_MAX_PATH] = { 0 };
-		wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+		auto fileName = std::vector<wchar_t>{};
+		fileName.resize(_MAX_PATH);
+		auto dirBuffer = std::vector<wchar_t>{};
+		dirBuffer.resize(_MAX_PATH);
+
 		auto    workingFileStr        = WorkingFileName->wstring();
 		auto    dirStr                = DefaultDirectory->wstring();
-		std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
-		std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
+		std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
+		std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
+		// ToDo - find a better way to do this
 		OpenFileName.hwndOwner       = ThrEdWindow;
 		OpenFileName.hInstance       = ThrEdInstance;
-		OpenFileName.lpstrFile       = &szFileName[0];
-		OpenFileName.lpstrInitialDir = &lpszBuffer[0];
+		OpenFileName.lpstrFile       = fileName.data();
+		OpenFileName.lpstrInitialDir = dirBuffer.data();
 		OpenFileName.nFilterIndex    = 0;
 		if (GetSaveFileName(&OpenFileName)) {
-			WorkingFileName->assign(&szFileName[0]);
+			fileName.resize(wcslen(fileName.data()));
+			WorkingFileName->assign(fileName.cbegin(), fileName.cend());
 			*DefaultDirectory = WorkingFileName->parent_path();
 			switch (OpenFileName.nFilterIndex) {
 			case 1: {
@@ -5118,8 +5127,11 @@ void thred::internal::redbak() {
 		else {
 			ClipPoints->clear();
 		}
-		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-		std::copy(&undoData->colors[0], &undoData->colors[sizeColors], &UserColor[0]);
+		// ToDo - add field in BAKHED to keep track of number of colors
+		const auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
+		const auto undoColors = gsl::span<COLORREF>{ undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors) };
+		const auto userColors = gsl::span<COLORREF>{ UserColor,  gsl::narrow<ptrdiff_t>(sizeColors) };
+		std::copy(undoColors.cbegin(), undoColors.cend(), userColors.begin());
 		for (auto iColor = 0u; iColor < sizeColors; iColor++) {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 			UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
@@ -5625,18 +5637,21 @@ void thred::internal::rstdu() {
 }
 
 void thred::internal::nuFil() {
-	wchar_t szFileName[_MAX_PATH] = { 0 };
-	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+	auto fileName = std::vector<wchar_t>{};
+	fileName.resize(_MAX_PATH);
+	auto dirBuffer = std::vector<wchar_t>{};
+	dirBuffer.resize(_MAX_PATH);
 	auto    workingFileStr        = WorkingFileName->wstring();
 	auto    dirStr                = DefaultDirectory->wstring();
-	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
-	std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
+	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
+	std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
 	OpenFileName.hwndOwner       = ThrEdWindow;
 	OpenFileName.hInstance       = ThrEdInstance;
-	OpenFileName.lpstrFile       = &szFileName[0];
-	OpenFileName.lpstrInitialDir = &lpszBuffer[0];
+	OpenFileName.lpstrFile       = fileName.data();
+	OpenFileName.lpstrInitialDir = dirBuffer.data();
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
-		WorkingFileName->assign(&szFileName[0]);
+		fileName.resize(wcslen(fileName.data()));
+		WorkingFileName->assign(fileName.cbegin(), fileName.cend());
 		fnamtabs();
 		trace::untrace();
 		if (!FormList->empty()) {
@@ -5737,9 +5752,10 @@ void thred::internal::nuFil() {
 							PCSHeader.hoopType = LARGHUP;
 						}
 						ritfnam(*DesignerName);
+						const auto modifierName = gsl::span<char>{ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName)};
 						std::copy(&IniFile.designerName[0],
 						          &IniFile.designerName[strlen(&IniFile.designerName[0])],
-						          &ExtendedHeader.modifierName[0]);
+						          modifierName.begin());
 						break;
 					}
 					case 1:
@@ -6012,14 +6028,14 @@ void thred::internal::nuFil() {
 #if PESACT
 					else {
 						// ToDo - (PES) is there a better estimate for data size?
-						auto fileBuffer = new uint8_t[MAXITEMS * 8];
+						auto fileBuf = std::make_unique<uint8_t[]>(MAXITEMS * 8);
+						auto fileBuffer = fileBuf.get();
 						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, nullptr);
 						auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
 						if (strncmp(pesHeader->led, "#PES00", 6) != 0) {
 							auto fmtStr = std::wstring {};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
-							delete[] fileBuffer;
 							return;
 						}
 						auto pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
@@ -6108,10 +6124,8 @@ void thred::internal::nuFil() {
 							auto fmtStr = std::wstring {};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
-							delete[] fileBuffer;
 							return;
 						}
-						delete[] fileBuffer;
 					}
 #endif
 				}
@@ -6970,7 +6984,8 @@ void thred::internal::newFil() {
 	*ThrName = *DefaultDirectory / ((*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.cbegin(), designer.cend(), &ExtendedHeader.modifierName[0]);
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	rstdu();
 	rstAll();
 	displayText::clrhbut(3);
@@ -8214,22 +8229,26 @@ void thred::internal::lodbmp() {
 		DeleteObject(BitmapFileHandle);
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
-	wchar_t szFileName[_MAX_PATH] = { 0 };
-	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
+	auto fileName = std::vector<wchar_t>{};
+	fileName.resize(_MAX_PATH);
+	auto dirBuffer = std::vector<wchar_t>{};
+	dirBuffer.resize(_MAX_PATH);
 	auto    workingFileStr        = UserBMPFileName->wstring();
 	auto    dirStr                = DefaultBMPDirectory->wstring();
-	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
-	std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
-	OpenBitmapName.lpstrFile       = &szFileName[0];
-	OpenBitmapName.lpstrInitialDir = &lpszBuffer[0];
+	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
+	std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
+	OpenBitmapName.lpstrFile       = fileName.data();
+	OpenBitmapName.lpstrInitialDir = dirBuffer.data();
 	if (GetOpenFileName(&OpenBitmapName)) {
-		UserBMPFileName->assign(&szFileName[0]);
+		fileName.resize(wcslen(fileName.data()));
+		UserBMPFileName->assign(fileName.cbegin(), fileName.cend());
 		trace::untrace();
-		auto filename = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
+		auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
-		if (!filename.empty() && filename.size() < 16) {
-			std::copy(filename.cbegin(), filename.cend(), &PCSBMPFileName[0]);
+		if (!saveFile.empty() && saveFile.size() < 16) {
+			const auto bmpName = gsl::span<char>{ PCSBMPFileName, sizeof(PCSBMPFileName) };
+			std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
 			defbNam();
 			bfil();
 		}
@@ -18142,7 +18161,8 @@ void thred::internal::init() {
 	fnamtabs();
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.begin(), designer.end(), &ExtendedHeader.modifierName[0]);
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	std::copy(designer.begin(), designer.end(), modifierName.begin());
 	ExtendedHeader.stgran = 0;
 	for (auto& reservedChar : ExtendedHeader.res) {
 		reservedChar = 0;
