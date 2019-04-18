@@ -23,7 +23,7 @@
 
 namespace wrap {
 double bufToDouble(wchar_t* buffer);
-float  bufToFloat(wchar_t* buffer);
+float  bufToFloat(const wchar_t* buffer);
 
 uint64_t bufTou64(wchar_t* buffer);
 

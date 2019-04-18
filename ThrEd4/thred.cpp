@@ -264,8 +264,8 @@ OPENFILENAME OpenFileName = {
 	sizeof(OpenFileName), // lStructsize
 	nullptr,              // hwndOwner
 	nullptr,              // hInstance
-	AllFilter,            // lpstrFilter
-	CustomFilter,         // lpstrCustomFilter
+	&AllFilter[0],        // lpstrFilter
+	&CustomFilter[0],     // lpstrCustomFilter
 	_MAX_PATH,            // nMaxCustFilter
 	0,                    // nFilterIndex
 	nullptr,              // lpstrFile
@@ -298,8 +298,8 @@ OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
 	nullptr,                // hwndOwner
 	nullptr,                // hInstance
-	BmpFilter,              // lpstrFilter
-	CustomFilter,           // lpstrCustomFilter
+	&BmpFilter[0],          // lpstrFilter
+	&CustomFilter[0],       // lpstrCustomFilter
 	_MAX_PATH,              // nMaxCustFilter
 	0,                      // nFilterIndex
 	nullptr,                // lpstrFile
@@ -1032,8 +1032,8 @@ BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		case IDOK: {
 			auto    hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			wchar_t designerBuffer[50];
-			GetWindowText(hwnd, designerBuffer, sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-			DesignerName->assign(designerBuffer);
+			GetWindowText(hwnd, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			DesignerName->assign(&designerBuffer[0]);
 			EndDialog(hwndlg, 0);
 			SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 			return TRUE;
@@ -1185,7 +1185,7 @@ void thred::internal::fnamtabs() {
 		std::swap(NameEncoder[destination], NameEncoder[source]);
 	}
 	const auto fillval = gsl::narrow_cast<uint8_t>(0);
-	std::fill_n(NameDecoder, sizeof(NameDecoder), fillval);
+	std::fill_n(&NameDecoder[0], sizeof(NameDecoder), fillval);
 	for (auto iName = 32u; iName < 127; iName++) {
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<uint8_t>(iName);
 	}
@@ -1449,8 +1449,8 @@ void thred::internal::dudat() {
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount != 0u) {
-			std::copy(StitchBuffer,
-			          StitchBuffer + PCSHeader.stitchCount,
+			std::copy(&StitchBuffer[0],
+			          &StitchBuffer[PCSHeader.stitchCount],
 			          stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
 		}
 		backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
@@ -1476,7 +1476,7 @@ void thred::internal::dudat() {
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 		auto sizeColors    = (sizeof(UserColor) / sizeof(UserColor[0]));
-		std::copy(UserColor, UserColor + sizeColors, stdext::make_checked_array_iterator(backupData->colors, sizeColors));
+		std::copy(&UserColor[0], &UserColor[sizeColors], stdext::make_checked_array_iterator(backupData->colors, sizeColors));
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
 		if (!TexturePointsBuffer->empty()) {
@@ -2054,8 +2054,8 @@ void thred::internal::chkhup() {
 
 void thred::internal::chknum() {
 	auto value = 0.0f;
-	if (wcslen(MsgBuffer) != 0u) {
-		value = wrap::bufToFloat(MsgBuffer);
+	if (std::wcslen(&MsgBuffer[0]) != 0u) {
+		value = wrap::bufToFloat(&MsgBuffer[0]);
 		// Todo - remove this once the buffer overflow into MsgBuffer is resolved
 		if (value > gsl::narrow_cast<float>(MAXINT32)) { // NOLINT
 			throw;
@@ -2077,7 +2077,7 @@ void thred::internal::chknum() {
 	}
 	if (MsgIndex != 0u) {
 		if (FormMenuChoice != 0u) {
-			value = wrap::bufToFloat(SideWindowEntryBuffer) * PFGRAN;
+			value = wrap::bufToFloat(&SideWindowEntryBuffer[0]) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF: {
 				thred::savdo();
@@ -2128,7 +2128,7 @@ void thred::internal::chknum() {
 			case LFTHCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nufthcol((wrap::bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
+					form::nufthcol((std::wcstol(&SideWindowEntryBuffer[0], nullptr,10) - 1) & 0xfu);
 					wrap::setSideWinVal(LFTHCOL);
 					thred::coltab();
 				}
@@ -2162,7 +2162,7 @@ void thred::internal::chknum() {
 			case LBRDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nubrdcol((wrap::bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu);
+					form::nubrdcol((std::wcstol(&SideWindowEntryBuffer[0], nullptr,10) - 1u) & 0xfu);
 					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
@@ -2338,7 +2338,7 @@ void thred::internal::chknum() {
 		}
 		else {
 			if (PreferenceIndex != 0u) {
-				value = wrap::bufToFloat(SideWindowEntryBuffer);
+				value = wrap::bufToFloat(&SideWindowEntryBuffer[0]);
 				switch (PreferenceIndex - 1) {
 				case PEG: {
 					IniFile.eggRatio = value;
@@ -2483,9 +2483,9 @@ void thred::internal::chknum() {
 				PreferenceIndex = 0;
 			}
 			else {
-				if (wcslen(MsgBuffer) != 0u) {
+				if (wcslen(&MsgBuffer[0]) != 0u) {
 					OutputDebugString(fmt::format(L"chknum:MsgBuffer [{}]\n", MsgBuffer).c_str());
-					value = wrap::bufToDouble(MsgBuffer);
+					value = wrap::bufToDouble(&MsgBuffer[0]);
 					OutputDebugString(fmt::format(L"chknum:Value [{}]\n", value).c_str());
 					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
 					for (auto i = 0u; i < 64; i++) {
@@ -3463,23 +3463,23 @@ void thred::internal::defbNam() {
 void thred::internal::ritini() {
 	auto           directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
 	constexpr char fillchar  = '\0';
-	std::fill(IniFile.defaultDirectory, IniFile.defaultDirectory + sizeof(IniFile.defaultDirectory), fillchar);
-	std::copy(directory.cbegin(), directory.cend(), IniFile.defaultDirectory);
+	std::fill(&IniFile.defaultDirectory[0], &IniFile.defaultDirectory[sizeof(IniFile.defaultDirectory)], fillchar);
+	std::copy(directory.cbegin(), directory.cend(), &IniFile.defaultDirectory[0]);
 	const auto& previousNames = *PreviousNames;
 	{
 		auto iVersion = 0u;
 		for (auto& prevName : IniFile.prevNames) {
-			std::fill(prevName, prevName + sizeof(prevName), fillchar);
+			std::fill(&prevName[0], &prevName[sizeof(prevName)], fillchar);
 			if (!previousNames[iVersion].empty()) {
 				auto previous = utf::Utf16ToUtf8(previousNames[iVersion]);
-				std::copy(previous.cbegin(), previous.cend(), prevName);
+				std::copy(previous.cbegin(), previous.cend(), &prevName[0]);
 			}
 			iVersion++;
 		}
 	}
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::fill(IniFile.designerName, IniFile.designerName + sizeof(IniFile.designerName), fillchar);
-	std::copy(designer.cbegin(), designer.cend(), IniFile.designerName);
+	std::fill(&IniFile.designerName[0], &IniFile.designerName[sizeof(IniFile.designerName)], fillchar);
+	std::copy(designer.cbegin(), designer.cend(), &IniFile.designerName[0]);
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		IniFile.stitchColors[iColor]              = UserColor[iColor];
 		IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
@@ -3799,7 +3799,7 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto designer            = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.cbegin(), designer.cend(), ExtendedHeader.modifierName);
+	std::copy(designer.cbegin(), designer.cend(), &ExtendedHeader.modifierName[0]);
 	if (!FormList->empty()) {
 		for (auto& form : (*FormList)) {
 			vertexCount += form.vertexCount;
@@ -3838,17 +3838,17 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	durit(&output, &ExtendedHeader, sizeof(ExtendedHeader));
 	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]));
 	if (PCSBMPFileName[0] == 0) {
-		std::fill_n(PCSBMPFileName, sizeof(PCSBMPFileName), '\0');
+		std::fill_n(&PCSBMPFileName[0], sizeof(PCSBMPFileName), '\0');
 	}
-	durit(&output, PCSBMPFileName, sizeof(PCSBMPFileName));
+	durit(&output, &PCSBMPFileName[0], sizeof(PCSBMPFileName));
 	durit(&output, &BackgroundColor, sizeof(BackgroundColor));
-	durit(&output, UserColor, sizeof(UserColor));
-	durit(&output, CustomColor, sizeof(CustomColor));
+	durit(&output, &UserColor[0], sizeof(UserColor));
+	durit(&output, &CustomColor[0], sizeof(CustomColor));
 	for (auto iThread = 0; iThread < threadLength; iThread++) {
 		MsgBuffer[iThread] = ThreadSize[iThread][0];
 	}
 	MsgBuffer[threadLength] = 0;
-	auto threadSizeBufW     = std::wstring(MsgBuffer);
+	auto threadSizeBufW     = std::wstring(&MsgBuffer[0]);
 	auto threadSizeBuf      = utf::Utf16ToUtf8(threadSizeBufW);
 	durit(&output, threadSizeBuf.c_str(), wrap::toUnsigned(threadSizeBuf.size() * sizeof(threadSizeBuf[0])));
 	if (!FormList->empty()) {
@@ -3923,9 +3923,9 @@ void thred::internal::thrsav() {
 			for (auto& version : *VersionNames) {
 				version.clear();
 			}
-			duver(*DefaultDirectory / fileData.cFileName);
+			duver(*DefaultDirectory / &fileData.cFileName[0]);
 			while (FindNextFile(file, &fileData)) {
-				duver(*DefaultDirectory / fileData.cFileName);
+				duver(*DefaultDirectory / &fileData.cFileName[0]);
 			}
 			FindClose(file);
 			fs::remove(VersionNames->back());
@@ -4279,7 +4279,7 @@ void thred::internal::pecdat(uint8_t* buffer) {
 	OutputIndex     = sizeof(PECHDR) + sizeof(PECHDR2);
 	auto* pecHeader = convert_ptr<PECHDR*>(buffer);
 	PESdata         = buffer;
-	PEScolors       = pecHeader->pad;
+	PEScolors       = &pecHeader->pad[0];
 	auto thisStitch = fPOINT {};
 	rpcrd(thisStitch, StitchBuffer[0].x, StitchBuffer[0].y);
 	auto iColor  = 1u;
@@ -4369,7 +4369,7 @@ void thred::internal::sav() {
 			// dstHeader fields are fixed width, so use strncpy in its intended way.
 			// Use sizeof to ensure no overrun if the format string is wrong length
 			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched));
-			std::fill_n(dstHeader.desc, sizeof(dstHeader.desc), ' ');
+			std::fill_n(&dstHeader.desc[0], sizeof(dstHeader.desc), ' ');
 			if (desc != nullptr) {
 				for (auto iHeader = 0u; iHeader < sizeof(dstHeader.desc); iHeader++) {
 					if ((desc[iHeader] != 0) && desc[iHeader] != '.') {
@@ -4404,7 +4404,7 @@ void thred::internal::sav() {
 			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));
 			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));
 			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
-			std::fill_n(dstHeader.res, sizeof(dstHeader.res), ' ');
+			std::fill_n(&dstHeader.res[0], sizeof(dstHeader.res), ' ');
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
 			wrap::WriteFile(PCSFileHandle,
@@ -4659,15 +4659,15 @@ void thred::internal::sav() {
 					break;
 				}
 				if (UserFlagMap.test(UserFlag::BSAVOF)) {
-					*MsgBuffer = 0;
-					if (WriteFile(PCSFileHandle, MsgBuffer, 15, &bytesWritten, nullptr) == 0) {
+					MsgBuffer[0] = 0;
+					if (WriteFile(PCSFileHandle, static_cast<LPCVOID>(MsgBuffer), 15, &bytesWritten, nullptr) == 0) {
 						displayText::riter();
 						flag = false;
 						break;
 					}
 				}
 				else {
-					if (WriteFile(PCSFileHandle, PCSBMPFileName, 15, &bytesWritten, nullptr) == 0) {
+					if (WriteFile(PCSFileHandle, static_cast<LPCVOID>(PCSBMPFileName), 15, &bytesWritten, nullptr) == 0) {
 						displayText::riter();
 						flag = false;
 						break;
@@ -4741,20 +4741,20 @@ void thred::internal::auxmen() {
 }
 
 void thred::internal::savAs() {
-	if ((PCSHeader.stitchCount != 0u) || !FormList->empty() || (*PCSBMPFileName != 0)) {
+	if ((PCSHeader.stitchCount != 0u) || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
 		wchar_t szFileName[_MAX_PATH] = { 0 };
 		wchar_t lpszBuffer[_MAX_PATH] = { 0 };
 		auto    workingFileStr        = WorkingFileName->wstring();
 		auto    dirStr                = DefaultDirectory->wstring();
-		std::copy(workingFileStr.cbegin(), workingFileStr.cend(), szFileName);
-		std::copy(dirStr.cbegin(), dirStr.cend(), lpszBuffer);
+		std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
+		std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
 		OpenFileName.hwndOwner       = ThrEdWindow;
 		OpenFileName.hInstance       = ThrEdInstance;
-		OpenFileName.lpstrFile       = szFileName;
-		OpenFileName.lpstrInitialDir = lpszBuffer;
+		OpenFileName.lpstrFile       = &szFileName[0];
+		OpenFileName.lpstrInitialDir = &lpszBuffer[0];
 		OpenFileName.nFilterIndex    = 0;
 		if (GetSaveFileName(&OpenFileName)) {
-			WorkingFileName->assign(szFileName);
+			WorkingFileName->assign(&szFileName[0]);
 			*DefaultDirectory = WorkingFileName->parent_path();
 			switch (OpenFileName.nFilterIndex) {
 			case 1: {
@@ -5083,7 +5083,7 @@ void thred::internal::redbak() {
 	const auto undoData = convert_ptr<BAKHED*>((*UndoBuffer)[UndoBufferWriteIndex].get());
 	if (undoData != nullptr) {
 		if (undoData->stitchCount != 0u) {
-			std::copy(undoData->stitches, undoData->stitches + undoData->stitchCount, StitchBuffer);
+			std::copy(&undoData->stitches[0], &undoData->stitches[undoData->stitchCount], StitchBuffer);
 		}
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
@@ -5116,7 +5116,7 @@ void thred::internal::redbak() {
 			ClipPoints->clear();
 		}
 		auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-		std::copy(undoData->colors, undoData->colors + sizeColors, UserColor);
+		std::copy(&undoData->colors[0], &undoData->colors[sizeColors], &UserColor[0]);
 		for (auto iColor = 0u; iColor < sizeColors; iColor++) {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 			UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
@@ -5626,14 +5626,14 @@ void thred::internal::nuFil() {
 	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
 	auto    workingFileStr        = WorkingFileName->wstring();
 	auto    dirStr                = DefaultDirectory->wstring();
-	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), szFileName);
-	std::copy(dirStr.cbegin(), dirStr.cend(), lpszBuffer);
+	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
+	std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
 	OpenFileName.hwndOwner       = ThrEdWindow;
 	OpenFileName.hInstance       = ThrEdInstance;
-	OpenFileName.lpstrFile       = szFileName;
-	OpenFileName.lpstrInitialDir = lpszBuffer;
+	OpenFileName.lpstrFile       = &szFileName[0];
+	OpenFileName.lpstrInitialDir = &lpszBuffer[0];
 	if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
-		WorkingFileName->assign(szFileName);
+		WorkingFileName->assign(&szFileName[0]);
 		fnamtabs();
 		trace::untrace();
 		if (!FormList->empty()) {
@@ -5670,7 +5670,7 @@ void thred::internal::nuFil() {
 			TextureIndex = 0;
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
 			deldu();
-			DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
+			DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 			thred::unbsho();
 			StateMap.reset(StateFlag::MOVSET);
 			form::frmon();
@@ -5719,7 +5719,7 @@ void thred::internal::nuFil() {
 						return;
 					}
 					const auto version = (thredHeader.headerType & 0xff000000) >> 24u;
-					DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
+					DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 					switch (version) {
 					case 0: {
 						if (PCSHeader.hoopType == SMALHUP) {
@@ -5734,9 +5734,9 @@ void thred::internal::nuFil() {
 							PCSHeader.hoopType = LARGHUP;
 						}
 						ritfnam(*DesignerName);
-						std::copy(IniFile.designerName,
-						          IniFile.designerName + strlen(IniFile.designerName),
-						          ExtendedHeader.modifierName);
+						std::copy(&IniFile.designerName[0],
+						          &IniFile.designerName[strlen(&IniFile.designerName[0])],
+						          &ExtendedHeader.modifierName[0]);
 						break;
 					}
 					case 1:
@@ -5762,13 +5762,13 @@ void thred::internal::nuFil() {
 					UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
 					PCSHeader.stitchCount = thredHeader.stitchCount;
 					auto stitchesRead     = DWORD { 0 };
-					ReadFile(FileHandle, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]), &stitchesRead, nullptr);
+					ReadFile(FileHandle, static_cast<LPVOID>(StitchBuffer), PCSHeader.stitchCount * sizeof(StitchBuffer[0]), &stitchesRead, nullptr);
 					if (stitchesRead != PCSHeader.stitchCount * sizeof(StitchBuffer[0])) {
 						PCSHeader.stitchCount = gsl::narrow<uint16_t>(stitchesRead / sizeof(StitchBuffer[0]));
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, PCSBMPFileName, sizeof(PCSBMPFileName), &BytesRead, nullptr);
+					ReadFile(FileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
 						prtred();
@@ -5781,12 +5781,12 @@ void thred::internal::nuFil() {
 						return;
 					}
 					BackgroundBrush = CreateSolidBrush(BackgroundColor);
-					ReadFile(FileHandle, UserColor, sizeof(UserColor), &BytesRead, nullptr);
+					ReadFile(FileHandle, static_cast<LPVOID>(UserColor), sizeof(UserColor), &BytesRead, nullptr);
 					if (BytesRead != sizeof(UserColor)) {
 						prtred();
 						return;
 					}
-					ReadFile(FileHandle, CustomColor, sizeof(CustomColor), &BytesRead, nullptr);
+					ReadFile(FileHandle, static_cast<LPVOID>(CustomColor), sizeof(CustomColor), &BytesRead, nullptr);
 					if (BytesRead != sizeof(CustomColor)) {
 						prtred();
 						return;
@@ -5794,12 +5794,12 @@ void thred::internal::nuFil() {
 					constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
 					                              / 2; // ThreadSize is defined as a 16 entry array of 2 characters
 					char msgBuffer[threadLength];
-					ReadFile(FileHandle, msgBuffer, threadLength, &BytesRead, nullptr);
+					ReadFile(FileHandle, static_cast<LPVOID>(msgBuffer), threadLength, &BytesRead, nullptr);
 					if (BytesRead != threadLength) {
 						prtred();
 						return;
 					}
-					auto threadSizebuf  = std::string(msgBuffer, sizeof(msgBuffer));
+					auto threadSizebuf  = std::string(&msgBuffer[0], sizeof(msgBuffer));
 					auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
 					for (auto iThread = 0; iThread < threadLength; iThread++) {
 						ThreadSize[iThread][0] = threadSizeBufW[iThread];
@@ -6024,7 +6024,7 @@ void thred::internal::nuFil() {
 						auto pecOffset           = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
 						PESstitch                = &fileBuffer[pecOffset];
 						const auto pesColorCount = pecHeader->colorCount + 1u;
-						PEScolors                = pecHeader->pad;
+						PEScolors                = &pecHeader->pad[0];
 						const auto threadCount   = sizeof(PESThread) / sizeof(PESThread[0]);
 						auto       colorMap      = boost::dynamic_bitset<>(threadCount);
 						auto       activeColor   = 0u;
@@ -6135,7 +6135,7 @@ void thred::internal::nuFil() {
 			}
 			if (PCSBMPFileName[0] != 0) {
 				fs::current_path(*DefaultDirectory);
-				auto BMPfileName = utf::Utf8ToUtf16(PCSBMPFileName);
+				auto BMPfileName = utf::Utf8ToUtf16(std::string(&PCSBMPFileName[0]));
 				UserBMPFileName->assign(BMPfileName);
 				bfil();
 			}
@@ -6192,7 +6192,7 @@ COLORREF thred::internal::nuCol(COLORREF init) noexcept {
 	ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
 	ColorStruct.hwndOwner      = ThrEdWindow;
 	ColorStruct.lCustData      = 0;
-	ColorStruct.lpCustColors   = CustomColor;
+	ColorStruct.lpCustColors   = &CustomColor[0];
 	ColorStruct.lpfnHook       = nullptr;
 	ColorStruct.lpTemplateName = nullptr;
 	ColorStruct.rgbResult      = init;
@@ -6204,7 +6204,7 @@ COLORREF thred::internal::nuBak() noexcept {
 	BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
 	BackgroundColorStruct.hwndOwner      = ThrEdWindow;
 	BackgroundColorStruct.lCustData      = 0;
-	BackgroundColorStruct.lpCustColors   = CustomBackgroundColor;
+	BackgroundColorStruct.lpCustColors   = &CustomBackgroundColor[0];
 	BackgroundColorStruct.lpfnHook       = nullptr;
 	BackgroundColorStruct.lpTemplateName = nullptr;
 	BackgroundColorStruct.rgbResult      = BackgroundColor;
@@ -6216,7 +6216,7 @@ COLORREF thred::internal::nuBit() noexcept {
 	BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
 	BitMapColorStruct.hwndOwner      = ThrEdWindow;
 	BitMapColorStruct.lCustData      = 0;
-	BitMapColorStruct.lpCustColors   = BitmapBackgroundColors;
+	BitMapColorStruct.lpCustColors   = &BitmapBackgroundColors[0];
 	BitMapColorStruct.lpfnHook       = nullptr;
 	BitMapColorStruct.lpTemplateName = nullptr;
 	BitMapColorStruct.rgbResult      = BitmapColor;
@@ -6962,12 +6962,12 @@ void thred::internal::newFil() {
 		ReleaseDC(ThrEdWindow, BitmapDC);
 	}
 	deldu();
-	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRED], *DesignerName).c_str());
 	*ThrName = *DefaultDirectory / ((*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.cbegin(), designer.cend(), ExtendedHeader.modifierName);
+	std::copy(designer.cbegin(), designer.cend(), &ExtendedHeader.modifierName[0]);
 	rstdu();
 	rstAll();
 	displayText::clrhbut(3);
@@ -8028,10 +8028,10 @@ void thred::internal::endknt(uint32_t finish) {
 		iStart--;
 	} while (length == 0.0f);
 	if (StateMap.test(StateFlag::FILDIR)) {
-		knots = KnotAtLastOrder;
+		knots = &KnotAtLastOrder[0];
 	}
 	else {
-		knots = KnotAtEndOrder;
+		knots = &KnotAtEndOrder[0];
 	}
 	if (knots != nullptr) {
 		if ((iStart & 0x8000000u) == 0u) {
@@ -8107,8 +8107,8 @@ uint32_t thred::internal::kjmp(uint32_t start) noexcept {
 }
 
 void thred::mvstchs(uint32_t destination, uint32_t source, uint32_t count) {
-	auto       sourceStart     = StitchBuffer + source;
-	auto       sourceEnd       = sourceStart + count;
+	auto       sourceStart     = &StitchBuffer[source];
+	auto       sourceEnd       = &sourceStart[count];
 	const auto destinationSpan = stdext::make_checked_array_iterator(StitchBuffer + destination, (MAXITEMS * 2) - destination);
 	std::copy(sourceStart, sourceEnd, destinationSpan);
 }
@@ -8215,18 +8215,18 @@ void thred::internal::lodbmp() {
 	wchar_t lpszBuffer[_MAX_PATH] = { 0 };
 	auto    workingFileStr        = UserBMPFileName->wstring();
 	auto    dirStr                = DefaultBMPDirectory->wstring();
-	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), szFileName);
-	std::copy(dirStr.cbegin(), dirStr.cend(), lpszBuffer);
-	OpenBitmapName.lpstrFile       = szFileName;
-	OpenBitmapName.lpstrInitialDir = lpszBuffer;
+	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), &szFileName[0]);
+	std::copy(dirStr.cbegin(), dirStr.cend(), &lpszBuffer[0]);
+	OpenBitmapName.lpstrFile       = &szFileName[0];
+	OpenBitmapName.lpstrInitialDir = &lpszBuffer[0];
 	if (GetOpenFileName(&OpenBitmapName)) {
-		UserBMPFileName->assign(szFileName);
+		UserBMPFileName->assign(&szFileName[0]);
 		trace::untrace();
 		auto filename = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
 		if (!filename.empty() && filename.size() < 16) {
-			std::copy(filename.cbegin(), filename.cend(), PCSBMPFileName);
+			std::copy(filename.cbegin(), filename.cend(), &PCSBMPFileName[0]);
 			defbNam();
 			bfil();
 		}
@@ -8354,7 +8354,7 @@ void thred::internal::setsped() {
 }
 
 void thred::internal::deltot() {
-	DesignerName->assign(utf::Utf8ToUtf16(std::string(IniFile.designerName)));
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 	TextureIndex = 0;
 	FormList->clear();
 	PCSHeader.stitchCount = 0;
@@ -8823,10 +8823,10 @@ void thred::internal::insfil() {
 		ThrEdWindow,                         // hwndOwner
 		ThrEdInstance,                       // hInstance
 		L"THR files\0*.thr\0\0",             // lpstrFilter
-		CustomFilter,                        // lpstrCustomFilter
+		&CustomFilter[0],                    // lpstrCustomFilter
 		_MAX_PATH,                           // nMaxCustFilter
 		0,                                   // nFilterIndex
-		InsertedFileName,                    // lpstrFile
+		&InsertedFileName[0],                // lpstrFile
 		_MAX_PATH,                           // nMaxFile
 		nullptr,                             // lpstrFileTitle
 		0,                                   // nMaxFileTitle
@@ -8842,15 +8842,15 @@ void thred::internal::insfil() {
 	};
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
-		InsertedFileHandle = CreateFile(InsertedFileName, (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
+		InsertedFileHandle = CreateFile(static_cast<LPTSTR>(InsertedFileName), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
-			displayText::filnopn(IDS_FNOPN, InsertedFileName);
+			displayText::filnopn(IDS_FNOPN, fs::path(&InsertedFileName[0]));
 			FileHandle = nullptr;
 			CloseHandle(InsertedFileHandle);
 		}
 		else {
 			InsertedStitchCount = PCSHeader.stitchCount;
-			if (isthr(InsertedFileName)) {
+			if (isthr(&InsertedFileName[0])) {
 				auto fileHeader = STRHED {};
 				ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
 				if ((fileHeader.headerType & 0xffffffu) != 0x746872u) {
@@ -10257,9 +10257,9 @@ void thred::internal::thumnail() {
 	}
 	else {
 		Thumbnails->clear();
-		Thumbnails->push_back(fileData.cFileName);
+		Thumbnails->push_back(std::wstring(&fileData.cFileName[0]));
 		while (FindNextFile(file, &fileData)) {
-			Thumbnails->push_back(fileData.cFileName);
+			Thumbnails->push_back(std::wstring(&fileData.cFileName[0]));
 		}
 		FindClose(file);
 		std::sort(Thumbnails->begin(), Thumbnails->end());
@@ -10287,11 +10287,11 @@ void thred::internal::nuthsel() {
 	if (ThumbnailIndex < Thumbnails->size()) {
 		const auto savedIndex = ThumbnailIndex;
 		auto       iThumbnail = 0u;
-		const auto length     = wcslen(ThumbnailSearchString);
+		const auto length     = wcslen(&ThumbnailSearchString[0]);
 		StateMap.set(StateFlag::RESTCH);
 		if (length != 0u) {
 			while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
-				if (wcsncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length) == 0) {
+				if (wcsncmp(&ThumbnailSearchString[0], (*Thumbnails)[ThumbnailIndex].data(), length) == 0) {
 					ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 					thred::redraw(BackupViewer[iThumbnail++]);
 				}
@@ -10319,12 +10319,12 @@ void thred::internal::nuthsel() {
 
 void thred::internal::nuthbak(uint32_t count) {
 	if (ThumbnailIndex != 0u) {
-		const auto length = wcslen(ThumbnailSearchString);
+		const auto length = wcslen(&ThumbnailSearchString[0]);
 		if (length != 0u) {
 			while ((count != 0u) && ThumbnailIndex < MAXFORMS) {
 				if (ThumbnailIndex != 0u) {
 					ThumbnailIndex--;
-					if (wcsncmp(ThumbnailSearchString, (*Thumbnails)[ThumbnailIndex].data(), length) == 0) {
+					if (wcsncmp(&ThumbnailSearchString[0], (*Thumbnails)[ThumbnailIndex].data(), length) == 0) {
 						count--;
 					}
 				}
@@ -10344,12 +10344,12 @@ void thred::internal::nuthbak(uint32_t count) {
 }
 
 void thred::internal::nuthum(char character) {
-	auto length = wcslen(ThumbnailSearchString);
+	auto length = wcslen(&ThumbnailSearchString[0]);
 	if (length < 16) {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[length++] = character;
 		ThumbnailSearchString[length]   = 0;
-		auto txt                        = std::wstring(ThumbnailSearchString);
+		auto txt                        = std::wstring(&ThumbnailSearchString[0]);
 		displayText::butxt(HBOXSEL, txt);
 		ThumbnailIndex = 0;
 		nuthsel();
@@ -10357,12 +10357,12 @@ void thred::internal::nuthum(char character) {
 }
 
 void thred::internal::bakthum() {
-	auto searchStringLength = wcslen(ThumbnailSearchString);
+	auto searchStringLength = wcslen(&ThumbnailSearchString[0]);
 	if (searchStringLength != 0u) {
 		StateMap.set(StateFlag::RESTCH);
 		ThumbnailSearchString[--searchStringLength] = 0;
 		ThumbnailIndex                              = 0;
-		auto txt                                    = std::wstring(ThumbnailSearchString);
+		auto txt                                    = std::wstring(&ThumbnailSearchString[0]);
 		displayText::butxt(HBOXSEL, txt);
 		nuthsel();
 	}
@@ -10564,7 +10564,7 @@ void thred::internal::desiz() {
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (PCSHeader.stitchCount != 0u) {
-		auto modifier = utf::Utf8ToUtf16(ExtendedHeader.modifierName);
+		auto modifier = utf::Utf8ToUtf16(std::string(&ExtendedHeader.modifierName[0]));
 		info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
 	}
 	displayText::shoMsg(info);
@@ -11331,7 +11331,7 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			case IDOK: {
 				auto fileError = 0u;
 				for (auto iFile = 0u; iFile < fileInfo->count; iFile++) {
-					auto fileName = *DefaultDirectory / fileInfo->data[iFile].cFileName;
+					auto fileName = *DefaultDirectory / &fileInfo->data[iFile].cFileName[0];
 					if (!SetFileAttributes(fileName.wstring().c_str(), fileInfo->data[iFile].dwFileAttributes)) {
 						fileError++;
 					}
@@ -11768,7 +11768,7 @@ void thred::internal::set1knot() {
 	}
 	else {
 		displayText::msgstr(IDS_NOSTCHSEL);
-		displayText::shoMsg(MsgBuffer);
+		displayText::shoMsg(std::wstring(&MsgBuffer[0]));
 	}
 }
 
@@ -12057,21 +12057,21 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 			wchar_t buf1[HBUFSIZ]   = { 0 };
 			for (auto iFeatherStyle = 0u; iFeatherStyle < 6; iFeatherStyle++) {
 				LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, static_cast<LPTSTR>(buf1), HBUFSIZ);
-				if (wcscmp(buf, buf1) == 0) {
+				if (wcscmp(&buf[0], &buf1[0]) == 0) {
 					IniFile.featherFillType = gsl::narrow<uint8_t>(iFeatherStyle + 1);
 					break;
 				}
 			}
-			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf, HBUFSIZ);
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), static_cast<LPTSTR>(buf), HBUFSIZ);
 			IniFile.featherRatio = wrap::wcstof(buf);
-			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf, HBUFSIZ);
-			IniFile.featherUpCount = gsl::narrow<uint8_t>(std::stoi(buf));
-			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf, HBUFSIZ);
-			IniFile.featherDownCount = gsl::narrow<uint8_t>(std::stoi(buf));
-			GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf, HBUFSIZ);
-			IniFile.featherMinStitchSize = std::stof(buf) * PFGRAN;
-			GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf, HBUFSIZ);
-			IniFile.featherCount = gsl::narrow<uint16_t>(std::stoi(buf));
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), static_cast<LPTSTR>(buf), HBUFSIZ);
+			IniFile.featherUpCount = gsl::narrow<uint8_t>(std::stoi(&buf[0]));
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), static_cast<LPTSTR>(buf), HBUFSIZ);
+			IniFile.featherDownCount = gsl::narrow<uint8_t>(std::stoi(&buf[0]));
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), static_cast<LPTSTR>(buf), HBUFSIZ);
+			IniFile.featherMinStitchSize = std::wcstof(&buf[0], nullptr) * PFGRAN;
+			GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), static_cast<LPTSTR>(buf), HBUFSIZ);
+			IniFile.featherCount = gsl::narrow<uint16_t>(std::stoi(&buf[0]));
 			if (IniFile.featherCount < 1) {
 				IniFile.featherCount = 1;
 			}
@@ -13647,7 +13647,7 @@ bool thred::internal::handleFormDataSheet() {
 			std::wstring layerText[] = { L"0", L"1", L"2", L"3", L"4" };
 			FormMenuChoice           = LLAYR;
 			StateMap.reset(StateFlag::FILTYP);
-			sidmsg((*ValueWindow)[LLAYR], layerText, 5);
+			sidmsg((*ValueWindow)[LLAYR], &layerText[0], 5);
 			break;
 		}
 		if (Msg.hwnd == (*ValueWindow)[LFRMFIL] || Msg.hwnd == (*LabelWindow)[LFRMFIL]) {
@@ -14180,7 +14180,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			wchar_t buffer[3]                   = { 0 };
 			wcsncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2);
 			buffer[2] = 0;
-			SetWindowText(ThreadSizeWin[ThreadSizeSelected], buffer);
+			SetWindowText(ThreadSizeWin[ThreadSizeSelected], static_cast<LPTSTR>(buffer));
 			StateMap.set(StateFlag::RESTCH);
 			for (auto& iWindow : ChangeThreadSizeWin) {
 				if (iWindow != nullptr) {
@@ -15835,7 +15835,7 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 		MsgBuffer[0] = '-';
 		MsgBuffer[1] = 0;
 		MsgIndex     = 1;
-		SetWindowText(GeneralNumberInputBox, MsgBuffer);
+		SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
 		return true;
 	}
 	if (dunum(code)) {
@@ -15845,7 +15845,7 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 		else {
 			MsgBuffer[MsgIndex++] = NumericCode;
 			MsgBuffer[MsgIndex]   = 0;
-			SetWindowText(GeneralNumberInputBox, MsgBuffer);
+			SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
 		}
 		return true;
 	}
@@ -15854,7 +15854,7 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 	case 0xbe: { // period
 		MsgBuffer[MsgIndex++] = '.';
 		MsgBuffer[MsgIndex]   = 0;
-		SetWindowText(GeneralNumberInputBox, MsgBuffer);
+		SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
 		return true;
 	}
 	case 8: { // backspace
@@ -15865,7 +15865,7 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 			}
 			else {
 				MsgBuffer[MsgIndex] = 0;
-				SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
 			}
 		}
 		return true;
@@ -17397,10 +17397,10 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.test(StateFlag::FSETFSPAC) || StateMap.test(StateFlag::GTWLKIND)) {
 			// Check for keycode 'dash' and numpad 'subtract'
 			if (code == 189 || code == 109) {
-				*MsgBuffer   = '-';
+				MsgBuffer[0]   = '-';
 				MsgIndex     = 1;
 				MsgBuffer[1] = 0;
-				SetWindowText(GeneralNumberInputBox, MsgBuffer);
+				SetWindowText(GeneralNumberInputBox, &MsgBuffer[0]);
 				return true;
 			}
 		}
@@ -17408,7 +17408,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			if (chkminus(code)) {
 				MsgIndex                 = 1;
 				SideWindowEntryBuffer[0] = '-';
-				SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+				SetWindowText(SideMessageWindow, &SideWindowEntryBuffer[0]);
 				return true;
 			}
 			if (dunum(code)) {
@@ -17417,11 +17417,11 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					MsgBuffer[1] = 0;
 					if (PreferenceIndex == PSHO + 1) {
 						ShowStitchThreshold = unthrsh(NumericCode - 0x30);
-						SetWindowText((*ValueWindow)[PSHO], MsgBuffer);
+						SetWindowText((*ValueWindow)[PSHO], &MsgBuffer[0]);
 					}
 					else {
 						StitchBoxesThreshold = unthrsh(NumericCode - 0x30);
-						SetWindowText((*ValueWindow)[PBOX], MsgBuffer);
+						SetWindowText((*ValueWindow)[PBOX], &MsgBuffer[0]);
 					}
 					thred::unsid();
 				}
@@ -17429,7 +17429,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 					if (MsgIndex < ((sizeof(SideWindowEntryBuffer) - 1) / sizeof(SideWindowEntryBuffer[0]))) {
 						SideWindowEntryBuffer[MsgIndex++] = NumericCode;
 						SideWindowEntryBuffer[MsgIndex]   = 0;
-						SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+						SetWindowText(SideMessageWindow, &SideWindowEntryBuffer[0]);
 					}
 				}
 				return true;
@@ -17439,13 +17439,13 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			case 0xbe: { // period
 				SideWindowEntryBuffer[MsgIndex++] = '.';
 				SideWindowEntryBuffer[MsgIndex]   = 0;
-				SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+				SetWindowText(SideMessageWindow, &SideWindowEntryBuffer[0]);
 				return true;
 			}
 			case 8: { // backspace
 				if (MsgIndex != 0u) {
 					SideWindowEntryBuffer[--MsgIndex] = 0;
-					SetWindowText(SideMessageWindow, SideWindowEntryBuffer);
+					SetWindowText(SideMessageWindow, &SideWindowEntryBuffer[0]);
 				}
 				return true;
 			}
@@ -17477,8 +17477,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 		}
 		if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
-			if (std::wcslen(MsgBuffer) != 0) {
-				const auto value = wrap::bufToFloat(MsgBuffer);
+			if (std::wcslen(&MsgBuffer[0]) != 0) {
+				const auto value = wrap::bufToFloat(&MsgBuffer[0]);
 				if (value != 0.0f) {
 					IniFile.rotationAngle = value * PI_F / 180.0f;
 				}
@@ -17486,8 +17486,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			form::duprot(IniFile.rotationAngle);
 		}
 		if (StateMap.testAndReset(StateFlag::ENTROT)) {
-			if (std::wcslen(MsgBuffer) != 0) {
-				const auto value = wrap::bufToFloat(MsgBuffer);
+			if (std::wcslen(&MsgBuffer[0]) != 0) {
+				const auto value = wrap::bufToFloat(&MsgBuffer[0]);
 				if (value != 0.0) {
 					IniFile.rotationAngle = value * PI_F / 180.0f;
 				}
@@ -18139,7 +18139,7 @@ void thred::internal::init() {
 	fnamtabs();
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	std::copy(designer.begin(), designer.end(), ExtendedHeader.modifierName);
+	std::copy(designer.begin(), designer.end(), &ExtendedHeader.modifierName[0]);
 	ExtendedHeader.stgran = 0;
 	for (auto& reservedChar : ExtendedHeader.res) {
 		reservedChar = 0;

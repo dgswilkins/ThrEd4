@@ -37,7 +37,7 @@ double wrap::bufToDouble(wchar_t* buffer) {
 	return value;
 }
 
-float wrap::bufToFloat(wchar_t* buffer) {
+float wrap::bufToFloat(const wchar_t* buffer) {
 	auto value = 0.0f;
 
 	try {
