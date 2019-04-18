@@ -2139,7 +2139,9 @@ void thred::internal::chknum() {
 			case LFRMCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nufilcol((wrap::bufTou64(SideWindowEntryBuffer) - 1) & 0xfu);
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfu;
+					form::nufilcol(colVal);
+					wcscpy_s(SideWindowEntryBuffer, fmt::format(L"{}", colVal + 1).c_str());
 					wrap::setSideWinVal(LFRMCOL);
 					thred::coltab();
 				}
@@ -2150,7 +2152,9 @@ void thred::internal::chknum() {
 			case LUNDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					SelectedForm->underlayColor = (wrap::bufTou64(SideWindowEntryBuffer) - 1u) & 0xfu;
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfu;
+					SelectedForm->underlayColor = colVal;
+					wcscpy_s(SideWindowEntryBuffer, fmt::format(L"{}", colVal + 1).c_str());
 					wrap::setSideWinVal(LUNDCOL);
 					form::refilfn();
 					thred::coltab();
