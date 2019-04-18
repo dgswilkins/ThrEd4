@@ -126,7 +126,7 @@ constexpr uint32_t REDMSK    = 0xffff00u;       // mask for the color red
 constexpr uint32_t GRNMSK    = 0xff00ffu;       // mask for the color green
 constexpr uint32_t BLUMSK    = 0x00ffffu;       // mask for the color blue
 constexpr float    TRACLEN   = 1.0f;            // initial trace length
-constexpr double   TRACRAT   = 1.00001;         // initial trace ratio
+constexpr float    TRACRAT   = 1.00001f;        // initial trace ratio
 constexpr float    CHSDEF    = 24.0f;           // default chain stitch length
 constexpr double   CHRDEF    = 0.25;            // default chain stitch ratio
 constexpr float    NUGINI    = 2.0f;            // default nudge step
@@ -988,7 +988,7 @@ struct _iniFil {
 	float    customHoopX;                            // custom hoop width
 	float    customHoopY;                            // custom hoop height
 	float    traceLength;                            // lens points
-	double   traceRatio;                             // trace ratio
+	float    traceRatio;                             // trace ratio
 	float    chainSpace;                             // chain space
 	float    chainRatio;                             // chain ratio
 	float    cursorNudgeStep;                        // cursor nudge step
