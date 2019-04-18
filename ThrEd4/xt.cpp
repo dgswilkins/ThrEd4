@@ -84,7 +84,7 @@ void xt::setfchk() {
 #ifdef _DEBUG
 
 void xt::internal::prbug() noexcept {
-	OutputDebugString(MsgBuffer);
+	OutputDebugString(&MsgBuffer[0]);
 }
 #endif
 
@@ -145,27 +145,27 @@ uint32_t xt::internal::bpsg() noexcept {
 	if (PseudoRandomValue == 0u) {
 		PseudoRandomValue = FSED;
 	}
-	testValue = PseudoRandomValue & 0x40000008;
+	testValue = PseudoRandomValue & 0x40000008u;
 	PseudoRandomValue >>= 1u;
-	if (testValue == 0x8 || testValue == 0x40000000) {
-		PseudoRandomValue |= 0x40000000;
+	if (testValue == 0x8u || testValue == 0x40000000u) {
+		PseudoRandomValue |= 0x40000000u;
 	}
 	return PseudoRandomValue;
 }
 
-void xt::internal::nurat(FEATHER& feather) {
-	const auto remainder = fmod(feather.globalPosition, 1);
+void xt::internal::nurat(FEATHER& feather) noexcept {
+	const auto remainder = fmodf(feather.globalPosition, 1.0f);
 	switch (feather.fillType) {
 	case FTHPSG: {
 		if (feather.upCount != 0u) {
 			if (feather.countUp != 0u) {
 				feather.ratio
-				    = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
 				feather.countUp--;
 			}
 			else {
 				feather.ratio
-				    = (gsl::narrow_cast<float>(feather.totalCount) - (bpsg() % feather.totalCount)) / feather.totalCount;
+				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(bpsg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
 				if (feather.countDown != 0u) {
 					feather.countDown--;
 				}
@@ -178,7 +178,7 @@ void xt::internal::nurat(FEATHER& feather) {
 		}
 		else {
 			feather.ratio
-			    = (gsl::narrow_cast<float>(feather.totalCount) - (form::psg() % feather.totalCount)) / feather.totalCount;
+			    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
 		}
 		feather.ratio *= feather.formRatio;
 		break;
@@ -194,27 +194,27 @@ void xt::internal::nurat(FEATHER& feather) {
 	}
 	case FTHSIN: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = sin((1.0 - remainder) / (1.0 - feather.globalRatio) * PI + PI) * 0.5 + 0.5;
+			feather.ratio = sin((1.0f - remainder) / (1.0f - feather.globalRatio) * PI_F + PI_F) * 0.5f + 0.5f;
 		}
 		else {
-			feather.ratio = sin(remainder / feather.globalRatio * PI) * 0.5 + 0.5;
+			feather.ratio = sin(remainder / feather.globalRatio * PI_F) * 0.5f + 0.5f;
 		}
 		feather.ratio *= feather.formRatio;
 		break;
 	}
 	case FTHSIN2: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = sin((1.0 - remainder) / (1.0 - feather.globalRatio) * PI);
+			feather.ratio = sin((1.0f - remainder) / (1.0f - feather.globalRatio) * PI_F);
 		}
 		else {
-			feather.ratio = sin(remainder / feather.globalRatio * PI);
+			feather.ratio = sin(remainder / feather.globalRatio * PI_F);
 		}
 		feather.ratio *= feather.formRatio;
 		break;
 	}
 	case FTHRMP: {
 		if (remainder > feather.globalRatio) {
-			feather.ratio = (1.0 - remainder) / (1.0 - feather.globalRatio);
+			feather.ratio = (1.0f - remainder) / (1.0f - feather.globalRatio);
 		}
 		else {
 			feather.ratio = remainder / feather.globalRatio;
@@ -357,7 +357,7 @@ void xt::fthrfn() {
 		ind++;
 	}
 	feather.globalPosition = 0;
-	feather.globalStep     = 4.0 / BSequence->size() * ind;
+	feather.globalStep     = 4.0f / gsl::narrow_cast<float>(BSequence->size() * ind);
 	feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / ind;
 	feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
 	feather.globalUp       = feather.globalPhase * feather.globalRatio;
@@ -467,14 +467,14 @@ int32_t xt::internal::fil2crd(const fs::path& fileName) {
 	wchar_t command[_MAX_PATH * 2 + 1 + 4];
 
 	wcscpy_s(command, L"\"");
-	wcscpy_s(command, utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str());
+	wcscpy_s(command, utf::Utf8ToUtf16(std::string(&IniFile.p2cName[0])).c_str());
 	wcscpy_s(command, L"\" \"");
 	wcscpy_s(command, fileName.wstring().c_str());
 	wcscpy_s(command, L"\"");
 	startupInfo    = {};
 	startupInfo.cb = sizeof(startupInfo);
 	if (!CreateProcess(
-	        nullptr, command, nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInfo)) {
+	        nullptr, static_cast<LPTSTR>(command), nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInfo)) {
 		errorCode = GetLastError();
 	}
 	else {
@@ -488,7 +488,7 @@ int32_t xt::internal::fil2crd(const fs::path& fileName) {
 
 bool xt::internal::chkp2cnam(const wchar_t* fileName) noexcept {
 	auto handleP2C = CreateFile(fileName, GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (handleP2C == INVALID_HANDLE_VALUE) {
+	if (handleP2C == INVALID_HANDLE_VALUE) { // NOLINT
 		return false;
 	}
 
@@ -508,11 +508,11 @@ void xt::pes2crd() {
         sizeof(OPENFILENAME), // lStructsize
         ThrEdWindow,          // hwndOwner
         ThrEdInstance,        // hInstance
-        filter,               // lpstrFilter
+        &filter[0],           // lpstrFilter
         nullptr,              // lpstrCustomFilter
         0,                    // nMaxCustFilter
         0,                    // nFilterIndex
-        programName,          // lpstrFile
+        &programName[0],      // lpstrFile
         _MAX_PATH,            // nMaxFile
         nullptr,              // lpstrFileTitle
         0,                    // nMaxFileTitle
@@ -534,32 +534,32 @@ void xt::pes2crd() {
 		displayText::tabmsg(IDS_P2CNODAT);
 		return;
 	}
-	if (xi::chkp2cnam(utf::Utf8ToUtf16(std::string(IniFile.p2cName)).c_str())) {
+	if (xi::chkp2cnam(utf::Utf8ToUtf16(std::string(&IniFile.p2cName[0])).c_str())) {
 		xi::fil2crd(*ThrName);
 		return;
 	}
-	*IniFile.p2cName = 0;
+	IniFile.p2cName[0] = 0;
 	// ToDo - fix registry handling
-	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey)
+	if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, L"SOFTWARE\\Microsoft\\Windows\\CurrentVersion", 0, KEY_READ, &registryKey) // NOLINT
 	    == ERROR_SUCCESS) {
 		auto size    = DWORD { _MAX_PATH };
 		auto keyType = DWORD { REG_SZ };
 		GSL_SUPPRESS(26490) {
-			if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size)
+			if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size) // NOLINT
 			    == ERROR_SUCCESS) {
 				wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
-				if (!xi::chkp2cnam(programName)) {
-					*programName = 0;
+				if (!xi::chkp2cnam(&programName[0])) {
+					programName[0] = 0;
 				}
 			}
 		}
 	}
-	if (*programName == 0u) {
-		LoadString(ThrEdInstance, IDS_P2CMSG, message, P2CBUFSIZ);
-		LoadString(ThrEdInstance, IDS_P2CTITL, caption, P2CBUFSIZ);
-		if (IDOK == MessageBox(ThrEdWindow, message, caption, MB_OKCANCEL)) {
+	if (programName[0] == 0u) {
+		LoadString(ThrEdInstance, IDS_P2CMSG, static_cast<LPTSTR>(message), P2CBUFSIZ);
+		LoadString(ThrEdInstance, IDS_P2CTITL, static_cast<LPTSTR>(caption), P2CBUFSIZ);
+		if (IDOK == MessageBox(ThrEdWindow, static_cast<LPTSTR>(message), static_cast<LPTSTR>(caption), MB_OKCANCEL)) {
 			if (GetOpenFileName(&openFileName)) {
-				if (!xi::chkp2cnam(programName)) {
+				if (!xi::chkp2cnam(&programName[0])) {
 					return;
 				}
 			}
@@ -571,7 +571,7 @@ void xt::pes2crd() {
 			return;
 		}
 	}
-	auto p2cName = utf::Utf16ToUtf8(std::wstring(programName));
+	auto p2cName = utf::Utf16ToUtf8(std::wstring(&programName[0]));
 	std::copy(p2cName.cbegin(), p2cName.cend(), IniFile.p2cName);
 	xi::fil2crd(*AuxName);
 }
@@ -672,10 +672,13 @@ void xt::internal::ritcwlk() {
 }
 
 uint32_t xt::internal::gucon(const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code) {
-	auto       length      = hypot(finish.x - start.x, finish.y - start.y);
-	auto       startVertex = form::closflt(start.x, start.y);
-	const auto endVertex   = form::closflt(finish.x, finish.y);
-	auto       up = 0u, down = 0u;
+	auto length      = hypot(finish.x - start.x, finish.y - start.y);
+	auto startVertex = form::closflt(start.x, start.y);
+
+	const auto endVertex = form::closflt(finish.x, finish.y);
+
+	auto up   = 0u;
+	auto down = 0u;
 
 	if (length < 5) {
 		return 0;
@@ -897,7 +900,7 @@ void xt::dubit(uint32_t bit) {
 
 void xt::setuang() {
 	StateMap.set(StateFlag::GTUANG);
-	displayText::msgflt(IDS_UANG, IniFile.underlayAngle / PI * 180);
+	displayText::msgflt(IDS_UANG, IniFile.underlayAngle / PI_F * 180.0f);
 }
 
 void xt::setuspac() {
@@ -970,7 +973,7 @@ void xt::selalfrm() {
 }
 
 uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
-	auto       result          = char { 0 };
+	auto       result          = uint8_t { 0 };
 	auto       bit             = DWORD { 0 };
 	const auto maskedAttribute = attribute & SRTYPMSK;
 
@@ -978,16 +981,16 @@ uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
 	_BitScanReverse(&bit, maskedAttribute);
 
 	if (bit == 0) {
-		return 0;
+		return 0u;
 	}
 
-	result = ((bit & 0xff) - 18);
+	result = ((bit & 0xffu) - 18u);
 
 	if ((result != 12) || ((maskedAttribute & TYPATMSK) == 0)) {
-		return result & 0xf;
+		return result & 0xfu;
 	}
 
-	return 1;
+	return 1u;
 }
 
 void xt::internal::durec(OREC& record) noexcept {
@@ -995,7 +998,7 @@ void xt::internal::durec(OREC& record) noexcept {
 
 	record.type          = StitchTypes[dutyp(stitch->attribute)];
 	const auto attribute = stitch->attribute & SRTMSK;
-	record.color         = attribute & 0xf;
+	record.color         = attribute & 0xfu;
 	record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
@@ -1153,7 +1156,7 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count
 }
 
 void xt::fsort() {
-	auto attribute = StitchBuffer->attribute & SRTMSK;
+	auto attribute = StitchBuffer[0].attribute & SRTMSK;
 
 	// There cannot be more records than stitches
 	// ToDo - convert this to a reserve/pushback
@@ -1299,7 +1302,7 @@ void xt::internal::duatf(uint32_t ind) {
 	auto attributeFields = ATFLD { (attribute & COLMSK),
 		                           ((attribute & FRMSK) >> FRMSHFT),
 		                           gsl::narrow<uint32_t>(StitchTypes[dutyp(attribute)]),
-		                           ((attribute >> LAYSHFT) & 7),
+		                           ((attribute >> LAYSHFT) & 7u),
 		                           0 };
 
 	if ((attribute & 0x80000000) != 0u) {
@@ -2410,7 +2413,7 @@ void xt::internal::rtrclpfn() {
 			LowerLeftStitch.y = 0.0f;
 			EmptyClipboard();
 			Clip        = RegisterClipboardFormat(PcdClipFormat);
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2); // NOLINT
 			if (ClipPointer != nullptr) {
 				ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 				thred::rtclpfn(0, 0);
@@ -2444,8 +2447,8 @@ void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
 float xt::internal::getstxt(uint32_t stringIndex, HWND dialog) {
 	// ToDo - This is not great code.
 	wchar_t buffer[16] = {};
-	GetWindowText(GetDlgItem(dialog, stringIndex), buffer, sizeof(buffer) / sizeof(buffer[0]));
-	return wrap::bufToFloat(buffer) * PFGRAN;
+	GetWindowText(GetDlgItem(dialog, stringIndex), static_cast<LPTSTR>(buffer), sizeof(buffer) / sizeof(buffer[0]));
+	return wrap::bufToFloat(&buffer[0]) * PFGRAN;
 }
 
 bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
@@ -2469,7 +2472,7 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		break;
 	}
 	case WM_COMMAND: {
-		switch (LOWORD(wparam)) {
+		switch (LOWORD(wparam)) { // NOLINT
 		case IDCANCEL: {
 			EndDialog(hwndlg, 0);
 			return TRUE;
@@ -2513,23 +2516,24 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		}
 		}
 	}
+	default: {}
 	}
 	return 0;
 }
 
-void xt::internal::sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::sadj(fPOINTATTR& stitch, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
 	stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
 	stitch.y = (stitch.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void xt::internal::sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
+void xt::internal::sadj(fPOINT& point, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept {
 	point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
 	point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
 void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 	const auto newSize = fPOINT { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
-	const auto designSizeRatio = dPOINT { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
+	const auto designSizeRatio = fPOINT { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		sadj(StitchBuffer[iStitch], designSizeRatio, designSizeRect);
 	}
@@ -2558,15 +2562,15 @@ void xt::nudsiz() {
 	if (flag != 0) {
 		DesignSize.x = designSizeRect.right - designSizeRect.left;
 		DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xi::setsprc)) {
+		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xi::setsprc)) { // NOLINT
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
-				IniFile.hoopSizeX = DesignSize.x * 1.05;
+				IniFile.hoopSizeX = DesignSize.x * 1.05f;
 				UnzoomedRect.x    = wrap::round<int32_t>(IniFile.hoopSizeX);
 				flag              = 1;
 			}
 			if (DesignSize.y > IniFile.hoopSizeY) {
-				IniFile.hoopSizeY = DesignSize.y * 1.05;
+				IniFile.hoopSizeY = DesignSize.y * 1.05f;
 				UnzoomedRect.y    = wrap::round<int32_t>(IniFile.hoopSizeY);
 				flag              = 1;
 			}
@@ -2603,7 +2607,7 @@ void xt::mvshft() {
 		SetCapture(ThrEdWindow);
 	}
 	if (StateMap.test(StateFlag::BZUMIN)) {
-		if ((Msg.wParam & MK_LBUTTON) != 0u) {
+		if ((Msg.wParam & MK_LBUTTON) != 0u) { // NOLINT
 			if (StateMap.testAndSet(StateFlag::VCAPT)) {
 				SetCapture(ThrEdWindow);
 			}

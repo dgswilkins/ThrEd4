@@ -167,7 +167,7 @@ namespace internal {
 	fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept;
 	void   notundfn(uint32_t code);
 	void   nudfn(const fRECTANGLE& designSizeRect);
-	void   nurat(FEATHER& feather);
+	void   nurat(FEATHER& feather) noexcept;
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
@@ -178,8 +178,8 @@ namespace internal {
 	void ritcwlk();
 	void ritund();
 	void ritwlk();
-	void sadj(fPOINT& point, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
-	void sadj(fPOINTATTR& stitch, const dPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
+	void sadj(fPOINT& point, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
+	void sadj(fPOINTATTR& stitch, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 
 	BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
