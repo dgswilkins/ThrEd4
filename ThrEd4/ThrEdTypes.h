@@ -1118,9 +1118,9 @@ public:
 class BSEQPNT
 {
 public:
-	float  x;
-	float  y;
-	int8_t attribute;
+	float  x{};
+	float  y{};
+	int8_t attribute{};
 
 	inline BSEQPNT() noexcept = default;
 	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
@@ -1397,8 +1397,8 @@ inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
 class SATCONOUT
 {
 public:
-	uint16_t start;
-	uint16_t finish;
+	uint16_t start{};
+	uint16_t finish{};
 
 	SATCONOUT() noexcept;
 	// SATCONOUT(SATCONOUT&&) = default;
@@ -1890,16 +1890,16 @@ class FRMHEDOUT
 {
 public:
 	uint8_t       attribute;    // attribute
-	uint16_t      vertexCount;  // number of sides
+	uint16_t      vertexCount{};  // number of sides
 	uint8_t       type;         // type
 	uint8_t       fillColor;    // fill color
 	uint8_t       borderColor;  // border color
-	uint16_t      clipEntries;  // number of border clipboard entries
+	uint16_t      clipEntries{};  // number of border clipboard entries
 	DWORD         vertexIndex;  // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
 	DWORD      borderClipData;  // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	uint16_t   satinGuideCount; // number of satin guidelines
-	uint16_t   wordParam;       // clipboard/textured fill phase or satin end guide
+	uint16_t   satinGuideCount{}; // number of satin guidelines
+	uint16_t   wordParam{};       // clipboard/textured fill phase or satin end guide
 	fRECTANGLE rectangle {};    // rectangle
 	uint8_t    fillType;        // fill type
 	uint8_t    edgeType;        // edge type
@@ -1917,8 +1917,8 @@ public:
 	float    maxBorderStitchLen;  // maximum border stitch length
 	float    minBorderStitchLen;  // minimum border stitch length
 	TFINFO   fillInfo {};         // feather/texture info
-	uint16_t fillStart;           // fill start point
-	uint16_t fillEnd;             // fill end point
+	uint16_t fillStart{};           // fill start point
+	uint16_t fillEnd{};             // fill end point
 	float    underlaySpacing;     // underlay spacing
 	float    underlayStitchLen;   // underlay stitch length
 	float    underlayStitchAngle; // underlay stitch angle
@@ -2807,7 +2807,7 @@ struct _txtrct {
 using TXTRCT = struct _txtrct;
 
 struct _txhst {
-	std::vector<TXPNT> texturePoints;
+	std::vector<TXPNT> texturePoints{};
 	float              height  = 0.0;
 	float              width   = 0.0;
 	float              spacing = 0.0;
