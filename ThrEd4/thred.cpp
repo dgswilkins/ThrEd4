@@ -2141,8 +2141,7 @@ void thred::internal::chknum() {
 					thred::savdo();
 					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfu;
 					form::nufilcol(colVal);
-					wcscpy_s(SideWindowEntryBuffer, fmt::format(L"{}", colVal + 1).c_str());
-					wrap::setSideWinVal(LFRMCOL);
+					SetWindowText((*ValueWindow)[LUNDCOL], fmt::format(L"{}", colVal + 1).c_str());
 					thred::coltab();
 				}
 				thred::unsid();
@@ -2154,8 +2153,7 @@ void thred::internal::chknum() {
 					thred::savdo();
 					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfu;
 					SelectedForm->underlayColor = colVal;
-					wcscpy_s(SideWindowEntryBuffer, fmt::format(L"{}", colVal + 1).c_str());
-					wrap::setSideWinVal(LUNDCOL);
+					SetWindowText((*ValueWindow)[LUNDCOL], fmt::format(L"{}", colVal + 1).c_str());
 					form::refilfn();
 					thred::coltab();
 				}
@@ -2166,8 +2164,9 @@ void thred::internal::chknum() {
 			case LBRDCOL: {
 				if (value != 0.0f) {
 					thred::savdo();
-					form::nubrdcol((std::wcstol(&SideWindowEntryBuffer[0], nullptr,10) - 1u) & 0xfu);
-					wrap::setSideWinVal(LFRMCOL);
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfu;
+					form::nubrdcol(colVal);
+					SetWindowText((*ValueWindow)[LBRDCOL], fmt::format(L"{}", colVal + 1).c_str());
 					thred::coltab();
 				}
 				thred::unsid();
