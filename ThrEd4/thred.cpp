@@ -4430,11 +4430,11 @@ void thred::internal::sav() {
 			pesHeader.cslen = 7;
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
 			auto matchIndex = 0u;
-			for (auto iColor = 0u; iColor < 16; iColor++) {
+			for (unsigned long iColor : UserColor) {
 				auto       matchMin    = 0xffffffffu;
 				const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1u; iColorMatch < threadCount; iColorMatch++) {
-					const auto match = pesmtch(UserColor[iColor], iColorMatch);
+					const auto match = pesmtch(iColor, iColorMatch);
 					if (match < matchMin) {
 						matchIndex = iColorMatch;
 						matchMin   = match;
@@ -5136,8 +5136,8 @@ void thred::internal::redbak() {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 			UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 		}
-		for (auto iColor = 0u; iColor < sizeColors; iColor++) {
-			thred::redraw(UserColorWin[iColor]);
+		for (auto & iColor : UserColorWin) {
+			thred::redraw(iColor);
 		}
 		TexturePointsBuffer->resize(undoData->texturePointCount);
 		if (undoData->texturePointCount != 0u) {
