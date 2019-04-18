@@ -39,13 +39,13 @@ namespace internal {
 	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
 	void     dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
-	uint32_t ducolm() noexcept;
+	uint32_t ducolm();
 
 	void durct(uint32_t shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 	void dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept;
 	void dutrac();
 	void dutrnum0(uint32_t color);
-	void dwnum(uint32_t iRGB) noexcept;
+	void dwnum(uint32_t iRGB);
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
 

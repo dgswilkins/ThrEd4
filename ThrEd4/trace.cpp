@@ -124,7 +124,7 @@ void trace::internal::trcstpnum() {
 void trace::internal::trcratnum() {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_TRCRAT);
-	displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1)));
+	displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1.0f)));
 }
 
 bool trace::internal::trcin(COLORREF color) {
@@ -795,22 +795,24 @@ void trace::internal::dutrac() {
 		form::frmclr(*SelectedForm);
 		CurrentVertexIndex = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
 		OutputIndex        = 0;
-		FormVertices->push_back(fPOINT { tracedPoints[0].x * StitchBmpRatio.x, tracedPoints[0].y * StitchBmpRatio.y });
+		FormVertices->push_back(fPOINT { gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
+		                                 gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y });
 		OutputIndex++;
 		iNext                = 0;
-		auto traceLengthSum  = 0.0;
+		auto traceLengthSum  = 0.0f;
 		auto landscapeOffset = 0.0f;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
-			landscapeOffset = UnzoomedRect.y - BitmapSizeinStitches.y;
+			landscapeOffset = gsl::narrow_cast<float>(UnzoomedRect.y) - BitmapSizeinStitches.y;
 		}
 		for (auto iCurrent = 1u; iCurrent < tracedPoints.size(); iCurrent++) {
-			traceLengthSum += hypot(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x,
-			                        tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y);
-			const auto traceLength
-			    = hypot(tracedPoints[iCurrent].x - tracedPoints[iNext].x, tracedPoints[iCurrent].y - tracedPoints[iNext].y);
+			traceLengthSum += hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x),
+			                         gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y));
+			const auto traceLength = hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
+			                                gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
-				FormVertices->push_back(fPOINT { tracedPoints[iCurrent - 1].x * StitchBmpRatio.x,
-				                                 tracedPoints[iCurrent - 1].y * StitchBmpRatio.y + landscapeOffset });
+				FormVertices->push_back(
+				    fPOINT { gsl::narrow_cast<float>(tracedPoints[iCurrent - 1].x) * StitchBmpRatio.x,
+				             gsl::narrow_cast<float>(tracedPoints[iCurrent - 1].y) * StitchBmpRatio.y + landscapeOffset });
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
@@ -980,20 +982,21 @@ void trace::dutrnum1() {
 		ti::trcstpnum();
 	}
 	else {
-		IniFile.traceRatio = 1 + pow(0.1, traceLength);
+		IniFile.traceRatio = 1.0f + pow(0.1f, traceLength);
 		ti::trcratnum();
 	}
 }
 
-uint32_t trace::internal::ducolm() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) uint32_t trace::internal::ducolm() {
 	if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth)) {
-		return 0;
+		return 0u;
 	}
-	if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth) << 1u) {
-		return 1;
+	if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth) * 2) {
+		return 1u;
 	}
 
-	return 2;
+	return 2u;
 }
 
 void trace::internal::trnumwnd0(int32_t position) noexcept {
@@ -1189,6 +1192,7 @@ void trace::tracpar() {
 							trace::tracedg();
 							break;
 						}
+						default: {}
 						}
 					}
 				}
@@ -1197,7 +1201,8 @@ void trace::tracpar() {
 	}
 }
 
-void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
 	const uint32_t NumeralWidth = thred::txtWid(L"0");
 
 	wchar_t buffer[11] = { 0 };
@@ -1205,17 +1210,17 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
 	color >>= shift;
 	color &= 0xffu;
 	_itow_s(color, buffer, 10);
-	const auto bufferLength = gsl::narrow<uint32_t>(wcslen(buffer));
+	const auto bufferLength = gsl::narrow<uint32_t>(wcslen(&buffer[0]));
 	const auto xPosition    = NumeralWidth * (3 - bufferLength) + 1;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-	wrap::TextOut(DrawItem->hDC, xPosition, 1, buffer, bufferLength);
+	wrap::TextOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
 }
 
 void trace::internal::upnum(uint32_t iRGB) {
 	ti::trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
 }
 
-void trace::internal::dwnum(uint32_t iRGB) noexcept {
+void trace::internal::dwnum(uint32_t iRGB) {
 	ti::trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
 }
 
@@ -1293,13 +1298,13 @@ void trace::wasTrace() {
 				SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 			}
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-			wrap::TextOut(DrawItem->hDC, 1, 1, buffer, gsl::narrow<uint32_t>(wcslen(buffer)));
+			wrap::TextOut(DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(buffer), gsl::narrow<uint32_t>(wcslen(&buffer[0])));
 			break;
 		}
 		if (DrawItem->hwndItem == TraceNumberInput) {
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 			SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-			wrap::TextOut(DrawItem->hDC, 1, 1, TraceInputBuffer, gsl::narrow<uint32_t>(wcslen(TraceInputBuffer)));
+			wrap::TextOut(DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(TraceInputBuffer), gsl::narrow<uint32_t>(wcslen(&TraceInputBuffer[0])));
 			break;
 		}
 	}
