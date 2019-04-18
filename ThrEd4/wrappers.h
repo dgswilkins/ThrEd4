@@ -66,4 +66,4 @@ template <class outType> outType wcstoi(const wchar_t (&buffer)[HBUFSIZ]) {
 
 #pragma warning(pop)
 
-}
+}  // namespace wrap
