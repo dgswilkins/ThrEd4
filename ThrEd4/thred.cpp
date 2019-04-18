@@ -18026,7 +18026,7 @@ void thred::internal::init() {
 	if (IniFile.traceLength == 0.0f) {
 		IniFile.traceLength = TRACLEN;
 	}
-	if (IniFile.traceRatio == 0.0) {
+	if (IniFile.traceRatio == 0.0f) {
 		IniFile.traceRatio = TRACRAT;
 	}
 	if (IniFile.chainSpace == 0.0f) {
