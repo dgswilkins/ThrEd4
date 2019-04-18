@@ -4430,17 +4430,17 @@ void thred::internal::sav() {
 			pesHeader.cslen = 7;
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
 			auto matchIndex = 0u;
-			for (unsigned long iColor : UserColor) {
+			for (COLORREF color : UserColor) {
 				auto       matchMin    = 0xffffffffu;
 				const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1u; iColorMatch < threadCount; iColorMatch++) {
-					const auto match = pesmtch(iColor, iColorMatch);
+					const auto match = pesmtch(color, iColorMatch);
 					if (match < matchMin) {
 						matchIndex = iColorMatch;
 						matchMin   = match;
 					}
 				}
-				PESequivColors[iColor] = gsl::narrow<uint8_t>(matchIndex);
+				PESequivColors[color] = gsl::narrow<uint8_t>(matchIndex);
 			}
 			auto color        = StitchBuffer[0].attribute & COLMSK;
 			auto boundingRect = fRECTANGLE {};
