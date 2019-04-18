@@ -1406,8 +1406,8 @@ public:
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
 	//~SATCONOUT() = default;
 
-	explicit SATCONOUT(const SATCON& rhs) noexcept;
-	inline SATCONOUT& operator=(const SATCON& rhs) noexcept;
+	explicit SATCONOUT(const SATCON& rhs);
+	inline SATCONOUT& operator=(const SATCON& rhs);
 };
 
 inline SATCONOUT::SATCONOUT() noexcept {
@@ -1415,12 +1415,12 @@ inline SATCONOUT::SATCONOUT() noexcept {
 	finish = 0u;
 }
 
-inline SATCONOUT::SATCONOUT(const SATCON& rhs) noexcept {
+inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
-inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) noexcept {
+inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 
@@ -1927,14 +1927,14 @@ public:
 	uint8_t  underlayColor;       // underlay color
 	uint8_t  cres;                // reserved
 
-	FRMHEDOUT() noexcept;
+	inline FRMHEDOUT() noexcept;
 	// FRMHEDOUT(FRMHEDOUT&&) = default;
 	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
 	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
 	//~FRMHEDOUT() = default;
 
-	explicit inline FRMHEDOUT(const FRMHED& rhs) noexcept;
-	inline FRMHEDOUT& operator=(const FRMHED& rhs) noexcept;
+	explicit inline FRMHEDOUT(const FRMHED& rhs);
+	inline FRMHEDOUT& operator=(const FRMHED& rhs);
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
@@ -1977,7 +1977,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	cres                = 0;
 }
 
-inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
+inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
@@ -2033,7 +2033,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) noexcept {
 	cres                = rhs.cres;
 }
 
-inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) noexcept {
+inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
