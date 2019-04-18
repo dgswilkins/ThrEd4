@@ -56,7 +56,7 @@ namespace internal {
 	void tracwnd();
 	bool trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints);
 	bool trcin(COLORREF color);
-	void trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) noexcept;
+	void trcnum(uint32_t shift, COLORREF color, uint32_t iRGB);
 	void trcols(COLORREF color) noexcept;
 	void trcratnum();
 	void trcstpnum();
@@ -66,6 +66,6 @@ namespace internal {
 
 	uint32_t trsum() noexcept;
 
-	void upnum(uint32_t iRGB) noexcept;
+	void upnum(uint32_t iRGB);
 } // namespace internal
 } // namespace trace
