@@ -3465,7 +3465,7 @@ void thred::internal::defbNam() {
 
 void thred::internal::ritini() {
 	auto           directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-	const auto defaultDirectory = gsl::span<char>{ IniFile.defaultDirectory, sizeof(IniFile.defaultDirectory) };
+	const auto defaultDirectory = gsl::span<char>{ IniFile.defaultDirectory };
 	constexpr char fillchar  = '\0';
 	std::fill(defaultDirectory.begin(), defaultDirectory.end(), fillchar);
 	std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
@@ -3473,7 +3473,7 @@ void thred::internal::ritini() {
 	{
 		auto iVersion = 0u;
 		for (auto& prevName : IniFile.prevNames) {
-			const auto name = gsl::span<char>{ prevName, sizeof(prevName) };
+			const auto name = gsl::span<char>{ prevName };
 			std::fill(name.begin(), name.end(), fillchar);
 			if (!previousNames[iVersion].empty()) {
 				auto previous = utf::Utf16ToUtf8(previousNames[iVersion]);
@@ -3483,7 +3483,7 @@ void thred::internal::ritini() {
 		}
 	}
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	const auto designerName = gsl::span<char>{ IniFile.designerName, sizeof(IniFile.designerName) };
+	const auto designerName = gsl::span<char>{ IniFile.designerName};
 	std::fill(designerName.begin(), designerName.end(), fillchar);
 	std::copy(designer.cbegin(), designer.cend(), designerName.begin());
 	for (auto iColor = 0u; iColor < 16; iColor++) {
@@ -3805,7 +3805,7 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	stitchHeader.stitchCount = PCSHeader.stitchCount;
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto designer            = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName };
 	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	if (!FormList->empty()) {
 		for (auto& form : (*FormList)) {
@@ -5130,7 +5130,7 @@ void thred::internal::redbak() {
 		// ToDo - add field in BAKHED to keep track of number of colors
 		const auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 		const auto undoColors = gsl::span<COLORREF>{ undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors) };
-		const auto userColors = gsl::span<COLORREF>{ UserColor,  gsl::narrow<ptrdiff_t>(sizeColors) };
+		const auto userColors = gsl::span<COLORREF>{ UserColor };
 		std::copy(undoColors.cbegin(), undoColors.cend(), userColors.begin());
 		for (auto iColor = 0u; iColor < sizeColors; iColor++) {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
@@ -5752,7 +5752,7 @@ void thred::internal::nuFil() {
 							PCSHeader.hoopType = LARGHUP;
 						}
 						ritfnam(*DesignerName);
-						const auto modifierName = gsl::span<char>{ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName)};
+						const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName };
 						std::copy(&IniFile.designerName[0],
 						          &IniFile.designerName[strlen(&IniFile.designerName[0])],
 						          modifierName.begin());
@@ -6984,7 +6984,7 @@ void thred::internal::newFil() {
 	*ThrName = *DefaultDirectory / ((*StringTable)[STR_NUFIL].c_str());
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName };
 	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	rstdu();
 	rstAll();
@@ -8247,7 +8247,7 @@ void thred::internal::lodbmp() {
 		// PCS file can only store a 16 character filename?
 		// ToDo - give the user a little more info that the bitmap has not been loaded
 		if (!saveFile.empty() && saveFile.size() < 16) {
-			const auto bmpName = gsl::span<char>{ PCSBMPFileName, sizeof(PCSBMPFileName) };
+			const auto bmpName = gsl::span<char>{ PCSBMPFileName };
 			std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
 			defbNam();
 			bfil();
@@ -17728,8 +17728,8 @@ void thred::internal::redini() {
 			auto& previousNames = *PreviousNames;
 			auto  iVersion      = 0u;
 			for (const auto& prevName : IniFile.prevNames) {
-				if (strlen(prevName) != 0u) {
-					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(prevName)));
+				if (strlen(&prevName[0]) != 0u) {
+					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(&prevName[0])));
 				}
 				else {
 					previousNames[iVersion].clear();
@@ -18161,7 +18161,7 @@ void thred::internal::init() {
 	fnamtabs();
 	ritfnam(*DesignerName);
 	auto designer = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName, sizeof(ExtendedHeader.modifierName) };
+	const auto modifierName = gsl::span<char>{ ExtendedHeader.modifierName };
 	std::copy(designer.begin(), designer.end(), modifierName.begin());
 	ExtendedHeader.stgran = 0;
 	for (auto& reservedChar : ExtendedHeader.res) {
