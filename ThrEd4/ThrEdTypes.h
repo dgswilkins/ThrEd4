@@ -821,10 +821,10 @@ enum fillStyles
 	TXHORF,   // Horizontal texture fill
 	TXANGF,   // Angle texture fill
 };
-constexpr uint32_t MCLPF    = 1 << CLPF;
-constexpr uint32_t MVCLPF   = 1 << VCLPF;
-constexpr uint32_t MHCLPF   = 1 << HCLPF;
-constexpr uint32_t MANGCLPF = 1 << ANGCLPF;
+constexpr uint32_t MCLPF    = 1u << static_cast<uint32_t>(CLPF);
+constexpr uint32_t MVCLPF   = 1u << static_cast<uint32_t>(VCLPF);
+constexpr uint32_t MHCLPF   = 1u << static_cast<uint32_t>(HCLPF);
+constexpr uint32_t MANGCLPF = 1u << static_cast<uint32_t>(ANGCLPF);
 
 // preference window
 enum preferenceItems
@@ -1415,12 +1415,14 @@ inline SATCONOUT::SATCONOUT() noexcept {
 	finish = 0u;
 }
 
-inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
-inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 
@@ -1809,7 +1811,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -1864,7 +1866,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -1977,7 +1979,8 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	cres                = 0;
 }
 
-inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
@@ -1995,7 +1998,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2033,7 +2036,8 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	cres                = rhs.cres;
 }
 
-inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
@@ -2051,7 +2055,7 @@ inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2109,7 +2113,7 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2164,7 +2168,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1 << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
