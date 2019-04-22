@@ -1046,7 +1046,7 @@ BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 }
 
 void thred::internal::getdes() noexcept {
-	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, (DLGPROC)dnamproc); // NOLINT
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT
 }
 
 bool thred::internal::isfclp() {
@@ -12108,7 +12108,7 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
-	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, static_cast<DLGPROC>(fthdefprc)); // NOLINT
+	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT
 }
 
 bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
