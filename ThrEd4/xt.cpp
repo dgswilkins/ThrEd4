@@ -1158,45 +1158,41 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count
 void xt::fsort() {
 	auto attribute = StitchBuffer[0].attribute & SRTMSK;
 
-	// There cannot be more records than stitches
-	// ToDo - convert this to a reserve/pushback
 	auto stitchRegion = std::vector<OREC> {};
-	stitchRegion.resize(PCSHeader.stitchCount);
+	stitchRegion.reserve(100);
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
 	thred::savdo();
-	stitchRegion[0].start       = 0;
-	stitchRegion[0].startStitch = StitchBuffer;
+	stitchRegion.emplace_back(OREC {});
+	stitchRegion.back().startStitch = StitchBuffer;
 	ColorOrder[AppliqueColor]   = 0;
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		if (iColor != AppliqueColor) {
 			ColorOrder[iColor] = iColor + 1;
 		}
 	}
-	auto index = 0u;
 	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if ((StitchBuffer[iStitch].attribute & SRTMSK) != attribute) {
-			stitchRegion[index].finish    = iStitch;
-			stitchRegion[index].endStitch = &StitchBuffer[iStitch - 1];
-			index++;
-			stitchRegion[index].start       = iStitch;
-			stitchRegion[index].startStitch = &StitchBuffer[iStitch];
+			stitchRegion.back().finish    = iStitch;
+			stitchRegion.back().endStitch = &StitchBuffer[iStitch - 1];
+			stitchRegion.emplace_back(OREC {});
+			stitchRegion.back().start       = iStitch;
+			stitchRegion.back().startStitch = &StitchBuffer[iStitch];
 			attribute                       = StitchBuffer[iStitch].attribute & SRTMSK;
 		}
 	}
-	stitchRegion[index].endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
-	stitchRegion[index].finish    = PCSHeader.stitchCount;
-	index++;
-	const auto lastRegion = index;
+	stitchRegion.back().finish    = PCSHeader.stitchCount;
+	stitchRegion.back().endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
+	const auto lastRegion = stitchRegion.size();
 	auto       pRecs      = std::vector<OREC*> {};
-	pRecs.resize(lastRegion);
+	pRecs.reserve(lastRegion);
 	auto pFRecs = std::vector<OREC*> {};
-	pFRecs.resize(lastRegion);
-	for (auto iRegion = 0u; iRegion < lastRegion; iRegion++) {
-		xi::durec(stitchRegion[iRegion]);
-		pRecs[iRegion]  = &stitchRegion[iRegion];
-		pFRecs[iRegion] = &stitchRegion[iRegion];
+	pFRecs.reserve(lastRegion);
+	for (auto& region:stitchRegion) {
+		xi::durec(region);
+		pRecs.push_back(&region);
+		pFRecs.push_back(&region);
 	}
 	std::sort(pRecs.begin(), pRecs.end(), xi::recmp);
 	std::sort(pFRecs.begin(), pFRecs.end(), xi::refcmp);
@@ -2562,7 +2558,7 @@ void xt::nudsiz() {
 	if (flag != 0) {
 		DesignSize.x = designSizeRect.right - designSizeRect.left;
 		DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, (DLGPROC)xi::setsprc)) { // NOLINT
+		if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT
 			flag = 0;
 			if (DesignSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = DesignSize.x * 1.05f;
