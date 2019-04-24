@@ -59,7 +59,7 @@ constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color b
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
 constexpr float    ZMARGIN    = 1.25f;             // zoom margin for select zooms
-constexpr float    SMALSIZ    = 0.25f;              // default small stitch size
+constexpr float    SMALSIZ    = 0.25f;             // default small stitch size
 constexpr float    MINSIZ     = 0.1f;              // default minimum stitch size
 constexpr float    USESIZ     = 3.5f;              // user preferred size
 constexpr double   MAXSIZ     = 9.0;               // default maximum stitch size
@@ -112,7 +112,7 @@ constexpr uint8_t  NCODOF    = 80u;             // name encoding offset
 constexpr double   CLPMIN    = 0.5;             // if clipboard data less wide, then don't fill
 constexpr float    CLPMINAUT = 1.2f;            // for skinny vertical clips
 constexpr float    BRDWID    = 18.0f;           // default satin border size
-constexpr float    SNPLEN    = 0.15f;            // default snap together length size
+constexpr float    SNPLEN    = 0.15f;           // default snap together length size
 constexpr float    STARAT    = 0.4f;            // default star ratio
 constexpr float    SPIRWRAP  = 1.52f;           // default spiral wrap
 constexpr uint32_t BALNORM   = 0x80u;           // normal balarad stitch
@@ -1118,9 +1118,9 @@ public:
 class BSEQPNT
 {
 public:
-	float  x{};
-	float  y{};
-	int8_t attribute{};
+	float  x {};
+	float  y {};
+	int8_t attribute {};
 
 	inline BSEQPNT() noexcept = default;
 	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
@@ -1397,8 +1397,8 @@ inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
 class SATCONOUT
 {
 public:
-	uint16_t start{};
-	uint16_t finish{};
+	uint16_t start {};
+	uint16_t finish {};
 
 	SATCONOUT() noexcept;
 	// SATCONOUT(SATCONOUT&&) = default;
@@ -1648,27 +1648,29 @@ using TFINFO = union _tfhed;
 class FRMHEDO
 {
 public:
-	uint8_t       attribute;       // attribute
-	uint16_t      vertexCount;     // number of sides
-	uint8_t       type;            // type
-	uint8_t       fillColor;       // fill color
-	uint8_t       borderColor;     // border color
-	uint16_t      clipEntries;     // number of border clipboard entries
-	DWORD         vertices;        // points
-	SATINANGLEOUT satinOrAngle;    // satin guidelines or angle clipboard fill angle
-	DWORD         borderClipData;  // border clipboard data
-	uint16_t      satinGuideCount; // number of satin guidelines
-	uint16_t      wordParam;       // word parameter
-	fRECTANGLE    rectangle {};    // rectangle
-	uint8_t       fillType;        // fill type
-	uint8_t       edgeType;        // edge type
-	float         fillSpacing;     // fill spacing
-	FLENCNTOUT    lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLPOUT    angleOrClipData; // fill angle or clipboard data pointer
-	float         borderSize;      // border size
-	float         edgeSpacing;     // edge spacing
-	float         edgeStitchLen;   // edge stitch length
-	uint16_t      res;             // pico length
+	uint8_t  attribute;   // attribute
+	uint16_t vertexCount; // number of sides
+	uint8_t  type;        // type
+	uint8_t  fillColor;   // fill color
+	uint8_t  borderColor; // border color
+	uint16_t clipEntries; // number of border clipboard entries
+	DWORD    vertices;    // points
+
+	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
+
+	DWORD      borderClipData;  // border clipboard data
+	uint16_t   satinGuideCount; // number of satin guidelines
+	uint16_t   wordParam;       // word parameter
+	fRECTANGLE rectangle {};    // rectangle
+	uint8_t    fillType;        // fill type
+	uint8_t    edgeType;        // edge type
+	float      fillSpacing;     // fill spacing
+	FLENCNTOUT lengthOrCount;   // fill stitch length or clipboard count
+	FANGCLPOUT angleOrClipData; // fill angle or clipboard data pointer
+	float      borderSize;      // border size
+	float      edgeSpacing;     // edge spacing
+	float      edgeStitchLen;   // edge stitch length
+	uint16_t   res;             // pico length
 
 	FRMHEDO() noexcept;
 };
@@ -1702,43 +1704,42 @@ class FRMHEDOUT;
 class FRMHED
 {
 public:
-	uint8_t    attribute;          // attribute
-	uint32_t   vertexCount;        // number of sides
-	uint8_t    type;               // type
-	uint8_t    fillColor;          // fill color
-	uint8_t    borderColor;        // border color
-	uint32_t   clipEntries;        // number of border clipboard entries
-	uint32_t   vertexIndex;        // index into FormVertices
-	SATINANGLE satinOrAngle {};    // satin guidelines or angle clipboard fill angle
-	uint32_t   borderClipData;     // pointer to start of border clipboard data
-	uint32_t   satinGuideCount;    // number of satin guidelines
-	uint32_t   wordParam;          // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle {};       // rectangle
-	uint8_t    fillType;           // fill type
-	uint8_t    edgeType;           // edge type
-	float      fillSpacing;        // fill spacing
-	FLENCNT    lengthOrCount {};   // fill stitch length or clipboard count
-	FANGCLP    angleOrClipData {}; // fill angle or clipboard data pointer
-	float      borderSize;         // border size
-	float      edgeSpacing;        // edge spacing
-	float      edgeStitchLen;      // edge stitch length
-	uint16_t   picoLength;         // pico length
-
-	uint32_t extendedAttribute;   // attribute extension
-	float    maxFillStitchLen;    // maximum fill stitch length
-	float    minFillStitchLen;    // minimum fill stitch length
-	float    maxBorderStitchLen;  // maximum border stitch length
-	float    minBorderStitchLen;  // minimum border stitch length
-	TFINFO   fillInfo {};         // feather/texture info
-	uint32_t fillStart;           // fill start point
-	uint32_t fillEnd;             // fill end point
-	float    underlaySpacing;     // underlay spacing
-	float    underlayStitchLen;   // underlay stitch length
-	float    underlayStitchAngle; // underlay stitch angle
-	float    underlayIndent;      // underlay/edge walk indent
-	float    txof;                // gradient end density
-	uint8_t  underlayColor;       // underlay color
-	uint8_t  cres;                // reserved
+	uint8_t    attribute;           // attribute
+	uint32_t   vertexCount;         // number of sides
+	uint8_t    type;                // type
+	uint8_t    fillColor;           // fill color
+	uint8_t    borderColor;         // border color
+	uint32_t   clipEntries;         // number of border clipboard entries
+	uint32_t   vertexIndex;         // index into FormVertices
+	SATINANGLE satinOrAngle {};     // satin guidelines or angle clipboard fill angle
+	uint32_t   borderClipData;      // pointer to start of border clipboard data
+	uint32_t   satinGuideCount;     // number of satin guidelines
+	uint32_t   wordParam;           // clipboard/textured fill phase or satin end guide
+	fRECTANGLE rectangle {};        // rectangle
+	uint8_t    fillType;            // fill type
+	uint8_t    edgeType;            // edge type
+	float      fillSpacing;         // fill spacing
+	FLENCNT    lengthOrCount {};    // fill stitch length or clipboard count
+	FANGCLP    angleOrClipData {};  // fill angle or clipboard data pointer
+	float      borderSize;          // border size
+	float      edgeSpacing;         // edge spacing
+	float      edgeStitchLen;       // edge stitch length
+	uint16_t   picoLength;          // pico length
+	uint32_t   extendedAttribute;   // attribute extension
+	float      maxFillStitchLen;    // maximum fill stitch length
+	float      minFillStitchLen;    // minimum fill stitch length
+	float      maxBorderStitchLen;  // maximum border stitch length
+	float      minBorderStitchLen;  // minimum border stitch length
+	TFINFO     fillInfo {};         // feather/texture info
+	uint32_t   fillStart;           // fill start point
+	uint32_t   fillEnd;             // fill end point
+	float      underlaySpacing;     // underlay spacing
+	float      underlayStitchLen;   // underlay stitch length
+	float      underlayStitchAngle; // underlay stitch angle
+	float      underlayIndent;      // underlay/edge walk indent
+	float      txof;                // gradient end density
+	uint8_t    underlayColor;       // underlay color
+	uint8_t    cres;                // reserved
 
 	FRMHED() noexcept;
 	// FRMHED(FRMHED&&) = default;
@@ -1891,36 +1892,38 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 class FRMHEDOUT
 {
 public:
-	uint8_t       attribute;    // attribute
-	uint16_t      vertexCount{};  // number of sides
-	uint8_t       type;         // type
-	uint8_t       fillColor;    // fill color
-	uint8_t       borderColor;  // border color
-	uint16_t      clipEntries{};  // number of border clipboard entries
-	DWORD         vertexIndex;  // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
-	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
-	DWORD      borderClipData;  // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	uint16_t   satinGuideCount{}; // number of satin guidelines
-	uint16_t   wordParam{};       // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle {};    // rectangle
-	uint8_t    fillType;        // fill type
-	uint8_t    edgeType;        // edge type
-	float      fillSpacing;     // fill spacing
-	FLENCNTOUT lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLPOUT angleOrClipData; // fill angle or clipboard data pointer
-	float      borderSize;      // border size
-	float      edgeSpacing;     // edge spacing
-	float      edgeStitchLen;   // edge stitch length
-	uint16_t   picoLength;      // pico length
+	uint8_t  attribute;      // attribute
+	uint16_t vertexCount {}; // number of sides
+	uint8_t  type;           // type
+	uint8_t  fillColor;      // fill color
+	uint8_t  borderColor;    // border color
+	uint16_t clipEntries {}; // number of border clipboard entries
+	DWORD    vertexIndex;    // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 
+	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
+
+	DWORD      borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+	uint16_t   satinGuideCount {}; // number of satin guidelines
+	uint16_t   wordParam {};       // clipboard/textured fill phase or satin end guide
+	fRECTANGLE rectangle {};       // rectangle
+	uint8_t    fillType;           // fill type
+	uint8_t    edgeType;           // edge type
+	float      fillSpacing;        // fill spacing
+	FLENCNTOUT lengthOrCount;      // fill stitch length or clipboard count
+	FANGCLPOUT angleOrClipData;    // fill angle or clipboard data pointer
+
+	float    borderSize;          // border size
+	float    edgeSpacing;         // edge spacing
+	float    edgeStitchLen;       // edge stitch length
+	uint16_t picoLength;          // pico length
 	uint32_t extendedAttribute;   // attribute extension
 	float    maxFillStitchLen;    // maximum fill stitch length
 	float    minFillStitchLen;    // minimum fill stitch length
 	float    maxBorderStitchLen;  // maximum border stitch length
 	float    minBorderStitchLen;  // minimum border stitch length
 	TFINFO   fillInfo {};         // feather/texture info
-	uint16_t fillStart{};           // fill start point
-	uint16_t fillEnd{};             // fill end point
+	uint16_t fillStart {};        // fill start point
+	uint16_t fillEnd {};          // fill end point
 	float    underlaySpacing;     // underlay spacing
 	float    underlayStitchLen;   // underlay stitch length
 	float    underlayStitchAngle; // underlay stitch angle
@@ -2811,10 +2814,11 @@ struct _txtrct {
 using TXTRCT = struct _txtrct;
 
 struct _txhst {
-	std::vector<TXPNT> texturePoints{};
-	float              height  = 0.0;
-	float              width   = 0.0;
-	float              spacing = 0.0;
+	std::vector<TXPNT> texturePoints {};
+
+	float height  = 0.0;
+	float width   = 0.0;
+	float spacing = 0.0;
 };
 
 using TXHST = struct _txhst;
@@ -2822,9 +2826,10 @@ using TXHST = struct _txhst;
 struct _txhstbuff {
 	uint32_t* placeholder;
 	uint32_t  count;
-	float     height;
-	float     width;
-	float     spacing;
+
+	float height;
+	float width;
+	float spacing;
 };
 
 using TXHSTBUF = struct _txhstbuff;

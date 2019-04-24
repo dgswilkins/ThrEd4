@@ -86,23 +86,24 @@ void    wrnmen();
 void    zumhom();
 
 namespace internal {
-	void   angdif(float angle) noexcept;
-	void   auxmen();
-	void   bak();
-	void   bakmrk();
-	void   bakthum();
-	void   bal2thr(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
-	void   barnam(HWND window, uint32_t iThumbnail);
-	void   bfil();
-	bool   binv(const std::vector<uint8_t>& monoBitmapData, uint32_t bitmapWidthInBytes);
-	bool   bitar();
-	void   bitlin(const uint8_t* source, uint32_t* destination, COLORREF foreground, COLORREF background);
-	void   bitsiz();
-	void   box(uint32_t iNearest, HDC dc) noexcept;
-	void   boxs() noexcept;
-	void   bsavmen();
+	void angdif(float angle) noexcept;
+	void auxmen();
+	void bak();
+	void bakmrk();
+	void bakthum();
+	void bal2thr(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
+	void barnam(HWND window, uint32_t iThumbnail);
+	void bfil();
+	bool binv(const std::vector<uint8_t>& monoBitmapData, uint32_t bitmapWidthInBytes);
+	bool bitar();
+	void bitlin(const uint8_t* source, uint32_t* destination, COLORREF foreground, COLORREF background);
+	void bitsiz();
+	void box(uint32_t iNearest, HDC dc) noexcept;
+	void boxs() noexcept;
+	void bsavmen();
 	void centr();
 	void chk1col();
+
 	bool
 	         chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& rotationAngle, fPOINT& rotationCenter, FRMHED& textureForm);
 	bool     chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept;
@@ -152,6 +153,7 @@ namespace internal {
 	void     delstch1(uint32_t iStitch) noexcept;
 	void     deltot();
 	void     desiz();
+
 	BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 	bool doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag);
@@ -164,7 +166,7 @@ namespace internal {
 	void dstin(uint32_t number, POINT& pout) noexcept;
 	void dstran(std::vector<DSTREC>& DSTData);
 
-	inline uint32_t dtrn(DSTREC* dpnt);
+	uint32_t dtrn(DSTREC* dpnt);
 
 	void duClos(uint32_t startStitch, uint32_t stitchCount) noexcept;
 	void duIns();

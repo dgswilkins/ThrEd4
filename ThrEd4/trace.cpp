@@ -1043,8 +1043,8 @@ void trace::internal::pxlin(uint32_t start, uint32_t finish) {
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);
 	line[1] = BitmapPoint;
-	Polyline(BitmapDC,static_cast<const POINT*>(line),2);
-	Polyline(TraceDC,static_cast<const POINT*>(line),2);
+	Polyline(BitmapDC, static_cast<const POINT*>(line), 2);
+	Polyline(TraceDC, static_cast<const POINT*>(line), 2);
 }
 
 void trace::internal::bfrm() {
@@ -1144,7 +1144,7 @@ void trace::tracpar() {
 				if (position < 18) {
 					StateMap.set(StateFlag::NUMIN);
 					StateMap.set(StateFlag::TRNIN0);
-					MsgIndex          = 0;
+					MsgIndex            = 0;
 					TraceInputBuffer[0] = 0;
 					if (position < 17) {
 						ti::trnumwnd0(ButtonHeight * 16);
@@ -1159,7 +1159,7 @@ void trace::tracpar() {
 					if (position < 20) {
 						StateMap.set(StateFlag::NUMIN);
 						StateMap.set(StateFlag::TRNIN1);
-						MsgIndex          = 0;
+						MsgIndex            = 0;
 						TraceInputBuffer[0] = 0;
 						if (position < 19) {
 							ti::trnumwnd1(ButtonHeight * 18);
@@ -1304,7 +1304,8 @@ void trace::wasTrace() {
 		if (DrawItem->hwndItem == TraceNumberInput) {
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 			SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-			wrap::TextOut(DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(TraceInputBuffer), gsl::narrow<uint32_t>(wcslen(&TraceInputBuffer[0])));
+			wrap::TextOut(
+			    DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(TraceInputBuffer), gsl::narrow<uint32_t>(wcslen(&TraceInputBuffer[0])));
 			break;
 		}
 	}

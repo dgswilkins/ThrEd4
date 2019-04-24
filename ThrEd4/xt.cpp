@@ -160,12 +160,14 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 		if (feather.upCount != 0u) {
 			if (feather.countUp != 0u) {
 				feather.ratio
-				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
+				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount))
+				      / gsl::narrow_cast<float>(feather.totalCount);
 				feather.countUp--;
 			}
 			else {
 				feather.ratio
-				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(bpsg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
+				    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(bpsg() % feather.totalCount))
+				      / gsl::narrow_cast<float>(feather.totalCount);
 				if (feather.countDown != 0u) {
 					feather.countDown--;
 				}
@@ -178,7 +180,8 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 		}
 		else {
 			feather.ratio
-			    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount)) / gsl::narrow_cast<float>(feather.totalCount);
+			    = (gsl::narrow_cast<float>(feather.totalCount) - gsl::narrow_cast<float>(form::psg() % feather.totalCount))
+			      / gsl::narrow_cast<float>(feather.totalCount);
 		}
 		feather.ratio *= feather.formRatio;
 		break;
@@ -473,8 +476,16 @@ int32_t xt::internal::fil2crd(const fs::path& fileName) {
 	wcscpy_s(command, L"\"");
 	startupInfo    = {};
 	startupInfo.cb = sizeof(startupInfo);
-	if (!CreateProcess(
-	        nullptr, static_cast<LPTSTR>(command), nullptr, nullptr, 0, NORMAL_PRIORITY_CLASS, nullptr, nullptr, &startupInfo, &processInfo)) {
+	if (!CreateProcess(nullptr,
+	                   static_cast<LPTSTR>(command),
+	                   nullptr,
+	                   nullptr,
+	                   0,
+	                   NORMAL_PRIORITY_CLASS,
+	                   nullptr,
+	                   nullptr,
+	                   &startupInfo,
+	                   &processInfo)) {
 		errorCode = GetLastError();
 	}
 	else {
@@ -545,7 +556,8 @@ void xt::pes2crd() {
 		auto size    = DWORD { _MAX_PATH };
 		auto keyType = DWORD { REG_SZ };
 		GSL_SUPPRESS(26490) {
-			if (RegQueryValueEx(registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size) // NOLINT
+			if (RegQueryValueEx(
+			        registryKey, L"ProgramFilesDir", nullptr, &keyType, reinterpret_cast<LPBYTE>(programName), &size) // NOLINT
 			    == ERROR_SUCCESS) {
 				wcscat_s(programName, L"\\Computerservice SSHSBV\\PES2Card\\LinkP2C.exe");
 				if (!xi::chkp2cnam(&programName[0])) {
@@ -1166,7 +1178,7 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = StitchBuffer;
-	ColorOrder[AppliqueColor]   = 0;
+	ColorOrder[AppliqueColor]       = 0;
 	for (auto iColor = 0u; iColor < 16; iColor++) {
 		if (iColor != AppliqueColor) {
 			ColorOrder[iColor] = iColor + 1;
@@ -1184,12 +1196,12 @@ void xt::fsort() {
 	}
 	stitchRegion.back().finish    = PCSHeader.stitchCount;
 	stitchRegion.back().endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
-	const auto lastRegion = stitchRegion.size();
-	auto       pRecs      = std::vector<OREC*> {};
+	const auto lastRegion         = stitchRegion.size();
+	auto       pRecs              = std::vector<OREC*> {};
 	pRecs.reserve(lastRegion);
 	auto pFRecs = std::vector<OREC*> {};
 	pFRecs.reserve(lastRegion);
-	for (auto& region:stitchRegion) {
+	for (auto& region : stitchRegion) {
 		xi::durec(region);
 		pRecs.push_back(&region);
 		pFRecs.push_back(&region);
