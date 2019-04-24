@@ -3785,6 +3785,7 @@ void thred::internal::duver(const fs::path& name) {
 
 #pragma warning(push)
 #pragma warning(disable : 26487)
+// ToDo - there must be a safer way to do this
 void thred::internal::durit(char** destination, const void* const source, uint32_t count) noexcept {
 	if ((destination != nullptr) && (source != nullptr)) {
 		GSL_SUPPRESS(26474) memcpy(gsl::narrow_cast<void*>(*destination), source, count);
@@ -4255,8 +4256,8 @@ void thred::internal::pecEncodeint32_t(int32_t delta) noexcept {
 }
 
 void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) {
-	auto deltaX = wrap::round<int32_t>(srcX * 5 / 3);
-	auto deltaY = -wrap::round<int32_t>(srcY * 5 / 3);
+	auto deltaX = wrap::round<int32_t>(srcX * 5.0f / 3.0f);
+	auto deltaY = -wrap::round<int32_t>(srcY * 5.0f / 3.0f);
 	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
 		PESdata[OutputIndex] = (deltaX < 0) ? deltaX - 128 : deltaX;
 		OutputIndex++;
@@ -6072,8 +6073,8 @@ void thred::internal::nuFil() {
 						StateMap.reset(StateFlag::FILDIR);
 						auto iPESstitch         = 0u;
 						auto iActualPESstitches = 1u;
-						StitchBuffer[0].x       = 0;
-						StitchBuffer[0].y       = 0;
+						StitchBuffer[0].x       = 0.0f;
+						StitchBuffer[0].y       = 0.0f;
 						auto locof              = 0.0f;
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3)) {
 							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3;
@@ -6087,11 +6088,12 @@ void thred::internal::nuFil() {
 								}
 								else {
 									if ((PESstitch[iPESstitch] & 0x80u) != 0u) {
-										auto pesVal = ((PESstitch[iPESstitch] & 0x0Fu) << 8u) + PESstitch[iPESstitch + 1];
+										auto pesVal = (((PESstitch[iPESstitch] & 0x0Fu) << 8u) | PESstitch[iPESstitch + 1]) & 0xFFF;
 										if ((pesVal & 0x800u) != 0u) {
 											pesVal -= 0x1000;
 										}
-										locof = gsl::narrow_cast<decltype(locof)>(pesVal);
+										auto sPesVal = gsl::narrow_cast<int32_t>(pesVal);
+										locof = gsl::narrow_cast<decltype(locof)>(sPesVal);
 										iPESstitch++;
 									}
 									else {
@@ -6102,7 +6104,7 @@ void thred::internal::nuFil() {
 											locof = PESstitch[iPESstitch];
 										}
 									}
-									locof *= 0.6f;
+									locof *= 3.0f / 5.0f;
 									// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 									if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 										loc.y -= locof;
