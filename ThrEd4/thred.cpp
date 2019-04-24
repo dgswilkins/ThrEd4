@@ -2056,10 +2056,6 @@ void thred::internal::chknum() {
 	auto value = 0.0f;
 	if (std::wcslen(&MsgBuffer[0]) != 0u) {
 		value = wrap::bufToFloat(&MsgBuffer[0]);
-		// Todo - remove this once the buffer overflow into MsgBuffer is resolved
-		if (value > gsl::narrow_cast<float>(MAXINT32)) { // NOLINT
-			throw;
-		}
 	}
 
 	xt::clrstch();
@@ -2487,13 +2483,7 @@ void thred::internal::chknum() {
 			}
 			else {
 				if (wcslen(&MsgBuffer[0]) != 0u) {
-					OutputDebugString(fmt::format(L"chknum:MsgBuffer [{}]\n", MsgBuffer).c_str());
-					value = wrap::bufToDouble(&MsgBuffer[0]);
-					OutputDebugString(fmt::format(L"chknum:Value [{}]\n", value).c_str());
-					// ToDo - figure out why MsgBuffer gets large value and crashes gsl::narrow below
-					for (auto i = 0u; i < 64; i++) {
-						MsgBuffer[i] = 0x0;
-					}
+					value = wrap::bufToFloat(&MsgBuffer[0]);
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
 							if (value < FormList->size()) {
@@ -3852,13 +3842,12 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	durit(&output, &BackgroundColor, sizeof(BackgroundColor));
 	durit(&output, &UserColor[0], sizeof(UserColor));
 	durit(&output, &CustomColor[0], sizeof(CustomColor));
+	auto threadSizeBuffer = std::string{};
+	threadSizeBuffer.resize(threadLength);
 	for (auto iThread = 0; iThread < threadLength; iThread++) {
-		MsgBuffer[iThread] = ThreadSize[iThread][0];
+		threadSizeBuffer[iThread] = ThreadSize[iThread][0];
 	}
-	MsgBuffer[threadLength] = 0;
-	auto threadSizeBufW     = std::wstring(&MsgBuffer[0]);
-	auto threadSizeBuf      = utf::Utf16ToUtf8(threadSizeBufW);
-	durit(&output, threadSizeBuf.c_str(), wrap::toUnsigned(threadSizeBuf.size() * sizeof(threadSizeBuf[0])));
+	durit(&output, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
 	if (!FormList->empty()) {
 		auto outForms = std::vector<FRMHEDOUT> {};
 		outForms.reserve(FormList->size());
@@ -4668,8 +4657,8 @@ void thred::internal::sav() {
 					break;
 				}
 				if (UserFlagMap.test(UserFlag::BSAVOF)) {
-					MsgBuffer[0] = 0;
-					if (WriteFile(PCSFileHandle, static_cast<LPCVOID>(MsgBuffer), 15, &bytesWritten, nullptr) == 0) {
+					const char blank[16] = {};
+					if (WriteFile(PCSFileHandle, static_cast<LPCVOID>(blank), 15, &bytesWritten, nullptr) == 0) {
 						displayText::riter();
 						flag = false;
 						break;
