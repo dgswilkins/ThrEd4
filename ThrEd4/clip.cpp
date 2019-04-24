@@ -99,7 +99,7 @@ void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip -= cnt;
 		}
-		if (clip::iseclpx(fpnt)) {
+		if (clip::iseclpx(iForm)) {
 			formList[iForm].borderClipData -= cnt;
 		}
 	}
