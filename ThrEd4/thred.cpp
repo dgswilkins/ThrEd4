@@ -4198,7 +4198,7 @@ bool thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) {
 
 #if PESACT
 
-uint32_t thred::internal::pesmtch(COLORREF referenceColor, uint8_t colorIndex) {
+uint32_t thred::internal::pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex) {
 	auto color = PECCOLOR { GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor) }; // NOLINT
 	auto translatedColor
 	    = PECCOLOR { PESThread[colorIndex].color.r, PESThread[colorIndex].color.g, PESThread[colorIndex].color.b };
@@ -4429,8 +4429,9 @@ void thred::internal::sav() {
 			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
 			pesHeader.cslen = 7;
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
-			auto matchIndex = 0u;
-			for (COLORREF color : UserColor) {
+			auto iColor = 0;
+			for (const auto color : UserColor) {
+				auto       matchIndex  = 0u;
 				auto       matchMin    = 0xffffffffu;
 				const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1u; iColorMatch < threadCount; iColorMatch++) {
@@ -4440,9 +4441,9 @@ void thred::internal::sav() {
 						matchMin   = match;
 					}
 				}
-				PESequivColors[color] = gsl::narrow<uint8_t>(matchIndex);
+				PESequivColors[iColor++] = gsl::narrow<uint8_t>(matchIndex);
 			}
-			auto color        = StitchBuffer[0].attribute & COLMSK;
+			auto stitchColor        = StitchBuffer[0].attribute & COLMSK;
 			auto boundingRect = fRECTANGLE {};
 			sizstch(boundingRect, StitchBuffer);
 			PESstitchCenterOffset.x = form::midl(boundingRect.right, boundingRect.left);
@@ -4457,9 +4458,9 @@ void thred::internal::sav() {
 			auto* blockHeader     = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
 			auto  threadList      = std::vector<PESCOLORLIST> {};
 			auto  blockIndex      = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
-			threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[color] });
+			threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
 			blockHeader->stitchtype  = 1; // first block is a jump in place
-			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->threadIndex = PESequivColors[stitchColor];
 			blockHeader->stitchcount = 2;
 			bufferIndex += sizeof(*blockHeader);
 			blockIndex++;
@@ -4470,7 +4471,7 @@ void thred::internal::sav() {
 			bufferIndex += sizeof(*contCode);
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 0; // then a normal stitch in place
-			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->threadIndex = PESequivColors[stitchColor];
 			blockHeader->stitchcount = 2;
 			bufferIndex += sizeof(*blockHeader);
 			blockIndex++;
@@ -4481,7 +4482,7 @@ void thred::internal::sav() {
 			bufferIndex += sizeof(*contCode);
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 1; // then a jump to the first location
-			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->threadIndex = PESequivColors[stitchColor];
 			blockHeader->stitchcount = 2;
 			bufferIndex += sizeof(*blockHeader);
 			blockIndex++;
@@ -4494,12 +4495,12 @@ void thred::internal::sav() {
 			auto pesThreadCount      = 0u;
 			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 			blockHeader->stitchtype  = 0; // normal stitch
-			blockHeader->threadIndex = PESequivColors[color];
+			blockHeader->threadIndex = PESequivColors[stitchColor];
 			bufferIndex += sizeof(*blockHeader);
 			blockIndex++;
 			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (color == (StitchBuffer[iStitch].attribute & COLMSK)) {
+				if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
 				}
 				else {
@@ -4509,11 +4510,11 @@ void thred::internal::sav() {
 					blockHeader->stitchcount = OutputIndex;
 					OutputIndex              = 0;
 					pesThreadCount++;
-					color = StitchBuffer[iStitch].attribute & COLMSK;
-					threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[color] });
+					stitchColor = StitchBuffer[iStitch].attribute & COLMSK;
+					threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
 					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 					blockHeader->stitchtype  = 1; // jump stitch
-					blockHeader->threadIndex = PESequivColors[color];
+					blockHeader->threadIndex = PESequivColors[stitchColor];
 					blockHeader->stitchcount = 2;
 					bufferIndex += sizeof(*blockHeader);
 					blockIndex++;
@@ -4525,7 +4526,7 @@ void thred::internal::sav() {
 					OutputIndex              = 0;
 					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
 					blockHeader->stitchtype  = 0; // normal stitch
-					blockHeader->threadIndex = PESequivColors[color];
+					blockHeader->threadIndex = PESequivColors[stitchColor];
 					bufferIndex += sizeof(*blockHeader);
 					blockIndex++;
 					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
@@ -4601,12 +4602,12 @@ void thred::internal::sav() {
 			std::copy(&imageWithFrame[0][0],
 			          &imageWithFrame[0][0] + sizeof(imageWithFrame),
 			          stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
-			color = (StitchBuffer[0].attribute & COLMSK);
+			stitchColor = (StitchBuffer[0].attribute & COLMSK);
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
 				auto y = wrap::round<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 3u;
 				y      = ThumbHeight - y;
-				if (color == (StitchBuffer[iStitch].attribute & COLMSK)) {
+				if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
 					thumbnail[y][x] = 1;
 				}
 				else {
@@ -4614,7 +4615,7 @@ void thred::internal::sav() {
 					std::copy(&imageWithFrame[0][0],
 					          &imageWithFrame[0][0] + sizeof(imageWithFrame),
 					          stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
-					color           = (StitchBuffer[iStitch].attribute & COLMSK);
+					stitchColor           = (StitchBuffer[iStitch].attribute & COLMSK);
 					thumbnail[y][x] = 1;
 				}
 			}

@@ -510,7 +510,7 @@ namespace internal {
 	void     pecdat(uint8_t* buffer);
 	void     pecEncodeint32_t(int32_t deltaY) noexcept;
 	void     pecEncodeStop(uint8_t* buffer, uint8_t val) noexcept;
-	uint32_t pesmtch(COLORREF referenceColor, uint8_t colorIndex);
+	uint32_t pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex);
 	void     pecnam(uint8_t* pchr);
 	void     ritpcol(uint8_t colorIndex) noexcept;
 	void     ritpes(uint8_t* buffer, uint32_t& bufferIndex, uint32_t iStitch, const std::vector<fPOINTATTR>& stitches);
