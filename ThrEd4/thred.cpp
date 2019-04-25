@@ -2955,9 +2955,6 @@ void thred::internal::lenCalc() {
 }
 
 void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
-	// ToDo - does this function work correctly?
-	// ToDo - rename inf
-
 	const auto codedAttribute = ClosestFormToCursor << 4u;
 	auto       stitchSize     = 1e99;
 
@@ -3015,27 +3012,26 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		}
 	}
 	else {
-		const auto iStitch     = startStitch;
-		auto       iNextStitch = startStitch + 1;
-		SelectedPoint          = StitchBuffer[iStitch];
-		for (auto inf = iNextStitch; inf < endStitch; inf++) {
+		auto iNextStitch = startStitch + 1;
+		auto prevPoint    = StitchBuffer[startStitch];
+		for (auto iStitch = iNextStitch; iStitch < endStitch; iStitch++) {
 			if ((StitchBuffer[iNextStitch].attribute & KNOTMSK) != 0u) {
-				SelectedPoint = StitchBuffer[iNextStitch];
-				thred::mvstch(iNextStitch++, inf);
+				prevPoint = StitchBuffer[iNextStitch];
+				thred::mvstch(iNextStitch++, iStitch);
 			}
 			else {
-				const auto delta = POINT { wrap::round<int32_t>(StitchBuffer[inf].x - SelectedPoint.x),
-					                       wrap::round<int32_t>(StitchBuffer[inf].y - SelectedPoint.y) };
+				const auto delta = POINT { wrap::round<int32_t>(StitchBuffer[iStitch].x - prevPoint.x),
+					                       wrap::round<int32_t>(StitchBuffer[iStitch].y - prevPoint.y) };
 				stitchSize       = hypot(delta.x, delta.y);
 				if (stitchSize > SmallStitchLength) {
-					thred::mvstch(iNextStitch++, inf);
-					SelectedPoint = StitchBuffer[inf];
+					thred::mvstch(iNextStitch++, iStitch);
+					prevPoint = StitchBuffer[iStitch];
 				}
 			}
 		}
-		auto inf = endStitch;
-		while (inf < PCSHeader.stitchCount) {
-			thred::mvstch(iNextStitch++, inf++);
+		
+		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount;iStitch++) {
+			thred::mvstch(iNextStitch++, iStitch);
 		}
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iNextStitch);
 		thred::coltab();
