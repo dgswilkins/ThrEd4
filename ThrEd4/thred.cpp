@@ -5978,7 +5978,7 @@ void thred::internal::nuFil() {
 										               gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].y)
 										                   + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0f,
 										               color };
-									iStitch;
+									iStitch++;
 									iPCSstitch++;
 								}
 							}
