@@ -3261,8 +3261,7 @@ void thred::grpAdj() {
                                    wrap::round<int32_t>(StitchRangeRect.top - StitchRangeRect.bottom) };
 			auto coordinate = 0.0f;
 			if (newSize.x < MINZUM) {
-				// ToDo - we are comparing an integer to a small float here - does that make sense?
-				if (newSize.x < TINY) {
+				if (newSize.x < 1) {
 					newSize.x = 1;
 				}
 				coordinate = gsl::narrow_cast<decltype(coordinate)>(MINZUM) / newSize.x;
