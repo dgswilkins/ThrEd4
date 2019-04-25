@@ -5969,7 +5969,7 @@ void thred::internal::nuFil() {
 								if (PCSDataBuffer[iPCSstitch].tag == 3) {
 									ColorChangeTable[iColorChange].colorIndex    = PCSDataBuffer[iPCSstitch].fx;
 									ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-									color                                        = NOTFRM | PCSDataBuffer[iPCSstitch++].fx;
+									color                                        = NOTFRM | PCSDataBuffer[iPCSstitch].fx;
 								}
 								else {
 									StitchBuffer[iStitch]
@@ -5979,8 +5979,8 @@ void thred::internal::nuFil() {
 										                   + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0f,
 										               color };
 									iStitch++;
-									iPCSstitch++;
 								}
+								iPCSstitch++;
 							}
 							PCSHeader.stitchCount = gsl::narrow<uint16_t>(iStitch);
 							// Grab the bitmap filename
