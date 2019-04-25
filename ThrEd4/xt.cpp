@@ -1196,7 +1196,7 @@ void xt::fsort() {
 	}
 	stitchRegion.back().finish    = PCSHeader.stitchCount;
 	stitchRegion.back().endStitch = &StitchBuffer[PCSHeader.stitchCount - 1];
-	const auto lastRegion         = stitchRegion.size();
+	const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
 	auto       pRecs              = std::vector<OREC*> {};
 	pRecs.reserve(lastRegion);
 	auto pFRecs = std::vector<OREC*> {};
