@@ -1179,10 +1179,8 @@ void form::frmovlin() {
 
 void form::makspac(uint32_t start, uint32_t count) {
 	if (!form::chkmax(PCSHeader.stitchCount, count)) {
-		std::copy(static_cast<fPOINTATTR*>(StitchBuffer) + start,
-		          static_cast<fPOINTATTR*>(StitchBuffer) + PCSHeader.stitchCount,
-		          stdext::make_checked_array_iterator(static_cast<fPOINTATTR*>(StitchBuffer) + start + count,
-		                                              MAXITEMS - (start + count)));
+		const auto dest = gsl::span<fPOINTATTR>(&StitchBuffer[start + count], MAXITEMS - (start + count));
+		std::copy(&StitchBuffer[start], &StitchBuffer[PCSHeader.stitchCount], dest.begin());
 		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
 	}
 }
@@ -8970,9 +8968,8 @@ void form::srtfrm() {
 			auto       iHighStitch        = histogram[iForm]++;
 			highStitchBuffer[iHighStitch] = StitchBuffer[iStitch];
 		}
-		std::copy(highStitchBuffer.cbegin(),
-		          highStitchBuffer.cend(),
-		          stdext::make_checked_array_iterator(static_cast<fPOINTATTR*>(StitchBuffer), MAXITEMS));
+		const auto dest = gsl::span<fPOINTATTR>(StitchBuffer);
+		std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), dest.begin());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

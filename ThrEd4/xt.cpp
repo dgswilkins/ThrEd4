@@ -616,9 +616,8 @@ void xt::internal::delwlk(uint32_t code) {
 			}
 		}
 		if (highStitchBuffer.size() != PCSHeader.stitchCount) {
-			std::copy(highStitchBuffer.cbegin(),
-			          highStitchBuffer.cend(),
-			          stdext::make_checked_array_iterator(StitchBuffer, PCSHeader.stitchCount));
+			const auto dest = gsl::span<fPOINTATTR>(StitchBuffer);
+			std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), dest.begin());
 			PCSHeader.stitchCount = gsl::narrow<uint16_t>(highStitchBuffer.size());
 		}
 	}
@@ -1511,9 +1510,8 @@ void xt::internal::duint(uint32_t offset, uint32_t code, INTINF& ilData) {
 		auto sourceStart = &StitchBuffer[ilData.start];
 		auto sourceEnd   = sourceStart + count;
 
-		const auto destination
-		    = stdext::make_checked_array_iterator(&ilData.highStitchBuffer[ilData.output], MAXITEMS - ilData.output);
-		std::copy(sourceStart, sourceEnd, destination);
+		const auto destination = gsl::span<fPOINTATTR>(&ilData.highStitchBuffer[ilData.output], MAXITEMS - ilData.output);
+		std::copy(sourceStart, sourceEnd, destination.begin());
 		ilData.start += count;
 		ilData.output += count;
 	}
@@ -1635,8 +1633,8 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			auto sourceEnd   = sourceStart + ine;
 
 			const auto destination
-			    = stdext::make_checked_array_iterator(&StitchBuffer[ilData.output + MAXITEMS], MAXITEMS - ilData.output);
-			std::copy(sourceStart, sourceEnd, destination);
+			    = gsl::span<fPOINTATTR>(&StitchBuffer[ilData.output + MAXITEMS], MAXITEMS - ilData.output);
+			std::copy(sourceStart, sourceEnd, destination.begin());
 			ilData.output += ine;
 		}
 		auto sourceStart = ilData.highStitchBuffer;

@@ -392,10 +392,11 @@ void repair::internal::reptx() {
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
+			// ToDo - this code is broken. Why are satinguides referred to when repairing textures?
 			if (gsl::narrow<uint16_t>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {
-				auto       sourceStart = &SatinGuides[form.fillInfo.texture.index];
-				auto       sourceEnd   = sourceStart + form.fillInfo.texture.count;
-				const auto destination = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
+				auto sourceStart = std::next(SatinGuides->cbegin(), form.fillInfo.texture.index);
+				auto sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
+				auto destination = std::next(SatinGuides->begin(), textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 				textureCount += form.fillInfo.texture.count;
@@ -404,10 +405,9 @@ void repair::internal::reptx() {
 			else {
 				if (TextureIndex > form.fillInfo.texture.index) {
 					form.fillInfo.texture.count = gsl::narrow<uint16_t>(TextureIndex) - form.fillInfo.texture.index;
-					auto       sourceStart      = &SatinGuides[form.fillInfo.texture.index];
-					auto       sourceEnd        = sourceStart + form.fillInfo.texture.count;
-					const auto destination
-					    = stdext::make_checked_array_iterator(&SatinGuides[textureCount], 10000 - textureCount);
+					auto       sourceStart      = std::next(SatinGuides->cbegin(), form.fillInfo.texture.index);
+					auto       sourceEnd        = std::next(sourceStart, form.fillInfo.texture.count);
+					const auto destination      = std::next(SatinGuides->begin(), textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 					ri::bcup(iForm, badData);
