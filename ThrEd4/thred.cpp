@@ -1405,46 +1405,45 @@ void thred::internal::dudat() {
 		backupData->formCount = formCount;
 		backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 		if (formCount != 0) {
-			std::copy(
-				formList.cbegin(), formList.cend(), stdext::make_checked_array_iterator(backupData->forms, formList.size()));
+			const auto dest = gsl::span<FRMHED>(backupData->forms, formList.size());
+			std::copy(formList.cbegin(), formList.cend(), dest.begin());
 		}
 		backupData->stitchCount = PCSHeader.stitchCount;
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount != 0u) {
-			std::copy(&StitchBuffer[0],
-				&StitchBuffer[PCSHeader.stitchCount],
-				stdext::make_checked_array_iterator(backupData->stitches, PCSHeader.stitchCount));
+			const auto dest = gsl::span<fPOINTATTR>(backupData->stitches, PCSHeader.stitchCount);
+			std::copy(&StitchBuffer[0], &StitchBuffer[PCSHeader.stitchCount], dest.begin());
 		}
 		backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
 		if (!FormVertices->empty()) {
-			std::copy(FormVertices->cbegin(),
-				FormVertices->cend(),
-				stdext::make_checked_array_iterator(backupData->vertices, FormVertices->size()));
+			const auto dest = gsl::span<fPOINT>(backupData->vertices, FormVertices->size());
+			std::copy(FormVertices->cbegin(), FormVertices->cend(), dest.begin());
 		}
 		backupData->guideCount = gsl::narrow<decltype(backupData->guideCount)>(SatinGuides->size());
 		backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 		if (!SatinGuides->empty()) {
-			std::copy(SatinGuides->cbegin(),
-				SatinGuides->cend(),
-				stdext::make_checked_array_iterator(backupData->guide, backupData->guideCount));
+			const auto dest = gsl::span<SATCON>(backupData->guide, backupData->guideCount);
+			std::copy(SatinGuides->cbegin(), SatinGuides->cend(), dest.begin());
 		}
 		backupData->clipPointCount = gsl::narrow<decltype(backupData->clipPointCount)>(ClipPoints->size());
 		backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 		if (!ClipPoints->empty()) {
-			std::copy(ClipPoints->cbegin(),
-				ClipPoints->cend(),
-				stdext::make_checked_array_iterator(backupData->clipPoints, backupData->clipPointCount));
+			const auto dest = gsl::span<fPOINT>(backupData->clipPoints, backupData->clipPointCount);
+			std::copy(ClipPoints->cbegin(), ClipPoints->cend(), dest.begin());
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
-		auto sizeColors    = (sizeof(UserColor) / sizeof(UserColor[0]));
-		std::copy(&UserColor[0], &UserColor[sizeColors], stdext::make_checked_array_iterator(backupData->colors, sizeColors));
+		{
+			auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
+			const auto dest = gsl::span<COLORREF>(backupData->colors, sizeColors);
+			std::copy(
+			    &UserColor[0], &UserColor[sizeColors], dest.begin());
+		}
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
 		if (!TexturePointsBuffer->empty()) {
-			std::copy(TexturePointsBuffer->cbegin(),
-				TexturePointsBuffer->cend(),
-				stdext::make_checked_array_iterator(backupData->texturePoints, backupData->texturePointCount));
+			const auto dest = gsl::span<TXPNT>(backupData->texturePoints, backupData->texturePointCount);
+			std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), dest.begin());
 		}
 	}
 }
@@ -4179,13 +4178,13 @@ void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(uint8_t* pchr) {
-	strncpy(convert_ptr<char*>(pchr), "LA:", 3);
+	strncpy(convert_ptr<char*>(pchr), "LA:", 3); // NOLINT
 	const auto lblSize  = sizeof((static_cast<PECHDR*>(nullptr))->label) - 3;
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
 	}
-	strncpy(convert_ptr<char*>(pchr + 3), fileStem.c_str(), lblSize);
+	strncpy(convert_ptr<char*>(pchr + 3), fileStem.c_str(), lblSize); // NOLINT
 }
 #pragma warning(pop)
 
@@ -4322,7 +4321,7 @@ void thred::internal::sav() {
 			ritdst(DSTOffsetData, DSTRecords, saveStitches);
 			// dstHeader fields are fixed width, so use strncpy in its intended way.
 			// Use sizeof to ensure no overrun if the format string is wrong length
-			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched));
+			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched)); // NOLINT
 			std::fill_n(&dstHeader.desc[0], sizeof(dstHeader.desc), ' ');
 			if (desc != nullptr) {
 				for (auto iHeader = 0u; iHeader < sizeof(dstHeader.desc); iHeader++) {
@@ -4335,47 +4334,47 @@ void thred::internal::sav() {
 				}
 			}
 			dstHeader.desc[16] = 0xd;
-			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed));
-			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));
-			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed));
-			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co));
-			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed));
-			strncpy(dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus));
-			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed));
-			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffsetData.Positive.x).c_str(), sizeof(dstHeader.xmin));
-			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed));
-			strncpy(dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus));
-			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed));
-			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffsetData.Negative.y).c_str(), sizeof(dstHeader.ymin));
-			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed));
-			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax));
-			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed));
-			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay));
-			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed));
-			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx));
-			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed));
-			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my));
-			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));
-			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));
-			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));
+			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed)); // NOLINT
+			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs)); // NOLINT
+			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed)); // NOLINT
+			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co)); // NOLINT
+			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed)); // NOLINT
+			strncpy(dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus)); // NOLINT
+			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed)); // NOLINT
+			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffsetData.Positive.x).c_str(), sizeof(dstHeader.xmin)); // NOLINT
+			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed)); // NOLINT
+			strncpy(dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus)); // NOLINT
+			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed)); // NOLINT
+			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffsetData.Negative.y).c_str(), sizeof(dstHeader.ymin)); // NOLINT
+			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed)); // NOLINT
+			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax)); // NOLINT
+			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed)); // NOLINT
+			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay)); // NOLINT
+			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed)); // NOLINT
+			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx)); // NOLINT
+			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed)); // NOLINT
+			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my)); // NOLINT
+			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed)); // NOLINT
+			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd)); // NOLINT
+			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof)); // NOLINT
 			std::fill_n(&dstHeader.res[0], sizeof(dstHeader.res), ' ');
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
 			wrap::WriteFile(PCSFileHandle,
-				DSTRecords.data(),
-				wrap::toUnsigned(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
-				&bytesWritten,
-				nullptr);
+			                DSTRecords.data(),
+			                wrap::toUnsigned(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
+			                &bytesWritten,
+			                nullptr);
 			break;
 		}
 #if PESACT
 		case AUXPES: {
 			auto pesHeader = PESHED {};
-			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led));
+			strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led)); // NOLINT
 			pesHeader.celn = 7;
-			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce));
+			strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce)); // NOLINT
 			pesHeader.cslen = 7;
-			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs));
+			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs)); // NOLINT
 			auto iColor = 0;
 			for (const auto color : UserColor) {
 				auto       matchIndex  = 0u;
@@ -4534,10 +4533,8 @@ void thred::internal::sav() {
 
 			const auto yFactor = 31.0f / IniFile.hoopSizeY;
 			const auto xFactor = 40.0f / IniFile.hoopSizeX;
-
-			std::copy(&imageWithFrame[0][0],
-				&imageWithFrame[0][0] + sizeof(imageWithFrame),
-				stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+			const auto dest    = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
+			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				auto x          = wrap::floor<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 4;
 				auto y          = wrap::floor<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 5;
@@ -4546,9 +4543,7 @@ void thred::internal::sav() {
 			}
 			thi::writeThumbnail(pchr, p_thumbnail);
 
-			std::copy(&imageWithFrame[0][0],
-				&imageWithFrame[0][0] + sizeof(imageWithFrame),
-				stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 			stitchColor = (StitchBuffer[0].attribute & COLMSK);
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
@@ -4559,9 +4554,7 @@ void thred::internal::sav() {
 				}
 				else {
 					thi::writeThumbnail(pchr, p_thumbnail);
-					std::copy(&imageWithFrame[0][0],
-						&imageWithFrame[0][0] + sizeof(imageWithFrame),
-						stdext::make_checked_array_iterator(&thumbnail[0][0], sizeof(thumbnail)));
+					std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 					stitchColor     = (StitchBuffer[iStitch].attribute & COLMSK);
 					thumbnail[y][x] = 1;
 				}
@@ -6041,7 +6034,7 @@ void thred::internal::nuFil() {
 								else {
 									if ((PESstitch[iPESstitch] & 0x80u) != 0u) {
 										auto pesVal
-											= (((PESstitch[iPESstitch] & 0x0Fu) << 8u) | PESstitch[iPESstitch + 1]) & 0xFFF;
+										    = (((PESstitch[iPESstitch] & 0x0Fu) << 8u) | PESstitch[iPESstitch + 1]) & 0xFFFu;
 										if ((pesVal & 0x800u) != 0u) {
 											pesVal -= 0x1000;
 										}
@@ -7640,10 +7633,8 @@ void thred::internal::duclip() {
 							if (texture::istx(selectedForm)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
 								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
-								std::copy(startPoint,
-									endPoint,
-									stdext::make_checked_array_iterator(&textures[textureCount],
-										SelectedForm->fillInfo.texture.count));
+								const auto dest       = gsl::span<TXPNT>(&textures[textureCount], SelectedForm->fillInfo.texture.count);
+								std::copy(startPoint, endPoint, dest.begin());
 								forms[iForm++].fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 								textureCount += SelectedForm->fillInfo.texture.count;
 							}
@@ -7738,9 +7729,8 @@ void thred::internal::duclip() {
 							if (texture::istx(ClosestFormToCursor)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
 								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
-								std::copy(startPoint,
-									endPoint,
-									stdext::make_checked_array_iterator(textures, SelectedForm->fillInfo.texture.count));
+								const auto dest       = gsl::span<TXPNT>(textures, SelectedForm->fillInfo.texture.count);
+								std::copy(startPoint, endPoint, dest.begin());
 							}
 							SetClipboardData(ThrEdClip, ThrEdClipPointer);
 						}
@@ -8083,8 +8073,8 @@ uint32_t thred::internal::kjmp(uint32_t start) noexcept {
 void thred::mvstchs(uint32_t destination, uint32_t source, uint32_t count) {
 	auto       sourceStart     = &StitchBuffer[source];
 	auto       sourceEnd       = &sourceStart[count];
-	const auto destinationSpan = stdext::make_checked_array_iterator(StitchBuffer + destination, (MAXITEMS * 2) - destination);
-	std::copy(sourceStart, sourceEnd, destinationSpan);
+	const auto destinationSpan = gsl::span<fPOINTATTR>(&StitchBuffer[destination], (MAXITEMS * 2) - destination);
+	std::copy(sourceStart, sourceEnd, destinationSpan.begin());
 }
 
 void thred::internal::setknt() {
