@@ -3729,23 +3729,18 @@ void thred::internal::duver(const fs::path& name) {
 	}
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26487)
-// ToDo - there must be a safer way to do this
-void thred::internal::durit(char** destination, const void* const source, uint32_t count) noexcept {
-	if ((destination != nullptr) && (source != nullptr)) {
-		GSL_SUPPRESS(26474) memcpy(gsl::narrow_cast<void*>(*destination), source, count);
-		*destination += count;
+void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
+	if (source != nullptr) {
+		const auto src = gsl::span<const char>{ gsl::narrow_cast<const char*>(source), gsl::narrow<ptrdiff_t>(count) };
+		destination.insert(destination.end(), src.begin(), src.end());
 	}
 }
-#pragma warning(pop)
 
-void thred::internal::dubuf(char* const buffer, uint32_t& count) {
+void thred::internal::dubuf(std::vector<char>& buffer) {
 	auto stitchHeader  = STRHED {};
 	auto vertexCount   = 0u;
 	auto guideCount    = 0u;
 	auto clipDataCount = 0u;
-	auto output        = buffer;
 
 	stitchHeader.headerType  = 0x2746872;
 	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof(StitchBuffer[0]) + sizeof(stitchHeader) + sizeof(PCSBMPFileName);
@@ -3776,34 +3771,39 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 	    = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	constexpr auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
 	auto vtxLen = sizeof(stitchHeader) + PCSHeader.stitchCount * sizeof(StitchBuffer[0]) + formDataOffset;
+	const auto thredDataSize
+		= FormList->size() * sizeof(decltype(FormList->back())) + vertexCount * sizeof(decltype(FormVertices->back()))
+		+ guideCount * sizeof(decltype(SatinGuides->back())) + clipDataCount * sizeof(decltype(ClipPoints->back()))
+		+ TextureIndex * sizeof(decltype(TexturePointsBuffer->back()));
+	buffer.reserve(vtxLen + thredDataSize);
+	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
 	if (vtxLen > USHRT_MAX) {
 		vtxLen = USHRT_MAX;
 	}
 	stitchHeader.vertexLen   = gsl::narrow<uint16_t>(vtxLen);
 	stitchHeader.dlineLen    = gsl::narrow<uint16_t>(sizeof(decltype(FormVertices->back())) * vertexCount);
 	stitchHeader.clipDataLen = gsl::narrow<uint16_t>(sizeof(decltype(ClipPoints->back())) * clipDataCount);
-	durit(&output, &stitchHeader, sizeof(stitchHeader));
+	durit(buffer, &stitchHeader, sizeof(stitchHeader));
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
 	ExtendedHeader.texturePointCount = gsl::narrow<uint32_t>(TextureIndex);
-	durit(&output, &ExtendedHeader, sizeof(ExtendedHeader));
-	durit(&output, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]));
+	durit(buffer, &ExtendedHeader, sizeof(ExtendedHeader));
+	durit(buffer, StitchBuffer, PCSHeader.stitchCount * sizeof(StitchBuffer[0]));
 	if (PCSBMPFileName[0] == 0) {
 		std::fill_n(&PCSBMPFileName[0], sizeof(PCSBMPFileName), '\0');
 	}
-	durit(&output, &PCSBMPFileName[0], sizeof(PCSBMPFileName));
-	durit(&output, &BackgroundColor, sizeof(BackgroundColor));
-	durit(&output, &UserColor[0], sizeof(UserColor));
-	durit(&output, &CustomColor[0], sizeof(CustomColor));
+	durit(buffer, &PCSBMPFileName[0], sizeof(PCSBMPFileName));
+	durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
+	durit(buffer, &UserColor[0], sizeof(UserColor));
+	durit(buffer, &CustomColor[0], sizeof(CustomColor));
 	auto threadSizeBuffer = std::string {};
 	threadSizeBuffer.resize(threadLength);
 	for (auto iThread = 0; iThread < threadLength; iThread++) {
 		threadSizeBuffer[iThread] = ThreadSize[iThread][0];
 	}
-	durit(&output, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
+	durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
 	if (!FormList->empty()) {
 		auto outForms = std::vector<FRMHEDOUT> {};
 		outForms.reserve(FormList->size());
@@ -3843,25 +3843,23 @@ void thred::internal::dubuf(char* const buffer, uint32_t& count) {
 			}
 		}
 		if (!outForms.empty()) {
-			durit(&output, outForms.data(), wrap::toUnsigned(outForms.size() * sizeof(decltype(outForms.back()))));
+			durit(buffer, outForms.data(), wrap::toUnsigned(outForms.size() * sizeof(decltype(outForms.back()))));
 		}
 		if (!vertices.empty()) {
-			durit(&output, vertices.data(), wrap::toUnsigned(vertices.size() * sizeof(decltype(vertices.back()))));
+			durit(buffer, vertices.data(), wrap::toUnsigned(vertices.size() * sizeof(decltype(vertices.back()))));
 		}
 		if (!guides.empty()) {
-			durit(&output, guides.data(), wrap::toUnsigned(guides.size() * sizeof(decltype(guides.back()))));
+			durit(buffer, guides.data(), wrap::toUnsigned(guides.size() * sizeof(decltype(guides.back()))));
 		}
 		if (!points.empty()) {
-			durit(&output, points.data(), wrap::toUnsigned(points.size() * sizeof(decltype(points.back()))));
+			durit(buffer, points.data(), wrap::toUnsigned(points.size() * sizeof(decltype(points.back()))));
 		}
 		if (!TexturePointsBuffer->empty()) {
-			durit(&output,
-				TexturePointsBuffer->data(),
+			durit(buffer,
+			      TexturePointsBuffer->data(),
 			      gsl::narrow<uint32_t>(TextureIndex * sizeof(decltype(TexturePointsBuffer->back()))));
 		}
 	}
-	// ToDo - find a better way than pointer arithmetic
-	count = output - buffer;
 }
 
 void thred::internal::thrsav() {
@@ -3899,14 +3897,11 @@ void thred::internal::thrsav() {
 		FileHandle = nullptr;
 	}
 	else {
-		// ToDo - MAXITEMS * 8 is not the best option here. Need something better
 		auto output = std::vector<char> {};
-		output.resize(MAXITEMS * 8);
-		auto count = 0u;
-		dubuf(output.data(), count);
+		dubuf(output);
 		auto bytesWritten = DWORD { 0 };
-		WriteFile(FileHandle, output.data(), count, &bytesWritten, nullptr);
-		if (bytesWritten != count) {
+		WriteFile(FileHandle, output.data(), output.size(), &bytesWritten, nullptr);
+		if (bytesWritten != output.size()) {
 			auto fmtStr = std::wstring {};
 			displayText::loadString(fmtStr, IDS_FWERR);
 			displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));

@@ -174,7 +174,7 @@ namespace internal {
 	void duar();
 	void dubar();
 	void dubox();
-	void dubuf(char* buffer, uint32_t& count);
+	void dubuf(std::vector<char>& buffer);
 	void duclip();
 	void duclp() noexcept;
 	void ducmd();
@@ -197,7 +197,7 @@ namespace internal {
 	void dupclp();
 	void duprct();
 	void durcntr(dPOINT& rotationCenter) noexcept;
-	void durit(char** destination, const void* source, uint32_t count) noexcept;
+	void durit(std::vector<char>& destination, const void* source, uint32_t count);
 	void durot() noexcept;
 	void durotu() noexcept;
 	void dusel(HDC dc);
