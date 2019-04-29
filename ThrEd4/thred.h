@@ -515,7 +515,9 @@ namespace internal {
 	uint32_t pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex);
 	void     pecnam(uint8_t* pchr);
 	void     ritpcol(uint8_t colorIndex) noexcept;
-	void     ritpes(uint8_t* buffer, uint32_t& bufferIndex, uint32_t iStitch, const std::vector<fPOINTATTR>& stitches);
+	void     ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch);
+	void     ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
+	void     ritpesCode(std::vector<uint8_t>& buffer);
 	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY);
 	void     setpes();
 	uint32_t tripl(char* dat);

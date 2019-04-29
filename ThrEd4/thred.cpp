@@ -4153,15 +4153,30 @@ uint32_t thred::internal::pesmtch(const COLORREF& referenceColor, const uint8_t&
 	    std::sqrt((((512 + meanR) * deltaR * deltaR) / 256u) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) / 256u)));
 }
 
-void thred::internal::ritpes(uint8_t* buffer, uint32_t& bufferIndex, uint32_t iStitch, const std::vector<fPOINTATTR>& stitches) {
-	if (buffer != nullptr) {
-		const auto factor    = 3.0f / 5.0f;
-		auto*      pesStitch = convert_ptr<PESTCH*>(&buffer[bufferIndex]);
-		pesStitch->x         = -stitches[iStitch].x * factor + PESstitchCenterOffset.x;
-		pesStitch->y         = stitches[iStitch].y * factor - PESstitchCenterOffset.y;
-		bufferIndex += sizeof(*pesStitch);
-		OutputIndex++;
-	}
+void thred::internal::ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch) {
+	const auto factor  = 3.0f / 5.0f;
+	const auto oldSize = buffer.size();
+	buffer.resize(oldSize + sizeof(PESTCH));
+	auto* pesStitch = convert_ptr<PESTCH*>(&buffer[oldSize]);
+	const auto scaledStitch = fPOINT{-stitch.x * factor + PESstitchCenterOffset.x, stitch.y * factor - PESstitchCenterOffset.y};
+	pesStitch->x    = wrap::round<int16_t>(scaledStitch.x);
+	pesStitch->y    = wrap::round<int16_t>(scaledStitch.y);
+	OutputIndex++;
+}
+
+void thred::internal::ritpesCode(std::vector<uint8_t>& buffer) {
+	constexpr auto blockEndCode = uint16_t{ 0x8003u };
+	const auto oldSize = buffer.size();
+	buffer.resize(oldSize + sizeof(uint16_t));
+	auto* contCode = convert_ptr<uint16_t*>(&buffer[oldSize]);
+	*contCode      = blockEndCode;
+}
+
+void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
+	const auto oldSize = buffer.size();
+	buffer.resize(oldSize + sizeof(PESSTCHLST));
+	auto* blockHeader     = convert_ptr<PESSTCHLST*>(&buffer[oldSize]);
+	*blockHeader = newBlock;
 }
 
 void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
@@ -4392,99 +4407,85 @@ void thred::internal::sav() {
 			pesHeader.xsiz          = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0f / 3.0f));
 			pesHeader.ysiz          = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex             = 0;
-			// ToDo - convert to vector ?
-			auto  pesBuffer       = std::make_unique<uint8_t[]>(wrap::toSize(PCSHeader.stitchCount * 8u));
-			auto  pesStitchBuffer = pesBuffer.get();
-			auto  bufferIndex     = 0u; // Index into the uint8_t array
-			auto* blockHeader     = convert_ptr<PESSTCHLST*>(pesStitchBuffer);
+			auto  pesBuffer = std::vector<uint8_t>{};
+			// make a reasonable guess for the size of data in the buffer. err on the side of caution 
+			const auto bufSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000; 
+			pesBuffer.reserve(bufSize);
 			auto  threadList      = std::vector<PESCOLORLIST> {};
 			auto  blockIndex      = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
 			threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
-			blockHeader->stitchtype  = 1; // first block is a jump in place
-			blockHeader->threadIndex = PESequivColors[stitchColor];
-			blockHeader->stitchcount = 2;
-			bufferIndex += sizeof(*blockHeader);
+			pesBuffer.resize(sizeof(PESSTCHLST));
+			// first block is a jump in place
+			ritpesBlock(pesBuffer, PESSTCHLST{ 1, PESequivColors[stitchColor], 2 });
 			blockIndex++;
-			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
-			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
-			auto* contCode = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-			*contCode      = 0x8003;
-			bufferIndex += sizeof(*contCode);
-			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-			blockHeader->stitchtype  = 0; // then a normal stitch in place
-			blockHeader->threadIndex = PESequivColors[stitchColor];
-			blockHeader->stitchcount = 2;
-			bufferIndex += sizeof(*blockHeader);
+			ritpes(pesBuffer, saveStitches[0]);
+			ritpes(pesBuffer, saveStitches[0]);
+			ritpesCode(pesBuffer);
+			// then a normal stitch in place
+			ritpesBlock(pesBuffer, PESSTCHLST{ 0, PESequivColors[stitchColor], 2 });
 			blockIndex++;
-			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
-			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
-			contCode  = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-			*contCode = 0x8003;
-			bufferIndex += sizeof(*contCode);
-			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-			blockHeader->stitchtype  = 1; // then a jump to the first location
-			blockHeader->threadIndex = PESequivColors[stitchColor];
-			blockHeader->stitchcount = 2;
-			bufferIndex += sizeof(*blockHeader);
+			ritpes(pesBuffer, saveStitches[0]);
+			ritpes(pesBuffer, saveStitches[0]);
+			ritpesCode(pesBuffer);
+			// then a jump to the first location
+			ritpesBlock(pesBuffer, PESSTCHLST{ 1, PESequivColors[stitchColor], 2 });
 			blockIndex++;
-			ritpes(pesStitchBuffer, bufferIndex, 0, saveStitches);
-			ritpes(pesStitchBuffer, bufferIndex, 1, saveStitches);
-			contCode  = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-			*contCode = 0x8003;
-			bufferIndex += sizeof(*contCode);
+			ritpes(pesBuffer, saveStitches[0]);
+			ritpes(pesBuffer, saveStitches[1]);
+			ritpesCode(pesBuffer);
 			// now stitch out.
 			auto pesThreadCount      = 0u;
-			blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-			blockHeader->stitchtype  = 0; // normal stitch
-			blockHeader->threadIndex = PESequivColors[stitchColor];
-			bufferIndex += sizeof(*blockHeader);
+			auto lastIndex = pesBuffer.size();
+			ritpesBlock(pesBuffer, PESSTCHLST{ 0, PESequivColors[stitchColor], 0 });
 			blockIndex++;
 			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
-					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
+					// we are in the same color block, so write the stitch
+					ritpes(pesBuffer, saveStitches[iStitch]);
 				}
 				else {
-					contCode  = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-					*contCode = 0x8003;
-					bufferIndex += sizeof(*contCode);
+					// write stitch
+					ritpesCode(pesBuffer);
+					// close out the previous block
+					auto blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 					blockHeader->stitchcount = OutputIndex;
-					OutputIndex              = 0;
+					// save the thread/color information
 					pesThreadCount++;
 					stitchColor = StitchBuffer[iStitch].attribute & COLMSK;
 					threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
-					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-					blockHeader->stitchtype  = 1; // jump stitch
-					blockHeader->threadIndex = PESequivColors[stitchColor];
-					blockHeader->stitchcount = 2;
-					bufferIndex += sizeof(*blockHeader);
+					// then create the jump block
+					OutputIndex = 0;
+					ritpesBlock(pesBuffer, PESSTCHLST { 1, PESequivColors[stitchColor], 2 });
 					blockIndex++;
-					ritpes(pesStitchBuffer, bufferIndex, iStitch - 1, saveStitches);
-					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
-					contCode  = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
-					*contCode = 0x8003;
-					bufferIndex += sizeof(*contCode);
-					OutputIndex              = 0;
-					blockHeader              = convert_ptr<PESSTCHLST*>(&pesStitchBuffer[bufferIndex]);
-					blockHeader->stitchtype  = 0; // normal stitch
-					blockHeader->threadIndex = PESequivColors[stitchColor];
-					bufferIndex += sizeof(*blockHeader);
+					ritpes(pesBuffer, saveStitches[iStitch - 1]);
+					ritpes(pesBuffer, saveStitches[iStitch]);
+					ritpesCode(pesBuffer);
+					// and finally start the next block
+					OutputIndex = 0;
+					lastIndex   = pesBuffer.size();
+					ritpesBlock(pesBuffer, PESSTCHLST { 0, PESequivColors[stitchColor], 0 });
 					blockIndex++;
-					ritpes(pesStitchBuffer, bufferIndex, iStitch, saveStitches);
+					ritpes(pesBuffer, saveStitches[iStitch]);
 				}
 			}
+			// finalize the last stitch block
+			auto blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 			blockHeader->stitchcount = OutputIndex;
-			auto* colorIndex         = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+			// write the color/thread table
+			lastIndex = pesBuffer.size();
+			pesBuffer.resize(lastIndex + sizeof(uint16_t));
+			auto* colorIndex         = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
 			*colorIndex              = pesThreadCount;
-			bufferIndex += sizeof(*colorIndex);
 			for (auto paletteIndex = 0u; paletteIndex < pesThreadCount; paletteIndex++) {
-				auto* colorEntry = convert_ptr<uint16_t*>(&pesStitchBuffer[bufferIndex]);
+				lastIndex = pesBuffer.size();
+				pesBuffer.resize(lastIndex + 2 * sizeof(uint16_t));
+				auto* colorEntry = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
 				*colorEntry      = threadList[paletteIndex].blockIndex;
 				colorEntry++;
 				*colorEntry = threadList[paletteIndex].colorIndex;
-				bufferIndex += 2 * sizeof(*colorEntry);
 			}
-			pesHeader.off     = bufferIndex + sizeof(pesHeader);
+			pesHeader.off     = pesBuffer.size() + sizeof(pesHeader);
 			pesHeader.blct    = 1;
 			pesHeader.bcnt    = pesThreadCount;
 			pesHeader.hpsz    = 0;
@@ -4492,7 +4493,7 @@ void thred::internal::sav() {
 			GroupEndStitch    = PCSHeader.stitchCount - 1;
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
-			WriteFile(PCSFileHandle, pesStitchBuffer, bufferIndex, &bytesWritten, nullptr);
+			WriteFile(PCSFileHandle, pesBuffer.data(), pesBuffer.size(), &bytesWritten, nullptr);
 			// ToDo - (PES) is there a better estimate for data size?
 			auto  pesChr    = std::make_unique<uint8_t[]>(MAXITEMS * 4);
 			auto  pchr      = pesChr.get();
@@ -6603,10 +6604,12 @@ void thred::internal::unlin() {
 void thred::internal::movbox() {
 	if (stch2px(ClosestPointIndex)) {
 		unbox();
-		OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}]\n",
+		OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
 		                              ClosestPointIndex,
 		                              ((StitchBuffer[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
-		                              ((StitchBuffer[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT))
+		                              ((StitchBuffer[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT),
+		                              StitchBuffer[ClosestPointIndex].x,
+		                              StitchBuffer[ClosestPointIndex].y)
 		                      .c_str());
 		dubox();
 		if (StateMap.test(StateFlag::UPTO)) {
@@ -8658,7 +8661,7 @@ void thred::redclp() {
 
 #if CLPBUG
 		OutputDebugString(
-		    fmt::format("redclp:interator [0] x [{:6.2f}] y [{:6.2f}]\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
+		    fmt::format(L"redclp:interator [0] x [{:6.2f}] y [{:6.2f}]\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
 #endif
 		ClipRect.left = ClipRect.right = clipBuffer[0].x;
 		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
@@ -8671,7 +8674,7 @@ void thred::redclp() {
 #if CLPBUG
 			OutputDebugString(
 			    fmt::format(
-			        "redclp:interator [{}] x [{:6.2f}] y [{:6.2f}]\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y)
+			        L"redclp:interator [{}] x [{:6.2f}] y [{:6.2f}]\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y)
 			        .c_str());
 #endif
 			if (clipBuffer[iStitch].x < ClipRect.left) {
