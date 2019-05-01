@@ -4179,96 +4179,92 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 	*blockHeader = newBlock;
 }
 
+/*
 void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
 	PESstitches[OutputIndex].x   = gsl::narrow_cast<decltype(PESstitches[OutputIndex].x)>(colorIndex);
 	PESstitches[OutputIndex++].y = 0;
 }
+*/
 
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
-void thred::internal::pecnam(uint8_t* pchr) {
-	strncpy(convert_ptr<char*>(pchr), "LA:", 3); // NOLINT
-	const auto lblSize  = sizeof((static_cast<PECHDR*>(nullptr))->label) - 3;
+void thred::internal::pecnam(gsl::span<char> label) {
+	strncpy(&label[0], "LA:", 3); // NOLINT
+	const auto lblSize  = label.size() - 3u;
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
 	}
-	strncpy(convert_ptr<char*>(pchr + 3), fileStem.c_str(), lblSize); // NOLINT
+	strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT
 }
 #pragma warning(pop)
 
-void thred::internal::pecEncodeint32_t(int32_t delta) noexcept {
+void thred::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta) {
 	auto outputVal = gsl::narrow_cast<uint32_t>(abs(delta)) & 0x7FFu;
 	if (delta < 0) {
 		outputVal = delta + 0x1000u & 0x7FFu;
 		outputVal |= 0x800u;
 	}
-	PESdata[OutputIndex] = ((outputVal >> 8u) & 0x0Fu) | 0x80u;
-	OutputIndex++;
-	PESdata[OutputIndex] = outputVal & 0xffu;
-	OutputIndex++;
+	auto upperByte = gsl::narrow_cast<uint8_t>(((outputVal >> 8u) & 0x0Fu) | 0x80u);
+	buffer.push_back(upperByte);
+	auto lowerByte = gsl::narrow_cast<uint8_t>(outputVal & 0xffu);
+	buffer.push_back(lowerByte);
 }
 
-void thred::internal::rpcrd(fPOINT& thisStitch, float srcX, float srcY) {
+void thred::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY) {
 	auto deltaX = wrap::round<int32_t>(srcX * 5.0f / 3.0f);
 	auto deltaY = -wrap::round<int32_t>(srcY * 5.0f / 3.0f);
 	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
-		PESdata[OutputIndex] = (deltaX < 0) ? deltaX - 128 : deltaX;
-		OutputIndex++;
-		PESdata[OutputIndex] = (deltaY < 0) ? deltaY - 128 : deltaY;
-		OutputIndex++;
+		auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7Fu);
+		auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7Fu);
+		buffer.push_back(xVal);
+		buffer.push_back(yVal);
 	}
 	else {
-		pecEncodeint32_t(deltaX);
-		pecEncodeint32_t(deltaY);
+		pecEncodeint32_t(buffer, deltaX);
+		pecEncodeint32_t(buffer, deltaY);
 	}
 	thisStitch.x += deltaX * 0.6f;
 	thisStitch.y += -deltaY * 0.6f;
 }
 
-inline void thred::internal::pecEncodeStop(uint8_t* buffer, uint8_t val) noexcept {
-	if (buffer != nullptr) {
-		buffer[OutputIndex] = 0xfe;
-		OutputIndex++;
-		buffer[OutputIndex] = 0xb0;
-		OutputIndex++;
-		buffer[OutputIndex] = val;
-		OutputIndex++;
-	}
+inline void thred::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
+		buffer.push_back(0xfe);
+		buffer.push_back(0xb0);
+		buffer.push_back(val);
 }
 
-void thred::internal::pecdat(uint8_t* buffer) {
-	OutputIndex     = sizeof(PECHDR) + sizeof(PECHDR2);
-	auto* pecHeader = convert_ptr<PECHDR*>(buffer);
-	PESdata         = buffer;
+void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
+	auto* pecHeader = convert_ptr<PECHDR*>(buffer.data());
+	PESdata         = buffer.data();
 	PEScolors       = &pecHeader->pad[0];
 	auto thisStitch = fPOINT {};
-	rpcrd(thisStitch, StitchBuffer[0].x, StitchBuffer[0].y);
+	rpcrd(buffer, thisStitch, StitchBuffer[0].x, StitchBuffer[0].y);
 	auto iColor  = 1u;
 	auto color   = StitchBuffer[0].attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
 	for (auto iStitch = 0u; iStitch < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1; iStitch++) {
 		if ((StitchBuffer[iStitch + 1].attribute & COLMSK) != color) {
 			color = StitchBuffer[iStitch + 1].attribute & COLMSK;
-			pecEncodeStop(PESdata, (iColor % 2) + 1);
+			pecEncodeStop(buffer, (iColor % 2) + 1);
 			PEScolors[iColor] = PESequivColors[color];
 			iColor++;
 		}
 		const auto xDelta = StitchBuffer[iStitch + 1].x - thisStitch.x;
 		const auto yDelta = StitchBuffer[iStitch + 1].y - thisStitch.y;
-		rpcrd(thisStitch, xDelta, yDelta);
+		rpcrd(buffer, thisStitch, xDelta, yDelta);
 	}
-	PESdata[OutputIndex++] = 0xff;
-	PESdata[OutputIndex++] = 0;
+	buffer.push_back(0xffu);
+	buffer.push_back(0x0u);
 }
 
-void thred::internal::writeThumbnail(uint8_t* pchr, uint8_t const (*image)[ThumbHeight][ThumbWidth]) noexcept {
-	if (pchr != nullptr && image != nullptr) {
+void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]) {
+	if (image != nullptr) {
 		for (auto i = 0u; i < ThumbHeight; i++) {
 			for (auto j = 0u; j < 6; j++) {
 				const auto offset = j * 8;
-				uint8_t    output = 0u;
+				auto output = uint8_t{ 0u };
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset] != 0);
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 1u] != 0u) << 1u;
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 2u] != 0u) << 2u;
@@ -4277,7 +4273,7 @@ void thred::internal::writeThumbnail(uint8_t* pchr, uint8_t const (*image)[Thumb
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 5u] != 0u) << 5u;
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 6u] != 0u) << 6u;
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 7u] != 0u) << 7u;
-				pchr[OutputIndex++] = output;
+				buffer.push_back(output);
 			}
 		}
 	}
@@ -4408,9 +4404,9 @@ void thred::internal::sav() {
 			pesHeader.ysiz          = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex             = 0;
 			auto  pesBuffer = std::vector<uint8_t>{};
-			// make a reasonable guess for the size of data in the buffer. err on the side of caution 
-			const auto bufSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000; 
-			pesBuffer.reserve(bufSize);
+			// make a reasonable guess for the size of data in the PES buffer. err on the side of caution 
+			const auto pesSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000; 
+			pesBuffer.reserve(pesSize);
 			auto  threadList      = std::vector<PESCOLORLIST> {};
 			auto  blockIndex      = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
 			threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
@@ -4494,22 +4490,29 @@ void thred::internal::sav() {
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
 			WriteFile(PCSFileHandle, pesBuffer.data(), pesBuffer.size(), &bytesWritten, nullptr);
-			// ToDo - (PES) is there a better estimate for data size?
-			auto  pesChr    = std::make_unique<uint8_t[]>(MAXITEMS * 4);
-			auto  pchr      = pesChr.get();
-			auto* pecHeader = convert_ptr<PECHDR*>(pchr);
-			pecnam(pchr);
-			auto fstart = &pchr[sizeof(pecHeader->label)];
-			auto fend   = &pchr[sizeof(*pecHeader)];
+			pesBuffer.clear();
+			pesBuffer.shrink_to_fit();
+			auto  pecBuffer = std::vector<uint8_t>{};
+			// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates are 2 bytes 
+			// and pad by 1000 to account for jumps. Also reserve memory for thumbnails
+			const auto pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + PCSHeader.stitchCount * 2 + 1000
+			                     + (pesThreadCount + 1) * ThumbHeight * (ThumbWidth / 8); 
+			pecBuffer.reserve(pecSize);
+			pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
+			auto* pecHeader = convert_ptr<PECHDR*>(&pecBuffer[0]);
+			const auto label = gsl::span<char>(pecHeader->label);
+			pecnam(label);
+			auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
+			auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 			std::fill(fstart, fend, ' ');
 			pecHeader->labnd       = 13; // 13 = carriage return
 			pecHeader->colorCount  = gsl::narrow<uint8_t>(pesThreadCount);
 			pecHeader->thumbHeight = ThumbHeight;
 			pecHeader->thumbWidth  = ThumbWidth / 8;
-			pecdat(pchr);
-			auto* pecHeader2            = convert_ptr<PECHDR2*>(&pchr[sizeof(PECHDR)]);
+			pecdat(pecBuffer);
+			auto* pecHeader2            = convert_ptr<PECHDR2*>(&pecBuffer[sizeof(PECHDR)]);
 			pecHeader2->unknown1        = 0;
-			pecHeader2->thumbnailOffset = OutputIndex - 512;
+			pecHeader2->thumbnailOffset = wrap::toUnsigned(pecBuffer.size() - sizeof(PECHDR));
 			pecHeader2->unknown2        = 0x3100;
 			pecHeader2->unknown3        = 0xf0ff;
 			pecHeader2->width           = pesHeader.xsiz;
@@ -4537,7 +4540,7 @@ void thred::internal::sav() {
 				y               = ThumbHeight - y;
 				thumbnail[y][x] = 1u;
 			}
-			thi::writeThumbnail(pchr, p_thumbnail);
+			thi::writeThumbnail(pecBuffer, p_thumbnail);
 
 			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 			stitchColor = (StitchBuffer[0].attribute & COLMSK);
@@ -4549,14 +4552,14 @@ void thred::internal::sav() {
 					thumbnail[y][x] = 1;
 				}
 				else {
-					thi::writeThumbnail(pchr, p_thumbnail);
+					thi::writeThumbnail(pecBuffer, p_thumbnail);
 					std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 					stitchColor     = (StitchBuffer[iStitch].attribute & COLMSK);
 					thumbnail[y][x] = 1;
 				}
 			}
-			thi::writeThumbnail(pchr, p_thumbnail);
-			WriteFile(PCSFileHandle, pchr, OutputIndex, &bytesWritten, nullptr);
+			thi::writeThumbnail(pecBuffer, p_thumbnail);
+			WriteFile(PCSFileHandle, pecBuffer.data(), pecBuffer.size(), &bytesWritten, nullptr);
 			break;
 		}
 #endif

@@ -509,19 +509,19 @@ namespace internal {
 
 #if PESACT
 	uint32_t dupcol(uint32_t activeColor);
-	void     pecdat(uint8_t* buffer);
-	void     pecEncodeint32_t(int32_t deltaY) noexcept;
-	void     pecEncodeStop(uint8_t* buffer, uint8_t val) noexcept;
+	void     pecdat(std::vector<uint8_t>& buffer);
+	void     pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t deltaY);
+	void     pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
 	uint32_t pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex);
-	void     pecnam(uint8_t* pchr);
-	void     ritpcol(uint8_t colorIndex) noexcept;
+	void     pecnam(gsl::span<char> pchr);
+	//void     ritpcol(uint8_t colorIndex) noexcept;
 	void     ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch);
 	void     ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
 	void     ritpesCode(std::vector<uint8_t>& buffer);
-	void     rpcrd(fPOINT& thisStitch, float srcX, float srcY);
+	void     rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
 	void     setpes();
 	uint32_t tripl(char* dat);
-	void     writeThumbnail(uint8_t* pchr, uint8_t const (*image)[ThumbHeight][ThumbWidth]) noexcept;
+	void     writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]);
 #endif
 
 #ifdef ALLOCFAILURE
