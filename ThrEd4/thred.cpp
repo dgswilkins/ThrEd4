@@ -4179,13 +4179,6 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 	*blockHeader = newBlock;
 }
 
-/*
-void thred::internal::ritpcol(uint8_t colorIndex) noexcept {
-	PESstitches[OutputIndex].x   = gsl::narrow_cast<decltype(PESstitches[OutputIndex].x)>(colorIndex);
-	PESstitches[OutputIndex++].y = 0;
-}
-*/
-
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
@@ -4277,6 +4270,43 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const
 			}
 		}
 	}
+}
+
+void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer)
+{
+	uint8_t thumbnail[ThumbHeight][ThumbWidth] = {};
+	auto  const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
+
+	const auto yFactor = 31.0f / IniFile.hoopSizeY;
+	const auto xFactor = 40.0f / IniFile.hoopSizeX;
+	const auto dest = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
+	// write the overall thumbnail
+	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
+	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		auto x = wrap::floor<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 4;
+		auto y = wrap::floor<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 5;
+		y = ThumbHeight - y;
+		thumbnail[y][x] = 1u;
+	}
+	thi::writeThumbnail(pecBuffer, p_thumbnail);
+	// now write out the individual thread thumbnails
+	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
+	auto stitchColor = (StitchBuffer[0].attribute & COLMSK);
+	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
+		auto y = wrap::round<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 3u;
+		y = ThumbHeight - y;
+		if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
+			thumbnail[y][x] = 1;
+		}
+		else {
+			thi::writeThumbnail(pecBuffer, p_thumbnail);
+			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
+			stitchColor = (StitchBuffer[iStitch].attribute & COLMSK);
+			thumbnail[y][x] = 1;
+		}
+	}
+	thi::writeThumbnail(pecBuffer, p_thumbnail);
 }
 
 #endif
@@ -4527,38 +4557,7 @@ void thred::internal::sav() {
 			pecHeader2->xMin = ((xInt16_le & 0xff00u) >> 8u) | ((xInt16_le & 0x00ffu) << 8u);
 			pecHeader2->yMin = ((yInt16_le & 0xff00u) >> 8u) | ((yInt16_le & 0x00ffu) << 8u);
 
-			uint8_t thumbnail[ThumbHeight][ThumbWidth]           = {};
-			uint8_t const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
-
-			const auto yFactor = 31.0f / IniFile.hoopSizeY;
-			const auto xFactor = 40.0f / IniFile.hoopSizeX;
-			const auto dest    = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
-			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				auto x          = wrap::floor<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 4;
-				auto y          = wrap::floor<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 5;
-				y               = ThumbHeight - y;
-				thumbnail[y][x] = 1u;
-			}
-			thi::writeThumbnail(pecBuffer, p_thumbnail);
-
-			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-			stitchColor = (StitchBuffer[0].attribute & COLMSK);
-			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
-				auto y = wrap::round<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 3u;
-				y      = ThumbHeight - y;
-				if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
-					thumbnail[y][x] = 1;
-				}
-				else {
-					thi::writeThumbnail(pecBuffer, p_thumbnail);
-					std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-					stitchColor     = (StitchBuffer[iStitch].attribute & COLMSK);
-					thumbnail[y][x] = 1;
-				}
-			}
-			thi::writeThumbnail(pecBuffer, p_thumbnail);
+			thi::pecImage(pecBuffer);
 			WriteFile(PCSFileHandle, pecBuffer.data(), pecBuffer.size(), &bytesWritten, nullptr);
 			break;
 		}
@@ -4632,6 +4631,7 @@ void thred::internal::sav() {
 		}
 	}
 }
+
 #pragma warning(pop)
 
 void thred::internal::auxmen() {

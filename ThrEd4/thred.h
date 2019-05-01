@@ -512,9 +512,9 @@ namespace internal {
 	void     pecdat(std::vector<uint8_t>& buffer);
 	void     pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t deltaY);
 	void     pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
-	uint32_t pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex);
+	void     pecImage(std::vector<uint8_t>& pecBuffer);
 	void     pecnam(gsl::span<char> pchr);
-	//void     ritpcol(uint8_t colorIndex) noexcept;
+	uint32_t pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex);
 	void     ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch);
 	void     ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
 	void     ritpesCode(std::vector<uint8_t>& buffer);
