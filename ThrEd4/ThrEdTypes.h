@@ -2642,7 +2642,7 @@ struct _pesstitchlist {
 using PESSTCHLST = struct _pesstitchlist;
 
 struct _pecheader {
-	int8_t   label[19];  // Label string prefixed with "LA:" and padded with space (0x20)                         NOLINT
+	char     label[19];  // Label string prefixed with "LA:" and padded with space (0x20)                         NOLINT
 	int8_t   labnd;      // carriage return character
 	uint8_t  ukn1[11];   // Unknown (' ')                                                                         NOLINT
 	uint8_t  ukn2;       // Unknown
