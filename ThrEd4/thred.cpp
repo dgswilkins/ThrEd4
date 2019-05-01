@@ -192,7 +192,7 @@ HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
 COLORREF        BackgroundColor; // stitch window background
-COLORREF        BoxColor[] = { 0x404040, 0x408040, 0x804040, 0x404080 };
+const COLORREF  BoxColor[] = { 0x404040, 0x408040, 0x804040, 0x404080 };
 int32_t         ThreadWidthPixels[3];                  // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0);               // Map of color numbers in design that are actually displayed
 double          GapToNearest[NERCNT];                  // distances of the closest points
@@ -212,7 +212,7 @@ uint32_t   Knots[MAXKNOTS];                            // pointers to knots
 uint32_t   KnotCount;                                  // number of knots in the design
 uint32_t   KnotAttribute;                              // knot stitch attribute
 fPOINT     KnotStep;                                   // knot stepSize
-char       KnotAtStartOrder[] = { 2, 3, 1, 4, 0 };     // knot spacings
+const char KnotAtStartOrder[] = { 2, 3, 1, 4, 0 };     // knot spacings
 char       KnotAtEndOrder[]   = { -2, -3, -1, -4, 0 }; // reverse knot spacings
 char       KnotAtLastOrder[]  = { 0, -4, -1, -3, -2 }; // reverse knot spacings
 fRECTANGLE ClipRectAdjusted;                           // rectangle for adjust range ends for clipboard fills
@@ -222,8 +222,9 @@ HANDLE     BalaradFile;                                // balarad file handle
 float      AspectRatio = (LHUPX / LHUPY); // aspect ratio of the stitch window
 SCROLLINFO ScrollInfo;                    // scroll bar i/o structure
 
-COLORREF DefaultColors[] = { 0x000000, 0x800000, 0xFF0000, 0x808000, 0xFFFF00, 0x800080, 0xFF00FF, 0x000080,
-	                         0x0000FF, 0x008000, 0x00FF00, 0x008080, 0x00FFFF, 0x808080, 0xC0C0C0, 0xFFFFFF };
+const COLORREF DefaultColors[]
+    = { 0x00000000, 0x00800000, 0x00FF0000, 0x00808000, 0x00FFFF00, 0x00800080, 0x00FF00FF, 0x00000080,
+	    0x000000FF, 0x00008000, 0x0000FF00, 0x00008080, 0x0000FFFF, 0x00808080, 0x00C0C0C0, 0x00FFFFFF };
 
 int32_t BoxOffset[4];
 
@@ -322,19 +323,21 @@ BITMAPV4HEADER   BitmapFileHeaderV4; // bitmap version4 file header
 BITMAPINFO       BitmapInfo;         // bitmap info
 BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 
-COLORREF DefaultUserColors[] = {
-	0x00000000, 0x002dffff, 0x003f87e9, 0x000762f8, 0x000000ff, 0x002f03af, 0x007248b7, 0x00ff0080,
-	0x00920166, 0x00a00000, 0x00ff2424, 0x006a4d15, 0x00f5800a, 0x004b7807, 0x00156a1e, 0x00dbe6e3,
-};
+const COLORREF DefaultUserColors[]
+    = { 0x00000000, 0x002dffff, 0x003f87e9, 0x000762f8, 0x000000ff, 0x002f03af, 0x007248b7, 0x00ff0080,
+	    0x00920166, 0x00a00000, 0x00ff2424, 0x006a4d15, 0x00f5800a, 0x004b7807, 0x00156a1e, 0x00dbe6e3 };
 
-COLORREF DefaultCustomColors[] = { 0x729674, 0x1a1eb9, 0x427347, 0xbfff,   0xd3c25f, 0xc3ced0, 0x4a8459, 0x8cacd0,
-	                               0x81aeb6, 0x7243a5, 0xbdadda, 0x9976c5, 0x96d9f5, 0xe2ddd6, 0x245322, 0x7b60ae };
+const COLORREF DefaultCustomColors[]
+    = { 0x00729674, 0x001a1eb9, 0x00427347, 0x0000bfff, 0x00d3c25f, 0xc003ced0, 0x004a8459, 0x008cacd0,
+	    0x0081aeb6, 0x007243a5, 0x00bdadda, 0x009976c5, 0x0096d9f5, 0x00e2ddd6, 0x00245322, 0x007b60ae };
 
-COLORREF DefaultCustomBackgroundColors[] = { 0xa3c5dc, 0xadc7b6, 0xd1fcfb, 0xdcd7c0, 0xebddcd, 0xc6b3b3, 0xdec9ce, 0xd2d1e9,
-	                                         0xdfdffd, 0xbee6ef, 0x8fb8b1, 0x85c2e0, 0xabc1c9, 0xd3d3c7, 0x7c9c84, 0x9acddc };
+const COLORREF DefaultCustomBackgroundColors[]
+    = { 0x00a3c5dc, 0x00adc7b6, 0x00d1fcfb, 0x00dcd7c0, 0x00ebddcd, 0x00c6b3b3, 0x00dec9ce, 0x00d2d1e9,
+	    0x00dfdffd, 0x00bee6ef, 0x008fb8b1, 0x0085c2e0, 0x00abc1c9, 0x00d3d3c7, 0x007c9c84, 0x009acddc };
 
-COLORREF DefaultBitmapBackgroundColors[] = { 0xc0d5bf, 0xc8dfee, 0x708189, 0xa5a97a, 0xb8d6fe, 0x8a8371, 0x4b6cb8, 0x9cdcc2,
-	                                         0x366d39, 0xdcfcfb, 0x3c4f75, 0x95b086, 0xc9dcba, 0x43377b, 0xb799ae, 0x54667a };
+const COLORREF DefaultBitmapBackgroundColors[]
+    = { 0x00c0d5bf, 0x00c8dfee, 0x00708189, 0x00a5a97a, 0x00b8d6fe, 0x008a8371, 0x004b6cb8, 0x009cdcc2,
+	    0x00366d39, 0x00dcfcfb, 0x003c4f75, 0x0095b086, 0x00c9dcba, 0x0043377b, 0x00b799ae, 0x0054667a };
 
 POINT MoveLine0[2];              // move point line
 POINT MoveLine1[2];              // move point line
@@ -354,16 +357,15 @@ struct _dstdat {
 
 using DSTDAT = struct _dstdat;
 
-constexpr auto XCOR = 0;
-constexpr auto YCOR = 1;
+constexpr auto XCOR = char{ 0 };
+constexpr auto YCOR = char{ 1 };
 
-DSTDAT DSTValues[] = {
-	{ XCOR, 1 }, { XCOR, -1 }, { XCOR, 9 },  { XCOR, -9 },  { YCOR, -9 },  { YCOR, 9 },  { YCOR, -1 }, { YCOR, 1 },
-	{ XCOR, 3 }, { XCOR, -3 }, { XCOR, 27 }, { XCOR, -27 }, { YCOR, -27 }, { YCOR, 27 }, { YCOR, -3 }, { YCOR, 3 },
-	{ XCOR, 0 }, { XCOR, 0 },  { XCOR, 81 }, { XCOR, -81 }, { YCOR, -81 }, { YCOR, 81 },
-};
+const DSTDAT DSTValues[]
+    = { { XCOR, 1 }, { XCOR, -1 }, { XCOR, 9 },  { XCOR, -9 },  { YCOR, -9 },  { YCOR, 9 },  { YCOR, -1 }, { YCOR, 1 },
+	    { XCOR, 3 }, { XCOR, -3 }, { XCOR, 27 }, { XCOR, -27 }, { YCOR, -27 }, { YCOR, 27 }, { YCOR, -3 }, { YCOR, 3 },
+	    { XCOR, 0 }, { XCOR, 0 },  { XCOR, 81 }, { XCOR, -81 }, { YCOR, -81 }, { YCOR, 81 } };
 
-uint32_t Xdst[] = {
+const uint32_t Xdst[] = {
 	0x090a0a, //-121
 	0x090a08, //-120
 	0x090a09, //-119
@@ -606,10 +608,10 @@ uint32_t Xdst[] = {
 	0x050405, // 118
 	0x050506, // 119
 	0x050504, // 120
-	0x050505, // 121
+	0x050505  // 121
 };
 
-uint32_t Ydst[] = {
+const uint32_t Ydst[] = {
 	0x115050, //-121
 	0x115010, //-120
 	0x115090, //-119
@@ -852,11 +854,11 @@ uint32_t Ydst[] = {
 	0x2120a0, // 118
 	0x21a060, // 119
 	0x21a020, // 120
-	0x21a0a0, // 121
+	0x21a0a0  // 121
 };
 
 #if PESACT
-THREAD PESThread[] = {
+const THREAD PESThread[] = {
 	{ { 0x00, 0x00, 0x00 }, "Unknown", "" },                // Index  00
 	{ { 0x1a, 0x0a, 0x94 }, "Prussian Blue", "ETP007" },    // Index 01
 	{ { 0x0f, 0x75, 0xff }, "Blue", "ETP405" },             // Index 02
@@ -925,53 +927,53 @@ THREAD PESThread[] = {
 };
 
 const char imageWithFrame[ThumbHeight][ThumbWidth]
-    = { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-	    { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
-	    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-	    { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-	    { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-	    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-	    { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
-	    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
+= { { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
+{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
+{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } };
 
 #endif
 
-uint32_t FillTypes[] = // fill type array for side window display
+const uint32_t FillTypes[] = // fill type array for side window display
     { 0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF };
-uint32_t EdgeFillTypes[] = // edge fill type array for side window display
-    { 0,        EDGELINE,  EDGEBEAN,   EDGECLIP,   EDGEANGSAT, EDGEAPPL, EDGEPROPSAT,
+const uint32_t EdgeFillTypes[] = // edge fill type array for side window display
+    { 0, EDGELINE,  EDGEBEAN,   EDGECLIP,   EDGEANGSAT, EDGEAPPL, EDGEPROPSAT,
 	  EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX };
-uint32_t FeatherFillTypes[] = // feather fill types
+const uint32_t FeatherFillTypes[] = // feather fill types
     { FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ };
 
 BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
@@ -1434,10 +1436,9 @@ void thred::internal::dudat() {
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 		{
-			auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-			const auto dest = gsl::span<COLORREF>(backupData->colors, sizeColors);
-			std::copy(
-			    &UserColor[0], &UserColor[sizeColors], dest.begin());
+			auto       sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
+			const auto dest       = gsl::span<COLORREF>(backupData->colors, sizeColors);
+			std::copy(&UserColor[0], &UserColor[sizeColors], dest.begin());
 		}
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = TextureIndex;
@@ -2974,7 +2975,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	}
 	else {
 		auto iNextStitch = startStitch + 1;
-		auto prevPoint    = StitchBuffer[startStitch];
+		auto prevPoint   = StitchBuffer[startStitch];
 		for (auto iStitch = iNextStitch; iStitch < endStitch; iStitch++) {
 			if ((StitchBuffer[iNextStitch].attribute & KNOTMSK) != 0u) {
 				prevPoint = StitchBuffer[iNextStitch];
@@ -2990,8 +2991,8 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 				}
 			}
 		}
-		
-		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount;iStitch++) {
+
+		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
 			thred::mvstch(iNextStitch++, iStitch);
 		}
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iNextStitch);
@@ -3731,7 +3732,7 @@ void thred::internal::duver(const fs::path& name) {
 
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
 	if (source != nullptr) {
-		const auto src = gsl::span<const char>{ gsl::narrow_cast<const char*>(source), gsl::narrow<ptrdiff_t>(count) };
+		const auto src = gsl::span<const char> { gsl::narrow_cast<const char*>(source), gsl::narrow<ptrdiff_t>(count) };
 		destination.insert(destination.end(), src.begin(), src.end());
 	}
 }
@@ -3771,11 +3772,11 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	    = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	constexpr auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-	auto vtxLen = sizeof(stitchHeader) + PCSHeader.stitchCount * sizeof(StitchBuffer[0]) + formDataOffset;
+	auto       vtxLen = sizeof(stitchHeader) + PCSHeader.stitchCount * sizeof(StitchBuffer[0]) + formDataOffset;
 	const auto thredDataSize
-		= FormList->size() * sizeof(decltype(FormList->back())) + vertexCount * sizeof(decltype(FormVertices->back()))
-		+ guideCount * sizeof(decltype(SatinGuides->back())) + clipDataCount * sizeof(decltype(ClipPoints->back()))
-		+ TextureIndex * sizeof(decltype(TexturePointsBuffer->back()));
+	    = FormList->size() * sizeof(decltype(FormList->back())) + vertexCount * sizeof(decltype(FormVertices->back()))
+	      + guideCount * sizeof(decltype(SatinGuides->back())) + clipDataCount * sizeof(decltype(ClipPoints->back()))
+	      + TextureIndex * sizeof(decltype(TexturePointsBuffer->back()));
 	buffer.reserve(vtxLen + thredDataSize);
 	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
 	if (vtxLen > USHRT_MAX) {
@@ -4157,16 +4158,17 @@ void thred::internal::ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& sti
 	const auto factor  = 3.0f / 5.0f;
 	const auto oldSize = buffer.size();
 	buffer.resize(oldSize + sizeof(PESTCH));
-	auto* pesStitch = convert_ptr<PESTCH*>(&buffer[oldSize]);
-	const auto scaledStitch = fPOINT{-stitch.x * factor + PESstitchCenterOffset.x, stitch.y * factor - PESstitchCenterOffset.y};
-	pesStitch->x    = wrap::round<int16_t>(scaledStitch.x);
-	pesStitch->y    = wrap::round<int16_t>(scaledStitch.y);
+	auto*      pesStitch = convert_ptr<PESTCH*>(&buffer[oldSize]);
+	const auto scaledStitch
+	    = fPOINT { -stitch.x * factor + PESstitchCenterOffset.x, stitch.y * factor - PESstitchCenterOffset.y };
+	pesStitch->x = wrap::round<int16_t>(scaledStitch.x);
+	pesStitch->y = wrap::round<int16_t>(scaledStitch.y);
 	OutputIndex++;
 }
 
 void thred::internal::ritpesCode(std::vector<uint8_t>& buffer) {
-	constexpr auto blockEndCode = uint16_t{ 0x8003u };
-	const auto oldSize = buffer.size();
+	constexpr auto blockEndCode = uint16_t { 0x8003u };
+	const auto     oldSize      = buffer.size();
 	buffer.resize(oldSize + sizeof(uint16_t));
 	auto* contCode = convert_ptr<uint16_t*>(&buffer[oldSize]);
 	*contCode      = blockEndCode;
@@ -4175,8 +4177,8 @@ void thred::internal::ritpesCode(std::vector<uint8_t>& buffer) {
 void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
 	const auto oldSize = buffer.size();
 	buffer.resize(oldSize + sizeof(PESSTCHLST));
-	auto* blockHeader     = convert_ptr<PESSTCHLST*>(&buffer[oldSize]);
-	*blockHeader = newBlock;
+	auto* blockHeader = convert_ptr<PESSTCHLST*>(&buffer[oldSize]);
+	*blockHeader      = newBlock;
 }
 
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
@@ -4223,9 +4225,9 @@ void thred::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, fl
 }
 
 inline void thred::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
-		buffer.push_back(0xfe);
-		buffer.push_back(0xb0);
-		buffer.push_back(val);
+	buffer.push_back(0xfe);
+	buffer.push_back(0xb0);
+	buffer.push_back(val);
 }
 
 void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
@@ -4257,7 +4259,7 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const
 		for (auto i = 0u; i < ThumbHeight; i++) {
 			for (auto j = 0u; j < 6; j++) {
 				const auto offset = j * 8;
-				auto output = uint8_t{ 0u };
+				auto       output = uint8_t { 0u };
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset] != 0);
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 1u] != 0u) << 1u;
 				output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 2u] != 0u) << 2u;
@@ -4272,20 +4274,19 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const
 	}
 }
 
-void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer)
-{
-	uint8_t thumbnail[ThumbHeight][ThumbWidth] = {};
-	auto  const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
+void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
+	uint8_t thumbnail[ThumbHeight][ThumbWidth]        = {};
+	auto const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
 
 	const auto yFactor = 31.0f / IniFile.hoopSizeY;
 	const auto xFactor = 40.0f / IniFile.hoopSizeX;
-	const auto dest = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
+	const auto dest    = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
 	// write the overall thumbnail
 	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		auto x = wrap::floor<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 4;
-		auto y = wrap::floor<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 5;
-		y = ThumbHeight - y;
+		auto x          = wrap::floor<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 4;
+		auto y          = wrap::floor<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 5;
+		y               = ThumbHeight - y;
 		thumbnail[y][x] = 1u;
 	}
 	thi::writeThumbnail(pecBuffer, p_thumbnail);
@@ -4295,14 +4296,14 @@ void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer)
 	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		auto x = wrap::round<uint16_t>((StitchBuffer[iStitch].x) * xFactor) + 3u;
 		auto y = wrap::round<uint16_t>((StitchBuffer[iStitch].y) * yFactor) + 3u;
-		y = ThumbHeight - y;
+		y      = ThumbHeight - y;
 		if (stitchColor == (StitchBuffer[iStitch].attribute & COLMSK)) {
 			thumbnail[y][x] = 1;
 		}
 		else {
 			thi::writeThumbnail(pecBuffer, p_thumbnail);
 			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-			stitchColor = (StitchBuffer[iStitch].attribute & COLMSK);
+			stitchColor     = (StitchBuffer[iStitch].attribute & COLMSK);
 			thumbnail[y][x] = 1;
 		}
 	}
@@ -4370,29 +4371,31 @@ void thred::internal::sav() {
 				}
 			}
 			dstHeader.desc[16] = 0xd;
-			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed)); // NOLINT
+			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed));                                       // NOLINT
 			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs)); // NOLINT
-			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed)); // NOLINT
-			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co)); // NOLINT
-			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed)); // NOLINT
-			strncpy(dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus)); // NOLINT
-			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed)); // NOLINT
+			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed));                                           // NOLINT
+			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co));                                              // NOLINT
+			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed));                                     // NOLINT
+			strncpy(
+			    dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus));   // NOLINT
+			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed));                                               // NOLINT
 			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffsetData.Positive.x).c_str(), sizeof(dstHeader.xmin)); // NOLINT
-			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed)); // NOLINT
-			strncpy(dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus)); // NOLINT
-			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed)); // NOLINT
+			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed));                                             // NOLINT
+			strncpy(
+			    dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus));   // NOLINT
+			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed));                                               // NOLINT
 			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffsetData.Negative.y).c_str(), sizeof(dstHeader.ymin)); // NOLINT
-			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed)); // NOLINT
-			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax)); // NOLINT
-			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed)); // NOLINT
-			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay)); // NOLINT
-			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed)); // NOLINT
-			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx)); // NOLINT
-			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed)); // NOLINT
-			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my)); // NOLINT
-			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed)); // NOLINT
-			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd)); // NOLINT
-			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof)); // NOLINT
+			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed));                                                   // NOLINT
+			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax));                                                    // NOLINT
+			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed));                                                   // NOLINT
+			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay));                                                    // NOLINT
+			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed));                                                   // NOLINT
+			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx));                                                    // NOLINT
+			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed));                                                   // NOLINT
+			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my));                                                    // NOLINT
+			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));                                                    // NOLINT
+			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));                                                    // NOLINT
+			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));                                                      // NOLINT
 			std::fill_n(&dstHeader.res[0], sizeof(dstHeader.res), ' ');
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
@@ -4433,36 +4436,36 @@ void thred::internal::sav() {
 			pesHeader.xsiz          = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0f / 3.0f));
 			pesHeader.ysiz          = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex             = 0;
-			auto  pesBuffer = std::vector<uint8_t>{};
-			// make a reasonable guess for the size of data in the PES buffer. err on the side of caution 
-			const auto pesSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000; 
+			auto pesBuffer          = std::vector<uint8_t> {};
+			// make a reasonable guess for the size of data in the PES buffer. err on the side of caution
+			const auto pesSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000;
 			pesBuffer.reserve(pesSize);
-			auto  threadList      = std::vector<PESCOLORLIST> {};
-			auto  blockIndex      = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
+			auto threadList = std::vector<PESCOLORLIST> {};
+			auto blockIndex = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
 			threadList.push_back(PESCOLORLIST { blockIndex, PESequivColors[stitchColor] });
 			pesBuffer.resize(sizeof(PESSTCHLST));
 			// first block is a jump in place
-			ritpesBlock(pesBuffer, PESSTCHLST{ 1, PESequivColors[stitchColor], 2 });
+			ritpesBlock(pesBuffer, PESSTCHLST { 1, PESequivColors[stitchColor], 2 });
 			blockIndex++;
 			ritpes(pesBuffer, saveStitches[0]);
 			ritpes(pesBuffer, saveStitches[0]);
 			ritpesCode(pesBuffer);
 			// then a normal stitch in place
-			ritpesBlock(pesBuffer, PESSTCHLST{ 0, PESequivColors[stitchColor], 2 });
+			ritpesBlock(pesBuffer, PESSTCHLST { 0, PESequivColors[stitchColor], 2 });
 			blockIndex++;
 			ritpes(pesBuffer, saveStitches[0]);
 			ritpes(pesBuffer, saveStitches[0]);
 			ritpesCode(pesBuffer);
 			// then a jump to the first location
-			ritpesBlock(pesBuffer, PESSTCHLST{ 1, PESequivColors[stitchColor], 2 });
+			ritpesBlock(pesBuffer, PESSTCHLST { 1, PESequivColors[stitchColor], 2 });
 			blockIndex++;
 			ritpes(pesBuffer, saveStitches[0]);
 			ritpes(pesBuffer, saveStitches[1]);
 			ritpesCode(pesBuffer);
 			// now stitch out.
-			auto pesThreadCount      = 0u;
-			auto lastIndex = pesBuffer.size();
-			ritpesBlock(pesBuffer, PESSTCHLST{ 0, PESequivColors[stitchColor], 0 });
+			auto pesThreadCount = 0u;
+			auto lastIndex      = pesBuffer.size();
+			ritpesBlock(pesBuffer, PESSTCHLST { 0, PESequivColors[stitchColor], 0 });
 			blockIndex++;
 			OutputIndex = 0;
 			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -4501,8 +4504,8 @@ void thred::internal::sav() {
 			// write the color/thread table
 			lastIndex = pesBuffer.size();
 			pesBuffer.resize(lastIndex + sizeof(uint16_t));
-			auto* colorIndex         = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
-			*colorIndex              = pesThreadCount;
+			auto* colorIndex = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
+			*colorIndex      = pesThreadCount;
 			for (auto paletteIndex = 0u; paletteIndex < pesThreadCount; paletteIndex++) {
 				lastIndex = pesBuffer.size();
 				pesBuffer.resize(lastIndex + 2 * sizeof(uint16_t));
@@ -4522,15 +4525,15 @@ void thred::internal::sav() {
 			WriteFile(PCSFileHandle, pesBuffer.data(), pesBuffer.size(), &bytesWritten, nullptr);
 			pesBuffer.clear();
 			pesBuffer.shrink_to_fit();
-			auto  pecBuffer = std::vector<uint8_t>{};
-			// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates are 2 bytes 
+			auto pecBuffer = std::vector<uint8_t> {};
+			// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates are 2 bytes
 			// and pad by 1000 to account for jumps. Also reserve memory for thumbnails
 			const auto pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + PCSHeader.stitchCount * 2 + 1000
-			                     + (pesThreadCount + 1) * ThumbHeight * (ThumbWidth / 8); 
+			                     + (pesThreadCount + 1) * ThumbHeight * (ThumbWidth / 8);
 			pecBuffer.reserve(pecSize);
 			pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
-			auto* pecHeader = convert_ptr<PECHDR*>(&pecBuffer[0]);
-			const auto label = gsl::span<char>(pecHeader->label);
+			auto*      pecHeader = convert_ptr<PECHDR*>(&pecBuffer[0]);
+			const auto label     = gsl::span<char>(pecHeader->label);
 			pecnam(label);
 			auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 			auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
@@ -7634,7 +7637,7 @@ void thred::internal::duclip() {
 							if (texture::istx(selectedForm)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
 								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
-								const auto dest       = gsl::span<TXPNT>(&textures[textureCount], SelectedForm->fillInfo.texture.count);
+								const auto dest = gsl::span<TXPNT>(&textures[textureCount], SelectedForm->fillInfo.texture.count);
 								std::copy(startPoint, endPoint, dest.begin());
 								forms[iForm++].fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 								textureCount += SelectedForm->fillInfo.texture.count;
@@ -7730,7 +7733,7 @@ void thred::internal::duclip() {
 							if (texture::istx(ClosestFormToCursor)) {
 								auto startPoint = std::next(TexturePointsBuffer->cbegin(), SelectedForm->fillInfo.texture.index);
 								auto endPoint   = std::next(startPoint, SelectedForm->fillInfo.texture.count);
-								const auto dest       = gsl::span<TXPNT>(textures, SelectedForm->fillInfo.texture.count);
+								const auto dest = gsl::span<TXPNT>(textures, SelectedForm->fillInfo.texture.count);
 								std::copy(startPoint, endPoint, dest.begin());
 							}
 							SetClipboardData(ThrEdClip, ThrEdClipPointer);
