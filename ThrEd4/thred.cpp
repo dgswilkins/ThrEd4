@@ -3901,7 +3901,7 @@ void thred::internal::thrsav() {
 		auto output = std::vector<char> {};
 		dubuf(output);
 		auto bytesWritten = DWORD { 0 };
-		WriteFile(FileHandle, output.data(), output.size(), &bytesWritten, nullptr);
+		WriteFile(FileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
 		if (bytesWritten != output.size()) {
 			auto fmtStr = std::wstring {};
 			displayText::loadString(fmtStr, IDS_FWERR);
@@ -4186,7 +4186,7 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(gsl::span<char> label) {
 	strncpy(&label[0], "LA:", 3); // NOLINT
-	const auto lblSize  = label.size() - 3u;
+	const auto  lblSize  = wrap::toUnsigned(label.size() - 3u);
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
@@ -4514,7 +4514,7 @@ void thred::internal::sav() {
 				colorEntry++;
 				*colorEntry = threadList[paletteIndex].colorIndex;
 			}
-			pesHeader.off     = pesBuffer.size() + sizeof(pesHeader);
+			pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
 			pesHeader.blct    = 1;
 			pesHeader.bcnt    = pesThreadCount;
 			pesHeader.hpsz    = 0;
@@ -4522,13 +4522,13 @@ void thred::internal::sav() {
 			GroupEndStitch    = PCSHeader.stitchCount - 1;
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
-			WriteFile(PCSFileHandle, pesBuffer.data(), pesBuffer.size(), &bytesWritten, nullptr);
+			WriteFile(PCSFileHandle, pesBuffer.data(), wrap::toUnsigned(pesBuffer.size()), &bytesWritten, nullptr);
 			pesBuffer.clear();
 			pesBuffer.shrink_to_fit();
 			auto pecBuffer = std::vector<uint8_t> {};
 			// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates are 2 bytes
 			// and pad by 1000 to account for jumps. Also reserve memory for thumbnails
-			const auto pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + PCSHeader.stitchCount * 2 + 1000
+			const auto pecSize = gsl::narrow_cast<uint32_t>(sizeof(PECHDR)) + gsl::narrow_cast<uint32_t>(sizeof(PECHDR2)) + PCSHeader.stitchCount * 2 + 1000
 			                     + (pesThreadCount + 1) * ThumbHeight * (ThumbWidth / 8);
 			pecBuffer.reserve(pecSize);
 			pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
@@ -4561,7 +4561,7 @@ void thred::internal::sav() {
 			pecHeader2->yMin = ((yInt16_le & 0xff00u) >> 8u) | ((yInt16_le & 0x00ffu) << 8u);
 
 			thi::pecImage(pecBuffer);
-			WriteFile(PCSFileHandle, pecBuffer.data(), pecBuffer.size(), &bytesWritten, nullptr);
+			WriteFile(PCSFileHandle, pecBuffer.data(), wrap::toUnsigned(pecBuffer.size()), &bytesWritten, nullptr);
 			break;
 		}
 #endif
