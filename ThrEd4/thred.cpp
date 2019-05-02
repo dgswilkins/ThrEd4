@@ -19475,10 +19475,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_InterleaveSequence        = std::vector<fPOINT> {};
 		auto private_InterleaveSequenceIndices = std::vector<INSREC> {};
 		auto private_LabelWindow               = std::vector<HWND> {};
-#pragma warning(push)
-#pragma warning(disable : 26492) // supress warning for casting away the const
-		auto formOnOff = const_cast<LPTSTR>(private_FormOnOff.data());
-#pragma warning(pop)
+		auto formOnOff                         = private_FormOnOff.data();
 
 		auto private_MenuInfo = MENUITEMINFO {
 			sizeof(MENUITEMINFO), // Size
