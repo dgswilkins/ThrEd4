@@ -838,7 +838,7 @@ void form::internal::setzig() {
 }
 
 void form::setmfrm() {
-	auto  point     = POINT {};
+	auto  point     = POINT {0l,0l};
 	auto& closeForm = (*FormList)[ClosestFormToCursor];
 	auto  vertexIt  = std::next(FormVertices->cbegin(), closeForm.vertexIndex);
 	form::sfCor2px(vertexIt[0], point);
@@ -5190,7 +5190,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	thred::duzrat();
-	auto rectangle = RECT {};
+	auto rectangle = RECT {0l,0l,0l,0l};
 	form::sRct2px(SelectedForm->rectangle, rectangle);
 	auto& formControls = *FormControlPoints;
 	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
@@ -5228,7 +5228,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 		}
 	}
 	if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top && point.y <= rectangle.bottom) {
-		auto formOrigin = POINT {};
+		auto formOrigin = POINT {0l,0l};
 		auto vertexIt   = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		form::sfCor2px(vertexIt[0], formOrigin);
 		FormMoveDelta = fPOINT { formOrigin.x - point.x, formOrigin.y - point.y };
@@ -5888,7 +5888,7 @@ void form::internal::getbig() noexcept {
 
 void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	auto stitchCoord = fPOINT { stitchRect.left, stitchRect.top };
-	auto screenCoord = POINT {};
+	auto screenCoord = POINT {0l,0l};
 
 	thred::sCor2px(stitchCoord, screenCoord);
 	screenRect.left = screenCoord.x;

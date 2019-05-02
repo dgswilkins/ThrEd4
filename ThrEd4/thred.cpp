@@ -1123,7 +1123,7 @@ void thred::duzrat() noexcept {
 }
 
 uint32_t thred::internal::rsed() noexcept {
-	auto time = SYSTEMTIME {};
+	auto time = SYSTEMTIME {0u,0u,0u,0u,0u,0u,0u,0u};
 
 	GetLocalTime(&time);
 	return (time.wSecond << 16u) | time.wMilliseconds; // NOLINT
@@ -1470,7 +1470,7 @@ void thred::savdo() {
 }
 
 void thred::internal::redfils() {
-	auto findData = WIN32_FIND_DATA {};
+	auto findData = WIN32_FIND_DATA{ 0,{0,0},{0,0},{0,0},0,0,0,0,L"",L"" };
 
 	for (const auto iLRU : LRUMenuId) {
 		if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != -1) {
@@ -3465,7 +3465,7 @@ void thred::internal::ritini() {
 	IniFile.buttonholeCornerLength = ButtonholeCornerLength;
 	IniFile.picotSpace             = PicotSpacing;
 	if (!UserFlagMap.test(UserFlag::SAVMAX)) {
-		auto windowRect = RECT {};
+		auto windowRect = RECT {0l,0l,0l,0l};
 		GetWindowRect(ThrEdWindow, &windowRect);
 		IniFile.initialWindowCoords.left   = windowRect.left;
 		IniFile.initialWindowCoords.right  = windowRect.right;
@@ -3868,7 +3868,7 @@ void thred::internal::thrsav() {
 		return;
 	}
 	if (!StateMap.testAndReset(StateFlag::IGNAM)) {
-		auto fileData = WIN32_FIND_DATA {};
+		auto fileData = WIN32_FIND_DATA { 0,{0,0},{0,0},{0,0},0,0,0,0,L"",L""};
 		auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 		if (file != INVALID_HANDLE_VALUE) { // NOLINT
 			StateMap.reset(StateFlag::CMPDO);
@@ -4017,7 +4017,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		}
 		const auto stepSize
 		    = POINT { gsl::narrow<int32_t>(absoluteLengths.x / count + 1), gsl::narrow<int32_t>(absoluteLengths.y / count + 1) };
-		auto difference = POINT {};
+		auto difference = POINT {0l,0l};
 		while ((lengths.x != 0) || (lengths.y != 0)) {
 			auto dstType = REGTYP;
 			if (abs(lengths.x) > stepSize.x) {
@@ -4348,10 +4348,10 @@ void thred::internal::sav() {
 		auto DSTRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
 		DSTRecords.reserve(wrap::toSize(PCSHeader.stitchCount) + 128u);
-		auto DSTOffsetData   = DSTOffsets {};
-		auto PCSStitchBuffer = std::vector<PCSTCH> {};
-		auto auxName         = utf::Utf16ToUtf8(*AuxName);
-		auto desc            = strrchr(auxName.data(), '\\') + 1;
+		auto       DSTOffsetData   = DSTOffsets {};
+		auto       PCSStitchBuffer = std::vector<PCSTCH> {};
+		auto       auxName         = utf::Utf16ToUtf8(*AuxName);
+		const auto* desc            = strrchr(auxName.data(), '\\') + 1;
 		switch (IniFile.auxFileType) {
 		case AUXDST: {
 			auto dstHeader = DSTHED {};
@@ -4816,8 +4816,8 @@ void thred::internal::dusid(uint32_t entry) noexcept {
 
 void thred::internal::sidmsg(HWND window, std::wstring* const strings, uint32_t entries) {
 	if (strings != nullptr) {
-		auto childListRect  = RECT {};
-		auto parentListRect = RECT {};
+		auto childListRect  = RECT {0l,0l,0l,0l};
+		auto parentListRect = RECT {0l,0l,0l,0l};
 		auto entryCount     = entries;
 
 		std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
@@ -5007,8 +5007,8 @@ void thred::internal::stchWnd() {
 // check if a click occurred in A vertical set of 16 windows
 // and calculate which window had the click
 bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
-	auto topRect    = RECT {};
-	auto bottomRect = RECT {};
+	auto topRect    = RECT {0l,0l,0l,0l};
+	auto bottomRect = RECT {0l,0l,0l,0l};
 
 	GetWindowRect(topWindow, &topRect);
 	GetWindowRect(bottomWindow, &bottomRect);
@@ -5479,7 +5479,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 			}
 		}
 		else {
-			auto dstStitch = POINT {};
+			auto dstStitch = POINT {0l,0l};
 			dstin(thi::dtrn(&record), dstStitch);
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
@@ -7339,7 +7339,7 @@ void thred::internal::rotstch(fPOINTATTR* stitch, const float rotationAngle, con
 }
 
 void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) {
-	auto rotated           = POINT {};
+	auto rotated           = POINT {0l,0l};
 	auto rotationReference = fPOINT { (RotationRect.left), (RotationRect.top) };
 
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
@@ -8716,7 +8716,7 @@ constexpr uint32_t thred::internal::nxtcrnr(uint32_t corner) {
 }
 
 void thred::internal::drwmrk(HDC dc) {
-	auto       markCoordinates = POINT {};
+	auto       markCoordinates = POINT {0l,0l};
 	POINT      markLine[2]     = {};
 	const auto markOffset      = gsl::narrow<int32_t>(MulDiv(6, *screenDPI, 96));
 
@@ -9251,7 +9251,7 @@ void thred::internal::deldir() {
 }
 
 bool thred::internal::chkwnd(HWND window) noexcept {
-	auto windowRect = RECT {};
+	auto windowRect = RECT {0l,0l,0l,0l};
 
 	GetWindowRect(window, &windowRect);
 	return Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
@@ -10212,7 +10212,7 @@ void thred::internal::rthumnam(uint32_t iThumbnail) {
 }
 
 void thred::internal::thumnail() {
-	auto fileData = WIN32_FIND_DATA {};
+	auto fileData = WIN32_FIND_DATA { 0,{0,0},{0,0},{0,0},0,0,0,0,L"",L""};
 
 	thred::unbsho();
 	thred::undat();
@@ -10544,8 +10544,8 @@ void thred::internal::desiz() {
 }
 
 void thred::internal::sidhup() {
-	auto hoopRectangle        = RECT {};
-	auto preferencesRectangle = RECT {};
+	auto hoopRectangle        = RECT {0l,0l,0l,0l};
+	auto preferencesRectangle = RECT {0l,0l,0l,0l};
 
 	StateMap.set(StateFlag::HUPMSG);
 	GetWindowRect((*ValueWindow)[PHUP], &hoopRectangle);
@@ -10939,9 +10939,9 @@ constexpr uint32_t thred::internal::byteSwap(uint32_t data) noexcept {
 void thred::internal::ritcur() noexcept {
 	auto currentCursor = GetCursor();
 	if (currentCursor != nullptr) {
-		auto iconInfo = ICONINFO {};
+		auto iconInfo = ICONINFO {FALSE, 0u,0u,nullptr,nullptr};
 		GetIconInfo(currentCursor, &iconInfo);
-		auto cursorPosition = POINT {};
+		auto cursorPosition = POINT {0l,0l};
 		GetCursorPos(&cursorPosition);
 		cursorPosition.x -= (StitchWindowOrigin.x + iconInfo.xHotspot);
 		cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
@@ -11473,7 +11473,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
-	auto pixel = POINT {};
+	auto pixel = POINT {0l,0l};
 	if (deltaX != 0.0f) {
 		if (deltaX > 0) {
 			pixel.x = IniFile.nudgePixels;
@@ -11770,7 +11770,7 @@ void thred::internal::selfrmx() {
 }
 
 void thred::internal::setpclp() {
-	auto point = POINT {};
+	auto point = POINT {0l,0l};
 	FormVerticesAsLine->clear();
 	auto it = InterleaveSequence->begin();
 	form::sfCor2px(*it, point);
@@ -12634,7 +12634,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 bool thred::internal::handleEitherButtonDown(bool& retflag) {
 	retflag = true;
 	if (FormDataSheet != nullptr) {
-		auto formDataRect = RECT {};
+		auto formDataRect = RECT {0l,0l,0l,0l};
 		GetWindowRect(FormDataSheet, &formDataRect);
 	}
 	if (StateMap.testAndReset(StateFlag::THUMON)) {
@@ -13907,7 +13907,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			code = 1;
 		}
 		else {
-			auto windowRect = RECT {};
+			auto windowRect = RECT {0l,0l,0l,0l};
 			GetWindowRect(DeleteStitchesDialog, &windowRect);
 			if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
 			    && Msg.pt.y <= windowRect.bottom) {
@@ -14107,7 +14107,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			}
 			return true;
 		}
-		auto windowRect = RECT {};
+		auto windowRect = RECT {0l,0l,0l,0l};
 		GetWindowRect(CancelButton, &windowRect);
 		if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
 		    && Msg.pt.y <= windowRect.bottom) {
@@ -14123,7 +14123,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			code = 1;
 		}
 		else {
-			auto windowRect = RECT {};
+			auto windowRect = RECT {0l,0l,0l,0l};
 			GetWindowRect(DeleteStitchesDialog, &windowRect);
 			if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
 			    && Msg.pt.y <= windowRect.bottom) {
@@ -14180,7 +14180,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		return true;
 	}
 	if (StateMap.testAndReset(StateFlag::FORMIN)) {
-		auto windowRect = RECT {};
+		auto windowRect = RECT {0l,0l,0l,0l};
 		GetWindowRect(MsgWindow, &windowRect);
 		if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top
 		    && Msg.pt.y <= windowRect.bottom) {
@@ -17915,9 +17915,9 @@ void thred::internal::init() {
 	TextureIndex = 0;
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT
 	MainMenu   = GetMenu(ThrEdWindow);
-	auto wRect = RECT {};
+	auto wRect = RECT {0l,0l,0l,0l};
 	GetWindowRect(ThrEdWindow, &wRect);
-	auto mRect = RECT {};
+	auto mRect = RECT {0l,0l,0l,0l};
 	GetMenuItemRect(ThrEdWindow, MainMenu, 0, &mRect);
 	wRect.left  = mRect.left;
 	wRect.right = mRect.right;
@@ -18168,7 +18168,7 @@ void thred::internal::dumov() {
 	                    StitchBuffer[MoveAnchor + 1].x - StitchBuffer[MoveAnchor].x);
 	if (anchorStitch.x >= ZoomRect.left && anchorStitch.x <= ZoomRect.right && anchorStitch.y >= ZoomRect.bottom
 	    && anchorStitch.y <= ZoomRect.top) {
-		auto  rotationCenterPixels = POINT {};
+		auto  rotationCenterPixels = POINT {0l,0l};
 		POINT rotationOutline[8]   = {};
 		sdCor2px(StitchBuffer[MoveAnchor], rotationCenterPixels);
 		rotationOutline[0]    = rotationCenterPixels;
@@ -18260,7 +18260,7 @@ void thred::internal::drwknot() {
 		const auto kOffset = gsl::narrow<int32_t>(MulDiv(KnotBoxSize, *screenDPI, 96));
 		const auto kLine   = gsl::narrow<int32_t>(MulDiv(KnotLineSize, *screenDPI, 96));
 
-		auto  point   = POINT {};
+		auto  point   = POINT {0l,0l};
 		POINT tlin[5] = {};
 
 		for (auto ind = 0u; ind < KnotCount; ind++) {
@@ -18975,7 +18975,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 			}
 			else {
-				auto scrollPoint = POINT {}; // for scroll bar functions
+				auto scrollPoint = POINT {0l,0l}; // for scroll bar functions
 				scrollPoint.x    = wrap::round<int32_t>((ZoomRect.right - ZoomRect.left) * LINSCROL);
 				if (scrollPoint.x == 0) {
 					scrollPoint.x = 1;
@@ -18994,7 +18994,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 			}
 			else {
-				auto scrollPoint = POINT {}; // for scroll bar functions
+				auto scrollPoint = POINT {0l,0l}; // for scroll bar functions
 				scrollPoint.x    = wrap::round<int32_t>(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
 				if (scrollPoint.x == 0) {
 					scrollPoint.x = -1;
@@ -19064,7 +19064,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 	case WM_VSCROLL: {
 		switch (LOWORD(wParam)) { // NOLINT
 		case SB_LINEDOWN: {
-			auto scrollPoint = POINT {};
+			auto scrollPoint = POINT {0l,0l};
 			scrollPoint.y    = wrap::round<int32_t>((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 			if (scrollPoint.y == 0) {
 				scrollPoint.y = 1;
@@ -19073,7 +19073,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			return 1;
 		}
 		case SB_LINEUP: {
-			auto scrollPoint = POINT {};
+			auto scrollPoint = POINT {0l,0l};
 			scrollPoint.y    = wrap::round<int32_t>(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 			if (scrollPoint.y == 0) {
 				scrollPoint.y = -1;
@@ -19210,7 +19210,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 					SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 					SetTextColor(DrawItem->hDC, defTxt(iColor));
 					auto colorNum = std::wstring(fmt::format(L"{}", iColor + 1));
-					auto textSize = SIZE {};
+					auto textSize = SIZE {0l,0l};
 					wrap::GetTextExtentPoint32(DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 					wrap::TextOut(
 					    DrawItem->hDC, (ButtonWidth - textSize.cx) / 2, 0, colorNum.c_str(), wrap::toUnsigned(colorNum.size()));
@@ -19416,7 +19416,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	ThrEdInstance = hInstance;
 
-	auto wc        = WNDCLASSEX {};
+	auto wc        = WNDCLASSEX { 0u, 0u, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	wc.cbSize      = sizeof(WNDCLASSEX);
 	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC; // NOLINT
 	wc.lpfnWndProc = thi::WndProc;

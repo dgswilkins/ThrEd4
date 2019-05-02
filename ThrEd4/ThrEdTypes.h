@@ -936,15 +936,16 @@ constexpr uint32_t HLIN = HNUM;
 #pragma pack(1)
 
 // pcs file header structure
-struct _pcsheader {
-	int8_t   leadIn;
-	int8_t   hoopType;
-	uint16_t colorCount;
-	COLORREF colors[COLOR_COUNT]; // NOLINT
-	uint16_t stitchCount;
-};
+class PCSHEADER {
+public:
+	int8_t   leadIn{ 0 };
+	int8_t   hoopType{ 0 };
+	uint16_t colorCount{ 0 };
+	COLORREF colors[COLOR_COUNT]{ 0 }; // NOLINT
+	uint16_t stitchCount{ 0 };
 
-using PCSHEADER = struct _pcsheader;
+	constexpr PCSHEADER()  noexcept = default;
+};
 
 // ini file structure
 struct _iniFil {
@@ -1349,10 +1350,10 @@ constexpr uint32_t FRMBFIL  = 0x40000000u;
 constexpr uint32_t FRMAPFIL = 0x60000000u;
 
 struct _floatRectangle {
-	float left;
-	float top;
-	float right;
-	float bottom;
+	float left {0.0f};
+	float top {0.0f};
+	float right {0.0f};
+	float bottom {0.0f};
 };
 
 using fRECTANGLE = struct _floatRectangle;
@@ -2271,79 +2272,81 @@ struct _fvclip {
 using FORMVERTEXCLIP = struct _fvclip; // form points clipboard header
 
 struct _strhed { // thred file header
-	uint32_t headerType;
-	uint32_t fileLength;    // length of strhed + length of stitch data
-	uint16_t stitchCount;   // number of stitches
-	uint16_t hoopType;      // size of hoop
-	uint16_t formCount;     // number of forms
-	uint16_t vertexLen;     // points to form points
-	uint16_t vertexCount;   // number of form points
-	uint16_t dlineLen;      // points to dline data
-	uint16_t dlineCount;    // dline data count
-	uint16_t clipDataLen;   // points to clipboard data
-	uint16_t clipDataCount; // clipboard data count
+	uint32_t headerType {0u};
+	uint32_t fileLength {0u};    // length of strhed + length of stitch data
+	uint16_t stitchCount {0u};   // number of stitches
+	uint16_t hoopType {0u};      // size of hoop
+	uint16_t formCount {0u};     // number of forms
+	uint16_t vertexLen {0u};     // points to form points
+	uint16_t vertexCount {0u};   // number of form points
+	uint16_t dlineLen {0u};      // points to dline data
+	uint16_t dlineCount {0u};    // dline data count
+	uint16_t clipDataLen {0u};   // points to clipboard data
+	uint16_t clipDataCount {0u}; // clipboard data count
 };
 
 using STRHED = _strhed;
 
 struct _txpnt { // textured fill point
-	float    y;
-	uint16_t line;
+	float    y {0.0f};
+	uint16_t line {0u};
 };
 
 using TXPNT = struct _txpnt;
 
 struct _txoff { // textured fill offset
-	float   y;
-	int32_t line;
+	float   y {0.0f};
+	int32_t line { 0 };
 };
 
 using TXOFF = struct _txoff;
 
-struct _strex {                      // thred v1.0 file header extension
-	float    hoopSizeX;              // hoop size x dimension
-	float    hoopSizeY;              // hoop size y dimension
-	float    stgran;                 // stitches per millimeter
-	char     creatorName[NAME_LEN];  // name of the file creator NOLINT(modernize-avoid-c-arrays)
-	char     modifierName[NAME_LEN]; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
-	int8_t   auxFormat;              // auxillary file format
-	int8_t   stres;                  // reserved
-	uint32_t texturePointCount;      // textured fill point32_t count
-	int8_t   res[RES_SIZE];          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
+class STREX {                      // thred v1.0 file header extension
+public:
+	float    hoopSizeX { 0.0f };           // hoop size x dimension
+	float    hoopSizeY { 0.0f };           // hoop size y dimension
+	float    stgran { 0.0f };              // stitches per millimeter
+	char     creatorName[NAME_LEN] { 0 };  // name of the file creator NOLINT(modernize-avoid-c-arrays)
+	char     modifierName[NAME_LEN] { 0 }; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
+	int8_t   auxFormat { 0 };              // auxillary file format
+	int8_t   stres { 0 };                  // reserved
+	uint32_t texturePointCount { 0 };      // textured fill point32_t count
+	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
+
+	constexpr STREX() noexcept = default;
 };
 
-using STREX = struct _strex;
+class DSTHED {      // dst file header
+public:
+	char desched[3] { 0 };  // 00  00	description   NOLINT
+	char desc[17] { 0 };    // 03  03                 NOLINT
+	char recshed[3] { 0 };  // 20  14	record count  NOLINT
+	char recs[8] { 0 };     // 23  17                 NOLINT
+	char cohed[3] { 0 };    // 31  1F                 NOLINT
+	char co[4] { 0 };       // 34  22                 NOLINT
+	char xplushed[3] { 0 }; // 38  26	x+ size       NOLINT
+	char xplus[6] { 0 };    // 41  29                 NOLINT
+	char xminhed[3] { 0 };  // 47  2F	x- size       NOLINT
+	char xmin[6] { 0 };     // 50  32                 NOLINT
+	char yplushed[3] { 0 }; // 56  38                 NOLINT
+	char yplus[6] { 0 };    // 59  3B	y+ size       NOLINT
+	char yminhed[3] { 0 };  // 65  41                 NOLINT
+	char ymin[6] { 0 };     // 68  44	y- size       NOLINT
+	char axhed[3] { 0 };    // 74  4A                 NOLINT
+	char ax[7] { 0 };       // 77  4D                 NOLINT
+	char ayhed[3] { 0 };    // 84  54                 NOLINT
+	char ay[7] { 0 };       // 87  57                 NOLINT
+	char mxhed[3] { 0 };    // 94  5E                 NOLINT
+	char mx[7] { 0 };       // 97  61                 NOLINT
+	char myhed[3] { 0 };    // 104 68                 NOLINT
+	char my[7] { 0 };       // 107 6B                 NOLINT
+	char pdhed[2] { 0 };    // 114 72                 NOLINT
+	char pd[7] { 0 };       // 116 74                 NOLINT
+	char eof[1] { 0 };      // 123 7B                 NOLINT
+	char res[388] { 0 };    // 124 7C                 NOLINT
 
-struct _dsthed {      // dst file header
-	char desched[3];  // 0 0		description NOLINT
-	char desc[17];    // 3 3                    NOLINT
-	char recshed[3];  // 20 14	record count    NOLINT
-	char recs[8];     // 23 17                  NOLINT
-	char cohed[3];    // 31 1F                  NOLINT
-	char co[4];       // 34 22                  NOLINT
-	char xplushed[3]; // 38 26	x+ size         NOLINT
-	char xplus[6];    // 41 29                  NOLINT
-	char xminhed[3];  // 47 2F	x- size         NOLINT
-	char xmin[6];     // 50 32                  NOLINT
-	char yplushed[3]; // 56 38                  NOLINT
-	char yplus[6];    // 59 3B	y+ size         NOLINT
-	char yminhed[3];  // 65 41                  NOLINT
-	char ymin[6];     // 68 44	y- size         NOLINT
-	char axhed[3];    // 74 4A                  NOLINT
-	char ax[7];       // 77 4D                  NOLINT
-	char ayhed[3];    // 84 54                  NOLINT
-	char ay[7];       // 87 57                  NOLINT
-	char mxhed[3];    // 94 5E                  NOLINT
-	char mx[7];       // 97 61                  NOLINT
-	char myhed[3];    // 104 68                 NOLINT
-	char my[7];       // 107 6B                 NOLINT
-	char pdhed[2];    // 114 72                 NOLINT
-	char pd[7];       // 116 74                 NOLINT
-	char eof[1];      // 123 7B                 NOLINT
-	char res[388];    // 124 7C                 NOLINT
+	constexpr DSTHED() noexcept = default;
 };
-
-using DSTHED = struct _dsthed;
 
 // dst type masks
 
@@ -2360,8 +2363,8 @@ struct _dstrec { // dst stitch record
 using DSTREC = struct _dstrec;
 
 struct _dstoffsets {
-	POINT Positive; // plus offset written into the destination file header
-	POINT Negative; // minus offset written into the destination file header
+	POINT Positive { 0, 0 }; // plus offset written into the destination file header
+	POINT Negative { 0, 0 }; // minus offset written into the destination file header
 };
 
 using DSTOffsets = struct _dstoffsets;
@@ -2426,8 +2429,8 @@ struct _frmrange {
 using FRMRANGE = struct _frmrange;
 
 struct _range {
-	uint32_t start;
-	uint32_t finish;
+	uint32_t start {0u};
+	uint32_t finish {0u};
 };
 
 using RANGE = struct _range;
@@ -2515,17 +2518,18 @@ struct _cursorMask {
 using CURSORMASK = struct _cursorMask;
 
 // balarad file header
-struct _balhed {
-	COLORREF color[256]; // NOLINT
-	uint32_t signature;
-	uint16_t version;
-	float    hoopSizeX;
-	float    hoopSizeY;
-	COLORREF backgroundColor;
-	uint8_t  res[1006]; // NOLINT
-};
+class BALHED {
+public:
+	COLORREF color[256] { 0 }; // NOLINT
+	uint32_t signature { 0u };
+	uint16_t version { 0u };
+	float    hoopSizeX { 0.0f };
+	float    hoopSizeY { 0.0f };
+	COLORREF backgroundColor { 0 };
+	uint8_t  res[1006] { 0 }; // NOLINT
 
-using BALHED = struct _balhed;
+	constexpr BALHED() noexcept = default;
+};
 
 // balarad stitch
 struct _balstch {
@@ -2587,44 +2591,45 @@ struct _pesled {
 
 using PESLED = struct _pesled;
 
-struct _peshed {
-	char     led[8];  //   0-7  Identification and version (#PES0001)         NOLINT
-	uint32_t off;     //   8-b  Absolute PEC section byte offset
-	uint16_t hpsz;    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-	uint16_t usdn;    //   e,f  Use existing design area (1)
-	uint16_t blct;    // 10,11  CSewSeg segment block count (1)
-	char     hnd1[4]; // 12-15  header end (FF FF 00 00)                      NOLINT
-	uint16_t celn;    // 16,17  Length of following string (7)
-	char     ce[7];   // 18-1e  CEmbOne identification (CEmbOne)              NOLINT
-	int16_t  xlft;    // 1f,20  Extent left
-	int16_t  xtop;    // 21,22  Extent top
-	int16_t  xrht;    // 23,24  Extent right
-	int16_t  xbot;    // 25,26  Extent bottom
-	int16_t  plft;    // 27,28  Extent left position
-	int16_t  ptop;    // 29,2a  Extent top position
-	int16_t  prht;    // 2b,2c  Extent right position
-	int16_t  pbot;    // 2d,2e  Extent bottom position
-	float    atfm1;   // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
-	float    atfm2;   // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
-	float    atfm3;   // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
-	float    atfm4;   // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
-	float    atfm5;   // 3f-42  Affine transform Left_Pos
-	float    atfm6;   // 43-46  Affine transform Bottom_Pos
-	uint16_t ukn1;    // 47,48  unknown (1)
-	int16_t  xtrn;    // 49,4a  CSewSeg x coordinate translation (0)
-	int16_t  ytrn;    // 4b,4c  CSewSeg y coordinate translation (0)
-	int16_t  xsiz;    // 4d,4e  CSewSeg width
-	int16_t  ysiz;    // 4f,50  CSewSeg height
-	int8_t   ukn2[8]; // 51,58  unknown (0)                                   NOLINT
-	uint16_t bcnt;    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-	int8_t   hnd2[4]; // 5b-5e  header end (FF FF 00 00)                      NOLINT
-	uint16_t cslen;   // 5f,60  CSewSeg length (7)
-	char     cs[7];   // 61-67  CSewSeg identification (CSewSeg)              NOLINT
-	                  // uint16_t styp1;   // 68,69  Stitch type (0)
-	                  // uint16_t scol;    // 6a,6b  Stitch Palette thread index
-};
+class PESHED {
+public:
+	char     led[8] { 0 };  //   0-7  Identification and version (#PES0001)         NOLINT
+	uint32_t off { 0 };     //   8-b  Absolute PEC section byte offset
+	uint16_t hpsz { 0 };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+	uint16_t usdn { 0 };    //   e,f  Use existing design area (1)
+	uint16_t blct { 0 };    // 10,11  CSewSeg segment block count (1)
+	char     hnd1[4] { 0 }; // 12-15  header end (FF FF 00 00)                      NOLINT
+	uint16_t celn { 0 };    // 16,17  Length of following string (7)
+	char     ce[7] { 0 };   // 18-1e  CEmbOne identification (CEmbOne)              NOLINT
+	int16_t  xlft { 0 };    // 1f,20  Extent left
+	int16_t  xtop { 0 };    // 21,22  Extent top
+	int16_t  xrht { 0 };    // 23,24  Extent right
+	int16_t  xbot { 0 };    // 25,26  Extent bottom
+	int16_t  plft { 0 };    // 27,28  Extent left position
+	int16_t  ptop { 0 };    // 29,2a  Extent top position
+	int16_t  prht { 0 };    // 2b,2c  Extent right position
+	int16_t  pbot { 0 };    // 2d,2e  Extent bottom position
+	float    atfm1 { 0 };   // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
+	float    atfm2 { 0 };   // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
+	float    atfm3 { 0 };   // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
+	float    atfm4 { 0 };   // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
+	float    atfm5 { 0 };   // 3f-42  Affine transform Left_Pos
+	float    atfm6 { 0 };   // 43-46  Affine transform Bottom_Pos
+	uint16_t ukn1 { 0 };    // 47,48  unknown (1)
+	int16_t  xtrn { 0 };    // 49,4a  CSewSeg x coordinate translation (0)
+	int16_t  ytrn { 0 };    // 4b,4c  CSewSeg y coordinate translation (0)
+	int16_t  xsiz { 0 };    // 4d,4e  CSewSeg width
+	int16_t  ysiz { 0 };    // 4f,50  CSewSeg height
+	int8_t   ukn2[8] { 0 }; // 51,58  unknown (0)                                   NOLINT
+	uint16_t bcnt { 0 };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+	int8_t   hnd2[4] { 0 }; // 5b-5e  header end (FF FF 00 00)                      NOLINT
+	uint16_t cslen { 0 };   // 5f,60  CSewSeg length (7)
+	char     cs[7] { 0 };   // 61-67  CSewSeg identification (CSewSeg)              NOLINT
+	                        // uint16_t styp1;   // 68,69  Stitch type (0)
+	                        // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
-using PESHED = struct _peshed;
+	constexpr PESHED() noexcept = default;
+};
 
 struct _pestch {
 	int16_t x;
@@ -2715,24 +2720,24 @@ struct _orec {
 using OREC = struct _orec;
 
 struct _srtrec {
-	uint32_t start;         // start region index
-	uint32_t finish;        // finish region index
-	uint32_t count;         // number of regions in range
-	uint32_t currentRegion; // current region index
-	bool     direction;     // direction of sort
+	uint32_t start         {0u};    // start region index
+	uint32_t finish        {0u};    // finish region index
+	uint32_t count         {0u};    // number of regions in range
+	uint32_t currentRegion {0u};    // current region index
+	bool     direction     = false; // direction of sort
 };
 
 using SRTREC = struct _srtrec;
 
 struct _fstrts {
-	uint32_t applique;
-	uint32_t fill;
-	uint32_t feather;
-	uint32_t border;
-	uint32_t appliqueColor;
-	uint32_t fillColor;
-	uint32_t featherColor;
-	uint32_t borderColor;
+	uint32_t applique { 0 };
+	uint32_t fill { 0 };
+	uint32_t feather { 0 };
+	uint32_t border { 0 };
+	uint32_t appliqueColor { 0 };
+	uint32_t fillColor { 0 };
+	uint32_t featherColor { 0 };
+	uint32_t borderColor { 0 };
 };
 
 using FSTRTS = struct _fstrts;
@@ -2774,12 +2779,12 @@ enum interleaveTypes
 };
 
 struct _intinf {
-	uint32_t    pins;
-	uint32_t    coloc;
-	uint32_t    layerIndex;
-	uint32_t    start;
-	uint32_t    output;
-	fPOINTATTR* highStitchBuffer;
+	uint32_t    pins {0u};
+	uint32_t    coloc {0u};
+	uint32_t    layerIndex {0u};
+	uint32_t    start {0u};
+	uint32_t    output {0u};
+	fPOINTATTR* highStitchBuffer = nullptr;
 };
 
 using INTINF = struct _intinf;
@@ -2847,18 +2852,18 @@ constexpr uint32_t BADSAT = 4;
 constexpr uint32_t BADTX  = 8;
 
 struct _badcnts {
-	uint32_t attribute;
-	uint32_t flt;
-	uint32_t clip;
-	uint32_t guideCount; // ToDo - is this an accurate description?
-	uint32_t tx;
+	uint32_t attribute {0u};
+	uint32_t flt {0u};
+	uint32_t clip {0u};
+	uint32_t guideCount {0u}; // ToDo - is this an accurate description?
+	uint32_t tx {0u};
 };
 
 using BADCNTS = struct _badcnts;
 
 struct _findInfo {
-	uint32_t         count;
-	WIN32_FIND_DATA* data;
+	uint32_t         count { 0 };
+	WIN32_FIND_DATA* data { nullptr };
 };
 
 using FINDINFO = struct _findInfo;

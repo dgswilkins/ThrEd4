@@ -160,18 +160,20 @@ bool trace::internal::trcin(COLORREF color) {
 }
 
 void trace::internal::getrmap() {
-	auto info   = BITMAPINFO {};
-	auto header = BITMAPINFOHEADER {};
-
-	header.biSize        = sizeof(header);
-	header.biWidth       = BitmapWidth;
-	header.biHeight      = BitmapHeight;
-	header.biPlanes      = 1;
-	header.biBitCount    = 32;
-	header.biCompression = BI_RGB;
-	info.bmiHeader       = header;
-	TraceBitmap          = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
-	TraceDC              = CreateCompatibleDC(StitchWindowDC);
+	auto header = BITMAPINFOHEADER { gsl::narrow<DWORD>(sizeof(BITMAPINFOHEADER)),
+		                             gsl::narrow_cast<long>(BitmapWidth),
+		                             gsl::narrow_cast<long>(BitmapHeight),
+		                             1u,
+		                             32u,
+		                             BI_RGB,
+		                             0u,
+		                             0l,
+		                             0l,
+		                             0u,
+		                             0u };
+	auto info   = BITMAPINFO { header, RGBQUAD { 0, 0, 0, 0 } };
+	TraceBitmap = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
+	TraceDC     = CreateCompatibleDC(StitchWindowDC);
 	if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
 		SelectObject(TraceDC, TraceBitmap);
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
@@ -652,7 +654,7 @@ void trace::internal::dutrac() {
 		const auto savedPoint     = CurrentTracePoint.y * BitmapWidth + CurrentTracePoint.x;
 		auto       traceDirection = 0u;
 		if (!TracedEdges->test(savedPoint)) {
-			auto findRectangle = RECT {};
+			auto findRectangle = RECT {0l,0l,0l,0l};
 			auto point         = savedPoint;
 			auto limit         = (CurrentTracePoint.y + 1) * BitmapWidth;
 			while (point < limit && !TracedEdges->test(point)) {
@@ -1264,9 +1266,9 @@ void trace::internal::dublk(HDC dc, const RECT& traceHighMask, const RECT& trace
 }
 
 void trace::wasTrace() {
-	auto       traceHighMaskRect   = RECT {};             // high trace mask rectangle
-	auto       traceMiddleMaskRect = RECT {};             // middle trace mask rectangle
-	auto       traceLowMaskRect    = RECT {};             // low trace mask rectangle
+	auto       traceHighMaskRect   = RECT {0l,0l,0l,0l};             // high trace mask rectangle
+	auto       traceMiddleMaskRect = RECT {0l,0l,0l,0l};             // middle trace mask rectangle
+	auto       traceLowMaskRect    = RECT {0l,0l,0l,0l};             // low trace mask rectangle
 	const auto BlackBrush          = CreateSolidBrush(0); // black brush
 
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {

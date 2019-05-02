@@ -464,8 +464,8 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 }
 
 int32_t xt::internal::fil2crd(const fs::path& fileName) {
-	auto    startupInfo = STARTUPINFO {};
-	auto    processInfo = PROCESS_INFORMATION {};
+	auto    startupInfo = STARTUPINFO {0u,nullptr,nullptr,nullptr,0u,0u,0u,0u,0u,0u,0u,0u,0u,0u,nullptr,nullptr,nullptr,nullptr};
+	auto    processInfo = PROCESS_INFORMATION {nullptr,nullptr,0u,0u};
 	auto    errorCode   = 0;
 	wchar_t command[_MAX_PATH * 2 + 1 + 4];
 
@@ -1253,7 +1253,7 @@ void xt::fsort() {
 			sortRecord.count  = sortRecord.finish - sortRecord.start;
 			auto minimumJumps = 0xffffffffu;
 			// timeout used to put an upper bound on the number of sorting permutations checked
-			auto fileTime = FILETIME {};
+			auto fileTime = FILETIME {0u,0u};
 			GetSystemTimeAsFileTime(&fileTime);
 			const auto startTime        = xi::tim2int(fileTime);
 			auto       minimumIndex     = 0u;
