@@ -59,7 +59,7 @@
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 extern uint32_t   ActiveColor;
 extern uint32_t   ActiveLayer;

@@ -27,7 +27,7 @@
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 uint32_t   ActiveColor = 0; // active color selector
 uint32_t   ActiveLayer = 0; // active layer

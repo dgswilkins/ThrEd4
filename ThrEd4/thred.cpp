@@ -49,7 +49,7 @@
 #include "xt.h"
 #include "thred.h"
 
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 namespace thi = thred::internal;
 
@@ -3713,7 +3713,7 @@ bool thred::internal::chkattr(const fs::path& filename) {
 		                                (*StringTable)[STR_OVRIT].c_str(),
 		                                MB_YESNO);
 		if (buttonPressed == IDYES) {
-			fs::permissions(filename, fs::perms::add_perms | writeBits);
+			fs::permissions(filename, writeBits, fs::perm_options::add);
 		}
 		else {
 			return true;
