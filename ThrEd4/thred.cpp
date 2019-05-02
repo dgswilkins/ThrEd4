@@ -5974,10 +5974,16 @@ void thred::internal::nuFil() {
 					}
 #if PESACT
 					else {
-						// ToDo - (PES) is there a better estimate for data size?
-						auto fileBuf    = std::make_unique<uint8_t[]>(MAXITEMS * 8);
-						auto fileBuffer = fileBuf.get();
-						ReadFile(FileHandle, fileBuffer, MAXITEMS * 8, &BytesRead, nullptr);
+						auto ec = std::error_code {};
+						const auto size = fs::file_size(*WorkingFileName, ec);
+						if (ec != std::error_code{}) {
+							// ToDo - find better error message
+							displayText::filnopn(IDS_FNOPN, *WorkingFileName);
+							return;
+						}
+						auto fileBuf    = std::vector<uint8_t>(size);
+						auto fileBuffer = fileBuf.data();
+						ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
 						auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
 						if (strncmp(pesHeader->led, "#PES00", 6) != 0) {
 							auto fmtStr = std::wstring {};
