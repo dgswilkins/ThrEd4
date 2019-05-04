@@ -7388,7 +7388,7 @@ void thred::internal::rot(fPOINT& rotationCenter) {
 			break;
 		}
 		if (StateMap.test(StateFlag::BIGBOX)) {
-			RotationRect = AllItemsRect;
+			RotationRect = *AllItemsRect;
 			break;
 		}
 		if (!SelectedFormList->empty()) {
@@ -11423,11 +11423,11 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 			StitchBuffer[iStitch].x += deltaX;
 			StitchBuffer[iStitch].y += deltaY;
 		}
-		AllItemsRect.bottom += deltaY;
-		AllItemsRect.top += deltaY;
-		AllItemsRect.left += deltaX;
-		AllItemsRect.right += deltaX;
-		form::stchrct2px(AllItemsRect, SelectedFormsRect);
+		AllItemsRect->bottom += deltaY;
+		AllItemsRect->top += deltaY;
+		AllItemsRect->left += deltaX;
+		AllItemsRect->right += deltaX;
+		form::stchrct2px(*AllItemsRect, SelectedFormsRect);
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
@@ -19447,6 +19447,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
+		auto private_AllItemRect               = fRECTANGLE {};
 		auto private_AngledFormVertices        = std::vector<fPOINT> {};
 		auto private_AuxName                   = fs::path {};
 		auto private_BSequence                 = std::vector<BSEQPNT> {};
@@ -19536,6 +19537,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_UndoBuffer.resize(16);
 		private_ValueWindow.resize(LASTLIN);
 
+		AllItemsRect              = &private_AllItemRect;
 		AngledFormVertices        = &private_AngledFormVertices;
 		AuxName                   = &private_AuxName;
 		BSequence                 = &private_BSequence;

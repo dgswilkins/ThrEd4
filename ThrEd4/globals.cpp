@@ -29,9 +29,9 @@
 
 namespace fs = std::filesystem;
 
-uint32_t   ActiveColor = 0; // active color selector
-uint32_t   ActiveLayer = 0; // active layer
-fRECTANGLE AllItemsRect;    // rectangle enclosing all forms and stitches
+uint32_t    ActiveColor = 0; // active color selector
+uint32_t    ActiveLayer = 0; // active layer
+fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
