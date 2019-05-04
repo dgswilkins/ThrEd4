@@ -126,7 +126,7 @@ namespace internal {
 	uint32_t closlin();
 	void     clpadj();
 	void     clpbox();
-	void     clpradj(fPOINTATTR stitch) noexcept;
+	void     clpradj(fRECTANGLE& clipRectAdjusted, const fPOINTATTR& stitch) noexcept;
 	bool     cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept;
 	void     colchk() noexcept;
 	DWORD    coldis(COLORREF colorA, COLORREF colorB);

@@ -119,7 +119,6 @@ HWND          FirstWin;           // first window not destroyed for exiting enum
 FRMRANGE      SelectedFormsRange; // range of selected forms
 uint32_t      TmpFormIndex;       // saved form index
 float         ZoomMin;            // minimum allowed zoom value
-fRECTANGLE    CheckHoopRect;      // for checking the hoop size
 fPOINT        BalaradOffset;      // balarad offset
 uint32_t      SideWindowLocation; // side message window location
 POINT         SideWindowSize;     // size of the side message window
@@ -215,7 +214,6 @@ fPOINT     KnotStep;                                   // knot stepSize
 const char KnotAtStartOrder[] = { 2, 3, 1, 4, 0 };     // knot spacings
 char       KnotAtEndOrder[]   = { -2, -3, -1, -4, 0 }; // reverse knot spacings
 char       KnotAtLastOrder[]  = { 0, -4, -1, -3, -2 }; // reverse knot spacings
-fRECTANGLE ClipRectAdjusted;                           // rectangle for adjust range ends for clipboard fills
 HANDLE     BalaradFile;                                // balarad file handle
 
 // graphics variables
@@ -1941,38 +1939,39 @@ void thred::zumhom() {
 }
 
 void thred::internal::hupfn() {
+	auto    checkHoopRect = fRECTANGLE{};      // for checking the hoop size
 	StateMap.reset(StateFlag::HUPCHNG);
-	sizstch(CheckHoopRect, StitchBuffer);
+	sizstch(checkHoopRect, StitchBuffer);
 	if (!FormList->empty()) {
 		if (PCSHeader.stitchCount == 0u) {
 			auto vertexIt        = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			CheckHoopRect.top    = vertexIt[0].y;
-			CheckHoopRect.bottom = vertexIt[0].y;
-			CheckHoopRect.right  = vertexIt[0].x;
-			CheckHoopRect.left   = vertexIt[0].x;
+			checkHoopRect.top    = vertexIt[0].y;
+			checkHoopRect.bottom = vertexIt[0].y;
+			checkHoopRect.right  = vertexIt[0].x;
+			checkHoopRect.left   = vertexIt[0].x;
 		}
 		for (auto& FormVertice : *FormVertices) {
-			if (FormVertice.x < CheckHoopRect.left) {
-				CheckHoopRect.left = FormVertice.x;
+			if (FormVertice.x < checkHoopRect.left) {
+				checkHoopRect.left = FormVertice.x;
 			}
-			if (FormVertice.x > CheckHoopRect.right) {
-				CheckHoopRect.right = FormVertice.x;
+			if (FormVertice.x > checkHoopRect.right) {
+				checkHoopRect.right = FormVertice.x;
 			}
-			if (FormVertice.y < CheckHoopRect.bottom) {
-				CheckHoopRect.bottom = FormVertice.y;
+			if (FormVertice.y < checkHoopRect.bottom) {
+				checkHoopRect.bottom = FormVertice.y;
 			}
-			if (FormVertice.y > CheckHoopRect.top) {
-				CheckHoopRect.top = FormVertice.y;
+			if (FormVertice.y > checkHoopRect.top) {
+				checkHoopRect.top = FormVertice.y;
 			}
 		}
 	}
 	if ((PCSHeader.stitchCount != 0u) || !FormVertices->empty() || StateMap.test(StateFlag::HUPEX)) {
-		if (CheckHoopRect.left < 0 || CheckHoopRect.right > IniFile.hoopSizeX || CheckHoopRect.bottom < 0
-		    || CheckHoopRect.top > IniFile.hoopSizeY) {
+		if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX || checkHoopRect.bottom < 0
+		    || checkHoopRect.top > IniFile.hoopSizeY) {
 			StateMap.set(StateFlag::HUPEX);
 		}
 		if (StateMap.test(StateFlag::HUPEX)) {
-			const auto hoopSize = fPOINT { CheckHoopRect.right - CheckHoopRect.left, CheckHoopRect.top - CheckHoopRect.bottom };
+			const auto hoopSize = fPOINT { checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom };
 			if (hoopSize.x > IniFile.hoopSizeX) {
 				IniFile.hoopSizeX = hoopSize.x;
 				StateMap.set(StateFlag::HUPCHNG);
@@ -1981,7 +1980,7 @@ void thred::internal::hupfn() {
 				IniFile.hoopSizeY = hoopSize.y;
 				StateMap.set(StateFlag::HUPCHNG);
 			}
-			const auto designCenter = fPOINT { hoopSize.x / 2.0f + CheckHoopRect.left, hoopSize.y / 2.0f + CheckHoopRect.bottom };
+			const auto designCenter = fPOINT { hoopSize.x / 2.0f + checkHoopRect.left, hoopSize.y / 2.0f + checkHoopRect.bottom };
 			const auto hoopCenter   = fPOINT { IniFile.hoopSizeX / 2.0f, IniFile.hoopSizeY / 2.0f };
 			const auto delta        = fPOINT { hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y };
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -10617,18 +10616,18 @@ void thred::internal::fop() {
 	}
 }
 
-void thred::internal::clpradj(fPOINTATTR stitch) noexcept {
-	if (stitch.x < ClipRectAdjusted.left) {
-		ClipRectAdjusted.left = stitch.x;
+void thred::internal::clpradj(fRECTANGLE& clipRectAdjusted, const fPOINTATTR& stitch) noexcept {
+	if (stitch.x < clipRectAdjusted.left) {
+		clipRectAdjusted.left = stitch.x;
 	}
-	if (stitch.x > ClipRectAdjusted.right) {
-		ClipRectAdjusted.right = stitch.x;
+	if (stitch.x > clipRectAdjusted.right) {
+		clipRectAdjusted.right = stitch.x;
 	}
-	if (stitch.y < ClipRectAdjusted.bottom) {
-		ClipRectAdjusted.bottom = stitch.y;
+	if (stitch.y < clipRectAdjusted.bottom) {
+		clipRectAdjusted.bottom = stitch.y;
 	}
-	if (stitch.y > ClipRectAdjusted.top) {
-		ClipRectAdjusted.top = stitch.y;
+	if (stitch.y > clipRectAdjusted.top) {
+		clipRectAdjusted.top = stitch.y;
 	}
 }
 
@@ -10636,28 +10635,29 @@ void thred::internal::clpadj() {
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		auto iStitch          = GroupStartStitch;
-		ClipRectAdjusted.left = ClipRect.right = StitchBuffer[iStitch++].x;
-		ClipRectAdjusted.top = ClipRectAdjusted.bottom = StitchBuffer[iStitch].y;
-		clpradj(StitchBuffer[iStitch]);
+		auto clipRectAdjusted = fRECTANGLE {
+			StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y, StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y
+		}; 
+		iStitch++;
 		while (iStitch < GroupEndStitch) {
-			clpradj(StitchBuffer[iStitch++]);
+			clpradj(clipRectAdjusted, StitchBuffer[iStitch++]);
 		}
-		if (StitchBuffer[iStitch].x < ClipRectAdjusted.left) {
-			ClipRectAdjusted.left = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x < clipRectAdjusted.left) {
+			clipRectAdjusted.left = StitchBuffer[iStitch].x;
 		}
-		if (StitchBuffer[iStitch].x > ClipRectAdjusted.right) {
-			ClipRectAdjusted.right = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x > clipRectAdjusted.right) {
+			clipRectAdjusted.right = StitchBuffer[iStitch].x;
 		}
-		const auto clipMiddle            = form::midl(ClipRectAdjusted.right, ClipRectAdjusted.left);
+		const auto clipMiddle            = form::midl(clipRectAdjusted.right, clipRectAdjusted.left);
 		StitchBuffer[GroupStartStitch].y = StitchBuffer[GroupEndStitch].y
-		    = form::midl(ClipRectAdjusted.top, ClipRectAdjusted.bottom);
+		    = form::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
 		if (StitchBuffer[GroupStartStitch].x < clipMiddle) {
-			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.left;
-			StitchBuffer[GroupEndStitch].x   = ClipRectAdjusted.right;
+			StitchBuffer[GroupStartStitch].x = clipRectAdjusted.left;
+			StitchBuffer[GroupEndStitch].x   = clipRectAdjusted.right;
 		}
 		else {
-			StitchBuffer[GroupEndStitch].x   = ClipRectAdjusted.left;
-			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.right;
+			StitchBuffer[GroupEndStitch].x   = clipRectAdjusted.left;
+			StitchBuffer[GroupStartStitch].x = clipRectAdjusted.right;
 		}
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
