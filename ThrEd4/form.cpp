@@ -934,11 +934,11 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 void form::flipv() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		const auto midpoint      = form::midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
+		const auto offset      = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			vertexIt[currentVertex].y = midpoint + midpoint - vertexIt[currentVertex].y;
+			vertexIt[currentVertex].y = offset - vertexIt[currentVertex].y;
 			currentVertex             = pdir(currentVertex);
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -6729,11 +6729,11 @@ void form::fliph() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		const auto midpoint      = form::midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
+		const auto offset      = SelectedVerticesRect.right + SelectedVerticesRect.left;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			vertexIt[currentVertex].x = midpoint + midpoint - vertexIt[currentVertex].x;
+			vertexIt[currentVertex].x = offset - vertexIt[currentVertex].x;
 			currentVertex             = form::pdir(currentVertex);
 		}
 		StateMap.set(StateFlag::RESTCH);
