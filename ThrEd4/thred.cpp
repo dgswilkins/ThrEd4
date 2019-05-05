@@ -7074,8 +7074,7 @@ void thred::internal::clpbox() {
 }
 
 void thred::internal::lodclp(uint32_t iStitch) {
-	const auto adjustment = fPOINT { (ClipOrigin.x - ClipRect.left), (ClipOrigin.y - ClipRect.bottom) };
-	auto       source     = PCSHeader.stitchCount;
+	auto source = PCSHeader.stitchCount;
 	if (PCSHeader.stitchCount != 0u) {
 		source--;
 	}
@@ -7098,7 +7097,7 @@ void thred::internal::lodclp(uint32_t iStitch) {
 	}
 	ClosestPointIndex = iStitch;
 	for (auto& clip : *ClipBuffer) {
-		StitchBuffer[iStitch++] = { clip.x + adjustment.x, clip.y + adjustment.y, clip.attribute & COLMSK | LayerIndex | NOTFRM };
+		StitchBuffer[iStitch++] = { clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, clip.attribute & COLMSK | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1;
 	StateMap.set(StateFlag::GRPSEL);

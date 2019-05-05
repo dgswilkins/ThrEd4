@@ -103,7 +103,6 @@ extern void*     ClipPointer;
 
 extern std::vector<fPOINT>* ClipPoints;
 
-extern fRECTANGLE ClipRect;
 extern FLSIZ      ClipRectSize;
 extern CLPSTCH*   ClipStitchData;
 extern uint32_t   ClipTypeMap;

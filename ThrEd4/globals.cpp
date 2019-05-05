@@ -71,7 +71,6 @@ void*     ClipPointer;    // for memory allocation for clipboard data
 
 std::vector<fPOINT>* ClipPoints; // main clipboard fill points for forms
 
-fRECTANGLE ClipRect;       // clipboard rectangle
 FLSIZ      ClipRectSize;   // clipboard rectangle size
 CLPSTCH*   ClipStitchData; // for pcs clipboard data
 
