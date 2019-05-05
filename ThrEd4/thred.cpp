@@ -8655,6 +8655,7 @@ void thred::internal::movi() {
 }
 
 void thred::redclp() {
+	auto clipRect = fRECTANGLE{};
 	const auto codedLayer = ActiveLayer << LAYSHFT;
 
 	ClipPointer = GlobalLock(ClipMemory);
@@ -8674,8 +8675,8 @@ void thred::redclp() {
 		OutputDebugString(
 		    fmt::format(L"redclp:interator [0] x [{:6.2f}] y [{:6.2f}]\n", ClipBuffer[0].x, ClipBuffer[0].y).c_str());
 #endif
-		ClipRect.left = ClipRect.right = clipBuffer[0].x;
-		ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
+		clipRect.left = clipRect.right = clipBuffer[0].x;
+		clipRect.bottom = clipRect.top = clipBuffer[0].y;
 		for (auto iStitch = 1u; iStitch < clipSize; iStitch++) {
 			clipBuffer.emplace_back(
 			    gsl::narrow_cast<float>(ClipStitchData[iStitch].x) + gsl::narrow_cast<float>(ClipStitchData[iStitch].fx) / 256.0f,
@@ -8688,30 +8689,30 @@ void thred::redclp() {
 			        L"redclp:interator [{}] x [{:6.2f}] y [{:6.2f}]\n", iStitch, ClipBuffer[iStitch].x, ClipBuffer[iStitch].y)
 			        .c_str());
 #endif
-			if (clipBuffer[iStitch].x < ClipRect.left) {
-				ClipRect.left = clipBuffer[iStitch].x;
+			if (clipBuffer[iStitch].x < clipRect.left) {
+				clipRect.left = clipBuffer[iStitch].x;
 			}
-			if (clipBuffer[iStitch].x > ClipRect.right) {
-				ClipRect.right = clipBuffer[iStitch].x;
+			if (clipBuffer[iStitch].x > clipRect.right) {
+				clipRect.right = clipBuffer[iStitch].x;
 			}
-			if (clipBuffer[iStitch].y < ClipRect.bottom) {
-				ClipRect.bottom = clipBuffer[iStitch].y;
+			if (clipBuffer[iStitch].y < clipRect.bottom) {
+				clipRect.bottom = clipBuffer[iStitch].y;
 			}
-			if (clipBuffer[iStitch].y > ClipRect.top) {
-				ClipRect.top = clipBuffer[iStitch].y;
+			if (clipBuffer[iStitch].y > clipRect.top) {
+				clipRect.top = clipBuffer[iStitch].y;
 			}
 		}
 		clipBuffer[0].attribute = ActiveColor | codedLayer;
-		ClipRectSize            = { ClipRect.right - ClipRect.left, ClipRect.top - ClipRect.bottom };
+		ClipRectSize            = { clipRect.right - clipRect.left, clipRect.top - clipRect.bottom };
 		GlobalUnlock(ClipMemory);
-		if ((ClipRect.left != 0.0f) || (ClipRect.bottom != 0.0f)) {
+		if ((clipRect.left != 0.0f) || (clipRect.bottom != 0.0f)) {
 			for (auto& clip : *ClipBuffer) {
-				clip.x -= ClipRect.left;
-				clip.y -= ClipRect.bottom;
+				clip.x -= clipRect.left;
+				clip.y -= clipRect.bottom;
 			}
-			ClipRect.top -= ClipRect.bottom;
-			ClipRect.right -= ClipRect.left;
-			ClipRect.bottom = ClipRect.left = 0;
+			clipRect.top -= clipRect.bottom;
+			clipRect.right -= clipRect.left;
+			clipRect.bottom = clipRect.left = 0;
 		}
 	}
 }
@@ -10635,29 +10636,29 @@ void thred::internal::clpadj() {
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		auto iStitch          = GroupStartStitch;
-		auto clipRectAdjusted = fRECTANGLE {
+		auto ClipRectAdjusted = fRECTANGLE {
 			StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y, StitchBuffer[iStitch].x, StitchBuffer[iStitch + 1].y
 		}; 
 		iStitch++;
 		while (iStitch < GroupEndStitch) {
-			clpradj(clipRectAdjusted, StitchBuffer[iStitch++]);
+			clpradj(ClipRectAdjusted, StitchBuffer[iStitch++]);
 		}
-		if (StitchBuffer[iStitch].x < clipRectAdjusted.left) {
-			clipRectAdjusted.left = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x < ClipRectAdjusted.left) {
+			ClipRectAdjusted.left = StitchBuffer[iStitch].x;
 		}
-		if (StitchBuffer[iStitch].x > clipRectAdjusted.right) {
-			clipRectAdjusted.right = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x > ClipRectAdjusted.right) {
+			ClipRectAdjusted.right = StitchBuffer[iStitch].x;
 		}
-		const auto clipMiddle            = form::midl(clipRectAdjusted.right, clipRectAdjusted.left);
-		StitchBuffer[GroupStartStitch].y = StitchBuffer[GroupEndStitch].y
-		    = form::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
+		const auto clipMiddle            = form::midl(ClipRectAdjusted.right, ClipRectAdjusted.left);
+		StitchBuffer[GroupStartStitch].y = form::midl(ClipRectAdjusted.top, ClipRectAdjusted.bottom);
+		StitchBuffer[GroupEndStitch].y   = StitchBuffer[GroupStartStitch].y;
 		if (StitchBuffer[GroupStartStitch].x < clipMiddle) {
-			StitchBuffer[GroupStartStitch].x = clipRectAdjusted.left;
-			StitchBuffer[GroupEndStitch].x   = clipRectAdjusted.right;
+			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.left;
+			StitchBuffer[GroupEndStitch].x   = ClipRectAdjusted.right;
 		}
 		else {
-			StitchBuffer[GroupEndStitch].x   = clipRectAdjusted.left;
-			StitchBuffer[GroupStartStitch].x = clipRectAdjusted.right;
+			StitchBuffer[GroupEndStitch].x   = ClipRectAdjusted.left;
+			StitchBuffer[GroupStartStitch].x = ClipRectAdjusted.right;
 		}
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -19447,7 +19448,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
-		auto private_AllItemRect               = fRECTANGLE {};
+		auto private_AllItemsRect              = fRECTANGLE {};
 		auto private_AngledFormVertices        = std::vector<fPOINT> {};
 		auto private_AuxName                   = fs::path {};
 		auto private_BSequence                 = std::vector<BSEQPNT> {};
@@ -19537,7 +19538,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_UndoBuffer.resize(16);
 		private_ValueWindow.resize(LASTLIN);
 
-		AllItemsRect              = &private_AllItemRect;
+		AllItemsRect              = &private_AllItemsRect;
 		AngledFormVertices        = &private_AngledFormVertices;
 		AuxName                   = &private_AuxName;
 		BSequence                 = &private_BSequence;

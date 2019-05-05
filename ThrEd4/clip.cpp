@@ -191,7 +191,7 @@ uint32_t clip::numclp() {
 	return find;
 }
 
-void clip::oclp(uint32_t clipIndex, uint32_t clipEntries) {
+void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) {
 	auto  clipIt     = std::next(ClipPoints->begin(), clipIndex);
 	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
@@ -202,40 +202,40 @@ void clip::oclp(uint32_t clipIndex, uint32_t clipEntries) {
 				clipBuffer.emplace_back(fPOINTATTR { (*clipIt).x, (*clipIt).y, 0 });
 				clipIt++;
 			}
-			ClipRect.left = ClipRect.right = clipBuffer[0].x;
-			ClipRect.bottom = ClipRect.top = clipBuffer[0].y;
+			clipRect.left = clipRect.right = clipBuffer[0].x;
+			clipRect.bottom = clipRect.top = clipBuffer[0].y;
 			for (auto& clip : *ClipBuffer) {
-				if (clip.x < ClipRect.left) {
-					ClipRect.left = clip.x;
+				if (clip.x < clipRect.left) {
+					clipRect.left = clip.x;
 				}
-				if (clip.x > ClipRect.right) {
-					ClipRect.right = clip.x;
+				if (clip.x > clipRect.right) {
+					clipRect.right = clip.x;
 				}
-				if (clip.y < ClipRect.bottom) {
-					ClipRect.bottom = clip.y;
+				if (clip.y < clipRect.bottom) {
+					clipRect.bottom = clip.y;
 				}
-				if (clip.y > ClipRect.top) {
-					ClipRect.top = clip.y;
+				if (clip.y > clipRect.top) {
+					clipRect.top = clip.y;
 				}
 			}
 		}
 		else {
-			ClipRect = fRECTANGLE {};
+			clipRect = fRECTANGLE {};
 		}
-		ClipRectSize.cx = ClipRect.right - ClipRect.left;
-		ClipRectSize.cy = ClipRect.top - ClipRect.bottom;
+		ClipRectSize.cx = clipRect.right - clipRect.left;
+		ClipRectSize.cy = clipRect.top - clipRect.bottom;
 	}
 }
 
-void clip::internal::durev(std::vector<fPOINT>& clipReversedData) {
+void clip::internal::durev(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipReversedData) {
 	if (!ClipBuffer->empty()) {
-		const auto midpoint   = form::midl(ClipRect.right, ClipRect.left);
+		const auto midpoint   = form::midl(clipRect.right, clipRect.left);
 		auto&      clipBuffer = *ClipBuffer;
 
 		if (clipBuffer[0].x > midpoint) {
 			auto iBuffer = clipBuffer.begin();
 			for (auto& reversed : clipReversedData) {
-				reversed = fPOINT { ClipRect.right - iBuffer->x, iBuffer->y };
+				reversed = fPOINT { clipRect.right - iBuffer->x, iBuffer->y };
 				iBuffer++;
 			}
 		}
@@ -357,7 +357,8 @@ void clip::clpout() {
 	}
 }
 
-bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
+bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
+                            const std::vector<fPOINT>& clipReversedData,
                             std::vector<fPOINT>&       clipFillData,
                             uint32_t                   start,
                             uint32_t                   finish,
@@ -367,7 +368,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	const auto& begin              = vertexIt[start];
 	const auto  delta              = fPOINT { (end.x - begin.x), (end.y - begin.y) };
 	const auto  length             = hypot(delta.x, delta.y);
-	const auto  clipReferencePoint = fPOINTATTR { ClipRect.left, ClipRect.bottom, 0u };
+	const auto  clipReferencePoint = fPOINTATTR { clipRect.left, clipRect.bottom, 0u };
 	const auto  rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
@@ -405,7 +406,7 @@ bool clip::internal::clpsid(const std::vector<fPOINT>& clipReversedData,
 	return false;
 }
 
-void clip::clpbrd(uint32_t startVertex) {
+void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 	auto moveToCoords = dPOINT {}; // moving formOrigin for clipboard fill
 
 	OSequence->clear();
@@ -417,22 +418,22 @@ void clip::clpbrd(uint32_t startVertex) {
 	clipFillData.resize(clipStitchCount);
 	auto clipReversedData = std::vector<fPOINT> {};
 	clipReversedData.resize(clipStitchCount);
-	const auto rotationCenter = fPOINT { form::midl(ClipRect.right, ClipRect.left), form::midl(ClipRect.top, ClipRect.bottom) };
-	ClipReference.x           = ClipRect.left;
+	const auto rotationCenter = fPOINT { form::midl(clipRect.right, clipRect.left), form::midl(clipRect.top, clipRect.bottom) };
+	ClipReference.x           = clipRect.left;
 	ClipReference.y           = rotationCenter.y;
-	ci::durev(clipReversedData);
+	ci::durev(clipRect, clipReversedData);
 	if (SelectedForm->type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		SelectedPoint  = vertexIt[0];
 		auto clipAngle = 0.0f;      // for clipboard border fill
 		auto vector0   = fPOINT {}; // x size of the clipboard fill at the fill angle
 		ci::setvct(0, 1, clipAngle, vector0);
-		// Since ClipRect.bottom is always 0
-		BorderClipReference.y = ClipRect.top / 2;
-		// Use 0 to align left edge of clip with beginning of line, ClipRect.right / 2 if you want to align
+		// Since clipRect.bottom is always 0
+		BorderClipReference.y = clipRect.top / 2;
+		// Use 0 to align left edge of clip with beginning of line, clipRect.right / 2 if you want to align
 		// the center of the clip with the beginning of the line
 		BorderClipReference.x = 0;
-		// BorderClipReference.x = ClipRect.right / 2;
+		// BorderClipReference.x = clipRect.right / 2;
 		auto currentSide = 0u;
 		for (currentSide = 0u; currentSide < VertexCount - 2; currentSide++) {
 			ci::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
@@ -447,7 +448,7 @@ void clip::clpbrd(uint32_t startVertex) {
 		auto currentVertex = startVertex;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = form::prv(currentVertex);
-			if (ci::clpsid(clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
+			if (ci::clpsid(clipRect, clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
 			}
 			currentVertex = nextVertex;
@@ -711,7 +712,10 @@ void clip::duxclp() {
 	}
 }
 
-void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter) {
+void clip::internal::clpcrnr(const fRECTANGLE&    clipRect,
+                             std::vector<fPOINT>& clipFillData,
+                             uint32_t             vertex,
+                             const fPOINT&        rotationCenter) {
 	const auto nextVertex = form::nxt(vertex);
 	auto       delta      = dPOINT {};
 
@@ -725,7 +729,7 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex,
 			             (*InsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
-	const auto referencePoint = fPOINTATTR { form::midl(ClipRect.right, ClipRect.left), ClipRect.top, 0u };
+	const auto referencePoint = fPOINTATTR { form::midl(clipRect.right, clipRect.left), clipRect.top, 0u };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
@@ -747,7 +751,8 @@ void clip::internal::clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex,
 	}
 }
 
-void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
+void clip::internal::picfn(const fRECTANGLE&    clipRect,
+                           std::vector<fPOINT>& clipFillData,
                            uint32_t             start,
                            uint32_t             finish,
                            float                spacing,
@@ -755,7 +760,7 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto       delta    = fPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto       length   = hypot(delta.x, delta.y);
-	const fPOINTATTR referencePoint = { form::midl(ClipRect.right, ClipRect.left), ClipRect.top, 0u };
+	const fPOINTATTR referencePoint = { form::midl(clipRect.right, clipRect.left), clipRect.top, 0u };
 
 	auto       rotationAngle = atan2(-delta.x, delta.y);
 	const auto outerStep
@@ -805,25 +810,25 @@ void clip::internal::picfn(std::vector<fPOINT>& clipFillData,
 	}
 }
 
-void clip::clpic() {
+void clip::clpic(const fRECTANGLE& clipRect) {
 	auto clipFillData = std::vector<fPOINT> {};
 	clipFillData.resize(ClipBuffer->size());
 
-	const auto rotationCenter = fPOINT { form::midl(ClipRect.right, ClipRect.left), form::midl(ClipRect.top, ClipRect.bottom) };
+	const auto rotationCenter = fPOINT { form::midl(clipRect.right, clipRect.left), form::midl(clipRect.top, clipRect.bottom) };
 
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2 = ClipRectSize.cx / 2.0f;
 	HorizontalLength  = ClipRectSize.cx;
 	ClipReference.y   = rotationCenter.y;
-	ClipReference.x   = ClipRect.left;
+	ClipReference.x   = clipRect.left;
 	satin::satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (auto iVertex = 0u; iVertex < VertexCount - 2; iVertex++) {
-			ci::picfn(clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
-			ci::clpcrnr(clipFillData, iVertex, rotationCenter);
+			ci::picfn(clipRect, clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
+			ci::clpcrnr(clipRect, clipFillData, iVertex, rotationCenter);
 		}
-		ci::picfn(clipFillData, VertexCount - 2, VertexCount - 1, SelectedForm->edgeSpacing, rotationCenter);
+		ci::picfn(clipRect, clipFillData, VertexCount - 2, VertexCount - 1, SelectedForm->edgeSpacing, rotationCenter);
 	}
 	else {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -833,8 +838,8 @@ void clip::clpic() {
 		auto currentVertex = 0u;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = form::nxt(currentVertex);
-			ci::picfn(clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
-			ci::clpcrnr(clipFillData, currentVertex, rotationCenter);
+			ci::picfn(clipRect, clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
+			ci::clpcrnr(clipRect, clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
 		}
 		OSequence->push_back(vertexIt[currentVertex]);

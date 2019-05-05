@@ -27,8 +27,8 @@
 namespace clip {
 
 void chnfn();
-void clpbrd(uint32_t startVertex);
-void clpic();
+void clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex);
+void clpic(const fRECTANGLE& clipRect);
 void clpout();
 void delclps(uint32_t iForm);
 void deleclp(uint32_t iForm);
@@ -46,12 +46,13 @@ bool iseclpx(const FRMHED& form) noexcept;
 uint32_t nueclp(uint32_t currentForm, uint32_t count);
 uint32_t numclp();
 
-void oclp(uint32_t clipIndex, uint32_t clipEntries);
+void oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries);
 
 namespace internal {
 
-	void clpcrnr(std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter);
-	bool clpsid(const std::vector<fPOINT>& clipReversedData,
+	void clpcrnr(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipFillData, uint32_t vertex, const fPOINT& rotationCenter);
+	bool clpsid(const fRECTANGLE&          clipRect,
+	            const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            uint32_t                   start,
 	            uint32_t                   finish,
@@ -62,7 +63,7 @@ namespace internal {
 	void duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t start, uint32_t finish);
 	void dufxlen(std::vector<fPOINT>& chainEndPoints);
 	void dulast(std::vector<fPOINT>& chainEndPoints);
-	void durev(std::vector<fPOINT>& clipReversedData);
+	void durev(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipReversedData);
 
 	uint32_t findclp(uint32_t formIndex);
 	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs);
@@ -88,7 +89,12 @@ namespace internal {
 	            const fPOINT&              rotationCenter,
 	            uint32_t                   currentSide);
 	bool nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide);
-	void picfn(std::vector<fPOINT>& clipFillData, uint32_t start, uint32_t finish, float spacing, const fPOINT& rotationCenter);
+	void picfn(const fRECTANGLE&    clipRect,
+	           std::vector<fPOINT>& clipFillData,
+	           uint32_t             start,
+	           uint32_t             finish,
+	           float                spacing,
+	           const fPOINT&        rotationCenter);
 	bool ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point);
 	void setvct(uint32_t start, uint32_t finish, float& clipAngle, fPOINT& vector0);
 	void xclpfn(const std::vector<fPOINT>& tempClipPoints,

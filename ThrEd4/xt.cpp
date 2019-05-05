@@ -797,7 +797,6 @@ void xt::internal::undclp() {
 	clipBuffer.clear();
 	clipBuffer.reserve(2);
 	ClipRectSize = FLSIZ { 0, SelectedForm->underlayStitchLen };
-	ClipRect     = fRECTANGLE { 0, SelectedForm->underlayStitchLen, 0, 0 };
 	clipBuffer.emplace_back(0.0f, 00.0f, 0u);
 	clipBuffer.emplace_back(0.0f, SelectedForm->underlayStitchLen, 0u);
 }
@@ -2401,17 +2400,17 @@ void xt::duauxnam() {
 
 void xt::internal::rtrclpfn() {
 	auto count = 0u;
-
+	auto clipRect = fRECTANGLE{};
 	if (OpenClipboard(ThrEdWindow) != 0) {
 		form::fvars(ClosestFormToCursor);
 		if (clip::iseclp(ClosestFormToCursor)) {
 			count = SelectedForm->clipEntries;
-			clip::oclp(SelectedForm->borderClipData, count);
+			clip::oclp(clipRect, SelectedForm->borderClipData, count);
 		}
 		else {
 			if (clip::isclp(ClosestFormToCursor)) {
 				count = SelectedForm->lengthOrCount.clipCount;
-				clip::oclp(SelectedForm->angleOrClipData.clip, count);
+				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, count);
 			}
 		}
 		if (count != 0u) {

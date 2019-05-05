@@ -964,36 +964,36 @@ void form::flipv() {
 
 		auto rectangle = fRECTANGLE {};
 		form::pxrct2stch(SelectedFormsRect, rectangle);
-		const auto midpoint = form::midl(rectangle.top, rectangle.bottom);
+		const auto offset = rectangle.top + rectangle.bottom;
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			formMap.set(ClosestFormToCursor);
 			form::fvars(ClosestFormToCursor);
 			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
-				vertexIt[iVertex].y = midpoint + midpoint - vertexIt[iVertex].y;
+				vertexIt[iVertex].y = offset - vertexIt[iVertex].y;
 			}
 			form::frmout(ClosestFormToCursor);
 		}
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			const auto decodedForm = (StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT;
 			if (formMap.test(decodedForm) && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
-				StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
+				StitchBuffer[iStitch].y = offset - StitchBuffer[iStitch].y;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			const auto midpoint = form::midl(SelectedForm->rectangle.top, SelectedForm->rectangle.bottom);
+			const auto offset = SelectedForm->rectangle.top + SelectedForm->rectangle.bottom;
 			auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
-				vertexIt[iVertex].y = midpoint + midpoint - vertexIt[iVertex].y;
+				vertexIt[iVertex].y = offset - vertexIt[iVertex].y;
 			}
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
 				    && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
-					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
+					StitchBuffer[iStitch].y = offset - StitchBuffer[iStitch].y;
 				}
 			}
 			form::frmout(ClosestFormToCursor);
@@ -1005,9 +1005,9 @@ void form::flipv() {
 				thred::rngadj();
 				auto rectangle = fRECTANGLE {};
 				thred::selRct(rectangle);
-				const auto midpoint = form::midl(rectangle.top, rectangle.bottom);
+				const auto offset = rectangle.top + rectangle.bottom;
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					StitchBuffer[iStitch].y = midpoint + midpoint - StitchBuffer[iStitch].y;
+					StitchBuffer[iStitch].y = offset - StitchBuffer[iStitch].y;
 				}
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -2156,12 +2156,14 @@ void form::internal::chkbrd() {
 			break;
 		}
 		case EDGECLIP: { // Clipboard
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clip::clpbrd(form::getlast());
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::clpbrd(clipRect, form::getlast());
 			break;
 		}
 		case EDGECLIPX: { // Even Clipboard
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::duxclp();
 			break;
 		}
@@ -2192,8 +2194,9 @@ void form::internal::chkbrd() {
 			break;
 		}
 		case EDGEPICOT: { // Picot
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clip::clpic();
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::clpic(clipRect);
 			break;
 		}
 		case EDGEDOUBLE: { // Double
@@ -4793,9 +4796,10 @@ void form::refilfn() {
 			break;
 		}
 		case EDGECLIP: {
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::clpout();
-			clip::clpbrd(0);
+			clip::clpbrd(clipRect, 0);
 			fi::ritbrd();
 			break;
 		}
@@ -4832,10 +4836,11 @@ void form::refilfn() {
 			break;
 		}
 		case EDGEPICOT: {
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getplen();
-			clip::clpic();
+			clip::clpic(clipRect);
 			ButtonholeCornerLength = length;
 			fi::ritbrd();
 			break;
@@ -4858,7 +4863,8 @@ void form::refilfn() {
 			break;
 		}
 		case EDGECLIPX: {
-			clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::duxclp();
 			fi::ritbrd();
 			break;
@@ -4914,7 +4920,8 @@ void form::refilfn() {
 				break;
 			}
 			case VCLPF: {
-				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				auto clipRect = fRECTANGLE{};
+				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				form::fvars(ClosestFormToCursor);
 				workingFormVertices.clear();
 				workingFormVertices.reserve(SelectedForm->vertexCount);
@@ -4926,13 +4933,15 @@ void form::refilfn() {
 				break;
 			}
 			case HCLPF: {
-				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				auto clipRect = fRECTANGLE{};
+				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 				doFill = false;
 				break;
 			}
 			case ANGCLPF: {
-				clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				auto clipRect = fRECTANGLE{};
+				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
 				form::angclpfn(textureSegments, *AngledFormVertices);
 				doFill = false;
@@ -4993,7 +5002,8 @@ void form::refilfn() {
 			break;
 		}
 		case CLPF: {
-			clip::oclp(SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 			fi::fmclp();
 			fi::ritfil();
 			break;
@@ -6780,7 +6790,7 @@ void form::fliph() {
 			}
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if ((StitchBuffer[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-				    && ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
+					&& ((StitchBuffer[iStitch].attribute & NOTFRM) == 0u)) {
 					StitchBuffer[iStitch].x = offset - StitchBuffer[iStitch].x;
 				}
 			}
@@ -7858,7 +7868,8 @@ void form::bakdup() {
 }
 
 void form::internal::shrnks() {
-	clip::oclp(SelectedForm->borderClipData, SelectedForm->clipEntries);
+	auto clipRect = fRECTANGLE {};
+	clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
 		auto&      thisVertex = vertexIt[iVertex];
