@@ -7374,11 +7374,6 @@ void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) 
 	durot();
 }
 
-void thred::internal::durcntr(dPOINT& rotationCenter) noexcept {
-	rotationCenter.x = form::midl(RotationRect.right, RotationRect.left);
-	rotationCenter.y = form::midl(RotationRect.top, RotationRect.bottom);
-}
-
 void thred::internal::rot(fPOINT& rotationCenter) {
 	do {
 		if (StateMap.test(StateFlag::FPSEL)) {

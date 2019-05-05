@@ -196,7 +196,6 @@ namespace internal {
 	bool dunum(uint32_t code) noexcept;
 	void dupclp();
 	void duprct();
-	void durcntr(dPOINT& rotationCenter) noexcept;
 	void durit(std::vector<char>& destination, const void* source, uint32_t count);
 	void durot() noexcept;
 	void durotu() noexcept;
