@@ -6179,7 +6179,7 @@ void form::setexpand(float xyRatio) {
 			rectangle = SelectedForm->rectangle;
 		}
 		else {
-			rectangle = fRECTANGLE { StitchRangeRect.left, StitchRangeRect.top, StitchRangeRect.right, StitchRangeRect.bottom };
+			rectangle = StitchRangeRect;
 		}
 		size0.y = rectangle.top - rectangle.bottom;
 	}
