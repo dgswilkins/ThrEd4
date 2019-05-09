@@ -725,7 +725,7 @@ void form::drwfrm() {
 					fi::frmsqr0(formLines[0]);
 				}
 				if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
-					form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
+					form::sRct2px(*SelectedVerticesRect, SelectedPixelsRect);
 					form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 					StateMap.set(StateFlag::SHOPSEL);
 					form::dupsel(StitchWindowMemDC);
@@ -934,7 +934,7 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 void form::flipv() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		const auto offset      = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
+		const auto offset      = SelectedVerticesRect->top + SelectedVerticesRect->bottom;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -5936,7 +5936,7 @@ void form::setstrtch() {
 
 	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
-		stitchRect = SelectedVerticesRect;
+		stitchRect = *SelectedVerticesRect;
 	}
 	else {
 		if (!SelectedFormList->empty() || StateMap.test(StateFlag::BIGBOX)) {
@@ -6729,7 +6729,7 @@ void form::fliph() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		const auto offset      = SelectedVerticesRect.right + SelectedVerticesRect.left;
+		const auto offset      = SelectedVerticesRect->right + SelectedVerticesRect->left;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -7168,47 +7168,52 @@ void form::internal::dufcntr(fPOINT& center) {
 
 fPOINT form::rotpar() {
 	auto rotationCenter = fPOINT {};
+	auto& rotationRect = *RotationRect;
 	if (StateMap.test(StateFlag::FPSEL)) {
-		rotationCenter.x = form::midl(SelectedVerticesRect.right, SelectedVerticesRect.left);
-		rotationCenter.y = form::midl(SelectedVerticesRect.top, SelectedVerticesRect.bottom);
+		rotationRect = *SelectedVerticesRect;
+		rotationCenter
+		    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
 		return rotationCenter;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		rotationCenter.x = form::midl(AllItemsRect->right, AllItemsRect->left);
-		rotationCenter.y = form::midl(AllItemsRect->top, AllItemsRect->bottom);
+		rotationRect = *AllItemsRect;
+		rotationCenter
+		    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
 		return rotationCenter;
 	}
 	if (!SelectedFormList->empty()) {
+		form::pxrct2stch(SelectedFormsRect, rotationRect);
 		if (StateMap.test(StateFlag::GMRK)) {
-			rotationCenter.x = ZoomMarkPoint.x;
-			rotationCenter.y = ZoomMarkPoint.y;
+			rotationCenter = fPOINT { ZoomMarkPoint.x, ZoomMarkPoint.y };
 		}
 		else {
-			fi::dufcntr(rotationCenter);
+			rotationCenter
+			    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+			// fi::dufcntr(rotationCenter);
 		}
 		StateMap.set(StateFlag::FRMSROT);
 		return rotationCenter;
 	}
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		RotationRect = SelectedForm->rectangle;
+		form::fvars(ClosestFormToCursor);
+		rotationRect = SelectedForm->rectangle;
 		if (!StateMap.test(StateFlag::GMRK)) {
 			rotationCenter
-			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
+			    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
 		}
 		StateMap.set(StateFlag::FRMROT);
+		return rotationCenter;
 	}
-	else {
-		if (StateMap.test(StateFlag::GRPSEL)) {
-			thred::rngadj();
-			thred::selRct(RotationRect);
+	if (StateMap.test(StateFlag::GRPSEL)) {
+		thred::rngadj();
+		thred::selRct(rotationRect);
+		if (StateMap.test(StateFlag::GMRK)) {
+			rotationCenter = ZoomMarkPoint;
 		}
-	}
-	if (StateMap.test(StateFlag::GMRK)) {
-		rotationCenter = ZoomMarkPoint;
-	}
-	else {
-		rotationCenter
-		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
+		else {
+			rotationCenter
+				= fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+		}
 	}
 	return rotationCenter;
 }
