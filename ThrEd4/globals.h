@@ -63,7 +63,7 @@ namespace fs = std::filesystem;
 
 extern uint32_t    ActiveColor;
 extern uint32_t    ActiveLayer;
-extern fRECTANGLE* AllItemsRect;
+extern fRECTANGLE  AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
@@ -201,7 +201,7 @@ extern int32_t        PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
 extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
-extern fRECTANGLE*    RotationRect;
+extern fRECTANGLE    RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
@@ -230,7 +230,7 @@ extern fPOINT SelectedPoint;
 
 extern std::vector<POINT>* SelectedPointsLine;
 
-extern fRECTANGLE* SelectedVerticesRect;
+extern fRECTANGLE SelectedVerticesRect;
 extern double     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 extern wchar_t    SideWindowEntryBuffer[11];

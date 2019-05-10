@@ -7344,28 +7344,26 @@ void thred::internal::rotstch(fPOINTATTR* stitch, const float rotationAngle, con
 
 void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) {
 	auto rotated           = POINT {0l,0l};
-	const auto& rotationRect = *RotationRect;
-	auto rotationReference = fPOINT { rotationRect.left, rotationRect.top };
-	OutputDebugString(fmt::format(L"ritrot:left [{}] top[{}]\n", rotationRect.left, rotationRect.top).c_str());
+	auto rotationReference = fPOINT { RotationRect.left, RotationRect.top };
 
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
 	rotationReference.x                       = rotationCenter.x;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossVertLine[0] = rotated;
-	rotationReference.x       = rotationRect.right;
+	rotationReference.x       = RotationRect.right;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[1] = rotated;
 	rotationReference.y = rotationCenter.y;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossHorzLine[1] = rotated;
-	rotationReference.y       = rotationRect.bottom;
+	rotationReference.y       = RotationRect.bottom;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[2] = rotated;
 	rotationReference.x = rotationCenter.x;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxCrossVertLine[1] = rotated;
-	rotationReference.x       = rotationRect.left;
+	rotationReference.x       = RotationRect.left;
 	rotang(rotationReference, rotated, rotationAngle, rotationCenter);
 	RotateBoxOutline[3] = rotated;
 	rotationReference.y = rotationCenter.y;
@@ -9466,22 +9464,21 @@ void thred::internal::unmov() {
 void thred::internal::duprct() {
 	auto currentVertex        = SelectedFormVertices.start;
 	auto vertexIt             = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	auto& selectedVerticesRect = *SelectedVerticesRect;
-	selectedVerticesRect.left = selectedVerticesRect.right = vertexIt[currentVertex].x;
-	selectedVerticesRect.top = selectedVerticesRect.bottom = vertexIt[currentVertex].y;
+	SelectedVerticesRect.left = SelectedVerticesRect.right = vertexIt[currentVertex].x;
+	SelectedVerticesRect.top = SelectedVerticesRect.bottom = vertexIt[currentVertex].y;
 	currentVertex                                          = form::pdir(currentVertex);
 	for (auto iVertex = 0u; iVertex < SelectedFormVertices.vertexCount; iVertex++) {
-		if (vertexIt[currentVertex].x < selectedVerticesRect.left) {
-			selectedVerticesRect.left = vertexIt[currentVertex].x;
+		if (vertexIt[currentVertex].x < SelectedVerticesRect.left) {
+			SelectedVerticesRect.left = vertexIt[currentVertex].x;
 		}
-		if (vertexIt[currentVertex].x > selectedVerticesRect.right) {
-			selectedVerticesRect.right = vertexIt[currentVertex].x;
+		if (vertexIt[currentVertex].x > SelectedVerticesRect.right) {
+			SelectedVerticesRect.right = vertexIt[currentVertex].x;
 		}
-		if (vertexIt[currentVertex].y < selectedVerticesRect.bottom) {
-			selectedVerticesRect.bottom = vertexIt[currentVertex].y;
+		if (vertexIt[currentVertex].y < SelectedVerticesRect.bottom) {
+			SelectedVerticesRect.bottom = vertexIt[currentVertex].y;
 		}
-		if (vertexIt[currentVertex].y > selectedVerticesRect.top) {
-			selectedVerticesRect.top = vertexIt[currentVertex].y;
+		if (vertexIt[currentVertex].y > SelectedVerticesRect.top) {
+			SelectedVerticesRect.top = vertexIt[currentVertex].y;
 		}
 		currentVertex = form::pdir(currentVertex);
 	}
@@ -9490,7 +9487,7 @@ void thred::internal::duprct() {
 void thred::setpsel() {
 	form::unpsel();
 	thi::duprct();
-	form::sRct2px(*SelectedVerticesRect, SelectedPixelsRect);
+	form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
 	form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	form::sfCor2px(vertexIt[SelectedFormVertices.finish], EndPointCross);
@@ -11421,11 +11418,11 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 			StitchBuffer[iStitch].x += deltaX;
 			StitchBuffer[iStitch].y += deltaY;
 		}
-		AllItemsRect->bottom += deltaY;
-		AllItemsRect->top += deltaY;
-		AllItemsRect->left += deltaX;
-		AllItemsRect->right += deltaX;
-		form::stchrct2px(*AllItemsRect, SelectedFormsRect);
+		AllItemsRect.bottom += deltaY;
+		AllItemsRect.top += deltaY;
+		AllItemsRect.left += deltaX;
+		AllItemsRect.right += deltaX;
+		form::stchrct2px(AllItemsRect, SelectedFormsRect);
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
@@ -19446,7 +19443,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	UNREFERENCED_PARAMETER(lpCmdLine);
 
 	if (RegisterClassEx(&wc)) {
-		auto private_AllItemsRect              = fRECTANGLE {};
 		auto private_AngledFormVertices        = std::vector<fPOINT> {};
 		auto private_AuxName                   = fs::path {};
 		auto private_BSequence                 = std::vector<BSEQPNT> {};
@@ -19497,7 +19493,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_OutsidePointList          = std::vector<fPOINT> {};
 		auto private_PreviousNames             = std::vector<fs::path> {};
 		auto private_RGBFileName               = fs::path {};
-		auto private_RotationRect              = fRECTANGLE {};
 		auto private_RubberBandLine            = std::vector<POINT> {};
 		auto private_SatinGuides               = std::vector<SATCON> {};
 		auto private_SearchLine                = std::vector<POINT> {};
@@ -19506,7 +19501,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_SelectedFormsLine         = std::vector<POINT> {};
 		auto private_SelectedPointsLine        = std::vector<POINT> {};
 		auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
-		auto private_SelectedVerticesRect      = fRECTANGLE {};
 		auto private_StringTable               = std::vector<std::wstring> {};
 		auto private_TempPolygon               = std::vector<fPOINT> {};
 		auto private_TempTexturePoints         = std::vector<TXPNT> {};
@@ -19538,7 +19532,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_UndoBuffer.resize(16);
 		private_ValueWindow.resize(LASTLIN);
 
-		AllItemsRect              = &private_AllItemsRect;
 		AngledFormVertices        = &private_AngledFormVertices;
 		AuxName                   = &private_AuxName;
 		BSequence                 = &private_BSequence;
@@ -19572,7 +19565,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		OutsidePointList          = &private_OutsidePointList;
 		PreviousNames             = &private_PreviousNames;
 		RGBFileName               = &private_RGBFileName;
-		RotationRect              = &private_RotationRect;
 		RubberBandLine            = &private_RubberBandLine;
 		SatinGuides               = &private_SatinGuides;
 		SearchLine                = &private_SearchLine;
@@ -19580,7 +19572,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		SelectedFormList          = &private_SelectedFormList;
 		SelectedFormsLine         = &private_SelectedFormsLine;
 		SelectedPointsLine        = &private_SelectedPointsLine;
-		SelectedVerticesRect      = &private_SelectedVerticesRect;
 		StringTable               = &private_StringTable;
 		TempPolygon               = &private_TempPolygon;
 		TextureInputBuffer        = &private_textureInputBuffer;

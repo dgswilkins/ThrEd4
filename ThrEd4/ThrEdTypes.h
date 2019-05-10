@@ -1349,14 +1349,30 @@ constexpr uint32_t FRMFIL   = 0x20000000u;
 constexpr uint32_t FRMBFIL  = 0x40000000u;
 constexpr uint32_t FRMAPFIL = 0x60000000u;
 
-struct _floatRectangle {
-	float left {0.0f};
-	float top {0.0f};
-	float right {0.0f};
-	float bottom {0.0f};
+class fRECTANGLE {
+public:
+	float left{ 0.0f };
+	float top{ 0.0f };
+	float right{ 0.0f };
+	float bottom{ 0.0f };
+
+	constexpr fRECTANGLE() noexcept = default;
+	// fRECTANGLE(fRECTANGLE&&) = default;
+	// fRECTANGLE& operator=(const fRECTANGLE& rhs) = default;
+	// fRECTANGLE& operator=(fRECTANGLE&&) = default;
+	//~fRECTANGLE() = default;
+
+	inline fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
+
+
 };
 
-using fRECTANGLE = struct _floatRectangle;
+inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept
+    : left(rhsLeft)
+    , top(rhsTop)
+    , right(rhsRight)
+    , bottom(rhsBottom) {
+}
 
 struct _forminfo {
 	uint32_t type;
@@ -1371,10 +1387,10 @@ class SATCONOUT;
 class SATCON
 {
 public:
-	uint32_t start;
-	uint32_t finish;
+	uint32_t start{};
+	uint32_t finish{};
 
-	SATCON() noexcept;
+	constexpr SATCON() noexcept = default;
 	// SATCON(SATCON&&) = default;
 	// SATCON& operator=(const SATCON& rhs) = default;
 	// SATCON& operator=(SATCON&&) = default;
@@ -1384,11 +1400,6 @@ public:
 	inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
 	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
 };
-
-inline SATCON::SATCON() noexcept {
-	start  = 0u;
-	finish = 0u;
-}
 
 inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
     : start(rStart)
@@ -1401,7 +1412,7 @@ public:
 	uint16_t start {};
 	uint16_t finish {};
 
-	SATCONOUT() noexcept;
+	constexpr SATCONOUT() noexcept = default;
 	// SATCONOUT(SATCONOUT&&) = default;
 	// SATCONOUT& operator=(const SATCONOUT& rhs) = default;
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
@@ -1410,11 +1421,6 @@ public:
 	explicit SATCONOUT(const SATCON& rhs);
 	inline SATCONOUT& operator=(const SATCON& rhs);
 };
-
-inline SATCONOUT::SATCONOUT() noexcept {
-	start  = 0u;
-	finish = 0u;
-}
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
@@ -1690,7 +1696,7 @@ inline FRMHEDO::FRMHEDO() noexcept
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
-	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
+	rectangle       = {};
 	fillType        = 0;
 	edgeType        = 0;
 	fillSpacing     = 0;
@@ -1769,7 +1775,7 @@ inline FRMHED::FRMHED() noexcept
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
-	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
+	rectangle       = {};
 	fillType        = 0;
 	edgeType        = 0;
 	fillSpacing     = 0;
@@ -1957,7 +1963,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	borderClipData  = 0;
 	satinGuideCount = 0;
 	wordParam       = 0;
-	rectangle       = { 0.0f, 0.0f, 0.0f, 0.0f };
+	rectangle       = {};
 	fillType        = 0;
 	edgeType        = 0;
 	fillSpacing     = 0;
@@ -2428,12 +2434,17 @@ struct _frmrange {
 
 using FRMRANGE = struct _frmrange;
 
-struct _range {
+class RANGE {
+public:
 	uint32_t start {0u};
 	uint32_t finish {0u};
-};
 
-using RANGE = struct _range;
+	constexpr RANGE() noexcept = default;
+	// RANGE(RANGE&&) = default;
+	// RANGE& operator=(const RANGE& rhs) = default;
+	// RANGE& operator=(RANGE&&) = default;
+	//~RANGE() = default;
+};
 
 class REGION // region for sequencing vertical fills
 {

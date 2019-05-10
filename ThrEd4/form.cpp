@@ -725,7 +725,7 @@ void form::drwfrm() {
 					fi::frmsqr0(formLines[0]);
 				}
 				if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
-					form::sRct2px(*SelectedVerticesRect, SelectedPixelsRect);
+					form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
 					form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 					StateMap.set(StateFlag::SHOPSEL);
 					form::dupsel(StitchWindowMemDC);
@@ -934,7 +934,7 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 void form::flipv() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		const auto offset      = SelectedVerticesRect->top + SelectedVerticesRect->bottom;
+		const auto offset      = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -945,7 +945,7 @@ void form::flipv() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		const auto offset = AllItemsRect->top + AllItemsRect->bottom;
+		const auto offset = AllItemsRect.top + AllItemsRect.bottom;
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.y = offset - FormVertice.y;
 		}
@@ -5864,35 +5864,34 @@ void form::setap() {
 }
 
 void form::internal::getbig() noexcept {
-	auto& allItemsRect = *AllItemsRect;
-	allItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
+	AllItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
 	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
-		if (trct.left < allItemsRect.left) {
-			allItemsRect.left = trct.left;
+		if (trct.left < AllItemsRect.left) {
+			AllItemsRect.left = trct.left;
 		}
-		if (trct.top > allItemsRect.top) {
-			allItemsRect.top = trct.top;
+		if (trct.top > AllItemsRect.top) {
+			AllItemsRect.top = trct.top;
 		}
-		if (trct.right > allItemsRect.right) {
-			allItemsRect.right = trct.right;
+		if (trct.right > AllItemsRect.right) {
+			AllItemsRect.right = trct.right;
 		}
-		if (trct.bottom < allItemsRect.bottom) {
-			allItemsRect.bottom = trct.bottom;
+		if (trct.bottom < AllItemsRect.bottom) {
+			AllItemsRect.bottom = trct.bottom;
 		}
 	}
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (StitchBuffer[iStitch].x < allItemsRect.left) {
-			allItemsRect.left = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x < AllItemsRect.left) {
+			AllItemsRect.left = StitchBuffer[iStitch].x;
 		}
-		if (StitchBuffer[iStitch].y > allItemsRect.top) {
-			allItemsRect.top = StitchBuffer[iStitch].y;
+		if (StitchBuffer[iStitch].y > AllItemsRect.top) {
+			AllItemsRect.top = StitchBuffer[iStitch].y;
 		}
-		if (StitchBuffer[iStitch].x > allItemsRect.right) {
-			allItemsRect.right = StitchBuffer[iStitch].x;
+		if (StitchBuffer[iStitch].x > AllItemsRect.right) {
+			AllItemsRect.right = StitchBuffer[iStitch].x;
 		}
-		if (StitchBuffer[iStitch].y < allItemsRect.bottom) {
-			allItemsRect.bottom = StitchBuffer[iStitch].y;
+		if (StitchBuffer[iStitch].y < AllItemsRect.bottom) {
+			AllItemsRect.bottom = StitchBuffer[iStitch].y;
 		}
 	}
 }
@@ -5924,7 +5923,7 @@ void form::selal() {
 	NearestCount = 0;
 	StateMap.reset(StateFlag::RUNPAT);
 	thred::duzrat();
-	form::stchrct2px(*AllItemsRect, SelectedFormsRect);
+	form::stchrct2px(AllItemsRect, SelectedFormsRect);
 	StateMap.set(StateFlag::BIGBOX);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -5936,7 +5935,7 @@ void form::setstrtch() {
 
 	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
-		stitchRect = *SelectedVerticesRect;
+		stitchRect = SelectedVerticesRect;
 	}
 	else {
 		if (!SelectedFormList->empty() || StateMap.test(StateFlag::BIGBOX)) {
@@ -6729,7 +6728,7 @@ void form::fliph() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		const auto offset      = SelectedVerticesRect->right + SelectedVerticesRect->left;
+		const auto offset      = SelectedVerticesRect.right + SelectedVerticesRect.left;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -6740,7 +6739,7 @@ void form::fliph() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		const auto offset = AllItemsRect->right + AllItemsRect->left;
+		const auto offset = AllItemsRect.right + AllItemsRect.left;
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.x = offset - FormVertice.x;
 		}
@@ -7168,27 +7167,26 @@ void form::internal::dufcntr(fPOINT& center) {
 
 fPOINT form::rotpar() {
 	auto rotationCenter = fPOINT {};
-	auto& rotationRect = *RotationRect;
 	if (StateMap.test(StateFlag::FPSEL)) {
-		rotationRect = *SelectedVerticesRect;
+		RotationRect = SelectedVerticesRect;
 		rotationCenter
-		    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 		return rotationCenter;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
-		rotationRect = *AllItemsRect;
+		RotationRect = AllItemsRect;
 		rotationCenter
-		    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 		return rotationCenter;
 	}
 	if (!SelectedFormList->empty()) {
-		form::pxrct2stch(SelectedFormsRect, rotationRect);
+		form::pxrct2stch(SelectedFormsRect, RotationRect);
 		if (StateMap.test(StateFlag::GMRK)) {
 			rotationCenter = fPOINT { ZoomMarkPoint.x, ZoomMarkPoint.y };
 		}
 		else {
 			rotationCenter
-			    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 			// fi::dufcntr(rotationCenter);
 		}
 		StateMap.set(StateFlag::FRMSROT);
@@ -7196,23 +7194,23 @@ fPOINT form::rotpar() {
 	}
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		form::fvars(ClosestFormToCursor);
-		rotationRect = SelectedForm->rectangle;
+		RotationRect = SelectedForm->rectangle;
 		if (!StateMap.test(StateFlag::GMRK)) {
 			rotationCenter
-			    = fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 		}
 		StateMap.set(StateFlag::FRMROT);
 		return rotationCenter;
 	}
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		thred::rngadj();
-		thred::selRct(rotationRect);
+		thred::selRct(RotationRect);
 		if (StateMap.test(StateFlag::GMRK)) {
 			rotationCenter = ZoomMarkPoint;
 		}
 		else {
 			rotationCenter
-				= fPOINT { form::midl(rotationRect.right, rotationRect.left), form::midl(rotationRect.top, rotationRect.bottom) };
+				= fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 		}
 	}
 	return rotationCenter;
@@ -8216,7 +8214,7 @@ void form::centir() {
 	StateMap.reset(StateFlag::BIGBOX);
 	fi::getbig();
 	const auto itemCenter
-	    = fPOINT { form::midl(AllItemsRect->right, AllItemsRect->left), form::midl(AllItemsRect->top, AllItemsRect->bottom) };
+	    = fPOINT { form::midl(AllItemsRect.right, AllItemsRect.left), form::midl(AllItemsRect.top, AllItemsRect.bottom) };
 	const auto hoopCenter = fPOINT { UnzoomedRect.x / 2.0f, UnzoomedRect.y / 2.0f };
 	const auto delta      = fPOINT { hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y };
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {

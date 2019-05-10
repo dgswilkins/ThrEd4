@@ -31,7 +31,7 @@ namespace fs = std::filesystem;
 
 uint32_t   ActiveColor = 0; // active color selector
 uint32_t   ActiveLayer = 0; // active layer
-fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
+fRECTANGLE AllItemsRect{};  // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
@@ -168,7 +168,7 @@ int32_t        PreferenceWindowWidth;             // width of the preference win
 HWND           PreferencesWindow;                 // preferences window
 uint32_t       PreviousFormIndex;                 // previously selected form
 uint32_t       PseudoRandomValue;                 // pseudo-random sequence register
-fRECTANGLE*    RotationRect;                      // rotation rectangle
+fRECTANGLE     RotationRect{};                    // rotation rectangle
 
 std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
@@ -197,7 +197,7 @@ fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordin
 
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
-fRECTANGLE* SelectedVerticesRect = nullptr;                   // rectangle enclosing selected form verticess
+fRECTANGLE SelectedVerticesRect{};                   // rectangle enclosing selected form verticess
 double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
 HWND       SideMessageWindow   = nullptr;          // main side message window
 wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
