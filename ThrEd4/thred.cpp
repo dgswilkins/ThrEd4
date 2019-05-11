@@ -4146,8 +4146,7 @@ bool thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) {
 
 uint32_t thred::internal::pesmtch(const COLORREF& referenceColor, const uint8_t& colorIndex) {
 	auto color = PECCOLOR { GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor) }; // NOLINT
-	auto translatedColor
-	    = PECCOLOR { PESThread[colorIndex].color.r, PESThread[colorIndex].color.g, PESThread[colorIndex].color.b };
+	auto translatedColor = PESThread[colorIndex].color;
 
 	const auto meanR  = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
 	auto       deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
