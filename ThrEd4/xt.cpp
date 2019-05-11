@@ -1292,15 +1292,20 @@ void xt::fsort() {
 
 #ifdef _DEBUG
 
-struct _atfld {
-	uint32_t color;
-	uint32_t form;
-	uint32_t type;
-	uint32_t layer;
-	uint32_t user;
-};
+class ATFLD {
+public:
+	uint32_t color{ 0u };
+	uint32_t form{ 0u };
+	uint32_t type{ 0u };
+	uint32_t layer{ 0u };
+	uint32_t user{ 0u };
 
-using ATFLD = struct _atfld;
+	constexpr ATFLD() noexcept = default;
+	// ATFLD(ATFLD&&) = default;
+	// ATFLD& operator=(const ATFLD& rhs) = default;
+	// ATFLD& operator=(ATFLD&&) = default;
+	//~ATFLD() = default;
+};
 
 void xt::internal::duatf(uint32_t ind) {
 	const auto attribute = StitchBuffer[ind].attribute;

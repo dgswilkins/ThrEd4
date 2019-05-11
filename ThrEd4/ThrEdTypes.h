@@ -1,3 +1,4 @@
+
 #pragma once
 
 // Open Source headers
@@ -821,6 +822,7 @@ enum fillStyles
 	TXHORF,   // Horizontal texture fill
 	TXANGF,   // Angle texture fill
 };
+
 constexpr uint32_t MCLPF    = 1u << static_cast<uint32_t>(CLPF);
 constexpr uint32_t MVCLPF   = 1u << static_cast<uint32_t>(VCLPF);
 constexpr uint32_t MHCLPF   = 1u << static_cast<uint32_t>(HCLPF);
@@ -935,107 +937,118 @@ constexpr uint32_t HLIN = HNUM;
 
 #pragma pack(1)
 
-// pcs file header structure
-class PCSHEADER {
+
+class PCSHEADER // pcs file header structure
+{
 public:
-	int8_t   leadIn{ 0 };
-	int8_t   hoopType{ 0 };
-	uint16_t colorCount{ 0 };
-	COLORREF colors[COLOR_COUNT]{ 0 }; // NOLINT
-	uint16_t stitchCount{ 0 };
+	int8_t   leadIn { 0 };
+	int8_t   hoopType { 0 };
+	uint16_t colorCount { 0 };
+	COLORREF colors[COLOR_COUNT] { 0 }; // NOLINT
+	uint16_t stitchCount { 0 };
 
-	constexpr PCSHEADER()  noexcept = default;
+	constexpr PCSHEADER() noexcept = default;
+	// PCSHEADER(PCSHEADER&&) = default;
+	// PCSHEADER& operator=(const PCSHEADER& rhs) = default;
+	// PCSHEADER& operator=(PCSHEADER&&) = default;
+	//~PCSHEADER() = default;
 };
 
-// ini file structure
-struct _iniFil {
-	char     defaultDirectory[180];                  // default directory                   NOLINT
-	COLORREF stitchColors[COLOR_COUNT];              // colors                              NOLINT
-	COLORREF stitchPreferredColors[COLOR_COUNT];     // stitch preference colors            NOLINT
-	COLORREF backgroundPreferredColors[COLOR_COUNT]; // background preference colors        NOLINT
-	COLORREF backgroundColor;                        // background color
-	COLORREF bitmapColor;                            // bitmap color
-	float    minStitchLength;                        // minimum stitch length
-	double   showStitchThreshold;                    // show stitch points
-	double   threadSize30;                           // millimeter size of 30 weight thread
-	double   threadSize40;                           // millimeter size of 40 weight thread
-	double   threadSize60;                           // millimeter size of 60 weight thread
-	float    userStitchLength;                       // user stitch length
-	float    maxStitchLength;                        // maximum stitch length
-	float    smallStitchLength;                      // small stitch size
-	double   stitchBoxesThreshold;                   // show sitch box level
-	float    stitchSpace;                            // stitch spacing between lines of stitches
-	float    fillAngle;                              // fill angle
-	uint32_t userFlagMap;                            // bitmap for user variables
-	float    borderWidth;                            // border width
-	uint32_t appliqueColor;                          // applique color
-	char     prevNames[OLDNUM][_MAX_PATH];           // last file names                     NOLINT
-	float    snapLength;                             // snap together length
-	float    starRatio;                              // star ratio
-	float    spiralWrap;                             // spiral wrap
-	COLORREF bitmapBackgroundColors[COLOR_COUNT];    // bitmap background color preferences NOLINT
-	float    buttonholeCornerLength;                 // buttonhole fill corner length
-	float    picotSpace;                             // space between border picots
-	int8_t   hoopType;                               // hoop type
-	int8_t   auxFileType;                            // machine file type
-	float    hoopSizeX;                              // hoop x size
-	float    hoopSizeY;                              // hoop y size
-	float    rotationAngle;                          // rotation angle
-	float    gridSize;                               // grid size
-	float    clipOffset;                             // clipboard offset
-	RECT     initialWindowCoords;                    // initial window coordinates
-	COLORREF gridColor;                              // grid color
-	uint32_t fillPhase;                              // clipboard fill phase
-	float    customHoopX;                            // custom hoop width
-	float    customHoopY;                            // custom hoop height
-	float    traceLength;                            // lens points
-	float    traceRatio;                             // trace ratio
-	float    chainSpace;                             // chain space
-	float    chainRatio;                             // chain ratio
-	float    cursorNudgeStep;                        // cursor nudge step
-	uint16_t nudgePixels;                            // nudge pixels
-	float    eggRatio;                               // egg ratio
-	uint16_t stitchSizePixels;                       // size of stitch points in pixels
-	uint16_t formVertexSizePixels;                   // size of form points in pixels
-	uint16_t formSides;                              // sides of a created form
-	float    tearTailLength;                         // length of the tear tail
-	float    tearTwistStep;                          // tear twist step
-	float    tearTwistRatio;                         // tear twist ratio
-	uint16_t wavePoints;                             // wave points
-	uint16_t waveStart;                              // wave strting point
-	uint16_t waveEnd;                                // wave ending point;
-	uint16_t waveLobes;                              // wave lobes
-	uint8_t  featherFillType;                        // feather fill type
-	uint8_t  featherUpCount;                         // feather up count
-	uint8_t  featherDownCount;                       // feather down count
-	uint8_t  featherType;                            // feather bits
-	float    featherRatio;                           // feather ratio
-	float    featherMinStitchSize;                   // feather floor
-	uint16_t featherCount;                           // feather fill psg granularity
-	char     p2cName[MAX_PATH];                      // pes2card file                       NOLINT
-	float    underlayIndent;                         // edge walk/underlay indent
-	float    underlayAngle;                          // underlay angle
-	float    underlaySpacing;                        // underlay spacing
-	float    underlayStitchLen;                      // underlay stitch length
-	float    daisyDiameter;                          // daisy diameter
-	float    daisyPetalLen;                          // daisy petal length
-	float    daisyHoleDiameter;                      // daisy hole diameter
-	uint32_t daisyPetalCount;                        // daisy petals
-	uint32_t daisyPetalPoints;                       // daisy petal points
-	uint32_t daisyInnerCount;                        // daisy inner count
-	uint8_t  daisyBorderType;                        // daisy border type
-	uint8_t  dataCheck;                              // data check
-	float    textureHeight;                          // textured fill height
-	float    textureWidth;                           // textured fill width
-	float    textureSpacing;                         // textured fill spacing
-	uint16_t formBoxSizePixels;                      // form box pixels
-	uint16_t daisyHeartCount;                        // daisy heart count
-	uint16_t textureEditorSize;                      // texture editor pixels
-	float    clpspc;                                 // clipboard fill spacing
-	char     designerName[NAME_LEN];                 // designer name                       NOLINT
-};
 
-using INIFILE = struct _iniFil;
+class INIFILE // ini file structure
+{
+public:
+	char     defaultDirectory[180] { 0 };                   // default directory                   NOLINT
+	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors                              NOLINT
+	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors            NOLINT
+	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors        NOLINT
+	COLORREF backgroundColor { 0u };                        // background color
+	COLORREF bitmapColor { 0u };                            // bitmap color
+	float    minStitchLength { 0.0f };                      // minimum stitch length
+	double   showStitchThreshold { 0.0 };                   // show stitch points
+	double   threadSize30 { 0.0 };                          // millimeter size of 30 weight thread
+	double   threadSize40 { 0.0 };                          // millimeter size of 40 weight thread
+	double   threadSize60 { 0.0 };                          // millimeter size of 60 weight thread
+	float    userStitchLength { 0.0f };                     // user stitch length
+	float    maxStitchLength { 0.0f };                      // maximum stitch length
+	float    smallStitchLength { 0.0f };                    // small stitch size
+	double   stitchBoxesThreshold { 0.0 };                  // show sitch box level
+	float    stitchSpace { 0.0f };                          // stitch spacing between lines of stitches
+	float    fillAngle { 0.0f };                            // fill angle
+	uint32_t userFlagMap { 0u };                            // bitmap for user variables
+	float    borderWidth { 0.0f };                          // border width
+	uint32_t appliqueColor { 0u };                          // applique color
+	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names                     NOLINT
+	float    snapLength { 0.0f };                           // snap together length
+	float    starRatio { 0.0f };                            // star ratio
+	float    spiralWrap { 0.0f };                           // spiral wrap
+	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u };    // bitmap background color preferences NOLINT
+	float    buttonholeCornerLength { 0.0f };               // buttonhole fill corner length
+	float    picotSpace { 0.0f };                           // space between border picots
+	int8_t   hoopType { 0 };                                // hoop type
+	int8_t   auxFileType { 0 };                             // machine file type
+	float    hoopSizeX { 0.0f };                            // hoop x size
+	float    hoopSizeY { 0.0f };                            // hoop y size
+	float    rotationAngle { 0.0f };                        // rotation angle
+	float    gridSize { 0.0f };                             // grid size
+	float    clipOffset { 0.0f };                           // clipboard offset
+	RECT     initialWindowCoords { 0, 0, 0, 0 };            // initial window coordinates
+	COLORREF gridColor { 0u };                              // grid color
+	uint32_t fillPhase { 0u };                              // clipboard fill phase
+	float    customHoopX { 0.0f };                          // custom hoop width
+	float    customHoopY { 0.0f };                          // custom hoop height
+	float    traceLength { 0.0f };                          // lens points
+	float    traceRatio { 0.0f };                           // trace ratio
+	float    chainSpace { 0.0f };                           // chain space
+	float    chainRatio { 0.0f };                           // chain ratio
+	float    cursorNudgeStep { 0.0f };                      // cursor nudge step
+	uint16_t nudgePixels { 0u };                            // nudge pixels
+	float    eggRatio { 0.0f };                             // egg ratio
+	uint16_t stitchSizePixels { 0u };                       // size of stitch points in pixels
+	uint16_t formVertexSizePixels { 0u };                   // size of form points in pixels
+	uint16_t formSides { 0u };                              // sides of a created form
+	float    tearTailLength { 0.0f };                       // length of the tear tail
+	float    tearTwistStep { 0.0f };                        // tear twist step
+	float    tearTwistRatio { 0.0f };                       // tear twist ratio
+	uint16_t wavePoints { 0u };                             // wave points
+	uint16_t waveStart { 0u };                              // wave strting point
+	uint16_t waveEnd { 0u };                                // wave ending point;
+	uint16_t waveLobes { 0u };                              // wave lobes
+	uint8_t  featherFillType { 0u };                        // feather fill type
+	uint8_t  featherUpCount { 0u };                         // feather up count
+	uint8_t  featherDownCount { 0u };                       // feather down count
+	uint8_t  featherType { 0u };                            // feather bits
+	float    featherRatio { 0.0f };                         // feather ratio
+	float    featherMinStitchSize { 0.0f };                 // feather floor
+	uint16_t featherCount { 0u };                           // feather fill psg granularity
+	char     p2cName[MAX_PATH] { 0 };                       // pes2card file                       NOLINT
+	float    underlayIndent { 0.0f };                       // edge walk/underlay indent
+	float    underlayAngle { 0.0f };                        // underlay angle
+	float    underlaySpacing { 0.0f };                      // underlay spacing
+	float    underlayStitchLen { 0.0f };                    // underlay stitch length
+	float    daisyDiameter { 0.0f };                        // daisy diameter
+	float    daisyPetalLen { 0.0f };                        // daisy petal length
+	float    daisyHoleDiameter { 0.0f };                    // daisy hole diameter
+	uint32_t daisyPetalCount { 0u };                        // daisy petals
+	uint32_t daisyPetalPoints { 0u };                       // daisy petal points
+	uint32_t daisyInnerCount { 0u };                        // daisy inner count
+	uint8_t  daisyBorderType { 0u };                        // daisy border type
+	uint8_t  dataCheck { 0u };                              // data check
+	float    textureHeight { 0.0f };                        // textured fill height
+	float    textureWidth { 0.0f };                         // textured fill width
+	float    textureSpacing { 0.0f };                       // textured fill spacing
+	uint16_t formBoxSizePixels { 0u };                      // form box pixels
+	uint16_t daisyHeartCount { 0u };                        // daisy heart count
+	uint16_t textureEditorSize { 0u };                      // texture editor pixels
+	float    clpspc { 0.0f };                               // clipboard fill spacing
+	char     designerName[NAME_LEN] { 0 };                  // designer name                       NOLINT
+
+	constexpr INIFILE() noexcept = default;
+	// INIFILE(INIFILE&&) = default;
+	// INIFILE& operator=(const INIFILE& rhs) = default;
+	// INIFILE& operator=(INIFILE&&) = default;
+	//~INIFILE() = default;
+};
 
 enum machineType
 {
@@ -1044,14 +1057,20 @@ enum machineType
 	AUXPES
 };
 
-struct _formVertices {
-	uint32_t start;
-	uint32_t vertexCount;
-	uint32_t finish;
-	uint32_t form;
-};
+class FORMVERTICES
+{
+public:
+	uint32_t start { 0u };
+	uint32_t vertexCount { 0u };
+	uint32_t finish { 0u };
+	uint32_t form { 0u };
 
-using FORMVERTICES = struct _formVertices;
+	constexpr FORMVERTICES() noexcept = default;
+	// FORMVERTICES(FORMVERTICES&&) = default;
+	// FORMVERTICES& operator=(const FORMVERTICES& rhs) = default;
+	// FORMVERTICES& operator=(FORMVERTICES&&) = default;
+	//~FORMVERTICES() = default;
+};
 
 class fPOINT;
 class fPOINTATTR;
@@ -1071,6 +1090,10 @@ public:
 	inline bool    operator==(const dPOINT& rhs) const noexcept;
 	inline dPOINT& operator=(const fPOINT& rhs) noexcept;
 	inline dPOINT& operator=(const BSEQPNT& rhs) noexcept;
+	// dPOINT(dPOINT&&) = default;
+	// dPOINT& operator=(const dPOINT& rhs) = default;
+	// dPOINT& operator=(dPOINT&&) = default;
+	//~dPOINT() = default;
 };
 
 class fPOINT
@@ -1089,6 +1112,10 @@ public:
 	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
 	inline fPOINT& operator=(const SMALPNTL& rhs) noexcept;
 	inline fPOINT& operator=(const BSEQPNT& rhs) noexcept;
+	// fPOINT(fPOINT&&) = default;
+	// fPOINT& operator=(const fPOINT& rhs) = default;
+	// fPOINT& operator=(fPOINT&&) = default;
+	//~fPOINT() = default;
 };
 
 class fPOINTATTR
@@ -1110,18 +1137,24 @@ public:
 class SMALPNTL
 {
 public:
-	uint32_t line; // line and group must remain in this order for sort to work
-	uint32_t group;
-	float    x;
-	float    y;
+	uint32_t line { 0u }; // line and group must remain in this order for sort to work
+	uint32_t group { 0u };
+	float    x { 0.0f };
+	float    y { 0.0f };
+
+	constexpr SMALPNTL() noexcept = default;
+	// SMALPNTL(SMALPNTL&&) = default;
+	// SMALPNTL& operator=(const SMALPNTL& rhs) = default;
+	// SMALPNTL& operator=(SMALPNTL&&) = default;
+	//~SMALPNTL() = default;
 };
 
 class BSEQPNT
 {
 public:
-	float  x {};
-	float  y {};
-	int8_t attribute {};
+	float  x { 0.0f };
+	float  y { 0.0f };
+	int8_t attribute { 0u };
 
 	inline BSEQPNT() noexcept = default;
 	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
@@ -1240,52 +1273,76 @@ inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
 	return *this;
 }
 
-struct _floatPointLine {
-	float    x;
-	float    y;
-	uint16_t line;
+class fPOINTLINE
+{
+public:
+	float    x { 0.0f };
+	float    y { 0.0f };
+	uint16_t line { 0u };
+
+	constexpr fPOINTLINE() noexcept = default;
+	// fPOINTLINE(fPOINTLINE&&) = default;
+	// fPOINTLINE& operator=(const fPOINTLINE& rhs) = default;
+	// fPOINTLINE& operator=(fPOINTLINE&&) = default;
+	//~fPOINTLINE() = default;
 };
 
-using fPOINTLINE = struct _floatPointLine;
+class dRECTANGLE
+{
+public:
+	double top { 0.0 };
+	double bottom { 0.0 };
+	double left { 0.0 };
+	double right { 0.0 };
 
-struct _doublerectangle {
-	double top;
-	double bottom;
-	double left;
-	double right;
+	constexpr dRECTANGLE() noexcept = default;
+	// dRECTANGLE(dRECTANGLE&&) = default;
+	// dRECTANGLE& operator=(const dRECTANGLE& rhs) = default;
+	// dRECTANGLE& operator=(dRECTANGLE&&) = default;
+	//~dRECTANGLE() = default;
 };
 
-using dRECTANGLE = struct _doublerectangle;
+class COLCHNG
+{
+public:
+	uint16_t stitchIndex { 0u }; // stitch index
+	uint16_t colorIndex { 0u };  // color index
 
-struct _colChng {
-	uint16_t stitchIndex; // stitch index
-	uint16_t colorIndex;  // color index
+	constexpr COLCHNG() noexcept = default;
+	// COLCHNG(COLCHNG&&) = default;
+	// COLCHNG& operator=(const COLCHNG& rhs) = default;
+	// COLCHNG& operator=(COLCHNG&&) = default;
+	//~COLCHNG() = default;
 };
-
-using COLCHNG = struct _colChng;
 
 class FEATHER
 {
 public:
-	uint32_t fillType;          // type of feather fill
-	float    ratio;             // feather ratio
-	float    minStitch;         // smallest stitch allowed
-	float    ratioLocal;        // local feather ratio
-	float    formRatio;         // feather ratio from form
-	uint32_t extendedAttribute; // extended form attribute
-	uint32_t upCount;           // feather up count
-	uint32_t downCount;         // feather down count
-	uint32_t totalCount;        // up count plus down count
-	uint32_t phaseIndex;
-	uint32_t phase;
-	uint32_t countUp;
-	uint32_t countDown;
-	float    globalStep;
-	float    globalPosition;
-	float    globalPhase;
-	float    globalUp;
-	float    globalDown;
-	float    globalRatio;
+	uint32_t fillType { 0u };          // type of feather fill
+	float    ratio { 0.0f };           // feather ratio
+	float    minStitch { 0.0f };       // smallest stitch allowed
+	float    ratioLocal { 0.0f };      // local feather ratio
+	float    formRatio { 0.0f };       // feather ratio from form
+	uint32_t extendedAttribute { 0u }; // extended form attribute
+	uint32_t upCount { 0u };           // feather up count
+	uint32_t downCount { 0u };         // feather down count
+	uint32_t totalCount { 0u };        // up count plus down count
+	uint32_t phaseIndex { 0u };
+	uint32_t phase { 0u };
+	uint32_t countUp { 0u };
+	uint32_t countDown { 0u };
+	float    globalStep { 0.0f };
+	float    globalPosition { 0.0f };
+	float    globalPhase { 0.0f };
+	float    globalUp { 0.0f };
+	float    globalDown { 0.0f };
+	float    globalRatio { 0.0f };
+
+	constexpr FEATHER() noexcept = default;
+	// FEATHER(FEATHER&&) = default;
+	// FEATHER& operator=(const FEATHER& rhs) = default;
+	// FEATHER& operator=(FEATHER&&) = default;
+	//~FEATHER() = default;
 };
 
 constexpr uint32_t COLMSK    = 0x0000000fu; // 0000 0000 0000 0000 0000 0000 0000 1111
@@ -1349,12 +1406,13 @@ constexpr uint32_t FRMFIL   = 0x20000000u;
 constexpr uint32_t FRMBFIL  = 0x40000000u;
 constexpr uint32_t FRMAPFIL = 0x60000000u;
 
-class fRECTANGLE {
+class fRECTANGLE
+{
 public:
-	float left{ 0.0f };
-	float top{ 0.0f };
-	float right{ 0.0f };
-	float bottom{ 0.0f };
+	float left { 0.0f };
+	float top { 0.0f };
+	float right { 0.0f };
+	float bottom { 0.0f };
 
 	constexpr fRECTANGLE() noexcept = default;
 	// fRECTANGLE(fRECTANGLE&&) = default;
@@ -1363,8 +1421,6 @@ public:
 	//~fRECTANGLE() = default;
 
 	inline fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
-
-
 };
 
 inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept
@@ -1374,21 +1430,27 @@ inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float
     , bottom(rhsBottom) {
 }
 
-struct _forminfo {
-	uint32_t type;
-	uint32_t attribute;
-	uint32_t sideCount;
-};
+class FORMINFO
+{
+public:
+	uint32_t type { 0u };
+	uint32_t attribute { 0u };
+	uint32_t sideCount { 0u };
 
-using FORMINFO = struct _forminfo;
+	constexpr FORMINFO() noexcept = default;
+	// FORMINFO(FORMINFO&&) = default;
+	// FORMINFO& operator=(const FORMINFO& rhs) = default;
+	// FORMINFO& operator=(FORMINFO&&) = default;
+	//~FORMINFO() = default;
+};
 
 class SATCONOUT;
 
 class SATCON
 {
 public:
-	uint32_t start{};
-	uint32_t finish{};
+	uint32_t start {};
+	uint32_t finish {};
 
 	constexpr SATCON() noexcept = default;
 	// SATCON(SATCON&&) = default;
@@ -1623,36 +1685,57 @@ constexpr uint32_t EGHOL_LINS = 7;
 constexpr uint32_t EGPIC_LINS = 7;
 constexpr uint32_t EGCHN_LINS = 6;
 
-struct _featherInfo {
-	uint8_t  fillType;      // feather fill type
-	uint8_t  upCount;       // feather up count
-	uint8_t  downCount;     // feather down count
-	uint8_t  color;         // feather blend color
-	float    ratio;         // feather ratio
-	float    minStitchSize; // feather floor
-	uint16_t count;         // feather fill psg granularity
+class FTHINFO
+{
+public:
+	uint8_t  fillType { 0u };        // feather fill type
+	uint8_t  upCount { 0u };         // feather up count
+	uint8_t  downCount { 0u };       // feather down count
+	uint8_t  color { 0u };           // feather blend color
+	float    ratio { 0.0f };         // feather ratio
+	float    minStitchSize { 0.0f }; // feather floor
+	uint16_t count { 0u };           // feather fill psg granularity
+
+	constexpr FTHINFO() noexcept = default;
+	// FTHINFO(FTHINFO&&) = default;
+	// FTHINFO& operator=(const FTHINFO& rhs) = default;
+	// FTHINFO& operator=(FTHINFO&&) = default;
+	//~FTHINFO() = default;
 };
 
-using FTHINFO = struct _featherInfo;
+class TXTRINFO
+{
+public:
+	int16_t  lines { 0 };
+	uint16_t index { 0u };
+	uint16_t count { 0u };
+	float    height { 0.0f };
 
-struct _textureInfo {
-	int16_t  lines;
-	uint16_t index;
-	uint16_t count;
-	float    height;
+	constexpr TXTRINFO() noexcept = default;
+	// TXTRINFO(TXTRINFO&&) = default;
+	// TXTRINFO& operator=(const TXTRINFO& rhs) = default;
+	// TXTRINFO& operator=(TXTRINFO&&) = default;
+	//~TXTRINFO() = default;
 };
 
-using TXTRINFO = struct _textureInfo;
-
-union _tfhed {
+union TFINFO {
+public:
 	FTHINFO  feather;
 	TXTRINFO texture;
+
+	TFINFO() noexcept;
+	// TFINFO(TFINFO&&) = default;
+	// TFINFO& operator=(const TFINFO& rhs) = default;
+	// TFINFO& operator=(TFINFO&&) = default;
+	//~TFINFO() = default;
 };
 
-using TFINFO = union _tfhed;
+inline TFINFO::TFINFO() noexcept
+    : feather() {
+}
 
-// Original form header used prior to version 2
-class FRMHEDO
+
+class FRMHEDO // Original form header used prior to version 2
 {
 public:
 	uint8_t  attribute;   // attribute
@@ -1680,6 +1763,10 @@ public:
 	uint16_t   res;             // pico length
 
 	FRMHEDO() noexcept;
+	// FRMHEDO(FRMHEDO&&) = default;
+	// FRMHEDO& operator=(const FRMHEDO& rhs) = default;
+	// FRMHEDO& operator=(FRMHEDO&&) = default;
+	//~FRMHEDO() = default;
 };
 
 inline FRMHEDO::FRMHEDO() noexcept
@@ -2253,61 +2340,98 @@ constexpr uint32_t AT_CWLK    = 0x100u; // center walk
 constexpr uint32_t FRECONT  = 0x80u;
 constexpr uint32_t NFRECONT = 0x7fu;
 
-struct _frmclp {
-	uint32_t clipType {};
-	uint32_t reserved {};
-	FRMHED   form;
+class FORMCLIP // form data clipboard header
+{
+public:
+	uint32_t clipType { 0u };
+	uint32_t reserved { 0u };
+	FRMHED   form {};
+
+	constexpr FORMCLIP() noexcept = default;
+	// FORMCLIP(FORMCLIP&&) = default;
+	// FORMCLIP& operator=(const FORMCLIP& rhs) = default;
+	// FORMCLIP& operator=(FORMCLIP&&) = default;
+	//~FORMCLIP() = default;
 };
 
-using FORMCLIP = struct _frmclp; // form data clipboard header
+class FORMSCLIP // multiple forms clipboard header
+{
+public:
+	uint32_t clipType { 0u };
+	uint16_t formCount { 0u };
+	uint16_t reserved { 0u };
 
-struct _frmsclp {
-	uint32_t clipType;
-	uint16_t formCount;
-	uint16_t reserved;
+	constexpr FORMSCLIP() noexcept = default;
+	// FORMSCLIP(FORMSCLIP&&) = default;
+	// FORMSCLIP& operator=(const FORMSCLIP& rhs) = default;
+	// FORMSCLIP& operator=(FORMSCLIP&&) = default;
+	//~FORMSCLIP() = default;
 };
 
-using FORMSCLIP = struct _frmsclp; // multiple forms clipboard header
+class FORMVERTEXCLIP // form points clipboard header
+{
+public:
+	uint32_t clipType { 0u };
+	uint32_t vertexCount { 0u };
+	bool     direction { 0u };
 
-struct _fvclip {
-	uint32_t clipType;
-	uint32_t vertexCount;
-	bool     direction;
+	constexpr FORMVERTEXCLIP() noexcept = default;
+	// FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
+	// FORMVERTEXCLIP& operator=(const FORMVERTEXCLIP& rhs) = default;
+	// FORMVERTEXCLIP& operator=(FORMVERTEXCLIP&&) = default;
+	//~FORMVERTEXCLIP() = default;
 };
 
-using FORMVERTEXCLIP = struct _fvclip; // form points clipboard header
+class STRHED // thred file header
+{
+public:
+	uint32_t headerType { 0u };
+	uint32_t fileLength { 0u };    // length of strhed + length of stitch data
+	uint16_t stitchCount { 0u };   // number of stitches
+	uint16_t hoopType { 0u };      // size of hoop
+	uint16_t formCount { 0u };     // number of forms
+	uint16_t vertexLen { 0u };     // points to form points
+	uint16_t vertexCount { 0u };   // number of form points
+	uint16_t dlineLen { 0u };      // points to dline data
+	uint16_t dlineCount { 0u };    // dline data count
+	uint16_t clipDataLen { 0u };   // points to clipboard data
+	uint16_t clipDataCount { 0u }; // clipboard data count
 
-struct _strhed { // thred file header
-	uint32_t headerType {0u};
-	uint32_t fileLength {0u};    // length of strhed + length of stitch data
-	uint16_t stitchCount {0u};   // number of stitches
-	uint16_t hoopType {0u};      // size of hoop
-	uint16_t formCount {0u};     // number of forms
-	uint16_t vertexLen {0u};     // points to form points
-	uint16_t vertexCount {0u};   // number of form points
-	uint16_t dlineLen {0u};      // points to dline data
-	uint16_t dlineCount {0u};    // dline data count
-	uint16_t clipDataLen {0u};   // points to clipboard data
-	uint16_t clipDataCount {0u}; // clipboard data count
+	constexpr STRHED() noexcept = default;
+	// STRHED(STRHED&&) = default;
+	// STRHED& operator=(const STRHED& rhs) = default;
+	// STRHED& operator=(STRHED&&) = default;
+	//~STRHED() = default;
 };
 
-using STRHED = _strhed;
+class TXPNT // textured fill point
+{ 
+public:
+	float    y { 0.0f };
+	uint16_t line { 0u };
 
-struct _txpnt { // textured fill point
-	float    y {0.0f};
-	uint16_t line {0u};
+	constexpr TXPNT() noexcept = default;
+	// TXPNT(TXPNT&&) = default;
+	// TXPNT& operator=(const TXPNT& rhs) = default;
+	// TXPNT& operator=(TXPNT&&) = default;
+	//~TXPNT() = default;
 };
 
-using TXPNT = struct _txpnt;
-
-struct _txoff { // textured fill offset
-	float   y {0.0f};
+class TXOFF // textured fill offset
+{
+public:
+	float   y { 0.0f };
 	int32_t line { 0 };
+
+	constexpr TXOFF() noexcept = default;
+	// TXOFF(TXOFF&&) = default;
+	// TXOFF& operator=(const TXOFF& rhs) = default;
+	// TXOFF& operator=(TXOFF&&) = default;
+	//~TXOFF() = default;
 };
 
-using TXOFF = struct _txoff;
-
-class STREX {                      // thred v1.0 file header extension
+class STREX // thred v1.0 file header extension
+{
 public:
 	float    hoopSizeX { 0.0f };           // hoop size x dimension
 	float    hoopSizeY { 0.0f };           // hoop size y dimension
@@ -2320,9 +2444,14 @@ public:
 	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
 
 	constexpr STREX() noexcept = default;
+	// STREX(STREX&&) = default;
+	// STREX& operator=(const STREX& rhs) = default;
+	// STREX& operator=(STREX&&) = default;
+	//~STREX() = default;
 };
 
-class DSTHED {      // dst file header
+class DSTHED // dst file header
+{
 public:
 	char desched[3] { 0 };  // 00  00	description   NOLINT
 	char desc[17] { 0 };    // 03  03                 NOLINT
@@ -2352,6 +2481,10 @@ public:
 	char res[388] { 0 };    // 124 7C                 NOLINT
 
 	constexpr DSTHED() noexcept = default;
+	// DSTHED(DSTHED&&) = default;
+	// DSTHED& operator=(const DSTHED& rhs) = default;
+	// DSTHED& operator=(DSTHED&&) = default;
+	//~DSTHED() = default;
 };
 
 // dst type masks
@@ -2360,84 +2493,127 @@ constexpr uint32_t JMPTYP = 0x830000u;
 constexpr uint32_t COLTYP = 0x630000u;
 constexpr uint32_t REGTYP = 0x030000u;
 
-struct _dstrec { // dst stitch record
-	uint8_t led;
-	uint8_t mid;
-	uint8_t nd;
+class DSTREC // dst stitch record
+{
+public:
+	uint8_t led { 0u };
+	uint8_t mid { 0u };
+	uint8_t nd { 0u };
+
+	constexpr DSTREC() noexcept = default;
+	// DSTREC(DSTREC&&) = default;
+	// DSTREC& operator=(const DSTREC& rhs) = default;
+	// DSTREC& operator=(DSTREC&&) = default;
+	//~DSTREC() = default;
 };
 
-using DSTREC = struct _dstrec;
-
-struct _dstoffsets {
+class DSTOffsets
+{
+public:
 	POINT Positive { 0, 0 }; // plus offset written into the destination file header
 	POINT Negative { 0, 0 }; // minus offset written into the destination file header
+
+	constexpr DSTOffsets() noexcept = default;
+	// DSTOffsets(DSTOffsets&&) = default;
+	// DSTOffsets& operator=(const DSTOffsets& rhs) = default;
+	// DSTOffsets& operator=(DSTOffsets&&) = default;
+	//~DSTOffsets() = default;
 };
 
-using DSTOffsets = struct _dstoffsets;
-
-struct _pcstch {
-	uint8_t fx; // fractional part of x coord or color if tag = 3
-	int16_t x;  // integer part of x coord
-	uint8_t nx;
-	uint8_t fy; // fractional part of y coord
-	int16_t y;  // integer part of y coord
-	uint8_t ny;
-	uint8_t tag;
-};
-
-using PCSTCH = struct _pcstch;
-
-struct _clpstch {
-	uint32_t led;  // ????
-	uint8_t  fx;   // fractional part of x coord
-	uint16_t x;    // integer part of x coord
-	uint8_t  spcx; // ToDo - Is this structure member needed?
-	uint8_t  fy;   // fractional part of y coord
-	uint16_t y;    // integer part of y coord
-	uint8_t  spcy; // ToDo - Is this structure member needed?
-	uint8_t  myst; // ToDo - Is this structure member needed?
-	uint8_t  tag;  // ToDo - Is this structure member needed?
-};
-
-using CLPSTCH = struct _clpstch;
-
-struct _bakhed {
-	uint32_t    formCount;
-	FRMHED*     forms;
-	uint32_t    stitchCount;
-	fPOINTATTR* stitches;
-	uint32_t    vertexCount;
-	fPOINT*     vertices;
-	uint32_t    guideCount;
-	SATCON*     guide;
-	uint32_t    clipPointCount;
-	fPOINT*     clipPoints;
-	COLORREF*   colors;
-	TXPNT*      texturePoints;
-	uint32_t    texturePointCount;
-	POINT       zoomRect;
-};
-
-using BAKHED = struct _bakhed;
-
-struct _flsiz {
-	float cx;
-	float cy;
-};
-
-using FLSIZ = struct _flsiz;
-
-struct _frmrange {
-	uint32_t start;
-	uint32_t finish;
-};
-
-using FRMRANGE = struct _frmrange;
-
-class RANGE {
+class PCSTCH
+{
 public:
-	uint32_t start {0u};
-	uint32_t finish {0u};
+	uint8_t fx { 0u }; // fractional part of x coord or color if tag = 3
+	int16_t x { 0 };   // integer part of x coord
+	uint8_t nx { 0u };
+	uint8_t fy { 0u }; // fractional part of y coord
+	int16_t y { 0u };  // integer part of y coord
+	uint8_t ny { 0u };
+	uint8_t tag { 0u };
+
+	constexpr PCSTCH() noexcept = default;
+	// PCSTCH(PCSTCH&&) = default;
+	// PCSTCH& operator=(const PCSTCH& rhs) = default;
+	// PCSTCH& operator=(PCSTCH&&) = default;
+	//~PCSTCH() = default;
+};
+
+class CLPSTCH
+{
+public:
+	uint32_t led { 0u };  // ????
+	uint8_t  fx { 0u };   // fractional part of x coord
+	uint16_t x { 0u };    // integer part of x coord
+	uint8_t  spcx { 0u }; // ToDo - Is this structure member needed?
+	uint8_t  fy { 0u };   // fractional part of y coord
+	uint16_t y { 0u };    // integer part of y coord
+	uint8_t  spcy { 0u }; // ToDo - Is this structure member needed?
+	uint8_t  myst { 0u }; // ToDo - Is this structure member needed?
+	uint8_t  tag { 0u };  // ToDo - Is this structure member needed?
+
+	constexpr CLPSTCH() noexcept = default;
+	// CLPSTCH(CLPSTCH&&) = default;
+	// CLPSTCH& operator=(const CLPSTCH& rhs) = default;
+	// CLPSTCH& operator=(CLPSTCH&&) = default;
+	//~CLPSTCH() = default;
+};
+
+class BAKHED
+{
+public:
+	uint32_t    formCount { 0u };
+	FRMHED*     forms { nullptr };
+	uint32_t    stitchCount { 0u };
+	fPOINTATTR* stitches { nullptr };
+	uint32_t    vertexCount { 0u };
+	fPOINT*     vertices { nullptr };
+	uint32_t    guideCount { 0u };
+	SATCON*     guide { nullptr };
+	uint32_t    clipPointCount { 0u };
+	fPOINT*     clipPoints { nullptr };
+	COLORREF*   colors { nullptr };
+	TXPNT*      texturePoints { nullptr };
+	uint32_t    texturePointCount { 0u };
+	POINT       zoomRect { 0, 0 };
+
+	constexpr BAKHED() noexcept = default;
+	// BAKHED(CLPSTCH&&) = default;
+	// BAKHED& operator=(const BAKHED& rhs) = default;
+	// BAKHED& operator=(BAKHED&&) = default;
+	//~BAKHED() = default;
+};
+
+class FLSIZ
+{
+public:
+	float cx { 0.0f };
+	float cy { 0.0f };
+
+	constexpr FLSIZ() noexcept = default;
+	// FLSIZ(FLSIZ&&) = default;
+	// FLSIZ& operator=(const FLSIZ& rhs) = default;
+	// FLSIZ& operator=(FLSIZ&&) = default;
+	//~FLSIZ() = default;
+};
+
+class FRMRANGE
+{
+public:
+	uint32_t start { 0u };
+	uint32_t finish { 0u };
+
+	constexpr FRMRANGE() noexcept = default;
+	// FRMRANGE(FRMRANGE&&) = default;
+	// FRMRANGE& operator=(const FRMRANGE& rhs) = default;
+	// FRMRANGE& operator=(FRMRANGE&&) = default;
+	//~FRMRANGE() = default;
+};
+
+class RANGE
+{
+public:
+	uint32_t start { 0u };
+	uint32_t finish { 0u };
 
 	constexpr RANGE() noexcept = default;
 	// RANGE(RANGE&&) = default;
@@ -2469,67 +2645,104 @@ inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uin
     , breakCount(rhsCount) {
 }
 
-struct _rcon { // PathMap: path map for sequencing
-	uint32_t node;
-	bool     isConnected;
-	uint32_t nextGroup;
+class RCON // PathMap: path map for sequencing
+{
+public:
+	uint32_t node { 0u };
+	bool     isConnected { false };
+	uint32_t nextGroup { 0u };
+
+	constexpr RCON() noexcept = default;
+	// RCON(RCON&&) = default;
+	// RCON& operator=(const RCON& rhs) = default;
+	// RCON& operator=(RCON&&) = default;
+	//~RCON() = default;
 };
 
-using RCON = struct _rcon;
+class RGSEQ // TempPath: temporary path connections
+{
+public:
+	uint32_t pcon { 0u }; // pointer to PathMap entry
+	int32_t  count { 0 };
+	bool     skp { false }; // path not found
 
-struct _rgseq {    // TempPath: temporary path connections
-	uint32_t pcon; // pointer to PathMap entry
-	int32_t  count;
-	bool     skp; // path not found
+	constexpr RGSEQ() noexcept = default;
+	// RGSEQ(RGSEQ&&) = default;
+	// RGSEQ& operator=(const RGSEQ& rhs) = default;
+	// RGSEQ& operator=(RGSEQ&&) = default;
+	//~RGSEQ() = default;
 };
 
-using RGSEQ = struct _rgseq;
+class FSEQ // SequencePath: path of sequenced regions
+{
+public:
+	uint16_t node { 0u };
+	uint16_t nextGroup { 0u };
+	bool     skp { false }; // path not found
 
-struct _fseq { // SequencePath: path of sequenced regions
-	uint16_t node;
-	uint16_t nextGroup;
-	bool     skp; // path not found
+	constexpr FSEQ() noexcept = default;
+	// FSEQ(FSEQ&&) = default;
+	// FSEQ& operator=(const FSEQ& rhs) = default;
+	// FSEQ& operator=(FSEQ&&) = default;
+	//~FSEQ() = default;
 };
-
-using FSEQ = struct _fseq;
 
 constexpr uint32_t SEQTOP = 2;
 constexpr uint32_t SEQBOT = 3;
 
-struct _pvec {
-	double angle;
-	double length;
+class PVEC
+{
+public:
+	double angle { 0.0 };
+	double length { 0.0 };
+
+	constexpr PVEC() noexcept = default;
+	// PVEC(PVEC&&) = default;
+	// PVEC& operator=(const PVEC& rhs) = default;
+	// PVEC& operator=(PVEC&&) = default;
+	//~PVEC() = default;
 };
 
-using PVEC = struct _pvec;
+class VRCT2
+{
+public:
+	fPOINT aipnt {};
+	fPOINT aopnt {};
+	fPOINT bipnt {};
+	fPOINT bopnt {};
+	fPOINT cipnt {};
+	fPOINT copnt {};
+	fPOINT dipnt {};
+	fPOINT dopnt {};
 
-struct _vrct2 {
-	fPOINT aipnt;
-	fPOINT aopnt;
-	fPOINT bipnt;
-	fPOINT bopnt;
-	fPOINT cipnt;
-	fPOINT copnt;
-	fPOINT dipnt;
-	fPOINT dopnt;
+	constexpr VRCT2() noexcept = default;
+	// VRCT2(VRCT2&&) = default;
+	// VRCT2& operator=(const VRCT2& rhs) = default;
+	// VRCT2& operator=(VRCT2&&) = default;
+	//~VRCT2() = default;
 };
 
-using VRCT2 = struct _vrct2;
+class CURSORMASK
+{
+public:
+	uint8_t form[128] { 0 };            // NOLINT
+	uint8_t dline[128] { 0 };           // NOLINT
+	uint8_t uprightNeedle[128] { 0 };   // NOLINT
+	uint8_t leftUpNeedle[128] { 0 };    // NOLINT
+	uint8_t leftDownNeedle[128] { 0 };  // NOLINT
+	uint8_t rightUpNeedle[128] { 0 };   // NOLINT
+	uint8_t rightDownNeedle[128] { 0 }; // NOLINT
 
-struct _cursorMask {
-	uint8_t form[128];            // NOLINT
-	uint8_t dline[128];           // NOLINT
-	uint8_t uprightNeedle[128];   // NOLINT
-	uint8_t leftUpNeedle[128];    // NOLINT
-	uint8_t leftDownNeedle[128];  // NOLINT
-	uint8_t rightUpNeedle[128];   // NOLINT
-	uint8_t rightDownNeedle[128]; // NOLINT
+	constexpr CURSORMASK() noexcept = default;
+	// CURSORMASK(CURSORMASK&&) = default;
+	// CURSORMASK& operator=(const CURSORMASK& rhs) = default;
+	// CURSORMASK& operator=(CURSORMASK&&) = default;
+	//~CURSORMASK() = default;
 };
 
-using CURSORMASK = struct _cursorMask;
 
-// balarad file header
-class BALHED {
+class BALHED // balarad file header
+{
 public:
 	COLORREF color[256] { 0 }; // NOLINT
 	uint32_t signature { 0u };
@@ -2540,31 +2753,47 @@ public:
 	uint8_t  res[1006] { 0 }; // NOLINT
 
 	constexpr BALHED() noexcept = default;
+	// BALHED(BALHED&&) = default;
+	// BALHED& operator=(const BALHED& rhs) = default;
+	// BALHED& operator=(BALHED&&) = default;
+	//~BALHED() = default;
 };
 
-// balarad stitch
-struct _balstch {
-	uint8_t code;
-	uint8_t flag;
-	float   x;
-	float   y;
+
+class BALSTCH // balarad stitch
+{
+public:
+	uint8_t code { 0u };
+	uint8_t flag { 0u };
+	float   x { 0.0f };
+	float   y { 0.0f };
+
+	constexpr BALSTCH() noexcept = default;
+	// BALSTCH(BALSTCH&&) = default;
+	// BALSTCH& operator=(const BALSTCH& rhs) = default;
+	// BALSTCH& operator=(BALSTCH&&) = default;
+	//~BALSTCH() = default;
 };
 
-using BALSTCH = struct _balstch;
+class CLPSEG
+{
+public:
+	uint32_t start { 0u };
+	float    beginLength { 0.0f };
+	uint32_t beginIndex { 0u };
+	uint32_t asid { 0u };
+	uint32_t finish { 0u };
+	float    endLength { 0.0f };
+	uint32_t endIndex { 0u };
+	uint32_t zsid { 0u };
+	int8_t   dun { 0 };
 
-struct _clpseg {
-	uint32_t start;
-	float    beginLength;
-	uint32_t beginIndex;
-	uint32_t asid;
-	uint32_t finish;
-	float    endLength;
-	uint32_t endIndex;
-	uint32_t zsid;
-	int8_t   dun;
+	constexpr CLPSEG() noexcept = default;
+	// CLPSEG(CLPSEG&&) = default;
+	// CLPSEG& operator=(const CLPSEG& rhs) = default;
+	// CLPSEG& operator=(CLPSEG&&) = default;
+	//~CLPSEG() = default;
 };
-
-using CLPSEG = struct _clpseg;
 
 class CLIPSORT
 {
@@ -2575,34 +2804,57 @@ public:
 	fPOINT   point;
 
 	constexpr CLIPSORT() noexcept = default;
+	// CLIPSORT(CLIPSORT&&) = default;
+	// CLIPSORT& operator=(const CLIPSORT& rhs) = default;
+	// CLIPSORT& operator=(CLIPSORT&&) = default;
+	//~CLIPSORT() = default;
 };
 
-struct _clipnt {
-	float    x;
-	float    y;
-	uint32_t vertexIndex;
-	uint32_t flag;
+class CLIPNT
+{
+public:
+	float    x { 0.0f };
+	float    y { 0.0f };
+	uint32_t vertexIndex { 0u };
+	uint32_t flag { 0u };
+
+	constexpr CLIPNT() noexcept = default;
+	// CLIPNT(CLIPNT&&) = default;
+	// CLIPNT& operator=(const v& rhs) = default;
+	// CLIPNT& operator=(CLIPNT&&) = default;
+	//~CLIPNT() = default;
 };
 
-using CLIPNT = struct _clipnt;
+class VCLPX
+{
+public:
+	uint32_t segment { 0u };
+	uint32_t vertex { 0u };
 
-struct _vclpx {
-	uint32_t segment;
-	uint32_t vertex;
+	constexpr VCLPX() noexcept = default;
+	// VCLPX(VCLPX&&) = default;
+	// VCLPX& operator=(const VCLPX& rhs) = default;
+	// VCLPX& operator=(VCLPX&&) = default;
+	//~VCLPX() = default;
 };
-
-using VCLPX = struct _vclpx;
 
 #if PESACT
 
-struct _pesled {
-	int8_t   ver[8]; // NOLINT
-	uint32_t pec;
+class PESLED
+{
+public:
+	int8_t   ver[8] { 0 }; // NOLINT
+	uint32_t pec { 0u };
+
+	constexpr PESLED() noexcept = default;
+	// PESLED(PESLED&&) = default;
+	// PESLED& operator=(const PESLED& rhs) = default;
+	// PESLED& operator=(PESLED&&) = default;
+	//~PESLED() = default;
 };
 
-using PESLED = struct _pesled;
-
-class PESHED {
+class PESHED
+{
 public:
 	char     led[8] { 0 };  //   0-7  Identification and version (#PES0001)         NOLINT
 	uint32_t off { 0 };     //   8-b  Absolute PEC section byte offset
@@ -2642,105 +2894,161 @@ public:
 	constexpr PESHED() noexcept = default;
 };
 
-struct _pestch {
-	int16_t x;
-	int16_t y;
+class PESTCH
+{
+public:
+	int16_t x { 0 };
+	int16_t y { 0 };
+
+	constexpr PESTCH() noexcept = default;
+	// PESTCH(PESTCH&&) = default;
+	// PESTCH& operator=(const PESTCH& rhs) = default;
+	// PESTCH& operator=(PESTCH&&) = default;
+	//~PESTCH() = default;
 };
 
-using PESTCH = struct _pestch;
+class PESSTCHLST
+{
+public:
+	uint16_t stitchtype { 0u };
+	uint16_t threadIndex { 0u };
+	uint16_t stitchcount { 0u };
 
-struct _pesstitchlist {
-	uint16_t stitchtype;
-	uint16_t threadIndex;
-	uint16_t stitchcount;
+	constexpr PESSTCHLST() noexcept = default;
+	// PESSTCHLST(PESSTCHLST&&) = default;
+	// PESSTCHLST& operator=(const PESSTCHLST& rhs) = default;
+	// PESSTCHLST& operator=(PESSTCHLST&&) = default;
+	//~PESSTCHLST() = default;
 };
 
-using PESSTCHLST = struct _pesstitchlist;
+class PECHDR
+{
+public:
+	char     label[19] { 0 };   // Label string prefixed with "LA:" and padded with space (0x20)                         NOLINT
+	int8_t   labnd { 0 };       // carriage return character
+	uint8_t  ukn1[11] { 0u };   // Unknown (' ')                                                                         NOLINT
+	uint8_t  ukn2 { 0u };       // Unknown
+	uint16_t hnd1 { 0u };       // Unknown (0x00ff)
+	uint8_t  thumbWidth { 0u }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+	                            // Thus, 6 would mean 6×8 = 48 pixels per line
+	uint8_t thumbHeight { 0u }; // Thumbnail image height in pixels (38)
+	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20                                  NOLINT
+	uint8_t colorCount { 0u };  // Number of colors minus one, 0xFF means 0 colors
+	uint8_t pad[463] { 0u };    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20   NOLINT
 
-struct _pecheader {
-	char     label[19];  // Label string prefixed with "LA:" and padded with space (0x20)                         NOLINT
-	int8_t   labnd;      // carriage return character
-	uint8_t  ukn1[11];   // Unknown (' ')                                                                         NOLINT
-	uint8_t  ukn2;       // Unknown
-	uint16_t hnd1;       // Unknown (0x00ff)
-	uint8_t  thumbWidth; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-	                     // Thus, 6 would mean 6×8 = 48 pixels per line
-	uint8_t thumbHeight; // Thumbnail image height in pixels (38)
-	uint8_t ukn3[12];    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20                                  NOLINT
-	uint8_t colorCount;  // Number of colors minus one, 0xFF means 0 colors
-	uint8_t pad[463];    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20   NOLINT
+	constexpr PECHDR() noexcept = default;
+	// PECHDR(PECHDR&&) = default;
+	// PECHDR& operator=(const PECHDR& rhs) = default;
+	// PECHDR& operator=(PECHDR&&) = default;
+	//~PECHDR() = default;
 };
-
-using PECHDR = struct _pecheader;
 
 static const uint8_t ThumbHeight = 38u;
 static const uint8_t ThumbWidth  = 48u;
 
-struct _pecheader2 {
-	uint16_t unknown1;        // typical 0x0000
-	uint16_t thumbnailOffset; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
-	uint16_t unknown2;        // typical 0x3100
-	uint16_t unknown3;        // typical 0xf0ff
-	int16_t  width;           // Width
-	int16_t  height;          // height
-	uint16_t unknown4;        // typical 0x01e0
-	uint16_t unknown5;        // typical 0x01b0
-	uint16_t xMin;            // starting X val (Bigendian)
-	uint16_t yMin;            // starting Y val (Bigendian)
-};
+class PECHDR2
+{
+public:
+	uint16_t unknown1 { 0u };        // typical 0x0000
+	uint16_t thumbnailOffset { 0u }; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
+	uint16_t unknown2 { 0u };        // typical 0x3100
+	uint16_t unknown3 { 0u };        // typical 0xf0ff
+	int16_t  width { 0 };            // Width
+	int16_t  height { 0 };           // height
+	uint16_t unknown4 { 0u };        // typical 0x01e0
+	uint16_t unknown5 { 0u };        // typical 0x01b0
+	uint16_t xMin { 0u };            // starting X val (Bigendian)
+	uint16_t yMin { 0u };            // starting Y val (Bigendian)
 
-using PECHDR2 = struct _pecheader2;
+	constexpr PECHDR2() noexcept = default;
+	// PECHDR2(PECHDR2&&) = default;
+	// PECHDR2& operator=(const PECHDR2& rhs) = default;
+	// PECHDR2& operator=(PECHDR2&&) = default;
+	//~PECHDR2() = default;
+};
 
 #endif
 
-struct _trcpnt {
-	int16_t x;
-	int16_t y;
+class TRCPNT
+{
+public:
+	int16_t x { 0 };
+	int16_t y { 0 };
+
+	constexpr TRCPNT() noexcept = default;
+	// TRCPNT(TRCPNT&&) = default;
+	// TRCPNT& operator=(const TRCPNT& rhs) = default;
+	// TRCPNT& operator=(TRCPNT&&) = default;
+	//~TRCPNT() = default;
 };
 
-using TRCPNT = struct _trcpnt;
+// ToDo - Is this class needed?
+class TXTMSG
+{
+public:
+	uint32_t cod { 0u };
+	int8_t*  str { nullptr };
 
-// ToDo - Is this struct needed?
-struct _txtmsg {
-	uint32_t cod;
-	int8_t*  str;
+	constexpr TXTMSG() noexcept = default;
+	// TXTMSG(TXTMSG&&) = default;
+	// TXTMSG& operator=(const TXTMSG& rhs) = default;
+	// TXTMSG& operator=(TXTMSG&&) = default;
+	//~TXTMSG() = default;
 };
 
-using TXTMSG = struct _txtmsg;
+class GRDCOD
+{
+public:
+	uint32_t id { 0u };
+	uint32_t col { 0u };
 
-struct _grdcod {
-	uint32_t id;
-	uint32_t col;
+	constexpr GRDCOD() noexcept = default;
+	// GRDCOD(GRDCOD&&) = default;
+	// GRDCOD& operator=(const GRDCOD& rhs) = default;
+	// GRDCOD& operator=(GRDCOD&&) = default;
+	//~GRDCOD() = default;
 };
-
-using GRDCOD = struct _grdcod;
 
 #pragma pack()
 
-struct _orec {
-	uint32_t    start;
-	uint32_t    finish;
-	fPOINTATTR* startStitch;
-	fPOINTATTR* endStitch;
-	uint32_t    color;
-	uint32_t    type;
-	uint32_t    form;
-	uint32_t    otyp;
+class OREC
+{
+public:
+	uint32_t    start { 0u };
+	uint32_t    finish { 0u };
+	fPOINTATTR* startStitch { nullptr };
+	fPOINTATTR* endStitch { nullptr };
+	uint32_t    color { 0u };
+	uint32_t    type { 0u };
+	uint32_t    form { 0u };
+	uint32_t    otyp { 0u };
+
+	constexpr OREC() noexcept = default;
+	// OREC(OREC&&) = default;
+	// OREC& operator=(const OREC& rhs) = default;
+	// OREC& operator=(OREC&&) = default;
+	//~OREC() = default;
 };
 
-using OREC = struct _orec;
+class SRTREC
+{
+public:
+	uint32_t start { 0u };         // start region index
+	uint32_t finish { 0u };        // finish region index
+	uint32_t count { 0u };         // number of regions in range
+	uint32_t currentRegion { 0u }; // current region index
+	bool     direction = false;    // direction of sort
 
-struct _srtrec {
-	uint32_t start         {0u};    // start region index
-	uint32_t finish        {0u};    // finish region index
-	uint32_t count         {0u};    // number of regions in range
-	uint32_t currentRegion {0u};    // current region index
-	bool     direction     = false; // direction of sort
+	constexpr SRTREC() noexcept = default;
+	// SRTREC(SRTREC&&) = default;
+	// SRTREC& operator=(const SRTREC& rhs) = default;
+	// SRTREC& operator=(SRTREC&&) = default;
+	//~SRTREC() = default;
 };
 
-using SRTREC = struct _srtrec;
-
-struct _fstrts {
+class FSTRTS
+{
+public:
 	uint32_t applique { 0 };
 	uint32_t fill { 0 };
 	uint32_t feather { 0 };
@@ -2749,9 +3057,13 @@ struct _fstrts {
 	uint32_t fillColor { 0 };
 	uint32_t featherColor { 0 };
 	uint32_t borderColor { 0 };
-};
 
-using FSTRTS = struct _fstrts;
+	constexpr FSTRTS() noexcept = default;
+	// FSTRTS(FSTRTS&&) = default;
+	// FSTRTS& operator=(const FSTRTS& rhs) = default;
+	// FSTRTS& operator=(FSTRTS&&) = default;
+	//~FSTRTS() = default;
+};
 
 union _fillStarts {
 	FSTRTS   fillNamed;
@@ -2772,14 +3084,20 @@ constexpr uint32_t M_FCOL   = 0x200u;
 constexpr uint32_t M_FTHCOL = 0x400u;
 constexpr uint32_t M_ECOL   = 0x800u;
 
-struct _insrec {
-	uint32_t code;
-	uint32_t color;
-	uint32_t index;
-	uint32_t seq;
-};
+class INSREC
+{
+public:
+	uint32_t code { 0u };
+	uint32_t color { 0u };
+	uint32_t index { 0u };
+	uint32_t seq { 0u };
 
-using INSREC = struct _insrec;
+	constexpr INSREC() noexcept = default;
+	// INSREC(INSREC&&) = default;
+	// INSREC& operator=(const INSREC& rhs) = default;
+	// INSREC& operator=(INSREC&&) = default;
+	//~INSREC() = default;
+};
 
 enum interleaveTypes
 { // interleave sequence identifiers
@@ -2789,16 +3107,22 @@ enum interleaveTypes
 	I_BRD,
 };
 
-struct _intinf {
-	uint32_t    pins {0u};
-	uint32_t    coloc {0u};
-	uint32_t    layerIndex {0u};
-	uint32_t    start {0u};
-	uint32_t    output {0u};
-	fPOINTATTR* highStitchBuffer = nullptr;
-};
+class INTINF
+{
+public:
+	uint32_t    pins { 0u };
+	uint32_t    coloc { 0u };
+	uint32_t    layerIndex { 0u };
+	uint32_t    start { 0u };
+	uint32_t    output { 0u };
+	fPOINTATTR* highStitchBuffer { nullptr };
 
-using INTINF = struct _intinf;
+	constexpr INTINF() noexcept = default;
+	// INTINF(INTINF&&) = default;
+	// INTINF& operator=(const INTINF& rhs) = default;
+	// INTINF& operator=(INTINF&&) = default;
+	//~INTINF() = default;
+};
 
 class TXTSCR
 {
@@ -2818,66 +3142,106 @@ public:
 	fPOINT   formCenter;                // middle of the form
 
 	constexpr TXTSCR() noexcept = default;
+	// TXTSCR(TXTSCR&&) = default;
+	// TXTSCR& operator=(const TXTSCR& rhs) = default;
+	// TXTSCR& operator=(TXTSCR&&) = default;
+	//~TXTSCR() = default;
 };
 
-struct _txtrct {
-	uint16_t left;
-	uint16_t right;
-	float    top;
-	float    bottom;
+class TXTRCT
+{
+public:
+	uint16_t left { 0u };
+	uint16_t right { 0u };
+	float    top { 0.0f };
+	float    bottom { 0.0f };
+
+	constexpr TXTRCT() noexcept = default;
+	// TXTRCT(TXTRCT&&) = default;
+	// TXTRCT& operator=(const TXTRCT& rhs) = default;
+	// TXTRCT& operator=(TXTRCT&&) = default;
+	//~TXTRCT() = default;
 };
 
-using TXTRCT = struct _txtrct;
-
-struct _txhst {
+class TXHST
+{
+public:
 	std::vector<TXPNT> texturePoints {};
 
-	float height  = 0.0;
-	float width   = 0.0;
-	float spacing = 0.0;
+	float height { 0.0f };
+	float width { 0.0f };
+	float spacing { 0.0f };
+
+	constexpr TXHST() noexcept = default;
+	// TXHST(TXHST&&) = default;
+	// TXHST& operator=(const TXHST& rhs) = default;
+	// TXHST& operator=(TXHST&&) = default;
+	//~TXHST() = default;
 };
 
-using TXHST = struct _txhst;
+class TXHSTBUF
+{
+public:
+	uint32_t* placeholder { nullptr };
+	uint32_t  count { 0u };
 
-struct _txhstbuff {
-	uint32_t* placeholder;
-	uint32_t  count;
+	float height { 0.0f };
+	float width { 0.0f };
+	float spacing { 0.0f };
 
-	float height;
-	float width;
-	float spacing;
+	constexpr TXHSTBUF() noexcept = default;
+	// TXHSTBUF(TXHSTBUF&&) = default;
+	// TXHSTBUF& operator=(const TXHSTBUF& rhs) = default;
+	// TXHSTBUF& operator=(TXHSTBUF&&) = default;
+	//~TXHSTBUF() = default;
 };
 
-using TXHSTBUF = struct _txhstbuff;
+class RNGCNT
+{
+public:
+	int32_t line { 0 };
+	int32_t stitchCount { 0 };
 
-struct _rngcnt {
-	int32_t line;
-	int32_t stitchCount;
+	constexpr RNGCNT() noexcept = default;
+	// RNGCNT(RNGCNT&&) = default;
+	// RNGCNT& operator=(const RNGCNT& rhs) = default;
+	// RNGCNT& operator=(RNGCNT&&) = default;
+	//~RNGCNT() = default;
 };
-
-using RNGCNT = struct _rngcnt;
 
 constexpr uint32_t BADFLT = 1;
 constexpr uint32_t BADCLP = 2;
 constexpr uint32_t BADSAT = 4;
 constexpr uint32_t BADTX  = 8;
 
-struct _badcnts {
-	uint32_t attribute {0u};
-	uint32_t flt {0u};
-	uint32_t clip {0u};
-	uint32_t guideCount {0u}; // ToDo - is this an accurate description?
-	uint32_t tx {0u};
+class BADCNTS
+{
+public:
+	uint32_t attribute { 0u };
+	uint32_t flt { 0u };
+	uint32_t clip { 0u };
+	uint32_t guideCount { 0u }; // ToDo - is this an accurate description?
+	uint32_t tx { 0u };
+
+	constexpr BADCNTS() noexcept = default;
+	// BADCNTS(BADCNTS&&) = default;
+	// BADCNTS& operator=(const BADCNTS& rhs) = default;
+	// BADCNTS& operator=(BADCNTS&&) = default;
+	//~BADCNTS() = default;
 };
 
-using BADCNTS = struct _badcnts;
-
-struct _findInfo {
+class FINDINFO
+{
+public:
 	uint32_t         count { 0 };
 	WIN32_FIND_DATA* data { nullptr };
-};
 
-using FINDINFO = struct _findInfo;
+	constexpr FINDINFO() noexcept = default;
+	// FINDINFO(FINDINFO&&) = default;
+	// FINDINFO& operator=(const FINDINFO& rhs) = default;
+	// FINDINFO& operator=(FINDINFO&&) = default;
+	//~FINDINFO() = default;
+};
 
 // is intersection of line and cursor in, before or after the line
 enum intersectionStyles
@@ -2887,37 +3251,61 @@ enum intersectionStyles
 	POINT_AFTER_LINE
 };
 
-// Sorted line length info
-struct _lengthInfo {
-	uint32_t index;
-	bool     isEnd;
-	float    length;
+
+class LENINFO // Sorted line length info
+{
+public:
+	uint32_t index { 0u };
+	bool     isEnd { false };
+	float    length { 0.0f };
+
+	constexpr LENINFO() noexcept = default;
+	// LENINFO(LENINFO&&) = default;
+	// LENINFO& operator=(const LENINFO& rhs) = default;
+	// LENINFO& operator=(LENINFO&&) = default;
+	//~LENINFO() = default;
 };
 
-using LENINFO = struct _lengthInfo;
+class PECCOLOR
+{
+public:
+	uint8_t r { 0u };
+	uint8_t g { 0u };
+	uint8_t b { 0u };
 
-struct _pecColor {
-	uint8_t r;
-	uint8_t g;
-	uint8_t b;
+	constexpr PECCOLOR() noexcept = default;
+	// PECCOLOR(PECCOLOR&&) = default;
+	// PECCOLOR& operator=(const PECCOLOR& rhs) = default;
+	// PECCOLOR& operator=(PECCOLOR&&) = default;
+	//~PECCOLOR() = default;
 };
 
-using PECCOLOR = struct _pecColor;
+class PESCOLORLIST
+{
+public:
+	uint16_t blockIndex { 0u };
+	uint16_t colorIndex { 0u };
 
-struct _colorchange {
-	uint16_t blockIndex;
-	uint16_t colorIndex;
+	constexpr PESCOLORLIST() noexcept = default;
+	// PESCOLORLIST(PESCOLORLIST&&) = default;
+	// PESCOLORLIST& operator=(const PESCOLORLIST& rhs) = default;
+	// PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
+	//~PESCOLORLIST() = default;
 };
 
-using PESCOLORLIST = struct _colorchange;
+class THREAD
+{
+public:
+	PECCOLOR    color {};
+	const char* description { nullptr };
+	const char* catalogNumber { nullptr };
 
-struct _thread {
-	PECCOLOR    color;
-	const char* description;
-	const char* catalogNumber;
+	constexpr THREAD() noexcept = default;
+	// THREAD(THREAD&&) = default;
+	// THREAD& operator=(const THREAD& rhs) = default;
+	// THREAD& operator=(THREAD&&) = default;
+	//~THREAD() = default;
 };
-
-using THREAD = struct _thread;
 
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
