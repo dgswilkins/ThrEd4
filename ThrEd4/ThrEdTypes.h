@@ -1525,7 +1525,7 @@ public:
 	//~FANGCLP() = default;
 };
 
-inline FANGCLP::FANGCLP() noexcept { // NOLINT
+inline FANGCLP::FANGCLP() noexcept { 
 	guide.start  = 0u;
 	guide.finish = 0u;
 }
@@ -1554,8 +1554,18 @@ public:
 	float    stitchLength;
 	uint32_t clipCount; // number of points in fill clipboard data
 
+	FLENCNT() noexcept;
+	// FLENCNT(FLENCNT&&) = default;
+	// FLENCNT& operator=(const FLENCNT& rhs) = default;
+	// FLENCNT& operator=(FLENCNT&&) = default;
+	//~FLENCNT() = default;
+
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
+
+inline FLENCNT::FLENCNT() noexcept {
+	clipCount = 0u;
+}
 
 union FLENCNTOUT {
 public:
@@ -1599,8 +1609,18 @@ public:
 	uint32_t guide;
 	float    angle;
 
+	SATINANGLE() noexcept;
+	// SATINANGLE(SATINANGLE&&) = default;
+	// SATINANGLE& operator=(const SATINANGLE& rhs) = default;
+	// SATINANGLE& operator=(SATINANGLE&&) = default;
+	//~SATINANGLE() = default;
+
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };
+
+inline SATINANGLE::SATINANGLE() noexcept {
+	angle = 0.0;
+}
 
 union SATINANGLEOUT {
 public:
@@ -2373,7 +2393,7 @@ class FORMVERTEXCLIP // form points clipboard header
 public:
 	uint32_t clipType { 0u };
 	uint32_t vertexCount { 0u };
-	bool     direction { 0u };
+	bool     direction { false };
 
 	constexpr FORMVERTEXCLIP() noexcept = default;
 	// FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
@@ -2892,6 +2912,10 @@ public:
 	                        // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
 	constexpr PESHED() noexcept = default;
+	// PESHED(PESHED&&) = default;
+	// PESHED& operator=(const PESHED& rhs) = default;
+	// PESHED& operator=(PESHED&&) = default;
+	//~PESHED() = default;
 };
 
 class PESTCH
@@ -3049,14 +3073,14 @@ public:
 class FSTRTS
 {
 public:
-	uint32_t applique { 0 };
-	uint32_t fill { 0 };
-	uint32_t feather { 0 };
-	uint32_t border { 0 };
-	uint32_t appliqueColor { 0 };
-	uint32_t fillColor { 0 };
-	uint32_t featherColor { 0 };
-	uint32_t borderColor { 0 };
+	uint32_t applique { 0u };
+	uint32_t fill { 0u };
+	uint32_t feather { 0u };
+	uint32_t border { 0u };
+	uint32_t appliqueColor { 0u };
+	uint32_t fillColor { 0u };
+	uint32_t featherColor { 0u };
+	uint32_t borderColor { 0u };
 
 	constexpr FSTRTS() noexcept = default;
 	// FSTRTS(FSTRTS&&) = default;
@@ -3065,12 +3089,21 @@ public:
 	//~FSTRTS() = default;
 };
 
-union _fillStarts {
+union FILLSTARTS {
+public:
 	FSTRTS   fillNamed;
 	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)]; // NOLINT
+
+	FILLSTARTS() noexcept;
+	// FILLSTARTS(FILLSTARTS&&) = default;
+	// FILLSTARTS& operator=(const FILLSTARTS& rhs) = default;
+	// FILLSTARTS& operator=(FILLSTARTS&&) = default;
+	//~FILLSTARTS() = default;
 };
 
-using FILLSTARTS = union _fillStarts;
+inline FILLSTARTS::FILLSTARTS() noexcept
+    : fillNamed() {
+}
 
 constexpr uint32_t M_AP     = 0x002u;
 constexpr uint32_t M_CWLK   = 0x004u;
