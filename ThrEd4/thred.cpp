@@ -1129,7 +1129,7 @@ uint32_t thred::internal::rsed() noexcept {
 	auto time = SYSTEMTIME {0u,0u,0u,0u,0u,0u,0u,0u};
 
 	GetLocalTime(&time);
-	return (time.wSecond << 16u) | time.wMilliseconds; 
+	return (gsl::narrow_cast<uint32_t>(time.wSecond) << 16u) | time.wMilliseconds;
 }
 
 void thred::internal::fnamtabs() {
