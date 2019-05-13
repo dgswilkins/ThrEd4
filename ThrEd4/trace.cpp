@@ -161,8 +161,8 @@ bool trace::internal::trcin(COLORREF color) {
 
 void trace::internal::getrmap() {
 	auto header = BITMAPINFOHEADER { gsl::narrow<DWORD>(sizeof(BITMAPINFOHEADER)),
-		                             gsl::narrow_cast<long>(BitmapWidth),
-		                             gsl::narrow_cast<long>(BitmapHeight),
+		                             gsl::narrow_cast<LONG>(BitmapWidth),
+		                             gsl::narrow_cast<LONG>(BitmapHeight),
 		                             1u,
 		                             32u,
 		                             BI_RGB,
