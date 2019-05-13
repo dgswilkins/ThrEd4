@@ -8,9 +8,9 @@
 // this does NOT validate that the EnumCount element is the last element
 template <class T> struct has_enum_count {
 	using yes = char;
-	using no  = yes (&)[2];
+	using no  = yes (&)[2]; //NOLINT(modernize-avoid-c-arrays)
 
-	template <class U> static yes test(decltype(U::EnumCount)*); // NOLINT
+	template <class U> static yes test(decltype(U::EnumCount)*); 
 	template <class U> static no  test(...);
 
 	// SFINAE magic.

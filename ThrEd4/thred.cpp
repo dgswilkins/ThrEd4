@@ -99,7 +99,7 @@ int32_t         MovieTimeStep;            // time delay for stitchout
 // WARNING the size of the following array must be changed if the maximum movie speed is changed
 POINT MovieLine[100]; // line for movie stitch draw
 
-uint32_t LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's
+uint32_t LRUMenuId[] = { FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3 }; // recently used file menu ID's 
 
 uint32_t UndoBufferWriteIndex = 0;      // undo storage pointer
 uint32_t UndoBufferReadIndex  = 0;      // undo retrieval pointers
@@ -1129,7 +1129,7 @@ uint32_t thred::internal::rsed() noexcept {
 	auto time = SYSTEMTIME {0u,0u,0u,0u,0u,0u,0u,0u};
 
 	GetLocalTime(&time);
-	return (time.wSecond << 16u) | time.wMilliseconds; // NOLINT
+	return (time.wSecond << 16u) | time.wMilliseconds; 
 }
 
 void thred::internal::fnamtabs() {
@@ -4188,13 +4188,13 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(gsl::span<char> label) {
-	strncpy(&label[0], "LA:", 3); // NOLINT
+	strncpy(&label[0], "LA:", 3); 
 	const auto  lblSize  = wrap::toUnsigned(label.size() - 3u);
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
 	}
-	strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT
+	strncpy(&label[3], fileStem.c_str(), lblSize); 
 }
 #pragma warning(pop)
 
@@ -4214,8 +4214,8 @@ void thred::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, fl
 	auto deltaX = wrap::round<int32_t>(srcX * 5.0f / 3.0f);
 	auto deltaY = -wrap::round<int32_t>(srcY * 5.0f / 3.0f);
 	if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
-		auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7Fu);
-		auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7Fu);
+		auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7Fu); // NOLINT
+		auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7Fu); // NOLINT
 		buffer.push_back(xVal);
 		buffer.push_back(yVal);
 	}
@@ -5523,7 +5523,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 }
 
 bool thred::internal::chkdst(const DSTHED* dstHeader) noexcept {
-	return strncmp(dstHeader->desched, "LA:", 3) == 0;
+	return strncmp(dstHeader->desched, "LA:", 3) == 0; // NOLINT
 }
 
 #if PESACT
@@ -5988,7 +5988,7 @@ void thred::internal::nuFil() {
 						auto fileBuffer = fileBuf.data();
 						ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
 						auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
-						if (strncmp(pesHeader->led, "#PES00", 6) != 0) {
+						if (strncmp(pesHeader->led, "#PES00", 6) != 0) { // NOLINT
 							auto fmtStr = std::wstring {};
 							displayText::loadString(fmtStr, IDS_NOTPES);
 							displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
@@ -6127,7 +6127,7 @@ void thred::internal::nuFil() {
 			for (auto iColor = 0u; iColor < 16; iColor++) {
 				UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-				wcsncpy_s(buffer, ThreadSize[iColor], 2);
+				wcsncpy_s(buffer, ThreadSize[iColor], 2); // NOLINT
 				SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
 			}
 			for (auto& iColor : UserColorWin) {
@@ -14162,7 +14162,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			ThreadSize[ThreadSizeSelected][0]   = threadSizeMap[VerticalIndex];
 			ThreadSizeIndex[ThreadSizeSelected] = VerticalIndex;
 			wchar_t buffer[3]                   = { 0 };
-			wcsncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2);
+			wcsncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2); // NOLINT
 			buffer[2] = 0;
 			SetWindowText(ThreadSizeWin[ThreadSizeSelected], static_cast<LPTSTR>(buffer));
 			StateMap.set(StateFlag::RESTCH);
@@ -17163,7 +17163,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
                              float&              xyRatio,
                              float&              rotationAngle,
                              fPOINT&             rotationCenter,
-                             FRMHED&             textureForm) { // NOLINT
+                             FRMHED&             textureForm) { 
 	if (Msg.message == WM_MOUSEMOVE) {
 		return thi::handleMouseMove(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm);
 	}
@@ -19409,7 +19409,7 @@ int32_t handle_program_memory_depletion(uint32_t) {
 int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                           _In_opt_ HINSTANCE hPrevInstance,
                           _In_ LPTSTR lpCmdLine,   // NOLINT
-                          _In_ int32_t nShowCmd) { // NOLINT
+                          _In_ int32_t nShowCmd) { 
 	UNREFERENCED_PARAMETER(nShowCmd);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);

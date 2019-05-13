@@ -944,7 +944,7 @@ public:
 	int8_t   leadIn { 0 };
 	int8_t   hoopType { 0 };
 	uint16_t colorCount { 0 };
-	COLORREF colors[COLOR_COUNT] { 0 }; // NOLINT
+	COLORREF colors[COLOR_COUNT] { 0 }; //NOLINT(modernize-avoid-c-arrays)
 	uint16_t stitchCount { 0 };
 
 	constexpr PCSHEADER() noexcept = default;
@@ -958,10 +958,10 @@ public:
 class INIFILE // ini file structure
 {
 public:
-	char     defaultDirectory[180] { 0 };                   // default directory                   NOLINT
-	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors                              NOLINT
-	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors            NOLINT
-	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors        NOLINT
+	char     defaultDirectory[180] { 0 };                   // default directory                   
+	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors                              
+	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors            
+	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors        
 	COLORREF backgroundColor { 0u };                        // background color
 	COLORREF bitmapColor { 0u };                            // bitmap color
 	float    minStitchLength { 0.0f };                      // minimum stitch length
@@ -978,11 +978,11 @@ public:
 	uint32_t userFlagMap { 0u };                            // bitmap for user variables
 	float    borderWidth { 0.0f };                          // border width
 	uint32_t appliqueColor { 0u };                          // applique color
-	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names                     NOLINT
+	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names                     
 	float    snapLength { 0.0f };                           // snap together length
 	float    starRatio { 0.0f };                            // star ratio
 	float    spiralWrap { 0.0f };                           // spiral wrap
-	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u };    // bitmap background color preferences NOLINT
+	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u };    // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
 	float    buttonholeCornerLength { 0.0f };               // buttonhole fill corner length
 	float    picotSpace { 0.0f };                           // space between border picots
 	int8_t   hoopType { 0 };                                // hoop type
@@ -1021,7 +1021,7 @@ public:
 	float    featherRatio { 0.0f };                         // feather ratio
 	float    featherMinStitchSize { 0.0f };                 // feather floor
 	uint16_t featherCount { 0u };                           // feather fill psg granularity
-	char     p2cName[MAX_PATH] { 0 };                       // pes2card file                       NOLINT
+	char     p2cName[MAX_PATH] { 0 };                       // pes2card file                       NOLINT(modernize-avoid-c-arrays)
 	float    underlayIndent { 0.0f };                       // edge walk/underlay indent
 	float    underlayAngle { 0.0f };                        // underlay angle
 	float    underlaySpacing { 0.0f };                      // underlay spacing
@@ -1041,7 +1041,7 @@ public:
 	uint16_t daisyHeartCount { 0u };                        // daisy heart count
 	uint16_t textureEditorSize { 0u };                      // texture editor pixels
 	float    clpspc { 0.0f };                               // clipboard fill spacing
-	char     designerName[NAME_LEN] { 0 };                  // designer name                       NOLINT
+	char     designerName[NAME_LEN] { 0 };                  // designer name                       NOLINT(modernize-avoid-c-arrays)
 
 	constexpr INIFILE() noexcept = default;
 	// INIFILE(INIFILE&&) = default;
@@ -1525,7 +1525,7 @@ public:
 	//~FANGCLP() = default;
 };
 
-inline FANGCLP::FANGCLP() noexcept { 
+inline FANGCLP::FANGCLP() noexcept { //NOLINT
 	guide.start  = 0u;
 	guide.finish = 0u;
 }
@@ -1563,7 +1563,7 @@ public:
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
 
-inline FLENCNT::FLENCNT() noexcept {
+inline FLENCNT::FLENCNT() noexcept { //NOLINT
 	clipCount = 0u;
 }
 
@@ -1618,7 +1618,7 @@ public:
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };
 
-inline SATINANGLE::SATINANGLE() noexcept {
+inline SATINANGLE::SATINANGLE() noexcept { // NOLINT
 	angle = 0.0;
 }
 
@@ -2473,32 +2473,32 @@ public:
 class DSTHED // dst file header
 {
 public:
-	char desched[3] { 0 };  // 00  00	description   NOLINT
-	char desc[17] { 0 };    // 03  03                 NOLINT
-	char recshed[3] { 0 };  // 20  14	record count  NOLINT
-	char recs[8] { 0 };     // 23  17                 NOLINT
-	char cohed[3] { 0 };    // 31  1F                 NOLINT
-	char co[4] { 0 };       // 34  22                 NOLINT
-	char xplushed[3] { 0 }; // 38  26	x+ size       NOLINT
-	char xplus[6] { 0 };    // 41  29                 NOLINT
-	char xminhed[3] { 0 };  // 47  2F	x- size       NOLINT
-	char xmin[6] { 0 };     // 50  32                 NOLINT
-	char yplushed[3] { 0 }; // 56  38                 NOLINT
-	char yplus[6] { 0 };    // 59  3B	y+ size       NOLINT
-	char yminhed[3] { 0 };  // 65  41                 NOLINT
-	char ymin[6] { 0 };     // 68  44	y- size       NOLINT
-	char axhed[3] { 0 };    // 74  4A                 NOLINT
-	char ax[7] { 0 };       // 77  4D                 NOLINT
-	char ayhed[3] { 0 };    // 84  54                 NOLINT
-	char ay[7] { 0 };       // 87  57                 NOLINT
-	char mxhed[3] { 0 };    // 94  5E                 NOLINT
-	char mx[7] { 0 };       // 97  61                 NOLINT
-	char myhed[3] { 0 };    // 104 68                 NOLINT
-	char my[7] { 0 };       // 107 6B                 NOLINT
-	char pdhed[2] { 0 };    // 114 72                 NOLINT
-	char pd[7] { 0 };       // 116 74                 NOLINT
-	char eof[1] { 0 };      // 123 7B                 NOLINT
-	char res[388] { 0 };    // 124 7C                 NOLINT
+	char desched[3] { 0 };  // 00  00	description   NOLINT(modernize-avoid-c-arrays)
+	char desc[17] { 0 };    // 03  03                 NOLINT(modernize-avoid-c-arrays)
+	char recshed[3] { 0 };  // 20  14	record count  NOLINT(modernize-avoid-c-arrays)
+	char recs[8] { 0 };     // 23  17                 NOLINT(modernize-avoid-c-arrays)
+	char cohed[3] { 0 };    // 31  1F                 NOLINT(modernize-avoid-c-arrays)
+	char co[4] { 0 };       // 34  22                 NOLINT(modernize-avoid-c-arrays)
+	char xplushed[3] { 0 }; // 38  26	x+ size       NOLINT(modernize-avoid-c-arrays)
+	char xplus[6] { 0 };    // 41  29                 NOLINT(modernize-avoid-c-arrays)
+	char xminhed[3] { 0 };  // 47  2F	x- size       NOLINT(modernize-avoid-c-arrays)
+	char xmin[6] { 0 };     // 50  32                 NOLINT(modernize-avoid-c-arrays)
+	char yplushed[3] { 0 }; // 56  38                 NOLINT(modernize-avoid-c-arrays)
+	char yplus[6] { 0 };    // 59  3B	y+ size       NOLINT(modernize-avoid-c-arrays)
+	char yminhed[3] { 0 };  // 65  41                 NOLINT(modernize-avoid-c-arrays)
+	char ymin[6] { 0 };     // 68  44	y- size       NOLINT(modernize-avoid-c-arrays)
+	char axhed[3] { 0 };    // 74  4A                 NOLINT(modernize-avoid-c-arrays)
+	char ax[7] { 0 };       // 77  4D                 NOLINT(modernize-avoid-c-arrays)
+	char ayhed[3] { 0 };    // 84  54                 NOLINT(modernize-avoid-c-arrays)
+	char ay[7] { 0 };       // 87  57                 NOLINT(modernize-avoid-c-arrays)
+	char mxhed[3] { 0 };    // 94  5E                 NOLINT(modernize-avoid-c-arrays)
+	char mx[7] { 0 };       // 97  61                 NOLINT(modernize-avoid-c-arrays)
+	char myhed[3] { 0 };    // 104 68                 NOLINT(modernize-avoid-c-arrays)
+	char my[7] { 0 };       // 107 6B                 NOLINT(modernize-avoid-c-arrays)
+	char pdhed[2] { 0 };    // 114 72                 NOLINT(modernize-avoid-c-arrays)
+	char pd[7] { 0 };       // 116 74                 NOLINT(modernize-avoid-c-arrays)
+	char eof[1] { 0 };      // 123 7B                 NOLINT(modernize-avoid-c-arrays)
+	char res[388] { 0 };    // 124 7C                 NOLINT(modernize-avoid-c-arrays)
 
 	constexpr DSTHED() noexcept = default;
 	// DSTHED(DSTHED&&) = default;
@@ -2745,13 +2745,13 @@ public:
 class CURSORMASK
 {
 public:
-	uint8_t form[128] { 0 };            // NOLINT
-	uint8_t dline[128] { 0 };           // NOLINT
-	uint8_t uprightNeedle[128] { 0 };   // NOLINT
-	uint8_t leftUpNeedle[128] { 0 };    // NOLINT
-	uint8_t leftDownNeedle[128] { 0 };  // NOLINT
-	uint8_t rightUpNeedle[128] { 0 };   // NOLINT
-	uint8_t rightDownNeedle[128] { 0 }; // NOLINT
+	uint8_t form[128] { 0 };            // NOLINT(modernize-avoid-c-arrays)
+	uint8_t dline[128] { 0 };           // NOLINT(modernize-avoid-c-arrays)
+	uint8_t uprightNeedle[128] { 0 };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftUpNeedle[128] { 0 };    // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftDownNeedle[128] { 0 };  // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightUpNeedle[128] { 0 };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightDownNeedle[128] { 0 }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr CURSORMASK() noexcept = default;
 	// CURSORMASK(CURSORMASK&&) = default;
@@ -2764,13 +2764,13 @@ public:
 class BALHED // balarad file header
 {
 public:
-	COLORREF color[256] { 0 }; // NOLINT
+	COLORREF color[256] { 0 }; // NOLINT(modernize-avoid-c-arrays)
 	uint32_t signature { 0u };
 	uint16_t version { 0u };
 	float    hoopSizeX { 0.0f };
 	float    hoopSizeY { 0.0f };
 	COLORREF backgroundColor { 0 };
-	uint8_t  res[1006] { 0 }; // NOLINT
+	uint8_t  res[1006] { 0 }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr BALHED() noexcept = default;
 	// BALHED(BALHED&&) = default;
@@ -2863,7 +2863,7 @@ public:
 class PESLED
 {
 public:
-	int8_t   ver[8] { 0 }; // NOLINT
+	int8_t   ver[8] { 0 }; // NOLINT(modernize-avoid-c-arrays)
 	uint32_t pec { 0u };
 
 	constexpr PESLED() noexcept = default;
@@ -2876,14 +2876,14 @@ public:
 class PESHED
 {
 public:
-	char     led[8] { 0 };  //   0-7  Identification and version (#PES0001)         NOLINT
+	char     led[8] { 0 };  //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
 	uint32_t off { 0 };     //   8-b  Absolute PEC section byte offset
 	uint16_t hpsz { 0 };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
 	uint16_t usdn { 0 };    //   e,f  Use existing design area (1)
 	uint16_t blct { 0 };    // 10,11  CSewSeg segment block count (1)
-	char     hnd1[4] { 0 }; // 12-15  header end (FF FF 00 00)                      NOLINT
+	char     hnd1[4] { 0 }; // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
 	uint16_t celn { 0 };    // 16,17  Length of following string (7)
-	char     ce[7] { 0 };   // 18-1e  CEmbOne identification (CEmbOne)              NOLINT
+	char     ce[7] { 0 };   // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
 	int16_t  xlft { 0 };    // 1f,20  Extent left
 	int16_t  xtop { 0 };    // 21,22  Extent top
 	int16_t  xrht { 0 };    // 23,24  Extent right
@@ -2903,11 +2903,11 @@ public:
 	int16_t  ytrn { 0 };    // 4b,4c  CSewSeg y coordinate translation (0)
 	int16_t  xsiz { 0 };    // 4d,4e  CSewSeg width
 	int16_t  ysiz { 0 };    // 4f,50  CSewSeg height
-	int8_t   ukn2[8] { 0 }; // 51,58  unknown (0)                                   NOLINT
+	int8_t   ukn2[8] { 0 }; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
 	uint16_t bcnt { 0 };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-	int8_t   hnd2[4] { 0 }; // 5b-5e  header end (FF FF 00 00)                      NOLINT
+	int8_t   hnd2[4] { 0 }; // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
 	uint16_t cslen { 0 };   // 5f,60  CSewSeg length (7)
-	char     cs[7] { 0 };   // 61-67  CSewSeg identification (CSewSeg)              NOLINT
+	char     cs[7] { 0 };   // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
 	                        // uint16_t styp1;   // 68,69  Stitch type (0)
 	                        // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
@@ -2948,17 +2948,17 @@ public:
 class PECHDR
 {
 public:
-	char     label[19] { 0 };   // Label string prefixed with "LA:" and padded with space (0x20)                         NOLINT
+	char     label[19] { 0 };   // Label string prefixed with "LA:" and padded with space (0x20)                         // NOLINT(modernize-avoid-c-arrays)
 	int8_t   labnd { 0 };       // carriage return character
-	uint8_t  ukn1[11] { 0u };   // Unknown (' ')                                                                         NOLINT
+	uint8_t  ukn1[11] { 0u };   // Unknown (' ')                                                                         // NOLINT(modernize-avoid-c-arrays)
 	uint8_t  ukn2 { 0u };       // Unknown
 	uint16_t hnd1 { 0u };       // Unknown (0x00ff)
 	uint8_t  thumbWidth { 0u }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
 	                            // Thus, 6 would mean 6×8 = 48 pixels per line
 	uint8_t thumbHeight { 0u }; // Thumbnail image height in pixels (38)
-	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20                                  NOLINT
+	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20                                  // NOLINT(modernize-avoid-c-arrays)
 	uint8_t colorCount { 0u };  // Number of colors minus one, 0xFF means 0 colors
-	uint8_t pad[463] { 0u };    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20   NOLINT
+	uint8_t pad[463] { 0u };    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20   // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr PECHDR() noexcept = default;
 	// PECHDR(PECHDR&&) = default;
@@ -3092,7 +3092,7 @@ public:
 union FILLSTARTS {
 public:
 	FSTRTS   fillNamed;
-	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)]; // NOLINT
+	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)]; 
 
 	FILLSTARTS() noexcept;
 	// FILLSTARTS(FILLSTARTS&&) = default;

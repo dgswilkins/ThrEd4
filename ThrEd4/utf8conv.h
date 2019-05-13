@@ -45,7 +45,7 @@ inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 
 	// handle the special case of empty input string
 	if (utf8.empty()) {
-		_ASSERTE(utf16.empty());
+		_ASSERTE(utf16.empty()); // NOLINT
 		return utf16;
 	}
 
@@ -58,7 +58,7 @@ inline std::string Utf16ToUtf8(const std::wstring& utf16) {
 	std::string utf8;
 
 	if (utf16.empty()) {
-		_ASSERTE(utf8.empty());
+		_ASSERTE(utf8.empty()); // NOLINT
 		return utf8;
 	}
 
