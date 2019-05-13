@@ -3935,14 +3935,8 @@ void thred::internal::chk1col() {
 }
 
 void thred::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
-	union {
-		uint32_t data;
-		DSTREC   dstRecord;
-	} x {};
-
-	x.data = data;
-
-	DSTRecords.push_back(x.dstRecord);
+	auto dstRecord = DSTREC{gsl::narrow_cast<uint8_t>(data & 0xFFu), gsl::narrow_cast<uint8_t>((data & 0xFF00u) >> 8), gsl::narrow_cast<uint8_t>((data & 0xFF0000u) >> 16)};
+	DSTRecords.push_back(dstRecord);
 }
 
 constexpr uint32_t thred::internal::dudbits(const POINT& dif) {
@@ -4055,7 +4049,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 			lengths.y -= difference.y;
 		}
 	}
-	DSTRecords.push_back({ 0, 0, gsl::narrow<uint8_t>(0xf3) });
+	DSTRecords.push_back({ gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0xf3) });
 
 	if (colfil()) {
 		auto bytesWritten = DWORD { 0 };
