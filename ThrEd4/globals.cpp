@@ -211,7 +211,9 @@ EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
 
 fPOINT     StitchBmpRatio;                 // stitch hoop to bitmap ratios
 double     StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
-fPOINTATTR StitchBuffer[MAXITEMS * 2];     // main stitch buffer
+
+std::vector<fPOINTATTR>* StitchBuffer;     // main stitch buffer
+
 POINT      StitchCoordinatesPixels;        // converted from stitch to pixel
 fRECTANGLE StitchRangeRect;                // stitch range rectangle
 RECT       StitchWindowClientRect;         // stitch window size,client

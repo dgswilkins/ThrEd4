@@ -239,7 +239,7 @@ namespace internal {
 	void     getDocsFolder(fs::path* directory);
 	void     getfrmbox();
 	void     getfrmpix();
-	uint32_t gethand(const fPOINTATTR* stitch, uint32_t stitchCount) noexcept;
+	uint32_t gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept;
 	void     getnpix();
 	void     getstpix();
 	void     gotbox();
@@ -451,7 +451,7 @@ namespace internal {
 
 	uint32_t    sizclp(uint32_t& formFirstStitchIndex, uint32_t& formStitchCount);
 	uint32_t    sizfclp();
-	void        sizstch(fRECTANGLE& rectangle, const fPOINTATTR* stitches) noexcept;
+	void        sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 	void        srchk();
 	uint32_t    srchknot(uint32_t source) noexcept;
 	inline void stCor2px(const fPOINTATTR& stitch, POINT& point);

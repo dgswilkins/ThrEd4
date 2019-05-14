@@ -74,7 +74,7 @@ void repair::lodchk() {
 	}
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		const auto attribute = StitchBuffer[iStitch].attribute;
+		const auto attribute = (*StitchBuffer)[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
 			const auto tform = (attribute & FRMSK) >> FRMSHFT;
 			if (tform < formMap.size()) {
@@ -82,7 +82,7 @@ void repair::lodchk() {
 			}
 			else {
 				// ToDo - unassign the stitch from any form
-				StitchBuffer[iStitch].attribute &= (NFRMSK & NTYPMSK);
+				(*StitchBuffer)[iStitch].attribute &= (NFRMSK & NTYPMSK);
 			}
 		}
 	}
@@ -94,7 +94,7 @@ void repair::lodchk() {
 	}
 	formMap.reset();
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		const auto attribute = StitchBuffer[iStitch].attribute;
+		const auto attribute = (*StitchBuffer)[iStitch].attribute;
 		if ((attribute & TYPBRD) != 0u) {
 			formMap.set((attribute & FRMSK) >> FRMSHFT);
 		}
@@ -210,8 +210,8 @@ void repair::internal::chkfstch() noexcept {
 	const auto codedFormIndex = FormList->size() << FRMSHFT;
 
 	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((StitchBuffer[iStitch].attribute & FRMSK) >= codedFormIndex) {
-			StitchBuffer[iStitch].attribute = NOTFRM;
+		if (((*StitchBuffer)[iStitch].attribute & FRMSK) >= codedFormIndex) {
+			(*StitchBuffer)[iStitch].attribute = NOTFRM;
 		}
 	}
 }

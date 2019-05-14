@@ -244,7 +244,9 @@ extern EnumMap<StateFlag> StateMap;
 
 extern fPOINT     StitchBmpRatio;
 extern double     StitchBoxesThreshold;
-extern fPOINTATTR StitchBuffer[MAXITEMS * 2];
+
+extern std::vector<fPOINTATTR>* StitchBuffer;
+
 extern POINT      StitchCoordinatesPixels;
 extern fRECTANGLE StitchRangeRect;
 extern RECT       StitchWindowClientRect;
