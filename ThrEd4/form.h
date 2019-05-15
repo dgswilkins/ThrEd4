@@ -310,7 +310,7 @@ namespace internal {
 	void  fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	            std::vector<uint32_t>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints);
-	void  frmpnts(uint32_t type) noexcept;
+	void  frmpnts(uint32_t type);
 	void  frmpoly(const POINT* line, uint32_t count) noexcept;
 	void  frmsqr(uint32_t iVertex);
 	void  frmsqr0(const POINT& controlPoint);
@@ -321,7 +321,7 @@ namespace internal {
 	void  fshor();
 	void  fspic();
 	void  fsvrt();
-	void  getbig() noexcept;
+	void  getbig();
 	float getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	             const std::vector<double>& lengths,
 	             uint32_t                   iPoint,

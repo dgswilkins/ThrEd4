@@ -37,7 +37,7 @@ void     chkmen() noexcept;
 void     chkrng(fPOINT& range);
 void     coltab();
 void     delfstchs();
-void     delinf() noexcept;
+void     delinf();
 void     delstchm();
 uint32_t duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
@@ -48,7 +48,7 @@ void     grpAdj();
 void     hidbit();
 void     movStch();
 
-void inline mvstch(uint32_t destination, uint32_t source) noexcept;
+void inline mvstch(uint32_t destination, uint32_t source);
 
 void mvstchs(uint32_t destination, uint32_t source, uint32_t count);
 
@@ -70,11 +70,11 @@ void    rtclpfn(uint32_t destination, uint32_t source);
 void    sCor2px(const fPOINT& stitchCoordinate, POINT& pixelCoordinate);
 void    savdo();
 void    save();
-void    selRct(fRECTANGLE& sourceRect) noexcept;
+void    selRct(fRECTANGLE& sourceRect);
 void    setpsel();
 void    shft(const fPOINT& delta) noexcept;
 void    stch2pxr(const fPOINT& stitchCoordinate);
-void    stchrct(fRECTANGLE& rectangle) noexcept;
+void    stchrct(fRECTANGLE& rectangle);
 void    strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
 int32_t txtWid(const wchar_t* string) noexcept;
 void    unbBox();
@@ -127,8 +127,8 @@ namespace internal {
 	void     clpadj();
 	void     clpbox();
 	void     clpradj(fRECTANGLE& clipRectAdjusted, const fPOINTATTR& stitch) noexcept;
-	bool     cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept;
-	void     colchk() noexcept;
+	bool     cmpstch(uint32_t iStitchA, uint32_t iStitchB);
+	void     colchk();
 	DWORD    coldis(COLORREF colorA, COLORREF colorB);
 	bool     colfil();
 	uint32_t colmatch(COLORREF color);
@@ -150,7 +150,7 @@ namespace internal {
 	void     delsfrms(uint32_t code);
 	void     delsmal(uint32_t startStitch, uint32_t endStitch);
 	void     delstch();
-	void     delstch1(uint32_t iStitch) noexcept;
+	void     delstch1(uint32_t iStitch);
 	void     deltot();
 	void     desiz();
 
@@ -168,7 +168,7 @@ namespace internal {
 
 	uint32_t dtrn(DSTREC* dpnt);
 
-	void duClos(uint32_t startStitch, uint32_t stitchCount) noexcept;
+	void duClos(uint32_t startStitch, uint32_t stitchCount);
 	void duIns();
 	void duSelbox();
 	void duar();
@@ -221,10 +221,10 @@ namespace internal {
 	bool     finrng(uint32_t find);
 	void     fixpclp();
 	void     fnamtabs();
-	void     fndknt() noexcept;
+	void     fndknt();
 	void     fop();
 	void     frmcalc();
-	uint32_t frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept;
+	uint32_t frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex);
 	void     frmcurmen();
 	void     frmcursel(uint32_t cursorType);
 	void     frmpos(float deltaX, float deltaY);
@@ -239,7 +239,7 @@ namespace internal {
 	void     getDocsFolder(fs::path* directory);
 	void     getfrmbox();
 	void     getfrmpix();
-	uint32_t gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept;
+	uint32_t gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount);
 	void     getnpix();
 	void     getstpix();
 	void     gotbox();
@@ -280,17 +280,17 @@ namespace internal {
 	void     ilin1() noexcept;
 	void     infadj(float* xCoordinate, float* yCoordinate) noexcept;
 	void     init();
-	bool     inrng(uint32_t stitch) noexcept;
+	bool     inrng(uint32_t stitch);
 	void     insadj();
 	void     inscol();
 	void     insfil();
 	void     insflin(POINT insertPoint);
 	bool     iselpnt();
 	bool     isfclp();
-	bool     isknots() noexcept;
+	bool     isknots();
 	void     istch();
 	bool     isthr(const wchar_t* filename);
-	uint32_t kjmp(uint32_t start) noexcept;
+	uint32_t kjmp(uint32_t start);
 	void     knotmen();
 	void     ladj();
 	void     lenCalc();
@@ -323,7 +323,7 @@ namespace internal {
 	void     nedon();
 	void     newFil();
 	void     noMsg();
-	void     nuAct(uint32_t iStitch) noexcept;
+	void     nuAct(uint32_t iStitch);
 	COLORREF nuBak() noexcept;
 	COLORREF nuBit() noexcept;
 	HBRUSH   nuBrush(HBRUSH brush, COLORREF color) noexcept;
@@ -346,7 +346,7 @@ namespace internal {
 
 	constexpr uint32_t nxtcrnr(uint32_t corner);
 
-	void ofstch(uint32_t iSource, char offset) noexcept;
+	void ofstch(uint32_t iSource, char offset);
 	bool oldwnd(HWND window);
 	void ovrlay();
 	void patdun();
@@ -451,7 +451,7 @@ namespace internal {
 
 	uint32_t    sizclp(uint32_t& formFirstStitchIndex, uint32_t& formStitchCount);
 	uint32_t    sizfclp();
-	void        sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
+	void        sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches);
 	void        srchk();
 	uint32_t    srchknot(uint32_t source) noexcept;
 	inline void stCor2px(const fPOINTATTR& stitch, POINT& point);
@@ -461,9 +461,9 @@ namespace internal {
 	void        stchWnd();
 	void        stchbox(uint32_t iStitch, HDC dc);
 	void        stchout();
-	void        stchsnap(uint32_t start, uint32_t finish) noexcept;
-	double      stlen(uint32_t iStitch) noexcept;
-	void        strtknt(uint32_t start) noexcept;
+	void        stchsnap(uint32_t start, uint32_t finish);
+	double      stlen(uint32_t iStitch);
+	void        strtknt(uint32_t start);
 	void        tglhid();
 	void        thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
 	void        thrsav();
@@ -491,14 +491,14 @@ namespace internal {
 	bool   updateHoopSize();
 	bool   updateFillColor();
 	bool   updatePreferences();
-	bool   usedcol() noexcept;
+	bool   usedcol();
 	void   vubak();
 	void   vuselthr();
 	void   vuthrds();
 
 	LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	bool wastch() noexcept;
+	bool wastch();
 	void xlin();
 	void xlin1();
 	void zRctAdj() noexcept;

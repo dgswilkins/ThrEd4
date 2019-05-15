@@ -5863,7 +5863,7 @@ void form::setap() {
 	displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1)));
 }
 
-void form::internal::getbig() noexcept {
+void form::internal::getbig() {
 	AllItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
 	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
@@ -7537,7 +7537,7 @@ void form::frmsadj() {
 	}
 }
 
-void form::internal::frmpnts(uint32_t type) noexcept {
+void form::internal::frmpnts(uint32_t type) {
 	auto       iStitch = 0u;
 	const auto trg     = ((ClosestFormToCursor << 4u) | type);
 

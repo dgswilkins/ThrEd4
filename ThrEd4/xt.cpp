@@ -1002,7 +1002,7 @@ uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
 	return 1u;
 }
 
-void xt::internal::durec(OREC& record) noexcept {
+void xt::internal::durec(OREC& record) {
 	const auto* stitch = &(*StitchBuffer)[record.start];
 
 	record.type          = StitchTypes[dutyp(stitch->attribute)];
@@ -1509,9 +1509,9 @@ bool xt::internal::lastcol(uint32_t index, fPOINT& point) {
 
 void xt::internal::duint(uint32_t offset, uint32_t code, INTINF& ilData) {
 	if (ilData.coloc > ilData.start) {
-		auto count       = ilData.coloc - ilData.start;
-		auto sourceStart = std::next(StitchBuffer->begin(), ilData.start);
-		auto sourceEnd   = sourceStart + count;
+		const auto count       = ilData.coloc - ilData.start;
+		auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
+		auto       sourceEnd   = sourceStart + count;
 
 		const auto destination = gsl::span<fPOINTATTR>(&ilData.highStitchBuffer[ilData.output], MAXITEMS - ilData.output);
 		std::copy(sourceStart, sourceEnd, destination.begin());

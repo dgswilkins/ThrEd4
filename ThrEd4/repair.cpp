@@ -206,7 +206,7 @@ void repair::internal::bcup(uint32_t find, BADCNTS& badData) {
 	}
 }
 
-void repair::internal::chkfstch() noexcept {
+void repair::internal::chkfstch() {
 	const auto codedFormIndex = FormList->size() << FRMSHFT;
 
 	for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {

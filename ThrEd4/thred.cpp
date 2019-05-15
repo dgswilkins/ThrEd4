@@ -1020,7 +1020,7 @@ bool thred::internal::isfclp() {
 	return clip::isclp(ClosestFormToCursor) && (*FormList)[ClosestFormToCursor].fillType != CLPF;
 }
 
-double thred::internal::stlen(uint32_t iStitch) noexcept {
+double thred::internal::stlen(uint32_t iStitch) {
 	return hypot((*StitchBuffer)[iStitch + 1].x - (*StitchBuffer)[iStitch].x, (*StitchBuffer)[iStitch + 1].y - (*StitchBuffer)[iStitch].y);
 }
 
@@ -1293,7 +1293,7 @@ void thred::internal::ritcor(const fPOINTATTR& pointAttribute) {
 	thred::ritfcor(point);
 }
 
-void thred::internal::fndknt() noexcept {
+void thred::internal::fndknt() {
 	auto endStitch = PCSHeader.stitchCount;
 	if (PCSHeader.stitchCount > 4) {
 		endStitch -= 4;
@@ -1576,7 +1576,7 @@ void thred::rngadj() noexcept {
 	}
 }
 
-void thred::mvstch(uint32_t destination, uint32_t source) noexcept {
+void thred::mvstch(uint32_t destination, uint32_t source) {
 	(*StitchBuffer)[destination] = (*StitchBuffer)[source];
 }
 
@@ -1773,7 +1773,7 @@ double thred::internal::pxchk(double pixelSize) noexcept {
 	return pixelSize;
 }
 
-void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept {
+void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) {
 	if (PCSHeader.stitchCount != 0u) {
 		rectangle.bottom = rectangle.top = stitches[0].y;
 		rectangle.left = rectangle.right = stitches[0].x;
@@ -2827,10 +2827,10 @@ void thred::internal::frmcalc() {
 			endStitch--;
 			for (auto iStitch = 0u; iStitch < endStitch; iStitch++) {
 				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == code && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-				    && ((*StitchBuffer)[iStitch + 1].attribute & FRMSK) == code
-				    && (((*StitchBuffer)[iStitch + 1].attribute & TYPMSK) != 0u)) {
+					&& ((*StitchBuffer)[iStitch + 1].attribute & FRMSK) == code
+					&& (((*StitchBuffer)[iStitch + 1].attribute & TYPMSK) != 0u)) {
 					const auto length = std::hypot((*StitchBuffer)[iStitch + 1].x - (*StitchBuffer)[iStitch].x,
-					                               (*StitchBuffer)[iStitch + 1].y - (*StitchBuffer)[iStitch].y);
+						(*StitchBuffer)[iStitch + 1].y - (*StitchBuffer)[iStitch].y);
 					if (length > maxLength) {
 						maxLength          = length;
 						LargestStitchIndex = iStitch;
@@ -2933,13 +2933,13 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			lastStitch--;
 			while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
 				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) {
+					&& ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) {
 					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) {
 						iNextStitch = iStitch;
 					}
 					else {
 						const auto delta = POINT { wrap::round<int32_t>((*StitchBuffer)[iStitch].x - (*StitchBuffer)[iNextStitch].x),
-							                       wrap::round<int32_t>((*StitchBuffer)[iStitch].y - (*StitchBuffer)[iNextStitch].y) };
+							wrap::round<int32_t>((*StitchBuffer)[iStitch].y - (*StitchBuffer)[iNextStitch].y) };
 						stitchSize       = hypot(delta.x, delta.y);
 					}
 					iStitch++;
@@ -3155,7 +3155,7 @@ void thred::internal::ducros(HDC dc) {
 	selin(GroupStartStitch, GroupEndStitch, dc);
 }
 
-void thred::selRct(fRECTANGLE& sourceRect) noexcept {
+void thred::selRct(fRECTANGLE& sourceRect) {
 	sourceRect.left = sourceRect.right = (*StitchBuffer)[GroupStartStitch].x;
 	sourceRect.top = sourceRect.bottom = (*StitchBuffer)[GroupStartStitch].y;
 	for (auto iStitch = GroupStartStitch + 1; iStitch <= GroupEndStitch; iStitch++) {
@@ -3266,7 +3266,7 @@ void thred::grpAdj() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::nuAct(uint32_t iStitch) noexcept {
+void thred::internal::nuAct(uint32_t iStitch) {
 	const auto color = ActiveColor;
 	ActiveColor      = (*StitchBuffer)[iStitch].attribute & COLMSK;
 	thred::redraw(UserColorWin[color]);
@@ -3920,8 +3920,8 @@ void thred::internal::chk1col() {
 	StateMap.set(StateFlag::RESTCH);
 	for (auto iColorChange = 0u; iColorChange < ColorChanges; iColorChange++) {
 		if (ColorChangeTable[iColorChange + 1].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
-			auto iStitch = ColorChangeTable[iColorChange].stitchIndex;
-			auto color   = 0u;
+			const auto iStitch = ColorChangeTable[iColorChange].stitchIndex;
+			auto       color   = 0u;
 			if (iStitch != 0u) {
 				color = (*StitchBuffer)[iStitch - 1].attribute & COLMSK;
 			}
@@ -3935,7 +3935,7 @@ void thred::internal::chk1col() {
 }
 
 void thred::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
-	auto dstRecord = DSTREC{gsl::narrow_cast<uint8_t>(data & 0xFFu), gsl::narrow_cast<uint8_t>((data & 0xFF00u) >> 8), gsl::narrow_cast<uint8_t>((data & 0xFF0000u) >> 16)};
+	auto dstRecord = DSTREC{gsl::narrow_cast<uint8_t>(data & 0xFFu), gsl::narrow_cast<uint8_t>((data & 0xFF00u) >> 8u), gsl::narrow_cast<uint8_t>((data & 0xFF0000u) >> 16u)};
 	DSTRecords.push_back(dstRecord);
 }
 
@@ -4273,7 +4273,7 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const
 
 void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	uint8_t thumbnail[ThumbHeight][ThumbWidth]        = {};
-	auto const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
+	uint8_t const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
 
 	const auto yFactor = 31.0f / IniFile.hoopSizeY;
 	const auto xFactor = 40.0f / IniFile.hoopSizeX;
@@ -5018,7 +5018,7 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 	return false;
 }
 
-void thred::internal::delstch1(uint32_t iStitch) noexcept {
+void thred::internal::delstch1(uint32_t iStitch) {
 	if (PCSHeader.stitchCount != 0u) {
 		while (iStitch <= PCSHeader.stitchCount) {
 			(*StitchBuffer)[iStitch] = (*StitchBuffer)[iStitch + 1];
@@ -6397,7 +6397,7 @@ void thred::internal::zumout() {
 	}
 }
 
-void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount) noexcept {
+void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount) {
 	for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; iStitch++) {
 		const auto cx    = (((*StitchBuffer)[iStitch].x > SelectedPoint.x) ? ((*StitchBuffer)[iStitch].x - SelectedPoint.x)
                                                                      : (SelectedPoint.x - (*StitchBuffer)[iStitch].x));
@@ -7459,7 +7459,7 @@ uint32_t thred::internal::sizfclp() {
 	return clipSize;
 }
 
-uint32_t thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept {
+uint32_t thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) {
 	const auto codedAttribute = iForm << FRMSHFT;
 	auto       iStitch        = 0u;
 
@@ -7961,7 +7961,7 @@ void thred::internal::unpat() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
-bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept {
+bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) {
 	if ((*StitchBuffer)[iStitchA].x != (*StitchBuffer)[iStitchB].x) {
 		return false;
 	}
@@ -7969,7 +7969,7 @@ bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept {
 	return (*StitchBuffer)[iStitchA].y == (*StitchBuffer)[iStitchB].y;
 }
 
-void thred::internal::ofstch(uint32_t iSource, char offset) noexcept {
+void thred::internal::ofstch(uint32_t iSource, char offset) {
 	(*StitchBuffer)[OutputIndex++] = { (*StitchBuffer)[iSource].x + KnotStep.x * gsl::narrow_cast<float>(offset),
 		                            (*StitchBuffer)[iSource].y + KnotStep.y * gsl::narrow_cast<float>(offset),
 		                            KnotAttribute };
@@ -8012,7 +8012,7 @@ void thred::internal::endknt(uint32_t finish) {
 	}
 }
 
-void thred::internal::strtknt(uint32_t start) noexcept {
+void thred::internal::strtknt(uint32_t start) {
 	auto length = 0.0f;
 	auto delta  = fPOINT {};
 	auto finish = start + 1;
@@ -8045,7 +8045,7 @@ GSL_SUPPRESS(26440) void thred::internal::delknt() {
 	PCSHeader.stitchCount = gsl::narrow<uint16_t>(newStitchCount);
 }
 
-bool thred::internal::isknots() noexcept {
+bool thred::internal::isknots() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) {
 			return true;
@@ -8063,7 +8063,7 @@ void thred::internal::delknot() {
 	}
 }
 
-uint32_t thred::internal::kjmp(uint32_t start) noexcept {
+uint32_t thred::internal::kjmp(uint32_t start) {
 	while (start < gsl::narrow_cast<uint32_t>(PCSHeader.stitchCount) - 1 && stlen(start) > KNOTLEN) {
 		thred::mvstch(OutputIndex++, start++);
 	}
@@ -8336,7 +8336,7 @@ void thred::internal::deltot() {
 	SetWindowText(ThrEdWindow, fmt::format((*StringTable)[STR_THRDBY], ThrName->wstring(), *DesignerName).c_str());
 }
 
-bool thred::internal::wastch() noexcept {
+bool thred::internal::wastch() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 			return true;
@@ -8775,7 +8775,7 @@ bool thred::internal::isthr(const wchar_t* const filename) {
 	return (extention.compare(0, 3, L".th") == 0);
 }
 
-uint32_t thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept {
+uint32_t thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) {
 	auto userStitchCount = 0u;
 	for (auto iStitch = 0u; iStitch < stitchCount; iStitch++) {
 		if ((stitch[iStitch].attribute & USMSK) != 0u) {
@@ -9375,7 +9375,7 @@ void thred::internal::infadj(float* xCoordinate, float* yCoordinate) noexcept {
 	}
 }
 
-void thred::delinf() noexcept {
+void thred::delinf() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		thi::infadj(&(*StitchBuffer)[iStitch].x, &(*StitchBuffer)[iStitch].y);
 	}
@@ -9895,7 +9895,7 @@ void thred::internal::vuselthr() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::colchk() noexcept {
+void thred::internal::colchk() {
 	auto color         = (*StitchBuffer)[0].attribute & COLMSK;
 	auto currentStitch = 0u;
 
@@ -10098,7 +10098,7 @@ void thred::internal::setsrch(uint32_t stitch) {
 	displayText::ritnum(STR_NUMSCH, ClosestPointIndex);
 }
 
-bool thred::internal::inrng(uint32_t stitch) noexcept {
+bool thred::internal::inrng(uint32_t stitch) {
 	return (*StitchBuffer)[stitch].x >= StitchRangeRect.left && (*StitchBuffer)[stitch].x <= StitchRangeRect.right
 	       && (*StitchBuffer)[stitch].y >= StitchRangeRect.bottom && (*StitchBuffer)[stitch].y <= StitchRangeRect.top;
 }
@@ -10473,7 +10473,7 @@ bool thred::internal::dunum(uint32_t code) noexcept {
 	return false;
 }
 
-void thred::stchrct(fRECTANGLE& rectangle) noexcept {
+void thred::stchrct(fRECTANGLE& rectangle) {
 	if (PCSHeader.stitchCount != 0u) {
 		rectangle.bottom = rectangle.left = 1e10;
 		rectangle.top = rectangle.right = 0;
@@ -11147,7 +11147,7 @@ void thred::internal::frmcursel(uint32_t cursorType) {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void thred::internal::stchsnap(uint32_t start, uint32_t finish) noexcept {
+void thred::internal::stchsnap(uint32_t start, uint32_t finish) {
 	auto pnt = &(*StitchBuffer)[start];
 
 	for (auto i = 0u; i < finish - start; i++) {
@@ -11673,7 +11673,7 @@ void thred::internal::inscol() {
 	}
 }
 
-bool thred::internal::usedcol() noexcept {
+bool thred::internal::usedcol() {
 	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 		if (((*StitchBuffer)[iStitch].attribute & COLMSK) == VerticalIndex) {
 			return true;
@@ -14351,7 +14351,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (StateMap.test(StateFlag::BAKEND)) {
 						xlin1();
-						auto iStitch          = PCSHeader.stitchCount;
+						const auto iStitch       = PCSHeader.stitchCount;
 						(*StitchBuffer)[iStitch] = { SelectedPoint.x, SelectedPoint.y, code };
 						thred::duzrat();
 						stch2px1(iStitch);
