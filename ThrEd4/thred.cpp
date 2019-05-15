@@ -1020,7 +1020,7 @@ bool thred::internal::isfclp() {
 	return clip::isclp(ClosestFormToCursor) && (*FormList)[ClosestFormToCursor].fillType != CLPF;
 }
 
-double thred::internal::stlen(uint32_t iStitch) {
+float thred::internal::stlen(uint32_t iStitch) {
 	return hypot((*StitchBuffer)[iStitch + 1].x - (*StitchBuffer)[iStitch].x, (*StitchBuffer)[iStitch + 1].y - (*StitchBuffer)[iStitch].y);
 }
 

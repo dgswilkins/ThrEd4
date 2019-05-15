@@ -462,7 +462,7 @@ namespace internal {
 	void        stchbox(uint32_t iStitch, HDC dc);
 	void        stchout();
 	void        stchsnap(uint32_t start, uint32_t finish);
-	double      stlen(uint32_t iStitch);
+	float       stlen(uint32_t iStitch);
 	void        strtknt(uint32_t start);
 	void        tglhid();
 	void        thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
