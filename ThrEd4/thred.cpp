@@ -5041,7 +5041,12 @@ void thred::internal::redbak() {
 	const auto undoData = convert_ptr<BAKHED*>((*UndoBuffer)[UndoBufferWriteIndex].get());
 	if (undoData != nullptr) {
 		if (undoData->stitchCount != 0u) {
+			StitchBuffer->resize(undoData->stitchCount);
 			std::copy(&undoData->stitches[0], &undoData->stitches[undoData->stitchCount], StitchBuffer->begin());
+		}
+		else {
+			StitchBuffer->clear();
+			StateMap.reset(StateFlag::INIT);
 		}
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(undoData->stitchCount);
 		UnzoomedRect          = undoData->zoomRect;
@@ -11888,6 +11893,7 @@ void thred::internal::qcode() {
 	if (PCSHeader.stitchCount == 1) {
 		StitchBuffer->clear();
 		PCSHeader.stitchCount = 0;
+		StateMap.reset(StateFlag::INIT);
 	}
 	// ToDo - do we need to erase vertices and textures when aborting?
 	if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
