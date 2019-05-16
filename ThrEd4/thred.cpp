@@ -3363,8 +3363,14 @@ void thred::internal::duar() {
 }
 
 void thred::internal::dubox() {
-	RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex + 1].y - (*StitchBuffer)[ClosestPointIndex].y,
-	                    (*StitchBuffer)[ClosestPointIndex + 1].x - (*StitchBuffer)[ClosestPointIndex].x);
+	if (ClosestPointIndex != (StitchBuffer->size() - 1)) { // if the selected point is not at the end then aim at the next point
+		RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex + 1].y - (*StitchBuffer)[ClosestPointIndex].y,
+		                    (*StitchBuffer)[ClosestPointIndex + 1].x - (*StitchBuffer)[ClosestPointIndex].x);
+	}
+	else { // otherwise aim in the same direction
+		RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1].y,
+		                    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1].x);
+	}
 	duar();
 	StateMap.reset(StateFlag::ELIN);
 	StateMap.set(StateFlag::SELBOX);
@@ -11880,6 +11886,7 @@ void thred::internal::qcode() {
 	StateMap.reset(StateFlag::FILDIR);
 	ReleaseCapture();
 	if (PCSHeader.stitchCount == 1) {
+		StitchBuffer->clear();
 		PCSHeader.stitchCount = 0;
 	}
 	// ToDo - do we need to erase vertices and textures when aborting?
@@ -14982,7 +14989,9 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 	}
 	else {
 		if (wrap::pressed(VK_CONTROL)) {
-			stch2px1(PCSHeader.stitchCount - 1);
+			if (!StitchBuffer->empty()) { 
+				stch2px1(StitchBuffer->size() - 1); 
+			}
 			endpnt();
 			StateMap.set(StateFlag::BAKEND);
 			StateMap.set(StateFlag::RESTCH);
@@ -17087,7 +17096,9 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 		break;
 	}
 	case ID_ADEND: { // add
-		stch2px1(PCSHeader.stitchCount - 1);
+		if (!StitchBuffer->empty()) { 
+			stch2px1(StitchBuffer->size() - 1); 
+		}
 		endpnt();
 		StateMap.set(StateFlag::BAKEND);
 		StateMap.set(StateFlag::RESTCH);
@@ -19111,8 +19122,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				return 1;
 			}
 			if (!StateMap.test(StateFlag::RUNPAT)) {
-				if (!StateMap.test(StateFlag::HIDSTCH)
-				    && ((FileHandle != nullptr) || StateMap.test(StateFlag::INIT) || !FormList->empty()
+				if (!StateMap.test(StateFlag::HIDSTCH) && !StitchBuffer->empty()
+				    && ((FileHandle != nullptr) || StateMap.test(StateFlag::INIT) || !FormList->empty() 
 				        || StateMap.test(StateFlag::SATPNT))
 				    && !StateMap.test(StateFlag::BAKSHO)) {
 					drwStch();
