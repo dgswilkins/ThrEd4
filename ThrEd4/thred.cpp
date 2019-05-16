@@ -1417,7 +1417,7 @@ void thred::internal::dudat() {
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 		if (PCSHeader.stitchCount != 0u) {
 			const auto dest = gsl::span<fPOINTATTR>(backupData->stitches, PCSHeader.stitchCount);
-			std::copy(&(*StitchBuffer)[0], &(*StitchBuffer)[PCSHeader.stitchCount], dest.begin());
+			std::copy(StitchBuffer->begin(), StitchBuffer->end(), dest.begin());
 		}
 		backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
 		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
@@ -5719,18 +5719,19 @@ void thred::internal::nuFil() {
 					}
 					ZoomRect              = fRECTANGLE { 0.0f, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0f };
 					UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
-					PCSHeader.stitchCount = thredHeader.stitchCount;
-					auto stitchesRead     = DWORD { 0 };
-					ReadFile(FileHandle,
-					         StitchBuffer->data(),
-					         PCSHeader.stitchCount * sizeof(StitchBuffer->back()),
-					         &stitchesRead,
-					         nullptr);
-					if (stitchesRead != PCSHeader.stitchCount * sizeof((*StitchBuffer)[0])) {
-						PCSHeader.stitchCount = gsl::narrow<uint16_t>(stitchesRead / sizeof((*StitchBuffer)[0]));
-						prtred();
-						return;
+					if (thredHeader.stitchCount != 0u) {
+						StitchBuffer->resize(thredHeader.stitchCount);
+						auto bytesToRead = gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
+						ReadFile(FileHandle, StitchBuffer->data(), bytesToRead, &BytesRead, nullptr);
+						if (BytesRead != bytesToRead) {
+							//StitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
+							//StateMap.set(StateFlag::BADFIL);
+							prtred();
+							return;
+						}
 					}
+					StitchBuffer->shrink_to_fit();
+					PCSHeader.stitchCount = thredHeader.stitchCount;
 					ReadFile(FileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
@@ -14352,7 +14353,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					if (StateMap.test(StateFlag::BAKEND)) {
 						xlin1();
 						const auto iStitch       = PCSHeader.stitchCount;
-						(*StitchBuffer)[iStitch] = { SelectedPoint.x, SelectedPoint.y, code };
+						StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, code });
 						thred::duzrat();
 						stch2px1(iStitch);
 						InsertLine[0] = StitchCoordinatesPixels;
@@ -14364,10 +14365,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					}
 
 					xlin1();
-					for (auto iStitch = PCSHeader.stitchCount; iStitch != 0u; iStitch--) {
-						(*StitchBuffer)[iStitch] = (*StitchBuffer)[iStitch - 1];
-					}
-					(*StitchBuffer)[0] = { SelectedPoint.x, SelectedPoint.y, code };
+					StitchBuffer->insert(StitchBuffer->begin(),{ SelectedPoint.x, SelectedPoint.y, code });
 					(*StitchBuffer)[0].attribute &= (~KNOTMSK);
 					stch2px1(0);
 					InsertLine[0] = StitchCoordinatesPixels;
@@ -14478,9 +14476,9 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		else {
 			if (thred::px2stch()) {
 				thred::savdo();
-				PCSHeader.stitchCount           = 1;
-				InsertLine[0]                   = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-				(*StitchBuffer)[0]                 = { SelectedPoint.x, SelectedPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM };
+				PCSHeader.stitchCount = 1;
+				InsertLine[0]         = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+				StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM });
 				ColorChanges                    = 1;
 				ColorChangeTable[0].colorIndex  = gsl::narrow<uint16_t>(ActiveColor);
 				ColorChangeTable[0].stitchIndex = 0;
@@ -19528,7 +19526,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_RubberBandLine.resize(3);
 		private_SelectedFormsLine.resize(9);
 		private_SelectedPointsLine.resize(9);
-		private_StitchBuffer.resize(MAXITEMS * 2);
+		//private_StitchBuffer.resize(MAXITEMS * 2);
 		private_StringTable.resize(STR_LEN);
 		private_UndoBuffer.resize(16);
 		private_ValueWindow.resize(LASTLIN);

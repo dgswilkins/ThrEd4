@@ -690,7 +690,7 @@ uint32_t xt::internal::gucon(const fPOINT& start, const fPOINT& finish, uint32_t
 	auto up   = 0u;
 	auto down = 0u;
 
-	if (length < 5) {
+	if (length < 5.0f) {
 		return 0;
 	}
 	if (startVertex == endVertex) {
@@ -712,16 +712,15 @@ uint32_t xt::internal::gucon(const fPOINT& start, const fPOINT& finish, uint32_t
 	} while (true);
 	auto iStitch = destination;
 	while (startVertex != endVertex) {
-		(*StitchBuffer)[iStitch].x         = indentedPoint[startVertex].x;
-		(*StitchBuffer)[iStitch].y         = indentedPoint[startVertex].y;
-		(*StitchBuffer)[iStitch].attribute = code;
 		if (iStitch != 0u) {
-			if ((*StitchBuffer)[iStitch - 1].x != (*StitchBuffer)[iStitch].x
-			    || (*StitchBuffer)[iStitch - 1].y != (*StitchBuffer)[iStitch].y) {
+			if ((*StitchBuffer)[iStitch - 1].x != indentedPoint[startVertex].x
+			    || (*StitchBuffer)[iStitch - 1].y != indentedPoint[startVertex].y) {
+				StitchBuffer->push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 				iStitch++;
 			}
 		}
 		else {
+			StitchBuffer->push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 			iStitch++;
 		}
 		auto intermediateVertex = 0u;
@@ -740,7 +739,7 @@ uint32_t xt::internal::gucon(const fPOINT& start, const fPOINT& finish, uint32_t
 			const auto step       = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
 			auto       localPoint = fPOINT { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
 			for (auto iStep = 0u; iStep < stitchCount - 1; iStep++) {
-				(*StitchBuffer)[iStitch] = { localPoint.x, localPoint.y, code };
+				StitchBuffer->push_back({ localPoint.x, localPoint.y, code });
 				iStitch++;
 				localPoint.x += step.x;
 				localPoint.y += step.y;
@@ -753,7 +752,7 @@ uint32_t xt::internal::gucon(const fPOINT& start, const fPOINT& finish, uint32_t
 			startVertex = form::nxt(startVertex);
 		}
 	}
-	(*StitchBuffer)[iStitch] = { indentedPoint[startVertex].x, indentedPoint[startVertex].y, code };
+	StitchBuffer->push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 	iStitch++;
 	return iStitch - destination;
 }
@@ -1644,7 +1643,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		auto sourceEnd   = sourceStart + ilData.output;
 		std::copy(sourceStart, sourceEnd, StitchBuffer->begin());
 	}
-	else {
+	else { // no stitches added so far
 		const auto offset   = 0;
 		auto       code     = 0u;
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -1667,14 +1666,15 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
 				ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1].index;
 				ine++) {
-				(*StitchBuffer)[ilData.output] = { (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code };
 				if (ilData.output > 0) {
-					if ((*StitchBuffer)[ilData.output].x != (*StitchBuffer)[ilData.output - 1].x
-						|| (*StitchBuffer)[ilData.output].y != (*StitchBuffer)[ilData.output - 1].y) {
+					if ((*InterleaveSequence)[ine].x != (*StitchBuffer)[ilData.output - 1].x
+						|| (*InterleaveSequence)[ine].y != (*StitchBuffer)[ilData.output - 1].y) {
+						StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
 						ilData.output++;
 					}
 				}
 				else {
+					StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
 					ilData.output++;
 				}
 			}
