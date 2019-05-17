@@ -321,7 +321,7 @@ void texture::internal::txtxfn(const POINT& reference, uint16_t offsetPixels) no
 }
 
 void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
-	auto ref = POINT {0l,0l};
+	auto ref = POINT { 0l, 0l };
 
 	txi::txt2pix((*TempTexturePoints)[index], ref);
 	txi::txtxfn(ref, offsetPixels);
@@ -336,7 +336,7 @@ void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
 
 void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
 	auto texturePoint = TXPNT { textureRect.top, textureRect.left };
-	auto point        = POINT {0l,0l};
+	auto point        = POINT { 0l, 0l };
 
 	txi::txt2pix(texturePoint, point);
 	rectangle.left    = point.x - IniFile.textureEditorSize;
@@ -406,7 +406,7 @@ void texture::drwtxtr() {
 	auto textureRecord = TXPNT {};
 	line[0].x          = 0;
 	line[1].x          = StitchWindowClientRect.right;
-	auto point         = POINT {0l,0l};
+	auto point         = POINT { 0l, 0l };
 	for (auto iGrid = 0u; iGrid < gridLineCount; iGrid++) {
 		txi::txt2pix(textureRecord, point);
 		line[0].y = line[1].y = point.y;
@@ -491,7 +491,7 @@ void texture::internal::deorg(POINT& point) noexcept {
 }
 
 bool texture::internal::txbutfn() {
-	auto offset = POINT {0l,0l};
+	auto offset = POINT { 0l, 0l };
 
 	txi::deorg(offset);
 	return txi::px2txt(offset);
@@ -522,8 +522,8 @@ void texture::txtrbut() {
 bool texture::internal::txtclos(uint32_t& closestTexturePoint) {
 	if (closestTexturePoint != 0u) {
 		auto minimumLength = 1e99;
-		auto reference     = POINT {0l,0l};
-		auto point         = POINT {0l,0l};
+		auto reference     = POINT { 0l, 0l };
+		auto point         = POINT { 0l, 0l };
 
 		txi::deorg(reference);
 		closestTexturePoint = 0;
@@ -632,7 +632,7 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 }
 
 void texture::internal::setxclp(const FRMHED& textureForm) {
-	auto screenOffset = POINT {0l,0l};
+	auto screenOffset = POINT { 0l, 0l };
 	auto editorOffset = fPOINT {};
 
 	txi::deorg(screenOffset);
@@ -662,7 +662,7 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 }
 
 void texture::internal::stxlin() {
-	auto offset = POINT {0l,0l};
+	auto offset = POINT { 0l, 0l };
 	auto point0 = fPOINT {};
 	auto point1 = fPOINT {};
 
@@ -689,7 +689,7 @@ void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
 }
 
 void texture::txtrup() {
-	auto offset = POINT {0l,0l};
+	auto offset = POINT { 0l, 0l };
 
 	if (StateMap.testAndReset(StateFlag::TXTMOV)) {
 		texture::savtxt();
@@ -933,7 +933,7 @@ void texture::internal::chktxnum() {
 }
 
 void texture::internal::butsid(uint32_t windowId) {
-	auto buttonRect = RECT {0l,0l,0l,0l};
+	auto buttonRect = RECT { 0l, 0l, 0l, 0l };
 
 	txi::chktxnum();
 	TextureWindowId = windowId;
@@ -1262,7 +1262,7 @@ void texture::txtlbut(const FRMHED& textureForm) {
 		return;
 	}
 	if (!SelectedTexturePointsList->empty()) {
-		auto point = POINT {0l,0l};
+		auto point = POINT { 0l, 0l };
 		txi::deorg(point);
 		if (point.x > TexturePixelRect.left && point.x < TexturePixelRect.right && point.y > TexturePixelRect.top
 		    && point.y < TexturePixelRect.bottom) {

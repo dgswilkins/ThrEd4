@@ -838,7 +838,7 @@ void form::internal::setzig() {
 }
 
 void form::setmfrm() {
-	auto  point     = POINT {0l,0l};
+	auto  point     = POINT { 0l, 0l };
 	auto& closeForm = (*FormList)[ClosestFormToCursor];
 	auto  vertexIt  = std::next(FormVertices->cbegin(), closeForm.vertexIndex);
 	form::sfCor2px(vertexIt[0], point);
@@ -934,7 +934,7 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 void form::flipv() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
-		const auto offset      = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
+		const auto offset        = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -985,7 +985,7 @@ void form::flipv() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			const auto offset = SelectedForm->rectangle.top + SelectedForm->rectangle.bottom;
+			const auto offset   = SelectedForm->rectangle.top + SelectedForm->rectangle.bottom;
 			auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].y = offset - vertexIt[iVertex].y;
@@ -2156,13 +2156,13 @@ void form::internal::chkbrd() {
 			break;
 		}
 		case EDGECLIP: { // Clipboard
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::clpbrd(clipRect, form::getlast());
 			break;
 		}
 		case EDGECLIPX: { // Even Clipboard
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::duxclp();
 			break;
@@ -2194,7 +2194,7 @@ void form::internal::chkbrd() {
 			break;
 		}
 		case EDGEPICOT: { // Picot
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::clpic(clipRect);
 			break;
@@ -4306,7 +4306,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 		auto index    = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
-				auto lineGroupPoint   = &*sortedLines[iLine];
+				auto lineGroupPoint      = &*sortedLines[iLine];
 				(*StitchBuffer)[index++] = (fPOINTATTR { lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
 				(*StitchBuffer)[index++] = (fPOINTATTR { lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
 			}
@@ -4796,7 +4796,7 @@ void form::refilfn() {
 			break;
 		}
 		case EDGECLIP: {
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::clpout();
 			clip::clpbrd(clipRect, 0);
@@ -4836,7 +4836,7 @@ void form::refilfn() {
 			break;
 		}
 		case EDGEPICOT: {
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getplen();
@@ -4863,7 +4863,7 @@ void form::refilfn() {
 			break;
 		}
 		case EDGECLIPX: {
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 			clip::duxclp();
 			fi::ritbrd();
@@ -4920,7 +4920,7 @@ void form::refilfn() {
 				break;
 			}
 			case VCLPF: {
-				auto clipRect = fRECTANGLE{};
+				auto clipRect = fRECTANGLE {};
 				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				form::fvars(ClosestFormToCursor);
 				workingFormVertices.clear();
@@ -4933,14 +4933,14 @@ void form::refilfn() {
 				break;
 			}
 			case HCLPF: {
-				auto clipRect = fRECTANGLE{};
+				auto clipRect = fRECTANGLE {};
 				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 				doFill = false;
 				break;
 			}
 			case ANGCLPF: {
-				auto clipRect = fRECTANGLE{};
+				auto clipRect = fRECTANGLE {};
 				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
 				form::angclpfn(textureSegments, *AngledFormVertices);
@@ -5002,7 +5002,7 @@ void form::refilfn() {
 			break;
 		}
 		case CLPF: {
-			auto clipRect = fRECTANGLE{};
+			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
 			fi::fmclp();
 			fi::ritfil();
@@ -5200,7 +5200,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 
 	NewFormVertexCount = SelectedForm->vertexCount + 1;
 	thred::duzrat();
-	auto rectangle = RECT {0l,0l,0l,0l};
+	auto rectangle = RECT { 0l, 0l, 0l, 0l };
 	form::sRct2px(SelectedForm->rectangle, rectangle);
 	auto& formControls = *FormControlPoints;
 	formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
@@ -5238,7 +5238,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 		}
 	}
 	if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top && point.y <= rectangle.bottom) {
-		auto formOrigin = POINT {0l,0l};
+		auto formOrigin = POINT { 0l, 0l };
 		auto vertexIt   = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		form::sfCor2px(vertexIt[0], formOrigin);
 		FormMoveDelta = fPOINT { formOrigin.x - point.x, formOrigin.y - point.y };
@@ -5898,7 +5898,7 @@ void form::internal::getbig() {
 
 void form::stchrct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
 	auto stitchCoord = fPOINT { stitchRect.left, stitchRect.top };
-	auto screenCoord = POINT {0l,0l};
+	auto screenCoord = POINT { 0l, 0l };
 
 	thred::sCor2px(stitchCoord, screenCoord);
 	screenRect.left = screenCoord.x;
@@ -6728,7 +6728,7 @@ void form::fliph() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		const auto offset      = SelectedVerticesRect.right + SelectedVerticesRect.left;
+		const auto offset        = SelectedVerticesRect.right + SelectedVerticesRect.left;
 		auto       currentVertex = SelectedFormVertices.start;
 		auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
 		for (auto iVertex = 0u; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
@@ -6782,14 +6782,14 @@ void form::fliph() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			thred::savdo();
-			const auto offset = SelectedForm->rectangle.right + SelectedForm->rectangle.left;
+			const auto offset   = SelectedForm->rectangle.right + SelectedForm->rectangle.left;
 			auto       vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = offset - vertexIt[iVertex].x;
 			}
 			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-					&& (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
+				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
 					(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
 				}
 			}
@@ -7036,9 +7036,9 @@ void form::internal::snpfn(const std::vector<uint32_t>& xPoints, uint32_t start,
 		for (auto current = start; current < end; current++) {
 			auto reference = xPoints[current];
 			for (auto iPoint = current + 1; iPoint < finish; iPoint++) {
-				auto       check = xPoints[iPoint];
-				const auto CheckLength
-				    = hypot((*StitchBuffer)[check].x - (*StitchBuffer)[reference].x, (*StitchBuffer)[check].y - (*StitchBuffer)[reference].y);
+				auto       check       = xPoints[iPoint];
+				const auto CheckLength = hypot((*StitchBuffer)[check].x - (*StitchBuffer)[reference].x,
+				                               (*StitchBuffer)[check].y - (*StitchBuffer)[reference].y);
 				if (CheckLength < SnapLength) {
 					(*StitchBuffer)[check] = (*StitchBuffer)[reference];
 				}
@@ -7094,7 +7094,8 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	const auto attribute = (ClosestFormToCursor << 4u) & FRMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		for (auto iStitch = start; iStitch < finish; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
+			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
+			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
 				auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
 				xHistogram[iColumn]++;
 			}
@@ -7116,7 +7117,8 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	xHistogram[endColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
+			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
+			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
 				auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
 
 				xPoints[xHistogram[iColumn]++] = iStitch;
@@ -7210,7 +7212,7 @@ fPOINT form::rotpar() {
 		}
 		else {
 			rotationCenter
-				= fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
+			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 		}
 	}
 	return rotationCenter;
@@ -8313,7 +8315,8 @@ void form::internal::unbean(uint32_t start, uint32_t finish) {
 	BeanCount = 0;
 	for (iSource = start; iSource <= finish; iSource++) {
 		thred::mvstch(iCopy++, iSource);
-		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[iSource + 2].x && (*StitchBuffer)[iSource].y == (*StitchBuffer)[iSource + 2].y) {
+		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[iSource + 2].x
+		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[iSource + 2].y) {
 			iSource += 2;
 			BeanCount += 2;
 		}

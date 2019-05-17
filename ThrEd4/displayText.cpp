@@ -83,8 +83,8 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		auto textSize    = SIZE {0l,0l};
-		auto messageSize = SIZE {0l,0l};
+		auto textSize    = SIZE { 0l, 0l };
+		auto messageSize = SIZE { 0l, 0l };
 		for (auto& string : strings) {
 			wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
 			if (textSize.cx > messageSize.cx) {
@@ -95,7 +95,7 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		messageSize.cy *= gsl::narrow<int32_t>(strings.size());
-		auto mainRect = RECT {0l,0l,0l,0l};
+		auto mainRect = RECT { 0l, 0l, 0l, 0l };
 		GetWindowRect(MainStitchWin, &mainRect);
 		auto xOffset = mainRect.left;
 		GetWindowRect(ThrEdWindow, &mainRect);
@@ -135,10 +135,10 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() noexcept {
-	auto messageRect = RECT {0l,0l,0l,0l};
+	auto messageRect = RECT { 0l, 0l, 0l, 0l };
 
 	GetClientRect(MsgWindow, &messageRect);
-	auto wRect = RECT {0l,0l,0l,0l};
+	auto wRect = RECT { 0l, 0l, 0l, 0l };
 	GetWindowRect(MainStitchWin, &wRect);
 	auto xOffset = wRect.left;
 	GetWindowRect(ThrEdWindow, &wRect);
@@ -441,8 +441,8 @@ GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
 #pragma warning(pop)
 
 void displayText::tomsg() {
-	auto OKrect   = RECT {0l,0l,0l,0l};
-	auto textSize = SIZE {0l,0l};
+	auto OKrect   = RECT { 0l, 0l, 0l, 0l };
+	auto textSize = SIZE { 0l, 0l };
 
 	GetWindowRect(OKButton, &OKrect);
 	wrap::GetTextExtentPoint32(
@@ -486,7 +486,7 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 }
 
 HFONT displayText::getThrEdFont(int32_t weight) noexcept {
-	auto lfText = LOGFONT {0l,0l,0l,0l,0l,0,0,0,0,0,0,0,0,L""};
+	auto lfText = LOGFONT { 0l, 0l, 0l, 0l, 0l, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);

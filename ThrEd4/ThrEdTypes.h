@@ -937,14 +937,13 @@ constexpr uint32_t HLIN = HNUM;
 
 #pragma pack(1)
 
-
 class PCSHEADER // pcs file header structure
 {
 public:
 	int8_t   leadIn { 0 };
 	int8_t   hoopType { 0 };
 	uint16_t colorCount { 0 };
-	COLORREF colors[COLOR_COUNT] { 0 }; //NOLINT(modernize-avoid-c-arrays)
+	COLORREF colors[COLOR_COUNT] { 0 }; // NOLINT(modernize-avoid-c-arrays)
 	uint16_t stitchCount { 0 };
 
 	constexpr PCSHEADER() noexcept = default;
@@ -954,14 +953,13 @@ public:
 	//~PCSHEADER() = default;
 };
 
-
 class INIFILE // ini file structure
 {
 public:
-	char     defaultDirectory[180] { 0 };                   // default directory                   
-	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors                              
-	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors            
-	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors        
+	char     defaultDirectory[180] { 0 };                   // default directory
+	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors
+	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors
+	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors
 	COLORREF backgroundColor { 0u };                        // background color
 	COLORREF bitmapColor { 0u };                            // bitmap color
 	float    minStitchLength { 0.0f };                      // minimum stitch length
@@ -978,70 +976,70 @@ public:
 	uint32_t userFlagMap { 0u };                            // bitmap for user variables
 	float    borderWidth { 0.0f };                          // border width
 	uint32_t appliqueColor { 0u };                          // applique color
-	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names                     
+	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names
 	float    snapLength { 0.0f };                           // snap together length
 	float    starRatio { 0.0f };                            // star ratio
 	float    spiralWrap { 0.0f };                           // spiral wrap
-	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u };    // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
-	float    buttonholeCornerLength { 0.0f };               // buttonhole fill corner length
-	float    picotSpace { 0.0f };                           // space between border picots
-	int8_t   hoopType { 0 };                                // hoop type
-	int8_t   auxFileType { 0 };                             // machine file type
-	float    hoopSizeX { 0.0f };                            // hoop x size
-	float    hoopSizeY { 0.0f };                            // hoop y size
-	float    rotationAngle { 0.0f };                        // rotation angle
-	float    gridSize { 0.0f };                             // grid size
-	float    clipOffset { 0.0f };                           // clipboard offset
-	RECT     initialWindowCoords { 0, 0, 0, 0 };            // initial window coordinates
-	COLORREF gridColor { 0u };                              // grid color
-	uint32_t fillPhase { 0u };                              // clipboard fill phase
-	float    customHoopX { 0.0f };                          // custom hoop width
-	float    customHoopY { 0.0f };                          // custom hoop height
-	float    traceLength { 0.0f };                          // lens points
-	float    traceRatio { 0.0f };                           // trace ratio
-	float    chainSpace { 0.0f };                           // chain space
-	float    chainRatio { 0.0f };                           // chain ratio
-	float    cursorNudgeStep { 0.0f };                      // cursor nudge step
-	uint16_t nudgePixels { 0u };                            // nudge pixels
-	float    eggRatio { 0.0f };                             // egg ratio
-	uint16_t stitchSizePixels { 0u };                       // size of stitch points in pixels
-	uint16_t formVertexSizePixels { 0u };                   // size of form points in pixels
-	uint16_t formSides { 0u };                              // sides of a created form
-	float    tearTailLength { 0.0f };                       // length of the tear tail
-	float    tearTwistStep { 0.0f };                        // tear twist step
-	float    tearTwistRatio { 0.0f };                       // tear twist ratio
-	uint16_t wavePoints { 0u };                             // wave points
-	uint16_t waveStart { 0u };                              // wave strting point
-	uint16_t waveEnd { 0u };                                // wave ending point;
-	uint16_t waveLobes { 0u };                              // wave lobes
-	uint8_t  featherFillType { 0u };                        // feather fill type
-	uint8_t  featherUpCount { 0u };                         // feather up count
-	uint8_t  featherDownCount { 0u };                       // feather down count
-	uint8_t  featherType { 0u };                            // feather bits
-	float    featherRatio { 0.0f };                         // feather ratio
-	float    featherMinStitchSize { 0.0f };                 // feather floor
-	uint16_t featherCount { 0u };                           // feather fill psg granularity
-	char     p2cName[MAX_PATH] { 0 };                       // pes2card file                       NOLINT(modernize-avoid-c-arrays)
-	float    underlayIndent { 0.0f };                       // edge walk/underlay indent
-	float    underlayAngle { 0.0f };                        // underlay angle
-	float    underlaySpacing { 0.0f };                      // underlay spacing
-	float    underlayStitchLen { 0.0f };                    // underlay stitch length
-	float    daisyDiameter { 0.0f };                        // daisy diameter
-	float    daisyPetalLen { 0.0f };                        // daisy petal length
-	float    daisyHoleDiameter { 0.0f };                    // daisy hole diameter
-	uint32_t daisyPetalCount { 0u };                        // daisy petals
-	uint32_t daisyPetalPoints { 0u };                       // daisy petal points
-	uint32_t daisyInnerCount { 0u };                        // daisy inner count
-	uint8_t  daisyBorderType { 0u };                        // daisy border type
-	uint8_t  dataCheck { 0u };                              // data check
-	float    textureHeight { 0.0f };                        // textured fill height
-	float    textureWidth { 0.0f };                         // textured fill width
-	float    textureSpacing { 0.0f };                       // textured fill spacing
-	uint16_t formBoxSizePixels { 0u };                      // form box pixels
-	uint16_t daisyHeartCount { 0u };                        // daisy heart count
-	uint16_t textureEditorSize { 0u };                      // texture editor pixels
-	float    clpspc { 0.0f };                               // clipboard fill spacing
-	char     designerName[NAME_LEN] { 0 };                  // designer name                       NOLINT(modernize-avoid-c-arrays)
+	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u }; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
+	float    buttonholeCornerLength { 0.0f };            // buttonhole fill corner length
+	float    picotSpace { 0.0f };                        // space between border picots
+	int8_t   hoopType { 0 };                             // hoop type
+	int8_t   auxFileType { 0 };                          // machine file type
+	float    hoopSizeX { 0.0f };                         // hoop x size
+	float    hoopSizeY { 0.0f };                         // hoop y size
+	float    rotationAngle { 0.0f };                     // rotation angle
+	float    gridSize { 0.0f };                          // grid size
+	float    clipOffset { 0.0f };                        // clipboard offset
+	RECT     initialWindowCoords { 0, 0, 0, 0 };         // initial window coordinates
+	COLORREF gridColor { 0u };                           // grid color
+	uint32_t fillPhase { 0u };                           // clipboard fill phase
+	float    customHoopX { 0.0f };                       // custom hoop width
+	float    customHoopY { 0.0f };                       // custom hoop height
+	float    traceLength { 0.0f };                       // lens points
+	float    traceRatio { 0.0f };                        // trace ratio
+	float    chainSpace { 0.0f };                        // chain space
+	float    chainRatio { 0.0f };                        // chain ratio
+	float    cursorNudgeStep { 0.0f };                   // cursor nudge step
+	uint16_t nudgePixels { 0u };                         // nudge pixels
+	float    eggRatio { 0.0f };                          // egg ratio
+	uint16_t stitchSizePixels { 0u };                    // size of stitch points in pixels
+	uint16_t formVertexSizePixels { 0u };                // size of form points in pixels
+	uint16_t formSides { 0u };                           // sides of a created form
+	float    tearTailLength { 0.0f };                    // length of the tear tail
+	float    tearTwistStep { 0.0f };                     // tear twist step
+	float    tearTwistRatio { 0.0f };                    // tear twist ratio
+	uint16_t wavePoints { 0u };                          // wave points
+	uint16_t waveStart { 0u };                           // wave strting point
+	uint16_t waveEnd { 0u };                             // wave ending point;
+	uint16_t waveLobes { 0u };                           // wave lobes
+	uint8_t  featherFillType { 0u };                     // feather fill type
+	uint8_t  featherUpCount { 0u };                      // feather up count
+	uint8_t  featherDownCount { 0u };                    // feather down count
+	uint8_t  featherType { 0u };                         // feather bits
+	float    featherRatio { 0.0f };                      // feather ratio
+	float    featherMinStitchSize { 0.0f };              // feather floor
+	uint16_t featherCount { 0u };                        // feather fill psg granularity
+	char     p2cName[MAX_PATH] { 0 };                    // pes2card file                       NOLINT(modernize-avoid-c-arrays)
+	float    underlayIndent { 0.0f };                    // edge walk/underlay indent
+	float    underlayAngle { 0.0f };                     // underlay angle
+	float    underlaySpacing { 0.0f };                   // underlay spacing
+	float    underlayStitchLen { 0.0f };                 // underlay stitch length
+	float    daisyDiameter { 0.0f };                     // daisy diameter
+	float    daisyPetalLen { 0.0f };                     // daisy petal length
+	float    daisyHoleDiameter { 0.0f };                 // daisy hole diameter
+	uint32_t daisyPetalCount { 0u };                     // daisy petals
+	uint32_t daisyPetalPoints { 0u };                    // daisy petal points
+	uint32_t daisyInnerCount { 0u };                     // daisy inner count
+	uint8_t  daisyBorderType { 0u };                     // daisy border type
+	uint8_t  dataCheck { 0u };                           // data check
+	float    textureHeight { 0.0f };                     // textured fill height
+	float    textureWidth { 0.0f };                      // textured fill width
+	float    textureSpacing { 0.0f };                    // textured fill spacing
+	uint16_t formBoxSizePixels { 0u };                   // form box pixels
+	uint16_t daisyHeartCount { 0u };                     // daisy heart count
+	uint16_t textureEditorSize { 0u };                   // texture editor pixels
+	float    clpspc { 0.0f };                            // clipboard fill spacing
+	char     designerName[NAME_LEN] { 0 };               // designer name                       NOLINT(modernize-avoid-c-arrays)
 
 	constexpr INIFILE() noexcept = default;
 	// INIFILE(INIFILE&&) = default;
@@ -1525,7 +1523,7 @@ public:
 	//~FANGCLP() = default;
 };
 
-inline FANGCLP::FANGCLP() noexcept { //NOLINT
+inline FANGCLP::FANGCLP() noexcept { // NOLINT
 	guide.start  = 0u;
 	guide.finish = 0u;
 }
@@ -1563,7 +1561,7 @@ public:
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
 
-inline FLENCNT::FLENCNT() noexcept { //NOLINT
+inline FLENCNT::FLENCNT() noexcept { // NOLINT
 	clipCount = 0u;
 }
 
@@ -1753,7 +1751,6 @@ public:
 inline TFINFO::TFINFO() noexcept
     : feather() {
 }
-
 
 class FRMHEDO // Original form header used prior to version 2
 {
@@ -2425,7 +2422,7 @@ public:
 };
 
 class TXPNT // textured fill point
-{ 
+{
 public:
 	float    y { 0.0f };
 	uint16_t line { 0u };
@@ -2760,7 +2757,6 @@ public:
 	//~CURSORMASK() = default;
 };
 
-
 class BALHED // balarad file header
 {
 public:
@@ -2778,7 +2774,6 @@ public:
 	// BALHED& operator=(BALHED&&) = default;
 	//~BALHED() = default;
 };
-
 
 class BALSTCH // balarad stitch
 {
@@ -2948,17 +2943,17 @@ public:
 class PECHDR
 {
 public:
-	char     label[19] { 0 };   // Label string prefixed with "LA:" and padded with space (0x20)                         // NOLINT(modernize-avoid-c-arrays)
-	int8_t   labnd { 0 };       // carriage return character
-	uint8_t  ukn1[11] { 0u };   // Unknown (' ')                                                                         // NOLINT(modernize-avoid-c-arrays)
+	char label[19] { 0 }; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays)
+	int8_t   labnd { 0 }; // carriage return character
+	uint8_t  ukn1[11] { 0u };   // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
 	uint8_t  ukn2 { 0u };       // Unknown
 	uint16_t hnd1 { 0u };       // Unknown (0x00ff)
 	uint8_t  thumbWidth { 0u }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
 	                            // Thus, 6 would mean 6×8 = 48 pixels per line
 	uint8_t thumbHeight { 0u }; // Thumbnail image height in pixels (38)
-	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20                                  // NOLINT(modernize-avoid-c-arrays)
+	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
 	uint8_t colorCount { 0u };  // Number of colors minus one, 0xFF means 0 colors
-	uint8_t pad[463] { 0u };    // Pad bytes up to 512. This will hold the pallette indices for thread colors and 0x20   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t pad[463] { 0u };    // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
 
 	constexpr PECHDR() noexcept = default;
 	// PECHDR(PECHDR&&) = default;
@@ -3092,7 +3087,7 @@ public:
 union FILLSTARTS {
 public:
 	FSTRTS   fillNamed;
-	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)]; 
+	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)];
 
 	FILLSTARTS() noexcept;
 	// FILLSTARTS(FILLSTARTS&&) = default;
@@ -3283,7 +3278,6 @@ enum intersectionStyles
 	POINT_BEFORE_LINE,
 	POINT_AFTER_LINE
 };
-
 
 class LENINFO // Sorted line length info
 {

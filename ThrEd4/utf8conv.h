@@ -38,7 +38,7 @@
 namespace utf {
 #pragma warning(push)
 #pragma warning(disable : 26477) // supress warning for _ASSERTE
-#pragma warning(disable: 4996)    // wstring_convert was declared deprecated in c++17
+#pragma warning(disable : 4996)  // wstring_convert was declared deprecated in c++17
 
 inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 	std::wstring utf16;

@@ -654,7 +654,7 @@ void trace::internal::dutrac() {
 		const auto savedPoint     = CurrentTracePoint.y * BitmapWidth + CurrentTracePoint.x;
 		auto       traceDirection = 0u;
 		if (!TracedEdges->test(savedPoint)) {
-			auto findRectangle = RECT {0l,0l,0l,0l};
+			auto findRectangle = RECT { 0l, 0l, 0l, 0l };
 			auto point         = savedPoint;
 			auto limit         = (CurrentTracePoint.y + 1) * BitmapWidth;
 			while (point < limit && !TracedEdges->test(point)) {
@@ -1266,10 +1266,10 @@ void trace::internal::dublk(HDC dc, const RECT& traceHighMask, const RECT& trace
 }
 
 void trace::wasTrace() {
-	auto       traceHighMaskRect   = RECT {0l,0l,0l,0l};             // high trace mask rectangle
-	auto       traceMiddleMaskRect = RECT {0l,0l,0l,0l};             // middle trace mask rectangle
-	auto       traceLowMaskRect    = RECT {0l,0l,0l,0l};             // low trace mask rectangle
-	const auto BlackBrush          = CreateSolidBrush(0); // black brush
+	auto       traceHighMaskRect   = RECT { 0l, 0l, 0l, 0l }; // high trace mask rectangle
+	auto       traceMiddleMaskRect = RECT { 0l, 0l, 0l, 0l }; // middle trace mask rectangle
+	auto       traceLowMaskRect    = RECT { 0l, 0l, 0l, 0l }; // low trace mask rectangle
+	const auto BlackBrush          = CreateSolidBrush(0);     // black brush
 
 	for (auto iRGB = 0; iRGB < 3; iRGB++) {
 		if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {

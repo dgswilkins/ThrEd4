@@ -50,7 +50,7 @@ uint16_t DaisyTypeStrings[] = {
 };
 
 void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
-	auto labelSize = SIZE {0l,0l};
+	auto labelSize = SIZE { 0l, 0l };
 
 	wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
 	textSize.y = labelSize.cy;
@@ -60,7 +60,7 @@ void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 }
 
 auto formForms::maxwid(uint32_t start, uint32_t finish) {
-	auto textSize = POINT {0l,0l};
+	auto textSize = POINT { 0l, 0l };
 
 	while (start <= finish) {
 		formForms::maxtsiz((*StringTable)[start++], textSize);
@@ -504,7 +504,7 @@ void formForms::refrm() {
 }
 
 void formForms::sidwnd(HWND wnd) noexcept {
-	auto windowRect = RECT {0l,0l,0l,0l};
+	auto windowRect = RECT { 0l, 0l, 0l, 0l };
 
 	MsgIndex                 = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -527,7 +527,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 }
 
 void formForms::prfsid(HWND wnd) noexcept {
-	auto windowRect = RECT {0l,0l,0l,0l};
+	auto windowRect = RECT { 0l, 0l, 0l, 0l };
 
 	MsgIndex                 = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -583,7 +583,7 @@ void formForms::internal::prflin(const std::wstring& msg, uint32_t row) {
 
 void formForms::prfmsg() {
 	auto choice         = std::wstring {};
-	auto preferenceRect = RECT {0l,0l,0l,0l};
+	auto preferenceRect = RECT { 0l, 0l, 0l, 0l };
 
 	if (StateMap.testAndReset(StateFlag::INSRT)) {
 		StateMap.set(StateFlag::WASRT);

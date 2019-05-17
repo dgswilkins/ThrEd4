@@ -61,9 +61,9 @@
 
 namespace fs = std::filesystem;
 
-extern uint32_t    ActiveColor;
-extern uint32_t    ActiveLayer;
-extern fRECTANGLE  AllItemsRect;
+extern uint32_t   ActiveColor;
+extern uint32_t   ActiveLayer;
+extern fRECTANGLE AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
@@ -103,17 +103,17 @@ extern void*     ClipPointer;
 
 extern std::vector<fPOINT>* ClipPoints;
 
-extern FLSIZ      ClipRectSize;
-extern CLPSTCH*   ClipStitchData;
-extern uint32_t   ClipTypeMap;
-extern uint32_t   ClosestFormToCursor;
-extern uint32_t   ClosestPointIndex;
-extern uint32_t   ClosestVertexToCursor;
-extern int32_t*   ColorBarSize;
-extern HCURSOR    CrossCursor;
-extern uint32_t   CurrentFormGuides;
-extern uint32_t   CurrentFormGuidesCount;
-extern uint32_t   CurrentVertexIndex;
+extern FLSIZ    ClipRectSize;
+extern CLPSTCH* ClipStitchData;
+extern uint32_t ClipTypeMap;
+extern uint32_t ClosestFormToCursor;
+extern uint32_t ClosestPointIndex;
+extern uint32_t ClosestVertexToCursor;
+extern int32_t* ColorBarSize;
+extern HCURSOR  CrossCursor;
+extern uint32_t CurrentFormGuides;
+extern uint32_t CurrentFormGuidesCount;
+extern uint32_t CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
 
@@ -201,7 +201,7 @@ extern int32_t        PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
 extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
-extern fRECTANGLE    RotationRect;
+extern fRECTANGLE     RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
@@ -242,8 +242,8 @@ extern float      StarRatio;
 
 extern EnumMap<StateFlag> StateMap;
 
-extern fPOINT     StitchBmpRatio;
-extern double     StitchBoxesThreshold;
+extern fPOINT StitchBmpRatio;
+extern double StitchBoxesThreshold;
 
 extern std::vector<fPOINTATTR>* StitchBuffer;
 

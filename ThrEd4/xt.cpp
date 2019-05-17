@@ -464,8 +464,10 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 }
 
 int32_t xt::internal::fil2crd(const fs::path& fileName) {
-	auto    startupInfo = STARTUPINFO {0u,nullptr,nullptr,nullptr,0u,0u,0u,0u,0u,0u,0u,0u,0u,0u,nullptr,nullptr,nullptr,nullptr};
-	auto    processInfo = PROCESS_INFORMATION {nullptr,nullptr,0u,0u};
+	auto    startupInfo = STARTUPINFO {
+		0u, nullptr, nullptr, nullptr, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, nullptr, nullptr, nullptr, nullptr
+	};
+	auto    processInfo = PROCESS_INFORMATION { nullptr, nullptr, 0u, 0u };
 	auto    errorCode   = 0;
 	wchar_t command[_MAX_PATH * 2 + 1 + 4];
 
@@ -1250,7 +1252,7 @@ void xt::fsort() {
 			sortRecord.count  = sortRecord.finish - sortRecord.start;
 			auto minimumJumps = 0xffffffffu;
 			// timeout used to put an upper bound on the number of sorting permutations checked
-			auto fileTime = FILETIME {0u,0u};
+			auto fileTime = FILETIME { 0u, 0u };
 			GetSystemTimeAsFileTime(&fileTime);
 			const auto startTime        = xi::tim2int(fileTime);
 			auto       minimumIndex     = 0u;
@@ -1290,13 +1292,14 @@ void xt::fsort() {
 
 #ifdef _DEBUG
 
-class ATFLD {
+class ATFLD
+{
 public:
-	uint32_t color{ 0u };
-	uint32_t form{ 0u };
-	uint32_t type{ 0u };
-	uint32_t layer{ 0u };
-	uint32_t user{ 0u };
+	uint32_t color { 0u };
+	uint32_t form { 0u };
+	uint32_t type { 0u };
+	uint32_t layer { 0u };
+	uint32_t user { 0u };
 
 	constexpr ATFLD() noexcept = default;
 	// ATFLD(ATFLD&&) = default;
@@ -1538,7 +1541,7 @@ void xt::internal::duint(uint32_t offset, uint32_t code, INTINF& ilData) {
 		ilData.highStitchBuffer[ilData.output].y         = (*InterleaveSequence)[iSequence].y;
 		ilData.highStitchBuffer[ilData.output].attribute = code;
 		if (ilData.highStitchBuffer[ilData.output].x != ilData.highStitchBuffer[ilData.output - 1].x
-			|| ilData.highStitchBuffer[ilData.output].y != ilData.highStitchBuffer[ilData.output - 1].y) {
+		    || ilData.highStitchBuffer[ilData.output].y != ilData.highStitchBuffer[ilData.output - 1].y) {
 			ilData.output++;
 		}
 	}
@@ -1634,8 +1637,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			auto sourceStart = &(*StitchBuffer)[ilData.start];
 			auto sourceEnd   = sourceStart + ine;
 
-			const auto destination
-			    = gsl::span<fPOINTATTR>(&(*StitchBuffer)[ilData.output + MAXITEMS], MAXITEMS - ilData.output);
+			const auto destination = gsl::span<fPOINTATTR>(&(*StitchBuffer)[ilData.output + MAXITEMS], MAXITEMS - ilData.output);
 			std::copy(sourceStart, sourceEnd, destination.begin());
 			ilData.output += ine;
 		}
@@ -1664,11 +1666,11 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 				    colpnt, (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index], ilData.output, code);
 			}
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
-				ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1].index;
-				ine++) {
+			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1].index;
+			     ine++) {
 				if (ilData.output > 0) {
 					if ((*InterleaveSequence)[ine].x != (*StitchBuffer)[ilData.output - 1].x
-						|| (*InterleaveSequence)[ine].y != (*StitchBuffer)[ilData.output - 1].y) {
+					    || (*InterleaveSequence)[ine].y != (*StitchBuffer)[ilData.output - 1].y) {
 						StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
 						ilData.output++;
 					}
@@ -2403,8 +2405,8 @@ void xt::duauxnam() {
 }
 
 void xt::internal::rtrclpfn() {
-	auto count = 0u;
-	auto clipRect = fRECTANGLE{};
+	auto count    = 0u;
+	auto clipRect = fRECTANGLE {};
 	if (OpenClipboard(ThrEdWindow) != 0) {
 		form::fvars(ClosestFormToCursor);
 		if (clip::iseclp(ClosestFormToCursor)) {
