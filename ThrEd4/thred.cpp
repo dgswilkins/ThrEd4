@@ -1318,55 +1318,57 @@ void thred::internal::fndknt() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void thred::coltab() {
-	ColorChanges   = 0;
-	auto endStitch = PCSHeader.stitchCount;
-	if (endStitch != 0u) {
-		endStitch--;
-		(*StitchBuffer)[0].attribute &= NCOLMSK;
-		(*StitchBuffer)[0].attribute |= ((*StitchBuffer)[1].attribute & COLMSK);
-		(*StitchBuffer)[PCSHeader.stitchCount - 1].attribute &= NCOLMSK;
-		(*StitchBuffer)[PCSHeader.stitchCount - 1].attribute |= ((*StitchBuffer)[PCSHeader.stitchCount - 2].attribute & COLMSK);
-		auto currentColor = (*StitchBuffer)[0].attribute & COLMSK;
-		for (auto iStitch = 1u; iStitch < endStitch; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & COLMSK) != currentColor) {
-				if (((*StitchBuffer)[iStitch + 1].attribute & COLMSK) == currentColor) {
-					(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-					(*StitchBuffer)[iStitch].attribute |= currentColor;
+	if (StitchBuffer->size() > 1) {
+		ColorChanges   = 0;
+		auto endStitch = PCSHeader.stitchCount;
+		if (endStitch != 0u) {
+			endStitch--;
+			(*StitchBuffer)[0].attribute &= NCOLMSK;
+			(*StitchBuffer)[0].attribute |= ((*StitchBuffer)[1].attribute & COLMSK);
+			(*StitchBuffer)[PCSHeader.stitchCount - 1].attribute &= NCOLMSK;
+			(*StitchBuffer)[PCSHeader.stitchCount - 1].attribute |= ((*StitchBuffer)[PCSHeader.stitchCount - 2].attribute & COLMSK);
+			auto currentColor = (*StitchBuffer)[0].attribute & COLMSK;
+			for (auto iStitch = 1u; iStitch < endStitch; iStitch++) {
+				if (((*StitchBuffer)[iStitch].attribute & COLMSK) != currentColor) {
+					if (((*StitchBuffer)[iStitch + 1].attribute & COLMSK) == currentColor) {
+						(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
+						(*StitchBuffer)[iStitch].attribute |= currentColor;
+					}
+					currentColor = (*StitchBuffer)[iStitch].attribute & COLMSK;
 				}
-				currentColor = (*StitchBuffer)[iStitch].attribute & COLMSK;
 			}
+			auto iColor  = 0u;
+			currentColor = 0xffffffff;
+			const auto range
+			    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
+			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+				auto* Stitch = &(*StitchBuffer)[iStitch];
+				if (Stitch->x < range.left) {
+					Stitch->x = range.left;
+				}
+				if (Stitch->x > range.right) {
+					Stitch->x = range.right;
+				}
+				if (Stitch->y > range.top) {
+					Stitch->y = range.top;
+				}
+				if (Stitch->y < range.bottom) {
+					Stitch->y = range.bottom;
+				}
+				const auto nextColor = Stitch->attribute & COLMSK;
+				if (currentColor != nextColor) {
+					ColorChangeTable[iColor].colorIndex    = gsl::narrow<uint16_t>(nextColor);
+					ColorChangeTable[iColor++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
+					currentColor                           = nextColor;
+				}
+			}
+			ColorChanges                         = iColor;
+			ColorChangeTable[iColor].stitchIndex = gsl::narrow<uint16_t>(PCSHeader.stitchCount);
+			if (ClosestPointIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+				ClosestPointIndex = PCSHeader.stitchCount - 1;
+			}
+			thi::fndknt();
 		}
-		auto iColor  = 0u;
-		currentColor = 0xffffffff;
-		const auto range
-		    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			auto* Stitch = &(*StitchBuffer)[iStitch];
-			if (Stitch->x < range.left) {
-				Stitch->x = range.left;
-			}
-			if (Stitch->x > range.right) {
-				Stitch->x = range.right;
-			}
-			if (Stitch->y > range.top) {
-				Stitch->y = range.top;
-			}
-			if (Stitch->y < range.bottom) {
-				Stitch->y = range.bottom;
-			}
-			const auto nextColor = Stitch->attribute & COLMSK;
-			if (currentColor != nextColor) {
-				ColorChangeTable[iColor].colorIndex    = gsl::narrow<uint16_t>(nextColor);
-				ColorChangeTable[iColor++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-				currentColor                           = nextColor;
-			}
-		}
-		ColorChanges                         = iColor;
-		ColorChangeTable[iColor].stitchIndex = gsl::narrow<uint16_t>(PCSHeader.stitchCount);
-		if (ClosestPointIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			ClosestPointIndex = PCSHeader.stitchCount - 1;
-		}
-		thi::fndknt();
 	}
 }
 
@@ -11930,9 +11932,9 @@ void thred::internal::qcode() {
 }
 
 void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen) {
-	const auto* activeStitch = &(*StitchBuffer)[currentStitch];
+	if (!StitchBuffer->empty()) {
+		const auto activeStitch = std::next(StitchBuffer->begin(), currentStitch);
 
-	if (activeStitch != nullptr) {
 		if (ActiveLayer != 0u) {
 			LineIndex = 0;
 		}
@@ -11965,7 +11967,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 			}
 		}
 		LineIndex        = 1;
-		const auto layer = (activeStitch[iOffset].attribute & LAYMSK) >> LAYSHFT;
+		const auto layer = (activeStitch[iOffset - 1].attribute & LAYMSK) >> LAYSHFT;
 		if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
 			if (iOffset != 0u) {
 				linePoints[0] = { wrap::round<int32_t>((activeStitch[iOffset - 1].x - ZoomRect.left) * ZoomRatio.x),
@@ -11978,9 +11980,6 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 					                                   - (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y) };
 			}
 		}
-	}
-	else {
-		throw;
 	}
 }
 
@@ -14489,9 +14488,10 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		else {
 			if (thred::px2stch()) {
 				thred::savdo();
-				PCSHeader.stitchCount = 1;
-				InsertLine[0]         = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+				InsertLine[0] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+				InsertLine[1] = InsertLine[0];
 				StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM });
+				PCSHeader.stitchCount = 1;
 				ColorChanges                    = 1;
 				ColorChangeTable[0].colorIndex  = gsl::narrow<uint16_t>(ActiveColor);
 				ColorChangeTable[0].stitchIndex = 0;
@@ -19128,7 +19128,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				return 1;
 			}
 			if (!StateMap.test(StateFlag::RUNPAT)) {
-				if (!StateMap.test(StateFlag::HIDSTCH) && !StitchBuffer->empty()
+				if (!StateMap.test(StateFlag::HIDSTCH)
 				    && ((FileHandle != nullptr) || StateMap.test(StateFlag::INIT) || !FormList->empty() 
 				        || StateMap.test(StateFlag::SATPNT))
 				    && !StateMap.test(StateFlag::BAKSHO)) {
