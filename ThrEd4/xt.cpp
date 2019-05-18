@@ -1510,7 +1510,7 @@ bool xt::internal::lastcol(uint32_t index, fPOINT& point) {
 	return false;
 }
 
-void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t offset, uint32_t code, INTINF& ilData) {
+void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
 	if (ilData.coloc > ilData.start) {
 		const auto count       = ilData.coloc - ilData.start;
 		auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
@@ -1526,7 +1526,7 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t offset, uint3
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 			ilData.output += gucon(buffer, vertexIt[SelectedForm->fillStart],
 			                       (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
-			                       ilData.output + offset,
+			                       ilData.output,
 			                       code);
 		}
 	}
@@ -1559,12 +1559,12 @@ bool xt::internal::isfil() noexcept {
 	return false;
 }
 
-void xt::internal::chkend(std::vector<fPOINTATTR>& buffer, uint32_t offset, uint32_t code, INTINF& ilData) {
+void xt::internal::chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
 		if ((SelectedForm->extendedAttribute & AT_END) != 0u) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			ilData.output += gucon(buffer, InterleaveSequence->back(), vertexIt[SelectedForm->fillEnd], ilData.output + offset, code);
+			ilData.output += gucon(buffer, InterleaveSequence->back(), vertexIt[SelectedForm->fillEnd], ilData.output, code);
 		}
 	}
 }
@@ -1627,9 +1627,9 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			}
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[ilData.pins].code
 			                             | (*InterleaveSequenceIndices)[ilData.pins].color);
-			xi::duint(highStitchBuffer, offset, code, ilData);
+			xi::duint(highStitchBuffer, code, ilData);
 		}
-		xi::chkend(highStitchBuffer, 0, code, ilData);
+		xi::chkend(highStitchBuffer, code, ilData);
 		if ((PCSHeader.stitchCount != 0u) && ilData.start < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
 			const auto ine         = PCSHeader.stitchCount - ilData.start;
 			auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
@@ -1645,7 +1645,6 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		StitchBuffer->insert(StitchBuffer->begin(), sourceStart, sourceEnd);
 	}
 	else { // no stitches added so far
-		const auto offset   = 0;
 		auto       code     = 0u;
 		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
@@ -1655,7 +1654,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 					ilData.output += xi::gucon(*StitchBuffer, vertexIt[SelectedForm->fillStart],
 					                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
-					                           ilData.output + offset,
+					                           ilData.output,
 					                           code);
 				}
 			}
@@ -1680,7 +1679,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 				}
 			}
 		}
-		xi::chkend(*StitchBuffer, 0, code, ilData);
+		xi::chkend(*StitchBuffer, code, ilData);
 	}
 	PCSHeader.stitchCount = gsl::narrow<uint16_t>(ilData.output);
 	thred::coltab();
