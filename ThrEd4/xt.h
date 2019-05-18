@@ -116,7 +116,7 @@ namespace internal {
 	uint32_t bpsg() noexcept;
 	void     bspacfn(uint32_t find, float length);
 	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
-	void     chkend(uint32_t offset, uint32_t code, INTINF& ilData);
+	void     chkend(std::vector<fPOINTATTR>& buffer, uint32_t offset, uint32_t code, INTINF& ilData);
 	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
 	void     chkuseq();
@@ -127,7 +127,7 @@ namespace internal {
 	void duatf(uint32_t ind);
 #endif
 
-	void     duint(uint32_t offset, uint32_t code, INTINF& ilData);
+	void     duint(std::vector<fPOINTATTR>& buffer, uint32_t offset, uint32_t code, INTINF& ilData);
 	uint32_t duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord);
 
 	constexpr float durat(float start, float finish, float featherRatio);
@@ -160,7 +160,7 @@ namespace internal {
 	void    fwidfn(uint32_t find, float length);
 	float   getstxt(uint32_t stringIndex, HWND dialog);
 
-	uint32_t gucon(const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
+	uint32_t gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
 
 	bool   isfil() noexcept;
 	bool   lastcol(uint32_t index, fPOINT& point);

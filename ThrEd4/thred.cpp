@@ -1404,7 +1404,7 @@ void thred::internal::dudat() {
 	const auto&    formList  = *FormList;
 	const auto     formCount = wrap::toUnsigned(formList.size());
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
-	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof((*StitchBuffer)[0]) * PCSHeader.stitchCount
+	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(decltype(StitchBuffer->back())) * PCSHeader.stitchCount
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
 	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
@@ -3006,6 +3006,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
 			thred::mvstch(iNextStitch++, iStitch);
 		}
+		StitchBuffer->resize(iNextStitch);
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iNextStitch);
 		thred::coltab();
 	}
@@ -5751,7 +5752,7 @@ void thred::internal::nuFil() {
 						}
 					}
 					StitchBuffer->shrink_to_fit();
-					PCSHeader.stitchCount = thredHeader.stitchCount;
+					PCSHeader.stitchCount = wrap::toUnsigned(StitchBuffer->size());
 					ReadFile(FileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
@@ -6978,10 +6979,11 @@ void thred::internal::newFil() {
 	StateMap.reset(StateFlag::FORMSEL);
 	StateMap.reset(StateFlag::BAKACT);
 	StateMap.reset(StateFlag::GMRK);
+	StitchBuffer->clear();
+	StitchBuffer->shrink_to_fit();
 	PCSHeader.stitchCount = 0;
 	DisplayedColorBitmap.reset();
 	PCSBMPFileName[0]     = 0;
-	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
 	FormVertices->shrink_to_fit();
 	TexturePointsBuffer->clear();
@@ -7846,6 +7848,7 @@ void thred::internal::f1del() {
 				stitchCount++;
 			}
 		}
+		StitchBuffer->resize(stitchCount);
 		PCSHeader.stitchCount = gsl::narrow<uint16_t>(stitchCount);
 	}
 	clip::deleclp(ClosestFormToCursor);
@@ -18140,6 +18143,7 @@ void thred::internal::init() {
 	ZoomFactor            = 1;
 	PCSHeader.leadIn      = 0x32;
 	PCSHeader.colorCount  = 16;
+	StitchBuffer->clear();
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
 	ladj();
