@@ -2956,11 +2956,11 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 				}
 			}
 		}
-		if (iStitch == lastStitch) {
-			return; // we reached the last stitch without seeing a small stitch so don't do anything
+		if (iStitch != lastStitch) {
+			iStitch--; // we found a small stich so back up to the start point
 		}
 		else {
-			iStitch--; // we found a small stich so back up to the start point
+			return; // we reached the last stitch without seeing a small stitch so don't do anything
 		}
 		auto iOutputStitch = iStitch;
 		auto prevPoint   = (*StitchBuffer)[startStitch];
@@ -11110,12 +11110,12 @@ void thred::internal::retrac() {
 		if (GroupStartStitch == 0u) {
 			GroupStartStitch++;
 		}
-		form::makspac(GroupEndStitch + 1, GroupEndStitch - GroupStartStitch);
-		auto source      = GroupEndStitch - 1;
-		auto destination = GroupEndStitch + 1;
-		while ((source != 0u) && (source >= GroupStartStitch)) {
-			(*StitchBuffer)[destination++] = (*StitchBuffer)[source--];
-		}
+		const auto count = GroupEndStitch - GroupStartStitch;
+		auto insertPoint = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+		auto startPoint = std::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
+		auto endPoint = std::next(startPoint, count);
+		StitchBuffer->insert(insertPoint, startPoint, endPoint);
+		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

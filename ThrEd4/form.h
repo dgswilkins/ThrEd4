@@ -125,7 +125,6 @@ void ispcdclp();
 void join();
 bool lastch();
 bool linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection);
-void makspac(uint32_t start, uint32_t count);
 void mdufrm();
 
 // pragma required until MSVC /analyze recognizes noexcept(false)

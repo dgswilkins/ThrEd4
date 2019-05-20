@@ -1177,14 +1177,6 @@ void form::frmovlin() {
 	thred::ritmov();
 }
 
-void form::makspac(uint32_t start, uint32_t count) {
-	if (!form::chkmax(PCSHeader.stitchCount, count)) {
-		const auto dest = gsl::span<fPOINTATTR>(&(*StitchBuffer)[start + count], MAXITEMS - (start + count));
-		std::copy(&(*StitchBuffer)[start], &(*StitchBuffer)[PCSHeader.stitchCount], dest.begin());
-		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
-	}
-}
-
 bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) {
 	const auto delta  = fPOINT { finish.x - start.x, finish.y - start.y };
 	auto       length = hypot(delta.x, delta.y);

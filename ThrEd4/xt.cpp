@@ -1681,7 +1681,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		}
 		xi::chkend(*StitchBuffer, code, ilData);
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(ilData.output);
+	PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 	thred::coltab();
 }
 
