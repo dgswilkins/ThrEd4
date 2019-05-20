@@ -2928,61 +2928,78 @@ void thred::internal::lenCalc() {
 
 void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	const auto codedAttribute = ClosestFormToCursor << 4u;
-	auto       stitchSize     = 1e99;
+	auto       stitchSize     = 1e38f;
 
 	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		auto iNextStitch = form::find1st();
-		auto iStitch     = iNextStitch + 1;
+		auto iPrevStitch = form::find1st();
+		auto iStitch     = iPrevStitch + 1;
 		auto lastStitch  = PCSHeader.stitchCount;
-		if (lastStitch != 0u) {
+		
+		if (lastStitch != 0u) { // find the first small stitch in the selected form
 			lastStitch--;
 			while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
 				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) {
-					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) {
-						iNextStitch = iStitch;
+					&& ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) {  // are we still in the selected form?
+					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) == 0u) { // is this a knot?
+						const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - (*StitchBuffer)[iPrevStitch].x,
+							                        (*StitchBuffer)[iStitch].y - (*StitchBuffer)[iPrevStitch].y };
+						stitchSize       = hypot(delta.x, delta.y);
+						if (stitchSize > SmallStitchLength) {
+							iPrevStitch++;
+							iStitch++;
+						}
+					}
+				}
+				else {
+					return; // we reached the last stitch in the selected form without seeing a small stitch so don't do anything
+				}
+			}
+		}
+		if (iStitch == lastStitch) {
+			return; // we reached the last stitch without seeing a small stitch so don't do anything
+		}
+		else {
+			iStitch--; // we found a small stich so back up to the start point
+		}
+		auto iOutputStitch = iStitch;
+		auto prevPoint   = (*StitchBuffer)[startStitch];
+		lastStitch       = PCSHeader.stitchCount;
+		if (lastStitch != 0u) {
+			lastStitch--;
+			while (iStitch < lastStitch) {
+				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
+					&& ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
+					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) { // is this a knot?
+						prevPoint = (*StitchBuffer)[iOutputStitch];
+						thred::mvstch(iOutputStitch, iStitch);
+						iOutputStitch++;
 					}
 					else {
-						const auto delta
-						    = POINT { wrap::round<int32_t>((*StitchBuffer)[iStitch].x - (*StitchBuffer)[iNextStitch].x),
-							          wrap::round<int32_t>((*StitchBuffer)[iStitch].y - (*StitchBuffer)[iNextStitch].y) };
+						const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
 						stitchSize = hypot(delta.x, delta.y);
-					}
-					iStitch++;
-				}
-			}
-		}
-		if (iStitch != endStitch - 2) {
-			iStitch--;
-			iNextStitch = iStitch + 2;
-			lastStitch  = PCSHeader.stitchCount;
-			if (lastStitch != 0u) {
-				lastStitch--;
-				while (iNextStitch < lastStitch) {
-					do {
-						if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-						    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute
-						    && (((*StitchBuffer)[iStitch].attribute & KNOTMSK) == 0u)) {
-							const auto delta
-							    = POINT { wrap::round<int32_t>((*StitchBuffer)[iNextStitch].x - (*StitchBuffer)[iStitch].x),
-								          wrap::round<int32_t>((*StitchBuffer)[iNextStitch++].y - (*StitchBuffer)[iStitch].y) };
-							stitchSize = hypot(delta.x, delta.y);
+						if (stitchSize > SmallStitchLength) {
+							thred::mvstch(iOutputStitch, iStitch);
+							prevPoint = (*StitchBuffer)[iStitch];
+							iOutputStitch++;
 						}
 						else {
-							iNextStitch++;
+							if (iOutputStitch > lastStitch) { 
+								break; // we are at the end of the buffer
+							}
 						}
-					} while (stitchSize < SmallStitchLength && iNextStitch < PCSHeader.stitchCount);
-					(*StitchBuffer)[++iStitch] = (*StitchBuffer)[--iNextStitch];
+					}
 				}
+				else {
+					break; // we are no longer in the form
+				}
+				iStitch++;
 			}
-			iStitch++;
-			while (iNextStitch < PCSHeader.stitchCount) {
-				(*StitchBuffer)[iStitch++] = (*StitchBuffer)[iNextStitch++];
-			}
-			PCSHeader.stitchCount = gsl::narrow<uint16_t>(iStitch);
-			thred::coltab();
 		}
+		iOutputStitch++;
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), iOutputStitch), std::next(StitchBuffer->begin(), iStitch));
+		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+		thred::coltab();
 	}
 	else {
 		auto iNextStitch = startStitch + 1;
@@ -2993,8 +3010,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 				thred::mvstch(iNextStitch++, iStitch);
 			}
 			else {
-				const auto delta = POINT { wrap::round<int32_t>((*StitchBuffer)[iStitch].x - prevPoint.x),
-					                       wrap::round<int32_t>((*StitchBuffer)[iStitch].y - prevPoint.y) };
+				const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
 				stitchSize       = hypot(delta.x, delta.y);
 				if (stitchSize > SmallStitchLength) {
 					thred::mvstch(iNextStitch++, iStitch);
@@ -3276,7 +3292,12 @@ void thred::grpAdj() {
 
 void thred::internal::nuAct(uint32_t iStitch) {
 	const auto color = ActiveColor;
-	ActiveColor      = (*StitchBuffer)[iStitch].attribute & COLMSK;
+	if (!StitchBuffer->empty()) {
+		ActiveColor = (*StitchBuffer)[iStitch].attribute & COLMSK;
+	}
+	else {
+		ActiveColor = 0;
+	}
 	thred::redraw(UserColorWin[color]);
 	thred::redraw(UserColorWin[ActiveColor]);
 }
@@ -3809,7 +3830,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
 	ExtendedHeader.texturePointCount = gsl::narrow<uint32_t>(TextureIndex);
 	durit(buffer, &ExtendedHeader, sizeof(ExtendedHeader));
-	durit(buffer, StitchBuffer, PCSHeader.stitchCount * sizeof((*StitchBuffer)[0]));
+	durit(buffer, StitchBuffer->data(), wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back()))));
 	if (PCSBMPFileName[0] == 0) {
 		std::fill_n(&PCSBMPFileName[0], sizeof(PCSBMPFileName), '\0');
 	}
@@ -9927,17 +9948,19 @@ void thred::internal::vuselthr() {
 }
 
 void thred::internal::colchk() {
-	auto color         = (*StitchBuffer)[0].attribute & COLMSK;
-	auto currentStitch = 0u;
+	if (!StitchBuffer->empty()) {
+		auto color = StitchBuffer->front().attribute & COLMSK;
+		auto currentStitch = 0u;
 
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
-			if ((iStitch - currentStitch == 1) && ((currentStitch) != 0u)) {
-				(*StitchBuffer)[iStitch - 1].attribute
-				    = (*StitchBuffer)[iStitch].attribute & NCOLMSK | ((*StitchBuffer)[currentStitch - 1].attribute & COLMSK);
+		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
+				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0u)) {
+					(*StitchBuffer)[iStitch - 1].attribute
+						= (*StitchBuffer)[iStitch].attribute & NCOLMSK | ((*StitchBuffer)[currentStitch - 1].attribute & COLMSK);
+				}
+				color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+				currentStitch = iStitch;
 			}
-			color         = (*StitchBuffer)[iStitch].attribute & COLMSK;
-			currentStitch = iStitch;
 		}
 	}
 }
