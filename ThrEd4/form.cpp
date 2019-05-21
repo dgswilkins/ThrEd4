@@ -5557,13 +5557,14 @@ void form::unfil() {
 				SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			}
 		}
-		auto iDestination = 0u;
-		for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-			if (!formMap.test(((*StitchBuffer)[iSource].attribute & FRMSK) >> FRMSHFT)) {
-				(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
+		auto iDestination = StitchBuffer->begin();
+		for (auto& stitch : *StitchBuffer) {
+			if (!formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+				*iDestination++ = stitch;
 			}
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
+		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
+		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -5583,19 +5584,19 @@ void form::unfil() {
 				}
 			}
 			const auto codedForm    = ClosestFormToCursor << FRMSHFT;
-			auto       iDestination = 0u;
-			for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-				if (((*StitchBuffer)[iSource].attribute & FRMSK) != codedForm
-				    || (((*StitchBuffer)[iSource].attribute & NOTFRM) != 0u)) {
-					(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
+			auto       iDestination = StitchBuffer->begin();
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0u)) {
+					*iDestination++ = stitch;
 				}
 			}
+			StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
 			clip::delclps(ClosestFormToCursor);
 			texture::deltx(ClosestFormToCursor);
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
-			PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
+			PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 			thred::ritot(PCSHeader.stitchCount);
 		}
 	}
