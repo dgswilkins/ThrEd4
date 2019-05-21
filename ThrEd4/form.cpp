@@ -145,46 +145,36 @@ void form::internal::rotbak(float rotationAngle, const fPOINT& rotationCenter) n
 	}
 }
 
-void form::internal::delfil(uint32_t attribute) {
-	auto iSource = 0u;
-
-	attribute &= TYPMSK | FRMSK;
-	StateMap.reset(StateFlag::WASDEL);
-	while (((*StitchBuffer)[iSource].attribute & (TYPMSK | FRMSK)) != attribute && iSource < PCSHeader.stitchCount) {
-		iSource++;
-	}
-	auto iDestination = iSource;
-	if (iSource < PCSHeader.stitchCount) {
-		StateMap.set(StateFlag::WASDEL);
-	}
-	while (iSource < PCSHeader.stitchCount) {
-		if (((*StitchBuffer)[iSource].attribute & (TYPMSK | FRMSK)) != attribute) {
-			(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
-		}
-		iSource++;
-	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
-}
-
 void form::delmfil() {
 	if (texture::istx(ClosestFormToCursor)) {
 		texture::deltx(ClosestFormToCursor);
 	}
 	clip::delmclp(ClosestFormToCursor);
-	auto iDestination = 0;
-	for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-		const auto stitchAttribute = (*StitchBuffer)[iSource].attribute;
-		if ((stitchAttribute & NOTFRM) == 0u) {
-			const auto attribute = ClosestFormToCursor << FRMSHFT;
-			if (!((stitchAttribute & FRMSK) == attribute && ((stitchAttribute & (TYPFRM | FTHMSK)) != 0u))) {
-				thred::mvstch(iDestination++, iSource);
-			}
+	// find the first stitch to delete
+	const auto codedForm = ClosestFormToCursor << FRMSHFT;
+	auto stitchIt = StitchBuffer->begin();
+	auto flag = false;
+	while( stitchIt != StitchBuffer->end()) {
+		const auto& attribute = (*stitchIt).attribute;
+		if (((attribute & NOTFRM) == 0u) && ((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
+			flag = true;
+			break;
 		}
-		else {
-			thred::mvstch(iDestination++, iSource);
-		}
+		stitchIt++;
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
+	if (flag) { 
+		auto startPoint = stitchIt; // we found the start stitch. 
+		while( stitchIt != StitchBuffer->end()) { // Now find the end stitch
+			const auto& attribute = (*stitchIt).attribute;
+			if (!((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
+				break;
+			}
+			stitchIt++;
+		}
+		auto endPoint = stitchIt;
+		StitchBuffer->erase(startPoint, endPoint);
+	}
+	PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 }
 
 void form::fsizpar() noexcept {

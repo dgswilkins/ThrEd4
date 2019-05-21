@@ -245,7 +245,6 @@ namespace internal {
 	void contf();
 	bool contsf(uint32_t formIndex);
 	void cplayfn(uint32_t iForm, uint32_t play);
-	void delfil(uint32_t attribute);
 
 	constexpr uint32_t duat(uint32_t attribute);
 
