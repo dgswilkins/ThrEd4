@@ -5079,7 +5079,7 @@ void thred::internal::redbak() {
 			StitchBuffer->clear();
 			StateMap.reset(StateFlag::INIT);
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(undoData->stitchCount);
+		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 		UnzoomedRect          = undoData->zoomRect;
 		if (undoData->formCount != 0u) {
 			FormList->resize(undoData->formCount);
@@ -17328,7 +17328,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			}
 		}
 		if (StateMap.test(StateFlag::FILMSG)) {
-			if (code == VK_RETURN || code == 0xc0) {
+			if (code == VK_RETURN || code == 0xc0) { // check for return or back tick '`'
 				thred::savdo();
 				form::unfil();
 				thred::coltab();
