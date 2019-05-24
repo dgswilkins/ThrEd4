@@ -648,7 +648,7 @@ void form::drwfrm() {
 		form::fvars(iForm);
 		form::frmlin(SelectedForm->vertexIndex, VertexCount);
 		if (!FormLines->empty()) {
-			auto layer = ((SelectedForm->attribute & FRMLMSK) >> 1u);
+			auto layer = gsl::narrow_cast<uint32_t>(gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1u);
 			if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
 				POINT line[2]   = {};
 				auto  lastPoint = 0u;
@@ -1101,8 +1101,8 @@ bool form::closfrm() {
 		auto point         = fPOINT {};
 		auto minimumLength = 1e99;
 		fi::px2stchf(screenCoordinate, point);
-		const auto layerCoded  = ActiveLayer << 1u;
-		const auto maxForm     = FormList->size();
+		const auto layerCoded  = gsl::narrow_cast<uint8_t>(ActiveLayer << 1u);
+		const auto maxForm     = wrap::toUnsigned(FormList->size());
 		const auto savedVertex = VertexCount;
 		for (auto iForm = 0u; iForm < maxForm; iForm++) {
 			if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
@@ -1110,7 +1110,7 @@ bool form::closfrm() {
 			}
 			auto& currentForm    = (*FormList)[iForm];
 			VertexCount          = currentForm.vertexCount;
-			const auto formLayer = currentForm.attribute & FRMLMSK;
+			const auto formLayer = gsl::narrow_cast<uint8_t>(currentForm.attribute & FRMLMSK);
 			if ((ActiveLayer == 0u) || (formLayer == 0u) || formLayer == layerCoded) {
 				auto vertexIt = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
 				// find the closest line first and then find the closest vertex on that line
@@ -5418,8 +5418,8 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter = (*FormList)[iForm];
-		if ((ActiveLayer == 0u) || ((formIter.attribute & FRMLMSK) >> 1u) == ActiveLayer
-		    || ((formIter.attribute & FRMLMSK) == 0u)) {
+		auto layer = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1u);
+		if ((ActiveLayer == 0u) || layer == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0u)) {
 			CurrentVertexIndex     = formIter.vertexIndex;
 			const auto savedVertex = VertexCount;
 			VertexCount            = formIter.vertexCount;
@@ -7308,7 +7308,7 @@ void form::internal::duprotfs(float rotationAngle) {
 
 void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) {
 	thred::rngadj();
-	ClosestPointIndex = StitchBuffer->size();
+	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size());
 	auto sourceIt = std::next(StitchBuffer->begin(), GroupStartStitch);
 	auto endPoint = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
 	while (sourceIt < endPoint) {
@@ -8287,8 +8287,8 @@ void form::dubean() {
 void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	auto highStitchBuffer = std::vector<fPOINTATTR>{};
 	auto lastStitch = finish;
-	if (lastStitch > StitchBuffer->size() - 3u) {
-		lastStitch = StitchBuffer->size() - 3u;
+	if (lastStitch > wrap::toUnsigned(StitchBuffer->size()) - 3u) {
+		lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3u;
 	}
 	auto iSource = start;
 	for (; iSource <= lastStitch; iSource++) {

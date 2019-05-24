@@ -2321,9 +2321,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	return *this;
 }
 
-constexpr uint32_t FRMEND   = 0x01u;
-constexpr uint32_t FRMLMSK  = 0x0eu;
-constexpr uint32_t NFRMLMSK = 0xf1u;
+constexpr uint8_t FRMEND   = 0x01u; // 0000 0001
+constexpr uint8_t FRMLMSK  = 0x0eu; // 0000 1110
+constexpr uint8_t NFRMLMSK = 0xf1u; // 1111 0001
 
 /*form attribute bits
 
@@ -2335,11 +2335,11 @@ constexpr uint32_t NFRMLMSK = 0xf1u;
 */
 
 // blunt bits
-constexpr uint32_t FBLNT  = 0x20u;
-constexpr uint32_t SBLNT  = 0x40u;
-constexpr uint32_t NFBLNT = 0xdfu;
-constexpr uint32_t NSBLNT = 0xbfu;
-constexpr uint32_t NOBLNT = 0x9fu;
+constexpr uint8_t FBLNT  = 0x20u; // 0010 0000
+constexpr uint8_t SBLNT  = 0x40u; // 0100 0000
+constexpr uint8_t NFBLNT = 0xdfu; // 1101 1111
+constexpr uint8_t NSBLNT = 0xbfu; // 1011 1111
+constexpr uint8_t NOBLNT = 0x9fu; // 1001 1111
 
 // frmhed extended attribute bits
 
@@ -2354,8 +2354,8 @@ constexpr uint32_t AT_WALK    = 0x080u; // edge walk
 constexpr uint32_t AT_CWLK    = 0x100u; // center walk
 
 // contour refil
-constexpr uint32_t FRECONT  = 0x80u;
-constexpr uint32_t NFRECONT = 0x7fu;
+constexpr uint32_t FRECONT  = 0x80u; // 1000 0000
+constexpr uint32_t NFRECONT = 0x7fu; // 0111 1111
 
 class FORMCLIP // form data clipboard header
 {

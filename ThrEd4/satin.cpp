@@ -286,7 +286,7 @@ bool satin::internal::satselfn() {
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto&      form      = (*FormList)[iForm];
-		const auto layerCode = (form.attribute & FRMLMSK) >> 1u;
+		const auto layerCode = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1u);
 		if ((ActiveLayer == 0u) || (layerCode == 0u) || layerCode == ActiveLayer) {
 			auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iVertex = 0u; iVertex < form.vertexCount; iVertex++) {

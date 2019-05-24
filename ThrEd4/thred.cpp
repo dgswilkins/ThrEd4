@@ -10164,7 +10164,7 @@ bool thred::internal::finrng(uint32_t find) {
 		if (ActiveLayer == 0u) {
 			return true;
 		}
-		const auto cod = ((*FormList)[find].attribute & FRMLMSK) >> 1u;
+		const auto cod = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>((*FormList)[find].attribute & FRMLMSK) >> 1u);
 		return (cod == 0u) || ActiveLayer == cod;
 	}
 
@@ -15036,7 +15036,7 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 	else {
 		if (wrap::pressed(VK_CONTROL)) {
 			if (!StitchBuffer->empty()) {
-				stch2px1(StitchBuffer->size() - 1);
+				stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1u);
 			}
 			endpnt();
 			StateMap.set(StateFlag::BAKEND);
@@ -17143,7 +17143,7 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 	}
 	case ID_ADEND: { // add
 		if (!StitchBuffer->empty()) {
-			stch2px1(StitchBuffer->size() - 1);
+			stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1u);
 		}
 		endpnt();
 		StateMap.set(StateFlag::BAKEND);
