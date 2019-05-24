@@ -7307,19 +7307,16 @@ void form::internal::duprotfs(float rotationAngle) {
 }
 
 void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) {
-	auto destination = PCSHeader.stitchCount;
-
 	thred::rngadj();
-
-	for (auto source = GroupStartStitch; source <= GroupEndStitch; source++) {
-		(*StitchBuffer)[destination].x           = (*StitchBuffer)[source].x;
-		(*StitchBuffer)[destination].y           = (*StitchBuffer)[source].y;
-		(*StitchBuffer)[destination++].attribute = (*StitchBuffer)[source].attribute & (~(FRMSK | TYPMSK));
+	ClosestPointIndex = StitchBuffer->size();
+	auto sourceIt = std::next(StitchBuffer->begin(), GroupStartStitch);
+	auto endPoint = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+	while (sourceIt < endPoint) {
+		StitchBuffer->push_back(fPOINTATTR{ (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
+		sourceIt++;
 	}
-	ClosestPointIndex = PCSHeader.stitchCount;
-	PCSHeader.stitchCount += gsl::narrow<uint16_t>(GroupEndStitch - GroupStartStitch);
-	GroupStitchIndex = PCSHeader.stitchCount;
-	PCSHeader.stitchCount++;
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
+	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1u);
 	thred::rngadj();
 	thred::rotfn(rotationAngle, rotationCenter);
 	thred::coltab();
@@ -7362,13 +7359,11 @@ void form::cpylayr(uint32_t codedLayer) {
 				thred::savdo();
 				thred::rngadj();
 				const auto codedStitchLayer = codedLayer << (LAYSHFT - 1);
-				auto       iCurrentStitch   = PCSHeader.stitchCount;
-				for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iCurrentStitch].x           = (*StitchBuffer)[iStitch].x;
-					(*StitchBuffer)[iCurrentStitch].y           = (*StitchBuffer)[iStitch].y;
-					(*StitchBuffer)[iCurrentStitch++].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+				auto       endStitch   = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+				for (auto currentStitch   = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch; currentStitch++) {
+					StitchBuffer->push_back(fPOINTATTR{ (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
-				PCSHeader.stitchCount = iCurrentStitch;
+				PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -8219,54 +8214,52 @@ void form::centir() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
+	auto highStitchBuffer = std::vector<fPOINTATTR>{};
 	auto iSourceStitch = start;
-	auto iCopyStitch   = MAXITEMS;
 
 	BeanCount = 0;
-	thred::mvstch(iCopyStitch++, iSourceStitch);
+	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 	if ((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
 	    || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y) {
-		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
-		thred::mvstch(iCopyStitch++, iSourceStitch);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
-	thred::mvstch(iCopyStitch++, iSourceStitch);
+	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 	if ((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
 	    || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y) {
-		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
-		thred::mvstch(iCopyStitch++, iSourceStitch);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
-	while (iSourceStitch < finish - 2) {
-		thred::mvstch(iCopyStitch++, iSourceStitch);
+	while (iSourceStitch < finish - 1) {
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		if (((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
 		     || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y)
 		    && ((*StitchBuffer)[iSourceStitch - 2].x != (*StitchBuffer)[iSourceStitch].x
 		        || (*StitchBuffer)[iSourceStitch - 2].y != (*StitchBuffer)[iSourceStitch].y)) {
-			thred::mvstch(iCopyStitch++, iSourceStitch + 1);
-			thred::mvstch(iCopyStitch++, iSourceStitch);
+			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 			BeanCount += 2;
 		}
 		iSourceStitch++;
 	}
-	thred::mvstch(iCopyStitch++, iSourceStitch);
+	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 	if (((*StitchBuffer)[iSourceStitch - 2].x != (*StitchBuffer)[iSourceStitch].x
 	     || (*StitchBuffer)[iSourceStitch - 2].y != (*StitchBuffer)[iSourceStitch].y)) {
-		thred::mvstch(iCopyStitch++, iSourceStitch + 1);
-		thred::mvstch(iCopyStitch++, iSourceStitch);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
-	iSourceStitch++;
-	while (iSourceStitch < PCSHeader.stitchCount) {
-		thred::mvstch(iCopyStitch++, iSourceStitch++);
-	}
-	auto iOutputStitch = start;
-	for (iSourceStitch = MAXITEMS; iSourceStitch < iCopyStitch; iSourceStitch++) {
-		thred::mvstch(iOutputStitch++, iSourceStitch);
-	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iOutputStitch);
+//	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+	// now copy stitches back up to the end of the original group
+	std::copy(highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start)); 
+	// and then insert the remainder of the new stitches
+	StitchBuffer->insert(std::next(StitchBuffer->begin(), finish), std::next(highStitchBuffer.begin(), finish - start), highStitchBuffer.end());
+
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::dubean() {
@@ -8291,30 +8284,32 @@ void form::dubean() {
 	}
 }
 
-void form::internal::unbean(uint32_t start, uint32_t finish) {
+void form::internal::unbean(uint32_t start, uint32_t& finish) {
+	auto highStitchBuffer = std::vector<fPOINTATTR>{};
+	auto lastStitch = finish;
+	if (lastStitch > StitchBuffer->size() - 3u) {
+		lastStitch = StitchBuffer->size() - 3u;
+	}
 	auto iSource = start;
-	auto iCopy   = MAXITEMS;
-
-	BeanCount = 0;
-	for (iSource = start; iSource <= finish; iSource++) {
-		thred::mvstch(iCopy++, iSource);
+	for (; iSource <= lastStitch; iSource++) {
+		highStitchBuffer.push_back((*StitchBuffer)[iSource]);
 		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[iSource + 2].x
 		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[iSource + 2].y) {
 			iSource += 2;
-			BeanCount += 2;
 		}
 	}
-	if (BeanCount != 0u) {
-		BeanCount -= 2;
+	if (finish != lastStitch) {
+		while (iSource != finish + 1) {
+			highStitchBuffer.push_back((*StitchBuffer)[iSource++]);
+		}
 	}
-	if (iSource > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-		iSource = PCSHeader.stitchCount - 1;
+	if ((finish - start) > highStitchBuffer.size()) {
+		auto stitchStart = std::next(StitchBuffer->begin(), start);
+		std::copy(highStitchBuffer.begin(), highStitchBuffer.end(), stitchStart);
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()), std::next(StitchBuffer->begin(), finish + 1));
 	}
-	while (iSource < PCSHeader.stitchCount) {
-		thred::mvstch(iCopy++, iSource++);
-	}
-	thred::mvstchs(start, MAXITEMS, iCopy);
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(start + iCopy);
+	finish = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::debean() {
@@ -8323,21 +8318,23 @@ void form::debean() {
 		thred::rngadj();
 		fi::unbean(GroupStartStitch, GroupEndStitch);
 		if (ClosestPointIndex > GroupStitchIndex) {
-			ClosestPointIndex -= BeanCount;
+			ClosestPointIndex = GroupEndStitch;
 		}
 		else {
-			GroupStitchIndex -= BeanCount;
+			GroupStitchIndex = GroupEndStitch;
 		}
-		if (ClosestPointIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			ClosestPointIndex = PCSHeader.stitchCount - 1;
+		auto iEndStitch = wrap::toUnsigned(StitchBuffer->size()) - 1u;
+		if (ClosestPointIndex > gsl::narrow<uint32_t>(iEndStitch) - 1) {
+			ClosestPointIndex = iEndStitch;
 		}
-		if (GroupStitchIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			GroupStitchIndex = PCSHeader.stitchCount - 1;
+		if (GroupStitchIndex > gsl::narrow<uint32_t>(iEndStitch) - 1) {
+			GroupStitchIndex = iEndStitch;
 		}
 		thred::grpAdj();
 	}
 	else {
-		fi::unbean(0, PCSHeader.stitchCount - 1);
+		auto iEndStitch = wrap::toUnsigned(StitchBuffer->size()) - 1u;
+		fi::unbean(0, iEndStitch);
 	}
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);

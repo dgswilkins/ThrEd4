@@ -470,7 +470,7 @@ namespace internal {
 	void stchfrm(uint32_t formIndex, uint32_t* attribute) noexcept;
 	void
 	     trfrm(const fPOINT& bottomLeftPoint, const fPOINT& topLeftPoint, const fPOINT& bottomRightPoint, const fPOINT& topRightPoint);
-	void unbean(uint32_t start, uint32_t finish);
+	void unbean(uint32_t start, uint32_t& finish);
 	void uncon();
 
 	uint32_t leftsid(const std::vector<fPOINT>& currentFormVertices);
