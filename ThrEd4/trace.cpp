@@ -178,7 +178,7 @@ void trace::internal::getrmap() {
 		SelectObject(TraceDC, TraceBitmap);
 		BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 		StateMap.set(StateFlag::WASTRAC);
-		TraceDataSize = (BitmapWidth + 1) * (BitmapHeight + 1);
+		TraceDataSize = (BitmapWidth + 1u) * (BitmapHeight + 1u);
 		TracedMap->resize(TraceDataSize);
 		TracedMap->reset();
 		StretchBlt(StitchWindowMemDC,
@@ -333,11 +333,11 @@ void trace::trdif() {
 		}
 		for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
 			ti::blanklin(differenceBitmap, 0);
-			for (auto iHeight = 1u; iHeight < BitmapHeight - 1; iHeight++) {
+			for (auto iHeight = 1u; iHeight < BitmapHeight - 1u; iHeight++) {
 				auto iPoint = iHeight * BitmapWidth;
 
 				differenceBitmap[iPoint++] = 0;
-				for (auto iWidth = 1u; iWidth < BitmapWidth - 1; iWidth++) {
+				for (auto iWidth = 1u; iWidth < BitmapWidth - 1u; iWidth++) {
 					ti::difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
 					differenceBitmap[iPoint] = ti::trsum();
 					auto& colorSum           = differenceBitmap[iPoint];
@@ -545,7 +545,7 @@ bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDir
 		break;
 	}
 	case TRCD: {
-		pixelIndex -= (BitmapWidth + 1);
+		pixelIndex -= (BitmapWidth + 1u);
 		if (CurrentTracePoint.y == 0) {
 			traceDirection = TRCR;
 		}
@@ -789,7 +789,7 @@ void trace::internal::dutrac() {
 				iNext = iCurrent;
 			}
 		}
-		for (auto iCurrent = iNext + 1; iCurrent < decimatedLine.size(); iCurrent++) {
+		for (auto iCurrent = iNext + 1u; iCurrent < decimatedLine.size(); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
 		FormList->push_back(FRMHED {});
@@ -807,14 +807,14 @@ void trace::internal::dutrac() {
 			landscapeOffset = gsl::narrow_cast<float>(UnzoomedRect.y) - BitmapSizeinStitches.y;
 		}
 		for (auto iCurrent = 1u; iCurrent < tracedPoints.size(); iCurrent++) {
-			traceLengthSum += hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1].x),
-			                         gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1].y));
+			traceLengthSum += hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1u].x),
+			                         gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1u].y));
 			const auto traceLength = hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
 			                                gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
 			if (traceLengthSum > traceLength * IniFile.traceRatio) {
 				FormVertices->push_back(
-				    fPOINT { gsl::narrow_cast<float>(tracedPoints[iCurrent - 1].x) * StitchBmpRatio.x,
-				             gsl::narrow_cast<float>(tracedPoints[iCurrent - 1].y) * StitchBmpRatio.y + landscapeOffset });
+				    fPOINT { gsl::narrow_cast<float>(tracedPoints[iCurrent - 1u].x) * StitchBmpRatio.x,
+				             gsl::narrow_cast<float>(tracedPoints[iCurrent - 1u].y) * StitchBmpRatio.y + landscapeOffset });
 				OutputIndex++;
 				iCurrent--;
 				iNext          = iCurrent;
@@ -1051,8 +1051,8 @@ void trace::internal::pxlin(uint32_t start, uint32_t finish) {
 
 void trace::internal::bfrm() {
 	if (VertexCount != 0u) {
-		for (auto iVertex = 0u; iVertex < VertexCount - 1; iVertex++) {
-			ti::pxlin(iVertex, iVertex + 1);
+		for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
+			ti::pxlin(iVertex, iVertex + 1u);
 		}
 		if (SelectedForm->type != FRMLINE) {
 			ti::pxlin(VertexCount - 1, 0);
@@ -1213,7 +1213,7 @@ GSL_SUPPRESS(26440) void trace::internal::trcnum(uint32_t shift, COLORREF color,
 	color &= 0xffu;
 	_itow_s(color, buffer, 10);
 	const auto bufferLength = gsl::narrow<uint32_t>(wcslen(&buffer[0]));
-	const auto xPosition    = NumeralWidth * (3 - bufferLength) + 1;
+	const auto xPosition    = NumeralWidth * (3u - bufferLength) + 1u;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	wrap::TextOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
 }

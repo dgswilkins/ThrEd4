@@ -131,7 +131,7 @@ void texture::redtx() {
 	auto    textureHistoryBuffer = std::vector<TXHSTBUF> {};
 	textureHistoryBuffer.resize(ITXBUFLEN);
 
-	TextureHistoryIndex = ITXBUFLEN - 1;
+	TextureHistoryIndex = ITXBUFLEN - 1u;
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 		auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 		if (handle != INVALID_HANDLE_VALUE) { // NOLINT
@@ -250,7 +250,7 @@ void texture::internal::txrbak() noexcept {
 		TextureHistoryIndex--;
 	}
 	else {
-		TextureHistoryIndex = ITXBUFLEN - 1;
+		TextureHistoryIndex = ITXBUFLEN - 1u;
 	}
 }
 
@@ -376,7 +376,7 @@ void texture::drwtxtr() {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	const auto pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
 	TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
-	const auto extraWidth = TextureScreen.spacing * gsl::narrow_cast<float>(TextureScreen.lines + 2);
+	const auto extraWidth = TextureScreen.spacing * gsl::narrow_cast<float>(TextureScreen.lines + 2u);
 	if (StateMap.testAndReset(StateFlag::CHKTX)) {
 		txi::chktx();
 	}
@@ -650,7 +650,7 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 		vertex.x += editorOffset.x;
 		vertex.y += editorOffset.y;
 	}
-	auto lineCount = textureForm.vertexCount - 1;
+	auto lineCount = textureForm.vertexCount - 1u;
 	if (textureForm.type != FRMLINE) {
 		lineCount++;
 	}
@@ -1018,7 +1018,7 @@ void texture::deltx(uint32_t formIndex) {
 				}
 			}
 		}
-		for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
+		for (auto iForm = formIndex + 1u; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				auto& formIter = (*FormList)[iForm];
 				if (formIter.fillInfo.texture.index == currentIndex) {
@@ -1043,7 +1043,7 @@ void texture::deltx(uint32_t formIndex) {
 					iBuffer += fillInfo.texture.count;
 				}
 			}
-			for (auto iForm = formIndex + 1; iForm < FormList->size(); iForm++) {
+			for (auto iForm = formIndex + 1u; iForm < FormList->size(); iForm++) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
@@ -1093,7 +1093,7 @@ void texture::internal::nutx() {
 			auto destination = std::next(startSource, tempPointCount);
 			auto _           = std::copy(startSource, endSource, destination);
 		}
-		for (auto iForm = ClosestFormToCursor + 1; iForm < FormList->size(); iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				(*FormList)[iForm].fillInfo.texture.index += gsl::narrow<uint16_t>(tempPointCount);
 			}
@@ -1185,14 +1185,14 @@ void texture::internal::dutxmir() {
 		const auto evenOffset = 1u - (TextureScreen.lines & 1u);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
-		auto iPoint = TempTexturePoints->size() - 1;
+		auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1u;
 		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0) {
 			iPoint--;
 		}
-		TempTexturePoints->resize(iPoint + 1);
+		TempTexturePoints->resize(wrap::toSize(iPoint) + 1u);
 		const auto iMirrorPoint = iPoint + evenOffset;
 		for (auto index = 0u; index < iMirrorPoint; index++) {
-			auto newLine = gsl::narrow<uint16_t>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1);
+			auto newLine = gsl::narrow<uint16_t>(TextureScreen.lines - (*TempTexturePoints)[index].line + 1u);
 			TempTexturePoints->emplace_back(TXPNT { (*TempTexturePoints)[index].y, newLine });
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -1285,7 +1285,7 @@ void texture::txtlbut(const FRMHED& textureForm) {
 	StateMap.reset(StateFlag::BZUM);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
-	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
+	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1u;
 }
 
 void texture::internal::txbak() {
@@ -1618,7 +1618,7 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
 			const auto currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + iTexturePoint);
 			if (currentPoint.line != 0u) {
-				const auto iSegment = currentPoint.line - 1;
+				const auto iSegment = currentPoint.line - 1u;
 
 				textureSegments[iSegment].line = iTexturePoint;
 				textureSegments[iSegment].stitchCount++;
