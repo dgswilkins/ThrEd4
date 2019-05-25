@@ -8221,41 +8221,41 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 
 	BeanCount = 0;
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+	if ((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+	    || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
+		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+	if ((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+	    || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
+		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	while (iSourceStitch < finish - 1) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-		if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
-		     || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y)
-		    && ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
-		        || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
-			highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+		if (((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+		     || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y)
+		    && ((*StitchBuffer)[wrap::toSize(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
+		        || (*StitchBuffer)[wrap::toSize(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
+			highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 			BeanCount += 2;
 		}
 		iSourceStitch++;
 	}
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
-	     || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
-		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+	if (((*StitchBuffer)[wrap::toSize(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
+	     || (*StitchBuffer)[wrap::toSize(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
+		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
-	//	highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+	//	highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 	// now copy stitches back up to the end of the original group
 	std::copy(
 	    highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start));
@@ -8297,8 +8297,8 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	auto iSource = start;
 	for (; iSource <= lastStitch; iSource++) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSource]);
-		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 2u].x
-		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 2u].y) {
+		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[wrap::toSize(iSource) + 2u].x
+		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[wrap::toSize(iSource) + 2u].y) {
 			iSource += 2;
 		}
 	}

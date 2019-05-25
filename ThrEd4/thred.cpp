@@ -1023,8 +1023,8 @@ bool thred::internal::isfclp() {
 }
 
 float thred::internal::stlen(uint32_t iStitch) {
-	return hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-	             (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+	return hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+	             (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 }
 
 void thred::undat() noexcept {
@@ -1334,7 +1334,7 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 			auto currentColor = (*StitchBuffer)[0].attribute & COLMSK;
 			for (auto iStitch = 1u; iStitch < endStitch; iStitch++) {
 				if (((*StitchBuffer)[iStitch].attribute & COLMSK) != currentColor) {
-					if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & COLMSK) == currentColor) {
+					if (((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK) == currentColor) {
 						(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
 						(*StitchBuffer)[iStitch].attribute |= currentColor;
 					}
@@ -2833,11 +2833,11 @@ void thred::internal::frmcalc() {
 			endStitch--;
 			for (auto iStitch = 0u; iStitch < endStitch; iStitch++) {
 				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == code && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-				    && ((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & FRMSK) == code
-				    && (((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & TYPMSK) != 0u)) {
+				    && ((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & FRMSK) == code
+				    && (((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & TYPMSK) != 0u)) {
 					const auto length
-					    = std::hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-					                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+					    = std::hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+					                 (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 					if (length > maxLength) {
 						maxLength          = length;
 						LargestStitchIndex = iStitch;
@@ -2874,8 +2874,8 @@ void thred::internal::lenfn(uint32_t start, uint32_t end) {
 	SmallestStitchIndex = 0u;
 	LargestStitchIndex  = 0u;
 	for (auto iStitch = start; iStitch < end; iStitch++) {
-		const auto length = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-		                          (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+		const auto length = hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+		                          (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 		if (length > maxLength) {
 			maxLength          = length;
 			LargestStitchIndex = iStitch;
@@ -2899,8 +2899,8 @@ void thred::internal::lenCalc() {
 	if (StateMap.test(StateFlag::LENSRCH)) {
 		auto       txt = std::wstring {};
 		const auto lenMax
-		    = (hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-		             (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y)
+		    = (hypot((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+		             (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y)
 		       / PFGRAN);
 		displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 		displayText::loadString(txt, IDS_SRCH);
@@ -3397,8 +3397,8 @@ void thred::internal::duar() {
 void thred::internal::dubox() {
 	if (ClosestPointIndex != (StitchBuffer->size() - 1)) { // if the selected point is not at the end then aim at the next point
 		RotateAngle
-		    = atan2((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y,
-		            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x);
+		    = atan2((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y,
+		            (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x);
 	}
 	else { // otherwise aim in the same direction
 		RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1].y,
@@ -4278,14 +4278,14 @@ void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
 	auto color   = (*StitchBuffer)[0].attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
 	for (auto iStitch = 0u; iStitch < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1; iStitch++) {
-		if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & COLMSK) != color) {
-			color = (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & COLMSK;
+		if (((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK) != color) {
+			color = (*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK;
 			pecEncodeStop(buffer, (iColor % 2) + 1);
 			PEScolors[iColor] = PESequivColors[color];
 			iColor++;
 		}
-		const auto xDelta = (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - thisStitch.x;
-		const auto yDelta = (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - thisStitch.y;
+		const auto xDelta = (*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - thisStitch.x;
+		const auto yDelta = (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - thisStitch.y;
 		rpcrd(buffer, thisStitch, xDelta, yDelta);
 	}
 	buffer.push_back(0xffu);
@@ -5062,7 +5062,7 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 void thred::internal::delstch1(uint32_t iStitch) {
 	if (PCSHeader.stitchCount != 0u) {
 		while (iStitch <= PCSHeader.stitchCount) {
-			(*StitchBuffer)[iStitch] = (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u];
+			(*StitchBuffer)[iStitch] = (*StitchBuffer)[wrap::toSize(iStitch) + 1u];
 			iStitch++;
 		}
 		PCSHeader.stitchCount--;
@@ -6312,9 +6312,9 @@ void thred::internal::zumin() {
 					}
 				}
 				else {
-					SelectedPoint = fPOINT { form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x,
+					SelectedPoint = fPOINT { form::midl((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x,
 						                                (*StitchBuffer)[ClosestPointIndex].x),
-						                     form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y,
+						                     form::midl((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y,
 						                                (*StitchBuffer)[ClosestPointIndex].y) };
 				}
 				break;
@@ -6781,23 +6781,23 @@ uint32_t thred::internal::closlin() {
 					if ((ActiveLayer == 0u) || (layer == 0u) || (layer == ActiveLayer)) {
 						auto       boundingRect = fRECTANGLE {};
 						const auto xba
-						    = wrap::round<int32_t>(stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x - stitches[iStitch].x);
+						    = wrap::round<int32_t>(stitches[wrap::toSize(iStitch) + 1u].x - stitches[iStitch].x);
 						const auto yab
-						    = wrap::round<int32_t>(stitches[iStitch].y - stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].y);
+						    = wrap::round<int32_t>(stitches[iStitch].y - stitches[wrap::toSize(iStitch) + 1u].y);
 						if (xba > 0) {
 							boundingRect.left  = stitches[iStitch].x - tolerance;
-							boundingRect.right = stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x + tolerance;
+							boundingRect.right = stitches[wrap::toSize(iStitch) + 1u].x + tolerance;
 						}
 						else {
-							boundingRect.left  = stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x - tolerance;
+							boundingRect.left  = stitches[wrap::toSize(iStitch) + 1u].x - tolerance;
 							boundingRect.right = stitches[iStitch].x + tolerance;
 						}
 						if (yab < 0) {
 							boundingRect.bottom = stitches[iStitch].y - tolerance;
-							boundingRect.top    = stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].y + tolerance;
+							boundingRect.top    = stitches[wrap::toSize(iStitch) + 1u].y + tolerance;
 						}
 						else {
-							boundingRect.bottom = stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].y - tolerance;
+							boundingRect.bottom = stitches[wrap::toSize(iStitch) + 1u].y - tolerance;
 							boundingRect.top    = stitches[iStitch].y + tolerance;
 						}
 						if (checkedPoint.x > boundingRect.left && checkedPoint.x < boundingRect.right
@@ -6894,8 +6894,8 @@ void thred::internal::istch() {
 			const auto angb = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1].y,
 			                        (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1].x);
 			const auto angf = atan2(
-			    (*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y,
-			    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x);
+			    (*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y,
+			    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x);
 			if (fabs(angf - angt) > fabs(angb - angt)) {
 				ClosestPointIndex--;
 			}
@@ -8338,7 +8338,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 		RunPoint--;
 		wrap::Polyline(StitchWindowDC, static_cast<const POINT*>(MovieLine), iMovieFrame);
 	}
-	if (((*StitchBuffer)[gsl::narrow_cast<size_t>(RunPoint) + 1].attribute & 0xfu) != color) {
+	if (((*StitchBuffer)[wrap::toSize(RunPoint) + 1].attribute & 0xfu) != color) {
 		RunPoint++;
 	}
 	displayText::ritnum(STR_NUMSEL, RunPoint);
@@ -9981,8 +9981,8 @@ GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t fi
 	finish--;
 	// ToDo - Use a temp buffer rather than the high buffer
 	for (auto iSource = start; iSource < finish; iSource++) {
-		const auto delta  = dPOINT { (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].x - (*StitchBuffer)[iSource].x,
-                                    (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].y - (*StitchBuffer)[iSource].y };
+		const auto delta  = dPOINT { (*StitchBuffer)[wrap::toSize(iSource) + 1u].x - (*StitchBuffer)[iSource].x,
+                                    (*StitchBuffer)[wrap::toSize(iSource) + 1u].y - (*StitchBuffer)[iSource].y };
 		const auto length = hypot(delta.x, delta.y);
 		thred::mvstch(destination++, iSource);
 		if (length > IniFile.maxStitchLength) {
@@ -9990,10 +9990,10 @@ GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t fi
 			const auto step        = dPOINT { delta.x / stitchCount, delta.y / stitchCount };
 			auto       point       = dPOINT { (*StitchBuffer)[iSource].x + step.x, (*StitchBuffer)[iSource].y + step.y };
 			auto       attribute   = (*StitchBuffer)[iSource].attribute;
-			if (attribute != (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute) {
+			if (attribute != (*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute) {
 				if (((attribute & NOTFRM) == 0u)
-				    && (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute & TYPMSK) != 0u)) {
-					if (!((attribute & FRMSK) == ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute & FRMSK))) {
+				    && (((*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute & TYPMSK) != 0u)) {
+					if (!((attribute & FRMSK) == ((*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute & FRMSK))) {
 						attribute &= NTYPMSK;
 					}
 				}
@@ -10087,11 +10087,11 @@ void thred::internal::longer() {
 		return;
 	}
 	const auto currentLength
-	    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-	            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
+	    = hypot((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+	            (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
 	for (iStitch = ClosestPointIndex + 1; iStitch < SelectedRange.finish; iStitch++) {
-		const auto length = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-		                          (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+		const auto length = hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+		                          (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 		if (length == currentLength) {
 			flag = false;
 			break;
@@ -10102,8 +10102,8 @@ void thred::internal::longer() {
 		const auto rangeEnd      = SelectedRange.finish - 1;
 		for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; currentStitch++) {
 			const auto length
-			    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].x - (*StitchBuffer)[currentStitch].x,
-			            (*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].y - (*StitchBuffer)[currentStitch].y);
+			    = hypot((*StitchBuffer)[wrap::toSize(currentStitch) + 1u].x - (*StitchBuffer)[currentStitch].x,
+			            (*StitchBuffer)[wrap::toSize(currentStitch) + 1u].y - (*StitchBuffer)[currentStitch].y);
 			if (length > currentLength && length < minimumLength) {
 				minimumLength = length;
 				iStitch       = currentStitch;
@@ -10127,8 +10127,8 @@ void thred::internal::shorter() {
 		return;
 	}
 	currentLength
-	    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-	            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
+	    = hypot((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+	            (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
 	for (currentStitch = ClosestPointIndex; currentStitch != 0; currentStitch--) {
 		const auto length = hypot((*StitchBuffer)[currentStitch].x - (*StitchBuffer)[currentStitch - 1].x,
 		                          (*StitchBuffer)[currentStitch].y - (*StitchBuffer)[currentStitch - 1].y);
@@ -10142,15 +10142,15 @@ void thred::internal::shorter() {
 		auto maximumLength = 0.0;
 		auto iStitch       = 0u;
 		for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1; iStitch++) {
-			const auto length = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-			                          (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+			const auto length = hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+			                          (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 			if (length < currentLength && length > maximumLength) {
 				maximumLength = length;
 				currentStitch = iStitch;
 			}
 		}
-		const auto minLength = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-		                             (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+		const auto minLength = hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+		                             (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 		displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", minLength));
 	}
 	CurrentStitchIndex = currentStitch;
@@ -10696,9 +10696,9 @@ void thred::internal::clpadj() {
 		thred::rngadj();
 		auto iStitch          = GroupStartStitch;
 		auto ClipRectAdjusted = fRECTANGLE { (*StitchBuffer)[iStitch].x,
-			                                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y,
+			                                 (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y,
 			                                 (*StitchBuffer)[iStitch].x,
-			                                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y };
+			                                 (*StitchBuffer)[wrap::toSize(iStitch) + 1u].y };
 		iStitch++;
 		while (iStitch < GroupEndStitch) {
 			clpradj(ClipRectAdjusted, (*StitchBuffer)[iStitch++]);
@@ -12177,9 +12177,9 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 						wrap::setCursor(NeedleUpCursor);
 					}
 					else {
-						if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x
+						if ((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x
 						    > (*StitchBuffer)[ClosestPointIndex].x) {
-							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y
+							if ((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y
 							    > (*StitchBuffer)[ClosestPointIndex].y) {
 								wrap::setCursor(NeedleLeftUpCursor);
 							}
@@ -12188,7 +12188,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 							}
 						}
 						else {
-							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y
+							if ((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y
 							    > (*StitchBuffer)[ClosestPointIndex].y) {
 								wrap::setCursor(NeedleRightUpCursor);
 							}
@@ -14446,9 +14446,9 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 
 				xlin();
 				if ((((*StitchBuffer)[ClosestPointIndex].attribute & ALTYPMSK) != 0u)
-				    && (((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].attribute & ALTYPMSK) != 0u)) {
+				    && (((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].attribute & ALTYPMSK) != 0u)) {
 					if (((*StitchBuffer)[ClosestPointIndex].attribute & FRMSK)
-					    == ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].attribute & FRMSK)) {
+					    == ((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].attribute & FRMSK)) {
 						code = (*StitchBuffer)[ClosestPointIndex].attribute | USMSK;
 					}
 				}
@@ -18237,8 +18237,8 @@ void thred::internal::relin() {
 void thred::internal::dumov() {
 	const auto anchorStitch = (*StitchBuffer)[MoveAnchor];
 
-	RotateAngle = atan2((*StitchBuffer)[gsl::narrow_cast<size_t>(MoveAnchor) + 1u].y - (*StitchBuffer)[MoveAnchor].y,
-	                    (*StitchBuffer)[gsl::narrow_cast<size_t>(MoveAnchor) + 1u].x - (*StitchBuffer)[MoveAnchor].x);
+	RotateAngle = atan2((*StitchBuffer)[wrap::toSize(MoveAnchor) + 1u].y - (*StitchBuffer)[MoveAnchor].y,
+	                    (*StitchBuffer)[wrap::toSize(MoveAnchor) + 1u].x - (*StitchBuffer)[MoveAnchor].x);
 	if (anchorStitch.x >= ZoomRect.left && anchorStitch.x <= ZoomRect.right && anchorStitch.y >= ZoomRect.bottom
 	    && anchorStitch.y <= ZoomRect.top) {
 		auto  rotationCenterPixels = POINT { 0l, 0l };
@@ -18267,7 +18267,7 @@ void thred::internal::dumov() {
 uint32_t thred::internal::chkup(uint32_t count, uint32_t iStitch) {
 	if (StateMap.test(StateFlag::UPTO) && (ClosestPointIndex != 0u)) {
 		if (ColorChangeTable[iStitch].stitchIndex < ClosestPointIndex) {
-			if (ColorChangeTable[gsl::narrow_cast<size_t>(iStitch) + 1u].stitchIndex < ClosestPointIndex) {
+			if (ColorChangeTable[wrap::toSize(iStitch) + 1u].stitchIndex < ClosestPointIndex) {
 				return count;
 			}
 			return ClosestPointIndex - ColorChangeTable[iStitch].stitchIndex + 1;
