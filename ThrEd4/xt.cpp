@@ -683,7 +683,11 @@ void xt::internal::ritcwlk() {
 	}
 }
 
-uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code) {
+uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
+                             const fPOINT&            start,
+                             const fPOINT&            finish,
+                             uint32_t                 destination,
+                             uint32_t                 code) {
 	auto length      = hypot(finish.x - start.x, finish.y - start.y);
 	auto startVertex = form::closflt(start.x, start.y);
 
@@ -715,8 +719,7 @@ uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& star
 	auto iStitch = destination;
 	while (startVertex != endVertex) {
 		if (iStitch != 0u) {
-			if (buffer[iStitch - 1].x != indentedPoint[startVertex].x
-			    || buffer[iStitch - 1].y != indentedPoint[startVertex].y) {
+			if (buffer[iStitch - 1].x != indentedPoint[startVertex].x || buffer[iStitch - 1].y != indentedPoint[startVertex].y) {
 				buffer.push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 				iStitch++;
 			}
@@ -1430,7 +1433,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	fillStartsData.fillNamed.featherColor++;
 	fillStartsData.fillNamed.borderColor++;
 	fillStartsData.fillNamed.appliqueColor++;
-	fillStartsMap         = tmap;
+	fillStartsMap = tmap;
 	StitchBuffer->resize(iDestinationStitch);
 	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestinationStitch);
 	if ((tmap & M_ECOL) == 0u) {
@@ -1524,7 +1527,8 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			ilData.output += gucon(buffer, vertexIt[SelectedForm->fillStart],
+			ilData.output += gucon(buffer,
+			                       vertexIt[SelectedForm->fillStart],
 			                       (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
 			                       ilData.output,
 			                       code);
@@ -1532,8 +1536,8 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	}
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
-		ilData.output += gucon(buffer, 
-		    point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
+		ilData.output
+		    += gucon(buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
 	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1].index;
@@ -1579,9 +1583,9 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 	    = (gsl::narrow<uint32_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (PCSHeader.stitchCount != 0u) {
-		const auto offset = 0;
-		auto highStitchBuffer = std::vector<fPOINTATTR>{};
-		auto code               = 0u;
+		const auto offset           = 0;
+		auto       highStitchBuffer = std::vector<fPOINTATTR> {};
+		auto       code             = 0u;
 		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			ilData.pins = iSequence;
 			switch ((*InterleaveSequenceIndices)[iSequence].seq) {
@@ -1645,14 +1649,15 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		StitchBuffer->insert(StitchBuffer->begin(), sourceStart, sourceEnd);
 	}
 	else { // no stitches added so far
-		auto       code     = 0u;
-		auto       vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto code     = 0u;
+		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
 			                             | (*InterleaveSequenceIndices)[iSequence].color);
 			if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-					ilData.output += xi::gucon(*StitchBuffer, vertexIt[SelectedForm->fillStart],
+					ilData.output += xi::gucon(*StitchBuffer,
+					                           vertexIt[SelectedForm->fillStart],
 					                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
 					                           ilData.output,
 					                           code);
@@ -1660,8 +1665,11 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			}
 			auto colpnt = fPOINT {};
 			if (xi::lastcol(iSequence, colpnt)) {
-				ilData.output += xi::gucon(*StitchBuffer, 
-				    colpnt, (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index], ilData.output, code);
+				ilData.output += xi::gucon(*StitchBuffer,
+				                           colpnt,
+				                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index],
+				                           ilData.output,
+				                           code);
 			}
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
 			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1].index;

@@ -1404,7 +1404,7 @@ void thred::internal::dudat() {
 	const auto&    formList  = *FormList;
 	const auto     formCount = wrap::toUnsigned(formList.size());
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
-	const auto     size      = sizeof(BAKHED) + formSize * formList.size() + sizeof(decltype(StitchBuffer->back())) * PCSHeader.stitchCount
+	const auto size = sizeof(BAKHED) + formSize * formList.size() + sizeof(decltype(StitchBuffer->back())) * PCSHeader.stitchCount
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
 	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
@@ -2835,8 +2835,9 @@ void thred::internal::frmcalc() {
 				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == code && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
 				    && ((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & FRMSK) == code
 				    && (((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].attribute & TYPMSK) != 0u)) {
-					const auto length = std::hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
-					                               (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
+					const auto length
+					    = std::hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
+					                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
 					if (length > maxLength) {
 						maxLength          = length;
 						LargestStitchIndex = iStitch;
@@ -2896,10 +2897,11 @@ void thred::internal::lenCalc() {
 	const auto blank = std::wstring {};
 
 	if (StateMap.test(StateFlag::LENSRCH)) {
-		auto       txt    = std::wstring {};
-		const auto lenMax = (hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-		                           (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y)
-		                     / PFGRAN);
+		auto       txt = std::wstring {};
+		const auto lenMax
+		    = (hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+		             (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y)
+		       / PFGRAN);
 		displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 		displayText::loadString(txt, IDS_SRCH);
 		displayText::butxt(HMAXLEN, txt);
@@ -2935,13 +2937,13 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		auto iPrevStitch = form::find1st();
 		auto iStitch     = iPrevStitch + 1;
 		auto lastStitch  = PCSHeader.stitchCount;
-		
+
 		if (lastStitch != 0u) { // find the first small stitch in the selected form
 			lastStitch--;
 			while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
 				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-					&& ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) {  // are we still in the selected form?
-					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) == 0u) { // is this a knot?
+				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
+					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) == 0u) {          // is this a knot?
 						const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - (*StitchBuffer)[iPrevStitch].x,
 							                        (*StitchBuffer)[iStitch].y - (*StitchBuffer)[iPrevStitch].y };
 						stitchSize       = hypot(delta.x, delta.y);
@@ -2963,20 +2965,21 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			return; // we reached the last stitch without seeing a small stitch so don't do anything
 		}
 		auto iOutputStitch = iStitch;
-		auto prevPoint   = (*StitchBuffer)[startStitch];
-		lastStitch       = PCSHeader.stitchCount;
+		auto prevPoint     = (*StitchBuffer)[startStitch];
+		lastStitch         = PCSHeader.stitchCount;
 		if (lastStitch != 0u) {
 			lastStitch--;
 			while (iStitch < lastStitch) {
 				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-					&& ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
-					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) { // is this a knot?
+				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
+					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) {          // is this a knot?
 						prevPoint = (*StitchBuffer)[iOutputStitch];
 						thred::mvstch(iOutputStitch, iStitch);
 						iOutputStitch++;
 					}
 					else {
-						const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
+						const auto delta
+						    = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
 						stitchSize = hypot(delta.x, delta.y);
 						if (stitchSize > SmallStitchLength) {
 							thred::mvstch(iOutputStitch, iStitch);
@@ -2984,7 +2987,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 							iOutputStitch++;
 						}
 						else {
-							if (iOutputStitch > lastStitch) { 
+							if (iOutputStitch > lastStitch) {
 								break; // we are at the end of the buffer
 							}
 						}
@@ -3393,8 +3396,9 @@ void thred::internal::duar() {
 
 void thred::internal::dubox() {
 	if (ClosestPointIndex != (StitchBuffer->size() - 1)) { // if the selected point is not at the end then aim at the next point
-		RotateAngle = atan2((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y,
-		                    (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x);
+		RotateAngle
+		    = atan2((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y,
+		            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x);
 	}
 	else { // otherwise aim in the same direction
 		RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1].y,
@@ -6308,9 +6312,10 @@ void thred::internal::zumin() {
 					}
 				}
 				else {
-					SelectedPoint
-					    = fPOINT { form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x, (*StitchBuffer)[ClosestPointIndex].x),
-						           form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y, (*StitchBuffer)[ClosestPointIndex].y) };
+					SelectedPoint = fPOINT { form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x,
+						                                (*StitchBuffer)[ClosestPointIndex].x),
+						                     form::midl((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y,
+						                                (*StitchBuffer)[ClosestPointIndex].y) };
 				}
 				break;
 			}
@@ -6775,8 +6780,10 @@ uint32_t thred::internal::closlin() {
 					const auto layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
 					if ((ActiveLayer == 0u) || (layer == 0u) || (layer == ActiveLayer)) {
 						auto       boundingRect = fRECTANGLE {};
-						const auto xba          = wrap::round<int32_t>(stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x - stitches[iStitch].x);
-						const auto yab          = wrap::round<int32_t>(stitches[iStitch].y - stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].y);
+						const auto xba
+						    = wrap::round<int32_t>(stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x - stitches[iStitch].x);
+						const auto yab
+						    = wrap::round<int32_t>(stitches[iStitch].y - stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].y);
 						if (xba > 0) {
 							boundingRect.left  = stitches[iStitch].x - tolerance;
 							boundingRect.right = stitches[gsl::narrow_cast<size_t>(iStitch) + 1u].x + tolerance;
@@ -6886,8 +6893,9 @@ void thred::internal::istch() {
 			                        (*StitchBuffer)[ClosestPointIndex].x - SelectedPoint.x);
 			const auto angb = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1].y,
 			                        (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1].x);
-			const auto angf = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y,
-			                        (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x);
+			const auto angf = atan2(
+			    (*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y,
+			    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x);
 			if (fabs(angf - angt) > fabs(angb - angt)) {
 				ClosestPointIndex--;
 			}
@@ -7004,7 +7012,7 @@ void thred::internal::newFil() {
 	StitchBuffer->shrink_to_fit();
 	PCSHeader.stitchCount = 0;
 	DisplayedColorBitmap.reset();
-	PCSBMPFileName[0]     = 0;
+	PCSBMPFileName[0] = 0;
 	FormVertices->clear();
 	FormVertices->shrink_to_fit();
 	TexturePointsBuffer->clear();
@@ -9949,16 +9957,16 @@ void thred::internal::vuselthr() {
 
 void thred::internal::colchk() {
 	if (!StitchBuffer->empty()) {
-		auto color = StitchBuffer->front().attribute & COLMSK;
+		auto color         = StitchBuffer->front().attribute & COLMSK;
 		auto currentStitch = 0u;
 
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
 				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0u)) {
 					(*StitchBuffer)[iStitch - 1].attribute
-						= (*StitchBuffer)[iStitch].attribute & NCOLMSK | ((*StitchBuffer)[currentStitch - 1].attribute & COLMSK);
+					    = (*StitchBuffer)[iStitch].attribute & NCOLMSK | ((*StitchBuffer)[currentStitch - 1].attribute & COLMSK);
 				}
-				color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+				color         = (*StitchBuffer)[iStitch].attribute & COLMSK;
 				currentStitch = iStitch;
 			}
 		}
@@ -9983,7 +9991,8 @@ GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t fi
 			auto       point       = dPOINT { (*StitchBuffer)[iSource].x + step.x, (*StitchBuffer)[iSource].y + step.y };
 			auto       attribute   = (*StitchBuffer)[iSource].attribute;
 			if (attribute != (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute) {
-				if (((attribute & NOTFRM) == 0u) && (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute & TYPMSK) != 0u)) {
+				if (((attribute & NOTFRM) == 0u)
+				    && (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute & TYPMSK) != 0u)) {
 					if (!((attribute & FRMSK) == ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 1u].attribute & FRMSK))) {
 						attribute &= NTYPMSK;
 					}
@@ -10077,8 +10086,9 @@ void thred::internal::longer() {
 	if (ClosestPointIndex == LargestStitchIndex) {
 		return;
 	}
-	const auto currentLength = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-	                                 (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
+	const auto currentLength
+	    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+	            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
 	for (iStitch = ClosestPointIndex + 1; iStitch < SelectedRange.finish; iStitch++) {
 		const auto length = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].x - (*StitchBuffer)[iStitch].x,
 		                          (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y - (*StitchBuffer)[iStitch].y);
@@ -10091,8 +10101,9 @@ void thred::internal::longer() {
 		auto       minimumLength = 1e99;
 		const auto rangeEnd      = SelectedRange.finish - 1;
 		for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; currentStitch++) {
-			const auto length = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].x - (*StitchBuffer)[currentStitch].x,
-			                          (*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].y - (*StitchBuffer)[currentStitch].y);
+			const auto length
+			    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].x - (*StitchBuffer)[currentStitch].x,
+			            (*StitchBuffer)[gsl::narrow_cast<size_t>(currentStitch) + 1u].y - (*StitchBuffer)[currentStitch].y);
 			if (length > currentLength && length < minimumLength) {
 				minimumLength = length;
 				iStitch       = currentStitch;
@@ -10115,8 +10126,9 @@ void thred::internal::shorter() {
 	if (ClosestPointIndex == SmallestStitchIndex) {
 		return;
 	}
-	currentLength = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
-	                      (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
+	currentLength
+	    = hypot((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x - (*StitchBuffer)[ClosestPointIndex].x,
+	            (*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y - (*StitchBuffer)[ClosestPointIndex].y);
 	for (currentStitch = ClosestPointIndex; currentStitch != 0; currentStitch--) {
 		const auto length = hypot((*StitchBuffer)[currentStitch].x - (*StitchBuffer)[currentStitch - 1].x,
 		                          (*StitchBuffer)[currentStitch].y - (*StitchBuffer)[currentStitch - 1].y);
@@ -10683,9 +10695,10 @@ void thred::internal::clpadj() {
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		auto iStitch          = GroupStartStitch;
-		auto ClipRectAdjusted = fRECTANGLE {
-			(*StitchBuffer)[iStitch].x, (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y, (*StitchBuffer)[iStitch].x, (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y
-		};
+		auto ClipRectAdjusted = fRECTANGLE { (*StitchBuffer)[iStitch].x,
+			                                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y,
+			                                 (*StitchBuffer)[iStitch].x,
+			                                 (*StitchBuffer)[gsl::narrow_cast<size_t>(iStitch) + 1u].y };
 		iStitch++;
 		while (iStitch < GroupEndStitch) {
 			clpradj(ClipRectAdjusted, (*StitchBuffer)[iStitch++]);
@@ -11110,10 +11123,10 @@ void thred::internal::retrac() {
 		if (GroupStartStitch == 0u) {
 			GroupStartStitch++;
 		}
-		const auto count = GroupEndStitch - GroupStartStitch;
-		auto insertPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
-		auto startPoint = std::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
-		auto endPoint = std::next(startPoint, count);
+		const auto count       = GroupEndStitch - GroupStartStitch;
+		auto       insertPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
+		auto       startPoint  = std::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
+		auto       endPoint    = std::next(startPoint, count);
 		StitchBuffer->insert(insertPoint, startPoint, endPoint);
 		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
 		thred::coltab();
@@ -12164,8 +12177,10 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 						wrap::setCursor(NeedleUpCursor);
 					}
 					else {
-						if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x > (*StitchBuffer)[ClosestPointIndex].x) {
-							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y > (*StitchBuffer)[ClosestPointIndex].y) {
+						if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].x
+						    > (*StitchBuffer)[ClosestPointIndex].x) {
+							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y
+							    > (*StitchBuffer)[ClosestPointIndex].y) {
 								wrap::setCursor(NeedleLeftUpCursor);
 							}
 							else {
@@ -12173,7 +12188,8 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 							}
 						}
 						else {
-							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y > (*StitchBuffer)[ClosestPointIndex].y) {
+							if ((*StitchBuffer)[gsl::narrow_cast<size_t>(ClosestPointIndex) + 1u].y
+							    > (*StitchBuffer)[ClosestPointIndex].y) {
 								wrap::setCursor(NeedleRightUpCursor);
 							}
 							else {
@@ -18163,9 +18179,9 @@ void thred::internal::init() {
 		DefaultColorBrush[iColor] = CreateSolidBrush(DefaultColors[iColor]);
 		UserColorBrush[iColor]    = CreateSolidBrush(UserColor[iColor]);
 	}
-	ZoomFactor            = 1;
-	PCSHeader.leadIn      = 0x32;
-	PCSHeader.colorCount  = 16;
+	ZoomFactor           = 1;
+	PCSHeader.leadIn     = 0x32;
+	PCSHeader.colorCount = 16;
 	StitchBuffer->clear();
 	PCSHeader.stitchCount = 0;
 	GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);

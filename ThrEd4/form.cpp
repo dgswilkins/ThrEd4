@@ -152,9 +152,9 @@ void form::delmfil() {
 	clip::delmclp(ClosestFormToCursor);
 	// find the first stitch to delete
 	const auto codedForm = ClosestFormToCursor << FRMSHFT;
-	auto stitchIt = StitchBuffer->begin();
-	auto flag = false;
-	while( stitchIt != StitchBuffer->end()) {
+	auto       stitchIt  = StitchBuffer->begin();
+	auto       flag      = false;
+	while (stitchIt != StitchBuffer->end()) {
 		const auto& attribute = (*stitchIt).attribute;
 		if (((attribute & NOTFRM) == 0u) && ((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
 			flag = true;
@@ -162,9 +162,9 @@ void form::delmfil() {
 		}
 		stitchIt++;
 	}
-	if (flag) { 
-		auto startPoint = stitchIt; // we found the start stitch. 
-		while( stitchIt != StitchBuffer->end()) { // Now find the end stitch
+	if (flag) {
+		auto startPoint = stitchIt;               // we found the start stitch.
+		while (stitchIt != StitchBuffer->end()) { // Now find the end stitch
 			const auto& attribute = (*stitchIt).attribute;
 			if (!((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
 				break;
@@ -5418,7 +5418,7 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	thred::px2stch();
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& formIter = (*FormList)[iForm];
-		auto layer = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1u);
+		auto  layer    = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1u);
 		if ((ActiveLayer == 0u) || layer == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0u)) {
 			CurrentVertexIndex     = formIter.vertexIndex;
 			const auto savedVertex = VertexCount;
@@ -7309,14 +7309,14 @@ void form::internal::duprotfs(float rotationAngle) {
 void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) {
 	thred::rngadj();
 	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size());
-	auto sourceIt = std::next(StitchBuffer->begin(), GroupStartStitch);
-	auto endPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
+	auto sourceIt     = std::next(StitchBuffer->begin(), GroupStartStitch);
+	auto endPoint     = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
 	while (sourceIt < endPoint) {
-		StitchBuffer->push_back(fPOINTATTR{ (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
+		StitchBuffer->push_back(fPOINTATTR { (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
 		sourceIt++;
 	}
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
-	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1u);
+	GroupStitchIndex      = wrap::toUnsigned(StitchBuffer->size() - 1u);
 	thred::rngadj();
 	thred::rotfn(rotationAngle, rotationCenter);
 	thred::coltab();
@@ -7359,9 +7359,11 @@ void form::cpylayr(uint32_t codedLayer) {
 				thred::savdo();
 				thred::rngadj();
 				const auto codedStitchLayer = codedLayer << (LAYSHFT - 1);
-				auto       endStitch   = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
-				for (auto currentStitch   = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch; currentStitch++) {
-					StitchBuffer->push_back(fPOINTATTR{ (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
+				auto       endStitch        = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
+				for (auto currentStitch = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch;
+				     currentStitch++) {
+					StitchBuffer->push_back(fPOINTATTR {
+					    (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
 				PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 				thred::coltab();
@@ -8214,8 +8216,8 @@ void form::centir() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
-	auto highStitchBuffer = std::vector<fPOINTATTR>{};
-	auto iSourceStitch = start;
+	auto highStitchBuffer = std::vector<fPOINTATTR> {};
+	auto iSourceStitch    = start;
 
 	BeanCount = 0;
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
@@ -8253,11 +8255,13 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
-//	highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
+	//	highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 	// now copy stitches back up to the end of the original group
-	std::copy(highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start)); 
+	std::copy(
+	    highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start));
 	// and then insert the remainder of the new stitches
-	StitchBuffer->insert(std::next(StitchBuffer->begin(), finish), std::next(highStitchBuffer.begin(), finish - start), highStitchBuffer.end());
+	StitchBuffer->insert(
+	    std::next(StitchBuffer->begin(), finish), std::next(highStitchBuffer.begin(), finish - start), highStitchBuffer.end());
 
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
@@ -8285,8 +8289,8 @@ void form::dubean() {
 }
 
 void form::internal::unbean(uint32_t start, uint32_t& finish) {
-	auto highStitchBuffer = std::vector<fPOINTATTR>{};
-	auto lastStitch = finish;
+	auto highStitchBuffer = std::vector<fPOINTATTR> {};
+	auto lastStitch       = finish;
 	if (lastStitch > wrap::toUnsigned(StitchBuffer->size()) - 3u) {
 		lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3u;
 	}
@@ -8306,9 +8310,10 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	if ((finish - start) > highStitchBuffer.size()) {
 		auto stitchStart = std::next(StitchBuffer->begin(), start);
 		std::copy(highStitchBuffer.begin(), highStitchBuffer.end(), stitchStart);
-		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()), std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1u));
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()),
+		                    std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1u));
 	}
-	finish = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
+	finish                = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 

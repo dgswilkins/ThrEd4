@@ -160,7 +160,8 @@ namespace internal {
 	void    fwidfn(uint32_t find, float length);
 	float   getstxt(uint32_t stringIndex, HWND dialog);
 
-	uint32_t gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
+	uint32_t
+	gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
 
 	bool   isfil() noexcept;
 	bool   lastcol(uint32_t index, fPOINT& point);
