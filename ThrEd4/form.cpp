@@ -7310,7 +7310,7 @@ void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) 
 	thred::rngadj();
 	ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size());
 	auto sourceIt = std::next(StitchBuffer->begin(), GroupStartStitch);
-	auto endPoint = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+	auto endPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
 	while (sourceIt < endPoint) {
 		StitchBuffer->push_back(fPOINTATTR{ (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
 		sourceIt++;
@@ -7359,7 +7359,7 @@ void form::cpylayr(uint32_t codedLayer) {
 				thred::savdo();
 				thred::rngadj();
 				const auto codedStitchLayer = codedLayer << (LAYSHFT - 1);
-				auto       endStitch   = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+				auto       endStitch   = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u);
 				for (auto currentStitch   = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch; currentStitch++) {
 					StitchBuffer->push_back(fPOINTATTR{ (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
@@ -8219,41 +8219,41 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 
 	BeanCount = 0;
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+	if ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+	    || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
+		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+	if ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+	    || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y) {
+		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
 	iSourceStitch++;
 	while (iSourceStitch < finish - 1) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-		if (((*StitchBuffer)[iSourceStitch + 2].x != (*StitchBuffer)[iSourceStitch].x
-		     || (*StitchBuffer)[iSourceStitch + 2].y != (*StitchBuffer)[iSourceStitch].y)
-		    && ((*StitchBuffer)[iSourceStitch - 2].x != (*StitchBuffer)[iSourceStitch].x
-		        || (*StitchBuffer)[iSourceStitch - 2].y != (*StitchBuffer)[iSourceStitch].y)) {
-			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+		if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].x != (*StitchBuffer)[iSourceStitch].x
+		     || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 2u].y != (*StitchBuffer)[iSourceStitch].y)
+		    && ((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
+		        || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
+			highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 			BeanCount += 2;
 		}
 		iSourceStitch++;
 	}
 	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if (((*StitchBuffer)[iSourceStitch - 2].x != (*StitchBuffer)[iSourceStitch].x
-	     || (*StitchBuffer)[iSourceStitch - 2].y != (*StitchBuffer)[iSourceStitch].y)) {
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+	if (((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].x != (*StitchBuffer)[iSourceStitch].x
+	     || (*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) - 2u].y != (*StitchBuffer)[iSourceStitch].y)) {
+		highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
-//	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch + 1]);
+//	highStitchBuffer.push_back((*StitchBuffer)[gsl::narrow_cast<size_t>(iSourceStitch) + 1u]);
 	// now copy stitches back up to the end of the original group
 	std::copy(highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start)); 
 	// and then insert the remainder of the new stitches
@@ -8293,8 +8293,8 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	auto iSource = start;
 	for (; iSource <= lastStitch; iSource++) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSource]);
-		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[iSource + 2].x
-		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[iSource + 2].y) {
+		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 2u].x
+		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[gsl::narrow_cast<size_t>(iSource) + 2u].y) {
 			iSource += 2;
 		}
 	}
@@ -8306,7 +8306,7 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	if ((finish - start) > highStitchBuffer.size()) {
 		auto stitchStart = std::next(StitchBuffer->begin(), start);
 		std::copy(highStitchBuffer.begin(), highStitchBuffer.end(), stitchStart);
-		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()), std::next(StitchBuffer->begin(), finish + 1));
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()), std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1u));
 	}
 	finish = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
@@ -8323,7 +8323,7 @@ void form::debean() {
 		else {
 			GroupStitchIndex = GroupEndStitch;
 		}
-		auto iEndStitch = wrap::toUnsigned(StitchBuffer->size()) - 1u;
+		const auto iEndStitch = wrap::toUnsigned(StitchBuffer->size()) - 1u;
 		if (ClosestPointIndex > gsl::narrow<uint32_t>(iEndStitch) - 1) {
 			ClosestPointIndex = iEndStitch;
 		}
