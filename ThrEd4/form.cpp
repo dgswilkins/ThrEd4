@@ -8876,7 +8876,8 @@ void form::crop() {
 				(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
 			}
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), iDestination), StitchBuffer->end());
+		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
