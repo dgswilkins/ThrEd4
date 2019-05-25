@@ -1254,7 +1254,7 @@ void form::chkseq(bool border) {
 	}
 	bool flag = true;
 	for (auto iSequence = 0u; iSequence < OSequence->size() - 1; iSequence++) {
-		if (!fi::ritlin((*OSequence)[iSequence], (*OSequence)[wrap::toSize(iSequence) + 1], userStitchLen)) {
+		if (!fi::ritlin((*OSequence)[iSequence], (*OSequence)[wrap::toSize(iSequence) + 1u], userStitchLen)) {
 			flag = false;
 			break;
 		}
@@ -1507,8 +1507,8 @@ void form::internal::bold(double size) {
 		boldlin(iLine, iNextLine, size);
 	}
 	for (auto iSequence = 0u; iSequence < OSequence->size() - 1; iSequence++) {
-		const auto length = hypot((*OSequence)[wrap::toSize(iSequence) + 1].x - (*OSequence)[iSequence].x,
-		                          (*OSequence)[wrap::toSize(iSequence) + 1].y - (*OSequence)[iSequence].y);
+		const auto length = hypot((*OSequence)[wrap::toSize(iSequence) + 1u].x - (*OSequence)[iSequence].x,
+		                          (*OSequence)[wrap::toSize(iSequence) + 1u].y - (*OSequence)[iSequence].y);
 		if (length > TINY) {
 			(*OSequence)[iOutput++] = (*OSequence)[iSequence];
 		}

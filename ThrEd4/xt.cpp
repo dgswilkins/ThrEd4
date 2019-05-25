@@ -308,11 +308,11 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
 		xratf(adjustedPoint, (*OSequence)[iSequence], currentPoint, feather.ratioLocal);
-		xratf(adjustedPoint, (*OSequence)[wrap::toSize(iSequence) + 1], nextPoint, feather.ratioLocal);
+		xratf(adjustedPoint, (*OSequence)[wrap::toSize(iSequence) + 1u], nextPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.ratio;
 		xratf(currentPoint, (*OSequence)[iSequence], (*OSequence)[iSequence], feather.ratioLocal);
 		xratf(
-		    nextPoint, (*OSequence)[wrap::toSize(iSequence) + 1], (*OSequence)[wrap::toSize(iSequence) + 1], feather.ratioLocal);
+		    nextPoint, (*OSequence)[wrap::toSize(iSequence) + 1u], (*OSequence)[wrap::toSize(iSequence) + 1u], feather.ratioLocal);
 	}
 }
 
@@ -643,8 +643,8 @@ void xt::internal::chkuseq() {
 		}
 		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
 		for (auto iSequence = 0u; iSequence < OutputIndex - 1; iSequence++) {
-			const auto delta       = fPOINT { (*OSequence)[wrap::toSize(iSequence) + 1].x - (*OSequence)[iSequence].x,
-                                        (*OSequence)[wrap::toSize(iSequence) + 1].y - (*OSequence)[iSequence].y };
+			const auto delta       = fPOINT { (*OSequence)[wrap::toSize(iSequence) + 1u].x - (*OSequence)[iSequence].x,
+                                        (*OSequence)[wrap::toSize(iSequence) + 1u].y - (*OSequence)[iSequence].y };
 			const auto length      = hypot(delta.x, delta.y);
 			const auto stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
 			if (stitchCount != 0u) {
@@ -1506,7 +1506,7 @@ bool xt::internal::lastcol(uint32_t index, fPOINT& point) {
 	while (index != 0u) {
 		index--;
 		if ((*InterleaveSequenceIndices)[index].color == color) {
-			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[wrap::toSize(index) + 1].index - 1];
+			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[wrap::toSize(index) + 1u].index - 1];
 			return true;
 		}
 	}
@@ -1540,7 +1540,7 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 		    += gucon(buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
-	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1].index;
+	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1u].index;
 	     iSequence++) {
 		if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1].x
 		    || (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1].y) {
@@ -1672,7 +1672,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 				                           code);
 			}
 			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
-			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1].index;
+			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1u].index;
 			     ine++) {
 				if (ilData.output > 0) {
 					if ((*InterleaveSequence)[ine].x != (*StitchBuffer)[ilData.output - 1].x

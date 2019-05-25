@@ -1056,8 +1056,8 @@ void formForms::setear() {
 		auto       vertexIt         = std::next(FormVertices->begin(), CurrentVertexIndex);
 		const auto count            = wrap::toSize(VertexCount) / 4u;
 		const auto middle           = form::midl(vertexIt[1].x, vertexIt[0].x);
-		auto       step             = vertexIt[count + 1].y - vertexIt[count].y;
-		auto       verticalPosition = vertexIt[count + 1].y;
+		auto       step             = vertexIt[count + 1u].y - vertexIt[count].y;
+		auto       verticalPosition = vertexIt[count + 1u].y;
 		auto       iLeftVertices    = wrap::toSize(VertexCount) - count;
 		auto       iRightVertices   = count + 1u;
 		for (auto iStep = 0u; iStep < count; iStep++) {
