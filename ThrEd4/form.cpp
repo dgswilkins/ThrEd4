@@ -7603,22 +7603,24 @@ void form::selalfil() {
 }
 
 bool form::frmrng(uint32_t iForm, RANGE& range) {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		range.start  = 0;
-		range.finish = PCSHeader.stitchCount;
 		auto& form   = (*FormList)[iForm];
 		const auto saveClose = ClosestFormToCursor;
 		ClosestFormToCursor = iForm;
 		if ((form.fillType != 0u) || (form.edgeType != 0u)) {
-			while (range.start < PCSHeader.stitchCount && notfstch((*StitchBuffer)[range.start].attribute)) {
+			while (range.start < StitchBuffer->size() && notfstch((*StitchBuffer)[range.start].attribute)) {
 				range.start++;
 			}
-			range.finish = PCSHeader.stitchCount - 1u;
+			range.finish = StitchBuffer->size() - 1u;
 			while (range.finish > range.start && notfstch((*StitchBuffer)[range.finish].attribute)) {
 				range.finish--;
 			}
 			ClosestFormToCursor = saveClose;
 			return range.finish > range.start;
+		}
+		else {
+			range.finish = StitchBuffer->size();
 		}
 		ClosestFormToCursor = saveClose;
 		return false;
