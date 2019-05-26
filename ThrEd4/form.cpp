@@ -7607,7 +7607,7 @@ bool form::frmrng(uint32_t iForm, RANGE& range) {
 		range.start  = 0;
 		range.finish = PCSHeader.stitchCount;
 		auto& form   = (*FormList)[iForm];
-		auto saveClose = ClosestFormToCursor;
+		const auto saveClose = ClosestFormToCursor;
 		ClosestFormToCursor = iForm;
 		if ((form.fillType != 0u) || (form.edgeType != 0u)) {
 			while (range.start < PCSHeader.stitchCount && notfstch((*StitchBuffer)[range.start].attribute)) {

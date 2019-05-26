@@ -5060,14 +5060,11 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 }
 
 void thred::internal::delstch1(uint32_t iStitch) {
-	if (PCSHeader.stitchCount != 0u) {
-		while (iStitch <= PCSHeader.stitchCount) {
-			(*StitchBuffer)[iStitch] = (*StitchBuffer)[wrap::toSize(iStitch) + 1u];
-			iStitch++;
-		}
+	if (!StitchBuffer->empty()) {
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), iStitch));
 		PCSHeader.stitchCount--;
-		if (ClosestPointIndex > gsl::narrow_cast<uint32_t>(PCSHeader.stitchCount) - 1) {
-			ClosestPointIndex = PCSHeader.stitchCount - 1u;
+		if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size()) - 1u) {
+			ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size()) - 1u;
 		}
 	}
 }
@@ -9975,25 +9972,25 @@ void thred::internal::colchk() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t finish) {
-	auto destination = MAXITEMS;
+	auto newStitches = std::vector<fPOINTATTR>{};
+	newStitches.reserve(finish - start); // we know that we will have at least this number of Stitches
 	auto adcnt       = 0u;
 
 	finish--;
-	// ToDo - Use a temp buffer rather than the high buffer
+	auto stitchIt = std::next(StitchBuffer->begin(), start);
+	auto nextStitchIt = stitchIt + 1u;
 	for (auto iSource = start; iSource < finish; iSource++) {
-		const auto delta  = dPOINT { (*StitchBuffer)[wrap::toSize(iSource) + 1u].x - (*StitchBuffer)[iSource].x,
-                                    (*StitchBuffer)[wrap::toSize(iSource) + 1u].y - (*StitchBuffer)[iSource].y };
+		const auto delta  = fPOINT { (*nextStitchIt).x - (*stitchIt).x, (*nextStitchIt).y - (*stitchIt).y };
 		const auto length = hypot(delta.x, delta.y);
-		thred::mvstch(destination++, iSource);
+		newStitches.push_back(*stitchIt);
 		if (length > IniFile.maxStitchLength) {
 			const auto stitchCount = std::ceil(length / UserStitchLength);
-			const auto step        = dPOINT { delta.x / stitchCount, delta.y / stitchCount };
-			auto       point       = dPOINT { (*StitchBuffer)[iSource].x + step.x, (*StitchBuffer)[iSource].y + step.y };
-			auto       attribute   = (*StitchBuffer)[iSource].attribute;
-			if (attribute != (*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute) {
-				if (((attribute & NOTFRM) == 0u)
-				    && (((*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute & TYPMSK) != 0u)) {
-					if (!((attribute & FRMSK) == ((*StitchBuffer)[wrap::toSize(iSource) + 1u].attribute & FRMSK))) {
+			const auto step        = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
+			auto       point       = fPOINT { (*stitchIt).x + step.x, (*stitchIt).y + step.y };
+			auto       attribute   = (*stitchIt).attribute;
+			if (attribute != (*nextStitchIt).attribute) {
+				if (((attribute & NOTFRM) == 0u) && (((*nextStitchIt).attribute & TYPMSK) != 0u)) {
+					if (!((attribute & FRMSK) == ((*nextStitchIt).attribute & FRMSK))) {
 						attribute &= NTYPMSK;
 					}
 				}
@@ -10002,27 +9999,23 @@ GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t fi
 				}
 			}
 			attribute &= (~KNOTMSK);
-			for (auto iStitch = 0; iStitch < stitchCount - 1u; iStitch++) {
-				(*StitchBuffer)[destination++] = { gsl::narrow<float>(point.x), gsl::narrow<float>(point.y), attribute };
+			for (auto iStitch = 0u; iStitch < wrap::round<decltype(iStitch)>(stitchCount) - 1u; iStitch++) {
+				newStitches.push_back(fPOINTATTR { point.x, point.y, attribute });
 				point.x += step.x;
 				point.y += step.y;
 				adcnt++;
 			}
 		}
+		stitchIt++;
+		nextStitchIt++;
 	}
-	auto source = finish;
-	while (source < PCSHeader.stitchCount) {
-		thred::mvstch(destination++, source++);
-	}
-	const auto* sourceStitch      = &(*StitchBuffer)[MAXITEMS];
-	auto*       destinationStitch = &(*StitchBuffer)[start];
-	if ((sourceStitch != nullptr) && (destinationStitch != nullptr)) {
-		const auto stitchCount = destination - (MAXITEMS);
-		for (source = 0; source < stitchCount; source++) {
-			destinationStitch[source] = sourceStitch[source];
-		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(start + stitchCount);
-	}
+	// now copy stitches back up to the end of the original group
+	std::copy(newStitches.begin(), std::next(newStitches.begin(), finish - start), std::next(StitchBuffer->begin(), start));
+	// and then insert the remainder of the new stitches
+	StitchBuffer->insert(
+	    std::next(StitchBuffer->begin(), finish), std::next(newStitches.begin(), finish - start), newStitches.end());
+
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	return adcnt;
 }
 
