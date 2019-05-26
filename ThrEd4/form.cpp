@@ -8255,7 +8255,6 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
 		BeanCount += 2;
 	}
-	//	highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1u]);
 	// now copy stitches back up to the end of the original group
 	std::copy(
 	    highStitchBuffer.begin(), std::next(highStitchBuffer.begin(), finish - start), std::next(StitchBuffer->begin(), start));
