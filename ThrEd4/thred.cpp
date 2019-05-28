@@ -11407,6 +11407,8 @@ void thred::internal::lock() {
 
 void thred::internal::delstch() {
 	thred::savdo();
+	StitchBuffer->clear();
+	StitchBuffer->shrink_to_fit();
 	PCSHeader.stitchCount = 0;
 	TextureIndex          = 0;
 	rstAll();
