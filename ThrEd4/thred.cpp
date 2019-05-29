@@ -1107,8 +1107,8 @@ int32_t datcod[] = { ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG };
 
 void thred::chkmen() noexcept {
 	auto code = UINT { MF_CHECKED };
-
-	for (auto iCode = 0u; iCode < (sizeof(datcod) / sizeof(datcod[0])); iCode++) {
+	auto lastCode = gsl::narrow_cast<uint32_t>(sizeof(datcod) / sizeof(datcod[0]));
+	for (auto iCode = 0u; iCode < lastCode; iCode++) {
 		code = MF_UNCHECKED;
 		if (iCode == IniFile.dataCheck) {
 			code = MF_CHECKED;
@@ -3001,7 +3001,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		}
 		iOutputStitch++;
 		StitchBuffer->erase(std::next(StitchBuffer->begin(), iOutputStitch), std::next(StitchBuffer->begin(), iStitch));
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 		thred::coltab();
 	}
 	else {
@@ -3026,7 +3026,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			thred::mvstch(iNextStitch++, iStitch);
 		}
 		StitchBuffer->resize(iNextStitch);
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iNextStitch);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iNextStitch);
 		thred::coltab();
 	}
 	rstAll();
@@ -3064,7 +3064,7 @@ void thred::internal::duzero() {
 				StateMap.reset(StateFlag::CONTIG);
 			}
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestination);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iDestination);
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 		return;
@@ -3641,7 +3641,7 @@ void thred::internal::redbal() {
 				UserPen[iColor]        = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 			}
-			PCSHeader.stitchCount = gsl::narrow<uint16_t>(iBalaradStitch);
+			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iBalaradStitch);
 			thred::coltab();
 			thred::redraw(ColorBar);
 			StateMap.set(StateFlag::INIT);
@@ -5080,7 +5080,7 @@ void thred::internal::redbak() {
 			StitchBuffer->clear();
 			StateMap.reset(StateFlag::INIT);
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		UnzoomedRect          = undoData->zoomRect;
 		if (undoData->formCount != 0u) {
 			FormList->resize(undoData->formCount);
@@ -5541,7 +5541,7 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 			}
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iStitch);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iStitch);
 	const auto dstSize    = fPOINT { maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y };
 	IniFile.hoopType      = CUSTHUP;
 	UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
@@ -5774,7 +5774,7 @@ void thred::internal::nuFil() {
 						}
 					}
 					StitchBuffer->shrink_to_fit();
-					PCSHeader.stitchCount = wrap::toUnsigned(StitchBuffer->size());
+					PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 					ReadFile(FileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
 					if (BytesRead != sizeof(PCSBMPFileName)) {
 						PCSBMPFileName[0] = 0;
@@ -5975,7 +5975,7 @@ void thred::internal::nuFil() {
 								}
 								iPCSstitch++;
 							}
-							PCSHeader.stitchCount = gsl::narrow<uint16_t>(iStitch);
+							PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iStitch);
 							// Grab the bitmap filename
 							auto tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
@@ -7080,7 +7080,7 @@ GSL_SUPPRESS(26440) void thred::delstchm() {
 			(*StitchBuffer)[destination++] = (*StitchBuffer)[iStitch];
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(destination);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(destination);
 }
 
 void thred::internal::duclp() noexcept {
@@ -7149,7 +7149,7 @@ void thred::internal::lodclp(uint32_t iStitch) {
 	}
 	GroupStitchIndex = iStitch - 1u;
 	StateMap.set(StateFlag::GRPSEL);
-	PCSHeader.stitchCount += gsl::narrow<uint16_t>(ClipBuffer->size());
+	PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(ClipBuffer->size());
 	if (PCSHeader.stitchCount != 0u) {
 		StateMap.set(StateFlag::INIT);
 	}
@@ -7861,7 +7861,7 @@ GSL_SUPPRESS(26440) void thred::delfstchs() {
 			}
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(iDestinationStitch);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iDestinationStitch);
 }
 
 void thred::internal::f1del() {
@@ -7875,7 +7875,7 @@ void thred::internal::f1del() {
 			}
 		}
 		StitchBuffer->resize(stitchCount);
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(stitchCount);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(stitchCount);
 	}
 	clip::deleclp(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
@@ -7960,7 +7960,7 @@ void thred::internal::delsfrms(uint32_t code) {
 						(*StitchBuffer)[validStitchCount++] = (*StitchBuffer)[iStitch];
 					}
 				}
-				PCSHeader.stitchCount = gsl::narrow<uint16_t>(validStitchCount);
+				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(validStitchCount);
 			}
 			else {
 				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -8097,7 +8097,7 @@ GSL_SUPPRESS(26440) void thred::internal::delknt() {
 			thred::mvstch(newStitchCount++, iStitch);
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(newStitchCount);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(newStitchCount);
 }
 
 bool thred::internal::isknots() {
@@ -8159,7 +8159,7 @@ void thred::internal::setknt() {
 	StateMap.set(StateFlag::FILDIR);
 	endknt(iStitch);
 	(*StitchBuffer)[OutputIndex - 1u].attribute &= (~KNOTMSK);
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(OutputIndex - MAXITEMS);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(OutputIndex - MAXITEMS);
 	thred::mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
@@ -8209,7 +8209,7 @@ void thred::internal::chkncol() {
 			}
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(OutputIndex - MAXITEMS);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(OutputIndex - MAXITEMS);
 	thred::mvstchs(0, MAXITEMS, PCSHeader.stitchCount);
 }
 
@@ -11784,26 +11784,20 @@ void thred::internal::delcol() {
 }
 
 void thred::internal::set1knot() {
-	if ((PCSHeader.stitchCount != 0u) && StateMap.test(StateFlag::SELBOX)) {
+	if ((!StitchBuffer->empty()) && StateMap.test(StateFlag::SELBOX)) {
 		thred::savdo();
-		if (ClosestPointIndex == gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+		if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1u)) {
 			StateMap.set(StateFlag::FILDIR);
+			StitchBuffer->resize(StitchBuffer->size() + 6u);
 			OutputIndex = ClosestPointIndex + 1u;
 			endknt(ClosestPointIndex);
 		}
 		else {
-			auto source = PCSHeader.stitchCount;
-			if (PCSHeader.stitchCount != 0u) {
-				source--;
-			}
-			auto destination = PCSHeader.stitchCount + 4u;
-			while ((source != 0u) && source >= ClosestPointIndex) {
-				thred::mvstch(destination--, source--);
-			}
+			StitchBuffer->insert(std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(ClosestPointIndex) + 1u), 5u, (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u]);
 			OutputIndex = ClosestPointIndex + 1u;
 			strtknt(ClosestPointIndex);
 		}
-		PCSHeader.stitchCount += 5;
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

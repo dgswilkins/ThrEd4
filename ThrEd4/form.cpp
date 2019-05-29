@@ -174,7 +174,7 @@ void form::delmfil() {
 		auto endPoint = stitchIt;
 		StitchBuffer->erase(startPoint, endPoint);
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 }
 
 void form::fsizpar() noexcept {
@@ -5564,7 +5564,7 @@ void form::unfil() {
 			}
 		}
 		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -5596,7 +5596,7 @@ void form::unfil() {
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
-			PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 			thred::ritot(PCSHeader.stitchCount);
 		}
 	}
@@ -7365,7 +7365,7 @@ void form::cpylayr(uint32_t codedLayer) {
 					StitchBuffer->push_back(fPOINTATTR {
 					    (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
-				PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -7612,7 +7612,7 @@ bool form::frmrng(uint32_t iForm, RANGE& range) {
 			while (range.start < StitchBuffer->size() && notfstch((*StitchBuffer)[range.start].attribute)) {
 				range.start++;
 			}
-			range.finish = StitchBuffer->size() - 1u;
+			range.finish = wrap::toUnsigned(StitchBuffer->size() - 1u);
 			while (range.finish > range.start && notfstch((*StitchBuffer)[range.finish].attribute)) {
 				range.finish--;
 			}
@@ -7620,7 +7620,7 @@ bool form::frmrng(uint32_t iForm, RANGE& range) {
 			return range.finish > range.start;
 		}
 		else {
-			range.finish = StitchBuffer->size();
+			range.finish = wrap::toUnsigned(StitchBuffer->size());
 		}
 		ClosestFormToCursor = saveClose;
 		return false;
@@ -8881,7 +8881,7 @@ void form::crop() {
 			}
 		}
 		StitchBuffer->resize(iDestination);
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
