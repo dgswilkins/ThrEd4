@@ -14403,13 +14403,13 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		if (StateMap.test(StateFlag::INIT)) {
 			unlin();
-			if (StateMap.test(StateFlag::INSRT) && PCSHeader.stitchCount < MAXITEMS) {
+			if (StateMap.test(StateFlag::INSRT)) {
 				thred::px2stch();
 				auto code = (ActiveColor | USMSK | (ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (StateMap.test(StateFlag::BAKEND)) {
 						xlin1();
-						const auto iStitch = PCSHeader.stitchCount;
+						const auto iStitch = wrap::toUnsigned(StitchBuffer->size());
 						StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, code });
 						thred::duzrat();
 						stch2px1(iStitch);
@@ -14441,14 +14441,9 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 						code = (*StitchBuffer)[ClosestPointIndex].attribute | USMSK;
 					}
 				}
-				auto iStitch = PCSHeader.stitchCount;
-				do {
-					(*StitchBuffer)[iStitch] = (*StitchBuffer)[iStitch - 1u];
-					iStitch--;
-				} while (iStitch > ClosestPointIndex);
-				PCSHeader.stitchCount++;
 				ClosestPointIndex++;
-				(*StitchBuffer)[ClosestPointIndex] = { SelectedPoint.x, SelectedPoint.y, code };
+				StitchBuffer->insert(std::next(StitchBuffer->begin(), ClosestPointIndex), fPOINTATTR{ SelectedPoint.x, SelectedPoint.y, code });
+				PCSHeader.stitchCount++;
 				xlin();
 				InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 				stch2px1(ClosestPointIndex);
