@@ -3042,29 +3042,32 @@ void thred::internal::duzero() {
 			formMap.set(selectedForm);
 		}
 		StateMap.reset(StateFlag::CONTIG);
-		auto iDestination  = 0u;
-		auto currentStitch = &(*StitchBuffer)[0];
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & TYPMSK) != 0u)
-			    && formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)) {
+		auto iDestination  = StitchBuffer->begin();
+		auto currentStitch = StitchBuffer->front();
+		for (auto& iStitch : *StitchBuffer) {
+			if (((iStitch.attribute & TYPMSK) != 0u)
+			    && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
 				if (StateMap.testAndSet(StateFlag::CONTIG)) {
 					const auto stitchLength
-					    = hypot((*StitchBuffer)[iStitch].x - currentStitch->x, (*StitchBuffer)[iStitch].y - currentStitch->y);
+					    = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
 					if (stitchLength > MinStitchLength) {
-						currentStitch                   = &(*StitchBuffer)[iStitch];
-						(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iStitch];
+						currentStitch   = iStitch;
+						(*iDestination) = iStitch;
+						iDestination++;
 					}
 				}
 				else {
-					currentStitch = &(*StitchBuffer)[iStitch];
+					currentStitch = iStitch;
 				}
 			}
 			else {
-				(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iStitch];
+				(*iDestination) = iStitch;
+				iDestination++;
 				StateMap.reset(StateFlag::CONTIG);
 			}
 		}
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iDestination);
+		StitchBuffer->erase(iDestination, StitchBuffer->end());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 		return;
@@ -3557,13 +3560,6 @@ DWORD thred::internal::coldis(COLORREF colorA, COLORREF colorB) {
 	    std::sqrt((((512 + meanR) * deltaR * deltaR) / 256u) + 4 * deltaG * deltaG + (((767 - meanR) * deltaB * deltaB) / 256u)));
 }
 
-void thred::internal::bal2thr(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) {
-	constexpr auto IBALRAT = 0.6f;
-
-	(*StitchBuffer)[destination]
-	    = { balaradStitch[source].x * IBALRAT + BalaradOffset.x, balaradStitch[source].y * IBALRAT + BalaradOffset.y, code };
-}
-
 uint32_t thred::internal::colmatch(COLORREF color) {
 	if (ColorChanges < 16) {
 		for (auto iColor = 0u; iColor < ColorChanges; iColor++) {
@@ -3595,6 +3591,7 @@ void thred::internal::redbal() {
 	auto balaradHeader = BALHED {};
 
 	PCSHeader.stitchCount = 0u;
+	StitchBuffer->clear();
 	FormList->clear();
 
 	auto balaradFile = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -3623,12 +3620,11 @@ void thred::internal::redbal() {
 			UserColor[0]           = balaradHeader.color[0];
 			auto color             = 0u;
 			auto bColor            = 1u;
-			auto iBalaradStitch    = 0u;
 			ColorChanges           = 1u;
 			for (auto iStitch = 0u; iStitch < stitchCount; iStitch++) {
 				switch (balaradStitch[iStitch].code) {
 				case BALNORM: {
-					bal2thr(balaradStitch, iBalaradStitch++, iStitch, color);
+					StitchBuffer->push_back(fPOINTATTR{ balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x, balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y, color });
 					break;
 				}
 				case BALSTOP: {
@@ -3641,7 +3637,7 @@ void thred::internal::redbal() {
 				UserPen[iColor]        = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
 				UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 			}
-			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iBalaradStitch);
+			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 			thred::coltab();
 			thred::redraw(ColorBar);
 			StateMap.set(StateFlag::INIT);

@@ -91,7 +91,6 @@ namespace internal {
 	void bak();
 	void bakmrk();
 	void bakthum();
-	void bal2thr(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
 	void barnam(HWND window, uint32_t iThumbnail);
 	void bfil();
 	bool binv(const std::vector<uint8_t>& monoBitmapData, uint32_t bitmapWidthInBytes);
