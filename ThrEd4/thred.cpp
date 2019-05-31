@@ -5954,23 +5954,22 @@ void thred::internal::nuFil() {
 							auto color        = 0u;
 							auto iPCSstitch   = 0u;
 							while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-								if (PCSDataBuffer[iPCSstitch].tag == 3) {
-									ColorChangeTable[iColorChange].colorIndex    = PCSDataBuffer[iPCSstitch].fx;
+								auto& stitch = PCSDataBuffer[iPCSstitch];
+								if (stitch.tag == 3) {
+									ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
 									ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-									color                                        = NOTFRM | PCSDataBuffer[iPCSstitch].fx;
+									color                                        = NOTFRM | stitch.fx;
 								}
 								else {
-									(*StitchBuffer)[iStitch]
-									    = fPOINTATTR { gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].x)
-										                   + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fx) / 256.0f,
-										               gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].y)
-										                   + gsl::narrow_cast<float>(PCSDataBuffer[iPCSstitch].fy) / 256.0f,
-										               color };
+									StitchBuffer->push_back(
+									    fPOINTATTR { wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0f,
+									                 wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / 256.0f,
+									                 color });
 									iStitch++;
 								}
 								iPCSstitch++;
 							}
-							PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iStitch);
+							PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 							// Grab the bitmap filename
 							auto tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
 							strcpy_s(PCSBMPFileName, tnam);
