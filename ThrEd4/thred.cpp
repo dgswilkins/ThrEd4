@@ -5503,7 +5503,6 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	auto localStitch       = fPOINT {};
 	auto maximumCoordinate = fPOINT { -1e12f, -1e12f };
 	auto mimimumCoordinate = fPOINT { 1e12f, 1e12f };
-	auto iStitch           = 0u;
 	for (auto& record : DSTData) {
 		if ((record.nd & 0x40u) != 0) {
 			if (bytesRead >= ((wrap::toSize(iColor) + 1u) * sizeof(decltype(colors.back())))) {
@@ -5520,24 +5519,24 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 			localStitch.x += dstStitch.x;
 			localStitch.y += dstStitch.y;
 			if ((record.nd & 0x80u) == 0u) {
-				(*StitchBuffer)[iStitch] = { localStitch.x * 0.6f, localStitch.y * 0.6f, color | NOTFRM };
-				if ((*StitchBuffer)[iStitch].x > maximumCoordinate.x) {
-					maximumCoordinate.x = (*StitchBuffer)[iStitch].x;
+				StitchBuffer->push_back(fPOINTATTR{ localStitch.x * 0.6f, localStitch.y * 0.6f, color | NOTFRM });
+				auto& stitch = StitchBuffer->back();
+				if (stitch.x > maximumCoordinate.x) {
+					maximumCoordinate.x = stitch.x;
 				}
-				if ((*StitchBuffer)[iStitch].y > maximumCoordinate.y) {
-					maximumCoordinate.y = (*StitchBuffer)[iStitch].y;
+				if (stitch.y > maximumCoordinate.y) {
+					maximumCoordinate.y = stitch.y;
 				}
-				if ((*StitchBuffer)[iStitch].x < mimimumCoordinate.x) {
-					mimimumCoordinate.x = (*StitchBuffer)[iStitch].x;
+				if (stitch.x < mimimumCoordinate.x) {
+					mimimumCoordinate.x = stitch.x;
 				}
-				if ((*StitchBuffer)[iStitch].y < mimimumCoordinate.y) {
-					mimimumCoordinate.y = (*StitchBuffer)[iStitch].y;
+				if (stitch.y < mimimumCoordinate.y) {
+					mimimumCoordinate.y = stitch.y;
 				}
-				iStitch++;
 			}
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iStitch);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	const auto dstSize    = fPOINT { maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y };
 	IniFile.hoopType      = CUSTHUP;
 	UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
@@ -5549,9 +5548,9 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 	}
 	const auto delta = fPOINT { (gsl::narrow_cast<float>(UnzoomedRect.x) - dstSize.x) / 2.0f - mimimumCoordinate.x,
 		                        (gsl::narrow_cast<float>(UnzoomedRect.y) - dstSize.y) / 2.0f - mimimumCoordinate.y };
-	for (iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		(*StitchBuffer)[iStitch].x += delta.x;
-		(*StitchBuffer)[iStitch].y += delta.y;
+	for (auto& iStitch : *StitchBuffer) {
+		iStitch.x += delta.x;
+		iStitch.y += delta.y;
 	}
 }
 
