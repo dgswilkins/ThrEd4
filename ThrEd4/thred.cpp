@@ -6060,9 +6060,7 @@ void thred::internal::nuFil() {
 						auto loc      = fPOINT {};
 						StateMap.reset(StateFlag::FILDIR);
 						auto iPESstitch         = 0u;
-						auto iActualPESstitches = 1u;
-						(*StitchBuffer)[0].x    = 0.0f;
-						(*StitchBuffer)[0].y    = 0.0f;
+						StitchBuffer->push_back(fPOINTATTR{});
 						auto locof              = 0.0f;
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3u)) {
 							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3u;
@@ -6087,7 +6085,7 @@ void thred::internal::nuFil() {
 									}
 									else {
 										if (PESstitch[iPESstitch] > 0x3f) {
-											locof = PESstitch[iPESstitch] - 128u;
+											locof = wrap::toFloat(PESstitch[iPESstitch]) - 128.0f;
 										}
 										else {
 											locof = PESstitch[iPESstitch];
@@ -6097,10 +6095,7 @@ void thred::internal::nuFil() {
 									// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 									if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 										loc.y -= locof;
-										(*StitchBuffer)[iActualPESstitches].x         = loc.x;
-										(*StitchBuffer)[iActualPESstitches].y         = loc.y;
-										(*StitchBuffer)[iActualPESstitches].attribute = color;
-										iActualPESstitches++;
+										StitchBuffer->push_back(fPOINTATTR{ loc.x, loc.y, color });
 									}
 									else {
 										loc.x += locof;
@@ -6108,7 +6103,7 @@ void thred::internal::nuFil() {
 								}
 								iPESstitch++;
 							}
-							PCSHeader.stitchCount = iActualPESstitches;
+							PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 							// IniFile.auxFileType=AUXPES;
 							hupfn();
 						}
