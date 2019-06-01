@@ -7063,13 +7063,10 @@ void thred::internal::rebox() {
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void thred::delstchm() {
 	thred::rngadj();
-	auto destination = GroupStartStitch;
-	if ((GroupEndStitch + 1u) < PCSHeader.stitchCount) {
-		for (auto iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[destination++] = (*StitchBuffer)[iStitch];
-		}
-	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(destination);
+	auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
+	auto end   = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+	StitchBuffer->erase(start, end);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void thred::internal::duclp() noexcept {
