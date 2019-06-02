@@ -7107,27 +7107,7 @@ void thred::internal::clpbox() {
 }
 
 void thred::internal::lodclp(uint32_t iStitch) {
-	auto source = PCSHeader.stitchCount;
-	if (PCSHeader.stitchCount != 0u) {
-		source--;
-	}
-	const auto clipSize    = wrap::toUnsigned(ClipBuffer->size());
-	auto       destination = PCSHeader.stitchCount + clipSize;
-	if ((PCSHeader.stitchCount != 0u) || (clipSize != 0u)) {
-		destination--;
-	}
-
-	if (iStitch != PCSHeader.stitchCount) {
-		iStitch++;
-	}
-	if (iStitch < gsl::narrow<uint32_t>(PCSHeader.stitchCount) && StateMap.test(StateFlag::INIT)) {
-		while ((source != 0u) && (source >= iStitch)) {
-			// ToDo - is source being decremented too soon?
-			(*StitchBuffer)[destination].x           = (*StitchBuffer)[source].x;
-			(*StitchBuffer)[destination].y           = (*StitchBuffer)[source--].y;
-			(*StitchBuffer)[destination--].attribute = (*StitchBuffer)[source].attribute;
-		}
-	}
+	StitchBuffer->insert(std::next(StitchBuffer->begin(), iStitch), ClipBuffer->size(), fPOINTATTR{});
 	ClosestPointIndex = iStitch;
 	for (auto& clip : *ClipBuffer) {
 		(*StitchBuffer)[iStitch++]
@@ -7135,8 +7115,8 @@ void thred::internal::lodclp(uint32_t iStitch) {
 	}
 	GroupStitchIndex = iStitch - 1u;
 	StateMap.set(StateFlag::GRPSEL);
-	PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(ClipBuffer->size());
-	if (PCSHeader.stitchCount != 0u) {
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
+	if (!StitchBuffer->empty()) {
 		StateMap.set(StateFlag::INIT);
 	}
 }
