@@ -7817,17 +7817,18 @@ void thred::internal::duclip() {
 GSL_SUPPRESS(26440) void thred::delfstchs() {
 	auto iDestinationStitch = 0u;
 
-	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
-		if (((*StitchBuffer)[iSourceStitch].attribute & NOTFRM) != 0u) {
-			(*StitchBuffer)[iDestinationStitch++] = (*StitchBuffer)[iSourceStitch];
+	for (auto iSourceStitch: *StitchBuffer) {
+		if ((iSourceStitch.attribute & NOTFRM) != 0u) {
+			(*StitchBuffer)[iDestinationStitch++] = iSourceStitch;
 		}
 		else {
-			if ((((*StitchBuffer)[iSourceStitch].attribute & FRMSK) >> 4u) != ClosestFormToCursor) {
-				(*StitchBuffer)[iDestinationStitch++] = (*StitchBuffer)[iSourceStitch];
+			if (((iSourceStitch.attribute & FRMSK) >> 4u) != ClosestFormToCursor) {
+				(*StitchBuffer)[iDestinationStitch++] = iSourceStitch;
 			}
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iDestinationStitch);
+	StitchBuffer->resize(iDestinationStitch);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void thred::internal::f1del() {
@@ -7951,6 +7952,7 @@ void thred::internal::delsfrms(uint32_t code) {
 }
 
 void thred::internal::cut() {
+	thred::savdo();
 	duclip();
 	if (!SelectedFormList->empty()) {
 		StateMap.set(StateFlag::DELTO);
