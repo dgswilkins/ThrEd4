@@ -179,8 +179,8 @@ void form::delmfil() {
 			stitchIt++;
 		}
 		StitchBuffer->erase(iDestinationStitch, StitchBuffer->end());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 }
 
 void form::fsizpar() noexcept {
