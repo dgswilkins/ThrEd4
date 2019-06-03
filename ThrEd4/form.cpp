@@ -163,16 +163,22 @@ void form::delmfil() {
 		stitchIt++;
 	}
 	if (flag) {
-		auto startPoint = stitchIt;               // we found the start stitch.
-		while (stitchIt != StitchBuffer->end()) { // Now find the end stitch
+		auto iDestinationStitch = stitchIt;               // we found the first stitch.
+		while (stitchIt != StitchBuffer->end()) { // Now find all stitches to delete
 			const auto& attribute = (*stitchIt).attribute;
-			if (!((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
-				break;
+			if ((attribute & NOTFRM) == 0u) {
+				if (!((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
+					*iDestinationStitch = *stitchIt; // keep all stitches that are not part of the current form
+					iDestinationStitch++;
+				}
+			}
+			else { // keep any non-form stitches
+				*iDestinationStitch = *stitchIt;
+				iDestinationStitch++;
 			}
 			stitchIt++;
 		}
-		auto endPoint = stitchIt;
-		StitchBuffer->erase(startPoint, endPoint);
+		StitchBuffer->erase(iDestinationStitch, StitchBuffer->end());
 	}
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 }
