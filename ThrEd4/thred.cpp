@@ -7909,33 +7909,26 @@ void thred::internal::delsfrms(uint32_t code) {
 				}
 			}
 			if (StateMap.test(StateFlag::DELTO)) {
-				auto validStitchCount = 0u;
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if (((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u) {
-						const auto iForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+				for (auto& stitch : *StitchBuffer) {
+					if ((stitch.attribute & ALTYPMSK) != 0u) {
+						const auto iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 						if (!formMap.test(iForm)) {
-							(*StitchBuffer)[validStitchCount].attribute = (*StitchBuffer)[iStitch].attribute &= NFRMSK;
-							(*StitchBuffer)[validStitchCount].attribute |= formIndices[iForm];
-							(*StitchBuffer)[validStitchCount].x   = (*StitchBuffer)[iStitch].x;
-							(*StitchBuffer)[validStitchCount++].y = (*StitchBuffer)[iStitch].y;
+							stitch.attribute &= NFRMSK;
+							stitch.attribute |= formIndices[iForm];
 						}
-					}
-					else {
-						(*StitchBuffer)[validStitchCount++] = (*StitchBuffer)[iStitch];
 					}
 				}
-				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(validStitchCount);
 			}
 			else {
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) {
-						const auto iForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+				for (auto& stitch : *StitchBuffer) {
+					if ((stitch.attribute & NOTFRM) == 0u) {
+						const auto iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 						if (formMap.test(iForm)) {
-							(*StitchBuffer)[iStitch].attribute &= (NFRMSK & NTYPMSK);
+							stitch.attribute &= (NFRMSK & NTYPMSK);
 						}
 						else {
-							(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute &= NFRMSK;
-							(*StitchBuffer)[iStitch].attribute |= formIndices[iForm];
+							stitch.attribute &= NFRMSK;
+							stitch.attribute |= formIndices[iForm];
 						}
 					}
 				}
