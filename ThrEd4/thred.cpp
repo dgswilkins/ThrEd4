@@ -7833,16 +7833,13 @@ GSL_SUPPRESS(26440) void thred::delfstchs() {
 
 void thred::internal::f1del() {
 	if (StateMap.test(StateFlag::DELTO)) {
-		auto cod         = gsl::narrow<uint32_t>(ClosestFormToCursor << FRMSHFT);
-		auto stitchCount = 0u;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (FRMSK | NOTFRM)) != cod) {
-				(*StitchBuffer)[stitchCount] = (*StitchBuffer)[iStitch];
-				stitchCount++;
-			}
-		}
-		StitchBuffer->resize(stitchCount);
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(stitchCount);
+		const auto codedForm = ClosestFormToCursor << FRMSHFT;
+		StitchBuffer->erase(
+			std::remove_if(StitchBuffer->begin(),
+				StitchBuffer->end(),
+				[codedForm](const fPOINTATTR& m) -> bool { return (m.attribute & FRMSK) == codedForm; }),
+			StitchBuffer->end());
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	}
 	clip::deleclp(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
