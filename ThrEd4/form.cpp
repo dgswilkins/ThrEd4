@@ -151,36 +151,19 @@ void form::delmfil() {
 	}
 	clip::delmclp(ClosestFormToCursor);
 	// find the first stitch to delete
-	const auto codedForm = ClosestFormToCursor << FRMSHFT;
-	auto       stitchIt  = StitchBuffer->begin();
-	auto       flag      = false;
-	while (stitchIt != StitchBuffer->end()) {
-		const auto& attribute = (*stitchIt).attribute;
-		if (((attribute & NOTFRM) == 0u) && ((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
-			flag = true;
-			break;
-		}
-		stitchIt++;
+	const auto codedForm   = ClosestFormToCursor << FRMSHFT;
+	auto       firstStitch = std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](const fPOINTATTR& m) -> bool {
+        return ((m.attribute & (FRMSK | NOTFRM)) == codedForm) && ((m.attribute & (TYPFRM | FTHMSK)) != 0u);
+    });
+	if (firstStitch != StitchBuffer->end()) {
+		// we found the first stitch, so now delete the stitches in the form
+		StitchBuffer->erase(
+		    std::remove_if(firstStitch,
+		                   StitchBuffer->end(),
+		                   [codedForm](const fPOINTATTR& m) -> bool { return (m.attribute & FRMSK) == codedForm; }),
+		    StitchBuffer->end());
 	}
-	if (flag) {
-		auto iDestinationStitch = stitchIt;               // we found the first stitch.
-		while (stitchIt != StitchBuffer->end()) { // Now find all stitches to delete
-			const auto& attribute = (*stitchIt).attribute;
-			if ((attribute & NOTFRM) == 0u) {
-				if (!((attribute & FRMSK) == codedForm) && ((attribute & (TYPFRM | FTHMSK)) != 0u)) {
-					*iDestinationStitch = *stitchIt; // keep all stitches that are not part of the current form
-					iDestinationStitch++;
-				}
-			}
-			else { // keep any non-form stitches
-				*iDestinationStitch = *stitchIt;
-				iDestinationStitch++;
-			}
-			stitchIt++;
-		}
-		StitchBuffer->erase(iDestinationStitch, StitchBuffer->end());
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
-	}
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::fsizpar() noexcept {
