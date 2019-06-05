@@ -7816,36 +7816,19 @@ void thred::internal::duclip() {
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void thred::delfstchs() {
 	const auto codedForm = ClosestFormToCursor << FRMSHFT;
-	auto       stitchIt  = StitchBuffer->begin();
-	auto       flag      = false;
 	// find the first stitch to delete
-	while (stitchIt != StitchBuffer->end()) {
-		const auto& attribute = (*stitchIt).attribute;
-		if (((attribute & NOTFRM) == 0u) && ((attribute & FRMSK) == codedForm)) {
-			flag = true;
-			break;
-		}
-		stitchIt++;
+	auto firstStitch = std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](const fPOINTATTR& m) -> bool {
+		return ((m.attribute & (FRMSK | NOTFRM)) == codedForm);
+	});
+	if (firstStitch != StitchBuffer->end()) {
+		// we found the first stitch, so now delete the stitches in the form
+		StitchBuffer->erase(
+		    std::remove_if(firstStitch,
+		                   StitchBuffer->end(),
+		                   [codedForm](const fPOINTATTR& m) -> bool { return (m.attribute & FRMSK) == codedForm; }),
+		    StitchBuffer->end());
 	}
-	if (flag) {
-		auto iDestinationStitch = stitchIt;       // we found the first stitch.
-		while (stitchIt != StitchBuffer->end()) { // Now find all stitches to delete
-			const auto& attribute = (*stitchIt).attribute;
-			if ((attribute & NOTFRM) != 0u) {
-				*iDestinationStitch = *stitchIt; // keep all stitches that are not part of a form
-				iDestinationStitch++;
-			}
-			else {
-				if ((attribute & FRMSK) != codedForm) {
-					*iDestinationStitch = *stitchIt; // keep all stitches that are not part of the current form
-					iDestinationStitch++;
-				}
-			}
-			stitchIt++;
-		}
-		StitchBuffer->erase(iDestinationStitch, StitchBuffer->end());
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
-	}
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void thred::internal::f1del() {
