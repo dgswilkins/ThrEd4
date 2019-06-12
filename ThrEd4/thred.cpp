@@ -12518,6 +12518,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		unlin();
 		ReleaseCapture();
 		StateMap.reset(StateFlag::CAPT);
+		thred::savdo();
 		thred::px2stch();
 		(*StitchBuffer)[ClosestPointIndex].x = SelectedPoint.x;
 		(*StitchBuffer)[ClosestPointIndex].y = SelectedPoint.y;
