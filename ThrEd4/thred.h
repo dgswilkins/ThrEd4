@@ -206,7 +206,7 @@ namespace internal {
 
 	void duver(const fs::path& name);
 	void duzero();
-	void endknt(uint32_t finish);
+	void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
 	void endpnt();
 
 	BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam);
@@ -286,10 +286,9 @@ namespace internal {
 	void     insflin(POINT insertPoint);
 	bool     iselpnt();
 	bool     isfclp();
-	bool     isknots();
 	void     istch();
 	bool     isthr(const wchar_t* filename);
-	uint32_t kjmp(uint32_t start);
+	uint32_t kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start);
 	void     knotmen();
 	void     ladj();
 	void     lenCalc();
@@ -345,7 +344,7 @@ namespace internal {
 
 	constexpr uint32_t nxtcrnr(uint32_t corner);
 
-	void ofstch(uint32_t iSource, char offset);
+	void ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset);
 	bool oldwnd(HWND window);
 	void ovrlay();
 	void patdun();
@@ -462,7 +461,7 @@ namespace internal {
 	void        stchout();
 	void        stchsnap(uint32_t start, uint32_t finish);
 	float       stlen(uint32_t iStitch);
-	void        strtknt(uint32_t start);
+	void        strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
 	void        tglhid();
 	void        thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
 	void        thrsav();
