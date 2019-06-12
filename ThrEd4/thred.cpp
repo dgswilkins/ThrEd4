@@ -2918,7 +2918,7 @@ void thred::internal::lenCalc() {
 				lenfn(GroupStartStitch, GroupEndStitch - 1u);
 			}
 			else {
-				lenfn(0, StitchBuffer->size() - 2u);
+				lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2u));
 			}
 		}
 		else {
@@ -4205,7 +4205,9 @@ void thred::internal::ritpesCode(std::vector<uint8_t>& buffer) {
 	const auto     oldSize      = buffer.size();
 	buffer.resize(oldSize + sizeof(uint16_t));
 	auto* contCode = convert_ptr<uint16_t*>(&buffer[oldSize]);
-	*contCode      = blockEndCode;
+	if (contCode != nullptr) {
+		*contCode = blockEndCode;
+	}
 }
 
 void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock) {
@@ -7064,7 +7066,7 @@ void thred::internal::rebox() {
 GSL_SUPPRESS(26440) void thred::delstchm() {
 	thred::rngadj();
 	auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
-	auto end   = std::next(StitchBuffer->begin(), GroupEndStitch + 1);
+	auto end   = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch + 1u));
 	StitchBuffer->erase(start, end);
 	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
