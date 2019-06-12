@@ -8342,6 +8342,7 @@ void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 	TextureIndex = 0;
 	FormList->clear();
+	StitchBuffer->clear();
 	PCSHeader.stitchCount = 0;
 	FormVertices->clear();
 	SatinGuides->clear();
@@ -8491,6 +8492,7 @@ void thred::internal::delet() {
 				}
 			}
 			else {
+				StitchBuffer->clear();
 				PCSHeader.stitchCount = 0;
 				StateMap.reset(StateFlag::SELBOX);
 			}
@@ -8586,6 +8588,7 @@ void thred::internal::delet() {
 				}
 			}
 			else {
+				StitchBuffer->clear();
 				PCSHeader.stitchCount = 0;
 				StateMap.reset(StateFlag::SELBOX);
 			}
