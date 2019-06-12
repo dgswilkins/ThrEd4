@@ -291,7 +291,7 @@ wchar_t                    ThumbnailSearchString[32];           // storage for t
 wchar_t                    InsertedFileName[_MAX_PATH] = { 0 }; // insert file name
 uint32_t                   InsertedVertexIndex;                 // saved float pointer for inserting files
 uint32_t                   InsertedFormIndex;                   // saved form pointer for inserting files
-uint32_t                   InsertedStitchCount;                 // saved stitch pointer for inserting files
+uint32_t                   InsertedStitchIndex;                 // saved stitch pointer for inserting files
 
 OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
@@ -8808,26 +8808,26 @@ uint32_t thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stit
 
 void thred::internal::insfil() {
 	auto file = OPENFILENAME {
-		sizeof(OPENFILENAME),                // lStructsize
-		ThrEdWindow,                         // hwndOwner
-		ThrEdInstance,                       // hInstance
-		L"THR files\0*.thr\0\0",             // lpstrFilter
-		&CustomFilter[0],                    // lpstrCustomFilter
-		_MAX_PATH,                           // nMaxCustFilter
-		0,                                   // nFilterIndex
-		&InsertedFileName[0],                // lpstrFile
-		_MAX_PATH,                           // nMaxFile
-		nullptr,                             // lpstrFileTitle
-		0,                                   // nMaxFileTitle
-		DefaultDirectory->wstring().c_str(), // lpstr	ialDir
-		nullptr,                             // lpstrTitle
-		OFN_EXPLORER | OFN_OVERWRITEPROMPT,  // NOLINT Flags
-		0,                                   // nFileOffset
-		0,                                   // nFileExtension
-		L"thr",                              // lpstrDefExt
-		0,                                   // lCustData
-		nullptr,                             // lpfnHook
-		nullptr,                             // lpTemplateName
+		sizeof(OPENFILENAME),                             // lStructsize
+		ThrEdWindow,                                      // hwndOwner
+		ThrEdInstance,                                    // hInstance
+		L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0", // lpstrFilter
+		&CustomFilter[0],                                 // lpstrCustomFilter
+		_MAX_PATH,                                        // nMaxCustFilter
+		0,                                                // nFilterIndex
+		&InsertedFileName[0],                             // lpstrFile
+		_MAX_PATH,                                        // nMaxFile
+		nullptr,                                          // lpstrFileTitle
+		0,                                                // nMaxFileTitle
+		DefaultDirectory->wstring().c_str(),              // lpstr	ialDir
+		nullptr,                                          // lpstrTitle
+		OFN_EXPLORER | OFN_OVERWRITEPROMPT,               // NOLINT Flags
+		0,                                                // nFileOffset
+		0,                                                // nFileExtension
+		L"thr",                                           // lpstrDefExt
+		0,                                                // lCustData
+		nullptr,                                          // lpfnHook
+		nullptr,                                          // lpTemplateName
 	};
 
 	if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
@@ -8839,7 +8839,7 @@ void thred::internal::insfil() {
 			CloseHandle(InsertedFileHandle);
 		}
 		else {
-			InsertedStitchCount = PCSHeader.stitchCount;
+			InsertedStitchIndex = StitchBuffer->size();
 			if (isthr(&InsertedFileName[0])) {
 				auto fileHeader = STRHED {};
 				ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
@@ -8855,11 +8855,11 @@ void thred::internal::insfil() {
 					auto           thredHeader = STREX {};
 					const auto     version     = (fileHeader.headerType & 0xff000000) >> 24u;
 					if (version != 0u) {
-						gethand(*StitchBuffer, PCSHeader.stitchCount);
+						gethand(*StitchBuffer, StitchBuffer->size());
 						// ToDo - replace constants with sizes of data structures?
 						homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW
-						          + gethand(*StitchBuffer, PCSHeader.stitchCount) * HANDW
-						          + gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW + PCSHeader.stitchCount * STCHW;
+						          + gethand(*StitchBuffer, StitchBuffer->size()) * HANDW
+						          + gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW + StitchBuffer->size() * STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
 					thred::savdo();
@@ -9086,67 +9086,75 @@ void thred::internal::insfil() {
 				auto pcsFileHeader = PCSHEADER {};
 				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
-					thred::savdo();
 					auto pcsStitchBuffer = std::vector<PCSTCH> {};
 					pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
-					ReadFile(InsertedFileHandle,
-					         pcsStitchBuffer.data(),
-					         pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())),
-					         &BytesRead,
-					         nullptr);
-					auto iStitch      = PCSHeader.stitchCount;
-					auto newAttribute = 0u;
-					auto iPCSStitch   = 0u;
-					for (iPCSStitch = 0u; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
-						if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-							newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
-						}
-						else {
-							(*StitchBuffer)[iStitch++]
-							    = fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
-								                   + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								               gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
-								                   + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
-								               newAttribute };
-						}
+					auto bytesToRead = gsl::narrow<DWORD>(pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())));
+					ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), bytesToRead, &BytesRead, nullptr);
+					if (BytesRead != bytesToRead) {
+						// pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
+						// StateMap.set(StateFlag::BADFIL);
+						prtred();
+						return;
 					}
-					const auto newStitchCount = iStitch;
-					iStitch                   = PCSHeader.stitchCount;
-					auto insertedRectangle    = fRECTANGLE { (*StitchBuffer)[iPCSStitch].x,
-                                                          (*StitchBuffer)[iPCSStitch].y,
-                                                          (*StitchBuffer)[iPCSStitch].x,
-                                                          (*StitchBuffer)[iPCSStitch].y };
-					iPCSStitch++;
-					while (iStitch < newStitchCount) {
-						if ((*StitchBuffer)[iStitch].x < insertedRectangle.left) {
-							insertedRectangle.left = (*StitchBuffer)[iStitch].x;
+					else {
+						thred::savdo();
+						auto insertIndex = StitchBuffer->size();
+						StitchBuffer->reserve(StitchBuffer->size() + pcsFileHeader.stitchCount);
+						auto newAttribute = 0u;
+						for (auto iPCSStitch = 0u; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
+							if (pcsStitchBuffer[iPCSStitch].tag == 3) {
+								newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
+							}
+							else {
+								(*StitchBuffer)
+								    .push_back(
+								        fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
+								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
+								                     gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
+								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+								                     newAttribute });
+							}
 						}
-						if ((*StitchBuffer)[iStitch].x > insertedRectangle.right) {
-							insertedRectangle.right = (*StitchBuffer)[iStitch].x;
+						const auto newStitchCount    = StitchBuffer->size();
+						auto       insertedRectangle = fRECTANGLE { (*StitchBuffer)[insertIndex].x,
+                                                              (*StitchBuffer)[insertIndex].y,
+                                                              (*StitchBuffer)[insertIndex].x,
+                                                              (*StitchBuffer)[insertIndex].y };
+						for (; insertIndex < newStitchCount; insertIndex++) {
+							auto& stitch = (*StitchBuffer)[insertIndex];
+							if (stitch.x < insertedRectangle.left) {
+								insertedRectangle.left = stitch.x;
+							}
+							if (stitch.x > insertedRectangle.right) {
+								insertedRectangle.right = stitch.x;
+							}
+							if (stitch.y < insertedRectangle.bottom) {
+								insertedRectangle.bottom = stitch.y;
+							}
+							if (stitch.y > insertedRectangle.top) {
+								insertedRectangle.top = stitch.y;
+							}
 						}
-						if ((*StitchBuffer)[iStitch].y < insertedRectangle.bottom) {
-							insertedRectangle.bottom = (*StitchBuffer)[iStitch].y;
-						}
-						if ((*StitchBuffer)[iStitch].y > insertedRectangle.top) {
-							insertedRectangle.top = (*StitchBuffer)[iStitch].y;
-						}
-						iStitch++;
+						InsertCenter            = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
+                                                form::midl(insertedRectangle.top, insertedRectangle.bottom) };
+						PCSHeader.stitchCount   = gsl::narrow<decltype(PCSHeader.stitchCount)>(newStitchCount);
+						const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
+							                               insertedRectangle.top - insertedRectangle.bottom };
+						form::ratsr();
+						InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
+						// ToDo - Should this be vertical ratio?
+						InsertSize.y = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
+						const auto initialInsertPoint
+						    = POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
+						insflin(initialInsertPoint);
+						NewFormVertexCount = 5;
+						StateMap.set(StateFlag::SHOFRM);
+						StateMap.set(StateFlag::INSFIL);
+						form::dufrm();
+						// We did not insert forms so insure that duinsfil does not move forms
+						InsertedFormIndex   = FormList->size();
+						InsertedVertexIndex = FormVertices->size();
 					}
-					InsertCenter            = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
-                                            form::midl(insertedRectangle.top, insertedRectangle.bottom) };
-					PCSHeader.stitchCount   = newStitchCount;
-					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
-						                               insertedRectangle.top - insertedRectangle.bottom };
-					form::ratsr();
-					InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
-					// ToDo - Should this be vertical ratio?
-					InsertSize.y                  = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
-					const auto initialInsertPoint = POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
-					insflin(initialInsertPoint);
-					NewFormVertexCount = 5;
-					StateMap.set(StateFlag::SHOFRM);
-					StateMap.set(StateFlag::INSFIL);
-					form::dufrm();
 				}
 			}
 			if (InsertedFileHandle != nullptr) {
@@ -10393,7 +10401,7 @@ void thred::internal::duinsfil() {
 		(*FormVertices)[iVertex].x += offset.x;
 		(*FormVertices)[iVertex].y += offset.y;
 	}
-	for (auto iStitch = InsertedStitchCount; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = InsertedStitchIndex; iStitch < StitchBuffer->size(); iStitch++) {
 		(*StitchBuffer)[iStitch].x += offset.x;
 		(*StitchBuffer)[iStitch].y += offset.y;
 	}
