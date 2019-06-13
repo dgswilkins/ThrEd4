@@ -1060,7 +1060,7 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
 		if (direction) {
-			currentStitch = &(*StitchBuffer)[pRecs[currentRegion]->finish];
+			currentStitch = &(*StitchBuffer)[pRecs[currentRegion]->finish - 1u];
 		}
 		else {
 			currentStitch = &(*StitchBuffer)[pRecs[currentRegion]->start];
