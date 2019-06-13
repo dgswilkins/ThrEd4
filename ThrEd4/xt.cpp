@@ -1185,7 +1185,7 @@ void xt::fsort() {
 			ColorOrder[iColor] = iColor + 1u;
 		}
 	}
-	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 1u; iStitch < StitchBuffer->size(); iStitch++) {
 		if (((*StitchBuffer)[iStitch].attribute & SRTMSK) != attribute) {
 			stitchRegion.back().finish    = iStitch;
 			stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1u];
@@ -1195,8 +1195,8 @@ void xt::fsort() {
 			attribute                       = (*StitchBuffer)[iStitch].attribute & SRTMSK;
 		}
 	}
-	stitchRegion.back().finish    = PCSHeader.stitchCount;
-	stitchRegion.back().endStitch = &(*StitchBuffer)[PCSHeader.stitchCount - 1u];
+	stitchRegion.back().finish    = StitchBuffer->size();
+	stitchRegion.back().endStitch = &(*StitchBuffer)[StitchBuffer->size() - 1u];
 	const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
 	auto       pRecs              = std::vector<OREC*> {};
 	pRecs.reserve(lastRegion);
@@ -1245,7 +1245,7 @@ void xt::fsort() {
 		stitchRange[iRange].finish  = lastRegion;
 		const auto lastRange        = ++iRange;
 		auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
-		tempStitchBuffer.resize(PCSHeader.stitchCount);
+		tempStitchBuffer.resize(StitchBuffer->size());
 		OutputIndex = 0;
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
