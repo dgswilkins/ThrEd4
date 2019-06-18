@@ -1582,10 +1582,6 @@ void thred::rngadj() noexcept {
 	}
 }
 
-void thred::mvstch(uint32_t destination, uint32_t source) {
-	(*StitchBuffer)[destination] = (*StitchBuffer)[source];
-}
-
 void thred::internal::box(uint32_t iNearest, HDC dc) noexcept {
 	const auto boxWidth = BoxOffset[iNearest];
 	POINT      line[5]  = {};
@@ -2974,7 +2970,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 					if (((*StitchBuffer)[iStitch].attribute & KNOTMSK) != 0u) {          // is this a knot?
 						prevPoint = (*StitchBuffer)[iOutputStitch];
-						thred::mvstch(iOutputStitch, iStitch);
+						(*StitchBuffer)[iOutputStitch] = (*StitchBuffer)[iStitch];
 						iOutputStitch++;
 					}
 					else {
@@ -2982,8 +2978,8 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 						    = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
 						stitchSize = hypot(delta.x, delta.y);
 						if (stitchSize > SmallStitchLength) {
-							thred::mvstch(iOutputStitch, iStitch);
-							prevPoint = (*StitchBuffer)[iStitch];
+							(*StitchBuffer)[iOutputStitch] = (*StitchBuffer)[iStitch];
+							prevPoint                      = (*StitchBuffer)[iStitch];
 							iOutputStitch++;
 						}
 						else {
@@ -3010,20 +3006,20 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		for (auto iStitch = iNextStitch; iStitch < endStitch; iStitch++) {
 			if (((*StitchBuffer)[iNextStitch].attribute & KNOTMSK) != 0u) {
 				prevPoint = (*StitchBuffer)[iNextStitch];
-				thred::mvstch(iNextStitch++, iStitch);
+				(*StitchBuffer)[iNextStitch++] = (*StitchBuffer)[iStitch];
 			}
 			else {
 				const auto delta = fPOINT { (*StitchBuffer)[iStitch].x - prevPoint.x, (*StitchBuffer)[iStitch].y - prevPoint.y };
 				stitchSize       = hypot(delta.x, delta.y);
 				if (stitchSize > SmallStitchLength) {
-					thred::mvstch(iNextStitch++, iStitch);
+					(*StitchBuffer)[iNextStitch++] = (*StitchBuffer)[iStitch];
 					prevPoint = (*StitchBuffer)[iStitch];
 				}
 			}
 		}
 
 		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-			thred::mvstch(iNextStitch++, iStitch);
+			(*StitchBuffer)[iNextStitch++] = (*StitchBuffer)[iStitch];
 		}
 		StitchBuffer->resize(iNextStitch);
 		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iNextStitch);
