@@ -1049,7 +1049,7 @@ bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
 }
 
 double
-xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
+xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
 	auto currentRegion = sortRecord.currentRegion;
 	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
@@ -1090,19 +1090,19 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 			if (direction) {
 				if (pRecs[currentRegion]->start != 0u) {
 					for (auto iRegion = pRecs[currentRegion]->finish - 1u; iRegion >= pRecs[currentRegion]->start; iRegion--) {
-						tempStitchBuffer[OutputIndex++] = (*StitchBuffer)[iRegion];
+						stitchBuffer.push_back((*StitchBuffer)[iRegion]);
 					}
 				}
 				else {
 					auto iRegion = pRecs[currentRegion]->finish;
 					while (iRegion != 0u) {
-						tempStitchBuffer[OutputIndex++] = (*StitchBuffer)[--iRegion];
+						stitchBuffer.push_back((*StitchBuffer)[--iRegion]);
 					}
 				}
 			}
 			else {
 				for (auto iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++) {
-					tempStitchBuffer[OutputIndex++] = (*StitchBuffer)[iRegion];
+					stitchBuffer.push_back((*StitchBuffer)[iRegion]);
 				}
 			}
 		}
@@ -1110,12 +1110,12 @@ xt::internal::precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vec
 	return totalJumps;
 }
 
-uint32_t xt::internal::duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
+uint32_t xt::internal::duprecs(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
 	sortRecord.direction = false;
-	const auto jumps0    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
+	const auto jumps0    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
 
 	sortRecord.direction = true;
-	const auto jumps1    = wrap::round<uint32_t>(precjmps(tempStitchBuffer, pRecs, sortRecord));
+	const auto jumps1    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
 
 	if (jumps0 < jumps1) {
 		sortRecord.direction = false;
@@ -1245,8 +1245,7 @@ void xt::fsort() {
 		stitchRange[iRange].finish  = lastRegion;
 		const auto lastRange        = ++iRange;
 		auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
-		tempStitchBuffer.resize(StitchBuffer->size());
-		OutputIndex = 0;
+		tempStitchBuffer.reserve(StitchBuffer->size());
 		for (iRange = 0; iRange < lastRange; iRange++) {
 			StateMap.reset(StateFlag::DUSRT);
 			auto sortRecord   = SRTREC {};
@@ -1281,8 +1280,9 @@ void xt::fsort() {
 			sortRecord.direction     = (minimumDirection != 0u);
 			xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
 		}
-		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cbegin() + OutputIndex, StitchBuffer->begin());
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(OutputIndex);
+		StitchBuffer->resize(tempStitchBuffer.size());
+		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cend(), StitchBuffer->begin());
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
