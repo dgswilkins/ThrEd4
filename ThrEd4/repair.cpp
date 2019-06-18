@@ -73,7 +73,7 @@ void repair::lodchk() {
 		}
 	}
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 		const auto attribute = (*StitchBuffer)[iStitch].attribute;
 		if ((attribute & TYPMSK) == TYPFRM) {
 			const auto tform = (attribute & FRMSK) >> FRMSHFT;
@@ -93,7 +93,7 @@ void repair::lodchk() {
 		}
 	}
 	formMap.reset();
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+	for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 		const auto attribute = (*StitchBuffer)[iStitch].attribute;
 		if ((attribute & TYPBRD) != 0u) {
 			formMap.set((attribute & FRMSK) >> FRMSHFT);

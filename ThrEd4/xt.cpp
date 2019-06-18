@@ -609,17 +609,18 @@ std::vector<fPOINT>& xt::insid() {
 #pragma warning(pop)
 
 void xt::internal::delwlk(uint32_t code) {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		auto highStitchBuffer = std::vector<fPOINTATTR> {};
-		highStitchBuffer.reserve(PCSHeader.stitchCount);
+		highStitchBuffer.reserve(StitchBuffer->size());
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
 			if (((*StitchBuffer)[iStitch].attribute & WLKFMSK) != code) {
 				highStitchBuffer.push_back((*StitchBuffer)[iStitch]);
 			}
 		}
-		if (highStitchBuffer.size() != PCSHeader.stitchCount) {
+		if (highStitchBuffer.size() != StitchBuffer->size()) {
+			StitchBuffer->resize(highStitchBuffer.size());
 			std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
-			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(highStitchBuffer.size());
+			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		}
 	}
 }
@@ -1689,7 +1690,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		}
 		xi::chkend(*StitchBuffer, code, ilData);
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(StitchBuffer->size());
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	thred::coltab();
 }
 
