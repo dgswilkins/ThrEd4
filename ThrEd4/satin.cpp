@@ -666,7 +666,7 @@ void satin::satbrd() {
 			si::satsbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(PCSHeader.stitchCount);
+			thred::ritot(StitchBuffer->size());
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}

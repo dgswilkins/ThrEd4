@@ -3026,7 +3026,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		thred::coltab();
 	}
 	rstAll();
-	thred::ritot(PCSHeader.stitchCount);
+	thred::ritot(StitchBuffer->size());
 	lenCalc();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -6141,7 +6141,7 @@ void thred::internal::nuFil() {
 				UserBMPFileName->assign(BMPfileName);
 				bfil();
 			}
-			thred::ritot(PCSHeader.stitchCount);
+			thred::ritot(StitchBuffer->size());
 			// BufferIndex     = 0;
 			ZoomRect     = fRECTANGLE { 0.0f, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0f };
 			UnzoomedRect = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
@@ -8181,7 +8181,7 @@ void thred::internal::setknots() {
 		chkncol();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
-		thred::ritot(PCSHeader.stitchCount);
+		thred::ritot(StitchBuffer->size());
 	}
 }
 
@@ -14519,7 +14519,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				StateMap.set(StateFlag::BAKEND);
 			}
 		}
-		thred::ritot(PCSHeader.stitchCount);
+		thred::ritot(StitchBuffer->size());
 		StateMap.set(StateFlag::BOXSLCT);
 		StateMap.set(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::NOSEL);
@@ -18751,7 +18751,7 @@ void thred::internal::drwStch() {
 	if (StateMap.test(StateFlag::SELBOX)) {
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 	}
-	thred::ritot(PCSHeader.stitchCount);
+	thred::ritot(StitchBuffer->size());
 	if (StateMap.test(StateFlag::INIT)) {
 		lenCalc();
 	}
