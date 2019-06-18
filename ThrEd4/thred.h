@@ -273,7 +273,7 @@ namespace internal {
 
 	void     ilin() noexcept;
 	void     ilin1() noexcept;
-	void     infadj(float* xCoordinate, float* yCoordinate) noexcept;
+	void     infadj(float& xCoordinate, float& yCoordinate) noexcept;
 	void     init();
 	bool     inrng(uint32_t stitch);
 	void     insadj();

@@ -1345,7 +1345,7 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 			currentColor = 0xffffffff;
 			const auto range
 			    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+			for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 				auto* Stitch = &(*StitchBuffer)[iStitch];
 				if (Stitch->x < range.left) {
 					Stitch->x = range.left;
@@ -1404,7 +1404,7 @@ void thred::internal::dudat() {
 	const auto&    formList  = *FormList;
 	const auto     formCount = wrap::toUnsigned(formList.size());
 	constexpr auto formSize  = sizeof(decltype(formList.back()));
-	const auto size = sizeof(BAKHED) + formSize * formList.size() + sizeof(decltype(StitchBuffer->back())) * PCSHeader.stitchCount
+	const auto size = sizeof(BAKHED) + formSize * formList.size() + sizeof(decltype(StitchBuffer->back())) * StitchBuffer->size()
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
 	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
@@ -1776,10 +1776,10 @@ double thred::internal::pxchk(double pixelSize) noexcept {
 }
 
 void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		rectangle.bottom = rectangle.top = stitches[0].y;
 		rectangle.left = rectangle.right = stitches[0].x;
-		for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 1u; iStitch < StitchBuffer->size(); iStitch++) {
 			if (stitches[iStitch].x < rectangle.left) {
 				rectangle.left = stitches[iStitch].x;
 			}
@@ -1972,7 +1972,7 @@ void thred::internal::hupfn() {
 			}
 		}
 	}
-	if ((PCSHeader.stitchCount != 0u) || !FormVertices->empty() || StateMap.test(StateFlag::HUPEX)) {
+	if (!StitchBuffer->empty() || !FormVertices->empty() || StateMap.test(StateFlag::HUPEX)) {
 		if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX || checkHoopRect.bottom < 0
 		    || checkHoopRect.top > IniFile.hoopSizeY) {
 			StateMap.set(StateFlag::HUPEX);
@@ -1990,7 +1990,7 @@ void thred::internal::hupfn() {
 			const auto designCenter = fPOINT { hoopSize.x / 2.0f + checkHoopRect.left, hoopSize.y / 2.0f + checkHoopRect.bottom };
 			const auto hoopCenter   = fPOINT { IniFile.hoopSizeX / 2.0f, IniFile.hoopSizeY / 2.0f };
 			const auto delta        = fPOINT { hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y };
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+			for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 				(*StitchBuffer)[iStitch].x += delta.x;
 				(*StitchBuffer)[iStitch].y += delta.y;
 			}
@@ -3022,7 +3022,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			(*StitchBuffer)[iNextStitch++] = (*StitchBuffer)[iStitch];
 		}
 		StitchBuffer->resize(iNextStitch);
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iNextStitch);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 	}
 	rstAll();
@@ -3586,8 +3586,8 @@ uint32_t thred::internal::colmatch(COLORREF color) {
 void thred::internal::redbal() {
 	auto balaradHeader = BALHED {};
 
-	PCSHeader.stitchCount = 0u;
 	StitchBuffer->clear();
+	PCSHeader.stitchCount = 0u;
 	FormList->clear();
 
 	auto balaradFile = CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -5056,7 +5056,7 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 void thred::internal::delstch1(uint32_t iStitch) {
 	if (!StitchBuffer->empty()) {
 		StitchBuffer->erase(std::next(StitchBuffer->begin(), iStitch));
-		PCSHeader.stitchCount--;
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size()) - 1u) {
 			ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size()) - 1u;
 		}
@@ -6159,7 +6159,7 @@ void thred::internal::nuFil() {
 				thred::redraw(iColor);
 			}
 			thred::redraw(ColorBar);
-			if (PCSHeader.stitchCount != 0u) {
+			if (!StitchBuffer->empty()) {
 				StateMap.set(StateFlag::INIT);
 			}
 			nuAct(0);
@@ -6168,7 +6168,7 @@ void thred::internal::nuFil() {
 			ritini();
 			const auto blank = std::wstring {};
 			displayText::butxt(HNUM, blank);
-			if (PCSHeader.stitchCount != 0u) {
+			if (!StitchBuffer->empty()) {
 				nuAct((*StitchBuffer)[0].attribute & COLMSK);
 			}
 			else {
@@ -9062,7 +9062,7 @@ void thred::internal::insfil() {
 						                    form::midl(insertedRectangle.top, insertedRectangle.bottom) };
 					auto dest    = std::next(StitchBuffer->begin(), PCSHeader.stitchCount);
 					StitchBuffer->insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
-					PCSHeader.stitchCount += fileHeader.stitchCount;
+					PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 						                               insertedRectangle.top - insertedRectangle.bottom };
 					form::ratsr();
@@ -9377,37 +9377,35 @@ void thred::internal::mv2b() {
 	}
 }
 
-void thred::internal::infadj(float* xCoordinate, float* yCoordinate) noexcept {
-	if ((xCoordinate != nullptr) && (yCoordinate != nullptr)) {
-		if (_finite(*xCoordinate) == 0) {
-			if (*xCoordinate > UnzoomedRect.x) {
-				*xCoordinate = UnzoomedRect.x;
+void thred::internal::infadj(float& xCoordinate, float& yCoordinate) noexcept {
+		if (isfinite(xCoordinate)) {
+			if (xCoordinate > UnzoomedRect.x) {
+				xCoordinate = UnzoomedRect.x;
 			}
 			else {
-				if (*xCoordinate < 0) {
-					*xCoordinate = 0;
+				if (xCoordinate < 0) {
+					xCoordinate = 0;
 				}
 			}
 		}
-		if (_finite(*yCoordinate) == 0) {
-			if (*yCoordinate > UnzoomedRect.y) {
-				*yCoordinate = UnzoomedRect.y;
+		if (isfinite(yCoordinate)) {
+			if (yCoordinate > UnzoomedRect.y) {
+				yCoordinate = UnzoomedRect.y;
 			}
 			else {
-				if (*yCoordinate < 0) {
-					*yCoordinate = 0;
+				if (yCoordinate < 0) {
+					yCoordinate = 0;
 				}
 			}
 		}
-	}
 }
 
 void thred::delinf() {
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		thi::infadj(&(*StitchBuffer)[iStitch].x, &(*StitchBuffer)[iStitch].y);
+	for (auto& iStitch : *StitchBuffer) {
+		thi::infadj(iStitch.x, iStitch.y);
 	}
 	for (auto& FormVertice : *FormVertices) {
-		thi::infadj(&FormVertice.x, &FormVertice.y);
+		thi::infadj(FormVertice.x, FormVertice.y);
 	}
 }
 
@@ -9418,7 +9416,7 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 	range.y = gsl::narrow<double>(UnzoomedRect.y);
 	if (!FormList->empty()) {
 		auto stitchCount = 0u;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) != 0u)
 			    || ((((*StitchBuffer)[iStitch].attribute & TYPMSK) != 0u)
 			        && (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT < FormList->size()))) {
@@ -9438,7 +9436,7 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 				stitchCount++;
 			}
 		}
-		PCSHeader.stitchCount = gsl::narrow<uint16_t>(stitchCount);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(stitchCount);
 	}
 	else {
 		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
@@ -9703,7 +9701,8 @@ void thred::internal::delfre() {
 			(*StitchBuffer)[currentStitchCount++] = (*StitchBuffer)[iStitch];
 		}
 	}
-	PCSHeader.stitchCount = gsl::narrow<uint16_t>(currentStitchCount);
+	StitchBuffer->resize(currentStitchCount);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -11091,7 +11090,7 @@ void thred::internal::retrac() {
 		auto       startPoint  = std::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
 		auto       endPoint    = std::next(startPoint, count);
 		StitchBuffer->insert(insertPoint, startPoint, endPoint);
-		PCSHeader.stitchCount += gsl::narrow<decltype(PCSHeader.stitchCount)>(count);
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -14390,7 +14389,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 						stch2px1(iStitch);
 						InsertLine[0] = StitchCoordinatesPixels;
 						InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-						PCSHeader.stitchCount++;
+						PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 						return true;
@@ -14402,7 +14401,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					stch2px1(0);
 					InsertLine[0] = StitchCoordinatesPixels;
 					InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-					PCSHeader.stitchCount++;
+					PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 					return true;
@@ -14418,7 +14417,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				}
 				ClosestPointIndex++;
 				StitchBuffer->insert(std::next(StitchBuffer->begin(), ClosestPointIndex), fPOINTATTR{ SelectedPoint.x, SelectedPoint.y, code });
-				PCSHeader.stitchCount++;
+				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 				xlin();
 				InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 				stch2px1(ClosestPointIndex);
@@ -14506,7 +14505,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				InsertLine[0] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 				InsertLine[1] = InsertLine[0];
 				StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM });
-				PCSHeader.stitchCount           = 1;
+				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 				ColorChanges                    = 1;
 				ColorChangeTable[0].colorIndex  = gsl::narrow<uint16_t>(ActiveColor);
 				ColorChangeTable[0].stitchIndex = 0;
