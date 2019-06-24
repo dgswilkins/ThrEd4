@@ -7679,11 +7679,10 @@ void form::fcntr() {
 			}
 			form::frmout(selectedForm);
 			auto codedForm = (selectedForm << FRMSHFT);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == codedForm
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].x += delta.x;
-					(*StitchBuffer)[iStitch].y += delta.y;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) == codedForm && ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.x += delta.x;
+					stitch.y += delta.y;
 				}
 			}
 		}
