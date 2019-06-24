@@ -4351,22 +4351,21 @@ void thred::internal::sav() {
 	if (chkattr(*AuxName)) {
 		return;
 	}
-	if (PCSHeader.stitchCount == 0u) {
+	if (StitchBuffer->empty()) {
 		return;
 	}
 	chk1col();
 	thred::coltab();
 	auto saveStitches = std::vector<fPOINTATTR> {};
-	saveStitches.resize(PCSHeader.stitchCount);
+	saveStitches.resize(StitchBuffer->size());
 	if (UserFlagMap.test(UserFlag::ROTAUX)) {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			saveStitches[iStitch] = (*StitchBuffer)[iStitch];
+		auto iDest = saveStitches.begin();
+		for (auto stitch : *StitchBuffer) {
+			*iDest++ = fPOINTATTR{ stitch.y, stitch.x, stitch.attribute };
 		}
 	}
 	else {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			saveStitches[iStitch] = (*StitchBuffer)[iStitch];
-		}
+		std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
 	}
 	PCSFileHandle
 	    = CreateFile(AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
@@ -4378,7 +4377,7 @@ void thred::internal::sav() {
 		auto flag       = true;
 		auto DSTRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
-		DSTRecords.reserve(wrap::toSize(PCSHeader.stitchCount) + 128u);
+		DSTRecords.reserve(StitchBuffer->size() + 128u);
 		auto        DSTOffsetData   = DSTOffsets {};
 		auto        PCSStitchBuffer = std::vector<PCSTCH> {};
 		auto        auxName         = utf::Utf16ToUtf8(*AuxName);
@@ -4468,8 +4467,8 @@ void thred::internal::sav() {
 			pesHeader.ysiz          = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0f / 3.0f));
 			OutputIndex             = 0;
 			auto pesBuffer          = std::vector<uint8_t> {};
-			// make a reasonable guess for the size of data in the PES buffer. err on the side of caution
-			const auto pesSize = sizeof(PESSTCHLST) + PCSHeader.stitchCount * sizeof(PESTCH) + 1000u;
+			// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
+			const auto pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000u;
 			pesBuffer.reserve(pesSize);
 			auto threadList = std::vector<PESCOLORLIST> {};
 			auto blockIndex = gsl::narrow_cast<uint16_t>(0u); // Index into the stitch blocks
@@ -4499,7 +4498,7 @@ void thred::internal::sav() {
 			ritpesBlock(pesBuffer, PESSTCHLST { 0, PESequivColors[stitchColor], 0 });
 			blockIndex++;
 			OutputIndex = 0;
-			for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
+			for (auto iStitch = 1u; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 				if (stitchColor == ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
 					// we are in the same color block, so write the stitch
 					ritpes(pesBuffer, saveStitches[iStitch]);
@@ -4550,7 +4549,7 @@ void thred::internal::sav() {
 			pesHeader.bcnt    = pesThreadCount;
 			pesHeader.hpsz    = 0;
 			GroupStartStitch  = 0;
-			GroupEndStitch    = PCSHeader.stitchCount - 1u;
+			GroupEndStitch    = gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size() - 1u);
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr);
 			WriteFile(PCSFileHandle, pesBuffer.data(), wrap::toUnsigned(pesBuffer.size()), &bytesWritten, nullptr);
@@ -4559,8 +4558,8 @@ void thred::internal::sav() {
 			auto pecBuffer = std::vector<uint8_t> {};
 			// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates are 2 bytes
 			// and pad by 1000 to account for jumps. Also reserve memory for thumbnails
-			const auto pecSize = gsl::narrow_cast<uint32_t>(sizeof(PECHDR)) + gsl::narrow_cast<uint32_t>(sizeof(PECHDR2))
-			                     + PCSHeader.stitchCount * 2 + 1000 + (pesThreadCount + 1u) * ThumbHeight * (ThumbWidth / 8);
+			const auto pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + StitchBuffer->size() * 2 + 1000
+				+ (wrap::toSize(pesThreadCount) + 1u) * ThumbHeight * (ThumbWidth / 8);
 			pecBuffer.reserve(pecSize);
 			pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 			auto*      pecHeader = convert_ptr<PECHDR*>(&pecBuffer[0]);
@@ -4613,18 +4612,18 @@ void thred::internal::sav() {
 				}
 				auto iPCSstitch = 0u;
 				auto savcol     = 0xffu;
-				PCSStitchBuffer.resize(wrap::toSize(PCSHeader.stitchCount) + ColorChanges + 2u);
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if ((saveStitches[iStitch].attribute & COLMSK) != savcol) {
-						savcol                           = saveStitches[iStitch].attribute & COLMSK;
+				PCSStitchBuffer.resize(StitchBuffer->size() + ColorChanges + 2u);
+				for (auto& stitch : saveStitches) {
+					if ((stitch.attribute & COLMSK) != savcol) {
+						savcol                           = stitch.attribute & COLMSK;
 						PCSStitchBuffer[iPCSstitch].tag  = 3;
 						PCSStitchBuffer[iPCSstitch++].fx = gsl::narrow<uint8_t>(savcol);
 					}
 					auto integerPart                = 0.0;
-					auto fractionalPart             = std::modf(saveStitches[iStitch].x, &integerPart);
+					auto fractionalPart             = std::modf(stitch.x, &integerPart);
 					PCSStitchBuffer[iPCSstitch].fx  = wrap::floor<uint8_t>(fractionalPart * 256.0);
 					PCSStitchBuffer[iPCSstitch].x   = gsl::narrow<int16_t>(integerPart);
-					fractionalPart                  = std::modf(saveStitches[iStitch].y, &integerPart);
+					fractionalPart                  = std::modf(stitch.y, &integerPart);
 					PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<uint8_t>(fractionalPart * 256.0);
 					PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<int16_t>(integerPart);
 				}
