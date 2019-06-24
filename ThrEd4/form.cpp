@@ -4996,9 +4996,8 @@ void form::refilfn() {
 void form::refil() {
 	if (!UserFlagMap.test(UserFlag::WRNOF)) {
 		const auto codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
-		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto attribute = (*StitchBuffer)[iStitch].attribute;
-			if (((attribute & NOTFRM) == 0u) && (attribute & (USMSK | FRMSK)) == codedForm) {
+		for (auto stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet != nullptr) {
 					StateMap.set(StateFlag::WASFRMFRM);
 				}
