@@ -6522,20 +6522,22 @@ bool thred::internal::closPnt1(uint32_t* closestStitch) {
 			}
 		}
 		else {
-			for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-				const auto layer = ((*StitchBuffer)[iStitch].attribute & LAYMSK) >> LAYSHFT;
+			auto currentStitch = 0u;
+			for (auto& stitch : *StitchBuffer) {
+				const auto layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
 				if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
-					if ((*StitchBuffer)[iStitch].x >= ZoomRect.left && (*StitchBuffer)[iStitch].x <= ZoomRect.right
-					    && (*StitchBuffer)[iStitch].y >= ZoomRect.bottom && (*StitchBuffer)[iStitch].y <= ZoomRect.top) {
-						const auto cx   = (*StitchBuffer)[iStitch].x - SelectedPoint.x;
-						const auto cy   = (*StitchBuffer)[iStitch].y - SelectedPoint.y;
+					if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right
+						&& stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
+						const auto cx   = stitch.x - SelectedPoint.x;
+						const auto cy   = stitch.y - SelectedPoint.y;
 						currentDistance = hypot(cx, cy);
 						if (currentDistance < DistanceToClick) {
 							DistanceToClick = currentDistance;
-							closestIndex    = iStitch;
+							closestIndex    = currentStitch;
 						}
 					}
 				}
+				currentStitch++;
 			}
 		}
 		if (DistanceToClick == 1e99) {
@@ -6583,8 +6585,8 @@ void thred::internal::toglup() {
 			if (!StateMap.test(StateFlag::SELBOX)) {
 				ClosestPointIndex = 0;
 				if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-					while (ClosestPointIndex < PCSHeader.stitchCount
-					       && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
+					while (ClosestPointIndex < StitchBuffer->size()
+						&& form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
 						ClosestPointIndex++;
 					}
 					StateMap.set(StateFlag::SELBOX);
