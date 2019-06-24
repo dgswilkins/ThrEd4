@@ -8067,7 +8067,7 @@ void thred::internal::delknot() {
 }
 
 uint32_t thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) {
-	while (start < gsl::narrow_cast<uint32_t>(PCSHeader.stitchCount) - 1 && stlen(start) > KNOTLEN) {
+	while (start < gsl::narrow<decltype(start)>(StitchBuffer->size() - 1u) && stlen(start) > KNOTLEN) {
 		buffer.push_back((*StitchBuffer)[start++]);
 	}
 	strtknt(buffer, start);
