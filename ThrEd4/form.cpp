@@ -8454,12 +8454,12 @@ void form::stchs2frm() {
 		}
 		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
 		if (ClosestPointIndex > GroupStitchIndex) {
-			if (ClosestPointIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+			if (ClosestPointIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1u)) {
 				ClosestPointIndex++;
 			}
 		}
 		else {
-			if (GroupStitchIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+			if (GroupStitchIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1u)) {
 				GroupStitchIndex++;
 			}
 		}
