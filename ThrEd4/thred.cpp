@@ -2924,16 +2924,16 @@ void thred::internal::lenCalc() {
 }
 
 void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
-	const auto codedAttribute = ClosestFormToCursor << 4u;
+	const auto codedAttribute = ClosestFormToCursor << FRMSHFT;
 	auto       stitchSize     = 1e38f;
 
 	thred::savdo();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		auto iPrevStitch = form::find1st();
 		auto iStitch     = iPrevStitch + 1u;
-		auto lastStitch  = PCSHeader.stitchCount;
+		auto lastStitch  = StitchBuffer->size();
 
-		if (lastStitch != 0u) { // find the first small stitch in the selected form
+		if (!StitchBuffer->empty()) { // find the first small stitch in the selected form
 			lastStitch--;
 			while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
 				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
@@ -2961,7 +2961,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		}
 		auto iOutputStitch = iStitch;
 		auto prevPoint     = (*StitchBuffer)[startStitch];
-		lastStitch         = PCSHeader.stitchCount;
+		lastStitch         = StitchBuffer->size();
 		if (lastStitch != 0u) {
 			lastStitch--;
 			while (iStitch < lastStitch) {
@@ -3016,16 +3016,12 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 				}
 			}
 		}
-
-		for (auto iStitch = endStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iNextStitch++] = (*StitchBuffer)[iStitch];
-		}
-		StitchBuffer->resize(iNextStitch);
+		StitchBuffer->erase(std::next(StitchBuffer->begin(), iNextStitch), std::next(StitchBuffer->begin(), endStitch));
 		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 	}
 	rstAll();
-	thred::ritot(StitchBuffer->size());
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	lenCalc();
 	StateMap.set(StateFlag::RESTCH);
 }
