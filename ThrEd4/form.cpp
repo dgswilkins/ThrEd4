@@ -7565,15 +7565,15 @@ bool form::notfstch(uint32_t attribute) noexcept {
 void form::selalfil() {
 	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		ClosestPointIndex = 0;
-		while (ClosestPointIndex < PCSHeader.stitchCount && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
+		ClosestPointIndex = 0u;
+		while (ClosestPointIndex < StitchBuffer->size() && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
 			ClosestPointIndex++;
 		}
-		if (ClosestPointIndex != PCSHeader.stitchCount) {
+		if (ClosestPointIndex != StitchBuffer->size()) {
 			if (ClosestPointIndex != 0u) {
 				ClosestPointIndex--;
 			}
-			GroupStitchIndex = PCSHeader.stitchCount - 1u;
+			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 			while (GroupStitchIndex > ClosestPointIndex && form::notfstch((*StitchBuffer)[GroupStitchIndex].attribute)) {
 				GroupStitchIndex--;
 			}
