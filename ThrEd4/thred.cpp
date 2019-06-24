@@ -1950,12 +1950,12 @@ void thred::internal::hupfn() {
 	StateMap.reset(StateFlag::HUPCHNG);
 	sizstch(checkHoopRect, *StitchBuffer);
 	if (!FormList->empty()) {
-		if (PCSHeader.stitchCount == 0u) {
+		if (StitchBuffer->empty()) {
 			auto vertexIt        = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			checkHoopRect.top    = vertexIt[0].y;
-			checkHoopRect.bottom = vertexIt[0].y;
-			checkHoopRect.right  = vertexIt[0].x;
-			checkHoopRect.left   = vertexIt[0].x;
+			checkHoopRect.top    = vertexIt->y;
+			checkHoopRect.bottom = vertexIt->y;
+			checkHoopRect.right  = vertexIt->x;
+			checkHoopRect.left   = vertexIt->x;
 		}
 		for (auto& FormVertice : *FormVertices) {
 			if (FormVertice.x < checkHoopRect.left) {
