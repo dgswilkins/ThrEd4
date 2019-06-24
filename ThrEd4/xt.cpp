@@ -1583,7 +1583,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 	ilData.layerIndex
 	    = (gsl::narrow<uint32_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		const auto offset           = 0;
 		auto       highStitchBuffer = std::vector<fPOINTATTR> {};
 		auto       code             = 0u;
@@ -1635,8 +1635,8 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			xi::duint(highStitchBuffer, code, ilData);
 		}
 		xi::chkend(highStitchBuffer, code, ilData);
-		if ((PCSHeader.stitchCount != 0u) && ilData.start < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			const auto ine         = PCSHeader.stitchCount - ilData.start;
+		if ((!StitchBuffer->empty()) && ilData.start < gsl::narrow<decltype(ilData.start)>(StitchBuffer->size() - 1u)) {
+			const auto ine         = wrap::toUnsigned(StitchBuffer->size() - ilData.start);
 			auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
 			auto       sourceEnd   = StitchBuffer->end();
 
