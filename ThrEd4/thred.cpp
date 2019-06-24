@@ -7661,23 +7661,22 @@ void thred::internal::duclip() {
 				for (auto& selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
 				}
-				// ToDo - what is astch used for?
+				// ToDo - replace use of old upper buffer with new vector (code will crash as is)
 				auto astch        = &(*StitchBuffer)[MAXITEMS];
 				auto stitchCount  = 0;
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-					    && formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)) {
-						if ((*StitchBuffer)[iStitch].x < LowerLeftStitch.x) {
-							LowerLeftStitch.x = (*StitchBuffer)[iStitch].x;
+				for (auto& stitch : *StitchBuffer) {
+					if (((stitch.attribute & NOTFRM) == 0u) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+						if (stitch.x < LowerLeftStitch.x) {
+							LowerLeftStitch.x = stitch.x;
 						}
-						if ((*StitchBuffer)[iStitch].y < LowerLeftStitch.y) {
-							LowerLeftStitch.y = (*StitchBuffer)[iStitch].y;
+						if (stitch.y < LowerLeftStitch.y) {
+							LowerLeftStitch.y = stitch.y;
 						}
-						astch[stitchCount++] = (*StitchBuffer)[iStitch];
+						astch[stitchCount++] = stitch;
 					}
 				}
-				if ((PCSHeader.stitchCount != 0u) && (stitchCount != 0)) {
+				if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 					Clip        = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2u); // NOLINT
 					if (ClipPointer != nullptr) {
@@ -7759,7 +7758,7 @@ void thred::internal::duclip() {
 								iTexture++;
 								auto iDestination   = 1u;
 								auto codedAttribute = gsl::narrow<uint32_t>(ClosestFormToCursor << FRMSHFT);
-								while (iTexture < PCSHeader.stitchCount) {
+								while (iTexture < StitchBuffer->size()) {
 									if (((*StitchBuffer)[iTexture].attribute & FRMSK) == codedAttribute
 									    && (((*StitchBuffer)[iTexture].attribute & NOTFRM) == 0u)) {
 										savclp(iDestination++, iTexture);
@@ -7774,7 +7773,7 @@ void thred::internal::duclip() {
 					CloseClipboard();
 				}
 				else {
-					if ((PCSHeader.stitchCount != 0u) && StateMap.test(StateFlag::GRPSEL)) {
+					if ((!StitchBuffer->empty()) && StateMap.test(StateFlag::GRPSEL)) {
 						Clip = RegisterClipboardFormat(PcdClipFormat);
 						thred::rngadj();
 						LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
