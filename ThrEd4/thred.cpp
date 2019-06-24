@@ -3646,7 +3646,7 @@ void thred::internal::ritbal() {
 	auto           outputName    = fs::path {};
 	constexpr auto BalaradRatio  = 10.0f / 6.0f;
 
-	if (!BalaradName0->empty() && !BalaradName1->empty() && (PCSHeader.stitchCount != 0u)) {
+	if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
 		if (WorkingFileName->empty()) {
 			outputName = *DefaultDirectory / L"balfil.thr";
 		}
@@ -3661,9 +3661,9 @@ void thred::internal::ritbal() {
 		auto color             = (*StitchBuffer)[0].attribute & COLMSK;
 		balaradHeader.color[0] = UserColor[color];
 		auto iColor            = 1u;
-		for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
-				color                         = (*StitchBuffer)[iStitch].attribute & COLMSK;
+		for (auto& stitch : *StitchBuffer) {
+			if (color != (stitch.attribute & COLMSK)) {
+				color                         = stitch.attribute & COLMSK;
 				balaradHeader.color[iColor++] = UserColor[color];
 				if ((iColor & 0xffffff00) != 0u) {
 					break;
@@ -3679,13 +3679,13 @@ void thred::internal::ritbal() {
 		BalaradOffset.x    = IniFile.hoopSizeX / 2.0f;
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0f;
 		auto balaradStitch = std::vector<BALSTCH> {};
-		balaradStitch.resize(wrap::toSize(PCSHeader.stitchCount) + 2u);
+		balaradStitch.resize(StitchBuffer->size() + 2u);
 		color = (*StitchBuffer)[0].attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0u;
 		thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
 		balaradStitch[iOutput].flag = gsl::narrow<uint8_t>(color);
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount && iOutput < 2; iStitch++) {
+		for (auto iStitch = 0u; iStitch < wrap::toUnsigned(StitchBuffer->size()) && iOutput < 2u; iStitch++) {
 			thr2bal(balaradStitch, iOutput++, iStitch, BALNORM);
 			if (((*StitchBuffer)[iStitch].attribute & COLMSK) != color) {
 				thr2bal(balaradStitch, iOutput, iStitch, BALSTOP);
