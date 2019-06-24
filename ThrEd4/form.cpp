@@ -8861,13 +8861,13 @@ void form::crop() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
-		auto iDestination = 0u;
-		for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-			if (form::cisin((*StitchBuffer)[iSource].x, (*StitchBuffer)[iSource].y)) {
-				(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
+		auto iDestination = StitchBuffer->begin();
+		for (auto& stitch : *StitchBuffer) {
+			if (form::cisin(stitch.x, stitch.y)) {
+				*iDestination++ = stitch;
 			}
 		}
-		StitchBuffer->resize(iDestination);
+		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
 		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
