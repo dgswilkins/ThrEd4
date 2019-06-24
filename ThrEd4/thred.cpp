@@ -1776,21 +1776,21 @@ double thred::internal::pxchk(double pixelSize) noexcept {
 }
 
 void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) {
-	if (!StitchBuffer->empty()) {
+	if (!stitches.empty()) {
 		rectangle.bottom = rectangle.top = stitches[0].y;
 		rectangle.left = rectangle.right = stitches[0].x;
-		for (auto iStitch = 1u; iStitch < StitchBuffer->size(); iStitch++) {
-			if (stitches[iStitch].x < rectangle.left) {
-				rectangle.left = stitches[iStitch].x;
+		for (auto stitch : stitches) {
+			if (stitch.x < rectangle.left) {
+				rectangle.left = stitch.x;
 			}
-			if (stitches[iStitch].x > rectangle.right) {
-				rectangle.right = stitches[iStitch].x;
+			if (stitch.x > rectangle.right) {
+				rectangle.right = stitch.x;
 			}
-			if (stitches[iStitch].y < rectangle.bottom) {
-				rectangle.bottom = stitches[iStitch].y;
+			if (stitch.y < rectangle.bottom) {
+				rectangle.bottom = stitch.y;
 			}
-			if (stitches[iStitch].y > rectangle.top) {
-				rectangle.top = stitches[iStitch].y;
+			if (stitch.y > rectangle.top) {
+				rectangle.top = stitch.y;
 			}
 		}
 	}
