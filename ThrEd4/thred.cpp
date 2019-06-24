@@ -6138,7 +6138,7 @@ void thred::internal::nuFil() {
 				UserBMPFileName->assign(BMPfileName);
 				bfil();
 			}
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			// BufferIndex     = 0;
 			ZoomRect     = fRECTANGLE { 0.0f, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0f };
 			UnzoomedRect = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
@@ -8178,7 +8178,7 @@ void thred::internal::setknots() {
 		chkncol();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
-		thred::ritot(StitchBuffer->size());
+		thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	}
 }
 
@@ -8832,7 +8832,7 @@ void thred::internal::insfil() {
 			CloseHandle(InsertedFileHandle);
 		}
 		else {
-			InsertedStitchIndex = StitchBuffer->size();
+			InsertedStitchIndex = gsl::narrow<decltype(InsertedStitchIndex)>(StitchBuffer->size());
 			if (isthr(&InsertedFileName[0])) {
 				auto fileHeader = STRHED {};
 				ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
@@ -8848,11 +8848,11 @@ void thred::internal::insfil() {
 					auto           thredHeader = STREX {};
 					const auto     version     = (fileHeader.headerType & 0xff000000) >> 24u;
 					if (version != 0u) {
-						gethand(*StitchBuffer, StitchBuffer->size());
+						gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
 						// ToDo - replace constants with sizes of data structures?
 						homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW
-						          + gethand(*StitchBuffer, StitchBuffer->size()) * HANDW
-						          + gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW + StitchBuffer->size() * STCHW;
+							+ gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW
+							+ gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW + gsl::narrow<decltype(homscor)>(StitchBuffer->size()) * STCHW;
 						ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
 					}
 					thred::savdo();
@@ -9145,8 +9145,8 @@ void thred::internal::insfil() {
 						StateMap.set(StateFlag::INSFIL);
 						form::dufrm();
 						// We did not insert forms so insure that duinsfil does not move forms
-						InsertedFormIndex   = FormList->size();
-						InsertedVertexIndex = FormVertices->size();
+						InsertedFormIndex   = wrap::toUnsigned(FormList->size());
+						InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
 					}
 				}
 			}
@@ -14515,7 +14515,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				StateMap.set(StateFlag::BAKEND);
 			}
 		}
-		thred::ritot(StitchBuffer->size());
+		thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		StateMap.set(StateFlag::BOXSLCT);
 		StateMap.set(StateFlag::BZUMIN);
 		StateMap.set(StateFlag::NOSEL);
@@ -18747,7 +18747,7 @@ void thred::internal::drwStch() {
 	if (StateMap.test(StateFlag::SELBOX)) {
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 	}
-	thred::ritot(StitchBuffer->size());
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	if (StateMap.test(StateFlag::INIT)) {
 		lenCalc();
 	}
