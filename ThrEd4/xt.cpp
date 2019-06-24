@@ -2552,8 +2552,8 @@ void xt::internal::sadj(fPOINT& point, const fPOINT& designSizeRatio, const fREC
 void xt::internal::nudfn(const fRECTANGLE& designSizeRect) {
 	const auto newSize = fPOINT { (designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom) };
 	const auto designSizeRatio = fPOINT { (DesignSize.x / newSize.x), (DesignSize.y / newSize.y) };
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		sadj((*StitchBuffer)[iStitch], designSizeRatio, designSizeRect);
+	for (auto& stitch : *StitchBuffer) {
+		sadj(stitch, designSizeRatio, designSizeRect);
 	}
 	for (auto& FormVertice : *FormVertices) {
 		sadj(FormVertice, designSizeRatio, designSizeRect);
@@ -2567,7 +2567,7 @@ void xt::nudsiz() {
 
 	thred::savdo();
 	flag = 0;
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::stchrct(designSizeRect);
 		flag = 1;
 	}
