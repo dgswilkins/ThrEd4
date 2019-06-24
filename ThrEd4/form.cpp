@@ -6082,8 +6082,8 @@ void form::setstrtch() {
 				}
 				form::frmout(iForm);
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - reference) * ratio + reference;
+			for (auto& stitch : *StitchBuffer) {
+				stitch.y = (stitch.y - reference) * ratio + reference;
 			}
 			selal();
 			return;
@@ -6263,9 +6263,9 @@ void form::setexpand(float xyRatio) {
 			}
 			form::frmout(iForm);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - stitchReference.x) * ratio.x + stitchReference.x;
-			(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - stitchReference.y) * ratio.y + stitchReference.y;
+		for (auto stitch : *StitchBuffer) {
+			stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
+			stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
 		}
 		form::selal();
 		return;
