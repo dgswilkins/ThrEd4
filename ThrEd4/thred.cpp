@@ -8479,7 +8479,7 @@ void thred::internal::delet() {
 			return;
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
-			if (PCSHeader.stitchCount > 2) {
+			if (StitchBuffer->size() > 2u) {
 				delstch1(ClosestPointIndex);
 				if (!stch2px(ClosestPointIndex)) {
 					movbox();
@@ -8575,7 +8575,7 @@ void thred::internal::delet() {
 			StateMap.set(StateFlag::RESTCH);
 		}
 		if (!satinFlag && closPnt1(&ClosestPointIndex)) {
-			if (PCSHeader.stitchCount > 2) {
+			if (StitchBuffer->size() > 2u) {
 				delstch1(ClosestPointIndex);
 				if (!stch2px(ClosestPointIndex)) {
 					movbox();
@@ -8604,7 +8604,7 @@ void thred::internal::movi() {
 	else {
 		rstAll();
 	}
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		if (MsgWindow != nullptr) {
 			DestroyWindow(MsgWindow);
 			MsgWindow = nullptr;
@@ -8636,10 +8636,10 @@ void thred::internal::movi() {
 			stepCount = gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor;
 		}
 		else {
-			stepCount = PCSHeader.stitchCount;
+			stepCount = gsl::narrow_cast<float>(StitchBuffer->size());
 		}
 		if (!StateMap.test(StateFlag::WASPAT)) {
-			MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0 * MOVITIM / stepCount);
+			MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0f * MOVITIM / stepCount);
 		}
 		if (MovieTimeStep < MINDELAY) {
 			MovieTimeStep = MINDELAY;
