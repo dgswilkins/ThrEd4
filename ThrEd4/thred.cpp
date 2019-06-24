@@ -1421,14 +1421,14 @@ void thred::internal::dudat() {
 			const auto dest = gsl::span<FRMHED>(backupData->forms, formList.size());
 			std::copy(formList.cbegin(), formList.cend(), dest.begin());
 		}
-		backupData->stitchCount = PCSHeader.stitchCount;
+		backupData->stitchCount = gsl::narrow<decltype(backupData->stitchCount)>(StitchBuffer->size());
 		backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
-		if (PCSHeader.stitchCount != 0u) {
-			const auto dest = gsl::span<fPOINTATTR>(backupData->stitches, PCSHeader.stitchCount);
+		if (!StitchBuffer->empty()) {
+			const auto dest = gsl::span<fPOINTATTR>(backupData->stitches, StitchBuffer->size());
 			std::copy(StitchBuffer->begin(), StitchBuffer->end(), dest.begin());
 		}
 		backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
-		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[PCSHeader.stitchCount]);
+		backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[StitchBuffer->size()]);
 		if (!FormVertices->empty()) {
 			const auto dest = gsl::span<fPOINT>(backupData->vertices, FormVertices->size());
 			std::copy(FormVertices->cbegin(), FormVertices->cend(), dest.begin());
