@@ -6585,7 +6585,7 @@ void thred::internal::toglup() {
 			if (!StateMap.test(StateFlag::SELBOX)) {
 				ClosestPointIndex = 0;
 				if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-					while (ClosestPointIndex < StitchBuffer->size()
+					while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size())
 						&& form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
 						ClosestPointIndex++;
 					}
@@ -6869,21 +6869,20 @@ void thred::internal::istch() {
 	xlin();
 	xlin1();
 	if (StateMap.test(StateFlag::SELBOX)) {
-		if ((ClosestPointIndex != 0u) && ClosestPointIndex != gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+		if ((ClosestPointIndex != 0u) && ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u)) {
 			thred::px2stch();
-			const auto angt = atan2((*StitchBuffer)[ClosestPointIndex].y - SelectedPoint.y,
-			                        (*StitchBuffer)[ClosestPointIndex].x - SelectedPoint.x);
-			const auto angb = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1u].y,
-			                        (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1u].x);
-			const auto angf = atan2(
-			    (*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].y,
-			    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u].x);
+			auto&      stitch    = (*StitchBuffer)[ClosestPointIndex];
+			auto&      prvStitch = (*StitchBuffer)[wrap::toSize(ClosestPointIndex) - 1u];
+			auto&      nxtStitch = (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1u];
+			const auto angt      = atan2(stitch.y - SelectedPoint.y, stitch.x - SelectedPoint.x);
+			const auto angb      = atan2(stitch.y - prvStitch.y, stitch.x - prvStitch.x);
+			const auto angf      = atan2(stitch.y - nxtStitch.y, stitch.x - nxtStitch.x);
 			if (fabs(angf - angt) > fabs(angb - angt)) {
 				ClosestPointIndex--;
 			}
 		}
 		else {
-			if (ClosestPointIndex == gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+			if (ClosestPointIndex == gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u)) {
 				ClosestPointIndex--;
 			}
 		}
