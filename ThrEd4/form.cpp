@@ -8128,11 +8128,11 @@ void form::cntrx() {
 				FormMoveDelta.x = 0.0f;
 			}
 			frmadj(ClosestFormToCursor);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-					(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-					(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+			for (auto& stitch : *StitchBuffer) {
+				if (((stitch.attribute & ALTYPMSK) != 0u)
+					&& (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+					stitch.x += FormMoveDelta.x;
+					stitch.y -= FormMoveDelta.y;
 				}
 			}
 		}
