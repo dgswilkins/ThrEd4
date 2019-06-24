@@ -658,7 +658,7 @@ void satin::satbrd() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
