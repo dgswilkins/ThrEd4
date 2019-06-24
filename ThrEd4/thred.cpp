@@ -9057,7 +9057,7 @@ void thred::internal::insfil() {
 					}
 					InsertCenter = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
 						                    form::midl(insertedRectangle.top, insertedRectangle.bottom) };
-					auto dest    = std::next(StitchBuffer->begin(), PCSHeader.stitchCount);
+					auto dest    = StitchBuffer->end();
 					StitchBuffer->insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
 					PCSHeader.stitchCount   = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 					const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
