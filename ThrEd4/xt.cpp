@@ -540,7 +540,7 @@ void xt::pes2crd() {
         nullptr,              // lpTemplateName
 	};
 
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::save();
 	}
 	else {
@@ -1359,7 +1359,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	const auto codedFormIndex = (ClosestFormToCursor << FRMSHFT);
 	auto       bordercolor    = gsl::narrow<uint32_t>(SelectedForm->borderColor & COLMSK);
 
-	auto tapcol = gsl::narrow<uint32_t>(SelectedForm->borderColor >> 4u);
+	auto appliqueColor = gsl::narrow<uint32_t>(SelectedForm->borderColor >> 4u);
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
@@ -1422,7 +1422,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 				tmap |= M_ECOL;
 				fillStartsData.fillNamed.borderColor = iDestinationStitch;
 			}
-			if (color == tapcol) {
+			if (color == appliqueColor) {
 				tmap |= M_APCOL;
 				fillStartsData.fillNamed.appliqueColor = iDestinationStitch;
 			}
