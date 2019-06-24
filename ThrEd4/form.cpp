@@ -8719,17 +8719,17 @@ void form::col2frm() {
 		featherColorHistogram.resize(formColorPermutations);
 		auto underlayColorHistogram = std::vector<uint32_t> {};
 		underlayColorHistogram.resize(formColorPermutations);
-		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto formColorCode = (*StitchBuffer)[iStitch].attribute & 0x3fffu;
-			if (((*StitchBuffer)[iStitch].attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0u) {
+		for (auto& stitch : *StitchBuffer) {
+			const auto formColorCode = stitch.attribute & (COLMSK | FRMSK);
+			if ((stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0u) {
 				underlayColorHistogram[formColorCode]++;
 			}
 			else {
-				if (((*StitchBuffer)[iStitch].attribute & FTHMSK) != 0u) {
+				if ((stitch.attribute & FTHMSK) != 0u) {
 					featherColorHistogram[formColorCode]++;
 				}
 				else {
-					switch ((*StitchBuffer)[iStitch].attribute & TYPMSK) {
+					switch (stitch.attribute & TYPMSK) {
 					case FRMFIL: {
 						fillColorHistogram[formColorCode]++;
 						break;
