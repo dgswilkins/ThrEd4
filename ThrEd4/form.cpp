@@ -6026,8 +6026,8 @@ void form::setstrtch() {
 				}
 				form::frmout(iForm);
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - reference) * ratio + reference;
+			for (auto stitch : *StitchBuffer) {
+				stitch.x = (stitch.x - reference) * ratio + reference;
 			}
 			selal();
 			return;
