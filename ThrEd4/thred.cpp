@@ -3324,7 +3324,7 @@ void thred::internal::ritlayr() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::FRMPSEL)) {
-			layer = ((*FormList)[ClosestFormToCursor].attribute & FRMLMSK) >> 1u;
+			layer = gsl::narrow_cast<decltype(layer)>((*FormList)[ClosestFormToCursor].attribute & FRMLMSK) >> 1u;
 		}
 	}
 	if ((layer & 0xffff0000u) != 0u) {
@@ -7974,9 +7974,9 @@ bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) {
 }
 
 void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset) {
-	buffer.push_back(fPOINTATTR { (*StitchBuffer)[iSource].x + KnotStep.x * gsl::narrow_cast<float>(offset),
-	                              (*StitchBuffer)[iSource].y + KnotStep.y * gsl::narrow_cast<float>(offset),
-	                              KnotAttribute });
+	buffer.emplace_back(fPOINTATTR { (*StitchBuffer)[iSource].x + KnotStep.x * gsl::narrow_cast<float>(offset),
+	                                 (*StitchBuffer)[iSource].y + KnotStep.y * gsl::narrow_cast<float>(offset),
+	                                 KnotAttribute });
 }
 
 void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
@@ -8660,7 +8660,7 @@ void thred::internal::movi() {
 
 void thred::redclp() {
 	auto       clipRect   = fRECTANGLE {};
-	const auto codedLayer = ActiveLayer << LAYSHFT;
+	const auto codedLayer = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
 
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {
@@ -9074,7 +9074,6 @@ void thred::internal::insfil() {
 				}
 			}
 			else {
-				// ToDo - inserting PCS files is broken and needs to be fixed
 				auto pcsFileHeader = PCSHEADER {};
 				ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
 				if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16) {
@@ -9082,13 +9081,7 @@ void thred::internal::insfil() {
 					pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
 					auto bytesToRead = gsl::narrow<DWORD>(pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())));
 					ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), bytesToRead, &BytesRead, nullptr);
-					if (BytesRead != bytesToRead) {
-						// pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
-						// StateMap.set(StateFlag::BADFIL);
-						prtred();
-						return;
-					}
-					else {
+					if (BytesRead == bytesToRead) {
 						thred::savdo();
 						auto insertIndex = StitchBuffer->size();
 						StitchBuffer->reserve(StitchBuffer->size() + pcsFileHeader.stitchCount);
@@ -9099,19 +9092,19 @@ void thred::internal::insfil() {
 							}
 							else {
 								(*StitchBuffer)
-								    .push_back(
-								        fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
-								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-								                     gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
-								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
-								                     newAttribute });
+									.emplace_back(
+										fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
+										+ gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
+										gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
+										+ gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+										newAttribute });
 							}
 						}
 						const auto newStitchCount    = StitchBuffer->size();
 						auto       insertedRectangle = fRECTANGLE { (*StitchBuffer)[insertIndex].x,
-                                                              (*StitchBuffer)[insertIndex].y,
-                                                              (*StitchBuffer)[insertIndex].x,
-                                                              (*StitchBuffer)[insertIndex].y };
+							(*StitchBuffer)[insertIndex].y,
+							(*StitchBuffer)[insertIndex].x,
+							(*StitchBuffer)[insertIndex].y };
 						for (; insertIndex < newStitchCount; insertIndex++) {
 							auto& stitch = (*StitchBuffer)[insertIndex];
 							if (stitch.x < insertedRectangle.left) {
@@ -9128,16 +9121,16 @@ void thred::internal::insfil() {
 							}
 						}
 						InsertCenter            = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
-                                                form::midl(insertedRectangle.top, insertedRectangle.bottom) };
+							form::midl(insertedRectangle.top, insertedRectangle.bottom) };
 						PCSHeader.stitchCount   = gsl::narrow<decltype(PCSHeader.stitchCount)>(newStitchCount);
 						const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
-							                               insertedRectangle.top - insertedRectangle.bottom };
+							insertedRectangle.top - insertedRectangle.bottom };
 						form::ratsr();
 						InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
 						// ToDo - Should this be vertical ratio?
 						InsertSize.y = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
 						const auto initialInsertPoint
-						    = POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
+							= POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
 						insflin(initialInsertPoint);
 						NewFormVertexCount = 5;
 						StateMap.set(StateFlag::SHOFRM);
@@ -9146,6 +9139,12 @@ void thred::internal::insfil() {
 						// We did not insert forms so insure that duinsfil does not move forms
 						InsertedFormIndex   = wrap::toUnsigned(FormList->size());
 						InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
+					}
+					else {
+						// pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
+						// StateMap.set(StateFlag::BADFIL);
+						prtred();
+						return;
 					}
 				}
 			}
@@ -9597,7 +9596,8 @@ void thred::internal::nulayr(uint32_t play) {
 	ladj();
 	if (ActiveLayer != 0u) {
 		if (StateMap.test(StateFlag::FORMSEL)
-		    && (gsl::narrow<uint32_t>(((*FormList)[ClosestFormToCursor].attribute & FRMLMSK) >> 1u) != ActiveLayer)) {
+		    && ((gsl::narrow_cast<decltype(ActiveLayer)>((*FormList)[ClosestFormToCursor].attribute & FRMLMSK) >> 1u)
+		        != ActiveLayer)) {
 			StateMap.reset(StateFlag::FORMSEL);
 		}
 		StateMap.reset(StateFlag::GRPSEL);
@@ -9970,7 +9970,7 @@ GSL_SUPPRESS(26440) uint32_t thred::internal::makbig(uint32_t start, uint32_t fi
 			}
 			attribute &= (~KNOTMSK);
 			for (auto iStitch = 0u; iStitch < wrap::round<decltype(iStitch)>(stitchCount) - 1u; iStitch++) {
-				newStitches.push_back(fPOINTATTR { point.x, point.y, attribute });
+				newStitches.emplace_back(fPOINTATTR { point.x, point.y, attribute });
 				point.x += step.x;
 				point.y += step.y;
 				adcnt++;
@@ -11364,13 +11364,13 @@ void thred::internal::lock() {
 
 	lockInfo.count = 0;
 	// ToDo - Replace 512 with maximum files in subdirectory
-	lockInfo.data = new WIN32_FIND_DATA[512];
+	lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT
 
 	GSL_SUPPRESS(26490)
 	DialogBoxParam(
 	    ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT
 
-	delete[] lockInfo.data;
+	delete[] lockInfo.data; //NOLINT
 }
 
 void thred::internal::delstch() {
@@ -13169,7 +13169,8 @@ bool thred::internal::handleSideWindowActive() {
 			StateMap.set(StateFlag::FORMSEL);
 		}
 		thred::unsid();
-		auto layerStr = fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1u));
+		auto layerStr
+		    = fmt::format(L"{}", (gsl::narrow_cast<decltype(SelectedForm->attribute)>(SelectedForm->attribute & FRMLMSK) >> 1u));
 		SetWindowText((*ValueWindow)[LLAYR], layerStr.c_str());
 		return true;
 	}
@@ -14377,7 +14378,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			unlin();
 			if (StateMap.test(StateFlag::INSRT)) {
 				thred::px2stch();
-				auto code = (ActiveColor | USMSK | (ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
+				auto code
+				    = (ActiveColor | USMSK | gsl::narrow_cast<decltype(ActiveColor)>(ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (StateMap.test(StateFlag::BAKEND)) {
 						xlin1();
@@ -14731,7 +14733,8 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					FormList->push_back(FRMHED {});
 					auto& formIter     = FormList->back();
 					formIter           = forms[iForm];
-					formIter.attribute = gsl::narrow<uint8_t>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1u));
+					formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK)
+					                      | gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1u));
 				}
 				auto formVertices  = convert_ptr<fPOINT*>(&forms[iForm]);
 				auto currentVertex = 0u;
@@ -14826,8 +14829,9 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					FormList->push_back(ClipFormHeader->form);
 					ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 					form::fvars(ClosestFormToCursor);
-					auto& formIter       = FormList->back();
-					formIter.attribute   = gsl::narrow<uint8_t>((formIter.attribute & NFRMLMSK) | (ActiveLayer << 1u));
+					auto& formIter     = FormList->back();
+					formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK)
+					                     | gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1u);
 					formIter.vertexIndex = thred::adflt(formIter.vertexCount);
 					auto formVertices    = convert_ptr<fPOINT*>(&ClipFormHeader[1]);
 					auto destIt          = std::next(FormVertices->begin(), formIter.vertexIndex);
