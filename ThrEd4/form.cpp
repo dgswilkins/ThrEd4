@@ -5559,9 +5559,8 @@ void form::unfil() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap.test(UserFlag::WRNOF)) {
 				const auto codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					const auto attribute = (*StitchBuffer)[iStitch].attribute;
-					if (((attribute & NOTFRM) == 0u) && (attribute & (USMSK | FRMSK)) == codedForm) {
+				for (auto stitch : *StitchBuffer) {
+					if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
 						displayText::tabmsg(IDS_UNFIL);
 						StateMap.set(StateFlag::FILMSG);
 						displayText::okcan();
