@@ -522,9 +522,9 @@ void form::delfrms() {
 	ClipPoints->clear();
 	FormList->clear();
 	SatinGuides->clear();
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		(*StitchBuffer)[iStitch].attribute &= NFRM_NTYP;
-		(*StitchBuffer)[iStitch].attribute |= NOTFRM;
+	for (auto stitch : *StitchBuffer) {
+		stitch.attribute &= NFRM_NTYP;
+		stitch.attribute |= NOTFRM;
 	}
 }
 
