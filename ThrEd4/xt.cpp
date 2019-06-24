@@ -1196,7 +1196,7 @@ void xt::fsort() {
 			attribute                       = (*StitchBuffer)[iStitch].attribute & SRTMSK;
 		}
 	}
-	stitchRegion.back().finish    = StitchBuffer->size();
+	stitchRegion.back().finish    = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
 	stitchRegion.back().endStitch = &(*StitchBuffer)[StitchBuffer->size() - 1u];
 	const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
 	auto       pRecs              = std::vector<OREC*> {};
@@ -1359,7 +1359,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	const auto codedFormIndex = (ClosestFormToCursor << FRMSHFT);
 	auto       bordercolor    = gsl::narrow<uint32_t>(SelectedForm->borderColor & COLMSK);
 
-	auto appliqueColor = gsl::narrow<uint32_t>(SelectedForm->borderColor >> 4u);
+	auto appliqueColor = gsl::narrow<uint32_t>(SelectedForm->borderColor >> FRMSHFT);
 	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
