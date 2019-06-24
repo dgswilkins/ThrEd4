@@ -4269,7 +4269,7 @@ void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
 	auto iColor  = 1u;
 	auto color   = (*StitchBuffer)[0].attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
-	for (auto iStitch = 0u; iStitch < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1u; iStitch++) {
+	for (auto iStitch = 0u; iStitch < StitchBuffer->size() - 1u; iStitch++) {
 		if (((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK) != color) {
 			color = (*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK;
 			pecEncodeStop(buffer, (iColor % 2u) + 1u);
