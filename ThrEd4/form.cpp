@@ -4990,7 +4990,7 @@ void form::refilfn() {
 	}
 	UserStitchLength = savedStitchLength;
 	xt::intlv(fillStartsData, fillStartsMap);
-	thred::ritot(StitchBuffer->size());
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	xt::setfchk();
 }
 
@@ -5586,7 +5586,7 @@ void form::unfil() {
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
 }
@@ -6390,7 +6390,7 @@ void form::dubold() {
 			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
 }
@@ -6835,7 +6835,7 @@ void form::prpbrd(float borderStitchSpacing) {
 			fi::prpsbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -7652,7 +7652,7 @@ void form::bhol() {
 			fi::bholbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -8852,7 +8852,7 @@ void form::chain() {
 			chan();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
