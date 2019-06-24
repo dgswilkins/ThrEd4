@@ -9331,24 +9331,20 @@ void thred::internal::mv2f() {
 
 void thred::internal::mv2b() {
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-		// ToDo - Use a temp buffer rather than the high buffer
 		thred::savdo();
+		std::vector<fPOINTATTR> tempStitchBuffer{};
 		auto       iLowBuffer  = 0u;
-		auto       iHighBuffer = MAXITEMS;
 		const auto attribute   = ClosestFormToCursor << FRMSHFT;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
-				(*StitchBuffer)[iHighBuffer++] = (*StitchBuffer)[iStitch];
+		for (auto& stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) == 0u)
+			    && (stitch.attribute & FRMSK) == attribute) {
+				tempStitchBuffer.push_back(stitch);
 			}
 			else {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
+				(*StitchBuffer)[iLowBuffer++] = stitch;
 			}
 		}
-		auto iStitch = MAXITEMS;
-		while (iStitch < iHighBuffer) {
-			(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch++];
-		}
+		std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -9356,17 +9352,19 @@ void thred::internal::mv2b() {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			thred::savdo();
 			thred::rngadj();
-			auto iHighBuffer = MAXITEMS;
+			std::vector<fPOINTATTR> tempStitchBuffer{};
+			// I am assuming that GroupEndStitch is always greater than GroupStartStitch otherwise I would need this
+			// const auto grpSize = GroupEndStitch > GroupStartStitch ? (GroupEndStitch - GroupStartStitch) : (GroupStartStitch - GroupEndStitch);
+			const auto grpSize = GroupEndStitch - GroupStartStitch;
+			tempStitchBuffer.reserve(grpSize);
 			for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-				(*StitchBuffer)[iHighBuffer++] = (*StitchBuffer)[iStitch];
+				tempStitchBuffer.push_back((*StitchBuffer)[iStitch]);
 			}
 			auto iLowBuffer = GroupStartStitch;
-			for (auto iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
+			for (auto iStitch = GroupEndStitch; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
 			}
-			for (auto iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
-			}
+			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
