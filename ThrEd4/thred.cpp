@@ -6178,8 +6178,8 @@ void thred::internal::nuFil() {
 		StateMap.set(StateFlag::INIT);
 		StateMap.reset(StateFlag::TRSET);
 		if (StateMap.test(StateFlag::NOTHRFIL)) {
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iStitch].attribute |= NOTFRM;
+			for (auto& stitch : *StitchBuffer) {
+				stitch .attribute |= NOTFRM;
 			}
 		}
 		repair::lodchk();
