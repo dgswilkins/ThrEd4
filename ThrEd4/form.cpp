@@ -8342,18 +8342,19 @@ void form::clpspac(const uint32_t insertPoint, uint32_t count) {
 }
 
 void form::stchadj() {
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		auto       high = (*StitchBuffer)[iStitch].attribute & FRMSK;
+	for (auto& stitch : *StitchBuffer) {
+		auto       high = stitch.attribute & FRMSK;
 		const auto low  = high >> FRMSHFT;
 		if (low > ClosestFormToCursor) {
-			(*StitchBuffer)[iStitch].attribute &= NFRMSK;
+			stitch.attribute &= NFRMSK;
 			high += 1u << FRMSHFT;
-			(*StitchBuffer)[iStitch].attribute |= high;
+			stitch.attribute |= high;
 		}
 	}
 	form::refilfn();
+	// ToDo - does this make sense?
 	const auto low = ClosestFormToCursor << FRMSHFT;
-	for (auto iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
+	for (auto iStitch = StitchBuffer->size(); iStitch != 0; iStitch--) {
 		if (((*StitchBuffer)[iStitch - 1u].attribute & FRMSK) == low) {
 			break;
 		}
