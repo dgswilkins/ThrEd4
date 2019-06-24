@@ -461,29 +461,25 @@ void texture::drwtxtr() {
 bool texture::internal::px2txt(const POINT& offset) {
 	auto editPoint = fPOINT {};
 
+	auto retval = false;
 	txi::px2ed(offset, editPoint);
-	auto val = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
-	if (val < -0.5f) {
-		val = 0.0f;
+	auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
+	if (line < -0.5f) {
+		line = 0.0f;
 	}
-	auto tmp = TXPNT { 0.0f, wrap::round<uint16_t>(val) };
-	if (tmp.line > TextureScreen.lines) {
-		return false;
-	}
-	if (tmp.line < 1) {
-		return false;
-	}
-	if (offset.y > TextureScreen.top) {
-		if (offset.y > TextureScreen.bottom) {
-			return false;
+	auto txPoint = TXPNT { 0.0f, wrap::round<uint16_t>(line) };
+	if ((txPoint.line <= TextureScreen.lines) && (txPoint.line >= 1)) {
+		if (offset.y > TextureScreen.top) {
+			if ((offset.y <= TextureScreen.bottom)) {
+				txPoint.y = TextureScreen.areaHeight
+				        - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height
+				           * TextureScreen.areaHeight);
+				TempTexturePoints->push_back(txPoint);
+				retval = true;
+			}
 		}
-		tmp.y = TextureScreen.areaHeight
-		        - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height * TextureScreen.areaHeight);
-		TempTexturePoints->push_back(tmp);
-		return true;
 	}
-
-	return false;
+	return retval;
 }
 
 void texture::internal::deorg(POINT& point) noexcept {
