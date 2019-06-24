@@ -8059,9 +8059,9 @@ void form::srtbyfrm() {
 			}
 		}
 		auto tempStitchBuffer = std::vector<fPOINTATTR> {};
-		tempStitchBuffer.resize(PCSHeader.stitchCount);
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			colorHistogram[color[(*StitchBuffer)[iStitch].attribute & 0xfu]]++;
+		tempStitchBuffer.resize(StitchBuffer->size());
+		for (auto& stitch : *StitchBuffer) {
+			colorHistogram[color[stitch.attribute & 0xfu]]++;
 		}
 		auto colorAccumulator = 0u;
 		for (auto iColor = 0u; iColor < 16; iColor++) {
@@ -8069,8 +8069,8 @@ void form::srtbyfrm() {
 			colorHistogram[iColor] = colorAccumulator;
 			colorAccumulator += value;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			tempStitchBuffer[colorHistogram[color[(*StitchBuffer)[iStitch].attribute & 0xfu]]++] = (*StitchBuffer)[iStitch];
+		for (auto& stitch : *StitchBuffer) {
+			tempStitchBuffer[colorHistogram[color[stitch.attribute & 0xfu]]++] = stitch;
 		}
 		fi::srtf(tempStitchBuffer, 0, colorHistogram[0]);
 		for (auto iColor = 0u; iColor < 15; iColor++) {
