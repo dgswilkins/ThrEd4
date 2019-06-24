@@ -395,8 +395,6 @@ namespace internal {
 	            uint32_t                     pathIndex,
 	            uint32_t&                    pathCount);
 
-	double p2p(const fPOINT& point0, const fPOINT& point1) noexcept;
-
 	void   pbrd(float edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	           const std::vector<VRCT2>& fillVerticalRect,
