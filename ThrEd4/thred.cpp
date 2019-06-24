@@ -4313,9 +4313,9 @@ void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	const auto dest    = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
 	// write the overall thumbnail
 	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		auto x          = wrap::floor<uint16_t>(((*StitchBuffer)[iStitch].x) * xFactor) + 4u;
-		auto y          = wrap::floor<uint16_t>(((*StitchBuffer)[iStitch].y) * yFactor) + 5u;
+	for (auto& stitch : *StitchBuffer) {
+		auto x          = wrap::floor<uint16_t>((stitch.x) * xFactor) + 4u;
+		auto y          = wrap::floor<uint16_t>((stitch.y) * yFactor) + 5u;
 		y               = ThumbHeight - y;
 		thumbnail[y][x] = 1u;
 	}
@@ -4323,17 +4323,18 @@ void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	// now write out the individual thread thumbnails
 	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
 	auto stitchColor = ((*StitchBuffer)[0].attribute & COLMSK);
-	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		auto x = wrap::round<uint16_t>(((*StitchBuffer)[iStitch].x) * xFactor) + 3u;
-		auto y = wrap::round<uint16_t>(((*StitchBuffer)[iStitch].y) * yFactor) + 3u;
+	// ToDo - check that this is still writing out the thumbnails correctly when starting from index 0 instead of 1
+	for (auto& stitch : *StitchBuffer) {
+		auto x = wrap::round<uint16_t>((stitch.x) * xFactor) + 3u;
+		auto y = wrap::round<uint16_t>((stitch.y) * yFactor) + 3u;
 		y      = ThumbHeight - y;
-		if (stitchColor == ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
+		if (stitchColor == (stitch.attribute & COLMSK)) {
 			thumbnail[y][x] = 1;
 		}
 		else {
 			thi::writeThumbnail(pecBuffer, p_thumbnail);
 			std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-			stitchColor     = ((*StitchBuffer)[iStitch].attribute & COLMSK);
+			stitchColor     = (stitch.attribute & COLMSK);
 			thumbnail[y][x] = 1;
 		}
 	}
