@@ -6285,10 +6285,10 @@ void thred::internal::zumin() {
 			if (StateMap.test(StateFlag::INSRT)) {
 				if (StateMap.test(StateFlag::LIN1)) {
 					if (StateMap.test(StateFlag::BAKEND)) {
-						SelectedPoint = (*StitchBuffer)[PCSHeader.stitchCount - 1u];
+						SelectedPoint = StitchBuffer->back();
 					}
 					else {
-						SelectedPoint = (*StitchBuffer)[0];
+						SelectedPoint = StitchBuffer->front();
 					}
 				}
 				else {
