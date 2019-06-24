@@ -7473,35 +7473,34 @@ uint32_t thred::internal::sizfclp() {
 
 uint32_t thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) {
 	const auto codedAttribute = iForm << FRMSHFT;
-	auto       iStitch        = 0u;
 
-	LowerLeftStitch = fPOINT { 1e20f, 1e20f };
-	auto flag       = true;
-	for (iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute
-		    && (((*StitchBuffer)[iStitch].attribute & TYPMSK) != 0u)) {
+	auto iStitch     = StitchBuffer->begin();
+	auto stitchCount = 0u;
+	auto flag        = true;
+	for (; iStitch != StitchBuffer->end(); ++iStitch) {
+		if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & TYPMSK) != 0u)) {
 			flag = false;
 			break;
 		}
+		stitchCount++;
 	}
 	if (flag) {
 		return 0;
 	}
 
-	formFirstStitchIndex = iStitch;
-	auto stitchCount     = 0u;
-	while (iStitch < PCSHeader.stitchCount) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == codedAttribute
-		    && (((*StitchBuffer)[iStitch].attribute & TYPMSK) != 0u)) {
-			if ((*StitchBuffer)[iStitch].x < LowerLeftStitch.x) {
-				LowerLeftStitch.x = (*StitchBuffer)[iStitch].x;
+	formFirstStitchIndex = stitchCount;
+	stitchCount          = 0u;
+	LowerLeftStitch      = fPOINT { 1e20f, 1e20f };
+	for (; iStitch != StitchBuffer->end(); ++iStitch) {
+		if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & TYPMSK) != 0u)) {
+			if (iStitch->x < LowerLeftStitch.x) {
+				LowerLeftStitch.x = iStitch->x;
 			}
-			if ((*StitchBuffer)[iStitch].y < LowerLeftStitch.y) {
-				LowerLeftStitch.y = (*StitchBuffer)[iStitch].y;
+			if (iStitch->y < LowerLeftStitch.y) {
+				LowerLeftStitch.y = iStitch->y;
 			}
 			stitchCount++;
 		}
-		iStitch++;
 	}
 	return stitchCount;
 }
