@@ -11906,7 +11906,7 @@ void thred::internal::qcode() {
 	StateMap.reset(StateFlag::HIDMAP);
 	StateMap.reset(StateFlag::FILDIR);
 	ReleaseCapture();
-	if (PCSHeader.stitchCount == 1) {
+	if (StitchBuffer->size() == 1) {
 		StitchBuffer->clear();
 		PCSHeader.stitchCount = 0;
 		StateMap.reset(StateFlag::INIT);
@@ -12382,7 +12382,7 @@ bool thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 				SetCapture(ThrEdWindow);
 			}
 			if (StateMap.test(StateFlag::LIN1)) {
-				if (PCSHeader.stitchCount != 0u) {
+				if (!StitchBuffer->empty()) {
 					xlin1();
 					InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 					StateMap.set(StateFlag::ILIN1);
@@ -12982,7 +12982,7 @@ bool thred::internal::handleRightButtonDown() {
 					if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 						StateMap.set(StateFlag::RESTCH);
 					}
-					if (PCSHeader.stitchCount != 0u) {
+					if (!StitchBuffer->empty()) {
 						rebox();
 					}
 				}
@@ -14329,8 +14329,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		if (StateMap.testAndReset(StateFlag::CLPSHO)) {
 			thred::savdo();
-			if ((PCSHeader.stitchCount != 0u)
-			    && (StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT))
+			if ((!StitchBuffer->empty()) && (StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT))
 			    && ClosestPointIndex != gsl::narrow<uint32_t>(PCSHeader.stitchCount - 1)) {
 				lodclp(ClosestPointIndex);
 			}
@@ -19199,7 +19198,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			return 1;
 		}
 		if (DrawItem->hwndItem == ColorBar && DrawItem->itemAction == ODA_DRAWENTIRE) {
-			if (PCSHeader.stitchCount != 0u) {
+			if (!StitchBuffer->empty()) {
 				dubar();
 			}
 			else {
