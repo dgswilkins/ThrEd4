@@ -6307,11 +6307,11 @@ void form::setexpand(float xyRatio) {
 GSL_SUPPRESS(26440) void form::nufilcol(uint32_t color) {
 	if (SelectedForm->fillColor != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillColor = gsl::narrow<uint8_t>(color);
-		const auto attribute    = (ClosestFormToCursor << 4u) | FRMFIL;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		const auto attribute    = (ClosestFormToCursor << FRMSHFT) | FRMFIL;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
+				stitch.attribute &= NCOLMSK;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6321,11 +6321,11 @@ GSL_SUPPRESS(26440) void form::nufilcol(uint32_t color) {
 GSL_SUPPRESS(26440) void form::nufthcol(uint32_t color) {
 	if (SelectedForm->fillInfo.feather.color != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillInfo.feather.color = gsl::narrow<uint8_t>(color);
-		const auto attribute                 = (ClosestFormToCursor << 4u) | FTHMSK;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (FRMSK | FTHMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		const auto attribute                 = (ClosestFormToCursor << FRMSHFT) | FTHMSK;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
+				stitch.attribute &= NCOLMSK;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6334,25 +6334,25 @@ GSL_SUPPRESS(26440) void form::nufthcol(uint32_t color) {
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void form::nubrdcol(uint32_t color) {
 	SelectedForm->borderColor = gsl::narrow<uint8_t>(color);
-	const auto attribute      = (ClosestFormToCursor << 4u) | FRMBFIL;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & (FRMSK | TYPMSK)) == attribute) {
-			(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-			(*StitchBuffer)[iStitch].attribute |= color;
+	const auto attribute      = (ClosestFormToCursor << FRMSHFT) | FRMBFIL;
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & (FRMSK | TYPMSK)) == attribute) {
+			stitch.attribute &= NCOLMSK;
+			stitch.attribute |= color;
 		}
 	}
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void form::nulapcol(uint32_t color) {
-	if (gsl::narrow<uint32_t>(SelectedForm->borderColor >> 4u) != color) {
+	if (gsl::narrow<uint32_t>(SelectedForm->borderColor >> FRMSHFT) != color) {
 		SelectedForm->borderColor &= COLMSK;
-		SelectedForm->borderColor |= color << 4u;
-		const auto attribute = (ClosestFormToCursor << 4u) | TYPMSK;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (TYPMSK | FRMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		SelectedForm->borderColor |= color << FRMSHFT;
+		const auto attribute = (ClosestFormToCursor << FRMSHFT) | TYPMSK;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (TYPMSK | FRMSK)) == attribute) {
+				stitch.attribute &= NCOLMSK;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6712,8 +6712,8 @@ void form::fliph() {
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.x = offset - FormVertice.x;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+		for (auto& stitch : *StitchBuffer) {
+			stitch.x = offset - stitch.x;
 		}
 		for (auto& iForm : *FormList) {
 			auto& rect = iForm.rectangle;
@@ -6740,10 +6740,10 @@ void form::fliph() {
 			}
 			form::frmout(ClosestFormToCursor);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto decodedForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
-			if (formMap.test(decodedForm) && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-				(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+		for (auto& stitch : *StitchBuffer) {
+			const auto decodedForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+			if (formMap.test(decodedForm) && ((stitch.attribute & NOTFRM) == 0u)) {
+				stitch.x = offset - stitch.x;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -6756,10 +6756,10 @@ void form::fliph() {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = offset - vertexIt[iVertex].x;
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
+					&& ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.x = offset - stitch.x;
 				}
 			}
 			form::frmout(ClosestFormToCursor);
