@@ -8169,7 +8169,7 @@ void thred::internal::chkncol() {
 }
 
 void thred::internal::setknots() {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::savdo();
 		delknt();
 		setknt();
@@ -8633,7 +8633,7 @@ void thred::internal::movi() {
 		}
 		auto stepCount = 0.0f;
 		if (StateMap.test(StateFlag::ZUMED)) {
-			stepCount = gsl::narrow_cast<float>(PCSHeader.stitchCount) * ZoomFactor * ZoomFactor;
+			stepCount = gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor;
 		}
 		else {
 			stepCount = PCSHeader.stitchCount;
