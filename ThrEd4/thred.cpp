@@ -8305,7 +8305,7 @@ void thred::internal::stchout() {
 		drwlstch(GroupEndStitch);
 	}
 	else {
-		drwlstch(PCSHeader.stitchCount - 1);
+		drwlstch(wrap::toUnsigned(StitchBuffer->size() - 1u));
 	}
 }
 
