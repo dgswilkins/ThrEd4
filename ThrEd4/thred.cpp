@@ -6917,7 +6917,7 @@ void thred::internal::mark() {
 }
 
 void thred::internal::selCol() {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		auto iStitch = 0u;
 		if (StateMap.test(StateFlag::SELBOX)) {
 			iStitch = ClosestPointIndex;
@@ -6930,8 +6930,8 @@ void thred::internal::selCol() {
 				iStitch = 0;
 			}
 		}
-		if (iStitch > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			iStitch = PCSHeader.stitchCount - 1u;
+		if (iStitch > gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1u)) {
+			iStitch = gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1u);
 		}
 		GroupStitchIndex  = iStitch;
 		ClosestPointIndex = iStitch;
@@ -6942,14 +6942,15 @@ void thred::internal::selCol() {
 		if (((*StitchBuffer)[ClosestPointIndex].attribute & COLMSK) != color) {
 			ClosestPointIndex++;
 		}
-		while (GroupStitchIndex < PCSHeader.stitchCount && ((*StitchBuffer)[GroupStitchIndex].attribute & COLMSK) == color) {
+		while (GroupStitchIndex < gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u)
+			&& ((*StitchBuffer)[GroupStitchIndex].attribute & COLMSK) == color) {
 			GroupStitchIndex++;
 		}
 		if (((*StitchBuffer)[ClosestPointIndex].attribute & COLMSK) != color) {
 			ClosestPointIndex--;
 		}
-		if (GroupStitchIndex > gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
-			GroupStitchIndex = PCSHeader.stitchCount - 1u;
+		if (GroupStitchIndex > gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u)) {
+			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 		}
 		StateMap.set(StateFlag::GRPSEL);
 		unbox();
