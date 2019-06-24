@@ -9411,42 +9411,47 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 	range.x = gsl::narrow<double>(UnzoomedRect.x);
 	range.y = gsl::narrow<double>(UnzoomedRect.y);
 	if (!FormList->empty()) {
-		auto stitchCount = 0u;
-		for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) != 0u)
-			    || ((((*StitchBuffer)[iStitch].attribute & TYPMSK) != 0u)
-			        && (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT < FormList->size()))) {
-				(*StitchBuffer)[stitchCount] = (*StitchBuffer)[iStitch];
-				if ((*StitchBuffer)[stitchCount].x > range.x) {
-					(*StitchBuffer)[stitchCount].x = range.x - 1.0f;
+		// ToDo - Why do we treat the forms differently?
+		auto tmpCount     = 0u;
+		auto iDestination = StitchBuffer->begin();
+		for (auto& stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) != 0u)
+			    || (((stitch.attribute & TYPMSK) != 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT < FormList->size()))) {
+				if (stitch.x > range.x) {
+					stitch.x = range.x - 1.0f;
 				}
-				if ((*StitchBuffer)[stitchCount].x < 0) {
-					(*StitchBuffer)[stitchCount].x = 0;
+				if (stitch.x < 0) {
+					stitch.x = 0;
 				}
-				if ((*StitchBuffer)[stitchCount].y > range.y) {
-					(*StitchBuffer)[stitchCount].y = range.y - 1.0f;
+				if (stitch.y > range.y) {
+					stitch.y = range.y - 1.0f;
 				}
-				if ((*StitchBuffer)[stitchCount].y < 0) {
-					(*StitchBuffer)[stitchCount].y = 0;
+				if (stitch.y < 0) {
+					stitch.y = 0;
 				}
-				stitchCount++;
+				*iDestination++ = stitch;
 			}
+			else {
+				OutputDebugString(fmt::format(L"chkrng:tmpCount [{}]\n", tmpCount).c_str());
+			}
+			tmpCount++;
 		}
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(stitchCount);
+		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	}
 	else {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((*StitchBuffer)[iStitch].x > range.x) {
-				(*StitchBuffer)[iStitch].x = range.x - 1.0f;
+		for (auto& stitch : *StitchBuffer) {
+			if (stitch.x > range.x) {
+				stitch.x = range.x - 1.0f;
 			}
-			if ((*StitchBuffer)[iStitch].x < 0) {
-				(*StitchBuffer)[iStitch].x = 0;
+			if (stitch.x < 0) {
+				stitch.x = 0;
 			}
-			if ((*StitchBuffer)[iStitch].y > range.y) {
-				(*StitchBuffer)[iStitch].y = range.y - 1.0f;
+			if (stitch.y > range.y) {
+				stitch.y = range.y - 1.0f;
 			}
-			if ((*StitchBuffer)[iStitch].y < 0) {
-				(*StitchBuffer)[iStitch].y = 0;
+			if (stitch.y < 0) {
+				stitch.y = 0;
 			}
 		}
 	}
