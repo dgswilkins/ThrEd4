@@ -1562,14 +1562,14 @@ void thred::internal::nunams() {
 }
 
 void thred::rngadj() {
-	auto lastStitch = PCSHeader.stitchCount;
+	auto lastStitch = wrap::toUnsigned(StitchBuffer->size());
 	if (lastStitch != 0u) {
 		lastStitch--;
 		if (ClosestPointIndex > lastStitch) {
 			ClosestPointIndex = lastStitch;
 		}
 	}
-	if (GroupStitchIndex > PCSHeader.stitchCount) {
+	if (GroupStitchIndex > StitchBuffer->size()) {
 		GroupStitchIndex = ClosestPointIndex;
 	}
 	if (GroupStitchIndex > ClosestPointIndex) {
