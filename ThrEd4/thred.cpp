@@ -8349,8 +8349,8 @@ void thred::internal::deltot() {
 }
 
 bool thred::internal::wastch() {
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 			return true;
 		}
 	}
@@ -8363,9 +8363,8 @@ bool thred::internal::frmstch() {
 	for (auto form : (*SelectedFormList)) {
 		formMap.set(form);
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		const auto formCode = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
-		if (formMap.test(formCode)) {
+	for (auto& stitch : *StitchBuffer) {
+		if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 			return true;
 		}
 	}
