@@ -1342,29 +1342,31 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 				}
 			}
 			auto iColor  = 0u;
+			auto iStitch = 0u;
 			currentColor = 0xffffffff;
 			const auto range
 			    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
-			for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
-				auto* Stitch = &(*StitchBuffer)[iStitch];
-				if (Stitch->x < range.left) {
-					Stitch->x = range.left;
+			for (auto& stitch : *StitchBuffer) {
+
+				if (stitch.x < range.left) {
+					stitch.x = range.left;
 				}
-				if (Stitch->x > range.right) {
-					Stitch->x = range.right;
+				if (stitch.x > range.right) {
+					stitch.x = range.right;
 				}
-				if (Stitch->y > range.top) {
-					Stitch->y = range.top;
+				if (stitch.y > range.top) {
+					stitch.y = range.top;
 				}
-				if (Stitch->y < range.bottom) {
-					Stitch->y = range.bottom;
+				if (stitch.y < range.bottom) {
+					stitch.y = range.bottom;
 				}
-				const auto nextColor = Stitch->attribute & COLMSK;
+				const auto nextColor = stitch.attribute & COLMSK;
 				if (currentColor != nextColor) {
 					ColorChangeTable[iColor].colorIndex    = gsl::narrow<decltype(ColorChangeTable[iColor].colorIndex)>(nextColor);
 					ColorChangeTable[iColor++].stitchIndex = gsl::narrow<decltype(ColorChangeTable[iColor].stitchIndex)>(iStitch);
 					currentColor                           = nextColor;
 				}
+				iStitch++;
 			}
 			ColorChanges                         = iColor;
 			ColorChangeTable[iColor].stitchIndex = gsl::narrow<decltype(ColorChangeTable[iColor].stitchIndex)>(StitchBuffer->size());
