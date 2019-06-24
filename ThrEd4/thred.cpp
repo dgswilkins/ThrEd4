@@ -8028,8 +8028,8 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 
 		length = hypot(delta.x, delta.y);
 		finish++;
-	} while (length < 2.0f && finish < PCSHeader.stitchCount);
-	if (finish < PCSHeader.stitchCount) {
+	} while (length < 2.0f && finish < wrap::toUnsigned(buffer.size()));
+	if (finish < wrap::toUnsigned(buffer.size())) {
 		KnotAttribute = (*StitchBuffer)[start].attribute | KNOTMSK;
 		KnotStep.x    = 2.0f / length * delta.x;
 		KnotStep.y    = 2.0f / length * delta.y;
@@ -8097,7 +8097,7 @@ void thred::internal::setknt() {
 		iStitch = 1;
 	}
 	StateMap.reset(StateFlag::FILDIR);
-	while (iStitch < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+	while (iStitch < wrap::toUnsigned(StitchBuffer->size() - 1u)) {
 		buffer.push_back((*StitchBuffer)[iStitch]);
 		if (stlen(iStitch) > KNOTLEN) {
 			endknt(buffer, iStitch);
