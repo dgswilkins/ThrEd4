@@ -5849,18 +5849,18 @@ void form::internal::getbig() {
 			AllItemsRect.bottom = trct.bottom;
 		}
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((*StitchBuffer)[iStitch].x < AllItemsRect.left) {
-			AllItemsRect.left = (*StitchBuffer)[iStitch].x;
+	for (auto stitch : *StitchBuffer) {
+		if (stitch.x < AllItemsRect.left) {
+			AllItemsRect.left = stitch.x;
 		}
-		if ((*StitchBuffer)[iStitch].y > AllItemsRect.top) {
-			AllItemsRect.top = (*StitchBuffer)[iStitch].y;
+		if (stitch.y > AllItemsRect.top) {
+			AllItemsRect.top = stitch.y;
 		}
-		if ((*StitchBuffer)[iStitch].x > AllItemsRect.right) {
-			AllItemsRect.right = (*StitchBuffer)[iStitch].x;
+		if (stitch.x > AllItemsRect.right) {
+			AllItemsRect.right = stitch.x;
 		}
-		if ((*StitchBuffer)[iStitch].y < AllItemsRect.bottom) {
-			AllItemsRect.bottom = (*StitchBuffer)[iStitch].y;
+		if (stitch.y < AllItemsRect.bottom) {
+			AllItemsRect.bottom = stitch.y;
 		}
 	}
 }
