@@ -1347,7 +1347,6 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 			const auto range
 			    = fRECTANGLE { UnzoomedRect.x * -1.0f, UnzoomedRect.y * 2.0f, UnzoomedRect.x * 2.0f, UnzoomedRect.y * -1.0f };
 			for (auto& stitch : *StitchBuffer) {
-
 				if (stitch.x < range.left) {
 					stitch.x = range.left;
 				}
@@ -4004,7 +4003,6 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 	auto destination = dstStitchBuffer.begin();
 	for (auto& stitch : stitches) {
 		*destination++ = fPOINTATTR{ stitch.x * 5 / 3, stitch.y * 5 / 3, stitch.attribute };
-
 	}
 	auto boundingRect = fRECTANGLE { dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y };
 	for (auto& stitch : dstStitchBuffer) {
@@ -4721,7 +4719,7 @@ void thred::internal::auxmen() {
 }
 
 void thred::internal::savAs() {
-	if ((PCSHeader.stitchCount != 0u) || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
+	if (!StitchBuffer->empty() || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
 		auto fileName = std::vector<wchar_t> {};
 		fileName.resize(_MAX_PATH);
 		auto dirBuffer = std::vector<wchar_t> {};
@@ -4790,7 +4788,7 @@ void thred::save() {
 			*WorkingFileName /= L".thr";
 		}
 		thi::thrsav();
-		if (PCSHeader.stitchCount != 0u) {
+		if (!StitchBuffer->empty()) {
 			thi::sav();
 		}
 	}
