@@ -2338,9 +2338,9 @@ void form::internal::prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormV
 	}
 	angledFormVertices[angledForm.vertexCount - 1u].x = vertexIt[VertexCount - 1u].x + delta.x * ratio;
 	angledFormVertices[angledForm.vertexCount - 1u].y = vertexIt[VertexCount - 1u].y + delta.y * ratio;
-	SelectedForm                                     = &angledForm;
-	VertexCount                                      = angledForm.vertexCount;
-	CurrentVertexIndex                               = angledForm.vertexIndex;
+	SelectedForm                                      = &angledForm;
+	VertexCount                                       = angledForm.vertexCount;
+	CurrentVertexIndex                                = angledForm.vertexIndex;
 }
 
 void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
@@ -2352,7 +2352,8 @@ void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
 		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
 		duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1u);
 	}
-	duromb(prct[VertexCount - 4u].bipnt, prct[VertexCount - 4u].dipnt, prct[VertexCount - 4u].bopnt, prct[VertexCount - 4u].dopnt);
+	duromb(
+	    prct[VertexCount - 4u].bipnt, prct[VertexCount - 4u].dipnt, prct[VertexCount - 4u].bopnt, prct[VertexCount - 4u].dopnt);
 }
 
 void form::internal::plbak(uint32_t backPoint) {
@@ -6551,7 +6552,8 @@ void form::duhart(uint32_t sideCount) {
 		angle -= stepAngle;
 	}
 	const auto firstVertex = iVertex;
-	const auto ratio = (vertexIt[lastVertex - 1u].x - vertexIt[0].x) / (vertexIt[lastVertex - 1u].x - vertexIt[firstVertex - 1u].x);
+	const auto ratio
+	    = (vertexIt[lastVertex - 1u].x - vertexIt[0].x) / (vertexIt[lastVertex - 1u].x - vertexIt[firstVertex - 1u].x);
 	for (iVertex = lastVertex; iVertex < firstVertex; iVertex++) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[lastVertex - 1u].x) * ratio + vertexIt[lastVertex - 1u].x;
 	}
@@ -6757,8 +6759,7 @@ void form::fliph() {
 				vertexIt[iVertex].x = offset - vertexIt[iVertex].x;
 			}
 			for (auto& stitch : *StitchBuffer) {
-				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-					&& ((stitch.attribute & NOTFRM) == 0u)) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor && ((stitch.attribute & NOTFRM) == 0u)) {
 					stitch.x = offset - stitch.x;
 				}
 			}
@@ -7087,9 +7088,8 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		auto iStitch = 0u;
 		for (auto& stitch : *StitchBuffer) {
-			if (((stitch.attribute & NOTFRM) == 0u)
-			    && (stitch.attribute & FRMSK) == attribute) {
-				auto iColumn = wrap::floor<uint32_t>(stitch.x);
+			if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & FRMSK) == attribute) {
+				auto iColumn                   = wrap::floor<uint32_t>(stitch.x);
 				xPoints[xHistogram[iColumn]++] = iStitch;
 			}
 			iStitch++;
@@ -7354,7 +7354,7 @@ void form::cpylayr(uint32_t codedLayer) {
 					StitchBuffer->push_back(fPOINTATTR {
 					    (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
-				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
+				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -7392,8 +7392,7 @@ void form::movlayr(uint32_t codedLayer) {
 			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
 			StateMap.reset(StateFlag::FORMSEL);
 			for (auto& stitch : *StitchBuffer) {
-				if (((stitch.attribute & ALTYPMSK) != 0u)
-					&& ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+				if (((stitch.attribute & ALTYPMSK) != 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
 				}
 			}
@@ -7500,8 +7499,7 @@ void form::frmsadj() {
 		formMap.set(selectedForm);
 	}
 	for (auto& stitch : *StitchBuffer) {
-		if (((stitch.attribute & ALTYPMSK) != 0u)
-			&& formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+		if (((stitch.attribute & ALTYPMSK) != 0u) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 			stitch.x += FormMoveDelta.x;
 			stitch.y -= FormMoveDelta.y;
 		}
@@ -7593,10 +7591,10 @@ void form::selalfil() {
 
 bool form::frmrng(uint32_t iForm, RANGE& range) {
 	if (!StitchBuffer->empty()) {
-		range.start  = 0;
-		auto& form   = (*FormList)[iForm];
+		range.start          = 0;
+		auto&      form      = (*FormList)[iForm];
 		const auto saveClose = ClosestFormToCursor;
-		ClosestFormToCursor = iForm;
+		ClosestFormToCursor  = iForm;
 		if ((form.fillType != 0u) || (form.edgeType != 0u)) {
 			while (range.start < StitchBuffer->size() && notfstch((*StitchBuffer)[range.start].attribute)) {
 				range.start++;
@@ -8129,8 +8127,7 @@ void form::cntrx() {
 			}
 			frmadj(ClosestFormToCursor);
 			for (auto& stitch : *StitchBuffer) {
-				if (((stitch.attribute & ALTYPMSK) != 0u)
-					&& (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+				if (((stitch.attribute & ALTYPMSK) != 0u) && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
 					stitch.x += FormMoveDelta.x;
 					stitch.y -= FormMoveDelta.y;
 				}
@@ -8868,7 +8865,7 @@ void form::crop() {
 			}
 		}
 		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
+		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}

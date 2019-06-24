@@ -1,5 +1,5 @@
 #include "stdafx.h"
- 
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -311,8 +311,10 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 		xratf(adjustedPoint, (*OSequence)[wrap::toSize(iSequence) + 1u], nextPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.ratio;
 		xratf(currentPoint, (*OSequence)[iSequence], (*OSequence)[iSequence], feather.ratioLocal);
-		xratf(
-		    nextPoint, (*OSequence)[wrap::toSize(iSequence) + 1u], (*OSequence)[wrap::toSize(iSequence) + 1u], feather.ratioLocal);
+		xratf(nextPoint,
+		      (*OSequence)[wrap::toSize(iSequence) + 1u],
+		      (*OSequence)[wrap::toSize(iSequence) + 1u],
+		      feather.ratioLocal);
 	}
 }
 
@@ -720,7 +722,8 @@ uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 	auto iStitch = destination;
 	while (startVertex != endVertex) {
 		if (iStitch != 0u) {
-			if (buffer[iStitch - 1u].x != indentedPoint[startVertex].x || buffer[iStitch - 1u].y != indentedPoint[startVertex].y) {
+			if (buffer[iStitch - 1u].x != indentedPoint[startVertex].x
+			    || buffer[iStitch - 1u].y != indentedPoint[startVertex].y) {
 				buffer.push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 				iStitch++;
 			}
@@ -1049,8 +1052,7 @@ bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
 	return false;
 }
 
-double
-xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
+double xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
 	auto currentRegion = sortRecord.currentRegion;
 	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
@@ -1441,7 +1443,8 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 		fillStartsData.fillNamed.borderColor = gsl::narrow<decltype(fillStartsData.fillNamed.borderColor)>(StitchBuffer->size());
 	}
 	if ((tmap & M_FTHCOL) == 0u) {
-		fillStartsData.fillNamed.featherColor = gsl::narrow<decltype(fillStartsData.fillNamed.featherColor)>(StitchBuffer->size());
+		fillStartsData.fillNamed.featherColor
+		    = gsl::narrow<decltype(fillStartsData.fillNamed.featherColor)>(StitchBuffer->size());
 	}
 	if ((tmap & M_FCOL) == 0u) {
 		fillStartsData.fillNamed.fillColor = gsl::narrow<decltype(fillStartsData.fillNamed.fillColor)>(StitchBuffer->size());
@@ -1453,7 +1456,8 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 					fillStartsData.fillNamed.applique = fillStartsData.fillNamed.appliqueColor + 1u;
 				}
 				else {
-					fillStartsData.fillNamed.applique = gsl::narrow<decltype(fillStartsData.fillNamed.applique)>(StitchBuffer->size());
+					fillStartsData.fillNamed.applique
+					    = gsl::narrow<decltype(fillStartsData.fillNamed.applique)>(StitchBuffer->size());
 				}
 			}
 		}

@@ -696,14 +696,14 @@ void satin::internal::satends(uint32_t isBlunt) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		auto vertexIt                       = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
+		auto vertexIt                        = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		(*InsidePoints)[VertexCount - 1u].x  = vertexIt[VertexCount - 1u].x + step.x;
 		(*InsidePoints)[VertexCount - 1u].y  = vertexIt[VertexCount - 1u].y - step.y;
 		(*OutsidePoints)[VertexCount - 1u].x = vertexIt[VertexCount - 1u].x - step.x;
 		(*OutsidePoints)[VertexCount - 1u].y = vertexIt[VertexCount - 1u].y + step.y;
 	}
 	else {
-		auto vertexIt                    = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt                     = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		(*InsidePoints)[VertexCount - 1u] = (*OutsidePoints)[VertexCount - 1u] = vertexIt[VertexCount - 1u];
 	}
 }

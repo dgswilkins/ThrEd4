@@ -224,7 +224,8 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		ffi::nxtlin(formMenuEntryCount);
 		if (SelectedForm->fillType == FTHF) {
 			labelWindow[LFTHCOL] = ffi::txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
-			valueWindow[LFTHCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1u)), ValueWindowCoords);
+			valueWindow[LFTHCOL]
+			    = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1u)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
 			valueWindow[LFTHTYP] = ffi::numwin(stringTable[wrap::toSize(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0],
