@@ -8190,9 +8190,9 @@ void form::centir() {
 	    = fPOINT { form::midl(AllItemsRect.right, AllItemsRect.left), form::midl(AllItemsRect.top, AllItemsRect.bottom) };
 	const auto hoopCenter = fPOINT { UnzoomedRect.x / 2.0f, UnzoomedRect.y / 2.0f };
 	const auto delta      = fPOINT { hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y };
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		(*StitchBuffer)[iStitch].x += delta.x;
-		(*StitchBuffer)[iStitch].y += delta.y;
+	for (auto& stitch : *StitchBuffer) {
+		stitch.x += delta.x;
+		stitch.y += delta.y;
 	}
 	for (auto& FormVertice : *FormVertices) {
 		FormVertice.x += delta.x;
