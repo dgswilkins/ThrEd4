@@ -954,10 +954,10 @@ void form::flipv() {
 			}
 			form::frmout(ClosestFormToCursor);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto decodedForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
-			if (formMap.test(decodedForm) && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-				(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+		for (auto& stitch : *StitchBuffer) {
+			const auto decodedForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+			if (formMap.test(decodedForm) && ((stitch.attribute & NOTFRM) == 0u)) {
+				stitch.y = offset - stitch.y;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -969,10 +969,9 @@ void form::flipv() {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].y = offset - vertexIt[iVertex].y;
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor && ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.y = offset - stitch.y;
 				}
 			}
 			form::frmout(ClosestFormToCursor);
