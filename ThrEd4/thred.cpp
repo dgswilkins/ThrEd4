@@ -7851,7 +7851,6 @@ void thred::frmdel() {
 		for (auto& stitch : *StitchBuffer) {
 			if ((stitch.attribute & NOTFRM) == 0u) {
 				const auto stitchForm = (stitch.attribute & FRMSK) >> FRMSHFT;
-
 				if (stitchForm > ClosestFormToCursor) {
 					stitch.attribute &= NFRMSK;
 					stitch.attribute |= (stitchForm - 1) << FRMSHFT;
@@ -7863,7 +7862,6 @@ void thred::frmdel() {
 		for (auto& stitch : *StitchBuffer) {
 			if ((stitch.attribute & NOTFRM) == 0u) {
 				const auto stitchForm = (stitch.attribute & FRMSK) >> FRMSHFT;
-
 				if (stitchForm == ClosestFormToCursor) {
 					stitch.attribute &= (NFRMSK & NTYPMSK);
 				}
@@ -10370,7 +10368,7 @@ void thred::internal::bakthum() {
 }
 
 void thred::internal::selalstch() {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		ClosestPointIndex = 0;
 		GroupStitchIndex  = PCSHeader.stitchCount - 1u;
 		GroupStartStitch  = ClosestPointIndex;
@@ -10503,7 +10501,7 @@ bool thred::internal::dunum(uint32_t code) noexcept {
 }
 
 void thred::stchrct(fRECTANGLE& rectangle) {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		rectangle.bottom = rectangle.left = 1e10;
 		rectangle.top = rectangle.right = 0;
 		for (auto index = 0u; index < PCSHeader.stitchCount; index++) {
@@ -10547,7 +10545,7 @@ void thred::internal::desiz() {
 	auto  info        = std::wstring {};
 	auto& stringTable = *StringTable;
 
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::stchrct(rectangle);
 		const auto xSize = (rectangle.right - rectangle.left) / PFGRAN;
 		const auto ySize = (rectangle.top - rectangle.bottom) / PFGRAN;
@@ -10564,7 +10562,7 @@ void thred::internal::desiz() {
 		info += fmt::format(stringTable[STR_FORMS], FormList->size(), xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		auto modifier = utf::Utf8ToUtf16(std::string(&ExtendedHeader.modifierName[0]));
 		info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
 	}
