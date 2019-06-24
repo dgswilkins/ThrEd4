@@ -7995,19 +7995,19 @@ void form::frmnumfn(uint32_t newFormIndex) {
 		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices->begin());
 		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides->begin());
 		std::copy(tempClipPoints.cbegin(), tempClipPoints.cend(), ClipPoints->begin());
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & SRTYPMSK) != 0u) {
-				const auto decodedFormIndex = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & SRTYPMSK) != 0u) {
+				const auto decodedFormIndex = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (decodedFormIndex == ClosestFormToCursor) {
-					fi::stchfrm(newFormIndex, (*StitchBuffer)[iStitch].attribute);
+					fi::stchfrm(newFormIndex, stitch.attribute);
 				}
 				else {
 					if (decodedFormIndex >= start && decodedFormIndex <= finish) {
 						if (newFormIndex < ClosestFormToCursor) {
-							fi::stchfrm(decodedFormIndex + 1, (*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
 						}
 						else {
-							fi::stchfrm(decodedFormIndex - 1, (*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex - 1, stitch.attribute);
 						}
 					}
 				}
