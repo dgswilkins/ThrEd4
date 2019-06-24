@@ -8257,7 +8257,7 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 }
 
 void form::dubean() {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::savdo();
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			thred::rngadj();
@@ -8271,7 +8271,7 @@ void form::dubean() {
 			thred::grpAdj();
 		}
 		else {
-			fi::bean(0, PCSHeader.stitchCount - 1);
+			fi::bean(0, wrap::toUnsigned(StitchBuffer->size() - 1u));
 		}
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
