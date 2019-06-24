@@ -1990,9 +1990,9 @@ void thred::internal::hupfn() {
 			const auto designCenter = fPOINT { hoopSize.x / 2.0f + checkHoopRect.left, hoopSize.y / 2.0f + checkHoopRect.bottom };
 			const auto hoopCenter   = fPOINT { IniFile.hoopSizeX / 2.0f, IniFile.hoopSizeY / 2.0f };
 			const auto delta        = fPOINT { hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y };
-			for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
-				(*StitchBuffer)[iStitch].x += delta.x;
-				(*StitchBuffer)[iStitch].y += delta.y;
+			for (auto& stitch : *StitchBuffer) {
+				stitch.x += delta.x;
+				stitch.y += delta.y;
 			}
 			for (auto& FormVertice : *FormVertices) {
 				FormVertice.x += delta.x;
