@@ -1561,7 +1561,7 @@ void thred::internal::nunams() {
 	redfils();
 }
 
-void thred::rngadj() noexcept {
+void thred::rngadj() {
 	auto lastStitch = PCSHeader.stitchCount;
 	if (lastStitch != 0u) {
 		lastStitch--;
@@ -9400,7 +9400,7 @@ void thred::internal::infadj(float& xCoordinate, float& yCoordinate) noexcept {
 		}
 }
 
-void thred::delinf() {
+void thred::delinf() noexcept {
 	for (auto& iStitch : *StitchBuffer) {
 		thi::infadj(iStitch.x, iStitch.y);
 	}

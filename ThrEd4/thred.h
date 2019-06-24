@@ -37,7 +37,7 @@ void     chkmen() noexcept;
 void     chkrng(fPOINT& range);
 void     coltab();
 void     delfstchs();
-void     delinf();
+void     delinf() noexcept;
 void     delstchm();
 uint32_t duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
@@ -56,7 +56,7 @@ void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
 void ritmov();
 void ritot(uint32_t number);
-void rngadj() noexcept;
+void rngadj();
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 void rotangf(const fPOINT& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 
