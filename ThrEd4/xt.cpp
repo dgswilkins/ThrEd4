@@ -614,9 +614,9 @@ void xt::internal::delwlk(uint32_t code) {
 	if (!StitchBuffer->empty()) {
 		auto highStitchBuffer = std::vector<fPOINTATTR> {};
 		highStitchBuffer.reserve(StitchBuffer->size());
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & WLKFMSK) != code) {
-				highStitchBuffer.push_back((*StitchBuffer)[iStitch]);
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & WLKFMSK) != code) {
+				highStitchBuffer.push_back(stitch);
 			}
 		}
 		if (highStitchBuffer.size() != StitchBuffer->size()) {
@@ -865,8 +865,8 @@ void xt::srtcol() {
 	auto colorStartStitch = std::vector<uint32_t> {};
 	colorStartStitch.resize(colorSize);
 
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		histogram[(*StitchBuffer)[iStitch].attribute & COLMSK]++;
+	for (auto& stitch : *StitchBuffer) {
+		histogram[stitch.attribute & COLMSK]++;
 	}
 	auto startStitch = 0u;
 	auto it          = histogram.cbegin();
@@ -876,9 +876,9 @@ void xt::srtcol() {
 		const auto _ = it++;
 	}
 	auto highStitchBuffer = std::vector<fPOINTATTR> {};
-	highStitchBuffer.resize(PCSHeader.stitchCount);
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		highStitchBuffer[colorStartStitch[(*StitchBuffer)[iStitch].attribute & COLMSK]++] = (*StitchBuffer)[iStitch];
+	highStitchBuffer.resize(StitchBuffer->size());
+	for (auto& stitch : *StitchBuffer) {
+		highStitchBuffer[colorStartStitch[stitch.attribute & COLMSK]++] = stitch;
 	}
 	std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
 }
@@ -1342,13 +1342,14 @@ void xt::internal::duatf(uint32_t ind) {
 
 void xt::dmpat() {
 	auto attribute = (*StitchBuffer)[0].attribute;
-
-	xi::duatf(0);
-	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (attribute != (*StitchBuffer)[iStitch].attribute) {
+	auto iStitch = 0u;
+	xi::duatf(iStitch);
+	for (auto& stitch : *StitchBuffer) {
+		if (attribute != stitch.attribute) {
 			xi::duatf(iStitch);
-			attribute = (*StitchBuffer)[iStitch].attribute;
+			attribute = stitch.attribute;
 		}
+		iStitch++;
 	}
 }
 #endif
@@ -1362,7 +1363,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	auto       bordercolor    = gsl::narrow<uint32_t>(SelectedForm->borderColor & COLMSK);
 
 	auto appliqueColor = gsl::narrow<uint32_t>(SelectedForm->borderColor >> FRMSHFT);
-	for (auto iSourceStitch = 0u; iSourceStitch < PCSHeader.stitchCount; iSourceStitch++) {
+	for (auto iSourceStitch = 0u; iSourceStitch < wrap::toUnsigned(StitchBuffer->size()); iSourceStitch++) {
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
 		}
