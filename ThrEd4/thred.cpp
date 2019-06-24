@@ -3991,7 +3991,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
                              const std::vector<fPOINTATTR>& stitches) {
 	constexpr auto DSTMax          = 121;
 	auto           dstStitchBuffer = std::vector<fPOINTATTR> {};
-	dstStitchBuffer.resize(PCSHeader.stitchCount);
+	dstStitchBuffer.resize(StitchBuffer->size());
 	auto colorData = std::vector<uint32_t> {};
 
 	// there could be as many colors as there are stitches
@@ -4001,24 +4001,24 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 	colorData.push_back(COLVER);
 	colorData.push_back(BackgroundColor);
 	colorData.push_back(UserColor[stitches[0].attribute & COLMSK]);
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		dstStitchBuffer[iStitch].x         = stitches[iStitch].x * 5 / 3;
-		dstStitchBuffer[iStitch].y         = stitches[iStitch].y * 5 / 3;
-		dstStitchBuffer[iStitch].attribute = stitches[iStitch].attribute;
+	auto destination = dstStitchBuffer.begin();
+	for (auto& stitch : stitches) {
+		*destination++ = fPOINTATTR{ stitch.x * 5 / 3, stitch.y * 5 / 3, stitch.attribute };
+
 	}
 	auto boundingRect = fRECTANGLE { dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y };
-	for (auto iStitch = 1u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (dstStitchBuffer[iStitch].x > boundingRect.right) {
-			boundingRect.right = dstStitchBuffer[iStitch].x + 0.5f;
+	for (auto& stitch : dstStitchBuffer) {
+		if (stitch.x > boundingRect.right) {
+			boundingRect.right = stitch.x + 0.5f;
 		}
-		if (dstStitchBuffer[iStitch].x < boundingRect.left) {
-			boundingRect.left = dstStitchBuffer[iStitch].x - 0.5f;
+		if (stitch.x < boundingRect.left) {
+			boundingRect.left = stitch.x - 0.5f;
 		}
-		if (dstStitchBuffer[iStitch].y > boundingRect.top) {
-			boundingRect.top = dstStitchBuffer[iStitch].y + 0.5f;
+		if (stitch.y > boundingRect.top) {
+			boundingRect.top = stitch.y + 0.5f;
 		}
-		if (dstStitchBuffer[iStitch].y < boundingRect.bottom) {
-			boundingRect.bottom = dstStitchBuffer[iStitch].y - 0.5f;
+		if (stitch.y < boundingRect.bottom) {
+			boundingRect.bottom = stitch.y - 0.5f;
 		}
 	}
 	auto centerCoordinate    = POINT { wrap::round<int32_t>(form::midl(boundingRect.right, boundingRect.left)),
@@ -4028,14 +4028,14 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 	DSTOffsetData.Negative.x = wrap::round<int32_t>(centerCoordinate.x - boundingRect.left - 1);
 	DSTOffsetData.Negative.y = wrap::round<int32_t>(centerCoordinate.y - boundingRect.bottom - 1);
 	auto color               = dstStitchBuffer[0].attribute & 0xfu;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (color != (dstStitchBuffer[iStitch].attribute & 0xfu)) {
+	for (auto& stitch : dstStitchBuffer) {
+		if (color != (stitch.attribute & 0xfu)) {
 			savdst(DSTRecords, 0xc30000);
-			color = dstStitchBuffer[iStitch].attribute & 0xfu;
+			color = stitch.attribute & 0xfu;
 			colorData.push_back(UserColor[color]);
 		}
-		auto lengths = POINT { wrap::round<int32_t>(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].x) - centerCoordinate.x),
-			                   wrap::round<int32_t>(gsl::narrow_cast<double>(dstStitchBuffer[iStitch].y) - centerCoordinate.y) };
+		auto lengths = POINT { wrap::round<int32_t>(gsl::narrow_cast<double>(stitch.x) - centerCoordinate.x),
+			wrap::round<int32_t>(gsl::narrow_cast<double>(stitch.y) - centerCoordinate.y) };
 		const auto absoluteLengths = POINT { abs(lengths.x), abs(lengths.y) };
 		auto       count           = 0u;
 		if (absoluteLengths.x > absoluteLengths.y) {
