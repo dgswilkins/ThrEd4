@@ -7935,11 +7935,9 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	}
 }
 
-void form::internal::stchfrm(uint32_t formIndex, uint32_t* attribute) noexcept {
-	if (attribute != nullptr) {
-		*attribute &= NFRMSK;
-		*attribute |= formIndex << FRMSHFT;
-	}
+void form::internal::stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept {
+	attribute &= NFRMSK;
+	attribute |= formIndex << FRMSHFT;
 }
 
 void form::frmnumfn(uint32_t newFormIndex) {
@@ -8001,15 +7999,15 @@ void form::frmnumfn(uint32_t newFormIndex) {
 			if (((*StitchBuffer)[iStitch].attribute & SRTYPMSK) != 0u) {
 				const auto decodedFormIndex = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
 				if (decodedFormIndex == ClosestFormToCursor) {
-					fi::stchfrm(newFormIndex, &(*StitchBuffer)[iStitch].attribute);
+					fi::stchfrm(newFormIndex, (*StitchBuffer)[iStitch].attribute);
 				}
 				else {
 					if (decodedFormIndex >= start && decodedFormIndex <= finish) {
 						if (newFormIndex < ClosestFormToCursor) {
-							fi::stchfrm(decodedFormIndex + 1, &(*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex + 1, (*StitchBuffer)[iStitch].attribute);
 						}
 						else {
-							fi::stchfrm(decodedFormIndex - 1, &(*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex - 1, (*StitchBuffer)[iStitch].attribute);
 						}
 					}
 				}

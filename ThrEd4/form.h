@@ -465,7 +465,7 @@ namespace internal {
 	     spurfn(const fPOINT& innerPoint, const fPOINT& outerPoint, fPOINT& underlayInnerPoint, fPOINT& underlayOuterPoint) noexcept;
 	bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, uint32_t start, uint32_t finish);
-	void stchfrm(uint32_t formIndex, uint32_t* attribute) noexcept;
+	void stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept;
 	void
 	     trfrm(const fPOINT& bottomLeftPoint, const fPOINT& topLeftPoint, const fPOINT& bottomRightPoint, const fPOINT& topRightPoint);
 	void unbean(uint32_t start, uint32_t& finish);
