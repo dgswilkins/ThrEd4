@@ -7499,11 +7499,11 @@ void form::frmsadj() {
 	for (auto selectedForm : (*SelectedFormList)) {
 		formMap.set(selectedForm);
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-		    && formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)) {
-			(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-			(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+	for (auto& stitch : *StitchBuffer) {
+		if (((stitch.attribute & ALTYPMSK) != 0u)
+			&& formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+			stitch.x += FormMoveDelta.x;
+			stitch.y -= FormMoveDelta.y;
 		}
 	}
 }
@@ -7512,12 +7512,12 @@ void form::internal::frmpnts(uint32_t type) {
 	auto       iStitch = 0u;
 	const auto trg     = ((ClosestFormToCursor << 4u) | type);
 
-	while (iStitch < PCSHeader.stitchCount && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
+	while (iStitch < StitchBuffer->size() && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
 		iStitch++;
 	}
 	ClosestPointIndex = iStitch;
-	if (PCSHeader.stitchCount > 0) {
-		iStitch = PCSHeader.stitchCount - 1u;
+	if (!StitchBuffer->empty()) {
+		iStitch = gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1u);
 	}
 	else {
 		iStitch = 0;
