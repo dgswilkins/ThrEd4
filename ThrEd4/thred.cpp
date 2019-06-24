@@ -3776,8 +3776,9 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	auto clipDataCount = 0u;
 
 	stitchHeader.headerType  = 0x2746872;
-	stitchHeader.fileLength  = PCSHeader.stitchCount * sizeof((*StitchBuffer)[0]) + sizeof(stitchHeader) + sizeof(PCSBMPFileName);
-	stitchHeader.stitchCount = PCSHeader.stitchCount;
+	stitchHeader.fileLength = gsl::narrow<decltype(stitchHeader.fileLength)>(
+		StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + sizeof(stitchHeader) + sizeof(PCSBMPFileName));
+	stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto       designer      = utf::Utf16ToUtf8(*DesignerName);
 	const auto modifierName  = gsl::span<char> { ExtendedHeader.modifierName };
@@ -3804,7 +3805,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	    = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
 	constexpr auto formDataOffset
 	    = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-	auto       vtxLen = sizeof(stitchHeader) + PCSHeader.stitchCount * sizeof((*StitchBuffer)[0]) + formDataOffset;
+	auto       vtxLen = sizeof(stitchHeader) + StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + formDataOffset;
 	const auto thredDataSize
 	    = FormList->size() * sizeof(decltype(FormList->back())) + vertexCount * sizeof(decltype(FormVertices->back()))
 	      + guideCount * sizeof(decltype(SatinGuides->back())) + clipDataCount * sizeof(decltype(ClipPoints->back()))
