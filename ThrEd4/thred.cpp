@@ -8145,22 +8145,24 @@ void thred::internal::chkncol() {
 	buffer.reserve(StitchBuffer->size());
 	OutputIndex = 0;
 	StateMap.reset(StateFlag::FILDIR);
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		const auto color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+	auto iStitch = 0u;
+	for (auto& stitch : *StitchBuffer) {
+		const auto color = stitch.attribute & COLMSK;
 		if (color == initialColor) {
-			buffer.push_back((*StitchBuffer)[iStitch]);
+			buffer.push_back(stitch);
 		}
 		else {
-			initialColor    = (*StitchBuffer)[iStitch].attribute & COLMSK;
+			initialColor    = stitch.attribute & COLMSK;
 			const auto code = srchknot(iStitch);
 			if ((code & 1u) != 0u) {
-				endknt(buffer, iStitch - 1);
+				endknt(buffer, iStitch - 1u);
 			}
-			buffer.push_back((*StitchBuffer)[iStitch]);
+			buffer.push_back(stitch);
 			if ((code & 2u) != 0u) {
 				strtknt(buffer, iStitch);
 			}
 		}
+		iStitch++;
 	}
 	StitchBuffer->resize(buffer.size());
 	*StitchBuffer         = buffer;
