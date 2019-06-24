@@ -928,12 +928,12 @@ void form::flipv() {
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.y = offset - FormVertice.y;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+		for (auto& stitch : *StitchBuffer) {
+			stitch.y = offset - stitch.y;
 		}
-		for (auto& formIter : *FormList) {
-			formIter.rectangle.bottom = offset - formIter.rectangle.bottom;
-			formIter.rectangle.top    = offset - formIter.rectangle.top;
+		for (auto& form : *FormList) {
+			form.rectangle.bottom = offset - form.rectangle.bottom;
+			form.rectangle.top    = offset - form.rectangle.top;
 		}
 		StateMap.set(StateFlag::RESTCH);
 		return;
