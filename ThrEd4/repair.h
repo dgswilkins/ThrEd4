@@ -18,7 +18,7 @@ namespace internal {
 	void     bcup(uint32_t find, BADCNTS& badData);
 	void     chkclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
-	void     chkfstch();
+	void     chkfstch() noexcept;
 	uint32_t frmchkfn();
 	void     repclp(std::wstring& repairMessage);
 	void     repflt(std::wstring& repairMessage);
