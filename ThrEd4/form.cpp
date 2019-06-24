@@ -7373,11 +7373,11 @@ void form::movlayr(uint32_t codedLayer) {
 			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
 			formMap.set(selectedForm);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u) {
-				const auto iCurrentForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & ALTYPMSK) != 0u) {
+				const auto iCurrentForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (formMap.test(iCurrentForm)) {
-					(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
 				}
 			}
 		}
@@ -7391,10 +7391,10 @@ void form::movlayr(uint32_t codedLayer) {
 			auto& formAttr = (*FormList)[ClosestFormToCursor].attribute;
 			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
 			StateMap.reset(StateFlag::FORMSEL);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-				    && (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-					(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+			for (auto& stitch : *StitchBuffer) {
+				if (((stitch.attribute & ALTYPMSK) != 0u)
+					&& ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
 				}
 			}
 			StateMap.set(StateFlag::RESTCH);
