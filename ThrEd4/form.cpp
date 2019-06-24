@@ -7056,7 +7056,7 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 
 	thred::chkrng(range);
 	auto xPoints = std::vector<uint32_t> {};
-	xPoints.resize(PCSHeader.stitchCount);
+	xPoints.resize(StitchBuffer->size());
 	auto xHistogram = std::vector<uint32_t> {};
 	xHistogram.resize(wrap::round<size_t>(range.x) + 1u);
 
@@ -7085,19 +7085,22 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	}
 	xHistogram[endColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
-				auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
-
+		auto iStitch = 0u;
+		for (auto& stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) == 0u)
+			    && (stitch.attribute & FRMSK) == attribute) {
+				auto iColumn = wrap::floor<uint32_t>(stitch.x);
 				xPoints[xHistogram[iColumn]++] = iStitch;
 			}
+			iStitch++;
 		}
 	}
 	else {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			auto iColumn                   = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
+		auto iStitch = 0u;
+		for (auto& stitch : *StitchBuffer) {
+			auto iColumn                   = wrap::floor<uint32_t>(stitch.x);
 			xPoints[xHistogram[iColumn]++] = iStitch;
+			iStitch++;
 		}
 	}
 	doTimeWindow(range.x, xPoints, xHistogram);
@@ -7110,7 +7113,7 @@ void form::snap() {
 		fi::snp(GroupStartStitch, GroupEndStitch);
 	}
 	else {
-		fi::snp(0, PCSHeader.stitchCount);
+		fi::snp(0, wrap::toUnsigned(StitchBuffer->size()));
 	}
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
