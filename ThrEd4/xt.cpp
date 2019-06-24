@@ -724,12 +724,12 @@ uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 		if (iStitch != 0u) {
 			if (buffer[iStitch - 1u].x != indentedPoint[startVertex].x
 			    || buffer[iStitch - 1u].y != indentedPoint[startVertex].y) {
-				buffer.push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
+				buffer.emplace_back(fPOINTATTR { indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 				iStitch++;
 			}
 		}
 		else {
-			buffer.push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
+			buffer.emplace_back(fPOINTATTR { indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 			iStitch++;
 		}
 		auto intermediateVertex = 0u;
@@ -748,7 +748,7 @@ uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 			const auto step       = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
 			auto       localPoint = fPOINT { indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y };
 			for (auto iStep = 0u; iStep < stitchCount - 1u; iStep++) {
-				buffer.push_back({ localPoint.x, localPoint.y, code });
+				buffer.emplace_back(fPOINTATTR { localPoint.x, localPoint.y, code });
 				iStitch++;
 				localPoint.x += step.x;
 				localPoint.y += step.y;
@@ -761,7 +761,7 @@ uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 			startVertex = form::nxt(startVertex);
 		}
 	}
-	buffer.push_back({ indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
+	buffer.emplace_back(fPOINTATTR { indentedPoint[startVertex].x, indentedPoint[startVertex].y, code });
 	iStitch++;
 	return iStitch - destination;
 }
@@ -1549,7 +1549,7 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	     iSequence++) {
 		if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1u].x
 		    || (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1u].y) {
-			buffer.push_back({ (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+			buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
 			ilData.output++;
 		}
 	}
