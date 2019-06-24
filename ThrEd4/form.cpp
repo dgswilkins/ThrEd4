@@ -5812,7 +5812,7 @@ void form::apliq() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -5833,7 +5833,7 @@ void form::setap() {
 	displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1u)));
 }
 
-void form::internal::getbig() {
+void form::internal::getbig() noexcept {
 	AllItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
 	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
@@ -6825,7 +6825,7 @@ void form::prpbrd(float borderStitchSpacing) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -7590,6 +7590,7 @@ void form::selalfil() {
 }
 
 bool form::frmrng(uint32_t iForm, RANGE& range) {
+	auto retval = false;
 	if (!StitchBuffer->empty()) {
 		range.start          = 0;
 		auto&      form      = (*FormList)[iForm];
@@ -7603,17 +7604,14 @@ bool form::frmrng(uint32_t iForm, RANGE& range) {
 			while (range.finish > range.start && notfstch((*StitchBuffer)[range.finish].attribute)) {
 				range.finish--;
 			}
-			ClosestFormToCursor = saveClose;
-			return range.finish > range.start;
+			retval = range.finish > range.start;
 		}
 		else {
 			range.finish = wrap::toUnsigned(StitchBuffer->size());
 		}
 		ClosestFormToCursor = saveClose;
-		return false;
 	}
-
-	return false;
+	return retval;
 }
 
 void form::internal::bholbrd() {
@@ -7774,7 +7772,7 @@ bool form::internal::contsf(uint32_t formIndex) {
 		SelectedForm->fillSpacing = LineSpacing;
 		SelectedForm->fillColor   = gsl::narrow<uint8_t>(ActiveColor);
 		form::fsizpar();
-		SelectedForm->attribute |= (ActiveLayer << 1u);
+		SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1u);
 		form::refilfn();
 		return true;
 	}

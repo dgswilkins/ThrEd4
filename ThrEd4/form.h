@@ -319,7 +319,7 @@ namespace internal {
 	void  fshor();
 	void  fspic();
 	void  fsvrt();
-	void  getbig();
+	void  getbig() noexcept;
 	float getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	             const std::vector<double>& lengths,
 	             uint32_t                   iPoint,
