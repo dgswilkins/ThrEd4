@@ -206,10 +206,10 @@ uint32_t form::find1st() {
 	}
 	const auto attribute = ClosestFormToCursor << 4u;
 	auto       iStitch   = 0u;
-	while (iStitch < PCSHeader.stitchCount) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
-			if (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) {
-				return iStitch;
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & FRMSK) == attribute) {
+			if ((stitch.attribute & NOTFRM) == 0u) {
+				break;
 			}
 		}
 		iStitch++;
