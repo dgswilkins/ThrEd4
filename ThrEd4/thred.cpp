@@ -2822,11 +2822,10 @@ void thred::internal::frmcalc() {
 	auto& form = (*FormList)[ClosestFormToCursor];
 	if ((form.fillType != 0u) || (form.edgeType != 0u)) {
 		const auto code      = ClosestFormToCursor << FRMSHFT;
-		auto       endStitch = PCSHeader.stitchCount;
+		const auto endStitch = StitchBuffer->size() - 1u;
 		auto       maxLength = 0.0;
 		auto       minLength = 1e99;
-		if (PCSHeader.stitchCount != 0u) {
-			endStitch--;
+		if (!StitchBuffer->empty()) {
 			for (auto iStitch = 0u; iStitch < endStitch; iStitch++) {
 				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == code && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
 				    && ((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & FRMSK) == code
