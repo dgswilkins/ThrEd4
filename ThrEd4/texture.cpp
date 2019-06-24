@@ -1678,10 +1678,10 @@ void texture::setshft() {
 	selectionRect.right  = SelectedPoint.x;
 	StateMap.reset(StateFlag::TXIN);
 	auto line = 1u;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (txi::inrct(selectionRect, (*StitchBuffer)[iStitch])) {
+	for (auto& stitch : *StitchBuffer) {
+		if (txi::inrct(selectionRect, stitch)) {
 			StateMap.set(StateFlag::TXIN);
-			TempTexturePoints->push_back({ ((*StitchBuffer)[iStitch].y - selectionRect.bottom), gsl::narrow<uint16_t>(line) });
+			TempTexturePoints->push_back(TXPNT { (stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line) });
 		}
 		else {
 			if (StateMap.testAndReset(StateFlag::TXIN)) {
