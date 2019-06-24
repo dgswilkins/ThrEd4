@@ -5235,11 +5235,11 @@ void form::rstfrm() {
 	SelectedForm->rectangle.top += offset.y;
 	SelectedForm->rectangle.right += offset.x;
 	SelectedForm->rectangle.bottom += offset.y;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute && (((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-		    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-			(*StitchBuffer)[iStitch].x += offset.x;
-			(*StitchBuffer)[iStitch].y += offset.y;
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & FRMSK) == attribute && ((stitch.attribute & ALTYPMSK) != 0u)
+		    && ((stitch.attribute & NOTFRM) == 0u)) {
+			stitch.x += offset.x;
+			stitch.y += offset.y;
 		}
 	}
 }
