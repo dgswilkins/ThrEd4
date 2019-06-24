@@ -1,5 +1,5 @@
 #include "stdafx.h"
-
+ 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -1436,15 +1436,15 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	fillStartsData.fillNamed.appliqueColor++;
 	fillStartsMap = tmap;
 	StitchBuffer->resize(iDestinationStitch);
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(iDestinationStitch);
+	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	if ((tmap & M_ECOL) == 0u) {
-		fillStartsData.fillNamed.borderColor = PCSHeader.stitchCount;
+		fillStartsData.fillNamed.borderColor = gsl::narrow<decltype(fillStartsData.fillNamed.borderColor)>(StitchBuffer->size());
 	}
 	if ((tmap & M_FTHCOL) == 0u) {
-		fillStartsData.fillNamed.featherColor = PCSHeader.stitchCount;
+		fillStartsData.fillNamed.featherColor = gsl::narrow<decltype(fillStartsData.fillNamed.featherColor)>(StitchBuffer->size());
 	}
 	if ((tmap & M_FCOL) == 0u) {
-		fillStartsData.fillNamed.fillColor = PCSHeader.stitchCount;
+		fillStartsData.fillNamed.fillColor = gsl::narrow<decltype(fillStartsData.fillNamed.fillColor)>(StitchBuffer->size());
 	}
 	if (SelectedForm->edgeType != 0u) {
 		if (SelectedForm->edgeType == EDGEAPPL) {
@@ -1453,7 +1453,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 					fillStartsData.fillNamed.applique = fillStartsData.fillNamed.appliqueColor + 1u;
 				}
 				else {
-					fillStartsData.fillNamed.applique = PCSHeader.stitchCount;
+					fillStartsData.fillNamed.applique = gsl::narrow<decltype(fillStartsData.fillNamed.applique)>(StitchBuffer->size());
 				}
 			}
 		}
@@ -1462,7 +1462,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 				fillStartsData.fillNamed.border = fillStartsData.fillNamed.borderColor + 1u;
 			}
 			else {
-				fillStartsData.fillNamed.border = PCSHeader.stitchCount;
+				fillStartsData.fillNamed.border = gsl::narrow<decltype(fillStartsData.fillNamed.border)>(StitchBuffer->size());
 			}
 		}
 	}
@@ -1472,7 +1472,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 				fillStartsData.fillNamed.fill = fillStartsData.fillNamed.fillColor + 1u;
 			}
 			else {
-				fillStartsData.fillNamed.fill = PCSHeader.stitchCount;
+				fillStartsData.fillNamed.fill = gsl::narrow<decltype(fillStartsData.fillNamed.fill)>(StitchBuffer->size());
 			}
 		}
 	}
@@ -1482,7 +1482,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 				fillStartsData.fillNamed.feather = fillStartsData.fillNamed.featherColor + 1u;
 			}
 			else {
-				fillStartsData.fillNamed.feather = PCSHeader.stitchCount;
+				fillStartsData.fillNamed.feather = gsl::narrow<decltype(fillStartsData.fillNamed.feather)>(StitchBuffer->size());
 			}
 		}
 	}
