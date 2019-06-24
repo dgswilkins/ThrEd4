@@ -3070,7 +3070,7 @@ void thred::internal::duzero() {
 		delsmal(GroupStartStitch, GroupEndStitch);
 	}
 	else {
-		delsmal(0, PCSHeader.stitchCount);
+		delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
 	}
 }
 
