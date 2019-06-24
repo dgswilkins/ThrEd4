@@ -1916,7 +1916,7 @@ void thred::internal::movins() {
 	if (StateMap.test(StateFlag::INSRT)) {
 		if (StateMap.test(StateFlag::LIN1)) {
 			if (StateMap.test(StateFlag::BAKEND)) {
-				stch2px1(PCSHeader.stitchCount - 1);
+				stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1));
 			}
 			else {
 				stch2px1(0);

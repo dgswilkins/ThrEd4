@@ -206,7 +206,7 @@ uint32_t form::find1st() {
 	}
 	const auto attribute = ClosestFormToCursor << 4u;
 	auto       iStitch   = 0u;
-	while (iStitch < PCSHeader.stitchCount) {
+	while (iStitch < StitchBuffer->size()) {
 		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
 			if (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) {
 				return iStitch;
@@ -522,9 +522,9 @@ void form::delfrms() {
 	ClipPoints->clear();
 	FormList->clear();
 	SatinGuides->clear();
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		(*StitchBuffer)[iStitch].attribute &= NFRM_NTYP;
-		(*StitchBuffer)[iStitch].attribute |= NOTFRM;
+	for (auto stitch : *StitchBuffer) {
+		stitch.attribute &= NFRM_NTYP;
+		stitch.attribute |= NOTFRM;
 	}
 }
 
@@ -928,12 +928,12 @@ void form::flipv() {
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.y = offset - FormVertice.y;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+		for (auto& stitch : *StitchBuffer) {
+			stitch.y = offset - stitch.y;
 		}
-		for (auto& formIter : *FormList) {
-			formIter.rectangle.bottom = offset - formIter.rectangle.bottom;
-			formIter.rectangle.top    = offset - formIter.rectangle.top;
+		for (auto& form : *FormList) {
+			form.rectangle.bottom = offset - form.rectangle.bottom;
+			form.rectangle.top    = offset - form.rectangle.top;
 		}
 		StateMap.set(StateFlag::RESTCH);
 		return;
@@ -954,10 +954,10 @@ void form::flipv() {
 			}
 			form::frmout(ClosestFormToCursor);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto decodedForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
-			if (formMap.test(decodedForm) && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-				(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+		for (auto& stitch : *StitchBuffer) {
+			const auto decodedForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+			if (formMap.test(decodedForm) && ((stitch.attribute & NOTFRM) == 0u)) {
+				stitch.y = offset - stitch.y;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -969,10 +969,9 @@ void form::flipv() {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].y = offset - vertexIt[iVertex].y;
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor && ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.y = offset - stitch.y;
 				}
 			}
 			form::frmout(ClosestFormToCursor);
@@ -4990,16 +4989,15 @@ void form::refilfn() {
 	}
 	UserStitchLength = savedStitchLength;
 	xt::intlv(fillStartsData, fillStartsMap);
-	thred::ritot(StitchBuffer->size());
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	xt::setfchk();
 }
 
 void form::refil() {
 	if (!UserFlagMap.test(UserFlag::WRNOF)) {
 		const auto codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
-		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto attribute = (*StitchBuffer)[iStitch].attribute;
-			if (((attribute & NOTFRM) == 0u) && (attribute & (USMSK | FRMSK)) == codedForm) {
+		for (auto stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
 				if (FormDataSheet != nullptr) {
 					StateMap.set(StateFlag::WASFRMFRM);
 				}
@@ -5237,11 +5235,11 @@ void form::rstfrm() {
 	SelectedForm->rectangle.top += offset.y;
 	SelectedForm->rectangle.right += offset.x;
 	SelectedForm->rectangle.bottom += offset.y;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute && (((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-		    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-			(*StitchBuffer)[iStitch].x += offset.x;
-			(*StitchBuffer)[iStitch].y += offset.y;
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & FRMSK) == attribute && ((stitch.attribute & ALTYPMSK) != 0u)
+		    && ((stitch.attribute & NOTFRM) == 0u)) {
+			stitch.x += offset.x;
+			stitch.y += offset.y;
 		}
 	}
 }
@@ -5561,9 +5559,8 @@ void form::unfil() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap.test(UserFlag::WRNOF)) {
 				const auto codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					const auto attribute = (*StitchBuffer)[iStitch].attribute;
-					if (((attribute & NOTFRM) == 0u) && (attribute & (USMSK | FRMSK)) == codedForm) {
+				for (auto stitch : *StitchBuffer) {
+					if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
 						displayText::tabmsg(IDS_UNFIL);
 						StateMap.set(StateFlag::FILMSG);
 						displayText::okcan();
@@ -5586,7 +5583,7 @@ void form::unfil() {
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
 }
@@ -5835,7 +5832,7 @@ void form::setap() {
 	displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1u)));
 }
 
-void form::internal::getbig() {
+void form::internal::getbig() noexcept {
 	AllItemsRect = fRECTANGLE { 1e9f, 0.0f, 0.0f, 1e9f };
 	for (auto& iForm : *FormList) {
 		const auto& trct = iForm.rectangle;
@@ -5852,18 +5849,18 @@ void form::internal::getbig() {
 			AllItemsRect.bottom = trct.bottom;
 		}
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((*StitchBuffer)[iStitch].x < AllItemsRect.left) {
-			AllItemsRect.left = (*StitchBuffer)[iStitch].x;
+	for (auto stitch : *StitchBuffer) {
+		if (stitch.x < AllItemsRect.left) {
+			AllItemsRect.left = stitch.x;
 		}
-		if ((*StitchBuffer)[iStitch].y > AllItemsRect.top) {
-			AllItemsRect.top = (*StitchBuffer)[iStitch].y;
+		if (stitch.y > AllItemsRect.top) {
+			AllItemsRect.top = stitch.y;
 		}
-		if ((*StitchBuffer)[iStitch].x > AllItemsRect.right) {
-			AllItemsRect.right = (*StitchBuffer)[iStitch].x;
+		if (stitch.x > AllItemsRect.right) {
+			AllItemsRect.right = stitch.x;
 		}
-		if ((*StitchBuffer)[iStitch].y < AllItemsRect.bottom) {
-			AllItemsRect.bottom = (*StitchBuffer)[iStitch].y;
+		if (stitch.y < AllItemsRect.bottom) {
+			AllItemsRect.bottom = stitch.y;
 		}
 	}
 }
@@ -6029,8 +6026,8 @@ void form::setstrtch() {
 				}
 				form::frmout(iForm);
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - reference) * ratio + reference;
+			for (auto stitch : *StitchBuffer) {
+				stitch.x = (stitch.x - reference) * ratio + reference;
 			}
 			selal();
 			return;
@@ -6085,8 +6082,8 @@ void form::setstrtch() {
 				}
 				form::frmout(iForm);
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - reference) * ratio + reference;
+			for (auto& stitch : *StitchBuffer) {
+				stitch.y = (stitch.y - reference) * ratio + reference;
 			}
 			selal();
 			return;
@@ -6266,9 +6263,9 @@ void form::setexpand(float xyRatio) {
 			}
 			form::frmout(iForm);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - stitchReference.x) * ratio.x + stitchReference.x;
-			(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - stitchReference.y) * ratio.y + stitchReference.y;
+		for (auto stitch : *StitchBuffer) {
+			stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
+			stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
 		}
 		form::selal();
 		return;
@@ -6311,10 +6308,10 @@ GSL_SUPPRESS(26440) void form::nufilcol(uint32_t color) {
 	if (SelectedForm->fillColor != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillColor = gsl::narrow<uint8_t>(color);
 		const auto attribute    = (ClosestFormToCursor << 4u) | FRMFIL;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
+				stitch.attribute &= 0xfffffff0;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6325,10 +6322,10 @@ GSL_SUPPRESS(26440) void form::nufthcol(uint32_t color) {
 	if (SelectedForm->fillInfo.feather.color != gsl::narrow<uint8_t>(color)) {
 		SelectedForm->fillInfo.feather.color = gsl::narrow<uint8_t>(color);
 		const auto attribute                 = (ClosestFormToCursor << 4u) | FTHMSK;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (FRMSK | FTHMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
+				stitch.attribute &= 0xfffffff0;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6338,10 +6335,10 @@ GSL_SUPPRESS(26440) void form::nufthcol(uint32_t color) {
 GSL_SUPPRESS(26440) void form::nubrdcol(uint32_t color) {
 	SelectedForm->borderColor = gsl::narrow<uint8_t>(color);
 	const auto attribute      = (ClosestFormToCursor << 4u) | FRMBFIL;
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & (FRMSK | TYPMSK)) == attribute) {
-			(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-			(*StitchBuffer)[iStitch].attribute |= color;
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & (FRMSK | TYPMSK)) == attribute) {
+			stitch.attribute &= 0xfffffff0;
+			stitch.attribute |= color;
 		}
 	}
 }
@@ -6352,10 +6349,10 @@ GSL_SUPPRESS(26440) void form::nulapcol(uint32_t color) {
 		SelectedForm->borderColor &= COLMSK;
 		SelectedForm->borderColor |= color << 4u;
 		const auto attribute = (ClosestFormToCursor << 4u) | TYPMSK;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & (TYPMSK | FRMSK)) == attribute) {
-				(*StitchBuffer)[iStitch].attribute &= 0xfffffff0;
-				(*StitchBuffer)[iStitch].attribute |= color;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & (TYPMSK | FRMSK)) == attribute) {
+				stitch.attribute &= 0xfffffff0;
+				stitch.attribute |= color;
 			}
 		}
 	}
@@ -6390,7 +6387,7 @@ void form::dubold() {
 			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
 }
@@ -6715,8 +6712,8 @@ void form::fliph() {
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.x = offset - FormVertice.x;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+		for (auto& stitch : *StitchBuffer) {
+			stitch.x = offset - stitch.x;
 		}
 		for (auto& iForm : *FormList) {
 			auto& rect = iForm.rectangle;
@@ -6743,10 +6740,10 @@ void form::fliph() {
 			}
 			form::frmout(ClosestFormToCursor);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto decodedForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
-			if (formMap.test(decodedForm) && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-				(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+		for (auto& stitch : *StitchBuffer) {
+			const auto decodedForm = (stitch.attribute & FRMSK) >> FRMSHFT;
+			if (formMap.test(decodedForm) && ((stitch.attribute & NOTFRM) == 0u)) {
+				stitch.x = offset - stitch.x;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);
@@ -6759,10 +6756,10 @@ void form::fliph() {
 			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = offset - vertexIt[iVertex].x;
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor
+				    && ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.x = offset - stitch.x;
 				}
 			}
 			form::frmout(ClosestFormToCursor);
@@ -6835,7 +6832,7 @@ void form::prpbrd(float borderStitchSpacing) {
 			fi::prpsbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -7059,7 +7056,7 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 
 	thred::chkrng(range);
 	auto xPoints = std::vector<uint32_t> {};
-	xPoints.resize(PCSHeader.stitchCount);
+	xPoints.resize(StitchBuffer->size());
 	auto xHistogram = std::vector<uint32_t> {};
 	xHistogram.resize(wrap::round<size_t>(range.x) + 1u);
 
@@ -7088,7 +7085,7 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	}
 	xHistogram[endColumn] = accumulator;
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
 			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
 				auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
@@ -7098,7 +7095,7 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 		}
 	}
 	else {
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < StitchBuffer->size(); iStitch++) {
 			auto iColumn                   = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
 			xPoints[xHistogram[iColumn]++] = iStitch;
 		}
@@ -7113,7 +7110,7 @@ void form::snap() {
 		fi::snp(GroupStartStitch, GroupEndStitch);
 	}
 	else {
-		fi::snp(0, PCSHeader.stitchCount);
+		fi::snp(0, wrap::toUnsigned(StitchBuffer->size()));
 	}
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -7373,11 +7370,11 @@ void form::movlayr(uint32_t codedLayer) {
 			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
 			formMap.set(selectedForm);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u) {
-				const auto iCurrentForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & ALTYPMSK) != 0u) {
+				const auto iCurrentForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (formMap.test(iCurrentForm)) {
-					(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
 				}
 			}
 		}
@@ -7391,10 +7388,10 @@ void form::movlayr(uint32_t codedLayer) {
 			auto& formAttr = (*FormList)[ClosestFormToCursor].attribute;
 			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
 			StateMap.reset(StateFlag::FORMSEL);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-				    && (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-					(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+			for (auto& stitch : *StitchBuffer) {
+				if (((stitch.attribute & ALTYPMSK) != 0u)
+				    && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
 				}
 			}
 			StateMap.set(StateFlag::RESTCH);
@@ -7499,11 +7496,11 @@ void form::frmsadj() {
 	for (auto selectedForm : (*SelectedFormList)) {
 		formMap.set(selectedForm);
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-		    && formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)) {
-			(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-			(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+	for (auto& stitch : *StitchBuffer) {
+		if (((stitch.attribute & ALTYPMSK) != 0u)
+		    && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+			stitch.x += FormMoveDelta.x;
+			stitch.y -= FormMoveDelta.y;
 		}
 	}
 }
@@ -7512,12 +7509,12 @@ void form::internal::frmpnts(uint32_t type) {
 	auto       iStitch = 0u;
 	const auto trg     = ((ClosestFormToCursor << 4u) | type);
 
-	while (iStitch < PCSHeader.stitchCount && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
+	while (iStitch < StitchBuffer->size() && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
 		iStitch++;
 	}
 	ClosestPointIndex = iStitch;
-	if (PCSHeader.stitchCount > 0) {
-		iStitch = PCSHeader.stitchCount - 1u;
+	if (!StitchBuffer->empty()) {
+		iStitch = gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1u);
 	}
 	else {
 		iStitch = 0;
@@ -7565,15 +7562,15 @@ bool form::notfstch(uint32_t attribute) noexcept {
 void form::selalfil() {
 	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		ClosestPointIndex = 0;
-		while (ClosestPointIndex < PCSHeader.stitchCount && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
+		ClosestPointIndex = 0u;
+		while (ClosestPointIndex < StitchBuffer->size() && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
 			ClosestPointIndex++;
 		}
-		if (ClosestPointIndex != PCSHeader.stitchCount) {
+		if (ClosestPointIndex != StitchBuffer->size()) {
 			if (ClosestPointIndex != 0u) {
 				ClosestPointIndex--;
 			}
-			GroupStitchIndex = PCSHeader.stitchCount - 1u;
+			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 			while (GroupStitchIndex > ClosestPointIndex && form::notfstch((*StitchBuffer)[GroupStitchIndex].attribute)) {
 				GroupStitchIndex--;
 			}
@@ -7652,7 +7649,7 @@ void form::bhol() {
 			fi::bholbrd();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -7679,11 +7676,10 @@ void form::fcntr() {
 			}
 			form::frmout(selectedForm);
 			auto codedForm = (selectedForm << FRMSHFT);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == codedForm
-				    && (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)) {
-					(*StitchBuffer)[iStitch].x += delta.x;
-					(*StitchBuffer)[iStitch].y += delta.y;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) == codedForm && ((stitch.attribute & NOTFRM) == 0u)) {
+					stitch.x += delta.x;
+					stitch.y += delta.y;
 				}
 			}
 		}
@@ -7936,11 +7932,9 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	}
 }
 
-void form::internal::stchfrm(uint32_t formIndex, uint32_t* attribute) noexcept {
-	if (attribute != nullptr) {
-		*attribute &= NFRMSK;
-		*attribute |= formIndex << FRMSHFT;
-	}
+void form::internal::stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept {
+	attribute &= NFRMSK;
+	attribute |= formIndex << FRMSHFT;
 }
 
 void form::frmnumfn(uint32_t newFormIndex) {
@@ -7998,19 +7992,19 @@ void form::frmnumfn(uint32_t newFormIndex) {
 		std::copy(tempFormVertices.cbegin(), tempFormVertices.cend(), FormVertices->begin());
 		std::copy(tempGuides.cbegin(), tempGuides.cend(), SatinGuides->begin());
 		std::copy(tempClipPoints.cbegin(), tempClipPoints.cend(), ClipPoints->begin());
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & SRTYPMSK) != 0u) {
-				const auto decodedFormIndex = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		for (auto& stitch : *StitchBuffer) {
+			if ((stitch.attribute & SRTYPMSK) != 0u) {
+				const auto decodedFormIndex = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (decodedFormIndex == ClosestFormToCursor) {
-					fi::stchfrm(newFormIndex, &(*StitchBuffer)[iStitch].attribute);
+					fi::stchfrm(newFormIndex, stitch.attribute);
 				}
 				else {
 					if (decodedFormIndex >= start && decodedFormIndex <= finish) {
 						if (newFormIndex < ClosestFormToCursor) {
-							fi::stchfrm(decodedFormIndex + 1, &(*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
 						}
 						else {
-							fi::stchfrm(decodedFormIndex - 1, &(*StitchBuffer)[iStitch].attribute);
+							fi::stchfrm(decodedFormIndex - 1, stitch.attribute);
 						}
 					}
 				}
@@ -8062,9 +8056,9 @@ void form::srtbyfrm() {
 			}
 		}
 		auto tempStitchBuffer = std::vector<fPOINTATTR> {};
-		tempStitchBuffer.resize(PCSHeader.stitchCount);
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			colorHistogram[color[(*StitchBuffer)[iStitch].attribute & 0xfu]]++;
+		tempStitchBuffer.resize(StitchBuffer->size());
+		for (auto& stitch : *StitchBuffer) {
+			colorHistogram[color[stitch.attribute & 0xfu]]++;
 		}
 		auto colorAccumulator = 0u;
 		for (auto iColor = 0u; iColor < 16; iColor++) {
@@ -8072,8 +8066,8 @@ void form::srtbyfrm() {
 			colorHistogram[iColor] = colorAccumulator;
 			colorAccumulator += value;
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			tempStitchBuffer[colorHistogram[color[(*StitchBuffer)[iStitch].attribute & 0xfu]]++] = (*StitchBuffer)[iStitch];
+		for (auto& stitch : *StitchBuffer) {
+			tempStitchBuffer[colorHistogram[color[stitch.attribute & 0xfu]]++] = stitch;
 		}
 		fi::srtf(tempStitchBuffer, 0, colorHistogram[0]);
 		for (auto iColor = 0u; iColor < 15; iColor++) {
@@ -8131,11 +8125,11 @@ void form::cntrx() {
 				FormMoveDelta.x = 0.0f;
 			}
 			frmadj(ClosestFormToCursor);
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((((*StitchBuffer)[iStitch].attribute & ALTYPMSK) != 0u)
-				    && ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-					(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-					(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+			for (auto& stitch : *StitchBuffer) {
+				if (((stitch.attribute & ALTYPMSK) != 0u)
+				    && (stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+					stitch.x += FormMoveDelta.x;
+					stitch.y -= FormMoveDelta.y;
 				}
 			}
 		}
@@ -8193,9 +8187,9 @@ void form::centir() {
 	    = fPOINT { form::midl(AllItemsRect.right, AllItemsRect.left), form::midl(AllItemsRect.top, AllItemsRect.bottom) };
 	const auto hoopCenter = fPOINT { UnzoomedRect.x / 2.0f, UnzoomedRect.y / 2.0f };
 	const auto delta      = fPOINT { hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y };
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		(*StitchBuffer)[iStitch].x += delta.x;
-		(*StitchBuffer)[iStitch].y += delta.y;
+	for (auto& stitch : *StitchBuffer) {
+		stitch.x += delta.x;
+		stitch.y += delta.y;
 	}
 	for (auto& FormVertice : *FormVertices) {
 		FormVertice.x += delta.x;
@@ -8260,7 +8254,7 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 }
 
 void form::dubean() {
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::savdo();
 		if (StateMap.test(StateFlag::GRPSEL)) {
 			thred::rngadj();
@@ -8274,7 +8268,7 @@ void form::dubean() {
 			thred::grpAdj();
 		}
 		else {
-			fi::bean(0, PCSHeader.stitchCount - 1);
+			fi::bean(0, wrap::toUnsigned(StitchBuffer->size() - 1));
 		}
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -8345,18 +8339,19 @@ void form::clpspac(const uint32_t insertPoint, uint32_t count) {
 }
 
 void form::stchadj() {
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		auto       high = (*StitchBuffer)[iStitch].attribute & FRMSK;
+	for (auto& stitch : *StitchBuffer) {
+		auto       high = stitch.attribute & FRMSK;
 		const auto low  = high >> FRMSHFT;
 		if (low > ClosestFormToCursor) {
-			(*StitchBuffer)[iStitch].attribute &= NFRMSK;
+			stitch.attribute &= NFRMSK;
 			high += 1u << FRMSHFT;
-			(*StitchBuffer)[iStitch].attribute |= high;
+			stitch.attribute |= high;
 		}
 	}
 	form::refilfn();
+	// ToDo - does this make sense?
 	const auto low = ClosestFormToCursor << FRMSHFT;
-	for (auto iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
+	for (auto iStitch = StitchBuffer->size(); iStitch != 0; iStitch--) {
 		if (((*StitchBuffer)[iStitch - 1u].attribute & FRMSK) == low) {
 			break;
 		}
@@ -8456,12 +8451,12 @@ void form::stchs2frm() {
 		}
 		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
 		if (ClosestPointIndex > GroupStitchIndex) {
-			if (ClosestPointIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+			if (ClosestPointIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1u)) {
 				ClosestPointIndex++;
 			}
 		}
 		else {
-			if (GroupStitchIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+			if (GroupStitchIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1u)) {
 				GroupStitchIndex++;
 			}
 		}
@@ -8721,17 +8716,17 @@ void form::col2frm() {
 		featherColorHistogram.resize(formColorPermutations);
 		auto underlayColorHistogram = std::vector<uint32_t> {};
 		underlayColorHistogram.resize(formColorPermutations);
-		for (auto iStitch = 0; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto formColorCode = (*StitchBuffer)[iStitch].attribute & 0x3fffu;
-			if (((*StitchBuffer)[iStitch].attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0u) {
+		for (auto& stitch : *StitchBuffer) {
+			const auto formColorCode = stitch.attribute & (COLMSK | FRMSK);
+			if ((stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0u) {
 				underlayColorHistogram[formColorCode]++;
 			}
 			else {
-				if (((*StitchBuffer)[iStitch].attribute & FTHMSK) != 0u) {
+				if ((stitch.attribute & FTHMSK) != 0u) {
 					featherColorHistogram[formColorCode]++;
 				}
 				else {
-					switch ((*StitchBuffer)[iStitch].attribute & TYPMSK) {
+					switch (stitch.attribute & TYPMSK) {
 					case FRMFIL: {
 						fillColorHistogram[formColorCode]++;
 						break;
@@ -8852,7 +8847,7 @@ void form::chain() {
 			chan();
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
-			thred::ritot(StitchBuffer->size());
+			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 			StateMap.set(StateFlag::RESTCH);
 		}
 	}
@@ -8863,13 +8858,13 @@ void form::crop() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		thred::savdo();
 		form::fvars(ClosestFormToCursor);
-		auto iDestination = 0u;
-		for (auto iSource = 0u; iSource < PCSHeader.stitchCount; iSource++) {
-			if (form::cisin((*StitchBuffer)[iSource].x, (*StitchBuffer)[iSource].y)) {
-				(*StitchBuffer)[iDestination++] = (*StitchBuffer)[iSource];
+		auto iDestination = StitchBuffer->begin();
+		for (auto& stitch : *StitchBuffer) {
+			if (form::cisin(stitch.x, stitch.y)) {
+				*iDestination++ = stitch;
 			}
 		}
-		StitchBuffer->resize(iDestination);
+		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
 		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());;
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -8946,10 +8941,10 @@ void form::srtfrm() {
 	auto histogram = std::vector<uint32_t> {};
 	histogram.resize(FormList->size());
 
-	if (PCSHeader.stitchCount != 0u) {
+	if (!StitchBuffer->empty()) {
 		thred::savdo();
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto iForm = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		for (auto& stitch : *StitchBuffer) {
+			const auto iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 			histogram[iForm]++;
 		}
 		auto totalStitches = 0u;
@@ -8959,11 +8954,11 @@ void form::srtfrm() {
 			totalStitches += formStitchCount;
 		}
 		auto highStitchBuffer = std::vector<fPOINTATTR> {};
-		highStitchBuffer.resize(PCSHeader.stitchCount);
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			const auto iForm              = ((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT;
+		highStitchBuffer.resize(StitchBuffer->size());
+		for (auto& stitch : *StitchBuffer) {
+			const auto iForm              = (stitch.attribute & FRMSK) >> FRMSHFT;
 			auto       iHighStitch        = histogram[iForm]++;
-			highStitchBuffer[iHighStitch] = (*StitchBuffer)[iStitch];
+			highStitchBuffer[iHighStitch] = stitch;
 		}
 		std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
 		thred::coltab();
