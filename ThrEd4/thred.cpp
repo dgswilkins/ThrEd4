@@ -10463,11 +10463,10 @@ void thred::internal::nucols() {
 			SelectedForm->underlayColor = gsl::narrow<uint8_t>(ActiveColor);
 		}
 	}
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)
-		    && ((*StitchBuffer)[iStitch].attribute & TYPMSK) != TYPMSK) {
-			(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-			(*StitchBuffer)[iStitch].attribute |= ActiveColor;
+	for (auto& stitch : *StitchBuffer) {
+		if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT) && (stitch.attribute & TYPMSK) != TYPMSK) {
+			stitch.attribute &= NCOLMSK;
+			stitch.attribute |= ActiveColor;
 		}
 	}
 }
