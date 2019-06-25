@@ -70,7 +70,7 @@ void    selRct(fRECTANGLE& sourceRect);
 void    setpsel();
 void    shft(const fPOINT& delta) noexcept;
 void    stch2pxr(const fPOINT& stitchCoordinate);
-void    stchrct(fRECTANGLE& rectangle);
+void    stchrct(fRECTANGLE& rectangle) noexcept;
 void    strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
 int32_t txtWid(const wchar_t* string) noexcept;
 void    unbBox();
@@ -492,7 +492,7 @@ namespace internal {
 
 	LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 
-	bool wastch();
+	bool wastch() noexcept;
 	void xlin();
 	void xlin1();
 	void zRctAdj() noexcept;
