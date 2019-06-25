@@ -11579,16 +11579,16 @@ void thred::internal::movchk() {
 			if (thi::chkMsgs(Msg.pt, defaultColorWin[0], defaultColorWin[15])) {
 				const auto key          = wrap::pressed(VK_SHIFT);
 				const auto switchColors = wrap::pressed(VK_CONTROL);
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					const auto color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+				for (auto& stitch : *StitchBuffer) {
+					const auto color = stitch.attribute & COLMSK;
 					if (color == VerticalIndex) {
-						(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-						(*StitchBuffer)[iStitch].attribute |= DraggedColor;
+						stitch.attribute &= NCOLMSK;
+						stitch.attribute |= DraggedColor;
 					}
 					else {
 						if (key && color == DraggedColor) {
-							(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-							(*StitchBuffer)[iStitch].attribute |= VerticalIndex;
+							stitch.attribute &= NCOLMSK;
+							stitch.attribute |= VerticalIndex;
 						}
 					}
 				}
