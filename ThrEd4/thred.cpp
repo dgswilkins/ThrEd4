@@ -11687,7 +11687,7 @@ void thred::internal::inscol() {
 	}
 }
 
-bool thred::internal::usedcol() {
+bool thred::internal::usedcol() noexcept {
 	for (auto& stitch : *StitchBuffer) {
 		if ((stitch.attribute & COLMSK) == VerticalIndex) {
 			return true;
@@ -11703,11 +11703,11 @@ void thred::internal::delcol() {
 			displayText::tabmsg(IDS_COLU);
 		}
 		else {
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				const auto color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+			for (auto& stitch : *StitchBuffer) {
+				const auto color = stitch.attribute & COLMSK;
 				if (color > VerticalIndex && (color != 0u)) {
-					(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-					(*StitchBuffer)[iStitch].attribute |= color - 1u;
+					stitch.attribute &= NCOLMSK;
+					stitch.attribute |= color - 1u;
 				}
 			}
 			for (auto& formIter : *FormList) {

@@ -485,7 +485,7 @@ namespace internal {
 	bool   updateHoopSize();
 	bool   updateFillColor();
 	bool   updatePreferences();
-	bool   usedcol();
+	bool   usedcol() noexcept;
 	void   vubak();
 	void   vuselthr();
 	void   vuthrds();
