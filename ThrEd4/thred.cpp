@@ -10169,7 +10169,7 @@ void thred::internal::ungrphi() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			auto flag = true;
-			for (auto iStitch = PCSHeader.stitchCount; iStitch != 0; iStitch--) {
+			for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; iStitch--) {
 				if ((((*StitchBuffer)[iStitch - 1u].attribute & NOTFRM) == 0u)
 				    && (((*StitchBuffer)[iStitch - 1u].attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 					ClosestPointIndex = iStitch - 1u;
