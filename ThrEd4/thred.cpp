@@ -17117,15 +17117,15 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 
 bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
                              float&              xyRatio,
-                             float&              rotationAngle,
+                             float&              angle,
                              fPOINT&             rotationCenter,
                              FRMHED&             textureForm) {
 	if (Msg.message == WM_MOUSEMOVE) {
-		return thi::handleMouseMove(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm);
+		return thi::handleMouseMove(stretchBoxLine, xyRatio, angle, rotationCenter, textureForm);
 	}
 	if (Msg.message == WM_LBUTTONUP) {
 		auto       retflag = true;
-		const auto retval  = thi::handleLeftButtonUp(xyRatio, rotationAngle, rotationCenter, retflag);
+		const auto retval  = thi::handleLeftButtonUp(xyRatio, angle, rotationCenter, retflag);
 		if (retflag) {
 			return retval;
 		}
@@ -17143,7 +17143,7 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	if (Msg.message == WM_LBUTTONDOWN) {
 		{
 			auto       retflag = true;
-			const auto retval  = thi::handleLeftButtonDown(stretchBoxLine, xyRatio, rotationAngle, textureForm, retflag);
+			const auto retval  = thi::handleLeftButtonDown(stretchBoxLine, xyRatio, angle, textureForm, retflag);
 			if (retflag) {
 				return retval;
 			}
