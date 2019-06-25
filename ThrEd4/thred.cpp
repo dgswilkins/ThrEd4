@@ -10016,8 +10016,8 @@ void thred::internal::rembig() {
 }
 
 void thred::internal::duselrng() {
-	SelectedRange.start  = 0;
-	SelectedRange.finish = PCSHeader.stitchCount;
+	SelectedRange.start  = 0u;
+	SelectedRange.finish = gsl::narrow<decltype(SelectedRange.finish)>(StitchBuffer->size());
 	if (StateMap.test(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		SelectedRange.start  = GroupStartStitch;
