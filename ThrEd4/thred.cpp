@@ -9123,7 +9123,7 @@ void thred::internal::insfil() {
 						}
 						InsertCenter            = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
 							form::midl(insertedRectangle.top, insertedRectangle.bottom) };
-						PCSHeader.stitchCount   = gsl::narrow<decltype(PCSHeader.stitchCount)>(newStitchCount);
+						PCSHeader.stitchCount   = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 						const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
 							insertedRectangle.top - insertedRectangle.bottom };
 						form::ratsr();
@@ -9284,45 +9284,36 @@ bool thred::internal::chkok() noexcept {
 
 void thred::internal::mv2f() {
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-		// ToDo - Use a temp buffer rather than the high buffer
 		thred::savdo();
+		std::vector<fPOINTATTR> tempStitchBuffer{};
+		// since most of the stitches will be moved into the temp buffer, reserve the space
+		tempStitchBuffer.reserve(StitchBuffer->size());
 		auto       iLowBuffer  = 0u;
-		auto       iHighBuffer = MAXITEMS;
 		const auto attribute   = ClosestFormToCursor << FRMSHFT;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
+		for (auto& stitch : *StitchBuffer) {
+			if (((stitch.attribute & NOTFRM) == 0u)
+			    && (stitch.attribute & FRMSK) == attribute) {
+				(*StitchBuffer)[iLowBuffer++] = stitch;
 			}
 			else {
-				(*StitchBuffer)[iHighBuffer++] = (*StitchBuffer)[iStitch];
+				tempStitchBuffer.push_back(stitch);
 			}
 		}
-		auto iStitch = MAXITEMS;
-		while (iStitch < iHighBuffer) {
-			(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch++];
-		}
+		std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
 	else {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			thred::savdo();
+			std::vector<fPOINTATTR> tempStitchBuffer{};
+			const auto grpSize = GroupEndStitch + 1u - GroupStartStitch;
+			tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
 			thred::rngadj();
-			auto iHighBuffer = MAXITEMS;
-			auto iLowBuffer  = 0u;
-			for (auto iStitch = 0u; iStitch < GroupStartStitch; iStitch++) {
-				(*StitchBuffer)[iHighBuffer++] = (*StitchBuffer)[iStitch];
-			}
-			for (auto iStitch = GroupEndStitch; iStitch < PCSHeader.stitchCount; iStitch++) {
-				(*StitchBuffer)[iHighBuffer++] = (*StitchBuffer)[iStitch];
-			}
-			for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
-			}
-			for (auto iStitch = MAXITEMS; iStitch < iHighBuffer; iStitch++) {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
-			}
+			std::copy(StitchBuffer->begin(), std::next(StitchBuffer->begin(), GroupStartStitch), tempStitchBuffer.begin());
+			std::copy(std::next(StitchBuffer->begin(), GroupEndStitch + 1u), StitchBuffer->end(), std::next(tempStitchBuffer.begin(), GroupStartStitch));
+			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch), std::next(StitchBuffer->begin(), GroupEndStitch + 1u), StitchBuffer->begin());
+			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), grpSize));
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
@@ -9353,18 +9344,11 @@ void thred::internal::mv2b() {
 			thred::savdo();
 			thred::rngadj();
 			std::vector<fPOINTATTR> tempStitchBuffer{};
-			// I am assuming that GroupEndStitch is always greater than GroupStartStitch otherwise I would need this
-			// const auto grpSize = GroupEndStitch > GroupStartStitch ? (GroupEndStitch - GroupStartStitch) : (GroupStartStitch - GroupEndStitch);
-			const auto grpSize = GroupEndStitch - GroupStartStitch;
-			tempStitchBuffer.reserve(grpSize);
-			for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-				tempStitchBuffer.push_back((*StitchBuffer)[iStitch]);
-			}
-			auto iLowBuffer = GroupStartStitch;
-			for (auto iStitch = GroupEndStitch; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
-				(*StitchBuffer)[iLowBuffer++] = (*StitchBuffer)[iStitch];
-			}
-			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
+			const auto grpSize = GroupEndStitch + 1u - GroupStartStitch;
+			tempStitchBuffer.resize(grpSize);
+			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch), std::next(StitchBuffer->begin(), GroupEndStitch + 1u), tempStitchBuffer.begin());
+			std::copy(std::next(StitchBuffer->begin(), GroupEndStitch + 1u), StitchBuffer->end(), std::next(StitchBuffer->begin(), GroupStartStitch));
+			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
