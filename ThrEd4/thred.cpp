@@ -14952,21 +14952,21 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 	retflag = 1;
 	if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
 		if (StateMap.testAndReset(StateFlag::SELBOX)) {
-			GroupStitchIndex = PCSHeader.stitchCount - 1u;
+			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 			StateMap.set(StateFlag::GRPSEL);
 		}
 		else {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				if (GroupStitchIndex > ClosestPointIndex) {
-					GroupStitchIndex = PCSHeader.stitchCount - 1u;
+					GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 				}
 				else {
-					ClosestPointIndex = PCSHeader.stitchCount - 1u;
+					ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u);
 				}
 			}
 			else {
 				StateMap.set(StateFlag::SELBOX);
-				ClosestPointIndex = PCSHeader.stitchCount - 1u;
+				ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u);
 				StateMap.set(StateFlag::RESTCH);
 				return true;
 			}
@@ -14994,7 +14994,7 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 	else {
 		if (wrap::pressed(VK_CONTROL)) {
 			if (!StitchBuffer->empty()) {
-				stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1u);
+				stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1u));
 			}
 			endpnt();
 			StateMap.set(StateFlag::BAKEND);
@@ -15010,7 +15010,7 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 					setsrch(LargestStitchIndex);
 					return true;
 				}
-				ClosestPointIndex = PCSHeader.stitchCount - 1u;
+				ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u);
 			}
 			movbox();
 		}
