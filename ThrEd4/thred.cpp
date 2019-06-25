@@ -9750,7 +9750,7 @@ void thred::internal::selup() {
 		if (StateMap.test(StateFlag::SELBOX)) {
 			unbox();
 			const auto attribute = (*StitchBuffer)[ClosestPointIndex].attribute & ATMSK;
-			while (ClosestPointIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1
+			while (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u)
 			       && ((*StitchBuffer)[ClosestPointIndex].attribute & ATMSK) == attribute) {
 				ClosestPointIndex++;
 			}
@@ -9993,7 +9993,7 @@ void thred::internal::rembig() {
 			}
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				thred::rngadj();
-				if (GroupEndStitch < PCSHeader.stitchCount) {
+				if (GroupEndStitch < gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size())) {
 					GroupEndStitch++;
 				}
 				if (ClosestPointIndex < GroupStitchIndex) {
@@ -10005,7 +10005,7 @@ void thred::internal::rembig() {
 				thred::grpAdj();
 				break;
 			}
-			thi::makbig(0, PCSHeader.stitchCount);
+			thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
 		} while (false);
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
