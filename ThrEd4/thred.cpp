@@ -10485,20 +10485,20 @@ bool thred::internal::dunum(uint32_t code) noexcept {
 
 void thred::stchrct(fRECTANGLE& rectangle) {
 	if (!StitchBuffer->empty()) {
-		rectangle.bottom = rectangle.left = 1e10;
+		rectangle.bottom = rectangle.left = 1e10f;
 		rectangle.top = rectangle.right = 0;
-		for (auto index = 0u; index < PCSHeader.stitchCount; index++) {
-			if ((*StitchBuffer)[index].x < rectangle.left) {
-				rectangle.left = (*StitchBuffer)[index].x;
+		for (auto& stitch : *StitchBuffer) {
+			if (stitch.x < rectangle.left) {
+				rectangle.left = stitch.x;
 			}
-			if ((*StitchBuffer)[index].x > rectangle.right) {
-				rectangle.right = (*StitchBuffer)[index].x;
+			if (stitch.x > rectangle.right) {
+				rectangle.right = stitch.x;
 			}
-			if ((*StitchBuffer)[index].y < rectangle.bottom) {
-				rectangle.bottom = (*StitchBuffer)[index].y;
+			if (stitch.y < rectangle.bottom) {
+				rectangle.bottom = stitch.y;
 			}
-			if ((*StitchBuffer)[index].y > rectangle.top) {
-				rectangle.top = (*StitchBuffer)[index].y;
+			if (stitch.y > rectangle.top) {
+				rectangle.top = stitch.y;
 			}
 		}
 	}
