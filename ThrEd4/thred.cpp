@@ -18269,7 +18269,7 @@ void thred::internal::drwknot() {
 	constexpr auto KnotBoxSize  = 5;  // offset of the knot box sides;
 	constexpr auto KnotLineSize = 10; // length of the knot line;
 
-	if (!UserFlagMap.test(UserFlag::KNOTOF) && (KnotCount != 0u) && (PCSHeader.stitchCount != 0u)) {
+	if (!UserFlagMap.test(UserFlag::KNOTOF) && (KnotCount != 0u) && (!StitchBuffer->empty())) {
 		const auto kOffset = gsl::narrow<int32_t>(MulDiv(KnotBoxSize, *screenDPI, 96));
 		const auto kLine   = gsl::narrow<int32_t>(MulDiv(KnotLineSize, *screenDPI, 96));
 
@@ -18696,12 +18696,14 @@ void thred::internal::drwStch() {
 				}
 			}
 			else {
-				for (auto iColor = 0; iColor < PCSHeader.stitchCount; iColor++) {
-					if ((*StitchBuffer)[iColor].x >= ZoomRect.left && (*StitchBuffer)[iColor].x <= ZoomRect.right
-					    && (*StitchBuffer)[iColor].y >= ZoomRect.bottom && (*StitchBuffer)[iColor].y <= ZoomRect.top
-					    && setRmap(stitchMap, (*StitchBuffer)[iColor])) {
-						stchbox(iColor, StitchWindowMemDC);
+				auto iStitch = 0u;
+				for (auto& stitch : *StitchBuffer) {
+					if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right
+					    && stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top
+					    && setRmap(stitchMap, stitch)) {
+						stchbox(iStitch, StitchWindowMemDC);
 					}
+					iStitch++;
 				}
 			}
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -18751,7 +18753,7 @@ void thred::internal::dubar() {
 
 	for (auto iColorChange = 0u; iColorChange < ColorChanges; iColorChange++) {
 		const auto barSectionHeight
-		    = gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1u].stitchIndex) / PCSHeader.stitchCount;
+		    = gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1u].stitchIndex) / StitchBuffer->size();
 		colorBarRect.bottom = wrap::round<int32_t>(barSectionHeight * DrawItem->rcItem.bottom);
 		FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 		colorBarRect.top = colorBarRect.bottom;
