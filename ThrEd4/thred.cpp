@@ -12444,9 +12444,9 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 				for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 					form::frmadj(iForm);
 				}
-				for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-					(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-					(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+				for (auto& stitch : *StitchBuffer) {
+					stitch.x += FormMoveDelta.x;
+					stitch.y -= FormMoveDelta.y;
 				}
 				form::selal();
 			}
@@ -12717,14 +12717,14 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 			if (((Msg.wParam & MK_SHIFT) != 0u) // NOLINT
 			    && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 				unbox();
-				GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
+				GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
 				StateMap.set(StateFlag::GRPSEL);
 				thred::grpAdj();
 				nuAct(GroupStitchIndex);
 				StateMap.set(StateFlag::RESTCH);
 			}
 			else {
-				ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
+				ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
 				nuAct(ClosestPointIndex);
 				movbox();
 				if (StateMap.testAndReset(StateFlag::GRPSEL)) {
@@ -12735,7 +12735,7 @@ bool thred::internal::handleEitherButtonDown(bool& retflag) {
 			}
 		}
 		else {
-			ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * PCSHeader.stitchCount);
+			ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
 			nuAct(ClosestPointIndex);
 			rstAll();
 			StateMap.set(StateFlag::SELBOX);
@@ -14315,11 +14315,11 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		if (StateMap.testAndReset(StateFlag::CLPSHO)) {
 			thred::savdo();
 			if ((!StitchBuffer->empty()) && (StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT))
-			    && ClosestPointIndex != gsl::narrow<uint32_t>(PCSHeader.stitchCount - 1)) {
+			    && ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u)) {
 				lodclp(ClosestPointIndex);
 			}
 			else {
-				lodclp(PCSHeader.stitchCount);
+				lodclp(wrap::toUnsigned(StitchBuffer->size()));
 			}
 			thred::rngadj();
 			auto formsRect = fRECTANGLE {};
