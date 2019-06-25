@@ -7327,11 +7327,11 @@ void thred::rotflt(fPOINT& point, const float rotationAngle, const fPOINT& rotat
 	point.y = rotationCenter.y + len * sin(newAngle);
 }
 
-void thred::internal::rotstch(fPOINTATTR* stitch, const float rotationAngle, const fPOINT& rotationCenter) noexcept {
+void thred::internal::rotstch(fPOINTATTR& stitch, const float rotationAngle, const fPOINT& rotationCenter) noexcept {
 	auto       distanceToCenter = 0.0f;
 	auto       newAngle         = 0.0f;
-	const auto dx               = stitch->x - rotationCenter.x;
-	const auto dy               = stitch->y - rotationCenter.y;
+	const auto dx               = stitch.x - rotationCenter.x;
+	const auto dy               = stitch.y - rotationCenter.y;
 
 	if (dx != 0.0) {
 		distanceToCenter = hypot(dx, dy);
@@ -7348,8 +7348,8 @@ void thred::internal::rotstch(fPOINTATTR* stitch, const float rotationAngle, con
 			newAngle         = rotationAngle - PI_F / 2.0f;
 		}
 	}
-	stitch->y = rotationCenter.y + distanceToCenter * sin(newAngle);
-	stitch->x = rotationCenter.x + distanceToCenter * cos(newAngle);
+	stitch.y = rotationCenter.y + distanceToCenter * sin(newAngle);
+	stitch.x = rotationCenter.x + distanceToCenter * cos(newAngle);
 }
 
 void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) {
@@ -9523,8 +9523,8 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 		for (auto& FormVertice : *FormVertices) {
 			thred::rotflt(FormVertice, rotationAngle, rotationCenter);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			thi::rotstch(&(*StitchBuffer)[iStitch], rotationAngle, rotationCenter);
+		for (auto& stitch : *StitchBuffer) {
+			thi::rotstch(stitch, rotationAngle, rotationCenter);
 		}
 		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 			form::frmout(iForm);
@@ -9558,7 +9558,7 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 		}
 		else {
 			for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-				thi::rotstch(&(*StitchBuffer)[iStitch], rotationAngle, rotationCenter);
+				thi::rotstch((*StitchBuffer)[iStitch], rotationAngle, rotationCenter);
 			}
 			thred::rngadj();
 			thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);

@@ -400,7 +400,7 @@ namespace internal {
 	void     rotmrk();
 	void     rotpix(const POINT& unrotatedPoint, POINT& rotatedPoint, const POINT& rotationCenterPixels);
 	void     rotseg();
-	void     rotstch(fPOINTATTR* stitch, float rotationAngle, const fPOINT& rotationCenter) noexcept;
+	void     rotstch(fPOINTATTR& stitch, float rotationAngle, const fPOINT& rotationCenter) noexcept;
 	uint32_t rsed() noexcept;
 	void     rshft(const POINT& shiftPoint);
 	void     rstAll();
