@@ -10355,7 +10355,7 @@ void thred::internal::bakthum() {
 void thred::internal::selalstch() {
 	if (!StitchBuffer->empty()) {
 		ClosestPointIndex = 0;
-		GroupStitchIndex  = PCSHeader.stitchCount - 1u;
+		GroupStitchIndex  = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 		GroupStartStitch  = ClosestPointIndex;
 		GroupEndStitch    = GroupStitchIndex;
 		StateMap.set(StateFlag::GRPSEL);
