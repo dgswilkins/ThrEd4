@@ -11642,8 +11642,8 @@ void thred::internal::inscol() {
 	auto colorMap = boost::dynamic_bitset<>(16);
 	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], UserColorWin[15])) {
 		VerticalIndex &= COLMSK;
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			colorMap.set((*StitchBuffer)[iStitch].attribute & COLMSK);
+		for (auto& stitch : *StitchBuffer) {
+			colorMap.set(stitch.attribute & COLMSK);
 		}
 		if (colorMap.all()) {
 			displayText::tabmsg(IDS_COLAL);
@@ -11653,11 +11653,11 @@ void thred::internal::inscol() {
 			while (colorMap.test(nextColor)) {
 				nextColor--;
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				const auto color = (*StitchBuffer)[iStitch].attribute & COLMSK;
+			for (auto& stitch : *StitchBuffer) {
+				const auto color = stitch.attribute & COLMSK;
 				if (color >= VerticalIndex && color < nextColor) {
-					(*StitchBuffer)[iStitch].attribute &= NCOLMSK;
-					(*StitchBuffer)[iStitch].attribute |= color + 1u;
+					stitch.attribute &= NCOLMSK;
+					stitch.attribute |= color + 1u;
 				}
 			}
 			for (auto& formIter : *FormList) {
@@ -11688,8 +11688,8 @@ void thred::internal::inscol() {
 }
 
 bool thred::internal::usedcol() {
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & COLMSK) == VerticalIndex) {
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & COLMSK) == VerticalIndex) {
 			return true;
 		}
 	}
