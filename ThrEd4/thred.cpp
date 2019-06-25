@@ -10536,7 +10536,7 @@ void thred::internal::desiz() {
 		    || (rectangle.top > IniFile.hoopSizeY)) {
 			info += stringTable[STR_STCHOUT];
 		}
-		info += fmt::format(stringTable[STR_STCHS], PCSHeader.stitchCount, xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		info += fmt::format(stringTable[STR_STCHS], wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (!FormList->empty()) {
 		thred::frmrct(rectangle);
