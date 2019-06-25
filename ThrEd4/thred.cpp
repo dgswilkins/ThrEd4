@@ -10407,7 +10407,7 @@ void thred::internal::rngal() {
 		auto iStitch     = 0u;
 		auto iRange      = 0u;
 		auto flagInRange = false;
-		while (iStitch < PCSHeader.stitchCount) {
+		for (; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			if (inrng(iStitch)) {
 				if (!flagInRange) {
 					prng[iRange].start = iStitch;
@@ -10421,7 +10421,6 @@ void thred::internal::rngal() {
 					flagInRange = false;
 				}
 			}
-			iStitch++;
 		}
 		if (flagInRange) {
 			prng[iRange].finish = iStitch - 1u;
