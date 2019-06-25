@@ -9680,9 +9680,10 @@ void thred::internal::delfre() {
 	auto currentStitchCount = 0u;
 
 	thred::savdo();
-	for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u) {
-			(*StitchBuffer)[currentStitchCount++] = (*StitchBuffer)[iStitch];
+	// ToDo - this loop does not delete all free stitches. look at frmdel as well
+	for (auto& stitch : *StitchBuffer) {
+		if ((stitch.attribute & NOTFRM) == 0u) {
+			(*StitchBuffer)[currentStitchCount++] = stitch;
 		}
 	}
 	StitchBuffer->resize(currentStitchCount);
