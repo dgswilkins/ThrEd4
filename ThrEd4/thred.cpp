@@ -10138,15 +10138,16 @@ void thred::internal::ungrplo() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			auto flag = true;
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0u)
-				    && (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
+			auto iStitch = 0u;
+			for (auto& stitch : *StitchBuffer) {
+				if (((stitch.attribute & NOTFRM) == 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 					ClosestPointIndex = iStitch;
 					StateMap.set(StateFlag::SELBOX);
 					StateMap.set(StateFlag::RESTCH);
 					flag = false;
 					break;
 				}
+				iStitch++;
 			}
 			if (flag) {
 				displayText::grpmsg1();
