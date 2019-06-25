@@ -10817,17 +10817,18 @@ void thred::internal::rotmrk() {
 			for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
 				angdif(nuang(vertexIt[iVertex].y - ZoomMarkPoint.y, vertexIt[iVertex].x - ZoomMarkPoint.x));
 			}
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) == codedFormIndex) {
-					angdif(nuang((*StitchBuffer)[iStitch].y - ZoomMarkPoint.y, (*StitchBuffer)[iStitch].x - ZoomMarkPoint.x));
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) == codedFormIndex) {
+					angdif(nuang(stitch.y - ZoomMarkPoint.y, stitch.x - ZoomMarkPoint.x));
 				}
 			}
 		}
 		else {
 			thred::rngadj();
-			LowestAngle = HighestAngle = 0;
-			OriginalAngle              = atan2((*StitchBuffer)[GroupStartStitch].y - ZoomMarkPoint.y,
-                                  (*StitchBuffer)[GroupStartStitch].x - ZoomMarkPoint.x);
+			LowestAngle   = 0.0f;
+			HighestAngle  = 0.0f;
+			OriginalAngle = atan2((*StitchBuffer)[GroupStartStitch].y - ZoomMarkPoint.y,
+			                      (*StitchBuffer)[GroupStartStitch].x - ZoomMarkPoint.x);
 			for (auto iStitch = GroupStartStitch + 1u; iStitch <= GroupEndStitch; iStitch++) {
 				angdif(nuang((*StitchBuffer)[iStitch].y - ZoomMarkPoint.y, (*StitchBuffer)[iStitch].x - ZoomMarkPoint.x));
 			}
