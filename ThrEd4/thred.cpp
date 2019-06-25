@@ -15056,9 +15056,8 @@ bool thred::internal::handleRightKey(bool& retflag) {
 				StateMap.reset(StateFlag::LENSRCH);
 				StateMap.reset(StateFlag::FORMSEL);
 				if (StateMap.testAndReset(StateFlag::SELBOX)) {
-					auto lastStitch = PCSHeader.stitchCount;
-					if (lastStitch != 0u) {
-						lastStitch--;
+					if (!StitchBuffer->empty()) {
+						auto lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1u);
 						if (ClosestPointIndex < lastStitch) {
 							StateMap.set(StateFlag::GRPSEL);
 							GroupStitchIndex = ClosestPointIndex + 1u;
@@ -15066,9 +15065,8 @@ bool thred::internal::handleRightKey(bool& retflag) {
 					}
 				}
 				else {
-					auto lastStitch = PCSHeader.stitchCount;
-					if (lastStitch != 0u) {
-						lastStitch--;
+					if (!StitchBuffer->empty()) {
+						auto lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1u);
 						if (GroupStitchIndex < lastStitch) {
 							GroupStitchIndex++;
 							nuAct(GroupStitchIndex);
@@ -15102,14 +15100,14 @@ bool thred::internal::handleRightKey(bool& retflag) {
 				}
 				else {
 					if (StateMap.test(StateFlag::SELBOX)) {
-						if (ClosestPointIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+						if (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1u)) {
 							ClosestPointIndex++;
 						}
 						movbox();
 						return true;
 					}
 					if (StateMap.test(StateFlag::GRPSEL)) {
-						if (GroupStitchIndex < gsl::narrow<uint32_t>(PCSHeader.stitchCount) - 1) {
+						if (GroupStitchIndex < gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u)) {
 							GroupStitchIndex++;
 							thred::grpAdj();
 							thred::redraw(ColorBar);
