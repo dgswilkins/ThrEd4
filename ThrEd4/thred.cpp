@@ -11427,9 +11427,9 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 			SelectedForm = &formIt;
 			frmpos(deltaX, deltaY);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			(*StitchBuffer)[iStitch].x += deltaX;
-			(*StitchBuffer)[iStitch].y += deltaY;
+		for (auto& stitch : *StitchBuffer) {
+			stitch.x += deltaX;
+			stitch.y += deltaY;
 		}
 		AllItemsRect.bottom += deltaY;
 		AllItemsRect.top += deltaY;
@@ -11444,10 +11444,10 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			formMap.set(selectedForm);
 		}
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-			if (formMap.test(((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT)) {
-				(*StitchBuffer)[iStitch].x += deltaX;
-				(*StitchBuffer)[iStitch].y += deltaY;
+		for (auto& stitch : *StitchBuffer) {
+			if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
+				stitch.x += deltaX;
+				stitch.y += deltaY;
 			}
 		}
 		for (auto selectedForm : (*SelectedFormList)) {
@@ -11461,10 +11461,10 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		SelectedForm = &((*FormList)[ClosestFormToCursor]);
 		frmpos(deltaX, deltaY);
 		if ((SelectedForm->fillType != 0u) || (SelectedForm->edgeType != 0u)) {
-			for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-				if (((*StitchBuffer)[iStitch].attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-					(*StitchBuffer)[iStitch].x += deltaX;
-					(*StitchBuffer)[iStitch].y += deltaY;
+			for (auto& stitch : *StitchBuffer) {
+				if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
+					stitch.x += deltaX;
+					stitch.y += deltaY;
 				}
 			}
 		}
