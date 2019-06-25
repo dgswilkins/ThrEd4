@@ -8057,13 +8057,6 @@ uint32_t thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) 
 	return start;
 }
 
-void thred::mvstchs(uint32_t destination, uint32_t source, uint32_t count) {
-	auto       sourceStart     = &(*StitchBuffer)[source];
-	auto       sourceEnd       = &sourceStart[count];
-	const auto destinationSpan = gsl::span<fPOINTATTR>(&(*StitchBuffer)[destination], (MAXITEMS * 2) - destination);
-	std::copy(sourceStart, sourceEnd, destinationSpan.begin());
-}
-
 void thred::internal::setknt() {
 	auto iStitch = 0u;
 

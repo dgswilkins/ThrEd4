@@ -48,7 +48,6 @@ void     grpAdj();
 void     hidbit();
 void     movStch();
 
-void mvstchs(uint32_t destination, uint32_t source, uint32_t count);
 bool px2stch() noexcept;
 void pxCor2stch(const POINT& point) noexcept;
 void redclp();
