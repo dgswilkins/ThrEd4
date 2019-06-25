@@ -9911,7 +9911,7 @@ void thred::internal::colchk() {
 		auto color         = StitchBuffer->front().attribute & COLMSK;
 		auto currentStitch = 0u;
 
-		for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
+		for (auto iStitch = 0u; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
 				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0u)) {
 					(*StitchBuffer)[iStitch - 1u].attribute
@@ -14573,13 +14573,11 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 							formIter.underlayColor = gsl::narrow<uint8_t>(ActiveColor);
 						}
 						const auto formCode = ClosestFormToCursor << FRMSHFT;
-						for (auto iStitch = 0u; iStitch < PCSHeader.stitchCount; iStitch++) {
-							auto stitchAttribute = (*StitchBuffer)[iStitch].attribute;
-							if (((stitchAttribute & ALTYPMSK) != 0u) && (stitchAttribute & FRMSK) == formCode
-							    && (stitchAttribute & TYPMSK) != TYPMSK) {
-								stitchAttribute &= NCOLMSK;
-								stitchAttribute |= ActiveColor;
-								(*StitchBuffer)[iStitch].attribute = stitchAttribute;
+						for (auto& stitch : *StitchBuffer) {
+							if (((stitch.attribute & ALTYPMSK) != 0u) && (stitch.attribute & FRMSK) == formCode
+							    && (stitch.attribute & TYPMSK) != TYPMSK) {
+								stitch.attribute &= NCOLMSK;
+								stitch.attribute |= ActiveColor;
 							}
 						}
 						thred::coltab();
