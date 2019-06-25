@@ -10604,7 +10604,7 @@ void thred::internal::setdst() {
 
 void thred::internal::fop() {
 	trace::untrace();
-	if (!FormList->empty() || (PCSHeader.stitchCount != 0u)) {
+	if (!FormList->empty() || (!StitchBuffer->empty())) {
 		if (savcmp()) {
 			nuFil();
 			nulayr(0);
