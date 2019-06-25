@@ -14433,17 +14433,16 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					drwLin(linePoints, 0, 2, BackgroundPen);
 				}
 				else {
-					auto lastStitch = PCSHeader.stitchCount;
-					if (lastStitch != 0u) {
-						lastStitch--;
+					if (!StitchBuffer->empty()) {
+						auto lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1u);
 						if (ClosestPointIndex == lastStitch) {
 							if (ZoomFactor < STCHBOX) {
 								SelectObject(StitchWindowDC, LinePen);
-								stchbox(PCSHeader.stitchCount - 1, StitchWindowDC);
-								stchbox(PCSHeader.stitchCount - 2, StitchWindowDC);
+								stchbox(lastStitch, StitchWindowDC);
+								stchbox(lastStitch - 1, StitchWindowDC);
 							}
 							SetROP2(StitchWindowDC, R2_COPYPEN);
-							drwLin(linePoints, PCSHeader.stitchCount - 2, 2, BackgroundPen);
+							drwLin(linePoints, lastStitch - 1, 2, BackgroundPen);
 						}
 						else {
 							if (ZoomFactor < STCHBOX) {
@@ -14466,7 +14465,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					stch2px1(ClosestPointIndex - 1);
 					MoveLine0[0] = StitchCoordinatesPixels;
 				}
-				auto iStitch = PCSHeader.stitchCount;
+				auto iStitch = wrap::toUnsigned(StitchBuffer->size());
 				if (iStitch != 0u) {
 					iStitch--;
 				}
