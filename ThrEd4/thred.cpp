@@ -18759,7 +18759,7 @@ void thred::internal::dubar() {
 		colorBarRect.top = colorBarRect.bottom;
 	}
 	if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL)) {
-		auto selectedIndicator = gsl::narrow_cast<double>(ClosestPointIndex) / PCSHeader.stitchCount;
+		auto selectedIndicator = gsl::narrow_cast<double>(ClosestPointIndex) / StitchBuffer->size();
 		indicatorLine[0].y = indicatorLine[1].y = wrap::round<int32_t>(colorBarRect.bottom * selectedIndicator + 0.5);
 		indicatorLine[0].x                      = colorBarRect.left;
 		indicatorLine[1].x                      = colorBarRect.right;
@@ -18767,7 +18767,7 @@ void thred::internal::dubar() {
 		SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 		Polyline(DrawItem->hDC, static_cast<const POINT*>(indicatorLine), 2);
 		if (StateMap.test(StateFlag::GRPSEL)) {
-			selectedIndicator  = gsl::narrow_cast<double>(GroupStitchIndex) / PCSHeader.stitchCount;
+			selectedIndicator  = gsl::narrow_cast<double>(GroupStitchIndex) / StitchBuffer->size();
 			indicatorLine[0].y = indicatorLine[1].y = wrap::round<int32_t>(colorBarRect.bottom * selectedIndicator + 0.5);
 			indicatorLine[0].x                      = colorBarRect.left;
 			indicatorLine[1].x                      = colorBarRect.right;
