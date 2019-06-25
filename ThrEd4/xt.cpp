@@ -622,7 +622,6 @@ void xt::internal::delwlk(uint32_t code) {
 		if (highStitchBuffer.size() != StitchBuffer->size()) {
 			StitchBuffer->resize(highStitchBuffer.size());
 			std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
-			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		}
 	}
 }
@@ -1285,7 +1284,6 @@ void xt::fsort() {
 		}
 		StitchBuffer->resize(tempStitchBuffer.size());
 		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cend(), StitchBuffer->begin());
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -1439,7 +1437,6 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	fillStartsData.fillNamed.appliqueColor++;
 	fillStartsMap = tmap;
 	StitchBuffer->resize(iDestinationStitch);
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	if ((tmap & M_ECOL) == 0u) {
 		fillStartsData.fillNamed.borderColor = gsl::narrow<decltype(fillStartsData.fillNamed.borderColor)>(StitchBuffer->size());
 	}
@@ -1695,7 +1692,6 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		}
 		xi::chkend(*StitchBuffer, code, ilData);
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	thred::coltab();
 }
 

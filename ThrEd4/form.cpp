@@ -163,7 +163,6 @@ void form::delmfil() {
 		                   [codedForm](const fPOINTATTR& m) -> bool { return (m.attribute & FRMSK) == codedForm; }),
 		    StitchBuffer->end());
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::fsizpar() noexcept {
@@ -5552,7 +5551,6 @@ void form::unfil() {
 			}
 		}
 		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -5583,7 +5581,6 @@ void form::unfil() {
 			SelectedForm->fillType = 0;
 			SelectedForm->edgeType = 0;
 			SelectedForm->extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
-			PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
@@ -7304,7 +7301,6 @@ void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) 
 		StitchBuffer->push_back(fPOINTATTR { (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
 		sourceIt++;
 	}
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 	GroupStitchIndex      = wrap::toUnsigned(StitchBuffer->size() - 1u);
 	thred::rngadj();
 	thred::rotfn(rotationAngle, rotationCenter);
@@ -7354,7 +7350,6 @@ void form::cpylayr(uint32_t codedLayer) {
 					StitchBuffer->push_back(fPOINTATTR {
 					    (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
 				}
-				PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -8247,8 +8242,6 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 	// and then insert the remainder of the new stitches
 	StitchBuffer->insert(
 	    std::next(StitchBuffer->begin(), finish), std::next(highStitchBuffer.begin(), finish - start), highStitchBuffer.end());
-
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::dubean() {
@@ -8299,7 +8292,6 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 		                    std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1u));
 	}
 	finish                = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
-	PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 }
 
 void form::debean() {
@@ -8863,7 +8855,6 @@ void form::crop() {
 			}
 		}
 		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
