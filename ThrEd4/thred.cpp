@@ -9358,6 +9358,7 @@ void thred::delinf() noexcept {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
+	thred::savdo();
 	thred::delinf();
 	range.x = gsl::narrow<double>(UnzoomedRect.x);
 	range.y = gsl::narrow<double>(UnzoomedRect.y);
@@ -9387,7 +9388,8 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 			}
 			tmpCount++;
 		}
-		StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
+		StitchBuffer->resize(iDestination - StitchBuffer->begin());
+		thred::coltab();
 	}
 	else {
 		for (auto& stitch : *StitchBuffer) {
