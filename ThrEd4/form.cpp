@@ -6261,7 +6261,7 @@ void form::setexpand(float xyRatio) {
 			}
 			form::frmout(iForm);
 		}
-		for (auto stitch : *StitchBuffer) {
+		for (auto& stitch : *StitchBuffer) {
 			stitch.x = (stitch.x - stitchReference.x) * ratio.x + stitchReference.x;
 			stitch.y = (stitch.y - stitchReference.y) * ratio.y + stitchReference.y;
 		}
