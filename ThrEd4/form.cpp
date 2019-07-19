@@ -5795,7 +5795,7 @@ void form::apliq() {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow_cast<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -5809,7 +5809,7 @@ void form::apliq() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow_cast<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -6807,7 +6807,7 @@ void form::prpbrd(float borderStitchSpacing) {
 			form::fvars(ClosestFormToCursor);
 			SelectedForm->borderSize = LineSpacing;
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow_cast<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -7365,7 +7365,7 @@ void form::movlayr(uint32_t codedLayer) {
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
 			auto& formAttr = (*FormList)[selectedForm].attribute;
-			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
+			formAttr       = gsl::narrow<uint8_t>(codedLayer | gsl::narrow_cast<decltype(codedLayer)>(formAttr & NFRMLMSK));
 			formMap.set(selectedForm);
 		}
 		for (auto& stitch : *StitchBuffer) {
@@ -7384,7 +7384,7 @@ void form::movlayr(uint32_t codedLayer) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			thred::savdo();
 			auto& formAttr = (*FormList)[ClosestFormToCursor].attribute;
-			formAttr       = gsl::narrow<uint8_t>((formAttr & NFRMLMSK) | codedLayer);
+			formAttr       = gsl::narrow<uint8_t>(codedLayer | gsl::narrow_cast<decltype(codedLayer)>(formAttr & NFRMLMSK));
 			StateMap.reset(StateFlag::FORMSEL);
 			for (auto& stitch : *StitchBuffer) {
 				if (((stitch.attribute & ALTYPMSK) != 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {

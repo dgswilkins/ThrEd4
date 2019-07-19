@@ -643,7 +643,7 @@ void satin::satbrd() {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
 			if (UserFlagMap.test(UserFlag::BLUNT)) {
-				SelectedForm->attribute |= (SBLNT | FBLNT);
+				SelectedForm->attribute |= gsl::narrow_cast<decltype(SelectedForm->attribute)>(SBLNT | FBLNT);
 			}
 			else {
 				SelectedForm->attribute &= NOBLNT;
@@ -799,6 +799,7 @@ void satin::ribon() {
 				StateMap.set(StateFlag::DELTO);
 				thred::frmdel();
 				ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
+				thred::coltab();
 				StateMap.set(StateFlag::FORMSEL);
 				StateMap.set(StateFlag::INIT);
 				StateMap.set(StateFlag::RESTCH);

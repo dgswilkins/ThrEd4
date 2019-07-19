@@ -161,7 +161,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", ((SelectedForm->attribute & FRMLMSK) >> 1u)), ValueWindowCoords);
+	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1u)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);

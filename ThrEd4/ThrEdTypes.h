@@ -976,7 +976,7 @@ public:
 	uint32_t userFlagMap { 0u };                            // bitmap for user variables
 	float    borderWidth { 0.0f };                          // border width
 	uint32_t appliqueColor { 0u };                          // applique color
-	char     prevNames[OLDNUM][_MAX_PATH] { 0 };            // last file names
+	char     prevNames[OLDNUM][_MAX_PATH]{ { 0 } };            // last file names
 	float    snapLength { 0.0f };                           // snap together length
 	float    starRatio { 0.0f };                            // star ratio
 	float    spiralWrap { 0.0f };                           // spiral wrap
