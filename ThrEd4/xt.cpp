@@ -1545,9 +1545,15 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
 	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1u].index;
 	     iSequence++) {
-		if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1u].x
-		    || (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1u].y) {
-			buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+		if (ilData.output > 0) {
+			if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1u].x
+				|| (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1u].y) {
+				buffer.emplace_back(fPOINTATTR{ (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+				ilData.output++;
+			}
+		}
+		else {
+			buffer.emplace_back(fPOINTATTR{ (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
 			ilData.output++;
 		}
 	}
