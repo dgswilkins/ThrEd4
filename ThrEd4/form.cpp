@@ -3066,9 +3066,9 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 	}
 	auto clipGrid = RECT { wrap::floor<int32_t>(boundingRect.left / clipWidth),
-		                   wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0f) + 2,
-		                   wrap::ceil<int32_t>(boundingRect.right / clipWidth),
-		                   wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0f) };
+		wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0f) + 2,
+		wrap::ceil<int32_t>(boundingRect.right / clipWidth),
+		wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0f) };
 
 	auto negativeOffset = 0l;
 	auto clipGridOffset = 0u;
@@ -5206,6 +5206,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 			return true;
 		}
 	}
+	SelectedFormControlVertex >>= 1u;
 	if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top && point.y <= rectangle.bottom) {
 		auto formOrigin = POINT { 0l, 0l };
 		auto vertexIt   = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);

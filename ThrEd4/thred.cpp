@@ -9633,6 +9633,7 @@ bool thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 		StateMap.set(StateFlag::SHOSTRTCH);
 		return true;
 	}
+	SelectedFormControlVertex >>= 1u;
 	if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right
 	    && pointToTest.y >= SelectedFormsRect.top && pointToTest.y <= SelectedFormsRect.bottom) {
 		SelectedFormsSize
@@ -17632,7 +17633,7 @@ void thred::internal::redini() {
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
 			LoadString(
-			    ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+				ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
 			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			getdes();
 		}
