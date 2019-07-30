@@ -3202,7 +3202,7 @@ void thred::internal::dusel(HDC dc) {
 	SetROP2(dc, R2_NOTXORPEN);
 	SelectObject(dc, LinePen);
 	wrap::Polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1));
-	for (auto iPoint = 0u; iPoint < 8; iPoint++) {
+	for (auto iPoint = 0u; iPoint < (FormControlPoints->size() - 1); iPoint++) {
 		form::selsqr((*FormControlPoints)[iPoint], dc);
 	}
 	SetROP2(dc, R2_COPYPEN);
@@ -3215,7 +3215,8 @@ void thred::internal::unsel() {
 }
 
 void thred::internal::nuselrct() {
-	fPOINT outline[9] = {};
+	auto outline = std::vector<fPOINT> {};
+	outline.resize(FormControlPoints->size());
 
 	unsel();
 	outline[0].x = outline[6].x = outline[7].x = outline[8].x = StitchRangeRect.left;
@@ -3224,8 +3225,11 @@ void thred::internal::nuselrct() {
 	outline[3].y = outline[7].y = form::midl(StitchRangeRect.top, StitchRangeRect.bottom);
 	outline[4].y = outline[5].y = outline[6].y = StitchRangeRect.bottom;
 	outline[2].x = outline[3].x = outline[4].x = StitchRangeRect.right;
-	for (auto iLine = 0u; iLine < 9; iLine++) {
-		form::sfCor2px(outline[iLine], (*FormControlPoints)[iLine]);
+	
+	auto iPoint = outline.begin();
+	for (auto& controlPoint : *FormControlPoints) {
+		form::sfCor2px(*iPoint, controlPoint);
+		iPoint++;
 	}
 }
 
@@ -9565,17 +9569,17 @@ void thred::internal::nulayr(uint32_t play) {
 }
 
 bool thred::internal::iselpnt() {
+	const auto pointToTest         = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 	auto       closestControlPoint = 0u;
 	auto       minimumLength       = 1e99;
-	const auto pointToTest         = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
-
-	for (auto iControlPoint = 0u; iControlPoint < 9; iControlPoint++) {
-		const auto length
-		    = hypot(pointToTest.x - (*FormControlPoints)[iControlPoint].x, pointToTest.y - (*FormControlPoints)[iControlPoint].y);
+	auto       iControlPoint       = 0u;
+	for (auto controlPoint : *FormControlPoints) {
+		const auto length = hypot(pointToTest.x - controlPoint.x, pointToTest.y - controlPoint.y);
 		if (length < minimumLength) {
 			minimumLength       = length;
 			closestControlPoint = iControlPoint;
 		}
+		iControlPoint++;
 	}
 	if (minimumLength < CLOSENUF) {
 		SelectedFormControlVertex = closestControlPoint;
@@ -13976,10 +13980,10 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
 		auto& controlPoint = *FormControlPoints;
 		if (iselpnt()) {
-			for (auto iSide = 0u; iSide < 4; iSide++) {
+			for (auto iSide = 0u; iSide < stretchBoxLine.size(); iSide++) {
 				stretchBoxLine[iSide] = controlPoint[wrap::toSize(iSide) * 2u];
 			}
-			stretchBoxLine[4] = stretchBoxLine[0];
+			stretchBoxLine.back() = stretchBoxLine.front();
 			if ((SelectedFormControlVertex & 1u) != 0u) {
 				StateMap.set(StateFlag::STRTCH);
 			}
@@ -19486,7 +19490,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_textureInputBuffer        = std::wstring {};
 
 		private_DefaultColorWin.resize(16);
-		private_FormControlPoints.resize(10);
+		private_FormControlPoints.resize(9);
 		private_LabelWindow.resize(LASTLIN);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");

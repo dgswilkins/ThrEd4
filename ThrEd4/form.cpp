@@ -5182,18 +5182,19 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 	formControls[3].y = formControls[7].y = wrap::round<int32_t>(form::midl(rectangle.top, rectangle.bottom));
 
 	auto minimumLength = 1e99;
-	for (auto iControl = 0u; iControl < 10; iControl++) {
-		const auto length = hypot(formControls[iControl].x - point.x, formControls[iControl].y - point.y);
+	auto formControlIndex = 0u;
+	for (auto iControl : formControls) {
+		const auto length = hypot(iControl.x - point.x, iControl.y - point.y);
 		if (length < minimumLength) {
 			minimumLength             = length;
-			SelectedFormControlVertex = iControl;
+			SelectedFormControlVertex = formControlIndex;
 		}
 		if (minimumLength < CLOSENUF) {
 			form::ritfrct(ClosestFormToCursor, StitchWindowDC);
-			for (auto iCorner = 0u; iCorner < 4; iCorner++) {
+			for (auto iCorner = 0u; iCorner < stretchBoxLine.size(); iCorner++) {
 				stretchBoxLine[iCorner] = formControls[wrap::toSize(iCorner) * 2u];
 			}
-			stretchBoxLine[4] = stretchBoxLine[0];
+			stretchBoxLine.back() = stretchBoxLine.front();
 			thred::strtchbox(stretchBoxLine);
 			if ((SelectedFormControlVertex & 1u) != 0u) {
 				StateMap.set(StateFlag::STRTCH);
@@ -5207,6 +5208,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 			StateMap.set(StateFlag::SHOSTRTCH);
 			return true;
 		}
+		formControlIndex++;
 	}
 	SelectedFormControlVertex >>= 1u;
 	if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top && point.y <= rectangle.bottom) {
