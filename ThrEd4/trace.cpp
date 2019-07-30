@@ -613,7 +613,8 @@ bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDir
 		}
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 		tracedPoints.push_back({ gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y) });
@@ -1194,7 +1195,8 @@ void trace::tracpar() {
 							trace::tracedg();
 							break;
 						}
-						default: {}
+						default: {
+						}
 						}
 					}
 				}
@@ -1343,7 +1345,8 @@ void trace::traceNumberInput(uint32_t NumericCode) {
 		ti::dutrnum0(traceColor);
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	thred::redraw(TraceNumberInput);
 }

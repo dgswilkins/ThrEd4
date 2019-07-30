@@ -3066,9 +3066,9 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		}
 	}
 	auto clipGrid = RECT { wrap::floor<int32_t>(boundingRect.left / clipWidth),
-		wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0f) + 2,
-		wrap::ceil<int32_t>(boundingRect.right / clipWidth),
-		wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0f) };
+		                   wrap::ceil<int32_t>(boundingRect.top / ClipRectSize.cy + 1.0f) + 2,
+		                   wrap::ceil<int32_t>(boundingRect.right / clipWidth),
+		                   wrap::floor<int32_t>(boundingRect.bottom / ClipRectSize.cy - 1.0f) };
 
 	auto negativeOffset = 0l;
 	auto clipGridOffset = 0u;
@@ -3094,7 +3094,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		for (auto iVertex = 0u; iVertex < currentVertexCount; iVertex++) {
 			vertexIt[iVertex].y += formNegativeOffset;
 		}
-		boundingRect.top    += formNegativeOffset;
+		boundingRect.top += formNegativeOffset;
 		boundingRect.bottom += formNegativeOffset;
 	}
 	auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
@@ -5181,7 +5181,7 @@ bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
 	formControls[1].x = formControls[5].x = wrap::round<int32_t>(form::midl(rectangle.right, rectangle.left));
 	formControls[3].y = formControls[7].y = wrap::round<int32_t>(form::midl(rectangle.top, rectangle.bottom));
 
-	auto minimumLength = 1e99;
+	auto minimumLength    = 1e99;
 	auto formControlIndex = 0u;
 	for (auto iControl : formControls) {
 		const auto length = hypot(iControl.x - point.x, iControl.y - point.y);
@@ -7306,7 +7306,7 @@ void form::internal::duprots(float rotationAngle, const fPOINT& rotationCenter) 
 		StitchBuffer->push_back(fPOINTATTR { (*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK)) });
 		sourceIt++;
 	}
-	GroupStitchIndex      = wrap::toUnsigned(StitchBuffer->size() - 1u);
+	GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1u);
 	thred::rngadj();
 	thred::rotfn(rotationAngle, rotationCenter);
 	thred::coltab();
@@ -7510,6 +7510,7 @@ void form::internal::frmpnts(uint32_t type) {
 	auto       iStitch = 0u;
 	const auto trg     = ((ClosestFormToCursor << 4u) | type);
 
+	// ToDo - could this be more efficient with a ranged for?
 	while (iStitch < StitchBuffer->size() && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
 		iStitch++;
 	}
@@ -8296,7 +8297,7 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 		StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()),
 		                    std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1u));
 	}
-	finish                = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
+	finish = start + wrap::toUnsigned(highStitchBuffer.size() - 1u);
 }
 
 void form::debean() {

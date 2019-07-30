@@ -931,44 +931,44 @@ const THREAD PESThread[] = {
 };
 
 const char imageWithFrame[ThumbHeight][ThumbWidth]= { 
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
-    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
-    { 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
-    { 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
-    { 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
-    { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } 
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
+	{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+	{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0 },
+	{ 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0 },
+	{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
+	{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
+	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 } 
 };
 
 #endif
@@ -1009,7 +1009,8 @@ BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		}
 		}
 	}
-	default: {}
+	default: {
+	}
 	}
 	return FALSE;
 }
@@ -2195,7 +2196,8 @@ void thred::internal::chknum() {
 				form::refil();
 				return;
 			}
-			default: {}
+			default: {
+			}
 			}
 			if (FormMenuChoice == LBCSIZ) {
 				thred::savdo();
@@ -2256,7 +2258,9 @@ void thred::internal::chknum() {
 							SelectedForm->edgeSpacing = value;
 							break;
 						}
-						default: { SelectedForm->edgeSpacing = value / 2.0f; }
+						default: {
+							SelectedForm->edgeSpacing = value / 2.0f;
+						}
 						}
 						break;
 					}
@@ -2291,7 +2295,8 @@ void thred::internal::chknum() {
 						SelectedForm->borderColor |= (gsl::narrow_cast<uint32_t>(borderColor) << 4u);
 						break;
 					}
-					default: {}
+					default: {
+					}
 					}
 				}
 				else {
@@ -3225,7 +3230,7 @@ void thred::internal::nuselrct() {
 	outline[3].y = outline[7].y = form::midl(StitchRangeRect.top, StitchRangeRect.bottom);
 	outline[4].y = outline[5].y = outline[6].y = StitchRangeRect.bottom;
 	outline[2].x = outline[3].x = outline[4].x = StitchRangeRect.right;
-	
+
 	auto iPoint = outline.begin();
 	for (auto& controlPoint : *FormControlPoints) {
 		form::sfCor2px(*iPoint, controlPoint);
@@ -5070,7 +5075,7 @@ void thred::internal::redbak() {
 			StitchBuffer->clear();
 			StateMap.reset(StateFlag::INIT);
 		}
-		UnzoomedRect          = undoData->zoomRect;
+		UnzoomedRect = undoData->zoomRect;
 		if (undoData->formCount != 0u) {
 			FormList->resize(undoData->formCount);
 			std::copy(undoData->forms, undoData->forms + undoData->formCount, FormList->begin());
@@ -5271,7 +5276,8 @@ bool thred::internal::gudtyp(WORD bitCount) noexcept {
 		return true;
 	case 32:
 		return true;
-	default: {}
+	default: {
+	}
 	}
 	return false;
 }
@@ -5529,9 +5535,9 @@ void thred::internal::dstran(std::vector<DSTREC>& DSTData) {
 			}
 		}
 	}
-	const auto dstSize    = fPOINT { maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y };
-	IniFile.hoopType      = CUSTHUP;
-	UnzoomedRect          = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
+	const auto dstSize = fPOINT { maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y };
+	IniFile.hoopType   = CUSTHUP;
+	UnzoomedRect       = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
 	if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
 		IniFile.hoopSizeX = dstSize.x * 1.1f;
 		IniFile.hoopSizeY = dstSize.y * 1.1f;
@@ -7652,7 +7658,7 @@ void thred::internal::duclip() {
 				for (auto& selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
 				}
-				auto astch = std::vector<fPOINTATTR>{};
+				auto astch = std::vector<fPOINTATTR> {};
 				// Reserve a reasonable amount space, probably not enough though
 				astch.reserve(StitchBuffer->size() / 16u);
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
@@ -7667,7 +7673,7 @@ void thred::internal::duclip() {
 						astch.push_back(stitch);
 					}
 				}
-				auto stitchCount  = astch.size();
+				const auto stitchCount = astch.size();
 				if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 					Clip        = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2u); // NOLINT
@@ -8091,7 +8097,7 @@ void thred::internal::setknt() {
 	endknt(buffer, iStitch);
 	buffer.back().attribute &= (~KNOTMSK);
 	StitchBuffer->resize(buffer.size());
-	*StitchBuffer         = buffer;
+	*StitchBuffer = buffer;
 }
 
 uint32_t thred::internal::srchknot(uint32_t source) noexcept {
@@ -8145,7 +8151,7 @@ void thred::internal::chkncol() {
 		iStitch++;
 	}
 	StitchBuffer->resize(buffer.size());
-	*StitchBuffer         = buffer;
+	*StitchBuffer = buffer;
 }
 
 void thred::internal::setknots() {
@@ -9068,19 +9074,19 @@ void thred::internal::insfil() {
 							}
 							else {
 								(*StitchBuffer)
-									.emplace_back(
-										fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
-										+ gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
-										gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
-										+ gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
-										newAttribute });
+								    .emplace_back(
+								        fPOINTATTR { gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x)
+								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0f,
+								                     gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y)
+								                         + gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0f,
+								                     newAttribute });
 							}
 						}
 						const auto newStitchCount    = StitchBuffer->size();
 						auto       insertedRectangle = fRECTANGLE { (*StitchBuffer)[insertIndex].x,
-							(*StitchBuffer)[insertIndex].y,
-							(*StitchBuffer)[insertIndex].x,
-							(*StitchBuffer)[insertIndex].y };
+                                                              (*StitchBuffer)[insertIndex].y,
+                                                              (*StitchBuffer)[insertIndex].x,
+                                                              (*StitchBuffer)[insertIndex].y };
 						for (; insertIndex < newStitchCount; insertIndex++) {
 							auto& stitch = (*StitchBuffer)[insertIndex];
 							if (stitch.x < insertedRectangle.left) {
@@ -9097,15 +9103,15 @@ void thred::internal::insfil() {
 							}
 						}
 						InsertCenter            = fPOINT { form::midl(insertedRectangle.right, insertedRectangle.left),
-							form::midl(insertedRectangle.top, insertedRectangle.bottom) };
+                                                form::midl(insertedRectangle.top, insertedRectangle.bottom) };
 						const auto insertedSize = fPOINT { insertedRectangle.right - insertedRectangle.left,
-							insertedRectangle.top - insertedRectangle.bottom };
+							                               insertedRectangle.top - insertedRectangle.bottom };
 						form::ratsr();
 						InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
 						// ToDo - Should this be vertical ratio?
 						InsertSize.y = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
 						const auto initialInsertPoint
-							= POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
+						    = POINT { StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2 };
 						insflin(initialInsertPoint);
 						NewFormVertexCount = 5;
 						StateMap.set(StateFlag::SHOFRM);
@@ -9259,14 +9265,13 @@ bool thred::internal::chkok() noexcept {
 void thred::internal::mv2f() {
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 		thred::savdo();
-		std::vector<fPOINTATTR> tempStitchBuffer{};
+		std::vector<fPOINTATTR> tempStitchBuffer {};
 		// since most of the stitches will be moved into the temp buffer, reserve the space
 		tempStitchBuffer.reserve(StitchBuffer->size());
-		auto       iLowBuffer  = 0u;
-		const auto attribute   = ClosestFormToCursor << FRMSHFT;
+		auto       iLowBuffer = 0u;
+		const auto attribute  = ClosestFormToCursor << FRMSHFT;
 		for (auto& stitch : *StitchBuffer) {
-			if (((stitch.attribute & NOTFRM) == 0u)
-			    && (stitch.attribute & FRMSK) == attribute) {
+			if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & FRMSK) == attribute) {
 				(*StitchBuffer)[iLowBuffer++] = stitch;
 			}
 			else {
@@ -9280,13 +9285,17 @@ void thred::internal::mv2f() {
 	else {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			thred::savdo();
-			std::vector<fPOINTATTR> tempStitchBuffer{};
-			const auto grpSize = GroupEndStitch + 1u - GroupStartStitch;
+			std::vector<fPOINTATTR> tempStitchBuffer {};
+			const auto              grpSize = GroupEndStitch + 1u - GroupStartStitch;
 			tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
 			thred::rngadj();
 			std::copy(StitchBuffer->begin(), std::next(StitchBuffer->begin(), GroupStartStitch), tempStitchBuffer.begin());
-			std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u), StitchBuffer->end(), std::next(tempStitchBuffer.begin(), GroupStartStitch));
-			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch), std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u), StitchBuffer->begin());
+			std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u),
+			          StitchBuffer->end(),
+			          std::next(tempStitchBuffer.begin(), GroupStartStitch));
+			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch),
+			          std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u),
+			          StitchBuffer->begin());
 			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), grpSize));
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -9297,12 +9306,11 @@ void thred::internal::mv2f() {
 void thred::internal::mv2b() {
 	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 		thred::savdo();
-		std::vector<fPOINTATTR> tempStitchBuffer{};
-		auto       iLowBuffer  = 0u;
-		const auto attribute   = ClosestFormToCursor << FRMSHFT;
+		std::vector<fPOINTATTR> tempStitchBuffer {};
+		auto                    iLowBuffer = 0u;
+		const auto              attribute  = ClosestFormToCursor << FRMSHFT;
 		for (auto& stitch : *StitchBuffer) {
-			if (((stitch.attribute & NOTFRM) == 0u)
-			    && (stitch.attribute & FRMSK) == attribute) {
+			if (((stitch.attribute & NOTFRM) == 0u) && (stitch.attribute & FRMSK) == attribute) {
 				tempStitchBuffer.push_back(stitch);
 			}
 			else {
@@ -9317,12 +9325,18 @@ void thred::internal::mv2b() {
 		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 			thred::savdo();
 			thred::rngadj();
-			std::vector<fPOINTATTR> tempStitchBuffer{};
-			const auto grpSize = GroupEndStitch + 1u - GroupStartStitch;
+			std::vector<fPOINTATTR> tempStitchBuffer {};
+			const auto              grpSize = GroupEndStitch + 1u - GroupStartStitch;
 			tempStitchBuffer.resize(grpSize);
-			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch), std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u), tempStitchBuffer.begin());
-			std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u), StitchBuffer->end(), std::next(StitchBuffer->begin(), GroupStartStitch));
-			std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
+			std::copy(std::next(StitchBuffer->begin(), GroupStartStitch),
+			          std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u),
+			          tempStitchBuffer.begin());
+			std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1u),
+			          StitchBuffer->end(),
+			          std::next(StitchBuffer->begin(), GroupStartStitch));
+			std::copy(tempStitchBuffer.begin(),
+			          tempStitchBuffer.end(),
+			          std::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 		}
@@ -9803,7 +9817,7 @@ void thred::internal::seldwn() {
 }
 
 bool thred::internal::movstchs(uint32_t destination, uint32_t start, uint32_t finish) {
-	std::vector<fPOINTATTR> tempStitchBuffer{};
+	std::vector<fPOINTATTR> tempStitchBuffer {};
 
 	if ((destination + 1u) < wrap::toUnsigned(StitchBuffer->size())) {
 		destination++;
@@ -9818,13 +9832,18 @@ bool thred::internal::movstchs(uint32_t destination, uint32_t start, uint32_t fi
 	if (destination < start) {
 		tempStitchBuffer.resize(finish - destination);
 		std::copy(std::next(StitchBuffer->begin(), start), std::next(StitchBuffer->begin(), finish), tempStitchBuffer.begin());
-		std::copy(std::next(StitchBuffer->begin(), destination), std::next(StitchBuffer->begin(), start), std::next(tempStitchBuffer.begin(), finish - start));
+		std::copy(std::next(StitchBuffer->begin(), destination),
+		          std::next(StitchBuffer->begin(), start),
+		          std::next(tempStitchBuffer.begin(), finish - start));
 		std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), destination));
 	}
 	else {
 		tempStitchBuffer.resize(destination - start);
-		std::copy(std::next(StitchBuffer->begin(), finish), std::next(StitchBuffer->begin(), destination), tempStitchBuffer.begin());
-		std::copy(std::next(StitchBuffer->begin(), start), std::next(StitchBuffer->begin(), finish), std::next(tempStitchBuffer.begin(), destination - finish));
+		std::copy(
+		    std::next(StitchBuffer->begin(), finish), std::next(StitchBuffer->begin(), destination), tempStitchBuffer.begin());
+		std::copy(std::next(StitchBuffer->begin(), start),
+		          std::next(StitchBuffer->begin(), finish),
+		          std::next(tempStitchBuffer.begin(), destination - finish));
 		std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), start));
 	}
 	return true;
@@ -9879,6 +9898,7 @@ void thred::internal::colchk() {
 		auto color         = StitchBuffer->front().attribute & COLMSK;
 		auto currentStitch = 0u;
 
+		// ToDo - Can this loop become a ranged for?
 		for (auto iStitch = 0u; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
 				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0u)) {
@@ -10103,7 +10123,7 @@ void thred::internal::ungrplo() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			auto flag = true;
+			auto flag    = true;
 			auto iStitch = 0u;
 			for (auto& stitch : *StitchBuffer) {
 				if (((stitch.attribute & NOTFRM) == 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
@@ -10184,7 +10204,8 @@ void thred::internal::rthumnam(uint32_t iThumbnail) {
 		barnam((*ButtonWin)[HMAXLEN], iThumbnail);
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 }
 
@@ -10502,7 +10523,8 @@ void thred::internal::desiz() {
 		    || (rectangle.top > IniFile.hoopSizeY)) {
 			info += stringTable[STR_STCHOUT];
 		}
-		info += fmt::format(stringTable[STR_STCHS], wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize / 25.4), ySize, (ySize / 25.4));
+		info += fmt::format(
+		    stringTable[STR_STCHS], wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize / 25.4), ySize, (ySize / 25.4));
 	}
 	if (!FormList->empty()) {
 		thred::frmrct(rectangle);
@@ -11302,7 +11324,8 @@ INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			}
 		}
 	}
-	default: {}
+	default: {
+	}
 	}
 	return FALSE;
 }
@@ -11319,14 +11342,14 @@ void thred::internal::lock() {
 	DialogBoxParam(
 	    ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT
 
-	delete[] lockInfo.data; //NOLINT
+	delete[] lockInfo.data; // NOLINT
 }
 
 void thred::internal::delstch() {
 	thred::savdo();
 	StitchBuffer->clear();
 	StitchBuffer->shrink_to_fit();
-	TextureIndex          = 0;
+	TextureIndex = 0;
 	rstAll();
 	form::clrfills();
 	ColorChanges     = 0;
@@ -11719,7 +11742,7 @@ void thred::internal::set1knot() {
 		buffer.insert(
 		    buffer.end(), std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(ClosestPointIndex) + 1u), StitchBuffer->end());
 		StitchBuffer->resize(buffer.size());
-		*StitchBuffer         = buffer;
+		*StitchBuffer = buffer;
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -12035,7 +12058,8 @@ BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		}
 		}
 	}
-	default: {}
+	default: {
+	}
 	}
 	return FALSE;
 }
@@ -14070,7 +14094,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			case 1: {
 				movbak('r', '0');
 			}
-			default: {}
+			default: {
+			}
 			}
 			movbak('t', 'r');
 			thrBack = 't';
@@ -14183,7 +14208,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			case FRMEGG - 2:
 			case FRMZIGZAG - 2:
 				return true;
-			default: {}
+			default: {
+			}
 			}
 		}
 		thred::unmsg();
@@ -14333,8 +14359,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 						StitchBuffer->push_back({ SelectedPoint.x, SelectedPoint.y, code });
 						thred::duzrat();
 						stch2px1(iStitch);
-						InsertLine[0]         = StitchCoordinatesPixels;
-						InsertLine[1]         = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+						InsertLine[0] = StitchCoordinatesPixels;
+						InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
 						return true;
@@ -14344,8 +14370,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					StitchBuffer->insert(StitchBuffer->begin(), { SelectedPoint.x, SelectedPoint.y, code });
 					(*StitchBuffer)[0].attribute &= (~KNOTMSK);
 					stch2px1(0);
-					InsertLine[0]         = StitchCoordinatesPixels;
-					InsertLine[1]         = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+					InsertLine[0] = StitchCoordinatesPixels;
+					InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
 					return true;
@@ -15770,7 +15796,8 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		}
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	retflag = false;
 	return {};
@@ -15828,7 +15855,8 @@ bool thred::internal::handleNumericInput(const uint32_t& code, bool& retflag) {
 		}
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	retflag = false;
 	return {};
@@ -16410,7 +16438,8 @@ bool thred::internal::handleEditMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -16720,7 +16749,8 @@ bool thred::internal::handleViewMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -16786,7 +16816,9 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 			flag                      = true;
 			break;
 		}
-		default: { OpenFileName.nFilterIndex = 2; }
+		default: {
+			OpenFileName.nFilterIndex = 2;
+		}
 		}
 		nuFil();
 		nulayr(0);
@@ -16830,7 +16862,8 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -17002,7 +17035,8 @@ bool thred::internal::handleFillMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -17118,7 +17152,8 @@ bool thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 		flag = true;
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return flag;
 }
@@ -17238,7 +17273,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				form::duform(FRMDAISY - 2);
 				return true;
 			}
-			default: {}
+			default: {
+			}
 			}
 		}
 		if (StateMap.test(StateFlag::FILMSG)) {
@@ -17339,7 +17375,9 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				bakthum();
 				break;
 			}
-			default: { TranslateMessage(&Msg); }
+			default: {
+				TranslateMessage(&Msg);
+			}
 			}
 			return true;
 		}
@@ -17404,7 +17442,8 @@ bool thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 				PreferenceIndex = 0;
 				return true;
 			}
-			default: {}
+			default: {
+			}
 			}
 		}
 		if (code == 'I') {
@@ -17638,7 +17677,7 @@ void thred::internal::redini() {
 		if (DesignerName->empty()) {
 			wchar_t designerBuffer[50];
 			LoadString(
-				ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+			    ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
 			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
 			getdes();
 		}
@@ -18012,7 +18051,9 @@ void thred::internal::init() {
 			buttonTxt   = &(*StringTable)[STR_PIKOL];
 			break;
 		}
-		default: { windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; } // NOLINT
+		default: {
+			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+		} // NOLINT
 		}
 		if (buttonTxt != nullptr) {
 			(*ButtonWin)[iButton] = CreateWindow(L"STATIC",
@@ -18655,9 +18696,8 @@ void thred::internal::drwStch() {
 			else {
 				auto iStitch = 0u;
 				for (auto& stitch : *StitchBuffer) {
-					if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right
-					    && stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top
-					    && setRmap(stitchMap, stitch)) {
+					if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom
+					    && stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch)) {
 						stchbox(iStitch, StitchWindowMemDC);
 					}
 					iStitch++;
@@ -18766,7 +18806,9 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					stitchSourceSize.y = extendedHeader.hoopSizeY;
 					break;
 				}
-				default: { return; }
+				default: {
+					return;
+				}
 				}
 			}
 			const auto drawingDestinationSize
@@ -19284,7 +19326,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 			ShowWindow(p_hWnd, SW_SHOW);
 			break;
 		}
-		default: {}
+		default: {
+		}
 		}
 		GetClientRect(p_hWnd, &ThredWindowRect);
 		thred::movStch();
@@ -19343,7 +19386,8 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 		}
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	return DefWindowProc(p_hWnd, message, wParam, lParam);
 }

@@ -161,7 +161,8 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1u)), ValueWindowCoords);
+	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1u)),
+	                                  ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
@@ -935,7 +936,9 @@ void formForms::dasyfrm() {
 				}
 				break;
 			}
-			default: { throw; }
+			default: {
+				throw;
+			}
 			}
 			FormVertices->push_back(fPOINT { referencePoint.x + cos(angle) * distanceFromDaisyCenter,
 			                                 referencePoint.y + sin(angle) * distanceFromDaisyCenter });
@@ -994,12 +997,13 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 		auto hFont = displayText::getThrEdFont(400);
 		// SendMessage(hwndlg, WM_SETFONT, (WPARAM)hFont, MAKELPARAM(TRUE, 0));
-		EnumChildWindows(hwndlg,
-		                 [](HWND p_hWnd, LPARAM lParam) -> BOOL {
-			                 SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
-			                 return TRUE;
-		                 },
-		                 (LPARAM)hFont);
+		EnumChildWindows(
+		    hwndlg,
+		    [](HWND p_hWnd, LPARAM lParam) -> BOOL {
+			    SendMessage(p_hWnd, WM_SETFONT, (WPARAM)lParam, MAKELPARAM(TRUE, 0));
+			    return TRUE;
+		    },
+		    (LPARAM)hFont);
 #endif // !TESTCODE
 		ffi::initTearDlg(hwndlg);
 		break;

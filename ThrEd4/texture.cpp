@@ -472,8 +472,8 @@ bool texture::internal::px2txt(const POINT& offset) {
 		if (offset.y > TextureScreen.top) {
 			if ((offset.y <= TextureScreen.bottom)) {
 				txPoint.y = TextureScreen.areaHeight
-				        - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height
-				           * TextureScreen.areaHeight);
+				            - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) / TextureScreen.height
+				               * TextureScreen.areaHeight);
 				TempTexturePoints->push_back(txPoint);
 				retval = true;
 			}
@@ -920,7 +920,8 @@ void texture::internal::chktxnum() {
 			StateMap.set(StateFlag::CHKTX);
 			break;
 		}
-		default: {}
+		default: {
+		}
 		}
 	}
 	DestroyWindow(SideWindowButton);
@@ -1165,7 +1166,8 @@ void texture::internal::dutxfn(uint32_t textureType) {
 			txi::txang();
 			break;
 		}
-		default: {}
+		default: {
+		}
 		}
 	}
 	texture::txof();
@@ -1485,7 +1487,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 			flag = false;
 			break;
 		}
-		default: {}
+		default: {
+		}
 		}
 		if (flag) {
 			if (TextureInputBuffer->size() < 8) { // floating point 7 digits of precision + '.'
@@ -1596,7 +1599,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 		texture::txsnap();
 		break;
 	}
-	default: {}
+	default: {
+	}
 	}
 	StateMap.reset(StateFlag::LASTXBAK);
 }

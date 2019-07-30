@@ -280,7 +280,7 @@ bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t curr
 }
 
 bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOINT& point) {
-	auto retval = false;
+	auto       retval        = false;
 	const auto adjustedPoint = fPOINT { (point.x - ClipReference.x), (point.y - ClipReference.y) };
 
 	if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(OSequence->size()))) {
@@ -288,7 +288,7 @@ bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOIN
 	}
 	else {
 		for (auto& data : clipFillData) {
-			OSequence->push_back(fPOINT{ data.x + adjustedPoint.x, data.y + adjustedPoint.y });
+			OSequence->push_back(fPOINT { data.x + adjustedPoint.x, data.y + adjustedPoint.y });
 		}
 	}
 	return retval;

@@ -1340,7 +1340,7 @@ void xt::internal::duatf(uint32_t ind) {
 
 void xt::dmpat() {
 	auto attribute = (*StitchBuffer)[0].attribute;
-	auto iStitch = 0u;
+	auto iStitch   = 0u;
 	xi::duatf(iStitch);
 	for (auto& stitch : *StitchBuffer) {
 		if (attribute != stitch.attribute) {
@@ -1547,13 +1547,13 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	     iSequence++) {
 		if (ilData.output > 0) {
 			if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1u].x
-				|| (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1u].y) {
-				buffer.emplace_back(fPOINTATTR{ (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+			    || (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1u].y) {
+				buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
 				ilData.output++;
 			}
 		}
 		else {
-			buffer.emplace_back(fPOINTATTR{ (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+			buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
 			ilData.output++;
 		}
 	}
@@ -2541,7 +2541,8 @@ BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		}
 		}
 	}
-	default: {}
+	default: {
+	}
 	}
 	return 0;
 }
