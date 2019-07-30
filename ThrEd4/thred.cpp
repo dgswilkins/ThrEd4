@@ -18033,7 +18033,7 @@ void thred::internal::init() {
 	makCol(); // make the color change windows
 	ButtonWin->resize(9);
 	for (auto iButton = 0u; iButton < 9; iButton++) {
-		auto windowFlags = 0u;
+		DWORD windowFlags = 0u;
 		auto buttonTxt   = &blank;
 		switch (iButton) {
 		case HBOXSEL: {
@@ -18052,8 +18052,8 @@ void thred::internal::init() {
 			break;
 		}
 		default: {
-			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		} // NOLINT
+			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
+		}
 		}
 		if (buttonTxt != nullptr) {
 			(*ButtonWin)[iButton] = CreateWindow(L"STATIC",
