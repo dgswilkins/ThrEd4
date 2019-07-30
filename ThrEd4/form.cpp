@@ -3094,6 +3094,8 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		for (auto iVertex = 0u; iVertex < currentVertexCount; iVertex++) {
 			vertexIt[iVertex].y += formNegativeOffset;
 		}
+		boundingRect.top    += formNegativeOffset;
+		boundingRect.bottom += formNegativeOffset;
 	}
 	auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
 	regionCrossingData.reserve(MAXFRMLINS);
