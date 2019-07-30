@@ -7409,15 +7409,15 @@ void thred::internal::rot(fPOINT& rotationCenter) {
 	ritrot(0, rotationCenter);
 }
 
-void thred::internal::savclp(uint32_t destination, uint32_t source) {
+void thred::internal::savclp(uint32_t destination, std::vector<fPOINTATTR>& buffer, uint32_t source) {
 	auto integer = 0.0;
 
-	ClipStitchData[destination].led  = (*StitchBuffer)[source].attribute & COLMSK;
-	auto fractional                  = modf(gsl::narrow_cast<double>((*StitchBuffer)[source].x) - LowerLeftStitch.x, &integer);
+	ClipStitchData[destination].led  = buffer[source].attribute & COLMSK;
+	auto fractional                  = modf(gsl::narrow_cast<double>(buffer[source].x) - LowerLeftStitch.x, &integer);
 	ClipStitchData[destination].fx   = wrap::floor<uint8_t>(fractional * 256.0);
 	ClipStitchData[destination].x    = gsl::narrow<uint16_t>(integer);
 	ClipStitchData[destination].spcx = 0;
-	fractional                       = modf(gsl::narrow_cast<double>((*StitchBuffer)[source].y) - LowerLeftStitch.y, &integer);
+	fractional                       = modf(gsl::narrow_cast<double>(buffer[source].y) - LowerLeftStitch.y, &integer);
 	ClipStitchData[destination].fy   = wrap::floor<uint8_t>(fractional * 256.0);
 	ClipStitchData[destination].y    = gsl::narrow<uint16_t>(integer);
 	ClipStitchData[destination].spcy = 0;
@@ -7652,9 +7652,9 @@ void thred::internal::duclip() {
 				for (auto& selectedForm : (*SelectedFormList)) {
 					formMap.set(selectedForm);
 				}
-				// ToDo - replace use of old upper buffer with new vector (code will crash as is)
-				auto astch        = &(*StitchBuffer)[MAXITEMS];
-				auto stitchCount  = 0;
+				auto astch = std::vector<fPOINTATTR>{};
+				// Reserve a reasonable amount space, probably not enough though
+				astch.reserve(StitchBuffer->size() / 16u);
 				LowerLeftStitch.x = LowerLeftStitch.y = 1e30f;
 				for (auto& stitch : *StitchBuffer) {
 					if (((stitch.attribute & NOTFRM) == 0u) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
@@ -7664,22 +7664,23 @@ void thred::internal::duclip() {
 						if (stitch.y < LowerLeftStitch.y) {
 							LowerLeftStitch.y = stitch.y;
 						}
-						astch[stitchCount++] = stitch;
+						astch.push_back(stitch);
 					}
 				}
+				auto stitchCount  = astch.size();
 				if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 					Clip        = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2u); // NOLINT
 					if (ClipPointer != nullptr) {
 						ClipStitchData    = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
-						auto iStitch      = MAXITEMS;
+						auto iStitch      = 0u;
 						auto iDestination = 0u;
-						savclp(0, iStitch);
+						savclp(0, astch, 0);
 						iStitch++;
 						ClipStitchData[0].led = stitchCount;
 						iDestination++;
-						while (iStitch < stitchCount + MAXITEMS) {
-							savclp(iDestination++, iStitch++);
+						while (iStitch < stitchCount) {
+							savclp(iDestination++, astch, iStitch++);
 						}
 						SetClipboardData(Clip, ClipPointer);
 					}
@@ -7745,7 +7746,7 @@ void thred::internal::duclip() {
 							if (ClipPointer != nullptr) {
 								ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 								auto iTexture  = firstStitch;
-								savclp(0, iTexture);
+								savclp(0, *StitchBuffer, iTexture);
 								ClipStitchData[0].led = length;
 								iTexture++;
 								auto iDestination   = 1u;
@@ -7753,7 +7754,7 @@ void thred::internal::duclip() {
 								while (iTexture < StitchBuffer->size()) {
 									if (((*StitchBuffer)[iTexture].attribute & FRMSK) == codedAttribute
 									    && (((*StitchBuffer)[iTexture].attribute & NOTFRM) == 0u)) {
-										savclp(iDestination++, iTexture);
+										savclp(iDestination++, *StitchBuffer, iTexture);
 									}
 									iTexture++;
 								}
@@ -7782,11 +7783,11 @@ void thred::internal::duclip() {
 						ClipPointer        = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2u); // NOLINT
 						if (ClipPointer != nullptr) {
 							ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
-							savclp(0, iSource);
+							savclp(0, *StitchBuffer, iSource);
 							ClipStitchData[0].led = length;
 							iSource++;
 							for (auto iStitch = 1u; iStitch < length; iStitch++) {
-								savclp(iStitch, iSource++);
+								savclp(iStitch, *StitchBuffer, iSource++);
 							}
 							SetClipboardData(Clip, ClipPointer);
 						}
