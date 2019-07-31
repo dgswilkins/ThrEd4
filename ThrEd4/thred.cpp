@@ -7673,7 +7673,7 @@ void thred::internal::duclip() {
 						astch.push_back(stitch);
 					}
 				}
-				const auto stitchCount = astch.size();
+				const auto stitchCount = wrap::toUnsigned(astch.size());
 				if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 					Clip        = RegisterClipboardFormat(PcdClipFormat);
 					ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2u); // NOLINT
