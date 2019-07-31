@@ -836,7 +836,7 @@ void form::durpoli(uint32_t vertexCount) {
 		vertexCount = 3;
 	}
 	const auto stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(vertexCount);
-	// ToDo - why 500?
+	// 500 gives us a reasonably sized default
 	const auto length = 500.0f / gsl::narrow_cast<float>(vertexCount) * ZoomFactor
 	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto newForm        = FRMHED {};
@@ -2487,8 +2487,6 @@ void form::internal::contf() {
 	highVertices.resize(highVertexIndex);
 
 	auto lowLength = 0.0f;
-	// ToDo - rename pols, polref, polin & poldif
-
 	OSequence->clear();
 	auto lowIndex = 0u;
 	for (auto iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
@@ -2501,11 +2499,11 @@ void form::internal::contf() {
 	}
 	auto       selind              = 0u;
 	const auto selectedVertexCount = finish - start;
-	auto       pols                = std::vector<PVEC> {};
-	pols.resize(selectedVertexCount);
+	auto       polyLines           = std::vector<PVEC> {};
+	polyLines.resize(selectedVertexCount);
 	for (auto iVertex = start + 1u; iVertex <= finish; iVertex++) {
-		const auto delta = fPOINT { vertexIt[iVertex].x - selectionStart.x, vertexIt[iVertex].y - selectionStart.y };
-		pols[selind]     = { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
+		const auto delta  = fPOINT { vertexIt[iVertex].x - selectionStart.x, vertexIt[iVertex].y - selectionStart.y };
+		polyLines[selind] = { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
 		selind++;
 	}
 	auto highIndex  = 0u;
@@ -2541,7 +2539,7 @@ void form::internal::contf() {
 	auto       lowCount  = 0u;
 	auto       highCount = 0u;
 	auto       delta     = fPOINT { vertexIt[finish].x - vertexIt[start].x, vertexIt[finish].y - vertexIt[start].y };
-	const auto polref    = PVEC { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
+	const auto reference = PVEC { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
 	auto       lowStep   = fPOINT {};
 	auto       lowPoint  = fPOINT {};
 	auto       highStep  = fPOINT {};
@@ -2569,24 +2567,24 @@ void form::internal::contf() {
 				highIndex++;
 			}
 		}
-		delta.x          = highPoint.x - lowPoint.x;
-		delta.y          = highPoint.y - lowPoint.y;
-		const auto polin = PVEC { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
-		if (polref.length > 0.9 * LineSpacing) {
-			const auto poldif = PVEC { polin.angle - polref.angle, polin.length / polref.length };
+		delta.x = highPoint.x - lowPoint.x;
+		delta.y = highPoint.y - lowPoint.y;
+		if (reference.length > 0.9 * LineSpacing) {
+			const auto polyLine = PVEC { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
+			const auto polyDiff = PVEC { polyLine.angle - reference.angle, polyLine.length / reference.length };
 			if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 				OSequence->push_back(fPOINT { lowPoint });
 				for (auto iVertex = 0u; iVertex < (selectedVertexCount - 1); iVertex++) {
-					const auto length = pols[iVertex].length * poldif.length;
-					const auto angle  = pols[iVertex].angle + poldif.angle;
+					const auto length = polyLines[iVertex].length * polyDiff.length;
+					const auto angle  = polyLines[iVertex].angle + polyDiff.angle;
 					OSequence->push_back(fPOINT { lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length });
 				}
 			}
 			else {
 				OSequence->push_back(fPOINT { highPoint });
 				for (auto iVertex = selectedVertexCount - 1u; iVertex != 0; iVertex--) {
-					const auto length = pols[iVertex - 1u].length * poldif.length;
-					const auto angle  = pols[iVertex - 1u].angle + poldif.angle;
+					const auto length = polyLines[iVertex - 1u].length * polyDiff.length;
+					const auto angle  = polyLines[iVertex - 1u].angle + polyDiff.angle;
 					OSequence->push_back(fPOINT { lowPoint.x + cos(angle) * length, lowPoint.y + sin(angle) * length });
 				}
 			}
