@@ -699,7 +699,6 @@ void clip::duxclp() {
 	tempClipPoints.reserve(ClipBuffer->size());
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	OSequence->clear();
-	// ToDo - does this make sense?
 	const auto rotationCenter = fPOINT {};
 	for (auto iPoint = 1u; iPoint < chainEndPoints.size(); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
@@ -876,7 +875,6 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
 	}
-	// ToDo - Should this be an insert?
 	for (auto iChain = 0u; iChain < chainCount; iChain++) {
 		OSequence->push_back(chainPoint[chainSequence[iChain]]);
 	}
