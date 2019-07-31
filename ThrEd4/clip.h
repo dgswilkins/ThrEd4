@@ -78,8 +78,7 @@ namespace internal {
 	     fxpnt(const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs, fPOINT& moveToCoords, uint32_t currentSide);
 	void lincrnr(const std::vector<fPOINT>& clipReversedData,
 	             std::vector<fPOINT>&       clipFillData,
-	             double                     clipAngle,
-	             dPOINT&                    moveToCoords,
+	             float                      clipAngle,
 	             const fPOINT&              rotationCenter,
 	             uint32_t                   currentSide);
 	void linsid(const std::vector<fPOINT>& clipReversedData,
@@ -88,7 +87,7 @@ namespace internal {
 	            const fPOINT&              vector0,
 	            const fPOINT&              rotationCenter,
 	            uint32_t                   currentSide);
-	bool nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide);
+	bool nupnt(float clipAngle, fPOINT& moveToCoords) noexcept;
 	void picfn(const fRECTANGLE&    clipRect,
 	           std::vector<fPOINT>& clipFillData,
 	           uint32_t             start,

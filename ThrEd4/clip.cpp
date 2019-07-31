@@ -256,13 +256,10 @@ void clip::internal::setvct(uint32_t start, uint32_t finish, float& clipAngle, f
 	vector0.y     = ClipRectSize.cx * sin(clipAngle);
 }
 
-bool clip::internal::nupnt(double clipAngle, dPOINT& moveToCoords, uint32_t currentSide) {
+bool clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords) noexcept {
 	const auto sinAngle = sin(clipAngle);
 	const auto cosAngle = cos(clipAngle);
 
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	// ToDo - change moveToCoords to float
-	moveToCoords = vertexIt[wrap::toSize(currentSide) + 2u];
 	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
@@ -296,14 +293,14 @@ bool clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOIN
 
 void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                              std::vector<fPOINT>&       clipFillData,
-                             double                     clipAngle,
-                             dPOINT&                    moveToCoords,
+                             float                      clipAngle,
                              const fPOINT&              rotationCenter,
                              uint32_t                   currentSide) {
-	auto delta = dPOINT {};
+	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto moveToCoords = vertexIt[wrap::toSize(currentSide) + 2u];
 
-	if (ci::nupnt(clipAngle, moveToCoords, currentSide)) {
-		delta = dPOINT { moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y };
+	if (ci::nupnt(clipAngle, moveToCoords)) {
+		const auto delta = fPOINT { moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y };
 
 		const auto rotationAngle = atan2(delta.y, delta.x);
 		thred::rotangf(BorderClipReference, ClipReference, rotationAngle, rotationCenter);
@@ -351,8 +348,6 @@ void clip::clpout() {
 	else {
 		satin::satout(ClipRectSize.cy);
 		InsidePointList->clear();
-		// ToDo - insert should be replaced with this line once vertices is a std::vector * as a copy will not be
-		// required  InsidePoints = SelectedForm->vertices;
 		auto srcStart = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
 		auto srcEnd   = std::next(srcStart, VertexCount);
 		InsidePointList->insert(InsidePointList->end(), srcStart, srcEnd);
@@ -410,7 +405,6 @@ bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
 }
 
 void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
-	auto moveToCoords = dPOINT {}; // moving formOrigin for clipboard fill
 
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
@@ -441,7 +435,7 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 		for (currentSide = 0u; currentSide < VertexCount - 2u; currentSide++) {
 			ci::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 			ci::setvct(currentSide + 1, currentSide + 2, clipAngle, vector0);
-			ci::lincrnr(clipReversedData, clipFillData, clipAngle, moveToCoords, rotationCenter, currentSide);
+			ci::lincrnr(clipReversedData, clipFillData, clipAngle, rotationCenter, currentSide);
 		}
 		ci::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 	}
