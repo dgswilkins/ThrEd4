@@ -714,8 +714,7 @@ void form::drwfrm() {
 	if (!SelectedFormList->empty()) {
 		SelectObject(StitchWindowMemDC, MultiFormPen);
 		ratsr();
-		// ToDo - Does these numbers make sense?
-		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
+		SelectedFormsRect.top = SelectedFormsRect.left = LONG_MAX;
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 		for (auto selectedForm : (*SelectedFormList)) {
 			fselrct(selectedForm);
@@ -860,8 +859,6 @@ void form::durpoli(uint32_t vertexCount) {
 		point.y += length * sin(angle);
 		angle += stepAngle;
 	}
-	// ToDo do I need to assign again?
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	form::frmout(ClosestFormToCursor);
 	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount = vertexCount + 1u;
