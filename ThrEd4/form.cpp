@@ -5553,13 +5553,15 @@ void form::unfil() {
 				}
 			}
 			const auto codedForm    = ClosestFormToCursor << FRMSHFT;
-			auto       iDestination = StitchBuffer->begin();
-			for (auto& stitch : *StitchBuffer) {
-				if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0u)) {
-					*iDestination++ = stitch;
+			if (!StitchBuffer->empty()) {
+				auto iDestination = StitchBuffer->begin();
+				for (auto& stitch : *StitchBuffer) {
+					if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0u)) {
+						*iDestination++ = stitch;
+					}
 				}
+				StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
 			}
-			StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
 			clip::delclps(ClosestFormToCursor);
 			texture::deltx(ClosestFormToCursor);
 			SelectedForm->fillType = 0;
