@@ -5301,16 +5301,11 @@ void form::rotfrm(uint32_t newStartVertex) {
 	auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
 	auto rotatedVertices = std::vector<fPOINT> {};
 	rotatedVertices.resize(VertexCount);
-	auto iVertex       = 0u;
-	auto iGuide        = 0u;
 	auto iRotatedGuide = 0u;
 	auto iRotated      = newStartVertex;
-	auto tlin          = 0u;
 
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
-		rotatedVertices[iVertex] = vertexIt[iVertex];
-	}
-	for (iVertex = 0; iVertex < VertexCount; iVertex++) {
+	std::copy(vertexIt, std::next(vertexIt, VertexCount), rotatedVertices.begin());
+	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex] = rotatedVertices[iRotated];
 		iRotated          = form::nxt(iRotated);
 	}
@@ -5322,14 +5317,12 @@ void form::rotfrm(uint32_t newStartVertex) {
 			    = (SelectedForm->wordParam + SelectedForm->vertexCount - newStartVertex) % SelectedForm->vertexCount;
 		}
 		if (VertexCount != 0u) {
-			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+			for (auto iGuide = 0u; iGuide < SelectedForm->satinGuideCount; iGuide++) {
 				if (guideIt[iGuide].start != newStartVertex && guideIt[iGuide].finish != newStartVertex) {
 					guideIt[iRotatedGuide].start  = (guideIt[iGuide].start + VertexCount - newStartVertex) % VertexCount;
 					guideIt[iRotatedGuide].finish = (guideIt[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
 					if (guideIt[iRotatedGuide].start > guideIt[iRotatedGuide].finish) {
-						tlin                         = guideIt[iRotatedGuide].start;
-						guideIt[iRotatedGuide].start = guideIt[iRotatedGuide].finish;
-						guideIt[iGuide].finish       = tlin;
+						std::swap(guideIt[iRotatedGuide].start, guideIt[iRotatedGuide].finish);
 					}
 					iRotatedGuide++;
 				}
@@ -5338,16 +5331,7 @@ void form::rotfrm(uint32_t newStartVertex) {
 	}
 	if (iRotatedGuide != 0u) {
 		SelectedForm->satinGuideCount = iRotatedGuide;
-		// ToDo - Can we do the sort in place?
-		auto rotatedGuides = std::vector<SATCON> {};
-		rotatedGuides.resize(iRotatedGuide);
-		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			rotatedGuides[iGuide] = guideIt[iGuide];
-		}
-		std::sort(rotatedGuides.begin(), rotatedGuides.end(), fi::scomp);
-		for (iGuide = 0; iGuide < iRotatedGuide; iGuide++) {
-			guideIt[iGuide] = rotatedGuides[iGuide];
-		}
+		std::sort(guideIt, std::next(guideIt, iRotatedGuide), fi::scomp);
 	}
 	if (VertexCount != 0u) {
 		if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
