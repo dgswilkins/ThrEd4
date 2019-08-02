@@ -18449,9 +18449,9 @@ void thred::internal::drwStch() {
 				}
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
 				stitchCount                 = ColorChangeTable[iColor + 1u].stitchIndex - ColorChangeTable[iColor].stitchIndex;
-				const auto* currentStitches = &(*StitchBuffer)[ColorChangeTable[iColor].stitchIndex];
-				if (currentStitches != nullptr) {
-					stitchCount          = chkup(stitchCount, iColor);
+				if (!StitchBuffer->empty()) {
+					const auto* currentStitches = &(*StitchBuffer)[ColorChangeTable[iColor].stitchIndex];
+					stitchCount                 = chkup(stitchCount, iColor);
 					const auto maxYcoord = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
 
 					for (auto iStitch = 0u; iStitch < stitchCount; iStitch++) {
