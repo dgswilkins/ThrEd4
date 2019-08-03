@@ -4313,17 +4313,15 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 #if BUGSEQ
 		// Note - this debug code only works for vertical fill on a single form
 		auto bugColor = 0u;
-		auto index    = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
-				auto lineGroupPoint      = &*sortedLines[iLine];
-				(*StitchBuffer)[index++] = (fPOINTATTR { lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
-				(*StitchBuffer)[index++] = (fPOINTATTR { lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
+				const auto* lineGroupPoint = &*sortedLines[iLine];
+				StitchBuffer->push_back(fPOINTATTR { lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
+				StitchBuffer->push_back(fPOINTATTR { lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
 			}
 			bugColor++;
 			bugColor &= 0xf;
 		}
-		PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(index);
 #else
 		OutputIndex = 0;
 		BSequence->clear();
