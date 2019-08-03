@@ -441,7 +441,6 @@ namespace internal {
 
 	void sbold();
 	void sbord();
-	bool scomp(const SATCON& arg1, const SATCON& arg2) noexcept;
 	void seteg();
 	void sethart();
 	void setlens();

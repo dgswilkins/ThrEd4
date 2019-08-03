@@ -46,6 +46,7 @@ void     satpnt1();
 void     satsel();
 void     satzum();
 void     sbrd();
+bool     scomp(const SATCON& arg1, const SATCON& arg2) noexcept;
 void     slbrd();
 void     spltsat(uint32_t guideIndex);
 
@@ -62,12 +63,11 @@ namespace internal {
 	void satcpy(const std::vector<SATCON>& source, uint32_t size);
 	void satends(uint32_t isBlunt);
 	void satfn(const std::vector<float>& lengths, uint32_t line1Start, uint32_t line1End, uint32_t line2Start, uint32_t line2End);
-	uint32_t satind(const SATCON* guide) noexcept;
-	void     satmf(const std::vector<float>& lengths);
-	void     satsbrd();
-	bool     satselfn();
-	void     sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish);
-	void     sfn(uint32_t startVertex);
-	void     unsat();
+	void satmf(const std::vector<float>& lengths);
+	void satsbrd();
+	bool satselfn();
+	void sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish);
+	void sfn(uint32_t startVertex);
+	void unsat();
 } // namespace internal
 } // namespace satin

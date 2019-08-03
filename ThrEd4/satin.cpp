@@ -327,6 +327,24 @@ void satin::internal::satcpy(const std::vector<SATCON>& source, uint32_t size) {
 	std::copy(source.cbegin(), source.cend(), guideIt);
 }
 
+
+bool satin::scomp(const SATCON& arg1, const SATCON& arg2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (arg1.start < arg2.start) {
+		return true;
+	}
+	if (arg2.start < arg1.start) {
+		return false;
+	}
+	if (arg1.finish < arg2.finish) {
+		return true;
+	}
+	if (arg2.finish < arg1.finish) {
+		return false;
+	}
+	return false;
+}
+
 void satin::satadj() {
 	form::fvars(ClosestFormToCursor);
 
@@ -517,6 +535,12 @@ void satin::satadj() {
 			}
 			SelectedForm->satinGuideCount = CurrentFormGuidesCount;
 		}
+	}
+	else {
+		// sort the guides
+		auto start = std::next(SatinGuides->begin(), CurrentFormGuides);
+		auto end   = std::next(start, SelectedForm->satinGuideCount);
+		std::sort(start, end, satin::scomp);
 	}
 	if (SelectedForm->satinGuideCount < savedGuideCount) {
 		const auto iGuide = savedGuideCount - CurrentFormGuidesCount;

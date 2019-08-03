@@ -5278,10 +5278,6 @@ void form::drwcon() {
 	fi::ducon();
 }
 
-bool form::internal::scomp(const SATCON& arg1, const SATCON& arg2) noexcept {
-	return (arg1.start < arg2.start);
-}
-
 void form::duinsf() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
@@ -5331,7 +5327,7 @@ void form::rotfrm(uint32_t newStartVertex) {
 	}
 	if (iRotatedGuide != 0u) {
 		SelectedForm->satinGuideCount = iRotatedGuide;
-		std::sort(guideIt, std::next(guideIt, iRotatedGuide), fi::scomp);
+		std::sort(guideIt, std::next(guideIt, iRotatedGuide), satin::scomp);
 	}
 	if (VertexCount != 0u) {
 		if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
