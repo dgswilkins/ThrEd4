@@ -327,7 +327,6 @@ void satin::internal::satcpy(const std::vector<SATCON>& source, uint32_t size) {
 	std::copy(source.cbegin(), source.cend(), guideIt);
 }
 
-
 bool satin::scomp(const SATCON& arg1, const SATCON& arg2) noexcept {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (arg1.start < arg2.start) {

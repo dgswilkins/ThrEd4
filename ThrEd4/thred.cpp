@@ -18019,7 +18019,7 @@ void thred::internal::init() {
 	ButtonWin->resize(9);
 	for (auto iButton = 0u; iButton < 9; iButton++) {
 		DWORD windowFlags = 0u;
-		auto buttonTxt   = &blank;
+		auto  buttonTxt   = &blank;
 		switch (iButton) {
 		case HBOXSEL: {
 			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
@@ -18433,11 +18433,11 @@ void thred::internal::drwStch() {
 					wascol = 0;
 				}
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
-				stitchCount                 = ColorChangeTable[iColor + 1u].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+				stitchCount = ColorChangeTable[iColor + 1u].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				if (!StitchBuffer->empty()) {
 					const auto* currentStitches = &(*StitchBuffer)[ColorChangeTable[iColor].stitchIndex];
 					stitchCount                 = chkup(stitchCount, iColor);
-					const auto maxYcoord = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
+					const auto maxYcoord        = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
 
 					for (auto iStitch = 0u; iStitch < stitchCount; iStitch++) {
 						const auto layer = (currentStitches[iStitch].attribute & LAYMSK) >> LAYSHFT;

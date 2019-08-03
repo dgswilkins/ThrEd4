@@ -5591,7 +5591,7 @@ void form::unfil() {
 					}
 				}
 			}
-			const auto codedForm    = ClosestFormToCursor << FRMSHFT;
+			const auto codedForm = ClosestFormToCursor << FRMSHFT;
 			if (!StitchBuffer->empty()) {
 				auto iDestination = StitchBuffer->begin();
 				for (auto& stitch : *StitchBuffer) {

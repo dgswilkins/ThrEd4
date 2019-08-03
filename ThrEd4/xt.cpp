@@ -466,9 +466,11 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 }
 
 int32_t xt::internal::fil2crd(const fs::path& fileName) {
+	// clang-format off
 	auto    startupInfo = STARTUPINFO {
 		0u, nullptr, nullptr, nullptr, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, 0u, nullptr, nullptr, nullptr, nullptr
 	};
+	// clang-format on
 	auto    processInfo = PROCESS_INFORMATION { nullptr, nullptr, 0u, 0u };
 	auto    errorCode   = 0;
 	wchar_t command[_MAX_PATH * 2 + 1 + 4];

@@ -260,7 +260,7 @@ bool clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords) noexcept {
 	const auto sinAngle = sin(clipAngle);
 	const auto cosAngle = cos(clipAngle);
 
-	auto length  = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
+	auto length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
 		for (auto step = 0u; step < 10; step++) {
 			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
@@ -296,7 +296,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                              float                      clipAngle,
                              const fPOINT&              rotationCenter,
                              uint32_t                   currentSide) {
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt     = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	auto moveToCoords = vertexIt[wrap::toSize(currentSide) + 2u];
 
 	if (ci::nupnt(clipAngle, moveToCoords)) {
@@ -405,7 +405,6 @@ bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
 }
 
 void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
-
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
 	HorizontalLength2          = ClipRectSize.cx / 2;
