@@ -4475,6 +4475,8 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 }
 
 void form::internal::bakseq() {
+#if BUGSEQ
+#else
 	constexpr auto RITSIZ = 6;
 
 	const uint32_t seqtab[] = {
@@ -4613,7 +4615,8 @@ void form::internal::bakseq() {
 		}
 		iSequence--;
 	}
-#endif
+#endif // BUGBAK
+#endif // BUGSEQ
 }
 
 void form::filinu(const fPOINT& inPoint) {
