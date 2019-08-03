@@ -173,8 +173,8 @@ namespace internal {
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
 	void ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio);
-	bool recmp(const OREC* record1, const OREC* record2) noexcept;
-	bool refcmp(const OREC* record1, const OREC* record2) noexcept;
+	bool orComp(const OREC* record1, const OREC* record2) noexcept;
+	bool orfComp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
 	void ritcwlk();
 	void ritund();

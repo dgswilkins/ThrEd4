@@ -1018,26 +1018,56 @@ void xt::internal::durec(OREC& record) {
 	record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-bool xt::internal::recmp(const OREC* record1, const OREC* record2) noexcept {
-	if (ColorOrder[record1->color] == ColorOrder[record2->color]) {
-		if (record1->form == record2->form) {
-			if (record1->type == record2->type) {
-				return (record1->start < record2->start);
-			}
-			return (record1->type < record2->type);
+bool xt::internal::orComp(const OREC* record1, const OREC* record2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (record1 != nullptr && record2 != nullptr) {
+		if (ColorOrder[record1->color] < ColorOrder[record2->color]) {
+			return true;
 		}
-
-		return (record1->form < record2->form);
+		if (ColorOrder[record2->color] < ColorOrder[record1->color]) {
+			return false;
+		}
+		if (record1->form < record2->form) {
+			return true;
+		}
+		if (record2->form < record1->form) {
+			return false;
+		}
+		if (record1->type < record2->type) {
+			return true;
+		}
+		if (record2->type < record1->type) {
+			return false;
+		}
+		if (record1->start < record2->start) {
+			return true;
+		}
+		if (record2->start < record1->start) {
+			return false;
+		}
 	}
-	return (ColorOrder[record1->color] < ColorOrder[record2->color]);
+
+	return false;
 }
 
-bool xt::internal::refcmp(const OREC* record1, const OREC* record2) noexcept {
-	if (record1->form == record2->form) {
-		return (record1->type < record2->type);
+bool xt::internal::orfComp(const OREC* record1, const OREC* record2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (record1 != nullptr && record2 != nullptr) {
+		if (record1->form < record2->form) {
+			return true;
+		}
+		if (record2->form < record1->form) {
+			return false;
+		}
+		if (record1->type < record2->type) {
+			return true;
+		}
+		if (record2->type < record1->type) {
+			return false;
+		}
 	}
 
-	return (record1->form < record2->form);
+	return false;
 }
 
 bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
@@ -1209,8 +1239,8 @@ void xt::fsort() {
 		pRecs.push_back(&region);
 		pFRecs.push_back(&region);
 	}
-	std::sort(pRecs.begin(), pRecs.end(), xi::recmp);
-	std::sort(pFRecs.begin(), pFRecs.end(), xi::refcmp);
+	std::sort(pRecs.begin(), pRecs.end(), xi::orComp);
+	std::sort(pFRecs.begin(), pFRecs.end(), xi::orfComp);
 #ifdef _DEBUG
 	xi::dmprec(pRecs, lastRegion);
 #endif

@@ -74,7 +74,7 @@ namespace internal {
 	void   txang();
 	void   txbak();
 	bool   txbutfn();
-	bool   txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept;
+	bool   tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept;
 	void   txcntrv(const FRMHED& textureForm);
 	void   txdelal();
 	bool   txdig(uint32_t keyCode, char& character);

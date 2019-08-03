@@ -229,7 +229,7 @@ namespace internal {
 	void chkbrd();
 	void chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices);
 	bool closat(intersectionStyles& inOutFlag);
-	bool clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
+	bool vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept;
 	void clpcon(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& currentFormVertices);
 	void clpfm();
 
@@ -241,7 +241,7 @@ namespace internal {
 	                 const std::vector<fPOINT>& currentFormVertices);
 
 	bool clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t sind);
-	bool comp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept;
+	bool fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept;
 	void contf();
 	bool contsf(uint32_t formIndex);
 	void cplayfn(uint32_t iForm, uint32_t play);
@@ -354,8 +354,8 @@ namespace internal {
 	          const std::vector<fPOINT>& currentFormVertices);
 	void lapbrd();
 	void lcon(std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
-	bool lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
-	bool lencmpa(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept;
+	bool lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
+	bool clipComp(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept;
 	void linrutb(uint32_t start);
 	bool lnclos(std::vector<uint32_t>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
@@ -462,7 +462,7 @@ namespace internal {
 	void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, uint32_t iRect);
 	void
 	     spurfn(const fPOINT& innerPoint, const fPOINT& outerPoint, fPOINT& underlayInnerPoint, fPOINT& underlayOuterPoint) noexcept;
-	bool sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
+	bool spComp(const SMALPNTL* const arg1, const SMALPNTL* const arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, uint32_t start, uint32_t finish);
 	void stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept;
 	void

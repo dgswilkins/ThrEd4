@@ -949,12 +949,22 @@ void texture::internal::butsid(uint32_t windowId) {
 	displayText::updateWinFont(MainStitchWin);
 }
 
-bool texture::internal::txcmp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept {
-	if (texturePoint0.line == texturePoint1.line) {
-		return (texturePoint0.y < texturePoint1.y);
+bool texture::internal::tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (texturePoint0.line < texturePoint1.line) {
+		return true;
+	}
+	if (texturePoint1.line < texturePoint0.line) {
+		return false;
+	}
+	if (texturePoint0.y < texturePoint1.y) {
+		return true;
+	}
+	if (texturePoint1.y < texturePoint0.y) {
+		return false;
 	}
 
-	return (texturePoint0.line < texturePoint1.line);
+	return false;
 }
 
 void texture::internal::txpar() {
@@ -1062,7 +1072,7 @@ void texture::deltx(uint32_t formIndex) {
 void texture::internal::nutx() {
 	auto index = 0u;
 
-	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
+	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 	if (!FormList->empty()) {
 		if (texture::istx(ClosestFormToCursor)) {
 			const auto& texture = (*FormList)[ClosestFormToCursor].fillInfo.texture;
@@ -1182,7 +1192,7 @@ void texture::internal::dutxmir() {
 		const auto centerLine = (TextureScreen.lines + 1u) / 2;
 		const auto evenOffset = 1u - (TextureScreen.lines & 1u);
 		texture::savtxt();
-		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::txcmp);
+		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 		auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1u;
 		while ((*TempTexturePoints)[iPoint].line > centerLine && iPoint >= 0) {
 			iPoint--;

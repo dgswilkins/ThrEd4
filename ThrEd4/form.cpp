@@ -72,12 +72,19 @@ void form::frmclr(FRMHED& destination) noexcept {
 	destination = head;
 }
 
-bool form::internal::comp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept {
+bool form::internal::fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (point1.y < point2.y) {
 		return true;
 	}
+	if (point2.y < point1.y) {
+		return false;
+	}
 	if (point1.x < point2.x) {
 		return true;
+	}
+	if (point2.x < point1.x) {
+		return false;
 	}
 	return false;
 }
@@ -2240,7 +2247,7 @@ void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
 		if (iPoint > 1) {
 			const auto evenPointCount = iPoint &= 0xfffffffe;
 			groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
-			std::sort(projectedPoints.begin(), projectedPoints.end(), comp);
+			std::sort(projectedPoints.begin(), projectedPoints.end(), fi::fplComp);
 			iPoint                    = 0;
 			const auto savedLineCount = lineEndpoints.size();
 			while (iPoint < evenPointCount) {
@@ -2644,8 +2651,21 @@ uint32_t form::internal::leftsid(const std::vector<fPOINT>& currentFormVertices)
 	return leftVertex;
 }
 
-bool form::internal::clpcmp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
-	return (vclpx1.segment < vclpx2.segment);
+bool form::internal::vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (vclpx1.segment < vclpx2.segment) {
+		return true;
+	}
+	if (vclpx2.segment < vclpx1.segment) {
+		return false;
+	}
+	if (vclpx1.vertex < vclpx2.vertex) {
+		return true;
+	}
+	if (vclpx2.vertex < vclpx1.vertex) {
+		return false;
+	}
+	return false;
 }
 
 bool form::internal::isin(std::vector<VCLPX>&        regionCrossingData,
@@ -2767,11 +2787,20 @@ bool form::internal::isect(uint32_t                   vertex0,
 	return flag;
 }
 
-bool form::internal::lencmpa(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept {
-	const auto local1 = arg1->segmentLength;
-	const auto local2 = arg2->segmentLength;
+bool form::internal::clipComp(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if ((arg1 != nullptr) && (arg2 != nullptr)) {
+		const auto local1 = arg1->segmentLength;
+		const auto local2 = arg2->segmentLength;
+		if (local1 < local2) {
+			return true;
+		}
+		if (local2 < local1) {
+			return false;
+		}
+	}
 
-	return (local1 < local2);
+	return false;
 }
 
 void form::internal::mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) {
@@ -2836,7 +2865,7 @@ uint32_t form::internal::insect(std::vector<CLIPSORT>&     clipIntersectData,
 		}
 	}
 	if (count > 1) {
-		std::sort(arrayOfClipIntersectData.begin(), arrayOfClipIntersectData.end(), lencmpa);
+		std::sort(arrayOfClipIntersectData.begin(), arrayOfClipIntersectData.end(), fi::clipComp);
 		auto iDestination = 1u;
 		for (iIntersection = 0; iIntersection < count - 1u; iIntersection++) {
 			if (fabs(gsl::narrow_cast<double>(arrayOfClipIntersectData[iIntersection]->segmentLength)
@@ -2878,8 +2907,16 @@ uint32_t form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	return finish + 1u;
 }
 
-bool form::internal::lencmp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
-	return (arg1.length < arg2.length);
+bool form::internal::lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
+	if (arg1.length < arg2.length) {
+		return true;
+	}
+	if (arg2.length < arg1.length) {
+		return false;
+	}
+
+	return false;
 }
 
 void form::internal::chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices) {
@@ -3113,7 +3150,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 			regionCrossingData.push_back({ iSegment, iVertex });
 		}
 	}
-	std::sort(regionCrossingData.begin(), regionCrossingData.end(), clpcmp);
+	std::sort(regionCrossingData.begin(), regionCrossingData.end(), fi::vclpComp);
 	auto iclpx = std::vector<uint32_t> {};
 	iclpx.reserve(regionCrossingData.size());
 	auto regionSegment = regionCrossingData[0].segment;
@@ -3299,7 +3336,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 			sortedLengths.push_back({ iSegment, false, clipSegments[iSegment].beginLength });
 			sortedLengths.push_back({ iSegment, true, clipSegments[iSegment].endLength });
 		}
-		std::sort(sortedLengths.begin(), sortedLengths.end(), lencmp);
+		std::sort(sortedLengths.begin(), sortedLengths.end(), fi::lenComp);
 		for (auto iSorted = 0u; iSorted < sortedLengths.size(); iSorted++) {
 			if (sortedLengths[iSorted].isEnd) {
 				clipSegments[sortedLengths[iSorted].index].endIndex = iSorted;
@@ -3451,25 +3488,31 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOI
 	form::fvars(ClosestFormToCursor);
 }
 
-bool form::internal::sqcomp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept {
+bool form::internal::spComp(const SMALPNTL* const arg1, const SMALPNTL* const arg2) noexcept {
+	// make sure the comparison obeys strict weak ordering for stable sorting
 	if ((arg1 != nullptr) && (arg2 != nullptr)) {
 		const auto& lineEnd1 = *arg1;
 		const auto& lineEnd2 = *arg2;
-
-		if (lineEnd1.line == lineEnd2.line) {
-			if (lineEnd1.group == lineEnd2.group) {
-				if (lineEnd1.y == lineEnd2.y) {
-					return false;
-				}
-
-				return (lineEnd1.y < lineEnd2.y);
-			}
-
-			return (lineEnd1.group < lineEnd2.group);
+		if (lineEnd1.line < lineEnd2.line) {
+			return true;
 		}
-
-		return (lineEnd1.line < lineEnd2.line);
+		if (lineEnd2.line < lineEnd1.line) {
+			return false;
+		}
+		if (lineEnd1.group < lineEnd2.group) {
+			return true;
+		}
+		if (lineEnd2.group < lineEnd1.group) {
+			return false;
+		}
+		if (lineEnd1.y < lineEnd2.y) {
+			return true;
+		}
+		if (lineEnd2.y < lineEnd1.y) {
+			return false;
+		}
 	}
+
 	return false;
 }
 
@@ -4226,7 +4269,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 		for (auto iLine = 0u; iLine < stitchLineCount; iLine += 2) {
 			sortedLines.push_back(&lineEndpoints[iLine]);
 		}
-		std::sort(sortedLines.begin(), sortedLines.end(), sqcomp);
+		std::sort(sortedLines.begin(), sortedLines.end(), fi::spComp);
 		const auto lineCount = wrap::toUnsigned(sortedLines.size());
 		auto       regions   = std::vector<REGION> {};
 		regions.emplace_back(0u, 0u, 0u, 0u);
