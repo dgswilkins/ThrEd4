@@ -11934,24 +11934,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 			}
 		}
 		SelectObject(StitchWindowMemDC, hPen);
-		// ToDo - where did 16000 come from?
-		if (LineIndex < 16000) {
-			wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
-		}
-		else {
-			iOffset = 0;
-			while (LineIndex != 0u) {
-				if (LineIndex > 16000) {
-					Polyline(StitchWindowMemDC, &linePoints[iOffset], 16000);
-					iOffset += 15999;
-					LineIndex -= 15999;
-				}
-				else {
-					wrap::Polyline(StitchWindowMemDC, &linePoints[iOffset], LineIndex);
-					break;
-				}
-			}
-		}
+		wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 		LineIndex        = 1;
 		const auto layer = (activeStitch[iOffset - 1u].attribute & LAYMSK) >> LAYSHFT;
 		if ((ActiveLayer == 0u) || (layer == 0u) || layer == ActiveLayer) {
