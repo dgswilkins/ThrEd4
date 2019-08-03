@@ -355,7 +355,7 @@ namespace internal {
 	void lapbrd();
 	void lcon(std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	bool lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept;
-	bool clipComp(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept;
+	bool clipComp(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept;
 	void linrutb(uint32_t start);
 	bool lnclos(std::vector<uint32_t>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
@@ -462,7 +462,7 @@ namespace internal {
 	void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, uint32_t iRect);
 	void
 	     spurfn(const fPOINT& innerPoint, const fPOINT& outerPoint, fPOINT& underlayInnerPoint, fPOINT& underlayOuterPoint) noexcept;
-	bool spComp(const SMALPNTL* const arg1, const SMALPNTL* const arg2) noexcept;
+	bool spComp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
 	void srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, uint32_t start, uint32_t finish);
 	void stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept;
 	void
