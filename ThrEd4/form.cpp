@@ -6475,7 +6475,6 @@ void form::duspir(uint32_t stepCount) {
 		stepCount = 100;
 	}
 	const auto stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(stepCount);
-	// ToDo - Why 800?
 	const auto length = 800.0f / gsl::narrow_cast<float>(stepCount) * ZoomFactor
 	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto newForm        = FRMHED {};
@@ -6698,8 +6697,6 @@ void form::duzig(uint32_t vertices) {
 		}
 	}
 	SelectedForm->type = FRMLINE;
-	// ToDo do I need to assign again?
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	form::frmout(ClosestFormToCursor);
 	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount = vertices + 1u;
