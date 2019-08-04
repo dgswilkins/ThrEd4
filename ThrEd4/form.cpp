@@ -6475,7 +6475,7 @@ void form::duspir(uint32_t stepCount) {
 		stepCount = 100;
 	}
 	const auto stepAngle = PI_F * 2.0f / gsl::narrow_cast<float>(stepCount);
-	const auto length = 800.0f / gsl::narrow_cast<float>(stepCount) * ZoomFactor
+	const auto length    = 800.0f / gsl::narrow_cast<float>(stepCount) * ZoomFactor
 	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
 	auto newForm        = FRMHED {};
 	auto vertexCount    = wrap::round<uint32_t>(gsl::narrow_cast<float>(stepCount) * SpiralWrap);
@@ -7516,24 +7516,35 @@ void form::frmsadj() {
 }
 
 void form::internal::frmpnts(uint32_t type) {
-	auto       iStitch = 0u;
-	const auto trg     = ((ClosestFormToCursor << 4u) | type);
-
-	// ToDo - could this be more efficient with a ranged for?
-	while (iStitch < StitchBuffer->size() && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
-		iStitch++;
-	}
-	ClosestPointIndex = iStitch;
 	if (!StitchBuffer->empty()) {
-		iStitch = gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1u);
+		auto       iStitch = 0u;
+		const auto trg     = ((ClosestFormToCursor << 4u) | type);
+
+		for (auto stitch : *StitchBuffer) {
+			if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
+				break;
+			}
+			else {
+				iStitch++;
+			}
+		}
+		ClosestPointIndex = iStitch;
+		auto bFlag        = false;
+		for (auto it = std::next(StitchBuffer->begin(), ClosestPointIndex); it != StitchBuffer->end(); it++) {
+			if (((*it).attribute & (ALTYPMSK | FRMSK)) != trg) {
+				GroupStitchIndex = std::distance(StitchBuffer->begin(), it) - 1u;
+				bFlag            = true;
+				break;
+			}
+		}
+		if (!bFlag) {
+			GroupStitchIndex = StitchBuffer->size() - 1u;
+		}
 	}
 	else {
-		iStitch = 0;
+		ClosestPointIndex = 0;
+		GroupStitchIndex = 0;
 	}
-	while (iStitch > ClosestPointIndex && ((*StitchBuffer)[iStitch].attribute & (ALTYPMSK | FRMSK)) != trg) {
-		iStitch--;
-	}
-	GroupStitchIndex = iStitch;
 }
 
 void form::selfil(uint32_t type) {
