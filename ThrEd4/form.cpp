@@ -3828,7 +3828,12 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 		while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1u] && pathMap[iPath].node != nextNode) {
 			iPath++;
 		}
-		sequencePath[pathCount++].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
+		if (iPath < pathMap.size()) {
+			sequencePath[pathCount++].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
+		}
+		else {
+			sequencePath[pathCount++].nextGroup = 0;
+		}
 	}
 	else {
 		sequencePath[pathCount++].nextGroup = 0;
@@ -4281,33 +4286,26 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 				breakLine = sortedLines[iLine]->line;
 			}
 		}
-		regions.back().end     = lineCount - 1u;
-		const auto regionCount = wrap::toUnsigned(regions.size());
-		auto       regionsList = std::vector<REGION> {};
-		regionsList.resize(regionCount);
-		auto visitedRegions = boost::dynamic_bitset<>(regionCount);
-		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
-			regionsList[iRegion].start      = regions[iRegion].start;
-			regionsList[iRegion].end        = regions[iRegion].end;
-			regionsList[iRegion].breakCount = 0;
-		}
-		const auto iStartLine = 0u;
+		regions.back().end        = lineCount - 1u;
+		const auto regionCount    = wrap::toUnsigned(regions.size());
+		auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
+		const auto iStartLine     = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
 			auto count = 0u;
-			if ((regionsList[iRegion].end - regionsList[iRegion].start) > 1) {
-				auto startGroup = sortedLines[regionsList[iRegion].start]->group;
-				for (auto iLine = regionsList[iRegion].start + 1u; iLine <= regionsList[iRegion].end; iLine++) {
+			if ((regions[iRegion].end - regions[iRegion].start) > 1) {
+				auto startGroup = sortedLines[regions[iRegion].start]->group;
+				for (auto iLine = regions[iRegion].start + 1u; iLine <= regions[iRegion].end; iLine++) {
 					startGroup++;
 					if (sortedLines[iLine]->group != startGroup) {
 						if (count == 0u) {
-							regionsList[iRegion].regionBreak = iStartLine;
+							regions[iRegion].regionBreak = iStartLine;
 						}
 						count++;
 						startGroup = sortedLines[iLine]->group;
 					}
 				}
 			}
-			regionsList[iRegion].breakCount = count;
+			regions[iRegion].breakCount = count;
 		}
 
 #if BUGSEQ
@@ -4347,7 +4345,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 						                                 sortedLines,
 						                                 iSequence,
 						                                 iNode,
-						                                 regionsList,
+						                                 regions,
 						                                 gapToClosestRegion,
 						                                 nextGroup);
 						if (isConnected) {
@@ -4368,7 +4366,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 							                                 sortedLines,
 							                                 iSequence,
 							                                 iNode,
-							                                 regionsList,
+							                                 regions,
 							                                 gapToClosestRegion,
 							                                 nextGroup);
 							if (isConnected) {
@@ -4385,7 +4383,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 			auto startGroup = 0xffffffffu;
 			auto leftRegion = 0u;
 			for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
-				auto lineGroupPoint = sortedLines[regionsList[iRegion].start];
+				auto lineGroupPoint = sortedLines[regions[iRegion].start];
 				if (lineGroupPoint->group < startGroup) {
 					startGroup = lineGroupPoint->group;
 					leftRegion = iRegion;
@@ -4422,7 +4420,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 				       mapIndexSequence,
 				       visitedRegions,
 				       sortedLines,
-				       regionsList,
+				       regions,
 				       doneRegion,
 				       pathMapIndex,
 				       sequencePathIndex,
@@ -4457,7 +4455,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 				if (!unvis(visitedRegions, visitedIndex)) {
 					break;
 				}
-				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, regionsList, lastGroup, sequencePathIndex);
+				durgn(sequencePath, visitedRegions, sortedLines, iPath, lineCount, regions, lastGroup, sequencePathIndex);
 			}
 		}
 		else {
@@ -4465,9 +4463,9 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 			sequencePath.resize(sequencePathIndex);
 			auto lastGroup            = 0u;
 			sequencePath[0].node      = 0;
-			sequencePath[0].nextGroup = gsl::narrow<uint16_t>(sortedLines[regionsList[0].end]->group);
+			sequencePath[0].nextGroup = gsl::narrow<uint16_t>(sortedLines[regions[0].end]->group);
 			sequencePath[0].skp       = false;
-			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, regionsList, lastGroup, sequencePathIndex);
+			durgn(sequencePath, visitedRegions, sortedLines, 0, lineCount, regions, lastGroup, sequencePathIndex);
 		}
 
 #endif
