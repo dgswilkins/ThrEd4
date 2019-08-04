@@ -4122,14 +4122,7 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 		    = std::round((gsl::narrow_cast<double>(lastGroup) - groupStart) / (gsl::narrow_cast<double>(groupEnd) - groupStart)
 		                     * (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart)
 		                 + sequenceStart);
-		// ToDo - is this guard still needed now that intermediate is calculated correctly?
-		if (intermediate > lineCount) {
-			seql = 0;
-		}
-		else {
-			// ToDo - is abs the correct choice when intermediate < 0 or should seql be set to 0?
-			seql = gsl::narrow<decltype(seql)>(std::abs(intermediate));
-		}
+		seql = gsl::narrow<decltype(seql)>(std::abs(intermediate));
 	}
 	const auto length
 	    = (gsl::narrow_cast<double>(groupEnd) - groupStart) * (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart);
