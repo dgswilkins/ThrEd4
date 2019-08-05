@@ -7882,7 +7882,6 @@ void form::internal::shrnks() {
 	const auto length        = hypot(lastDelta.x, lastDelta.y);
 	auto       rotationAngle = atan2(lastDelta.y, lastDelta.x);
 	// ToDo - what does this loop do?
-	// ToDo - move constant calculations out of the loop
 	for (auto ine = 0u; ine < 5; ine++) {
 		auto delta = fPOINT { vertexIt[0].x - vertexIt[VertexCount - 1u].x, vertexIt[0].y - vertexIt[VertexCount - 1u].y };
 
@@ -7901,6 +7900,7 @@ void form::internal::shrnks() {
 void form::shrnk() {
 	form::fvars(ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FORMSEL) && SelectedForm->edgeType == EDGECLIP) {
+		thred::savdo();
 		fi::shrnks();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
