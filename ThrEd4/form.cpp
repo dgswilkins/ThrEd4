@@ -8411,10 +8411,6 @@ void form::spltfrm() {
 						return;
 					}
 				}
-				displayText::spltmsg();
-			}
-			else {
-				displayText::spltmsg();
 			}
 		}
 		else {
@@ -8428,7 +8424,6 @@ void form::spltfrm() {
 				}
 				return;
 			}
-			displayText::spltmsg();
 		}
 	}
 	displayText::spltmsg();
