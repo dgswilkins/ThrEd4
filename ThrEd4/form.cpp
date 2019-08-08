@@ -8355,23 +8355,17 @@ void form::clpspac(const uint32_t insertPoint, uint32_t count) {
 }
 
 void form::stchadj() {
+	const auto codedClosest = ClosestFormToCursor << FRMSHFT;
+	const auto offset       = 1u << FRMSHFT;
 	for (auto& stitch : *StitchBuffer) {
-		auto       high = stitch.attribute & FRMSK;
-		const auto low  = high >> FRMSHFT;
-		if (low > ClosestFormToCursor) {
+		auto codedForm = stitch.attribute & FRMSK;
+		if (codedForm > codedClosest) {
 			stitch.attribute &= NFRMSK;
-			high += 1u << FRMSHFT;
-			stitch.attribute |= high;
+			codedForm += offset;
+			stitch.attribute |= codedForm;
 		}
 	}
 	form::refilfn();
-	// ToDo - does this make sense?
-	const auto low = ClosestFormToCursor << FRMSHFT;
-	for (auto iStitch = StitchBuffer->size(); iStitch != 0; iStitch--) {
-		if (((*StitchBuffer)[iStitch - 1u].attribute & FRMSK) == low) {
-			break;
-		}
-	}
 	ClosestFormToCursor++;
 	form::refilfn();
 	StateMap.reset(StateFlag::FRMPSEL);
