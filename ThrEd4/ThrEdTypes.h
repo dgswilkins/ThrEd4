@@ -11,20 +11,20 @@
 // Local Headers
 #include "switches.h"
 
-constexpr int32_t RES_SIZE    = 26;       // reserved for expansion in the ThrEd v1.0 header
-constexpr int32_t NAME_LEN    = 50;       // Length of the name fields in ThrEd headers
-constexpr int32_t COLOR_COUNT = 16;       // Number of colors in arrays
-constexpr int32_t SRTIM       = 20000000; // sort time limit in 100 ns intervals
+constexpr auto RES_SIZE    = 26;       // reserved for expansion in the ThrEd v1.0 header
+constexpr auto NAME_LEN    = 50;       // Length of the name fields in ThrEd headers
+constexpr auto COLOR_COUNT = 16;       // Number of colors in arrays
+constexpr auto SRTIM       = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes
-constexpr uint32_t DAZPETS = 5u;  // petals
-constexpr uint32_t DAZCNT  = 10u; // petal points
-constexpr uint32_t DAZICNT = 2u;  // petal inner points
-constexpr uint32_t DAZLEN  = 15u; // diameter
-constexpr uint32_t DAZPLEN = 20u; // petal length
-constexpr uint32_t DAZHLEN = 5u;  // hole size
-constexpr uint32_t DAZTYP  = 5u;  // border type
-constexpr uint32_t DAZMCNT = 7u;  // mirror count
+constexpr auto DAZPETS = 5u;  // petals
+constexpr auto DAZCNT  = 10u; // petal points
+constexpr auto DAZICNT = 2u;  // petal inner points
+constexpr auto DAZLEN  = 15u; // diameter
+constexpr auto DAZPLEN = 20u; // petal length
+constexpr auto DAZHLEN = 5u;  // hole size
+constexpr auto DAZTYP  = 5u;  // border type
+constexpr auto DAZMCNT = 7u;  // mirror count
 // end of daisy codes
 
 constexpr float    TXTRAT   = 0.95f;       // texture fill clipboard shrink/grow ratio
@@ -77,7 +77,7 @@ constexpr int32_t  MOVITIM    = 12;                // default movie time
 constexpr float    DEFSPACE   = 0.45f;             // default stitch spacing
 constexpr float    DEFANG     = 0.7853981f;        // default fill angle, 45 degrees
 constexpr uint32_t MAXFRMLINS = 20000u;            // maximum lines in a form
-constexpr uint32_t MSGSIZ     = 8192;              // size of the message buffer
+constexpr uint32_t MSGSIZ     = 8192u;             // size of the message buffer
 constexpr float    PI_F       = 3.1415927f;        // PI to single precision
 constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
@@ -104,8 +104,8 @@ constexpr float    IBFCLEN   = (4.0f * PFGRAN); // initial buttonhole fill corne
 constexpr float    IPICSPAC  = 6.0f;            // initial picot border space
 constexpr int32_t  PRFLINS   = 28;              // number of lines on the preference menu
 constexpr uint32_t EDGETYPS  = 12u;             // number of border fill types
-constexpr uint32_t SEED      = 3037000499;      // pseudo-random-sequence seed
-constexpr uint32_t FSED      = 1340007303;      // feather sequence seed
+constexpr uint32_t SEED      = 3037000499u;     // pseudo-random-sequence seed
+constexpr uint32_t FSED      = 1340007303u;     // feather sequence seed
 constexpr double   HUPS      = 5u;              // number of hoops the user can select
 constexpr uint32_t NORDSED   = 0x5a5a5a5au;     // name order seed
 constexpr uint32_t NCODSED   = 0x73ef5a7eu;     // name encoding seed
@@ -118,7 +118,7 @@ constexpr float    STARAT    = 0.4f;            // default star ratio
 constexpr float    SPIRWRAP  = 1.52f;           // default spiral wrap
 constexpr uint32_t BALNORM   = 0x80u;           // normal balarad stitch
 constexpr uint32_t BALJUMP   = 0x81u;           // balarad jump stitch
-constexpr uint32_t BALSTOP   = 0;               // balarad stop
+constexpr uint32_t BALSTOP   = 0u;              // balarad stop
 constexpr uint32_t COLVER    = 0x776874u;       // color file version
 constexpr uint32_t REDCOL    = 0x0000ffu;       // code for the color red
 constexpr uint32_t GRNCOL    = 0x00ff00u;       // code for the color green
@@ -747,8 +747,8 @@ enum clipDataType
 };
 
 // edge underlay bit
-constexpr uint32_t EGUND  = 0x80u;
-constexpr uint32_t NEGUND = 0x7fu;
+constexpr auto EGUND  = 0x80u;
+constexpr auto NEGUND = 0x7fu;
 
 // form data lines
 enum formData
@@ -823,10 +823,10 @@ enum fillStyles
 	TXANGF,   // Angle texture fill
 };
 
-constexpr uint32_t MCLPF    = 1u << static_cast<uint32_t>(CLPF);
-constexpr uint32_t MVCLPF   = 1u << static_cast<uint32_t>(VCLPF);
-constexpr uint32_t MHCLPF   = 1u << static_cast<uint32_t>(HCLPF);
-constexpr uint32_t MANGCLPF = 1u << static_cast<uint32_t>(ANGCLPF);
+constexpr auto MCLPF    = 1u << static_cast<uint32_t>(CLPF);
+constexpr auto MVCLPF   = 1u << static_cast<uint32_t>(VCLPF);
+constexpr auto MHCLPF   = 1u << static_cast<uint32_t>(HCLPF);
+constexpr auto MANGCLPF = 1u << static_cast<uint32_t>(ANGCLPF);
 
 // preference window
 enum preferenceItems
@@ -1378,10 +1378,10 @@ constexpr uint32_t ALTYPMSK  = 0x61f00000u; // 0110 0001 1111 0000 0000 0000 000
 constexpr uint32_t SRTMSK    = 0x61f03fffu; // 0110 0001 1111 0000 0011 1111 1111 1111
 constexpr uint32_t SRTYPMSK  = 0x61700000u; // 0110 0001 0111 0000 0000 0000 0000 0000
 constexpr uint32_t NOTFRM    = 0x00080000u; // 0000 0000 0000 1000 0000 0000 0000 0000
-constexpr uint32_t FRMSHFT   = 4;
-constexpr uint32_t LAYSHFT   = 25;
-constexpr uint32_t TYPSHFT   = 29;
-constexpr uint32_t USHFT     = 31;
+constexpr uint32_t FRMSHFT   = 4u;
+constexpr uint32_t LAYSHFT   = 25u;
+constexpr uint32_t TYPSHFT   = 29u;
+constexpr uint32_t USHFT     = 31u;
 
 /*
 bit definitions for fPOINTATTR.attribute
@@ -1447,8 +1447,8 @@ class SATCONOUT;
 class SATCON
 {
 public:
-	uint32_t start {};
-	uint32_t finish {};
+	uint32_t start { 0u };
+	uint32_t finish { 0u };
 
 	constexpr SATCON() noexcept = default;
 	// SATCON(SATCON&&) = default;
@@ -1469,8 +1469,8 @@ inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
 class SATCONOUT
 {
 public:
-	uint16_t start {};
-	uint16_t finish {};
+	uint16_t start { 0u };
+	uint16_t finish { 0u };
 
 	constexpr SATCONOUT() noexcept = default;
 	// SATCONOUT(SATCONOUT&&) = default;
@@ -1668,40 +1668,40 @@ EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
 EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 */
 
-constexpr uint32_t BELEN    = 0x001u;
-constexpr uint32_t BESPAC   = 0x002u;
-constexpr uint32_t BESIZ    = 0x004u;
-constexpr uint32_t BNCLP    = 0x008u;
-constexpr uint32_t BPICSPAC = 0x010u;
-constexpr uint32_t BCNRSIZ  = 0x020u;
-constexpr uint32_t BRDEND   = 0x040u;
-constexpr uint32_t BRDPOS   = 0x080u;
-constexpr uint32_t BEMAX    = 0x100u;
-constexpr uint32_t BEMIN    = 0x200u;
-constexpr uint32_t CHNPOS   = 0x400u;
+constexpr auto BELEN    = 1u;
+constexpr auto BESPAC   = 1u << 1;
+constexpr auto BESIZ    = 1u << 2;
+constexpr auto BNCLP    = 1u << 3;
+constexpr auto BPICSPAC = 1u << 4;
+constexpr auto BCNRSIZ  = 1u << 5;
+constexpr auto BRDEND   = 1u << 6;
+constexpr auto BRDPOS   = 1u << 7;
+constexpr auto BEMAX    = 1u << 8;
+constexpr auto BEMIN    = 1u << 9;
+constexpr auto CHNPOS   = 1u << 10;
 
-constexpr uint32_t MEGLIN  = (BELEN | BEMAX | BEMIN);
-constexpr uint32_t MEGBLD  = (BELEN | BEMAX | BEMIN);
-constexpr uint32_t MEGCLP  = (BNCLP | BEMAX | BEMIN);
-constexpr uint32_t MEGSAT  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr uint32_t MEGAP   = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr uint32_t MEGPRP  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
-constexpr uint32_t MEGHOL  = (BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN);
-constexpr uint32_t MEGPIC  = (BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN);
-constexpr uint32_t MEGDUB  = (BELEN | BEMAX | BEMIN);
-constexpr uint32_t MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
-constexpr uint32_t MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
-constexpr uint32_t MEGCLPX = (BNCLP | BEMAX | BEMIN);
+constexpr auto MEGLIN  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGBLD  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGCLP  = (BNCLP | BEMAX | BEMIN);
+constexpr auto MEGSAT  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGAP   = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGPRP  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGHOL  = (BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN);
+constexpr auto MEGPIC  = (BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN);
+constexpr auto MEGDUB  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
+constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
+constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
-constexpr uint32_t EGLIN_LINS = 4;
-constexpr uint32_t EGBLD_LINS = 4;
-constexpr uint32_t EGCLP_LINS = 3;
-constexpr uint32_t EGSAT_LINS = 6;
-constexpr uint32_t EGAP_LINS  = 7;
-constexpr uint32_t EGPRP_LINS = 6;
-constexpr uint32_t EGHOL_LINS = 7;
-constexpr uint32_t EGPIC_LINS = 7;
-constexpr uint32_t EGCHN_LINS = 6;
+constexpr auto EGLIN_LINS = 4u;
+constexpr auto EGBLD_LINS = 4u;
+constexpr auto EGCLP_LINS = 3u;
+constexpr auto EGSAT_LINS = 6u;
+constexpr auto EGAP_LINS  = 7u;
+constexpr auto EGPRP_LINS = 6u;
+constexpr auto EGHOL_LINS = 7u;
+constexpr auto EGPIC_LINS = 7u;
+constexpr auto EGCHN_LINS = 6u;
 
 class FTHINFO
 {
@@ -1790,24 +1790,24 @@ inline FRMHEDO::FRMHEDO() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0;
-	vertexCount     = 0;
-	type            = 0;
-	fillColor       = 0;
-	borderColor     = 0;
-	clipEntries     = 0;
-	vertices        = 0;
-	borderClipData  = 0;
-	satinGuideCount = 0;
-	wordParam       = 0;
+	attribute       = 0u;
+	vertexCount     = 0u;
+	type            = 0u;
+	fillColor       = 0u;
+	borderColor     = 0u;
+	clipEntries     = 0u;
+	vertices        = 0u;
+	borderClipData  = 0u;
+	satinGuideCount = 0u;
+	wordParam       = 0u;
 	rectangle       = {};
-	fillType        = 0;
-	edgeType        = 0;
-	fillSpacing     = 0;
-	borderSize      = 0;
-	edgeSpacing     = 0;
-	edgeStitchLen   = 0;
-	res             = 0;
+	fillType        = 0u;
+	edgeType        = 0u;
+	fillSpacing     = 0.0f;
+	borderSize      = 0.0f;
+	edgeSpacing     = 0.0f;
+	edgeStitchLen   = 0.0f;
+	res             = 0u;
 }
 
 class FRMHEDOUT;
@@ -1869,40 +1869,40 @@ inline FRMHED::FRMHED() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0;
-	vertexCount     = 0;
-	type            = 0;
-	fillColor       = 0;
-	borderColor     = 0;
-	clipEntries     = 0;
-	vertexIndex     = 0;
-	borderClipData  = 0;
-	satinGuideCount = 0;
-	wordParam       = 0;
+	attribute       = 0u;
+	vertexCount     = 0u;
+	type            = 0u;
+	fillColor       = 0u;
+	borderColor     = 0u;
+	clipEntries     = 0u;
+	vertexIndex     = 0u;
+	borderClipData  = 0u;
+	satinGuideCount = 0u;
+	wordParam       = 0u;
 	rectangle       = {};
-	fillType        = 0;
-	edgeType        = 0;
-	fillSpacing     = 0;
-	borderSize      = 0;
-	edgeSpacing     = 0;
-	edgeStitchLen   = 0;
-	picoLength      = 0;
+	fillType        = 0u;
+	edgeType        = 0u;
+	fillSpacing     = 0.0f;
+	borderSize      = 0.0f;
+	edgeSpacing     = 0.0f;
+	edgeStitchLen   = 0.0f;
+	picoLength      = 0u;
 
-	maxFillStitchLen    = 0;
-	minFillStitchLen    = 0;
-	extendedAttribute   = 0;
-	maxBorderStitchLen  = 0;
-	minBorderStitchLen  = 0;
+	maxFillStitchLen    = 0.0f;
+	minFillStitchLen    = 0.0f;
+	extendedAttribute   = 0u;
+	maxBorderStitchLen  = 0.0f;
+	minBorderStitchLen  = 0.0f;
 	fillInfo            = {};
-	fillStart           = 0;
-	fillEnd             = 0;
-	underlaySpacing     = 0;
-	underlayStitchLen   = 0;
-	underlayStitchAngle = 0;
-	underlayIndent      = 0;
-	txof                = 0;
-	underlayColor       = 0;
-	cres                = 0;
+	fillStart           = 0u;
+	fillEnd             = 0u;
+	underlaySpacing     = 0.0f;
+	underlayStitchLen   = 0.0f;
+	underlayStitchAngle = 0.0f;
+	underlayIndent      = 0.0f;
+	txof                = 0.0f;
+	underlayColor       = 0u;
+	cres                = 0u;
 }
 
 inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
@@ -1943,21 +1943,21 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	edgeStitchLen = rhs.edgeStitchLen;
 	picoLength    = rhs.res;
 
-	extendedAttribute   = 0;
-	maxFillStitchLen    = 0;
-	minFillStitchLen    = 0;
-	maxBorderStitchLen  = 0;
-	minBorderStitchLen  = 0;
+	extendedAttribute   = 0u;
+	maxFillStitchLen    = 0.0f;
+	minFillStitchLen    = 0.0f;
+	maxBorderStitchLen  = 0.0f;
+	minBorderStitchLen  = 0.0f;
 	fillInfo            = {};
-	fillStart           = 0;
-	fillEnd             = 0;
-	underlaySpacing     = 0;
-	underlayStitchLen   = 0;
-	underlayStitchAngle = 0;
-	underlayIndent      = 0;
-	txof                = 0;
-	underlayColor       = 0;
-	cres                = 0;
+	fillStart           = 0u;
+	fillEnd             = 0u;
+	underlaySpacing     = 0.0f;
+	underlayStitchLen   = 0.0f;
+	underlayStitchAngle = 0.0f;
+	underlayIndent      = 0.0f;
+	txof                = 0.0f;
+	underlayColor       = 0u;
+	cres                = 0u;
 }
 
 inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
@@ -1967,7 +1967,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0;
+	vertexIndex     = 0u;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -2057,40 +2057,40 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0;
-	vertexCount     = 0;
-	type            = 0;
-	fillColor       = 0;
-	borderColor     = 0;
-	clipEntries     = 0;
-	vertexIndex     = 0;
-	borderClipData  = 0;
-	satinGuideCount = 0;
-	wordParam       = 0;
+	attribute       = 0u;
+	vertexCount     = 0u;
+	type            = 0u;
+	fillColor       = 0u;
+	borderColor     = 0u;
+	clipEntries     = 0u;
+	vertexIndex     = 0u;
+	borderClipData  = 0u;
+	satinGuideCount = 0u;
+	wordParam       = 0u;
 	rectangle       = {};
-	fillType        = 0;
-	edgeType        = 0;
-	fillSpacing     = 0;
-	borderSize      = 0;
-	edgeSpacing     = 0;
-	edgeStitchLen   = 0;
-	picoLength      = 0;
+	fillType        = 0u;
+	edgeType        = 0u;
+	fillSpacing     = 0.0f;
+	borderSize      = 0.0f;
+	edgeSpacing     = 0.0f;
+	edgeStitchLen   = 0.0f;
+	picoLength      = 0u;
 
-	maxFillStitchLen    = 0;
-	minFillStitchLen    = 0;
-	extendedAttribute   = 0;
-	maxBorderStitchLen  = 0;
-	minBorderStitchLen  = 0;
+	maxFillStitchLen    = 0.0f;
+	minFillStitchLen    = 0.0f;
+	extendedAttribute   = 0u;
+	maxBorderStitchLen  = 0.0f;
+	minBorderStitchLen  = 0.0f;
 	fillInfo            = {};
-	fillStart           = 0;
-	fillEnd             = 0;
-	underlaySpacing     = 0;
-	underlayStitchLen   = 0;
-	underlayStitchAngle = 0;
-	underlayIndent      = 0;
-	txof                = 0;
-	underlayColor       = 0;
-	cres                = 0;
+	fillStart           = 0u;
+	fillEnd             = 0u;
+	underlaySpacing     = 0.0f;
+	underlayStitchLen   = 0.0f;
+	underlayStitchAngle = 0.0f;
+	underlayIndent      = 0.0f;
+	txof                = 0.0f;
+	underlayColor       = 0u;
+	cres                = 0u;
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
@@ -2101,9 +2101,9 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-	vertexIndex     = 0; // do not write the pointer value to file
+	vertexIndex     = 0u; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0; // do not write the pointer value to file
+	borderClipData  = 0u; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
 	wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
 	rectangle       = rhs.rectangle;
@@ -2343,19 +2343,19 @@ constexpr uint8_t NOBLNT = 0x9fu; // 1001 1111
 
 // frmhed extended attribute bits
 
-constexpr uint32_t AT_SQR     = 0x001u; // square ends
-constexpr uint32_t AT_FTHUP   = 0x002u; // feather up or down flag
-constexpr uint32_t AT_FTHBTH  = 0x004u; // feather both up and down flag
-constexpr uint32_t AT_FTHBLND = 0x008u; // feather blend flag
-constexpr uint32_t AT_STRT    = 0x010u; // user set start flag
-constexpr uint32_t AT_END     = 0x020u; // user set end flag
-constexpr uint32_t AT_UND     = 0x040u; // underlay flag
-constexpr uint32_t AT_WALK    = 0x080u; // edge walk
-constexpr uint32_t AT_CWLK    = 0x100u; // center walk
+constexpr auto AT_SQR     = 1u;      // square ends
+constexpr auto AT_FTHUP   = 1u << 1; // feather up or down flag
+constexpr auto AT_FTHBTH  = 1u << 2; // feather both up and down flag
+constexpr auto AT_FTHBLND = 1u << 3; // feather blend flag
+constexpr auto AT_STRT    = 1u << 4; // user set start flag
+constexpr auto AT_END     = 1u << 5; // user set end flag
+constexpr auto AT_UND     = 1u << 6; // underlay flag
+constexpr auto AT_WALK    = 1u << 7; // edge walk
+constexpr auto AT_CWLK    = 1u << 8; // center walk
 
 // contour refil
-constexpr uint32_t FRECONT  = 0x80u; // 1000 0000
-constexpr uint32_t NFRECONT = 0x7fu; // 0111 1111
+constexpr auto FRECONT  = 0x80u; // 1000 0000
+constexpr auto NFRECONT = 0x7fu; // 0111 1111
 
 class FORMCLIP // form data clipboard header
 {
@@ -2457,7 +2457,7 @@ public:
 	char     modifierName[NAME_LEN] { 0 }; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
 	int8_t   auxFormat { 0 };              // auxillary file format
 	int8_t   stres { 0 };                  // reserved
-	uint32_t texturePointCount { 0 };      // textured fill point32_t count
+	uint32_t texturePointCount { 0u };     // textured fill point32_t count
 	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
 
 	constexpr STREX() noexcept = default;
@@ -2506,9 +2506,9 @@ public:
 
 // dst type masks
 
-constexpr uint32_t JMPTYP = 0x830000u;
-constexpr uint32_t COLTYP = 0x630000u;
-constexpr uint32_t REGTYP = 0x030000u;
+constexpr auto JMPTYP = 0x830000u;
+constexpr auto COLTYP = 0x630000u;
+constexpr auto REGTYP = 0x030000u;
 
 class DSTREC // dst stitch record
 {
@@ -2704,8 +2704,8 @@ public:
 	//~FSEQ() = default;
 };
 
-constexpr uint32_t SEQTOP = 2;
-constexpr uint32_t SEQBOT = 3;
+constexpr auto SEQTOP = 2u;
+constexpr auto SEQBOT = 3u;
 
 class PVEC
 {
@@ -2742,13 +2742,13 @@ public:
 class CURSORMASK
 {
 public:
-	uint8_t form[128] { 0 };            // NOLINT(modernize-avoid-c-arrays)
-	uint8_t dline[128] { 0 };           // NOLINT(modernize-avoid-c-arrays)
-	uint8_t uprightNeedle[128] { 0 };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftUpNeedle[128] { 0 };    // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftDownNeedle[128] { 0 };  // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightUpNeedle[128] { 0 };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightDownNeedle[128] { 0 }; // NOLINT(modernize-avoid-c-arrays)
+	uint8_t form[128] { 0u };            // NOLINT(modernize-avoid-c-arrays)
+	uint8_t dline[128] { 0u };           // NOLINT(modernize-avoid-c-arrays)
+	uint8_t uprightNeedle[128] { 0u };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftUpNeedle[128] { 0u };    // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftDownNeedle[128] { 0u };  // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightUpNeedle[128] { 0u };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightDownNeedle[128] { 0u }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr CURSORMASK() noexcept = default;
 	// CURSORMASK(CURSORMASK&&) = default;
@@ -2760,13 +2760,13 @@ public:
 class BALHED // balarad file header
 {
 public:
-	COLORREF color[256] { 0 }; // NOLINT(modernize-avoid-c-arrays)
+	COLORREF color[256] { 0u }; // NOLINT(modernize-avoid-c-arrays)
 	uint32_t signature { 0u };
 	uint16_t version { 0u };
 	float    hoopSizeX { 0.0f };
 	float    hoopSizeY { 0.0f };
-	COLORREF backgroundColor { 0 };
-	uint8_t  res[1006] { 0 }; // NOLINT(modernize-avoid-c-arrays)
+	COLORREF backgroundColor { 0u };
+	uint8_t  res[1006] { 0u }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr BALHED() noexcept = default;
 	// BALHED(BALHED&&) = default;
@@ -2871,40 +2871,40 @@ public:
 class PESHED
 {
 public:
-	char     led[8] { 0 };  //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
-	uint32_t off { 0 };     //   8-b  Absolute PEC section byte offset
-	uint16_t hpsz { 0 };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-	uint16_t usdn { 0 };    //   e,f  Use existing design area (1)
-	uint16_t blct { 0 };    // 10,11  CSewSeg segment block count (1)
-	char     hnd1[4] { 0 }; // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t celn { 0 };    // 16,17  Length of following string (7)
-	char     ce[7] { 0 };   // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
-	int16_t  xlft { 0 };    // 1f,20  Extent left
-	int16_t  xtop { 0 };    // 21,22  Extent top
-	int16_t  xrht { 0 };    // 23,24  Extent right
-	int16_t  xbot { 0 };    // 25,26  Extent bottom
-	int16_t  plft { 0 };    // 27,28  Extent left position
-	int16_t  ptop { 0 };    // 29,2a  Extent top position
-	int16_t  prht { 0 };    // 2b,2c  Extent right position
-	int16_t  pbot { 0 };    // 2d,2e  Extent bottom position
-	float    atfm1 { 0 };   // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
-	float    atfm2 { 0 };   // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
-	float    atfm3 { 0 };   // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
-	float    atfm4 { 0 };   // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
-	float    atfm5 { 0 };   // 3f-42  Affine transform Left_Pos
-	float    atfm6 { 0 };   // 43-46  Affine transform Bottom_Pos
-	uint16_t ukn1 { 0 };    // 47,48  unknown (1)
-	int16_t  xtrn { 0 };    // 49,4a  CSewSeg x coordinate translation (0)
-	int16_t  ytrn { 0 };    // 4b,4c  CSewSeg y coordinate translation (0)
-	int16_t  xsiz { 0 };    // 4d,4e  CSewSeg width
-	int16_t  ysiz { 0 };    // 4f,50  CSewSeg height
-	int8_t   ukn2[8] { 0 }; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
-	uint16_t bcnt { 0 };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-	int8_t   hnd2[4] { 0 }; // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t cslen { 0 };   // 5f,60  CSewSeg length (7)
-	char     cs[7] { 0 };   // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
-	                        // uint16_t styp1;   // 68,69  Stitch type (0)
-	                        // uint16_t scol;    // 6a,6b  Stitch Palette thread index
+	char     led[8] { 0 };   //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
+	uint32_t off { 0u };     //   8-b  Absolute PEC section byte offset
+	uint16_t hpsz { 0u };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+	uint16_t usdn { 0u };    //   e,f  Use existing design area (1)
+	uint16_t blct { 0u };    // 10,11  CSewSeg segment block count (1)
+	char     hnd1[4] { 0 };  // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+	uint16_t celn { 0u };    // 16,17  Length of following string (7)
+	char     ce[7] { 0 };    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
+	int16_t  xlft { 0 };     // 1f,20  Extent left
+	int16_t  xtop { 0 };     // 21,22  Extent top
+	int16_t  xrht { 0 };     // 23,24  Extent right
+	int16_t  xbot { 0 };     // 25,26  Extent bottom
+	int16_t  plft { 0 };     // 27,28  Extent left position
+	int16_t  ptop { 0 };     // 29,2a  Extent top position
+	int16_t  prht { 0 };     // 2b,2c  Extent right position
+	int16_t  pbot { 0 };     // 2d,2e  Extent bottom position
+	float    atfm1 { 0.0f }; // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
+	float    atfm2 { 0.0f }; // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
+	float    atfm3 { 0.0f }; // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
+	float    atfm4 { 0.0f }; // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
+	float    atfm5 { 0.0f }; // 3f-42  Affine transform Left_Pos
+	float    atfm6 { 0.0f }; // 43-46  Affine transform Bottom_Pos
+	uint16_t ukn1 { 0u };    // 47,48  unknown (1)
+	int16_t  xtrn { 0 };     // 49,4a  CSewSeg x coordinate translation (0)
+	int16_t  ytrn { 0 };     // 4b,4c  CSewSeg y coordinate translation (0)
+	int16_t  xsiz { 0 };     // 4d,4e  CSewSeg width
+	int16_t  ysiz { 0 };     // 4f,50  CSewSeg height
+	int8_t   ukn2[8] { 0 };  // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
+	uint16_t bcnt { 0u };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+	int8_t   hnd2[4] { 0 };  // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+	uint16_t cslen { 0u };   // 5f,60  CSewSeg length (7)
+	char     cs[7] { 0 };    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
+	                         // uint16_t styp1;   // 68,69  Stitch type (0)
+	                         // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
 	constexpr PESHED() noexcept = default;
 	// PESHED(PESHED&&) = default;
@@ -3100,17 +3100,17 @@ inline FILLSTARTS::FILLSTARTS() noexcept
     : fillNamed() {
 }
 
-constexpr uint32_t M_AP     = 0x002u;
-constexpr uint32_t M_CWLK   = 0x004u;
-constexpr uint32_t M_WALK   = 0x008u;
-constexpr uint32_t M_UND    = 0x010u;
-constexpr uint32_t M_FIL    = 0x020u;
-constexpr uint32_t M_FTH    = 0x040u;
-constexpr uint32_t M_BRD    = 0x080u;
-constexpr uint32_t M_APCOL  = 0x100u;
-constexpr uint32_t M_FCOL   = 0x200u;
-constexpr uint32_t M_FTHCOL = 0x400u;
-constexpr uint32_t M_ECOL   = 0x800u;
+constexpr auto M_AP     = 1u << 1;
+constexpr auto M_CWLK   = 1u << 2;
+constexpr auto M_WALK   = 1u << 3;
+constexpr auto M_UND    = 1u << 4;
+constexpr auto M_FIL    = 1u << 5;
+constexpr auto M_FTH    = 1u << 6;
+constexpr auto M_BRD    = 1u << 7;
+constexpr auto M_APCOL  = 1u << 8;
+constexpr auto M_FCOL   = 1u << 9;
+constexpr auto M_FTHCOL = 1u << 10;
+constexpr auto M_ECOL   = 1u << 11;
 
 class INSREC
 {
@@ -3155,17 +3155,17 @@ public:
 class TXTSCR
 {
 public:
-	int32_t  top {};                    // pixel top line
-	int32_t  bottom {};                 // pixel bottom line
-	int32_t  height {};                 // pixel height of area
-	int32_t  halfHeight {};             // pixel middle of area
+	int32_t  top { 0 };                 // pixel top line
+	int32_t  bottom { 0 };              // pixel bottom line
+	int32_t  height { 0 };              // pixel height of area
+	int32_t  halfHeight { 0 };          // pixel middle of area
 	float    xOffset { 0.0f };          // edit x offset of area
 	float    yOffset { 0.0f };          // edit y offset of area
 	float    areaHeight { 0.0f };       // edit height of area
 	float    screenHeight { 0.0f };     // edit height of screen
 	float    width { 0.0f };            // edit width of area
 	float    spacing { 0.0f };          // edit space between lines
-	uint16_t lines { 0 };               // number of lines
+	uint16_t lines { 0u };              // number of lines
 	float    editToPixelRatio { 0.0f }; // edit to pixel ratio
 	fPOINT   formCenter;                // middle of the form
 
@@ -3237,10 +3237,10 @@ public:
 	//~RNGCNT() = default;
 };
 
-constexpr uint32_t BADFLT = 1;
-constexpr uint32_t BADCLP = 2;
-constexpr uint32_t BADSAT = 4;
-constexpr uint32_t BADTX  = 8;
+constexpr auto BADFLT = 1u;
+constexpr auto BADCLP = 1u << 1;
+constexpr auto BADSAT = 1u << 2;
+constexpr auto BADTX  = 1u << 3;
 
 class BADCNTS
 {
@@ -3261,7 +3261,7 @@ public:
 class FINDINFO
 {
 public:
-	uint32_t         count { 0 };
+	uint32_t         count { 0u };
 	WIN32_FIND_DATA* data { nullptr };
 
 	constexpr FINDINFO() noexcept = default;
