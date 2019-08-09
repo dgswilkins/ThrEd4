@@ -82,7 +82,6 @@ void repair::lodchk() {
 					formMap.set(tform);
 				}
 				else {
-					// ToDo - unassign the stitch from any form
 					stitch.attribute &= (NFRMSK & NTYPMSK);
 				}
 			}
@@ -127,6 +126,33 @@ void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexc
 	}
 }
 
+void repair::internal::chkVrtx(const FRMHED& form, BADCNTS& badData) noexcept {
+	if (badData.flt == form.vertexIndex) {
+		badData.flt += form.vertexCount;
+	}
+	else {
+		badData.attribute |= BADFLT;
+	}
+}
+
+void repair::internal::chkSat(const FRMHED& form, BADCNTS& badData) noexcept {
+	if (badData.guideCount == form.satinOrAngle.guide) {
+		badData.guideCount += form.satinGuideCount;
+	}
+	else {
+		badData.attribute |= BADSAT;
+	}
+}
+
+void repair::internal::chkTxt(const FRMHED& form, BADCNTS& badData) noexcept {
+	if (badData.tx == form.fillInfo.texture.index) {
+		badData.tx += form.fillInfo.texture.count;
+	}
+	else {
+		badData.attribute |= BADTX;
+	}
+}
+
 uint32_t repair::internal::frmchkfn() {
 	auto badData = BADCNTS {};
 
@@ -137,12 +163,7 @@ uint32_t repair::internal::frmchkfn() {
 				if (form.vertexCount == 0u) {
 					badData.attribute |= BADFLT;
 				}
-				if (badData.flt == form.vertexIndex) {
-					badData.flt += form.vertexCount;
-				}
-				else {
-					badData.attribute |= BADFLT;
-				}
+				ri::chkVrtx(form, badData);
 			}
 			if ((badData.attribute & BADCLP) == 0u) {
 				if (clip::isclp(iForm)) {
@@ -152,24 +173,14 @@ uint32_t repair::internal::frmchkfn() {
 					ri::chkeclp(form, badData);
 				}
 			}
-			if (form.type == SAT && (form.satinGuideCount != 0u)) {
-				if ((badData.attribute & BADSAT) == 0u) {
-					if (badData.guideCount == form.satinOrAngle.guide) {
-						badData.guideCount += form.satinGuideCount;
-					}
-					else {
-						badData.attribute |= BADSAT;
-					}
+			if ((badData.attribute & BADSAT) == 0u) {
+				if (form.type == SAT && (form.satinGuideCount != 0u)) {
+					ri::chkSat(form, badData);
 				}
 			}
-			if (texture::istx(iForm)) {
-				if ((badData.attribute & BADTX) == 0u) {
-					if (badData.tx == form.fillInfo.texture.index) {
-						badData.tx += form.fillInfo.texture.count;
-					}
-					else {
-						badData.attribute |= BADTX;
-					}
+			if ((badData.attribute & BADTX) == 0u) {
+				if (texture::istx(iForm)) {
+					ri::chkTxt(form, badData);
 				}
 			}
 			if (badData.attribute == (BADFLT | BADCLP | BADSAT | BADTX)) {
@@ -224,24 +235,23 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	auto  badData      = BADCNTS {};
 	auto& formList     = *FormList;
 
-	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
-		if (formList[iForm].vertexCount != 0u) {
-			formList[iDestination++] = formList[iForm];
-			vertexCount += formList[iForm].vertexCount;
+	for (auto form : *FormList) {
+		if (form.vertexCount != 0u) {
+			formList[iDestination++] = form;
+			vertexCount += form.vertexCount;
 		}
 	}
+	formList.resize(iDestination);
 	auto vertexPoint = std::vector<fPOINT> {};
 	auto iVertex     = 0u;
 	auto flag        = true;
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		auto& form = formList[iForm];
 		if (FormVertices->size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
-			vertexPoint.resize(vertexPoint.size() + form.vertexCount);
-			auto       sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
-			auto       sourceEnd   = std::next(sourceStart, form.vertexCount);
-			auto       destination = std::next(vertexPoint.begin(), iVertex);
-			const auto _           = std::copy(sourceStart, sourceEnd, destination);
-			form.vertexIndex       = iVertex;
+			auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
+			auto sourceEnd   = std::next(sourceStart, form.vertexCount);
+			vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
+			form.vertexIndex = iVertex;
 			iVertex += form.vertexCount;
 			ri::bcup(iForm, badData);
 		}
@@ -249,8 +259,6 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			if (form.vertexIndex < FormVertices->size()) {
 				form.vertexCount = gsl::narrow<uint16_t>(FormVertices->size() - form.vertexIndex);
 				satin::delsac(iForm);
-				// ToDo - do we need to increase the size of vertexPoint?
-				// vertexPoint.resize(vertexPoint.size + form.vertexCount);
 				auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
 				auto sourceEnd   = std::next(sourceStart, form.vertexCount);
 				vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
@@ -268,11 +276,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			}
 		}
 	}
-	// ToDo - is this needed?
-	if (flag) {
-		FormVertices->resize(iVertex);
-	}
-	std::copy(vertexPoint.cbegin(), vertexPoint.cend(), FormVertices->begin());
+	*FormVertices = std::move(vertexPoint);
 }
 
 void repair::internal::repclp(std::wstring& repairMessage) {

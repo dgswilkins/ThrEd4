@@ -19,6 +19,9 @@ namespace internal {
 	void     chkclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexcept;
 	void     chkfstch() noexcept;
+	void     chkSat(const FRMHED& form, BADCNTS& badData) noexcept;
+	void     chkTxt(const FRMHED& form, BADCNTS& badData) noexcept;
+	void     chkVrtx(const FRMHED& form, BADCNTS& badData) noexcept;
 	uint32_t frmchkfn();
 	void     repclp(std::wstring& repairMessage);
 	void     repflt(std::wstring& repairMessage);
