@@ -4128,7 +4128,6 @@ void form::internal::durgn(const std::vector<FSEQ>&      sequencePath,
 	    = (gsl::narrow_cast<double>(groupEnd) - groupStart) * (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart);
 	auto seqn = sequenceEnd;
 	if (length != 0.0) {
-		// ToDo - Is this the best fix for this issue?
 		if (nextGroup == 0 || nextGroup < groupStart) {
 			nextGroup = groupStart;
 		}
@@ -7538,7 +7537,7 @@ void form::internal::frmpnts(uint32_t type) {
 			}
 		}
 		if (!bFlag) {
-			GroupStitchIndex = StitchBuffer->size() - 1u;
+			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1u);
 		}
 	}
 	else {
