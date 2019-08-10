@@ -3054,7 +3054,7 @@ void form::internal::clpcon(const std::vector<RNGCNT>& textureSegments, std::vec
 		clipWidth = CLPMINAUT;
 	}
 	if (StateMap.test(StateFlag::TXFIL)) {
-		if ((TextureIndex != 0u)
+		if ((!TexturePointsBuffer->empty())
 		    && SelectedForm->fillInfo.texture.index + SelectedForm->fillInfo.texture.count
 		           <= gsl::narrow<uint16_t>(TextureIndex)) {
 			clipWidth = SelectedForm->fillSpacing;

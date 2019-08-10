@@ -1413,7 +1413,7 @@ void thred::internal::dudat() {
 	                  + sizeof(decltype(FormVertices->back())) * FormVertices->size()
 	                  + sizeof(decltype(ClipPoints->back())) * ClipPoints->size()
 	                  + sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor)
-	                  + sizeof(decltype(TexturePointsBuffer->back())) * TextureIndex;
+	                  + sizeof(decltype(TexturePointsBuffer->back())) * TexturePointsBuffer->size();
 	undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size);
 	auto backupData                  = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
 	if (backupData != nullptr) {
@@ -1455,7 +1455,7 @@ void thred::internal::dudat() {
 			std::copy(&UserColor[0], &UserColor[sizeColors], dest.begin());
 		}
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
-		backupData->texturePointCount = TextureIndex;
+		backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 		if (!TexturePointsBuffer->empty()) {
 			const auto dest = gsl::span<TXPNT>(backupData->texturePoints, backupData->texturePointCount);
 			std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), dest.begin());
@@ -3815,7 +3815,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	const auto thredDataSize
 	    = FormList->size() * sizeof(decltype(FormList->back())) + vertexCount * sizeof(decltype(FormVertices->back()))
 	      + guideCount * sizeof(decltype(SatinGuides->back())) + clipDataCount * sizeof(decltype(ClipPoints->back()))
-	      + TextureIndex * sizeof(decltype(TexturePointsBuffer->back()));
+	      + TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()));
 	buffer.reserve(vtxLen + thredDataSize);
 	// ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
 	if (vtxLen > USHRT_MAX) {
@@ -3828,7 +3828,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	ExtendedHeader.auxFormat         = IniFile.auxFileType;
 	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
 	ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
-	ExtendedHeader.texturePointCount = gsl::narrow<uint32_t>(TextureIndex);
+	ExtendedHeader.texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 	durit(buffer, &ExtendedHeader, sizeof(ExtendedHeader));
 	durit(buffer, StitchBuffer->data(), wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back()))));
 	if (PCSBMPFileName[0] == 0) {
@@ -3897,7 +3897,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 		if (!TexturePointsBuffer->empty()) {
 			durit(buffer,
 			      TexturePointsBuffer->data(),
-			      gsl::narrow<uint32_t>(TextureIndex * sizeof(decltype(TexturePointsBuffer->back()))));
+			      gsl::narrow<uint32_t>(TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()))));
 		}
 	}
 }
@@ -5664,6 +5664,7 @@ void thred::internal::nuFil() {
 			StateMap.reset(StateFlag::BAKING);
 			StateMap.reset(StateFlag::REDUSHO);
 			TextureIndex = 0;
+			TexturePointsBuffer->clear();
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
 			deldu();
 			DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
@@ -17907,6 +17908,7 @@ void thred::internal::init() {
 
 	ReleaseDC(nullptr, deviceContext);
 	TextureIndex = 0;
+	TexturePointsBuffer->clear();
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT
 	MainMenu   = GetMenu(ThrEdWindow);
 	auto wRect = RECT { 0l, 0l, 0l, 0l };

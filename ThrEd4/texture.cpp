@@ -1015,7 +1015,7 @@ void texture::deltx(uint32_t formIndex) {
 
 	const auto currentIndex = (*FormList)[formIndex].fillInfo.texture.index;
 
-	if ((TextureIndex != 0u) && texture::istx(formIndex) && (SelectedForm->fillInfo.texture.count != 0u)) {
+	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (SelectedForm->fillInfo.texture.count != 0u)) {
 		// First check to see if the texture is shared between forms
 		for (auto iForm = 0u; iForm < formIndex; iForm++) {
 			if (texture::istx(iForm)) {
@@ -1036,16 +1036,14 @@ void texture::deltx(uint32_t formIndex) {
 		// Only if it is not shared, should the texture be deleted
 		if (!flag) {
 			auto textureBuffer = std::vector<TXPNT> {};
-			textureBuffer.reserve(TextureIndex);
+			textureBuffer.reserve(TexturePointsBuffer->size());
 			auto iBuffer = 0u;
 			for (auto iForm = 0u; iForm < formIndex; iForm++) {
 				if (texture::istx(iForm)) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
-					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-					auto destination       = std::next(textureBuffer.begin(), iBuffer);
-					auto _                 = std::copy(startSource, endSource, destination);
+					textureBuffer.insert(textureBuffer.end(), startSource, endSource);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
@@ -1055,15 +1053,13 @@ void texture::deltx(uint32_t formIndex) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
-					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-					auto destination       = std::next(textureBuffer.begin(), iBuffer);
-					auto _                 = std::copy(startSource, endSource, destination);
+					textureBuffer.insert(textureBuffer.end(), startSource, endSource);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
 			}
 			TextureIndex         = iBuffer;
-			*TexturePointsBuffer = textureBuffer;
+			*TexturePointsBuffer = std::move(textureBuffer);
 		}
 		(*FormList)[formIndex].fillType = 0;
 	}
@@ -1091,22 +1087,15 @@ void texture::internal::nutx() {
 	}
 	if (!TempTexturePoints->empty()) {
 		const auto tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-		const auto pointCount     = TextureIndex - index;
-		TexturePointsBuffer->resize(TexturePointsBuffer->size() + tempPointCount);
-		TextureIndex += tempPointCount;
-		auto startSource = std::next(TexturePointsBuffer->begin(), index);
-		if (pointCount != 0u) {
-			auto endSource   = std::next(startSource, pointCount);
-			auto destination = std::next(startSource, tempPointCount);
-			auto _           = std::copy(startSource, endSource, destination);
-		}
+		auto insertIt = std::next(TexturePointsBuffer->begin(), index);
+		TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 		for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {
 				(*FormList)[iForm].fillInfo.texture.index += gsl::narrow<uint16_t>(tempPointCount);
 			}
 		}
-		auto _ = std::copy(TempTexturePoints->cbegin(), TempTexturePoints->cend(), startSource);
 
+		TextureIndex = TexturePointsBuffer->size();
 		SelectedForm->fillInfo.texture.index = gsl::narrow<uint16_t>(index);
 		SelectedForm->fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
 	}
