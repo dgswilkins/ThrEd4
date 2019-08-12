@@ -288,7 +288,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		auto& form           = (*FormList)[iForm];
 		auto  clipDifference = 0u;
 		if (clip::isclp(iForm)) {
-			// ToDo - pointer arithmetic to be fixed
 			clipDifference = form.angleOrClipData.clip;
 			if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);

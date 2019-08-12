@@ -470,21 +470,20 @@ void satin::satadj() {
 
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount = (iGuide);
 		satinMap.reset();
-		// Todo - are iForward and iReverse appropriate variable names below?
 		for (iGuide = 0u; iGuide < CurrentFormGuidesCount; iGuide++) {
 			auto iForward = guideIt[iGuide].finish;
 			auto iReverse = iForward;
-			if (iForward > VertexCount - 1) {
+			if (iForward > VertexCount - 1u) {
 				iForward = VertexCount - 1u;
 			}
 			if (satinMap.test_set(iForward)) {
-				if (iForward < VertexCount - 1) {
+				if (iForward < VertexCount - 1u) {
 					iForward++;
 				}
 				if (iReverse > (SatinEndGuide) + 1u) {
 					iReverse--;
 				}
-				while (satinMap.test(iForward) && iForward < VertexCount - 1) {
+				while (satinMap.test(iForward) && iForward < VertexCount - 1u) {
 					iForward++;
 				}
 				while (iReverse > (SatinEndGuide)-1 && (satinMap.test(iReverse))) {
@@ -524,8 +523,8 @@ void satin::satadj() {
 		}
 		CurrentFormGuidesCount = SelectedForm->satinGuideCount = iGuide;
 		if (SatinEndGuide != 0u) {
-			const auto end0 = (VertexCount - SatinEndGuide - 2);
-			const auto end1 = (SatinEndGuide - 2);
+			const auto end0 = (VertexCount - SatinEndGuide - 2u);
+			const auto end1 = (SatinEndGuide - 2u);
 			if (CurrentFormGuidesCount > end0) {
 				CurrentFormGuidesCount = end0;
 			}
