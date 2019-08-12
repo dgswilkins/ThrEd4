@@ -1043,7 +1043,9 @@ void texture::deltx(uint32_t formIndex) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
-					textureBuffer.insert(textureBuffer.end(), startSource, endSource);
+					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+					auto destination       = std::next(textureBuffer.begin(), iBuffer);
+					auto _                 = std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
@@ -1053,7 +1055,9 @@ void texture::deltx(uint32_t formIndex) {
 					auto& fillInfo    = (*FormList)[iForm].fillInfo;
 					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
-					textureBuffer.insert(textureBuffer.end(), startSource, endSource);
+					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+					auto destination       = std::next(textureBuffer.begin(), iBuffer);
+					auto _                 = std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
