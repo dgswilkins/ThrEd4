@@ -5123,7 +5123,6 @@ void thred::internal::redbak() {
 			const auto _ = std::copy(
 			    undoData->texturePoints, undoData->texturePoints + undoData->texturePointCount, TexturePointsBuffer->begin());
 		}
-		TextureIndex = undoData->texturePointCount;
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -5663,7 +5662,6 @@ void thred::internal::nuFil() {
 			StateMap.reset(StateFlag::SAVACT);
 			StateMap.reset(StateFlag::BAKING);
 			StateMap.reset(StateFlag::REDUSHO);
-			TextureIndex = 0;
 			TexturePointsBuffer->clear();
 			EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
 			deldu();
@@ -5889,10 +5887,8 @@ void thred::internal::nuFil() {
 								TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							TextureIndex = wrap::toUnsigned(TexturePointsBuffer->size());
 						}
 						else {
-							TextureIndex = 0;
 							TexturePointsBuffer->clear();
 						}
 						TexturePointsBuffer->shrink_to_fit();
@@ -7001,7 +6997,6 @@ void thred::internal::newFil() {
 	FormVertices->shrink_to_fit();
 	TexturePointsBuffer->clear();
 	TexturePointsBuffer->shrink_to_fit();
-	TextureIndex = 0;
 	ClipPoints->clear();
 	ClipPoints->shrink_to_fit();
 	SatinGuides->clear();
@@ -8323,7 +8318,6 @@ void thred::internal::setsped() {
 
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
-	TextureIndex = 0;
 	TexturePointsBuffer->clear();
 	FormList->clear();
 	StitchBuffer->clear();
@@ -8983,7 +8977,6 @@ void thred::internal::insfil() {
 							StateMap.set(StateFlag::BADFIL);
 						}
 
-						TextureIndex = textureOffset;
 						if (fileHeader.formCount != 0u) {
 							insertedRectangle.left   = (*FormVertices)[InsertedVertexIndex].x;
 							insertedRectangle.right  = (*FormVertices)[InsertedVertexIndex].x;
@@ -11353,7 +11346,6 @@ void thred::internal::delstch() {
 	thred::savdo();
 	StitchBuffer->clear();
 	StitchBuffer->shrink_to_fit();
-	TextureIndex = 0;
 	TexturePointsBuffer->clear();
 	TexturePointsBuffer->shrink_to_fit();
 	rstAll();
@@ -14749,7 +14741,6 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				TexturePointsBuffer->resize(TexturePointsBuffer->size() + textureCount);
 				auto textureDestination = std::next(TexturePointsBuffer->begin(), oldEnd);
 				auto _                  = std::copy(textureSource, textureSource + textureCount, textureDestination);
-				TextureIndex += textureCount;
 				GlobalUnlock(ClipMemory);
 				SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 				SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
@@ -14821,7 +14812,6 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 						auto currentCount = formIter.fillInfo.texture.count;
 						TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
 						auto iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
-						TextureIndex += currentCount;
 						const auto _ = std::copy(textureSource, textureSource + currentCount, iter);
 					}
 				}
@@ -17911,7 +17901,6 @@ void thred::internal::init() {
 	auto       blank           = std::wstring {};
 
 	ReleaseDC(nullptr, deviceContext);
-	TextureIndex = 0;
 	TexturePointsBuffer->clear();
 	LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT
 	MainMenu   = GetMenu(ThrEdWindow);

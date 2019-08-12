@@ -225,7 +225,6 @@ POINT      StitchWindowSize;        // size of the stitch window in pixels
 std::vector<std::wstring>* StringTable; //
 std::vector<fPOINT>*       TempPolygon; // temporary storage when user is entering a polygon;
 
-uint32_t            TextureIndex;                   // next textured fill point index
 std::wstring*       TextureInputBuffer;             // texture fill number buffer
 std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
 HWND                ThreadSizeWin[16];              // thread size windows

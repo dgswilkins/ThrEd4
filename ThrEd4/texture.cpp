@@ -1062,7 +1062,6 @@ void texture::deltx(uint32_t formIndex) {
 					iBuffer += fillInfo.texture.count;
 				}
 			}
-			TextureIndex         = iBuffer;
 			*TexturePointsBuffer = std::move(textureBuffer);
 		}
 		(*FormList)[formIndex].fillType = 0;
@@ -1099,7 +1098,6 @@ void texture::internal::nutx() {
 			}
 		}
 
-		TextureIndex = TexturePointsBuffer->size();
 		SelectedForm->fillInfo.texture.index = gsl::narrow<uint16_t>(index);
 		SelectedForm->fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
 	}

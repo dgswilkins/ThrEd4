@@ -398,22 +398,21 @@ void repair::internal::reptx() {
 	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
-			// ToDo - this code is broken. Why are satinguides referred to when repairing textures?
-			if (gsl::narrow<uint16_t>(TextureIndex) > form.fillInfo.texture.index + form.fillInfo.texture.count) {
-				auto sourceStart = std::next(SatinGuides->cbegin(), form.fillInfo.texture.index);
+			if (wrap::toUnsigned(TexturePointsBuffer->size()) > wrap::toUnsigned(form.fillInfo.texture.index) + form.fillInfo.texture.count) {
+				auto sourceStart = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 				auto sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
-				auto destination = std::next(SatinGuides->begin(), textureCount);
+				auto destination = std::next(TexturePointsBuffer->begin(), textureCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 				textureCount += form.fillInfo.texture.count;
 				ri::bcup(iForm, badData);
 			}
 			else {
-				if (TextureIndex > form.fillInfo.texture.index) {
-					form.fillInfo.texture.count = gsl::narrow<uint16_t>(TextureIndex) - form.fillInfo.texture.index;
-					auto       sourceStart      = std::next(SatinGuides->cbegin(), form.fillInfo.texture.index);
+				if (TexturePointsBuffer->size() > form.fillInfo.texture.index) {
+					form.fillInfo.texture.count = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - form.fillInfo.texture.index;
+					auto       sourceStart      = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 					auto       sourceEnd        = std::next(sourceStart, form.fillInfo.texture.count);
-					const auto destination      = std::next(SatinGuides->begin(), textureCount);
+					const auto destination      = std::next(TexturePointsBuffer->begin(), textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 					ri::bcup(iForm, badData);
@@ -425,7 +424,7 @@ void repair::internal::reptx() {
 			}
 		}
 	}
-	TextureIndex = textureCount;
+	TexturePointsBuffer->resize(textureCount);
 }
 
 void repair::repar() {
