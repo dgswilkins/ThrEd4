@@ -7542,7 +7542,7 @@ void form::internal::frmpnts(uint32_t type) {
 	}
 	else {
 		ClosestPointIndex = 0;
-		GroupStitchIndex = 0;
+		GroupStitchIndex  = 0;
 	}
 }
 

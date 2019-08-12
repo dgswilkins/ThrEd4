@@ -801,10 +801,9 @@ void satin::ribon() {
 					form.fillInfo.feather.downCount     = IniFile.featherDownCount;
 					form.fillInfo.feather.fillType      = IniFile.featherFillType;
 					form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-					// ToDo - should this be ORed in to keep other attributes?
-					form.extendedAttribute      = IniFile.featherType;
-					form.fillInfo.feather.count = IniFile.featherCount;
-					form.fillInfo.feather.color = (ActiveColor + 1u) & COLMSK;
+					form.extendedAttribute              = IniFile.featherType;
+					form.fillInfo.feather.count         = IniFile.featherCount;
+					form.fillInfo.feather.color         = (ActiveColor + 1u) & COLMSK;
 				}
 				else {
 					form.fillType = SATF;

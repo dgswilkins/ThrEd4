@@ -1090,7 +1090,7 @@ void texture::internal::nutx() {
 	}
 	if (!TempTexturePoints->empty()) {
 		const auto tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-		auto insertIt = std::next(TexturePointsBuffer->begin(), index);
+		auto       insertIt       = std::next(TexturePointsBuffer->begin(), index);
 		TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 		for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
 			if (texture::istx(iForm)) {

@@ -8938,7 +8938,7 @@ void thred::internal::insfil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							TexturePointsBuffer->insert(
-								TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
+							    TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
@@ -14811,8 +14811,8 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 
 						auto currentCount = formIter.fillInfo.texture.count;
 						TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
-						auto iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
-						const auto _ = std::copy(textureSource, textureSource + currentCount, iter);
+						auto       iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
+						const auto _    = std::copy(textureSource, textureSource + currentCount, iter);
 					}
 				}
 				GlobalUnlock(ClipMemory);
