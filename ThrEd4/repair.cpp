@@ -196,7 +196,7 @@ uint32_t repair::internal::frmchkfn() {
 		if (badData.guideCount != SatinGuides->size()) {
 			badData.attribute |= BADSAT;
 		}
-		if (badData.tx != TextureIndex) {
+		if (badData.tx != TexturePointsBuffer->size()) {
 			badData.attribute |= BADTX;
 		}
 	}
@@ -268,7 +268,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				FormList->resize(iForm);
 				ClipPoints->resize(badData.clip);
 				SatinGuides->resize(badData.guideCount);
-				TextureIndex = badData.tx;
+				TexturePointsBuffer->resize(badData.tx);
 				ri::chkfstch();
 				ri::adbad(repairMessage, IDS_FRMDAT, wrap::toUnsigned(FormList->size()));
 				flag = false;
