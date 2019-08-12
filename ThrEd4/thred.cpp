@@ -8324,6 +8324,7 @@ void thred::internal::setsped() {
 void thred::internal::deltot() {
 	DesignerName->assign(utf::Utf8ToUtf16(std::string(&IniFile.designerName[0])));
 	TextureIndex = 0;
+	TexturePointsBuffer->clear();
 	FormList->clear();
 	StitchBuffer->clear();
 	FormVertices->clear();
@@ -8943,7 +8944,7 @@ void thred::internal::insfil() {
 								StateMap.set(StateFlag::BADFIL);
 							}
 							TexturePointsBuffer->insert(
-							    TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
+								TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
@@ -11353,6 +11354,8 @@ void thred::internal::delstch() {
 	StitchBuffer->clear();
 	StitchBuffer->shrink_to_fit();
 	TextureIndex = 0;
+	TexturePointsBuffer->clear();
+	TexturePointsBuffer->shrink_to_fit();
 	rstAll();
 	form::clrfills();
 	ColorChanges     = 0;
@@ -14739,11 +14742,12 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					if (texture::istx(formOffset + iForm)) {
 						SelectedForm = &((*FormList)[wrap::toSize(formOffset) + iForm]);
 						textureCount += SelectedForm->fillInfo.texture.count;
-						SelectedForm->fillInfo.texture.index += gsl::narrow<uint16_t>(TextureIndex);
+						SelectedForm->fillInfo.texture.index += gsl::narrow<uint16_t>(TexturePointsBuffer->size());
 					}
 				}
+				const auto oldEnd = TexturePointsBuffer->size();
 				TexturePointsBuffer->resize(TexturePointsBuffer->size() + textureCount);
-				auto textureDestination = std::next(TexturePointsBuffer->begin(), TextureIndex);
+				auto textureDestination = std::next(TexturePointsBuffer->begin(), oldEnd);
 				auto _                  = std::copy(textureSource, textureSource + textureCount, textureDestination);
 				TextureIndex += textureCount;
 				GlobalUnlock(ClipMemory);
@@ -14812,11 +14816,11 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					}
 					auto textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
 					if (texture::istx(lastFormIndex)) {
-						formIter.fillInfo.texture.index = gsl::narrow<uint16_t>(TextureIndex);
+						formIter.fillInfo.texture.index = gsl::narrow<uint16_t>(TexturePointsBuffer->size());
 
 						auto currentCount = formIter.fillInfo.texture.count;
 						TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
-						auto iter = std::next(TexturePointsBuffer->begin(), TextureIndex);
+						auto iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
 						TextureIndex += currentCount;
 						const auto _ = std::copy(textureSource, textureSource + currentCount, iter);
 					}
