@@ -629,7 +629,6 @@ bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDir
 void trace::internal::dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept {
 	if (point != nullptr) {
 		traceDiff.x = point[1].x - point[0].x;
-		// ToDo - this is likely incorrect
 		traceDiff.y = point[1].y - point[0].y;
 	}
 }
@@ -842,15 +841,14 @@ void trace::trinit() {
 			StateMap.set(StateFlag::TRCRED);
 			StateMap.set(StateFlag::TRCGRN);
 			StateMap.set(StateFlag::TRCBLU);
-			uint32_t componentPeak[3] = { 0 };
+			uint32_t componentPeak[3] = { 0u };
 			if (!StateMap.test(StateFlag::WASTRAC)) {
 				ti::getrmap();
 			}
 			if (StateMap.test(StateFlag::MONOMAP)) {
-				// ToDo - Is this intializing correctly?
 				auto color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 				auto iPixel = 0u;
-				for (iPixel = 0; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
+				for (; iPixel < BitmapWidth * BitmapHeight; iPixel++) {
 					if (TraceBitmapData[iPixel] != color) {
 						break;
 					}
@@ -878,9 +876,9 @@ void trace::trinit() {
 						histogramData[iRGB][PixelColors[iRGB]]++;
 					}
 				}
-				uint32_t componentPeakCount[3] = { 0 };
-				for (auto iLevel = 0u; iLevel < 256; iLevel++) {
-					for (auto iRGB = 0u; iRGB < 3; iRGB++) {
+				uint32_t componentPeakCount[3] = { 0u };
+				for (auto iLevel = 0u; iLevel < 256u; iLevel++) {
+					for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
 						if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
 							componentPeakCount[iRGB] = histogramData[iRGB][iLevel];
 							componentPeak[iRGB]      = iLevel;
@@ -888,16 +886,16 @@ void trace::trinit() {
 					}
 				}
 			}
-			InvertDownColor = 0;
-			for (auto iRGB = 0u; iRGB < 3; iRGB++) {
+			InvertDownColor = 0u;
+			for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
 				if (componentPeak[iRGB] != 0u) {
 					componentPeak[iRGB]--;
 				}
 				InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
 			}
 			DownPixelColor = InvertDownColor ^ 0xffffffu;
-			InvertUpColor  = 0xffffff;
-			UpPixelColor   = 0;
+			InvertUpColor  = 0xffffffu;
+			UpPixelColor   = 0u;
 		}
 		StateMap.set(StateFlag::WASTRCOL);
 		trace::trace();
