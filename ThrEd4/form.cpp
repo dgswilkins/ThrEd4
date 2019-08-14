@@ -7523,9 +7523,7 @@ void form::internal::frmpnts(uint32_t type) {
 			if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
 				break;
 			}
-			else {
-				iStitch++;
-			}
+			iStitch++;
 		}
 		ClosestPointIndex = iStitch;
 		auto bFlag        = false;
