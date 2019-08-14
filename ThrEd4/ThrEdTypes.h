@@ -1669,16 +1669,16 @@ EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 */
 
 constexpr auto BELEN    = 1u;
-constexpr auto BESPAC   = 1u << 1;
-constexpr auto BESIZ    = 1u << 2;
-constexpr auto BNCLP    = 1u << 3;
-constexpr auto BPICSPAC = 1u << 4;
-constexpr auto BCNRSIZ  = 1u << 5;
-constexpr auto BRDEND   = 1u << 6;
-constexpr auto BRDPOS   = 1u << 7;
-constexpr auto BEMAX    = 1u << 8;
-constexpr auto BEMIN    = 1u << 9;
-constexpr auto CHNPOS   = 1u << 10;
+constexpr auto BESPAC   = 1u << 1u;
+constexpr auto BESIZ    = 1u << 2u;
+constexpr auto BNCLP    = 1u << 3u;
+constexpr auto BPICSPAC = 1u << 4u;
+constexpr auto BCNRSIZ  = 1u << 5u;
+constexpr auto BRDEND   = 1u << 6u;
+constexpr auto BRDPOS   = 1u << 7u;
+constexpr auto BEMAX    = 1u << 8u;
+constexpr auto BEMIN    = 1u << 9u;
+constexpr auto CHNPOS   = 1u << 10u;
 
 constexpr auto MEGLIN  = (BELEN | BEMAX | BEMIN);
 constexpr auto MEGBLD  = (BELEN | BEMAX | BEMIN);
@@ -2344,14 +2344,14 @@ constexpr uint8_t NOBLNT = 0x9fu; // 1001 1111
 // frmhed extended attribute bits
 
 constexpr auto AT_SQR     = 1u;      // square ends
-constexpr auto AT_FTHUP   = 1u << 1; // feather up or down flag
-constexpr auto AT_FTHBTH  = 1u << 2; // feather both up and down flag
-constexpr auto AT_FTHBLND = 1u << 3; // feather blend flag
-constexpr auto AT_STRT    = 1u << 4; // user set start flag
-constexpr auto AT_END     = 1u << 5; // user set end flag
-constexpr auto AT_UND     = 1u << 6; // underlay flag
-constexpr auto AT_WALK    = 1u << 7; // edge walk
-constexpr auto AT_CWLK    = 1u << 8; // center walk
+constexpr auto AT_FTHUP   = 1u << 1u; // feather up or down flag
+constexpr auto AT_FTHBTH  = 1u << 2u; // feather both up and down flag
+constexpr auto AT_FTHBLND = 1u << 3u; // feather blend flag
+constexpr auto AT_STRT    = 1u << 4u; // user set start flag
+constexpr auto AT_END     = 1u << 5u; // user set end flag
+constexpr auto AT_UND     = 1u << 6u; // underlay flag
+constexpr auto AT_WALK    = 1u << 7u; // edge walk
+constexpr auto AT_CWLK    = 1u << 8u; // center walk
 
 // contour refil
 constexpr auto FRECONT  = 0x80u; // 1000 0000
@@ -3100,17 +3100,17 @@ inline FILLSTARTS::FILLSTARTS() noexcept
     : fillNamed() {
 }
 
-constexpr auto M_AP     = 1u << 1;
-constexpr auto M_CWLK   = 1u << 2;
-constexpr auto M_WALK   = 1u << 3;
-constexpr auto M_UND    = 1u << 4;
-constexpr auto M_FIL    = 1u << 5;
-constexpr auto M_FTH    = 1u << 6;
-constexpr auto M_BRD    = 1u << 7;
-constexpr auto M_APCOL  = 1u << 8;
-constexpr auto M_FCOL   = 1u << 9;
-constexpr auto M_FTHCOL = 1u << 10;
-constexpr auto M_ECOL   = 1u << 11;
+constexpr auto M_AP     = 1u << 1u;
+constexpr auto M_CWLK   = 1u << 2u;
+constexpr auto M_WALK   = 1u << 3u;
+constexpr auto M_UND    = 1u << 4u;
+constexpr auto M_FIL    = 1u << 5u;
+constexpr auto M_FTH    = 1u << 6u;
+constexpr auto M_BRD    = 1u << 7u;
+constexpr auto M_APCOL  = 1u << 8u;
+constexpr auto M_FCOL   = 1u << 9u;
+constexpr auto M_FTHCOL = 1u << 10u;
+constexpr auto M_ECOL   = 1u << 11u;
 
 class INSREC
 {
@@ -3238,9 +3238,9 @@ public:
 };
 
 constexpr auto BADFLT = 1u;
-constexpr auto BADCLP = 1u << 1;
-constexpr auto BADSAT = 1u << 2;
-constexpr auto BADTX  = 1u << 3;
+constexpr auto BADCLP = 1u << 1u;
+constexpr auto BADSAT = 1u << 2u;
+constexpr auto BADTX  = 1u << 3u;
 
 class BADCNTS
 {
