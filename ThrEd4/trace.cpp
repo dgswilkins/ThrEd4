@@ -368,6 +368,28 @@ void trace::trdif() {
 	}
 }
 
+#if TRCMTH == 0
+unsigned trace::internal::colsum(COLORREF col) {
+	ti::trcols(col);
+	auto colorSum = 0u;
+	for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
+		if (StateMap.test(TraceRGBFlag[iRGB]))
+			colorSum += PixelColors[iRGB];
+	}
+	return colorSum;
+}
+
+unsigned trace::internal::icolsum(COLORREF col) {
+	ti::trcols(col);
+	auto colorSum = 0u;
+	for (auto iRGB = 0u; iRGB < 3u; iRGB++) {
+		if (StateMap.test(TraceRGBFlag[iRGB]))
+			colorSum += 255 - PixelColors[iRGB];
+	}
+	return colorSum;
+}
+#endif
+
 void trace::trace() {
 	if (PCSBMPFileName[0] != 0) {
 		trace::untrace();
@@ -409,17 +431,15 @@ void trace::trace() {
 		}
 
 #if TRCMTH == 0
-		// ToDo - Fix TracedMap and setrac references
-
-		auto usum = ti::icolsum(UpPixelColor);
-		auto dsum = ti::icolsum(DownPixelColor);
-		if (TracedMap == nullptr) {
-			TracedMap = new uint32_t[TraceDataSize]();
+		auto upBrightness = ti::icolsum(UpPixelColor);
+		auto downBrightness = ti::icolsum(DownPixelColor);
+		if (TracedMap->empty()) {
+			TracedMap->resize(TraceDataSize, false);
 		}
 		for (auto index = 0u; index < BitmapWidth * BitmapHeight; index++) {
-			auto psum = colsum(TraceBitmapData[index]);
-			if (usum > psum && dsum < psum)
-				setrac(index);
+			auto pointBrightness = ti::colsum(TraceBitmapData[index]);
+			if (upBrightness > pointBrightness && downBrightness < pointBrightness)
+				TracedMap->set(index);
 			else
 				TraceBitmapData[index] = 0;
 		}

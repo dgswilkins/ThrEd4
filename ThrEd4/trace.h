@@ -38,7 +38,8 @@ namespace internal {
 
 	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
-	void     dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
+	void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
+
 	uint32_t ducolm();
 
 	void durct(uint32_t shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
@@ -48,7 +49,6 @@ namespace internal {
 	void dwnum(uint32_t iRGB);
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
-
 	void pxlin(uint32_t start, uint32_t finish);
 	void ritrcol(COLORREF* color, uint32_t number) noexcept;
 	void shownd(HWND hwnd) noexcept;
@@ -67,5 +67,10 @@ namespace internal {
 	uint32_t trsum() noexcept;
 
 	void upnum(uint32_t iRGB);
+
+#if TRCMTH == 0
+	uint32_t colsum(COLORREF col);
+	uint32_t icolsum(COLORREF col);
+#endif
 } // namespace internal
 } // namespace trace
