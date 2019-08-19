@@ -18848,9 +18848,6 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 			}
 			if (stitchHeader.formCount != 0u) {
 				do {
-					// Todo - find a better value than MAXFRMLINS
-					auto lines = std::vector<POINT> {};
-					lines.resize(MAXFRMLINS);
 					SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
 					auto formList = std::vector<FRMHED> {};
 					formList.resize(stitchHeader.formCount);
@@ -18884,6 +18881,14 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					if (BytesRead != bytesToRead) {
 						break;
 					}
+					auto lines = std::vector<POINT>{};
+					auto maxLines = 0u;
+					for (auto iForm = 0; iForm < stitchHeader.formCount; iForm++) {
+						if (formList[iForm].vertexCount > maxLines) {
+							maxLines = formList[iForm].vertexCount;
+						}
+					}
+					lines.resize(maxLines + 1u);
 					auto iVertex = 0u;
 					for (auto iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 						const auto iLine = iVertex;
