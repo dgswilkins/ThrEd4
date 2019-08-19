@@ -1872,7 +1872,6 @@ void xt::dufind(float indent) {
 void xt::internal::fangfn(uint32_t find, float angle) {
 	ClosestFormToCursor = find;
 	form::fvars(ClosestFormToCursor);
-	// ToDo - also do angle updates for texture filled forms
 	if (SelectedForm->type == FRMFPOLY && (SelectedForm->fillType != 0u)) {
 		switch (SelectedForm->fillType) {
 		case VRTF:
@@ -1889,6 +1888,13 @@ void xt::internal::fangfn(uint32_t find, float angle) {
 			SelectedForm->satinOrAngle.angle = angle;
 			break;
 		}
+		case TXVRTF:
+		case TXHORF:
+		case TXANGF: {
+			SelectedForm->fillType = TXANGF;
+			SelectedForm->angleOrClipData.angle = angle;
+			break;
+		}
 		}
 		form::refilfn();
 	}
@@ -1896,7 +1902,7 @@ void xt::internal::fangfn(uint32_t find, float angle) {
 
 void xt::dufxang(float angle) {
 	thred::savdo();
-	angle *= gsl::narrow_cast<float>(PI) / 180;
+	angle *= PI_F / 180.0f;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::fangfn(ClosestFormToCursor, angle);
 	}
