@@ -1760,7 +1760,7 @@ void xt::internal::uangfn(uint32_t find, float angle) {
 
 void xt::dufang(float angle) {
 	thred::savdo();
-	angle *= gsl::narrow_cast<float>(PI) / 180;
+	angle *= PI_F / 180.0f;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		xi::uangfn(ClosestFormToCursor, angle);
 	}
