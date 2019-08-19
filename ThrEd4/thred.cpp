@@ -15323,12 +15323,7 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 			form::crop();
 		}
 		else {
-			if (wrap::pressed(VK_CONTROL)) {
-				xt::pes2crd();
-			}
-			else {
-				form::insat();
-			}
+			form::insat();
 		}
 		break;
 	}
@@ -16738,11 +16733,6 @@ bool thred::internal::handleViewMenu(const WORD& wParameter) {
 bool thred::internal::handleFileMenu(const WORD& wParameter) {
 	auto flag = false;
 	switch (wParameter) {
-	case ID_PES2CRD: { // file / PES2Card
-		xt::pes2crd();
-		flag = true;
-		break;
-	}
 	case ID_CLOSE: { // file / Close
 		filclos();
 		flag = true;

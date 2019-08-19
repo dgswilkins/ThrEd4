@@ -610,7 +610,6 @@
 #define ID_FTHDEF                       40238
 #define ID_FETHR                        40239
 #define ID_2FTHR                        40240
-#define ID_PES2CRD                      40241
 #define ID_CLPSPAC                      40242
 #define ID_FILSTRT                      40243
 #define ID_FILEND                       40244

@@ -68,7 +68,6 @@ void notcwlk();
 void notund();
 void notwlk();
 void nudsiz();
-void pes2crd();
 void rtrclp();
 void selalfrm();
 void setbcol();
@@ -117,7 +116,6 @@ namespace internal {
 	void     bspacfn(uint32_t find, float length);
 	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
 	void     chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
-	bool     chkp2cnam(const wchar_t* fileName) noexcept;
 	bool     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
 	void     chkuseq();
 	void     delwlk(uint32_t code);
@@ -143,7 +141,6 @@ namespace internal {
 	void    fangfn(uint32_t find, float angle);
 	void    fcolfn(uint32_t find, uint32_t color);
 	void    fhifn(uint32_t find, float length);
-	int32_t fil2crd(const fs::path& fileName);
 	void    findfn(uint32_t find, float indent);
 	void    flenfn(uint32_t find, float length);
 	void    fmaxfn(uint32_t find, float length);

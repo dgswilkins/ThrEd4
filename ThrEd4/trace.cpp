@@ -1154,7 +1154,6 @@ void trace::tracpar() {
 			trace::trace();
 		}
 		else {
-			// ToDo - Does this line make sense?
 			const auto position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
 			if (position < 16) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
