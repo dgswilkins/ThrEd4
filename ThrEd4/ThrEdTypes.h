@@ -79,6 +79,7 @@ constexpr float    DEFANG     = 0.7853981f;        // default fill angle, 45 deg
 constexpr uint32_t MAXFRMLINS = 20000u;            // maximum lines in a form
 constexpr uint32_t MSGSIZ     = 8192u;             // size of the message buffer
 constexpr float    PI_F       = 3.1415927f;        // PI to single precision
+constexpr float    PI_F2      = PI_F * 2.0f;       //
 constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
 constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"

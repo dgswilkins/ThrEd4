@@ -845,11 +845,11 @@ void formForms::dasyfrm() {
 	if (maximumYsize > maximumXsize) {
 		maximumXsize = maximumYsize;
 	}
-	maximumXsize /= 6;
+	maximumXsize /= 6.0f;
 	auto       diameter     = IniFile.daisyDiameter;
 	auto       petalLength  = IniFile.daisyPetalLen;
 	auto       holeDiameter = IniFile.daisyHoleDiameter;
-	const auto ratio        = maximumXsize / (gsl::narrow_cast<double>(diameter) + petalLength);
+	const auto ratio        = maximumXsize / (diameter + petalLength);
 	diameter *= ratio;
 	petalLength *= ratio;
 	holeDiameter *= ratio;
@@ -857,9 +857,9 @@ void formForms::dasyfrm() {
 	auto iVertex       = 0u;
 	auto fref          = 0u;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
-		auto       angle            = PI2;
+		auto       angle            = PI_F2;
 		const auto holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
-		const auto holeSegmentAngle = PI2 / holeVertexCount;
+		const auto holeSegmentAngle = PI_F2 / holeVertexCount;
 		FormVertices->push_back(fPOINT { referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle) });
 		iVertex++;
 		for (auto iSegment = 0u; iSegment < holeVertexCount + 1u; iSegment++) {
@@ -877,19 +877,19 @@ void formForms::dasyfrm() {
 		petalPointCount  = (IniFile.daisyHeartCount + 1u) * 2u;
 		petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
 	}
-	const auto petalSegmentAngle = PI2 / petalVertexCount;
-	const auto deltaPetalAngle   = PI / IniFile.daisyPetalPoints;
+	const auto petalSegmentAngle = PI_F2 / petalVertexCount;
+	const auto deltaPetalAngle   = PI_F / IniFile.daisyPetalPoints;
 	if (UserFlagMap.test(UserFlag::DAZD)) {
 		SelectedForm->satinGuideCount    = IniFile.daisyPetalCount - 1u;
 		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1u;
 		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
 	const auto halfPetalPointCount = IniFile.daisyPetalPoints / 2;
-	auto       angle               = 0.0;
+	auto       angle               = 0.0f;
 	for (auto iMacroPetal = 0u; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
-		auto petalPointAngle         = 0.0;
+		auto petalPointAngle         = 0.0f;
 		PseudoRandomValue            = SEED;
-		auto distanceFromDaisyCenter = 0.0;
+		auto distanceFromDaisyCenter = 0.0f;
 		for (auto iPoint = 0u; iPoint < petalPointCount; iPoint++) {
 			switch (borderType) {
 			case DSIN: {
@@ -898,7 +898,7 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DRAMP: {
-				distanceFromDaisyCenter = diameter + (gsl::narrow_cast<double>(iPoint) / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter = diameter + (iPoint / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DSAW: {
@@ -910,12 +910,12 @@ void formForms::dasyfrm() {
 					sawPointCount = iPoint;
 				}
 				distanceFromDaisyCenter
-				    = diameter + (gsl::narrow_cast<double>(sawPointCount) / IniFile.daisyPetalPoints * petalLength);
+				    = diameter + (sawPointCount / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
 			case DRAG: {
 				distanceFromDaisyCenter = diameter
-				                          + (gsl::narrow_cast<double>(form::psg() % IniFile.daisyPetalPoints)
+				                          + ((form::psg() % IniFile.daisyPetalPoints)
 				                             / IniFile.daisyPetalPoints * petalLength);
 				break;
 			}
