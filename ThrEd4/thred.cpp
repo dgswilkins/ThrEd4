@@ -18888,7 +18888,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 							maxLines = formList[iForm].vertexCount;
 						}
 					}
-					lines.resize(maxLines + 1u);
+					lines.resize(wrap::toSize(maxLines) + 1u);
 					auto iVertex = 0u;
 					for (auto iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 						const auto iLine = iVertex;
