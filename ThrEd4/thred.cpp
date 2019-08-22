@@ -7431,16 +7431,16 @@ void thred::internal::savclp(uint32_t destination, std::vector<fPOINTATTR>& buff
 }
 
 void thred::rtclpfn(uint32_t destination, uint32_t source) {
-	auto  integer    = 0.0;
+	auto  integer    = 0.0f;
 	auto& clipBuffer = *ClipBuffer;
 
 	ClipStitchData[destination].led  = 0;
-	auto fractional                  = modf(gsl::narrow_cast<double>(clipBuffer[source].x) - LowerLeftStitch.x, &integer);
-	ClipStitchData[destination].fx   = wrap::floor<uint8_t>(fractional * 256.0);
+	auto fractional                  = modf(clipBuffer[source].x - LowerLeftStitch.x, &integer);
+	ClipStitchData[destination].fx   = wrap::floor<uint8_t>(fractional * 256.0f);
 	ClipStitchData[destination].x    = gsl::narrow<uint16_t>(integer);
 	ClipStitchData[destination].spcx = 0;
-	fractional                       = modf(gsl::narrow_cast<double>(clipBuffer[source].y) - LowerLeftStitch.y, &integer);
-	ClipStitchData[destination].fy   = wrap::floor<uint8_t>(fractional * 256.0);
+	fractional                       = modf(clipBuffer[source].y - LowerLeftStitch.y, &integer);
+	ClipStitchData[destination].fy   = wrap::floor<uint8_t>(fractional * 256.0f);
 	ClipStitchData[destination].y    = gsl::narrow<uint16_t>(integer);
 	ClipStitchData[destination].spcy = 0;
 	// ToDo - Are these structure members needed?
