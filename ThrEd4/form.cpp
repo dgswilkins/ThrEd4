@@ -7861,36 +7861,31 @@ void form::bakdup() {
 
 void form::internal::shrnks() {
 	auto clipRect = fRECTANGLE {};
+	auto lengths = std::vector<uint32_t>{};
+	auto deltas = std::vector<fPOINT>{};
+	lengths.reserve(VertexCount);
+	deltas.reserve(VertexCount - 1u);
 	clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
-		auto&      thisVertex = vertexIt[iVertex];
-		auto&      nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
-		const auto vDelta     = fPOINT { nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y };
-
-		const auto length = hypot(vDelta.x, vDelta.y);
-		const auto count  = std::round(length / ClipRectSize.cx);
-		const auto ratio  = (ClipRectSize.cx * count + 0.004f) / length;
-
-		nextVertex.x = thisVertex.x + vDelta.x * ratio;
-		nextVertex.y = thisVertex.y + vDelta.y * ratio;
+		auto& thisVertex = vertexIt[iVertex];
+		auto& nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
+		deltas.emplace_back(fPOINT{ nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y });
+		lengths.emplace_back(hypot(deltas.back().x, deltas.back().y));
 	}
-	const auto lastDelta     = fPOINT { vertexIt[0].x - vertexIt[1].x, vertexIt[0].y - vertexIt[1].y };
-	const auto length        = hypot(lastDelta.x, lastDelta.y);
-	auto       rotationAngle = atan2(lastDelta.y, lastDelta.x);
-	// ToDo - what does this loop do?
-	for (auto ine = 0u; ine < 5; ine++) {
-		auto delta = fPOINT { vertexIt[0].x - vertexIt[VertexCount - 1u].x, vertexIt[0].y - vertexIt[VertexCount - 1u].y };
-
-		const auto deltaLength     = hypot(delta.x, delta.y);
-		const auto count           = deltaLength / ClipRectSize.cx;
-		const auto truncationDelta = deltaLength - count * ClipRectSize.cx;
-		rotationAngle -= truncationDelta / length;
-		delta.x       = cos(rotationAngle) * length;
-		delta.y       = sin(rotationAngle) * length;
-		vertexIt[0].x = vertexIt[1].x + delta.x;
-		vertexIt[0].y = vertexIt[1].y + delta.y;
+	auto length = lengths.begin();
+	auto delta = deltas.begin();
+	for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
+		const auto count = std::floor(*length / ClipRectSize.cx);
+		const auto ratio = (ClipRectSize.cx * count + 0.004f) / *length;
+		auto& thisVertex = vertexIt[iVertex];
+		auto& nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
+		nextVertex.x = thisVertex.x + (*delta).x * ratio;
+		nextVertex.y = thisVertex.y + (*delta).y * ratio;
+		length++;
+		delta++;
 	}
+	form::frmout(ClosestFormToCursor);
 	form::refil();
 }
 
