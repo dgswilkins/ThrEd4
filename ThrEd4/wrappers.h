@@ -36,6 +36,8 @@ double   toDouble(float invar) noexcept;
 double   toDouble(int32_t invar) noexcept;
 float    toFloat(double invar);
 float    toFloat(int32_t invar) noexcept;
+float    toFloat(LONG invar) noexcept;
+float    toFloat(uint32_t invar) noexcept;
 size_t   toSize(uint32_t invar) noexcept;
 uint32_t toUnsigned(size_t invar);
 float    wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept;

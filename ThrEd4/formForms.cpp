@@ -898,7 +898,7 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DRAMP: {
-				distanceFromDaisyCenter = diameter + (iPoint / IniFile.daisyPetalPoints * petalLength);
+				distanceFromDaisyCenter = diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 				break;
 			}
 			case DSAW: {
@@ -910,13 +910,13 @@ void formForms::dasyfrm() {
 					sawPointCount = iPoint;
 				}
 				distanceFromDaisyCenter
-				    = diameter + (sawPointCount / IniFile.daisyPetalPoints * petalLength);
+				    = diameter + (wrap::toFloat(sawPointCount) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 				break;
 			}
 			case DRAG: {
 				distanceFromDaisyCenter = diameter
-				                          + ((form::psg() % IniFile.daisyPetalPoints)
-				                             / IniFile.daisyPetalPoints * petalLength);
+				                          + (wrap::toFloat(form::psg() % IniFile.daisyPetalPoints)
+				                             / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 				break;
 			}
 			case DCOG: {

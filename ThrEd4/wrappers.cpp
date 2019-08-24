@@ -92,6 +92,14 @@ float wrap::toFloat(int32_t invar) noexcept {
 	return gsl::narrow_cast<float>(invar);
 }
 
+float wrap::toFloat(LONG invar) noexcept {
+	return gsl::narrow_cast<float>(invar);
+}
+
+float wrap::toFloat(uint32_t invar) noexcept {
+	return gsl::narrow_cast<float>(invar);
+}
+
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
