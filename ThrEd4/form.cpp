@@ -6589,45 +6589,45 @@ void form::duhart(uint32_t sideCount) {
 }
 
 void form::dulens(uint32_t sides) {
-	// ToDo - this does not produce a consistent size of lens
-	//        or the correct number of sides
-	if (sides < 6) {
-		sides = 6;
+	if (sides < 4) {
+		sides = 4;
 	}
+/*
 	if (sides > 48) {
 		sides = 48;
 	}
-	const auto steps     = sides * 2u;
-	const auto stepAngle = PI_F * 2.0f / steps;
-	auto       count     = wrap::round<uint32_t>(steps / 2.0f * 0.3f);
-	auto       angle     = count * stepAngle;
-	const auto length    = 500.0f / gsl::narrow_cast<float>(steps) * ZoomFactor
-	                    * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
-	FormList->push_back(FRMHED {});
-	SelectedForm              = &(FormList->back());
-	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
+*/
+	const auto steps     = sides >> 1;
+	// ToDo - convert ratio to a preference
+	const auto ratio = 0.8f;
+	const auto radius = 100.0f * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	const auto theta = std::atan(1.0f / ratio);
+	const auto omega = 2.0f * theta / steps;
+	const auto phi = (PI_F - omega) / 2.0f;
+	const auto stepLength = 2.0f * radius * std::cos(phi);
+	FormList->push_back(FRMHED{});
+	SelectedForm = &(FormList->back());
+	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	SelectedForm->vertexIndex = gsl::narrow<decltype(SelectedForm->vertexIndex)>(FormVertices->size());
-	SelectedForm->attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1u);
+	SelectedForm->attribute = ActiveLayer << 1u;
 	form::fvars(ClosestFormToCursor);
 	thred::px2stch();
-	auto point   = SelectedPoint;
+	auto point = SelectedPoint;
 	auto iVertex = 0u;
-	SelectedPoint.x -= 0.0001f;
-	while (point.x >= SelectedPoint.x) {
+	FormVertices->reserve(FormVertices->size() + wrap::toSize(steps << 1) + 1u);
+	for (auto iStep = 0u; iStep < steps; iStep++) {
+		const auto rho = PI_F - (theta - iStep * omega) - phi;
 		FormVertices->push_back(point);
-		point.x += length * cos(angle);
-		point.y += length * sin(angle);
-		angle += stepAngle;
+		point.x += stepLength * cos(rho);
+		point.y += stepLength * sin(rho);
 		iVertex++;
 	}
-	auto lastVertex = iVertex;
-	if (lastVertex != 0u) {
-		lastVertex--;
-	}
-	auto       vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-	const auto av       = vertexIt[0].x;
-	for (iVertex = lastVertex; iVertex != 1; iVertex--) {
-		FormVertices->push_back(fPOINT { av + av - vertexIt[iVertex - 1u].x, vertexIt[iVertex - 1u].y });
+	FormVertices->push_back(point);
+	auto       vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(SelectedForm->vertexIndex + iVertex - 1u));
+	const auto av       = SelectedPoint.x;
+	for (; iVertex != 1; iVertex--) {
+		FormVertices->push_back(fPOINT { av + av - (*vertexIt).x, (*vertexIt).y });
+		vertexIt--;
 	}
 	SelectedForm->vertexCount
 	    = gsl::narrow<decltype(SelectedForm->vertexCount)>(FormVertices->size() - SelectedForm->vertexIndex);
