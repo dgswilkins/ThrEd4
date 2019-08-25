@@ -1839,9 +1839,15 @@ void thred::shft(const fPOINT& delta) noexcept {
 }
 
 void thred::internal::stch2px1(uint32_t iStitch) {
-	StitchCoordinatesPixels.x = wrap::round<int32_t>(((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f);
-	StitchCoordinatesPixels.y = wrap::round<int32_t>(StitchWindowClientRect.bottom
-	                                                 - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+	if (!StitchBuffer->empty()) {
+		StitchCoordinatesPixels.x = wrap::round<int32_t>(((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f);
+		StitchCoordinatesPixels.y = wrap::round<int32_t>(StitchWindowClientRect.bottom
+			- ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+	}
+	else {
+		StitchCoordinatesPixels.x = wrap::round<int32_t>(0.05f);
+		StitchCoordinatesPixels.y = wrap::round<int32_t>(StitchWindowClientRect.bottom + 0.05f);
+	}
 }
 
 void thred::internal::shft2box() {
@@ -3121,13 +3127,15 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
 		std::swap(start, end);
 	}
 	SearchLine->clear();
-	for (auto iStitch = start; iStitch <= end; iStitch++) {
-		SearchLine->push_back(
-		    POINT { wrap::round<int32_t>((((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f)),
-		            wrap::round<int32_t>(
-		                (StitchWindowClientRect.bottom - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)) });
+	if (!StitchBuffer->empty()) {
+		for (auto iStitch = start; iStitch <= end; iStitch++) {
+			SearchLine->push_back(
+				POINT{ wrap::round<int32_t>((((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f)),
+						wrap::round<int32_t>(
+							(StitchWindowClientRect.bottom - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)) });
+		}
+		wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
 	}
-	wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
 	SetROP2(dc, R2_COPYPEN);
 }
 
@@ -3179,20 +3187,22 @@ void thred::internal::ducros(HDC dc) {
 }
 
 void thred::selRct(fRECTANGLE& sourceRect) {
-	sourceRect.left = sourceRect.right = (*StitchBuffer)[GroupStartStitch].x;
-	sourceRect.top = sourceRect.bottom = (*StitchBuffer)[GroupStartStitch].y;
-	for (auto iStitch = GroupStartStitch + 1u; iStitch <= GroupEndStitch; iStitch++) {
-		if ((*StitchBuffer)[iStitch].x > sourceRect.right) {
-			sourceRect.right = (*StitchBuffer)[iStitch].x;
-		}
-		if ((*StitchBuffer)[iStitch].x < sourceRect.left) {
-			sourceRect.left = (*StitchBuffer)[iStitch].x;
-		}
-		if ((*StitchBuffer)[iStitch].y < sourceRect.bottom) {
-			sourceRect.bottom = (*StitchBuffer)[iStitch].y;
-		}
-		if ((*StitchBuffer)[iStitch].y > sourceRect.top) {
-			sourceRect.top = (*StitchBuffer)[iStitch].y;
+	if (!StitchBuffer->empty()) {
+		sourceRect.left = sourceRect.right = (*StitchBuffer)[GroupStartStitch].x;
+		sourceRect.top = sourceRect.bottom = (*StitchBuffer)[GroupStartStitch].y;
+		for (auto iStitch = GroupStartStitch + 1u; iStitch <= GroupEndStitch; iStitch++) {
+			if ((*StitchBuffer)[iStitch].x > sourceRect.right) {
+				sourceRect.right = (*StitchBuffer)[iStitch].x;
+			}
+			if ((*StitchBuffer)[iStitch].x < sourceRect.left) {
+				sourceRect.left = (*StitchBuffer)[iStitch].x;
+			}
+			if ((*StitchBuffer)[iStitch].y < sourceRect.bottom) {
+				sourceRect.bottom = (*StitchBuffer)[iStitch].y;
+			}
+			if ((*StitchBuffer)[iStitch].y > sourceRect.top) {
+				sourceRect.top = (*StitchBuffer)[iStitch].y;
+			}
 		}
 	}
 	if (sourceRect.right - sourceRect.left == 0) {
