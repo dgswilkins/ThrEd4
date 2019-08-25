@@ -6615,11 +6615,12 @@ void form::dulens(uint32_t sides) {
 	auto point = SelectedPoint;
 	auto iVertex = 0u;
 	FormVertices->reserve(FormVertices->size() + wrap::toSize(steps << 1) + 1u);
+	auto rho = PI_F - theta - phi;
 	for (auto iStep = 0u; iStep < steps; iStep++) {
-		const auto rho = PI_F - (theta - iStep * omega) - phi;
 		FormVertices->push_back(point);
 		point.x += stepLength * cos(rho);
 		point.y += stepLength * sin(rho);
+		rho += omega;
 		iVertex++;
 	}
 	FormVertices->push_back(point);
