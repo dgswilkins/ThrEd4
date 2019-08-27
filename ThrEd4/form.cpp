@@ -6592,29 +6592,34 @@ void form::dulens(uint32_t sides) {
 	if (sides < 4) {
 		sides = 4;
 	}
-/*
-	if (sides > 48) {
-		sides = 48;
-	}
-*/
-	const auto steps     = sides >> 1;
-	// ToDo - convert ratio to a preference
-	const auto ratio = 0.8f;
-	const auto radius = 100.0f * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
-	const auto theta = std::atan(1.0f / ratio);
+	/*
+	    if (sides > 48) {
+	        sides = 48;
+	    }
+	*/
+	const auto steps = sides >> 1;
+	// Calculate the angle subtended by the arc of the lens which is determined by the aspect ratio
+	const auto theta = std::atan(1.0f / IniFile.lensRatio);
+	// now calculate the radius of the lens arc and scale by the zoom factor
+	const auto radius
+	    = (100.0f / std::sin(theta)) * ZoomFactor * gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+	// get the angle subtended by each step
 	const auto omega = 2.0f * theta / steps;
+	// and the interior angle of every segment
 	const auto phi = (PI_F - omega) / 2.0f;
+	// as well as the length of every segment
 	const auto stepLength = 2.0f * radius * std::cos(phi);
-	FormList->push_back(FRMHED{});
-	SelectedForm = &(FormList->back());
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
+	FormList->push_back(FRMHED {});
+	SelectedForm              = &(FormList->back());
+	ClosestFormToCursor       = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1u);
 	SelectedForm->vertexIndex = gsl::narrow<decltype(SelectedForm->vertexIndex)>(FormVertices->size());
-	SelectedForm->attribute = ActiveLayer << 1u;
+	SelectedForm->attribute   = ActiveLayer << 1u;
 	form::fvars(ClosestFormToCursor);
 	thred::px2stch();
-	auto point = SelectedPoint;
+	auto point   = SelectedPoint;
 	auto iVertex = 0u;
 	FormVertices->reserve(FormVertices->size() + wrap::toSize(steps << 1) + 1u);
+	// rho is the angle of this particular segment
 	auto rho = PI_F - theta - phi;
 	for (auto iStep = 0u; iStep < steps; iStep++) {
 		FormVertices->push_back(point);

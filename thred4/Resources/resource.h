@@ -2,8 +2,6 @@
 // Microsoft Visual C++ generated include file.
 // Used by ThrEd4.rc
 //
-// clang-format off
-
 #define IDS_FSELB                       1
 #define IDS_FSELF                       2
 #define IDS_FSELA                       3
@@ -233,6 +231,7 @@
 #define IDS_PRF25                       213
 #define IDS_PRF26                       214
 #define IDS_PRF27                       215
+#define IDS_PRF28                       216
 #define IDS_FRMPLUS                     217
 #define IDS_FRMINUS                     218
 #define IDS_OKENT                       219
@@ -668,4 +667,3 @@
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
-// clang-format on

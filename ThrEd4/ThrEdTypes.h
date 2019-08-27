@@ -34,6 +34,7 @@ constexpr float    MAXWLK   = 54.0f;       // max underlay/edge walk stitch leng
 constexpr float    MINWLK   = 2.4f;        // max underlay/edge walk stitch length
 constexpr float    DEFULEN  = 12.0f;       // default underlay stitch length
 constexpr float    DEFUSPAC = 6.0f;        // default underlay stitch spacing
+constexpr float    DEFLRAT  = 0.8f;        // default lens form aspect ratio
 constexpr uint16_t IWAVPNTS = 36u;         // default wave points
 constexpr uint16_t IWAVSTRT = 10u;         // default wave start
 constexpr uint16_t IWAVEND  = 26u;         // default wave end
@@ -103,7 +104,7 @@ constexpr int32_t  KNOTLEN   = 54;              // set knots for stitches longer
 constexpr int32_t  MAXKNOTS  = 16384;           // maximum number of knots
 constexpr float    IBFCLEN   = (4.0f * PFGRAN); // initial buttonhole fill corner length
 constexpr float    IPICSPAC  = 6.0f;            // initial picot border space
-constexpr int32_t  PRFLINS   = 28;              // number of lines on the preference menu
+constexpr int32_t  PRFLINS   = 29;              // number of lines on the preference menu
 constexpr uint32_t EDGETYPS  = 12u;             // number of border fill types
 constexpr uint32_t SEED      = 3037000499u;     // pseudo-random-sequence seed
 constexpr uint32_t FSED      = 1340007303u;     // feather sequence seed
@@ -266,6 +267,7 @@ enum stringLabel
 	STR_PRF25,
 	STR_PRF26,
 	STR_PRF27,
+	STR_PRF28,
 	STR_FRMPLUS,
 	STR_FRMINUS,
 	STR_OKENT,
@@ -860,6 +862,7 @@ enum preferenceItems
 	PNUDG,  // 25
 	PEG,    // 26
 	PHUPY,  // 27
+	PLRAT,  // 28
 };
 
 // file menu items
@@ -1000,6 +1003,7 @@ public:
 	float    traceRatio { 0.0f };                        // trace ratio
 	float    chainSpace { 0.0f };                        // chain space
 	float    chainRatio { 0.0f };                        // chain ratio
+	float    lensRatio { 0.0f };                         // lens aspect ratio
 	float    cursorNudgeStep { 0.0f };                   // cursor nudge step
 	uint16_t nudgePixels { 0u };                         // nudge pixels
 	float    eggRatio { 0.0f };                          // egg ratio

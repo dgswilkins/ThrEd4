@@ -648,6 +648,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{}", (*StringTable)[wrap::toSize(IniFile.hoopType) - 1u + STR_HUP0]), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
 	ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
 	if (UserFlagMap.test(UserFlag::BLUNT)) {

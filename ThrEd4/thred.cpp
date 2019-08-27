@@ -1842,7 +1842,7 @@ void thred::internal::stch2px1(uint32_t iStitch) {
 	if (!StitchBuffer->empty()) {
 		StitchCoordinatesPixels.x = wrap::round<int32_t>(((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f);
 		StitchCoordinatesPixels.y = wrap::round<int32_t>(StitchWindowClientRect.bottom
-			- ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
+		                                                 - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f);
 	}
 	else {
 		StitchCoordinatesPixels.x = wrap::round<int32_t>(0.05f);
@@ -2412,6 +2412,17 @@ void thred::internal::chknum() {
 								StarRatio = 0.05f;
 							}
 							SetWindowText((*ValueWindow)[PSTAR], fmt::format(L"{:.2f}", StarRatio).c_str());
+							break;
+						}
+						case PLRAT: {
+							IniFile.lensRatio = value;
+							if (IniFile.lensRatio > 10.0f) {
+								IniFile.lensRatio = 10.0f;
+							}
+							if (IniFile.lensRatio < 0.1f) {
+								IniFile.lensRatio = 0.1f;
+							}
+							SetWindowText((*ValueWindow)[PLRAT], fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
 							break;
 						}
 						case PSPIR: {
@@ -3130,9 +3141,9 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
 	if (!StitchBuffer->empty()) {
 		for (auto iStitch = start; iStitch <= end; iStitch++) {
 			SearchLine->push_back(
-				POINT{ wrap::round<int32_t>((((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f)),
-						wrap::round<int32_t>(
-							(StitchWindowClientRect.bottom - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)) });
+			    POINT { wrap::round<int32_t>((((*StitchBuffer)[iStitch].x - ZoomRect.left) * ZoomRatio.x + 0.5f)),
+			            wrap::round<int32_t>((StitchWindowClientRect.bottom
+			                                  - ((*StitchBuffer)[iStitch].y - ZoomRect.bottom) * ZoomRatio.y + 0.5f)) });
 		}
 		wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
 	}
@@ -10748,6 +10759,7 @@ void thred::internal::defpref() {
 	IniFile.textureHeight        = ITXHI;
 	IniFile.textureWidth         = ITXWID;
 	IniFile.textureSpacing       = ITXSPAC;
+	IniFile.lensRatio            = DEFLRAT;
 }
 
 void thred::internal::dumrk(float xCoord, float yCoord) {
@@ -17982,6 +17994,9 @@ void thred::internal::init() {
 	if (IniFile.chainRatio == 0.0f) {
 		IniFile.chainRatio = CHRDEF;
 	}
+	if (IniFile.lensRatio == 0.0f) {
+		IniFile.lensRatio = DEFLRAT;
+	}
 	if (IniFile.cursorNudgeStep == 0.0f) {
 		IniFile.cursorNudgeStep = NUGINI;
 	}
@@ -18891,7 +18906,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					if (BytesRead != bytesToRead) {
 						break;
 					}
-					auto lines = std::vector<POINT>{};
+					auto lines    = std::vector<POINT> {};
 					auto maxLines = 0u;
 					for (auto iForm = 0; iForm < stitchHeader.formCount; iForm++) {
 						if (formList[iForm].vertexCount > maxLines) {
