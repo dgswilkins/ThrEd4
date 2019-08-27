@@ -1890,7 +1890,7 @@ void xt::internal::fangfn(uint32_t find, float angle) {
 		case TXVRTF:
 		case TXHORF:
 		case TXANGF: {
-			SelectedForm->fillType = TXANGF;
+			SelectedForm->fillType              = TXANGF;
 			SelectedForm->angleOrClipData.angle = angle;
 			break;
 		}

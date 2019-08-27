@@ -7867,8 +7867,8 @@ void form::bakdup() {
 
 void form::internal::shrnks() {
 	auto clipRect = fRECTANGLE {};
-	auto lengths = std::vector<uint32_t>{};
-	auto deltas = std::vector<fPOINT>{};
+	auto lengths  = std::vector<uint32_t> {};
+	auto deltas   = std::vector<fPOINT> {};
 	lengths.reserve(VertexCount);
 	deltas.reserve(VertexCount - 1u);
 	clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
@@ -7876,18 +7876,18 @@ void form::internal::shrnks() {
 	for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
 		auto& thisVertex = vertexIt[iVertex];
 		auto& nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
-		deltas.emplace_back(fPOINT{ nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y });
+		deltas.emplace_back(fPOINT { nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y });
 		lengths.emplace_back(hypot(deltas.back().x, deltas.back().y));
 	}
 	auto length = lengths.begin();
-	auto delta = deltas.begin();
+	auto delta  = deltas.begin();
 	for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
-		const auto count = std::floor(*length / ClipRectSize.cx);
-		const auto ratio = (ClipRectSize.cx * count + 0.004f) / *length;
-		auto& thisVertex = vertexIt[iVertex];
-		auto& nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
-		nextVertex.x = thisVertex.x + (*delta).x * ratio;
-		nextVertex.y = thisVertex.y + (*delta).y * ratio;
+		const auto count      = std::floor(*length / ClipRectSize.cx);
+		const auto ratio      = (ClipRectSize.cx * count + 0.004f) / *length;
+		auto&      thisVertex = vertexIt[iVertex];
+		auto&      nextVertex = vertexIt[wrap::toSize(iVertex) + 1u];
+		nextVertex.x          = thisVertex.x + (*delta).x * ratio;
+		nextVertex.y          = thisVertex.y + (*delta).y * ratio;
 		length++;
 		delta++;
 	}

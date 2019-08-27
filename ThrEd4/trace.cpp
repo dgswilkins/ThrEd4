@@ -431,7 +431,7 @@ void trace::trace() {
 		}
 
 #if TRCMTH == 0
-		auto upBrightness = ti::icolsum(UpPixelColor);
+		auto upBrightness   = ti::icolsum(UpPixelColor);
 		auto downBrightness = ti::icolsum(DownPixelColor);
 		if (TracedMap->empty()) {
 			TracedMap->resize(TraceDataSize, false);

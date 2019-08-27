@@ -899,7 +899,8 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DRAMP: {
-				distanceFromDaisyCenter = diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
+				distanceFromDaisyCenter
+				    = diameter + (wrap::toFloat(iPoint) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
 				break;
 			}
 			case DSAW: {

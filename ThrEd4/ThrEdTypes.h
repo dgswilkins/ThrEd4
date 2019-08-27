@@ -2348,7 +2348,7 @@ constexpr uint8_t NOBLNT = 0x9fu; // 1001 1111
 
 // frmhed extended attribute bits
 
-constexpr auto AT_SQR     = 1u;      // square ends
+constexpr auto AT_SQR     = 1u;       // square ends
 constexpr auto AT_FTHUP   = 1u << 1u; // feather up or down flag
 constexpr auto AT_FTHBTH  = 1u << 2u; // feather both up and down flag
 constexpr auto AT_FTHBLND = 1u << 3u; // feather blend flag
