@@ -17658,194 +17658,201 @@ void thred::internal::ducmd() {
 	}
 }
 
+void thred::internal::setPrefs() {
+	defpref();
+	getDocsFolder(DefaultDirectory);
+	if (DesignerName->empty()) {
+		wchar_t designerBuffer[50];
+		LoadString(
+		    ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+		DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
+		getdes();
+	}
+}
+
 void thred::internal::redini() {
 	duhom();
 	*IniFileName = *HomeDirectory;
 	*IniFileName /= L"thred.ini";
 	IniFileHandle = CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
-		defpref();
-		getDocsFolder(DefaultDirectory);
-		if (DesignerName->empty()) {
-			wchar_t designerBuffer[50];
-			LoadString(
-			    ThrEdInstance, IDS_UNAM, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-			DesignerName->assign(static_cast<const wchar_t*>(designerBuffer));
-			getdes();
-		}
+		setPrefs();
 	}
 	else {
 		auto bytesRead = DWORD { 0 };
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
 		if (bytesRead < sizeof(IniFile)) {
-			IniFile.formBoxSizePixels = DEFBPIX;
+			// ToDo - back up original ini file
+			setPrefs();
 		}
-		auto directory = utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.defaultDirectory)));
-		DefaultDirectory->assign(directory);
-		DefaultBMPDirectory->assign(directory);
-		{
-			auto& previousNames = *PreviousNames;
-			auto  iVersion      = 0u;
-			for (const auto& prevName : IniFile.prevNames) {
-				if (strlen(&prevName[0]) != 0u) {
-					previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(&prevName[0])));
+		else {
+			auto directory = utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.defaultDirectory)));
+			DefaultDirectory->assign(directory);
+			DefaultBMPDirectory->assign(directory);
+			{
+				auto& previousNames = *PreviousNames;
+				auto  iVersion      = 0u;
+				for (const auto& prevName : IniFile.prevNames) {
+					if (strlen(&prevName[0]) != 0u) {
+						previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(&prevName[0])));
+					}
+					else {
+						previousNames[iVersion].clear();
+					}
+					iVersion++;
 				}
-				else {
-					previousNames[iVersion].clear();
-				}
-				iVersion++;
 			}
-		}
-		DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.designerName))));
-		for (auto iColor = 0u; iColor < 16; iColor++) {
-			UserColor[iColor]              = IniFile.stitchColors[iColor];
-			CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
-			CustomBackgroundColor[iColor]  = IniFile.backgroundPreferredColors[iColor];
-			BitmapBackgroundColors[iColor] = IniFile.bitmapBackgroundColors[iColor];
-		}
-		BackgroundColor = IniFile.backgroundColor;
-		BitmapColor     = IniFile.bitmapColor;
-		MinStitchLength = IniFile.minStitchLength;
-		if (IniFile.showStitchThreshold < 0) {
-			IniFile.showStitchThreshold = 0;
-		}
-		if (IniFile.showStitchThreshold > 9) {
-			IniFile.showStitchThreshold = 9;
-		}
-		ShowStitchThreshold = IniFile.showStitchThreshold;
-		if (IniFile.threadSize30 != 0.0) {
-			ThreadSize30 = IniFile.threadSize30;
-		}
-		if (IniFile.threadSize40 != 0.0) {
-			ThreadSize40 = IniFile.threadSize40;
-		}
-		if (IniFile.threadSize60 != 0.0) {
-			ThreadSize60 = IniFile.threadSize60;
-		}
-		if (IniFile.userStitchLength != 0.0f) {
-			UserStitchLength = IniFile.userStitchLength;
-		}
-		if (IniFile.maxStitchLength == 0.0) {
-			IniFile.maxStitchLength = MAXSIZ * PFGRAN;
-		}
-		if (IniFile.smallStitchLength != 0.0f) {
-			SmallStitchLength = IniFile.smallStitchLength;
-		}
-		StitchBoxesThreshold = IniFile.stitchBoxesThreshold;
-		if (IniFile.stitchSpace != 0.0f) {
-			LineSpacing = IniFile.stitchSpace;
-		}
-		{
-			const auto tmp = EnumMap<UserFlag>(IniFile.userFlagMap);
-			UserFlagMap    = tmp;
-		}
-		if (IniFile.borderWidth != 0.0f) {
-			BorderWidth = IniFile.borderWidth;
-		}
-		if (IniFile.appliqueColor != 0u) {
-			AppliqueColor = IniFile.appliqueColor & 0xfu;
-		}
-		if (IniFile.snapLength != 0.0f) {
-			SnapLength = IniFile.snapLength;
-		}
-		if (IniFile.starRatio != 0.0f) {
-			StarRatio = IniFile.starRatio;
-		}
-		if (IniFile.spiralWrap != 0.0f) {
-			SpiralWrap = IniFile.spiralWrap;
-		}
-		if (IniFile.buttonholeCornerLength != 0.0f) {
-			ButtonholeCornerLength = IniFile.buttonholeCornerLength;
-		}
-		if (IniFile.gridSize == 0.0f) {
-			IniFile.gridSize = 12;
-		}
-		if (IniFile.wavePoints == 0u) {
-			IniFile.wavePoints = IWAVPNTS;
-		}
-		if (IniFile.waveStart == 0u) {
-			IniFile.waveStart = IWAVSTRT;
-		}
-		if (IniFile.waveEnd == 0u) {
-			IniFile.waveEnd = IWAVEND;
-		}
-		if (IniFile.waveLobes == 0u) {
-			IniFile.waveLobes = IWAVS;
-		}
-		if (IniFile.featherFillType == 0u) {
-			IniFile.featherFillType = FDEFTYP;
-		}
-		if (IniFile.featherUpCount == 0u) {
-			IniFile.featherUpCount = FDEFUP;
-		}
-		if (IniFile.featherDownCount == 0u) {
-			IniFile.featherDownCount = FDEFDWN;
-		}
-		if (IniFile.featherRatio == 0.0f) {
-			IniFile.featherRatio = FDEFRAT;
-		}
-		if (IniFile.featherMinStitchSize == 0.0f) {
-			IniFile.featherMinStitchSize = FDEFFLR;
-		}
-		if (IniFile.featherCount == 0u) {
-			IniFile.featherCount = FDEFNUM;
-		}
-		if (IniFile.daisyHoleDiameter == 0.0f) {
-			IniFile.daisyHoleDiameter = DAZHLEN;
-		}
-		if (IniFile.daisyPetalPoints == 0u) {
-			IniFile.daisyPetalPoints = DAZCNT;
-		}
-		if (IniFile.daisyInnerCount == 0u) {
-			IniFile.daisyInnerCount = DAZICNT;
-		}
-		if (IniFile.daisyDiameter == 0.0f) {
-			IniFile.daisyDiameter = DAZLEN;
-		}
-		if (IniFile.daisyPetalCount == 0u) {
-			IniFile.daisyPetalCount = DAZPETS;
-		}
-		if (IniFile.daisyPetalLen == 0.0f) {
-			IniFile.daisyPetalLen = DAZPLEN;
-		}
+			DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<const char*>(IniFile.designerName))));
+			for (auto iColor = 0u; iColor < 16; iColor++) {
+				UserColor[iColor]              = IniFile.stitchColors[iColor];
+				CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
+				CustomBackgroundColor[iColor]  = IniFile.backgroundPreferredColors[iColor];
+				BitmapBackgroundColors[iColor] = IniFile.bitmapBackgroundColors[iColor];
+			}
+			BackgroundColor = IniFile.backgroundColor;
+			BitmapColor     = IniFile.bitmapColor;
+			MinStitchLength = IniFile.minStitchLength;
+			if (IniFile.showStitchThreshold < 0) {
+				IniFile.showStitchThreshold = 0;
+			}
+			if (IniFile.showStitchThreshold > 9) {
+				IniFile.showStitchThreshold = 9;
+			}
+			ShowStitchThreshold = IniFile.showStitchThreshold;
+			if (IniFile.threadSize30 != 0.0) {
+				ThreadSize30 = IniFile.threadSize30;
+			}
+			if (IniFile.threadSize40 != 0.0) {
+				ThreadSize40 = IniFile.threadSize40;
+			}
+			if (IniFile.threadSize60 != 0.0) {
+				ThreadSize60 = IniFile.threadSize60;
+			}
+			if (IniFile.userStitchLength != 0.0f) {
+				UserStitchLength = IniFile.userStitchLength;
+			}
+			if (IniFile.maxStitchLength == 0.0) {
+				IniFile.maxStitchLength = MAXSIZ * PFGRAN;
+			}
+			if (IniFile.smallStitchLength != 0.0f) {
+				SmallStitchLength = IniFile.smallStitchLength;
+			}
+			StitchBoxesThreshold = IniFile.stitchBoxesThreshold;
+			if (IniFile.stitchSpace != 0.0f) {
+				LineSpacing = IniFile.stitchSpace;
+			}
+			{
+				const auto tmp = EnumMap<UserFlag>(IniFile.userFlagMap);
+				UserFlagMap    = tmp;
+			}
+			if (IniFile.borderWidth != 0.0f) {
+				BorderWidth = IniFile.borderWidth;
+			}
+			if (IniFile.appliqueColor != 0u) {
+				AppliqueColor = IniFile.appliqueColor & 0xfu;
+			}
+			if (IniFile.snapLength != 0.0f) {
+				SnapLength = IniFile.snapLength;
+			}
+			if (IniFile.starRatio != 0.0f) {
+				StarRatio = IniFile.starRatio;
+			}
+			if (IniFile.spiralWrap != 0.0f) {
+				SpiralWrap = IniFile.spiralWrap;
+			}
+			if (IniFile.buttonholeCornerLength != 0.0f) {
+				ButtonholeCornerLength = IniFile.buttonholeCornerLength;
+			}
+			if (IniFile.gridSize == 0.0f) {
+				IniFile.gridSize = 12;
+			}
+			if (IniFile.wavePoints == 0u) {
+				IniFile.wavePoints = IWAVPNTS;
+			}
+			if (IniFile.waveStart == 0u) {
+				IniFile.waveStart = IWAVSTRT;
+			}
+			if (IniFile.waveEnd == 0u) {
+				IniFile.waveEnd = IWAVEND;
+			}
+			if (IniFile.waveLobes == 0u) {
+				IniFile.waveLobes = IWAVS;
+			}
+			if (IniFile.featherFillType == 0u) {
+				IniFile.featherFillType = FDEFTYP;
+			}
+			if (IniFile.featherUpCount == 0u) {
+				IniFile.featherUpCount = FDEFUP;
+			}
+			if (IniFile.featherDownCount == 0u) {
+				IniFile.featherDownCount = FDEFDWN;
+			}
+			if (IniFile.featherRatio == 0.0f) {
+				IniFile.featherRatio = FDEFRAT;
+			}
+			if (IniFile.featherMinStitchSize == 0.0f) {
+				IniFile.featherMinStitchSize = FDEFFLR;
+			}
+			if (IniFile.featherCount == 0u) {
+				IniFile.featherCount = FDEFNUM;
+			}
+			if (IniFile.daisyHoleDiameter == 0.0f) {
+				IniFile.daisyHoleDiameter = DAZHLEN;
+			}
+			if (IniFile.daisyPetalPoints == 0u) {
+				IniFile.daisyPetalPoints = DAZCNT;
+			}
+			if (IniFile.daisyInnerCount == 0u) {
+				IniFile.daisyInnerCount = DAZICNT;
+			}
+			if (IniFile.daisyDiameter == 0.0f) {
+				IniFile.daisyDiameter = DAZLEN;
+			}
+			if (IniFile.daisyPetalCount == 0u) {
+				IniFile.daisyPetalCount = DAZPETS;
+			}
+			if (IniFile.daisyPetalLen == 0.0f) {
+				IniFile.daisyPetalLen = DAZPLEN;
+			}
 
-		switch (IniFile.hoopType) {
-		case SMALHUP: {
-			IniFile.hoopSizeX = SHUPX;
-			IniFile.hoopSizeY = SHUPY;
-			break;
-		}
-		case LARGHUP: {
-			IniFile.hoopSizeX = LHUPX;
-			IniFile.hoopSizeY = LHUPY;
-			break;
-		}
-		case CUSTHUP: {
-			if (IniFile.hoopSizeX == 0.0f) {
-				IniFile.hoopSizeX = LHUPX;
+			switch (IniFile.hoopType) {
+			case SMALHUP: {
+				IniFile.hoopSizeX = SHUPX;
+				IniFile.hoopSizeY = SHUPY;
+				break;
 			}
-			if (IniFile.hoopSizeY == 0.0f) {
+			case LARGHUP: {
+				IniFile.hoopSizeX = LHUPX;
+				IniFile.hoopSizeY = LHUPY;
+				break;
+			}
+			case CUSTHUP: {
+				if (IniFile.hoopSizeX == 0.0f) {
+					IniFile.hoopSizeX = LHUPX;
+				}
+				if (IniFile.hoopSizeY == 0.0f) {
+					IniFile.hoopSizeY = LHUPY;
+				}
+				break;
+			}
+			case HUP100: {
+				if (IniFile.hoopSizeX == 0.0f) {
+					IniFile.hoopSizeX = HUP100XY;
+				}
+				if (IniFile.hoopSizeY == 0.0f) {
+					IniFile.hoopSizeY = HUP100XY;
+				}
+				break;
+			}
+			default: {
+				IniFile.hoopType  = LARGHUP;
+				IniFile.hoopSizeX = LHUPX;
 				IniFile.hoopSizeY = LHUPY;
 			}
-			break;
-		}
-		case HUP100: {
-			if (IniFile.hoopSizeX == 0.0f) {
-				IniFile.hoopSizeX = HUP100XY;
 			}
-			if (IniFile.hoopSizeY == 0.0f) {
-				IniFile.hoopSizeY = HUP100XY;
-			}
-			break;
+			UnzoomedRect = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
+			PicotSpacing = IniFile.picotSpace;
 		}
-		default: {
-			IniFile.hoopType  = LARGHUP;
-			IniFile.hoopSizeX = LHUPX;
-			IniFile.hoopSizeY = LHUPY;
-		}
-		}
-		UnzoomedRect = { wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY) };
-		PicotSpacing = IniFile.picotSpace;
 	}
 	if (IniFile.gridColor == 0u) {
 		IniFile.gridColor = DEFGRD;

@@ -429,6 +429,7 @@ namespace internal {
 	void     setmov();
 	void     setpclp();
 	void     setpcs();
+	void     setPrefs();
 	void     setsped();
 	void     setsrch(uint32_t stitch);
 	void     shft2box();
