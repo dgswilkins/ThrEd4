@@ -3229,8 +3229,8 @@ void thred::selRct(fRECTANGLE& sourceRect) {
 void thred::internal::dusel(HDC dc) {
 	SetROP2(dc, R2_NOTXORPEN);
 	SelectObject(dc, LinePen);
-	wrap::Polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1));
-	for (auto iPoint = 0u; iPoint < (FormControlPoints->size() - 1); iPoint++) {
+	wrap::Polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1u));
+	for (auto iPoint = 0u; iPoint < wrap::toUnsigned(FormControlPoints->size() - 1u); iPoint++) {
 		form::selsqr((*FormControlPoints)[iPoint], dc);
 	}
 	SetROP2(dc, R2_COPYPEN);
@@ -4295,7 +4295,7 @@ void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
 	auto iColor  = 1u;
 	auto color   = (*StitchBuffer)[0].attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
-	for (auto iStitch = 0u; iStitch < StitchBuffer->size() - 1u; iStitch++) {
+	for (auto iStitch = 0u; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1u); iStitch++) {
 		if (((*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK) != color) {
 			color = (*StitchBuffer)[wrap::toSize(iStitch) + 1u].attribute & COLMSK;
 			pecEncodeStop(buffer, (iColor % 2u) + 1u);
@@ -4417,7 +4417,7 @@ void thred::internal::sav() {
 			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched)); // NOLINT
 			std::fill_n(&dstHeader.desc[0], sizeof(dstHeader.desc), ' ');
 			if (desc != nullptr) {
-				for (auto iHeader = 0u; iHeader < sizeof(dstHeader.desc); iHeader++) {
+				for (auto iHeader = 0u; iHeader < wrap::toUnsigned(sizeof(dstHeader.desc)); iHeader++) {
 					if ((desc[iHeader] != 0) && desc[iHeader] != '.') {
 						dstHeader.desc[iHeader] = desc[iHeader];
 					}
@@ -5920,7 +5920,7 @@ void thred::internal::nuFil() {
 						auto clipOffset   = 0u;
 						auto vertexOffset = 0u;
 						auto guideOffset  = 0u;
-						for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+						for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 							auto& form       = (*FormList)[iForm];
 							form.vertexIndex = vertexOffset;
 							vertexOffset += form.vertexCount;
@@ -8964,7 +8964,7 @@ void thred::internal::insfil() {
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
 						// update the form pointer variables
-						for (auto iFormList = InsertedFormIndex; iFormList < FormList->size(); iFormList++) {
+						for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(FormList->size()); iFormList++) {
 							auto& formIter       = (*FormList)[iFormList];
 							formIter.vertexIndex = vertexOffset;
 							vertexOffset += formIter.vertexCount;
@@ -9003,7 +9003,7 @@ void thred::internal::insfil() {
 							insertedRectangle.right  = (*FormVertices)[InsertedVertexIndex].x;
 							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
 							insertedRectangle.top    = (*FormVertices)[InsertedVertexIndex].y;
-							for (auto iVertex = InsertedVertexIndex + 1u; iVertex < FormVertices->size(); iVertex++) {
+							for (auto iVertex = InsertedVertexIndex + 1u; iVertex < wrap::toUnsigned(FormVertices->size()); iVertex++) {
 								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
 									insertedRectangle.left = (*FormVertices)[iVertex].x;
 								}
@@ -9533,7 +9533,7 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 		for (auto& stitch : *StitchBuffer) {
 			thi::rotstch(stitch, rotationAngle, rotationCenter);
 		}
-		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			form::frmout(iForm);
 		}
 		form::selal();
@@ -10374,18 +10374,18 @@ void thred::internal::selalstch() {
 void thred::internal::duinsfil() {
 	thred::px2stch();
 	const auto offset = fPOINT { SelectedPoint.x - InsertCenter.x, SelectedPoint.y - InsertCenter.y };
-	for (auto iForm = InsertedFormIndex; iForm < FormList->size(); iForm++) {
+	for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& formRectangle = (*FormList)[iForm].rectangle;
 		formRectangle.bottom += offset.y;
 		formRectangle.top += offset.y;
 		formRectangle.left += offset.x;
 		formRectangle.right += offset.x;
 	}
-	for (auto iVertex = InsertedVertexIndex; iVertex < FormVertices->size(); iVertex++) {
+	for (auto iVertex = InsertedVertexIndex; iVertex < wrap::toUnsigned(FormVertices->size()); iVertex++) {
 		(*FormVertices)[iVertex].x += offset.x;
 		(*FormVertices)[iVertex].y += offset.y;
 	}
-	for (auto iStitch = InsertedStitchIndex; iStitch < StitchBuffer->size(); iStitch++) {
+	for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 		(*StitchBuffer)[iStitch].x += offset.x;
 		(*StitchBuffer)[iStitch].y += offset.y;
 	}
@@ -12430,7 +12430,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		else {
 			if (StateMap.test(StateFlag::BIGBOX)) {
 				thred::savdo();
-				for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+				for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 					form::frmadj(iForm);
 				}
 				for (auto& stitch : *StitchBuffer) {
@@ -12548,7 +12548,7 @@ bool thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 				// amount overallocated
 				SelectedFormList->reserve(FormList->size());
 				StateMap.reset(StateFlag::FORMSEL);
-				for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+				for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 					if (finrng(iForm)) {
 						SelectedFormList->push_back(iForm);
 					}
@@ -14008,7 +14008,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
 		auto& controlPoint = *FormControlPoints;
 		if (iselpnt()) {
-			for (auto iSide = 0u; iSide < stretchBoxLine.size(); iSide++) {
+			for (auto iSide = 0u; iSide < wrap::toUnsigned(stretchBoxLine.size()); iSide++) {
 				stretchBoxLine[iSide] = controlPoint[wrap::toSize(iSide) * 2u];
 			}
 			stretchBoxLine.back() = stretchBoxLine.front();
@@ -19393,7 +19393,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 }
 
 void thred::internal::sachk() {
-	for (auto iForm = 0ul; iForm < FormList->size(); iForm++) {
+	for (auto iForm = 0ul; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		const auto& form = (*FormList)[iForm];
 		if (form.type == SAT && (form.satinGuideCount != 0u)) {
 			auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);

@@ -49,7 +49,7 @@ void satin::delsac(uint32_t formIndex) {
 			auto eraseStart = std::next(SatinGuides->cbegin(), formList[formIndex].satinOrAngle.guide);
 			auto eraseEnd   = std::next(eraseStart, formList[formIndex].satinGuideCount);
 			SatinGuides->erase(eraseStart, eraseEnd);
-			for (auto iForm = formIndex + 1u; iForm < FormList->size(); iForm++) {
+			for (auto iForm = formIndex + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0u)) {
 					formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 				}
@@ -63,7 +63,7 @@ void satin::internal::sacspac(uint32_t startGuide, uint32_t guideCount) {
 	const auto val = SATCON {};
 	auto       pos = std::next(SatinGuides->cbegin(), startGuide);
 	SatinGuides->insert(pos, val);
-	for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			form.satinOrAngle.guide += guideCount;
@@ -284,7 +284,7 @@ bool satin::internal::satselfn() {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
-	for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto&      form      = (*FormList)[iForm];
 		const auto layerCode = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1u);
 		if ((ActiveLayer == 0u) || (layerCode == 0u) || layerCode == ActiveLayer) {
@@ -543,7 +543,7 @@ void satin::satadj() {
 	if (SelectedForm->satinGuideCount < savedGuideCount) {
 		const auto iGuide = savedGuideCount - CurrentFormGuidesCount;
 		OutputDebugString(fmt::format(L"Guides adjusted by {}, so updating forms\n", iGuide).c_str());
-		for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+		for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			auto& form = (*FormList)[iForm];
 			if (form.type == SAT) {
 				form.satinOrAngle.guide -= iGuide;
@@ -557,7 +557,7 @@ void satin::delcon(uint32_t GuideIndex) {
 	auto       guide  = std::next(SatinGuides->cbegin(), offset);
 
 	SatinGuides->erase(guide);
-	for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT && (form.satinGuideCount != 0u)) {
 			form.satinOrAngle.guide--;
@@ -603,7 +603,7 @@ void satin::delspnt() {
 					iGuide++;
 				}
 				SelectedForm->satinGuideCount--;
-				for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+				for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 					auto& form = (*FormList)[iForm];
 					if (form.type == SAT && (form.satinGuideCount != 0u)) {
 						form.satinOrAngle.guide++;
@@ -628,7 +628,7 @@ void satin::delspnt() {
 		ClosestVertexToCursor = SelectedForm->vertexCount - 1u;
 	}
 	StateMap.set(StateFlag::FRMPSEL);
-	for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = (*FormList)[iForm];
 		form.vertexIndex--;
 	}

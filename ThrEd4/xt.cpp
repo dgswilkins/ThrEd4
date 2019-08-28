@@ -854,7 +854,7 @@ void xt::chkund(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>&
 
 void xt::selalfrm() {
 	SelectedFormList->reserve(FormList->size());
-	for (auto formIndex = 0u; formIndex < FormList->size(); formIndex++) {
+	for (auto formIndex = 0u; formIndex < wrap::toUnsigned(FormList->size()); formIndex++) {
 		SelectedFormList->push_back(formIndex);
 	}
 	StateMap.set(StateFlag::RESTCH);
@@ -1089,7 +1089,7 @@ void xt::fsort() {
 			ColorOrder[iColor] = iColor + 1u;
 		}
 	}
-	for (auto iStitch = 1u; iStitch < StitchBuffer->size(); iStitch++) {
+	for (auto iStitch = 1u; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 		if (((*StitchBuffer)[iStitch].attribute & SRTMSK) != attribute) {
 			stitchRegion.back().finish    = iStitch;
 			stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1u];
@@ -1497,7 +1497,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		const auto offset           = 0;
 		auto       highStitchBuffer = std::vector<fPOINTATTR> {};
 		auto       code             = 0u;
-		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
+		for (auto iSequence = 0u; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			ilData.pins = iSequence;
 			switch ((*InterleaveSequenceIndices)[iSequence].seq) {
 			case I_AP: {
@@ -1562,7 +1562,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 	else { // no stitches added so far
 		auto code     = 0u;
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		for (auto iSequence = 0u; iSequence < (InterleaveSequenceIndices->size() - 1u); iSequence++) {
+		for (auto iSequence = 0u; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1u); iSequence++) {
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
 			                             | (*InterleaveSequenceIndices)[iSequence].color);
 			if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
@@ -2518,7 +2518,7 @@ void xt::nudsiz() {
 				displayText::hsizmsg();
 			}
 			form::centir();
-			for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+			for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 				form::frmout(iForm);
 			}
 		}

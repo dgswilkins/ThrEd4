@@ -790,7 +790,7 @@ void trace::internal::dutrac() {
 		decimatedLine.push_back(tracedPoints[0]);
 		ti::dutdif(traceDiff[0], tracedPoints.data());
 		OutputIndex = 1;
-		for (auto iPoint = 1u; iPoint < tracedPoints.size(); iPoint++) {
+		for (auto iPoint = 1u; iPoint < wrap::toUnsigned(tracedPoints.size()); iPoint++) {
 			traceDiff[1] = traceDiff[0];
 			ti::dutdif(traceDiff[0], &tracedPoints[iPoint]);
 			if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
@@ -801,7 +801,7 @@ void trace::internal::dutrac() {
 		tracedPoints.reserve(decimatedLine.size());
 		tracedPoints.push_back(decimatedLine[0]);
 		auto iNext = 0u;
-		for (auto iCurrent = 1u; iCurrent < decimatedLine.size(); iCurrent++) {
+		for (auto iCurrent = 1u; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
 			const auto traceLength
 			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
 			if (traceLength > IniFile.traceLength) {
@@ -809,7 +809,7 @@ void trace::internal::dutrac() {
 				iNext = iCurrent;
 			}
 		}
-		for (auto iCurrent = iNext + 1u; iCurrent < decimatedLine.size(); iCurrent++) {
+		for (auto iCurrent = iNext + 1u; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
 		FormList->push_back(FRMHED {});
@@ -826,7 +826,7 @@ void trace::internal::dutrac() {
 		if (StateMap.test(StateFlag::LANDSCAP)) {
 			landscapeOffset = gsl::narrow_cast<float>(UnzoomedRect.y) - BitmapSizeinStitches.y;
 		}
-		for (auto iCurrent = 1u; iCurrent < tracedPoints.size(); iCurrent++) {
+		for (auto iCurrent = 1u; iCurrent < wrap::toUnsigned(tracedPoints.size()); iCurrent++) {
 			traceLengthSum += hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1u].x),
 			                         gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1u].y));
 			const auto traceLength = hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
@@ -1092,7 +1092,7 @@ void trace::blak() {
 		if (!StateMap.test(StateFlag::WASTRAC)) {
 			ti::getrmap();
 		}
-		for (auto iForm = 0u; iForm < FormList->size(); iForm++) {
+		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			form::fvars(iForm);
 			ti::bfrm();
 		}

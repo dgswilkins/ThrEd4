@@ -95,7 +95,7 @@ uint32_t clip::internal::findclp(uint32_t formIndex) {
 
 void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 	auto& formList = *FormList;
-	for (auto iForm = fpnt + 1u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = fpnt + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip -= cnt;
 		}
@@ -155,12 +155,12 @@ uint32_t clip::nueclp(uint32_t currentForm, uint32_t count) {
 	const auto it  = std::next(ClipPoints->cbegin(), find);
 	const auto val = fPOINT {};
 	ClipPoints->insert(it, count, val);
-	for (auto iform = currentForm; iform < FormList->size(); iform++) {
+	for (auto iform = currentForm; iform < wrap::toUnsigned(FormList->size()); iform++) {
 		if (clip::iseclpx(iform)) {
 			formList[iform].borderClipData += count;
 		}
 	}
-	for (auto iform = currentForm + 1u; iform < FormList->size(); iform++) {
+	for (auto iform = currentForm + 1u; iform < wrap::toUnsigned(FormList->size()); iform++) {
 		if (clip::isclp(iform)) {
 			formList[iform].angleOrClipData.clip += count;
 		}
@@ -180,7 +180,7 @@ uint32_t clip::numclp() {
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		formList[ClosestFormToCursor].borderClipData += clipSize;
 	}
-	for (auto iForm = ClosestFormToCursor + 1u; iForm < FormList->size(); iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip += clipSize;
 		}
@@ -699,7 +699,7 @@ void clip::duxclp() {
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	OSequence->clear();
 	const auto rotationCenter = fPOINT {};
-	for (auto iPoint = 1u; iPoint < chainEndPoints.size(); iPoint++) {
+	for (auto iPoint = 1u; iPoint < wrap::toUnsigned(chainEndPoints.size()); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
