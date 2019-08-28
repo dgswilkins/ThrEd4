@@ -17681,8 +17681,11 @@ void thred::internal::redini() {
 	else {
 		auto bytesRead = DWORD { 0 };
 		ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
+		CloseHandle(IniFileHandle);
 		if (bytesRead < sizeof(IniFile)) {
-			// ToDo - back up original ini file
+			auto newFileName = *IniFileName;
+			newFileName.replace_filename("thred-ini.bak");
+			fs::rename(*IniFileName, newFileName);
 			setPrefs();
 		}
 		else {
@@ -17857,7 +17860,6 @@ void thred::internal::redini() {
 	if (IniFile.gridColor == 0u) {
 		IniFile.gridColor = DEFGRD;
 	}
-	CloseHandle(IniFileHandle);
 	if (IniFile.fillAngle == 0.0) {
 		IniFile.fillAngle = PI_F / 6.0f;
 	}
