@@ -2034,7 +2034,7 @@ void form::internal::apbrd() {
 	OSequence->push_back(vertexIt[currentVertex]);
 	for (auto iVertex = 0u; iVertex < VertexCount * 2u; iVertex++) {
 		const auto nextVertex = form::nxt(currentVertex);
-		bdrlin(currentVertex, nextVertex, APSPAC);
+		bdrlin(currentVertex, nextVertex, IniFile.AppStitchLen);
 		currentVertex = nextVertex;
 	}
 }
@@ -2441,13 +2441,12 @@ void form::internal::lapbrd() {
 	const auto savedStitchLength = UserStitchLength;
 
 	OSequence->clear();
-	// ToDo - Should APSPAC be a configurable variable instead?
-	UserStitchLength = APSPAC;
+	UserStitchLength = IniFile.AppStitchLen;
 	for (auto iVertex = 0u; iVertex < VertexCount - 1u; iVertex++) {
-		bdrlin(iVertex, iVertex + 1, APSPAC);
+		bdrlin(iVertex, iVertex + 1, IniFile.AppStitchLen);
 	}
 	for (auto iVertex = VertexCount - 1u; iVertex != 0; iVertex--) {
-		bdrlin(iVertex, iVertex - 1, APSPAC);
+		bdrlin(iVertex, iVertex - 1, IniFile.AppStitchLen);
 	}
 	UserStitchLength = savedStitchLength;
 }

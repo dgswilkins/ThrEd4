@@ -104,7 +104,7 @@ constexpr int32_t  KNOTLEN   = 54;              // set knots for stitches longer
 constexpr int32_t  MAXKNOTS  = 16384;           // maximum number of knots
 constexpr float    IBFCLEN   = (4.0f * PFGRAN); // initial buttonhole fill corner length
 constexpr float    IPICSPAC  = 6.0f;            // initial picot border space
-constexpr int32_t  PRFLINS   = 29;              // number of lines on the preference menu
+constexpr int32_t  PRFLINS   = 30;              // number of lines on the preference menu
 constexpr uint32_t EDGETYPS  = 12u;             // number of border fill types
 constexpr uint32_t SEED      = 3037000499u;     // pseudo-random-sequence seed
 constexpr uint32_t FSED      = 1340007303u;     // feather sequence seed
@@ -268,6 +268,7 @@ enum stringLabel
 	STR_PRF26,
 	STR_PRF27,
 	STR_PRF28,
+	STR_PRF29,
 	STR_FRMPLUS,
 	STR_FRMINUS,
 	STR_OKENT,
@@ -863,6 +864,7 @@ enum preferenceItems
 	PEG,    // 26
 	PHUPY,  // 27
 	PLRAT,  // 28
+	PAPSL,  // 29
 };
 
 // file menu items
@@ -1004,6 +1006,7 @@ public:
 	float    chainSpace { 0.0f };                        // chain space
 	float    chainRatio { 0.0f };                        // chain ratio
 	float    lensRatio { 0.0f };                         // lens aspect ratio
+	float    AppStitchLen { 0.0f };                      // Applique stitch length
 	float    cursorNudgeStep { 0.0f };                   // cursor nudge step
 	uint16_t nudgePixels { 0u };                         // nudge pixels
 	float    eggRatio { 0.0f };                          // egg ratio

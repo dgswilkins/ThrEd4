@@ -626,6 +626,7 @@ void formForms::prfmsg() {
 	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
 	ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1u)), STR_PRF10);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen / PFGRAN)), STR_PRF29);
 	ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
 	ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);

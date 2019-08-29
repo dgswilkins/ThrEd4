@@ -111,6 +111,7 @@
 #define IDS_PRT                         104
 #define IDS_NOTPES                      105
 #define IDS_INVKEY                      106
+#define IDS_PRF29                       106
 #define IDS_DAYKEY                      108
 #define IDS_SHRTF                       109
 #define IDS_TRC0                        110

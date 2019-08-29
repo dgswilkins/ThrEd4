@@ -2398,6 +2398,11 @@ void thred::internal::chknum() {
 							SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", (AppliqueColor + 1u)).c_str());
 							break;
 						}
+						case PAPSL: {
+							IniFile.AppStitchLen = value * PFGRAN;
+							SetWindowText((*ValueWindow)[PAPSL], bufVal.c_str());
+							break;
+						}
 						case PSNP: {
 							SnapLength = value * PFGRAN;
 							SetWindowText((*ValueWindow)[PSNP], bufVal.c_str());
@@ -10705,6 +10710,7 @@ void thred::internal::defpref() {
 	}
 	formForms::dazdef();
 	AppliqueColor          = 15;
+	IniFile.AppStitchLen   = APSPAC;
 	BorderWidth            = BRDWID;
 	ButtonholeCornerLength = IBFCLEN;
 	IniFile.chainSpace     = CHSDEF;
