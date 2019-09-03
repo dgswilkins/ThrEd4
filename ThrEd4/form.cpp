@@ -3838,6 +3838,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 }
 
 void form::internal::rspnt(float xCoordinate, float yCoordinate) {
+	OutputDebugString(fmt::format(L"rspnt: x {},y {}\n", xCoordinate, yCoordinate).c_str());
 	BSequence->emplace_back(xCoordinate, yCoordinate, 0);
 	OutputIndex++;
 }
@@ -4301,7 +4302,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 		// Note - this debug code only works for vertical fill on a single form
 		auto bugColor = 0u;
 		for (auto iRegion = 0u; iRegion < regionCount; iRegion++) {
-			for (auto iLine = regionsList[iRegion].start; iLine <= regionsList[iRegion].end; iLine++) {
+			for (auto iLine = regions[iRegion].start; iLine <= regions[iRegion].end; iLine++) {
 				const auto* lineGroupPoint = &*sortedLines[iLine];
 				StitchBuffer->push_back(fPOINTATTR { lineGroupPoint[0].x, lineGroupPoint[0].y, bugColor });
 				StitchBuffer->push_back(fPOINTATTR { lineGroupPoint[1].x, lineGroupPoint[1].y, bugColor });
