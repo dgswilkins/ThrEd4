@@ -4512,7 +4512,7 @@ void form::internal::bakseq() {
 			if ((SelectedForm->extendedAttribute & AT_SQR) != 0u) {
 				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 					OSequence->push_back(fPOINT { bPrevious.x, bPrevious.y });
-					auto count = ceil(bCurrent.y / UserStitchLength);
+					auto count = wrap::ceil<int32_t>(bCurrent.y / UserStitchLength);
 					do {
 						OSequence->push_back(fPOINT {
 						    0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
@@ -4527,7 +4527,7 @@ void form::internal::bakseq() {
 				}
 				else {
 					OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
-					auto count = wrap::floor<uint32_t>(bCurrent.y / UserStitchLength);
+					auto count = wrap::floor<int32_t>(bCurrent.y / UserStitchLength);
 					do {
 						OSequence->push_back(fPOINT {
 						    0.0f,
@@ -4543,7 +4543,7 @@ void form::internal::bakseq() {
 				}
 			}
 			else {
-				auto count = wrap::ceil<uint32_t>(bNext.y / UserStitchLength);
+				auto count = wrap::ceil<int32_t>(bNext.y / UserStitchLength);
 				do {
 					OSequence->push_back(fPOINT {
 					    0.0f, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9 });
@@ -4561,7 +4561,7 @@ void form::internal::bakseq() {
 		}
 		case SEQBOT: {
 			if ((SelectedForm->extendedAttribute & AT_SQR) == 0u) {
-				auto count = wrap::floor<uint32_t>(bNext.y / UserStitchLength);
+				auto count = wrap::floor<int32_t>(bNext.y / UserStitchLength);
 				do {
 					OSequence->push_back(fPOINT {
 					    0.0f, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9 });
