@@ -5796,7 +5796,6 @@ void form::internal::sapliq() {
 		}
 	}
 	SelectedForm->fillType = 0u;
-	SelectedForm->type     = FRMFPOLY;
 	form::refilfn();
 }
 
