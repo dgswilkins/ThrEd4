@@ -739,7 +739,7 @@ void satin::ribon() {
 			const auto savedFormIndex = ClosestFormToCursor;
 			satin::satout(BorderWidth);
 			form::fvars(ClosestFormToCursor);
-			HorizontalLength2 = BorderWidth / 2.0f;
+			HorizontalLength2 = BorderWidth;
 			if (!FormList->empty()) {
 				FormList->push_back(FRMHED {});
 				auto& form = FormList->back();
