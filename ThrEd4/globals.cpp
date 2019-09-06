@@ -118,7 +118,6 @@ uint32_t  GroupStartStitch;      // lower end of selected stitches
 uint32_t  GroupStitchIndex;      // last point selected in group
 fs::path* HomeDirectory;         // directory from which thred was executed
 double    HorizontalLength;      // horizontal length of a clipboard fill
-float     HorizontalLength2;     // horizontal length of a clipboard fill/2
 float     HorizontalRatio;       // horizontal ratio between the zoom window and the entire stitch space
 HWND      HorizontalScrollBar;   // horizontal scroll bar
 INIFILE   IniFile;               // initialization file

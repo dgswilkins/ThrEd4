@@ -29,7 +29,7 @@ namespace clip {
 void chnfn();
 void clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex);
 void clpic(const fRECTANGLE& clipRect);
-void clpout();
+void clpout(float width);
 void delclps(uint32_t iForm);
 void deleclp(uint32_t iForm);
 void delmclp(uint32_t iForm);

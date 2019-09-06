@@ -341,9 +341,9 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 	}
 }
 
-void clip::clpout() {
+void clip::clpout(float width) {
 	if (SelectedForm->type == FRMLINE) {
-		satin::satout(HorizontalLength2);
+		satin::satout(width);
 	}
 	else {
 		satin::satout(ClipRectSize.cy);
@@ -407,7 +407,6 @@ bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
 void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
-	HorizontalLength2          = ClipRectSize.cx / 2;
 	HorizontalLength           = ClipRectSize.cx;
 	const auto clipStitchCount = ClipBuffer->size();
 	auto       clipFillData    = std::vector<fPOINT> {};
@@ -439,7 +438,7 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 		ci::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 	}
 	else {
-		clpout();
+		clpout(ClipRectSize.cx / 2);
 		auto reference     = startVertex;
 		auto currentVertex = startVertex;
 		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
@@ -813,7 +812,6 @@ void clip::clpic(const fRECTANGLE& clipRect) {
 
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
-	HorizontalLength2 = ClipRectSize.cx / 2.0f;
 	HorizontalLength  = ClipRectSize.cx;
 	ClipReference.y   = rotationCenter.y;
 	ClipReference.x   = clipRect.left;

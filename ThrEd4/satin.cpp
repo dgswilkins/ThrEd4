@@ -694,9 +694,9 @@ void satin::satbrd() {
 	}
 }
 
-void satin::internal::satends(uint32_t isBlunt) {
+void satin::internal::satends(uint32_t isBlunt, float width) {
 	if ((isBlunt & SBLNT) != 0u) {
-		auto step = fPOINT { sin((*FormAngles)[0]) * HorizontalLength2 / 2.0f, cos((*FormAngles)[0]) * HorizontalLength2 / 2.0f };
+		auto step = fPOINT { sin((*FormAngles)[0]) * width / 2.0f, cos((*FormAngles)[0]) * width / 2.0f };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -712,8 +712,8 @@ void satin::internal::satends(uint32_t isBlunt) {
 		(*InsidePoints)[0] = (*OutsidePoints)[0] = vertexIt[0];
 	}
 	if ((isBlunt & FBLNT) != 0u) {
-		auto step = fPOINT { sin((*FormAngles)[VertexCount - 2u]) * HorizontalLength2 / 2.0f,
-			                 cos((*FormAngles)[VertexCount - 2u]) * HorizontalLength2 / 2.0f };
+		auto step = fPOINT { sin((*FormAngles)[VertexCount - 2u]) * width / 2.0f,
+			                 cos((*FormAngles)[VertexCount - 2u]) * width / 2.0f };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -739,7 +739,6 @@ void satin::ribon() {
 			const auto savedFormIndex = ClosestFormToCursor;
 			satin::satout(BorderWidth);
 			form::fvars(ClosestFormToCursor);
-			HorizontalLength2 = BorderWidth;
 			if (!FormList->empty()) {
 				FormList->push_back(FRMHED {});
 				auto& form = FormList->back();
@@ -758,7 +757,7 @@ void satin::ribon() {
 					else {
 						isBlunt = 0;
 					}
-					si::satends(isBlunt);
+					si::satends(isBlunt, BorderWidth);
 					form.vertexIndex         = thred::adflt(VertexCount * 2u);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
 					vertexIt[0].x            = (*OutsidePoints)[0].x;
@@ -843,9 +842,9 @@ void satin::slbrd() {
 
 	OSequence->clear();
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
-		HorizontalLength2 = SelectedForm->borderSize * URAT;
-		satin::satout(HorizontalLength2);
-		si::satends(SelectedForm->attribute);
+		auto width = SelectedForm->borderSize * URAT;
+		satin::satout(width);
+		si::satends(SelectedForm->attribute, width);
 		StateMap.reset(StateFlag::SAT1);
 		StateMap.reset(StateFlag::FILDIR);
 		LineSpacing = USPAC;
@@ -857,9 +856,9 @@ void satin::slbrd() {
 			si::sbfn(*InsidePoints, iVertex, iVertex - 1);
 		}
 	}
-	HorizontalLength2 = SelectedForm->borderSize;
-	satin::satout(HorizontalLength2);
-	si::satends(SelectedForm->attribute);
+	auto width = SelectedForm->borderSize;
+	satin::satout(width);
+	si::satends(SelectedForm->attribute, width);
 	LineSpacing = SelectedForm->edgeSpacing;
 	StateMap.reset(StateFlag::SAT1);
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount - 1u; iVertex++) {
@@ -1416,7 +1415,7 @@ void satin::satout(float satinWidth) {
 	}
 }
 
-void satin::sbrd() {
+void satin::sbrd(float width) {
 	const auto savedSpacing = LineSpacing;
 	const auto start        = form::getlast();
 
@@ -1426,13 +1425,13 @@ void satin::sbrd() {
 	OSequence->push_back(fPOINT { 0.0, 0.0 });
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		LineSpacing = USPAC;
-		satin::satout(HorizontalLength2 * URAT);
+		satin::satout(width * URAT);
 		si::sfn(start);
 		StateMap.set(StateFlag::FILDIR);
 		si::sfn(start);
 	}
 	form::fvars(ClosestFormToCursor);
-	satin::satout(HorizontalLength2);
+	satin::satout(width);
 	LineSpacing = SelectedForm->edgeSpacing;
 	si::sfn(start);
 	LineSpacing = savedSpacing;

@@ -45,7 +45,7 @@ void     satpnt0();
 void     satpnt1();
 void     satsel();
 void     satzum();
-void     sbrd();
+void     sbrd(float width);
 bool     scomp(const SATCON& arg1, const SATCON& arg2) noexcept;
 void     slbrd();
 void     spltsat(uint32_t guideIndex);
@@ -61,7 +61,7 @@ namespace internal {
 	void sacspac(uint32_t startGuide, uint32_t guideCount);
 	void satclos();
 	void satcpy(const std::vector<SATCON>& source, uint32_t size);
-	void satends(uint32_t isBlunt);
+	void satends(uint32_t isBlunt, float width);
 	void satfn(const std::vector<float>& lengths, uint32_t line1Start, uint32_t line1End, uint32_t line2Start, uint32_t line2End);
 	void satmf(const std::vector<float>& lengths);
 	void satsbrd();

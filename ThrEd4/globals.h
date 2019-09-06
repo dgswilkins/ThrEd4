@@ -151,7 +151,6 @@ extern uint32_t  GroupStartStitch;
 extern uint32_t  GroupStitchIndex;
 extern fs::path* HomeDirectory;
 extern double    HorizontalLength;
-extern float     HorizontalLength2;
 extern float     HorizontalRatio;
 extern HWND      HorizontalScrollBar;
 extern INIFILE   IniFile;

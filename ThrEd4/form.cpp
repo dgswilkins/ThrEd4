@@ -1911,7 +1911,8 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t 
 void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
                             const std::vector<VRCT2>& fillVerticalRect,
                             uint32_t                  start,
-                            uint32_t                  finish) {
+                            uint32_t                  finish,
+                            float                     width) {
 	if (StateMap.test(StateFlag::UND)) {
 		if (StateMap.test(StateFlag::UNDPHAS)) {
 			form::filinsb(underlayVerticalRect[start].copnt);
@@ -1922,8 +1923,8 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 			if (length > SelectedForm->edgeStitchLen) {
 				const auto angle = atan2((*InsidePoints)[finish].y - (*OutsidePoints)[finish].y,
 				                         (*InsidePoints)[finish].x - (*OutsidePoints)[finish].x);
-				const auto point = fPOINT { underlayVerticalRect[finish].bopnt.x + cos(angle) * HorizontalLength2,
-					                        underlayVerticalRect[finish].bopnt.y + sin(angle) * HorizontalLength2 };
+				const auto point = fPOINT { underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
+					                        underlayVerticalRect[finish].bopnt.y + sin(angle) * width };
 				form::filinsb(point);
 			}
 			form::filinsb(underlayVerticalRect[finish].bipnt);
@@ -1938,8 +1939,8 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 			if (length > SelectedForm->edgeStitchLen) {
 				const auto angle = atan2((*OutsidePoints)[finish].y - (*InsidePoints)[finish].y,
 				                         (*OutsidePoints)[finish].x - (*InsidePoints)[finish].x);
-				const auto point = fPOINT { underlayVerticalRect[finish].bipnt.x + cos(angle) * HorizontalLength2,
-					                        underlayVerticalRect[finish].bipnt.y + sin(angle) * HorizontalLength2 };
+				const auto point = fPOINT { underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
+					                        underlayVerticalRect[finish].bipnt.y + sin(angle) * width };
 				form::filinsb(point);
 			}
 			form::filinsb(underlayVerticalRect[finish].bopnt);
@@ -1954,7 +1955,8 @@ void form::internal::duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
                          const std::vector<VRCT2>& fillVerticalRect,
                          uint32_t                  startVertex,
-                         const std::vector<VRCT2>& vrct) {
+                         const std::vector<VRCT2>& vrct,
+                         float                     width) {
 	auto currentVertex = startVertex;
 	auto nextVertex    = form::nxt(currentVertex);
 
@@ -1962,18 +1964,18 @@ void form::internal::pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	SelectedPoint = vertexIt[startVertex];
 	for (auto iVertex = 0u; iVertex < SelectedForm->vertexCount; iVertex++) {
 		duromb(vrct[currentVertex].bipnt, vrct[currentVertex].cipnt, vrct[currentVertex].bopnt, vrct[currentVertex].copnt);
-		duspnd(underlayVerticalRect, fillVerticalRect, currentVertex, nextVertex);
+		duspnd(underlayVerticalRect, fillVerticalRect, currentVertex, nextVertex, width);
 		currentVertex = nextVertex;
 		nextVertex    = form::nxt(nextVertex);
 	}
 }
 
-void form::internal::prsmal() {
+void form::internal::prsmal(float width) {
 	auto iOutput       = 0u;
-	auto minimumLength = USPAC * 0.8;
+	auto minimumLength = USPAC * 0.8f;
 
-	if (minimumLength > HorizontalLength2) {
-		minimumLength = HorizontalLength2 * 0.9;
+	if (minimumLength > width) {
+		minimumLength = width * 0.9f;
 	}
 	auto iReference = 0u;
 	for (auto iSequence = 1u; iSequence < wrap::toUnsigned(OSequence->size()); iSequence++) {
@@ -2009,20 +2011,19 @@ void form::internal::pbrd(float edgeSpacing) {
 		StateMap.reset(StateFlag::SAT1);
 		LineSpacing = USPAC;
 		StateMap.set(StateFlag::UND);
-		HorizontalLength2 = SelectedForm->borderSize * URAT;
-		satin::satout(HorizontalLength2);
+		const auto width = SelectedForm->borderSize * URAT;
+		satin::satout(width);
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.set(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect);
+		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect, width);
 		StateMap.reset(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect);
+		pfn(underlayVerticalRect, fillVerticalRect, start, underlayVerticalRect, width);
 		LineSpacing = edgeSpacing;
-		prsmal();
-		HorizontalLength2 = SelectedForm->borderSize;
+		prsmal(width);
 		StateMap.reset(StateFlag::UND);
 	}
-	pfn(underlayVerticalRect, fillVerticalRect, start, fillVerticalRect);
+	pfn(underlayVerticalRect, fillVerticalRect, start, fillVerticalRect, SelectedForm->borderSize);
 	LineSpacing = spacing;
 }
 
@@ -2141,24 +2142,20 @@ void form::internal::chkbrd() {
 			break;
 		}
 		case EDGEANGSAT: { // Angle Satin
-			HorizontalLength2 = SelectedForm->borderSize;
-			satin::sbrd();
+			satin::sbrd(SelectedForm->borderSize);
 			break;
 		}
 		case EDGEPROPSAT: { // Proportional Satin
-			HorizontalLength2 = SelectedForm->borderSize;
 			pbrd(SelectedForm->edgeSpacing);
 			break;
 		}
 		case EDGEAPPL: { // Applique
 			apbrd();
 			ritapbrd();
-			HorizontalLength2 = SelectedForm->borderSize;
-			satin::sbrd();
+			satin::sbrd(SelectedForm->borderSize);
 			break;
 		}
 		case EDGEBHOL: { // BH Buttonhole
-			HorizontalLength2      = SelectedForm->borderSize * 2.0f;
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(20);
@@ -2348,12 +2345,13 @@ void form::internal::prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormV
 
 void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
                           const std::vector<VRCT2>& fillVerticalRect,
-                          const std::vector<VRCT2>& prct) {
+                          const std::vector<VRCT2>& prct,
+                          float                     width) {
 	duromb(prct[1].aipnt, prct[1].cipnt, prct[1].aopnt, prct[1].copnt);
-	duspnd(underlayVerticalRect, fillVerticalRect, 1, 2);
+	duspnd(underlayVerticalRect, fillVerticalRect, 1, 2, width);
 	for (auto iVertex = 2u; iVertex < VertexCount - 4u; iVertex++) {
 		duromb(prct[iVertex].bipnt, prct[iVertex].cipnt, prct[iVertex].bopnt, prct[iVertex].copnt);
-		duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1u);
+		duspnd(underlayVerticalRect, fillVerticalRect, iVertex, iVertex + 1u, width);
 	}
 	duromb(
 	    prct[VertexCount - 4u].bipnt, prct[VertexCount - 4u].dipnt, prct[VertexCount - 4u].bopnt, prct[VertexCount - 4u].dopnt);
@@ -2415,24 +2413,24 @@ void form::internal::plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fP
 	if ((SelectedForm->edgeType & EGUND) != 0u) {
 		LineSpacing = USPAC;
 		StateMap.set(StateFlag::UND);
-		HorizontalLength2 = SelectedForm->borderSize * URAT;
+		const auto width = SelectedForm->borderSize * URAT;
 		StateMap.set(StateFlag::UNDPHAS);
 		StateMap.reset(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
+		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width);
 		const auto savedIndex = wrap::toUnsigned(OSequence->size());
 		StateMap.reset(StateFlag::UNDPHAS);
 		SelectedPoint = vertexIt[0];
 		StateMap.set(StateFlag::FILDIR);
-		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect);
+		plfn(underlayVerticalRect, fillVerticalRect, underlayVerticalRect, width);
 		plbak(savedIndex);
-		prsmal();
+		prsmal(width);
 		if (!OSequence->empty()) { // ensure that we can do a valid read from OSequence
 			SelectedPoint = OSequence->back();
 		}
 	}
 	StateMap.reset(StateFlag::UND);
 	LineSpacing = SelectedForm->edgeSpacing;
-	plfn(underlayVerticalRect, fillVerticalRect, fillVerticalRect);
+	plfn(underlayVerticalRect, fillVerticalRect, fillVerticalRect, SelectedForm->borderSize);
 	LineSpacing = edgeSpacing;
 	form::fvars(ClosestFormToCursor);
 }
@@ -4782,7 +4780,6 @@ void form::refilfn() {
 	textureSegments.resize(SelectedForm->fillInfo.texture.lines);
 	switch (SelectedForm->type) {
 	case FRMLINE: {
-		HorizontalLength2 = SelectedForm->borderSize;
 		switch (SelectedForm->edgeType & NEGUND) {
 		case EDGELINE: {
 			fi::brdfil(SelectedForm->edgeStitchLen);
@@ -4797,7 +4794,7 @@ void form::refilfn() {
 		case EDGECLIP: {
 			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clip::clpout();
+			clip::clpout(SelectedForm->borderSize);
 			clip::clpbrd(clipRect, 0);
 			fi::ritbrd();
 			break;
@@ -4825,7 +4822,6 @@ void form::refilfn() {
 			break;
 		}
 		case EDGEBHOL: {
-			HorizontalLength2      = 2.0f * SelectedForm->borderSize;
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(20);
@@ -5732,8 +5728,7 @@ void form::internal::fsclp() {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	HorizontalLength2 = ClipRectSize.cy / 2;
-	clip::clpout();
+	clip::clpout(ClipRectSize.cy / 2);
 	form::refilfn();
 }
 
@@ -7364,7 +7359,7 @@ void form::cpylayr(uint32_t codedLayer) {
 				for (auto currentStitch = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch;
 				     currentStitch++) {
 					StitchBuffer->push_back(fPOINTATTR {
-					    (*currentStitch).x, (*currentStitch).y, (*currentStitch).attribute & NLAYMSK | codedStitchLayer });
+					    (*currentStitch).x, (*currentStitch).y, ((*currentStitch).attribute & NLAYMSK) | codedStitchLayer });
 				}
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
@@ -7388,7 +7383,7 @@ void form::movlayr(uint32_t codedLayer) {
 			if ((stitch.attribute & ALTYPMSK) != 0u) {
 				const auto iCurrentForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (formMap.test(iCurrentForm)) {
-					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
+					stitch.attribute = (stitch.attribute & NLAYMSK) | codedStitchLayer;
 				}
 			}
 		}
@@ -7404,7 +7399,7 @@ void form::movlayr(uint32_t codedLayer) {
 			StateMap.reset(StateFlag::FORMSEL);
 			for (auto& stitch : *StitchBuffer) {
 				if (((stitch.attribute & ALTYPMSK) != 0u) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
-					stitch.attribute = stitch.attribute & NLAYMSK | codedStitchLayer;
+					stitch.attribute = (stitch.attribute & NLAYMSK) | codedStitchLayer;
 				}
 			}
 			StateMap.set(StateFlag::RESTCH);
@@ -7414,7 +7409,7 @@ void form::movlayr(uint32_t codedLayer) {
 				thred::savdo();
 				thred::rngadj();
 				for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].attribute = (*StitchBuffer)[iStitch].attribute & NLAYMSK | codedStitchLayer;
+					(*StitchBuffer)[iStitch].attribute = ((*StitchBuffer)[iStitch].attribute & NLAYMSK) | codedStitchLayer;
 				}
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -7737,7 +7732,6 @@ void form::internal::fspic() {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	HorizontalLength2 = ClipRectSize.cy / 2;
 	form::refilfn();
 }
 

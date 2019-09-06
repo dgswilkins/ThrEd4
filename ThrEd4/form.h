@@ -286,7 +286,8 @@ namespace internal {
 	void  duspnd(const std::vector<VRCT2>& underlayVerticalRect,
 	             const std::vector<VRCT2>& fillVerticalRect,
 	             uint32_t                  start,
-	             uint32_t                  finish);
+	             uint32_t                  finish,
+	             float                     width);
 	void  filsclp();
 	void  filsfn();
 	float findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept;
@@ -399,18 +400,20 @@ namespace internal {
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
 	           const std::vector<VRCT2>& fillVerticalRect,
 	           uint32_t                  startVertex,
-	           const std::vector<VRCT2>& vrct);
+	           const std::vector<VRCT2>& vrct,
+	           float                     width);
 	void   plbak(uint32_t backPoint);
 	void   plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	void   plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	            const std::vector<VRCT2>& fillVerticalRect,
-	            const std::vector<VRCT2>& prct);
+	            const std::vector<VRCT2>& prct,
+	            float                     width);
 	void   prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	bool   proj(const fPOINT& point, float slope, const fPOINT& point0, const fPOINT& point1, fPOINT& intersectionPoint) noexcept;
 	bool   projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept;
 	bool   projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept;
 	void   prpsbrd();
-	void   prsmal();
+	void   prsmal(float width);
 	void   px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
 	void   rats();
 	bool   regclos(std::vector<uint32_t>&        groupIndexSequence,
