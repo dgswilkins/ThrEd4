@@ -1,0 +1,29 @@
+---
+Checks:            '\
+boost-*,\
+bugprone-*,\
+cert-*,-cert-dcl16-c,\
+clang-analyzer-core*,\
+clang-analyzer-cplusplus*,\
+clang-analyzer-deadcode*,\
+clang-analyzer-nullability*,\
+clang-analyzer-optin.cplusplus.UninitializedObject,\
+clang-analyzer-optin.performance*,\
+clang-analyzer-optin.portability*,\
+clang-analyzer-security*,\
+clang-analyzer-unix*,\
+clang-analyzer-valist*,\
+cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,\
+google-*,-google-runtime-references,\
+llvm-*,-llvm-include-order,\
+misc-*,\
+modernize-*,\
+nullability-*,\
+performance-*,\
+portability-*,\
+readability-*,\
+'
+WarningsAsErrors:  ''
+HeaderFilterRegex: 'ThrEd4\\*\.(h|hxx|cxx)$'
+FormatStyle:       'file'
+User:              dwilkins
