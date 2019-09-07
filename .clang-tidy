@@ -1,5 +1,5 @@
 ---
-Checks:            '\
+Checks:            "\
 boost-*,\
 bugprone-*,\
 cert-*,-cert-dcl16-c,\
@@ -22,7 +22,7 @@ nullability-*,\
 performance-*,\
 portability-*,\
 readability-*,\
-'
+"
 WarningsAsErrors:  ''
 HeaderFilterRegex: 'ThrEd4\\*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
