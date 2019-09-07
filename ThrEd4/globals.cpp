@@ -100,7 +100,7 @@ std::vector<POINT>* FormControlPoints; // form control rectangle in pixel coordi
 HWND                 FormDataSheet = nullptr; // form data sheet
 std::vector<POINT>*  FormLines;               // used in the form drawing routines
 std::vector<FRMHED>* FormList;                // a list of form headers
-uint32_t             FormMenuChoice = 0u;     // data type for form data form numerical entry
+uint32_t             FormMenuChoice = 0U;     // data type for form data form numerical entry
 fPOINT               FormMoveDelta;           // offset for moving forms
 
 std::wstring* FormOnOff;
@@ -252,7 +252,7 @@ HWND               VerticalScrollBar;                    // vertical scroll bar
 fs::path*          WorkingFileName;                      //
 POINT              ZoomBoxLine[5];                       // the zoom box
 fPOINT             ZoomBoxOrigin;                        // zoom box origin
-float              ZoomFactor = 1.0f;                    // zoom factor
+float              ZoomFactor = 1.0F;                    // zoom factor
 fPOINT             ZoomMarkPoint;                        // stitch coordinates of the zoom mark
 fPOINT             ZoomRatio;                            // zoom ratio used to draw stitch window
 fRECTANGLE         ZoomRect;                             // zoom rectangle

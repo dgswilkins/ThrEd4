@@ -17,42 +17,42 @@ constexpr auto COLOR_COUNT = 16;       // Number of colors in arrays
 constexpr auto SRTIM       = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes
-constexpr auto DAZPETS = 5u;  // petals
-constexpr auto DAZCNT  = 10u; // petal points
-constexpr auto DAZICNT = 2u;  // petal inner points
-constexpr auto DAZLEN  = 15u; // diameter
-constexpr auto DAZPLEN = 20u; // petal length
-constexpr auto DAZHLEN = 5u;  // hole size
-constexpr auto DAZTYP  = 5u;  // border type
-constexpr auto DAZMCNT = 7u;  // mirror count
+constexpr auto DAZPETS = 5U;  // petals
+constexpr auto DAZCNT  = 10U; // petal points
+constexpr auto DAZICNT = 2U;  // petal inner points
+constexpr auto DAZLEN  = 15U; // diameter
+constexpr auto DAZPLEN = 20U; // petal length
+constexpr auto DAZHLEN = 5U;  // hole size
+constexpr auto DAZTYP  = 5U;  // border type
+constexpr auto DAZMCNT = 7U;  // mirror count
 // end of daisy codes
 
-constexpr float    TXTRAT   = 0.95f;       // texture fill clipboard shrink/grow ratio
-constexpr uint32_t MAXMSK   = 0xffff0000u; // for checking for greater than 65536
-constexpr uint16_t DEFBPIX  = 4u;          // default form box pixels
-constexpr float    MAXWLK   = 54.0f;       // max underlay/edge walk stitch length
-constexpr float    MINWLK   = 2.4f;        // max underlay/edge walk stitch length
-constexpr float    DEFULEN  = 12.0f;       // default underlay stitch length
-constexpr float    DEFUSPAC = 6.0f;        // default underlay stitch spacing
-constexpr float    DEFLRAT  = 0.8f;        // default lens form aspect ratio
-constexpr uint16_t IWAVPNTS = 36u;         // default wave points
-constexpr uint16_t IWAVSTRT = 10u;         // default wave start
-constexpr uint16_t IWAVEND  = 26u;         // default wave end
-constexpr uint16_t IWAVS    = 5u;          // default wave lobes
-constexpr uint32_t THRLED0  = 0x746872u;   // lead dword value for thred file v 1.0
-constexpr uint32_t THRLED1  = 0x1746872u;  // lead dword value for thred file v 1.1
-constexpr float    ZUMFCT   = 0.65f;       // zoom factor
-constexpr float    PAGSCROL = 0.9f;        // page scroll factor
-constexpr float    LINSCROL = 0.05f;       // line scroll factor
-constexpr uint32_t TXTSIDS  = 6u;          // extra pixels in a text box
-constexpr uint32_t MAXITEMS = 0x10000u;    // maximum number of stitches, sequence items & clipboard points
-constexpr uint32_t MAXCHNG  = 10000u;      // maximum number of color changes
-constexpr float    SHUPX    = 480.0f;      // small hoop x size
-constexpr float    SHUPY    = 480.0f;      // small hoop y size
-constexpr float    LHUPX    = 719.0f;      // large hoop x size
-constexpr float    LHUPY    = 690.0f;      // large hoop y size
-constexpr float    HUP100XY = 600.0f;      // 100 millimeter hoop size
-constexpr float    PFGRAN   = 6.0f;        // pfaff "pixels" per millimeter
+constexpr float    TXTRAT   = 0.95F;       // texture fill clipboard shrink/grow ratio
+constexpr uint32_t MAXMSK   = 0xffff0000U; // for checking for greater than 65536
+constexpr uint16_t DEFBPIX  = 4U;          // default form box pixels
+constexpr float    MAXWLK   = 54.0F;       // max underlay/edge walk stitch length
+constexpr float    MINWLK   = 2.4F;        // max underlay/edge walk stitch length
+constexpr float    DEFULEN  = 12.0F;       // default underlay stitch length
+constexpr float    DEFUSPAC = 6.0F;        // default underlay stitch spacing
+constexpr float    DEFLRAT  = 0.8F;        // default lens form aspect ratio
+constexpr uint16_t IWAVPNTS = 36U;         // default wave points
+constexpr uint16_t IWAVSTRT = 10U;         // default wave start
+constexpr uint16_t IWAVEND  = 26U;         // default wave end
+constexpr uint16_t IWAVS    = 5U;          // default wave lobes
+constexpr uint32_t THRLED0  = 0x746872U;   // lead dword value for thred file v 1.0
+constexpr uint32_t THRLED1  = 0x1746872U;  // lead dword value for thred file v 1.1
+constexpr float    ZUMFCT   = 0.65F;       // zoom factor
+constexpr float    PAGSCROL = 0.9F;        // page scroll factor
+constexpr float    LINSCROL = 0.05F;       // line scroll factor
+constexpr uint32_t TXTSIDS  = 6U;          // extra pixels in a text box
+constexpr uint32_t MAXITEMS = 0x10000U;    // maximum number of stitches, sequence items & clipboard points
+constexpr uint32_t MAXCHNG  = 10000U;      // maximum number of color changes
+constexpr float    SHUPX    = 480.0F;      // small hoop x size
+constexpr float    SHUPY    = 480.0F;      // small hoop y size
+constexpr float    LHUPX    = 719.0F;      // large hoop x size
+constexpr float    LHUPY    = 690.0F;      // large hoop y size
+constexpr float    HUP100XY = 600.0F;      // 100 millimeter hoop size
+constexpr float    PFGRAN   = 6.0F;        // pfaff "pixels" per millimeter
 constexpr double   TSIZ30   = 0.3;         // #30 thread size in millimeters
 constexpr double   TSIZ40   = 0.2;         // #40 thread size in millimeters
 constexpr double   TSIZ60   = 0.05;        // #60 thread size in millimeters
@@ -60,99 +60,99 @@ constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll ba
 constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
-constexpr float    ZMARGIN    = 1.25f;             // zoom margin for select zooms
-constexpr float    SMALSIZ    = 0.25f;             // default small stitch size
-constexpr float    MINSIZ     = 0.1f;              // default minimum stitch size
-constexpr float    USESIZ     = 3.5f;              // user preferred size
+constexpr float    ZMARGIN    = 1.25F;             // zoom margin for select zooms
+constexpr float    SMALSIZ    = 0.25F;             // default small stitch size
+constexpr float    MINSIZ     = 0.1F;              // default minimum stitch size
+constexpr float    USESIZ     = 3.5F;              // user preferred size
 constexpr double   MAXSIZ     = 9.0;               // default maximum stitch size
-constexpr float    PFAFGRAN   = 6.0f;              // pfaf stitch points per millimeter
+constexpr float    PFAFGRAN   = 6.0F;              // pfaf stitch points per millimeter
 constexpr int32_t  MINZUM     = 5;                 // minimum zoom in stitch points
 constexpr double   SHOPNTS    = 0.00;              // show stitch points when zoom below this
 constexpr double   STCHBOX    = 0.4226;            // show stitch boxes when zoom below this
-constexpr uint32_t BITCOL     = 0xffff00u;         // default bitmap color
-constexpr uint32_t MAXFORMS   = 1024u;             // maximum number of forms
+constexpr uint32_t BITCOL     = 0xffff00U;         // default bitmap color
+constexpr uint32_t MAXFORMS   = 1024U;             // maximum number of forms
 constexpr double   FORMFCT    = 0.05;              // new forms part of screen
 constexpr int32_t  MAXDELAY   = 600;               // maximum movie time step
 constexpr int32_t  MINDELAY   = 1;                 // minimum movie time step
 constexpr int32_t  MOVITIM    = 12;                // default movie time
-constexpr float    DEFSPACE   = 0.45f;             // default stitch spacing
-constexpr float    DEFANG     = 0.7853981f;        // default fill angle, 45 degrees
-constexpr uint32_t MAXFRMLINS = 20000u;            // maximum lines in a form
-constexpr uint32_t MSGSIZ     = 8192u;             // size of the message buffer
-constexpr float    PI_F       = 3.1415927f;        // PI to single precision
-constexpr float    PI_F2      = PI_F * 2.0f;       //
+constexpr float    DEFSPACE   = 0.45F;             // default stitch spacing
+constexpr float    DEFANG     = 0.7853981F;        // default fill angle, 45 degrees
+constexpr uint32_t MAXFRMLINS = 20000U;            // maximum lines in a form
+constexpr uint32_t MSGSIZ     = 8192U;             // size of the message buffer
+constexpr float    PI_F       = 3.1415927F;        // PI to single precision
+constexpr float    PI_F2      = PI_F * 2.0F;       //
 constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
 constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
-constexpr float    USPAC      = 15.0f;             // underlay fill spacing
-constexpr float    APSPAC     = 10.8f;             // applique border spacing
-constexpr uint32_t OSEQLEN    = 0x40000u;          // output sequence length
-constexpr uint32_t BSEQLEN    = OSEQLEN * 2u;      // reverse sequence length
-constexpr float    URAT       = 0.75f;             // ratio of underlay stitch to satin border size
+constexpr float    USPAC      = 15.0F;             // underlay fill spacing
+constexpr float    APSPAC     = 10.8F;             // applique border spacing
+constexpr uint32_t OSEQLEN    = 0x40000U;          // output sequence length
+constexpr uint32_t BSEQLEN    = OSEQLEN * 2U;      // reverse sequence length
+constexpr float    URAT       = 0.75F;             // ratio of underlay stitch to satin border size
 constexpr double   PURAT      = 0.6;               // for proportional satin corners
 
-constexpr float DIURAT = (1.0f - URAT) / 2.0f;        //(1-URAT)/2
-constexpr float DOURAT = (1.0f - URAT) / 2.0f + URAT; //(1-URAT)/2+URAT
+constexpr float DIURAT = (1.0F - URAT) / 2.0F;        //(1-URAT)/2
+constexpr float DOURAT = (1.0F - URAT) / 2.0F + URAT; //(1-URAT)/2+URAT
 
-constexpr float    MINRCT    = 12.0f;           // minimum dimension of a form select rectangle
-constexpr uint32_t OLDNUM    = 4u;              // number of old filenames saved on file menu
+constexpr float    MINRCT    = 12.0F;           // minimum dimension of a form select rectangle
+constexpr uint32_t OLDNUM    = 4U;              // number of old filenames saved on file menu
 constexpr int8_t   OLDVER    = 4;               // number of old file versions kept
-constexpr float    TINY      = 1e-6f;           // tiny number for floating point stuff
+constexpr float    TINY      = 1e-6F;           // tiny number for floating point stuff
 constexpr int32_t  SPEDLIN   = 30;              // speed change for line message on speed scroll bar
 constexpr int32_t  SPEDPAG   = 120;             // speed change for page message on speed scroll bar
 constexpr int32_t  KNOTLEN   = 54;              // set knots for stitches longer than this
 constexpr int32_t  MAXKNOTS  = 16384;           // maximum number of knots
-constexpr float    IBFCLEN   = (4.0f * PFGRAN); // initial buttonhole fill corner length
-constexpr float    IPICSPAC  = 6.0f;            // initial picot border space
+constexpr float    IBFCLEN   = (4.0F * PFGRAN); // initial buttonhole fill corner length
+constexpr float    IPICSPAC  = 6.0F;            // initial picot border space
 constexpr int32_t  PRFLINS   = 30;              // number of lines on the preference menu
-constexpr uint32_t EDGETYPS  = 12u;             // number of border fill types
-constexpr uint32_t SEED      = 3037000499u;     // pseudo-random-sequence seed
-constexpr uint32_t FSED      = 1340007303u;     // feather sequence seed
-constexpr double   HUPS      = 5u;              // number of hoops the user can select
-constexpr uint32_t NORDSED   = 0x5a5a5a5au;     // name order seed
-constexpr uint32_t NCODSED   = 0x73ef5a7eu;     // name encoding seed
-constexpr uint8_t  NCODOF    = 80u;             // name encoding offset
+constexpr uint32_t EDGETYPS  = 12U;             // number of border fill types
+constexpr uint32_t SEED      = 3037000499U;     // pseudo-random-sequence seed
+constexpr uint32_t FSED      = 1340007303U;     // feather sequence seed
+constexpr double   HUPS      = 5U;              // number of hoops the user can select
+constexpr uint32_t NORDSED   = 0x5a5a5a5aU;     // name order seed
+constexpr uint32_t NCODSED   = 0x73ef5a7eU;     // name encoding seed
+constexpr uint8_t  NCODOF    = 80U;             // name encoding offset
 constexpr double   CLPMIN    = 0.5;             // if clipboard data less wide, then don't fill
-constexpr float    CLPMINAUT = 1.2f;            // for skinny vertical clips
-constexpr float    BRDWID    = 18.0f;           // default satin border size
-constexpr float    SNPLEN    = 0.15f;           // default snap together length size
-constexpr float    STARAT    = 0.4f;            // default star ratio
-constexpr float    SPIRWRAP  = 1.52f;           // default spiral wrap
-constexpr uint32_t BALNORM   = 0x80u;           // normal balarad stitch
-constexpr uint32_t BALJUMP   = 0x81u;           // balarad jump stitch
-constexpr uint32_t BALSTOP   = 0u;              // balarad stop
-constexpr uint32_t COLVER    = 0x776874u;       // color file version
-constexpr uint32_t REDCOL    = 0x0000ffu;       // code for the color red
-constexpr uint32_t GRNCOL    = 0x00ff00u;       // code for the color green
-constexpr uint32_t BLUCOL    = 0xff0000u;       // code for the color blue
-constexpr uint32_t REDMSK    = 0xffff00u;       // mask for the color red
-constexpr uint32_t GRNMSK    = 0xff00ffu;       // mask for the color green
-constexpr uint32_t BLUMSK    = 0x00ffffu;       // mask for the color blue
-constexpr float    TRACLEN   = 1.0f;            // initial trace length
-constexpr float    TRACRAT   = 1.00001f;        // initial trace ratio
-constexpr float    CHSDEF    = 24.0f;           // default chain stitch length
+constexpr float    CLPMINAUT = 1.2F;            // for skinny vertical clips
+constexpr float    BRDWID    = 18.0F;           // default satin border size
+constexpr float    SNPLEN    = 0.15F;           // default snap together length size
+constexpr float    STARAT    = 0.4F;            // default star ratio
+constexpr float    SPIRWRAP  = 1.52F;           // default spiral wrap
+constexpr uint32_t BALNORM   = 0x80U;           // normal balarad stitch
+constexpr uint32_t BALJUMP   = 0x81U;           // balarad jump stitch
+constexpr uint32_t BALSTOP   = 0U;              // balarad stop
+constexpr uint32_t COLVER    = 0x776874U;       // color file version
+constexpr uint32_t REDCOL    = 0x0000ffU;       // code for the color red
+constexpr uint32_t GRNCOL    = 0x00ff00U;       // code for the color green
+constexpr uint32_t BLUCOL    = 0xff0000U;       // code for the color blue
+constexpr uint32_t REDMSK    = 0xffff00U;       // mask for the color red
+constexpr uint32_t GRNMSK    = 0xff00ffU;       // mask for the color green
+constexpr uint32_t BLUMSK    = 0x00ffffU;       // mask for the color blue
+constexpr float    TRACLEN   = 1.0F;            // initial trace length
+constexpr float    TRACRAT   = 1.00001F;        // initial trace ratio
+constexpr float    CHSDEF    = 24.0F;           // default chain stitch length
 constexpr double   CHRDEF    = 0.25;            // default chain stitch ratio
-constexpr float    NUGINI    = 2.0f;            // default nudge step
-constexpr uint16_t DEFPIX    = 2u;              // default nudge pixels
+constexpr float    NUGINI    = 2.0F;            // default nudge step
+constexpr uint16_t DEFPIX    = 2U;              // default nudge pixels
 constexpr double   DEFEGRAT  = 1.5;             // default egg ratio
-constexpr uint16_t DEFPNTPIX = 4u;              // default form and stitch point32_t pixels
+constexpr uint16_t DEFPNTPIX = 4U;              // default form and stitch point32_t pixels
 constexpr int32_t  HBUFSIZ   = 1024;            // help buffer size
-constexpr uint32_t HIGRD     = 0xffffffu;       // grid high color
-constexpr uint32_t MEDGRD    = 0x404040u;       // grid medium color
-constexpr uint32_t DEFGRD    = 0x202020u;       // grid default color
-constexpr uint32_t REDGRD    = 0xff2020u;       // grid red color
-constexpr uint32_t BLUGRD    = 0x20ff20u;       // grid green color
-constexpr uint32_t GRNGRD    = 0x2020ffu;       // grid blue color
-constexpr float    FDEFRAT   = 0.6f;            // default feather ratio
-constexpr uint8_t  FDEFUP    = 10u;             // default feather up count
+constexpr uint32_t HIGRD     = 0xffffffU;       // grid high color
+constexpr uint32_t MEDGRD    = 0x404040U;       // grid medium color
+constexpr uint32_t DEFGRD    = 0x202020U;       // grid default color
+constexpr uint32_t REDGRD    = 0xff2020U;       // grid red color
+constexpr uint32_t BLUGRD    = 0x20ff20U;       // grid green color
+constexpr uint32_t GRNGRD    = 0x2020ffU;       // grid blue color
+constexpr float    FDEFRAT   = 0.6F;            // default feather ratio
+constexpr uint8_t  FDEFUP    = 10U;             // default feather up count
 constexpr uint8_t  FDEFDWN   = 5;               // default feather down count
-constexpr float    FDEFFLR   = 9.0f;            // default feather floor
-constexpr uint16_t FDEFNUM   = 10u;             // default feather number
-constexpr float    ITXHI     = (9.0f * PFGRAN); // default texture editor height
-constexpr float    ITXWID    = (9.0f * PFGRAN); // default texture editor width
-constexpr float    ITXSPAC   = (0.4f * PFGRAN); // default texture editor spacing
-constexpr uint16_t ITXPIX    = 5u;              // default texture editor cross pixels
-constexpr uint32_t ITXBUFLEN = 16u;             // texture buffer depth
+constexpr float    FDEFFLR   = 9.0F;            // default feather floor
+constexpr uint16_t FDEFNUM   = 10U;             // default feather number
+constexpr float    ITXHI     = (9.0F * PFGRAN); // default texture editor height
+constexpr float    ITXWID    = (9.0F * PFGRAN); // default texture editor width
+constexpr float    ITXSPAC   = (0.4F * PFGRAN); // default texture editor spacing
+constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross pixels
+constexpr uint32_t ITXBUFLEN = 16U;             // texture buffer depth
 
 enum stringLabel
 {
@@ -671,7 +671,7 @@ enum edgeFillStyles
 // form types
 enum formStyles
 {
-	FRMLINE = 1u, // Line form
+	FRMLINE = 1U, // Line form
 	FRMFPOLY,     // Freehand polygon form
 	FRMRPOLY,     // Regular polygon form
 	FRMSTAR,      // Star form
@@ -751,8 +751,8 @@ enum clipDataType
 };
 
 // edge underlay bit
-constexpr auto EGUND  = 0x80u;
-constexpr auto NEGUND = 0x7fu;
+constexpr auto EGUND  = 0x80U;
+constexpr auto NEGUND = 0x7fU;
 
 // form data lines
 enum formData
@@ -827,10 +827,10 @@ enum fillStyles
 	TXANGF,   // Angle texture fill
 };
 
-constexpr auto MCLPF    = 1u << static_cast<uint32_t>(CLPF);
-constexpr auto MVCLPF   = 1u << static_cast<uint32_t>(VCLPF);
-constexpr auto MHCLPF   = 1u << static_cast<uint32_t>(HCLPF);
-constexpr auto MANGCLPF = 1u << static_cast<uint32_t>(ANGCLPF);
+constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
+constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
+constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
+constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 
 // preference window
 enum preferenceItems
@@ -963,90 +963,90 @@ class INIFILE // ini file structure
 {
 public:
 	char     defaultDirectory[180] { 0 };                   // default directory
-	COLORREF stitchColors[COLOR_COUNT] { 0u };              // colors
-	COLORREF stitchPreferredColors[COLOR_COUNT] { 0u };     // stitch preference colors
-	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0u }; // background preference colors
-	COLORREF backgroundColor { 0u };                        // background color
-	COLORREF bitmapColor { 0u };                            // bitmap color
-	float    minStitchLength { 0.0f };                      // minimum stitch length
+	COLORREF stitchColors[COLOR_COUNT] { 0U };              // colors
+	COLORREF stitchPreferredColors[COLOR_COUNT] { 0U };     // stitch preference colors
+	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0U }; // background preference colors
+	COLORREF backgroundColor { 0U };                        // background color
+	COLORREF bitmapColor { 0U };                            // bitmap color
+	float    minStitchLength { 0.0F };                      // minimum stitch length
 	double   showStitchThreshold { 0.0 };                   // show stitch points
 	double   threadSize30 { 0.0 };                          // millimeter size of 30 weight thread
 	double   threadSize40 { 0.0 };                          // millimeter size of 40 weight thread
 	double   threadSize60 { 0.0 };                          // millimeter size of 60 weight thread
-	float    userStitchLength { 0.0f };                     // user stitch length
-	float    maxStitchLength { 0.0f };                      // maximum stitch length
-	float    smallStitchLength { 0.0f };                    // small stitch size
+	float    userStitchLength { 0.0F };                     // user stitch length
+	float    maxStitchLength { 0.0F };                      // maximum stitch length
+	float    smallStitchLength { 0.0F };                    // small stitch size
 	double   stitchBoxesThreshold { 0.0 };                  // show sitch box level
-	float    stitchSpace { 0.0f };                          // stitch spacing between lines of stitches
-	float    fillAngle { 0.0f };                            // fill angle
-	uint32_t userFlagMap { 0u };                            // bitmap for user variables
-	float    borderWidth { 0.0f };                          // border width
-	uint32_t appliqueColor { 0u };                          // applique color
+	float    stitchSpace { 0.0F };                          // stitch spacing between lines of stitches
+	float    fillAngle { 0.0F };                            // fill angle
+	uint32_t userFlagMap { 0U };                            // bitmap for user variables
+	float    borderWidth { 0.0F };                          // border width
+	uint32_t appliqueColor { 0U };                          // applique color
 	char     prevNames[OLDNUM][_MAX_PATH] { { 0 } };        // last file names
-	float    snapLength { 0.0f };                           // snap together length
-	float    starRatio { 0.0f };                            // star ratio
-	float    spiralWrap { 0.0f };                           // spiral wrap
-	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0u }; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
-	float    buttonholeCornerLength { 0.0f };            // buttonhole fill corner length
-	float    picotSpace { 0.0f };                        // space between border picots
+	float    snapLength { 0.0F };                           // snap together length
+	float    starRatio { 0.0F };                            // star ratio
+	float    spiralWrap { 0.0F };                           // spiral wrap
+	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0U }; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
+	float    buttonholeCornerLength { 0.0F };            // buttonhole fill corner length
+	float    picotSpace { 0.0F };                        // space between border picots
 	int8_t   hoopType { 0 };                             // hoop type
 	int8_t   auxFileType { 0 };                          // machine file type
-	float    hoopSizeX { 0.0f };                         // hoop x size
-	float    hoopSizeY { 0.0f };                         // hoop y size
-	float    rotationAngle { 0.0f };                     // rotation angle
-	float    gridSize { 0.0f };                          // grid size
-	float    clipOffset { 0.0f };                        // clipboard offset
+	float    hoopSizeX { 0.0F };                         // hoop x size
+	float    hoopSizeY { 0.0F };                         // hoop y size
+	float    rotationAngle { 0.0F };                     // rotation angle
+	float    gridSize { 0.0F };                          // grid size
+	float    clipOffset { 0.0F };                        // clipboard offset
 	RECT     initialWindowCoords { 0, 0, 0, 0 };         // initial window coordinates
-	COLORREF gridColor { 0u };                           // grid color
-	uint32_t fillPhase { 0u };                           // clipboard fill phase
-	float    customHoopX { 0.0f };                       // custom hoop width
-	float    customHoopY { 0.0f };                       // custom hoop height
-	float    traceLength { 0.0f };                       // lens points
-	float    traceRatio { 0.0f };                        // trace ratio
-	float    chainSpace { 0.0f };                        // chain space
-	float    chainRatio { 0.0f };                        // chain ratio
-	float    lensRatio { 0.0f };                         // lens aspect ratio
-	float    AppStitchLen { 0.0f };                      // Applique stitch length
-	float    cursorNudgeStep { 0.0f };                   // cursor nudge step
-	uint16_t nudgePixels { 0u };                         // nudge pixels
-	float    eggRatio { 0.0f };                          // egg ratio
-	uint16_t stitchSizePixels { 0u };                    // size of stitch points in pixels
-	uint16_t formVertexSizePixels { 0u };                // size of form points in pixels
-	uint16_t formSides { 0u };                           // sides of a created form
-	float    tearTailLength { 0.0f };                    // length of the tear tail
-	float    tearTwistStep { 0.0f };                     // tear twist step
-	float    tearTwistRatio { 0.0f };                    // tear twist ratio
-	uint16_t wavePoints { 0u };                          // wave points
-	uint16_t waveStart { 0u };                           // wave strting point
-	uint16_t waveEnd { 0u };                             // wave ending point;
-	uint16_t waveLobes { 0u };                           // wave lobes
-	uint8_t  featherFillType { 0u };                     // feather fill type
-	uint8_t  featherUpCount { 0u };                      // feather up count
-	uint8_t  featherDownCount { 0u };                    // feather down count
-	uint8_t  featherType { 0u };                         // feather bits
-	float    featherRatio { 0.0f };                      // feather ratio
-	float    featherMinStitchSize { 0.0f };              // feather floor
-	uint16_t featherCount { 0u };                        // feather fill psg granularity
+	COLORREF gridColor { 0U };                           // grid color
+	uint32_t fillPhase { 0U };                           // clipboard fill phase
+	float    customHoopX { 0.0F };                       // custom hoop width
+	float    customHoopY { 0.0F };                       // custom hoop height
+	float    traceLength { 0.0F };                       // lens points
+	float    traceRatio { 0.0F };                        // trace ratio
+	float    chainSpace { 0.0F };                        // chain space
+	float    chainRatio { 0.0F };                        // chain ratio
+	float    lensRatio { 0.0F };                         // lens aspect ratio
+	float    AppStitchLen { 0.0F };                      // Applique stitch length
+	float    cursorNudgeStep { 0.0F };                   // cursor nudge step
+	uint16_t nudgePixels { 0U };                         // nudge pixels
+	float    eggRatio { 0.0F };                          // egg ratio
+	uint16_t stitchSizePixels { 0U };                    // size of stitch points in pixels
+	uint16_t formVertexSizePixels { 0U };                // size of form points in pixels
+	uint16_t formSides { 0U };                           // sides of a created form
+	float    tearTailLength { 0.0F };                    // length of the tear tail
+	float    tearTwistStep { 0.0F };                     // tear twist step
+	float    tearTwistRatio { 0.0F };                    // tear twist ratio
+	uint16_t wavePoints { 0U };                          // wave points
+	uint16_t waveStart { 0U };                           // wave strting point
+	uint16_t waveEnd { 0U };                             // wave ending point;
+	uint16_t waveLobes { 0U };                           // wave lobes
+	uint8_t  featherFillType { 0U };                     // feather fill type
+	uint8_t  featherUpCount { 0U };                      // feather up count
+	uint8_t  featherDownCount { 0U };                    // feather down count
+	uint8_t  featherType { 0U };                         // feather bits
+	float    featherRatio { 0.0F };                      // feather ratio
+	float    featherMinStitchSize { 0.0F };              // feather floor
+	uint16_t featherCount { 0U };                        // feather fill psg granularity
 	char     p2cName[MAX_PATH] { 0 };                    // pes2card file                       NOLINT(modernize-avoid-c-arrays)
-	float    underlayIndent { 0.0f };                    // edge walk/underlay indent
-	float    underlayAngle { 0.0f };                     // underlay angle
-	float    underlaySpacing { 0.0f };                   // underlay spacing
-	float    underlayStitchLen { 0.0f };                 // underlay stitch length
-	float    daisyDiameter { 0.0f };                     // daisy diameter
-	float    daisyPetalLen { 0.0f };                     // daisy petal length
-	float    daisyHoleDiameter { 0.0f };                 // daisy hole diameter
-	uint32_t daisyPetalCount { 0u };                     // daisy petals
-	uint32_t daisyPetalPoints { 0u };                    // daisy petal points
-	uint32_t daisyInnerCount { 0u };                     // daisy inner count
-	uint8_t  daisyBorderType { 0u };                     // daisy border type
-	uint8_t  dataCheck { 0u };                           // data check
-	float    textureHeight { 0.0f };                     // textured fill height
-	float    textureWidth { 0.0f };                      // textured fill width
-	float    textureSpacing { 0.0f };                    // textured fill spacing
-	uint16_t formBoxSizePixels { 0u };                   // form box pixels
-	uint16_t daisyHeartCount { 0u };                     // daisy heart count
-	uint16_t textureEditorSize { 0u };                   // texture editor pixels
-	float    clpspc { 0.0f };                            // clipboard fill spacing
+	float    underlayIndent { 0.0F };                    // edge walk/underlay indent
+	float    underlayAngle { 0.0F };                     // underlay angle
+	float    underlaySpacing { 0.0F };                   // underlay spacing
+	float    underlayStitchLen { 0.0F };                 // underlay stitch length
+	float    daisyDiameter { 0.0F };                     // daisy diameter
+	float    daisyPetalLen { 0.0F };                     // daisy petal length
+	float    daisyHoleDiameter { 0.0F };                 // daisy hole diameter
+	uint32_t daisyPetalCount { 0U };                     // daisy petals
+	uint32_t daisyPetalPoints { 0U };                    // daisy petal points
+	uint32_t daisyInnerCount { 0U };                     // daisy inner count
+	uint8_t  daisyBorderType { 0U };                     // daisy border type
+	uint8_t  dataCheck { 0U };                           // data check
+	float    textureHeight { 0.0F };                     // textured fill height
+	float    textureWidth { 0.0F };                      // textured fill width
+	float    textureSpacing { 0.0F };                    // textured fill spacing
+	uint16_t formBoxSizePixels { 0U };                   // form box pixels
+	uint16_t daisyHeartCount { 0U };                     // daisy heart count
+	uint16_t textureEditorSize { 0U };                   // texture editor pixels
+	float    clpspc { 0.0F };                            // clipboard fill spacing
 	char     designerName[NAME_LEN] { 0 };               // designer name                       NOLINT(modernize-avoid-c-arrays)
 
 	constexpr INIFILE() noexcept = default;
@@ -1066,10 +1066,10 @@ enum machineType
 class FORMVERTICES
 {
 public:
-	uint32_t start { 0u };
-	uint32_t vertexCount { 0u };
-	uint32_t finish { 0u };
-	uint32_t form { 0u };
+	uint32_t start { 0U };
+	uint32_t vertexCount { 0U };
+	uint32_t finish { 0U };
+	uint32_t form { 0U };
 
 	constexpr FORMVERTICES() noexcept = default;
 	// FORMVERTICES(FORMVERTICES&&) = default;
@@ -1105,8 +1105,8 @@ public:
 class fPOINT
 {
 public:
-	float x { 0.0f };
-	float y { 0.0f };
+	float x { 0.0F };
+	float y { 0.0F };
 
 	constexpr fPOINT() noexcept = default;
 	inline fPOINT(double rhsX, double rhsY) noexcept;
@@ -1127,9 +1127,9 @@ public:
 class fPOINTATTR
 {
 public:
-	float    x { 0.0f };
-	float    y { 0.0f };
-	uint32_t attribute { 0u };
+	float    x { 0.0F };
+	float    y { 0.0F };
+	uint32_t attribute { 0U };
 
 	constexpr fPOINTATTR() noexcept = default;
 	inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
@@ -1143,10 +1143,10 @@ public:
 class SMALPNTL
 {
 public:
-	uint32_t line { 0u }; // line and group must remain in this order for sort to work
-	uint32_t group { 0u };
-	float    x { 0.0f };
-	float    y { 0.0f };
+	uint32_t line { 0U }; // line and group must remain in this order for sort to work
+	uint32_t group { 0U };
+	float    x { 0.0F };
+	float    y { 0.0F };
 
 	constexpr SMALPNTL() noexcept = default;
 	// SMALPNTL(SMALPNTL&&) = default;
@@ -1158,9 +1158,9 @@ public:
 class BSEQPNT
 {
 public:
-	float  x { 0.0f };
-	float  y { 0.0f };
-	int8_t attribute { 0u };
+	float  x { 0.0F };
+	float  y { 0.0F };
+	int8_t attribute { 0U };
 
 	inline BSEQPNT() noexcept = default;
 	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
@@ -1282,9 +1282,9 @@ inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
 class fPOINTLINE
 {
 public:
-	float    x { 0.0f };
-	float    y { 0.0f };
-	uint16_t line { 0u };
+	float    x { 0.0F };
+	float    y { 0.0F };
+	uint16_t line { 0U };
 
 	constexpr fPOINTLINE() noexcept = default;
 	// fPOINTLINE(fPOINTLINE&&) = default;
@@ -1311,8 +1311,8 @@ public:
 class COLCHNG
 {
 public:
-	uint16_t stitchIndex { 0u }; // stitch index
-	uint16_t colorIndex { 0u };  // color index
+	uint16_t stitchIndex { 0U }; // stitch index
+	uint16_t colorIndex { 0U };  // color index
 
 	constexpr COLCHNG() noexcept = default;
 	// COLCHNG(COLCHNG&&) = default;
@@ -1324,25 +1324,25 @@ public:
 class FEATHER
 {
 public:
-	uint32_t fillType { 0u };          // type of feather fill
-	float    ratio { 0.0f };           // feather ratio
-	float    minStitch { 0.0f };       // smallest stitch allowed
-	float    ratioLocal { 0.0f };      // local feather ratio
-	float    formRatio { 0.0f };       // feather ratio from form
-	uint32_t extendedAttribute { 0u }; // extended form attribute
-	uint32_t upCount { 0u };           // feather up count
-	uint32_t downCount { 0u };         // feather down count
-	uint32_t totalCount { 0u };        // up count plus down count
-	uint32_t phaseIndex { 0u };
-	uint32_t phase { 0u };
-	uint32_t countUp { 0u };
-	uint32_t countDown { 0u };
-	float    globalStep { 0.0f };
-	float    globalPosition { 0.0f };
-	float    globalPhase { 0.0f };
-	float    globalUp { 0.0f };
-	float    globalDown { 0.0f };
-	float    globalRatio { 0.0f };
+	uint32_t fillType { 0U };          // type of feather fill
+	float    ratio { 0.0F };           // feather ratio
+	float    minStitch { 0.0F };       // smallest stitch allowed
+	float    ratioLocal { 0.0F };      // local feather ratio
+	float    formRatio { 0.0F };       // feather ratio from form
+	uint32_t extendedAttribute { 0U }; // extended form attribute
+	uint32_t upCount { 0U };           // feather up count
+	uint32_t downCount { 0U };         // feather down count
+	uint32_t totalCount { 0U };        // up count plus down count
+	uint32_t phaseIndex { 0U };
+	uint32_t phase { 0U };
+	uint32_t countUp { 0U };
+	uint32_t countDown { 0U };
+	float    globalStep { 0.0F };
+	float    globalPosition { 0.0F };
+	float    globalPhase { 0.0F };
+	float    globalUp { 0.0F };
+	float    globalDown { 0.0F };
+	float    globalRatio { 0.0F };
 
 	constexpr FEATHER() noexcept = default;
 	// FEATHER(FEATHER&&) = default;
@@ -1351,45 +1351,45 @@ public:
 	//~FEATHER() = default;
 };
 
-constexpr uint32_t COLMSK    = 0x0000000fu; // 0000 0000 0000 0000 0000 0000 0000 1111
-constexpr uint32_t APCOLMSK  = 0x000000f0u; // 0000 0000 0000 0000 0000 0000 1111 0000
-constexpr uint32_t NCOLMSK   = 0xfffffff0u; // 1111 1111 1111 1111 1111 1111 1111 0000
-constexpr uint32_t COLSMSK   = 0x0000ffffu; // 0000 0000 0000 0000 1111 1111 1111 1111
-constexpr uint32_t FRMSK     = 0x00003ff0u; // 0000 0000 0000 0000 0011 1111 1111 0000
-constexpr uint32_t NFRMSK    = 0xffffc00fu; // 1111 1111 1111 1111 1100 0000 0000 1111
-constexpr uint32_t UFRMSK    = 0x80003ff0u; // 1000 0000 0000 0000 0011 1111 1111 0000
-constexpr uint32_t TYPFMSK   = 0x20003ff0u; // 0010 0000 0000 0000 0011 1111 1111 0000
-constexpr uint32_t TYPBMSK   = 0x40003ff0u; // 0100 0000 0000 0000 0011 1111 1111 0000
-constexpr uint32_t TYPAPMSK  = 0x60003ff0u; // 0110 0000 0000 0000 0011 1111 1111 0000
-constexpr uint32_t LAYMSK    = 0x0e000000u; // 0000 1110 0000 0000 0000 0000 0000 0000
-constexpr uint32_t NLAYMSK   = 0xf1ffffffu; // 1111 0001 1111 1111 1111 1111 1111 1111
-constexpr uint32_t TYPMSK    = 0x60000000u; // 0110 0000 0000 0000 0000 0000 0000 0000
-constexpr uint32_t TYPFRM    = 0x20000000u; // 0010 0000 0000 0000 0000 0000 0000 0000
-constexpr uint32_t TYPBRD    = 0x40000000u; // 0100 0000 0000 0000 0000 0000 0000 0000
-constexpr uint32_t NTYPMSK   = 0x9fffffffu; // 1001 1111 1111 1111 1111 1111 1111 1111
-constexpr uint32_t USMSK     = 0x80000000u; // 1000 0000 0000 0000 0000 0000 0000 0000
-constexpr uint32_t ATMSK     = 0x7fffffffu; // 0111 1111 1111 1111 1111 1111 1111 1111
-constexpr uint32_t NFRM_NTYP = 0x9fffc00fu; // 1001 1111 1111 1111 1100 0000 0000 1111
-constexpr uint32_t TYPATMSK  = 0x20000000u; // 0010 0000 0000 0000 0000 0000 0000 0000
-constexpr uint32_t WLKMSK    = 0x00200000u; // 0000 0000 0010 0000 0000 0000 0000 0000
-constexpr uint32_t WLKFMSK   = 0x00203ff0u; // 0000 0000 0010 0000 0011 1111 1111 0000
-constexpr uint32_t CWLKMSK   = 0x00100000u; // 0000 0000 0001 0000 0000 0000 0000 0000
-constexpr uint32_t CWLKFMSK  = 0x00103ff0u; // 0000 0000 0001 0000 0011 1111 1111 0000
-constexpr uint32_t UNDMSK    = 0x00400000u; // 0000 0000 0100 0000 0000 0000 0000 0000
-constexpr uint32_t WUNDMSK   = 0x00600000u; // 0000 0000 0110 0000 0000 0000 0000 0000
-constexpr uint32_t UNDFMSK   = 0x00403ff0u; // 0000 0000 0100 0000 0011 1111 1111 0000
-constexpr uint32_t KNOTMSK   = 0x00800000u; // 0000 0000 1000 0000 0000 0000 0000 0000
-constexpr uint32_t NKNOTMSK  = 0xff7fffffu; // 1111 1111 0111 1111 1111 1111 1111 1111
-constexpr uint32_t FTHMSK    = 0x01000000u; // 0000 0001 0000 0000 0000 0000 0000 0000
-constexpr uint32_t DELMSK    = 0x61e03ff0u; // 0110 0001 1110 0000 0011 1111 1111 0000
-constexpr uint32_t ALTYPMSK  = 0x61f00000u; // 0110 0001 1111 0000 0000 0000 0000 0000
-constexpr uint32_t SRTMSK    = 0x61f03fffu; // 0110 0001 1111 0000 0011 1111 1111 1111
-constexpr uint32_t SRTYPMSK  = 0x61700000u; // 0110 0001 0111 0000 0000 0000 0000 0000
-constexpr uint32_t NOTFRM    = 0x00080000u; // 0000 0000 0000 1000 0000 0000 0000 0000
-constexpr uint32_t FRMSHFT   = 4u;
-constexpr uint32_t LAYSHFT   = 25u;
-constexpr uint32_t TYPSHFT   = 29u;
-constexpr uint32_t USHFT     = 31u;
+constexpr uint32_t COLMSK    = 0x0000000fU; // 0000 0000 0000 0000 0000 0000 0000 1111
+constexpr uint32_t APCOLMSK  = 0x000000f0U; // 0000 0000 0000 0000 0000 0000 1111 0000
+constexpr uint32_t NCOLMSK   = 0xfffffff0U; // 1111 1111 1111 1111 1111 1111 1111 0000
+constexpr uint32_t COLSMSK   = 0x0000ffffU; // 0000 0000 0000 0000 1111 1111 1111 1111
+constexpr uint32_t FRMSK     = 0x00003ff0U; // 0000 0000 0000 0000 0011 1111 1111 0000
+constexpr uint32_t NFRMSK    = 0xffffc00fU; // 1111 1111 1111 1111 1100 0000 0000 1111
+constexpr uint32_t UFRMSK    = 0x80003ff0U; // 1000 0000 0000 0000 0011 1111 1111 0000
+constexpr uint32_t TYPFMSK   = 0x20003ff0U; // 0010 0000 0000 0000 0011 1111 1111 0000
+constexpr uint32_t TYPBMSK   = 0x40003ff0U; // 0100 0000 0000 0000 0011 1111 1111 0000
+constexpr uint32_t TYPAPMSK  = 0x60003ff0U; // 0110 0000 0000 0000 0011 1111 1111 0000
+constexpr uint32_t LAYMSK    = 0x0e000000U; // 0000 1110 0000 0000 0000 0000 0000 0000
+constexpr uint32_t NLAYMSK   = 0xf1ffffffU; // 1111 0001 1111 1111 1111 1111 1111 1111
+constexpr uint32_t TYPMSK    = 0x60000000U; // 0110 0000 0000 0000 0000 0000 0000 0000
+constexpr uint32_t TYPFRM    = 0x20000000U; // 0010 0000 0000 0000 0000 0000 0000 0000
+constexpr uint32_t TYPBRD    = 0x40000000U; // 0100 0000 0000 0000 0000 0000 0000 0000
+constexpr uint32_t NTYPMSK   = 0x9fffffffU; // 1001 1111 1111 1111 1111 1111 1111 1111
+constexpr uint32_t USMSK     = 0x80000000U; // 1000 0000 0000 0000 0000 0000 0000 0000
+constexpr uint32_t ATMSK     = 0x7fffffffU; // 0111 1111 1111 1111 1111 1111 1111 1111
+constexpr uint32_t NFRM_NTYP = 0x9fffc00fU; // 1001 1111 1111 1111 1100 0000 0000 1111
+constexpr uint32_t TYPATMSK  = 0x20000000U; // 0010 0000 0000 0000 0000 0000 0000 0000
+constexpr uint32_t WLKMSK    = 0x00200000U; // 0000 0000 0010 0000 0000 0000 0000 0000
+constexpr uint32_t WLKFMSK   = 0x00203ff0U; // 0000 0000 0010 0000 0011 1111 1111 0000
+constexpr uint32_t CWLKMSK   = 0x00100000U; // 0000 0000 0001 0000 0000 0000 0000 0000
+constexpr uint32_t CWLKFMSK  = 0x00103ff0U; // 0000 0000 0001 0000 0011 1111 1111 0000
+constexpr uint32_t UNDMSK    = 0x00400000U; // 0000 0000 0100 0000 0000 0000 0000 0000
+constexpr uint32_t WUNDMSK   = 0x00600000U; // 0000 0000 0110 0000 0000 0000 0000 0000
+constexpr uint32_t UNDFMSK   = 0x00403ff0U; // 0000 0000 0100 0000 0011 1111 1111 0000
+constexpr uint32_t KNOTMSK   = 0x00800000U; // 0000 0000 1000 0000 0000 0000 0000 0000
+constexpr uint32_t NKNOTMSK  = 0xff7fffffU; // 1111 1111 0111 1111 1111 1111 1111 1111
+constexpr uint32_t FTHMSK    = 0x01000000U; // 0000 0001 0000 0000 0000 0000 0000 0000
+constexpr uint32_t DELMSK    = 0x61e03ff0U; // 0110 0001 1110 0000 0011 1111 1111 0000
+constexpr uint32_t ALTYPMSK  = 0x61f00000U; // 0110 0001 1111 0000 0000 0000 0000 0000
+constexpr uint32_t SRTMSK    = 0x61f03fffU; // 0110 0001 1111 0000 0011 1111 1111 1111
+constexpr uint32_t SRTYPMSK  = 0x61700000U; // 0110 0001 0111 0000 0000 0000 0000 0000
+constexpr uint32_t NOTFRM    = 0x00080000U; // 0000 0000 0000 1000 0000 0000 0000 0000
+constexpr uint32_t FRMSHFT   = 4U;
+constexpr uint32_t LAYSHFT   = 25U;
+constexpr uint32_t TYPSHFT   = 29U;
+constexpr uint32_t USHFT     = 31U;
 
 /*
 bit definitions for fPOINTATTR.attribute
@@ -1408,17 +1408,17 @@ bit definitions for fPOINTATTR.attribute
 31		set for user edited stitches
 */
 
-constexpr uint32_t FRMFIL   = 0x20000000u;
-constexpr uint32_t FRMBFIL  = 0x40000000u;
-constexpr uint32_t FRMAPFIL = 0x60000000u;
+constexpr uint32_t FRMFIL   = 0x20000000U;
+constexpr uint32_t FRMBFIL  = 0x40000000U;
+constexpr uint32_t FRMAPFIL = 0x60000000U;
 
 class fRECTANGLE
 {
 public:
-	float left { 0.0f };
-	float top { 0.0f };
-	float right { 0.0f };
-	float bottom { 0.0f };
+	float left { 0.0F };
+	float top { 0.0F };
+	float right { 0.0F };
+	float bottom { 0.0F };
 
 	constexpr fRECTANGLE() noexcept = default;
 	// fRECTANGLE(fRECTANGLE&&) = default;
@@ -1439,9 +1439,9 @@ inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float
 class FORMINFO
 {
 public:
-	uint32_t type { 0u };
-	uint32_t attribute { 0u };
-	uint32_t sideCount { 0u };
+	uint32_t type { 0U };
+	uint32_t attribute { 0U };
+	uint32_t sideCount { 0U };
 
 	constexpr FORMINFO() noexcept = default;
 	// FORMINFO(FORMINFO&&) = default;
@@ -1455,8 +1455,8 @@ class SATCONOUT;
 class SATCON
 {
 public:
-	uint32_t start { 0u };
-	uint32_t finish { 0u };
+	uint32_t start { 0U };
+	uint32_t finish { 0U };
 
 	constexpr SATCON() noexcept = default;
 	// SATCON(SATCON&&) = default;
@@ -1477,8 +1477,8 @@ inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
 class SATCONOUT
 {
 public:
-	uint16_t start { 0u };
-	uint16_t finish { 0u };
+	uint16_t start { 0U };
+	uint16_t finish { 0U };
 
 	constexpr SATCONOUT() noexcept = default;
 	// SATCONOUT(SATCONOUT&&) = default;
@@ -1532,8 +1532,8 @@ public:
 };
 
 inline FANGCLP::FANGCLP() noexcept { // NOLINT
-	guide.start  = 0u;
-	guide.finish = 0u;
+	guide.start  = 0U;
+	guide.finish = 0U;
 }
 
 union FANGCLPOUT {
@@ -1570,7 +1570,7 @@ public:
 };
 
 inline FLENCNT::FLENCNT() noexcept { // NOLINT
-	clipCount = 0u;
+	clipCount = 0U;
 }
 
 union FLENCNTOUT {
@@ -1589,7 +1589,7 @@ public:
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
-	clipCount = 0u;
+	clipCount = 0U;
 }
 
 inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) noexcept {
@@ -1676,17 +1676,17 @@ EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
 EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
 */
 
-constexpr auto BELEN    = 1u;
-constexpr auto BESPAC   = 1u << 1u;
-constexpr auto BESIZ    = 1u << 2u;
-constexpr auto BNCLP    = 1u << 3u;
-constexpr auto BPICSPAC = 1u << 4u;
-constexpr auto BCNRSIZ  = 1u << 5u;
-constexpr auto BRDEND   = 1u << 6u;
-constexpr auto BRDPOS   = 1u << 7u;
-constexpr auto BEMAX    = 1u << 8u;
-constexpr auto BEMIN    = 1u << 9u;
-constexpr auto CHNPOS   = 1u << 10u;
+constexpr auto BELEN    = 1U;
+constexpr auto BESPAC   = 1U << 1U;
+constexpr auto BESIZ    = 1U << 2U;
+constexpr auto BNCLP    = 1U << 3U;
+constexpr auto BPICSPAC = 1U << 4U;
+constexpr auto BCNRSIZ  = 1U << 5U;
+constexpr auto BRDEND   = 1U << 6U;
+constexpr auto BRDPOS   = 1U << 7U;
+constexpr auto BEMAX    = 1U << 8U;
+constexpr auto BEMIN    = 1U << 9U;
+constexpr auto CHNPOS   = 1U << 10U;
 
 constexpr auto MEGLIN  = (BELEN | BEMAX | BEMIN);
 constexpr auto MEGBLD  = (BELEN | BEMAX | BEMIN);
@@ -1701,26 +1701,26 @@ constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
-constexpr auto EGLIN_LINS = 4u;
-constexpr auto EGBLD_LINS = 4u;
-constexpr auto EGCLP_LINS = 3u;
-constexpr auto EGSAT_LINS = 6u;
-constexpr auto EGAP_LINS  = 7u;
-constexpr auto EGPRP_LINS = 6u;
-constexpr auto EGHOL_LINS = 7u;
-constexpr auto EGPIC_LINS = 7u;
-constexpr auto EGCHN_LINS = 6u;
+constexpr auto EGLIN_LINS = 4U;
+constexpr auto EGBLD_LINS = 4U;
+constexpr auto EGCLP_LINS = 3U;
+constexpr auto EGSAT_LINS = 6U;
+constexpr auto EGAP_LINS  = 7U;
+constexpr auto EGPRP_LINS = 6U;
+constexpr auto EGHOL_LINS = 7U;
+constexpr auto EGPIC_LINS = 7U;
+constexpr auto EGCHN_LINS = 6U;
 
 class FTHINFO
 {
 public:
-	uint8_t  fillType { 0u };        // feather fill type
-	uint8_t  upCount { 0u };         // feather up count
-	uint8_t  downCount { 0u };       // feather down count
-	uint8_t  color { 0u };           // feather blend color
-	float    ratio { 0.0f };         // feather ratio
-	float    minStitchSize { 0.0f }; // feather floor
-	uint16_t count { 0u };           // feather fill psg granularity
+	uint8_t  fillType { 0U };        // feather fill type
+	uint8_t  upCount { 0U };         // feather up count
+	uint8_t  downCount { 0U };       // feather down count
+	uint8_t  color { 0U };           // feather blend color
+	float    ratio { 0.0F };         // feather ratio
+	float    minStitchSize { 0.0F }; // feather floor
+	uint16_t count { 0U };           // feather fill psg granularity
 
 	constexpr FTHINFO() noexcept = default;
 	// FTHINFO(FTHINFO&&) = default;
@@ -1733,9 +1733,9 @@ class TXTRINFO
 {
 public:
 	int16_t  lines { 0 };
-	uint16_t index { 0u };
-	uint16_t count { 0u };
-	float    height { 0.0f };
+	uint16_t index { 0U };
+	uint16_t count { 0U };
+	float    height { 0.0F };
 
 	constexpr TXTRINFO() noexcept = default;
 	// TXTRINFO(TXTRINFO&&) = default;
@@ -1798,24 +1798,24 @@ inline FRMHEDO::FRMHEDO() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0u;
-	vertexCount     = 0u;
-	type            = 0u;
-	fillColor       = 0u;
-	borderColor     = 0u;
-	clipEntries     = 0u;
-	vertices        = 0u;
-	borderClipData  = 0u;
-	satinGuideCount = 0u;
-	wordParam       = 0u;
+	attribute       = 0U;
+	vertexCount     = 0U;
+	type            = 0U;
+	fillColor       = 0U;
+	borderColor     = 0U;
+	clipEntries     = 0U;
+	vertices        = 0U;
+	borderClipData  = 0U;
+	satinGuideCount = 0U;
+	wordParam       = 0U;
 	rectangle       = {};
-	fillType        = 0u;
-	edgeType        = 0u;
-	fillSpacing     = 0.0f;
-	borderSize      = 0.0f;
-	edgeSpacing     = 0.0f;
-	edgeStitchLen   = 0.0f;
-	res             = 0u;
+	fillType        = 0U;
+	edgeType        = 0U;
+	fillSpacing     = 0.0F;
+	borderSize      = 0.0F;
+	edgeSpacing     = 0.0F;
+	edgeStitchLen   = 0.0F;
+	res             = 0U;
 }
 
 class FRMHEDOUT;
@@ -1877,40 +1877,40 @@ inline FRMHED::FRMHED() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0u;
-	vertexCount     = 0u;
-	type            = 0u;
-	fillColor       = 0u;
-	borderColor     = 0u;
-	clipEntries     = 0u;
-	vertexIndex     = 0u;
-	borderClipData  = 0u;
-	satinGuideCount = 0u;
-	wordParam       = 0u;
+	attribute       = 0U;
+	vertexCount     = 0U;
+	type            = 0U;
+	fillColor       = 0U;
+	borderColor     = 0U;
+	clipEntries     = 0U;
+	vertexIndex     = 0U;
+	borderClipData  = 0U;
+	satinGuideCount = 0U;
+	wordParam       = 0U;
 	rectangle       = {};
-	fillType        = 0u;
-	edgeType        = 0u;
-	fillSpacing     = 0.0f;
-	borderSize      = 0.0f;
-	edgeSpacing     = 0.0f;
-	edgeStitchLen   = 0.0f;
-	picoLength      = 0u;
+	fillType        = 0U;
+	edgeType        = 0U;
+	fillSpacing     = 0.0F;
+	borderSize      = 0.0F;
+	edgeSpacing     = 0.0F;
+	edgeStitchLen   = 0.0F;
+	picoLength      = 0U;
 
-	maxFillStitchLen    = 0.0f;
-	minFillStitchLen    = 0.0f;
-	extendedAttribute   = 0u;
-	maxBorderStitchLen  = 0.0f;
-	minBorderStitchLen  = 0.0f;
+	maxFillStitchLen    = 0.0F;
+	minFillStitchLen    = 0.0F;
+	extendedAttribute   = 0U;
+	maxBorderStitchLen  = 0.0F;
+	minBorderStitchLen  = 0.0F;
 	fillInfo            = {};
-	fillStart           = 0u;
-	fillEnd             = 0u;
-	underlaySpacing     = 0.0f;
-	underlayStitchLen   = 0.0f;
-	underlayStitchAngle = 0.0f;
-	underlayIndent      = 0.0f;
-	txof                = 0.0f;
-	underlayColor       = 0u;
-	cres                = 0u;
+	fillStart           = 0U;
+	fillEnd             = 0U;
+	underlaySpacing     = 0.0F;
+	underlayStitchLen   = 0.0F;
+	underlayStitchAngle = 0.0F;
+	underlayIndent      = 0.0F;
+	txof                = 0.0F;
+	underlayColor       = 0U;
+	cres                = 0U;
 }
 
 inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
@@ -1930,8 +1930,8 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -1951,21 +1951,21 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	edgeStitchLen = rhs.edgeStitchLen;
 	picoLength    = rhs.res;
 
-	extendedAttribute   = 0u;
-	maxFillStitchLen    = 0.0f;
-	minFillStitchLen    = 0.0f;
-	maxBorderStitchLen  = 0.0f;
-	minBorderStitchLen  = 0.0f;
+	extendedAttribute   = 0U;
+	maxFillStitchLen    = 0.0F;
+	minFillStitchLen    = 0.0F;
+	maxBorderStitchLen  = 0.0F;
+	minBorderStitchLen  = 0.0F;
 	fillInfo            = {};
-	fillStart           = 0u;
-	fillEnd             = 0u;
-	underlaySpacing     = 0.0f;
-	underlayStitchLen   = 0.0f;
-	underlayStitchAngle = 0.0f;
-	underlayIndent      = 0.0f;
-	txof                = 0.0f;
-	underlayColor       = 0u;
-	cres                = 0u;
+	fillStart           = 0U;
+	fillEnd             = 0U;
+	underlaySpacing     = 0.0F;
+	underlayStitchLen   = 0.0F;
+	underlayStitchAngle = 0.0F;
+	underlayIndent      = 0.0F;
+	txof                = 0.0F;
+	underlayColor       = 0U;
+	cres                = 0U;
 }
 
 inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
@@ -1975,7 +1975,7 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0u;
+	vertexIndex     = 0U;
 	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
@@ -1985,8 +1985,8 @@ inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2065,40 +2065,40 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
     : satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
-	attribute       = 0u;
-	vertexCount     = 0u;
-	type            = 0u;
-	fillColor       = 0u;
-	borderColor     = 0u;
-	clipEntries     = 0u;
-	vertexIndex     = 0u;
-	borderClipData  = 0u;
-	satinGuideCount = 0u;
-	wordParam       = 0u;
+	attribute       = 0U;
+	vertexCount     = 0U;
+	type            = 0U;
+	fillColor       = 0U;
+	borderColor     = 0U;
+	clipEntries     = 0U;
+	vertexIndex     = 0U;
+	borderClipData  = 0U;
+	satinGuideCount = 0U;
+	wordParam       = 0U;
 	rectangle       = {};
-	fillType        = 0u;
-	edgeType        = 0u;
-	fillSpacing     = 0.0f;
-	borderSize      = 0.0f;
-	edgeSpacing     = 0.0f;
-	edgeStitchLen   = 0.0f;
-	picoLength      = 0u;
+	fillType        = 0U;
+	edgeType        = 0U;
+	fillSpacing     = 0.0F;
+	borderSize      = 0.0F;
+	edgeSpacing     = 0.0F;
+	edgeStitchLen   = 0.0F;
+	picoLength      = 0U;
 
-	maxFillStitchLen    = 0.0f;
-	minFillStitchLen    = 0.0f;
-	extendedAttribute   = 0u;
-	maxBorderStitchLen  = 0.0f;
-	minBorderStitchLen  = 0.0f;
+	maxFillStitchLen    = 0.0F;
+	minFillStitchLen    = 0.0F;
+	extendedAttribute   = 0U;
+	maxBorderStitchLen  = 0.0F;
+	minBorderStitchLen  = 0.0F;
 	fillInfo            = {};
-	fillStart           = 0u;
-	fillEnd             = 0u;
-	underlaySpacing     = 0.0f;
-	underlayStitchLen   = 0.0f;
-	underlayStitchAngle = 0.0f;
-	underlayIndent      = 0.0f;
-	txof                = 0.0f;
-	underlayColor       = 0u;
-	cres                = 0u;
+	fillStart           = 0U;
+	fillEnd             = 0U;
+	underlaySpacing     = 0.0F;
+	underlayStitchLen   = 0.0F;
+	underlayStitchAngle = 0.0F;
+	underlayIndent      = 0.0F;
+	txof                = 0.0F;
+	underlayColor       = 0U;
+	cres                = 0U;
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
@@ -2109,9 +2109,9 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-	vertexIndex     = 0u; // do not write the pointer value to file
+	vertexIndex     = 0U; // do not write the pointer value to file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0u; // do not write the pointer value to file
+	borderClipData  = 0U; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
 	wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
 	rectangle       = rhs.rectangle;
@@ -2119,8 +2119,8 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2176,8 +2176,8 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2224,9 +2224,9 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0u; // do not read the index from a v2 file
+	vertexIndex     = 0U; // do not read the index from a v2 file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0u; // do not read the index from a v2 file
+	borderClipData  = 0U; // do not read the index from a v2 file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;
@@ -2234,8 +2234,8 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2279,9 +2279,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	fillColor       = rhs.fillColor;
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0u; // do not read the index from a v2 file
+	vertexIndex     = 0U; // do not read the index from a v2 file
 	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0u; // do not read the index from a v2 file
+	borderClipData  = 0U; // do not read the index from a v2 file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
 	rectangle       = rhs.rectangle;
@@ -2289,8 +2289,8 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
 	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0u))
-	    || ((((1u << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0u))) {
+	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
+	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
 	}
 	else {
@@ -2329,9 +2329,9 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	return *this;
 }
 
-constexpr uint8_t FRMEND   = 0x01u; // 0000 0001
-constexpr uint8_t FRMLMSK  = 0x0eu; // 0000 1110
-constexpr uint8_t NFRMLMSK = 0xf1u; // 1111 0001
+constexpr uint8_t FRMEND   = 0x01U; // 0000 0001
+constexpr uint8_t FRMLMSK  = 0x0eU; // 0000 1110
+constexpr uint8_t NFRMLMSK = 0xf1U; // 1111 0001
 
 /*form attribute bits
 
@@ -2343,33 +2343,33 @@ constexpr uint8_t NFRMLMSK = 0xf1u; // 1111 0001
 */
 
 // blunt bits
-constexpr uint8_t FBLNT  = 0x20u; // 0010 0000
-constexpr uint8_t SBLNT  = 0x40u; // 0100 0000
-constexpr uint8_t NFBLNT = 0xdfu; // 1101 1111
-constexpr uint8_t NSBLNT = 0xbfu; // 1011 1111
-constexpr uint8_t NOBLNT = 0x9fu; // 1001 1111
+constexpr uint8_t FBLNT  = 0x20U; // 0010 0000
+constexpr uint8_t SBLNT  = 0x40U; // 0100 0000
+constexpr uint8_t NFBLNT = 0xdfU; // 1101 1111
+constexpr uint8_t NSBLNT = 0xbfU; // 1011 1111
+constexpr uint8_t NOBLNT = 0x9fU; // 1001 1111
 
 // frmhed extended attribute bits
 
-constexpr auto AT_SQR     = 1u;       // square ends
-constexpr auto AT_FTHUP   = 1u << 1u; // feather up or down flag
-constexpr auto AT_FTHBTH  = 1u << 2u; // feather both up and down flag
-constexpr auto AT_FTHBLND = 1u << 3u; // feather blend flag
-constexpr auto AT_STRT    = 1u << 4u; // user set start flag
-constexpr auto AT_END     = 1u << 5u; // user set end flag
-constexpr auto AT_UND     = 1u << 6u; // underlay flag
-constexpr auto AT_WALK    = 1u << 7u; // edge walk
-constexpr auto AT_CWLK    = 1u << 8u; // center walk
+constexpr auto AT_SQR     = 1U;       // square ends
+constexpr auto AT_FTHUP   = 1U << 1U; // feather up or down flag
+constexpr auto AT_FTHBTH  = 1U << 2U; // feather both up and down flag
+constexpr auto AT_FTHBLND = 1U << 3U; // feather blend flag
+constexpr auto AT_STRT    = 1U << 4U; // user set start flag
+constexpr auto AT_END     = 1U << 5U; // user set end flag
+constexpr auto AT_UND     = 1U << 6U; // underlay flag
+constexpr auto AT_WALK    = 1U << 7U; // edge walk
+constexpr auto AT_CWLK    = 1U << 8U; // center walk
 
 // contour refil
-constexpr auto FRECONT  = 0x80u; // 1000 0000
-constexpr auto NFRECONT = 0x7fu; // 0111 1111
+constexpr auto FRECONT  = 0x80U; // 1000 0000
+constexpr auto NFRECONT = 0x7fU; // 0111 1111
 
 class FORMCLIP // form data clipboard header
 {
 public:
-	uint32_t clipType { 0u };
-	uint32_t reserved { 0u };
+	uint32_t clipType { 0U };
+	uint32_t reserved { 0U };
 	FRMHED   form {};
 
 	constexpr FORMCLIP() noexcept = default;
@@ -2382,9 +2382,9 @@ public:
 class FORMSCLIP // multiple forms clipboard header
 {
 public:
-	uint32_t clipType { 0u };
-	uint16_t formCount { 0u };
-	uint16_t reserved { 0u };
+	uint32_t clipType { 0U };
+	uint16_t formCount { 0U };
+	uint16_t reserved { 0U };
 
 	constexpr FORMSCLIP() noexcept = default;
 	// FORMSCLIP(FORMSCLIP&&) = default;
@@ -2396,8 +2396,8 @@ public:
 class FORMVERTEXCLIP // form points clipboard header
 {
 public:
-	uint32_t clipType { 0u };
-	uint32_t vertexCount { 0u };
+	uint32_t clipType { 0U };
+	uint32_t vertexCount { 0U };
 	bool     direction { false };
 
 	constexpr FORMVERTEXCLIP() noexcept = default;
@@ -2410,17 +2410,17 @@ public:
 class STRHED // thred file header
 {
 public:
-	uint32_t headerType { 0u };
-	uint32_t fileLength { 0u };    // length of strhed + length of stitch data
-	uint16_t stitchCount { 0u };   // number of stitches
-	uint16_t hoopType { 0u };      // size of hoop
-	uint16_t formCount { 0u };     // number of forms
-	uint16_t vertexLen { 0u };     // points to form points
-	uint16_t vertexCount { 0u };   // number of form points
-	uint16_t dlineLen { 0u };      // points to dline data
-	uint16_t dlineCount { 0u };    // dline data count
-	uint16_t clipDataLen { 0u };   // points to clipboard data
-	uint16_t clipDataCount { 0u }; // clipboard data count
+	uint32_t headerType { 0U };
+	uint32_t fileLength { 0U };    // length of strhed + length of stitch data
+	uint16_t stitchCount { 0U };   // number of stitches
+	uint16_t hoopType { 0U };      // size of hoop
+	uint16_t formCount { 0U };     // number of forms
+	uint16_t vertexLen { 0U };     // points to form points
+	uint16_t vertexCount { 0U };   // number of form points
+	uint16_t dlineLen { 0U };      // points to dline data
+	uint16_t dlineCount { 0U };    // dline data count
+	uint16_t clipDataLen { 0U };   // points to clipboard data
+	uint16_t clipDataCount { 0U }; // clipboard data count
 
 	constexpr STRHED() noexcept = default;
 	// STRHED(STRHED&&) = default;
@@ -2432,8 +2432,8 @@ public:
 class TXPNT // textured fill point
 {
 public:
-	float    y { 0.0f };
-	uint16_t line { 0u };
+	float    y { 0.0F };
+	uint16_t line { 0U };
 
 	constexpr TXPNT() noexcept = default;
 	// TXPNT(TXPNT&&) = default;
@@ -2445,7 +2445,7 @@ public:
 class TXOFF // textured fill offset
 {
 public:
-	float   y { 0.0f };
+	float   y { 0.0F };
 	int32_t line { 0 };
 
 	constexpr TXOFF() noexcept = default;
@@ -2458,14 +2458,14 @@ public:
 class STREX // thred v1.0 file header extension
 {
 public:
-	float    hoopSizeX { 0.0f };           // hoop size x dimension
-	float    hoopSizeY { 0.0f };           // hoop size y dimension
-	float    stgran { 0.0f };              // stitches per millimeter
+	float    hoopSizeX { 0.0F };           // hoop size x dimension
+	float    hoopSizeY { 0.0F };           // hoop size y dimension
+	float    stgran { 0.0F };              // stitches per millimeter
 	char     creatorName[NAME_LEN] { 0 };  // name of the file creator NOLINT(modernize-avoid-c-arrays)
 	char     modifierName[NAME_LEN] { 0 }; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
 	int8_t   auxFormat { 0 };              // auxillary file format
 	int8_t   stres { 0 };                  // reserved
-	uint32_t texturePointCount { 0u };     // textured fill point32_t count
+	uint32_t texturePointCount { 0U };     // textured fill point32_t count
 	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
 
 	constexpr STREX() noexcept = default;
@@ -2514,16 +2514,16 @@ public:
 
 // dst type masks
 
-constexpr auto JMPTYP = 0x830000u;
-constexpr auto COLTYP = 0x630000u;
-constexpr auto REGTYP = 0x030000u;
+constexpr auto JMPTYP = 0x830000U;
+constexpr auto COLTYP = 0x630000U;
+constexpr auto REGTYP = 0x030000U;
 
 class DSTREC // dst stitch record
 {
 public:
-	uint8_t led { 0u };
-	uint8_t mid { 0u };
-	uint8_t nd { 0u };
+	uint8_t led { 0U };
+	uint8_t mid { 0U };
+	uint8_t nd { 0U };
 
 	constexpr DSTREC() noexcept = default;
 	// DSTREC(DSTREC&&) = default;
@@ -2548,13 +2548,13 @@ public:
 class PCSTCH
 {
 public:
-	uint8_t fx { 0u }; // fractional part of x coord or color if tag = 3
+	uint8_t fx { 0U }; // fractional part of x coord or color if tag = 3
 	int16_t x { 0 };   // integer part of x coord
-	uint8_t nx { 0u };
-	uint8_t fy { 0u }; // fractional part of y coord
-	int16_t y { 0u };  // integer part of y coord
-	uint8_t ny { 0u };
-	uint8_t tag { 0u };
+	uint8_t nx { 0U };
+	uint8_t fy { 0U }; // fractional part of y coord
+	int16_t y { 0U };  // integer part of y coord
+	uint8_t ny { 0U };
+	uint8_t tag { 0U };
 
 	constexpr PCSTCH() noexcept = default;
 	// PCSTCH(PCSTCH&&) = default;
@@ -2566,15 +2566,15 @@ public:
 class CLPSTCH
 {
 public:
-	uint32_t led { 0u };  // ????
-	uint8_t  fx { 0u };   // fractional part of x coord
-	uint16_t x { 0u };    // integer part of x coord
-	uint8_t  spcx { 0u }; // ToDo - Is this structure member needed?
-	uint8_t  fy { 0u };   // fractional part of y coord
-	uint16_t y { 0u };    // integer part of y coord
-	uint8_t  spcy { 0u }; // ToDo - Is this structure member needed?
-	uint8_t  myst { 0u }; // ToDo - Is this structure member needed?
-	uint8_t  tag { 0u };  // ToDo - Is this structure member needed?
+	uint32_t led { 0U };  // ????
+	uint8_t  fx { 0U };   // fractional part of x coord
+	uint16_t x { 0U };    // integer part of x coord
+	uint8_t  spcx { 0U }; // ToDo - Is this structure member needed?
+	uint8_t  fy { 0U };   // fractional part of y coord
+	uint16_t y { 0U };    // integer part of y coord
+	uint8_t  spcy { 0U }; // ToDo - Is this structure member needed?
+	uint8_t  myst { 0U }; // ToDo - Is this structure member needed?
+	uint8_t  tag { 0U };  // ToDo - Is this structure member needed?
 
 	constexpr CLPSTCH() noexcept = default;
 	// CLPSTCH(CLPSTCH&&) = default;
@@ -2586,19 +2586,19 @@ public:
 class BAKHED
 {
 public:
-	uint32_t    formCount { 0u };
+	uint32_t    formCount { 0U };
 	FRMHED*     forms { nullptr };
-	uint32_t    stitchCount { 0u };
+	uint32_t    stitchCount { 0U };
 	fPOINTATTR* stitches { nullptr };
-	uint32_t    vertexCount { 0u };
+	uint32_t    vertexCount { 0U };
 	fPOINT*     vertices { nullptr };
-	uint32_t    guideCount { 0u };
+	uint32_t    guideCount { 0U };
 	SATCON*     guide { nullptr };
-	uint32_t    clipPointCount { 0u };
+	uint32_t    clipPointCount { 0U };
 	fPOINT*     clipPoints { nullptr };
 	COLORREF*   colors { nullptr };
 	TXPNT*      texturePoints { nullptr };
-	uint32_t    texturePointCount { 0u };
+	uint32_t    texturePointCount { 0U };
 	POINT       zoomRect { 0, 0 };
 
 	constexpr BAKHED() noexcept = default;
@@ -2611,8 +2611,8 @@ public:
 class FLSIZ
 {
 public:
-	float cx { 0.0f };
-	float cy { 0.0f };
+	float cx { 0.0F };
+	float cy { 0.0F };
 
 	constexpr FLSIZ() noexcept = default;
 	// FLSIZ(FLSIZ&&) = default;
@@ -2624,8 +2624,8 @@ public:
 class FRMRANGE
 {
 public:
-	uint32_t start { 0u };
-	uint32_t finish { 0u };
+	uint32_t start { 0U };
+	uint32_t finish { 0U };
 
 	constexpr FRMRANGE() noexcept = default;
 	// FRMRANGE(FRMRANGE&&) = default;
@@ -2637,8 +2637,8 @@ public:
 class RANGE
 {
 public:
-	uint32_t start { 0u };
-	uint32_t finish { 0u };
+	uint32_t start { 0U };
+	uint32_t finish { 0U };
 
 	constexpr RANGE() noexcept = default;
 	// RANGE(RANGE&&) = default;
@@ -2650,10 +2650,10 @@ public:
 class REGION // region for sequencing vertical fills
 {
 public:
-	uint32_t start { 0u };       // start line of region
-	uint32_t end { 0u };         // end line of region
-	uint32_t regionBreak { 0u }; // ToDo - Is this member needed?
-	uint32_t breakCount { 0u };
+	uint32_t start { 0U };       // start line of region
+	uint32_t end { 0U };         // end line of region
+	uint32_t regionBreak { 0U }; // ToDo - Is this member needed?
+	uint32_t breakCount { 0U };
 
 	constexpr REGION() noexcept = default;
 	inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
@@ -2673,9 +2673,9 @@ inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uin
 class RCON // PathMap: path map for sequencing
 {
 public:
-	uint32_t node { 0u };
+	uint32_t node { 0U };
 	bool     isConnected { false };
-	uint32_t nextGroup { 0u };
+	uint32_t nextGroup { 0U };
 
 	constexpr RCON() noexcept = default;
 	// RCON(RCON&&) = default;
@@ -2687,7 +2687,7 @@ public:
 class RGSEQ // TempPath: temporary path connections
 {
 public:
-	uint32_t pcon { 0u }; // pointer to PathMap entry
+	uint32_t pcon { 0U }; // pointer to PathMap entry
 	int32_t  count { 0 };
 	bool     skp { false }; // path not found
 
@@ -2701,8 +2701,8 @@ public:
 class FSEQ // SequencePath: path of sequenced regions
 {
 public:
-	uint16_t node { 0u };
-	uint16_t nextGroup { 0u };
+	uint16_t node { 0U };
+	uint16_t nextGroup { 0U };
 	bool     skp { false }; // path not found
 
 	constexpr FSEQ() noexcept = default;
@@ -2712,8 +2712,8 @@ public:
 	//~FSEQ() = default;
 };
 
-constexpr auto SEQTOP = 2u;
-constexpr auto SEQBOT = 3u;
+constexpr auto SEQTOP = 2U;
+constexpr auto SEQBOT = 3U;
 
 class PVEC
 {
@@ -2750,13 +2750,13 @@ public:
 class CURSORMASK
 {
 public:
-	uint8_t form[128] { 0u };            // NOLINT(modernize-avoid-c-arrays)
-	uint8_t dline[128] { 0u };           // NOLINT(modernize-avoid-c-arrays)
-	uint8_t uprightNeedle[128] { 0u };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftUpNeedle[128] { 0u };    // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftDownNeedle[128] { 0u };  // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightUpNeedle[128] { 0u };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightDownNeedle[128] { 0u }; // NOLINT(modernize-avoid-c-arrays)
+	uint8_t form[128] { 0U };            // NOLINT(modernize-avoid-c-arrays)
+	uint8_t dline[128] { 0U };           // NOLINT(modernize-avoid-c-arrays)
+	uint8_t uprightNeedle[128] { 0U };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftUpNeedle[128] { 0U };    // NOLINT(modernize-avoid-c-arrays)
+	uint8_t leftDownNeedle[128] { 0U };  // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightUpNeedle[128] { 0U };   // NOLINT(modernize-avoid-c-arrays)
+	uint8_t rightDownNeedle[128] { 0U }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr CURSORMASK() noexcept = default;
 	// CURSORMASK(CURSORMASK&&) = default;
@@ -2768,13 +2768,13 @@ public:
 class BALHED // balarad file header
 {
 public:
-	COLORREF color[256] { 0u }; // NOLINT(modernize-avoid-c-arrays)
-	uint32_t signature { 0u };
-	uint16_t version { 0u };
-	float    hoopSizeX { 0.0f };
-	float    hoopSizeY { 0.0f };
-	COLORREF backgroundColor { 0u };
-	uint8_t  res[1006] { 0u }; // NOLINT(modernize-avoid-c-arrays)
+	COLORREF color[256] { 0U }; // NOLINT(modernize-avoid-c-arrays)
+	uint32_t signature { 0U };
+	uint16_t version { 0U };
+	float    hoopSizeX { 0.0F };
+	float    hoopSizeY { 0.0F };
+	COLORREF backgroundColor { 0U };
+	uint8_t  res[1006] { 0U }; // NOLINT(modernize-avoid-c-arrays)
 
 	constexpr BALHED() noexcept = default;
 	// BALHED(BALHED&&) = default;
@@ -2786,10 +2786,10 @@ public:
 class BALSTCH // balarad stitch
 {
 public:
-	uint8_t code { 0u };
-	uint8_t flag { 0u };
-	float   x { 0.0f };
-	float   y { 0.0f };
+	uint8_t code { 0U };
+	uint8_t flag { 0U };
+	float   x { 0.0F };
+	float   y { 0.0F };
 
 	constexpr BALSTCH() noexcept = default;
 	// BALSTCH(BALSTCH&&) = default;
@@ -2801,14 +2801,14 @@ public:
 class CLPSEG
 {
 public:
-	uint32_t start { 0u };
-	float    beginLength { 0.0f };
-	uint32_t beginIndex { 0u };
-	uint32_t asid { 0u };
-	uint32_t finish { 0u };
-	float    endLength { 0.0f };
-	uint32_t endIndex { 0u };
-	uint32_t zsid { 0u };
+	uint32_t start { 0U };
+	float    beginLength { 0.0F };
+	uint32_t beginIndex { 0U };
+	uint32_t asid { 0U };
+	uint32_t finish { 0U };
+	float    endLength { 0.0F };
+	uint32_t endIndex { 0U };
+	uint32_t zsid { 0U };
 	int8_t   dun { 0 };
 
 	constexpr CLPSEG() noexcept = default;
@@ -2821,8 +2821,8 @@ public:
 class CLIPSORT
 {
 public:
-	float    segmentLength { 0.0f };
-	float    sideLength { 0.0f };
+	float    segmentLength { 0.0F };
+	float    sideLength { 0.0F };
 	uint32_t vertexIndex { 0 };
 	fPOINT   point;
 
@@ -2836,10 +2836,10 @@ public:
 class CLIPNT
 {
 public:
-	float    x { 0.0f };
-	float    y { 0.0f };
-	uint32_t vertexIndex { 0u };
-	uint32_t flag { 0u };
+	float    x { 0.0F };
+	float    y { 0.0F };
+	uint32_t vertexIndex { 0U };
+	uint32_t flag { 0U };
 
 	constexpr CLIPNT() noexcept = default;
 	// CLIPNT(CLIPNT&&) = default;
@@ -2851,8 +2851,8 @@ public:
 class VCLPX
 {
 public:
-	uint32_t segment { 0u };
-	uint32_t vertex { 0u };
+	uint32_t segment { 0U };
+	uint32_t vertex { 0U };
 
 	constexpr VCLPX() noexcept = default;
 	// VCLPX(VCLPX&&) = default;
@@ -2867,7 +2867,7 @@ class PESLED
 {
 public:
 	int8_t   ver[8] { 0 }; // NOLINT(modernize-avoid-c-arrays)
-	uint32_t pec { 0u };
+	uint32_t pec { 0U };
 
 	constexpr PESLED() noexcept = default;
 	// PESLED(PESLED&&) = default;
@@ -2880,12 +2880,12 @@ class PESHED
 {
 public:
 	char     led[8] { 0 };   //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
-	uint32_t off { 0u };     //   8-b  Absolute PEC section byte offset
-	uint16_t hpsz { 0u };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-	uint16_t usdn { 0u };    //   e,f  Use existing design area (1)
-	uint16_t blct { 0u };    // 10,11  CSewSeg segment block count (1)
+	uint32_t off { 0U };     //   8-b  Absolute PEC section byte offset
+	uint16_t hpsz { 0U };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+	uint16_t usdn { 0U };    //   e,f  Use existing design area (1)
+	uint16_t blct { 0U };    // 10,11  CSewSeg segment block count (1)
 	char     hnd1[4] { 0 };  // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t celn { 0u };    // 16,17  Length of following string (7)
+	uint16_t celn { 0U };    // 16,17  Length of following string (7)
 	char     ce[7] { 0 };    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
 	int16_t  xlft { 0 };     // 1f,20  Extent left
 	int16_t  xtop { 0 };     // 21,22  Extent top
@@ -2895,21 +2895,21 @@ public:
 	int16_t  ptop { 0 };     // 29,2a  Extent top position
 	int16_t  prht { 0 };     // 2b,2c  Extent right position
 	int16_t  pbot { 0 };     // 2d,2e  Extent bottom position
-	float    atfm1 { 0.0f }; // 2f-32  Affine transform Scale X (1.0f) (00 00 80 3f)
-	float    atfm2 { 0.0f }; // 33-36  Affine transform Skew X (0.0f) (00 00 00 00)
-	float    atfm3 { 0.0f }; // 37-3a  Affine transform Skew Y (0.0f) (00 00 00 00)
-	float    atfm4 { 0.0f }; // 3b-3e  Affine transform Scale Y (1.0f) (00 00 80 3f)
-	float    atfm5 { 0.0f }; // 3f-42  Affine transform Left_Pos
-	float    atfm6 { 0.0f }; // 43-46  Affine transform Bottom_Pos
-	uint16_t ukn1 { 0u };    // 47,48  unknown (1)
+	float    atfm1 { 0.0F }; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+	float    atfm2 { 0.0F }; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
+	float    atfm3 { 0.0F }; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+	float    atfm4 { 0.0F }; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
+	float    atfm5 { 0.0F }; // 3f-42  Affine transform Left_Pos
+	float    atfm6 { 0.0F }; // 43-46  Affine transform Bottom_Pos
+	uint16_t ukn1 { 0U };    // 47,48  unknown (1)
 	int16_t  xtrn { 0 };     // 49,4a  CSewSeg x coordinate translation (0)
 	int16_t  ytrn { 0 };     // 4b,4c  CSewSeg y coordinate translation (0)
 	int16_t  xsiz { 0 };     // 4d,4e  CSewSeg width
 	int16_t  ysiz { 0 };     // 4f,50  CSewSeg height
 	int8_t   ukn2[8] { 0 };  // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
-	uint16_t bcnt { 0u };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+	uint16_t bcnt { 0U };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
 	int8_t   hnd2[4] { 0 };  // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t cslen { 0u };   // 5f,60  CSewSeg length (7)
+	uint16_t cslen { 0U };   // 5f,60  CSewSeg length (7)
 	char     cs[7] { 0 };    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
 	                         // uint16_t styp1;   // 68,69  Stitch type (0)
 	                         // uint16_t scol;    // 6a,6b  Stitch Palette thread index
@@ -2937,9 +2937,9 @@ public:
 class PESSTCHLST
 {
 public:
-	uint16_t stitchtype { 0u };
-	uint16_t threadIndex { 0u };
-	uint16_t stitchcount { 0u };
+	uint16_t stitchtype { 0U };
+	uint16_t threadIndex { 0U };
+	uint16_t stitchcount { 0U };
 
 	constexpr PESSTCHLST() noexcept = default;
 	// PESSTCHLST(PESSTCHLST&&) = default;
@@ -2953,15 +2953,15 @@ class PECHDR
 public:
 	char label[19] { 0 }; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays)
 	int8_t   labnd { 0 }; // carriage return character
-	uint8_t  ukn1[11] { 0u };   // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
-	uint8_t  ukn2 { 0u };       // Unknown
-	uint16_t hnd1 { 0u };       // Unknown (0x00ff)
-	uint8_t  thumbWidth { 0u }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+	uint8_t  ukn1[11] { 0U };   // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
+	uint8_t  ukn2 { 0U };       // Unknown
+	uint16_t hnd1 { 0U };       // Unknown (0x00ff)
+	uint8_t  thumbWidth { 0U }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
 	                            // Thus, 6 would mean 6×8 = 48 pixels per line
-	uint8_t thumbHeight { 0u }; // Thumbnail image height in pixels (38)
-	uint8_t ukn3[12] { 0u };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
-	uint8_t colorCount { 0u };  // Number of colors minus one, 0xFF means 0 colors
-	uint8_t pad[463] { 0u };    // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
+	uint8_t thumbHeight { 0U }; // Thumbnail image height in pixels (38)
+	uint8_t ukn3[12] { 0U };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
+	uint8_t colorCount { 0U };  // Number of colors minus one, 0xFF means 0 colors
+	uint8_t pad[463] { 0U };    // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
 
 	constexpr PECHDR() noexcept = default;
 	// PECHDR(PECHDR&&) = default;
@@ -2970,22 +2970,22 @@ public:
 	//~PECHDR() = default;
 };
 
-static const uint8_t ThumbHeight = 38u;
-static const uint8_t ThumbWidth  = 48u;
+static const uint8_t ThumbHeight = 38U;
+static const uint8_t ThumbWidth  = 48U;
 
 class PECHDR2
 {
 public:
-	uint16_t unknown1 { 0u };        // typical 0x0000
-	uint16_t thumbnailOffset { 0u }; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
-	uint16_t unknown2 { 0u };        // typical 0x3100
-	uint16_t unknown3 { 0u };        // typical 0xf0ff
+	uint16_t unknown1 { 0U };        // typical 0x0000
+	uint16_t thumbnailOffset { 0U }; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
+	uint16_t unknown2 { 0U };        // typical 0x3100
+	uint16_t unknown3 { 0U };        // typical 0xf0ff
 	int16_t  width { 0 };            // Width
 	int16_t  height { 0 };           // height
-	uint16_t unknown4 { 0u };        // typical 0x01e0
-	uint16_t unknown5 { 0u };        // typical 0x01b0
-	uint16_t xMin { 0u };            // starting X val (Bigendian)
-	uint16_t yMin { 0u };            // starting Y val (Bigendian)
+	uint16_t unknown4 { 0U };        // typical 0x01e0
+	uint16_t unknown5 { 0U };        // typical 0x01b0
+	uint16_t xMin { 0U };            // starting X val (Bigendian)
+	uint16_t yMin { 0U };            // starting Y val (Bigendian)
 
 	constexpr PECHDR2() noexcept = default;
 	// PECHDR2(PECHDR2&&) = default;
@@ -3013,7 +3013,7 @@ public:
 class TXTMSG
 {
 public:
-	uint32_t cod { 0u };
+	uint32_t cod { 0U };
 	int8_t*  str { nullptr };
 
 	constexpr TXTMSG() noexcept = default;
@@ -3026,8 +3026,8 @@ public:
 class GRDCOD
 {
 public:
-	uint32_t id { 0u };
-	uint32_t col { 0u };
+	uint32_t id { 0U };
+	uint32_t col { 0U };
 
 	constexpr GRDCOD() noexcept = default;
 	// GRDCOD(GRDCOD&&) = default;
@@ -3041,14 +3041,14 @@ public:
 class OREC
 {
 public:
-	uint32_t    start { 0u };
-	uint32_t    finish { 0u };
+	uint32_t    start { 0U };
+	uint32_t    finish { 0U };
 	fPOINTATTR* startStitch { nullptr };
 	fPOINTATTR* endStitch { nullptr };
-	uint32_t    color { 0u };
-	uint32_t    type { 0u };
-	uint32_t    form { 0u };
-	uint32_t    otyp { 0u };
+	uint32_t    color { 0U };
+	uint32_t    type { 0U };
+	uint32_t    form { 0U };
+	uint32_t    otyp { 0U };
 
 	constexpr OREC() noexcept = default;
 	// OREC(OREC&&) = default;
@@ -3060,10 +3060,10 @@ public:
 class SRTREC
 {
 public:
-	uint32_t start { 0u };         // start region index
-	uint32_t finish { 0u };        // finish region index
-	uint32_t count { 0u };         // number of regions in range
-	uint32_t currentRegion { 0u }; // current region index
+	uint32_t start { 0U };         // start region index
+	uint32_t finish { 0U };        // finish region index
+	uint32_t count { 0U };         // number of regions in range
+	uint32_t currentRegion { 0U }; // current region index
 	bool     direction = false;    // direction of sort
 
 	constexpr SRTREC() noexcept = default;
@@ -3076,14 +3076,14 @@ public:
 class FSTRTS
 {
 public:
-	uint32_t applique { 0u };
-	uint32_t fill { 0u };
-	uint32_t feather { 0u };
-	uint32_t border { 0u };
-	uint32_t appliqueColor { 0u };
-	uint32_t fillColor { 0u };
-	uint32_t featherColor { 0u };
-	uint32_t borderColor { 0u };
+	uint32_t applique { 0U };
+	uint32_t fill { 0U };
+	uint32_t feather { 0U };
+	uint32_t border { 0U };
+	uint32_t appliqueColor { 0U };
+	uint32_t fillColor { 0U };
+	uint32_t featherColor { 0U };
+	uint32_t borderColor { 0U };
 
 	constexpr FSTRTS() noexcept = default;
 	// FSTRTS(FSTRTS&&) = default;
@@ -3108,25 +3108,25 @@ inline FILLSTARTS::FILLSTARTS() noexcept
     : fillNamed() {
 }
 
-constexpr auto M_AP     = 1u << 1u;
-constexpr auto M_CWLK   = 1u << 2u;
-constexpr auto M_WALK   = 1u << 3u;
-constexpr auto M_UND    = 1u << 4u;
-constexpr auto M_FIL    = 1u << 5u;
-constexpr auto M_FTH    = 1u << 6u;
-constexpr auto M_BRD    = 1u << 7u;
-constexpr auto M_APCOL  = 1u << 8u;
-constexpr auto M_FCOL   = 1u << 9u;
-constexpr auto M_FTHCOL = 1u << 10u;
-constexpr auto M_ECOL   = 1u << 11u;
+constexpr auto M_AP     = 1U << 1U;
+constexpr auto M_CWLK   = 1U << 2U;
+constexpr auto M_WALK   = 1U << 3U;
+constexpr auto M_UND    = 1U << 4U;
+constexpr auto M_FIL    = 1U << 5U;
+constexpr auto M_FTH    = 1U << 6U;
+constexpr auto M_BRD    = 1U << 7U;
+constexpr auto M_APCOL  = 1U << 8U;
+constexpr auto M_FCOL   = 1U << 9U;
+constexpr auto M_FTHCOL = 1U << 10U;
+constexpr auto M_ECOL   = 1U << 11U;
 
 class INSREC
 {
 public:
-	uint32_t code { 0u };
-	uint32_t color { 0u };
-	uint32_t index { 0u };
-	uint32_t seq { 0u };
+	uint32_t code { 0U };
+	uint32_t color { 0U };
+	uint32_t index { 0U };
+	uint32_t seq { 0U };
 
 	constexpr INSREC() noexcept = default;
 	// INSREC(INSREC&&) = default;
@@ -3146,11 +3146,11 @@ enum interleaveTypes
 class INTINF
 {
 public:
-	uint32_t    pins { 0u };
-	uint32_t    coloc { 0u };
-	uint32_t    layerIndex { 0u };
-	uint32_t    start { 0u };
-	uint32_t    output { 0u };
+	uint32_t    pins { 0U };
+	uint32_t    coloc { 0U };
+	uint32_t    layerIndex { 0U };
+	uint32_t    start { 0U };
+	uint32_t    output { 0U };
 	fPOINTATTR* highStitchBuffer { nullptr };
 
 	constexpr INTINF() noexcept = default;
@@ -3167,14 +3167,14 @@ public:
 	int32_t  bottom { 0 };              // pixel bottom line
 	int32_t  height { 0 };              // pixel height of area
 	int32_t  halfHeight { 0 };          // pixel middle of area
-	float    xOffset { 0.0f };          // edit x offset of area
-	float    yOffset { 0.0f };          // edit y offset of area
-	float    areaHeight { 0.0f };       // edit height of area
-	float    screenHeight { 0.0f };     // edit height of screen
-	float    width { 0.0f };            // edit width of area
-	float    spacing { 0.0f };          // edit space between lines
-	uint16_t lines { 0u };              // number of lines
-	float    editToPixelRatio { 0.0f }; // edit to pixel ratio
+	float    xOffset { 0.0F };          // edit x offset of area
+	float    yOffset { 0.0F };          // edit y offset of area
+	float    areaHeight { 0.0F };       // edit height of area
+	float    screenHeight { 0.0F };     // edit height of screen
+	float    width { 0.0F };            // edit width of area
+	float    spacing { 0.0F };          // edit space between lines
+	uint16_t lines { 0U };              // number of lines
+	float    editToPixelRatio { 0.0F }; // edit to pixel ratio
 	fPOINT   formCenter;                // middle of the form
 
 	constexpr TXTSCR() noexcept = default;
@@ -3187,10 +3187,10 @@ public:
 class TXTRCT
 {
 public:
-	uint16_t left { 0u };
-	uint16_t right { 0u };
-	float    top { 0.0f };
-	float    bottom { 0.0f };
+	uint16_t left { 0U };
+	uint16_t right { 0U };
+	float    top { 0.0F };
+	float    bottom { 0.0F };
 
 	constexpr TXTRCT() noexcept = default;
 	// TXTRCT(TXTRCT&&) = default;
@@ -3204,9 +3204,9 @@ class TXHST
 public:
 	std::vector<TXPNT> texturePoints {};
 
-	float height { 0.0f };
-	float width { 0.0f };
-	float spacing { 0.0f };
+	float height { 0.0F };
+	float width { 0.0F };
+	float spacing { 0.0F };
 
 	constexpr TXHST() noexcept = default;
 	// TXHST(TXHST&&) = default;
@@ -3219,11 +3219,11 @@ class TXHSTBUF
 {
 public:
 	uint32_t* placeholder { nullptr };
-	uint32_t  count { 0u };
+	uint32_t  count { 0U };
 
-	float height { 0.0f };
-	float width { 0.0f };
-	float spacing { 0.0f };
+	float height { 0.0F };
+	float width { 0.0F };
+	float spacing { 0.0F };
 
 	constexpr TXHSTBUF() noexcept = default;
 	// TXHSTBUF(TXHSTBUF&&) = default;
@@ -3245,19 +3245,19 @@ public:
 	//~RNGCNT() = default;
 };
 
-constexpr auto BADFLT = 1u;
-constexpr auto BADCLP = 1u << 1u;
-constexpr auto BADSAT = 1u << 2u;
-constexpr auto BADTX  = 1u << 3u;
+constexpr auto BADFLT = 1U;
+constexpr auto BADCLP = 1U << 1U;
+constexpr auto BADSAT = 1U << 2U;
+constexpr auto BADTX  = 1U << 3U;
 
 class BADCNTS
 {
 public:
-	uint32_t attribute { 0u };
-	uint32_t flt { 0u };
-	uint32_t clip { 0u };
-	uint32_t guideCount { 0u }; // ToDo - is this an accurate description?
-	uint32_t tx { 0u };
+	uint32_t attribute { 0U };
+	uint32_t flt { 0U };
+	uint32_t clip { 0U };
+	uint32_t guideCount { 0U }; // ToDo - is this an accurate description?
+	uint32_t tx { 0U };
 
 	constexpr BADCNTS() noexcept = default;
 	// BADCNTS(BADCNTS&&) = default;
@@ -3269,7 +3269,7 @@ public:
 class FINDINFO
 {
 public:
-	uint32_t         count { 0u };
+	uint32_t         count { 0U };
 	WIN32_FIND_DATA* data { nullptr };
 
 	constexpr FINDINFO() noexcept = default;
@@ -3290,9 +3290,9 @@ enum intersectionStyles
 class LENINFO // Sorted line length info
 {
 public:
-	uint32_t index { 0u };
+	uint32_t index { 0U };
 	bool     isEnd { false };
-	float    length { 0.0f };
+	float    length { 0.0F };
 
 	constexpr LENINFO() noexcept = default;
 	// LENINFO(LENINFO&&) = default;
@@ -3304,9 +3304,9 @@ public:
 class PECCOLOR
 {
 public:
-	uint8_t r { 0u };
-	uint8_t g { 0u };
-	uint8_t b { 0u };
+	uint8_t r { 0U };
+	uint8_t g { 0U };
+	uint8_t b { 0U };
 
 	constexpr PECCOLOR() noexcept = default;
 	// PECCOLOR(PECCOLOR&&) = default;
@@ -3318,8 +3318,8 @@ public:
 class PESCOLORLIST
 {
 public:
-	uint16_t blockIndex { 0u };
-	uint16_t colorIndex { 0u };
+	uint16_t blockIndex { 0U };
+	uint16_t colorIndex { 0U };
 
 	constexpr PESCOLORLIST() noexcept = default;
 	// PESCOLORLIST(PESCOLORLIST&&) = default;

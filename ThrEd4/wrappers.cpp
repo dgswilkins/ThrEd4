@@ -25,14 +25,14 @@
 #include "wrappers.h"
 
 float wrap::bufToFloat(const wchar_t* buffer) {
-	auto value = 0.0f;
+	auto value = 0.0F;
 
 	try {
 		value = std::stof(std::wstring(buffer));
 	}
 	catch (...) {
 		OutputDebugString(fmt::format(L"bufToFloat:stof failed trying to convert '{}'\n", buffer).c_str());
-		value = 0.0f;
+		value = 0.0F;
 	}
 	return value;
 }
@@ -42,7 +42,7 @@ void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
 }
 
 bool wrap::pressed(int virtKey) noexcept {
-	return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000u) != 0u;
+	return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000U) != 0U;
 }
 
 void wrap::WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
@@ -66,7 +66,7 @@ void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSI
 }
 
 float wrap::toFloat(double invar) {
-	auto result = 0.0f;
+	auto result = 0.0F;
 	try {
 		result = gsl::narrow<float>(invar);
 	}

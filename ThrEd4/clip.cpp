@@ -55,39 +55,39 @@ bool clip::iseclp(const FRMHED& form) noexcept {
 
 bool clip::isclp(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
-	return ((1u << form.fillType) & ClipTypeMap) != 0;
+	return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
 
 bool clip::isclp(const FRMHED& form) noexcept {
-	return ((1u << form.fillType) & ClipTypeMap) != 0;
+	return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
 
 bool clip::isclpx(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
-	return clip::isclp(iForm) && (form.lengthOrCount.clipCount != 0u);
+	return clip::isclp(iForm) && (form.lengthOrCount.clipCount != 0U);
 }
 
 bool clip::isclpx(const FRMHED& form) noexcept {
-	return clip::isclp(form) && (form.lengthOrCount.clipCount != 0u);
+	return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
 }
 
 bool clip::iseclpx(uint32_t iForm) {
 	auto& form = (*FormList)[iForm];
-	return clip::iseclp(iForm) && (form.clipEntries != 0u);
+	return clip::iseclp(iForm) && (form.clipEntries != 0U);
 }
 
 bool clip::iseclpx(const FRMHED& form) noexcept {
-	return clip::iseclp(form) && (form.clipEntries != 0u);
+	return clip::iseclp(form) && (form.clipEntries != 0U);
 }
 
 uint32_t clip::internal::findclp(uint32_t formIndex) {
 	auto& formList = *FormList;
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1)) {
-			return formList[iForm - 1u].borderClipData + formList[iForm - 1u].clipEntries;
+			return formList[iForm - 1U].borderClipData + formList[iForm - 1U].clipEntries;
 		}
 		if (clip::isclp(iForm - 1)) {
-			return formList[iForm - 1u].angleOrClipData.clip + formList[iForm - 1u].lengthOrCount.clipCount;
+			return formList[iForm - 1U].angleOrClipData.clip + formList[iForm - 1U].lengthOrCount.clipCount;
 		}
 	}
 	return 0;
@@ -95,7 +95,7 @@ uint32_t clip::internal::findclp(uint32_t formIndex) {
 
 void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 	auto& formList = *FormList;
-	for (auto iForm = fpnt + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = fpnt + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip -= cnt;
 		}
@@ -160,7 +160,7 @@ uint32_t clip::nueclp(uint32_t currentForm, uint32_t count) {
 			formList[iform].borderClipData += count;
 		}
 	}
-	for (auto iform = currentForm + 1u; iform < wrap::toUnsigned(FormList->size()); iform++) {
+	for (auto iform = currentForm + 1U; iform < wrap::toUnsigned(FormList->size()); iform++) {
 		if (clip::isclp(iform)) {
 			formList[iform].angleOrClipData.clip += count;
 		}
@@ -180,7 +180,7 @@ uint32_t clip::numclp() {
 	if (clip::iseclpx(ClosestFormToCursor)) {
 		formList[ClosestFormToCursor].borderClipData += clipSize;
 	}
-	for (auto iForm = ClosestFormToCursor + 1u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		if (clip::isclpx(iForm)) {
 			formList[iForm].angleOrClipData.clip += clipSize;
 		}
@@ -196,9 +196,9 @@ void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) 
 	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
 		clipBuffer.clear();
-		if (clipEntries != 0u) {
+		if (clipEntries != 0U) {
 			clipBuffer.reserve(clipEntries);
-			for (auto iClip = 0u; iClip < clipEntries; iClip++) {
+			for (auto iClip = 0U; iClip < clipEntries; iClip++) {
 				clipBuffer.emplace_back(fPOINTATTR { (*clipIt).x, (*clipIt).y, 0 });
 				clipIt++;
 			}
@@ -262,7 +262,7 @@ bool clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords) noexcept {
 
 	auto length = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > ClipRectSize.cx) {
-		for (auto step = 0u; step < 10; step++) {
+		for (auto step = 0U; step < 10U; step++) {
 			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 			const auto delta = ClipRectSize.cx - length;
 			moveToCoords.x += delta * cosAngle;
@@ -297,7 +297,7 @@ void clip::internal::lincrnr(const std::vector<fPOINT>& clipReversedData,
                              const fPOINT&              rotationCenter,
                              uint32_t                   currentSide) {
 	auto vertexIt     = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	auto moveToCoords = vertexIt[wrap::toSize(currentSide) + 2u];
+	auto moveToCoords = vertexIt[wrap::toSize(currentSide) + 2U];
 
 	if (ci::nupnt(clipAngle, moveToCoords)) {
 		const auto delta = fPOINT { moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y };
@@ -321,19 +321,19 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
                             const fPOINT&              rotationCenter,
                             uint32_t                   currentSide) {
 	auto        vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	const auto& point     = vertexIt[wrap::toSize(currentSide) + 1u];
+	const auto& point     = vertexIt[wrap::toSize(currentSide) + 1U];
 	const auto  delta     = fPOINT { (point.x - SelectedPoint.x), (point.y - SelectedPoint.y) };
 	const auto  length    = hypot(delta.x, delta.y);
 	const auto  clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
 
-	if (clipCount != 0u) {
+	if (clipCount != 0U) {
 		thred::rotangf(BorderClipReference, ClipReference, clipAngle, rotationCenter);
 		auto reversedData = clipReversedData.begin();
 		for (auto& data : clipFillData) {
 			thred::rotangf(*reversedData, data, clipAngle, rotationCenter);
 			reversedData++;
 		}
-		for (auto iClip = 0u; iClip < clipCount; iClip++) {
+		for (auto iClip = 0U; iClip < clipCount; iClip++) {
 			ci::ritclp(clipFillData, SelectedPoint);
 			SelectedPoint.x += vector0.x;
 			SelectedPoint.y += vector0.y;
@@ -366,19 +366,19 @@ bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
 	const auto& begin              = vertexIt[start];
 	const auto  delta              = fPOINT { (end.x - begin.x), (end.y - begin.y) };
 	const auto  length             = hypot(delta.x, delta.y);
-	const auto  clipReferencePoint = fPOINTATTR { clipRect.left, clipRect.bottom, 0u };
+	const auto  clipReferencePoint = fPOINTATTR { clipRect.left, clipRect.bottom, 0U };
 	const auto  rotationAngle      = atan2(delta.y, delta.x);
 
 	thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
-	if (ClipRectSize.cx == 0.0f) {
+	if (ClipRectSize.cx == 0.0F) {
 		return false;
 	}
 	const auto clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
-	if (clipCount != 0u) {
-		auto remainder = 0.0f;
-		if (clipCount > 1u) {
+	if (clipCount != 0U) {
+		auto remainder = 0.0F;
+		if (clipCount > 1U) {
 			remainder
-			    = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) / (gsl::narrow_cast<float>(clipCount) - 1.0f)
+			    = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) / (gsl::narrow_cast<float>(clipCount) - 1.0F)
 			       + ClipRectSize.cx)
 			      / length;
 		}
@@ -392,7 +392,7 @@ bool clip::internal::clpsid(const fRECTANGLE&          clipRect,
 			thred::rotangf(*reversedData, data, rotationAngle, rotationCenter);
 			reversedData++;
 		}
-		for (auto stepCount = 0u; stepCount < clipCount; stepCount++) {
+		for (auto stepCount = 0U; stepCount < clipCount; stepCount++) {
 			if (ci::ritclp(clipFillData, insertPoint)) {
 				break;
 			}
@@ -420,7 +420,7 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 	if (SelectedForm->type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		SelectedPoint  = vertexIt[0];
-		auto clipAngle = 0.0f;      // for clipboard border fill
+		auto clipAngle = 0.0F;      // for clipboard border fill
 		auto vector0   = fPOINT {}; // x size of the clipboard fill at the fill angle
 		ci::setvct(0, 1, clipAngle, vector0);
 		// Since clipRect.bottom is always 0
@@ -429,8 +429,8 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 		// the center of the clip with the beginning of the line
 		BorderClipReference.x = 0;
 		// BorderClipReference.x = clipRect.right / 2;
-		auto currentSide = 0u;
-		for (currentSide = 0u; currentSide < VertexCount - 2u; currentSide++) {
+		auto currentSide = 0U;
+		for (currentSide = 0U; currentSide < VertexCount - 2U; currentSide++) {
 			ci::linsid(clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide);
 			ci::setvct(currentSide + 1, currentSide + 2, clipAngle, vector0);
 			ci::lincrnr(clipReversedData, clipFillData, clipAngle, rotationCenter, currentSide);
@@ -441,7 +441,7 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 		clpout(ClipRectSize.cx / 2);
 		auto reference     = startVertex;
 		auto currentVertex = startVertex;
-		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = form::prv(currentVertex);
 			if (ci::clpsid(clipRect, clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
@@ -459,7 +459,7 @@ bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
 	moveToCoords  = vertexIt[NextStart];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
-		for (auto iGuess = 0u; iGuess < 10; iGuess++) {
+		for (auto iGuess = 0U; iGuess < 10; iGuess++) {
 			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 			const auto delta = AdjustedSpace - length;
 			moveToCoords.x += delta * listCOSINEs[currentSide];
@@ -502,7 +502,7 @@ void clip::internal::fxlin(std::vector<fPOINT>&      chainEndPoints,
 		const auto length   = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
 		const auto count    = wrap::floor<uint32_t>(length / AdjustedSpace);
 		const auto delta    = fPOINT { AdjustedSpace * ListCOSINEs[currentSide], AdjustedSpace * ListSINEs[currentSide] };
-		for (auto iChain = 0u; iChain < count; iChain++) {
+		for (auto iChain = 0U; iChain < count; iChain++) {
 			SelectedPoint.x += delta.x;
 			SelectedPoint.y += delta.y;
 			chainEndPoints.push_back(SelectedPoint);
@@ -515,10 +515,10 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
                            const std::vector<float>& listCOSINEs) {
 	auto moveToCoords = fPOINT {}; // moving formOrigin for clipboard fill
 
-	AdjustedSpace = 0.0f;
+	AdjustedSpace = 0.0F;
 	auto flag     = true;
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-	for (auto iVertex = 1u; iVertex < VertexCount; iVertex++) {
+	for (auto iVertex = 1U; iVertex < VertexCount; iVertex++) {
 		const auto length = hypot(vertexIt[iVertex].x - vertexIt[0].x, vertexIt[iVertex].y - vertexIt[0].y);
 		if (length > SelectedForm->edgeSpacing) {
 			flag = false;
@@ -536,20 +536,20 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 	}
 	AdjustedSpace              = SelectedForm->edgeSpacing;
 	auto       minimumSpacing  = SelectedForm->edgeSpacing;
-	const auto halfSpacing     = AdjustedSpace / 2.0f;
-	auto       interval        = 1e9f;
-	auto       minimumInterval = 1e9f;
-	auto       loopCount       = 0u;
-	auto       initialCount    = 0u;
-	auto       smallestSpacing = 0.0f;
-	auto       largestSpacing  = 1.0f;
+	const auto halfSpacing     = AdjustedSpace / 2.0F;
+	auto       interval        = 1e9F;
+	auto       minimumInterval = 1e9F;
+	auto       loopCount       = 0U;
+	auto       initialCount    = 0U;
+	auto       smallestSpacing = 0.0F;
+	auto       largestSpacing  = 1.0F;
 	// loop at least 50 times to guarantee convergence
 	while (loopCount < 50 && (largestSpacing - smallestSpacing) > TINY) {
 		BeanCount        = 0;
 		SelectedPoint    = vertexIt[0];
-		auto currentSide = 0u;
-		for (currentSide = 0u; currentSide < VertexCount - 1u; currentSide++) {
-			NextStart = currentSide + 1u;
+		auto currentSide = 0U;
+		for (currentSide = 0U; currentSide < VertexCount - 1U; currentSide++) {
+			NextStart = currentSide + 1U;
 			ci::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
 		if (SelectedForm->type != FRMLINE) {
@@ -557,16 +557,16 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 			ci::fxlit(listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
 		else {
-			NextStart = VertexCount - 1u;
+			NextStart = VertexCount - 1U;
 		}
-		if (initialCount == 0u) {
+		if (initialCount == 0U) {
 			initialCount    = BeanCount;
 			smallestSpacing = AdjustedSpace;
 			minimumInterval = hypot(vertexIt[NextStart].x - SelectedPoint.x, vertexIt[NextStart].y - SelectedPoint.y);
 			interval        = minimumInterval;
 			minimumSpacing  = AdjustedSpace;
 			interval /= initialCount;
-			AdjustedSpace += interval / 2.0f;
+			AdjustedSpace += interval / 2.0F;
 			largestSpacing = smallestSpacing + interval;
 		}
 		else {
@@ -597,9 +597,9 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 	OutputIndex   = 1;
 	AdjustedSpace = minimumSpacing;
 	chainEndPoints.push_back(SelectedPoint);
-	auto currentSide = 0u;
-	for (currentSide = 0; currentSide < VertexCount - 1u; currentSide++) {
-		NextStart = currentSide + 1u;
+	auto currentSide = 0U;
+	for (currentSide = 0; currentSide < VertexCount - 1U; currentSide++) {
+		NextStart = currentSide + 1U;
 		ci::fxlin(chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
 	}
 	if (SelectedForm->type != FRMLINE) {
@@ -618,16 +618,16 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 	form::duangs();
 	auto listSINEs = std::vector<float> {};
-	listSINEs.reserve(wrap::toSize(VertexCount) + 1u);
+	listSINEs.reserve(wrap::toSize(VertexCount) + 1U);
 	auto listCOSINEs = std::vector<float> {};
 	listCOSINEs.reserve(VertexCount);
-	for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
 	}
-	listSINEs.push_back(sin(((*FormAngles)[0] > (*FormAngles)[VertexCount - 1u])
-	                            ? ((*FormAngles)[0] - (*FormAngles)[VertexCount - 1u])
-	                            : ((*FormAngles)[VertexCount - 1u] - (*FormAngles)[0])));
+	listSINEs.push_back(sin(((*FormAngles)[0] > (*FormAngles)[VertexCount - 1U])
+	                            ? ((*FormAngles)[0] - (*FormAngles)[VertexCount - 1U])
+	                            : ((*FormAngles)[VertexCount - 1U] - (*FormAngles)[0])));
 	ci::fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 
@@ -636,19 +636,19 @@ void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
 	tempClipPoints.reserve(chainEndPoints.size());
 	if (form::lastch()) {
 		auto minimumLength = 1e99;
-		auto minimumIndex  = 0u;
-		for (auto iPoint = 0u; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 1u; iPoint++) {
+		auto minimumIndex  = 0U;
+		for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 1U; iPoint++) {
 			const auto length = hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				minimumIndex  = iPoint;
 			}
 		}
-		if (minimumIndex != 0u) {
-			for (auto iPoint = minimumIndex; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 2u; iPoint++) {
+		if (minimumIndex != 0U) {
+			for (auto iPoint = minimumIndex; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 2U; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
-			for (auto iPoint = 0u; iPoint <= minimumIndex; iPoint++) {
+			for (auto iPoint = 0U; iPoint <= minimumIndex; iPoint++) {
 				tempClipPoints.push_back(chainEndPoints[iPoint]);
 			}
 			chainEndPoints = tempClipPoints;
@@ -698,7 +698,7 @@ void clip::duxclp() {
 	ci::clpxadj(tempClipPoints, chainEndPoints);
 	OSequence->clear();
 	const auto rotationCenter = fPOINT {};
-	for (auto iPoint = 1u; iPoint < wrap::toUnsigned(chainEndPoints.size()); iPoint++) {
+	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(chainEndPoints.size()); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
 	if (SelectedForm->type != FRMLINE) {
@@ -723,7 +723,7 @@ void clip::internal::clpcrnr(const fRECTANGLE&    clipRect,
 			             (*InsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
-	const auto referencePoint = fPOINTATTR { form::midl(clipRect.right, clipRect.left), clipRect.top, 0u };
+	const auto referencePoint = fPOINTATTR { form::midl(clipRect.right, clipRect.left), clipRect.top, 0U };
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
@@ -754,7 +754,7 @@ void clip::internal::picfn(const fRECTANGLE&    clipRect,
 	auto             vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	const auto       delta    = fPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto       length   = hypot(delta.x, delta.y);
-	const fPOINTATTR referencePoint = { form::midl(clipRect.right, clipRect.left), clipRect.top, 0u };
+	const fPOINTATTR referencePoint = { form::midl(clipRect.right, clipRect.left), clipRect.top, 0U };
 
 	auto       rotationAngle = atan2(-delta.x, delta.y);
 	const auto outerStep
@@ -763,11 +763,11 @@ void clip::internal::picfn(const fRECTANGLE&    clipRect,
 	const auto count = wrap::round<uint32_t>(length / spacing);
 	rotationAngle    = atan2(delta.y, delta.x);
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
-	if (count != 0u) {
+	if (count != 0U) {
 		auto step = fPOINT {};
 		if (count > 1) {
 			const auto tdub
-			    = ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0f) + spacing)
+			    = ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0F) + spacing)
 			      / length;
 			const auto val = fPOINT { delta.x * tdub, delta.y * tdub };
 			step           = val;
@@ -779,7 +779,7 @@ void clip::internal::picfn(const fRECTANGLE&    clipRect,
 		}
 		auto flag       = true;
 		auto innerPoint = fPOINT { vertexIt[start].x, vertexIt[start].y };
-		for (auto iStep = 0u; iStep < count - 1u; iStep++) {
+		for (auto iStep = 0U; iStep < count - 1U; iStep++) {
 			const auto firstPoint = fPOINT { innerPoint.x + step.x, innerPoint.y + step.y };
 			const auto outerPoint = fPOINT { firstPoint.x + outerStep.x, firstPoint.y + outerStep.y };
 			OSequence->push_back(firstPoint);
@@ -817,7 +817,7 @@ void clip::clpic(const fRECTANGLE& clipRect) {
 	ClipReference.x   = clipRect.left;
 	satin::satout(20);
 	if (SelectedForm->type == FRMLINE) {
-		for (auto iVertex = 0u; iVertex < VertexCount - 2u; iVertex++) {
+		for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {
 			ci::picfn(clipRect, clipFillData, iVertex, iVertex + 1, SelectedForm->edgeSpacing, rotationCenter);
 			ci::clpcrnr(clipRect, clipFillData, iVertex, rotationCenter);
 		}
@@ -825,11 +825,11 @@ void clip::clpic(const fRECTANGLE& clipRect) {
 	}
 	else {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		if (SelectedForm->fillType == 0u) {
+		if (SelectedForm->fillType == 0U) {
 			OSequence->push_back(vertexIt[0]);
 		}
-		auto currentVertex = 0u;
-		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+		auto currentVertex = 0U;
+		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 			const auto nextVertex = form::nxt(currentVertex);
 			ci::picfn(clipRect, clipFillData, currentVertex, nextVertex, SelectedForm->edgeSpacing, rotationCenter);
 			ci::clpcrnr(clipRect, clipFillData, currentVertex, rotationCenter);
@@ -847,7 +847,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 	auto delta
 	    = fPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto lengthDelta  = fPOINT { (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
-	const auto angle        = atan2(delta.y, delta.x) + PI_F / 2.0f;
+	const auto angle        = atan2(delta.y, delta.x) + PI_F / 2.0F;
 	const auto offset       = fPOINT { (cos(angle) * SelectedForm->borderSize), (sin(angle) * SelectedForm->borderSize) };
 	const auto middleXcoord = chainEndPoints[start].x + lengthDelta.x;
 	const auto middleYcoord = chainEndPoints[start].y + lengthDelta.y;
@@ -859,20 +859,20 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
 	if (finish < chainEndPoints.size() - 1) {
-		delta.x = chainEndPoints[wrap::toSize(finish) + 1u].x - chainEndPoints[finish].x;
-		delta.y = chainEndPoints[wrap::toSize(finish) + 1u].y - chainEndPoints[finish].y;
+		delta.x = chainEndPoints[wrap::toSize(finish) + 1U].x - chainEndPoints[finish].x;
+		delta.y = chainEndPoints[wrap::toSize(finish) + 1U].y - chainEndPoints[finish].y;
 	}
 	else {
-		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1u].x;
-		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1u].y;
+		delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1U].x;
+		delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1U].y;
 	}
-	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0f;
-	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0f;
+	chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0F;
+	chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0F;
 	auto chainCount = wrap::toUnsigned(chainSequence.size());
 	if (StateMap.test(StateFlag::LINCHN)) {
 		chainCount--;
 	}
-	for (auto iChain = 0u; iChain < chainCount; iChain++) {
+	for (auto iChain = 0U; iChain < chainCount; iChain++) {
 		OSequence->push_back(chainPoint[chainSequence[iChain]]);
 	}
 }
@@ -880,14 +880,14 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	OSequence->clear();
 	auto chainLength = wrap::toUnsigned(chainEndPoints.size());
-	if (chainLength > 2u) {
+	if (chainLength > 2U) {
 		chainLength--;
-		for (auto iPoint = 0u; iPoint < chainLength - 1u; iPoint++) {
-			ci::duchfn(chainEndPoints, iPoint, iPoint + 1u);
+		for (auto iPoint = 0U; iPoint < chainLength - 1U; iPoint++) {
+			ci::duchfn(chainEndPoints, iPoint, iPoint + 1U);
 		}
 		if (SelectedForm->type == FRMLINE) {
 			ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
-			auto backupAt = 8u;
+			auto backupAt = 8U;
 			if (StateMap.test(StateFlag::LINCHN)) {
 				backupAt--;
 			}

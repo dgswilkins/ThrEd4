@@ -52,9 +52,9 @@ void repair::lodchk() {
 	thred::delinf();
 	if (!FormList->empty()) {
 		auto& formList = *FormList;
-		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			SelectedForm = &formList[iForm];
-			if (SelectedForm->type == 0u) {
+			if (SelectedForm->type == 0U) {
 				SelectedForm->type = FRMFPOLY;
 			}
 			else {
@@ -66,10 +66,10 @@ void repair::lodchk() {
 				}
 			}
 			form::frmout(iForm);
-			if (SelectedForm->maxFillStitchLen == 0.0f) {
+			if (SelectedForm->maxFillStitchLen == 0.0F) {
 				SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
 			}
-			if (SelectedForm->maxBorderStitchLen == 0.0f) {
+			if (SelectedForm->maxBorderStitchLen == 0.0F) {
 				SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
 			}
 		}
@@ -86,7 +86,7 @@ void repair::lodchk() {
 				}
 			}
 		}
-		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			auto& form = (*FormList)[iForm];
 			if (!formMap.test(iForm)) {
 				form.fillType = 0;
@@ -95,11 +95,11 @@ void repair::lodchk() {
 		formMap.reset();
 		for (auto& stitch : *StitchBuffer) {
 			const auto attribute = stitch.attribute;
-			if ((attribute & TYPBRD) != 0u) {
+			if ((attribute & TYPBRD) != 0U) {
 				formMap.set((attribute & FRMSK) >> FRMSHFT);
 			}
 		}
-		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			auto& form = (*FormList)[iForm];
 			if (!formMap.test(iForm)) {
 				form.edgeType = 0;
@@ -157,15 +157,15 @@ uint32_t repair::internal::frmchkfn() {
 	auto badData = BADCNTS {};
 
 	if (!FormList->empty()) {
-		for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			const auto& form = (*FormList)[iForm];
-			if ((badData.attribute & BADFLT) == 0u) {
-				if (form.vertexCount == 0u) {
+			if ((badData.attribute & BADFLT) == 0U) {
+				if (form.vertexCount == 0U) {
 					badData.attribute |= BADFLT;
 				}
 				ri::chkVrtx(form, badData);
 			}
-			if ((badData.attribute & BADCLP) == 0u) {
+			if ((badData.attribute & BADCLP) == 0U) {
 				if (clip::isclp(iForm)) {
 					ri::chkclp(form, badData);
 				}
@@ -173,12 +173,12 @@ uint32_t repair::internal::frmchkfn() {
 					ri::chkeclp(form, badData);
 				}
 			}
-			if ((badData.attribute & BADSAT) == 0u) {
-				if (form.type == SAT && (form.satinGuideCount != 0u)) {
+			if ((badData.attribute & BADSAT) == 0U) {
+				if (form.type == SAT && (form.satinGuideCount != 0U)) {
 					ri::chkSat(form, badData);
 				}
 			}
-			if ((badData.attribute & BADTX) == 0u) {
+			if ((badData.attribute & BADTX) == 0U) {
 				if (texture::istx(iForm)) {
 					ri::chkTxt(form, badData);
 				}
@@ -230,22 +230,22 @@ void repair::internal::chkfstch() noexcept {
 }
 
 void repair::internal::repflt(std::wstring& repairMessage) {
-	auto  iDestination = 0u;
-	auto  vertexCount  = 0u;
+	auto  iDestination = 0U;
+	auto  vertexCount  = 0U;
 	auto  badData      = BADCNTS {};
 	auto& formList     = *FormList;
 
 	for (auto form : *FormList) {
-		if (form.vertexCount != 0u) {
+		if (form.vertexCount != 0U) {
 			formList[iDestination++] = form;
 			vertexCount += form.vertexCount;
 		}
 	}
 	formList.resize(iDestination);
 	auto vertexPoint = std::vector<fPOINT> {};
-	auto iVertex     = 0u;
+	auto iVertex     = 0U;
 	auto flag        = true;
-	for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = formList[iForm];
 		if (FormVertices->size() >= wrap::toSize(form.vertexIndex) + form.vertexCount) {
 			auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
@@ -280,13 +280,13 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 }
 
 void repair::internal::repclp(std::wstring& repairMessage) {
-	auto badClipCount = 0u;
-	auto clipCount    = 0u;
+	auto badClipCount = 0U;
+	auto clipCount    = 0U;
 
 	auto clipPoint = std::vector<fPOINT> {};
-	for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form           = (*FormList)[iForm];
-		auto  clipDifference = 0u;
+		auto  clipDifference = 0U;
 		if (clip::isclp(iForm)) {
 			clipDifference = form.angleOrClipData.clip;
 			if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
@@ -349,16 +349,16 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 	}
 	std::copy(clipPoint.cbegin(), clipPoint.cend(), ClipPoints->begin());
-	if (badClipCount != 0u) {
+	if (badClipCount != 0U) {
 		ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
 	}
 }
 
 void repair::internal::repsat() {
-	auto guideCount = 0u;
+	auto guideCount = 0U;
 	auto badData    = BADCNTS {};
 
-	for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = (*FormList)[iForm];
 		if (form.type == SAT) {
 			const auto guideDifference = form.satinOrAngle.guide;
@@ -391,10 +391,10 @@ void repair::internal::repsat() {
 }
 
 void repair::internal::reptx() {
-	auto textureCount = 0u;
+	auto textureCount = 0U;
 	auto badData      = BADCNTS {};
 
-	for (auto iForm = 0u; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		if (texture::istx(iForm)) {
 			auto& form = (*FormList)[iForm];
 			if (wrap::toUnsigned(TexturePointsBuffer->size())
@@ -434,16 +434,16 @@ void repair::repar() {
 
 	thred::savdo();
 	// RepairString = MsgBuffer;
-	if ((repairType & BADFLT) != 0u) {
+	if ((repairType & BADFLT) != 0U) {
 		ri::repflt(repairMessage);
 	}
-	if ((repairType & BADCLP) != 0u) {
+	if ((repairType & BADCLP) != 0U) {
 		ri::repclp(repairMessage);
 	}
-	if ((repairType & BADSAT) != 0u) {
+	if ((repairType & BADSAT) != 0U) {
 		ri::repsat();
 	}
-	if ((repairType & BADTX) != 0u) {
+	if ((repairType & BADTX) != 0U) {
 		ri::reptx();
 	}
 	repair::lodchk();
@@ -452,23 +452,23 @@ void repair::repar() {
 }
 
 void repair::frmchkx() {
-	if (IniFile.dataCheck != 0u) {
+	if (IniFile.dataCheck != 0U) {
 		const auto code = ri::frmchkfn();
 		switch (IniFile.dataCheck) {
 		case 1: {
-			if (code != 0u) {
+			if (code != 0U) {
 				displayText::datmsg(code);
 			}
 			break;
 		}
 		case 2: {
-			if (code != 0u) {
+			if (code != 0U) {
 				repair::repar();
 			}
 			break;
 		}
 		case 3: {
-			if (code != 0u) {
+			if (code != 0U) {
 				repair::repar();
 				displayText::tabmsg(IDS_DATREP);
 			}

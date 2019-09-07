@@ -50,7 +50,7 @@ uint16_t DaisyTypeStrings[] = {
 };
 
 void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
-	auto labelSize = SIZE { 0l, 0l };
+	auto labelSize = SIZE { 0L, 0L };
 
 	wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
 	textSize.y = labelSize.cy;
@@ -60,7 +60,7 @@ void formForms::maxtsiz(const std::wstring& label, POINT& textSize) {
 }
 
 auto formForms::maxwid(uint32_t start, uint32_t finish) {
-	auto textSize = POINT { 0l, 0l };
+	auto textSize = POINT { 0L, 0L };
 
 	while (start <= finish) {
 		formForms::maxtsiz((*StringTable)[start++], textSize);
@@ -161,12 +161,12 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1u)),
+	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1U)),
 	                                  ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (SelectedForm->type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
-		if ((SelectedForm->extendedAttribute & AT_CWLK) != 0u) {
+		if ((SelectedForm->extendedAttribute & AT_CWLK) != 0U) {
 			choice = stringTable[STR_ON];
 		}
 		else {
@@ -175,7 +175,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		valueWindow[LCWLK] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		labelWindow[LWALK] = ffi::txtwin(stringTable[STR_WALK], LabelWindowCoords);
-		if ((SelectedForm->extendedAttribute & AT_WALK) != 0u) {
+		if ((SelectedForm->extendedAttribute & AT_WALK) != 0U) {
 			choice = stringTable[STR_ON];
 		}
 		else {
@@ -184,7 +184,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		valueWindow[LWALK] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		labelWindow[LUND] = ffi::txtwin(stringTable[STR_UND], LabelWindowCoords);
-		if ((SelectedForm->extendedAttribute & AT_UND) != 0u) {
+		if ((SelectedForm->extendedAttribute & AT_UND) != 0U) {
 			choice = stringTable[STR_ON];
 		}
 		else {
@@ -192,9 +192,9 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		}
 		valueWindow[LUND] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
-		if ((SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0u) {
+		if ((SelectedForm->extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0U) {
 			labelWindow[LUNDCOL] = ffi::txtwin(stringTable[STR_UNDCOL], LabelWindowCoords);
-			valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(L"{}", (SelectedForm->underlayColor + 1u)), ValueWindowCoords);
+			valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(L"{}", (SelectedForm->underlayColor + 1U)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LULEN] = ffi::txtwin(stringTable[STR_ULEN], LabelWindowCoords);
 			valueWindow[LULEN]
@@ -204,7 +204,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		labelWindow[LWLKIND] = ffi::txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
 		valueWindow[LWLKIND] = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlayIndent / PFGRAN)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
-		if ((SelectedForm->extendedAttribute & AT_UND) != 0u) {
+		if ((SelectedForm->extendedAttribute & AT_UND) != 0U) {
 			labelWindow[LUSPAC] = ffi::txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
 			valueWindow[LUSPAC]
 			    = ffi::txtrwin(fmt::format(L"{:.2f}", (SelectedForm->underlaySpacing / PFGRAN)), ValueWindowCoords);
@@ -219,21 +219,21 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	labelWindow[LFRMFIL] = ffi::txtwin(stringTable[STR_TXT2], LabelWindowCoords);
 	valueWindow[LFRMFIL] = ffi::txtrwin(stringTable[wrap::toSize(SelectedForm->fillType) + STR_FIL0], ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if (SelectedForm->fillType != 0u) {
+	if (SelectedForm->fillType != 0U) {
 		labelWindow[LFRMCOL] = ffi::txtwin(stringTable[STR_TXT3], LabelWindowCoords);
-		valueWindow[LFRMCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillColor + 1u)), ValueWindowCoords);
+		valueWindow[LFRMCOL] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillColor + 1U)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		if (SelectedForm->fillType == FTHF) {
 			labelWindow[LFTHCOL] = ffi::txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
 			valueWindow[LFTHCOL]
-			    = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1u)), ValueWindowCoords);
+			    = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillInfo.feather.color + 1U)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
-			valueWindow[LFTHTYP] = ffi::numwin(stringTable[wrap::toSize(SelectedForm->fillInfo.feather.fillType) - 1u + STR_FTH0],
+			valueWindow[LFTHTYP] = ffi::numwin(stringTable[wrap::toSize(SelectedForm->fillInfo.feather.fillType) - 1U + STR_FTH0],
 			                                   ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
-			if ((SelectedForm->extendedAttribute & AT_FTHBLND) != 0u) {
+			if ((SelectedForm->extendedAttribute & AT_FTHBLND) != 0U) {
 				choice = stringTable[STR_ON];
 			}
 			else {
@@ -241,9 +241,9 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 			}
 			valueWindow[LFTHBLND] = ffi::txtrwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
-			if ((SelectedForm->extendedAttribute & AT_FTHBLND) == 0u) {
+			if ((SelectedForm->extendedAttribute & AT_FTHBLND) == 0U) {
 				labelWindow[LFTHBTH] = ffi::txtwin(stringTable[STR_FTHBOTH], LabelWindowCoords);
-				if ((SelectedForm->extendedAttribute & (AT_FTHBTH)) != 0u) {
+				if ((SelectedForm->extendedAttribute & (AT_FTHBTH)) != 0U) {
 					choice = stringTable[STR_ON];
 				}
 				else {
@@ -251,9 +251,9 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 				}
 				valueWindow[LFTHBTH] = ffi::txtrwin(choice, ValueWindowCoords);
 				ffi::nxtlin(formMenuEntryCount);
-				if ((SelectedForm->extendedAttribute & AT_FTHBTH) == 0u) {
+				if ((SelectedForm->extendedAttribute & AT_FTHBTH) == 0U) {
 					labelWindow[LFTHUP] = ffi::txtwin(stringTable[STR_FTHUP], LabelWindowCoords);
-					if ((SelectedForm->extendedAttribute & AT_FTHUP) != 0u) {
+					if ((SelectedForm->extendedAttribute & AT_FTHUP) != 0U) {
 						choice = stringTable[STR_ON];
 					}
 					else {
@@ -327,7 +327,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		if (SelectedForm->fillType == VRTF || SelectedForm->fillType == HORF || SelectedForm->fillType == ANGF
 		    || texture::istx(ClosestFormToCursor)) {
 			labelWindow[LBFILSQR] = ffi::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
-			if ((SelectedForm->extendedAttribute & AT_SQR) != 0u) {
+			if ((SelectedForm->extendedAttribute & AT_SQR) != 0U) {
 				choice = stringTable[STR_SQR];
 			}
 			else {
@@ -338,7 +338,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		}
 	}
 	labelWindow[LFSTRT] = ffi::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
-	if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
+	if ((SelectedForm->extendedAttribute & AT_STRT) != 0U) {
 		choice = stringTable[STR_ON];
 	}
 	else {
@@ -346,13 +346,13 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	}
 	valueWindow[LFSTRT] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if ((SelectedForm->extendedAttribute & AT_STRT) != 0u) {
+	if ((SelectedForm->extendedAttribute & AT_STRT) != 0U) {
 		labelWindow[LDSTRT] = ffi::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
 		valueWindow[LDSTRT] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillStart)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LFEND] = ffi::txtwin(stringTable[STR_FEND], LabelWindowCoords);
-	if ((SelectedForm->extendedAttribute & AT_END) != 0u) {
+	if ((SelectedForm->extendedAttribute & AT_END) != 0U) {
 		choice = stringTable[STR_ON];
 	}
 	else {
@@ -360,7 +360,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 	}
 	valueWindow[LFEND] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if ((SelectedForm->extendedAttribute & AT_END) != 0u) {
+	if ((SelectedForm->extendedAttribute & AT_END) != 0U) {
 		labelWindow[LDEND] = ffi::txtwin(stringTable[STR_FEND], LabelWindowCoords);
 		valueWindow[LDEND] = ffi::numwin(fmt::format(L"{}", (SelectedForm->fillEnd)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
@@ -369,15 +369,15 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 
 	auto edgeFillType = SelectedForm->edgeType & NEGUND;
 	if (edgeFillType >= EDGELAST) {
-		edgeFillType = EDGELAST - 1u;
+		edgeFillType = EDGELAST - 1U;
 	}
-	const auto iEdge = edgeFillType - 1u;
+	const auto iEdge = edgeFillType - 1U;
 
 	valueWindow[LBRD] = ffi::txtrwin(stringTable[wrap::toSize(edgeFillType) + STR_EDG0], ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if (edgeFillType != 0u) {
+	if (edgeFillType != 0U) {
 		labelWindow[LBRDCOL] = ffi::txtwin(stringTable[STR_TXT8], LabelWindowCoords);
-		valueWindow[LBRDCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor & COLMSK) + 1u)), ValueWindowCoords);
+		valueWindow[LBRDCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor & COLMSK) + 1U)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		if ((edgeArray[iEdge] & BESPAC) != 0) {
 			labelWindow[LBRDSPAC] = ffi::txtwin(stringTable[STR_TXT9], LabelWindowCoords);
@@ -429,12 +429,12 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		}
 		if (edgeFillType == EDGEAPPL) {
 			labelWindow[LAPCOL] = ffi::txtwin(stringTable[STR_TXT12], LabelWindowCoords);
-			valueWindow[LAPCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4u) + 1u)), ValueWindowCoords);
+			valueWindow[LAPCOL] = ffi::numwin(fmt::format(L"{}", ((SelectedForm->borderColor >> 4U) + 1U)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
 			labelWindow[LBRDUND] = ffi::txtwin(stringTable[STR_TXT17], LabelWindowCoords);
-			if ((SelectedForm->edgeType & EGUND) != 0u) {
+			if ((SelectedForm->edgeType & EGUND) != 0U) {
 				choice = stringTable[STR_ON];
 			}
 			else {
@@ -456,7 +456,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		}
 		if (SelectedForm->type == FRMLINE && ((edgeArray[iEdge] & BRDEND) != 0)) {
 			labelWindow[LBSTRT] = ffi::txtwin(stringTable[STR_TXT14], LabelWindowCoords);
-			if ((SelectedForm->attribute & SBLNT) != 0u) {
+			if ((SelectedForm->attribute & SBLNT) != 0U) {
 				choice = stringTable[STR_BLUNT];
 			}
 			else {
@@ -465,7 +465,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 			valueWindow[LBSTRT] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LBFIN] = ffi::txtwin(stringTable[STR_TXT15], LabelWindowCoords);
-			if ((SelectedForm->attribute & FBLNT) != 0u) {
+			if ((SelectedForm->attribute & FBLNT) != 0U) {
 				choice = stringTable[STR_BLUNT];
 			}
 			else {
@@ -485,7 +485,7 @@ void formForms::refrm() {
 	}
 	LabelWindowSize = ValueWindowSize = {};
 	StateMap.set(StateFlag::REFCNT); // don't create windows - just size them
-	auto formMenuEntryCount = 0u;
+	auto formMenuEntryCount = 0U;
 	ffi::refrmfn(formMenuEntryCount);
 	if (FormDataSheet != nullptr) {
 		DestroyWindow(FormDataSheet);
@@ -506,7 +506,7 @@ void formForms::refrm() {
 }
 
 void formForms::sidwnd(HWND wnd) noexcept {
-	auto windowRect = RECT { 0l, 0l, 0l, 0l };
+	auto windowRect = RECT { 0L, 0L, 0L, 0L };
 
 	MsgIndex                 = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -529,7 +529,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 }
 
 void formForms::prfsid(HWND wnd) noexcept {
-	auto windowRect = RECT { 0l, 0l, 0l, 0l };
+	auto windowRect = RECT { 0L, 0L, 0L, 0L };
 
 	MsgIndex                 = 0;
 	SideWindowEntryBuffer[0] = 0;
@@ -585,7 +585,7 @@ void formForms::internal::prflin(const std::wstring& msg, uint32_t row) {
 
 void formForms::prfmsg() {
 	auto choice         = std::wstring {};
-	auto preferenceRect = RECT { 0l, 0l, 0l, 0l };
+	auto preferenceRect = RECT { 0L, 0L, 0L, 0L };
 
 	if (StateMap.testAndReset(StateFlag::INSRT)) {
 		StateMap.set(StateFlag::WASRT);
@@ -595,11 +595,11 @@ void formForms::prfmsg() {
 	if (FormDataSheet != nullptr) {
 		thred::undat();
 		thred::unsid();
-		FormMenuChoice = 0u;
+		FormMenuChoice = 0U;
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
 	ValueWindowSize.x = ValueWindowSize.y = 0;
-	formForms::maxtsiz((*StringTable)[STR_PRF0 + 4u], LabelWindowSize);
+	formForms::maxtsiz((*StringTable)[STR_PRF0 + 4U], LabelWindowSize);
 	formForms::maxtsiz((*StringTable)[STR_TAPR], ValueWindowSize);
 	LabelWindowSize.x = formForms::maxwid(STR_PRF0, STR_PRF27);
 	LabelWindowSize.x += 4;
@@ -625,7 +625,7 @@ void formForms::prfmsg() {
 	LabelWindowCoords.right                             = 3 + LabelWindowSize.x;
 	ValueWindowCoords.left                              = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right                             = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
-	ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1u)), STR_PRF10);
+	ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), STR_PRF10);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen / PFGRAN)), STR_PRF29);
 	ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
 	ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
@@ -646,7 +646,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	form::sethup();
-	ffi::prflin(fmt::format(L"{}", (*StringTable)[wrap::toSize(IniFile.hoopType) - 1u + STR_HUP0]), STR_PRF17);
+	ffi::prflin(fmt::format(L"{}", (*StringTable)[wrap::toSize(IniFile.hoopType) - 1U + STR_HUP0]), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
@@ -695,14 +695,14 @@ void formForms::frmnum() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void formForms::internal::chkdaz() {
-	if (IniFile.daisyPetalPoints == 0u) {
-		IniFile.daisyPetalPoints = 1u;
+	if (IniFile.daisyPetalPoints == 0U) {
+		IniFile.daisyPetalPoints = 1U;
 	}
-	if (IniFile.daisyInnerCount == 0u) {
-		IniFile.daisyInnerCount = 1u;
+	if (IniFile.daisyInnerCount == 0U) {
+		IniFile.daisyInnerCount = 1U;
 	}
-	if (IniFile.daisyPetalCount == 0u) {
-		IniFile.daisyPetalCount = 1u;
+	if (IniFile.daisyPetalCount == 0U) {
+		IniFile.daisyPetalCount = 1U;
 	}
 	if (IniFile.daisyHeartCount > gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints)) {
 		IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
@@ -731,14 +731,14 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format(L"{}", IniFile.daisyInnerCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format(L"{}", IniFile.daisyPetalCount).c_str());
 	SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format(L"{:.2f}", IniFile.daisyPetalLen).c_str());
-	auto flag = 1u;
+	auto flag = 1U;
 	if (!UserFlagMap.test(UserFlag::DAZHOL)) {
-		flag = 0u;
+		flag = 0U;
 	}
 	CheckDlgButton(hWinDialog, IDC_HOLE, flag);
-	flag = 1u;
+	flag = 1U;
 	if (!UserFlagMap.test(UserFlag::DAZD)) {
-		flag = 0u;
+		flag = 0U;
 	}
 	CheckDlgButton(hWinDialog, IDC_DLIN, flag);
 	auto daisyType = std::wstring {};
@@ -781,13 +781,13 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			IniFile.daisyPetalCount = wrap::wcstoi<uint32_t>(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.daisyPetalLen = wrap::wcstof(buffer);
-			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0u) {
+			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
 				UserFlagMap.set(UserFlag::DAZHOL);
 			}
 			else {
 				UserFlagMap.reset(UserFlag::DAZHOL);
 			}
-			if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0u) {
+			if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
 				UserFlagMap.set(UserFlag::DAZD);
 			}
 			else {
@@ -812,13 +812,13 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			break;
 		}
 		case IDC_DLIN: {
-			if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0u) {
+			if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
 				CheckDlgButton(hwndlg, IDC_HOLE, BST_CHECKED);
 			}
 			break;
 		}
 		case IDC_HOLE: {
-			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0u) {
+			if (IsDlgButtonChecked(hwndlg, IDC_HOLE) == 0U) {
 				CheckDlgButton(hwndlg, IDC_DLIN, BST_UNCHECKED);
 			}
 			break;
@@ -838,16 +838,16 @@ void formForms::dasyfrm() {
 	const auto referencePoint = fPOINT { form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
 	FormList->push_back(FRMHED {});
 	SelectedForm              = &FormList->back();
-	ClosestFormToCursor       = wrap::toUnsigned(FormList->size() - 1u);
+	ClosestFormToCursor       = wrap::toUnsigned(FormList->size() - 1U);
 	SelectedForm->vertexIndex = wrap::toUnsigned(FormVertices->size());
-	SelectedForm->attribute   = gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1u);
+	SelectedForm->attribute   = gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1U);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
 	if (maximumYsize > maximumXsize) {
 		maximumXsize = maximumYsize;
 	}
-	maximumXsize /= 6.0f;
+	maximumXsize /= 6.0F;
 	auto       diameter     = IniFile.daisyDiameter;
 	auto       petalLength  = IniFile.daisyPetalLen;
 	auto       holeDiameter = IniFile.daisyHoleDiameter;
@@ -856,15 +856,15 @@ void formForms::dasyfrm() {
 	petalLength *= ratio;
 	holeDiameter *= ratio;
 	SelectedForm->type = FRMFPOLY;
-	auto iVertex       = 0u;
-	auto fref          = 0u;
+	auto iVertex       = 0U;
+	auto fref          = 0U;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle            = PI_F2;
 		const auto holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 		const auto holeSegmentAngle = PI_F2 / holeVertexCount;
 		FormVertices->push_back(fPOINT { referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle) });
 		iVertex++;
-		for (auto iSegment = 0u; iSegment < holeVertexCount + 1u; iSegment++) {
+		for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; iSegment++) {
 			FormVertices->push_back(
 			    fPOINT { referencePoint.x + holeDiameter * cos(angle), referencePoint.y + holeDiameter * sin(angle) });
 			iVertex++;
@@ -876,23 +876,23 @@ void formForms::dasyfrm() {
 	auto       petalPointCount  = IniFile.daisyPetalPoints;
 	const auto borderType       = IniFile.daisyBorderType;
 	if (borderType == DHART) {
-		petalPointCount  = (IniFile.daisyHeartCount + 1u) * 2u;
+		petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 		petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
 	}
 	const auto petalSegmentAngle = PI_F2 / petalVertexCount;
 	const auto deltaPetalAngle   = PI_F / IniFile.daisyPetalPoints;
 	if (UserFlagMap.test(UserFlag::DAZD)) {
-		SelectedForm->satinGuideCount    = IniFile.daisyPetalCount - 1u;
-		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1u;
+		SelectedForm->satinGuideCount    = IniFile.daisyPetalCount - 1U;
+		SelectedForm->wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
 		SelectedForm->satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
 	}
 	const auto halfPetalPointCount = IniFile.daisyPetalPoints / 2;
-	auto       angle               = 0.0f;
-	for (auto iMacroPetal = 0u; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
-		auto petalPointAngle         = 0.0f;
+	auto       angle               = 0.0F;
+	for (auto iMacroPetal = 0U; iMacroPetal < IniFile.daisyPetalCount; iMacroPetal++) {
+		auto petalPointAngle         = 0.0F;
 		PseudoRandomValue            = SEED;
-		auto distanceFromDaisyCenter = 0.0f;
-		for (auto iPoint = 0u; iPoint < petalPointCount; iPoint++) {
+		auto distanceFromDaisyCenter = 0.0F;
+		for (auto iPoint = 0U; iPoint < petalPointCount; iPoint++) {
 			switch (borderType) {
 			case DSIN: {
 				distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
@@ -905,7 +905,7 @@ void formForms::dasyfrm() {
 				break;
 			}
 			case DSAW: {
-				auto sawPointCount = 0u;
+				auto sawPointCount = 0U;
 				if (iPoint > halfPetalPointCount) {
 					sawPointCount = IniFile.daisyPetalPoints - iPoint;
 				}
@@ -949,15 +949,15 @@ void formForms::dasyfrm() {
 			angle += petalSegmentAngle;
 			auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
 			if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-				guideIt[iMacroPetal].start  = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1u;
+				guideIt[iMacroPetal].start  = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 				guideIt[iMacroPetal].finish = iVertex;
 			}
 		}
 	}
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
-		vertexIt[fref - 1u].y += 0.01f;
-		vertexIt[fref].y += 0.01f;
+		vertexIt[fref - 1U].y += 0.01F;
+		vertexIt[fref].y += 0.01F;
 	}
 	SelectedForm->vertexCount = iVertex;
 	if (UserFlagMap.test(UserFlag::DAZD)) {
@@ -965,13 +965,13 @@ void formForms::dasyfrm() {
 		SelectedForm->attribute = 1;
 	}
 	StateMap.set(StateFlag::INIT);
-	form::frmout(wrap::toUnsigned(FormList->size() - 1u));
-	for (auto iMacroPetal = 0u; iMacroPetal < iVertex; iMacroPetal++) {
+	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	for (auto iMacroPetal = 0U; iMacroPetal < iVertex; iMacroPetal++) {
 		vertexIt[iMacroPetal].x -= SelectedForm->rectangle.left;
 		vertexIt[iMacroPetal].y -= SelectedForm->rectangle.bottom;
 	}
 	FormMoveDelta      = fPOINT {};
-	NewFormVertexCount = iVertex + 1u;
+	NewFormVertexCount = iVertex + 1U;
 	StateMap.set(StateFlag::POLIMOV);
 	form::setmfrm();
 	form::mdufrm();
@@ -1032,17 +1032,17 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		}
 		case IDC_DEFTEAR: {
 			IniFile.formSides      = 20;
-			IniFile.tearTailLength = 1.1f;
-			IniFile.tearTwistStep  = 0.0f;
-			IniFile.tearTwistRatio = 1.6f;
+			IniFile.tearTailLength = 1.1F;
+			IniFile.tearTwistStep  = 0.0F;
+			IniFile.tearTwistRatio = 1.6F;
 			ffi::initTearDlg(hwndlg);
 			break;
 		}
 		case IDC_DEFPAIS: {
 			IniFile.formSides      = 24;
-			IniFile.tearTailLength = 1.15f;
-			IniFile.tearTwistStep  = 0.3f * PFGRAN;
-			IniFile.tearTwistRatio = 1.8f;
+			IniFile.tearTailLength = 1.15F;
+			IniFile.tearTwistStep  = 0.3F * PFGRAN;
+			IniFile.tearTwistRatio = 1.8F;
 			ffi::initTearDlg(hwndlg);
 			break;
 		}
@@ -1060,15 +1060,15 @@ void formForms::setear() {
 		thred::savdo();
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
-		form::fvars(wrap::toUnsigned(FormList->size() - 1u));
+		form::fvars(wrap::toUnsigned(FormList->size() - 1U));
 		auto       vertexIt         = std::next(FormVertices->begin(), CurrentVertexIndex);
-		const auto count            = wrap::toSize(VertexCount) / 4u;
+		const auto count            = wrap::toSize(VertexCount) / 4U;
 		const auto middle           = form::midl(vertexIt[1].x, vertexIt[0].x);
-		auto       step             = vertexIt[count + 1u].y - vertexIt[count].y;
-		auto       verticalPosition = vertexIt[count + 1u].y;
+		auto       step             = vertexIt[count + 1U].y - vertexIt[count].y;
+		auto       verticalPosition = vertexIt[count + 1U].y;
 		auto       iLeftVertices    = wrap::toSize(VertexCount) - count;
-		auto       iRightVertices   = count + 1u;
-		for (auto iStep = 0u; iStep < count; iStep++) {
+		auto       iRightVertices   = count + 1U;
+		for (auto iStep = 0U; iStep < count; iStep++) {
 			vertexIt[iLeftVertices].y  = verticalPosition;
 			vertexIt[iRightVertices].y = vertexIt[iLeftVertices].y;
 			vertexIt[iRightVertices].x += twistStep;
@@ -1085,8 +1085,8 @@ void formForms::setear() {
 		verticalPosition -= step / 2.0;
 		FormVertices->push_back(vertexIt[0]);
 		vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex); // iterator invalidated by push_back
-		if (twistStep != 0.0f) {
-			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0f;
+		if (twistStep != 0.0F) {
+			vertexIt[0].x = vertexIt[1].x + twistStep / 4.0F;
 		}
 		else {
 			vertexIt[0].x = middle;
@@ -1095,29 +1095,29 @@ void formForms::setear() {
 		SelectedForm->vertexCount++;
 		NewFormVertexCount++;
 		StateMap.set(StateFlag::FORMSEL);
-		form::fvars(wrap::toUnsigned(FormList->size() - 1u));
-		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
+		form::fvars(wrap::toUnsigned(FormList->size() - 1U));
+		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto size = fPOINT { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
 			                       SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
 
-		auto horizontalRatio = UnzoomedRect.x / 4.0f / size.x;
-		if (horizontalRatio > 1.0f) {
-			horizontalRatio = 1.0f;
+		auto horizontalRatio = UnzoomedRect.x / 4.0F / size.x;
+		if (horizontalRatio > 1.0F) {
+			horizontalRatio = 1.0F;
 		}
-		const auto verticalRatio = UnzoomedRect.y / 4.0f / size.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0F / size.y;
 		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
 		}
-		if (horizontalRatio < 1.0f) {
-			for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+		if (horizontalRatio < 1.0F) {
+			for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 				vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
-		for (auto iVertex = 0u; iVertex < VertexCount; iVertex++) {
+		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 			vertexIt[iVertex].x -= SelectedForm->rectangle.left;
 			vertexIt[iVertex].y -= SelectedForm->rectangle.bottom;
 		}
@@ -1163,7 +1163,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 				IniFile.wavePoints = 3;
 			}
 			if (IniFile.waveStart == IniFile.waveEnd) {
-				IniFile.waveEnd += (IniFile.wavePoints >> 2u);
+				IniFile.waveEnd += (IniFile.wavePoints >> 2U);
 			}
 			IniFile.waveStart %= IniFile.wavePoints;
 			IniFile.waveEnd %= IniFile.wavePoints;
@@ -1193,11 +1193,11 @@ void formForms::wavfrm() {
 		// reuse regular polygon code to build the template for points
 		form::durpoli(IniFile.wavePoints);
 		form::mdufrm();
-		auto iPoint    = 0u;
+		auto iPoint    = 0U;
 		auto waveIndex = IniFile.waveStart;
 		auto vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
 		while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
-			const uint16_t iNextVertex = (waveIndex + 1u) % IniFile.wavePoints;
+			const uint16_t iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
 
 			points.emplace_back(-vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
 			                    -vertexIt[iNextVertex].y + vertexIt[waveIndex].y);
@@ -1205,15 +1205,15 @@ void formForms::wavfrm() {
 			waveIndex = iNextVertex;
 		}
 		const auto count           = iPoint;
-		auto       iVertex         = 0u;
+		auto       iVertex         = 0U;
 		auto       currentPosition = fPOINT {};
 		const auto formVerticesSize
 		    = (IniFile.waveLobes * count) + 1 - IniFile.wavePoints; // account for vertices already allocated by durpoli above
 		FormVertices->resize(FormVertices->size() + formVerticesSize);
 		vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex); // resize may invalidate iterator
-		for (auto iLobe = 0u; iLobe < IniFile.waveLobes; iLobe++) {
-			if ((iLobe & 1u) != 0u) {
-				for (auto index = 0u; index < count; index++) {
+		for (auto iLobe = 0U; iLobe < IniFile.waveLobes; iLobe++) {
+			if ((iLobe & 1U) != 0U) {
+				for (auto index = 0U; index < count; index++) {
 					vertexIt[iVertex] = currentPosition;
 					iVertex++;
 					currentPosition.x += points[index].x;
@@ -1224,44 +1224,44 @@ void formForms::wavfrm() {
 				for (auto index = count; index != 0; index--) {
 					vertexIt[iVertex] = currentPosition;
 					iVertex++;
-					currentPosition.x += points[index - 1u].x;
-					currentPosition.y += points[index - 1u].y;
+					currentPosition.x += points[index - 1U].x;
+					currentPosition.y += points[index - 1U].y;
 				}
 			}
 		}
 		vertexIt[iVertex]        = currentPosition;
-		const auto vertexCount   = iVertex + 1u;
+		const auto vertexCount   = iVertex + 1U;
 		const auto rotationAngle = -atan2(vertexIt[iVertex].y - vertexIt[0].y, vertexIt[iVertex].x - vertexIt[0].x);
-		for (auto index = 0u; index < vertexCount; index++) {
+		for (auto index = 0U; index < vertexCount; index++) {
 			thred::rotflt(vertexIt[index], rotationAngle, { 0.0, 0.0 });
 		}
 		SelectedForm->type        = FRMLINE;
 		SelectedForm->vertexCount = vertexCount;
-		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
+		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 		StateMap.reset(StateFlag::FORMSEL);
 		const auto selectedSize    = fPOINT { SelectedForm->rectangle.right - SelectedForm->rectangle.left,
                                            SelectedForm->rectangle.top - SelectedForm->rectangle.bottom };
-		auto       horizontalRatio = UnzoomedRect.x / 4.0f / selectedSize.x;
+		auto       horizontalRatio = UnzoomedRect.x / 4.0F / selectedSize.x;
 		if (horizontalRatio > 1) {
-			horizontalRatio = 1.0f;
+			horizontalRatio = 1.0F;
 		}
-		const auto verticalRatio = UnzoomedRect.y / 4.0f / selectedSize.y;
+		const auto verticalRatio = UnzoomedRect.y / 4.0F / selectedSize.y;
 		if (verticalRatio < horizontalRatio) {
 			horizontalRatio = verticalRatio;
 		}
-		if (horizontalRatio < 1.0f) {
-			for (auto index = 0u; index < vertexCount; index++) {
+		if (horizontalRatio < 1.0F) {
+			for (auto index = 0U; index < vertexCount; index++) {
 				vertexIt[index].x = (vertexIt[index].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
 				vertexIt[index].y = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
-		form::frmout(wrap::toUnsigned(FormList->size() - 1u));
-		for (auto index = 0u; index < vertexCount; index++) {
+		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+		for (auto index = 0U; index < vertexCount; index++) {
 			vertexIt[index].x -= SelectedForm->rectangle.left;
 			vertexIt[index].y -= SelectedForm->rectangle.bottom;
 		}
 		FormMoveDelta      = fPOINT {};
-		NewFormVertexCount = vertexCount + 1u;
+		NewFormVertexCount = vertexCount + 1U;
 		form::setmfrm();
 		form::mdufrm();
 	}

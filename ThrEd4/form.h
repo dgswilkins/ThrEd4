@@ -131,7 +131,7 @@ void mdufrm();
 #pragma warning(push)
 #pragma warning(disable : 26440)
 template <class inType> float midl(inType high, inType low) noexcept {
-	return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0f + gsl::narrow_cast<float>(low);
+	return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
 }
 #pragma warning(pop)
 

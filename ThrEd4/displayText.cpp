@@ -70,8 +70,8 @@ void displayText::shoMsg(const std::wstring& message) {
 	if (!message.empty()) {
 		auto strings = std::vector<std::wstring> {};
 
-		auto       iString              = 0u;
-		auto       previousStringLength = 0u;
+		auto       iString              = 0U;
+		auto       previousStringLength = 0U;
 		const auto sizeLim              = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
@@ -83,8 +83,8 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
-		auto textSize    = SIZE { 0l, 0l };
-		auto messageSize = SIZE { 0l, 0l };
+		auto textSize    = SIZE { 0L, 0L };
+		auto messageSize = SIZE { 0L, 0L };
 		for (auto& string : strings) {
 			wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
 			if (textSize.cx > messageSize.cx) {
@@ -95,7 +95,7 @@ void displayText::shoMsg(const std::wstring& message) {
 			}
 		}
 		messageSize.cy *= gsl::narrow<int32_t>(strings.size());
-		auto mainRect = RECT { 0l, 0l, 0l, 0l };
+		auto mainRect = RECT { 0L, 0L, 0L, 0L };
 		GetWindowRect(MainStitchWin, &mainRect);
 		auto xOffset = mainRect.left;
 		GetWindowRect(ThrEdWindow, &mainRect);
@@ -135,10 +135,10 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() noexcept {
-	auto messageRect = RECT { 0l, 0l, 0l, 0l };
+	auto messageRect = RECT { 0L, 0L, 0L, 0L };
 
 	GetClientRect(MsgWindow, &messageRect);
-	auto wRect = RECT { 0l, 0l, 0l, 0l };
+	auto wRect = RECT { 0L, 0L, 0L, 0L };
 	GetWindowRect(MainStitchWin, &wRect);
 	auto xOffset = wRect.left;
 	GetWindowRect(ThrEdWindow, &wRect);
@@ -208,7 +208,7 @@ void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 			}
 		}
 		else {
-			SetWindowText((*ButtonWin)[iButton], (*StringTable)[wrap::toSize(iButton) - 4u + STR_TRC0].c_str());
+			SetWindowText((*ButtonWin)[iButton], (*StringTable)[wrap::toSize(iButton) - 4U + STR_TRC0].c_str());
 		}
 	}
 	else {
@@ -217,7 +217,7 @@ void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 }
 
 void displayText::clrhbut(uint32_t startButton) {
-	for (auto iButton = startButton; iButton < 9u; iButton++) {
+	for (auto iButton = startButton; iButton < 9U; iButton++) {
 		SetWindowText((*ButtonWin)[iButton], L"");
 	}
 }
@@ -328,7 +328,7 @@ void displayText::spltmsg() {
 }
 
 void displayText::datmsg(uint32_t code) {
-	auto dataErrorID = 0u;
+	auto dataErrorID = 0U;
 	auto dataError   = std::wstring {};
 
 	switch (code) {
@@ -360,7 +360,7 @@ void displayText::okcan() {
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
 	                        MsgRect.bottom + 15,
-	                        ButtonWidth << 2u,
+	                        ButtonWidth << 2U,
 	                        ButtonHeight,
 	                        MainStitchWin,
 	                        nullptr,
@@ -441,8 +441,8 @@ GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
 #pragma warning(pop)
 
 void displayText::tomsg() {
-	auto OKrect   = RECT { 0l, 0l, 0l, 0l };
-	auto textSize = SIZE { 0l, 0l };
+	auto OKrect   = RECT { 0L, 0L, 0L, 0L };
+	auto textSize = SIZE { 0L, 0L };
 
 	GetWindowRect(OKButton, &OKrect);
 	wrap::GetTextExtentPoint32(
@@ -482,11 +482,11 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	di::bxtxt(HTXHOR, IDS_TXHOR);
 	di::bxtxt(HTXANG, IDS_TXANG);
 	di::bxtxt(HTXMIR, IDS_TXMIR);
-	SetWindowText((*ButtonWin)[HTXMIR + 1u], L"");
+	SetWindowText((*ButtonWin)[HTXMIR + 1U], L"");
 }
 
 HFONT displayText::getThrEdFont(int32_t weight) noexcept {
-	auto lfText = LOGFONT { 0l, 0l, 0l, 0l, 0l, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
+	auto lfText = LOGFONT { 0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
