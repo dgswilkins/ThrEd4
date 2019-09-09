@@ -3986,7 +3986,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 					else {
 						if (savedTopLine != sortedLines[iLineDec][1].line) {
 							if (iLineDec != 0U) {
-								sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]);
+								sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
 							}
 							flag          = true;
 							sequenceLines = duseq2(sortedLines[iLineDec]);
@@ -3996,7 +3996,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				}
 				else {
 					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-						sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]);
+						sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
 					}
 					flag          = true;
 					sequenceLines = sortedLines[iLineDec];
@@ -4022,7 +4022,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 					else {
 						if (savedTopLine != sortedLines[iLine][1].line) {
 							if (iLine != 0U) {
-								sequenceLines = duseq2(sortedLines[iLine - 1U]);
+								sequenceLines = duseq2(sortedLines[iLine - 1U]); // NOLINT
 							}
 							flag          = true;
 							sequenceLines = duseq2(sortedLines[iLine]);
@@ -4033,7 +4033,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				else {
 					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 						if (iLine != 0U) {
-							sequenceLines = duseq2(sortedLines[iLine - 1U]);
+							sequenceLines = duseq2(sortedLines[iLine - 1U]); // NOLINT
 						}
 					}
 					flag          = true;
@@ -5515,6 +5515,7 @@ void form::insat() { // insert a point in a form
 			fi::nufpnt(ClosestVertexToCursor, selectedForm);
 			auto vertexIt = std::next(FormVertices->begin(), selectedForm->vertexIndex);
 			if (StateMap.testAndReset(StateFlag::PRELIN)) {
+				// ToDo - convert to std::swap
 				SelectedPoint = vertexIt[0];
 				vertexIt[0]   = vertexIt[1];
 				vertexIt[1]   = SelectedPoint;
@@ -5657,6 +5658,7 @@ void form::setins() {
 	fi::nufpnt(FormVertexPrev, FormForInsert);
 	if (StateMap.test(StateFlag::PRELIN)) {
 		auto vertexIt = std::next(FormVertices->begin(), FormForInsert->vertexIndex);
+		// ToDo - use std:swap
 		SelectedPoint = vertexIt[0];
 		vertexIt[0]   = vertexIt[1];
 		vertexIt[1]   = SelectedPoint;
@@ -8363,18 +8365,21 @@ void form::stchadj() {
 }
 
 bool form::internal::spltlin() {
-	if (ClosestVertexToCursor < 2 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
+	if (ClosestVertexToCursor < 1 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
 		return false;
 	}
+	fi::nufpnt(ClosestVertexToCursor, SelectedForm);
+	auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
+	vertexIt[1U] = vertexIt[0U];
+	form::frmlin(SelectedForm->vertexIndex, SelectedForm->vertexCount);
+
+	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), 1, (*FormList)[ClosestFormToCursor]);
 	auto& srcForm = (*FormList)[ClosestFormToCursor];
-	auto  it      = std::next(FormList->cbegin(), ClosestFormToCursor);
-	it            = FormList->insert(it, srcForm);
-	srcForm       = (*FormList)[ClosestFormToCursor];
 	auto& dstForm = (*FormList)[wrap::toSize(ClosestFormToCursor) + 1U];
 
-	SelectedForm->vertexCount = ClosestVertexToCursor;
-	dstForm.vertexCount -= ClosestVertexToCursor;
-	dstForm.vertexIndex = srcForm.vertexIndex + ClosestVertexToCursor;
+	srcForm.vertexCount = ClosestVertexToCursor + 1U;
+	dstForm.vertexCount -= srcForm.vertexCount;
+	dstForm.vertexIndex = srcForm.vertexIndex + srcForm.vertexCount;
 	form::frmout(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor + 1U);
 	if (clip::iseclp(ClosestFormToCursor)) {
