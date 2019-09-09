@@ -211,7 +211,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 			valueWindow[LUANG]
-			    = ffi::txtrwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->underlayStitchAngle) * 180 / PI)),
+			    = ffi::txtrwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->underlayStitchAngle) * 180.0 / PI)),
 			                   ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
@@ -308,14 +308,14 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LFRMANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180 / PI)),
+			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180.0 / PI)),
 			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == ANGCLPF) {
 			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LSACANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->satinOrAngle.angle) * 180 / PI)),
+			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->satinOrAngle.angle) * 180.0 / PI)),
 			                  ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
@@ -634,7 +634,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
 	ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
-	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI * 180)), STR_PRF1);
+	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI_F * 180.0F)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL)) {
 		choice = (*StringTable)[STR_SQR];
 	}
@@ -795,7 +795,7 @@ BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			}
 			GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			wchar_t compareBuffer[HBUFSIZ] = { 0 };
-			for (uint8_t iType = 0; iType < 6; iType++) {
+			for (uint8_t iType = 0U; iType < 6U; iType++) {
 				LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPTSTR>(compareBuffer), HBUFSIZ);
 				if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 					IniFile.daisyBorderType = iType;
@@ -1039,7 +1039,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 			break;
 		}
 		case IDC_DEFPAIS: {
-			IniFile.formSides      = 24;
+			IniFile.formSides      = 24U;
 			IniFile.tearTailLength = 1.15F;
 			IniFile.tearTwistStep  = 0.3F * PFGRAN;
 			IniFile.tearTwistRatio = 1.8F;
@@ -1082,7 +1082,7 @@ void formForms::setear() {
 		vertexIt[0].y = vertexIt[1].y = verticalPosition;
 		vertexIt[0].x += twistStep;
 		vertexIt[1].x += twistStep;
-		verticalPosition -= step / 2.0;
+		verticalPosition -= step / 2.0F;
 		FormVertices->push_back(vertexIt[0]);
 		vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex); // iterator invalidated by push_back
 		if (twistStep != 0.0F) {
@@ -1156,8 +1156,8 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 			IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer);
 			GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 			IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer);
-			if (IniFile.wavePoints > 100) {
-				IniFile.wavePoints = 100;
+			if (IniFile.wavePoints > 100U) {
+				IniFile.wavePoints = 100U;
 			}
 			if (IniFile.wavePoints < 3) {
 				IniFile.wavePoints = 3;

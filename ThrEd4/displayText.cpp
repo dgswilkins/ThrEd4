@@ -199,7 +199,7 @@ void displayText::crmsg(const fs::path& fileName) {
 
 void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
-		if (iButton == 5) {
+		if (iButton == 5U) {
 			if (StateMap.test(StateFlag::HIDMAP)) {
 				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1H].c_str());
 			}

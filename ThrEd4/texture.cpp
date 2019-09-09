@@ -1492,7 +1492,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 		}
 		}
 		if (flag) {
-			if (TextureInputBuffer->size() < 8) { // floating point 7 digits of precision + '.'
+			if (TextureInputBuffer->size() < 8U) { // floating point 7 digits of precision + '.'
 				if (txi::txdig(keyCode, character)) {
 					TextureInputBuffer->push_back(character);
 				}

@@ -262,8 +262,8 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 	const auto length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
-	if (length < (2.0 * feather.minStitch)) {
-		feather.ratio = 0.5;
+	if (length < (2.0F * feather.minStitch)) {
+		feather.ratio = 0.5F;
 		ratpnt(iSequence, iSequence + 1, currentPoint, feather.ratio);
 		ratpnt(iSequence + 3, iSequence + 2, nextPoint, feather.ratio);
 	}
@@ -303,7 +303,7 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 		auto adjustedPoint = fPOINT {};
 		auto currentPoint  = fPOINT {};
 		auto nextPoint     = fPOINT {};
-		feather.ratioLocal = 0.5;
+		feather.ratioLocal = 0.5F;
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
 		xratf(adjustedPoint, (*OSequence)[iSequence], currentPoint, feather.ratioLocal);
@@ -874,7 +874,7 @@ uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
 
 	result = ((bit & 0xffU) - 18U);
 
-	if ((result != 12) || ((maskedAttribute & TYPATMSK) == 0)) {
+	if ((result != 12U) || ((maskedAttribute & TYPATMSK) == 0)) {
 		return result & 0xfU;
 	}
 
@@ -1076,7 +1076,7 @@ void xt::fsort() {
 	auto attribute = (*StitchBuffer)[0].attribute & SRTMSK;
 
 	auto stitchRegion = std::vector<OREC> {};
-	stitchRegion.reserve(100);
+	stitchRegion.reserve(100U);
 
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
@@ -1084,7 +1084,7 @@ void xt::fsort() {
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = &(*StitchBuffer)[0];
 	ColorOrder[AppliqueColor]       = 0;
-	for (auto iColor = 0U; iColor < 16; iColor++) {
+	for (auto iColor = 0U; iColor < 16U; iColor++) {
 		if (iColor != AppliqueColor) {
 			ColorOrder[iColor] = iColor + 1U;
 		}

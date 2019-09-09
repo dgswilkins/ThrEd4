@@ -57,7 +57,7 @@ POINT     TraceMsgPoint;               // message point for trace parsing
 uint32_t  HighColors[3];               // separated upper reference colors
 uint32_t  LowColors[3];                // separated lower reference colors
 uint32_t  ColumnColor;                 // trace color column
-uint32_t  TraceShift[] = { 0, 8, 16 }; // trace shift values
+uint32_t  TraceShift[] = { 0U, 8U, 16U }; // trace shift values
 HBRUSH    TraceBrush[3];               // red,green,and blue brushes
 HWND      TraceNumberInput;            // trace number input window
 HPEN      BlackPen;                    // black pen
@@ -204,7 +204,7 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 }
 
 void trace::internal::tracwnd() {
-	for (auto iColor = 0U; iColor < 16; iColor++) {
+	for (auto iColor = 0U; iColor < 16U; iColor++) {
 		ti::hidwnd((*DefaultColorWin)[iColor]);
 		ti::hidwnd(UserColorWin[iColor]);
 		ti::hidwnd(ThreadSizeWin[iColor]);
@@ -269,7 +269,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 uint32_t trace::internal::trsum() noexcept {
 	auto sumAdjacent = 0U;
 
-	for (auto iAdjacent = 1U; iAdjacent < 9; iAdjacent++) {
+	for (auto iAdjacent = 1U; iAdjacent < 9U; iAdjacent++) {
 		sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0])
 		                    ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0])
 		                    : (TraceAdjacentColors[0] - TraceAdjacentColors[iAdjacent]));
@@ -638,7 +638,7 @@ bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDir
 	}
 	if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 		tracedPoints.push_back({ gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y) });
-		if (tracedPoints.size() >= 500000) {
+		if (tracedPoints.size() >= 500000U) {
 			return false;
 		}
 	}
@@ -780,7 +780,7 @@ void trace::internal::dutrac() {
 		while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) {
 			;
 		}
-		if (tracedPoints.size() >= 500000) {
+		if (tracedPoints.size() >= 500000U) {
 			displayText::tabmsg(IDS_FRM2L);
 			return;
 		}
@@ -1155,18 +1155,18 @@ void trace::tracpar() {
 		}
 		else {
 			const auto position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
-			if (position < 16) {
+			if (position < 16U) {
 				StateMap.flip(TraceRGBFlag[ColumnColor]);
 				thred::redraw(TraceSelectWindow[ColumnColor]);
 				trace::trace();
 			}
 			else {
-				if (position < 18) {
+				if (position < 18U) {
 					StateMap.set(StateFlag::NUMIN);
 					StateMap.set(StateFlag::TRNIN0);
 					MsgIndex            = 0;
 					TraceInputBuffer[0] = 0;
-					if (position < 17) {
+					if (position < 17U) {
 						ti::trnumwnd0(ButtonHeight * 16);
 						StateMap.set(StateFlag::TRNUP);
 					}
@@ -1181,7 +1181,7 @@ void trace::tracpar() {
 						StateMap.set(StateFlag::TRNIN1);
 						MsgIndex            = 0;
 						TraceInputBuffer[0] = 0;
-						if (position < 19) {
+						if (position < 19U) {
 							ti::trnumwnd1(ButtonHeight * 18);
 							StateMap.set(StateFlag::TRNUP);
 						}
@@ -1192,23 +1192,23 @@ void trace::tracpar() {
 					}
 					else {
 						switch (position) {
-						case 20: {
+						case 20U: {
 							trace::trdif();
 							break;
 						}
-						case 21: {
+						case 21U: {
 							thred::hidbit();
 							break;
 						}
-						case 22: {
+						case 22U: {
 							trace::blak();
 							break;
 						}
-						case 23: {
+						case 23U: {
 							trace::trcsel();
 							break;
 						}
-						case 24: {
+						case 24U: {
 							trace::tracedg();
 							break;
 						}
@@ -1257,9 +1257,9 @@ void trace::internal::durct(uint32_t    shift,
 	traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
 	traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
 
-	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255;
+	auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255.0;
 	traceMiddleMask.top    = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
-	ratio                  = gsl::narrow_cast<double>(upperColor) / 255;
+	ratio                  = gsl::narrow_cast<double>(upperColor) / 255.0;
 	traceMiddleMask.bottom = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
 	StateMap.reset(StateFlag::DUHI);
 	StateMap.reset(StateFlag::DULO);
@@ -1268,7 +1268,7 @@ void trace::internal::durct(uint32_t    shift,
 		traceLowMask.bottom = traceMiddleMask.top;
 		traceLowMask.top    = 0;
 	}
-	if (upperColor != 255) {
+	if (upperColor != 255U) {
 		StateMap.set(StateFlag::DUHI);
 		traceHighMask.top    = traceMiddleMask.bottom;
 		traceHighMask.bottom = traceControlRect.bottom;

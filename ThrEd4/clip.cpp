@@ -267,7 +267,7 @@ bool clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords) noexcept {
 			const auto delta = ClipRectSize.cx - length;
 			moveToCoords.x += delta * cosAngle;
 			moveToCoords.y += delta * sinAngle;
-			if (fabs(delta) < 0.01) {
+			if (fabs(delta) < 0.01F) {
 				break;
 			}
 		}
@@ -459,12 +459,12 @@ bool clip::internal::fxpnt(const std::vector<float>& listSINEs,
 	moveToCoords  = vertexIt[NextStart];
 	auto length   = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 	if (length > AdjustedSpace) {
-		for (auto iGuess = 0U; iGuess < 10; iGuess++) {
+		for (auto iGuess = 0U; iGuess < 10U; iGuess++) {
 			length           = hypot(moveToCoords.x - SelectedPoint.x, moveToCoords.y - SelectedPoint.y);
 			const auto delta = AdjustedSpace - length;
 			moveToCoords.x += delta * listCOSINEs[currentSide];
 			moveToCoords.y += delta * listSINEs[currentSide];
-			if (fabs(delta) < 0.2) {
+			if (fabs(delta) < 0.2F) {
 				break;
 			}
 		}
@@ -544,7 +544,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 	auto       smallestSpacing = 0.0F;
 	auto       largestSpacing  = 1.0F;
 	// loop at least 50 times to guarantee convergence
-	while (loopCount < 50 && (largestSpacing - smallestSpacing) > TINY) {
+	while (loopCount < 50U && (largestSpacing - smallestSpacing) > TINY) {
 		BeanCount        = 0;
 		SelectedPoint    = vertexIt[0];
 		auto currentSide = 0U;
@@ -691,7 +691,7 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 void clip::duxclp() {
 	auto chainEndPoints = std::vector<fPOINT> {};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
-	chainEndPoints.reserve(50);
+	chainEndPoints.reserve(50U);
 	ci::dufxlen(chainEndPoints);
 	auto tempClipPoints = std::vector<fPOINT> {};
 	tempClipPoints.reserve(ClipBuffer->size());
@@ -843,7 +843,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 	const auto chainSequence = std::vector<uint32_t> { 0, 1, 2, 3, 0, 1, 4, 3, 0, 3 }; // chain stitch sequence
 
 	auto chainPoint = std::vector<fPOINT> {};
-	chainPoint.resize(5);
+	chainPoint.resize(5U);
 	auto delta
 	    = fPOINT { (chainEndPoints[finish].x - chainEndPoints[start].x), (chainEndPoints[finish].y - chainEndPoints[start].y) };
 	const auto lengthDelta  = fPOINT { (delta.x * SelectedForm->edgeStitchLen), (delta.y * SelectedForm->edgeStitchLen) };
@@ -909,7 +909,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 void clip::chnfn() {
 	auto chainEndPoints = std::vector<fPOINT> {};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
-	chainEndPoints.reserve(50);
+	chainEndPoints.reserve(50U);
 	form::fvars(ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
 	ci::dufxlen(chainEndPoints);

@@ -745,9 +745,9 @@ void satin::ribon() {
 				// reset vars as emplace may invalidate pointers
 				form::fvars(ClosestFormToCursor);
 				auto iNewVertex       = 0U;
-				form.maxFillStitchLen = 9 * PFGRAN;
+				form.maxFillStitchLen = 9.0F * PFGRAN;
 				form.minFillStitchLen = MinStitchLength;
-				MaxStitchLen          = 9 * PFGRAN;
+				MaxStitchLen          = 9.0F * PFGRAN;
 				if (SelectedForm->type == FRMLINE) {
 					// Set blunt flags
 					auto isBlunt = 0U;
@@ -1269,7 +1269,7 @@ void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& p
 void satin::internal::sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish) {
 	auto& outsidePoints = *OutsidePoints;
 	auto  satinBackup   = std::vector<fPOINT> {}; // backup stitches in satin fills
-	satinBackup.resize(8);
+	satinBackup.resize(8U);
 	auto innerDelta
 	    = fPOINT { (insidePoints[finish].x - insidePoints[start].x), (insidePoints[finish].y - insidePoints[start].y) };
 	const auto innerLength = hypot(innerDelta.x, innerDelta.y);
