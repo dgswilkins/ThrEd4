@@ -7134,7 +7134,7 @@ void thred::internal::lodclp(uint32_t iStitch) {
 	ClosestPointIndex = iStitch;
 	for (auto& clip : *ClipBuffer) {
 		(*StitchBuffer)[iStitch++]
-		    = { clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, clip.attribute & COLMSK | LayerIndex | NOTFRM };
+		    = { clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | LayerIndex | NOTFRM };
 	}
 	GroupStitchIndex = iStitch - 1U;
 	StateMap.set(StateFlag::GRPSEL);
@@ -9930,8 +9930,8 @@ void thred::internal::colchk() {
 		for (auto iStitch = 0U; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			if (color != ((*StitchBuffer)[iStitch].attribute & COLMSK)) {
 				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0U)) {
-					(*StitchBuffer)[iStitch - 1U].attribute
-					    = (*StitchBuffer)[iStitch].attribute & NCOLMSK | ((*StitchBuffer)[currentStitch - 1U].attribute & COLMSK);
+					(*StitchBuffer)[iStitch - 1U].attribute = ((*StitchBuffer)[iStitch].attribute & NCOLMSK)
+					                                          | ((*StitchBuffer)[currentStitch - 1U].attribute & COLMSK);
 				}
 				color         = (*StitchBuffer)[iStitch].attribute & COLMSK;
 				currentStitch = iStitch;
@@ -11101,7 +11101,8 @@ void thred::internal::retrac() {
 
 void thred::internal::setgrd(COLORREF color) {
 	const GRDCOD gridCodes[] = {
-		ID_GRDHI, HIGRD, ID_GRDMED, MEDGRD, ID_GRDEF, DEFGRD, ID_GRDRED, REDGRD, ID_GRDBLU, BLUGRD, ID_GRDGRN, GRNGRD,
+		{ ID_GRDHI, HIGRD },   { ID_GRDMED, MEDGRD }, { ID_GRDEF, DEFGRD },
+		{ ID_GRDRED, REDGRD }, { ID_GRDBLU, BLUGRD }, { ID_GRDGRN, GRNGRD },
 	};
 
 	for (const auto gridCode : gridCodes) {

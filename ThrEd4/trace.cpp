@@ -171,7 +171,7 @@ void trace::internal::getrmap() {
 		                             0L,
 		                             0U,
 		                             0U };
-	auto info   = BITMAPINFO { header, RGBQUAD { 0, 0, 0, 0 } };
+	auto info   = BITMAPINFO { header, { RGBQUAD { 0, 0, 0, 0 } } };
 	TraceBitmap = thred::getBitmap(BitmapDC, &info, &TraceBitmapData);
 	TraceDC     = CreateCompatibleDC(StitchWindowDC);
 	if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
@@ -854,7 +854,7 @@ void trace::internal::dutrac() {
 }
 
 void trace::trinit() {
-	uint32_t histogramData[3][256] = { 0 };
+	uint32_t histogramData[3][256] = { { 0 } };
 
 	if (PCSBMPFileName[0] != 0) {
 		if (!StateMap.test(StateFlag::TRSET)) {
