@@ -5515,10 +5515,7 @@ void form::insat() { // insert a point in a form
 			fi::nufpnt(ClosestVertexToCursor, selectedForm);
 			auto vertexIt = std::next(FormVertices->begin(), selectedForm->vertexIndex);
 			if (StateMap.testAndReset(StateFlag::PRELIN)) {
-				// ToDo - convert to std::swap
-				SelectedPoint = vertexIt[0];
-				vertexIt[0]   = vertexIt[1];
-				vertexIt[1]   = SelectedPoint;
+				std::swap(vertexIt[0], vertexIt[1]);
 			}
 		}
 		else {
@@ -5658,10 +5655,7 @@ void form::setins() {
 	fi::nufpnt(FormVertexPrev, FormForInsert);
 	if (StateMap.test(StateFlag::PRELIN)) {
 		auto vertexIt = std::next(FormVertices->begin(), FormForInsert->vertexIndex);
-		// ToDo - use std:swap
-		SelectedPoint = vertexIt[0];
-		vertexIt[0]   = vertexIt[1];
-		vertexIt[1]   = SelectedPoint;
+		std::swap(vertexIt[0], vertexIt[1]);
 	}
 	else {
 		VertexCount    = FormForInsert->vertexCount;
