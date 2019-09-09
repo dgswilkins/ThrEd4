@@ -571,7 +571,7 @@ enum class StateFlag
 	INDIR,     // inner border switched with outer
 	DIDSTRT,   // start stitches have been written
 	REFCNT,    // counting the form-form lines
-	UNDCOL,    // user is entrering an underlay color
+	UNDCOL,    // user is entering an underlay color
 	FSETULEN,  // user is setting the underlay stitch length for a group of forms
 	ISEND,     // writing the end stitches
 	FSETUSPAC, // user is setting the underlay spacing for a group of forms
