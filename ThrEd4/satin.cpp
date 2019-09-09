@@ -842,7 +842,7 @@ void satin::slbrd() {
 
 	OSequence->clear();
 	if ((SelectedForm->edgeType & EGUND) != 0U) {
-		auto width = SelectedForm->borderSize * URAT;
+		const auto width = SelectedForm->borderSize * URAT;
 		satin::satout(width);
 		si::satends(SelectedForm->attribute, width);
 		StateMap.reset(StateFlag::SAT1);
@@ -856,7 +856,7 @@ void satin::slbrd() {
 			si::sbfn(*InsidePoints, iVertex, iVertex - 1);
 		}
 	}
-	auto width = SelectedForm->borderSize;
+	const auto width = SelectedForm->borderSize;
 	satin::satout(width);
 	si::satends(SelectedForm->attribute, width);
 	LineSpacing = SelectedForm->edgeSpacing;
