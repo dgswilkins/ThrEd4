@@ -2329,18 +2329,18 @@ inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
 	return *this;
 }
 
-constexpr uint8_t FRMEND   = 0x01U; // 0000 0001
-constexpr uint8_t FRMLMSK  = 0x0eU; // 0000 1110
-constexpr uint8_t NFRMLMSK = 0xf1U; // 1111 0001
-
 /*form attribute bits
 
-1		end teflon line
-2-4	layer bits
+0		end teflon line
+1-3		layer bits
 5		finish blunt
 6		start blunt
 7		refill bit for contour fill
 */
+
+constexpr uint8_t FRMEND   = 0x01U; // 0000 0001
+constexpr uint8_t FRMLMSK  = 0x0eU; // 0000 1110
+constexpr uint8_t NFRMLMSK = 0xf1U; // 1111 0001
 
 // blunt bits
 constexpr uint8_t FBLNT  = 0x20U; // 0010 0000
@@ -2348,6 +2348,10 @@ constexpr uint8_t SBLNT  = 0x40U; // 0100 0000
 constexpr uint8_t NFBLNT = 0xdfU; // 1101 1111
 constexpr uint8_t NSBLNT = 0xbfU; // 1011 1111
 constexpr uint8_t NOBLNT = 0x9fU; // 1001 1111
+
+// contour refil
+constexpr auto FRECONT  = 0x80U; // 1000 0000
+constexpr auto NFRECONT = 0x7fU; // 0111 1111
 
 // frmhed extended attribute bits
 
@@ -2360,10 +2364,6 @@ constexpr auto AT_END     = 1U << 5U; // user set end flag
 constexpr auto AT_UND     = 1U << 6U; // underlay flag
 constexpr auto AT_WALK    = 1U << 7U; // edge walk
 constexpr auto AT_CWLK    = 1U << 8U; // center walk
-
-// contour refil
-constexpr auto FRECONT  = 0x80U; // 1000 0000
-constexpr auto NFRECONT = 0x7fU; // 0111 1111
 
 class FORMCLIP // form data clipboard header
 {
