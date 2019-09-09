@@ -13157,6 +13157,8 @@ bool thred::internal::handleSideWindowActive() {
 		auto layerStr
 		    = fmt::format(L"{}", (gsl::narrow_cast<decltype(SelectedForm->attribute)>(SelectedForm->attribute & FRMLMSK) >> 1U));
 		SetWindowText((*ValueWindow)[LLAYR], layerStr.c_str());
+		formForms::refrm();
+
 		return true;
 	}
 	SelectedForm->borderColor &= COLMSK;
