@@ -5579,12 +5579,14 @@ void form::unfil() {
 			const auto codedForm = ClosestFormToCursor << FRMSHFT;
 			if (!StitchBuffer->empty()) {
 				auto iDestination = StitchBuffer->begin();
+				auto destCount = 0u;
 				for (auto& stitch : *StitchBuffer) {
 					if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
 						*iDestination++ = stitch;
+						destCount++;
 					}
 				}
-				StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
+				StitchBuffer->resize(destCount);
 			}
 			clip::delclps(ClosestFormToCursor);
 			texture::deltx(ClosestFormToCursor);
