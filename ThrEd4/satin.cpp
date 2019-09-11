@@ -385,7 +385,7 @@ void satin::satadj() {
 		}
 		if (SatinEndGuide != 0U) {
 			satinMap.set(SatinEndGuide);
-			satinMap.set(wrap::toSize(SatinEndGuide) + 1U);
+			satinMap.set((wrap::toSize(SatinEndGuide) + 1U) % VertexCount);
 		}
 		// check to see if any of the current guides are end guides and add to interiorGuides if not
 		interiorGuides.clear();
