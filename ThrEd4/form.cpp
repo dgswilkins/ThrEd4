@@ -5469,13 +5469,16 @@ void form::internal::nufpnt(uint32_t vertex, FRMHED* formForInsert) {
 		formForInsert->vertexCount++;
 		auto vertexIt                       = std::next(FormVertices->begin(), formForInsert->vertexIndex);
 		vertexIt[wrap::toSize(vertex) + 1U] = SelectedPoint;
-		auto guideIt                        = std::next(SatinGuides->begin(), formForInsert->satinOrAngle.guide);
-		for (auto ind = 0U; ind < formForInsert->satinGuideCount; ind++) {
-			if (guideIt[ind].start > vertex) {
-				guideIt[ind].start++;
-			}
-			if (guideIt[ind].finish > vertex) {
-				guideIt[ind].finish++;
+		if (formForInsert->satinGuideCount != 0u) {
+			auto guideIt = std::next(SatinGuides->begin(), formForInsert->satinOrAngle.guide);
+			for (auto ind = 0U; ind < formForInsert->satinGuideCount; ind++) {
+				if (guideIt->start > vertex) {
+					guideIt->start++;
+				}
+				if (guideIt->finish > vertex) {
+					guideIt->finish++;
+				}
+				guideIt++;
 			}
 		}
 		if (formForInsert->wordParam >= vertex + 1U) {
