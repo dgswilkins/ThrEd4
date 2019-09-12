@@ -166,7 +166,13 @@ void satin::spltsat(uint32_t guideIndex) {
 	SelectedForm->satinGuideCount = guideIndex;
 	for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; iForm++) {
 		auto& formIter = formList[iForm];
-		formIter.satinOrAngle.guide--;
+		if (formIter.satinGuideCount != 0 || formIter.satinOrAngle.guide != 0u) {
+			formIter.satinOrAngle.guide--;
+		}
+		else {
+			// under most circumstances this code is redundant, but it does ensure consistency
+			formIter.satinOrAngle.guide = 0;
+		}
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
 		form::clpspac(SelectedForm->borderClipData, SelectedForm->clipEntries);
