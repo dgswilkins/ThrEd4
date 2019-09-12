@@ -50,7 +50,8 @@ void satin::delsac(uint32_t formIndex) {
 			auto eraseEnd   = std::next(eraseStart, formList[formIndex].satinGuideCount);
 			SatinGuides->erase(eraseStart, eraseEnd);
 			for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U)) {
+				if (formList[iForm].type == SAT && (formList[iForm].satinGuideCount != 0U)
+				    && (formList[iForm].satinOrAngle.guide >= formList[formIndex].satinGuideCount)) {
 					formList[iForm].satinOrAngle.guide -= formList[formIndex].satinGuideCount;
 				}
 			}
@@ -547,7 +548,7 @@ void satin::satadj() {
 		OutputDebugString(fmt::format(L"Guides adjusted by {}, so updating forms\n", iGuide).c_str());
 		for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 			auto& form = (*FormList)[iForm];
-			if (form.type == SAT) {
+			if ((form.type == SAT) && (form.satinOrAngle.guide >= iGuide)) {
 				form.satinOrAngle.guide -= iGuide;
 			}
 		}
