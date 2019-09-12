@@ -166,12 +166,8 @@ void satin::spltsat(uint32_t guideIndex) {
 	SelectedForm->satinGuideCount = guideIndex;
 	for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; iForm++) {
 		auto& formIter = formList[iForm];
-		if (formIter.satinGuideCount != 0 || formIter.satinOrAngle.guide != 0u) {
+		if ((formIter.type == SAT) && (formIter.satinGuideCount != 0U) && formIter.satinOrAngle.guide != 0U) {
 			formIter.satinOrAngle.guide--;
-		}
-		else {
-			// under most circumstances this code is redundant, but it does ensure consistency
-			formIter.satinOrAngle.guide = 0;
 		}
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
@@ -565,7 +561,7 @@ void satin::delcon(uint32_t GuideIndex) {
 	SatinGuides->erase(guide);
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = (*FormList)[iForm];
-		if (form.type == SAT && (form.satinGuideCount != 0U)) {
+		if ((form.type == SAT) && (form.satinGuideCount != 0U) && (form.satinOrAngle.guide != 0U)) {
 			form.satinOrAngle.guide--;
 		}
 	}
