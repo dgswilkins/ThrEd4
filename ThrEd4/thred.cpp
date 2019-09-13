@@ -3354,7 +3354,9 @@ void thred::internal::ritlayr() {
 	auto layer = 0xffffffffU;
 
 	if (StateMap.test(StateFlag::SELBOX)) {
-		layer = ((*StitchBuffer)[ClosestPointIndex].attribute & LAYMSK) >> LAYSHFT;
+		if (!StitchBuffer->empty()) {
+			layer = ((*StitchBuffer)[ClosestPointIndex].attribute & LAYMSK) >> LAYSHFT;
+		}
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::FRMPSEL)) {
@@ -18632,9 +18634,6 @@ void thred::internal::drwStch() {
 						}
 					}
 				}
-				else {
-					throw;
-				}
 				if (LineIndex != 0U) {
 					wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
 					linePoints[0] = linePoints[LineIndex - 1U];
@@ -18660,9 +18659,11 @@ void thred::internal::drwStch() {
 			}
 		}
 		if (StateMap.test(StateFlag::SELBOX)) {
-			ritcor((*StitchBuffer)[ClosestPointIndex]);
-			if (stch2px(ClosestPointIndex)) {
-				dubox();
+			if (!StitchBuffer->empty()) {
+				ritcor((*StitchBuffer)[ClosestPointIndex]);
+				if (stch2px(ClosestPointIndex)) {
+					dubox();
+				}
 			}
 		}
 		if (StateMap.test(StateFlag::FRMPSEL)) {
