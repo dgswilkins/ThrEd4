@@ -13,15 +13,15 @@ clang-analyzer-optin.portability*,\
 clang-analyzer-security*,\
 clang-analyzer-unix*,\
 clang-analyzer-valist*,\
-cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,\
+cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,\
 google-*,-google-runtime-references,\
 llvm-*,-llvm-include-order,\
 misc-*,\
-modernize-*,\
+modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
 performance-*,\
 portability-*,\
-readability-*,\
+readability-*,-readability-magic-numbers\
 "
 WarningsAsErrors:  ''
 HeaderFilterRegex: 'ThrEd4\\*\.(h|hxx|cxx)$'
