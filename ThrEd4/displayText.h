@@ -20,7 +20,7 @@ HFONT       getThrEdFont(int32_t weight) noexcept;
 void        grpmsg();
 void        grpmsg1();
 void        hsizmsg();
-inline void loadString(std::wstring& sDest, uint32_t stringID);
+void        loadString(std::wstring& sDest, uint32_t stringID);
 void        lodstr();
 void        msgflt(uint32_t messageId, float value);
 void        msgstr(uint32_t code) noexcept;

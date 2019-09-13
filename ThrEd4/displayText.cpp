@@ -55,7 +55,7 @@ uint16_t LoadStringList[] = {
 	IDS_UWLKIND, IDS_UND,      IDS_ULEN,      IDS_FUANG,  IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,  IDS_FRMBOX,  IDS_TXOF,
 };
 
-inline void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
+void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 	auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
 	sDest.clear();
 	GSL_SUPPRESS(26490) {
