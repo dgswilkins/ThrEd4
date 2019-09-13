@@ -151,7 +151,7 @@ uint32_t pdir(uint32_t vertex);
 void picot();
 void prpbrd(float borderStitchSpacing);
 
-constexpr uint32_t prv(uint32_t iVertex);
+uint32_t prv(uint32_t iVertex) noexcept;
 
 uint32_t psg() noexcept;
 void     pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept;

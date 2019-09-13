@@ -885,7 +885,7 @@ uint32_t form::nxt(uint32_t iVertex) noexcept {
 	return iVertex;
 }
 
-constexpr uint32_t form::prv(uint32_t iVertex) {
+uint32_t form::prv(uint32_t iVertex) noexcept {
 	if (iVertex != 0U) {
 		iVertex--;
 	}
