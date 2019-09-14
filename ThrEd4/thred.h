@@ -152,6 +152,7 @@ namespace internal {
 	BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 	bool doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag);
+	void drawBackground();
 	void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
 	void drwStch();
 	void drwknot();

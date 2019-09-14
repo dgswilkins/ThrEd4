@@ -18349,6 +18349,32 @@ bool thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap, const fPOINTAT
 	return !stitchMap.test_set(bitPoint);
 }
 
+void thred::internal::drawBackground()
+{
+	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
+	thred::duzrat();
+	if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
+		auto deviceContext = BitmapDC;
+		if (StateMap.test(StateFlag::WASTRAC)) {
+			deviceContext = TraceDC;
+		}
+		if (bitar()) {
+			StretchBlt(StitchWindowMemDC,
+				BitmapDstRect.left,
+				BitmapDstRect.top,
+				BitmapDstRect.right - BitmapDstRect.left,
+				BitmapDstRect.bottom - BitmapDstRect.top,
+				deviceContext,
+				BitmapSrcRect.left,
+				BitmapSrcRect.top,
+				BitmapSrcRect.right - BitmapSrcRect.left,
+				BitmapSrcRect.bottom - BitmapSrcRect.top,
+				SRCCOPY);
+		}
+	}
+	dugrid();
+}
+
 void thred::internal::drwStch() {
 	auto stitchCount = 0U;
 
@@ -18370,28 +18396,7 @@ void thred::internal::drwStch() {
 	}
 	auto linePoints = std::vector<POINT> {};
 	linePoints.resize(wrap::toSize(stitchCount) + 2U);
-	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	thred::duzrat();
-	if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
-		auto deviceContext = BitmapDC;
-		if (StateMap.test(StateFlag::WASTRAC)) {
-			deviceContext = TraceDC;
-		}
-		if (bitar()) {
-			StretchBlt(StitchWindowMemDC,
-			           BitmapDstRect.left,
-			           BitmapDstRect.top,
-			           BitmapDstRect.right - BitmapDstRect.left,
-			           BitmapDstRect.bottom - BitmapDstRect.top,
-			           deviceContext,
-			           BitmapSrcRect.left,
-			           BitmapSrcRect.top,
-			           BitmapSrcRect.right - BitmapSrcRect.left,
-			           BitmapSrcRect.bottom - BitmapSrcRect.top,
-			           SRCCOPY);
-		}
-	}
-	dugrid();
+	thi::drawBackground();
 	if (StateMap.test(StateFlag::INIT)) {
 		if (StateMap.test(StateFlag::ZUMED)) {
 			ScrollInfo.cbSize = sizeof(ScrollInfo);
@@ -19160,9 +19165,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 					drwStch();
 				}
 				else {
-					FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-					thred::duzrat();
-					dugrid();
+					thi::drawBackground();
 					if (StateMap.test(StateFlag::HIDSTCH)) {
 						form::drwfrm();
 						if (StateMap.test(StateFlag::SATPNT)) {
