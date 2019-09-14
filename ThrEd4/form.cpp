@@ -7422,15 +7422,20 @@ void form::movlayr(uint32_t codedLayer) {
 
 void form::join() {
 	const auto savedFormIndex = ClosestFormToCursor;
-
+	auto srcForm = std::next(FormList->cbegin(), ClosestFormToCursor);
+	auto lastVertex = std::next(FormVertices->begin(), srcForm->vertexIndex + srcForm->vertexCount - 1U);
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
 		auto formIter   = std::next(FormList->cbegin(), ClosestFormToCursor);
 		auto vertexList = std::vector<fPOINT> {};
-		vertexList.resize(formIter->vertexCount);
+		vertexList.reserve(formIter->vertexCount);
 		auto vertexIt = std::next(FormVertices->cbegin(), formIter->vertexIndex);
-		for (auto iVertex = 0U; iVertex < formIter->vertexCount; iVertex++) {
-			vertexList[iVertex]   = vertexIt[ClosestVertexToCursor];
+		if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)){
+			vertexList.push_back(vertexIt[ClosestVertexToCursor]);
+		}
+		ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
+		for (auto iVertex = 1U; iVertex < formIter->vertexCount; iVertex++) {
+			vertexList.push_back(vertexIt[ClosestVertexToCursor]);
 			ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
 		}
 		StateMap.set(StateFlag::DELTO);
@@ -7441,7 +7446,7 @@ void form::join() {
 		else {
 			ClosestFormToCursor = savedFormIndex;
 		}
-		formIter                  = std::next(FormList->cbegin(), ClosestFormToCursor); // formIter possibly invalidated by frmdel
+		formIter                  = std::next(FormList->cbegin(), ClosestFormToCursor); // points to the first form
 		const auto insertionPoint = formIter->vertexIndex + formIter->vertexCount;
 		form::fltspac(formIter->vertexCount, wrap::toUnsigned(vertexList.size()));
 		auto dest = std::next(FormVertices->begin(), insertionPoint);
