@@ -5415,49 +5415,54 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	thred::px2stch();
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& formIter = (*FormList)[iForm];
-		auto  layer    = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
-		if ((ActiveLayer == 0U) || layer == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0U)) {
-			CurrentVertexIndex     = formIter.vertexIndex;
-			const auto savedVertex = VertexCount;
-			VertexCount            = formIter.vertexCount;
-			auto lastVertex        = 0U;
-			if (formIter.type == FRMLINE) {
-				lastVertex = VertexCount - 1U;
-			}
-			else {
-				lastVertex = VertexCount;
-			}
-			// Loop through for all line segments
-			auto length   = 0.0;
-			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			for (auto iVertex = 0U; iVertex < lastVertex; iVertex++) {
-				const auto param = findDistanceToSide(vertexIt[iVertex], vertexIt[form::nxt(iVertex)], SelectedPoint, length);
-				if ((length < minimumLength)) {
-					if ((param < 0.0) && (iVertex == 0)) {
-						// this should only happen if the Closest vertex is the start of a line (vertex 0)
-						minimumLength         = length;
-						ClosestFormToCursor   = iForm;
-						ClosestVertexToCursor = iVertex;
-						inOutFlag             = POINT_BEFORE_LINE;
-					}
-					else {
-						// return the vertex after the intersection
-						if ((param > 1.0) && (iVertex == lastVertex - 1)) {
+		if (formIter.vertexCount != 0U) {
+			auto layer = gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(formIter.attribute & FRMLMSK) >> 1U);
+			if ((ActiveLayer == 0U) || layer == ActiveLayer || ((formIter.attribute & FRMLMSK) == 0U)) {
+				CurrentVertexIndex     = formIter.vertexIndex;
+				const auto savedVertex = VertexCount;
+				VertexCount            = formIter.vertexCount;
+				auto lastVertex        = 0U;
+				if (formIter.type == FRMLINE) {
+					lastVertex = VertexCount - 1U;
+				}
+				else {
+					lastVertex = VertexCount;
+				}
+				// Loop through for all line segments
+				auto length   = 0.0;
+				auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+				for (auto iVertex = 0U; iVertex < lastVertex; iVertex++) {
+					const auto param = findDistanceToSide(vertexIt[iVertex], vertexIt[form::nxt(iVertex)], SelectedPoint, length);
+					if ((length < minimumLength)) {
+						if ((param < 0.0) && (iVertex == 0)) {
+							// this should only happen if the Closest vertex is the start of a line (vertex 0)
 							minimumLength         = length;
 							ClosestFormToCursor   = iForm;
-							ClosestVertexToCursor = form::nxt(iVertex);
-							inOutFlag             = POINT_AFTER_LINE;
+							ClosestVertexToCursor = iVertex;
+							inOutFlag             = POINT_BEFORE_LINE;
 						}
 						else {
-							minimumLength         = length;
-							ClosestFormToCursor   = iForm;
-							ClosestVertexToCursor = form::nxt(iVertex);
-							inOutFlag             = POINT_IN_LINE;
+							// return the vertex after the intersection
+							if ((param > 1.0) && (iVertex == lastVertex - 1)) {
+								minimumLength         = length;
+								ClosestFormToCursor   = iForm;
+								ClosestVertexToCursor = form::nxt(iVertex);
+								inOutFlag             = POINT_AFTER_LINE;
+							}
+							else {
+								minimumLength         = length;
+								ClosestFormToCursor   = iForm;
+								ClosestVertexToCursor = form::nxt(iVertex);
+								inOutFlag             = POINT_IN_LINE;
+							}
 						}
 					}
 				}
+				VertexCount = savedVertex;
 			}
-			VertexCount = savedVertex;
+		}
+		else {
+			OutputDebugString(L"");
 		}
 	}
 	return minimumLength != 1e99;
