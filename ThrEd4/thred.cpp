@@ -16833,7 +16833,11 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	case ID_HIDBITF:  // file / Hide Bitmap
+	case ID_HIDBITF:{ // file / Hide Bitmap
+		thred::hidbit();
+		flag = true;
+		break;
+	}
 	case ID_LODBIT: { // file / Load Bitmap
 		lodbmp();
 		flag = true;
