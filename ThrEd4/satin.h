@@ -33,7 +33,7 @@ void     delcon(uint32_t GuideIndex);
 void     delsac(uint32_t formIndex);
 void     delspnt();
 void     drwsat();
-void     dusat();
+void     dusat() noexcept;
 void     ribon();
 void     satadj();
 void     satbrd();
@@ -52,7 +52,7 @@ void     spltsat(uint32_t guideIndex);
 
 namespace internal {
 
-	bool chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt);
+	bool chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) noexcept;
 	void filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, uint32_t& satinBackupIndex);
 
 	uint32_t nusac(uint32_t formIndex, uint32_t guideCount);

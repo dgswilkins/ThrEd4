@@ -8,7 +8,7 @@ namespace displayText {
 void        alrotmsg();
 void        bfilmsg();
 void        butxt(uint32_t iButton, const std::wstring& buttonText);
-void        clrhbut(uint32_t startButton);
+void        clrhbut(uint32_t startButton) noexcept;
 bool        clpmsgs(uint32_t code);
 void        crmsg(const fs::path& fileName);
 void        datmsg(uint32_t code);
@@ -25,7 +25,7 @@ void        lodstr();
 void        msgflt(uint32_t messageId, float value);
 void        msgstr(uint32_t code) noexcept;
 void        numWnd() noexcept;
-void        okcan();
+void        okcan() noexcept;
 void        pntmsg(uint32_t msgID);
 void        riter();
 void        ritnum(uint32_t code, uint32_t value);

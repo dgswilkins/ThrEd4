@@ -216,7 +216,7 @@ void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 	}
 }
 
-void displayText::clrhbut(uint32_t startButton) {
+void displayText::clrhbut(uint32_t startButton) noexcept {
 	for (auto iButton = startButton; iButton < 9U; iButton++) {
 		SetWindowText((*ButtonWin)[iButton], L"");
 	}
@@ -352,7 +352,7 @@ void displayText::datmsg(uint32_t code) {
 	displayText::shoMsg(dataError);
 }
 
-void displayText::okcan() {
+void displayText::okcan() noexcept {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(L"STATIC", // NOLINT

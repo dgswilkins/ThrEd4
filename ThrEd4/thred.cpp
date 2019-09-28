@@ -1021,11 +1021,11 @@ void thred::internal::getdes() noexcept {
 	DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT
 }
 
-bool thred::internal::isfclp() {
+bool thred::internal::isfclp() noexcept {
 	return clip::isclp(ClosestFormToCursor) && (*FormList)[ClosestFormToCursor].fillType != CLPF;
 }
 
-float thred::internal::stlen(uint32_t iStitch) {
+float thred::internal::stlen(uint32_t iStitch) noexcept {
 	return hypot((*StitchBuffer)[wrap::toSize(iStitch) + 1U].x - (*StitchBuffer)[iStitch].x,
 	             (*StitchBuffer)[wrap::toSize(iStitch) + 1U].y - (*StitchBuffer)[iStitch].y);
 }
@@ -1657,7 +1657,7 @@ void thred::redraw(HWND window) noexcept {
 	}
 }
 
-void thred::internal::nuRct() {
+void thred::internal::nuRct() noexcept {
 	GetClientRect(ThrEdWindow, &ThredWindowRect);
 	GetWindowRect(ColorBar, &ColorBarRect);
 	if (!ButtonWin->empty()) {
@@ -1780,7 +1780,7 @@ double thred::internal::pxchk(double pixelSize) noexcept {
 	return pixelSize;
 }
 
-void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) {
+void thred::internal::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept {
 	if (!stitches.empty()) {
 		rectangle.bottom = rectangle.top = stitches[0].y;
 		rectangle.left = rectangle.right = stitches[0].x;
@@ -2716,7 +2716,7 @@ void thred::unmsg() {
 	}
 }
 
-GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) {
+GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) noexcept {
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 		if ((*DefaultColorWin)[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window) {
 			return false;
@@ -2745,7 +2745,7 @@ GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) {
 	return true;
 }
 
-BOOL CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) {
+BOOL CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
 	UNREFERENCED_PARAMETER(lParam);
 
 	if (oldwnd(hwnd)) {
@@ -3202,7 +3202,7 @@ void thred::internal::ducros(HDC dc) {
 	selin(GroupStartStitch, GroupEndStitch, dc);
 }
 
-void thred::selRct(fRECTANGLE& sourceRect) {
+void thred::selRct(fRECTANGLE& sourceRect) noexcept {
 	if (!StitchBuffer->empty()) {
 		sourceRect.left = sourceRect.right = (*StitchBuffer)[GroupStartStitch].x;
 		sourceRect.top = sourceRect.bottom = (*StitchBuffer)[GroupStartStitch].y;
@@ -3319,7 +3319,7 @@ void thred::grpAdj() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::nuAct(uint32_t iStitch) {
+void thred::internal::nuAct(uint32_t iStitch) noexcept {
 	const auto color = ActiveColor;
 	if (!StitchBuffer->empty()) {
 		ActiveColor = (*StitchBuffer)[iStitch].attribute & COLMSK;
@@ -3563,7 +3563,7 @@ bool thred::internal::savcmp() noexcept {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) {
+void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) noexcept {
 	constexpr auto BalaradRatio = 10.0F / 6.0F;
 
 	balaradStitch[destination].flag = 0;
@@ -6459,7 +6459,7 @@ void thred::internal::zumout() {
 	}
 }
 
-void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount) {
+void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount) noexcept {
 	for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; iStitch++) {
 		const auto cx    = (((*StitchBuffer)[iStitch].x > SelectedPoint.x) ? ((*StitchBuffer)[iStitch].x - SelectedPoint.x)
                                                                         : (SelectedPoint.x - (*StitchBuffer)[iStitch].x));
@@ -7484,7 +7484,7 @@ void thred::rtclpfn(uint32_t destination, uint32_t source) {
 	ClipStitchData[destination].tag  = 0x14;
 }
 
-uint32_t thred::internal::sizfclp() {
+uint32_t thred::internal::sizfclp() noexcept {
 	auto clipSize
 	    = gsl::narrow<uint32_t>(sizeof(decltype(*ClipFormHeader)) + VertexCount * sizeof(decltype(FormVertices->back())));
 	if (SelectedForm->type == SAT) {
@@ -7995,7 +7995,7 @@ void thred::internal::unpat() {
 		StateMap.set(StateFlag::RESTCH);
 	}
 }
-bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) {
+bool thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept {
 	if ((*StitchBuffer)[iStitchA].x != (*StitchBuffer)[iStitchB].x) {
 		return false;
 	}
@@ -8804,7 +8804,7 @@ bool thred::internal::isthr(const wchar_t* const filename) {
 	return (extention.compare(0, 3, L".th") == 0);
 }
 
-uint32_t thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) {
+uint32_t thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept {
 	auto userStitchCount = 0U;
 	for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
 		if ((stitch[iStitch].attribute & USMSK) != 0U) {
@@ -9461,7 +9461,7 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 	}
 }
 
-void thred::ritmov() {
+void thred::ritmov() noexcept {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor != 0U) {
@@ -9616,7 +9616,7 @@ void thred::internal::nulayr(uint32_t play) {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-bool thred::internal::iselpnt() {
+bool thred::internal::iselpnt() noexcept {
 	const auto pointToTest         = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 	auto       closestControlPoint = 0U;
 	auto       minimumLength       = 1e99;
@@ -10128,12 +10128,12 @@ void thred::internal::setsrch(uint32_t stitch) {
 	displayText::ritnum(STR_NUMSCH, ClosestPointIndex);
 }
 
-bool thred::internal::inrng(uint32_t stitch) {
+bool thred::internal::inrng(uint32_t stitch) noexcept {
 	return (*StitchBuffer)[stitch].x >= StitchRangeRect.left && (*StitchBuffer)[stitch].x <= StitchRangeRect.right
 	       && (*StitchBuffer)[stitch].y >= StitchRangeRect.bottom && (*StitchBuffer)[stitch].y <= StitchRangeRect.top;
 }
 
-bool thred::internal::finrng(uint32_t find) {
+bool thred::internal::finrng(uint32_t find) noexcept {
 	const auto& rectFind = (*FormList)[find].rectangle;
 	if (rectFind.left >= StitchRangeRect.left && rectFind.right <= StitchRangeRect.right
 	    && rectFind.bottom >= StitchRangeRect.bottom && rectFind.top <= StitchRangeRect.top) {
@@ -10524,7 +10524,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void thred::frmrct(fRECTANGLE& rectangle) {
+void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 	rectangle.left = rectangle.right = (*FormVertices)[0].x;
 	rectangle.top = rectangle.bottom = (*FormVertices)[0].y;
 	for (auto& FormVertice : *FormVertices) {
@@ -10790,7 +10790,7 @@ void thred::internal::dumrk(float xCoord, float yCoord) {
 	StateMap.set(StateFlag::WASMRK);
 }
 
-void thred::internal::gselrng() {
+void thred::internal::gselrng() noexcept {
 	auto& selectedFormList = *SelectedFormList;
 
 	SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
@@ -11062,14 +11062,14 @@ void thred::internal::tglhid() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void thred::internal::respac() {
+void thred::internal::respac() noexcept {
 	if (clip::isclp(ClosestFormToCursor)) {
 		SelectedForm->fillSpacing = LineSpacing;
 		form::fsizpar();
 	}
 }
 
-bool thred::internal::chkminus(uint32_t code) {
+bool thred::internal::chkminus(uint32_t code) noexcept {
 	if (code == 189 || code == 109) {  // '-' key pressed
 		if (PreferenceIndex == PFAZ) { // Clipboard Offset in preferences
 			return true;
@@ -11182,7 +11182,7 @@ void thred::internal::frmcursel(uint32_t cursorType) {
 	StateMap.set(StateFlag::DUMEN);
 }
 
-void thred::internal::stchsnap(uint32_t start, uint32_t finish) {
+void thred::internal::stchsnap(uint32_t start, uint32_t finish) noexcept {
 	auto pnt = &(*StitchBuffer)[start];
 
 	for (auto i = 0U; i < finish - start; i++) {
@@ -17559,7 +17559,7 @@ int32_t thred::txtWid(const wchar_t* string) noexcept {
 	return TextSize.cx;
 }
 
-void thred::internal::makCol() {
+void thred::internal::makCol() noexcept {
 	wchar_t buffer[3] = { 0 };
 
 	buffer[1] = L'0';

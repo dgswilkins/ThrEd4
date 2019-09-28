@@ -113,7 +113,7 @@ constexpr float xt::internal::durat(float start, float finish, float featherRati
 	return (finish - start) * featherRatio + start;
 }
 
-void xt::internal::duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) {
+void xt::internal::duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) noexcept {
 	point.x = durat((*BSequence)[finish].x, (*BSequence)[start].x, featherRatioLocal);
 	point.y = durat((*BSequence)[finish].y, (*BSequence)[start].y, featherRatioLocal);
 }
@@ -239,7 +239,7 @@ void xt::internal::fthfn(uint32_t iSequence, FEATHER& feather) {
 	durats(iSequence, OSequence, feather);
 }
 
-void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) {
+void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
 	point.x = ((*BSequence)[iNextPoint].x - (*BSequence)[iPoint].x) * featherRatio + (*BSequence)[iPoint].x;
 	point.y = ((*BSequence)[iNextPoint].y - (*BSequence)[iPoint].y) * featherRatio + (*BSequence)[iPoint].y;
 }
@@ -881,7 +881,7 @@ uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
 	return 1U;
 }
 
-void xt::internal::durec(OREC& record) {
+void xt::internal::durec(OREC& record) noexcept {
 	const auto* stitch = &(*StitchBuffer)[record.start];
 
 	record.type          = StitchTypes[dutyp(stitch->attribute)];
@@ -944,7 +944,7 @@ bool xt::internal::orfComp(const OREC* record1, const OREC* record2) noexcept {
 
 bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
                            const std::vector<OREC*>&    pRecs,
-                           const SRTREC&                stitchRecord) {
+                           const SRTREC&                stitchRecord) noexcept {
 	for (auto iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
 		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form]) {
 			return true;
@@ -1046,7 +1046,7 @@ void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, uint32_t count
 }
 #endif
 
-bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) {
+bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept {
 	auto formIndex = stitchRegion[0]->form;
 	auto color     = stitchRegion[0]->color;
 
@@ -1408,7 +1408,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	}
 }
 
-bool xt::internal::lastcol(uint32_t index, fPOINT& point) {
+bool xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept {
 	const auto color = (*InterleaveSequenceIndices)[index].color;
 	while (index != 0U) {
 		index--;

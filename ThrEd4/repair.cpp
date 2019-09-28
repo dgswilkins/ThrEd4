@@ -203,7 +203,7 @@ uint32_t repair::internal::frmchkfn() {
 	return badData.attribute;
 }
 
-void repair::internal::bcup(uint32_t find, BADCNTS& badData) {
+void repair::internal::bcup(uint32_t find, BADCNTS& badData) noexcept {
 	const auto& form = (*FormList)[find];
 	if (clip::isclp(find)) {
 		badData.clip += form.lengthOrCount.clipCount;

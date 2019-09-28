@@ -116,7 +116,7 @@ namespace internal {
 	void     bspacfn(uint32_t find, float length);
 	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
 	void     chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
-	bool     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord);
+	bool     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) noexcept;
 	void     chkuseq();
 	void     delwlk(uint32_t code);
 
@@ -131,10 +131,10 @@ namespace internal {
 	constexpr float durat(float start, float finish, float featherRatio);
 
 	void     durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather);
-	void     durec(OREC& record);
+	void     durec(OREC& record) noexcept;
 	uint32_t dutyp(uint32_t attribute) noexcept;
 
-	void duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal);
+	void duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) noexcept;
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
@@ -161,7 +161,7 @@ namespace internal {
 	gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
 
 	bool   isfil() noexcept;
-	bool   lastcol(uint32_t index, fPOINT& point);
+	bool   lastcol(uint32_t index, fPOINT& point) noexcept;
 	fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept;
 	void   notundfn(uint32_t code);
 	void   nudfn(const fRECTANGLE& designSizeRect);
@@ -169,7 +169,7 @@ namespace internal {
 
 	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
 
-	void ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio);
+	void ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept;
 	bool orComp(const OREC* record1, const OREC* record2) noexcept;
 	bool orfComp(const OREC* record1, const OREC* record2) noexcept;
 	void rtrclpfn();
@@ -183,7 +183,7 @@ namespace internal {
 
 	void setstxt(uint32_t stringIndex, float value, HWND dialog);
 	void setundfn(uint32_t code);
-	bool srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm);
+	bool srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept;
 
 	constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept;
 

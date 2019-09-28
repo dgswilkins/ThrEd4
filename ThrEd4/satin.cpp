@@ -1215,7 +1215,7 @@ void satin::satfix() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void satin::dusat() {
+void satin::dusat() noexcept {
 	const auto  vertexCount = TempPolygon->size();
 	auto&       formLines   = *FormLines;
 	const auto* line        = &formLines[vertexCount - 1U];
@@ -1476,7 +1476,7 @@ void satin::internal::outfn(uint32_t start, uint32_t finish, float satinWidth) {
 	(*OutsidePoints)[finish].y = vertexIt[finish].y + yOffset;
 }
 
-bool satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) {
+bool satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) noexcept {
 	const auto maxSB = satinBackup.size();
 	for (auto iBackup = 0U; iBackup < maxSB; iBackup++) {
 		const auto length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);

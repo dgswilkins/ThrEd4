@@ -577,7 +577,7 @@ HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
 	                    nullptr);
 }
 
-void formForms::internal::prflin(const std::wstring& msg, uint32_t row) {
+void formForms::internal::prflin(const std::wstring& msg, uint32_t row) noexcept {
 	ffi::prftwin((*StringTable)[row]);
 	(*ValueWindow)[row - STR_PRF0] = ffi::prfnwin(msg);
 	ffi::nxtlinprf();

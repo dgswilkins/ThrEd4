@@ -42,7 +42,7 @@ void     delstchm();
 uint32_t duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
 void     frmdel();
-void     frmrct(fRECTANGLE& rectangle);
+void     frmrct(fRECTANGLE& rectangle) noexcept;
 HBITMAP  getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits);
 void     grpAdj();
 void     hidbit();
@@ -53,7 +53,7 @@ void pxCor2stch(const POINT& point) noexcept;
 void redclp();
 void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
-void ritmov();
+void ritmov() noexcept;
 void ritot(uint32_t number);
 void rngadj();
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
@@ -64,7 +64,7 @@ void rtclpfn(uint32_t destination, uint32_t source);
 void sCor2px(const fPOINT& stitchCoordinate, POINT& pixelCoordinate);
 void savdo();
 void save();
-void selRct(fRECTANGLE& sourceRect);
+void selRct(fRECTANGLE& sourceRect) noexcept;
 void setpsel();
 void shft(const fPOINT& delta) noexcept;
 void stch2pxr(const fPOINT& stitchCoordinate);
@@ -107,7 +107,7 @@ namespace internal {
 	bool chkhid(uint32_t colorToCheck);
 	void chkhup();
 	void chkirct() noexcept;
-	bool chkminus(uint32_t code);
+	bool chkminus(uint32_t code) noexcept;
 	void chkncol();
 	void chknum();
 	bool chkok() noexcept;
@@ -122,7 +122,7 @@ namespace internal {
 	void     clpadj();
 	void     clpbox();
 	void     clpradj(fRECTANGLE& clipRectAdjusted, const fPOINTATTR& stitch) noexcept;
-	bool     cmpstch(uint32_t iStitchA, uint32_t iStitchB);
+	bool     cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept;
 	void     colchk();
 	DWORD    coldis(COLORREF colorA, COLORREF colorB);
 	bool     colfil();
@@ -164,7 +164,7 @@ namespace internal {
 
 	uint32_t dtrn(DSTREC* dpnt);
 
-	void duClos(uint32_t startStitch, uint32_t stitchCount);
+	void duClos(uint32_t startStitch, uint32_t stitchCount) noexcept;
 	void duIns();
 	void duSelbox();
 	void duar();
@@ -206,7 +206,7 @@ namespace internal {
 	void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
 	void endpnt();
 
-	BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam);
+	BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept;
 
 	void     esccode();
 	void     f1del();
@@ -214,7 +214,7 @@ namespace internal {
 	void     fil2sel(uint32_t stat);
 	void     filclos();
 	void     filfrms();
-	bool     finrng(uint32_t find);
+	bool     finrng(uint32_t find) noexcept;
 	void     fixpclp();
 	void     fnamtabs();
 	void     fndknt();
@@ -235,12 +235,12 @@ namespace internal {
 	void     getDocsFolder(fs::path* directory);
 	void     getfrmbox();
 	void     getfrmpix();
-	uint32_t gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount);
+	uint32_t gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept;
 
 	void getnpix();
 	void getstpix();
 	void gotbox();
-	void gselrng();
+	void gselrng() noexcept;
 	void gsnap();
 	bool gudtyp(WORD bitCount) noexcept;
 	bool handleEditMenu(const WORD& wParameter);
@@ -275,13 +275,13 @@ namespace internal {
 	void ilin1() noexcept;
 	void infadj(float& xCoordinate, float& yCoordinate) noexcept;
 	void init();
-	bool inrng(uint32_t stitch);
+	bool inrng(uint32_t stitch) noexcept;
 	void insadj();
 	void inscol();
 	void insfil();
 	void insflin(POINT insertPoint);
-	bool iselpnt();
-	bool isfclp();
+	bool iselpnt() noexcept;
+	bool isfclp() noexcept;
 	void istch();
 	bool isthr(const wchar_t* filename);
 
@@ -299,7 +299,7 @@ namespace internal {
 	void     lodbmp();
 	void     lodclp(uint32_t iStitch);
 	void     longer();
-	void     makCol();
+	void     makCol() noexcept;
 	uint32_t makbig(uint32_t start, uint32_t finish);
 	void     mark();
 	void     movbak(char source, char destination);
@@ -317,14 +317,14 @@ namespace internal {
 	void     nedon();
 	void     newFil();
 	void     noMsg();
-	void     nuAct(uint32_t iStitch);
+	void     nuAct(uint32_t iStitch) noexcept;
 	COLORREF nuBak() noexcept;
 	COLORREF nuBit() noexcept;
 	HBRUSH   nuBrush(HBRUSH brush, COLORREF color) noexcept;
 	COLORREF nuCol(COLORREF init) noexcept;
 	void     nuFil();
 	HPEN     nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept;
-	void     nuRct();
+	void     nuRct() noexcept;
 	void     nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
 	float    nuang(float yDelta, float xDelta) noexcept;
 	void     nucols();
@@ -341,7 +341,7 @@ namespace internal {
 	constexpr uint32_t nxtcrnr(uint32_t corner);
 
 	void ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset);
-	bool oldwnd(HWND window);
+	bool oldwnd(HWND window) noexcept;
 	void ovrlay();
 	void patdun();
 	void pcsbsavof();
@@ -374,7 +374,7 @@ namespace internal {
 	void     reldun();
 	void     relin();
 	void     rembig();
-	void     respac();
+	void     respac() noexcept;
 	void     retrac();
 	void     rint() noexcept;
 	void     ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem);
@@ -441,8 +441,8 @@ namespace internal {
 	void     sidhup();
 	void     sidmsg(HWND window, std::wstring* strings, uint32_t entries);
 	uint32_t sizclp(uint32_t& formFirstStitchIndex, uint32_t& formStitchCount);
-	uint32_t sizfclp();
-	void     sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches);
+	uint32_t sizfclp() noexcept;
+	void     sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 	void     srchk();
 	uint32_t srchknot(uint32_t source) noexcept;
 
@@ -454,11 +454,11 @@ namespace internal {
 	void  stchWnd();
 	void  stchbox(uint32_t iStitch, HDC dc);
 	void  stchout();
-	void  stchsnap(uint32_t start, uint32_t finish);
-	float stlen(uint32_t iStitch);
+	void  stchsnap(uint32_t start, uint32_t finish) noexcept;
+	float stlen(uint32_t iStitch) noexcept;
 	void  strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
 	void  tglhid();
-	void  thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
+	void  thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) noexcept;
 	void  thrsav();
 	void  thumbak();
 	void  thumnail();

@@ -23,7 +23,7 @@ void deltx(uint32_t formIndex);
 void drwtxtr();
 void dutxtfil();
 void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uint32_t>* ptrTexturePointsList) noexcept;
-bool istx(uint32_t iForm);
+bool istx(uint32_t iForm) noexcept;
 void redtx();
 void rstxt();
 void rtrtx();
@@ -43,7 +43,7 @@ void writeScreenWidth(uint32_t position);
 namespace internal {
 
 	void   altx();
-	void   angrct(fRECTANGLE& rectangle);
+	void   angrct(fRECTANGLE& rectangle) noexcept;
 	void   butsid(uint32_t windowId);
 	bool   chkbut();
 	void   chktx();

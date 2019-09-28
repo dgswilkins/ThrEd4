@@ -109,9 +109,9 @@ bool     frmrng(uint32_t iForm, RANGE& range);
 void     frmsadj();
 void     fselrct(uint32_t iForm);
 void     fsizpar() noexcept;
-void     fvars(uint32_t iForm);
+void     fvars(uint32_t iForm) noexcept;
 
-float getblen();
+float getblen() noexcept;
 
 uint32_t getlast();
 
@@ -124,8 +124,8 @@ void insat();
 void ispcdclp();
 void join();
 bool lastch();
-bool linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection);
-void mdufrm();
+bool linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept;
+void mdufrm() noexcept;
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
@@ -156,7 +156,7 @@ uint32_t prv(uint32_t iVertex) noexcept;
 uint32_t psg() noexcept;
 void     pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept;
 void     ratsr();
-void     rct2sel(const RECT& rectangle, std::vector<POINT>& line);
+void     rct2sel(const RECT& rectangle, std::vector<POINT>& line) noexcept;
 void     redup();
 void     refil();
 void     refilal();
@@ -367,7 +367,7 @@ namespace internal {
 	            double                 gapToClosestRegion) noexcept;
 	void makpoli();
 	void movseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t ind);
-	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source);
+	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;
 	bool notdun(std::vector<RGSEQ>&            tempPath,
 	            const std::vector<RCON>&       pathMap,
 	            const std::vector<uint32_t>&   mapIndexSequence,
@@ -394,7 +394,7 @@ namespace internal {
 	            const std::vector<RCON>&     pathMap,
 	            const std::vector<uint32_t>& mapIndexSequence,
 	            uint32_t                     pathIndex,
-	            uint32_t&                    pathCount);
+	            uint32_t&                    pathCount) noexcept;
 
 	void   pbrd(float edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
@@ -402,7 +402,7 @@ namespace internal {
 	           uint32_t                  startVertex,
 	           const std::vector<VRCT2>& vrct,
 	           float                     width);
-	void   plbak(uint32_t backPoint) noexcept;
+	void   plbak(uint32_t backPoint);
 	void   plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	void   plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	            const std::vector<VRCT2>& fillVerticalRect,
@@ -423,7 +423,7 @@ namespace internal {
 	               uint32_t                      iRegion1,
 	               const std::vector<REGION>&    regionsList,
 	               double                        gapToClosestRegion,
-	               uint32_t&                     nextGroup);
+	               uint32_t&                     nextGroup) noexcept;
 	double reglen(const std::vector<SMALPNTL*>& sortedLines,
 	              uint32_t                      iRegion,
 	              const std::vector<fPOINT>&    lastRegionCorners,
@@ -458,11 +458,11 @@ namespace internal {
 
 	void shrnks();
 	void snp(uint32_t start, uint32_t finish);
-	void snpfn(const std::vector<uint32_t>& xPoints, uint32_t start, uint32_t end, uint32_t finish);
+	void snpfn(const std::vector<uint32_t>& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
 	void spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish);
 	bool spltlin();
 	void sprct(std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish);
-	void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, uint32_t iRect);
+	void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, uint32_t iRect) noexcept;
 	void
 	     spurfn(const fPOINT& innerPoint, const fPOINT& outerPoint, fPOINT& underlayInnerPoint, fPOINT& underlayOuterPoint) noexcept;
 	bool spComp(const SMALPNTL* arg1, const SMALPNTL* arg2) noexcept;
@@ -476,6 +476,6 @@ namespace internal {
 	uint32_t leftsid(const std::vector<fPOINT>& currentFormVertices);
 
 	bool unvis(const boost::dynamic_bitset<>& visitedRegions, uint32_t& visitedIndex);
-	bool vscmp(uint32_t index1, uint32_t index2);
+	bool vscmp(uint32_t index1, uint32_t index2) noexcept;
 } // namespace internal
 } // namespace form

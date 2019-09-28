@@ -34,13 +34,13 @@ void delclps(uint32_t iForm);
 void deleclp(uint32_t iForm);
 void delmclp(uint32_t iForm);
 void duxclp();
-bool isclp(uint32_t iForm);
+bool isclp(uint32_t iForm) noexcept;
 bool isclp(const FRMHED& form) noexcept;
-bool isclpx(uint32_t iForm);
+bool isclpx(uint32_t iForm) noexcept;
 bool isclpx(const FRMHED& form) noexcept;
-bool iseclp(uint32_t iForm);
+bool iseclp(uint32_t iForm) noexcept;
 bool iseclp(const FRMHED& form) noexcept;
-bool iseclpx(uint32_t iForm);
+bool iseclpx(uint32_t iForm) noexcept;
 bool iseclpx(const FRMHED& form) noexcept;
 
 uint32_t nueclp(uint32_t currentForm, uint32_t count);
@@ -65,7 +65,7 @@ namespace internal {
 	void dulast(std::vector<fPOINT>& chainEndPoints);
 	void durev(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipReversedData);
 
-	uint32_t findclp(uint32_t formIndex);
+	uint32_t findclp(uint32_t formIndex) noexcept;
 	void fxlen(std::vector<fPOINT>& chainEndPoints, const std::vector<float>& listSINEs, const std::vector<float>& listCOSINEs);
 	void fxlin(std::vector<fPOINT>&      chainEndPoints,
 	           const std::vector<float>& ListSINEs,

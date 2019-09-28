@@ -175,7 +175,7 @@ void texture::redtx() {
 	txi::redtbak();
 }
 
-bool texture::istx(uint32_t iForm) {
+bool texture::istx(uint32_t iForm) noexcept {
 	const auto& pfrm = (*FormList)[iForm];
 	if (pfrm.fillType == TXVRTF) {
 		return true;
@@ -749,7 +749,7 @@ void texture::txtrup() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::angrct(fRECTANGLE& rectangle) {
+void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
 	auto& angledFormVertices = *AngledFormVertices;
 	rectangle.left           = angledFormVertices[0].x;
 	rectangle.right          = angledFormVertices[0].x;

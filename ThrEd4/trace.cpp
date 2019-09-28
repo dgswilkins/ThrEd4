@@ -223,7 +223,7 @@ void trace::internal::tracwnd() {
 	displayText::clrhbut(4);
 }
 
-void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) {
+void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept {
 	for (auto iPoint = lineStart; iPoint < lineStart + BitmapWidth; iPoint++) {
 		differenceBitmap[iPoint] = 0;
 	}

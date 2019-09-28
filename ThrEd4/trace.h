@@ -33,7 +33,7 @@ void wasTrace1();
 namespace internal {
 
 	void bfrm();
-	void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart);
+	void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept;
 	void difbits(uint32_t shift, uint32_t* point) noexcept;
 
 	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;

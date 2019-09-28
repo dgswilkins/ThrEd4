@@ -52,7 +52,7 @@ namespace internal {
 	HWND numwin(const std::wstring& winName, const RECT& location);
 	void nxtlin(uint32_t& formMenuEntryCount) noexcept;
 	void nxtlinprf() noexcept;
-	void prflin(const std::wstring& msg, uint32_t row);
+	void prflin(const std::wstring& msg, uint32_t row) noexcept;
 	HWND prfnwin(const std::wstring& text) noexcept;
 	void prftwin(const std::wstring& text) noexcept;
 	void refrmfn(uint32_t& formMenuEntryCount);

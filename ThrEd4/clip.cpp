@@ -44,7 +44,7 @@ fPOINT   BorderClipReference; // reference for clipboard line border
 float    AdjustedSpace;       // adjusted space
 uint32_t NextStart;           // index of the endpoint of the line segment being processed
 
-bool clip::iseclp(uint32_t iForm) {
+bool clip::iseclp(uint32_t iForm) noexcept {
 	auto& form = (*FormList)[iForm];
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
@@ -53,7 +53,7 @@ bool clip::iseclp(const FRMHED& form) noexcept {
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
-bool clip::isclp(uint32_t iForm) {
+bool clip::isclp(uint32_t iForm) noexcept {
 	auto& form = (*FormList)[iForm];
 	return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
@@ -62,7 +62,7 @@ bool clip::isclp(const FRMHED& form) noexcept {
 	return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
 
-bool clip::isclpx(uint32_t iForm) {
+bool clip::isclpx(uint32_t iForm) noexcept {
 	auto& form = (*FormList)[iForm];
 	return clip::isclp(iForm) && (form.lengthOrCount.clipCount != 0U);
 }
@@ -71,7 +71,7 @@ bool clip::isclpx(const FRMHED& form) noexcept {
 	return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
 }
 
-bool clip::iseclpx(uint32_t iForm) {
+bool clip::iseclpx(uint32_t iForm) noexcept {
 	auto& form = (*FormList)[iForm];
 	return clip::iseclp(iForm) && (form.clipEntries != 0U);
 }
@@ -80,7 +80,7 @@ bool clip::iseclpx(const FRMHED& form) noexcept {
 	return clip::iseclp(form) && (form.clipEntries != 0U);
 }
 
-uint32_t clip::internal::findclp(uint32_t formIndex) {
+uint32_t clip::internal::findclp(uint32_t formIndex) noexcept {
 	auto& formList = *FormList;
 	for (auto iForm = formIndex; iForm != 0; iForm--) {
 		if (clip::iseclp(iForm - 1)) {
