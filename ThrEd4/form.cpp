@@ -4284,7 +4284,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 		regions.back().end        = lineCount - 1U;
 		const auto regionCount    = wrap::toUnsigned(regions.size());
 		auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
-		const auto iStartLine     = 0U;
+		constexpr auto iStartLine     = 0U;
 		for (auto iRegion = 0U; iRegion < regionCount; iRegion++) {
 			auto count = 0U;
 			if ((regions[iRegion].end - regions[iRegion].start) > 1) {
@@ -4454,7 +4454,7 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 			}
 		}
 		else {
-			const auto sequencePathIndex = 1U;
+			constexpr auto sequencePathIndex = 1U;
 			sequencePath.resize(sequencePathIndex);
 			auto lastGroup            = 0U;
 			sequencePath[0].node      = 0;
@@ -5444,7 +5444,7 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 							minimumLength         = length;
 							ClosestFormToCursor   = iForm;
 							ClosestVertexToCursor = iVertex;
-							inOutFlag             = POINT_BEFORE_LINE;
+							inOutFlag             = intersectionStyles::POINT_BEFORE_LINE;
 						}
 						else {
 							// return the vertex after the intersection
@@ -5452,13 +5452,13 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 								minimumLength         = length;
 								ClosestFormToCursor   = iForm;
 								ClosestVertexToCursor = form::nxt(iVertex);
-								inOutFlag             = POINT_AFTER_LINE;
+								inOutFlag             = intersectionStyles::POINT_AFTER_LINE;
 							}
 							else {
 								minimumLength         = length;
 								ClosestFormToCursor   = iForm;
 								ClosestVertexToCursor = form::nxt(iVertex);
-								inOutFlag             = POINT_IN_LINE;
+								inOutFlag             = intersectionStyles::POINT_IN_LINE;
 							}
 						}
 					}
@@ -5509,14 +5509,14 @@ void form::internal::nufpnt(uint32_t vertex, FRMHED* formForInsert) {
 
 void form::insat() { // insert a point in a form
 	// clang-format off
-	auto inOutFlag = POINT_IN_LINE;
+	auto inOutFlag = intersectionStyles::POINT_IN_LINE;
 	// clang-format on
 	if (fi::closat(inOutFlag)) {
 		thred::savdo();
 		auto*      selectedForm = &((*FormList)[ClosestFormToCursor]);
 		const auto lastVertex   = selectedForm->vertexCount - 1U;
 		form::fvars(ClosestFormToCursor);
-		if (inOutFlag != POINT_IN_LINE) {
+		if (inOutFlag != intersectionStyles::POINT_IN_LINE) {
 			if (ClosestVertexToCursor == 0 && selectedForm->type == FRMLINE) {
 				StateMap.set(StateFlag::PRELIN);
 			}
@@ -5640,12 +5640,12 @@ void form::rinfrm() {
 
 void form::infrm() { // insert multiple points into a form
 	// clang-format off
-	auto inOutFlag = POINT_IN_LINE;
+	auto inOutFlag = intersectionStyles::POINT_IN_LINE;
 	// clang-format on
 	if (fi::closat(inOutFlag)) {
 		FormForInsert = &((*FormList)[ClosestFormToCursor]);
 		form::fvars(ClosestFormToCursor);
-		if (inOutFlag != POINT_IN_LINE) {
+		if (inOutFlag != intersectionStyles::POINT_IN_LINE) {
 			if ((ClosestVertexToCursor == 0U) && FormForInsert->type == FRMLINE) {
 				FormVertexPrev = 0;
 				StateMap.set(StateFlag::PRELIN);
@@ -8367,7 +8367,7 @@ void form::clpspac(const uint32_t insertPoint, uint32_t count) {
 
 void form::stchadj() {
 	const auto codedClosest = ClosestFormToCursor << FRMSHFT;
-	const auto offset       = 1U << FRMSHFT;
+	constexpr auto offset       = 1U << FRMSHFT;
 	for (auto& stitch : *StitchBuffer) {
 		auto codedForm = stitch.attribute & FRMSK;
 		if (codedForm > codedClosest) {

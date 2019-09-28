@@ -100,9 +100,11 @@ float wrap::toFloat(uint32_t invar) noexcept {
 	return gsl::narrow_cast<float>(invar);
 }
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
+
 #pragma warning(push)
-#pragma warning(disable : 26440)
+#pragma warning(disable : 26440) // pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(disable : 26497) // since this is used in other translation units, "constexpr" cannot be used as it implicitly
+                                 // defines the function as inline
 uint32_t wrap::toUnsigned(size_t invar) {
 #ifdef _WIN64
 	return gsl::narrow<uint32_t>(invar);

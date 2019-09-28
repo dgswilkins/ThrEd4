@@ -4217,7 +4217,7 @@ uint32_t thred::internal::pesmtch(const COLORREF& referenceColor, const uint8_t&
 }
 
 void thred::internal::ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch) {
-	const auto factor  = 3.0F / 5.0F;
+	constexpr auto factor  = 3.0F / 5.0F;
 	const auto oldSize = buffer.size();
 	buffer.resize(oldSize + sizeof(PESTCH));
 	auto*      pesStitch = convert_ptr<PESTCH*>(&buffer[oldSize]);
@@ -4482,7 +4482,7 @@ void thred::internal::sav() {
 			for (const auto color : UserColor) {
 				auto       matchIndex  = 0U;
 				auto       matchMin    = 0xffffffffU;
-				const auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
+				constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1U; iColorMatch < threadCount; iColorMatch++) {
 					const auto match = pesmtch(color, iColorMatch);
 					if (match < matchMin) {
@@ -5141,7 +5141,7 @@ void thred::internal::redbak() {
 			ClipPoints->clear();
 		}
 		// ToDo - add field in BAKHED to keep track of number of colors
-		const auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
+		constexpr auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 		const auto undoColors = gsl::span<COLORREF> { undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors) };
 		const auto userColors = gsl::span<COLORREF> { UserColor };
 		std::copy(undoColors.cbegin(), undoColors.cend(), userColors.begin());
@@ -5598,7 +5598,7 @@ uint32_t thred::internal::tripl(char* dat) {
 }
 
 uint32_t thred::internal::dupcol(uint32_t activeColor) {
-	const auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
+	constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
 	const auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
 	const auto color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
 	for (auto iColor = 0U; iColor < activeColor; iColor++) {
@@ -6061,7 +6061,7 @@ void thred::internal::nuFil() {
 						PESstitch                = &fileBuffer[pecOffset];
 						const auto pesColorCount = pecHeader->colorCount + 1U;
 						PEScolors                = &pecHeader->pad[0];
-						const auto threadCount   = sizeof(PESThread) / sizeof(PESThread[0]);
+						constexpr auto threadCount   = sizeof(PESThread) / sizeof(PESThread[0]);
 						auto       colorMap      = boost::dynamic_bitset<>(threadCount);
 						auto       activeColor   = 0U;
 						for (auto iColor = 0U; iColor < pesColorCount; iColor++) {
@@ -8881,9 +8881,9 @@ void thred::internal::insfil() {
 						         &BytesRead,
 						         nullptr);
 					}
-					const auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
-					                          / 2; // ThreadSize is defined as a 16 entry array of 2 bytes
-					const auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
+					constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
+					                          / 2U; // ThreadSize is defined as a 16 entry array of 2 bytes
+					constexpr auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
 					                            + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					auto insertedRectangle = fRECTANGLE { 1e-9F, 1e9F, 1e-9F, 1e9F };
@@ -18189,8 +18189,8 @@ void thred::internal::init() {
 COLORREF thred::internal::defTxt(uint32_t iColor) {
 	// bitmap for color number. Black or white bit chosen for contrast against the default background colors
 	const auto textColorMap = std::bitset<16>(0xbaf);
-	const auto white        = 0xffffffU;
-	const auto black        = 0U;
+	constexpr auto white        = 0xffffffU;
+	constexpr auto black        = 0U;
 	return textColorMap.test(iColor) ? white : black;
 }
 

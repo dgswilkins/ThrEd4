@@ -2970,8 +2970,8 @@ public:
 	//~PECHDR() = default;
 };
 
-static const uint8_t ThumbHeight = 38U;
-static const uint8_t ThumbWidth  = 48U;
+static constexpr uint8_t ThumbHeight = 38U;
+static constexpr uint8_t ThumbWidth  = 48U;
 
 class PECHDR2
 {
@@ -3280,7 +3280,7 @@ public:
 };
 
 // is intersection of line and cursor in, before or after the line
-enum intersectionStyles
+enum class intersectionStyles
 {
 	POINT_IN_LINE = 0,
 	POINT_BEFORE_LINE,
