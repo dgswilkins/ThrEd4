@@ -7433,7 +7433,7 @@ void form::movlayr(uint32_t codedLayer) {
 void form::join() {
 	const auto savedFormIndex = ClosestFormToCursor;
 	auto srcForm = std::next(FormList->cbegin(), ClosestFormToCursor);
-	auto lastVertex = std::next(FormVertices->begin(), srcForm->vertexIndex + srcForm->vertexCount - 1U);
+	auto lastVertex = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(srcForm->vertexIndex) + srcForm->vertexCount - 1U);
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
 		auto formIter   = std::next(FormList->cbegin(), ClosestFormToCursor);
