@@ -863,6 +863,7 @@ void form::durpoli(uint32_t vertexCount) {
 	auto point    = SelectedPoint;
 	auto angle    = 0.0F;
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
+	// ToDo - should this be vertexCount?
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].x = point.x;
 		vertexIt[iVertex].y = point.y;
@@ -2366,7 +2367,7 @@ void form::internal::plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	    prct[VertexCount - 4U].bipnt, prct[VertexCount - 4U].dipnt, prct[VertexCount - 4U].bopnt, prct[VertexCount - 4U].dopnt);
 }
 
-void form::internal::plbak(uint32_t backPoint) {
+void form::internal::plbak(uint32_t backPoint) noexcept {
 	if ((!OSequence->empty()) && (backPoint < (OSequence->size() - 1U))) {
 		auto iSequence = wrap::toUnsigned(OSequence->size() - 1U);
 		while (iSequence > backPoint) {
@@ -3537,29 +3538,29 @@ bool form::internal::isclos(const SMALPNTL* const lineEndPoint0,
 }
 
 bool form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
-	std::vector<SMALPNTL>& lineEndpoints,
-	uint32_t               group0,
-	uint32_t               line0,
-	uint32_t               group1,
-	uint32_t               line1,
-	double                 gapToClosestRegion) {
+                            std::vector<SMALPNTL>& lineEndpoints,
+                            uint32_t               group0,
+                            uint32_t               line0,
+                            uint32_t               group1,
+                            uint32_t               line1,
+                            double                 gapToClosestRegion) noexcept {
 	const auto lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
-	if (group1 > groupIndexSequence.size() - 2) {
+	if (group1 > groupIndexSequence.size() - 2U) {
 		return false;
 	}
 	if (group0 == 0) {
 		return false;
 	}
 	if (lineEndPoint0 != nullptr) {
-		auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1U] - groupIndexSequence[group0]) / 2;
+		auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1U] - groupIndexSequence[group0]) / 2U;
 		auto index0 = 0U;
 		while ((count0 != 0U) && lineEndPoint0[index0].line != line0) {
 			count0--;
 			index0 += 2;
 		}
 		if (count0 != 0U) {
-			auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2;
+			auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
 			auto index1 = 0U;
 			if (const auto lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 				while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {

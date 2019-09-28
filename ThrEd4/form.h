@@ -364,7 +364,7 @@ namespace internal {
 	            uint32_t               line0,
 	            uint32_t               group1,
 	            uint32_t               line1,
-	            double                 gapToClosestRegion);
+	            double                 gapToClosestRegion) noexcept;
 	void makpoli();
 	void movseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t ind);
 	void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source);
@@ -402,7 +402,7 @@ namespace internal {
 	           uint32_t                  startVertex,
 	           const std::vector<VRCT2>& vrct,
 	           float                     width);
-	void   plbak(uint32_t backPoint);
+	void   plbak(uint32_t backPoint) noexcept;
 	void   plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	void   plfn(const std::vector<VRCT2>& underlayVerticalRect,
 	            const std::vector<VRCT2>& fillVerticalRect,
