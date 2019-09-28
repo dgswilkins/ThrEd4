@@ -1197,6 +1197,7 @@ void satin::satfix() {
 	if (TempPolygon->size() > minSize) {
 		form.vertexIndex = thred::adflt(vertexCount);
 		auto vertexIt    = std::next(FormVertices->begin(), form.vertexIndex);
+		// ToDo - replace with copy
 		for (auto iVertex = 0U; iVertex < vertexCount; iVertex++) {
 			vertexIt[iVertex] = (*TempPolygon)[iVertex];
 		}
@@ -1266,7 +1267,8 @@ void satin::satpnt1() {
 
 void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup, const fPOINT& point, uint32_t& satinBackupIndex) {
 	satinBackup[satinBackupIndex++] = point;
-	satinBackupIndex &= (satinBackup.size() - 1);
+	satinBackupIndex
+	    &= (satinBackup.size() - 1U); // make sure that satinBackupIndex rolls over when it reaches the end of the buffer
 	form::filinsb(point);
 }
 
