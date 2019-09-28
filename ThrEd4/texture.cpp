@@ -1328,7 +1328,7 @@ void texture::internal::txtdel() {
 		for (auto& p : *SelectedTexturePointsList) {
 			texturePointsMap.set(p);
 		}
-		// Another potential pattern for this:
+		// ToDo - Another potential pattern for this:
 		// myVector.erase(remove_if(myVector.begin(), myVector.end(), testFunction), myVector.end());
 		auto tmpTexture = std::vector<TXPNT> {};
 		tmpTexture.reserve(TempTexturePoints->size() - SelectedTexturePointsList->size());
