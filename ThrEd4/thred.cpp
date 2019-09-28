@@ -18289,7 +18289,7 @@ bool thred::internal::bitar() {
 }
 
 inline void thred::internal::stCor2px(const fPOINTATTR& stitch, POINT& point) {
-	// ToDo - is 0.5 still required with toint32_t?
+	// ToDo - is 0.5 still required with round?
 	point = { wrap::round<int32_t>((stitch.x - ZoomRect.left) * ZoomRatio.x + 0.5F),
 		      wrap::round<int32_t>(StitchWindowClientRect.bottom - (stitch.y - ZoomRect.bottom) * ZoomRatio.y + 0.5F) };
 }

@@ -135,7 +135,7 @@ constexpr double   CHRDEF    = 0.25;            // default chain stitch ratio
 constexpr float    NUGINI    = 2.0F;            // default nudge step
 constexpr uint16_t DEFPIX    = 2U;              // default nudge pixels
 constexpr double   DEFEGRAT  = 1.5;             // default egg ratio
-constexpr uint16_t DEFPNTPIX = 4U;              // default form and stitch point32_t pixels
+constexpr uint16_t DEFPNTPIX = 4U;              // default form and stitch point pixels
 constexpr int32_t  HBUFSIZ   = 1024;            // help buffer size
 constexpr uint32_t HIGRD     = 0xffffffU;       // grid high color
 constexpr uint32_t MEDGRD    = 0x404040U;       // grid medium color
@@ -376,7 +376,7 @@ enum class StateFlag
 	ISUP,      // up stitch exists
 	WASLIN,    // a move stitch line has been drawn
 	CAPT,      // screen capture in effect
-	VCAPT,     // keep screen capture as int32_t as the mouse cursor
+	VCAPT,     // keep screen capture as long as the mouse cursor
 	           // is in the edit window
 	SELBOX,    // the select box is showing
 	ILIN,      // insert line is showing on the screen
@@ -406,14 +406,14 @@ enum class StateFlag
 	ENTR40,    // user is entering a new thread size for #40 thread
 	ENTR60,    // user is entering a new thread size for #60 thread
 	FORMSEL,   // a form is selected
-	FRMPMOV,   // user is moving a point32_t on a form
+	FRMPMOV,   // user is moving a point on a form
 	IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
 	FRMOV,     // user is moving a form
 	RUNPAT,    // user is running a pattern
 	WASPAT,    // user ran a pattern, but hasn't done anything else yet
 	FILDIR,    // direction lines in angle fill
 	SHOSAT,    // the satin stitch form is on the screen
-	SHOCON,    // connect point32_t line is visible
+	SHOCON,    // connect point line is visible
 	FENDIN,    // user is selecting fill ends
 	DELFRM,    // user wants to delete a form
 	BAKACT,    // there are entries in the undo buffer
@@ -422,7 +422,7 @@ enum class StateFlag
 	REDUSHO,   // redo menu item is active
 	UNDUSHO,   // undo menu item is active
 	FUNCLP,    // user is loading a form from the clipboard
-	FRMPSEL,   // user has selected a point32_t in a form
+	FRMPSEL,   // user has selected a point in a form
 	SHOINSF,   // the form insert line has been drawn
 	SAT1,      // set when the first stitch is entered in a satin fill
 	FILMSG,    // set when user tries to unfill a form with edited stitches
@@ -463,7 +463,7 @@ enum class StateFlag
 	FUNSCLP,   // user is pasting a group of forms
 	DELSFRMS,  // user is deleting a group of forms
 	BIGBOX,    // user has selected all forms and stitches
-	MOVSET,    // the move point32_t has been selected
+	MOVSET,    // the move point has been selected
 	UPTO,      // show points up to the selected point
 	LENSRCH,   // user has hit the max or min button
 	BOXSLCT,   // user is making a select box
@@ -480,7 +480,7 @@ enum class StateFlag
 	MONOMAP,   // set if a color bitmap is loaded
 	THUMON,    // user is loading a thumnail
 	CLPOVR,    // can't fit another clipboard fill on the current line
-	CONTIG,    // contiguous point32_t flag
+	CONTIG,    // contiguous point flag
 	NUROT,     // user is entering a rotate angle
 	APSID,     // user is entering a new applique color
 	FRMSAM,    // don't find an already selected form
@@ -493,7 +493,7 @@ enum class StateFlag
 	RESTCH,    // redraw the stitch window
 	WASGRP,    // group of stitches selected when entering length search
 	REFILMSG,  // refill all message is up
-	PRELIN,    // user is inserting form points before the 0 point32_t in a line form
+	PRELIN,    // user is inserting form points before the 0 point in a line form
 	WASRT,     // insert was active when preferences activated
 	WASDIR,    // last minimum direction for sequencing
 	BRKFIX,    // last line sequenced was from the end of a break of an already done region
@@ -508,11 +508,11 @@ enum class StateFlag
 	ZUMACT,    // zoom to actual size
 	WASREFIL,  // last fill was a refil
 	DUMEN,     // menu needs to be refilled
-	WASNEG,    // form had a point32_t less than the size of the clipboard fill
+	WASNEG,    // form had a point less than the size of the clipboard fill
 	FCLOS,     // user is closing a file
 	NOTFREE,   // no free space on the drive
-	PIXIN,     // user in inputting nudge pixels
-	STPXIN,    // user is inputting stitch point32_t pixels
+	PIXIN,     // user in inputing nudge pixels
+	STPXIN,    // user is inputing stitch point pixels
 	FRMPXIN,   // user is inputting form vertex pixels
 	WASMRK,    // user has set a mark
 	RESIZ,     // need to change the size of the main window
@@ -528,8 +528,8 @@ enum class StateFlag
 	TRCRED,    // red trace on
 	TRCGRN,    // green trace on
 	TRCBLU,    // blue trace on
-	DUHI,      // paint32_t the high trace rectangle
-	DULO,      // paint32_t the low trace rectangle
+	DUHI,      // paint the high trace rectangle
+	DULO,      // paint the low trace rectangle
 	WASDIF,    // found edges on bitmap
 	WASDSEL,   // color selected bitmap
 	TRNIN0,    // trace color number input
@@ -607,7 +607,7 @@ enum class StateFlag
 	CHKTX,     // user has changed the texture fill window size, check the points
 	FSETFIND,  // user is setting the indent for a group of forms
 	TXBOX,     // user is importing stitches for textured fill
-	TXIN,      // last stitch point32_t was in stitch select box
+	TXIN,      // last stitch point was in stitch select box
 	SCLPSPAC,  // user is setting the clipbard fill spacing
 	FCHK,      // check the forms
 	NOCLP,     // don't load clipboard data from forms
@@ -2465,7 +2465,7 @@ public:
 	char     modifierName[NAME_LEN] { 0 }; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
 	int8_t   auxFormat { 0 };              // auxillary file format
 	int8_t   stres { 0 };                  // reserved
-	uint32_t texturePointCount { 0U };     // textured fill point32_t count
+	uint32_t texturePointCount { 0U };     // textured fill point count
 	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
 
 	constexpr STREX() noexcept = default;
