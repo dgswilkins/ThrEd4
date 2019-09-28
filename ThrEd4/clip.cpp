@@ -858,7 +858,7 @@ void clip::internal::duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t 
 	chainPoint[1].y = middleYcoord + offset.y;
 	chainPoint[3].x = middleXcoord - offset.x;
 	chainPoint[3].y = middleYcoord - offset.y;
-	if (finish < chainEndPoints.size() - 1) {
+	if (finish < chainEndPoints.size() - 1U) {
 		delta.x = chainEndPoints[wrap::toSize(finish) + 1U].x - chainEndPoints[finish].x;
 		delta.y = chainEndPoints[wrap::toSize(finish) + 1U].y - chainEndPoints[finish].y;
 	}
