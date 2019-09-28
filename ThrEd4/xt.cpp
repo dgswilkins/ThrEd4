@@ -1073,126 +1073,128 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count
 }
 
 void xt::fsort() {
-	auto attribute = (*StitchBuffer)[0].attribute & SRTMSK;
+	if (!StitchBuffer->empty()) {
+		auto attribute = (*StitchBuffer)[0].attribute & SRTMSK;
 
-	auto stitchRegion = std::vector<OREC> {};
-	stitchRegion.reserve(100U);
+		auto stitchRegion = std::vector<OREC> {};
+		stitchRegion.reserve(100U);
 
-	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
-	//        in a single form are not in ascending order already.
-	thred::savdo();
-	stitchRegion.emplace_back(OREC {});
-	stitchRegion.back().startStitch = &(*StitchBuffer)[0];
-	ColorOrder[AppliqueColor]       = 0;
-	for (auto iColor = 0U; iColor < 16U; iColor++) {
-		if (iColor != AppliqueColor) {
-			ColorOrder[iColor] = iColor + 1U;
+		// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
+		//        in a single form are not in ascending order already.
+		thred::savdo();
+		stitchRegion.emplace_back(OREC {});
+		stitchRegion.back().startStitch = &(*StitchBuffer)[0];
+		ColorOrder[AppliqueColor]       = 0;
+		for (auto iColor = 0U; iColor < 16U; iColor++) {
+			if (iColor != AppliqueColor) {
+				ColorOrder[iColor] = iColor + 1U;
+			}
 		}
-	}
-	for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
-		if (((*StitchBuffer)[iStitch].attribute & SRTMSK) != attribute) {
-			stitchRegion.back().finish    = iStitch;
-			stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1U];
-			stitchRegion.emplace_back(OREC {});
-			stitchRegion.back().start       = iStitch;
-			stitchRegion.back().startStitch = &(*StitchBuffer)[iStitch];
-			attribute                       = (*StitchBuffer)[iStitch].attribute & SRTMSK;
+		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
+			if (((*StitchBuffer)[iStitch].attribute & SRTMSK) != attribute) {
+				stitchRegion.back().finish    = iStitch;
+				stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1U];
+				stitchRegion.emplace_back(OREC {});
+				stitchRegion.back().start       = iStitch;
+				stitchRegion.back().startStitch = &(*StitchBuffer)[iStitch];
+				attribute                       = (*StitchBuffer)[iStitch].attribute & SRTMSK;
+			}
 		}
-	}
-	stitchRegion.back().finish    = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
-	stitchRegion.back().endStitch = &(*StitchBuffer)[StitchBuffer->size() - 1U];
-	const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
-	auto       pRecs              = std::vector<OREC*> {};
-	pRecs.reserve(lastRegion);
-	auto pFRecs = std::vector<OREC*> {};
-	pFRecs.reserve(lastRegion);
-	for (auto& region : stitchRegion) {
-		xi::durec(region);
-		pRecs.push_back(&region);
-		pFRecs.push_back(&region);
-	}
-	std::sort(pRecs.begin(), pRecs.end(), xi::orComp);
-	std::sort(pFRecs.begin(), pFRecs.end(), xi::orfComp);
+		stitchRegion.back().finish    = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
+		stitchRegion.back().endStitch = &(*StitchBuffer)[StitchBuffer->size() - 1U];
+		const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
+		auto       pRecs              = std::vector<OREC*> {};
+		pRecs.reserve(lastRegion);
+		auto pFRecs = std::vector<OREC*> {};
+		pFRecs.reserve(lastRegion);
+		for (auto& region : stitchRegion) {
+			xi::durec(region);
+			pRecs.push_back(&region);
+			pFRecs.push_back(&region);
+		}
+		std::sort(pRecs.begin(), pRecs.end(), xi::orComp);
+		std::sort(pFRecs.begin(), pFRecs.end(), xi::orfComp);
 #ifdef _DEBUG
-	xi::dmprec(pRecs, lastRegion);
+		xi::dmprec(pRecs, lastRegion);
 #endif
-	auto badForm = 0U;
-	if (xi::srtchk(pFRecs, lastRegion, badForm)) {
-		auto stitchRange = std::vector<RANGE> {};
-		stitchRange.resize(lastRegion);
-		stitchRange[0].start = 0;
-		attribute            = pRecs[0]->color;
-		auto currentForm     = 0xffffffffU;
-		auto typeCount       = 0U;
-		auto iRange          = 0U;
-		for (auto iRegion = 0U; iRegion < lastRegion; iRegion++) {
-			auto srtskp = true;
-			if (attribute != pRecs[iRegion]->color) {
-				stitchRange[iRange++].finish = iRegion;
-				stitchRange[iRange].start    = iRegion;
-				attribute                    = pRecs[iRegion]->color;
-				currentForm                  = pRecs[iRegion]->form;
-				typeCount                    = 0;
-				srtskp                       = false;
-			}
-			if (srtskp) {
-				if (pRecs[iRegion]->form == currentForm) {
-					typeCount++;
+		auto badForm = 0U;
+		if (xi::srtchk(pFRecs, lastRegion, badForm)) {
+			auto stitchRange = std::vector<RANGE> {};
+			stitchRange.resize(lastRegion);
+			stitchRange[0].start = 0;
+			attribute            = pRecs[0]->color;
+			auto currentForm     = 0xffffffffU;
+			auto typeCount       = 0U;
+			auto iRange          = 0U;
+			for (auto iRegion = 0U; iRegion < lastRegion; iRegion++) {
+				auto srtskp = true;
+				if (attribute != pRecs[iRegion]->color) {
+					stitchRange[iRange++].finish = iRegion;
+					stitchRange[iRange].start    = iRegion;
+					attribute                    = pRecs[iRegion]->color;
+					currentForm                  = pRecs[iRegion]->form;
+					typeCount                    = 0;
+					srtskp                       = false;
 				}
-				else {
-					typeCount   = 0;
-					currentForm = pRecs[iRegion]->form;
-				}
-			}
-			pRecs[iRegion]->otyp = typeCount;
-		}
-		stitchRange[iRange].finish  = lastRegion;
-		const auto lastRange        = ++iRange;
-		auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
-		tempStitchBuffer.reserve(StitchBuffer->size());
-		for (iRange = 0; iRange < lastRange; iRange++) {
-			StateMap.reset(StateFlag::DUSRT);
-			auto sortRecord   = SRTREC {};
-			sortRecord.start  = stitchRange[iRange].start;
-			sortRecord.finish = stitchRange[iRange].finish;
-			sortRecord.count  = sortRecord.finish - sortRecord.start;
-			auto minimumJumps = 0xffffffffU;
-			// timeout used to put an upper bound on the number of sorting permutations checked
-			auto fileTime = FILETIME { 0U, 0U };
-			GetSystemTimeAsFileTime(&fileTime);
-			const auto startTime        = xi::tim2int(fileTime);
-			auto       minimumIndex     = 0U;
-			auto       minimumDirection = 0U;
-			for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
-				sortRecord.currentRegion = iRegion;
-				if (pRecs[iRegion]->otyp == 0U) {
-					const auto jumps = xi::duprecs(tempStitchBuffer, pRecs, sortRecord);
-					if (jumps < minimumJumps) {
-						minimumJumps     = jumps;
-						minimumIndex     = iRegion;
-						minimumDirection = gsl::narrow_cast<uint32_t>(sortRecord.direction);
+				if (srtskp) {
+					if (pRecs[iRegion]->form == currentForm) {
+						typeCount++;
+					}
+					else {
+						typeCount   = 0;
+						currentForm = pRecs[iRegion]->form;
 					}
 				}
-				GetSystemTimeAsFileTime(&fileTime);
-				const auto nextTime = xi::tim2int(fileTime);
-				if (nextTime.QuadPart - startTime.QuadPart > SRTIM) {
-					break;
-				}
+				pRecs[iRegion]->otyp = typeCount;
 			}
-			StateMap.set(StateFlag::DUSRT);
-			sortRecord.currentRegion = minimumIndex;
-			sortRecord.direction     = (minimumDirection != 0U);
-			xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
+			stitchRange[iRange].finish  = lastRegion;
+			const auto lastRange        = ++iRange;
+			auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
+			tempStitchBuffer.reserve(StitchBuffer->size());
+			for (iRange = 0; iRange < lastRange; iRange++) {
+				StateMap.reset(StateFlag::DUSRT);
+				auto sortRecord   = SRTREC {};
+				sortRecord.start  = stitchRange[iRange].start;
+				sortRecord.finish = stitchRange[iRange].finish;
+				sortRecord.count  = sortRecord.finish - sortRecord.start;
+				auto minimumJumps = 0xffffffffU;
+				// timeout used to put an upper bound on the number of sorting permutations checked
+				auto fileTime = FILETIME { 0U, 0U };
+				GetSystemTimeAsFileTime(&fileTime);
+				const auto startTime        = xi::tim2int(fileTime);
+				auto       minimumIndex     = 0U;
+				auto       minimumDirection = 0U;
+				for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
+					sortRecord.currentRegion = iRegion;
+					if (pRecs[iRegion]->otyp == 0U) {
+						const auto jumps = xi::duprecs(tempStitchBuffer, pRecs, sortRecord);
+						if (jumps < minimumJumps) {
+							minimumJumps     = jumps;
+							minimumIndex     = iRegion;
+							minimumDirection = gsl::narrow_cast<uint32_t>(sortRecord.direction);
+						}
+					}
+					GetSystemTimeAsFileTime(&fileTime);
+					const auto nextTime = xi::tim2int(fileTime);
+					if (nextTime.QuadPart - startTime.QuadPart > SRTIM) {
+						break;
+					}
+				}
+				StateMap.set(StateFlag::DUSRT);
+				sortRecord.currentRegion = minimumIndex;
+				sortRecord.direction     = (minimumDirection != 0U);
+				xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
+			}
+			StitchBuffer->resize(tempStitchBuffer.size());
+			std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cend(), StitchBuffer->begin());
+			thred::coltab();
+			StateMap.set(StateFlag::RESTCH);
 		}
-		StitchBuffer->resize(tempStitchBuffer.size());
-		std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cend(), StitchBuffer->begin());
-		thred::coltab();
-		StateMap.set(StateFlag::RESTCH);
-	}
-	else {
-		auto str = std::wstring {};
-		displayText::loadString(str, IDS_SRTER);
-		displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
+		else {
+			auto str = std::wstring {};
+			displayText::loadString(str, IDS_SRTER);
+			displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
+		}
 	}
 }
 

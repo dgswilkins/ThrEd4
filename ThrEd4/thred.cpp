@@ -1925,10 +1925,10 @@ void thred::internal::movins() {
 	if (StateMap.test(StateFlag::INSRT)) {
 		if (StateMap.test(StateFlag::LIN1)) {
 			if (StateMap.test(StateFlag::BAKEND)) {
-				stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1));
+				stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
 			}
 			else {
-				stch2px1(0);
+				stch2px1(0U);
 			}
 			endpnt();
 		}
@@ -3423,21 +3423,22 @@ void thred::internal::duar() {
 }
 
 void thred::internal::dubox() {
-	if (ClosestPointIndex != (StitchBuffer->size() - 1)) { // if the selected point is not at the end then aim at the next point
-		RotateAngle = atan2((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].y - (*StitchBuffer)[ClosestPointIndex].y,
-		                    (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].x - (*StitchBuffer)[ClosestPointIndex].x);
+	if (!StitchBuffer->empty()) {
+		if (ClosestPointIndex != (StitchBuffer->size() - 1U)) { // if the selected point is not at the end then aim at the next point
+			RotateAngle = atan2((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].y - (*StitchBuffer)[ClosestPointIndex].y,
+				(*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].x - (*StitchBuffer)[ClosestPointIndex].x);
+		}
+		else { // otherwise aim in the same direction
+			RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1U].y,
+				(*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1U].x);
+		}
+		duar();
+		StateMap.reset(StateFlag::ELIN);
+		StateMap.set(StateFlag::SELBOX);
+		StateMap.reset(StateFlag::FRMPSEL);
+		thred::redraw(ColorBar);
+		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 	}
-	else { // otherwise aim in the same direction
-		RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1U].y,
-		                    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1U].x);
-	}
-	duar();
-	StateMap.reset(StateFlag::ELIN);
-	StateMap.set(StateFlag::SELBOX);
-	StateMap.reset(StateFlag::FRMPSEL);
-	thred::redraw(ColorBar);
-	// if (!BufferIndex)
-	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 }
 
 bool thred::internal::stch2px(uint32_t iStitch) {
@@ -4130,7 +4131,7 @@ void thred::internal::ritdst(DSTOffsets&                    DSTOffsetData,
 		if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 			wrap::WriteFile(colorFile,
 			                &colorData[2],
-			                wrap::toUnsigned((colorData.size() - 2) * sizeof(decltype(colorData.data()))),
+			                wrap::toUnsigned((colorData.size() - 2U) * sizeof(decltype(colorData.data()))),
 			                &bytesWritten,
 			                nullptr);
 		}
@@ -6674,28 +6675,30 @@ void thred::internal::unlin() {
 }
 
 void thred::internal::movbox() {
-	if (stch2px(ClosestPointIndex)) {
-		unbox();
-		OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
-		                              ClosestPointIndex,
-		                              (((*StitchBuffer)[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
-		                              (((*StitchBuffer)[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT),
-		                              (*StitchBuffer)[ClosestPointIndex].x,
-		                              (*StitchBuffer)[ClosestPointIndex].y)
-		                      .c_str());
-		dubox();
-		if (StateMap.test(StateFlag::UPTO)) {
+	if (!StitchBuffer->empty()) {
+		if (stch2px(ClosestPointIndex)) {
+			unbox();
+			OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
+				ClosestPointIndex,
+				(((*StitchBuffer)[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
+				(((*StitchBuffer)[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT),
+				(*StitchBuffer)[ClosestPointIndex].x,
+				(*StitchBuffer)[ClosestPointIndex].y)
+				.c_str());
+			dubox();
+			if (StateMap.test(StateFlag::UPTO)) {
+				StateMap.set(StateFlag::RESTCH);
+			}
+		}
+		else {
+			shft2box();
+			StateMap.set(StateFlag::SELBOX);
+			StateMap.reset(StateFlag::FRMPSEL);
 			StateMap.set(StateFlag::RESTCH);
 		}
+		nuAct(ClosestPointIndex);
+		ritcor((*StitchBuffer)[ClosestPointIndex]);
 	}
-	else {
-		shft2box();
-		StateMap.set(StateFlag::SELBOX);
-		StateMap.reset(StateFlag::FRMPSEL);
-		StateMap.set(StateFlag::RESTCH);
-	}
-	nuAct(ClosestPointIndex);
-	ritcor((*StitchBuffer)[ClosestPointIndex]);
 }
 
 bool thred::internal::chkhid(uint32_t colorToCheck) {
@@ -9743,7 +9746,7 @@ void thred::internal::selup() {
 	if (wrap::pressed(VK_SHIFT)) {
 		StateMap.reset(StateFlag::SELBOX);
 		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-			if (ClosestFormToCursor < FormList->size() - 1) {
+			if (ClosestFormToCursor < FormList->size() - 1U) {
 				SelectedFormList->push_back(ClosestFormToCursor);
 				LastFormSelected = ClosestFormToCursor + 1U;
 				SelectedFormList->push_back(LastFormSelected);
@@ -9754,7 +9757,7 @@ void thred::internal::selup() {
 		}
 		else {
 			if (!SelectedFormList->empty()) {
-				if (LastFormSelected < FormList->size() - 1) {
+				if (LastFormSelected < FormList->size() - 1U) {
 					LastFormSelected++;
 					dufsel();
 				}
@@ -9779,7 +9782,7 @@ void thred::internal::selup() {
 		else {
 			if (!FormList->empty()) {
 				if (StateMap.testAndSet(StateFlag::FORMSEL)) {
-					if (ClosestFormToCursor < gsl::narrow<uint32_t>(FormList->size()) - 1) {
+					if (ClosestFormToCursor < gsl::narrow<uint32_t>(FormList->size()) - 1U) {
 						ClosestFormToCursor++;
 					}
 				}
@@ -11920,7 +11923,9 @@ void thred::internal::qcode() {
 	// ToDo - do we need to erase vertices and textures when aborting?
 	if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
 		FormList->pop_back();
-		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		if (!FormList->empty()) {
+			ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		}
 	};
 	if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 		thi::bak();
@@ -14953,32 +14958,33 @@ bool thred::internal::handleHomeKey(bool& retflag) {
 bool thred::internal::handleEndKey(int32_t& retflag) {
 	retflag = 1;
 	if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
-		if (StateMap.testAndReset(StateFlag::SELBOX)) {
-			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
-			StateMap.set(StateFlag::GRPSEL);
-		}
-		else {
-			if (StateMap.test(StateFlag::GRPSEL)) {
-				if (GroupStitchIndex > ClosestPointIndex) {
-					GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
-				}
-				else {
-					ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
-				}
+		if (!StitchBuffer->empty()) {
+			if (StateMap.testAndReset(StateFlag::SELBOX)) {
+				GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+				StateMap.set(StateFlag::GRPSEL);
 			}
 			else {
-				StateMap.set(StateFlag::SELBOX);
-				ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
-				StateMap.set(StateFlag::RESTCH);
-				return true;
+				if (StateMap.test(StateFlag::GRPSEL)) {
+					if (GroupStitchIndex > ClosestPointIndex) {
+						GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+					}
+					else {
+						ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+					}
+				}
+				else {
+					StateMap.set(StateFlag::SELBOX);
+					ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+					StateMap.set(StateFlag::RESTCH);
+					return true;
+				}
 			}
-		}
-		thred::grpAdj();
-		thred::redraw(ColorBar);
-		{
+			thred::grpAdj();
+			thred::redraw(ColorBar);
 			retflag = 2;
-			return {};
-		};
+			return true;
+		}
+		return false;
 	}
 	if (wrap::pressed(VK_SHIFT)) {
 		auto iColor = 0U;
@@ -15018,7 +15024,7 @@ bool thred::internal::handleEndKey(int32_t& retflag) {
 		}
 	}
 	retflag = 0;
-	return {};
+	return false;
 }
 
 bool thred::internal::handleRightKey(bool& retflag) {
@@ -15771,7 +15777,7 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		break;
 	}
 	case 'G': {
-		mark();
+		thi::mark();
 		break;
 	}
 	case 'M': {
