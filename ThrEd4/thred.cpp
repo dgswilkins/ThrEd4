@@ -14732,6 +14732,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					SelectedForm              = &((*FormList)[offset]);
 					SelectedForm->vertexIndex = thred::adflt(SelectedForm->vertexCount);
 					auto vertexIt             = std::next(FormVertices->begin(), SelectedForm->vertexIndex);
+					// ToDo - replace with copy
 					for (auto iVertex = 0U; iVertex < SelectedForm->vertexCount; iVertex++) {
 						vertexIt[iVertex] = formVertices[currentVertex++];
 					}
@@ -19574,6 +19575,8 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_DefaultColorWin.resize(16U);
 		private_FormControlPoints.resize(9U);
 		private_LabelWindow.resize(LASTLIN);
+		private_PreviousNames.reserve(OLDNUM);
+		private_VersionNames.reserve(OLDVER);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
 			private_PreviousNames.emplace_back(L"");
 		}
