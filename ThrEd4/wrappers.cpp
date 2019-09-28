@@ -104,7 +104,11 @@ float wrap::toFloat(uint32_t invar) noexcept {
 #pragma warning(push)
 #pragma warning(disable : 26440)
 uint32_t wrap::toUnsigned(size_t invar) {
+#ifdef _WIN64
 	return gsl::narrow<uint32_t>(invar);
+#else
+	return invar;
+#endif
 }
 #pragma warning(pop)
 
