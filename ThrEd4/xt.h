@@ -116,9 +116,10 @@ namespace internal {
 	void     bspacfn(uint32_t find, float length);
 	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
 	void     chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
-	bool     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) noexcept;
-	void     chkuseq();
-	void     delwlk(uint32_t code);
+	bool
+	     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) noexcept;
+	void chkuseq();
+	void delwlk(uint32_t code);
 
 #ifdef _DEBUG
 	void dmprec(const std::vector<OREC*>& stitchRegion, uint32_t count);

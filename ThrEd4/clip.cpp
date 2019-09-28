@@ -812,9 +812,9 @@ void clip::clpic(const fRECTANGLE& clipRect) {
 
 	OSequence->clear();
 	StateMap.reset(StateFlag::CLPBAK);
-	HorizontalLength  = ClipRectSize.cx;
-	ClipReference.y   = rotationCenter.y;
-	ClipReference.x   = clipRect.left;
+	HorizontalLength = ClipRectSize.cx;
+	ClipReference.y  = rotationCenter.y;
+	ClipReference.x  = clipRect.left;
 	satin::satout(20);
 	if (SelectedForm->type == FRMLINE) {
 		for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {

@@ -51,16 +51,16 @@ uint32_t  TraceAdjacentColors[9];                                               
 wchar_t   TraceInputBuffer[4];                                                          // for user input color numbers
 COLORREF  UpPixelColor;                                                                 // color of the up reference pixel
 COLORREF  DownPixelColor;                                                               // color of the down reference pixel
-COLORREF  InvertUpColor;               // complement color of the up reference pixel
-COLORREF  InvertDownColor;             // complement color of the down reference pixel
-POINT     TraceMsgPoint;               // message point for trace parsing
-uint32_t  HighColors[3];               // separated upper reference colors
-uint32_t  LowColors[3];                // separated lower reference colors
-uint32_t  ColumnColor;                 // trace color column
+COLORREF  InvertUpColor;                  // complement color of the up reference pixel
+COLORREF  InvertDownColor;                // complement color of the down reference pixel
+POINT     TraceMsgPoint;                  // message point for trace parsing
+uint32_t  HighColors[3];                  // separated upper reference colors
+uint32_t  LowColors[3];                   // separated lower reference colors
+uint32_t  ColumnColor;                    // trace color column
 uint32_t  TraceShift[] = { 0U, 8U, 16U }; // trace shift values
-HBRUSH    TraceBrush[3];               // red,green,and blue brushes
-HWND      TraceNumberInput;            // trace number input window
-HPEN      BlackPen;                    // black pen
+HBRUSH    TraceBrush[3];                  // red,green,and blue brushes
+HWND      TraceNumberInput;               // trace number input window
+HPEN      BlackPen;                       // black pen
 
 void trace::initColorRef() noexcept {
 	UpPixelColor    = 0;

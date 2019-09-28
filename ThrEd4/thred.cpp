@@ -1172,7 +1172,7 @@ void thred::internal::ritfnam(const std::wstring& designerName) {
 		fnamtabs();
 	}
 	PseudoRandomValue = rsed();
-	auto    iName = 0U;
+	auto iName        = 0U;
 	for (; iName < 50U; iName++) {
 		tmpName[iName] = form::psg() & 0xffU;
 	}
@@ -3424,13 +3424,14 @@ void thred::internal::duar() {
 
 void thred::internal::dubox() {
 	if (!StitchBuffer->empty()) {
-		if (ClosestPointIndex != (StitchBuffer->size() - 1U)) { // if the selected point is not at the end then aim at the next point
+		if (ClosestPointIndex
+		    != (StitchBuffer->size() - 1U)) { // if the selected point is not at the end then aim at the next point
 			RotateAngle = atan2((*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].y - (*StitchBuffer)[ClosestPointIndex].y,
-				(*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].x - (*StitchBuffer)[ClosestPointIndex].x);
+			                    (*StitchBuffer)[wrap::toSize(ClosestPointIndex) + 1U].x - (*StitchBuffer)[ClosestPointIndex].x);
 		}
 		else { // otherwise aim in the same direction
 			RotateAngle = atan2((*StitchBuffer)[ClosestPointIndex].y - (*StitchBuffer)[ClosestPointIndex - 1U].y,
-				(*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1U].x);
+			                    (*StitchBuffer)[ClosestPointIndex].x - (*StitchBuffer)[ClosestPointIndex - 1U].x);
 		}
 		duar();
 		StateMap.reset(StateFlag::ELIN);
@@ -3563,7 +3564,10 @@ bool thred::internal::savcmp() noexcept {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) noexcept {
+void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch,
+                              uint32_t              destination,
+                              uint32_t              source,
+                              uint32_t              code) noexcept {
 	constexpr auto BalaradRatio = 10.0F / 6.0F;
 
 	balaradStitch[destination].flag = 0;
@@ -4218,7 +4222,7 @@ uint32_t thred::internal::pesmtch(const COLORREF& referenceColor, const uint8_t&
 
 void thred::internal::ritpes(std::vector<uint8_t>& buffer, const fPOINTATTR& stitch) {
 	constexpr auto factor  = 3.0F / 5.0F;
-	const auto oldSize = buffer.size();
+	const auto     oldSize = buffer.size();
 	buffer.resize(oldSize + sizeof(PESTCH));
 	auto*      pesStitch = convert_ptr<PESTCH*>(&buffer[oldSize]);
 	const auto scaledStitch
@@ -4480,8 +4484,8 @@ void thred::internal::sav() {
 			strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs)); // NOLINT
 			auto iColor = 0;
 			for (const auto color : UserColor) {
-				auto       matchIndex  = 0U;
-				auto       matchMin    = 0xffffffffU;
+				auto           matchIndex  = 0U;
+				auto           matchMin    = 0xffffffffU;
 				constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 				for (auto iColorMatch = 1U; iColorMatch < threadCount; iColorMatch++) {
 					const auto match = pesmtch(color, iColorMatch);
@@ -5142,8 +5146,8 @@ void thred::internal::redbak() {
 		}
 		// ToDo - add field in BAKHED to keep track of number of colors
 		constexpr auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-		const auto undoColors = gsl::span<COLORREF> { undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors) };
-		const auto userColors = gsl::span<COLORREF> { UserColor };
+		const auto     undoColors = gsl::span<COLORREF> { undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors) };
+		const auto     userColors = gsl::span<COLORREF> { UserColor };
 		std::copy(undoColors.cbegin(), undoColors.cend(), userColors.begin());
 		for (auto iColor = 0U; iColor < sizeColors; iColor++) {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
@@ -5599,8 +5603,8 @@ uint32_t thred::internal::tripl(char* dat) {
 
 uint32_t thred::internal::dupcol(uint32_t activeColor) {
 	constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
-	const auto threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
-	const auto color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
+	const auto     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
+	const auto     color       = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
 	for (auto iColor = 0U; iColor < activeColor; iColor++) {
 		if (UserColor[iColor] == color) {
 			return iColor;
@@ -6057,13 +6061,13 @@ void thred::internal::nuFil() {
 						}
 						auto pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
 						// auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
-						auto pecOffset           = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-						PESstitch                = &fileBuffer[pecOffset];
-						const auto pesColorCount = pecHeader->colorCount + 1U;
-						PEScolors                = &pecHeader->pad[0];
-						constexpr auto threadCount   = sizeof(PESThread) / sizeof(PESThread[0]);
-						auto       colorMap      = boost::dynamic_bitset<>(threadCount);
-						auto       activeColor   = 0U;
+						auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+						PESstitch                  = &fileBuffer[pecOffset];
+						const auto pesColorCount   = pecHeader->colorCount + 1U;
+						PEScolors                  = &pecHeader->pad[0];
+						constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
+						auto           colorMap    = boost::dynamic_bitset<>(threadCount);
+						auto           activeColor = 0U;
 						for (auto iColor = 0U; iColor < pesColorCount; iColor++) {
 							if (PEScolors[iColor] < threadCount) {
 								if (!colorMap.test_set(PEScolors[iColor])) {
@@ -6679,12 +6683,12 @@ void thred::internal::movbox() {
 		if (stch2px(ClosestPointIndex)) {
 			unbox();
 			OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
-				ClosestPointIndex,
-				(((*StitchBuffer)[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
-				(((*StitchBuffer)[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT),
-				(*StitchBuffer)[ClosestPointIndex].x,
-				(*StitchBuffer)[ClosestPointIndex].y)
-				.c_str());
+			                              ClosestPointIndex,
+			                              (((*StitchBuffer)[ClosestPointIndex].attribute & FRMSK) >> FRMSHFT),
+			                              (((*StitchBuffer)[ClosestPointIndex].attribute & TYPMSK) >> TYPSHFT),
+			                              (*StitchBuffer)[ClosestPointIndex].x,
+			                              (*StitchBuffer)[ClosestPointIndex].y)
+			                      .c_str());
 			dubox();
 			if (StateMap.test(StateFlag::UPTO)) {
 				StateMap.set(StateFlag::RESTCH);
@@ -8882,9 +8886,9 @@ void thred::internal::insfil() {
 						         nullptr);
 					}
 					constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0]))
-					                          / 2U; // ThreadSize is defined as a 16 entry array of 2 bytes
+					                              / 2U; // ThreadSize is defined as a 16 entry array of 2 bytes
 					constexpr auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) + sizeof(UserColor)
-					                            + sizeof(CustomColor) + threadLength;
+					                                + sizeof(CustomColor) + threadLength;
 					SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
 					auto insertedRectangle = fRECTANGLE { 1e-9F, 1e9F, 1e-9F, 1e9F };
 					InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
@@ -9018,7 +9022,8 @@ void thred::internal::insfil() {
 							insertedRectangle.right  = (*FormVertices)[InsertedVertexIndex].x;
 							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
 							insertedRectangle.top    = (*FormVertices)[InsertedVertexIndex].y;
-							for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size()); iVertex++) {
+							for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
+							     iVertex++) {
 								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
 									insertedRectangle.left = (*FormVertices)[iVertex].x;
 								}
@@ -16840,7 +16845,7 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 		flag = true;
 		break;
 	}
-	case ID_HIDBITF:{ // file / Hide Bitmap
+	case ID_HIDBITF: { // file / Hide Bitmap
 		thred::hidbit();
 		flag = true;
 		break;
@@ -18188,7 +18193,7 @@ void thred::internal::init() {
 
 COLORREF thred::internal::defTxt(uint32_t iColor) {
 	// bitmap for color number. Black or white bit chosen for contrast against the default background colors
-	const auto textColorMap = std::bitset<16>(0xbaf);
+	const auto     textColorMap = std::bitset<16>(0xbaf);
 	constexpr auto white        = 0xffffffU;
 	constexpr auto black        = 0U;
 	return textColorMap.test(iColor) ? white : black;
@@ -18360,8 +18365,7 @@ bool thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap, const fPOINTAT
 	return !stitchMap.test_set(bitPoint);
 }
 
-void thred::internal::drawBackground()
-{
+void thred::internal::drawBackground() {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	thred::duzrat();
 	if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
@@ -18371,16 +18375,16 @@ void thred::internal::drawBackground()
 		}
 		if (bitar()) {
 			StretchBlt(StitchWindowMemDC,
-				BitmapDstRect.left,
-				BitmapDstRect.top,
-				BitmapDstRect.right - BitmapDstRect.left,
-				BitmapDstRect.bottom - BitmapDstRect.top,
-				deviceContext,
-				BitmapSrcRect.left,
-				BitmapSrcRect.top,
-				BitmapSrcRect.right - BitmapSrcRect.left,
-				BitmapSrcRect.bottom - BitmapSrcRect.top,
-				SRCCOPY);
+			           BitmapDstRect.left,
+			           BitmapDstRect.top,
+			           BitmapDstRect.right - BitmapDstRect.left,
+			           BitmapDstRect.bottom - BitmapDstRect.top,
+			           deviceContext,
+			           BitmapSrcRect.left,
+			           BitmapSrcRect.top,
+			           BitmapSrcRect.right - BitmapSrcRect.left,
+			           BitmapSrcRect.bottom - BitmapSrcRect.top,
+			           SRCCOPY);
 		}
 	}
 	dugrid();

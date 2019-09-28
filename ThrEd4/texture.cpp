@@ -146,7 +146,8 @@ void texture::redtx() {
 						                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFLEN),
 						                   &historyBytesRead,
 						                   nullptr)) {
-							for (auto index = 0U; index < (historyBytesRead / wrap::toUnsigned(sizeof(decltype(textureHistoryBuffer.back()))));
+							for (auto index = 0U;
+							     index < (historyBytesRead / wrap::toUnsigned(sizeof(decltype(textureHistoryBuffer.back()))));
 							     index++) {
 								TextureHistory[index].height  = textureHistoryBuffer[index].height;
 								TextureHistory[index].width   = textureHistoryBuffer[index].width;

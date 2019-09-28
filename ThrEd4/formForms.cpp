@@ -307,9 +307,9 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 		ffi::nxtlin(formMenuEntryCount);
 		if (SelectedForm->fillType == ANGF || SelectedForm->fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-			valueWindow[LFRMANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180.0 / PI)),
-			                  ValueWindowCoords);
+			valueWindow[LFRMANG] = ffi::numwin(
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(SelectedForm->angleOrClipData.angle) * 180.0 / PI)),
+			    ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (SelectedForm->fillType == ANGCLPF) {

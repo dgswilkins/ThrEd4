@@ -4281,9 +4281,9 @@ void form::internal::lcon(std::vector<uint32_t>& groupIndexSequence, std::vector
 				breakLine = sortedLines[iLine]->line;
 			}
 		}
-		regions.back().end        = lineCount - 1U;
-		const auto regionCount    = wrap::toUnsigned(regions.size());
-		auto       visitedRegions = boost::dynamic_bitset<>(regionCount);
+		regions.back().end            = lineCount - 1U;
+		const auto     regionCount    = wrap::toUnsigned(regions.size());
+		auto           visitedRegions = boost::dynamic_bitset<>(regionCount);
 		constexpr auto iStartLine     = 0U;
 		for (auto iRegion = 0U; iRegion < regionCount; iRegion++) {
 			auto count = 0U;
@@ -5592,7 +5592,7 @@ void form::unfil() {
 			const auto codedForm = ClosestFormToCursor << FRMSHFT;
 			if (!StitchBuffer->empty()) {
 				auto iDestination = StitchBuffer->begin();
-				auto destCount = 0u;
+				auto destCount    = 0u;
 				for (auto& stitch : *StitchBuffer) {
 					if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
 						*iDestination++ = stitch;
@@ -7432,15 +7432,16 @@ void form::movlayr(uint32_t codedLayer) {
 
 void form::join() {
 	const auto savedFormIndex = ClosestFormToCursor;
-	auto srcForm = std::next(FormList->cbegin(), ClosestFormToCursor);
-	auto lastVertex = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(srcForm->vertexIndex) + srcForm->vertexCount - 1U);
+	auto       srcForm        = std::next(FormList->cbegin(), ClosestFormToCursor);
+	auto       lastVertex
+	    = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(srcForm->vertexIndex) + srcForm->vertexCount - 1U);
 	StateMap.set(StateFlag::FRMSAM);
 	if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
 		auto formIter   = std::next(FormList->cbegin(), ClosestFormToCursor);
 		auto vertexList = std::vector<fPOINT> {};
 		vertexList.reserve(formIter->vertexCount);
 		auto vertexIt = std::next(FormVertices->cbegin(), formIter->vertexIndex);
-		if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)){
+		if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)) {
 			vertexList.push_back(vertexIt[ClosestVertexToCursor]);
 		}
 		ClosestVertexToCursor = form::nxt(ClosestVertexToCursor);
@@ -7598,7 +7599,7 @@ void form::selalfil() {
 	displayText::frm1pnt();
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto savedIndex = ClosestPointIndex;
-		ClosestPointIndex = 0U;
+		ClosestPointIndex     = 0U;
 		while (ClosestPointIndex < StitchBuffer->size() && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
 			ClosestPointIndex++;
 		}
@@ -8366,7 +8367,7 @@ void form::clpspac(const uint32_t insertPoint, uint32_t count) {
 }
 
 void form::stchadj() {
-	const auto codedClosest = ClosestFormToCursor << FRMSHFT;
+	const auto     codedClosest = ClosestFormToCursor << FRMSHFT;
 	constexpr auto offset       = 1U << FRMSHFT;
 	for (auto& stitch : *StitchBuffer) {
 		auto codedForm = stitch.attribute & FRMSK;
@@ -8387,7 +8388,8 @@ bool form::internal::spltlin() {
 		return false;
 	}
 	fi::nufpnt(ClosestVertexToCursor, SelectedForm);
-	auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
+	auto vertexIt
+	    = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
 	vertexIt[1U] = vertexIt[0U];
 	form::frmlin(SelectedForm->vertexIndex, SelectedForm->vertexCount);
 

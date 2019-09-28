@@ -731,7 +731,7 @@ void xt::internal::fncwlk() {
 
 void xt::srtcol() {
 	constexpr auto colorSize = 16;
-	auto       histogram = std::vector<uint32_t> {};
+	auto           histogram = std::vector<uint32_t> {};
 	histogram.resize(colorSize);
 	auto colorStartStitch = std::vector<uint32_t> {};
 	colorStartStitch.resize(colorSize);
@@ -1496,8 +1496,8 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 	    = (gsl::narrow<uint32_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (!StitchBuffer->empty()) {
-		auto       highStitchBuffer = std::vector<fPOINTATTR> {};
-		auto       code             = 0U;
+		auto highStitchBuffer = std::vector<fPOINTATTR> {};
+		auto code             = 0U;
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); iSequence++) {
 			ilData.pins = iSequence;
 			switch ((*InterleaveSequenceIndices)[iSequence].seq) {

@@ -715,8 +715,8 @@ void satin::internal::satends(uint32_t isBlunt, float width) {
 		(*InsidePoints)[0] = (*OutsidePoints)[0] = vertexIt[0];
 	}
 	if ((isBlunt & FBLNT) != 0U) {
-		auto step = fPOINT { sin((*FormAngles)[VertexCount - 2U]) * width / 2.0F,
-			                 cos((*FormAngles)[VertexCount - 2U]) * width / 2.0F };
+		auto step
+		    = fPOINT { sin((*FormAngles)[VertexCount - 2U]) * width / 2.0F, cos((*FormAngles)[VertexCount - 2U]) * width / 2.0F };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -740,7 +740,7 @@ void satin::ribon() {
 		if (VertexCount > 2) {
 			thred::savdo();
 			const auto savedFormIndex = ClosestFormToCursor;
-			const auto newAttribute = (SelectedForm->attribute & FRMLMSK) | FRMEND;
+			const auto newAttribute   = (SelectedForm->attribute & FRMLMSK) | FRMEND;
 			satin::satout(BorderWidth);
 			form::fvars(ClosestFormToCursor);
 			if (!FormList->empty()) {
