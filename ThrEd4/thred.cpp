@@ -14699,11 +14699,11 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					StateMap.set(StateFlag::FUNCLP);
 					FormList->push_back(FRMHED {});
 					ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+					form::fvars(ClosestFormToCursor);
 					auto& formIter       = FormList->back();
 					formIter.type        = FRMLINE;
 					formIter.vertexCount = ClipFormVerticesData->vertexCount + 1U;
-					formIter.vertexIndex = thred::adflt(SelectedForm->vertexCount);
-					form::fvars(ClosestFormToCursor);
+					formIter.vertexIndex = thred::adflt(formIter.vertexCount);
 					auto vertices    = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 					auto destination = std::next(FormVertices->begin(), formIter.vertexIndex);
 					std::copy(vertices, vertices + formIter.vertexCount, destination);
