@@ -863,8 +863,7 @@ void form::durpoli(uint32_t vertexCount) {
 	auto point    = SelectedPoint;
 	auto angle    = 0.0F;
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
-	// ToDo - should this be vertexCount?
-	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+	for (auto iVertex = 0U; iVertex < vertexCount; iVertex++) {
 		vertexIt[iVertex].x = point.x;
 		vertexIt[iVertex].y = point.y;
 		point.x += length * cos(angle);
