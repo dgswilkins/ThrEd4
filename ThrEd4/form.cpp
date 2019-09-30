@@ -380,26 +380,27 @@ void form::setfrm() {
 		fi::rats();
 		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		form::fvars(ClosestFormToCursor);
-		fi::px2stchf((*FormLines)[0], point);
+		fi::px2stchf(FormLines->front(), point);
 		auto       vertexIt     = std::next(FormVertices->begin(), CurrentVertexIndex);
-		auto&      firstVertex  = vertexIt[0];
-		const auto delta        = fPOINT { point.x - firstVertex.x, point.y - firstVertex.y };
-		SelectedForm->rectangle = fRECTANGLE { 1e30F, 0.0F, 0.0F, 1e30F };
+		const auto delta        = fPOINT { point.x - vertexIt->x, point.y - vertexIt->y };
+		auto& rectangle = (*FormList)[ClosestFormToCursor].rectangle;
+		rectangle = fRECTANGLE { 1e30F, 0.0F, 0.0F, 1e30F };
 		for (auto iVertex = 0U; iVertex < NewFormVertexCount - 1U; iVertex++) {
-			vertexIt[iVertex].x += delta.x;
-			vertexIt[iVertex].y += delta.y;
-			if (vertexIt[iVertex].x < SelectedForm->rectangle.left) {
-				SelectedForm->rectangle.left = vertexIt[iVertex].x;
+			vertexIt->x += delta.x;
+			vertexIt->y += delta.y;
+			if (vertexIt->x < rectangle.left) {
+				rectangle.left = vertexIt->x;
 			}
-			if (vertexIt[iVertex].y > SelectedForm->rectangle.top) {
-				SelectedForm->rectangle.top = vertexIt[iVertex].y;
+			if (vertexIt->x > rectangle.right) {
+				rectangle.right = vertexIt->x;
 			}
-			if (vertexIt[iVertex].x > SelectedForm->rectangle.right) {
-				SelectedForm->rectangle.right = vertexIt[iVertex].x;
+			if (vertexIt->y > rectangle.top) {
+				rectangle.top = vertexIt->y;
 			}
-			if (vertexIt[iVertex].y < SelectedForm->rectangle.bottom) {
-				SelectedForm->rectangle.bottom = vertexIt[iVertex].y;
+			if (vertexIt->y < rectangle.bottom) {
+				rectangle.bottom = vertexIt->y;
 			}
+			++vertexIt;
 		}
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.set(StateFlag::INIT);
@@ -1269,16 +1270,13 @@ void form::chkseq(bool border) {
 	auto destination = wrap::toUnsigned(savedIndex + 1U);
 	for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); iSequence++) {
 		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1U].x,
-		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1U].y);
+			(*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1U].y);
 		if (len > minimumStitchLength) {
 			(*InterleaveSequence)[destination] = (*InterleaveSequence)[iSequence];
-			destination++;
+			++destination;
 		}
 	}
-	const auto newSize = wrap::toSize(destination);
-	if (newSize != InterleaveSequence->size()) {
-		InterleaveSequence->resize(newSize);
-	}
+	InterleaveSequence->resize(destination);
 #endif
 }
 
