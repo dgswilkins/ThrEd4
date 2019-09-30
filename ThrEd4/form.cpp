@@ -1680,10 +1680,13 @@ bool form::internal::projh(float yCoordinate, const fPOINT& point0, const fPOINT
 }
 
 void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish) {
-	const auto delta        = fPOINT { ((*OutsidePoints)[finish].x - (*OutsidePoints)[start].x),
-                                ((*OutsidePoints)[finish].y - (*OutsidePoints)[start].y) };
+	auto&      opStart      = (*OutsidePoints)[start];
+	auto&      opFinish     = (*OutsidePoints)[finish];
+	auto&      ipStart      = (*InsidePoints)[start];
+	auto&      ipFinish     = (*InsidePoints)[finish];
+	const auto delta        = fPOINT { (opFinish.x - opStart.x), (opFinish.y - opStart.y) };
 	auto       point        = fPOINT {};
-	auto*      verticalRect = &fillVerticalRect[start];
+	auto&      verticalRect = fillVerticalRect[start];
 
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	if ((SelectedForm->type == FRMLINE) && ((SelectedForm->edgeType & NEGUND) == EDGEPROPSAT)) {
@@ -1692,81 +1695,81 @@ void form::internal::sprct(std::vector<VRCT2>& fillVerticalRect, uint32_t start,
 	if ((delta.x != 0.0F) && (delta.y != 0.0F)) {
 		const auto slope = -delta.x / delta.y;
 		point            = vertexIt[finish];
-		proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
-		proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
+		proj(point, slope, opStart, opFinish, verticalRect.dopnt);
+		proj(point, slope, ipStart, ipFinish, verticalRect.dipnt);
 		point = vertexIt[start];
-		proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->aopnt);
-		proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->aipnt);
-		point = (*InsidePoints)[start];
-		if (proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->bopnt)) {
-			verticalRect->bipnt = (*InsidePoints)[start];
+		proj(point, slope, opStart, opFinish, verticalRect.aopnt);
+		proj(point, slope, ipStart, ipFinish, verticalRect.aipnt);
+		point = ipStart;
+		if (proj(point, slope, opStart, opFinish, verticalRect.bopnt)) {
+			verticalRect.bipnt = ipStart;
 		}
 		else {
-			verticalRect->bopnt = (*OutsidePoints)[start];
-			point               = (*OutsidePoints)[start];
-			proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->bipnt);
+			verticalRect.bopnt = opStart;
+			point              = opStart;
+			proj(point, slope, ipStart, ipFinish, verticalRect.bipnt);
 		}
-		point = (*InsidePoints)[finish];
-		if (proj(point, slope, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->copnt)) {
-			verticalRect->cipnt = (*InsidePoints)[finish];
+		point = ipFinish;
+		if (proj(point, slope, opStart, opFinish, verticalRect.copnt)) {
+			verticalRect.cipnt = ipFinish;
 		}
 		else {
-			verticalRect->copnt = (*OutsidePoints)[finish];
-			point               = (*OutsidePoints)[finish];
-			proj(point, slope, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->cipnt);
+			verticalRect.copnt = opFinish;
+			point              = opFinish;
+			proj(point, slope, ipStart, ipFinish, verticalRect.cipnt);
 		}
 	}
 	else {
 		if (delta.x != 0.0) {
 			point.x = vertexIt[finish].x;
-			projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
-			projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
+			projv(point.x, opStart, opFinish, verticalRect.dopnt);
+			projv(point.x, ipStart, ipFinish, verticalRect.dipnt);
 			point.x = vertexIt[start].x;
-			projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->aopnt);
-			projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->aipnt);
-			point.x = (*InsidePoints)[start].x;
-			if (projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->bopnt)) {
-				verticalRect->bipnt = (*InsidePoints)[start];
+			projv(point.x, opStart, opFinish, verticalRect.aopnt);
+			projv(point.x, ipStart, ipFinish, verticalRect.aipnt);
+			point.x = ipStart.x;
+			if (projv(point.x, opStart, opFinish, verticalRect.bopnt)) {
+				verticalRect.bipnt = ipStart;
 			}
 			else {
-				verticalRect->bopnt = (*OutsidePoints)[start];
-				point.x             = (*OutsidePoints)[start].x;
-				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->bipnt);
+				verticalRect.bopnt = opStart;
+				point.x            = opStart.x;
+				projv(point.x, ipStart, ipFinish, verticalRect.bipnt);
 			}
-			point.x = (*InsidePoints)[finish].x;
-			if (projv(point.x, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->copnt)) {
-				verticalRect->cipnt = (*InsidePoints)[finish];
+			point.x = ipFinish.x;
+			if (projv(point.x, opStart, opFinish, verticalRect.copnt)) {
+				verticalRect.cipnt = ipFinish;
 			}
 			else {
-				verticalRect->copnt = (*OutsidePoints)[finish];
-				point.x             = (*OutsidePoints)[finish].x;
-				projv(point.x, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->cipnt);
+				verticalRect.copnt = opFinish;
+				point.x            = opFinish.x;
+				projv(point.x, ipStart, ipFinish, verticalRect.cipnt);
 			}
 		}
 		else {
 			point.y = vertexIt[finish].y;
-			projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->dopnt);
-			projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->dipnt);
+			projh(point.y, opStart, opFinish, verticalRect.dopnt);
+			projh(point.y, ipStart, ipFinish, verticalRect.dipnt);
 			point.y = vertexIt[start].y;
-			projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->aopnt);
-			projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->aipnt);
-			point.y = (*InsidePoints)[start].y;
-			if (projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->bopnt)) {
-				verticalRect->bipnt = (*InsidePoints)[start];
+			projh(point.y, opStart, opFinish, verticalRect.aopnt);
+			projh(point.y, ipStart, ipFinish, verticalRect.aipnt);
+			point.y = ipStart.y;
+			if (projh(point.y, opStart, opFinish, verticalRect.bopnt)) {
+				verticalRect.bipnt = ipStart;
 			}
 			else {
-				verticalRect->bopnt = (*OutsidePoints)[start];
-				point.y             = (*OutsidePoints)[start].y;
-				projh(point.y, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->bipnt);
+				verticalRect.bopnt = opStart;
+				point.y            = opStart.y;
+				projh(point.y, ipStart, ipFinish, verticalRect.bipnt);
 			}
-			point.y = (*InsidePoints)[finish].y;
-			if (projh(point.y, (*OutsidePoints)[start], (*OutsidePoints)[finish], verticalRect->copnt)) {
-				verticalRect->cipnt = (*InsidePoints)[finish];
+			point.y = ipFinish.y;
+			if (projh(point.y, opStart, opFinish, verticalRect.copnt)) {
+				verticalRect.cipnt = ipFinish;
 			}
 			else {
-				verticalRect->copnt = (*OutsidePoints)[finish];
-				point.y             = (*OutsidePoints)[finish].y;
-				projh((*OutsidePoints)[finish].y, (*InsidePoints)[start], (*InsidePoints)[finish], verticalRect->cipnt);
+				verticalRect.copnt = opFinish;
+				point.y            = opFinish.y;
+				projh(opFinish.y, ipStart, ipFinish, verticalRect.cipnt);
 			}
 		}
 	}
