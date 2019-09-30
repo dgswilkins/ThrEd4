@@ -1789,22 +1789,12 @@ void form::internal::spurfn(const fPOINT& innerPoint,
 void form::internal::spurct(std::vector<VRCT2>&       underlayVerticalRect,
                             const std::vector<VRCT2>& fillVerticalRect,
                             uint32_t                  iRect) noexcept {
-	spurfn(fillVerticalRect[iRect].aipnt,
-	       fillVerticalRect[iRect].aopnt,
-	       underlayVerticalRect[iRect].aipnt,
-	       underlayVerticalRect[iRect].aopnt);
-	spurfn(fillVerticalRect[iRect].bipnt,
-	       fillVerticalRect[iRect].bopnt,
-	       underlayVerticalRect[iRect].bipnt,
-	       underlayVerticalRect[iRect].bopnt);
-	spurfn(fillVerticalRect[iRect].cipnt,
-	       fillVerticalRect[iRect].copnt,
-	       underlayVerticalRect[iRect].cipnt,
-	       underlayVerticalRect[iRect].copnt);
-	spurfn(fillVerticalRect[iRect].dipnt,
-	       fillVerticalRect[iRect].dopnt,
-	       underlayVerticalRect[iRect].dipnt,
-	       underlayVerticalRect[iRect].dopnt);
+	auto& fRect  = fillVerticalRect[iRect];
+	auto& ulRect = underlayVerticalRect[iRect];
+	spurfn(fRect.aipnt, fRect.aopnt, ulRect.aipnt, ulRect.aopnt);
+	spurfn(fRect.bipnt, fRect.bopnt, ulRect.bipnt, ulRect.bopnt);
+	spurfn(fRect.cipnt, fRect.copnt, ulRect.cipnt, ulRect.copnt);
+	spurfn(fRect.dipnt, fRect.dopnt, ulRect.dipnt, ulRect.dopnt);
 }
 
 void form::internal::duromb(const fPOINT& start0, const fPOINT& finish0, const fPOINT& start1, const fPOINT& finish1) {
