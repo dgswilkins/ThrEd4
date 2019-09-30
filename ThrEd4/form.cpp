@@ -243,19 +243,20 @@ void form::frmout(uint32_t formIndex) {
 		auto& rectangle    = form.rectangle;
 		CurrentVertexIndex = form.vertexIndex;
 		auto vertexIt      = std::next(FormVertices->cbegin(), form.vertexIndex);
-		rectangle          = fRECTANGLE { vertexIt[0].x, vertexIt[0].y, vertexIt[0].x, vertexIt[0].y };
+		rectangle          = fRECTANGLE { vertexIt->x, vertexIt->y, vertexIt->x, vertexIt->y };
 		for (auto iVertex = 1U; iVertex < form.vertexCount; iVertex++) {
-			if (vertexIt[iVertex].x < rectangle.left) {
-				rectangle.left = vertexIt[iVertex].x;
+			++vertexIt;
+			if (vertexIt->x < rectangle.left) {
+				rectangle.left = vertexIt->x;
 			}
-			if (vertexIt[iVertex].y > rectangle.top) {
-				rectangle.top = vertexIt[iVertex].y;
+			if (vertexIt->y > rectangle.top) {
+				rectangle.top = vertexIt->y;
 			}
-			if (vertexIt[iVertex].x > rectangle.right) {
-				rectangle.right = vertexIt[iVertex].x;
+			if (vertexIt->x > rectangle.right) {
+				rectangle.right = vertexIt->x;
 			}
-			if (vertexIt[iVertex].y < rectangle.bottom) {
-				rectangle.bottom = vertexIt[iVertex].y;
+			if (vertexIt->y < rectangle.bottom) {
+				rectangle.bottom = vertexIt->y;
 			}
 		}
 		if (rectangle.top - rectangle.bottom < MINRCT) {
