@@ -2625,7 +2625,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVe
 	if (leftEdge < ClipRectSize.cx) {
 		StateMap.set(StateFlag::WASNEG);
 		formOffset = ClipRectSize.cx + fabs(leftEdge) + .01F;
-		for (auto vertex : currentFormVertices) {
+		for (auto& vertex : currentFormVertices) {
 			vertex.x += formOffset;
 		}
 		SelectedForm->rectangle.left += formOffset;
