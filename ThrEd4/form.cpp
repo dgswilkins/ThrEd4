@@ -2439,10 +2439,10 @@ void form::internal::lapbrd() {
 	OSequence->clear();
 	UserStitchLength = IniFile.AppStitchLen;
 	for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
-		bdrlin(iVertex, iVertex + 1, IniFile.AppStitchLen);
+		bdrlin(iVertex, iVertex + 1U, IniFile.AppStitchLen);
 	}
-	for (auto iVertex = VertexCount - 1U; iVertex != 0; iVertex--) {
-		bdrlin(iVertex, iVertex - 1, IniFile.AppStitchLen);
+	for (auto iVertex = VertexCount - 1U; iVertex != 0U; iVertex--) {
+		bdrlin(iVertex, iVertex - 1U, IniFile.AppStitchLen);
 	}
 	UserStitchLength = savedStitchLength;
 }
@@ -2452,10 +2452,10 @@ void form::internal::blbrd(double spacing) {
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	OSequence->push_back(vertexIt[0]);
 	for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {
-		bhfn(iVertex, iVertex + 1, spacing);
+		bhfn(iVertex, iVertex + 1U, spacing);
 		bhcrnr(iVertex);
 	}
-	bhfn(VertexCount - 2, VertexCount - 1, spacing);
+	bhfn(VertexCount - 2U, VertexCount - 1U, spacing);
 	OSequence->push_back(vertexIt[VertexCount - 1U]);
 }
 
@@ -2493,8 +2493,7 @@ void form::internal::contf() {
 	auto lowIndex = 0U;
 	for (auto iVertex = lowVertexIndex; iVertex != 0; iVertex--) {
 		lowVertices[lowIndex] = vertexIt[iVertex];
-		lowDeltas[lowIndex].x = vertexIt[iVertex - 1U].x - vertexIt[iVertex].x;
-		lowDeltas[lowIndex].y = vertexIt[iVertex - 1U].y - vertexIt[iVertex].y;
+		lowDeltas[lowIndex]  = fPOINT { vertexIt[iVertex - 1U].x - vertexIt[iVertex].x, vertexIt[iVertex - 1U].y - vertexIt[iVertex].y };
 		lowLengths[lowIndex]  = hypot(lowDeltas[lowIndex].x, lowDeltas[lowIndex].y);
 		lowLength += lowLengths[lowIndex];
 		lowIndex++;
@@ -5464,38 +5463,36 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 	return minimumLength != 1e99;
 }
 
-void form::internal::nufpnt(uint32_t vertex, FRMHED* formForInsert) {
-	if (formForInsert != nullptr) {
-		form::fltspac(vertex + 1, 1);
-		formForInsert->vertexCount++;
-		auto vertexIt                       = std::next(FormVertices->begin(), formForInsert->vertexIndex);
-		vertexIt[wrap::toSize(vertex) + 1U] = SelectedPoint;
-		if (formForInsert->satinGuideCount != 0u) {
-			auto guideIt = std::next(SatinGuides->begin(), formForInsert->satinOrAngle.guide);
-			for (auto ind = 0U; ind < formForInsert->satinGuideCount; ind++) {
-				if (guideIt->start > vertex) {
-					guideIt->start++;
-				}
-				if (guideIt->finish > vertex) {
-					guideIt->finish++;
-				}
-				guideIt++;
+void form::internal::nufpnt(uint32_t vertex, FRMHED& formForInsert) {
+	form::fltspac(vertex + 1U, 1U);
+	formForInsert.vertexCount++;
+	auto vertexIt                       = std::next(FormVertices->begin(), formForInsert.vertexIndex + vertex + 1U);
+	vertexIt[wrap::toSize(vertex) + 1U] = SelectedPoint;
+	if (formForInsert.satinGuideCount != 0u) {
+		auto guideIt = std::next(SatinGuides->begin(), formForInsert.satinOrAngle.guide);
+		for (auto ind = 0U; ind < formForInsert.satinGuideCount; ind++) {
+			if (guideIt->start > vertex) {
+				guideIt->start++;
 			}
-		}
-		if (formForInsert->wordParam >= vertex + 1U) {
-			formForInsert->wordParam++;
-			formForInsert->wordParam %= VertexCount;
-		}
-		if (formForInsert->fillType == CONTF) {
-			if (formForInsert->angleOrClipData.guide.start > vertex) {
-				formForInsert->angleOrClipData.guide.start++;
+			if (guideIt->finish > vertex) {
+				guideIt->finish++;
 			}
-			if (formForInsert->angleOrClipData.guide.finish > vertex) {
-				formForInsert->angleOrClipData.guide.finish++;
-			}
+			guideIt++;
 		}
-		form::frmlin(formForInsert->vertexIndex, formForInsert->vertexCount);
 	}
+	if (formForInsert.wordParam >= vertex + 1U) {
+		formForInsert.wordParam++;
+		formForInsert.wordParam %= VertexCount;
+	}
+	if (formForInsert.fillType == CONTF) {
+		if (formForInsert.angleOrClipData.guide.start > vertex) {
+			formForInsert.angleOrClipData.guide.start++;
+		}
+		if (formForInsert.angleOrClipData.guide.finish > vertex) {
+			formForInsert.angleOrClipData.guide.finish++;
+		}
+	}
+	form::frmlin(formForInsert.vertexIndex, formForInsert.vertexCount);
 }
 
 void form::insat() { // insert a point in a form
@@ -5504,20 +5501,20 @@ void form::insat() { // insert a point in a form
 	// clang-format on
 	if (fi::closat(inOutFlag)) {
 		thred::savdo();
-		auto*      selectedForm = &((*FormList)[ClosestFormToCursor]);
-		const auto lastVertex   = selectedForm->vertexCount - 1U;
+		auto&      selectedForm = (*FormList)[ClosestFormToCursor];
+		const auto lastVertex   = selectedForm.vertexCount - 1U;
 		form::fvars(ClosestFormToCursor);
 		if (inOutFlag != intersectionStyles::POINT_IN_LINE) {
-			if (ClosestVertexToCursor == 0 && selectedForm->type == FRMLINE) {
+			if (ClosestVertexToCursor == 0 && selectedForm.type == FRMLINE) {
 				StateMap.set(StateFlag::PRELIN);
 			}
 			else {
-				if (ClosestVertexToCursor != lastVertex && selectedForm->type == FRMLINE) {
+				if (ClosestVertexToCursor != lastVertex && selectedForm.type == FRMLINE) {
 					ClosestVertexToCursor = form::prv(ClosestVertexToCursor);
 				}
 			}
 			fi::nufpnt(ClosestVertexToCursor, selectedForm);
-			auto vertexIt = std::next(FormVertices->begin(), selectedForm->vertexIndex);
+			auto vertexIt = std::next(FormVertices->begin(), selectedForm.vertexIndex);
 			if (StateMap.testAndReset(StateFlag::PRELIN)) {
 				std::swap(vertexIt[0], vertexIt[1]);
 			}
@@ -5658,7 +5655,7 @@ void form::infrm() { // insert multiple points into a form
 
 void form::setins() {
 	thred::px2stch();
-	fi::nufpnt(FormVertexPrev, FormForInsert);
+	fi::nufpnt(FormVertexPrev, *FormForInsert);
 	if (StateMap.test(StateFlag::PRELIN)) {
 		auto vertexIt = std::next(FormVertices->begin(), FormForInsert->vertexIndex);
 		std::swap(vertexIt[0], vertexIt[1]);
@@ -8378,7 +8375,7 @@ bool form::internal::spltlin() {
 	if (ClosestVertexToCursor < 1 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
 		return false;
 	}
-	fi::nufpnt(ClosestVertexToCursor, SelectedForm);
+	fi::nufpnt(ClosestVertexToCursor, *SelectedForm);
 	auto vertexIt
 	    = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(SelectedForm->vertexIndex) + ClosestVertexToCursor);
 	vertexIt[1U] = vertexIt[0U];
