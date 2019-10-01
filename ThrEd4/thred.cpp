@@ -5081,6 +5081,7 @@ void thred::internal::stchWnd() {
 // check if a click occurred in A vertical set of 16 windows
 // and calculate which window had the click
 bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept {
+	auto flag = false;
 	auto topRect    = RECT { 0L, 0L, 0L, 0L };
 	auto bottomRect = RECT { 0L, 0L, 0L, 0L };
 
@@ -5090,9 +5091,14 @@ bool thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
 	if (clickCoord.x > topRect.left && clickCoord.x < bottomRect.right && clickCoord.y > topRect.top
 	    && clickCoord.y < bottomRect.bottom) {
 		VerticalIndex = 15U - (bottomRect.bottom - clickCoord.y) / ButtonHeight;
-		return true;
+		if (VerticalIndex > 15U) { // Something has broken so do something reasonable
+			VerticalIndex = 0;
+		}
+		else { // we have a valid Index
+			flag = true;
+		}
 	}
-	return false;
+	return flag;
 }
 
 void thred::internal::delstch1(uint32_t iStitch) {
@@ -11597,7 +11603,7 @@ void thred::internal::movchk() {
 	auto& defaultColorWin = *DefaultColorWin;
 	if ((Msg.wParam & MK_LBUTTON) != 0U) { // NOLINT
 		if (!StateMap.testAndSet(StateFlag::WASMOV)) {
-			if (thi::chkMsgs(Msg.pt, defaultColorWin[0], defaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
 				DraggedColor = VerticalIndex & 0xfU;
 				StateMap.set(StateFlag::WASCOL);
 			}
@@ -11605,7 +11611,7 @@ void thred::internal::movchk() {
 	}
 	else {
 		if (StateMap.testAndReset(StateFlag::WASMOV) && StateMap.testAndReset(StateFlag::WASCOL)) {
-			if (thi::chkMsgs(Msg.pt, defaultColorWin[0], defaultColorWin[15])) {
+			if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
 				const auto key          = wrap::pressed(VK_SHIFT);
 				const auto switchColors = wrap::pressed(VK_CONTROL);
 				for (auto& stitch : *StitchBuffer) {
@@ -11726,41 +11732,38 @@ bool thred::internal::usedcol() noexcept {
 }
 
 void thred::internal::delcol() {
-	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
-		VerticalIndex &= 0xfU;
-		if (usedcol()) {
-			displayText::tabmsg(IDS_COLU);
+	if (usedcol()) {
+		displayText::tabmsg(IDS_COLU);
+	}
+	else {
+		for (auto& stitch : *StitchBuffer) {
+			const auto color = stitch.attribute & COLMSK;
+			if (color > VerticalIndex && (color != 0U)) {
+				stitch.attribute &= NCOLMSK;
+				stitch.attribute |= color - 1U;
+			}
 		}
-		else {
-			for (auto& stitch : *StitchBuffer) {
-				const auto color = stitch.attribute & COLMSK;
-				if (color > VerticalIndex && (color != 0U)) {
-					stitch.attribute &= NCOLMSK;
-					stitch.attribute |= color - 1U;
+		for (auto& formIter : *FormList) {
+			if (formIter.fillType != 0U) {
+				if (formIter.fillColor > VerticalIndex) {
+					formIter.fillColor--;
+				}
+				if (formIter.fillInfo.feather.color > VerticalIndex) {
+					formIter.fillInfo.feather.color--;
 				}
 			}
-			for (auto& formIter : *FormList) {
-				if (formIter.fillType != 0U) {
-					if (formIter.fillColor > VerticalIndex) {
-						formIter.fillColor--;
-					}
-					if (formIter.fillInfo.feather.color > VerticalIndex) {
-						formIter.fillInfo.feather.color--;
-					}
-				}
-				if (formIter.edgeType != 0U) {
-					if (formIter.borderColor > VerticalIndex) {
-						formIter.borderColor--;
-					}
+			if (formIter.edgeType != 0U) {
+				if (formIter.borderColor > VerticalIndex) {
+					formIter.borderColor--;
 				}
 			}
-			for (auto iColor = VerticalIndex; iColor < 15U; iColor++) {
-				UserColor[iColor] = UserColor[iColor + 1U];
-				nuscol(iColor);
-			}
-			thred::coltab();
-			StateMap.set(StateFlag::RESTCH);
 		}
+		for (auto iColor = VerticalIndex; iColor < 15U; iColor++) {
+			UserColor[iColor] = UserColor[iColor + 1U];
+			nuscol(iColor);
+		}
+		thred::coltab();
+		StateMap.set(StateFlag::RESTCH);
 	}
 }
 
@@ -13890,7 +13893,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
 		thred::unsid();
 		thred::unmsg();
-		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 			xt::dufcol(VerticalIndex + 1U);
 			return true;
 		}
@@ -13898,7 +13901,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
 		thred::unsid();
 		thred::unmsg();
-		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 			xt::dubcol(VerticalIndex + 1U);
 			return true;
 		}
@@ -13987,7 +13990,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (!SelectedFormList->empty() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
 		return true;
 	}
-	if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+	if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 		return thi::updateFillColor();
 	}
 	if (StateMap.testAndReset(StateFlag::OSAV)) {
@@ -14244,7 +14247,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		thred::unmsg();
 		return true;
 	}
-	if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+	if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 		AppliqueColor = VerticalIndex;
 		SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", VerticalIndex).c_str());
 		thred::unsid();
@@ -14539,7 +14542,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		toglHid();
 		return true;
 	}
-	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 		if (Msg.message == WM_LBUTTONDOWN) {
 			thred::savdo();
 			auto code   = ActiveColor;
@@ -15813,7 +15816,7 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		break;
 	}
 	case VK_DELETE: {
-		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
 			delcol();
 		}
 		else {
