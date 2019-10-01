@@ -2718,7 +2718,7 @@ void thred::unmsg() {
 
 GSL_SUPPRESS(26461) bool thred::internal::oldwnd(HWND window) noexcept {
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
-		if ((*DefaultColorWin)[iColor] == window || UserColorWin[iColor] == window || ThreadSizeWin[iColor] == window) {
+		if ((*DefaultColorWin)[iColor] == window || (*UserColorWin)[iColor] == window || ThreadSizeWin[iColor] == window) {
 			return false;
 		}
 	}
@@ -3327,8 +3327,8 @@ void thred::internal::nuAct(uint32_t iStitch) noexcept {
 	else {
 		ActiveColor = 0;
 	}
-	thred::redraw(UserColorWin[color]);
-	thred::redraw(UserColorWin[ActiveColor]);
+	thred::redraw((*UserColorWin)[color]);
+	thred::redraw((*UserColorWin)[ActiveColor]);
 }
 
 void thred::internal::lensadj() {
@@ -5159,7 +5159,7 @@ void thred::internal::redbak() {
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 			UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 		}
-		for (auto& iColor : UserColorWin) {
+		for (auto& iColor : *UserColorWin) {
 			thred::redraw(iColor);
 		}
 		TexturePointsBuffer->resize(undoData->texturePointCount);
@@ -6195,7 +6195,7 @@ void thred::internal::nuFil() {
 				wcsncpy_s(buffer, ThreadSize[iColor], 2); // NOLINT
 				SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
 			}
-			for (auto& iColor : UserColorWin) {
+			for (auto& iColor : *UserColorWin) {
 				thred::redraw(iColor);
 			}
 			thred::redraw(ColorBar);
@@ -7054,7 +7054,7 @@ void thred::internal::newFil() {
 	WorkingFileName->clear();
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 		thred::redraw((*DefaultColorWin)[iColor]);
-		thred::redraw(UserColorWin[iColor]);
+		thred::redraw((*UserColorWin)[iColor]);
 		thred::redraw(ThreadSizeWin[iColor]);
 	}
 	thred::zumhom();
@@ -7091,7 +7091,7 @@ void thred::internal::rebox() {
 			SearchLine->clear();
 			SearchLine->shrink_to_fit();
 			StateMap.set(StateFlag::RESTCH);
-			for (auto& window : UserColorWin) {
+			for (auto& window : *UserColorWin) {
 				thred::redraw(window);
 			}
 		}
@@ -11596,7 +11596,7 @@ void thred::internal::bakmrk() {
 void thred::internal::nuscol(uint32_t iColor) noexcept {
 	UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-	thred::redraw(UserColorWin[iColor]);
+	thred::redraw((*UserColorWin)[iColor]);
 }
 
 void thred::internal::movchk() {
@@ -11675,50 +11675,48 @@ void thred::internal::movchk() {
 
 void thred::internal::inscol() {
 	auto colorMap = boost::dynamic_bitset<>(16U);
-	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
-		VerticalIndex &= COLMSK;
+	VerticalIndex &= COLMSK;
+	for (auto& stitch : *StitchBuffer) {
+		colorMap.set(stitch.attribute & COLMSK);
+	}
+	if (colorMap.all()) {
+		displayText::tabmsg(IDS_COLAL);
+	}
+	else {
+		auto nextColor = 15U;
+		while (colorMap.test(nextColor)) {
+			nextColor--;
+		}
 		for (auto& stitch : *StitchBuffer) {
-			colorMap.set(stitch.attribute & COLMSK);
+			const auto color = stitch.attribute & COLMSK;
+			if (color >= VerticalIndex && color < nextColor) {
+				stitch.attribute &= NCOLMSK;
+				stitch.attribute |= color + 1U;
+			}
 		}
-		if (colorMap.all()) {
-			displayText::tabmsg(IDS_COLAL);
+		for (auto& formIter : *FormList) {
+			if (formIter.fillType != 0U) {
+				if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
+					formIter.fillColor++;
+				}
+				if (formIter.fillInfo.feather.color >= VerticalIndex && formIter.fillInfo.feather.color < nextColor) {
+					formIter.fillInfo.feather.color++;
+				}
+			}
+			if (formIter.edgeType != 0U) {
+				if (formIter.borderColor >= VerticalIndex && formIter.borderColor < nextColor) {
+					formIter.borderColor++;
+				}
+			}
 		}
-		else {
-			auto nextColor = 15U;
-			while (colorMap.test(nextColor)) {
-				nextColor--;
+		for (auto iColor = nextColor; iColor > VerticalIndex; iColor--) {
+			if (iColor != 0U) {
+				UserColor[iColor] = UserColor[iColor - 1U];
 			}
-			for (auto& stitch : *StitchBuffer) {
-				const auto color = stitch.attribute & COLMSK;
-				if (color >= VerticalIndex && color < nextColor) {
-					stitch.attribute &= NCOLMSK;
-					stitch.attribute |= color + 1U;
-				}
-			}
-			for (auto& formIter : *FormList) {
-				if (formIter.fillType != 0U) {
-					if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
-						formIter.fillColor++;
-					}
-					if (formIter.fillInfo.feather.color >= VerticalIndex && formIter.fillInfo.feather.color < nextColor) {
-						formIter.fillInfo.feather.color++;
-					}
-				}
-				if (formIter.edgeType != 0U) {
-					if (formIter.borderColor >= VerticalIndex && formIter.borderColor < nextColor) {
-						formIter.borderColor++;
-					}
-				}
-			}
-			for (auto iColor = nextColor; iColor > VerticalIndex; iColor--) {
-				if (iColor != 0U) {
-					UserColor[iColor] = UserColor[iColor - 1U];
-				}
-				nuscol(iColor);
-			}
-			thred::coltab();
-			StateMap.set(StateFlag::RESTCH);
+			nuscol(iColor);
 		}
+		thred::coltab();
+		StateMap.set(StateFlag::RESTCH);
 	}
 }
 
@@ -14547,8 +14545,8 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			thred::savdo();
 			auto code   = ActiveColor;
 			ActiveColor = VerticalIndex & 0xfU;
-			thred::redraw(UserColorWin[code]);
-			thred::redraw(UserColorWin[ActiveColor]);
+			thred::redraw((*UserColorWin)[code]);
+			thred::redraw((*UserColorWin)[ActiveColor]);
 			if (StateMap.test(StateFlag::HID)) {
 				StateMap.reset(StateFlag::SELBOX);
 				StateMap.reset(StateFlag::GRPSEL);
@@ -14619,13 +14617,13 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		return true;
 	}
-	if (thi::chkMsgs(Msg.pt, UserColorWin[0], UserColorWin[15])) {
+	if (thi::chkMsgs(Msg.pt, UserColorWin->front(), UserColorWin->back())) {
 		if (Msg.message == WM_LBUTTONDOWN && (nuCol(UserColor[VerticalIndex]) != 0U)) {
 			thred::savdo();
 			UserColor[VerticalIndex]      = ColorStruct.rgbResult;
 			UserPen[VerticalIndex]        = nuPen(UserPen[VerticalIndex], 1, UserColor[VerticalIndex]);
 			UserColorBrush[VerticalIndex] = nuBrush(UserColorBrush[VerticalIndex], UserColor[VerticalIndex]);
-			thred::redraw(UserColorWin[VerticalIndex]);
+			thred::redraw((*UserColorWin)[VerticalIndex]);
 			StateMap.set(StateFlag::RESTCH);
 		}
 		return true;
@@ -15271,7 +15269,18 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		break;
 	}
 	case VK_INSERT: {
-		inscol();
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin->back())) { // check if point is in any of the color windows
+			inscol();
+		}
+		break;
+	}
+	case VK_DELETE: {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin->back())) { 
+			delcol();
+		}
+		else {
+			delet();
+		}
 		break;
 	}
 	case 0x6d: { // keypad -
@@ -15812,15 +15821,6 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		}
 		else {
 			form::fcntr();
-		}
-		break;
-	}
-	case VK_DELETE: {
-		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
-			delcol();
-		}
-		else {
-			delet();
 		}
 		break;
 	}
@@ -16455,7 +16455,7 @@ bool thred::internal::handleEditMenu(const WORD& wParameter) {
 			UserColor[iColor]      = DefaultColors[iColor];
 			UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 			UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
-			thred::redraw(UserColorWin[iColor]);
+			thred::redraw((*UserColorWin)[iColor]);
 		}
 		StateMap.set(StateFlag::RESTCH);
 		flag = true;
@@ -17588,7 +17588,7 @@ void thred::internal::makCol() noexcept {
 		                                          ThrEdInstance,
 		                                          nullptr);
 		displayText::setWindowFont((*DefaultColorWin)[iColor], hFont);
-		UserColorWin[iColor]  = CreateWindow(L"STATIC", // NOLINT
+		(*UserColorWin)[iColor]  = CreateWindow(L"STATIC", // NOLINT
                                             nullptr,
                                             SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                             ButtonWidth,
@@ -19279,7 +19279,7 @@ LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wPar
 				}
 				return 1;
 			}
-			if (DrawItem->hwndItem == UserColorWin[iColor]) {
+			if (DrawItem->hwndItem == (*UserColorWin)[iColor]) {
 				FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[iColor]);
 				if (iColor == ActiveColor) {
 					SelectObject(DrawItem->hDC, CrossPen);
@@ -19574,6 +19574,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_TracedMap                 = boost::dynamic_bitset<> {};
 		auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
 		auto private_UserBMPFileName           = fs::path {};
+		auto private_UserColorWin              = std::vector<HWND> {};
 		auto private_ValueWindow               = std::vector<HWND> {};
 		auto private_VersionNames              = std::vector<fs::path> {};
 		auto private_WorkingFileName           = fs::path {};
@@ -19582,6 +19583,13 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		private_DefaultColorWin.resize(16U);
 		private_FormControlPoints.resize(9U);
 		private_LabelWindow.resize(LASTLIN);
+		private_RubberBandLine.resize(3U);
+		private_SelectedFormsLine.resize(9U);
+		private_SelectedPointsLine.resize(9U);
+		private_StringTable.resize(STR_LEN);
+		private_UndoBuffer.resize(16U);
+		private_UserColorWin.resize(16U);
+		private_ValueWindow.resize(LASTLIN);
 		private_PreviousNames.reserve(OLDNUM);
 		private_VersionNames.reserve(OLDVER);
 		for (auto iVersion = 0; iVersion < OLDNUM; iVersion++) {
@@ -19590,13 +19598,6 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		for (auto iVersion = 0; iVersion < OLDVER; iVersion++) {
 			private_VersionNames.emplace_back(L"");
 		}
-		private_RubberBandLine.resize(3U);
-		private_SelectedFormsLine.resize(9U);
-		private_SelectedPointsLine.resize(9U);
-		// private_StitchBuffer.resize(MAXITEMS * 2);
-		private_StringTable.resize(STR_LEN);
-		private_UndoBuffer.resize(16U);
-		private_ValueWindow.resize(LASTLIN);
 
 		AngledFormVertices        = &private_AngledFormVertices;
 		AuxName                   = &private_AuxName;
@@ -19649,6 +19650,7 @@ int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		TracedMap                 = &private_TracedMap;
 		UndoBuffer                = &private_UndoBuffer;
 		UserBMPFileName           = &private_UserBMPFileName;
+		UserColorWin              = &private_UserColorWin;
 		ValueWindow               = &private_ValueWindow;
 		VersionNames              = &private_VersionNames;
 		WorkingFileName           = &private_WorkingFileName;

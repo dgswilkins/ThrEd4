@@ -241,7 +241,7 @@ boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
 POINT              UnzoomedRect;                         // size of the unzoomed stitch window
 COLORREF           UserColor[16];                        // user colors
-HWND               UserColorWin[16];                     // user color windows
+std::vector<HWND>* UserColorWin;                         // user color windows
 EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persistent binary variables set by the user
 HPEN               UserPen[16];                          // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
