@@ -313,7 +313,7 @@ void satin::satsel() {
 		thred::duzrat();
 		StartPoint    = ClosestVertexToCursor;
 		auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		form::sfCor2px(vertexIt[ClosestVertexToCursor], (*FormLines)[0]);
+		form::sfCor2px(vertexIt[ClosestVertexToCursor], FormLines->front());
 		StateMap.reset(StateFlag::SHOCON);
 		StateMap.set(StateFlag::SATCNKT);
 		if (SelectedForm->type == FRMFPOLY) {
@@ -699,20 +699,20 @@ void satin::satbrd() {
 
 void satin::internal::satends(uint32_t isBlunt, float width) {
 	if ((isBlunt & SBLNT) != 0U) {
-		auto step = fPOINT { sin((*FormAngles)[0]) * width / 2.0F, cos((*FormAngles)[0]) * width / 2.0F };
+		auto step = fPOINT { sin(FormAngles->front()) * width / 2.0F, cos(FormAngles->front()) * width / 2.0F };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
 		auto vertexIt         = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		(*InsidePoints)[0].x  = vertexIt[0].x + step.x;
-		(*InsidePoints)[0].y  = vertexIt[0].y - step.y;
-		(*OutsidePoints)[0].x = vertexIt[0].x - step.x;
-		(*OutsidePoints)[0].y = vertexIt[0].y + step.y;
+		InsidePoints->front().x  = vertexIt->x + step.x;
+		InsidePoints->front().y  = vertexIt->y - step.y;
+		OutsidePoints->front().x = vertexIt->x - step.x;
+		OutsidePoints->front().y = vertexIt->y + step.y;
 	}
 	else {
 		auto vertexIt      = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		(*InsidePoints)[0] = (*OutsidePoints)[0] = vertexIt[0];
+		InsidePoints->front() = OutsidePoints->front() = *vertexIt;
 	}
 	if ((isBlunt & FBLNT) != 0U) {
 		auto step
@@ -764,8 +764,8 @@ void satin::ribon() {
 					si::satends(isBlunt, BorderWidth);
 					form.vertexIndex         = thred::adflt(VertexCount * 2U);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
-					vertexIt[0].x            = (*OutsidePoints)[0].x;
-					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;
+					vertexIt[0].x            = OutsidePoints->front().x;
+					vertexIt[iNewVertex++].y = OutsidePoints->front().y;
 					for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 						vertexIt[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
@@ -776,14 +776,14 @@ void satin::ribon() {
 				else {
 					form.vertexIndex         = thred::adflt((VertexCount * 2U) + 2U);
 					auto vertexIt            = std::next(FormVertices->begin(), form.vertexIndex);
-					vertexIt[0].x            = (*OutsidePoints)[0].x;
-					vertexIt[iNewVertex++].y = (*OutsidePoints)[0].y;
+					vertexIt[0].x            = OutsidePoints->front().x;
+					vertexIt[iNewVertex++].y = OutsidePoints->front().y;
 					form.underlayIndent      = IniFile.underlayIndent;
 					for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 						vertexIt[iNewVertex++] = (*InsidePoints)[iVertex];
 					}
-					vertexIt[iNewVertex++] = (*InsidePoints)[0];
-					vertexIt[iNewVertex++] = (*OutsidePoints)[0];
+					vertexIt[iNewVertex++] = InsidePoints->front();
+					vertexIt[iNewVertex++] = OutsidePoints->front();
 					for (auto iVertex = VertexCount - 1U; iVertex != 0; iVertex--) {
 						vertexIt[iNewVertex++] = (*OutsidePoints)[iVertex];
 					}
@@ -1375,7 +1375,7 @@ void satin::internal::sfn(uint32_t startVertex) {
 		si::sbfn(*InsidePoints, startVertex, nextVertex);
 		startVertex = nextVertex;
 	}
-	(*OSequence)[0] = OSequence->back();
+	OSequence->front() = OSequence->back();
 }
 
 void satin::satzum() {

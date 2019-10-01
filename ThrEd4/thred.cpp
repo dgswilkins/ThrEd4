@@ -1334,7 +1334,7 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 			auto lastStitch = StitchBuffer->rbegin();
 			lastStitch->attribute &= NCOLMSK;
 			lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
-			auto currentColor = (*StitchBuffer)[0].attribute & COLMSK;
+			auto currentColor = StitchBuffer->front().attribute & COLMSK;
 			for (auto stitchIt = StitchBuffer->begin() + 1U; stitchIt < StitchBuffer->end() - 1U; stitchIt++) {
 				if ((stitchIt->attribute & COLMSK) != currentColor) {
 					if (((stitchIt + 1)->attribute & COLMSK) == currentColor) {
@@ -3694,7 +3694,7 @@ void thred::internal::ritbal() {
 		if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT
 			return;
 		}
-		auto color             = (*StitchBuffer)[0].attribute & COLMSK;
+		auto color             = StitchBuffer->front().attribute & COLMSK;
 		balaradHeader.color[0] = UserColor[color];
 		auto iColor            = 1U;
 		for (auto& stitch : *StitchBuffer) {
@@ -3716,7 +3716,7 @@ void thred::internal::ritbal() {
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
 		auto balaradStitch = std::vector<BALSTCH> {};
 		balaradStitch.resize(StitchBuffer->size() + 2U);
-		color = (*StitchBuffer)[0].attribute & COLMSK;
+		color = StitchBuffer->front().attribute & COLMSK;
 		// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 		auto iOutput = 0U;
 		thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
@@ -4303,9 +4303,9 @@ void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
 	PESdata         = buffer.data();
 	PEScolors       = &pecHeader->pad[0];
 	auto thisStitch = fPOINT {};
-	rpcrd(buffer, thisStitch, (*StitchBuffer)[0].x, (*StitchBuffer)[0].y);
+	rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
 	auto iColor  = 1U;
-	auto color   = (*StitchBuffer)[0].attribute & COLMSK;
+	auto color   = StitchBuffer->front().attribute & COLMSK;
 	PEScolors[0] = PESequivColors[color];
 	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); iStitch++) {
 		if (((*StitchBuffer)[wrap::toSize(iStitch) + 1U].attribute & COLMSK) != color) {
@@ -4360,7 +4360,7 @@ void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	thi::writeThumbnail(pecBuffer, p_thumbnail);
 	// now write out the individual thread thumbnails
 	std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
-	auto stitchColor = ((*StitchBuffer)[0].attribute & COLMSK);
+	auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
 	// ToDo - check that this is still writing out the thumbnails correctly when starting from index 0 instead of 1
 	for (auto& stitch : *StitchBuffer) {
 		auto x = wrap::round<uint16_t>((stitch.x) * xFactor) + 3U;
@@ -4496,7 +4496,7 @@ void thred::internal::sav() {
 				}
 				PESequivColors[iColor++] = gsl::narrow<uint8_t>(matchIndex);
 			}
-			auto stitchColor  = (*StitchBuffer)[0].attribute & COLMSK;
+			auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
 			auto boundingRect = fRECTANGLE {};
 			sizstch(boundingRect, *StitchBuffer);
 			PESstitchCenterOffset.x = form::midl(boundingRect.right, boundingRect.left);
@@ -6203,7 +6203,7 @@ void thred::internal::nuFil() {
 			const auto blank = std::wstring {};
 			displayText::butxt(HNUM, blank);
 			if (!StitchBuffer->empty()) {
-				nuAct((*StitchBuffer)[0].attribute & COLMSK);
+				nuAct(StitchBuffer->front().attribute & COLMSK);
 			}
 			else {
 				nuAct(0);
@@ -7549,7 +7549,7 @@ uint32_t thred::internal::sizclp(uint32_t& formFirstStitchIndex, uint32_t& formS
 	if ((SelectedForm->fillType != 0U) || (SelectedForm->edgeType != 0U)) {
 		formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 		length += formStitchCount;
-		FileSize += length * sizeof((*StitchBuffer)[0]);
+		FileSize += length * sizeof(StitchBuffer->front());
 	}
 	if (clip::iseclp(ClosestFormToCursor)) {
 		FileSize += SelectedForm->clipEntries * sizeof(decltype(ClipPoints->back()));
@@ -8162,7 +8162,7 @@ uint32_t thred::internal::srchknot(uint32_t source) noexcept {
 }
 
 void thred::internal::chkncol() {
-	auto initialColor = (*StitchBuffer)[0].attribute & COLMSK;
+	auto initialColor = StitchBuffer->front().attribute & COLMSK;
 
 	// ToDo - Use a temp buffer rather than the high buffer
 	auto buffer = std::vector<fPOINTATTR> {};
@@ -10529,9 +10529,9 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void thred::frmrct(fRECTANGLE& rectangle) noexcept {
-	rectangle.left = rectangle.right = (*FormVertices)[0].x;
-	rectangle.top = rectangle.bottom = (*FormVertices)[0].y;
+void thred::frmrct(fRECTANGLE& rectangle) {
+	rectangle.left = rectangle.right = FormVertices->front().x;
+	rectangle.top = rectangle.bottom = FormVertices->front().y;
 	for (auto& FormVertice : *FormVertices) {
 		if (FormVertice.x < rectangle.left) {
 			rectangle.left = FormVertice.x;
@@ -11669,7 +11669,7 @@ void thred::internal::movchk() {
 
 void thred::internal::inscol() {
 	auto colorMap = boost::dynamic_bitset<>(16U);
-	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], UserColorWin[15])) {
+	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
 		VerticalIndex &= COLMSK;
 		for (auto& stitch : *StitchBuffer) {
 			colorMap.set(stitch.attribute & COLMSK);
@@ -11726,7 +11726,7 @@ bool thred::internal::usedcol() noexcept {
 }
 
 void thred::internal::delcol() {
-	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], UserColorWin[15])) {
+	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), UserColorWin[15])) {
 		VerticalIndex &= 0xfU;
 		if (usedcol()) {
 			displayText::tabmsg(IDS_COLU);
@@ -13890,7 +13890,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
 		thred::unsid();
 		thred::unmsg();
-		if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 			xt::dufcol(VerticalIndex + 1U);
 			return true;
 		}
@@ -13898,7 +13898,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
 		thred::unsid();
 		thred::unmsg();
-		if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 			xt::dubcol(VerticalIndex + 1U);
 			return true;
 		}
@@ -13987,7 +13987,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (!SelectedFormList->empty() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
 		return true;
 	}
-	if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+	if (StateMap.test(StateFlag::SIDCOL) && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 		return thi::updateFillColor();
 	}
 	if (StateMap.testAndReset(StateFlag::OSAV)) {
@@ -14244,7 +14244,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		thred::unmsg();
 		return true;
 	}
-	if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+	if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 		AppliqueColor = VerticalIndex;
 		SetWindowText((*ValueWindow)[PAP], fmt::format(L"{}", VerticalIndex).c_str());
 		thred::unsid();
@@ -14397,7 +14397,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 
 					xlin1();
 					StitchBuffer->insert(StitchBuffer->begin(), { SelectedPoint.x, SelectedPoint.y, code });
-					(*StitchBuffer)[0].attribute &= (~KNOTMSK);
+					StitchBuffer->front().attribute &= (~KNOTMSK);
 					stch2px1(0);
 					InsertLine[0] = StitchCoordinatesPixels;
 					InsertLine[1] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
@@ -14539,7 +14539,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		toglHid();
 		return true;
 	}
-	if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 		if (Msg.message == WM_LBUTTONDOWN) {
 			thred::savdo();
 			auto code   = ActiveColor;
@@ -15813,7 +15813,7 @@ bool thred::internal::handleMainWinKeys(const uint32_t&     code,
 		break;
 	}
 	case VK_DELETE: {
-		if (thi::chkMsgs(Msg.pt, (*DefaultColorWin)[0], (*DefaultColorWin)[15])) {
+		if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), (*DefaultColorWin)[15])) {
 			delcol();
 		}
 		else {
@@ -18866,7 +18866,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 				stitchesToDraw.resize(stitchHeader.stitchCount);
 				auto lines = std::vector<POINT> {};
 				lines.resize(stitchHeader.stitchCount);
-				const auto bytesToRead = gsl::narrow_cast<DWORD>(stitchHeader.stitchCount * sizeof((*StitchBuffer)[0]));
+				const auto bytesToRead = gsl::narrow_cast<DWORD>(stitchHeader.stitchCount * sizeof(StitchBuffer->front()));
 				ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &BytesRead, nullptr);
 				if (bytesToRead == BytesRead) {
 					SetFilePointer(thrEdFile, 16, nullptr, FILE_CURRENT);

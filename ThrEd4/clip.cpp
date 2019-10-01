@@ -625,9 +625,9 @@ void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
 	}
-	listSINEs.push_back(sin(((*FormAngles)[0] > (*FormAngles)[VertexCount - 1U])
-	                            ? ((*FormAngles)[0] - (*FormAngles)[VertexCount - 1U])
-	                            : ((*FormAngles)[VertexCount - 1U] - (*FormAngles)[0])));
+	listSINEs.push_back(sin((FormAngles->front() > (*FormAngles)[VertexCount - 1U])
+		? (FormAngles->front() - (*FormAngles)[VertexCount - 1U])
+		: ((*FormAngles)[VertexCount - 1U] - FormAngles->front())));
 	ci::fxlen(chainEndPoints, listSINEs, listCOSINEs);
 }
 

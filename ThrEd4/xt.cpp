@@ -350,29 +350,29 @@ void xt::fthrfn() {
 	xi::fthvars(feather);
 	LineSpacing = SelectedForm->fillSpacing;
 	satin::satfil();
-	(*BSequence)[0].attribute = 0;
+	BSequence->front().attribute = 0;
 	(*BSequence)[1].attribute = 1;
 	if (feather.phaseIndex == 0U) {
-		feather.phaseIndex = 1;
+		feather.phaseIndex = 1U;
 	}
 	auto       ind = gsl::narrow_cast<uint32_t>(BSequence->size()) / (feather.phaseIndex << 2U);
 	const auto res = gsl::narrow_cast<uint32_t>(BSequence->size()) % (feather.phaseIndex << 2U);
 	if (res > (feather.phaseIndex << 1U)) {
 		ind++;
 	}
-	feather.globalPosition = 0;
+	feather.globalPosition = 0.0F;
 	feather.globalStep     = 4.0F / gsl::narrow_cast<float>(BSequence->size() * ind);
 	feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / ind;
 	feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
 	feather.globalUp       = feather.globalPhase * feather.globalRatio;
 	feather.globalDown     = feather.globalPhase - feather.globalUp;
 	SelectedForm->fillType = FTHF;
-	feather.phase          = 1;
+	feather.phase          = 1U;
 	BSequence->push_back((*BSequence)[BSequence->size() - 2U]);
 	BSequence->push_back((*BSequence)[BSequence->size() - 1U]);
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
-		OutputIndex = 0;
-		for (ind = 0; ind < wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
+		OutputIndex = 0U;
+		for (ind = 0U; ind < wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
 			if ((*BSequence)[ind].attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
@@ -380,14 +380,14 @@ void xt::fthrfn() {
 	}
 	else {
 		if ((SelectedForm->extendedAttribute & AT_FTHBTH) != 0U) {
-			for (ind = 0; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
+			for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
 				if ((*BSequence)[ind].attribute == 0) {
 					xi::fthdfn(ind, feather);
 				}
 			}
 		}
 		else {
-			for (ind = 0; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
+			for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
 				if ((*BSequence)[ind].attribute != 0) {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
 						xi::fthfn(ind, feather);
@@ -1074,7 +1074,7 @@ bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count
 
 void xt::fsort() {
 	if (!StitchBuffer->empty()) {
-		auto attribute = (*StitchBuffer)[0].attribute & SRTMSK;
+		auto attribute = StitchBuffer->front().attribute & SRTMSK;
 
 		auto stitchRegion = std::vector<OREC> {};
 		stitchRegion.reserve(100U);
@@ -1083,7 +1083,7 @@ void xt::fsort() {
 		//        in a single form are not in ascending order already.
 		thred::savdo();
 		stitchRegion.emplace_back(OREC {});
-		stitchRegion.back().startStitch = &(*StitchBuffer)[0];
+		stitchRegion.back().startStitch = &StitchBuffer->front();
 		ColorOrder[AppliqueColor]       = 0;
 		for (auto iColor = 0U; iColor < 16U; iColor++) {
 			if (iColor != AppliqueColor) {
@@ -1243,7 +1243,7 @@ void xt::internal::duatf(uint32_t ind) {
 }
 
 void xt::dmpat() {
-	auto attribute = (*StitchBuffer)[0].attribute;
+	auto attribute = StitchBuffer->front().attribute;
 	auto iStitch   = 0U;
 	xi::duatf(iStitch);
 	for (auto& stitch : *StitchBuffer) {

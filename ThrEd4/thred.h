@@ -43,7 +43,7 @@ void     delstchm();
 uint32_t duthrsh(double threshold) noexcept;
 void     duzrat() noexcept;
 void     frmdel();
-void     frmrct(fRECTANGLE& rectangle) noexcept;
+void     frmrct(fRECTANGLE& rectangle);
 HBITMAP  getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits);
 void     grpAdj();
 void     hidbit();

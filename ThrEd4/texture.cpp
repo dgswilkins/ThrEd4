@@ -564,7 +564,7 @@ void texture::internal::ritxrct() noexcept {
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
 	if (!SelectedTexturePointsList->empty()) {
-		auto texturePoint = &(*TempTexturePoints)[(*SelectedTexturePointsList)[0]];
+		auto texturePoint = &(*TempTexturePoints)[SelectedTexturePointsList->front()];
 		textureRect.left = textureRect.right = texturePoint->line;
 		textureRect.top = textureRect.bottom = texturePoint->y;
 		for (auto iPoint = 1U; iPoint < wrap::toUnsigned(SelectedTexturePointsList->size()); iPoint++) {
@@ -666,7 +666,7 @@ void texture::internal::stxlin() {
 	StateMap.reset(StateFlag::TXTMOV);
 	txi::deorg(offset);
 	txi::px2ed(offset, point1);
-	txi::px2ed((*FormLines)[0], point0);
+	txi::px2ed(FormLines->front(), point0);
 	txi::dutxlin(point0, point1);
 	StateMap.set(StateFlag::RESTCH);
 }
@@ -1272,7 +1272,7 @@ void texture::txtlbut(const FRMHED& textureForm) {
 		}
 	}
 	if (!SelectedTexturePointsList->empty()) {
-		if (txi::txtclos((*SelectedTexturePointsList)[0])) {
+		if (txi::txtclos(SelectedTexturePointsList->front())) {
 			SelectedTexturePointsList->resize(1);
 			txi::setxmov();
 			txi::dutxrct(TextureRect);

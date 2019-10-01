@@ -2377,8 +2377,8 @@ void form::internal::plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fP
 	underlayVerticalRect.resize(wrap::toSize(VertexCount) + 3U);
 	prebrd(angledForm, angledFormVertices);
 	satin::satout(SelectedForm->borderSize);
-	InsidePoints->push_back((*InsidePoints)[0]);
-	OutsidePoints->push_back((*OutsidePoints)[0]);
+	InsidePoints->push_back(InsidePoints->front());
+	OutsidePoints->push_back(OutsidePoints->front());
 	for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
 		sprct(fillVerticalRect, iVertex, iVertex + 1U);
 		spurct(underlayVerticalRect, fillVerticalRect, iVertex);
