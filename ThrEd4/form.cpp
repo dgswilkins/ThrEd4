@@ -3809,11 +3809,12 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 	doneRegion = pathMap[regionPath[pathLength - 1U].pcon].node;
 }
 
-void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             const std::vector<RCON>&     pathMap,
                             const std::vector<uint32_t>& mapIndexSequence,
                             uint32_t                     pathIndex,
-                            uint32_t&                    pathCount) noexcept {
+                            uint32_t&                    pathCount) {
 	auto iPath = mapIndexSequence[sequencePath[pathIndex].node];
 
 	if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {

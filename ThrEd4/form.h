@@ -395,7 +395,7 @@ namespace internal {
 	            const std::vector<RCON>&     pathMap,
 	            const std::vector<uint32_t>& mapIndexSequence,
 	            uint32_t                     pathIndex,
-	            uint32_t&                    pathCount) noexcept;
+	            uint32_t&                    pathCount);
 
 	void   pbrd(float edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
