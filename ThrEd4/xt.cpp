@@ -744,7 +744,7 @@ void xt::srtcol() {
 	for (auto& stitchColor : colorStartStitch) {
 		stitchColor = startStitch;
 		startStitch += *it;
-		const auto _ = it++;
+		++it;
 	}
 	auto highStitchBuffer = std::vector<fPOINTATTR> {};
 	highStitchBuffer.resize(StitchBuffer->size());
