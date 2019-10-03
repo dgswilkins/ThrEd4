@@ -3813,7 +3813,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             const std::vector<RCON>&     pathMap,
                             const std::vector<uint32_t>& mapIndexSequence,
                             uint32_t                     pathIndex,
-                            uint32_t&                    pathCount) {
+                            uint32_t&                    pathCount) noexcept {
 	auto iPath = mapIndexSequence[sequencePath[pathIndex].node];
 
 	if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {

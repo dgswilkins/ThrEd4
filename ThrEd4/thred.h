@@ -54,7 +54,7 @@ void pxCor2stch(const POINT& point) noexcept;
 void redclp();
 void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
-void ritmov() noexcept;
+void ritmov();
 void ritot(uint32_t number);
 void rngadj();
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
@@ -243,7 +243,7 @@ namespace internal {
 	void gotbox();
 	void gselrng() noexcept;
 	void gsnap();
-	bool gudtyp(WORD bitCount) noexcept;
+	auto gudtyp(WORD bitCount) noexcept -> bool;
 	bool handleEditMenu(const WORD& wParameter);
 	bool handleEitherButtonDown(bool& retflag);
 	bool handleEndKey(int32_t& retflag);
@@ -442,7 +442,7 @@ namespace internal {
 	void     sidhup();
 	void     sidmsg(HWND window, std::wstring* strings, uint32_t entries);
 	uint32_t sizclp(uint32_t& formFirstStitchIndex, uint32_t& formStitchCount);
-	uint32_t sizfclp() noexcept;
+	uint32_t sizfclp();
 	void     sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 	void     srchk();
 	uint32_t srchknot(uint32_t source) noexcept;
@@ -459,7 +459,7 @@ namespace internal {
 	float stlen(uint32_t iStitch) noexcept;
 	void  strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
 	void  tglhid();
-	void  thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) noexcept;
+	void  thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code);
 	void  thrsav();
 	void  thumbak();
 	void  thumnail();

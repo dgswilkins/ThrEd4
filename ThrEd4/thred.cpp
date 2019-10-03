@@ -1327,7 +1327,6 @@ GSL_SUPPRESS(26440) void thred::coltab() {
 	if (StitchBuffer->size() > 1) {
 		ColorChanges = 0;
 		if (!StitchBuffer->empty()) {
-			const auto endStitch   = StitchBuffer->size() - 1U;
 			auto       firstStitch = StitchBuffer->begin();
 			firstStitch->attribute &= NCOLMSK;
 			firstStitch->attribute |= (firstStitch + 1)->attribute & COLMSK;
@@ -2257,10 +2256,7 @@ void thred::internal::chknum() {
 						thred::savdo();
 						const auto edgeType = SelectedForm->edgeType & NEGUND;
 						switch (edgeType) {
-						case EDGEPROPSAT: {
-							SelectedForm->edgeSpacing = value;
-							break;
-						}
+						case EDGEPROPSAT:
 						case EDGEOCHAIN:
 						case EDGELCHAIN: {
 							SelectedForm->edgeSpacing = value;
@@ -3564,10 +3560,11 @@ bool thred::internal::savcmp() noexcept {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch,
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch,
                               uint32_t              destination,
                               uint32_t              source,
-                              uint32_t              code) noexcept {
+                              uint32_t              code) {
 	constexpr auto BalaradRatio = 10.0F / 6.0F;
 
 	balaradStitch[destination].flag = 0;
@@ -4253,13 +4250,13 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(gsl::span<char> label) {
-	strncpy(&label[0], "LA:", 3);
+	strncpy(&label[0], "LA:", 3); // NOLINT
 	const auto lblSize  = wrap::toUnsigned(label.size() - 3U);
 	auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
 	if (fileStem.size() < lblSize) {
 		fileStem += std::string(lblSize - fileStem.size(), ' ');
 	}
-	strncpy(&label[3], fileStem.c_str(), lblSize);
+	strncpy(&label[3], fileStem.c_str(), lblSize); //NOLINT
 }
 #pragma warning(pop)
 
@@ -4416,14 +4413,14 @@ void thred::internal::sav() {
 		auto DSTRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches
 		DSTRecords.reserve(StitchBuffer->size() + 128U);
-		auto        DSTOffsetData   = DSTOffsets {};
+		auto        DSTOffset   = DSTOffsets {};
 		auto        PCSStitchBuffer = std::vector<PCSTCH> {};
 		auto        auxName         = utf::Utf16ToUtf8(*AuxName);
 		const auto* desc            = strrchr(auxName.data(), '\\') + 1U;
 		switch (IniFile.auxFileType) {
 		case AUXDST: {
 			auto dstHeader = DSTHED {};
-			ritdst(DSTOffsetData, DSTRecords, saveStitches);
+			ritdst(DSTOffset, DSTRecords, saveStitches);
 			// dstHeader fields are fixed width, so use strncpy in its intended way.
 			// Use sizeof to ensure no overrun if the format string is wrong length
 			strncpy(dstHeader.desched, "LA:", sizeof(dstHeader.desched)); // NOLINT
@@ -4439,31 +4436,29 @@ void thred::internal::sav() {
 				}
 			}
 			dstHeader.desc[16] = 0xd;
-			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed));                                       // NOLINT
-			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs)); // NOLINT
-			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed));                                           // NOLINT
-			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co));                                              // NOLINT
-			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed));                                     // NOLINT
-			strncpy(
-			    dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffsetData.Negative.x).c_str(), sizeof(dstHeader.xplus));   // NOLINT
-			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed));                                               // NOLINT
-			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffsetData.Positive.x).c_str(), sizeof(dstHeader.xmin)); // NOLINT
-			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed));                                             // NOLINT
-			strncpy(
-			    dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffsetData.Positive.y).c_str(), sizeof(dstHeader.yplus));   // NOLINT
-			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed));                                               // NOLINT
-			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffsetData.Negative.y).c_str(), sizeof(dstHeader.ymin)); // NOLINT
-			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed));                                                   // NOLINT
-			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax));                                                    // NOLINT
-			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed));                                                   // NOLINT
-			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay));                                                    // NOLINT
-			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed));                                                   // NOLINT
-			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx));                                                    // NOLINT
-			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed));                                                   // NOLINT
-			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my));                                                    // NOLINT
-			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));                                                    // NOLINT
-			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));                                                    // NOLINT
-			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));                                                      // NOLINT
+			strncpy(dstHeader.recshed, "ST:", sizeof(dstHeader.recshed));                                             // NOLINT
+			strncpy(dstHeader.recs, fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT
+			strncpy(dstHeader.cohed, "CO:", sizeof(dstHeader.cohed));                                                 // NOLINT
+			strncpy(dstHeader.co, "  0\xd", sizeof(dstHeader.co));                                                    // NOLINT
+			strncpy(dstHeader.xplushed, "+X:", sizeof(dstHeader.xplushed));                                           // NOLINT
+			strncpy(dstHeader.xplus, fmt::format("{:5d}\xd", DSTOffset.Negative.x).c_str(), sizeof(dstHeader.xplus)); // NOLINT
+			strncpy(dstHeader.xminhed, "-X:", sizeof(dstHeader.xminhed));                                             // NOLINT
+			strncpy(dstHeader.xmin, fmt::format("{:5d}\xd", DSTOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));   // NOLINT
+			strncpy(dstHeader.yplushed, "+Y:", sizeof(dstHeader.yplushed));                                           // NOLINT
+			strncpy(dstHeader.yplus, fmt::format("{:5d}\xd", DSTOffset.Positive.y).c_str(), sizeof(dstHeader.yplus)); // NOLINT
+			strncpy(dstHeader.yminhed, "-Y:", sizeof(dstHeader.yminhed));                                             // NOLINT
+			strncpy(dstHeader.ymin, fmt::format("{:5d}\xd", DSTOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));   // NOLINT
+			strncpy(dstHeader.axhed, "AX:", sizeof(dstHeader.axhed));                                                 // NOLINT
+			strncpy(dstHeader.ax, "-    0\r", sizeof(dstHeader.ax));                                                  // NOLINT
+			strncpy(dstHeader.ayhed, "AY:", sizeof(dstHeader.ayhed));                                                 // NOLINT
+			strncpy(dstHeader.ay, "+    0\r", sizeof(dstHeader.ay));                                                  // NOLINT
+			strncpy(dstHeader.mxhed, "MX:", sizeof(dstHeader.mxhed));                                                 // NOLINT
+			strncpy(dstHeader.mx, "+    0\r", sizeof(dstHeader.mx));                                                  // NOLINT
+			strncpy(dstHeader.myhed, "MY:", sizeof(dstHeader.myhed));                                                 // NOLINT
+			strncpy(dstHeader.my, "+    0\r", sizeof(dstHeader.my));                                                  // NOLINT
+			strncpy(dstHeader.pdhed, "PD", sizeof(dstHeader.pdhed));                                                  // NOLINT
+			strncpy(dstHeader.pd, "******\r", sizeof(dstHeader.pd));                                                  // NOLINT
+			strncpy(dstHeader.eof, "\x1a", sizeof(dstHeader.eof));                                                    // NOLINT
 			std::fill_n(&dstHeader.res[0], sizeof(dstHeader.res), ' ');
 			auto bytesWritten = DWORD { 0 };
 			WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
@@ -5164,7 +5159,7 @@ void thred::internal::redbak() {
 		}
 		TexturePointsBuffer->resize(undoData->texturePointCount);
 		if (undoData->texturePointCount != 0U) {
-			const auto _ = std::copy(
+			std::copy(
 			    undoData->texturePoints, undoData->texturePoints + undoData->texturePointCount, TexturePointsBuffer->begin());
 		}
 		thred::coltab();
@@ -5313,18 +5308,15 @@ COLORREF thred::internal::fswap(COLORREF color) noexcept {
 	return _byteswap_ulong(color) >> 8U;
 }
 
-bool thred::internal::gudtyp(WORD bitCount) noexcept {
+auto thred::internal::gudtyp(WORD bitCount) noexcept -> bool {
+	auto flag = false;
 	switch (bitCount) {
 	case 1U:
-		return true;
 	case 24U:
-		return true;
 	case 32U:
-		return true;
-	default: {
+		flag = true;
 	}
-	}
-	return false;
+	return flag;
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
@@ -5388,7 +5380,7 @@ HBITMAP thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uin
 	}
 }
 
-void thred::internal::bfil() {
+GSL_SUPPRESS(26490) void thred::internal::bfil() {
 	const auto InverseBackgroundColor = fswap(BackgroundColor);
 	BitmapFileHandle = CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (BitmapFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
@@ -5401,7 +5393,8 @@ void thred::internal::bfil() {
 		return;
 	}
 	ReadFile(BitmapFileHandle, &BitmapFileHeader, 14U, &BytesRead, nullptr);
-	if (BitmapFileHeader.bfType == 'MB') {
+	constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+	if (BitmapFileHeader.bfType == MB_Sig) {                  
 		auto fileHeaderSize = BitmapFileHeader.bfOffBits - 14U;
 		if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 			fileHeaderSize = sizeof(BITMAPV4HEADER);
@@ -7494,7 +7487,8 @@ void thred::rtclpfn(uint32_t destination, uint32_t source) {
 	ClipStitchData[destination].tag  = 0x14;
 }
 
-uint32_t thred::internal::sizfclp() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) uint32_t thred::internal::sizfclp() {
 	auto clipSize
 	    = gsl::narrow<uint32_t>(sizeof(decltype(*ClipFormHeader)) + VertexCount * sizeof(decltype(FormVertices->back())));
 	if (SelectedForm->type == SAT) {
@@ -7583,12 +7577,7 @@ void thred::internal::duclip() {
 					auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
 					clipHeader->clipType    = CLP_FRMPS;
 					clipHeader->vertexCount = SelectedFormVertices.vertexCount;
-					if (StateMap.test(StateFlag::PSELDIR)) {
-						clipHeader->direction = true;
-					}
-					else {
-						clipHeader->direction = false;
-					}
+					clipHeader->direction = StateMap.test(StateFlag::PSELDIR);
 					// skip past the header
 					auto* vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
 					form::fvars(ClosestFormToCursor);
@@ -9472,7 +9461,8 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
 	}
 }
 
-void thred::ritmov() noexcept {
+// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+GSL_SUPPRESS(26440) void thred::ritmov() {
 	SetROP2(StitchWindowDC, R2_XORPEN);
 	SelectObject(StitchWindowDC, FormPen);
 	if (ClosestVertexToCursor != 0U) {
@@ -14672,7 +14662,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				auto clipCopyBuffer = std::vector<uint8_t> {};
 				clipCopyBuffer.resize(byteCount);
 				auto clipPointer = gsl::narrow_cast<uint8_t*>(ClipPointer);
-				auto _           = std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
+				std::copy(clipPointer, clipPointer + byteCount, clipCopyBuffer.begin());
 				GlobalUnlock(ClipMemory);
 				CloseClipboard();
 				ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
@@ -14790,7 +14780,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				const auto oldEnd = TexturePointsBuffer->size();
 				TexturePointsBuffer->resize(TexturePointsBuffer->size() + textureCount);
 				auto textureDestination = std::next(TexturePointsBuffer->begin(), oldEnd);
-				auto _                  = std::copy(textureSource, textureSource + textureCount, textureDestination);
+				std::copy(textureSource, textureSource + textureCount, textureDestination);
 				GlobalUnlock(ClipMemory);
 				SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 				SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
@@ -14862,7 +14852,7 @@ bool thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 						auto currentCount = formIter.fillInfo.texture.count;
 						TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
 						auto       iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
-						const auto _    = std::copy(textureSource, textureSource + currentCount, iter);
+						std::copy(textureSource, textureSource + currentCount, iter);
 					}
 				}
 				GlobalUnlock(ClipMemory);
@@ -16836,7 +16826,6 @@ bool thred::internal::handleFileMenu(const WORD& wParameter) {
 		switch (IniFile.auxFileType) {
 		case AUXDST: {
 			OpenFileName.nFilterIndex = 3;
-			flag                      = true;
 			break;
 		}
 		default: {
@@ -18934,7 +18923,7 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 						if (BytesRead != bytesToRead) {
 							break;
 						}
-						const auto _ = std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
+						std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 					}
 					else {
 						auto inFormList = std::vector<FRMHEDOUT> {};
