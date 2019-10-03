@@ -1046,7 +1046,7 @@ void texture::deltx(uint32_t formIndex) {
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 					auto destination       = std::next(textureBuffer.begin(), iBuffer);
-					auto _                 = std::copy(startSource, endSource, destination);
+					std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
@@ -1058,7 +1058,7 @@ void texture::deltx(uint32_t formIndex) {
 					auto  endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 					auto destination       = std::next(textureBuffer.begin(), iBuffer);
-					auto _                 = std::copy(startSource, endSource, destination);
+					std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
 				}
@@ -1471,11 +1471,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 			txi::chktxnum();
 			return;
 		}
-		case VK_ESCAPE: {
-			texture::rstxt();
-			StateMap.set(StateFlag::RESTCH);
-			break;
-		}
+		case VK_ESCAPE:
 		case 'Q': {
 			texture::rstxt();
 			StateMap.set(StateFlag::RESTCH);
@@ -1642,7 +1638,7 @@ void texture::rtrtx() {
 		TempTexturePoints->resize(currentCount);
 		auto startSource         = std::next(TexturePointsBuffer->cbegin(), currentIndex);
 		auto endSource           = std::next(startSource, currentCount);
-		auto _                   = std::copy(startSource, endSource, TempTexturePoints->begin());
+		std::copy(startSource, endSource, TempTexturePoints->begin());
 		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
 		TextureScreen.spacing    = SelectedForm->fillSpacing;
 		TextureScreen.lines      = SelectedForm->fillInfo.texture.lines;
