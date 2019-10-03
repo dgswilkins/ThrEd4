@@ -5468,8 +5468,8 @@ bool form::internal::closat(intersectionStyles& inOutFlag) {
 void form::internal::nufpnt(uint32_t vertex, FRMHED& formForInsert) {
 	form::fltspac(vertex + 1U, 1U);
 	formForInsert.vertexCount++;
-	auto vertexIt                       = std::next(FormVertices->begin(), formForInsert.vertexIndex + vertex + 1U);
-	vertexIt[wrap::toSize(vertex) + 1U] = SelectedPoint;
+	auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(formForInsert.vertexIndex) + vertex + 1U);
+	*vertexIt     = SelectedPoint;
 	if (formForInsert.satinGuideCount != 0u) {
 		auto guideIt = std::next(SatinGuides->begin(), formForInsert.satinOrAngle.guide);
 		for (auto ind = 0U; ind < formForInsert.satinGuideCount; ind++) {

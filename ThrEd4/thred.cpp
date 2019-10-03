@@ -14543,7 +14543,7 @@ bool thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 		if (Msg.message == WM_LBUTTONDOWN) {
 			thred::savdo();
-			auto code   = ActiveColor;
+			const auto code = ActiveColor;
 			ActiveColor = VerticalIndex & 0xfU;
 			thred::redraw((*UserColorWin)[code]);
 			thred::redraw((*UserColorWin)[ActiveColor]);
