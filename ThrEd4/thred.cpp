@@ -5308,7 +5308,7 @@ COLORREF thred::internal::fswap(COLORREF color) noexcept {
 	return _byteswap_ulong(color) >> 8U;
 }
 
-auto thred::internal::gudtyp(WORD bitCount) noexcept -> bool {
+constexpr auto thred::internal::gudtyp(WORD bitCount) noexcept -> bool {
 	auto flag = false;
 	switch (bitCount) {
 	case 1U:

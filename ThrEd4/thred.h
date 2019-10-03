@@ -243,7 +243,7 @@ namespace internal {
 	void gotbox();
 	void gselrng() noexcept;
 	void gsnap();
-	auto gudtyp(WORD bitCount) noexcept -> bool;
+	constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 	bool handleEditMenu(const WORD& wParameter);
 	bool handleEitherButtonDown(bool& retflag);
 	bool handleEndKey(int32_t& retflag);
