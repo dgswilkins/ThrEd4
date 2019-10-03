@@ -3813,7 +3813,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             const std::vector<RCON>&     pathMap,
                             const std::vector<uint32_t>& mapIndexSequence,
                             uint32_t                     pathIndex,
-                            uint32_t&                    pathCount) noexcept {
+                            uint32_t&                    pathCount) {
 	auto iPath = mapIndexSequence[sequencePath[pathIndex].node];
 
 	if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {
@@ -5470,7 +5470,7 @@ void form::internal::nufpnt(uint32_t vertex, FRMHED& formForInsert) {
 	formForInsert.vertexCount++;
 	auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(formForInsert.vertexIndex) + vertex + 1U);
 	*vertexIt     = SelectedPoint;
-	if (formForInsert.satinGuideCount != 0u) {
+	if (formForInsert.satinGuideCount != 0U) {
 		auto guideIt = std::next(SatinGuides->begin(), formForInsert.satinOrAngle.guide);
 		for (auto ind = 0U; ind < formForInsert.satinGuideCount; ind++) {
 			if (guideIt->start > vertex) {
@@ -5582,7 +5582,7 @@ void form::unfil() {
 			const auto codedForm = ClosestFormToCursor << FRMSHFT;
 			if (!StitchBuffer->empty()) {
 				auto iDestination = StitchBuffer->begin();
-				auto destCount    = 0u;
+				auto destCount    = 0U;
 				for (auto& stitch : *StitchBuffer) {
 					if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
 						*iDestination++ = stitch;
@@ -7912,43 +7912,37 @@ void form::shrnk() {
 
 void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
                             std::vector<SATCON>& tempGuides,
-                            std::vector<fPOINT>& destinationFormVertices,
-                            std::vector<FRMHED>& destinationFormList,
+                            std::vector<fPOINT>& destFormVertices,
+                            std::vector<FRMHED>& destFormList,
                             uint32_t             formIndex,
                             uint32_t&            formRelocationIndex,
                             uint32_t&            formSourceIndex) {
-	auto& destination = destinationFormList[formRelocationIndex];
+	auto& dest = destFormList[formRelocationIndex];
 
-	destinationFormList[formRelocationIndex++] = (*FormList)[formIndex];
+	destFormList[formRelocationIndex++] = (*FormList)[formIndex];
 
-	auto       vertexIt = std::next(FormVertices->cbegin(), destination.vertexIndex);
-	const auto res      = std::copy(
-        vertexIt, std::next(vertexIt, destination.vertexCount), std::next(destinationFormVertices.begin(), formSourceIndex));
-	destination.vertexIndex = formSourceIndex;
-	formSourceIndex += destination.vertexCount;
-	if (destination.satinGuideCount != 0U) {
-		auto guideStart = std::next(SatinGuides->cbegin(), destination.satinOrAngle.guide);
-		auto guideEnd   = guideStart + destination.satinGuideCount;
+	auto vertexIt = std::next(FormVertices->cbegin(), dest.vertexIndex);
+	std::copy(vertexIt, std::next(vertexIt, dest.vertexCount), std::next(destFormVertices.begin(), formSourceIndex));
+	dest.vertexIndex = formSourceIndex;
+	formSourceIndex += dest.vertexCount;
+	if (dest.satinGuideCount != 0U) {
+		auto guideStart = std::next(SatinGuides->cbegin(), dest.satinOrAngle.guide);
+		auto guideEnd   = guideStart + dest.satinGuideCount;
 		tempGuides.insert(tempGuides.end(), guideStart, guideEnd);
-
-		destination.satinOrAngle.guide
-		    = gsl::narrow<decltype(destination.satinOrAngle.guide)>(tempGuides.size() - destination.satinGuideCount);
+		dest.satinOrAngle.guide = gsl::narrow<decltype(dest.satinOrAngle.guide)>(tempGuides.size() - dest.satinGuideCount);
 	}
 	if (clip::iseclpx(formIndex)) {
-		const auto sourceStart = std::next(ClipPoints->cbegin(), destination.borderClipData);
-		auto       sourceEnd   = std::next(sourceStart, destination.clipEntries);
+		const auto sourceStart = std::next(ClipPoints->cbegin(), dest.borderClipData);
+		auto       sourceEnd   = std::next(sourceStart, dest.clipEntries);
 		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
-
-		destination.borderClipData
-		    = gsl::narrow<decltype(destination.borderClipData)>(tempClipPoints.size() - destination.clipEntries);
+		dest.borderClipData = gsl::narrow<decltype(dest.borderClipData)>(tempClipPoints.size() - dest.clipEntries);
 	}
 	if (clip::isclpx(formIndex)) {
-		auto sourceStart = std::next(ClipPoints->cbegin(), destination.angleOrClipData.clip);
-		auto sourceEnd   = std::next(sourceStart, destination.lengthOrCount.clipCount);
+		auto sourceStart = std::next(ClipPoints->cbegin(), dest.angleOrClipData.clip);
+		auto sourceEnd   = std::next(sourceStart, dest.lengthOrCount.clipCount);
 		tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
-
-		destination.angleOrClipData.clip = gsl::narrow<decltype(destination.angleOrClipData.clip)>(
-		    tempClipPoints.size() - destination.lengthOrCount.clipCount);
+		dest.angleOrClipData.clip
+		    = gsl::narrow<decltype(dest.angleOrClipData.clip)>(tempClipPoints.size() - dest.lengthOrCount.clipCount);
 	}
 }
 

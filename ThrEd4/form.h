@@ -255,8 +255,8 @@ namespace internal {
 	void dufcntr(fPOINT& center);
 	void dufdat(std::vector<fPOINT>& tempClipPoints,
 	            std::vector<SATCON>& tempGuides,
-	            std::vector<fPOINT>& destinationFormVertices,
-	            std::vector<FRMHED>& destinationFormList,
+	            std::vector<fPOINT>& destFormVertices,
+	            std::vector<FRMHED>& destFormList,
 	            uint32_t             formIndex,
 	            uint32_t&            formRelocationIndex,
 	            uint32_t&            formSourceIndex);
@@ -395,7 +395,7 @@ namespace internal {
 	            const std::vector<RCON>&     pathMap,
 	            const std::vector<uint32_t>& mapIndexSequence,
 	            uint32_t                     pathIndex,
-	            uint32_t&                    pathCount) noexcept;
+	            uint32_t&                    pathCount);
 
 	void   pbrd(float edgeSpacing);
 	void   pfn(const std::vector<VRCT2>& underlayVerticalRect,
