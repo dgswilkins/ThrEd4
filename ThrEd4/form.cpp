@@ -2120,53 +2120,54 @@ void form::internal::dubfn() {
 
 void form::internal::chkbrd() {
 	form::fvars(ClosestFormToCursor);
-	if (SelectedForm->edgeType != 0U) {
-		switch (SelectedForm->edgeType & NEGUND) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	if (form.edgeType != 0U) {
+		switch (form.edgeType & NEGUND) {
 		case EDGELINE: { // Line
-			brdfil(SelectedForm->edgeStitchLen);
+			brdfil(form.edgeStitchLen);
 			break;
 		}
 		case EDGEBEAN: { // Bean
-			bold(SelectedForm->edgeStitchLen);
+			bold(form.edgeStitchLen);
 			break;
 		}
 		case EDGECLIP: { // Clipboard
-			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 			clip::clpbrd(clipRect, form::getlast());
 			break;
 		}
 		case EDGECLIPX: { // Even Clipboard
-			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 			clip::duxclp();
 			break;
 		}
 		case EDGEANGSAT: { // Angle Satin
-			satin::sbrd(SelectedForm->borderSize);
+			satin::sbrd(form.borderSize);
 			break;
 		}
 		case EDGEPROPSAT: { // Proportional Satin
-			pbrd(SelectedForm->edgeSpacing);
+			pbrd(form.edgeSpacing);
 			break;
 		}
 		case EDGEAPPL: { // Applique
 			apbrd();
 			ritapbrd();
-			satin::sbrd(SelectedForm->borderSize);
+			satin::sbrd(form.borderSize);
 			break;
 		}
 		case EDGEBHOL: { // BH Buttonhole
-			const auto length      = ButtonholeCornerLength;
+			const auto length = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(20);
-			bhbrd(SelectedForm->edgeSpacing);
+			bhbrd(form.edgeSpacing);
 			ButtonholeCornerLength = length;
 			break;
 		}
 		case EDGEPICOT: { // Picot
-			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			auto clipRect = fRECTANGLE{};
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 			clip::clpic(clipRect);
 			break;
 		}
@@ -4743,8 +4744,9 @@ void form::refilfn() {
 
 	StateMap.reset(StateFlag::TXFIL);
 	form::fvars(ClosestFormToCursor);
-	if (SelectedForm->type == FRMLINE) {
-		SelectedForm->underlayIndent = 0;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	if (form.type == FRMLINE) {
+		form.underlayIndent = 0;
 	}
 	if (!(StateMap.test(StateFlag::FUNCLP) || StateMap.test(StateFlag::FUNSCLP))) {
 		thred::savdo();
@@ -4753,45 +4755,45 @@ void form::refilfn() {
 	auto fillStartsMap  = 0U;            // fill starts bitmap
 	xt::fdelstch(fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
-	if (SelectedForm->fillSpacing < 0.5F && !clip::isclp(ClosestFormToCursor)) {
-		SelectedForm->fillSpacing = 0.5F;
+	if (form.fillSpacing < 0.5F && !clip::isclp(ClosestFormToCursor)) {
+		form.fillSpacing = 0.5F;
 	}
-	if (SelectedForm->edgeSpacing < 0.5F) {
-		SelectedForm->edgeSpacing = 0.5F;
+	if (form.edgeSpacing < 0.5F) {
+		form.edgeSpacing = 0.5F;
 	}
 	if (!clip::isclp(ClosestFormToCursor)) {
-		UserStitchLength = SelectedForm->lengthOrCount.stitchLength;
+		UserStitchLength = form.lengthOrCount.stitchLength;
 	}
 	if (!(StateMap.test(StateFlag::WASDO) || StateMap.test(StateFlag::FUNCLP) || StateMap.test(StateFlag::FUNSCLP))) {
 		thred::savdo();
 	}
 	StateMap.reset(StateFlag::WASDO);
-	if (((SelectedForm->extendedAttribute & (AT_UND | AT_WALK)) != 0U) && SelectedForm->type == FRMLINE
-	    && SelectedForm->fillType != CONTF) {
-		SelectedForm->type = FRMFPOLY;
+	if (((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U) && form.type == FRMLINE
+	    && form.fillType != CONTF) {
+		form.type = FRMFPOLY;
 	}
 	InterleaveSequence->clear();
 	InterleaveSequenceIndices->clear();
 	StateMap.reset(StateFlag::ISUND);
 	auto textureSegments = std::vector<RNGCNT> {};
-	textureSegments.resize(SelectedForm->fillInfo.texture.lines);
-	switch (SelectedForm->type) {
+	textureSegments.resize(form.fillInfo.texture.lines);
+	switch (form.type) {
 	case FRMLINE: {
-		switch (SelectedForm->edgeType & NEGUND) {
+		switch (form.edgeType & NEGUND) {
 		case EDGELINE: {
-			fi::brdfil(SelectedForm->edgeStitchLen);
+			fi::brdfil(form.edgeStitchLen);
 			fi::ritbrd();
 			break;
 		}
 		case EDGEBEAN: {
-			fi::bold(SelectedForm->edgeStitchLen);
+			fi::bold(form.edgeStitchLen);
 			fi::ritbrd();
 			break;
 		}
 		case EDGECLIP: {
 			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
-			clip::clpout(SelectedForm->borderSize);
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
+			clip::clpout(form.borderSize);
 			clip::clpbrd(clipRect, 0);
 			fi::ritbrd();
 			break;
@@ -4803,9 +4805,9 @@ void form::refilfn() {
 			break;
 		}
 		case EDGEPROPSAT: {
-			if (SelectedForm->vertexCount > 2) {
+			if (form.vertexCount > 2) {
 				StateMap.reset(StateFlag::SAT1);
-				fi::plbrd(SelectedForm->edgeSpacing, angledForm, *AngledFormVertices);
+				fi::plbrd(form.edgeSpacing, angledForm, *AngledFormVertices);
 				fi::ritbrd();
 			}
 			break;
@@ -4822,14 +4824,14 @@ void form::refilfn() {
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(20);
-			fi::blbrd(SelectedForm->edgeSpacing);
+			fi::blbrd(form.edgeSpacing);
 			ButtonholeCornerLength = length;
 			fi::ritbrd();
 			break;
 		}
 		case EDGEPICOT: {
 			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getplen();
 			clip::clpic(clipRect);
@@ -4856,13 +4858,13 @@ void form::refilfn() {
 		}
 		case EDGECLIPX: {
 			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->borderClipData, SelectedForm->clipEntries);
+			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
 			clip::duxclp();
 			fi::ritbrd();
 			break;
 		}
 		}
-		if (SelectedForm->fillType == CONTF && ((SelectedForm->attribute & FRECONT) != 0)) {
+		if (form.fillType == CONTF && ((form.attribute & FRECONT) != 0)) {
 			fi::contf();
 			fi::ritfil();
 		}
@@ -4873,20 +4875,20 @@ void form::refilfn() {
 		xt::chkwlk();
 		xt::chkund(textureSegments, *AngledFormVertices);
 		StateMap.reset(StateFlag::ISUND);
-		if (SelectedForm->fillType != 0U) {
+		if (form.fillType != 0U) {
 			const auto spacing      = LineSpacing;
-			LineSpacing             = SelectedForm->fillSpacing;
+			LineSpacing             = form.fillSpacing;
 			auto lineEndpoints      = std::vector<SMALPNTL> {};
 			auto groupIndexSequence = std::vector<uint32_t> {};
 			auto rotationCenter     = fPOINT {};
 			auto doFill             = true;
 			auto rotationAngle      = 0.0;
-			switch (SelectedForm->fillType) {
+			switch (form.fillType) {
 			case VRTF: {
 				workingFormVertices.clear();
-				workingFormVertices.reserve(SelectedForm->vertexCount);
-				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
+				workingFormVertices.reserve(form.vertexCount);
+				auto startVertex = std::next(FormVertices->cbegin(), form.vertexIndex);
+				auto endVertex   = std::next(startVertex, form.vertexCount);
 				workingFormVertices.insert(workingFormVertices.end(), startVertex, endVertex);
 				fi::fnvrt(workingFormVertices, groupIndexSequence, lineEndpoints);
 				break;
@@ -4902,7 +4904,7 @@ void form::refilfn() {
 				break;
 			}
 			case ANGF: {
-				rotationAngle = PI / 2 - SelectedForm->angleOrClipData.angle;
+				rotationAngle = PI / 2 - form.angleOrClipData.angle;
 				fi::fnang(groupIndexSequence, lineEndpoints, rotationAngle, rotationCenter, angledForm, *AngledFormVertices);
 				workingFormVertices.clear();
 				workingFormVertices.reserve(angledForm.vertexCount);
@@ -4913,12 +4915,12 @@ void form::refilfn() {
 			}
 			case VCLPF: {
 				auto clipRect = fRECTANGLE {};
-				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 				form::fvars(ClosestFormToCursor);
 				workingFormVertices.clear();
-				workingFormVertices.reserve(SelectedForm->vertexCount);
-				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
+				workingFormVertices.reserve(form.vertexCount);
+				auto startVertex = std::next(FormVertices->cbegin(), form.vertexIndex);
+				auto endVertex   = std::next(startVertex, form.vertexCount);
 				workingFormVertices.insert(workingFormVertices.end(), startVertex, endVertex);
 				fi::clpcon(textureSegments, workingFormVertices);
 				doFill = false;
@@ -4926,14 +4928,14 @@ void form::refilfn() {
 			}
 			case HCLPF: {
 				auto clipRect = fRECTANGLE {};
-				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 				fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 				doFill = false;
 				break;
 			}
 			case ANGCLPF: {
 				auto clipRect = fRECTANGLE {};
-				clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+				clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 				StateMap.reset(StateFlag::ISUND);
 				form::angclpfn(textureSegments, *AngledFormVertices);
 				doFill = false;
@@ -4942,9 +4944,9 @@ void form::refilfn() {
 			case TXVRTF: {
 				texture::setxt(textureSegments);
 				workingFormVertices.clear();
-				workingFormVertices.reserve(SelectedForm->vertexCount);
-				auto startVertex = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-				auto endVertex   = std::next(startVertex, SelectedForm->vertexCount);
+				workingFormVertices.reserve(form.vertexCount);
+				auto startVertex = std::next(FormVertices->cbegin(), form.vertexIndex);
+				auto endVertex   = std::next(startVertex, form.vertexCount);
 				workingFormVertices.insert(workingFormVertices.end(), startVertex, endVertex);
 				fi::clpcon(textureSegments, workingFormVertices);
 				doFill = false;
@@ -4967,7 +4969,7 @@ void form::refilfn() {
 			if (doFill) {
 				fi::lcon(groupIndexSequence, lineEndpoints);
 				fi::bakseq();
-				if (SelectedForm->fillType != VRTF && SelectedForm->fillType != TXVRTF) {
+				if (form.fillType != VRTF && form.fillType != TXVRTF) {
 					rotationAngle = -rotationAngle;
 					fi::rotbak(rotationAngle, rotationCenter);
 				}
@@ -4983,11 +4985,11 @@ void form::refilfn() {
 		xt::chkwlk();
 		xt::chkund(textureSegments, *AngledFormVertices);
 		StateMap.reset(StateFlag::ISUND);
-		switch (SelectedForm->fillType) {
+		switch (form.fillType) {
 		case SATF: {
 			const auto spacing = LineSpacing;
-			LineSpacing        = SelectedForm->fillSpacing;
-			UserStitchLength   = SelectedForm->lengthOrCount.stitchLength;
+			LineSpacing        = form.fillSpacing;
+			UserStitchLength   = form.lengthOrCount.stitchLength;
 			satin::satfil();
 			LineSpacing = spacing;
 			fi::ritfil();
@@ -4995,7 +4997,7 @@ void form::refilfn() {
 		}
 		case CLPF: {
 			auto clipRect = fRECTANGLE {};
-			clip::oclp(clipRect, SelectedForm->angleOrClipData.clip, SelectedForm->lengthOrCount.clipCount);
+			clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
 			fi::fmclp();
 			fi::ritfil();
 			break;

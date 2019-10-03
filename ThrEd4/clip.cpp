@@ -342,14 +342,15 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 }
 
 void clip::clpout(float width) {
-	if (SelectedForm->type == FRMLINE) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	if (form.type == FRMLINE) {
 		satin::satout(width);
 	}
 	else {
 		satin::satout(ClipRectSize.cy);
 		InsidePointList->clear();
-		auto srcStart = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		auto srcEnd   = std::next(srcStart, VertexCount);
+		auto srcStart = std::next(FormVertices->cbegin(), form.vertexIndex);
+		auto srcEnd   = std::next(srcStart, form.vertexCount);
 		InsidePointList->insert(InsidePointList->end(), srcStart, srcEnd);
 		InsidePoints = InsidePointList;
 	}
@@ -417,7 +418,7 @@ void clip::clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex) {
 	ClipReference.x           = clipRect.left;
 	ClipReference.y           = rotationCenter.y;
 	ci::durev(clipRect, clipReversedData);
-	if (SelectedForm->type == FRMLINE) {
+	if (FormList->operator[](ClosestFormToCursor).type == FRMLINE) {
 		auto vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		SelectedPoint  = vertexIt[0];
 		auto clipAngle = 0.0F;      // for clipboard border fill
