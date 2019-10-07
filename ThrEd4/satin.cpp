@@ -698,38 +698,35 @@ void satin::satbrd() {
 }
 
 void satin::internal::satends(uint32_t isBlunt, float width) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	auto& vertexIndex = form.vertexIndex;
+	auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	if ((isBlunt & SBLNT) != 0U) {
-		auto step = fPOINT { sin(FormAngles->front()) * width / 2.0F, cos(FormAngles->front()) * width / 2.0F };
+		auto step = fPOINT{ sin(FormAngles->front()) * width / 2.0F, cos(FormAngles->front()) * width / 2.0F };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		auto vertexIt         = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		InsidePoints->front().x  = vertexIt->x + step.x;
-		InsidePoints->front().y  = vertexIt->y - step.y;
-		OutsidePoints->front().x = vertexIt->x - step.x;
-		OutsidePoints->front().y = vertexIt->y + step.y;
+		InsidePoints->front() = fPOINT{ vertexIt->x + step.x, vertexIt->y - step.y };
+		OutsidePoints->front() = fPOINT{ vertexIt->x - step.x, vertexIt->y + step.y };
 	}
 	else {
-		auto vertexIt      = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		InsidePoints->front() = OutsidePoints->front() = *vertexIt;
 	}
+	auto& vertexCount = form.vertexCount;
+	vertexIt += vertexCount - 1U;
 	if ((isBlunt & FBLNT) != 0U) {
 		auto step
-		    = fPOINT { sin((*FormAngles)[VertexCount - 2U]) * width / 2.0F, cos((*FormAngles)[VertexCount - 2U]) * width / 2.0F };
+			= fPOINT{ sin((*FormAngles)[vertexCount - 2U]) * width / 2.0F, cos((*FormAngles)[vertexCount - 2U]) * width / 2.0F };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
 		}
-		auto vertexIt                        = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
-		(*InsidePoints)[VertexCount - 1U].x  = vertexIt[VertexCount - 1U].x + step.x;
-		(*InsidePoints)[VertexCount - 1U].y  = vertexIt[VertexCount - 1U].y - step.y;
-		(*OutsidePoints)[VertexCount - 1U].x = vertexIt[VertexCount - 1U].x - step.x;
-		(*OutsidePoints)[VertexCount - 1U].y = vertexIt[VertexCount - 1U].y + step.y;
+		InsidePoints->back() = fPOINT{ vertexIt->x + step.x, vertexIt->y - step.y };
+		OutsidePoints->back() = fPOINT{ vertexIt->x - step.x, vertexIt->y + step.y };
 	}
 	else {
-		auto vertexIt                     = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		(*InsidePoints)[VertexCount - 1U] = (*OutsidePoints)[VertexCount - 1U] = vertexIt[VertexCount - 1U];
+		InsidePoints->back() = OutsidePoints->back() = *vertexIt;
 	}
 }
 
