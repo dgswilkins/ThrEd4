@@ -27,7 +27,6 @@
 #include "ThrEdTypes.h"
 
 namespace formForms {
-
 void dazdef();
 void dasyfrm();
 void frmnum();
@@ -41,29 +40,25 @@ void sidwnd(HWND wnd) noexcept;
 void wavfrm();
 
 namespace internal {
-
 	void chkdaz();
 
 	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
 	void initdaz(HWND hWinDialog);
-
-	inline void initTearDlg(HWND hwndlg);
-
-	HWND numwin(const std::wstring& winName, const RECT& location);
+	void initTearDlg(HWND hwndlg);
+	auto numwin(const std::wstring& winName, const RECT& location) -> HWND;
 	void nxtlin(uint32_t& formMenuEntryCount) noexcept;
 	void nxtlinprf() noexcept;
 	void prflin(const std::wstring& msg, uint32_t row) noexcept;
-	HWND prfnwin(const std::wstring& text) noexcept;
+	auto prfnwin(const std::wstring& text) noexcept -> HWND;
 	void prftwin(const std::wstring& text) noexcept;
 	void refrmfn(uint32_t& formMenuEntryCount);
 
 	bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-	HWND txtrwin(const std::wstring& winName, const RECT& location);
-	HWND txtwin(const std::wstring& windowName, const RECT& location);
-
-	inline void wavinit(HWND hwndlg);
+	auto txtrwin(const std::wstring& winName, const RECT& location) -> HWND;
+	auto txtwin(const std::wstring& windowName, const RECT& location) -> HWND;
+	void wavinit(HWND hwndlg);
 
 	bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 } // namespace internal

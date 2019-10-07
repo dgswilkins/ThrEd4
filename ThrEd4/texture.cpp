@@ -57,7 +57,7 @@ void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uin
 	SelectedTexturePointsList = ptrTexturePointsList;
 }
 
-bool texture::internal::txnam(wchar_t* name, int32_t sizeName) {
+auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
 	auto texturePath = fs::path(ArgList[0]);
 
 	texturePath.replace_filename(L"thred.txr");
@@ -176,7 +176,7 @@ void texture::redtx() {
 	txi::redtbak();
 }
 
-bool texture::istx(uint32_t iForm) noexcept {
+auto texture::istx(uint32_t iForm) noexcept -> bool {
 	const auto& pfrm = (*FormList)[iForm];
 	if (pfrm.fillType == TXVRTF) {
 		return true;
@@ -199,7 +199,7 @@ void texture::internal::txrfor() noexcept {
 	}
 }
 
-bool texture::internal::chktxh(_In_ const TXHST* historyItem) {
+auto texture::internal::chktxh(_In_ const TXHST* historyItem) -> bool {
 	if (historyItem != nullptr) {
 		if (historyItem->texturePoints.size() != TempTexturePoints->size()) {
 			return true;
@@ -459,7 +459,7 @@ void texture::drwtxtr() {
 	displayText::drwtxbut(TextureScreen);
 }
 
-bool texture::internal::px2txt(const POINT& offset) {
+auto texture::internal::px2txt(const POINT& offset) -> bool {
 	auto editPoint = fPOINT {};
 
 	auto retval = false;
@@ -487,7 +487,7 @@ void texture::internal::deorg(POINT& point) noexcept {
 	point = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 }
 
-bool texture::internal::txbutfn() {
+auto texture::internal::txbutfn() -> bool {
 	auto offset = POINT { 0L, 0L };
 
 	txi::deorg(offset);
@@ -516,7 +516,7 @@ void texture::txtrbut() {
 	}
 }
 
-bool texture::internal::txtclos(uint32_t& closestTexturePoint) {
+auto texture::internal::txtclos(uint32_t& closestTexturePoint) -> bool {
 	if (closestTexturePoint != 0U) {
 		auto minimumLength = 1e99;
 		auto reference     = POINT { 0L, 0L };
@@ -589,7 +589,7 @@ void texture::internal::dutxrct(TXTRCT& textureRect) {
 	}
 }
 
-fPOINT texture::internal::ed2stch(const fPOINT& point) noexcept {
+auto texture::internal::ed2stch(const fPOINT& point) noexcept -> fPOINT {
 	return { (point.x - TextureScreen.xOffset), (point.y - TextureScreen.yOffset) };
 }
 
@@ -950,7 +950,7 @@ void texture::internal::butsid(uint32_t windowId) {
 	displayText::updateWinFont(MainStitchWin);
 }
 
-bool texture::internal::tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept {
+auto texture::internal::tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (texturePoint0.line < texturePoint1.line) {
 		return true;
@@ -1210,7 +1210,7 @@ void texture::internal::txdelal() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-bool texture::internal::chkbut() {
+auto texture::internal::chkbut() -> bool {
 	if (Msg.hwnd == (*ButtonWin)[HTXCLR]) {
 		txi::txdelal();
 		return true;
@@ -1385,7 +1385,7 @@ void texture::internal::txgro(const FRMHED& textureForm) {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) bool texture::internal::txdig(uint32_t keyCode, char& character) {
+GSL_SUPPRESS(26440) auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
 	if (isdigit(keyCode) != 0) {
 		character = gsl::narrow<char>(keyCode);
 		return true;
@@ -1647,7 +1647,7 @@ void texture::rtrtx() {
 	}
 }
 
-bool texture::internal::inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept {
+auto texture::internal::inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept -> bool {
 	if (stitch.x < rectangle.left) {
 		return false;
 	}

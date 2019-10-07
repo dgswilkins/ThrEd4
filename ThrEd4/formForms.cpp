@@ -68,7 +68,7 @@ auto formForms::maxwid(uint32_t start, uint32_t finish) {
 	return textSize.x + 6;
 }
 
-HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& location) {
+auto formForms::internal::txtwin(const std::wstring& windowName, const RECT& location) -> HWND {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(windowName, LabelWindowSize);
 		return nullptr;
@@ -86,7 +86,7 @@ HWND formForms::internal::txtwin(const std::wstring& windowName, const RECT& loc
 	                    nullptr);
 }
 
-HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& location) {
+auto formForms::internal::txtrwin(const std::wstring& winName, const RECT& location) -> HWND {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
@@ -104,7 +104,7 @@ HWND formForms::internal::txtrwin(const std::wstring& winName, const RECT& locat
 	                    nullptr);
 }
 
-HWND formForms::internal::numwin(const std::wstring& winName, const RECT& location) {
+auto formForms::internal::numwin(const std::wstring& winName, const RECT& location) -> HWND {
 	if (StateMap.test(StateFlag::REFCNT)) {
 		formForms::maxtsiz(winName, ValueWindowSize);
 		return nullptr;
@@ -563,7 +563,7 @@ void formForms::internal::prftwin(const std::wstring& text) noexcept {
 	             nullptr);
 }
 
-HWND formForms::internal::prfnwin(const std::wstring& text) noexcept {
+auto formForms::internal::prfnwin(const std::wstring& text) noexcept -> HWND {
 	return CreateWindow(L"STATIC", // NOLINT
 	                    text.c_str(),
 	                    SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
@@ -977,7 +977,7 @@ void formForms::dasyfrm() {
 	form::mdufrm();
 }
 
-inline void formForms::internal::initTearDlg(HWND hwndlg) {
+void formForms::internal::initTearDlg(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format(L"{:d}", IniFile.formSides).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format(L"{:.3f}", IniFile.tearTailLength).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), fmt::format(L"{:.3f}", IniFile.tearTwistStep / PFGRAN).c_str());
@@ -1124,7 +1124,7 @@ void formForms::setear() {
 	}
 }
 
-inline void formForms::internal::wavinit(HWND hwndlg) {
+void formForms::internal::wavinit(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format(L"{}", IniFile.wavePoints).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(L"{}", IniFile.waveStart).c_str());
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(L"{}", IniFile.waveEnd).c_str());

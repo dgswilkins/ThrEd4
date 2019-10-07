@@ -39,9 +39,7 @@ namespace internal {
 	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
 	void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
-
-	uint32_t ducolm();
-
+	auto ducolm() -> uint32_t;
 	void durct(uint32_t shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 	void dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept;
 	void dutrac();
@@ -54,8 +52,8 @@ namespace internal {
 	void shownd(HWND hwnd) noexcept;
 	void stch2bit(fPOINT& point);
 	void tracwnd();
-	bool trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints);
-	bool trcin(COLORREF color);
+	auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints) -> bool;
+	auto trcin(COLORREF color) -> bool;
 	void trcnum(uint32_t shift, COLORREF color, uint32_t iRGB);
 	void trcols(COLORREF color) noexcept;
 	void trcratnum();
@@ -63,14 +61,12 @@ namespace internal {
 	void trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept;
 	void trnumwnd0(int32_t position) noexcept;
 	void trnumwnd1(int32_t position) noexcept;
-
-	uint32_t trsum() noexcept;
-
+	auto trsum() noexcept -> uint32_t;
 	void upnum(uint32_t iRGB);
 
 #if TRCMTH == 0
-	uint32_t colsum(COLORREF col);
-	uint32_t icolsum(COLORREF col);
+	auto colsum(COLORREF col) -> uint32_t;
+	auto icolsum(COLORREF col) -> uint32_t;
 #endif
 } // namespace internal
 } // namespace trace

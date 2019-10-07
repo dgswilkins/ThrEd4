@@ -109,7 +109,7 @@ void xt::internal::fthvars(FEATHER& feather) {
 	}
 }
 
-constexpr float xt::internal::durat(float start, float finish, float featherRatio) {
+constexpr auto xt::internal::durat(float start, float finish, float featherRatio) -> float {
 	return (finish - start) * featherRatio + start;
 }
 
@@ -138,7 +138,7 @@ void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEA
 	}
 }
 
-uint32_t xt::internal::bpsg() noexcept {
+auto xt::internal::bpsg() noexcept -> uint32_t {
 	auto testValue = 0U;
 
 	if (PseudoRandomValue == 0U) {
@@ -244,7 +244,7 @@ void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, f
 	point.y = ((*BSequence)[iNextPoint].y - (*BSequence)[iPoint].y) * featherRatio + (*BSequence)[iPoint].y;
 }
 
-fPOINT xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept {
+auto xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept -> fPOINT {
 	return fPOINT { form::midl(endPoint.x, startPoint.x), form::midl(endPoint.y, startPoint.y) };
 }
 
@@ -456,7 +456,7 @@ void xt::fethr() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
+constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
 	auto op = ULARGE_INTEGER { { 0, 0 } };
 
 	op.LowPart  = time.dwLowDateTime;
@@ -466,7 +466,7 @@ constexpr ULARGE_INTEGER xt::internal::tim2int(FILETIME time) noexcept {
 
 #pragma warning(push)
 #pragma warning(disable : 26487)
-std::vector<fPOINT>& xt::insid() {
+auto xt::insid() -> std::vector<fPOINT>& {
 	satin::satout(fabs(SelectedForm->underlayIndent));
 	if (SelectedForm->underlayIndent > 0) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
@@ -557,11 +557,11 @@ void xt::internal::ritcwlk() {
 	}
 }
 
-uint32_t xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
-                             const fPOINT&            start,
-                             const fPOINT&            finish,
-                             uint32_t                 destination,
-                             uint32_t                 code) {
+auto xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
+                         const fPOINT&            start,
+                         const fPOINT&            finish,
+                         uint32_t                 destination,
+                         uint32_t                 code) -> uint32_t {
 	auto length      = hypot(finish.x - start.x, finish.y - start.y);
 	auto startVertex = form::closflt(start.x, start.y);
 
@@ -860,7 +860,7 @@ void xt::selalfrm() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-uint32_t xt::internal::dutyp(uint32_t attribute) noexcept {
+auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 	auto       result          = uint8_t { 0 };
 	auto       bit             = DWORD { 0 };
 	const auto maskedAttribute = attribute & SRTYPMSK;
@@ -890,7 +890,7 @@ void xt::internal::durec(OREC& record) noexcept {
 	record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-bool xt::internal::orComp(const OREC* record1, const OREC* record2) noexcept {
+auto xt::internal::orComp(const OREC* record1, const OREC* record2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (record1 != nullptr && record2 != nullptr) {
 		if (ColorOrder[record1->color] < ColorOrder[record2->color]) {
@@ -922,7 +922,7 @@ bool xt::internal::orComp(const OREC* record1, const OREC* record2) noexcept {
 	return false;
 }
 
-bool xt::internal::orfComp(const OREC* record1, const OREC* record2) noexcept {
+auto xt::internal::orfComp(const OREC* record1, const OREC* record2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (record1 != nullptr && record2 != nullptr) {
 		if (record1->form < record2->form) {
@@ -942,9 +942,9 @@ bool xt::internal::orfComp(const OREC* record1, const OREC* record2) noexcept {
 	return false;
 }
 
-bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
+auto xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
                            const std::vector<OREC*>&    pRecs,
-                           const SRTREC&                stitchRecord) noexcept {
+                           const SRTREC&                stitchRecord) noexcept -> bool {
 	for (auto iStitch = stitchRecord.start; iStitch < stitchRecord.finish; iStitch++) {
 		if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form]) {
 			return true;
@@ -953,7 +953,8 @@ bool xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
 	return false;
 }
 
-double xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) {
+auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord)
+    -> double {
 	auto currentRegion = sortRecord.currentRegion;
 	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
 	auto direction     = sortRecord.direction;
@@ -1014,7 +1015,8 @@ double xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::
 	return totalJumps;
 }
 
-uint32_t xt::internal::duprecs(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) {
+auto xt::internal::duprecs(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord)
+    -> uint32_t {
 	sortRecord.direction = false;
 	const auto jumps0    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
 
@@ -1046,7 +1048,7 @@ void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, uint32_t count
 }
 #endif
 
-bool xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept {
+auto xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept -> bool {
 	auto formIndex = stitchRegion[0]->form;
 	auto color     = stitchRegion[0]->color;
 
@@ -1408,7 +1410,7 @@ void xt::fdelstch(FILLSTARTS& fillStartsData, uint32_t& fillStartsMap) {
 	}
 }
 
-bool xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept {
+auto xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept -> bool {
 	const auto color = (*InterleaveSequenceIndices)[index].color;
 	while (index != 0U) {
 		index--;
@@ -1463,7 +1465,7 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	}
 }
 
-bool xt::internal::isfil() noexcept {
+auto xt::internal::isfil() noexcept -> bool {
 	if (SelectedForm->fillType != 0U) {
 		return true;
 	}
@@ -2378,14 +2380,14 @@ void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
 	SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value / PFGRAN)).c_str());
 }
 
-float xt::internal::getstxt(uint32_t stringIndex, HWND dialog) {
+auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
 	// ToDo - This is not great code.
 	wchar_t buffer[16] = {};
 	GetWindowText(GetDlgItem(dialog, stringIndex), static_cast<LPTSTR>(buffer), sizeof(buffer) / sizeof(buffer[0]));
 	return wrap::bufToFloat(&buffer[0]) * PFGRAN;
 }
 
-bool xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) {
+auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool {
 	point.x = getstxt(IDC_DESWID, dialog);
 	point.y = getstxt(IDC_DESHI, dialog);
 	// ToDo - should this have a range? aspectRatio +/- %

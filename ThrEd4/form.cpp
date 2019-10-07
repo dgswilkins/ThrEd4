@@ -74,7 +74,7 @@ void form::frmclr(FRMHED& destination) noexcept {
 	destination = head;
 }
 
-bool form::internal::fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept {
+auto form::internal::fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (point1.y < point2.y) {
 		return true;
@@ -100,7 +100,7 @@ void form::dusqr() {
 	}
 }
 
-bool form::chkmax(uint32_t arg0, uint32_t arg1) noexcept {
+auto form::chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool {
 	if ((arg0 & MAXMSK) != 0U) {
 		return true;
 	}
@@ -138,7 +138,7 @@ void form::delflt(uint32_t formIndex) {
 	}
 }
 
-bool form::internal::chk2of() {
+auto form::internal::chk2of() -> bool {
 	if (!StateMap.test(StateFlag::SELBOX)) {
 		return false;
 	}
@@ -208,7 +208,7 @@ void form::chkcont() {
 	SelectedForm->attribute |= FRECONT;
 }
 
-uint32_t form::find1st() {
+auto form::find1st() -> uint32_t {
 	if (fi::chk2of()) {
 		return ClosestPointIndex;
 	}
@@ -881,7 +881,7 @@ void form::durpoli(uint32_t vertexCount) {
 	mdufrm();
 }
 
-uint32_t form::nxt(uint32_t iVertex) noexcept {
+auto form::nxt(uint32_t iVertex) noexcept -> uint32_t {
 	iVertex++;
 	if (iVertex > VertexCount - 1) {
 		iVertex = 0;
@@ -889,7 +889,7 @@ uint32_t form::nxt(uint32_t iVertex) noexcept {
 	return iVertex;
 }
 
-uint32_t form::prv(uint32_t iVertex) noexcept {
+auto form::prv(uint32_t iVertex) noexcept -> uint32_t {
 	if (iVertex != 0U) {
 		iVertex--;
 	}
@@ -899,7 +899,7 @@ uint32_t form::prv(uint32_t iVertex) noexcept {
 	return iVertex;
 }
 
-uint32_t form::pdir(uint32_t vertex) {
+auto form::pdir(uint32_t vertex) -> uint32_t {
 	if (StateMap.test(StateFlag::PSELDIR)) {
 		return form::nxt(vertex);
 	}
@@ -1045,10 +1045,10 @@ void form::duform(uint32_t formType) {
 	}
 }
 
-float form::internal::findDistanceToSide(const fPOINT& lineStart,
-                                         const fPOINT& lineEnd,
-                                         const fPOINT& point,
-                                         double&       distance) noexcept {
+auto form::internal::findDistanceToSide(const fPOINT& lineStart,
+                                        const fPOINT& lineEnd,
+                                        const fPOINT& point,
+                                        double&       distance) noexcept -> float {
 	const auto A     = gsl::narrow_cast<double>(point.x) - lineStart.x;
 	const auto B     = gsl::narrow_cast<double>(point.y) - lineStart.y;
 	const auto C     = gsl::narrow_cast<double>(lineEnd.x) - lineStart.x;
@@ -1089,7 +1089,7 @@ float form::internal::findDistanceToSide(const fPOINT& lineStart,
 	return param;
 }
 
-bool form::closfrm() {
+auto form::closfrm() -> bool {
 	if (!FormList->empty()) {
 		const auto screenCoordinate = POINT { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
 		fi::rats();
@@ -1164,7 +1164,7 @@ void form::frmovlin() {
 	thred::ritmov();
 }
 
-bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) {
+auto form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) -> bool {
 	const auto delta  = fPOINT { finish.x - start.x, finish.y - start.y };
 	auto       length = hypot(delta.x, delta.y);
 	// This clamp is temporary to avoid overflow when BH corner value is too large. Find a better fix
@@ -1192,7 +1192,7 @@ bool form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 	return true;
 }
 
-uint32_t form::closflt(float xCoordinate, float yCoordinate) {
+auto form::closflt(float xCoordinate, float yCoordinate) -> uint32_t {
 	auto closestVertex = 0U;
 
 	auto minimumLength = 1e99;
@@ -1306,7 +1306,7 @@ void form::internal::ritfil() {
 	}
 }
 
-bool form::lastch() {
+auto form::lastch() -> bool {
 	if (!InterleaveSequence->empty()) {
 		LastPoint = InterleaveSequence->back();
 		return true;
@@ -1314,7 +1314,7 @@ bool form::lastch() {
 	{ return false; }
 }
 
-uint32_t form::getlast() {
+auto form::getlast() -> uint32_t {
 	if (SelectedForm->fillType != 0U) {
 		form::lastch();
 		auto minimumLength = 1e99;
@@ -1370,7 +1370,7 @@ void form::internal::linrutb(uint32_t start) {
 	LineSpacing = spacing;
 }
 
-float form::getblen() noexcept {
+auto form::getblen() noexcept -> float {
 	auto&      form    = (*FormList)[ClosestFormToCursor];
 	const auto iLength = (form.clipEntries << 16U) | form.picoLength;
 	return gsl::narrow_cast<float>(iLength);
@@ -1384,7 +1384,7 @@ void form::savblen(float fLength) {
 	form.picoLength  = iLength & 0xFFFFU;
 }
 
-float form::getplen() noexcept {
+auto form::getplen() noexcept -> float {
 	const auto value = SelectedForm->picoLength;
 
 	return (gsl::narrow_cast<float>(value >> 8U) + gsl::narrow_cast<float>(value & 0xffU) / 256.0F);
@@ -1531,7 +1531,8 @@ void form::duangs() {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-bool form::internal::projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept {
+auto form::internal::projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept
+    -> bool {
 	const auto deltaX = upperPoint.x - lowerPoint.x;
 
 	intersection.x = xCoordinate;
@@ -1550,7 +1551,7 @@ bool form::internal::projv(float xCoordinate, const fPOINT& lowerPoint, const fP
 	return false;
 }
 
-bool form::cisin(float xCoordinate, float yCoordinate) {
+auto form::cisin(float xCoordinate, float yCoordinate) -> bool {
 	const auto* rectangle = &SelectedForm->rectangle;
 
 	if (xCoordinate >= rectangle->right) {
@@ -1598,11 +1599,11 @@ bool form::cisin(float xCoordinate, float yCoordinate) {
 
 /* find the intersection of two lines, one defined by point and slope, the other by the coordinates
    of the endpoints. */
-bool form::internal::proj(const fPOINT& point,
+auto form::internal::proj(const fPOINT& point,
                           float         slope,
                           const fPOINT& point0,
                           const fPOINT& point1,
-                          fPOINT&       intersectionPoint) noexcept {
+                          fPOINT&       intersectionPoint) noexcept -> bool {
 	const auto delta = fPOINT { point1.x - point0.x, point1.y - point0.y };
 	if (delta.x != 0.0F) {
 		const auto sideSlope     = delta.y / delta.x;
@@ -1634,7 +1635,7 @@ bool form::internal::proj(const fPOINT& point,
 	return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum);
 }
 
-bool form::linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept {
+auto form::linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept -> bool {
 	if (OutsidePoints != nullptr) {
 		const auto delta
 		    = fPOINT { ((*OutsidePoints)[start].x - points[start].x), ((*OutsidePoints)[start].y - points[start].y) };
@@ -1654,7 +1655,7 @@ bool form::linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t fini
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-bool form::internal::projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept {
+auto form::internal::projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept -> bool {
 	const auto deltaX = point1.x - point0.x;
 
 	intersection.y = yCoordinate;
@@ -1836,7 +1837,7 @@ void form::internal::duromb(const fPOINT& start0, const fPOINT& finish0, const f
 	}
 }
 
-uint32_t form::psg() noexcept {
+auto form::psg() noexcept -> uint32_t {
 	if (PseudoRandomValue == 0U) {
 		PseudoRandomValue = SEED;
 	}
@@ -2629,7 +2630,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVe
 	}
 }
 
-uint32_t form::internal::leftsid(const std::vector<fPOINT>& currentFormVertices) {
+auto form::internal::leftsid(const std::vector<fPOINT>& currentFormVertices) -> uint32_t {
 	auto leftVertex = 0U;
 	auto iVertex    = 0U;
 	auto minimumX   = 1e9F;
@@ -2644,7 +2645,7 @@ uint32_t form::internal::leftsid(const std::vector<fPOINT>& currentFormVertices)
 	return leftVertex;
 }
 
-bool form::internal::vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept {
+auto form::internal::vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (vclpx1.segment < vclpx2.segment) {
 		return true;
@@ -2661,13 +2662,13 @@ bool form::internal::vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept
 	return false;
 }
 
-bool form::internal::isin(std::vector<VCLPX>&        regionCrossingData,
+auto form::internal::isin(std::vector<VCLPX>&        regionCrossingData,
                           float                      xCoordinate,
                           float                      yCoordinate,
                           uint32_t                   regionCrossingStart,
                           uint32_t                   regionCrossingEnd,
                           const fRECTANGLE&          boundingRect,
-                          const std::vector<fPOINT>& currentFormVertices) {
+                          const std::vector<fPOINT>& currentFormVertices) -> bool {
 	auto count = 0U;
 	auto point = fPOINT {};
 
@@ -2718,13 +2719,13 @@ void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
 	clipStitchPoints.push_back(clipStitchPoint);
 }
 
-bool form::internal::isect(uint32_t                   vertex0,
+auto form::internal::isect(uint32_t                   vertex0,
                            uint32_t                   vertex1,
                            fPOINT&                    intersection,
                            float&                     length,
                            const fPOINT&              lineSegmentStart,
                            const fPOINT&              lineSegmentEnd,
-                           const std::vector<fPOINT>& currentFormVertices) {
+                           const std::vector<fPOINT>& currentFormVertices) -> bool {
 	const auto delta            = fPOINT { (lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y) };
 	const auto point            = lineSegmentStart;
 	auto       tempIntersection = fPOINT {};
@@ -2780,7 +2781,7 @@ bool form::internal::isect(uint32_t                   vertex0,
 	return flag;
 }
 
-bool form::internal::clipComp(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept {
+auto form::internal::clipComp(const CLIPSORT* const arg1, const CLIPSORT* const arg2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if ((arg1 != nullptr) && (arg2 != nullptr)) {
 		const auto local1 = arg1->segmentLength;
@@ -2802,14 +2803,14 @@ void form::internal::mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, ui
 	}
 }
 
-uint32_t form::internal::insect(std::vector<CLIPSORT>&     clipIntersectData,
-                                const std::vector<VCLPX>&  regionCrossingData,
-                                std::vector<CLIPSORT*>&    arrayOfClipIntersectData,
-                                uint32_t                   regionCrossingStart,
-                                uint32_t                   regionCrossingEnd,
-                                const fPOINT&              lineSegmentStart,
-                                const fPOINT&              lineSegmentEnd,
-                                const std::vector<fPOINT>& currentFormVertices) {
+auto form::internal::insect(std::vector<CLIPSORT>&     clipIntersectData,
+                            const std::vector<VCLPX>&  regionCrossingData,
+                            std::vector<CLIPSORT*>&    arrayOfClipIntersectData,
+                            uint32_t                   regionCrossingStart,
+                            uint32_t                   regionCrossingEnd,
+                            const fPOINT&              lineSegmentStart,
+                            const fPOINT&              lineSegmentEnd,
+                            const std::vector<fPOINT>& currentFormVertices) -> uint32_t {
 	auto  iRegions        = 0U;
 	auto  iIntersection   = 0U;
 	auto  count           = 0U;
@@ -2872,10 +2873,10 @@ uint32_t form::internal::insect(std::vector<CLIPSORT>&     clipIntersectData,
 	return count;
 }
 
-float form::internal::getlen(std::vector<CLIPNT>&       clipStitchPoints,
-                             const std::vector<double>& lengths,
-                             uint32_t                   iPoint,
-                             const std::vector<fPOINT>& currentFormVertices) {
+auto form::internal::getlen(std::vector<CLIPNT>&       clipStitchPoints,
+                            const std::vector<double>& lengths,
+                            uint32_t                   iPoint,
+                            const std::vector<fPOINT>& currentFormVertices) -> float {
 	auto retval = 0.0F;
 	clipStitchPoints[iPoint].vertexIndex %= currentFormVertices.size();
 	auto vertexIt = currentFormVertices.cbegin();
@@ -2885,12 +2886,12 @@ float form::internal::getlen(std::vector<CLIPNT>&       clipStitchPoints,
 	return retval;
 }
 
-uint32_t form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
-                                 std::vector<CLPSEG>&       clipSegments,
-                                 const std::vector<double>& lengths,
-                                 uint32_t                   start,
-                                 uint32_t                   finish,
-                                 const std::vector<fPOINT>& currentFormVertices) {
+auto form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
+                             std::vector<CLPSEG>&       clipSegments,
+                             const std::vector<double>& lengths,
+                             uint32_t                   start,
+                             uint32_t                   finish,
+                             const std::vector<fPOINT>& currentFormVertices) -> uint32_t {
 	const auto clipSegment = CLPSEG { start,  getlen(clipStitchPoints, lengths, start, currentFormVertices),
 		                              0U,     clipStitchPoints[start].vertexIndex,
 		                              finish, getlen(clipStitchPoints, lengths, finish, currentFormVertices),
@@ -2900,7 +2901,7 @@ uint32_t form::internal::clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	return finish + 1U;
 }
 
-bool form::internal::lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept {
+auto form::internal::lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (arg1.length < arg2.length) {
 		return true;
@@ -2976,7 +2977,8 @@ void form::internal::ritseg(const std::vector<CLIPNT>& clipStitchPoints,
 	clipSegments[currentSegmentIndex].dun = 1;
 }
 
-bool form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t sind) {
+auto form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t sind)
+    -> bool {
 	auto       index        = 1U;
 	const auto indexDoubled = wrap::toUnsigned(clipSegments.size()) * 2U;
 
@@ -2999,9 +3001,9 @@ bool form::internal::clpnxt(const std::vector<CLPSEG>& clipSegments, const std::
 	return true;
 }
 
-bool form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
+auto form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
                             const std::vector<LENINFO>& sortedLengths,
-                            uint32_t&                   currentSegmentIndex) {
+                            uint32_t&                   currentSegmentIndex) -> bool {
 	auto index = 0U;
 
 	if (StateMap.test(StateFlag::FILDIR)) {
@@ -3023,7 +3025,7 @@ bool form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
 	return true;
 }
 
-bool form::internal::vscmp(uint32_t index1, uint32_t index2) noexcept {
+auto form::internal::vscmp(uint32_t index1, uint32_t index2) noexcept -> bool {
 	if ((*OSequence)[index1].x != (*OSequence)[index2].x) {
 		return true;
 	}
@@ -3481,7 +3483,7 @@ void form::angclpfn(const std::vector<RNGCNT>& textureSegments, std::vector<fPOI
 	form::fvars(ClosestFormToCursor);
 }
 
-bool form::internal::spComp(const SMALPNTL* const arg1, const SMALPNTL* const arg2) noexcept {
+auto form::internal::spComp(const SMALPNTL* const arg1, const SMALPNTL* const arg2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if ((arg1 != nullptr) && (arg2 != nullptr)) {
 		const auto& lineEnd1 = *arg1;
@@ -3509,9 +3511,9 @@ bool form::internal::spComp(const SMALPNTL* const arg1, const SMALPNTL* const ar
 	return false;
 }
 
-bool form::internal::isclos(const SMALPNTL* const lineEndPoint0,
+auto form::internal::isclos(const SMALPNTL* const lineEndPoint0,
                             const SMALPNTL* const lineEndPoint1,
-                            double                gapToClosestRegion) noexcept {
+                            double                gapToClosestRegion) noexcept -> bool {
 	if ((lineEndPoint0 != nullptr) && (lineEndPoint1 != nullptr)) {
 		const auto low0  = lineEndPoint0[0].y - gapToClosestRegion;
 		const auto high0 = lineEndPoint0[1].y + gapToClosestRegion;
@@ -3528,13 +3530,13 @@ bool form::internal::isclos(const SMALPNTL* const lineEndPoint0,
 	return true;
 }
 
-bool form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
+auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
                             std::vector<SMALPNTL>& lineEndpoints,
                             uint32_t               group0,
                             uint32_t               line0,
                             uint32_t               group1,
                             uint32_t               line1,
-                            double                 gapToClosestRegion) noexcept {
+                            double                 gapToClosestRegion) noexcept -> bool {
 	const auto lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
 
 	if (group1 > groupIndexSequence.size() - 2U) {
@@ -3567,14 +3569,14 @@ bool form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
 	return false;
 }
 
-bool form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
+auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
                              std::vector<SMALPNTL>&        lineEndpoints,
                              const std::vector<SMALPNTL*>& sortedLines,
                              uint32_t                      iRegion0,
                              uint32_t                      iRegion1,
                              const std::vector<REGION>&    regionsList,
                              double                        gapToClosestRegion,
-                             uint32_t&                     nextGroup) noexcept {
+                             uint32_t&                     nextGroup) noexcept -> bool {
 	const auto lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
 	auto       lineEndPoint0End   = gsl::narrow_cast<SMALPNTL*>(nullptr);
 	const auto lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
@@ -3652,7 +3654,7 @@ bool form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
 	return false;
 }
 
-bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions, uint32_t& visitedIndex) {
+auto form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions, uint32_t& visitedIndex) -> bool {
 	const auto regionCount = visitedRegions.size();
 	for (visitedIndex = 0; visitedIndex < regionCount; visitedIndex++) {
 		if (!visitedRegions[visitedIndex]) {
@@ -3662,13 +3664,13 @@ bool form::internal::unvis(const boost::dynamic_bitset<>& visitedRegions, uint32
 	return false;
 }
 
-bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
+auto form::internal::notdun(std::vector<RGSEQ>&            tempPath,
                             const std::vector<RCON>&       pathMap,
                             const std::vector<uint32_t>&   mapIndexSequence,
                             const boost::dynamic_bitset<>& visitedRegions,
                             uint32_t                       pathLength,
                             uint32_t                       doneRegion,
-                            uint32_t                       sequencePathIndex) {
+                            uint32_t                       sequencePathIndex) -> bool {
 	auto previousLevel = pathLength;
 	if (previousLevel != 0U) {
 		previousLevel--;
@@ -3721,10 +3723,10 @@ bool form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 	return false;
 }
 
-double form::internal::reglen(const std::vector<SMALPNTL*>& sortedLines,
-                              uint32_t                      iRegion,
-                              const std::vector<fPOINT>&    lastRegionCorners,
-                              const std::vector<REGION>&    regionsList) {
+auto form::internal::reglen(const std::vector<SMALPNTL*>& sortedLines,
+                            uint32_t                      iRegion,
+                            const std::vector<fPOINT>&    lastRegionCorners,
+                            const std::vector<REGION>&    regionsList) -> double {
 	auto lineEndPoints = std::vector<SMALPNTL*> {};
 	lineEndPoints.resize(4);
 
@@ -3951,7 +3953,7 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t 
 	lastGroup = sortedLines[finish][0].group;
 }
 
-SMALPNTL* form::internal::duseq2(SMALPNTL* sequenceLines) {
+auto form::internal::duseq2(SMALPNTL* sequenceLines) -> SMALPNTL* {
 	if (sequenceLines != nullptr) {
 		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x), form::midl(sequenceLines[1].y, sequenceLines[0].y));
 	}
@@ -5188,7 +5190,7 @@ void form::filangl() {
 	}
 }
 
-bool form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) {
+auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 	form::fvars(ClosestFormToCursor);
 	const auto point = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 
@@ -5407,7 +5409,7 @@ void form::filsat() {
 	}
 }
 
-bool form::internal::closat(intersectionStyles& inOutFlag) {
+auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
@@ -5531,7 +5533,7 @@ void form::insat() { // insert a point in a form
 	StateMap.set(StateFlag::RESTCH);
 }
 
-bool form::chkdel() noexcept {
+auto form::chkdel() noexcept -> bool {
 	if (SelectedForm->type == FRMLINE) {
 		return SelectedForm->vertexCount <= 2;
 	}
@@ -6643,7 +6645,7 @@ void form::dulens(uint32_t sides) {
 	form::mdufrm();
 }
 
-constexpr float form::internal::shreg(float highValue, float reference, float eggRatio) noexcept {
+constexpr auto form::internal::shreg(float highValue, float reference, float eggRatio) noexcept -> float {
 	return (highValue - reference) * eggRatio + reference;
 }
 
@@ -7151,7 +7153,7 @@ void form::internal::dufcntr(fPOINT& center) {
 	center = fPOINT { form::midl(bigRect.right, bigRect.left), form::midl(bigRect.top, bigRect.bottom) };
 }
 
-fPOINT form::rotpar() {
+auto form::rotpar() -> fPOINT {
 	auto rotationCenter = fPOINT {};
 	if (StateMap.test(StateFlag::FPSEL)) {
 		RotationRect = SelectedVerticesRect;
@@ -7477,7 +7479,7 @@ void form::refilal() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-bool form::internal::notsel() noexcept {
+auto form::internal::notsel() noexcept -> bool {
 	for (auto selectedForm : (*SelectedFormList)) {
 		if (selectedForm == ClosestFormToCursor) {
 			return false;
@@ -7579,7 +7581,7 @@ void form::selfil(uint32_t type) {
 	}
 }
 
-bool form::notfstch(uint32_t attribute) noexcept {
+auto form::notfstch(uint32_t attribute) noexcept -> bool {
 	if ((attribute & NOTFRM) != 0U) {
 		return true;
 	}
@@ -7617,7 +7619,7 @@ void form::selalfil() {
 	}
 }
 
-bool form::frmrng(uint32_t iForm, RANGE& range) {
+auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
 	auto retval = false;
 	if (!StitchBuffer->empty()) {
 		range.start          = 0;
@@ -7789,7 +7791,7 @@ void form::picot() {
 	}
 }
 
-bool form::internal::contsf(uint32_t formIndex) {
+auto form::internal::contsf(uint32_t formIndex) -> bool {
 	ClosestFormToCursor = formIndex;
 	form::fvars(formIndex);
 	if (SelectedForm->vertexCount > 4) {
@@ -8030,7 +8032,7 @@ void form::frmnumfn(uint32_t newFormIndex) {
 	}
 }
 
-constexpr uint32_t form::internal::duat(uint32_t attribute) {
+constexpr auto form::internal::duat(uint32_t attribute) -> uint32_t {
 	const auto type = ((attribute >> TYPSHFT) + 1U) & 3U;
 	const auto frm  = (attribute & FRMSK) >> 2U;
 
@@ -8368,7 +8370,7 @@ void form::stchadj() {
 	StateMap.reset(StateFlag::FRMPSEL);
 }
 
-bool form::internal::spltlin() {
+auto form::internal::spltlin() -> bool {
 	if (ClosestVertexToCursor < 1 || SelectedForm->vertexCount - ClosestVertexToCursor < 2) {
 		return false;
 	}

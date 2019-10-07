@@ -255,7 +255,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
 	displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
-bool displayText::clpmsgs(uint32_t code) {
+auto displayText::clpmsgs(uint32_t code) -> bool {
 	form::ispcdclp();
 	if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
 		displayText::tabmsg(IDS_CLPS);
@@ -271,7 +271,7 @@ void displayText::frm1pnt() {
 	}
 }
 
-bool displayText::filmsgs(uint32_t code) {
+auto displayText::filmsgs(uint32_t code) -> bool {
 	if (!SelectedFormList->empty()) {
 		return displayText::clpmsgs(code);
 	}
@@ -486,7 +486,7 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	SetWindowText((*ButtonWin)[HTXMIR + 1U], L"");
 }
 
-HFONT displayText::getThrEdFont(int32_t weight) noexcept {
+auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 	auto lfText = LOGFONT { 0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
 #if HIGHDPI
 	const auto uDpi = GetDpiForWindow(ThrEdWindow);

@@ -13,10 +13,10 @@ clang-analyzer-optin.portability*,\
 clang-analyzer-security*,\
 clang-analyzer-unix*,\
 clang-analyzer-valist*,\
-cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,\
+cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
 google-*,-google-runtime-references,\
 llvm-*,-llvm-include-order,\
-misc-*,\
+misc-*,-misc-non-private-member-variables-in-classes,\
 modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
 performance-*,\

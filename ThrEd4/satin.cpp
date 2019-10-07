@@ -72,7 +72,7 @@ void satin::internal::sacspac(uint32_t startGuide, uint32_t guideCount) {
 	}
 }
 
-uint32_t satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) {
+auto satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
 	auto  guideIndex = 0U;
 	auto& formList   = *FormList;
 
@@ -283,7 +283,7 @@ void satin::satknkt() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-bool satin::internal::satselfn() {
+auto satin::internal::satselfn() -> bool {
 	auto minimumLength = 1e99;
 
 	thred::px2stch();
@@ -330,7 +330,7 @@ void satin::internal::satcpy(const std::vector<SATCON>& source, uint32_t size) {
 	std::copy(source.cbegin(), source.cend(), guideIt);
 }
 
-bool satin::scomp(const SATCON& arg1, const SATCON& arg2) noexcept {
+auto satin::scomp(const SATCON& arg1, const SATCON& arg2) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (arg1.start < arg2.start) {
 		return true;
@@ -1476,7 +1476,7 @@ void satin::internal::outfn(uint32_t start, uint32_t finish, float satinWidth) {
 	(*OutsidePoints)[finish].y = vertexIt[finish].y + yOffset;
 }
 
-bool satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) noexcept {
+auto satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) noexcept -> bool {
 	const auto maxSB = satinBackup.size();
 	for (auto iBackup = 0U; iBackup < maxSB; iBackup++) {
 		const auto length = hypot(satinBackup[iBackup].x - pnt.x, satinBackup[iBackup].y - pnt.y);
@@ -1487,7 +1487,7 @@ bool satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOIN
 	return false;
 }
 
-uint32_t satin::adsatk(uint32_t count) {
+auto satin::adsatk(uint32_t count) -> uint32_t {
 	const auto iSatinConnect = wrap::toUnsigned(SatinGuides->size());
 	const auto it            = SatinGuides->end();
 	const auto val           = SATCON {};

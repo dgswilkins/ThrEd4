@@ -127,7 +127,7 @@ void trace::internal::trcratnum() {
 	displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1.0F)));
 }
 
-bool trace::internal::trcin(COLORREF color) {
+auto trace::internal::trcin(COLORREF color) -> bool {
 	if (color != 0U) {
 		ti::trcols(color);
 		if (StateMap.test(StateFlag::TRCRED)) {
@@ -266,7 +266,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 	}
 }
 
-uint32_t trace::internal::trsum() noexcept {
+auto trace::internal::trsum() noexcept -> uint32_t {
 	auto sumAdjacent = 0U;
 
 	for (auto iAdjacent = 1U; iAdjacent < 9U; iAdjacent++) {
@@ -538,7 +538,8 @@ void trace::tracedg() {
 	StateMap.set(StateFlag::WASEDG);
 }
 
-bool trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints) {
+auto trace::internal::trcbit(const uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints)
+    -> bool {
 	auto pixelIndex = CurrentTracePoint.y * BitmapWidth + CurrentTracePoint.x;
 	switch (traceDirection) {
 	case TRCR: {
@@ -784,6 +785,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRM2L);
 			return;
 		}
+		#ifndef TESTTRC
 		auto decimatedLine = std::vector<TRCPNT> {};
 		decimatedLine.reserve(tracedPoints.size());
 		TRCPNT traceDiff[2] = {};
@@ -800,18 +802,19 @@ void trace::internal::dutrac() {
 		tracedPoints.clear();
 		tracedPoints.reserve(decimatedLine.size());
 		tracedPoints.push_back(decimatedLine[0]);
-		auto iNext = 0U;
+		auto iNextDec = 0U;
 		for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
 			const auto traceLength
-			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNext].x, decimatedLine[iCurrent].y - decimatedLine[iNext].y);
+			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x, decimatedLine[iCurrent].y - decimatedLine[iNextDec].y);
 			if (traceLength > IniFile.traceLength) {
-				tracedPoints.push_back(decimatedLine[iNext]);
-				iNext = iCurrent;
+				tracedPoints.push_back(decimatedLine[iNextDec]);
+				iNextDec = iCurrent;
 			}
 		}
-		for (auto iCurrent = iNext + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
+		for (auto iCurrent = iNextDec + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
+		#endif
 		FormList->push_back(FRMHED {});
 		SelectedForm = &(FormList->back());
 		form::frmclr(*SelectedForm);
@@ -820,7 +823,7 @@ void trace::internal::dutrac() {
 		FormVertices->push_back(fPOINT { gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
 		                                 gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y });
 		OutputIndex++;
-		iNext                = 0;
+		auto iNext                = 0;
 		auto traceLengthSum  = 0.0F;
 		auto landscapeOffset = 0.0F;
 		if (StateMap.test(StateFlag::LANDSCAP)) {
@@ -1009,7 +1012,7 @@ void trace::dutrnum1() {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) uint32_t trace::internal::ducolm() {
+GSL_SUPPRESS(26440) auto trace::internal::ducolm() -> uint32_t {
 	if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth)) {
 		return 0U;
 	}

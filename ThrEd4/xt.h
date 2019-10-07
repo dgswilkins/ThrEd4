@@ -59,9 +59,7 @@ void fethr();
 void fethrf();
 void fsort();
 void fthrfn();
-
-std::vector<fPOINT>& insid();
-
+auto insid() -> std::vector<fPOINT>&;
 void intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap);
 void mvshft();
 void notcwlk();
@@ -108,16 +106,17 @@ namespace internal {
 	void prbug() noexcept;
 #endif
 
-	void     bcolfn(uint32_t find, uint32_t color);
-	void     blenfn(uint32_t find, float length);
-	void     bmaxfn(uint32_t find, float length);
-	void     bminfn(uint32_t find, float length);
-	uint32_t bpsg() noexcept;
-	void     bspacfn(uint32_t find, float length);
-	bool     chkasp(fPOINT& point, float aspectRatio, HWND dialog);
-	void     chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
-	bool
-	     chkrdun(const std::vector<uint32_t>& formFillCounter, const std::vector<OREC*>& pRecs, const SRTREC& stitchRecord) noexcept;
+	void bcolfn(uint32_t find, uint32_t color);
+	void blenfn(uint32_t find, float length);
+	void bmaxfn(uint32_t find, float length);
+	void bminfn(uint32_t find, float length);
+	auto bpsg() noexcept -> uint32_t;
+	void bspacfn(uint32_t find, float length);
+	auto chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool;
+	void chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
+	auto chkrdun(const std::vector<uint32_t>& formFillCounter,
+	             const std::vector<OREC*>&    pRecs,
+	             const SRTREC&                stitchRecord) noexcept -> bool;
 	void chkuseq();
 	void delwlk(uint32_t code);
 
@@ -126,53 +125,48 @@ namespace internal {
 	void duatf(uint32_t ind);
 #endif
 
-	void     duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
-	uint32_t duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord);
+	void duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
+	auto duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) -> uint32_t;
 
 	constexpr float durat(float start, float finish, float featherRatio);
 
-	void     durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather);
-	void     durec(OREC& record) noexcept;
-	uint32_t dutyp(uint32_t attribute) noexcept;
-
+	void durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather);
+	void durec(OREC& record) noexcept;
+	auto dutyp(uint32_t attribute) noexcept -> uint32_t;
 	void duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) noexcept;
 
 	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
 
-	void  fangfn(uint32_t find, float angle);
-	void  fcolfn(uint32_t find, uint32_t color);
-	void  fhifn(uint32_t find, float length);
-	void  findfn(uint32_t find, float indent);
-	void  flenfn(uint32_t find, float length);
-	void  fmaxfn(uint32_t find, float length);
-	void  fminfn(uint32_t find, float length);
-	void  fncwlk();
-	void  fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices);
-	void  fnwlk(uint32_t find);
-	void  fritfil(std::vector<fPOINT>& featherSequence);
-	void  fspacfn(uint32_t find, float spacing);
-	void  fthdfn(uint32_t iSequence, FEATHER& feather);
-	void  fthfn(uint32_t iSequence, FEATHER& feather);
-	void  fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
-	void  fthvars(FEATHER& feather);
-	void  fwidfn(uint32_t find, float length);
-	float getstxt(uint32_t stringIndex, HWND dialog);
-
-	uint32_t
-	gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code);
-
-	bool   isfil() noexcept;
-	bool   lastcol(uint32_t index, fPOINT& point) noexcept;
-	fPOINT midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept;
-	void   notundfn(uint32_t code);
-	void   nudfn(const fRECTANGLE& designSizeRect);
-	void   nurat(FEATHER& feather) noexcept;
-
-	double precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord);
-
+	void fangfn(uint32_t find, float angle);
+	void fcolfn(uint32_t find, uint32_t color);
+	void fhifn(uint32_t find, float length);
+	void findfn(uint32_t find, float indent);
+	void flenfn(uint32_t find, float length);
+	void fmaxfn(uint32_t find, float length);
+	void fminfn(uint32_t find, float length);
+	void fncwlk();
+	void fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices);
+	void fnwlk(uint32_t find);
+	void fritfil(std::vector<fPOINT>& featherSequence);
+	void fspacfn(uint32_t find, float spacing);
+	void fthdfn(uint32_t iSequence, FEATHER& feather);
+	void fthfn(uint32_t iSequence, FEATHER& feather);
+	void fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
+	void fthvars(FEATHER& feather);
+	void fwidfn(uint32_t find, float length);
+	auto getstxt(uint32_t stringIndex, HWND dialog) -> float;
+	auto gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code)
+	    -> uint32_t;
+	auto isfil() noexcept -> bool;
+	auto lastcol(uint32_t index, fPOINT& point) noexcept -> bool;
+	auto midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept -> fPOINT;
+	void notundfn(uint32_t code);
+	void nudfn(const fRECTANGLE& designSizeRect);
+	void nurat(FEATHER& feather) noexcept;
+	auto precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord) -> double;
 	void ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept;
-	bool orComp(const OREC* record1, const OREC* record2) noexcept;
-	bool orfComp(const OREC* record1, const OREC* record2) noexcept;
+	auto orComp(const OREC* record1, const OREC* record2) noexcept -> bool;
+	auto orfComp(const OREC* record1, const OREC* record2) noexcept -> bool;
 	void rtrclpfn();
 	void ritcwlk();
 	void ritund();
@@ -184,7 +178,7 @@ namespace internal {
 
 	void setstxt(uint32_t stringIndex, float value, HWND dialog);
 	void setundfn(uint32_t code);
-	bool srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept;
+	auto srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count, uint32_t& badForm) noexcept -> bool;
 
 	constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept;
 

@@ -24,7 +24,7 @@
 #include "switches.h"
 #include "wrappers.h"
 
-float wrap::bufToFloat(const wchar_t* buffer) {
+auto wrap::bufToFloat(const wchar_t* buffer) -> float {
 	auto value = 0.0F;
 
 	try {
@@ -41,7 +41,7 @@ void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
-bool wrap::pressed(int virtKey) noexcept {
+auto wrap::pressed(int virtKey) noexcept -> bool {
 	return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000U) != 0U;
 }
 
@@ -49,7 +49,8 @@ void wrap::WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD
 	WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-bool wrap::ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept {
+auto wrap::ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
+    -> bool {
 	return (ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped) == TRUE);
 }
 
@@ -65,7 +66,7 @@ void wrap::GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSI
 	GetTextExtentPoint(hdc, lpString, gsl::narrow<int32_t>(cbString), lpSize);
 }
 
-float wrap::toFloat(double invar) {
+auto wrap::toFloat(double invar) -> float {
 	auto result = 0.0F;
 	try {
 		result = gsl::narrow<float>(invar);
@@ -88,15 +89,15 @@ float wrap::toFloat(double invar) {
 	return result;
 }
 
-float wrap::toFloat(int32_t invar) noexcept {
+auto wrap::toFloat(int32_t invar) noexcept -> float {
 	return gsl::narrow_cast<float>(invar);
 }
 
-float wrap::toFloat(LONG invar) noexcept {
+auto wrap::toFloat(LONG invar) noexcept -> float {
 	return gsl::narrow_cast<float>(invar);
 }
 
-float wrap::toFloat(uint32_t invar) noexcept {
+auto wrap::toFloat(uint32_t invar) noexcept -> float {
 	return gsl::narrow_cast<float>(invar);
 }
 
@@ -104,7 +105,7 @@ float wrap::toFloat(uint32_t invar) noexcept {
 #pragma warning(disable : 26440) // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(disable : 26497) // since this is used in other translation units, "constexpr" cannot be used as it implicitly
                                  // defines the function as inline
-uint32_t wrap::toUnsigned(size_t invar) {
+auto wrap::toUnsigned(size_t invar) -> uint32_t {
 #ifdef _WIN64
 	return gsl::narrow<uint32_t>(invar);
 #else
@@ -113,19 +114,19 @@ uint32_t wrap::toUnsigned(size_t invar) {
 }
 #pragma warning(pop)
 
-double wrap::toDouble(float invar) noexcept {
+auto wrap::toDouble(float invar) noexcept -> double {
 	return gsl::narrow_cast<double>(invar);
 }
 
-double wrap::toDouble(int32_t invar) noexcept {
+auto wrap::toDouble(int32_t invar) noexcept -> double {
 	return gsl::narrow_cast<double>(invar);
 }
 
-size_t wrap::toSize(uint32_t invar) noexcept {
+auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 	return gsl::narrow_cast<size_t>(invar);
 }
 
-float wrap::wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept {
+auto wrap::wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept -> float {
 	return std::wcstof(static_cast<const wchar_t*>(buffer), nullptr);
 }
 
@@ -137,7 +138,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 	}
 }
 
-HPEN wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept {
+auto wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN {
 	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }

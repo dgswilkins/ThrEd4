@@ -153,7 +153,7 @@ void repair::internal::chkTxt(const FRMHED& form, BADCNTS& badData) noexcept {
 	}
 }
 
-uint32_t repair::internal::frmchkfn() {
+auto repair::internal::frmchkfn() -> uint32_t {
 	auto badData = BADCNTS {};
 
 	if (!FormList->empty()) {

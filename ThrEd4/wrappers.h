@@ -22,26 +22,26 @@
 #include "ThrEdTypes.h"
 
 namespace wrap {
-float    bufToFloat(const wchar_t* buffer);
-HPEN     CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept;
-void     GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
-void     GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
-void     Polyline(HDC hdc, const POINT* apt, uint32_t cpt) noexcept;
-bool     pressed(int virtKey) noexcept;
-bool     ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept;
-void     setCursor(HCURSOR hCursor) noexcept;
-void     setSideWinVal(int index) noexcept;
-void     TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
-double   toDouble(float invar) noexcept;
-double   toDouble(int32_t invar) noexcept;
-float    toFloat(double invar);
-float    toFloat(int32_t invar) noexcept;
-float    toFloat(LONG invar) noexcept;
-float    toFloat(uint32_t invar) noexcept;
-size_t   toSize(uint32_t invar) noexcept;
-uint32_t toUnsigned(size_t invar);
-float    wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept;
-void     WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
+auto bufToFloat(const wchar_t* buffer) -> float;
+auto CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN;
+void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
+void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
+void Polyline(HDC hdc, const POINT* apt, uint32_t cpt) noexcept;
+auto pressed(int virtKey) noexcept -> bool;
+auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept -> bool;
+void setCursor(HCURSOR hCursor) noexcept;
+void setSideWinVal(int index) noexcept;
+void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
+auto toDouble(float invar) noexcept -> double;
+auto toDouble(int32_t invar) noexcept -> double;
+auto toFloat(double invar) -> float;
+auto toFloat(int32_t invar) noexcept -> float;
+auto toFloat(LONG invar) noexcept -> float;
+auto toFloat(uint32_t invar) noexcept -> float;
+auto toSize(uint32_t invar) noexcept -> size_t;
+auto toUnsigned(size_t invar) -> uint32_t;
+auto wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept -> float;
+void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
