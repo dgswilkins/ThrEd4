@@ -699,7 +699,7 @@ void satin::satbrd() {
 
 void satin::internal::satends(uint32_t isBlunt, float width) {
 	auto& form = FormList->operator[](ClosestFormToCursor);
-	auto& vertexIndex = form.vertexIndex;
+	const auto& vertexIndex = form.vertexIndex;
 	auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	if ((isBlunt & SBLNT) != 0U) {
 		auto step = fPOINT{ sin(FormAngles->front()) * width / 2.0F, cos(FormAngles->front()) * width / 2.0F };
@@ -713,7 +713,7 @@ void satin::internal::satends(uint32_t isBlunt, float width) {
 	else {
 		InsidePoints->front() = OutsidePoints->front() = *vertexIt;
 	}
-	auto& vertexCount = form.vertexCount;
+	const auto& vertexCount = form.vertexCount;
 	vertexIt += vertexCount - 1U;
 	if ((isBlunt & FBLNT) != 0U) {
 		auto step
