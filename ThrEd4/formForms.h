@@ -54,12 +54,12 @@ namespace internal {
 	void prftwin(const std::wstring& text) noexcept;
 	void refrmfn(uint32_t& formMenuEntryCount);
 
-	bool CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 	auto txtrwin(const std::wstring& winName, const RECT& location) -> HWND;
 	auto txtwin(const std::wstring& windowName, const RECT& location) -> HWND;
 	void wavinit(HWND hwndlg);
 
-	bool CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 } // namespace internal
 } // namespace formForms

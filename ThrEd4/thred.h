@@ -144,7 +144,7 @@ namespace internal {
 	void deltot();
 	void desiz();
 
-	BOOL CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 	auto doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool;
 	void drawBackground();
@@ -199,7 +199,7 @@ namespace internal {
 	void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
 	void endpnt();
 
-	BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept;
+	auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 	void esccode();
 	void f1del();
@@ -221,7 +221,7 @@ namespace internal {
 	auto frmstch() -> bool;
 	auto fswap(COLORREF color) noexcept -> COLORREF;
 
-	BOOL CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 	void getbak();
 	void getdes() noexcept;
@@ -288,7 +288,7 @@ namespace internal {
 	void linbmen();
 	void lock();
 
-	INT_PTR CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
 	void lodbmp();
 	void lodclp(uint32_t iStitch);
@@ -478,7 +478,7 @@ namespace internal {
 	void vuselthr();
 	void vuthrds();
 
-	LRESULT CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	auto CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
 	auto wastch() noexcept -> bool;
 	void xlin();

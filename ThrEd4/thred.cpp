@@ -983,7 +983,7 @@ const uint32_t EdgeFillTypes[] = // edge fill type array for side window display
 const uint32_t FeatherFillTypes[] = // feather fill types
     { FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ };
 
-BOOL CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	switch (umsg) {
@@ -2741,7 +2741,7 @@ GSL_SUPPRESS(26461) auto thred::internal::oldwnd(HWND window) noexcept -> bool {
 	return true;
 }
 
-BOOL CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept {
+auto CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 	UNREFERENCED_PARAMETER(lParam);
 
 	if (oldwnd(hwnd)) {
@@ -11265,7 +11265,7 @@ void thred::internal::ritlock(const WIN32_FIND_DATA* fileData, uint32_t fileInde
 	}
 }
 
-INT_PTR CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
 	auto fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
 
 	switch (umsg) {
@@ -11987,7 +11987,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 	}
 }
 
-BOOL CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	switch (umsg) {
@@ -18984,7 +18984,7 @@ struct CreateParams {
 	BOOL bEnableNonClientDpiScaling;
 };
 
-LRESULT CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) {
+auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
 	switch (message) {
 #if HIGHDPI
 	case WM_NCCREATE: {
@@ -19453,10 +19453,10 @@ auto handle_program_memory_depletion(uint32_t)->int32_t {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
-int32_t APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                           _In_opt_ HINSTANCE hPrevInstance,
                           _In_ LPTSTR lpCmdLine, // NOLINT
-                          _In_ int32_t nShowCmd) {
+                          _In_ int32_t nShowCmd) -> int32_t {
 	UNREFERENCED_PARAMETER(nShowCmd);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);

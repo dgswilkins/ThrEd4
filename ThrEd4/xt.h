@@ -135,7 +135,7 @@ namespace internal {
 	auto dutyp(uint32_t attribute) noexcept -> uint32_t;
 	void duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) noexcept;
 
-	BOOL CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept;
+	auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 	void fangfn(uint32_t find, float angle);
 	void fcolfn(uint32_t find, uint32_t color);
@@ -174,7 +174,7 @@ namespace internal {
 	void sadj(fPOINT& point, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 
-	BOOL CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+	auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
 	void setstxt(uint32_t stringIndex, float value, HWND dialog);
 	void setundfn(uint32_t code);

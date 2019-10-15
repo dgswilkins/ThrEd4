@@ -750,7 +750,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
 
-BOOL CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	switch (umsg) { // NOLINT
@@ -984,7 +984,7 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(L"{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 
-bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	switch (umsg) { // NOLINT
@@ -1049,7 +1049,7 @@ bool CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		}
 	}
 	}
-	return false;
+	return FALSE;
 }
 
 void formForms::setear() {
@@ -1131,7 +1131,7 @@ void formForms::internal::wavinit(HWND hwndlg) {
 	SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(L"{}", IniFile.waveLobes).c_str());
 }
 
-bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	switch (umsg) { // NOLINT
@@ -1181,7 +1181,7 @@ bool CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		}
 	}
 	}
-	return false;
+	return FALSE;
 }
 
 void formForms::wavfrm() {

@@ -40,7 +40,7 @@ void satpnt1();
 void satsel();
 void satzum();
 void sbrd(float width);
-bool scomp(const SATCON& arg1, const SATCON& arg2) noexcept;
+auto scomp(const SATCON& arg1, const SATCON& arg2) noexcept -> bool;
 void slbrd();
 void spltsat(uint32_t guideIndex);
 

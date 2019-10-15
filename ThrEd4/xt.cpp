@@ -2394,7 +2394,7 @@ auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool
 	return (point.y / point.x) == aspectRatio;
 }
 
-BOOL CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) {
+auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 	UNREFERENCED_PARAMETER(lparam);
 
 	auto designSizeDialog = hwndlg; // change design size dialog window
@@ -2564,7 +2564,7 @@ void xt::setclpspac() {
 	displayText::numWnd();
 }
 
-BOOL CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept {
+auto CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 	UNREFERENCED_PARAMETER(lParam);
 
 	DestroyWindow(hwnd);
