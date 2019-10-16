@@ -278,8 +278,8 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	if (!FormList->empty()) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			SelectedForm = &((*FormList)[ClosestFormToCursor]);
-			if (SelectedForm->vertexCount == 2) {
+			const auto& form = FormList->operator[](ClosestFormToCursor);
+			if (form.vertexCount == 2) {
 				if (code < FML_LIN) {
 					displayText::tabmsg(IDS_FRM3X);
 					return true;
