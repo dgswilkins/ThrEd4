@@ -92,11 +92,12 @@ auto form::internal::fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2)
 }
 
 void form::dusqr() {
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	if (UserFlagMap.test(UserFlag::SQRFIL)) {
-		SelectedForm->extendedAttribute |= AT_SQR;
+		form.extendedAttribute |= AT_SQR;
 	}
 	else {
-		SelectedForm->extendedAttribute &= ~(AT_SQR);
+		form.extendedAttribute &= ~(AT_SQR);
 	}
 }
 
@@ -175,9 +176,11 @@ void form::delmfil() {
 }
 
 void form::fsizpar() noexcept {
-	SelectedForm->maxFillStitchLen           = IniFile.maxStitchLength;
-	SelectedForm->lengthOrCount.stitchLength = UserStitchLength;
-	SelectedForm->minFillStitchLen           = MinStitchLength;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+
+	form.maxFillStitchLen           = IniFile.maxStitchLength;
+	form.lengthOrCount.stitchLength = UserStitchLength;
+	form.minFillStitchLen           = MinStitchLength;
 }
 
 void form::chkcont() {
