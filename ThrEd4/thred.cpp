@@ -8057,8 +8057,8 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 
 		length = hypot(delta.x, delta.y);
 		finish++;
-	} while (length < 2.0F && finish < wrap::toUnsigned(buffer.size()));
-	if (finish < wrap::toUnsigned(buffer.size())) {
+	} while (length < 2.0F && finish < wrap::toUnsigned(StitchBuffer->size()));
+	if (finish < wrap::toUnsigned(StitchBuffer->size())) {
 		KnotAttribute = (*StitchBuffer)[start].attribute | KNOTMSK;
 		KnotStep.x    = 2.0F / length * delta.x;
 		KnotStep.y    = 2.0F / length * delta.y;
