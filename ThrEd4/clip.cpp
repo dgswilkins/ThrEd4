@@ -342,7 +342,7 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 }
 
 void clip::clpout(float width) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (form.type == FRMLINE) {
 		satin::satout(width);
 	}
@@ -517,7 +517,7 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
                            const std::vector<float>& listSINEs,
                            const std::vector<float>& listCOSINEs) {
 	auto moveToCoords = fPOINT {}; // moving formOrigin for clipboard fill
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	AdjustedSpace = 0.0F;
 	auto flag     = true;
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);

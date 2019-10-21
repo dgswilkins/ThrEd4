@@ -2124,7 +2124,7 @@ void form::internal::dubfn() {
 
 void form::internal::chkbrd() {
 	form::fvars(ClosestFormToCursor);
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (form.edgeType != 0U) {
 		switch (form.edgeType & NEGUND) {
 		case EDGELINE: { // Line

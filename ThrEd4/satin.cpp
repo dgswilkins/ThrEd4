@@ -698,7 +698,7 @@ void satin::satbrd() {
 }
 
 void satin::internal::satends(uint32_t isBlunt, float width) {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	const auto& vertexIndex = form.vertexIndex;
 	auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	if ((isBlunt & SBLNT) != 0U) {
