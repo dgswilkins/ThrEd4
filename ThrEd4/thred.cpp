@@ -10130,8 +10130,11 @@ void thred::internal::setsrch(uint32_t stitch) {
 }
 
 auto thred::internal::inrng(uint32_t stitch) noexcept -> bool {
-	return (*StitchBuffer)[stitch].x >= StitchRangeRect.left && (*StitchBuffer)[stitch].x <= StitchRangeRect.right
-	       && (*StitchBuffer)[stitch].y >= StitchRangeRect.bottom && (*StitchBuffer)[stitch].y <= StitchRangeRect.top;
+	if (stitch < StitchBuffer->size()) {
+		return (*StitchBuffer)[stitch].x >= StitchRangeRect.left && (*StitchBuffer)[stitch].x <= StitchRangeRect.right
+			&& (*StitchBuffer)[stitch].y >= StitchRangeRect.bottom && (*StitchBuffer)[stitch].y <= StitchRangeRect.top;
+	}
+	return false;
 }
 
 auto thred::internal::finrng(uint32_t find) noexcept -> bool {
