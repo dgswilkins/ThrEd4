@@ -83,6 +83,7 @@ void repair::lodchk() {
 				}
 				else {
 					stitch.attribute &= (NFRMSK & NTYPMSK);
+					stitch.attribute |= NOTFRM;
 				}
 			}
 		}

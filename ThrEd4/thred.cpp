@@ -7894,6 +7894,7 @@ void thred::frmdel() {
 				const auto stitchForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 				if (stitchForm == ClosestFormToCursor) {
 					stitch.attribute &= (NFRMSK & NTYPMSK);
+					stitch.attribute |= NOTFRM;
 				}
 				if (stitchForm > ClosestFormToCursor) {
 					stitch.attribute &= NFRMSK;
@@ -7947,6 +7948,7 @@ void thred::internal::delsfrms(uint32_t code) {
 						const auto iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 						if (formMap.test(iForm)) {
 							stitch.attribute &= (NFRMSK & NTYPMSK);
+							stitch.attribute |= NOTFRM;
 						}
 						else {
 							stitch.attribute &= NFRMSK;
@@ -9968,10 +9970,12 @@ GSL_SUPPRESS(26440) auto thred::internal::makbig(uint32_t start, uint32_t finish
 				if (((attribute & NOTFRM) == 0U) && (((*nextStitchIt).attribute & TYPMSK) != 0U)) {
 					if (!((attribute & FRMSK) == ((*nextStitchIt).attribute & FRMSK))) {
 						attribute &= NTYPMSK;
+						attribute |= NOTFRM;
 					}
 				}
 				else {
 					attribute &= NTYPMSK;
+					attribute |= NOTFRM;
 				}
 			}
 			attribute &= (~KNOTMSK);
