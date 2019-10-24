@@ -9103,7 +9103,7 @@ void thred::internal::insfil() {
 						auto newAttribute = 0U;
 						for (auto iPCSStitch = 0U; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
 							if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-								newAttribute = pcsStitchBuffer[iPCSStitch++].fx;
+								newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
 							}
 							else {
 								(*StitchBuffer)
