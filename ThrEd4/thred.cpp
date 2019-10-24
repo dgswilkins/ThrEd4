@@ -7860,10 +7860,10 @@ void thred::internal::f1del() {
 	if (StateMap.test(StateFlag::DELTO)) {
 		const auto codedForm = ClosestFormToCursor << FRMSHFT;
 		StitchBuffer->erase(
-		    std::remove_if(StitchBuffer->begin(),
-		                   StitchBuffer->end(),
-		                   [codedForm](const fPOINTATTR& m) -> bool { return (m.attribute & FRMSK) == codedForm; }),
-		    StitchBuffer->end());
+			std::remove_if(StitchBuffer->begin(),
+				StitchBuffer->end(),
+				[codedForm](const fPOINTATTR& m) -> bool { return (((m.attribute & NOTFRM) == 0U) && ((m.attribute & FRMSK) == codedForm)); }),
+			StitchBuffer->end());
 	}
 	clip::deleclp(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
