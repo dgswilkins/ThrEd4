@@ -5310,7 +5310,7 @@ auto thred::internal::fswap(COLORREF color) noexcept -> COLORREF {
 
 constexpr auto thred::internal::gudtyp(WORD bitCount) noexcept -> bool {
 	auto flag = false;
-	switch (bitCount) {
+	switch (bitCount) { // NOLINT
 	case 1U:
 	case 24U:
 	case 32U:
@@ -7884,7 +7884,7 @@ void thred::frmdel() {
 				const auto stitchForm = (stitch.attribute & FRMSK);
 				if (stitchForm > codedForm) {
 					stitch.attribute &= NFRMSK;
-					stitch.attribute |= (stitchForm - (1 << FRMSHFT));
+					stitch.attribute |= (stitchForm - (1U << FRMSHFT));
 				}
 			}
 		}
@@ -7899,7 +7899,7 @@ void thred::frmdel() {
 				}
 				if (stitchForm > codedForm) {
 					stitch.attribute &= NFRMSK;
-					stitch.attribute |= (stitchForm - (1 << FRMSHFT));
+					stitch.attribute |= (stitchForm - (1U << FRMSHFT));
 				}
 			}
 		}
