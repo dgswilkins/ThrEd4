@@ -737,7 +737,6 @@ void satin::ribon() {
 		if (VertexCount > 2) {
 			thred::savdo();
 			const auto savedFormIndex = ClosestFormToCursor;
-			const auto newAttribute   = (SelectedForm->attribute & FRMLMSK) | FRMEND;
 			satin::satout(BorderWidth);
 			form::fvars(ClosestFormToCursor);
 			if (!FormList->empty()) {
@@ -790,7 +789,9 @@ void satin::ribon() {
 				form.fillSpacing                = LineSpacing;
 				form.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 				form.vertexCount                = iNewVertex;
-				form.attribute                  = newAttribute;
+				form.attribute                  = SelectedForm->attribute;
+				form.attribute &= FRMLMSK;
+				form.attribute |= FRMEND;
 				form.wordParam                  = iNewVertex / 2;
 				form.satinGuideCount            = form.wordParam - 2U;
 				form.satinOrAngle.guide         = adsatk(form.satinGuideCount);
