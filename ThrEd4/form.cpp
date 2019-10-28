@@ -7158,51 +7158,38 @@ void form::internal::dufcntr(fPOINT& center) {
 
 auto form::rotpar() -> fPOINT {
 	auto rotationCenter = fPOINT {};
-	if (StateMap.test(StateFlag::FPSEL)) {
-		RotationRect = SelectedVerticesRect;
+	do {
+		if (StateMap.test(StateFlag::FORMSEL)) {
+			form::fvars(ClosestFormToCursor);
+			RotationRect = SelectedForm->rectangle;
+			StateMap.set(StateFlag::FRMROT);
+			break;
+		}
+		if (!SelectedFormList->empty()) {
+			form::pxrct2stch(SelectedFormsRect, RotationRect);
+			StateMap.set(StateFlag::FRMSROT);
+			break;
+		}
+		if (StateMap.test(StateFlag::BIGBOX)) {
+			RotationRect = AllItemsRect;
+			break;
+		}
+		if (StateMap.test(StateFlag::GRPSEL)) {
+			thred::rngadj();
+			thred::selRct(RotationRect);
+			break;
+		}
+		if (StateMap.test(StateFlag::FPSEL)) {
+			RotationRect = SelectedVerticesRect;
+			break;
+		}
+	} while (false);
+	if (StateMap.test(StateFlag::GMRK)) {
+		rotationCenter = ZoomMarkPoint;
+	}
+	else {
 		rotationCenter
-		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-		return rotationCenter;
-	}
-	if (StateMap.test(StateFlag::BIGBOX)) {
-		RotationRect = AllItemsRect;
-		rotationCenter
-		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-		return rotationCenter;
-	}
-	if (!SelectedFormList->empty()) {
-		form::pxrct2stch(SelectedFormsRect, RotationRect);
-		if (StateMap.test(StateFlag::GMRK)) {
-			rotationCenter = fPOINT { ZoomMarkPoint.x, ZoomMarkPoint.y };
-		}
-		else {
-			rotationCenter
-			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-			// fi::dufcntr(rotationCenter);
-		}
-		StateMap.set(StateFlag::FRMSROT);
-		return rotationCenter;
-	}
-	if (StateMap.test(StateFlag::FORMSEL)) {
-		form::fvars(ClosestFormToCursor);
-		RotationRect = SelectedForm->rectangle;
-		if (!StateMap.test(StateFlag::GMRK)) {
-			rotationCenter
-			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-		}
-		StateMap.set(StateFlag::FRMROT);
-		return rotationCenter;
-	}
-	if (StateMap.test(StateFlag::GRPSEL)) {
-		thred::rngadj();
-		thred::selRct(RotationRect);
-		if (StateMap.test(StateFlag::GMRK)) {
-			rotationCenter = ZoomMarkPoint;
-		}
-		else {
-			rotationCenter
-			    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-		}
+			= fPOINT{ form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 	}
 	return rotationCenter;
 }
