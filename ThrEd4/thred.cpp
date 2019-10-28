@@ -7420,30 +7420,22 @@ void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) 
 
 void thred::internal::rot(fPOINT& rotationCenter) {
 	do {
-		if (StateMap.test(StateFlag::FPSEL)) {
-			// RotationRect = SelectedVerticesRect;
-			break;
-		}
-		if (StateMap.test(StateFlag::BIGBOX)) {
-			// RotationRect = *AllItemsRect;
+		if (StateMap.test(StateFlag::FORMSEL)) {
 			break;
 		}
 		if (!SelectedFormList->empty()) {
-			// form::pxrct2stch(SelectedFormsRect, RotationRect);
-			// StateMap.set(StateFlag::FRMSROT);
 			break;
 		}
-		if (StateMap.test(StateFlag::FORMSEL)) {
-			// form::fvars(ClosestFormToCursor);
-			// StateMap.set(StateFlag::FRMROT);
-			// RotationRect = SelectedForm->rectangle;
+		if (StateMap.test(StateFlag::BIGBOX)) {
 			break;
 		}
 		if (StateMap.test(StateFlag::GRPSEL)) {
-			// thred::rngadj();
-			// thred::selRct(RotationRect);
 			break;
 		}
+		if (StateMap.test(StateFlag::FPSEL)) {
+			break;
+		}
+		// no rotatable selections found
 		displayText::shoseln(IDS_FGRPF, IDS_ROT);
 		return;
 	} while (false);
