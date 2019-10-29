@@ -109,7 +109,7 @@ void frmovlin();
 auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
 void fselrct(uint32_t iForm);
-void fsizpar() noexcept;
+void fsizpar(FRMHED& form) noexcept;
 void fvars(uint32_t iForm) noexcept;
 auto getblen() noexcept -> float;
 auto getlast() -> uint32_t;

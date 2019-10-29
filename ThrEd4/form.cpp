@@ -175,40 +175,40 @@ void form::delmfil() {
 	}
 }
 
-void form::fsizpar() noexcept {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+void form::fsizpar(FRMHED& form) noexcept {
 
-	form.maxFillStitchLen           = IniFile.maxStitchLength;
 	form.lengthOrCount.stitchLength = UserStitchLength;
+	form.maxFillStitchLen           = IniFile.maxStitchLength;
 	form.minFillStitchLen           = MinStitchLength;
 }
 
 void form::chkcont() {
-	fsizpar();
-	if (SelectedForm->fillType != CONTF) {
-		auto guideIt = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	fsizpar(form);
+	if (form.fillType != CONTF) {
+		auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 		if (CurrentFormGuidesCount != 0U) {
 			auto shortestGuideIndex = 0U;
 			auto minimumLength      = 10000U;
-			for (auto iGuide = 0U; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+			for (auto iGuide = 0U; iGuide < form.satinGuideCount; iGuide++) {
 				const auto length = guideIt[iGuide].finish - guideIt[iGuide].start;
 				if (length < minimumLength) {
 					minimumLength      = length;
 					shortestGuideIndex = iGuide;
 				}
 			}
-			SelectedForm->angleOrClipData.guide.start  = guideIt[shortestGuideIndex].start;
-			SelectedForm->angleOrClipData.guide.finish = guideIt[shortestGuideIndex].finish;
+			form.angleOrClipData.guide.start  = guideIt[shortestGuideIndex].start;
+			form.angleOrClipData.guide.finish = guideIt[shortestGuideIndex].finish;
 			satin::delsac(ClosestFormToCursor);
 		}
 		else {
-			SelectedForm->angleOrClipData.guide.start  = 1;
-			SelectedForm->angleOrClipData.guide.finish = SelectedForm->vertexCount - 2U;
+			form.angleOrClipData.guide.start  = 1;
+			form.angleOrClipData.guide.finish = form.vertexCount - 2U;
 		}
 	}
-	SelectedForm->type     = FRMLINE;
-	SelectedForm->fillType = CONTF;
-	SelectedForm->attribute |= FRECONT;
+	form.attribute |= FRECONT;
+	form.type     = FRMLINE;
+	form.fillType = CONTF;
 }
 
 auto form::find1st() -> uint32_t {
@@ -5096,12 +5096,12 @@ void form::internal::fsvrt() {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	SelectedForm->fillType  = VRTF;
-	SelectedForm->type      = FRMFPOLY;
-	SelectedForm->fillColor = gsl::narrow<decltype(SelectedForm->fillColor)>(ActiveColor);
-	form::fsizpar();
-	SelectedForm->fillSpacing = LineSpacing;
-	SelectedForm->type        = FRMFPOLY;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	form.type = FRMFPOLY;
+	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+	form.fillType  = VRTF;
+	form.fillSpacing = LineSpacing;
+	form::fsizpar(form);
 	form::dusqr();
 	form::refilfn();
 }
@@ -5138,12 +5138,13 @@ void form::internal::fshor() {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	SelectedForm->fillType  = HORF;
-	SelectedForm->fillColor = gsl::narrow<decltype(SelectedForm->fillColor)>(ActiveColor);
-	form::fsizpar();
-	SelectedForm->fillSpacing           = LineSpacing;
-	SelectedForm->angleOrClipData.angle = gsl::narrow_cast<float>(PI) / 2;
-	SelectedForm->type                  = FRMFPOLY;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	form.type = FRMFPOLY;
+	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+	form.fillType  = HORF;
+	form.fillSpacing           = LineSpacing;
+	form::fsizpar(form);
+	form.angleOrClipData.angle = gsl::narrow_cast<float>(PI) / 2;
 	form::dusqr();
 	form::refil();
 }
@@ -5178,12 +5179,13 @@ void form::internal::fsangl() {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	SelectedForm->fillType              = ANGF;
-	SelectedForm->angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
-	SelectedForm->fillColor             = gsl::narrow<decltype(SelectedForm->fillColor)>(ActiveColor);
-	form::fsizpar();
-	SelectedForm->fillSpacing = LineSpacing;
-	SelectedForm->type        = FRMFPOLY;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	form.type = FRMFPOLY;
+	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+	form.fillType              = ANGF;
+	form.angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
+	form.fillSpacing = LineSpacing;
+	form::fsizpar(form);
 	form::dusqr();
 	form::refil();
 }
@@ -5398,12 +5400,12 @@ void form::rotfrm(uint32_t newStartVertex) {
 void form::internal::filsfn() {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	SelectedForm->type = SAT;
-	form::fsizpar();
-	SelectedForm->fillType    = SATF;
-	SelectedForm->fillColor   = gsl::narrow<uint8_t>(ActiveColor);
-	SelectedForm->fillSpacing = LineSpacing;
-	SelectedForm->type        = SAT;
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	form.type = SAT;
+	form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+	form.fillType = SATF;
+	form.fillSpacing = LineSpacing;
+	form::fsizpar(form);
 	form::refilfn();
 }
 
@@ -7806,15 +7808,16 @@ void form::picot() {
 
 auto form::internal::contsf(uint32_t formIndex) -> bool {
 	ClosestFormToCursor = formIndex;
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	form::fvars(formIndex);
-	if (SelectedForm->vertexCount > 4) {
+	if (form.vertexCount > 4) {
 		clip::delclps(ClosestFormToCursor);
 		texture::deltx(ClosestFormToCursor);
 		form::chkcont();
-		SelectedForm->fillSpacing = LineSpacing;
-		SelectedForm->fillColor   = gsl::narrow<uint8_t>(ActiveColor);
-		form::fsizpar();
-		SelectedForm->attribute |= gsl::narrow<decltype(SelectedForm->attribute)>(ActiveLayer << 1U);
+		form.attribute |= gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
+		form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+		form.fillSpacing = LineSpacing;
+		form::fsizpar(form);
 		form::refilfn();
 		return true;
 	}

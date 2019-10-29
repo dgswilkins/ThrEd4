@@ -11065,8 +11065,9 @@ void thred::internal::tglhid() {
 
 void thred::internal::respac() noexcept {
 	if (clip::isclp(ClosestFormToCursor)) {
-		SelectedForm->fillSpacing = LineSpacing;
-		form::fsizpar();
+		auto& form = FormList->operator[](ClosestFormToCursor);
+		form.fillSpacing = LineSpacing;
+		form::fsizpar(form);
 	}
 }
 
