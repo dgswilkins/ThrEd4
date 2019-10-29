@@ -366,7 +366,7 @@ void form::internal::rats() {
 
 void form::fvars(uint32_t iForm) noexcept {
 	if (!FormList->empty() && iForm < FormList->size()) {
-		auto& form             = (*FormList)[iForm];
+		auto& form             = FormList->operator[](iForm);
 		SelectedForm           = &form;
 		CurrentVertexIndex     = form.vertexIndex;
 		VertexCount            = form.vertexCount;
@@ -650,26 +650,27 @@ void form::drwfrm() {
 	const auto maxForm = FormList->size();
 	for (auto iForm = 0U; iForm < maxForm; iForm++) {
 		form::fvars(iForm);
-		form::frmlin(SelectedForm->vertexIndex, VertexCount);
+		auto& form = FormList->operator[](iForm);
+		form::frmlin(form.vertexIndex, VertexCount);
 		if (!FormLines->empty()) {
-			auto layer = gsl::narrow_cast<uint32_t>(gsl::narrow_cast<uint8_t>(SelectedForm->attribute & FRMLMSK) >> 1U);
+			auto layer = gsl::narrow_cast<uint32_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 			if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 				POINT line[2]   = {};
 				auto  lastPoint = 0U;
 				auto  vertexIt  = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-				if (SelectedForm->type == SAT) {
-					if ((SelectedForm->attribute & FRMEND) != 0U) {
+				if (form.type == SAT) {
+					if ((form.attribute & FRMEND) != 0U) {
 						SelectObject(StitchWindowMemDC, FormPen3px);
 						Polyline(StitchWindowMemDC, FormLines->data(), 2);
 						lastPoint = 1;
 					}
-					if (SelectedForm->wordParam != 0U) {
+					if (form.wordParam != 0U) {
 						SelectObject(StitchWindowMemDC, FormPen);
-						fi::frmpoly(&((*FormLines)[1]), SelectedForm->wordParam);
+						fi::frmpoly(&((*FormLines)[1]), form.wordParam);
 						SelectObject(StitchWindowMemDC, FormPen3px);
-						Polyline(StitchWindowMemDC, &((*FormLines)[SelectedForm->wordParam]), 2);
+						Polyline(StitchWindowMemDC, &((*FormLines)[form.wordParam]), 2);
 						SelectObject(StitchWindowMemDC, LayerPen[layer]);
-						lastPoint = SelectedForm->wordParam + 1U;
+						lastPoint = form.wordParam + 1U;
 					}
 					const auto maxGuide = (*FormList)[iForm].satinGuideCount;
 					auto       guideIt  = std::next(SatinGuides->cbegin(), CurrentFormGuides);
@@ -681,11 +682,11 @@ void form::drwfrm() {
 					}
 				}
 				SelectObject(StitchWindowMemDC, LayerPen[layer]);
-				if (SelectedForm->type == FRMLINE) {
+				if (form.type == FRMLINE) {
 					fi::frmpoly(FormLines->data(), VertexCount);
-					if (SelectedForm->fillType == CONTF) {
-						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.start], line[0]);
-						thred::sCor2px(vertexIt[SelectedForm->angleOrClipData.guide.finish], line[1]);
+					if (form.fillType == CONTF) {
+						thred::sCor2px(vertexIt[form.angleOrClipData.guide.start], line[0]);
+						thred::sCor2px(vertexIt[form.angleOrClipData.guide.finish], line[1]);
 						Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
 					}
 				}
