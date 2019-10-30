@@ -478,7 +478,7 @@ void formForms::internal::refrmfn(uint32_t& formMenuEntryCount) {
 }
 
 void formForms::refrm() {
-	SelectedForm = &((*FormList)[ClosestFormToCursor]);
+	SelectedForm = &(FormList->operator[](ClosestFormToCursor));
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		DestroyWindow(PreferencesWindow);
 		StateMap.reset(StateFlag::WASRT);

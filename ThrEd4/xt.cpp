@@ -1055,7 +1055,7 @@ auto xt::internal::srtchk(const std::vector<OREC*>& stitchRegion, uint32_t count
 	for (auto iRegion = 1U; iRegion < count; iRegion++) {
 		if (stitchRegion[iRegion]->form == formIndex) {
 			if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
-				auto& form = (*FormList)[formIndex];
+				auto& form = FormList->operator[](formIndex);
 				if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U)
 				    && stitchRegion[iRegion]->color == form.fillColor) {
 					continue;
@@ -2283,7 +2283,7 @@ void xt::setfhi() {
 
 void xt::setfilstrt() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		auto& form     = (*FormList)[ClosestFormToCursor];
+		auto& form     = FormList->operator[](ClosestFormToCursor);
 		form.fillStart = gsl::narrow<uint16_t>(ClosestVertexToCursor);
 		form.extendedAttribute |= AT_STRT;
 		form::refil();
@@ -2297,7 +2297,7 @@ void xt::setfilstrt() {
 
 void xt::setfilend() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
-		auto& form   = (*FormList)[ClosestFormToCursor];
+		auto& form   = FormList->operator[](ClosestFormToCursor);
 		form.fillEnd = gsl::narrow<uint16_t>(ClosestVertexToCursor);
 		form.extendedAttribute |= AT_END;
 		form::refil();

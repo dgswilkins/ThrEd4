@@ -45,7 +45,7 @@ float    AdjustedSpace;       // adjusted space
 uint32_t NextStart;           // index of the endpoint of the line segment being processed
 
 auto clip::iseclp(uint32_t iForm) noexcept -> bool {
-	auto& form = (*FormList)[iForm];
+	auto& form = FormList->operator[](iForm);
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
@@ -54,7 +54,7 @@ auto clip::iseclp(const FRMHED& form) noexcept -> bool {
 }
 
 auto clip::isclp(uint32_t iForm) noexcept -> bool {
-	auto& form = (*FormList)[iForm];
+	auto& form = FormList->operator[](iForm);
 	return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
 
@@ -63,7 +63,7 @@ auto clip::isclp(const FRMHED& form) noexcept -> bool {
 }
 
 auto clip::isclpx(uint32_t iForm) noexcept -> bool {
-	auto& form = (*FormList)[iForm];
+	auto& form = FormList->operator[](iForm);
 	return clip::isclp(iForm) && (form.lengthOrCount.clipCount != 0U);
 }
 
@@ -72,7 +72,7 @@ auto clip::isclpx(const FRMHED& form) noexcept -> bool {
 }
 
 auto clip::iseclpx(uint32_t iForm) noexcept -> bool {
-	auto& form = (*FormList)[iForm];
+	auto& form = FormList->operator[](iForm);
 	return clip::iseclp(iForm) && (form.clipEntries != 0U);
 }
 
@@ -108,7 +108,7 @@ void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 void clip::delmclp(uint32_t iForm) {
 	if (!ClipPoints->empty()) {
 		if (clip::isclp(iForm)) {
-			auto&      form       = (*FormList)[iForm];
+			auto&      form       = FormList->operator[](iForm);
 			const auto destIndex  = ci::findclp(iForm);
 			auto       eraseStart = std::next(ClipPoints->cbegin(), destIndex);
 			auto       eraseEnd   = std::next(eraseStart, form.lengthOrCount.clipCount);
@@ -125,7 +125,7 @@ void clip::delmclp(uint32_t iForm) {
 void clip::deleclp(uint32_t iForm) {
 	if (!ClipPoints->empty()) {
 		if (clip::iseclp(iForm)) {
-			auto& form      = (*FormList)[iForm];
+			auto& form      = FormList->operator[](iForm);
 			auto  destIndex = ci::findclp(iForm);
 			if (clip::isclpx(iForm)) {
 				destIndex += form.lengthOrCount.clipCount;
