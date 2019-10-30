@@ -222,7 +222,7 @@ namespace internal {
 	void chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices);
 	auto closat(intersectionStyles& inOutFlag) -> bool;
 	auto vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept -> bool;
-	void clpcon(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& currentFormVertices);
+	void clpcon(FRMHED& form,const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& currentFormVertices);
 	void clpfm();
 	auto clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
 	             std::vector<CLPSEG>&       clipSegments,
