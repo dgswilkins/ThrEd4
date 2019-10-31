@@ -596,9 +596,13 @@ void satin::delspnt() {
 		if (currentForm.satinGuideCount != 0U) {
 			auto guideIt = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
 			auto iGuide  = 0U;
-			while (guideIt[iGuide].start != ClosestVertexToCursor && guideIt[iGuide].finish != ClosestVertexToCursor
-				&& iGuide < SelectedForm->satinGuideCount) {
-				iGuide++;
+			while (iGuide < currentForm.satinGuideCount) {
+				if (guideIt[iGuide].start != ClosestVertexToCursor && guideIt[iGuide].finish != ClosestVertexToCursor) {
+					iGuide++;
+				}
+				else {
+					break;
+				}
 			}
 			if (iGuide < currentForm.satinGuideCount
 			    && (guideIt[iGuide].start == ClosestVertexToCursor || guideIt[iGuide].finish == ClosestVertexToCursor)) {
