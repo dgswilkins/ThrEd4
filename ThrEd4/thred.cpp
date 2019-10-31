@@ -13134,10 +13134,11 @@ auto thred::internal::updatePreferences() -> bool {
 
 auto thred::internal::handleSideWindowActive() -> bool {
 	thred::savdo();
+	auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	if (FormMenuChoice == LFTHTYP) {
 		for (auto iFillType = 0U; iFillType < 6U; iFillType++) {
 			if (Msg.hwnd == SideWindow[iFillType]) {
-				SelectedForm->fillInfo.feather.fillType = gsl::narrow<uint8_t>(iFillType + 1U);
+				currentForm.fillInfo.feather.fillType = gsl::narrow<uint8_t>(iFillType + 1U);
 				thred::unsid();
 				form::refil();
 				formForms::refrm();
@@ -13159,31 +13160,31 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		}
 		thred::unsid();
 		auto layerStr
-		    = fmt::format(L"{}", (gsl::narrow_cast<decltype(SelectedForm->attribute)>(SelectedForm->attribute & FRMLMSK) >> 1U));
+		    = fmt::format(L"{}", (gsl::narrow_cast<decltype(currentForm.attribute)>(currentForm.attribute & FRMLMSK) >> 1U));
 		SetWindowText((*ValueWindow)[LLAYR], layerStr.c_str());
 		formForms::refrm();
 
 		return true;
 	}
-	SelectedForm->borderColor &= COLMSK;
+	currentForm.borderColor &= COLMSK;
 	if (StateMap.testAndReset(StateFlag::BRDACT)) {
 		if (clip::iseclp(ClosestFormToCursor)) {
 			clip::deleclp(ClosestFormToCursor);
 		}
 		do {
 			if (Msg.hwnd == SideWindow[0]) {
-				SelectedForm->edgeType = 0;
+				currentForm.edgeType = 0;
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 				break;
 			}
 			if (Msg.hwnd == SideWindow[1]) {
-				if (SelectedForm->edgeType != 0U) {
-					const auto code = SelectedForm->edgeType & NEGUND;
+				if (currentForm.edgeType != 0U) {
+					const auto code = currentForm.edgeType & NEGUND;
 					if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-						form::bsizpar();
+						form::bsizpar(currentForm);
 					}
-					SelectedForm->edgeType = EDGELINE;
+					currentForm.edgeType = EDGELINE;
 					break;
 				}
 
@@ -13191,12 +13192,12 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[2]) {
-				if (SelectedForm->edgeType != 0U) {
-					const auto code = SelectedForm->edgeType & NEGUND;
+				if (currentForm.edgeType != 0U) {
+					const auto code = currentForm.edgeType & NEGUND;
 					if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-						form::bsizpar();
+						form::bsizpar(currentForm);
 					}
-					SelectedForm->edgeType = EDGEBEAN;
+					currentForm.edgeType = EDGEBEAN;
 					break;
 				}
 
@@ -13208,25 +13209,25 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[4]) {
-				if (SelectedForm->edgeType != 0U) {
-					switch (SelectedForm->edgeType) {
+				if (currentForm.edgeType != 0U) {
+					switch (currentForm.edgeType) {
 					case EDGECLIP: {
-						form::bsizpar();
+						form::bsizpar(currentForm);
 					}
 					case EDGELINE:
 					case EDGEBEAN: {
-						SelectedForm->borderSize  = BorderWidth;
-						SelectedForm->edgeSpacing = LineSpacing;
+						currentForm.borderSize  = BorderWidth;
+						currentForm.edgeSpacing = LineSpacing;
 						break;
 					}
 					case EDGEPROPSAT: {
-						SelectedForm->edgeSpacing /= 2;
+						currentForm.edgeSpacing /= 2;
 						break;
 					}
 					}
-					SelectedForm->edgeType = EDGEANGSAT;
+					currentForm.edgeType = EDGEANGSAT;
 					if (UserFlagMap.test(UserFlag::DUND)) {
-						SelectedForm->edgeType |= EGUND;
+						currentForm.edgeType |= EGUND;
 					}
 					break;
 				}
@@ -13235,24 +13236,24 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[5]) {
-				if (SelectedForm->fillType != 0U) {
+				if (currentForm.fillType != 0U) {
 					form::delmfil();
-					SelectedForm->fillType = 0;
+					currentForm.fillType = 0;
 				}
-				if (SelectedForm->edgeType != 0U) {
-					if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN
-					    || SelectedForm->edgeType == EDGECLIP) {
-						SelectedForm->borderSize  = BorderWidth;
-						SelectedForm->edgeSpacing = LineSpacing;
-						if (SelectedForm->edgeType == EDGECLIP) {
-							form::bsizpar();
+				if (currentForm.edgeType != 0U) {
+					if (currentForm.edgeType == EDGELINE || currentForm.edgeType == EDGEBEAN
+					    || currentForm.edgeType == EDGECLIP) {
+						currentForm.borderSize  = BorderWidth;
+						currentForm.edgeSpacing = LineSpacing;
+						if (currentForm.edgeType == EDGECLIP) {
+							form::bsizpar(currentForm);
 						}
 					}
-					SelectedForm->edgeType = EDGEAPPL;
+					currentForm.edgeType = EDGEAPPL;
 					if (UserFlagMap.test(UserFlag::DUND)) {
-						SelectedForm->edgeType |= EGUND;
+						currentForm.edgeType |= EGUND;
 					}
-					SelectedForm->borderColor |= (AppliqueColor << 4U);
+					currentForm.borderColor |= (AppliqueColor << 4U);
 					break;
 				}
 
@@ -13260,24 +13261,24 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[6]) {
-				if (SelectedForm->edgeType != 0U) {
-					switch (SelectedForm->edgeType) {
+				if (currentForm.edgeType != 0U) {
+					switch (currentForm.edgeType) {
 					case EDGECLIP: {
-						form::bsizpar();
+						form::bsizpar(currentForm);
 					}
 					case EDGELINE:
 					case EDGEBEAN: {
-						SelectedForm->borderSize  = BorderWidth;
-						SelectedForm->edgeSpacing = LineSpacing;
+						currentForm.borderSize  = BorderWidth;
+						currentForm.edgeSpacing = LineSpacing;
 						break;
 					}
 					case EDGEANGSAT: {
-						SelectedForm->edgeSpacing *= 2;
+						currentForm.edgeSpacing *= 2;
 					}
 					}
-					SelectedForm->edgeType = EDGEPROPSAT;
+					currentForm.edgeType = EDGEPROPSAT;
 					if (UserFlagMap.test(UserFlag::DUND)) {
-						SelectedForm->edgeType |= EGUND;
+						currentForm.edgeType |= EGUND;
 					}
 					break;
 				}
@@ -13286,16 +13287,16 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[7]) {
-				if (SelectedForm->edgeType != 0U) {
-					if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN
-					    || SelectedForm->edgeType == EDGECLIP) {
-						SelectedForm->borderSize  = BorderWidth;
-						SelectedForm->edgeSpacing = LineSpacing;
-						if (SelectedForm->edgeType == EDGECLIP) {
-							form::bsizpar();
+				if (currentForm.edgeType != 0U) {
+					if (currentForm.edgeType == EDGELINE || currentForm.edgeType == EDGEBEAN
+					    || currentForm.edgeType == EDGECLIP) {
+						currentForm.borderSize  = BorderWidth;
+						currentForm.edgeSpacing = LineSpacing;
+						if (currentForm.edgeType == EDGECLIP) {
+							form::bsizpar(currentForm);
 						}
 					}
-					SelectedForm->edgeType = EDGEBHOL;
+					currentForm.edgeType = EDGEBHOL;
 					break;
 				}
 
@@ -13303,13 +13304,13 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[8]) {
-				if (SelectedForm->edgeType != 0U) {
-					if (SelectedForm->edgeType == EDGELINE || SelectedForm->edgeType == EDGEBEAN
-					    || SelectedForm->edgeType == EDGECLIP) {
-						SelectedForm->borderSize  = BorderWidth;
-						SelectedForm->edgeSpacing = LineSpacing;
-						if (SelectedForm->edgeType == EDGECLIP) {
-							form::bsizpar();
+				if (currentForm.edgeType != 0U) {
+					if (currentForm.edgeType == EDGELINE || currentForm.edgeType == EDGEBEAN
+					    || currentForm.edgeType == EDGECLIP) {
+						currentForm.borderSize  = BorderWidth;
+						currentForm.edgeSpacing = LineSpacing;
+						if (currentForm.edgeType == EDGECLIP) {
+							form::bsizpar(currentForm);
 						}
 					}
 					form::picot();
@@ -13320,12 +13321,12 @@ auto thred::internal::handleSideWindowActive() -> bool {
 				break;
 			}
 			if (Msg.hwnd == SideWindow[9]) {
-				if (SelectedForm->edgeType != 0U) {
-					const auto code = SelectedForm->edgeType & NEGUND;
+				if (currentForm.edgeType != 0U) {
+					const auto code = currentForm.edgeType & NEGUND;
 					if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
-						form::bsizpar();
+						form::bsizpar(currentForm);
 					}
-					SelectedForm->edgeType = EDGEDOUBLE;
+					currentForm.edgeType = EDGEDOUBLE;
 					break;
 				}
 
@@ -13357,32 +13358,32 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		return true;
 	}
 
-	if (SelectedForm->fillType == SAT && (SelectedForm->satinGuideCount != 0U)) {
+	if (currentForm.fillType == SAT && (currentForm.satinGuideCount != 0U)) {
 		satin::delsac(ClosestFormToCursor);
 	}
-	if ((SelectedForm->edgeType & NEGUND) == EDGEAPPL) {
-		SelectedForm->edgeType = EDGEANGSAT;
+	if ((currentForm.edgeType & NEGUND) == EDGEAPPL) {
+		currentForm.edgeType = EDGEANGSAT;
 		if (UserFlagMap.test(UserFlag::DUND)) {
-			SelectedForm->edgeType |= EGUND;
+			currentForm.edgeType |= EGUND;
 		}
 	}
 	auto textureFlag = false;
 	do {
 		if (Msg.hwnd == SideWindow[0]) { // none
-			SelectedForm->type = FRMFPOLY;
+			currentForm.type = FRMFPOLY;
 			form::delmfil();
-			SelectedForm->fillType = 0;
+			currentForm.fillType = 0;
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
 			break;
 		}
 		if (Msg.hwnd == SideWindow[1]) { // vertical fill
 			thred::savdo();
-			SelectedForm->type = FRMFPOLY;
-			if (SelectedForm->fillType != 0U) {
+			currentForm.type = FRMFPOLY;
+			if (currentForm.fillType != 0U) {
 				respac();
-				SelectedForm->fillType = VRTF;
-				SelectedForm->type     = FRMFPOLY;
+				currentForm.fillType = VRTF;
+				currentForm.type     = FRMFPOLY;
 				clip::delmclp(ClosestFormToCursor);
 				break;
 			}
@@ -13391,10 +13392,10 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			break;
 		}
 		if (Msg.hwnd == SideWindow[2]) { // horizontal fill
-			SelectedForm->type = FRMFPOLY;
-			if (SelectedForm->fillType != 0U) {
+			currentForm.type = FRMFPOLY;
+			if (currentForm.fillType != 0U) {
 				respac();
-				SelectedForm->fillType = HORF;
+				currentForm.fillType = HORF;
 				clip::delmclp(ClosestFormToCursor);
 				break;
 			}
@@ -13403,15 +13404,15 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			break;
 		}
 		if (Msg.hwnd == SideWindow[3]) { // angle fill
-			SelectedForm->type = FRMFPOLY;
-			if (SelectedForm->fillType != 0U) {
-				if (SelectedForm->satinGuideCount != 0U) {
+			currentForm.type = FRMFPOLY;
+			if (currentForm.fillType != 0U) {
+				if (currentForm.satinGuideCount != 0U) {
 					satin::delsac(ClosestFormToCursor);
 				}
 				respac();
 				// ToDo - should we be using the angle information already present
-				SelectedForm->fillType              = ANGF;
-				SelectedForm->angleOrClipData.angle = IniFile.fillAngle;
+				currentForm.fillType              = ANGF;
+				currentForm.angleOrClipData.angle = IniFile.fillAngle;
 				clip::delmclp(ClosestFormToCursor);
 				break;
 			}
@@ -13420,13 +13421,13 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			break;
 		}
 		if (Msg.hwnd == SideWindow[4]) { // fan fill
-			SelectedForm->type = SAT;
-			if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
-				SelectedForm->satinOrAngle.guide = 0;
+			currentForm.type = SAT;
+			if ((currentForm.fillType == ANGF) || (currentForm.fillType == ANGCLPF) || (currentForm.fillType == TXANGF)) {
+				currentForm.satinOrAngle.guide = 0;
 			}
-			if (SelectedForm->fillType != 0U) {
+			if (currentForm.fillType != 0U) {
 				respac();
-				SelectedForm->fillType = SATF;
+				currentForm.fillType = SATF;
 				clip::delmclp(ClosestFormToCursor);
 				break;
 			}
@@ -13436,17 +13437,17 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			break;
 		}
 		if (Msg.hwnd == SideWindow[5]) { // fan clip
-			SelectedForm->type = SAT;
-			if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
-				SelectedForm->satinOrAngle.guide = 0;
+			currentForm.type = SAT;
+			if ((currentForm.fillType == ANGF) || (currentForm.fillType == ANGCLPF) || (currentForm.fillType == TXANGF)) {
+				currentForm.satinOrAngle.guide = 0;
 			}
 			form::clpfil();
 			break;
 		}
 		if (Msg.hwnd == SideWindow[6]) { // contour fill
-			if (SelectedForm->fillType != 0U) {
-				if (SelectedForm->fillType == CLPF) {
-					SelectedForm->fillSpacing = LineSpacing;
+			if (currentForm.fillType != 0U) {
+				if (currentForm.fillType == CLPF) {
+					currentForm.fillSpacing = LineSpacing;
 				}
 				form::chkcont();
 				clip::delclps(ClosestFormToCursor);
@@ -13476,7 +13477,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		}
 		if (Msg.hwnd == SideWindow[9]) { // angle clip
 			if (sidclp()) {
-				if (SelectedForm->satinGuideCount != 0U) {
+				if (currentForm.satinGuideCount != 0U) {
 					satin::delsac(ClosestFormToCursor);
 				}
 				form::angsclp();
@@ -13487,8 +13488,8 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			break;
 		}
 		if (Msg.hwnd == SideWindow[10]) { // feather fill
-			if ((SelectedForm->fillType == ANGF) || (SelectedForm->fillType == ANGCLPF) || (SelectedForm->fillType == TXANGF)) {
-				SelectedForm->satinOrAngle.guide = 0;
+			if ((currentForm.fillType == ANGF) || (currentForm.fillType == ANGCLPF) || (currentForm.fillType == TXANGF)) {
+				currentForm.satinOrAngle.guide = 0;
 			}
 			xt::fethrf();
 			StateMap.set(StateFlag::INIT);
@@ -13499,7 +13500,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		if (Msg.hwnd == SideWindow[11]) // vertical texture
 		{
 			if (texture::istx(ClosestFormToCursor)) {
-				SelectedForm->fillType = TXVRTF;
+				currentForm.fillType = TXVRTF;
 				break;
 			}
 			texture::dutxtfil();
@@ -13509,7 +13510,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		if (Msg.hwnd == SideWindow[12]) // horizontal texture
 		{
 			if (texture::istx(ClosestFormToCursor)) {
-				SelectedForm->fillType = TXHORF;
+				currentForm.fillType = TXHORF;
 				break;
 			}
 			texture::dutxtfil();
@@ -13519,8 +13520,8 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		if (Msg.hwnd == SideWindow[13]) // angle texture
 		{
 			if (texture::istx(ClosestFormToCursor)) {
-				SelectedForm->fillType              = TXANGF;
-				SelectedForm->angleOrClipData.angle = IniFile.fillAngle;
+				currentForm.fillType              = TXANGF;
+				currentForm.angleOrClipData.angle = IniFile.fillAngle;
 				break;
 			}
 			texture::dutxtfil();

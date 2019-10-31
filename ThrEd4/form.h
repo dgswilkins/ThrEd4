@@ -36,12 +36,12 @@ void bakdup();
 void bhol();
 void boxsel();
 void bord();
-void bsizpar() noexcept;
+void bsizpar(FRMHED& currentForm) noexcept;
 void centir();
 void chain();
 void chan();
 void chkcont();
-auto chkdel() noexcept -> bool;
+auto chkdel(const FRMHED& currentForm) noexcept -> bool;
 auto chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
@@ -239,7 +239,7 @@ namespace internal {
 
 	constexpr auto duat(uint32_t attribute) -> uint32_t;
 
-	void dubfn();
+	void dubfn(const FRMHED& currentForm);
 	void ducon() noexcept;
 	void dudif(const fPOINT& start, const fPOINT& finish, fPOINT& delta) noexcept;
 	void dufcntr(fPOINT& center);
@@ -399,7 +399,7 @@ namespace internal {
 	    -> bool;
 	auto projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept -> bool;
 	auto projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept -> bool;
-	void prpsbrd();
+	void prpsbrd(FRMHED& currentForm);
 	void prsmal(float width);
 	void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
 	void rats();

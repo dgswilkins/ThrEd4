@@ -580,7 +580,8 @@ void satin::delcon(uint32_t GuideIndex) {
 
 void satin::delspnt() {
 	form::fvars(ClosestFormToCursor);
-	if (form::chkdel()) {
+	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	if (form::chkdel(currentForm)) {
 		StateMap.set(StateFlag::DELTO);
 		thred::frmdel();
 		StateMap.reset(StateFlag::FRMPSEL);
@@ -588,24 +589,24 @@ void satin::delspnt() {
 		StateMap.set(StateFlag::RESTCH);
 		return;
 	}
-	if (SelectedForm->type == SAT) {
-		if (ClosestVertexToCursor < SelectedForm->wordParam) {
-			SelectedForm->wordParam--;
+	if (currentForm.type == SAT) {
+		if (ClosestVertexToCursor < currentForm.wordParam) {
+			currentForm.wordParam--;
 		}
-		if (SelectedForm->satinGuideCount != 0U) {
-			auto guideIt = std::next(SatinGuides->begin(), SelectedForm->satinOrAngle.guide);
+		if (currentForm.satinGuideCount != 0U) {
+			auto guideIt = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
 			auto iGuide  = 0U;
 			while (guideIt[iGuide].start != ClosestVertexToCursor && guideIt[iGuide].finish != ClosestVertexToCursor
-			       && iGuide < SelectedForm->satinGuideCount) {
+				&& iGuide < SelectedForm->satinGuideCount) {
 				iGuide++;
 			}
-			if (iGuide < SelectedForm->satinGuideCount
+			if (iGuide < currentForm.satinGuideCount
 			    && (guideIt[iGuide].start == ClosestVertexToCursor || guideIt[iGuide].finish == ClosestVertexToCursor)) {
-				while (iGuide < SelectedForm->satinGuideCount) {
+				while (iGuide < currentForm.satinGuideCount) {
 					guideIt[iGuide] = guideIt[wrap::toSize(iGuide) + 1U];
 					iGuide++;
 				}
-				SelectedForm->satinGuideCount--;
+				currentForm.satinGuideCount--;
 				for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 					auto& form = FormList->operator[](iForm);
 					if (form.type == SAT && (form.satinGuideCount != 0U)) {
@@ -613,7 +614,7 @@ void satin::delspnt() {
 					}
 				}
 			}
-			for (iGuide = 0; iGuide < SelectedForm->satinGuideCount; iGuide++) {
+			for (iGuide = 0; iGuide < currentForm.satinGuideCount; iGuide++) {
 				if (guideIt[iGuide].start > ClosestVertexToCursor) {
 					guideIt[iGuide].start--;
 				}
@@ -623,19 +624,19 @@ void satin::delspnt() {
 			}
 		}
 	}
-	auto closestVertexIt = std::next(FormVertices->cbegin(), wrap::toSize(SelectedForm->vertexIndex) + ClosestVertexToCursor);
+	auto closestVertexIt = std::next(FormVertices->cbegin(), wrap::toSize(currentForm.vertexIndex) + ClosestVertexToCursor);
 	FormVertices->erase(closestVertexIt);
-	SelectedForm->vertexCount--;
+	currentForm.vertexCount--;
 	form::fvars(ClosestFormToCursor);
-	if (ClosestVertexToCursor > (SelectedForm->vertexCount) - 1) {
-		ClosestVertexToCursor = SelectedForm->vertexCount - 1U;
+	if (ClosestVertexToCursor > (currentForm.vertexCount) - 1) {
+		ClosestVertexToCursor = currentForm.vertexCount - 1U;
 	}
 	StateMap.set(StateFlag::FRMPSEL);
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = FormList->operator[](iForm);
 		form.vertexIndex--;
 	}
-	auto vertexIt = std::next(FormVertices->cbegin(), SelectedForm->vertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
 	thred::ritfcor(vertexIt[ClosestVertexToCursor]);
 	displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 	form::frmout(ClosestFormToCursor);
@@ -648,14 +649,15 @@ void satin::delspnt() {
 
 void satin::internal::satsbrd() {
 	clip::deleclp(ClosestFormToCursor);
-	SelectedForm->edgeType = EDGEANGSAT;
+	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	currentForm.edgeType = EDGEANGSAT;
 	if (UserFlagMap.test(UserFlag::DUND)) {
-		SelectedForm->edgeType |= EGUND;
+		currentForm.edgeType |= EGUND;
 	}
-	form::bsizpar();
-	SelectedForm->borderSize  = BorderWidth;
-	SelectedForm->edgeSpacing = LineSpacing / 2;
-	SelectedForm->borderColor = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(currentForm);
+	currentForm.borderSize  = BorderWidth;
+	currentForm.edgeSpacing = LineSpacing / 2;
+	currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
 	form::refilfn();
 }
 
