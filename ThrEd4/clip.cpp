@@ -344,10 +344,10 @@ void clip::internal::linsid(const std::vector<fPOINT>& clipReversedData,
 void clip::clpout(float width) {
 	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (form.type == FRMLINE) {
-		satin::satout(width);
+		satin::satout(form, width);
 	}
 	else {
-		satin::satout(ClipRectSize.cy);
+		satin::satout(form, ClipRectSize.cy);
 		InsidePointList->clear();
 		auto srcStart = std::next(FormVertices->cbegin(), form.vertexIndex);
 		auto srcEnd   = std::next(srcStart, form.vertexCount);
@@ -618,8 +618,8 @@ void clip::internal::fxlen(std::vector<fPOINT>&      chainEndPoints,
 	}
 }
 
-void clip::internal::dufxlen(std::vector<fPOINT>& chainEndPoints) {
-	form::duangs();
+void clip::internal::dufxlen(const FRMHED& form, std::vector<fPOINT>& chainEndPoints) {
+	form::duangs(form);
 	auto listSINEs = std::vector<float> {};
 	listSINEs.reserve(wrap::toSize(VertexCount) + 1U);
 	auto listCOSINEs = std::vector<float> {};
@@ -692,11 +692,11 @@ void clip::internal::xclpfn(const std::vector<fPOINT>& tempClipPoints,
 	}
 }
 
-void clip::duxclp() {
+void clip::duxclp(const FRMHED& form) {
 	auto chainEndPoints = std::vector<fPOINT> {};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50U);
-	ci::dufxlen(chainEndPoints);
+	ci::dufxlen(form, chainEndPoints);
 	auto tempClipPoints = std::vector<fPOINT> {};
 	tempClipPoints.reserve(ClipBuffer->size());
 	ci::clpxadj(tempClipPoints, chainEndPoints);
@@ -705,7 +705,6 @@ void clip::duxclp() {
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(chainEndPoints.size()); iPoint++) {
 		ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
 	}
-	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (form.type != FRMLINE) {
 		OSequence->push_back(chainEndPoints[0]);
 	}
@@ -821,8 +820,8 @@ void clip::clpic(const fRECTANGLE& clipRect) {
 	HorizontalLength = ClipRectSize.cx;
 	ClipReference.y  = rotationCenter.y;
 	ClipReference.x  = clipRect.left;
-	satin::satout(20);
 	const auto& form = FormList->operator[](ClosestFormToCursor);
+	satin::satout(form, 20);
 	if (form.type == FRMLINE) {
 		for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {
 			ci::picfn(clipRect, clipFillData, iVertex, iVertex + 1, form.edgeSpacing, rotationCenter);
@@ -915,13 +914,13 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	}
 }
 
-void clip::chnfn() {
+void clip::chnfn(const FRMHED& form) {
 	auto chainEndPoints = std::vector<fPOINT> {};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50U);
 	form::fvars(ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
-	ci::dufxlen(chainEndPoints);
+	ci::dufxlen(form, chainEndPoints);
 	ci::dulast(chainEndPoints);
 	ci::duch(chainEndPoints);
 }

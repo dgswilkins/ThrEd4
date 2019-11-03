@@ -26,14 +26,14 @@
 
 namespace clip {
 
-void chnfn();
+void chnfn(const FRMHED& form);
 void clpbrd(const fRECTANGLE& clipRect, uint32_t startVertex);
 void clpic(const fRECTANGLE& clipRect);
 void clpout(float width);
 void delclps(uint32_t iForm);
 void deleclp(uint32_t iForm);
 void delmclp(uint32_t iForm);
-void duxclp();
+void duxclp(const FRMHED& form);
 auto isclp(uint32_t iForm) noexcept -> bool;
 auto isclp(const FRMHED& form) noexcept -> bool;
 auto isclpx(uint32_t iForm) noexcept -> bool;
@@ -59,7 +59,7 @@ namespace internal {
 	void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
 	void duch(std::vector<fPOINT>& chainEndPoints);
 	void duchfn(const std::vector<fPOINT>& chainEndPoints, uint32_t start, uint32_t finish);
-	void dufxlen(std::vector<fPOINT>& chainEndPoints);
+	void dufxlen(const FRMHED& form, std::vector<fPOINT>& chainEndPoints);
 	void dulast(std::vector<fPOINT>& chainEndPoints);
 	void durev(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipReversedData);
 	auto findclp(uint32_t formIndex) noexcept -> uint32_t;

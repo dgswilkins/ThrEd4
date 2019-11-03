@@ -1154,7 +1154,7 @@ void texture::internal::dutxfn(uint32_t textureType) {
 		texture::deltx(ClosestFormToCursor);
 		texture::savtxt();
 		txi::nutx();
-		form::dusqr();
+		form::dusqr(FormList->operator[](ClosestFormToCursor));
 		switch (textureType) {
 		case VRTYP: {
 			txi::txvrt();

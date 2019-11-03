@@ -11835,7 +11835,7 @@ void thred::internal::unpclp() {
 	}
 }
 
-void thred::internal::fixpclp() {
+void thred::internal::fixpclp(uint32_t closestFormToCursor) {
 	const auto point = POINT { (Msg.pt.x + gsl::narrow_cast<decltype(Msg.pt.x)>(FormMoveDelta.x)),
 		                       (Msg.pt.y + gsl::narrow_cast<decltype(Msg.pt.y)>(FormMoveDelta.y)) };
 	auto       it    = std::next(InterleaveSequence->begin(), 1);
@@ -11843,7 +11843,7 @@ void thred::internal::fixpclp() {
 	const auto offset = fPOINT { SelectedPoint.x - it->x, SelectedPoint.y - it->y };
 	const auto count  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
 	form::fltspac(form::nxt(ClosestVertexToCursor), count);
-	SelectedForm->vertexCount += count;
+	FormList->operator[](closestFormToCursor).vertexCount += count;
 	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iOutput = 1U; iOutput < wrap::toUnsigned(InterleaveSequence->size()) - 1U; iOutput++) {
 		*vertexIt = fPOINT { it->x + offset.x, it->y + offset.y };
@@ -13898,7 +13898,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap.testAndReset(StateFlag::FPUNCLP)) {
 		thred::savdo();
-		fixpclp();
+		fixpclp(ClosestFormToCursor);
 		form::frmout(ClosestFormToCursor);
 		return true;
 	}
@@ -14559,24 +14559,24 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					SelectedForm = &(FormList->operator[](ClosestFormToCursor));
 					if ((SelectedForm->fillType != 0U) || (SelectedForm->edgeType != 0U)
 					    || ((SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
-						auto& formIter = FormList->operator[](ClosestFormToCursor);
-						if (formIter.fillType != 0U) {
-							formIter.fillColor = gsl::narrow<uint8_t>(ActiveColor);
-							if (formIter.fillType == FTHF) {
-								formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(ActiveColor);
+						auto& currentForm = FormList->operator[](ClosestFormToCursor);
+						if (currentForm.fillType != 0U) {
+							currentForm.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+							if (currentForm.fillType == FTHF) {
+								currentForm.fillInfo.feather.color = gsl::narrow<uint8_t>(ActiveColor);
 							}
 						}
-						if (formIter.edgeType != 0U) {
-							if (formIter.edgeType == EDGEAPPL) {
-								formIter.borderColor &= APCOLMSK;
-								formIter.borderColor |= ActiveColor;
+						if (currentForm.edgeType != 0U) {
+							if (currentForm.edgeType == EDGEAPPL) {
+								currentForm.borderColor &= APCOLMSK;
+								currentForm.borderColor |= ActiveColor;
 							}
 							else {
-								formIter.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+								currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
 							}
 						}
 						if ((SelectedForm->extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
-							formIter.underlayColor = gsl::narrow<uint8_t>(ActiveColor);
+							currentForm.underlayColor = gsl::narrow<uint8_t>(ActiveColor);
 						}
 						const auto formCode = ClosestFormToCursor << FRMSHFT;
 						for (auto& stitch : *StitchBuffer) {

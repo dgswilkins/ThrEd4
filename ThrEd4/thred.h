@@ -208,7 +208,7 @@ namespace internal {
 	void filclos();
 	void filfrms();
 	auto finrng(uint32_t find) noexcept -> bool;
-	void fixpclp();
+	void fixpclp(uint32_t closestFormToCursor);
 	void fnamtabs();
 	void fndknt();
 	void fop();

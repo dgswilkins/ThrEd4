@@ -351,7 +351,7 @@ void xt::fthrfn() {
 	LineSpacing = SelectedForm->fillSpacing;
 	satin::satfil();
 	BSequence->front().attribute = 0;
-	(*BSequence)[1].attribute = 1;
+	(*BSequence)[1].attribute    = 1;
 	if (feather.phaseIndex == 0U) {
 		feather.phaseIndex = 1U;
 	}
@@ -466,12 +466,12 @@ constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
 
 #pragma warning(push)
 #pragma warning(disable : 26487)
-auto xt::insid() -> std::vector<fPOINT>& {
-	satin::satout(fabs(SelectedForm->underlayIndent));
-	if (SelectedForm->underlayIndent > 0) {
+auto xt::insid(const FRMHED& form) -> std::vector<fPOINT>& {
+	satin::satout(form, fabs(form.underlayIndent));
+	if (form.underlayIndent > 0) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
-			if (!form::cisin((*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
+			if (!form::cisin(form, (*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				(*InsidePoints)[iVertex] = vertexIt[iVertex];
 			}
 		}
@@ -498,24 +498,24 @@ void xt::internal::delwlk(uint32_t code) {
 	}
 }
 
-void xt::internal::chkuseq() {
+void xt::internal::chkuseq(FRMHED& form) {
 #if BUGBAK
 	uint32_t index;
 
 	for (index = 0; index < OutputIndex; index++) {
 		InterleaveSequence->push_back((*OSequence)[index]);
 	}
-	InterleaveSequenceIndices->back().color = SelectedForm->underlayColor;
+	InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
 
 	if (OutputIndex != 0U) {
-		if (SelectedForm->underlayStitchLen < MINWLK) {
-			SelectedForm->underlayStitchLen = MINWLK;
+		if (form.underlayStitchLen < MINWLK) {
+			form.underlayStitchLen = MINWLK;
 		}
-		if (SelectedForm->underlayStitchLen > MAXWLK) {
-			SelectedForm->underlayStitchLen = MAXWLK;
+		if (form.underlayStitchLen > MAXWLK) {
+			form.underlayStitchLen = MAXWLK;
 		}
-		const auto underlayStitchLength = SelectedForm->underlayStitchLen;
+		const auto underlayStitchLength = form.underlayStitchLen;
 		for (auto iSequence = 0U; iSequence < OutputIndex - 1U; iSequence++) {
 			const auto delta       = fPOINT { (*OSequence)[wrap::toSize(iSequence) + 1U].x - (*OSequence)[iSequence].x,
                                         (*OSequence)[wrap::toSize(iSequence) + 1U].y - (*OSequence)[iSequence].y };
@@ -536,28 +536,29 @@ void xt::internal::chkuseq() {
 		}
 		InterleaveSequence->push_back((*OSequence)[OutputIndex - 1U]);
 		// ToDo - should this be front or (back - 1) ?
-		InterleaveSequenceIndices->front().color = SelectedForm->underlayColor;
+		InterleaveSequenceIndices->front().color = form.underlayColor;
 	}
 #endif
 }
 
-void xt::internal::ritwlk() {
+void xt::internal::ritwlk(FRMHED& form) {
 	if (OutputIndex != 0U) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC { WLKMSK, SelectedForm->underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL });
-		chkuseq();
+		chkuseq(form);
 	}
 }
 
-void xt::internal::ritcwlk() {
+void xt::internal::ritcwlk(FRMHED& form) {
 	if (OutputIndex != 0U) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC { CWLKMSK, SelectedForm->underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL });
-		chkuseq();
+		chkuseq(form);
 	}
 }
 
-auto xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
+auto xt::internal::gucon(const FRMHED&            form,
+                         std::vector<fPOINTATTR>& buffer,
                          const fPOINT&            start,
                          const fPOINT&            finish,
                          uint32_t                 destination,
@@ -576,7 +577,7 @@ auto xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 	if (startVertex == endVertex) {
 		return 0;
 	}
-	const auto& indentedPoint = xt::insid();
+	const auto& indentedPoint = xt::insid(form);
 	up = down = startVertex;
 	do {
 		if (up == endVertex) {
@@ -637,20 +638,20 @@ auto xt::internal::gucon(std::vector<fPOINTATTR>& buffer,
 	return iStitch - destination;
 }
 
-void xt::internal::fnwlk(uint32_t find) {
-	form::fvars(find);
-	if (SelectedForm->type == FRMLINE) {
-		SelectedForm->type = FRMFPOLY;
+void xt::internal::fnwlk(FRMHED& form) {
+	// form::fvars(find);
+	if (form.type == FRMLINE) {
+		form.type = FRMFPOLY;
 	}
 	auto start = 0U;
-	if (((SelectedForm->extendedAttribute & AT_STRT) != 0U) && SelectedForm->type != FRMLINE) {
-		start = SelectedForm->fillStart;
+	if (((form.extendedAttribute & AT_STRT) != 0U) && form.type != FRMLINE) {
+		start = form.fillStart;
 	}
 	auto count = VertexCount;
-	if (SelectedForm->type != FRMLINE) {
+	if (form.type != FRMLINE) {
 		count++;
 	}
-	const auto& walkPoints = xt::insid();
+	const auto& walkPoints = xt::insid(form);
 	OutputIndex            = 0;
 	while (count != 0U) {
 		OSequence->push_back(walkPoints[start]);
@@ -658,56 +659,56 @@ void xt::internal::fnwlk(uint32_t find) {
 		start = form::nxt(start);
 		count--;
 	}
-	ritwlk();
+	ritwlk(form);
 }
 
-void xt::internal::ritund() {
+void xt::internal::ritund(FRMHED& form) {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(
 		    INSREC { UNDMSK, SelectedForm->underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL });
-		chkuseq();
+		chkuseq(form);
 	}
 }
 
-void xt::internal::undclp() {
+void xt::internal::undclp(const FRMHED& form) {
 	// ToDo - Is it better to initialize individually?
 	auto& clipBuffer = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(2);
-	ClipRectSize = FLSIZ { 0, SelectedForm->underlayStitchLen };
+	ClipRectSize = FLSIZ { 0, form.underlayStitchLen };
 	clipBuffer.emplace_back(0.0F, 00.0F, 0U);
-	clipBuffer.emplace_back(0.0F, SelectedForm->underlayStitchLen, 0U);
+	clipBuffer.emplace_back(0.0F, form.underlayStitchLen, 0U);
 }
 
-void xt::internal::fncwlk() {
+void xt::internal::fncwlk(FRMHED& form) {
 	OutputIndex = 0;
 	OSequence->clear();
-	SelectedForm->extendedAttribute |= AT_CWLK;
-	if (SelectedForm->satinGuideCount != 0U) {
+	form.extendedAttribute |= AT_CWLK;
+	if (form.satinGuideCount != 0U) {
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-		if (SelectedForm->wordParam != 0U) {
-			const auto iVertex    = SelectedForm->wordParam;
+		if (form.wordParam != 0U) {
+			const auto iVertex    = form.wordParam;
 			auto&      thisVertex = vertexIt[iVertex];
 			auto&      nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
 			OSequence->push_back(fPOINT { form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y) });
 			OutputIndex++;
 		}
-		auto guideIt = std::next(SatinGuides->cbegin(), SelectedForm->satinOrAngle.guide);
-		for (auto iGuide = SelectedForm->satinGuideCount; iGuide != 0; iGuide--) {
+		auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+		for (auto iGuide = form.satinGuideCount; iGuide != 0; iGuide--) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
 			             form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y) });
 			OutputIndex++;
 		}
-		if ((SelectedForm->attribute & FRMEND) != 0U) {
+		if ((form.attribute & FRMEND) != 0U) {
 			OSequence->push_back(fPOINT { form::midl(vertexIt[0].x, vertexIt[1].x), form::midl(vertexIt[0].y, vertexIt[1].y) });
 			OutputIndex++;
 		}
 	}
 	else {
 		auto start = 0U;
-		if ((SelectedForm->extendedAttribute & AT_STRT) != 0U) {
-			start = SelectedForm->fillStart;
+		if ((form.extendedAttribute & AT_STRT) != 0U) {
+			start = form.fillStart;
 		}
 		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 		OSequence->push_back(vertexIt[start]);
@@ -717,7 +718,7 @@ void xt::internal::fncwlk() {
 		for (auto iGuide = 1U; iGuide < (VertexCount / 2); iGuide++) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[finish].x, vertexIt[start].x), form::midl(vertexIt[finish].y, vertexIt[start].y) });
-			if (form::cisin(OSequence->back().x, OSequence->back().y)) {
+			if (form::cisin(form, OSequence->back().x, OSequence->back().y)) {
 				OutputIndex++;
 			}
 			start  = form::nxt(start);
@@ -726,7 +727,7 @@ void xt::internal::fncwlk() {
 		OSequence->push_back(vertexIt[start]);
 		OutputIndex++;
 	}
-	ritcwlk();
+	ritcwlk(form);
 }
 
 void xt::srtcol() {
@@ -806,46 +807,46 @@ void xt::setulen() {
 	displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
 }
 
-void xt::chkcwlk() {
+void xt::chkcwlk(FRMHED& form) {
 	if ((SelectedForm->extendedAttribute & AT_CWLK) != 0U) {
-		xi::fncwlk();
+		xi::fncwlk(form);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | CWLKMSK);
 	}
 }
 
-void xt::chkwlk() {
-	if ((SelectedForm->extendedAttribute & AT_WALK) != 0U) {
-		xi::fnwlk(ClosestFormToCursor);
+void xt::chkwlk(FRMHED& form) {
+	if ((form.extendedAttribute & AT_WALK) != 0U) {
+		xi::fnwlk(form);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | WLKMSK);
 	}
 }
 
-void xt::internal::fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices) {
+void xt::internal::fnund(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
 	const auto savedStitchSize = UserStitchLength;
 
 	UserStitchLength = 1e38F;
-	if (SelectedForm->underlaySpacing == 0.0F) {
-		SelectedForm->underlaySpacing = IniFile.underlaySpacing;
+	if (form.underlaySpacing == 0.0F) {
+		form.underlaySpacing = IniFile.underlaySpacing;
 	}
-	if (SelectedForm->underlayStitchLen == 0.0F) {
-		SelectedForm->underlayStitchLen = IniFile.underlayStitchLen;
+	if (form.underlayStitchLen == 0.0F) {
+		form.underlayStitchLen = IniFile.underlayStitchLen;
 	}
-	undclp();
+	undclp(form);
 	StateMap.set(StateFlag::ISUND);
-	form::angclpfn(textureSegments, angledFormVertices);
+	form::angclpfn(form, textureSegments, angledFormVertices);
 	OutputIndex = wrap::toUnsigned(OSequence->size());
-	ritund();
-	form::fvars(find);
+	ritund(form);
+	//form::fvars(find);
 	UserStitchLength = savedStitchSize;
 }
 
-void xt::chkund(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
-	if ((SelectedForm->extendedAttribute & AT_UND) != 0U) {
-		xi::fnund(textureSegments, ClosestFormToCursor, angledFormVertices);
+void xt::chkund(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices) {
+	if ((form.extendedAttribute & AT_UND) != 0U) {
+		xi::fnund(form, textureSegments, angledFormVertices);
 	}
 	else {
 		xi::delwlk((ClosestFormToCursor << FRMSHFT) | UNDMSK);
@@ -1422,7 +1423,7 @@ auto xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept -> bool {
 	return false;
 }
 
-void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
+void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
 	if (ilData.coloc > ilData.start) {
 		const auto count       = ilData.coloc - ilData.start;
 		auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
@@ -1436,7 +1437,8 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	if ((SelectedForm->extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			ilData.output += gucon(buffer,
+			ilData.output += gucon(form,
+			                       buffer,
 			                       vertexIt[SelectedForm->fillStart],
 			                       (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
 			                       ilData.output,
@@ -1445,8 +1447,8 @@ void xt::internal::duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF&
 	}
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
-		ilData.output
-		    += gucon(buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
+		ilData.output += gucon(
+		    form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
 	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1U].index;
@@ -1478,24 +1480,23 @@ auto xt::internal::isfil() noexcept -> bool {
 	return false;
 }
 
-void xt::internal::chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
+void xt::internal::chkend(const FRMHED& form, std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
 	if (isfil()) {
 		StateMap.set(StateFlag::ISEND);
-		if ((SelectedForm->extendedAttribute & AT_END) != 0U) {
+		if ((form.extendedAttribute & AT_END) != 0U) {
 			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			ilData.output += gucon(buffer, InterleaveSequence->back(), vertexIt[SelectedForm->fillEnd], ilData.output, code);
+			ilData.output += gucon(form, buffer, InterleaveSequence->back(), vertexIt[form.fillEnd], ilData.output, code);
 		}
 	}
 }
 
-void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
+void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 	auto ilData = INTINF {};
 
 	StateMap.reset(StateFlag::ISEND);
 	form::fvars(ClosestFormToCursor);
 	InterleaveSequenceIndices->emplace_back(INSREC { 0, 0, wrap::toUnsigned(InterleaveSequence->size()), 0 });
-	ilData.layerIndex
-	    = (gsl::narrow<uint32_t>(SelectedForm->attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
+	ilData.layerIndex = (gsl::narrow<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1)) | (ClosestFormToCursor << FRMSHFT);
 	StateMap.reset(StateFlag::DIDSTRT);
 	if (!StitchBuffer->empty()) {
 		auto highStitchBuffer = std::vector<fPOINTATTR> {};
@@ -1545,9 +1546,9 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			}
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[ilData.pins].code
 			                             | (*InterleaveSequenceIndices)[ilData.pins].color);
-			xi::duint(highStitchBuffer, code, ilData);
+			xi::duint(form, highStitchBuffer, code, ilData);
 		}
-		xi::chkend(highStitchBuffer, code, ilData);
+		xi::chkend(form, highStitchBuffer, code, ilData);
 		if ((!StitchBuffer->empty()) && ilData.start < gsl::narrow<decltype(ilData.start)>(StitchBuffer->size() - 1U)) {
 			const auto ine         = wrap::toUnsigned(StitchBuffer->size() - ilData.start);
 			auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
@@ -1568,10 +1569,11 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); iSequence++) {
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
 			                             | (*InterleaveSequenceIndices)[iSequence].color);
-			if ((SelectedForm->extendedAttribute & AT_STRT) != 0U) {
+			if ((form.extendedAttribute & AT_STRT) != 0U) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-					ilData.output += xi::gucon(*StitchBuffer,
-					                           vertexIt[SelectedForm->fillStart],
+					ilData.output += xi::gucon(form,
+					                           *StitchBuffer,
+					                           vertexIt[form.fillStart],
 					                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
 					                           ilData.output,
 					                           code);
@@ -1579,7 +1581,8 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 			}
 			auto colpnt = fPOINT {};
 			if (xi::lastcol(iSequence, colpnt)) {
-				ilData.output += xi::gucon(*StitchBuffer,
+				ilData.output += xi::gucon(form,
+				                           *StitchBuffer,
 				                           colpnt,
 				                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index],
 				                           ilData.output,
@@ -1601,7 +1604,7 @@ void xt::intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap) {
 				}
 			}
 		}
-		xi::chkend(*StitchBuffer, code, ilData);
+		xi::chkend(form, *StitchBuffer, code, ilData);
 	}
 	thred::coltab();
 }

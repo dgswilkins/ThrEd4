@@ -24,9 +24,9 @@ namespace xt {
 
 void chgchk(uint8_t code);
 void chgwrn();
-void chkcwlk();
-void chkund(const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
-void chkwlk();
+void chkcwlk(FRMHED& form);
+void chkund(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
+void chkwlk(FRMHED& form);
 void clrstch() noexcept;
 
 #ifdef _DEBUG
@@ -59,8 +59,8 @@ void fethr();
 void fethrf();
 void fsort();
 void fthrfn();
-auto insid() -> std::vector<fPOINT>&;
-void intlv(const FILLSTARTS& fillStartsData, uint32_t fillStartsMap);
+auto insid(const FRMHED& form) -> std::vector<fPOINT>&;
+void intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fillStartsMap);
 void mvshft();
 void notcwlk();
 void notund();
@@ -113,11 +113,11 @@ namespace internal {
 	auto bpsg() noexcept -> uint32_t;
 	void bspacfn(uint32_t find, float length);
 	auto chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool;
-	void chkend(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
+	void chkend(const FRMHED& form, std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
 	auto chkrdun(const std::vector<uint32_t>& formFillCounter,
 	             const std::vector<OREC*>&    pRecs,
 	             const SRTREC&                stitchRecord) noexcept -> bool;
-	void chkuseq();
+	void chkuseq(FRMHED& form);
 	void delwlk(uint32_t code);
 
 #ifdef _DEBUG
@@ -125,7 +125,7 @@ namespace internal {
 	void duatf(uint32_t ind);
 #endif
 
-	void duint(std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
+	void duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData);
 	auto duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, const std::vector<OREC*>& pRecs, SRTREC& sortRecord) -> uint32_t;
 
 	constexpr float durat(float start, float finish, float featherRatio);
@@ -144,9 +144,9 @@ namespace internal {
 	void flenfn(uint32_t find, float length);
 	void fmaxfn(uint32_t find, float length);
 	void fminfn(uint32_t find, float length);
-	void fncwlk();
-	void fnund(const std::vector<RNGCNT>& textureSegments, uint32_t find, std::vector<fPOINT>& angledFormVertices);
-	void fnwlk(uint32_t find);
+	void fncwlk(FRMHED& form);
+	void fnund(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
+	void fnwlk(FRMHED& form);
 	void fritfil(std::vector<fPOINT>& featherSequence);
 	void fspacfn(uint32_t find, float spacing);
 	void fthdfn(uint32_t iSequence, FEATHER& feather);
@@ -155,8 +155,12 @@ namespace internal {
 	void fthvars(FEATHER& feather);
 	void fwidfn(uint32_t find, float length);
 	auto getstxt(uint32_t stringIndex, HWND dialog) -> float;
-	auto gucon(std::vector<fPOINTATTR>& buffer, const fPOINT& start, const fPOINT& finish, uint32_t destination, uint32_t code)
-	    -> uint32_t;
+	auto gucon(const FRMHED&            form,
+	           std::vector<fPOINTATTR>& buffer,
+	           const fPOINT&            start,
+	           const fPOINT&            finish,
+	           uint32_t                 destination,
+	           uint32_t                 code) -> uint32_t;
 	auto isfil() noexcept -> bool;
 	auto lastcol(uint32_t index, fPOINT& point) noexcept -> bool;
 	auto midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept -> fPOINT;
@@ -168,9 +172,9 @@ namespace internal {
 	auto orComp(const OREC* record1, const OREC* record2) noexcept -> bool;
 	auto orfComp(const OREC* record1, const OREC* record2) noexcept -> bool;
 	void rtrclpfn();
-	void ritcwlk();
-	void ritund();
-	void ritwlk();
+	void ritcwlk(FRMHED& form);
+	void ritund(FRMHED& form);
+	void ritwlk(FRMHED& form);
 	void sadj(fPOINT& point, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 	void sadj(fPOINTATTR& stitch, const fPOINT& designSizeRatio, const fRECTANGLE& designSizeRect) noexcept;
 
@@ -185,7 +189,7 @@ namespace internal {
 	void uangfn(uint32_t find, float angle);
 	void ucolfn(uint32_t find, uint32_t color);
 	void ulenfn(uint32_t find, float length);
-	void undclp();
+	void undclp(const FRMHED& form);
 	void uspacfn(uint32_t find, float spacing);
 	void xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOINT& point, float featherRatioLocal) noexcept;
 } // namespace internal
