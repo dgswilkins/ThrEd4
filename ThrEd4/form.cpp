@@ -2401,10 +2401,7 @@ void form::internal::plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fP
 	}
 	sprct(fillVerticalRect, (VertexCount - 1), 0);
 	spurct(underlayVerticalRect, fillVerticalRect, (VertexCount - 1));
-	auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
-	if ((angledForm.type == FRMLINE) && ((angledForm.edgeType & NEGUND) == EDGEPROPSAT)) {
-		vertexIt = std::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
-	}
+	auto vertexIt = std::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
 	if ((angledForm.attribute & SBLNT) == 0U) {
 		const auto& val = vertexIt[1];
 
@@ -2422,7 +2419,6 @@ void form::internal::plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fP
 		underlayVerticalRect[VertexCount - 4U].dopnt = val;
 	}
 	OSequence->clear();
-	vertexIt      = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	SelectedPoint = vertexIt[0];
 	if ((angledForm.edgeType & EGUND) != 0U) {
 		LineSpacing = USPAC;
