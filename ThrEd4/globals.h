@@ -204,8 +204,6 @@ extern fRECTANGLE     RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
-extern uint32_t SatinEndGuide;
-
 extern std::vector<SATCON>* SatinGuides;
 
 extern RECT      scRct;

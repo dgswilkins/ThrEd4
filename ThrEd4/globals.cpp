@@ -170,8 +170,6 @@ fRECTANGLE     RotationRect {};                   // rotation rectangle
 
 std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
-uint32_t SatinEndGuide; // satin end guide for the currently selected form
-
 std::vector<SATCON>* SatinGuides; // satin form connects
 
 RECT      scRct;      //

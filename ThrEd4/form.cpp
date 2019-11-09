@@ -370,7 +370,6 @@ void form::fvars(uint32_t iForm) noexcept {
 		VertexCount            = form.vertexCount;
 		CurrentFormGuides      = form.satinOrAngle.guide;
 		CurrentFormGuidesCount = form.satinGuideCount;
-		SatinEndGuide          = form.wordParam;
 	}
 }
 

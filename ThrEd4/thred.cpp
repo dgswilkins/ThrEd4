@@ -8418,14 +8418,12 @@ void thred::internal::delet() {
 		if (form.type == SAT) {
 			// Make sure the end guides are still valid
 			if (vertexMap.test(0) || vertexMap.test(1)) {
-				form.wordParam = 0;
-				SatinEndGuide           = 0;
+				form.wordParam = 0; // Satin end guide
 				form.attribute &= 0xfeU;
 			}
 			const auto iNext = form.wordParam + 1U;
 			if (vertexMap.test(form.wordParam) || vertexMap.test(iNext)) {
 				form.wordParam = 0;
-				SatinEndGuide           = 0;
 			}
 
 			// ToDo - Is there a better way to do this than iterating through?
@@ -8556,9 +8554,10 @@ void thred::internal::delet() {
 							break;
 						}
 					}
-					if (SatinEndGuide != 0U) {
-						if (ClosestVertexToCursor == gsl::narrow<uint32_t>(SatinEndGuide)
-						    || ClosestVertexToCursor == gsl::narrow<uint32_t>(SatinEndGuide) + 1U) {
+					const auto& endGuide = form.wordParam;
+					if (endGuide != 0U) {
+						if (ClosestVertexToCursor == gsl::narrow<uint32_t>(endGuide)
+						    || ClosestVertexToCursor == gsl::narrow<uint32_t>(endGuide) + 1U) {
 							form.wordParam = 0;
 							satinFlag               = true;
 							break;
