@@ -368,7 +368,6 @@ void form::fvars(uint32_t iForm) noexcept {
 		auto& form             = FormList->operator[](iForm);
 		CurrentVertexIndex     = form.vertexIndex;
 		VertexCount            = form.vertexCount;
-		CurrentFormGuides      = form.satinOrAngle.guide;
 		CurrentFormGuidesCount = form.satinGuideCount;
 	}
 }
@@ -670,7 +669,7 @@ void form::drwfrm() {
 						lastPoint = form.wordParam + 1U;
 					}
 					const auto maxGuide = FormList->operator[](iForm).satinGuideCount;
-					auto       guideIt  = std::next(SatinGuides->cbegin(), CurrentFormGuides);
+					auto       guideIt  = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 					for (auto iGuide = 0U; iGuide < maxGuide; iGuide++) {
 						form::sfCor2px(vertexIt[guideIt[iGuide].start], line[0]);
 						form::sfCor2px(vertexIt[guideIt[iGuide].finish], line[1]);
@@ -5331,7 +5330,7 @@ void form::uninsf() {
 	}
 }
 
-void form::rotfrm(FRMHED& currentForm, uint32_t newStartVertex) {
+void form::rotfrm(FRMHED& form, uint32_t newStartVertex) {
 	form::fvars(ClosestFormToCursor);
 
 	auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
@@ -5346,14 +5345,14 @@ void form::rotfrm(FRMHED& currentForm, uint32_t newStartVertex) {
 		iRotated          = form::nxt(iRotated);
 	}
 	iRotatedGuide = 0;
-	auto guideIt  = std::next(SatinGuides->begin(), CurrentFormGuides);
-	if (currentForm.type == SAT) {
-		if (currentForm.wordParam != 0U) {
-			currentForm.wordParam
-			    = (currentForm.wordParam + currentForm.vertexCount - newStartVertex) % currentForm.vertexCount;
+	auto guideIt  = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
+	if (form.type == SAT) {
+		if (form.wordParam != 0U) {
+			form.wordParam
+			    = (form.wordParam + form.vertexCount - newStartVertex) % form.vertexCount;
 		}
 		if (VertexCount != 0U) {
-			for (auto iGuide = 0U; iGuide < currentForm.satinGuideCount; iGuide++) {
+			for (auto iGuide = 0U; iGuide < form.satinGuideCount; iGuide++) {
 				if (guideIt[iGuide].start != newStartVertex && guideIt[iGuide].finish != newStartVertex) {
 					guideIt[iRotatedGuide].start  = (guideIt[iGuide].start + VertexCount - newStartVertex) % VertexCount;
 					guideIt[iRotatedGuide].finish = (guideIt[iGuide].finish + VertexCount - newStartVertex) % VertexCount;
@@ -5366,15 +5365,15 @@ void form::rotfrm(FRMHED& currentForm, uint32_t newStartVertex) {
 		}
 	}
 	if (iRotatedGuide != 0U) {
-		currentForm.satinGuideCount = iRotatedGuide;
+		form.satinGuideCount = iRotatedGuide;
 		std::sort(guideIt, std::next(guideIt, iRotatedGuide), satin::scomp);
 	}
 	if (VertexCount != 0U) {
-		if ((currentForm.extendedAttribute & AT_STRT) != 0U) {
-			currentForm.fillStart = (currentForm.fillStart + VertexCount - newStartVertex) % VertexCount;
+		if ((form.extendedAttribute & AT_STRT) != 0U) {
+			form.fillStart = (form.fillStart + VertexCount - newStartVertex) % VertexCount;
 		}
-		if ((currentForm.extendedAttribute & AT_END) != 0U) {
-			currentForm.fillEnd = (currentForm.fillEnd + VertexCount - newStartVertex) % VertexCount;
+		if ((form.extendedAttribute & AT_END) != 0U) {
+			form.fillEnd = (form.fillEnd + VertexCount - newStartVertex) % VertexCount;
 		}
 	}
 }

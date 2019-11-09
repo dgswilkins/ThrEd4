@@ -158,7 +158,7 @@ void ritfrct(uint32_t iForm, HDC dc);
 void rotagain();
 void rotcmd();
 void rotdup();
-void rotfrm(FRMHED& currentForm, uint32_t newStartVertex);
+void rotfrm(FRMHED& form, uint32_t newStartVertex);
 auto rotpar() -> fPOINT;
 void rstfrm();
 void sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect);

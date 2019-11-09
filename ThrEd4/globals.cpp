@@ -80,7 +80,6 @@ uint32_t ClosestPointIndex;      // index of closest point
 uint32_t ClosestVertexToCursor;  // formOrigin closest to the cursor
 int32_t* ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR  CrossCursor;            // cross
-uint32_t CurrentFormGuides;      // guide index in the currently selected form
 uint32_t CurrentFormGuidesCount; // number of guides in the currently selected form
 uint32_t CurrentVertexIndex;     // points in the currently selected form
 

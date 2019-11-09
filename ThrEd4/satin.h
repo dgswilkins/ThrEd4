@@ -50,7 +50,7 @@ namespace internal {
 	void outfn(const FRMHED& form, uint32_t start, uint32_t finish, float satinWidth);
 	void sacspac(uint32_t startGuide, uint32_t guideCount);
 	void satclos();
-	void satcpy(const std::vector<SATCON>& source, uint32_t size);
+	void satcpy(FRMHED& form, const std::vector<SATCON>& source, uint32_t size);
 	void satends(const FRMHED& form, uint32_t isBlunt, float width);
 	void satfn(const std::vector<float>& lengths, uint32_t line1Start, uint32_t line1End, uint32_t line2Start, uint32_t line2End);
 	void satmf(const FRMHED& form, const std::vector<float>& lengths);

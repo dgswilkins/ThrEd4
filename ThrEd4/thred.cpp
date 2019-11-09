@@ -8427,7 +8427,7 @@ void thred::internal::delet() {
 			}
 
 			// ToDo - Is there a better way to do this than iterating through?
-			auto guideIt = std::next(SatinGuides->begin(), CurrentFormGuides);
+			auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; iGuide++) {
 				auto newGuideVal = 0U;
 				for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
