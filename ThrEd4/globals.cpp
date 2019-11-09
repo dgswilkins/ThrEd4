@@ -65,7 +65,6 @@ uint32_t Clip = 0;                         // pcs format clipboard handle
 
 std::vector<fPOINTATTR>* ClipBuffer; //
 
-FORMCLIP* ClipFormHeader; // for thred form clipboard data
 HGLOBAL   ClipMemory;     // handle to the clipboard memory
 void*     ClipPointer;    // for memory allocation for clipboard data
 
@@ -182,7 +181,6 @@ int32_t*  ScrollSize; // Scroll bar width scaled for DPI
 std::vector<POINT>* SearchLine; // stitch select line
 
 HPEN     SelectAllPen;              // pen for drawing large boxes
-FRMHED*  SelectedForm;              // pointer to selected form
 uint32_t SelectedFormControlVertex; // user selected form control formOrigin
 
 std::vector<uint32_t>* SelectedFormList;     // a list of selected forms

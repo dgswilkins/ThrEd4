@@ -22,15 +22,15 @@
 
 namespace satin {
 auto adsatk(uint32_t count) -> uint32_t;
-void delcon(uint32_t GuideIndex);
+void delcon(FRMHED& form, uint32_t GuideIndex);
 void delsac(uint32_t formIndex);
 void delspnt();
 void drwsat();
 void dusat() noexcept;
 void ribon();
-void satadj();
+void satadj(FRMHED& form);
 void satbrd();
-void satfil();
+void satfil(FRMHED& form);
 void satfix();
 void satknkt();
 void satout(const FRMHED& form, float satinWidth);
@@ -51,10 +51,10 @@ namespace internal {
 	void sacspac(uint32_t startGuide, uint32_t guideCount);
 	void satclos();
 	void satcpy(const std::vector<SATCON>& source, uint32_t size);
-	void satends(uint32_t isBlunt, float width);
+	void satends(const FRMHED& form, uint32_t isBlunt, float width);
 	void satfn(const std::vector<float>& lengths, uint32_t line1Start, uint32_t line1End, uint32_t line2Start, uint32_t line2End);
-	void satmf(const std::vector<float>& lengths);
-	void satsbrd();
+	void satmf(const FRMHED& form, const std::vector<float>& lengths);
+	void satsbrd(uint32_t formIndex);
 	auto satselfn() -> bool;
 	void sbfn(const std::vector<fPOINT>& insidePoints, uint32_t start, uint32_t finish);
 	void sfn(const FRMHED& form, uint32_t startVertex);

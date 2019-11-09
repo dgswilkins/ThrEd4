@@ -98,7 +98,6 @@ extern uint32_t Clip;
 
 extern std::vector<fPOINTATTR>* ClipBuffer;
 
-extern FORMCLIP* ClipFormHeader;
 extern HGLOBAL   ClipMemory;
 extern void*     ClipPointer;
 
@@ -216,7 +215,6 @@ extern int32_t*  ScrollSize;
 extern std::vector<POINT>* SearchLine;
 
 extern HPEN     SelectAllPen;
-extern FRMHED*  SelectedForm;
 extern uint32_t SelectedFormControlVertex;
 
 extern std::vector<uint32_t>* SelectedFormList;

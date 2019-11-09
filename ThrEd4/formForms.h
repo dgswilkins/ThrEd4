@@ -52,7 +52,7 @@ namespace internal {
 	void prflin(const std::wstring& msg, uint32_t row) noexcept;
 	auto prfnwin(const std::wstring& text) noexcept -> HWND;
 	void prftwin(const std::wstring& text) noexcept;
-	void refrmfn(uint32_t& formMenuEntryCount);
+	void refrmfn(const FRMHED& form, uint32_t& formMenuEntryCount);
 
 	auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 

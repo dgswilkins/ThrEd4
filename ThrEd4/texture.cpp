@@ -190,6 +190,19 @@ auto texture::istx(uint32_t iForm) noexcept -> bool {
 	return false;
 }
 
+auto texture::istx(const FRMHED& form) noexcept -> bool {
+	if (form.fillType == TXVRTF) {
+		return true;
+	}
+	if (form.fillType == TXHORF) {
+		return true;
+	}
+	if (form.fillType == TXANGF) {
+		return true;
+	}
+	return false;
+}
+
 void texture::internal::txrfor() noexcept {
 	if (TextureHistoryIndex < (ITXBUFLEN - 1)) {
 		TextureHistoryIndex++;
@@ -824,24 +837,26 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 	ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
 	ClipMemory = GetClipboardData(ThrEdClip);
 	if (ClipMemory != nullptr) {
-		ClipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
-		if (ClipFormHeader != nullptr) {
-			if (ClipFormHeader->clipType == CLP_FRM) {
-				SelectedForm     = &ClipFormHeader->form;
-				auto vertices    = convert_ptr<fPOINT*>(&SelectedForm[1]);
-				textureForm      = *SelectedForm;
-				auto sourceStart = vertices;
-				auto sourceEnd   = sourceStart + SelectedForm->vertexCount;
-				AngledFormVertices->clear();
-				AngledFormVertices->resize(SelectedForm->vertexCount);
-				auto destination = AngledFormVertices->begin();
-				std::copy(sourceStart, sourceEnd, destination);
-				textureForm.vertexIndex = 0;
-				StateMap.reset(StateFlag::TXTLIN);
-				StateMap.set(StateFlag::TXTCLP);
-				StateMap.set(StateFlag::TXTMOV);
-				txi::setxfrm();
-				TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+		auto clipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
+		if (clipFormHeader != nullptr) {
+			if (clipFormHeader->clipType == CLP_FRM) {
+				auto clipForm     = &clipFormHeader->form;
+				if (nullptr != clipForm) {
+					auto vertices = convert_ptr<fPOINT*>(&clipForm[1]);
+					textureForm = *clipForm;
+					auto sourceStart = vertices;
+					auto sourceEnd = sourceStart + textureForm.vertexCount;
+					AngledFormVertices->clear();
+					AngledFormVertices->resize(textureForm.vertexCount);
+					auto destination = AngledFormVertices->begin();
+					std::copy(sourceStart, sourceEnd, destination);
+					textureForm.vertexIndex = 0;
+					StateMap.reset(StateFlag::TXTLIN);
+					StateMap.set(StateFlag::TXTCLP);
+					StateMap.set(StateFlag::TXTMOV);
+					txi::setxfrm();
+					TextureCursorLocation = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
+				}
 			}
 			GlobalUnlock(ClipMemory);
 		}
@@ -968,55 +983,55 @@ auto texture::internal::tpComp(const TXPNT& texturePoint0, const TXPNT& textureP
 	return false;
 }
 
-void texture::internal::txpar() {
-	SelectedForm->type                       = FRMFPOLY;
-	SelectedForm->fillInfo.texture.lines     = TextureScreen.lines;
-	SelectedForm->fillInfo.texture.height    = TextureScreen.areaHeight;
-	SelectedForm->fillSpacing                = TextureScreen.spacing;
-	SelectedForm->lengthOrCount.stitchLength = IniFile.userStitchLength;
-	SelectedForm->maxFillStitchLen           = IniFile.maxStitchLength;
-	SelectedForm->minFillStitchLen           = IniFile.minStitchLength;
-	SelectedForm->fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
+void texture::internal::txpar(FRMHED& form) {
+	form.type                       = FRMFPOLY;
+	form.fillInfo.texture.lines     = TextureScreen.lines;
+	form.fillInfo.texture.height    = TextureScreen.areaHeight;
+	form.fillSpacing                = TextureScreen.spacing;
+	form.lengthOrCount.stitchLength = IniFile.userStitchLength;
+	form.maxFillStitchLen           = IniFile.maxStitchLength;
+	form.minFillStitchLen           = IniFile.minStitchLength;
+	form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
 	form::refilfn();
 }
 
-void texture::internal::txvrt() {
+void texture::internal::txvrt(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
-			SelectedForm->fillType = TXVRTF;
-			txi::txpar();
+			form.fillType = TXVRTF;
+			txi::txpar(form);
 		}
 	}
 }
 
-void texture::internal::txhor() {
+void texture::internal::txhor(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
-			SelectedForm->fillType = TXHORF;
-			txi::txpar();
+			form.fillType = TXHORF;
+			txi::txpar(form);
 		}
 	}
 }
 
-void texture::internal::txang() {
+void texture::internal::txang(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
-			SelectedForm->fillType              = TXANGF;
-			SelectedForm->angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
-			txi::txpar();
+			form.fillType              = TXANGF;
+			form.angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
+			txi::txpar(form);
 		}
 	}
 }
 
 void texture::deltx(uint32_t formIndex) {
 	auto flag = false;
+	auto& form = FormList->operator[](formIndex);
+	const auto& currentIndex = form.fillInfo.texture.index;
 
-	const auto currentIndex = FormList->operator[](formIndex).fillInfo.texture.index;
-
-	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (SelectedForm->fillInfo.texture.count != 0U)) {
+	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
 		// First check to see if the texture is shared between forms
 		for (auto iForm = 0U; iForm < formIndex; iForm++) {
 			if (texture::istx(iForm)) {
@@ -1065,17 +1080,17 @@ void texture::deltx(uint32_t formIndex) {
 			}
 			*TexturePointsBuffer = std::move(textureBuffer);
 		}
-		FormList->operator[](formIndex).fillType = 0;
+		form.fillType = 0;
 	}
 }
 
-void texture::internal::nutx() {
+void texture::internal::nutx(FRMHED& form) {
 	auto index = 0U;
 
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 	if (!FormList->empty()) {
 		if (texture::istx(ClosestFormToCursor)) {
-			const auto& texture = FormList->operator[](ClosestFormToCursor).fillInfo.texture;
+			const auto& texture = form.fillInfo.texture;
 			index               = texture.index;
 			texture::deltx(ClosestFormToCursor);
 		}
@@ -1099,8 +1114,8 @@ void texture::internal::nutx() {
 			}
 		}
 
-		SelectedForm->fillInfo.texture.index = gsl::narrow<uint16_t>(index);
-		SelectedForm->fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
+		form.fillInfo.texture.index = gsl::narrow<uint16_t>(index);
+		form.fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
 	}
 }
 
@@ -1147,25 +1162,26 @@ enum textureStyles
 void texture::internal::dutxfn(uint32_t textureType) {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		txi::altx();
+		auto& form = FormList->operator[](ClosestFormToCursor);
 		clip::delmclp(ClosestFormToCursor);
-		if (SelectedForm->satinGuideCount != 0U) {
+		if (form.satinGuideCount != 0U) {
 			satin::delsac(ClosestFormToCursor);
 		}
 		texture::deltx(ClosestFormToCursor);
 		texture::savtxt();
-		txi::nutx();
+		txi::nutx(form);
 		form::dusqr(FormList->operator[](ClosestFormToCursor));
 		switch (textureType) {
 		case VRTYP: {
-			txi::txvrt();
+			txi::txvrt(form);
 			break;
 		}
 		case HORTYP: {
-			txi::txhor();
+			txi::txhor(form);
 			break;
 		}
 		case ANGTYP: {
-			txi::txang();
+			txi::txang(form);
 			break;
 		}
 		default: {
@@ -1603,15 +1619,15 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	StateMap.reset(StateFlag::LASTXBAK);
 }
 
-void texture::setxt(std::vector<RNGCNT>& textureSegments) {
-	const auto currentIndex = SelectedForm->fillInfo.texture.index;
-	const auto currentCount = SelectedForm->fillInfo.texture.count;
+void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
+	const auto currentIndex = form.fillInfo.texture.index;
+	const auto currentCount = form.fillInfo.texture.count;
 
 	texture::savtxt();
-	SelectedForm->wordParam = 0;
+	form.wordParam = 0;
 	StateMap.set(StateFlag::TXFIL);
-	ClipRectSize.cx = SelectedForm->fillSpacing;
-	ClipRectSize.cy = SelectedForm->fillInfo.texture.height;
+	ClipRectSize.cx = form.fillSpacing;
+	ClipRectSize.cy = form.fillInfo.texture.height;
 	if (currentCount != 0U) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
 			const auto currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + iTexturePoint);
@@ -1625,13 +1641,13 @@ void texture::setxt(std::vector<RNGCNT>& textureSegments) {
 	}
 }
 
-void texture::rtrtx() {
+void texture::rtrtx(const FRMHED& form) {
 	form::fvars(ClosestFormToCursor);
 	TempTexturePoints->clear();
 
-	const auto currentIndex = SelectedForm->fillInfo.texture.index;
+	const auto currentIndex = form.fillInfo.texture.index;
 	if (TexturePointsBuffer->size() > gsl::narrow<uint32_t>(currentIndex)) {
-		auto currentCount = SelectedForm->fillInfo.texture.count;
+		auto currentCount = form.fillInfo.texture.count;
 		if (TexturePointsBuffer->size() < gsl::narrow<uint32_t>(currentIndex + currentCount)) {
 			currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
 		}
@@ -1639,9 +1655,9 @@ void texture::rtrtx() {
 		auto startSource         = std::next(TexturePointsBuffer->cbegin(), currentIndex);
 		auto endSource           = std::next(startSource, currentCount);
 		std::copy(startSource, endSource, TempTexturePoints->begin());
-		TextureScreen.areaHeight = SelectedForm->fillInfo.texture.height;
-		TextureScreen.spacing    = SelectedForm->fillSpacing;
-		TextureScreen.lines      = SelectedForm->fillInfo.texture.lines;
+		TextureScreen.areaHeight = form.fillInfo.texture.height;
+		TextureScreen.spacing    = form.fillSpacing;
+		TextureScreen.lines      = form.fillInfo.texture.lines;
 		TextureScreen.width = gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
 		texture::savtxt();
 	}

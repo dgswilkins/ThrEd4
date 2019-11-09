@@ -29,7 +29,7 @@ namespace form {
 
 void angclp();
 void angclpfn(const FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& angledFormVertices);
-void angsclp();
+void angsclp(FRMHED& form);
 void apliq();
 void bakagain();
 void bakdup();
@@ -59,7 +59,7 @@ void crop();
 void debean();
 void delflt(uint32_t formIndex);
 void delfrms();
-void delmfil();
+void delmfil(uint32_t formIndex);
 void drwcon();
 void drwfrm();
 void duangs(const FRMHED& form);
@@ -67,7 +67,7 @@ void dubean();
 void dubfil();
 void dubig();
 void dubold();
-void dubsfil();
+void dubsfil(FRMHED& form);
 void dueg(uint32_t sides);
 void duform(uint32_t formType);
 void dufrm() noexcept;
@@ -112,7 +112,7 @@ void fselrct(uint32_t iForm);
 void fsizpar(FRMHED& form) noexcept;
 void fvars(uint32_t iForm) noexcept;
 auto getblen() noexcept -> float;
-auto getlast() -> uint32_t;
+auto getlast(const FRMHED& form) -> uint32_t;
 auto getplen() noexcept -> float;
 void horclp();
 void horsclp();
@@ -158,7 +158,7 @@ void ritfrct(uint32_t iForm, HDC dc);
 void rotagain();
 void rotcmd();
 void rotdup();
-void rotfrm(uint32_t newStartVertex);
+void rotfrm(FRMHED& currentForm, uint32_t newStartVertex);
 auto rotpar() -> fPOINT;
 void rstfrm();
 void sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect);
@@ -202,14 +202,14 @@ namespace internal {
 	void bakseq();
 	void bdrlin(uint32_t start, uint32_t finish, float stitchSize);
 	void bean(uint32_t start, uint32_t finish);
-	void bhbrd(double spacing);
+	void bhbrd(const FRMHED& form);
 	void bhcrnr(uint32_t vertex);
-	void bhfn(uint32_t start, uint32_t finish, double spacing);
-	void bholbrd();
-	void blbrd(double spacing);
-	void bold(double size);
+	void bhfn(const FRMHED& form, uint32_t start, uint32_t finish);
+	void bholbrd(uint32_t formIndex);
+	void blbrd(const FRMHED& form);
+	void bold(const FRMHED& form);
 	void boldlin(uint32_t start, uint32_t finish, double size);
-	void brdfil(float pd_Size);
+	void brdfil(const FRMHED& form);
 	void brkdun(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish);
 	void brkseq(const std::vector<SMALPNTL*>& sortedLines,
 	            uint32_t                      start,
@@ -282,7 +282,7 @@ namespace internal {
 	void filsfn();
 	auto findDistanceToSide(const fPOINT& lineStart, const fPOINT& lineEnd, const fPOINT& point, double& distance) noexcept
 	    -> float;
-	void fmclp();
+	void fmclp(FRMHED& form);
 	void fnagain(float rotationAngle);
 	void fnang(std::vector<uint32_t>& groupIndexSequence,
 	           std::vector<SMALPNTL>& lineEndpoints,
@@ -305,11 +305,11 @@ namespace internal {
 	void frmsqr(uint32_t iVertex);
 	void frmsqr0(const POINT& controlPoint);
 	void frmx(const POINT& controlPoint, HDC dc);
-	void fsangl();
-	void fsclp();
-	void fsclpx(uint32_t iForm);
-	void fshor();
-	void fspic();
+	void fsangl(FRMHED& form);
+	void fsclp(uint32_t formIndex);
+	void fsclpx(uint32_t formIndex);
+	void fshor(FRMHED& form);
+	void fspic(uint32_t formIndex);
 	void fsvrt();
 	void getbig() noexcept;
 	auto getlen(std::vector<CLIPNT>&       clipStitchPoints,
@@ -401,7 +401,7 @@ namespace internal {
 	    -> bool;
 	auto projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept -> bool;
 	auto projv(float xCoordinate, const fPOINT& lowerPoint, const fPOINT& upperPoint, fPOINT& intersection) noexcept -> bool;
-	void prpsbrd(FRMHED& currentForm);
+	void prpsbrd(uint32_t formIndex);
 	void prsmal(float width);
 	void px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept;
 	void rats();
@@ -429,9 +429,9 @@ namespace internal {
 	void rotbak(float rotationAngle, const fPOINT& rotationCenter) noexcept;
 	void rotentr(double rotationAngle);
 	void rspnt(float xCoordinate, float yCoordinate);
-	void sapliq();
-	void sbold();
-	void sbord();
+	void sapliq(uint32_t formIndex);
+	void sbold(uint32_t formIndex);
+	void sbord(uint32_t formIndex);
 	void seteg();
 	void sethart();
 	void setlens();

@@ -816,8 +816,8 @@ void trace::internal::dutrac() {
 		}
 		#endif
 		FormList->push_back(FRMHED {});
-		SelectedForm = &(FormList->back());
-		form::frmclr(*SelectedForm);
+		auto& form = FormList->back();
+		form::frmclr(form);
 		CurrentVertexIndex = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
 		OutputIndex        = 0;
 		FormVertices->push_back(fPOINT { gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
@@ -844,12 +844,12 @@ void trace::internal::dutrac() {
 				traceLengthSum = 0.0;
 			}
 		}
-		SelectedForm->vertexIndex = CurrentVertexIndex;
-		SelectedForm->vertexCount = gsl::narrow<decltype(SelectedForm->vertexCount)>(OutputIndex);
-		SelectedForm->type        = FRMFPOLY;
-		SelectedForm->attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+		form.vertexIndex = CurrentVertexIndex;
+		form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(OutputIndex);
+		form.type        = FRMFPOLY;
+		form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-		SelectedForm->satinGuideCount = 0;
+		form.satinGuideCount = 0;
 		StateMap.set(StateFlag::RESTCH);
 		StateMap.set(StateFlag::FRMOF);
 		form::tglfrm();
@@ -1059,10 +1059,10 @@ void trace::internal::stch2bit(fPOINT& point) {
 	BitmapPoint.y = wrap::round<int32_t>(BitmapHeight - BmpStitchRatio.y * point.y);
 }
 
-void trace::internal::pxlin(uint32_t start, uint32_t finish) {
+void trace::internal::pxlin(const FRMHED& form, uint32_t start, uint32_t finish) {
 	POINT line[2];
 
-	auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	ti::stch2bit(vertexIt[start]);
 	line[0] = BitmapPoint;
 	ti::stch2bit(vertexIt[finish]);
@@ -1071,13 +1071,13 @@ void trace::internal::pxlin(uint32_t start, uint32_t finish) {
 	Polyline(TraceDC, static_cast<const POINT*>(line), 2);
 }
 
-void trace::internal::bfrm() {
+void trace::internal::bfrm(const FRMHED& form) {
 	if (VertexCount != 0U) {
 		for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
-			ti::pxlin(iVertex, iVertex + 1U);
+			ti::pxlin(form, iVertex, iVertex + 1U);
 		}
-		if (SelectedForm->type != FRMLINE) {
-			ti::pxlin(VertexCount - 1, 0);
+		if (form.type != FRMLINE) {
+			ti::pxlin(form, VertexCount - 1, 0);
 		}
 	}
 }
@@ -1095,9 +1095,8 @@ void trace::blak() {
 		if (!StateMap.test(StateFlag::WASTRAC)) {
 			ti::getrmap();
 		}
-		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-			form::fvars(iForm);
-			ti::bfrm();
+		for (auto iForm : *FormList) {
+			ti::bfrm(iForm);
 		}
 		DeleteObject(BlackPen);
 		StateMap.set(StateFlag::WASBLAK);

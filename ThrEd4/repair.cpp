@@ -51,26 +51,25 @@ void repair::internal::adbad(std::wstring& repairMessage, uint32_t code, uint32_
 void repair::lodchk() {
 	thred::delinf();
 	if (!FormList->empty()) {
-		auto& formList = *FormList;
 		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-			SelectedForm = &formList[iForm];
-			if (SelectedForm->type == 0U) {
-				SelectedForm->type = FRMFPOLY;
+			auto& form = FormList->operator[](iForm);
+			if (form.type == 0U) {
+				form.type = FRMFPOLY;
 			}
 			else {
-				if (SelectedForm->type == FRMLINE) {
-					if (SelectedForm->fillType != CONTF) {
-						SelectedForm->fillType                = 0;
-						SelectedForm->lengthOrCount.clipCount = 0;
+				if (form.type == FRMLINE) {
+					if (form.fillType != CONTF) {
+						form.fillType                = 0;
+						form.lengthOrCount.clipCount = 0;
 					}
 				}
 			}
 			form::frmout(iForm);
-			if (SelectedForm->maxFillStitchLen == 0.0F) {
-				SelectedForm->maxFillStitchLen = IniFile.maxStitchLength;
+			if (form.maxFillStitchLen == 0.0F) {
+				form.maxFillStitchLen = IniFile.maxStitchLength;
 			}
-			if (SelectedForm->maxBorderStitchLen == 0.0F) {
-				SelectedForm->maxBorderStitchLen = IniFile.maxStitchLength;
+			if (form.maxBorderStitchLen == 0.0F) {
+				form.maxBorderStitchLen = IniFile.maxStitchLength;
 			}
 		}
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
@@ -167,10 +166,10 @@ auto repair::internal::frmchkfn() -> uint32_t {
 				ri::chkVrtx(form, badData);
 			}
 			if ((badData.attribute & BADCLP) == 0U) {
-				if (clip::isclp(iForm)) {
+				if (clip::isclp(form)) {
 					ri::chkclp(form, badData);
 				}
-				if (clip::iseclp(iForm)) {
+				if (clip::iseclp(form)) {
 					ri::chkeclp(form, badData);
 				}
 			}
@@ -204,18 +203,17 @@ auto repair::internal::frmchkfn() -> uint32_t {
 	return badData.attribute;
 }
 
-void repair::internal::bcup(uint32_t find, BADCNTS& badData) noexcept {
-	const auto& form = FormList->operator[](find);
-	if (clip::isclp(find)) {
+void repair::internal::bcup(const FRMHED& form, BADCNTS& badData) noexcept {
+	if (clip::isclp(form)) {
 		badData.clip += form.lengthOrCount.clipCount;
 	}
-	if (clip::iseclp(find)) {
+	if (clip::iseclp(form)) {
 		badData.clip += form.clipEntries;
 	}
 	if (form.type == SAT) {
 		badData.guideCount += form.satinGuideCount;
 	}
-	if (texture::istx(find)) {
+	if (texture::istx(form)) {
 		badData.tx += form.fillInfo.texture.count;
 	}
 }
@@ -253,7 +251,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 			vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
 			form.vertexIndex = iVertex;
 			iVertex += form.vertexCount;
-			ri::bcup(iForm, badData);
+			ri::bcup(form, badData);
 		}
 		else {
 			if (form.vertexIndex < FormVertices->size()) {
@@ -262,7 +260,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 				auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
 				auto sourceEnd   = std::next(sourceStart, form.vertexCount);
 				vertexPoint.insert(vertexPoint.end(), sourceStart, sourceEnd);
-				ri::bcup(iForm, badData);
+				ri::bcup(form, badData);
 			}
 			else {
 				FormList->resize(iForm);
@@ -286,7 +284,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form           = FormList->operator[](iForm);
 		auto  clipDifference = 0U;
-		if (clip::isclp(iForm)) {
+		if (clip::isclp(form)) {
 			clipDifference = form.angleOrClipData.clip;
 			if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
@@ -316,7 +314,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 				}
 			}
 		}
-		if (clip::iseclp(iForm)) {
+		if (clip::iseclp(form)) {
 			clipDifference = form.borderClipData;
 			if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
 				clipPoint.resize(clipPoint.size() + form.clipEntries);
@@ -368,7 +366,7 @@ void repair::internal::repsat() {
 				std::copy(sourceStart, sourceEnd, destination);
 				form.satinOrAngle.guide = guideCount;
 				guideCount += form.satinGuideCount;
-				ri::bcup(iForm, badData);
+				ri::bcup(form, badData);
 			}
 			else {
 				if (guideDifference < SatinGuides->size()) {
@@ -377,7 +375,7 @@ void repair::internal::repsat() {
 					auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
 					const auto destination = std::next(SatinGuides->begin(), guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
-					ri::bcup(iForm, badData);
+					ri::bcup(form, badData);
 				}
 				else {
 					guideCount           = badData.guideCount;
@@ -404,7 +402,7 @@ void repair::internal::reptx() {
 				std::copy(sourceStart, sourceEnd, destination);
 				form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 				textureCount += form.fillInfo.texture.count;
-				ri::bcup(iForm, badData);
+				ri::bcup(form, badData);
 			}
 			else {
 				if (TexturePointsBuffer->size() > form.fillInfo.texture.index) {
@@ -415,7 +413,7 @@ void repair::internal::reptx() {
 					const auto destination = std::next(TexturePointsBuffer->begin(), textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
-					ri::bcup(iForm, badData);
+					ri::bcup(form, badData);
 					textureCount = badData.tx;
 				}
 				else {

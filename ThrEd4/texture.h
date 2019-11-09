@@ -23,12 +23,13 @@ void drwtxtr();
 void dutxtfil();
 void initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uint32_t>* ptrTexturePointsList) noexcept;
 auto istx(uint32_t iForm) noexcept -> bool;
+auto istx(const FRMHED& form) noexcept -> bool;
 void redtx();
 void rstxt();
-void rtrtx();
+void rtrtx(const FRMHED& form);
 void savtxt();
 void setshft();
-void setxt(std::vector<RNGCNT>& textureSegments);
+void setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments);
 void txdun();
 void txof();
 void txsnap();
@@ -58,7 +59,7 @@ namespace internal {
 	auto ed2stch(const fPOINT& point) noexcept -> fPOINT;
 	void ed2txp(const POINT& offset, TXPNT& textureRecord);
 	auto inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept -> bool;
-	void nutx();
+	void nutx(FRMHED& form);
 	void nxbak();
 	void px2ed(const POINT& point, fPOINT& editPoint) noexcept;
 	auto px2txt(const POINT& offset) -> bool;
@@ -69,7 +70,7 @@ namespace internal {
 	void setxfrm();
 	void setxmov();
 	void stxlin();
-	void txang();
+	void txang(FRMHED& form);
 	void txbak();
 	auto txbutfn() -> bool;
 	auto tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept -> bool;
@@ -77,10 +78,10 @@ namespace internal {
 	void txdelal();
 	auto txdig(uint32_t keyCode, char& character) -> bool;
 	void txgro(const FRMHED& textureForm);
-	void txhor();
+	void txhor(FRMHED& form);
 	auto txnam(wchar_t* name, int32_t sizeName) -> bool;
 	void txnudg(int32_t deltaX, float deltaY);
-	void txpar();
+	void txpar(FRMHED& form);
 	void txrbak() noexcept;
 	void txrct2rct(const TXTRCT& textureRect, RECT& rectangle);
 	void txrfor() noexcept;
@@ -92,6 +93,6 @@ namespace internal {
 	void txtdel();
 	void txtlin();
 	void txtxfn(const POINT& reference, uint16_t offsetPixels) noexcept;
-	void txvrt();
+	void txvrt(FRMHED& form);
 } // namespace internal
 } // namespace texture

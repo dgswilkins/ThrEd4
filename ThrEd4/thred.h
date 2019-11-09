@@ -51,7 +51,7 @@ void pxCor2stch(const POINT& point) noexcept;
 void redclp();
 void redraw(HWND window) noexcept;
 void ritfcor(const fPOINT& point);
-void ritmov();
+void ritmov(uint32_t formIndex);
 void ritot(uint32_t number);
 void rngadj();
 void rotang1(const fPOINTATTR& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, const fPOINT& rotationCenter) noexcept;
@@ -202,7 +202,7 @@ namespace internal {
 	auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 	void esccode();
-	void f1del();
+	void f1del(uint32_t formIndex);
 	void fil2men();
 	void fil2sel(uint32_t stat);
 	void filclos();
@@ -216,7 +216,7 @@ namespace internal {
 	auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) -> uint32_t;
 	void frmcurmen();
 	void frmcursel(uint32_t cursorType);
-	void frmpos(float deltaX, float deltaY);
+	void frmpos(FRMHED& form, float deltaX, float deltaY);
 	void frmsnap(uint32_t start, uint32_t count);
 	auto frmstch() -> bool;
 	auto fswap(COLORREF color) noexcept -> COLORREF;
@@ -366,7 +366,7 @@ namespace internal {
 	void reldun();
 	void relin();
 	void rembig();
-	void respac() noexcept;
+	void respac(FRMHED& form) noexcept;
 	void retrac();
 	void rint() noexcept;
 	void ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem);
@@ -431,9 +431,9 @@ namespace internal {
 	void shorter();
 	auto sidclp() -> bool;
 	void sidhup();
-	void sidmsg(HWND window, std::wstring* strings, uint32_t entries);
-	auto sizclp(uint32_t& formFirstStitchIndex, uint32_t& formStitchCount) -> uint32_t;
-	auto sizfclp() -> uint32_t;
+	void sidmsg(const FRMHED& form, HWND window, std::wstring* strings, uint32_t entries);
+	auto sizclp(const FRMHED& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount) -> uint32_t;
+	auto sizfclp(const FRMHED& form) -> uint32_t;
 	void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 	void srchk();
 	auto srchknot(uint32_t source) noexcept -> uint32_t;

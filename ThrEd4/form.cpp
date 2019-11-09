@@ -154,9 +154,9 @@ void form::internal::rotbak(float rotationAngle, const fPOINT& rotationCenter) n
 	}
 }
 
-void form::delmfil() {
-	if (texture::istx(ClosestFormToCursor)) {
-		texture::deltx(ClosestFormToCursor);
+void form::delmfil(uint32_t formIndex) {
+	if (texture::istx(formIndex)) {
+		texture::deltx(formIndex);
 	}
 	clip::delmclp(ClosestFormToCursor);
 	// find the first stitch to delete
@@ -366,7 +366,6 @@ void form::internal::rats() {
 void form::fvars(uint32_t iForm) noexcept {
 	if (!FormList->empty() && iForm < FormList->size()) {
 		auto& form             = FormList->operator[](iForm);
-		SelectedForm           = &form;
 		CurrentVertexIndex     = form.vertexIndex;
 		VertexCount            = form.vertexCount;
 		CurrentFormGuides      = form.satinOrAngle.guide;
@@ -744,11 +743,11 @@ void form::drwfrm() {
 			form::ritfrct(ClosestFormToCursor, StitchWindowMemDC);
 		}
 		if (StateMap.test(StateFlag::FRMPMOV)) {
-			thred::ritmov();
+			thred::ritmov(ClosestFormToCursor);
 			(*RubberBandLine)[1].x = Msg.pt.x - StitchWindowOrigin.x;
 			(*RubberBandLine)[1].y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOMOV);
-			thred::ritmov();
+			thred::ritmov(ClosestFormToCursor);
 		}
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -1166,7 +1165,7 @@ void form::frmovlin() {
 		(*RubberBandLine)[iPoint] = formLines[previousPoint];
 		previousPoint             = form::nxt(previousPoint);
 	}
-	thred::ritmov();
+	thred::ritmov(ClosestFormToCursor);
 }
 
 auto form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) -> bool {
@@ -1245,7 +1244,7 @@ void form::chkseq(bool border) {
 			form.maxFillStitchLen = IniFile.maxStitchLength;
 		}
 		MaxStitchLen = form.maxFillStitchLen;
-		if (clip::isclp(ClosestFormToCursor)) {
+		if (clip::isclp(form)) {
 			userStitchLen = MaxStitchLen;
 		}
 		else {
@@ -1324,8 +1323,7 @@ auto form::lastch() -> bool {
 	{ return false; }
 }
 
-auto form::getlast() -> uint32_t {
-	const auto& form = FormList->operator[](ClosestFormToCursor);
+auto form::getlast(const FRMHED& form) -> uint32_t {
 	if (form.fillType != 0U) {
 		form::lastch();
 		auto minimumLength = 1e99;
@@ -1448,27 +1446,26 @@ void form::internal::bdrlin(uint32_t start, uint32_t finish, float stitchSize) {
 	OSequence->push_back(vertexIt[finish]);
 }
 
-void form::internal::brdfil(float pd_Size) {
+void form::internal::brdfil(const FRMHED& form) {
 	auto currentVertex = 0U;
-	const auto& form = FormList->operator[](ClosestFormToCursor);
 
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 		currentVertex = form.fillStart;
 	}
 	else {
-		currentVertex = form::getlast();
+		currentVertex = form::getlast(form);
 	}
 	OSequence->clear();
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	OSequence->push_back(vertexIt[currentVertex]);
 	for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
 		const auto nextVertex = form::nxt(currentVertex);
-		bdrlin(currentVertex, nextVertex, pd_Size);
+		bdrlin(currentVertex, nextVertex, form.edgeStitchLen);
 		currentVertex = nextVertex;
 	}
 	if (form.type != FRMLINE) {
 		const auto nextVertex = form::nxt(currentVertex);
-		bdrlin(currentVertex, nextVertex, pd_Size);
+		bdrlin(currentVertex, nextVertex, form.edgeStitchLen);
 	}
 }
 
@@ -1501,23 +1498,22 @@ void form::internal::boldlin(uint32_t start, uint32_t finish, double size) {
 	}
 }
 
-void form::internal::bold(double size) {
+void form::internal::bold(const FRMHED& form) {
 	auto iOutput   = 0U;
-	auto iNextLine = form::getlast();
+	auto iNextLine = form::getlast(form);
 	auto iLine     = iNextLine;
 
 	OSequence->clear();
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	OSequence->push_back(vertexIt[iLine]);
 	for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
 		iNextLine = form::nxt(iLine);
-		boldlin(iLine, iNextLine, size);
+		boldlin(iLine, iNextLine, form.edgeStitchLen);
 		iLine = iNextLine;
 	}
-	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (form.type != FRMLINE) {
 		iNextLine = form::nxt(iLine);
-		boldlin(iLine, iNextLine, size);
+		boldlin(iLine, iNextLine, form.edgeStitchLen);
 	}
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); iSequence++) {
 		const auto length = hypot((*OSequence)[wrap::toSize(iSequence) + 1U].x - (*OSequence)[iSequence].x,
@@ -2011,7 +2007,7 @@ void form::internal::prsmal(float width) {
 
 void form::internal::pbrd(const FRMHED& form) {
 	const auto spacing = LineSpacing;
-	const auto start   = form::getlast();
+	const auto start   = form::getlast(form);
 
 	LineSpacing = form.edgeSpacing;
 	OSequence->clear();
@@ -2059,16 +2055,15 @@ void form::internal::apbrd() {
 	}
 }
 
-void form::internal::bhfn(uint32_t start, uint32_t finish, double spacing) {
-	auto       vertexIt   = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+void form::internal::bhfn(const FRMHED& form, uint32_t start, uint32_t finish) {
+	auto       vertexIt   = std::next(FormVertices->cbegin(), form.vertexIndex);
 	const auto delta      = fPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto length     = hypot(delta.x, delta.y);
-	const auto count      = wrap::round<uint32_t>(length / spacing);
+	const auto count      = wrap::round<uint32_t>(length / form.edgeSpacing);
 	const auto step       = fPOINT { (delta.x / count), (delta.y / count) };
 	auto       innerPoint = fPOINT { vertexIt[start].x, vertexIt[start].y };
 
 	const auto rotationAngle = atan2(-delta.x, delta.y);
-	const auto& form = FormList->operator[](ClosestFormToCursor);
 	const auto outerStep
 	    = fPOINT { form.borderSize * cos(rotationAngle), form.borderSize * sin(rotationAngle) };
 	if (count != 0U) {
@@ -2116,22 +2111,22 @@ void form::internal::bhcrnr(uint32_t vertex) {
 	OSequence->push_back(vertexIt[nextVertex]);
 }
 
-void form::internal::bhbrd(double spacing) {
-	auto vertex = form::getlast();
+void form::internal::bhbrd(const FRMHED& form) {
+	auto vertex = form::getlast(form);
 
 	OSequence->clear();
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	OSequence->push_back(vertexIt[vertex]);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		const auto nextVertex = form::nxt(vertex);
-		bhfn(vertex, nextVertex, spacing);
+		bhfn(form, vertex, nextVertex);
 		bhcrnr(vertex);
 		vertex = nextVertex;
 	}
 }
 
 void form::internal::dubfn(const FRMHED& currentForm) {
-	brdfil(currentForm.edgeStitchLen);
+	brdfil(currentForm);
 	for (auto iBackward = OSequence->size(); iBackward != 0; iBackward--) {
 		OSequence->push_back((*OSequence)[iBackward - 1U]);
 	}
@@ -2142,17 +2137,17 @@ void form::internal::chkbrd(const FRMHED& form) {
 	if (form.edgeType != 0U) {
 		switch (form.edgeType & NEGUND) {
 		case EDGELINE: { // Line
-			brdfil(form.edgeStitchLen);
+			brdfil(form);
 			break;
 		}
 		case EDGEBEAN: { // Bean
-			bold(form.edgeStitchLen);
+			bold(form);
 			break;
 		}
 		case EDGECLIP: { // Clipboard
 			auto clipRect = fRECTANGLE{};
 			clip::oclp(clipRect, form.borderClipData, form.clipEntries);
-			clip::clpbrd(clipRect, form::getlast());
+			clip::clpbrd(clipRect, form::getlast(form));
 			break;
 		}
 		case EDGECLIPX: { // Even Clipboard
@@ -2179,7 +2174,7 @@ void form::internal::chkbrd(const FRMHED& form) {
 			const auto length = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(form, 20);
-			bhbrd(form.edgeSpacing);
+			bhbrd(form);
 			ButtonholeCornerLength = length;
 			break;
 		}
@@ -2354,7 +2349,6 @@ void form::internal::prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormV
 	}
 	angledFormVertices[angledForm.vertexCount - 1U].x = vertexIt[VertexCount - 1U].x + delta.x * ratio;
 	angledFormVertices[angledForm.vertexCount - 1U].y = vertexIt[VertexCount - 1U].y + delta.y * ratio;
-	SelectedForm                                      = &angledForm;
 	VertexCount                                       = angledForm.vertexCount;
 	CurrentVertexIndex                                = angledForm.vertexIndex;
 }
@@ -2459,15 +2453,15 @@ void form::internal::lapbrd() {
 	UserStitchLength = savedStitchLength;
 }
 
-void form::internal::blbrd(double spacing) {
+void form::internal::blbrd(const FRMHED& form) {
 	OSequence->clear();
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	OSequence->push_back(vertexIt[0]);
 	for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {
-		bhfn(iVertex, iVertex + 1U, spacing);
+		bhfn(form, iVertex, iVertex + 1U);
 		bhcrnr(iVertex);
 	}
-	bhfn(VertexCount - 2U, VertexCount - 1U, spacing);
+	bhfn(form, VertexCount - 2U, VertexCount - 1U);
 	OSequence->push_back(vertexIt[VertexCount - 1U]);
 }
 
@@ -4736,11 +4730,11 @@ void form::internal::clpfm() {
 	}
 }
 
-void form::internal::fmclp() {
+void form::internal::fmclp(FRMHED& form) {
 	const auto savedSpacing = LineSpacing;
 	LineSpacing = ClipRectSize.cx;
 	StateMap.set(StateFlag::BARSAT);
-	satin::satfil();
+	satin::satfil(form);
 	StateMap.reset(StateFlag::BARSAT);
 	clpfm();
 	auto& currentForm = FormList->operator[](ClosestFormToCursor);
@@ -4765,15 +4759,15 @@ void form::refilfn() {
 	}
 	auto fillStartsData = FILLSTARTS {}; // fill start data for refill
 	auto fillStartsMap  = 0U;            // fill starts bitmap
-	xt::fdelstch(fillStartsData, fillStartsMap);
+	xt::fdelstch(form, fillStartsData, fillStartsMap);
 	StateMap.set(StateFlag::WASREFIL);
-	if (form.fillSpacing < 0.5F && !clip::isclp(ClosestFormToCursor)) {
+	if (form.fillSpacing < 0.5F && !clip::isclp(form)) {
 		form.fillSpacing = 0.5F;
 	}
 	if (form.edgeSpacing < 0.5F) {
 		form.edgeSpacing = 0.5F;
 	}
-	if (!clip::isclp(ClosestFormToCursor)) {
+	if (!clip::isclp(form)) {
 		UserStitchLength = form.lengthOrCount.stitchLength;
 	}
 	if (!(StateMap.test(StateFlag::WASDO) || StateMap.test(StateFlag::FUNCLP) || StateMap.test(StateFlag::FUNSCLP))) {
@@ -4793,12 +4787,12 @@ void form::refilfn() {
 	case FRMLINE: {
 		switch (form.edgeType & NEGUND) {
 		case EDGELINE: {
-			fi::brdfil(form.edgeStitchLen);
+			fi::brdfil(form);
 			fi::ritbrd(form);
 			break;
 		}
 		case EDGEBEAN: {
-			fi::bold(form.edgeStitchLen);
+			fi::bold(form);
 			fi::ritbrd(form);
 			break;
 		}
@@ -4836,7 +4830,7 @@ void form::refilfn() {
 			const auto length      = ButtonholeCornerLength;
 			ButtonholeCornerLength = form::getblen();
 			satin::satout(form, 20);
-			fi::blbrd(form.edgeSpacing);
+			fi::blbrd(form);
 			ButtonholeCornerLength = length;
 			fi::ritbrd(form);
 			break;
@@ -4954,7 +4948,7 @@ void form::refilfn() {
 				break;
 			}
 			case TXVRTF: {
-				texture::setxt(textureSegments);
+				texture::setxt(form, textureSegments);
 				workingFormVertices.clear();
 				workingFormVertices.reserve(form.vertexCount);
 				auto startVertex = std::next(FormVertices->cbegin(), form.vertexIndex);
@@ -4965,13 +4959,13 @@ void form::refilfn() {
 				break;
 			}
 			case TXHORF: {
-				texture::setxt(textureSegments);
+				texture::setxt(form, textureSegments);
 				fi::horclpfn(textureSegments, angledForm, *AngledFormVertices);
 				doFill = false;
 				break;
 			}
 			case TXANGF: {
-				texture::setxt(textureSegments);
+				texture::setxt(form, textureSegments);
 				StateMap.reset(StateFlag::ISUND);
 				form::angclpfn(form, textureSegments, *AngledFormVertices);
 				doFill = false;
@@ -5002,7 +4996,7 @@ void form::refilfn() {
 			const auto spacing = LineSpacing;
 			LineSpacing        = form.fillSpacing;
 			UserStitchLength   = form.lengthOrCount.stitchLength;
-			satin::satfil();
+			satin::satfil(form);
 			LineSpacing = spacing;
 			fi::ritfil();
 			break;
@@ -5010,13 +5004,13 @@ void form::refilfn() {
 		case CLPF: {
 			auto clipRect = fRECTANGLE {};
 			clip::oclp(clipRect, form.angleOrClipData.clip, form.lengthOrCount.clipCount);
-			fi::fmclp();
+			fi::fmclp(form);
 			fi::ritfil();
 			break;
 		}
 		case FTHF: {
 			StateMap.set(StateFlag::CNV2FTH);
-			xt::fthrfn();
+			xt::fthrfn(form);
 			break;
 		}
 		}
@@ -5077,10 +5071,10 @@ void form::internal::makpoli() {
 }
 
 void form::internal::fsvrt() {
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	auto& form = FormList->operator[](ClosestFormToCursor);
 	form.type = FRMFPOLY;
 	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
 	form.fillType  = VRTF;
@@ -5119,11 +5113,10 @@ void form::filvrt() {
 	}
 }
 
-void form::internal::fshor() {
+void form::internal::fshor(FRMHED& form) {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	auto& form = FormList->operator[](ClosestFormToCursor);
 	form.type = FRMFPOLY;
 	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
 	form.fillType  = HORF;
@@ -5141,10 +5134,10 @@ void form::filhor() {
 	if (!SelectedFormList->empty()) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
-			const auto& currentForm = FormList->operator[](ClosestFormToCursor);
+			auto& form = FormList->operator[](ClosestFormToCursor);
 			form::fvars(ClosestFormToCursor);
-			if (currentForm.type != FRMLINE) {
-				fi::fshor();
+			if (form.type != FRMLINE) {
+				fi::fshor(form);
 			}
 		}
 		StateMap.set(StateFlag::INIT);
@@ -5153,7 +5146,8 @@ void form::filhor() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			fi::fshor();
+			auto& form = FormList->operator[](ClosestFormToCursor);
+			fi::fshor(form);
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -5161,11 +5155,10 @@ void form::filhor() {
 	}
 }
 
-void form::internal::fsangl() {
+void form::internal::fsangl(FRMHED& form) {
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
 	makpoli();
-	auto& form = FormList->operator[](ClosestFormToCursor);
 	form.type = FRMFPOLY;
 	form.fillColor = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
 	form.fillType              = ANGF;
@@ -5184,10 +5177,10 @@ void form::filangl() {
 		thred::savdo();
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
-			const auto& currentForm = FormList->operator[](ClosestFormToCursor);
+			auto& form = FormList->operator[](selectedForm);
 			form::fvars(ClosestFormToCursor);
-			if (currentForm.type != FRMLINE) {
-				fi::fsangl();
+			if (form.type != FRMLINE) {
+				fi::fsangl(form);
 			}
 		}
 		StateMap.set(StateFlag::INIT);
@@ -5197,7 +5190,8 @@ void form::filangl() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			thred::savdo();
-			fi::fsangl();
+			auto& form = FormList->operator[](ClosestFormToCursor);
+			fi::fsangl(form);
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -5338,7 +5332,7 @@ void form::uninsf() {
 	}
 }
 
-void form::rotfrm(uint32_t newStartVertex) {
+void form::rotfrm(FRMHED& currentForm, uint32_t newStartVertex) {
 	form::fvars(ClosestFormToCursor);
 
 	auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
@@ -5354,7 +5348,6 @@ void form::rotfrm(uint32_t newStartVertex) {
 	}
 	iRotatedGuide = 0;
 	auto guideIt  = std::next(SatinGuides->begin(), CurrentFormGuides);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	if (currentForm.type == SAT) {
 		if (currentForm.wordParam != 0U) {
 			currentForm.wordParam
@@ -5388,9 +5381,9 @@ void form::rotfrm(uint32_t newStartVertex) {
 }
 
 void form::internal::filsfn() {
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	auto& form = FormList->operator[](ClosestFormToCursor);
 	form.type = SAT;
 	form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
 	form.fillType = SATF;
@@ -5567,14 +5560,14 @@ void form::unfil() {
 	if (!SelectedFormList->empty()) {
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto selectedForm : (*SelectedFormList)) {
-			auto& currentForm = FormList->operator[](selectedForm);
-			if ((currentForm.fillType != 0U) || (currentForm.edgeType != 0U)) {
+			auto& form = FormList->operator[](selectedForm);
+			if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 				clip::delclps(selectedForm);
 				texture::deltx(selectedForm);
 				formMap.set(selectedForm);
-				currentForm.fillType = 0;
-				currentForm.edgeType = 0;
-				currentForm.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
+				form.fillType = 0;
+				form.edgeType = 0;
+				form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			}
 		}
 		auto iDestination = StitchBuffer->begin();
@@ -5613,12 +5606,12 @@ void form::unfil() {
 				}
 				StitchBuffer->resize(destCount);
 			}
+			auto& form = FormList->operator[](ClosestFormToCursor);
 			clip::delclps(ClosestFormToCursor);
 			texture::deltx(ClosestFormToCursor);
-			auto& currentForm = FormList->operator[](ClosestFormToCursor);
-			currentForm.fillType = 0;
-			currentForm.edgeType = 0;
-			currentForm.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
+			form.fillType = 0;
+			form.edgeType = 0;
+			form.extendedAttribute &= ~(AT_UND | AT_CWLK | AT_WALK);
 			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 		}
 	}
@@ -5626,10 +5619,11 @@ void form::unfil() {
 
 void form::frm0() {
 	if (StateMap.test(StateFlag::FRMPSEL)) {
+		auto& form = FormList->operator[](ClosestFormToCursor);
 		thred::savdo();
-		form::rotfrm(ClosestVertexToCursor);
+		form::rotfrm(form, ClosestVertexToCursor);
 		ClosestVertexToCursor = 0;
-		satin::satadj();
+		satin::satadj(form);
 		form::refil();
 		thred::coltab();
 		StateMap.set(StateFlag::RESTCH);
@@ -5705,12 +5699,12 @@ void form::bsizpar(FRMHED& currentForm) noexcept {
 	currentForm.minBorderStitchLen = MinStitchLength;
 }
 
-void form::internal::sbord() {
+void form::internal::sbord(uint32_t formIndex) {
 	form::fvars(ClosestFormToCursor);
-	clip::deleclp(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.edgeType = EDGELINE;
-	form::bsizpar(currentForm);
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
+	form.edgeType = EDGELINE;
+	form::bsizpar(form);
 	form::refilfn();
 }
 
@@ -5722,8 +5716,9 @@ void form::bord() {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			FormList->operator[](ClosestFormToCursor).borderColor = gsl::narrow<uint8_t>(ActiveColor);
-			fi::sbord();
+			auto& form = FormList->operator[](selectedForm);
+			form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+			fi::sbord(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -5731,8 +5726,9 @@ void form::bord() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			FormList->operator[](ClosestFormToCursor).borderColor = gsl::narrow<uint8_t>(ActiveColor);
-			fi::sbord();
+			auto& form = FormList->operator[](ClosestFormToCursor);
+			form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+			fi::sbord(ClosestFormToCursor);
 			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
@@ -5740,18 +5736,18 @@ void form::bord() {
 	}
 }
 
-void form::internal::fsclp() {
-	clip::deleclp(ClosestFormToCursor);
+void form::internal::fsclp(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
 	const auto clipSize          = wrap::toUnsigned(ClipBuffer->size());
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.edgeType       = EDGECLIP;
-	currentForm.clipEntries    = clipSize;
-	currentForm.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
-	currentForm.borderSize     = ClipRectSize.cy;
-	currentForm.edgeSpacing    = ClipRectSize.cx;
-	currentForm.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
-	form::bsizpar(currentForm);
-	auto offsetStart = std::next(ClipPoints->begin(), currentForm.borderClipData);
+	form.edgeType       = EDGECLIP;
+	form.clipEntries    = clipSize;
+	form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
+	form.borderSize     = ClipRectSize.cy;
+	form.edgeSpacing    = ClipRectSize.cx;
+	form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(form);
+	auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
@@ -5777,7 +5773,7 @@ void form::fclp() {
 					for (auto selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
-						fi::fsclp();
+						fi::fsclp(selectedForm);
 					}
 					StateMap.set(StateFlag::INIT);
 					thred::coltab();
@@ -5785,7 +5781,7 @@ void form::fclp() {
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
-						fi::fsclp();
+						fi::fsclp(ClosestFormToCursor);
 						StateMap.set(StateFlag::INIT);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
@@ -5802,24 +5798,24 @@ void form::fclp() {
 	}
 }
 
-void form::internal::sapliq() {
+void form::internal::sapliq(uint32_t formIndex) {
 	form::fvars(ClosestFormToCursor);
-	clip::deleclp(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.edgeType = EDGEAPPL;
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
+	form.edgeType = EDGEAPPL;
 	if (UserFlagMap.test(UserFlag::DUND)) {
-		currentForm.edgeType |= EGUND;
+		form.edgeType |= EGUND;
 	}
-	currentForm.edgeSpacing = LineSpacing / 2.0F;
-	currentForm.borderSize  = IniFile.borderWidth;
-	form::bsizpar(currentForm);
-	currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor | (AppliqueColor << 4U));
-	if (currentForm.type != FRMLINE) {
-		if (currentForm.fillType == SAT && (currentForm.satinGuideCount != 0U)) {
+	form.edgeSpacing = LineSpacing / 2.0F;
+	form.borderSize  = IniFile.borderWidth;
+	form::bsizpar(form);
+	form.borderColor = gsl::narrow<uint8_t>(ActiveColor | (AppliqueColor << 4U));
+	if (form.type != FRMLINE) {
+		if (form.fillType == SAT && (form.satinGuideCount != 0U)) {
 			satin::delsac(ClosestFormToCursor);
 		}
 	}
-	currentForm.fillType = 0U;
+	form.fillType = 0U;
 	form::refilfn();
 }
 
@@ -5838,7 +5834,7 @@ void form::apliq() {
 			else {
 				currentForm.attribute &= NOBLNT;
 			}
-			fi::sapliq();
+			fi::sapliq(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -5853,7 +5849,7 @@ void form::apliq() {
 			else {
 				currentForm.attribute &= NOBLNT;
 			}
-			fi::sapliq();
+			fi::sapliq(ClosestFormToCursor);
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
 			StateMap.set(StateFlag::RESTCH);
@@ -6409,13 +6405,13 @@ GSL_SUPPRESS(26440) void form::nulapcol(uint32_t color) {
 	}
 }
 
-void form::internal::sbold() {
+void form::internal::sbold(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
 	form::fvars(ClosestFormToCursor);
-	clip::deleclp(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.edgeType    = EDGEBEAN;
-	currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
-	form::bsizpar(currentForm);
+	clip::deleclp(formIndex);
+	form.edgeType    = EDGEBEAN;
+	form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(form);
 	form::refilfn();
 }
 
@@ -6427,7 +6423,7 @@ void form::dubold() {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			fi::sbold();
+			fi::sbold(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -6435,7 +6431,7 @@ void form::dubold() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			fi::sbold();
+			fi::sbold(ClosestFormToCursor);
 			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
@@ -6695,8 +6691,9 @@ void form::dueg(uint32_t sides) {
 		sides = 8U;
 	}
 	form::durpoli(sides);
+	auto& form = FormList->back();
 
-	auto       vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto       vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	const auto reference = form::midl(vertexIt[sides / 2].y, vertexIt[0].y);
 	const auto maximumY  = vertexIt[sides >> 2U].y - vertexIt[0].y;
 
@@ -6837,17 +6834,18 @@ void form::fliph() {
 	}
 }
 
-void form::internal::prpsbrd(FRMHED& currentForm) {
-	if (currentForm.vertexCount > 2) {
-		clip::deleclp(ClosestFormToCursor);
-		currentForm.edgeType = EDGEPROPSAT;
+void form::internal::prpsbrd(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
+	if (form.vertexCount > 2) {
+		clip::deleclp(formIndex);
+		form.edgeType = EDGEPROPSAT;
 		if (UserFlagMap.test(UserFlag::DUND)) {
-			currentForm.edgeType |= EGUND;
+			form.edgeType |= EGUND;
 		}
-		form::bsizpar(currentForm);
-		currentForm.borderSize  = BorderWidth;
-		currentForm.edgeSpacing = LineSpacing;
-		currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+		form::bsizpar(form);
+		form.borderSize  = BorderWidth;
+		form.edgeSpacing = LineSpacing;
+		form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
 		form::refilfn();
 	}
 }
@@ -6871,7 +6869,7 @@ void form::prpbrd(float borderStitchSpacing) {
 			else {
 				currentForm.attribute &= NOBLNT;
 			}
-			fi::prpsbrd(currentForm);
+			fi::prpsbrd(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -6887,7 +6885,7 @@ void form::prpbrd(float borderStitchSpacing) {
 			else {
 				currentForm.attribute &= NOBLNT;
 			}
-			fi::prpsbrd(currentForm);
+			fi::prpsbrd(ClosestFormToCursor);
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
 			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
@@ -7308,14 +7306,14 @@ void form::internal::adfrm(uint32_t iForm) {
 		auto guideDest                = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
 		std::copy(guideStart, guideEnd, guideDest);
 	}
-	if (clip::iseclpx(iForm)) {
+	if (clip::iseclpx(srcForm)) {
 		currentForm.borderClipData = thred::adclp(srcForm.clipEntries);
 
 		auto offsetStart          = std::next(ClipPoints->cbegin(), srcForm.borderClipData);
 		auto destination          = std::next(ClipPoints->begin(), currentForm.borderClipData);
 		std::copy(offsetStart, std::next(offsetStart, srcForm.clipEntries), destination);
 	}
-	if (clip::isclpx(iForm)) {
+	if (clip::isclpx(srcForm)) {
 		currentForm.angleOrClipData.clip = thred::adclp(srcForm.lengthOrCount.clipCount);
 
 		auto       sourceStart          = std::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
@@ -7686,14 +7684,14 @@ auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
 	return retval;
 }
 
-void form::internal::bholbrd() {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	clip::deleclp(ClosestFormToCursor);
-	currentForm.borderSize = BorderWidth;
-	form::bsizpar(currentForm);
-	currentForm.edgeType    = EDGEBHOL;
-	currentForm.edgeSpacing = LineSpacing;
-	currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+void form::internal::bholbrd(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
+	form.borderSize = BorderWidth;
+	form::bsizpar(form);
+	form.edgeType    = EDGEBHOL;
+	form.edgeSpacing = LineSpacing;
+	form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
 	form::savblen(ButtonholeCornerLength);
 	form::refilfn();
 }
@@ -7709,7 +7707,7 @@ void form::bhol() {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			fi::bholbrd();
+			fi::bholbrd(selectedForm);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -7718,7 +7716,7 @@ void form::bhol() {
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			form::fvars(ClosestFormToCursor);
-			fi::bholbrd();
+			fi::bholbrd(ClosestFormToCursor);
 			StateMap.set(StateFlag::INIT);
 			thred::coltab();
 			thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
@@ -7773,19 +7771,19 @@ void form::boxsel() {
 	}
 }
 
-void form::internal::fspic() {
-	clip::deleclp(ClosestFormToCursor);
+void form::internal::fspic(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
 	const auto clipSize          = wrap::toUnsigned(ClipBuffer->size());
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.edgeType       = EDGEPICOT;
-	currentForm.clipEntries    = clipSize;
-	currentForm.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
-	currentForm.borderSize     = ClipRectSize.cy;
-	currentForm.edgeSpacing    = PicotSpacing;
-	currentForm.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
-	form::bsizpar(currentForm);
+	form.edgeType       = EDGEPICOT;
+	form.clipEntries    = clipSize;
+	form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
+	form.borderSize     = ClipRectSize.cy;
+	form.edgeSpacing    = PicotSpacing;
+	form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(form);
 	form::savplen(ButtonholeCornerLength);
-	auto offsetStart = std::next(ClipPoints->begin(), currentForm.borderClipData);
+	auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
@@ -7810,7 +7808,7 @@ void form::picot() {
 					for (auto selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
 						form::fvars(ClosestFormToCursor);
-						fi::fspic();
+						fi::fspic(selectedForm);
 					}
 					StateMap.set(StateFlag::INIT);
 					thred::coltab();
@@ -7818,7 +7816,7 @@ void form::picot() {
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
-						fi::fspic();
+						fi::fspic(ClosestFormToCursor);
 						StateMap.set(StateFlag::INIT);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
@@ -8417,29 +8415,29 @@ void form::stchadj() {
 }
 
 auto form::internal::spltlin() -> bool {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	if (ClosestVertexToCursor < 1 || currentForm.vertexCount - ClosestVertexToCursor < 2) {
+	auto& form = FormList->operator[](ClosestFormToCursor);
+	if (ClosestVertexToCursor < 1 || form.vertexCount - ClosestVertexToCursor < 2) {
 		return false;
 	}
-	fi::nufpnt(ClosestVertexToCursor, currentForm);
+	fi::nufpnt(ClosestVertexToCursor, form);
 	auto vertexIt
-	    = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(currentForm.vertexIndex) + ClosestVertexToCursor);
+	    = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + ClosestVertexToCursor);
 	vertexIt[1U] = vertexIt[0U];
-	form::frmlin(currentForm.vertexIndex, currentForm.vertexCount);
+	form::frmlin(form.vertexIndex, form.vertexCount);
 
-	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), 1, currentForm);
+	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), 1, form);
 	auto& dstForm = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
 
-	currentForm.vertexCount = ClosestVertexToCursor + 1U;
-	dstForm.vertexCount -= currentForm.vertexCount;
-	dstForm.vertexIndex = currentForm.vertexIndex + currentForm.vertexCount;
+	form.vertexCount = ClosestVertexToCursor + 1U;
+	dstForm.vertexCount -= form.vertexCount;
+	dstForm.vertexIndex = form.vertexIndex + form.vertexCount;
 	form::frmout(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor + 1U);
-	if (clip::iseclp(ClosestFormToCursor)) {
-		form::clpspac(currentForm.borderClipData, currentForm.clipEntries);
+	if (clip::iseclp(form)) {
+		form::clpspac(form.borderClipData, form.clipEntries);
 		const auto maxForm = FormList->size();
 		for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; iForm++) {
-			FormList->operator[](iForm).borderClipData += currentForm.clipEntries;
+			FormList->operator[](iForm).borderClipData += form.clipEntries;
 		}
 	}
 	form::stchadj();
@@ -8521,22 +8519,22 @@ void form::stchs2frm() {
 
 void form::vrtsclp() {
 	form::fvars(ClosestFormToCursor);
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.lengthOrCount.clipCount = gsl::narrow<decltype(currentForm.lengthOrCount.clipCount)>(ClipBuffer->size());
-	currentForm.angleOrClipData.clip    = clip::numclp();
-	currentForm.wordParam               = IniFile.fillPhase;
+	form.lengthOrCount.clipCount = gsl::narrow<decltype(form.lengthOrCount.clipCount)>(ClipBuffer->size());
+	form.angleOrClipData.clip    = clip::numclp();
+	form.wordParam               = IniFile.fillPhase;
 	fi::makpoli();
-	currentForm.fillSpacing = IniFile.clipOffset;
-	auto offsetStart          = std::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
+	form.fillSpacing = IniFile.clipOffset;
+	auto offsetStart          = std::next(ClipPoints->begin(), form.angleOrClipData.clip);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	currentForm.fillType  = VCLPF;
-	currentForm.fillColor = gsl::narrow<uint8_t>(ActiveColor);
-	currentForm.type      = FRMFPOLY;
+	form.fillType  = VCLPF;
+	form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+	form.type      = FRMFPOLY;
 	refilfn();
 }
 
@@ -8587,25 +8585,25 @@ void form::vrtclp() {
 
 void form::horsclp() {
 	form::fvars(ClosestFormToCursor);
+	auto& form = FormList->operator[](ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	const auto clipSize                   = wrap::toUnsigned(ClipBuffer->size());
-	currentForm.lengthOrCount.clipCount = clipSize;
-	currentForm.angleOrClipData.clip    = clip::numclp();
-	currentForm.lengthOrCount.clipCount = clipSize;
-	currentForm.wordParam               = IniFile.fillPhase;
+	form.lengthOrCount.clipCount = clipSize;
+	form.angleOrClipData.clip    = clip::numclp();
+	form.lengthOrCount.clipCount = clipSize;
+	form.wordParam               = IniFile.fillPhase;
 	fi::makpoli();
-	currentForm.fillSpacing = IniFile.clipOffset;
-	auto offsetStart          = std::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
+	form.fillSpacing = IniFile.clipOffset;
+	auto offsetStart          = std::next(ClipPoints->begin(), form.angleOrClipData.clip);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	currentForm.fillType  = HCLPF;
-	currentForm.fillColor = gsl::narrow<uint8_t>(ActiveColor);
-	currentForm.type      = FRMFPOLY;
-	CurrentVertexIndex      = currentForm.vertexIndex;
+	form.fillType  = HCLPF;
+	form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+	form.type      = FRMFPOLY;
+	CurrentVertexIndex      = form.vertexIndex;
 	form::refilfn();
 }
 
@@ -8654,25 +8652,24 @@ void form::horclp() {
 	}
 }
 
-void form::angsclp() {
+void form::angsclp(FRMHED& form) {
 	form::fvars(ClosestFormToCursor);
 	clip::delmclp(ClosestFormToCursor);
 	texture::deltx(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	currentForm.angleOrClipData.clip    = clip::numclp();
-	currentForm.lengthOrCount.clipCount = gsl::narrow<decltype(currentForm.lengthOrCount.clipCount)>(ClipBuffer->size());
-	currentForm.wordParam               = IniFile.fillPhase;
+	form.angleOrClipData.clip    = clip::numclp();
+	form.lengthOrCount.clipCount = gsl::narrow<decltype(form.lengthOrCount.clipCount)>(ClipBuffer->size());
+	form.wordParam               = IniFile.fillPhase;
 	fi::makpoli();
-	currentForm.satinOrAngle.angle = IniFile.fillAngle;
-	currentForm.fillSpacing        = IniFile.clipOffset;
-	auto offsetStart                 = std::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
+	form.satinOrAngle.angle = IniFile.fillAngle;
+	form.fillSpacing        = IniFile.clipOffset;
+	auto offsetStart                 = std::next(ClipPoints->begin(), form.angleOrClipData.clip);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	currentForm.fillType  = ANGCLPF;
-	currentForm.fillColor = gsl::narrow<uint8_t>(ActiveColor);
-	currentForm.type      = FRMFPOLY;
+	form.fillType  = ANGCLPF;
+	form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+	form.type      = FRMFPOLY;
 	form::refilfn();
 }
 
@@ -8691,9 +8688,10 @@ void form::angclp() {
 					StateMap.set(StateFlag::NOCLP);
 					for (auto selectedForm : (*SelectedFormList)) {
 						ClosestFormToCursor = selectedForm;
+						auto& form = FormList->operator[](selectedForm);
 						form::fvars(ClosestFormToCursor);
-						if (FormList->operator[](ClosestFormToCursor).type != FRMLINE) {
-							angsclp();
+						if (form.type != FRMLINE) {
+							angsclp(form);
 						}
 					}
 					StateMap.reset(StateFlag::NOCLP);
@@ -8703,7 +8701,8 @@ void form::angclp() {
 				}
 				else {
 					if (StateMap.test(StateFlag::FORMSEL)) {
-						angsclp();
+						auto& form = FormList->operator[](ClosestFormToCursor);
+						angsclp(form);
 						StateMap.set(StateFlag::INIT);
 						thred::coltab();
 						StateMap.set(StateFlag::RESTCH);
@@ -8720,14 +8719,13 @@ void form::angclp() {
 	}
 }
 
-void form::dubsfil() {
+void form::dubsfil(FRMHED& form) {
 	form::fvars(ClosestFormToCursor);
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
-	currentForm.edgeType    = EDGEDOUBLE;
-	currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
-	form::bsizpar(currentForm);
-	fi::dubfn(currentForm);
+	form.edgeType    = EDGEDOUBLE;
+	form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(form);
+	fi::dubfn(form);
 	form::refilfn();
 }
 
@@ -8739,7 +8737,8 @@ void form::dubfil() {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			dubsfil();
+			auto& form = FormList->operator[](selectedForm);
+			dubsfil(form);
 		}
 		StateMap.set(StateFlag::INIT);
 		thred::coltab();
@@ -8747,7 +8746,8 @@ void form::dubfil() {
 	}
 	else {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			dubsfil();
+			auto& form = FormList->operator[](ClosestFormToCursor);
+			dubsfil(form);
 			thred::coltab();
 			StateMap.set(StateFlag::INIT);
 			StateMap.set(StateFlag::RESTCH);
@@ -8927,23 +8927,23 @@ void form::crop() {
 	}
 }
 
-void form::internal::fsclpx(uint32_t iForm) {
-	clip::deleclp(iForm);
+void form::internal::fsclpx(uint32_t formIndex) {
+	auto& form = FormList->operator[](formIndex);
+	clip::deleclp(formIndex);
 	const auto clipSize          = wrap::toUnsigned(ClipBuffer->size());
-	auto& currentForm = FormList->operator[](iForm);
-	currentForm.edgeType       = EDGECLIPX;
-	currentForm.clipEntries    = clipSize;
-	currentForm.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
-	currentForm.borderSize     = ClipRectSize.cy;
-	currentForm.edgeSpacing    = ClipRectSize.cx;
-	currentForm.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
-	form::bsizpar(currentForm);
-	auto offsetStart = std::next(ClipPoints->begin(), currentForm.borderClipData);
+	form.edgeType       = EDGECLIPX;
+	form.clipEntries    = clipSize;
+	form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
+	form.borderSize     = ClipRectSize.cy;
+	form.edgeSpacing    = ClipRectSize.cx;
+	form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+	form::bsizpar(form);
+	auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
 	for (auto& clip : *ClipBuffer) {
 		*offsetStart = clip;
 		offsetStart++;
 	}
-	clip::duxclp(currentForm);
+	clip::duxclp(form);
 	form::refilfn();
 }
 
