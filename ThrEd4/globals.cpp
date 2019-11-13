@@ -80,12 +80,11 @@ uint32_t ClosestPointIndex;      // index of closest point
 uint32_t ClosestVertexToCursor;  // formOrigin closest to the cursor
 int32_t* ColorBarSize;           // Color bar width scaled for DPI
 HCURSOR  CrossCursor;            // cross
-uint32_t CurrentFormGuidesCount; // number of guides in the currently selected form
-uint32_t CurrentVertexIndex;     // points in the currently selected form
+uint32_t CurrentVertexIndex;     // points in the currently selected form 
 
 std::vector<HWND>* DefaultColorWin; // default color windows
 
-HWND            DeleteStitchesDialog; // asking user if they want to delete the sitches associated with a form
+HWND            DeleteStitchesDialog; // asking user if they want to delete the sitches associated with a form 
 std::wstring*   DesignerName;         // designer name in clear
 HWND            DiscardButton;        // discard button
 DRAWITEMSTRUCT* DrawItem;             // for owner-draw windows
@@ -130,7 +129,7 @@ std::vector<HWND>*   LabelWindow;               // text handles for the form dat
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
 HPEN   LayerPen[6];                     //
 float  LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
-fPOINT LowerLeftStitch;                 // lower left formOrigin in a form
+fPOINT LowerLeftStitch;                 // lower left formOrigin in a form 
 HMENU  MainMenu;                        // main menu
 HWND   MainStitchWin;                   // stitch window
 float  MaxStitchLen;                    // maximum stitch length
@@ -145,7 +144,7 @@ RECT     MsgRect;                             // rectangle containing the text m
 HWND     MsgWindow = nullptr;                 // message window
 HPEN     MultiFormPen;                        // multiple selected forms pen
 uint32_t NearestCount;                        // number of boxes selected
-uint32_t NewFormVertexCount;                  // points in the new form
+uint32_t NewFormVertexCount;                  // points in the new form 
 HWND     OKButton;                            // ok button
 
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
@@ -163,7 +162,7 @@ float          PicotSpacing    = IPICSPAC;        // space between border picots
 uint32_t       PreferenceIndex = 0;               // index to the active preference window
 int32_t        PreferenceWindowWidth;             // width of the preference window
 HWND           PreferencesWindow;                 // preferences window
-uint32_t       PreviousFormIndex;                 // previously selected form
+uint32_t       PreviousFormIndex;                 // previously selected form 
 uint32_t       PseudoRandomValue;                 // pseudo-random sequence register
 fRECTANGLE     RotationRect {};                   // rotation rectangle
 

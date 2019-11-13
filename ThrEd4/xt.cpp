@@ -565,9 +565,9 @@ auto xt::internal::gucon(const FRMHED&            form,
                          uint32_t                 destination,
                          uint32_t                 code) -> uint32_t {
 	auto length      = hypot(finish.x - start.x, finish.y - start.y);
-	auto startVertex = form::closflt(start.x, start.y);
+	auto startVertex = form::closflt(form, start.x, start.y);
 
-	const auto endVertex = form::closflt(finish.x, finish.y);
+	const auto endVertex = form::closflt(form, finish.x, finish.y);
 
 	auto up   = 0U;
 	auto down = 0U;
@@ -697,7 +697,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 		for (auto iGuide = form.satinGuideCount; iGuide != 0; iGuide--) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
-			             form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y) });
+			            form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y) });
 			OutputIndex++;
 		}
 		if ((form.attribute & FRMEND) != 0U) {
@@ -1447,7 +1447,7 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output += gucon(
-		    form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
+		   form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
 	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1U].index;

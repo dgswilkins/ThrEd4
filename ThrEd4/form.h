@@ -46,7 +46,7 @@ auto chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
 auto cisin(const FRMHED& form, float xCoordinate, float yCoordinate) -> bool;
-auto closflt(float xCoordinate, float yCoordinate) -> uint32_t;
+auto closflt(const FRMHED& form, float xCoordinate, float yCoordinate) -> uint32_t;
 auto closfrm() -> bool;
 void clpfil();
 void clpspac(uint32_t insertPoint, uint32_t count);
@@ -198,9 +198,9 @@ namespace internal {
 
 	void adfrm(uint32_t iForm);
 	void angout(FRMHED& angledForm);
-	void apbrd();
+	void apbrd(uint32_t vertexIndex);
 	void bakseq();
-	void bdrlin(uint32_t start, uint32_t finish, float stitchSize);
+	void bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize);
 	void bean(uint32_t start, uint32_t finish);
 	void bhbrd(const FRMHED& form);
 	void bhcrnr(uint32_t vertex);
@@ -208,7 +208,7 @@ namespace internal {
 	void bholbrd(uint32_t formIndex);
 	void blbrd(const FRMHED& form);
 	void bold(const FRMHED& form);
-	void boldlin(uint32_t start, uint32_t finish, double size);
+	void boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, double size);
 	void brdfil(const FRMHED& form);
 	void brkdun(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish);
 	void brkseq(const std::vector<SMALPNTL*>& sortedLines,
@@ -302,7 +302,7 @@ namespace internal {
 	           std::vector<SMALPNTL>& lineEndpoints);
 	void frmpnts(uint32_t type);
 	void frmpoly(const POINT* line, uint32_t count) noexcept;
-	void frmsqr(uint32_t iVertex);
+	void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
 	void frmsqr0(const POINT& controlPoint);
 	void frmx(const POINT& controlPoint, HDC dc);
 	void fsangl(FRMHED& form);
@@ -341,11 +341,10 @@ namespace internal {
 	          uint32_t                   regionCrossingEnd,
 	          const fRECTANGLE&          boundingRect,
 	          const std::vector<fPOINT>& currentFormVertices) -> bool;
-	void lapbrd();
+	void lapbrd(uint32_t vertexIndex);
 	void lcon(std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	auto lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept -> bool;
 	auto clipComp(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept -> bool;
-	void linrutb(uint32_t start);
 	auto lnclos(std::vector<uint32_t>& groupIndexSequence,
 	            std::vector<SMALPNTL>& lineEndpoints,
 	            uint32_t               group0,
@@ -464,4 +463,4 @@ namespace internal {
 	auto unvis(const boost::dynamic_bitset<>& visitedRegions, uint32_t& visitedIndex) -> bool;
 	auto vscmp(uint32_t index1, uint32_t index2) noexcept -> bool;
 } // namespace internal
-} // namespace form
+} // namespace form 

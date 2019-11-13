@@ -111,7 +111,6 @@ extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
 extern int32_t* ColorBarSize;
 extern HCURSOR  CrossCursor;
-extern uint32_t CurrentFormGuidesCount;
 extern uint32_t CurrentVertexIndex;
 
 extern std::vector<HWND>* DefaultColorWin;
