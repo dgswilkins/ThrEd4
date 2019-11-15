@@ -763,7 +763,7 @@ void satin::ribon() {
 					if (UserFlagMap.test(UserFlag::BLUNT)) {
 						isBlunt = SBLNT | FBLNT;
 					}
-					si::satends(newForm, isBlunt, BorderWidth);
+					si::satends(currentForm, isBlunt, BorderWidth);
 					newForm.vertexIndex         = thred::adflt(VertexCount * 2U);
 					auto vertexIt            = std::next(FormVertices->begin(), newForm.vertexIndex);
 					vertexIt[0].x            = OutsidePoints->front().x;
