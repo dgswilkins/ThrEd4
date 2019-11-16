@@ -1176,6 +1176,9 @@ auto form::internal::ritlin(const fPOINT& start, const fPOINT& finish, float use
 
 	InterleaveSequence->push_back(start);
 	if (length > MaxStitchLen) {
+		if (userStitchLen < 1e-1f) {
+			userStitchLen = 1e-1f;
+		}
 		auto count = wrap::ceil<uint32_t>(length / userStitchLen);
 		if (count == 0U) {
 			count = 1;
@@ -1458,6 +1461,9 @@ void form::internal::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t fini
 	auto       vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	const auto delta    = fPOINT { (vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y) };
 	const auto length   = hypot(delta.x, delta.y);
+	if (size < 1e-1) {
+		size = 1e-1;
+	}
 	auto       count    = wrap::round<uint32_t>(length / size);
 
 	if (count != 0U) {
