@@ -1117,7 +1117,7 @@ void satin::satfil(FRMHED& form) {
 	form.fillType = SATF;
 	auto lengths           = std::vector<float> {};
 	lengths.reserve(wrap::toSize(VertexCount) + 1U);
-	auto length = 0.0F;
+	auto length = 0.0;
 	lengths.push_back(length);
 	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
 	for (auto iVertex = 1U; iVertex < VertexCount; iVertex++) {
@@ -1151,7 +1151,7 @@ void satin::satfil(FRMHED& form) {
 				break;
 			}
 
-			length       = (length - lengths[1]) / 2;
+			length       = (length - lengths[1]) / 2.0;
 			auto iVertex = 1U;
 			if (!StateMap.test(StateFlag::BARSAT)) {
 				SelectedPoint = vertexIt[1];
@@ -1173,7 +1173,7 @@ void satin::satfil(FRMHED& form) {
 			si::satmf(form, lengths);
 			break;
 		}
-		length /= 2.0F;
+		length /= 2.0;
 		auto iVertex = 0;
 		if (!StateMap.test(StateFlag::BARSAT) && !StateMap.test(StateFlag::FTHR)) {
 			SelectedPoint = vertexIt[0];
