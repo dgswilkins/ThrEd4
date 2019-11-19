@@ -98,8 +98,8 @@ extern uint32_t Clip;
 
 extern std::vector<fPOINTATTR>* ClipBuffer;
 
-extern HGLOBAL   ClipMemory;
-extern void*     ClipPointer;
+extern HGLOBAL ClipMemory;
+extern void*   ClipPointer;
 
 extern std::vector<fPOINT>* ClipPoints;
 
@@ -271,7 +271,7 @@ extern POINT    UnzoomedRect;
 extern COLORREF UserColor[16];
 
 extern std::vector<HWND>* UserColorWin;
-extern EnumMap<UserFlag> UserFlagMap;
+extern EnumMap<UserFlag>  UserFlagMap;
 
 extern HPEN  UserPen[16];
 extern float UserStitchLength;

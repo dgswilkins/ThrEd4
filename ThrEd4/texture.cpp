@@ -840,12 +840,12 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 		auto clipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
 		if (clipFormHeader != nullptr) {
 			if (clipFormHeader->clipType == CLP_FRM) {
-				auto clipForm     = &clipFormHeader->form;
+				auto clipForm = &clipFormHeader->form;
 				if (nullptr != clipForm) {
-					auto vertices = convert_ptr<fPOINT*>(&clipForm[1]);
-					textureForm = *clipForm;
+					auto vertices    = convert_ptr<fPOINT*>(&clipForm[1]);
+					textureForm      = *clipForm;
 					auto sourceStart = vertices;
-					auto sourceEnd = sourceStart + textureForm.vertexCount;
+					auto sourceEnd   = sourceStart + textureForm.vertexCount;
 					AngledFormVertices->clear();
 					AngledFormVertices->resize(textureForm.vertexCount);
 					auto destination = AngledFormVertices->begin();
@@ -1027,9 +1027,9 @@ void texture::internal::txang(FRMHED& form) {
 }
 
 void texture::deltx(uint32_t formIndex) {
-	auto flag = false;
-	auto& form = FormList->operator[](formIndex);
-	const auto& currentIndex = form.fillInfo.texture.index;
+	auto  flag                          = false;
+	auto& form                          = FormList->operator[](formIndex);
+	const auto&            currentIndex = form.fillInfo.texture.index;
 
 	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
 		// First check to see if the texture is shared between forms
@@ -1056,11 +1056,11 @@ void texture::deltx(uint32_t formIndex) {
 			auto iBuffer = 0U;
 			for (auto iForm = 0U; iForm < formIndex; iForm++) {
 				if (texture::istx(iForm)) {
-					auto& fillInfo    = FormList->operator[](iForm).fillInfo;
-					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-					auto  endSource   = std::next(startSource, fillInfo.texture.count);
+					auto& fillInfo                         = FormList->operator[](iForm).fillInfo;
+					auto                       startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+					auto                       endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-					auto destination       = std::next(textureBuffer.begin(), iBuffer);
+					auto destination = std::next(textureBuffer.begin(), iBuffer);
 					std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
@@ -1068,11 +1068,11 @@ void texture::deltx(uint32_t formIndex) {
 			}
 			for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 				if (texture::istx(iForm)) {
-					auto& fillInfo    = FormList->operator[](iForm).fillInfo;
-					auto  startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-					auto  endSource   = std::next(startSource, fillInfo.texture.count);
+					auto& fillInfo                         = FormList->operator[](iForm).fillInfo;
+					auto                       startSource = std::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+					auto                       endSource   = std::next(startSource, fillInfo.texture.count);
 					textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-					auto destination       = std::next(textureBuffer.begin(), iBuffer);
+					auto destination = std::next(textureBuffer.begin(), iBuffer);
 					std::copy(startSource, endSource, destination);
 					fillInfo.texture.index = iBuffer;
 					iBuffer += fillInfo.texture.count;
@@ -1652,8 +1652,8 @@ void texture::rtrtx(const FRMHED& form) {
 			currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
 		}
 		TempTexturePoints->resize(currentCount);
-		auto startSource         = std::next(TexturePointsBuffer->cbegin(), currentIndex);
-		auto endSource           = std::next(startSource, currentCount);
+		auto startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
+		auto endSource   = std::next(startSource, currentCount);
 		std::copy(startSource, endSource, TempTexturePoints->begin());
 		TextureScreen.areaHeight = form.fillInfo.texture.height;
 		TextureScreen.spacing    = form.fillSpacing;

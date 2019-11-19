@@ -2712,8 +2712,8 @@ public:
 	//~FSEQ() = default;
 };
 
-constexpr auto SEQTOP = 2U;
-constexpr auto SEQBOT = 3U;
+constexpr auto SEQTOP = 2;
+constexpr auto SEQBOT = 3;
 
 class PVEC
 {

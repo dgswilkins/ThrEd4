@@ -785,7 +785,7 @@ void trace::internal::dutrac() {
 			displayText::tabmsg(IDS_FRM2L);
 			return;
 		}
-		#ifndef TESTTRC
+#ifndef TESTTRC
 		auto decimatedLine = std::vector<TRCPNT> {};
 		decimatedLine.reserve(tracedPoints.size());
 		TRCPNT traceDiff[2] = {};
@@ -804,8 +804,8 @@ void trace::internal::dutrac() {
 		tracedPoints.push_back(decimatedLine[0]);
 		auto iNextDec = 0U;
 		for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
-			const auto traceLength
-			    = hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x, decimatedLine[iCurrent].y - decimatedLine[iNextDec].y);
+			const auto traceLength = hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x,
+			                               decimatedLine[iCurrent].y - decimatedLine[iNextDec].y);
 			if (traceLength > IniFile.traceLength) {
 				tracedPoints.push_back(decimatedLine[iNextDec]);
 				iNextDec = iCurrent;
@@ -814,7 +814,7 @@ void trace::internal::dutrac() {
 		for (auto iCurrent = iNextDec + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
 			tracedPoints.push_back(decimatedLine[iCurrent]);
 		}
-		#endif
+#endif
 		FormList->push_back(FRMHED {});
 		auto& form = FormList->back();
 		form::frmclr(form);
@@ -823,7 +823,7 @@ void trace::internal::dutrac() {
 		FormVertices->push_back(fPOINT { gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
 		                                 gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y });
 		OutputIndex++;
-		auto iNext                = 0;
+		auto iNext           = 0;
 		auto traceLengthSum  = 0.0F;
 		auto landscapeOffset = 0.0F;
 		if (StateMap.test(StateFlag::LANDSCAP)) {

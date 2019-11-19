@@ -161,8 +161,8 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-	valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U)),
-	                                  ValueWindowCoords);
+	valueWindow[LLAYR]
+	    = ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (form.type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
@@ -197,8 +197,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 			valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(L"{}", (form.underlayColor + 1U)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LULEN] = ffi::txtwin(stringTable[STR_ULEN], LabelWindowCoords);
-			valueWindow[LULEN]
-			    = ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LULEN] = ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayStitchLen / PFGRAN)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		labelWindow[LWLKIND] = ffi::txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
@@ -206,13 +205,11 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		ffi::nxtlin(formMenuEntryCount);
 		if ((form.extendedAttribute & AT_UND) != 0U) {
 			labelWindow[LUSPAC] = ffi::txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
-			valueWindow[LUSPAC]
-			    = ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlaySpacing / PFGRAN)), ValueWindowCoords);
+			valueWindow[LUSPAC] = ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlaySpacing / PFGRAN)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
-			valueWindow[LUANG]
-			    = ffi::txtrwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.underlayStitchAngle) * 180.0 / PI)),
-			                   ValueWindowCoords);
+			valueWindow[LUANG] = ffi::txtrwin(
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.underlayStitchAngle) * 180.0 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 	}
@@ -225,12 +222,11 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		ffi::nxtlin(formMenuEntryCount);
 		if (form.fillType == FTHF) {
 			labelWindow[LFTHCOL] = ffi::txtwin(stringTable[STR_FTHCOL], LabelWindowCoords);
-			valueWindow[LFTHCOL]
-			    = ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.color + 1U)), ValueWindowCoords);
+			valueWindow[LFTHCOL] = ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.color + 1U)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHTYP] = ffi::txtwin(stringTable[STR_FTHTYP], LabelWindowCoords);
-			valueWindow[LFTHTYP] = ffi::numwin(stringTable[wrap::toSize(form.fillInfo.feather.fillType) - 1U + STR_FTH0],
-			                                   ValueWindowCoords);
+			valueWindow[LFTHTYP]
+			    = ffi::numwin(stringTable[wrap::toSize(form.fillInfo.feather.fillType) - 1U + STR_FTH0], ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
 			if ((form.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -267,8 +263,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 			valueWindow[LFTHUPCNT] = ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.upCount)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHDWNCNT] = ffi::txtwin(stringTable[STR_FTHDWNCNT], LabelWindowCoords);
-			valueWindow[LFTHDWNCNT]
-			    = ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.downCount)), ValueWindowCoords);
+			valueWindow[LFTHDWNCNT] = ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.downCount)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHSIZ] = ffi::txtwin(stringTable[STR_FTHSIZ], LabelWindowCoords);
 			valueWindow[LFTHSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (form.fillInfo.feather.ratio)), ValueWindowCoords);
@@ -308,15 +303,13 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		if (form.fillType == ANGF || form.fillType == TXANGF) {
 			labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 			valueWindow[LFRMANG] = ffi::numwin(
-			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.angleOrClipData.angle) * 180.0 / PI)),
-			    ValueWindowCoords);
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.angleOrClipData.angle) * 180.0 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (form.fillType == ANGCLPF) {
 			labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-			valueWindow[LSACANG]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.satinOrAngle.angle) * 180.0 / PI)),
-			                  ValueWindowCoords);
+			valueWindow[LSACANG] = ffi::numwin(
+			    fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.satinOrAngle.angle) * 180.0 / PI)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -324,8 +317,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 			valueWindow[LFRMFAZ] = ffi::numwin(fmt::format(L"{}", (form.wordParam)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
-		if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF
-		    || texture::istx(ClosestFormToCursor)) {
+		if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF || texture::istx(ClosestFormToCursor)) {
 			labelWindow[LBFILSQR] = ffi::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
 			if ((form.extendedAttribute & AT_SQR) != 0U) {
 				choice = stringTable[STR_SQR];
@@ -397,8 +389,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		}
 		if ((edgeArray[iEdge] & BEMAX) != 0) {
 			labelWindow[LMAXBRD] = ffi::txtwin(stringTable[STR_TXT22], LabelWindowCoords);
-			valueWindow[LMAXBRD]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (form.maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LMAXBRD] = ffi::numwin(fmt::format(L"{:.2f}", (form.maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if ((edgeArray[iEdge] & BELEN) != 0) {
@@ -408,8 +399,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		}
 		if ((edgeArray[iEdge] & BEMIN) != 0) {
 			labelWindow[LMINBRD] = ffi::txtwin(stringTable[STR_TXT23], LabelWindowCoords);
-			valueWindow[LMINBRD]
-			    = ffi::numwin(fmt::format(L"{:.2f}", (form.minBorderStitchLen / PFGRAN)), ValueWindowCoords);
+			valueWindow[LMINBRD] = ffi::numwin(fmt::format(L"{:.2f}", (form.minBorderStitchLen / PFGRAN)), ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if ((edgeArray[iEdge] & BESIZ) != 0) {
@@ -837,10 +827,10 @@ void formForms::dasyfrm() {
 	}
 	const auto referencePoint = fPOINT { form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom) };
 	FormList->push_back(FRMHED {});
-	auto& form              = FormList->back();
-	ClosestFormToCursor       = wrap::toUnsigned(FormList->size() - 1U);
-	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
-	form.attribute   = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
+	auto& form          = FormList->back();
+	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
+	form.vertexIndex    = wrap::toUnsigned(FormVertices->size());
+	form.attribute      = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
 	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
@@ -855,9 +845,9 @@ void formForms::dasyfrm() {
 	diameter *= ratio;
 	petalLength *= ratio;
 	holeDiameter *= ratio;
-	form.type = FRMFPOLY;
-	auto iVertex       = 0U;
-	auto fref          = 0U;
+	form.type    = FRMFPOLY;
+	auto iVertex = 0U;
+	auto fref    = 0U;
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
 		auto       angle            = PI_F2;
 		const auto holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
@@ -1100,8 +1090,7 @@ void formForms::setear() {
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
-		const auto size = fPOINT { form.rectangle.right - form.rectangle.left,
-			                       form.rectangle.top - form.rectangle.bottom };
+		const auto size = fPOINT { form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom };
 
 		auto horizontalRatio = UnzoomedRect.x / 4.0F / size.x;
 		if (horizontalRatio > 1.0F) {
@@ -1241,9 +1230,9 @@ void formForms::wavfrm() {
 		form.vertexCount = vertexCount;
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 		StateMap.reset(StateFlag::FORMSEL);
-		const auto selectedSize    = fPOINT { form.rectangle.right - form.rectangle.left,
-                                           form.rectangle.top - form.rectangle.bottom };
-		auto       horizontalRatio = UnzoomedRect.x / 4.0F / selectedSize.x;
+		const auto selectedSize
+		    = fPOINT { form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom };
+		auto horizontalRatio = UnzoomedRect.x / 4.0F / selectedSize.x;
 		if (horizontalRatio > 1) {
 			horizontalRatio = 1.0F;
 		}

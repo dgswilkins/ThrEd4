@@ -282,8 +282,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 
 	auto clipPoint = std::vector<fPOINT> {};
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-		auto& form           = FormList->operator[](iForm);
-		auto  clipDifference = 0U;
+		auto& form                            = FormList->operator[](iForm);
+		auto                   clipDifference = 0U;
 		if (clip::isclp(form)) {
 			clipDifference = form.angleOrClipData.clip;
 			if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {

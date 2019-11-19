@@ -52,7 +52,7 @@ namespace internal {
 	             std::vector<fPOINT>& clipFillData,
 	             uint32_t             vertex,
 	             const fPOINT&        rotationCenter);
-	auto clpsid(uint32_t vertexIndex,
+	auto clpsid(uint32_t                   vertexIndex,
 	            const fRECTANGLE&          clipRect,
 	            const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
@@ -67,7 +67,7 @@ namespace internal {
 	void dulast(std::vector<fPOINT>& chainEndPoints);
 	void durev(const fRECTANGLE& clipRect, std::vector<fPOINT>& clipReversedData);
 	auto findclp(uint32_t formIndex) noexcept -> uint32_t;
-	void fxlen(CONST FRMHED&            form ,
+	void fxlen(CONST FRMHED&             form,
 	           std::vector<fPOINT>&      chainEndPoints,
 	           const std::vector<float>& listSINEs,
 	           const std::vector<float>& listCOSINEs);
@@ -86,15 +86,14 @@ namespace internal {
 	           const std::vector<float>& listSINEs,
 	           const std::vector<float>& listCOSINEs,
 	           fPOINT&                   moveToCoords,
-	           uint32_t                  currentSide)
-	    -> bool;
-	void lincrnr(uint32_t vertexIndex,
+	           uint32_t                  currentSide) -> bool;
+	void lincrnr(uint32_t                   vertexIndex,
 	             const std::vector<fPOINT>& clipReversedData,
 	             std::vector<fPOINT>&       clipFillData,
 	             float                      clipAngle,
 	             const fPOINT&              rotationCenter,
 	             uint32_t                   currentSide);
-	void linsid(uint32_t vertexIndex,
+	void linsid(uint32_t                   vertexIndex,
 	            const std::vector<fPOINT>& clipReversedData,
 	            std::vector<fPOINT>&       clipFillData,
 	            float                      clipAngle,
@@ -102,7 +101,7 @@ namespace internal {
 	            const fPOINT&              rotationCenter,
 	            uint32_t                   currentSide);
 	auto nupnt(float clipAngle, fPOINT& moveToCoords) noexcept -> bool;
-	void picfn(const FRMHED&       form ,
+	void picfn(const FRMHED&        form,
 	           const fRECTANGLE&    clipRect,
 	           std::vector<fPOINT>& clipFillData,
 	           uint32_t             start,

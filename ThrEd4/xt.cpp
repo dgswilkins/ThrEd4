@@ -366,7 +366,7 @@ void xt::fthrfn(FRMHED& form) {
 	feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
 	feather.globalUp       = feather.globalPhase * feather.globalRatio;
 	feather.globalDown     = feather.globalPhase - feather.globalUp;
-	form.fillType = FTHF;
+	form.fillType          = FTHF;
 	feather.phase          = 1U;
 	BSequence->push_back((*BSequence)[BSequence->size() - 2U]);
 	BSequence->push_back((*BSequence)[BSequence->size() - 1U]);
@@ -697,7 +697,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 		for (auto iGuide = form.satinGuideCount; iGuide != 0; iGuide--) {
 			OSequence->push_back(
 			    fPOINT { form::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
-			            form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y) });
+			             form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y) });
 			OutputIndex++;
 		}
 		if ((form.attribute & FRMEND) != 0U) {
@@ -761,8 +761,7 @@ void xt::dubit(FRMHED& form, uint32_t bit) {
 	if (form.type == FRMLINE) {
 		form.type = FRMFPOLY;
 	}
-	if (((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0U)
-	    && ((bit & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
+	if (((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) == 0U) && ((bit & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
 		if (form.fillType != 0U) {
 			form.underlayColor = form.fillColor;
 		}
@@ -1447,7 +1446,7 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output += gucon(
-		   form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
+		    form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
 	}
 	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
 	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1U].index;
@@ -1861,7 +1860,7 @@ void xt::setfspac() {
 void xt::internal::findfn(uint32_t formNumber, float indent) {
 	ClosestFormToCursor = formNumber;
 	form::fvars(ClosestFormToCursor);
-	auto& form = FormList->operator[](formNumber);
+	auto& form          = FormList->operator[](formNumber);
 	form.underlayIndent = indent;
 	if ((form.extendedAttribute & (AT_UND | AT_WALK)) != 0U) {
 		form::refilfn();
@@ -2230,10 +2229,10 @@ void xt::setfmax() {
 void xt::internal::fwidfn(uint32_t formNumber, float length) {
 	ClosestFormToCursor = formNumber;
 	form::fvars(ClosestFormToCursor);
-	auto& form = FormList->operator[](formNumber);
-	const auto reference = form.rectangle.left;
-	const auto ratio     = length / (form.rectangle.right - reference);
-	auto       vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto& form                       = FormList->operator[](formNumber);
+	const auto             reference = form.rectangle.left;
+	const auto             ratio     = length / (form.rectangle.right - reference);
+	auto                   vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 	}
@@ -2272,10 +2271,10 @@ void xt::setfind() {
 void xt::internal::fhifn(uint32_t formNumber, float length) {
 	ClosestFormToCursor = formNumber;
 	form::fvars(ClosestFormToCursor);
-	auto& form = FormList->operator[](formNumber);
-	const auto reference = form.rectangle.bottom;
-	const auto ratio     = length / (form.rectangle.top - reference);
-	auto       vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto& form                       = FormList->operator[](formNumber);
+	const auto             reference = form.rectangle.bottom;
+	const auto             ratio     = length / (form.rectangle.top - reference);
+	auto                   vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 	}
@@ -2354,8 +2353,8 @@ void xt::duauxnam() {
 
 void xt::internal::rtrclpfn(const FRMHED& form) {
 	if (OpenClipboard(ThrEdWindow) != 0) {
-		auto count = 0U;
-		auto clipRect = fRECTANGLE{};
+		auto count    = 0U;
+		auto clipRect = fRECTANGLE {};
 		form::fvars(ClosestFormToCursor);
 		if (clip::iseclp(form)) {
 			count = form.clipEntries;
