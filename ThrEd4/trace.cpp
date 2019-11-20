@@ -818,8 +818,8 @@ void trace::internal::dutrac() {
 		FormList->push_back(FRMHED {});
 		auto& form = FormList->back();
 		form::frmclr(form);
-		CurrentVertexIndex = gsl::narrow<decltype(CurrentVertexIndex)>(FormVertices->size());
-		OutputIndex        = 0;
+		form.vertexIndex = gsl::narrow<decltype(form.vertexIndex)>(FormVertices->size());
+		OutputIndex      = 0;
 		FormVertices->push_back(fPOINT { gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
 		                                 gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y });
 		OutputIndex++;
@@ -844,7 +844,6 @@ void trace::internal::dutrac() {
 				traceLengthSum = 0.0;
 			}
 		}
-		form.vertexIndex = CurrentVertexIndex;
 		form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(OutputIndex);
 		form.type        = FRMFPOLY;
 		form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);

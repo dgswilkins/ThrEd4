@@ -184,7 +184,7 @@ namespace internal {
 	void dun();
 	auto dunum(uint32_t code) noexcept -> bool;
 	void dupclp();
-	void duprct();
+	void duprct(uint32_t vertexIndex);
 	void durit(std::vector<char>& destination, const void* source, uint32_t count);
 	void durot() noexcept;
 	void durotu() noexcept;

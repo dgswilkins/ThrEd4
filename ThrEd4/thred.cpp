@@ -1961,7 +1961,7 @@ void thred::internal::hupfn() {
 	sizstch(checkHoopRect, *StitchBuffer);
 	if (!FormList->empty()) {
 		if (StitchBuffer->empty()) {
-			auto vertexIt        = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+			auto vertexIt        = FormVertices->cbegin();
 			checkHoopRect.top    = vertexIt->y;
 			checkHoopRect.bottom = vertexIt->y;
 			checkHoopRect.right  = vertexIt->x;
@@ -7571,7 +7571,7 @@ void thred::internal::duclip() {
 					// skip past the header
 					auto* vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
 					form::fvars(ClosestFormToCursor);
-					auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+					auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 					auto iSource  = SelectedFormVertices.start;
 					for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 						vertices[iVertex] = vertexIt[iSource];
@@ -8398,13 +8398,13 @@ void thred::internal::delet() {
 			currentFormVertex = form::pdir(currentFormVertex);
 		}
 		currentFormVertex = 0;
-		auto vertexIt     = std::next(FormVertices->begin(), CurrentVertexIndex);
+		auto vertexIt     = std::next(FormVertices->begin(), form.vertexIndex);
 		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 			if (!vertexMap.test(iVertex)) {
 				vertexIt[currentFormVertex++] = vertexIt[iVertex];
 			}
 		}
-		auto eraseStart = std::next(FormVertices->cbegin(), wrap::toSize(CurrentVertexIndex) + currentFormVertex);
+		auto eraseStart = std::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + currentFormVertex);
 		auto eraseEnd   = std::next(eraseStart, (VertexCount - currentFormVertex));
 		FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 		const auto nextForm = wrap::toSize(ClosestFormToCursor) + 1U;
@@ -9488,9 +9488,9 @@ void thred::internal::unmov() {
 	}
 }
 
-void thred::internal::duprct() {
+void thred::internal::duprct(uint32_t vertexIndex) {
 	auto currentVertex        = SelectedFormVertices.start;
-	auto vertexIt             = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt             = std::next(FormVertices->cbegin(), vertexIndex);
 	SelectedVerticesRect.left = SelectedVerticesRect.right = vertexIt[currentVertex].x;
 	SelectedVerticesRect.top = SelectedVerticesRect.bottom = vertexIt[currentVertex].y;
 	currentVertex                                          = form::pdir(currentVertex);
@@ -9513,10 +9513,11 @@ void thred::internal::duprct() {
 
 void thred::setpsel() {
 	form::unpsel();
-	thi::duprct();
+	const auto vertexIndex = FormList->operator[](ClosestFormToCursor).vertexIndex;
+	thi::duprct(vertexIndex);
 	form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
 	form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	form::sfCor2px(vertexIt[SelectedFormVertices.finish], EndPointCross);
 	StateMap.set(StateFlag::SHOPSEL);
 	form::dupsel(StitchWindowDC);
@@ -9527,8 +9528,9 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 	thred::savdo();
 	if (StateMap.test(StateFlag::FPSEL)) {
 		form::fvars(ClosestFormToCursor);
-		auto currentVertex = SelectedFormVertices.start;
-		auto vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
+		auto& form                           = FormList->operator[](ClosestFormToCursor);
+		auto                   currentVertex = SelectedFormVertices.start;
+		auto                   vertexIt      = std::next(FormVertices->begin(), form.vertexIndex);
 		for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 			thred::rotflt(vertexIt[currentVertex], rotationAngle, rotationCenter);
 			currentVertex = form::pdir(currentVertex);
@@ -9556,8 +9558,9 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 		for (auto selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			form::fvars(ClosestFormToCursor);
-			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
-			for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+			auto& form                      = FormList->operator[](selectedForm);
+			auto                   vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+			for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
 			form::frmout(ClosestFormToCursor);
@@ -9568,8 +9571,9 @@ void thred::rotfn(float rotationAngle, const fPOINT& rotationCenter) {
 	else {
 		if (StateMap.testAndReset(StateFlag::FRMROT)) {
 			form::fvars(ClosestFormToCursor);
-			auto vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
-			for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+			auto& form                      = FormList->operator[](ClosestFormToCursor);
+			auto                   vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+			for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 				thred::rotflt(vertexIt[iVertex], rotationAngle, rotationCenter);
 			}
 			form::frmout(ClosestFormToCursor);
@@ -10838,10 +10842,11 @@ void thred::internal::rotmrk() {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			const auto codedFormIndex = ClosestFormToCursor << FRMSHFT;
 			form::fvars(ClosestFormToCursor);
-			LowestAngle = HighestAngle = 0.0F;
-			auto vertexIt              = std::next(FormVertices->cbegin(), CurrentVertexIndex);
-			OriginalAngle              = atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
-			for (auto iVertex = 1U; iVertex < VertexCount; iVertex++) {
+			LowestAngle = HighestAngle      = 0.0F;
+			auto& form                      = FormList->operator[](ClosestFormToCursor);
+			auto                   vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
+			OriginalAngle                   = atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
+			for (auto iVertex = 1U; iVertex < form.vertexCount; iVertex++) {
 				angdif(nuang(vertexIt[iVertex].y - ZoomMarkPoint.y, vertexIt[iVertex].x - ZoomMarkPoint.x));
 			}
 			for (auto& stitch : *StitchBuffer) {
@@ -11844,8 +11849,9 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
 	const auto offset = fPOINT { SelectedPoint.x - it->x, SelectedPoint.y - it->y };
 	const auto count  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
 	form::fltspac(form::nxt(ClosestVertexToCursor), count);
-	FormList->operator[](closestFormToCursor).vertexCount += count;
-	auto      vertexIt = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto& form = FormList->operator[](closestFormToCursor);
+	form.vertexCount += count;
+	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iOutput = 1U; iOutput < wrap::toUnsigned(InterleaveSequence->size()) - 1U; iOutput++) {
 		*vertexIt = fPOINT { it->x + offset.x, it->y + offset.y };
 		vertexIt++;
@@ -12433,7 +12439,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		if (StateMap.test(StateFlag::FPSEL)) {
 			form::fvars(ClosestFormToCursor);
 			auto iSelectedVertex = SelectedFormVertices.start;
-			auto vertexIt        = std::next(FormVertices->begin(), CurrentVertexIndex);
+			auto vertexIt        = std::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 			for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 				vertexIt[iSelectedVertex].x += FormMoveDelta.x;
 				vertexIt[iSelectedVertex].y -= FormMoveDelta.y;

@@ -470,7 +470,7 @@ constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
 auto xt::insid(const FRMHED& form) -> std::vector<fPOINT>& {
 	satin::satout(form, fabs(form.underlayIndent));
 	if (form.underlayIndent > 0) {
-		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 			if (!form::cisin(form, (*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
 				(*InsidePoints)[iVertex] = vertexIt[iVertex];
@@ -685,7 +685,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 	OSequence->clear();
 	form.extendedAttribute |= AT_CWLK;
 	if (form.satinGuideCount != 0U) {
-		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		if (form.wordParam != 0U) {
 			const auto iVertex    = form.wordParam;
 			auto&      thisVertex = vertexIt[iVertex];
@@ -710,7 +710,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 		if ((form.extendedAttribute & AT_STRT) != 0U) {
 			start = form.fillStart;
 		}
-		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		OSequence->push_back(vertexIt[start]);
 		OutputIndex++;
 		auto finish = form::prv(start);
@@ -1434,7 +1434,7 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 	}
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
-			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+			auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 			ilData.output += gucon(form,
 			                       buffer,
 			                       vertexIt[form.fillStart],
@@ -1482,7 +1482,7 @@ void xt::internal::chkend(const FRMHED& form, std::vector<fPOINTATTR>& buffer, u
 	if (isfil(form)) {
 		StateMap.set(StateFlag::ISEND);
 		if ((form.extendedAttribute & AT_END) != 0U) {
-			auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+			auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 			ilData.output += gucon(form, buffer, InterleaveSequence->back(), vertexIt[form.fillEnd], ilData.output, code);
 		}
 	}
@@ -1563,7 +1563,7 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 	}
 	else { // no stitches added so far
 		auto code     = 0U;
-		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); iSequence++) {
 			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
 			                             | (*InterleaveSequenceIndices)[iSequence].color);
@@ -2232,7 +2232,7 @@ void xt::internal::fwidfn(uint32_t formNumber, float length) {
 	auto& form                       = FormList->operator[](formNumber);
 	const auto             reference = form.rectangle.left;
 	const auto             ratio     = length / (form.rectangle.right - reference);
-	auto                   vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto                   vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 	}
@@ -2274,7 +2274,7 @@ void xt::internal::fhifn(uint32_t formNumber, float length) {
 	auto& form                       = FormList->operator[](formNumber);
 	const auto             reference = form.rectangle.bottom;
 	const auto             ratio     = length / (form.rectangle.top - reference);
-	auto                   vertexIt  = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto                   vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 	}
