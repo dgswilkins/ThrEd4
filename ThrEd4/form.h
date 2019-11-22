@@ -203,7 +203,7 @@ namespace internal {
 	void bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize);
 	void bean(uint32_t start, uint32_t finish);
 	void bhbrd(const FRMHED& form);
-	void bhcrnr(uint32_t vertex);
+	void bhcrnr(uint32_t vertexIndex, uint32_t vertex);
 	void bhfn(const FRMHED& form, uint32_t start, uint32_t finish);
 	void bholbrd(uint32_t formIndex);
 	void blbrd(const FRMHED& form);
@@ -272,7 +272,7 @@ namespace internal {
 	           SMALPNTL*                     sequenceLines);
 	void duseq1(const SMALPNTL* sequenceLines);
 	auto duseq2(SMALPNTL* sequenceLines) -> SMALPNTL*;
-	void duspnd(const FRMHED&             form,
+	void duspnd(uint32_t                  stitchLen,
 	            const std::vector<VRCT2>& underlayVerticalRect,
 	            const std::vector<VRCT2>& fillVerticalRect,
 	            uint32_t                  start,
@@ -389,13 +389,13 @@ namespace internal {
 	         const std::vector<VRCT2>& vrct,
 	         float                     width);
 	void plbak(uint32_t backPoint);
-	void plbrd(float edgeSpacing, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
-	void plfn(const FRMHED&             form,
+	void plbrd(FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	void plfn(uint32_t                  stitchLen,
 	          const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
 	          const std::vector<VRCT2>& prct,
 	          float                     width);
-	void prebrd(FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	void prebrd(FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	auto proj(const fPOINT& point, float slope, const fPOINT& point0, const fPOINT& point1, fPOINT& intersectionPoint) noexcept
 	    -> bool;
 	auto projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept -> bool;
