@@ -6744,6 +6744,7 @@ void form::fliph() {
 		return;
 	}
 	if (StateMap.test(StateFlag::BIGBOX)) {
+		thred::savdo();
 		const auto offset = AllItemsRect.right + AllItemsRect.left;
 		for (auto& FormVertice : *FormVertices) {
 			FormVertice.x = offset - FormVertice.x;
