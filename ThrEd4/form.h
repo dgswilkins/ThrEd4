@@ -389,13 +389,13 @@ namespace internal {
 	         const std::vector<VRCT2>& vrct,
 	         float                     width);
 	void plbak(uint32_t backPoint);
-	void plbrd(FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	void plbrd(const FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	void plfn(uint32_t                  stitchLen,
 	          const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
 	          const std::vector<VRCT2>& prct,
 	          float                     width);
-	void prebrd(FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
+	void prebrd(const FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
 	auto proj(const fPOINT& point, float slope, const fPOINT& point0, const fPOINT& point1, fPOINT& intersectionPoint) noexcept
 	    -> bool;
 	auto projh(float yCoordinate, const fPOINT& point0, const fPOINT& point1, fPOINT& intersection) noexcept -> bool;
@@ -448,7 +448,7 @@ namespace internal {
 	void snpfn(const std::vector<uint32_t>& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
 	void spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish);
 	auto spltlin() -> bool;
-	void sprct(std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish);
+	void sprct(const std::vector<fPOINT>* vertices, uint32_t vertexIndex, std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish);
 	void spurct(std::vector<VRCT2>& underlayVerticalRect, const std::vector<VRCT2>& fillVerticalRect, uint32_t iRect) noexcept;
 	void
 	     spurfn(const fPOINT& innerPoint, const fPOINT& outerPoint, fPOINT& underlayInnerPoint, fPOINT& underlayOuterPoint) noexcept;

@@ -95,7 +95,7 @@ void satin::spltsat(uint32_t guideIndex) {
 
 	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), currentForm);
 	form::fvars(ClosestFormToCursor);
-	auto& form                      = FormList->operator[](ClosestFormToCursor); // insert may have invalidated currentForm
+	auto& form                      = FormList->operator[](ClosestFormToCursor); // insert may have invalidated
 	const auto             maxForm  = FormList->size();
 	auto                   position = std::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + form.vertexCount);
 	FormVertices->insert(position, 2, fPOINT {});
@@ -106,7 +106,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	auto       currentGuide  = guideIt[guideIndex];
 	const auto oldLastVertex = currentGuide.start + (VertexCount - currentGuide.finish) + 1U;
 	auto       iNewVertex    = oldLastVertex + 1U;
-	auto       vertexIt      = std::next(FormVertices->begin(), CurrentVertexIndex);
+	auto       vertexIt      = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
 		if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
 			vertexBuffer[iOldVertex++] = vertexIt[iVertex];
@@ -873,13 +873,14 @@ void satin::slbrd(const FRMHED& form) {
 	LineSpacing = savedSpacing;
 }
 
-void satin::internal::satfn(const std::vector<float>& lengths,
+void satin::internal::satfn(const FRMHED&             form,
+                            const std::vector<float>& lengths,
                             uint32_t                  line1Start,
                             uint32_t                  line1End,
                             uint32_t                  line2Start,
                             uint32_t                  line2End) {
 	if (line1Start != line1End && line2Start != line2End) {
-		auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		if (!StateMap.testAndSet(StateFlag::SAT1)) {
 			if (StateMap.test(StateFlag::FTHR)) {
 				auto vertex = vertexIt[line1Start % VertexCount];
@@ -1063,7 +1064,7 @@ void satin::internal::satmf(const FRMHED& form, const std::vector<float>& length
 		start = 1;
 	}
 	auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-	si::satfn(lengths, start, guideIt[0].start, VertexCount, guideIt[0].finish);
+	si::satfn(form, lengths, start, guideIt[0].start, VertexCount, guideIt[0].finish);
 	auto endGuideIndex = form.satinGuideCount;
 	if (endGuideIndex != 0U) {
 		endGuideIndex--;
@@ -1071,11 +1072,11 @@ void satin::internal::satmf(const FRMHED& form, const std::vector<float>& length
 	for (auto iGuide = 0U; iGuide < endGuideIndex; iGuide++) {
 		auto& thisGuide = guideIt[iGuide];
 		auto& nextGuide = guideIt[wrap::toSize(iGuide) + 1U];
-		si::satfn(lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
+		si::satfn(form, lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
 	}
 	auto& endGuide = form.wordParam;
 	if (endGuide != 0U) {
-		si::satfn(lengths, guideIt[endGuideIndex].start, endGuide, guideIt[endGuideIndex].finish, endGuide + 1U);
+		si::satfn(form, lengths, guideIt[endGuideIndex].start, endGuide, guideIt[endGuideIndex].finish, endGuide + 1U);
 	}
 	else {
 		if (guideIt[endGuideIndex].finish - guideIt[endGuideIndex].start > 2) {
@@ -1090,10 +1091,11 @@ void satin::internal::satmf(const FRMHED& form, const std::vector<float>& length
 			if (deltaY > deltaX) {
 				iVertex--;
 			}
-			si::satfn(lengths, guideIt[endGuideIndex].start, iVertex, guideIt[endGuideIndex].finish, iVertex);
+			si::satfn(form, lengths, guideIt[endGuideIndex].start, iVertex, guideIt[endGuideIndex].finish, iVertex);
 		}
 		else {
-			si::satfn(lengths,
+			si::satfn(form,
+			          lengths,
 			          guideIt[endGuideIndex].start,
 			          guideIt[endGuideIndex].start + 1,
 			          guideIt[endGuideIndex].finish,
@@ -1117,7 +1119,7 @@ void satin::satfil(FRMHED& form) {
 	lengths.reserve(wrap::toSize(VertexCount) + 1U);
 	auto length = 0.0;
 	lengths.push_back(length);
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 1U; iVertex < VertexCount; iVertex++) {
 		const auto delta
 		    = fPOINT { vertexIt[iVertex].x - vertexIt[iVertex - 1U].x, vertexIt[iVertex].y - vertexIt[iVertex - 1U].y };
@@ -1135,7 +1137,7 @@ void satin::satfil(FRMHED& form) {
 				break;
 			}
 
-			si::satfn(lengths, 1, endGuide, VertexCount, endGuide + 1U);
+			si::satfn(form, lengths, 1, endGuide, VertexCount, endGuide + 1U);
 			break;
 		}
 		if ((form.attribute & FRMEND) != 0U) {
@@ -1145,7 +1147,7 @@ void satin::satfil(FRMHED& form) {
 			}
 
 			if (VertexCount == 3 && ((FormList->operator[](ClosestFormToCursor).attribute & 1U) != 0)) {
-				si::satfn(lengths, 2, 3, 2, 1);
+				si::satfn(form, lengths, 2, 3, 2, 1);
 				break;
 			}
 
@@ -1163,7 +1165,7 @@ void satin::satfil(FRMHED& form) {
 			if (deltaB > deltaA) {
 				iVertex--;
 			}
-			si::satfn(lengths, 1, iVertex, VertexCount, iVertex);
+			si::satfn(form, lengths, 1, iVertex, VertexCount, iVertex);
 
 			break;
 		}
@@ -1185,7 +1187,7 @@ void satin::satfil(FRMHED& form) {
 		if (deltaB > deltaA) {
 			iVertex--;
 		}
-		si::satfn(lengths, 0, iVertex, VertexCount, iVertex);
+		si::satfn(form, lengths, 0, iVertex, VertexCount, iVertex);
 	} while (false);
 
 	LineSpacing = savedSpacing;
@@ -1470,9 +1472,9 @@ void satin::internal::outfn(const FRMHED& form, uint32_t start, uint32_t finish,
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}
-	auto vertexIt = std::next(FormVertices->cbegin(), CurrentVertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT)) {
-		vertexIt = std::next(AngledFormVertices->cbegin(), CurrentVertexIndex);
+		vertexIt = std::next(AngledFormVertices->cbegin(), form.vertexIndex);
 	}
 	(*InsidePoints)[finish].x  = vertexIt[finish].x - xOffset;
 	(*InsidePoints)[finish].y  = vertexIt[finish].y - yOffset;
