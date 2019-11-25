@@ -87,20 +87,20 @@ auto satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t
 }
 
 void satin::spltsat(uint32_t guideIndex) {
-	auto& formList                = *FormList;
-	auto& form                    = formList.operator[](ClosestFormToCursor);
-	auto                  guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
+	auto& currentForm                     = FormList->operator[](ClosestFormToCursor);
+	auto                          guideIt = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
 	// We are adding two additional vertices when splitting the form
 	auto vertexBuffer = std::vector<fPOINT> {};
 	vertexBuffer.resize(wrap::toSize(VertexCount) + 2U);
 
-	formList.insert(std::next(formList.cbegin(), ClosestFormToCursor), form);
+	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), currentForm);
 	form::fvars(ClosestFormToCursor);
-	const auto maxForm  = formList.size();
-	auto       position = std::next(FormVertices->cbegin(), wrap::toSize(CurrentVertexIndex) + VertexCount);
+	auto& form                      = FormList->operator[](ClosestFormToCursor); // insert may have invalidated currentForm
+	const auto             maxForm  = FormList->size();
+	auto                   position = std::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + form.vertexCount);
 	FormVertices->insert(position, 2, fPOINT {});
 	for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; iForm++) {
-		formList.operator[](iForm).vertexIndex += 2;
+		FormList->operator[](iForm).vertexIndex += 2;
 	}
 	auto       iOldVertex    = 0U;
 	auto       currentGuide  = guideIt[guideIndex];
@@ -134,11 +134,10 @@ void satin::spltsat(uint32_t guideIndex) {
 	for (auto iVertex = 0U; iVertex < iNewVertex; iVertex++) {
 		vertexIt[iVertex] = vertexBuffer[iVertex];
 	}
-	form                 = formList.operator[](ClosestFormToCursor); // insert may have invalidated
 	form.vertexCount     = iOldVertex;
-	auto& nextForm       = formList.operator[](wrap::toSize(ClosestFormToCursor) + 1U);
+	auto& nextForm       = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
 	nextForm.vertexCount = iNewVertex - iOldVertex;
-	nextForm.vertexIndex = CurrentVertexIndex + iOldVertex;
+	nextForm.vertexIndex = form.vertexIndex + iOldVertex;
 	form::frmout(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor + 1U);
 	auto iNewGuide = 1U;
@@ -166,7 +165,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	nextForm.satinGuideCount    = form.satinGuideCount - guideIndex - 1U;
 	form.satinGuideCount        = guideIndex;
 	for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; iForm++) {
-		auto& formIter = formList.operator[](iForm);
+		auto& formIter = FormList->operator[](iForm);
 		if ((formIter.type == SAT) && (formIter.satinGuideCount != 0U) && formIter.satinOrAngle.guide != 0U) {
 			formIter.satinOrAngle.guide--;
 		}
@@ -174,7 +173,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	if (clip::iseclp(form)) {
 		form::clpspac(form.borderClipData, form.clipEntries);
 		for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; iForm++) {
-			auto& formIter = formList.operator[](iForm);
+			auto& formIter = FormList->operator[](iForm);
 			formIter.borderClipData += form.clipEntries;
 		}
 	}
