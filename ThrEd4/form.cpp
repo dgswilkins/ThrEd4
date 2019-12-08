@@ -2488,10 +2488,13 @@ void form::internal::contf(FRMHED& form) {
 		highLength += highLengths[highIndex];
 		highIndex++;
 	}
-	auto highSpacing = form.fillSpacing;
-	auto lowSpacing  = form.fillSpacing * lowLength / highLength;
+	auto lowSpacing = form.fillSpacing;
+	auto highSpacing = form.fillSpacing; 
 	if (highLength < lowLength) {
-		std::swap(highSpacing, lowSpacing);
+		highSpacing = form.fillSpacing * highLength / lowLength;
+	}
+	else {
+		lowSpacing = form.fillSpacing * lowLength / highLength;
 	}
 	for (auto iVertex = 0U; iVertex < lowVertexIndex; iVertex++) {
 		lowCounts[iVertex]  = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
