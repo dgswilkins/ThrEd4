@@ -443,9 +443,8 @@ void clip::clpbrd(const FRMHED& form, const fRECTANGLE& clipRect, uint32_t start
 		clpout(ClipRectSize.cx / 2);
 		auto       reference     = startVertex;
 		auto       currentVertex = startVertex;
-		const auto vertexCount   = FormList->operator[](ClosestFormToCursor).vertexCount;
-		for (auto iVertex = 0U; iVertex < vertexCount; iVertex++) {
-			const auto nextVertex = form::prv(currentVertex);
+		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
+			const auto nextVertex = form::prv(form, currentVertex);
 			if (ci::clpsid(form.vertexIndex, clipRect, clipReversedData, clipFillData, reference, nextVertex, rotationCenter)) {
 				reference = nextVertex;
 			}
@@ -524,7 +523,7 @@ void clip::internal::fxlen(const FRMHED&             form,
 	AdjustedSpace     = 0.0F;
 	auto flag         = true;
 	auto vertexIt     = std::next(FormVertices->cbegin(), form.vertexIndex);
-	for (auto iVertex = 1U; iVertex < VertexCount; iVertex++) {
+	for (auto iVertex = 1U; iVertex < form.vertexCount; iVertex++) {
 		const auto length = hypot(vertexIt[iVertex].x - vertexIt[0].x, vertexIt[iVertex].y - vertexIt[0].y);
 		if (length > form.edgeSpacing) {
 			flag = false;
@@ -554,7 +553,7 @@ void clip::internal::fxlen(const FRMHED&             form,
 		BeanCount        = 0;
 		SelectedPoint    = vertexIt[0];
 		auto currentSide = 0U;
-		for (currentSide = 0U; currentSide < VertexCount - 1U; currentSide++) {
+		for (currentSide = 0U; currentSide < form.vertexCount - 1U; currentSide++) {
 			NextStart = currentSide + 1U;
 			ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
@@ -563,7 +562,7 @@ void clip::internal::fxlen(const FRMHED&             form,
 			ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide);
 		}
 		else {
-			NextStart = VertexCount - 1U;
+			NextStart = form.vertexCount - 1U;
 		}
 		if (initialCount == 0U) {
 			initialCount    = BeanCount;
@@ -604,7 +603,7 @@ void clip::internal::fxlen(const FRMHED&             form,
 	AdjustedSpace = minimumSpacing;
 	chainEndPoints.push_back(SelectedPoint);
 	auto currentSide = 0U;
-	for (currentSide = 0; currentSide < VertexCount - 1U; currentSide++) {
+	for (currentSide = 0; currentSide < form.vertexCount - 1U; currentSide++) {
 		NextStart = currentSide + 1U;
 		ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide);
 	}
@@ -624,16 +623,16 @@ void clip::internal::fxlen(const FRMHED&             form,
 void clip::internal::dufxlen(const FRMHED& form, std::vector<fPOINT>& chainEndPoints) {
 	form::duangs(form);
 	auto listSINEs = std::vector<float> {};
-	listSINEs.reserve(wrap::toSize(VertexCount) + 1U);
+	listSINEs.reserve(wrap::toSize(form.vertexCount) + 1U);
 	auto listCOSINEs = std::vector<float> {};
-	listCOSINEs.reserve(VertexCount);
-	for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+	listCOSINEs.reserve(form.vertexCount);
+	for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 		listSINEs.push_back(sin((*FormAngles)[iVertex]));
 		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
 	}
-	listSINEs.push_back(sin((FormAngles->front() > (*FormAngles)[VertexCount - 1U])
-	                            ? (FormAngles->front() - (*FormAngles)[VertexCount - 1U])
-	                            : ((*FormAngles)[VertexCount - 1U] - FormAngles->front())));
+	listSINEs.push_back(sin((FormAngles->front() > (*FormAngles)[form.vertexCount - 1U])
+	                            ? (FormAngles->front() - (*FormAngles)[form.vertexCount - 1U])
+	                            : ((*FormAngles)[form.vertexCount - 1U] - FormAngles->front())));
 	ci::fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
 }
 
@@ -713,15 +712,15 @@ void clip::duxclp(const FRMHED& form) {
 	}
 }
 
-void clip::internal::clpcrnr(uint32_t             vertexIndex,
+void clip::internal::clpcrnr(const FRMHED& form,
                              const fRECTANGLE&    clipRect,
                              std::vector<fPOINT>& clipFillData,
                              uint32_t             vertex,
                              const fPOINT&        rotationCenter) {
-	const auto nextVertex = form::nxt(vertex);
+	const auto nextVertex = form::nxt(form, vertex);
 	auto       delta      = dPOINT {};
 
-	auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
+	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if (StateMap.test(StateFlag::INDIR)) {
 		delta = fPOINT { (*OutsidePoints)[nextVertex].x - vertexIt[nextVertex].x,
 			             (*OutsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
@@ -825,11 +824,11 @@ void clip::clpic(const FRMHED& form, const fRECTANGLE& clipRect) {
 	ClipReference.x  = clipRect.left;
 	satin::satout(form, 20);
 	if (form.type == FRMLINE) {
-		for (auto iVertex = 0U; iVertex < VertexCount - 2U; iVertex++) {
+		for (auto iVertex = 0U; iVertex < form.vertexCount - 2U; iVertex++) {
 			ci::picfn(form, clipRect, clipFillData, iVertex, iVertex + 1, form.edgeSpacing, rotationCenter);
-			ci::clpcrnr(form.vertexIndex, clipRect, clipFillData, iVertex, rotationCenter);
+			ci::clpcrnr(form, clipRect, clipFillData, iVertex, rotationCenter);
 		}
-		ci::picfn(form, clipRect, clipFillData, VertexCount - 2, VertexCount - 1, form.edgeSpacing, rotationCenter);
+		ci::picfn(form, clipRect, clipFillData, form.vertexCount - 2, form.vertexCount - 1, form.edgeSpacing, rotationCenter);
 	}
 	else {
 		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
@@ -837,10 +836,10 @@ void clip::clpic(const FRMHED& form, const fRECTANGLE& clipRect) {
 			OSequence->push_back(vertexIt[0]);
 		}
 		auto currentVertex = 0U;
-		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
-			const auto nextVertex = form::nxt(currentVertex);
+		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
+			const auto nextVertex = form::nxt(form, currentVertex);
 			ci::picfn(form, clipRect, clipFillData, currentVertex, nextVertex, form.edgeSpacing, rotationCenter);
-			ci::clpcrnr(form.vertexIndex, clipRect, clipFillData, currentVertex, rotationCenter);
+			ci::clpcrnr(form, clipRect, clipFillData, currentVertex, rotationCenter);
 			currentVertex = nextVertex;
 		}
 		OSequence->push_back(vertexIt[currentVertex]);
@@ -920,7 +919,6 @@ void clip::chnfn(const FRMHED& form) {
 	auto chainEndPoints = std::vector<fPOINT> {};
 	// reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
 	chainEndPoints.reserve(50U);
-	form::fvars(ClosestFormToCursor);
 	clip::deleclp(ClosestFormToCursor);
 	ci::dufxlen(form, chainEndPoints);
 	ci::dulast(chainEndPoints);

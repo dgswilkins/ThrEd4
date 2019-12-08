@@ -66,7 +66,7 @@ namespace internal {
 	void redtbak();
 	void ritxfrm(const FRMHED& textureForm);
 	void ritxrct() noexcept;
-	void setxclp(const FRMHED& textureForm);
+	void setxclp(const FRMHED& form);
 	void setxfrm();
 	void setxmov();
 	void stxlin();

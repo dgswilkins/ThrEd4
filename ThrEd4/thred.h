@@ -41,7 +41,7 @@ void delstchm();
 auto duthrsh(double threshold) noexcept -> uint32_t;
 void duzrat() noexcept;
 void frmdel();
-void frmrct(fRECTANGLE& rectangle);
+void frmrct(fRECTANGLE& rectangle) noexcept;
 auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
 void grpAdj();
 void hidbit();
@@ -184,7 +184,7 @@ namespace internal {
 	void dun();
 	auto dunum(uint32_t code) noexcept -> bool;
 	void dupclp();
-	void duprct(uint32_t vertexIndex);
+	void duprct(const FRMHED& form);
 	void durit(std::vector<char>& destination, const void* source, uint32_t count);
 	void durot() noexcept;
 	void durotu() noexcept;

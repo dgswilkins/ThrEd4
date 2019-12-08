@@ -831,7 +831,6 @@ void formForms::dasyfrm() {
 	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	form.vertexIndex    = wrap::toUnsigned(FormVertices->size());
 	form.attribute      = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
-	form::fvars(ClosestFormToCursor);
 	auto       maximumXsize = ZoomRect.right - ZoomRect.left;
 	const auto maximumYsize = ZoomRect.top - ZoomRect.bottom;
 	if (maximumYsize > maximumXsize) {
@@ -1051,13 +1050,12 @@ void formForms::setear() {
 		auto twistStep = IniFile.tearTwistStep;
 		form::durpoli(IniFile.formSides);
 		auto& form = FormList->back();
-		form::fvars(wrap::toUnsigned(FormList->size() - 1U));
 		auto       vertexIt         = std::next(FormVertices->begin(), form.vertexIndex);
-		const auto count            = wrap::toSize(VertexCount) / 4U;
+		const auto count            = wrap::toSize(form.vertexCount) / 4U;
 		const auto middle           = form::midl(vertexIt[1].x, vertexIt[0].x);
 		auto       step             = vertexIt[count + 1U].y - vertexIt[count].y;
 		auto       verticalPosition = vertexIt[count + 1U].y;
-		auto       iLeftVertices    = wrap::toSize(VertexCount) - count;
+		auto       iLeftVertices    = wrap::toSize(form.vertexCount) - count;
 		auto       iRightVertices   = count + 1U;
 		for (auto iStep = 0U; iStep < count; iStep++) {
 			vertexIt[iLeftVertices].y  = verticalPosition;
@@ -1086,7 +1084,6 @@ void formForms::setear() {
 		form.vertexCount++;
 		NewFormVertexCount++;
 		StateMap.set(StateFlag::FORMSEL);
-		form::fvars(wrap::toUnsigned(FormList->size() - 1U));
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 		form::flipv();
 		StateMap.reset(StateFlag::FORMSEL);
@@ -1101,13 +1098,13 @@ void formForms::setear() {
 			horizontalRatio = verticalRatio;
 		}
 		if (horizontalRatio < 1.0F) {
-			for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+			for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 				vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
 				vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
 			}
 		}
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-		for (auto iVertex = 0U; iVertex < VertexCount; iVertex++) {
+		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 			vertexIt[iVertex].x -= form.rectangle.left;
 			vertexIt[iVertex].y -= form.rectangle.bottom;
 		}

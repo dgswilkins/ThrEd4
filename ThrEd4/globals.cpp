@@ -239,7 +239,6 @@ EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persi
 HPEN               UserPen[16];                          // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
-uint32_t           VertexCount;                          // sides of the selected form to fill
 float              VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
 HWND               VerticalScrollBar;                    // vertical scroll bar
 fs::path*          WorkingFileName;                      //

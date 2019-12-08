@@ -47,7 +47,7 @@ void oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries);
 
 namespace internal {
 
-	void clpcrnr(uint32_t             vertexIndex,
+	void clpcrnr(const FRMHED& form,
 	             const fRECTANGLE&    clipRect,
 	             std::vector<fPOINT>& clipFillData,
 	             uint32_t             vertex,

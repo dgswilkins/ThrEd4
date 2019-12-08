@@ -100,7 +100,7 @@ void form();
 void frm0();
 void frmadj(uint32_t formIndex);
 void frmclr(FRMHED& destination) noexcept;
-void frmlin(uint32_t vertices, uint32_t vertexCount);
+void frmlin(const FRMHED& form);
 void frmlin(const std::vector<fPOINT>& vertices);
 void frmnumfn(uint32_t newFormIndex);
 void frmon();
@@ -110,7 +110,6 @@ auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
 void fselrct(uint32_t iForm);
 void fsizpar(FRMHED& form) noexcept;
-void fvars(uint32_t iForm) noexcept;
 auto getblen() noexcept -> float;
 auto getlast(const FRMHED& form) -> uint32_t;
 auto getplen() noexcept -> float;
@@ -120,7 +119,7 @@ void infrm();
 void insat();
 void ispcdclp();
 void join();
-auto lastch() -> bool;
+auto lastch() noexcept -> bool;
 auto linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept -> bool;
 void mdufrm() noexcept;
 
@@ -140,11 +139,11 @@ void nufilcol(uint32_t color);
 void nufsel();
 void nufthcol(uint32_t color);
 void nulapcol(uint32_t color);
-auto nxt(uint32_t iVertex) noexcept -> uint32_t;
-auto pdir(uint32_t vertex) -> uint32_t;
+auto nxt(const FRMHED& form, uint32_t iVertex) noexcept -> uint32_t;
+auto pdir(const FRMHED& form, uint32_t vertex) -> uint32_t;
 void picot();
 void prpbrd(float borderStitchSpacing);
-auto prv(uint32_t iVertex) noexcept -> uint32_t;
+auto prv(const FRMHED& form, uint32_t iVertex) noexcept -> uint32_t;
 auto psg() noexcept -> uint32_t;
 void pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept;
 void ratsr();
@@ -198,12 +197,12 @@ namespace internal {
 
 	void adfrm(uint32_t iForm);
 	void angout(FRMHED& angledForm);
-	void apbrd(uint32_t vertexIndex);
+	void apbrd(const FRMHED& form);
 	void bakseq();
 	void bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize);
 	void bean(uint32_t start, uint32_t finish);
 	void bhbrd(const FRMHED& form);
-	void bhcrnr(uint32_t vertexIndex, uint32_t vertex);
+	void bhcrnr(const FRMHED& form, uint32_t vertex);
 	void bhfn(const FRMHED& form, uint32_t start, uint32_t finish);
 	void bholbrd(uint32_t formIndex);
 	void blbrd(const FRMHED& form);
@@ -219,7 +218,7 @@ namespace internal {
 	            SMALPNTL*                     sequenceLines);
 	auto chk2of() -> bool;
 	void chkbrd(const FRMHED& form);
-	void chksid(uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices);
+	void chksid(const FRMHED& form, uint32_t vertexIndex, uint32_t clipIntersectSide, const std::vector<fPOINT>& currentFormVertices);
 	auto closat(intersectionStyles& inOutFlag) -> bool;
 	auto vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept -> bool;
 	void clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& currentFormVertices);
@@ -233,7 +232,7 @@ namespace internal {
 
 	auto clpnxt(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t sind) -> bool;
 	auto fplComp(const fPOINTLINE& point1, const fPOINTLINE& point2) noexcept -> bool;
-	void contf();
+	void contf(FRMHED& form);
 	auto contsf(uint32_t formIndex) -> bool;
 	void cplayfn(uint32_t iForm, uint32_t play);
 
@@ -242,7 +241,7 @@ namespace internal {
 	void dubfn(const FRMHED& currentForm);
 	void ducon() noexcept;
 	void dudif(const fPOINT& start, const fPOINT& finish, fPOINT& delta) noexcept;
-	void dufcntr(fPOINT& center);
+	void dufcntr(fPOINT& center) noexcept;
 	void dufdat(std::vector<fPOINT>& tempClipPoints,
 	            std::vector<SATCON>& tempGuides,
 	            std::vector<fPOINT>& destFormVertices,
@@ -255,7 +254,8 @@ namespace internal {
 	void dupfn(float rotationAngle);
 	void duprotfs(float rotationAngle);
 	void duprots(float rotationAngle, const fPOINT& rotationCenter);
-	void durgn(const std::vector<FSEQ>&      sequencePath,
+	void durgn(const FRMHED&                 form,
+	           const std::vector<FSEQ>&      sequencePath,
 	           boost::dynamic_bitset<>&      visitedRegions,
 	           const std::vector<SMALPNTL*>& sortedLines,
 	           uint32_t                      pthi,
@@ -317,7 +317,8 @@ namespace internal {
 	            uint32_t                   iPoint,
 	            const std::vector<fPOINT>& currentFormVertices) -> float;
 	void horclpfn(const std::vector<RNGCNT>& textureSegments, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
-	auto insect(std::vector<CLIPSORT>&     clipIntersectData,
+	auto insect(const FRMHED&              form,
+	            std::vector<CLIPSORT>&     clipIntersectData,
 	            const std::vector<VCLPX>&  regionCrossingData,
 	            std::vector<CLIPSORT*>&    arrayOfClipIntersectData,
 	            uint32_t                   regionCrossingStart,
@@ -334,15 +335,16 @@ namespace internal {
 	           const fPOINT&              lineSegmentStart,
 	           const fPOINT&              lineSegmentEnd,
 	           const std::vector<fPOINT>& currentFormVertices) -> bool;
-	auto isin(std::vector<VCLPX>&        regionCrossingData,
+	auto isin(const FRMHED&              form,
+	          std::vector<VCLPX>&        regionCrossingData,
 	          float                      xCoordinate,
 	          float                      yCoordinate,
 	          uint32_t                   regionCrossingStart,
 	          uint32_t                   regionCrossingEnd,
 	          const fRECTANGLE&          boundingRect,
 	          const std::vector<fPOINT>& currentFormVertices) -> bool;
-	void lapbrd(uint32_t vertexIndex);
-	void lcon(std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
+	void lapbrd(const FRMHED& form);
+	void lcon(const FRMHED& form, std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
 	auto lenComp(const LENINFO& arg1, const LENINFO& arg2) noexcept -> bool;
 	auto clipComp(const CLIPSORT* arg1, const CLIPSORT* arg2) noexcept -> bool;
 	auto lnclos(std::vector<uint32_t>& groupIndexSequence,
@@ -390,7 +392,7 @@ namespace internal {
 	         float                     width);
 	void plbak(uint32_t backPoint);
 	void plbrd(const FRMHED& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
-	void plfn(uint32_t                  stitchLen,
+	void plfn(const FRMHED& form,
 	          const std::vector<VRCT2>& underlayVerticalRect,
 	          const std::vector<VRCT2>& fillVerticalRect,
 	          const std::vector<VRCT2>& prct,
@@ -420,7 +422,8 @@ namespace internal {
 	void ritbrd(const FRMHED& form);
 	void ritfil();
 	auto ritlin(const fPOINT& start, const fPOINT& finish, float userStitchLen) -> bool;
-	void ritseg(const std::vector<CLIPNT>& clipStitchPoints,
+	void ritseg(const FRMHED&              form,
+	            const std::vector<CLIPNT>& clipStitchPoints,
 	            std::vector<CLPSEG>&       clipSegments,
 	            uint32_t                   currentSegmentIndex,
 	            uint32_t&                  clipIntersectSide,

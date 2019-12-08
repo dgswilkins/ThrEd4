@@ -47,7 +47,7 @@ POINT                  SelectTexturePointsOrigin; // original location of select
 POINT                  TextureCursorLocation;     // texture editor move cursor location
 HPEN                   TextureCrossPen;           // texture editor cross pen
 TXHST                  TextureHistory[ITXBUFLEN]; // texture editor history headers
-int32_t                TextureHistoryIndex;       // pointer to the next texture history buffer
+uint32_t               TextureHistoryIndex;       // pointer to the next texture history buffer
 std::vector<TXPNT>*    TempTexturePoints;         // temporary storage for textured fill data
 std::vector<uint32_t>* SelectedTexturePointsList; // list of selected points
 TXTSCR                 TextureScreen;             // texture editor layout parameters
@@ -204,7 +204,7 @@ auto texture::istx(const FRMHED& form) noexcept -> bool {
 }
 
 void texture::internal::txrfor() noexcept {
-	if (TextureHistoryIndex < (ITXBUFLEN - 1)) {
+	if (TextureHistoryIndex < (ITXBUFLEN - 1U)) {
 		TextureHistoryIndex++;
 	}
 	else {
@@ -641,7 +641,7 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 	}
 }
 
-void texture::internal::setxclp(const FRMHED& textureForm) {
+void texture::internal::setxclp(const FRMHED& form) {
 	auto screenOffset = POINT { 0L, 0L };
 	auto editorOffset = fPOINT {};
 
@@ -660,13 +660,12 @@ void texture::internal::setxclp(const FRMHED& textureForm) {
 		vertex.x += editorOffset.x;
 		vertex.y += editorOffset.y;
 	}
-	auto lineCount = textureForm.vertexCount - 1U;
-	if (textureForm.type != FRMLINE) {
+	auto lineCount = form.vertexCount - 1U;
+	if (form.type != FRMLINE) {
 		lineCount++;
 	}
-	VertexCount = textureForm.vertexCount;
 	for (auto iLine = 0U; iLine < lineCount; iLine++) {
-		const auto iNextVertex = form::nxt(iLine);
+		const auto iNextVertex = form::nxt(form, iLine);
 		txi::dutxlin(angledFormVertices[iLine], angledFormVertices[iNextVertex]);
 	}
 }
@@ -998,7 +997,6 @@ void texture::internal::txpar(FRMHED& form) {
 void texture::internal::txvrt(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			form::fvars(ClosestFormToCursor);
 			form.fillType = TXVRTF;
 			txi::txpar(form);
 		}
@@ -1008,7 +1006,6 @@ void texture::internal::txvrt(FRMHED& form) {
 void texture::internal::txhor(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			form::fvars(ClosestFormToCursor);
 			form.fillType = TXHORF;
 			txi::txpar(form);
 		}
@@ -1018,7 +1015,6 @@ void texture::internal::txhor(FRMHED& form) {
 void texture::internal::txang(FRMHED& form) {
 	if (!TempTexturePoints->empty()) {
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			form::fvars(ClosestFormToCursor);
 			form.fillType              = TXANGF;
 			form.angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
 			txi::txpar(form);
@@ -1263,7 +1259,6 @@ auto texture::internal::chkbut() -> bool {
 }
 
 void texture::txtlbut(const FRMHED& textureForm) {
-	form::fvars(ClosestFormToCursor);
 	if (txi::chkbut()) {
 		return;
 	}
@@ -1642,7 +1637,6 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 }
 
 void texture::rtrtx(const FRMHED& form) {
-	form::fvars(ClosestFormToCursor);
 	TempTexturePoints->clear();
 
 	const auto currentIndex = form.fillInfo.texture.index;

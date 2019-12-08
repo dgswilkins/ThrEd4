@@ -1071,12 +1071,12 @@ void trace::internal::pxlin(const FRMHED& form, uint32_t start, uint32_t finish)
 }
 
 void trace::internal::bfrm(const FRMHED& form) {
-	if (VertexCount != 0U) {
-		for (auto iVertex = 0U; iVertex < VertexCount - 1U; iVertex++) {
+	if (form.vertexCount != 0U) {
+		for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; iVertex++) {
 			ti::pxlin(form, iVertex, iVertex + 1U);
 		}
 		if (form.type != FRMLINE) {
-			ti::pxlin(form, VertexCount - 1, 0);
+			ti::pxlin(form, form.vertexCount - 1U, 0);
 		}
 	}
 }

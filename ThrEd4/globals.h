@@ -277,7 +277,6 @@ extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
-extern uint32_t   VertexCount;
 extern float      VerticalRatio;
 extern HWND       VerticalScrollBar;
 extern fs::path*  WorkingFileName;
