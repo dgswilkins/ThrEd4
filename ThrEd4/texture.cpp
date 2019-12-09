@@ -1340,7 +1340,7 @@ void texture::internal::txtdel() {
 		for (auto& p : *SelectedTexturePointsList) {
 			texturePointsMap.set(p);
 		}
-		auto index = 0u;
+		auto index = 0U;
 		TempTexturePoints->erase(remove_if(TempTexturePoints->begin(),
 		                                   TempTexturePoints->end(),
 		                                   [&index, texturePointsMap](auto point) {
