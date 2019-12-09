@@ -1266,7 +1266,6 @@ void form::chkseq(bool border) {
 #endif
 }
 
-// ToDo - move form variable into calling function
 void form::internal::ritbrd(const FRMHED& form) {
 	if (!OSequence->empty()) {
 		InterleaveSequenceIndices->emplace_back(INSREC {
