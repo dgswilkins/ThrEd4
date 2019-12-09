@@ -16729,6 +16729,13 @@ auto thred::internal::handleViewMenu(const WORD& wParameter) -> bool {
 		flag = true;
 		break;
 	}
+	case ID_LENDEF: { // view / Set / Default Stitch Lengths
+		IniFile.maxStitchLength = MAXSIZ * PFGRAN;
+		UserStitchLength = USESIZ * PFGRAN;
+		MinStitchLength = MINSIZ * PFGRAN;
+		flag = true;
+		break;
+	}
 	case ID_TSIZDEF: { // view / Thread Size / Set Defaults
 		ThreadSize30 = TSIZ30;
 		ThreadSize40 = TSIZ40;
@@ -17148,13 +17155,6 @@ auto thred::internal::handleMainMenu(const WORD& wParameter, fPOINT& rotationCen
 			form::form();
 		}
 		flag = true;
-		break;
-	}
-	case ID_LENDEF: { // Todo - No menu item in thred.rc for this option
-		IniFile.maxStitchLength = MAXSIZ * PFGRAN;
-		UserStitchLength        = USESIZ * PFGRAN;
-		MinStitchLength         = MINSIZ * PFGRAN;
-		flag                    = true;
 		break;
 	}
 	case ID_ROT: { // rot
