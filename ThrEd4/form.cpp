@@ -7209,12 +7209,12 @@ void form::internal::adfrm(uint32_t iForm) {
 	std::copy(vertexIt, std::next(vertexIt, srcForm.vertexCount), std::next(FormVertices->begin(), currentForm.vertexIndex));
 	currentForm.vertexCount = srcForm.vertexCount;
 	if (srcForm.type == SAT && (srcForm.satinGuideCount != 0U)) {
-		currentForm.satinOrAngle.guide = satin::adsatk(srcForm.satinGuideCount);
+		currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
 		auto guideStart = std::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
 		auto guideEnd   = std::next(guideStart, srcForm.satinGuideCount);
-		auto guideDest  = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
-		std::copy(guideStart, guideEnd, guideDest);
+		auto guideDest  = SatinGuides->end();
+		SatinGuides->insert(guideDest, guideStart, guideEnd);
 	}
 	if (clip::iseclpx(srcForm)) {
 		currentForm.borderClipData = thred::adclp(srcForm.clipEntries);
@@ -7276,12 +7276,12 @@ void form::internal::cplayfn(uint32_t iForm, uint32_t play) {
 	auto vertexIt                         = std::next(FormVertices->cbegin(), srcForm.vertexIndex);
 	std::copy(vertexIt, std::next(vertexIt, srcForm.vertexCount), std::next(FormVertices->begin(), currentForm.vertexIndex));
 	if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-		currentForm.satinOrAngle.guide = satin::adsatk(srcForm.satinGuideCount);
+		currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
 		auto       sourceStart = std::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
 		auto       sourceEnd   = std::next(sourceStart, srcForm.satinGuideCount);
-		const auto destination = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
-		std::copy(sourceStart, sourceEnd, destination);
+		const auto destination = SatinGuides->end();
+		SatinGuides->insert(destination, sourceStart, sourceEnd);
 	}
 	currentForm.clipEntries             = 0;
 	currentForm.fillType                = 0;
