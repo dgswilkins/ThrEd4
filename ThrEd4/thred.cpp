@@ -14745,12 +14745,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 				for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 					const auto offset = formOffset + iForm;
 					auto& form        = FormList->operator[](offset);
-					form.vertexIndex  = thred::adflt(form.vertexCount);
-					auto vertexIt     = std::next(FormVertices->begin(), form.vertexIndex);
-					// ToDo - replace with copy
-					for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-						vertexIt[iVertex] = formVertices[currentVertex++];
-					}
+					form.vertexIndex  = wrap::toUnsigned(FormVertices->size());
+					FormVertices->insert(FormVertices->end(), &formVertices[currentVertex], &formVertices[currentVertex + form.vertexCount]);
+					currentVertex += form.vertexCount;
 				}
 				auto guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
 				auto currentGuide = 0U;
