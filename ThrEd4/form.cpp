@@ -2478,13 +2478,11 @@ void form::internal::contf(FRMHED& form) {
 	auto highIndex  = 0U;
 	auto highLength = 0.0F;
 	for (auto iVertex = finish; iVertex < form.vertexCount - 1U; iVertex++) {
-		auto& thisVertex          = vertexIt[iVertex];
-		auto& nextVertex          = vertexIt[wrap::toSize(iVertex) + 1U];
-		highVertices[highIndex].x = thisVertex.x;
-		highVertices[highIndex].y = thisVertex.y;
-		highDeltas[highIndex].x   = nextVertex.x - thisVertex.x;
-		highDeltas[highIndex].y   = nextVertex.y - thisVertex.y;
-		highLengths[highIndex]    = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
+		auto& thisVertex        = vertexIt[iVertex];
+		auto& nextVertex        = vertexIt[wrap::toSize(iVertex) + 1U];
+		highVertices[highIndex] = thisVertex;
+		highDeltas[highIndex]   = fPOINT { nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y };
+		highLengths[highIndex]  = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
 		highLength += highLengths[highIndex];
 		highIndex++;
 	}
@@ -2498,13 +2496,11 @@ void form::internal::contf(FRMHED& form) {
 	}
 	for (auto iVertex = 0U; iVertex < lowVertexIndex; iVertex++) {
 		lowCounts[iVertex]  = wrap::round<uint32_t>(lowLengths[iVertex] / lowSpacing);
-		lowSteps[iVertex].x = lowDeltas[iVertex].x / lowCounts[iVertex];
-		lowSteps[iVertex].y = lowDeltas[iVertex].y / lowCounts[iVertex];
+		lowSteps[iVertex] = fPOINT { lowDeltas[iVertex].x / lowCounts[iVertex], lowDeltas[iVertex].y / lowCounts[iVertex] };
 	}
 	for (auto iVertex = 0U; iVertex < highVertexIndex; iVertex++) {
 		highCounts[iVertex]  = wrap::round<uint32_t>(highLengths[iVertex] / highSpacing);
-		highSteps[iVertex].x = highDeltas[iVertex].x / highCounts[iVertex];
-		highSteps[iVertex].y = highDeltas[iVertex].y / highCounts[iVertex];
+		highSteps[iVertex] = fPOINT { highDeltas[iVertex].x / highCounts[iVertex], highDeltas[iVertex].y / highCounts[iVertex] };
 	}
 	lowIndex = highIndex = 0;
 	StateMap.reset(StateFlag::FILDIR);
@@ -2539,8 +2535,7 @@ void form::internal::contf(FRMHED& form) {
 				highIndex++;
 			}
 		}
-		delta.x = highPoint.x - lowPoint.x;
-		delta.y = highPoint.y - lowPoint.y;
+		delta = fPOINT { highPoint.x - lowPoint.x, highPoint.y - lowPoint.y };
 		if (reference.length > 0.9 * LineSpacing) {
 			const auto polyLine = PVEC { atan2(delta.y, delta.x), hypot(delta.x, delta.y) };
 			const auto polyDiff = PVEC { polyLine.angle - reference.angle, polyLine.length / reference.length };
