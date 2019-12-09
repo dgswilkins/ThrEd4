@@ -558,7 +558,6 @@ void satin::delcon(FRMHED& form, uint32_t GuideIndex) {
 	auto       guide  = std::next(SatinGuides->cbegin(), offset);
 
 	SatinGuides->erase(guide);
-	// ToDo - is there a better loop construct for here?
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& afterForm = FormList->operator[](iForm);
 		if ((afterForm.type == SAT) && (afterForm.satinGuideCount != 0U) && (afterForm.satinOrAngle.guide != 0U)) {
@@ -1193,10 +1192,7 @@ void satin::satfix() {
 	if (TempPolygon->size() > minSize) {
 		form.vertexIndex = thred::adflt(vertexCount);
 		auto vertexIt    = std::next(FormVertices->begin(), form.vertexIndex);
-		// ToDo - replace with copy
-		for (auto iVertex = 0U; iVertex < vertexCount; iVertex++) {
-			vertexIt[iVertex] = (*TempPolygon)[iVertex];
-		}
+		std::copy(TempPolygon->cbegin(), TempPolygon->cend(), vertexIt);
 		TempPolygon->clear();
 		form.vertexCount = vertexCount;
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
