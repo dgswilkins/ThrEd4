@@ -1340,16 +1340,14 @@ void texture::internal::txtdel() {
 		for (auto& p : *SelectedTexturePointsList) {
 			texturePointsMap.set(p);
 		}
-		// ToDo - Another potential pattern for this:
-		// myVector.erase(remove_if(myVector.begin(), myVector.end(), testFunction), myVector.end());
-		auto tmpTexture = std::vector<TXPNT> {};
-		tmpTexture.reserve(TempTexturePoints->size() - SelectedTexturePointsList->size());
-		for (auto iSourcePoint = 0U; iSourcePoint < wrap::toUnsigned(TempTexturePoints->size()); iSourcePoint++) {
-			if (!texturePointsMap.test(iSourcePoint)) {
-				tmpTexture.push_back((*TempTexturePoints)[iSourcePoint]);
-			}
-		}
-		*TempTexturePoints = tmpTexture;
+		auto index = 0u;
+		TempTexturePoints->erase(remove_if(TempTexturePoints->begin(),
+		                                   TempTexturePoints->end(),
+		                                   [&index, texturePointsMap](auto point) {
+			                                   std::ignore = point; // avoid unused parameter warning with code that optimizes out
+			                                   return texturePointsMap.test(index++);
+		                                   }),
+		                         TempTexturePoints->end());
 		SelectedTexturePointsList->clear();
 		StateMap.set(StateFlag::RESTCH);
 		return;
