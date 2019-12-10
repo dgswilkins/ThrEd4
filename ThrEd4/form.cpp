@@ -7204,32 +7204,26 @@ void form::internal::adfrm(uint32_t iForm) {
 	auto& srcForm     = FormList->operator[](iForm);
 
 	ClosestFormToCursor     = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-	currentForm.vertexIndex = thred::adflt(srcForm.vertexCount);
+	currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	auto vertexIt           = std::next(FormVertices->cbegin(), srcForm.vertexIndex);
-	std::copy(vertexIt, std::next(vertexIt, srcForm.vertexCount), std::next(FormVertices->begin(), currentForm.vertexIndex));
-	currentForm.vertexCount = srcForm.vertexCount;
+	FormVertices->insert(FormVertices->end(), vertexIt, std::next(vertexIt, srcForm.vertexCount));
 	if (srcForm.type == SAT && (srcForm.satinGuideCount != 0U)) {
 		currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
 		auto guideStart = std::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
-		auto guideEnd   = std::next(guideStart, srcForm.satinGuideCount);
-		auto guideDest  = SatinGuides->end();
-		SatinGuides->insert(guideDest, guideStart, guideEnd);
+		SatinGuides->insert(SatinGuides->end(), guideStart, std::next(guideStart, srcForm.satinGuideCount));
 	}
 	if (clip::iseclpx(srcForm)) {
-		currentForm.borderClipData = thred::adclp(srcForm.clipEntries);
+		currentForm.borderClipData = wrap::toUnsigned(ClipPoints->size());
 
-		auto offsetStart = std::next(ClipPoints->cbegin(), srcForm.borderClipData);
-		auto destination = std::next(ClipPoints->begin(), currentForm.borderClipData);
-		std::copy(offsetStart, std::next(offsetStart, srcForm.clipEntries), destination);
+		auto srcStart = std::next(ClipPoints->cbegin(), srcForm.borderClipData);
+		ClipPoints->insert(ClipPoints->end(), srcStart, std::next(srcStart, srcForm.clipEntries));
 	}
 	if (clip::isclpx(srcForm)) {
-		currentForm.angleOrClipData.clip = thred::adclp(srcForm.lengthOrCount.clipCount);
+		currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
-		auto       sourceStart = std::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
-		auto       sourceEnd   = std::next(sourceStart, srcForm.lengthOrCount.clipCount);
-		const auto destination = std::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
-		std::copy(sourceStart, sourceEnd, destination);
+		auto srcStart = std::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
+		ClipPoints->insert(ClipPoints->end(), srcStart, std::next(srcStart, srcForm.lengthOrCount.clipCount));
 	}
 }
 
