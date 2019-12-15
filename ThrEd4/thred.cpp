@@ -11866,9 +11866,10 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
 	const auto offset = fPOINT { SelectedPoint.x - it->x, SelectedPoint.y - it->y };
 	const auto count  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
 	auto& form = FormList->operator[](closestFormToCursor);
-	form::fltspac(form::nxt(form, ClosestVertexToCursor), count);
+	const auto nextVertex = form::nxt(form, ClosestVertexToCursor);
+	form::fltspac(nextVertex, count);
 	form.vertexCount += count;
-	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex + nextVertex);
 	for (auto iOutput = 1U; iOutput < wrap::toUnsigned(InterleaveSequence->size()) - 1U; iOutput++) {
 		*vertexIt = fPOINT { it->x + offset.x, it->y + offset.y };
 		vertexIt++;
