@@ -273,8 +273,8 @@ void form::frmout(uint32_t formIndex) {
 }
 
 void form::sfCor2px(const fPOINT& stitchPoint, POINT& screen) {
-	screen.x = wrap::round<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x + 0.5F);
-	screen.y = wrap::round<int32_t>(StitchWindowClientRect.bottom - (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y + 0.5F);
+	screen.x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x);
+	screen.y = wrap::ceil<int32_t>(StitchWindowClientRect.bottom - (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y);
 }
 
 void form::internal::px2stchf(const POINT& screen, fPOINT& stitchPoint) noexcept {
@@ -618,12 +618,12 @@ void form::unpsel() {
 }
 
 void form::sRct2px(const fRECTANGLE& stitchRect, RECT& screenRect) {
-	screenRect.left = wrap::round<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x + 0.5F);
+	screenRect.left = wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x);
 	screenRect.top
-	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y + 0.5F);
-	screenRect.right = wrap::round<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x + 0.5F);
+	    = wrap::ceil<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y);
+	screenRect.right = wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x);
 	screenRect.bottom
-	    = wrap::round<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y + 0.5F);
+	    = wrap::ceil<int32_t>((StitchWindowClientRect.bottom) - (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y);
 }
 
 void form::drwfrm() {
@@ -1385,13 +1385,14 @@ void form::internal::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finis
 	auto       step        = fPOINT {};
 
 	if (UserFlagMap.test(UserFlag::LINSPAC)) {
-		stitchCount = wrap::round<uint32_t>(length / stitchSize + 0.5F);
+		stitchCount = wrap::ceil<uint32_t>(length / stitchSize);
 		if (stitchCount != 0U) {
 			step.x = delta.x / stitchCount;
 			step.y = delta.y / stitchCount;
 		}
 	}
 	else {
+		// ToDo - Is this calculation correct?
 		stitchCount      = wrap::round<uint32_t>((length - stitchSize / 2.0F) / stitchSize + 1.0F);
 		const auto angle = atan2(delta.y, delta.x);
 		step.x           = cos(angle) * stitchSize;

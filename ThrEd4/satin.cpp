@@ -910,7 +910,7 @@ void satin::internal::satfn(const FRMHED&             form,
 		auto segmentStitchCount = 0U;
 		for (auto iSegment = 0U; iSegment < line1Segments - 1U; iSegment++) {
 			const auto nextVertex = form::nxt(form, iVertex);
-			const auto val = wrap::round<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount + 0.5F);
+			const auto val = wrap::ceil<uint32_t>(((lengths[nextVertex] - lengths[iVertex]) / line1Length) * stitchCount);
 			line1StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iVertex = form::nxt(form, iVertex);
@@ -922,7 +922,7 @@ void satin::internal::satfn(const FRMHED&             form,
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
 			const auto val
-			    = wrap::round<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount + 0.5F);
+			    = wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount);
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = form::prv(form, iNextVertex);
