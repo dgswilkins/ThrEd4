@@ -8227,17 +8227,18 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	if (lastStitch > wrap::toUnsigned(StitchBuffer->size()) - 3U) {
 		lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3U;
 	}
-	auto iSource = start;
-	for (; iSource <= lastStitch; iSource++) {
-		highStitchBuffer.push_back((*StitchBuffer)[iSource]);
-		if ((*StitchBuffer)[iSource].x == (*StitchBuffer)[wrap::toSize(iSource) + 2U].x
-		    && (*StitchBuffer)[iSource].y == (*StitchBuffer)[wrap::toSize(iSource) + 2U].y) {
-			iSource += 2;
+	auto iSourceStitch = start;
+	for (; iSourceStitch <= lastStitch; iSourceStitch++) {
+		const auto stitch     = StitchBuffer->operator[](iSourceStitch);
+		const auto stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+		highStitchBuffer.push_back(stitch);
+		if (stitch.x == stitchFwd2.x && stitch.y == stitchFwd2.y) {
+			iSourceStitch += 2;
 		}
 	}
 	if (finish != lastStitch) {
-		while (iSource != finish + 1U) {
-			highStitchBuffer.push_back((*StitchBuffer)[iSource++]);
+		while (iSourceStitch != finish + 1U) {
+			highStitchBuffer.push_back(StitchBuffer->operator[](iSourceStitch++));
 		}
 	}
 	if ((finish - start) > highStitchBuffer.size()) {
@@ -8365,6 +8366,7 @@ void form::spltfrm() {
 
 void form::stchs2frm() {
 	if (StateMap.test(StateFlag::GRPSEL)) {
+		thred::savdo();
 		thred::rngadj();
 		if ((GroupEndStitch - GroupStartStitch) > 12000U) {
 			displayText::tabmsg(IDS_STMAX);
@@ -8376,23 +8378,12 @@ void form::stchs2frm() {
 		currentForm.type        = FRMLINE;
 		currentForm.vertexCount = vertexCount;
 		currentForm.vertexIndex = thred::adflt(vertexCount);
-		auto iVertex            = 0U;
 		auto vertexIt           = std::next(FormVertices->begin(), currentForm.vertexIndex);
 		for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-			vertexIt[iVertex].x   = (*StitchBuffer)[iStitch].x;
-			vertexIt[iVertex++].y = (*StitchBuffer)[iStitch].y;
+			*vertexIt = StitchBuffer->operator[](iStitch);
+			vertexIt++;
 		}
 		form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-		if (ClosestPointIndex > GroupStitchIndex) {
-			if (ClosestPointIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1U)) {
-				ClosestPointIndex++;
-			}
-		}
-		else {
-			if (GroupStitchIndex < gsl::narrow<uint32_t>(StitchBuffer->size() - 1U)) {
-				GroupStitchIndex++;
-			}
-		}
 		thred::delstchm();
 		StateMap.reset(StateFlag::GRPSEL);
 		thred::coltab();
