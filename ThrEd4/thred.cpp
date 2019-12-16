@@ -14696,9 +14696,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 					InterleaveSequence->reserve(wrap::toSize(ClipFormVerticesData->vertexCount) + 3U);
 					InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
 					auto clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
-					// Todo - localize iVertex into the loop
-					auto iVertex = 0U;
-					for (iVertex = 0; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
+					for (auto iVertex = 0U; iVertex <= ClipFormVerticesData->vertexCount; iVertex++) {
 						InterleaveSequence->push_back(clipData[iVertex]);
 					}
 					const auto nextVertex = form::nxt(form, ClosestVertexToCursor);
