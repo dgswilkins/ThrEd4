@@ -8157,39 +8157,38 @@ GSL_SUPPRESS(26440) void form::internal::bean(uint32_t start, uint32_t finish) {
 	auto iSourceStitch    = start;
 
 	BeanCount = 0;
-	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1U]);
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-		BeanCount += 2;
-	}
-	iSourceStitch++;
-	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if ((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].x != (*StitchBuffer)[iSourceStitch].x
-	    || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].y != (*StitchBuffer)[iSourceStitch].y) {
-		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1U]);
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-		BeanCount += 2;
-	}
-	iSourceStitch++;
-	while (iSourceStitch < finish - 1) {
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-		if (((*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].x != (*StitchBuffer)[iSourceStitch].x
-		     || (*StitchBuffer)[wrap::toSize(iSourceStitch) + 2U].y != (*StitchBuffer)[iSourceStitch].y)
-		    && ((*StitchBuffer)[wrap::toSize(iSourceStitch) - 2U].x != (*StitchBuffer)[iSourceStitch].x
-		        || (*StitchBuffer)[wrap::toSize(iSourceStitch) - 2U].y != (*StitchBuffer)[iSourceStitch].y)) {
-			highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1U]);
-			highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
+	for (auto loop = 0; loop < 2; loop++) {
+		const auto stitch     = StitchBuffer->operator[](iSourceStitch);
+		const auto stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+		const auto stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+		highStitchBuffer.push_back(stitch);
+		if (stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) {
+			highStitchBuffer.push_back(stitchFwd1);
+			highStitchBuffer.push_back(stitch);
 			BeanCount += 2;
 		}
 		iSourceStitch++;
 	}
-	highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
-	if (((*StitchBuffer)[wrap::toSize(iSourceStitch) - 2U].x != (*StitchBuffer)[iSourceStitch].x
-	     || (*StitchBuffer)[wrap::toSize(iSourceStitch) - 2U].y != (*StitchBuffer)[iSourceStitch].y)) {
-		highStitchBuffer.push_back((*StitchBuffer)[wrap::toSize(iSourceStitch) + 1U]);
-		highStitchBuffer.push_back((*StitchBuffer)[iSourceStitch]);
+	while (iSourceStitch < finish - 1) {
+		const auto stitch      = StitchBuffer->operator[](iSourceStitch);
+		const auto stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+		const auto stitchFwd2  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+		const auto stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
+		highStitchBuffer.push_back(stitch);
+		if ((stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) && (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y)) {
+			highStitchBuffer.push_back(stitchFwd1);
+			highStitchBuffer.push_back(stitch);
+			BeanCount += 2;
+		}
+		iSourceStitch++;
+	}
+	const auto stitch      = StitchBuffer->operator[](iSourceStitch);
+	const auto stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+	const auto stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
+	highStitchBuffer.push_back(stitch);
+	if (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y) {
+		highStitchBuffer.push_back(stitchFwd1);
+		highStitchBuffer.push_back(stitch);
 		BeanCount += 2;
 	}
 	// now copy stitches back up to the end of the original group
