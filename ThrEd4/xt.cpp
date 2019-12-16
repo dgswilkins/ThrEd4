@@ -993,19 +993,19 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::ve
 			if (direction) {
 				if (pRecs[currentRegion]->start != 0U) {
 					for (auto iRegion = pRecs[currentRegion]->finish - 1U; iRegion >= pRecs[currentRegion]->start; iRegion--) {
-						stitchBuffer.push_back((*StitchBuffer)[iRegion]);
+						stitchBuffer.push_back(StitchBuffer->operator[](iRegion));
 					}
 				}
 				else {
 					auto iRegion = pRecs[currentRegion]->finish;
 					while (iRegion != 0U) {
-						stitchBuffer.push_back((*StitchBuffer)[--iRegion]);
+						stitchBuffer.push_back(StitchBuffer->operator[](--iRegion));
 					}
 				}
 			}
 			else {
 				for (auto iRegion = pRecs[currentRegion]->start; iRegion < pRecs[currentRegion]->finish; iRegion++) {
-					stitchBuffer.push_back((*StitchBuffer)[iRegion]);
+					stitchBuffer.push_back(StitchBuffer->operator[](iRegion));
 				}
 			}
 		}
@@ -1035,7 +1035,7 @@ void xt::internal::dmprec(const std::vector<OREC*>& stitchRegion, uint32_t count
 	for (auto iRegion = 0U; iRegion < count; iRegion++) {
 		OutputDebugString(fmt::format(L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 		                              iRegion,
-		                              (*StitchBuffer)[stitchRegion[iRegion]->start].attribute,
+		                              StitchBuffer->operator[](stitchRegion[iRegion]->start).attribute,
 		                              stitchRegion[iRegion]->form,
 		                              stitchRegion[iRegion]->type,
 		                              stitchRegion[iRegion]->color,
@@ -1091,13 +1091,13 @@ void xt::fsort() {
 			}
 		}
 		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
-			if (((*StitchBuffer)[iStitch].attribute & SRTMSK) != attribute) {
+			if ((StitchBuffer->operator[](iStitch).attribute & SRTMSK) != attribute) {
 				stitchRegion.back().finish    = iStitch;
 				stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1U];
 				stitchRegion.emplace_back(OREC {});
 				stitchRegion.back().start       = iStitch;
 				stitchRegion.back().startStitch = &(*StitchBuffer)[iStitch];
-				attribute                       = (*StitchBuffer)[iStitch].attribute & SRTMSK;
+				attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 			}
 		}
 		stitchRegion.back().finish    = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
@@ -1217,7 +1217,7 @@ public:
 };
 
 void xt::internal::duatf(uint32_t ind) {
-	const auto attribute = (*StitchBuffer)[ind].attribute;
+	const auto attribute = StitchBuffer->operator[](ind).attribute;
 
 	auto attributeFields = ATFLD { (attribute & COLMSK),
 		                           ((attribute & FRMSK) >> FRMSHFT),
@@ -1269,7 +1269,7 @@ void xt::fdelstch(const FRMHED& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 			ClosestPointIndex = iDestinationStitch;
 		}
-		const auto attribute = (*StitchBuffer)[iSourceStitch].attribute;
+		const auto attribute = StitchBuffer->operator[](iSourceStitch).attribute;
 		if (codedFormIndex == (attribute & (FRMSK | NOTFRM))) {
 			const auto type = StitchTypes[xi::dutyp(attribute)];
 			switch (type) {
@@ -1331,7 +1331,7 @@ void xt::fdelstch(const FRMHED& form, FILLSTARTS& fillStartsData, uint32_t& fill
 				tmap |= M_APCOL;
 				fillStartsData.fillNamed.appliqueColor = iDestinationStitch;
 			}
-			(*StitchBuffer)[iDestinationStitch] = (*StitchBuffer)[iSourceStitch];
+			StitchBuffer->operator[](iDestinationStitch) = StitchBuffer->operator[](iSourceStitch);
 			iDestinationStitch++;
 		}
 	}
@@ -1588,8 +1588,8 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1U].index;
 			     ine++) {
 				if (ilData.output > 0) {
-					if ((*InterleaveSequence)[ine].x != (*StitchBuffer)[ilData.output - 1U].x
-					    || (*InterleaveSequence)[ine].y != (*StitchBuffer)[ilData.output - 1U].y) {
+					if ((*InterleaveSequence)[ine].x != StitchBuffer->operator[](ilData.output - 1U).x
+					    || (*InterleaveSequence)[ine].y != StitchBuffer->operator[](ilData.output - 1U).y) {
 						StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
 						ilData.output++;
 					}

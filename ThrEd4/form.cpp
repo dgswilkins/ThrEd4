@@ -979,7 +979,7 @@ void form::flipv() {
 				thred::selRct(rectangle);
 				const auto offset = rectangle.top + rectangle.bottom;
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].y = offset - (*StitchBuffer)[iStitch].y;
+					StitchBuffer->operator[](iStitch).y = offset - StitchBuffer->operator[](iStitch).y;
 				}
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -1111,7 +1111,7 @@ auto form::closfrm() -> bool {
 				}
 			}
 		}
-		auto& vertex = (*FormVertices)[wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex];
+		auto& vertex = FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
 		thred::stch2pxr(vertex);
 		minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x, StitchCoordinatesPixels.y - screenCoordinate.y);
 		if (minimumLength < CLOSENUF) {
@@ -3312,9 +3312,7 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 #if CLPVU == 1
 
 		for (uint32_t iStitch = 0; iStitch < ActivePointIndex; iStitch++) {
-			(*StitchBuffer)[iStitch].x         = ClipStitchPoints[iStitch].x;
-			(*StitchBuffer)[iStitch].y         = ClipStitchPoints[iStitch].y;
-			(*StitchBuffer)[iStitch].attribute = 0;
+			StitchBuffer->operator[](iStitch) = fPOINTATTR{ ClipStitchPoints[iStitch].x, ClipStitchPoints[iStitch].y, 0 };
 		}
 		PCSHeader.stitchCount = ActivePointIndex;
 #endif
@@ -3324,9 +3322,7 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 		auto iStitch = 0;
 		for (iSegment = 0; iSegment < ClipSegmentIndex; iSegment++) {
 			for (iStitchPoint = clipSegments[iSegment].start; iStitchPoint <= clipSegments[iSegment].finish; iStitchPoint++) {
-				(*StitchBuffer)[iStitch].x           = ClipStitchPoints[iStitchPoint].x;
-				(*StitchBuffer)[iStitch].y           = ClipStitchPoints[iStitchPoint].y;
-				(*StitchBuffer)[iStitch++].attribute = iSegment & 0xf;
+				StitchBuffer->operator[](iStitch) = fPOINTATTR{ ClipStitchPoints[iStitchPoint].x, ClipStitchPoints[iStitchPoint].y, iSegment & 0xf };
 			}
 		}
 		PCSHeader.stitchCount = iStitch;
@@ -6020,7 +6016,7 @@ void form::setstrtch() {
 			}
 			else {
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - reference) * ratio + reference;
+					StitchBuffer->operator[](iStitch).x = (StitchBuffer->operator[](iStitch).x - reference) * ratio + reference;
 				}
 			}
 		}
@@ -6073,7 +6069,7 @@ void form::setstrtch() {
 			}
 			else {
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - reference) * ratio + reference;
+					StitchBuffer->operator[](iStitch).y = (StitchBuffer->operator[](iStitch).y - reference) * ratio + reference;
 				}
 			}
 		}
@@ -6261,8 +6257,8 @@ void form::setexpand(float xyRatio) {
 		}
 		else {
 			for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-				(*StitchBuffer)[iStitch].x = ((*StitchBuffer)[iStitch].x - reference.x) * ratio.x + reference.x;
-				(*StitchBuffer)[iStitch].y = ((*StitchBuffer)[iStitch].y - reference.y) * ratio.y + reference.y;
+				StitchBuffer->operator[](iStitch).x = (StitchBuffer->operator[](iStitch).x - reference.x) * ratio.x + reference.x;
+				StitchBuffer->operator[](iStitch).y = (StitchBuffer->operator[](iStitch).y - reference.y) * ratio.y + reference.y;
 			}
 		}
 	}
@@ -6743,7 +6739,7 @@ void form::fliph() {
 				thred::selRct(rectangle);
 				const auto offset = rectangle.right + rectangle.left;
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].x = offset - (*StitchBuffer)[iStitch].x;
+					StitchBuffer->operator[](iStitch).x = offset - StitchBuffer->operator[](iStitch).x;
 				}
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -6900,7 +6896,7 @@ void form::flpord() {
 				iForward             = GroupStartStitch;
 				const auto endStitch = ((GroupEndStitch - GroupStartStitch) / 2U) + 1U;
 				for (auto iStitch = 0U; iStitch < endStitch; iStitch++) {
-					std::swap((*StitchBuffer)[iForward], (*StitchBuffer)[GroupEndStitch - iStitch]);
+					std::swap(StitchBuffer->operator[](iForward), StitchBuffer->operator[](GroupEndStitch - iStitch));
 					iForward++;
 				}
 				thred::coltab();
@@ -6975,10 +6971,10 @@ void form::internal::snpfn(const std::vector<uint32_t>& xPoints, uint32_t start,
 			auto reference = xPoints[current];
 			for (auto iPoint = current + 1U; iPoint < finish; iPoint++) {
 				auto       check       = xPoints[iPoint];
-				const auto CheckLength = hypot((*StitchBuffer)[check].x - (*StitchBuffer)[reference].x,
-				                               (*StitchBuffer)[check].y - (*StitchBuffer)[reference].y);
+				const auto CheckLength = hypot(StitchBuffer->operator[](check).x - StitchBuffer->operator[](reference).x,
+				                               StitchBuffer->operator[](check).y - StitchBuffer->operator[](reference).y);
 				if (CheckLength < SnapLength) {
-					(*StitchBuffer)[check] = (*StitchBuffer)[reference];
+					StitchBuffer->operator[](check) = StitchBuffer->operator[](reference);
 				}
 			}
 		}
@@ -7032,16 +7028,16 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
 	const auto attribute = (ClosestFormToCursor << 4U) & FRMSK;
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		for (auto iStitch = start; iStitch < finish; iStitch++) {
-			if ((((*StitchBuffer)[iStitch].attribute & NOTFRM) == 0U)
-			    && ((*StitchBuffer)[iStitch].attribute & FRMSK) == attribute) {
-				auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
+			if (((StitchBuffer->operator[](iStitch).attribute & NOTFRM) == 0U)
+			    && (StitchBuffer->operator[](iStitch).attribute & FRMSK) == attribute) {
+				auto iColumn = wrap::floor<uint32_t>(StitchBuffer->operator[](iStitch).x);
 				xHistogram[iColumn]++;
 			}
 		}
 	}
 	else {
 		for (auto iStitch = start; iStitch < finish; iStitch++) {
-			auto iColumn = wrap::floor<uint32_t>((*StitchBuffer)[iStitch].x);
+			auto iColumn = wrap::floor<uint32_t>(StitchBuffer->operator[](iStitch).x);
 			xHistogram[iColumn]++;
 		}
 	}
@@ -7360,7 +7356,7 @@ void form::movlayr(uint32_t codedLayer) {
 				thred::savdo();
 				thred::rngadj();
 				for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].attribute = ((*StitchBuffer)[iStitch].attribute & NLAYMSK) | codedStitchLayer;
+					StitchBuffer->operator[](iStitch).attribute = (StitchBuffer->operator[](iStitch).attribute & NLAYMSK) | codedStitchLayer;
 				}
 				StateMap.set(StateFlag::RESTCH);
 			}
@@ -7534,7 +7530,7 @@ void form::selalfil() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 		const auto savedIndex = ClosestPointIndex;
 		ClosestPointIndex     = 0U;
-		while (ClosestPointIndex < StitchBuffer->size() && form::notfstch((*StitchBuffer)[ClosestPointIndex].attribute)) {
+		while (ClosestPointIndex < StitchBuffer->size() && form::notfstch(StitchBuffer->operator[](ClosestPointIndex).attribute)) {
 			ClosestPointIndex++;
 		}
 		if (ClosestPointIndex != StitchBuffer->size()) {
@@ -7542,7 +7538,7 @@ void form::selalfil() {
 				ClosestPointIndex--;
 			}
 			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
-			while (GroupStitchIndex > ClosestPointIndex && form::notfstch((*StitchBuffer)[GroupStitchIndex].attribute)) {
+			while (GroupStitchIndex > ClosestPointIndex && form::notfstch(StitchBuffer->operator[](GroupStitchIndex).attribute)) {
 				GroupStitchIndex--;
 			}
 			StateMap.set(StateFlag::GRPSEL);
@@ -7568,11 +7564,11 @@ auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
 		const auto             saveClose = ClosestFormToCursor;
 		ClosestFormToCursor              = iForm;
 		if ((form.fillType != 0U) || (form.edgeType != 0U)) {
-			while (range.start < StitchBuffer->size() && notfstch((*StitchBuffer)[range.start].attribute)) {
+			while (range.start < StitchBuffer->size() && notfstch(StitchBuffer->operator[](range.start).attribute)) {
 				range.start++;
 			}
 			range.finish = wrap::toUnsigned(StitchBuffer->size() - 1U);
-			while (range.finish > range.start && notfstch((*StitchBuffer)[range.finish].attribute)) {
+			while (range.finish > range.start && notfstch(StitchBuffer->operator[](range.finish).attribute)) {
 				range.finish--;
 			}
 			retval = range.finish > range.start;
@@ -7991,7 +7987,7 @@ void form::internal::srtf(const std::vector<fPOINTATTR>& tempStitchBuffer, uint3
 			stitchAccumulator += value;
 		}
 		for (auto iStitch = start; iStitch < finish; iStitch++) {
-			(*StitchBuffer)[stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++] = tempStitchBuffer[iStitch];
+			StitchBuffer->operator[](stitchHistogram[duat(tempStitchBuffer[iStitch].attribute)]++) = tempStitchBuffer[iStitch];
 		}
 	}
 }
@@ -8092,22 +8088,21 @@ void form::cntrx() {
 				flag = true;
 				thred::savdo();
 				thred::rngadj();
-				auto groupRect = fRECTANGLE { (*StitchBuffer)[GroupStartStitch].x,
-					                          (*StitchBuffer)[GroupStartStitch].y,
-					                          (*StitchBuffer)[GroupStartStitch].x,
-					                          (*StitchBuffer)[GroupStartStitch].y };
+				const auto startStitch = StitchBuffer->operator[](GroupStartStitch);
+				auto groupRect         = fRECTANGLE { startStitch.x, startStitch.y, startStitch.x, startStitch.y };
 				for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; iStitch++) {
-					if ((*StitchBuffer)[iStitch].x < groupRect.left) {
-						groupRect.left = (*StitchBuffer)[iStitch].x;
+					const auto stitch = StitchBuffer->operator[](iStitch);
+					if (stitch.x < groupRect.left) {
+						groupRect.left = stitch.x;
 					}
-					if ((*StitchBuffer)[iStitch].y > groupRect.top) {
-						groupRect.top = (*StitchBuffer)[iStitch].y;
+					if (stitch.y > groupRect.top) {
+						groupRect.top = stitch.y;
 					}
-					if ((*StitchBuffer)[iStitch].x > groupRect.right) {
-						groupRect.right = (*StitchBuffer)[iStitch].x;
+					if (stitch.x > groupRect.right) {
+						groupRect.right = stitch.x;
 					}
-					if ((*StitchBuffer)[iStitch].y < groupRect.bottom) {
-						groupRect.bottom = (*StitchBuffer)[iStitch].y;
+					if (stitch.y < groupRect.bottom) {
+						groupRect.bottom = stitch.y;
 					}
 				}
 				const auto selectedCenter
@@ -8120,8 +8115,8 @@ void form::cntrx() {
 					FormMoveDelta.x = 0.0F;
 				}
 				for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-					(*StitchBuffer)[iStitch].x += FormMoveDelta.x;
-					(*StitchBuffer)[iStitch].y -= FormMoveDelta.y;
+					StitchBuffer->operator[](iStitch).x += FormMoveDelta.x;
+					StitchBuffer->operator[](iStitch).y -= FormMoveDelta.y;
 				}
 			}
 			else {

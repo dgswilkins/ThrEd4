@@ -9029,23 +9029,25 @@ void thred::internal::insfil() {
 						}
 
 						if (fileHeader.formCount != 0U) {
-							insertedRectangle.left   = (*FormVertices)[InsertedVertexIndex].x;
-							insertedRectangle.right  = (*FormVertices)[InsertedVertexIndex].x;
-							insertedRectangle.bottom = (*FormVertices)[InsertedVertexIndex].y;
-							insertedRectangle.top    = (*FormVertices)[InsertedVertexIndex].y;
+							const auto insertedVertex = FormVertices->operator[](InsertedVertexIndex);
+							insertedRectangle.left   = insertedVertex.x;
+							insertedRectangle.right  = insertedVertex.x;
+							insertedRectangle.bottom = insertedVertex.y;
+							insertedRectangle.top    = insertedVertex.y;
 							for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
 							     iVertex++) {
-								if ((*FormVertices)[iVertex].x < insertedRectangle.left) {
-									insertedRectangle.left = (*FormVertices)[iVertex].x;
+								const auto vertex = FormVertices->operator[](iVertex);
+								if (vertex.x < insertedRectangle.left) {
+									insertedRectangle.left = vertex.x;
 								}
-								if ((*FormVertices)[iVertex].x > insertedRectangle.right) {
-									insertedRectangle.right = (*FormVertices)[iVertex].x;
+								if (vertex.x > insertedRectangle.right) {
+									insertedRectangle.right = vertex.x;
 								}
-								if ((*FormVertices)[iVertex].y < insertedRectangle.bottom) {
-									insertedRectangle.bottom = (*FormVertices)[iVertex].y;
+								if (vertex.y < insertedRectangle.bottom) {
+									insertedRectangle.bottom = vertex.y;
 								}
-								if ((*FormVertices)[iVertex].y > insertedRectangle.top) {
-									insertedRectangle.top = (*FormVertices)[iVertex].y;
+								if (vertex.y > insertedRectangle.top) {
+									insertedRectangle.top = vertex.y;
 								}
 							}
 						}
@@ -10423,12 +10425,12 @@ void thred::internal::duinsfil() {
 		formRectangle.right += offset.x;
 	}
 	for (auto iVertex = InsertedVertexIndex; iVertex < wrap::toUnsigned(FormVertices->size()); iVertex++) {
-		(*FormVertices)[iVertex].x += offset.x;
-		(*FormVertices)[iVertex].y += offset.y;
+		FormVertices->operator[](iVertex).x += offset.x;
+		FormVertices->operator[](iVertex).y += offset.y;
 	}
 	for (auto iStitch = InsertedStitchIndex; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
-		(*StitchBuffer)[iStitch].x += offset.x;
-		(*StitchBuffer)[iStitch].y += offset.y;
+		StitchBuffer->operator[](iStitch).x += offset.x;
+		StitchBuffer->operator[](iStitch).y += offset.y;
 	}
 	StateMap.reset(StateFlag::FRMOF);
 	StateMap.set(StateFlag::INIT);
