@@ -307,14 +307,13 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 		feather.ratioLocal = 0.5F;
 		duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.minStitch / length / 2;
-		xratf(adjustedPoint, (*OSequence)[iSequence], currentPoint, feather.ratioLocal);
-		xratf(adjustedPoint, (*OSequence)[wrap::toSize(iSequence) + 1U], nextPoint, feather.ratioLocal);
+		const auto sequence = OSequence->operator[](iSequence);
+		const auto sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+		xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
+		xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
 		feather.ratioLocal = feather.ratio;
-		xratf(currentPoint, (*OSequence)[iSequence], (*OSequence)[iSequence], feather.ratioLocal);
-		xratf(nextPoint,
-		      (*OSequence)[wrap::toSize(iSequence) + 1U],
-		      (*OSequence)[wrap::toSize(iSequence) + 1U],
-		      feather.ratioLocal);
+		xratf(currentPoint, sequence, OSequence->operator[](iSequence), feather.ratioLocal);
+		xratf(nextPoint, sequenceFwd1, OSequence->operator[](wrap::toSize(iSequence) + 1U), feather.ratioLocal);
 	}
 }
 
@@ -331,7 +330,7 @@ void xt::internal::fritfil(const FRMHED& form, std::vector<fPOINT>& featherSeque
 			const auto sequenceMax      = wrap::toUnsigned(featherSequence.size());
 			auto       iReverseSequence = sequenceMax - 1U;
 			for (auto iSequence = 0U; iSequence < sequenceMax; iSequence++) {
-				(*OSequence)[iSequence] = featherSequence[iReverseSequence];
+				OSequence->operator[](iSequence) = featherSequence[iReverseSequence];
 				iReverseSequence--;
 			}
 			OSequence->resize(sequenceMax);
@@ -504,7 +503,7 @@ void xt::internal::chkuseq(FRMHED& form) {
 	uint32_t index;
 
 	for (index = 0; index < OutputIndex; index++) {
-		InterleaveSequence->push_back((*OSequence)[index]);
+		InterleaveSequence->push_back(OSequence->operator[](index));
 	}
 	InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
@@ -518,13 +517,14 @@ void xt::internal::chkuseq(FRMHED& form) {
 		}
 		const auto underlayStitchLength = form.underlayStitchLen;
 		for (auto iSequence = 0U; iSequence < OutputIndex - 1U; iSequence++) {
-			const auto delta       = fPOINT { (*OSequence)[wrap::toSize(iSequence) + 1U].x - (*OSequence)[iSequence].x,
-                                        (*OSequence)[wrap::toSize(iSequence) + 1U].y - (*OSequence)[iSequence].y };
-			const auto length      = hypot(delta.x, delta.y);
-			const auto stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
+			const auto sequence     = OSequence->operator[](iSequence);
+			const auto sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+			const auto delta        = fPOINT { sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y };
+			const auto length       = hypot(delta.x, delta.y);
+			const auto stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
 			if (stitchCount != 0U) {
 				const auto step  = fPOINT { delta.x / stitchCount, delta.y / stitchCount };
-				auto       point = (*OSequence)[iSequence];
+				auto       point = sequence;
 				for (auto index = 0U; index < stitchCount; index++) {
 					InterleaveSequence->push_back(point);
 					point.x += step.x;
@@ -532,10 +532,10 @@ void xt::internal::chkuseq(FRMHED& form) {
 				}
 			}
 			else {
-				InterleaveSequence->push_back((*OSequence)[iSequence]);
+				InterleaveSequence->push_back(OSequence->operator[](iSequence));
 			}
 		}
-		InterleaveSequence->push_back((*OSequence)[OutputIndex - 1U]);
+		InterleaveSequence->push_back(OSequence->operator[](OutputIndex - 1U));
 		// ToDo - should this be front or (back - 1) ?
 		InterleaveSequenceIndices->front().color = form.underlayColor;
 	}

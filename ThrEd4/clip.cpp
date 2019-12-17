@@ -627,12 +627,12 @@ void clip::internal::dufxlen(const FRMHED& form, std::vector<fPOINT>& chainEndPo
 	auto listCOSINEs = std::vector<float> {};
 	listCOSINEs.reserve(form.vertexCount);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-		listSINEs.push_back(sin((*FormAngles)[iVertex]));
-		listCOSINEs.push_back(cos((*FormAngles)[iVertex]));
+		listSINEs.push_back(sin(FormAngles->operator[](iVertex)));
+		listCOSINEs.push_back(cos(FormAngles->operator[](iVertex)));
 	}
-	listSINEs.push_back(sin((FormAngles->front() > (*FormAngles)[form.vertexCount - 1U])
-	                            ? (FormAngles->front() - (*FormAngles)[form.vertexCount - 1U])
-	                            : ((*FormAngles)[form.vertexCount - 1U] - FormAngles->front())));
+	listSINEs.push_back(sin((FormAngles->front() > FormAngles->operator[](form.vertexCount - 1U))
+	                            ? (FormAngles->front() - FormAngles->operator[](form.vertexCount - 1U))
+	                            : (FormAngles->operator[](form.vertexCount - 1U) - FormAngles->front())));
 	ci::fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
 }
 
@@ -901,7 +901,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 				backupAt--;
 			}
 			if ((OSequence->size() >= backupAt)) {
-				(*OSequence)[OSequence->size() - backupAt] = chainEndPoints[chainLength];
+				OSequence->operator[](OSequence->size() - backupAt) = chainEndPoints[chainLength];
 			}
 			OSequence->push_back(chainEndPoints[chainLength]);
 		}

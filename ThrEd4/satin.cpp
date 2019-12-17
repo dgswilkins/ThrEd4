@@ -714,7 +714,7 @@ void satin::internal::satends(const FRMHED& form, uint32_t isBlunt, float width)
 	vertexIt += vertexCount - 1U;
 	if ((isBlunt & FBLNT) != 0U) {
 		auto step
-		    = fPOINT { sin((*FormAngles)[vertexCount - 2U]) * width / 2.0F, cos((*FormAngles)[vertexCount - 2U]) * width / 2.0F };
+		    = fPOINT { sin(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F, cos(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F };
 		if (StateMap.test(StateFlag::INDIR)) {
 			step.x = -step.x;
 			step.y = -step.y;
@@ -1437,14 +1437,14 @@ void satin::internal::outfn(const FRMHED& form, uint32_t start, uint32_t finish,
 	auto xOffset = 0.0F;
 	auto yOffset = 0.0F;
 
-	if (fabs((*FormAngles)[start]) < TINY && fabs((*FormAngles)[finish]) < TINY) {
+	if (fabs(FormAngles->operator[](start)) < TINY && fabs(FormAngles->operator[](finish)) < TINY) {
 		xOffset = 0.0F;
 		yOffset = satinWidth;
 	}
 	else {
 		constexpr auto SATHRESH = 10.0;
 
-		auto angle  = ((*FormAngles)[finish] - (*FormAngles)[start]) / 2.0F;
+		auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
 		auto length = satinWidth / cos(angle);
 		if (length < -satinWidth * SATHRESH) {
 			length = -satinWidth * SATHRESH;
@@ -1452,7 +1452,7 @@ void satin::internal::outfn(const FRMHED& form, uint32_t start, uint32_t finish,
 		if (length > satinWidth * SATHRESH) {
 			length = satinWidth * SATHRESH;
 		}
-		angle += (*FormAngles)[start] + PI_F / 2.0F;
+		angle += FormAngles->operator[](start) + PI_F / 2.0F;
 		xOffset = length * cos(angle);
 		yOffset = length * sin(angle);
 	}

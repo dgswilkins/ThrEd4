@@ -1196,7 +1196,7 @@ void form::chkseq(bool border) {
 	UNREFERENCED_PARAMETER(border);
 
 	for (auto index = 0U; index < SequenceIndex; index++) {
-		InterleaveSequence->push_back((*OSequence)[index]);
+		InterleaveSequence->push_back(OSequence->operator[](index));
 	}
 #else
 
@@ -1238,7 +1238,7 @@ void form::chkseq(bool border) {
 	bool flag = true;
 	if (!OSequence->empty()) {
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size()) - 1U; iSequence++) {
-			if (!fi::ritlin((*OSequence)[iSequence], (*OSequence)[wrap::toSize(iSequence) + 1U], userStitchLen)) {
+			if (!fi::ritlin(OSequence->operator[](iSequence), OSequence->operator[](wrap::toSize(iSequence) + 1U), userStitchLen)) {
 				flag = false;
 				break;
 			}
@@ -1484,13 +1484,14 @@ void form::internal::bold(const FRMHED& form) {
 		boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
 	}
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); iSequence++) {
-		const auto length = hypot((*OSequence)[wrap::toSize(iSequence) + 1U].x - (*OSequence)[iSequence].x,
-		                          (*OSequence)[wrap::toSize(iSequence) + 1U].y - (*OSequence)[iSequence].y);
+		const auto sequence = OSequence->operator[](iSequence);
+		const auto sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+		const auto                           length = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y);
 		if (length > TINY) {
-			(*OSequence)[iOutput++] = (*OSequence)[iSequence];
+			OSequence->operator[](iOutput++) = sequence;
 		}
 	}
-	(*OSequence)[iOutput++] = vertexIt[iNextLine];
+	OSequence->operator[](iOutput++) = vertexIt[iNextLine];
 	OSequence->resize(iOutput);
 }
 
@@ -1958,11 +1959,12 @@ void form::internal::prsmal(float width) {
 	}
 	auto iReference = 0U;
 	for (auto iSequence = 1U; iSequence < wrap::toUnsigned(OSequence->size()); iSequence++) {
-		const auto delta  = fPOINT { (*OSequence)[iSequence].x - (*OSequence)[iReference].x,
-                                    (*OSequence)[iSequence].y - (*OSequence)[iReference].y };
+		const auto seq    = OSequence->operator[](iSequence);
+		const auto seqRef = OSequence->operator[](iReference);
+		const auto delta  = fPOINT { seq.x - seqRef.x, seq.y - seqRef.y };
 		const auto length = hypot(delta.x, delta.y);
 		if (length > minimumLength) {
-			(*OSequence)[iOutput++] = (*OSequence)[iSequence];
+			OSequence->operator[](iOutput++) = seq;
 			iReference              = iSequence;
 		}
 	}
@@ -2091,7 +2093,7 @@ void form::internal::bhbrd(const FRMHED& form) {
 void form::internal::dubfn(const FRMHED& currentForm) {
 	brdfil(currentForm);
 	for (auto iBackward = OSequence->size(); iBackward != 0; iBackward--) {
-		OSequence->push_back((*OSequence)[iBackward - 1U]);
+		OSequence->push_back(OSequence->operator[](iBackward - 1U));
 	}
 }
 
@@ -2334,7 +2336,7 @@ void form::internal::plbak(uint32_t backPoint) {
 	if ((!OSequence->empty()) && (backPoint < (OSequence->size() - 1U))) {
 		auto iSequence = wrap::toUnsigned(OSequence->size() - 1U);
 		while (iSequence > backPoint) {
-			std::swap((*OSequence)[iSequence], (*OSequence)[backPoint]);
+			std::swap(OSequence->operator[](iSequence), OSequence->operator[](backPoint));
 			iSequence--;
 			backPoint++;
 		}
@@ -2994,11 +2996,11 @@ auto form::internal::nucseg(const std::vector<CLPSEG>&  clipSegments,
 }
 
 auto form::internal::vscmp(uint32_t index1, uint32_t index2) noexcept -> bool {
-	if ((*OSequence)[index1].x != (*OSequence)[index2].x) {
+	if (OSequence->operator[](index1).x != OSequence->operator[](index2).x) {
 		return true;
 	}
 
-	return (*OSequence)[index1].y != (*OSequence)[index2].y;
+	return OSequence->operator[](index1).y != OSequence->operator[](index2).y;
 }
 
 void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegments, std::vector<fPOINT>& currentFormVertices) {
@@ -3344,7 +3346,7 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size()); iSequence++) {
 			if (vscmp(iSequence, index)) {
 				index++;
-				(*OSequence)[index] = (*OSequence)[iSequence];
+				OSequence->operator[](index) = OSequence->operator[](iSequence);
 			}
 		}
 		OSequence->resize(index);
@@ -4432,8 +4434,7 @@ void form::internal::bakseq() {
 #if BUGBAK
 
 	for (SequenceIndex = 0; SequenceIndex < OutputIndex; SequenceIndex++) {
-		(*OSequence)[SequenceIndex].x = BSequence->operator[](SequenceIndex).x;
-		(*OSequence)[SequenceIndex].y = BSequence->operator[](SequenceIndex).y;
+		OSequence->operator[](SequenceIndex) = BSequence->operator[](SequenceIndex);
 	}
 	SelectedForm->maxFillStitchLen = 6000;
 #else
