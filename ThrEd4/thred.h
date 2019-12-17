@@ -444,7 +444,7 @@ namespace internal {
 	void stchWnd();
 	void stchbox(uint32_t iStitch, HDC dc);
 	void stchout();
-	void stchsnap(uint32_t start, uint32_t finish) noexcept;
+	void stchsnap(uint32_t start, uint32_t finish);
 	auto stlen(uint32_t iStitch) noexcept -> float;
 	void strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
 	void tglhid();

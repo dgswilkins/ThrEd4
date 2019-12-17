@@ -880,10 +880,10 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 }
 
 void xt::internal::durec(OREC& record) noexcept {
-	const auto* stitch = &(*StitchBuffer)[record.start];
+	const auto stitchIt = std::next(StitchBuffer->begin(), record.start);
 
-	record.type          = StitchTypes[dutyp(stitch->attribute)];
-	const auto attribute = stitch->attribute & SRTMSK;
+	record.type          = StitchTypes[dutyp(stitchIt->attribute)];
+	const auto attribute = stitchIt->attribute & SRTMSK;
 	record.color         = attribute & 0xfU;
 	record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
@@ -954,7 +954,7 @@ auto xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
 auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord)
     -> double {
 	auto currentRegion = sortRecord.currentRegion;
-	auto currentStitch = gsl::narrow_cast<fPOINTATTR*>(nullptr);
+	auto stitchIt = StitchBuffer->begin();
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter = std::vector<uint32_t> {};
@@ -963,21 +963,22 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::ve
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
 		if (direction) {
-			currentStitch = &(*StitchBuffer)[pRecs[currentRegion]->finish - 1U];
+			stitchIt = std::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U);
 		}
 		else {
-			currentStitch = &(*StitchBuffer)[pRecs[currentRegion]->start];
+			stitchIt = std::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 		}
 		for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-				auto length
-				    = hypot(pRecs[iRegion]->startStitch->x - currentStitch->x, pRecs[iRegion]->startStitch->y - currentStitch->y);
+				auto& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
+				auto length = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction     = false;
 					currentRegion = iRegion;
 				}
-				length = hypot(pRecs[iRegion]->endStitch->x - currentStitch->x, pRecs[iRegion]->endStitch->y - currentStitch->y);
+				auto& endStitch = StitchBuffer->operator[](pRecs[iRegion]->endStitch);
+				length = hypot(endStitch.x - stitchIt->x, endStitch.y - stitchIt->y);
 				if (length < minimumLength) {
 					minimumLength = length;
 					direction     = true;
@@ -1083,7 +1084,7 @@ void xt::fsort() {
 		//        in a single form are not in ascending order already.
 		thred::savdo();
 		stitchRegion.emplace_back(OREC {});
-		stitchRegion.back().startStitch = &StitchBuffer->front();
+		stitchRegion.back().startStitch = 0;
 		ColorOrder[AppliqueColor]       = 0;
 		for (auto iColor = 0U; iColor < 16U; iColor++) {
 			if (iColor != AppliqueColor) {
@@ -1093,15 +1094,15 @@ void xt::fsort() {
 		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 			if ((StitchBuffer->operator[](iStitch).attribute & SRTMSK) != attribute) {
 				stitchRegion.back().finish    = iStitch;
-				stitchRegion.back().endStitch = &(*StitchBuffer)[iStitch - 1U];
+				stitchRegion.back().endStitch = iStitch - 1U;
 				stitchRegion.emplace_back(OREC {});
 				stitchRegion.back().start       = iStitch;
-				stitchRegion.back().startStitch = &(*StitchBuffer)[iStitch];
+				stitchRegion.back().startStitch = iStitch;
 				attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 			}
 		}
 		stitchRegion.back().finish    = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
-		stitchRegion.back().endStitch = &(*StitchBuffer)[StitchBuffer->size() - 1U];
+		stitchRegion.back().endStitch = StitchBuffer->size() - 1U;
 		const auto lastRegion         = wrap::toUnsigned(stitchRegion.size());
 		auto       pRecs              = std::vector<OREC*> {};
 		pRecs.reserve(lastRegion);

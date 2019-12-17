@@ -3043,8 +3043,8 @@ class OREC
 public:
 	uint32_t    start { 0U };
 	uint32_t    finish { 0U };
-	fPOINTATTR* startStitch { nullptr };
-	fPOINTATTR* endStitch { nullptr };
+	uint32_t startStitch { 0U };
+	uint32_t endStitch { 0U };
 	uint32_t    color { 0U };
 	uint32_t    type { 0U };
 	uint32_t    form { 0U };
