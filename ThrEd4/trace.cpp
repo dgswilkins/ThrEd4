@@ -205,8 +205,8 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 
 void trace::internal::tracwnd() {
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
-		ti::hidwnd((*DefaultColorWin)[iColor]);
-		ti::hidwnd((*UserColorWin)[iColor]);
+		ti::hidwnd(DefaultColorWin->operator[](iColor));
+		ti::hidwnd(UserColorWin->operator[](iColor));
 		ti::hidwnd(ThreadSizeWin[iColor]);
 	}
 	for (auto iTrace = 0U; iTrace < 3; iTrace++) {
@@ -215,8 +215,8 @@ void trace::internal::tracwnd() {
 		ti::shownd(TraceUpWindow[iTrace]);
 		ti::shownd(TraceDownWindow[iTrace]);
 	}
-	ti::hidwnd((*ButtonWin)[HBOXSEL]);
-	ti::hidwnd((*ButtonWin)[HUPTO]);
+	ti::hidwnd(ButtonWin->operator[](HBOXSEL));
+	ti::hidwnd(ButtonWin->operator[](HUPTO));
 	ti::shownd(TraceStepWin);
 	ti::trcstpnum();
 	ti::trcratnum();
@@ -289,8 +289,8 @@ void trace::untrace() {
 		}
 		StateMap.reset(StateFlag::WASEDG);
 		for (auto iColor = 0U; iColor < 16U; iColor++) {
-			ti::shownd((*DefaultColorWin)[iColor]);
-			ti::shownd((*UserColorWin)[iColor]);
+			ti::shownd(DefaultColorWin->operator[](iColor));
+			ti::shownd(UserColorWin->operator[](iColor));
 			ti::shownd(ThreadSizeWin[iColor]);
 		}
 		for (auto iTrace = 0U; iTrace < 3U; iTrace++) {
@@ -300,7 +300,7 @@ void trace::untrace() {
 			ti::hidwnd(TraceDownWindow[iTrace]);
 		}
 		for (auto iButton = 0U; iButton < 9U; iButton++) {
-			ti::shownd((*ButtonWin)[iButton]);
+			ti::shownd(ButtonWin->operator[](iButton));
 		}
 		ti::hidwnd(TraceStepWin);
 	}
@@ -1310,12 +1310,12 @@ void trace::wasTrace() {
 		if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 			auto    TempBrush  = BlackBrush;
 			wchar_t buffer[10] = { 0 }; // for integer to string conversion
-			wcscpy_s(buffer, (*StringTable)[STR_OFF].c_str());
+			wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 			SetBkColor(DrawItem->hDC, 0);
 			SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 			if (StateMap.test(TraceRGBFlag[iRGB])) {
 				TempBrush = TraceBrush[iRGB];
-				wcscpy_s(buffer, (*StringTable)[STR_ON].c_str());
+				wcscpy_s(buffer, StringTable->operator[](STR_ON).c_str());
 				SetTextColor(DrawItem->hDC, 0);
 				SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 			}

@@ -124,7 +124,7 @@ void displayText::tabmsg(uint32_t code) {
 
 void displayText::lodstr() {
 	for (auto iString = 0; iString < STR_LEN; iString++) {
-		displayText::loadString((*StringTable)[iString], LoadStringList[iString]);
+		displayText::loadString(StringTable->operator[](iString), LoadStringList[iString]);
 	}
 }
 
@@ -202,29 +202,29 @@ void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5U) {
 			if (StateMap.test(StateFlag::HIDMAP)) {
-				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1H].c_str());
+				SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1H).c_str());
 			}
 			else {
-				SetWindowText((*ButtonWin)[iButton], (*StringTable)[STR_TRC1S].c_str());
+				SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1S).c_str());
 			}
 		}
 		else {
-			SetWindowText((*ButtonWin)[iButton], (*StringTable)[wrap::toSize(iButton) - 4U + STR_TRC0].c_str());
+			SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](wrap::toSize(iButton) - 4U + STR_TRC0).c_str());
 		}
 	}
 	else {
-		SetWindowText((*ButtonWin)[iButton], buttonText.c_str());
+		SetWindowText(ButtonWin->operator[](iButton), buttonText.c_str());
 	}
 }
 
 void displayText::clrhbut(uint32_t startButton) noexcept {
 	for (auto iButton = startButton; iButton < 9U; iButton++) {
-		SetWindowText((*ButtonWin)[iButton], L"");
+		SetWindowText(ButtonWin->operator[](iButton), L"");
 	}
 }
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
-	displayText::butxt(HNUM, fmt::format((*StringTable)[code], value));
+	displayText::butxt(HNUM, fmt::format(StringTable->operator[](code), value));
 }
 
 void displayText::msgstr(uint32_t code) noexcept {
@@ -357,7 +357,7 @@ void displayText::okcan() noexcept {
 	GetClientRect(MsgWindow, &MsgRect);
 
 	OKButton = CreateWindow(L"STATIC", // NOLINT
-	                        (*StringTable)[STR_OKENT].c_str(),
+	                        StringTable->operator[](STR_OKENT).c_str(),
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
 	                        MsgRect.bottom + 15,
@@ -369,7 +369,7 @@ void displayText::okcan() noexcept {
 	                        nullptr);
 
 	CancelButton = CreateWindow(L"STATIC", // NOLINT
-	                            (*StringTable)[STR_CANCEL].c_str(),
+	                            StringTable->operator[](STR_CANCEL).c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            ButtonWidth * 5,
 	                            MsgRect.bottom + 15,
@@ -416,7 +416,7 @@ void displayText::savdisc() {
 	                             nullptr);
 
 	CancelButton = CreateWindow(L"STATIC", // NOLINT
-	                            (*StringTable)[STR_CANCEL].c_str(),
+	                            StringTable->operator[](STR_CANCEL).c_str(),
 	                            SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                            2 * ButtonWidthX3 + 25,
 	                            MsgRect.bottom + 15,
@@ -447,9 +447,9 @@ void displayText::tomsg() {
 
 	GetWindowRect(OKButton, &OKrect);
 	wrap::GetTextExtentPoint32(
-	    GetDC(ThrEdWindow), (*StringTable)[STR_DELST2].c_str(), wrap::toUnsigned((*StringTable)[STR_DELST2].size()), &textSize);
+	    GetDC(ThrEdWindow), StringTable->operator[](STR_DELST2).c_str(), wrap::toUnsigned(StringTable->operator[](STR_DELST2).size()), &textSize);
 	DeleteStitchesDialog = CreateWindow(L"STATIC", // NOLINT
-	                                    (*StringTable)[STR_DELST2].c_str(),
+	                                    StringTable->operator[](STR_DELST2).c_str(),
 	                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                    3,
 	                                    OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
@@ -465,25 +465,25 @@ void displayText::tomsg() {
 void displayText::internal::bxtxt(uint32_t iButton, uint32_t iMessage) {
 	auto message = std::wstring {};
 	displayText::loadString(message, iMessage);
-	SetWindowText((*ButtonWin)[iButton], message.c_str());
+	SetWindowText(ButtonWin->operator[](iButton), message.c_str());
 }
 
 void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, iMessage);
-	SetWindowText((*ButtonWin)[iButton], fmt::format(fmtStr, data).c_str());
+	SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }
 
 void displayText::drwtxbut(const TXTSCR& textureScreen) {
 	di::bxtxt(HTXCLR, IDS_CLEAR);
 	di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
-	thred::redraw((*ButtonWin)[HTXWID]);
+	thred::redraw(ButtonWin->operator[](HTXWID));
 	di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
 	di::bxtxt(HTXVRT, IDS_TXVRT);
 	di::bxtxt(HTXHOR, IDS_TXHOR);
 	di::bxtxt(HTXANG, IDS_TXANG);
 	di::bxtxt(HTXMIR, IDS_TXMIR);
-	SetWindowText((*ButtonWin)[HTXMIR + 1U], L"");
+	SetWindowText(ButtonWin->operator[](HTXMIR + 1U), L"");
 }
 
 auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {

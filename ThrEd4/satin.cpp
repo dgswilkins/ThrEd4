@@ -756,10 +756,10 @@ void satin::ribon() {
 					vertexIt[0].x            = OutsidePoints->front().x;
 					vertexIt[iNewVertex++].y = OutsidePoints->front().y;
 					for (auto iVertex = 0U; iVertex < currentForm.vertexCount; iVertex++) {
-						vertexIt[iNewVertex++] = (*InsidePoints)[iVertex];
+						vertexIt[iNewVertex++] = InsidePoints->operator[](iVertex);
 					}
 					for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; iVertex--) {
-						vertexIt[iNewVertex++] = (*OutsidePoints)[iVertex];
+						vertexIt[iNewVertex++] = OutsidePoints->operator[](iVertex);
 					}
 				}
 				else {
@@ -769,12 +769,12 @@ void satin::ribon() {
 					vertexIt[iNewVertex++].y = OutsidePoints->front().y;
 					newForm.underlayIndent   = IniFile.underlayIndent;
 					for (auto iVertex = 0U; iVertex < currentForm.vertexCount; iVertex++) {
-						vertexIt[iNewVertex++] = (*InsidePoints)[iVertex];
+						vertexIt[iNewVertex++] = InsidePoints->operator[](iVertex);
 					}
 					vertexIt[iNewVertex++] = InsidePoints->front();
 					vertexIt[iNewVertex++] = OutsidePoints->front();
 					for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; iVertex--) {
-						vertexIt[iNewVertex++] = (*OutsidePoints)[iVertex];
+						vertexIt[iNewVertex++] = OutsidePoints->operator[](iVertex);
 					}
 				}
 				newForm.type                       = SAT;
@@ -1394,7 +1394,7 @@ void satin::satout(const FRMHED& form, float satinWidth) {
 		}
 		auto count = 0U;
 		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-			if (form::cisin(form, (*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
+			if (form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
 				count++;
 			}
 		}
@@ -1460,10 +1460,10 @@ void satin::internal::outfn(const FRMHED& form, uint32_t start, uint32_t finish,
 	if ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT)) {
 		vertexIt = std::next(AngledFormVertices->cbegin(), form.vertexIndex);
 	}
-	(*InsidePoints)[finish].x  = vertexIt[finish].x - xOffset;
-	(*InsidePoints)[finish].y  = vertexIt[finish].y - yOffset;
-	(*OutsidePoints)[finish].x = vertexIt[finish].x + xOffset;
-	(*OutsidePoints)[finish].y = vertexIt[finish].y + yOffset;
+	InsidePoints->operator[](finish).x  = vertexIt[finish].x - xOffset;
+	InsidePoints->operator[](finish).y  = vertexIt[finish].y - yOffset;
+	OutsidePoints->operator[](finish).x = vertexIt[finish].x + xOffset;
+	OutsidePoints->operator[](finish).y = vertexIt[finish].y + yOffset;
 }
 
 auto satin::internal::chkbak(const std::vector<fPOINT>& satinBackup, const fPOINT& pnt) noexcept -> bool {

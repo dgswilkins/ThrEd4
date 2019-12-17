@@ -397,7 +397,7 @@ void form::setfrm() {
 }
 
 void form::form() {
-	displayText::shoMsg((*StringTable)[STR_FMEN]);
+	displayText::shoMsg(StringTable->operator[](STR_FMEN));
 	StateMap.set(StateFlag::FORMIN);
 	StateMap.reset(StateFlag::INSRT);
 	thred::duzrat();
@@ -586,7 +586,7 @@ void form::dubig() {
 	SelectObject(StitchWindowMemDC, SelectAllPen);
 	Polyline(StitchWindowMemDC, SelectedFormsLine->data(), 9);
 	for (auto iPoint = 0U; iPoint < 8U; iPoint++) {
-		form::selsqr((*SelectedFormsLine)[iPoint], StitchWindowMemDC);
+		form::selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
 	}
 }
 
@@ -606,7 +606,7 @@ void form::dupsel(HDC dc) {
 	Polyline(dc, SelectedPointsLine->data(), 9);
 	// iPoint = SelectedFormVertices.start;
 	for (auto iPoint = 0U; iPoint < 8U; iPoint++) {
-		form::selsqr((*SelectedPointsLine)[iPoint], dc);
+		form::selsqr(SelectedPointsLine->operator[](iPoint), dc);
 	}
 	fi::frmx(EndPointCross, dc);
 }
@@ -730,8 +730,8 @@ void form::drwfrm() {
 		}
 		if (StateMap.test(StateFlag::FRMPMOV)) {
 			thred::ritmov(ClosestFormToCursor);
-			(*RubberBandLine)[1].x = Msg.pt.x - StitchWindowOrigin.x;
-			(*RubberBandLine)[1].y = Msg.pt.y - StitchWindowOrigin.y;
+			RubberBandLine->operator[](1).x = Msg.pt.x - StitchWindowOrigin.x;
+			RubberBandLine->operator[](1).y = Msg.pt.y - StitchWindowOrigin.y;
 			StateMap.set(StateFlag::SHOMOV);
 			thred::ritmov(ClosestFormToCursor);
 		}
@@ -1139,7 +1139,7 @@ void form::frmovlin() {
 	auto  previousPoint = form::prv(form,ClosestVertexToCursor);
 	auto& formLines     = *FormLines;
 	for (auto iPoint = 0; iPoint < 3; iPoint++) {
-		(*RubberBandLine)[iPoint] = formLines[previousPoint];
+		RubberBandLine->operator[](iPoint) = formLines[previousPoint];
 		previousPoint             = form::nxt(form, previousPoint);
 	}
 	thred::ritmov(ClosestFormToCursor);
@@ -1255,10 +1255,12 @@ void form::chkseq(bool border) {
 	}
 	auto destination = wrap::toUnsigned(savedIndex + 1U);
 	for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); iSequence++) {
-		const auto len = hypot((*InterleaveSequence)[iSequence].x - (*InterleaveSequence)[iSequence - 1U].x,
-		                       (*InterleaveSequence)[iSequence].y - (*InterleaveSequence)[iSequence - 1U].y);
+		const auto seq = InterleaveSequence->operator[](iSequence);
+		const auto seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
+		const auto len = hypot(seq.x - seqBack1.x,
+		                       seq.y - seqBack1.y);
 		if (len > minimumStitchLength) {
-			(*InterleaveSequence)[destination] = (*InterleaveSequence)[iSequence];
+			InterleaveSequence->operator[](destination) = seq;
 			++destination;
 		}
 	}
@@ -1617,17 +1619,17 @@ auto form::internal::proj(const fPOINT& point,
 auto form::linx(const std::vector<fPOINT>& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept -> bool {
 	if (OutsidePoints != nullptr) {
 		const auto delta
-		    = fPOINT { ((*OutsidePoints)[start].x - points[start].x), ((*OutsidePoints)[start].y - points[start].y) };
+		    = fPOINT { (OutsidePoints->operator[](start).x - points[start].x), (OutsidePoints->operator[](start).y - points[start].y) };
 		const auto point = points[start];
 
 		if ((delta.x == 0.0F) && (delta.y == 0.0F)) {
 			return false;
 		}
 		if (delta.x != 0.0F) {
-			return fi::proj(point, delta.y / delta.x, (*OutsidePoints)[finish], points[finish], intersection);
+			return fi::proj(point, delta.y / delta.x, OutsidePoints->operator[](finish), points[finish], intersection);
 		}
 
-		return fi::projv(point.x, points[finish], (*OutsidePoints)[finish], intersection);
+		return fi::projv(point.x, points[finish], OutsidePoints->operator[](finish), intersection);
 	}
 
 	return false;
@@ -1660,10 +1662,10 @@ auto form::internal::projh(float yCoordinate, const fPOINT& point0, const fPOINT
 }
 
 void form::internal::sprct(const std::vector<fPOINT>* vertices, uint32_t vertexIndex, std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish) {
-	auto&      opStart      = (*OutsidePoints)[start];
-	auto&      opFinish     = (*OutsidePoints)[finish];
-	auto&      ipStart      = (*InsidePoints)[start];
-	auto&      ipFinish     = (*InsidePoints)[finish];
+	auto&      opStart      = OutsidePoints->operator[](start);
+	auto&      opFinish     = OutsidePoints->operator[](finish);
+	auto&      ipStart      = InsidePoints->operator[](start);
+	auto&      ipFinish     = InsidePoints->operator[](finish);
 	const auto delta        = fPOINT { (opFinish.x - opStart.x), (opFinish.y - opStart.y) };
 	auto       point        = fPOINT {};
 	auto&      verticalRect = fillVerticalRect[start];
@@ -1900,8 +1902,8 @@ void form::internal::duspnd(uint32_t                  stitchLen,
                                         underlayVerticalRect[finish].bipnt.y - underlayVerticalRect[start].cipnt.y };
 			const auto length = hypot(delta.x, delta.y);
 			if (length > stitchLen) {
-				const auto angle = atan2((*InsidePoints)[finish].y - (*OutsidePoints)[finish].y,
-				                         (*InsidePoints)[finish].x - (*OutsidePoints)[finish].x);
+				const auto angle = atan2(InsidePoints->operator[](finish).y - OutsidePoints->operator[](finish).y,
+				                         InsidePoints->operator[](finish).x - OutsidePoints->operator[](finish).x);
 				const auto point = fPOINT { underlayVerticalRect[finish].bopnt.x + cos(angle) * width,
 					                        underlayVerticalRect[finish].bopnt.y + sin(angle) * width };
 				form::filinsb(point);
@@ -1916,8 +1918,8 @@ void form::internal::duspnd(uint32_t                  stitchLen,
                                         underlayVerticalRect[finish].bopnt.y - underlayVerticalRect[start].copnt.y };
 			const auto length = hypot(delta.x, delta.y);
 			if (length > stitchLen) {
-				const auto angle = atan2((*OutsidePoints)[finish].y - (*InsidePoints)[finish].y,
-				                         (*OutsidePoints)[finish].x - (*InsidePoints)[finish].x);
+				const auto angle = atan2(OutsidePoints->operator[](finish).y - InsidePoints->operator[](finish).y,
+				                         OutsidePoints->operator[](finish).x - InsidePoints->operator[](finish).x);
 				const auto point = fPOINT { underlayVerticalRect[finish].bipnt.x + cos(angle) * width,
 					                        underlayVerticalRect[finish].bipnt.y + sin(angle) * width };
 				form::filinsb(point);
@@ -2057,12 +2059,12 @@ void form::internal::bhcrnr(const FRMHED& form, uint32_t vertex) {
 
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta.x = (*OutsidePoints)[nextVertex].x - vertexIt[nextVertex].x;
-		delta.y = (*OutsidePoints)[nextVertex].y - vertexIt[nextVertex].y;
+		delta.x = OutsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x;
+		delta.y = OutsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y;
 	}
 	else {
-		delta.x = (*InsidePoints)[nextVertex].x - vertexIt[nextVertex].x;
-		delta.y = (*InsidePoints)[nextVertex].y - vertexIt[nextVertex].y;
+		delta.x = InsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x;
+		delta.y = InsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y;
 	}
 	const auto length = hypot(delta.x, delta.y);
 	const auto ratio  = ButtonholeCornerLength / length;
@@ -3805,7 +3807,7 @@ void form::internal::rspnt(float xCoordinate, float yCoordinate) {
 void form::internal::brkdun(const std::vector<SMALPNTL*>& sortedLines, uint32_t start, uint32_t finish) {
 	rspnt(sortedLines[start]->x, sortedLines[start]->y);
 	rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
-	rspnt((*WorkingFormVertices)[sortedLines[start]->line].x, (*WorkingFormVertices)[sortedLines[start]->line].y);
+	rspnt(WorkingFormVertices->operator[](sortedLines[start]->line).x, WorkingFormVertices->operator[](sortedLines[start]->line).y);
 	StateMap.set(StateFlag::BRKFIX);
 }
 
@@ -4037,14 +4039,14 @@ void form::internal::durgn(const FRMHED&                 form,
 		auto        minimumLength = 1e99;
 		auto        mindif        = 0U;
 		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-			const auto length = hypot(bpnt.x - (*WorkingFormVertices)[iVertex].x, bpnt.y - (*WorkingFormVertices)[iVertex].y);
+			const auto length = hypot(bpnt.x - WorkingFormVertices->operator[](iVertex).x, bpnt.y - WorkingFormVertices->operator[](iVertex).y);
 			if (length < minimumLength) {
 				minimumLength = length;
 				mindif        = iVertex;
 			}
 		}
 		if (minimumLength != 0.0) {
-			rspnt((*WorkingFormVertices)[mindif].x, (*WorkingFormVertices)[mindif].y);
+			rspnt(WorkingFormVertices->operator[](mindif).x, WorkingFormVertices->operator[](mindif).y);
 		}
 		if (form.vertexCount != 0U) {
 			const auto fdif = (form.vertexCount + firstLine - mindif) % form.vertexCount;
@@ -4052,18 +4054,18 @@ void form::internal::durgn(const FRMHED&                 form,
 			if (fdif < bdif) {
 				auto ind = form::nxt(form, mindif);
 				while (ind != firstLine) {
-					rspnt((*WorkingFormVertices)[ind].x, (*WorkingFormVertices)[ind].y);
+					rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
 					ind = form::nxt(form, ind);
 				}
-				rspnt((*WorkingFormVertices)[ind].x, (*WorkingFormVertices)[ind].y);
+				rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
 			}
 			else {
 				auto ind = form::prv(form, mindif);
 				while (ind != firstLine) {
-					rspnt((*WorkingFormVertices)[ind].x, (*WorkingFormVertices)[ind].y);
+					rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
 					ind = form::prv(form, ind);
 				}
-				rspnt((*WorkingFormVertices)[ind].x, (*WorkingFormVertices)[ind].y);
+				rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
 			}
 		}
 	}
@@ -5625,7 +5627,7 @@ void form::setins() {
 		FormVertexNext = form::nxt(*FormForInsert, FormVertexPrev);
 	}
 	form::frmlin(*FormForInsert);
-	InsertLine[0]   = (*FormLines)[FormVertexPrev];
+	InsertLine[0]   = FormLines->operator[](FormVertexPrev);
 	InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
 	InsertLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	StateMap.set(StateFlag::INSFRM);
@@ -6813,10 +6815,10 @@ void form::tglfrm() {
 	}
 	StateMap.reset(StateFlag::HIDSTCH);
 	if (StateMap.testAndFlip(StateFlag::FRMOF)) {
-		FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
+		FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
 	}
 	else {
-		FormOnOff->assign((*StringTable)[STR_FRMINUS]);
+		FormOnOff->assign(StringTable->operator[](STR_FRMINUS));
 		StateMap.reset(StateFlag::FORMSEL);
 		StateMap.reset(StateFlag::FORMIN);
 		StateMap.reset(StateFlag::MOVFRM);
@@ -6838,7 +6840,7 @@ void form::tglfrm() {
 void form::frmon() {
 	thred::unbsho();
 	StateMap.reset(StateFlag::FRMOF);
-	FormOnOff->assign((*StringTable)[STR_FRMPLUS]);
+	FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
 	SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
 	StateMap.set(StateFlag::DUMEN);
 }

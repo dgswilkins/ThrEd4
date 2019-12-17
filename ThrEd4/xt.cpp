@@ -471,8 +471,8 @@ auto xt::insid(const FRMHED& form) -> std::vector<fPOINT>& {
 	if (form.underlayIndent > 0) {
 		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-			if (!form::cisin(form, (*InsidePoints)[iVertex].x, (*InsidePoints)[iVertex].y)) {
-				(*InsidePoints)[iVertex] = vertexIt[iVertex];
+			if (!form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
+				InsidePoints->operator[](iVertex) = vertexIt[iVertex];
 			}
 		}
 		return *InsidePoints;
@@ -1415,7 +1415,7 @@ auto xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept -> bool {
 	while (index != 0U) {
 		index--;
 		if (InterleaveSequenceIndices->operator[](index).color == color) {
-			point = (*InterleaveSequence)[InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index - 1U];
+			point = InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index - 1U);
 			return true;
 		}
 	}

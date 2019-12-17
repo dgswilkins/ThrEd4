@@ -63,7 +63,7 @@ auto formForms::maxwid(uint32_t start, uint32_t finish) {
 	auto textSize = POINT { 0L, 0L };
 
 	while (start <= finish) {
-		formForms::maxtsiz((*StringTable)[start++], textSize);
+		formForms::maxtsiz(StringTable->operator[](start++), textSize);
 	}
 	return textSize.x + 6;
 }
@@ -568,8 +568,8 @@ auto formForms::internal::prfnwin(const std::wstring& text) noexcept -> HWND {
 }
 
 void formForms::internal::prflin(const std::wstring& msg, uint32_t row) noexcept {
-	ffi::prftwin((*StringTable)[row]);
-	(*ValueWindow)[row - STR_PRF0] = ffi::prfnwin(msg);
+	ffi::prftwin(StringTable->operator[](row));
+	ValueWindow->operator[](row - STR_PRF0) = ffi::prfnwin(msg);
 	ffi::nxtlinprf();
 }
 
@@ -589,8 +589,8 @@ void formForms::prfmsg() {
 	}
 	LabelWindowSize.x = LabelWindowSize.y = 0;
 	ValueWindowSize.x = ValueWindowSize.y = 0;
-	formForms::maxtsiz((*StringTable)[STR_PRF0 + 4U], LabelWindowSize);
-	formForms::maxtsiz((*StringTable)[STR_TAPR], ValueWindowSize);
+	formForms::maxtsiz(StringTable->operator[](STR_PRF0 + 4U), LabelWindowSize);
+	formForms::maxtsiz(StringTable->operator[](STR_TAPR), ValueWindowSize);
 	LabelWindowSize.x = formForms::maxwid(STR_PRF0, STR_PRF27);
 	LabelWindowSize.x += 4;
 	DestroyWindow(PreferencesWindow);
@@ -626,34 +626,34 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI_F * 180.0F)), STR_PRF1);
 	if (UserFlagMap.test(UserFlag::SQRFIL)) {
-		choice = (*StringTable)[STR_SQR];
+		choice = StringTable->operator[](STR_SQR);
 	}
 	else {
-		choice = (*StringTable)[STR_PNTD];
+		choice = StringTable->operator[](STR_PNTD);
 	}
 	ffi::prflin(choice, STR_PRF2);
 	ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
 	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
 	ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
 	form::sethup();
-	ffi::prflin(fmt::format(L"{}", (*StringTable)[wrap::toSize(IniFile.hoopType) - 1U + STR_HUP0]), STR_PRF17);
+	ffi::prflin(fmt::format(L"{}", StringTable->operator[](wrap::toSize(IniFile.hoopType) - 1U + STR_HUP0)), STR_PRF17);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
 	ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
 	ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
 	if (UserFlagMap.test(UserFlag::BLUNT)) {
-		choice = (*StringTable)[STR_BLUNT];
+		choice = StringTable->operator[](STR_BLUNT);
 	}
 	else {
-		choice = (*StringTable)[STR_TAPR];
+		choice = StringTable->operator[](STR_TAPR);
 	}
 	ffi::prflin(choice, STR_PRF15);
 	if (UserFlagMap.test(UserFlag::DUND)) {
-		choice = (*StringTable)[STR_ON];
+		choice = StringTable->operator[](STR_ON);
 	}
 	else {
-		choice = (*StringTable)[STR_OFF];
+		choice = StringTable->operator[](STR_OFF);
 	}
 	ffi::prflin(choice, STR_PRF19);
 	ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);

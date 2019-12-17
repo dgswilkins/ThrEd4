@@ -722,12 +722,12 @@ void clip::internal::clpcrnr(const FRMHED& form,
 
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if (StateMap.test(StateFlag::INDIR)) {
-		delta = fPOINT { (*OutsidePoints)[nextVertex].x - vertexIt[nextVertex].x,
-			             (*OutsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
+		delta = fPOINT { OutsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x,
+			             OutsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y };
 	}
 	else {
-		delta = fPOINT { (*InsidePoints)[nextVertex].x - vertexIt[nextVertex].x,
-			             (*InsidePoints)[nextVertex].y - vertexIt[nextVertex].y };
+		delta = fPOINT { InsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x,
+			             InsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y };
 	}
 	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
 	const auto referencePoint = fPOINTATTR { form::midl(clipRect.right, clipRect.left), clipRect.top, 0U };
