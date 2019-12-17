@@ -1410,11 +1410,11 @@ void xt::fdelstch(const FRMHED& form, FILLSTARTS& fillStartsData, uint32_t& fill
 }
 
 auto xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept -> bool {
-	const auto color = (*InterleaveSequenceIndices)[index].color;
+	const auto color = InterleaveSequenceIndices->operator[](index).color;
 	while (index != 0U) {
 		index--;
-		if ((*InterleaveSequenceIndices)[index].color == color) {
-			point = (*InterleaveSequence)[(*InterleaveSequenceIndices)[wrap::toSize(index) + 1U].index - 1U];
+		if (InterleaveSequenceIndices->operator[](index).color == color) {
+			point = (*InterleaveSequence)[InterleaveSequenceIndices->operator[](wrap::toSize(index) + 1U).index - 1U];
 			return true;
 		}
 	}
@@ -1438,7 +1438,7 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 			ilData.output += gucon(form,
 			                       buffer,
 			                       vertexIt[form.fillStart],
-			                       (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
+			                       (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index],
 			                       ilData.output,
 			                       code);
 		}
@@ -1446,10 +1446,10 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output += gucon(
-		    form, buffer, point, (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index], ilData.output, code);
+		    form, buffer, point, (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index], ilData.output, code);
 	}
-	for (auto iSequence = (*InterleaveSequenceIndices)[ilData.pins].index;
-	     iSequence < (*InterleaveSequenceIndices)[wrap::toSize(ilData.pins) + 1U].index;
+	for (auto iSequence = InterleaveSequenceIndices->operator[](ilData.pins).index;
+	     iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
 	     iSequence++) {
 		if (ilData.output > 0) {
 			if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1U].x
@@ -1500,7 +1500,7 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 		auto code             = 0U;
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); iSequence++) {
 			ilData.pins = iSequence;
-			switch ((*InterleaveSequenceIndices)[iSequence].seq) {
+			switch (InterleaveSequenceIndices->operator[](iSequence).seq) {
 			case I_AP: {
 				if (((fillStartsMap & M_FIL) != 0U) && fillStartsData.fillNamed.applique >= ilData.coloc) {
 					ilData.coloc = fillStartsData.fillNamed.applique;
@@ -1541,8 +1541,8 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 				break;
 			}
 			}
-			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[ilData.pins].code
-			                             | (*InterleaveSequenceIndices)[ilData.pins].color);
+			code = gsl::narrow<uint32_t>(ilData.layerIndex | InterleaveSequenceIndices->operator[](ilData.pins).code
+			                             | InterleaveSequenceIndices->operator[](ilData.pins).color);
 			xi::duint(form, highStitchBuffer, code, ilData);
 		}
 		xi::chkend(form, highStitchBuffer, code, ilData);
@@ -1564,14 +1564,14 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 		auto code     = 0U;
 		auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); iSequence++) {
-			code = gsl::narrow<uint32_t>(ilData.layerIndex | (*InterleaveSequenceIndices)[iSequence].code
-			                             | (*InterleaveSequenceIndices)[iSequence].color);
+			code = gsl::narrow<uint32_t>(ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code
+			                             | InterleaveSequenceIndices->operator[](iSequence).color);
 			if ((form.extendedAttribute & AT_STRT) != 0U) {
 				if (!StateMap.testAndSet(StateFlag::DIDSTRT)) {
 					ilData.output += xi::gucon(form,
 					                           *StitchBuffer,
 					                           vertexIt[form.fillStart],
-					                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[ilData.pins].index],
+					                           (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index],
 					                           ilData.output,
 					                           code);
 				}
@@ -1581,12 +1581,12 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 				ilData.output += xi::gucon(form,
 				                           *StitchBuffer,
 				                           colpnt,
-				                           (*InterleaveSequence)[(*InterleaveSequenceIndices)[iSequence].index],
+				                           (*InterleaveSequence)[InterleaveSequenceIndices->operator[](iSequence).index],
 				                           ilData.output,
 				                           code);
 			}
-			for (auto ine = (*InterleaveSequenceIndices)[iSequence].index;
-			     ine < (*InterleaveSequenceIndices)[wrap::toSize(iSequence) + 1U].index;
+			for (auto ine = InterleaveSequenceIndices->operator[](iSequence).index;
+			     ine < InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
 			     ine++) {
 				if (ilData.output > 0) {
 					if ((*InterleaveSequence)[ine].x != StitchBuffer->operator[](ilData.output - 1U).x
