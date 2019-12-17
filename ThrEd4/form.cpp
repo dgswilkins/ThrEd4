@@ -4027,11 +4027,11 @@ void form::internal::durgn(const FRMHED&                 form,
 	const auto  sequenceStart = currentRegion.start;
 	const auto  sequenceEnd   = currentRegion.end;
 	if (sequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
-		if ((*BSequence)[OutputIndex - 1U].attribute != SEQBOT) {
-			rspnt((*BSequence)[OutputIndex - 2U].x, (*BSequence)[OutputIndex - 2U].y);
+		if (BSequence->operator[](OutputIndex - 1U).attribute != SEQBOT) {
+			rspnt(BSequence->operator[](OutputIndex - 2U).x, BSequence->operator[](OutputIndex - 2U).y);
 		}
 		const auto  firstLine     = sortedLines[sequenceStart]->line;
-		const auto& bpnt          = (*BSequence)[OutputIndex - 1U];
+		const auto& bpnt          = BSequence->operator[](OutputIndex - 1U);
 		auto        minimumLength = 1e99;
 		auto        mindif        = 0U;
 		for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
@@ -4432,8 +4432,8 @@ void form::internal::bakseq() {
 #if BUGBAK
 
 	for (SequenceIndex = 0; SequenceIndex < OutputIndex; SequenceIndex++) {
-		(*OSequence)[SequenceIndex].x = (*BSequence)[SequenceIndex].x;
-		(*OSequence)[SequenceIndex].y = (*BSequence)[SequenceIndex].y;
+		(*OSequence)[SequenceIndex].x = BSequence->operator[](SequenceIndex).x;
+		(*OSequence)[SequenceIndex].y = BSequence->operator[](SequenceIndex).y;
 	}
 	SelectedForm->maxFillStitchLen = 6000;
 #else
@@ -4445,18 +4445,18 @@ void form::internal::bakseq() {
 
 	OSequence->clear();
 	StateMap.reset(StateFlag::FILDIR);
-	OSequence->push_back(fPOINT { (*BSequence)[iSequence].x, (*BSequence)[iSequence].y });
-	SelectedPoint = (*BSequence)[iSequence];
+	OSequence->push_back(fPOINT { BSequence->operator[](iSequence).x, BSequence->operator[](iSequence).y });
+	SelectedPoint = BSequence->operator[](iSequence);
 	if (iSequence != 0U) {
 		iSequence--;
 	}
 	while (iSequence > 0) {
 		const auto rcnt           = iSequence % RITSIZ;
 		const auto StitchSpacing2 = LineSpacing * 2;
-		const auto rit            = wrap::round<int32_t>((*BSequence)[iSequence].x / StitchSpacing2);
-		auto&      bPrevious      = (*BSequence)[iSequence - 1U];
-		auto&      bCurrent       = (*BSequence)[iSequence];
-		auto&      bNext          = (*BSequence)[wrap::toSize(iSequence) + 1U];
+		const auto rit            = wrap::round<int32_t>(BSequence->operator[](iSequence).x / StitchSpacing2);
+		auto&      bPrevious      = BSequence->operator[](iSequence - 1U);
+		auto&      bCurrent       = BSequence->operator[](iSequence);
+		auto&      bNext          = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 		auto       delta          = fPOINT { bCurrent.x - bNext.x, bCurrent.y - bNext.y };
 		auto       slope          = 1e38F;
 		if (delta.y != 0.0) {
@@ -4652,10 +4652,10 @@ void form::internal::trfrm(const fPOINT& bottomLeftPoint,
 
 void form::internal::clpfm() {
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(BSequence->size()) - 2U; iSequence += 2) {
-		auto&      bSeq0       = (*BSequence)[iSequence];
-		auto&      bSeq1       = (*BSequence)[wrap::toSize(iSequence) + 1U];
-		auto&      bSeq2       = (*BSequence)[wrap::toSize(iSequence) + 2U];
-		auto&      bSeq3       = (*BSequence)[wrap::toSize(iSequence) + 3U];
+		auto&      bSeq0       = BSequence->operator[](iSequence);
+		auto&      bSeq1       = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+		auto&      bSeq2       = BSequence->operator[](wrap::toSize(iSequence) + 2U);
+		auto&      bSeq3       = BSequence->operator[](wrap::toSize(iSequence) + 3U);
 		const auto leftLength  = hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
 		const auto rightLength = hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
 		const auto leftDelta   = fPOINT { bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y };

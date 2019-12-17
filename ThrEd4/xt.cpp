@@ -114,14 +114,14 @@ constexpr auto xt::internal::durat(float start, float finish, float featherRatio
 }
 
 void xt::internal::duxrats(uint32_t start, uint32_t finish, fPOINT& point, float featherRatioLocal) noexcept {
-	point.x = durat((*BSequence)[finish].x, (*BSequence)[start].x, featherRatioLocal);
-	point.y = durat((*BSequence)[finish].y, (*BSequence)[start].y, featherRatioLocal);
+	point.x = durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal);
+	point.y = durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal);
 }
 
 void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
 	if (sequence != nullptr) {
-		auto&      bCurrent     = (*BSequence)[iSequence];
-		auto&      bNext        = (*BSequence)[wrap::toSize(iSequence) + 1U];
+		auto&      bCurrent     = BSequence->operator[](iSequence);
+		auto&      bNext        = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 		const auto stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 
 		if (stitchLength < feather.minStitch) {
@@ -240,8 +240,9 @@ void xt::internal::fthfn(uint32_t iSequence, FEATHER& feather) {
 }
 
 void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
-	point.x = ((*BSequence)[iNextPoint].x - (*BSequence)[iPoint].x) * featherRatio + (*BSequence)[iPoint].x;
-	point.y = ((*BSequence)[iNextPoint].y - (*BSequence)[iPoint].y) * featherRatio + (*BSequence)[iPoint].y;
+	const auto bPoint = BSequence->operator[](iPoint);
+	point.x = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
+	point.y = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
 }
 
 auto xt::internal::midpnt(const fPOINT& startPoint, const fPOINT& endPoint) noexcept -> fPOINT {
@@ -257,8 +258,8 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 	auto       currentPoint = fPOINT {};
 	auto       nextPoint    = fPOINT {};
 	auto       midPoint     = fPOINT {};
-	auto&      bCurrent     = (*BSequence)[iSequence];
-	auto&      bNext        = (*BSequence)[wrap::toSize(iSequence) + 1U];
+	auto&      bCurrent     = BSequence->operator[](iSequence);
+	auto&      bNext        = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 	const auto length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
@@ -292,8 +293,8 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 }
 
 void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
-	auto&      bCurrent = (*BSequence)[iSequence];
-	auto&      bNext    = (*BSequence)[wrap::toSize(iSequence) + 1U];
+	auto&      bCurrent = BSequence->operator[](iSequence);
+	auto&      bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 	const auto length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
 
 	nurat(feather);
@@ -351,7 +352,7 @@ void xt::fthrfn(FRMHED& form) {
 	LineSpacing = form.fillSpacing;
 	satin::satfil(form);
 	BSequence->front().attribute = 0;
-	(*BSequence)[1].attribute    = 1;
+	BSequence->operator[](1).attribute    = 1;
 	if (feather.phaseIndex == 0U) {
 		feather.phaseIndex = 1U;
 	}
@@ -368,12 +369,12 @@ void xt::fthrfn(FRMHED& form) {
 	feather.globalDown     = feather.globalPhase - feather.globalUp;
 	form.fillType          = FTHF;
 	feather.phase          = 1U;
-	BSequence->push_back((*BSequence)[BSequence->size() - 2U]);
-	BSequence->push_back((*BSequence)[BSequence->size() - 1U]);
+	BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
+	BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
 	if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
 		OutputIndex = 0U;
 		for (ind = 0U; ind < wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
-			if ((*BSequence)[ind].attribute == 0) {
+			if (BSequence->operator[](ind).attribute == 0) {
 				xi::fthrbfn(ind, feather, featherSequence);
 			}
 		}
@@ -381,24 +382,24 @@ void xt::fthrfn(FRMHED& form) {
 	else {
 		if ((form.extendedAttribute & AT_FTHBTH) != 0U) {
 			for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
-				if ((*BSequence)[ind].attribute == 0) {
+				if (BSequence->operator[](ind).attribute == 0) {
 					xi::fthdfn(ind, feather);
 				}
 			}
 		}
 		else {
 			for (ind = 0U; ind <= wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
-				if ((*BSequence)[ind].attribute != 0) {
+				if (BSequence->operator[](ind).attribute != 0) {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
 						xi::fthfn(ind, feather);
 					}
 					else {
-						OSequence->push_back(fPOINT { (*BSequence)[ind].x, (*BSequence)[ind].y });
+						OSequence->push_back(fPOINT { BSequence->operator[](ind).x, BSequence->operator[](ind).y });
 					}
 				}
 				else {
 					if ((feather.extendedAttribute & AT_FTHUP) != 0U) {
-						OSequence->push_back(fPOINT { (*BSequence)[ind].x, (*BSequence)[ind].y });
+						OSequence->push_back(fPOINT { BSequence->operator[](ind).x, BSequence->operator[](ind).y });
 					}
 					else {
 						xi::fthfn(ind, feather);
