@@ -1438,7 +1438,7 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 			ilData.output += gucon(form,
 			                       buffer,
 			                       vertexIt[form.fillStart],
-			                       (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index],
+			                       InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 			                       ilData.output,
 			                       code);
 		}
@@ -1446,20 +1446,21 @@ void xt::internal::duint(const FRMHED& form, std::vector<fPOINTATTR>& buffer, ui
 	auto point = fPOINT {};
 	if (lastcol(ilData.pins, point)) {
 		ilData.output += gucon(
-		    form, buffer, point, (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index], ilData.output, code);
+		    form, buffer, point, InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index), ilData.output, code);
 	}
 	for (auto iSequence = InterleaveSequenceIndices->operator[](ilData.pins).index;
 	     iSequence < InterleaveSequenceIndices->operator[](wrap::toSize(ilData.pins) + 1U).index;
 	     iSequence++) {
 		if (ilData.output > 0) {
-			if ((*InterleaveSequence)[iSequence].x != buffer[ilData.output - 1U].x
-			    || (*InterleaveSequence)[iSequence].y != buffer[ilData.output - 1U].y) {
-				buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+			auto interleave = InterleaveSequence->operator[](iSequence);
+			if (interleave.x != buffer[ilData.output - 1U].x || interleave.y != buffer[ilData.output - 1U].y) {
+				buffer.emplace_back(fPOINTATTR { interleave.x, interleave.y, code });
 				ilData.output++;
 			}
 		}
 		else {
-			buffer.emplace_back(fPOINTATTR { (*InterleaveSequence)[iSequence].x, (*InterleaveSequence)[iSequence].y, code });
+			auto interleave = InterleaveSequence->operator[](iSequence);
+			buffer.emplace_back(fPOINTATTR { interleave.x, interleave.y, code });
 			ilData.output++;
 		}
 	}
@@ -1571,7 +1572,7 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 					ilData.output += xi::gucon(form,
 					                           *StitchBuffer,
 					                           vertexIt[form.fillStart],
-					                           (*InterleaveSequence)[InterleaveSequenceIndices->operator[](ilData.pins).index],
+					                           InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 					                           ilData.output,
 					                           code);
 				}
@@ -1581,7 +1582,7 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 				ilData.output += xi::gucon(form,
 				                           *StitchBuffer,
 				                           colpnt,
-				                           (*InterleaveSequence)[InterleaveSequenceIndices->operator[](iSequence).index],
+				                           InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](iSequence).index),
 				                           ilData.output,
 				                           code);
 			}
@@ -1589,14 +1590,16 @@ void xt::intlv(const FRMHED& form, const FILLSTARTS& fillStartsData, uint32_t fi
 			     ine < InterleaveSequenceIndices->operator[](wrap::toSize(iSequence) + 1U).index;
 			     ine++) {
 				if (ilData.output > 0) {
-					if ((*InterleaveSequence)[ine].x != StitchBuffer->operator[](ilData.output - 1U).x
-					    || (*InterleaveSequence)[ine].y != StitchBuffer->operator[](ilData.output - 1U).y) {
-						StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
+					auto& interleave = InterleaveSequence->operator[](ine);
+					auto& stitch = StitchBuffer->operator[](ilData.output - 1U);
+					if (interleave.x != stitch.x || interleave.y != stitch.y) {
+						StitchBuffer->push_back({ interleave.x, interleave.y, code });
 						ilData.output++;
 					}
 				}
 				else {
-					StitchBuffer->push_back({ (*InterleaveSequence)[ine].x, (*InterleaveSequence)[ine].y, code });
+					auto& interleave = InterleaveSequence->operator[](ine);
+					StitchBuffer->push_back({ interleave.x, interleave.y, code });
 					ilData.output++;
 				}
 			}
