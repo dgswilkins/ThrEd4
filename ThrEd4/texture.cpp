@@ -1454,16 +1454,16 @@ void texture::txsnap() {
 		const auto halfGrid = IniFile.gridSize / 2;
 		if (!SelectedTexturePointsList->empty()) {
 			for (auto iPoint = 0U; iPoint < txpntSize; iPoint++) {
-				auto       texturePoint = &(*TempTexturePoints)[SelectedTexturePointsList->operator[](iPoint)];
-				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y         = yStep * IniFile.gridSize;
+				auto&       texturePoint = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
+				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (auto iPoint = 0U; iPoint < txpntSize; iPoint++) {
-				auto       texturePoint = &(*TempTexturePoints)[iPoint];
-				const auto yStep        = (texturePoint->y + halfGrid) / IniFile.gridSize;
-				texturePoint->y         = yStep * IniFile.gridSize;
+				auto&       texturePoint = TempTexturePoints->operator[](iPoint);
+				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
 		StateMap.set(StateFlag::RESTCH);

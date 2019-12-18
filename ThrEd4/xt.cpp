@@ -880,7 +880,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 	return 1U;
 }
 
-void xt::internal::durec(OREC& record) noexcept {
+void xt::internal::durec(OREC& record) {
 	const auto stitchIt = std::next(StitchBuffer->begin(), record.start);
 
 	record.type          = StitchTypes[dutyp(stitchIt->attribute)];

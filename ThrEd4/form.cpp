@@ -650,9 +650,9 @@ void form::drwfrm() {
 					}
 					if (form.wordParam != 0U) {
 						SelectObject(StitchWindowMemDC, FormPen);
-						fi::frmpoly(&((*FormLines)[1]), form.wordParam);
+						fi::frmpoly(&(FormLines->operator[](1)), form.wordParam);
 						SelectObject(StitchWindowMemDC, FormPen3px);
-						Polyline(StitchWindowMemDC, &((*FormLines)[form.wordParam]), 2);
+						Polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), 2);
 						SelectObject(StitchWindowMemDC, LayerPen[layer]);
 						lastPoint = form.wordParam + 1U;
 					}
@@ -675,7 +675,7 @@ void form::drwfrm() {
 					}
 				}
 				else {
-					fi::frmpoly(&((*FormLines)[lastPoint]), form.vertexCount + 1 - lastPoint);
+					fi::frmpoly(&(FormLines->operator[](lastPoint)), form.vertexCount + 1 - lastPoint);
 				}
 				if (ClosestFormToCursor == iForm && StateMap.test(StateFlag::FRMPSEL)) {
 					auto& formLines = *FormLines;

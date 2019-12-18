@@ -9500,7 +9500,7 @@ GSL_SUPPRESS(26440) void thred::ritmov(uint32_t formIndex) {
 	else {
 		RubberBandLine->operator[](2) = FormLines->operator[](1);
 		if (form.type == FRMLINE) {
-			Polyline(StitchWindowDC, &(*RubberBandLine)[1], 2);
+			Polyline(StitchWindowDC, &RubberBandLine->operator[](1), 2);
 		}
 		else {
 			Polyline(StitchWindowDC, RubberBandLine->data(), 3);
@@ -13665,7 +13665,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 		}
 		if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 			FormMenuChoice = LFTHTYP;
-			sidmsg(form, ValueWindow->operator[](LFTHTYP), &(*StringTable)[STR_FTH0], 6);
+			sidmsg(form, ValueWindow->operator[](LFTHTYP), &StringTable->operator[](STR_FTH0), 6);
 			break;
 		}
 		if (Msg.hwnd == ValueWindow->operator[](LFRM) || Msg.hwnd == LabelWindow->operator[](LFRM)) {
@@ -13693,7 +13693,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 		if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 			StateMap.reset(StateFlag::FILTYP);
 			FormMenuChoice = LFRMFIL;
-			sidmsg(form, ValueWindow->operator[](LFRMFIL), &(*StringTable)[STR_FIL0], 14U);
+			sidmsg(form, ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), 14U);
 			break;
 		}
 		if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
@@ -13728,7 +13728,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 		}
 		if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 			StateMap.set(StateFlag::FILTYP);
-			sidmsg(form, ValueWindow->operator[](LBRD), &(*StringTable)[STR_EDG0], EDGETYPS + 1U);
+			sidmsg(form, ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS + 1U);
 			StateMap.set(StateFlag::BRDACT);
 			break;
 		}
@@ -18092,17 +18092,17 @@ void thred::internal::init() {
 		switch (iButton) {
 		case HBOXSEL: {
 			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
-			buttonTxt   = &(*StringTable)[STR_BOXSEL];
+			buttonTxt   = &StringTable->operator[](STR_BOXSEL);
 			break;
 		}
 		case HUPTO: {
 			windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
-			buttonTxt   = &(*StringTable)[STR_UPOF];
+			buttonTxt   = &StringTable->operator[](STR_UPOF);
 			break;
 		}
 		case HHID: {
 			windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
-			buttonTxt   = &(*StringTable)[STR_PIKOL];
+			buttonTxt   = &StringTable->operator[](STR_PIKOL);
 			break;
 		}
 		default: {
