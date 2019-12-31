@@ -6819,6 +6819,9 @@ auto thred::internal::closlin() -> uint32_t {
 	for (auto iChange = 0U; iChange < ColorChanges; iChange++) {
 		auto stitchCount
 		    = gsl::narrow<uint16_t>(std::abs(ColorChangeTable[iChange + 1U].stitchIndex - ColorChangeTable[iChange].stitchIndex));
+		if (ColorChangeTable[iChange + 1U].stitchIndex == StitchBuffer->size()) {
+			--stitchCount;
+		}
 		const auto stitches = std::next(StitchBuffer->begin(), ColorChangeTable[iChange].stitchIndex);
 		if (thi::chkhid(iChange)) {
 			for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
