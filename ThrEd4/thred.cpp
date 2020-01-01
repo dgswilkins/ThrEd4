@@ -14446,6 +14446,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					}
 				}
 				ClosestPointIndex++;
+				thred::savdo();
 				StitchBuffer->insert(std::next(StitchBuffer->begin(), ClosestPointIndex),
 				                     fPOINTATTR { SelectedPoint.x, SelectedPoint.y, code });
 				xlin();
