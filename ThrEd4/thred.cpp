@@ -7412,6 +7412,9 @@ void thred::internal::rotstch(fPOINTATTR& stitch, const float rotationAngle, con
 }
 
 void thred::internal::ritrot(float rotationAngle, const fPOINT& rotationCenter) {
+	if (StateMap.test(StateFlag::MOVCNTR)) { // set rotation angle to 0 if we are moving the center point
+		rotationAngle = 0.0F;
+	}
 	auto rotated           = POINT { 0L, 0L };
 	auto rotationReference = fPOINT { RotationRect.left, RotationRect.top };
 
@@ -13902,7 +13905,6 @@ auto thred::internal::handleFormDataSheet() -> bool {
 
 auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
                                            float&              xyRatio,
-                                           float               rotationAngle,
                                            const FRMHED&       textureForm,
                                            bool&               retflag) -> bool {
 	retflag = true;
@@ -14334,8 +14336,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				thred::px2stch();
 				StateMap.set(StateFlag::MOVCNTR);
 				unrot();
-				// ToDo - set rotation angle to zero if we are moving the center
-				ritrot(rotationAngle, SelectedPoint);
+				ritrot(0, SelectedPoint);
 			}
 			else {
 				if (adjustedPoint.x != 0.0F) {
@@ -17230,7 +17231,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	if (Msg.message == WM_LBUTTONDOWN) {
 		{
 			auto       retflag = true;
-			const auto retval  = thi::handleLeftButtonDown(stretchBoxLine, xyRatio, angle, textureForm, retflag);
+			const auto retval  = thi::handleLeftButtonDown(stretchBoxLine, xyRatio, textureForm, retflag);
 			if (retflag) {
 				return retval;
 			}

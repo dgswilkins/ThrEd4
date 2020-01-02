@@ -246,7 +246,6 @@ namespace internal {
 	auto handleHomeKey(bool& retflag) -> bool;
 	auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	                          float&              xyRatio,
-	                          float               rotationAngle,
 	                          const FRMHED&       textureForm,
 	                          bool&               retflag) -> bool;
 	auto handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) -> bool;
