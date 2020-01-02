@@ -11956,13 +11956,23 @@ void thred::internal::qcode() {
 		StitchBuffer->clear();
 		StateMap.reset(StateFlag::INIT);
 	}
-	// ToDo - do we need to erase vertices and textures when aborting?
 	if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
+		auto& form = FormList->back();
+		if (form.vertexCount != 0U) {
+			auto first = std::next(FormVertices->begin(), form.vertexIndex);
+			auto last = std::next(first, form.vertexCount);
+			FormVertices->erase(first, last);
+		}
+		if (form.satinGuideCount != 0U) {
+			auto first = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
+			auto last = std::next(first, form.satinGuideCount);
+			SatinGuides->erase(first, last);
+		}
 		FormList->pop_back();
 		if (!FormList->empty()) {
 			ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		}
-	};
+	}
 	if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 		thi::bak();
 		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
