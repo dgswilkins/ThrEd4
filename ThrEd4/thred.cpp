@@ -10464,37 +10464,31 @@ void thred::internal::gotbox() {
 void thred::internal::rngal() {
 	if (!StateMap.testAndReset(StateFlag::WASFPNT)) {
 		StateMap.reset(StateFlag::GRPSEL);
-		// ToDo - use .reserve instead with .push_back
 		auto prng = std::vector<RANGE> {};
-		prng.resize(MAXITEMS);
 		StateMap.reset(StateFlag::GRPSEL);
 		auto iStitch     = 0U;
-		auto iRange      = 0U;
 		auto flagInRange = false;
 		for (; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			if (inrng(iStitch)) {
 				if (!flagInRange) {
-					prng[iRange].start = iStitch;
+					prng.push_back(RANGE{ iStitch, 0U });
 					flagInRange        = true;
 				}
 			}
 			else {
 				if (flagInRange) {
-					prng[iRange].finish = iStitch - 1U;
-					iRange++;
+					prng.back().finish = iStitch - 1U;
 					flagInRange = false;
 				}
 			}
 		}
 		if (flagInRange) {
-			prng[iRange].finish = iStitch - 1U;
-			iRange++;
+			prng.back().finish = iStitch - 1U;
 		}
-		const auto rangeCount = iRange;
-		if (rangeCount != 0U) {
+		if (!prng.empty()) {
 			auto maximumLength = 0U;
 			auto largestRange  = 0U;
-			for (auto index = 0U; index < rangeCount; index++) {
+			for (auto index = 0U; index < prng.size(); index++) {
 				const auto length = prng[index].finish - prng[index].start;
 				if (length > maximumLength) {
 					maximumLength = length;
