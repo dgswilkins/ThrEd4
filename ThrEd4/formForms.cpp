@@ -395,7 +395,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 }
 
 void formForms::refrm() {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (StateMap.testAndReset(StateFlag::PRFACT)) {
 		DestroyWindow(PreferencesWindow);
 		StateMap.reset(StateFlag::WASRT);
