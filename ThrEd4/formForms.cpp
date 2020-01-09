@@ -138,7 +138,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 	const uint16_t edgeArray[]
 	    = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
 
-	auto& stringTable = *StringTable;
+	const auto& stringTable = *StringTable;
 	auto& labelWindow = *LabelWindow;
 	auto& valueWindow = *ValueWindow;
 
@@ -501,7 +501,6 @@ void formForms::internal::prflin(const std::wstring& msg, uint32_t row) noexcept
 }
 
 void formForms::prfmsg() {
-	auto choice         = std::wstring {};
 	auto preferenceRect = RECT { 0L, 0L, 0L, 0L };
 
 	if (StateMap.testAndReset(StateFlag::INSRT)) {
@@ -552,12 +551,7 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI_F * 180.0F)), STR_PRF1);
-	if (UserFlagMap.test(UserFlag::SQRFIL)) {
-		choice = StringTable->operator[](STR_SQR);
-	}
-	else {
-		choice = StringTable->operator[](STR_PNTD);
-	}
+	auto choice = (UserFlagMap.test(UserFlag::SQRFIL)) ? StringTable->operator[](STR_SQR) : StringTable->operator[](STR_PNTD);
 	ffi::prflin(choice, STR_PRF2);
 	ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
 	ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
@@ -569,19 +563,9 @@ void formForms::prfmsg() {
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
 	ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
 	ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
-	if (UserFlagMap.test(UserFlag::BLUNT)) {
-		choice = StringTable->operator[](STR_BLUNT);
-	}
-	else {
-		choice = StringTable->operator[](STR_TAPR);
-	}
+	choice = (UserFlagMap.test(UserFlag::BLUNT)) ? StringTable->operator[](STR_BLUNT) : StringTable->operator[](STR_TAPR);
 	ffi::prflin(choice, STR_PRF15);
-	if (UserFlagMap.test(UserFlag::DUND)) {
-		choice = StringTable->operator[](STR_ON);
-	}
-	else {
-		choice = StringTable->operator[](STR_OFF);
-	}
+	choice = (UserFlagMap.test(UserFlag::DUND)) ? StringTable->operator[](STR_ON) : StringTable->operator[](STR_OFF);
 	ffi::prflin(choice, STR_PRF19);
 	ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
 	ffi::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
