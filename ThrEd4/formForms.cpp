@@ -138,7 +138,6 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 	const uint16_t edgeArray[]
 	    = { MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0 };
 
-	auto  choice      = std::wstring {};
 	auto& stringTable = *StringTable;
 	auto& labelWindow = *LabelWindow;
 	auto& valueWindow = *ValueWindow;
@@ -152,13 +151,8 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 	ValueWindowCoords.left   = 6 + LabelWindowSize.x;
 	ValueWindowCoords.right  = 6 + LabelWindowSize.x + ValueWindowSize.x + 6;
 	labelWindow[LFRM]        = ffi::txtwin(stringTable[STR_TXT0], LabelWindowCoords);
-	if (form.type == FRMLINE) {
-		choice = stringTable[STR_EDG1];
-	}
-	else {
-		choice = stringTable[STR_FREH];
-	}
-	valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
+	auto choice              = (form.type == FRMLINE) ? stringTable[STR_EDG1] : stringTable[STR_FREH];
+	valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
 	valueWindow[LLAYR]
@@ -166,30 +160,15 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 	ffi::nxtlin(formMenuEntryCount);
 	if (form.type != FRMLINE) {
 		labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
-		if ((form.extendedAttribute & AT_CWLK) != 0U) {
-			choice = stringTable[STR_ON];
-		}
-		else {
-			choice = stringTable[STR_OFF];
-		}
+		choice             = ((form.extendedAttribute & AT_CWLK) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 		valueWindow[LCWLK] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		labelWindow[LWALK] = ffi::txtwin(stringTable[STR_WALK], LabelWindowCoords);
-		if ((form.extendedAttribute & AT_WALK) != 0U) {
-			choice = stringTable[STR_ON];
-		}
-		else {
-			choice = stringTable[STR_OFF];
-		}
+		choice             = ((form.extendedAttribute & AT_WALK) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 		valueWindow[LWALK] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		labelWindow[LUND] = ffi::txtwin(stringTable[STR_UND], LabelWindowCoords);
-		if ((form.extendedAttribute & AT_UND) != 0U) {
-			choice = stringTable[STR_ON];
-		}
-		else {
-			choice = stringTable[STR_OFF];
-		}
+		choice            = ((form.extendedAttribute & AT_UND) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 		valueWindow[LUND] = ffi::txtrwin(choice, ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 		if ((form.extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0U) {
@@ -229,32 +208,17 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 			    = ffi::numwin(stringTable[wrap::toSize(form.fillInfo.feather.fillType) - 1U + STR_FTH0], ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LFTHBLND] = ffi::txtwin(stringTable[STR_FTHBLND], LabelWindowCoords);
-			if ((form.extendedAttribute & AT_FTHBLND) != 0U) {
-				choice = stringTable[STR_ON];
-			}
-			else {
-				choice = stringTable[STR_OFF];
-			}
+			choice                = ((form.extendedAttribute & AT_FTHBLND) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 			valueWindow[LFTHBLND] = ffi::txtrwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			if ((form.extendedAttribute & AT_FTHBLND) == 0U) {
 				labelWindow[LFTHBTH] = ffi::txtwin(stringTable[STR_FTHBOTH], LabelWindowCoords);
-				if ((form.extendedAttribute & (AT_FTHBTH)) != 0U) {
-					choice = stringTable[STR_ON];
-				}
-				else {
-					choice = stringTable[STR_OFF];
-				}
+				choice = ((form.extendedAttribute & (AT_FTHBTH)) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 				valueWindow[LFTHBTH] = ffi::txtrwin(choice, ValueWindowCoords);
 				ffi::nxtlin(formMenuEntryCount);
 				if ((form.extendedAttribute & AT_FTHBTH) == 0U) {
 					labelWindow[LFTHUP] = ffi::txtwin(stringTable[STR_FTHUP], LabelWindowCoords);
-					if ((form.extendedAttribute & AT_FTHUP) != 0U) {
-						choice = stringTable[STR_ON];
-					}
-					else {
-						choice = stringTable[STR_OFF];
-					}
+					choice = ((form.extendedAttribute & AT_FTHUP) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 					valueWindow[LFTHUP] = ffi::txtrwin(choice, ValueWindowCoords);
 					ffi::nxtlin(formMenuEntryCount);
 				}
@@ -319,23 +283,13 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		}
 		if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF || texture::istx(ClosestFormToCursor)) {
 			labelWindow[LBFILSQR] = ffi::txtwin(stringTable[STR_PRF2], LabelWindowCoords);
-			if ((form.extendedAttribute & AT_SQR) != 0U) {
-				choice = stringTable[STR_SQR];
-			}
-			else {
-				choice = stringTable[STR_PNTD];
-			}
+			choice                = ((form.extendedAttribute & AT_SQR) != 0U) ? stringTable[STR_SQR] : stringTable[STR_PNTD];
 			valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 	}
 	labelWindow[LFSTRT] = ffi::txtwin(stringTable[STR_FSTRT], LabelWindowCoords);
-	if ((form.extendedAttribute & AT_STRT) != 0U) {
-		choice = stringTable[STR_ON];
-	}
-	else {
-		choice = stringTable[STR_OFF];
-	}
+	choice              = ((form.extendedAttribute & AT_STRT) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 	valueWindow[LFSTRT] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
@@ -344,12 +298,7 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LFEND] = ffi::txtwin(stringTable[STR_FEND], LabelWindowCoords);
-	if ((form.extendedAttribute & AT_END) != 0U) {
-		choice = stringTable[STR_ON];
-	}
-	else {
-		choice = stringTable[STR_OFF];
-	}
+	choice             = ((form.extendedAttribute & AT_END) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 	valueWindow[LFEND] = ffi::txtrwin(choice, ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & AT_END) != 0U) {
@@ -373,12 +322,9 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		ffi::nxtlin(formMenuEntryCount);
 		if ((edgeArray[iEdge] & BESPAC) != 0) {
 			labelWindow[LBRDSPAC] = ffi::txtwin(stringTable[STR_TXT9], LabelWindowCoords);
-			if (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN) {
-				choice = fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN));
-			}
-			else {
-				choice = fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN * 2));
-			}
+			choice                = (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
+			             ? fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN))
+			             : fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN * 2));
 			valueWindow[LBRDSPAC] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
@@ -424,43 +370,24 @@ void formForms::internal::refrmfn(const FRMHED& form, uint32_t& formMenuEntryCou
 		}
 		if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
 			labelWindow[LBRDUND] = ffi::txtwin(stringTable[STR_TXT17], LabelWindowCoords);
-			if ((form.edgeType & EGUND) != 0U) {
-				choice = stringTable[STR_ON];
-			}
-			else {
-				choice = stringTable[STR_OFF];
-			}
+			choice               = ((form.edgeType & EGUND) != 0U) ? stringTable[STR_ON] : stringTable[STR_OFF];
 			valueWindow[LBRDUND] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if ((edgeArray[iEdge] & BCNRSIZ) != 0) {
-			if (form.edgeType == EDGEBHOL) {
-				choice = fmt::format(L"{:.2f}", (form::getblen() / PFGRAN));
-			}
-			else {
-				choice = fmt::format(L"{:.2f}", (form::getplen() / PFGRAN));
-			}
+			choice = (form.edgeType == EDGEBHOL) ? fmt::format(L"{:.2f}", (form::getblen() / PFGRAN))
+			                                     : fmt::format(L"{:.2f}", (form::getplen() / PFGRAN));
 			labelWindow[LBCSIZ] = ffi::txtwin(stringTable[STR_TXT13], LabelWindowCoords);
 			valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
 		if (form.type == FRMLINE && ((edgeArray[iEdge] & BRDEND) != 0)) {
 			labelWindow[LBSTRT] = ffi::txtwin(stringTable[STR_TXT14], LabelWindowCoords);
-			if ((form.attribute & SBLNT) != 0U) {
-				choice = stringTable[STR_BLUNT];
-			}
-			else {
-				choice = stringTable[STR_TAPR];
-			}
+			choice              = ((form.attribute & SBLNT) != 0U) ? stringTable[STR_BLUNT] : stringTable[STR_TAPR];
 			valueWindow[LBSTRT] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 			labelWindow[LBFIN] = ffi::txtwin(stringTable[STR_TXT15], LabelWindowCoords);
-			if ((form.attribute & FBLNT) != 0U) {
-				choice = stringTable[STR_BLUNT];
-			}
-			else {
-				choice = stringTable[STR_TAPR];
-			}
+			choice             = ((form.attribute & FBLNT) != 0U) ? stringTable[STR_BLUNT] : stringTable[STR_TAPR];
 			valueWindow[LBFIN] = ffi::numwin(choice, ValueWindowCoords);
 			ffi::nxtlin(formMenuEntryCount);
 		}
