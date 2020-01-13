@@ -3539,9 +3539,7 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
                              double                        gapToClosestRegion,
                              uint32_t&                     nextGroup) noexcept -> bool {
 	const auto lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
-	auto       lineEndPoint0End   = gsl::narrow_cast<SMALPNTL*>(nullptr);
 	const auto lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
-	auto       lineEndPoint1End   = gsl::narrow_cast<SMALPNTL*>(nullptr);
 	const auto group0Start        = lineEndPoint0Start->group;
 	auto       group0End          = 0U;
 	const auto group1Start        = lineEndPoint1Start->group;
@@ -3566,8 +3564,8 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
 		return true;
 	}
 
-	lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
-	lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
+	const auto lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
+	const auto lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
 	group1End        = lineEndPoint1End->group;
 	group0End        = lineEndPoint0End->group;
 	auto groupEnd    = 0U;
@@ -3976,7 +3974,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 		}
 		else {
 			auto iLine = start;
-			for (iLine = start; iLine <= finish; iLine++) {
+			for (; iLine <= finish; iLine++) {
 				if (sequenceMap.test_set(iLine)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 						flag          = true;
@@ -7402,7 +7400,6 @@ void form::join() {
 		form::fltspac(form.vertexCount, wrap::toUnsigned(vertexList.size()));
 		auto dest = std::next(FormVertices->begin(), insertionPoint);
 		std::copy(vertexList.cbegin(), vertexList.cend(), dest);
-		vertexIt          = std::next(FormVertices->cbegin(), form.vertexIndex);
 		form.vertexCount += gsl::narrow<decltype(form.vertexCount)>(vertexList.size());
 		form::frmout(ClosestFormToCursor);
 		form::refil();
@@ -7897,19 +7894,8 @@ void form::internal::stchfrm(uint32_t formIndex, uint32_t& attribute) noexcept {
 }
 
 void form::frmnumfn(uint32_t newFormIndex) {
-	auto start  = 0U;
-	auto finish = 0U;
-
 	thred::savdo();
 	if (newFormIndex != ClosestFormToCursor) {
-		if (ClosestFormToCursor > newFormIndex) {
-			start  = newFormIndex;
-			finish = ClosestFormToCursor;
-		}
-		else {
-			start  = ClosestFormToCursor;
-			finish = newFormIndex;
-		}
 		auto formRelocationIndex = 0U;
 		auto sourceForm          = 0U;
 
@@ -7958,6 +7944,11 @@ void form::frmnumfn(uint32_t newFormIndex) {
 					fi::stchfrm(newFormIndex, stitch.attribute);
 				}
 				else {
+					auto start = newFormIndex;
+					auto finish = ClosestFormToCursor;
+					if (ClosestFormToCursor < newFormIndex) {
+						std::swap(start, finish);
+					}
 					if (decodedFormIndex >= start && decodedFormIndex <= finish) {
 						if (newFormIndex < ClosestFormToCursor) {
 							fi::stchfrm(decodedFormIndex + 1, stitch.attribute);
