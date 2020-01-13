@@ -6849,27 +6849,21 @@ void form::frmon() {
 }
 
 void form::internal::fnord() {
-	auto& currentForm                      = FormList->operator[](ClosestFormToCursor);
-	auto                          vertexIt = std::next(FormVertices->begin(), currentForm.vertexIndex);
-	for (auto iVertex = 0U; iVertex < (currentForm.vertexCount / 2); iVertex++) {
-		std::swap(vertexIt[iVertex], vertexIt[currentForm.vertexCount - iVertex - 1U]);
-	}
+	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	auto start = std::next(FormVertices->begin(), currentForm.vertexIndex);
+	auto end   = std::next(start, currentForm.vertexCount);
+	std::reverse(start, end);
 	form::refil();
 }
 
 void form::flpord() {
-	auto iVertex  = 0U;
-	auto iForward = 0U;
-	auto start    = 0U;
-	auto finish   = 0U;
-
 	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
-		start         = SelectedFormVertices.start;
-		finish        = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % form.vertexCount;
+		auto start    = SelectedFormVertices.start;
+		auto finish   = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % form.vertexCount;
 		auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
-		for (iVertex = 0; iVertex <= (SelectedFormVertices.vertexCount / 2); iVertex++) {
+		for (auto iVertex = 0U; iVertex <= (SelectedFormVertices.vertexCount / 2); iVertex++) {
 			std::swap(vertexIt[start], vertexIt[finish]);
 			start = form::pdir(form, start);
 			StateMap.flip(StateFlag::PSELDIR);
@@ -6899,12 +6893,9 @@ void form::flpord() {
 			if (StateMap.test(StateFlag::GRPSEL)) {
 				thred::savdo();
 				thred::rngadj();
-				iForward             = GroupStartStitch;
-				const auto endStitch = ((GroupEndStitch - GroupStartStitch) / 2U) + 1U;
-				for (auto iStitch = 0U; iStitch < endStitch; iStitch++) {
-					std::swap(StitchBuffer->operator[](iForward), StitchBuffer->operator[](GroupEndStitch - iStitch));
-					iForward++;
-				}
+				auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
+				auto end   = std::next(StitchBuffer->begin(), GroupEndStitch);
+				std::reverse(start, end);
 				thred::coltab();
 				StateMap.set(StateFlag::RESTCH);
 			}
