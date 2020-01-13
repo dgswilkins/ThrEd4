@@ -271,7 +271,7 @@ namespace internal {
 	           uint32_t&                     lastGroup,
 	           SMALPNTL*                     sequenceLines);
 	void duseq1(const SMALPNTL* sequenceLines);
-	auto duseq2(SMALPNTL* sequenceLines) -> SMALPNTL*;
+	void duseq2(const SMALPNTL* sequenceLines);
 	void duspnd(uint32_t                  stitchLen,
 	            const std::vector<VRCT2>& underlayVerticalRect,
 	            const std::vector<VRCT2>& fillVerticalRect,

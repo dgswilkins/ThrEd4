@@ -3915,11 +3915,10 @@ void form::internal::dunseq(const std::vector<SMALPNTL*>& sortedLines, uint32_t 
 	lastGroup = sortedLines[finish][0].group;
 }
 
-auto form::internal::duseq2(SMALPNTL* sequenceLines) -> SMALPNTL* {
+void form::internal::duseq2(const SMALPNTL* sequenceLines) {
 	if (sequenceLines != nullptr) {
 		rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x), form::midl(sequenceLines[1].y, sequenceLines[0].y));
 	}
-	return sequenceLines;
 }
 
 void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
@@ -3942,22 +3941,24 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				if (sequenceMap.test_set(iLineDec)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 						flag          = true;
-						sequenceLines = duseq2(sortedLines[iLineDec]);
+						duseq2(sortedLines[iLineDec]);
+						sequenceLines = sortedLines[iLineDec];
 					}
 					else {
 						if (savedTopLine != sortedLines[iLineDec][1].line) {
 							if (iLineDec != 0U) {
-								sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
+								duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
 							}
 							flag          = true;
-							sequenceLines = duseq2(sortedLines[iLineDec]);
+							duseq2(sortedLines[iLineDec]);
+							sequenceLines = sortedLines[iLineDec];
 							savedTopLine  = sequenceLines[1].line;
 						}
 					}
 				}
 				else {
 					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-						sequenceLines = duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
+						duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
 					}
 					flag          = true;
 					sequenceLines = sortedLines[iLineDec];
@@ -3966,7 +3967,8 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			}
 			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 				flag          = true;
-				sequenceLines = duseq2(sortedLines[iLine]);
+				duseq2(sortedLines[iLine]);
+				sequenceLines = sortedLines[iLine];
 			}
 			if (flag) {
 				lastGroup = sequenceLines->group;
@@ -3978,15 +3980,17 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				if (sequenceMap.test_set(iLine)) {
 					if (!StateMap.testAndSet(StateFlag::SEQDUN)) {
 						flag          = true;
-						sequenceLines = duseq2(sortedLines[iLine]);
+						duseq2(sortedLines[iLine]);
+						sequenceLines = sortedLines[iLine];
 					}
 					else {
 						if (savedTopLine != sortedLines[iLine][1].line) {
 							if (iLine != 0U) {
-								sequenceLines = duseq2(sortedLines[iLine - 1U]); // NOLINT
+								duseq2(sortedLines[iLine - 1U]); // NOLINT
 							}
 							flag          = true;
-							sequenceLines = duseq2(sortedLines[iLine]);
+							duseq2(sortedLines[iLine]);
+							sequenceLines = sortedLines[iLine];
 							savedTopLine  = sequenceLines[1].line;
 						}
 					}
@@ -3994,7 +3998,7 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 				else {
 					if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 						if (iLine != 0U) {
-							sequenceLines = duseq2(sortedLines[iLine - 1U]); // NOLINT
+							duseq2(sortedLines[iLine - 1U]); // NOLINT
 						}
 					}
 					flag          = true;
@@ -4005,7 +4009,8 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
 			if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 				if (iLine != 0U) {
 					flag          = true;
-					sequenceLines = duseq2(sortedLines[iLine - 1U]);
+					duseq2(sortedLines[iLine - 1U]);
+					sequenceLines = sortedLines[iLine - 1U];
 				}
 			}
 			if (flag) {
