@@ -1235,8 +1235,8 @@ void form::chkseq(bool border) {
 	if (userStitchLen > MaxStitchLen) {
 		userStitchLen = MaxStitchLen;
 	}
-	bool flag = true;
 	if (!OSequence->empty()) {
+		bool flag = true;
 		for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size()) - 1U; iSequence++) {
 			if (!fi::ritlin(OSequence->operator[](iSequence), OSequence->operator[](wrap::toSize(iSequence) + 1U), userStitchLen)) {
 				flag = false;
@@ -3253,7 +3253,6 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 
 #if CLPVU == 0
 	StateMap.reset(StateFlag::FILDIR);
-	auto previousPoint = 0U;
 	auto clipSegments  = std::vector<CLPSEG> {};
 	auto endPoint      = wrap::toUnsigned(clipStitchPoints.size());
 	if (endPoint != 0U) {
@@ -3267,6 +3266,7 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 				break;
 			}
 			case 1: { // line
+				auto previousPoint = 0U;
 				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 					clpnseg(clipStitchPoints, clipSegments, lengths, previousPoint, iPoint, currentFormVertices);
 				}
@@ -3504,8 +3504,8 @@ auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
 		}
 		if (count0 != 0U) {
 			auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-			auto index1 = 0U;
 			if (const auto lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
+				auto index1 = 0U;
 				while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
 					count1--;
 					index1 += 2;
@@ -3915,11 +3915,11 @@ void form::internal::duseq(const std::vector<SMALPNTL*>& sortedLines,
                            uint32_t&                     lastGroup,
                            SMALPNTL*                     sequenceLines) {
 	auto savedTopLine = sortedLines[start][1].line;
-	bool flag         = false;
 
 	sequenceLines = sortedLines[start];
 	if (sequenceLines != nullptr) {
 		StateMap.reset(StateFlag::SEQDUN);
+		bool flag = false;
 		if (start > finish) {
 			auto iLine = start + 1U;
 			// This odd construction for iLine is used to ensure loop terminates when finish = 0
