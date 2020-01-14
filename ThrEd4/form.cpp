@@ -2805,7 +2805,7 @@ auto form::internal::insect(const FRMHED&              form,
 		          lineSegmentStart,
 		          lineSegmentEnd,
 		          currentFormVertices)) {
-			auto& intersection = clipIntersectData[iIntersection].point;
+			const auto& intersection = clipIntersectData[iIntersection].point;
 			if (intersection.x >= lineSegmentRect.left && intersection.x <= lineSegmentRect.right
 			    && intersection.y >= lineSegmentRect.bottom && intersection.y <= lineSegmentRect.top) {
 				clipIntersectData[iIntersection].segmentLength
@@ -7118,9 +7118,7 @@ auto form::rotpar() -> fPOINT {
 	if (StateMap.test(StateFlag::GMRK)) {
 		return ZoomMarkPoint;
 	}
-	else {
-		return fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
-	}
+	return fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 }
 
 void form::internal::rotentr(double rotationAngle) {
@@ -8277,6 +8275,7 @@ auto form::internal::spltlin() -> bool {
 	}
 	fi::nufpnt(ClosestVertexToCursor, form);
 	auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + ClosestVertexToCursor);
+	// cppcheck-suppress unreadVariable
 	vertexIt[1U]  = vertexIt[0U];
 	form::frmlin(form);
 
