@@ -260,7 +260,7 @@ namespace internal {
 	           const std::vector<SMALPNTL*>& sortedLines,
 	           uint32_t                      pthi,
 	           uint32_t                      lineCount,
-	           std::vector<REGION>&          regionsList,
+	           const std::vector<REGION>&    regionsList,
 	           uint32_t&                     lastGroup,
 	           uint32_t                      sequencePathIndex);
 	void duromb(const fPOINT& start0, const fPOINT& finish0, const fPOINT& start1, const fPOINT& finish1);
@@ -336,7 +336,7 @@ namespace internal {
 	           const fPOINT&              lineSegmentEnd,
 	           const std::vector<fPOINT>& currentFormVertices) -> bool;
 	auto isin(const FRMHED&              form,
-	          std::vector<VCLPX>&        regionCrossingData,
+	          const std::vector<VCLPX>&  regionCrossingData,
 	          float                      xCoordinate,
 	          float                      yCoordinate,
 	          uint32_t                   regionCrossingStart,

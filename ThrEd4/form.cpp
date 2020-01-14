@@ -2433,7 +2433,7 @@ void form::internal::blbrd(const FRMHED& form) {
 void form::internal::contf(FRMHED& form) {
 	const auto             start           = form.angleOrClipData.guide.start;
 	auto                   vertexIt        = std::next(FormVertices->cbegin(), form.vertexIndex);
-	auto&                  selectionStart  = vertexIt[start];
+	const auto&            selectionStart  = vertexIt[start];
 	const auto             finish          = form.angleOrClipData.guide.finish;
 	const auto             lowVertexIndex  = start;
 	const auto             highVertexIndex = form.vertexCount - start - 1U;
@@ -2627,7 +2627,7 @@ auto form::internal::vclpComp(const VCLPX& vclpx1, const VCLPX& vclpx2) noexcept
 }
 
 auto form::internal::isin(const FRMHED&              form,
-                          std::vector<VCLPX>&        regionCrossingData,
+                          const std::vector<VCLPX>&  regionCrossingData,
                           float                      xCoordinate,
                           float                      yCoordinate,
                           uint32_t                   regionCrossingStart,
@@ -4013,7 +4013,7 @@ void form::internal::durgn(const FRMHED&                 form,
                            const std::vector<SMALPNTL*>& sortedLines,
                            uint32_t                      pthi,
                            uint32_t                      lineCount,
-                           std::vector<REGION>&          regionsList,
+                           const std::vector<REGION>&    regionsList,
                            uint32_t&                     lastGroup,
                            uint32_t                      sequencePathIndex) {
 	auto        sequenceMap   = boost::dynamic_bitset<>(lineCount);
