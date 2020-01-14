@@ -3632,7 +3632,7 @@ auto form::internal::notdun(std::vector<RGSEQ>&            tempPath,
 		regionPath[iPath].count = mapIndexSequence[wrap::toSize(pathMap[regionPath[wrap::toSize(iPath) - 1U].pcon].node) + 1U]
 		                          - regionPath[iPath].pcon;
 	}
-	while (visitedRegions[pathMap[regionPath[previousLevel].pcon].node] && previousLevel >= 0) {
+	while (visitedRegions[pathMap[regionPath[previousLevel].pcon].node]) {
 		if (--regionPath[previousLevel].count > 0) {
 			regionPath[previousLevel].pcon++;
 		}
