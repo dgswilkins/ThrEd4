@@ -364,7 +364,6 @@ namespace internal {
 	            uint32_t                       pathLength,
 	            uint32_t                       doneRegion,
 	            uint32_t                       sequencePathIndex) -> bool;
-	auto notsel() noexcept -> bool;
 	auto nucseg(const std::vector<CLPSEG>& clipSegments, const std::vector<LENINFO>& sortedLengths, uint32_t& currentSegmentIndex)
 	    -> bool;
 	void nufpnt(uint32_t vertex, FRMHED& formForInsert);

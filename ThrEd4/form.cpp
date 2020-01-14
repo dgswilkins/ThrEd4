@@ -2577,13 +2577,8 @@ void form::internal::contf(FRMHED& form) {
 }
 
 void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices) {
-	auto leftEdge = 1e9F;
+	auto leftEdge = (std::min_element(currentFormVertices.begin(), currentFormVertices.end(), [](const fPOINT& a, const fPOINT& b) {  return a.x < b.x; }))->x;
 
-	for (auto vertex : currentFormVertices) {
-		if (vertex.x < leftEdge) {
-			leftEdge = vertex.x;
-		}
-	}
 	if (leftEdge < ClipRectSize.cx) {
 		StateMap.set(StateFlag::WASNEG);
 		formOffset = ClipRectSize.cx + fabs(leftEdge) + .01F;
@@ -7406,22 +7401,13 @@ void form::refilal() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-auto form::internal::notsel() noexcept -> bool {
-	for (auto selectedForm : (*SelectedFormList)) {
-		if (selectedForm == ClosestFormToCursor) {
-			return false;
-		}
-	}
-	return true;
-}
-
 void form::nufsel() {
 	if (!FormList->empty()) {
 		StateMap.reset(StateFlag::FORMSEL);
 		if (StateMap.testAndReset(StateFlag::WASEL)) {
 			SelectedFormList->push_back(PreviousFormIndex);
 		}
-		if (fi::notsel()) {
+		if (std::none_of(SelectedFormList->begin(), SelectedFormList->end(), [](uint32_t i) {return i == ClosestFormToCursor; })) {
 			SelectedFormList->push_back(ClosestFormToCursor);
 		}
 		StateMap.set(StateFlag::RESTCH);
