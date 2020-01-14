@@ -7090,7 +7090,6 @@ void form::internal::dufcntr(fPOINT& center) noexcept {
 }
 
 auto form::rotpar() -> fPOINT {
-	auto rotationCenter = fPOINT {};
 	do {
 		if (StateMap.test(StateFlag::FORMSEL)) {
 			RotationRect = FormList->operator[](ClosestFormToCursor).rectangle;
@@ -7117,13 +7116,11 @@ auto form::rotpar() -> fPOINT {
 		}
 	} while (false);
 	if (StateMap.test(StateFlag::GMRK)) {
-		rotationCenter = ZoomMarkPoint;
+		return ZoomMarkPoint;
 	}
 	else {
-		rotationCenter
-		    = fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
+		return fPOINT { form::midl(RotationRect.right, RotationRect.left), form::midl(RotationRect.top, RotationRect.bottom) };
 	}
-	return rotationCenter;
 }
 
 void form::internal::rotentr(double rotationAngle) {
