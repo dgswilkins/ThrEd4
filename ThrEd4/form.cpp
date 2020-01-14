@@ -2786,7 +2786,6 @@ auto form::internal::insect(const FRMHED&              form,
 	auto  iIntersection   = 0U;
 	auto  count           = 0U;
 	auto  lineSegmentRect = fRECTANGLE {};
-	auto* intersection    = gsl::narrow_cast<fPOINT*>(nullptr);
 
 	if (lineSegmentEnd.x > lineSegmentStart.x) {
 		lineSegmentRect.left  = lineSegmentStart.x;
@@ -2816,9 +2815,9 @@ auto form::internal::insect(const FRMHED&              form,
 		          lineSegmentStart,
 		          lineSegmentEnd,
 		          currentFormVertices)) {
-			intersection = &clipIntersectData[iIntersection].point;
-			if (intersection->x >= lineSegmentRect.left && intersection->x <= lineSegmentRect.right
-			    && intersection->y >= lineSegmentRect.bottom && intersection->y <= lineSegmentRect.top) {
+			auto& intersection = clipIntersectData[iIntersection].point;
+			if (intersection.x >= lineSegmentRect.left && intersection.x <= lineSegmentRect.right
+			    && intersection.y >= lineSegmentRect.bottom && intersection.y <= lineSegmentRect.top) {
 				clipIntersectData[iIntersection].segmentLength
 				    = hypot(clipIntersectData[iIntersection].point.x - lineSegmentStart.x,
 				            clipIntersectData[iIntersection].point.y - lineSegmentStart.y);
