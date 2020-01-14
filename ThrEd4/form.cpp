@@ -1834,19 +1834,17 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t 
 	const auto outerDelta  = fPOINT { (fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
                                      (fillVerticalRect[finish].copnt.y - fillVerticalRect[start].bopnt.y) };
 	const auto outerLength = hypot(outerDelta.x, outerDelta.y);
-	auto       pivot       = fPOINT {};
 	auto       startDelta  = fPOINT {};
 	auto       finishDelta = fPOINT {};
 
+	auto pivot = (outerLength > innerLength) ? fillVerticalRect[start].cipnt : fillVerticalRect[start].copnt;
 	if (outerLength > innerLength) {
-		pivot         = fillVerticalRect[start].cipnt;
 		startDelta.x  = fillVerticalRect[start].copnt.x - pivot.x;
 		startDelta.y  = fillVerticalRect[start].copnt.y - pivot.y;
 		finishDelta.x = fillVerticalRect[finish].bopnt.x - pivot.x;
 		finishDelta.y = fillVerticalRect[finish].bopnt.y - pivot.y;
 	}
 	else {
-		pivot         = fillVerticalRect[start].copnt;
 		startDelta.x  = fillVerticalRect[start].cipnt.x - pivot.x;
 		startDelta.y  = fillVerticalRect[start].cipnt.y - pivot.y;
 		finishDelta.x = fillVerticalRect[finish].bipnt.x - pivot.x;
@@ -6084,6 +6082,7 @@ void form::setstrtch() {
 
 void form::setexpand(float xyRatio) {
 	auto size0     = fPOINT {};
+	// cppcheck-suppress redundantInitialization
 	auto rectangle = fRECTANGLE {};
 
 	thred::savdo();
