@@ -3259,6 +3259,7 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 		endPoint--;
 		// reserve a reasonable amount but not the full amount potentially required
 		clipSegments.reserve(endPoint / 10U);
+		auto previousPoint = 0U;
 		for (auto iPoint = 0U; iPoint < endPoint; iPoint++) {
 			switch (clipStitchPoints[iPoint].flag) {
 			case 0: { // inside
@@ -3266,7 +3267,6 @@ void form::internal::clpcon(FRMHED& form, const std::vector<RNGCNT>& textureSegm
 				break;
 			}
 			case 1: { // line
-				auto previousPoint = 0U;
 				if (StateMap.testAndFlip(StateFlag::FILDIR)) {
 					clpnseg(clipStitchPoints, clipSegments, lengths, previousPoint, iPoint, currentFormVertices);
 				}
