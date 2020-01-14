@@ -2700,8 +2700,6 @@ auto form::internal::isect(uint32_t                   vertex0,
 	const auto point            = lineSegmentStart;
 	auto       tempIntersection = fPOINT {};
 	auto       flag             = false;
-	auto       left             = 0.0F;
-	auto       right            = 0.0F;
 
 	auto vertexIt = currentFormVertices.cbegin();
 	if ((delta.x != 0.0F) && (delta.y != 0.0F)) {
@@ -2716,13 +2714,10 @@ auto form::internal::isect(uint32_t                   vertex0,
 				flag = projh(point.y, vertexIt[vertex0], vertexIt[vertex1], tempIntersection);
 			}
 			else if (vertexIt[vertex0].y == lineSegmentStart.y && vertexIt[vertex1].y == lineSegmentStart.y) {
-				if (vertexIt[vertex0].x < vertexIt[vertex1].x) {
-					left  = vertexIt[vertex0].x;
-					right = vertexIt[vertex1].x;
-				}
-				else {
-					left  = vertexIt[vertex1].x;
-					right = vertexIt[vertex0].x;
+				auto left  = vertexIt[vertex0].x;
+				auto right = vertexIt[vertex1].x;
+				if (vertexIt[vertex0].x > vertexIt[vertex1].x) {
+					std::swap(left, right);
 				}
 				if (lineSegmentStart.x > left && lineSegmentStart.x < right) {
 					intersection.x = lineSegmentStart.x;
