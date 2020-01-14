@@ -816,7 +816,7 @@ void form::internal::setzig() {
 
 void form::setmfrm() {
 	auto  point                          = POINT { 0L, 0L };
-	auto& closeForm                      = FormList->operator[](ClosestFormToCursor);
+	const auto& closeForm                      = FormList->operator[](ClosestFormToCursor);
 	auto                        vertexIt = std::next(FormVertices->cbegin(), closeForm.vertexIndex);
 	form::sfCor2px(vertexIt[0], point);
 	const auto offset    = POINT { Msg.pt.x - StitchWindowOrigin.x - point.x + wrap::round<int32_t>(FormMoveDelta.x),
@@ -905,7 +905,7 @@ void form::pxrct2stch(const RECT& screenRect, fRECTANGLE& stitchRect) noexcept {
 }
 
 void form::flipv() {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		const auto offset        = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
 		auto       currentVertex = SelectedFormVertices.start;
@@ -1137,7 +1137,7 @@ void form::frmovlin() {
 	}
 	form::frmlin(form);
 	auto  previousPoint = form::prv(form,ClosestVertexToCursor);
-	auto& formLines     = *FormLines;
+	const auto& formLines     = *FormLines;
 	for (auto iPoint = 0; iPoint < 3; iPoint++) {
 		RubberBandLine->operator[](iPoint) = formLines[previousPoint];
 		previousPoint             = form::nxt(form, previousPoint);
@@ -1662,10 +1662,10 @@ auto form::internal::projh(float yCoordinate, const fPOINT& point0, const fPOINT
 }
 
 void form::internal::sprct(const std::vector<fPOINT>* vertices, uint32_t vertexIndex, std::vector<VRCT2>& fillVerticalRect, uint32_t start, uint32_t finish) {
-	auto&      opStart      = OutsidePoints->operator[](start);
-	auto&      opFinish     = OutsidePoints->operator[](finish);
-	auto&      ipStart      = InsidePoints->operator[](start);
-	auto&      ipFinish     = InsidePoints->operator[](finish);
+	const auto&      opStart      = OutsidePoints->operator[](start);
+	const auto&      opFinish     = OutsidePoints->operator[](finish);
+	const auto&      ipStart      = InsidePoints->operator[](start);
+	const auto&      ipFinish     = InsidePoints->operator[](finish);
 	const auto delta        = fPOINT { (opFinish.x - opStart.x), (opFinish.y - opStart.y) };
 	auto       point        = fPOINT {};
 	auto&      verticalRect = fillVerticalRect[start];
@@ -1768,7 +1768,7 @@ void form::internal::spurfn(const fPOINT& innerPoint,
 void form::internal::spurct(std::vector<VRCT2>&       underlayVerticalRect,
                             const std::vector<VRCT2>& fillVerticalRect,
                             uint32_t                  iRect) noexcept {
-	auto& fRect  = fillVerticalRect[iRect];
+	const auto& fRect  = fillVerticalRect[iRect];
 	auto& ulRect = underlayVerticalRect[iRect];
 	spurfn(fRect.aipnt, fRect.aopnt, ulRect.aipnt, ulRect.aopnt);
 	spurfn(fRect.bipnt, fRect.bopnt, ulRect.bipnt, ulRect.bopnt);
@@ -4991,7 +4991,7 @@ void form::refil() {
 }
 
 void form::setfpnt() {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 
 	const auto screenCoordinate = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 	auto       vertexIt         = std::next(FormVertices->begin(), form.vertexIndex);
@@ -6599,7 +6599,7 @@ void form::dueg(uint32_t sides) {
 		sides = 8U;
 	}
 	form::durpoli(sides);
-	auto& form = FormList->back();
+	const auto& form = FormList->back();
 
 	auto       vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	const auto reference = form::midl(vertexIt[sides / 2].y, vertexIt[0].y);
@@ -6654,7 +6654,7 @@ void form::duzig(uint32_t vertices) {
 }
 
 void form::fliph() {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if (StateMap.test(StateFlag::FPSEL)) {
 		thred::savdo();
 		const auto offset        = SelectedVerticesRect.right + SelectedVerticesRect.left;
@@ -6838,7 +6838,7 @@ void form::frmon() {
 }
 
 void form::internal::fnord() {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	const auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	auto start = std::next(FormVertices->begin(), currentForm.vertexIndex);
 	auto end   = std::next(start, currentForm.vertexCount);
 	std::reverse(start, end);
@@ -7415,7 +7415,7 @@ void form::nufsel() {
 }
 
 void form::frmadj(uint32_t formIndex) {
-	auto& form = FormList->operator[](formIndex);
+	const auto& form = FormList->operator[](formIndex);
 	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 		vertexIt[iVertex].x += FormMoveDelta.x;
