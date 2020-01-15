@@ -281,9 +281,9 @@ auto clip::internal::ritclp(const std::vector<fPOINT>& clipFillData, const fPOIN
 		retval = true;
 	}
 	else {
-		for (auto& data : clipFillData) {
-			OSequence->push_back(fPOINT { data.x + adjustedPoint.x, data.y + adjustedPoint.y });
-		}
+		std::transform(clipFillData.begin(), clipFillData.end(), std::back_inserter(*OSequence), [&adjustedPoint](const auto& data) {
+			return fPOINT { data.x + adjustedPoint.x, data.y + adjustedPoint.y };
+		});
 	}
 	return retval;
 }
@@ -667,14 +667,14 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
 	const auto& form       = FormList->operator[](ClosestFormToCursor);
 	if (form.type == FRMLINE) {
 		const auto pivot = ClipRectSize.cy / 2;
-		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back(clip.x, (-clip.y + pivot));
-		}
+		std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) {
+			return fPOINT { clip.x, (-clip.y + pivot) };
+		});
 	}
 	else {
-		for (auto& clip : clipBuffer) {
-			tempClipPoints.emplace_back(clip.x, (-clip.y));
-		}
+		std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [](auto& clip) {
+			return fPOINT { clip.x, (-clip.y) };
+		});
 	}
 }
 
