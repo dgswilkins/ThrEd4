@@ -74,7 +74,7 @@ void satin::internal::sacspac(uint32_t startGuide, uint32_t guideCount) {
 
 auto satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t {
 	auto  guideIndex = 0U;
-	auto& formList   = *FormList;
+	const auto& formList   = *FormList;
 
 	for (auto iForm = 0U; iForm < formIndex; iForm++) {
 		auto& form = formList[iForm];
@@ -1064,7 +1064,7 @@ void satin::internal::satmf(const FRMHED& form, const std::vector<float>& length
 		auto& nextGuide = guideIt[wrap::toSize(iGuide) + 1U];
 		si::satfn(form, lengths, thisGuide.start, nextGuide.start, thisGuide.finish, nextGuide.finish);
 	}
-	auto& endGuide = form.wordParam;
+	const auto& endGuide = form.wordParam;
 	if (endGuide != 0U) {
 		si::satfn(form, lengths, guideIt[endGuideIndex].start, endGuide, guideIt[endGuideIndex].finish, endGuide + 1U);
 	}
