@@ -467,6 +467,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 }
 
 void formForms::internal::prftwin(const std::wstring& text) noexcept {
+	// cppcheck-suppress ignoredReturnValue
 	CreateWindow(L"STATIC", // NOLINT
 	             text.c_str(),
 	             WS_CHILD | WS_VISIBLE,
@@ -856,7 +857,9 @@ void formForms::dasyfrm() {
 	}
 	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	if (UserFlagMap.test(UserFlag::DAZHOL)) {
+		// cppcheck-suppress unreadVariable
 		vertexIt[fref - 1U].y += 0.01F;
+		// cppcheck-suppress unreadVariable
 		vertexIt[fref].y += 0.01F;
 	}
 	form.vertexCount = iVertex;
