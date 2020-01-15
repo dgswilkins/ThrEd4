@@ -2170,25 +2170,19 @@ void form::internal::chkbrd(const FRMHED& form) {
 void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
                            std::vector<uint32_t>& groupIndexSequence,
                            std::vector<SMALPNTL>& lineEndpoints) {
-	auto highX  = currentFillVertices[0].x;
-	auto lowX   = currentFillVertices[0].x;
-	const auto currentVertexCount = wrap::toUnsigned(currentFillVertices.size());
-	for (auto fillVertex = std::next(currentFillVertices.cbegin(), 1); fillVertex < currentFillVertices.end(); fillVertex++) {
-		if (fillVertex->x > highX) {
-			highX = fillVertex->x;
-		}
-		if (fillVertex->x < lowX) {
-			lowX = fillVertex->x;
-		}
-	}
-
+	const auto [min, max]      = std::minmax_element(std::next(currentFillVertices.begin(), 1),
+                                                currentFillVertices.end(),
+                                                [](const fPOINT& a, const fPOINT& b) { return a.x < b.x; });
+	auto highX  = max->x;
+	auto lowX   = min->x;
 	auto lineOffset            = wrap::floor<int32_t>(lowX / LineSpacing);
 	lowX                       = LineSpacing * lineOffset;
 	auto       fillLineCount   = wrap::floor<uint32_t>((gsl::narrow_cast<double>(highX) - lowX) / LineSpacing + 1.0F);
 	const auto step            = (highX - lowX) / fillLineCount;
 	auto       currentX        = lowX;
 	auto       projectedPoints = std::vector<fPOINTLINE> {};
-	projectedPoints.reserve(wrap::toSize(currentVertexCount) + 2U);
+	projectedPoints.reserve(currentFillVertices.size() + 2U);
+	const auto currentVertexCount = wrap::toUnsigned(currentFillVertices.size());
 	for (auto iLine = 0U; iLine < fillLineCount; iLine++) {
 		auto iLineCounter = 0U;
 		currentX += step;
@@ -2489,7 +2483,7 @@ void form::internal::contf(FRMHED& form) {
 		highIndex++;
 	}
 	auto lowSpacing = form.fillSpacing;
-	auto highSpacing = form.fillSpacing; 
+	auto highSpacing = lowSpacing; 
 	if (highLength < lowLength) {
 		highSpacing = form.fillSpacing * highLength / lowLength;
 	}
