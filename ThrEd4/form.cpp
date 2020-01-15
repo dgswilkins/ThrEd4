@@ -1837,7 +1837,7 @@ void form::internal::spend(const std::vector<VRCT2>& fillVerticalRect, uint32_t 
 	auto       startDelta  = fPOINT {};
 	auto       finishDelta = fPOINT {};
 
-	auto pivot = (outerLength > innerLength) ? fillVerticalRect[start].cipnt : fillVerticalRect[start].copnt;
+	const auto pivot = (outerLength > innerLength) ? fillVerticalRect[start].cipnt : fillVerticalRect[start].copnt;
 	if (outerLength > innerLength) {
 		startDelta.x  = fillVerticalRect[start].copnt.x - pivot.x;
 		startDelta.y  = fillVerticalRect[start].copnt.y - pivot.y;
