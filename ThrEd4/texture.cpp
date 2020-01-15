@@ -1023,11 +1023,11 @@ void texture::internal::txang(FRMHED& form) {
 }
 
 void texture::deltx(uint32_t formIndex) {
-	auto  flag                          = false;
 	auto& form                          = FormList->operator[](formIndex);
 	const auto&            currentIndex = form.fillInfo.texture.index;
 
 	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
+		auto flag = false;
 		// First check to see if the texture is shared between forms
 		for (auto iForm = 0U; iForm < formIndex; iForm++) {
 			if (texture::istx(iForm)) {
