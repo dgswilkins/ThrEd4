@@ -230,14 +230,12 @@ void repair::internal::chkfstch() noexcept {
 
 void repair::internal::repflt(std::wstring& repairMessage) {
 	auto  iDestination = 0U;
-	auto  vertexCount  = 0U;
 	auto  badData      = BADCNTS {};
 	auto& formList     = *FormList;
 
 	for (auto form : *FormList) {
 		if (form.vertexCount != 0U) {
 			formList[iDestination++] = form;
-			vertexCount += form.vertexCount;
 		}
 	}
 	formList.resize(iDestination);
