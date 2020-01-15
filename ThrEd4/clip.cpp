@@ -45,7 +45,7 @@ float    AdjustedSpace;       // adjusted space
 uint32_t NextStart;           // index of the endpoint of the line segment being processed
 
 auto clip::iseclp(uint32_t iForm) noexcept -> bool {
-	auto& form = FormList->operator[](iForm);
+	const auto& form = FormList->operator[](iForm);
 	return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
 
@@ -58,7 +58,7 @@ auto clip::isclp(const FRMHED& form) noexcept -> bool {
 }
 
 auto clip::isclpx(uint32_t iForm) noexcept -> bool {
-	auto& form = FormList->operator[](iForm);
+	const auto& form = FormList->operator[](iForm);
 	return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
 }
 
@@ -67,7 +67,7 @@ auto clip::isclpx(const FRMHED& form) noexcept -> bool {
 }
 
 auto clip::iseclpx(uint32_t iForm) noexcept -> bool {
-	auto& form = FormList->operator[](iForm);
+	const auto& form = FormList->operator[](iForm);
 	return clip::iseclp(iForm) && (form.clipEntries != 0U);
 }
 
@@ -143,7 +143,7 @@ void clip::delclps(uint32_t formIndex) {
 
 auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	auto  find = ci::findclp(currentForm);
-	auto& form = FormList->operator[](currentForm);
+	const auto& form = FormList->operator[](currentForm);
 	if (clip::isclp(form)) {
 		find += form.lengthOrCount.clipCount;
 	}
