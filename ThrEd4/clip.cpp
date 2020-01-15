@@ -718,37 +718,33 @@ void clip::internal::clpcrnr(const FRMHED& form,
                              uint32_t             vertex,
                              const fPOINT&        rotationCenter) {
 	const auto nextVertex = form::nxt(form, vertex);
-	auto       delta      = dPOINT {};
 
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-	if (StateMap.test(StateFlag::INDIR)) {
-		delta = fPOINT { OutsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x,
-			             OutsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y };
-	}
-	else {
-		delta = fPOINT { InsidePoints->operator[](nextVertex).x - vertexIt[nextVertex].x,
-			             InsidePoints->operator[](nextVertex).y - vertexIt[nextVertex].y };
-	}
-	const auto rotationAngle  = atan2(delta.y, delta.x) + PI / 2;
-	const auto referencePoint = fPOINTATTR { form::midl(clipRect.right, clipRect.left), clipRect.top, 0U };
-	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
-	auto iClip = clipFillData.begin();
-	for (auto& clip : *ClipBuffer) {
-		thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
-		iClip++;
-	}
-	const auto length = hypot(delta.x, delta.y);
-	const auto ratio  = form::getplen() / length;
-	delta.x *= ratio;
-	delta.y *= ratio;
-	const auto point = fPOINT { vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
-	OSequence->push_back(vertexIt[nextVertex]);
-	OSequence->push_back(point);
-	OSequence->push_back(vertexIt[nextVertex]);
-	OSequence->push_back(point);
-	if (!ci::ritclp(clipFillData, point)) {
+	const auto points = StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+	if (points != nullptr) {
+		auto delta = fPOINT{ points->operator[](nextVertex).x - vertexIt[nextVertex].x,
+							 points->operator[](nextVertex).y - vertexIt[nextVertex].y };
+		const auto rotationAngle = atan2(delta.y, delta.x) + PI / 2;
+		const auto referencePoint = fPOINTATTR{ form::midl(clipRect.right, clipRect.left), clipRect.top, 0U };
+		thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+		auto iClip = clipFillData.begin();
+		for (auto& clip : *ClipBuffer) {
+			thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
+			iClip++;
+		}
+		const auto length = hypot(delta.x, delta.y);
+		const auto ratio  = form::getplen() / length;
+		delta.x *= ratio;
+		delta.y *= ratio;
+		const auto point = fPOINT { vertexIt[nextVertex].x + delta.x, vertexIt[nextVertex].y + delta.y };
+		OSequence->push_back(vertexIt[nextVertex]);
 		OSequence->push_back(point);
 		OSequence->push_back(vertexIt[nextVertex]);
+		OSequence->push_back(point);
+		if (!ci::ritclp(clipFillData, point)) {
+			OSequence->push_back(point);
+			OSequence->push_back(vertexIt[nextVertex]);
+		}
 	}
 }
 
