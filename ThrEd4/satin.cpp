@@ -268,6 +268,7 @@ void satin::internal::satclos() {
 				auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
 
 				guideIt[initialGuideCount].start  = closestVertex;
+				// cppcheck-suppress unreadVariable
 				guideIt[initialGuideCount].finish = ClosestVertexToCursor;
 				form.satinGuideCount              = 1;
 			}
@@ -922,7 +923,7 @@ void satin::internal::satfn(const FRMHED&             form,
 		segmentStitchCount = 0;
 		while (iVertex > line2End) {
 			const auto val
-			    = wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount);
+				= wrap::ceil<uint32_t>(((lengths[iNextVertex] - lengths[iVertex]) / line2Length) * stitchCount);
 			line2StitchCounts.push_back(val);
 			segmentStitchCount += val;
 			iNextVertex = form::prv(form, iNextVertex);
@@ -938,18 +939,8 @@ void satin::internal::satfn(const FRMHED&             form,
 		auto iLine2Vertex  = line2Start;
 		auto line1Delta
 		    = fPOINT { vertexIt[line1Next].x - vertexIt[iLine1Vertex].x, vertexIt[line1Next].y - vertexIt[iLine1Vertex].y };
-		auto line2Delta = fPOINT {};
-		auto line2Point = fPOINT {};
-		if (iLine2Vertex == form.vertexCount) {
-			line2Delta.x = vertexIt[line2Previous].x - vertexIt[0].x;
-			line2Delta.y = vertexIt[line2Previous].y - vertexIt[0].y;
-			line2Point   = vertexIt[0];
-		}
-		else {
-			line2Delta.x = vertexIt[line2Previous].x - vertexIt[iLine2Vertex].x;
-			line2Delta.y = vertexIt[line2Previous].y - vertexIt[iLine2Vertex].y;
-			line2Point   = vertexIt[iLine2Vertex];
-		}
+		auto line2Point  = (iLine2Vertex == form.vertexCount) ? vertexIt[0] : vertexIt[iLine2Vertex];
+		auto line2Delta  = fPOINT { vertexIt[line2Previous].x - line2Point.x, vertexIt[line2Previous].y - line2Point.y };
 		iLine1Vertex     = form::nxt(form, iLine1Vertex);
 		iLine2Vertex     = form::prv(form, iLine2Vertex);
 		auto line1Step   = fPOINT { line1Delta.x / line1Count, line1Delta.y / line1Count };
