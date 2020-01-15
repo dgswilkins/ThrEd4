@@ -190,8 +190,8 @@ auto clip::numclp() -> uint32_t {
 
 void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) {
 	auto  clipIt     = std::next(ClipPoints->begin(), clipIndex);
-	auto& clipBuffer = *ClipBuffer;
 	if (!StateMap.test(StateFlag::NOCLP)) {
+		auto& clipBuffer = *ClipBuffer;
 		clipBuffer.clear();
 		if (clipEntries != 0U) {
 			clipBuffer.reserve(clipEntries);
