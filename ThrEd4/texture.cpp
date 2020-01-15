@@ -763,7 +763,7 @@ void texture::txtrup() {
 }
 
 void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
-	auto& angledFormVertices = *AngledFormVertices;
+	const auto& angledFormVertices = *AngledFormVertices;
 	rectangle.left           = angledFormVertices[0].x;
 	rectangle.right          = angledFormVertices[0].x;
 	rectangle.bottom         = angledFormVertices[0].y;
