@@ -118,9 +118,7 @@ void texture::internal::redtbak() {
 		if (!textureHistoryItem->texturePoints.empty()) {
 			TempTexturePoints->clear();
 			TempTexturePoints->reserve(textureHistoryItem->texturePoints.size());
-			for (auto texturePoint : textureHistoryItem->texturePoints) {
-				TempTexturePoints->push_back(texturePoint);
-			}
+			TempTexturePoints->insert(TempTexturePoints->begin(), textureHistoryItem->texturePoints.cbegin(), textureHistoryItem->texturePoints.cend());
 		}
 		StateMap.set(StateFlag::RESTCH);
 	}
@@ -373,13 +371,12 @@ void texture::internal::px2ed(const POINT& point, fPOINT& editPoint) noexcept {
 }
 
 void texture::internal::chktx() {
-	auto tmpTexture = std::vector<TXPNT> {};
-	for (auto& p : *TempTexturePoints) {
-		if (p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight) {
-			tmpTexture.push_back(p);
-		}
-	}
-	*TempTexturePoints = tmpTexture;
+	TempTexturePoints->erase(std::remove_if(TempTexturePoints->begin(),
+	                                        TempTexturePoints->end(),
+	                                        [&](const auto& p) -> bool {
+		                                        return !(p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight);
+	                                        }),
+	                         TempTexturePoints->end());
 }
 
 void texture::drwtxtr() {
