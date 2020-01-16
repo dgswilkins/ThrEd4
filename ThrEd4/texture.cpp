@@ -1195,7 +1195,7 @@ void texture::internal::dutxmir() {
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 		auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1U;
-		while (TempTexturePoints->operator[](iPoint).line > centerLine && iPoint >= 0) {
+		while (TempTexturePoints->operator[](iPoint).line > centerLine) {
 			iPoint--;
 		}
 		TempTexturePoints->resize(wrap::toSize(iPoint) + 1U);
