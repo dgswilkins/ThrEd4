@@ -500,7 +500,6 @@ namespace internal {
 	void ritpesCode(std::vector<uint8_t>& buffer);
 	void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
 	void setpes();
-	auto tripl(char* dat) -> uint32_t;
 	void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]);
 #endif
 

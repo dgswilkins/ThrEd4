@@ -5620,10 +5620,6 @@ auto thred::internal::chkdst(const DSTHED* dstHeader) noexcept -> bool {
 
 #if PESACT
 
-auto thred::internal::tripl(char* dat) -> uint32_t {
-	return (*convert_ptr<uint32_t*>(dat)) & 0xffffffU;
-}
-
 auto thred::internal::dupcol(uint32_t activeColor) -> uint32_t {
 	constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
 	const auto     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
