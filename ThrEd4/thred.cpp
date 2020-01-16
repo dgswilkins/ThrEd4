@@ -1039,7 +1039,7 @@ void thred::internal::getdes() noexcept {
 }
 
 auto thred::internal::isfclp() noexcept -> bool {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	return clip::isclp(form) && form.fillType != CLPF;
 }
 
@@ -2865,7 +2865,7 @@ void thred::ritot(uint32_t number) {
 }
 
 void thred::internal::frmcalc() {
-	auto& form = FormList->operator[](ClosestFormToCursor);
+	const auto& form = FormList->operator[](ClosestFormToCursor);
 	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 		const auto code      = ClosestFormToCursor << FRMSHFT;
 		const auto endStitch = StitchBuffer->size() - 1U;
@@ -7486,7 +7486,7 @@ void thred::internal::savclp(uint32_t destination, std::vector<fPOINTATTR>& buff
 
 void thred::rtclpfn(uint32_t destination, uint32_t source) {
 	auto  integer    = 0.0F;
-	auto& clipBuffer = *ClipBuffer;
+	const auto& clipBuffer = *ClipBuffer;
 
 	ClipStitchData[destination].led  = 0;
 	auto fractional                  = modf(clipBuffer[source].x - LowerLeftStitch.x, &integer);
@@ -8817,7 +8817,7 @@ auto thred::internal::isthr(const wchar_t* const filename) -> bool {
 	return (extention.compare(0, 3, L".th") == 0);
 }
 
-auto thred::internal::gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept -> uint32_t {
+auto thred::internal::gethand(const std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept -> uint32_t {
 	auto userStitchCount = 0U;
 	for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
 		if ((stitch[iStitch].attribute & USMSK) != 0U) {
@@ -10827,7 +10827,7 @@ void thred::internal::dumrk(float xCoord, float yCoord) {
 }
 
 void thred::internal::gselrng() noexcept {
-	auto& selectedFormList = *SelectedFormList;
+	const auto& selectedFormList = *SelectedFormList;
 
 	SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
 	for (auto selectedForm : selectedFormList) {

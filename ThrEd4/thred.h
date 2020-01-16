@@ -228,7 +228,7 @@ namespace internal {
 	void getDocsFolder(fs::path* directory);
 	void getfrmbox();
 	void getfrmpix();
-	auto gethand(std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept -> uint32_t;
+	auto gethand(const std::vector<fPOINTATTR>& stitch, uint32_t stitchCount) noexcept -> uint32_t;
 	void getnpix();
 	void getstpix();
 	void gotbox();
