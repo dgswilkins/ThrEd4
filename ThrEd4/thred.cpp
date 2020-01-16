@@ -9228,7 +9228,7 @@ void thred::internal::rebak() {
 		DestroyWindow(iVersion);
 	}
 	auto newFileName    = *ThrName;
-	auto safetyFileName = *ThrName;
+	auto safetyFileName = newFileName; // initialise from local variable
 	auto ext            = newFileName.extension().wstring();
 	ext.back()          = FileVersionIndex + 's';
 	newFileName.replace_extension(ext);
@@ -9254,7 +9254,7 @@ void thred::internal::thumbak() {
 
 void thred::internal::movbak(char source, char destination) {
 	auto sourceFileName      = *ThrName;
-	auto destinationFileName = *ThrName;
+	auto destinationFileName = sourceFileName; // initialise from local variable
 	auto ext                 = ThrName->extension().wstring();
 
 	ext.back() = source;
