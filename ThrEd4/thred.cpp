@@ -7246,10 +7246,9 @@ void thred::sCor2px(const fPOINT& stitchCoordinate, POINT& pixelCoordinate) {
 		    wrap::ceil<int32_t>(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y) };
 }
 
-void thred::internal::sdCor2px(const fPOINTATTR stitchPoint, POINT& pixelCoordinate) {
-	pixelCoordinate
-	    = { wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
-		    wrap::ceil<int32_t>(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y) };
+auto thred::internal::sdCor2px(const fPOINTATTR& stitchPoint) -> POINT {
+	return POINT { wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
+		           wrap::ceil<int32_t>(StitchWindowClientRect.bottom + (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y) };
 }
 
 void thred::internal::durot() noexcept {
@@ -18242,9 +18241,8 @@ void thred::internal::dumov() {
 	                    StitchBuffer->operator[](wrap::toSize(MoveAnchor) + 1U).x - StitchBuffer->operator[](MoveAnchor).x);
 	if (anchorStitch.x >= ZoomRect.left && anchorStitch.x <= ZoomRect.right && anchorStitch.y >= ZoomRect.bottom
 	    && anchorStitch.y <= ZoomRect.top) {
-		auto  rotationCenterPixels = POINT { 0L, 0L };
 		POINT rotationOutline[8]   = {};
-		sdCor2px(StitchBuffer->operator[](MoveAnchor), rotationCenterPixels);
+		auto rotationCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
 		rotationOutline[0]    = rotationCenterPixels;
 		rotationOutline[6]    = rotationCenterPixels;
 		auto OffsetFromCenter = POINT { rotationCenterPixels.x + 12, rotationCenterPixels.y + 2 };

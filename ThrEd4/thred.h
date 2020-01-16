@@ -401,7 +401,7 @@ namespace internal {
 	auto savcmp() noexcept -> bool;
 	void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 	void savmap();
-	void sdCor2px(fPOINTATTR stitchPoint, POINT& pixelCoordinate);
+	auto sdCor2px(const fPOINTATTR& stitchPoint) -> POINT;
 	void segentr(float rotationAngle);
 	void selCol();
 	void selalstch();
