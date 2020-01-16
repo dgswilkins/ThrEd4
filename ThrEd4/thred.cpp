@@ -6107,15 +6107,15 @@ void thred::internal::nuFil() {
 								UserColor[activeColor++] = color;
 							}
 						}
-						auto color    = 0U;
 						PEScolorIndex = 1;
 						auto loc      = fPOINT {};
 						StateMap.reset(StateFlag::FILDIR);
-						auto iPESstitch = 0U;
 						StitchBuffer->push_back(fPOINTATTR {});
-						auto locof = 0.0F;
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
-							const auto pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
+							auto       color      = 0U;
+							auto       iPESstitch = 0U;
+							auto       locof      = 0.0F;
+							const auto pecCount   = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
 							while (iPESstitch < pecCount) {
 								if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
 									break;
