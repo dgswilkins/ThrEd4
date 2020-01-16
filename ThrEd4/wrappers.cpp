@@ -118,10 +118,6 @@ auto wrap::toDouble(float invar) noexcept -> double {
 	return gsl::narrow_cast<double>(invar);
 }
 
-auto wrap::toDouble(int32_t invar) noexcept -> double {
-	return gsl::narrow_cast<double>(invar);
-}
-
 auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 	return gsl::narrow_cast<size_t>(invar);
 }
