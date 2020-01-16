@@ -14503,7 +14503,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					}
 				}
 				MoveLine0[1] = MoveLine1[0] = { Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y };
-				if (ClosestPointIndex <= 0) {
+				if (ClosestPointIndex == 0) {
 					StateMap.reset(StateFlag::ISDWN);
 				}
 				else {
