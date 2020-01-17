@@ -8053,17 +8053,19 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 
 void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 	auto length = 0.0F;
-	auto delta  = fPOINT {};
 	auto finish = start + 1U;
 
 	do {
-		delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
-			             StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y };
+		const auto delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
+			                        StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y };
 
 		length = hypot(delta.x, delta.y);
 		finish++;
 	} while (length < 2.0F && finish < wrap::toUnsigned(StitchBuffer->size()));
 	if (finish < wrap::toUnsigned(StitchBuffer->size())) {
+		const auto delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
+			                        StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y };
+
 		KnotAttribute = StitchBuffer->operator[](start).attribute | KNOTMSK;
 		KnotStep.x    = 2.0F / length * delta.x;
 		KnotStep.y    = 2.0F / length * delta.y;
