@@ -1127,13 +1127,9 @@ void thred::wrnmen() {
 int32_t datcod[] = { ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG };
 
 void thred::chkmen() noexcept {
-	auto code     = UINT { MF_CHECKED };
 	auto lastCode = gsl::narrow_cast<uint32_t>(sizeof(datcod) / sizeof(datcod[0]));
 	for (auto iCode = 0U; iCode < lastCode; iCode++) {
-		code = MF_UNCHECKED;
-		if (iCode == IniFile.dataCheck) {
-			code = MF_CHECKED;
-		}
+		const auto code = (iCode == IniFile.dataCheck) ? UINT { MF_CHECKED } : UINT { MF_UNCHECKED };
 		CheckMenuItem(MainMenu, datcod[iCode], code);
 	}
 }
@@ -16896,6 +16892,8 @@ auto thred::internal::handleFileMenu(const WORD& wParameter) -> bool {
 		break;
 	}
 	case ID_FILE_NEW1: { // file / New
+		// suppress the warning that occurs when DEBUG is true
+		// cppcheck-suppress knownConditionTrueFalse
 		if (!savcmp()) {
 			displayText::savdisc();
 			StateMap.set(StateFlag::NEWBAK);
