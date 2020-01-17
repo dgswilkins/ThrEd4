@@ -5454,16 +5454,10 @@ GSL_SUPPRESS(26490) void thred::internal::bfil() {
 			monoBitmapData.resize(bitmapSizeBytes);
 			ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, nullptr);
 			CloseHandle(BitmapFileHandle);
-			auto foreground = COLORREF {};
-			auto background = COLORREF {};
-			if (binv(monoBitmapData, bitmapWidthBytes)) {
-				background = BitmapColor;
-				foreground = InverseBackgroundColor;
-			}
-			else {
-				foreground = BitmapColor;
-				background = InverseBackgroundColor;
-			}
+			const auto flag       = binv(monoBitmapData, bitmapWidthBytes);
+			const auto foreground = gsl::narrow_cast<COLORREF>(flag ? InverseBackgroundColor : BitmapColor);
+			const auto background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : InverseBackgroundColor);
+
 			BitmapInfoHeader               = {};
 			BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
 			BitmapInfoHeader.biWidth       = BitmapWidth;
@@ -8027,30 +8021,24 @@ void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, 
 
 void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	auto length = 0.0F;
-	auto delta  = fPOINT {};
 	auto iStart = finish - 1U;
 	if (finish == 0U) {
 		iStart++;
 	}
 
-	auto knots = gsl::narrow_cast<char*>(nullptr);
-
 	KnotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
 	do {
-		delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
-			             StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y };
+		const auto delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
+			                        StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y };
 
 		length = hypot(delta.x, delta.y);
 		iStart--;
 	} while (length == 0.0F);
-	if (StateMap.test(StateFlag::FILDIR)) {
-		knots = &KnotAtLastOrder[0];
-	}
-	else {
-		knots = &KnotAtEndOrder[0];
-	}
+	const auto* knots = (StateMap.test(StateFlag::FILDIR)) ? &KnotAtLastOrder[0] : &KnotAtEndOrder[0];
 	if (knots != nullptr) {
 		if ((iStart & 0x8000000U) == 0U) {
+			const auto delta = fPOINT { StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
+				                        StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y };
 			KnotStep.x = 2.0F / length * delta.x;
 			KnotStep.y = 2.0F / length * delta.y;
 			for (auto iKnot = 0U; iKnot < 5U; iKnot++) {
@@ -18238,7 +18226,7 @@ void thred::internal::dumov() {
 	if (anchorStitch.x >= ZoomRect.left && anchorStitch.x <= ZoomRect.right && anchorStitch.y >= ZoomRect.bottom
 	    && anchorStitch.y <= ZoomRect.top) {
 		POINT rotationOutline[8]   = {};
-		auto rotationCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
+		const auto rotationCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
 		rotationOutline[0]    = rotationCenterPixels;
 		rotationOutline[6]    = rotationCenterPixels;
 		auto OffsetFromCenter = POINT { rotationCenterPixels.x + 12, rotationCenterPixels.y + 2 };
