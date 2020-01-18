@@ -363,7 +363,6 @@ POINT RotateBoxCrossHorzLine[2]; // horizontal part of the rotate cross
 POINT RotateBoxToCursorLine[2];  // line from the cursor to the center of the rotate cross
 
 COLCHNG ColorChangeTable[MAXCHNG];
-STREX   ExtendedHeader; // thred file header extension
 
 class DSTDAT
 {
@@ -1208,7 +1207,7 @@ void thred::internal::ritfnam(const std::wstring& designerName) {
 	}
 	for (iName = 0U; iName < 50U; iName++) {
 		if (NameOrder[iName] < 50U) {
-			ExtendedHeader.creatorName[NameOrder[iName]] = tmpName[iName];
+			ExtendedHeader->creatorName[NameOrder[iName]] = tmpName[iName];
 		}
 	}
 }
@@ -1219,7 +1218,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 
 	for (auto iName = 0; iName < 50; iName++) {
 		if (NameOrder[iName] < 50) {
-			tmpName[iName] = ExtendedHeader.creatorName[NameOrder[iName]];
+			tmpName[iName] = ExtendedHeader->creatorName[NameOrder[iName]];
 		}
 		else {
 			tmpName[iName] = 111;
@@ -3829,7 +3828,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
 	stitchHeader.hoopType    = IniFile.hoopType;
 	auto       designer      = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName  = gsl::span<char> { ExtendedHeader.modifierName };
+	const auto modifierName  = gsl::span<char> { ExtendedHeader->modifierName };
 	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	if (!FormList->empty()) {
 		for (auto& form : (*FormList)) {
@@ -3867,11 +3866,11 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	stitchHeader.dlineLen    = gsl::narrow<uint16_t>(sizeof(decltype(FormVertices->back())) * vertexCount);
 	stitchHeader.clipDataLen = gsl::narrow<uint16_t>(sizeof(decltype(ClipPoints->back())) * clipDataCount);
 	durit(buffer, &stitchHeader, sizeof(stitchHeader));
-	ExtendedHeader.auxFormat         = IniFile.auxFileType;
-	ExtendedHeader.hoopSizeX         = IniFile.hoopSizeX;
-	ExtendedHeader.hoopSizeY         = IniFile.hoopSizeY;
-	ExtendedHeader.texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
-	durit(buffer, &ExtendedHeader, sizeof(ExtendedHeader));
+	ExtendedHeader->auxFormat         = IniFile.auxFileType;
+	ExtendedHeader->hoopSizeX         = IniFile.hoopSizeX;
+	ExtendedHeader->hoopSizeY         = IniFile.hoopSizeY;
+	ExtendedHeader->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
+	durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
 	durit(buffer, StitchBuffer->data(), wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back()))));
 	if (PCSBMPFileName[0] == 0) {
 		std::fill_n(&PCSBMPFileName[0], sizeof(PCSBMPFileName), '\0');
@@ -5769,7 +5768,7 @@ void thred::internal::nuFil() {
 							PCSHeader.hoopType = LARGHUP;
 						}
 						ritfnam(*DesignerName);
-						const auto modifierName = gsl::span<char> { ExtendedHeader.modifierName };
+						const auto modifierName = gsl::span<char> { ExtendedHeader->modifierName };
 						std::copy(&IniFile.designerName[0],
 						          &IniFile.designerName[strlen(&IniFile.designerName[0])],
 						          modifierName.begin());
@@ -5777,15 +5776,15 @@ void thred::internal::nuFil() {
 					}
 					case 1:
 					case 2: {
-						ReadFile(FileHandle, &ExtendedHeader, sizeof(ExtendedHeader), &BytesRead, nullptr);
-						if (BytesRead != sizeof(ExtendedHeader)) {
+						ReadFile(FileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &BytesRead, nullptr);
+						if (BytesRead != sizeof(*ExtendedHeader)) {
 							displayText::tabmsg(IDS_SHRTF);
 							return;
 						}
-						IniFile.hoopSizeX = ExtendedHeader.hoopSizeX;
-						IniFile.hoopSizeY = ExtendedHeader.hoopSizeY;
+						IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
+						IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
 						UnzoomedRect
-						    = { wrap::round<int32_t>(ExtendedHeader.hoopSizeX), wrap::round<int32_t>(ExtendedHeader.hoopSizeY) };
+						    = { wrap::round<int32_t>(ExtendedHeader->hoopSizeX), wrap::round<int32_t>(ExtendedHeader->hoopSizeY) };
 						redfnam(*DesignerName);
 						break;
 					}
@@ -5918,9 +5917,9 @@ void thred::internal::nuFil() {
 							}
 						}
 						ClipPoints->shrink_to_fit();
-						if (ExtendedHeader.texturePointCount != 0U) {
-							TexturePointsBuffer->resize(ExtendedHeader.texturePointCount);
-							bytesToRead = gsl::narrow<DWORD>(ExtendedHeader.texturePointCount
+						if (ExtendedHeader->texturePointCount != 0U) {
+							TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
+							bytesToRead = gsl::narrow<DWORD>(ExtendedHeader->texturePointCount
 							                                 * sizeof(decltype(TexturePointsBuffer->back())));
 							ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
@@ -7016,7 +7015,7 @@ void thred::internal::newFil() {
 	*ThrName = *DefaultDirectory / (StringTable->operator[](STR_NUFIL).c_str());
 	ritfnam(*DesignerName);
 	auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName = gsl::span<char> { ExtendedHeader.modifierName };
+	const auto modifierName = gsl::span<char> { ExtendedHeader->modifierName };
 	std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
 	rstdu();
 	rstAll();
@@ -9068,7 +9067,7 @@ void thred::internal::insfil() {
 						                     + fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
 						if (filscor > homscor) {
 							for (auto iName = 0U; iName < 50U; iName++) {
-								ExtendedHeader.creatorName[iName] = thredHeader.creatorName[iName];
+								ExtendedHeader->creatorName[iName] = thredHeader.creatorName[iName];
 							}
 							redfnam(*DesignerName);
 							SetWindowText(ThrEdWindow,
@@ -10582,7 +10581,7 @@ void thred::internal::desiz() {
 	}
 	info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
 	if (!StitchBuffer->empty()) {
-		auto modifier = utf::Utf8ToUtf16(std::string(&ExtendedHeader.modifierName[0]));
+		auto modifier = utf::Utf8ToUtf16(std::string(&ExtendedHeader->modifierName[0]));
 		info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
 	}
 	displayText::shoMsg(info);
@@ -18171,12 +18170,8 @@ void thred::internal::init() {
 	fnamtabs();
 	ritfnam(*DesignerName);
 	auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-	const auto modifierName = gsl::span<char> { ExtendedHeader.modifierName };
+	const auto modifierName = gsl::span<char> { ExtendedHeader->modifierName };
 	std::copy(designer.begin(), designer.end(), modifierName.begin());
-	ExtendedHeader.stgran = 0;
-	for (auto& reservedChar : ExtendedHeader.res) {
-		reservedChar = 0;
-	}
 	chkhup();
 	nedmen();
 	fil2men();
@@ -18807,8 +18802,8 @@ void thred::internal::ritbak(const fs::path& fileName, DRAWITEMSTRUCT* drawItem)
 					if (BytesRead != sizeof(extendedHeader)) {
 						return;
 					}
-					stitchSourceSize.x = extendedHeader.hoopSizeX;
-					stitchSourceSize.y = extendedHeader.hoopSizeY;
+					stitchSourceSize.x = ExtendedHeader->hoopSizeX;
+					stitchSourceSize.y = ExtendedHeader->hoopSizeY;
 					break;
 				}
 				default: {
@@ -19482,6 +19477,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		auto private_DefaultColorWin           = std::vector<HWND> {};
 		auto private_DefaultDirectory          = fs::path {};
 		auto private_DesignerName              = std::wstring {};
+		auto private_ExtendedHeader            = STREX {}; 
 		auto private_FormAngles                = std::vector<float> {};
 		auto private_FormControlPoints         = std::vector<POINT> {};
 		auto private_FormLines                 = std::vector<POINT> {};
@@ -19576,6 +19572,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		DefaultColorWin           = &private_DefaultColorWin;
 		DefaultDirectory          = &private_DefaultDirectory;
 		DesignerName              = &private_DesignerName;
+		ExtendedHeader            = &private_ExtendedHeader;
 		FormAngles                = &private_FormAngles;
 		FormControlPoints         = &private_FormControlPoints;
 		FormLines                 = &private_FormLines;

@@ -120,6 +120,7 @@ extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
+extern STREX*          ExtendedHeader;
 extern HMENU           FillMenu;
 
 extern std::vector<float>* FormAngles;

@@ -88,6 +88,7 @@ std::wstring*   DesignerName;         // designer name in clear
 HWND            DiscardButton;        // discard button
 DRAWITEMSTRUCT* DrawItem;             // for owner-draw windows
 POINT           EndPointCross;        // point to draw at the end cross for form select points
+STREX*          ExtendedHeader;       // thred file header extension
 HMENU           FillMenu;             // fill submenu
 
 std::vector<float>* FormAngles;        // angles of a form for satin border fills
