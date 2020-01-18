@@ -14559,7 +14559,6 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 		if (Msg.message == WM_LBUTTONDOWN) {
-			thred::savdo();
 			const auto code = ActiveColor;
 			ActiveColor     = VerticalIndex & 0xfU;
 			thred::redraw(UserColorWin->operator[](code));
@@ -14574,6 +14573,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			}
 			else {
 				if (!SelectedFormList->empty()) {
+					thred::savdo();
 					nucols();
 					thred::coltab();
 					StateMap.set(StateFlag::RESTCH);
@@ -14584,6 +14584,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 					auto& form = FormList->operator[](ClosestFormToCursor);
 					if ((form.fillType != 0U) || (form.edgeType != 0U)
 					    || ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
+						thred::savdo();
 						if (form.fillType != 0U) {
 							form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
 							if (form.fillType == FTHF) {
@@ -14616,6 +14617,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 				}
 				else {
 					if (StateMap.test(StateFlag::GRPSEL)) {
+						thred::savdo();
 						for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; iStitch++) {
 							StitchBuffer->operator[](iStitch).attribute &= 0xfffffff0;
 							StitchBuffer->operator[](iStitch).attribute |= ActiveColor;
