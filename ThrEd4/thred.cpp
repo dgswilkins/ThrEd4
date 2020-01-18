@@ -18482,7 +18482,7 @@ void thred::internal::drwStch() {
 								break;
 							}
 						}
-						break;
+						continue;
 					}
 					wascol = 0;
 				}
@@ -18560,9 +18560,9 @@ void thred::internal::drwStch() {
 										wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)
 									};
 									wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
-									LineIndex = 0;
-								}
-								else {
+								LineIndex = 0;
+							}
+							else {
 									if (iStitch != 0U) {
 										// write an equation for this line
 										const auto xDelta = stitchIt[iStitch].x - stitchIt[iStitch - 1U].x;
