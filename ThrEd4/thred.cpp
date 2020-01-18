@@ -18469,7 +18469,6 @@ void thred::internal::drwStch() {
 			LineIndex = 0;
 			StateMap.reset(StateFlag::LINED);
 			StateMap.reset(StateFlag::LININ);
-			auto wascol = 0U;
 			for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 				if (StateMap.test(StateFlag::HID)) {
 					if (ColorChangeTable[iColor].colorIndex != ActiveColor) {
@@ -18482,13 +18481,10 @@ void thred::internal::drwStch() {
 								break;
 							}
 						}
-						continue;
+						continue; 
 					}
-					wascol = 0;
 				}
-				else {
-					wascol = 0;
-				}
+				auto wascol = 0U;
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
 				stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				if (!StitchBuffer->empty()) {
