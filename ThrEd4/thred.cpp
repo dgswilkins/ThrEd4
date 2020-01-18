@@ -3694,19 +3694,12 @@ void thred::internal::redbal() {
 
 void thred::internal::ritbal() {
 	auto           balaradHeader = BALHED {};
-	auto           balaradFile   = HANDLE {};
-	auto           outputName    = fs::path {};
-	constexpr auto BalaradRatio  = 10.0F / 6.0F;
+	constexpr auto balaradRatio  = 10.0F / 6.0F;
 
 	if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
-		if (WorkingFileName->empty()) {
-			outputName = *DefaultDirectory / L"balfil.thr";
-		}
-		else {
-			outputName = *WorkingFileName;
-		}
+		auto outputName = (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
 		outputName.replace_extension(L".thv");
-		balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+		auto balaradFile = CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 		if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT
 			return;
 		}
@@ -3724,8 +3717,8 @@ void thred::internal::ritbal() {
 		}
 		balaradHeader.signature       = 'drbm';
 		balaradHeader.backgroundColor = BackgroundColor;
-		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BalaradRatio;
-		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BalaradRatio;
+		balaradHeader.hoopSizeX       = IniFile.hoopSizeX * balaradRatio;
+		balaradHeader.hoopSizeY       = IniFile.hoopSizeY * balaradRatio;
 		auto bytesWritten             = DWORD { 0 };
 		WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 		BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
@@ -3757,7 +3750,7 @@ void thred::internal::ritbal() {
 	}
 	else {
 		if (!BalaradName1->empty()) {
-			balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+			auto balaradFile = CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 			CloseHandle(balaradFile);
 		}
 	}
@@ -6104,7 +6097,6 @@ void thred::internal::nuFil() {
 						if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
 							auto       color      = 0U;
 							auto       iPESstitch = 0U;
-							auto       locof      = 0.0F;
 							const auto pecCount   = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
 							while (iPESstitch < pecCount) {
 								if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
@@ -6115,6 +6107,8 @@ void thred::internal::nuFil() {
 									iPESstitch += 2;
 								}
 								else {
+									auto locof = 0.0F;
+
 									if ((PESstitch[iPESstitch] & 0x80U) != 0U) {
 										auto pesVal
 										    = (((PESstitch[iPESstitch] & 0x0FU) << 8U) | PESstitch[iPESstitch + 1U]) & 0xFFFU;
