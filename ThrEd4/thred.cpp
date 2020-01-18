@@ -6525,7 +6525,6 @@ void thred::internal::closPnt() {
 auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 	if (closestStitch != nullptr) {
 		auto       closestIndex    = 0U;
-		double     currentDistance = 1e99;
 		const auto pointToCheck    = POINT { (Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y) };
 
 		if (StateMap.test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
@@ -6556,7 +6555,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 							    = ((stitch.x > SelectedPoint.x) ? (stitch.x - SelectedPoint.x) : (SelectedPoint.x - stitch.x));
 							const auto cy
 							    = ((stitch.y > SelectedPoint.y) ? (stitch.y - SelectedPoint.y) : (SelectedPoint.y - stitch.y));
-							currentDistance = hypot(cx, cy);
+							const auto currentDistance = hypot(cx, cy);
 							if (currentDistance < DistanceToClick) {
 								DistanceToClick = currentDistance;
 								closestIndex    = iStitch;
@@ -6575,7 +6574,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 					    && stitch.y <= ZoomRect.top) {
 						const auto cx   = stitch.x - SelectedPoint.x;
 						const auto cy   = stitch.y - SelectedPoint.y;
-						currentDistance = hypot(cx, cy);
+						const auto currentDistance = hypot(cx, cy);
 						if (currentDistance < DistanceToClick) {
 							DistanceToClick = currentDistance;
 							closestIndex    = currentStitch;
