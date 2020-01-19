@@ -5858,9 +5858,8 @@ void thred::internal::nuFil() {
 								formListOriginal.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto form : formListOriginal) {
-								FormList->push_back(FRMHED { form });
-							}
+							FormList->reserve(formListOriginal.size());
+							FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
 						}
 						else {
 							auto inFormList = std::vector<FRMHEDOUT> {};
@@ -5873,9 +5872,8 @@ void thred::internal::nuFil() {
 								inFormList.resize(thredHeader.formCount);
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto form : inFormList) {
-								FormList->push_back(FRMHED { form });
-							}
+							FormList->reserve(inFormList.size());
+							FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 						}
 						FormList->shrink_to_fit();
 						if (thredHeader.vertexCount != 0U) {
@@ -5894,17 +5892,15 @@ void thred::internal::nuFil() {
 						}
 						FormVertices->shrink_to_fit();
 						if (thredHeader.dlineCount != 0U) {
-							auto inSatinGuides = std::vector<SATCONOUT>(thredHeader.dlineCount);
-							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
-							ReadFile(FileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
+							auto inGuideList = std::vector<SATCONOUT>(thredHeader.dlineCount);
+							bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inGuideList.back())));
+							ReadFile(FileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								inSatinGuides.resize(BytesRead / sizeof(decltype(inSatinGuides.back())));
+								inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							SatinGuides->reserve(inSatinGuides.size());
-							for (auto& guide : inSatinGuides) {
-								SatinGuides->push_back(SATCON { guide });
-							}
+							SatinGuides->reserve(inGuideList.size());
+							SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
 						}
 						SatinGuides->shrink_to_fit();
 						if (thredHeader.clipDataCount != 0U) {
@@ -8904,7 +8900,7 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							FormList->resize(FormList->size() + inFormList.size());
+							FormList->reserve(FormList->size() + inFormList.size());
 							FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 						}
 						else {
@@ -8916,7 +8912,7 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							FormList->resize(FormList->size() + inFormList.size());
+							FormList->reserve(FormList->size() + inFormList.size());
 							FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 						}
 						auto vertexOffset = wrap::toUnsigned(FormVertices->size());
@@ -8930,7 +8926,7 @@ void thred::internal::insfil() {
 								inVerticeList.resize(BytesRead / sizeof(decltype(inVerticeList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							FormVertices->resize(FormVertices->size() + inVerticeList.size());
+							FormVertices->reserve(FormVertices->size() + inVerticeList.size());
 							FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
 						}
 						else {
@@ -8946,7 +8942,7 @@ void thred::internal::insfil() {
 								inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							SatinGuides->resize(SatinGuides->size() + inGuideList.size());
+							SatinGuides->reserve(SatinGuides->size() + inGuideList.size());
 							SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
 							newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
 						}
@@ -8960,7 +8956,7 @@ void thred::internal::insfil() {
 								inPointList.resize(BytesRead / sizeof(decltype(inPointList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							ClipPoints->resize(ClipPoints->size() + inPointList.size());
+							ClipPoints->reserve(ClipPoints->size() + inPointList.size());
 							ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
 						}
 						if (thredHeader.texturePointCount != 0U) {
@@ -8973,7 +8969,7 @@ void thred::internal::insfil() {
 								inTextureList.resize(BytesRead / sizeof(decltype(inTextureList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							TexturePointsBuffer->resize(TexturePointsBuffer->size() + inTextureList.size());
+							TexturePointsBuffer->reserve(TexturePointsBuffer->size() + inTextureList.size());
 							TexturePointsBuffer->insert(
 							    TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
 						}
@@ -18478,9 +18474,9 @@ void thred::internal::drwStch() {
 				SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
 				stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 				if (!StitchBuffer->empty()) {
-					const auto stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable[iColor].stitchIndex);
-					stitchCount                 = chkup(stitchCount, iColor);
-					const auto maxYcoord        = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
+					const auto stitchIt  = std::next(StitchBuffer->begin(), ColorChangeTable[iColor].stitchIndex);
+					stitchCount          = chkup(stitchCount, iColor);
+					const auto maxYcoord = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
 
 					for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
 						const auto layer = (stitchIt[iStitch].attribute & LAYMSK) >> LAYSHFT;
@@ -18546,15 +18542,15 @@ void thred::internal::drwStch() {
 										wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)
 									};
 									wrap::Polyline(StitchWindowMemDC, linePoints.data(), LineIndex);
-								LineIndex = 0;
-							}
-							else {
+									LineIndex = 0;
+								}
+								else {
 									if (iStitch != 0U) {
 										// write an equation for this line
-										const auto xDelta = stitchIt[iStitch].x - stitchIt[iStitch - 1U].x;
-										const auto yDelta = stitchIt[iStitch - 1U].y - stitchIt[iStitch].y;
-										const auto slope  = gsl::narrow_cast<double>(xDelta) / yDelta;
-										const auto offset = stitchIt[iStitch].x + slope * stitchIt[iStitch].y;
+										const auto xDelta        = stitchIt[iStitch].x - stitchIt[iStitch - 1U].x;
+										const auto yDelta        = stitchIt[iStitch - 1U].y - stitchIt[iStitch].y;
+										const auto slope         = gsl::narrow_cast<double>(xDelta) / yDelta;
+										const auto offset        = stitchIt[iStitch].x + slope * stitchIt[iStitch].y;
 										POINT      stitchLine[2] = {};
 										do {
 											// does the line intersect with the top of the screen?
@@ -19422,11 +19418,11 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
-// cppcheck-suppress unusedFunction
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
                        _In_ LPTSTR lpCmdLine, // NOLINT
                        _In_ int32_t nShowCmd) -> int32_t {
+// cppcheck-suppress unusedFunction
 	UNREFERENCED_PARAMETER(nShowCmd);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
