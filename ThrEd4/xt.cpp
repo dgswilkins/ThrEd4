@@ -954,7 +954,6 @@ auto xt::internal::chkrdun(const std::vector<uint32_t>& formFillCounter,
 auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::vector<OREC*>& pRecs, const SRTREC& sortRecord)
     -> double {
 	auto currentRegion = sortRecord.currentRegion;
-	auto stitchIt = StitchBuffer->begin();
 	auto direction     = sortRecord.direction;
 
 	auto formFillCounter = std::vector<uint32_t> {};
@@ -962,12 +961,9 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>& stitchBuffer, const std::ve
 	auto totalJumps = 0U;
 	while (chkrdun(formFillCounter, pRecs, sortRecord)) {
 		double minimumLength = 1e9;
-		if (direction) {
-			stitchIt = std::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U);
-		}
-		else {
-			stitchIt = std::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
-		}
+
+		auto stitchIt = (direction) ? std::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
+		                            : std::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 		for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; iRegion++) {
 			if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 				auto& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
