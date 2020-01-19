@@ -8904,9 +8904,8 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto& form : inFormList) {
-								FormList->push_back(FRMHED { form });
-							}
+							FormList->resize(FormList->size() + inFormList.size());
+							FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 						}
 						else {
 							auto inFormList = std::vector<FRMHEDOUT> {};
@@ -8917,65 +8916,66 @@ void thred::internal::insfil() {
 								inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto& form : inFormList) {
-								FormList->push_back(FRMHED { form });
-							}
+							FormList->resize(FormList->size() + inFormList.size());
+							FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 						}
 						auto vertexOffset = wrap::toUnsigned(FormVertices->size());
 						if (fileHeader.vertexCount != 0U) {
-							auto inFormVertices = std::vector<fPOINT> {};
-							inFormVertices.resize(fileHeader.vertexCount);
+							auto inVerticeList = std::vector<fPOINT> {};
+							inVerticeList.resize(fileHeader.vertexCount);
 							auto bytesToRead
-							    = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inFormVertices.back())));
-							ReadFile(InsertedFileHandle, inFormVertices.data(), bytesToRead, &BytesRead, nullptr);
+							    = gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inVerticeList.back())));
+							ReadFile(InsertedFileHandle, inVerticeList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								inFormVertices.resize(BytesRead / sizeof(decltype(inFormVertices.back())));
+								inVerticeList.resize(BytesRead / sizeof(decltype(inVerticeList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							FormVertices->insert(FormVertices->end(), inFormVertices.cbegin(), inFormVertices.cend());
+							FormVertices->resize(FormVertices->size() + inVerticeList.size());
+							FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
 						}
 						else {
 							StateMap.set(StateFlag::BADFIL);
 						}
 						auto guideOffset = wrap::toUnsigned(SatinGuides->size());
 						if (fileHeader.dlineCount != 0U) {
-							auto inSatinGuides = std::vector<SATCONOUT> {};
-							inSatinGuides.resize(fileHeader.dlineCount);
-							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(decltype(inSatinGuides.back())));
-							ReadFile(InsertedFileHandle, inSatinGuides.data(), bytesToRead, &BytesRead, nullptr);
+							auto inGuideList = std::vector<SATCONOUT> {};
+							inGuideList.resize(fileHeader.dlineCount);
+							auto bytesToRead = gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(decltype(inGuideList.back())));
+							ReadFile(InsertedFileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								inSatinGuides.resize(BytesRead / sizeof(decltype(inSatinGuides.back())));
+								inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							for (auto& guide : inSatinGuides) {
-								SatinGuides->push_back(SATCON { guide });
-							}
-							newSatinGuideIndex += wrap::toUnsigned(inSatinGuides.size());
+							SatinGuides->resize(SatinGuides->size() + inGuideList.size());
+							SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+							newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
 						}
 						if (fileHeader.clipDataCount != 0U) {
-							auto tempClipPoints = std::vector<fPOINT> {};
-							tempClipPoints.resize(fileHeader.clipDataCount);
+							auto inPointList = std::vector<fPOINT> {};
+							inPointList.resize(fileHeader.clipDataCount);
 							auto bytesToRead
 							    = gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
-							ReadFile(InsertedFileHandle, tempClipPoints.data(), bytesToRead, &BytesRead, nullptr);
+							ReadFile(InsertedFileHandle, inPointList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								tempClipPoints.resize(BytesRead / sizeof(decltype(tempClipPoints.back())));
+								inPointList.resize(BytesRead / sizeof(decltype(inPointList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
-							ClipPoints->insert(ClipPoints->end(), tempClipPoints.begin(), tempClipPoints.end());
+							ClipPoints->resize(ClipPoints->size() + inPointList.size());
+							ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
 						}
 						if (thredHeader.texturePointCount != 0U) {
-							auto tempTextureBuffer = std::vector<TXPNT> {};
-							tempTextureBuffer.resize(thredHeader.texturePointCount);
+							auto inTextureList = std::vector<TXPNT> {};
+							inTextureList.resize(thredHeader.texturePointCount);
 							auto bytesToRead
-							    = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(decltype(tempTextureBuffer.back())));
-							ReadFile(InsertedFileHandle, tempTextureBuffer.data(), bytesToRead, &BytesRead, nullptr);
+							    = gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(decltype(inTextureList.back())));
+							ReadFile(InsertedFileHandle, inTextureList.data(), bytesToRead, &BytesRead, nullptr);
 							if (BytesRead != bytesToRead) {
-								tempTextureBuffer.resize(BytesRead / sizeof(decltype(tempTextureBuffer.back())));
+								inTextureList.resize(BytesRead / sizeof(decltype(inTextureList.back())));
 								StateMap.set(StateFlag::BADFIL);
 							}
+							TexturePointsBuffer->resize(TexturePointsBuffer->size() + inTextureList.size());
 							TexturePointsBuffer->insert(
-							    TexturePointsBuffer->end(), tempTextureBuffer.begin(), tempTextureBuffer.end());
+							    TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
 						}
 						CloseHandle(InsertedFileHandle);
 						InsertedFileHandle = nullptr;
@@ -19422,6 +19422,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
+// cppcheck-suppress unusedFunction
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
                        _In_ LPTSTR lpCmdLine, // NOLINT
