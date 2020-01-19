@@ -257,7 +257,6 @@ void xt::internal::xratf(const fPOINT& startPoint, const fPOINT& endPoint, fPOIN
 void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence) {
 	auto       currentPoint = fPOINT {};
 	auto       nextPoint    = fPOINT {};
-	auto       midPoint     = fPOINT {};
 	auto&      bCurrent     = BSequence->operator[](iSequence);
 	auto&      bNext        = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 	const auto length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
@@ -283,7 +282,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 		xratf(currentLowPoint, currentHighPoint, currentPoint, feather.ratioLocal);
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
-	midPoint = midpnt(currentPoint, nextPoint);
+	auto midPoint = midpnt(currentPoint, nextPoint);
 	OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
 	OutputIndex++;
 	OSequence->push_back(midPoint);
