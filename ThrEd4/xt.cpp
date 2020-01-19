@@ -2211,11 +2211,11 @@ void xt::setfmax() {
 }
 
 void xt::internal::fwidfn(uint32_t formNumber, float length) {
-	ClosestFormToCursor = formNumber;
-	auto& form                       = FormList->operator[](formNumber);
-	const auto             reference = form.rectangle.left;
-	const auto             ratio     = length / (form.rectangle.right - reference);
-	auto                   vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
+	ClosestFormToCursor   = formNumber;
+	const auto& form      = FormList->operator[](formNumber);
+	const auto  reference = form.rectangle.left;
+	const auto  ratio     = length / (form.rectangle.right - reference);
+	auto        vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
 	}
@@ -2252,11 +2252,11 @@ void xt::setfind() {
 }
 
 void xt::internal::fhifn(uint32_t formNumber, float length) {
-	ClosestFormToCursor = formNumber;
-	auto& form                       = FormList->operator[](formNumber);
-	const auto             reference = form.rectangle.bottom;
-	const auto             ratio     = length / (form.rectangle.top - reference);
-	auto                   vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
+	ClosestFormToCursor   = formNumber;
+	const auto& form      = FormList->operator[](formNumber);
+	const auto  reference = form.rectangle.bottom;
+	const auto  ratio     = length / (form.rectangle.top - reference);
+	auto        vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
 	}
