@@ -102,10 +102,6 @@ void uspac();
 
 namespace internal {
 
-#ifdef _DEBUG
-	void prbug() noexcept;
-#endif
-
 	void bcolfn(uint32_t formNumber, uint32_t color);
 	void blenfn(FRMHED& form, float length);
 	void bmaxfn(uint32_t formNumber, float length);

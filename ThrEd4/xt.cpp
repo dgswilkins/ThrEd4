@@ -80,13 +80,6 @@ void xt::setfchk() {
 	}
 }
 
-#ifdef _DEBUG
-
-void xt::internal::prbug() noexcept {
-	OutputDebugString(&MsgBuffer[0]);
-}
-#endif
-
 void xt::internal::fthvars(const FRMHED& form, FEATHER& feather) {
 	StateMap.reset(StateFlag::BARSAT);
 	StateMap.reset(StateFlag::FTHR);
