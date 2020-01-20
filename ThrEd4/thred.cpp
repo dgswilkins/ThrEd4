@@ -16882,8 +16882,6 @@ auto thred::internal::handleFileMenu(const WORD& wParameter) -> bool {
 		break;
 	}
 	case ID_FILE_NEW1: { // file / New
-		// suppress the warning that occurs when DEBUG is true
-		// cppcheck-suppress knownConditionTrueFalse
 		if (!savcmp()) {
 			displayText::savdisc();
 			StateMap.set(StateFlag::NEWBAK);
@@ -19418,11 +19416,8 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
-auto APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                       _In_opt_ HINSTANCE hPrevInstance,
-                       _In_ LPTSTR lpCmdLine, // NOLINT
-                       _In_ int32_t nShowCmd) -> int32_t {
-// cppcheck-suppress unusedFunction
+auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd)
+    -> int32_t { // NOLINT
 	UNREFERENCED_PARAMETER(nShowCmd);
 
 	ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
