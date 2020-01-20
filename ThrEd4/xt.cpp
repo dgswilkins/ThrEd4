@@ -1399,9 +1399,7 @@ void xt::fdelstch(const FRMHED& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		}
 	}
 	if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
-		for (auto& startPoint : fillStartsData.fillArray) {
-			startPoint = ClosestPointIndex;
-		}
+		std::fill(fillStartsData.fillArray, fillStartsData.fillArray + (sizeof(FSTRTS) / sizeof(uint32_t)), ClosestPointIndex);
 	}
 }
 
