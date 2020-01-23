@@ -275,7 +275,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 		xratf(currentLowPoint, currentHighPoint, currentPoint, feather.ratioLocal);
 		xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
 	}
-	auto midPoint = midpnt(currentPoint, nextPoint);
+	const auto midPoint = midpnt(currentPoint, nextPoint);
 	OSequence->push_back(fPOINT { bCurrent.x, bCurrent.y });
 	OutputIndex++;
 	OSequence->push_back(midPoint);
@@ -1392,7 +1392,7 @@ void xt::fdelstch(const FRMHED& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		}
 	}
 	if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
-		std::fill(fillStartsData.fillArray, fillStartsData.fillArray + (sizeof(FSTRTS) / sizeof(uint32_t)), ClosestPointIndex);
+		std::fill(std::begin(fillStartsData.fillArray), std::end(fillStartsData.fillArray), ClosestPointIndex);
 	}
 }
 
