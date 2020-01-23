@@ -32,7 +32,6 @@ auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRea
 void setCursor(HCURSOR hCursor) noexcept;
 void setSideWinVal(int index) noexcept;
 void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
-auto toDouble(float invar) noexcept -> double;
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;
