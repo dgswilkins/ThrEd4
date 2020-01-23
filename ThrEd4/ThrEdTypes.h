@@ -1566,6 +1566,7 @@ public:
 	// FLENCNT& operator=(FLENCNT&&) = default;
 	//~FLENCNT() = default;
 
+	explicit FLENCNT(const FLENCNTOUT& rhs) noexcept;
 	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
 };
 
@@ -1602,6 +1603,10 @@ inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) noexcept {
 	return *this;
 }
 
+inline FLENCNT::FLENCNT(const FLENCNTOUT& rhs) noexcept {
+	clipCount = rhs.clipCount;
+}
+
 inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) noexcept {
 	clipCount = rhs.clipCount;
 
@@ -1621,6 +1626,7 @@ public:
 	// SATINANGLE& operator=(SATINANGLE&&) = default;
 	//~SATINANGLE() = default;
 
+	explicit SATINANGLE(const SATINANGLEOUT& rhs) noexcept;
 	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
 };
 
@@ -1655,6 +1661,10 @@ inline SATINANGLEOUT& SATINANGLEOUT::operator=(const SATINANGLE& rhs) noexcept {
 	angle = rhs.angle;
 
 	return *this;
+}
+
+inline SATINANGLE::SATINANGLE(const SATINANGLEOUT& rhs) noexcept {
+	angle = rhs.angle;
 }
 
 inline SATINANGLE& SATINANGLE::operator=(const SATINANGLEOUT& rhs) noexcept {
@@ -1797,7 +1807,8 @@ public:
 inline FRMHEDO::FRMHEDO() noexcept
     : satinOrAngle()
     , lengthOrCount()
-    , angleOrClipData() {
+    , angleOrClipData()
+    , rectangle() {
 	attribute       = 0U;
 	vertexCount     = 0U;
 	type            = 0U;
@@ -1808,7 +1819,6 @@ inline FRMHEDO::FRMHEDO() noexcept
 	borderClipData  = 0U;
 	satinGuideCount = 0U;
 	wordParam       = 0U;
-	rectangle       = {};
 	fillType        = 0U;
 	edgeType        = 0U;
 	fillSpacing     = 0.0F;
@@ -1874,9 +1884,11 @@ public:
 };
 
 inline FRMHED::FRMHED() noexcept
-    : satinOrAngle()
+    : fillInfo()
+    , satinOrAngle()
     , lengthOrCount()
-    , angleOrClipData() {
+    , angleOrClipData()
+    , rectangle() {
 	attribute       = 0U;
 	vertexCount     = 0U;
 	type            = 0U;
@@ -1887,7 +1899,6 @@ inline FRMHED::FRMHED() noexcept
 	borderClipData  = 0U;
 	satinGuideCount = 0U;
 	wordParam       = 0U;
-	rectangle       = {};
 	fillType        = 0U;
 	edgeType        = 0U;
 	fillSpacing     = 0.0F;
@@ -1901,7 +1912,6 @@ inline FRMHED::FRMHED() noexcept
 	extendedAttribute   = 0U;
 	maxBorderStitchLen  = 0.0F;
 	minBorderStitchLen  = 0.0F;
-	fillInfo            = {};
 	fillStart           = 0U;
 	fillEnd             = 0U;
 	underlaySpacing     = 0.0F;
@@ -1913,7 +1923,11 @@ inline FRMHED::FRMHED() noexcept
 	cres                = 0U;
 }
 
-inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
+inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept
+    : fillInfo()
+    , lengthOrCount(rhs.lengthOrCount)
+    , rectangle(rhs.rectangle)
+    , satinOrAngle(rhs.satinOrAngle) {
 	attribute       = rhs.attribute;
 	vertexCount     = rhs.vertexCount;
 	type            = rhs.type;
@@ -1921,15 +1935,12 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
 	vertexIndex     = 0;
-	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
-	rectangle       = rhs.rectangle;
 	fillType        = rhs.fillType;
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
 	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
@@ -1956,7 +1967,6 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept {
 	minFillStitchLen    = 0.0F;
 	maxBorderStitchLen  = 0.0F;
 	minBorderStitchLen  = 0.0F;
-	fillInfo            = {};
 	fillStart           = 0U;
 	fillEnd             = 0U;
 	underlaySpacing     = 0.0F;
@@ -2062,7 +2072,9 @@ public:
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
-    : satinOrAngle()
+    : fillInfo()
+    , rectangle()
+    , satinOrAngle()
     , lengthOrCount()
     , angleOrClipData() {
 	attribute       = 0U;
@@ -2075,7 +2087,6 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	borderClipData  = 0U;
 	satinGuideCount = 0U;
 	wordParam       = 0U;
-	rectangle       = {};
 	fillType        = 0U;
 	edgeType        = 0U;
 	fillSpacing     = 0.0F;
@@ -2089,7 +2100,6 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 	extendedAttribute   = 0U;
 	maxBorderStitchLen  = 0.0F;
 	minBorderStitchLen  = 0.0F;
-	fillInfo            = {};
 	fillStart           = 0U;
 	fillEnd             = 0U;
 	underlaySpacing     = 0.0F;
@@ -2102,7 +2112,11 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
+GSL_SUPPRESS(26440)
+inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs)
+    : satinOrAngle(rhs.satinOrAngle)
+    , rectangle(rhs.rectangle)
+    , lengthOrCount(rhs.lengthOrCount) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
@@ -2110,15 +2124,12 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs) {
 	borderColor     = rhs.borderColor;
 	clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
 	vertexIndex     = 0U; // do not write the pointer value to file
-	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = 0U; // do not write the pointer value to file
 	satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
 	wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
-	rectangle       = rhs.rectangle;
 	fillType        = rhs.fillType;
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
 	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
@@ -2217,7 +2228,10 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	return *this;
 }
 
-inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
+inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept
+    : satinOrAngle(rhs.satinOrAngle)
+    , rectangle(rhs.rectangle)
+    , lengthOrCount(rhs.lengthOrCount) {
 	attribute       = rhs.attribute;
 	vertexCount     = rhs.vertexCount;
 	type            = rhs.type;
@@ -2225,15 +2239,12 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept {
 	borderColor     = rhs.borderColor;
 	clipEntries     = rhs.clipEntries;
 	vertexIndex     = 0U; // do not read the index from a v2 file
-	satinOrAngle    = rhs.satinOrAngle;
 	borderClipData  = 0U; // do not read the index from a v2 file
 	satinGuideCount = rhs.satinGuideCount;
 	wordParam       = rhs.wordParam;
-	rectangle       = rhs.rectangle;
 	fillType        = rhs.fillType;
 	edgeType        = rhs.edgeType;
 	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
 	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
 	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 		angleOrClipData.clip = rhs.angleOrClipData.clip;
