@@ -262,8 +262,8 @@ OPENFILENAME OpenFileName = {
 	sizeof(OpenFileName), // lStructsize
 	nullptr,              // hwndOwner
 	nullptr,              // hInstance
-	&AllFilter[0],        // lpstrFilter
-	&CustomFilter[0],     // lpstrCustomFilter
+	std::begin(AllFilter),    // lpstrFilter
+	std::begin(CustomFilter), // lpstrCustomFilter
 	_MAX_PATH,            // nMaxCustFilter
 	0,                    // nFilterIndex
 	nullptr,              // lpstrFile
@@ -305,8 +305,8 @@ OPENFILENAME OpenBitmapName = {
 	sizeof(OpenBitmapName), // lStructsize
 	nullptr,                // hwndOwner
 	nullptr,                // hInstance
-	&BmpFilter[0],          // lpstrFilter
-	&CustomFilter[0],       // lpstrCustomFilter
+	std::begin(BmpFilter),    // lpstrFilter
+	std::begin(CustomFilter), // lpstrCustomFilter
 	_MAX_PATH,              // nMaxCustFilter
 	0,                      // nFilterIndex
 	nullptr,                // lpstrFile
@@ -1020,7 +1020,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 			auto    hwnd = GetDlgItem(hwndlg, IDC_DESED);
 			wchar_t designerBuffer[50];
 			GetWindowText(hwnd, static_cast<LPTSTR>(designerBuffer), sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-			DesignerName->assign(&designerBuffer[0]);
+			DesignerName->assign(std::begin(designerBuffer));
 			EndDialog(hwndlg, 0);
 			SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
 			return TRUE;
@@ -1171,7 +1171,7 @@ void thred::internal::fnamtabs() {
 		std::swap(NameEncoder[destination], NameEncoder[source]);
 	}
 	const auto fillval = gsl::narrow_cast<uint8_t>(0);
-	std::fill_n(&NameDecoder[0], sizeof(NameDecoder), fillval);
+	std::fill(std::begin(NameDecoder), std::end(NameDecoder), fillval);
 	for (auto iName = 32U; iName < 127U; iName++) {
 		NameDecoder[NameEncoder[iName]] = gsl::narrow<uint8_t>(iName);
 	}
@@ -1462,9 +1462,8 @@ void thred::internal::dudat() {
 		}
 		backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 		{
-			auto       sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-			const auto dest       = gsl::span<COLORREF>(backupData->colors, sizeColors);
-			std::copy(&UserColor[0], &UserColor[sizeColors], dest.begin());
+			const auto dest       = gsl::span<COLORREF>(backupData->colors, COLOR_COUNT);
+			std::copy(std::begin(UserColor), std::end(UserColor), dest.begin());
 		}
 		backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
 		backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
@@ -2045,8 +2044,8 @@ void thred::internal::chkhup() {
 
 void thred::internal::chknum() {
 	auto value = 0.0F;
-	if (std::wcslen(&MsgBuffer[0]) != 0U) {
-		value = wrap::bufToFloat(&MsgBuffer[0]);
+	if (std::wcslen(std::begin(MsgBuffer)) != 0U) {
+		value = wrap::bufToFloat(std::begin(MsgBuffer));
 	}
 
 	xt::clrstch();
@@ -2065,7 +2064,7 @@ void thred::internal::chknum() {
 	if (MsgIndex != 0U) {
 		if (FormMenuChoice != 0U) {
 			auto& form = FormList->operator[](ClosestFormToCursor);
-			value      = wrap::bufToFloat(&SideWindowEntryBuffer[0]) * PFGRAN;
+			value      = wrap::bufToFloat(std::begin(SideWindowEntryBuffer)) * PFGRAN;
 			switch (FormMenuChoice) {
 			case LTXOF: {
 				thred::savdo();
@@ -2116,7 +2115,7 @@ void thred::internal::chknum() {
 			case LFTHCOL: {
 				if (value != 0.0F) {
 					thred::savdo();
-					form::nufthcol(gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfU);
+					form::nufthcol(gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU);
 					wrap::setSideWinVal(LFTHCOL);
 					thred::coltab();
 				}
@@ -2127,7 +2126,7 @@ void thred::internal::chknum() {
 			case LFRMCOL: {
 				if (value != 0.0F) {
 					thred::savdo();
-					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfU;
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
 					form::nufilcol(colVal);
 					SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 					thred::coltab();
@@ -2139,7 +2138,7 @@ void thred::internal::chknum() {
 			case LUNDCOL: {
 				if (value != 0.0F) {
 					thred::savdo();
-					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfU;
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
 					form.underlayColor = colVal;
 					SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 					form::refilfn();
@@ -2152,7 +2151,7 @@ void thred::internal::chknum() {
 			case LBRDCOL: {
 				if (value != 0.0F) {
 					thred::savdo();
-					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(&SideWindowEntryBuffer[0], nullptr, 10) - 1)) & 0xfU;
+					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
 					form::nubrdcol(colVal);
 					SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 					thred::coltab();
@@ -2330,7 +2329,7 @@ void thred::internal::chknum() {
 		}
 		else {
 			if (PreferenceIndex != 0U) {
-				value = wrap::bufToFloat(&SideWindowEntryBuffer[0]);
+				value = wrap::bufToFloat(std::begin(SideWindowEntryBuffer));
 				switch (PreferenceIndex - 1) {
 				case PEG: {
 					IniFile.eggRatio = value;
@@ -2491,8 +2490,8 @@ void thred::internal::chknum() {
 				PreferenceIndex = 0;
 			}
 			else {
-				if (wcslen(&MsgBuffer[0]) != 0U) {
-					value = wrap::bufToFloat(&MsgBuffer[0]);
+				if (wcslen(std::begin(MsgBuffer)) != 0U) {
+					value = wrap::bufToFloat(std::begin(MsgBuffer));
 					do {
 						if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
 							if (value < FormList->size()) {
@@ -3873,12 +3872,12 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	durit(buffer, ExtendedHeader, sizeof(*ExtendedHeader));
 	durit(buffer, StitchBuffer->data(), wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back()))));
 	if (PCSBMPFileName[0] == 0) {
-		std::fill_n(&PCSBMPFileName[0], sizeof(PCSBMPFileName), '\0');
+		std::fill(std::begin(PCSBMPFileName), std::end(PCSBMPFileName), '\0');
 	}
-	durit(buffer, &PCSBMPFileName[0], sizeof(PCSBMPFileName));
+	durit(buffer, std::begin(PCSBMPFileName), sizeof(PCSBMPFileName));
 	durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
-	durit(buffer, &UserColor[0], sizeof(UserColor));
-	durit(buffer, &CustomColor[0], sizeof(CustomColor));
+	durit(buffer, std::begin(UserColor), sizeof(UserColor));
+	durit(buffer, std::begin(CustomColor), sizeof(CustomColor));
 	auto threadSizeBuffer = std::string {};
 	threadSizeBuffer.resize(threadLength);
 	for (auto iThread = 0U; iThread < threadLength; iThread++) {
@@ -3955,9 +3954,9 @@ void thred::internal::thrsav() {
 			for (auto& version : *VersionNames) {
 				version.clear();
 			}
-			duver(*DefaultDirectory / &fileData.cFileName[0]);
+			duver(*DefaultDirectory / std::begin(fileData.cFileName));
 			while (FindNextFile(file, &fileData)) {
-				duver(*DefaultDirectory / &fileData.cFileName[0]);
+				duver(*DefaultDirectory / std::begin(fileData.cFileName));
 			}
 			FindClose(file);
 			fs::remove(VersionNames->back());
@@ -4309,7 +4308,7 @@ inline void thred::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t
 void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
 	auto* pecHeader = convert_ptr<PECHDR*>(buffer.data());
 	PESdata         = buffer.data();
-	PEScolors       = &pecHeader->pad[0];
+	PEScolors       = std::begin(pecHeader->pad);
 	auto thisStitch = fPOINT {};
 	rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
 	auto iColor  = 1U;
@@ -9936,9 +9935,9 @@ GSL_SUPPRESS(26440) void thred::internal::colchk() {
 		// ToDo - Can this loop become a ranged for?
 		for (auto iStitch = 0U; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
 			const auto stitch     = StitchBuffer->operator[](iStitch);
-			auto       stitchBck1 = StitchBuffer->operator[](iStitch - 1U);
 			if (color != (stitch.attribute & COLMSK)) {
 				if ((iStitch - currentStitch == 1) && ((currentStitch) != 0U)) {
+					auto stitchBck1      = StitchBuffer->operator[](iStitch - 1U);
 					stitchBck1.attribute = (stitch.attribute & NCOLMSK) | (stitchBck1.attribute & COLMSK);
 				}
 				color         = stitch.attribute & COLMSK;
