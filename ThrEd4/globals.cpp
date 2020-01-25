@@ -35,7 +35,7 @@ fRECTANGLE AllItemsRect {}; // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
-uint32_t  AppliqueColor = 15U; // underlay color
+uint32_t  AppliqueColor = COLOR_COUNT - 1; // underlay color
 LPTSTR*   ArgList;             // command line argument array
 HCURSOR   ArrowCursor;         // arrow
 fs::path* AuxName;             //
@@ -220,7 +220,7 @@ std::vector<fPOINT>*       TempPolygon; // temporary storage when user is enteri
 
 std::wstring*       TextureInputBuffer;             // texture fill number buffer
 std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
-HWND                ThreadSizeWin[16];              // thread size windows
+HWND                ThreadSizeWin[COLOR_COUNT];     // thread size windows
 uint32_t            ThrEdClip       = 0;            // thred format
 const wchar_t*      ThrEdClipFormat = L"threditor"; //
 HINSTANCE           ThrEdInstance;                  // main instance handle
@@ -234,10 +234,10 @@ boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
 POINT              UnzoomedRect;                         // size of the unzoomed stitch window
-COLORREF           UserColor[16];                        // user colors
+COLORREF           UserColor[COLOR_COUNT];               // user colors
 std::vector<HWND>* UserColorWin;                         // user color windows
 EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persistent binary variables set by the user
-HPEN               UserPen[16];                          // user color pens
+HPEN               UserPen[COLOR_COUNT];                 // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
 float              VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
