@@ -989,14 +989,14 @@ void trace::internal::dutrnum0(uint32_t color) {
 }
 
 void trace::dutrnum2() {
-	ti::dutrnum0(std::stoi(&TraceInputBuffer[0]));
+	ti::dutrnum0(std::stoi(std::begin(TraceInputBuffer)));
 }
 
 void trace::dutrnum1() {
 	DestroyWindow(GeneralNumberInputBox);
 	StateMap.reset(StateFlag::NUMIN);
 	StateMap.reset(StateFlag::TRNIN1);
-	auto traceLength = wrap::bufToFloat(&MsgBuffer[0]);
+	auto traceLength = wrap::bufToFloat(std::begin(MsgBuffer));
 	if (traceLength > 9.0F) {
 		traceLength = 9.0F;
 	}
@@ -1232,7 +1232,7 @@ GSL_SUPPRESS(26440) void trace::internal::trcnum(uint32_t shift, COLORREF color,
 	color >>= shift;
 	color &= 0xffU;
 	_itow_s(color, buffer, 10);
-	const auto bufferLength = gsl::narrow<uint32_t>(wcslen(&buffer[0]));
+	const auto bufferLength = gsl::narrow<uint32_t>(wcslen(std::begin(buffer)));
 	const auto xPosition    = NumeralWidth * (3U - bufferLength) + 1U;
 	SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	wrap::TextOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
@@ -1320,14 +1320,14 @@ void trace::wasTrace() {
 				SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 			}
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-			wrap::TextOut(DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(buffer), gsl::narrow<uint32_t>(wcslen(&buffer[0])));
+			wrap::TextOut(DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(buffer), gsl::narrow<uint32_t>(wcslen(std::begin(buffer))));
 			break;
 		}
 		if (DrawItem->hwndItem == TraceNumberInput) {
 			FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 			SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
 			wrap::TextOut(
-			    DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(TraceInputBuffer), gsl::narrow<uint32_t>(wcslen(&TraceInputBuffer[0])));
+			    DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(TraceInputBuffer), gsl::narrow<uint32_t>(wcslen(std::begin(TraceInputBuffer))));
 			break;
 		}
 	}
@@ -1348,7 +1348,7 @@ void trace::wasTrace1() {
 void trace::traceNumberInput(uint32_t NumericCode) {
 	TraceInputBuffer[MsgIndex++] = NumericCode;
 	TraceInputBuffer[MsgIndex]   = 0;
-	auto traceColor              = std::stoi(&TraceInputBuffer[0]);
+	auto traceColor              = std::stoi(std::begin(TraceInputBuffer));
 	switch (MsgIndex) {
 	case 2: {
 		if (traceColor > 25) {

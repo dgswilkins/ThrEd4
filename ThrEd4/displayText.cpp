@@ -228,7 +228,7 @@ void displayText::ritnum(uint32_t code, uint32_t value) {
 }
 
 void displayText::msgstr(uint32_t code) noexcept {
-	LoadString(ThrEdInstance, code, &MsgBuffer[0], MSGSIZ);
+	LoadString(ThrEdInstance, code, std::begin(MsgBuffer), MSGSIZ);
 }
 
 void displayText::riter() {
@@ -389,9 +389,9 @@ void displayText::savdisc() {
 
 	GetClientRect(MsgWindow, &MsgRect);
 
-	LoadString(ThrEdInstance, IDS_SAV, &buffer[0], HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_SAV, std::begin(buffer), HBUFSIZ);
 	OKButton = CreateWindow(L"STATIC", // NOLINT
-	                        &buffer[0],
+	                        std::begin(buffer),
 	                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                        5,
 	                        MsgRect.bottom + 15,
@@ -402,9 +402,9 @@ void displayText::savdisc() {
 	                        ThrEdInstance,
 	                        nullptr);
 
-	LoadString(ThrEdInstance, IDS_DISC, &buffer[0], HBUFSIZ);
+	LoadString(ThrEdInstance, IDS_DISC, std::begin(buffer), HBUFSIZ);
 	DiscardButton = CreateWindow(L"STATIC", // NOLINT
-	                             &buffer[0],
+	                             std::begin(buffer),
 	                             SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                             ButtonWidthX3 + 15,
 	                             MsgRect.bottom + 15,
