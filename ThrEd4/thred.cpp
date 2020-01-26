@@ -2128,7 +2128,7 @@ void thred::internal::chknum() {
 					thred::savdo();
 					auto colVal = gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
 					form::nufilcol(colVal);
-					SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
+					SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 					thred::coltab();
 				}
 				thred::unsid();
