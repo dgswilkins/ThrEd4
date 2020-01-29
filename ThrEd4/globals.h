@@ -191,7 +191,7 @@ extern std::vector<fPOINT>* OutsidePoints;
 
 extern char           PCSBMPFileName[16];
 extern PCSHEADER      PCSHeader;
-extern const wchar_t* PcdClipFormat;
+extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
 extern uint32_t       PreferenceIndex;
 extern int32_t        PreferenceWindowWidth;
@@ -256,7 +256,7 @@ extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 extern HWND                 ThreadSizeWin[16];
 extern uint32_t             ThrEdClip;
-extern const wchar_t*       ThrEdClipFormat;
+extern wchar_t const*       ThrEdClipFormat;
 extern HINSTANCE            ThrEdInstance;
 extern HWND                 ThrEdWindow;
 extern fs::path*            ThrName;

@@ -65,7 +65,7 @@ auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
 }
 
 void texture::txdun() {
-	const char signature[4]         = "txh";
+	char const signature[4]         = "txh";
 	auto       textureHistoryBuffer = std::vector<TXHSTBUF> {};
 	textureHistoryBuffer.resize(ITXBUFLEN);
 
@@ -78,7 +78,7 @@ void texture::txdun() {
 				WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 				WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 				auto bufferIter = textureHistoryBuffer.begin();
-				for (const auto& historyEntry : TextureHistory) {
+				for (auto const& historyEntry : TextureHistory) {
 					auto& bufferEntry       = *bufferIter;
 					bufferEntry.placeholder = nullptr;
 					bufferEntry.count       = gsl::narrow<uint32_t>(historyEntry.texturePoints.size());
@@ -110,7 +110,7 @@ void texture::txdun() {
 
 void texture::internal::redtbak() {
 	OutputDebugString(fmt::format(L"retrieving texture history {}\n", TextureHistoryIndex).c_str());
-	const auto* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
+	auto const* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (textureHistoryItem != nullptr) {
 		TextureScreen.areaHeight = textureHistoryItem->height;
 		TextureScreen.width      = textureHistoryItem->width;
@@ -175,7 +175,7 @@ void texture::redtx() {
 }
 
 auto texture::istx(uint32_t iForm) noexcept -> bool {
-	const auto& pfrm = FormList->operator[](iForm);
+	auto const& pfrm = FormList->operator[](iForm);
 	if (pfrm.fillType == TXVRTF) {
 		return true;
 	}
@@ -188,7 +188,7 @@ auto texture::istx(uint32_t iForm) noexcept -> bool {
 	return false;
 }
 
-auto texture::istx(const FRMHED& form) noexcept -> bool {
+auto texture::istx(FRMHED const& form) noexcept -> bool {
 	if (form.fillType == TXVRTF) {
 		return true;
 	}
@@ -210,7 +210,7 @@ void texture::internal::txrfor() noexcept {
 	}
 }
 
-auto texture::internal::chktxh(_In_ const TXHST* historyItem) -> bool {
+auto texture::internal::chktxh(_In_ TXHST const* historyItem) -> bool {
 	if (historyItem != nullptr) {
 		if (historyItem->texturePoints.size() != TempTexturePoints->size()) {
 			return true;
@@ -312,7 +312,7 @@ void texture::dutxtfil() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
+void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
 	screenPoint.x
 	    = wrap::round<int32_t>((gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset)
 	                           / TextureScreen.editToPixelRatio);
@@ -321,7 +321,7 @@ void texture::internal::txt2pix(const TXPNT& texturePoint, POINT& screenPoint) {
 	    - texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height + TextureScreen.top);
 }
 
-void texture::internal::txtxfn(const POINT& reference, uint16_t offsetPixels) noexcept {
+void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept {
 	POINT line[2] = {};
 
 	line[0] = { reference.x, reference.y - offsetPixels };
@@ -346,7 +346,7 @@ void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
 	txi::txtxfn(ref, offsetPixels);
 }
 
-void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
+void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) {
 	auto texturePoint = TXPNT { textureRect.top, textureRect.left };
 	auto point        = POINT { 0L, 0L };
 
@@ -360,12 +360,12 @@ void texture::internal::txrct2rct(const TXTRCT& textureRect, RECT& rectangle) {
 	rectangle.bottom = point.y + IniFile.textureEditorSize;
 }
 
-void texture::internal::ed2px(const fPOINT& editPoint, POINT& point) {
+void texture::internal::ed2px(fPOINT const& editPoint, POINT& point) {
 	point.x = wrap::round<int32_t>(editPoint.x / TextureScreen.editToPixelRatio);
 	point.y = wrap::round<int32_t>(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
 }
 
-void texture::internal::px2ed(const POINT& point, fPOINT& editPoint) noexcept {
+void texture::internal::px2ed(POINT const& point, fPOINT& editPoint) noexcept {
 	editPoint.x = point.x * TextureScreen.editToPixelRatio;
 	editPoint.y = TextureScreen.screenHeight - point.y * TextureScreen.editToPixelRatio;
 }
@@ -373,7 +373,7 @@ void texture::internal::px2ed(const POINT& point, fPOINT& editPoint) noexcept {
 void texture::internal::chktx() {
 	TempTexturePoints->erase(std::remove_if(TempTexturePoints->begin(),
 	                                        TempTexturePoints->end(),
-	                                        [&](const auto& p) -> bool {
+	                                        [&](auto const& p) -> bool {
 		                                        return !(p.line <= TextureScreen.lines && p.y <= TextureScreen.areaHeight);
 	                                        }),
 	                         TempTexturePoints->end());
@@ -382,12 +382,12 @@ void texture::internal::chktx() {
 void texture::drwtxtr() {
 	POINT line[2] = {};
 
-	const auto editSpace = TextureScreen.areaHeight * 2.0 / (TextureScreen.spacing * (TextureScreen.lines + 2.0));
+	auto const editSpace = TextureScreen.areaHeight * 2.0 / (TextureScreen.spacing * (TextureScreen.lines + 2.0));
 
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	const auto pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
+	auto const pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
 	TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
-	const auto extraWidth = TextureScreen.spacing * gsl::narrow_cast<float>(TextureScreen.lines + 2U);
+	auto const extraWidth = TextureScreen.spacing * gsl::narrow_cast<float>(TextureScreen.lines + 2U);
 	if (StateMap.testAndReset(StateFlag::CHKTX)) {
 		txi::chktx();
 	}
@@ -469,7 +469,7 @@ void texture::drwtxtr() {
 	displayText::drwtxbut(TextureScreen);
 }
 
-auto texture::internal::px2txt(const POINT& offset) -> bool {
+auto texture::internal::px2txt(POINT const& offset) -> bool {
 	auto editPoint = fPOINT {};
 
 	auto retval = false;
@@ -536,7 +536,7 @@ auto texture::internal::txtclos(uint32_t& closestTexturePoint) -> bool {
 		closestTexturePoint = 0;
 		for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); iPoint++) {
 			txi::txt2pix(TempTexturePoints->operator[](iPoint), point);
-			const auto length = hypot(point.x - reference.x, point.y - reference.y);
+			auto const length = hypot(point.x - reference.x, point.y - reference.y);
 			if (length < minimumLength) {
 				minimumLength       = length;
 				closestTexturePoint = iPoint;
@@ -557,9 +557,9 @@ void texture::internal::setxmov() {
 }
 
 void texture::internal::ritxrct() noexcept {
-	const auto offset    = POINT { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+	auto const offset    = POINT { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                                 (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
-	const auto rectangle = RECT { (TexturePixelRect.left + offset.x),
+	auto const rectangle = RECT { (TexturePixelRect.left + offset.x),
 		                          (TexturePixelRect.top + offset.y),
 		                          (TexturePixelRect.right + offset.x),
 		                          (TexturePixelRect.bottom + offset.y) };
@@ -599,19 +599,19 @@ void texture::internal::dutxrct(TXTRCT& textureRect) {
 	}
 }
 
-auto texture::internal::ed2stch(const fPOINT& point) noexcept -> fPOINT {
+auto texture::internal::ed2stch(fPOINT const& point) noexcept -> fPOINT {
 	return { (point.x - TextureScreen.xOffset), (point.y - TextureScreen.yOffset) };
 }
 
-void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) {
-	const auto point0 = txi::ed2stch(point0in);
-	const auto point1 = txi::ed2stch(point1in);
+void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) {
+	auto const point0 = txi::ed2stch(point0in);
+	auto const point1 = txi::ed2stch(point1in);
 
-	const auto deltaX = point1.x - point0.x;
+	auto const deltaX = point1.x - point0.x;
 	if (fabs(deltaX) < TINY) {
 		return;
 	}
-	const auto slope  = (point1.y - point0.y) / deltaX;
+	auto const slope  = (point1.y - point0.y) / deltaX;
 	auto       start  = point0.x;
 	auto       finish = point1.x;
 	if (start > finish) {
@@ -625,11 +625,11 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 	if (integerFinish > TextureScreen.lines) {
 		integerFinish = TextureScreen.lines;
 	}
-	const auto lineRange = integerFinish - integerStart;
+	auto const lineRange = integerFinish - integerStart;
 	if (lineRange >= 0) {
 		TempTexturePoints->reserve(TempTexturePoints->size() + lineRange);
 		while (integerStart <= integerFinish) {
-			const auto yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
+			auto const yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 			if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
 				TempTexturePoints->push_back({ yOffset, gsl::narrow<uint16_t>(integerStart) });
 			}
@@ -638,7 +638,7 @@ void texture::internal::dutxlin(const fPOINT& point0in, const fPOINT& point1in) 
 	}
 }
 
-void texture::internal::setxclp(const FRMHED& form) {
+void texture::internal::setxclp(FRMHED const& form) {
 	auto screenOffset = POINT { 0L, 0L };
 	auto editorOffset = fPOINT {};
 
@@ -662,7 +662,7 @@ void texture::internal::setxclp(const FRMHED& form) {
 		lineCount++;
 	}
 	for (auto iLine = 0U; iLine < lineCount; iLine++) {
-		const auto iNextVertex = form::nxt(form, iLine);
+		auto const iNextVertex = form::nxt(form, iLine);
 		txi::dutxlin(angledFormVertices[iLine], angledFormVertices[iNextVertex]);
 	}
 }
@@ -680,7 +680,7 @@ void texture::internal::stxlin() {
 	StateMap.set(StateFlag::RESTCH);
 }
 
-void texture::internal::ed2txp(const POINT& offset, TXPNT& textureRecord) {
+void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
 	auto point = fPOINT {};
 
 	txi::px2ed(offset, point);
@@ -702,7 +702,7 @@ void texture::txtrup() {
 		txi::deorg(offset);
 		offset.x -= SelectTexturePointsOrigin.x;
 		offset.y -= SelectTexturePointsOrigin.y;
-		const auto Xmagnitude    = abs(offset.x);
+		auto const Xmagnitude    = abs(offset.x);
 		auto       textureOffset = TXOFF { wrap::toFloat(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
                                      wrap::ceil<int32_t>(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing) };
 		if (offset.x < 0) {
@@ -760,7 +760,7 @@ void texture::txtrup() {
 }
 
 void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
-	const auto& angledFormVertices = *AngledFormVertices;
+	auto const& angledFormVertices = *AngledFormVertices;
 	rectangle.left           = angledFormVertices[0].x;
 	rectangle.right          = angledFormVertices[0].x;
 	rectangle.bottom         = angledFormVertices[0].y;
@@ -781,7 +781,7 @@ void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
 	}
 }
 
-void texture::internal::ritxfrm(const FRMHED& textureForm) {
+void texture::internal::ritxfrm(FRMHED const& textureForm) {
 	auto offset = POINT { (TextureCursorLocation.x - SelectTexturePointsOrigin.x),
 		                  (TextureCursorLocation.y - SelectTexturePointsOrigin.y) };
 
@@ -790,7 +790,7 @@ void texture::internal::ritxfrm(const FRMHED& textureForm) {
 	auto& formLines = *FormLines;
 	formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
 	auto&      angledFormVertices = *AngledFormVertices;
-	const auto maxVertex          = wrap::toUnsigned(angledFormVertices.size());
+	auto const maxVertex          = wrap::toUnsigned(angledFormVertices.size());
 	for (auto iVertex = 0U; iVertex < maxVertex; iVertex++) {
 		txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
 		formLines[iVertex].x += offset.x;
@@ -815,9 +815,9 @@ void texture::internal::setxfrm() {
 		vertex.y -= angleRect.bottom;
 	}
 	txi::angrct(angleRect);
-	const auto height = angleRect.top - angleRect.bottom;
+	auto const height = angleRect.top - angleRect.bottom;
 	if (height > TextureScreen.areaHeight) {
-		const auto ratio = TextureScreen.areaHeight / height * 0.95;
+		auto const ratio = TextureScreen.areaHeight / height * 0.95;
 		for (auto& vertex : angledFormVertices) {
 			vertex.x *= ratio;
 			vertex.y *= ratio;
@@ -866,7 +866,7 @@ void texture::internal::dutxtlin() noexcept {
 	Polyline(StitchWindowDC, FormLines->data(), 2);
 }
 
-void texture::txtrmov(const FRMHED& textureForm) {
+void texture::txtrmov(FRMHED const& textureForm) {
 	if (StateMap.test(StateFlag::TXTLIN)) {
 		txi::dutxtlin();
 		txi::deorg(FormLines->operator[](1));
@@ -961,7 +961,7 @@ void texture::internal::butsid(uint32_t windowId) {
 	displayText::updateWinFont(MainStitchWin);
 }
 
-auto texture::internal::tpComp(const TXPNT& texturePoint0, const TXPNT& texturePoint1) noexcept -> bool {
+auto texture::internal::tpComp(TXPNT const& texturePoint0, TXPNT const& texturePoint1) noexcept -> bool {
 	// make sure the comparison obeys strict weak ordering for stable sorting
 	if (texturePoint0.line < texturePoint1.line) {
 		return true;
@@ -1021,7 +1021,7 @@ void texture::internal::txang(FRMHED& form) {
 
 void texture::deltx(uint32_t formIndex) {
 	auto& form                          = FormList->operator[](formIndex);
-	const auto&            currentIndex = form.fillInfo.texture.index;
+	auto const&            currentIndex = form.fillInfo.texture.index;
 
 	if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
 		auto flag = false;
@@ -1083,14 +1083,14 @@ void texture::internal::nutx(FRMHED& form) {
 	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 	if (!FormList->empty()) {
 		if (texture::istx(ClosestFormToCursor)) {
-			const auto& texture = form.fillInfo.texture;
+			auto const& texture = form.fillInfo.texture;
 			index               = texture.index;
 			texture::deltx(ClosestFormToCursor);
 		}
 		else {
 			for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
 				if (texture::istx(iForm)) {
-					const auto& texture = FormList->operator[](iForm).fillInfo.texture;
+					auto const& texture = FormList->operator[](iForm).fillInfo.texture;
 					index               = texture.index + texture.count;
 					break;
 				}
@@ -1098,7 +1098,7 @@ void texture::internal::nutx(FRMHED& form) {
 		}
 	}
 	if (!TempTexturePoints->empty()) {
-		const auto tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
+		auto const tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
 		auto       insertIt       = std::next(TexturePointsBuffer->begin(), index);
 		TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 		for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
@@ -1116,7 +1116,7 @@ void texture::internal::nutx(FRMHED& form) {
 void texture::internal::altx() {
 	auto txtLines = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
 	if (StateMap.test(StateFlag::FORMSEL)) {
-		const auto halfHeight = TextureScreen.areaHeight / 2.0F;
+		auto const halfHeight = TextureScreen.areaHeight / 2.0F;
 		for (auto& texturePoint : *TempTexturePoints) {
 			txtLines.set(texturePoint.line);
 		}
@@ -1190,8 +1190,8 @@ void texture::internal::dutxfn(uint32_t textureType) {
 
 void texture::internal::dutxmir() {
 	if (!TempTexturePoints->empty()) {
-		const auto centerLine = (TextureScreen.lines + 1U) / 2;
-		const auto evenOffset = 1U - (TextureScreen.lines & 1U);
+		auto const centerLine = (TextureScreen.lines + 1U) / 2;
+		auto const evenOffset = 1U - (TextureScreen.lines & 1U);
 		texture::savtxt();
 		std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
 		auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1U;
@@ -1199,7 +1199,7 @@ void texture::internal::dutxmir() {
 			iPoint--;
 		}
 		TempTexturePoints->resize(wrap::toSize(iPoint) + 1U);
-		const auto iMirrorPoint = iPoint + evenOffset;
+		auto const iMirrorPoint = iPoint + evenOffset;
 		for (auto index = 0U; index < iMirrorPoint; index++) {
 			auto newLine = gsl::narrow<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
 			TempTexturePoints->emplace_back(TXPNT { TempTexturePoints->operator[](index).y, newLine });
@@ -1255,7 +1255,7 @@ auto texture::internal::chkbut() -> bool {
 	return false;
 }
 
-void texture::txtlbut(const FRMHED& textureForm) {
+void texture::txtlbut(FRMHED const& textureForm) {
 	if (txi::chkbut()) {
 		return;
 	}
@@ -1358,7 +1358,7 @@ void texture::internal::txtdel() {
 	}
 }
 
-void texture::internal::txcntrv(const FRMHED& textureForm) {
+void texture::internal::txcntrv(FRMHED const& textureForm) {
 	if (StateMap.testAndReset(StateFlag::TXTCLP)) {
 		StateMap.set(StateFlag::TXHCNTR);
 		texture::savtxt();
@@ -1367,7 +1367,7 @@ void texture::internal::txcntrv(const FRMHED& textureForm) {
 	}
 }
 
-void texture::internal::txsiz(float ratio, const FRMHED& textureForm) {
+void texture::internal::txsiz(float ratio, FRMHED const& textureForm) {
 	txi::ritxfrm(textureForm);
 	auto& angledFormVertices = *AngledFormVertices;
 	for (auto& vertex : angledFormVertices) {
@@ -1382,11 +1382,11 @@ void texture::internal::txsiz(float ratio, const FRMHED& textureForm) {
 	txi::ritxfrm(textureForm);
 }
 
-void texture::internal::txshrnk(const FRMHED& textureForm) {
+void texture::internal::txshrnk(FRMHED const& textureForm) {
 	txi::txsiz(TXTRAT, textureForm);
 }
 
-void texture::internal::txgro(const FRMHED& textureForm) {
+void texture::internal::txgro(FRMHED const& textureForm) {
 	txi::txsiz(1.0F / TXTRAT, textureForm);
 }
 
@@ -1410,9 +1410,9 @@ GSL_SUPPRESS(26440) auto texture::internal::txdig(uint32_t keyCode, char& charac
 void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 	if (!SelectedTexturePointsList->empty()) {
 		if (deltaY != 0.0F) {
-			const auto screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
+			auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 			for (auto point : *SelectedTexturePointsList) {
-				const auto yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
+				auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
 				if (yCoord < 0.0) {
 					return;
 				}
@@ -1426,7 +1426,7 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 		}
 		else {
 			for (auto point : *SelectedTexturePointsList) {
-				const auto textureLine = TempTexturePoints->operator[](point).line + deltaX;
+				auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
 				if (textureLine < 1) {
 					return;
 				}
@@ -1434,7 +1434,7 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 					return;
 				}
 			}
-			for (const auto point : *SelectedTexturePointsList) {
+			for (auto const point : *SelectedTexturePointsList) {
 				TempTexturePoints->operator[](point).line += gsl::narrow<uint16_t>(deltaX);
 			}
 		}
@@ -1444,22 +1444,22 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 }
 
 void texture::txsnap() {
-	const auto txpntSize = TempTexturePoints->size();
+	auto const txpntSize = TempTexturePoints->size();
 
 	if (txpntSize != 0U) {
 		texture::savtxt();
-		const auto halfGrid = IniFile.gridSize / 2;
+		auto const halfGrid = IniFile.gridSize / 2;
 		if (!SelectedTexturePointsList->empty()) {
 			for (auto iPoint = 0U; iPoint < txpntSize; iPoint++) {
 				auto&       texturePoint = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
-				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				auto const yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
 				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
 		else {
 			for (auto iPoint = 0U; iPoint < txpntSize; iPoint++) {
 				auto&       texturePoint = TempTexturePoints->operator[](iPoint);
-				const auto yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
+				auto const yStep        = (texturePoint.y + halfGrid) / IniFile.gridSize;
 				texturePoint.y         = yStep * IniFile.gridSize;
 			}
 		}
@@ -1610,8 +1610,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 }
 
 void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
-	const auto currentIndex = form.fillInfo.texture.index;
-	const auto currentCount = form.fillInfo.texture.count;
+	auto const currentIndex = form.fillInfo.texture.index;
+	auto const currentCount = form.fillInfo.texture.count;
 
 	texture::savtxt();
 	form.wordParam = 0;
@@ -1620,9 +1620,9 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 	ClipRectSize.cy = form.fillInfo.texture.height;
 	if (currentCount != 0U) {
 		for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
-			const auto currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + iTexturePoint);
+			auto const currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + iTexturePoint);
 			if (currentPoint.line != 0U) {
-				const auto iSegment = currentPoint.line - 1U;
+				auto const iSegment = currentPoint.line - 1U;
 
 				textureSegments[iSegment].line = iTexturePoint;
 				textureSegments[iSegment].stitchCount++;
@@ -1631,10 +1631,10 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 	}
 }
 
-void texture::rtrtx(const FRMHED& form) {
+void texture::rtrtx(FRMHED const& form) {
 	TempTexturePoints->clear();
 
-	const auto currentIndex = form.fillInfo.texture.index;
+	auto const currentIndex = form.fillInfo.texture.index;
 	if (TexturePointsBuffer->size() > gsl::narrow<uint32_t>(currentIndex)) {
 		auto currentCount = form.fillInfo.texture.count;
 		if (TexturePointsBuffer->size() < gsl::narrow<uint32_t>(currentIndex + currentCount)) {
@@ -1652,7 +1652,7 @@ void texture::rtrtx(const FRMHED& form) {
 	}
 }
 
-auto texture::internal::inrct(const fRECTANGLE& rectangle, const fPOINTATTR& stitch) noexcept -> bool {
+auto texture::internal::inrct(fRECTANGLE const& rectangle, fPOINTATTR const& stitch) noexcept -> bool {
 	if (stitch.x < rectangle.left) {
 		return false;
 	}

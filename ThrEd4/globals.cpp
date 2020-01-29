@@ -157,7 +157,7 @@ std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline
 
 char           PCSBMPFileName[16];                // bitmap file name from pcs file
 PCSHEADER      PCSHeader;                         // pcs file header
-const wchar_t* PcdClipFormat   = L"PMust_Format"; //
+wchar_t const* PcdClipFormat   = L"PMust_Format"; //
 float          PicotSpacing    = IPICSPAC;        // space between border picots
 uint32_t       PreferenceIndex = 0;               // index to the active preference window
 int32_t        PreferenceWindowWidth;             // width of the preference window
@@ -222,7 +222,7 @@ std::wstring*       TextureInputBuffer;             // texture fill number buffe
 std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
 HWND                ThreadSizeWin[COLOR_COUNT];     // thread size windows
 uint32_t            ThrEdClip       = 0;            // thred format
-const wchar_t*      ThrEdClipFormat = L"threditor"; //
+wchar_t const*      ThrEdClipFormat = L"threditor"; //
 HINSTANCE           ThrEdInstance;                  // main instance handle
 HWND                ThrEdWindow;                    // main window handle
 fs::path*           ThrName;                        //

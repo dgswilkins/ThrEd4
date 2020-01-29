@@ -32,22 +32,22 @@ void wasTrace1();
 
 namespace internal {
 
-	void bfrm(const FRMHED& form);
+	void bfrm(FRMHED const& form);
 	void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept;
 	void difbits(uint32_t shift, uint32_t* point) noexcept;
 
 	static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
-	void dublk(HDC dc, const RECT& traceHighMask, const RECT& traceLowMask, HBRUSH brush);
+	void dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
 	auto ducolm() -> uint32_t;
-	void durct(uint32_t shift, const RECT& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
-	void dutdif(TRCPNT& traceDiff, const TRCPNT* point) noexcept;
+	void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
+	void dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept;
 	void dutrac();
 	void dutrnum0(uint32_t color);
 	void dwnum(uint32_t iRGB);
 	void getrmap();
 	void hidwnd(HWND hwnd) noexcept;
-	void pxlin(const FRMHED& form, uint32_t start, uint32_t finish);
+	void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
 	void ritrcol(COLORREF* color, uint32_t number) noexcept;
 	void shownd(HWND hwnd) noexcept;
 	void stch2bit(fPOINT& point);

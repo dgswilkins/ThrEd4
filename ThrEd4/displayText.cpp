@@ -67,13 +67,13 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 	}
 }
 
-void displayText::shoMsg(const std::wstring& message) {
+void displayText::shoMsg(std::wstring const& message) {
 	if (!message.empty()) {
 		auto strings = std::vector<std::wstring> {};
 
 		auto       iString              = 0U;
 		auto       previousStringLength = 0U;
-		const auto sizeLim              = message.size();
+		auto const sizeLim              = message.size();
 		while (iString < sizeLim) {
 			if (message[iString] == 10) {
 				strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
@@ -168,7 +168,7 @@ void displayText::msgflt(uint32_t messageId, float value) {
 	displayText::numWnd();
 }
 
-void displayText::tsizmsg(const wchar_t* threadSizeText, double threadSize) {
+void displayText::tsizmsg(wchar_t const* threadSizeText, double threadSize) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, IDS_SIZ);
@@ -184,21 +184,21 @@ void displayText::bfilmsg() {
 	displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
-void displayText::filnopn(uint32_t code, const fs::path& fileName) {
+void displayText::filnopn(uint32_t code, fs::path const& fileName) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, code);
 	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void displayText::crmsg(const fs::path& fileName) {
+void displayText::crmsg(fs::path const& fileName) {
 	auto fmtStr = std::wstring {};
 
 	displayText::loadString(fmtStr, IDS_CREAT);
 	displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
-void displayText::butxt(uint32_t iButton, const std::wstring& buttonText) {
+void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
 	if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
 		if (iButton == 5U) {
 			if (StateMap.test(StateFlag::HIDMAP)) {
@@ -278,7 +278,7 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	if (!FormList->empty()) {
 		displayText::frm1pnt();
 		if (StateMap.test(StateFlag::FORMSEL)) {
-			const auto& form = FormList->operator[](ClosestFormToCursor);
+			auto const& form = FormList->operator[](ClosestFormToCursor);
 			if (form.vertexCount == 2) {
 				if (code < FML_LIN) {
 					displayText::tabmsg(IDS_FRM3X);
@@ -436,7 +436,7 @@ auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 }
 
 GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
-	const auto* hFont = displayText::getThrEdFont(400);
+	auto const* hFont = displayText::getThrEdFont(400);
 	EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont)); // NOLINT
 }
 #pragma warning(pop)
@@ -474,7 +474,7 @@ void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float da
 	SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }
 
-void displayText::drwtxbut(const TXTSCR& textureScreen) {
+void displayText::drwtxbut(TXTSCR const& textureScreen) {
 	di::bxtxt(HTXCLR, IDS_CLEAR);
 	di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
 	thred::redraw(ButtonWin->operator[](HTXWID));
@@ -489,7 +489,7 @@ void displayText::drwtxbut(const TXTSCR& textureScreen) {
 auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 	auto lfText = LOGFONT { 0L, 0L, 0L, 0L, 0L, 0, 0, 0, 0, 0, 0, 0, 0, L"" };
 #if HIGHDPI
-	const auto uDpi = GetDpiForWindow(ThrEdWindow);
+	auto const uDpi = GetDpiForWindow(ThrEdWindow);
 	SystemParametersInfoForDpi(SPI_GETICONTITLELOGFONT, sizeof(lfText), &lfText, FALSE, uDpi);
 	lfText.lfWeight = weight;
 	return CreateFontIndirectW(&lfText);

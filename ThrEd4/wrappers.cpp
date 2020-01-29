@@ -24,7 +24,7 @@
 #include "switches.h"
 #include "wrappers.h"
 
-auto wrap::bufToFloat(const wchar_t* buffer) -> float {
+auto wrap::bufToFloat(wchar_t const* buffer) -> float {
 	auto value = 0.0F;
 
 	try {
@@ -37,7 +37,7 @@ auto wrap::bufToFloat(const wchar_t* buffer) -> float {
 	return value;
 }
 
-void wrap::Polyline(HDC hdc, CONST POINT* apt, uint32_t cpt) noexcept {
+void wrap::Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
 	Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
@@ -71,11 +71,11 @@ auto wrap::toFloat(double invar) -> float {
 	try {
 		result = gsl::narrow<float>(invar);
 	}
-	catch (const gsl::narrowing_error& e) { // check if we are seeing a rounding error
+	catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
 		UNREFERENCED_PARAMETER(e);
 
-		const auto var  = gsl::narrow_cast<float>(invar);
-		const auto diff = abs(invar - var);
+		auto const var  = gsl::narrow_cast<float>(invar);
+		auto const diff = abs(invar - var);
 		if (diff < 4e-5) {
 			result = var;
 		}
@@ -118,8 +118,8 @@ auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 	return gsl::narrow_cast<size_t>(invar);
 }
 
-auto wrap::wcstof(const wchar_t (&buffer)[HBUFSIZ]) noexcept -> float {
-	return std::wcstof(static_cast<const wchar_t*>(buffer), nullptr);
+auto wrap::wcstof(wchar_t const (&buffer)[HBUFSIZ]) noexcept -> float {
+	return std::wcstof(static_cast<wchar_t const*>(buffer), nullptr);
 }
 
 void wrap::setCursor(HCURSOR hCursor) noexcept {
@@ -131,7 +131,7 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
 }
 
 auto wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN {
-	const auto scaledWidth = MulDiv(width, *screenDPI, 96);
+	auto const scaledWidth = MulDiv(width, *screenDPI, 96);
 	return ::CreatePen(iStyle, scaledWidth, color);
 }
 

@@ -954,7 +954,7 @@ public:
 
 	constexpr PCSHEADER() noexcept = default;
 	// PCSHEADER(PCSHEADER&&) = default;
-	// PCSHEADER& operator=(const PCSHEADER& rhs) = default;
+	// PCSHEADER& operator=(PCSHEADER const& rhs) = default;
 	// PCSHEADER& operator=(PCSHEADER&&) = default;
 	//~PCSHEADER() = default;
 };
@@ -1051,7 +1051,7 @@ public:
 
 	constexpr INIFILE() noexcept = default;
 	// INIFILE(INIFILE&&) = default;
-	// INIFILE& operator=(const INIFILE& rhs) = default;
+	// INIFILE& operator=(INIFILE const& rhs) = default;
 	// INIFILE& operator=(INIFILE&&) = default;
 	//~INIFILE() = default;
 };
@@ -1073,7 +1073,7 @@ public:
 
 	constexpr FORMVERTICES() noexcept = default;
 	// FORMVERTICES(FORMVERTICES&&) = default;
-	// FORMVERTICES& operator=(const FORMVERTICES& rhs) = default;
+	// FORMVERTICES& operator=(FORMVERTICES const& rhs) = default;
 	// FORMVERTICES& operator=(FORMVERTICES&&) = default;
 	//~FORMVERTICES() = default;
 };
@@ -1090,14 +1090,14 @@ public:
 	double y { 0.0 };
 
 	constexpr dPOINT() noexcept = default;
-	explicit inline dPOINT(const fPOINT& rhs) noexcept;
+	explicit inline dPOINT(fPOINT const& rhs) noexcept;
 	inline dPOINT(float rhsX, float rhsY) noexcept;
 	inline dPOINT(double rhsX, double rhsY) noexcept;
-	inline bool    operator==(const dPOINT& rhs) const noexcept;
-	inline dPOINT& operator=(const fPOINT& rhs) noexcept;
-	inline dPOINT& operator=(const BSEQPNT& rhs) noexcept;
+	inline bool    operator==(dPOINT const& rhs) const noexcept;
+	inline dPOINT& operator=(fPOINT const& rhs) noexcept;
+	inline dPOINT& operator=(BSEQPNT const& rhs) noexcept;
 	// dPOINT(dPOINT&&) = default;
-	// dPOINT& operator=(const dPOINT& rhs) = default;
+	// dPOINT& operator=(dPOINT const& rhs) = default;
 	// dPOINT& operator=(dPOINT&&) = default;
 	//~dPOINT() = default;
 };
@@ -1112,14 +1112,14 @@ public:
 	inline fPOINT(double rhsX, double rhsY) noexcept;
 	inline fPOINT(float rhsX, float rhsY) noexcept;
 	inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
-	explicit inline fPOINT(const dPOINT& rhs) noexcept;
-	inline bool    operator==(const fPOINT& rhs) const noexcept;
-	inline fPOINT& operator=(const dPOINT& rhs) noexcept;
-	inline fPOINT& operator=(const fPOINTATTR& rhs) noexcept;
-	inline fPOINT& operator=(const SMALPNTL& rhs) noexcept;
-	inline fPOINT& operator=(const BSEQPNT& rhs) noexcept;
+	explicit inline fPOINT(dPOINT const& rhs) noexcept;
+	inline bool    operator==(fPOINT const& rhs) const noexcept;
+	inline fPOINT& operator=(dPOINT const& rhs) noexcept;
+	inline fPOINT& operator=(fPOINTATTR const& rhs) noexcept;
+	inline fPOINT& operator=(SMALPNTL const& rhs) noexcept;
+	inline fPOINT& operator=(BSEQPNT const& rhs) noexcept;
 	// fPOINT(fPOINT&&) = default;
-	// fPOINT& operator=(const fPOINT& rhs) = default;
+	// fPOINT& operator=(fPOINT const& rhs) = default;
 	// fPOINT& operator=(fPOINT&&) = default;
 	//~fPOINT() = default;
 };
@@ -1135,7 +1135,7 @@ public:
 	inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
 	inline fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
 	// fPOINTATTR(fPOINTATTR&&) = default;
-	// fPOINTATTR& operator=(const fPOINTATTR& rhs) = default;
+	// fPOINTATTR& operator=(fPOINTATTR const& rhs) = default;
 	// fPOINTATTR& operator=(fPOINTATTR&&) = default;
 	//~fPOINTATTR() = default;
 };
@@ -1150,7 +1150,7 @@ public:
 
 	constexpr SMALPNTL() noexcept = default;
 	// SMALPNTL(SMALPNTL&&) = default;
-	// SMALPNTL& operator=(const SMALPNTL& rhs) = default;
+	// SMALPNTL& operator=(SMALPNTL const& rhs) = default;
 	// SMALPNTL& operator=(SMALPNTL&&) = default;
 	//~SMALPNTL() = default;
 };
@@ -1166,7 +1166,7 @@ public:
 	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
 	inline BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr);
 	// BSEQPNT(BSEQPNT&&) = default;
-	// BSEQPNT& operator=(const BSEQPNT& rhs) = default;
+	// BSEQPNT& operator=(BSEQPNT const& rhs) = default;
 	// BSEQPNT& operator=(BSEQPNT&&) = default;
 	//~BSEQPNT() = default;
 };
@@ -1187,7 +1187,7 @@ inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr)
 }
 #pragma warning(pop)
 
-inline bool fPOINT::operator==(const fPOINT& rhs) const noexcept {
+inline bool fPOINT::operator==(fPOINT const& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
@@ -1207,31 +1207,31 @@ inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
 	y = gsl::narrow_cast<float>(rhsY);
 }
 
-inline fPOINT::fPOINT(const dPOINT& rhs) noexcept {
+inline fPOINT::fPOINT(dPOINT const& rhs) noexcept {
 	x = gsl::narrow_cast<float>(rhs.x);
 	y = gsl::narrow_cast<float>(rhs.y);
 }
 
-inline fPOINT& fPOINT::operator=(const dPOINT& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(dPOINT const& rhs) noexcept {
 	x = gsl::narrow_cast<float>(rhs.x);
 	y = gsl::narrow_cast<float>(rhs.y);
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const SMALPNTL& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(SMALPNTL const& rhs) noexcept {
 	x = gsl::narrow_cast<float>(rhs.x);
 	y = gsl::narrow_cast<float>(rhs.y);
 	return *this;
 }
 #pragma warning(pop)
 
-inline fPOINT& fPOINT::operator=(const fPOINTATTR& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(fPOINTATTR const& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline fPOINT& fPOINT::operator=(const BSEQPNT& rhs) noexcept {
+inline fPOINT& fPOINT::operator=(BSEQPNT const& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
@@ -1249,7 +1249,7 @@ inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept 
 	attribute = rhsA;
 }
 
-inline dPOINT::dPOINT(const fPOINT& rhs) noexcept
+inline dPOINT::dPOINT(fPOINT const& rhs) noexcept
     : x(rhs.x)
     , y(rhs.y) {
 }
@@ -1263,17 +1263,17 @@ inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept
     : x(rhsX)
     , y(rhsY) {
 }
-inline bool dPOINT::operator==(const dPOINT& rhs) const noexcept {
+inline bool dPOINT::operator==(dPOINT const& rhs) const noexcept {
 	return (x == rhs.x) && (y == rhs.y);
 }
 
-inline dPOINT& dPOINT::operator=(const fPOINT& rhs) noexcept {
+inline dPOINT& dPOINT::operator=(fPOINT const& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
 }
 
-inline dPOINT& dPOINT::operator=(const BSEQPNT& rhs) noexcept {
+inline dPOINT& dPOINT::operator=(BSEQPNT const& rhs) noexcept {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
@@ -1288,7 +1288,7 @@ public:
 
 	constexpr fPOINTLINE() noexcept = default;
 	// fPOINTLINE(fPOINTLINE&&) = default;
-	// fPOINTLINE& operator=(const fPOINTLINE& rhs) = default;
+	// fPOINTLINE& operator=(fPOINTLINE const& rhs) = default;
 	// fPOINTLINE& operator=(fPOINTLINE&&) = default;
 	//~fPOINTLINE() = default;
 };
@@ -1303,7 +1303,7 @@ public:
 
 	constexpr dRECTANGLE() noexcept = default;
 	// dRECTANGLE(dRECTANGLE&&) = default;
-	// dRECTANGLE& operator=(const dRECTANGLE& rhs) = default;
+	// dRECTANGLE& operator=(dRECTANGLE const& rhs) = default;
 	// dRECTANGLE& operator=(dRECTANGLE&&) = default;
 	//~dRECTANGLE() = default;
 };
@@ -1316,7 +1316,7 @@ public:
 
 	constexpr COLCHNG() noexcept = default;
 	// COLCHNG(COLCHNG&&) = default;
-	// COLCHNG& operator=(const COLCHNG& rhs) = default;
+	// COLCHNG& operator=(COLCHNG const& rhs) = default;
 	// COLCHNG& operator=(COLCHNG&&) = default;
 	//~COLCHNG() = default;
 };
@@ -1346,7 +1346,7 @@ public:
 
 	constexpr FEATHER() noexcept = default;
 	// FEATHER(FEATHER&&) = default;
-	// FEATHER& operator=(const FEATHER& rhs) = default;
+	// FEATHER& operator=(FEATHER const& rhs) = default;
 	// FEATHER& operator=(FEATHER&&) = default;
 	//~FEATHER() = default;
 };
@@ -1422,7 +1422,7 @@ public:
 
 	constexpr fRECTANGLE() noexcept = default;
 	// fRECTANGLE(fRECTANGLE&&) = default;
-	// fRECTANGLE& operator=(const fRECTANGLE& rhs) = default;
+	// fRECTANGLE& operator=(fRECTANGLE const& rhs) = default;
 	// fRECTANGLE& operator=(fRECTANGLE&&) = default;
 	//~fRECTANGLE() = default;
 
@@ -1445,7 +1445,7 @@ public:
 
 	constexpr FORMINFO() noexcept = default;
 	// FORMINFO(FORMINFO&&) = default;
-	// FORMINFO& operator=(const FORMINFO& rhs) = default;
+	// FORMINFO& operator=(FORMINFO const& rhs) = default;
 	// FORMINFO& operator=(FORMINFO&&) = default;
 	//~FORMINFO() = default;
 };
@@ -1460,13 +1460,13 @@ public:
 
 	constexpr SATCON() noexcept = default;
 	// SATCON(SATCON&&) = default;
-	// SATCON& operator=(const SATCON& rhs) = default;
+	// SATCON& operator=(SATCON const& rhs) = default;
 	// SATCON& operator=(SATCON&&) = default;
 	//~SATCON() = default;
 
-	explicit SATCON(const SATCONOUT& rhs) noexcept;
+	explicit SATCON(SATCONOUT const& rhs) noexcept;
 	inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
-	inline SATCON& operator=(const SATCONOUT& rhs) noexcept;
+	inline SATCON& operator=(SATCONOUT const& rhs) noexcept;
 };
 
 inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
@@ -1482,34 +1482,34 @@ public:
 
 	constexpr SATCONOUT() noexcept = default;
 	// SATCONOUT(SATCONOUT&&) = default;
-	// SATCONOUT& operator=(const SATCONOUT& rhs) = default;
+	// SATCONOUT& operator=(SATCONOUT const& rhs) = default;
 	// SATCONOUT& operator=(SATCONOUT&&) = default;
 	//~SATCONOUT() = default;
 
-	explicit SATCONOUT(const SATCON& rhs);
-	inline SATCONOUT& operator=(const SATCON& rhs);
+	explicit SATCONOUT(SATCON const& rhs);
+	inline SATCONOUT& operator=(SATCON const& rhs);
 };
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(const SATCON& rhs) {
+GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline SATCONOUT& SATCONOUT::operator=(const SATCON& rhs) {
+GSL_SUPPRESS(26440) inline SATCONOUT& SATCONOUT::operator=(SATCON const& rhs) {
 	start  = gsl::narrow<uint16_t>(rhs.start);
 	finish = gsl::narrow<uint16_t>(rhs.finish);
 
 	return *this;
 }
 
-inline SATCON::SATCON(const SATCONOUT& rhs) noexcept {
+inline SATCON::SATCON(SATCONOUT const& rhs) noexcept {
 	start  = rhs.start;
 	finish = rhs.finish;
 }
 
-inline SATCON& SATCON::operator=(const SATCONOUT& rhs) noexcept {
+inline SATCON& SATCON::operator=(SATCONOUT const& rhs) noexcept {
 	start  = rhs.start;
 	finish = rhs.finish;
 
@@ -1526,7 +1526,7 @@ public:
 
 	FANGCLP() noexcept;
 	// FANGCLP(FANGCLP&&) = default;
-	// FANGCLP& operator=(const FANGCLP& rhs) = default;
+	// FANGCLP& operator=(FANGCLP const& rhs) = default;
 	// FANGCLP& operator=(FANGCLP&&) = default;
 	//~FANGCLP() = default;
 };
@@ -1544,7 +1544,7 @@ public:
 
 	FANGCLPOUT() noexcept;
 	// FANGCLPOUT(FANGCLPOUT&&) = default;
-	// FANGCLPOUT& operator=(const FANGCLPOUT& rhs) = default;
+	// FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
 	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
 	//~FANGCLPOUT() = default;
 };
@@ -1562,12 +1562,12 @@ public:
 
 	FLENCNT() noexcept;
 	// FLENCNT(FLENCNT&&) = default;
-	// FLENCNT& operator=(const FLENCNT& rhs) = default;
+	// FLENCNT& operator=(FLENCNT const& rhs) = default;
 	// FLENCNT& operator=(FLENCNT&&) = default;
 	//~FLENCNT() = default;
 
-	explicit FLENCNT(const FLENCNTOUT& rhs) noexcept;
-	inline FLENCNT& operator=(const FLENCNTOUT& rhs) noexcept;
+	explicit FLENCNT(FLENCNTOUT const& rhs) noexcept;
+	inline FLENCNT& operator=(FLENCNTOUT const& rhs) noexcept;
 };
 
 inline FLENCNT::FLENCNT() noexcept { // NOLINT
@@ -1581,33 +1581,33 @@ public:
 
 	FLENCNTOUT() noexcept;
 	// FLENCNTOUT(FLENCNTOUT&&) = default;
-	// FLENCNTOUT& operator=(const FLENCNTOUT& rhs) = default;
+	// FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
 	// FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
 	//~FLENCNTOUT() = default;
 
-	explicit FLENCNTOUT(const FLENCNT& rhs) noexcept;
-	inline FLENCNTOUT& operator=(const FLENCNT& rhs) noexcept;
+	explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
+	inline FLENCNTOUT& operator=(FLENCNT const& rhs) noexcept;
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
 	clipCount = 0U;
 }
 
-inline FLENCNTOUT::FLENCNTOUT(const FLENCNT& rhs) noexcept {
+inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept {
 	clipCount = rhs.clipCount;
 }
 
-inline FLENCNTOUT& FLENCNTOUT::operator=(const FLENCNT& rhs) noexcept {
+inline FLENCNTOUT& FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept {
 	clipCount = rhs.clipCount;
 
 	return *this;
 }
 
-inline FLENCNT::FLENCNT(const FLENCNTOUT& rhs) noexcept {
+inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept {
 	clipCount = rhs.clipCount;
 }
 
-inline FLENCNT& FLENCNT::operator=(const FLENCNTOUT& rhs) noexcept {
+inline FLENCNT& FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept {
 	clipCount = rhs.clipCount;
 
 	return *this;
@@ -1622,12 +1622,12 @@ public:
 
 	SATINANGLE() noexcept;
 	// SATINANGLE(SATINANGLE&&) = default;
-	// SATINANGLE& operator=(const SATINANGLE& rhs) = default;
+	// SATINANGLE& operator=(SATINANGLE const& rhs) = default;
 	// SATINANGLE& operator=(SATINANGLE&&) = default;
 	//~SATINANGLE() = default;
 
-	explicit SATINANGLE(const SATINANGLEOUT& rhs) noexcept;
-	inline SATINANGLE& operator=(const SATINANGLEOUT& rhs) noexcept;
+	explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
+	inline SATINANGLE& operator=(SATINANGLEOUT const& rhs) noexcept;
 };
 
 inline SATINANGLE::SATINANGLE() noexcept { // NOLINT
@@ -1641,33 +1641,33 @@ public:
 
 	SATINANGLEOUT() noexcept;
 	// SATINANGLEOUT(SATINANGLEOUT&&) = default;
-	// SATINANGLEOUT& operator=(const SATINANGLEOUT& rhs) = default;
+	// SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
 	// SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
 	//~SATINANGLEOUT() = default;
 
-	explicit SATINANGLEOUT(const SATINANGLE& rhs) noexcept;
-	inline SATINANGLEOUT& operator=(const SATINANGLE& rhs) noexcept;
+	explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
+	inline SATINANGLEOUT& operator=(SATINANGLE const& rhs) noexcept;
 };
 
 inline SATINANGLEOUT::SATINANGLEOUT() noexcept {
 	angle = 0.0;
 }
 
-inline SATINANGLEOUT::SATINANGLEOUT(const SATINANGLE& rhs) noexcept {
+inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept {
 	angle = rhs.angle;
 }
 
-inline SATINANGLEOUT& SATINANGLEOUT::operator=(const SATINANGLE& rhs) noexcept {
+inline SATINANGLEOUT& SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept {
 	angle = rhs.angle;
 
 	return *this;
 }
 
-inline SATINANGLE::SATINANGLE(const SATINANGLEOUT& rhs) noexcept {
+inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept {
 	angle = rhs.angle;
 }
 
-inline SATINANGLE& SATINANGLE::operator=(const SATINANGLEOUT& rhs) noexcept {
+inline SATINANGLE& SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept {
 	angle = rhs.angle;
 
 	return *this;
@@ -1734,7 +1734,7 @@ public:
 
 	constexpr FTHINFO() noexcept = default;
 	// FTHINFO(FTHINFO&&) = default;
-	// FTHINFO& operator=(const FTHINFO& rhs) = default;
+	// FTHINFO& operator=(FTHINFO const& rhs) = default;
 	// FTHINFO& operator=(FTHINFO&&) = default;
 	//~FTHINFO() = default;
 };
@@ -1749,7 +1749,7 @@ public:
 
 	constexpr TXTRINFO() noexcept = default;
 	// TXTRINFO(TXTRINFO&&) = default;
-	// TXTRINFO& operator=(const TXTRINFO& rhs) = default;
+	// TXTRINFO& operator=(TXTRINFO const& rhs) = default;
 	// TXTRINFO& operator=(TXTRINFO&&) = default;
 	//~TXTRINFO() = default;
 };
@@ -1761,7 +1761,7 @@ public:
 
 	TFINFO() noexcept;
 	// TFINFO(TFINFO&&) = default;
-	// TFINFO& operator=(const TFINFO& rhs) = default;
+	// TFINFO& operator=(TFINFO const& rhs) = default;
 	// TFINFO& operator=(TFINFO&&) = default;
 	//~TFINFO() = default;
 };
@@ -1799,7 +1799,7 @@ public:
 
 	FRMHEDO() noexcept;
 	// FRMHEDO(FRMHEDO&&) = default;
-	// FRMHEDO& operator=(const FRMHEDO& rhs) = default;
+	// FRMHEDO& operator=(FRMHEDO const& rhs) = default;
 	// FRMHEDO& operator=(FRMHEDO&&) = default;
 	//~FRMHEDO() = default;
 };
@@ -1872,15 +1872,15 @@ public:
 
 	FRMHED() noexcept;
 	// FRMHED(FRMHED&&) = default;
-	// FRMHED& operator=(const FRMHED& rhs) = default;
+	// FRMHED& operator=(FRMHED const& rhs) = default;
 	// FRMHED& operator=(FRMHED&&) = default;
 	//~FRMHED() = default;
 
-	explicit inline FRMHED(const FRMHEDO& rhs) noexcept;
-	explicit inline FRMHED(const FRMHEDOUT& rhs) noexcept;
+	explicit inline FRMHED(FRMHEDO const& rhs) noexcept;
+	explicit inline FRMHED(FRMHEDOUT const& rhs) noexcept;
 
-	inline FRMHED& operator=(const FRMHEDO& rhs) noexcept;
-	inline FRMHED& operator=(const FRMHEDOUT& rhs) noexcept;
+	inline FRMHED& operator=(FRMHEDO const& rhs) noexcept;
+	inline FRMHED& operator=(FRMHEDOUT const& rhs) noexcept;
 };
 
 inline FRMHED::FRMHED() noexcept
@@ -1923,7 +1923,7 @@ inline FRMHED::FRMHED() noexcept
 	cres                = 0U;
 }
 
-inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept
+inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept
     : fillInfo()
     , lengthOrCount(rhs.lengthOrCount)
     , rectangle(rhs.rectangle)
@@ -1978,7 +1978,7 @@ inline FRMHED::FRMHED(const FRMHEDO& rhs) noexcept
 	cres                = 0U;
 }
 
-inline FRMHED& FRMHED::operator=(const FRMHEDO& rhs) noexcept {
+inline FRMHED& FRMHED::operator=(FRMHEDO const& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = rhs.vertexCount;
 	type            = rhs.type;
@@ -2063,12 +2063,12 @@ public:
 
 	inline FRMHEDOUT() noexcept;
 	// FRMHEDOUT(FRMHEDOUT&&) = default;
-	// FRMHEDOUT& operator=(const FRMHEDOUT& rhs) = default;
+	// FRMHEDOUT& operator=(FRMHEDOUT const& rhs) = default;
 	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
 	//~FRMHEDOUT() = default;
 
-	explicit inline FRMHEDOUT(const FRMHED& rhs);
-	inline FRMHEDOUT& operator=(const FRMHED& rhs);
+	explicit inline FRMHEDOUT(FRMHED const& rhs);
+	inline FRMHEDOUT& operator=(FRMHED const& rhs);
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept
@@ -2113,7 +2113,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440)
-inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs)
+inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs)
     : satinOrAngle(rhs.satinOrAngle)
     , rectangle(rhs.rectangle)
     , lengthOrCount(rhs.lengthOrCount) {
@@ -2170,7 +2170,7 @@ inline FRMHEDOUT::FRMHEDOUT(const FRMHED& rhs)
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
+GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(FRMHED const& rhs) {
 	attribute       = rhs.attribute;
 	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
 	type            = rhs.type;
@@ -2228,7 +2228,7 @@ GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(const FRMHED& rhs) {
 	return *this;
 }
 
-inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept
+inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept
     : satinOrAngle(rhs.satinOrAngle)
     , rectangle(rhs.rectangle)
     , lengthOrCount(rhs.lengthOrCount) {
@@ -2283,7 +2283,7 @@ inline FRMHED::FRMHED(const FRMHEDOUT& rhs) noexcept
 	cres                = rhs.cres;
 }
 
-inline FRMHED& FRMHED::operator=(const FRMHEDOUT& rhs) noexcept {
+inline FRMHED& FRMHED::operator=(FRMHEDOUT const& rhs) noexcept {
 	attribute       = rhs.attribute;
 	vertexCount     = rhs.vertexCount;
 	type            = rhs.type;
@@ -2385,7 +2385,7 @@ public:
 
 	constexpr FORMCLIP() noexcept = default;
 	// FORMCLIP(FORMCLIP&&) = default;
-	// FORMCLIP& operator=(const FORMCLIP& rhs) = default;
+	// FORMCLIP& operator=(FORMCLIP const& rhs) = default;
 	// FORMCLIP& operator=(FORMCLIP&&) = default;
 	//~FORMCLIP() = default;
 };
@@ -2399,7 +2399,7 @@ public:
 
 	constexpr FORMSCLIP() noexcept = default;
 	// FORMSCLIP(FORMSCLIP&&) = default;
-	// FORMSCLIP& operator=(const FORMSCLIP& rhs) = default;
+	// FORMSCLIP& operator=(FORMSCLIP const& rhs) = default;
 	// FORMSCLIP& operator=(FORMSCLIP&&) = default;
 	//~FORMSCLIP() = default;
 };
@@ -2413,7 +2413,7 @@ public:
 
 	constexpr FORMVERTEXCLIP() noexcept = default;
 	// FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
-	// FORMVERTEXCLIP& operator=(const FORMVERTEXCLIP& rhs) = default;
+	// FORMVERTEXCLIP& operator=(FORMVERTEXCLIP const& rhs) = default;
 	// FORMVERTEXCLIP& operator=(FORMVERTEXCLIP&&) = default;
 	//~FORMVERTEXCLIP() = default;
 };
@@ -2435,7 +2435,7 @@ public:
 
 	constexpr STRHED() noexcept = default;
 	// STRHED(STRHED&&) = default;
-	// STRHED& operator=(const STRHED& rhs) = default;
+	// STRHED& operator=(STRHED const& rhs) = default;
 	// STRHED& operator=(STRHED&&) = default;
 	//~STRHED() = default;
 };
@@ -2448,7 +2448,7 @@ public:
 
 	constexpr TXPNT() noexcept = default;
 	// TXPNT(TXPNT&&) = default;
-	// TXPNT& operator=(const TXPNT& rhs) = default;
+	// TXPNT& operator=(TXPNT const& rhs) = default;
 	// TXPNT& operator=(TXPNT&&) = default;
 	//~TXPNT() = default;
 };
@@ -2461,7 +2461,7 @@ public:
 
 	constexpr TXOFF() noexcept = default;
 	// TXOFF(TXOFF&&) = default;
-	// TXOFF& operator=(const TXOFF& rhs) = default;
+	// TXOFF& operator=(TXOFF const& rhs) = default;
 	// TXOFF& operator=(TXOFF&&) = default;
 	//~TXOFF() = default;
 };
@@ -2481,7 +2481,7 @@ public:
 
 	constexpr STREX() noexcept = default;
 	// STREX(STREX&&) = default;
-	// STREX& operator=(const STREX& rhs) = default;
+	// STREX& operator=(STREX const& rhs) = default;
 	// STREX& operator=(STREX&&) = default;
 	//~STREX() = default;
 };
@@ -2518,7 +2518,7 @@ public:
 
 	constexpr DSTHED() noexcept = default;
 	// DSTHED(DSTHED&&) = default;
-	// DSTHED& operator=(const DSTHED& rhs) = default;
+	// DSTHED& operator=(DSTHED const& rhs) = default;
 	// DSTHED& operator=(DSTHED&&) = default;
 	//~DSTHED() = default;
 };
@@ -2538,7 +2538,7 @@ public:
 
 	constexpr DSTREC() noexcept = default;
 	// DSTREC(DSTREC&&) = default;
-	// DSTREC& operator=(const DSTREC& rhs) = default;
+	// DSTREC& operator=(DSTREC const& rhs) = default;
 	// DSTREC& operator=(DSTREC&&) = default;
 	//~DSTREC() = default;
 };
@@ -2551,7 +2551,7 @@ public:
 
 	constexpr DSTOffsets() noexcept = default;
 	// DSTOffsets(DSTOffsets&&) = default;
-	// DSTOffsets& operator=(const DSTOffsets& rhs) = default;
+	// DSTOffsets& operator=(DSTOffsets const& rhs) = default;
 	// DSTOffsets& operator=(DSTOffsets&&) = default;
 	//~DSTOffsets() = default;
 };
@@ -2569,7 +2569,7 @@ public:
 
 	constexpr PCSTCH() noexcept = default;
 	// PCSTCH(PCSTCH&&) = default;
-	// PCSTCH& operator=(const PCSTCH& rhs) = default;
+	// PCSTCH& operator=(PCSTCH const& rhs) = default;
 	// PCSTCH& operator=(PCSTCH&&) = default;
 	//~PCSTCH() = default;
 };
@@ -2589,7 +2589,7 @@ public:
 
 	constexpr CLPSTCH() noexcept = default;
 	// CLPSTCH(CLPSTCH&&) = default;
-	// CLPSTCH& operator=(const CLPSTCH& rhs) = default;
+	// CLPSTCH& operator=(CLPSTCH const& rhs) = default;
 	// CLPSTCH& operator=(CLPSTCH&&) = default;
 	//~CLPSTCH() = default;
 };
@@ -2614,7 +2614,7 @@ public:
 
 	constexpr BAKHED() noexcept = default;
 	// BAKHED(CLPSTCH&&) = default;
-	// BAKHED& operator=(const BAKHED& rhs) = default;
+	// BAKHED& operator=(BAKHED const& rhs) = default;
 	// BAKHED& operator=(BAKHED&&) = default;
 	//~BAKHED() = default;
 };
@@ -2627,7 +2627,7 @@ public:
 
 	constexpr FLSIZ() noexcept = default;
 	// FLSIZ(FLSIZ&&) = default;
-	// FLSIZ& operator=(const FLSIZ& rhs) = default;
+	// FLSIZ& operator=(FLSIZ const& rhs) = default;
 	// FLSIZ& operator=(FLSIZ&&) = default;
 	//~FLSIZ() = default;
 };
@@ -2640,7 +2640,7 @@ public:
 
 	constexpr FRMRANGE() noexcept = default;
 	// FRMRANGE(FRMRANGE&&) = default;
-	// FRMRANGE& operator=(const FRMRANGE& rhs) = default;
+	// FRMRANGE& operator=(FRMRANGE const& rhs) = default;
 	// FRMRANGE& operator=(FRMRANGE&&) = default;
 	//~FRMRANGE() = default;
 };
@@ -2653,7 +2653,7 @@ public:
 
 	constexpr RANGE() noexcept = default;
 	// RANGE(RANGE&&) = default;
-	// RANGE& operator=(const RANGE& rhs) = default;
+	// RANGE& operator=(RANGE const& rhs) = default;
 	// RANGE& operator=(RANGE&&) = default;
 	//~RANGE() = default;
 };
@@ -2669,7 +2669,7 @@ public:
 	constexpr REGION() noexcept = default;
 	inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
 	// REGION(REGION&&) = default;
-	// REGION& operator=(const REGION& rhs) = default;
+	// REGION& operator=(REGION const& rhs) = default;
 	// REGION& operator=(REGION&&) = default;
 	//~REGION() = default;
 };
@@ -2690,7 +2690,7 @@ public:
 
 	constexpr RCON() noexcept = default;
 	// RCON(RCON&&) = default;
-	// RCON& operator=(const RCON& rhs) = default;
+	// RCON& operator=(RCON const& rhs) = default;
 	// RCON& operator=(RCON&&) = default;
 	//~RCON() = default;
 };
@@ -2704,7 +2704,7 @@ public:
 
 	constexpr RGSEQ() noexcept = default;
 	// RGSEQ(RGSEQ&&) = default;
-	// RGSEQ& operator=(const RGSEQ& rhs) = default;
+	// RGSEQ& operator=(RGSEQ const& rhs) = default;
 	// RGSEQ& operator=(RGSEQ&&) = default;
 	//~RGSEQ() = default;
 };
@@ -2718,7 +2718,7 @@ public:
 
 	constexpr FSEQ() noexcept = default;
 	// FSEQ(FSEQ&&) = default;
-	// FSEQ& operator=(const FSEQ& rhs) = default;
+	// FSEQ& operator=(FSEQ const& rhs) = default;
 	// FSEQ& operator=(FSEQ&&) = default;
 	//~FSEQ() = default;
 };
@@ -2734,7 +2734,7 @@ public:
 
 	constexpr PVEC() noexcept = default;
 	// PVEC(PVEC&&) = default;
-	// PVEC& operator=(const PVEC& rhs) = default;
+	// PVEC& operator=(PVEC const& rhs) = default;
 	// PVEC& operator=(PVEC&&) = default;
 	//~PVEC() = default;
 };
@@ -2753,7 +2753,7 @@ public:
 
 	constexpr VRCT2() noexcept = default;
 	// VRCT2(VRCT2&&) = default;
-	// VRCT2& operator=(const VRCT2& rhs) = default;
+	// VRCT2& operator=(VRCT2 const& rhs) = default;
 	// VRCT2& operator=(VRCT2&&) = default;
 	//~VRCT2() = default;
 };
@@ -2771,7 +2771,7 @@ public:
 
 	constexpr CURSORMASK() noexcept = default;
 	// CURSORMASK(CURSORMASK&&) = default;
-	// CURSORMASK& operator=(const CURSORMASK& rhs) = default;
+	// CURSORMASK& operator=(CURSORMASK const& rhs) = default;
 	// CURSORMASK& operator=(CURSORMASK&&) = default;
 	//~CURSORMASK() = default;
 };
@@ -2789,7 +2789,7 @@ public:
 
 	constexpr BALHED() noexcept = default;
 	// BALHED(BALHED&&) = default;
-	// BALHED& operator=(const BALHED& rhs) = default;
+	// BALHED& operator=(BALHED const& rhs) = default;
 	// BALHED& operator=(BALHED&&) = default;
 	//~BALHED() = default;
 };
@@ -2804,7 +2804,7 @@ public:
 
 	constexpr BALSTCH() noexcept = default;
 	// BALSTCH(BALSTCH&&) = default;
-	// BALSTCH& operator=(const BALSTCH& rhs) = default;
+	// BALSTCH& operator=(BALSTCH const& rhs) = default;
 	// BALSTCH& operator=(BALSTCH&&) = default;
 	//~BALSTCH() = default;
 };
@@ -2824,7 +2824,7 @@ public:
 
 	constexpr CLPSEG() noexcept = default;
 	// CLPSEG(CLPSEG&&) = default;
-	// CLPSEG& operator=(const CLPSEG& rhs) = default;
+	// CLPSEG& operator=(CLPSEG const& rhs) = default;
 	// CLPSEG& operator=(CLPSEG&&) = default;
 	//~CLPSEG() = default;
 };
@@ -2839,7 +2839,7 @@ public:
 
 	constexpr CLIPSORT() noexcept = default;
 	// CLIPSORT(CLIPSORT&&) = default;
-	// CLIPSORT& operator=(const CLIPSORT& rhs) = default;
+	// CLIPSORT& operator=(CLIPSORT const& rhs) = default;
 	// CLIPSORT& operator=(CLIPSORT&&) = default;
 	//~CLIPSORT() = default;
 };
@@ -2854,7 +2854,7 @@ public:
 
 	constexpr CLIPNT() noexcept = default;
 	// CLIPNT(CLIPNT&&) = default;
-	// CLIPNT& operator=(const v& rhs) = default;
+	// CLIPNT& operator=(CLIPNT const& rhs) = default;
 	// CLIPNT& operator=(CLIPNT&&) = default;
 	//~CLIPNT() = default;
 };
@@ -2867,7 +2867,7 @@ public:
 
 	constexpr VCLPX() noexcept = default;
 	// VCLPX(VCLPX&&) = default;
-	// VCLPX& operator=(const VCLPX& rhs) = default;
+	// VCLPX& operator=(VCLPX const& rhs) = default;
 	// VCLPX& operator=(VCLPX&&) = default;
 	//~VCLPX() = default;
 };
@@ -2882,7 +2882,7 @@ public:
 
 	constexpr PESLED() noexcept = default;
 	// PESLED(PESLED&&) = default;
-	// PESLED& operator=(const PESLED& rhs) = default;
+	// PESLED& operator=(PESLED const& rhs) = default;
 	// PESLED& operator=(PESLED&&) = default;
 	//~PESLED() = default;
 };
@@ -2927,7 +2927,7 @@ public:
 
 	constexpr PESHED() noexcept = default;
 	// PESHED(PESHED&&) = default;
-	// PESHED& operator=(const PESHED& rhs) = default;
+	// PESHED& operator=(PESHED const& rhs) = default;
 	// PESHED& operator=(PESHED&&) = default;
 	//~PESHED() = default;
 };
@@ -2940,7 +2940,7 @@ public:
 
 	constexpr PESTCH() noexcept = default;
 	// PESTCH(PESTCH&&) = default;
-	// PESTCH& operator=(const PESTCH& rhs) = default;
+	// PESTCH& operator=(PESTCH const& rhs) = default;
 	// PESTCH& operator=(PESTCH&&) = default;
 	//~PESTCH() = default;
 };
@@ -2954,7 +2954,7 @@ public:
 
 	constexpr PESSTCHLST() noexcept = default;
 	// PESSTCHLST(PESSTCHLST&&) = default;
-	// PESSTCHLST& operator=(const PESSTCHLST& rhs) = default;
+	// PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
 	// PESSTCHLST& operator=(PESSTCHLST&&) = default;
 	//~PESSTCHLST() = default;
 };
@@ -2976,7 +2976,7 @@ public:
 
 	constexpr PECHDR() noexcept = default;
 	// PECHDR(PECHDR&&) = default;
-	// PECHDR& operator=(const PECHDR& rhs) = default;
+	// PECHDR& operator=(PECHDR const& rhs) = default;
 	// PECHDR& operator=(PECHDR&&) = default;
 	//~PECHDR() = default;
 };
@@ -3000,7 +3000,7 @@ public:
 
 	constexpr PECHDR2() noexcept = default;
 	// PECHDR2(PECHDR2&&) = default;
-	// PECHDR2& operator=(const PECHDR2& rhs) = default;
+	// PECHDR2& operator=(PECHDR2 const& rhs) = default;
 	// PECHDR2& operator=(PECHDR2&&) = default;
 	//~PECHDR2() = default;
 };
@@ -3015,7 +3015,7 @@ public:
 
 	constexpr TRCPNT() noexcept = default;
 	// TRCPNT(TRCPNT&&) = default;
-	// TRCPNT& operator=(const TRCPNT& rhs) = default;
+	// TRCPNT& operator=(TRCPNT const& rhs) = default;
 	// TRCPNT& operator=(TRCPNT&&) = default;
 	//~TRCPNT() = default;
 };
@@ -3029,7 +3029,7 @@ public:
 
 	constexpr TXTMSG() noexcept = default;
 	// TXTMSG(TXTMSG&&) = default;
-	// TXTMSG& operator=(const TXTMSG& rhs) = default;
+	// TXTMSG& operator=(TXTMSG const& rhs) = default;
 	// TXTMSG& operator=(TXTMSG&&) = default;
 	//~TXTMSG() = default;
 };
@@ -3042,7 +3042,7 @@ public:
 
 	constexpr GRDCOD() noexcept = default;
 	// GRDCOD(GRDCOD&&) = default;
-	// GRDCOD& operator=(const GRDCOD& rhs) = default;
+	// GRDCOD& operator=(GRDCOD const& rhs) = default;
 	// GRDCOD& operator=(GRDCOD&&) = default;
 	//~GRDCOD() = default;
 };
@@ -3063,7 +3063,7 @@ public:
 
 	constexpr OREC() noexcept = default;
 	// OREC(OREC&&) = default;
-	// OREC& operator=(const OREC& rhs) = default;
+	// OREC& operator=(OREC const& rhs) = default;
 	// OREC& operator=(OREC&&) = default;
 	//~OREC() = default;
 };
@@ -3079,7 +3079,7 @@ public:
 
 	constexpr SRTREC() noexcept = default;
 	// SRTREC(SRTREC&&) = default;
-	// SRTREC& operator=(const SRTREC& rhs) = default;
+	// SRTREC& operator=(SRTREC const& rhs) = default;
 	// SRTREC& operator=(SRTREC&&) = default;
 	//~SRTREC() = default;
 };
@@ -3098,7 +3098,7 @@ public:
 
 	constexpr FSTRTS() noexcept = default;
 	// FSTRTS(FSTRTS&&) = default;
-	// FSTRTS& operator=(const FSTRTS& rhs) = default;
+	// FSTRTS& operator=(FSTRTS const& rhs) = default;
 	// FSTRTS& operator=(FSTRTS&&) = default;
 	//~FSTRTS() = default;
 };
@@ -3110,7 +3110,7 @@ public:
 
 	FILLSTARTS() noexcept;
 	// FILLSTARTS(FILLSTARTS&&) = default;
-	// FILLSTARTS& operator=(const FILLSTARTS& rhs) = default;
+	// FILLSTARTS& operator=(FILLSTARTS const& rhs) = default;
 	// FILLSTARTS& operator=(FILLSTARTS&&) = default;
 	//~FILLSTARTS() = default;
 };
@@ -3141,7 +3141,7 @@ public:
 
 	constexpr INSREC() noexcept = default;
 	// INSREC(INSREC&&) = default;
-	// INSREC& operator=(const INSREC& rhs) = default;
+	// INSREC& operator=(INSREC const& rhs) = default;
 	// INSREC& operator=(INSREC&&) = default;
 	//~INSREC() = default;
 };
@@ -3166,7 +3166,7 @@ public:
 
 	constexpr INTINF() noexcept = default;
 	// INTINF(INTINF&&) = default;
-	// INTINF& operator=(const INTINF& rhs) = default;
+	// INTINF& operator=(INTINF const& rhs) = default;
 	// INTINF& operator=(INTINF&&) = default;
 	//~INTINF() = default;
 };
@@ -3190,7 +3190,7 @@ public:
 
 	constexpr TXTSCR() noexcept = default;
 	// TXTSCR(TXTSCR&&) = default;
-	// TXTSCR& operator=(const TXTSCR& rhs) = default;
+	// TXTSCR& operator=(TXTSCR const& rhs) = default;
 	// TXTSCR& operator=(TXTSCR&&) = default;
 	//~TXTSCR() = default;
 };
@@ -3205,7 +3205,7 @@ public:
 
 	constexpr TXTRCT() noexcept = default;
 	// TXTRCT(TXTRCT&&) = default;
-	// TXTRCT& operator=(const TXTRCT& rhs) = default;
+	// TXTRCT& operator=(TXTRCT const& rhs) = default;
 	// TXTRCT& operator=(TXTRCT&&) = default;
 	//~TXTRCT() = default;
 };
@@ -3221,7 +3221,7 @@ public:
 
 	constexpr TXHST() noexcept = default;
 	// TXHST(TXHST&&) = default;
-	// TXHST& operator=(const TXHST& rhs) = default;
+	// TXHST& operator=(TXHST const& rhs) = default;
 	// TXHST& operator=(TXHST&&) = default;
 	//~TXHST() = default;
 };
@@ -3238,7 +3238,7 @@ public:
 
 	constexpr TXHSTBUF() noexcept = default;
 	// TXHSTBUF(TXHSTBUF&&) = default;
-	// TXHSTBUF& operator=(const TXHSTBUF& rhs) = default;
+	// TXHSTBUF& operator=(TXHSTBUF const& rhs) = default;
 	// TXHSTBUF& operator=(TXHSTBUF&&) = default;
 	//~TXHSTBUF() = default;
 };
@@ -3251,7 +3251,7 @@ public:
 
 	constexpr RNGCNT() noexcept = default;
 	// RNGCNT(RNGCNT&&) = default;
-	// RNGCNT& operator=(const RNGCNT& rhs) = default;
+	// RNGCNT& operator=(RNGCNT const& rhs) = default;
 	// RNGCNT& operator=(RNGCNT&&) = default;
 	//~RNGCNT() = default;
 };
@@ -3272,7 +3272,7 @@ public:
 
 	constexpr BADCNTS() noexcept = default;
 	// BADCNTS(BADCNTS&&) = default;
-	// BADCNTS& operator=(const BADCNTS& rhs) = default;
+	// BADCNTS& operator=(BADCNTS const& rhs) = default;
 	// BADCNTS& operator=(BADCNTS&&) = default;
 	//~BADCNTS() = default;
 };
@@ -3285,7 +3285,7 @@ public:
 
 	constexpr FINDINFO() noexcept = default;
 	// FINDINFO(FINDINFO&&) = default;
-	// FINDINFO& operator=(const FINDINFO& rhs) = default;
+	// FINDINFO& operator=(FINDINFO const& rhs) = default;
 	// FINDINFO& operator=(FINDINFO&&) = default;
 	//~FINDINFO() = default;
 };
@@ -3307,7 +3307,7 @@ public:
 
 	constexpr LENINFO() noexcept = default;
 	// LENINFO(LENINFO&&) = default;
-	// LENINFO& operator=(const LENINFO& rhs) = default;
+	// LENINFO& operator=(LENINFO const& rhs) = default;
 	// LENINFO& operator=(LENINFO&&) = default;
 	//~LENINFO() = default;
 };
@@ -3321,7 +3321,7 @@ public:
 
 	constexpr PECCOLOR() noexcept = default;
 	// PECCOLOR(PECCOLOR&&) = default;
-	// PECCOLOR& operator=(const PECCOLOR& rhs) = default;
+	// PECCOLOR& operator=(PECCOLOR const& rhs) = default;
 	// PECCOLOR& operator=(PECCOLOR&&) = default;
 	//~PECCOLOR() = default;
 };
@@ -3334,7 +3334,7 @@ public:
 
 	constexpr PESCOLORLIST() noexcept = default;
 	// PESCOLORLIST(PESCOLORLIST&&) = default;
-	// PESCOLORLIST& operator=(const PESCOLORLIST& rhs) = default;
+	// PESCOLORLIST& operator=(PECCOLORLIST const& rhs) = default;
 	// PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
 	//~PESCOLORLIST() = default;
 };
@@ -3343,12 +3343,12 @@ class THREAD
 {
 public:
 	PECCOLOR    color {};
-	const char* description { nullptr };
-	const char* catalogNumber { nullptr };
+	char const* description { nullptr };
+	char const* catalogNumber { nullptr };
 
 	constexpr THREAD() noexcept = default;
 	// THREAD(THREAD&&) = default;
-	// THREAD& operator=(const THREAD& rhs) = default;
+	// THREAD& operator=(THREAD const& rhs) = default;
 	// THREAD& operator=(THREAD&&) = default;
 	//~THREAD() = default;
 };

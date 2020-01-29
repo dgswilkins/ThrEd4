@@ -40,7 +40,7 @@ namespace utf {
 #pragma warning(disable : 26477) // supress warning for _ASSERTE
 #pragma warning(disable : 4996)  // wstring_convert was declared deprecated in c++17
 
-inline std::wstring Utf8ToUtf16(const std::string& utf8) {
+inline std::wstring Utf8ToUtf16(std::string const& utf8) {
 	std::wstring utf16;
 
 	// handle the special case of empty input string
@@ -54,7 +54,7 @@ inline std::wstring Utf8ToUtf16(const std::string& utf8) {
 	return utf16;
 }
 
-inline std::string Utf16ToUtf8(const std::wstring& utf16) {
+inline std::string Utf16ToUtf8(std::wstring const& utf16) {
 	std::string utf8;
 
 	if (utf16.empty()) {

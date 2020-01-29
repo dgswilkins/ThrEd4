@@ -74,9 +74,9 @@ void repair::lodchk() {
 		}
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
 		for (auto& stitch : *StitchBuffer) {
-			const auto attribute = stitch.attribute;
+			auto const attribute = stitch.attribute;
 			if ((attribute & TYPMSK) == TYPFRM) {
-				const auto tform = (attribute & FRMSK) >> FRMSHFT;
+				auto const tform = (attribute & FRMSK) >> FRMSHFT;
 				if (tform < formMap.size()) {
 					formMap.set(tform);
 				}
@@ -94,7 +94,7 @@ void repair::lodchk() {
 		}
 		formMap.reset();
 		for (auto& stitch : *StitchBuffer) {
-			const auto attribute = stitch.attribute;
+			auto const attribute = stitch.attribute;
 			if ((attribute & TYPBRD) != 0U) {
 				formMap.set((attribute & FRMSK) >> FRMSHFT);
 			}
@@ -108,7 +108,7 @@ void repair::lodchk() {
 	}
 }
 
-void repair::internal::chkclp(const FRMHED& formHeader, BADCNTS& badData) noexcept {
+void repair::internal::chkclp(FRMHED const& formHeader, BADCNTS& badData) noexcept {
 	if (badData.clip == formHeader.angleOrClipData.clip) {
 		badData.clip += formHeader.lengthOrCount.clipCount;
 	}
@@ -117,7 +117,7 @@ void repair::internal::chkclp(const FRMHED& formHeader, BADCNTS& badData) noexce
 	}
 }
 
-void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexcept {
+void repair::internal::chkeclp(FRMHED const& formHeader, BADCNTS& badData) noexcept {
 	if (badData.clip == formHeader.borderClipData) {
 		badData.clip += formHeader.clipEntries;
 	}
@@ -126,7 +126,7 @@ void repair::internal::chkeclp(const FRMHED& formHeader, BADCNTS& badData) noexc
 	}
 }
 
-void repair::internal::chkVrtx(const FRMHED& form, BADCNTS& badData) noexcept {
+void repair::internal::chkVrtx(FRMHED const& form, BADCNTS& badData) noexcept {
 	if (badData.flt == form.vertexIndex) {
 		badData.flt += form.vertexCount;
 	}
@@ -135,7 +135,7 @@ void repair::internal::chkVrtx(const FRMHED& form, BADCNTS& badData) noexcept {
 	}
 }
 
-void repair::internal::chkSat(const FRMHED& form, BADCNTS& badData) noexcept {
+void repair::internal::chkSat(FRMHED const& form, BADCNTS& badData) noexcept {
 	if (badData.guideCount == form.satinOrAngle.guide) {
 		badData.guideCount += form.satinGuideCount;
 	}
@@ -144,7 +144,7 @@ void repair::internal::chkSat(const FRMHED& form, BADCNTS& badData) noexcept {
 	}
 }
 
-void repair::internal::chkTxt(const FRMHED& form, BADCNTS& badData) noexcept {
+void repair::internal::chkTxt(FRMHED const& form, BADCNTS& badData) noexcept {
 	if (badData.tx == form.fillInfo.texture.index) {
 		badData.tx += form.fillInfo.texture.count;
 	}
@@ -158,7 +158,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
 
 	if (!FormList->empty()) {
 		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-			const auto& form = FormList->operator[](iForm);
+			auto const& form = FormList->operator[](iForm);
 			if ((badData.attribute & BADFLT) == 0U) {
 				if (form.vertexCount == 0U) {
 					badData.attribute |= BADFLT;
@@ -203,7 +203,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
 	return badData.attribute;
 }
 
-void repair::internal::bcup(const FRMHED& form, BADCNTS& badData) noexcept {
+void repair::internal::bcup(FRMHED const& form, BADCNTS& badData) noexcept {
 	if (clip::isclp(form)) {
 		badData.clip += form.lengthOrCount.clipCount;
 	}
@@ -219,7 +219,7 @@ void repair::internal::bcup(const FRMHED& form, BADCNTS& badData) noexcept {
 }
 
 void repair::internal::chkfstch() noexcept {
-	const auto codedFormIndex = FormList->size() << FRMSHFT;
+	auto const codedFormIndex = FormList->size() << FRMSHFT;
 
 	for (auto& stitch : *StitchBuffer) {
 		if ((stitch.attribute & FRMSK) >= codedFormIndex) {
@@ -356,11 +356,11 @@ void repair::internal::repsat() {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		auto& form = FormList->operator[](iForm);
 		if (form.type == SAT) {
-			const auto guideDifference = form.satinOrAngle.guide;
+			auto const guideDifference = form.satinOrAngle.guide;
 			if (FormVertices->size() > wrap::toSize(guideDifference) + form.vertexCount) {
 				auto       sourceStart = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 				auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
-				const auto destination = std::next(SatinGuides->begin(), guideCount);
+				auto const destination = std::next(SatinGuides->begin(), guideCount);
 				std::copy(sourceStart, sourceEnd, destination);
 				form.satinOrAngle.guide = guideCount;
 				guideCount += form.satinGuideCount;
@@ -371,7 +371,7 @@ void repair::internal::repsat() {
 					form.satinGuideCount   = gsl::narrow<uint16_t>(SatinGuides->size() - guideDifference);
 					auto       sourceStart = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 					auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
-					const auto destination = std::next(SatinGuides->begin(), guideCount);
+					auto const destination = std::next(SatinGuides->begin(), guideCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					ri::bcup(form, badData);
 				}
@@ -408,7 +408,7 @@ void repair::internal::reptx() {
 					    = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - form.fillInfo.texture.index;
 					auto       sourceStart = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 					auto       sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
-					const auto destination = std::next(TexturePointsBuffer->begin(), textureCount);
+					auto const destination = std::next(TexturePointsBuffer->begin(), textureCount);
 					std::copy(sourceStart, sourceEnd, destination);
 					form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
 					ri::bcup(form, badData);
@@ -425,7 +425,7 @@ void repair::internal::reptx() {
 
 void repair::repar() {
 	auto       repairMessage = std::wstring {};
-	const auto repairType    = ri::frmchkfn();
+	auto const repairType    = ri::frmchkfn();
 
 	thred::savdo();
 	// RepairString = MsgBuffer;
@@ -448,7 +448,7 @@ void repair::repar() {
 
 void repair::frmchkx() {
 	if (IniFile.dataCheck != 0U) {
-		const auto code = ri::frmchkfn();
+		auto const code = ri::frmchkfn();
 		switch (IniFile.dataCheck) {
 		case 1: {
 			if (code != 0U) {

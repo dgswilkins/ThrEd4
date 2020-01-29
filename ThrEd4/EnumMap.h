@@ -27,39 +27,39 @@ public:
 	explicit constexpr EnumMap(uint32_t i_val)
 	    : mask_(i_val) {
 	}
-	inline bool test(const EnumType i_key) const {
+	inline bool test(EnumType const i_key) const {
 		return mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
 	inline void set() {
 		mask_.set();
 	}
-	inline void set(const EnumType i_key, bool i_val = true) {
+	inline void set(EnumType const i_key, bool i_val = true) {
 		mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 	}
-	inline bool testAndSet(const EnumType i_key, bool i_val = true) {
-		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	inline bool testAndSet(EnumType const i_key, bool i_val = true) {
+		bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
 		return val;
 	}
 	inline void reset() noexcept {
 		mask_.reset();
 	}
-	inline void reset(const EnumType i_key) {
+	inline void reset(EnumType const i_key) {
 		mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
-	inline bool testAndReset(const EnumType i_key) {
-		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	inline bool testAndReset(EnumType const i_key) {
+		bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
 	inline void flip() {
 		mask_.flip();
 	}
-	inline void flip(const EnumType i_key) {
+	inline void flip(EnumType const i_key) {
 		mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 	}
-	inline bool testAndFlip(const EnumType i_key) {
-		const bool val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	inline bool testAndFlip(EnumType const i_key) {
+		bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
 		return val;
 	}
@@ -85,34 +85,34 @@ public:
 		return mask_;
 	}
 	inline void
-	mask(const std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)>& i_mask) {
+	mask(std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> const& i_mask) {
 		mask_ = i_mask;
 	}
 
-	bool operator==(const EnumMap<EnumType>& i_other) const {
+	bool operator==(EnumMap<EnumType> const& i_other) const {
 		return mask_ == i_other.mask_;
 	}
-	bool operator!=(const EnumMap<EnumType>& i_other) const {
+	bool operator!=(EnumMap<EnumType> const& i_other) const {
 		return mask_ != i_other.mask_;
 	}
 
-	EnumMap<EnumType> operator&=(const EnumMap<EnumType>& i_other) {
+	EnumMap<EnumType> operator&=(EnumMap<EnumType> const& i_other) {
 		mask_ &= i_other.mask_;
 		return *this;
 	}
 
-	EnumMap<EnumType> operator|=(const EnumMap<EnumType>& i_other) {
+	EnumMap<EnumType> operator|=(EnumMap<EnumType> const& i_other) {
 		mask_ |= i_other.mask_;
 		return *this;
 	}
 
-	EnumMap<EnumType> operator&(const EnumMap<EnumType>& i_other) const {
+	EnumMap<EnumType> operator&(EnumMap<EnumType> const& i_other) const {
 		EnumMap<EnumType> newMask;
 		newMask.mask_ = mask_ & i_other.mask_;
 		return newMask;
 	}
 
-	EnumMap<EnumType> operator|(const EnumMap<EnumType>& i_other) const {
+	EnumMap<EnumType> operator|(EnumMap<EnumType> const& i_other) const {
 		EnumMap<EnumType> newMask;
 		newMask.mask_ = mask_ | i_other.mask_;
 		return newMask;
