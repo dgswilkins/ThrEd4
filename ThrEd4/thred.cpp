@@ -19021,8 +19021,8 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			if (BytesRead != sizeof(extendedHeader)) {
 			  return;
 			}
-			stitchSourceSize.x = ExtendedHeader->hoopSizeX;
-			stitchSourceSize.y = ExtendedHeader->hoopSizeY;
+			stitchSourceSize.x = extendedHeader.hoopSizeX;
+			stitchSourceSize.y = extendedHeader.hoopSizeY;
 			break;
 		  }
 		  default: {
