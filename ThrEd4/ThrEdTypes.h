@@ -45,19 +45,19 @@ constexpr float    ZUMFCT   = 0.65F;       // zoom factor
 constexpr float    PAGSCROL = 0.9F;        // page scroll factor
 constexpr float    LINSCROL = 0.05F;       // line scroll factor
 constexpr uint32_t TXTSIDS  = 6U;          // extra pixels in a text box
-constexpr uint32_t MAXITEMS = 0x10000U;    // maximum number of stitches, sequence items & clipboard points
-constexpr uint32_t MAXCHNG  = 10000U;      // maximum number of color changes
-constexpr float    SHUPX    = 480.0F;      // small hoop x size
-constexpr float    SHUPY    = 480.0F;      // small hoop y size
-constexpr float    LHUPX    = 719.0F;      // large hoop x size
-constexpr float    LHUPY    = 690.0F;      // large hoop y size
-constexpr float    HUP100XY = 600.0F;      // 100 millimeter hoop size
-constexpr float    PFGRAN   = 6.0F;        // pfaff "pixels" per millimeter
-constexpr double   TSIZ30   = 0.3;         // #30 thread size in millimeters
-constexpr double   TSIZ40   = 0.2;         // #40 thread size in millimeters
-constexpr double   TSIZ60   = 0.05;        // #60 thread size in millimeters
-constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll bar
-constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
+constexpr uint32_t MAXITEMS = 0x10000U; // maximum number of stitches, sequence items & clipboard points
+constexpr uint32_t MAXCHNG  = 10000U; // maximum number of color changes
+constexpr float    SHUPX    = 480.0F; // small hoop x size
+constexpr float    SHUPY    = 480.0F; // small hoop y size
+constexpr float    LHUPX    = 719.0F; // large hoop x size
+constexpr float    LHUPY    = 690.0F; // large hoop y size
+constexpr float    HUP100XY = 600.0F; // 100 millimeter hoop size
+constexpr float    PFGRAN   = 6.0F;   // pfaff "pixels" per millimeter
+constexpr double   TSIZ30   = 0.3;    // #30 thread size in millimeters
+constexpr double   TSIZ40   = 0.2;    // #40 thread size in millimeters
+constexpr double   TSIZ60   = 0.05;   // #60 thread size in millimeters
+constexpr int32_t  SCROLSIZ = 12;     // logical pixel width of a scroll bar
+constexpr int32_t  COLSIZ   = 12;     // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
 constexpr float    ZMARGIN    = 1.25F;             // zoom margin for select zooms
@@ -83,13 +83,13 @@ constexpr float    PI_F       = 3.1415927F;        // PI to single precision
 constexpr float    PI_F2      = PI_F * 2.0F;       //
 constexpr double   PI         = 3.141592653589793; // PI to double precision
 constexpr double   PI2        = PI * 2.0;          //
-constexpr double   MAXSTCH    = 54.0;              // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
-constexpr float    USPAC      = 15.0F;             // underlay fill spacing
-constexpr float    APSPAC     = 10.8F;             // applique border spacing
-constexpr uint32_t OSEQLEN    = 0x40000U;          // output sequence length
-constexpr uint32_t BSEQLEN    = OSEQLEN * 2U;      // reverse sequence length
-constexpr float    URAT       = 0.75F;             // ratio of underlay stitch to satin border size
-constexpr double   PURAT      = 0.6;               // for proportional satin corners
+constexpr double MAXSTCH = 54.0; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
+constexpr float  USPAC   = 15.0F;          // underlay fill spacing
+constexpr float  APSPAC  = 10.8F;          // applique border spacing
+constexpr uint32_t OSEQLEN = 0x40000U;     // output sequence length
+constexpr uint32_t BSEQLEN = OSEQLEN * 2U; // reverse sequence length
+constexpr float    URAT    = 0.75F;        // ratio of underlay stitch to satin border size
+constexpr double   PURAT   = 0.6;          // for proportional satin corners
 
 constexpr float DIURAT = (1.0F - URAT) / 2.0F;        //(1-URAT)/2
 constexpr float DOURAT = (1.0F - URAT) / 2.0F + URAT; //(1-URAT)/2+URAT
@@ -154,600 +154,587 @@ constexpr float    ITXSPAC   = (0.4F * PFGRAN); // default texture editor spacin
 constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross pixels
 constexpr uint32_t ITXBUFLEN = 16U;             // texture buffer depth
 
-enum stringLabel
-{
-	STR_PIKOL,
-	STR_UPON,
-	STR_UPOF,
-	STR_AUXTXT,
-	STR_HUP0,
-	STR_HUP1,
-	STR_HUP2,
-	STR_HUP3,
-	STR_HUP4,
-	STR_TRC0,
-	STR_TRC1S,
-	STR_TRC2,
-	STR_TRC3,
-	STR_TRC4,
-	STR_TRC1H,
-	STR_NUMPNT,
-	STR_NUMFRM,
-	STR_NUMSCH,
-	STR_NUMFORM,
-	STR_NUMSEL,
-	STR_BOXSEL,
-	STR_CLOS,
-	STR_TOT,
-	STR_LAYR,
-	STR_OVRLOK,
-	STR_OVRIT,
-	STR_THRED,
-	STR_NUFIL,
-	STR_EMB,
-	STR_ON,
-	STR_OFF,
-	STR_FMEN,
-	STR_TXT0,
-	STR_TXT1,
-	STR_TXT2,
-	STR_TXT3,
-	STR_TXT4,
-	STR_TXT5,
-	STR_TXT6,
-	STR_TXT7,
-	STR_TXT8,
-	STR_TXT9,
-	STR_TXT10,
-	STR_TXT11,
-	STR_TXT12,
-	STR_TXT13,
-	STR_TXT14,
-	STR_TXT15,
-	STR_TXT16,
-	STR_TXT17,
-	STR_TXT18,
-	STR_TXT19,
-	STR_TXT20,
-	STR_TXT21,
-	STR_TXT22,
-	STR_TXT23,
-	STR_FIL0,
-	STR_FIL1,
-	STR_FIL2,
-	STR_FIL3,
-	STR_FIL4,
-	STR_FIL5,
-	STR_FIL6,
-	STR_FIL7,
-	STR_FIL8,
-	STR_FIL9,
-	STR_FIL10,
-	STR_FIL11,
-	STR_FIL12,
-	STR_FIL13,
-	STR_EDG0,
-	STR_EDG1,
-	STR_EDG2,
-	STR_EDG3,
-	STR_EDG4,
-	STR_EDG5,
-	STR_EDG6,
-	STR_EDG7,
-	STR_EDG8,
-	STR_EDG9,
-	STR_EDG10,
-	STR_EDG11,
-	STR_EDG12,
-	STR_PRF0,
-	STR_PRF1,
-	STR_PRF2,
-	STR_PRF3,
-	STR_PRF4,
-	STR_PRF5,
-	STR_PRF6,
-	STR_PRF7,
-	STR_PRF8,
-	STR_PRF9,
-	STR_PRF10,
-	STR_PRF11,
-	STR_PRF12,
-	STR_PRF13,
-	STR_PRF14,
-	STR_PRF15,
-	STR_PRF16,
-	STR_PRF17,
-	STR_PRF18,
-	STR_PRF19,
-	STR_PRF20,
-	STR_PRF21,
-	STR_PRF22,
-	STR_PRF23,
-	STR_PRF24,
-	STR_PRF25,
-	STR_PRF26,
-	STR_PRF27,
-	STR_PRF28,
-	STR_PRF29,
-	STR_FRMPLUS,
-	STR_FRMINUS,
-	STR_OKENT,
-	STR_CANCEL,
-	STR_FREH,
-	STR_BLUNT,
-	STR_TAPR,
-	STR_PNTD,
-	STR_SQR,
-	STR_DELST2,
-	STR_THRDBY,
-	STR_STCHOUT,
-	STR_STCHS,
-	STR_FORMS,
-	STR_HUPWID,
-	STR_CREATBY,
-	STR_CUSTHUP,
-	STR_STCHP,
-	STR_FRMP,
-	STR_ENTROT,
-	STR_NUDG,
-	STR_ALLX,
-	STR_FTHCOL,
-	STR_FTHTYP,
-	STR_FTH0,
-	STR_FTH1,
-	STR_FTH2,
-	STR_FTH3,
-	STR_FTH4,
-	STR_FTH5,
-	STR_FTHBLND,
-	STR_FTHUP,
-	STR_FTHBOTH,
-	STR_FTHUPCNT,
-	STR_FTHDWNCNT,
-	STR_FTHSIZ,
-	STR_FTHNUM,
-	STR_FTHFLR,
-	STR_FSTRT,
-	STR_FEND,
-	STR_WALK,
-	STR_UWLKIND,
-	STR_UND,
-	STR_ULEN,
-	STR_FUANG,
-	STR_FUSPAC,
-	STR_CWLK,
-	STR_UNDCOL,
-	STR_FRMBOX,
-	STR_TXOF,
-	STR_LEN, // must be last entry in enum
+enum stringLabel {
+  STR_PIKOL,
+  STR_UPON,
+  STR_UPOF,
+  STR_AUXTXT,
+  STR_HUP0,
+  STR_HUP1,
+  STR_HUP2,
+  STR_HUP3,
+  STR_HUP4,
+  STR_TRC0,
+  STR_TRC1S,
+  STR_TRC2,
+  STR_TRC3,
+  STR_TRC4,
+  STR_TRC1H,
+  STR_NUMPNT,
+  STR_NUMFRM,
+  STR_NUMSCH,
+  STR_NUMFORM,
+  STR_NUMSEL,
+  STR_BOXSEL,
+  STR_CLOS,
+  STR_TOT,
+  STR_LAYR,
+  STR_OVRLOK,
+  STR_OVRIT,
+  STR_THRED,
+  STR_NUFIL,
+  STR_EMB,
+  STR_ON,
+  STR_OFF,
+  STR_FMEN,
+  STR_TXT0,
+  STR_TXT1,
+  STR_TXT2,
+  STR_TXT3,
+  STR_TXT4,
+  STR_TXT5,
+  STR_TXT6,
+  STR_TXT7,
+  STR_TXT8,
+  STR_TXT9,
+  STR_TXT10,
+  STR_TXT11,
+  STR_TXT12,
+  STR_TXT13,
+  STR_TXT14,
+  STR_TXT15,
+  STR_TXT16,
+  STR_TXT17,
+  STR_TXT18,
+  STR_TXT19,
+  STR_TXT20,
+  STR_TXT21,
+  STR_TXT22,
+  STR_TXT23,
+  STR_FIL0,
+  STR_FIL1,
+  STR_FIL2,
+  STR_FIL3,
+  STR_FIL4,
+  STR_FIL5,
+  STR_FIL6,
+  STR_FIL7,
+  STR_FIL8,
+  STR_FIL9,
+  STR_FIL10,
+  STR_FIL11,
+  STR_FIL12,
+  STR_FIL13,
+  STR_EDG0,
+  STR_EDG1,
+  STR_EDG2,
+  STR_EDG3,
+  STR_EDG4,
+  STR_EDG5,
+  STR_EDG6,
+  STR_EDG7,
+  STR_EDG8,
+  STR_EDG9,
+  STR_EDG10,
+  STR_EDG11,
+  STR_EDG12,
+  STR_PRF0,
+  STR_PRF1,
+  STR_PRF2,
+  STR_PRF3,
+  STR_PRF4,
+  STR_PRF5,
+  STR_PRF6,
+  STR_PRF7,
+  STR_PRF8,
+  STR_PRF9,
+  STR_PRF10,
+  STR_PRF11,
+  STR_PRF12,
+  STR_PRF13,
+  STR_PRF14,
+  STR_PRF15,
+  STR_PRF16,
+  STR_PRF17,
+  STR_PRF18,
+  STR_PRF19,
+  STR_PRF20,
+  STR_PRF21,
+  STR_PRF22,
+  STR_PRF23,
+  STR_PRF24,
+  STR_PRF25,
+  STR_PRF26,
+  STR_PRF27,
+  STR_PRF28,
+  STR_PRF29,
+  STR_FRMPLUS,
+  STR_FRMINUS,
+  STR_OKENT,
+  STR_CANCEL,
+  STR_FREH,
+  STR_BLUNT,
+  STR_TAPR,
+  STR_PNTD,
+  STR_SQR,
+  STR_DELST2,
+  STR_THRDBY,
+  STR_STCHOUT,
+  STR_STCHS,
+  STR_FORMS,
+  STR_HUPWID,
+  STR_CREATBY,
+  STR_CUSTHUP,
+  STR_STCHP,
+  STR_FRMP,
+  STR_ENTROT,
+  STR_NUDG,
+  STR_ALLX,
+  STR_FTHCOL,
+  STR_FTHTYP,
+  STR_FTH0,
+  STR_FTH1,
+  STR_FTH2,
+  STR_FTH3,
+  STR_FTH4,
+  STR_FTH5,
+  STR_FTHBLND,
+  STR_FTHUP,
+  STR_FTHBOTH,
+  STR_FTHUPCNT,
+  STR_FTHDWNCNT,
+  STR_FTHSIZ,
+  STR_FTHNUM,
+  STR_FTHFLR,
+  STR_FSTRT,
+  STR_FEND,
+  STR_WALK,
+  STR_UWLKIND,
+  STR_UND,
+  STR_ULEN,
+  STR_FUANG,
+  STR_FUSPAC,
+  STR_CWLK,
+  STR_UNDCOL,
+  STR_FRMBOX,
+  STR_TXOF,
+  STR_LEN, // must be last entry in enum
 };
 
 // edge tracing directions
-enum traceDirection
-{
-	TRCU, // top edge
-	TRCR, // right edge
-	TRCD, // bottom edge
-	TRCL  // left edge
+enum traceDirection {
+  TRCU, // top edge
+  TRCR, // right edge
+  TRCD, // bottom edge
+  TRCL  // left edge
 };
 
-enum hoopSize
-{
-	SETCUST = 1, // set the custom hoop
-	SMALHUP = 2, // pfaf code for small hoop
-	LARGHUP,     // pfaf code for large hoop
-	HUP100,      // 100 millimeter hoop
-	CUSTHUP      // user defined hoop size
+enum hoopSize {
+  SETCUST = 1, // set the custom hoop
+  SMALHUP = 2, // pfaf code for small hoop
+  LARGHUP,     // pfaf code for large hoop
+  HUP100,      // 100 millimeter hoop
+  CUSTHUP      // user defined hoop size
 };
 
-enum daisyStyles
-{          // daisy form types
-	DSIN,  // Sine shape
-	DRAMP, // Ramp shape
-	DSAW,  // Sawtooth shape
-	DRAG,  // Ragged shape
-	DCOG,  // Cog shape
-	DHART  // Heart shape
+enum daisyStyles { // daisy form types
+  DSIN,            // Sine shape
+  DRAMP,           // Ramp shape
+  DSAW,            // Sawtooth shape
+  DRAG,            // Ragged shape
+  DCOG,            // Cog shape
+  DHART            // Heart shape
 };
 
 // bitmap
-enum class StateFlag
-{
-	SATIN,     // user is entering a satin stitch form
-	SATPNT,    // user is entering points for a satin stitch form
-	BOXZUM,    // box zoom select mode
-	BZUMIN,    // display the zoom box
-	BZUM,      // zoom box displayed on screen
-	INSRT,     // insert mode active
-	SELPNT,    // user has clicked on a selected point
-	SATCNKT,   // user is connecting points in a satin form
-	INSFRM,    // user is inserting points in a form
-	FORMIN,    // user is selecting a form
-	PRFACT,    // user is selecting preferences
-	POLIMOV,   // user is placing a pre defined form
-	SIZSEL,    // thread size select boxes displayed
-	THRDS,     // State of the threads/lines box
-	LINED,     // line has been started
-	LININ,     // line is in the zoom rectangle
-	ZUMED,     // stitch window is zoomed
-	COL,       // state of the color/all box
-	HID,       // state of the show/hide button
-	ISDWN,     // down stitch exists
-	ISUP,      // up stitch exists
-	WASLIN,    // a move stitch line has been drawn
-	CAPT,      // screen capture in effect
-	VCAPT,     // keep screen capture as long as the mouse cursor
-	           // is in the edit window
-	SELBOX,    // the select box is showing
-	ILIN,      // insert line is showing on the screen
-	INIT,      // set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
-	LIN1,      // drawing only one line in stitch insert mode
-	ILIN1,     // one insert line showing on screen
-	GRPSEL,    // group select mode
-	SCROS,     // start group cross has been drawn
-	ECROS,     // end group cross has been drawn
-	ELIN,      // group select line has been drawn
-	BAKEND,    // insert data should be appended to the end of the file
-	CLPSHO,    // display the clipboard insert rectangle
-	SELSHO,    // display the select rectangle
-	ROTAT,     // rotate state
-	ROTSHO,    // rotate rectangle is showing
-	ROTUSHO,   // rotate indicator line is showing
-	ROTCAPT,   // rotate capture mode
-	MOVCNTR,   // user is moving the rotate center
-	GETMIN,    // user is entering a minimum stitch length
-	NUMIN,     // user is entering a number
-	MOVFRM,    // user is moving a form vertex
-	MOVMSG,    // user tried to move an edited form
-	SHOFRM,    // form is currently written to the screen
-	STHR,      // user is entering a new stitch box threshold
-	ENTAR,     // user is adjusting a number with the up and down arrow keys
-	ENTR30,    // user is entering a new thread size for #30 thread
-	ENTR40,    // user is entering a new thread size for #40 thread
-	ENTR60,    // user is entering a new thread size for #60 thread
-	FORMSEL,   // a form is selected
-	FRMPMOV,   // user is moving a point on a form
-	IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
-	FRMOV,     // user is moving a form
-	RUNPAT,    // user is running a pattern
-	WASPAT,    // user ran a pattern, but hasn't done anything else yet
-	FILDIR,    // direction lines in angle fill
-	SHOSAT,    // the satin stitch form is on the screen
-	SHOCON,    // connect point line is visible
-	FENDIN,    // user is selecting fill ends
-	DELFRM,    // user wants to delete a form
-	BAKACT,    // there are entries in the undo buffer
-	BAKWRAP,   // undo buffer pointer has wrapped
-	BAKING,    // user has called the undo function
-	REDUSHO,   // redo menu item is active
-	UNDUSHO,   // undo menu item is active
-	FUNCLP,    // user is loading a form from the clipboard
-	FRMPSEL,   // user has selected a point in a form
-	SHOINSF,   // the form insert line has been drawn
-	SAT1,      // set when the first stitch is entered in a satin fill
-	FILMSG,    // set when user tries to unfill a form with edited stitches
-	CLPBAK,    // set when the first clipboard fill item has been entered
-	STRTCH,    // user is stretching a form horizontally or vertically
-	SHOSTRTCH, // stretch box is written to the screen
-	EXPAND,    // user is expanding a form horizontally and vertically
-	SIDACT,    // side message window is active
-	BRDACT,    // border data in side message window
-	FILTYP,    // 0=main fill, 1=border fill, used in side message display
-	GMRK,      // draw the mark on the screen
-	SIDCOL,    // user is selecting a fill color for a form
-	BRDSID,    // user is selecting a border fill color for a form
-	ENTRPOL,   // user is entering sides for a regular polygon
-	FRMROT,    // user is rotating a form
-	DELTO,     // user is deleting a form and the associated stitches
-	REDOLD,    // user is opening a file from the old file list
-	BAKSHO,    // user is looking at backup files
-	DUBAK,     // user has chosen a backup file to load, but may want to save changes
-	IGNAM,     // save the thred file without making backups
-	PRGMSG,    // delete all backups message is displayed
-	NEWBAK,    // user is starting a new file, but may want to save changes
-	SAVEX,     // user is exiting, may want to save changes
-	OSAV,      // user wants to load a new file, but may want to save changes
-	FRMOF,     // forms are not displayed and can't be selected
-	SHOMOV,    // user moving form line shown on screen
-	BARSAT,    // doing a bare satin fill to be filled in with clipboard data
-	ENTRSTAR,  // user in entering the number of points for a star
-	ENTROT,    // user is entering a rotate number for command rotate;
-	ENTRDUP,   // user is entering a rotate angle for rotate and duplicate
-	ENTRSPIR,  // user is entering the number of points for a spiral
-	ENTRHART,  // user is entering the number of points for a heart
-	ENTRLENS,  // user is entering the number of points for a lens
-	SEQDUN,    // last stitch sequenced was already done
-	WASEL,     // a form was selected when the user hit control-right-click
-	MOVFRMS,   // user is moving a group of forms
-	FRMSROT,   // user is rotating group of forms
-	FUNSCLP,   // user is pasting a group of forms
-	DELSFRMS,  // user is deleting a group of forms
-	BIGBOX,    // user has selected all forms and stitches
-	MOVSET,    // the move point has been selected
-	UPTO,      // show points up to the selected point
-	LENSRCH,   // user has hit the max or min button
-	BOXSLCT,   // user is making a select box
-	THUMSHO,   // thumbnail mode
-	INSFIL,    // user is inserting a file
-	IGNORINS,  // don't use the open file dialog box to get the insert file name
-	RBUT,      // user pressed the right mouse button selecting a thumbnail
-	UND,       // stitching a proportional satin underlay
-	UNDPHAS,   // proportional satin underlay phase
-	SAVAS,     // user is saving a file under a new name
-	SHOSIZ,    // design size box is displayed
-	HUPMSG,    // user is selecting a hoop size
-	IGNTHR,    // ignore the close enough threshold for 'C' hotkey
-	MONOMAP,   // set if a color bitmap is loaded
-	THUMON,    // user is loading a thumnail
-	CLPOVR,    // can't fit another clipboard fill on the current line
-	CONTIG,    // contiguous point flag
-	NUROT,     // user is entering a rotate angle
-	APSID,     // user is entering a new applique color
-	FRMSAM,    // don't find an already selected form
-	ENTRSEG,   // user is entering rotation segments
-	ENTRFNUM,  // user is entering a form number
-	WASFRMFRM, // need to restore the form-form
-	SAVACT,    // activate the undo save
-	CNTRH,     // for centering horizontally
-	CNTRV,     // for centering vertically
-	RESTCH,    // redraw the stitch window
-	WASGRP,    // group of stitches selected when entering length search
-	REFILMSG,  // refill all message is up
-	PRELIN,    // user is inserting form points before the 0 point in a line form
-	WASRT,     // insert was active when preferences activated
-	WASDIR,    // last minimum direction for sequencing
-	BRKFIX,    // last line sequenced was from the end of a break of an already done region
-	RELAYR,    // need to write the layer in the layer button
-	HIDSTCH,   // don't display the stitches
-	WASIN,     // placing stitches inside the form for vertical clipboard fill
-	LTRACE,    // line trace funtion active
-	HUPEX,     // set when points are outside the hoop
-	HUPCHNG,   // hoop size has been changed
-	SIZED,     // window has been resized
-	ROTAL,     // user is rotating all stitches
-	ZUMACT,    // zoom to actual size
-	WASREFIL,  // last fill was a refil
-	DUMEN,     // menu needs to be refilled
-	WASNEG,    // form had a point less than the size of the clipboard fill
-	FCLOS,     // user is closing a file
-	NOTFREE,   // no free space on the drive
-	PIXIN,     // user in inputing nudge pixels
-	STPXIN,    // user is inputing stitch point pixels
-	FRMPXIN,   // user is inputting form vertex pixels
-	WASMRK,    // user has set a mark
-	RESIZ,     // need to change the size of the main window
-	MSGOF,     // offset the message box
-	WASMOV,    // mouse move capture flag
-	WASCOL,    // mouse move started in a color box
-	ENTREG,    // user is entering an egg form
-	BADFIL,    // loaded file is corrupted
-	WASTRAC,   // trace bitmap loaded
-	LANDSCAP,  // trace bitmap is landscape position
-	WASEDG,    // trace edge map was created
-	TRCUP,     // trace the up limit
-	TRCRED,    // red trace on
-	TRCGRN,    // green trace on
-	TRCBLU,    // blue trace on
-	DUHI,      // paint the high trace rectangle
-	DULO,      // paint the low trace rectangle
-	WASDIF,    // found edges on bitmap
-	WASDSEL,   // color selected bitmap
-	TRNIN0,    // trace color number input
-	TRNUP,     // trace up number input
-	WASTRCOL,  // trace color entered from keyboard
-	TRNIN1,    // trace parameter number input
-	TRSET,     // trace numbers have been set
-	WASESC,    // user hit escape
-	HIDMAP,    // hide the bitmap
-	WASBLAK,   // bitmap form pixels set to black
-	LINCHN,    // chain stitch has line in middle
-	ENTRZIG,   // user is creating a zig-zag form
-	FOLFRM,    // form-form is displaying a follower form
-	DUREFRM,   // display the form-form
-	SIDX,      // display the extra fills
-	WASLED,    // lead form found in frmchk
-	FPSEL,     // form points selected
-	SHOPSEL,   // form points selected rectangle is showing
-	PSELDIR,   // direction of form vertex select
-	FPUNCLP,   // user is retrieving clipped form points into a form
-	SHOP,      // clipboard from points are showing
-	WASPCDCLP, // there is pcd data on the clipboard
-	FTHR,      // feather fill flag
-	FBOTH,     // do both sides of a feather fill
-	ENTRFTHUP, // user is entering the feather up number
-	FTHSID,    // user is entering a feather color
-	CNV2FTH,   // converting a form to feather ribbon
-	WASFPNT,   // user is moving a form vertex
-	WASDO,     // backup has been made before refill
-	NOSEL,     // left button down didn't select anything
-	WASDEL,    // stitches were deleted
-	GTWLKIND,  // get the edge walk/underlay offset
-	GTWLKLEN,  // get the edge walk/underlay stitch length
-	GTUANG,    // get the underlay angle
-	GTUSPAC,   // get the underlay spacing
-	BADVER,    // key version does not match
-	DUSRT,     // write sort info
-	WLKDIR,    // edge walk direction, 0=forward
-	INDIR,     // inner border switched with outer
-	DIDSTRT,   // start stitches have been written
-	REFCNT,    // counting the form-form lines
-	UNDCOL,    // user is entering an underlay color
-	FSETULEN,  // user is setting the underlay stitch length for a group of forms
-	ISEND,     // writing the end stitches
-	FSETUSPAC, // user is setting the underlay spacing for a group of forms
-	FSETUANG,  // user is setting the underlay angle for a group of forms
-	FSETFLEN,  // user is setting the fill stitch length for a group of forms
-	FSETFSPAC, // user is setting the fill spacing for a group of forms
-	FSETFANG,  // user is setting the fill angle for a group of forms
-	FSETUCOL,  // user is setting the underlay color for a group of forms
-	FSETFCOL,  // user is setting the fill color for a group of forms
-	FSETBCOL,  // user is setting the border color for a group of forms
-	FSETBLEN,  // user is setting the border color for a group of forms
-	FSETBSPAC, // user is setting the border spacing for a group of forms
-	FSETBMIN,  // user is setting the minimum border stitch length for a group of forms
-	FSETBMAX,  // user is setting the maximum border stitch length for a group of forms
-	FSETFMIN,  // user is setting the minimum fill stitch length for a group of forms
-	FSETFMAX,  // user is setting the maximum fill stitch length for a group of forms
-	FSETFWID,  // user is setting the width for a group of forms
-	FSETFHI,   // user is setting the height for a group of forms
-	TXTRED,    // displaying the texture fill editor
-	FRMBOXIN,  // user is setting the form box pixels
-	TXTMOV,    // user is moving a texture editor point
-	TXTCLP,    // user is setting texture points with a clipboard form
-	TXTLIN,    // user is setting texture points in a line
-	WASTXBAK,  // texture fill editor history active
-	LASTXBAK,  // last key was a texture back key
-	TXBDIR,    // texture backup direction
-	TXHCNTR,   // texture center on
-	TXFIL,     // texture fill in progress
-	WASWROT,   // texture clipboard form was written
-	DESCHG,    // design size change 0=x, 1=y
-	CMPDO,     // design has been changed
-	ISUND,     // doing underlay fill
-	CHKTX,     // user has changed the texture fill window size, check the points
-	FSETFIND,  // user is setting the indent for a group of forms
-	TXBOX,     // user is importing stitches for textured fill
-	TXIN,      // last stitch point was in stitch select box
-	SCLPSPAC,  // user is setting the clipbard fill spacing
-	FCHK,      // check the forms
-	NOCLP,     // don't load clipboard data from forms
-	NOTHRFIL,  // loaded file wasn't a Thred file
+enum class StateFlag {
+  SATIN,   // user is entering a satin stitch form
+  SATPNT,  // user is entering points for a satin stitch form
+  BOXZUM,  // box zoom select mode
+  BZUMIN,  // display the zoom box
+  BZUM,    // zoom box displayed on screen
+  INSRT,   // insert mode active
+  SELPNT,  // user has clicked on a selected point
+  SATCNKT, // user is connecting points in a satin form
+  INSFRM,  // user is inserting points in a form
+  FORMIN,  // user is selecting a form
+  PRFACT,  // user is selecting preferences
+  POLIMOV, // user is placing a pre defined form
+  SIZSEL,  // thread size select boxes displayed
+  THRDS,   // State of the threads/lines box
+  LINED,   // line has been started
+  LININ,   // line is in the zoom rectangle
+  ZUMED,   // stitch window is zoomed
+  COL,     // state of the color/all box
+  HID,     // state of the show/hide button
+  ISDWN,   // down stitch exists
+  ISUP,    // up stitch exists
+  WASLIN,  // a move stitch line has been drawn
+  CAPT,    // screen capture in effect
+  VCAPT,   // keep screen capture as long as the mouse cursor
+           // is in the edit window
+  SELBOX,  // the select box is showing
+  ILIN,    // insert line is showing on the screen
+  INIT,   // set when a stitch is entered in the stitch buffer,a form is entered, or the mark is set
+  LIN1,   // drawing only one line in stitch insert mode
+  ILIN1,  // one insert line showing on screen
+  GRPSEL, // group select mode
+  SCROS,  // start group cross has been drawn
+  ECROS,  // end group cross has been drawn
+  ELIN,   // group select line has been drawn
+  BAKEND, // insert data should be appended to the end of the file
+  CLPSHO, // display the clipboard insert rectangle
+  SELSHO, // display the select rectangle
+  ROTAT,  // rotate state
+  ROTSHO, // rotate rectangle is showing
+  ROTUSHO,   // rotate indicator line is showing
+  ROTCAPT,   // rotate capture mode
+  MOVCNTR,   // user is moving the rotate center
+  GETMIN,    // user is entering a minimum stitch length
+  NUMIN,     // user is entering a number
+  MOVFRM,    // user is moving a form vertex
+  MOVMSG,    // user tried to move an edited form
+  SHOFRM,    // form is currently written to the screen
+  STHR,      // user is entering a new stitch box threshold
+  ENTAR,     // user is adjusting a number with the up and down arrow keys
+  ENTR30,    // user is entering a new thread size for #30 thread
+  ENTR40,    // user is entering a new thread size for #40 thread
+  ENTR60,    // user is entering a new thread size for #60 thread
+  FORMSEL,   // a form is selected
+  FRMPMOV,   // user is moving a point on a form
+  IGNOR,     // user may elect to ignore a message about losing edits when resizing a form
+  FRMOV,     // user is moving a form
+  RUNPAT,    // user is running a pattern
+  WASPAT,    // user ran a pattern, but hasn't done anything else yet
+  FILDIR,    // direction lines in angle fill
+  SHOSAT,    // the satin stitch form is on the screen
+  SHOCON,    // connect point line is visible
+  FENDIN,    // user is selecting fill ends
+  DELFRM,    // user wants to delete a form
+  BAKACT,    // there are entries in the undo buffer
+  BAKWRAP,   // undo buffer pointer has wrapped
+  BAKING,    // user has called the undo function
+  REDUSHO,   // redo menu item is active
+  UNDUSHO,   // undo menu item is active
+  FUNCLP,    // user is loading a form from the clipboard
+  FRMPSEL,   // user has selected a point in a form
+  SHOINSF,   // the form insert line has been drawn
+  SAT1,      // set when the first stitch is entered in a satin fill
+  FILMSG,    // set when user tries to unfill a form with edited stitches
+  CLPBAK,    // set when the first clipboard fill item has been entered
+  STRTCH,    // user is stretching a form horizontally or vertically
+  SHOSTRTCH, // stretch box is written to the screen
+  EXPAND,    // user is expanding a form horizontally and vertically
+  SIDACT,    // side message window is active
+  BRDACT,    // border data in side message window
+  FILTYP,    // 0=main fill, 1=border fill, used in side message display
+  GMRK,      // draw the mark on the screen
+  SIDCOL,    // user is selecting a fill color for a form
+  BRDSID,    // user is selecting a border fill color for a form
+  ENTRPOL,   // user is entering sides for a regular polygon
+  FRMROT,    // user is rotating a form
+  DELTO,     // user is deleting a form and the associated stitches
+  REDOLD,    // user is opening a file from the old file list
+  BAKSHO,    // user is looking at backup files
+  DUBAK,     // user has chosen a backup file to load, but may want to save changes
+  IGNAM,     // save the thred file without making backups
+  PRGMSG,    // delete all backups message is displayed
+  NEWBAK,    // user is starting a new file, but may want to save changes
+  SAVEX,     // user is exiting, may want to save changes
+  OSAV,      // user wants to load a new file, but may want to save changes
+  FRMOF,     // forms are not displayed and can't be selected
+  SHOMOV,    // user moving form line shown on screen
+  BARSAT,    // doing a bare satin fill to be filled in with clipboard data
+  ENTRSTAR,  // user in entering the number of points for a star
+  ENTROT,    // user is entering a rotate number for command rotate;
+  ENTRDUP,   // user is entering a rotate angle for rotate and duplicate
+  ENTRSPIR,  // user is entering the number of points for a spiral
+  ENTRHART,  // user is entering the number of points for a heart
+  ENTRLENS,  // user is entering the number of points for a lens
+  SEQDUN,    // last stitch sequenced was already done
+  WASEL,     // a form was selected when the user hit control-right-click
+  MOVFRMS,   // user is moving a group of forms
+  FRMSROT,   // user is rotating group of forms
+  FUNSCLP,   // user is pasting a group of forms
+  DELSFRMS,  // user is deleting a group of forms
+  BIGBOX,    // user has selected all forms and stitches
+  MOVSET,    // the move point has been selected
+  UPTO,      // show points up to the selected point
+  LENSRCH,   // user has hit the max or min button
+  BOXSLCT,   // user is making a select box
+  THUMSHO,   // thumbnail mode
+  INSFIL,    // user is inserting a file
+  IGNORINS,  // don't use the open file dialog box to get the insert file name
+  RBUT,      // user pressed the right mouse button selecting a thumbnail
+  UND,       // stitching a proportional satin underlay
+  UNDPHAS,   // proportional satin underlay phase
+  SAVAS,     // user is saving a file under a new name
+  SHOSIZ,    // design size box is displayed
+  HUPMSG,    // user is selecting a hoop size
+  IGNTHR,    // ignore the close enough threshold for 'C' hotkey
+  MONOMAP,   // set if a color bitmap is loaded
+  THUMON,    // user is loading a thumnail
+  CLPOVR,    // can't fit another clipboard fill on the current line
+  CONTIG,    // contiguous point flag
+  NUROT,     // user is entering a rotate angle
+  APSID,     // user is entering a new applique color
+  FRMSAM,    // don't find an already selected form
+  ENTRSEG,   // user is entering rotation segments
+  ENTRFNUM,  // user is entering a form number
+  WASFRMFRM, // need to restore the form-form
+  SAVACT,    // activate the undo save
+  CNTRH,     // for centering horizontally
+  CNTRV,     // for centering vertically
+  RESTCH,    // redraw the stitch window
+  WASGRP,    // group of stitches selected when entering length search
+  REFILMSG,  // refill all message is up
+  PRELIN,    // user is inserting form points before the 0 point in a line form
+  WASRT,     // insert was active when preferences activated
+  WASDIR,    // last minimum direction for sequencing
+  BRKFIX,    // last line sequenced was from the end of a break of an already done region
+  RELAYR,    // need to write the layer in the layer button
+  HIDSTCH,   // don't display the stitches
+  WASIN,     // placing stitches inside the form for vertical clipboard fill
+  LTRACE,    // line trace funtion active
+  HUPEX,     // set when points are outside the hoop
+  HUPCHNG,   // hoop size has been changed
+  SIZED,     // window has been resized
+  ROTAL,     // user is rotating all stitches
+  ZUMACT,    // zoom to actual size
+  WASREFIL,  // last fill was a refil
+  DUMEN,     // menu needs to be refilled
+  WASNEG,    // form had a point less than the size of the clipboard fill
+  FCLOS,     // user is closing a file
+  NOTFREE,   // no free space on the drive
+  PIXIN,     // user in inputing nudge pixels
+  STPXIN,    // user is inputing stitch point pixels
+  FRMPXIN,   // user is inputting form vertex pixels
+  WASMRK,    // user has set a mark
+  RESIZ,     // need to change the size of the main window
+  MSGOF,     // offset the message box
+  WASMOV,    // mouse move capture flag
+  WASCOL,    // mouse move started in a color box
+  ENTREG,    // user is entering an egg form
+  BADFIL,    // loaded file is corrupted
+  WASTRAC,   // trace bitmap loaded
+  LANDSCAP,  // trace bitmap is landscape position
+  WASEDG,    // trace edge map was created
+  TRCUP,     // trace the up limit
+  TRCRED,    // red trace on
+  TRCGRN,    // green trace on
+  TRCBLU,    // blue trace on
+  DUHI,      // paint the high trace rectangle
+  DULO,      // paint the low trace rectangle
+  WASDIF,    // found edges on bitmap
+  WASDSEL,   // color selected bitmap
+  TRNIN0,    // trace color number input
+  TRNUP,     // trace up number input
+  WASTRCOL,  // trace color entered from keyboard
+  TRNIN1,    // trace parameter number input
+  TRSET,     // trace numbers have been set
+  WASESC,    // user hit escape
+  HIDMAP,    // hide the bitmap
+  WASBLAK,   // bitmap form pixels set to black
+  LINCHN,    // chain stitch has line in middle
+  ENTRZIG,   // user is creating a zig-zag form
+  FOLFRM,    // form-form is displaying a follower form
+  DUREFRM,   // display the form-form
+  SIDX,      // display the extra fills
+  WASLED,    // lead form found in frmchk
+  FPSEL,     // form points selected
+  SHOPSEL,   // form points selected rectangle is showing
+  PSELDIR,   // direction of form vertex select
+  FPUNCLP,   // user is retrieving clipped form points into a form
+  SHOP,      // clipboard from points are showing
+  WASPCDCLP, // there is pcd data on the clipboard
+  FTHR,      // feather fill flag
+  FBOTH,     // do both sides of a feather fill
+  ENTRFTHUP, // user is entering the feather up number
+  FTHSID,    // user is entering a feather color
+  CNV2FTH,   // converting a form to feather ribbon
+  WASFPNT,   // user is moving a form vertex
+  WASDO,     // backup has been made before refill
+  NOSEL,     // left button down didn't select anything
+  WASDEL,    // stitches were deleted
+  GTWLKIND,  // get the edge walk/underlay offset
+  GTWLKLEN,  // get the edge walk/underlay stitch length
+  GTUANG,    // get the underlay angle
+  GTUSPAC,   // get the underlay spacing
+  BADVER,    // key version does not match
+  DUSRT,     // write sort info
+  WLKDIR,    // edge walk direction, 0=forward
+  INDIR,     // inner border switched with outer
+  DIDSTRT,   // start stitches have been written
+  REFCNT,    // counting the form-form lines
+  UNDCOL,    // user is entering an underlay color
+  FSETULEN,  // user is setting the underlay stitch length for a group of forms
+  ISEND,     // writing the end stitches
+  FSETUSPAC, // user is setting the underlay spacing for a group of forms
+  FSETUANG,  // user is setting the underlay angle for a group of forms
+  FSETFLEN,  // user is setting the fill stitch length for a group of forms
+  FSETFSPAC, // user is setting the fill spacing for a group of forms
+  FSETFANG,  // user is setting the fill angle for a group of forms
+  FSETUCOL,  // user is setting the underlay color for a group of forms
+  FSETFCOL,  // user is setting the fill color for a group of forms
+  FSETBCOL,  // user is setting the border color for a group of forms
+  FSETBLEN,  // user is setting the border color for a group of forms
+  FSETBSPAC, // user is setting the border spacing for a group of forms
+  FSETBMIN,  // user is setting the minimum border stitch length for a group of forms
+  FSETBMAX,  // user is setting the maximum border stitch length for a group of forms
+  FSETFMIN,  // user is setting the minimum fill stitch length for a group of forms
+  FSETFMAX,  // user is setting the maximum fill stitch length for a group of forms
+  FSETFWID,  // user is setting the width for a group of forms
+  FSETFHI,   // user is setting the height for a group of forms
+  TXTRED,    // displaying the texture fill editor
+  FRMBOXIN,  // user is setting the form box pixels
+  TXTMOV,    // user is moving a texture editor point
+  TXTCLP,    // user is setting texture points with a clipboard form
+  TXTLIN,    // user is setting texture points in a line
+  WASTXBAK,  // texture fill editor history active
+  LASTXBAK,  // last key was a texture back key
+  TXBDIR,    // texture backup direction
+  TXHCNTR,   // texture center on
+  TXFIL,     // texture fill in progress
+  WASWROT,   // texture clipboard form was written
+  DESCHG,    // design size change 0=x, 1=y
+  CMPDO,     // design has been changed
+  ISUND,     // doing underlay fill
+  CHKTX,     // user has changed the texture fill window size, check the points
+  FSETFIND,  // user is setting the indent for a group of forms
+  TXBOX,     // user is importing stitches for textured fill
+  TXIN,      // last stitch point was in stitch select box
+  SCLPSPAC,  // user is setting the clipbard fill spacing
+  FCHK,      // check the forms
+  NOCLP,     // don't load clipboard data from forms
+  NOTHRFIL,  // loaded file wasn't a Thred file
 
-	EnumCount // must be the last entry in the enum
+  EnumCount // must be the last entry in the enum
 };
 
 // user bitmap
-enum class UserFlag
-{
-	SQRFIL,   // square ends on fills
-	BLUNT,    // blunt ends on satin lines
-	NEDOF,    // needle cursor off
-	KNOTOF,   // don't show knots
-	BSAVOF,   // don't save PCS bitmaps
-	LINSPAC,  // evenly space border line points
-	DUND,     // underlay in satin borders
-	FIL2OF,   // fill to select off
-	ROTAUX,   // rotate the aux file when saving
-	SAVMAX,   // thred window maximized
-	MARQ,     // remove mark when user hits escape only
-	FRMX,     // cross cursor for form entry
-	DAZHOL,   // daisy hole
-	DAZD,     // daisy d-lines
-	CHREF,    // refill forms when changing design size
-	WRNOF,    // warn if edited off
-	EnumCount // must be the last entry in the enum
+enum class UserFlag {
+  SQRFIL,   // square ends on fills
+  BLUNT,    // blunt ends on satin lines
+  NEDOF,    // needle cursor off
+  KNOTOF,   // don't show knots
+  BSAVOF,   // don't save PCS bitmaps
+  LINSPAC,  // evenly space border line points
+  DUND,     // underlay in satin borders
+  FIL2OF,   // fill to select off
+  ROTAUX,   // rotate the aux file when saving
+  SAVMAX,   // thred window maximized
+  MARQ,     // remove mark when user hits escape only
+  FRMX,     // cross cursor for form entry
+  DAZHOL,   // daisy hole
+  DAZD,     // daisy d-lines
+  CHREF,    // refill forms when changing design size
+  WRNOF,    // warn if edited off
+  EnumCount // must be the last entry in the enum
 };
 
-enum featherStyles
-{               // feather fill types
-	FTHSIN = 1, // sine
-	FTHSIN2,    // half sine
-	FTHLIN,     // line
-	FTHPSG,     // psuedo-random sequence
-	FTHRMP,     // sawtooth
-	FTHFAZ      // phase
+enum featherStyles { // feather fill types
+  FTHSIN = 1,        // sine
+  FTHSIN2,           // half sine
+  FTHLIN,            // line
+  FTHPSG,            // psuedo-random sequence
+  FTHRMP,            // sawtooth
+  FTHFAZ             // phase
 };
 
 constexpr int32_t FDEFTYP = FTHPSG; // default feather type
 
 // edge fill types
-enum edgeFillStyles
-{
-	EDGELINE = 1, // Line
-	EDGEBEAN,     // Bean
-	EDGECLIP,     // Clipboard
-	EDGEANGSAT,   // Angle Satin
-	EDGEAPPL,     // Applique
-	EDGEPROPSAT,  // Proportional Satin
-	EDGEBHOL,     // Buttonhole
-	EDGEPICOT,    // Picot
-	EDGEDOUBLE,   // Double
-	EDGELCHAIN,   // Line Chain
-	EDGEOCHAIN,   // Open Chain
-	EDGECLIPX,    // Even Clipboard
-	EDGELAST      // must always be the last value
+enum edgeFillStyles {
+  EDGELINE = 1, // Line
+  EDGEBEAN,     // Bean
+  EDGECLIP,     // Clipboard
+  EDGEANGSAT,   // Angle Satin
+  EDGEAPPL,     // Applique
+  EDGEPROPSAT,  // Proportional Satin
+  EDGEBHOL,     // Buttonhole
+  EDGEPICOT,    // Picot
+  EDGEDOUBLE,   // Double
+  EDGELCHAIN,   // Line Chain
+  EDGEOCHAIN,   // Open Chain
+  EDGECLIPX,    // Even Clipboard
+  EDGELAST      // must always be the last value
 };
 
 // form types
-enum formStyles
-{
-	FRMLINE = 1U, // Line form
-	FRMFPOLY,     // Freehand polygon form
-	FRMRPOLY,     // Regular polygon form
-	FRMSTAR,      // Star form
-	FRMSPIRAL,    // Spiral Form
-	SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
-	FRMHEART,     // Heart Form
-	FRMLENS,      // Lens form
-	FRMEGG,       // Egg form
-	FRMTEAR,      // Teardrop form
-	FRMZIGZAG,    // Zig-Zag form
-	FRMWAVE,      // Wave Form
-	FRMDAISY,     // Daisy form
+enum formStyles {
+  FRMLINE = 1U, // Line form
+  FRMFPOLY,     // Freehand polygon form
+  FRMRPOLY,     // Regular polygon form
+  FRMSTAR,      // Star form
+  FRMSPIRAL,    // Spiral Form
+  SAT,          // Used when fill is 'feather', 'fan', 'fan clip' or form is daisy
+  FRMHEART,     // Heart Form
+  FRMLENS,      // Lens form
+  FRMEGG,       // Egg form
+  FRMTEAR,      // Teardrop form
+  FRMZIGZAG,    // Zig-Zag form
+  FRMWAVE,      // Wave Form
+  FRMDAISY,     // Daisy form
 };
 
 // main menu items
-enum mainMenuItems
-{
-	M_FILE,
-	M_VIEW,
-	M_FORM,
-	M_EDIT,
-	M_IN,
-	M_OUT,
-	M_UNDO,
-	M_REDO,
-	M_ROT,
-	M_PREF,
-	M_FILL,
-	M_ADD,
-	M_FRM,
-	M_ALL,
-	M_1,
-	M_2,
-	M_3,
-	M_4,
-	M_HELP,
+enum mainMenuItems {
+  M_FILE,
+  M_VIEW,
+  M_FORM,
+  M_EDIT,
+  M_IN,
+  M_OUT,
+  M_UNDO,
+  M_REDO,
+  M_ROT,
+  M_PREF,
+  M_FILL,
+  M_ADD,
+  M_FRM,
+  M_ALL,
+  M_1,
+  M_2,
+  M_3,
+  M_4,
+  M_HELP,
 };
 
 // view menu items
-enum viewMenuItems
-{
-	MVW_MOVIE,
-	MVW_SET,
-	MVW_BACK,
-	MVW_ZOOM,
-	MVW_THRD,
-	MVW_SHWT,
-	MVW_SHWTCOL,
-	MVW_DSGN,
-	MVW_KNOT,
-	MVW_MARK,
-	MVW_ABOUT,
+enum viewMenuItems {
+  MVW_MOVIE,
+  MVW_SET,
+  MVW_BACK,
+  MVW_ZOOM,
+  MVW_THRD,
+  MVW_SHWT,
+  MVW_SHWTCOL,
+  MVW_DSGN,
+  MVW_KNOT,
+  MVW_MARK,
+  MVW_ABOUT,
 };
 
 // fill menu items
-enum fillMenuItems
-{
-	MFIL_SAT,
-	MFIL_FTH,
-	MFIL_VERT,
-	MFIL_HOR,
-	MFIL_ANG,
-	MFIL_CLP,
-	MFIL_CONT,
-	MFIL_TED,
-	MFIL_BORD,
-	MFIL_UNFIL
+enum fillMenuItems {
+  MFIL_SAT,
+  MFIL_FTH,
+  MFIL_VERT,
+  MFIL_HOR,
+  MFIL_ANG,
+  MFIL_CLP,
+  MFIL_CONT,
+  MFIL_TED,
+  MFIL_BORD,
+  MFIL_UNFIL
 };
 
 // clipboard data types
-enum clipDataType
-{
-	CLP_STCH = 1,
-	CLP_FRM,
-	CLP_FRMS,
-	CLP_FRMPS,
+enum clipDataType {
+  CLP_STCH = 1,
+  CLP_FRM,
+  CLP_FRMS,
+  CLP_FRMPS,
 };
 
 // edge underlay bit
@@ -755,76 +742,74 @@ constexpr auto EGUND  = 0x80U;
 constexpr auto NEGUND = 0x7fU;
 
 // form data lines
-enum formData
-{
-	LFRM,       // form 0
-	LLAYR,      // layer 1
-	LFRMFIL,    // form fill 2
-	LFRMCOL,    // form fill color 3
-	LFRMSPAC,   // form fill space 4
-	LFRMLEN,    // form stitch length 5
-	LFRMANG,    // angle of angle fill 6
-	LBRD,       // border 7
-	LBRDCOL,    // border color 8
-	LBRDSPAC,   // border space 9
-	LBRDLEN,    // border stitch length 10
-	LBRDSIZ,    // border size 11
-	LAPCOL,     // applique color 12
-	LBCSIZ,     // buttonhole corner size 13
-	LBSTRT,     // form start style 14
-	LBFIN,      // form end style 15
-	LBRDPIC,    // pico border spacing 16
-	LBRDUND,    // border underlay 17
-	LSACANG,    // angle clipboard angle 18
-	LFRMFAZ,    // clipboard phase 19
-	LBRDPOS,    // chain position 20
-	LBFILSQR,   // square/pointed fill ends 21
-	LMAXFIL,    // maximum fill stitch length 22
-	LMINFIL,    // minimum fill stitch length 23
-	LMAXBRD,    // maximum border stitch length 24
-	LMINBRD,    // minimum border stitch length 25
-	LFTHCOL,    // feather color 26
-	LFTHTYP,    // feather fill type
-	LFTHBLND,   // feather blend
-	LFTHBTH,    // feather both up and down
-	LFTHUP,     // feather up or down
-	LFTHUPCNT,  // feather up count
-	LFTHDWNCNT, // feather down count
-	LFTHSIZ,    // feather size
-	LFTHNUM,    // feather number
-	LFTHFLR,    // feather floor
-	LFSTRT,     // form fill start on/off
-	LDSTRT,     // form fill start data
-	LFEND,      // form fill end on/off
-	LDEND,      // form fill end data
-	LCWLK,      // center walk
-	LWALK,      // edge walk
-	LWLKIND,    // edge walk/underlay indent
-	LUND,       // underlay
-	LULEN,      // underaly stitch length
-	LUANG,      // underlay angle
-	LUSPAC,     // underlay spacing
-	LUNDCOL,    // underlay color
-	LTXOF,      // texture fill spacing
-	LASTLIN     // must be the last entry
+enum formData {
+  LFRM,       // form 0
+  LLAYR,      // layer 1
+  LFRMFIL,    // form fill 2
+  LFRMCOL,    // form fill color 3
+  LFRMSPAC,   // form fill space 4
+  LFRMLEN,    // form stitch length 5
+  LFRMANG,    // angle of angle fill 6
+  LBRD,       // border 7
+  LBRDCOL,    // border color 8
+  LBRDSPAC,   // border space 9
+  LBRDLEN,    // border stitch length 10
+  LBRDSIZ,    // border size 11
+  LAPCOL,     // applique color 12
+  LBCSIZ,     // buttonhole corner size 13
+  LBSTRT,     // form start style 14
+  LBFIN,      // form end style 15
+  LBRDPIC,    // pico border spacing 16
+  LBRDUND,    // border underlay 17
+  LSACANG,    // angle clipboard angle 18
+  LFRMFAZ,    // clipboard phase 19
+  LBRDPOS,    // chain position 20
+  LBFILSQR,   // square/pointed fill ends 21
+  LMAXFIL,    // maximum fill stitch length 22
+  LMINFIL,    // minimum fill stitch length 23
+  LMAXBRD,    // maximum border stitch length 24
+  LMINBRD,    // minimum border stitch length 25
+  LFTHCOL,    // feather color 26
+  LFTHTYP,    // feather fill type
+  LFTHBLND,   // feather blend
+  LFTHBTH,    // feather both up and down
+  LFTHUP,     // feather up or down
+  LFTHUPCNT,  // feather up count
+  LFTHDWNCNT, // feather down count
+  LFTHSIZ,    // feather size
+  LFTHNUM,    // feather number
+  LFTHFLR,    // feather floor
+  LFSTRT,     // form fill start on/off
+  LDSTRT,     // form fill start data
+  LFEND,      // form fill end on/off
+  LDEND,      // form fill end data
+  LCWLK,      // center walk
+  LWALK,      // edge walk
+  LWLKIND,    // edge walk/underlay indent
+  LUND,       // underlay
+  LULEN,      // underaly stitch length
+  LUANG,      // underlay angle
+  LUSPAC,     // underlay spacing
+  LUNDCOL,    // underlay color
+  LTXOF,      // texture fill spacing
+  LASTLIN     // must be the last entry
 };
 
 // fill types
-enum fillStyles
-{
-	VRTF = 1, // Vertical fill
-	HORF,     // Horizontal fill
-	ANGF,     // Angle fill
-	SATF,     // Fan fill ?
-	CLPF,     // Fan clip Fill
-	CONTF,    // Contour fill
-	VCLPF,    // Vertical clip fill
-	HCLPF,    // Horizontal clip fill
-	ANGCLPF,  // Angle clip fill
-	FTHF,     // Feather fill
-	TXVRTF,   // Vertical texture fill
-	TXHORF,   // Horizontal texture fill
-	TXANGF,   // Angle texture fill
+enum fillStyles {
+  VRTF = 1, // Vertical fill
+  HORF,     // Horizontal fill
+  ANGF,     // Angle fill
+  SATF,     // Fan fill ?
+  CLPF,     // Fan clip Fill
+  CONTF,    // Contour fill
+  VCLPF,    // Vertical clip fill
+  HCLPF,    // Horizontal clip fill
+  ANGCLPF,  // Angle clip fill
+  FTHF,     // Feather fill
+  TXVRTF,   // Vertical texture fill
+  TXHORF,   // Horizontal texture fill
+  TXANGF,   // Angle texture fill
 };
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
@@ -833,110 +818,95 @@ constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
 constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 
 // preference window
-enum preferenceItems
-{
-	PSPAC,  // 0
-	PANGL,  // 1
-	PSQR,   // 2
-	PSAT,   // 3
-	PMAX,   // 4
-	PUSE,   // 5
-	PMIN,   // 6
-	PSHO,   // 7
-	PBOX,   // 8
-	PSMAL,  // 9
-	PAP,    // 10
-	PSNP,   // 11
-	PSTAR,  // 12
-	PSPIR,  // 13
-	PBUT,   // 14
-	PBLNT,  // 15
-	PPIC,   // 16
-	PHUP,   // 17
-	PHUPX,  // 18
-	PUND,   // 19
-	PGRD,   // 20
-	PCLPOF, // 21
-	PFAZ,   // 22
-	PCHN,   // 23
-	PCHRAT, // 24
-	PNUDG,  // 25
-	PEG,    // 26
-	PHUPY,  // 27
-	PLRAT,  // 28
-	PAPSL,  // 29
+enum preferenceItems {
+  PSPAC,  // 0
+  PANGL,  // 1
+  PSQR,   // 2
+  PSAT,   // 3
+  PMAX,   // 4
+  PUSE,   // 5
+  PMIN,   // 6
+  PSHO,   // 7
+  PBOX,   // 8
+  PSMAL,  // 9
+  PAP,    // 10
+  PSNP,   // 11
+  PSTAR,  // 12
+  PSPIR,  // 13
+  PBUT,   // 14
+  PBLNT,  // 15
+  PPIC,   // 16
+  PHUP,   // 17
+  PHUPX,  // 18
+  PUND,   // 19
+  PGRD,   // 20
+  PCLPOF, // 21
+  PFAZ,   // 22
+  PCHN,   // 23
+  PCHRAT, // 24
+  PNUDG,  // 25
+  PEG,    // 26
+  PHUPY,  // 27
+  PLRAT,  // 28
+  PAPSL,  // 29
 };
 
 // file menu items
-enum fileMenuItems
-{
-	FM_NEW,
-	FM_OPEN,
-	FM_CLOS,
-	FM_THUMB,
-	FM_OPNPCS,
-	FM_INSRT,
-	FM_OVRLAY,
-	FM_SAV,
-	FM_SAVAS,
-	FM_LODBIT,
-	FM_SAVBIT,
-	FM_HIDBIT,
-	FM_RMVBIT,
-	FM_PURG,
-	FM_LOCK,
-	FM_ONAM0,
-	FM_ONAM1,
-	FM_ONAM2,
-	FM_ONAM3
+enum fileMenuItems {
+  FM_NEW,
+  FM_OPEN,
+  FM_CLOS,
+  FM_THUMB,
+  FM_OPNPCS,
+  FM_INSRT,
+  FM_OVRLAY,
+  FM_SAV,
+  FM_SAVAS,
+  FM_LODBIT,
+  FM_SAVBIT,
+  FM_HIDBIT,
+  FM_RMVBIT,
+  FM_PURG,
+  FM_LOCK,
+  FM_ONAM0,
+  FM_ONAM1,
+  FM_ONAM2,
+  FM_ONAM3
 };
 
 // fill message codes
-enum fillMessageCodes
-{
-	FMM_FAN,
-	FMM_VRT,
-	FMM_HOR,
-	FMM_ANG,
-	FMM_CLP,
-	FMM_FTH,
-	FML_LIN = 0x100,
-	FML_BLD,
-	FML_ANGS,
-	FML_PRPS,
-	FML_APLQ,
-	FML_BHOL,
-	FML_CLP,
-	FML_PIC,
-	FMX_UNF,
-	FML_CONT,
-	FML_CHAIN,
+enum fillMessageCodes {
+  FMM_FAN,
+  FMM_VRT,
+  FMM_HOR,
+  FMM_ANG,
+  FMM_CLP,
+  FMM_FTH,
+  FML_LIN = 0x100,
+  FML_BLD,
+  FML_ANGS,
+  FML_PRPS,
+  FML_APLQ,
+  FML_BHOL,
+  FML_CLP,
+  FML_PIC,
+  FMX_UNF,
+  FML_CONT,
+  FML_CHAIN,
 };
 
 // button windows
-enum stitchButtons
-{
-	HBOXSEL,
-	HUPTO,
-	HHID,
-	HNUM,
-	HTOT,
-	HMINLEN,
-	HMAXLEN,
-	HCOR,
-	HLAYR
-};
+enum stitchButtons { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
 
-enum textureButtons
-{ // text button windows
-	HTXCLR,
-	HTXHI,
-	HTXWID,
-	HTXSPAC,
-	HTXVRT,
-	HTXHOR,
-	HTXANG,
-	HTXMIR,
+enum textureButtons { // text button windows
+  HTXCLR,
+  HTXHI,
+  HTXWID,
+  HTXSPAC,
+  HTXVRT,
+  HTXHOR,
+  HTXANG,
+  HTXMIR,
 };
 
 constexpr uint32_t HLIN = HNUM;
@@ -945,137 +915,132 @@ constexpr uint32_t HLIN = HNUM;
 
 class PCSHEADER // pcs file header structure
 {
-public:
-	int8_t   leadIn { 0 };
-	int8_t   hoopType { 0 };
-	uint16_t colorCount { 0 };
-	COLORREF colors[COLOR_COUNT] { 0 }; // NOLINT(modernize-avoid-c-arrays)
-	uint16_t stitchCount { 0 };
+  public:
+  int8_t   leadIn {0};
+  int8_t   hoopType {0};
+  uint16_t colorCount {0};
+  COLORREF colors[COLOR_COUNT] {0}; // NOLINT(modernize-avoid-c-arrays)
+  uint16_t stitchCount {0};
 
-	constexpr PCSHEADER() noexcept = default;
-	// PCSHEADER(PCSHEADER&&) = default;
-	// PCSHEADER& operator=(PCSHEADER const& rhs) = default;
-	// PCSHEADER& operator=(PCSHEADER&&) = default;
-	//~PCSHEADER() = default;
+  constexpr PCSHEADER() noexcept = default;
+  // PCSHEADER(PCSHEADER&&) = default;
+  // PCSHEADER& operator=(PCSHEADER const& rhs) = default;
+  // PCSHEADER& operator=(PCSHEADER&&) = default;
+  //~PCSHEADER() = default;
 };
 
 class INIFILE // ini file structure
 {
-public:
-	char     defaultDirectory[180] { 0 };                   // default directory
-	COLORREF stitchColors[COLOR_COUNT] { 0U };              // colors
-	COLORREF stitchPreferredColors[COLOR_COUNT] { 0U };     // stitch preference colors
-	COLORREF backgroundPreferredColors[COLOR_COUNT] { 0U }; // background preference colors
-	COLORREF backgroundColor { 0U };                        // background color
-	COLORREF bitmapColor { 0U };                            // bitmap color
-	float    minStitchLength { 0.0F };                      // minimum stitch length
-	double   showStitchThreshold { 0.0 };                   // show stitch points
-	double   threadSize30 { 0.0 };                          // millimeter size of 30 weight thread
-	double   threadSize40 { 0.0 };                          // millimeter size of 40 weight thread
-	double   threadSize60 { 0.0 };                          // millimeter size of 60 weight thread
-	float    userStitchLength { 0.0F };                     // user stitch length
-	float    maxStitchLength { 0.0F };                      // maximum stitch length
-	float    smallStitchLength { 0.0F };                    // small stitch size
-	double   stitchBoxesThreshold { 0.0 };                  // show sitch box level
-	float    stitchSpace { 0.0F };                          // stitch spacing between lines of stitches
-	float    fillAngle { 0.0F };                            // fill angle
-	uint32_t userFlagMap { 0U };                            // bitmap for user variables
-	float    borderWidth { 0.0F };                          // border width
-	uint32_t appliqueColor { 0U };                          // applique color
-	char     prevNames[OLDNUM][_MAX_PATH] { { 0 } };        // last file names
-	float    snapLength { 0.0F };                           // snap together length
-	float    starRatio { 0.0F };                            // star ratio
-	float    spiralWrap { 0.0F };                           // spiral wrap
-	COLORREF bitmapBackgroundColors[COLOR_COUNT] { 0U }; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
-	float    buttonholeCornerLength { 0.0F };            // buttonhole fill corner length
-	float    picotSpace { 0.0F };                        // space between border picots
-	int8_t   hoopType { 0 };                             // hoop type
-	int8_t   auxFileType { 0 };                          // machine file type
-	float    hoopSizeX { 0.0F };                         // hoop x size
-	float    hoopSizeY { 0.0F };                         // hoop y size
-	float    rotationAngle { 0.0F };                     // rotation angle
-	float    gridSize { 0.0F };                          // grid size
-	float    clipOffset { 0.0F };                        // clipboard offset
-	RECT     initialWindowCoords { 0, 0, 0, 0 };         // initial window coordinates
-	COLORREF gridColor { 0U };                           // grid color
-	uint32_t fillPhase { 0U };                           // clipboard fill phase
-	float    customHoopX { 0.0F };                       // custom hoop width
-	float    customHoopY { 0.0F };                       // custom hoop height
-	float    traceLength { 0.0F };                       // lens points
-	float    traceRatio { 0.0F };                        // trace ratio
-	float    chainSpace { 0.0F };                        // chain space
-	float    chainRatio { 0.0F };                        // chain ratio
-	float    lensRatio { 0.0F };                         // lens aspect ratio
-	float    AppStitchLen { 0.0F };                      // Applique stitch length
-	float    cursorNudgeStep { 0.0F };                   // cursor nudge step
-	uint16_t nudgePixels { 0U };                         // nudge pixels
-	float    eggRatio { 0.0F };                          // egg ratio
-	uint16_t stitchSizePixels { 0U };                    // size of stitch points in pixels
-	uint16_t formVertexSizePixels { 0U };                // size of form points in pixels
-	uint16_t formSides { 0U };                           // sides of a created form
-	float    tearTailLength { 0.0F };                    // length of the tear tail
-	float    tearTwistStep { 0.0F };                     // tear twist step
-	float    tearTwistRatio { 0.0F };                    // tear twist ratio
-	uint16_t wavePoints { 0U };                          // wave points
-	uint16_t waveStart { 0U };                           // wave strting point
-	uint16_t waveEnd { 0U };                             // wave ending point;
-	uint16_t waveLobes { 0U };                           // wave lobes
-	uint8_t  featherFillType { 0U };                     // feather fill type
-	uint8_t  featherUpCount { 0U };                      // feather up count
-	uint8_t  featherDownCount { 0U };                    // feather down count
-	uint8_t  featherType { 0U };                         // feather bits
-	float    featherRatio { 0.0F };                      // feather ratio
-	float    featherMinStitchSize { 0.0F };              // feather floor
-	uint16_t featherCount { 0U };                        // feather fill psg granularity
-	char     p2cName[MAX_PATH] { 0 };                    // pes2card file                       NOLINT(modernize-avoid-c-arrays)
-	float    underlayIndent { 0.0F };                    // edge walk/underlay indent
-	float    underlayAngle { 0.0F };                     // underlay angle
-	float    underlaySpacing { 0.0F };                   // underlay spacing
-	float    underlayStitchLen { 0.0F };                 // underlay stitch length
-	float    daisyDiameter { 0.0F };                     // daisy diameter
-	float    daisyPetalLen { 0.0F };                     // daisy petal length
-	float    daisyHoleDiameter { 0.0F };                 // daisy hole diameter
-	uint32_t daisyPetalCount { 0U };                     // daisy petals
-	uint32_t daisyPetalPoints { 0U };                    // daisy petal points
-	uint32_t daisyInnerCount { 0U };                     // daisy inner count
-	uint8_t  daisyBorderType { 0U };                     // daisy border type
-	uint8_t  dataCheck { 0U };                           // data check
-	float    textureHeight { 0.0F };                     // textured fill height
-	float    textureWidth { 0.0F };                      // textured fill width
-	float    textureSpacing { 0.0F };                    // textured fill spacing
-	uint16_t formBoxSizePixels { 0U };                   // form box pixels
-	uint16_t daisyHeartCount { 0U };                     // daisy heart count
-	uint16_t textureEditorSize { 0U };                   // texture editor pixels
-	float    clpspc { 0.0F };                            // clipboard fill spacing
-	char     designerName[NAME_LEN] { 0 };               // designer name                       NOLINT(modernize-avoid-c-arrays)
+  public:
+  char     defaultDirectory[180] {0};                   // default directory
+  COLORREF stitchColors[COLOR_COUNT] {0U};              // colors
+  COLORREF stitchPreferredColors[COLOR_COUNT] {0U};     // stitch preference colors
+  COLORREF backgroundPreferredColors[COLOR_COUNT] {0U}; // background preference colors
+  COLORREF backgroundColor {0U};                        // background color
+  COLORREF bitmapColor {0U};                            // bitmap color
+  float    minStitchLength {0.0F};                      // minimum stitch length
+  double   showStitchThreshold {0.0};                   // show stitch points
+  double   threadSize30 {0.0};                          // millimeter size of 30 weight thread
+  double   threadSize40 {0.0};                          // millimeter size of 40 weight thread
+  double   threadSize60 {0.0};                          // millimeter size of 60 weight thread
+  float    userStitchLength {0.0F};                     // user stitch length
+  float    maxStitchLength {0.0F};                      // maximum stitch length
+  float    smallStitchLength {0.0F};                    // small stitch size
+  double   stitchBoxesThreshold {0.0};                  // show sitch box level
+  float    stitchSpace {0.0F};                          // stitch spacing between lines of stitches
+  float    fillAngle {0.0F};                            // fill angle
+  uint32_t userFlagMap {0U};                            // bitmap for user variables
+  float    borderWidth {0.0F};                          // border width
+  uint32_t appliqueColor {0U};                          // applique color
+  char     prevNames[OLDNUM][_MAX_PATH] {{0}};          // last file names
+  float    snapLength {0.0F};                           // snap together length
+  float    starRatio {0.0F};                            // star ratio
+  float    spiralWrap {0.0F};                           // spiral wrap
+  COLORREF bitmapBackgroundColors[COLOR_COUNT] {0U}; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
+  float    buttonholeCornerLength {0.0F};    // buttonhole fill corner length
+  float    picotSpace {0.0F};                // space between border picots
+  int8_t   hoopType {0};                     // hoop type
+  int8_t   auxFileType {0};                  // machine file type
+  float    hoopSizeX {0.0F};                 // hoop x size
+  float    hoopSizeY {0.0F};                 // hoop y size
+  float    rotationAngle {0.0F};             // rotation angle
+  float    gridSize {0.0F};                  // grid size
+  float    clipOffset {0.0F};                // clipboard offset
+  RECT     initialWindowCoords {0, 0, 0, 0}; // initial window coordinates
+  COLORREF gridColor {0U};                   // grid color
+  uint32_t fillPhase {0U};                   // clipboard fill phase
+  float    customHoopX {0.0F};               // custom hoop width
+  float    customHoopY {0.0F};               // custom hoop height
+  float    traceLength {0.0F};               // lens points
+  float    traceRatio {0.0F};                // trace ratio
+  float    chainSpace {0.0F};                // chain space
+  float    chainRatio {0.0F};                // chain ratio
+  float    lensRatio {0.0F};                 // lens aspect ratio
+  float    AppStitchLen {0.0F};              // Applique stitch length
+  float    cursorNudgeStep {0.0F};           // cursor nudge step
+  uint16_t nudgePixels {0U};                 // nudge pixels
+  float    eggRatio {0.0F};                  // egg ratio
+  uint16_t stitchSizePixels {0U};            // size of stitch points in pixels
+  uint16_t formVertexSizePixels {0U};        // size of form points in pixels
+  uint16_t formSides {0U};                   // sides of a created form
+  float    tearTailLength {0.0F};            // length of the tear tail
+  float    tearTwistStep {0.0F};             // tear twist step
+  float    tearTwistRatio {0.0F};            // tear twist ratio
+  uint16_t wavePoints {0U};                  // wave points
+  uint16_t waveStart {0U};                   // wave strting point
+  uint16_t waveEnd {0U};                     // wave ending point;
+  uint16_t waveLobes {0U};                   // wave lobes
+  uint8_t  featherFillType {0U};             // feather fill type
+  uint8_t  featherUpCount {0U};              // feather up count
+  uint8_t  featherDownCount {0U};            // feather down count
+  uint8_t  featherType {0U};                 // feather bits
+  float    featherRatio {0.0F};              // feather ratio
+  float    featherMinStitchSize {0.0F};      // feather floor
+  uint16_t featherCount {0U};                // feather fill psg granularity
+  char p2cName[MAX_PATH] {0}; // pes2card file                       NOLINT(modernize-avoid-c-arrays)
+  float    underlayIndent {0.0F};    // edge walk/underlay indent
+  float    underlayAngle {0.0F};     // underlay angle
+  float    underlaySpacing {0.0F};   // underlay spacing
+  float    underlayStitchLen {0.0F}; // underlay stitch length
+  float    daisyDiameter {0.0F};     // daisy diameter
+  float    daisyPetalLen {0.0F};     // daisy petal length
+  float    daisyHoleDiameter {0.0F}; // daisy hole diameter
+  uint32_t daisyPetalCount {0U};     // daisy petals
+  uint32_t daisyPetalPoints {0U};    // daisy petal points
+  uint32_t daisyInnerCount {0U};     // daisy inner count
+  uint8_t  daisyBorderType {0U};     // daisy border type
+  uint8_t  dataCheck {0U};           // data check
+  float    textureHeight {0.0F};     // textured fill height
+  float    textureWidth {0.0F};      // textured fill width
+  float    textureSpacing {0.0F};    // textured fill spacing
+  uint16_t formBoxSizePixels {0U};   // form box pixels
+  uint16_t daisyHeartCount {0U};     // daisy heart count
+  uint16_t textureEditorSize {0U};   // texture editor pixels
+  float    clpspc {0.0F};            // clipboard fill spacing
+  char designerName[NAME_LEN] {0}; // designer name                       NOLINT(modernize-avoid-c-arrays)
 
-	constexpr INIFILE() noexcept = default;
-	// INIFILE(INIFILE&&) = default;
-	// INIFILE& operator=(INIFILE const& rhs) = default;
-	// INIFILE& operator=(INIFILE&&) = default;
-	//~INIFILE() = default;
+  constexpr INIFILE() noexcept = default;
+  // INIFILE(INIFILE&&) = default;
+  // INIFILE& operator=(INIFILE const& rhs) = default;
+  // INIFILE& operator=(INIFILE&&) = default;
+  //~INIFILE() = default;
 };
 
-enum machineType
-{
-	AUXPCS,
-	AUXDST,
-	AUXPES
-};
+enum machineType { AUXPCS, AUXDST, AUXPES };
 
 class FORMVERTICES
 {
-public:
-	uint32_t start { 0U };
-	uint32_t vertexCount { 0U };
-	uint32_t finish { 0U };
-	uint32_t form { 0U };
+  public:
+  uint32_t start {0U};
+  uint32_t vertexCount {0U};
+  uint32_t finish {0U};
+  uint32_t form {0U};
 
-	constexpr FORMVERTICES() noexcept = default;
-	// FORMVERTICES(FORMVERTICES&&) = default;
-	// FORMVERTICES& operator=(FORMVERTICES const& rhs) = default;
-	// FORMVERTICES& operator=(FORMVERTICES&&) = default;
-	//~FORMVERTICES() = default;
+  constexpr FORMVERTICES() noexcept = default;
+  // FORMVERTICES(FORMVERTICES&&) = default;
+  // FORMVERTICES& operator=(FORMVERTICES const& rhs) = default;
+  // FORMVERTICES& operator=(FORMVERTICES&&) = default;
+  //~FORMVERTICES() = default;
 };
 
 class fPOINT;
@@ -1085,270 +1050,258 @@ class BSEQPNT;
 
 class dPOINT
 {
-public:
-	double x { 0.0 };
-	double y { 0.0 };
+  public:
+  double x {0.0};
+  double y {0.0};
 
-	constexpr dPOINT() noexcept = default;
-	explicit inline dPOINT(fPOINT const& rhs) noexcept;
-	inline dPOINT(float rhsX, float rhsY) noexcept;
-	inline dPOINT(double rhsX, double rhsY) noexcept;
-	inline bool    operator==(dPOINT const& rhs) const noexcept;
-	inline dPOINT& operator=(fPOINT const& rhs) noexcept;
-	inline dPOINT& operator=(BSEQPNT const& rhs) noexcept;
-	// dPOINT(dPOINT&&) = default;
-	// dPOINT& operator=(dPOINT const& rhs) = default;
-	// dPOINT& operator=(dPOINT&&) = default;
-	//~dPOINT() = default;
+  constexpr dPOINT() noexcept = default;
+  explicit inline dPOINT(fPOINT const& rhs) noexcept;
+  inline dPOINT(float rhsX, float rhsY) noexcept;
+  inline dPOINT(double rhsX, double rhsY) noexcept;
+  inline bool    operator==(dPOINT const& rhs) const noexcept;
+  inline dPOINT& operator=(fPOINT const& rhs) noexcept;
+  inline dPOINT& operator=(BSEQPNT const& rhs) noexcept;
+  // dPOINT(dPOINT&&) = default;
+  // dPOINT& operator=(dPOINT const& rhs) = default;
+  // dPOINT& operator=(dPOINT&&) = default;
+  //~dPOINT() = default;
 };
 
 class fPOINT
 {
-public:
-	float x { 0.0F };
-	float y { 0.0F };
+  public:
+  float x {0.0F};
+  float y {0.0F};
 
-	constexpr fPOINT() noexcept = default;
-	inline fPOINT(double rhsX, double rhsY) noexcept;
-	inline fPOINT(float rhsX, float rhsY) noexcept;
-	inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
-	explicit inline fPOINT(dPOINT const& rhs) noexcept;
-	inline bool    operator==(fPOINT const& rhs) const noexcept;
-	inline fPOINT& operator=(dPOINT const& rhs) noexcept;
-	inline fPOINT& operator=(fPOINTATTR const& rhs) noexcept;
-	inline fPOINT& operator=(SMALPNTL const& rhs) noexcept;
-	inline fPOINT& operator=(BSEQPNT const& rhs) noexcept;
-	// fPOINT(fPOINT&&) = default;
-	// fPOINT& operator=(fPOINT const& rhs) = default;
-	// fPOINT& operator=(fPOINT&&) = default;
-	//~fPOINT() = default;
+  constexpr fPOINT() noexcept = default;
+  inline fPOINT(double rhsX, double rhsY) noexcept;
+  inline fPOINT(float rhsX, float rhsY) noexcept;
+  inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
+  explicit inline fPOINT(dPOINT const& rhs) noexcept;
+  inline bool    operator==(fPOINT const& rhs) const noexcept;
+  inline fPOINT& operator=(dPOINT const& rhs) noexcept;
+  inline fPOINT& operator=(fPOINTATTR const& rhs) noexcept;
+  inline fPOINT& operator=(SMALPNTL const& rhs) noexcept;
+  inline fPOINT& operator=(BSEQPNT const& rhs) noexcept;
+  // fPOINT(fPOINT&&) = default;
+  // fPOINT& operator=(fPOINT const& rhs) = default;
+  // fPOINT& operator=(fPOINT&&) = default;
+  //~fPOINT() = default;
 };
 
 class fPOINTATTR
 {
-public:
-	float    x { 0.0F };
-	float    y { 0.0F };
-	uint32_t attribute { 0U };
+  public:
+  float    x {0.0F};
+  float    y {0.0F};
+  uint32_t attribute {0U};
 
-	constexpr fPOINTATTR() noexcept = default;
-	inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
-	inline fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
-	// fPOINTATTR(fPOINTATTR&&) = default;
-	// fPOINTATTR& operator=(fPOINTATTR const& rhs) = default;
-	// fPOINTATTR& operator=(fPOINTATTR&&) = default;
-	//~fPOINTATTR() = default;
+  constexpr fPOINTATTR() noexcept = default;
+  inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
+  inline fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
+  // fPOINTATTR(fPOINTATTR&&) = default;
+  // fPOINTATTR& operator=(fPOINTATTR const& rhs) = default;
+  // fPOINTATTR& operator=(fPOINTATTR&&) = default;
+  //~fPOINTATTR() = default;
 };
 
 class SMALPNTL
 {
-public:
-	uint32_t line { 0U }; // line and group must remain in this order for sort to work
-	uint32_t group { 0U };
-	float    x { 0.0F };
-	float    y { 0.0F };
+  public:
+  uint32_t line {0U}; // line and group must remain in this order for sort to work
+  uint32_t group {0U};
+  float    x {0.0F};
+  float    y {0.0F};
 
-	constexpr SMALPNTL() noexcept = default;
-	// SMALPNTL(SMALPNTL&&) = default;
-	// SMALPNTL& operator=(SMALPNTL const& rhs) = default;
-	// SMALPNTL& operator=(SMALPNTL&&) = default;
-	//~SMALPNTL() = default;
+  constexpr SMALPNTL() noexcept = default;
+  // SMALPNTL(SMALPNTL&&) = default;
+  // SMALPNTL& operator=(SMALPNTL const& rhs) = default;
+  // SMALPNTL& operator=(SMALPNTL&&) = default;
+  //~SMALPNTL() = default;
 };
 
 class BSEQPNT
 {
-public:
-	float  x { 0.0F };
-	float  y { 0.0F };
-	int8_t attribute { 0U };
+  public:
+  float  x {0.0F};
+  float  y {0.0F};
+  int8_t attribute {0U};
 
-	inline BSEQPNT() noexcept = default;
-	inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
-	inline BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr);
-	// BSEQPNT(BSEQPNT&&) = default;
-	// BSEQPNT& operator=(BSEQPNT const& rhs) = default;
-	// BSEQPNT& operator=(BSEQPNT&&) = default;
-	//~BSEQPNT() = default;
+  inline BSEQPNT() noexcept = default;
+  inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
+  inline BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr);
+  // BSEQPNT(BSEQPNT&&) = default;
+  // BSEQPNT& operator=(BSEQPNT const& rhs) = default;
+  // BSEQPNT& operator=(BSEQPNT&&) = default;
+  //~BSEQPNT() = default;
 };
 
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
 inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
-	x         = gsl::narrow<float>(rhsX);
-	y         = gsl::narrow<float>(rhsY);
-	attribute = gsl::narrow<int8_t>(rhsAttr);
+  x         = gsl::narrow<float>(rhsX);
+  y         = gsl::narrow<float>(rhsY);
+  attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 
-inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr)
-    : x(rhsX)
-    , y(rhsY) {
-	attribute = gsl::narrow<int8_t>(rhsAttr);
+inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
+  attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 #pragma warning(pop)
 
 inline bool fPOINT::operator==(fPOINT const& rhs) const noexcept {
-	return (x == rhs.x) && (y == rhs.y);
+  return (x == rhs.x) && (y == rhs.y);
 }
 
-inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept
-    : x(rhsX)
-    , y(rhsY) {
+inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
-	x = gsl::narrow_cast<float>(rhsX);
-	y = gsl::narrow_cast<float>(rhsY);
+  x = gsl::narrow_cast<float>(rhsX);
+  y = gsl::narrow_cast<float>(rhsY);
 }
 
 #pragma warning(push)
 #pragma warning(disable : 4244)
 inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
-	x = gsl::narrow_cast<float>(rhsX);
-	y = gsl::narrow_cast<float>(rhsY);
+  x = gsl::narrow_cast<float>(rhsX);
+  y = gsl::narrow_cast<float>(rhsY);
 }
 
 inline fPOINT::fPOINT(dPOINT const& rhs) noexcept {
-	x = gsl::narrow_cast<float>(rhs.x);
-	y = gsl::narrow_cast<float>(rhs.y);
+  x = gsl::narrow_cast<float>(rhs.x);
+  y = gsl::narrow_cast<float>(rhs.y);
 }
 
 inline fPOINT& fPOINT::operator=(dPOINT const& rhs) noexcept {
-	x = gsl::narrow_cast<float>(rhs.x);
-	y = gsl::narrow_cast<float>(rhs.y);
-	return *this;
+  x = gsl::narrow_cast<float>(rhs.x);
+  y = gsl::narrow_cast<float>(rhs.y);
+  return *this;
 }
 
 inline fPOINT& fPOINT::operator=(SMALPNTL const& rhs) noexcept {
-	x = gsl::narrow_cast<float>(rhs.x);
-	y = gsl::narrow_cast<float>(rhs.y);
-	return *this;
+  x = gsl::narrow_cast<float>(rhs.x);
+  y = gsl::narrow_cast<float>(rhs.y);
+  return *this;
 }
 #pragma warning(pop)
 
 inline fPOINT& fPOINT::operator=(fPOINTATTR const& rhs) noexcept {
-	x = rhs.x;
-	y = rhs.y;
-	return *this;
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
 }
 
 inline fPOINT& fPOINT::operator=(BSEQPNT const& rhs) noexcept {
-	x = rhs.x;
-	y = rhs.y;
-	return *this;
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
 }
 
-inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept
-    : x(rhsX)
-    , y(rhsY)
-    , attribute(rhsA) {
+inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept :
+    x(rhsX), y(rhsY), attribute(rhsA) {
 }
 
 inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept {
-	x         = gsl::narrow_cast<float>(rhsX);
-	y         = gsl::narrow_cast<float>(rhsY);
-	attribute = rhsA;
+  x         = gsl::narrow_cast<float>(rhsX);
+  y         = gsl::narrow_cast<float>(rhsY);
+  attribute = rhsA;
 }
 
-inline dPOINT::dPOINT(fPOINT const& rhs) noexcept
-    : x(rhs.x)
-    , y(rhs.y) {
+inline dPOINT::dPOINT(fPOINT const& rhs) noexcept : x(rhs.x), y(rhs.y) {
 }
 
-inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept
-    : x(rhsX)
-    , y(rhsY) {
+inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
-inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept
-    : x(rhsX)
-    , y(rhsY) {
+inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 inline bool dPOINT::operator==(dPOINT const& rhs) const noexcept {
-	return (x == rhs.x) && (y == rhs.y);
+  return (x == rhs.x) && (y == rhs.y);
 }
 
 inline dPOINT& dPOINT::operator=(fPOINT const& rhs) noexcept {
-	x = rhs.x;
-	y = rhs.y;
-	return *this;
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
 }
 
 inline dPOINT& dPOINT::operator=(BSEQPNT const& rhs) noexcept {
-	x = rhs.x;
-	y = rhs.y;
-	return *this;
+  x = rhs.x;
+  y = rhs.y;
+  return *this;
 }
 
 class fPOINTLINE
 {
-public:
-	float    x { 0.0F };
-	float    y { 0.0F };
-	uint16_t line { 0U };
+  public:
+  float    x {0.0F};
+  float    y {0.0F};
+  uint16_t line {0U};
 
-	constexpr fPOINTLINE() noexcept = default;
-	// fPOINTLINE(fPOINTLINE&&) = default;
-	// fPOINTLINE& operator=(fPOINTLINE const& rhs) = default;
-	// fPOINTLINE& operator=(fPOINTLINE&&) = default;
-	//~fPOINTLINE() = default;
+  constexpr fPOINTLINE() noexcept = default;
+  // fPOINTLINE(fPOINTLINE&&) = default;
+  // fPOINTLINE& operator=(fPOINTLINE const& rhs) = default;
+  // fPOINTLINE& operator=(fPOINTLINE&&) = default;
+  //~fPOINTLINE() = default;
 };
 
 class dRECTANGLE
 {
-public:
-	double top { 0.0 };
-	double bottom { 0.0 };
-	double left { 0.0 };
-	double right { 0.0 };
+  public:
+  double top {0.0};
+  double bottom {0.0};
+  double left {0.0};
+  double right {0.0};
 
-	constexpr dRECTANGLE() noexcept = default;
-	// dRECTANGLE(dRECTANGLE&&) = default;
-	// dRECTANGLE& operator=(dRECTANGLE const& rhs) = default;
-	// dRECTANGLE& operator=(dRECTANGLE&&) = default;
-	//~dRECTANGLE() = default;
+  constexpr dRECTANGLE() noexcept = default;
+  // dRECTANGLE(dRECTANGLE&&) = default;
+  // dRECTANGLE& operator=(dRECTANGLE const& rhs) = default;
+  // dRECTANGLE& operator=(dRECTANGLE&&) = default;
+  //~dRECTANGLE() = default;
 };
 
 class COLCHNG
 {
-public:
-	uint16_t stitchIndex { 0U }; // stitch index
-	uint16_t colorIndex { 0U };  // color index
+  public:
+  uint16_t stitchIndex {0U}; // stitch index
+  uint16_t colorIndex {0U};  // color index
 
-	constexpr COLCHNG() noexcept = default;
-	// COLCHNG(COLCHNG&&) = default;
-	// COLCHNG& operator=(COLCHNG const& rhs) = default;
-	// COLCHNG& operator=(COLCHNG&&) = default;
-	//~COLCHNG() = default;
+  constexpr COLCHNG() noexcept = default;
+  // COLCHNG(COLCHNG&&) = default;
+  // COLCHNG& operator=(COLCHNG const& rhs) = default;
+  // COLCHNG& operator=(COLCHNG&&) = default;
+  //~COLCHNG() = default;
 };
 
 class FEATHER
 {
-public:
-	uint32_t fillType { 0U };          // type of feather fill
-	float    ratio { 0.0F };           // feather ratio
-	float    minStitch { 0.0F };       // smallest stitch allowed
-	float    ratioLocal { 0.0F };      // local feather ratio
-	float    formRatio { 0.0F };       // feather ratio from form
-	uint32_t extendedAttribute { 0U }; // extended form attribute
-	uint32_t upCount { 0U };           // feather up count
-	uint32_t downCount { 0U };         // feather down count
-	uint32_t totalCount { 0U };        // up count plus down count
-	uint32_t phaseIndex { 0U };
-	uint32_t phase { 0U };
-	uint32_t countUp { 0U };
-	uint32_t countDown { 0U };
-	float    globalStep { 0.0F };
-	float    globalPosition { 0.0F };
-	float    globalPhase { 0.0F };
-	float    globalUp { 0.0F };
-	float    globalDown { 0.0F };
-	float    globalRatio { 0.0F };
+  public:
+  uint32_t fillType {0U};          // type of feather fill
+  float    ratio {0.0F};           // feather ratio
+  float    minStitch {0.0F};       // smallest stitch allowed
+  float    ratioLocal {0.0F};      // local feather ratio
+  float    formRatio {0.0F};       // feather ratio from form
+  uint32_t extendedAttribute {0U}; // extended form attribute
+  uint32_t upCount {0U};           // feather up count
+  uint32_t downCount {0U};         // feather down count
+  uint32_t totalCount {0U};        // up count plus down count
+  uint32_t phaseIndex {0U};
+  uint32_t phase {0U};
+  uint32_t countUp {0U};
+  uint32_t countDown {0U};
+  float    globalStep {0.0F};
+  float    globalPosition {0.0F};
+  float    globalPhase {0.0F};
+  float    globalUp {0.0F};
+  float    globalDown {0.0F};
+  float    globalRatio {0.0F};
 
-	constexpr FEATHER() noexcept = default;
-	// FEATHER(FEATHER&&) = default;
-	// FEATHER& operator=(FEATHER const& rhs) = default;
-	// FEATHER& operator=(FEATHER&&) = default;
-	//~FEATHER() = default;
+  constexpr FEATHER() noexcept = default;
+  // FEATHER(FEATHER&&) = default;
+  // FEATHER& operator=(FEATHER const& rhs) = default;
+  // FEATHER& operator=(FEATHER&&) = default;
+  //~FEATHER() = default;
 };
 
 constexpr uint32_t COLMSK    = 0x0000000fU; // 0000 0000 0000 0000 0000 0000 0000 1111
@@ -1414,263 +1367,258 @@ constexpr uint32_t FRMAPFIL = 0x60000000U;
 
 class fRECTANGLE
 {
-public:
-	float left { 0.0F };
-	float top { 0.0F };
-	float right { 0.0F };
-	float bottom { 0.0F };
+  public:
+  float left {0.0F};
+  float top {0.0F};
+  float right {0.0F};
+  float bottom {0.0F};
 
-	constexpr fRECTANGLE() noexcept = default;
-	// fRECTANGLE(fRECTANGLE&&) = default;
-	// fRECTANGLE& operator=(fRECTANGLE const& rhs) = default;
-	// fRECTANGLE& operator=(fRECTANGLE&&) = default;
-	//~fRECTANGLE() = default;
+  constexpr fRECTANGLE() noexcept = default;
+  // fRECTANGLE(fRECTANGLE&&) = default;
+  // fRECTANGLE& operator=(fRECTANGLE const& rhs) = default;
+  // fRECTANGLE& operator=(fRECTANGLE&&) = default;
+  //~fRECTANGLE() = default;
 
-	inline fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
+  inline fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
 };
 
-inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept
-    : left(rhsLeft)
-    , top(rhsTop)
-    , right(rhsRight)
-    , bottom(rhsBottom) {
+inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
+    left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
 }
 
 class FORMINFO
 {
-public:
-	uint32_t type { 0U };
-	uint32_t attribute { 0U };
-	uint32_t sideCount { 0U };
+  public:
+  uint32_t type {0U};
+  uint32_t attribute {0U};
+  uint32_t sideCount {0U};
 
-	constexpr FORMINFO() noexcept = default;
-	// FORMINFO(FORMINFO&&) = default;
-	// FORMINFO& operator=(FORMINFO const& rhs) = default;
-	// FORMINFO& operator=(FORMINFO&&) = default;
-	//~FORMINFO() = default;
+  constexpr FORMINFO() noexcept = default;
+  // FORMINFO(FORMINFO&&) = default;
+  // FORMINFO& operator=(FORMINFO const& rhs) = default;
+  // FORMINFO& operator=(FORMINFO&&) = default;
+  //~FORMINFO() = default;
 };
 
 class SATCONOUT;
 
 class SATCON
 {
-public:
-	uint32_t start { 0U };
-	uint32_t finish { 0U };
+  public:
+  uint32_t start {0U};
+  uint32_t finish {0U};
 
-	constexpr SATCON() noexcept = default;
-	// SATCON(SATCON&&) = default;
-	// SATCON& operator=(SATCON const& rhs) = default;
-	// SATCON& operator=(SATCON&&) = default;
-	//~SATCON() = default;
+  constexpr SATCON() noexcept = default;
+  // SATCON(SATCON&&) = default;
+  // SATCON& operator=(SATCON const& rhs) = default;
+  // SATCON& operator=(SATCON&&) = default;
+  //~SATCON() = default;
 
-	explicit SATCON(SATCONOUT const& rhs) noexcept;
-	inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
-	inline SATCON& operator=(SATCONOUT const& rhs) noexcept;
+  explicit SATCON(SATCONOUT const& rhs) noexcept;
+  inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
+  inline SATCON& operator=(SATCONOUT const& rhs) noexcept;
 };
 
-inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept
-    : start(rStart)
-    , finish(rFinish) {
+inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept : start(rStart), finish(rFinish) {
 }
 
 class SATCONOUT
 {
-public:
-	uint16_t start { 0U };
-	uint16_t finish { 0U };
+  public:
+  uint16_t start {0U};
+  uint16_t finish {0U};
 
-	constexpr SATCONOUT() noexcept = default;
-	// SATCONOUT(SATCONOUT&&) = default;
-	// SATCONOUT& operator=(SATCONOUT const& rhs) = default;
-	// SATCONOUT& operator=(SATCONOUT&&) = default;
-	//~SATCONOUT() = default;
+  constexpr SATCONOUT() noexcept = default;
+  // SATCONOUT(SATCONOUT&&) = default;
+  // SATCONOUT& operator=(SATCONOUT const& rhs) = default;
+  // SATCONOUT& operator=(SATCONOUT&&) = default;
+  //~SATCONOUT() = default;
 
-	explicit SATCONOUT(SATCON const& rhs);
-	inline SATCONOUT& operator=(SATCON const& rhs);
+  explicit SATCONOUT(SATCON const& rhs);
+  inline SATCONOUT& operator=(SATCON const& rhs);
 };
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
-	start  = gsl::narrow<uint16_t>(rhs.start);
-	finish = gsl::narrow<uint16_t>(rhs.finish);
+  start  = gsl::narrow<uint16_t>(rhs.start);
+  finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) inline SATCONOUT& SATCONOUT::operator=(SATCON const& rhs) {
-	start  = gsl::narrow<uint16_t>(rhs.start);
-	finish = gsl::narrow<uint16_t>(rhs.finish);
+  start  = gsl::narrow<uint16_t>(rhs.start);
+  finish = gsl::narrow<uint16_t>(rhs.finish);
 
-	return *this;
+  return *this;
 }
 
 inline SATCON::SATCON(SATCONOUT const& rhs) noexcept {
-	start  = rhs.start;
-	finish = rhs.finish;
+  start  = rhs.start;
+  finish = rhs.finish;
 }
 
 inline SATCON& SATCON::operator=(SATCONOUT const& rhs) noexcept {
-	start  = rhs.start;
-	finish = rhs.finish;
+  start  = rhs.start;
+  finish = rhs.finish;
 
-	return *this;
+  return *this;
 }
 
 union FANGCLPOUT;
 
 union FANGCLP {
-public:
-	float    angle;
-	uint32_t clip; // pointer to start of fill clipboard data
-	SATCON   guide;
+  public:
+  float    angle;
+  uint32_t clip; // pointer to start of fill clipboard data
+  SATCON   guide;
 
-	FANGCLP() noexcept;
-	// FANGCLP(FANGCLP&&) = default;
-	// FANGCLP& operator=(FANGCLP const& rhs) = default;
-	// FANGCLP& operator=(FANGCLP&&) = default;
-	//~FANGCLP() = default;
+  FANGCLP() noexcept;
+  // FANGCLP(FANGCLP&&) = default;
+  // FANGCLP& operator=(FANGCLP const& rhs) = default;
+  // FANGCLP& operator=(FANGCLP&&) = default;
+  //~FANGCLP() = default;
 };
 
 inline FANGCLP::FANGCLP() noexcept { // NOLINT
-	guide.start  = 0U;
-	guide.finish = 0U;
+  guide.start  = 0U;
+  guide.finish = 0U;
 }
 
 union FANGCLPOUT {
-public:
-	float     angle;
-	DWORD     clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	SATCONOUT guide;
+  public:
+  float angle;
+  DWORD clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  SATCONOUT guide;
 
-	FANGCLPOUT() noexcept;
-	// FANGCLPOUT(FANGCLPOUT&&) = default;
-	// FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
-	// FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
-	//~FANGCLPOUT() = default;
+  FANGCLPOUT() noexcept;
+  // FANGCLPOUT(FANGCLPOUT&&) = default;
+  // FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
+  // FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
+  //~FANGCLPOUT() = default;
 };
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
-	clip = 0;
+  clip = 0;
 }
 
 union FLENCNTOUT;
 
 union FLENCNT {
-public:
-	float    stitchLength;
-	uint32_t clipCount; // number of points in fill clipboard data
+  public:
+  float    stitchLength;
+  uint32_t clipCount; // number of points in fill clipboard data
 
-	FLENCNT() noexcept;
-	// FLENCNT(FLENCNT&&) = default;
-	// FLENCNT& operator=(FLENCNT const& rhs) = default;
-	// FLENCNT& operator=(FLENCNT&&) = default;
-	//~FLENCNT() = default;
+  FLENCNT() noexcept;
+  // FLENCNT(FLENCNT&&) = default;
+  // FLENCNT& operator=(FLENCNT const& rhs) = default;
+  // FLENCNT& operator=(FLENCNT&&) = default;
+  //~FLENCNT() = default;
 
-	explicit FLENCNT(FLENCNTOUT const& rhs) noexcept;
-	inline FLENCNT& operator=(FLENCNTOUT const& rhs) noexcept;
+  explicit FLENCNT(FLENCNTOUT const& rhs) noexcept;
+  inline FLENCNT& operator=(FLENCNTOUT const& rhs) noexcept;
 };
 
 inline FLENCNT::FLENCNT() noexcept { // NOLINT
-	clipCount = 0U;
+  clipCount = 0U;
 }
 
 union FLENCNTOUT {
-public:
-	float    stitchLength {};
-	uint32_t clipCount;
+  public:
+  float    stitchLength {};
+  uint32_t clipCount;
 
-	FLENCNTOUT() noexcept;
-	// FLENCNTOUT(FLENCNTOUT&&) = default;
-	// FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
-	// FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
-	//~FLENCNTOUT() = default;
+  FLENCNTOUT() noexcept;
+  // FLENCNTOUT(FLENCNTOUT&&) = default;
+  // FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
+  // FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
+  //~FLENCNTOUT() = default;
 
-	explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
-	inline FLENCNTOUT& operator=(FLENCNT const& rhs) noexcept;
+  explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
+  inline FLENCNTOUT& operator=(FLENCNT const& rhs) noexcept;
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
-	clipCount = 0U;
+  clipCount = 0U;
 }
 
 inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept {
-	clipCount = rhs.clipCount;
+  clipCount = rhs.clipCount;
 }
 
 inline FLENCNTOUT& FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept {
-	clipCount = rhs.clipCount;
+  clipCount = rhs.clipCount;
 
-	return *this;
+  return *this;
 }
 
 inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept {
-	clipCount = rhs.clipCount;
+  clipCount = rhs.clipCount;
 }
 
 inline FLENCNT& FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept {
-	clipCount = rhs.clipCount;
+  clipCount = rhs.clipCount;
 
-	return *this;
+  return *this;
 }
 
 union SATINANGLEOUT;
 
 union SATINANGLE {
-public:
-	uint32_t guide;
-	float    angle;
+  public:
+  uint32_t guide;
+  float    angle;
 
-	SATINANGLE() noexcept;
-	// SATINANGLE(SATINANGLE&&) = default;
-	// SATINANGLE& operator=(SATINANGLE const& rhs) = default;
-	// SATINANGLE& operator=(SATINANGLE&&) = default;
-	//~SATINANGLE() = default;
+  SATINANGLE() noexcept;
+  // SATINANGLE(SATINANGLE&&) = default;
+  // SATINANGLE& operator=(SATINANGLE const& rhs) = default;
+  // SATINANGLE& operator=(SATINANGLE&&) = default;
+  //~SATINANGLE() = default;
 
-	explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
-	inline SATINANGLE& operator=(SATINANGLEOUT const& rhs) noexcept;
+  explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
+  inline SATINANGLE& operator=(SATINANGLEOUT const& rhs) noexcept;
 };
 
 inline SATINANGLE::SATINANGLE() noexcept { // NOLINT
-	angle = 0.0;
+  angle = 0.0;
 }
 
 union SATINANGLEOUT {
-public:
-	DWORD guide {};
-	float angle;
+  public:
+  DWORD guide {};
+  float angle;
 
-	SATINANGLEOUT() noexcept;
-	// SATINANGLEOUT(SATINANGLEOUT&&) = default;
-	// SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
-	// SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
-	//~SATINANGLEOUT() = default;
+  SATINANGLEOUT() noexcept;
+  // SATINANGLEOUT(SATINANGLEOUT&&) = default;
+  // SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
+  // SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
+  //~SATINANGLEOUT() = default;
 
-	explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
-	inline SATINANGLEOUT& operator=(SATINANGLE const& rhs) noexcept;
+  explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
+  inline SATINANGLEOUT& operator=(SATINANGLE const& rhs) noexcept;
 };
 
 inline SATINANGLEOUT::SATINANGLEOUT() noexcept {
-	angle = 0.0;
+  angle = 0.0;
 }
 
 inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept {
-	angle = rhs.angle;
+  angle = rhs.angle;
 }
 
 inline SATINANGLEOUT& SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept {
-	angle = rhs.angle;
+  angle = rhs.angle;
 
-	return *this;
+  return *this;
 }
 
 inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept {
-	angle = rhs.angle;
+  angle = rhs.angle;
 }
 
 inline SATINANGLE& SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept {
-	angle = rhs.angle;
+  angle = rhs.angle;
 
-	return *this;
+  return *this;
 }
 
 /*
@@ -1723,621 +1671,604 @@ constexpr auto EGCHN_LINS = 6U;
 
 class FTHINFO
 {
-public:
-	uint8_t  fillType { 0U };        // feather fill type
-	uint8_t  upCount { 0U };         // feather up count
-	uint8_t  downCount { 0U };       // feather down count
-	uint8_t  color { 0U };           // feather blend color
-	float    ratio { 0.0F };         // feather ratio
-	float    minStitchSize { 0.0F }; // feather floor
-	uint16_t count { 0U };           // feather fill psg granularity
+  public:
+  uint8_t  fillType {0U};        // feather fill type
+  uint8_t  upCount {0U};         // feather up count
+  uint8_t  downCount {0U};       // feather down count
+  uint8_t  color {0U};           // feather blend color
+  float    ratio {0.0F};         // feather ratio
+  float    minStitchSize {0.0F}; // feather floor
+  uint16_t count {0U};           // feather fill psg granularity
 
-	constexpr FTHINFO() noexcept = default;
-	// FTHINFO(FTHINFO&&) = default;
-	// FTHINFO& operator=(FTHINFO const& rhs) = default;
-	// FTHINFO& operator=(FTHINFO&&) = default;
-	//~FTHINFO() = default;
+  constexpr FTHINFO() noexcept = default;
+  // FTHINFO(FTHINFO&&) = default;
+  // FTHINFO& operator=(FTHINFO const& rhs) = default;
+  // FTHINFO& operator=(FTHINFO&&) = default;
+  //~FTHINFO() = default;
 };
 
 class TXTRINFO
 {
-public:
-	int16_t  lines { 0 };
-	uint16_t index { 0U };
-	uint16_t count { 0U };
-	float    height { 0.0F };
+  public:
+  int16_t  lines {0};
+  uint16_t index {0U};
+  uint16_t count {0U};
+  float    height {0.0F};
 
-	constexpr TXTRINFO() noexcept = default;
-	// TXTRINFO(TXTRINFO&&) = default;
-	// TXTRINFO& operator=(TXTRINFO const& rhs) = default;
-	// TXTRINFO& operator=(TXTRINFO&&) = default;
-	//~TXTRINFO() = default;
+  constexpr TXTRINFO() noexcept = default;
+  // TXTRINFO(TXTRINFO&&) = default;
+  // TXTRINFO& operator=(TXTRINFO const& rhs) = default;
+  // TXTRINFO& operator=(TXTRINFO&&) = default;
+  //~TXTRINFO() = default;
 };
 
 union TFINFO {
-public:
-	FTHINFO  feather;
-	TXTRINFO texture;
+  public:
+  FTHINFO  feather;
+  TXTRINFO texture;
 
-	TFINFO() noexcept;
-	// TFINFO(TFINFO&&) = default;
-	// TFINFO& operator=(TFINFO const& rhs) = default;
-	// TFINFO& operator=(TFINFO&&) = default;
-	//~TFINFO() = default;
+  TFINFO() noexcept;
+  // TFINFO(TFINFO&&) = default;
+  // TFINFO& operator=(TFINFO const& rhs) = default;
+  // TFINFO& operator=(TFINFO&&) = default;
+  //~TFINFO() = default;
 };
 
-inline TFINFO::TFINFO() noexcept
-    : feather() {
+inline TFINFO::TFINFO() noexcept : feather() {
 }
 
 class FRMHEDO // Original form header used prior to version 2
 {
-public:
-	uint8_t  attribute;   // attribute
-	uint16_t vertexCount; // number of sides
-	uint8_t  type;        // type
-	uint8_t  fillColor;   // fill color
-	uint8_t  borderColor; // border color
-	uint16_t clipEntries; // number of border clipboard entries
-	DWORD    vertices;    // points
+  public:
+  uint8_t  attribute;   // attribute
+  uint16_t vertexCount; // number of sides
+  uint8_t  type;        // type
+  uint8_t  fillColor;   // fill color
+  uint8_t  borderColor; // border color
+  uint16_t clipEntries; // number of border clipboard entries
+  DWORD    vertices;    // points
 
-	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
+  SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
 
-	DWORD      borderClipData;  // border clipboard data
-	uint16_t   satinGuideCount; // number of satin guidelines
-	uint16_t   wordParam;       // word parameter
-	fRECTANGLE rectangle {};    // rectangle
-	uint8_t    fillType;        // fill type
-	uint8_t    edgeType;        // edge type
-	float      fillSpacing;     // fill spacing
-	FLENCNTOUT lengthOrCount;   // fill stitch length or clipboard count
-	FANGCLPOUT angleOrClipData; // fill angle or clipboard data pointer
-	float      borderSize;      // border size
-	float      edgeSpacing;     // edge spacing
-	float      edgeStitchLen;   // edge stitch length
-	uint16_t   res;             // pico length
+  DWORD      borderClipData;  // border clipboard data
+  uint16_t   satinGuideCount; // number of satin guidelines
+  uint16_t   wordParam;       // word parameter
+  fRECTANGLE rectangle {};    // rectangle
+  uint8_t    fillType;        // fill type
+  uint8_t    edgeType;        // edge type
+  float      fillSpacing;     // fill spacing
+  FLENCNTOUT lengthOrCount;   // fill stitch length or clipboard count
+  FANGCLPOUT angleOrClipData; // fill angle or clipboard data pointer
+  float      borderSize;      // border size
+  float      edgeSpacing;     // edge spacing
+  float      edgeStitchLen;   // edge stitch length
+  uint16_t   res;             // pico length
 
-	FRMHEDO() noexcept;
-	// FRMHEDO(FRMHEDO&&) = default;
-	// FRMHEDO& operator=(FRMHEDO const& rhs) = default;
-	// FRMHEDO& operator=(FRMHEDO&&) = default;
-	//~FRMHEDO() = default;
+  FRMHEDO() noexcept;
+  // FRMHEDO(FRMHEDO&&) = default;
+  // FRMHEDO& operator=(FRMHEDO const& rhs) = default;
+  // FRMHEDO& operator=(FRMHEDO&&) = default;
+  //~FRMHEDO() = default;
 };
 
-inline FRMHEDO::FRMHEDO() noexcept
-    : satinOrAngle()
-    , lengthOrCount()
-    , angleOrClipData()
-    , rectangle() {
-	attribute       = 0U;
-	vertexCount     = 0U;
-	type            = 0U;
-	fillColor       = 0U;
-	borderColor     = 0U;
-	clipEntries     = 0U;
-	vertices        = 0U;
-	borderClipData  = 0U;
-	satinGuideCount = 0U;
-	wordParam       = 0U;
-	fillType        = 0U;
-	edgeType        = 0U;
-	fillSpacing     = 0.0F;
-	borderSize      = 0.0F;
-	edgeSpacing     = 0.0F;
-	edgeStitchLen   = 0.0F;
-	res             = 0U;
+inline FRMHEDO::FRMHEDO() noexcept :
+    satinOrAngle(), lengthOrCount(), angleOrClipData(), rectangle() {
+  attribute       = 0U;
+  vertexCount     = 0U;
+  type            = 0U;
+  fillColor       = 0U;
+  borderColor     = 0U;
+  clipEntries     = 0U;
+  vertices        = 0U;
+  borderClipData  = 0U;
+  satinGuideCount = 0U;
+  wordParam       = 0U;
+  fillType        = 0U;
+  edgeType        = 0U;
+  fillSpacing     = 0.0F;
+  borderSize      = 0.0F;
+  edgeSpacing     = 0.0F;
+  edgeStitchLen   = 0.0F;
+  res             = 0U;
 }
 
 class FRMHEDOUT;
 
 class FRMHED
 {
-public:
-	uint8_t    attribute;           // attribute
-	uint32_t   vertexCount;         // number of sides
-	uint8_t    type;                // type
-	uint8_t    fillColor;           // fill color
-	uint8_t    borderColor;         // border color
-	uint32_t   clipEntries;         // number of border clipboard entries
-	uint32_t   vertexIndex;         // index into FormVertices
-	SATINANGLE satinOrAngle {};     // satin guidelines or angle clipboard fill angle
-	uint32_t   borderClipData;      // pointer to start of border clipboard data
-	uint32_t   satinGuideCount;     // number of satin guidelines
-	uint32_t   wordParam;           // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle {};        // rectangle
-	uint8_t    fillType;            // fill type
-	uint8_t    edgeType;            // edge type
-	float      fillSpacing;         // fill spacing
-	FLENCNT    lengthOrCount {};    // fill stitch length or clipboard count
-	FANGCLP    angleOrClipData {};  // fill angle or clipboard data pointer
-	float      borderSize;          // border size
-	float      edgeSpacing;         // edge spacing
-	float      edgeStitchLen;       // edge stitch length
-	uint16_t   picoLength;          // pico length
-	uint32_t   extendedAttribute;   // attribute extension
-	float      maxFillStitchLen;    // maximum fill stitch length
-	float      minFillStitchLen;    // minimum fill stitch length
-	float      maxBorderStitchLen;  // maximum border stitch length
-	float      minBorderStitchLen;  // minimum border stitch length
-	TFINFO     fillInfo {};         // feather/texture info
-	uint32_t   fillStart;           // fill start point
-	uint32_t   fillEnd;             // fill end point
-	float      underlaySpacing;     // underlay spacing
-	float      underlayStitchLen;   // underlay stitch length
-	float      underlayStitchAngle; // underlay stitch angle
-	float      underlayIndent;      // underlay/edge walk indent
-	float      txof;                // gradient end density
-	uint8_t    underlayColor;       // underlay color
-	uint8_t    cres;                // reserved
+  public:
+  uint8_t    attribute;           // attribute
+  uint32_t   vertexCount;         // number of sides
+  uint8_t    type;                // type
+  uint8_t    fillColor;           // fill color
+  uint8_t    borderColor;         // border color
+  uint32_t   clipEntries;         // number of border clipboard entries
+  uint32_t   vertexIndex;         // index into FormVertices
+  SATINANGLE satinOrAngle {};     // satin guidelines or angle clipboard fill angle
+  uint32_t   borderClipData;      // pointer to start of border clipboard data
+  uint32_t   satinGuideCount;     // number of satin guidelines
+  uint32_t   wordParam;           // clipboard/textured fill phase or satin end guide
+  fRECTANGLE rectangle {};        // rectangle
+  uint8_t    fillType;            // fill type
+  uint8_t    edgeType;            // edge type
+  float      fillSpacing;         // fill spacing
+  FLENCNT    lengthOrCount {};    // fill stitch length or clipboard count
+  FANGCLP    angleOrClipData {};  // fill angle or clipboard data pointer
+  float      borderSize;          // border size
+  float      edgeSpacing;         // edge spacing
+  float      edgeStitchLen;       // edge stitch length
+  uint16_t   picoLength;          // pico length
+  uint32_t   extendedAttribute;   // attribute extension
+  float      maxFillStitchLen;    // maximum fill stitch length
+  float      minFillStitchLen;    // minimum fill stitch length
+  float      maxBorderStitchLen;  // maximum border stitch length
+  float      minBorderStitchLen;  // minimum border stitch length
+  TFINFO     fillInfo {};         // feather/texture info
+  uint32_t   fillStart;           // fill start point
+  uint32_t   fillEnd;             // fill end point
+  float      underlaySpacing;     // underlay spacing
+  float      underlayStitchLen;   // underlay stitch length
+  float      underlayStitchAngle; // underlay stitch angle
+  float      underlayIndent;      // underlay/edge walk indent
+  float      txof;                // gradient end density
+  uint8_t    underlayColor;       // underlay color
+  uint8_t    cres;                // reserved
 
-	FRMHED() noexcept;
-	// FRMHED(FRMHED&&) = default;
-	// FRMHED& operator=(FRMHED const& rhs) = default;
-	// FRMHED& operator=(FRMHED&&) = default;
-	//~FRMHED() = default;
+  FRMHED() noexcept;
+  // FRMHED(FRMHED&&) = default;
+  // FRMHED& operator=(FRMHED const& rhs) = default;
+  // FRMHED& operator=(FRMHED&&) = default;
+  //~FRMHED() = default;
 
-	explicit inline FRMHED(FRMHEDO const& rhs) noexcept;
-	explicit inline FRMHED(FRMHEDOUT const& rhs) noexcept;
+  explicit inline FRMHED(FRMHEDO const& rhs) noexcept;
+  explicit inline FRMHED(FRMHEDOUT const& rhs) noexcept;
 
-	inline FRMHED& operator=(FRMHEDO const& rhs) noexcept;
-	inline FRMHED& operator=(FRMHEDOUT const& rhs) noexcept;
+  inline FRMHED& operator=(FRMHEDO const& rhs) noexcept;
+  inline FRMHED& operator=(FRMHEDOUT const& rhs) noexcept;
 };
 
-inline FRMHED::FRMHED() noexcept
-    : fillInfo()
-    , satinOrAngle()
-    , lengthOrCount()
-    , angleOrClipData()
-    , rectangle() {
-	attribute       = 0U;
-	vertexCount     = 0U;
-	type            = 0U;
-	fillColor       = 0U;
-	borderColor     = 0U;
-	clipEntries     = 0U;
-	vertexIndex     = 0U;
-	borderClipData  = 0U;
-	satinGuideCount = 0U;
-	wordParam       = 0U;
-	fillType        = 0U;
-	edgeType        = 0U;
-	fillSpacing     = 0.0F;
-	borderSize      = 0.0F;
-	edgeSpacing     = 0.0F;
-	edgeStitchLen   = 0.0F;
-	picoLength      = 0U;
+inline FRMHED::FRMHED() noexcept :
+    fillInfo(), satinOrAngle(), lengthOrCount(), angleOrClipData(), rectangle() {
+  attribute       = 0U;
+  vertexCount     = 0U;
+  type            = 0U;
+  fillColor       = 0U;
+  borderColor     = 0U;
+  clipEntries     = 0U;
+  vertexIndex     = 0U;
+  borderClipData  = 0U;
+  satinGuideCount = 0U;
+  wordParam       = 0U;
+  fillType        = 0U;
+  edgeType        = 0U;
+  fillSpacing     = 0.0F;
+  borderSize      = 0.0F;
+  edgeSpacing     = 0.0F;
+  edgeStitchLen   = 0.0F;
+  picoLength      = 0U;
 
-	maxFillStitchLen    = 0.0F;
-	minFillStitchLen    = 0.0F;
-	extendedAttribute   = 0U;
-	maxBorderStitchLen  = 0.0F;
-	minBorderStitchLen  = 0.0F;
-	fillStart           = 0U;
-	fillEnd             = 0U;
-	underlaySpacing     = 0.0F;
-	underlayStitchLen   = 0.0F;
-	underlayStitchAngle = 0.0F;
-	underlayIndent      = 0.0F;
-	txof                = 0.0F;
-	underlayColor       = 0U;
-	cres                = 0U;
+  maxFillStitchLen    = 0.0F;
+  minFillStitchLen    = 0.0F;
+  extendedAttribute   = 0U;
+  maxBorderStitchLen  = 0.0F;
+  minBorderStitchLen  = 0.0F;
+  fillStart           = 0U;
+  fillEnd             = 0U;
+  underlaySpacing     = 0.0F;
+  underlayStitchLen   = 0.0F;
+  underlayStitchAngle = 0.0F;
+  underlayIndent      = 0.0F;
+  txof                = 0.0F;
+  underlayColor       = 0U;
+  cres                = 0U;
 }
 
-inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept
-    : fillInfo()
-    , lengthOrCount(rhs.lengthOrCount)
-    , rectangle(rhs.rectangle)
-    , satinOrAngle(rhs.satinOrAngle) {
-	attribute       = rhs.attribute;
-	vertexCount     = rhs.vertexCount;
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0;
-	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
-	satinGuideCount = rhs.satinGuideCount;
-	wordParam       = rhs.wordParam;
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
+    fillInfo(), lengthOrCount(rhs.lengthOrCount), rectangle(rhs.rectangle), satinOrAngle(rhs.satinOrAngle) {
+  attribute       = rhs.attribute;
+  vertexCount     = rhs.vertexCount;
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = rhs.clipEntries;
+  vertexIndex     = 0;
+  borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
+  satinGuideCount = rhs.satinGuideCount;
+  wordParam       = rhs.wordParam;
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
+		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.res;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.res;
 
-	extendedAttribute   = 0U;
-	maxFillStitchLen    = 0.0F;
-	minFillStitchLen    = 0.0F;
-	maxBorderStitchLen  = 0.0F;
-	minBorderStitchLen  = 0.0F;
-	fillStart           = 0U;
-	fillEnd             = 0U;
-	underlaySpacing     = 0.0F;
-	underlayStitchLen   = 0.0F;
-	underlayStitchAngle = 0.0F;
-	underlayIndent      = 0.0F;
-	txof                = 0.0F;
-	underlayColor       = 0U;
-	cres                = 0U;
+  extendedAttribute   = 0U;
+  maxFillStitchLen    = 0.0F;
+  minFillStitchLen    = 0.0F;
+  maxBorderStitchLen  = 0.0F;
+  minBorderStitchLen  = 0.0F;
+  fillStart           = 0U;
+  fillEnd             = 0U;
+  underlaySpacing     = 0.0F;
+  underlayStitchLen   = 0.0F;
+  underlayStitchAngle = 0.0F;
+  underlayIndent      = 0.0F;
+  txof                = 0.0F;
+  underlayColor       = 0U;
+  cres                = 0U;
 }
 
 inline FRMHED& FRMHED::operator=(FRMHEDO const& rhs) noexcept {
-	attribute       = rhs.attribute;
-	vertexCount     = rhs.vertexCount;
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0U;
-	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
-	satinGuideCount = rhs.satinGuideCount;
-	wordParam       = rhs.wordParam;
-	rectangle       = rhs.rectangle;
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+  attribute       = rhs.attribute;
+  vertexCount     = rhs.vertexCount;
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = rhs.clipEntries;
+  vertexIndex     = 0U;
+  satinOrAngle    = rhs.satinOrAngle;
+  borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
+  satinGuideCount = rhs.satinGuideCount;
+  wordParam       = rhs.wordParam;
+  rectangle       = rhs.rectangle;
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  lengthOrCount   = rhs.lengthOrCount;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
+		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.res;
-	return *this;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.res;
+  return *this;
 }
 
 class FRMHEDOUT
 {
-public:
-	uint8_t  attribute;      // attribute
-	uint16_t vertexCount {}; // number of sides
-	uint8_t  type;           // type
-	uint8_t  fillColor;      // fill color
-	uint8_t  borderColor;    // border color
-	uint16_t clipEntries {}; // number of border clipboard entries
-	DWORD    vertexIndex;    // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
+  public:
+  uint8_t  attribute;      // attribute
+  uint16_t vertexCount {}; // number of sides
+  uint8_t  type;           // type
+  uint8_t  fillColor;      // fill color
+  uint8_t  borderColor;    // border color
+  uint16_t clipEntries {}; // number of border clipboard entries
+  DWORD    vertexIndex; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 
-	SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
+  SATINANGLEOUT satinOrAngle; // satin guidelines or angle clipboard fill angle
 
-	DWORD      borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-	uint16_t   satinGuideCount {}; // number of satin guidelines
-	uint16_t   wordParam {};       // clipboard/textured fill phase or satin end guide
-	fRECTANGLE rectangle {};       // rectangle
-	uint8_t    fillType;           // fill type
-	uint8_t    edgeType;           // edge type
-	float      fillSpacing;        // fill spacing
-	FLENCNTOUT lengthOrCount;      // fill stitch length or clipboard count
-	FANGCLPOUT angleOrClipData;    // fill angle or clipboard data pointer
+  DWORD      borderClipData; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  uint16_t   satinGuideCount {}; // number of satin guidelines
+  uint16_t   wordParam {};       // clipboard/textured fill phase or satin end guide
+  fRECTANGLE rectangle {};       // rectangle
+  uint8_t    fillType;           // fill type
+  uint8_t    edgeType;           // edge type
+  float      fillSpacing;        // fill spacing
+  FLENCNTOUT lengthOrCount;      // fill stitch length or clipboard count
+  FANGCLPOUT angleOrClipData;    // fill angle or clipboard data pointer
 
-	float    borderSize;          // border size
-	float    edgeSpacing;         // edge spacing
-	float    edgeStitchLen;       // edge stitch length
-	uint16_t picoLength;          // pico length
-	uint32_t extendedAttribute;   // attribute extension
-	float    maxFillStitchLen;    // maximum fill stitch length
-	float    minFillStitchLen;    // minimum fill stitch length
-	float    maxBorderStitchLen;  // maximum border stitch length
-	float    minBorderStitchLen;  // minimum border stitch length
-	TFINFO   fillInfo {};         // feather/texture info
-	uint16_t fillStart {};        // fill start point
-	uint16_t fillEnd {};          // fill end point
-	float    underlaySpacing;     // underlay spacing
-	float    underlayStitchLen;   // underlay stitch length
-	float    underlayStitchAngle; // underlay stitch angle
-	float    underlayIndent;      // underlay/edge walk indent
-	float    txof;                // gradient end density
-	uint8_t  underlayColor;       // underlay color
-	uint8_t  cres;                // reserved
+  float    borderSize;          // border size
+  float    edgeSpacing;         // edge spacing
+  float    edgeStitchLen;       // edge stitch length
+  uint16_t picoLength;          // pico length
+  uint32_t extendedAttribute;   // attribute extension
+  float    maxFillStitchLen;    // maximum fill stitch length
+  float    minFillStitchLen;    // minimum fill stitch length
+  float    maxBorderStitchLen;  // maximum border stitch length
+  float    minBorderStitchLen;  // minimum border stitch length
+  TFINFO   fillInfo {};         // feather/texture info
+  uint16_t fillStart {};        // fill start point
+  uint16_t fillEnd {};          // fill end point
+  float    underlaySpacing;     // underlay spacing
+  float    underlayStitchLen;   // underlay stitch length
+  float    underlayStitchAngle; // underlay stitch angle
+  float    underlayIndent;      // underlay/edge walk indent
+  float    txof;                // gradient end density
+  uint8_t  underlayColor;       // underlay color
+  uint8_t  cres;                // reserved
 
-	inline FRMHEDOUT() noexcept;
-	// FRMHEDOUT(FRMHEDOUT&&) = default;
-	// FRMHEDOUT& operator=(FRMHEDOUT const& rhs) = default;
-	// FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
-	//~FRMHEDOUT() = default;
+  inline FRMHEDOUT() noexcept;
+  // FRMHEDOUT(FRMHEDOUT&&) = default;
+  // FRMHEDOUT& operator=(FRMHEDOUT const& rhs) = default;
+  // FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
+  //~FRMHEDOUT() = default;
 
-	explicit inline FRMHEDOUT(FRMHED const& rhs);
-	inline FRMHEDOUT& operator=(FRMHED const& rhs);
+  explicit inline FRMHEDOUT(FRMHED const& rhs);
+  inline FRMHEDOUT& operator=(FRMHED const& rhs);
 };
 
-inline FRMHEDOUT::FRMHEDOUT() noexcept
-    : fillInfo()
-    , rectangle()
-    , satinOrAngle()
-    , lengthOrCount()
-    , angleOrClipData() {
-	attribute       = 0U;
-	vertexCount     = 0U;
-	type            = 0U;
-	fillColor       = 0U;
-	borderColor     = 0U;
-	clipEntries     = 0U;
-	vertexIndex     = 0U;
-	borderClipData  = 0U;
-	satinGuideCount = 0U;
-	wordParam       = 0U;
-	fillType        = 0U;
-	edgeType        = 0U;
-	fillSpacing     = 0.0F;
-	borderSize      = 0.0F;
-	edgeSpacing     = 0.0F;
-	edgeStitchLen   = 0.0F;
-	picoLength      = 0U;
+inline FRMHEDOUT::FRMHEDOUT() noexcept :
+    fillInfo(), rectangle(), satinOrAngle(), lengthOrCount(), angleOrClipData() {
+  attribute       = 0U;
+  vertexCount     = 0U;
+  type            = 0U;
+  fillColor       = 0U;
+  borderColor     = 0U;
+  clipEntries     = 0U;
+  vertexIndex     = 0U;
+  borderClipData  = 0U;
+  satinGuideCount = 0U;
+  wordParam       = 0U;
+  fillType        = 0U;
+  edgeType        = 0U;
+  fillSpacing     = 0.0F;
+  borderSize      = 0.0F;
+  edgeSpacing     = 0.0F;
+  edgeStitchLen   = 0.0F;
+  picoLength      = 0U;
 
-	maxFillStitchLen    = 0.0F;
-	minFillStitchLen    = 0.0F;
-	extendedAttribute   = 0U;
-	maxBorderStitchLen  = 0.0F;
-	minBorderStitchLen  = 0.0F;
-	fillStart           = 0U;
-	fillEnd             = 0U;
-	underlaySpacing     = 0.0F;
-	underlayStitchLen   = 0.0F;
-	underlayStitchAngle = 0.0F;
-	underlayIndent      = 0.0F;
-	txof                = 0.0F;
-	underlayColor       = 0U;
-	cres                = 0U;
+  maxFillStitchLen    = 0.0F;
+  minFillStitchLen    = 0.0F;
+  extendedAttribute   = 0U;
+  maxBorderStitchLen  = 0.0F;
+  minBorderStitchLen  = 0.0F;
+  fillStart           = 0U;
+  fillEnd             = 0U;
+  underlaySpacing     = 0.0F;
+  underlayStitchLen   = 0.0F;
+  underlayStitchAngle = 0.0F;
+  underlayIndent      = 0.0F;
+  txof                = 0.0F;
+  underlayColor       = 0U;
+  cres                = 0U;
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440)
-inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs)
-    : satinOrAngle(rhs.satinOrAngle)
-    , rectangle(rhs.rectangle)
-    , lengthOrCount(rhs.lengthOrCount) {
-	attribute       = rhs.attribute;
-	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-	vertexIndex     = 0U; // do not write the pointer value to file
-	borderClipData  = 0U; // do not write the pointer value to file
-	satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
-	wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
+    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
+  attribute       = rhs.attribute;
+  vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
+  vertexIndex     = 0U; // do not write the pointer value to file
+  borderClipData  = 0U; // do not write the pointer value to file
+  satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
+  wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start =
+		    gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
+		angleOrClipData.guide.finish =
+		    gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start = gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
-				angleOrClipData.guide.finish
-				    = gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.picoLength;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.picoLength;
 
-	extendedAttribute   = rhs.extendedAttribute;
-	maxFillStitchLen    = rhs.maxFillStitchLen;
-	minFillStitchLen    = rhs.minFillStitchLen;
-	maxBorderStitchLen  = rhs.maxBorderStitchLen;
-	minBorderStitchLen  = rhs.minBorderStitchLen;
-	fillInfo            = rhs.fillInfo;
-	fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
-	fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
-	underlaySpacing     = rhs.underlaySpacing;
-	underlayStitchLen   = rhs.underlayStitchLen;
-	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent      = rhs.underlayIndent;
-	txof                = rhs.txof;
-	underlayColor       = rhs.underlayColor;
-	cres                = rhs.cres;
+  extendedAttribute   = rhs.extendedAttribute;
+  maxFillStitchLen    = rhs.maxFillStitchLen;
+  minFillStitchLen    = rhs.minFillStitchLen;
+  maxBorderStitchLen  = rhs.maxBorderStitchLen;
+  minBorderStitchLen  = rhs.minBorderStitchLen;
+  fillInfo            = rhs.fillInfo;
+  fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
+  fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
+  underlaySpacing     = rhs.underlaySpacing;
+  underlayStitchLen   = rhs.underlayStitchLen;
+  underlayStitchAngle = rhs.underlayStitchAngle;
+  underlayIndent      = rhs.underlayIndent;
+  txof                = rhs.txof;
+  underlayColor       = rhs.underlayColor;
+  cres                = rhs.cres;
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(FRMHED const& rhs) {
-	attribute       = rhs.attribute;
-	vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-	vertexIndex     = 0; // do not write the pointer value to file
-	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0; // do not write the pointer value to file
-	satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
-	wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
-	rectangle       = rhs.rectangle;
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+  attribute       = rhs.attribute;
+  vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
+  vertexIndex     = 0; // do not write the pointer value to file
+  satinOrAngle    = rhs.satinOrAngle;
+  borderClipData  = 0; // do not write the pointer value to file
+  satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
+  wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
+  rectangle       = rhs.rectangle;
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  lengthOrCount   = rhs.lengthOrCount;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start =
+		    gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
+		angleOrClipData.guide.finish =
+		    gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start = gsl::narrow<decltype(angleOrClipData.guide.start)>(rhs.angleOrClipData.guide.start);
-				angleOrClipData.guide.finish
-				    = gsl::narrow<decltype(angleOrClipData.guide.finish)>(rhs.angleOrClipData.guide.finish);
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.picoLength;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.picoLength;
 
-	extendedAttribute   = rhs.extendedAttribute;
-	maxFillStitchLen    = rhs.maxFillStitchLen;
-	minFillStitchLen    = rhs.minFillStitchLen;
-	maxBorderStitchLen  = rhs.maxBorderStitchLen;
-	minBorderStitchLen  = rhs.minBorderStitchLen;
-	fillInfo            = rhs.fillInfo;
-	fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
-	fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
-	underlaySpacing     = rhs.underlaySpacing;
-	underlayStitchLen   = rhs.underlayStitchLen;
-	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent      = rhs.underlayIndent;
-	txof                = rhs.txof;
-	underlayColor       = rhs.underlayColor;
-	cres                = rhs.cres;
+  extendedAttribute   = rhs.extendedAttribute;
+  maxFillStitchLen    = rhs.maxFillStitchLen;
+  minFillStitchLen    = rhs.minFillStitchLen;
+  maxBorderStitchLen  = rhs.maxBorderStitchLen;
+  minBorderStitchLen  = rhs.minBorderStitchLen;
+  fillInfo            = rhs.fillInfo;
+  fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
+  fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
+  underlaySpacing     = rhs.underlaySpacing;
+  underlayStitchLen   = rhs.underlayStitchLen;
+  underlayStitchAngle = rhs.underlayStitchAngle;
+  underlayIndent      = rhs.underlayIndent;
+  txof                = rhs.txof;
+  underlayColor       = rhs.underlayColor;
+  cres                = rhs.cres;
 
-	return *this;
+  return *this;
 }
 
-inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept
-    : satinOrAngle(rhs.satinOrAngle)
-    , rectangle(rhs.rectangle)
-    , lengthOrCount(rhs.lengthOrCount) {
-	attribute       = rhs.attribute;
-	vertexCount     = rhs.vertexCount;
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0U; // do not read the index from a v2 file
-	borderClipData  = 0U; // do not read the index from a v2 file
-	satinGuideCount = rhs.satinGuideCount;
-	wordParam       = rhs.wordParam;
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
+    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
+  attribute       = rhs.attribute;
+  vertexCount     = rhs.vertexCount;
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = rhs.clipEntries;
+  vertexIndex     = 0U; // do not read the index from a v2 file
+  borderClipData  = 0U; // do not read the index from a v2 file
+  satinGuideCount = rhs.satinGuideCount;
+  wordParam       = rhs.wordParam;
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
+		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.picoLength;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.picoLength;
 
-	extendedAttribute   = rhs.extendedAttribute;
-	maxFillStitchLen    = rhs.maxFillStitchLen;
-	minFillStitchLen    = rhs.minFillStitchLen;
-	maxBorderStitchLen  = rhs.maxBorderStitchLen;
-	minBorderStitchLen  = rhs.minBorderStitchLen;
-	fillInfo            = rhs.fillInfo;
-	fillStart           = rhs.fillStart;
-	fillEnd             = rhs.fillEnd;
-	underlaySpacing     = rhs.underlaySpacing;
-	underlayStitchLen   = rhs.underlayStitchLen;
-	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent      = rhs.underlayIndent;
-	txof                = rhs.txof;
-	underlayColor       = rhs.underlayColor;
-	cres                = rhs.cres;
+  extendedAttribute   = rhs.extendedAttribute;
+  maxFillStitchLen    = rhs.maxFillStitchLen;
+  minFillStitchLen    = rhs.minFillStitchLen;
+  maxBorderStitchLen  = rhs.maxBorderStitchLen;
+  minBorderStitchLen  = rhs.minBorderStitchLen;
+  fillInfo            = rhs.fillInfo;
+  fillStart           = rhs.fillStart;
+  fillEnd             = rhs.fillEnd;
+  underlaySpacing     = rhs.underlaySpacing;
+  underlayStitchLen   = rhs.underlayStitchLen;
+  underlayStitchAngle = rhs.underlayStitchAngle;
+  underlayIndent      = rhs.underlayIndent;
+  txof                = rhs.txof;
+  underlayColor       = rhs.underlayColor;
+  cres                = rhs.cres;
 }
 
 inline FRMHED& FRMHED::operator=(FRMHEDOUT const& rhs) noexcept {
-	attribute       = rhs.attribute;
-	vertexCount     = rhs.vertexCount;
-	type            = rhs.type;
-	fillColor       = rhs.fillColor;
-	borderColor     = rhs.borderColor;
-	clipEntries     = rhs.clipEntries;
-	vertexIndex     = 0U; // do not read the index from a v2 file
-	satinOrAngle    = rhs.satinOrAngle;
-	borderClipData  = 0U; // do not read the index from a v2 file
-	satinGuideCount = rhs.satinGuideCount;
-	wordParam       = rhs.wordParam;
-	rectangle       = rhs.rectangle;
-	fillType        = rhs.fillType;
-	edgeType        = rhs.edgeType;
-	fillSpacing     = rhs.fillSpacing;
-	lengthOrCount   = rhs.lengthOrCount;
-	if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U))
-	    || ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
-		angleOrClipData.clip = rhs.angleOrClipData.clip;
+  attribute       = rhs.attribute;
+  vertexCount     = rhs.vertexCount;
+  type            = rhs.type;
+  fillColor       = rhs.fillColor;
+  borderColor     = rhs.borderColor;
+  clipEntries     = rhs.clipEntries;
+  vertexIndex     = 0U; // do not read the index from a v2 file
+  satinOrAngle    = rhs.satinOrAngle;
+  borderClipData  = 0U; // do not read the index from a v2 file
+  satinGuideCount = rhs.satinGuideCount;
+  wordParam       = rhs.wordParam;
+  rectangle       = rhs.rectangle;
+  fillType        = rhs.fillType;
+  edgeType        = rhs.edgeType;
+  fillSpacing     = rhs.fillSpacing;
+  lengthOrCount   = rhs.lengthOrCount;
+  if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
+      ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
+	angleOrClipData.clip = rhs.angleOrClipData.clip;
+  }
+  else {
+	if (type == FRMLINE) {
+	  if (fillType == CONTF) {
+		angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
+		angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
+	  }
 	}
 	else {
-		if (type == FRMLINE) {
-			if (fillType == CONTF) {
-				angleOrClipData.guide.start  = rhs.angleOrClipData.guide.start;
-				angleOrClipData.guide.finish = rhs.angleOrClipData.guide.finish;
-			}
-		}
-		else {
-			angleOrClipData.angle = rhs.angleOrClipData.angle;
-		}
+	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
+  }
 
-	borderSize    = rhs.borderSize;
-	edgeSpacing   = rhs.edgeSpacing;
-	edgeStitchLen = rhs.edgeStitchLen;
-	picoLength    = rhs.picoLength;
+  borderSize    = rhs.borderSize;
+  edgeSpacing   = rhs.edgeSpacing;
+  edgeStitchLen = rhs.edgeStitchLen;
+  picoLength    = rhs.picoLength;
 
-	extendedAttribute   = rhs.extendedAttribute;
-	maxFillStitchLen    = rhs.maxFillStitchLen;
-	minFillStitchLen    = rhs.minFillStitchLen;
-	maxBorderStitchLen  = rhs.maxBorderStitchLen;
-	minBorderStitchLen  = rhs.minBorderStitchLen;
-	fillInfo            = rhs.fillInfo;
-	fillStart           = rhs.fillStart;
-	fillEnd             = rhs.fillEnd;
-	underlaySpacing     = rhs.underlaySpacing;
-	underlayStitchLen   = rhs.underlayStitchLen;
-	underlayStitchAngle = rhs.underlayStitchAngle;
-	underlayIndent      = rhs.underlayIndent;
-	txof                = rhs.txof;
-	underlayColor       = rhs.underlayColor;
-	cres                = rhs.cres;
+  extendedAttribute   = rhs.extendedAttribute;
+  maxFillStitchLen    = rhs.maxFillStitchLen;
+  minFillStitchLen    = rhs.minFillStitchLen;
+  maxBorderStitchLen  = rhs.maxBorderStitchLen;
+  minBorderStitchLen  = rhs.minBorderStitchLen;
+  fillInfo            = rhs.fillInfo;
+  fillStart           = rhs.fillStart;
+  fillEnd             = rhs.fillEnd;
+  underlaySpacing     = rhs.underlaySpacing;
+  underlayStitchLen   = rhs.underlayStitchLen;
+  underlayStitchAngle = rhs.underlayStitchAngle;
+  underlayIndent      = rhs.underlayIndent;
+  txof                = rhs.txof;
+  underlayColor       = rhs.underlayColor;
+  cres                = rhs.cres;
 
-	return *this;
+  return *this;
 }
 
 /*form attribute bits
@@ -2378,149 +2309,149 @@ constexpr auto AT_CWLK    = 1U << 8U; // center walk
 
 class FORMCLIP // form data clipboard header
 {
-public:
-	uint32_t clipType { 0U };
-	uint32_t reserved { 0U };
-	FRMHED   form {};
+  public:
+  uint32_t clipType {0U};
+  uint32_t reserved {0U};
+  FRMHED   form {};
 
-	constexpr FORMCLIP() noexcept = default;
-	// FORMCLIP(FORMCLIP&&) = default;
-	// FORMCLIP& operator=(FORMCLIP const& rhs) = default;
-	// FORMCLIP& operator=(FORMCLIP&&) = default;
-	//~FORMCLIP() = default;
+  constexpr FORMCLIP() noexcept = default;
+  // FORMCLIP(FORMCLIP&&) = default;
+  // FORMCLIP& operator=(FORMCLIP const& rhs) = default;
+  // FORMCLIP& operator=(FORMCLIP&&) = default;
+  //~FORMCLIP() = default;
 };
 
 class FORMSCLIP // multiple forms clipboard header
 {
-public:
-	uint32_t clipType { 0U };
-	uint16_t formCount { 0U };
-	uint16_t reserved { 0U };
+  public:
+  uint32_t clipType {0U};
+  uint16_t formCount {0U};
+  uint16_t reserved {0U};
 
-	constexpr FORMSCLIP() noexcept = default;
-	// FORMSCLIP(FORMSCLIP&&) = default;
-	// FORMSCLIP& operator=(FORMSCLIP const& rhs) = default;
-	// FORMSCLIP& operator=(FORMSCLIP&&) = default;
-	//~FORMSCLIP() = default;
+  constexpr FORMSCLIP() noexcept = default;
+  // FORMSCLIP(FORMSCLIP&&) = default;
+  // FORMSCLIP& operator=(FORMSCLIP const& rhs) = default;
+  // FORMSCLIP& operator=(FORMSCLIP&&) = default;
+  //~FORMSCLIP() = default;
 };
 
 class FORMVERTEXCLIP // form points clipboard header
 {
-public:
-	uint32_t clipType { 0U };
-	uint32_t vertexCount { 0U };
-	bool     direction { false };
+  public:
+  uint32_t clipType {0U};
+  uint32_t vertexCount {0U};
+  bool     direction {false};
 
-	constexpr FORMVERTEXCLIP() noexcept = default;
-	// FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
-	// FORMVERTEXCLIP& operator=(FORMVERTEXCLIP const& rhs) = default;
-	// FORMVERTEXCLIP& operator=(FORMVERTEXCLIP&&) = default;
-	//~FORMVERTEXCLIP() = default;
+  constexpr FORMVERTEXCLIP() noexcept = default;
+  // FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
+  // FORMVERTEXCLIP& operator=(FORMVERTEXCLIP const& rhs) = default;
+  // FORMVERTEXCLIP& operator=(FORMVERTEXCLIP&&) = default;
+  //~FORMVERTEXCLIP() = default;
 };
 
 class STRHED // thred file header
 {
-public:
-	uint32_t headerType { 0U };
-	uint32_t fileLength { 0U };    // length of strhed + length of stitch data
-	uint16_t stitchCount { 0U };   // number of stitches
-	uint16_t hoopType { 0U };      // size of hoop
-	uint16_t formCount { 0U };     // number of forms
-	uint16_t vertexLen { 0U };     // points to form points
-	uint16_t vertexCount { 0U };   // number of form points
-	uint16_t dlineLen { 0U };      // points to dline data
-	uint16_t dlineCount { 0U };    // dline data count
-	uint16_t clipDataLen { 0U };   // points to clipboard data
-	uint16_t clipDataCount { 0U }; // clipboard data count
+  public:
+  uint32_t headerType {0U};
+  uint32_t fileLength {0U};    // length of strhed + length of stitch data
+  uint16_t stitchCount {0U};   // number of stitches
+  uint16_t hoopType {0U};      // size of hoop
+  uint16_t formCount {0U};     // number of forms
+  uint16_t vertexLen {0U};     // points to form points
+  uint16_t vertexCount {0U};   // number of form points
+  uint16_t dlineLen {0U};      // points to dline data
+  uint16_t dlineCount {0U};    // dline data count
+  uint16_t clipDataLen {0U};   // points to clipboard data
+  uint16_t clipDataCount {0U}; // clipboard data count
 
-	constexpr STRHED() noexcept = default;
-	// STRHED(STRHED&&) = default;
-	// STRHED& operator=(STRHED const& rhs) = default;
-	// STRHED& operator=(STRHED&&) = default;
-	//~STRHED() = default;
+  constexpr STRHED() noexcept = default;
+  // STRHED(STRHED&&) = default;
+  // STRHED& operator=(STRHED const& rhs) = default;
+  // STRHED& operator=(STRHED&&) = default;
+  //~STRHED() = default;
 };
 
 class TXPNT // textured fill point
 {
-public:
-	float    y { 0.0F };
-	uint16_t line { 0U };
+  public:
+  float    y {0.0F};
+  uint16_t line {0U};
 
-	constexpr TXPNT() noexcept = default;
-	// TXPNT(TXPNT&&) = default;
-	// TXPNT& operator=(TXPNT const& rhs) = default;
-	// TXPNT& operator=(TXPNT&&) = default;
-	//~TXPNT() = default;
+  constexpr TXPNT() noexcept = default;
+  // TXPNT(TXPNT&&) = default;
+  // TXPNT& operator=(TXPNT const& rhs) = default;
+  // TXPNT& operator=(TXPNT&&) = default;
+  //~TXPNT() = default;
 };
 
 class TXOFF // textured fill offset
 {
-public:
-	float   y { 0.0F };
-	int32_t line { 0 };
+  public:
+  float   y {0.0F};
+  int32_t line {0};
 
-	constexpr TXOFF() noexcept = default;
-	// TXOFF(TXOFF&&) = default;
-	// TXOFF& operator=(TXOFF const& rhs) = default;
-	// TXOFF& operator=(TXOFF&&) = default;
-	//~TXOFF() = default;
+  constexpr TXOFF() noexcept = default;
+  // TXOFF(TXOFF&&) = default;
+  // TXOFF& operator=(TXOFF const& rhs) = default;
+  // TXOFF& operator=(TXOFF&&) = default;
+  //~TXOFF() = default;
 };
 
 class STREX // thred v1.0 file header extension
 {
-public:
-	float    hoopSizeX { 0.0F };           // hoop size x dimension
-	float    hoopSizeY { 0.0F };           // hoop size y dimension
-	float    stgran { 0.0F };              // stitches per millimeter
-	char     creatorName[NAME_LEN] { 0 };  // name of the file creator NOLINT(modernize-avoid-c-arrays)
-	char     modifierName[NAME_LEN] { 0 }; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
-	int8_t   auxFormat { 0 };              // auxillary file format
-	int8_t   stres { 0 };                  // reserved
-	uint32_t texturePointCount { 0U };     // textured fill point count
-	int8_t   res[RES_SIZE] { 0 };          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
+  public:
+  float  hoopSizeX {0.0F};           // hoop size x dimension
+  float  hoopSizeY {0.0F};           // hoop size y dimension
+  float  stgran {0.0F};              // stitches per millimeter
+  char   creatorName[NAME_LEN] {0};  // name of the file creator NOLINT(modernize-avoid-c-arrays)
+  char   modifierName[NAME_LEN] {0}; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
+  int8_t auxFormat {0};              // auxillary file format
+  int8_t stres {0};                  // reserved
+  uint32_t texturePointCount {0U};   // textured fill point count
+  int8_t   res[RES_SIZE] {0};        // reserved for expansion NOLINT(modernize-avoid-c-arrays)
 
-	constexpr STREX() noexcept = default;
-	// STREX(STREX&&) = default;
-	// STREX& operator=(STREX const& rhs) = default;
-	// STREX& operator=(STREX&&) = default;
-	//~STREX() = default;
+  constexpr STREX() noexcept = default;
+  // STREX(STREX&&) = default;
+  // STREX& operator=(STREX const& rhs) = default;
+  // STREX& operator=(STREX&&) = default;
+  //~STREX() = default;
 };
 
 class DSTHED // dst file header
 {
-public:
-	char desched[3] { 0 };  // 00  00	description   NOLINT(modernize-avoid-c-arrays)
-	char desc[17] { 0 };    // 03  03                 NOLINT(modernize-avoid-c-arrays)
-	char recshed[3] { 0 };  // 20  14	record count  NOLINT(modernize-avoid-c-arrays)
-	char recs[8] { 0 };     // 23  17                 NOLINT(modernize-avoid-c-arrays)
-	char cohed[3] { 0 };    // 31  1F                 NOLINT(modernize-avoid-c-arrays)
-	char co[4] { 0 };       // 34  22                 NOLINT(modernize-avoid-c-arrays)
-	char xplushed[3] { 0 }; // 38  26	x+ size       NOLINT(modernize-avoid-c-arrays)
-	char xplus[6] { 0 };    // 41  29                 NOLINT(modernize-avoid-c-arrays)
-	char xminhed[3] { 0 };  // 47  2F	x- size       NOLINT(modernize-avoid-c-arrays)
-	char xmin[6] { 0 };     // 50  32                 NOLINT(modernize-avoid-c-arrays)
-	char yplushed[3] { 0 }; // 56  38                 NOLINT(modernize-avoid-c-arrays)
-	char yplus[6] { 0 };    // 59  3B	y+ size       NOLINT(modernize-avoid-c-arrays)
-	char yminhed[3] { 0 };  // 65  41                 NOLINT(modernize-avoid-c-arrays)
-	char ymin[6] { 0 };     // 68  44	y- size       NOLINT(modernize-avoid-c-arrays)
-	char axhed[3] { 0 };    // 74  4A                 NOLINT(modernize-avoid-c-arrays)
-	char ax[7] { 0 };       // 77  4D                 NOLINT(modernize-avoid-c-arrays)
-	char ayhed[3] { 0 };    // 84  54                 NOLINT(modernize-avoid-c-arrays)
-	char ay[7] { 0 };       // 87  57                 NOLINT(modernize-avoid-c-arrays)
-	char mxhed[3] { 0 };    // 94  5E                 NOLINT(modernize-avoid-c-arrays)
-	char mx[7] { 0 };       // 97  61                 NOLINT(modernize-avoid-c-arrays)
-	char myhed[3] { 0 };    // 104 68                 NOLINT(modernize-avoid-c-arrays)
-	char my[7] { 0 };       // 107 6B                 NOLINT(modernize-avoid-c-arrays)
-	char pdhed[2] { 0 };    // 114 72                 NOLINT(modernize-avoid-c-arrays)
-	char pd[7] { 0 };       // 116 74                 NOLINT(modernize-avoid-c-arrays)
-	char eof[1] { 0 };      // 123 7B                 NOLINT(modernize-avoid-c-arrays)
-	char res[388] { 0 };    // 124 7C                 NOLINT(modernize-avoid-c-arrays)
+  public:
+  char desched[3] {0};  // 00  00	description   NOLINT(modernize-avoid-c-arrays)
+  char desc[17] {0};    // 03  03                 NOLINT(modernize-avoid-c-arrays)
+  char recshed[3] {0};  // 20  14	record count  NOLINT(modernize-avoid-c-arrays)
+  char recs[8] {0};     // 23  17                 NOLINT(modernize-avoid-c-arrays)
+  char cohed[3] {0};    // 31  1F                 NOLINT(modernize-avoid-c-arrays)
+  char co[4] {0};       // 34  22                 NOLINT(modernize-avoid-c-arrays)
+  char xplushed[3] {0}; // 38  26	x+ size       NOLINT(modernize-avoid-c-arrays)
+  char xplus[6] {0};    // 41  29                 NOLINT(modernize-avoid-c-arrays)
+  char xminhed[3] {0};  // 47  2F	x- size       NOLINT(modernize-avoid-c-arrays)
+  char xmin[6] {0};     // 50  32                 NOLINT(modernize-avoid-c-arrays)
+  char yplushed[3] {0}; // 56  38                 NOLINT(modernize-avoid-c-arrays)
+  char yplus[6] {0};    // 59  3B	y+ size       NOLINT(modernize-avoid-c-arrays)
+  char yminhed[3] {0};  // 65  41                 NOLINT(modernize-avoid-c-arrays)
+  char ymin[6] {0};     // 68  44	y- size       NOLINT(modernize-avoid-c-arrays)
+  char axhed[3] {0};    // 74  4A                 NOLINT(modernize-avoid-c-arrays)
+  char ax[7] {0};       // 77  4D                 NOLINT(modernize-avoid-c-arrays)
+  char ayhed[3] {0};    // 84  54                 NOLINT(modernize-avoid-c-arrays)
+  char ay[7] {0};       // 87  57                 NOLINT(modernize-avoid-c-arrays)
+  char mxhed[3] {0};    // 94  5E                 NOLINT(modernize-avoid-c-arrays)
+  char mx[7] {0};       // 97  61                 NOLINT(modernize-avoid-c-arrays)
+  char myhed[3] {0};    // 104 68                 NOLINT(modernize-avoid-c-arrays)
+  char my[7] {0};       // 107 6B                 NOLINT(modernize-avoid-c-arrays)
+  char pdhed[2] {0};    // 114 72                 NOLINT(modernize-avoid-c-arrays)
+  char pd[7] {0};       // 116 74                 NOLINT(modernize-avoid-c-arrays)
+  char eof[1] {0};      // 123 7B                 NOLINT(modernize-avoid-c-arrays)
+  char res[388] {0};    // 124 7C                 NOLINT(modernize-avoid-c-arrays)
 
-	constexpr DSTHED() noexcept = default;
-	// DSTHED(DSTHED&&) = default;
-	// DSTHED& operator=(DSTHED const& rhs) = default;
-	// DSTHED& operator=(DSTHED&&) = default;
-	//~DSTHED() = default;
+  constexpr DSTHED() noexcept = default;
+  // DSTHED(DSTHED&&) = default;
+  // DSTHED& operator=(DSTHED const& rhs) = default;
+  // DSTHED& operator=(DSTHED&&) = default;
+  //~DSTHED() = default;
 };
 
 // dst type masks
@@ -2531,196 +2462,193 @@ constexpr auto REGTYP = 0x030000U;
 
 class DSTREC // dst stitch record
 {
-public:
-	uint8_t led { 0U };
-	uint8_t mid { 0U };
-	uint8_t nd { 0U };
+  public:
+  uint8_t led {0U};
+  uint8_t mid {0U};
+  uint8_t nd {0U};
 
-	constexpr DSTREC() noexcept = default;
-	// DSTREC(DSTREC&&) = default;
-	// DSTREC& operator=(DSTREC const& rhs) = default;
-	// DSTREC& operator=(DSTREC&&) = default;
-	//~DSTREC() = default;
+  constexpr DSTREC() noexcept = default;
+  // DSTREC(DSTREC&&) = default;
+  // DSTREC& operator=(DSTREC const& rhs) = default;
+  // DSTREC& operator=(DSTREC&&) = default;
+  //~DSTREC() = default;
 };
 
 class DSTOffsets
 {
-public:
-	POINT Positive { 0, 0 }; // plus offset written into the destination file header
-	POINT Negative { 0, 0 }; // minus offset written into the destination file header
+  public:
+  POINT Positive {0, 0}; // plus offset written into the destination file header
+  POINT Negative {0, 0}; // minus offset written into the destination file header
 
-	constexpr DSTOffsets() noexcept = default;
-	// DSTOffsets(DSTOffsets&&) = default;
-	// DSTOffsets& operator=(DSTOffsets const& rhs) = default;
-	// DSTOffsets& operator=(DSTOffsets&&) = default;
-	//~DSTOffsets() = default;
+  constexpr DSTOffsets() noexcept = default;
+  // DSTOffsets(DSTOffsets&&) = default;
+  // DSTOffsets& operator=(DSTOffsets const& rhs) = default;
+  // DSTOffsets& operator=(DSTOffsets&&) = default;
+  //~DSTOffsets() = default;
 };
 
 class PCSTCH
 {
-public:
-	uint8_t fx { 0U }; // fractional part of x coord or color if tag = 3
-	int16_t x { 0 };   // integer part of x coord
-	uint8_t nx { 0U };
-	uint8_t fy { 0U }; // fractional part of y coord
-	int16_t y { 0U };  // integer part of y coord
-	uint8_t ny { 0U };
-	uint8_t tag { 0U };
+  public:
+  uint8_t fx {0U}; // fractional part of x coord or color if tag = 3
+  int16_t x {0};   // integer part of x coord
+  uint8_t nx {0U};
+  uint8_t fy {0U}; // fractional part of y coord
+  int16_t y {0U};  // integer part of y coord
+  uint8_t ny {0U};
+  uint8_t tag {0U};
 
-	constexpr PCSTCH() noexcept = default;
-	// PCSTCH(PCSTCH&&) = default;
-	// PCSTCH& operator=(PCSTCH const& rhs) = default;
-	// PCSTCH& operator=(PCSTCH&&) = default;
-	//~PCSTCH() = default;
+  constexpr PCSTCH() noexcept = default;
+  // PCSTCH(PCSTCH&&) = default;
+  // PCSTCH& operator=(PCSTCH const& rhs) = default;
+  // PCSTCH& operator=(PCSTCH&&) = default;
+  //~PCSTCH() = default;
 };
 
 class CLPSTCH
 {
-public:
-	uint32_t led { 0U };  // ????
-	uint8_t  fx { 0U };   // fractional part of x coord
-	uint16_t x { 0U };    // integer part of x coord
-	uint8_t  spcx { 0U }; // ToDo - Is this structure member needed?
-	uint8_t  fy { 0U };   // fractional part of y coord
-	uint16_t y { 0U };    // integer part of y coord
-	uint8_t  spcy { 0U }; // ToDo - Is this structure member needed?
-	uint8_t  myst { 0U }; // ToDo - Is this structure member needed?
-	uint8_t  tag { 0U };  // ToDo - Is this structure member needed?
+  public:
+  uint32_t led {0U};  // ????
+  uint8_t  fx {0U};   // fractional part of x coord
+  uint16_t x {0U};    // integer part of x coord
+  uint8_t  spcx {0U}; // ToDo - Is this structure member needed?
+  uint8_t  fy {0U};   // fractional part of y coord
+  uint16_t y {0U};    // integer part of y coord
+  uint8_t  spcy {0U}; // ToDo - Is this structure member needed?
+  uint8_t  myst {0U}; // ToDo - Is this structure member needed?
+  uint8_t  tag {0U};  // ToDo - Is this structure member needed?
 
-	constexpr CLPSTCH() noexcept = default;
-	// CLPSTCH(CLPSTCH&&) = default;
-	// CLPSTCH& operator=(CLPSTCH const& rhs) = default;
-	// CLPSTCH& operator=(CLPSTCH&&) = default;
-	//~CLPSTCH() = default;
+  constexpr CLPSTCH() noexcept = default;
+  // CLPSTCH(CLPSTCH&&) = default;
+  // CLPSTCH& operator=(CLPSTCH const& rhs) = default;
+  // CLPSTCH& operator=(CLPSTCH&&) = default;
+  //~CLPSTCH() = default;
 };
 
 class BAKHED
 {
-public:
-	uint32_t    formCount { 0U };
-	FRMHED*     forms { nullptr };
-	uint32_t    stitchCount { 0U };
-	fPOINTATTR* stitches { nullptr };
-	uint32_t    vertexCount { 0U };
-	fPOINT*     vertices { nullptr };
-	uint32_t    guideCount { 0U };
-	SATCON*     guide { nullptr };
-	uint32_t    clipPointCount { 0U };
-	fPOINT*     clipPoints { nullptr };
-	COLORREF*   colors { nullptr };
-	TXPNT*      texturePoints { nullptr };
-	uint32_t    texturePointCount { 0U };
-	POINT       zoomRect { 0, 0 };
+  public:
+  uint32_t    formCount {0U};
+  FRMHED*     forms {nullptr};
+  uint32_t    stitchCount {0U};
+  fPOINTATTR* stitches {nullptr};
+  uint32_t    vertexCount {0U};
+  fPOINT*     vertices {nullptr};
+  uint32_t    guideCount {0U};
+  SATCON*     guide {nullptr};
+  uint32_t    clipPointCount {0U};
+  fPOINT*     clipPoints {nullptr};
+  COLORREF*   colors {nullptr};
+  TXPNT*      texturePoints {nullptr};
+  uint32_t    texturePointCount {0U};
+  POINT       zoomRect {0, 0};
 
-	constexpr BAKHED() noexcept = default;
-	// BAKHED(CLPSTCH&&) = default;
-	// BAKHED& operator=(BAKHED const& rhs) = default;
-	// BAKHED& operator=(BAKHED&&) = default;
-	//~BAKHED() = default;
+  constexpr BAKHED() noexcept = default;
+  // BAKHED(CLPSTCH&&) = default;
+  // BAKHED& operator=(BAKHED const& rhs) = default;
+  // BAKHED& operator=(BAKHED&&) = default;
+  //~BAKHED() = default;
 };
 
 class FLSIZ
 {
-public:
-	float cx { 0.0F };
-	float cy { 0.0F };
+  public:
+  float cx {0.0F};
+  float cy {0.0F};
 
-	constexpr FLSIZ() noexcept = default;
-	// FLSIZ(FLSIZ&&) = default;
-	// FLSIZ& operator=(FLSIZ const& rhs) = default;
-	// FLSIZ& operator=(FLSIZ&&) = default;
-	//~FLSIZ() = default;
+  constexpr FLSIZ() noexcept = default;
+  // FLSIZ(FLSIZ&&) = default;
+  // FLSIZ& operator=(FLSIZ const& rhs) = default;
+  // FLSIZ& operator=(FLSIZ&&) = default;
+  //~FLSIZ() = default;
 };
 
 class FRMRANGE
 {
-public:
-	uint32_t start { 0U };
-	uint32_t finish { 0U };
+  public:
+  uint32_t start {0U};
+  uint32_t finish {0U};
 
-	constexpr FRMRANGE() noexcept = default;
-	// FRMRANGE(FRMRANGE&&) = default;
-	// FRMRANGE& operator=(FRMRANGE const& rhs) = default;
-	// FRMRANGE& operator=(FRMRANGE&&) = default;
-	//~FRMRANGE() = default;
+  constexpr FRMRANGE() noexcept = default;
+  // FRMRANGE(FRMRANGE&&) = default;
+  // FRMRANGE& operator=(FRMRANGE const& rhs) = default;
+  // FRMRANGE& operator=(FRMRANGE&&) = default;
+  //~FRMRANGE() = default;
 };
 
 class RANGE
 {
-public:
-	uint32_t start { 0U };
-	uint32_t finish { 0U };
+  public:
+  uint32_t start {0U};
+  uint32_t finish {0U};
 
-	constexpr RANGE() noexcept = default;
-	// RANGE(RANGE&&) = default;
-	// RANGE& operator=(RANGE const& rhs) = default;
-	// RANGE& operator=(RANGE&&) = default;
-	//~RANGE() = default;
+  constexpr RANGE() noexcept = default;
+  // RANGE(RANGE&&) = default;
+  // RANGE& operator=(RANGE const& rhs) = default;
+  // RANGE& operator=(RANGE&&) = default;
+  //~RANGE() = default;
 };
 
 class REGION // region for sequencing vertical fills
 {
-public:
-	uint32_t start { 0U };       // start line of region
-	uint32_t end { 0U };         // end line of region
-	uint32_t regionBreak { 0U }; // ToDo - Is this member needed?
-	uint32_t breakCount { 0U };
+  public:
+  uint32_t start {0U};       // start line of region
+  uint32_t end {0U};         // end line of region
+  uint32_t regionBreak {0U}; // ToDo - Is this member needed?
+  uint32_t breakCount {0U};
 
-	constexpr REGION() noexcept = default;
-	inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
-	// REGION(REGION&&) = default;
-	// REGION& operator=(REGION const& rhs) = default;
-	// REGION& operator=(REGION&&) = default;
-	//~REGION() = default;
+  constexpr REGION() noexcept = default;
+  inline REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept;
+  // REGION(REGION&&) = default;
+  // REGION& operator=(REGION const& rhs) = default;
+  // REGION& operator=(REGION&&) = default;
+  //~REGION() = default;
 };
 
-inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept
-    : start(rhsStart)
-    , end(rhsEnd)
-    , regionBreak(rhsBreak)
-    , breakCount(rhsCount) {
+inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uint32_t rhsCount) noexcept :
+    start(rhsStart), end(rhsEnd), regionBreak(rhsBreak), breakCount(rhsCount) {
 }
 
 class RCON // PathMap: path map for sequencing
 {
-public:
-	uint32_t node { 0U };
-	bool     isConnected { false };
-	uint32_t nextGroup { 0U };
+  public:
+  uint32_t node {0U};
+  bool     isConnected {false};
+  uint32_t nextGroup {0U};
 
-	constexpr RCON() noexcept = default;
-	// RCON(RCON&&) = default;
-	// RCON& operator=(RCON const& rhs) = default;
-	// RCON& operator=(RCON&&) = default;
-	//~RCON() = default;
+  constexpr RCON() noexcept = default;
+  // RCON(RCON&&) = default;
+  // RCON& operator=(RCON const& rhs) = default;
+  // RCON& operator=(RCON&&) = default;
+  //~RCON() = default;
 };
 
 class RGSEQ // TempPath: temporary path connections
 {
-public:
-	uint32_t pcon { 0U }; // pointer to PathMap entry
-	int32_t  count { 0 };
-	bool     skp { false }; // path not found
+  public:
+  uint32_t pcon {0U}; // pointer to PathMap entry
+  int32_t  count {0};
+  bool     skp {false}; // path not found
 
-	constexpr RGSEQ() noexcept = default;
-	// RGSEQ(RGSEQ&&) = default;
-	// RGSEQ& operator=(RGSEQ const& rhs) = default;
-	// RGSEQ& operator=(RGSEQ&&) = default;
-	//~RGSEQ() = default;
+  constexpr RGSEQ() noexcept = default;
+  // RGSEQ(RGSEQ&&) = default;
+  // RGSEQ& operator=(RGSEQ const& rhs) = default;
+  // RGSEQ& operator=(RGSEQ&&) = default;
+  //~RGSEQ() = default;
 };
 
 class FSEQ // SequencePath: path of sequenced regions
 {
-public:
-	uint16_t node { 0U };
-	uint16_t nextGroup { 0U };
-	bool     skp { false }; // path not found
+  public:
+  uint16_t node {0U};
+  uint16_t nextGroup {0U};
+  bool     skp {false}; // path not found
 
-	constexpr FSEQ() noexcept = default;
-	// FSEQ(FSEQ&&) = default;
-	// FSEQ& operator=(FSEQ const& rhs) = default;
-	// FSEQ& operator=(FSEQ&&) = default;
-	//~FSEQ() = default;
+  constexpr FSEQ() noexcept = default;
+  // FSEQ(FSEQ&&) = default;
+  // FSEQ& operator=(FSEQ const& rhs) = default;
+  // FSEQ& operator=(FSEQ&&) = default;
+  //~FSEQ() = default;
 };
 
 constexpr auto SEQTOP = 2;
@@ -2728,257 +2656,257 @@ constexpr auto SEQBOT = 3;
 
 class PVEC
 {
-public:
-	double angle { 0.0 };
-	double length { 0.0 };
+  public:
+  double angle {0.0};
+  double length {0.0};
 
-	constexpr PVEC() noexcept = default;
-	// PVEC(PVEC&&) = default;
-	// PVEC& operator=(PVEC const& rhs) = default;
-	// PVEC& operator=(PVEC&&) = default;
-	//~PVEC() = default;
+  constexpr PVEC() noexcept = default;
+  // PVEC(PVEC&&) = default;
+  // PVEC& operator=(PVEC const& rhs) = default;
+  // PVEC& operator=(PVEC&&) = default;
+  //~PVEC() = default;
 };
 
 class VRCT2
 {
-public:
-	fPOINT aipnt {};
-	fPOINT aopnt {};
-	fPOINT bipnt {};
-	fPOINT bopnt {};
-	fPOINT cipnt {};
-	fPOINT copnt {};
-	fPOINT dipnt {};
-	fPOINT dopnt {};
+  public:
+  fPOINT aipnt {};
+  fPOINT aopnt {};
+  fPOINT bipnt {};
+  fPOINT bopnt {};
+  fPOINT cipnt {};
+  fPOINT copnt {};
+  fPOINT dipnt {};
+  fPOINT dopnt {};
 
-	constexpr VRCT2() noexcept = default;
-	// VRCT2(VRCT2&&) = default;
-	// VRCT2& operator=(VRCT2 const& rhs) = default;
-	// VRCT2& operator=(VRCT2&&) = default;
-	//~VRCT2() = default;
+  constexpr VRCT2() noexcept = default;
+  // VRCT2(VRCT2&&) = default;
+  // VRCT2& operator=(VRCT2 const& rhs) = default;
+  // VRCT2& operator=(VRCT2&&) = default;
+  //~VRCT2() = default;
 };
 
 class CURSORMASK
 {
-public:
-	uint8_t form[128] { 0U };            // NOLINT(modernize-avoid-c-arrays)
-	uint8_t dline[128] { 0U };           // NOLINT(modernize-avoid-c-arrays)
-	uint8_t uprightNeedle[128] { 0U };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftUpNeedle[128] { 0U };    // NOLINT(modernize-avoid-c-arrays)
-	uint8_t leftDownNeedle[128] { 0U };  // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightUpNeedle[128] { 0U };   // NOLINT(modernize-avoid-c-arrays)
-	uint8_t rightDownNeedle[128] { 0U }; // NOLINT(modernize-avoid-c-arrays)
+  public:
+  uint8_t form[128] {0U};            // NOLINT(modernize-avoid-c-arrays)
+  uint8_t dline[128] {0U};           // NOLINT(modernize-avoid-c-arrays)
+  uint8_t uprightNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays)
+  uint8_t leftUpNeedle[128] {0U};    // NOLINT(modernize-avoid-c-arrays)
+  uint8_t leftDownNeedle[128] {0U};  // NOLINT(modernize-avoid-c-arrays)
+  uint8_t rightUpNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays)
+  uint8_t rightDownNeedle[128] {0U}; // NOLINT(modernize-avoid-c-arrays)
 
-	constexpr CURSORMASK() noexcept = default;
-	// CURSORMASK(CURSORMASK&&) = default;
-	// CURSORMASK& operator=(CURSORMASK const& rhs) = default;
-	// CURSORMASK& operator=(CURSORMASK&&) = default;
-	//~CURSORMASK() = default;
+  constexpr CURSORMASK() noexcept = default;
+  // CURSORMASK(CURSORMASK&&) = default;
+  // CURSORMASK& operator=(CURSORMASK const& rhs) = default;
+  // CURSORMASK& operator=(CURSORMASK&&) = default;
+  //~CURSORMASK() = default;
 };
 
 class BALHED // balarad file header
 {
-public:
-	COLORREF color[256] { 0U }; // NOLINT(modernize-avoid-c-arrays)
-	uint32_t signature { 0U };
-	uint16_t version { 0U };
-	float    hoopSizeX { 0.0F };
-	float    hoopSizeY { 0.0F };
-	COLORREF backgroundColor { 0U };
-	uint8_t  res[1006] { 0U }; // NOLINT(modernize-avoid-c-arrays)
+  public:
+  COLORREF color[256] {0U}; // NOLINT(modernize-avoid-c-arrays)
+  uint32_t signature {0U};
+  uint16_t version {0U};
+  float    hoopSizeX {0.0F};
+  float    hoopSizeY {0.0F};
+  COLORREF backgroundColor {0U};
+  uint8_t  res[1006] {0U}; // NOLINT(modernize-avoid-c-arrays)
 
-	constexpr BALHED() noexcept = default;
-	// BALHED(BALHED&&) = default;
-	// BALHED& operator=(BALHED const& rhs) = default;
-	// BALHED& operator=(BALHED&&) = default;
-	//~BALHED() = default;
+  constexpr BALHED() noexcept = default;
+  // BALHED(BALHED&&) = default;
+  // BALHED& operator=(BALHED const& rhs) = default;
+  // BALHED& operator=(BALHED&&) = default;
+  //~BALHED() = default;
 };
 
 class BALSTCH // balarad stitch
 {
-public:
-	uint8_t code { 0U };
-	uint8_t flag { 0U };
-	float   x { 0.0F };
-	float   y { 0.0F };
+  public:
+  uint8_t code {0U};
+  uint8_t flag {0U};
+  float   x {0.0F};
+  float   y {0.0F};
 
-	constexpr BALSTCH() noexcept = default;
-	// BALSTCH(BALSTCH&&) = default;
-	// BALSTCH& operator=(BALSTCH const& rhs) = default;
-	// BALSTCH& operator=(BALSTCH&&) = default;
-	//~BALSTCH() = default;
+  constexpr BALSTCH() noexcept = default;
+  // BALSTCH(BALSTCH&&) = default;
+  // BALSTCH& operator=(BALSTCH const& rhs) = default;
+  // BALSTCH& operator=(BALSTCH&&) = default;
+  //~BALSTCH() = default;
 };
 
 class CLPSEG
 {
-public:
-	uint32_t start { 0U };
-	float    beginLength { 0.0F };
-	uint32_t beginIndex { 0U };
-	uint32_t asid { 0U };
-	uint32_t finish { 0U };
-	float    endLength { 0.0F };
-	uint32_t endIndex { 0U };
-	uint32_t zsid { 0U };
-	int8_t   dun { 0 };
+  public:
+  uint32_t start {0U};
+  float    beginLength {0.0F};
+  uint32_t beginIndex {0U};
+  uint32_t asid {0U};
+  uint32_t finish {0U};
+  float    endLength {0.0F};
+  uint32_t endIndex {0U};
+  uint32_t zsid {0U};
+  int8_t   dun {0};
 
-	constexpr CLPSEG() noexcept = default;
-	// CLPSEG(CLPSEG&&) = default;
-	// CLPSEG& operator=(CLPSEG const& rhs) = default;
-	// CLPSEG& operator=(CLPSEG&&) = default;
-	//~CLPSEG() = default;
+  constexpr CLPSEG() noexcept = default;
+  // CLPSEG(CLPSEG&&) = default;
+  // CLPSEG& operator=(CLPSEG const& rhs) = default;
+  // CLPSEG& operator=(CLPSEG&&) = default;
+  //~CLPSEG() = default;
 };
 
 class CLIPSORT
 {
-public:
-	float    segmentLength { 0.0F };
-	float    sideLength { 0.0F };
-	uint32_t vertexIndex { 0 };
-	fPOINT   point;
+  public:
+  float    segmentLength {0.0F};
+  float    sideLength {0.0F};
+  uint32_t vertexIndex {0};
+  fPOINT   point;
 
-	constexpr CLIPSORT() noexcept = default;
-	// CLIPSORT(CLIPSORT&&) = default;
-	// CLIPSORT& operator=(CLIPSORT const& rhs) = default;
-	// CLIPSORT& operator=(CLIPSORT&&) = default;
-	//~CLIPSORT() = default;
+  constexpr CLIPSORT() noexcept = default;
+  // CLIPSORT(CLIPSORT&&) = default;
+  // CLIPSORT& operator=(CLIPSORT const& rhs) = default;
+  // CLIPSORT& operator=(CLIPSORT&&) = default;
+  //~CLIPSORT() = default;
 };
 
 class CLIPNT
 {
-public:
-	float    x { 0.0F };
-	float    y { 0.0F };
-	uint32_t vertexIndex { 0U };
-	uint32_t flag { 0U };
+  public:
+  float    x {0.0F};
+  float    y {0.0F};
+  uint32_t vertexIndex {0U};
+  uint32_t flag {0U};
 
-	constexpr CLIPNT() noexcept = default;
-	// CLIPNT(CLIPNT&&) = default;
-	// CLIPNT& operator=(CLIPNT const& rhs) = default;
-	// CLIPNT& operator=(CLIPNT&&) = default;
-	//~CLIPNT() = default;
+  constexpr CLIPNT() noexcept = default;
+  // CLIPNT(CLIPNT&&) = default;
+  // CLIPNT& operator=(CLIPNT const& rhs) = default;
+  // CLIPNT& operator=(CLIPNT&&) = default;
+  //~CLIPNT() = default;
 };
 
 class VCLPX
 {
-public:
-	uint32_t segment { 0U };
-	uint32_t vertex { 0U };
+  public:
+  uint32_t segment {0U};
+  uint32_t vertex {0U};
 
-	constexpr VCLPX() noexcept = default;
-	// VCLPX(VCLPX&&) = default;
-	// VCLPX& operator=(VCLPX const& rhs) = default;
-	// VCLPX& operator=(VCLPX&&) = default;
-	//~VCLPX() = default;
+  constexpr VCLPX() noexcept = default;
+  // VCLPX(VCLPX&&) = default;
+  // VCLPX& operator=(VCLPX const& rhs) = default;
+  // VCLPX& operator=(VCLPX&&) = default;
+  //~VCLPX() = default;
 };
 
 #if PESACT
 
 class PESLED
 {
-public:
-	int8_t   ver[8] { 0 }; // NOLINT(modernize-avoid-c-arrays)
-	uint32_t pec { 0U };
+  public:
+  int8_t   ver[8] {0}; // NOLINT(modernize-avoid-c-arrays)
+  uint32_t pec {0U};
 
-	constexpr PESLED() noexcept = default;
-	// PESLED(PESLED&&) = default;
-	// PESLED& operator=(PESLED const& rhs) = default;
-	// PESLED& operator=(PESLED&&) = default;
-	//~PESLED() = default;
+  constexpr PESLED() noexcept = default;
+  // PESLED(PESLED&&) = default;
+  // PESLED& operator=(PESLED const& rhs) = default;
+  // PESLED& operator=(PESLED&&) = default;
+  //~PESLED() = default;
 };
 
 class PESHED
 {
-public:
-	char     led[8] { 0 };   //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
-	uint32_t off { 0U };     //   8-b  Absolute PEC section byte offset
-	uint16_t hpsz { 0U };    //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-	uint16_t usdn { 0U };    //   e,f  Use existing design area (1)
-	uint16_t blct { 0U };    // 10,11  CSewSeg segment block count (1)
-	char     hnd1[4] { 0 };  // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t celn { 0U };    // 16,17  Length of following string (7)
-	char     ce[7] { 0 };    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
-	int16_t  xlft { 0 };     // 1f,20  Extent left
-	int16_t  xtop { 0 };     // 21,22  Extent top
-	int16_t  xrht { 0 };     // 23,24  Extent right
-	int16_t  xbot { 0 };     // 25,26  Extent bottom
-	int16_t  plft { 0 };     // 27,28  Extent left position
-	int16_t  ptop { 0 };     // 29,2a  Extent top position
-	int16_t  prht { 0 };     // 2b,2c  Extent right position
-	int16_t  pbot { 0 };     // 2d,2e  Extent bottom position
-	float    atfm1 { 0.0F }; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
-	float    atfm2 { 0.0F }; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
-	float    atfm3 { 0.0F }; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
-	float    atfm4 { 0.0F }; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
-	float    atfm5 { 0.0F }; // 3f-42  Affine transform Left_Pos
-	float    atfm6 { 0.0F }; // 43-46  Affine transform Bottom_Pos
-	uint16_t ukn1 { 0U };    // 47,48  unknown (1)
-	int16_t  xtrn { 0 };     // 49,4a  CSewSeg x coordinate translation (0)
-	int16_t  ytrn { 0 };     // 4b,4c  CSewSeg y coordinate translation (0)
-	int16_t  xsiz { 0 };     // 4d,4e  CSewSeg width
-	int16_t  ysiz { 0 };     // 4f,50  CSewSeg height
-	int8_t   ukn2[8] { 0 };  // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
-	uint16_t bcnt { 0U };    // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-	int8_t   hnd2[4] { 0 };  // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-	uint16_t cslen { 0U };   // 5f,60  CSewSeg length (7)
-	char     cs[7] { 0 };    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
-	                         // uint16_t styp1;   // 68,69  Stitch type (0)
-	                         // uint16_t scol;    // 6a,6b  Stitch Palette thread index
+  public:
+  char     led[8] {0}; //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
+  uint32_t off {0U};  //   8-b  Absolute PEC section byte offset
+  uint16_t hpsz {0U}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  uint16_t usdn {0U}; //   e,f  Use existing design area (1)
+  uint16_t blct {0U}; // 10,11  CSewSeg segment block count (1)
+  char     hnd1[4] {0}; // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint16_t celn {0U}; // 16,17  Length of following string (7)
+  char     ce[7] {0}; // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
+  int16_t  xlft {0};     // 1f,20  Extent left
+  int16_t  xtop {0};     // 21,22  Extent top
+  int16_t  xrht {0};     // 23,24  Extent right
+  int16_t  xbot {0};     // 25,26  Extent bottom
+  int16_t  plft {0};     // 27,28  Extent left position
+  int16_t  ptop {0};     // 29,2a  Extent top position
+  int16_t  prht {0};     // 2b,2c  Extent right position
+  int16_t  pbot {0};     // 2d,2e  Extent bottom position
+  float    atfm1 {0.0F}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+  float    atfm2 {0.0F}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
+  float    atfm3 {0.0F}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+  float    atfm4 {0.0F}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
+  float    atfm5 {0.0F}; // 3f-42  Affine transform Left_Pos
+  float    atfm6 {0.0F}; // 43-46  Affine transform Bottom_Pos
+  uint16_t ukn1 {0U};    // 47,48  unknown (1)
+  int16_t  xtrn {0};     // 49,4a  CSewSeg x coordinate translation (0)
+  int16_t  ytrn {0};     // 4b,4c  CSewSeg y coordinate translation (0)
+  int16_t  xsiz {0};     // 4d,4e  CSewSeg width
+  int16_t  ysiz {0};     // 4f,50  CSewSeg height
+  int8_t   ukn2[8] {0}; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
+  uint16_t bcnt {0U}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+  int8_t   hnd2[4] {0}; // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint16_t cslen {0U}; // 5f,60  CSewSeg length (7)
+  char     cs[7] {0}; // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
+                      // uint16_t styp1;   // 68,69  Stitch type (0)
+                      // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
-	constexpr PESHED() noexcept = default;
-	// PESHED(PESHED&&) = default;
-	// PESHED& operator=(PESHED const& rhs) = default;
-	// PESHED& operator=(PESHED&&) = default;
-	//~PESHED() = default;
+  constexpr PESHED() noexcept = default;
+  // PESHED(PESHED&&) = default;
+  // PESHED& operator=(PESHED const& rhs) = default;
+  // PESHED& operator=(PESHED&&) = default;
+  //~PESHED() = default;
 };
 
 class PESTCH
 {
-public:
-	int16_t x { 0 };
-	int16_t y { 0 };
+  public:
+  int16_t x {0};
+  int16_t y {0};
 
-	constexpr PESTCH() noexcept = default;
-	// PESTCH(PESTCH&&) = default;
-	// PESTCH& operator=(PESTCH const& rhs) = default;
-	// PESTCH& operator=(PESTCH&&) = default;
-	//~PESTCH() = default;
+  constexpr PESTCH() noexcept = default;
+  // PESTCH(PESTCH&&) = default;
+  // PESTCH& operator=(PESTCH const& rhs) = default;
+  // PESTCH& operator=(PESTCH&&) = default;
+  //~PESTCH() = default;
 };
 
 class PESSTCHLST
 {
-public:
-	uint16_t stitchtype { 0U };
-	uint16_t threadIndex { 0U };
-	uint16_t stitchcount { 0U };
+  public:
+  uint16_t stitchtype {0U};
+  uint16_t threadIndex {0U};
+  uint16_t stitchcount {0U};
 
-	constexpr PESSTCHLST() noexcept = default;
-	// PESSTCHLST(PESSTCHLST&&) = default;
-	// PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
-	// PESSTCHLST& operator=(PESSTCHLST&&) = default;
-	//~PESSTCHLST() = default;
+  constexpr PESSTCHLST() noexcept = default;
+  // PESSTCHLST(PESSTCHLST&&) = default;
+  // PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
+  // PESSTCHLST& operator=(PESSTCHLST&&) = default;
+  //~PESSTCHLST() = default;
 };
 
 class PECHDR
 {
-public:
-	char label[19] { 0 }; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays)
-	int8_t   labnd { 0 }; // carriage return character
-	uint8_t  ukn1[11] { 0U };   // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
-	uint8_t  ukn2 { 0U };       // Unknown
-	uint16_t hnd1 { 0U };       // Unknown (0x00ff)
-	uint8_t  thumbWidth { 0U }; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-	                            // Thus, 6 would mean 6×8 = 48 pixels per line
-	uint8_t thumbHeight { 0U }; // Thumbnail image height in pixels (38)
-	uint8_t ukn3[12] { 0U };    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
-	uint8_t colorCount { 0U };  // Number of colors minus one, 0xFF means 0 colors
-	uint8_t pad[463] { 0U };    // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
+  public:
+  char     label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays)
+  int8_t   labnd {0};     // carriage return character
+  uint8_t  ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
+  uint8_t  ukn2 {0U};     // Unknown
+  uint16_t hnd1 {0U};     // Unknown (0x00ff)
+  uint8_t  thumbWidth {0U}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
+                            // Thus, 6 would mean 6×8 = 48 pixels per line
+  uint8_t thumbHeight {0U}; // Thumbnail image height in pixels (38)
+  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
+  uint8_t colorCount {0U}; // Number of colors minus one, 0xFF means 0 colors
+  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
 
-	constexpr PECHDR() noexcept = default;
-	// PECHDR(PECHDR&&) = default;
-	// PECHDR& operator=(PECHDR const& rhs) = default;
-	// PECHDR& operator=(PECHDR&&) = default;
-	//~PECHDR() = default;
+  constexpr PECHDR() noexcept = default;
+  // PECHDR(PECHDR&&) = default;
+  // PECHDR& operator=(PECHDR const& rhs) = default;
+  // PECHDR& operator=(PECHDR&&) = default;
+  //~PECHDR() = default;
 };
 
 static constexpr uint8_t ThumbHeight = 38U;
@@ -2986,137 +2914,136 @@ static constexpr uint8_t ThumbWidth  = 48U;
 
 class PECHDR2
 {
-public:
-	uint16_t unknown1 { 0U };        // typical 0x0000
-	uint16_t thumbnailOffset { 0U }; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
-	uint16_t unknown2 { 0U };        // typical 0x3100
-	uint16_t unknown3 { 0U };        // typical 0xf0ff
-	int16_t  width { 0 };            // Width
-	int16_t  height { 0 };           // height
-	uint16_t unknown4 { 0U };        // typical 0x01e0
-	uint16_t unknown5 { 0U };        // typical 0x01b0
-	uint16_t xMin { 0U };            // starting X val (Bigendian)
-	uint16_t yMin { 0U };            // starting Y val (Bigendian)
+  public:
+  uint16_t unknown1 {0U}; // typical 0x0000
+  uint16_t thumbnailOffset {0U}; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
+  uint16_t unknown2 {0U}; // typical 0x3100
+  uint16_t unknown3 {0U}; // typical 0xf0ff
+  int16_t  width {0};     // Width
+  int16_t  height {0};    // height
+  uint16_t unknown4 {0U}; // typical 0x01e0
+  uint16_t unknown5 {0U}; // typical 0x01b0
+  uint16_t xMin {0U};     // starting X val (Bigendian)
+  uint16_t yMin {0U};     // starting Y val (Bigendian)
 
-	constexpr PECHDR2() noexcept = default;
-	// PECHDR2(PECHDR2&&) = default;
-	// PECHDR2& operator=(PECHDR2 const& rhs) = default;
-	// PECHDR2& operator=(PECHDR2&&) = default;
-	//~PECHDR2() = default;
+  constexpr PECHDR2() noexcept = default;
+  // PECHDR2(PECHDR2&&) = default;
+  // PECHDR2& operator=(PECHDR2 const& rhs) = default;
+  // PECHDR2& operator=(PECHDR2&&) = default;
+  //~PECHDR2() = default;
 };
 
 #endif
 
 class TRCPNT
 {
-public:
-	int16_t x { 0 };
-	int16_t y { 0 };
+  public:
+  int16_t x {0};
+  int16_t y {0};
 
-	constexpr TRCPNT() noexcept = default;
-	// TRCPNT(TRCPNT&&) = default;
-	// TRCPNT& operator=(TRCPNT const& rhs) = default;
-	// TRCPNT& operator=(TRCPNT&&) = default;
-	//~TRCPNT() = default;
+  constexpr TRCPNT() noexcept = default;
+  // TRCPNT(TRCPNT&&) = default;
+  // TRCPNT& operator=(TRCPNT const& rhs) = default;
+  // TRCPNT& operator=(TRCPNT&&) = default;
+  //~TRCPNT() = default;
 };
 
 // ToDo - Is this class needed?
 class TXTMSG
 {
-public:
-	uint32_t cod { 0U };
-	int8_t*  str { nullptr };
+  public:
+  uint32_t cod {0U};
+  int8_t*  str {nullptr};
 
-	constexpr TXTMSG() noexcept = default;
-	// TXTMSG(TXTMSG&&) = default;
-	// TXTMSG& operator=(TXTMSG const& rhs) = default;
-	// TXTMSG& operator=(TXTMSG&&) = default;
-	//~TXTMSG() = default;
+  constexpr TXTMSG() noexcept = default;
+  // TXTMSG(TXTMSG&&) = default;
+  // TXTMSG& operator=(TXTMSG const& rhs) = default;
+  // TXTMSG& operator=(TXTMSG&&) = default;
+  //~TXTMSG() = default;
 };
 
 class GRDCOD
 {
-public:
-	uint32_t id { 0U };
-	uint32_t col { 0U };
+  public:
+  uint32_t id {0U};
+  uint32_t col {0U};
 
-	constexpr GRDCOD() noexcept = default;
-	// GRDCOD(GRDCOD&&) = default;
-	// GRDCOD& operator=(GRDCOD const& rhs) = default;
-	// GRDCOD& operator=(GRDCOD&&) = default;
-	//~GRDCOD() = default;
+  constexpr GRDCOD() noexcept = default;
+  // GRDCOD(GRDCOD&&) = default;
+  // GRDCOD& operator=(GRDCOD const& rhs) = default;
+  // GRDCOD& operator=(GRDCOD&&) = default;
+  //~GRDCOD() = default;
 };
 
 #pragma pack()
 
 class OREC
 {
-public:
-	uint32_t    start { 0U };
-	uint32_t    finish { 0U };
-	uint32_t startStitch { 0U };
-	uint32_t endStitch { 0U };
-	uint32_t    color { 0U };
-	uint32_t    type { 0U };
-	uint32_t    form { 0U };
-	uint32_t    otyp { 0U };
+  public:
+  uint32_t start {0U};
+  uint32_t finish {0U};
+  uint32_t startStitch {0U};
+  uint32_t endStitch {0U};
+  uint32_t color {0U};
+  uint32_t type {0U};
+  uint32_t form {0U};
+  uint32_t otyp {0U};
 
-	constexpr OREC() noexcept = default;
-	// OREC(OREC&&) = default;
-	// OREC& operator=(OREC const& rhs) = default;
-	// OREC& operator=(OREC&&) = default;
-	//~OREC() = default;
+  constexpr OREC() noexcept = default;
+  // OREC(OREC&&) = default;
+  // OREC& operator=(OREC const& rhs) = default;
+  // OREC& operator=(OREC&&) = default;
+  //~OREC() = default;
 };
 
 class SRTREC
 {
-public:
-	uint32_t start { 0U };         // start region index
-	uint32_t finish { 0U };        // finish region index
-	uint32_t count { 0U };         // number of regions in range
-	uint32_t currentRegion { 0U }; // current region index
-	bool     direction = false;    // direction of sort
+  public:
+  uint32_t start {0U};         // start region index
+  uint32_t finish {0U};        // finish region index
+  uint32_t count {0U};         // number of regions in range
+  uint32_t currentRegion {0U}; // current region index
+  bool     direction = false;  // direction of sort
 
-	constexpr SRTREC() noexcept = default;
-	// SRTREC(SRTREC&&) = default;
-	// SRTREC& operator=(SRTREC const& rhs) = default;
-	// SRTREC& operator=(SRTREC&&) = default;
-	//~SRTREC() = default;
+  constexpr SRTREC() noexcept = default;
+  // SRTREC(SRTREC&&) = default;
+  // SRTREC& operator=(SRTREC const& rhs) = default;
+  // SRTREC& operator=(SRTREC&&) = default;
+  //~SRTREC() = default;
 };
 
 class FSTRTS
 {
-public:
-	uint32_t applique { 0U };
-	uint32_t fill { 0U };
-	uint32_t feather { 0U };
-	uint32_t border { 0U };
-	uint32_t appliqueColor { 0U };
-	uint32_t fillColor { 0U };
-	uint32_t featherColor { 0U };
-	uint32_t borderColor { 0U };
+  public:
+  uint32_t applique {0U};
+  uint32_t fill {0U};
+  uint32_t feather {0U};
+  uint32_t border {0U};
+  uint32_t appliqueColor {0U};
+  uint32_t fillColor {0U};
+  uint32_t featherColor {0U};
+  uint32_t borderColor {0U};
 
-	constexpr FSTRTS() noexcept = default;
-	// FSTRTS(FSTRTS&&) = default;
-	// FSTRTS& operator=(FSTRTS const& rhs) = default;
-	// FSTRTS& operator=(FSTRTS&&) = default;
-	//~FSTRTS() = default;
+  constexpr FSTRTS() noexcept = default;
+  // FSTRTS(FSTRTS&&) = default;
+  // FSTRTS& operator=(FSTRTS const& rhs) = default;
+  // FSTRTS& operator=(FSTRTS&&) = default;
+  //~FSTRTS() = default;
 };
 
 union FILLSTARTS {
-public:
-	FSTRTS   fillNamed;
-	uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)];
+  public:
+  FSTRTS   fillNamed;
+  uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)];
 
-	FILLSTARTS() noexcept;
-	// FILLSTARTS(FILLSTARTS&&) = default;
-	// FILLSTARTS& operator=(FILLSTARTS const& rhs) = default;
-	// FILLSTARTS& operator=(FILLSTARTS&&) = default;
-	//~FILLSTARTS() = default;
+  FILLSTARTS() noexcept;
+  // FILLSTARTS(FILLSTARTS&&) = default;
+  // FILLSTARTS& operator=(FILLSTARTS const& rhs) = default;
+  // FILLSTARTS& operator=(FILLSTARTS&&) = default;
+  //~FILLSTARTS() = default;
 };
 
-inline FILLSTARTS::FILLSTARTS() noexcept
-    : fillNamed() {
+inline FILLSTARTS::FILLSTARTS() noexcept : fillNamed() {
 }
 
 constexpr auto M_AP     = 1U << 1U;
@@ -3133,127 +3060,126 @@ constexpr auto M_ECOL   = 1U << 11U;
 
 class INSREC
 {
-public:
-	uint32_t code { 0U };
-	uint32_t color { 0U };
-	uint32_t index { 0U };
-	uint32_t seq { 0U };
+  public:
+  uint32_t code {0U};
+  uint32_t color {0U};
+  uint32_t index {0U};
+  uint32_t seq {0U};
 
-	constexpr INSREC() noexcept = default;
-	// INSREC(INSREC&&) = default;
-	// INSREC& operator=(INSREC const& rhs) = default;
-	// INSREC& operator=(INSREC&&) = default;
-	//~INSREC() = default;
+  constexpr INSREC() noexcept = default;
+  // INSREC(INSREC&&) = default;
+  // INSREC& operator=(INSREC const& rhs) = default;
+  // INSREC& operator=(INSREC&&) = default;
+  //~INSREC() = default;
 };
 
-enum interleaveTypes
-{ // interleave sequence identifiers
-	I_AP,
-	I_FIL,
-	I_FTH,
-	I_BRD,
+enum interleaveTypes { // interleave sequence identifiers
+  I_AP,
+  I_FIL,
+  I_FTH,
+  I_BRD,
 };
 
 class INTINF
 {
-public:
-	uint32_t    pins { 0U };
-	uint32_t    coloc { 0U };
-	uint32_t    layerIndex { 0U };
-	uint32_t    start { 0U };
-	uint32_t    output { 0U };
-	fPOINTATTR* highStitchBuffer { nullptr };
+  public:
+  uint32_t    pins {0U};
+  uint32_t    coloc {0U};
+  uint32_t    layerIndex {0U};
+  uint32_t    start {0U};
+  uint32_t    output {0U};
+  fPOINTATTR* highStitchBuffer {nullptr};
 
-	constexpr INTINF() noexcept = default;
-	// INTINF(INTINF&&) = default;
-	// INTINF& operator=(INTINF const& rhs) = default;
-	// INTINF& operator=(INTINF&&) = default;
-	//~INTINF() = default;
+  constexpr INTINF() noexcept = default;
+  // INTINF(INTINF&&) = default;
+  // INTINF& operator=(INTINF const& rhs) = default;
+  // INTINF& operator=(INTINF&&) = default;
+  //~INTINF() = default;
 };
 
 class TXTSCR
 {
-public:
-	int32_t  top { 0 };                 // pixel top line
-	int32_t  bottom { 0 };              // pixel bottom line
-	int32_t  height { 0 };              // pixel height of area
-	int32_t  halfHeight { 0 };          // pixel middle of area
-	float    xOffset { 0.0F };          // edit x offset of area
-	float    yOffset { 0.0F };          // edit y offset of area
-	float    areaHeight { 0.0F };       // edit height of area
-	float    screenHeight { 0.0F };     // edit height of screen
-	float    width { 0.0F };            // edit width of area
-	float    spacing { 0.0F };          // edit space between lines
-	uint16_t lines { 0U };              // number of lines
-	float    editToPixelRatio { 0.0F }; // edit to pixel ratio
-	fPOINT   formCenter;                // middle of the form
+  public:
+  int32_t  top {0};                 // pixel top line
+  int32_t  bottom {0};              // pixel bottom line
+  int32_t  height {0};              // pixel height of area
+  int32_t  halfHeight {0};          // pixel middle of area
+  float    xOffset {0.0F};          // edit x offset of area
+  float    yOffset {0.0F};          // edit y offset of area
+  float    areaHeight {0.0F};       // edit height of area
+  float    screenHeight {0.0F};     // edit height of screen
+  float    width {0.0F};            // edit width of area
+  float    spacing {0.0F};          // edit space between lines
+  uint16_t lines {0U};              // number of lines
+  float    editToPixelRatio {0.0F}; // edit to pixel ratio
+  fPOINT   formCenter;              // middle of the form
 
-	constexpr TXTSCR() noexcept = default;
-	// TXTSCR(TXTSCR&&) = default;
-	// TXTSCR& operator=(TXTSCR const& rhs) = default;
-	// TXTSCR& operator=(TXTSCR&&) = default;
-	//~TXTSCR() = default;
+  constexpr TXTSCR() noexcept = default;
+  // TXTSCR(TXTSCR&&) = default;
+  // TXTSCR& operator=(TXTSCR const& rhs) = default;
+  // TXTSCR& operator=(TXTSCR&&) = default;
+  //~TXTSCR() = default;
 };
 
 class TXTRCT
 {
-public:
-	uint16_t left { 0U };
-	uint16_t right { 0U };
-	float    top { 0.0F };
-	float    bottom { 0.0F };
+  public:
+  uint16_t left {0U};
+  uint16_t right {0U};
+  float    top {0.0F};
+  float    bottom {0.0F};
 
-	constexpr TXTRCT() noexcept = default;
-	// TXTRCT(TXTRCT&&) = default;
-	// TXTRCT& operator=(TXTRCT const& rhs) = default;
-	// TXTRCT& operator=(TXTRCT&&) = default;
-	//~TXTRCT() = default;
+  constexpr TXTRCT() noexcept = default;
+  // TXTRCT(TXTRCT&&) = default;
+  // TXTRCT& operator=(TXTRCT const& rhs) = default;
+  // TXTRCT& operator=(TXTRCT&&) = default;
+  //~TXTRCT() = default;
 };
 
 class TXHST
 {
-public:
-	std::vector<TXPNT> texturePoints {};
+  public:
+  std::vector<TXPNT> texturePoints {};
 
-	float height { 0.0F };
-	float width { 0.0F };
-	float spacing { 0.0F };
+  float height {0.0F};
+  float width {0.0F};
+  float spacing {0.0F};
 
-	constexpr TXHST() noexcept = default;
-	// TXHST(TXHST&&) = default;
-	// TXHST& operator=(TXHST const& rhs) = default;
-	// TXHST& operator=(TXHST&&) = default;
-	//~TXHST() = default;
+  constexpr TXHST() noexcept = default;
+  // TXHST(TXHST&&) = default;
+  // TXHST& operator=(TXHST const& rhs) = default;
+  // TXHST& operator=(TXHST&&) = default;
+  //~TXHST() = default;
 };
 
 class TXHSTBUF
 {
-public:
-	uint32_t* placeholder { nullptr };
-	uint32_t  count { 0U };
+  public:
+  uint32_t* placeholder {nullptr};
+  uint32_t  count {0U};
 
-	float height { 0.0F };
-	float width { 0.0F };
-	float spacing { 0.0F };
+  float height {0.0F};
+  float width {0.0F};
+  float spacing {0.0F};
 
-	constexpr TXHSTBUF() noexcept = default;
-	// TXHSTBUF(TXHSTBUF&&) = default;
-	// TXHSTBUF& operator=(TXHSTBUF const& rhs) = default;
-	// TXHSTBUF& operator=(TXHSTBUF&&) = default;
-	//~TXHSTBUF() = default;
+  constexpr TXHSTBUF() noexcept = default;
+  // TXHSTBUF(TXHSTBUF&&) = default;
+  // TXHSTBUF& operator=(TXHSTBUF const& rhs) = default;
+  // TXHSTBUF& operator=(TXHSTBUF&&) = default;
+  //~TXHSTBUF() = default;
 };
 
 class RNGCNT
 {
-public:
-	int32_t line { 0 };
-	int32_t stitchCount { 0 };
+  public:
+  int32_t line {0};
+  int32_t stitchCount {0};
 
-	constexpr RNGCNT() noexcept = default;
-	// RNGCNT(RNGCNT&&) = default;
-	// RNGCNT& operator=(RNGCNT const& rhs) = default;
-	// RNGCNT& operator=(RNGCNT&&) = default;
-	//~RNGCNT() = default;
+  constexpr RNGCNT() noexcept = default;
+  // RNGCNT(RNGCNT&&) = default;
+  // RNGCNT& operator=(RNGCNT const& rhs) = default;
+  // RNGCNT& operator=(RNGCNT&&) = default;
+  //~RNGCNT() = default;
 };
 
 constexpr auto BADFLT = 1U;
@@ -3263,105 +3189,100 @@ constexpr auto BADTX  = 1U << 3U;
 
 class BADCNTS
 {
-public:
-	uint32_t attribute { 0U };
-	uint32_t flt { 0U };
-	uint32_t clip { 0U };
-	uint32_t guideCount { 0U }; // ToDo - is this an accurate description?
-	uint32_t tx { 0U };
+  public:
+  uint32_t attribute {0U};
+  uint32_t flt {0U};
+  uint32_t clip {0U};
+  uint32_t guideCount {0U}; // ToDo - is this an accurate description?
+  uint32_t tx {0U};
 
-	constexpr BADCNTS() noexcept = default;
-	// BADCNTS(BADCNTS&&) = default;
-	// BADCNTS& operator=(BADCNTS const& rhs) = default;
-	// BADCNTS& operator=(BADCNTS&&) = default;
-	//~BADCNTS() = default;
+  constexpr BADCNTS() noexcept = default;
+  // BADCNTS(BADCNTS&&) = default;
+  // BADCNTS& operator=(BADCNTS const& rhs) = default;
+  // BADCNTS& operator=(BADCNTS&&) = default;
+  //~BADCNTS() = default;
 };
 
 class FINDINFO
 {
-public:
-	uint32_t         count { 0U };
-	WIN32_FIND_DATA* data { nullptr };
+  public:
+  uint32_t         count {0U};
+  WIN32_FIND_DATA* data {nullptr};
 
-	constexpr FINDINFO() noexcept = default;
-	// FINDINFO(FINDINFO&&) = default;
-	// FINDINFO& operator=(FINDINFO const& rhs) = default;
-	// FINDINFO& operator=(FINDINFO&&) = default;
-	//~FINDINFO() = default;
+  constexpr FINDINFO() noexcept = default;
+  // FINDINFO(FINDINFO&&) = default;
+  // FINDINFO& operator=(FINDINFO const& rhs) = default;
+  // FINDINFO& operator=(FINDINFO&&) = default;
+  //~FINDINFO() = default;
 };
 
 // is intersection of line and cursor in, before or after the line
-enum class intersectionStyles
-{
-	POINT_IN_LINE = 0,
-	POINT_BEFORE_LINE,
-	POINT_AFTER_LINE
-};
+enum class intersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
 
 class LENINFO // Sorted line length info
 {
-public:
-	uint32_t index { 0U };
-	bool     isEnd { false };
-	float    length { 0.0F };
+  public:
+  uint32_t index {0U};
+  bool     isEnd {false};
+  float    length {0.0F};
 
-	constexpr LENINFO() noexcept = default;
-	// LENINFO(LENINFO&&) = default;
-	// LENINFO& operator=(LENINFO const& rhs) = default;
-	// LENINFO& operator=(LENINFO&&) = default;
-	//~LENINFO() = default;
+  constexpr LENINFO() noexcept = default;
+  // LENINFO(LENINFO&&) = default;
+  // LENINFO& operator=(LENINFO const& rhs) = default;
+  // LENINFO& operator=(LENINFO&&) = default;
+  //~LENINFO() = default;
 };
 
 class PECCOLOR
 {
-public:
-	uint8_t r { 0U };
-	uint8_t g { 0U };
-	uint8_t b { 0U };
+  public:
+  uint8_t r {0U};
+  uint8_t g {0U};
+  uint8_t b {0U};
 
-	constexpr PECCOLOR() noexcept = default;
-	// PECCOLOR(PECCOLOR&&) = default;
-	// PECCOLOR& operator=(PECCOLOR const& rhs) = default;
-	// PECCOLOR& operator=(PECCOLOR&&) = default;
-	//~PECCOLOR() = default;
+  constexpr PECCOLOR() noexcept = default;
+  // PECCOLOR(PECCOLOR&&) = default;
+  // PECCOLOR& operator=(PECCOLOR const& rhs) = default;
+  // PECCOLOR& operator=(PECCOLOR&&) = default;
+  //~PECCOLOR() = default;
 };
 
 class PESCOLORLIST
 {
-public:
-	uint16_t blockIndex { 0U };
-	uint16_t colorIndex { 0U };
+  public:
+  uint16_t blockIndex {0U};
+  uint16_t colorIndex {0U};
 
-	constexpr PESCOLORLIST() noexcept = default;
-	// PESCOLORLIST(PESCOLORLIST&&) = default;
-	// PESCOLORLIST& operator=(PECCOLORLIST const& rhs) = default;
-	// PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
-	//~PESCOLORLIST() = default;
+  constexpr PESCOLORLIST() noexcept = default;
+  // PESCOLORLIST(PESCOLORLIST&&) = default;
+  // PESCOLORLIST& operator=(PECCOLORLIST const& rhs) = default;
+  // PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
+  //~PESCOLORLIST() = default;
 };
 
 class THREAD
 {
-public:
-	PECCOLOR    color {};
-	char const* description { nullptr };
-	char const* catalogNumber { nullptr };
+  public:
+  PECCOLOR    color {};
+  char const* description {nullptr};
+  char const* catalogNumber {nullptr};
 
-	constexpr THREAD() noexcept = default;
-	// THREAD(THREAD&&) = default;
-	// THREAD& operator=(THREAD const& rhs) = default;
-	// THREAD& operator=(THREAD&&) = default;
-	//~THREAD() = default;
+  constexpr THREAD() noexcept = default;
+  // THREAD(THREAD&&) = default;
+  // THREAD& operator=(THREAD const& rhs) = default;
+  // THREAD& operator=(THREAD&&) = default;
+  //~THREAD() = default;
 };
 
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
-	GSL_SUPPRESS(26474) {
-		if (pointer) {
-			return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
-		}
-
-		throw;
+  GSL_SUPPRESS(26474) {
+	if (pointer) {
+	  return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
 	}
+
+	throw;
+  }
 }

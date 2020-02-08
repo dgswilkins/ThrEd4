@@ -36,9 +36,9 @@ fRECTANGLE AllItemsRect {}; // rectangle enclosing all forms and stitches
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
 uint32_t  AppliqueColor = COLOR_COUNT - 1; // underlay color
-LPTSTR*   ArgList;             // command line argument array
-HCURSOR   ArrowCursor;         // arrow
-fs::path* AuxName;             //
+LPTSTR*   ArgList;                         // command line argument array
+HCURSOR   ArrowCursor;                     // arrow
+fs::path* AuxName;                         //
 
 std::vector<BSEQPNT>* BSequence; //
 
@@ -83,13 +83,13 @@ HCURSOR  CrossCursor;           // cross
 
 std::vector<HWND>* DefaultColorWin; // default color windows
 
-HWND            DeleteStitchesDialog; // asking user if they want to delete the sitches associated with a form
-std::wstring*   DesignerName;         // designer name in clear
-HWND            DiscardButton;        // discard button
-DRAWITEMSTRUCT* DrawItem;             // for owner-draw windows
-POINT           EndPointCross;        // point to draw at the end cross for form select points
-STREX*          ExtendedHeader;       // thred file header extension
-HMENU           FillMenu;             // fill submenu
+HWND DeleteStitchesDialog; // asking user if they want to delete the sitches associated with a form
+std::wstring*   DesignerName;   // designer name in clear
+HWND            DiscardButton;  // discard button
+DRAWITEMSTRUCT* DrawItem;       // for owner-draw windows
+POINT           EndPointCross;  // point to draw at the end cross for form select points
+STREX*          ExtendedHeader; // thred file header extension
+HMENU           FillMenu;       // fill submenu
 
 std::vector<float>* FormAngles;        // angles of a form for satin border fills
 std::vector<POINT>* FormControlPoints; // form control rectangle in pixel coordinates
@@ -115,13 +115,13 @@ uint32_t  GroupStartStitch;      // lower end of selected stitches
 uint32_t  GroupStitchIndex;      // last point selected in group
 fs::path* HomeDirectory;         // directory from which thred was executed
 double    HorizontalLength;      // horizontal length of a clipboard fill
-float     HorizontalRatio;       // horizontal ratio between the zoom window and the entire stitch space
-HWND      HorizontalScrollBar;   // horizontal scroll bar
-INIFILE   IniFile;               // initialization file
-POINT     InsertLine[3];         // the insert line
+float     HorizontalRatio; // horizontal ratio between the zoom window and the entire stitch space
+HWND      HorizontalScrollBar; // horizontal scroll bar
+INIFILE   IniFile;             // initialization file
+POINT     InsertLine[3];       // the insert line
 
-std::vector<fPOINT>* InsidePointList;           // list of inside outline points for satin or clipboard fills
-std::vector<fPOINT>* InsidePoints;              // pointer to the list of inside outline points
+std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
+std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
 std::vector<INSREC>* InterleaveSequenceIndices; // indices into interleave points
 std::vector<fPOINT>* InterleaveSequence;        // storage for interleave points
 std::vector<HWND>*   LabelWindow;               // text handles for the form data sheet
@@ -190,11 +190,11 @@ fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordin
 
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
-fRECTANGLE SelectedVerticesRect {};                // rectangle enclosing selected form verticess
-double     ShowStitchThreshold = SHOPNTS;          // show stitch grid below this zoom level
-HWND       SideMessageWindow   = nullptr;          // main side message window
-wchar_t    SideWindowEntryBuffer[11];              // side window number for entering form data sheet numbers
-HWND       SideWindow[16];                         // side message windows
+fRECTANGLE SelectedVerticesRect {};       // rectangle enclosing selected form verticess
+double     ShowStitchThreshold = SHOPNTS; // show stitch grid below this zoom level
+HWND       SideMessageWindow   = nullptr; // main side message window
+wchar_t    SideWindowEntryBuffer[11];     // side window number for entering form data sheet numbers
+HWND       SideWindow[16];                // side message windows
 float      SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
 float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
 float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
@@ -233,19 +233,19 @@ HDC                 TraceDC;                        // trace device context
 boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
-POINT              UnzoomedRect;                         // size of the unzoomed stitch window
-COLORREF           UserColor[COLOR_COUNT];               // user colors
-std::vector<HWND>* UserColorWin;                         // user color windows
-EnumMap<UserFlag>  UserFlagMap(0);                       // for storage of persistent binary variables set by the user
+POINT              UnzoomedRect;           // size of the unzoomed stitch window
+COLORREF           UserColor[COLOR_COUNT]; // user colors
+std::vector<HWND>* UserColorWin;           // user color windows
+EnumMap<UserFlag>  UserFlagMap(0); // for storage of persistent binary variables set by the user
 HPEN               UserPen[COLOR_COUNT];                 // user color pens
 float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
-float              VerticalRatio;                        // vertical ratio between the zoom window and the entire stitch space
-HWND               VerticalScrollBar;                    // vertical scroll bar
-fs::path*          WorkingFileName;                      //
-POINT              ZoomBoxLine[5];                       // the zoom box
-fPOINT             ZoomBoxOrigin;                        // zoom box origin
-float              ZoomFactor = 1.0F;                    // zoom factor
-fPOINT             ZoomMarkPoint;                        // stitch coordinates of the zoom mark
-fPOINT             ZoomRatio;                            // zoom ratio used to draw stitch window
-fRECTANGLE         ZoomRect;                             // zoom rectangle
+float      VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
+HWND       VerticalScrollBar; // vertical scroll bar
+fs::path*  WorkingFileName;   //
+POINT      ZoomBoxLine[5];    // the zoom box
+fPOINT     ZoomBoxOrigin;     // zoom box origin
+float      ZoomFactor = 1.0F; // zoom factor
+fPOINT     ZoomMarkPoint;     // stitch coordinates of the zoom mark
+fPOINT     ZoomRatio;         // zoom ratio used to draw stitch window
+fRECTANGLE ZoomRect;          // zoom rectangle

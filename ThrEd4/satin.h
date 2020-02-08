@@ -44,25 +44,25 @@ void slbrd(FRMHED const& form);
 void spltsat(uint32_t guideIndex);
 
 namespace internal {
-	auto chkbak(std::vector<fPOINT> const& satinBackup, fPOINT const& pnt) noexcept -> bool;
-	void filinsbw(std::vector<fPOINT>& satinBackup, fPOINT const& point, uint32_t& satinBackupIndex);
-	auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
-	void outfn(FRMHED const& form, uint32_t start, uint32_t finish, float satinWidth);
-	void sacspac(uint32_t startGuide, uint32_t guideCount);
-	void satclos();
-	void satcpy(FRMHED const& form, std::vector<SATCON> const& source, uint32_t size);
-	void satends(FRMHED const& form, uint32_t isBlunt, float width);
-	void satfn(FRMHED const&             form,
-	           std::vector<float> const& lengths,
-	           uint32_t                  line1Start,
-	           uint32_t                  line1End,
-	           uint32_t                  line2Start,
-	           uint32_t                  line2End);
-	void satmf(FRMHED const& form, std::vector<float> const& lengths);
-	void satsbrd(uint32_t formIndex);
-	auto satselfn() -> bool;
-	void sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish);
-	void sfn(FRMHED const& form, uint32_t startVertex);
-	void unsat();
+  auto chkbak(std::vector<fPOINT> const& satinBackup, fPOINT const& pnt) noexcept -> bool;
+  void filinsbw(std::vector<fPOINT>& satinBackup, fPOINT const& point, uint32_t& satinBackupIndex);
+  auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
+  void outfn(FRMHED const& form, uint32_t start, uint32_t finish, float satinWidth);
+  void sacspac(uint32_t startGuide, uint32_t guideCount);
+  void satclos();
+  void satcpy(FRMHED const& form, std::vector<SATCON> const& source, uint32_t size);
+  void satends(FRMHED const& form, uint32_t isBlunt, float width);
+  void satfn(FRMHED const&             form,
+             std::vector<float> const& lengths,
+             uint32_t                  line1Start,
+             uint32_t                  line1End,
+             uint32_t                  line2Start,
+             uint32_t                  line2End);
+  void satmf(FRMHED const& form, std::vector<float> const& lengths);
+  void satsbrd(uint32_t formIndex);
+  auto satselfn() -> bool;
+  void sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish);
+  void sfn(FRMHED const& form, uint32_t startVertex);
+  void unsat();
 } // namespace internal
 } // namespace satin

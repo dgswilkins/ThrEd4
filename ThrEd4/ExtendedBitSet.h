@@ -12,48 +12,47 @@
 template <typename Block = uint32_t, typename Allocator = std::allocator<uint32_t>>
 class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 {
-	using super = boost::dynamic_bitset<Block, Allocator>;
+  using super = boost::dynamic_bitset<Block, Allocator>;
 
-public:
-	GSL_SUPPRESS(26434)
-	explicit ExtendedBitSet(std::size_t bits)
-	    : super::dynamic_bitset(bits) {
-	}
+  public:
+  GSL_SUPPRESS(26434)
+  explicit ExtendedBitSet(std::size_t bits) : super::dynamic_bitset(bits) {
+  }
 
-	/*
-	bool testAndReset(std::size_t pos) const {
-	    bool val = super::test(pos);
-	    super::reset(pos);
-	    return val;
-	}
-	*/
+  /*
+  bool testAndReset(std::size_t pos) const {
+      bool val = super::test(pos);
+      super::reset(pos);
+      return val;
+  }
+  */
 
-	size_t getFirst() {
-		const size_t foundBit = super::find_first();
-		if (foundBit != super::npos) {
-			super::reset(foundBit);
-		}
-		else {
-			return 0xFFFFFFFF;
-		}
-		return foundBit;
+  size_t getFirst() {
+	const size_t foundBit = super::find_first();
+	if (foundBit != super::npos) {
+	  super::reset(foundBit);
 	}
+	else {
+	  return 0xFFFFFFFF;
+	}
+	return foundBit;
+  }
 
-	size_t getLast() {
-		size_t foundBit = super::find_first();
-		if (foundBit != super::npos) {
-			do {
-				if (super::find_next(foundBit) != super::npos) {
-					foundBit = super::find_next(foundBit);
-				}
-			} while (super::find_next(foundBit) != super::npos);
+  size_t getLast() {
+	size_t foundBit = super::find_first();
+	if (foundBit != super::npos) {
+	  do {
+		if (super::find_next(foundBit) != super::npos) {
+		  foundBit = super::find_next(foundBit);
 		}
-		if (foundBit != super::npos) {
-			super::reset(foundBit);
-		}
-		else {
-			return 0xFFFFFFFF;
-		}
-		return foundBit;
+	  } while (super::find_next(foundBit) != super::npos);
 	}
+	if (foundBit != super::npos) {
+	  super::reset(foundBit);
+	}
+	else {
+	  return 0xFFFFFFFF;
+	}
+	return foundBit;
+  }
 };

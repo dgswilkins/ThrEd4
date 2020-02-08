@@ -28,7 +28,8 @@ void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpS
 void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
 void Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
-auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept -> bool;
+auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
+    -> bool;
 void setCursor(HCURSOR hCursor) noexcept;
 void setSideWinVal(int index) noexcept;
 void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
@@ -45,19 +46,19 @@ void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytes
 #pragma warning(push)
 #pragma warning(disable : 26440)
 template <class outType, class inType> outType ceil(inType invar) {
-	return gsl::narrow<outType>(std::ceil(invar));
+  return gsl::narrow<outType>(std::ceil(invar));
 }
 
 template <class outType, class inType> outType floor(inType invar) {
-	return gsl::narrow<outType>(std::floor(invar));
+  return gsl::narrow<outType>(std::floor(invar));
 }
 
 template <class outType, class inType> outType round(inType invar) {
-	return gsl::narrow<outType>(std::round(invar));
+  return gsl::narrow<outType>(std::round(invar));
 }
 
 template <class outType> outType wcstoi(wchar_t const (&buffer)[HBUFSIZ]) {
-	return gsl::narrow<outType>(std::wcstoul(static_cast<wchar_t const*>(buffer), nullptr, 10));
+  return gsl::narrow<outType>(std::wcstoul(static_cast<wchar_t const*>(buffer), nullptr, 10));
 }
 
 #pragma warning(pop)

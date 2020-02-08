@@ -40,26 +40,26 @@ void sidwnd(HWND wnd) noexcept;
 void wavfrm();
 
 namespace internal {
-	void chkdaz();
+  void chkdaz();
 
-	BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+  BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
 
-	void initdaz(HWND hWinDialog);
-	void initTearDlg(HWND hwndlg);
-	auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
-	void nxtlin(uint32_t& formMenuEntryCount) noexcept;
-	void nxtlinprf() noexcept;
-	void prflin(std::wstring const& msg, uint32_t row) noexcept;
-	auto prfnwin(std::wstring const& text) noexcept -> HWND;
-	void prftwin(std::wstring const& text) noexcept;
-	void refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount);
+  void initdaz(HWND hWinDialog);
+  void initTearDlg(HWND hwndlg);
+  auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
+  void nxtlin(uint32_t& formMenuEntryCount) noexcept;
+  void nxtlinprf() noexcept;
+  void prflin(std::wstring const& msg, uint32_t row) noexcept;
+  auto prfnwin(std::wstring const& text) noexcept -> HWND;
+  void prftwin(std::wstring const& text) noexcept;
+  void refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount);
 
-	auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+  auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-	auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
-	auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
-	void wavinit(HWND hwndlg);
+  auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
+  auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
+  void wavinit(HWND hwndlg);
 
-	auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+  auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 } // namespace internal
 } // namespace formForms

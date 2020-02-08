@@ -41,30 +41,30 @@ namespace utf {
 #pragma warning(disable : 4996)  // wstring_convert was declared deprecated in c++17
 
 inline std::wstring Utf8ToUtf16(std::string const& utf8) {
-	std::wstring utf16;
+  std::wstring utf16;
 
-	// handle the special case of empty input string
-	if (utf8.empty()) {
-		_ASSERTE(utf16.empty()); // NOLINT
-		return utf16;
-	}
-
-	utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.from_bytes(utf8);
-
+  // handle the special case of empty input string
+  if (utf8.empty()) {
+	_ASSERTE(utf16.empty()); // NOLINT
 	return utf16;
+  }
+
+  utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.from_bytes(utf8);
+
+  return utf16;
 }
 
 inline std::string Utf16ToUtf8(std::wstring const& utf16) {
-	std::string utf8;
+  std::string utf8;
 
-	if (utf16.empty()) {
-		_ASSERTE(utf8.empty()); // NOLINT
-		return utf8;
-	}
-
-	utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.to_bytes(utf16);
-
+  if (utf16.empty()) {
+	_ASSERTE(utf8.empty()); // NOLINT
 	return utf8;
+  }
+
+  utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.to_bytes(utf16);
+
+  return utf8;
 }
 #pragma warning(pop)
 
