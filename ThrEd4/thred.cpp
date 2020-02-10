@@ -15065,7 +15065,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			          guides + formIter.satinGuideCount,
 			          std::next(SatinGuides->begin(), formIter.satinOrAngle.guide));
 		  }
-		  auto       clipData      = convert_ptr<fPOINT*>(guides);
+		  auto       clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
 		  auto       clipCount     = 0U;
 		  auto const lastFormIndex = wrap::toUnsigned(FormList->size() - 1U);
 		  if (clip::isclpx(lastFormIndex)) {
