@@ -8391,72 +8391,77 @@ void thred::hidbit() {
 }
 
 void thred::internal::drwlstch(uint32_t finish) {
-  auto color = 0U;
+  if (finish != 0) {
+	auto color = 0U;
 
-  if (StateMap.test(StateFlag::HID)) {
-	while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
-	  RunPoint++;
-	}
-  }
-  if (StateMap.test(StateFlag::ZUMED)) {
-	auto iMovieFrame = 1U;
-	while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint)) {
-	  RunPoint++;
-	}
-	auto const origin = RunPoint - 1U;
-
-	color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
-
-	auto flag = true;
-	while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
-	       (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-	  if (stch2px(RunPoint)) {
-		MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
-		if (flag) {
-		  flag = false;
-		  if (stch2px(RunPoint - 1)) {
-			MovieLine[0] = MovieLine[1];
-		  }
-		  else {
-			MovieLine[0] = StitchCoordinatesPixels;
-		  }
-		}
-	  }
-	  RunPoint++;
-	}
-	if (RunPoint == origin) {
-	  RunPoint++;
-	}
-	if (!stch2px(RunPoint)) {
-	  if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+	if (StateMap.test(StateFlag::HID)) {
+	  while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
 		RunPoint++;
 	  }
 	}
-	SelectObject(StitchWindowDC, UserPen[color]);
-	wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
-	if (!flag) {
+	if (StateMap.test(StateFlag::ZUMED)) {
+	  auto iMovieFrame = 1U;
+	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint)) {
+		RunPoint++;
+	  }
+	  auto const origin = RunPoint - 1U;
+
+	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+
+	  auto flag = true;
+	  while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
+	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+		if (stch2px(RunPoint)) {
+		  MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+		  if (flag) {
+			flag = false;
+			if (stch2px(RunPoint - 1)) {
+			  MovieLine[0] = MovieLine[1];
+			}
+			else {
+			  MovieLine[0] = StitchCoordinatesPixels;
+			}
+		  }
+		}
+		RunPoint++;
+	  }
+	  if (RunPoint == origin) {
+		RunPoint++;
+	  }
+	  if (!stch2px(RunPoint)) {
+		if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+		  MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+		  RunPoint++;
+		}
+	  }
+	  SelectObject(StitchWindowDC, UserPen[color]);
+	  wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
+	  if (!flag) {
+		RunPoint--;
+	  }
+	}
+	else {
+	  auto iMovieFrame = 0U;
+
+	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+	  SelectObject(StitchWindowDC, UserPen[color]);
+	  while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
+	         ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
+		stch2px1(RunPoint++);
+		MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+	  }
 	  RunPoint--;
+	  wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
+	}
+	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & 0xfU) != color) {
+	  RunPoint++;
+	}
+	displayText::ritnum(STR_NUMSEL, RunPoint);
+	if (RunPoint + 3 > finish - 1) {
+	  patdun();
 	}
   }
   else {
-	auto iMovieFrame = 0U;
-
-	color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
-	SelectObject(StitchWindowDC, UserPen[color]);
-	while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
-	       ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
-	  stch2px1(RunPoint++);
-	  MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
-	}
-	RunPoint--;
-	wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
-  }
-  if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & 0xfU) != color) {
-	RunPoint++;
-  }
-  displayText::ritnum(STR_NUMSEL, RunPoint);
-  if (RunPoint + 3 > finish - 1) {
 	patdun();
   }
 }
@@ -15077,13 +15082,10 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			clipCount += formIter.clipEntries;
 		  }
 		  auto textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
+		  auto textureSpan = gsl::span<TXPNT>(textureSource, formIter.fillInfo.texture.count);
 		  if (texture::istx(lastFormIndex)) {
 			formIter.fillInfo.texture.index = gsl::narrow<uint16_t>(TexturePointsBuffer->size());
-
-			auto currentCount = formIter.fillInfo.texture.count;
-			TexturePointsBuffer->resize(TexturePointsBuffer->size() + currentCount);
-			auto iter = std::next(TexturePointsBuffer->begin(), formIter.fillInfo.texture.index);
-			std::copy(textureSource, textureSource + currentCount, iter);
+			TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		  }
 		  NewFormVertexCount = formIter.vertexCount;
 		  if (formIter.type != FRMLINE) {
