@@ -4761,7 +4761,7 @@ void thred::internal::sav() {
 			break;
 		  }
 		  auto bytesWritten = DWORD {0};
-		  if (!WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, nullptr)) {
+		  if (FALSE == WriteFile(PCSFileHandle, &PCSHeader, 0x46, &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -4783,25 +4783,29 @@ void thred::internal::sav() {
 			PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<uint8_t>(fractionalPart * 256.0);
 			PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<int16_t>(integerPart);
 		  }
-		  if (!WriteFile(PCSFileHandle,
-		                 PCSStitchBuffer.data(),
-		                 iPCSstitch * sizeof(decltype(PCSStitchBuffer.back())),
-		                 &bytesWritten,
-		                 nullptr)) {
+		  if (FALSE == WriteFile(PCSFileHandle,
+		                         PCSStitchBuffer.data(),
+		                         iPCSstitch * sizeof(decltype(PCSStitchBuffer.back())),
+		                         &bytesWritten,
+		                         nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
 		  }
 		  if (UserFlagMap.test(UserFlag::BSAVOF)) {
 			char const blank[16] = {};
-			if (!WriteFile(PCSFileHandle, static_cast<LPCVOID>(blank), sizeof(blank) - 1U, &bytesWritten, nullptr)) {
+			if (FALSE == WriteFile(PCSFileHandle, static_cast<LPCVOID>(blank), sizeof(blank) - 1U, &bytesWritten, nullptr)) {
 			  displayText::riter();
 			  flag = false;
 			  break;
 			}
 		  }
 		  else {
-			if (!WriteFile(PCSFileHandle, static_cast<LPCVOID>(PCSBMPFileName), sizeof(PCSBMPFileName) - 1U, &bytesWritten, nullptr)) {
+			if (FALSE == WriteFile(PCSFileHandle,
+			                       static_cast<LPCVOID>(PCSBMPFileName),
+			                       sizeof(PCSBMPFileName) - 1U,
+			                       &bytesWritten,
+			                       nullptr)) {
 			  displayText::riter();
 			  flag = false;
 			  break;
