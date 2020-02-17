@@ -843,14 +843,11 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 	  if (clipFormHeader->clipType == CLP_FRM) {
 		auto clipForm = &clipFormHeader->form;
 		if (nullptr != clipForm) {
-		  auto vertices    = convert_ptr<fPOINT*>(&clipForm[1]);
 		  textureForm      = *clipForm;
-		  auto sourceStart = vertices;
-		  auto sourceEnd   = sourceStart + textureForm.vertexCount;
+		  auto vertices    = convert_ptr<fPOINT*>(&clipForm[1]);
+		  auto const source = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
-		  AngledFormVertices->resize(textureForm.vertexCount);
-		  auto destination = AngledFormVertices->begin();
-		  std::copy(sourceStart, sourceEnd, destination);
+		  AngledFormVertices->insert(AngledFormVertices->end(), source.cbegin(), source.cend());
 		  textureForm.vertexIndex = 0;
 		  StateMap.reset(StateFlag::TXTLIN);
 		  StateMap.set(StateFlag::TXTCLP);
