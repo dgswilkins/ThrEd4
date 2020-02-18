@@ -7582,21 +7582,21 @@ void thred::internal::rot(fPOINT& rotationCenter) {
   ritrot(0, rotationCenter);
 }
 
-void thred::internal::savclp(uint32_t destination, std::vector<fPOINTATTR>& buffer, uint32_t source) {
-  auto integer = 0.0;
+void thred::internal::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led) {
+  auto integer = 0.0F;
 
-  ClipStitchData[destination].led = buffer[source].attribute & COLMSK;
-  auto fractional = modf(gsl::narrow_cast<double>(buffer[source].x) - LowerLeftStitch.x, &integer);
-  ClipStitchData[destination].fx   = wrap::floor<uint8_t>(fractional * 256.0);
-  ClipStitchData[destination].x    = gsl::narrow<uint16_t>(integer);
-  ClipStitchData[destination].spcx = 0;
-  fractional = modf(gsl::narrow_cast<double>(buffer[source].y) - LowerLeftStitch.y, &integer);
-  ClipStitchData[destination].fy   = wrap::floor<uint8_t>(fractional * 256.0);
-  ClipStitchData[destination].y    = gsl::narrow<uint16_t>(integer);
-  ClipStitchData[destination].spcy = 0;
+  destination.led  = led;
+  auto fractional  = modf(source.x - LowerLeftStitch.x, &integer);
+  destination.fx   = wrap::floor<uint8_t>(fractional * 256.0F);
+  destination.x    = gsl::narrow<uint16_t>(integer);
+  destination.spcx = 0;
+  fractional       = modf(source.y - LowerLeftStitch.y, &integer);
+  destination.fy   = wrap::floor<uint8_t>(fractional * 256.0F);
+  destination.y    = gsl::narrow<uint16_t>(integer);
+  destination.spcy = 0;
   // ToDo - Are these structure members needed?
-  ClipStitchData[destination].myst = 1;
-  ClipStitchData[destination].tag  = 0x14;
+  destination.myst = 1;
+  destination.tag  = 0x14;
 }
 
 void thred::rtclpfn(uint32_t destination, uint32_t source) {
@@ -7845,12 +7845,12 @@ void thred::internal::duclip() {
 			ClipStitchData    = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 			auto iStitch      = 0U;
 			auto iDestination = 0U;
-			savclp(0, astch, 0);
+			savclp(ClipStitchData[0], astch[0], stitchCount);
 			iStitch++;
-			ClipStitchData[0].led = stitchCount;
 			iDestination++;
 			while (iStitch < stitchCount) {
-			  savclp(iDestination++, astch, iStitch++);
+			  savclp(ClipStitchData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
+			  ++iStitch;
 			}
 			SetClipboardData(Clip, ClipPointer);
 		  }
@@ -7915,15 +7915,16 @@ void thred::internal::duclip() {
 			  if (ClipPointer != nullptr) {
 				ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 				auto iTexture  = firstStitch;
-				savclp(0, *StitchBuffer, iTexture);
-				ClipStitchData[0].led = length;
+				savclp(ClipStitchData[0], StitchBuffer->operator[](iTexture),length);
 				iTexture++;
 				auto iDestination   = 1U;
 				auto codedAttribute = gsl::narrow<uint32_t>(ClosestFormToCursor << FRMSHFT);
 				while (iTexture < StitchBuffer->size()) {
 				  if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 				      ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
-					savclp(iDestination++, *StitchBuffer, iTexture);
+					savclp(ClipStitchData[iDestination++],
+					       StitchBuffer->operator[](iTexture),
+					       (StitchBuffer->operator[](iTexture).attribute & COLMSK));
 				  }
 				  iTexture++;
 				}
@@ -7953,11 +7954,11 @@ void thred::internal::duclip() {
 			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2U); // NOLINT
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
-			  savclp(0, *StitchBuffer, iSource);
-			  ClipStitchData[0].led = length;
+			  savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
 			  iSource++;
 			  for (auto iStitch = 1U; iStitch < length; iStitch++) {
-				savclp(iStitch, *StitchBuffer, iSource++);
+				savclp(ClipStitchData[iStitch], StitchBuffer->operator[](iSource), (StitchBuffer->operator[](iSource).attribute & COLMSK));
+				++iSource;
 			  }
 			  SetClipboardData(Clip, ClipPointer);
 			}

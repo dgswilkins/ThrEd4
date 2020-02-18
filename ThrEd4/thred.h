@@ -395,7 +395,7 @@ namespace internal {
   void sachk();
   void sav();
   void savAs();
-  void savclp(uint32_t destination, std::vector<fPOINTATTR>& buffer, uint32_t source);
+  void savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led);
   auto savcmp() noexcept -> bool;
   void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
   void savmap();
