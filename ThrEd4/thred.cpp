@@ -8839,8 +8839,8 @@ void thred::redclp() {
 
 #if CLPBUG
 	OutputDebugString(fmt::format(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n",
-	                              ClipBuffer[0].x,
-	                              ClipBuffer[0].y)
+	                              clipBuffer.back().x,
+	                              clipBuffer.back().y)
 	                      .c_str());
 #endif
 	clipRect.left = clipRect.right = clipBuffer[0].x;
@@ -8855,28 +8855,28 @@ void thred::redclp() {
 #if CLPBUG
 	  OutputDebugString(fmt::format(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n",
 	                                iStitch,
-	                                ClipBuffer[iStitch].x,
-	                                ClipBuffer[iStitch].y)
+	                                clipBuffer.back().x,
+	                                clipBuffer.back().y)
 	                        .c_str());
 #endif
-	  if (clipBuffer[iStitch].x < clipRect.left) {
-		clipRect.left = clipBuffer[iStitch].x;
+	  if (clipBuffer.back().x < clipRect.left) {
+		clipRect.left = clipBuffer.back().x;
 	  }
-	  if (clipBuffer[iStitch].x > clipRect.right) {
-		clipRect.right = clipBuffer[iStitch].x;
+	  if (clipBuffer.back().x > clipRect.right) {
+		clipRect.right = clipBuffer.back().x;
 	  }
-	  if (clipBuffer[iStitch].y < clipRect.bottom) {
-		clipRect.bottom = clipBuffer[iStitch].y;
+	  if (clipBuffer.back().y < clipRect.bottom) {
+		clipRect.bottom = clipBuffer.back().y;
 	  }
-	  if (clipBuffer[iStitch].y > clipRect.top) {
-		clipRect.top = clipBuffer[iStitch].y;
+	  if (clipBuffer.back().y > clipRect.top) {
+		clipRect.top = clipBuffer.back().y;
 	  }
 	}
-	clipBuffer[0].attribute = ActiveColor | codedLayer;
+	clipBuffer.front().attribute = ActiveColor | codedLayer;
 	ClipRectSize            = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
 	GlobalUnlock(ClipMemory);
 	if ((clipRect.left != 0.0F) || (clipRect.bottom != 0.0F)) {
-	  for (auto& clip : *ClipBuffer) {
+	  for (auto& clip : clipBuffer) {
 		clip.x -= clipRect.left;
 		clip.y -= clipRect.bottom;
 	  }
