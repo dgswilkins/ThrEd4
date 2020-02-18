@@ -5345,6 +5345,8 @@ void thred::internal::bak() {
   }
   StateMap.reset(StateFlag::FORMSEL);
   StateMap.reset(StateFlag::GRPSEL);
+  StateMap.reset(StateFlag::SCROS);
+  StateMap.reset(StateFlag::ECROS);
   redbak();
 }
 
