@@ -1404,13 +1404,13 @@ auto form::getplen() noexcept -> float {
 }
 
 void form::savplen(float length) {
-  auto integerPart = 0.0;
+  auto integerPart = 0.0F;
 
   if (length > 255.0F) {
 	length = 255.0F;
   }
   auto const fractionalPart = std::modf(length, &integerPart);
-  auto       fr             = wrap::floor<uint16_t>(fractionalPart * 256.0);
+  auto       fr             = wrap::floor<uint16_t>(fractionalPart * 256.0F);
   auto       num            = gsl::narrow<uint32_t>(integerPart);
 
   FormList->operator[](ClosestFormToCursor).picoLength = ((num << 8U) & 0xff00U) | fr;

@@ -4775,12 +4775,12 @@ void thred::internal::sav() {
 			  PCSStitchBuffer[iPCSstitch].tag  = 3;
 			  PCSStitchBuffer[iPCSstitch++].fx = gsl::narrow<uint8_t>(savcol);
 			}
-			auto integerPart                = 0.0;
+			auto integerPart                = 0.0F;
 			auto fractionalPart             = std::modf(stitch.x, &integerPart);
-			PCSStitchBuffer[iPCSstitch].fx  = wrap::floor<uint8_t>(fractionalPart * 256.0);
+			PCSStitchBuffer[iPCSstitch].fx  = wrap::floor<uint8_t>(fractionalPart * 256.0F);
 			PCSStitchBuffer[iPCSstitch].x   = gsl::narrow<int16_t>(integerPart);
 			fractionalPart                  = std::modf(stitch.y, &integerPart);
-			PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<uint8_t>(fractionalPart * 256.0);
+			PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<uint8_t>(fractionalPart * 256.0F);
 			PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<int16_t>(integerPart);
 		  }
 		  if (FALSE == WriteFile(PCSFileHandle,
@@ -7586,11 +7586,11 @@ void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led)
   auto integer = 0.0F;
 
   destination.led  = led;
-  auto fractional  = modf(source.x - LowerLeftStitch.x, &integer);
+  auto fractional  = std::modf(source.x - LowerLeftStitch.x, &integer);
   destination.fx   = wrap::floor<uint8_t>(fractional * 256.0F);
   destination.x    = gsl::narrow<uint16_t>(integer);
   destination.spcx = 0;
-  fractional       = modf(source.y - LowerLeftStitch.y, &integer);
+  fractional       = std::modf(source.y - LowerLeftStitch.y, &integer);
   destination.fy   = wrap::floor<uint8_t>(fractional * 256.0F);
   destination.y    = gsl::narrow<uint16_t>(integer);
   destination.spcy = 0;
