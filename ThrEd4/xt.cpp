@@ -2369,10 +2369,9 @@ void xt::internal::rtrclpfn(FRMHED const& form) {
 	  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2U); // NOLINT
 	  if (ClipPointer != nullptr) {
 		ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
-		thred::rtclpfn(0, 0);
-		ClipStitchData[0].led = count;
+		thred::savclp(ClipStitchData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; iStitch++) {
-		  thred::rtclpfn(iStitch, iStitch);
+		  thred::savclp(ClipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
 		}
 		SetClipboardData(Clip, ClipPointer);
 	  }

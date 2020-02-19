@@ -58,8 +58,8 @@ void rotang1(fPOINTATTR const& unrotatedPoint, fPOINT& rotatedPoint, float rotat
 void rotangf(fPOINT const& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept;
 void rotflt(fPOINT& point, float rotationAngle, fPOINT const& rotationCenter) noexcept;
 void rotfn(float rotationAngle, fPOINT const& rotationCenter);
-void rtclpfn(uint32_t destination, uint32_t source);
 void sCor2px(fPOINT const& stitchCoordinate, POINT& pixelCoordinate);
+void savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led);
 void savdo();
 void save();
 void selRct(fRECTANGLE& sourceRect) noexcept;
@@ -395,7 +395,6 @@ namespace internal {
   void sachk();
   void sav();
   void savAs();
-  void savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led);
   auto savcmp() noexcept -> bool;
   void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
   void savmap();

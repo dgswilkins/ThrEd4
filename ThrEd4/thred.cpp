@@ -7582,7 +7582,7 @@ void thred::internal::rot(fPOINT& rotationCenter) {
   ritrot(0, rotationCenter);
 }
 
-void thred::internal::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led) {
+void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led) {
   auto integer = 0.0F;
 
   destination.led  = led;
@@ -7597,24 +7597,6 @@ void thred::internal::savclp(CLPSTCH& destination, fPOINTATTR const& source, uin
   // ToDo - Are these structure members needed?
   destination.myst = 1;
   destination.tag  = 0x14;
-}
-
-void thred::rtclpfn(uint32_t destination, uint32_t source) {
-  auto        integer    = 0.0F;
-  auto const& clipBuffer = *ClipBuffer;
-
-  ClipStitchData[destination].led  = 0;
-  auto fractional                  = modf(clipBuffer[source].x - LowerLeftStitch.x, &integer);
-  ClipStitchData[destination].fx   = wrap::floor<uint8_t>(fractional * 256.0F);
-  ClipStitchData[destination].x    = gsl::narrow<uint16_t>(integer);
-  ClipStitchData[destination].spcx = 0;
-  fractional                       = modf(clipBuffer[source].y - LowerLeftStitch.y, &integer);
-  ClipStitchData[destination].fy   = wrap::floor<uint8_t>(fractional * 256.0F);
-  ClipStitchData[destination].y    = gsl::narrow<uint16_t>(integer);
-  ClipStitchData[destination].spcy = 0;
-  // ToDo - Are these structure members needed?
-  ClipStitchData[destination].myst = 1;
-  ClipStitchData[destination].tag  = 0x14;
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
