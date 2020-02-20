@@ -161,7 +161,7 @@ void rotdup();
 void rotfrm(FRMHED& form, uint32_t newStartVertex);
 auto rotpar() -> fPOINT;
 void rstfrm();
-void sRct2px(fRECTANGLE const& stitchRect, RECT& screenRect);
+auto sRct2px(fRECTANGLE const& stitchRect) -> RECT;
 void savblen(float fLength);
 void savplen(float length);
 void selal();

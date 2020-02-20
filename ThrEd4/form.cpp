@@ -643,13 +643,13 @@ void form::unpsel() {
   }
 }
 
-void form::sRct2px(fRECTANGLE const& stitchRect, RECT& screenRect) {
-  screenRect.left   = wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x);
-  screenRect.top    = wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
-                                       (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y);
-  screenRect.right  = wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x);
-  screenRect.bottom = wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
-                                          (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y);
+auto form::sRct2px(fRECTANGLE const& stitchRect) -> RECT {
+  return RECT {wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x),
+               wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
+                                   (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y),
+               wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x),
+               wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
+                                   (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
 void form::drwfrm() {
@@ -730,7 +730,7 @@ void form::drwfrm() {
 		  fi::frmsqr0(formLines[0]);
 		}
 		if (StateMap.test(StateFlag::FPSEL) && ClosestFormToCursor == iForm) {
-		  form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
+		  SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
 		  form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
 		  StateMap.set(StateFlag::SHOPSEL);
 		  form::dupsel(StitchWindowMemDC);
@@ -5206,8 +5206,7 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
-  auto rectangle = RECT {0L, 0L, 0L, 0L};
-  form::sRct2px(currentForm.rectangle, rectangle);
+  auto rectangle = form::sRct2px(currentForm.rectangle);
   auto& formControls = *FormControlPoints;
   formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
   formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;

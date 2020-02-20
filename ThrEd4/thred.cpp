@@ -9676,7 +9676,7 @@ void thred::setpsel() {
   form::unpsel();
   auto const& form = FormList->operator[](ClosestFormToCursor);
   thi::duprct(form);
-  form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
+  SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
   EndPointCross = form::sfCor2px(vertexIt[SelectedFormVertices.finish]);
