@@ -313,7 +313,7 @@ void satin::satsel() {
 	thred::duzrat();
 	StartPoint    = ClosestVertexToCursor;
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-	form::sfCor2px(vertexIt[ClosestVertexToCursor], FormLines->front());
+	FormLines->front() = form::sfCor2px(vertexIt[ClosestVertexToCursor]);
 	StateMap.reset(StateFlag::SHOCON);
 	StateMap.set(StateFlag::SATCNKT);
 	if (form.type == FRMFPOLY) {

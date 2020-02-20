@@ -3368,7 +3368,7 @@ void thred::internal::nuselrct() {
 
   auto iPoint = outline.begin();
   for (auto& controlPoint : *FormControlPoints) {
-	form::sfCor2px(*iPoint, controlPoint);
+	controlPoint = form::sfCor2px(*iPoint);
 	iPoint++;
   }
 }
@@ -9679,7 +9679,7 @@ void thred::setpsel() {
   form::sRct2px(SelectedVerticesRect, SelectedPixelsRect);
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-  form::sfCor2px(vertexIt[SelectedFormVertices.finish], EndPointCross);
+  EndPointCross = form::sfCor2px(vertexIt[SelectedFormVertices.finish]);
   StateMap.set(StateFlag::SHOPSEL);
   form::dupsel(StitchWindowDC);
   StateMap.set(StateFlag::FPSEL);
@@ -11992,18 +11992,18 @@ void thred::internal::setpclp() {
   auto point = POINT {0L, 0L};
   FormVerticesAsLine->clear();
   auto it = InterleaveSequence->begin();
-  form::sfCor2px(*it, point);
+  point = form::sfCor2px(*it);
   it++;
   FormVerticesAsLine->push_back(point);
-  form::sfCor2px(*it, point);
+  point = form::sfCor2px(*it);
   auto const offset =
       POINT {Msg.pt.x - StitchWindowOrigin.x - point.x, Msg.pt.y - StitchWindowOrigin.y - point.y};
   for (auto ine = 1U; ine < wrap::toUnsigned(InterleaveSequence->size()) - 1U; ine++) {
-	form::sfCor2px(*it, point);
+	point = form::sfCor2px(*it);
 	it++;
 	FormVerticesAsLine->push_back(POINT {point.x + offset.x, point.y + offset.y});
   }
-  form::sfCor2px(InterleaveSequence->back(), point);
+  point = form::sfCor2px(InterleaveSequence->back());
   FormVerticesAsLine->push_back(point);
 }
 

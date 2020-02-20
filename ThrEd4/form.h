@@ -177,7 +177,7 @@ void setins();
 void setmfrm();
 void setrang();
 void setstrtch();
-void sfCor2px(fPOINT const& stitchPoint, POINT& screen);
+auto sfCor2px(fPOINT const& stitchPoint) -> POINT;
 void shrnk();
 void snap();
 void spltfrm();

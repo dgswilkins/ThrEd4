@@ -288,10 +288,10 @@ void form::frmout(uint32_t formIndex) {
   }
 }
 
-void form::sfCor2px(fPOINT const& stitchPoint, POINT& screen) {
-  screen.x = wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x);
-  screen.y = wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                 (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y);
+auto form::sfCor2px(fPOINT const& stitchPoint) -> POINT {
+  return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
+                wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                                    (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
 void form::internal::px2stchf(POINT const& screen, fPOINT& stitchPoint) noexcept {
@@ -527,9 +527,9 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
   formOutline[1].x = formOutline[5].x = form::midl(rectangle.right, rectangle.left);
   formOutline[3].y = formOutline[7].y = form::midl(rectangle.top, rectangle.bottom);
   for (auto controlPoint = 0U; controlPoint < 8U; controlPoint++) {
-	form::sfCor2px(formOutline[controlPoint], pixelOutline[controlPoint]);
+	pixelOutline[controlPoint] = form::sfCor2px(formOutline[controlPoint]);
   }
-  form::sfCor2px(formOutline[0], pixelOutline[8]);
+  pixelOutline[8] = form::sfCor2px(formOutline[0]);
   Polyline(dc, static_cast<POINT*>(pixelOutline), 9);
   for (auto controlPoint = 0U; controlPoint < 8U; controlPoint++) {
 	form::selsqr(pixelOutline[controlPoint], dc);
@@ -687,8 +687,8 @@ void form::drwfrm() {
 		  auto const maxGuide = FormList->operator[](iForm).satinGuideCount;
 		  auto guideIt        = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 		  for (auto iGuide = 0U; iGuide < maxGuide; iGuide++) {
-			form::sfCor2px(vertexIt[guideIt[iGuide].start], line[0]);
-			form::sfCor2px(vertexIt[guideIt[iGuide].finish], line[1]);
+			line[0] = form::sfCor2px(vertexIt[guideIt[iGuide].start]);
+			line[1] = form::sfCor2px(vertexIt[guideIt[iGuide].finish]);
 			SelectObject(StitchWindowMemDC, FormPen);
 			Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
 		  }
@@ -848,14 +848,14 @@ void form::setmfrm() {
   auto        point     = POINT {0L, 0L};
   auto const& closeForm = FormList->operator[](ClosestFormToCursor);
   auto vertexIt         = std::next(FormVertices->cbegin(), closeForm.vertexIndex);
-  form::sfCor2px(vertexIt[0], point);
+  point = form::sfCor2px(vertexIt[0]);
   auto const offset =
       POINT {Msg.pt.x - StitchWindowOrigin.x - point.x + wrap::round<int32_t>(FormMoveDelta.x),
              Msg.pt.y - StitchWindowOrigin.y - point.y + wrap::round<int32_t>(FormMoveDelta.y)};
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(closeForm.vertexCount) + 1U);
   for (auto iForm = 0U; iForm < closeForm.vertexCount; iForm++) {
-	form::sfCor2px(vertexIt[iForm], point);
+	point = form::sfCor2px(vertexIt[iForm]);
 	formLines[iForm].x = point.x + offset.x;
 	formLines[iForm].y = point.y + offset.y;
   }
@@ -5253,7 +5253,7 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
       point.y <= rectangle.bottom) {
 	auto formOrigin = POINT {0L, 0L};
 	auto vertexIt   = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
-	form::sfCor2px(vertexIt[0], formOrigin);
+	formOrigin = form::sfCor2px(*vertexIt);
 	FormMoveDelta = fPOINT {formOrigin.x - point.x, formOrigin.y - point.y};
 	StateMap.set(StateFlag::FRMOV);
 	return true;
