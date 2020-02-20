@@ -6374,12 +6374,13 @@ auto thred::internal::nuBit() noexcept -> COLORREF {
   return ChooseColor(&BitMapColorStruct);
 }
 
-void thred::pxCor2stch(POINT const& point) noexcept {
-  auto ratio = gsl::narrow_cast<float>(point.x - StitchWindowAbsRect.left) /
-               gsl::narrow_cast<float>(StitchWindowClientRect.right);
-  SelectedPoint.x = ratio * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-  ratio = (gsl::narrow_cast<double>(StitchWindowAbsRect.bottom) - point.y) / StitchWindowClientRect.bottom;
-  SelectedPoint.y = ratio * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
+auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
+  auto ratioX = gsl::narrow_cast<float>(point.x - StitchWindowAbsRect.left) /
+                gsl::narrow_cast<float>(StitchWindowClientRect.right);
+  auto ratioY = gsl::narrow_cast<float>(StitchWindowAbsRect.bottom - point.y) /
+                gsl::narrow_cast<float>(StitchWindowClientRect.bottom);
+  return fPOINT {ratioX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
+                 ratioY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
 
 auto thred::px2stch() noexcept -> bool {
@@ -12024,7 +12025,7 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
   auto const point = POINT {(Msg.pt.x + gsl::narrow_cast<decltype(Msg.pt.x)>(FormMoveDelta.x)),
                             (Msg.pt.y + gsl::narrow_cast<decltype(Msg.pt.y)>(FormMoveDelta.y))};
   auto       it    = std::next(InterleaveSequence->begin(), 1);
-  thred::pxCor2stch(point);
+  SelectedPoint = thred::pxCor2stch(point);
   auto const offset                 = fPOINT {SelectedPoint.x - it->x, SelectedPoint.y - it->y};
   auto const count                  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
   auto& form                        = FormList->operator[](closestFormToCursor);

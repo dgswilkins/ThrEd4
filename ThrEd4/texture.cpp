@@ -1679,7 +1679,7 @@ void texture::setshft() {
   StateMap.reset(StateFlag::BZUMIN);
   selectionRect.top  = ZoomBoxOrigin.y;
   selectionRect.left = ZoomBoxOrigin.x;
-  thred::pxCor2stch(
+  SelectedPoint      = thred::pxCor2stch(
       POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
   selectionRect.bottom = SelectedPoint.y;
   selectionRect.right  = SelectedPoint.x;

@@ -47,7 +47,7 @@ void grpAdj();
 void hidbit();
 void movStch();
 auto px2stch() noexcept -> bool;
-void pxCor2stch(POINT const& point) noexcept;
+auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
 void ritfcor(fPOINT const& point);

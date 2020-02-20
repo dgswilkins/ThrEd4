@@ -923,12 +923,12 @@ auto form::pdir(FRMHED const& form, uint32_t vertex) -> uint32_t {
 
 void form::pxrct2stch(RECT const& screenRect, fRECTANGLE& stitchRect) noexcept {
   auto corner = POINT {screenRect.left + StitchWindowOrigin.x, screenRect.top + StitchWindowOrigin.y};
-  thred::pxCor2stch(corner);
-  stitchRect.left = SelectedPoint.x;
-  stitchRect.top  = SelectedPoint.y;
-  corner.x        = screenRect.right + StitchWindowOrigin.x;
-  corner.y        = screenRect.bottom + StitchWindowOrigin.y;
-  thred::pxCor2stch(corner);
+  SelectedPoint     = thred::pxCor2stch(corner);
+  stitchRect.left   = SelectedPoint.x;
+  stitchRect.top    = SelectedPoint.y;
+  corner.x          = screenRect.right + StitchWindowOrigin.x;
+  corner.y          = screenRect.bottom + StitchWindowOrigin.y;
+  SelectedPoint     = thred::pxCor2stch(corner);
   stitchRect.right  = SelectedPoint.x;
   stitchRect.bottom = SelectedPoint.y;
 }
@@ -5264,7 +5264,7 @@ void form::rstfrm() {
 
   form::setmfrm();
   StateMap.reset(StateFlag::FRMOV);
-  thred::pxCor2stch(point);
+  SelectedPoint       = thred::pxCor2stch(point);
   auto& currentForm   = FormList->operator[](ClosestFormToCursor);
   auto       vertexIt = std::next(FormVertices->begin(), currentForm.vertexIndex);
   auto const offset   = fPOINT {SelectedPoint.x - vertexIt[0].x, SelectedPoint.y - vertexIt[0].y};
