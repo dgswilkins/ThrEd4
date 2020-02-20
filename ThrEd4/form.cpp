@@ -294,13 +294,13 @@ auto form::sfCor2px(fPOINT const& stitchPoint) -> POINT {
                                     (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
-void form::internal::px2stchf(POINT const& screen, fPOINT& stitchPoint) noexcept {
+auto form::internal::px2stchf(POINT const& screen) noexcept -> fPOINT {
   auto const factorX =
       gsl::narrow_cast<float>(screen.x) / gsl::narrow_cast<float>(StitchWindowClientRect.right);
   auto const factorY =
       (gsl::narrow_cast<float>(StitchWindowClientRect.bottom) - screen.y) / StitchWindowClientRect.bottom;
-  stitchPoint.x = factorX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-  stitchPoint.y = factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
+  return fPOINT {factorX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
+                 factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
 
 void form::frmlin(FRMHED const& form) {
@@ -384,12 +384,10 @@ void form::internal::rats() {
 
 void form::setfrm() {
   if (!FormList->empty()) {
-	auto point = fPOINT {};
-
 	fi::rats();
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-	auto& form          = FormList->back();
-	fi::px2stchf(FormLines->front(), point);
+	ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+	auto&      form      = FormList->back();
+	auto const point     = fi::px2stchf(FormLines->front());
 	auto       vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	auto const delta     = fPOINT {point.x - vertexIt->x, point.y - vertexIt->y};
 	auto&      rectangle = form.rectangle;
@@ -1111,13 +1109,12 @@ auto form::closfrm() -> bool {
 	auto const screenCoordinate =
 	    POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	fi::rats();
-	auto closestForm   = 0U;
-	auto closestVertex = 0U;
-	auto point         = fPOINT {};
-	auto minimumLength = 1e99;
-	fi::px2stchf(screenCoordinate, point);
-	auto const layerCoded = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
-	auto const maxForm    = wrap::toUnsigned(FormList->size());
+	auto       closestForm   = 0U;
+	auto       closestVertex = 0U;
+	auto       minimumLength = 1e99;
+	auto const point         = fi::px2stchf(screenCoordinate);
+	auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
+	auto const maxForm       = wrap::toUnsigned(FormList->size());
 	for (auto iForm = 0U; iForm < maxForm; iForm++) {
 	  if (StateMap.test(StateFlag::FRMSAM) && iForm == ClosestFormToCursor) {
 		continue;
@@ -5053,11 +5050,11 @@ void form::setfpnt() {
 
   auto const screenCoordinate =
       POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex + ClosestVertexToCursor);
 
   form::unfrm();
   fi::rats();
-  fi::px2stchf(screenCoordinate, vertexIt[ClosestVertexToCursor]);
+  *vertexIt = fi::px2stchf(screenCoordinate);
   form::frmout(ClosestFormToCursor);
   refil();
   StateMap.set(StateFlag::WASFPNT);
@@ -6260,8 +6257,7 @@ void form::setexpand(float xyRatio) {
   }
   auto const integerReference =
       POINT {wrap::round<int32_t>(reference.x), wrap::round<int32_t>(reference.y)};
-  auto stitchReference = fPOINT {};
-  fi::px2stchf(integerReference, stitchReference);
+  auto const stitchReference = fi::px2stchf(integerReference);
   if (StateMap.test(StateFlag::FPSEL)) {
 	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	auto iCurrent = SelectedFormVertices.start;

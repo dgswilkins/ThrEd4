@@ -408,7 +408,7 @@ namespace internal {
       -> bool;
   void prpsbrd(uint32_t formIndex);
   void prsmal(float width);
-  void px2stchf(POINT const& screen, fPOINT& stitchPoint) noexcept;
+  auto px2stchf(POINT const& screen) noexcept -> fPOINT;
   void rats();
   auto regclos(std::vector<uint32_t>&        groupIndexSequence,
                std::vector<SMALPNTL>&        lineEndpoints,
