@@ -61,6 +61,8 @@ uint16_t LoadStringList[] = {
     IDS_FRMBOX,    IDS_TXOF,
 };
 
+auto LoadStringSpan = gsl::span(LoadStringList);
+
 void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
   sDest.clear();
@@ -129,7 +131,7 @@ void displayText::tabmsg(uint32_t code) {
 
 void displayText::lodstr() {
   for (auto iString = 0; iString < STR_LEN; iString++) {
-	displayText::loadString(StringTable->operator[](iString), LoadStringList[iString]);
+	displayText::loadString(StringTable->operator[](iString), LoadStringSpan[iString]);
   }
 }
 
