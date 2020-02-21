@@ -875,7 +875,7 @@ void form::durpoli(uint32_t vertexCount) {
   newForm.type        = FRMFPOLY;
   FormList->push_back(newForm);
   ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto point    = SelectedPoint;
   auto angle    = 0.0F;
   auto vertexIt = std::next(FormVertices->begin(), newForm.vertexIndex);
@@ -5201,13 +5201,12 @@ void form::filangl() {
 }
 
 auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
-  auto const point = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-
+  auto const  point = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
-  auto rectangle = form::sRct2px(currentForm.rectangle);
-  auto& formControls = *FormControlPoints;
+  auto const rectangle    = form::sRct2px(currentForm.rectangle);
+  auto&      formControls = *FormControlPoints;
   formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
   formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
   formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;
@@ -5422,7 +5421,7 @@ void form::filsat() {
 auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
   auto minimumLength = 1e99;
 
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	auto& formIter = FormList->operator[](iForm);
 	if (formIter.vertexCount != 0U) {
@@ -5667,7 +5666,7 @@ void form::infrm() { // insert multiple points into a form
 }
 
 void form::setins() {
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   fi::nufpnt(FormVertexPrev, *FormForInsert);
   if (StateMap.test(StateFlag::PRELIN)) {
 	auto vertexIt = std::next(FormVertices->begin(), FormForInsert->vertexIndex);
@@ -5933,7 +5932,7 @@ void form::setstrtch() {
 	  form::pxrct2stch(SelectedFormsRect, stitchRect);
 	}
 	else {
-	  thred::px2stch();
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  stitchRect = fRECTANGLE {0.0F, 0.0F, 0.0F, 0.0F};
 	}
   }
@@ -6161,7 +6160,7 @@ void form::setexpand(float xyRatio) {
 	size0.y         = rectangle.bottom - rectangle.top;
   }
   else {
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	if (StateMap.test(StateFlag::FORMSEL)) {
 	  rectangle = form.rectangle;
 	}
@@ -6450,7 +6449,7 @@ void form::dustar(uint32_t starCount, float length) {
   newForm.type           = FRMFPOLY;
   FormList->push_back(newForm);
   ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto point = SelectedPoint;
   StateMap.set(StateFlag::FILDIR);
   auto vertexIt = std::next(FormVertices->begin(), newForm.vertexIndex);
@@ -6497,7 +6496,7 @@ void form::duspir(uint32_t stepCount) {
   firstSpiral.resize(stepCount);
   auto centeredSpiral = std::vector<fPOINT> {};
   centeredSpiral.resize(stepCount);
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto point = SelectedPoint;
   auto angle = 0.0F;
   for (auto iStep = 0U; iStep < stepCount; iStep++) {
@@ -6545,7 +6544,7 @@ void form::duhart(uint32_t sideCount) {
   currentForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
   auto savedVertexIndex = gsl::narrow<uint32_t>(FormVertices->size());
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto       point     = SelectedPoint;
   auto       stepAngle = PI_F * 2.0F / gsl::narrow_cast<float>(sideCount);
   auto const length    = 300.0F / gsl::narrow_cast<float>(sideCount) * ZoomFactor *
@@ -6626,7 +6625,7 @@ void form::dulens(uint32_t sides) {
   ClosestFormToCursor     = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
   currentForm.vertexIndex = gsl::narrow<decltype(currentForm.vertexIndex)>(FormVertices->size());
   currentForm.attribute   = ActiveLayer << 1U;
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto point   = SelectedPoint;
   auto iVertex = 0U;
   FormVertices->reserve(FormVertices->size() + wrap::toSize(steps << 1U) + 1U);
@@ -6699,7 +6698,7 @@ void form::duzig(uint32_t vertices) {
   newForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   FormList->push_back(newForm);
   ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto const offset = fPOINT {UnzoomedRect.x / 6.0, UnzoomedRect.y / (6.0 * vertices)};
   auto vertexIt = std::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
   for (auto iVertex = 0U; iVertex < vertices; iVertex++) {

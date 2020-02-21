@@ -6383,15 +6383,9 @@ auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
                  ratioY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
 
-auto thred::px2stch() noexcept -> bool {
+auto thred::inStitchWin() noexcept -> bool {
   if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right &&
       Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
-	auto tdub = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) /
-	            gsl::narrow_cast<float>(StitchWindowClientRect.right);
-	SelectedPoint.x = tdub * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-	tdub =
-	    (gsl::narrow_cast<double>(StitchWindowAbsRect.bottom) - Msg.pt.y) / StitchWindowClientRect.bottom;
-	SelectedPoint.y = tdub * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom;
 	return true;
   }
   return false;
@@ -6481,7 +6475,8 @@ void thred::internal::zumin() {
 		                        form::midl(SelectedFormsRect.top, SelectedFormsRect.bottom)};
 		break;
 	  }
-	  if (!thred::px2stch()) {
+	  if (!thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		centr();
 	  }
 	} while (false);
@@ -6506,7 +6501,8 @@ void thred::internal::zumin() {
 void thred::internal::zumshft() {
   if (StateMap.test(StateFlag::ZUMED)) {
 	unboxs();
-	if (thred::px2stch()) {
+	if (thred::inStitchWin()) {
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  NearestCount = 0;
 	  thred::shft(SelectedPoint);
 	  if (StateMap.test(StateFlag::RUNPAT)) {
@@ -6554,7 +6550,8 @@ void thred::internal::zumout() {
 		shft2box();
 		break;
 	  }
-	  if (!thred::px2stch()) {
+	  if (!thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		centr();
 	  }
 	} while (false);
@@ -6612,7 +6609,7 @@ void thred::internal::closPnt() {
 	GapToNearest[iNear] = 1e99;
 	NearestPoint[iNear] = -1;
   }
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 	auto const iStitch0 = ColorChangeTable[iColor].stitchIndex;
 	auto const iStitch1 = ColorChangeTable[iColor + 1U].stitchIndex;
@@ -6655,7 +6652,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 		return true;
 	  }
 	}
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	DistanceToClick = 1e99;
 	if (StateMap.test(StateFlag::HID)) {
 	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
@@ -7037,7 +7034,7 @@ void thred::internal::istch() {
   if (StateMap.test(StateFlag::SELBOX)) {
 	if ((ClosestPointIndex != 0U) &&
 	    ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
-	  thred::px2stch();
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  auto& stitch    = StitchBuffer->operator[](ClosestPointIndex);
 	  auto& prvStitch = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
 	  auto& nxtStitch = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
@@ -7247,7 +7244,7 @@ void thred::internal::clpbox() {
   auto const ratio =
       gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   if (SelectedPoint.x + ClipRectSize.cx > UnzoomedRect.x) {
 	SelectedPoint.x = UnzoomedRect.x - ClipRectSize.cx;
   }
@@ -7290,7 +7287,7 @@ void thred::internal::rSelbox() {
                                         gsl::narrow_cast<int32_t>(lround(SelectBoxSize.cy * ratio))};
 
   unsel();
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   if (SelectedPoint.x - SelectBoxOffset.x + SelectBoxSize.cx >= UnzoomedRect.x) {
 	SelectedPoint.x = gsl::narrow_cast<float>(UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x);
   }
@@ -7324,7 +7321,7 @@ void thred::internal::rSelbox() {
 }
 
 void thred::internal::duSelbox() {
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   SelectBoxSize = {wrap::round<int32_t>(StitchRangeRect.right - StitchRangeRect.left),
                    wrap::round<int32_t>(StitchRangeRect.top - StitchRangeRect.bottom)};
 
@@ -10572,7 +10569,7 @@ void thred::internal::selalstch() {
 }
 
 void thred::internal::duinsfil() {
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto const offset = fPOINT {SelectedPoint.x - InsertCenter.x, SelectedPoint.y - InsertCenter.y};
   for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	auto& formRectangle = FormList->operator[](iForm).rectangle;
@@ -12298,14 +12295,14 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   movchk();
-  if (Msg.pt.x >= StitchWindowAbsRect.left && Msg.pt.x <= StitchWindowAbsRect.right &&
-      Msg.pt.y >= StitchWindowAbsRect.top && Msg.pt.y <= StitchWindowAbsRect.bottom) {
+  if (thred::inStitchWin()) {
 	if (wrap::pressed(VK_SHIFT)) {
 	  xt::mvshft();
 	  return true;
 	}
 	do {
-	  if ((wrap::pressed(VK_SHIFT)) && thred::px2stch()) {
+	  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		thred::ritfcor(SelectedPoint);
 	  }
 	  if ((StateMap.test(StateFlag::PRFACT) || StateMap.test(StateFlag::FORMIN) ||
@@ -12517,14 +12514,15 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	                                   Msg.pt.y - StitchWindowOrigin.y};
 	  StateMap.set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
-	  if (thred::px2stch()) {
+	  if (thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		thred::ritfcor(SelectedPoint);
 	  }
 	  return true;
 	}
 	if (StateMap.test(StateFlag::MOVCNTR)) {
 	  unrot();
-	  thred::px2stch();
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  ritrot(rotationAngle, SelectedPoint);
 	  return true;
 	}
@@ -12566,7 +12564,8 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
 	if (StateMap.test(StateFlag::CAPT)) {
-	  if (thred::px2stch()) {
+	  if (thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		thred::ritfcor(SelectedPoint);
 	  }
 	  unlin();
@@ -12575,7 +12574,8 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
 	if (StateMap.test(StateFlag::INSRT)) {
-	  if (thred::px2stch()) {
+	  if (thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		thred::ritfcor(SelectedPoint);
 	  }
 	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
@@ -12624,7 +12624,8 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::px2stch()) {
+  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	texture::setshft();
 	return true;
   }
@@ -12725,7 +12726,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	ReleaseCapture();
 	StateMap.reset(StateFlag::CAPT);
 	thred::savdo();
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	StitchBuffer->operator[](ClosestPointIndex).x = SelectedPoint.x;
 	StitchBuffer->operator[](ClosestPointIndex).y = SelectedPoint.y;
 	StitchBuffer->operator[](ClosestPointIndex).attribute |= USMSK;
@@ -12743,7 +12744,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	return true;
   }
   if (StateMap.test(StateFlag::BZUMIN)) {
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	if (StateMap.testAndReset(StateFlag::BOXSLCT)) {
 	  if (ZoomBoxOrigin.x > SelectedPoint.x) {
 		StitchRangeRect.right = ZoomBoxOrigin.x;
@@ -13053,8 +13054,9 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	StateMap.set(StateFlag::RESTCH);
 	return true;
   }
-  if (thred::px2stch() && !(StateMap.test(StateFlag::SIZSEL) &&
+  if (thred::inStitchWin() && !(StateMap.test(StateFlag::SIZSEL) &&
                             thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
 	  if ((Msg.wParam & MK_SHIFT) != 0U) { // NOLINT
 		TmpFormIndex = ClosestFormToCursor;
@@ -14083,7 +14085,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
                                            FRMHED const&       textureForm,
                                            bool&               retflag) -> bool {
   retflag = true;
-  if ((wrap::pressed(VK_SHIFT)) && thred::px2stch()) {
+  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	xt::dushft();
 	return true;
   }
@@ -14170,7 +14173,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	StateMap.reset(StateFlag::MOVFRMS);
 	auto formsRect = fRECTANGLE {};
 	form::pxrct2stch(SelectedFormsRect, formsRect);
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	FormMoveDelta = fPOINT {SelectedPoint.x - form::midl(formsRect.right, formsRect.left),
 	                        SelectedPoint.y - form::midl(formsRect.top, formsRect.bottom)};
 	for (auto iForm = 0U; iForm < ClipFormsCount; iForm++) {
@@ -14504,8 +14507,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   thred::unmsg();
-  if (thred::px2stch() && !(StateMap.test(StateFlag::SIZSEL) &&
+  if (thred::inStitchWin() && !(StateMap.test(StateFlag::SIZSEL) &&
                             thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	unpat();
 	if (StateMap.testAndReset(StateFlag::ROTAT)) {
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
@@ -14513,7 +14517,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	      fPOINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
 	              gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
 	  if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
-		thred::px2stch();
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		StateMap.set(StateFlag::MOVCNTR);
 		unrot();
 		ritrot(0, SelectedPoint);
@@ -14569,7 +14573,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	  ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	  ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-	  thred::px2stch();
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  ZoomBoxOrigin = SelectedPoint;
 	  StateMap.set(StateFlag::VCAPT);
 	  return true;
@@ -14589,7 +14593,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.test(StateFlag::INIT)) {
 	  unlin();
 	  if (StateMap.test(StateFlag::INSRT)) {
-		thred::px2stch();
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		auto code =
 		    (ActiveColor | USMSK | gsl::narrow_cast<decltype(ActiveColor)>(ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
 		if (StateMap.test(StateFlag::LIN1)) {
@@ -14711,7 +14715,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  }
 	}
 	else {
-	  if (thred::px2stch()) {
+	  if (thred::inStitchWin()) {
+		SelectedPoint = thred::pxCor2stch(Msg.pt);
 		thred::savdo();
 		InsertLine[0] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1] = InsertLine[0];
@@ -14735,7 +14740,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-	thred::px2stch();
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	ZoomBoxOrigin = SelectedPoint;
 	StateMap.set(StateFlag::VCAPT);
 	return true;
@@ -15874,7 +15879,8 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) / 2.0F, gsl::narrow_cast<float>(UnzoomedRect.y) / 2.0F);
 		}
 		else {
-		  if (thred::px2stch()) {
+		  if (thred::inStitchWin()) {
+			SelectedPoint = thred::pxCor2stch(Msg.pt);
 			dumrk(SelectedPoint.x, SelectedPoint.y);
 		  }
 		}

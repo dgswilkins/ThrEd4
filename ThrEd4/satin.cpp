@@ -185,7 +185,7 @@ void satin::internal::satclos() {
   auto                   minimumLength     = 1e99;
 
   form::uninsf();
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
 	auto const deltaX = SelectedPoint.x - vertexIt[iVertex].x;
@@ -285,7 +285,7 @@ void satin::satknkt() {
 auto satin::internal::satselfn() -> bool {
   auto minimumLength = 1e99;
 
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	auto& form = FormList->operator[](iForm);
 	auto const             layerCode =
@@ -1225,7 +1225,7 @@ void satin::internal::unsat() {
 
 void satin::drwsat() {
   si::unsat();
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto const vertexCount = TempPolygon->size();
   auto&      formLines   = *FormLines;
   formLines.resize(vertexCount + 1U);
@@ -1236,7 +1236,7 @@ void satin::drwsat() {
 }
 
 void satin::satpnt0() {
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto& formLines = *FormLines;
   formLines.clear();
   formLines.push_back(POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y});
@@ -1246,7 +1246,7 @@ void satin::satpnt0() {
 
 void satin::satpnt1() {
   si::unsat();
-  thred::px2stch();
+  SelectedPoint = thred::pxCor2stch(Msg.pt);
   auto const vertexCount   = TempPolygon->size();
   auto&      formLines     = *FormLines;
   formLines[vertexCount].x = Msg.pt.x - StitchWindowOrigin.x;

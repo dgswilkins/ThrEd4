@@ -396,7 +396,8 @@ void trace::trace() {
 	trace::untrace();
 	ti::tracwnd();
 	ti::getrmap();
-	if (thred::px2stch() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
+	if (thred::inStitchWin() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
+	  SelectedPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap.test(StateFlag::LANDSCAP)) {
 		SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	  }
@@ -658,7 +659,8 @@ void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept {
 }
 
 void trace::internal::dutrac() {
-  if (thred::px2stch()) {
+  if (thred::inStitchWin()) {
+	SelectedPoint = thred::pxCor2stch(Msg.pt);
 	if (!StateMap.test(StateFlag::WASEDG)) {
 	  trace::tracedg();
 	  return;
