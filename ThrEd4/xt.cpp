@@ -1425,7 +1425,8 @@ auto xt::internal::lastcol(uint32_t index, fPOINT& point) noexcept -> bool {
 
 void xt::internal::duint(FRMHED const& form, std::vector<fPOINTATTR>& buffer, uint32_t code, INTINF& ilData) {
   if (ilData.coloc > ilData.start) {
-	auto const count       = ilData.coloc - ilData.start;
+	auto const count = ilData.coloc > StitchBuffer->size() ? StitchBuffer->size() - ilData.start
+	                                                       : ilData.coloc - ilData.start;
 	auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
 	auto       sourceEnd   = sourceStart + count;
 
