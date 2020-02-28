@@ -86,9 +86,9 @@ void fcntr();
 void filangl();
 void filclpx();
 void filhor();
-void filin(fPOINT currentPoint);
-void filinsb(fPOINT const& point);
-void filinu(fPOINT const& inPoint);
+auto filin(fPOINT const& currentPoint, fPOINT const& stitchPoint) -> fPOINT;
+void filinsb(fPOINT const& point, fPOINT& stitchPoint);
+auto filinu(fPOINT const& inPoint, fPOINT const& stitchPoint) -> fPOINT;
 void filsat();
 void filvrt();
 auto find1st() -> uint32_t;
@@ -265,7 +265,7 @@ namespace internal {
              std::vector<REGION> const&    regionsList,
              uint32_t&                     lastGroup,
              uint32_t                      sequencePathIndex);
-  void duromb(fPOINT const& start0, fPOINT const& finish0, fPOINT const& start1, fPOINT const& finish1);
+  void duromb(fPOINT const& start0, fPOINT const& finish0, fPOINT const& start1, fPOINT const& finish1, fPOINT& stitchPoint);
   void duseq(std::vector<SMALPNTL*> const& sortedLines,
              uint32_t                      start,
              uint32_t                      finish,
@@ -279,7 +279,8 @@ namespace internal {
               std::vector<VRCT2> const& fillVerticalRect,
               uint32_t                  start,
               uint32_t                  finish,
-              float                     width);
+              float                     width,
+              fPOINT&                   stitchPoint);
   void filsclp();
   void filsfn();
   auto findDistanceToSide(fPOINT const& lineStart, fPOINT const& lineEnd, fPOINT const& point, double& distance) noexcept
@@ -370,7 +371,7 @@ namespace internal {
   auto nucseg(std::vector<CLPSEG> const&  clipSegments,
               std::vector<LENINFO> const& sortedLengths,
               uint32_t&                   currentSegmentIndex) -> bool;
-  void nufpnt(uint32_t vertex, FRMHED& formForInsert);
+  void nufpnt(uint32_t vertex, FRMHED& formForInsert, fPOINT const& stitchPoint);
   void doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram);
   void nxtrgn(std::vector<RGSEQ>&           tempPath,
               std::vector<RCON> const&      pathMap,
@@ -399,7 +400,8 @@ namespace internal {
             std::vector<VRCT2> const& underlayVerticalRect,
             std::vector<VRCT2> const& fillVerticalRect,
             std::vector<VRCT2> const& prct,
-            float                     width);
+            float                     width,
+            fPOINT&                   stitchPoint);
   void prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
   auto proj(fPOINT const& point, float slope, fPOINT const& point0, fPOINT const& point1, fPOINT& intersectionPoint) noexcept
       -> bool;
@@ -453,7 +455,7 @@ namespace internal {
   void shrnks();
   void snp(uint32_t start, uint32_t finish);
   void snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
-  void spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish);
+  void spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint);
   auto spltlin() -> bool;
   void sprct(std::vector<fPOINT> const* vertices,
              uint32_t                   vertexIndex,

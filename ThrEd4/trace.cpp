@@ -397,12 +397,13 @@ void trace::trace() {
 	ti::tracwnd();
 	ti::getrmap();
 	if (thred::inStitchWin() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
-	  SelectedPoint = thred::pxCor2stch(Msg.pt);
+	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap.test(StateFlag::LANDSCAP)) {
-		SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
+		stitchPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	  }
-	  BitmapPoint.x    = wrap::round<int32_t>(BmpStitchRatio.x * SelectedPoint.x);
-	  BitmapPoint.y    = wrap::round<int32_t>(BmpStitchRatio.y * SelectedPoint.y - 1.0F);
+	  BitmapPoint = POINT {wrap::round<int32_t>(BmpStitchRatio.x * stitchPoint.x),
+	                       wrap::round<int32_t>(BmpStitchRatio.y * stitchPoint.y - 1.0F)};
+
 	  auto const color = TraceBitmapData[BitmapPoint.y * BitmapWidth + BitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap.test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
@@ -660,17 +661,17 @@ void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept {
 
 void trace::internal::dutrac() {
   if (thred::inStitchWin()) {
-	SelectedPoint = thred::pxCor2stch(Msg.pt);
+	auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	if (!StateMap.test(StateFlag::WASEDG)) {
 	  trace::tracedg();
 	  return;
 	}
 	thred::savdo();
 	if (StateMap.test(StateFlag::LANDSCAP)) {
-	  SelectedPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
+	  stitchPoint.y -= (UnzoomedRect.y - BitmapSizeinStitches.y);
 	}
-	CurrentTracePoint.x = wrap::round<int32_t>(BmpStitchRatio.x * SelectedPoint.x);
-	CurrentTracePoint.y = wrap::round<int32_t>(BmpStitchRatio.y * SelectedPoint.y);
+	CurrentTracePoint = POINT {wrap::round<int32_t>(BmpStitchRatio.x * stitchPoint.x),
+	                           wrap::round<int32_t>(BmpStitchRatio.y * stitchPoint.y)};
 	if (CurrentTracePoint.x > gsl::narrow<int32_t>(BitmapWidth)) {
 	  CurrentTracePoint.x = BitmapWidth;
 	}

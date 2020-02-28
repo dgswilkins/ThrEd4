@@ -2553,8 +2553,7 @@ void xt::dushft() {
   ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
   ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
   ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
-  SelectedPoint = thred::pxCor2stch(Msg.pt);
-  ZoomBoxOrigin = SelectedPoint;
+  ZoomBoxOrigin = thred::pxCor2stch(Msg.pt);
 }
 
 void xt::mvshft() {

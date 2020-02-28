@@ -186,7 +186,6 @@ std::vector<POINT>*    SelectedFormsLine;    // line derived from the big rectan
 RECT   SelectedFormsRect;  // for multiple selections;
 fPOINT SelectedFormsSize;  // size of multiple select rectangle
 RECT   SelectedPixelsRect; // display form vertex select rectangle
-fPOINT SelectedPoint;      // for converting stitch coordinates to metric cordinates (mm)
 
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 

@@ -224,7 +224,6 @@ extern std::vector<POINT>*    SelectedFormsLine;
 extern RECT   SelectedFormsRect;
 extern fPOINT SelectedFormsSize;
 extern RECT   SelectedPixelsRect;
-extern fPOINT SelectedPoint;
 
 extern std::vector<POINT>* SelectedPointsLine;
 

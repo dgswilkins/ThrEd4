@@ -92,7 +92,7 @@ namespace internal {
   void box(uint32_t iNearest, HDC dc) noexcept;
   void boxs() noexcept;
   void bsavmen();
-  void centr();
+  auto centr() -> fPOINT;
   void chk1col();
   auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, fPOINT& rotationCenter, FRMHED& textureForm)
       -> bool;
@@ -157,7 +157,7 @@ namespace internal {
   void dstin(uint32_t number, POINT& pout) noexcept;
   void dstran(std::vector<DSTREC>& DSTData);
   auto dtrn(DSTREC* dpnt) -> uint32_t;
-  void duClos(uint32_t startStitch, uint32_t stitchCount) noexcept;
+  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint) noexcept;
   void duIns();
   void duSelbox();
   void duar();
