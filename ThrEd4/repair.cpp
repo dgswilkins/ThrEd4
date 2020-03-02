@@ -41,7 +41,6 @@ namespace ri = repair::internal;
 
 void repair::internal::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, code);
   repairMessage += fmtStr;
   displayText::loadString(fmtStr, IDS_NOTREP);
@@ -155,7 +154,6 @@ void repair::internal::chkTxt(FRMHED const& form, BADCNTS& badData) noexcept {
 
 auto repair::internal::frmchkfn() -> uint32_t {
   auto badData = BADCNTS {};
-
   if (!FormList->empty()) {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	  auto const& form = FormList->operator[](iForm);
@@ -220,7 +218,6 @@ void repair::internal::bcup(FRMHED const& form, BADCNTS& badData) noexcept {
 
 void repair::internal::chkfstch() noexcept {
   auto const codedFormIndex = FormList->size() << FRMSHFT;
-
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & FRMSK) >= codedFormIndex) {
 	  stitch.attribute = NOTFRM;
@@ -232,7 +229,6 @@ void repair::internal::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BADCNTS {};
   auto& formList     = *FormList;
-
   for (auto form : *FormList) {
 	if (form.vertexCount != 0U) {
 	  formList[iDestination++] = form;
@@ -277,11 +273,12 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 void repair::internal::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
-
-  auto clipPoint = std::vector<fPOINT> {};
+  auto clipPoint    = std::vector<fPOINT> {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-	auto& form                            = FormList->operator[](iForm);
-	auto                   clipDifference = 0U;
+	// clang-format off
+	auto& form           = FormList->operator[](iForm);
+	auto  clipDifference = 0U;
+	// clang-format on
 	if (clip::isclp(form)) {
 	  clipDifference = form.angleOrClipData.clip;
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
@@ -290,7 +287,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		auto sourceEnd   = std::next(sourceStart, form.lengthOrCount.clipCount);
 		auto destination = std::next(clipPoint.begin(), clipCount);
 		std::copy(sourceStart, sourceEnd, destination);
-
 		form.angleOrClipData.clip = clipCount;
 		clipCount += form.lengthOrCount.clipCount;
 	  }
@@ -302,7 +298,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		  auto sourceEnd   = std::next(sourceStart, form.lengthOrCount.clipCount);
 		  auto destination = std::next(clipPoint.begin(), clipCount);
 		  std::copy(sourceStart, sourceEnd, destination);
-
 		  form.angleOrClipData.clip = clipCount;
 		  clipCount += form.lengthOrCount.clipCount;
 		}
@@ -320,7 +315,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		auto sourceEnd   = std::next(sourceStart, form.clipEntries);
 		auto destination = std::next(clipPoint.begin(), clipCount);
 		std::copy(sourceStart, sourceEnd, destination);
-
 		form.borderClipData = clipCount;
 		clipCount += form.clipEntries;
 	  }
@@ -332,7 +326,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		  auto sourceEnd   = std::next(sourceStart, form.clipEntries);
 		  auto destination = std::next(clipPoint.begin(), clipCount);
 		  std::copy(sourceStart, sourceEnd, destination);
-
 		  form.borderClipData = clipCount;
 		  clipCount += form.clipEntries;
 		}
@@ -352,7 +345,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 void repair::internal::repsat() {
   auto guideCount = 0U;
   auto badData    = BADCNTS {};
-
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	auto& form = FormList->operator[](iForm);
 	if (form.type == SAT) {
@@ -388,7 +380,6 @@ void repair::internal::repsat() {
 void repair::internal::reptx() {
   auto textureCount = 0U;
   auto badData      = BADCNTS {};
-
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	if (texture::istx(iForm)) {
 	  auto& form = FormList->operator[](iForm);
@@ -426,7 +417,6 @@ void repair::internal::reptx() {
 void repair::repar() {
   auto       repairMessage = std::wstring {};
   auto const repairType    = ri::frmchkfn();
-
   thred::savdo();
   // RepairString = MsgBuffer;
   if ((repairType & BADFLT) != 0U) {

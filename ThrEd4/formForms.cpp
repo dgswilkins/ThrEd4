@@ -56,7 +56,6 @@ uint16_t DaisyTypeStrings[] = {
 
 void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
   auto labelSize = SIZE {0L, 0L};
-
   wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
   textSize.y = labelSize.cy;
   if (labelSize.cx > textSize.x) {
@@ -66,7 +65,6 @@ void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
 
 auto formForms::maxwid(uint32_t start, uint32_t finish) {
   auto textSize = POINT {0L, 0L};
-
   while (start <= finish) {
 	formForms::maxtsiz(StringTable->operator[](start++), textSize);
   }
@@ -142,11 +140,9 @@ void formForms::internal::nxtlinprf() noexcept {
 void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount) {
   uint16_t const edgeArray[] = {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
-
-  auto const& stringTable = *StringTable;
-  auto&       labelWindow = *LabelWindow;
-  auto&       valueWindow = *ValueWindow;
-
+  auto const& stringTable  = *StringTable;
+  auto&       labelWindow  = *LabelWindow;
+  auto&       valueWindow  = *ValueWindow;
   ValueWindowCoords.top    = 3;
   LabelWindowCoords.top    = ValueWindowCoords.top;
   ValueWindowCoords.bottom = 3 + LabelWindowSize.y;
@@ -325,13 +321,11 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	ffi::nxtlin(formMenuEntryCount);
   }
   labelWindow[LBRD] = ffi::txtwin(stringTable[STR_TXT7], LabelWindowCoords);
-
   auto edgeFillType = form.edgeType & NEGUND;
   if (edgeFillType >= EDGELAST) {
 	edgeFillType = EDGELAST - 1U;
   }
   auto const iEdge = edgeFillType - 1U;
-
   valueWindow[LBRD] = ffi::txtrwin(stringTable[wrap::toSize(edgeFillType) + STR_EDG0], ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (edgeFillType != 0U) {
@@ -445,8 +439,7 @@ void formForms::refrm() {
 }
 
 void formForms::sidwnd(HWND wnd) noexcept {
-  auto windowRect = RECT {0L, 0L, 0L, 0L};
-
+  auto windowRect          = RECT {0L, 0L, 0L, 0L};
   MsgIndex                 = 0;
   SideWindowEntryBuffer[0] = 0;
   auto const savedChoice   = FormMenuChoice;
@@ -468,8 +461,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
 }
 
 void formForms::prfsid(HWND wnd) noexcept {
-  auto windowRect = RECT {0L, 0L, 0L, 0L};
-
+  auto windowRect          = RECT {0L, 0L, 0L, 0L};
   MsgIndex                 = 0;
   SideWindowEntryBuffer[0] = 0;
   thred::unsid();
@@ -525,7 +517,6 @@ void formForms::internal::prflin(std::wstring const& msg, uint32_t row) noexcept
 
 void formForms::prfmsg() {
   auto preferenceRect = RECT {0L, 0L, 0L, 0L};
-
   if (StateMap.testAndReset(StateFlag::INSRT)) {
 	StateMap.set(StateFlag::WASRT);
   }
@@ -607,7 +598,6 @@ void formForms::prfmsg() {
 
 void formForms::frmnum() {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_FRML);
   if (!FormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
 	displayText::shoMsg(fmt::format(fmtStr, FormList->size()));
@@ -681,7 +671,6 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 
 auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-
   switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -918,7 +907,6 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
 
 auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-
   switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -988,7 +976,7 @@ void formForms::setear() {
   thred::unmsg();
   // NOLINTNEXTLINE
   auto const nResult = DialogBox(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); 
+      ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));
   if (nResult > 0) {
 	thred::savdo();
 	auto twistStep = IniFile.tearTwistStep;
@@ -1033,7 +1021,6 @@ void formForms::setear() {
 	StateMap.reset(StateFlag::FORMSEL);
 	auto const size =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-
 	auto horizontalRatio = UnzoomedRect.x / 4.0F / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
@@ -1065,7 +1052,6 @@ void formForms::internal::wavinit(HWND hwndlg) {
 
 auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-
   switch (umsg) { // NOLINT
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -1131,7 +1117,6 @@ void formForms::wavfrm() {
 	auto vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-
 	  points.emplace_back(-vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
 	                      -vertexIt[iNextVertex].y + vertexIt[waveIndex].y);
 	  iPoint++;

@@ -35,7 +35,7 @@
 //#pragma warning(disable:26497)	// f.4  		This function could be marked constexpr if compile-time evaluation is
 // desired
 #pragma warning(disable : 26499)    //			Could not find any lifetime tracking information
-// clang-format oN
+// clang-format on
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers

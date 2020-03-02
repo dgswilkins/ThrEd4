@@ -236,31 +236,22 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   auto testPoint = point;
-
   if (testPoint != nullptr) {
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[0]);
-
 	testPoint -= BitmapWidth;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[1]);
-
 	testPoint -= 1;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[2]);
-
 	testPoint += 2;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[3]);
-
 	testPoint += BitmapWidth;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[4]);
-
 	testPoint -= 2;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[5]);
-
 	testPoint += BitmapWidth;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[6]);
-
 	testPoint += 1;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[7]);
-
 	testPoint += 1;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[8]);
   }
@@ -268,7 +259,6 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 
 auto trace::internal::trsum() noexcept -> uint32_t {
   auto sumAdjacent = 0U;
-
   for (auto iAdjacent = 1U; iAdjacent < 9U; iAdjacent++) {
 	sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0])
 	                    ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0])
@@ -325,7 +315,6 @@ void trace::trdif() {
   if ((BitmapHeight * BitmapWidth) != 0U) {
 	auto differenceBitmap = std::vector<uint32_t> {};
 	differenceBitmap.resize(wrap::toSize(BitmapHeight) * BitmapWidth);
-
 	auto colorSumMaximum = 0U;
 	auto colorSumMinimum = 0xffffffffU;
 	if (!StateMap.test(StateFlag::WASTRAC)) {
@@ -334,8 +323,7 @@ void trace::trdif() {
 	for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
 	  ti::blanklin(differenceBitmap, 0);
 	  for (auto iHeight = 1U; iHeight < BitmapHeight - 1U; iHeight++) {
-		auto iPoint = iHeight * BitmapWidth;
-
+		auto iPoint                = iHeight * BitmapWidth;
 		differenceBitmap[iPoint++] = 0;
 		for (auto iWidth = 1U; iWidth < BitmapWidth - 1U; iWidth++) {
 		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
@@ -866,7 +854,6 @@ void trace::internal::dutrac() {
 
 void trace::trinit() {
   uint32_t histogramData[3][256] = {{0}};
-
   if (PCSBMPFileName[0] != 0) {
 	if (!StateMap.test(StateFlag::TRSET)) {
 	  StateMap.set(StateFlag::TRCRED);
@@ -1069,8 +1056,7 @@ void trace::internal::stch2bit(fPOINT& point) {
 
 void trace::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
   POINT line[2];
-
-  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+  auto  vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
   ti::stch2bit(vertexIt[start]);
   line[0] = BitmapPoint;
   ti::stch2bit(vertexIt[finish]);
@@ -1234,10 +1220,8 @@ void trace::tracpar() {
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 GSL_SUPPRESS(26440) void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
-  uint32_t const NumeralWidth = thred::txtWid(L"0");
-
-  wchar_t buffer[11] = {0};
-
+  auto const NumeralWidth = thred::txtWid(L"0");
+  wchar_t    buffer[11]   = {0};
   color >>= shift;
   color &= 0xffU;
   _itow_s(color, buffer, 10);
@@ -1263,11 +1247,9 @@ void trace::internal::durct(uint32_t    shift,
   auto const lowerColor    = (UpPixelColor >> shift) & 0xffU;
   auto const upperColor    = (DownPixelColor >> shift) & 0xffU;
   auto const controlHeight = traceControlRect.bottom - traceControlRect.top;
-
+  auto       ratio         = gsl::narrow_cast<double>(lowerColor) / 255.0;
   traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
   traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
-
-  auto ratio             = gsl::narrow_cast<double>(lowerColor) / 255.0;
   traceMiddleMask.top    = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
   ratio                  = gsl::narrow_cast<double>(upperColor) / 255.0;
   traceMiddleMask.bottom = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
@@ -1299,7 +1281,6 @@ void trace::wasTrace() {
   auto       traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
   auto       traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
   auto const BlackBrush          = CreateSolidBrush(0);   // black brush
-
   for (auto iRGB = 0; iRGB < 3; iRGB++) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);

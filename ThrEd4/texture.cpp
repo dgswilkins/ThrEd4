@@ -59,7 +59,6 @@ void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uin
 
 auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
   auto texturePath = fs::path(ArgList[0]);
-
   texturePath.replace_filename(L"thred.txr");
   return wcscpy_s(name, sizeName, texturePath.c_str()) == 0;
 }
@@ -68,7 +67,6 @@ void texture::txdun() {
   char const signature[4]         = "txh";
   auto       textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFLEN);
-
   if (!TextureHistory[0].texturePoints.empty()) {
 	wchar_t name[_MAX_PATH] = {0};
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
@@ -130,7 +128,6 @@ void texture::redtx() {
   wchar_t name[_MAX_PATH]      = {0};
   auto    textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFLEN);
-
   TextureHistoryIndex = ITXBUFLEN - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -326,18 +323,16 @@ void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
 
 void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept {
   POINT line[2] = {};
-
-  line[0] = {reference.x, reference.y - offsetPixels};
-  line[1] = {reference.x, reference.y + offsetPixels};
+  line[0]       = POINT {reference.x, reference.y - offsetPixels};
+  line[1]       = POINT {reference.x, reference.y + offsetPixels};
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
-  line[0] = {reference.x - offsetPixels, reference.y};
-  line[1] = {reference.x + offsetPixels, reference.y};
+  line[0] = POINT {reference.x - offsetPixels, reference.y};
+  line[1] = POINT {reference.x + offsetPixels, reference.y};
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
 }
 
 void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
   auto ref = POINT {0L, 0L};
-
   txi::txt2pix(TempTexturePoints->operator[](index), ref);
   txi::txtxfn(ref, offsetPixels);
   if (ref.y > TextureScreen.halfHeight) {
@@ -352,7 +347,6 @@ void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
 void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) {
   auto texturePoint = TXPNT {textureRect.top, textureRect.left};
   auto point        = POINT {0L, 0L};
-
   txi::txt2pix(texturePoint, point);
   rectangle.left    = point.x - IniFile.textureEditorSize;
   rectangle.top     = point.y - IniFile.textureEditorSize;
@@ -384,11 +378,9 @@ void texture::internal::chktx() {
 }
 
 void texture::drwtxtr() {
-  POINT line[2] = {};
-
+  POINT      line[2] = {};
   auto const editSpace =
       TextureScreen.areaHeight * 2.0 / (TextureScreen.spacing * (TextureScreen.lines + 2.0));
-
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
   auto const pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
@@ -477,8 +469,7 @@ void texture::drwtxtr() {
 
 auto texture::internal::px2txt(POINT const& offset) -> bool {
   auto editPoint = fPOINT {};
-
-  auto retval = false;
+  auto retval    = false;
   txi::px2ed(offset, editPoint);
   auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
   if (line < -0.5F) {
@@ -504,7 +495,6 @@ void texture::internal::deorg(POINT& point) noexcept {
 
 auto texture::internal::txbutfn() -> bool {
   auto offset = POINT {0L, 0L};
-
   txi::deorg(offset);
   return txi::px2txt(offset);
 }
@@ -536,7 +526,6 @@ auto texture::internal::txtclos(uint32_t& closestTexturePoint) -> bool {
 	auto minimumLength = 1e99;
 	auto reference     = POINT {0L, 0L};
 	auto point         = POINT {0L, 0L};
-
 	txi::deorg(reference);
 	closestTexturePoint = 0;
 	for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); iPoint++) {
@@ -562,14 +551,14 @@ void texture::internal::setxmov() {
 }
 
 void texture::internal::ritxrct() noexcept {
-  auto const offset    = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+  auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
+
   auto const rectangle = RECT {(TexturePixelRect.left + offset.x),
                                (TexturePixelRect.top + offset.y),
                                (TexturePixelRect.right + offset.x),
                                (TexturePixelRect.bottom + offset.y)};
   POINT      line[5]   = {};
-
   line[0].x = line[1].x = line[4].x = rectangle.left;
   line[2].x = line[3].x = rectangle.right;
   line[0].y = line[3].y = line[4].y = rectangle.top;
@@ -611,7 +600,6 @@ auto texture::internal::ed2stch(fPOINT const& point) noexcept -> fPOINT {
 void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) {
   auto const point0 = txi::ed2stch(point0in);
   auto const point1 = txi::ed2stch(point1in);
-
   auto const deltaX = point1.x - point0.x;
   if (fabs(deltaX) < TINY) {
 	return;
@@ -646,7 +634,6 @@ void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) 
 void texture::internal::setxclp(FRMHED const& form) {
   auto screenOffset = POINT {0L, 0L};
   auto editorOffset = fPOINT {};
-
   txi::deorg(screenOffset);
   txi::px2ed(screenOffset, editorOffset);
   if (StateMap.testAndReset(StateFlag::TXHCNTR)) {
@@ -676,7 +663,6 @@ void texture::internal::stxlin() {
   auto offset = POINT {0L, 0L};
   auto point0 = fPOINT {};
   auto point1 = fPOINT {};
-
   StateMap.reset(StateFlag::TXTMOV);
   txi::deorg(offset);
   txi::px2ed(offset, point1);
@@ -687,7 +673,6 @@ void texture::internal::stxlin() {
 
 void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
   auto point = fPOINT {};
-
   txi::px2ed(offset, point);
   auto val = (point.x - TextureScreen.xOffset) / TextureScreen.spacing;
   if (val < -0.5F) {
@@ -700,7 +685,6 @@ void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
 
 void texture::txtrup() {
   auto offset = POINT {0L, 0L};
-
   if (StateMap.testAndReset(StateFlag::TXTMOV)) {
 	texture::savtxt();
 	txi::deorg(offset);
@@ -812,7 +796,6 @@ void texture::internal::ritxfrm(FRMHED const& textureForm) {
 
 void texture::internal::setxfrm() {
   auto angleRect = fRECTANGLE {};
-
   txi::angrct(angleRect);
   auto& angledFormVertices = *AngledFormVertices;
   for (auto& vertex : angledFormVertices) {
@@ -843,9 +826,9 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 	  if (clipFormHeader->clipType == CLP_FRM) {
 		auto clipForm = &clipFormHeader->form;
 		if (nullptr != clipForm) {
-		  textureForm      = *clipForm;
-		  auto vertices    = convert_ptr<fPOINT*>(&clipForm[1]);
-		  auto const source = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
+		  textureForm         = *clipForm;
+		  auto       vertices = convert_ptr<fPOINT*>(&clipForm[1]);
+		  auto const source   = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), source.cbegin(), source.cend());
 		  textureForm.vertexIndex = 0;
@@ -904,7 +887,6 @@ void texture::internal::txtlin() {
 
 void texture::internal::chktxnum() {
   auto value = 0.0F;
-
   if (!TextureInputBuffer->empty()) {
 	value = std::stof(*TextureInputBuffer);
   }
@@ -945,7 +927,6 @@ void texture::internal::chktxnum() {
 
 void texture::internal::butsid(uint32_t windowId) {
   auto buttonRect = RECT {0L, 0L, 0L, 0L};
-
   txi::chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
@@ -1022,9 +1003,10 @@ void texture::internal::txang(FRMHED& form) {
 }
 
 void texture::deltx(uint32_t formIndex) {
-  auto& form                          = FormList->operator[](formIndex);
-  auto const&            currentIndex = form.fillInfo.texture.index;
-
+  // clang-format off
+  auto&       form         = FormList->operator[](formIndex);
+  auto const& currentIndex = form.fillInfo.texture.index;
+  // clang-format on
   if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
@@ -1081,7 +1063,6 @@ void texture::deltx(uint32_t formIndex) {
 
 void texture::internal::nutx(FRMHED& form) {
   auto index = 0U;
-
   std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
   if (!FormList->empty()) {
 	if (texture::istx(ClosestFormToCursor)) {
@@ -1108,7 +1089,6 @@ void texture::internal::nutx(FRMHED& form) {
 		FormList->operator[](iForm).fillInfo.texture.index += gsl::narrow<uint16_t>(tempPointCount);
 	  }
 	}
-
 	form.fillInfo.texture.index = gsl::narrow<uint16_t>(index);
 	form.fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
   }
@@ -1447,7 +1427,6 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 
 void texture::txsnap() {
   auto const txpntSize = TempTexturePoints->size();
-
   if (txpntSize != 0U) {
 	texture::savtxt();
 	auto const halfGrid = IniFile.gridSize / 2;
@@ -1470,8 +1449,7 @@ void texture::txsnap() {
 }
 
 void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
-  char character = {};
-
+  auto character = char {};
   if (SideWindowButton != nullptr) {
 	auto flag = true;
 	switch (keyCode) {
@@ -1614,7 +1592,6 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
   auto const currentIndex = form.fillInfo.texture.index;
   auto const currentCount = form.fillInfo.texture.count;
-
   texture::savtxt();
   form.wordParam = 0;
   StateMap.set(StateFlag::TXFIL);
@@ -1624,8 +1601,7 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 	for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; iTexturePoint--) {
 	  auto const currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + iTexturePoint);
 	  if (currentPoint.line != 0U) {
-		auto const iSegment = currentPoint.line - 1U;
-
+		auto const iSegment            = currentPoint.line - 1U;
 		textureSegments[iSegment].line = iTexturePoint;
 		textureSegments[iSegment].stitchCount++;
 	  }
@@ -1635,7 +1611,6 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 
 void texture::rtrtx(FRMHED const& form) {
   TempTexturePoints->clear();
-
   auto const currentIndex = form.fillInfo.texture.index;
   if (TexturePointsBuffer->size() > gsl::narrow<uint32_t>(currentIndex)) {
 	auto currentCount = form.fillInfo.texture.count;
@@ -1673,12 +1648,11 @@ auto texture::internal::inrct(fRECTANGLE const& rectangle, fPOINTATTR const& sti
 
 void texture::setshft() {
   auto selectionRect = fRECTANGLE {};
-
   texture::savtxt();
   thred::unbBox();
   StateMap.reset(StateFlag::BZUMIN);
-  selectionRect.top  = ZoomBoxOrigin.y;
-  selectionRect.left = ZoomBoxOrigin.x;
+  selectionRect.top      = ZoomBoxOrigin.y;
+  selectionRect.left     = ZoomBoxOrigin.x;
   auto const stitchPoint = thred::pxCor2stch(
       POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
   selectionRect.bottom = stitchPoint.y;

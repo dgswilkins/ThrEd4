@@ -68,16 +68,15 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   sDest.clear();
   GSL_SUPPRESS(26490) {
 	if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
-      auto const span = gsl::span<wchar_t>(pBuf, len);
-      sDest.insert(sDest.end(), span.cbegin(), span.cend());
-    }
+	  auto const span = gsl::span<wchar_t>(pBuf, len);
+	  sDest.insert(sDest.end(), span.cbegin(), span.cend());
+	}
   }
 }
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
-	auto strings = std::vector<std::wstring> {};
-
+	auto       strings              = std::vector<std::wstring> {};
 	auto       iString              = 0U;
 	auto       previousStringLength = 0U;
 	auto const sizeLim              = message.size();
@@ -137,14 +136,12 @@ void displayText::lodstr() {
 
 void displayText::hsizmsg() {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_HSIZ);
   displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
 }
 
 void displayText::numWnd() noexcept {
   auto messageRect = RECT {0L, 0L, 0L, 0L};
-
   GetClientRect(MsgWindow, &messageRect);
   auto wRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(MainStitchWin, &wRect);
@@ -168,7 +165,6 @@ void displayText::numWnd() noexcept {
 
 void displayText::msgflt(uint32_t messageId, float value) {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, messageId);
   displayText::shoMsg(fmt::format(fmtStr, value));
   StateMap.set(StateFlag::NUMIN);
@@ -177,7 +173,6 @@ void displayText::msgflt(uint32_t messageId, float value) {
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, double threadSize) {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_SIZ);
   displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
   StateMap.set(StateFlag::NUMIN);
@@ -186,21 +181,18 @@ void displayText::tsizmsg(wchar_t const* threadSizeText, double threadSize) {
 
 void displayText::bfilmsg() {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_BADFIL);
   displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 }
 
 void displayText::filnopn(uint32_t code, fs::path const& fileName) {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, code);
   displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
 
 void displayText::crmsg(fs::path const& fileName) {
   auto fmtStr = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_CREAT);
   displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
 }
@@ -246,7 +238,6 @@ void displayText::riter() {
 void displayText::pntmsg(uint32_t msgID) {
   auto fmtStr  = std::wstring {};
   auto message = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_PNT);
   displayText::loadString(message, msgID);
   displayText::shoMsg(fmt::format(fmtStr, message));
@@ -256,7 +247,6 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
   auto fmtStr = std::wstring {};
   auto msg0   = std::wstring {};
   auto msg1   = std::wstring {};
-
   displayText::loadString(fmtStr, IDS_SHOSEL);
   displayText::loadString(msg0, code0);
   displayText::loadString(msg1, code1);
@@ -304,7 +294,6 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	displayText::tabmsg(IDS_FILSEL);
 	return true;
   }
-
   displayText::tabmsg(IDS_FILCR);
   return true;
 }
@@ -339,7 +328,6 @@ void displayText::spltmsg() {
 void displayText::datmsg(uint32_t code) {
   auto dataErrorID = 0U;
   auto dataError   = std::wstring {};
-
   switch (code) {
 	case BADFLT:
 	  dataErrorID = IDS_BADFLT;
@@ -363,8 +351,7 @@ void displayText::datmsg(uint32_t code) {
 
 void displayText::okcan() noexcept {
   GetClientRect(MsgWindow, &MsgRect);
-
-  OKButton = CreateWindow(L"STATIC", // NOLINT
+  OKButton     = CreateWindow(L"STATIC", // NOLINT
                           StringTable->operator[](STR_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -375,7 +362,6 @@ void displayText::okcan() noexcept {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-
   CancelButton = CreateWindow(L"STATIC", // NOLINT
                               StringTable->operator[](STR_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
@@ -391,12 +377,9 @@ void displayText::okcan() noexcept {
 
 void displayText::savdisc() {
   wchar_t buffer[HBUFSIZ];
-
   di::sdmsg();
   StateMap.reset(StateFlag::BIGBOX);
-
   GetClientRect(MsgWindow, &MsgRect);
-
   LoadString(ThrEdInstance, IDS_SAV, std::begin(buffer), HBUFSIZ);
   OKButton = CreateWindow(L"STATIC", // NOLINT
                           std::begin(buffer),
@@ -409,7 +392,6 @@ void displayText::savdisc() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-
   LoadString(ThrEdInstance, IDS_DISC, std::begin(buffer), HBUFSIZ);
   DiscardButton = CreateWindow(L"STATIC", // NOLINT
                                std::begin(buffer),
@@ -422,8 +404,7 @@ void displayText::savdisc() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-
-  CancelButton = CreateWindow(L"STATIC", // NOLINT
+  CancelButton  = CreateWindow(L"STATIC", // NOLINT
                               StringTable->operator[](STR_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               2 * ButtonWidthX3 + 25,
@@ -452,7 +433,6 @@ GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
 void displayText::tomsg() {
   auto OKrect   = RECT {0L, 0L, 0L, 0L};
   auto textSize = SIZE {0L, 0L};
-
   GetWindowRect(OKButton, &OKrect);
   wrap::GetTextExtentPoint32(GetDC(ThrEdWindow),
                              StringTable->operator[](STR_DELST2).c_str(),

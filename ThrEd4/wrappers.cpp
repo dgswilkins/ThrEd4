@@ -26,7 +26,6 @@
 
 auto wrap::bufToFloat(wchar_t const* buffer) -> float {
   auto value = 0.0F;
-
   try {
 	value = std::stof(std::wstring(buffer));
   }
@@ -73,7 +72,6 @@ auto wrap::toFloat(double invar) -> float {
   }
   catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
 	UNREFERENCED_PARAMETER(e);
-
 	auto const var  = gsl::narrow_cast<float>(invar);
 	auto const diff = abs(invar - var);
 	if (diff < 4e-5) {
