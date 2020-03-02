@@ -2948,20 +2948,6 @@ class TRCPNT
   //~TRCPNT() = default;
 };
 
-// ToDo - Is this class needed?
-class TXTMSG
-{
-  public:
-  uint32_t cod {0U};
-  int8_t*  str {nullptr};
-
-  constexpr TXTMSG() noexcept = default;
-  // TXTMSG(TXTMSG&&) = default;
-  // TXTMSG& operator=(TXTMSG const& rhs) = default;
-  // TXTMSG& operator=(TXTMSG&&) = default;
-  //~TXTMSG() = default;
-};
-
 class GRDCOD
 {
   public:
