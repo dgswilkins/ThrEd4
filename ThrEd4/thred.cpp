@@ -12741,7 +12741,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	//			StateMap.reset(StateFlag::BZUMIN);
   }
   retflag = false;
-  return {};
+  return false;
 }
 
 auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
@@ -12843,7 +12843,7 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	return true;
   }
   retflag = false;
-  return {};
+  return false;
 }
 
 auto thred::internal::handleRightButtonDown() -> bool {
@@ -14724,7 +14724,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   retflag = false;
-  return {};
+  return false;
 }
 
 auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool {
