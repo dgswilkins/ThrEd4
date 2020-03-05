@@ -3125,7 +3125,8 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 	boundingRect.bottom += formNegativeOffset;
   }
   auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
-  regionCrossingData.reserve(MAXFRMLINS);
+  // reserve a little more than we need. Determined empirically
+  regionCrossingData.reserve((clipGrid.right - clipGrid.left) * 5);
   for (auto iVertex = 0U; iVertex < currentVertexCount; iVertex++) {
 	auto start  = wrap::floor<uint32_t>(vertexIt[iVertex].x / clipWidth);
 	auto finish = wrap::floor<uint32_t>(vertexIt[form::nxt(form, iVertex)].x / clipWidth);

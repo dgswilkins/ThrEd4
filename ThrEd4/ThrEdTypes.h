@@ -77,7 +77,6 @@ constexpr int32_t  MINDELAY   = 1;                 // minimum movie time step
 constexpr int32_t  MOVITIM    = 12;                // default movie time
 constexpr float    DEFSPACE   = 0.45F;             // default stitch spacing
 constexpr float    DEFANG     = 0.7853981F;        // default fill angle, 45 degrees
-constexpr uint32_t MAXFRMLINS = 20000U;            // maximum lines in a form
 constexpr uint32_t MSGSIZ     = 8192U;             // size of the message buffer
 constexpr float    PI_F       = 3.1415927F;        // PI to single precision
 constexpr float    PI_F2      = PI_F * 2.0F;       //
