@@ -16,7 +16,7 @@ clang-analyzer-valist*,\
 cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
 google-*,-google-runtime-references,\
 hicpp-*,-hicpp-avoid-c-arrays,\
-llvm-*,-llvm-include-order,\
+llvm-*,-llvm-include-order,-llvm-header-guard,\
 misc-*,-misc-non-private-member-variables-in-classes,\
 modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
@@ -25,6 +25,6 @@ portability-*,\
 readability-*,-readability-magic-numbers\
 "
 WarningsAsErrors:  ''
-HeaderFilterRegex: 'ThrEd4\\*\.(h|hxx|cxx)$'
+HeaderFilterRegex: '^.*ThrEd4\\.*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
 User:              dwilkins
