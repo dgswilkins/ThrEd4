@@ -127,7 +127,7 @@ void mdufrm() noexcept;
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-template <class inType> float midl(inType high, inType low) noexcept {
+template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
 }
 #pragma warning(pop)

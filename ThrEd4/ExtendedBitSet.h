@@ -27,7 +27,7 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
   }
   */
 
-  size_t getFirst() {
+  auto getFirst() -> size_t {
 	const size_t foundBit = super::find_first();
 	if (foundBit != super::npos) {
 	  super::reset(foundBit);
@@ -38,7 +38,7 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
 	return foundBit;
   }
 
-  size_t getLast() {
+  auto getLast() -> size_t {
 	size_t foundBit = super::find_first();
 	if (foundBit != super::npos) {
 	  do {

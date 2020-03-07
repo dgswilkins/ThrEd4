@@ -16,7 +16,7 @@ void  drwtxbut(TXTSCR const& textureScreen);
 auto  filmsgs(uint32_t code) -> bool;
 void  filnopn(uint32_t code, fs::path const& fileName);
 void  frm1pnt();
-HFONT getThrEdFont(int32_t weight) noexcept;
+auto getThrEdFont(int32_t weight) noexcept -> HFONT;
 void  grpmsg();
 void  grpmsg1();
 void  hsizmsg();

@@ -125,7 +125,7 @@ namespace internal {
   auto duprecs(std::vector<fPOINTATTR>& tempStitchBuffer, std::vector<OREC*> const& pRecs, SRTREC& sortRecord)
       -> uint32_t;
 
-  constexpr float durat(float start, float finish, float featherRatio);
+  constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
   void durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather);
   void durec(OREC& record);
@@ -182,7 +182,7 @@ namespace internal {
   void setundfn(uint32_t code);
   auto srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) noexcept -> bool;
 
-  constexpr ULARGE_INTEGER tim2int(FILETIME time) noexcept;
+  constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
 
   void uangfn(uint32_t formNumber, float angle);
   void ucolfn(uint32_t formNumber, uint32_t color);

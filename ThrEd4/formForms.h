@@ -42,7 +42,7 @@ void wavfrm();
 namespace internal {
   void chkdaz();
 
-  BOOL CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam);
+  auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
   void initdaz(HWND hWinDialog);
   void initTearDlg(HWND hwndlg);

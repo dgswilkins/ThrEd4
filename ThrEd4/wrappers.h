@@ -45,19 +45,19 @@ void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytes
 // pragma required until MSVC /analyze recognizes noexcept(false)
 #pragma warning(push)
 #pragma warning(disable : 26440)
-template <class outType, class inType> outType ceil(inType invar) {
+template <class outType, class inType> auto ceil(inType invar) -> outType {
   return gsl::narrow<outType>(std::ceil(invar));
 }
 
-template <class outType, class inType> outType floor(inType invar) {
+template <class outType, class inType> auto floor(inType invar) -> outType {
   return gsl::narrow<outType>(std::floor(invar));
 }
 
-template <class outType, class inType> outType round(inType invar) {
+template <class outType, class inType> auto round(inType invar) -> outType {
   return gsl::narrow<outType>(std::round(invar));
 }
 
-template <class outType> outType wcstoi(wchar_t const (&buffer)[HBUFSIZ]) {
+template <class outType> auto wcstoi(wchar_t const (&buffer)[HBUFSIZ]) -> outType {
   return gsl::narrow<outType>(std::wcstoul(static_cast<wchar_t const*>(buffer), nullptr, 10));
 }
 

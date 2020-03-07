@@ -1057,9 +1057,9 @@ class dPOINT
   explicit inline dPOINT(fPOINT const& rhs) noexcept;
   inline dPOINT(float rhsX, float rhsY) noexcept;
   inline dPOINT(double rhsX, double rhsY) noexcept;
-  inline bool    operator==(dPOINT const& rhs) const noexcept;
-  inline dPOINT& operator=(fPOINT const& rhs) noexcept;
-  inline dPOINT& operator=(BSEQPNT const& rhs) noexcept;
+  inline auto    operator==(dPOINT const& rhs) const noexcept -> bool;
+  inline auto operator=(fPOINT const& rhs) noexcept -> dPOINT&;
+  inline auto operator=(BSEQPNT const& rhs) noexcept -> dPOINT&;
   // dPOINT(dPOINT&&) = default;
   // dPOINT& operator=(dPOINT const& rhs) = default;
   // dPOINT& operator=(dPOINT&&) = default;
@@ -1077,11 +1077,11 @@ class fPOINT
   inline fPOINT(float rhsX, float rhsY) noexcept;
   inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
   explicit inline fPOINT(dPOINT const& rhs) noexcept;
-  inline bool    operator==(fPOINT const& rhs) const noexcept;
-  inline fPOINT& operator=(dPOINT const& rhs) noexcept;
-  inline fPOINT& operator=(fPOINTATTR const& rhs) noexcept;
-  inline fPOINT& operator=(SMALPNTL const& rhs) noexcept;
-  inline fPOINT& operator=(BSEQPNT const& rhs) noexcept;
+  inline auto operator==(fPOINT const& rhs) const noexcept -> bool;
+  inline auto operator=(dPOINT const& rhs) noexcept -> fPOINT&;
+  inline auto operator=(fPOINTATTR const& rhs) noexcept -> fPOINT&;
+  inline auto operator=(SMALPNTL const& rhs) noexcept -> fPOINT&;
+  inline auto operator=(BSEQPNT const& rhs) noexcept -> fPOINT&;
   // fPOINT(fPOINT&&) = default;
   // fPOINT& operator=(fPOINT const& rhs) = default;
   // fPOINT& operator=(fPOINT&&) = default;
@@ -1149,7 +1149,7 @@ inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rh
 }
 #pragma warning(pop)
 
-inline bool fPOINT::operator==(fPOINT const& rhs) const noexcept {
+inline auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
   return (x == rhs.x) && (y == rhs.y);
 }
 
@@ -1172,26 +1172,26 @@ inline fPOINT::fPOINT(dPOINT const& rhs) noexcept {
   y = gsl::narrow_cast<float>(rhs.y);
 }
 
-inline fPOINT& fPOINT::operator=(dPOINT const& rhs) noexcept {
+inline auto fPOINT::operator=(dPOINT const& rhs) noexcept -> fPOINT& {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
 
-inline fPOINT& fPOINT::operator=(SMALPNTL const& rhs) noexcept {
+inline auto fPOINT::operator=(SMALPNTL const& rhs) noexcept -> fPOINT& {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
 #pragma warning(pop)
 
-inline fPOINT& fPOINT::operator=(fPOINTATTR const& rhs) noexcept {
+inline auto fPOINT::operator=(fPOINTATTR const& rhs) noexcept -> fPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline fPOINT& fPOINT::operator=(BSEQPNT const& rhs) noexcept {
+inline auto fPOINT::operator=(BSEQPNT const& rhs) noexcept -> fPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
@@ -1215,17 +1215,17 @@ inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
 }
-inline bool dPOINT::operator==(dPOINT const& rhs) const noexcept {
+inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool{
   return (x == rhs.x) && (y == rhs.y);
 }
 
-inline dPOINT& dPOINT::operator=(fPOINT const& rhs) noexcept {
+inline auto dPOINT::operator=(fPOINT const& rhs) noexcept -> dPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline dPOINT& dPOINT::operator=(BSEQPNT const& rhs) noexcept {
+inline auto dPOINT::operator=(BSEQPNT const& rhs) noexcept -> dPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
@@ -1415,7 +1415,7 @@ class SATCON
 
   explicit SATCON(SATCONOUT const& rhs) noexcept;
   inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
-  inline SATCON& operator=(SATCONOUT const& rhs) noexcept;
+  inline auto operator=(SATCONOUT const& rhs) noexcept -> SATCON&;
 };
 
 inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept : start(rStart), finish(rFinish) {
@@ -1434,7 +1434,7 @@ class SATCONOUT
   //~SATCONOUT() = default;
 
   explicit SATCONOUT(SATCON const& rhs);
-  inline SATCONOUT& operator=(SATCON const& rhs);
+  inline auto operator=(SATCON const& rhs) -> SATCONOUT&;
 };
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
@@ -1444,7 +1444,7 @@ GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline SATCONOUT& SATCONOUT::operator=(SATCON const& rhs) {
+GSL_SUPPRESS(26440) inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
 
@@ -1456,7 +1456,7 @@ inline SATCON::SATCON(SATCONOUT const& rhs) noexcept {
   finish = rhs.finish;
 }
 
-inline SATCON& SATCON::operator=(SATCONOUT const& rhs) noexcept {
+inline auto SATCON::operator=(SATCONOUT const& rhs) noexcept -> SATCON& {
   start  = rhs.start;
   finish = rhs.finish;
 
@@ -1514,7 +1514,7 @@ union FLENCNT {
   //~FLENCNT() = default;
 
   explicit FLENCNT(FLENCNTOUT const& rhs) noexcept;
-  inline FLENCNT& operator=(FLENCNTOUT const& rhs) noexcept;
+  inline auto operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT&;
 };
 
 inline FLENCNT::FLENCNT() noexcept { // NOLINT
@@ -1533,7 +1533,7 @@ union FLENCNTOUT {
   //~FLENCNTOUT() = default;
 
   explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
-  inline FLENCNTOUT& operator=(FLENCNT const& rhs) noexcept;
+  inline auto operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT&;
 };
 
 inline FLENCNTOUT::FLENCNTOUT() noexcept {
@@ -1544,17 +1544,17 @@ inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept {
   clipCount = rhs.clipCount;
 }
 
-inline FLENCNTOUT& FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept {
+inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
   clipCount = rhs.clipCount;
 
   return *this;
 }
 
-inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept {
+inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept { // NOLINT(cppcoreguidelines-pro-type-member-init)
   clipCount = rhs.clipCount;
 }
 
-inline FLENCNT& FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept {
+inline auto FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT& {
   clipCount = rhs.clipCount;
 
   return *this;
@@ -1574,7 +1574,7 @@ union SATINANGLE {
   //~SATINANGLE() = default;
 
   explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
-  inline SATINANGLE& operator=(SATINANGLEOUT const& rhs) noexcept;
+  inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
 };
 
 inline SATINANGLE::SATINANGLE() noexcept { // NOLINT
@@ -1593,7 +1593,7 @@ union SATINANGLEOUT {
   //~SATINANGLEOUT() = default;
 
   explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
-  inline SATINANGLEOUT& operator=(SATINANGLE const& rhs) noexcept;
+  inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
 };
 
 inline SATINANGLEOUT::SATINANGLEOUT() noexcept {
@@ -1604,17 +1604,17 @@ inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept {
   angle = rhs.angle;
 }
 
-inline SATINANGLEOUT& SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept {
+inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT& {
   angle = rhs.angle;
 
   return *this;
 }
 
-inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept {
+inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept { // NOLINT(cppcoreguidelines-pro-type-member-init)
   angle = rhs.angle;
 }
 
-inline SATINANGLE& SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept {
+inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
   angle = rhs.angle;
 
   return *this;
@@ -1751,7 +1751,7 @@ class FRMHEDO // Original form header used prior to version 2
 };
 
 inline FRMHEDO::FRMHEDO() noexcept :
-    satinOrAngle(), lengthOrCount(), angleOrClipData(), rectangle() {
+    satinOrAngle(), lengthOrCount(), angleOrClipData() {
   attribute       = 0U;
   vertexCount     = 0U;
   type            = 0U;
@@ -1822,12 +1822,12 @@ class FRMHED
   explicit inline FRMHED(FRMHEDO const& rhs) noexcept;
   explicit inline FRMHED(FRMHEDOUT const& rhs) noexcept;
 
-  inline FRMHED& operator=(FRMHEDO const& rhs) noexcept;
-  inline FRMHED& operator=(FRMHEDOUT const& rhs) noexcept;
+  inline auto operator=(FRMHEDO const& rhs) noexcept -> FRMHED&;
+  inline auto operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED&;
 };
 
 inline FRMHED::FRMHED() noexcept :
-    fillInfo(), satinOrAngle(), lengthOrCount(), angleOrClipData(), rectangle() {
+    satinOrAngle(), lengthOrCount(), angleOrClipData(), fillInfo() {
   attribute       = 0U;
   vertexCount     = 0U;
   type            = 0U;
@@ -1863,7 +1863,7 @@ inline FRMHED::FRMHED() noexcept :
 }
 
 inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
-    fillInfo(), lengthOrCount(rhs.lengthOrCount), rectangle(rhs.rectangle), satinOrAngle(rhs.satinOrAngle) {
+    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount), fillInfo() {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -1914,7 +1914,7 @@ inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
   cres                = 0U;
 }
 
-inline FRMHED& FRMHED::operator=(FRMHEDO const& rhs) noexcept {
+inline auto FRMHED::operator=(FRMHEDO const& rhs) noexcept -> FRMHED& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -2004,11 +2004,11 @@ class FRMHEDOUT
   //~FRMHEDOUT() = default;
 
   explicit inline FRMHEDOUT(FRMHED const& rhs);
-  inline FRMHEDOUT& operator=(FRMHED const& rhs);
+  inline auto operator=(FRMHED const& rhs) -> FRMHEDOUT&;
 };
 
 inline FRMHEDOUT::FRMHEDOUT() noexcept :
-    fillInfo(), rectangle(), satinOrAngle(), lengthOrCount(), angleOrClipData() {
+    satinOrAngle(), lengthOrCount(), angleOrClipData(), fillInfo() {
   attribute       = 0U;
   vertexCount     = 0U;
   type            = 0U;
@@ -2101,7 +2101,7 @@ inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline FRMHEDOUT& FRMHEDOUT::operator=(FRMHED const& rhs) {
+GSL_SUPPRESS(26440) inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
   attribute       = rhs.attribute;
   vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
   type            = rhs.type;
@@ -2213,7 +2213,7 @@ inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
   cres                = rhs.cres;
 }
 
-inline FRMHED& FRMHED::operator=(FRMHEDOUT const& rhs) noexcept {
+inline auto FRMHED::operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -2419,32 +2419,32 @@ class STREX // thred v1.0 file header extension
 class DSTHED // dst file header
 {
   public:
-  char desched[3] {0};  // 00  00	description   NOLINT(modernize-avoid-c-arrays)
-  char desc[17] {0};    // 03  03                 NOLINT(modernize-avoid-c-arrays)
-  char recshed[3] {0};  // 20  14	record count  NOLINT(modernize-avoid-c-arrays)
-  char recs[8] {0};     // 23  17                 NOLINT(modernize-avoid-c-arrays)
-  char cohed[3] {0};    // 31  1F                 NOLINT(modernize-avoid-c-arrays)
-  char co[4] {0};       // 34  22                 NOLINT(modernize-avoid-c-arrays)
-  char xplushed[3] {0}; // 38  26	x+ size       NOLINT(modernize-avoid-c-arrays)
-  char xplus[6] {0};    // 41  29                 NOLINT(modernize-avoid-c-arrays)
-  char xminhed[3] {0};  // 47  2F	x- size       NOLINT(modernize-avoid-c-arrays)
-  char xmin[6] {0};     // 50  32                 NOLINT(modernize-avoid-c-arrays)
-  char yplushed[3] {0}; // 56  38                 NOLINT(modernize-avoid-c-arrays)
-  char yplus[6] {0};    // 59  3B	y+ size       NOLINT(modernize-avoid-c-arrays)
-  char yminhed[3] {0};  // 65  41                 NOLINT(modernize-avoid-c-arrays)
-  char ymin[6] {0};     // 68  44	y- size       NOLINT(modernize-avoid-c-arrays)
-  char axhed[3] {0};    // 74  4A                 NOLINT(modernize-avoid-c-arrays)
-  char ax[7] {0};       // 77  4D                 NOLINT(modernize-avoid-c-arrays)
-  char ayhed[3] {0};    // 84  54                 NOLINT(modernize-avoid-c-arrays)
-  char ay[7] {0};       // 87  57                 NOLINT(modernize-avoid-c-arrays)
-  char mxhed[3] {0};    // 94  5E                 NOLINT(modernize-avoid-c-arrays)
-  char mx[7] {0};       // 97  61                 NOLINT(modernize-avoid-c-arrays)
-  char myhed[3] {0};    // 104 68                 NOLINT(modernize-avoid-c-arrays)
-  char my[7] {0};       // 107 6B                 NOLINT(modernize-avoid-c-arrays)
-  char pdhed[2] {0};    // 114 72                 NOLINT(modernize-avoid-c-arrays)
-  char pd[7] {0};       // 116 74                 NOLINT(modernize-avoid-c-arrays)
-  char eof[1] {0};      // 123 7B                 NOLINT(modernize-avoid-c-arrays)
-  char res[388] {0};    // 124 7C                 NOLINT(modernize-avoid-c-arrays)
+  char desched[3] {0};  // 00  00	description   NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char desc[17] {0};    // 03  03                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char recshed[3] {0};  // 20  14	record count  NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char recs[8] {0};     // 23  17                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char cohed[3] {0};    // 31  1F                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char co[4] {0};       // 34  22                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char xplushed[3] {0}; // 38  26	x+ size       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char xplus[6] {0};    // 41  29                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char xminhed[3] {0};  // 47  2F	x- size       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char xmin[6] {0};     // 50  32                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char yplushed[3] {0}; // 56  38                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char yplus[6] {0};    // 59  3B	y+ size       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char yminhed[3] {0};  // 65  41                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char ymin[6] {0};     // 68  44	y- size       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char axhed[3] {0};    // 74  4A                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char ax[7] {0};       // 77  4D                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char ayhed[3] {0};    // 84  54                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char ay[7] {0};       // 87  57                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char mxhed[3] {0};    // 94  5E                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char mx[7] {0};       // 97  61                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char myhed[3] {0};    // 104 68                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char my[7] {0};       // 107 6B                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char pdhed[2] {0};    // 114 72                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char pd[7] {0};       // 116 74                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char eof[1] {0};      // 123 7B                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char res[388] {0};    // 124 7C                 NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
 
   constexpr DSTHED() noexcept = default;
   // DSTHED(DSTHED&&) = default;
@@ -2688,13 +2688,13 @@ class VRCT2
 class CURSORMASK
 {
   public:
-  uint8_t form[128] {0U};            // NOLINT(modernize-avoid-c-arrays)
-  uint8_t dline[128] {0U};           // NOLINT(modernize-avoid-c-arrays)
-  uint8_t uprightNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays)
-  uint8_t leftUpNeedle[128] {0U};    // NOLINT(modernize-avoid-c-arrays)
-  uint8_t leftDownNeedle[128] {0U};  // NOLINT(modernize-avoid-c-arrays)
-  uint8_t rightUpNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays)
-  uint8_t rightDownNeedle[128] {0U}; // NOLINT(modernize-avoid-c-arrays)
+  uint8_t form[128] {0U};            // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t dline[128] {0U};           // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t uprightNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t leftUpNeedle[128] {0U};    // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t leftDownNeedle[128] {0U};  // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t rightUpNeedle[128] {0U};   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t rightDownNeedle[128] {0U}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
 
   constexpr CURSORMASK() noexcept = default;
   // CURSORMASK(CURSORMASK&&) = default;
@@ -2706,13 +2706,13 @@ class CURSORMASK
 class BALHED // balarad file header
 {
   public:
-  COLORREF color[256] {0U}; // NOLINT(modernize-avoid-c-arrays)
+  COLORREF color[256] {0U}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint32_t signature {0U};
   uint16_t version {0U};
   float    hoopSizeX {0.0F};
   float    hoopSizeY {0.0F};
   COLORREF backgroundColor {0U};
-  uint8_t  res[1006] {0U}; // NOLINT(modernize-avoid-c-arrays)
+  uint8_t  res[1006] {0U}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
 
   constexpr BALHED() noexcept = default;
   // BALHED(BALHED&&) = default;
@@ -2804,7 +2804,7 @@ class VCLPX
 class PESLED
 {
   public:
-  int8_t   ver[8] {0}; // NOLINT(modernize-avoid-c-arrays)
+  int8_t   ver[8] {0}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint32_t pec {0U};
 
   constexpr PESLED() noexcept = default;
@@ -2817,14 +2817,14 @@ class PESLED
 class PESHED
 {
   public:
-  char     led[8] {0}; //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays)
+  char     led[8] {0}; //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint32_t off {0U};  //   8-b  Absolute PEC section byte offset
   uint16_t hpsz {0U}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
   uint16_t usdn {0U}; //   e,f  Use existing design area (1)
   uint16_t blct {0U}; // 10,11  CSewSeg segment block count (1)
   char     hnd1[4] {0}; // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
   uint16_t celn {0U}; // 16,17  Length of following string (7)
-  char     ce[7] {0}; // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays)
+  char     ce[7] {0}; // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   int16_t  xlft {0};     // 1f,20  Extent left
   int16_t  xtop {0};     // 21,22  Extent top
   int16_t  xrht {0};     // 23,24  Extent right
@@ -2844,11 +2844,11 @@ class PESHED
   int16_t  ytrn {0};     // 4b,4c  CSewSeg y coordinate translation (0)
   int16_t  xsiz {0};     // 4d,4e  CSewSeg width
   int16_t  ysiz {0};     // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {0}; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays)
+  int8_t   ukn2[8] {0}; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint16_t bcnt {0U}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
   int8_t   hnd2[4] {0}; // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
   uint16_t cslen {0U}; // 5f,60  CSewSeg length (7)
-  char     cs[7] {0}; // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays)
+  char     cs[7] {0}; // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
                       // uint16_t styp1;   // 68,69  Stitch type (0)
                       // uint16_t scol;    // 6a,6b  Stitch Palette thread index
 
@@ -2889,17 +2889,17 @@ class PESSTCHLST
 class PECHDR
 {
   public:
-  char     label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays)
+  char     label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   int8_t   labnd {0};     // carriage return character
-  uint8_t  ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays)
+  uint8_t  ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint8_t  ukn2 {0U};     // Unknown
   uint16_t hnd1 {0U};     // Unknown (0x00ff)
   uint8_t  thumbWidth {0U}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                             // Thus, 6 would mean 6×8 = 48 pixels per line
   uint8_t thumbHeight {0U}; // Thumbnail image height in pixels (38)
-  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays)
+  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint8_t colorCount {0U}; // Number of colors minus one, 0xFF means 0 colors
-  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays)
+  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
 
   constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;
@@ -3262,7 +3262,7 @@ class THREAD
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
-template <class T2, class T1> inline _Ret_notnull_ T2 convert_ptr(T1* pointer) {
+template <class T2, class T1> inline _Ret_notnull_ auto convert_ptr(T1* pointer) -> T2 {
   GSL_SUPPRESS(26474) {
 	if (pointer) {
 	  return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
