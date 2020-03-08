@@ -1437,14 +1437,14 @@ class SATCONOUT
   inline auto operator=(SATCON const& rhs) -> SATCONOUT&;
 };
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
 
@@ -2043,8 +2043,7 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept :
   cres                = 0U;
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440)
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
     satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
   attribute       = rhs.attribute;
@@ -2100,8 +2099,8 @@ inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
   cres                = rhs.cres;
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
   attribute       = rhs.attribute;
   vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
   type            = rhs.type;
@@ -3263,11 +3262,9 @@ class THREAD
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1> inline _Ret_notnull_ auto convert_ptr(T1* pointer) -> T2 {
-  GSL_SUPPRESS(26474) {
-	if (pointer) {
-	  return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
-	}
-
-	throw;
+  if (pointer) {
+    return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
   }
+
+  throw;
 }

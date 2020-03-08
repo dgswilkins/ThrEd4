@@ -1372,8 +1372,8 @@ void texture::internal::txgro(FRMHED const& textureForm) {
   txi::txsiz(1.0F / TXTRAT, textureForm);
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
   if (isdigit(keyCode) != 0) {
 	character = gsl::narrow<char>(keyCode);
 	return true;

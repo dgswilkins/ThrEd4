@@ -1396,7 +1396,7 @@ void thred::internal::fndknt() {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::coltab() {
+void thred::coltab() {
   if (StitchBuffer->size() > 1) {
 	ColorChanges = 0;
 	if (!StitchBuffer->empty()) {
@@ -2800,7 +2800,8 @@ void thred::unmsg() {
   }
 }
 
-GSL_SUPPRESS(26461) auto thred::internal::oldwnd(HWND window) noexcept -> bool {
+#pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
+auto thred::internal::oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < 16U; iColor++) {
 	if (window == DefaultColorWin->operator[](iColor) ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin[iColor] == window) {
@@ -3645,8 +3646,7 @@ auto thred::internal::savcmp() noexcept -> bool {
 #endif
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440)
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) {
   constexpr auto BalaradRatio = 10.0F / 6.0F;
   balaradStitch[destination] =
@@ -4827,10 +4827,9 @@ void thred::internal::auxmen() {
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }
-  GSL_SUPPRESS(26492) {
-	filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT
-	SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
-  }
+  #pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile (type.3)
+  filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT
+  SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
   StateMap.set(StateFlag::DUMEN);
 }
 
@@ -5295,8 +5294,8 @@ void thred::internal::bak() {
   redbak();
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::internal::bitsiz() {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+void thred::internal::bitsiz() {
   auto const screenAspectRatio =
       gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);
   auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
@@ -5321,23 +5320,21 @@ auto thred::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t 
   auto       blackBits = 0U;
   auto const byteCount = BitmapWidth >> 3U;
   for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
-	GSL_SUPPRESS(26429) {
-	  if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
-		auto const bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
-		for (auto iBytes = 0U; iBytes < byteCount; iBytes++) {
-		  if (bcpnt[iBytes] == 0U) {
-			blackBits++;
-		  }
-		  else {
-			if (bcpnt[iBytes] == 0xff) {
-			  whiteBits++;
-			}
+	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
+	  auto const bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
+	  for (auto iBytes = 0U; iBytes < byteCount; iBytes++) {
+		if (bcpnt[iBytes] == 0U) {
+		  blackBits++;
+		}
+		else {
+		  if (bcpnt[iBytes] == 0xff) {
+			whiteBits++;
 		  }
 		}
 	  }
-	  else {
-		throw;
-	  }
+	}
+	else {
+	  throw;
 	}
   }
   return whiteBits > blackBits;
@@ -5423,22 +5420,21 @@ void thred::internal::savmap() {
 }
 
 auto thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
-  GSL_SUPPRESS(26490) {
-	if (ppvBits != nullptr) {
-	  auto bitmap =
-	      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
-	  if (*ppvBits != nullptr) {
-		return bitmap;
-	  }
-	  DeleteObject(bitmap);
-	  throw;
+  if (ppvBits != nullptr) {
+	#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+	auto bitmap =
+	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
+	if (*ppvBits != nullptr) {
+	  return bitmap;
 	}
-
+	DeleteObject(bitmap);
 	throw;
   }
+
+  throw;
 }
 
-GSL_SUPPRESS(26490) void thred::internal::bfil() {
+void thred::internal::bfil() {
   auto const InverseBackgroundColor = fswap(BackgroundColor);
   BitmapFileHandle =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -5502,20 +5498,18 @@ GSL_SUPPRESS(26490) void thred::internal::bfil() {
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	  HBITMAP bitmap                 = {};
-	  GSL_SUPPRESS(26413) {
-		auto* bits = gsl::narrow_cast<uint32_t*>(nullptr);
-		bitmap     = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
-		// Synchronize
-		GdiFlush();
-		if (bits != nullptr) {
-		  for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
-			bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
-			       &bits[wrap::toSize(iHeight) * BitmapWidth],
-			       background,
-			       foreground);
-		  }
+	  auto*   bits                   = gsl::narrow_cast<uint32_t*>(nullptr);
+	  bitmap                         = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  // Synchronize
+	  GdiFlush();
+	  if (bits != nullptr) {
+		for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
+		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
+		         &bits[wrap::toSize(iHeight) * BitmapWidth],
+		         background,
+		         foreground);
 		}
-	  };
+	  }
 	  auto deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
@@ -7147,7 +7141,7 @@ void thred::internal::rebox() {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::delstchm() {
+void thred::delstchm() {
   thred::rngadj();
   auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
   auto end   = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch + 1U));
@@ -7514,8 +7508,8 @@ void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led)
   destination.tag  = 0x14;
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) auto thred::internal::sizfclp(FRMHED const& form) -> uint32_t {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+auto thred::internal::sizfclp(FRMHED const& form) -> uint32_t {
   auto clipSize =
       gsl::narrow<uint32_t>(sizeof(FORMCLIP) + form.vertexCount * sizeof(decltype(FormVertices->back())));
   if (form.type == SAT) {
@@ -7597,26 +7591,24 @@ void thred::internal::duclip() {
 	  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, // NOLINT
 	                                 (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
 	                                     sizeof(FORMVERTEXCLIP));
-	  GSL_SUPPRESS(26429) {
-		if (ThrEdClipPointer != nullptr) {
-		  auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
-		  clipHeader->clipType    = CLP_FRMPS;
-		  clipHeader->vertexCount = SelectedFormVertices.vertexCount;
-		  clipHeader->direction   = StateMap.test(StateFlag::PSELDIR);
-		  // skip past the header
-		  auto*       vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
-		  auto const& form     = FormList->operator[](ClosestFormToCursor);
-		  auto vertexIt        = std::next(FormVertices->cbegin(), form.vertexIndex);
-		  auto iSource         = SelectedFormVertices.start;
-		  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
-			vertices[iVertex] = vertexIt[iSource];
-			iSource           = form::pdir(form, iSource);
-		  }
-		  SetClipboardData(ThrEdClip, ThrEdClipPointer);
+	  if (ThrEdClipPointer != nullptr) {
+		auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
+		clipHeader->clipType    = CLP_FRMPS;
+		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
+		clipHeader->direction   = StateMap.test(StateFlag::PSELDIR);
+		// skip past the header
+		auto*       vertices                  = convert_ptr<fPOINT*>(&clipHeader[1]);
+		auto const& form                      = FormList->operator[](ClosestFormToCursor);
+		auto                         vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
+		auto                         iSource  = SelectedFormVertices.start;
+		for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
+		  vertices[iVertex] = vertexIt[iSource];
+		  iSource           = form::pdir(form, iSource);
 		}
-		else {
-		  throw;
-		}
+		SetClipboardData(ThrEdClip, ThrEdClipPointer);
+	  }
+	  else {
+		throw;
 	  }
 	  CloseClipboard();
 	}
@@ -7639,79 +7631,77 @@ void thred::internal::duclip() {
 		  msiz += FileSize;
 		}
 		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length); // NOLINT
-		GSL_SUPPRESS(26429) {
-		  if (ThrEdClipPointer != nullptr) {
-			auto clipFormsHeader       = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
-			clipFormsHeader->clipType  = CLP_FRMS;
-			clipFormsHeader->formCount = gsl::narrow<uint16_t>(SelectedFormList->size());
-			// Skip past the header
-			auto forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
-			auto iForm = 0U;
-			for (auto& selectedForm : (*SelectedFormList)) {
-			  auto& currentForm = FormList->operator[](selectedForm);
-			  forms[iForm++]    = currentForm;
-			}
-			// skip past the forms
-			auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
-			auto iVertex      = 0U;
-			for (auto& selectedForm : (*SelectedFormList)) {
-			  // clang-format off
+		if (ThrEdClipPointer != nullptr) {
+		  auto clipFormsHeader       = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
+		  clipFormsHeader->clipType  = CLP_FRMS;
+		  clipFormsHeader->formCount = gsl::narrow<uint16_t>(SelectedFormList->size());
+		  // Skip past the header
+		  auto forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
+		  auto iForm = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& currentForm = FormList->operator[](selectedForm);
+			forms[iForm++]    = currentForm;
+		  }
+		  // skip past the forms
+		  auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
+		  auto iVertex      = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			// clang-format off
 			  auto& form     = FormList->operator[](selectedForm);
 			  auto  vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-			  // clang-format on
-			  for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
-				formVertices[iVertex++] = vertexIt[iSide];
-			  }
+			// clang-format on
+			for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
+			  formVertices[iVertex++] = vertexIt[iSide];
 			}
-			// skip past the vertex list
-			auto guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
-			auto guideCount = 0U;
-			for (auto& selectedForm : (*SelectedFormList)) {
-			  auto& form = FormList->operator[](selectedForm);
-			  if (form.type == SAT) {
-				auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-				for (auto iGuide = 0U; iGuide < form.satinGuideCount; iGuide++) {
-				  guides[guideCount++] = guideIt[iGuide];
-				}
-			  }
-			}
-			// skip past the guides
-			auto points     = convert_ptr<fPOINT*>(&guides[guideCount]);
-			auto pointCount = 0;
-			for (auto& selectedForm : (*SelectedFormList)) {
-			  auto& form = FormList->operator[](selectedForm);
-			  if (clip::isclpx(form)) {
-				auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-				for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; iClip++) {
-				  points[pointCount++] = *offsetStart;
-				  offsetStart++;
-				}
-			  }
-			  if (clip::iseclp(form)) {
-				auto offsetStart = std::next(ClipPoints->cbegin(), form.borderClipData);
-				for (auto iClip = 0U; iClip < form.clipEntries; iClip++) {
-				  points[pointCount++] = *offsetStart;
-				  offsetStart++;
-				}
-			  }
-			}
-			// Skip past the points
-			auto textures     = convert_ptr<TXPNT*>(&points[pointCount]);
-			auto textureCount = 0;
-			iForm             = 0;
-			for (auto& selectedForm : (*SelectedFormList)) {
-			  auto& form = FormList->operator[](selectedForm);
-			  if (texture::istx(selectedForm)) {
-				auto startPoint = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-				auto       endPoint = std::next(startPoint, form.fillInfo.texture.count);
-				auto const dest = gsl::span<TXPNT>(&textures[textureCount], form.fillInfo.texture.count);
-				std::copy(startPoint, endPoint, dest.begin());
-				forms[iForm++].fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
-				textureCount += form.fillInfo.texture.count;
-			  }
-			}
-			SetClipboardData(ThrEdClip, ThrEdClipPointer);
 		  }
+		  // skip past the vertex list
+		  auto guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
+		  auto guideCount = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& form = FormList->operator[](selectedForm);
+			if (form.type == SAT) {
+			  auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			  for (auto iGuide = 0U; iGuide < form.satinGuideCount; iGuide++) {
+				guides[guideCount++] = guideIt[iGuide];
+			  }
+			}
+		  }
+		  // skip past the guides
+		  auto points     = convert_ptr<fPOINT*>(&guides[guideCount]);
+		  auto pointCount = 0;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& form = FormList->operator[](selectedForm);
+			if (clip::isclpx(form)) {
+			  auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+			  for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; iClip++) {
+				points[pointCount++] = *offsetStart;
+				offsetStart++;
+			  }
+			}
+			if (clip::iseclp(form)) {
+			  auto offsetStart = std::next(ClipPoints->cbegin(), form.borderClipData);
+			  for (auto iClip = 0U; iClip < form.clipEntries; iClip++) {
+				points[pointCount++] = *offsetStart;
+				offsetStart++;
+			  }
+			}
+		  }
+		  // Skip past the points
+		  auto textures     = convert_ptr<TXPNT*>(&points[pointCount]);
+		  auto textureCount = 0;
+		  iForm             = 0;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& form = FormList->operator[](selectedForm);
+			if (texture::istx(selectedForm)) {
+			  auto startPoint = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
+			  auto       endPoint = std::next(startPoint, form.fillInfo.texture.count);
+			  auto const dest = gsl::span<TXPNT>(&textures[textureCount], form.fillInfo.texture.count);
+			  std::copy(startPoint, endPoint, dest.begin());
+			  forms[iForm++].fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
+			  textureCount += form.fillInfo.texture.count;
+			}
+		  }
+		  SetClipboardData(ThrEdClip, ThrEdClipPointer);
 		}
 		CloseClipboard();
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
@@ -7763,73 +7753,71 @@ void thred::internal::duclip() {
 		  // clang-format on
 		  FileSize += sizeof(FORMCLIP);
 		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize); // NOLINT
-		  GSL_SUPPRESS(26429) {
-			if (ThrEdClipPointer != nullptr) {
-			  auto clipFormHeader      = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
-			  clipFormHeader->clipType = CLP_FRM;
-			  clipFormHeader->form     = form;
-			  auto formVertices        = convert_ptr<fPOINT*>(&clipFormHeader[1]);
-			  auto vertexIt            = std::next(FormVertices->cbegin(), form.vertexIndex);
-			  for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
-				formVertices[iSide] = vertexIt[iSide];
-			  }
-			  auto guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
-			  auto iGuide = 0U;
-			  if (form.type == SAT) {
-				auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-				for (iGuide = 0; iGuide < form.satinGuideCount; iGuide++) {
-				  guides[iGuide] = guideIt[iGuide];
-				}
-			  }
-			  auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
-			  auto iClip = 0U;
-			  if (clip::isclpx(ClosestFormToCursor)) {
-				auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-				for (iClip = 0; iClip < form.lengthOrCount.clipCount; iClip++) {
-				  mclp[iClip] = *offsetStart;
-				  offsetStart++;
-				}
-			  }
-			  auto points = convert_ptr<fPOINT*>(&mclp[iClip]);
-			  if (clip::iseclpx(ClosestFormToCursor)) {
-				auto offsetStart = std::next(ClipPoints->cbegin(), form.borderClipData);
-				for (iClip = 0; iClip < form.clipEntries; iClip++) {
-				  points[iClip] = *offsetStart;
-				  offsetStart++;
-				}
-			  }
-			  auto textures = convert_ptr<TXPNT*>(&points[iClip]);
-			  if (texture::istx(ClosestFormToCursor)) {
-				auto startPoint = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-				auto       endPoint = std::next(startPoint, form.fillInfo.texture.count);
-				auto const dest     = gsl::span<TXPNT>(textures, form.fillInfo.texture.count);
-				std::copy(startPoint, endPoint, dest.begin());
-			  }
-			  SetClipboardData(ThrEdClip, ThrEdClipPointer);
+		  if (ThrEdClipPointer != nullptr) {
+			auto clipFormHeader      = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
+			clipFormHeader->clipType = CLP_FRM;
+			clipFormHeader->form     = form;
+			auto formVertices        = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+			auto vertexIt            = std::next(FormVertices->cbegin(), form.vertexIndex);
+			for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
+			  formVertices[iSide] = vertexIt[iSide];
 			}
-			if (((form.fillType != 0U) || (form.edgeType != 0U))) {
-			  Clip = RegisterClipboardFormat(PcdClipFormat);
-			  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); // NOLINT
-			  if (ClipPointer != nullptr) {
-				ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
-				auto iTexture  = firstStitch;
-				savclp(ClipStitchData[0], StitchBuffer->operator[](iTexture), length);
+			auto guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
+			auto iGuide = 0U;
+			if (form.type == SAT) {
+			  auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			  for (iGuide = 0; iGuide < form.satinGuideCount; iGuide++) {
+				guides[iGuide] = guideIt[iGuide];
+			  }
+			}
+			auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
+			auto iClip = 0U;
+			if (clip::isclpx(ClosestFormToCursor)) {
+			  auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+			  for (iClip = 0; iClip < form.lengthOrCount.clipCount; iClip++) {
+				mclp[iClip] = *offsetStart;
+				offsetStart++;
+			  }
+			}
+			auto points = convert_ptr<fPOINT*>(&mclp[iClip]);
+			if (clip::iseclpx(ClosestFormToCursor)) {
+			  auto offsetStart = std::next(ClipPoints->cbegin(), form.borderClipData);
+			  for (iClip = 0; iClip < form.clipEntries; iClip++) {
+				points[iClip] = *offsetStart;
+				offsetStart++;
+			  }
+			}
+			auto textures = convert_ptr<TXPNT*>(&points[iClip]);
+			if (texture::istx(ClosestFormToCursor)) {
+			  auto startPoint = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
+			  auto       endPoint = std::next(startPoint, form.fillInfo.texture.count);
+			  auto const dest     = gsl::span<TXPNT>(textures, form.fillInfo.texture.count);
+			  std::copy(startPoint, endPoint, dest.begin());
+			}
+			SetClipboardData(ThrEdClip, ThrEdClipPointer);
+		  }
+		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
+			Clip = RegisterClipboardFormat(PcdClipFormat);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); // NOLINT
+			if (ClipPointer != nullptr) {
+			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
+			  auto iTexture  = firstStitch;
+			  savclp(ClipStitchData[0], StitchBuffer->operator[](iTexture), length);
+			  iTexture++;
+			  auto iDestination   = 1U;
+			  auto codedAttribute = gsl::narrow<uint32_t>(ClosestFormToCursor << FRMSHFT);
+			  while (iTexture < StitchBuffer->size()) {
+				if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
+				    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
+				  savclp(ClipStitchData[iDestination++],
+				         StitchBuffer->operator[](iTexture),
+				         (StitchBuffer->operator[](iTexture).attribute & COLMSK));
+				}
 				iTexture++;
-				auto iDestination   = 1U;
-				auto codedAttribute = gsl::narrow<uint32_t>(ClosestFormToCursor << FRMSHFT);
-				while (iTexture < StitchBuffer->size()) {
-				  if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
-				      ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
-					savclp(ClipStitchData[iDestination++],
-					       StitchBuffer->operator[](iTexture),
-					       (StitchBuffer->operator[](iTexture).attribute & COLMSK));
-				  }
-				  iTexture++;
-				}
-				SetClipboardData(Clip, ClipPointer);
 			  }
-			  form::ispcdclp();
+			  SetClipboardData(Clip, ClipPointer);
 			}
+			form::ispcdclp();
 		  }
 		  CloseClipboard();
 		}
@@ -7872,7 +7860,7 @@ void thred::internal::duclip() {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::delfstchs() {
+void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
   auto firstStitch =
@@ -9461,7 +9449,7 @@ void thred::delinf() noexcept {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
+void thred::chkrng(fPOINT& range) {
   thred::savdo();
   thred::delinf();
   range.x = gsl::narrow<double>(UnzoomedRect.x);
@@ -9513,8 +9501,8 @@ GSL_SUPPRESS(26440) void thred::chkrng(fPOINT& range) {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::ritmov(uint32_t formIndex) {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+void thred::ritmov(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
@@ -9986,8 +9974,8 @@ void thred::internal::vuselthr() {
   StateMap.set(StateFlag::RESTCH);
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void thred::internal::colchk() {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+void thred::internal::colchk() {
   if (!StitchBuffer->empty()) {
 	auto color         = StitchBuffer->front().attribute & COLMSK;
 	auto currentStitch = 0U;
@@ -10007,7 +9995,7 @@ GSL_SUPPRESS(26440) void thred::internal::colchk() {
 }
 
 // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) auto thred::internal::makbig(uint32_t start, uint32_t finish) -> uint32_t {
+auto thred::internal::makbig(uint32_t start, uint32_t finish) -> uint32_t {
   auto newStitches = std::vector<fPOINTATTR> {};
   newStitches.reserve(finish - start); // we know that we will have at least this number of Stitches
   auto adcnt = 0U;
@@ -11319,14 +11307,14 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 	for (auto iFile = 0U; iFile < fileIndex; iFile++) {
 	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
-		GSL_SUPPRESS(26490)
+		#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
 		            LB_ADDSTRING,
 		            0,
 		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
 	  }
 	  else {
-		GSL_SUPPRESS(26490)
+	    #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
 		            LB_ADDSTRING,
 		            0,
@@ -11342,7 +11330,8 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-	  GSL_SUPPRESS(26490) fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
+	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
 	  if (fileInfo != nullptr) {
 		auto searchName   = *DefaultDirectory / L"*.thr";
 		auto searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
@@ -11363,7 +11352,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  break;
 	}
 	case WM_COMMAND: {
-	  GSL_SUPPRESS(26490)
+	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT
 	  if (fileInfo != nullptr) {
 		switch (LOWORD(wparam)) { // NOLINT
@@ -11444,7 +11433,6 @@ void thred::internal::lock() {
   lockInfo.count = 0;
   // ToDo - Replace 512 with maximum files in subdirectory
   lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT
-  GSL_SUPPRESS(26490)
   DialogBoxParam(
       ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT
   delete[] lockInfo.data; // NOLINT
@@ -12083,7 +12071,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  auto featherStyle = std::wstring {};
 	  for (auto iFeatherStyle = 0U; iFeatherStyle < 6U; iFeatherStyle++) {
 		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
-		GSL_SUPPRESS(26490)
+		#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(
 		    GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT
 	  }
@@ -19099,27 +19087,25 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-			GSL_SUPPRESS(26490) {
-			  if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT
-				auto const position = HIWORD(wParam);                 // NOLINT
-				MovieTimeStep       = MAXDELAY - position;
-				setsped();
-				SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
-			  }
+			#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT
+			  auto const position = HIWORD(wParam);                 // NOLINT
+			  MovieTimeStep       = MAXDELAY - position;
+			  setsped();
+			  SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
 			}
 		  }
 		  else {
-			GSL_SUPPRESS(26490) {
-			  if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT
-				auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-				ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
-				ZoomRect.right       = ZoomRect.left + zoomWidth;
-				if (ZoomRect.right > UnzoomedRect.x) {
-				  ZoomRect.right = UnzoomedRect.x;
-				  ZoomRect.left  = UnzoomedRect.x - zoomWidth;
-				}
-				StateMap.set(StateFlag::RESTCH);
+			#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT
+			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
+			  ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
+			  ZoomRect.right       = ZoomRect.left + zoomWidth;
+			  if (ZoomRect.right > UnzoomedRect.x) {
+				ZoomRect.right = UnzoomedRect.x;
+				ZoomRect.left  = UnzoomedRect.x - zoomWidth;
 			  }
+			  StateMap.set(StateFlag::RESTCH);
 			}
 		  }
 		  return 1;
@@ -19171,7 +19157,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	}
 	case WM_DRAWITEM: {
 	  // owner draw windows
-	  GSL_SUPPRESS(26490) DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT
+	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT
 	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap.test(StateFlag::TXTRED)) {
 		  texture::drwtxtr();

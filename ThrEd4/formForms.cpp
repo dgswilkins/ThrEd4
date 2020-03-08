@@ -610,8 +610,8 @@ void formForms::frmnum() {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-GSL_SUPPRESS(26440) void formForms::internal::chkdaz() {
+#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
+void formForms::internal::chkdaz() {
   if (IniFile.daisyPetalPoints == 0U) {
 	IniFile.daisyPetalPoints = 1U;
   }
@@ -662,7 +662,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   auto daisyType = std::wstring {};
   for (auto const DaisyTypeString : DaisyTypeStrings) {
 	displayText::loadString(daisyType, DaisyTypeString);
-	GSL_SUPPRESS(26490)
+  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	SendMessage(
 	    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT
   }

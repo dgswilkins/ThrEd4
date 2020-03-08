@@ -66,11 +66,10 @@ auto LoadStringSpan = gsl::span(LoadStringList);
 void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
   sDest.clear();
-  GSL_SUPPRESS(26490) {
-	if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
-	  auto const span = gsl::span<wchar_t>(pBuf, len);
-	  sDest.insert(sDest.end(), span.cbegin(), span.cend());
-	}
+  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+  if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
+	auto const span = gsl::span<wchar_t>(pBuf, len);
+	sDest.insert(sDest.end(), span.cbegin(), span.cend());
   }
 }
 
@@ -424,8 +423,9 @@ auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
   return TRUE;
 }
 
-GSL_SUPPRESS(26490) void displayText::updateWinFont(HWND hWnd) noexcept {
+void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = displayText::getThrEdFont(400);
+  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont)); // NOLINT
 }
 #pragma warning(pop)
@@ -491,7 +491,8 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 #endif
 }
 
-GSL_SUPPRESS(26490)
-GSL_SUPPRESS(26461) void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+#pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
+void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
+  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0)); // NOLINT
 }

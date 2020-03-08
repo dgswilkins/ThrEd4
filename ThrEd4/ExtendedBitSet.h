@@ -15,8 +15,8 @@ class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
   using super = boost::dynamic_bitset<Block, Allocator>;
 
   public:
-  GSL_SUPPRESS(26434)
-  explicit ExtendedBitSet(std::size_t bits) : super::dynamic_bitset(bits) {
+      #pragma warning(suppress : 26434) // Function hides a non-virtual function  (c.128)
+      explicit ExtendedBitSet(std::size_t bits) : super::dynamic_bitset(bits) {
   }
 
   /*
