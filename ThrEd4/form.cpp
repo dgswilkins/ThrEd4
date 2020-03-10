@@ -839,10 +839,9 @@ void form::internal::setzig() {
 
 void form::setmfrm() {
   // clang-format off
-  auto        point     = POINT {0L, 0L};
   auto const& closeForm = FormList->operator[](ClosestFormToCursor);
   auto        vertexIt  = std::next(FormVertices->cbegin(), closeForm.vertexIndex);
-  point                 = form::sfCor2px(vertexIt[0]);
+  auto        point     = form::sfCor2px(vertexIt[0]);
   auto const  offset    =
       POINT {Msg.pt.x - StitchWindowOrigin.x - point.x + wrap::round<int32_t>(FormMoveDelta.x),
              Msg.pt.y - StitchWindowOrigin.y - point.y + wrap::round<int32_t>(FormMoveDelta.y)};
@@ -5200,9 +5199,8 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   SelectedFormControlVertex >>= 1U;
   if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top &&
       point.y <= rectangle.bottom) {
-	auto formOrigin = POINT {0L, 0L};
 	auto vertexIt   = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
-	formOrigin      = form::sfCor2px(*vertexIt);
+	auto const formOrigin = form::sfCor2px(*vertexIt);
 	FormMoveDelta   = fPOINT {formOrigin.x - point.x, formOrigin.y - point.y};
 	StateMap.set(StateFlag::FRMOV);
 	return true;
@@ -6096,16 +6094,17 @@ void form::setstrtch() {
 
 void form::setexpand(float xyRatio) {
   auto size0 = fPOINT {};
-  // cppcheck-suppress redundantInitialization
   auto rectangle = fRECTANGLE {};
   thred::savdo();
   auto  stitchPoint = fPOINT {};
   auto& form        = FormList->operator[](ClosestFormToCursor);
   if (!SelectedFormList->empty() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-	rectangle     = fRECTANGLE {gsl::narrow_cast<float>(SelectedFormsRect.left),
-                            gsl::narrow_cast<float>(SelectedFormsRect.top),
-                            gsl::narrow_cast<float>(SelectedFormsRect.right),
-                            gsl::narrow_cast<float>(SelectedFormsRect.bottom)};
+	// cppcheck-suppress redundantInitialization
+	rectangle = fRECTANGLE {gsl::narrow_cast<float>(SelectedFormsRect.left),
+	                        gsl::narrow_cast<float>(SelectedFormsRect.top),
+	                        gsl::narrow_cast<float>(SelectedFormsRect.right),
+	                        gsl::narrow_cast<float>(SelectedFormsRect.bottom)};
+
 	stitchPoint.x = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowOrigin.x);
 	stitchPoint.y = gsl::narrow_cast<float>(Msg.pt.y - StitchWindowOrigin.y);
 	size0.y       = rectangle.bottom - rectangle.top;

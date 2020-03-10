@@ -5497,9 +5497,8 @@ void thred::internal::bfil() {
 	  BitmapInfoHeader.biBitCount    = 32U;
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  HBITMAP bitmap                 = {};
 	  auto*   bits                   = gsl::narrow_cast<uint32_t*>(nullptr);
-	  bitmap                         = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto    bitmap                 = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -11860,10 +11859,9 @@ void thred::internal::selfrmx() {
 }
 
 void thred::internal::setpclp() {
-  auto point = POINT {0L, 0L};
   FormVerticesAsLine->clear();
   auto it = InterleaveSequence->begin();
-  point   = form::sfCor2px(*it);
+  auto point   = form::sfCor2px(*it);
   it++;
   FormVerticesAsLine->push_back(point);
   point = form::sfCor2px(*it);
