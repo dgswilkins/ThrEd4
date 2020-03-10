@@ -5199,9 +5199,9 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   SelectedFormControlVertex >>= 1U;
   if (point.x >= rectangle.left && point.x <= rectangle.right && point.y >= rectangle.top &&
       point.y <= rectangle.bottom) {
-	auto vertexIt   = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
+	auto       vertexIt   = std::next(FormVertices->cbegin(), currentForm.vertexIndex);
 	auto const formOrigin = form::sfCor2px(*vertexIt);
-	FormMoveDelta   = fPOINT {formOrigin.x - point.x, formOrigin.y - point.y};
+	FormMoveDelta         = fPOINT {formOrigin.x - point.x, formOrigin.y - point.y};
 	StateMap.set(StateFlag::FRMOV);
 	return true;
   }
@@ -6093,7 +6093,7 @@ void form::setstrtch() {
 }
 
 void form::setexpand(float xyRatio) {
-  auto size0 = fPOINT {};
+  auto size0     = fPOINT {};
   auto rectangle = fRECTANGLE {};
   thred::savdo();
   auto  stitchPoint = fPOINT {};

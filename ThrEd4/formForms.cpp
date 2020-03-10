@@ -662,7 +662,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   auto daisyType = std::wstring {};
   for (auto const DaisyTypeString : DaisyTypeStrings) {
 	displayText::loadString(daisyType, DaisyTypeString);
-  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	SendMessage(
 	    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT
   }

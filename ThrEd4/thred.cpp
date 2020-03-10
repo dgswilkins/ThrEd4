@@ -4827,7 +4827,7 @@ void thred::internal::auxmen() {
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }
-  #pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile (type.3)
+#pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile (type.3)
   filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT
   SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
   StateMap.set(StateFlag::DUMEN);
@@ -5421,7 +5421,7 @@ void thred::internal::savmap() {
 
 auto thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
-	#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	auto bitmap =
 	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
 	if (*ppvBits != nullptr) {
@@ -5497,8 +5497,8 @@ void thred::internal::bfil() {
 	  BitmapInfoHeader.biBitCount    = 32U;
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  auto*   bits                   = gsl::narrow_cast<uint32_t*>(nullptr);
-	  auto    bitmap                 = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
+	  auto  bitmap                   = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -11306,14 +11306,14 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 	for (auto iFile = 0U; iFile < fileIndex; iFile++) {
 	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
-		#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
 		            LB_ADDSTRING,
 		            0,
 		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
 	  }
 	  else {
-	    #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
 		            LB_ADDSTRING,
 		            0,
@@ -11329,7 +11329,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490)                     // Don't use reinterpret_cast (type.1)
 	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
 	  if (fileInfo != nullptr) {
 		auto searchName   = *DefaultDirectory / L"*.thr";
@@ -11351,7 +11351,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  break;
 	}
 	case WM_COMMAND: {
-	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT
 	  if (fileInfo != nullptr) {
 		switch (LOWORD(wparam)) { // NOLINT
@@ -11860,8 +11860,8 @@ void thred::internal::selfrmx() {
 
 void thred::internal::setpclp() {
   FormVerticesAsLine->clear();
-  auto it = InterleaveSequence->begin();
-  auto point   = form::sfCor2px(*it);
+  auto it    = InterleaveSequence->begin();
+  auto point = form::sfCor2px(*it);
   it++;
   FormVerticesAsLine->push_back(point);
   point = form::sfCor2px(*it);
@@ -12069,7 +12069,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  auto featherStyle = std::wstring {};
 	  for (auto iFeatherStyle = 0U; iFeatherStyle < 6U; iFeatherStyle++) {
 		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
-		#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(
 		    GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT
 	  }
@@ -14790,10 +14790,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto formVertices  = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
 		auto currentVertex = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
-		  auto const offset          = formOffset + iForm;
-		  auto& form                 = FormList->operator[](offset);
-		  form.vertexIndex           = wrap::toUnsigned(FormVertices->size());
-		  auto const currentVertices = gsl::span<fPOINT>(formVertices, gsl::narrow_cast<ptrdiff_t>(currentVertex) + form.vertexCount);
+		  auto const offset = formOffset + iForm;
+		  auto& form        = FormList->operator[](offset);
+		  form.vertexIndex  = wrap::toUnsigned(FormVertices->size());
+		  auto const currentVertices =
+		      gsl::span<fPOINT>(formVertices, gsl::narrow_cast<ptrdiff_t>(currentVertex) + form.vertexCount);
 		  FormVertices->insert(FormVertices->end(),
 		                       std::next(currentVertices.cbegin(), currentVertex),
 		                       currentVertices.cend());
@@ -19085,7 +19086,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-			#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT
 			  auto const position = HIWORD(wParam);                 // NOLINT
 			  MovieTimeStep       = MAXDELAY - position;
@@ -19094,7 +19095,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			}
 		  }
 		  else {
-			#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT
 			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
 			  ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
@@ -19154,8 +19155,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_DRAWITEM: {
-	  // owner draw windows
-	  #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+// owner draw windows
+#pragma warning(suppress : 26490)                            // Don't use reinterpret_cast (type.1)
 	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT
 	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap.test(StateFlag::TXTRED)) {
