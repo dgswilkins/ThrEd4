@@ -430,7 +430,7 @@ auto bitmap::getBitmapSizeinStitches() noexcept -> fPOINT {
   return BitmapSizeinStitches;
 }
 
-auto bitmap::getBmpBackColor(uint32_t index) noexcept -> COLORREF {
+auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
   return BitmapBackgroundColors[index];
 }
 
@@ -460,11 +460,11 @@ auto bitmap::getBitmapWidth() noexcept -> uint32_t {
   return BitmapWidth;
 }
 
-void bitmap::setBitmapColor(COLORREF newColor) noexcept {
+void bitmap::setBitmapColor(COLORREF const& newColor) noexcept {
   BitmapColor = newColor;
 }
 
-void bitmap::setBitmapPen(HPEN& pen) noexcept {
+void bitmap::setBitmapPen(HPEN const& pen) noexcept {
   BitmapPen = pen;
 }
 
