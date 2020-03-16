@@ -8,24 +8,6 @@
 #define NOMINMAX
 #endif
 
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-//#include <filesystem>
-//#include <vector>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26814)
-//#include <boost/dynamic_bitset.hpp>
-#pragma warning(pop)
-
-// Local Headers
-//#include "ThrEdTypes.h"
-
 namespace bitmap {
 void assignDefBmpDir(std::wstring const& directory);
 void assignUBFilename(fs::path const& directory);

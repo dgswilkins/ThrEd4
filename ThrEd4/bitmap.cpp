@@ -8,45 +8,11 @@
 #define NOMINMAX
 #endif
 
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
-#ifdef ALLOCFAILURE
-#include <new.h>
-#endif
-
-// Standard Libraries
-//#include <bitset>
-
-// Open Source headers
-//#include "warnings.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-//#include <boost/dynamic_bitset.hpp>
-//#include <fmt/format.h>
-#pragma warning(pop)
-
 // Local Headers
-//#include "switches.h"
-//#include "EnumMap.h"
-//#include "utf8conv.h"
-//#include "wrappers.h"
-
 #include "Resources/resource.h"
 #include "globals.h"
-//#include "clip.h"
 #include "displayText.h"
-//#include "form.h"
-//#include "formForms.h"
-//#include "hlp.h"
-//#include "repair.h"
-//#include "satin.h"
-//#include "texture.h"
 #include "trace.h"
-//#include "xt.h"
 #include "thred.h"
 #include "bitmap.h"
 
