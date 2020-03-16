@@ -43,15 +43,8 @@ fs::path* AuxName;                         //
 std::vector<BSEQPNT>* BSequence; //
 
 HBRUSH   BackgroundBrush;      // background color brush
+COLORREF BackgroundColor;      // stitch window background
 uint32_t BeanCount;            // number of stitches added by convert to bean
-HDC      BitmapDC;             // bitmap device context
-RECT     BitmapDstRect;        // stitch window destination rectangle for zooomed view
-uint32_t BitmapHeight;         // bitmap height
-POINT    BitmapPoint;          // a point on the bitmap
-fPOINT   BitmapSizeinStitches; // bitmap end points in stitch points
-RECT     BitmapSrcRect;        // bitmap source rectangle for zoomed view
-fPOINT   BmpStitchRatio;       // bitmap to stitch hoop ratios
-uint32_t BitmapWidth;          // bitmap width
 float    BorderWidth = BRDWID; // border width for satin borders
 int32_t  ButtonHeight;         // button height
 int32_t  ButtonWidth;          // button width
@@ -226,6 +219,7 @@ HINSTANCE           ThrEdInstance;                  // main instance handle
 HWND                ThrEdWindow;                    // main window handle
 fs::path*           ThrName;                        //
 POINT               ThredWindowOrigin;              // offset origin of the main window
+HBITMAP             TraceBitmap;                    // trace bitmap
 uint32_t*           TraceBitmapData;                // trace bitmap data
 HDC                 TraceDC;                        // trace device context
 

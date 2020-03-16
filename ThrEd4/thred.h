@@ -42,11 +42,11 @@ auto duthrsh(double threshold) noexcept -> uint32_t;
 void duzrat() noexcept;
 void frmdel();
 void frmrct(fRECTANGLE& rectangle) noexcept;
-auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
 void grpAdj();
 void hidbit();
 auto inStitchWin() noexcept -> bool;
 void movStch();
+auto nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
@@ -84,11 +84,6 @@ namespace internal {
   void bakmrk();
   void bakthum();
   void barnam(HWND window, uint32_t iThumbnail);
-  void bfil();
-  auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
-  auto bitar() -> bool;
-  void bitlin(uint8_t const* source, uint32_t* destination, COLORREF foreground, COLORREF background);
-  void bitsiz();
   void box(uint32_t iNearest, HDC dc) noexcept;
   void boxs() noexcept;
   void bsavmen();
@@ -127,7 +122,6 @@ namespace internal {
   void cut();
   void defNam(fs::path const& fileName);
   auto defTxt(uint32_t iColor) -> COLORREF;
-  void defbNam();
   void defpref();
   void delcol();
   void deldir();
@@ -219,7 +213,6 @@ namespace internal {
   void frmpos(FRMHED& form, float deltaX, float deltaY);
   void frmsnap(uint32_t start, uint32_t count);
   auto frmstch() -> bool;
-  auto fswap(COLORREF color) noexcept -> COLORREF;
 
   auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
@@ -234,9 +227,6 @@ namespace internal {
   void gotbox();
   void gselrng() noexcept;
   void gsnap();
-
-  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
-
   auto handleEditMenu(WORD const& wParameter) -> bool;
   auto handleEitherButtonDown(bool& retflag) -> bool;
   auto handleEndKey(int32_t& retflag) -> bool;
@@ -287,7 +277,6 @@ namespace internal {
 
   auto CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
-  void lodbmp();
   void lodclp(uint32_t iStitch);
   void longer();
   void makCol() noexcept;
@@ -298,7 +287,6 @@ namespace internal {
   void movchk();
   void movi();
   void movins();
-  void movmap(uint32_t cnt, uint8_t* buffer);
   void movmrk();
   auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
   void mv2b();
@@ -310,11 +298,9 @@ namespace internal {
   void noMsg();
   void nuAct(uint32_t iStitch) noexcept;
   auto nuBak() noexcept -> COLORREF;
-  auto nuBit() noexcept -> COLORREF;
   auto nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH;
   auto nuCol(COLORREF init) noexcept -> COLORREF;
   void nuFil();
-  auto nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN;
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
   auto nuang(float yDelta, float xDelta) noexcept -> float;
@@ -397,7 +383,6 @@ namespace internal {
   void savAs();
   auto savcmp() noexcept -> bool;
   void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
-  void savmap();
   auto sdCor2px(fPOINTATTR const& stitchPoint) -> POINT;
   void segentr(float rotationAngle);
   void selCol();

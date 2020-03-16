@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bitmap.cpp" />
     <ClCompile Include="displayText.cpp" />
     <ClCompile Include="form.cpp" />
     <ClCompile Include="formForms.cpp" />
@@ -40,6 +41,7 @@
     <ClCompile Include="xt.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bitmap.h" />
     <ClInclude Include="displayText.h" />
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />

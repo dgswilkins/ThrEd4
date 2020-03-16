@@ -37,6 +37,7 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
+#include "bitmap.h"
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
@@ -87,7 +88,6 @@ POINT           ClipOrigin;              // origin of clipboard box in stitch co
 SIZE            SelectBoxSize;           // size of the select box
 POINT SelectBoxOffset; // offset of the spot the user selected from the lower left of the select box
 float RotationHandleAngle;      // angle of the rotation handle
-uint32_t BitmapColor  = BITCOL; // bitmap color
 double   ThreadSize30 = TSIZ30; //#30 thread size
 double   ThreadSize40 = TSIZ40; //#40 thread size
 double   ThreadSize60 = TSIZ60; //#40 thread size
@@ -155,7 +155,6 @@ HPEN BoxPen[4];      // box pens
 HPEN CrossPen;       // pen for crosses in color windows
 HPEN GroupSelectPen; // pen for group select
 HPEN BackgroundPen;  // background color pen
-HPEN BitmapPen;      // bitmap pen
 HPEN ZoomMarkPen;    // zoom mark pen
 HPEN KnotPen;        // knot pen
 
@@ -171,9 +170,6 @@ COLORREF    CustomColor[16];
 // for the background color dialog box
 CHOOSECOLOR BackgroundColorStruct;
 COLORREF    CustomBackgroundColor[16];
-// for the bitmap color dialog box
-CHOOSECOLOR BitMapColorStruct;
-COLORREF    BitmapBackgroundColors[16];
 
 wchar_t  ThreadSize[16][2];    // user selected thread sizes
 uint32_t ThreadSizePixels[16]; // thread sizes in pixels
@@ -189,7 +185,6 @@ HWND  ColorBar;               // color bar
 HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
-COLORREF       BackgroundColor; // stitch window background
 COLORREF const BoxColor[] = {0x404040, 0x408040, 0x804040, 0x404080};
 int32_t        ThreadWidthPixels[3];     // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
@@ -254,20 +249,16 @@ fs::path* ColorFileName; //.thw file name
 fs::path* RGBFileName;   //.rgb file name
 fs::path* DefaultDirectory;
 fs::path* SearchName;
-fs::path* DefaultBMPDirectory;
 fs::path* BalaradName0; // balarad semaphore file
 fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
-fs::path* UserBMPFileName; // bitmap file name from user load
 fs::path* IniFileName;     //.ini file name
 
-wchar_t const BmpFilter[_MAX_PATH + 1]    = L"Microsoft (BMP)\0*.bmp\0";
 wchar_t       CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
 HANDLE        FileHandle                  = nullptr;
 HANDLE        PCSFileHandle               = nullptr;
 HANDLE        IniFileHandle               = nullptr;
 HANDLE        InsertedFileHandle; // insert file handle
-HANDLE        BitmapFileHandle;   // bitmap handle
 uint32_t      FileSize;           // size of file
 DWORD         BytesRead;          // bytes actually read from file
 uint32_t      ColorChanges;       // number of color changes
@@ -314,43 +305,6 @@ wchar_t  InsertedFileName[_MAX_PATH] = {0}; // insert file name
 uint32_t InsertedVertexIndex;               // saved float pointer for inserting files
 uint32_t InsertedFormIndex;                 // saved form pointer for inserting files
 uint32_t InsertedStitchIndex;               // saved stitch pointer for inserting files
-
-OPENFILENAME OpenBitmapName = {
-    sizeof(OpenBitmapName),   // lStructsize
-    nullptr,                  // hwndOwner
-    nullptr,                  // hInstance
-    std::begin(BmpFilter),    // lpstrFilter
-    std::begin(CustomFilter), // lpstrCustomFilter
-    _MAX_PATH,                // nMaxCustFilter
-    0,                        // nFilterIndex
-    nullptr,                  // lpstrFile
-    _MAX_PATH,                // nMaxFile
-    nullptr,                  // lpstrFileTitle
-    0,                        // nMaxFileTitle
-    nullptr,                  // lpstrInitialDir
-    nullptr,                  // lpstrTitle
-    OFN_OVERWRITEPROMPT,      // Flags
-    0,                        // nFileOffset
-    0,                        // nFileExtension
-    L"bmp",                   // lpstrDefExt
-    0,                        // lCustData
-    nullptr,                  // lpfnHook
-    nullptr,                  // lpTemplateName
-#ifdef _MAC
-    nullptr, // lpEditInfo
-    0U,      // lpstrPrompt
-#endif
-#if (_WIN32_WINNT >= 0x0500)
-    nullptr, // *pvReserved
-    0U,      // dwReserved
-    0U       // FlagsEx
-#endif
-};
-
-BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
-BITMAPV4HEADER   BitmapFileHeaderV4; // bitmap version4 file header
-BITMAPINFO       BitmapInfo;         // bitmap info
-BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 
 COLORREF const DefaultUserColors[] = {0x00000000,
                                       0x002dffff,
@@ -402,23 +356,6 @@ COLORREF const DefaultCustomBackgroundColors[] = {0x00a3c5dc,
                                                   0x00d3d3c7,
                                                   0x007c9c84,
                                                   0x009acddc};
-
-COLORREF const DefaultBitmapBackgroundColors[] = {0x00c0d5bf,
-                                                  0x00c8dfee,
-                                                  0x00708189,
-                                                  0x00a5a97a,
-                                                  0x00b8d6fe,
-                                                  0x008a8371,
-                                                  0x004b6cb8,
-                                                  0x009cdcc2,
-                                                  0x00366d39,
-                                                  0x00dcfcfb,
-                                                  0x003c4f75,
-                                                  0x0095b086,
-                                                  0x00c9dcba,
-                                                  0x0043377b,
-                                                  0x00b799ae,
-                                                  0x0054667a};
 
 POINT MoveLine0[2];              // move point line
 POINT MoveLine1[2];              // move point line
@@ -3462,7 +3399,7 @@ void thred::internal::ritlayr() {
   }
 }
 
-auto thred::internal::nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN {
+auto thred::nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN {
   DeleteObject(pen);
   return wrap::CreatePen(PS_SOLID, width, color);
 }
@@ -3562,12 +3499,6 @@ void thred::internal::defNam(fs::path const& fileName) {
   }
 }
 
-void thred::internal::defbNam() {
-  if (!UserBMPFileName->empty()) {
-	*DefaultBMPDirectory = UserBMPFileName->parent_path();
-  }
-}
-
 void thred::internal::ritini() {
   auto           directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
   auto const     defaultDirectory = gsl::span<char> {IniFile.defaultDirectory};
@@ -3595,10 +3526,10 @@ void thred::internal::ritini() {
 	IniFile.stitchColors[iColor]              = UserColor[iColor];
 	IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
 	IniFile.stitchPreferredColors[iColor]     = CustomColor[iColor];
-	IniFile.bitmapBackgroundColors[iColor]    = BitmapBackgroundColors[iColor];
+	IniFile.bitmapBackgroundColors[iColor]    = bitmap::getBmpBackColor(iColor);
   }
   IniFile.backgroundColor = BackgroundColor;
-  IniFile.bitmapColor     = BitmapColor;
+  IniFile.bitmapColor     = bitmap::getBmpColor();
   IniFile.minStitchLength = MinStitchLength;
   if (ShowStitchThreshold < 0.0) {
 	ShowStitchThreshold = 0.0;
@@ -5294,251 +5225,6 @@ void thred::internal::bak() {
   redbak();
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
-void thred::internal::bitsiz() {
-  auto const screenAspectRatio =
-      gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);
-  auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
-  if (bitmapAspectRatio > screenAspectRatio) {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.x);
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.x) / bitmapAspectRatio;
-  }
-  else {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.y) * bitmapAspectRatio;
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.y);
-  }
-  BmpStitchRatio.x = BitmapWidth / BitmapSizeinStitches.x;
-  BmpStitchRatio.y = BitmapHeight / BitmapSizeinStitches.y;
-  StitchBmpRatio.x = BitmapSizeinStitches.x / BitmapWidth;
-  StitchBmpRatio.y = BitmapSizeinStitches.y / BitmapHeight;
-}
-
-// Get a rough estimate of whether black or white
-// is dominant in the monochrome bitmap
-auto thred::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
-  auto       whiteBits = 0U;
-  auto       blackBits = 0U;
-  auto const byteCount = BitmapWidth >> 3U;
-  for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
-	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
-	  auto const bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
-	  for (auto iBytes = 0U; iBytes < byteCount; iBytes++) {
-		if (bcpnt[iBytes] == 0U) {
-		  blackBits++;
-		}
-		else {
-		  if (bcpnt[iBytes] == 0xff) {
-			whiteBits++;
-		  }
-		}
-	  }
-	}
-	else {
-	  throw;
-	}
-  }
-  return whiteBits > blackBits;
-}
-
-void thred::internal::bitlin(uint8_t const* source, uint32_t* destination, COLORREF foreground, COLORREF background) {
-  if ((source != nullptr) && (destination != nullptr)) {
-	for (auto i = 0U; i < (BitmapWidth >> 3U); i++) {
-	  auto bits = std::bitset<8U>(source[i]);
-	  for (auto bitOffset = 0U; bitOffset < 8U; bitOffset++) {
-		*destination = bits[bitOffset ^ 7U] ? foreground : background;
-		destination++;
-	  }
-	}
-	if (auto const final = (BitmapWidth % 8)) {
-	  auto bits = std::bitset<8U>(source[(BitmapWidth >> 3U)]);
-	  for (auto bitOffset = final; bitOffset < 8U; bitOffset++) {
-		*destination = bits[bitOffset ^ 7U] ? foreground : background;
-		destination++;
-	  }
-	}
-  }
-}
-
-auto thred::internal::fswap(COLORREF color) noexcept -> COLORREF {
-  // ToDo - find a better option than _byteswap
-  return _byteswap_ulong(color) >> 8U;
-}
-
-constexpr auto thred::internal::gudtyp(WORD bitCount) noexcept -> bool {
-  auto flag = false;
-  switch (bitCount) { // NOLINT
-	case 1U:
-	case 24U:
-	case 32U:
-	  flag = true;
-  }
-  return flag;
-}
-
-// Move unpacked 24BPP data into packed 24BPP data
-void thred::internal::movmap(uint32_t cnt, uint8_t* buffer) {
-  auto source = TraceBitmapData;
-  if (source != nullptr) {
-	auto destination = buffer;
-	for (auto i = 0U; i < cnt; i++) {
-	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
-	  destination += 3;
-	}
-  }
-}
-
-void thred::internal::savmap() {
-  if (PCSBMPFileName[0] != 0) {
-	if (StateMap.test(StateFlag::MONOMAP)) {
-	  displayText::tabmsg(IDS_SAVMAP);
-	  return;
-	}
-	if (!StateMap.test(StateFlag::WASTRAC)) {
-	  displayText::tabmsg(IDS_MAPCHG);
-	  return;
-	}
-	if (GetSaveFileName(&OpenBitmapName)) {
-	  BitmapFileHandle =
-	      CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	  if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
-		displayText::crmsg(*UserBMPFileName);
-		return;
-	  }
-	  auto bytesWritten = DWORD {0};
-	  WriteFile(BitmapFileHandle, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
-	  WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
-	  auto buffer = std::vector<uint8_t> {};
-	  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
-	  movmap(BitmapWidth * BitmapHeight, buffer.data());
-	  WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
-	  CloseHandle(BitmapFileHandle);
-	}
-  }
-  else {
-	displayText::tabmsg(IDS_SHOMAP);
-  }
-}
-
-auto thred::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
-  if (ppvBits != nullptr) {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	auto bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
-	if (*ppvBits != nullptr) {
-	  return bitmap;
-	}
-	DeleteObject(bitmap);
-	throw;
-  }
-
-  throw;
-}
-
-void thred::internal::bfil() {
-  auto const InverseBackgroundColor = fswap(BackgroundColor);
-  BitmapFileHandle =
-      CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (BitmapFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
-	auto fmtStr = std::wstring {};
-	displayText::loadString(fmtStr, IDS_UNOPEN);
-	displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
-	PCSBMPFileName[0] = 0;
-	return;
-  }
-  ReadFile(BitmapFileHandle, &BitmapFileHeader, 14U, &BytesRead, nullptr);
-  constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-  if (BitmapFileHeader.bfType == MB_Sig) {
-	auto fileHeaderSize = BitmapFileHeader.bfOffBits - 14U;
-	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
-	  fileHeaderSize = sizeof(BITMAPV4HEADER);
-	}
-	ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &BytesRead, nullptr);
-  }
-  else {
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
-	PCSBMPFileName[0] = 0;
-	return;
-  }
-  if (gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
-	if (!StateMap.testAndReset(StateFlag::WASESC)) {
-	  StateMap.reset(StateFlag::TRSET);
-	}
-	BitmapWidth  = BitmapFileHeaderV4.bV4Width;
-	BitmapHeight = BitmapFileHeaderV4.bV4Height;
-	StateMap.set(StateFlag::INIT);
-	ZoomRect.left   = 0.0F;
-	ZoomRect.bottom = 0.0F;
-	ZoomRect.right  = UnzoomedRect.x;
-	ZoomRect.top    = UnzoomedRect.y;
-	BitmapDC        = CreateCompatibleDC(StitchWindowDC);
-	if (BitmapFileHeaderV4.bV4BitCount == 1) {
-	  StateMap.set(StateFlag::MONOMAP);
-	  auto       bitmapWidthBytes = (BitmapWidth >> 5U) << 2U;
-	  auto const widthOverflow    = BitmapWidth % 32;
-	  if (widthOverflow != 0U) {
-		bitmapWidthBytes += 4;
-	  }
-	  auto const bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
-	  auto       monoBitmapData  = std::vector<uint8_t> {};
-	  monoBitmapData.resize(bitmapSizeBytes);
-	  ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &BytesRead, nullptr);
-	  CloseHandle(BitmapFileHandle);
-	  auto const flag       = binv(monoBitmapData, bitmapWidthBytes);
-	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? InverseBackgroundColor : BitmapColor);
-	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : InverseBackgroundColor);
-	  BitmapInfoHeader      = {};
-	  BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
-	  BitmapInfoHeader.biWidth       = BitmapWidth;
-	  BitmapInfoHeader.biHeight      = BitmapHeight;
-	  BitmapInfoHeader.biPlanes      = 1U;
-	  BitmapInfoHeader.biBitCount    = 32U;
-	  BitmapInfoHeader.biCompression = BI_RGB;
-	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	  auto  bitmap                   = thred::getBitmap(BitmapDC, &BitmapInfo, &bits);
-	  // Synchronize
-	  GdiFlush();
-	  if (bits != nullptr) {
-		for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
-		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
-		         &bits[wrap::toSize(iHeight) * BitmapWidth],
-		         background,
-		         foreground);
-		}
-	  }
-	  auto deviceContext = CreateCompatibleDC(StitchWindowDC);
-	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
-		SelectObject(deviceContext, bitmap);
-		BitmapFileHandle = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
-		SelectObject(BitmapDC, BitmapFileHandle);
-		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
-		DeleteObject(bitmap);
-		DeleteObject(deviceContext);
-	  }
-	}
-	else {
-	  CloseHandle(BitmapFileHandle);
-	  StateMap.reset(StateFlag::MONOMAP);
-	  BitmapFileHandle = LoadImage(
-	      ThrEdInstance, UserBMPFileName->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
-	  SelectObject(BitmapDC, BitmapFileHandle);
-	  StateMap.set(StateFlag::RESTCH);
-	}
-	bitsiz();
-	trace::initColorRef();
-	StateMap.reset(StateFlag::HIDMAP);
-  }
-  else {
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
-	PCSBMPFileName[0] = 0;
-	displayText::tabmsg(IDS_BMAP);
-  }
-}
-
 void thred::internal::prtred() {
   CloseHandle(FileHandle);
   StateMap.reset(StateFlag::INIT);
@@ -5719,11 +5405,7 @@ void thred::internal::nuFil() {
 	StateMap.reset(StateFlag::BIGBOX);
 	unthum();
 	thred::unbsho();
-	if (PCSBMPFileName[0] != 0) {
-	  DeleteObject(BitmapFileHandle);
-	  ReleaseDC(ThrEdWindow, BitmapDC);
-	  PCSBMPFileName[0] = 0;
-	}
+	bitmap::resetBmpFile(true);
 	// ToDo - use ifstream?
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 	FileHandle =
@@ -6212,10 +5894,7 @@ void thred::internal::nuFil() {
 		}
 	  }
 	  if (PCSBMPFileName[0] != 0) {
-		fs::current_path(*DefaultDirectory);
-		auto BMPfileName = utf::Utf8ToUtf16(std::string(std::begin(PCSBMPFileName)));
-		UserBMPFileName->assign(BMPfileName);
-		bfil();
+		bitmap::assignUBFilename(*DefaultDirectory);
 	  }
 	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
 	  // BufferIndex     = 0;
@@ -6290,18 +5969,6 @@ auto thred::internal::nuBak() noexcept -> COLORREF {
   BackgroundColorStruct.rgbResult      = BackgroundColor;
   BackgroundColorStruct.lStructSize    = sizeof(BackgroundColorStruct);
   return ChooseColor(&BackgroundColorStruct);
-}
-
-auto thred::internal::nuBit() noexcept -> COLORREF {
-  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
-  BitMapColorStruct.hwndOwner      = ThrEdWindow;
-  BitMapColorStruct.lCustData      = 0;
-  BitMapColorStruct.lpCustColors   = std::begin(BitmapBackgroundColors);
-  BitMapColorStruct.lpfnHook       = nullptr;
-  BitMapColorStruct.lpTemplateName = nullptr;
-  BitMapColorStruct.rgbResult      = BitmapColor;
-  BitMapColorStruct.lStructSize    = sizeof(BackgroundColorStruct);
-  return ChooseColor(&BitMapColorStruct);
 }
 
 auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
@@ -7046,11 +6713,7 @@ void thred::internal::selCol() {
 
 void thred::internal::newFil() {
   StateMap.reset(StateFlag::CMPDO);
-  if (PCSBMPFileName[0] != 0) {
-	PCSBMPFileName[0] = 0;
-	DeleteObject(BitmapFileHandle);
-	ReleaseDC(ThrEdWindow, BitmapDC);
-  }
+  bitmap::resetBmpFile(true);
   deldu();
   DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
   SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
@@ -8214,40 +7877,6 @@ void thred::internal::setknots() {
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-  }
-}
-
-void thred::internal::lodbmp() {
-  if (PCSBMPFileName[0] != 0) {
-	DeleteObject(BitmapFileHandle);
-	ReleaseDC(ThrEdWindow, BitmapDC);
-  }
-  auto fileName = std::vector<wchar_t> {};
-  fileName.resize(_MAX_PATH);
-  auto dirBuffer = std::vector<wchar_t> {};
-  dirBuffer.resize(_MAX_PATH);
-  auto workingFileStr = UserBMPFileName->wstring();
-  auto dirStr         = DefaultBMPDirectory->wstring();
-  std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
-  std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
-  OpenBitmapName.lpstrFile       = fileName.data();
-  OpenBitmapName.lpstrInitialDir = dirBuffer.data();
-  if (GetOpenFileName(&OpenBitmapName)) {
-	fileName.resize(wcslen(fileName.data()));
-	UserBMPFileName->assign(fileName.cbegin(), fileName.cend());
-	trace::untrace();
-	auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
-	// PCS file can only store a 16 character filename?
-	// ToDo - give the user a little more info that the bitmap has not been loaded
-	if (!saveFile.empty() && saveFile.size() < 16U) {
-	  auto const bmpName = gsl::span<char> {PCSBMPFileName};
-	  std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
-	  defbNam();
-	  bfil();
-	}
-	else {
-	}
-	StateMap.set(StateFlag::RESTCH);
   }
 }
 
@@ -10769,8 +10398,8 @@ void thred::internal::defpref() {
 	UserColor[iColor]              = DefaultUserColors[iColor];
 	CustomColor[iColor]            = DefaultCustomColors[iColor];
 	CustomBackgroundColor[iColor]  = DefaultCustomBackgroundColors[iColor];
-	BitmapBackgroundColors[iColor] = DefaultBitmapBackgroundColors[iColor];
   }
+  bitmap::setBmpBackColor();
   formForms::dazdef();
   AppliqueColor          = 15U;
   IniFile.AppStitchLen   = APSPAC;
@@ -10799,7 +10428,7 @@ void thred::internal::defpref() {
   MinStitchLength         = MINSIZ * PFGRAN;
   IniFile.clipOffset      = 0;
   IniFile.fillPhase       = 0;
-  BitmapColor             = 0xc8dfee;
+  bitmap::setBitmapColor(0xc8dfee);
   if (IniFile.customHoopX == 0.0F) {
 	IniFile.customHoopX = LHUPX;
   }
@@ -11456,7 +11085,7 @@ void thred::internal::chkbit() {
   if ((PCSBMPFileName[0] != 0) && (StateMap.test(StateFlag::WASDIF) || StateMap.test(StateFlag::WASDSEL) ||
                                    StateMap.test(StateFlag::WASBLAK))) {
 	StateMap.set(StateFlag::WASESC);
-	bfil();
+	bitmap::internal::bfil(BackgroundColor);
   }
 }
 
@@ -15306,7 +14935,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
 		if (PCSBMPFileName[0] != 0) {
-		  bfil();
+		  bitmap::internal::bfil(BackgroundColor);
 		}
 		StateMap.set(StateFlag::RESTCH);
 	  }
@@ -16816,7 +16445,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
 		if (PCSBMPFileName[0] != 0) {
-		  bfil();
+		  bitmap::internal::bfil(BackgroundColor);
 		}
 		thred::zumhom();
 	  }
@@ -16824,14 +16453,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_BITCOL: { // view / Set / Bitmap Color
-	  if (nuBit() != 0U) {
-		BitmapColor = fswap(BitMapColorStruct.rgbResult);
-		if (PCSBMPFileName[0] != 0) {
-		  bfil();
-		}
-		BitmapPen = nuPen(BitmapPen, 1, BitmapColor);
-		thred::zumhom();
-	  }
+	  bitmap::setBmpColor();
 	  flag = true;
 	  break;
 	}
@@ -16860,7 +16482,7 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_SAVMAP: { // file / Save Bitmap
-	  savmap();
+	  bitmap::savmap();
 	  flag = true;
 	  break;
 	}
@@ -16916,7 +16538,7 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LODBIT: { // file / Load Bitmap
-	  lodbmp();
+	  bitmap::lodbmp();
 	  flag = true;
 	  break;
 	}
@@ -17773,7 +17395,7 @@ void thred::internal::redini() {
 	else {
 	  auto directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
-	  DefaultBMPDirectory->assign(directory);
+	  bitmap::assignDefBmpDir(directory);
 	  {
 		auto& previousNames = *PreviousNames;
 		auto  iVersion      = 0U;
@@ -17792,10 +17414,10 @@ void thred::internal::redini() {
 		UserColor[iColor]              = IniFile.stitchColors[iColor];
 		CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
 		CustomBackgroundColor[iColor]  = IniFile.backgroundPreferredColors[iColor];
-		BitmapBackgroundColors[iColor] = IniFile.bitmapBackgroundColors[iColor];
 	  }
+	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
-	  BitmapColor     = IniFile.bitmapColor;
+	  bitmap::setBitmapColor(IniFile.bitmapColor);
 	  MinStitchLength = IniFile.minStitchLength;
 	  if (IniFile.showStitchThreshold < 0) {
 		IniFile.showStitchThreshold = 0;
@@ -18175,7 +17797,8 @@ void thred::internal::init() {
   GroupSelectPen     = wrap::CreatePen(PS_SOLID, 1U, 0x804080U);
   GridPen            = wrap::CreatePen(PS_SOLID, 1U, IniFile.gridColor);
   BackgroundPen      = wrap::CreatePen(PS_SOLID, 3U, BackgroundColor);
-  BitmapPen          = wrap::CreatePen(PS_SOLID, 1U, BitmapColor);
+  auto bitmapPen = wrap::CreatePen(PS_SOLID, 1U, bitmap::getBmpColor());
+  bitmap::setBitmapPen(bitmapPen);
   FormPen            = wrap::CreatePen(PS_SOLID, 1U, 0xc0c0c0U);
   MultiFormPen       = wrap::CreatePen(PS_SOLID, 1U, 0xc0c080U);
   FormPen3px         = wrap::CreatePen(PS_SOLID, 3U, 0xc0c0c0U);
@@ -18296,44 +17919,6 @@ auto thred::internal::chkup(uint32_t count, uint32_t iStitch) -> uint32_t {
   return count;
 }
 
-auto thred::internal::bitar() -> bool {
-  auto const zoomedInRect = fRECTANGLE {
-      ZoomRect.left, (UnzoomedRect.y - ZoomRect.top), ZoomRect.right, (UnzoomedRect.y - ZoomRect.bottom)};
-  if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
-	return false;
-  }
-  BitmapSrcRect = {wrap::ceil<int32_t>(ZoomRect.left * BmpStitchRatio.x),
-                   wrap::ceil<int32_t>(zoomedInRect.top * BmpStitchRatio.y),
-                   wrap::floor<int32_t>(ZoomRect.right * BmpStitchRatio.x),
-                   wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
-  if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
-	BitmapSrcRect.right = BitmapWidth;
-	StateMap.reset(StateFlag::LANDSCAP);
-  }
-  if (BitmapSrcRect.bottom > gsl::narrow<int32_t>(BitmapHeight)) {
-	BitmapSrcRect.bottom = BitmapHeight;
-	StateMap.set(StateFlag::LANDSCAP);
-  }
-  auto const backingRect = fRECTANGLE {BitmapSrcRect.left * StitchBmpRatio.x,
-                                       BitmapSrcRect.top * StitchBmpRatio.y,
-                                       BitmapSrcRect.right * StitchBmpRatio.x,
-                                       BitmapSrcRect.bottom * StitchBmpRatio.y};
-
-  auto const differenceRect = fRECTANGLE {backingRect.left - zoomedInRect.left,
-                                          backingRect.top - zoomedInRect.top,
-                                          zoomedInRect.right - backingRect.right,
-                                          zoomedInRect.bottom - backingRect.bottom};
-  auto const bitmapStitchRatio =
-      fPOINT {gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
-              gsl::narrow_cast<float>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
-  BitmapDstRect = {
-      wrap::round<int32_t>(differenceRect.left * bitmapStitchRatio.x),
-      wrap::round<int32_t>(differenceRect.top * bitmapStitchRatio.y),
-      wrap::round<int32_t>(StitchWindowClientRect.right - differenceRect.right * bitmapStitchRatio.x),
-      wrap::round<int32_t>(StitchWindowClientRect.bottom - differenceRect.bottom * bitmapStitchRatio.y)};
-  return true;
-}
-
 void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
   point = {
       wrap::ceil<int32_t>((stitch.x - ZoomRect.left) * ZoomRatio.x),
@@ -18409,23 +17994,7 @@ void thred::internal::drawBackground() {
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
   thred::duzrat();
   if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
-	auto deviceContext = BitmapDC;
-	if (StateMap.test(StateFlag::WASTRAC)) {
-	  deviceContext = TraceDC;
-	}
-	if (bitar()) {
-	  StretchBlt(StitchWindowMemDC,
-	             BitmapDstRect.left,
-	             BitmapDstRect.top,
-	             BitmapDstRect.right - BitmapDstRect.left,
-	             BitmapDstRect.bottom - BitmapDstRect.top,
-	             deviceContext,
-	             BitmapSrcRect.left,
-	             BitmapSrcRect.top,
-	             BitmapSrcRect.right - BitmapSrcRect.left,
-	             BitmapSrcRect.bottom - BitmapSrcRect.top,
-	             SRCCOPY);
-	}
+	bitmap::drawBmpBackground();
   }
   dugrid();
 }
@@ -19598,7 +19167,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	ClipBuffer                = &private_ClipBuffer;
 	ClipPoints                = &private_ClipPoints;
 	ColorFileName             = &private_ColorFileName;
-	DefaultBMPDirectory       = &private_DefaultBMPDirectory;
 	DefaultColorWin           = &private_DefaultColorWin;
 	DefaultDirectory          = &private_DefaultDirectory;
 	DesignerName              = &private_DesignerName;
@@ -19639,11 +19207,12 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	TracedEdges               = &private_TracedEdges;
 	TracedMap                 = &private_TracedMap;
 	UndoBuffer                = &private_UndoBuffer;
-	UserBMPFileName           = &private_UserBMPFileName;
 	UserColorWin              = &private_UserColorWin;
 	ValueWindow               = &private_ValueWindow;
 	VersionNames              = &private_VersionNames;
 	WorkingFileName           = &private_WorkingFileName;
+	bitmap::setDefBmpDir(&private_DefaultBMPDirectory);
+	bitmap::setUBfilename(&private_UserBMPFileName);
 	texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
 	thi::redini();
 	CreateParams createParams {};

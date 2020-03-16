@@ -32,7 +32,6 @@ void wasTrace1();
 
 namespace internal {
 
-  void bfrm(FRMHED const& form);
   void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept;
   void difbits(uint32_t shift, uint32_t* point) noexcept;
 
@@ -45,12 +44,9 @@ namespace internal {
   void dutrac();
   void dutrnum0(uint32_t color);
   void dwnum(uint32_t iRGB);
-  void getrmap();
   void hidwnd(HWND hwnd) noexcept;
-  void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
   void ritrcol(COLORREF* color, uint32_t number) noexcept;
   void shownd(HWND hwnd) noexcept;
-  void stch2bit(fPOINT& point);
   void tracwnd();
   auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints) -> bool;
   auto trcin(COLORREF color) -> bool;

@@ -57,6 +57,9 @@
     <ClCompile Include="satin.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="bitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -120,6 +123,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="warnings.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bitmap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

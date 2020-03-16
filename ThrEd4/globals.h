@@ -80,15 +80,8 @@ extern fs::path* AuxName;
 extern std::vector<BSEQPNT>* BSequence;
 
 extern HBRUSH   BackgroundBrush;
+extern COLORREF BackgroundColor;
 extern uint32_t BeanCount; // number of stitches added by convert to bean
-extern HDC      BitmapDC;
-extern RECT     BitmapDstRect;
-extern uint32_t BitmapHeight;
-extern POINT    BitmapPoint;
-extern fPOINT   BitmapSizeinStitches;
-extern RECT     BitmapSrcRect;
-extern fPOINT   BmpStitchRatio;
-extern uint32_t BitmapWidth;
 extern float    BorderWidth;
 extern int32_t  ButtonHeight;
 extern int32_t  ButtonWidth;
@@ -264,6 +257,7 @@ extern HINSTANCE            ThrEdInstance;
 extern HWND                 ThrEdWindow;
 extern fs::path*            ThrName;
 extern POINT                ThredWindowOrigin;
+extern HBITMAP              TraceBitmap;
 extern uint32_t*            TraceBitmapData;
 extern HDC                  TraceDC;
 
