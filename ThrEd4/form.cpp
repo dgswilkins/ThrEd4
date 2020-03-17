@@ -4982,17 +4982,17 @@ void form::refilfn() {
 void form::refil() {
   if (!UserFlagMap.test(UserFlag::WRNOF)) {
 	auto const codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
-	for (auto stitch : *StitchBuffer) {
-	  if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
-		if (FormDataSheet != nullptr) {
-		  StateMap.set(StateFlag::WASFRMFRM);
-		}
-		thred::undat();
-		displayText::tabmsg(IDS_REFIL);
-		StateMap.set(StateFlag::MOVMSG);
-		displayText::okcan();
-		return;
+	if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](fPOINTATTR const& m) -> bool {
+	      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
+	    })) {
+	  if (FormDataSheet != nullptr) {
+		StateMap.set(StateFlag::WASFRMFRM);
 	  }
+	  thred::undat();
+	  displayText::tabmsg(IDS_REFIL);
+	  StateMap.set(StateFlag::MOVMSG);
+	  displayText::okcan();
+	  return;
 	}
   }
   form::refilfn();
@@ -5529,20 +5529,20 @@ void form::unfil() {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 	  if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap.test(UserFlag::WRNOF)) {
 		auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-		for (auto stitch : *StitchBuffer) {
-		  if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm) {
-			displayText::tabmsg(IDS_UNFIL);
-			StateMap.set(StateFlag::FILMSG);
-			displayText::okcan();
-			StateMap.set(StateFlag::IGNOR);
-			return;
-		  }
+		if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](fPOINTATTR const& m) -> bool {
+		      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
+		    })) {
+		  displayText::tabmsg(IDS_UNFIL);
+		  StateMap.set(StateFlag::FILMSG);
+		  displayText::okcan();
+		  StateMap.set(StateFlag::IGNOR);
+		  return;
 		}
 	  }
-	  auto const codedForm = ClosestFormToCursor << FRMSHFT;
 	  if (!StitchBuffer->empty()) {
-		auto iDestination = StitchBuffer->begin();
-		auto destCount    = 0U;
+		auto       iDestination = StitchBuffer->begin();
+		auto       destCount    = 0U;
+		auto const codedForm    = ClosestFormToCursor << FRMSHFT;
 		for (auto& stitch : *StitchBuffer) {
 		  if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
 			*iDestination++ = stitch;
