@@ -1251,8 +1251,6 @@ void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup,
 
 void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   auto& outsidePoints = *OutsidePoints;
-  auto  satinBackup   = std::vector<fPOINT> {}; // backup stitches in satin fills
-  satinBackup.resize(8U);
   auto innerDelta = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
                             (insidePoints[finish].y - insidePoints[start].y)};
   auto outerDelta = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),
@@ -1267,9 +1265,6 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
   auto       count       = 0U;
   if (!StateMap.testAndSet(StateFlag::SAT1)) {
 	stitchPoint = insidePoints[start];
-  }
-  for (auto& sb : satinBackup) {
-	sb = fPOINT {1e12F, 1e12F};
   }
   if (outerLength > innerLength) {
 	count             = wrap::round<uint32_t>(outerLength / LineSpacing);
@@ -1295,6 +1290,9 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
   if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
 	return;
   }
+  auto  satinBackup   = std::vector<fPOINT> {}; // backup stitches in satin fills
+  satinBackup.resize(8U);
+  std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {1e12F, 1e12F});
   auto const innerStep        = fPOINT {innerDelta.x / count, innerDelta.y / count};
   auto const outerStep        = fPOINT {outerDelta.x / count, outerDelta.y / count};
   auto       satinBackupIndex = 0U;
