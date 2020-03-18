@@ -461,7 +461,7 @@ namespace internal {
 
   auto CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
-  auto wastch(uint32_t const& ClosestFormToCursor) -> bool;
+  auto wastch(uint32_t const& formIndex) -> bool;
   void xlin();
   void xlin1();
   void zRctAdj() noexcept;

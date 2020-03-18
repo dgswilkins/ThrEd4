@@ -8018,12 +8018,9 @@ void thred::internal::deltot() {
 }
 
 auto thred::internal::wastch(uint32_t const& formIndex) -> bool {
-  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](fPOINTATTR const& m) -> bool {
-	    return (m.attribute & FRMSK) >> FRMSHFT == formIndex;
-      })) {
-	return true;
-  }
-  return false;
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](fPOINTATTR const& m) -> bool {
+	return (m.attribute & FRMSK) >> FRMSHFT == formIndex;
+  });
 }
 
 auto thred::internal::frmstch() -> bool {
@@ -8031,12 +8028,9 @@ auto thred::internal::frmstch() -> bool {
   for (auto form : (*SelectedFormList)) {
 	formMap.set(form);
   }
-  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](fPOINTATTR const& m) -> bool {
-	    return formMap.test((m.attribute & FRMSK) >> FRMSHFT);
-      })) {
-	return true;
-  }
-  return false;
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](fPOINTATTR const& m) -> bool {
+	return formMap.test((m.attribute & FRMSK) >> FRMSHFT);
+  });
 }
 
 void thred::internal::delet() {
@@ -11394,12 +11388,9 @@ void thred::internal::inscol() {
 }
 
 auto thred::internal::usedcol(uint32_t& index) -> bool {
-  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](fPOINTATTR const& m) -> bool {
-	    return (m.attribute & COLMSK) == index;
-      })) {
-	return true;
-  }
-  return false;
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](fPOINTATTR const& m) -> bool {
+	return (m.attribute & COLMSK) == index;
+  });
 }
 
 void thred::internal::delcol() {
