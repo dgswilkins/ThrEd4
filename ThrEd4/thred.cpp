@@ -8017,11 +8017,11 @@ void thred::internal::deltot() {
                 fmt::format(StringTable->operator[](STR_THRDBY), ThrName->wstring(), *DesignerName).c_str());
 }
 
-auto thred::internal::wastch() noexcept -> bool {
-  for (auto& stitch : *StitchBuffer) {
-	if ((stitch.attribute & FRMSK) >> FRMSHFT == ClosestFormToCursor) {
-	  return true;
-	}
+auto thred::internal::wastch(uint32_t const& formIndex) -> bool {
+  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](fPOINTATTR const& m) -> bool {
+	    return (m.attribute & FRMSK) >> FRMSHFT == formIndex;
+      })) {
+	return true;
   }
   return false;
 }
@@ -8031,10 +8031,10 @@ auto thred::internal::frmstch() -> bool {
   for (auto form : (*SelectedFormList)) {
 	formMap.set(form);
   }
-  for (auto& stitch : *StitchBuffer) {
-	if (formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
-	  return true;
-	}
+  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](fPOINTATTR const& m) -> bool {
+	    return formMap.test((m.attribute & FRMSK) >> FRMSHFT);
+      })) {
+	return true;
   }
   return false;
 }
@@ -8128,7 +8128,7 @@ void thred::internal::delet() {
 	  return;
 	}
 	if (StateMap.test(StateFlag::FORMSEL) && !FormList->empty()) {
-	  if (wastch()) {
+	  if (wastch(ClosestFormToCursor)) {
 		StateMap.set(StateFlag::DELFRM);
 		displayText::tabmsg(IDS_FDEL);
 		displayText::okcan();
@@ -11393,17 +11393,17 @@ void thred::internal::inscol() {
   }
 }
 
-auto thred::internal::usedcol() noexcept -> bool {
-  for (auto& stitch : *StitchBuffer) {
-	if ((stitch.attribute & COLMSK) == VerticalIndex) {
-	  return true;
-	}
+auto thred::internal::usedcol(uint32_t& index) -> bool {
+  if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](fPOINTATTR const& m) -> bool {
+	    return (m.attribute & COLMSK) == index;
+      })) {
+	return true;
   }
   return false;
 }
 
 void thred::internal::delcol() {
-  if (usedcol()) {
+  if (usedcol(VerticalIndex)) {
 	displayText::tabmsg(IDS_COLU);
   }
   else {
@@ -16560,15 +16560,15 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILE_NEW1: { // file / New
-	  if (!savcmp()) {
+	  if (savcmp()) {
+		newFil();
+		nulayr(0);
+	  }
+	  else {
 		displayText::savdisc();
 		StateMap.set(StateFlag::NEWBAK);
 		StateMap.reset(StateFlag::PRFACT);
 		thred::undat();
-	  }
-	  else {
-		newFil();
-		nulayr(0);
 	  }
 	  flag = true;
 	  break;
@@ -19025,6 +19025,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 
 #pragma warning(push)
 #pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
+// cppcheck-suppress unusedFunction
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd)
     -> int32_t { // NOLINT
 

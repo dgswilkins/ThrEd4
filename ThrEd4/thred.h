@@ -454,14 +454,14 @@ namespace internal {
   auto updateHoopSize() -> bool;
   auto updateFillColor() -> bool;
   auto updatePreferences() -> bool;
-  auto usedcol() noexcept -> bool;
+  auto usedcol(uint32_t& VerticalIndex) -> bool;
   void vubak();
   void vuselthr();
   void vuthrds();
 
   auto CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
-  auto wastch() noexcept -> bool;
+  auto wastch(uint32_t const& ClosestFormToCursor) -> bool;
   void xlin();
   void xlin1();
   void zRctAdj() noexcept;
