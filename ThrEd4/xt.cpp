@@ -2488,6 +2488,7 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
+	#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {
