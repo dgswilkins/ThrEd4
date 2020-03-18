@@ -527,15 +527,13 @@ void satin::satadj(FRMHED& form) {
 	  iGuide = currentGuidesCount;
 	}
 	currentGuidesCount = iGuide;
-	if (endGuide != 0U) {
-	  auto const end0 = (form.vertexCount - endGuide - 2U);
-	  auto const end1 = (endGuide - 2U);
-	  if (currentGuidesCount > end0) {
-		currentGuidesCount = end0;
-	  }
-	  if (currentGuidesCount > end1) {
-		currentGuidesCount = end1;
-	  }
+	auto const end0    = (form.vertexCount - endGuide - 2U);
+	auto const end1    = (endGuide - 2U);
+	if (currentGuidesCount > end0) {
+	  currentGuidesCount = end0;
+	}
+	if (currentGuidesCount > end1) {
+	  currentGuidesCount = end1;
 	}
   }
   else {
