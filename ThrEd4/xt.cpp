@@ -469,17 +469,12 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 
 void xt::internal::delwlk(uint32_t code) {
   if (!StitchBuffer->empty()) {
-	auto highStitchBuffer = std::vector<fPOINTATTR> {};
-	highStitchBuffer.reserve(StitchBuffer->size());
-	for (auto& stitch : *StitchBuffer) {
-	  if ((stitch.attribute & WLKFMSK) != code) {
-		highStitchBuffer.push_back(stitch);
-	  }
-	}
-	if (highStitchBuffer.size() != StitchBuffer->size()) {
-	  StitchBuffer->resize(highStitchBuffer.size());
-	  std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
-	}
+	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
+	                                   StitchBuffer->end(),
+	                                   [&code](fPOINTATTR const& m) -> bool {
+	                                     return (m.attribute & WLKFMSK) == code;
+	                                   }),
+	                    StitchBuffer->end());
   }
 }
 
