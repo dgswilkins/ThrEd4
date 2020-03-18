@@ -280,7 +280,7 @@ auto clip::internal::ritclp(std::vector<fPOINT> const& clipFillData, fPOINT cons
 	std::transform(clipFillData.begin(),
 	               clipFillData.end(),
 	               std::back_inserter(*OSequence),
-	               [&adjustedPoint](auto const& data) {
+	               [&adjustedPoint](auto const& data) noexcept {
 	                 return fPOINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
 	               });
   }
@@ -673,12 +673,12 @@ void clip::internal::clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fP
   auto const& form       = FormList->operator[](ClosestFormToCursor);
   if (form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
-	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) {
+	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return fPOINT {clip.x, (-clip.y + pivot)};
 	});
   }
   else {
-	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [](auto& clip) {
+	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
 	  return fPOINT {clip.x, (-clip.y)};
 	});
   }
