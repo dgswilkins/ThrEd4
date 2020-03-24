@@ -123,15 +123,6 @@ auto lastch() noexcept -> bool;
 auto linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept
     -> bool;
 void mdufrm() noexcept;
-
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
-template <class inType> auto midl(inType high, inType low) noexcept -> float {
-  return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
-}
-#pragma warning(pop)
-
 void movlayr(uint32_t codedLayer);
 void munfrm();
 auto notfstch(uint32_t attribute) noexcept -> bool;

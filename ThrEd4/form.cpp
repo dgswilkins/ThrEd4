@@ -517,8 +517,8 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
   formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
   formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
   formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
-  formOutline[1].x = formOutline[5].x = form::midl(rectangle.right, rectangle.left);
-  formOutline[3].y = formOutline[7].y = form::midl(rectangle.top, rectangle.bottom);
+  formOutline[1].x = formOutline[5].x = wrap::midl(rectangle.right, rectangle.left);
+  formOutline[3].y = formOutline[7].y = wrap::midl(rectangle.top, rectangle.bottom);
   for (auto controlPoint = 0U; controlPoint < 8U; controlPoint++) {
 	pixelOutline[controlPoint] = form::sfCor2px(formOutline[controlPoint]);
   }
@@ -2285,7 +2285,7 @@ void form::internal::fnang(std::vector<uint32_t>& groupIndexSequence,
   angledForm = FormList->operator[](ClosestFormToCursor);
 
   auto const& angRect = angledForm.rectangle;
-  rotationCenter = fPOINT {form::midl(angRect.right, angRect.left), form::midl(angRect.top, angRect.bottom)};
+  rotationCenter = fPOINT {wrap::midl(angRect.right, angRect.left), wrap::midl(angRect.top, angRect.bottom)};
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
   auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
@@ -2306,7 +2306,7 @@ void form::internal::fnhor(std::vector<uint32_t>& groupIndexSequence,
   angledForm = FormList->operator[](ClosestFormToCursor);
 
   auto const& angRect = angledForm.rectangle;
-  rotationCenter = fPOINT {form::midl(angRect.right, angRect.left), form::midl(angRect.top, angRect.bottom)};
+  rotationCenter = fPOINT {wrap::midl(angRect.right, angRect.left), wrap::midl(angRect.top, angRect.bottom)};
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
   auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
@@ -2713,9 +2713,9 @@ auto form::internal::isin(FRMHED const&              form,
 void form::internal::inspnt(std::vector<CLIPNT>& clipStitchPoints) {
   CLIPNT clipStitchPoint {clipStitchPoints.back().x, clipStitchPoints.back().y, 0, 0};
   clipStitchPoints.back().x =
-      form::midl(clipStitchPoint.x, clipStitchPoints[clipStitchPoints.size() - 2U].x);
+      wrap::midl(clipStitchPoint.x, clipStitchPoints[clipStitchPoints.size() - 2U].x);
   clipStitchPoints.back().y =
-      form::midl(clipStitchPoint.y, clipStitchPoints[clipStitchPoints.size() - 2U].y);
+      wrap::midl(clipStitchPoint.y, clipStitchPoints[clipStitchPoints.size() - 2U].y);
   clipStitchPoints.back().flag = 1;
   clipStitchPoints.push_back(clipStitchPoint);
 }
@@ -3421,8 +3421,8 @@ void form::internal::horclpfn(std::vector<RNGCNT> const& textureSegments,
                               FRMHED&                    angledForm,
                               std::vector<fPOINT>&       angledFormVertices) {
   angledForm                = FormList->operator[](ClosestFormToCursor);
-  auto const rotationCenter = fPOINT {form::midl(angledForm.rectangle.right, angledForm.rectangle.left),
-                                      form::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
+  auto const rotationCenter = fPOINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
+                                      wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
   auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
@@ -3439,8 +3439,8 @@ void form::internal::horclpfn(std::vector<RNGCNT> const& textureSegments,
 void form::angclpfn(FRMHED const& form, std::vector<RNGCNT> const& textureSegments, std::vector<fPOINT>& angledFormVertices) {
   auto       rotationAngle = 0.0F;
   auto       angledForm    = form;
-  auto const rotationCenter = fPOINT {form::midl(angledForm.rectangle.right, angledForm.rectangle.left),
-                                      form::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
+  auto const rotationCenter = fPOINT {wrap::midl(angledForm.rectangle.right, angledForm.rectangle.left),
+                                      wrap::midl(angledForm.rectangle.top, angledForm.rectangle.bottom)};
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
   if (StateMap.test(StateFlag::ISUND)) {
@@ -3832,8 +3832,8 @@ void form::internal::brkdun(std::vector<SMALPNTL*> const& sortedLines, uint32_t 
 
 void form::internal::duseq1(SMALPNTL const* sequenceLines) {
   if (sequenceLines != nullptr) {
-	rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x),
-	      form::midl(sequenceLines[1].y, sequenceLines[0].y));
+	rspnt(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
+	      wrap::midl(sequenceLines[1].y, sequenceLines[0].y));
   }
 }
 
@@ -3935,8 +3935,8 @@ void form::internal::dunseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t 
 
 void form::internal::duseq2(SMALPNTL const* sequenceLines) {
   if (sequenceLines != nullptr) {
-	rspnt(form::midl(sequenceLines[1].x, sequenceLines[0].x),
-	      form::midl(sequenceLines[1].y, sequenceLines[0].y));
+	rspnt(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
+	      wrap::midl(sequenceLines[1].y, sequenceLines[0].y));
   }
 }
 
@@ -5164,8 +5164,8 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
   formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;
   formControls[4].y = formControls[5].y = formControls[6].y = rectangle.bottom;
-  formControls[1].x = formControls[5].x = wrap::round<int32_t>(form::midl(rectangle.right, rectangle.left));
-  formControls[3].y = formControls[7].y = wrap::round<int32_t>(form::midl(rectangle.top, rectangle.bottom));
+  formControls[1].x = formControls[5].x = wrap::round<int32_t>(wrap::midl(rectangle.right, rectangle.left));
+  formControls[3].y = formControls[7].y = wrap::round<int32_t>(wrap::midl(rectangle.top, rectangle.bottom));
 
   auto minimumLength    = 1e99;
   auto formControlIndex = 0U;
@@ -6410,8 +6410,8 @@ void form::dustar(uint32_t starCount, float length) {
 	point.y += length * sin(angle);
 	angle += stepAngle;
   }
-  auto const center = fPOINT {form::midl(vertexIt[starCount].x, vertexIt[0].x),
-                              form::midl(vertexIt[starCount].y, vertexIt[0].y)};
+  auto const center = fPOINT {wrap::midl(vertexIt[starCount].x, vertexIt[0].x),
+                              wrap::midl(vertexIt[starCount].y, vertexIt[0].y)};
   for (auto iVertex = 1U; iVertex < vertexCount; iVertex += 2) {
 	vertexIt[iVertex].x = (vertexIt[iVertex].x - center.x) * StarRatio + center.x;
 	vertexIt[iVertex].y = (vertexIt[iVertex].y - center.y) * StarRatio + center.y;
@@ -6455,8 +6455,8 @@ void form::duspir(uint32_t stepCount) {
 	point.y += length * sin(angle);
 	angle += stepAngle;
   }
-  auto const center = fPOINT {form::midl(firstSpiral[stepCount / 2].x, firstSpiral[0].x),
-                              form::midl(firstSpiral[stepCount / 2].y, firstSpiral[0].y)};
+  auto const center = fPOINT {wrap::midl(firstSpiral[stepCount / 2].x, firstSpiral[0].x),
+                              wrap::midl(firstSpiral[stepCount / 2].y, firstSpiral[0].y)};
   for (auto iStep = 0U; iStep < stepCount; iStep++) {
 	centeredSpiral[iStep].x = firstSpiral[iStep].x - center.x;
 	centeredSpiral[iStep].y = firstSpiral[iStep].y - center.y;
@@ -6618,7 +6618,7 @@ void form::dueg(uint32_t sides) {
   form::durpoli(sides);
   auto const& form      = FormList->back();
   auto        vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
-  auto const  reference = form::midl(vertexIt[sides / 2].y, vertexIt[0].y);
+  auto const  reference = wrap::midl(vertexIt[sides / 2].y, vertexIt[0].y);
   auto const  maximumY  = vertexIt[sides >> 2U].y - vertexIt[0].y;
   for (uint32_t iVertex = 0; iVertex < sides; iVertex++) {
 	if (vertexIt[iVertex].y < reference) {
@@ -7105,7 +7105,7 @@ void form::internal::dufcntr(fPOINT& center) noexcept {
 	  bigRect.bottom = formRect.bottom;
 	}
   }
-  center = fPOINT {form::midl(bigRect.right, bigRect.left), form::midl(bigRect.top, bigRect.bottom)};
+  center = fPOINT {wrap::midl(bigRect.right, bigRect.left), wrap::midl(bigRect.top, bigRect.bottom)};
 }
 
 auto form::rotpar() -> fPOINT {
@@ -7137,8 +7137,8 @@ auto form::rotpar() -> fPOINT {
   if (StateMap.test(StateFlag::GMRK)) {
 	return ZoomMarkPoint;
   }
-  return fPOINT {form::midl(RotationRect.right, RotationRect.left),
-                 form::midl(RotationRect.top, RotationRect.bottom)};
+  return fPOINT {wrap::midl(RotationRect.right, RotationRect.left),
+                 wrap::midl(RotationRect.top, RotationRect.bottom)};
 }
 
 void form::internal::rotentr(double rotationAngle) {
@@ -7627,14 +7627,14 @@ void form::fcntr() {
 	// clang-format off
 	auto        firstForm     = SelectedFormList->front();
 	auto const& firstRect     = FormList->operator[](firstForm).rectangle;
-	auto const  initialCenter = fPOINT {form::midl(firstRect.right, firstRect.left), 
-										form::midl(firstRect.top, firstRect.bottom)};
+	auto const  initialCenter = fPOINT {wrap::midl(firstRect.right, firstRect.left), 
+										wrap::midl(firstRect.top, firstRect.bottom)};
 	// clang-format on
 	for (auto selectedForm : (*SelectedFormList)) {
 	  // clang-format off
 	  auto const& formRect      = FormList->operator[](selectedForm).rectangle;
-	  auto const  currentCenter = fPOINT {form::midl(formRect.right, formRect.left), 
-										  form::midl(formRect.top, formRect.bottom)};
+	  auto const  currentCenter = fPOINT {wrap::midl(formRect.right, formRect.left), 
+										  wrap::midl(formRect.top, formRect.bottom)};
 	  auto const  delta         = fPOINT {initialCenter.x - currentCenter.x, initialCenter.y - currentCenter.y};
 	  auto&       currentForm   = FormList->operator[](selectedForm);
 	  auto        vertexIt      = std::next(FormVertices->begin(), currentForm.vertexIndex);
@@ -8049,8 +8049,8 @@ void form::cntrx() {
 	  thred::savdo();
 	  // clang-format off
 	  auto const& formRect       = FormList->operator[](ClosestFormToCursor).rectangle;
-	  auto const  selectedCenter = fPOINT {form::midl(formRect.right, formRect.left), 
-										   form::midl(formRect.top, formRect.bottom)};
+	  auto const  selectedCenter = fPOINT {wrap::midl(formRect.right, formRect.left), 
+										   wrap::midl(formRect.top, formRect.bottom)};
 	  // clang-format on
 	  FormMoveDelta = fPOINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
 	  if (StateMap.test(StateFlag::CNTRV)) {
@@ -8089,8 +8089,8 @@ void form::cntrx() {
 			groupRect.bottom = stitch.y;
 		  }
 		}
-		auto const selectedCenter = fPOINT {form::midl(groupRect.right, groupRect.left),
-		                                    form::midl(groupRect.top, groupRect.bottom)};
+		auto const selectedCenter = fPOINT {wrap::midl(groupRect.right, groupRect.left),
+		                                    wrap::midl(groupRect.top, groupRect.bottom)};
 		FormMoveDelta = fPOINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
 		if (StateMap.test(StateFlag::CNTRV)) {
 		  FormMoveDelta.y = 0.0F;
@@ -8116,8 +8116,8 @@ void form::cntrx() {
 void form::centir() {
   StateMap.reset(StateFlag::BIGBOX);
   fi::getbig();
-  auto const itemCenter = fPOINT {form::midl(AllItemsRect.right, AllItemsRect.left),
-                                  form::midl(AllItemsRect.top, AllItemsRect.bottom)};
+  auto const itemCenter = fPOINT {wrap::midl(AllItemsRect.right, AllItemsRect.left),
+                                  wrap::midl(AllItemsRect.top, AllItemsRect.bottom)};
   auto const hoopCenter = fPOINT {UnzoomedRect.x / 2.0F, UnzoomedRect.y / 2.0F};
   auto const delta      = fPOINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
   for (auto& stitch : *StitchBuffer) {

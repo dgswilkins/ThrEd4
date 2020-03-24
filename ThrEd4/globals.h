@@ -106,6 +106,7 @@ extern uint32_t ClipTypeMap;
 extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
+extern uint32_t ColorChanges;
 extern int32_t* ColorBarSize;
 extern HCURSOR  CrossCursor;
 

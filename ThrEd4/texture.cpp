@@ -812,8 +812,8 @@ void texture::internal::setxfrm() {
 	}
 	txi::angrct(angleRect);
   }
-  TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
-  TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
+  TextureScreen.formCenter.x = wrap::midl(angleRect.right, angleRect.left);
+  TextureScreen.formCenter.y = wrap::midl(angleRect.top, angleRect.bottom);
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
 }
 
@@ -1358,8 +1358,8 @@ void texture::internal::txsiz(float ratio, FRMHED const& textureForm) {
   }
   auto angleRect = fRECTANGLE {};
   txi::angrct(angleRect);
-  TextureScreen.formCenter.x = form::midl(angleRect.right, angleRect.left);
-  TextureScreen.formCenter.y = form::midl(angleRect.top, angleRect.bottom);
+  TextureScreen.formCenter.x = wrap::midl(angleRect.right, angleRect.left);
+  TextureScreen.formCenter.y = wrap::midl(angleRect.top, angleRect.bottom);
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
   txi::ritxfrm(textureForm);
 }

@@ -754,7 +754,7 @@ void formForms::dasyfrm() {
 	return;
   }
   auto const referencePoint =
-      fPOINT {form::midl(ZoomRect.right, ZoomRect.left), form::midl(ZoomRect.top, ZoomRect.bottom)};
+      fPOINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
   FormList->push_back(FRMHED {});
   auto& form              = FormList->back();
   ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
@@ -984,7 +984,7 @@ void formForms::setear() {
 	auto&      form             = FormList->back();
 	auto       vertexIt         = std::next(FormVertices->begin(), form.vertexIndex);
 	auto const count            = wrap::toSize(form.vertexCount) / 4U;
-	auto const middle           = form::midl(vertexIt[1].x, vertexIt[0].x);
+	auto const middle           = wrap::midl(vertexIt[1].x, vertexIt[0].x);
 	auto       step             = vertexIt[count + 1U].y - vertexIt[count].y;
 	auto       verticalPosition = vertexIt[count + 1U].y;
 	auto       iLeftVertices    = wrap::toSize(form.vertexCount) - count;

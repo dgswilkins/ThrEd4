@@ -26,6 +26,15 @@ auto bufToFloat(wchar_t const* buffer) -> float;
 auto CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN;
 void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
+
+// pragma required until MSVC /analyze recognizes noexcept(false)
+#pragma warning(push)
+#pragma warning(disable : 26440)
+template <class inType> auto midl(inType high, inType low) noexcept -> float {
+  return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
+}
+#pragma warning(pop)
+
 void Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
 auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept

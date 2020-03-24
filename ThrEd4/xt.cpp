@@ -234,7 +234,7 @@ void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, f
 }
 
 auto xt::internal::midpnt(fPOINT const& startPoint, fPOINT const& endPoint) noexcept -> fPOINT {
-  return fPOINT {form::midl(endPoint.x, startPoint.x), form::midl(endPoint.y, startPoint.y)};
+  return fPOINT {wrap::midl(endPoint.x, startPoint.x), wrap::midl(endPoint.y, startPoint.y)};
 }
 
 void xt::internal::xratf(fPOINT const& startPoint, fPOINT const& endPoint, fPOINT& point, float featherRatioLocal) noexcept {
@@ -669,19 +669,19 @@ void xt::internal::fncwlk(FRMHED& form) {
 	  auto&      thisVertex = vertexIt[iVertex];
 	  auto&      nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
 	  OSequence->push_back(
-	      fPOINT {form::midl(thisVertex.x, nextVertex.x), form::midl(thisVertex.y, nextVertex.y)});
+	      fPOINT {wrap::midl(thisVertex.x, nextVertex.x), wrap::midl(thisVertex.y, nextVertex.y)});
 	  OutputIndex++;
 	}
 	auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 	for (auto iGuide = form.satinGuideCount; iGuide != 0; iGuide--) {
 	  OSequence->push_back(fPOINT {
-	      form::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
-	      form::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y)});
+	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
+	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y)});
 	  OutputIndex++;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
-	  OSequence->push_back(fPOINT {form::midl(vertexIt[0].x, vertexIt[1].x),
-	                               form::midl(vertexIt[0].y, vertexIt[1].y)});
+	  OSequence->push_back(fPOINT {wrap::midl(vertexIt[0].x, vertexIt[1].x),
+	                               wrap::midl(vertexIt[0].y, vertexIt[1].y)});
 	  OutputIndex++;
 	}
   }
@@ -696,8 +696,8 @@ void xt::internal::fncwlk(FRMHED& form) {
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); iGuide++) {
-	  OSequence->push_back(fPOINT {form::midl(vertexIt[finish].x, vertexIt[start].x),
-	                               form::midl(vertexIt[finish].y, vertexIt[start].y)});
+	  OSequence->push_back(fPOINT {wrap::midl(vertexIt[finish].x, vertexIt[start].x),
+	                               wrap::midl(vertexIt[finish].y, vertexIt[start].y)});
 	  if (form::cisin(form, OSequence->back().x, OSequence->back().y)) {
 		OutputIndex++;
 	  }

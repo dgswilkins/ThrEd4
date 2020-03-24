@@ -225,7 +225,7 @@ void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) 
 
 void clip::internal::durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData) {
   if (!ClipBuffer->empty()) {
-	auto const midpoint   = form::midl(clipRect.right, clipRect.left);
+	auto const midpoint   = wrap::midl(clipRect.right, clipRect.left);
 	auto&      clipBuffer = *ClipBuffer;
 	if (clipBuffer[0].x > midpoint) {
 	  auto iBuffer = clipBuffer.begin();
@@ -412,7 +412,7 @@ void clip::clpbrd(FRMHED const& form, fRECTANGLE const& clipRect, uint32_t start
   auto clipReversedData = std::vector<fPOINT> {};
   clipReversedData.resize(clipStitchCount);
   auto const rotationCenter =
-      fPOINT {form::midl(clipRect.right, clipRect.left), form::midl(clipRect.top, clipRect.bottom)};
+      fPOINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   ClipReference.x = clipRect.left;
   ClipReference.y = rotationCenter.y;
   ci::durev(clipRect, clipReversedData);
@@ -731,7 +731,7 @@ void clip::internal::clpcrnr(FRMHED const&        form,
 	                     points->operator[](nextVertex).y - vertexIt[nextVertex].y};
 
 	auto const rotationAngle = atan2(delta.y, delta.x) + PI / 2;
-	auto const referencePoint = fPOINTATTR {form::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
+	auto const referencePoint = fPOINTATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
@@ -766,7 +766,7 @@ void clip::internal::picfn(FRMHED const&        form,
       fPOINT {(vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y)};
   auto       rotationAngle = atan2(-delta.x, delta.y);
   auto const length        = hypot(delta.x, delta.y);
-  auto const referencePoint = fPOINTATTR {form::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
+  auto const referencePoint = fPOINTATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
   auto const outerStep = fPOINT {form.borderSize * cos(rotationAngle), form.borderSize * sin(rotationAngle)};
   spacing += ClipRectSize.cx;
   auto const count = wrap::round<uint32_t>(length / spacing);
@@ -816,7 +816,7 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
   auto clipFillData = std::vector<fPOINT> {};
   clipFillData.resize(ClipBuffer->size());
   auto const rotationCenter =
-      fPOINT {form::midl(clipRect.right, clipRect.left), form::midl(clipRect.top, clipRect.bottom)};
+      fPOINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   OSequence->clear();
   StateMap.reset(StateFlag::CLPBAK);
   HorizontalLength = ClipRectSize.cx;

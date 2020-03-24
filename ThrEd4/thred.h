@@ -50,6 +50,7 @@ auto nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
+void resetColorChanges() noexcept;
 void ritfcor(fPOINT const& point);
 void ritmov(uint32_t formIndex);
 void ritot(uint32_t number);
@@ -95,7 +96,6 @@ namespace internal {
   auto chkattr(fs::path const& filename) -> bool;
   auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
   void chkbit();
-  auto chkdst(DSTHED const* dstHeader) noexcept -> bool;
   auto chkhid(uint32_t colorToCheck) -> bool;
   void chkhup();
   void chkirct() noexcept;
@@ -114,9 +114,6 @@ namespace internal {
   void clpradj(fRECTANGLE& clipRectAdjusted, fPOINTATTR const& stitch) noexcept;
   auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
   void colchk();
-  auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
-  auto colfil() -> bool;
-  auto colmatch(COLORREF color) -> uint32_t;
   void cros(uint32_t iStitch);
   void crtcurs() noexcept;
   void cut();
@@ -148,9 +145,6 @@ namespace internal {
   void drwlstch(uint32_t finish);
   void drwmrk(HDC dc);
   void dstcurs() noexcept;
-  void dstin(uint32_t number, POINT& pout) noexcept;
-  void dstran(std::vector<DSTREC>& DSTData);
-  auto dtrn(DSTREC* dpnt) -> uint32_t;
   void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint) noexcept;
   void duIns();
   void duSelbox();
@@ -163,9 +157,6 @@ namespace internal {
   void ducmd();
   void ducros(HDC dc);
   void dudat();
-
-  constexpr auto dudbits(POINT const& dif) -> uint32_t;
-
   void dufdef() noexcept;
   void dufsel();
   void dugrid();
@@ -356,7 +347,6 @@ namespace internal {
   void ritbal();
   void ritcor(fPOINTATTR const& pointAttribute);
   void ritcur() noexcept;
-  void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches);
   void ritfnam(std::wstring const& designerName);
   void ritini();
   void ritlayr();
@@ -382,7 +372,6 @@ namespace internal {
   void sav();
   void savAs();
   auto savcmp() noexcept -> bool;
-  void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
   auto sdCor2px(fPOINTATTR const& stitchPoint) -> POINT;
   void segentr(float rotationAngle);
   void selCol();
