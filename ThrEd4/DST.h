@@ -130,5 +130,5 @@ namespace internal {
     constexpr auto dudbits(POINT const& dif) -> uint32_t;
   
     void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
-  }
-}
+  } // namespace internal
+} // namespace DST
