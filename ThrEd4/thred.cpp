@@ -251,14 +251,14 @@ fs::path* SearchName;
 fs::path* BalaradName0; // balarad semaphore file
 fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
-fs::path* IniFileName;     //.ini file name
+fs::path* IniFileName; //.ini file name
 
-wchar_t       CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
-HANDLE        FileHandle                  = nullptr;
-HANDLE        IniFileHandle               = nullptr;
-HANDLE        InsertedFileHandle; // insert file handle
-uint32_t      FileSize;           // size of file
-DWORD         BytesRead;          // bytes actually read from file
+wchar_t  CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
+HANDLE   FileHandle                  = nullptr;
+HANDLE   IniFileHandle               = nullptr;
+HANDLE   InsertedFileHandle; // insert file handle
+uint32_t FileSize;           // size of file
+DWORD    BytesRead;          // bytes actually read from file
 
 OPENFILENAME OpenFileName = {
     sizeof(OpenFileName),     // lStructsize
@@ -502,7 +502,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  return TRUE;
 		}
 		case IDOK: {
-		  auto*    hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		  auto*   hwnd = GetDlgItem(hwndlg, IDC_DESED);
 		  wchar_t designerBuffer[50];
 		  GetWindowText(hwnd,
 		                static_cast<LPTSTR>(designerBuffer),
@@ -3378,7 +3378,7 @@ void thred::internal::thrsav() {
 	return;
   }
   if (!StateMap.testAndReset(StateFlag::IGNAM)) {
-	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
+	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	auto* file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 	if (file != INVALID_HANDLE_VALUE) { // NOLINT
 	  StateMap.reset(StateFlag::CMPDO);
@@ -3711,7 +3711,7 @@ void thred::internal::sav() {
 	PCSFileHandle = nullptr;
   }
   else {
-	auto flag       = true;
+	auto        flag            = true;
 	auto        PCSStitchBuffer = std::vector<PCSTCH> {};
 	auto        auxName         = utf::Utf16ToUtf8(*AuxName);
 	auto const* desc            = strrchr(auxName.data(), '\\') + 1U;
@@ -3791,7 +3791,7 @@ void thred::internal::sav() {
 			// write stitch
 			ritpesCode(pesBuffer);
 			// close out the previous block
-			auto* blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+			auto* blockHeader        = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 			blockHeader->stitchcount = OutputIndex;
 			// save the thread/color information
 			pesThreadCount++;
@@ -3813,7 +3813,7 @@ void thred::internal::sav() {
 		  }
 		}
 		// finalize the last stitch block
-		auto* blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+		auto* blockHeader        = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 		blockHeader->stitchcount = OutputIndex;
 		// write the color/thread table
 		lastIndex = pesBuffer.size();
@@ -4280,7 +4280,7 @@ void thred::internal::stchWnd() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  auto* hFont    = displayText::getThrEdFont(400);
+  auto* hFont   = displayText::getThrEdFont(400);
   SelectObject(GetDC(MainStitchWin), hFont);
   if (MainStitchWin != nullptr) {
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -4923,7 +4923,7 @@ void thred::internal::nuFil() {
 			  displayText::filnopn(IDS_FNOPN, *WorkingFileName);
 			  return;
 			}
-			auto fileBuf    = std::vector<uint8_t>(size);
+			auto  fileBuf    = std::vector<uint8_t>(size);
 			auto* fileBuffer = fileBuf.data();
 			ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
 			auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
@@ -5885,7 +5885,7 @@ void thred::internal::newFil() {
   FormList->clear();
   FormList->shrink_to_fit();
   thred::resetColorChanges();
-  KnotCount    = 0;
+  KnotCount = 0;
   WorkingFileName->clear();
   for (auto iColor = 0U; iColor < 16U; iColor++) {
 	thred::redraw(DefaultColorWin->operator[](iColor));
@@ -6427,19 +6427,19 @@ void thred::internal::duclip() {
 		}
 		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length); // NOLINT
 		if (ThrEdClipPointer != nullptr) {
-		  auto* clipFormsHeader       = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
+		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
 		  clipFormsHeader->clipType  = CLP_FRMS;
 		  clipFormsHeader->formCount = gsl::narrow<uint16_t>(SelectedFormList->size());
 		  // Skip past the header
 		  auto* forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
-		  auto iForm = 0U;
+		  auto  iForm = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& currentForm = FormList->operator[](selectedForm);
 			forms[iForm++]    = currentForm;
 		  }
 		  // skip past the forms
 		  auto* formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
-		  auto iVertex      = 0U;
+		  auto  iVertex      = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			// clang-format off
 			  auto& form     = FormList->operator[](selectedForm);
@@ -6451,7 +6451,7 @@ void thred::internal::duclip() {
 		  }
 		  // skip past the vertex list
 		  auto* guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
-		  auto guideCount = 0U;
+		  auto  guideCount = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
 			if (form.type == SAT) {
@@ -6463,7 +6463,7 @@ void thred::internal::duclip() {
 		  }
 		  // skip past the guides
 		  auto* points     = convert_ptr<fPOINT*>(&guides[guideCount]);
-		  auto pointCount = 0;
+		  auto  pointCount = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
 			if (clip::isclpx(form)) {
@@ -6483,8 +6483,8 @@ void thred::internal::duclip() {
 		  }
 		  // Skip past the points
 		  auto* textures     = convert_ptr<TXPNT*>(&points[pointCount]);
-		  auto textureCount = 0;
-		  iForm             = 0;
+		  auto  textureCount = 0;
+		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
 			if (texture::istx(selectedForm)) {
@@ -6549,16 +6549,16 @@ void thred::internal::duclip() {
 		  FileSize += sizeof(FORMCLIP);
 		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize); // NOLINT
 		  if (ThrEdClipPointer != nullptr) {
-			auto* clipFormHeader      = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
+			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
-			auto* formVertices        = convert_ptr<fPOINT*>(&clipFormHeader[1]);
-			auto vertexIt            = std::next(FormVertices->cbegin(), form.vertexIndex);
+			auto* formVertices       = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+			auto  vertexIt           = std::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
 			  formVertices[iSide] = vertexIt[iSide];
 			}
 			auto* guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
-			auto iGuide = 0U;
+			auto  iGuide = 0U;
 			if (form.type == SAT) {
 			  auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 			  for (iGuide = 0; iGuide < form.satinGuideCount; iGuide++) {
@@ -6566,7 +6566,7 @@ void thred::internal::duclip() {
 			  }
 			}
 			auto* mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
-			auto iClip = 0U;
+			auto  iClip = 0U;
 			if (clip::isclpx(ClosestFormToCursor)) {
 			  auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 			  for (iClip = 0; iClip < form.lengthOrCount.clipCount; iClip++) {
@@ -7456,10 +7456,10 @@ void thred::redclp() {
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // Symbol is never tested for nullness, it can be marked as not_null (f.23).
-	auto* const clipStitchPtr = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
-	auto const clipSize       = clipStitchPtr[0].led;
-	auto const clipStitchData = gsl::span<CLPSTCH>(clipStitchPtr, clipSize);
-	auto&      clipBuffer     = *ClipBuffer;
+	auto* const clipStitchPtr  = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
+	auto const  clipSize       = clipStitchPtr[0].led;
+	auto const  clipStitchData = gsl::span<CLPSTCH>(clipStitchPtr, clipSize);
+	auto&       clipBuffer     = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(clipSize);
 	clipBuffer.emplace_back(
@@ -9067,7 +9067,7 @@ void thred::internal::thumnail() {
   trace::untrace();
   fs::current_path(*DefaultDirectory);
   *SearchName = *DefaultDirectory / L"*.thr";
-  auto* file   = FindFirstFile(SearchName->wstring().c_str(), &fileData);
+  auto* file  = FindFirstFile(SearchName->wstring().c_str(), &fileData);
   if (file == INVALID_HANDLE_VALUE) { // NOLINT
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
@@ -9522,9 +9522,9 @@ void thred::internal::fil2men() {
 void thred::internal::defpref() {
   UserFlagMap.reset();
   for (auto iColor = 0U; iColor < 16U; iColor++) {
-	UserColor[iColor]              = DefaultUserColors[iColor];
-	CustomColor[iColor]            = DefaultCustomColors[iColor];
-	CustomBackgroundColor[iColor]  = DefaultCustomBackgroundColors[iColor];
+	UserColor[iColor]             = DefaultUserColors[iColor];
+	CustomColor[iColor]           = DefaultCustomColors[iColor];
+	CustomBackgroundColor[iColor] = DefaultCustomBackgroundColors[iColor];
   }
   bitmap::setBmpBackColor();
   formForms::dazdef();
@@ -10088,7 +10088,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 #pragma warning(suppress : 26490)                     // Don't use reinterpret_cast (type.1)
 	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
 	  if (fileInfo != nullptr) {
-		auto searchName   = *DefaultDirectory / L"*.thr";
+		auto  searchName   = *DefaultDirectory / L"*.thr";
 		auto* searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
 		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT
 		  auto fmtStr = std::wstring {};
@@ -10130,7 +10130,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			break;
 		  }
 		  case IDC_LOCK: {
-			auto fileError    = 0U;
+			auto  fileError    = 0U;
 			auto* unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) { // NOLINT
@@ -10144,7 +10144,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			break;
 		  }
 		  case IDC_UNLOCK: {
-			auto fileError  = 0U;
+			auto  fileError  = 0U;
 			auto* lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
@@ -13482,9 +13482,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto const byteCount =
 		    sizeof(*ClipFormVerticesData) + (wrap::toSize(ClipFormVerticesData->vertexCount) + 1U) *
 		                                        sizeof(decltype(FormVertices->back()));
-		auto       clipCopyBuffer = std::vector<uint8_t> {};
+		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
-		auto const clipSpan       = gsl::span<uint8_t>(clipP, byteCount);
+		auto const  clipSpan       = gsl::span<uint8_t>(clipP, byteCount);
 		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.cbegin(), clipSpan.cend());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
@@ -13542,8 +13542,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                        gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U));
 		}
-		auto* formVertices = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
-		auto currentVertex = 0U;
+		auto* formVertices  = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
+		auto  currentVertex = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  auto const offset = formOffset + iForm;
 		  auto& form        = FormList->operator[](offset);
@@ -13555,8 +13555,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                       currentVertices.cend());
 		  currentVertex += form.vertexCount;
 		}
-		auto* guides      = convert_ptr<SATCON*>(&formVertices[currentVertex]);
-		auto currentGuide = 0U;
+		auto* guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
+		auto  currentGuide = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  auto const offset = formOffset + iForm;
 		  auto& form        = FormList->operator[](offset);
@@ -13568,8 +13568,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			}
 		  }
 		}
-		auto* clipData   = convert_ptr<fPOINT*>(&guides[currentGuide]);
-		auto currentClip = 0U;
+		auto* clipData    = convert_ptr<fPOINT*>(&guides[currentGuide]);
+		auto  currentClip = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  // clang-format off
 		  auto const offset = formOffset + iForm;
@@ -13593,7 +13593,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  }
 		}
 		auto* textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
-		auto textureCount  = 0;
+		auto  textureCount  = 0;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  if (texture::istx(formOffset + iForm)) {
 			auto& form = FormList->operator[](wrap::toSize(formOffset) + iForm);
@@ -16537,9 +16537,9 @@ void thred::internal::redini() {
 	  }
 	  DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
 	  for (auto iColor = 0U; iColor < 16U; iColor++) {
-		UserColor[iColor]              = IniFile.stitchColors[iColor];
-		CustomColor[iColor]            = IniFile.stitchPreferredColors[iColor];
-		CustomBackgroundColor[iColor]  = IniFile.backgroundPreferredColors[iColor];
+		UserColor[iColor]             = IniFile.stitchColors[iColor];
+		CustomColor[iColor]           = IniFile.stitchPreferredColors[iColor];
+		CustomBackgroundColor[iColor] = IniFile.backgroundPreferredColors[iColor];
 	  }
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
@@ -16918,11 +16918,11 @@ void thred::internal::init() {
   for (auto iRGBK = 0U; iRGBK < 4; iRGBK++) {
 	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, 1, BoxColor[iRGBK]);
   }
-  LinePen            = wrap::CreatePen(PS_SOLID, 1U, 0x404040U);
-  CrossPen           = wrap::CreatePen(PS_SOLID, 5U, 0x804080U);
-  GroupSelectPen     = wrap::CreatePen(PS_SOLID, 1U, 0x804080U);
-  GridPen            = wrap::CreatePen(PS_SOLID, 1U, IniFile.gridColor);
-  BackgroundPen      = wrap::CreatePen(PS_SOLID, 3U, BackgroundColor);
+  LinePen         = wrap::CreatePen(PS_SOLID, 1U, 0x404040U);
+  CrossPen        = wrap::CreatePen(PS_SOLID, 5U, 0x804080U);
+  GroupSelectPen  = wrap::CreatePen(PS_SOLID, 1U, 0x804080U);
+  GridPen         = wrap::CreatePen(PS_SOLID, 1U, IniFile.gridColor);
+  BackgroundPen   = wrap::CreatePen(PS_SOLID, 3U, BackgroundColor);
   auto* bitmapPen = wrap::CreatePen(PS_SOLID, 1U, bitmap::getBmpColor());
   bitmap::setBitmapPen(bitmapPen);
   FormPen            = wrap::CreatePen(PS_SOLID, 1U, 0xc0c0c0U);
@@ -17569,9 +17569,9 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  auto* brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem->hDC, brush);
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
-		  auto iColor = stitchesToDraw[0].attribute & 0xfU;
-		  auto* pen   = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
-		  auto iLine  = 0U;
+		  auto  iColor = stitchesToDraw[0].attribute & 0xfU;
+		  auto* pen    = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
+		  auto  iLine  = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; iStitch++) {
 			if ((stitchesToDraw[iStitch].attribute & 0xfU) == iColor) {
 			  lines[iLine++] = {
@@ -18190,36 +18190,36 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
   if (RegisterClassEx(&wc)) {
-	auto private_AngledFormVertices        = std::vector<fPOINT> {};
-	auto private_AuxName                   = fs::path {};
-	auto private_BSequence                 = std::vector<BSEQPNT> {};
-	auto private_BalaradName0              = fs::path {};
-	auto private_BalaradName1              = fs::path {};
-	auto private_BalaradName2              = fs::path {};
-	auto private_ButtonWin                 = std::vector<HWND> {};
-	auto private_ClipBuffer                = std::vector<fPOINTATTR> {};
-	auto private_ClipPoints                = std::vector<fPOINT> {};
-	auto private_ColorFileName             = fs::path {};
-	auto private_DefaultBMPDirectory       = fs::path {};
-	auto private_DefaultColorWin           = std::vector<HWND> {};
-	auto private_DefaultDirectory          = fs::path {};
-	auto private_DesignerName              = std::wstring {};
-	auto private_ExtendedHeader            = STREX {};
-	auto private_FormAngles                = std::vector<float> {};
-	auto private_FormControlPoints         = std::vector<POINT> {};
-	auto private_FormLines                 = std::vector<POINT> {};
-	auto private_FormList                  = std::vector<FRMHED> {};
-	auto private_FormOnOff                 = std::wstring {};
-	auto private_FormVertices              = std::vector<fPOINT> {};
-	auto private_FormVerticesAsLine        = std::vector<POINT> {};
-	auto private_GeName                    = fs::path {};
-	auto private_HomeDirectory             = fs::path {};
-	auto private_IniFileName               = fs::path {};
-	auto private_InsidePointList           = std::vector<fPOINT> {};
-	auto private_InterleaveSequence        = std::vector<fPOINT> {};
-	auto private_InterleaveSequenceIndices = std::vector<INSREC> {};
-	auto private_LabelWindow               = std::vector<HWND> {};
-	auto* formOnOff                        = private_FormOnOff.data();
+	auto  private_AngledFormVertices        = std::vector<fPOINT> {};
+	auto  private_AuxName                   = fs::path {};
+	auto  private_BSequence                 = std::vector<BSEQPNT> {};
+	auto  private_BalaradName0              = fs::path {};
+	auto  private_BalaradName1              = fs::path {};
+	auto  private_BalaradName2              = fs::path {};
+	auto  private_ButtonWin                 = std::vector<HWND> {};
+	auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
+	auto  private_ClipPoints                = std::vector<fPOINT> {};
+	auto  private_ColorFileName             = fs::path {};
+	auto  private_DefaultBMPDirectory       = fs::path {};
+	auto  private_DefaultColorWin           = std::vector<HWND> {};
+	auto  private_DefaultDirectory          = fs::path {};
+	auto  private_DesignerName              = std::wstring {};
+	auto  private_ExtendedHeader            = STREX {};
+	auto  private_FormAngles                = std::vector<float> {};
+	auto  private_FormControlPoints         = std::vector<POINT> {};
+	auto  private_FormLines                 = std::vector<POINT> {};
+	auto  private_FormList                  = std::vector<FRMHED> {};
+	auto  private_FormOnOff                 = std::wstring {};
+	auto  private_FormVertices              = std::vector<fPOINT> {};
+	auto  private_FormVerticesAsLine        = std::vector<POINT> {};
+	auto  private_GeName                    = fs::path {};
+	auto  private_HomeDirectory             = fs::path {};
+	auto  private_IniFileName               = fs::path {};
+	auto  private_InsidePointList           = std::vector<fPOINT> {};
+	auto  private_InterleaveSequence        = std::vector<fPOINT> {};
+	auto  private_InterleaveSequenceIndices = std::vector<INSREC> {};
+	auto  private_LabelWindow               = std::vector<HWND> {};
+	auto* formOnOff                         = private_FormOnOff.data();
 
 	auto private_MenuInfo = MENUITEMINFO {
 	  sizeof(MENUITEMINFO), // Size

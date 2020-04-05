@@ -354,9 +354,9 @@ void trace::trace() {
 		auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 		stitchPoint.y -= (gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y);
 	  }
-	  auto const BmpSR = bitmap::getBmpStitchRatio();
-	  auto bitmapPoint = POINT {wrap::round<int32_t>(BmpSR.x * stitchPoint.x),
-	                            wrap::round<int32_t>(BmpSR.y * stitchPoint.y - 1.0F)};
+	  auto const BmpSR       = bitmap::getBmpStitchRatio();
+	  auto       bitmapPoint = POINT {wrap::round<int32_t>(BmpSR.x * stitchPoint.x),
+                                wrap::round<int32_t>(BmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap.test(StateFlag::TRCUP)) {
@@ -625,7 +625,7 @@ void trace::internal::dutrac() {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= (gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y);
 	}
-	auto const bmpSR = bitmap::getBmpStitchRatio();
+	auto const bmpSR  = bitmap::getBmpStitchRatio();
 	CurrentTracePoint = POINT {wrap::round<int32_t>(bmpSR.x * stitchPoint.x),
 	                           wrap::round<int32_t>(bmpSR.y * stitchPoint.y)};
 	if (CurrentTracePoint.x > gsl::narrow<int32_t>(bitmap::getBitmapHeight())) {
@@ -634,7 +634,7 @@ void trace::internal::dutrac() {
 	if (CurrentTracePoint.y > gsl::narrow<int32_t>(bitmap::getBitmapHeight())) {
 	  CurrentTracePoint.y = bitmap::getBitmapHeight();
 	}
-	auto const savedPoint     = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
+	auto const savedPoint = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
 	auto       traceDirection = 0U;
 	if (!TracedEdges->test(savedPoint)) {
 	  auto findRectangle = RECT {0L, 0L, 0L, 0L};
@@ -791,7 +791,7 @@ void trace::internal::dutrac() {
 	auto landscapeOffset = 0.0F;
 	if (StateMap.test(StateFlag::LANDSCAP)) {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-	  landscapeOffset = gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y;
+	  landscapeOffset   = gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y;
 	}
 	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(tracedPoints.size()); iCurrent++) {
 	  traceLengthSum +=
@@ -1216,10 +1216,10 @@ void trace::internal::dublk(HDC dc, RECT const& traceHighMask, RECT const& trace
 }
 
 void trace::wasTrace() {
-  auto       traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
-  auto       traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
-  auto       traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
-  auto* const BlackBrush         = CreateSolidBrush(0);   // black brush
+  auto        traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
+  auto        traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
+  auto        traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
+  auto* const BlackBrush          = CreateSolidBrush(0);   // black brush
   for (auto iRGB = 0; iRGB < 3; iRGB++) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
@@ -1237,7 +1237,7 @@ void trace::wasTrace() {
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
-	  auto*    TempBrush = BlackBrush;
+	  auto*   TempBrush  = BlackBrush;
 	  wchar_t buffer[10] = {0}; // for integer to string conversion
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);

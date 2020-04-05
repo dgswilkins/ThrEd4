@@ -176,8 +176,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfoHeader.biBitCount    = 32U;
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  auto *bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	  auto *bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
+	  auto* bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -188,7 +188,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		         foreground);
 		}
 	  }
-	  auto *deviceContext = CreateCompatibleDC(StitchWindowDC);
+	  auto* deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
 		BitmapFileHandle = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
@@ -337,9 +337,9 @@ void bitmap::savmap() {
 
 // Move unpacked 24BPP data into packed 24BPP data
 void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
-  auto *source = TraceBitmapData;
+  auto* source = TraceBitmapData;
   if (source != nullptr) {
-	auto *destination = buffer;
+	auto* destination = buffer;
 	for (auto i = 0U; i < cnt; i++) {
 	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
 	  destination += 3;
@@ -469,7 +469,7 @@ void bitmap::setBitmapPen(HPEN const& pen) noexcept {
 }
 
 void bitmap::drawBmpBackground() {
-  auto *deviceContext = BitmapDC;
+  auto* deviceContext = BitmapDC;
   if (StateMap.test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }

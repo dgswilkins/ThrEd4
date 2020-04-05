@@ -59,29 +59,29 @@ constexpr double   TSIZ60   = 0.05;   // #60 thread size in millimeters
 constexpr int32_t  SCROLSIZ = 12;     // logical pixel width of a scroll bar
 constexpr int32_t  COLSIZ   = 12;     // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
-constexpr double   CLOSENUF   = 15.0;              // mouse click region for select
-constexpr float    ZMARGIN    = 1.25F;             // zoom margin for select zooms
-constexpr float    SMALSIZ    = 0.25F;             // default small stitch size
-constexpr float    MINSIZ     = 0.1F;              // default minimum stitch size
-constexpr float    USESIZ     = 3.5F;              // user preferred size
-constexpr double   MAXSIZ     = 9.0;               // default maximum stitch size
-constexpr float    PFAFGRAN   = 6.0F;              // pfaf stitch points per millimeter
-constexpr int32_t  MINZUM     = 5;                 // minimum zoom in stitch points
-constexpr double   SHOPNTS    = 0.00;              // show stitch points when zoom below this
-constexpr double   STCHBOX    = 0.4226;            // show stitch boxes when zoom below this
-constexpr uint32_t BITCOL     = 0xffff00U;         // default bitmap color
-constexpr uint32_t MAXFORMS   = 1024U;             // maximum number of forms
-constexpr double   FORMFCT    = 0.05;              // new forms part of screen
-constexpr int32_t  MAXDELAY   = 600;               // maximum movie time step
-constexpr int32_t  MINDELAY   = 1;                 // minimum movie time step
-constexpr int32_t  MOVITIM    = 12;                // default movie time
-constexpr float    DEFSPACE   = 0.45F;             // default stitch spacing
-constexpr float    DEFANG     = 0.7853981F;        // default fill angle, 45 degrees
-constexpr uint32_t MSGSIZ     = 8192U;             // size of the message buffer
-constexpr float    PI_F       = 3.1415927F;        // PI to single precision
-constexpr float    PI_F2      = PI_F * 2.0F;       //
-constexpr double   PI         = 3.141592653589793; // PI to double precision
-constexpr double   PI2        = PI * 2.0;          //
+constexpr double   CLOSENUF = 15.0;              // mouse click region for select
+constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
+constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
+constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
+constexpr float    USESIZ   = 3.5F;              // user preferred size
+constexpr double   MAXSIZ   = 9.0;               // default maximum stitch size
+constexpr float    PFAFGRAN = 6.0F;              // pfaf stitch points per millimeter
+constexpr int32_t  MINZUM   = 5;                 // minimum zoom in stitch points
+constexpr double   SHOPNTS  = 0.00;              // show stitch points when zoom below this
+constexpr double   STCHBOX  = 0.4226;            // show stitch boxes when zoom below this
+constexpr uint32_t BITCOL   = 0xffff00U;         // default bitmap color
+constexpr uint32_t MAXFORMS = 1024U;             // maximum number of forms
+constexpr double   FORMFCT  = 0.05;              // new forms part of screen
+constexpr int32_t  MAXDELAY = 600;               // maximum movie time step
+constexpr int32_t  MINDELAY = 1;                 // minimum movie time step
+constexpr int32_t  MOVITIM  = 12;                // default movie time
+constexpr float    DEFSPACE = 0.45F;             // default stitch spacing
+constexpr float    DEFANG   = 0.7853981F;        // default fill angle, 45 degrees
+constexpr uint32_t MSGSIZ   = 8192U;             // size of the message buffer
+constexpr float    PI_F     = 3.1415927F;        // PI to single precision
+constexpr float    PI_F2    = PI_F * 2.0F;       //
+constexpr double   PI       = 3.141592653589793; // PI to double precision
+constexpr double   PI2      = PI * 2.0;          //
 constexpr double MAXSTCH = 54.0; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
 constexpr float  USPAC   = 15.0F;          // underlay fill spacing
 constexpr float  APSPAC  = 10.8F;          // applique border spacing
@@ -1057,7 +1057,7 @@ class dPOINT
   explicit inline dPOINT(fPOINT const& rhs) noexcept;
   inline dPOINT(float rhsX, float rhsY) noexcept;
   inline dPOINT(double rhsX, double rhsY) noexcept;
-  inline auto    operator==(dPOINT const& rhs) const noexcept -> bool;
+  inline auto operator==(dPOINT const& rhs) const noexcept -> bool;
   inline auto operator=(fPOINT const& rhs) noexcept -> dPOINT&;
   inline auto operator=(BSEQPNT const& rhs) noexcept -> dPOINT&;
   // dPOINT(dPOINT&&) = default;
@@ -1215,7 +1215,7 @@ inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
 }
-inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool{
+inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool {
   return (x == rhs.x) && (y == rhs.y);
 }
 
@@ -1750,8 +1750,7 @@ class FRMHEDO // Original form header used prior to version 2
   //~FRMHEDO() = default;
 };
 
-inline FRMHEDO::FRMHEDO() noexcept :
-    satinOrAngle(), lengthOrCount(), angleOrClipData() {
+inline FRMHEDO::FRMHEDO() noexcept : satinOrAngle(), lengthOrCount(), angleOrClipData() {
   attribute       = 0U;
   vertexCount     = 0U;
   type            = 0U;
@@ -1826,8 +1825,7 @@ class FRMHED
   inline auto operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED&;
 };
 
-inline FRMHED::FRMHED() noexcept :
-    satinOrAngle(), lengthOrCount(), angleOrClipData(), fillInfo() {
+inline FRMHED::FRMHED() noexcept : satinOrAngle(), lengthOrCount(), angleOrClipData(), fillInfo() {
   attribute       = 0U;
   vertexCount     = 0U;
   type            = 0U;
@@ -1863,7 +1861,8 @@ inline FRMHED::FRMHED() noexcept :
 }
 
 inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
-    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount), fillInfo() {
+    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount),
+    fillInfo() {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -2743,43 +2742,44 @@ class PESLED
   //~PESLED() = default;
 };
 
+// clang-format off
 class PESHED
 {
   public:
-  char     led[8] {0}; //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint32_t off {0U};  //   8-b  Absolute PEC section byte offset
-  uint16_t hpsz {0U}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-  uint16_t usdn {0U}; //   e,f  Use existing design area (1)
-  uint16_t blct {0U}; // 10,11  CSewSeg segment block count (1)
-  char     hnd1[4] {0}; // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-  uint16_t celn {0U}; // 16,17  Length of following string (7)
-  char     ce[7] {0}; // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  int16_t  xlft {0};     // 1f,20  Extent left
-  int16_t  xtop {0};     // 21,22  Extent top
-  int16_t  xrht {0};     // 23,24  Extent right
-  int16_t  xbot {0};     // 25,26  Extent bottom
-  int16_t  plft {0};     // 27,28  Extent left position
-  int16_t  ptop {0};     // 29,2a  Extent top position
-  int16_t  prht {0};     // 2b,2c  Extent right position
-  int16_t  pbot {0};     // 2d,2e  Extent bottom position
-  float    atfm1 {0.0F}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
-  float    atfm2 {0.0F}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
-  float    atfm3 {0.0F}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
-  float    atfm4 {0.0F}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
-  float    atfm5 {0.0F}; // 3f-42  Affine transform Left_Pos
-  float    atfm6 {0.0F}; // 43-46  Affine transform Bottom_Pos
-  uint16_t ukn1 {0U};    // 47,48  unknown (1)
-  int16_t  xtrn {0};     // 49,4a  CSewSeg x coordinate translation (0)
-  int16_t  ytrn {0};     // 4b,4c  CSewSeg y coordinate translation (0)
-  int16_t  xsiz {0};     // 4d,4e  CSewSeg width
-  int16_t  ysiz {0};     // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {0}; // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint16_t bcnt {0U}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  int8_t   hnd2[4] {0}; // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
-  uint16_t cslen {0U}; // 5f,60  CSewSeg length (7)
-  char     cs[7] {0}; // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-                      // uint16_t styp1;   // 68,69  Stitch type (0)
-                      // uint16_t scol;    // 6a,6b  Stitch Palette thread index
+  char     led[8]  {0};    //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint32_t off     {0U};   //   8-b  Absolute PEC section byte offset
+  uint16_t hpsz    {0U};   //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  uint16_t usdn    {0U};   //   e,f  Use existing design area (1)
+  uint16_t blct    {0U};   // 10,11  CSewSeg segment block count (1)
+  char     hnd1[4] {0};    // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint16_t celn    {0U};   // 16,17  Length of following string (7)
+  char     ce[7]   {0};    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  int16_t  xlft    {0};    // 1f,20  Extent left
+  int16_t  xtop    {0};    // 21,22  Extent top
+  int16_t  xrht    {0};    // 23,24  Extent right
+  int16_t  xbot    {0};    // 25,26  Extent bottom
+  int16_t  plft    {0};    // 27,28  Extent left position
+  int16_t  ptop    {0};    // 29,2a  Extent top position
+  int16_t  prht    {0};    // 2b,2c  Extent right position
+  int16_t  pbot    {0};    // 2d,2e  Extent bottom position
+  float    atfm1   {0.0F}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
+  float    atfm2   {0.0F}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
+  float    atfm3   {0.0F}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
+  float    atfm4   {0.0F}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
+  float    atfm5   {0.0F}; // 3f-42  Affine transform Left_Pos
+  float    atfm6   {0.0F}; // 43-46  Affine transform Bottom_Pos
+  uint16_t ukn1    {0U};   // 47,48  unknown (1)
+  int16_t  xtrn    {0};    // 49,4a  CSewSeg x coordinate translation (0)
+  int16_t  ytrn    {0};    // 4b,4c  CSewSeg y coordinate translation (0)
+  int16_t  xsiz    {0};    // 4d,4e  CSewSeg width
+  int16_t  ysiz    {0};    // 4f,50  CSewSeg height
+  int8_t   ukn2[8] {0};    // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint16_t bcnt    {0U};   // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+  int8_t   hnd2[4] {0};    // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint16_t cslen   {0U};   // 5f,60  CSewSeg length (7)
+  char     cs[7]   {0};    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+// uint16_t styp1;        // 68,69  Stitch type (0)
+// uint16_t scol;         // 6a,6b  Stitch Palette thread index
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
@@ -2787,6 +2787,7 @@ class PESHED
   // PESHED& operator=(PESHED&&) = default;
   //~PESHED() = default;
 };
+// clang-format on
 
 class PESTCH
 {
@@ -2818,11 +2819,11 @@ class PESSTCHLST
 class PECHDR
 {
   public:
-  char     label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  int8_t   labnd {0};     // carriage return character
-  uint8_t  ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t  ukn2 {0U};     // Unknown
-  uint16_t hnd1 {0U};     // Unknown (0x00ff)
+  char    label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  int8_t  labnd {0};     // carriage return character
+  uint8_t ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t  ukn2 {0U};    // Unknown
+  uint16_t hnd1 {0U};    // Unknown (0x00ff)
   uint8_t  thumbWidth {0U}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                             // Thus, 6 would mean 6×8 = 48 pixels per line
   uint8_t thumbHeight {0U}; // Thumbnail image height in pixels (38)
@@ -3193,7 +3194,7 @@ class THREAD
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
 template <class T2, class T1> inline _Ret_notnull_ auto convert_ptr(T1* pointer) -> T2 {
   if (pointer) {
-    return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
+	return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
   }
 
   throw;

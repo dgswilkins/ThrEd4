@@ -855,8 +855,8 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 }
 
 void xt::internal::durec(OREC& record) {
-  auto const stitchIt  = std::next(StitchBuffer->begin(), record.start);
-  record.type          = gsl::narrow<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
+  auto const stitchIt = std::next(StitchBuffer->begin(), record.start);
+  record.type         = gsl::narrow<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
   record.color         = attribute & 0xfU;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -2488,7 +2488,7 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-	#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {

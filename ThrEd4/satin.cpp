@@ -1249,9 +1249,9 @@ void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup,
 
 void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   auto& outsidePoints = *OutsidePoints;
-  auto innerDelta = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
+  auto  innerDelta    = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
                             (insidePoints[finish].y - insidePoints[start].y)};
-  auto outerDelta = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),
+  auto  outerDelta    = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),
                             (outsidePoints[finish].y - outsidePoints[start].y)};
 
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -1288,7 +1288,7 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
   if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
 	return;
   }
-  auto  satinBackup   = std::vector<fPOINT> {}; // backup stitches in satin fills
+  auto satinBackup = std::vector<fPOINT> {}; // backup stitches in satin fills
   satinBackup.resize(8U);
   std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {1e12F, 1e12F});
   auto const innerStep        = fPOINT {innerDelta.x / count, innerDelta.y / count};

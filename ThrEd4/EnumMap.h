@@ -11,7 +11,7 @@ template <class T> struct has_enum_count {
   using no  = yes (&)[2]; // NOLINT(modernize-avoid-c-arrays)
 
   template <class U> static auto test(decltype(U::EnumCount)*) -> yes;
-  template <class U> static auto  test(...) -> no;
+  template <class U> static auto test(...) -> no;
 
   // SFINAE magic.
   static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes); // NOLINT
@@ -79,7 +79,8 @@ template <typename EnumType> class EnumMap
   [[nodiscard]] inline auto all() const -> bool {
 	return mask_.all();
   }
-  [[nodiscard]] inline auto mask() const -> std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> {
+  [[nodiscard]] inline auto mask() const
+      -> std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> {
 	return mask_;
   }
   inline void

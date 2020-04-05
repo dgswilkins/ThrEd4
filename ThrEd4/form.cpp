@@ -3160,9 +3160,9 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   auto clipStitchPoints = std::vector<CLIPNT> {};
   // Reserve some memory, but probably not enough
   clipStitchPoints.reserve(1000U);
-  auto pasteLocation = fPOINT {};
-  auto *texture      = gsl::narrow_cast<TXPNT*>(nullptr);
-  auto iclpxSize     = wrap::toUnsigned(iclpx.size());
+  auto  pasteLocation = fPOINT {};
+  auto* texture       = gsl::narrow_cast<TXPNT*>(nullptr);
+  auto  iclpxSize     = wrap::toUnsigned(iclpx.size());
   if (iclpxSize != 0U) {
 	iclpxSize--;
 	bool breakFlag = false;
@@ -3396,8 +3396,8 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 
 void form::internal::angout(FRMHED& angledForm) {
   if (angledForm.vertexCount != 0U) {
-	auto *rectangle = &angledForm.rectangle;
-	auto vertexIt   = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
+	auto* rectangle = &angledForm.rectangle;
+	auto  vertexIt  = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
 	rectangle->left = rectangle->right = vertexIt[0].x;
 	rectangle->bottom = rectangle->top = vertexIt[0].y;
 	for (auto iVertex = 1U; iVertex < angledForm.vertexCount; iVertex++) {
@@ -3565,13 +3565,13 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
                              uint32_t&                     nextGroup) noexcept -> bool {
   auto const* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
   auto const* lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
-  auto const group0Start        = lineEndPoint0Start->group;
-  auto       group0End          = 0U;
-  auto const group1Start        = lineEndPoint1Start->group;
-  auto       group1End          = 0U;
-  auto       groupStart         = 0U;
-  auto       lineStart          = 0U;
-  auto       prevLine           = 0U;
+  auto const  group0Start        = lineEndPoint0Start->group;
+  auto        group0End          = 0U;
+  auto const  group1Start        = lineEndPoint1Start->group;
+  auto        group1End          = 0U;
+  auto        groupStart         = 0U;
+  auto        lineStart          = 0U;
+  auto        prevLine           = 0U;
   if (group0Start > group1Start) {
 	groupStart = group0Start;
 	lineStart  = lineEndPoint0Start->line;
@@ -3589,11 +3589,11 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
   }
   auto const* lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
   auto const* lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
-  group1End                   = lineEndPoint1End->group;
-  group0End                   = lineEndPoint0End->group;
-  auto groupEnd               = 0U;
-  auto lineEnd                = 0U;
-  auto lastLine               = 0U;
+  group1End                    = lineEndPoint1End->group;
+  group0End                    = lineEndPoint0End->group;
+  auto groupEnd                = 0U;
+  auto lineEnd                 = 0U;
+  auto lastLine                = 0U;
   if (group0End < group1End) {
 	groupEnd = group0End;
 	lineEnd  = lineEndPoint0End->line;
@@ -3838,7 +3838,7 @@ void form::internal::duseq1(SMALPNTL const* sequenceLines) {
 }
 
 void form::internal::movseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t ind) {
-  auto *lineEndPoint = sortedLines[ind];
+  auto* lineEndPoint = sortedLines[ind];
   BSequence->emplace_back(BSEQPNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
   OutputIndex++;
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
@@ -4173,7 +4173,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	  }
 	}
   }
-  auto *sequenceLines = gsl::narrow_cast<SMALPNTL*>(nullptr);
+  auto* sequenceLines = gsl::narrow_cast<SMALPNTL*>(nullptr);
   if (currentRegion.breakCount != 0U) {
 	if (dun) {
 	  brkdun(sortedLines, seql, seqn);
@@ -7003,7 +7003,7 @@ void form::internal::doTimeWindow(float                        rangeX,
                                  ThrEdInstance,
                                  nullptr);
 
-  auto       *timeDC      = GetDC(timeWindow);
+  auto*      timeDC       = GetDC(timeWindow);
   auto const timeStep     = gsl::narrow_cast<double>(StitchWindowSize.x) / rangeX;
   auto       timePosition = 0.0;
   auto&      formLines    = *FormLines;
