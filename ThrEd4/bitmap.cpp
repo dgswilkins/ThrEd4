@@ -100,7 +100,7 @@ auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	auto bitmap =
+	auto* bitmap =
 	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
 	if (*ppvBits != nullptr) {
 	  return bitmap;
@@ -176,8 +176,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfoHeader.biBitCount    = 32U;
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
-	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	  auto  bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto *bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
+	  auto *bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -188,7 +188,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		         foreground);
 		}
 	  }
-	  auto deviceContext = CreateCompatibleDC(StitchWindowDC);
+	  auto *deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
 		BitmapFileHandle = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
@@ -225,7 +225,7 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
   auto const byteCount = BitmapWidth >> 3U;
   for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
 	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
-	  auto const bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
+	  auto const* bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
 	  for (auto iBytes = 0U; iBytes < byteCount; iBytes++) {
 		if (bcpnt[iBytes] == 0U) {
 		  blackBits++;
@@ -337,9 +337,9 @@ void bitmap::savmap() {
 
 // Move unpacked 24BPP data into packed 24BPP data
 void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
-  auto source = TraceBitmapData;
+  auto *source = TraceBitmapData;
   if (source != nullptr) {
-	auto destination = buffer;
+	auto *destination = buffer;
 	for (auto i = 0U; i < cnt; i++) {
 	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
 	  destination += 3;
@@ -469,7 +469,7 @@ void bitmap::setBitmapPen(HPEN const& pen) noexcept {
 }
 
 void bitmap::drawBmpBackground() {
-  auto deviceContext = BitmapDC;
+  auto *deviceContext = BitmapDC;
   if (StateMap.test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }

@@ -577,7 +577,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {0};
   auto colors    = std::vector<uint32_t> {};
   if (di::colfil()) {
-	auto colorFile =
+	auto *colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 	  auto colorFileSize = LARGE_INTEGER {};
@@ -676,7 +676,7 @@ void DST::ritdst(DSTOffsets&                    DSTOffsetData,
   colorData.push_back(BackgroundColor);
   colorData.push_back(UserColor[stitches[0].attribute & COLMSK]);
   auto destination = dstStitchBuffer.begin();
-  for (auto& stitch : stitches) {
+  for (auto const& stitch : stitches) {
 	*destination++ = fPOINTATTR {stitch.x * 5.0F / 3.0F, stitch.y * 5.0F / 3.0F, stitch.attribute};
   }
   auto boundingRect = fRECTANGLE {
@@ -759,7 +759,7 @@ void DST::ritdst(DSTOffsets&                    DSTOffsetData,
       {gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0xf3)});
   if (di::colfil()) {
 	auto bytesWritten = DWORD {0};
-	auto colorFile =
+	auto *colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT
 	  wrap::WriteFile(colorFile,
@@ -880,7 +880,7 @@ auto DST::readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void DST::saveDST(std::vector<fPOINTATTR> const& saveStitches, const char* desc) {
-  auto PCSFileHandle = CreateFile(
+  auto *PCSFileHandle = CreateFile(
       AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
   if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 	displayText::crmsg(*AuxName);

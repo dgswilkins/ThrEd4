@@ -71,7 +71,7 @@ void texture::txdun() {
 	wchar_t name[_MAX_PATH] = {0};
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	  auto bytesWritten = DWORD {0};
-	  auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto *handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	  if (handle != INVALID_HANDLE_VALUE) { // NOLINT
 		WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
@@ -130,7 +130,7 @@ void texture::redtx() {
   textureHistoryBuffer.resize(ITXBUFLEN);
   TextureHistoryIndex = ITXBUFLEN - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
-	auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	auto *handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (handle != INVALID_HANDLE_VALUE) { // NOLINT
 	  auto bytesRead = DWORD {0};
 	  char sig[4]    = {0};
@@ -237,7 +237,7 @@ auto texture::internal::chktxh(_In_ TXHST const* historyItem) -> bool {
 
 void texture::savtxt() {
   if (!TempTexturePoints->empty()) {
-	auto currentHistoryItem = &TextureHistory[TextureHistoryIndex];
+	auto *currentHistoryItem = &TextureHistory[TextureHistoryIndex];
 	if (txi::chktxh(currentHistoryItem)) {
 	  StateMap.set(StateFlag::WASTXBAK);
 	  StateMap.reset(StateFlag::TXBDIR);
@@ -568,7 +568,7 @@ void texture::internal::ritxrct() noexcept {
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
   if (!SelectedTexturePointsList->empty()) {
-	auto texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->front());
+	auto *texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->front());
 	textureRect.left = textureRect.right = texturePoint->line;
 	textureRect.top = textureRect.bottom = texturePoint->y;
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(SelectedTexturePointsList->size()); iPoint++) {
@@ -821,13 +821,13 @@ void texture::internal::txtclp(FRMHED& textureForm) {
   ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
   ClipMemory = GetClipboardData(ThrEdClip);
   if (ClipMemory != nullptr) {
-	auto clipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
+	auto *clipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
 	if (clipFormHeader != nullptr) {
 	  if (clipFormHeader->clipType == CLP_FRM) {
-		auto clipForm = &clipFormHeader->form;
+		auto* clipForm = &clipFormHeader->form;
 		if (nullptr != clipForm) {
 		  textureForm         = *clipForm;
-		  auto       vertices = convert_ptr<fPOINT*>(&clipForm[1]);
+		  auto*      vertices = convert_ptr<fPOINT*>(&clipForm[1]);
 		  auto const source   = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), source.cbegin(), source.cend());

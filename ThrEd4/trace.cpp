@@ -199,7 +199,7 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 }
 
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
-  auto testPoint = point;
+  auto* testPoint = point;
   if (testPoint != nullptr) {
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[0]);
 	testPoint -= bitmap::getBitmapWidth();
@@ -1219,7 +1219,7 @@ void trace::wasTrace() {
   auto       traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
   auto       traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
   auto       traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
-  auto const BlackBrush          = CreateSolidBrush(0);   // black brush
+  auto* const BlackBrush         = CreateSolidBrush(0);   // black brush
   for (auto iRGB = 0; iRGB < 3; iRGB++) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
@@ -1237,7 +1237,7 @@ void trace::wasTrace() {
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
-	  auto    TempBrush  = BlackBrush;
+	  auto*    TempBrush = BlackBrush;
 	  wchar_t buffer[10] = {0}; // for integer to string conversion
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);

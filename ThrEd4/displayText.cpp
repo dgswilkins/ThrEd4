@@ -64,7 +64,7 @@ uint16_t LoadStringList[] = {
 auto LoadStringSpan = gsl::span(LoadStringList);
 
 void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
-  auto pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
+  auto *pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
   sDest.clear();
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT

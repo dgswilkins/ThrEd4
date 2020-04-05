@@ -489,7 +489,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
-	  auto hwnd = GetDlgItem(hwndlg, IDC_DESED);
+	  auto* hwnd = GetDlgItem(hwndlg, IDC_DESED);
 	  SetWindowText(hwnd, DesignerName->c_str());
 	  SetFocus(hwnd);
 	  SendMessage(hwnd, EM_SETSEL, 0, -1);
@@ -502,7 +502,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  return TRUE;
 		}
 		case IDOK: {
-		  auto    hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		  auto*    hwnd = GetDlgItem(hwndlg, IDC_DESED);
 		  wchar_t designerBuffer[50];
 		  GetWindowText(hwnd,
 		                static_cast<LPTSTR>(designerBuffer),
@@ -898,7 +898,7 @@ void thred::internal::dudat() {
                     sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor) +
                     sizeof(decltype(TexturePointsBuffer->back())) * TexturePointsBuffer->size();
   undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size);
-  auto backupData                  = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
+  auto* backupData                 = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
   if (backupData != nullptr) {
 	backupData->zoomRect  = UnzoomedRect;
 	backupData->formCount = formCount;
@@ -980,7 +980,7 @@ void thred::internal::redfils() {
 		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT
 	  }
 	  else {
-		auto fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
+		auto* fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
 		if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 		  previousNames[iLRU].clear();
 		}
@@ -2953,7 +2953,7 @@ void thred::stch2pxr(fPOINT const& stitchCoordinate) {
 
 void thred::internal::getDocsFolder(fs::path* directory) {
   if (directory != nullptr) {
-	auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
+	auto*      ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
 	auto const hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
 	if (SUCCEEDED(hr)) {
 	  directory->assign(ppszPath); // make a local copy of the path
@@ -3063,7 +3063,7 @@ void thred::internal::redbal() {
   auto balaradHeader = BALHED {};
   StitchBuffer->clear();
   FormList->clear();
-  auto balaradFile =
+  auto* balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT
 	auto bytesRead = DWORD {0U};
@@ -3124,7 +3124,7 @@ void thred::internal::ritbal() {
   if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
 	auto outputName = (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
 	outputName.replace_extension(L".thv");
-	auto balaradFile =
+	auto* balaradFile =
 	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT
 	  return;
@@ -3177,7 +3177,7 @@ void thred::internal::ritbal() {
   }
   else {
 	if (!BalaradName1->empty()) {
-	  auto balaradFile =
+	  auto* balaradFile =
 	      CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	  CloseHandle(balaradFile);
 	}
@@ -3253,7 +3253,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   stitchHeader.fileLength = gsl::narrow<decltype(stitchHeader.fileLength)>(
       StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + sizeof(stitchHeader) + sizeof(PCSBMPFileName));
   stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
-  stitchHeader.hoopType    = IniFile.hoopType;
+  stitchHeader.hoopType    = gsl::narrow<decltype(stitchHeader.hoopType)>(IniFile.hoopType);
   auto       designer      = utf::Utf16ToUtf8(*DesignerName);
   auto const modifierName  = gsl::span<char> {ExtendedHeader->modifierName};
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
@@ -3379,7 +3379,7 @@ void thred::internal::thrsav() {
   }
   if (!StateMap.testAndReset(StateFlag::IGNAM)) {
 	auto fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-	auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
+	auto* file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 	if (file != INVALID_HANDLE_VALUE) { // NOLINT
 	  StateMap.reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
@@ -3704,7 +3704,7 @@ void thred::internal::sav() {
   else {
 	std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
   }
-  auto PCSFileHandle = CreateFile(
+  auto* PCSFileHandle = CreateFile(
       AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
   if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
 	displayText::crmsg(*AuxName);
@@ -3791,7 +3791,7 @@ void thred::internal::sav() {
 			// write stitch
 			ritpesCode(pesBuffer);
 			// close out the previous block
-			auto blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+			auto* blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 			blockHeader->stitchcount = OutputIndex;
 			// save the thread/color information
 			pesThreadCount++;
@@ -3813,7 +3813,7 @@ void thred::internal::sav() {
 		  }
 		}
 		// finalize the last stitch block
-		auto blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
+		auto* blockHeader         = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
 		blockHeader->stitchcount = OutputIndex;
 		// write the color/thread table
 		lastIndex = pesBuffer.size();
@@ -4280,7 +4280,7 @@ void thred::internal::stchWnd() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  auto hFont    = displayText::getThrEdFont(400);
+  auto* hFont    = displayText::getThrEdFont(400);
   SelectObject(GetDC(MainStitchWin), hFont);
   if (MainStitchWin != nullptr) {
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -4342,7 +4342,7 @@ void thred::internal::delstch1(uint32_t iStitch) {
 }
 
 void thred::internal::redbak() {
-  auto const undoData = convert_ptr<BAKHED*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
+  auto const* undoData = convert_ptr<BAKHED*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
   if (undoData != nullptr) {
 	StitchBuffer->clear();
 	if (undoData->stitchCount != 0U) {
@@ -4878,7 +4878,7 @@ void thred::internal::nuFil() {
 				iPCSstitch++;
 			  }
 			  // Grab the bitmap filename
-			  auto tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
+			  auto const* tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
 			  strcpy_s(PCSBMPFileName, tnam);
 			  // wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
 			  IniFile.auxFileType = AUXPCS;
@@ -4924,16 +4924,16 @@ void thred::internal::nuFil() {
 			  return;
 			}
 			auto fileBuf    = std::vector<uint8_t>(size);
-			auto fileBuffer = fileBuf.data();
+			auto* fileBuffer = fileBuf.data();
 			ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
-			auto pesHeader = convert_ptr<PESHED*>(fileBuffer);
+			auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
 			if (strncmp(pesHeader->led, "#PES00", 6) != 0) { // NOLINT
 			  auto fmtStr = std::wstring {};
 			  displayText::loadString(fmtStr, IDS_NOTPES);
 			  displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
 			  return;
 			}
-			auto pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
+			auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
 			// auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
 			auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
 			PESstitch                  = &fileBuffer[pecOffset];
@@ -6427,18 +6427,18 @@ void thred::internal::duclip() {
 		}
 		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length); // NOLINT
 		if (ThrEdClipPointer != nullptr) {
-		  auto clipFormsHeader       = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
+		  auto* clipFormsHeader       = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
 		  clipFormsHeader->clipType  = CLP_FRMS;
 		  clipFormsHeader->formCount = gsl::narrow<uint16_t>(SelectedFormList->size());
 		  // Skip past the header
-		  auto forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
+		  auto* forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
 		  auto iForm = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& currentForm = FormList->operator[](selectedForm);
 			forms[iForm++]    = currentForm;
 		  }
 		  // skip past the forms
-		  auto formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
+		  auto* formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
 		  auto iVertex      = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			// clang-format off
@@ -6450,7 +6450,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // skip past the vertex list
-		  auto guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
+		  auto* guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
 		  auto guideCount = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6462,7 +6462,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // skip past the guides
-		  auto points     = convert_ptr<fPOINT*>(&guides[guideCount]);
+		  auto* points     = convert_ptr<fPOINT*>(&guides[guideCount]);
 		  auto pointCount = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6482,7 +6482,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // Skip past the points
-		  auto textures     = convert_ptr<TXPNT*>(&points[pointCount]);
+		  auto* textures     = convert_ptr<TXPNT*>(&points[pointCount]);
 		  auto textureCount = 0;
 		  iForm             = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
@@ -6549,15 +6549,15 @@ void thred::internal::duclip() {
 		  FileSize += sizeof(FORMCLIP);
 		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize); // NOLINT
 		  if (ThrEdClipPointer != nullptr) {
-			auto clipFormHeader      = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
+			auto* clipFormHeader      = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
-			auto formVertices        = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+			auto* formVertices        = convert_ptr<fPOINT*>(&clipFormHeader[1]);
 			auto vertexIt            = std::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iSide = 0U; iSide < form.vertexCount; iSide++) {
 			  formVertices[iSide] = vertexIt[iSide];
 			}
-			auto guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
+			auto* guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
 			auto iGuide = 0U;
 			if (form.type == SAT) {
 			  auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
@@ -6565,7 +6565,7 @@ void thred::internal::duclip() {
 				guides[iGuide] = guideIt[iGuide];
 			  }
 			}
-			auto mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
+			auto* mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
 			auto iClip = 0U;
 			if (clip::isclpx(ClosestFormToCursor)) {
 			  auto offsetStart = std::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
@@ -6574,7 +6574,7 @@ void thred::internal::duclip() {
 				offsetStart++;
 			  }
 			}
-			auto points = convert_ptr<fPOINT*>(&mclp[iClip]);
+			auto* points = convert_ptr<fPOINT*>(&mclp[iClip]);
 			if (clip::iseclpx(ClosestFormToCursor)) {
 			  auto offsetStart = std::next(ClipPoints->cbegin(), form.borderClipData);
 			  for (iClip = 0; iClip < form.clipEntries; iClip++) {
@@ -6582,7 +6582,7 @@ void thred::internal::duclip() {
 				offsetStart++;
 			  }
 			}
-			auto textures = convert_ptr<TXPNT*>(&points[iClip]);
+			auto* textures = convert_ptr<TXPNT*>(&points[iClip]);
 			if (texture::istx(ClosestFormToCursor)) {
 			  auto startPoint = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = std::next(startPoint, form.fillInfo.texture.count);
@@ -7456,7 +7456,7 @@ void thred::redclp() {
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // Symbol is never tested for nullness, it can be marked as not_null (f.23).
-	auto const clipStitchPtr  = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
+	auto* const clipStitchPtr = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
 	auto const clipSize       = clipStitchPtr[0].led;
 	auto const clipStitchData = gsl::span<CLPSTCH>(clipStitchPtr, clipSize);
 	auto&      clipBuffer     = *ClipBuffer;
@@ -8061,7 +8061,7 @@ void thred::internal::deldir() {
   displayText::tabmsg(IDS_BAKDEL);
   auto backSpec = std::wstring {L".th0"};
   auto& backChar = backSpec.back();
-  for (auto& p : fs::directory_iterator(*DefaultDirectory)) {
+  for (auto const& p : fs::directory_iterator(*DefaultDirectory)) {
 	if (!fs::is_directory(p)) {
 	  auto fileExt = p.path().extension().wstring();
 	  backChar     = 's';
@@ -9067,7 +9067,7 @@ void thred::internal::thumnail() {
   trace::untrace();
   fs::current_path(*DefaultDirectory);
   *SearchName = *DefaultDirectory / L"*.thr";
-  auto file   = FindFirstFile(SearchName->wstring().c_str(), &fileData);
+  auto* file   = FindFirstFile(SearchName->wstring().c_str(), &fileData);
   if (file == INVALID_HANDLE_VALUE) { // NOLINT
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
@@ -9785,7 +9785,7 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
 }
 
 void thred::internal::ritcur() noexcept {
-  auto currentCursor = GetCursor();
+  auto* currentCursor = GetCursor();
   if (currentCursor != nullptr) {
 	auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
 	GetIconInfo(currentCursor, &iconInfo);
@@ -10080,7 +10080,7 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 }
 
 auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  auto fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
+  auto* fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -10089,7 +10089,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
 	  if (fileInfo != nullptr) {
 		auto searchName   = *DefaultDirectory / L"*.thr";
-		auto searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
+		auto* searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
 		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT
 		  auto fmtStr = std::wstring {};
 		  displayText::loadString(fmtStr, IDS_NOTHRFIL);
@@ -10131,7 +10131,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  }
 		  case IDC_LOCK: {
 			auto fileError    = 0U;
-			auto unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
+			auto* unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) { // NOLINT
 				if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
@@ -10145,7 +10145,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  }
 		  case IDC_UNLOCK: {
 			auto fileError  = 0U;
-			auto lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
+			auto* lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
@@ -13483,7 +13483,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		    sizeof(*ClipFormVerticesData) + (wrap::toSize(ClipFormVerticesData->vertexCount) + 1U) *
 		                                        sizeof(decltype(FormVertices->back()));
 		auto       clipCopyBuffer = std::vector<uint8_t> {};
-		auto const clipP          = convert_ptr<uint8_t*>(ClipPointer);
+		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
 		auto const clipSpan       = gsl::span<uint8_t>(clipP, byteCount);
 		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.cbegin(), clipSpan.cend());
 		GlobalUnlock(ClipMemory);
@@ -13497,7 +13497,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  InterleaveSequence->clear();
 		  InterleaveSequence->reserve(wrap::toSize(ClipFormVerticesData->vertexCount) + 3U);
 		  InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
-		  auto       clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+		  auto*      clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 		  auto const vertSpan = gsl::span<fPOINT>(clipData, ClipFormVerticesData->vertexCount);
 		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.cbegin(), vertSpan.cend());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
@@ -13516,7 +13516,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.type        = FRMLINE;
 		  formIter.vertexCount = ClipFormVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
-		  auto       vertices  = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+		  auto*      vertices  = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 		  auto const vertSpan  = gsl::span<fPOINT>(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), vertSpan.cbegin(), vertSpan.cend());
 		  StateMap.set(StateFlag::INIT);
@@ -13529,11 +13529,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		return true;
 	  }
 	  // ToDo - Add more information to the clipboard so that memory can be allocated
-	  auto clipFormsHeader = gsl::narrow_cast<FORMSCLIP*>(ClipPointer);
+	  auto* clipFormsHeader = gsl::narrow_cast<FORMSCLIP*>(ClipPointer);
 	  if (clipFormsHeader->clipType == CLP_FRMS) {
 		auto iForm            = 0U;
 		ClipFormsCount        = clipFormsHeader->formCount;
-		auto       forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
+		auto*      forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
 		auto const formSpan   = gsl::span<FRMHED>(forms, clipFormsHeader->formCount);
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto form : formSpan) {
@@ -13542,7 +13542,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                        gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U));
 		}
-		auto formVertices  = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
+		auto* formVertices = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
 		auto currentVertex = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  auto const offset = formOffset + iForm;
@@ -13555,7 +13555,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                       currentVertices.cend());
 		  currentVertex += form.vertexCount;
 		}
-		auto guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
+		auto* guides      = convert_ptr<SATCON*>(&formVertices[currentVertex]);
 		auto currentGuide = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  auto const offset = formOffset + iForm;
@@ -13568,7 +13568,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			}
 		  }
 		}
-		auto clipData    = convert_ptr<fPOINT*>(&guides[currentGuide]);
+		auto* clipData   = convert_ptr<fPOINT*>(&guides[currentGuide]);
 		auto currentClip = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  // clang-format off
@@ -13592,7 +13592,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			}
 		  }
 		}
-		auto textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
+		auto* textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
 		auto textureCount  = 0;
 		for (iForm = 0; iForm < ClipFormsCount; iForm++) {
 		  if (texture::istx(formOffset + iForm)) {
@@ -13631,7 +13631,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		StateMap.set(StateFlag::FUNSCLP);
 	  }
 	  else {
-		auto clipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
+		auto* clipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
 		if (clipFormHeader->clipType == CLP_FRM) {
 		  FormMoveDelta = fPOINT {};
 		  StateMap.set(StateFlag::FUNCLP);
@@ -13641,16 +13641,16 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
-		  auto       formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+		  auto*      formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
 		  auto const verticesSpan = gsl::span<fPOINT>(formVertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), verticesSpan.cbegin(), verticesSpan.cend());
-		  auto guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
+		  auto* guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
 			auto const guideSpan        = gsl::span<SATCON>(guides, formIter.satinGuideCount);
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), guideSpan.cbegin(), guideSpan.cend());
 		  }
-		  auto       clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
+		  auto*      clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
 		  auto       clipCount     = 0U;
 		  auto const lastFormIndex = wrap::toUnsigned(FormList->size() - 1U);
 		  if (clip::isclpx(lastFormIndex)) {
@@ -13667,7 +13667,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			clipCount += formIter.clipEntries;
 		  }
 		  if (texture::istx(lastFormIndex)) {
-			auto       textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
+			auto*      textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
 			auto const textureSpan = gsl::span<TXPNT>(textureSource, formIter.fillInfo.texture.count);
 			formIter.fillInfo.texture.index = gsl::narrow<uint16_t>(TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(
@@ -16368,7 +16368,7 @@ void thred::internal::makCol() noexcept {
   wchar_t buffer[3] = {0};
   buffer[1]         = L'0';
   buffer[2]         = 0;
-  auto hFont        = displayText::getThrEdFont(400);
+  auto* hFont       = displayText::getThrEdFont(400);
   for (auto iColor = 0U; iColor < 16U; iColor++) {
 	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC", // NOLINT
 	                                                   nullptr,
@@ -16411,14 +16411,14 @@ void thred::internal::makCol() noexcept {
 
 void thred::internal::ritloc() {
   auto       lockFilePath = fs::path {};
-  auto       ppszPath = gsl::narrow_cast<PWSTR>(nullptr); // variable to receive the path memory block pointer.
+  auto*      ppszPath = gsl::narrow_cast<PWSTR>(nullptr); // variable to receive the path memory block pointer.
   auto const hr = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
   if (SUCCEEDED(hr)) {
 	lockFilePath.assign(ppszPath); // make a local copy of the path
 	lockFilePath /= L"ThrEd";
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
-	auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	auto* lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT
 	  auto bytesWritten = DWORD {0};
 	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
@@ -16692,7 +16692,7 @@ void thred::internal::redini() {
   if (IniFile.fillAngle == 0.0) {
 	IniFile.fillAngle = PI_F / 6.0F;
   }
-  auto deviceContext = GetDC(nullptr);
+  auto* deviceContext = GetDC(nullptr);
   ScreenSizePixels = {GetDeviceCaps(deviceContext, HORZRES), GetDeviceCaps(deviceContext, VERTRES)};
   if (IniFile.initialWindowCoords.left < 0) {
 	IniFile.initialWindowCoords.left = 0;
@@ -16746,7 +16746,7 @@ void thred::internal::chkirct() noexcept {
 }
 
 void thred::internal::init() {
-  auto       deviceContext   = GetDC(nullptr);
+  auto*      deviceContext   = GetDC(nullptr);
   auto const screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) / 2;
   auto       blank           = std::wstring {};
   ReleaseDC(nullptr, deviceContext);
@@ -16796,7 +16796,7 @@ void thred::internal::init() {
 	           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
 	           0);
   }
-  auto hFont = displayText::getThrEdFont(400);
+  auto* hFont = displayText::getThrEdFont(400);
   SelectObject(ThredDC, hFont);
   SelectObject(StitchWindowDC, hFont);
   ButtonWidth               = thred::txtWid(L"MM") + TXTSIDS;
@@ -16866,7 +16866,7 @@ void thred::internal::init() {
   ButtonWin->resize(9U);
   for (auto iButton = 0U; iButton < 9U; iButton++) {
 	DWORD windowFlags = 0U;
-	auto  buttonTxt   = &blank;
+	auto* buttonTxt   = &blank;
 	switch (iButton) {
 	  case HBOXSEL: {
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
@@ -16923,7 +16923,7 @@ void thred::internal::init() {
   GroupSelectPen     = wrap::CreatePen(PS_SOLID, 1U, 0x804080U);
   GridPen            = wrap::CreatePen(PS_SOLID, 1U, IniFile.gridColor);
   BackgroundPen      = wrap::CreatePen(PS_SOLID, 3U, BackgroundColor);
-  auto bitmapPen = wrap::CreatePen(PS_SOLID, 1U, bitmap::getBmpColor());
+  auto* bitmapPen = wrap::CreatePen(PS_SOLID, 1U, bitmap::getBmpColor());
   bitmap::setBitmapPen(bitmapPen);
   FormPen            = wrap::CreatePen(PS_SOLID, 1U, 0xc0c0c0U);
   MultiFormPen       = wrap::CreatePen(PS_SOLID, 1U, 0xc0c080U);
@@ -17500,7 +17500,7 @@ void thred::internal::dubar() {
 }
 
 void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
-  auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  auto* thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
   if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT
 	auto stitchHeader = STRHED {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
@@ -17566,11 +17566,11 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		                 wrap::toUnsigned(colors.size() * sizeof(decltype(colors.back()))),
 		                 &BytesRead,
 		                 nullptr);
-		  auto brush = CreateSolidBrush(brushColor);
+		  auto* brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem->hDC, brush);
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
 		  auto iColor = stitchesToDraw[0].attribute & 0xfU;
-		  auto pen    = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
+		  auto* pen   = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
 		  auto iLine  = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; iStitch++) {
 			if ((stitchesToDraw[iStitch].attribute & 0xfU) == iColor) {
@@ -18219,7 +18219,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	auto private_InterleaveSequence        = std::vector<fPOINT> {};
 	auto private_InterleaveSequenceIndices = std::vector<INSREC> {};
 	auto private_LabelWindow               = std::vector<HWND> {};
-	auto formOnOff                         = private_FormOnOff.data();
+	auto* formOnOff                        = private_FormOnOff.data();
 
 	auto private_MenuInfo = MENUITEMINFO {
 	  sizeof(MENUITEMINFO), // Size

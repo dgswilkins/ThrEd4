@@ -665,9 +665,9 @@ void xt::internal::fncwlk(FRMHED& form) {
   if (form.satinGuideCount != 0U) {
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if (form.wordParam != 0U) {
-	  auto const iVertex    = form.wordParam;
-	  auto&      thisVertex = vertexIt[iVertex];
-	  auto&      nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
+	  auto const  iVertex    = form.wordParam;
+	  auto const& thisVertex = vertexIt[iVertex];
+	  auto const& nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
 	  OSequence->push_back(
 	      fPOINT {wrap::midl(thisVertex.x, nextVertex.x), wrap::midl(thisVertex.y, nextVertex.y)});
 	  OutputIndex++;
@@ -856,7 +856,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 
 void xt::internal::durec(OREC& record) {
   auto const stitchIt  = std::next(StitchBuffer->begin(), record.start);
-  record.type          = StitchTypes[dutyp(stitchIt->attribute)];
+  record.type          = gsl::narrow<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
   record.color         = attribute & 0xfU;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -2387,7 +2387,7 @@ auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool
 
 auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  auto designSizeDialog = hwndlg; // change design size dialog window
+  auto* designSizeDialog = hwndlg; // change design size dialog window
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);

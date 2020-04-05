@@ -546,7 +546,7 @@ void formForms::prfmsg() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  auto preferenceDC      = GetDC(PreferencesWindow);
+  auto *preferenceDC     = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
   LabelWindowCoords.top = ValueWindowCoords.top = 3;
@@ -749,6 +749,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 
 void formForms::dasyfrm() {
   thred::unmsg();
+  #pragma warning(suppress : 26490)
   if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT
 	StateMap.reset(StateFlag::FORMIN);
 	return;
@@ -974,7 +975,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
   thred::unmsg();
-  // NOLINTNEXTLINE
+  #pragma warning(suppress : 26490) // NOLINTNEXTLINE
   auto const nResult = DialogBox(
       ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));
   if (nResult > 0) {
@@ -1104,6 +1105,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
+  #pragma warning(suppress : 26490)
   if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { // NOLINT
 	thred::savdo();
 	auto points = std::vector<fPOINT> {};

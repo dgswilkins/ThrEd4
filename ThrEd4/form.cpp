@@ -1528,8 +1528,8 @@ void form::duangs(FRMHED const& form) {
 	vertexIt = std::next(AngledFormVertices->cbegin(), form.vertexIndex);
   }
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; iVertex++) {
-	auto& thisVertex = vertexIt[iVertex];
-	auto& nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
+	auto const& thisVertex = vertexIt[iVertex];
+	auto const& nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
 	FormAngles->push_back(atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
   }
   FormAngles->push_back(atan2(vertexIt[0].y - vertexIt[form.vertexCount - 1U].y,
@@ -2249,7 +2249,7 @@ void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	  }
 	}
 	if (iPoint > 1) {
-	  auto const evenPointCount = iPoint &= 0xfffffffe;
+	  auto const evenPointCount = (iPoint & 0xfffffffe);
 	  groupIndexSequence.push_back(wrap::toUnsigned(lineEndpoints.size()));
 	  std::sort(projectedPoints.begin(), projectedPoints.end(), fi::fplComp);
 	  iPoint                    = 0;
@@ -2514,8 +2514,8 @@ void form::internal::contf(FRMHED& form) {
   auto highIndex  = 0U;
   auto highLength = 0.0F;
   for (auto iVertex = finish; iVertex < form.vertexCount - 1U; iVertex++) {
-	auto& thisVertex        = vertexIt[iVertex];
-	auto& nextVertex        = vertexIt[wrap::toSize(iVertex) + 1U];
+	auto const& thisVertex  = vertexIt[iVertex];
+	auto const& nextVertex  = vertexIt[wrap::toSize(iVertex) + 1U];
 	highVertices[highIndex] = thisVertex;
 	highDeltas[highIndex]   = fPOINT {nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y};
 	highLengths[highIndex]  = hypot(highDeltas[highIndex].x, highDeltas[highIndex].y);
@@ -3161,7 +3161,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   // Reserve some memory, but probably not enough
   clipStitchPoints.reserve(1000U);
   auto pasteLocation = fPOINT {};
-  auto texture       = gsl::narrow_cast<TXPNT*>(nullptr);
+  auto *texture      = gsl::narrow_cast<TXPNT*>(nullptr);
   auto iclpxSize     = wrap::toUnsigned(iclpx.size());
   if (iclpxSize != 0U) {
 	iclpxSize--;
@@ -3396,7 +3396,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 
 void form::internal::angout(FRMHED& angledForm) {
   if (angledForm.vertexCount != 0U) {
-	auto rectangle  = &angledForm.rectangle;
+	auto *rectangle = &angledForm.rectangle;
 	auto vertexIt   = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
 	rectangle->left = rectangle->right = vertexIt[0].x;
 	rectangle->bottom = rectangle->top = vertexIt[0].y;
@@ -3524,7 +3524,7 @@ auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
                             uint32_t               group1,
                             uint32_t               line1,
                             double                 gapToClosestRegion) noexcept -> bool {
-  auto const lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
+  auto const* lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
   if (group1 > groupIndexSequence.size() - 2U) {
 	return false;
   }
@@ -3540,7 +3540,7 @@ auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
 	}
 	if (count0 != 0U) {
 	  auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-	  if (auto const lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
+	  if (auto const* lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 		auto index1 = 0U;
 		while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
 		  count1--;
@@ -3563,8 +3563,8 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
                              std::vector<REGION> const&    regionsList,
                              double                        gapToClosestRegion,
                              uint32_t&                     nextGroup) noexcept -> bool {
-  auto const lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
-  auto const lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
+  auto const* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
+  auto const* lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
   auto const group0Start        = lineEndPoint0Start->group;
   auto       group0End          = 0U;
   auto const group1Start        = lineEndPoint1Start->group;
@@ -3587,8 +3587,8 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
 	nextGroup = groupStart;
 	return true;
   }
-  auto const lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
-  auto const lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
+  auto const* lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
+  auto const* lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
   group1End                   = lineEndPoint1End->group;
   group0End                   = lineEndPoint0End->group;
   auto groupEnd               = 0U;
@@ -3838,7 +3838,7 @@ void form::internal::duseq1(SMALPNTL const* sequenceLines) {
 }
 
 void form::internal::movseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t ind) {
-  auto lineEndPoint = sortedLines[ind];
+  auto *lineEndPoint = sortedLines[ind];
   BSequence->emplace_back(BSEQPNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
   OutputIndex++;
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
@@ -4173,7 +4173,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	  }
 	}
   }
-  auto sequenceLines = gsl::narrow_cast<SMALPNTL*>(nullptr);
+  auto *sequenceLines = gsl::narrow_cast<SMALPNTL*>(nullptr);
   if (currentRegion.breakCount != 0U) {
 	if (dun) {
 	  brkdun(sortedLines, seql, seqn);
@@ -4349,7 +4349,7 @@ void form::internal::lcon(FRMHED const&          form,
 	  auto startGroup = 0xffffffffU;
 	  auto leftRegion = 0U;
 	  for (auto iRegion = 0U; iRegion < regionCount; iRegion++) {
-		auto lineGroupPoint = sortedLines[regions[iRegion].start];
+		auto const* lineGroupPoint = sortedLines[regions[iRegion].start];
 		if (lineGroupPoint->group < startGroup) {
 		  startGroup = lineGroupPoint->group;
 		  leftRegion = iRegion;
@@ -7003,7 +7003,7 @@ void form::internal::doTimeWindow(float                        rangeX,
                                  ThrEdInstance,
                                  nullptr);
 
-  auto       timeDC       = GetDC(timeWindow);
+  auto       *timeDC      = GetDC(timeWindow);
   auto const timeStep     = gsl::narrow_cast<double>(StitchWindowSize.x) / rangeX;
   auto       timePosition = 0.0;
   auto&      formLines    = *FormLines;

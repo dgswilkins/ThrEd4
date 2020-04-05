@@ -693,7 +693,7 @@ void clip::internal::xclpfn(std::vector<fPOINT> const& tempClipPoints,
                              (chainEndPoints[finish].y - chainEndPoints[start].y)};
   auto const rotationAngle = atan2(delta.y, delta.x);
   auto       chainEndPoint = chainEndPoints[start];
-  for (auto& clip : tempClipPoints) {
+  for (auto const& clip : tempClipPoints) {
 	auto point = clip;
 	thred::rotflt(point, rotationAngle, rotationCenter);
 	OSequence->push_back(fPOINT {chainEndPoint.x + point.x, chainEndPoint.y + point.y});
@@ -723,9 +723,9 @@ void clip::internal::clpcrnr(FRMHED const&        form,
                              std::vector<fPOINT>& clipFillData,
                              uint32_t             vertex,
                              fPOINT const&        rotationCenter) {
-  auto const nextVertex = form::nxt(form, vertex);
-  auto       vertexIt   = std::next(FormVertices->cbegin(), form.vertexIndex);
-  auto const points     = StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const  nextVertex = form::nxt(form, vertex);
+  auto        vertexIt   = std::next(FormVertices->cbegin(), form.vertexIndex);
+  auto const* points     = StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (points != nullptr) {
 	auto delta = fPOINT {points->operator[](nextVertex).x - vertexIt[nextVertex].x,
 	                     points->operator[](nextVertex).y - vertexIt[nextVertex].y};
