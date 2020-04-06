@@ -29,7 +29,7 @@ void lodbmp();
 void setBmpBackColor() noexcept;
 void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;
-void setBitmapPen(HPEN const& pen) noexcept;
+void setBitmapPen(HPEN const pen) noexcept;
 void setDefBmpDir(fs::path* directory) noexcept;
 void setUBfilename(fs::path* fileName) noexcept;
 namespace internal {
