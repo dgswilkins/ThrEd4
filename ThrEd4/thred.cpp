@@ -10342,8 +10342,12 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	  pixel.y = +IniFile.nudgePixels;
 	}
   }
-  // ToDo - use SendInput instead
-  mouse_event(MOUSEEVENTF_MOVE, pixel.x, pixel.y, 0, 0);
+  auto input = INPUT {0};
+  input.type = INPUT_MOUSE;
+  input.mi.dwFlags = MOUSEEVENTF_MOVE;
+  input.mi.dx = pixel.x;
+  input.mi.dy = pixel.y;
+  SendInput(1,&input,sizeof(INPUT));
 }
 
 void thred::internal::pixmsg(uint32_t iString, uint32_t pixelCount) {
@@ -13848,8 +13852,8 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 
 auto thred::internal::handleRightKey(bool& retflag) -> bool {
   retflag                 = true;
-  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
   if (wrap::pressed(VK_SHIFT)) {
+	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 	if (StateMap.test(StateFlag::FPSEL)) {
 	  if (StateMap.test(StateFlag::PSELDIR)) {
 		++SelectedFormVertices.vertexCount %= vertexCount;
