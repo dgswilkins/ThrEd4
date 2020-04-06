@@ -18152,7 +18152,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 }
 #endif
 
-#pragma warning(suppress : 26461) // pointer to const con.3 cppcheck-suppress unusedFunction 
+#pragma warning(suppress : 26461) // cppcheck-suppress unusedFunction ; pragma suppresses pointer to const con.3 
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd) // NOLINT
     -> int32_t { 
 
