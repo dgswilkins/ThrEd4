@@ -5467,6 +5467,9 @@ void thred::internal::toglup() {
 		         form::notfstch(StitchBuffer->operator[](ClosestPointIndex).attribute)) {
 			ClosestPointIndex++;
 		  }
+		  if (ClosestPointIndex == StitchBuffer->size()) { // the selected form does not yet have any stitches
+			--ClosestPointIndex;
+		  }
 		  StateMap.set(StateFlag::SELBOX);
 		  StateMap.reset(StateFlag::FRMPSEL);
 		}
