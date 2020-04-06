@@ -18149,11 +18149,9 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 }
 #endif
 
-#pragma warning(push)
-#pragma warning(disable : 26461) // disable warning for hPrevInstance not being marked as a pointer to const
-// cppcheck-suppress unusedFunction
-auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd)
-    -> int32_t { // NOLINT
+#pragma warning(suppress : 26461) // pointer to const con.3 cppcheck-suppress unusedFunction 
+auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd) // NOLINT
+    -> int32_t { 
 
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
@@ -18441,4 +18439,3 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   LocalFree(ArgList);
   return -1;
 }
-#pragma warning(pop)

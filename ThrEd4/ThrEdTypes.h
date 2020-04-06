@@ -1160,8 +1160,6 @@ inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
   y = gsl::narrow_cast<float>(rhsY);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 4244)
 inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
@@ -1183,7 +1181,6 @@ inline auto fPOINT::operator=(SMALPNTL const& rhs) noexcept -> fPOINT& {
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
-#pragma warning(pop)
 
 inline auto fPOINT::operator=(fPOINTATTR const& rhs) noexcept -> fPOINT& {
   x = rhs.x;

@@ -416,8 +416,6 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26493) // we use c style casts as this is a C API
 auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0)); // NOLINT
   return TRUE;
@@ -428,7 +426,6 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont)); // NOLINT
 }
-#pragma warning(pop)
 
 void displayText::tomsg() {
   auto OKrect   = RECT {0L, 0L, 0L, 0L};

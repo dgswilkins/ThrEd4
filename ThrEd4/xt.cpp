@@ -449,8 +449,6 @@ constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
   return op;
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26487)
 auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
   satin::satout(form, fabs(form.underlayIndent));
   if (form.underlayIndent > 0) {
@@ -460,12 +458,12 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 		InsidePoints->operator[](iVertex) = vertexIt[iVertex];
 	  }
 	}
+#pragma warning(suppress : 26487) // Don't return a pointer that may be invalid (lifetime.4).
 	return *InsidePoints;
   }
 
   return *OutsidePoints;
 }
-#pragma warning(pop)
 
 void xt::internal::delwlk(uint32_t code) {
   if (!StitchBuffer->empty()) {
