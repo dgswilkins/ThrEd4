@@ -13,29 +13,14 @@
 
 // Open Source headers
 #include "warnings.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-//#include <fmt/format.h>
-#pragma warning(pop)
 
 // Local Headers
-//#include "switches.h"
-//#include "ExtendedBitSet.h"
-//#include "wrappers.h"
-
 #include "Resources/resource.h"
 #include "globals.h"
 #include "clip.h"
 #include "displayText.h"
 #include "form.h"
-//#include "formForms.h"
-//#include "hlp.h"
-//#include "texture.h"
 #include "thred.h"
-//#include "xt.h"
 #include "satin.h"
 
 namespace si = satin::internal;
