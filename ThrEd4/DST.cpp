@@ -16,18 +16,8 @@
 #endif
 
 // Standard Libraries
-//#include <bitset>
 
 // Open Source headers
-//#include "warnings.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-//#include <boost/dynamic_bitset.hpp>
-//#include <fmt/format.h>
-#pragma warning(pop)
 
 // Local Headers
 #include "wrappers.h"
