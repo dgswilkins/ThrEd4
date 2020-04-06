@@ -43,7 +43,6 @@
 #include <boost/dynamic_bitset.hpp>
 #include <fmt/format.h>
 #include <gsl/gsl>
-
 #pragma warning(pop)
 
 // Local Headers
