@@ -10457,10 +10457,10 @@ void thred::internal::movchk() {
 			}
 		  }
 		}
-		if (switchColors) {
+		if (!switchColors) {
 		  auto const swapColor     = UserColor[VerticalIndex];
 		  UserColor[VerticalIndex] = UserColor[DraggedColor];
-		  if (key) {
+		  if (!key) {
 			UserColor[DraggedColor] = swapColor;
 			nuscol(DraggedColor);
 		  }
