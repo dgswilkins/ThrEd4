@@ -1329,9 +1329,7 @@ void thred::internal::stch2px1(uint32_t iStitch) {
 	                        (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   }
   else {
-	// ToDo - what should these values be without the redundant round?
-	StitchCoordinatesPixels =
-	    POINT {wrap::round<int32_t>(0.01F), wrap::round<int32_t>(StitchWindowClientRect.bottom + 0.01F)};
+	StitchCoordinatesPixels = POINT {0L, StitchWindowClientRect.bottom};
   }
 }
 
