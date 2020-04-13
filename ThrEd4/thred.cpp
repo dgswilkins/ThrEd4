@@ -16466,12 +16466,12 @@ void thred::internal::ducmd() {
 			BalaradFile     = CreateFile(
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
-			  wchar_t readBuffer[_MAX_PATH + 1] = {0};
+			  char readBuffer[_MAX_PATH + 1] = {0};
 			  *BalaradName1                     = balaradFileName;
 			  auto bytesRead                    = DWORD {0};
 			  ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
-				BalaradName2->assign(static_cast<wchar_t const*>(readBuffer));
+				BalaradName2->assign(readBuffer);
 				redbal();
 			  }
 			  CloseHandle(BalaradFile);
