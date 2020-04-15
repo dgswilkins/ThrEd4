@@ -8857,7 +8857,9 @@ void thred::internal::longer() {
   auto const start         = StitchBuffer->operator[](ClosestPointIndex);
   auto const startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
   auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  for (iStitch = ClosestPointIndex + 1U; iStitch < SelectedRange.finish; iStitch++) {
+  auto const rangeEnd = ((SelectedRange.finish + 1) < StitchBuffer->size()) ? SelectedRange.finish
+                                                                            : SelectedRange.finish - 1U;
+  for (iStitch = ClosestPointIndex + 1U; iStitch < rangeEnd; iStitch++) {
 	auto const stitch     = StitchBuffer->operator[](iStitch);
 	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
@@ -8868,7 +8870,6 @@ void thred::internal::longer() {
   }
   if (flag) {
 	auto       minimumLength = 1e99;
-	auto const rangeEnd      = SelectedRange.finish - 1U;
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; currentStitch++) {
 	  auto const stitch     = StitchBuffer->operator[](currentStitch);
 	  auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
