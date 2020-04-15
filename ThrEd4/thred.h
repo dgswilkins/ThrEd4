@@ -174,7 +174,7 @@ namespace internal {
   void durot() noexcept;
   void durotu() noexcept;
   void dusel(HDC dc);
-  void duselrng();
+  void duselrng(RANGE& selectedRange);
   void dusid(uint32_t entry) noexcept;
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;

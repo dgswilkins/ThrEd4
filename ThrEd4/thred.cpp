@@ -8837,14 +8837,15 @@ void thred::internal::rembig() {
   }
 }
 
-void thred::internal::duselrng() {
-  SelectedRange.start  = 0U;
-  SelectedRange.finish = gsl::narrow<decltype(SelectedRange.finish)>(StitchBuffer->size());
+void thred::internal::duselrng(RANGE& selectedRange) {
   if (StateMap.test(StateFlag::GRPSEL)) {
 	thred::rngadj();
-	SelectedRange.start  = GroupStartStitch;
-	SelectedRange.finish = GroupEndStitch;
-	return;
+	selectedRange.start  = GroupStartStitch;
+	selectedRange.finish = GroupEndStitch;
+  }
+  else {
+	selectedRange.start  = 0U;
+	selectedRange.finish = gsl::narrow<decltype(selectedRange.finish)>(StitchBuffer->size());
   }
 }
 
@@ -9771,7 +9772,7 @@ void thred::internal::srchk() {
 	  StateMap.reset(StateFlag::WASGRP);
 	}
   }
-  duselrng();
+  duselrng(SelectedRange);
 }
 
 constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
