@@ -62,8 +62,6 @@ constexpr auto NERCNT = 4U; // number of entries in the near array;
 int32_t         ArgCount;                // command line argument count
 RECT            ThredWindowRect;         // main window size
 RECT            ColorBarRect;            // color bar rectangle
-RECT            MinLenRect;              // minimum length rectangle
-RECT            MaxLenRect;              // maximum length rectangle
 uint32_t        SmallestStitchIndex;     // pointer to the smallest stitch in the selected range
 uint32_t        LargestStitchIndex;      // pointer to the largest stitch in the selected range
 uint32_t        CurrentStitchIndex;      // pointer to the current selection for length search
@@ -1142,10 +1140,6 @@ void thred::redraw(HWND window) noexcept {
 void thred::internal::nuRct() noexcept {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   GetWindowRect(ColorBar, &ColorBarRect);
-  if (!ButtonWin->empty()) {
-	GetWindowRect(ButtonWin->operator[](HMINLEN), &MinLenRect);
-	GetWindowRect(ButtonWin->operator[](HMAXLEN), &MaxLenRect);
-  }
   if (ColorBarDC != nullptr) {
 	ReleaseDC(ColorBar, ColorBarDC);
 	ColorBarDC = GetDC(ColorBar);
@@ -11817,22 +11811,30 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	}
 	return true;
   }
-  if (Msg.pt.x >= MinLenRect.left && Msg.pt.x <= MinLenRect.right && Msg.pt.y > MinLenRect.top &&
-      Msg.pt.y <= MinLenRect.bottom) {
-	srchk();
-	setsrch(SmallestStitchIndex);
-	lensadj();
-	StateMap.set(StateFlag::GRPSEL);
-	StateMap.set(StateFlag::RESTCH);
-	return true;
-  }
-  if (Msg.pt.x >= MaxLenRect.left && Msg.pt.x <= MaxLenRect.right && Msg.pt.y > MaxLenRect.top &&
-      Msg.pt.y <= MaxLenRect.bottom) {
-	srchk();
-	setsrch(LargestStitchIndex);
-	lensadj();
-	StateMap.set(StateFlag::GRPSEL);
-	StateMap.set(StateFlag::RESTCH);
+  if (!ButtonWin->empty()) {
+	auto minLenRect = RECT {};
+	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect)) {
+	  if (Msg.pt.x >= minLenRect.left && Msg.pt.x <= minLenRect.right && Msg.pt.y > minLenRect.top &&
+		  Msg.pt.y <= minLenRect.bottom) {
+		srchk();
+		setsrch(SmallestStitchIndex);
+		lensadj();
+		StateMap.set(StateFlag::GRPSEL);
+		StateMap.set(StateFlag::RESTCH);
+		return true;
+	  }
+	}
+	auto maxLenRect = RECT {};
+	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect)) {
+	  if (Msg.pt.x >= maxLenRect.left && Msg.pt.x <= maxLenRect.right && Msg.pt.y > maxLenRect.top &&
+		  Msg.pt.y <= maxLenRect.bottom) {
+		srchk();
+		setsrch(LargestStitchIndex);
+		lensadj();
+		StateMap.set(StateFlag::GRPSEL);
+		StateMap.set(StateFlag::RESTCH);
+	  }
+	}
   }
   return true;
 }
