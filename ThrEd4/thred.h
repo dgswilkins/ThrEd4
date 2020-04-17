@@ -197,7 +197,7 @@ namespace internal {
   void fnamtabs();
   void fndknt();
   void fop();
-  void frmcalc();
+  void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
   auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) -> uint32_t;
   void frmcurmen();
   void frmcursel(uint32_t cursorType);
@@ -261,7 +261,7 @@ namespace internal {
   void knotmen();
   void ladj();
   void lenCalc();
-  void lenfn(uint32_t start, uint32_t end);
+  void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
   void lensadj();
   void linbmen();
   void lock();

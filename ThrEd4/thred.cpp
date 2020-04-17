@@ -2334,7 +2334,7 @@ void thred::ritot(uint32_t number) {
   displayText::butxt(HTOT, txt);
 }
 
-void thred::internal::frmcalc() {
+void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   auto const& form = FormList->operator[](ClosestFormToCursor);
   if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 	auto const code      = ClosestFormToCursor << FRMSHFT;
@@ -2350,11 +2350,11 @@ void thred::internal::frmcalc() {
 		  auto const length = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 		  if (length > maxLength) {
 			maxLength          = length;
-			LargestStitchIndex = iStitch;
+			largestStitchIndex = iStitch;
 		  }
 		  if (length < minLength) {
 			minLength           = length;
-			SmallestStitchIndex = iStitch;
+			smallestStitchIndex = iStitch;
 		  }
 		}
 	  }
@@ -2377,22 +2377,22 @@ void thred::internal::frmcalc() {
   }
 }
 
-void thred::internal::lenfn(uint32_t start, uint32_t end) {
+void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex) {
   auto maxLength      = 0.0;
   auto minLength      = 1e99;
-  SmallestStitchIndex = 0U;
-  LargestStitchIndex  = 0U;
+  smallestStitchIndex = 0U;
+  largestStitchIndex  = 0U;
   for (auto iStitch = start; iStitch < end; iStitch++) {
 	auto const stitch     = StitchBuffer->operator[](iStitch);
 	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (length > maxLength) {
 	  maxLength          = length;
-	  LargestStitchIndex = iStitch;
+	  largestStitchIndex = iStitch;
 	}
 	if (length < minLength) {
 	  minLength           = length;
-	  SmallestStitchIndex = iStitch;
+	  smallestStitchIndex = iStitch;
 	}
   }
   auto strMax = std::wstring {};
@@ -2417,16 +2417,16 @@ void thred::internal::lenCalc() {
   else {
 	if (StitchBuffer->size() > 1U) {
 	  if (StateMap.test(StateFlag::FORMSEL)) {
-		frmcalc();
+		frmcalc(LargestStitchIndex, SmallestStitchIndex);
 		displayText::butxt(HCOR, blank);
 		return;
 	  }
 	  thred::rngadj();
 	  if (StateMap.test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
-		lenfn(GroupStartStitch, GroupEndStitch - 1U);
+		lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
 	  }
 	  else {
-		lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2U));
+		lenfn(0, wrap::toUnsigned(StitchBuffer->size() - 2U), LargestStitchIndex, SmallestStitchIndex);
 	  }
 	}
 	else {
