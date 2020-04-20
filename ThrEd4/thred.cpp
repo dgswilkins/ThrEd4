@@ -9281,7 +9281,9 @@ void thred::internal::nucols() {
 	auto& form = FormList->operator[](selectedForm);
 	if (form.fillType != 0U) {
 	  form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
-	  form.fillInfo.feather.color = gsl::narrow<uint8_t>(ActiveColor);
+	  if (form.fillType == FTHF) {
+		form.fillInfo.feather.color = gsl::narrow<uint8_t>(ActiveColor);
+	  }
 	}
 	if (form.edgeType != 0U) {
 	  form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
@@ -10438,12 +10440,14 @@ void thred::internal::movchk() {
 				formIter.fillColor = gsl::narrow<uint8_t>(VerticalIndex);
 			  }
 			}
-			if (formIter.fillInfo.feather.color == VerticalIndex) {
-			  formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(DraggedColor);
-			}
-			else {
-			  if (key && formIter.fillInfo.feather.color == DraggedColor) {
-				formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(VerticalIndex);
+			if (formIter.fillType == FTHF) {
+			  if (formIter.fillInfo.feather.color == VerticalIndex) {
+				formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(DraggedColor);
+			  }
+			  else {
+				if (key && formIter.fillInfo.feather.color == DraggedColor) {
+				  formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(VerticalIndex);
+				}
 			  }
 			}
 		  }
@@ -10500,7 +10504,8 @@ void thred::internal::inscol() {
 		if (formIter.fillColor >= VerticalIndex && formIter.fillColor < nextColor) {
 		  formIter.fillColor++;
 		}
-		if (formIter.fillInfo.feather.color >= VerticalIndex && formIter.fillInfo.feather.color < nextColor) {
+		if (formIter.fillType == FTHF && formIter.fillInfo.feather.color >= VerticalIndex &&
+		    formIter.fillInfo.feather.color < nextColor) {
 		  formIter.fillInfo.feather.color++;
 		}
 	  }
@@ -10544,7 +10549,7 @@ void thred::internal::delcol() {
 		if (formIter.fillColor > VerticalIndex) {
 		  formIter.fillColor--;
 		}
-		if (formIter.fillInfo.feather.color > VerticalIndex) {
+		if (formIter.fillType == FTHF && formIter.fillInfo.feather.color > VerticalIndex) {
 		  formIter.fillInfo.feather.color--;
 		}
 	  }
