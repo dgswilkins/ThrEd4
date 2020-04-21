@@ -8453,8 +8453,7 @@ auto thred::internal::isLine(std::vector<POINT>& boxOutline) noexcept -> bool {
 
 // Is the point inside the box?
 auto thred::internal::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
-  return (point.x >= box.left && point.x <= box.right &&
-          point.y >= box.top && point.y <= box.bottom);
+  return (point.x >= box.left && point.x <= box.right && point.y >= box.top && point.y <= box.bottom);
 }
 
 auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
@@ -8880,7 +8879,7 @@ void thred::internal::longer() {
 	}
   }
   if (flag) {
-	auto       minimumLength = 1e99;
+	auto minimumLength = 1e99;
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; currentStitch++) {
 	  auto const stitch     = StitchBuffer->operator[](currentStitch);
 	  auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
@@ -9290,7 +9289,7 @@ void thred::internal::nucols() {
 	formMap.set(selectedForm);
 	auto& form = FormList->operator[](selectedForm);
 	if (form.fillType != 0U) {
-	  form.fillColor              = gsl::narrow<uint8_t>(ActiveColor);
+	  form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
 	  if (form.fillType == FTHF) {
 		form.fillInfo.feather.color = gsl::narrow<uint8_t>(ActiveColor);
 	  }
@@ -10348,12 +10347,12 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	  pixel.y = +IniFile.nudgePixels;
 	}
   }
-  auto input = INPUT {0};
-  input.type = INPUT_MOUSE;
+  auto input       = INPUT {0};
+  input.type       = INPUT_MOUSE;
   input.mi.dwFlags = MOUSEEVENTF_MOVE;
-  input.mi.dx = pixel.x;
-  input.mi.dy = pixel.y;
-  SendInput(1,&input,sizeof(INPUT));
+  input.mi.dx      = pixel.x;
+  input.mi.dy      = pixel.y;
+  SendInput(1, &input, sizeof(INPUT));
 }
 
 void thred::internal::pixmsg(uint32_t iString, uint32_t pixelCount) {
@@ -11843,8 +11842,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
   if (!ButtonWin->empty()) {
 	auto minLenRect = RECT {};
 	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect)) {
-	  if (Msg.pt.x >= minLenRect.left && Msg.pt.x <= minLenRect.right && Msg.pt.y > minLenRect.top &&
-		  Msg.pt.y <= minLenRect.bottom) {
+	  if (Msg.pt.x >= minLenRect.left && Msg.pt.x <= minLenRect.right &&
+	      Msg.pt.y > minLenRect.top && Msg.pt.y <= minLenRect.bottom) {
 		srchk();
 		setsrch(SmallestStitchIndex);
 		lensadj();
@@ -11855,8 +11854,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	}
 	auto maxLenRect = RECT {};
 	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect)) {
-	  if (Msg.pt.x >= maxLenRect.left && Msg.pt.x <= maxLenRect.right && Msg.pt.y > maxLenRect.top &&
-		  Msg.pt.y <= maxLenRect.bottom) {
+	  if (Msg.pt.x >= maxLenRect.left && Msg.pt.x <= maxLenRect.right &&
+	      Msg.pt.y > maxLenRect.top && Msg.pt.y <= maxLenRect.bottom) {
 		srchk();
 		setsrch(LargestStitchIndex);
 		lensadj();
@@ -13880,7 +13879,7 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 }
 
 auto thred::internal::handleRightKey(bool& retflag) -> bool {
-  retflag                 = true;
+  retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
 	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 	if (StateMap.test(StateFlag::FPSEL)) {
@@ -16498,8 +16497,8 @@ void thred::internal::ducmd() {
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
 			  char readBuffer[_MAX_PATH + 1] = {0};
-			  *BalaradName1                     = balaradFileName;
-			  auto bytesRead                    = DWORD {0};
+			  *BalaradName1                  = balaradFileName;
+			  auto bytesRead                 = DWORD {0};
 			  ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
 				BalaradName2->assign(readBuffer);
@@ -18185,10 +18184,9 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 }
 #endif
 
-#pragma warning(suppress : 26461) // cppcheck-suppress unusedFunction ; pragma suppresses pointer to const con.3 
+#pragma warning(suppress : 26461) // cppcheck-suppress unusedFunction ; pragma suppresses pointer to const con.3
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd) // NOLINT
-    -> int32_t { 
-
+    -> int32_t {
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
   UNREFERENCED_PARAMETER(lpCmdLine);
