@@ -464,7 +464,7 @@ void bitmap::setBitmapColor(COLORREF const& newColor) noexcept {
   BitmapColor = newColor;
 }
 
-void bitmap::setBitmapPen(HPEN const pen) noexcept {
+void bitmap::setBitmapPen(HPEN pen) noexcept {
   BitmapPen = pen;
 }
 
