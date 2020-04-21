@@ -253,6 +253,8 @@ namespace internal {
   void inscol();
   void insfil();
   void insflin(POINT insertPoint);
+  auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
+  auto isLine(std::vector<POINT>& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
   auto isfclp() noexcept -> bool;
   void istch();

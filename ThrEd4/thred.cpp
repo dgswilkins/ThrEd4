@@ -8446,6 +8446,17 @@ void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
   }
 }
 
+// Does the outline have zero width or zero height?
+auto thred::internal::isLine(std::vector<POINT>& boxOutline) noexcept -> bool {
+  return (boxOutline[0].x == boxOutline[1].x) || (boxOutline[1].y == boxOutline[2].y);
+}
+
+// Is the point inside the box?
+auto thred::internal::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
+  return (point.x >= box.left && point.x <= box.right &&
+          point.y >= box.top && point.y <= box.bottom);
+}
+
 auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto       minimumLength = 1e99;
   auto const pointToTest = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
@@ -8463,7 +8474,7 @@ auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 	formLines[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
   }
   formLines[4] = formLines[0];
-  if (minimumLength < CLOSENUF) {
+  if (minimumLength < CLOSENUF && !isLine(formLines)) {
 	for (auto iCorner = 0U; iCorner < 4; iCorner++) {
 	  stretchBoxLine[iCorner] = SelectedFormsLine->operator[](wrap::toSize(iCorner) * 2U);
 	}
@@ -8482,8 +8493,7 @@ auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 	return true;
   }
   SelectedFormControlVertex >>= 1U;
-  if (pointToTest.x >= SelectedFormsRect.left && pointToTest.x <= SelectedFormsRect.right &&
-      pointToTest.y >= SelectedFormsRect.top && pointToTest.y <= SelectedFormsRect.bottom) {
+  if (isInBox(pointToTest, SelectedFormsRect) || (minimumLength < CLOSENUF && isLine(formLines))) {
 	SelectedFormsSize = fPOINT {SelectedFormsRect.right - SelectedFormsRect.left,
 	                            SelectedFormsRect.bottom - SelectedFormsRect.top};
 	StateMap.set(StateFlag::MOVFRMS);
@@ -11028,6 +11038,18 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  stretchBoxLine[2].y = stretchBoxLine[3].y =
 	      Msg.pt.y + wrap::round<int32_t>(SelectedFormsSize.y) -
 	      wrap::round<int32_t>(FormMoveDelta.y) - StitchWindowOrigin.y;
+	  if (isLine(stretchBoxLine)) {
+		stretchBoxLine[0].x -= 1;
+		stretchBoxLine[0].y -= 1;
+		stretchBoxLine[1].x += 1;
+		stretchBoxLine[1].y -= 1;
+		stretchBoxLine[2].x += 1;
+		stretchBoxLine[2].y += 1;
+		stretchBoxLine[3].x -= 1;
+		stretchBoxLine[3].y += 1;
+		stretchBoxLine[4].x -= 1;
+		stretchBoxLine[4].y -= 1;
+	  }
 	  StateMap.set(StateFlag::SHOSTRTCH);
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
