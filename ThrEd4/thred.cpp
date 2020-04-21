@@ -11841,7 +11841,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
   }
   if (!ButtonWin->empty()) {
 	auto minLenRect = RECT {};
-	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect)) {
+	if (GetWindowRect(ButtonWin->operator[](HMINLEN), &minLenRect) != 0) {
 	  if (Msg.pt.x >= minLenRect.left && Msg.pt.x <= minLenRect.right &&
 	      Msg.pt.y > minLenRect.top && Msg.pt.y <= minLenRect.bottom) {
 		srchk();
@@ -11853,7 +11853,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  }
 	}
 	auto maxLenRect = RECT {};
-	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect)) {
+	if (GetWindowRect(ButtonWin->operator[](HMAXLEN), &maxLenRect) != 0) {
 	  if (Msg.pt.x >= maxLenRect.left && Msg.pt.x <= maxLenRect.right &&
 	      Msg.pt.y > maxLenRect.top && Msg.pt.y <= maxLenRect.bottom) {
 		srchk();
