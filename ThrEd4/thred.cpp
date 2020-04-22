@@ -5518,13 +5518,12 @@ void thred::internal::movbox() {
 	auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
 	if (stch2px(ClosestPointIndex)) {
 	  unbox();
-	  OutputDebugString(fmt::format(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
-	                                ClosestPointIndex,
-	                                ((stitch.attribute & FRMSK) >> FRMSHFT),
-	                                ((stitch.attribute & TYPMSK) >> TYPSHFT),
-	                                stitch.x,
-	                                stitch.y)
-	                        .c_str());
+	  outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
+	                 ClosestPointIndex,
+	                 ((stitch.attribute & FRMSK) >> FRMSHFT),
+	                 ((stitch.attribute & TYPMSK) >> TYPSHFT),
+	                 stitch.x,
+	                 stitch.y);
 	  dubox();
 	  if (StateMap.test(StateFlag::UPTO)) {
 		StateMap.set(StateFlag::RESTCH);
@@ -5909,12 +5908,10 @@ void thred::internal::rebox() {
 	nuAct(ClosestPointIndex);
 	if (stch2px(ClosestPointIndex)) {
 	  dubox();
-	  OutputDebugString(
-	      fmt::format(L"rebox:Stitch [{}] form [{}] type [{}]\n",
-	                  ClosestPointIndex,
-	                  ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
-	                  ((StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT))
-	          .c_str());
+	  outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
+	                 ClosestPointIndex,
+	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
+	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT));
 	}
 	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
 	  StateMap.reset(StateFlag::SCROS);
@@ -8226,7 +8223,7 @@ void thred::chkrng(fPOINT& range) {
 		*iDestination++ = stitch;
 	  }
 	  else {
-		OutputDebugString(fmt::format(L"chkrng:tmpCount [{}]\n", tmpCount).c_str());
+		outDebugString(L"chkrng:tmpCount [{}]\n", tmpCount);
 	  }
 	  tmpCount++;
 	}
@@ -11990,7 +11987,7 @@ auto thred::internal::updatePreferences() -> bool {
   for (auto iPreference = 0U; iPreference < PRFLINS; iPreference++) {
 	if (Msg.hwnd == ValueWindow->operator[](iPreference)) {
 	  PreferenceIndex = iPreference + 1U;
-	  OutputDebugString(fmt::format(L"handleLeftButtonDown:PreferenceIndex [{}]\n", PreferenceIndex).c_str());
+	  outDebugString(L"handleLeftButtonDown:PreferenceIndex [{}]\n", PreferenceIndex);
 	  formForms::prfsid(ValueWindow->operator[](iPreference));
 	  break;
 	}
@@ -12711,7 +12708,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
   } while (false);
-  OutputDebugString(fmt::format(L"handleLeftButtonDown:FormMenuChoice [{}]\n", FormMenuChoice).c_str());
+  outDebugString(L"handleLeftButtonDown:FormMenuChoice [{}]\n", FormMenuChoice);
 
   return true;
 }

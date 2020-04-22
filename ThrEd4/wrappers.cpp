@@ -30,7 +30,7 @@ auto wrap::bufToFloat(wchar_t const* buffer) -> float {
 	value = std::stof(std::wstring(buffer));
   }
   catch (...) {
-	OutputDebugString(fmt::format(L"bufToFloat:stof failed trying to convert '{}'\n", buffer).c_str());
+	outDebugString(L"bufToFloat:stof failed trying to convert '{}'\n", buffer);
 	value = 0.0F;
   }
   return value;

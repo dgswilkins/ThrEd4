@@ -1000,17 +1000,15 @@ auto xt::internal::duprecs(std::vector<fPOINTATTR>& stitchBuffer, std::vector<OR
 
 void xt::internal::dmprec(std::vector<OREC*> const& stitchRegion, uint32_t count) {
   for (auto iRegion = 0U; iRegion < count; iRegion++) {
-	OutputDebugString(
-	    fmt::format(
-	        L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
-	        iRegion,
-	        StitchBuffer->operator[](stitchRegion[iRegion]->start).attribute,
-	        stitchRegion[iRegion]->form,
-	        stitchRegion[iRegion]->type,
-	        stitchRegion[iRegion]->color,
-	        stitchRegion[iRegion]->start,
-	        stitchRegion[iRegion]->finish)
-	        .c_str());
+	outDebugString(
+	    L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
+	    iRegion,
+	    StitchBuffer->operator[](stitchRegion[iRegion]->start).attribute,
+	    stitchRegion[iRegion]->form,
+	    stitchRegion[iRegion]->type,
+	    stitchRegion[iRegion]->color,
+	    stitchRegion[iRegion]->start,
+	    stitchRegion[iRegion]->finish);
   }
 }
 #endif
@@ -1198,16 +1196,15 @@ void xt::internal::duatf(uint32_t ind) {
   else {
 	attributeFields.user = 0;
   }
-  OutputDebugString(fmt::format(L"{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: "
-                                L"{:1d} attrib: 0x{:08x}\n",
-                                ind,
-                                attributeFields.color,
-                                attributeFields.form,
-                                attributeFields.type,
-                                attributeFields.layer,
-                                attributeFields.user,
-                                attribute)
-                        .c_str());
+  outDebugString(L"{:5d}: color: {:2d} form: {:5d} type: {:2d}, layer: {:1d}: user: "
+                 L"{:1d} attrib: 0x{:08x}\n",
+                 ind,
+                 attributeFields.color,
+                 attributeFields.form,
+                 attributeFields.type,
+                 attributeFields.layer,
+                 attributeFields.user,
+                 attribute);
 }
 
 void xt::dmpat() {

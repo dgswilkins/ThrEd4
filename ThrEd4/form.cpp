@@ -1272,7 +1272,7 @@ void form::chkseq(bool border) {
 	}
   }
   else {
-	OutputDebugString(L"OSequence empty!");
+	outDebugString(L"OSequence empty!\n");
   }
   if (minimumStitchLength == 0.0F) {
 	return;
@@ -3817,7 +3817,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 }
 
 void form::internal::rspnt(float xCoordinate, float yCoordinate) {
-  OutputDebugString(fmt::format(L"rspnt: x {},y {}\n", xCoordinate, yCoordinate).c_str());
+  outDebugString(L"rspnt: x {},y {}\n", xCoordinate, yCoordinate);
   BSequence->emplace_back(xCoordinate, yCoordinate, 0);
   OutputIndex++;
 }
@@ -4406,9 +4406,7 @@ void form::internal::lcon(FRMHED const&          form,
 	  visitedRegions.reset();
 	  auto lastGroup = 0U;
 	  for (auto iPath = 0U; iPath < pathCount; iPath++) {
-		OutputDebugString(
-		    fmt::format(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup)
-		        .c_str());
+		outDebugString(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup);
 		if (!unvis(visitedRegions, visitedIndex)) {
 		  break;
 		}
@@ -5418,7 +5416,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  }
 	}
 	else {
-	  OutputDebugString(L"Form Has no vertices!");
+	  outDebugString(L"Form Has no vertices!\n");
 	}
   }
   return minimumLength != 1e99;

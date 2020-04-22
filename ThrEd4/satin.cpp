@@ -360,8 +360,7 @@ void satin::satadj(FRMHED& form) {
   }
   auto iDestination = wrap::toUnsigned(interiorGuides.size());
   if (currentGuidesCount > iDestination) {
-	OutputDebugString(
-	    fmt::format(L"Removed {} zero distance guides\n", (currentGuidesCount - iDestination)).c_str());
+	outDebugString(L"Removed {} zero distance guides\n", (currentGuidesCount - iDestination));
 	si::satcpy(form, interiorGuides, iDestination);
 	currentGuidesCount = iDestination;
   }
@@ -387,7 +386,7 @@ void satin::satadj(FRMHED& form) {
 	}
 	iDestination = gsl::narrow<decltype(iDestination)>(interiorGuides.size());
 	if (currentGuidesCount > iDestination) {
-	  OutputDebugString(fmt::format(L"Removed {} end guides\n", (currentGuidesCount - iDestination)).c_str());
+	  outDebugString(L"Removed {} end guides\n", (currentGuidesCount - iDestination));
 	  si::satcpy(form, interiorGuides, iDestination);
 	  currentGuidesCount = iDestination;
 	}
@@ -402,8 +401,7 @@ void satin::satadj(FRMHED& form) {
 	  }
 	  iDestination = gsl::narrow<decltype(iDestination)>(interiorGuides.size());
 	  if (currentGuidesCount > iDestination) {
-		OutputDebugString(
-		    fmt::format(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination)).c_str());
+		outDebugString(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination));
 		si::satcpy(form, interiorGuides, iDestination);
 		form.satinGuideCount = iDestination;
 		currentGuidesCount   = iDestination;
@@ -529,7 +527,7 @@ void satin::satadj(FRMHED& form) {
   }
   if (form.satinGuideCount < savedGuideCount) {
 	auto const iGuide = savedGuideCount - currentGuidesCount;
-	OutputDebugString(fmt::format(L"Guides adjusted by {}, so updating forms\n", iGuide).c_str());
+	outDebugString(L"Guides adjusted by {}, so updating forms\n", iGuide);
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 	  auto& afterForm = FormList->operator[](iForm);
 	  if ((afterForm.type == SAT) && (afterForm.satinOrAngle.guide >= iGuide)) {

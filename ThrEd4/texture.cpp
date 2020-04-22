@@ -108,7 +108,7 @@ void texture::txdun() {
 }
 
 void texture::internal::redtbak() {
-  OutputDebugString(fmt::format(L"retrieving texture history {}\n", TextureHistoryIndex).c_str());
+  outDebugString(L"retrieving texture history {}\n", TextureHistoryIndex);
   auto const* textureHistoryItem = &TextureHistory[TextureHistoryIndex];
   if (textureHistoryItem != nullptr) {
 	TextureScreen.areaHeight = textureHistoryItem->height;

@@ -11,6 +11,12 @@
 // Local Headers
 #include "switches.h"
 
+#ifdef _DEBUG
+#define outDebugString(X, ...) OutputDebugString(fmt::format(X, __VA_ARGS__).c_str());
+#else
+#define outDebugString(X, ...)
+#endif
+
 constexpr auto RES_SIZE    = 26;       // reserved for expansion in the ThrEd v1.0 header
 constexpr auto NAME_LEN    = 50;       // Length of the name fields in ThrEd headers
 constexpr auto COLOR_COUNT = 16;       // Number of colors in arrays
