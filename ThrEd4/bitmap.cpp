@@ -93,8 +93,11 @@ COLORREF const DefaultBitmapBackgroundColors[] = {0x00c0d5bf,
                                                   0x0054667a};
 
 auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
-  // ToDo - find a better option than _byteswap
-  return _byteswap_ulong(color) >> 8U;
+  // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
+  // it a portable version
+  auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
+                 ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
+  return a >> 8U;
 }
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
