@@ -376,6 +376,9 @@ void bitmap::lodbmp() {
 	  bitmap::internal::bfil(BackgroundColor);
 	}
 	else {
+	  auto fmtStr = std::wstring {};
+	  displayText::loadString(fmtStr, IDS_BMPLONG);
+	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 	}
 	StateMap.set(StateFlag::RESTCH);
   }

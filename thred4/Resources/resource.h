@@ -418,6 +418,7 @@
 #define IDS_DELBAK                      1107
 #define IDS_FFINDERR                    1108
 #define IDS_ROTMARK                     1109
+#define IDS_BMPLONG                     1110
 #define ID_FILE_OPEN1                   40002
 #define ID_VIEW_STCHBAK                 40003
 #define ID_EDIT_RESET_COL               40006
