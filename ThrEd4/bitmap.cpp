@@ -367,8 +367,6 @@ void bitmap::lodbmp() {
 	UserBMPFileName->assign(fileName.cbegin(), fileName.cend());
 	trace::untrace();
 	auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
-	// PCS file can only store a 16 character filename?
-	// ToDo - give the user a little more info that the bitmap has not been loaded
 	if (!saveFile.empty() && saveFile.size() < 16U) {
 	  auto const bmpName = gsl::span<char> {PCSBMPFileName};
 	  std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
@@ -376,6 +374,8 @@ void bitmap::lodbmp() {
 	  bitmap::internal::bfil(BackgroundColor);
 	}
 	else {
+	  // PCS file can only store a 16 character filename
+	  // Give the user a little more info why the bitmap has not been loaded
 	  auto fmtStr = std::wstring {};
 	  displayText::loadString(fmtStr, IDS_BMPLONG);
 	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
