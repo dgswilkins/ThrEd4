@@ -25,6 +25,6 @@ portability-*,\
 readability-*,-readability-magic-numbers\
 "
 WarningsAsErrors:  ''
-HeaderFilterRegex: '^.*ThrEd4\\.*\.(h|hxx|cxx)$'
+HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
 User:              dwilkins
