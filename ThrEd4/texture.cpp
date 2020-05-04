@@ -831,7 +831,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 		  auto*      vertices = convert_ptr<fPOINT*>(&clipForm[1]);
 		  auto const source   = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
-		  AngledFormVertices->insert(AngledFormVertices->end(), source.cbegin(), source.cend());
+		  AngledFormVertices->insert(AngledFormVertices->end(), source.begin(), source.end());
 		  textureForm.vertexIndex = 0;
 		  StateMap.reset(StateFlag::TXTLIN);
 		  StateMap.set(StateFlag::TXTCLP);

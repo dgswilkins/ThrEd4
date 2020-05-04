@@ -69,7 +69,7 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
 	auto const span = gsl::span<wchar_t>(pBuf, len);
-	sDest.insert(sDest.end(), span.cbegin(), span.cend());
+	sDest.insert(sDest.end(), span.begin(), span.end());
   }
 }
 

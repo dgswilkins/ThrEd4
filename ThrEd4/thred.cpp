@@ -3231,7 +3231,7 @@ void thred::internal::duver(fs::path const& name) {
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
 	auto const src =
-	    gsl::span<char const> {gsl::narrow_cast<char const*>(source), gsl::narrow<ptrdiff_t>(count)};
+	    gsl::span<char const> {gsl::narrow_cast<char const*>(source), gsl::narrow<size_t>(count)};
 	destination.insert(destination.end(), src.begin(), src.end());
   }
 }
@@ -4339,7 +4339,7 @@ void thred::internal::redbak() {
 	StitchBuffer->clear();
 	if (undoData->stitchCount != 0U) {
 	  auto const span = gsl::span<fPOINTATTR>(undoData->stitches, undoData->stitchCount);
-	  StitchBuffer->insert(StitchBuffer->end(), span.cbegin(), span.cend());
+	  StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
 	}
 	else {
 	  StateMap.reset(StateFlag::INIT);
@@ -4348,28 +4348,28 @@ void thred::internal::redbak() {
 	FormList->clear();
 	if (undoData->formCount != 0U) {
 	  auto const span = gsl::span<FRMHED>(undoData->forms, undoData->formCount);
-	  FormList->insert(FormList->end(), span.cbegin(), span.cend());
+	  FormList->insert(FormList->end(), span.begin(), span.end());
 	}
 	FormVertices->clear();
 	if (undoData->vertexCount != 0U) {
 	  auto const span = gsl::span<fPOINT>(undoData->vertices, undoData->vertexCount);
-	  FormVertices->insert(FormVertices->end(), span.cbegin(), span.cend());
+	  FormVertices->insert(FormVertices->end(), span.begin(), span.end());
 	}
 	SatinGuides->clear();
 	if (undoData->guideCount != 0U) {
 	  auto const span = gsl::span<SATCON>(undoData->guide, undoData->guideCount);
-	  SatinGuides->insert(SatinGuides->end(), span.cbegin(), span.cend());
+	  SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
 	}
 	ClipPoints->clear();
 	if (undoData->clipPointCount != 0U) {
 	  auto const span = gsl::span<fPOINT>(undoData->clipPoints, undoData->clipPointCount);
-	  ClipPoints->insert(ClipPoints->end(), span.cbegin(), span.cend());
+	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
 	}
 	// ToDo - add field in BAKHED to keep track of number of colors
 	constexpr auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
 	auto const undoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors)};
 	auto const userColors = gsl::span<COLORREF> {UserColor};
-	std::copy(undoColors.cbegin(), undoColors.cend(), userColors.begin());
+	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
 	for (auto iColor = 0U; iColor < sizeColors; iColor++) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
@@ -4380,7 +4380,7 @@ void thred::internal::redbak() {
 	TexturePointsBuffer->clear();
 	if (undoData->texturePointCount != 0U) {
 	  auto const span = gsl::span<TXPNT>(undoData->texturePoints, undoData->texturePointCount);
-	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.cbegin(), span.cend());
+	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
 	}
 	thred::coltab();
 	StateMap.set(StateFlag::RESTCH);
@@ -13517,7 +13517,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
 		auto const  clipSpan       = gsl::span<uint8_t>(clipP, byteCount);
-		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.cbegin(), clipSpan.cend());
+		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.begin(), clipSpan.end());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
 		ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
@@ -13531,7 +13531,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
 		  auto*      clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 		  auto const vertSpan = gsl::span<fPOINT>(clipData, ClipFormVerticesData->vertexCount);
-		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.cbegin(), vertSpan.cend());
+		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.begin(), vertSpan.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(vertexIt[nextVertex]);
 		  setpclp();
@@ -13550,7 +13550,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
 		  auto*      vertices  = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 		  auto const vertSpan  = gsl::span<fPOINT>(vertices, formIter.vertexCount);
-		  FormVertices->insert(FormVertices->end(), vertSpan.cbegin(), vertSpan.cend());
+		  FormVertices->insert(FormVertices->end(), vertSpan.begin(), vertSpan.end());
 		  StateMap.set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
@@ -13583,8 +13583,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto const currentVertices =
 		      gsl::span<fPOINT>(formVertices, gsl::narrow_cast<ptrdiff_t>(currentVertex) + form.vertexCount);
 		  FormVertices->insert(FormVertices->end(),
-		                       std::next(currentVertices.cbegin(), currentVertex),
-		                       currentVertices.cend());
+		                       std::next(currentVertices.begin(), currentVertex),
+		                       currentVertices.end());
 		  currentVertex += form.vertexCount;
 		}
 		auto* guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
@@ -13634,7 +13634,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  }
 		}
 		auto const textureSpan = gsl::span<TXPNT>(textureSource, textureCount);
-		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.cbegin(), textureSpan.cend());
+		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
@@ -13675,12 +13675,12 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
 		  auto*      formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
 		  auto const verticesSpan = gsl::span<fPOINT>(formVertices, formIter.vertexCount);
-		  FormVertices->insert(FormVertices->end(), verticesSpan.cbegin(), verticesSpan.cend());
+		  FormVertices->insert(FormVertices->end(), verticesSpan.begin(), verticesSpan.end());
 		  auto* guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
 			auto const guideSpan        = gsl::span<SATCON>(guides, formIter.satinGuideCount);
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
-			SatinGuides->insert(SatinGuides->end(), guideSpan.cbegin(), guideSpan.cend());
+			SatinGuides->insert(SatinGuides->end(), guideSpan.begin(), guideSpan.end());
 		  }
 		  auto*      clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
 		  auto       clipCount     = 0U;
@@ -13688,14 +13688,14 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  if (clip::isclpx(lastFormIndex)) {
 			auto const clipSpan = gsl::span<fPOINT>(clipData, formIter.lengthOrCount.clipCount);
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipSpan.cbegin(), clipSpan.cend());
+			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (clip::iseclpx(lastFormIndex)) {
 			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]); // NOLINT
 			auto const clipSpan     = gsl::span<fPOINT>(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipSpan.cbegin(), clipSpan.cend());
+			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (texture::istx(lastFormIndex)) {
@@ -13703,7 +13703,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			auto const textureSpan = gsl::span<TXPNT>(textureSource, formIter.fillInfo.texture.count);
 			formIter.fillInfo.texture.index = gsl::narrow<uint16_t>(TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(
-			    TexturePointsBuffer->end(), textureSpan.cbegin(), textureSpan.cend());
+			    TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		  }
 		  NewFormVertexCount = formIter.vertexCount;
 		  if (formIter.type != FRMLINE) {
