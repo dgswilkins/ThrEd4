@@ -351,36 +351,61 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
 }
 
 void bitmap::lodbmp() {
-  bitmap::resetBmpFile(false);
-  auto fileName = std::vector<wchar_t> {};
-  fileName.resize(_MAX_PATH);
-  auto dirBuffer = std::vector<wchar_t> {};
-  dirBuffer.resize(_MAX_PATH);
-  auto workingFileStr = UserBMPFileName->wstring();
-  auto dirStr         = DefaultBMPDirectory->wstring();
-  std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
-  std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
-  OpenBitmapName.lpstrFile       = fileName.data();
-  OpenBitmapName.lpstrInitialDir = dirBuffer.data();
-  if (GetOpenFileName(&OpenBitmapName)) {
-	fileName.resize(wcslen(fileName.data()));
-	UserBMPFileName->assign(fileName.cbegin(), fileName.cend());
-	trace::untrace();
-	auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
-	if (!saveFile.empty() && saveFile.size() < 16U) {
-	  auto const bmpName = gsl::span<char> {PCSBMPFileName};
-	  std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
-	  bi::defbNam();
-	  bitmap::internal::bfil(BackgroundColor);
+  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
+  auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+  auto* pFileOpen                      = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+  auto hr = CoCreateInstance(
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+  if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
+	auto dwOptions = DWORD {};
+	hr             = pFileOpen->GetOptions(&dwOptions);
+	if (SUCCEEDED(hr)) {
+	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
+	  hr |= pFileOpen->SetFileTypes(aFileTypesSize, aFileTypes);
+	  hr |= pFileOpen->SetTitle(L"Open Thred File");
+#if 0
+		// If we want to, we can set the default directory rather than using the OS mechanism for last used
+		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
+		hr |= SHCreateItemFromParsingName(DefaultBMPDirectory->wstring().data(), NULL, IID_PPV_ARGS(&psiFrom));
+		hr |= pFileOpen->SetFolder(psiFrom);
+		if (nullptr != psiFrom) {
+		  psiFrom->Release();
+		}
+#endif
+	  if (SUCCEEDED(hr)) {
+		hr = pFileOpen->Show(nullptr);
+		if (SUCCEEDED(hr)) {
+		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+		  hr          = pFileOpen->GetResult(&pItem);
+		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
+			auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+			hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			if (SUCCEEDED(hr)) {
+			  UserBMPFileName->assign(pszFilePath);
+			  CoTaskMemFree(pszFilePath);
+			  bitmap::resetBmpFile(false);
+			  trace::untrace();
+			  auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
+			  if (!saveFile.empty() && saveFile.size() < 16U) {
+				auto const bmpName = gsl::span<char> {PCSBMPFileName};
+				std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
+				bi::defbNam();
+				bitmap::internal::bfil(BackgroundColor);
+			  }
+			  else {
+				// PCS file can only store a 16 character filename
+				// Give the user a little more info why the bitmap has not been loaded
+				auto fmtStr = std::wstring {};
+				displayText::loadString(fmtStr, IDS_BMPLONG);
+				displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+			  }
+			  StateMap.set(StateFlag::RESTCH);
+			}
+		  }
+		}
+	  }
 	}
-	else {
-	  // PCS file can only store a 16 character filename
-	  // Give the user a little more info why the bitmap has not been loaded
-	  auto fmtStr = std::wstring {};
-	  displayText::loadString(fmtStr, IDS_BMPLONG);
-	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
-	}
-	StateMap.set(StateFlag::RESTCH);
   }
 }
 

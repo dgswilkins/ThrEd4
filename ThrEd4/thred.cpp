@@ -18189,7 +18189,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   UNREFERENCED_PARAMETER(lpCmdLine);
   UNREFERENCED_PARAMETER(nShowCmd);
 
-  ArgList = CommandLineToArgvW(GetCommandLine(), &ArgCount);
+  auto flag = false;
+  ArgList   = CommandLineToArgvW(GetCommandLine(), &ArgCount);
 
 #ifdef ALLOCFAILURE
   _PNH old_handler = _set_new_handler(handle_program_memory_depletion);
@@ -18197,276 +18198,281 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   // testalloc[0] = 1;
 #endif
 
-  ThrEdInstance = hInstance;
-  auto wc = WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
-  wc.cbSize      = sizeof(WNDCLASSEX);
-  wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC; // NOLINT
-  wc.lpfnWndProc = thi::WndProc;
-  wc.cbClsExtra  = 0;
-  wc.cbWndExtra  = 0;
-  wc.hInstance   = ThrEdInstance;
-  wc.hIcon       = gsl::narrow_cast<HICON>(
-      LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT
-  wc.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
-                        //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
-  wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-  wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT
-  wc.lpszClassName = L"thred";
-  wc.hIconSm       = nullptr;
+  auto const hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
+  if (SUCCEEDED(hr)) {
+	ThrEdInstance = hInstance;
+	auto wc = WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+	wc.cbSize      = sizeof(WNDCLASSEX);
+	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC; // NOLINT
+	wc.lpfnWndProc = thi::WndProc;
+	wc.cbClsExtra  = 0;
+	wc.cbWndExtra  = 0;
+	wc.hInstance   = ThrEdInstance;
+	wc.hIcon       = gsl::narrow_cast<HICON>(
+        LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT
+	wc.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
+	                      //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
+	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
+	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT
+	wc.lpszClassName = L"thred";
+	wc.hIconSm       = nullptr;
 
 #if HIGHDPI
-  auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT
+	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT
 #endif
 
-  if (RegisterClassEx(&wc)) {
-	auto  private_AngledFormVertices        = std::vector<fPOINT> {};
-	auto  private_AuxName                   = fs::path {};
-	auto  private_BSequence                 = std::vector<BSEQPNT> {};
-	auto  private_BalaradName0              = fs::path {};
-	auto  private_BalaradName1              = fs::path {};
-	auto  private_BalaradName2              = fs::path {};
-	auto  private_ButtonWin                 = std::vector<HWND> {};
-	auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
-	auto  private_ClipPoints                = std::vector<fPOINT> {};
-	auto  private_ColorFileName             = fs::path {};
-	auto  private_DefaultBMPDirectory       = fs::path {};
-	auto  private_DefaultColorWin           = std::vector<HWND> {};
-	auto  private_DefaultDirectory          = fs::path {};
-	auto  private_DesignerName              = std::wstring {};
-	auto  private_ExtendedHeader            = STREX {};
-	auto  private_FormAngles                = std::vector<float> {};
-	auto  private_FormControlPoints         = std::vector<POINT> {};
-	auto  private_FormLines                 = std::vector<POINT> {};
-	auto  private_FormList                  = std::vector<FRMHED> {};
-	auto  private_FormOnOff                 = std::wstring {};
-	auto  private_FormVertices              = std::vector<fPOINT> {};
-	auto  private_FormVerticesAsLine        = std::vector<POINT> {};
-	auto  private_GeName                    = fs::path {};
-	auto  private_HomeDirectory             = fs::path {};
-	auto  private_IniFileName               = fs::path {};
-	auto  private_InsidePointList           = std::vector<fPOINT> {};
-	auto  private_InterleaveSequence        = std::vector<fPOINT> {};
-	auto  private_InterleaveSequenceIndices = std::vector<INSREC> {};
-	auto  private_LabelWindow               = std::vector<HWND> {};
-	auto* formOnOff                         = private_FormOnOff.data();
+	if (RegisterClassEx(&wc)) {
+	  auto  private_AngledFormVertices        = std::vector<fPOINT> {};
+	  auto  private_AuxName                   = fs::path {};
+	  auto  private_BSequence                 = std::vector<BSEQPNT> {};
+	  auto  private_BalaradName0              = fs::path {};
+	  auto  private_BalaradName1              = fs::path {};
+	  auto  private_BalaradName2              = fs::path {};
+	  auto  private_ButtonWin                 = std::vector<HWND> {};
+	  auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
+	  auto  private_ClipPoints                = std::vector<fPOINT> {};
+	  auto  private_ColorFileName             = fs::path {};
+	  auto  private_DefaultBMPDirectory       = fs::path {};
+	  auto  private_DefaultColorWin           = std::vector<HWND> {};
+	  auto  private_DefaultDirectory          = fs::path {};
+	  auto  private_DesignerName              = std::wstring {};
+	  auto  private_ExtendedHeader            = STREX {};
+	  auto  private_FormAngles                = std::vector<float> {};
+	  auto  private_FormControlPoints         = std::vector<POINT> {};
+	  auto  private_FormLines                 = std::vector<POINT> {};
+	  auto  private_FormList                  = std::vector<FRMHED> {};
+	  auto  private_FormOnOff                 = std::wstring {};
+	  auto  private_FormVertices              = std::vector<fPOINT> {};
+	  auto  private_FormVerticesAsLine        = std::vector<POINT> {};
+	  auto  private_GeName                    = fs::path {};
+	  auto  private_HomeDirectory             = fs::path {};
+	  auto  private_IniFileName               = fs::path {};
+	  auto  private_InsidePointList           = std::vector<fPOINT> {};
+	  auto  private_InterleaveSequence        = std::vector<fPOINT> {};
+	  auto  private_InterleaveSequenceIndices = std::vector<INSREC> {};
+	  auto  private_LabelWindow               = std::vector<HWND> {};
+	  auto* formOnOff                         = private_FormOnOff.data();
 
-	auto private_MenuInfo = MENUITEMINFO {
-	  sizeof(MENUITEMINFO), // Size
-	      MIIM_TYPE,        // Mask
-	      MFT_STRING,       // Type
-	      0,                // State
-	      0,                // ID
-	      nullptr,          // SubMenu
-	      nullptr,          // bmpChecked
-	      nullptr,          // bmpUnchecked
-	      0,                // ItemData
-	      formOnOff,        // TypeData
-	      16,               // cch
+	  auto private_MenuInfo = MENUITEMINFO {
+		sizeof(MENUITEMINFO), // Size
+		    MIIM_TYPE,        // Mask
+		    MFT_STRING,       // Type
+		    0,                // State
+		    0,                // ID
+		    nullptr,          // SubMenu
+		    nullptr,          // bmpChecked
+		    nullptr,          // bmpUnchecked
+		    0,                // ItemData
+		    formOnOff,        // TypeData
+		    16,               // cch
 #if (WINVER >= 0x0500)
-	      nullptr // bmpItem
-#endif            /* WINVER >= 0x0500 */
-	};
-	auto private_OSequence                 = std::vector<fPOINT> {};
-	auto private_OutsidePointList          = std::vector<fPOINT> {};
-	auto private_PreviousNames             = std::vector<fs::path> {};
-	auto private_RGBFileName               = fs::path {};
-	auto private_RubberBandLine            = std::vector<POINT> {};
-	auto private_SatinGuides               = std::vector<SATCON> {};
-	auto private_SearchLine                = std::vector<POINT> {};
-	auto private_SearchName                = fs::path {};
-	auto private_SelectedFormList          = std::vector<uint32_t> {};
-	auto private_SelectedFormsLine         = std::vector<POINT> {};
-	auto private_SelectedPointsLine        = std::vector<POINT> {};
-	auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
-	auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
-	auto private_StringTable               = std::vector<std::wstring> {};
-	auto private_TempPolygon               = std::vector<fPOINT> {};
-	auto private_TempTexturePoints         = std::vector<TXPNT> {};
-	auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
-	auto private_ThrName                   = fs::path {};
-	auto private_Thumbnails                = std::vector<std::wstring> {};
-	auto private_TracedEdges               = boost::dynamic_bitset<> {};
-	auto private_TracedMap                 = boost::dynamic_bitset<> {};
-	auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
-	auto private_UserBMPFileName           = fs::path {};
-	auto private_UserColorWin              = std::vector<HWND> {};
-	auto private_ValueWindow               = std::vector<HWND> {};
-	auto private_VersionNames              = std::vector<fs::path> {};
-	auto private_WorkingFileName           = fs::path {};
-	auto private_textureInputBuffer        = std::wstring {};
+		    nullptr // bmpItem
+#endif              /* WINVER >= 0x0500 */
+	  };
+	  auto private_OSequence                 = std::vector<fPOINT> {};
+	  auto private_OutsidePointList          = std::vector<fPOINT> {};
+	  auto private_PreviousNames             = std::vector<fs::path> {};
+	  auto private_RGBFileName               = fs::path {};
+	  auto private_RubberBandLine            = std::vector<POINT> {};
+	  auto private_SatinGuides               = std::vector<SATCON> {};
+	  auto private_SearchLine                = std::vector<POINT> {};
+	  auto private_SearchName                = fs::path {};
+	  auto private_SelectedFormList          = std::vector<uint32_t> {};
+	  auto private_SelectedFormsLine         = std::vector<POINT> {};
+	  auto private_SelectedPointsLine        = std::vector<POINT> {};
+	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
+	  auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
+	  auto private_StringTable               = std::vector<std::wstring> {};
+	  auto private_TempPolygon               = std::vector<fPOINT> {};
+	  auto private_TempTexturePoints         = std::vector<TXPNT> {};
+	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
+	  auto private_ThrName                   = fs::path {};
+	  auto private_Thumbnails                = std::vector<std::wstring> {};
+	  auto private_TracedEdges               = boost::dynamic_bitset<> {};
+	  auto private_TracedMap                 = boost::dynamic_bitset<> {};
+	  auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
+	  auto private_UserBMPFileName           = fs::path {};
+	  auto private_UserColorWin              = std::vector<HWND> {};
+	  auto private_ValueWindow               = std::vector<HWND> {};
+	  auto private_VersionNames              = std::vector<fs::path> {};
+	  auto private_WorkingFileName           = fs::path {};
+	  auto private_textureInputBuffer        = std::wstring {};
 
-	private_DefaultColorWin.resize(16U);
-	private_FormControlPoints.resize(9U);
-	private_LabelWindow.resize(LASTLIN);
-	private_RubberBandLine.resize(3U);
-	private_SelectedFormsLine.resize(9U);
-	private_SelectedPointsLine.resize(9U);
-	private_StringTable.resize(STR_LEN);
-	private_UndoBuffer.resize(16U);
-	private_UserColorWin.resize(16U);
-	private_ValueWindow.resize(LASTLIN);
-	private_PreviousNames.reserve(OLDNUM);
-	private_VersionNames.reserve(OLDVER);
-	for (auto iVersion = 0U; iVersion < OLDNUM; iVersion++) {
-	  private_PreviousNames.emplace_back(L"");
-	}
-	for (auto iVersion = 0; iVersion < OLDVER; iVersion++) {
-	  private_VersionNames.emplace_back(L"");
-	}
-	AngledFormVertices        = &private_AngledFormVertices;
-	AuxName                   = &private_AuxName;
-	BSequence                 = &private_BSequence;
-	BalaradName0              = &private_BalaradName0;
-	BalaradName1              = &private_BalaradName1;
-	BalaradName2              = &private_BalaradName2;
-	ButtonWin                 = &private_ButtonWin;
-	ClipBuffer                = &private_ClipBuffer;
-	ClipPoints                = &private_ClipPoints;
-	DefaultColorWin           = &private_DefaultColorWin;
-	DefaultDirectory          = &private_DefaultDirectory;
-	DesignerName              = &private_DesignerName;
-	ExtendedHeader            = &private_ExtendedHeader;
-	FormAngles                = &private_FormAngles;
-	FormControlPoints         = &private_FormControlPoints;
-	FormLines                 = &private_FormLines;
-	FormList                  = &private_FormList;
-	FormOnOff                 = &private_FormOnOff;
-	FormVertices              = &private_FormVertices;
-	FormVerticesAsLine        = &private_FormVerticesAsLine;
-	GeName                    = &private_GeName;
-	HomeDirectory             = &private_HomeDirectory;
-	IniFileName               = &private_IniFileName;
-	InsidePointList           = &private_InsidePointList;
-	InterleaveSequence        = &private_InterleaveSequence;
-	InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
-	LabelWindow               = &private_LabelWindow;
-	MenuInfo                  = &private_MenuInfo;
-	OSequence                 = &private_OSequence;
-	OutsidePointList          = &private_OutsidePointList;
-	PreviousNames             = &private_PreviousNames;
-	RubberBandLine            = &private_RubberBandLine;
-	SatinGuides               = &private_SatinGuides;
-	SearchLine                = &private_SearchLine;
-	SearchName                = &private_SearchName;
-	SelectedFormList          = &private_SelectedFormList;
-	SelectedFormsLine         = &private_SelectedFormsLine;
-	SelectedPointsLine        = &private_SelectedPointsLine;
-	StitchBuffer              = &private_StitchBuffer;
-	StringTable               = &private_StringTable;
-	TempPolygon               = &private_TempPolygon;
-	TextureInputBuffer        = &private_textureInputBuffer;
-	TexturePointsBuffer       = &private_TexturePointsBuffer;
-	ThrName                   = &private_ThrName;
-	Thumbnails                = &private_Thumbnails;
-	TracedEdges               = &private_TracedEdges;
-	TracedMap                 = &private_TracedMap;
-	UndoBuffer                = &private_UndoBuffer;
-	UserColorWin              = &private_UserColorWin;
-	ValueWindow               = &private_ValueWindow;
-	VersionNames              = &private_VersionNames;
-	WorkingFileName           = &private_WorkingFileName;
-	bitmap::setDefBmpDir(&private_DefaultBMPDirectory);
-	bitmap::setUBfilename(&private_UserBMPFileName);
-	DST::setColFilename(&private_ColorFileName);
-	DST::setRGBFilename(&private_RGBFileName);
-	texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
-	thi::redini();
-	CreateParams createParams {};
-	createParams.bEnableNonClientDpiScaling = TRUE;
-	auto private_ScrollSize                 = SCROLSIZ;
-	ScrollSize                              = &private_ScrollSize;
-	auto private_ColorBarSize               = COLSIZ;
-	ColorBarSize                            = &private_ColorBarSize;
-	if (IniFile.initialWindowCoords.right != 0) {
-	  ThrEdWindow = CreateWindow(L"thred", // NOLINT
-	                             L"",
-	                             WS_OVERLAPPEDWINDOW,
-	                             IniFile.initialWindowCoords.left,
-	                             IniFile.initialWindowCoords.right,
-	                             IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
-	                             IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
-	                             nullptr,
-	                             nullptr,
-	                             hInstance,
-	                             &createParams);
-	}
-	else {
-	  ThrEdWindow = CreateWindow(L"thred", // NOLINT
-	                             L"",
-	                             WS_OVERLAPPEDWINDOW,
-	                             CW_USEDEFAULT,
-	                             CW_USEDEFAULT,
-	                             CW_USEDEFAULT,
-	                             CW_USEDEFAULT,
-	                             nullptr,
-	                             nullptr,
-	                             hInstance,
-	                             &createParams);
-	  GetClientRect(ThrEdWindow, &ThredWindowRect);
-	  IniFile.initialWindowCoords = ThredWindowRect;
-	}
-	// Adjust the scroll width for the screen DPI now that we have a window handle
-	auto private_DPI     = GetDpiForWindow(ThrEdWindow);
-	screenDPI            = &private_DPI;
-	private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, 96);
-	private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
-	thi::init();
-	if (UserFlagMap.test(UserFlag::SAVMAX)) {
-	  ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
-	}
-	else {
-	  ShowWindow(ThrEdWindow, SW_SHOW);
-	}
-	if (DesignerName->empty()) {
-	  wchar_t designerBuffer[50];
-	  LoadString(ThrEdInstance,
-	             IDS_UNAM,
-	             static_cast<LPTSTR>(designerBuffer),
-	             sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-	  DesignerName->assign(static_cast<wchar_t const*>(designerBuffer));
-	  thi::getdes();
-	}
-	auto xyRatio        = 1.0F; // expand form aspect ratio
-	auto rotationAngle  = 0.0F;
-	auto rotationCenter = fPOINT {};
-	auto textureForm    = FRMHED {};
-	auto stretchBoxLine = std::vector<POINT> {};
-	stretchBoxLine.resize(5U); // stretch and expand
-	while (GetMessage(&Msg, nullptr, 0, 0)) {
-	  StateMap.set(StateFlag::SAVACT);
-	  if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm)) {
-		DispatchMessage(&Msg);
+	  private_DefaultColorWin.resize(16U);
+	  private_FormControlPoints.resize(9U);
+	  private_LabelWindow.resize(LASTLIN);
+	  private_RubberBandLine.resize(3U);
+	  private_SelectedFormsLine.resize(9U);
+	  private_SelectedPointsLine.resize(9U);
+	  private_StringTable.resize(STR_LEN);
+	  private_UndoBuffer.resize(16U);
+	  private_UserColorWin.resize(16U);
+	  private_ValueWindow.resize(LASTLIN);
+	  private_PreviousNames.reserve(OLDNUM);
+	  private_VersionNames.reserve(OLDVER);
+	  for (auto iVersion = 0U; iVersion < OLDNUM; iVersion++) {
+		private_PreviousNames.emplace_back(L"");
 	  }
-	  if (StateMap.testAndReset(StateFlag::FCHK)) {
-		repair::frmchkx();
+	  for (auto iVersion = 0; iVersion < OLDVER; iVersion++) {
+		private_VersionNames.emplace_back(L"");
 	  }
-	  if (StateMap.testAndReset(StateFlag::RESTCH)) {
-		thred::redraw(MainStitchWin);
+	  AngledFormVertices        = &private_AngledFormVertices;
+	  AuxName                   = &private_AuxName;
+	  BSequence                 = &private_BSequence;
+	  BalaradName0              = &private_BalaradName0;
+	  BalaradName1              = &private_BalaradName1;
+	  BalaradName2              = &private_BalaradName2;
+	  ButtonWin                 = &private_ButtonWin;
+	  ClipBuffer                = &private_ClipBuffer;
+	  ClipPoints                = &private_ClipPoints;
+	  DefaultColorWin           = &private_DefaultColorWin;
+	  DefaultDirectory          = &private_DefaultDirectory;
+	  DesignerName              = &private_DesignerName;
+	  ExtendedHeader            = &private_ExtendedHeader;
+	  FormAngles                = &private_FormAngles;
+	  FormControlPoints         = &private_FormControlPoints;
+	  FormLines                 = &private_FormLines;
+	  FormList                  = &private_FormList;
+	  FormOnOff                 = &private_FormOnOff;
+	  FormVertices              = &private_FormVertices;
+	  FormVerticesAsLine        = &private_FormVerticesAsLine;
+	  GeName                    = &private_GeName;
+	  HomeDirectory             = &private_HomeDirectory;
+	  IniFileName               = &private_IniFileName;
+	  InsidePointList           = &private_InsidePointList;
+	  InterleaveSequence        = &private_InterleaveSequence;
+	  InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
+	  LabelWindow               = &private_LabelWindow;
+	  MenuInfo                  = &private_MenuInfo;
+	  OSequence                 = &private_OSequence;
+	  OutsidePointList          = &private_OutsidePointList;
+	  PreviousNames             = &private_PreviousNames;
+	  RubberBandLine            = &private_RubberBandLine;
+	  SatinGuides               = &private_SatinGuides;
+	  SearchLine                = &private_SearchLine;
+	  SearchName                = &private_SearchName;
+	  SelectedFormList          = &private_SelectedFormList;
+	  SelectedFormsLine         = &private_SelectedFormsLine;
+	  SelectedPointsLine        = &private_SelectedPointsLine;
+	  StitchBuffer              = &private_StitchBuffer;
+	  StringTable               = &private_StringTable;
+	  TempPolygon               = &private_TempPolygon;
+	  TextureInputBuffer        = &private_textureInputBuffer;
+	  TexturePointsBuffer       = &private_TexturePointsBuffer;
+	  ThrName                   = &private_ThrName;
+	  Thumbnails                = &private_Thumbnails;
+	  TracedEdges               = &private_TracedEdges;
+	  TracedMap                 = &private_TracedMap;
+	  UndoBuffer                = &private_UndoBuffer;
+	  UserColorWin              = &private_UserColorWin;
+	  ValueWindow               = &private_ValueWindow;
+	  VersionNames              = &private_VersionNames;
+	  WorkingFileName           = &private_WorkingFileName;
+	  bitmap::setDefBmpDir(&private_DefaultBMPDirectory);
+	  bitmap::setUBfilename(&private_UserBMPFileName);
+	  DST::setColFilename(&private_ColorFileName);
+	  DST::setRGBFilename(&private_RGBFileName);
+	  texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
+	  thi::redini();
+	  CreateParams createParams {};
+	  createParams.bEnableNonClientDpiScaling = TRUE;
+	  auto private_ScrollSize                 = SCROLSIZ;
+	  ScrollSize                              = &private_ScrollSize;
+	  auto private_ColorBarSize               = COLSIZ;
+	  ColorBarSize                            = &private_ColorBarSize;
+	  if (IniFile.initialWindowCoords.right != 0) {
+		ThrEdWindow = CreateWindow(L"thred", // NOLINT
+		                           L"",
+		                           WS_OVERLAPPEDWINDOW,
+		                           IniFile.initialWindowCoords.left,
+		                           IniFile.initialWindowCoords.right,
+		                           IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left,
+		                           IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top,
+		                           nullptr,
+		                           nullptr,
+		                           hInstance,
+		                           &createParams);
 	  }
-	  if (StateMap.testAndReset(StateFlag::RELAYR)) {
-		thi::ritlayr();
+	  else {
+		ThrEdWindow = CreateWindow(L"thred", // NOLINT
+		                           L"",
+		                           WS_OVERLAPPEDWINDOW,
+		                           CW_USEDEFAULT,
+		                           CW_USEDEFAULT,
+		                           CW_USEDEFAULT,
+		                           CW_USEDEFAULT,
+		                           nullptr,
+		                           nullptr,
+		                           hInstance,
+		                           &createParams);
+		GetClientRect(ThrEdWindow, &ThredWindowRect);
+		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
-	  if (!StateMap.test(StateFlag::TXTRED)) {
-		thi::sachk();
+	  // Adjust the scroll width for the screen DPI now that we have a window handle
+	  auto private_DPI     = GetDpiForWindow(ThrEdWindow);
+	  screenDPI            = &private_DPI;
+	  private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, 96);
+	  private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
+	  thi::init();
+	  if (UserFlagMap.test(UserFlag::SAVMAX)) {
+		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 	  }
-	  if (StateMap.testAndReset(StateFlag::DUMEN)) {
-		DrawMenuBar(ThrEdWindow);
+	  else {
+		ShowWindow(ThrEdWindow, SW_SHOW);
 	  }
-	}
+	  if (DesignerName->empty()) {
+		wchar_t designerBuffer[50];
+		LoadString(ThrEdInstance,
+		           IDS_UNAM,
+		           static_cast<LPTSTR>(designerBuffer),
+		           sizeof(designerBuffer) / sizeof(designerBuffer[0]));
+		DesignerName->assign(static_cast<wchar_t const*>(designerBuffer));
+		thi::getdes();
+	  }
+	  auto xyRatio        = 1.0F; // expand form aspect ratio
+	  auto rotationAngle  = 0.0F;
+	  auto rotationCenter = fPOINT {};
+	  auto textureForm    = FRMHED {};
+	  auto stretchBoxLine = std::vector<POINT> {};
+	  stretchBoxLine.resize(5U); // stretch and expand
+	  while (GetMessage(&Msg, nullptr, 0, 0)) {
+		StateMap.set(StateFlag::SAVACT);
+		if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm)) {
+		  DispatchMessage(&Msg);
+		}
+		if (StateMap.testAndReset(StateFlag::FCHK)) {
+		  repair::frmchkx();
+		}
+		if (StateMap.testAndReset(StateFlag::RESTCH)) {
+		  thred::redraw(MainStitchWin);
+		}
+		if (StateMap.testAndReset(StateFlag::RELAYR)) {
+		  thi::ritlayr();
+		}
+		if (!StateMap.test(StateFlag::TXTRED)) {
+		  thi::sachk();
+		}
+		if (StateMap.testAndReset(StateFlag::DUMEN)) {
+		  DrawMenuBar(ThrEdWindow);
+		}
+	  }
 #ifdef ALLOCFAILURE
-	_set_new_handler(old_handler);
+	  _set_new_handler(old_handler);
 #endif
+	  flag = true;
+	}
+
+#if HIGHDPI
+	// Restore the current thread's DPI awareness context
+	SetThreadDpiAwarenessContext(previousDpiContext);
+#endif
+  }
+  CoUninitialize();
+  LocalFree(ArgList);
+  if (flag) {
 	return 0;
   }
-#ifdef ALLOCFAILURE
-  _set_new_handler(old_handler);
-#endif
-
-#if HIGHDPI
-  // Restore the current thread's DPI awareness context
-  SetThreadDpiAwarenessContext(previousDpiContext);
-#endif
-
-  LocalFree(ArgList);
-  return -1;
+  else {
+	return -1;
+  }
 }
