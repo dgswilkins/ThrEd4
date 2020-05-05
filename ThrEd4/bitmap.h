@@ -39,10 +39,8 @@ namespace internal {
   void bitlin(uint8_t const* source, uint32_t* destination, COLORREF foreground, COLORREF background);
   void bitsiz();
   void defbNam();
-  auto fswap(COLORREF color) noexcept -> COLORREF;
-
-  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
-
+  auto constexpr fswap(COLORREF color) noexcept -> COLORREF;
+  auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
   void movmap(uint32_t cnt, uint8_t* buffer);
   auto nuBit() noexcept -> COLORREF;
   void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);

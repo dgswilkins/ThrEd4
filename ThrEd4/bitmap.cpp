@@ -92,7 +92,7 @@ COLORREF const DefaultBitmapBackgroundColors[] = {0x00c0d5bf,
                                                   0x00b799ae,
                                                   0x0054667a};
 
-auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
+auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
@@ -285,7 +285,7 @@ void bitmap::internal::bitsiz() {
   StitchBmpRatio.y = BitmapSizeinStitches.y / BitmapHeight;
 }
 
-constexpr auto bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
+auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
   auto flag = false;
   switch (bitCount) { // NOLINT
 	case 1U:
