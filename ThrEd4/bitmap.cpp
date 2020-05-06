@@ -104,7 +104,7 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
   if (ppvBits != nullptr) {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	auto* bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT
+	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	if (*ppvBits != nullptr) {
 	  return bitmap;
 	}
@@ -119,7 +119,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   auto const InverseBackgroundColor = fswap(backgroundColor);
   auto*      hBitmapFile =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (hBitmapFile == INVALID_HANDLE_VALUE) { // NOLINT
+  if (hBitmapFile == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_UNOPEN);
 	displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
@@ -283,14 +283,14 @@ void bitmap::internal::bitsiz() {
 }
 
 auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
-  auto flag = false;
-  switch (bitCount) { // NOLINT
+  switch (bitCount) { 
 	case 1U:
 	case 24U:
 	case 32U:
-	  flag = true;
+	  return true;
+	default:
+	  return false;
   }
-  return flag;
 }
 
 void bitmap::resetBmpFile(bool reset) noexcept {
@@ -437,7 +437,8 @@ void bitmap::internal::defbNam() {
 }
 
 auto bitmap::internal::nuBit() noexcept -> COLORREF {
-  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; 
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;
   BitMapColorStruct.lpCustColors   = std::begin(BitmapBackgroundColors);
