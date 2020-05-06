@@ -348,24 +348,24 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
 }
 
 void bitmap::lodbmp() {
-  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-  auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-  auto* pFileOpen                      = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
+  auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   auto hr = CoCreateInstance(
-      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen));
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
 	auto dwOptions = DWORD {};
 	hr             = pFileOpen->GetOptions(&dwOptions);
 	if (SUCCEEDED(hr)) {
-	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-	  hr |= pFileOpen->SetFileTypes(aFileTypesSize, aFileTypes);
-	  hr |= pFileOpen->SetTitle(L"Open Thred File");
+	  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
+	  auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
+	  hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	  hr += pFileOpen->SetTitle(L"Open Thred File");
 #if 0
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
 		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-		hr |= SHCreateItemFromParsingName(DefaultBMPDirectory->wstring().data(), NULL, IID_PPV_ARGS(&psiFrom));
-		hr |= pFileOpen->SetFolder(psiFrom);
+		hr += SHCreateItemFromParsingName(DefaultBMPDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+		hr += pFileOpen->SetFolder(psiFrom);
 		if (nullptr != psiFrom) {
 		  psiFrom->Release();
 		}
