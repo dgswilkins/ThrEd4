@@ -117,30 +117,28 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
 
 void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   auto const InverseBackgroundColor = fswap(backgroundColor);
-  BitmapFileHandle =
+  auto*      hBitmapFile =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (BitmapFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+  if (hBitmapFile == INVALID_HANDLE_VALUE) { // NOLINT
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_UNOPEN);
 	displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
+	CloseHandle(hBitmapFile);
 	PCSBMPFileName[0] = 0;
 	return;
   }
   auto bytesRead = DWORD {0};
-  ReadFile(BitmapFileHandle, &BitmapFileHeader, 14U, &bytesRead, nullptr);
+  ReadFile(hBitmapFile, &BitmapFileHeader, 14U, &bytesRead, nullptr);
   constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_Sig) {
 	auto fileHeaderSize = BitmapFileHeader.bfOffBits - 14U;
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 	  fileHeaderSize = sizeof(BITMAPV4HEADER);
 	}
-	ReadFile(BitmapFileHandle, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, nullptr);
+	ReadFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, nullptr);
   }
   else {
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
+	CloseHandle(hBitmapFile);
 	PCSBMPFileName[0] = 0;
 	return;
   }
@@ -166,8 +164,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  auto const bitmapSizeBytes = bitmapWidthBytes * BitmapHeight;
 	  auto       monoBitmapData  = std::vector<uint8_t> {};
 	  monoBitmapData.resize(bitmapSizeBytes);
-	  ReadFile(BitmapFileHandle, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
-	  CloseHandle(BitmapFileHandle);
+	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
+	  CloseHandle(hBitmapFile);
 	  auto const flag       = binv(monoBitmapData, bitmapWidthBytes);
 	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? InverseBackgroundColor : BitmapColor);
 	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : InverseBackgroundColor);
@@ -194,19 +192,19 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  auto* deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
-		BitmapFileHandle = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
-		SelectObject(BitmapDC, BitmapFileHandle);
+		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
+		SelectObject(BitmapDC, hBitmapFile);
 		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
 		DeleteObject(bitmap);
 		DeleteObject(deviceContext);
 	  }
 	}
 	else {
-	  CloseHandle(BitmapFileHandle);
+	  CloseHandle(hBitmapFile);
 	  StateMap.reset(StateFlag::MONOMAP);
-	  BitmapFileHandle = LoadImage(
+	  hBitmapFile = LoadImage(
 	      ThrEdInstance, UserBMPFileName->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
-	  SelectObject(BitmapDC, BitmapFileHandle);
+	  SelectObject(BitmapDC, hBitmapFile);
 	  StateMap.set(StateFlag::RESTCH);
 	}
 	bitsiz();
@@ -214,8 +212,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	StateMap.reset(StateFlag::HIDMAP);
   }
   else {
-	CloseHandle(BitmapFileHandle);
-	BitmapFileHandle  = nullptr;
+	CloseHandle(hBitmapFile);
 	PCSBMPFileName[0] = 0;
 	displayText::tabmsg(IDS_BMAP);
   }
