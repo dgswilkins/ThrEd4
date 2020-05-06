@@ -66,8 +66,8 @@ auto LoadStringSpan = gsl::span(LoadStringList);
 void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   auto* pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
   sDest.clear();
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) { // NOLINT
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1) NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
 	auto const span = gsl::span<wchar_t>(pBuf, len);
 	sDest.insert(sDest.end(), span.begin(), span.end());
   }
@@ -106,7 +106,8 @@ void displayText::shoMsg(std::wstring const& message) {
 	auto xOffset = mainRect.left;
 	GetWindowRect(ThrEdWindow, &mainRect);
 	xOffset -= mainRect.left;
-	MsgWindow = CreateWindow(L"STATIC", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	MsgWindow = CreateWindow(L"STATIC",
 	                         message.c_str(),
 	                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                         xOffset,
@@ -147,7 +148,8 @@ void displayText::numWnd() noexcept {
   auto xOffset = wRect.left;
   GetWindowRect(ThrEdWindow, &wRect);
   xOffset -= wRect.left;
-  GeneralNumberInputBox = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  GeneralNumberInputBox = CreateWindow(L"STATIC",
                                        nullptr,
                                        SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                        xOffset + 5,
@@ -350,7 +352,8 @@ void displayText::datmsg(uint32_t code) {
 
 void displayText::okcan() noexcept {
   GetClientRect(MsgWindow, &MsgRect);
-  OKButton     = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  OKButton = CreateWindow(L"STATIC",
                           StringTable->operator[](STR_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -361,7 +364,8 @@ void displayText::okcan() noexcept {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  CancelButton = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CancelButton = CreateWindow(L"STATIC",
                               StringTable->operator[](STR_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               ButtonWidth * 5,
@@ -380,7 +384,8 @@ void displayText::savdisc() {
   StateMap.reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
   LoadString(ThrEdInstance, IDS_SAV, std::begin(buffer), HBUFSIZ);
-  OKButton = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  OKButton = CreateWindow(L"STATIC",
                           std::begin(buffer),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
@@ -392,7 +397,8 @@ void displayText::savdisc() {
                           ThrEdInstance,
                           nullptr);
   LoadString(ThrEdInstance, IDS_DISC, std::begin(buffer), HBUFSIZ);
-  DiscardButton = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  DiscardButton = CreateWindow(L"STATIC",
                                std::begin(buffer),
                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 15,
@@ -403,7 +409,8 @@ void displayText::savdisc() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  CancelButton  = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CancelButton = CreateWindow(L"STATIC",
                               StringTable->operator[](STR_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               2 * ButtonWidthX3 + 25,
@@ -417,14 +424,15 @@ void displayText::savdisc() {
 }
 
 auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
-  SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0)); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
 }
 
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = displayText::getThrEdFont(400);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont)); // NOLINT
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1) NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+  EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
 
 void displayText::tomsg() {
@@ -435,7 +443,8 @@ void displayText::tomsg() {
                              StringTable->operator[](STR_DELST2).c_str(),
                              wrap::toUnsigned(StringTable->operator[](STR_DELST2).size()),
                              &textSize);
-  DeleteStitchesDialog = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  DeleteStitchesDialog = CreateWindow(L"STATIC",
                                       StringTable->operator[](STR_DELST2).c_str(),
                                       SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                       3,
@@ -491,5 +500,6 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0)); // NOLINT
+  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
+  SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }
