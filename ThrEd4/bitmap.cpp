@@ -313,21 +313,45 @@ void bitmap::savmap() {
 	  displayText::tabmsg(IDS_MAPCHG);
 	  return;
 	}
-	if (GetSaveFileName(&OpenBitmapName)) {
-	  BitmapFileHandle =
-	      CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	  if (BitmapFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
-		displayText::crmsg(*UserBMPFileName);
-		return;
+	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+	auto hr = CoCreateInstance(
+	    CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
+	  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
+	  auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	  hr += pFileSave->SetFileTypeIndex(0);
+	  hr += pFileSave->SetTitle(L"Save Bitmap");
+	  auto bmpName = utf::Utf8ToUtf16(static_cast<char*>(PCSBMPFileName));
+	  hr += pFileSave->SetFileName(bmpName.c_str());
+	  hr += pFileSave->SetDefaultExtension(L"bmp");
+	  if (SUCCEEDED(hr)) {
+		hr = pFileSave->Show(nullptr);
+		if (SUCCEEDED(hr)) {
+		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+		  hr          = pFileSave->GetResult(&pItem);
+		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
+			auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+			hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			if (SUCCEEDED(hr)) {
+			  auto* hBitmap = CreateFile(pszFilePath, GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+			  if (hBitmap == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+				displayText::crmsg(*UserBMPFileName);
+				return;
+			  }
+			  auto bytesWritten = DWORD {0};
+			  WriteFile(hBitmap, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
+			  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
+			  auto buffer = std::vector<uint8_t> {};
+			  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
+			  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
+			  WriteFile(hBitmap, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
+			  CloseHandle(hBitmap);
+			}
+		  }
+		}
 	  }
-	  auto bytesWritten = DWORD {0};
-	  WriteFile(BitmapFileHandle, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
-	  WriteFile(BitmapFileHandle, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
-	  auto buffer = std::vector<uint8_t> {};
-	  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
-	  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
-	  WriteFile(BitmapFileHandle, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
-	  CloseHandle(BitmapFileHandle);
 	}
   }
   else {
