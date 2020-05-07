@@ -23,6 +23,7 @@
 //#pragma warning(disable:26461)	// con.3    	The pointer argument can be marked as a pointer to const
 //#pragma warning(disable:26472)	// type.1   	Don't use a gsl::narrow_cast for arithmetic conversions
 //#pragma warning(disable:26474)	// type.1   	Don't cast between pointer types when the conversion could be implicit
+#pragma warning(disable : 26476)	// type.7   	Don't use a naked union 'union ' with multiple type pointers: Use variant instead
 #pragma warning(disable : 26481)    // bounds.1 	Don't use pointer arithmetic. Use span instead
 #pragma warning(disable : 26482)    // bounds.2 	Only index into arrays using constant expressions
 #pragma warning(disable : 26485)    // bounds.3 	No array to pointer decay
