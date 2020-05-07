@@ -43,7 +43,7 @@ inline auto Utf8ToUtf16(std::string const& utf8) -> std::wstring {
   // handle the special case of empty input string
   if (utf8.empty()) {
 #pragma warning(suppress : 26493) // type.4   	Don't use C-style casts
-	_ASSERTE(utf16.empty());      // NOLINT
+	_ASSERTE(utf16.empty());      
 	return utf16;
   }
 #pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
@@ -57,7 +57,7 @@ inline auto Utf16ToUtf8(std::wstring const& utf16) -> std::string {
 
   if (utf16.empty()) {
 #pragma warning(suppress : 26493) // type.4   	Don't use C-style casts
-	_ASSERTE(utf8.empty());       // NOLINT
+	_ASSERTE(utf8.empty());       
 	return utf8;
   }
 
