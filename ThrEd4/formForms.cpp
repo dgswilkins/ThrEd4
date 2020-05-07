@@ -76,7 +76,8 @@ auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& loc
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  return CreateWindow(L"STATIC", 
                       windowName.c_str(),
                       SS_NOTIFY | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -94,7 +95,8 @@ auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& locat
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  return CreateWindow(L"STATIC", 
                       winName.c_str(),
                       SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -112,7 +114,8 @@ auto formForms::internal::numwin(std::wstring const& winName, RECT const& locati
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
-  return CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  return CreateWindow(L"STATIC", 
                       winName.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -423,7 +426,8 @@ void formForms::refrm() {
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
   }
-  FormDataSheet = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  FormDataSheet = CreateWindow(L"STATIC", 
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 3,
@@ -447,7 +451,8 @@ void formForms::sidwnd(HWND wnd) noexcept {
   FormMenuChoice = savedChoice;
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
-  SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideMessageWindow = CreateWindow(L"STATIC", 
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    MsgRect.right - ThredWindowOrigin.x + 3,
@@ -467,7 +472,8 @@ void formForms::prfsid(HWND wnd) noexcept {
   thred::unsid();
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
-  SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideMessageWindow = CreateWindow(L"STATIC", 
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    windowRect.right - ThredWindowOrigin.x + 6,
@@ -482,7 +488,8 @@ void formForms::prfsid(HWND wnd) noexcept {
 
 void formForms::internal::prftwin(std::wstring const& text) noexcept {
   // cppcheck-suppress ignoredReturnValue
-  CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CreateWindow(L"STATIC", 
                text.c_str(),
                WS_CHILD | WS_VISIBLE,
                LabelWindowCoords.left,
@@ -496,7 +503,8 @@ void formForms::internal::prftwin(std::wstring const& text) noexcept {
 }
 
 auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
-  return CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  return CreateWindow(L"STATIC", 
                       text.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       ValueWindowCoords.left,
@@ -535,7 +543,8 @@ void formForms::prfmsg() {
   LabelWindowSize.x += 4;
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
-  PreferencesWindow      = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  PreferencesWindow      = CreateWindow(L"STATIC", 
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,
@@ -664,21 +673,22 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	displayText::loadString(daisyType, DaisyTypeString);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	SendMessage(
-	    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT
+	    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
 
 auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) { // NOLINT
+  switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  ffi::initdaz(hwndlg);
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -741,7 +751,16 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  }
 		  break;
 		}
+		default: {
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -750,7 +769,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 void formForms::dasyfrm() {
   thred::unmsg();
 #pragma warning(suppress : 26490)
-  if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT
+  if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	StateMap.reset(StateFlag::FORMIN);
 	return;
   }
@@ -908,7 +927,7 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
 
 auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) { // NOLINT
+  switch (umsg) { 
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
@@ -933,7 +952,8 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wparam)) { 
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -967,7 +987,16 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  ffi::initTearDlg(hwndlg);
 		  break;
 		}
+		default: {
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -1053,14 +1082,15 @@ void formForms::internal::wavinit(HWND hwndlg) {
 
 auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) { // NOLINT
+  switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  ffi::wavinit(hwndlg);
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -1097,7 +1127,16 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  ffi::wavinit(hwndlg);
 		  break;
 		}
+		default: {
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	}
+	default: {
+	  outDebugString(L"umsg [{}] not handled in wavprc\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -1106,7 +1145,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 void formForms::wavfrm() {
   thred::unmsg();
 #pragma warning(suppress : 26490)
-  if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { // NOLINT
+  if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	thred::savdo();
 	auto points = std::vector<fPOINT> {};
 	points.reserve(IniFile.wavePoints);
