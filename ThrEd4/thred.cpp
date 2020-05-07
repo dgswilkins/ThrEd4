@@ -494,7 +494,8 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wparam)) { 
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -520,7 +521,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 
 void thred::internal::getdes() noexcept {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 }
 
 auto thred::internal::isfclp() noexcept -> bool {
@@ -675,7 +676,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   }
   for (iName = 0U; iName < 50U; iName++) {
 	if (designer[iName] != 0) {
-	  tmpName[iName] = NameEncoder[designer[iName]]; // NOLINT
+	  tmpName[iName] = NameEncoder[gsl::narrow_cast<uint32_t>(designer[iName])]; 
 	}
 	else {
 	  while (NameDecoder[tmpName[iName]] != 0U) {
@@ -865,10 +866,12 @@ void thred::coltab() {
 void thred::internal::ladj() {
   for (auto iLayer = 0U; iLayer < 5U; iLayer++) {
 	if (iLayer == ActiveLayer) {
-	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED); 
 	}
 	else {
-	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_ENABLED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_ENABLED); 
 	}
   }
   StateMap.set(StateFlag::DUMEN);
@@ -949,10 +952,12 @@ void thred::savdo() {
   if (StateMap.testAndReset(StateFlag::SAVACT)) {
 	if (StateMap.testAndReset(StateFlag::BAKING)) {
 	  StateMap.reset(StateFlag::REDUSHO);
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); 
 	}
 	StateMap.set(StateFlag::BAKACT);
-	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED); 
 	StateMap.set(StateFlag::DUMEN);
 	thi::dudat();
 	UndoBufferWriteIndex++;
@@ -975,16 +980,16 @@ void thred::internal::redfils() {
 	if (!previousNames[iLRU].empty()) {
 	  if (StateMap.test(StateFlag::SAVAS)) {
 		AppendMenu(
-		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT
+		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
 	  }
 	  else {
 		auto* fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
-		if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+		if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		  previousNames[iLRU].clear();
 		}
 		else {
 		  AppendMenu(
-		      FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT
+		      FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
 		  FindClose(fileHandle);
 		}
 	  }
@@ -1149,7 +1154,8 @@ void thred::internal::nuRct() noexcept {
   }
   if (StitchWindowDC != nullptr) {
 	ReleaseDC(MainStitchWin, StitchWindowDC);
-	StitchWindowDC = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	StitchWindowDC = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS); 
 	StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
 	if (StitchWindowBmp != nullptr) {
 	  DeleteObject(StitchWindowBmp);
@@ -3026,8 +3032,8 @@ void thred::internal::ritini() {
 	IniFile.initialWindowCoords.top    = windowRect.top;
   }
   IniFileHandle = CreateFile(
-      IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
-  if (IniFileHandle != INVALID_HANDLE_VALUE) { // NOLINT
+      IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  if (IniFileHandle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, nullptr);
   }
   CloseHandle(IniFileHandle);
@@ -3057,7 +3063,7 @@ void thred::internal::redbal() {
   FormList->clear();
   auto* balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT
+  if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto bytesRead = DWORD {0U};
 	ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 	if (bytesRead == sizeof(balaradHeader)) {
@@ -3118,7 +3124,7 @@ void thred::internal::ritbal() {
 	outputName.replace_extension(L".thv");
 	auto* balaradFile =
 	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT
+	if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  return;
 	}
 	auto color             = StitchBuffer->front().attribute & COLMSK;
@@ -3372,7 +3378,7 @@ void thred::internal::thrsav() {
   if (!StateMap.testAndReset(StateFlag::IGNAM)) {
 	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	auto* file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
-	if (file != INVALID_HANDLE_VALUE) { // NOLINT
+	if (file != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  StateMap.reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
 		version.clear();
@@ -3396,7 +3402,7 @@ void thred::internal::thrsav() {
 	}
   }
   FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*ThrName);
 	FileHandle = nullptr;
   }
@@ -3498,7 +3504,8 @@ auto thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 #if PESACT
 
 auto thred::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-  auto color           = PECCOLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)}; // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  auto color           = PECCOLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)}; 
   auto translatedColor = PESThread[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
@@ -3542,13 +3549,13 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(gsl::span<char> label) {
-  strncpy(label.data(), "LA:", 3); // NOLINT
+  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
-  strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT
+  strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
 }
 #pragma warning(pop)
 
@@ -3568,8 +3575,10 @@ void thred::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, fl
   auto deltaX = wrap::round<int32_t>(srcX * 5.0F / 3.0F);
   auto deltaY = -wrap::round<int32_t>(srcY * 5.0F / 3.0F);
   if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
-	auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7FU); // NOLINT
-	auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7FU); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7FU); 
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7FU); 
 	buffer.push_back(xVal);
 	buffer.push_back(yVal);
   }
@@ -3697,8 +3706,8 @@ void thred::internal::sav() {
 	std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
   }
   auto* PCSFileHandle = CreateFile(
-      AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT
-  if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+      AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*AuxName);
 	PCSFileHandle = nullptr;
   }
@@ -3715,11 +3724,11 @@ void thred::internal::sav() {
 #if PESACT
 	  case AUXPES: {
 		auto pesHeader = PESHED {};
-		strncpy(pesHeader.led, "#PES0001", sizeof(pesHeader.led)); // NOLINT
+		strncpy(static_cast<char *>(pesHeader.led), "#PES0001", sizeof(pesHeader.led)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		pesHeader.celn = 7U;
-		strncpy(pesHeader.ce, "CEmbOne", sizeof(pesHeader.ce)); // NOLINT
+		strncpy(static_cast<char *>(pesHeader.ce), "CEmbOne", sizeof(pesHeader.ce)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		pesHeader.cslen = 7U;
-		strncpy(pesHeader.cs, "CSewSeg", sizeof(pesHeader.cs)); // NOLINT
+		strncpy(static_cast<char *>(pesHeader.cs), "CSewSeg", sizeof(pesHeader.cs)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto iColor = 0;
 		for (auto const color : UserColor) {
 		  auto           matchIndex  = 0U;
@@ -3991,7 +4000,7 @@ void thred::internal::auxmen() {
 	}
   }
 #pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile (type.3)
-  filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT
+  filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT(cppcoreguidelines-pro-type-const-cast) 
   SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
   StateMap.set(StateFlag::DUMEN);
 }
@@ -4106,7 +4115,8 @@ void thred::internal::dun() {
 }
 
 void thred::internal::dusid(uint32_t entry) noexcept {
-  SideWindow[entry] = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideWindow[entry] = CreateWindow(L"STATIC", 
                                    SideWindowsStrings[entry].c_str(),
                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    3,
@@ -4152,7 +4162,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		  }
 		}
 	  }
-	  SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  SideMessageWindow = CreateWindow(L"STATIC", 
 	                                   nullptr,
 	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                   parentListRect.right - ThredWindowOrigin.x + 3,
@@ -4208,7 +4219,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		  }
 		}
 	  }
-	  SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  SideMessageWindow = CreateWindow(L"STATIC", 
 	                                   nullptr,
 	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                   parentListRect.right - ThredWindowOrigin.x + 3,
@@ -4261,7 +4273,8 @@ auto thred::internal::centr() -> fPOINT {
 void thred::internal::stchWnd() {
   stchPars();
   MainStitchWin = nullptr;
-  MainStitchWin = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  MainStitchWin = CreateWindow(L"STATIC", 
                                nullptr,
                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3,
@@ -4276,7 +4289,8 @@ void thred::internal::stchWnd() {
   SelectObject(GetDC(MainStitchWin), hFont);
   if (MainStitchWin != nullptr) {
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
-	VerticalScrollBar   = CreateWindow(L"SCROLLBAR", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	VerticalScrollBar   = CreateWindow(L"SCROLLBAR", 
                                      nullptr,
                                      SBS_VERT | WS_CHILD | WS_VISIBLE,
                                      StitchWindowSize.x + ButtonWidthX3,
@@ -4287,7 +4301,8 @@ void thred::internal::stchWnd() {
                                      nullptr,
                                      ThrEdInstance,
                                      nullptr);
-	HorizontalScrollBar = CreateWindow(L"SCROLLBAR", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	HorizontalScrollBar = CreateWindow(L"SCROLLBAR", 
 	                                   nullptr,
 	                                   SBS_HORZ | WS_CHILD | WS_VISIBLE,
 	                                   ButtonWidthX3,
@@ -4393,16 +4408,19 @@ void thred::internal::redo() {
 	UndoBufferWriteIndex &= 0xfU;
 	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & 0xfU;
 	if (nextBufferIndex == UndoBufferReadIndex) {
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); 
 	  StateMap.reset(StateFlag::REDUSHO);
 	}
 	else {
 	  if (!StateMap.testAndSet(StateFlag::REDUSHO)) {
-		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED); // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED); 
 	  }
 	}
 	if (!StateMap.testAndSet(StateFlag::UNDUSHO)) {
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED); 
 	}
 	redbak();
 	StateMap.set(StateFlag::DUMEN);
@@ -4431,7 +4449,8 @@ void thred::internal::bak() {
 	UndoBufferWriteIndex &= 0xfU;
 	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
 	if (previousBufferIndex == UndoBufferReadIndex) {
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); 
 	  StateMap.set(StateFlag::DUMEN);
 	  StateMap.reset(StateFlag::UNDUSHO);
 	}
@@ -4441,13 +4460,15 @@ void thred::internal::bak() {
 	  UndoBufferWriteIndex--;
 	}
 	if (UndoBufferWriteIndex == 0U) {
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); 
 	  StateMap.set(StateFlag::DUMEN);
 	  StateMap.reset(StateFlag::UNDUSHO);
 	}
   }
   if (!StateMap.testAndSet(StateFlag::REDUSHO)) {
-	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED); 
 	StateMap.set(StateFlag::DUMEN);
   }
   StateMap.reset(StateFlag::FORMSEL);
@@ -4471,7 +4492,8 @@ void thred::internal::prtred() {
 auto thred::internal::dupcol(uint32_t activeColor) -> uint32_t {
   constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
   auto const     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
-  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); 
   for (auto iColor = 0U; iColor < activeColor; iColor++) {
 	if (UserColor[iColor] == color) {
 	  return iColor;
@@ -4513,8 +4535,10 @@ void thred::internal::rstdu() {
   deldu();
   StateMap.reset(StateFlag::REDUSHO);
   StateMap.reset(StateFlag::UNDUSHO);
-  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
-  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED); 
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); 
   StateMap.set(StateFlag::DUMEN);
 }
 
@@ -4550,7 +4574,7 @@ void thred::internal::nuFil() {
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 	FileHandle =
 	    CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (GetLastError() == 32U) {
 		displayText::filnopn(IDS_FNOPNA, *WorkingFileName);
 	  }
@@ -4565,7 +4589,8 @@ void thred::internal::nuFil() {
 	  StateMap.reset(StateFlag::BAKING);
 	  StateMap.reset(StateFlag::REDUSHO);
 	  TexturePointsBuffer->clear();
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED); 
 	  deldu();
 	  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
 	  thred::unbsho();
@@ -4919,7 +4944,7 @@ void thred::internal::nuFil() {
 			auto* fileBuffer = fileBuf.data();
 			ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
 			auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
-			if (strncmp(pesHeader->led, "#PES00", 6) != 0) { // NOLINT
+			if (strncmp(static_cast<char *>(pesHeader->led), "#PES00", 6) != 0) { 
 			  auto fmtStr = std::wstring {};
 			  displayText::loadString(fmtStr, IDS_NOTPES);
 			  displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
@@ -4938,7 +4963,8 @@ void thred::internal::nuFil() {
 			  if (PEScolors[iColor] < threadCount) {
 				if (!colorMap.test_set(PEScolors[iColor])) {
 				  auto const threadColor = PESThread[PEScolors[iColor]];
-				  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); // NOLINT
+				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+				  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b); 
 				  UserColor[activeColor++] = color;
 				  if (activeColor >= 16U) {
 					break;
@@ -4946,10 +4972,11 @@ void thred::internal::nuFil() {
 				}
 			  }
 			  else {
-				auto const color         = RGB( // NOLINT
-                    PESThread[0].color.r,
-                    PESThread[0].color.g,
-                    PESThread[0].color.b); // color unknown
+				// NOLINTNEXTLINE(hicpp-signed-bitwise)
+				auto const color = RGB(PESThread[0].color.r,
+				                       PESThread[0].color.g,
+				                       PESThread[0].color.b); // color unknown
+
 				UserColor[activeColor++] = color;
 			  }
 			}
@@ -5032,7 +5059,7 @@ void thred::internal::nuFil() {
 	  for (auto iColor = 0U; iColor < 16U; iColor++) {
 		UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 		UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-		wcsncpy_s(buffer, ThreadSize[iColor], 2); // NOLINT
+		wcsncpy_s(buffer, static_cast<wchar_t const *>(ThreadSize[iColor]), 2); 
 		SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
 	  }
 	  for (auto& iColor : *UserColorWin) {
@@ -5073,7 +5100,8 @@ void thred::internal::nuFil() {
 }
 
 auto thred::internal::nuCol(COLORREF init) noexcept -> COLORREF {
-  ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; 
   ColorStruct.hwndOwner      = ThrEdWindow;
   ColorStruct.lCustData      = 0;
   ColorStruct.lpCustColors   = std::begin(CustomColor);
@@ -5085,7 +5113,8 @@ auto thred::internal::nuCol(COLORREF init) noexcept -> COLORREF {
 }
 
 auto thred::internal::nuBak() noexcept -> COLORREF {
-  BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; 
   BackgroundColorStruct.hwndOwner      = ThrEdWindow;
   BackgroundColorStruct.lCustData      = 0;
   BackgroundColorStruct.lpCustColors   = std::begin(CustomBackgroundColor);
@@ -5515,6 +5544,7 @@ void thred::internal::unlin() {
 
 void thred::internal::movbox() {
   if (!StitchBuffer->empty()) {
+	// cppcheck-suppress unreadVariable
 	auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
 	if (stch2px(ClosestPointIndex)) {
 	  unbox();
@@ -6375,7 +6405,8 @@ void thred::internal::duclip() {
 	if (OpenClipboard(ThrEdWindow) != 0) {
 	  EmptyClipboard();
 	  ThrEdClip        = RegisterClipboardFormat(ThrEdClipFormat);
-	  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, 
 	                                 (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
 	                                     sizeof(FORMVERTEXCLIP));
 	  if (ThrEdClipPointer != nullptr) {
@@ -6417,7 +6448,8 @@ void thred::internal::duclip() {
 		  length += sizfclp(currentForm);
 		  msiz += FileSize;
 		}
-		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length); // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length); 
 		if (ThrEdClipPointer != nullptr) {
 		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
 		  clipFormsHeader->clipType  = CLP_FRMS;
@@ -6513,7 +6545,8 @@ void thred::internal::duclip() {
 		auto const stitchCount = wrap::toUnsigned(astch.size());
 		if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 		  Clip = RegisterClipboardFormat(PcdClipFormat);
-		  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); // NOLINT
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); 
 		  if (ClipPointer != nullptr) {
 			ClipStitchData    = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 			auto iStitch      = 0U;
@@ -6539,7 +6572,8 @@ void thred::internal::duclip() {
 		  auto const length      = sizclp(form, firstStitch, stitchCount);
 		  // clang-format on
 		  FileSize += sizeof(FORMCLIP);
-		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize); // NOLINT
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize); 
 		  if (ThrEdClipPointer != nullptr) {
 			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
 			clipFormHeader->clipType = CLP_FRM;
@@ -6585,7 +6619,8 @@ void thred::internal::duclip() {
 		  }
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); // NOLINT
+			// NOLINTNEXTLINE(hicpp-signed-bitwise)
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U); 
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 			  auto iTexture  = firstStitch;
@@ -6624,7 +6659,8 @@ void thred::internal::duclip() {
 			}
 			auto const length  = GroupEndStitch - GroupStartStitch + 1U;
 			auto       iSource = GroupStartStitch;
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2U); // NOLINT
+			// NOLINTNEXTLINE(hicpp-signed-bitwise)
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2U); 
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 			  savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
@@ -7006,8 +7042,10 @@ void thred::internal::setknots() {
 }
 
 void thred::internal::duhbit(uint32_t cod) noexcept {
-  CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);  // NOLINT
-  CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);  
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod); 
 }
 
 void thred::hidbit() {
@@ -7402,7 +7440,8 @@ void thred::internal::movi() {
 	}
 	thred::movStch();
 	if (!StateMap.test(StateFlag::WASPAT)) {
-	  SpeedScrollBar = CreateWindow(L"SCROLLBAR", // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  SpeedScrollBar = CreateWindow(L"SCROLLBAR", 
 	                                nullptr,
 	                                SBS_HORZ | WS_CHILD | WS_VISIBLE,
 	                                ButtonWidthX3,
@@ -7431,7 +7470,8 @@ void thred::internal::movi() {
 	  MovieTimeStep = MAXDELAY;
 	}
 	ScrollInfo.cbSize = sizeof(ScrollInfo);
-	ScrollInfo.fMask  = SIF_ALL; // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	ScrollInfo.fMask  = SIF_ALL; 
 	ScrollInfo.nMax   = MAXDELAY;
 	ScrollInfo.nMin   = MINDELAY;
 	ScrollInfo.nPage  = 1;
@@ -7541,7 +7581,8 @@ void thred::internal::vubak() {
 	  if ((iVersion & 2U) != 0U) {
 		verticalLocation = dy;
 	  }
-	  BackupViewer[iVersion] = CreateWindow(L"STATIC", // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  BackupViewer[iVersion] = CreateWindow(L"STATIC", 
 	                                        L"",
 	                                        SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                        dx * (iVersion & 1U) + ButtonWidthX3,
@@ -7621,7 +7662,7 @@ void thred::internal::insfil() {
   if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
 	InsertedFileHandle = CreateFile(
 	    static_cast<LPTSTR>(InsertedFileName), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+	if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  displayText::filnopn(IDS_FNOPN, fs::path(std::begin(InsertedFileName)));
 	  FileHandle = nullptr;
 	  CloseHandle(InsertedFileHandle);
@@ -7959,9 +8000,9 @@ void thred::internal::insfil() {
 void thred::internal::getbak() {
   // auto thumbSpan = gsl::span<uint32_t, 4>{ ThumbnailsSelected };
   if (StateMap.test(StateFlag::THUMSHO)) {
-	if (ThumbnailsSelected[FileVersionIndex] != 0U) { // NOLINT
+	if (ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)] != 0U) { 
 	  if (StateMap.test(StateFlag::RBUT)) {
-		wcscpy_s(InsertedFileName, Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]).data()); // NOLINT
+		wcscpy_s(InsertedFileName, Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]).data()); 
 		StateMap.set(StateFlag::IGNORINS);
 		unthum();
 		StateMap.set(StateFlag::FRMOF);
@@ -7976,7 +8017,7 @@ void thred::internal::getbak() {
 	  }
 	  else {
 		*WorkingFileName =
-		    *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]); // NOLINT
+		    *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]); 
 		StateMap.set(StateFlag::REDOLD);
 		nuFil();
 	  }
@@ -8444,6 +8485,7 @@ void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
 }
 
 // Does the outline have zero width or zero height?
+// cppcheck-suppress constParameter
 auto thred::internal::isLine(std::vector<POINT>& boxOutline) noexcept -> bool {
   return (boxOutline[0].x == boxOutline[1].x) || (boxOutline[1].y == boxOutline[2].y);
 }
@@ -8707,24 +8749,30 @@ void thred::internal::movmrk() {
 }
 
 void thred::internal::vuthrds() {
-  if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) { // NOLINT
-	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);          // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) { 
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);          
 	StateMap.reset(StateFlag::THRDS);
   }
   else {
-	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED); 
 	StateMap.set(StateFlag::THRDS);
   }
   StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::internal::vuselthr() {
-  if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) { // NOLINT
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);          // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);          
 	StateMap.reset(StateFlag::COL);
   }
   else {
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED); // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED); 
 	StateMap.set(StateFlag::COL);
   }
   StateMap.set(StateFlag::RESTCH);
@@ -9071,7 +9119,7 @@ void thred::internal::thumnail() {
   fs::current_path(*DefaultDirectory);
   *SearchName = *DefaultDirectory / L"*.thr";
   auto* file  = FindFirstFile(SearchName->wstring().c_str(), &fileData);
-  if (file == INVALID_HANDLE_VALUE) { // NOLINT
+  if (file == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
 	displayText::loadString(fmtStr, IDS_FFINDERR);
@@ -9393,7 +9441,8 @@ void thred::internal::sidhup() {
   StateMap.set(StateFlag::HUPMSG);
   GetWindowRect(ValueWindow->operator[](PHUP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
-  SideMessageWindow = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideMessageWindow = CreateWindow(L"STATIC", 
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    preferencesRectangle.right + 3 - ThredWindowOrigin.x,
@@ -9405,7 +9454,8 @@ void thred::internal::sidhup() {
                                    ThrEdInstance,
                                    nullptr);
   for (auto iHoop = 0U; iHoop < HUPS; iHoop++) {
-	SideWindow[iHoop] = CreateWindow(L"STATIC", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	SideWindow[iHoop] = CreateWindow(L"STATIC", 
 	                                 StringTable->operator[](wrap::toSize(iHoop) + STR_HUP0).c_str(),
 	                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                 3,
@@ -10066,19 +10116,20 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
 	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
 	for (auto iFile = 0U; iFile < fileIndex; iFile++) {
-	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { 
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
 		            LB_ADDSTRING,
 		            0,
-		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
+		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
 	  }
 	  else {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
 		            LB_ADDSTRING,
 		            0,
-		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT
+		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  }
 	}
   }
@@ -10091,11 +10142,11 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 #pragma warning(suppress : 26490)                     // Don't use reinterpret_cast (type.1)
-	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT
+	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  if (fileInfo != nullptr) {
 		auto  searchName   = *DefaultDirectory / L"*.thr";
 		auto* searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
-		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT
+		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		  auto fmtStr = std::wstring {};
 		  displayText::loadString(fmtStr, IDS_NOTHRFIL);
 		  displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
@@ -10113,23 +10164,26 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	}
 	case WM_COMMAND: {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT
+	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  if (fileInfo != nullptr) {
-		switch (LOWORD(wparam)) { // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		switch (LOWORD(wparam)) { 
 		  case IDCANCEL: {
 			EndDialog(hwndlg, wparam);
 			return TRUE;
 		  }
 		  case IDC_LOCKAL: {
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
-			  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY; // NOLINT
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY; 
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCKAL: {
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
-			  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY; // NOLINT
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY; 
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
@@ -10138,9 +10192,11 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			auto  fileError    = 0U;
 			auto* unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
-			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) { // NOLINT
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) { 
 				if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
-				  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY; // NOLINT
+				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+				  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY; 
 				}
 				fileError++;
 			  }
@@ -10152,9 +10208,11 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			auto  fileError  = 0U;
 			auto* lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
-			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { // NOLINT
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) { 
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
-				  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY; // NOLINT
+				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+				  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY; 
 				}
 				fileError++;
 			  }
@@ -10192,10 +10250,10 @@ void thred::internal::lock() {
   auto lockInfo  = FINDINFO {};
   lockInfo.count = 0;
   // ToDo - Replace 512 with maximum files in subdirectory
-  lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT
+  lockInfo.data = new WIN32_FIND_DATA[512]; //NOLINT(cppcoreguidelines-owning-memory)
   DialogBoxParam(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT
-  delete[] lockInfo.data; // NOLINT
+      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast) 
+  delete[] lockInfo.data; // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 void thred::internal::delstch() {
@@ -10410,7 +10468,8 @@ void thred::internal::nuscol(uint32_t iColor) noexcept {
 
 void thred::internal::movchk() {
   auto& defaultColorWin = *DefaultColorWin;
-  if ((Msg.wParam & MK_LBUTTON) != 0U) { // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  if ((Msg.wParam & MK_LBUTTON) != 0U) { 
 	if (!StateMap.testAndSet(StateFlag::WASMOV)) {
 	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
 		DraggedColor = VerticalIndex & 0xfU;
@@ -10711,9 +10770,11 @@ void thred::internal::esccode() {
   StateMap.reset(StateFlag::FRMOF);
   StateMap.reset(StateFlag::THRDS);
   thred::redraw(ButtonWin->operator[](HHID));
-  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED); 
   StateMap.reset(StateFlag::COL);
-  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED); 
   StateMap.set(StateFlag::DUMEN);
   StateMap.reset(StateFlag::RUNPAT);
   StateMap.reset(StateFlag::WASPAT);
@@ -10836,7 +10897,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 		SendMessage(
-		    GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT
+		    GetDlgItem(hwndlg, IDC_FDTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
 	  }
 	  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
 	  auto state = 0U;
@@ -10864,7 +10925,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  break;
 	}
 	case WM_COMMAND: {
-	  switch (LOWORD(wparam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wparam)) { 
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -10917,7 +10979,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 
 void thred::internal::dufdef() noexcept {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast) 
 }
 
 auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
@@ -11242,7 +11304,8 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	if (StateMap.test(StateFlag::BOXZUM) && StateMap.testAndSet(StateFlag::VCAPT)) {
 	  SetCapture(ThrEdWindow);
 	}
-	if (StateMap.test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) { // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	if (StateMap.test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) { 
 	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
@@ -11577,7 +11640,8 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	auto const colorBarPosition = (gsl::narrow_cast<double>(Msg.pt.y) - ColorBarRect.top) /
 	                              (gsl::narrow_cast<double>(ColorBarRect.bottom) - ColorBarRect.top);
 	if (Msg.message == WM_RBUTTONDOWN) {
-	  if (((Msg.wParam & MK_SHIFT) != 0U) // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  if (((Msg.wParam & MK_SHIFT) != 0U) 
 	      && (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
 		unbox();
 		GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
@@ -11699,7 +11763,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
   if (thred::inStitchWin() && !(StateMap.test(StateFlag::SIZSEL) &&
                                 thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
 	if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
-	  if ((Msg.wParam & MK_SHIFT) != 0U) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  if ((Msg.wParam & MK_SHIFT) != 0U) { 
 		TmpFormIndex = ClosestFormToCursor;
 		if (form::closfrm()) {
 		  // ToDo - I don't think this can ever be hit with closfrm
@@ -11722,7 +11787,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		  form::nufsel();
 		}
 	  }
-	  if ((Msg.wParam & MK_CONTROL) != 0U) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  if ((Msg.wParam & MK_CONTROL) != 0U) { 
 		if (SelectedFormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
 		  StateMap.set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
@@ -11784,7 +11850,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  }
 	}
 	if (StateMap.test(StateFlag::INIT) || (FileHandle != nullptr)) {
-	  if ((Msg.wParam & MK_SHIFT) != 0U) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  if ((Msg.wParam & MK_SHIFT) != 0U) { 
 		if (StateMap.test(StateFlag::SELBOX)) {
 		  auto const code = ClosestPointIndex;
 		  closPnt1(&ClosestPointIndex);
@@ -12978,8 +13045,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thrBack = 'r';
 	  ThrName->replace_extension(thrExt);
 	  FileHandle = CreateFile(
-	      ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr); // NOLINT
-	  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+	      ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+	  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		FileHandle = nullptr;
 	  }
 	  return true;
@@ -13034,7 +13101,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ThreadSize[ThreadSizeSelected][0]   = threadSizeMap[VerticalIndex];
 	  ThreadSizeIndex[ThreadSizeSelected] = VerticalIndex;
 	  wchar_t buffer[3]                   = {0};
-	  wcsncpy_s(buffer, ThreadSize[ThreadSizeSelected], 2); // NOLINT
+	  wcsncpy_s(buffer, static_cast<wchar_t const *>(ThreadSize[ThreadSizeSelected]), 2); 
 	  buffer[2] = 0;
 	  SetWindowText(ThreadSizeWin[ThreadSizeSelected], static_cast<LPTSTR>(buffer));
 	  StateMap.set(StateFlag::RESTCH);
@@ -13480,7 +13547,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::savdo();
 	  ThreadSizeSelected = VerticalIndex;
 	  for (auto iThreadSize = 0U; iThreadSize < 3; iThreadSize++) {
-		ChangeThreadSizeWin[iThreadSize] = CreateWindow(L"STATIC", // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		ChangeThreadSizeWin[iThreadSize] = CreateWindow(L"STATIC", 
 		                                                str[iThreadSize],
 		                                                WS_CHILD | WS_VISIBLE | WS_BORDER,
 		                                                ButtonWidthX3,
@@ -13692,7 +13760,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (clip::iseclpx(lastFormIndex)) {
-			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]); // NOLINT
+			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]); 
 			auto const clipSpan     = gsl::span<fPOINT>(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
@@ -16365,7 +16433,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  iVersion++;
 		}
 	  }
-	  auto const wParameter = LOWORD(Msg.wParam); // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  auto const wParameter = LOWORD(Msg.wParam); 
 	  if (wParameter > 40000U && wParameter < 40300U) {
 		thred::undat();
 	  }
@@ -16402,7 +16471,8 @@ void thred::internal::makCol() noexcept {
   buffer[2]         = 0;
   auto* hFont       = displayText::getThrEdFont(400);
   for (auto iColor = 0U; iColor < 16U; iColor++) {
-	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC", 
 	                                                   nullptr,
 	                                                   SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                                   0,
@@ -16414,7 +16484,8 @@ void thred::internal::makCol() noexcept {
 	                                                   ThrEdInstance,
 	                                                   nullptr);
 	displayText::setWindowFont(DefaultColorWin->operator[](iColor), hFont);
-	UserColorWin->operator[](iColor) = CreateWindow(L"STATIC", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	UserColorWin->operator[](iColor) = CreateWindow(L"STATIC", 
 	                                                nullptr,
 	                                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                                ButtonWidth,
@@ -16426,8 +16497,9 @@ void thred::internal::makCol() noexcept {
 	                                                ThrEdInstance,
 	                                                nullptr);
 	buffer[0]                        = ThreadSize[iColor][0];
-	ThreadSizeWin[iColor]            = CreateWindow(L"STATIC", // NOLINT
-                                         buffer,
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	ThreadSizeWin[iColor]            = CreateWindow(L"STATIC", 
+                                         static_cast<LPCTSTR>(buffer),
                                          SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                          ButtonWidth * 2U,
                                          ButtonHeight * iColor,
@@ -16451,7 +16523,7 @@ void thred::internal::ritloc() {
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
 	auto* lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT
+	if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  auto bytesWritten = DWORD {0};
 	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
 	  wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
@@ -16462,13 +16534,13 @@ void thred::internal::ritloc() {
 }
 
 void thred::internal::crtcurs() noexcept {
-  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));      // NOLINT
-  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));      // NOLINT
-  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));   // NOLINT
-  NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown)); // NOLINT
-  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp));   // NOLINT
-  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));  // NOLINT
-  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));    // NOLINT
+  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 }
 
 void thred::internal::duhom() {
@@ -16483,7 +16555,7 @@ void thred::internal::ducmd() {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  BalaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	  if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
+	  if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		CloseHandle(BalaradFile);
 		*BalaradName0 = balaradFileName;
 		if (ArgCount > 2) {
@@ -16492,7 +16564,7 @@ void thred::internal::ducmd() {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
 			BalaradFile     = CreateFile(
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT
+			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 			  char readBuffer[_MAX_PATH + 1] = {0};
 			  *BalaradName1                  = balaradFileName;
 			  auto bytesRead                 = DWORD {0};
@@ -16537,7 +16609,7 @@ void thred::internal::redini() {
   *IniFileName /= L"thred.ini";
   IniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT
+  if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	setPrefs();
   }
   else {
@@ -16783,7 +16855,7 @@ void thred::internal::init() {
   auto       blank           = std::wstring {};
   ReleaseDC(nullptr, deviceContext);
   TexturePointsBuffer->clear();
-  LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT
+  LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast) 
   MainMenu   = GetMenu(ThrEdWindow);
   auto wRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(ThrEdWindow, &wRect);
@@ -16807,15 +16879,16 @@ void thred::internal::init() {
   ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
   qchk();
-  ArrowCursor = LoadCursor(nullptr, IDC_ARROW); // NOLINT
-  CrossCursor = LoadCursor(nullptr, IDC_CROSS); // NOLINT
+  ArrowCursor = LoadCursor(nullptr, IDC_ARROW); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast) 
+  CrossCursor = LoadCursor(nullptr, IDC_CROSS); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   crtcurs();
   redfils();
   StateMap.reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
   SetStretchBltMode(ThredDC, COLORONCOLOR);
-  StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS); // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS); 
   StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
   ScreenSizeMM.cx   = GetDeviceCaps(ThredDC, HORZSIZE);
   ScreenSizeMM.cy   = GetDeviceCaps(ThredDC, VERTSIZE);
@@ -16901,22 +16974,26 @@ void thred::internal::init() {
 	auto* buttonTxt   = &blank;
 	switch (iButton) {
 	  case HBOXSEL: {
-		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; 
 		buttonTxt   = &StringTable->operator[](STR_BOXSEL);
 		break;
 	  }
 	  case HUPTO: {
-		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; 
 		buttonTxt   = &StringTable->operator[](STR_UPOF);
 		break;
 	  }
 	  case HHID: {
-		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER; 
 		buttonTxt   = &StringTable->operator[](STR_PIKOL);
 		break;
 	  }
 	  default: {
-		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER; 
 	  }
 	}
 	if (buttonTxt != nullptr) {
@@ -16934,7 +17011,8 @@ void thred::internal::init() {
 	}
   }
   trace::initTraceWindows();
-  ColorBar = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  ColorBar = CreateWindow(L"STATIC", 
                           L"",
                           SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           ThredWindowRect.right - *ColorBarSize,
@@ -17181,7 +17259,8 @@ void thred::internal::drwStch() {
   if (StateMap.test(StateFlag::INIT)) {
 	if (StateMap.test(StateFlag::ZUMED)) {
 	  ScrollInfo.cbSize = sizeof(ScrollInfo);
-	  ScrollInfo.fMask  = SIF_ALL; // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  ScrollInfo.fMask  = SIF_ALL; 
 	  ScrollInfo.nMax   = UnzoomedRect.y;
 	  ScrollInfo.nMin   = 0;
 	  ScrollInfo.nPage  = wrap::round<int32_t>(ZoomRect.top - ZoomRect.bottom);
@@ -17533,7 +17612,7 @@ void thred::internal::dubar() {
 
 void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
   auto* thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT
+  if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto stitchHeader = STRHED {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
 	if (BytesRead == sizeof(stitchHeader)) {
@@ -17744,7 +17823,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_HSCROLL: {
-	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) { 
 		case SB_LINELEFT: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 			MovieTimeStep += SPEDLIN;
@@ -17814,8 +17894,9 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		case SB_THUMBPOSITION: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT
-			  auto const position = HIWORD(wParam);                 // NOLINT
+			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  auto const position = HIWORD(wParam);                 
 			  MovieTimeStep       = MAXDELAY - position;
 			  setsped();
 			  SetScrollPos(SpeedScrollBar, SB_CTL, position, TRUE);
@@ -17823,9 +17904,10 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  }
 		  else {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT
+			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
 			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-			  ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
+			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  ZoomRect.left        = gsl::narrow<int32_t>(HIWORD(wParam)); 
 			  ZoomRect.right       = ZoomRect.left + zoomWidth;
 			  if (ZoomRect.right > UnzoomedRect.x) {
 				ZoomRect.right = UnzoomedRect.x;
@@ -17840,7 +17922,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_VSCROLL: {
-	  switch (LOWORD(wParam)) { // NOLINT
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  switch (LOWORD(wParam)) { 
 		case SB_LINEDOWN: {
 		  auto scrollPoint = POINT {0L, 0L};
 		  scrollPoint.y    = wrap::round<int32_t>((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
@@ -17869,7 +17952,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
-		  ZoomRect.top = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam)); // NOLINT
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  ZoomRect.top = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam)); 
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
 			ZoomRect.bottom = 0.0F;
@@ -17884,7 +17968,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	case WM_DRAWITEM: {
 // owner draw windows
 #pragma warning(suppress : 26490)                            // Don't use reinterpret_cast (type.1)
-	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT
+	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
 	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap.test(StateFlag::TXTRED)) {
 		  texture::drwtxtr();
@@ -18182,7 +18266,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 #endif
 
 #pragma warning(suppress : 26461) // cppcheck-suppress unusedFunction ; pragma suppresses pointer to const con.3
-auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd) // NOLINT
+auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd) // NOLINT(readability-non-const-parameter) 
     -> int32_t {
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
@@ -18197,28 +18281,29 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   // char* testalloc = new char[(~uint32_t((int32_t)0) / 2) - 1U]();
   // testalloc[0] = 1;
 #endif
-
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto const hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
   if (SUCCEEDED(hr)) {
 	ThrEdInstance = hInstance;
 	auto wc = WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 	wc.cbSize      = sizeof(WNDCLASSEX);
-	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC; // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC; 
 	wc.lpfnWndProc = thi::WndProc;
 	wc.cbClsExtra  = 0;
 	wc.cbWndExtra  = 0;
 	wc.hInstance   = ThrEdInstance;
 	wc.hIcon       = gsl::narrow_cast<HICON>(
-        LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT
+        LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	wc.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                      //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT
+	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	wc.lpszClassName = L"thred";
 	wc.hIconSm       = nullptr;
 
 #if HIGHDPI
-	auto previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT
+	auto* previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 #endif
 
 	if (RegisterClassEx(&wc)) {
@@ -18381,7 +18466,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_ColorBarSize               = COLSIZ;
 	  ColorBarSize                            = &private_ColorBarSize;
 	  if (IniFile.initialWindowCoords.right != 0) {
-		ThrEdWindow = CreateWindow(L"thred", // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		ThrEdWindow = CreateWindow(L"thred", 
 		                           L"",
 		                           WS_OVERLAPPEDWINDOW,
 		                           IniFile.initialWindowCoords.left,
@@ -18394,7 +18480,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		                           &createParams);
 	  }
 	  else {
-		ThrEdWindow = CreateWindow(L"thred", // NOLINT
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		ThrEdWindow = CreateWindow(L"thred", 
 		                           L"",
 		                           WS_OVERLAPPEDWINDOW,
 		                           CW_USEDEFAULT,
@@ -18472,7 +18559,5 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   if (flag) {
 	return 0;
   }
-  else {
-	return -1;
-  }
+  return -1;
 }

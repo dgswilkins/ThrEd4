@@ -1272,6 +1272,7 @@ void form::chkseq(bool border) {
 	}
   }
   else {
+	// this variadic macro causes cpp checker to see a syntax error
 	outDebugString(L"OSequence empty!\n");
   }
   if (minimumStitchLength == 0.0F) {
