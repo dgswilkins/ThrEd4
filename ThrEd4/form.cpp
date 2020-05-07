@@ -3965,7 +3965,7 @@ void form::internal::duseq(std::vector<SMALPNTL*> const& sortedLines,
 		  else {
 			if (savedTopLine != sortedLines[iLineDec][1].line) {
 			  if (iLineDec != 0U) {
-				duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
+				duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); 
 			  }
 			  flag = true;
 			  duseq2(sortedLines[iLineDec]);
@@ -3976,7 +3976,7 @@ void form::internal::duseq(std::vector<SMALPNTL*> const& sortedLines,
 		}
 		else {
 		  if (StateMap.testAndReset(StateFlag::SEQDUN)) {
-			duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); // NOLINT
+			duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]); 
 		  }
 		  flag          = true;
 		  sequenceLines = sortedLines[iLineDec];
@@ -4004,7 +4004,7 @@ void form::internal::duseq(std::vector<SMALPNTL*> const& sortedLines,
 		  else {
 			if (savedTopLine != sortedLines[iLine][1].line) {
 			  if (iLine != 0U) {
-				duseq2(sortedLines[iLine - 1U]); // NOLINT
+				duseq2(sortedLines[iLine - 1U]); 
 			  }
 			  flag = true;
 			  duseq2(sortedLines[iLine]);
@@ -4016,7 +4016,7 @@ void form::internal::duseq(std::vector<SMALPNTL*> const& sortedLines,
 		else {
 		  if (StateMap.testAndReset(StateFlag::SEQDUN)) {
 			if (iLine != 0U) {
-			  duseq2(sortedLines[iLine - 1U]); // NOLINT
+			  duseq2(sortedLines[iLine - 1U]); 
 			}
 		  }
 		  flag          = true;
@@ -5416,6 +5416,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  }
 	}
 	else {
+	  // this variadic macro causes cpp checker to see a syntax error
 	  outDebugString(L"Form Has no vertices!\n");
 	}
   }
@@ -6988,8 +6989,8 @@ void form::internal::doTimeWindow(float                        rangeX,
                                   std::vector<uint32_t> const& xPoints,
                                   std::vector<uint32_t> const& xHistogram) {
   auto checkLength = wrap::round<uint32_t>(SnapLength * 2.0F + 1.0F);
-
-  auto timeWindow = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  auto* timeWindow = CreateWindow(L"STATIC", 
                                  nullptr,
                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
                                  ButtonWidthX3,
