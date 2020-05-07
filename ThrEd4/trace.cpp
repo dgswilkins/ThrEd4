@@ -72,7 +72,8 @@ void trace::initColorRef() noexcept {
 #pragma warning(suppress : 26487) // Don't return a pointer '(*window)' that may be invalid (lifetime.4)
 void trace::internal::trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept {
   if (window != nullptr) {
-	*window = CreateWindow(L"STATIC", // NOLINT
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	*window = CreateWindow(L"STATIC", 
 	                       L"",
 	                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
 	                       xCoordinate,
@@ -87,7 +88,8 @@ void trace::internal::trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoord
 }
 
 void trace::initTraceWindows() noexcept {
-  TraceStepWin = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  TraceStepWin = CreateWindow(L"STATIC", 
                               L"",
                               SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
                               0,
@@ -986,7 +988,8 @@ auto trace::internal::ducolm() -> uint32_t {
 }
 
 void trace::internal::trnumwnd0(int32_t position) noexcept {
-  TraceNumberInput = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  TraceNumberInput = CreateWindow(L"STATIC", 
                                   nullptr,
                                   SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                   ButtonWidthX3,
@@ -1000,7 +1003,8 @@ void trace::internal::trnumwnd0(int32_t position) noexcept {
 }
 
 void trace::internal::trnumwnd1(int32_t position) noexcept {
-  GeneralNumberInputBox = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  GeneralNumberInputBox = CreateWindow(L"STATIC", 
                                        nullptr,
                                        WS_CHILD | WS_VISIBLE | WS_BORDER,
                                        ButtonWidthX3,

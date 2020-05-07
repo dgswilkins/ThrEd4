@@ -73,7 +73,7 @@ void texture::txdun() {
 	  auto  bytesWritten = DWORD {0};
 	  auto* handle =
 	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	  if (handle != INVALID_HANDLE_VALUE) { // NOLINT
+	  if (handle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
@@ -132,7 +132,7 @@ void texture::redtx() {
   TextureHistoryIndex = ITXBUFLEN - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	auto* handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (handle != INVALID_HANDLE_VALUE) { // NOLINT
+	if (handle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  auto bytesRead = DWORD {0};
 	  char sig[4]    = {0};
 	  if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr) != 0) {
@@ -931,7 +931,8 @@ void texture::internal::butsid(uint32_t windowId) {
   txi::chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
-  SideWindowButton = CreateWindow(L"STATIC", // NOLINT
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideWindowButton = CreateWindow(L"STATIC", 
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                   buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,
