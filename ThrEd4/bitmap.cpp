@@ -30,50 +30,14 @@ fPOINT    BitmapSizeinStitches;       // bitmap end points in stitch points
 RECT      BitmapSrcRect;              // bitmap source rectangle for zoomed view
 uint32_t  BitmapWidth;                // bitmap width
 fPOINT    BmpStitchRatio;             // bitmap to stitch hoop ratios
-fs::path* DefaultBMPDirectory;
-fs::path* UserBMPFileName; // bitmap file name from user load
+fs::path* UserBMPFileName;            // bitmap file name from user load
 
 BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
 BITMAPV4HEADER   BitmapFileHeaderV4; // bitmap version4 file header
 BITMAPINFO       BitmapInfo;         // bitmap info
 BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 
-wchar_t const BmpFilter[_MAX_PATH + 1]       = L"Microsoft (BMP)\0*.bmp\0";
-wchar_t       CustomBmpFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
-
 CHOOSECOLOR BitMapColorStruct;
-
-OPENFILENAME OpenBitmapName = {
-    sizeof(OpenBitmapName),      // lStructsize
-    nullptr,                     // hwndOwner
-    nullptr,                     // hInstance
-    std::begin(BmpFilter),       // lpstrFilter
-    std::begin(CustomBmpFilter), // lpstrCustomFilter
-    _MAX_PATH,                   // nMaxCustFilter
-    0,                           // nFilterIndex
-    nullptr,                     // lpstrFile
-    _MAX_PATH,                   // nMaxFile
-    nullptr,                     // lpstrFileTitle
-    0,                           // nMaxFileTitle
-    nullptr,                     // lpstrInitialDir
-    nullptr,                     // lpstrTitle
-    OFN_OVERWRITEPROMPT,         // Flags
-    0,                           // nFileOffset
-    0,                           // nFileExtension
-    L"bmp",                      // lpstrDefExt
-    0,                           // lCustData
-    nullptr,                     // lpfnHook
-    nullptr,                     // lpTemplateName
-#ifdef _MAC
-    nullptr, // lpEditInfo
-    0U,      // lpstrPrompt
-#endif
-#if (_WIN32_WINNT >= 0x0500)
-    nullptr, // *pvReserved
-    0U,      // dwReserved
-    0U       // FlagsEx
-#endif
-};
 
 COLORREF const DefaultBitmapBackgroundColors[] = {0x00c0d5bf,
                                                   0x00c8dfee,
@@ -411,7 +375,6 @@ void bitmap::lodbmp() {
 			  if (!saveFile.empty() && saveFile.size() < 16U) {
 				auto const bmpName = gsl::span<char> {PCSBMPFileName};
 				std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
-				bi::defbNam();
 				bitmap::internal::bfil(BackgroundColor);
 			  }
 			  else {
@@ -427,12 +390,6 @@ void bitmap::lodbmp() {
 		}
 	  }
 	}
-  }
-}
-
-void bitmap::internal::defbNam() {
-  if (!UserBMPFileName->empty()) {
-	*DefaultBMPDirectory = UserBMPFileName->parent_path();
   }
 }
 
@@ -462,14 +419,6 @@ void bitmap::setBmpColor() {
 
 void bitmap::setUBfilename(fs::path* fileName) noexcept {
   UserBMPFileName = fileName;
-}
-
-void bitmap::setDefBmpDir(fs::path* directory) noexcept {
-  DefaultBMPDirectory = directory;
-}
-
-void bitmap::assignDefBmpDir(std::wstring const& directory) {
-  DefaultBMPDirectory->assign(directory);
 }
 
 void bitmap::assignUBFilename(fs::path const& directory) {

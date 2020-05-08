@@ -9,7 +9,6 @@
 #endif
 
 namespace bitmap {
-void assignDefBmpDir(std::wstring const& directory);
 void assignUBFilename(fs::path const& directory);
 void bitbltBitmap() noexcept;
 void bfrm(FRMHED const& form);
@@ -30,7 +29,6 @@ void setBmpBackColor() noexcept;
 void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;
 void setBitmapPen(HPEN pen) noexcept;
-void setDefBmpDir(fs::path* directory) noexcept;
 void setUBfilename(fs::path* fileName) noexcept;
 namespace internal {
   void bfil(COLORREF const& backgroundColor);
@@ -38,7 +36,6 @@ namespace internal {
   auto bitar() -> bool;
   void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
   void bitsiz();
-  void defbNam();
   auto constexpr fswap(COLORREF color) noexcept -> COLORREF;
   auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
   void movmap(uint32_t cnt, uint8_t* buffer);

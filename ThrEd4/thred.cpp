@@ -16625,7 +16625,6 @@ void thred::internal::redini() {
 	else {
 	  auto directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
-	  bitmap::assignDefBmpDir(directory);
 	  {
 		auto& previousNames = *PreviousNames;
 		auto  iVersion      = 0U;
@@ -18317,7 +18316,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
 	  auto  private_ClipPoints                = std::vector<fPOINT> {};
 	  auto  private_ColorFileName             = fs::path {};
-	  auto  private_DefaultBMPDirectory       = fs::path {};
 	  auto  private_DefaultColorWin           = std::vector<HWND> {};
 	  auto  private_DefaultDirectory          = fs::path {};
 	  auto  private_DesignerName              = std::wstring {};
@@ -18453,7 +18451,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ValueWindow               = &private_ValueWindow;
 	  VersionNames              = &private_VersionNames;
 	  WorkingFileName           = &private_WorkingFileName;
-	  bitmap::setDefBmpDir(&private_DefaultBMPDirectory);
 	  bitmap::setUBfilename(&private_UserBMPFileName);
 	  DST::setColFilename(&private_ColorFileName);
 	  DST::setRGBFilename(&private_RGBFileName);
