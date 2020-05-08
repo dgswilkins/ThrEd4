@@ -790,7 +790,7 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 
 auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  auto       color1 = PECCOLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
+  auto color1 = PECCOLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto       color2 = PECCOLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
@@ -839,7 +839,7 @@ void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
 }
 
 auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
-  return strncmp(static_cast<const char *>(dstHeader->desched), "LA:", 3) == 0; 
+  return strncmp(static_cast<const char*>(dstHeader->desched), "LA:", 3) == 0;
 }
 
 auto DST::readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool {
@@ -870,7 +870,7 @@ auto DST::readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool {
 #pragma warning(disable : 4996)
 void DST::saveDST(std::vector<fPOINTATTR> const& saveStitches, const char* desc) {
   auto* PCSFileHandle = CreateFile(
-      AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr);  // NOLINT(hicpp-signed-bitwise)
+      AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
   if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*AuxName);
 	PCSFileHandle = nullptr;
@@ -884,8 +884,8 @@ void DST::saveDST(std::vector<fPOINTATTR> const& saveStitches, const char* desc)
 	DST::ritdst(DSTOffset, DSTRecords, saveStitches);
 	// dstHeader fields are fixed width, so use strncpy in its intended way.
 	// Use sizeof to ensure no overrun if the format string is wrong length
-    // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-	strncpy(static_cast<char *>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); 
+	// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+	strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched));
 	std::fill(std::begin(dstHeader.desc), std::end(dstHeader.desc), ' ');
 	if (desc != nullptr) {
 	  for (auto iHeader = 0U; iHeader < wrap::toUnsigned(sizeof(dstHeader.desc)); iHeader++) {

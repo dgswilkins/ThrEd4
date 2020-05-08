@@ -77,7 +77,7 @@ auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& loc
 	return nullptr;
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return CreateWindow(L"STATIC", 
+  return CreateWindow(L"STATIC",
                       windowName.c_str(),
                       SS_NOTIFY | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -96,7 +96,7 @@ auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& locat
 	return nullptr;
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return CreateWindow(L"STATIC", 
+  return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -115,7 +115,7 @@ auto formForms::internal::numwin(std::wstring const& winName, RECT const& locati
 	return nullptr;
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return CreateWindow(L"STATIC", 
+  return CreateWindow(L"STATIC",
                       winName.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       location.left,
@@ -427,7 +427,7 @@ void formForms::refrm() {
 	DestroyWindow(FormDataSheet);
   }
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  FormDataSheet = CreateWindow(L"STATIC", 
+  FormDataSheet = CreateWindow(L"STATIC",
                                nullptr,
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 3,
@@ -452,7 +452,7 @@ void formForms::sidwnd(HWND wnd) noexcept {
   GetWindowRect(wnd, &windowRect);
   GetWindowRect(FormDataSheet, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  SideMessageWindow = CreateWindow(L"STATIC", 
+  SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    MsgRect.right - ThredWindowOrigin.x + 3,
@@ -473,7 +473,7 @@ void formForms::prfsid(HWND wnd) noexcept {
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  SideMessageWindow = CreateWindow(L"STATIC", 
+  SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    windowRect.right - ThredWindowOrigin.x + 6,
@@ -489,7 +489,7 @@ void formForms::prfsid(HWND wnd) noexcept {
 void formForms::internal::prftwin(std::wstring const& text) noexcept {
   // cppcheck-suppress ignoredReturnValue
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CreateWindow(L"STATIC", 
+  CreateWindow(L"STATIC",
                text.c_str(),
                WS_CHILD | WS_VISIBLE,
                LabelWindowCoords.left,
@@ -504,7 +504,7 @@ void formForms::internal::prftwin(std::wstring const& text) noexcept {
 
 auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  return CreateWindow(L"STATIC", 
+  return CreateWindow(L"STATIC",
                       text.c_str(),
                       SS_NOTIFY | SS_RIGHT | WS_BORDER | WS_CHILD | WS_VISIBLE,
                       ValueWindowCoords.left,
@@ -544,7 +544,7 @@ void formForms::prfmsg() {
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  PreferencesWindow      = CreateWindow(L"STATIC", 
+  PreferencesWindow  = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,
@@ -555,7 +555,7 @@ void formForms::prfmsg() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  auto* preferenceDC     = GetDC(PreferencesWindow);
+  auto* preferenceDC = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
   LabelWindowCoords.top = ValueWindowCoords.top = 3;
@@ -672,8 +672,10 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   for (auto const DaisyTypeString : DaisyTypeStrings) {
 	displayText::loadString(daisyType, DaisyTypeString);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	SendMessage(
-	    GetDlgItem(hWinDialog, IDC_DAZTYP), CB_ADDSTRING, 0, reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
+	            CB_ADDSTRING,
+	            0,
+	            reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -927,7 +929,7 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
 
 auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  switch (umsg) { 
+  switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 #ifdef TESTCODE
@@ -953,7 +955,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	}
 	case WM_COMMAND: {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  switch (LOWORD(wparam)) { 
+	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;

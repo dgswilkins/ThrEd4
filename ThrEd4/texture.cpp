@@ -932,7 +932,7 @@ void texture::internal::butsid(uint32_t windowId) {
   TextureWindowId = windowId;
   GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  SideWindowButton = CreateWindow(L"STATIC", 
+  SideWindowButton = CreateWindow(L"STATIC",
                                   nullptr,
                                   SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                   buttonRect.left + ButtonWidthX3 - StitchWindowOrigin.x,

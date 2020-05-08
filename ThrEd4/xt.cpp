@@ -2335,9 +2335,9 @@ void xt::internal::rtrclpfn(FRMHED const& form) {
 	  LowerLeftStitch.x = 0.0F;
 	  LowerLeftStitch.y = 0.0F;
 	  EmptyClipboard();
-	  Clip        = RegisterClipboardFormat(PcdClipFormat);
+	  Clip = RegisterClipboardFormat(PcdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2U); 
+	  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, count * sizeof(CLPSTCH) + 2U);
 	  if (ClipPointer != nullptr) {
 		ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
 		thred::savclp(ClipStitchData[0], ClipBuffer->operator[](0), count);
@@ -2394,7 +2394,7 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 	}
 	case WM_COMMAND: {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  switch (LOWORD(wparam)) { 
+	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
 		  return TRUE;
@@ -2486,7 +2486,7 @@ void xt::nudsiz() {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast) 
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * 1.05F;
@@ -2531,7 +2531,7 @@ void xt::mvshft() {
   }
   if (StateMap.test(StateFlag::BZUMIN)) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	if ((Msg.wParam & MK_LBUTTON) != 0U) { 
+	if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }

@@ -149,7 +149,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
 		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
 		         &bits[wrap::toSize(iHeight) * BitmapWidth],
-				 bitmapWidthBytes,
+		         bitmapWidthBytes,
 		         background,
 		         foreground);
 		}
@@ -182,11 +182,12 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	displayText::tabmsg(IDS_BMAP);
   }
 }
+
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
 auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
-  auto       whiteBits = 0U;
-  auto       blackBits = 0U;
+  auto whiteBits = 0U;
+  auto blackBits = 0U;
   for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
 	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
 	  auto const* bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
@@ -208,7 +209,11 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
   return whiteBits > blackBits;
 }
 
-void bitmap::internal::bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background) {
+void bitmap::internal::bitlin(uint8_t const* source,
+                              uint32_t*      destination,
+                              uint32_t       bitmapWidthBytes,
+                              COLORREF       foreground,
+                              COLORREF       background) {
   if ((source != nullptr) && (destination != nullptr)) {
 	for (auto i = 0U; i < bitmapWidthBytes; i++) {
 	  auto bits = std::bitset<8U>(source[i]);
@@ -247,7 +252,7 @@ void bitmap::internal::bitsiz() {
 }
 
 auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
-  switch (bitCount) { 
+  switch (bitCount) {
 	case 1U:
 	case 24U:
 	case 32U:
@@ -395,7 +400,7 @@ void bitmap::lodbmp() {
 
 auto bitmap::internal::nuBit() noexcept -> COLORREF {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT; 
+  BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;
   BitMapColorStruct.lpCustColors   = std::begin(BitmapBackgroundColors);
