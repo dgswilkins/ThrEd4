@@ -36,7 +36,7 @@ namespace internal {
   void bfil(COLORREF const& backgroundColor);
   auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
   auto bitar() -> bool;
-  void bitlin(uint8_t const* source, uint32_t* destination, COLORREF foreground, COLORREF background);
+  void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
   void bitsiz();
   void defbNam();
   auto constexpr fswap(COLORREF color) noexcept -> COLORREF;

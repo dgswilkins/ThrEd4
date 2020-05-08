@@ -185,6 +185,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
 		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
 		         &bits[wrap::toSize(iHeight) * BitmapWidth],
+				 bitmapWidthBytes,
 		         background,
 		         foreground);
 		}
@@ -222,11 +223,10 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
   auto       whiteBits = 0U;
   auto       blackBits = 0U;
-  auto const byteCount = BitmapWidth >> 3U;
   for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
 	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
 	  auto const* bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
-	  for (auto iBytes = 0U; iBytes < byteCount; iBytes++) {
+	  for (auto iBytes = 0U; iBytes < bitmapWidthInBytes; iBytes++) {
 		if (bcpnt[iBytes] == 0U) {
 		  blackBits++;
 		}
@@ -244,9 +244,9 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
   return whiteBits > blackBits;
 }
 
-void bitmap::internal::bitlin(uint8_t const* source, uint32_t* destination, COLORREF foreground, COLORREF background) {
+void bitmap::internal::bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background) {
   if ((source != nullptr) && (destination != nullptr)) {
-	for (auto i = 0U; i < (BitmapWidth >> 3U); i++) {
+	for (auto i = 0U; i < bitmapWidthBytes; i++) {
 	  auto bits = std::bitset<8U>(source[i]);
 	  for (auto bitOffset = 0U; bitOffset < 8U; bitOffset++) {
 		*destination = bits[bitOffset ^ 7U] ? foreground : background;
@@ -254,7 +254,7 @@ void bitmap::internal::bitlin(uint8_t const* source, uint32_t* destination, COLO
 	  }
 	}
 	if (auto const final = (BitmapWidth % 8)) {
-	  auto bits = std::bitset<8U>(source[(BitmapWidth >> 3U)]);
+	  auto bits = std::bitset<8U>(source[bitmapWidthBytes]);
 	  for (auto bitOffset = final; bitOffset < 8U; bitOffset++) {
 		*destination = bits[bitOffset ^ 7U] ? foreground : background;
 		destination++;
