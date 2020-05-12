@@ -350,7 +350,7 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
   }
 }
 
-auto bitmap::internal::loadName(fs::path* fileName)-> boolean {
+auto bitmap::internal::loadName(fs::path* fileName)-> bool {
   if (nullptr != fileName) {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
