@@ -4542,22 +4542,94 @@ void thred::internal::rstdu() {
   StateMap.set(StateFlag::DUMEN);
 }
 
-void thred::internal::nuFil() {
-  auto fileName = std::vector<wchar_t> {};
-  fileName.resize(_MAX_PATH);
-  auto dirBuffer = std::vector<wchar_t> {};
-  dirBuffer.resize(_MAX_PATH);
-  auto workingFileStr = WorkingFileName->wstring();
-  auto dirStr         = DefaultDirectory->wstring();
-  std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
-  std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
-  OpenFileName.hwndOwner       = ThrEdWindow;
-  OpenFileName.hInstance       = ThrEdInstance;
-  OpenFileName.lpstrFile       = fileName.data();
-  OpenFileName.lpstrInitialDir = dirBuffer.data();
-  if (StateMap.testAndReset(StateFlag::REDOLD) || GetOpenFileName(&OpenFileName)) {
-	fileName.resize(wcslen(fileName.data()));
-	WorkingFileName->assign(fileName.cbegin(), fileName.cend());
+auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> boolean {
+  auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+  auto hr = CoCreateInstance(
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+  if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
+	auto dwOptions = DWORD {};
+	hr             = pFileOpen->GetOptions(&dwOptions);
+	if (SUCCEEDED(hr)) {
+	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
+#if PESACT
+	  COMDLG_FILTERSPEC const aFileTypes[] = {
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Brother", L"*.pes"}, {L"Tajima", L"*.dst"}};
+#else
+	  COMDLG_FILTERSPEC const aFileTypes[] = {
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
+#endif
+	  COMDLG_FILTERSPEC const iFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"*.pcs"}};
+	  auto constexpr aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  auto constexpr iFileTypesSize = (sizeof(iFileTypes) / sizeof(iFileTypes[0]));
+	  switch (fileTypes) {
+		case fileStyles::ALL_FILES: {
+		  hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+		  break;
+		}
+		case fileStyles::INS_FILES: {
+		  hr += pFileOpen->SetFileTypes(iFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(iFileTypes));
+		  break;
+		}
+	  }
+	  switch (fileIndex) {
+		case fileIndices::THR: {
+		  hr += pFileOpen->SetFileTypeIndex(1);
+		  break;
+		}
+		case fileIndices::PCS: {
+		  hr += pFileOpen->SetFileTypeIndex(2);
+		  break;
+		}
+#if PESACT
+		case fileIndices::PES: {
+		  hr += pFileOpen->SetFileTypeIndex(3);
+		  break;
+		}
+		case fileIndices::DST: {
+		  hr += pFileOpen->SetFileTypeIndex(4);
+#else
+		case fileIndices::DST: {
+		  hr += pFileOpen->SetFileTypeIndex(3);
+#endif
+		  break;
+		}
+	  }
+	  hr += pFileOpen->SetTitle(L"Open Thred File");
+#if 0
+		// If we want to, we can set the default directory rather than using the OS mechanism for last used
+		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
+		hr += SHCreateItemFromParsingName(DefaultDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+		hr += pFileOpen->SetFolder(psiFrom);
+		if (nullptr != psiFrom) {
+		  psiFrom->Release();
+		}
+#endif
+	  if (SUCCEEDED(hr)) {
+		hr = pFileOpen->Show(nullptr);
+		if (SUCCEEDED(hr)) {
+		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+		  hr          = pFileOpen->GetResult(&pItem);
+		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
+			auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+			hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			if (SUCCEEDED(hr)) {
+			  newFileName.assign(pszFilePath);
+			  CoTaskMemFree(pszFilePath);
+			  return true;
+			}
+		  }
+		}
+	  }
+	}
+  }
+  return false;
+}
+
+void thred::internal::nuFil(fileIndices fileIndex) {
+  auto newFileName = *WorkingFileName;
+  if (StateMap.testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, fileStyles::ALL_FILES, fileIndex)) {
+	WorkingFileName->assign(newFileName);
 	fnamtabs();
 	trace::untrace();
 	if (!FormList->empty()) {
@@ -4573,13 +4645,13 @@ void thred::internal::nuFil() {
 	// ToDo - use ifstream?
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 	FileHandle =
-	    CreateFile(WorkingFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	    CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (GetLastError() == 32U) {
-		displayText::filnopn(IDS_FNOPNA, *WorkingFileName);
+		displayText::filnopn(IDS_FNOPNA, newFileName);
 	  }
 	  else {
-		displayText::filnopn(IDS_FNOPN, *WorkingFileName);
+		displayText::filnopn(IDS_FNOPN, newFileName);
 	  }
 	  FileHandle = nullptr;
 	}
@@ -4615,7 +4687,7 @@ void thred::internal::nuFil() {
 	  StateMap.reset(StateFlag::BAKWRAP);
 	  ZoomFactor = 1;
 	  StateMap.set(StateFlag::RESTCH);
-	  defNam(*WorkingFileName);
+	  defNam(newFileName);
 	  NearestCount = 0;
 	  if (StateMap.testAndReset(StateFlag::WASPAT)) {
 		DestroyWindow(SpeedScrollBar);
@@ -4630,7 +4702,7 @@ void thred::internal::nuFil() {
 	  }
 	  auto       fileSizeHigh   = DWORD {};
 	  auto       fileSize       = GetFileSize(FileHandle, &fileSizeHigh);
-	  auto       fileExt        = WorkingFileName->extension().wstring();
+	  auto       fileExt        = newFileName.extension().wstring();
 	  auto const firstCharacter = tolower(fileExt[1]);
 	  if (firstCharacter == 't') {
 		auto thredHeader = STRHED {};
@@ -4862,7 +4934,7 @@ void thred::internal::nuFil() {
 		  if (tolower(fileExt[2]) == 'c') {
 			ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, nullptr);
 			if (fileSize == 0U) {
-			  displayText::filnopn(IDS_ZEROL, *WorkingFileName);
+			  displayText::filnopn(IDS_ZEROL, newFileName);
 			  return;
 			}
 			if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
@@ -4934,10 +5006,10 @@ void thred::internal::nuFil() {
 #if PESACT
 		  else {
 			auto       ec   = std::error_code {};
-			auto const size = fs::file_size(*WorkingFileName, ec);
+			auto const size = fs::file_size(newFileName, ec);
 			if (ec != std::error_code {}) {
 			  // ToDo - find better error message
-			  displayText::filnopn(IDS_FNOPN, *WorkingFileName);
+			  displayText::filnopn(IDS_FNOPN, newFileName);
 			  return;
 			}
 			auto  fileBuf    = std::vector<uint8_t>(size);
@@ -4947,7 +5019,7 @@ void thred::internal::nuFil() {
 			if (strncmp(static_cast<char*>(pesHeader->led), "#PES00", 6) != 0) {
 			  auto fmtStr = std::wstring {};
 			  displayText::loadString(fmtStr, IDS_NOTPES);
-			  displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+			  displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
 			  return;
 			}
 			auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
@@ -5033,7 +5105,7 @@ void thred::internal::nuFil() {
 			else {
 			  auto fmtStr = std::wstring {};
 			  displayText::loadString(fmtStr, IDS_NOTPES);
-			  displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+			  displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
 			  return;
 			}
 		  }
@@ -5086,7 +5158,7 @@ void thred::internal::nuFil() {
 	lenCalc();
 	SetWindowText(
 	    ThrEdWindow,
-	    fmt::format(StringTable->operator[](STR_THRDBY), WorkingFileName->wstring(), *DesignerName).c_str());
+	    fmt::format(StringTable->operator[](STR_THRDBY), newFileName.wstring(), *DesignerName).c_str());
 	CloseHandle(FileHandle);
 	StateMap.set(StateFlag::INIT);
 	StateMap.reset(StateFlag::TRSET);
@@ -7608,8 +7680,7 @@ void thred::internal::insflin(POINT insertPoint) {
   formLines[2].y = formLines[3].y = insertPoint.y + offset.y;
 }
 
-auto thred::internal::isthr(wchar_t const* const filename) -> bool {
-  auto thredPath = fs::path(filename);
+auto thred::internal::isthr(fs::path thredPath) -> bool {
   auto extention = thredPath.extension().wstring();
   return (extention.compare(0, 3, L".th") == 0);
 }
@@ -7624,283 +7695,314 @@ auto thred::internal::gethand(std::vector<fPOINTATTR> const& stitch, uint32_t st
   return userStitchCount;
 }
 
-void thred::internal::insfil() {
-  auto const defDirectory = DefaultDirectory->wstring();
-  // clang-format off
-  auto file = OPENFILENAME {
-	sizeof(OPENFILENAME),                             // lStructsize
-	ThrEdWindow,                                      // hwndOwner
-	ThrEdInstance,                                    // hInstance
-	L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0", // lpstrFilter
-	std::begin(CustomFilter),                         // lpstrCustomFilter
-	_MAX_PATH,                                        // nMaxCustFilter
-	0,                                                // nFilterIndex
-	std::begin(InsertedFileName),                     // lpstrFile
-	_MAX_PATH,                                        // nMaxFile
-	nullptr,                                          // lpstrFileTitle
-	0,                                                // nMaxFileTitle
-	defDirectory.c_str(),                             // lpstrInitialDir
-	nullptr,                                          // lpstrTitle
-	OFN_EXPLORER | OFN_OVERWRITEPROMPT,               // NOLINT Flags
-	0,                                                // nFileOffset
-	0,                                                // nFileExtension
-	L"thr",                                           // lpstrDefExt
-	0,                                                // lCustData
-	nullptr,                                          // lpfnHook
-	nullptr,                                          // lpTemplateName
-#ifdef _MAC
-	nullptr,                                          // lpEditInfo
-	0U,                                               // lpstrPrompt
-#endif
-#if (_WIN32_WINNT >= 0x0500)
-	nullptr,                                          // *pvReserved
-	0U,                                               // dwReserved
-	0U                                                // FlagsEx
-#endif
-  //clang-format on
-  };
-  if (StateMap.test(StateFlag::IGNORINS) || GetOpenFileName(&file)) {
-	InsertedFileHandle = CreateFile(
-	    static_cast<LPTSTR>(InsertedFileName), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-	  displayText::filnopn(IDS_FNOPN, fs::path(std::begin(InsertedFileName)));
-	  FileHandle = nullptr;
-	  CloseHandle(InsertedFileHandle);
+void thred::internal::insfil(fs::path& insertedFile) {
+  if (insertedFile.empty()) {
+	getNewFileName(insertedFile, fileStyles::INS_FILES, fileIndices::THR);
+  }
+  InsertedFileHandle =
+      CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	displayText::filnopn(IDS_FNOPN, insertedFile);
+	FileHandle = nullptr;
+	CloseHandle(InsertedFileHandle);
+  }
+  else {
+	InsertedStitchIndex = gsl::narrow<decltype(InsertedStitchIndex)>(StitchBuffer->size());
+	if (isthr(insertedFile)) {
+	  auto fileHeader = STRHED {};
+	  ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
+	  if ((fileHeader.headerType & 0xffffffU) != 0x746872U) {
+		displayText::tabmsg(IDS_NOTHR);
+	  }
+	  else {
+		constexpr auto FRMW        = 5;
+		constexpr auto HANDW       = 4;
+		constexpr auto FRMPW       = 2;
+		constexpr auto STCHW       = 1;
+		auto           homscor     = 0U;
+		auto           thredHeader = STREX {};
+		auto const     version     = (fileHeader.headerType & 0xff000000) >> 24U;
+		if (version != 0U) {
+		  gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
+		  // ToDo - replace constants with sizes of data structures?
+		  homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW +
+		            gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
+		            gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW +
+		            gsl::narrow<decltype(homscor)>(StitchBuffer->size()) * STCHW;
+		  ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
+		}
+		thred::savdo();
+		auto fileStitchBuffer = std::vector<fPOINTATTR> {};
+		if (fileHeader.stitchCount != 0U) {
+		  fileStitchBuffer.resize(fileHeader.stitchCount);
+		  ReadFile(InsertedFileHandle,
+		           fileStitchBuffer.data(),
+		           fileHeader.stitchCount * sizeof(fileStitchBuffer.back()),
+		           &BytesRead,
+		           nullptr);
+		}
+		constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
+		                              2U; // ThreadSize is defined as a 16 entry array of 2 bytes
+		constexpr auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) +
+		                                sizeof(UserColor) + sizeof(CustomColor) + threadLength;
+		SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
+		auto insertedRectangle = fRECTANGLE {1e-9F, 1e9F, 1e-9F, 1e9F};
+		InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
+		InsertedFormIndex      = gsl::narrow<decltype(InsertedFormIndex)>(FormList->size());
+		if (fileHeader.formCount != 0U) {
+		  auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
+		  auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
+		  auto       clipOffset         = wrap::toUnsigned(ClipPoints->size());
+		  auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
+		  if (version < 2) {
+			auto inFormList = std::vector<FRMHEDO> {};
+			inFormList.resize(fileHeader.formCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
+			ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != fileHeader.formCount * sizeof(decltype(inFormList.back()))) {
+			  inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			FormList->reserve(FormList->size() + inFormList.size());
+			FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+		  }
+		  else {
+			auto inFormList = std::vector<FRMHEDOUT> {};
+			inFormList.resize(fileHeader.formCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
+			wrap::ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != bytesToRead) {
+			  inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			FormList->reserve(FormList->size() + inFormList.size());
+			FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+		  }
+		  auto vertexOffset = wrap::toUnsigned(FormVertices->size());
+		  if (fileHeader.vertexCount != 0U) {
+			auto inVerticeList = std::vector<fPOINT> {};
+			inVerticeList.resize(fileHeader.vertexCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inVerticeList.back())));
+			ReadFile(InsertedFileHandle, inVerticeList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != bytesToRead) {
+			  inVerticeList.resize(BytesRead / sizeof(decltype(inVerticeList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			FormVertices->reserve(FormVertices->size() + inVerticeList.size());
+			FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
+		  }
+		  else {
+			StateMap.set(StateFlag::BADFIL);
+		  }
+		  auto guideOffset = wrap::toUnsigned(SatinGuides->size());
+		  if (fileHeader.dlineCount != 0U) {
+			auto inGuideList = std::vector<SATCONOUT> {};
+			inGuideList.resize(fileHeader.dlineCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(decltype(inGuideList.back())));
+			ReadFile(InsertedFileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != bytesToRead) {
+			  inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			SatinGuides->reserve(SatinGuides->size() + inGuideList.size());
+			SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+			newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
+		  }
+		  if (fileHeader.clipDataCount != 0U) {
+			auto inPointList = std::vector<fPOINT> {};
+			inPointList.resize(fileHeader.clipDataCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
+			ReadFile(InsertedFileHandle, inPointList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != bytesToRead) {
+			  inPointList.resize(BytesRead / sizeof(decltype(inPointList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			ClipPoints->reserve(ClipPoints->size() + inPointList.size());
+			ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
+		  }
+		  if (thredHeader.texturePointCount != 0U) {
+			auto inTextureList = std::vector<TXPNT> {};
+			inTextureList.resize(thredHeader.texturePointCount);
+			auto bytesToRead =
+			    gsl::narrow<DWORD>(thredHeader.texturePointCount * sizeof(decltype(inTextureList.back())));
+			ReadFile(InsertedFileHandle, inTextureList.data(), bytesToRead, &BytesRead, nullptr);
+			if (BytesRead != bytesToRead) {
+			  inTextureList.resize(BytesRead / sizeof(decltype(inTextureList.back())));
+			  StateMap.set(StateFlag::BADFIL);
+			}
+			TexturePointsBuffer->reserve(TexturePointsBuffer->size() + inTextureList.size());
+			TexturePointsBuffer->insert(
+			    TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
+		  }
+		  CloseHandle(InsertedFileHandle);
+		  InsertedFileHandle = nullptr;
+		  // update the form pointer variables
+		  for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(FormList->size()); iFormList++) {
+			auto& formIter       = FormList->operator[](iFormList);
+			formIter.vertexIndex = vertexOffset;
+			vertexOffset += formIter.vertexCount;
+			if (formIter.type == SAT) {
+			  if (formIter.satinGuideCount != 0U) {
+				formIter.satinOrAngle.guide = guideOffset;
+				guideOffset += formIter.satinGuideCount;
+			  }
+			}
+			if (clip::isclp(formIter)) {
+			  formIter.angleOrClipData.clip = clipOffset;
+			  clipOffset += formIter.lengthOrCount.clipCount;
+			}
+			if (clip::iseclpx(iFormList)) {
+			  formIter.borderClipData = clipOffset;
+			  clipOffset += formIter.clipEntries;
+			}
+			if (texture::istx(iFormList)) {
+			  formIter.fillInfo.texture.index =
+			      gsl::narrow<decltype(formIter.fillInfo.texture.index)>(textureOffset);
+			  textureOffset += formIter.fillInfo.texture.count;
+			}
+		  }
+		  if (newFormVertexIndex != FormVertices->size()) {
+			StateMap.set(StateFlag::BADFIL);
+		  }
+		  if (newSatinGuideIndex != SatinGuides->size()) {
+			StateMap.set(StateFlag::BADFIL);
+		  }
+		  if (clipOffset != ClipPoints->size()) {
+			StateMap.set(StateFlag::BADFIL);
+		  }
+		  if (fileHeader.formCount != 0U) {
+			auto const insertedVertex = FormVertices->operator[](InsertedVertexIndex);
+			insertedRectangle.left    = insertedVertex.x;
+			insertedRectangle.right   = insertedVertex.x;
+			insertedRectangle.bottom  = insertedVertex.y;
+			insertedRectangle.top     = insertedVertex.y;
+			for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
+			     iVertex++) {
+			  auto const vertex = FormVertices->operator[](iVertex);
+			  if (vertex.x < insertedRectangle.left) {
+				insertedRectangle.left = vertex.x;
+			  }
+			  if (vertex.x > insertedRectangle.right) {
+				insertedRectangle.right = vertex.x;
+			  }
+			  if (vertex.y < insertedRectangle.bottom) {
+				insertedRectangle.bottom = vertex.y;
+			  }
+			  if (vertex.y > insertedRectangle.top) {
+				insertedRectangle.top = vertex.y;
+			  }
+			}
+		  }
+		}
+		if (fileHeader.stitchCount != 0U) {
+		  auto encodedFormIndex = gsl::narrow<uint32_t>(InsertedFormIndex << FRMSHFT);
+		  for (auto iStitch = 0; iStitch < fileHeader.stitchCount; iStitch++) {
+			if ((fileStitchBuffer[iStitch].attribute & ALTYPMSK) != 0U) {
+			  auto const newAttribute = (fileStitchBuffer[iStitch].attribute & FRMSK) + encodedFormIndex;
+			  fileStitchBuffer[iStitch].attribute &= NFRMSK;
+			  fileStitchBuffer[iStitch].attribute |= newAttribute;
+			}
+			if (fileStitchBuffer[iStitch].x < insertedRectangle.left) {
+			  insertedRectangle.left = fileStitchBuffer[iStitch].x;
+			}
+			if (fileStitchBuffer[iStitch].x > insertedRectangle.right) {
+			  insertedRectangle.right = fileStitchBuffer[iStitch].x;
+			}
+			if (fileStitchBuffer[iStitch].y < insertedRectangle.bottom) {
+			  insertedRectangle.bottom = fileStitchBuffer[iStitch].y;
+			}
+			if (fileStitchBuffer[iStitch].y > insertedRectangle.top) {
+			  insertedRectangle.top = fileStitchBuffer[iStitch].y;
+			}
+		  }
+		}
+		if ((fileHeader.headerType & 0x1000000U) != 0U) {
+		  // ToDo - Replace constants with sizes of data structures
+		  auto const filscor = (fileHeader.formCount) * FRMW +
+		                       gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW +
+		                       fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
+		  if (filscor > homscor) {
+			for (auto iName = 0U; iName < 50U; iName++) {
+			  ExtendedHeader->creatorName[iName] = thredHeader.creatorName[iName];
+			}
+			redfnam(*DesignerName);
+			SetWindowText(
+			    ThrEdWindow,
+			    fmt::format(StringTable->operator[](STR_THRDBY), ThrName->wstring(), *DesignerName).c_str());
+		  }
+		}
+		InsertCenter = fPOINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
+		                       wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
+		auto dest    = StitchBuffer->end();
+		StitchBuffer->insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
+		auto const insertedSize = fPOINT {insertedRectangle.right - insertedRectangle.left,
+		                                  insertedRectangle.top - insertedRectangle.bottom};
+		form::ratsr();
+		InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
+		// ToDo - Should this be vertical ratio?
+		InsertSize.y = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
+		auto const initialInsertPoint =
+		    POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
+		insflin(initialInsertPoint);
+		NewFormVertexCount = 5U;
+		StateMap.set(StateFlag::SHOFRM);
+		StateMap.set(StateFlag::INSFIL);
+		form::dufrm();
+	  }
 	}
 	else {
-	  InsertedStitchIndex = gsl::narrow<decltype(InsertedStitchIndex)>(StitchBuffer->size());
-	  if (isthr(std::begin(InsertedFileName))) {
-		auto fileHeader = STRHED {};
-		ReadFile(InsertedFileHandle, &fileHeader, sizeof(fileHeader), &BytesRead, nullptr);
-		if ((fileHeader.headerType & 0xffffffU) != 0x746872U) {
-		  displayText::tabmsg(IDS_NOTHR);
-		}
-		else {
-		  constexpr auto FRMW        = 5;
-		  constexpr auto HANDW       = 4;
-		  constexpr auto FRMPW       = 2;
-		  constexpr auto STCHW       = 1;
-		  auto           homscor     = 0U;
-		  auto           thredHeader = STREX {};
-		  auto const     version     = (fileHeader.headerType & 0xff000000) >> 24U;
-		  if (version != 0U) {
-			gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
-			// ToDo - replace constants with sizes of data structures?
-			homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW +
-			          gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
-			          gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW +
-			          gsl::narrow<decltype(homscor)>(StitchBuffer->size()) * STCHW;
-			ReadFile(InsertedFileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
-		  }
+	  auto pcsFileHeader = PCSHEADER {};
+	  ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
+	  if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16U) {
+		auto pcsStitchBuffer = std::vector<PCSTCH> {};
+		pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
+		auto bytesToRead =
+		    gsl::narrow<DWORD>(pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())));
+		ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead == bytesToRead) {
 		  thred::savdo();
-		  auto fileStitchBuffer = std::vector<fPOINTATTR> {};
-		  if (fileHeader.stitchCount != 0U) {
-			fileStitchBuffer.resize(fileHeader.stitchCount);
-			ReadFile(InsertedFileHandle,
-			         fileStitchBuffer.data(),
-			         fileHeader.stitchCount * sizeof(fileStitchBuffer.back()),
-			         &BytesRead,
-			         nullptr);
-		  }
-		  constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
-		                                2U; // ThreadSize is defined as a 16 entry array of 2 bytes
-		  constexpr auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) +
-		                                  sizeof(UserColor) + sizeof(CustomColor) + threadLength;
-		  SetFilePointer(InsertedFileHandle, formDataOffset, nullptr, FILE_CURRENT);
-		  auto insertedRectangle = fRECTANGLE {1e-9F, 1e9F, 1e-9F, 1e9F};
-		  InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
-		  InsertedFormIndex      = gsl::narrow<decltype(InsertedFormIndex)>(FormList->size());
-		  if (fileHeader.formCount != 0U) {
-			auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
-			auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
-			auto       clipOffset         = wrap::toUnsigned(ClipPoints->size());
-			auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
-			if (version < 2) {
-			  auto inFormList = std::vector<FRMHEDO> {};
-			  inFormList.resize(fileHeader.formCount);
-			  auto bytesToRead =
-			      gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
-			  ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != fileHeader.formCount * sizeof(decltype(inFormList.back()))) {
-				inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  FormList->reserve(FormList->size() + inFormList.size());
-			  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+		  auto insertIndex = StitchBuffer->size();
+		  StitchBuffer->reserve(StitchBuffer->size() + pcsFileHeader.stitchCount);
+		  auto newAttribute = 0U;
+		  for (auto iPCSStitch = 0U; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
+			if (pcsStitchBuffer[iPCSStitch].tag == 3) {
+			  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
 			}
 			else {
-			  auto inFormList = std::vector<FRMHEDOUT> {};
-			  inFormList.resize(fileHeader.formCount);
-			  auto bytesToRead =
-			      gsl::narrow<DWORD>(fileHeader.formCount * sizeof(decltype(inFormList.back())));
-			  wrap::ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  FormList->reserve(FormList->size() + inFormList.size());
-			  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
-			}
-			auto vertexOffset = wrap::toUnsigned(FormVertices->size());
-			if (fileHeader.vertexCount != 0U) {
-			  auto inVerticeList = std::vector<fPOINT> {};
-			  inVerticeList.resize(fileHeader.vertexCount);
-			  auto bytesToRead =
-			      gsl::narrow<DWORD>(fileHeader.vertexCount * sizeof(decltype(inVerticeList.back())));
-			  ReadFile(InsertedFileHandle, inVerticeList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inVerticeList.resize(BytesRead / sizeof(decltype(inVerticeList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  FormVertices->reserve(FormVertices->size() + inVerticeList.size());
-			  FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
-			}
-			else {
-			  StateMap.set(StateFlag::BADFIL);
-			}
-			auto guideOffset = wrap::toUnsigned(SatinGuides->size());
-			if (fileHeader.dlineCount != 0U) {
-			  auto inGuideList = std::vector<SATCONOUT> {};
-			  inGuideList.resize(fileHeader.dlineCount);
-			  auto bytesToRead =
-			      gsl::narrow<DWORD>(fileHeader.dlineCount * sizeof(decltype(inGuideList.back())));
-			  ReadFile(InsertedFileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  SatinGuides->reserve(SatinGuides->size() + inGuideList.size());
-			  SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
-			  newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
-			}
-			if (fileHeader.clipDataCount != 0U) {
-			  auto inPointList = std::vector<fPOINT> {};
-			  inPointList.resize(fileHeader.clipDataCount);
-			  auto bytesToRead =
-			      gsl::narrow<DWORD>(fileHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
-			  ReadFile(InsertedFileHandle, inPointList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inPointList.resize(BytesRead / sizeof(decltype(inPointList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  ClipPoints->reserve(ClipPoints->size() + inPointList.size());
-			  ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
-			}
-			if (thredHeader.texturePointCount != 0U) {
-			  auto inTextureList = std::vector<TXPNT> {};
-			  inTextureList.resize(thredHeader.texturePointCount);
-			  auto bytesToRead = gsl::narrow<DWORD>(thredHeader.texturePointCount *
-			                                        sizeof(decltype(inTextureList.back())));
-			  ReadFile(InsertedFileHandle, inTextureList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inTextureList.resize(BytesRead / sizeof(decltype(inTextureList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  TexturePointsBuffer->reserve(TexturePointsBuffer->size() + inTextureList.size());
-			  TexturePointsBuffer->insert(
-			      TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
-			}
-			CloseHandle(InsertedFileHandle);
-			InsertedFileHandle = nullptr;
-			// update the form pointer variables
-			for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(FormList->size()); iFormList++) {
-			  auto& formIter       = FormList->operator[](iFormList);
-			  formIter.vertexIndex = vertexOffset;
-			  vertexOffset += formIter.vertexCount;
-			  if (formIter.type == SAT) {
-				if (formIter.satinGuideCount != 0U) {
-				  formIter.satinOrAngle.guide = guideOffset;
-				  guideOffset += formIter.satinGuideCount;
-				}
-			  }
-			  if (clip::isclp(formIter)) {
-				formIter.angleOrClipData.clip = clipOffset;
-				clipOffset += formIter.lengthOrCount.clipCount;
-			  }
-			  if (clip::iseclpx(iFormList)) {
-				formIter.borderClipData = clipOffset;
-				clipOffset += formIter.clipEntries;
-			  }
-			  if (texture::istx(iFormList)) {
-				formIter.fillInfo.texture.index =
-				    gsl::narrow<decltype(formIter.fillInfo.texture.index)>(textureOffset);
-				textureOffset += formIter.fillInfo.texture.count;
-			  }
-			}
-			if (newFormVertexIndex != FormVertices->size()) {
-			  StateMap.set(StateFlag::BADFIL);
-			}
-			if (newSatinGuideIndex != SatinGuides->size()) {
-			  StateMap.set(StateFlag::BADFIL);
-			}
-			if (clipOffset != ClipPoints->size()) {
-			  StateMap.set(StateFlag::BADFIL);
-			}
-			if (fileHeader.formCount != 0U) {
-			  auto const insertedVertex = FormVertices->operator[](InsertedVertexIndex);
-			  insertedRectangle.left    = insertedVertex.x;
-			  insertedRectangle.right   = insertedVertex.x;
-			  insertedRectangle.bottom  = insertedVertex.y;
-			  insertedRectangle.top     = insertedVertex.y;
-			  for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
-			       iVertex++) {
-				auto const vertex = FormVertices->operator[](iVertex);
-				if (vertex.x < insertedRectangle.left) {
-				  insertedRectangle.left = vertex.x;
-				}
-				if (vertex.x > insertedRectangle.right) {
-				  insertedRectangle.right = vertex.x;
-				}
-				if (vertex.y < insertedRectangle.bottom) {
-				  insertedRectangle.bottom = vertex.y;
-				}
-				if (vertex.y > insertedRectangle.top) {
-				  insertedRectangle.top = vertex.y;
-				}
-			  }
+			  (*StitchBuffer)
+			      .emplace_back(fPOINTATTR {gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x) +
+			                                    gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0F,
+			                                gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y) +
+			                                    gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0F,
+			                                newAttribute});
 			}
 		  }
-		  if (fileHeader.stitchCount != 0U) {
-			auto encodedFormIndex = gsl::narrow<uint32_t>(InsertedFormIndex << FRMSHFT);
-			for (auto iStitch = 0; iStitch < fileHeader.stitchCount; iStitch++) {
-			  if ((fileStitchBuffer[iStitch].attribute & ALTYPMSK) != 0U) {
-				auto const newAttribute = (fileStitchBuffer[iStitch].attribute & FRMSK) + encodedFormIndex;
-				fileStitchBuffer[iStitch].attribute &= NFRMSK;
-				fileStitchBuffer[iStitch].attribute |= newAttribute;
-			  }
-			  if (fileStitchBuffer[iStitch].x < insertedRectangle.left) {
-				insertedRectangle.left = fileStitchBuffer[iStitch].x;
-			  }
-			  if (fileStitchBuffer[iStitch].x > insertedRectangle.right) {
-				insertedRectangle.right = fileStitchBuffer[iStitch].x;
-			  }
-			  if (fileStitchBuffer[iStitch].y < insertedRectangle.bottom) {
-				insertedRectangle.bottom = fileStitchBuffer[iStitch].y;
-			  }
-			  if (fileStitchBuffer[iStitch].y > insertedRectangle.top) {
-				insertedRectangle.top = fileStitchBuffer[iStitch].y;
-			  }
+		  auto const newStitchCount = StitchBuffer->size();
+		  auto const startStitch    = StitchBuffer->operator[](insertIndex);
+		  auto                                   insertedRectangle =
+		      fRECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
+		  for (; insertIndex < newStitchCount; insertIndex++) {
+			auto const stitch = StitchBuffer->operator[](insertIndex);
+			if (stitch.x < insertedRectangle.left) {
+			  insertedRectangle.left = stitch.x;
 			}
-		  }
-		  if ((fileHeader.headerType & 0x1000000U) != 0U) {
-			// ToDo - Replace constants with sizes of data structures
-			auto const filscor = (fileHeader.formCount) * FRMW +
-			                     gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW +
-			                     fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
-			if (filscor > homscor) {
-			  for (auto iName = 0U; iName < 50U; iName++) {
-				ExtendedHeader->creatorName[iName] = thredHeader.creatorName[iName];
-			  }
-			  redfnam(*DesignerName);
-			  SetWindowText(ThrEdWindow,
-			                fmt::format(StringTable->operator[](STR_THRDBY), ThrName->wstring(), *DesignerName)
-			                    .c_str());
+			if (stitch.x > insertedRectangle.right) {
+			  insertedRectangle.right = stitch.x;
+			}
+			if (stitch.y < insertedRectangle.bottom) {
+			  insertedRectangle.bottom = stitch.y;
+			}
+			if (stitch.y > insertedRectangle.top) {
+			  insertedRectangle.top = stitch.y;
 			}
 		  }
 		  InsertCenter = fPOINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
 		                         wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
-		  auto dest    = StitchBuffer->end();
-		  StitchBuffer->insert(dest, fileStitchBuffer.cbegin(), fileStitchBuffer.cend());
 		  auto const insertedSize = fPOINT {insertedRectangle.right - insertedRectangle.left,
 		                                    insertedRectangle.top - insertedRectangle.bottom};
 		  form::ratsr();
@@ -7914,85 +8016,20 @@ void thred::internal::insfil() {
 		  StateMap.set(StateFlag::SHOFRM);
 		  StateMap.set(StateFlag::INSFIL);
 		  form::dufrm();
+		  // We did not insert forms so insure that duinsfil does not move forms
+		  InsertedFormIndex   = wrap::toUnsigned(FormList->size());
+		  InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
+		}
+		else {
+		  // pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
+		  // StateMap.set(StateFlag::BADFIL);
+		  prtred();
+		  return;
 		}
 	  }
-	  else {
-		auto pcsFileHeader = PCSHEADER {};
-		ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
-		if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16U) {
-		  auto pcsStitchBuffer = std::vector<PCSTCH> {};
-		  pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
-		  auto bytesToRead =
-		      gsl::narrow<DWORD>(pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())));
-		  ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), bytesToRead, &BytesRead, nullptr);
-		  if (BytesRead == bytesToRead) {
-			thred::savdo();
-			auto insertIndex = StitchBuffer->size();
-			StitchBuffer->reserve(StitchBuffer->size() + pcsFileHeader.stitchCount);
-			auto newAttribute = 0U;
-			for (auto iPCSStitch = 0U; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
-			  if (pcsStitchBuffer[iPCSStitch].tag == 3) {
-				newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
-			  }
-			  else {
-				(*StitchBuffer)
-				    .emplace_back(
-				        fPOINTATTR {gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x) +
-				                        gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / 256.0F,
-				                    gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y) +
-				                        gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / 256.0F,
-				                    newAttribute});
-			  }
-			}
-			auto const newStitchCount = StitchBuffer->size();
-			auto const startStitch    = StitchBuffer->operator[](insertIndex);
-			auto insertedRectangle =
-			    fRECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
-			for (; insertIndex < newStitchCount; insertIndex++) {
-			  auto const stitch = StitchBuffer->operator[](insertIndex);
-			  if (stitch.x < insertedRectangle.left) {
-				insertedRectangle.left = stitch.x;
-			  }
-			  if (stitch.x > insertedRectangle.right) {
-				insertedRectangle.right = stitch.x;
-			  }
-			  if (stitch.y < insertedRectangle.bottom) {
-				insertedRectangle.bottom = stitch.y;
-			  }
-			  if (stitch.y > insertedRectangle.top) {
-				insertedRectangle.top = stitch.y;
-			  }
-			}
-			InsertCenter = fPOINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
-			                       wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
-			auto const insertedSize = fPOINT {insertedRectangle.right - insertedRectangle.left,
-			                                  insertedRectangle.top - insertedRectangle.bottom};
-			form::ratsr();
-			InsertSize.x = wrap::round<int32_t>(insertedSize.x * HorizontalRatio);
-			// ToDo - Should this be vertical ratio?
-			InsertSize.y = wrap::round<int32_t>(insertedSize.y * HorizontalRatio);
-			auto const initialInsertPoint =
-			    POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
-			insflin(initialInsertPoint);
-			NewFormVertexCount = 5U;
-			StateMap.set(StateFlag::SHOFRM);
-			StateMap.set(StateFlag::INSFIL);
-			form::dufrm();
-			// We did not insert forms so insure that duinsfil does not move forms
-			InsertedFormIndex   = wrap::toUnsigned(FormList->size());
-			InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
-		  }
-		  else {
-			// pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
-			// StateMap.set(StateFlag::BADFIL);
-			prtred();
-			return;
-		  }
-		}
-	  }
-	  if (InsertedFileHandle != nullptr) {
-		CloseHandle(InsertedFileHandle);
-	  }
+	}
+	if (InsertedFileHandle != nullptr) {
+	  CloseHandle(InsertedFileHandle);
 	}
   }
 }
@@ -8000,13 +8037,13 @@ void thred::internal::insfil() {
 void thred::internal::getbak() {
   // auto thumbSpan = gsl::span<uint32_t, 4>{ ThumbnailsSelected };
   if (StateMap.test(StateFlag::THUMSHO)) {
-	if (ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)] != 0U) { 
+	if (ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)] != 0U) {
+	  *WorkingFileName = *DefaultDirectory /
+	                     Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]);
 	  if (StateMap.test(StateFlag::RBUT)) {
-		wcscpy_s(InsertedFileName, Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]).data()); 
-		StateMap.set(StateFlag::IGNORINS);
 		unthum();
 		StateMap.set(StateFlag::FRMOF);
-		insfil();
+		insfil(*WorkingFileName);
 		if (wrap::pressed(VK_SHIFT)) {
 		  StateMap.reset(StateFlag::INSFIL);
 		  StateMap.reset(StateFlag::FRMOF);
@@ -8016,10 +8053,8 @@ void thred::internal::getbak() {
 		}
 	  }
 	  else {
-		*WorkingFileName =
-		    *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]); 
 		StateMap.set(StateFlag::REDOLD);
-		nuFil();
+		nuFil(fileIndices::THR);
 	  }
 	}
 	else {
@@ -8046,7 +8081,7 @@ void thred::internal::rebak() {
   fs::rename(safetyFileName, newFileName);
   *WorkingFileName = *ThrName;
   StateMap.set(StateFlag::REDOLD);
-  nuFil();
+  nuFil(fileIndices::THR);
   fs::remove(safetyFileName);
 }
 
@@ -9490,7 +9525,7 @@ void thred::internal::fop() {
   trace::untrace();
   if (!FormList->empty() || (!StitchBuffer->empty())) {
 	if (savcmp()) {
-	  nuFil();
+	  nuFil(fileIndices::THR);
 	  nulayr(0);
 	}
 	else {
@@ -9499,7 +9534,7 @@ void thred::internal::fop() {
 	}
   }
   else {
-	nuFil();
+	nuFil(fileIndices::THR);
 	nulayr(0);
   }
 }
@@ -9997,8 +10032,8 @@ void thred::internal::setgrd(COLORREF color) {
 }
 
 void thred::internal::ovrlay() {
-  StateMap.reset(StateFlag::IGNORINS);
-  insfil();
+  auto fileName = fs::path {};
+  insfil(fileName);
   StateMap.reset(StateFlag::INSFIL);
   StateMap.reset(StateFlag::FRMOF);
   StateMap.set(StateFlag::INIT);
@@ -12905,12 +12940,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap.testAndReset(StateFlag::OSAV)) {
 	if (chkok()) {
 	  thred::save();
-	  nuFil();
+	  nuFil(fileIndices::THR);
 	  thred::unmsg();
 	  return true;
 	}
 	if (chkwnd(DiscardButton)) {
-	  nuFil();
+	  nuFil(fileIndices::THR);
 	  thred::unmsg();
 	  return true;
 	}
@@ -13024,7 +13059,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		WorkingFileName->replace_extension(workExt);
 	  }
 	  StateMap.set(StateFlag::REDOLD);
-	  nuFil();
+	  nuFil(fileIndices::THR);
 	  workBack = 'r';
 	  WorkingFileName->replace_extension(workExt);
 	  switch (FileVersionIndex) {
@@ -15724,8 +15759,8 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_INSFIL: { // file / Insert
-	  StateMap.reset(StateFlag::IGNORINS);
-	  insfil();
+	  auto fileName = fs::path {};
+	  insfil(fileName);
 	  flag = true;
 	  break;
 	}
@@ -15747,14 +15782,19 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	case ID_OPNPCD: { // file / Open Auxiliary file
 	  switch (IniFile.auxFileType) {
 		case AUXDST: {
-		  OpenFileName.nFilterIndex = 3;
+		  nuFil(fileIndices::DST);
 		  break;
 		}
+#ifdef PESACT
+		case AUXPES: {
+		  nuFil(fileIndices::PES);
+		  break;
+		}
+#endif
 		default: {
-		  OpenFileName.nFilterIndex = 2;
+		  nuFil(fileIndices::PCS);
 		}
 	  }
-	  nuFil();
 	  nulayr(0);
 	  flag = true;
 	  break;
@@ -16429,7 +16469,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  if (Msg.wParam == iLRU) {
 			*WorkingFileName = previousNames[iVersion];
 			StateMap.set(StateFlag::REDOLD);
-			nuFil();
+			nuFil(fileIndices::THR);
 		  }
 		  iVersion++;
 		}
@@ -16585,7 +16625,7 @@ void thred::internal::ducmd() {
 	else {
 	  WorkingFileName->assign(arg1);
 	  StateMap.set(StateFlag::REDOLD);
-	  nuFil();
+	  nuFil(fileIndices::THR);
 	}
   }
 }

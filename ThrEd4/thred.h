@@ -28,6 +28,20 @@
 
 namespace fs = std::filesystem;
 
+// File open types
+enum class fileStyles : uint8_t {
+  ALL_FILES, // All file Types
+  INS_FILES  // Insert file types
+};
+
+// File Indices
+enum class fileIndices : uint8_t {
+  THR, // Thredworks
+  PCS, // Pfaff
+  PES, // Brother
+  DST  // Tajima
+};
+
 namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
@@ -213,6 +227,7 @@ namespace internal {
   void getfrmbox();
   void getfrmpix();
   auto gethand(std::vector<fPOINTATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
+  auto getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex)->boolean;
   void getnpix();
   void getstpix();
   void gotbox();
@@ -251,14 +266,14 @@ namespace internal {
   auto inrng(uint32_t stitch) noexcept -> bool;
   void insadj();
   void inscol();
-  void insfil();
+  void insfil(fs::path& insertedFile);
   void insflin(POINT insertPoint);
   auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
   auto isLine(std::vector<POINT>& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
   auto isfclp() noexcept -> bool;
   void istch();
-  auto isthr(wchar_t const* filename) -> bool;
+  auto isthr(fs::path thredPath) -> bool;
   auto kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> uint32_t;
   void knotmen();
   void ladj();
@@ -293,7 +308,7 @@ namespace internal {
   auto nuBak() noexcept -> COLORREF;
   auto nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH;
   auto nuCol(COLORREF init) noexcept -> COLORREF;
-  void nuFil();
+  void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
   auto nuang(float yDelta, float xDelta) noexcept -> float;

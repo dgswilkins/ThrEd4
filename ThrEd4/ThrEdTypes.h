@@ -469,7 +469,6 @@ enum class StateFlag {
   BOXSLCT,   // user is making a select box
   THUMSHO,   // thumbnail mode
   INSFIL,    // user is inserting a file
-  IGNORINS,  // don't use the open file dialog box to get the insert file name
   RBUT,      // user pressed the right mouse button selecting a thumbnail
   UND,       // stitching a proportional satin underlay
   UNDPHAS,   // proportional satin underlay phase
