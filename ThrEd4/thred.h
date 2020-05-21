@@ -227,7 +227,7 @@ namespace internal {
   void getfrmbox();
   void getfrmpix();
   auto gethand(std::vector<fPOINTATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
-  auto getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex)->boolean;
+  auto getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool;
   void getnpix();
   void getstpix();
   void gotbox();

@@ -4542,7 +4542,8 @@ void thred::internal::rstdu() {
   StateMap.set(StateFlag::DUMEN);
 }
 
-auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> boolean {
+auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex)
+    -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   auto hr = CoCreateInstance(
