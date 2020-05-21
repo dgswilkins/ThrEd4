@@ -7370,13 +7370,16 @@ void form::movlayr(uint32_t codedLayer) {
 void form::join() {
   // clang-format off
   auto const savedFormIndex = ClosestFormToCursor;
-  auto&      form           = FormList->operator[](ClosestFormToCursor);
-  auto       lastVertex     = std::next(FormVertices->begin(),
-                                        gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + form.vertexCount - 1U);
+  auto& savedform           = FormList->operator[](ClosestFormToCursor);
+  auto  lastVertex          = std::next(FormVertices->begin(),
+										gsl::narrow_cast<ptrdiff_t>(savedform.vertexIndex) + savedform.vertexCount - 1U);
   // clang-format on
   StateMap.set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
-	auto vertexList = std::vector<fPOINT> {};
+    // clang-format off
+	auto& form       = FormList->operator[](ClosestFormToCursor);
+	auto  vertexList = std::vector<fPOINT> {};
+    // clang-format on
 	vertexList.reserve(form.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)) {
