@@ -4756,8 +4756,8 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 		  }
 		  ZoomRect = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 		  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
+		  StitchBuffer->resize(thredHeader.stitchCount);
 		  if (thredHeader.stitchCount != 0U) {
-			StitchBuffer->resize(thredHeader.stitchCount);
 			auto bytesToRead =
 			    gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
 			ReadFile(FileHandle, StitchBuffer->data(), bytesToRead, &BytesRead, nullptr);
