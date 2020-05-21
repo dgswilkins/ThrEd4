@@ -2330,8 +2330,7 @@ void thred::internal::rstAll() {
   SearchLine->clear();
   SearchLine->shrink_to_fit();
   FirstWin = nullptr;
-  while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0) != 0) {
-  }
+  while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0) != 0) { }
 }
 
 void thred::ritot(uint32_t number) {
@@ -4542,8 +4541,7 @@ void thred::internal::rstdu() {
   StateMap.set(StateFlag::DUMEN);
 }
 
-auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex)
-    -> bool {
+auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
   auto hr = CoCreateInstance(
@@ -4561,8 +4559,8 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
 #endif
 	  COMDLG_FILTERSPEC const iFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"*.pcs"}};
-	  auto constexpr aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-	  auto constexpr iFileTypesSize = (sizeof(iFileTypes) / sizeof(iFileTypes[0]));
+	  auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  auto constexpr iFileTypesSize        = (sizeof(iFileTypes) / sizeof(iFileTypes[0]));
 	  switch (fileTypes) {
 		case fileStyles::ALL_FILES: {
 		  hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
@@ -4642,8 +4640,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	bitmap::resetBmpFile(true);
 	// ToDo - use ifstream?
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
-	FileHandle =
-	    CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	FileHandle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (GetLastError() == 32U) {
 		displayText::filnopn(IDS_FNOPNA, newFileName);
@@ -8094,7 +8091,7 @@ void thred::internal::movbak(char source, char destination) {
   auto sourceFileName      = *ThrName;
   auto destinationFileName = sourceFileName; // initialise from local variable
   auto ext                 = ThrName->extension().wstring();
-  ext.back() = source;
+  ext.back()               = source;
   sourceFileName.replace_extension(ext);
   ext.back() = destination;
   destinationFileName.replace_extension(ext);
@@ -8125,7 +8122,7 @@ void thred::internal::purgdir() {
 void thred::internal::deldir() {
   thred::unmsg();
   displayText::tabmsg(IDS_BAKDEL);
-  auto backSpec = std::wstring {L".th0"};
+  auto  backSpec = std::wstring {L".th0"};
   auto& backChar = backSpec.back();
   for (auto const& p : fs::directory_iterator(*DefaultDirectory)) {
 	if (!fs::is_directory(p)) {
@@ -8200,9 +8197,9 @@ void thred::internal::mv2f() {
 void thred::internal::mv2b() {
   if (StateMap.testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
-	auto       tempStitchBuffer = std::vector<fPOINTATTR>{};
-	auto       iLowBuffer = 0U;
-	auto const attribute  = ClosestFormToCursor << FRMSHFT;
+	auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
+	auto       iLowBuffer       = 0U;
+	auto const attribute        = ClosestFormToCursor << FRMSHFT;
 	for (auto& stitch : *StitchBuffer) {
 	  if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == attribute) {
 		tempStitchBuffer.push_back(stitch);
