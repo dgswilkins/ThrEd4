@@ -4554,7 +4554,7 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
 #if PESACT
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Brother", L"*.pes"}, {L"Tajima", L"*.dst"}};
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}};
 #else
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
 	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
@@ -4581,19 +4581,16 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 		  hr += pFileOpen->SetFileTypeIndex(2);
 		  break;
 		}
+		case fileIndices::DST: {
+		  hr += pFileOpen->SetFileTypeIndex(3);
+		  break;
+		}
 #if PESACT
 		case fileIndices::PES: {
-		  hr += pFileOpen->SetFileTypeIndex(3);
-		  break;
-		}
-		case fileIndices::DST: {
 		  hr += pFileOpen->SetFileTypeIndex(4);
-#else
-		case fileIndices::DST: {
-		  hr += pFileOpen->SetFileTypeIndex(3);
-#endif
 		  break;
 		}
+#endif
 	  }
 	  hr += pFileOpen->SetTitle(L"Open Thred File");
 #if 0
@@ -15785,7 +15782,7 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 		  nuFil(fileIndices::DST);
 		  break;
 		}
-#ifdef PESACT
+#if PESACT
 		case AUXPES: {
 		  nuFil(fileIndices::PES);
 		  break;
