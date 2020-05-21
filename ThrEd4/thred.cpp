@@ -7678,7 +7678,7 @@ void thred::internal::insflin(POINT insertPoint) {
   formLines[2].y = formLines[3].y = insertPoint.y + offset.y;
 }
 
-auto thred::internal::isthr(fs::path thredPath) -> bool {
+auto thred::internal::isthr(fs::path const& thredPath) -> bool {
   auto extention = thredPath.extension().wstring();
   return (extention.compare(0, 3, L".th") == 0);
 }
