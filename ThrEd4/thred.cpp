@@ -4004,47 +4004,106 @@ void thred::internal::auxmen() {
   StateMap.set(StateFlag::DUMEN);
 }
 
+auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> bool {
+  if (nullptr != fileName) {
+	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
+#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+	auto hr = CoCreateInstance(
+	  CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
+#if PESACT
+	  COMDLG_FILTERSPEC const aFileTypes[] = {
+		{L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}};
+#else
+	  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
+#endif
+	  auto constexpr aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	  hr += pFileSave->SetFileTypeIndex(1);
+	  hr += pFileSave->SetTitle(L"Save As");
+	  auto bmpName = utf::Utf8ToUtf16(static_cast<char*>(PCSBMPFileName));
+	  hr += pFileSave->SetFileName(fileName->filename().c_str());
+	  hr += pFileSave->SetDefaultExtension(L"thr");
+	  if (SUCCEEDED(hr)) {
+		hr = pFileSave->Show(nullptr);
+		if (SUCCEEDED(hr)) {
+		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+		  hr = pFileSave->GetResult(&pItem);
+		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
+			auto reply = 0U;
+			hr = pFileSave->GetFileTypeIndex(&reply);
+			if (SUCCEEDED(hr)) {
+			  switch (reply) {
+				case 1:
+				{
+				  fileType = fileIndices::THR;
+				  break;
+				}
+				case 2:
+				{
+				  fileType = fileIndices::PCS;
+				  break;
+				}
+				case 3:
+				{
+				  fileType = fileIndices::DST;
+				  break;
+				}
+#if PESACT
+				case 4:
+				{
+				  fileType = fileIndices::PES;
+				  break;
+				}
+#endif
+				default:
+				{
+				  fileType = fileIndices::THR;
+				  break;
+				}
+			  }
+			  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+			  hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  if (SUCCEEDED(hr)) {
+				fileName->assign(pszFilePath);
+				CoTaskMemFree(pszFilePath);
+				return true;
+			  }
+			}
+		  }
+		}
+	  }
+	}
+  }
+  return false;
+}
+
 void thred::internal::savAs() {
   if (!StitchBuffer->empty() || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
-	auto fileName = std::vector<wchar_t> {};
-	fileName.resize(_MAX_PATH);
-	auto dirBuffer = std::vector<wchar_t> {};
-	dirBuffer.resize(_MAX_PATH);
-	auto workingFileStr = WorkingFileName->wstring();
-	auto dirStr         = DefaultDirectory->wstring();
-	std::copy(workingFileStr.cbegin(), workingFileStr.cend(), fileName.begin());
-	std::copy(dirStr.cbegin(), dirStr.cend(), dirBuffer.begin());
-	// ToDo - find a better way to do this
-	OpenFileName.hwndOwner       = ThrEdWindow;
-	OpenFileName.hInstance       = ThrEdInstance;
-	OpenFileName.lpstrFile       = fileName.data();
-	OpenFileName.lpstrInitialDir = dirBuffer.data();
-	OpenFileName.nFilterIndex    = 0;
-	if (GetSaveFileName(&OpenFileName)) {
-	  fileName.resize(wcslen(fileName.data()));
-	  WorkingFileName->assign(fileName.cbegin(), fileName.cend());
+	auto index = fileIndices {};
+	if (getSaveName(WorkingFileName, index)) {
 	  *DefaultDirectory = WorkingFileName->parent_path();
-	  switch (OpenFileName.nFilterIndex) {
-		case 1: {
+	  switch (index) {
+		case fileIndices::THR: {
 		  WorkingFileName->replace_extension(L".thr");
 		  break;
 		}
-		case 2: {
+		case fileIndices::PCS: {
 		  WorkingFileName->replace_extension(L".pcs");
 		  IniFile.auxFileType = AUXPCS;
 		  auxmen();
 		  break;
 		}
-		case 3:
 #if PESACT
+		case fileIndices::PES:
 		{
 		  WorkingFileName->replace_extension(L".pes");
 		  IniFile.auxFileType = AUXPES;
 		  auxmen();
 		  break;
 		}
-		case 4:
 #endif
+		case fileIndices::DST:
 		{
 		  WorkingFileName->replace_extension(L".dst");
 		  IniFile.auxFileType = AUXDST;

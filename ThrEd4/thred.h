@@ -303,6 +303,7 @@ namespace internal {
   void nedof();
   void nedon();
   void newFil();
+  auto getSaveName(fs::path* fileName, fileIndices& fileType) -> bool;
   void noMsg();
   void nuAct(uint32_t iStitch) noexcept;
   auto nuBak() noexcept -> COLORREF;
