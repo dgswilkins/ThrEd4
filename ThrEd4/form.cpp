@@ -5012,7 +5012,7 @@ void form::setfpnt() {
   StateMap.set(StateFlag::WASFPNT);
   StateMap.reset(StateFlag::SELBOX);
   StateMap.set(StateFlag::FRMPSEL);
-  thred::ritfcor(vertexIt[ClosestVertexToCursor]);
+  thred::ritfcor(*vertexIt);
   StateMap.set(StateFlag::RESTCH);
 }
 
@@ -7398,11 +7398,12 @@ void form::join() {
 	else {
 	  ClosestFormToCursor = savedFormIndex;
 	}
-	auto const insertionPoint = form.vertexIndex + form.vertexCount;
-	form::fltspac(form.vertexCount, wrap::toUnsigned(vertexList.size()));
+	auto& toForm       = FormList->operator[](ClosestFormToCursor);
+	auto const insertionPoint = toForm.vertexIndex + toForm.vertexCount;
+	form::fltspac(toForm.vertexCount, wrap::toUnsigned(vertexList.size()));
 	auto dest = std::next(FormVertices->begin(), insertionPoint);
 	std::copy(vertexList.cbegin(), vertexList.cend(), dest);
-	form.vertexCount += gsl::narrow<decltype(form.vertexCount)>(vertexList.size());
+	toForm.vertexCount += gsl::narrow<decltype(toForm.vertexCount)>(vertexList.size());
 	form::frmout(ClosestFormToCursor);
 	form::refil();
 	thred::coltab();
