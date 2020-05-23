@@ -3717,7 +3717,7 @@ void thred::internal::sav() {
 	auto const* desc            = strrchr(auxName.data(), '\\') + 1U;
 	switch (IniFile.auxFileType) {
 	  case AUXDST: {
-		DST::saveDST(saveStitches, desc);
+		DST::saveDST(PCSFileHandle, saveStitches, desc);
 		break;
 	  }
 #if PESACT

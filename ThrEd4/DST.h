@@ -86,7 +86,7 @@ namespace DST {
 auto colmatch(COLORREF color) -> uint32_t;
 auto readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool;
 void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches);
-void saveDST(std::vector<fPOINTATTR> const& saveStitches, const char* desc);
+void saveDST(void *PCSFileHandle, std::vector<fPOINTATTR> const& saveStitches, const char* desc);
 void setColFilename(fs::path* directory) noexcept;
 void setRGBFilename(fs::path* directory) noexcept;
 
