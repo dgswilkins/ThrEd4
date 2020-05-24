@@ -3744,7 +3744,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
   auto pathLength = 1U;        // length of the path to the region
   while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 	pathLength++;
-	auto const maxPathLength = 8U; // tuneable parameter
+	auto constexpr maxPathLength = 8U; // tuneable parameter
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength > maxPathLength) {
 	  auto* lineEndPoint = sortedLines[regionsList[doneRegion].start];
@@ -3799,10 +3799,10 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<RCON> const&     pathMap,
                             std::vector<uint32_t> const& mapIndexSequence,
                             uint32_t                     pathIndex) {
-  if ((pathIndex + 1U) < sequencePath.size()) {
-    const unsigned nextNode = sequencePath[pathIndex + 1].node;
+  if ((gsl::narrow_cast<size_t>(pathIndex) + 1U) < sequencePath.size()) {
+    const unsigned nextNode = sequencePath[gsl::narrow_cast<size_t>(pathIndex) + 1U].node;
     unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
-	while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
+	while (iPath < mapIndexSequence[gsl::narrow_cast<size_t>(sequencePath[pathIndex].node) + 1U] && pathMap[iPath].node != nextNode) {
 	  iPath++;
 	}
 	if (iPath < pathMap.size()) {

@@ -9001,7 +9001,7 @@ void thred::internal::longer() {
   auto const start         = StitchBuffer->operator[](ClosestPointIndex);
   auto const startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
   auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  auto const rangeEnd = ((SelectedRange.finish + 1) < StitchBuffer->size()) ? SelectedRange.finish
+  auto const rangeEnd = ((gsl::narrow_cast<size_t>(SelectedRange.finish) + 1U) < StitchBuffer->size()) ? SelectedRange.finish
                                                                             : SelectedRange.finish - 1U;
   for (iStitch = ClosestPointIndex + 1U; iStitch < rangeEnd; iStitch++) {
 	auto const stitch     = StitchBuffer->operator[](iStitch);
