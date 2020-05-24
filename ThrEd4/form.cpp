@@ -3798,24 +3798,22 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<RCON> const&     pathMap,
                             std::vector<uint32_t> const& mapIndexSequence,
-                            uint32_t                     pathIndex,
-                            uint32_t&                    pathCount) {
-  auto iPath = mapIndexSequence[sequencePath[pathIndex].node];
-  if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {
-	auto const nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
-	while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1U] &&
-	       pathMap[iPath].node != nextNode) {
+                            uint32_t                     pathIndex) {
+  if ((pathIndex + 1U) < sequencePath.size()) {
+    const unsigned nextNode = sequencePath[pathIndex + 1].node;
+    unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
+	while (iPath < mapIndexSequence[sequencePath[pathIndex].node + 1] && pathMap[iPath].node != nextNode) {
 	  iPath++;
 	}
 	if (iPath < pathMap.size()) {
-	  sequencePath[pathCount++].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
+	  sequencePath[pathIndex++].nextGroup = pathMap[iPath].nextGroup;
 	}
 	else {
-	  sequencePath[pathCount++].nextGroup = 0;
+	  sequencePath[pathIndex++].nextGroup = 0;
 	}
   }
   else {
-	sequencePath[pathCount++].nextGroup = 0;
+	  sequencePath[pathIndex++].nextGroup = 0;
   }
 }
 
@@ -4402,13 +4400,12 @@ void form::internal::lcon(FRMHED const&          form,
 		}
 		sequencePath.push_back({tmpNode, 0, tmpSkip});
 	  }
-	  auto pathCount = 0U;
 	  for (auto iPath = 0U; iPath < sequencePathIndex; iPath++) {
-		nxtseq(sequencePath, pathMap, mapIndexSequence, iPath, pathCount);
+		nxtseq(sequencePath, pathMap, mapIndexSequence, iPath);
 	  }
 	  visitedRegions.reset();
 	  auto lastGroup = 0U;
-	  for (auto iPath = 0U; iPath < pathCount; iPath++) {
+	  for (auto iPath = 0U; iPath < sequencePathIndex; iPath++) {
 		outDebugString(L"iterator {},vrt {},grpn {}\n", iPath, pathMap[iPath].node, pathMap[iPath].nextGroup);
 		if (!unvis(visitedRegions, visitedIndex)) {
 		  break;
