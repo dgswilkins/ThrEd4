@@ -3744,7 +3744,9 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
   auto pathLength = 1U;        // length of the path to the region
   while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 	pathLength++;
-	if (pathLength > tempPath.size() - sequencePathIndex) {
+	auto const maxPathLength = 8U; // tuneable parameter
+	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
+	if (pathLength > maxPathLength) {
 	  auto* lineEndPoint = sortedLines[regionsList[doneRegion].start];
 	  if (lineEndPoint != nullptr) {
 		lastRegionCorners[0] = lineEndPoint[0];
