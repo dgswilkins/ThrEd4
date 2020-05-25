@@ -10934,7 +10934,7 @@ void thred::internal::qcode() {
 }
 
 void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen) {
-  if (!StitchBuffer->empty()) {
+  if (!StitchBuffer->empty() && length != 0) {
 	auto const activeStitch = std::next(StitchBuffer->begin(), currentStitch);
 	if (ActiveLayer != 0U) {
 	  LineIndex = 0;
