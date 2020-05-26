@@ -232,7 +232,6 @@ void bitmap::internal::bitlin(uint8_t const* source,
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void bitmap::internal::bitsiz() {
   auto const screenAspectRatio =
       gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);

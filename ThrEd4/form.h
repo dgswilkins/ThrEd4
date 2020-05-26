@@ -377,7 +377,7 @@ namespace internal {
   void nxtseq(std::vector<FSEQ>&           sequencePath,
               std::vector<RCON> const&     pathMap,
               std::vector<uint32_t> const& mapIndexSequence,
-              uint32_t                     pathIndex);
+              uint32_t                     pathIndex) noexcept;
   void pbrd(FRMHED const& form);
   void pfn(std::vector<VRCT2> const& underlayVerticalRect,
            std::vector<VRCT2> const& fillVerticalRect,

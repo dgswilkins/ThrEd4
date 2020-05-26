@@ -47,9 +47,6 @@ auto toUnsigned(size_t invar) -> uint32_t;
 auto wcstof(wchar_t const (&buffer)[HBUFSIZ]) noexcept -> float;
 void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
 template <class outType, class inType> auto ceil(inType invar) -> outType {
   return gsl::narrow<outType>(std::ceil(invar));
 }
@@ -65,7 +62,5 @@ template <class outType, class inType> auto round(inType invar) -> outType {
 template <class outType> auto wcstoi(wchar_t const (&buffer)[HBUFSIZ]) -> outType {
   return gsl::narrow<outType>(std::wcstoul(static_cast<wchar_t const*>(buffer), nullptr, 10));
 }
-
-#pragma warning(pop)
 
 } // namespace wrap

@@ -3046,7 +3046,6 @@ auto thred::internal::savcmp() noexcept -> bool {
 #endif
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) {
   constexpr auto BalaradRatio = 10.0F / 6.0F;
   balaradStitch[destination] =
@@ -6451,7 +6450,6 @@ void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led)
   destination.tag  = 0x14;
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 auto thred::internal::sizfclp(FRMHED const& form) -> uint32_t {
   auto clipSize =
       gsl::narrow<uint32_t>(sizeof(FORMCLIP) + form.vertexCount * sizeof(decltype(FormVertices->back())));
@@ -7072,7 +7070,6 @@ auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> u
 
 void thred::internal::setknt() {
   auto iStitch = 0U;
-  // ToDo - Use a temp buffer rather than the high buffer
   auto buffer = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
   OutputIndex = 0;
@@ -7126,7 +7123,6 @@ auto thred::internal::srchknot(uint32_t source) noexcept -> uint32_t {
 
 void thred::internal::chkncol() {
   auto initialColor = StitchBuffer->front().attribute & COLMSK;
-  // ToDo - Use a temp buffer rather than the high buffer
   auto buffer = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
   OutputIndex = 0;
@@ -8378,7 +8374,6 @@ void thred::chkrng(fPOINT& range) {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::ritmov(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   SetROP2(StitchWindowDC, R2_XORPEN);
@@ -8867,7 +8862,6 @@ void thred::internal::vuselthr() {
   StateMap.set(StateFlag::RESTCH);
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::internal::colchk() {
   if (!StitchBuffer->empty()) {
 	auto color         = StitchBuffer->front().attribute & COLMSK;

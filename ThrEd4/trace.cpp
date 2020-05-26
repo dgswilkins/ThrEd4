@@ -975,7 +975,6 @@ void trace::dutrnum1() {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 auto trace::internal::ducolm() -> uint32_t {
   if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth)) {
 	return 0U;
@@ -1159,7 +1158,6 @@ void trace::tracpar() {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto const NumeralWidth = thred::txtWid(L"0");
   wchar_t    buffer[11]   = {0};

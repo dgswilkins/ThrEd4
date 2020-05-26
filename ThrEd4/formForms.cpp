@@ -619,7 +619,6 @@ void formForms::frmnum() {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void formForms::internal::chkdaz() {
   if (IniFile.daisyPetalPoints == 0U) {
 	IniFile.daisyPetalPoints = 1U;

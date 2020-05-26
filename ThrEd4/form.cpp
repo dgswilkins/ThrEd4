@@ -448,7 +448,6 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::selsqr(POINT const& controlPoint, HDC dc) {
   POINT      line[5] = {};
   auto const offset =
@@ -461,7 +460,6 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
   Polyline(dc, static_cast<POINT*>(line), 5);
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::internal::frmsqr0(POINT const& controlPoint) {
   POINT      line[5] = {};
   auto const offset =
@@ -476,7 +474,6 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::internal::frmx(POINT const& controlPoint, HDC dc) {
   POINT      line[2] = {};
   auto const offset  = MulDiv(8, gsl::narrow<int32_t>(*screenDPI), 96);
@@ -3797,11 +3794,10 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
   doneRegion = pathMap[regionPath[pathLength - 1U].pcon].node;
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<RCON> const&     pathMap,
                             std::vector<uint32_t> const& mapIndexSequence,
-                            uint32_t                     pathIndex) {
+                            uint32_t                     pathIndex) noexcept {
   if ((gsl::narrow_cast<size_t>(pathIndex) + 1U) < sequencePath.size()) {
     const unsigned nextNode = sequencePath[gsl::narrow_cast<size_t>(pathIndex) + 1U].node;
     unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
@@ -6275,7 +6271,6 @@ void form::setexpand(float xyRatio) {
   StateMap.set(StateFlag::RESTCH);
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::nufilcol(uint32_t color) {
   // clang-format off
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillColor;
@@ -6293,7 +6288,6 @@ void form::nufilcol(uint32_t color) {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::nufthcol(uint32_t color) {
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color;
   if (formColor != gsl::narrow<uint8_t>(color)) {
@@ -6308,7 +6302,6 @@ void form::nufthcol(uint32_t color) {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::nubrdcol(uint32_t color) {
   FormList-> operator[](ClosestFormToCursor).borderColor = gsl::narrow<uint8_t>(color);
   auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMBFIL;
@@ -6320,7 +6313,6 @@ void form::nubrdcol(uint32_t color) {
   }
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::nulapcol(uint32_t color) {
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
   if (gsl::narrow<uint32_t>(currentForm.borderColor >> FRMSHFT) != color) {

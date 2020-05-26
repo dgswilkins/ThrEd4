@@ -1140,9 +1140,6 @@ class BSEQPNT
   //~BSEQPNT() = default;
 };
 
-// pragma required until MSVC /analyze recognizes noexcept(false)
-#pragma warning(push)
-#pragma warning(disable : 26440)
 inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
   x         = gsl::narrow<float>(rhsX);
   y         = gsl::narrow<float>(rhsY);
@@ -1152,7 +1149,6 @@ inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
 inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
   attribute = gsl::narrow<int8_t>(rhsAttr);
 }
-#pragma warning(pop)
 
 inline auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
   return (x == rhs.x) && (y == rhs.y);
@@ -1439,13 +1435,11 @@ class SATCONOUT
   inline auto operator=(SATCON const& rhs) -> SATCONOUT&;
 };
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
@@ -2044,7 +2038,6 @@ inline FRMHEDOUT::FRMHEDOUT() noexcept :
   cres                = 0U;
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
     satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
   attribute       = rhs.attribute;
@@ -2100,7 +2093,6 @@ inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
   cres                = rhs.cres;
 }
 
-#pragma warning(suppress : 26440) // suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
   attribute       = rhs.attribute;
   vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
