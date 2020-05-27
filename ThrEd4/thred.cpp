@@ -494,7 +494,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -520,7 +520,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 }
 
 void thred::internal::getdes() noexcept {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1) Don't use C-style casts (type.4)
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 }
 
@@ -984,6 +984,7 @@ void thred::internal::redfils() {
 	  }
 	  else {
 		auto* fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
+		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 		if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		  previousNames[iLRU].clear();
 		}
@@ -2952,6 +2953,7 @@ void thred::internal::getDocsFolder(fs::path* directory) {
   if (directory != nullptr) {
 	auto*      ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
 	auto const hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
+	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	if (SUCCEEDED(hr)) {
 	  directory->assign(ppszPath); // make a local copy of the path
 	}
@@ -2970,7 +2972,8 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto           directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto const     defaultDirectory = gsl::span<char> {IniFile.defaultDirectory};
+  auto& defDir = IniFile.defaultDirectory;
+  auto const     defaultDirectory = gsl::span<char> {defDir};
   constexpr char fillchar         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), fillchar);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
@@ -2988,7 +2991,8 @@ void thred::internal::ritini() {
 	}
   }
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const designerName = gsl::span<char> {IniFile.designerName};
+  auto& desName = IniFile.designerName;
+  auto const designerName = gsl::span<char> {desName};
   std::fill(designerName.begin(), designerName.end(), fillchar);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   for (auto iColor = 0U; iColor < 16U; iColor++) {
@@ -3032,6 +3036,7 @@ void thred::internal::ritini() {
   }
   IniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (IniFileHandle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, nullptr);
   }
@@ -3061,6 +3066,7 @@ void thred::internal::redbal() {
   FormList->clear();
   auto* balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto bytesRead = DWORD {0U};
 	ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
@@ -3122,6 +3128,7 @@ void thred::internal::ritbal() {
 	outputName.replace_extension(L".thv");
 	auto* balaradFile =
 	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  return;
 	}
@@ -3251,7 +3258,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
   stitchHeader.hoopType    = gsl::narrow<decltype(stitchHeader.hoopType)>(IniFile.hoopType);
   auto       designer      = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName  = gsl::span<char> {ExtendedHeader->modifierName};
+  auto&      modName       = ExtendedHeader->modifierName;
+  auto const modifierName  = gsl::span<char> {modName};
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -3376,14 +3384,16 @@ void thred::internal::thrsav() {
   if (!StateMap.testAndReset(StateFlag::IGNAM)) {
 	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	auto* file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
+	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	if (file != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  StateMap.reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
 		version.clear();
 	  }
-	  duver(*DefaultDirectory / std::begin(fileData.cFileName));
+	  auto& fileName = fileData.cFileName;
+	  duver(*DefaultDirectory / std::begin(fileName));
 	  while (FindNextFile(file, &fileData)) {
-		duver(*DefaultDirectory / std::begin(fileData.cFileName));
+		duver(*DefaultDirectory / std::begin(fileName));
 	  }
 	  FindClose(file);
 	  fs::remove(VersionNames->back());
@@ -3400,6 +3410,7 @@ void thred::internal::thrsav() {
 	}
   }
   FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*ThrName);
 	FileHandle = nullptr;
@@ -3502,7 +3513,7 @@ auto thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 #if PESACT
 
 auto thred::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto color = PECCOLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
   auto translatedColor = PESThread[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
@@ -3596,8 +3607,9 @@ inline void thred::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t
 
 void thred::internal::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader = convert_ptr<PECHDR*>(buffer.data());
+  auto& pad = pecHeader->pad;
   PESdata         = buffer.data();
-  PEScolors       = std::begin(pecHeader->pad);
+  PEScolors       = std::begin(pad);
   auto thisStitch = fPOINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto iColor  = 1U;
@@ -3642,6 +3654,7 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer,
 
 void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   uint8_t thumbnail[ThumbHeight][ThumbWidth] = {};
+  #pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
   uint8_t const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
 
   auto const yFactor = 31.0F / IniFile.hoopSizeY;
@@ -3705,6 +3718,7 @@ void thred::internal::sav() {
   }
   auto* PCSFileHandle = CreateFile(
       AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*AuxName);
 	PCSFileHandle = nullptr;
@@ -3846,8 +3860,9 @@ void thred::internal::sav() {
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto const label     = gsl::span<char>(pecHeader->label);
-		pecnam(label);
+		auto& label = pecHeader->label;
+		auto const pecLabel     = gsl::span<char>(label);
+		pecnam(pecLabel);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 		std::fill(fstart, fend, ' ');
@@ -4003,6 +4018,8 @@ void thred::internal::auxmen() {
   StateMap.set(StateFlag::DUMEN);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 26493)     // Don't use C-style casts (type.4)
 auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> bool {
   if (nullptr != fileName) {
 	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
@@ -4076,6 +4093,7 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
   }
   return false;
 }
+#pragma warning(pop)
 
 void thred::internal::savAs() {
   if (!StitchBuffer->empty() || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
@@ -4549,7 +4567,7 @@ void thred::internal::prtred() {
 auto thred::internal::dupcol(uint32_t activeColor) -> uint32_t {
   constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
   auto const     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   for (auto iColor = 0U; iColor < activeColor; iColor++) {
 	if (UserColor[iColor] == color) {
@@ -4599,6 +4617,8 @@ void thred::internal::rstdu() {
   StateMap.set(StateFlag::DUMEN);
 }
 
+#pragma warning(push)
+#pragma warning(disable : 26493) // Don't use C-style casts (type.4)
 auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
@@ -4679,6 +4699,7 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
   }
   return false;
 }
+#pragma warning(pop)
 
 void thred::internal::nuFil(fileIndices fileIndex) {
   auto newFileName = *WorkingFileName;
@@ -4699,6 +4720,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	// ToDo - use ifstream?
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 	FileHandle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (GetLastError() == 32U) {
 		displayText::filnopn(IDS_FNOPNA, newFileName);
@@ -4709,6 +4731,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  FileHandle = nullptr;
 	}
 	else {
+	  auto& desName = IniFile.designerName;
 	  StateMap.reset(StateFlag::CMPDO);
 	  StateMap.reset(StateFlag::SAVACT);
 	  StateMap.reset(StateFlag::BAKING);
@@ -4717,7 +4740,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 	  deldu();
-	  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
+	  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
 	  thred::unbsho();
 	  StateMap.reset(StateFlag::MOVSET);
 	  form::frmon();
@@ -4766,7 +4789,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 			return;
 		  }
 		  auto const version = (thredHeader.headerType & 0xff000000) >> 24U;
-		  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
+		  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
 		  switch (version) {
 			case 0: {
 			  if (PCSHeader.hoopType == SMALHUP) {
@@ -4781,9 +4804,10 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 				PCSHeader.hoopType = LARGHUP;
 			  }
 			  ritfnam(*DesignerName);
-			  auto const modifierName = gsl::span<char> {ExtendedHeader->modifierName};
+			  auto& modName = ExtendedHeader->modifierName;
+			  auto const modifierName = gsl::span<char> {modName};
 			  std::copy(&IniFile.designerName[0],
-			            &IniFile.designerName[strlen(std::begin(IniFile.designerName))],
+			            &IniFile.designerName[strlen(std::begin(desName))],
 			            modifierName.begin());
 			  break;
 			}
@@ -5080,7 +5104,8 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 			auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
 			PESstitch                  = &fileBuffer[pecOffset];
 			auto const pesColorCount   = pecHeader->colorCount + 1U;
-			PEScolors                  = std::begin(pecHeader->pad);
+			auto& pad = pecHeader->pad;
+			PEScolors                  = std::begin(pad);
 			constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 			auto           colorMap    = boost::dynamic_bitset<>(threadCount);
 			auto           activeColor = 0U;
@@ -5088,7 +5113,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 			  if (PEScolors[iColor] < threadCount) {
 				if (!colorMap.test_set(PEScolors[iColor])) {
 				  auto const threadColor = PESThread[PEScolors[iColor]];
-				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+				  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 				  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 				  UserColor[activeColor++] = color;
 				  if (activeColor >= 16U) {
@@ -5097,7 +5122,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 				}
 			  }
 			  else {
-				// NOLINTNEXTLINE(hicpp-signed-bitwise)
+				#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 				auto const color = RGB(PESThread[0].color.r,
 				                       PESThread[0].color.g,
 				                       PESThread[0].color.b); // color unknown
@@ -5997,12 +6022,14 @@ void thred::internal::newFil() {
   StateMap.reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
   deldu();
-  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
+  auto& desName = IniFile.designerName;
+  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
   SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
   *ThrName = *DefaultDirectory / (StringTable->operator[](STR_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::span<char> {ExtendedHeader->modifierName};
+  auto& modName = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char> {modName};
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   rstdu();
   rstAll();
@@ -7288,7 +7315,8 @@ void thred::internal::setsped() {
 }
 
 void thred::internal::deltot() {
-  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(IniFile.designerName))));
+  auto& desName = IniFile.designerName;
+  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
   TexturePointsBuffer->clear();
   FormList->clear();
   StitchBuffer->clear();
@@ -7751,6 +7779,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
   }
   InsertedFileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	FileHandle = nullptr;
@@ -9202,6 +9231,7 @@ void thred::internal::thumnail() {
   fs::current_path(*DefaultDirectory);
   *SearchName = *DefaultDirectory / L"*.thr";
   auto* file  = FindFirstFile(SearchName->wstring().c_str(), &fileData);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (file == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
@@ -9211,9 +9241,10 @@ void thred::internal::thumnail() {
   }
   else {
 	Thumbnails->clear();
-	Thumbnails->push_back(std::wstring(std::begin(fileData.cFileName)));
+	auto& fileName = fileData.cFileName;
+	Thumbnails->push_back(std::wstring(std::begin(fileName)));
 	while (FindNextFile(file, &fileData)) {
-	  Thumbnails->push_back(std::wstring(std::begin(fileData.cFileName)));
+	  Thumbnails->push_back(std::wstring(std::begin(fileName)));
 	}
 	FindClose(file);
 	std::sort(Thumbnails->begin(), Thumbnails->end());
@@ -9512,7 +9543,8 @@ void thred::internal::desiz() {
   }
   info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX / PFGRAN), (IniFile.hoopSizeY / PFGRAN));
   if (!StitchBuffer->empty()) {
-	auto modifier = utf::Utf8ToUtf16(std::string(std::begin(ExtendedHeader->modifierName)));
+	auto& modifierName = ExtendedHeader->modifierName;
+	auto modifier = utf::Utf8ToUtf16(std::string(std::begin(modifierName)));
 	info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
   }
   displayText::shoMsg(info);
@@ -9933,6 +9965,7 @@ void thred::internal::ritcur() noexcept {
 	cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
 	// ToDo - replace with GetDIBits
 	uint8_t bitmapBits[64] = {};
+	#pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
 	GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < 32; iRow++) {
@@ -10229,6 +10262,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  if (fileInfo != nullptr) {
 		auto  searchName   = *DefaultDirectory / L"*.thr";
 		auto* searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
+		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		  auto fmtStr = std::wstring {};
 		  displayText::loadString(fmtStr, IDS_NOTHRFIL);
@@ -10249,7 +10283,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  if (fileInfo != nullptr) {
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
 			EndDialog(hwndlg, wparam);
@@ -10306,7 +10340,8 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  case IDOK: {
 			auto fileError = 0U;
 			for (auto iFile = 0U; iFile < fileInfo->count; iFile++) {
-			  auto fileName = *DefaultDirectory / std::begin(fileInfo->data[iFile].cFileName);
+			  auto& cFileName = fileInfo->data[iFile].cFileName;
+			  auto fileName = *DefaultDirectory / std::begin(cFileName);
 			  if (!SetFileAttributes(fileName.wstring().c_str(), fileInfo->data[iFile].dwFileAttributes)) {
 				fileError++;
 			  }
@@ -11010,7 +11045,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -11063,7 +11098,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1)
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 }
 
@@ -13131,6 +13166,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ThrName->replace_extension(thrExt);
 	  FileHandle = CreateFile(
 	      ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		FileHandle = nullptr;
 	  }
@@ -16522,7 +16558,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  iVersion++;
 		}
 	  }
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  auto const wParameter = LOWORD(Msg.wParam);
 	  if (wParameter > 40000U && wParameter < 40300U) {
 		thred::undat();
@@ -16606,12 +16642,14 @@ void thred::internal::ritloc() {
   auto       lockFilePath = fs::path {};
   auto*      ppszPath = gsl::narrow_cast<PWSTR>(nullptr); // variable to receive the path memory block pointer.
   auto const hr = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (SUCCEEDED(hr)) {
 	lockFilePath.assign(ppszPath); // make a local copy of the path
 	lockFilePath /= L"ThrEd";
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
 	auto* lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  auto bytesWritten = DWORD {0};
 	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
@@ -16622,6 +16660,9 @@ void thred::internal::ritloc() {
   CoTaskMemFree(ppszPath); // free up the path memory block
 }
 
+
+#pragma warning(push)
+#pragma warning(disable : 26493)     // Don't use C-style casts (type.4)
 void thred::internal::crtcurs() noexcept {
   FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
@@ -16631,6 +16672,7 @@ void thred::internal::crtcurs() noexcept {
   NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 }
+#pragma warning(pop)
 
 void thred::internal::duhom() {
   auto arg0      = fs::path {ArgList[0]};
@@ -16644,6 +16686,7 @@ void thred::internal::ducmd() {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  BalaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 	  if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 		CloseHandle(BalaradFile);
 		*BalaradName0 = balaradFileName;
@@ -16653,10 +16696,12 @@ void thred::internal::ducmd() {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
 			BalaradFile     = CreateFile(
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+			#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 			  char readBuffer[_MAX_PATH + 1] = {0};
 			  *BalaradName1                  = balaradFileName;
 			  auto bytesRead                 = DWORD {0};
+			  #pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
 			  ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
 				BalaradName2->assign(readBuffer);
@@ -16698,6 +16743,7 @@ void thred::internal::redini() {
   *IniFileName /= L"thred.ini";
   IniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	setPrefs();
   }
@@ -16943,6 +16989,7 @@ void thred::internal::init() {
   auto       blank           = std::wstring {};
   ReleaseDC(nullptr, deviceContext);
   TexturePointsBuffer->clear();
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   MainMenu   = GetMenu(ThrEdWindow);
   auto wRect = RECT {0L, 0L, 0L, 0L};
@@ -16967,7 +17014,9 @@ void thred::internal::init() {
   ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
   qchk();
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   ArrowCursor = LoadCursor(nullptr, IDC_ARROW); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   CrossCursor = LoadCursor(nullptr, IDC_CROSS); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   crtcurs();
   redfils();
@@ -17162,7 +17211,8 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::span<char> {ExtendedHeader->modifierName};
+  auto&      modName      = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char> {modName};
   std::copy(designer.begin(), designer.end(), modifierName.begin());
   chkhup();
   nedmen();
@@ -17700,6 +17750,7 @@ void thred::internal::dubar() {
 
 void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
   auto* thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
   if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	auto stitchHeader = STRHED {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
@@ -17911,7 +17962,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_HSCROLL: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
 		case SB_LINELEFT: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
@@ -17983,7 +18034,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  auto const position = HIWORD(wParam);
 			  MovieTimeStep       = MAXDELAY - position;
 			  setsped();
@@ -17994,7 +18045,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 #pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
 			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  ZoomRect.left  = gsl::narrow<int32_t>(HIWORD(wParam));
 			  ZoomRect.right = ZoomRect.left + zoomWidth;
 			  if (ZoomRect.right > UnzoomedRect.x) {
@@ -18010,7 +18061,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_VSCROLL: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  switch (LOWORD(wParam)) {
 		case SB_LINEDOWN: {
 		  auto scrollPoint = POINT {0L, 0L};
@@ -18040,7 +18091,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  ZoomRect.top = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
@@ -18092,6 +18143,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			  }
 			}
 		  }
+		  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
 		  BitBlt(StitchWindowDC,                // handle to destination DC
 		         0,                             // x-coord of destination upper-left corner
 		         0,                             // y-coord of destination upper-left corner

@@ -1372,7 +1372,8 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	}
   }
   if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
-	std::fill(std::begin(fillStartsData.fillArray), std::end(fillStartsData.fillArray), ClosestPointIndex);
+	auto& fillArray = fillStartsData.fillArray;
+	std::fill(std::begin(fillArray), std::end(fillArray), ClosestPointIndex);
   }
 }
 
@@ -2485,7 +2486,7 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1) Don't use C-style casts (type.4)
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {

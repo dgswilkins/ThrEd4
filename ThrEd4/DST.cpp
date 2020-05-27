@@ -569,6 +569,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   if (di::colfil()) {
 	auto* colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+    #pragma warning(suppress : 26493) // Don't use C-style casts (type.4) 
 	if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
@@ -748,6 +749,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto  bytesWritten = DWORD {0};
 	auto* colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+    #pragma warning(suppress : 26493) // Don't use C-style casts (type.4)
 	if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  wrap::WriteFile(colorFile,
 	                  &colorData[0],
@@ -757,6 +759,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	}
 	CloseHandle(colorFile);
 	colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+    #pragma warning(suppress : 26493) // Don't use C-style casts (type.4)
 	if (colorFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	  wrap::WriteFile(colorFile,
 	                  &colorData[2],
@@ -789,9 +792,9 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 }
 
 auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493) // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto color1 = PECCOLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493) // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
   auto       color2 = PECCOLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto       deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
@@ -879,7 +882,8 @@ void DST::saveDST(void *PCSFileHandle, std::vector<fPOINTATTR> const& saveStitch
   // Use sizeof to ensure no overrun if the format string is wrong length
   // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
   strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched));
-  std::fill(std::begin(dstHeader.desc), std::end(dstHeader.desc), ' ');
+  auto& dstDesc = dstHeader.desc;
+  std::fill(std::begin(dstDesc), std::end(dstDesc), ' ');
   if (desc != nullptr) {
 	for (auto iHeader = 0U; iHeader < wrap::toUnsigned(sizeof(dstHeader.desc)); iHeader++) {
 	  if ((desc[iHeader] != 0) && desc[iHeader] != '.') {
@@ -916,7 +920,8 @@ void DST::saveDST(void *PCSFileHandle, std::vector<fPOINTATTR> const& saveStitch
   strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
   strncpy(static_cast<char *>(dstHeader.eof),        "\x1a", sizeof(dstHeader.eof));                                              // NOLINT(clang-diagnostic-deprecated-declarations)
   // clang-format on
-  std::fill(std::begin(dstHeader.res), std::end(dstHeader.res), ' ');
+  auto& res = dstHeader.res;
+  std::fill(std::begin(res), std::end(res), ' ');
   auto bytesWritten = DWORD {0};
   WriteFile(PCSFileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr);
   wrap::WriteFile(PCSFileHandle,
