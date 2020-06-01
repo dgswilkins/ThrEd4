@@ -629,6 +629,7 @@ void xt::internal::fnwlk(FRMHED& form) {
   }
   auto const& walkPoints = xt::insid(form);
   OutputIndex            = 0;
+  OSequence->clear();
   while (count != 0U) {
 	OSequence->push_back(walkPoints[start]);
 	OutputIndex++;
