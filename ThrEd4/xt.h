@@ -113,7 +113,6 @@ namespace internal {
   auto chkrdun(std::vector<uint32_t> const& formFillCounter,
                std::vector<OREC*> const&    pRecs,
                SRTREC const&                stitchRecord) noexcept -> bool;
-  void chkuseq(FRMHED& form);
   void delwlk(uint32_t code);
 
 #ifdef _DEBUG
@@ -170,9 +169,7 @@ namespace internal {
   auto orComp(OREC const* record1, OREC const* record2) noexcept -> bool;
   auto orfComp(OREC const* record1, OREC const* record2) noexcept -> bool;
   void rtrclpfn(FRMHED const& form);
-  void ritcwlk(FRMHED& form);
-  void ritund(FRMHED& form);
-  void ritwlk(FRMHED& form);
+  void ritwlk(FRMHED& form, uint32_t walkMask);
   void sadj(fPOINT& point, fPOINT const& designSizeRatio, fRECTANGLE const& designSizeRect) noexcept;
   void sadj(fPOINTATTR& stitch, fPOINT const& designSizeRatio, fRECTANGLE const& designSizeRect) noexcept;
 

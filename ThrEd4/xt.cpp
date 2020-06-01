@@ -476,15 +476,17 @@ void xt::internal::delwlk(uint32_t code) {
   }
 }
 
-void xt::internal::chkuseq(FRMHED& form) {
+void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
+  if (!OSequence->empty()) {
+	InterleaveSequenceIndices->emplace_back(
+	    INSREC {walkMask, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
 #if BUGBAK
-  for (auto val : *OSequence) {
-	InterleaveSequence->push_back(val);
-  }
-  InterleaveSequenceIndices->back().color = form.underlayColor;
+	for (auto val : *OSequence) {
+	  InterleaveSequence->push_back(val);
+	}
+	InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
 
-  if (!OSequence->empty()) {
 	if (form.underlayStitchLen < MINWLK) {
 	  form.underlayStitchLen = MINWLK;
 	}
@@ -492,7 +494,7 @@ void xt::internal::chkuseq(FRMHED& form) {
 	  form.underlayStitchLen = MAXWLK;
 	}
 	auto const underlayStitchLength = form.underlayStitchLen;
-	auto const iSeqMax = OSequence->size() - 1U;
+	auto const iSeqMax              = OSequence->size() - 1U;
 	for (auto iSequence = size_t {0U}; iSequence < iSeqMax; iSequence++) {
 	  auto const sequence     = OSequence->operator[](iSequence);
 	  auto const sequenceFwd1 = OSequence->operator[](iSequence + 1U);
@@ -515,23 +517,7 @@ void xt::internal::chkuseq(FRMHED& form) {
 	InterleaveSequence->push_back(OSequence->back());
 	// ToDo - should this be front or (back - 1) ?
 	InterleaveSequenceIndices->front().color = form.underlayColor;
-  }
 #endif
-}
-
-void xt::internal::ritwlk(FRMHED& form) {
-  if (OutputIndex != 0U) {
-	InterleaveSequenceIndices->emplace_back(
-	    INSREC {WLKMSK, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
-	chkuseq(form);
-  }
-}
-
-void xt::internal::ritcwlk(FRMHED& form) {
-  if (OutputIndex != 0U) {
-	InterleaveSequenceIndices->emplace_back(
-	    INSREC {CWLKMSK, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
-	chkuseq(form);
   }
 }
 
@@ -627,23 +613,13 @@ void xt::internal::fnwlk(FRMHED& form) {
 	count++;
   }
   auto const& walkPoints = xt::insid(form);
-  OutputIndex            = 0;
   OSequence->clear();
   while (count != 0U) {
 	OSequence->push_back(walkPoints[start]);
-	OutputIndex++;
 	start = form::nxt(form, start);
 	count--;
   }
-  ritwlk(form);
-}
-
-void xt::internal::ritund(FRMHED& form) {
-  if (!OSequence->empty()) {
-	InterleaveSequenceIndices->emplace_back(
-	    INSREC {UNDMSK, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
-	chkuseq(form);
-  }
+  ritwlk(form, WLKMSK);
 }
 
 void xt::internal::undclp(FRMHED const& form) {
@@ -657,7 +633,6 @@ void xt::internal::undclp(FRMHED const& form) {
 }
 
 void xt::internal::fncwlk(FRMHED& form) {
-  OutputIndex = 0;
   OSequence->clear();
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
@@ -668,19 +643,16 @@ void xt::internal::fncwlk(FRMHED& form) {
 	  auto const& nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
 	  OSequence->push_back(
 	      fPOINT {wrap::midl(thisVertex.x, nextVertex.x), wrap::midl(thisVertex.y, nextVertex.y)});
-	  OutputIndex++;
 	}
 	auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 	for (auto iGuide = form.satinGuideCount; iGuide != 0; iGuide--) {
 	  OSequence->push_back(fPOINT {
 	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
 	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y)});
-	  OutputIndex++;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
 	  OSequence->push_back(fPOINT {wrap::midl(vertexIt[0].x, vertexIt[1].x),
 	                               wrap::midl(vertexIt[0].y, vertexIt[1].y)});
-	  OutputIndex++;
 	}
   }
   else {
@@ -690,22 +662,20 @@ void xt::internal::fncwlk(FRMHED& form) {
 	}
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	OSequence->push_back(vertexIt[start]);
-	OutputIndex++;
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); iGuide++) {
-	  OSequence->push_back(fPOINT {wrap::midl(vertexIt[finish].x, vertexIt[start].x),
-	                               wrap::midl(vertexIt[finish].y, vertexIt[start].y)});
-	  if (form::cisin(form, OSequence->back().x, OSequence->back().y)) {
-		OutputIndex++;
+	  auto const pnt = fPOINT {wrap::midl(vertexIt[finish].x, vertexIt[start].x),
+	                           wrap::midl(vertexIt[finish].y, vertexIt[start].y)};
+	  if (form::cisin(form, pnt.x, pnt.y)) {
+		OSequence->push_back(pnt);
 	  }
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
 	OSequence->push_back(vertexIt[start]);
-	OutputIndex++;
   }
-  ritcwlk(form);
+  ritwlk(form, CWLKMSK);
 }
 
 void xt::srtcol() {
@@ -814,8 +784,7 @@ void xt::internal::fnund(FRMHED& form, std::vector<RNGCNT> const& textureSegment
   undclp(form);
   StateMap.set(StateFlag::ISUND);
   form::angclpfn(form, textureSegments, angledFormVertices);
-  OutputIndex = wrap::toUnsigned(OSequence->size());
-  ritund(form);
+  ritwlk(form, UNDMSK);
   UserStitchLength = savedStitchSize;
 }
 
