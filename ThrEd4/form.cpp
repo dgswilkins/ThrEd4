@@ -1218,8 +1218,8 @@ void form::chkseq(bool border) {
 #if BUGBAK
   UNREFERENCED_PARAMETER(border);
 
-  for (auto index = 0U; index < SequenceIndex; index++) {
-	InterleaveSequence->push_back(OSequence->operator[](index));
+  for (auto val : *OSequence) {
+	InterleaveSequence->push_back(val);
   }
 #else
   auto       minimumStitchLength = 0.0F;
@@ -4444,10 +4444,10 @@ void form::internal::bakseq() {
 
 #if BUGBAK
 
-  for (SequenceIndex = 0; SequenceIndex < OutputIndex; SequenceIndex++) {
-	OSequence->operator[](SequenceIndex) = BSequence->operator[](SequenceIndex);
+  for (auto val : *BSequence) {
+	OSequence->push_back(fPOINT {val.x, val.y});
   }
-  SelectedForm->maxFillStitchLen = 6000;
+  FormList->operator[](ClosestFormToCursor).maxFillStitchLen = 6000;
 #else
 
   auto iSequence = OutputIndex;
