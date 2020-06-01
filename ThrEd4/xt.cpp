@@ -478,15 +478,13 @@ void xt::internal::delwlk(uint32_t code) {
 
 void xt::internal::chkuseq(FRMHED& form) {
 #if BUGBAK
-  uint32_t index;
-
-  for (index = 0; index < OutputIndex; index++) {
-	InterleaveSequence->push_back(OSequence->operator[](index));
+  for (auto val : *OSequence) {
+	InterleaveSequence->push_back(val);
   }
   InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
 
-  if (OutputIndex != 0U) {
+  if (!OSequence->empty()) {
 	if (form.underlayStitchLen < MINWLK) {
 	  form.underlayStitchLen = MINWLK;
 	}
@@ -494,9 +492,10 @@ void xt::internal::chkuseq(FRMHED& form) {
 	  form.underlayStitchLen = MAXWLK;
 	}
 	auto const underlayStitchLength = form.underlayStitchLen;
-	for (auto iSequence = 0U; iSequence < OutputIndex - 1U; iSequence++) {
+	auto const iSeqMax = OSequence->size() - 1U;
+	for (auto iSequence = size_t {0U}; iSequence < iSeqMax; iSequence++) {
 	  auto const sequence     = OSequence->operator[](iSequence);
-	  auto const sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+	  auto const sequenceFwd1 = OSequence->operator[](iSequence + 1U);
 	  auto const delta        = fPOINT {sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y};
 	  auto const length       = hypot(delta.x, delta.y);
 	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
@@ -513,7 +512,7 @@ void xt::internal::chkuseq(FRMHED& form) {
 		InterleaveSequence->push_back(OSequence->operator[](iSequence));
 	  }
 	}
-	InterleaveSequence->push_back(OSequence->operator[](OutputIndex - 1U));
+	InterleaveSequence->push_back(OSequence->back());
 	// ToDo - should this be front or (back - 1) ?
 	InterleaveSequenceIndices->front().color = form.underlayColor;
   }
