@@ -3818,36 +3818,30 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
   }
 }
 
-void form::internal::rspnt(float xCoordinate, float yCoordinate) {
-  outDebugString(L"rspnt: x {},y {}\n", xCoordinate, yCoordinate);
-  BSequence->emplace_back(xCoordinate, yCoordinate, 0);
-  OutputIndex++;
-}
-
 void form::internal::brkdun(std::vector<SMALPNTL*> const& sortedLines, uint32_t start, uint32_t finish) {
-  rspnt(sortedLines[start]->x, sortedLines[start]->y);
-  rspnt(sortedLines[finish]->x, sortedLines[finish]->y);
-  rspnt(WorkingFormVertices->operator[](sortedLines[start]->line).x,
-        WorkingFormVertices->operator[](sortedLines[start]->line).y);
+  BSequence->emplace_back(sortedLines[start]->x, sortedLines[start]->y, 0);
+  BSequence->emplace_back(sortedLines[finish]->x, sortedLines[finish]->y, 0);
+  BSequence->emplace_back(WorkingFormVertices->operator[](sortedLines[start]->line).x,
+                          WorkingFormVertices->operator[](sortedLines[start]->line).y,
+                          0);
   StateMap.set(StateFlag::BRKFIX);
 }
 
 void form::internal::duseq1(SMALPNTL const* sequenceLines) {
   if (sequenceLines != nullptr) {
-	rspnt(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
-	      wrap::midl(sequenceLines[1].y, sequenceLines[0].y));
+	BSequence->emplace_back(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
+	                        wrap::midl(sequenceLines[1].y, sequenceLines[0].y),
+	                        0);
   }
 }
 
 void form::internal::movseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t ind) {
   auto* lineEndPoint = sortedLines[ind];
   BSequence->emplace_back(BSEQPNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
-  OutputIndex++;
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
   //             and not the next entry in sortedLines
   lineEndPoint++;
   BSequence->emplace_back(BSEQPNT {lineEndPoint->x, lineEndPoint->y, SEQTOP});
-  OutputIndex++;
 }
 
 void form::internal::brkseq(std::vector<SMALPNTL*> const& sortedLines,
@@ -3868,9 +3862,9 @@ void form::internal::brkseq(std::vector<SMALPNTL*> const& sortedLines,
 	  auto const iLineDec = iLine - 1U;
 	  savedGroup--;
 	  if (sortedLines[iLineDec]->group != savedGroup) {
-		rspnt(sequenceLines[0].x, sequenceLines[0].y);
+		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
 		sequenceLines = sortedLines[iLineDec];
-		rspnt(sequenceLines[0].x, sequenceLines[0].y);
+		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
 		savedGroup = sequenceLines[0].group;
 	  }
 	  else {
@@ -3892,9 +3886,9 @@ void form::internal::brkseq(std::vector<SMALPNTL*> const& sortedLines,
 	for (auto iLine = start; iLine <= finish; iLine++) {
 	  savedGroup++;
 	  if (sortedLines[iLine]->group != savedGroup) {
-		rspnt(sequenceLines[0].x, sequenceLines[0].y);
+		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
 		sequenceLines = sortedLines[iLine];
-		rspnt(sequenceLines[0].x, sequenceLines[0].y);
+		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
 		savedGroup = sequenceLines[0].group;
 	  }
 	  else {
@@ -3930,15 +3924,16 @@ void form::internal::dunseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t 
   else {
 	minimumY /= 2.0F;
   }
-  rspnt(sortedLines[start][0].x, sortedLines[start][0].y + minimumY);
-  rspnt(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY);
+  BSequence->emplace_back(sortedLines[start][0].x, sortedLines[start][0].y + minimumY, 0);
+  BSequence->emplace_back(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY, 0);
   lastGroup = sortedLines[finish][0].group;
 }
 
 void form::internal::duseq2(SMALPNTL const* sequenceLines) {
   if (sequenceLines != nullptr) {
-	rspnt(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
-	      wrap::midl(sequenceLines[1].y, sequenceLines[0].y));
+	BSequence->emplace_back(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
+	                        wrap::midl(sequenceLines[1].y, sequenceLines[0].y),
+	                        0);
   }
 }
 
@@ -4056,12 +4051,14 @@ void form::internal::durgn(FRMHED const&                 form,
   auto const  sequenceStart = currentRegion.start;
   auto const  sequenceEnd   = currentRegion.end;
   if (sequencePath[pthi].skp || StateMap.testAndReset(StateFlag::BRKFIX)) {
-	if (BSequence->operator[](OutputIndex - 1U).attribute != SEQBOT) {
-	  rspnt(BSequence->operator[](OutputIndex - 2U).x, BSequence->operator[](OutputIndex - 2U).y);
+	auto iter = std::prev(BSequence->end());
+	if (iter->attribute != SEQBOT) {
+	  --iter;
+	  BSequence->emplace_back(iter->x, iter->y, 0);
 	}
 	// clang-format off
 	auto const  firstLine     = sortedLines[sequenceStart]->line;
-	auto const& bpnt          = BSequence->operator[](OutputIndex - 1U);
+	auto const& bpnt          = BSequence->back();
 	auto        minimumLength = 1e99;
 	auto        mindif        = 0U;
 	// clang-format on
@@ -4074,7 +4071,8 @@ void form::internal::durgn(FRMHED const&                 form,
 	  }
 	}
 	if (minimumLength != 0.0) {
-	  rspnt(WorkingFormVertices->operator[](mindif).x, WorkingFormVertices->operator[](mindif).y);
+	  BSequence->emplace_back(
+	      WorkingFormVertices->operator[](mindif).x, WorkingFormVertices->operator[](mindif).y, 0);
 	}
 	if (form.vertexCount != 0U) {
 	  auto const fdif = (form.vertexCount + firstLine - mindif) % form.vertexCount;
@@ -4082,18 +4080,22 @@ void form::internal::durgn(FRMHED const&                 form,
 	  if (fdif < bdif) {
 		auto ind = form::nxt(form, mindif);
 		while (ind != firstLine) {
-		  rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
+		  BSequence->emplace_back(
+		      WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y, 0);
 		  ind = form::nxt(form, ind);
 		}
-		rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
+		BSequence->emplace_back(
+		    WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y, 0);
 	  }
 	  else {
 		auto ind = form::prv(form, mindif);
 		while (ind != firstLine) {
-		  rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
+		  BSequence->emplace_back(
+		      WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y, 0);
 		  ind = form::prv(form, ind);
 		}
-		rspnt(WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y);
+		BSequence->emplace_back(
+		    WorkingFormVertices->operator[](ind).x, WorkingFormVertices->operator[](ind).y, 0);
 	  }
 	}
   }
@@ -4303,7 +4305,6 @@ void form::internal::lcon(FRMHED const&          form,
 	  bugColor &= 0xf;
 	}
 #else
-	OutputIndex = 0;
 	BSequence->clear();
 	auto mapIndexSequence = std::vector<uint32_t> {};
 	mapIndexSequence.reserve(wrap::toSize(regionCount) + 1U);
@@ -4357,7 +4358,6 @@ void form::internal::lcon(FRMHED const&          form,
 		  leftRegion = iRegion;
 		}
 	  }
-	  OutputIndex   = 0;
 	  auto tempPath = std::vector<RGSEQ> {};
 	  tempPath.resize(wrap::toSize((regionCount * (regionCount - 1U)) / 2U) + 1U);
 	  // find the leftmost region in pathMap
@@ -4450,7 +4450,7 @@ void form::internal::bakseq() {
   FormList->operator[](ClosestFormToCursor).maxFillStitchLen = 6000;
 #else
 
-  auto iSequence = OutputIndex;
+  auto iSequence = BSequence->size();
   if (iSequence != 0U) {
 	iSequence--;
   }

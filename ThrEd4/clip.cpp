@@ -604,7 +604,6 @@ void clip::internal::fxlen(FRMHED const&             form,
 	loopCount++;
   }
   auto stitchPoint = vertexIt[0];
-  OutputIndex      = 1;
   AdjustedSpace    = minimumSpacing;
   chainEndPoints.push_back(stitchPoint);
   auto currentSide = 0U;
