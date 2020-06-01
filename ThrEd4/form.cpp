@@ -2978,21 +2978,22 @@ void form::internal::ritseg(FRMHED const&              form,
 
 auto form::internal::clpnxt(std::vector<CLPSEG> const&  clipSegments,
                             std::vector<LENINFO> const& sortedLengths,
-                            uint32_t                    sind) -> bool {
+                            uint32_t                    sind,
+                            uint32_t&                   outIndex) -> bool {
   auto       index        = 1U;
   auto const indexDoubled = wrap::toUnsigned(clipSegments.size()) * 2U;
   StateMap.reset(StateFlag::FILDIR);
   while (index < clipSegments.size()) {
 	if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-	  OutputIndex = (sind + index) % indexDoubled;
-	  if (clipSegments[sortedLengths[OutputIndex].index].dun == 0) {
+	  outIndex = (sind + index) % indexDoubled;
+	  if (clipSegments[sortedLengths[outIndex].index].dun == 0) {
 		return false;
 	  }
 	  index++;
 	}
 	else {
-	  OutputIndex = (sind + indexDoubled - index) % indexDoubled;
-	  if (clipSegments[sortedLengths[OutputIndex].index].dun == 0) {
+	  outIndex = (sind + indexDoubled - index) % indexDoubled;
+	  if (clipSegments[sortedLengths[outIndex].index].dun == 0) {
 		return false;
 	  }
 	}
@@ -3004,22 +3005,23 @@ auto form::internal::nucseg(std::vector<CLPSEG> const&  clipSegments,
                             std::vector<LENINFO> const& sortedLengths,
                             uint32_t&                   currentSegmentIndex) -> bool {
   auto index = 0U;
+  auto outIndex = 0U;
   if (StateMap.test(StateFlag::FILDIR)) {
 	index = clipSegments[currentSegmentIndex].endIndex;
   }
   else {
 	index = clipSegments[currentSegmentIndex].beginIndex;
   }
-  if (clpnxt(clipSegments, sortedLengths, index)) {
+  if (clpnxt(clipSegments, sortedLengths, index, outIndex)) {
 	return false;
   }
-  if (sortedLengths[OutputIndex].isEnd) {
+  if (sortedLengths[outIndex].isEnd) {
 	StateMap.reset(StateFlag::FILDIR);
   }
   else {
 	StateMap.set(StateFlag::FILDIR);
   }
-  currentSegmentIndex = sortedLengths[OutputIndex].index;
+  currentSegmentIndex = sortedLengths[outIndex].index;
   return true;
 }
 

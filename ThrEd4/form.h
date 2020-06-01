@@ -221,9 +221,10 @@ namespace internal {
                uint32_t                   start,
                uint32_t                   finish,
                std::vector<fPOINT> const& currentFormVertices) -> uint32_t;
-
-  auto clpnxt(std::vector<CLPSEG> const& clipSegments, std::vector<LENINFO> const& sortedLengths, uint32_t sind)
-      -> bool;
+  auto clpnxt(std::vector<CLPSEG> const&  clipSegments,
+              std::vector<LENINFO> const& sortedLengths,
+              uint32_t                    sind,
+              uint32_t&                   outIndex) -> bool;
   auto fplComp(fPOINTLINE const& point1, fPOINTLINE const& point2) noexcept -> bool;
   void contf(FRMHED& form);
   auto contsf(uint32_t formIndex) -> bool;
