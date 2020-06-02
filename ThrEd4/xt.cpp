@@ -347,7 +347,7 @@ void xt::fthrfn(FRMHED& form) {
 	ind++;
   }
   feather.globalPosition = 0.0F;
-  feather.globalStep     = 4.0F / gsl::narrow_cast<float>(BSequence->size() * ind);
+  feather.globalStep     = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * gsl::narrow_cast<float>(ind);
   feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / ind;
   feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
   feather.globalUp       = feather.globalPhase * feather.globalRatio;
