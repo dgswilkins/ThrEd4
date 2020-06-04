@@ -273,9 +273,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
   }
   auto const midPoint = midpnt(currentPoint, nextPoint);
   OSequence->push_back(fPOINT {bCurrent.x, bCurrent.y});
-  OutputIndex++;
   OSequence->push_back(midPoint);
-  OutputIndex++;
   featherSequence.emplace_back(bNext.x, bNext.y);
   featherSequence.push_back(midPoint);
 }
@@ -357,7 +355,6 @@ void xt::fthrfn(FRMHED& form) {
   BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
   BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
-	OutputIndex = 0U;
 	for (ind = 0U; ind < wrap::toUnsigned(BSequence->size()) - 2U; ind++) {
 	  if (BSequence->operator[](ind).attribute == 0) {
 		xi::fthrbfn(ind, feather, featherSequence);
@@ -392,7 +389,6 @@ void xt::fthrfn(FRMHED& form) {
 		}
 	  }
 	}
-	OutputIndex = ind;
   }
   StateMap.reset(StateFlag::FTHR);
   StateMap.reset(StateFlag::BARSAT);

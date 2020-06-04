@@ -754,7 +754,6 @@ void trace::internal::dutrac() {
 	TRCPNT traceDiff[2] = {};
 	decimatedLine.push_back(tracedPoints[0]);
 	ti::dutdif(traceDiff[0], tracedPoints.data());
-	OutputIndex = 1;
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); iPoint++) {
 	  traceDiff[1] = traceDiff[0];
 	  ti::dutdif(traceDiff[0], &tracedPoints[iPoint]);
@@ -782,10 +781,8 @@ void trace::internal::dutrac() {
 	auto& form = FormList->back();
 	form::frmclr(form);
 	form.vertexIndex = gsl::narrow<decltype(form.vertexIndex)>(FormVertices->size());
-	OutputIndex      = 0;
 	FormVertices->push_back(fPOINT {gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y});
-	OutputIndex++;
 	auto iNext           = 0;
 	auto traceLengthSum  = 0.0F;
 	auto landscapeOffset = 0.0F;
@@ -804,13 +801,12 @@ void trace::internal::dutrac() {
 		FormVertices->push_back(fPOINT {
 		    gsl::narrow_cast<float>(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
 		    gsl::narrow_cast<float>(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
-		OutputIndex++;
 		iCurrent--;
 		iNext          = iCurrent;
 		traceLengthSum = 0.0;
 	  }
 	}
-	form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(OutputIndex);
+	form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(FormVertices->size() - form.vertexIndex);
 	form.type        = FRMFPOLY;
 	form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));

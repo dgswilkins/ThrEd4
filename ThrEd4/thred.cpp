@@ -3534,7 +3534,6 @@ void thred::internal::ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& sti
                                     stitch.y * factor - PESstitchCenterOffset.y};
   pesStitch->x            = wrap::round<int16_t>(scaledStitch.x);
   pesStitch->y            = wrap::round<int16_t>(scaledStitch.y);
-  OutputIndex++;
 }
 
 void thred::internal::ritpesCode(std::vector<uint8_t>& buffer) {
@@ -3718,7 +3717,7 @@ void thred::internal::sav() {
   }
   auto* PCSFileHandle = CreateFile(
       AuxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
+#pragma warning(suppress : 26493)              // Don't use C-style casts (type.4)
   if (PCSFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*AuxName);
 	PCSFileHandle = nullptr;
@@ -3762,7 +3761,7 @@ void thred::internal::sav() {
 		PESstitchCenterOffset.y = wrap::midl(boundingRect.top, boundingRect.bottom);
 		pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0F / 3.0F));
 		pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0F / 3.0F));
-		OutputIndex    = 0U;
+		auto stitchCount    = 0U;
 		auto pesBuffer = std::vector<uint8_t> {};
 		// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
@@ -3775,59 +3774,69 @@ void thred::internal::sav() {
 		ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
+		++stitchCount;
 		ritpes(pesBuffer, saveStitches[0]);
+		++stitchCount;
 		ritpesCode(pesBuffer);
 		// then a normal stitch in place
 		ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
+		++stitchCount;
 		ritpes(pesBuffer, saveStitches[0]);
+		++stitchCount;
 		ritpesCode(pesBuffer);
 		// then a jump to the first location
 		ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
+		++stitchCount;
 		ritpes(pesBuffer, saveStitches[1]);
+		++stitchCount;
 		ritpesCode(pesBuffer);
 		// now stitch out.
 		auto pesThreadCount = 0U;
 		auto lastIndex      = pesBuffer.size();
 		ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 0});
 		blockIndex++;
-		OutputIndex = 0;
+		stitchCount = 0;
 		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 		  if (stitchColor == (StitchBuffer->operator[](iStitch).attribute & COLMSK)) {
 			// we are in the same color block, so write the stitch
 			ritpes(pesBuffer, saveStitches[iStitch]);
+			++stitchCount;
 		  }
 		  else {
 			// write stitch
 			ritpesCode(pesBuffer);
 			// close out the previous block
 			auto* blockHeader        = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-			blockHeader->stitchcount = OutputIndex;
+			blockHeader->stitchcount = stitchCount;
 			// save the thread/color information
 			pesThreadCount++;
 			stitchColor = StitchBuffer->operator[](iStitch).attribute & COLMSK;
 			threadList.push_back(PESCOLORLIST {blockIndex, PESequivColors[stitchColor]});
 			// then create the jump block
-			OutputIndex = 0;
+			stitchCount = 0;
 			ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 			blockIndex++;
 			ritpes(pesBuffer, saveStitches[iStitch - 1U]);
+			++stitchCount;
 			ritpes(pesBuffer, saveStitches[iStitch]);
+			++stitchCount;
 			ritpesCode(pesBuffer);
 			// and finally start the next block
-			OutputIndex = 0;
+			stitchCount = 0;
 			lastIndex   = pesBuffer.size();
 			ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 0});
 			blockIndex++;
 			ritpes(pesBuffer, saveStitches[iStitch]);
+			++stitchCount;
 		  }
 		}
 		// finalize the last stitch block
 		auto* blockHeader        = convert_ptr<PESSTCHLST*>(&pesBuffer[lastIndex]);
-		blockHeader->stitchcount = OutputIndex;
+		blockHeader->stitchcount = stitchCount;
 		// write the color/thread table
 		lastIndex = pesBuffer.size();
 		pesBuffer.resize(lastIndex + sizeof(uint16_t));
@@ -3860,8 +3869,8 @@ void thred::internal::sav() {
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto& label = pecHeader->label;
-		auto const pecLabel     = gsl::span<char>(label);
+		auto&      label     = pecHeader->label;
+		auto const pecLabel  = gsl::span<char>(label);
 		pecnam(pecLabel);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
@@ -7099,7 +7108,6 @@ void thred::internal::setknt() {
   auto iStitch = 0U;
   auto buffer = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
-  OutputIndex = 0;
   buffer.push_back(StitchBuffer->front());
   strtknt(buffer, 0);
   if (stlen(0) > KNOTLEN) {
@@ -7152,7 +7160,6 @@ void thred::internal::chkncol() {
   auto initialColor = StitchBuffer->front().attribute & COLMSK;
   auto buffer = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
-  OutputIndex = 0;
   StateMap.reset(StateFlag::FILDIR);
   auto iStitch = 0U;
   for (auto& stitch : *StitchBuffer) {
@@ -10761,11 +10768,9 @@ void thred::internal::set1knot() {
 	              std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(ClosestPointIndex + 1U)));
 	if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  StateMap.set(StateFlag::FILDIR);
-	  OutputIndex = ClosestPointIndex + 1U;
 	  endknt(buffer, ClosestPointIndex);
 	}
 	else {
-	  OutputIndex = ClosestPointIndex + 1U;
 	  strtknt(buffer, ClosestPointIndex);
 	}
 	buffer.insert(buffer.end(),
@@ -13830,9 +13835,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		form::ratsr();
 		SelectedFormList->clear();
 		SelectedFormList->reserve(ClipFormsCount);
-		for (OutputIndex = 0; OutputIndex < (ClipFormsCount); OutputIndex++) {
-		  form::fselrct(OutputIndex + formOffset);
-		  SelectedFormList->push_back(OutputIndex + formOffset);
+		for (auto index = 0U; index < (ClipFormsCount); index++) {
+		  form::fselrct(formOffset + index);
+		  SelectedFormList->push_back(formOffset + index);
 		}
 		SelectedFormsSize.x = gsl::narrow<float>(SelectedFormsRect.right - SelectedFormsRect.left);
 		SelectedFormsSize.y = gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);

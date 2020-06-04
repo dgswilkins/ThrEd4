@@ -144,7 +144,6 @@ HWND     OKButton;                            // ok button
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
 
 bool     OutLineEverySelectedForm = false; // When selecting multiple forms, should we outline every form?
-uint32_t OutputIndex;                      // output pointer for sequencing
 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points
