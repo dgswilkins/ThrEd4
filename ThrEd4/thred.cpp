@@ -3761,7 +3761,6 @@ void thred::internal::sav() {
 		PESstitchCenterOffset.y = wrap::midl(boundingRect.top, boundingRect.bottom);
 		pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0F / 3.0F));
 		pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0F / 3.0F));
-		auto stitchCount    = 0U;
 		auto pesBuffer = std::vector<uint8_t> {};
 		// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
@@ -3774,32 +3773,26 @@ void thred::internal::sav() {
 		ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
-		++stitchCount;
 		ritpes(pesBuffer, saveStitches[0]);
-		++stitchCount;
 		ritpesCode(pesBuffer);
 		// then a normal stitch in place
 		ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
-		++stitchCount;
 		ritpes(pesBuffer, saveStitches[0]);
-		++stitchCount;
 		ritpesCode(pesBuffer);
 		// then a jump to the first location
 		ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		blockIndex++;
 		ritpes(pesBuffer, saveStitches[0]);
-		++stitchCount;
 		ritpes(pesBuffer, saveStitches[1]);
-		++stitchCount;
 		ritpesCode(pesBuffer);
 		// now stitch out.
 		auto pesThreadCount = 0U;
 		auto lastIndex      = pesBuffer.size();
 		ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 0});
 		blockIndex++;
-		stitchCount = 0;
+		auto stitchCount = 0;
 		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
 		  if (stitchColor == (StitchBuffer->operator[](iStitch).attribute & COLMSK)) {
 			// we are in the same color block, so write the stitch
