@@ -387,7 +387,7 @@ namespace internal {
   void rstdu();
   void rthumnam(uint32_t iThumbnail);
   void sachk();
-  auto savePCS(void* PCSFileHandle, std::vector<fPOINTATTR>& saveStitches) -> bool;
+  auto savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool;
   void sav();
   void savAs();
   auto savcmp() noexcept -> bool;
@@ -489,7 +489,7 @@ namespace internal {
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
   void ritpesCode(std::vector<uint8_t>& buffer);
   void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
-  auto savePES(void* PCSFileHandle, std::vector<fPOINTATTR> const& saveStitches) -> bool;
+  auto savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
   void setpes();
   void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]);
 #endif
