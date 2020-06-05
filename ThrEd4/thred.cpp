@@ -3845,7 +3845,15 @@ void thred::internal::sav() {
 		}
 		pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
 		pesHeader.blct    = 1;
+		pesHeader.hnd1[0] = 0xff;
+		pesHeader.hnd1[1] = 0xff;
+		pesHeader.hnd1[2] = 0x00;
+		pesHeader.hnd1[3] = 0x00;
 		pesHeader.bcnt    = pesThreadCount;
+		pesHeader.hnd2[0] = 0xff;
+		pesHeader.hnd2[1] = 0xff;
+		pesHeader.hnd2[2] = 0x00;
+		pesHeader.hnd2[3] = 0x00;
 		pesHeader.hpsz    = 0;
 		GroupStartStitch  = 0;
 		GroupEndStitch    = gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size() - 1U);
@@ -3870,6 +3878,7 @@ void thred::internal::sav() {
 		std::fill(fstart, fend, ' ');
 		pecHeader->labnd       = 13; // 13 = carriage return
 		pecHeader->colorCount  = gsl::narrow<uint8_t>(pesThreadCount);
+		pecHeader->hnd1        = 0x00ff;
 		pecHeader->thumbHeight = ThumbHeight;
 		pecHeader->thumbWidth  = ThumbWidth / 8U;
 		pecdat(pecBuffer);

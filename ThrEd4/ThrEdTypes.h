@@ -2745,7 +2745,7 @@ class PESHED
   uint16_t hpsz    {0U};   //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
   uint16_t usdn    {0U};   //   e,f  Use existing design area (1)
   uint16_t blct    {0U};   // 10,11  CSewSeg segment block count (1)
-  char     hnd1[4] {0};    // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint8_t  hnd1[4] {0};    // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
   uint16_t celn    {0U};   // 16,17  Length of following string (7)
   char     ce[7]   {0};    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   int16_t  xlft    {0};    // 1f,20  Extent left
@@ -2769,7 +2769,7 @@ class PESHED
   int16_t  ysiz    {0};    // 4f,50  CSewSeg height
   int8_t   ukn2[8] {0};    // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
   uint16_t bcnt    {0U};   // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  int8_t   hnd2[4] {0};    // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint8_t  hnd2[4] {0};    // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
   uint16_t cslen   {0U};   // 5f,60  CSewSeg length (7)
   char     cs[7]   {0};    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
 // uint16_t styp1;        // 68,69  Stitch type (0)
