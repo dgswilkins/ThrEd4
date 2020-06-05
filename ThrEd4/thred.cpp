@@ -3409,23 +3409,22 @@ void thred::internal::thrsav() {
 	  }
 	}
   }
-  FileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+  auto fileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
   #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	displayText::crmsg(*ThrName);
-	FileHandle = nullptr;
   }
   else {
 	auto output = std::vector<char> {};
 	dubuf(output);
 	auto bytesWritten = DWORD {0};
-	WriteFile(FileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
+	WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
 	if (bytesWritten != output.size()) {
 	  auto fmtStr = std::wstring {};
 	  displayText::loadString(fmtStr, IDS_FWERR);
 	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 	}
-	CloseHandle(FileHandle);
+	CloseHandle(fileHandle);
   }
 }
 
