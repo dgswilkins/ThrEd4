@@ -5247,7 +5247,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 #endif
 		}
 		else {
-		  if (DST::readDSTFile(FileHandle, fileSize)) {
+		  if (!DST::readDSTFile(FileHandle, fileSize)) {
 			return;
 		  }
 		}

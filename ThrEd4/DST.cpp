@@ -863,9 +863,9 @@ auto DST::readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool {
   else {
 	displayText::tabmsg(IDS_DST2S);
 	CloseHandle(fileHandle);
-	return true;
+	return false;
   }
-  return false;
+  return true;
 }
 
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
