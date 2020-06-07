@@ -42,11 +42,11 @@ inline auto Utf8ToUtf16(std::string const& utf8) -> std::wstring {
 
   // handle the special case of empty input string
   if (utf8.empty()) {
-	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-    _ASSERTE(utf16.empty());
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	_ASSERTE(utf16.empty());
 	return utf16;
   }
-  #pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
+#pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
   utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.from_bytes(utf8);
 
   return utf16;
@@ -56,12 +56,12 @@ inline auto Utf16ToUtf8(std::wstring const& utf16) -> std::string {
   std::string utf8;
 
   if (utf16.empty()) {
-	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	_ASSERTE(utf8.empty());       
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	_ASSERTE(utf8.empty());
 	return utf8;
   }
 
-  #pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
+#pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
   utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.to_bytes(utf16);
 
   return utf8;

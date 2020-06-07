@@ -3004,7 +3004,7 @@ auto form::internal::clpnxt(std::vector<CLPSEG> const&  clipSegments,
 auto form::internal::nucseg(std::vector<CLPSEG> const&  clipSegments,
                             std::vector<LENINFO> const& sortedLengths,
                             uint32_t&                   currentSegmentIndex) -> bool {
-  auto index = 0U;
+  auto index    = 0U;
   auto outIndex = 0U;
   if (StateMap.test(StateFlag::FILDIR)) {
 	index = clipSegments[currentSegmentIndex].endIndex;
@@ -3745,8 +3745,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 	pathLength++;
 	auto maxPathLength = tempPath.size() - sequencePathIndex;
 	if (maxPathLength > 8U) { // tuneable value. Increasing this increases path discovery time exponentially
-	  maxPathLength = 8U; 
-	} 
+	  maxPathLength = 8U;
+	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength > maxPathLength) {
 	  auto* lineEndPoint = sortedLines[regionsList[doneRegion].start];
@@ -3801,9 +3801,10 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<uint32_t> const& mapIndexSequence,
                             uint32_t                     pathIndex) noexcept {
   if ((gsl::narrow_cast<size_t>(pathIndex) + 1U) < sequencePath.size()) {
-    const unsigned nextNode = sequencePath[gsl::narrow_cast<size_t>(pathIndex) + 1U].node;
-    unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
-	while (iPath < mapIndexSequence[gsl::narrow_cast<size_t>(sequencePath[pathIndex].node) + 1U] && pathMap[iPath].node != nextNode) {
+	const unsigned nextNode = sequencePath[gsl::narrow_cast<size_t>(pathIndex) + 1U].node;
+	unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
+	while (iPath < mapIndexSequence[gsl::narrow_cast<size_t>(sequencePath[pathIndex].node) + 1U] &&
+	       pathMap[iPath].node != nextNode) {
 	  iPath++;
 	}
 	if (iPath < pathMap.size()) {
@@ -3814,7 +3815,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 	}
   }
   else {
-	  sequencePath[pathIndex++].nextGroup = 0;
+	sequencePath[pathIndex++].nextGroup = 0;
   }
 }
 
@@ -7372,10 +7373,10 @@ void form::join() {
   // clang-format on
   StateMap.set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap.test(StateFlag::FORMSEL) && form::closfrm()) {
-    // clang-format off
+	// clang-format off
 	auto& form       = FormList->operator[](ClosestFormToCursor);
 	auto  vertexList = std::vector<fPOINT> {};
-    // clang-format on
+	// clang-format on
 	vertexList.reserve(form.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)) {
@@ -7394,7 +7395,8 @@ void form::join() {
 	else {
 	  ClosestFormToCursor = savedFormIndex;
 	}
-	auto& toForm       = FormList->operator[](ClosestFormToCursor);
+	auto& toForm = FormList->operator[](ClosestFormToCursor);
+
 	auto const insertionPoint = toForm.vertexIndex + toForm.vertexCount;
 	form::fltspac(toForm.vertexCount, wrap::toUnsigned(vertexList.size()));
 	auto dest = std::next(FormVertices->begin(), insertionPoint);

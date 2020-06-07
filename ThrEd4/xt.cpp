@@ -345,13 +345,13 @@ void xt::fthrfn(FRMHED& form) {
 	ind++;
   }
   feather.globalPosition = 0.0F;
-  feather.globalStep     = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * gsl::narrow_cast<float>(ind);
-  feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / ind;
-  feather.globalRatio    = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
-  feather.globalUp       = feather.globalPhase * feather.globalRatio;
-  feather.globalDown     = feather.globalPhase - feather.globalUp;
-  form.fillType          = FTHF;
-  feather.phase          = 1U;
+  feather.globalStep = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * gsl::narrow_cast<float>(ind);
+  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / ind;
+  feather.globalRatio = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
+  feather.globalUp    = feather.globalPhase * feather.globalRatio;
+  feather.globalDown  = feather.globalPhase - feather.globalUp;
+  form.fillType       = FTHF;
+  feather.phase       = 1U;
   BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
   BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -454,7 +454,7 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 		InsidePoints->operator[](iVertex) = vertexIt[iVertex];
 	  }
 	}
-	#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
+#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
 	return *InsidePoints;
   }
 
@@ -2359,7 +2359,7 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 	  break;
 	}
 	case WM_COMMAND: {
-	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -2452,7 +2452,7 @@ void xt::nudsiz() {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { 
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) {
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * 1.05F;

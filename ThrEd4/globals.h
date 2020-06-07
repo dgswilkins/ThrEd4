@@ -181,7 +181,7 @@ extern HWND     OKButton;
 
 extern std::vector<fPOINT>* OSequence;
 
-extern bool     OutLineEverySelectedForm;
+extern bool OutLineEverySelectedForm;
 
 extern std::vector<fPOINT>* OutsidePointList;
 extern std::vector<fPOINT>* OutsidePoints;

@@ -69,7 +69,6 @@ void trace::initColorRef() noexcept {
   InvertDownColor = 0x808080;
 }
 
-
 #pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
 void trace::internal::trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept {
   if (nullptr != window) {
@@ -809,7 +808,7 @@ void trace::internal::dutrac() {
 	}
 	form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(FormVertices->size() - form.vertexIndex);
 	form.type        = FRMFPOLY;
-	form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+	form.attribute = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form.satinGuideCount = 0;
 	StateMap.set(StateFlag::RESTCH);

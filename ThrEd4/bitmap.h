@@ -40,7 +40,7 @@ namespace internal {
   auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
   void movmap(uint32_t cnt, uint8_t* buffer);
   auto nuBit() noexcept -> COLORREF;
-  auto loadName(fs::path* fileName)->bool;
+  auto loadName(fs::path* fileName) -> bool;
   void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
   auto saveName(fs::path& fileName);
   auto stch2bit(fPOINT& point) -> POINT;

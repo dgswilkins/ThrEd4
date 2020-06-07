@@ -64,8 +64,8 @@ auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
 }
 
 void texture::txdun() {
-  auto signature = std::array<char,4>{"txh"};
-  auto       textureHistoryBuffer = std::vector<TXHSTBUF> {};
+  auto signature            = std::array<char, 4> {"txh"};
+  auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFLEN);
   if (!TextureHistory[0].texturePoints.empty()) {
 	wchar_t name[_MAX_PATH] = {0};
@@ -73,8 +73,8 @@ void texture::txdun() {
 	  auto  bytesWritten = DWORD {0};
 	  auto* handle =
 	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)	  
-	  if (handle != INVALID_HANDLE_VALUE) { 
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), signature.size(), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
@@ -133,10 +133,10 @@ void texture::redtx() {
   TextureHistoryIndex = ITXBUFLEN - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	auto* handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	if (handle != INVALID_HANDLE_VALUE) { 
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
-	  auto sig = std::array<char, 4>{0};
+	  auto sig       = std::array<char, 4> {0};
 	  if (ReadFile(handle, sig.data(), sig.size(), &bytesRead, nullptr) != 0) {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
@@ -466,7 +466,7 @@ void texture::drwtxtr() {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2U);
   }
-  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
   displayText::drwtxbut(TextureScreen);
 }

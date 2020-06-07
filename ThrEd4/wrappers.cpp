@@ -100,7 +100,7 @@ auto wrap::toFloat(uint32_t invar) noexcept -> float {
 }
 
 #pragma warning(suppress : 26497 26440) // since this is used in other translation units, "constexpr"
-									    // cannot be used as it implicitly defines the function as inline.
+                                        // cannot be used as it implicitly defines the function as inline.
 auto wrap::toUnsigned(size_t invar) -> uint32_t {
 #ifdef _WIN64
   return gsl::narrow<uint32_t>(invar);

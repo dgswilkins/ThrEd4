@@ -273,7 +273,7 @@ namespace internal {
   auto iselpnt() noexcept -> bool;
   auto isfclp() noexcept -> bool;
   void istch();
-  auto isthr(fs::path const&  thredPath) -> bool;
+  auto isthr(fs::path const& thredPath) -> bool;
   auto kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> uint32_t;
   void knotmen();
   void ladj();

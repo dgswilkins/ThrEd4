@@ -14,7 +14,7 @@ template <class T> struct has_enum_count {
   template <class U> static auto test(...) -> no;
 
   // SFINAE magic.
-  static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes); 
+  static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes);
 };
 
 template <typename EnumType> class EnumMap

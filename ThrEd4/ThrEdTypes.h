@@ -1474,7 +1474,7 @@ union FANGCLP {
   //~FANGCLP() = default;
 };
 
-inline FANGCLP::FANGCLP() noexcept { 
+inline FANGCLP::FANGCLP() noexcept {
   guide.start  = 0U;
   guide.finish = 0U;
 }
@@ -1513,7 +1513,7 @@ union FLENCNT {
   inline auto operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT&;
 };
 
-inline FLENCNT::FLENCNT() noexcept { 
+inline FLENCNT::FLENCNT() noexcept {
   clipCount = 0U;
 }
 
@@ -1573,7 +1573,7 @@ union SATINANGLE {
   inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
 };
 
-inline SATINANGLE::SATINANGLE() noexcept { 
+inline SATINANGLE::SATINANGLE() noexcept {
   angle = 0.0;
 }
 
