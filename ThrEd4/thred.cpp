@@ -10024,8 +10024,8 @@ void thred::internal::ritcur() noexcept {
 	cursorPosition.x -= (StitchWindowOrigin.x + iconInfo.xHotspot);
 	cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
 	// ToDo - replace with GetDIBits
-	uint8_t bitmapBits[64] = {};
-	GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
+	auto bitmapBits = std::array<uint8_t, 64>{};
+	GetBitmapBits(iconInfo.hbmMask, 256, bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < 32; iRow++) {
 		auto const mask          = byteSwap(bitmapBits[iRow]);

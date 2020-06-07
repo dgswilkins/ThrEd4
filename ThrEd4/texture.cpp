@@ -64,7 +64,7 @@ auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
 }
 
 void texture::txdun() {
-  char const signature[4]         = "txh";
+  auto signature = std::array<char,4>{"txh"};
   auto       textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFLEN);
   if (!TextureHistory[0].texturePoints.empty()) {
@@ -75,7 +75,7 @@ void texture::txdun() {
 	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)	  
 	  if (handle != INVALID_HANDLE_VALUE) { 
-		WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
+		WriteFile(handle, signature.data(), signature.size(), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
 		for (auto const& historyEntry : TextureHistory) {
@@ -136,9 +136,9 @@ void texture::redtx() {
 	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (handle != INVALID_HANDLE_VALUE) { 
 	  auto bytesRead = DWORD {0};
-	  char sig[4]    = {0};
-	  if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr) != 0) {
-		if (strcmp(static_cast<char*>(sig), "txh") == 0) {
+	  auto sig = std::array<char, 4>{0};
+	  if (ReadFile(handle, sig.data(), sig.size(), &bytesRead, nullptr) != 0) {
+		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
 			auto historyBytesRead = DWORD {0};
 			if (wrap::ReadFile(handle,
