@@ -454,7 +454,7 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 		InsidePoints->operator[](iVertex) = vertexIt[iVertex];
 	  }
 	}
-#pragma warning(suppress : 26487) // Don't return a pointer that may be invalid (lifetime.4).
+	#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
 	return *InsidePoints;
   }
 
@@ -2359,7 +2359,7 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -2451,8 +2451,8 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1) Don't use C-style casts (type.4)
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) { 
 	  flag = 0;
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * 1.05F;

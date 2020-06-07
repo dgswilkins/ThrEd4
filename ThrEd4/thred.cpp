@@ -494,7 +494,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 	  break;
 	}
 	case WM_COMMAND: {
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -520,8 +520,8 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 }
 
 void thred::internal::getdes() noexcept {
-#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1) Don't use C-style casts (type.4)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); 
 }
 
 auto thred::internal::isfclp() noexcept -> bool {
@@ -984,8 +984,8 @@ void thred::internal::redfils() {
 	  }
 	  else {
 		auto* fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
-		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-		if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+		if (fileHandle == INVALID_HANDLE_VALUE) { 
 		  previousNames[iLRU].clear();
 		}
 		else {
@@ -2953,7 +2953,7 @@ void thred::internal::getDocsFolder(fs::path* directory) {
   if (directory != nullptr) {
 	auto*      ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
 	auto const hr       = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
-	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr)) {
 	  directory->assign(ppszPath); // make a local copy of the path
 	}
@@ -3036,8 +3036,8 @@ void thred::internal::ritini() {
   }
   IniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (IniFileHandle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (IniFileHandle != INVALID_HANDLE_VALUE) { 
 	WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &BytesRead, nullptr);
   }
   CloseHandle(IniFileHandle);
@@ -3066,8 +3066,8 @@ void thred::internal::redbal() {
   FormList->clear();
   auto* balaradFile =
       CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (balaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (balaradFile != INVALID_HANDLE_VALUE) { 
 	auto bytesRead = DWORD {0U};
 	ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 	if (bytesRead == sizeof(balaradHeader)) {
@@ -3128,8 +3128,8 @@ void thred::internal::ritbal() {
 	outputName.replace_extension(L".thv");
 	auto* balaradFile =
 	    CreateFile(outputName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	if (balaradFile == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (balaradFile == INVALID_HANDLE_VALUE) { 
 	  return;
 	}
 	auto color             = StitchBuffer->front().attribute & COLMSK;
@@ -3384,8 +3384,8 @@ void thred::internal::thrsav() {
   if (!StateMap.testAndReset(StateFlag::IGNAM)) {
 	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	auto* file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
-	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	if (file != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (file != INVALID_HANDLE_VALUE) { 
 	  StateMap.reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
 		version.clear();
@@ -3410,8 +3410,8 @@ void thred::internal::thrsav() {
 	}
   }
   auto* fileHandle = CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (fileHandle == INVALID_HANDLE_VALUE) { 
 	displayText::crmsg(*ThrName);
   }
   else {
@@ -3512,7 +3512,7 @@ auto thred::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 #if PESACT
 
 auto thred::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color = PECCOLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
   auto translatedColor = PESThread[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
@@ -3556,13 +3556,15 @@ void thred::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBl
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void thred::internal::pecnam(gsl::span<char> label) {
-  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
+  // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+  strncpy(label.data(), "LA:", 3); 
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
-  strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
+  // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+  strncpy(&label[3], fileStem.c_str(), lblSize); 
 }
 #pragma warning(pop)
 
@@ -3652,7 +3654,7 @@ void thred::internal::writeThumbnail(std::vector<uint8_t>& buffer,
 
 void thred::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   uint8_t thumbnail[ThumbHeight][ThumbWidth] = {};
-  #pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
+  #pragma warning(suppress : 26485) // bounds.3 No array to pointer decay
   uint8_t const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
 
   auto const yFactor = 31.0F / IniFile.hoopSizeY;
@@ -3695,8 +3697,8 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
   if (nullptr != auxName) {
 	auto* fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493)             // Don't use C-style casts (type.4)
-	if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (fileHandle == INVALID_HANDLE_VALUE) { 
 	  displayText::crmsg(*auxName);
 	  flag = false;
 	}
@@ -3823,19 +3825,22 @@ auto thred::internal::savePES(fs::path const* auxName, std::vector<fPOINTATTR> c
   if (nullptr != auxName) {
 	auto* fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-#pragma warning(suppress : 26493)             // Don't use C-style casts (type.4)
-	if (fileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (fileHandle == INVALID_HANDLE_VALUE) { 
 	  displayText::crmsg(*auxName);
 	  flag = false;
 	}
 	else {
 	  do {
 		auto pesHeader = PESHED {};
-		strncpy(static_cast<char*>(pesHeader.led), "#PES0001", sizeof(pesHeader.led)); // NOLINT(clang-diagnostic-deprecated-declarations)
+		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+		strncpy(static_cast<char*>(pesHeader.led), "#PES0001", sizeof(pesHeader.led)); 
 		pesHeader.celn = 7U;
-		strncpy(static_cast<char*>(pesHeader.ce), "CEmbOne", sizeof(pesHeader.ce)); // NOLINT(clang-diagnostic-deprecated-declarations)
+		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+		strncpy(static_cast<char*>(pesHeader.ce), "CEmbOne", sizeof(pesHeader.ce)); 
 		pesHeader.cslen = 7U;
-		strncpy(static_cast<char*>(pesHeader.cs), "CSewSeg", sizeof(pesHeader.cs)); // NOLINT(clang-diagnostic-deprecated-declarations)
+		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
+		strncpy(static_cast<char*>(pesHeader.cs), "CSewSeg", sizeof(pesHeader.cs)); 
 		auto iColor = 0;
 		for (auto const color : UserColor) {
 		  auto           matchIndex  = 0U;
@@ -4065,20 +4070,19 @@ void thred::internal::auxmen() {
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }
-#pragma warning(suppress : 26492) // Don't use const_cast to cast away const or volatile (type.3)
-  filinfo.dwTypeData = const_cast<LPTSTR>(auxMsg.c_str()); // NOLINT(cppcoreguidelines-pro-type-const-cast)
+#pragma warning(suppress : 26492) // type.3 Don't use const_cast to cast away const or volatile NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
+  filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str()); 
   SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
   StateMap.set(StateFlag::DUMEN);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26493)     // Don't use C-style casts (type.4)
 auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> bool {
   if (nullptr != fileName) {
 	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
 	auto hr = CoCreateInstance(
-	  CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+	  CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise) 
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 #if PESACT
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
@@ -4093,14 +4097,18 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 	  auto bmpName = utf::Utf8ToUtf16(static_cast<char*>(PCSBMPFileName));
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
 	  hr += pFileSave->SetDefaultExtension(L"thr");
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		hr = pFileSave->Show(nullptr);
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr)) {
 		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 		  hr = pFileSave->GetResult(&pItem);
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
 			auto reply = 0U;
 			hr = pFileSave->GetFileTypeIndex(&reply);
+			#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hr)) {
 			  switch (reply) {
 				case 1:
@@ -4133,6 +4141,7 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 			  }
 			  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
 			  hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hr)) {
 				fileName->assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);
@@ -4146,7 +4155,6 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
   }
   return false;
 }
-#pragma warning(pop)
 
 void thred::internal::savAs() {
   if (!StitchBuffer->empty() || !FormList->empty() || (PCSBMPFileName[0] != 0)) {
@@ -4618,7 +4626,7 @@ void thred::internal::prtred() {
 auto thred::internal::dupcol(uint32_t activeColor) -> uint32_t {
   constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
   auto const     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   for (auto iColor = 0U; iColor < activeColor; iColor++) {
 	if (UserColor[iColor] == color) {
@@ -4668,16 +4676,16 @@ void thred::internal::rstdu() {
   StateMap.set(StateFlag::DUMEN);
 }
 
-#pragma warning(push)
-#pragma warning(disable : 26493) // Don't use C-style casts (type.4)
 auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hr = CoCreateInstance(
-      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise) 
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
 	auto dwOptions = DWORD {};
 	hr             = pFileOpen->GetOptions(&dwOptions);
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr)) {
 	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
 #if PESACT
@@ -4730,14 +4738,18 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 		  psiFrom->Release();
 		}
 #endif
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		hr = pFileOpen->Show(nullptr);
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr)) {
 		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 		  hr          = pFileOpen->GetResult(&pItem);
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr) && (nullptr != pItem)) {
 			auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
 			hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hr)) {
 			  newFileName.assign(pszFilePath);
 			  CoTaskMemFree(pszFilePath);
@@ -4750,7 +4762,6 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
   }
   return false;
 }
-#pragma warning(pop)
 
 void thred::internal::nuFil(fileIndices fileIndex) {
   auto newFileName = *WorkingFileName;
@@ -4771,8 +4782,8 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	// ToDo - use ifstream?
 	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
 	FileHandle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (FileHandle == INVALID_HANDLE_VALUE) { 
 	  if (GetLastError() == 32U) {
 		displayText::filnopn(IDS_FNOPNA, newFileName);
 	  }
@@ -5164,7 +5175,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 			  if (PEScolors[iColor] < threadCount) {
 				if (!colorMap.test_set(PEScolors[iColor])) {
 				  auto const threadColor = PESThread[PEScolors[iColor]];
-				  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+				  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 				  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 				  UserColor[activeColor++] = color;
 				  if (activeColor >= 16U) {
@@ -5173,7 +5184,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 				}
 			  }
 			  else {
-				#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+				#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 				auto const color = RGB(PESThread[0].color.r,
 				                       PESThread[0].color.g,
 				                       PESThread[0].color.b); // color unknown
@@ -7686,7 +7697,7 @@ void thred::redclp() {
   auto const codedLayer = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
-#pragma warning(suppress : 26429) // Symbol is never tested for nullness, it can be marked as not_null (f.23).
+#pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
 	auto* const clipStitchPtr  = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
 	auto const  clipSize       = clipStitchPtr[0].led;
 	auto const  clipStitchData = gsl::span<CLPSTCH>(clipStitchPtr, clipSize);
@@ -7828,8 +7839,8 @@ void thred::internal::insfil(fs::path& insertedFile) {
   }
   InsertedFileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (InsertedFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (InsertedFileHandle == INVALID_HANDLE_VALUE) { 
 	displayText::filnopn(IDS_FNOPN, insertedFile);
 	FileHandle = nullptr;
 	CloseHandle(InsertedFileHandle);
@@ -9280,8 +9291,8 @@ void thred::internal::thumnail() {
   fs::current_path(*DefaultDirectory);
   *SearchName = *DefaultDirectory / L"*.thr";
   auto* file  = FindFirstFile(SearchName->wstring().c_str(), &fileData);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (file == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (file == INVALID_HANDLE_VALUE) { 
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
 	displayText::loadString(fmtStr, IDS_FFINDERR);
@@ -10014,7 +10025,6 @@ void thred::internal::ritcur() noexcept {
 	cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
 	// ToDo - replace with GetDIBits
 	uint8_t bitmapBits[64] = {};
-	#pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
 	GetBitmapBits(iconInfo.hbmMask, 256, &bitmapBits);
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < 32; iRow++) {
@@ -10283,14 +10293,14 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 	for (auto iFile = 0U; iFile < fileIndex; iFile++) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
 		            LB_ADDSTRING,
 		            0,
 		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  }
 	  else {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
 		            LB_ADDSTRING,
 		            0,
@@ -10306,13 +10316,13 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
-#pragma warning(suppress : 26490)                     // Don't use reinterpret_cast (type.1)
-	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+	  fileInfo = reinterpret_cast<FINDINFO*>(lparam); 
 	  if (fileInfo != nullptr) {
 		auto  searchName   = *DefaultDirectory / L"*.thr";
 		auto* searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
-		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-		if (searchResult == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+		if (searchResult == INVALID_HANDLE_VALUE) { 
 		  auto fmtStr = std::wstring {};
 		  displayText::loadString(fmtStr, IDS_NOTHRFIL);
 		  displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
@@ -10329,10 +10339,10 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  break;
 	}
 	case WM_COMMAND: {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER)); 
 	  if (fileInfo != nullptr) {
-		#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
 			EndDialog(hwndlg, wparam);
@@ -10417,10 +10427,10 @@ void thred::internal::lock() {
   auto lockInfo  = FINDINFO {};
   lockInfo.count = 0;
   // ToDo - Replace 512 with maximum files in subdirectory
-  lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT(cppcoreguidelines-owning-memory)
-  DialogBoxParam(
-      ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
-  delete[] lockInfo.data; // NOLINT(cppcoreguidelines-owning-memory)
+  lockInfo.data = new WIN32_FIND_DATA[512];  // NOLINT(cppcoreguidelines-owning-memory)
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo)); 
+  delete[] lockInfo.data;  // NOLINT(cppcoreguidelines-owning-memory)
 }
 
 void thred::internal::delstch() {
@@ -11060,7 +11070,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  auto featherStyle = std::wstring {};
 	  for (auto iFeatherStyle = 0U; iFeatherStyle < 6U; iFeatherStyle++) {
 		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
 		            CB_ADDSTRING,
 		            0,
@@ -11092,7 +11102,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  break;
 	}
 	case WM_COMMAND: {
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -11145,8 +11155,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
-#pragma warning(suppress : 26490 26493) // Don't use reinterpret_cast (type.1)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); 
 }
 
 auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
@@ -13213,8 +13223,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ThrName->replace_extension(thrExt);
 	  FileHandle = CreateFile(
 	      ThrName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	  if (FileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	  if (FileHandle == INVALID_HANDLE_VALUE) { 
 		FileHandle = nullptr;
 	  }
 	  return true;
@@ -16605,7 +16615,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  iVersion++;
 		}
 	  }
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  auto const wParameter = LOWORD(Msg.wParam);
 	  if (wParameter > 40000U && wParameter < 40300U) {
 		thred::undat();
@@ -16689,15 +16699,15 @@ void thred::internal::ritloc() {
   auto       lockFilePath = fs::path {};
   auto*      ppszPath = gsl::narrow_cast<PWSTR>(nullptr); // variable to receive the path memory block pointer.
   auto const hr = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr)) {
 	lockFilePath.assign(ppszPath); // make a local copy of the path
 	lockFilePath /= L"ThrEd";
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
 	auto* lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	if (lockFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (lockFile != INVALID_HANDLE_VALUE) { 
 	  auto bytesWritten = DWORD {0};
 	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
 	  wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
@@ -16711,13 +16721,13 @@ void thred::internal::ritloc() {
 #pragma warning(push)
 #pragma warning(disable : 26493)     // Don't use C-style casts (type.4)
 void thred::internal::crtcurs() noexcept {
-  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  FormCursor            = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Form));      // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  DLineCursor           = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_DLIN));      // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleUpCursor        = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_Upright));   // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
   NeedleRightDownCursor = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleRightUpCursor   = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_RightUp));   // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleLeftDownCursor  = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftDown));  // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  NeedleLeftUpCursor    = LoadCursor(ThrEdInstance, MAKEINTRESOURCE(IDC_LeftUp));    // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 }
 #pragma warning(pop)
 
@@ -16733,8 +16743,8 @@ void thred::internal::ducmd() {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  BalaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-	  if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	  if (BalaradFile != INVALID_HANDLE_VALUE) { 
 		CloseHandle(BalaradFile);
 		*BalaradName0 = balaradFileName;
 		if (ArgCount > 2) {
@@ -16743,15 +16753,17 @@ void thred::internal::ducmd() {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
 			BalaradFile     = CreateFile(
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-			#pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-			if (BalaradFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-			  char readBuffer[_MAX_PATH + 1] = {0};
+			#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+			if (BalaradFile != INVALID_HANDLE_VALUE) { 
+			  auto readBuffer = std::vector<char> {};
+			  readBuffer.resize(_MAX_PATH + 1);
 			  *BalaradName1                  = balaradFileName;
 			  auto bytesRead                 = DWORD {0};
-			  #pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
-			  ReadFile(BalaradFile, &readBuffer, (_MAX_PATH + 1), &bytesRead, nullptr);
+			  
+			  ReadFile(BalaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
-				BalaradName2->assign(readBuffer);
+				readBuffer.resize(bytesRead);
+				BalaradName2->assign(readBuffer.data());
 				redbal();
 			  }
 			  CloseHandle(BalaradFile);
@@ -16790,8 +16802,8 @@ void thred::internal::redini() {
   *IniFileName /= L"thred.ini";
   IniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (IniFileHandle == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (IniFileHandle == INVALID_HANDLE_VALUE) { 
 	setPrefs();
   }
   else {
@@ -17036,8 +17048,8 @@ void thred::internal::init() {
   auto       blank           = std::wstring {};
   ReleaseDC(nullptr, deviceContext);
   TexturePointsBuffer->clear();
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1)); 
   MainMenu   = GetMenu(ThrEdWindow);
   auto wRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(ThrEdWindow, &wRect);
@@ -17061,10 +17073,10 @@ void thred::internal::init() {
   ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
   qchk();
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  ArrowCursor = LoadCursor(nullptr, IDC_ARROW); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  CrossCursor = LoadCursor(nullptr, IDC_CROSS); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  ArrowCursor = LoadCursor(nullptr, IDC_ARROW); 
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  CrossCursor = LoadCursor(nullptr, IDC_CROSS); 
   crtcurs();
   redfils();
   StateMap.reset(); // clear the bitmap
@@ -17797,8 +17809,8 @@ void thred::internal::dubar() {
 
 void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
   auto* thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
-  if (thrEdFile != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (thrEdFile != INVALID_HANDLE_VALUE) { 
 	auto stitchHeader = STRHED {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &BytesRead, nullptr);
 	if (BytesRead == sizeof(stitchHeader)) {
@@ -18009,7 +18021,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_HSCROLL: {
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
 		case SB_LINELEFT: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
@@ -18079,9 +18091,9 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-			  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) { 
+			  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 			  auto const position = HIWORD(wParam);
 			  MovieTimeStep       = MAXDELAY - position;
 			  setsped();
@@ -18089,10 +18101,10 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			}
 		  }
 		  else {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+			if (reinterpret_cast<HWND>(lParam) == HorizontalScrollBar) { 
 			  auto const zoomWidth = ZoomRect.right - ZoomRect.left;
-			  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+			  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 			  ZoomRect.left  = gsl::narrow<int32_t>(HIWORD(wParam));
 			  ZoomRect.right = ZoomRect.left + zoomWidth;
 			  if (ZoomRect.right > UnzoomedRect.x) {
@@ -18108,7 +18120,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_VSCROLL: {
-	  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wParam)) {
 		case SB_LINEDOWN: {
 		  auto scrollPoint = POINT {0L, 0L};
@@ -18138,7 +18150,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
-		  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4) NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  ZoomRect.top = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
@@ -18153,8 +18165,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	}
 	case WM_DRAWITEM: {
 // owner draw windows
-#pragma warning(suppress : 26490)                            // Don't use reinterpret_cast (type.1)
-	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam); 
 	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap.test(StateFlag::TXTRED)) {
 		  texture::drwtxtr();
@@ -18190,7 +18202,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			  }
 			}
 		  }
-		  #pragma warning(suppress : 26493)     // Don't use C-style casts (type.4)
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  BitBlt(StitchWindowDC,                // handle to destination DC
 		         0,                             // x-coord of destination upper-left corner
 		         0,                             // y-coord of destination upper-left corner
@@ -18456,7 +18468,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
                        _In_opt_ HINSTANCE hPrevInstance,
                        _In_ LPTSTR        lpCmdLine,
-                       _In_ int32_t       nShowCmd) // NOLINT(readability-non-const-parameter)
+                       _In_ int32_t       nShowCmd) 
     -> int32_t {
   // to keep the compiler from complaining
   UNREFERENCED_PARAMETER(hPrevInstance);
@@ -18483,17 +18495,20 @@ auto APIENTRY wWinMain(_In_ HINSTANCE     hInstance,
 	wc.cbClsExtra  = 0;
 	wc.cbWndExtra  = 0;
 	wc.hInstance   = ThrEdInstance;
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts
 	wc.hIcon       = gsl::narrow_cast<HICON>(
         LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
 	wc.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
 	                      //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	wc.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
-	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	wc.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1); 
 	wc.lpszClassName = L"thred";
 	wc.hIconSm       = nullptr;
 
 #if HIGHDPI
-	auto* previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	auto* previousDpiContext = SetThreadDpiAwarenessContext(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE);
 #endif
 
 	if (RegisterClassEx(&wc)) {

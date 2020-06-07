@@ -66,9 +66,9 @@ auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	auto* bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
 	if (*ppvBits != nullptr) {
 	  return bitmap;
 	}
@@ -83,7 +83,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   auto const InverseBackgroundColor = fswap(backgroundColor);
   auto*      hBitmapFile =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-  if (hBitmapFile == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (hBitmapFile == INVALID_HANDLE_VALUE) { 
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_UNOPEN);
 	displayText::shoMsg(fmt::format(fmtStr, UserBMPFileName->wstring()));
@@ -159,6 +160,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
 		SelectObject(BitmapDC, hBitmapFile);
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
 		DeleteObject(bitmap);
 		DeleteObject(deviceContext);
@@ -273,9 +275,10 @@ void bitmap::resetBmpFile(bool reset) noexcept {
 
 auto bitmap::internal::saveName(fs::path& fileName) {
   auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
   auto hr = CoCreateInstance(
-	CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+	CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise) 
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 	COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
 	auto constexpr aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
@@ -285,14 +288,18 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 	auto bmpName = utf::Utf8ToUtf16(static_cast<char*>(PCSBMPFileName));
 	hr += pFileSave->SetFileName(bmpName.c_str());
 	hr += pFileSave->SetDefaultExtension(L"bmp");
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr)) {
 	  hr = pFileSave->Show(nullptr);
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 		hr = pFileSave->GetResult(&pItem);
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr) && (nullptr != pItem)) {
 		  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
 		  hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
 			  fileName.assign(pszFilePath);
 			  CoTaskMemFree(pszFilePath);
@@ -318,19 +325,20 @@ void bitmap::savmap() {
 	auto fileName = fs::path {};
 	if (bi::saveName(fileName)) {
 	  auto* hBitmap = CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-			  if (hBitmap == INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-				displayText::crmsg(*UserBMPFileName);
-				return;
-			  }
-			  auto bytesWritten = DWORD {0};
-			  WriteFile(hBitmap, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
-			  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
-			  auto buffer = std::vector<uint8_t> {};
-			  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
-			  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
-			  WriteFile(hBitmap, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
-			  CloseHandle(hBitmap);
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	  if (hBitmap == INVALID_HANDLE_VALUE) {
+		displayText::crmsg(*UserBMPFileName);
+		return;
 	  }
+	  auto bytesWritten = DWORD {0};
+	  WriteFile(hBitmap, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
+	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
+	  auto buffer = std::vector<uint8_t> {};
+	  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
+	  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
+	  WriteFile(hBitmap, buffer.data(), BitmapWidth * BitmapHeight * 3, &bytesWritten, nullptr);
+	  CloseHandle(hBitmap);
+	}
   }
   else {
 	displayText::tabmsg(IDS_SHOMAP);
@@ -352,16 +360,19 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
 auto bitmap::internal::loadName(fs::path* fileName)-> bool {
   if (nullptr != fileName) {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
 	auto hr = CoCreateInstance(
-	  CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(hicpp-signed-bitwise, cppcoreguidelines-pro-type-reinterpret-cast)
+	  CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise) 
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
 	  auto dwOptions = DWORD {};
 	  hr = pFileOpen->GetOptions(&dwOptions);
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
 		auto constexpr aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); 
 		hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 		hr += pFileOpen->SetTitle(L"Open Thred File");
 #if 0
@@ -373,14 +384,18 @@ auto bitmap::internal::loadName(fs::path* fileName)-> bool {
 		  psiFrom->Release();
 		}
 #endif
+		#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr)) {
 		  hr = pFileOpen->Show(nullptr);
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
 			auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 			hr = pFileOpen->GetResult(&pItem);
+			#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hr) && (nullptr != pItem)) {
 			  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
 			  hr = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hr)) {
 				fileName->assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);
@@ -499,6 +514,7 @@ void bitmap::drawBmpBackground() {
 	deviceContext = TraceDC;
   }
   if (bi::bitar()) {
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	StretchBlt(StitchWindowMemDC,
 	           BitmapDstRect.left,
 	           BitmapDstRect.top,
@@ -569,11 +585,13 @@ auto bitmap::getrmap() -> uint32_t {
   auto bitmapSize = 0U;
   if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
 	SelectObject(TraceDC, TraceBitmap);
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 	StateMap.set(StateFlag::WASTRAC);
 	bitmapSize = (BitmapWidth + 1U) * (BitmapHeight + 1U);
 	TracedMap->resize(bitmapSize);
 	TracedMap->reset();
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	StretchBlt(StitchWindowMemDC,
 	           BitmapDstRect.left,
 	           BitmapDstRect.top,
@@ -590,6 +608,7 @@ auto bitmap::getrmap() -> uint32_t {
 }
 
 void bitmap::bitbltBitmap() noexcept {
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 }
 

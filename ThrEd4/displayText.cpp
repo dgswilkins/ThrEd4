@@ -66,7 +66,7 @@ auto LoadStringSpan = gsl::span(LoadStringList);
 void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   auto* pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
   sDest.clear();
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1) NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
 	auto const span = gsl::span<wchar_t>(pBuf, len);
 	sDest.insert(sDest.end(), span.begin(), span.end());
@@ -424,14 +424,14 @@ void displayText::savdisc() {
 }
 
 auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
 }
 
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = displayText::getThrEdFont(400);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1) NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
 
@@ -497,9 +497,8 @@ auto displayText::getThrEdFont(int32_t weight) noexcept -> HFONT {
 #endif
 }
 
-#pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
+#pragma warning(suppress : 26461) // con.3 The pointer argument can be marked as a pointer to const
 void displayText::setWindowFont(HWND hWnd, HFONT hFont) noexcept {
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
-  // NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   SendMessage(hWnd, WM_SETFONT, reinterpret_cast<WPARAM>(hFont), MAKELPARAM(TRUE, 0));
 }

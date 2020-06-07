@@ -73,9 +73,8 @@ void texture::txdun() {
 	  auto  bytesWritten = DWORD {0};
 	  auto* handle =
 	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	  #pragma warning(suppress : 26493) // Don't use C-style casts (type.4)
-	  if (handle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
-		#pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)	  
+	  if (handle != INVALID_HANDLE_VALUE) { 
 		WriteFile(handle, &signature, sizeof(signature), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
@@ -134,11 +133,10 @@ void texture::redtx() {
   TextureHistoryIndex = ITXBUFLEN - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	auto* handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-	#pragma warning(suppress : 26493) // Don't use C-style casts (type.4)
-	if (handle != INVALID_HANDLE_VALUE) { // NOLINT(cppcoreguidelines-pro-type-cstyle-cast)
+	#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+	if (handle != INVALID_HANDLE_VALUE) { 
 	  auto bytesRead = DWORD {0};
 	  char sig[4]    = {0};
-	  #pragma warning(suppress : 26485) // No array to pointer decay (bounds.3)
 	  if (ReadFile(handle, &sig, sizeof(sig), &bytesRead, nullptr) != 0) {
 		if (strcmp(static_cast<char*>(sig), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
@@ -468,7 +466,7 @@ void texture::drwtxtr() {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2U);
   }
-  #pragma warning(suppress : 26493) // Don't use C-style casts (type.4)
+  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   BitBlt(StitchWindowDC, 0, 0, StitchWindowClientRect.right, StitchWindowClientRect.bottom, StitchWindowMemDC, 0, 0, SRCCOPY);
   displayText::drwtxbut(TextureScreen);
 }

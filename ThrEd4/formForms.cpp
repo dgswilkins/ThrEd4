@@ -670,11 +670,11 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   auto daisyType = std::wstring {};
   for (auto const DaisyTypeString : DaisyTypeStrings) {
 	displayText::loadString(daisyType, DaisyTypeString);
-#pragma warning(suppress : 26490) // Don't use reinterpret_cast (type.1)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast 
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
 	            CB_ADDSTRING,
 	            0,
-	            reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	            reinterpret_cast<LPARAM>(daisyType.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast) 
   }
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -688,7 +688,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -753,7 +753,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  break;
 		}
 		default: {
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in dasyproc\n", LOWORD(wparam));
 		  break;
 		}
@@ -769,8 +769,8 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 
 void formForms::dasyfrm() {
   thred::unmsg();
-#pragma warning(suppress : 26490)
-  if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) { 
 	StateMap.reset(StateFlag::FORMIN);
 	return;
   }
@@ -953,7 +953,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -989,7 +989,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  break;
 		}
 		default: {
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in tearprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1005,7 +1005,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
   thred::unmsg();
-#pragma warning(suppress : 26490) // NOLINTNEXTLINE
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
   auto const nResult = DialogBox(
       ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));
   if (nResult > 0) {
@@ -1090,7 +1090,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 	  break;
 	}
 	case WM_COMMAND: {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wparam)) {
 		case IDCANCEL: {
 		  EndDialog(hwndlg, 0);
@@ -1129,7 +1129,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  break;
 		}
 		default: {
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		  outDebugString(L"wparam [{}] not handled in wavprc\n", LOWORD(wparam));
 		  break;
 		}
@@ -1145,8 +1145,8 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
-#pragma warning(suppress : 26490)
-  if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
+  if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) { 
 	thred::savdo();
 	auto points = std::vector<fPOINT> {};
 	points.reserve(IniFile.wavePoints);

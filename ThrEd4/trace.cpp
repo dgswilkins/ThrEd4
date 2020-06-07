@@ -69,9 +69,10 @@ void trace::initColorRef() noexcept {
   InvertDownColor = 0x808080;
 }
 
-#pragma warning(suppress : 26487) // Don't return a pointer '(*window)' that may be invalid (lifetime.4)
+
+#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
 void trace::internal::trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept {
-  if (window != nullptr) {
+  if (nullptr != window) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	*window = CreateWindow(L"STATIC",
 	                       L"",
