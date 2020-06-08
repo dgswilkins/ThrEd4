@@ -1269,8 +1269,7 @@ void form::chkseq(bool border) {
 	}
   }
   else {
-	// this variadic macro causes cpp checker to see a syntax error
-	outDebugString(L"OSequence empty!\n");
+	outDebugString(L"chkseq: OSequence empty! border [{}]\n",border);
   }
   if (minimumStitchLength == 0.0F) {
 	return;
@@ -5418,8 +5417,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  }
 	}
 	else {
-	  // this variadic macro causes cpp checker to see a syntax error
-	  outDebugString(L"Form Has no vertices!\n");
+	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]",inOutFlag);
 	}
   }
   return minimumLength != 1e99;
@@ -6100,11 +6098,10 @@ void form::setexpand(float xyRatio) {
   auto  stitchPoint = fPOINT {};
   auto& form        = FormList->operator[](ClosestFormToCursor);
   if (!SelectedFormList->empty() || StateMap.test(StateFlag::BIGBOX) || StateMap.test(StateFlag::FPSEL)) {
-	// cppcheck-suppress redundantInitialization
-	rectangle = fRECTANGLE {gsl::narrow_cast<float>(SelectedFormsRect.left),
-	                        gsl::narrow_cast<float>(SelectedFormsRect.top),
-	                        gsl::narrow_cast<float>(SelectedFormsRect.right),
-	                        gsl::narrow_cast<float>(SelectedFormsRect.bottom)};
+	rectangle.left   = gsl::narrow_cast<float>(SelectedFormsRect.left);
+	rectangle.top    = gsl::narrow_cast<float>(SelectedFormsRect.top);
+	rectangle.right  = gsl::narrow_cast<float>(SelectedFormsRect.right);
+	rectangle.bottom = gsl::narrow_cast<float>(SelectedFormsRect.bottom);
 
 	stitchPoint.x = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowOrigin.x);
 	stitchPoint.y = gsl::narrow_cast<float>(Msg.pt.y - StitchWindowOrigin.y);
