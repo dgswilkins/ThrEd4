@@ -56,6 +56,8 @@ auto duthrsh(double threshold) noexcept -> uint32_t;
 void duzrat() noexcept;
 void frmdel();
 void frmrct(fRECTANGLE& rectangle) noexcept;
+auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle) -> bool;
+auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
 void grpAdj();
 void hidbit();
 auto inStitchWin() noexcept -> bool;
@@ -309,6 +311,7 @@ namespace internal {
   auto nuBak() noexcept -> COLORREF;
   auto nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH;
   auto nuCol(COLORREF init) noexcept -> COLORREF;
+  void resetState();
   void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
@@ -347,6 +350,9 @@ namespace internal {
   void qchk();
   void qcode();
   void rSelbox();
+  auto readPCSFile(std::filesystem::path const& newFileName) -> bool;
+  auto readPESFile(std::filesystem::path const& newFileName) -> bool;
+  auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
   void rebak();
   void rebox();
   void redbak();

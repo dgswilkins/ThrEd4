@@ -4758,538 +4758,566 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
   return false;
 }
 
+auto thred::getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool {
+  auto ec = std::error_code {};
+  size    = fs::file_size(newFileName, ec);
+  if (ec != std::error_code {}) {
+	// ToDo - find better error message
+	displayText::filnopn(IDS_FNOPN, newFileName);
+	return false;
+  }
+  return true;
+}
+
+#if PESACT
+auto thred::internal::readPESFile(std::filesystem::path const& newFileName) -> bool {
+  auto fileSize = uintmax_t {0};
+  if (!getFileSize(newFileName, fileSize)) {
+	return false;
+  }
+  auto fileHandle = HANDLE {0};
+  if (!thred::getFileHandle(newFileName,fileHandle)) {
+	return false;
+  }
+  auto  fileBuf    = std::vector<uint8_t>(fileSize);
+  auto* fileBuffer = fileBuf.data();
+  ReadFile(fileHandle, fileBuffer, fileSize, &BytesRead, nullptr);
+  auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
+  if (strncmp(static_cast<char*>(pesHeader->led), "#PES00", 6) != 0) {
+	auto fmtStr = std::wstring {};
+	displayText::loadString(fmtStr, IDS_NOTPES);
+	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	return false;
+  }
+  auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
+  // auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
+  auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+  PESstitch                  = &fileBuffer[pecOffset];
+  auto const pesColorCount   = pecHeader->colorCount + 1U;
+  auto&      pad             = pecHeader->pad;
+  PEScolors                  = std::begin(pad);
+  constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
+  auto           colorMap    = boost::dynamic_bitset<>(threadCount);
+  auto           activeColor = 0U;
+  for (auto iColor = 0U; iColor < pesColorCount; iColor++) {
+	if (PEScolors[iColor] < threadCount) {
+	  if (!colorMap.test_set(PEScolors[iColor])) {
+		auto const threadColor = PESThread[PEScolors[iColor]];
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+		UserColor[activeColor++] = color;
+		if (activeColor >= 16U) {
+		  break;
+		}
+	  }
+	}
+	else {
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+	  auto const color = RGB(PESThread[0].color.r,
+	                         PESThread[0].color.g,
+	                         PESThread[0].color.b); // color unknown
+
+	  UserColor[activeColor++] = color;
+	}
+  }
+  PEScolorIndex = 1;
+  auto loc      = fPOINT {};
+  StateMap.reset(StateFlag::FILDIR);
+  StitchBuffer->push_back(fPOINTATTR {});
+  if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
+	auto       color      = 0U;
+	auto       iPESstitch = 0U;
+	auto const pecCount   = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
+	while (iPESstitch < pecCount) {
+	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
+		break;
+	  }
+	  if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1U] == 0xb0) {
+		color = dupcol(activeColor);
+		iPESstitch += 2;
+	  }
+	  else {
+		auto locof = 0.0F;
+		if ((PESstitch[iPESstitch] & 0x80U) != 0U) {
+		  auto pesVal = (((PESstitch[iPESstitch] & 0x0FU) << 8U) | PESstitch[iPESstitch + 1U]) & 0xFFFU;
+		  if ((pesVal & 0x800U) != 0U) {
+			pesVal -= 0x1000;
+		  }
+		  auto sPesVal = gsl::narrow_cast<int32_t>(pesVal);
+		  locof        = gsl::narrow_cast<decltype(locof)>(sPesVal);
+		  iPESstitch++;
+		}
+		else {
+		  if (PESstitch[iPESstitch] > 0x3f) {
+			locof = wrap::toFloat(PESstitch[iPESstitch]) - 128.0F;
+		  }
+		  else {
+			locof = PESstitch[iPESstitch];
+		  }
+		}
+		locof *= 3.0F / 5.0F;
+		// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
+		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+		  loc.y -= locof;
+		  StitchBuffer->push_back(fPOINTATTR {loc.x, loc.y, color});
+		}
+		else {
+		  loc.x += locof;
+		}
+	  }
+	  iPESstitch++;
+	}
+	// IniFile.auxFileType=AUXPES;
+	hupfn();
+  }
+  else {
+	auto fmtStr = std::wstring {};
+	displayText::loadString(fmtStr, IDS_NOTPES);
+	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	return false;
+  }
+  return true;
+}
+#endif
+
+auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> bool {
+  auto fileSize = uintmax_t {0};
+  if (!getFileSize(newFileName, fileSize)) {
+	return false;
+  }
+  auto fileHandle = HANDLE {0};
+  if (!thred::getFileHandle(newFileName,fileHandle)) {
+	return false;
+  }
+  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, nullptr);
+  if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
+	for (auto iColor = 0U; iColor < 16U; iColor++) {
+	  UserColor[iColor] = PCSHeader.colors[iColor];
+	}
+	fileSize -= sizeof(PCSHeader);
+	auto const pcsStitchCount = fileSize / sizeof(PCSTCH) + 2U;
+	auto       PCSDataBuffer  = std::vector<PCSTCH> {};
+	PCSDataBuffer.resize(pcsStitchCount);
+	ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
+	auto iStitch      = 0U;
+	auto iColorChange = 0U;
+	auto color        = 0U;
+	auto iPCSstitch   = 0U;
+	while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
+	  auto& stitch = PCSDataBuffer[iPCSstitch];
+	  if (stitch.tag == 3) {
+		ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
+		ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
+		color                                        = NOTFRM | stitch.fx;
+	  }
+	  else {
+		StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0F,
+		                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / 256.0F,
+		                                    color});
+		iStitch++;
+	  }
+	  iPCSstitch++;
+	}
+	// Grab the bitmap filename
+	auto const* tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
+	strcpy_s(PCSBMPFileName, tnam);
+	// wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
+	IniFile.auxFileType = AUXPCS;
+	if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
+	  PCSHeader.hoopType = LARGHUP;
+	}
+	auto stitchRect = fRECTANGLE {};
+	sizstch(stitchRect, *StitchBuffer);
+	if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 || stitchRect.top > LHUPY) {
+	  IniFile.hoopSizeX = LHUPX;
+	  IniFile.hoopSizeY = LHUPY;
+	  chkhup();
+	}
+	else {
+	  if (PCSHeader.hoopType == LARGHUP) {
+		IniFile.hoopType  = LARGHUP;
+		IniFile.hoopSizeX = LHUPX;
+		IniFile.hoopSizeY = LHUPY;
+	  }
+	  else {
+		if (stitchRect.right > SHUPX || stitchRect.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
+		  IniFile.hoopType  = LARGHUP;
+		  IniFile.hoopSizeX = SHUPX;
+		  IniFile.hoopSizeY = SHUPY;
+		}
+		else {
+		  IniFile.hoopType  = SMALHUP;
+		  IniFile.hoopSizeX = SHUPX;
+		  IniFile.hoopSizeY = SHUPY;
+		}
+	  }
+	}
+  }
+  return true;
+}
+
+auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> bool {
+  auto fileHandle = HANDLE {0};
+  if (!thred::getFileHandle(newFileName,fileHandle)) {
+	return false;
+  }
+  auto thredHeader = STRHED {};
+  ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
+  if ((thredHeader.headerType & 0xffffffU) == 0x746872U) {
+	if (BytesRead != sizeof(thredHeader)) {
+	  displayText::tabmsg(IDS_SHRTF);
+	  return false;
+	}
+	auto const version = (thredHeader.headerType & 0xff000000) >> 24U;
+	auto& desName = IniFile.designerName;
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
+	switch (version) {
+	  case 0: {
+		if (PCSHeader.hoopType == SMALHUP) {
+		  IniFile.hoopSizeX = SHUPX;
+		  IniFile.hoopSizeY = SHUPY;
+		  UnzoomedRect      = {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
+		}
+		else {
+		  IniFile.hoopSizeX  = LHUPX;
+		  IniFile.hoopSizeY  = LHUPY;
+		  UnzoomedRect       = {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
+		  PCSHeader.hoopType = LARGHUP;
+		}
+		ritfnam(*DesignerName);
+		auto&      modName      = ExtendedHeader->modifierName;
+		auto const modifierName = gsl::span<char> {modName};
+		std::copy(&IniFile.designerName[0],
+		          &IniFile.designerName[strlen(std::begin(desName))],
+		          modifierName.begin());
+		break;
+	  }
+	  case 1:
+	  case 2: {
+		ReadFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &BytesRead, nullptr);
+		if (BytesRead != sizeof(*ExtendedHeader)) {
+		  displayText::tabmsg(IDS_SHRTF);
+		  return false;
+		}
+		IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
+		IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
+
+		UnzoomedRect = {wrap::round<int32_t>(ExtendedHeader->hoopSizeX),
+		                wrap::round<int32_t>(ExtendedHeader->hoopSizeY)};
+		redfnam(*DesignerName);
+		break;
+	  }
+	  default: {
+		displayText::tabmsg(IDS_NOTVER);
+		return false;
+	  }
+	}
+	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
+	StitchBuffer->resize(thredHeader.stitchCount);
+	if (thredHeader.stitchCount != 0U) {
+	  auto bytesToRead =
+	      gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
+	  ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &BytesRead, nullptr);
+	  if (BytesRead != bytesToRead) {
+		// StitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
+		// StateMap.set(StateFlag::BADFIL);
+		prtred();
+		return false;
+	  }
+	}
+	StitchBuffer->shrink_to_fit();
+	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
+	if (BytesRead != sizeof(PCSBMPFileName)) {
+	  PCSBMPFileName[0] = 0;
+	  prtred();
+	  return false;
+	}
+	ReadFile(fileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, nullptr);
+	if (BytesRead != sizeof(BackgroundColor)) {
+	  BackgroundColor = IniFile.backgroundColor;
+	  prtred();
+	  return false;
+	}
+	BackgroundBrush = CreateSolidBrush(BackgroundColor);
+	ReadFile(fileHandle, static_cast<LPVOID>(UserColor), sizeof(UserColor), &BytesRead, nullptr);
+	if (BytesRead != sizeof(UserColor)) {
+	  prtred();
+	  return false;
+	}
+	ReadFile(fileHandle, static_cast<LPVOID>(CustomColor), sizeof(CustomColor), &BytesRead, nullptr);
+	if (BytesRead != sizeof(CustomColor)) {
+	  prtred();
+	  return false;
+	}
+	constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
+	                              2; // ThreadSize is defined as a 16 entry array of 2 characters
+	char msgBuffer[threadLength];
+	ReadFile(fileHandle, static_cast<LPVOID>(msgBuffer), threadLength, &BytesRead, nullptr);
+	if (BytesRead != threadLength) {
+	  prtred();
+	  return false;
+	}
+	auto threadSizebuf  = std::string(std::begin(msgBuffer), sizeof(msgBuffer));
+	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
+	for (auto iThread = 0U; iThread < threadLength; iThread++) {
+	  ThreadSize[iThread][0] = threadSizeBufW[iThread];
+	}
+	if (thredHeader.formCount != 0) {
+	  StateMap.reset(StateFlag::BADFIL);
+	  MsgBuffer[0]     = 0;
+	  auto bytesToRead = DWORD {0};
+	  if (version < 2) {
+		auto formListOriginal = std::vector<FRMHEDO> {};
+		formListOriginal.resize(thredHeader.formCount);
+		bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
+		wrap::ReadFile(fileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != thredHeader.formCount * sizeof(decltype(formListOriginal.back()))) {
+		  thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
+		      BytesRead / sizeof(decltype(formListOriginal.back())));
+		  formListOriginal.resize(thredHeader.formCount);
+		  StateMap.set(StateFlag::BADFIL);
+		}
+		FormList->reserve(formListOriginal.size());
+		FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
+	  }
+	  else {
+		auto inFormList = std::vector<FRMHEDOUT> {};
+		inFormList.resize(thredHeader.formCount);
+		bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(inFormList.back())));
+		wrap::ReadFile(fileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != bytesToRead) {
+		  thredHeader.formCount =
+		      gsl::narrow<decltype(thredHeader.formCount)>(BytesRead / sizeof(decltype(inFormList.back())));
+		  inFormList.resize(thredHeader.formCount);
+		  StateMap.set(StateFlag::BADFIL);
+		}
+		FormList->reserve(inFormList.size());
+		FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
+	  }
+	  FormList->shrink_to_fit();
+	  if (thredHeader.vertexCount != 0U) {
+		FormVertices->resize(thredHeader.vertexCount);
+		bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
+		ReadFile(fileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != bytesToRead) {
+		  FormVertices->resize(BytesRead / sizeof(decltype(FormVertices->back())));
+		  StateMap.set(StateFlag::BADFIL);
+		}
+	  }
+	  else {
+		// We have forms but no vertices - blow up the read
+		prtred();
+		return false;
+	  }
+	  FormVertices->shrink_to_fit();
+	  if (thredHeader.dlineCount != 0U) {
+		auto inGuideList = std::vector<SATCONOUT>(thredHeader.dlineCount);
+		bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inGuideList.back())));
+		ReadFile(fileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != bytesToRead) {
+		  inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
+		  StateMap.set(StateFlag::BADFIL);
+		}
+		SatinGuides->reserve(inGuideList.size());
+		SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
+	  }
+	  SatinGuides->shrink_to_fit();
+	  if (thredHeader.clipDataCount != 0U) {
+		ClipPoints->resize(thredHeader.clipDataCount);
+		bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
+		ReadFile(fileHandle, ClipPoints->data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != bytesToRead) {
+		  ClipPoints->resize(BytesRead / sizeof(decltype(ClipPoints->back())));
+		  StateMap.set(StateFlag::BADFIL);
+		}
+	  }
+	  ClipPoints->shrink_to_fit();
+	  if (ExtendedHeader->texturePointCount != 0U) {
+		TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
+		bytesToRead = gsl::narrow<DWORD>(ExtendedHeader->texturePointCount *
+		                                 sizeof(decltype(TexturePointsBuffer->back())));
+		ReadFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
+		if (BytesRead != bytesToRead) {
+		  TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
+		  StateMap.set(StateFlag::BADFIL);
+		}
+	  }
+	  else {
+		TexturePointsBuffer->clear();
+	  }
+	  TexturePointsBuffer->shrink_to_fit();
+	  if (StateMap.testAndReset(StateFlag::BADFIL)) {
+		displayText::bfilmsg();
+	  }
+	  // now re-create all the pointers/indexes in the form data
+	  auto clipOffset   = 0U;
+	  auto vertexOffset = 0U;
+	  auto guideOffset  = 0U;
+	  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
+		auto& form       = FormList->operator[](iForm);
+		form.vertexIndex = vertexOffset;
+		vertexOffset += form.vertexCount;
+		if (form.type == SAT) {
+		  if (form.satinGuideCount != 0U) {
+			form.satinOrAngle.guide = guideOffset;
+			guideOffset += form.satinGuideCount;
+		  }
+		}
+		// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
+		// where we could not store the pointer in v2)
+		if (clip::isclp(form)) {
+		  form.angleOrClipData.clip = clipOffset;
+		  clipOffset += form.lengthOrCount.clipCount;
+		}
+		if (clip::iseclpx(iForm)) {
+		  form.borderClipData = clipOffset;
+		  clipOffset += form.clipEntries;
+		}
+	  }
+	  xt::setfchk();
+	}
+  }
+  else {
+	displayText::tabmsg(IDS_NOTHR);
+	return false;
+  }
+  return true;
+}
+
+auto thred::getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle) -> bool {
+  // ToDo - use ifstream?
+  // ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
+  auto handle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+  if (handle == INVALID_HANDLE_VALUE) {
+	if (GetLastError() == ERROR_SHARING_VIOLATION) {
+	  displayText::filnopn(IDS_FNOPNA, newFileName);
+	}
+	else {
+	  displayText::filnopn(IDS_FNOPN, newFileName);
+	}
+	fileHandle = nullptr;
+	return false;
+  }
+  fileHandle = handle;
+  return true;
+}
+
+void thred::internal::resetState() {
+  fnamtabs();
+  trace::untrace();
+  if (!FormList->empty()) {
+	form::delfrms();
+  }
+  unthum();
+  thred::unbsho();
+  bitmap::resetBmpFile(true);
+  TexturePointsBuffer->clear();
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
+  thred::unbsho();
+  form::frmon();
+  SelectedFormList->clear();
+  SelectedFormList->shrink_to_fit();
+  if (StateMap.test(StateFlag::PRFACT)) {
+	DestroyWindow(PreferencesWindow);
+	PreferenceIndex = 0;
+  }
+  PCSBMPFileName[0] = 0;
+  SearchLine->clear();
+  SearchLine->shrink_to_fit();
+  rstdu();
+  thred::unmsg();
+  ZoomFactor = 1;
+  NearestCount = 0;
+  if (StateMap.testAndReset(StateFlag::WASPAT)) {
+	DestroyWindow(SpeedScrollBar);
+  }
+  auto textureHistoryFlag = false;
+  if (StateMap.test(StateFlag::WASTXBAK)) {
+	textureHistoryFlag = true;
+  }
+  StateMap.reset();
+  if (textureHistoryFlag) {
+	StateMap.set(StateFlag::WASTXBAK);
+  }
+}
+
 void thred::internal::nuFil(fileIndices fileIndex) {
   auto newFileName = *WorkingFileName;
   if (StateMap.testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, fileStyles::ALL_FILES, fileIndex)) {
 	WorkingFileName->assign(newFileName);
-	fnamtabs();
-	trace::untrace();
-	if (!FormList->empty()) {
-	  form::delfrms();
-	}
-	StateMap.reset(StateFlag::ZUMED);
-	StateMap.reset(StateFlag::FRMOF);
-	StateMap.reset(StateFlag::HID);
-	StateMap.reset(StateFlag::BIGBOX);
-	unthum();
-	thred::unbsho();
-	bitmap::resetBmpFile(true);
-	// ToDo - use ifstream?
-	// ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
-	FileHandle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	if (FileHandle == INVALID_HANDLE_VALUE) {
-	  if (GetLastError() == 32U) {
-		displayText::filnopn(IDS_FNOPNA, newFileName);
+	defNam(newFileName);
+	resetState();
+	auto       fileExt        = newFileName.extension().wstring();
+	auto const firstCharacter = tolower(fileExt[1]);
+	if (firstCharacter == 't') {
+	  {
+		if (!readTHRFile(newFileName)) {
+		  return;
+		}
 	  }
-	  else {
-		displayText::filnopn(IDS_FNOPN, newFileName);
-	  }
-	  FileHandle = nullptr;
 	}
 	else {
-	  auto& desName = IniFile.designerName;
-	  StateMap.reset(StateFlag::CMPDO);
-	  StateMap.reset(StateFlag::SAVACT);
-	  StateMap.reset(StateFlag::BAKING);
-	  StateMap.reset(StateFlag::REDUSHO);
-	  TexturePointsBuffer->clear();
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	  deldu();
-	  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
-	  thred::unbsho();
-	  StateMap.reset(StateFlag::MOVSET);
-	  form::frmon();
-	  SelectedFormList->clear();
-	  SelectedFormList->shrink_to_fit();
-	  if (StateMap.testAndReset(StateFlag::PRFACT)) {
-		DestroyWindow(PreferencesWindow);
-		StateMap.reset(StateFlag::WASRT);
-		PreferenceIndex = 0;
-	  }
-	  PCSBMPFileName[0] = 0;
-	  StateMap.reset(StateFlag::SCROS);
-	  StateMap.reset(StateFlag::ECROS);
-	  SearchLine->clear();
-	  SearchLine->shrink_to_fit();
-	  StateMap.reset(StateFlag::BZUMIN);
-	  rstdu();
-	  thred::unmsg();
-	  UndoBufferWriteIndex = 0;
-	  StateMap.reset(StateFlag::BAKWRAP);
-	  ZoomFactor = 1;
-	  StateMap.set(StateFlag::RESTCH);
-	  defNam(newFileName);
-	  NearestCount = 0;
-	  if (StateMap.testAndReset(StateFlag::WASPAT)) {
-		DestroyWindow(SpeedScrollBar);
-	  }
-	  auto textureHistoryFlag = false;
-	  if (StateMap.test(StateFlag::WASTXBAK)) {
-		textureHistoryFlag = true;
-	  }
-	  StateMap.reset();
-	  if (textureHistoryFlag) {
-		StateMap.set(StateFlag::WASTXBAK);
-	  }
-	  auto       fileSizeHigh   = DWORD {};
-	  auto       fileSize       = GetFileSize(FileHandle, &fileSizeHigh);
-	  auto       fileExt        = newFileName.extension().wstring();
-	  auto const firstCharacter = tolower(fileExt[1]);
-	  if (firstCharacter == 't') {
-		auto thredHeader = STRHED {};
-		ReadFile(FileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
-		if ((thredHeader.headerType & 0xffffffU) == 0x746872U) {
-		  if (BytesRead != sizeof(thredHeader)) {
-			displayText::tabmsg(IDS_SHRTF);
+	  StateMap.set(StateFlag::NOTHRFIL);
+	  if (firstCharacter == 'p') {
+		if (tolower(fileExt[2]) == 'c') {
+		  if (!readPCSFile(newFileName)) {
 			return;
-		  }
-		  auto const version = (thredHeader.headerType & 0xff000000) >> 24U;
-		  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
-		  switch (version) {
-			case 0: {
-			  if (PCSHeader.hoopType == SMALHUP) {
-				IniFile.hoopSizeX = SHUPX;
-				IniFile.hoopSizeY = SHUPY;
-				UnzoomedRect = {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
-			  }
-			  else {
-				IniFile.hoopSizeX = LHUPX;
-				IniFile.hoopSizeY = LHUPY;
-				UnzoomedRect = {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
-				PCSHeader.hoopType = LARGHUP;
-			  }
-			  ritfnam(*DesignerName);
-			  auto&      modName      = ExtendedHeader->modifierName;
-			  auto const modifierName = gsl::span<char> {modName};
-			  std::copy(&IniFile.designerName[0],
-			            &IniFile.designerName[strlen(std::begin(desName))],
-			            modifierName.begin());
-			  break;
-			}
-			case 1:
-			case 2: {
-			  ReadFile(FileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &BytesRead, nullptr);
-			  if (BytesRead != sizeof(*ExtendedHeader)) {
-				displayText::tabmsg(IDS_SHRTF);
-				return;
-			  }
-			  IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
-			  IniFile.hoopSizeY = ExtendedHeader->hoopSizeY;
-
-			  UnzoomedRect = {wrap::round<int32_t>(ExtendedHeader->hoopSizeX),
-			                  wrap::round<int32_t>(ExtendedHeader->hoopSizeY)};
-			  redfnam(*DesignerName);
-			  break;
-			}
-			default: {
-			  displayText::tabmsg(IDS_NOTVER);
-			  return;
-			}
-		  }
-		  ZoomRect = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
-		  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-		  StitchBuffer->resize(thredHeader.stitchCount);
-		  if (thredHeader.stitchCount != 0U) {
-			auto bytesToRead =
-			    gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
-			ReadFile(FileHandle, StitchBuffer->data(), bytesToRead, &BytesRead, nullptr);
-			if (BytesRead != bytesToRead) {
-			  // StitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
-			  // StateMap.set(StateFlag::BADFIL);
-			  prtred();
-			  return;
-			}
-		  }
-		  StitchBuffer->shrink_to_fit();
-		  ReadFile(FileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
-		  if (BytesRead != sizeof(PCSBMPFileName)) {
-			PCSBMPFileName[0] = 0;
-			prtred();
-			return;
-		  }
-		  ReadFile(FileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, nullptr);
-		  if (BytesRead != sizeof(BackgroundColor)) {
-			BackgroundColor = IniFile.backgroundColor;
-			prtred();
-			return;
-		  }
-		  BackgroundBrush = CreateSolidBrush(BackgroundColor);
-		  ReadFile(FileHandle, static_cast<LPVOID>(UserColor), sizeof(UserColor), &BytesRead, nullptr);
-		  if (BytesRead != sizeof(UserColor)) {
-			prtred();
-			return;
-		  }
-		  ReadFile(FileHandle, static_cast<LPVOID>(CustomColor), sizeof(CustomColor), &BytesRead, nullptr);
-		  if (BytesRead != sizeof(CustomColor)) {
-			prtred();
-			return;
-		  }
-		  constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
-		                                2; // ThreadSize is defined as a 16 entry array of 2 characters
-		  char msgBuffer[threadLength];
-		  ReadFile(FileHandle, static_cast<LPVOID>(msgBuffer), threadLength, &BytesRead, nullptr);
-		  if (BytesRead != threadLength) {
-			prtred();
-			return;
-		  }
-		  auto threadSizebuf  = std::string(std::begin(msgBuffer), sizeof(msgBuffer));
-		  auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
-		  for (auto iThread = 0U; iThread < threadLength; iThread++) {
-			ThreadSize[iThread][0] = threadSizeBufW[iThread];
-		  }
-		  if (thredHeader.formCount != 0) {
-			StateMap.reset(StateFlag::BADFIL);
-			MsgBuffer[0]     = 0;
-			auto bytesToRead = DWORD {0};
-			if (version < 2) {
-			  auto formListOriginal = std::vector<FRMHEDO> {};
-			  formListOriginal.resize(thredHeader.formCount);
-			  bytesToRead =
-			      gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
-			  wrap::ReadFile(FileHandle, formListOriginal.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != thredHeader.formCount * sizeof(decltype(formListOriginal.back()))) {
-				thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
-				    BytesRead / sizeof(decltype(formListOriginal.back())));
-				formListOriginal.resize(thredHeader.formCount);
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  FormList->reserve(formListOriginal.size());
-			  FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
-			}
-			else {
-			  auto inFormList = std::vector<FRMHEDOUT> {};
-			  inFormList.resize(thredHeader.formCount);
-			  bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(inFormList.back())));
-			  wrap::ReadFile(FileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
-				    BytesRead / sizeof(decltype(inFormList.back())));
-				inFormList.resize(thredHeader.formCount);
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  FormList->reserve(inFormList.size());
-			  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
-			}
-			FormList->shrink_to_fit();
-			if (thredHeader.vertexCount != 0U) {
-			  FormVertices->resize(thredHeader.vertexCount);
-			  bytesToRead =
-			      gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
-			  ReadFile(FileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				FormVertices->resize(BytesRead / sizeof(decltype(FormVertices->back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			}
-			else {
-			  // We have forms but no vertices - blow up the read
-			  prtred();
-			  return;
-			}
-			FormVertices->shrink_to_fit();
-			if (thredHeader.dlineCount != 0U) {
-			  auto inGuideList = std::vector<SATCONOUT>(thredHeader.dlineCount);
-			  bytesToRead =
-			      gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inGuideList.back())));
-			  ReadFile(FileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			  SatinGuides->reserve(inGuideList.size());
-			  SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
-			}
-			SatinGuides->shrink_to_fit();
-			if (thredHeader.clipDataCount != 0U) {
-			  ClipPoints->resize(thredHeader.clipDataCount);
-			  bytesToRead =
-			      gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
-			  ReadFile(FileHandle, ClipPoints->data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				ClipPoints->resize(BytesRead / sizeof(decltype(ClipPoints->back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			}
-			ClipPoints->shrink_to_fit();
-			if (ExtendedHeader->texturePointCount != 0U) {
-			  TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
-			  bytesToRead = gsl::narrow<DWORD>(ExtendedHeader->texturePointCount *
-			                                   sizeof(decltype(TexturePointsBuffer->back())));
-			  ReadFile(FileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
-			  if (BytesRead != bytesToRead) {
-				TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
-				StateMap.set(StateFlag::BADFIL);
-			  }
-			}
-			else {
-			  TexturePointsBuffer->clear();
-			}
-			TexturePointsBuffer->shrink_to_fit();
-			if (StateMap.testAndReset(StateFlag::BADFIL)) {
-			  displayText::bfilmsg();
-			}
-			// now re-create all the pointers/indexes in the form data
-			auto clipOffset   = 0U;
-			auto vertexOffset = 0U;
-			auto guideOffset  = 0U;
-			for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
-			  auto& form       = FormList->operator[](iForm);
-			  form.vertexIndex = vertexOffset;
-			  vertexOffset += form.vertexCount;
-			  if (form.type == SAT) {
-				if (form.satinGuideCount != 0U) {
-				  form.satinOrAngle.guide = guideOffset;
-				  guideOffset += form.satinGuideCount;
-				}
-			  }
-			  // ToDo - do we still need to do this in v3? (we can store the offset safely in v3
-			  // where we could not store the pointer in v2)
-			  if (clip::isclp(form)) {
-				form.angleOrClipData.clip = clipOffset;
-				clipOffset += form.lengthOrCount.clipCount;
-			  }
-			  if (clip::iseclpx(iForm)) {
-				form.borderClipData = clipOffset;
-				clipOffset += form.clipEntries;
-			  }
-			}
-			xt::setfchk();
 		  }
 		}
-		else {
-		  displayText::tabmsg(IDS_NOTHR);
-		}
-	  }
-	  else {
-		StateMap.set(StateFlag::NOTHRFIL);
-		if (firstCharacter == 'p') {
-		  if (tolower(fileExt[2]) == 'c') {
-			ReadFile(FileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, nullptr);
-			if (fileSize == 0U) {
-			  displayText::filnopn(IDS_ZEROL, newFileName);
-			  return;
-			}
-			if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
-			  for (auto iColor = 0U; iColor < 16U; iColor++) {
-				UserColor[iColor] = PCSHeader.colors[iColor];
-			  }
-			  fileSize -= sizeof(PCSHeader);
-			  auto const pcsStitchCount = fileSize / sizeof(PCSTCH) + 2U;
-			  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
-			  PCSDataBuffer.resize(pcsStitchCount);
-			  ReadFile(FileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
-			  auto iStitch      = 0U;
-			  auto iColorChange = 0U;
-			  auto color        = 0U;
-			  auto iPCSstitch   = 0U;
-			  while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-				auto& stitch = PCSDataBuffer[iPCSstitch];
-				if (stitch.tag == 3) {
-				  ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
-				  ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-				  color                                        = NOTFRM | stitch.fx;
-				}
-				else {
-				  StitchBuffer->push_back(
-				      fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0F,
-				                  wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / 256.0F,
-				                  color});
-				  iStitch++;
-				}
-				iPCSstitch++;
-			  }
-			  // Grab the bitmap filename
-			  auto const* tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
-			  strcpy_s(PCSBMPFileName, tnam);
-			  // wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
-			  IniFile.auxFileType = AUXPCS;
-			  if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
-				PCSHeader.hoopType = LARGHUP;
-			  }
-			  auto stitchRect = fRECTANGLE {};
-			  sizstch(stitchRect, *StitchBuffer);
-			  if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 ||
-			      stitchRect.top > LHUPY) {
-				IniFile.hoopSizeX = LHUPX;
-				IniFile.hoopSizeY = LHUPY;
-				chkhup();
-			  }
-			  else {
-				if (PCSHeader.hoopType == LARGHUP) {
-				  IniFile.hoopType  = LARGHUP;
-				  IniFile.hoopSizeX = LHUPX;
-				  IniFile.hoopSizeY = LHUPY;
-				}
-				else {
-				  if (stitchRect.right > SHUPX || stitchRect.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
-					IniFile.hoopType  = LARGHUP;
-					IniFile.hoopSizeX = SHUPX;
-					IniFile.hoopSizeY = SHUPY;
-				  }
-				  else {
-					IniFile.hoopType  = SMALHUP;
-					IniFile.hoopSizeX = SHUPX;
-					IniFile.hoopSizeY = SHUPY;
-				  }
-				}
-			  }
-			}
-		  }
 #if PESACT
-		  else {
-			auto       ec   = std::error_code {};
-			auto const size = fs::file_size(newFileName, ec);
-			if (ec != std::error_code {}) {
-			  // ToDo - find better error message
-			  displayText::filnopn(IDS_FNOPN, newFileName);
-			  return;
-			}
-			auto  fileBuf    = std::vector<uint8_t>(size);
-			auto* fileBuffer = fileBuf.data();
-			ReadFile(FileHandle, fileBuffer, size, &BytesRead, nullptr);
-			auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
-			if (strncmp(static_cast<char*>(pesHeader->led), "#PES00", 6) != 0) {
-			  auto fmtStr = std::wstring {};
-			  displayText::loadString(fmtStr, IDS_NOTPES);
-			  displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
-			  return;
-			}
-			auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
-			// auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
-			auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-			PESstitch                  = &fileBuffer[pecOffset];
-			auto const pesColorCount   = pecHeader->colorCount + 1U;
-			auto&      pad             = pecHeader->pad;
-			PEScolors                  = std::begin(pad);
-			constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
-			auto           colorMap    = boost::dynamic_bitset<>(threadCount);
-			auto           activeColor = 0U;
-			for (auto iColor = 0U; iColor < pesColorCount; iColor++) {
-			  if (PEScolors[iColor] < threadCount) {
-				if (!colorMap.test_set(PEScolors[iColor])) {
-				  auto const threadColor = PESThread[PEScolors[iColor]];
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-				  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-				  UserColor[activeColor++] = color;
-				  if (activeColor >= 16U) {
-					break;
-				  }
-				}
-			  }
-			  else {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-				auto const color = RGB(PESThread[0].color.r,
-				                       PESThread[0].color.g,
-				                       PESThread[0].color.b); // color unknown
-
-				UserColor[activeColor++] = color;
-			  }
-			}
-			PEScolorIndex = 1;
-			auto loc      = fPOINT {};
-			StateMap.reset(StateFlag::FILDIR);
-			StitchBuffer->push_back(fPOINTATTR {});
-			if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
-			  auto color      = 0U;
-			  auto iPESstitch = 0U;
-			  auto const pecCount = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
-			  while (iPESstitch < pecCount) {
-				if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
-				  break;
-				}
-				if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1U] == 0xb0) {
-				  color = dupcol(activeColor);
-				  iPESstitch += 2;
-				}
-				else {
-				  auto locof = 0.0F;
-				  if ((PESstitch[iPESstitch] & 0x80U) != 0U) {
-					auto pesVal = (((PESstitch[iPESstitch] & 0x0FU) << 8U) | PESstitch[iPESstitch + 1U]) & 0xFFFU;
-					if ((pesVal & 0x800U) != 0U) {
-					  pesVal -= 0x1000;
-					}
-					auto sPesVal = gsl::narrow_cast<int32_t>(pesVal);
-					locof        = gsl::narrow_cast<decltype(locof)>(sPesVal);
-					iPESstitch++;
-				  }
-				  else {
-					if (PESstitch[iPESstitch] > 0x3f) {
-					  locof = wrap::toFloat(PESstitch[iPESstitch]) - 128.0F;
-					}
-					else {
-					  locof = PESstitch[iPESstitch];
-					}
-				  }
-				  locof *= 3.0F / 5.0F;
-				  // ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
-				  if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-					loc.y -= locof;
-					StitchBuffer->push_back(fPOINTATTR {loc.x, loc.y, color});
-				  }
-				  else {
-					loc.x += locof;
-				  }
-				}
-				iPESstitch++;
-			  }
-			  // IniFile.auxFileType=AUXPES;
-			  hupfn();
-			}
-			else {
-			  auto fmtStr = std::wstring {};
-			  displayText::loadString(fmtStr, IDS_NOTPES);
-			  displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
-			  return;
-			}
-		  }
-#endif
-		}
 		else {
-		  if (!DST::readDSTFile(FileHandle, fileSize)) {
+		  if (!readPESFile(newFileName)) {
 			return;
 		  }
 		}
-	  }
-	  if (PCSBMPFileName[0] != 0) {
-		bitmap::assignUBFilename(*DefaultDirectory);
-	  }
-	  thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	  // BufferIndex     = 0;
-	  ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
-	  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-	  thred::movStch();
-	  thred::coltab();
-	  StateMap.reset(StateFlag::ZUMED);
-	  wchar_t buffer[3] = {0};
-	  for (auto iColor = 0U; iColor < 16U; iColor++) {
-		UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
-		UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-		wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[iColor]), 2);
-		SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
-	  }
-	  for (auto& iColor : *UserColorWin) {
-		thred::redraw(iColor);
-	  }
-	  thred::redraw(ColorBar);
-	  if (!StitchBuffer->empty()) {
-		StateMap.set(StateFlag::INIT);
-	  }
-	  nuAct(0);
-	  StateMap.set(StateFlag::RESTCH);
-	  nunams();
-	  ritini();
-	  auto const blank = std::wstring {};
-	  displayText::butxt(HNUM, blank);
-	  if (!StitchBuffer->empty()) {
-		nuAct(StitchBuffer->front().attribute & COLMSK);
+#endif
 	  }
 	  else {
-		nuAct(0);
+		if (!DST::readDSTFile(newFileName)) {
+		  return;
+		}
 	  }
-	  auxmen();
 	}
+	if (PCSBMPFileName[0] != 0) {
+	  bitmap::assignUBFilename(*DefaultDirectory);
+	}
+	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
+	// BufferIndex     = 0;
+	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
+	thred::movStch();
+	thred::coltab();
+	StateMap.reset(StateFlag::ZUMED);
+	wchar_t buffer[3] = {0};
+	for (auto iColor = 0U; iColor < 16U; iColor++) {
+	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
+	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+	  wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[iColor]), 2);
+	  SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
+	}
+	for (auto& iColor : *UserColorWin) {
+	  thred::redraw(iColor);
+	}
+	thred::redraw(ColorBar);
+	if (!StitchBuffer->empty()) {
+	  StateMap.set(StateFlag::INIT);
+	}
+	nuAct(0);
+	StateMap.set(StateFlag::RESTCH);
+	nunams();
+	ritini();
+	auto const blank = std::wstring {};
+	displayText::butxt(HNUM, blank);
+	if (!StitchBuffer->empty()) {
+	  nuAct(StitchBuffer->front().attribute & COLMSK);
+	}
+	else {
+	  nuAct(0);
+	}
+	auxmen();
 	lenCalc();
 	SetWindowText(
 	    ThrEdWindow,

@@ -845,14 +845,22 @@ auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
   return strncmp(static_cast<const char*>(dstHeader->desched), "LA:", 3) == 0;
 }
 
-auto DST::readDSTFile(HANDLE fileHandle, DWORD& fileSize) -> bool {
+auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
+  auto fileSize = uintmax_t {0};
+  if (!thred::getFileSize(newFileName, fileSize)) {
+	return false;
+  }
+  auto fileHandle = HANDLE {0};
+  if (!thred::getFileHandle(newFileName,fileHandle)) {
+	return false;
+  }
   auto dstHeader = DSTHED {};
   auto bytesRead = DWORD {};
   ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr);
   if (bytesRead == sizeof(dstHeader)) {
 	if (di::chkdst(&dstHeader)) {
 	  PCSBMPFileName[0] = 0;
-	  fileSize          = GetFileSize(fileHandle, &bytesRead) - sizeof(dstHeader);
+	  fileSize          -= sizeof(dstHeader);
 	  auto DSTData      = std::vector<DSTREC> {};
 	  DSTData.resize(fileSize / sizeof(DSTREC));
 	  wrap::ReadFile(fileHandle, DSTData.data(), fileSize, &bytesRead, nullptr);
