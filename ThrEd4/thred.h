@@ -60,6 +60,7 @@ auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle)
 auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
 void grpAdj();
 void hidbit();
+void hupfn();
 auto inStitchWin() noexcept -> bool;
 void movStch();
 auto nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN;
@@ -82,6 +83,7 @@ void save();
 void selRct(fRECTANGLE& sourceRect) noexcept;
 void setpsel();
 void shft(fPOINT const& delta) noexcept;
+void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 void stch2pxr(fPOINT const& stitchCoordinate);
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
@@ -260,7 +262,6 @@ namespace internal {
   auto handleSideWindowActive() -> bool;
   auto handleViewMenu(WORD const& wParameter) -> bool;
   void hidknot();
-  void hupfn();
   void ilin() noexcept;
   void ilin1() noexcept;
   void infadj(float& xCoordinate, float& yCoordinate) noexcept;
@@ -351,7 +352,6 @@ namespace internal {
   void qcode();
   void rSelbox();
   auto readPCSFile(std::filesystem::path const& newFileName) -> bool;
-  auto readPESFile(std::filesystem::path const& newFileName) -> bool;
   auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
   void rebak();
   void rebox();
@@ -429,7 +429,6 @@ namespace internal {
   void sidmsg(FRMHED const& form, HWND window, std::wstring* strings, uint32_t entries);
   auto sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount) -> uint32_t;
   auto sizfclp(FRMHED const& form) -> uint32_t;
-  void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
   void srchk();
   auto srchknot(uint32_t source) noexcept -> uint32_t;
   void stCor2px(fPOINTATTR const& stitch, POINT& point);
@@ -484,20 +483,7 @@ namespace internal {
   void zumshft();
 
 #if PESACT
-  auto dupcol(uint32_t activeColor) -> uint32_t;
-  void pecdat(std::vector<uint8_t>& buffer);
-  void pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t deltaY);
-  void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
-  void pecImage(std::vector<uint8_t>& pecBuffer);
-  void pecnam(gsl::span<char> label);
-  auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
-  void ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch);
-  void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
-  void ritpesCode(std::vector<uint8_t>& buffer);
-  void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
-  auto savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
   void setpes();
-  void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]);
 #endif
 
 #ifdef ALLOCFAILURE
