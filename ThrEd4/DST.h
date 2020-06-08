@@ -1,3 +1,5 @@
+#pragma once
+
 #include "stdafx.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
