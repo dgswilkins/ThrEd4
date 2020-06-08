@@ -596,6 +596,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto localStitch       = fPOINT {};
   auto maximumCoordinate = fPOINT {-1e12F, -1e12F};
   auto mimimumCoordinate = fPOINT {1e12F, 1e12F};
+  StitchBuffer->clear();
+  StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
   for (auto& record : DSTData) {
 	if ((record.nd & 0x40U) != 0) {
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {

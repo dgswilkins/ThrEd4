@@ -4823,11 +4823,13 @@ auto thred::internal::readPESFile(std::filesystem::path const& newFileName) -> b
   PEScolorIndex = 1;
   auto loc      = fPOINT {};
   StateMap.reset(StateFlag::FILDIR);
-  StitchBuffer->push_back(fPOINTATTR {});
   if (BytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
 	auto       color      = 0U;
 	auto       iPESstitch = 0U;
 	auto const pecCount   = BytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
+	StitchBuffer->clear();
+	StitchBuffer->reserve(pecCount/2); // we are still reserving a bit more than necessary
+	StitchBuffer->push_back(fPOINTATTR {});
 	while (iPESstitch < pecCount) {
 	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
 		break;
@@ -4903,6 +4905,8 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 	auto iColorChange = 0U;
 	auto color        = 0U;
 	auto iPCSstitch   = 0U;
+	StitchBuffer->clear();
+	StitchBuffer->reserve(PCSHeader.stitchCount);
 	while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
 	  auto& stitch = PCSDataBuffer[iPCSstitch];
 	  if (stitch.tag == 3) {
