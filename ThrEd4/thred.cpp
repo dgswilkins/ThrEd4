@@ -422,7 +422,7 @@ void thred::undat() noexcept {
 }
 
 void thred::internal::qchk() {
-  if (UserFlagMap.test(UserFlag::MARQ)) {
+  if (UserFlagMap->test(UserFlag::MARQ)) {
 	CheckMenuItem(MainMenu, ID_MARKESC, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_MARKQ, MF_UNCHECKED);
   }
@@ -434,7 +434,7 @@ void thred::internal::qchk() {
 }
 
 void thred::internal::nedmen() {
-  if (UserFlagMap.test(UserFlag::NEDOF)) {
+  if (UserFlagMap->test(UserFlag::NEDOF)) {
 	CheckMenuItem(MainMenu, ID_SETNEDL, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_CHECKED);
   }
@@ -446,7 +446,7 @@ void thred::internal::nedmen() {
 }
 
 void thred::internal::knotmen() {
-  if (UserFlagMap.test(UserFlag::KNOTOF)) {
+  if (UserFlagMap->test(UserFlag::KNOTOF)) {
 	CheckMenuItem(MainMenu, ID_KNOTON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_KNOTOF, MF_CHECKED);
   }
@@ -458,7 +458,7 @@ void thred::internal::knotmen() {
 }
 
 void thred::internal::bsavmen() {
-  if (UserFlagMap.test(UserFlag::BSAVOF)) {
+  if (UserFlagMap->test(UserFlag::BSAVOF)) {
 	CheckMenuItem(MainMenu, ID_BSAVON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_BSAVOF, MF_CHECKED);
   }
@@ -470,7 +470,7 @@ void thred::internal::bsavmen() {
 }
 
 void thred::internal::linbmen() {
-  if (UserFlagMap.test(UserFlag::LINSPAC)) {
+  if (UserFlagMap->test(UserFlag::LINSPAC)) {
 	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_CHECKED);
   }
@@ -483,7 +483,7 @@ void thred::internal::linbmen() {
 
 void thred::wrnmen() {
   auto code = UINT {MF_CHECKED};
-  if (UserFlagMap.test(UserFlag::WRNOF)) {
+  if (UserFlagMap->test(UserFlag::WRNOF)) {
 	code = MF_UNCHECKED;
   }
   CheckMenuItem(MainMenu, ID_WARNOF, code);
@@ -2899,7 +2899,7 @@ void thred::internal::ritini() {
   IniFile.smallStitchLength      = SmallStitchLength;
   IniFile.stitchBoxesThreshold   = StitchBoxesThreshold;
   IniFile.stitchSpace            = LineSpacing;
-  IniFile.userFlagMap            = UserFlagMap.to_ulong();
+  IniFile.userFlagMap            = UserFlagMap->to_ulong();
   IniFile.borderWidth            = BorderWidth;
   IniFile.appliqueColor          = AppliqueColor;
   IniFile.snapLength             = SnapLength;
@@ -2907,7 +2907,7 @@ void thred::internal::ritini() {
   IniFile.spiralWrap             = SpiralWrap;
   IniFile.buttonholeCornerLength = ButtonholeCornerLength;
   IniFile.picotSpace             = PicotSpacing;
-  if (!UserFlagMap.test(UserFlag::SAVMAX)) {
+  if (!UserFlagMap->test(UserFlag::SAVMAX)) {
 	auto windowRect = RECT {0L, 0L, 0L, 0L};
 	GetWindowRect(ThrEdWindow, &windowRect);
 	IniFile.initialWindowCoords.left   = windowRect.left;
@@ -3450,7 +3450,7 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
 		  flag = false;
 		  break;
 		}
-		if (UserFlagMap.test(UserFlag::BSAVOF)) {
+		if (UserFlagMap->test(UserFlag::BSAVOF)) {
 		  char const blank[16] = {};
 		  if (FALSE == WriteFile(fileHandle, static_cast<LPCVOID>(blank), sizeof(blank) - 1U, &bytesWritten, nullptr)) {
 			displayText::riter();
@@ -3488,7 +3488,7 @@ void thred::internal::sav() {
   thred::coltab();
   auto saveStitches = std::vector<fPOINTATTR> {};
   saveStitches.resize(StitchBuffer->size());
-  if (UserFlagMap.test(UserFlag::ROTAUX)) {
+  if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
 	for (auto stitch : *StitchBuffer) {
 	  *iDest++ = fPOINTATTR {stitch.y, stitch.x, stitch.attribute};
@@ -3515,7 +3515,7 @@ void thred::internal::sav() {
   }
   if (flag) {
 	defNam(*WorkingFileName);
-	if (UserFlagMap.test(UserFlag::ROTAUX)) {
+	if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	  displayText::filnopn(IDS_FILROT, *AuxName);
 	}
   }
@@ -9129,7 +9129,7 @@ void thred::internal::shftflt(fPOINT point) noexcept {
 }
 
 void thred::internal::fil2men() {
-  if (UserFlagMap.test(UserFlag::FIL2OF)) {
+  if (UserFlagMap->test(UserFlag::FIL2OF)) {
 	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
   }
@@ -9140,7 +9140,7 @@ void thred::internal::fil2men() {
 }
 
 void thred::internal::defpref() {
-  UserFlagMap.reset();
+  UserFlagMap->reset();
   for (auto iColor = 0U; iColor < 16U; iColor++) {
 	UserColor[iColor]             = DefaultUserColors[iColor];
 	CustomColor[iColor]           = DefaultCustomColors[iColor];
@@ -9155,7 +9155,7 @@ void thred::internal::defpref() {
   IniFile.chainSpace     = CHSDEF;
   IniFile.chainRatio     = CHRDEF;
   IniFile.fillAngle      = DEFANG;
-  UserFlagMap.reset(UserFlag::SQRFIL);
+  UserFlagMap->reset(UserFlag::SQRFIL);
   LineSpacing             = DEFSPACE * PFGRAN;
   ShowStitchThreshold     = SHOPNTS;
   IniFile.gridSize        = 12.0F;
@@ -9164,7 +9164,7 @@ void thred::internal::defpref() {
   IniFile.hoopSizeY       = LHUPY;
   IniFile.cursorNudgeStep = NUGINI;
   IniFile.nudgePixels     = DEFPIX;
-  UserFlagMap.set(UserFlag::BLUNT);
+  UserFlagMap->set(UserFlag::BLUNT);
   SmallStitchLength       = SMALSIZ * PFGRAN;
   SnapLength              = SNPLEN * PFGRAN;
   SpiralWrap              = SPIRWRAP;
@@ -9183,7 +9183,7 @@ void thred::internal::defpref() {
 	IniFile.customHoopY = LHUPY;
   }
   PicotSpacing = IPICSPAC;
-  UserFlagMap.set(UserFlag::FIL2OF);
+  UserFlagMap->set(UserFlag::FIL2OF);
   fil2men();
   BackgroundColor              = 0xa8c4b1;
   UnzoomedRect.x               = wrap::round<int32_t>(IniFile.hoopSizeX);
@@ -9456,35 +9456,35 @@ void thred::internal::ritcur() noexcept {
 }
 
 void thred::internal::nedon() {
-  UserFlagMap.reset(UserFlag::NEDOF);
+  UserFlagMap->reset(UserFlag::NEDOF);
   nedmen();
 }
 
 void thred::internal::nedof() {
-  UserFlagMap.set(UserFlag::NEDOF);
+  UserFlagMap->set(UserFlag::NEDOF);
   nedmen();
 }
 
 void thred::internal::shoknot() {
-  UserFlagMap.reset(UserFlag::KNOTOF);
+  UserFlagMap->reset(UserFlag::KNOTOF);
   knotmen();
   StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::internal::hidknot() {
-  UserFlagMap.set(UserFlag::KNOTOF);
+  UserFlagMap->set(UserFlag::KNOTOF);
   knotmen();
   StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::internal::pcsbsavon() {
-  UserFlagMap.reset(UserFlag::BSAVOF);
+  UserFlagMap->reset(UserFlag::BSAVOF);
   bsavmen();
   StateMap.set(StateFlag::RESTCH);
 }
 
 void thred::internal::pcsbsavof() {
-  UserFlagMap.set(UserFlag::BSAVOF);
+  UserFlagMap->set(UserFlag::BSAVOF);
   bsavmen();
   StateMap.set(StateFlag::RESTCH);
 }
@@ -9573,15 +9573,15 @@ void thred::internal::ovrlay() {
 }
 
 void thred::internal::fil2sel(uint32_t stat) {
-  UserFlagMap.set(UserFlag::FIL2OF);
+  UserFlagMap->set(UserFlag::FIL2OF);
   if (stat != 0U) {
-	UserFlagMap.reset(UserFlag::FIL2OF);
+	UserFlagMap->reset(UserFlag::FIL2OF);
   }
   fil2men();
 }
 
 void thred::internal::rotauxmen() {
-  if (UserFlagMap.test(UserFlag::ROTAUX)) {
+  if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
   }
@@ -9592,16 +9592,16 @@ void thred::internal::rotauxmen() {
 }
 
 void thred::internal::rotauxsel(uint32_t stat) {
-  UserFlagMap.set(UserFlag::ROTAUX);
+  UserFlagMap->set(UserFlag::ROTAUX);
   if (stat == 0U) {
-	UserFlagMap.reset(UserFlag::ROTAUX);
+	UserFlagMap->reset(UserFlag::ROTAUX);
   }
   rotauxmen();
   StateMap.set(StateFlag::DUMEN);
 }
 
 void thred::internal::frmcurmen() {
-  if (UserFlagMap.test(UserFlag::FRMX)) {
+  if (UserFlagMap->test(UserFlag::FRMX)) {
 	CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
   }
@@ -9612,9 +9612,9 @@ void thred::internal::frmcurmen() {
 }
 
 void thred::internal::frmcursel(uint32_t cursorType) {
-  UserFlagMap.set(UserFlag::FRMX);
+  UserFlagMap->set(UserFlag::FRMX);
   if (cursorType == 0U) {
-	UserFlagMap.reset(UserFlag::FRMX);
+	UserFlagMap->reset(UserFlag::FRMX);
   }
   frmcurmen();
   StateMap.set(StateFlag::DUMEN);
@@ -10393,7 +10393,7 @@ void thred::internal::qcode() {
 	SelectedFormList->clear();
 	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
   }
-  if (!UserFlagMap.test(UserFlag::MARQ)) {
+  if (!UserFlagMap->test(UserFlag::MARQ)) {
 	StateMap.reset(StateFlag::GMRK);
   }
   if (StateMap.testAndReset(StateFlag::PRFACT)) {
@@ -10579,7 +10579,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		break;
 	  }
 	  if (!StateMap.test(StateFlag::INIT)) {
-		if (UserFlagMap.test(UserFlag::NEDOF)) {
+		if (UserFlagMap->test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {
@@ -10588,7 +10588,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		break;
 	  }
 	  if (StateMap.test(StateFlag::INSRT)) {
-		if (UserFlagMap.test(UserFlag::NEDOF)) {
+		if (UserFlagMap->test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {
@@ -10626,7 +10626,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap.test(StateFlag::SATIN) || StateMap.test(StateFlag::SATPNT) ||
 	      StateMap.test(StateFlag::INSFRM)) {
-		if (UserFlagMap.test(UserFlag::FRMX)) {
+		if (UserFlagMap->test(UserFlag::FRMX)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {
@@ -11592,7 +11592,7 @@ auto thred::internal::updateFillColor() -> bool {
 auto thred::internal::updatePreferences() -> bool {
   chknum();
   if (Msg.hwnd == ValueWindow->operator[](PSQR)) {
-	if (UserFlagMap.testAndFlip(UserFlag::SQRFIL)) {
+	if (UserFlagMap->testAndFlip(UserFlag::SQRFIL)) {
 	  SetWindowText(ValueWindow->operator[](PSQR), StringTable->operator[](STR_PNTD).c_str());
 	}
 	else {
@@ -11601,7 +11601,7 @@ auto thred::internal::updatePreferences() -> bool {
 	return true;
   }
   if (Msg.hwnd == ValueWindow->operator[](PBLNT)) {
-	if (UserFlagMap.testAndFlip(UserFlag::BLUNT)) {
+	if (UserFlagMap->testAndFlip(UserFlag::BLUNT)) {
 	  SetWindowText(ValueWindow->operator[](PBLNT), StringTable->operator[](STR_TAPR).c_str());
 	}
 	else {
@@ -11610,7 +11610,7 @@ auto thred::internal::updatePreferences() -> bool {
 	return true;
   }
   if (Msg.hwnd == ValueWindow->operator[](PUND)) {
-	if (UserFlagMap.testAndFlip(UserFlag::DUND)) {
+	if (UserFlagMap->testAndFlip(UserFlag::DUND)) {
 	  SetWindowText(ValueWindow->operator[](PUND), StringTable->operator[](STR_OFF).c_str());
 	}
 	else {
@@ -11724,7 +11724,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			}
 		  }
 		  form.edgeType = EDGEANGSAT;
-		  if (UserFlagMap.test(UserFlag::DUND)) {
+		  if (UserFlagMap->test(UserFlag::DUND)) {
 			form.edgeType |= EGUND;
 		  }
 		  break;
@@ -11746,7 +11746,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			}
 		  }
 		  form.edgeType = EDGEAPPL;
-		  if (UserFlagMap.test(UserFlag::DUND)) {
+		  if (UserFlagMap->test(UserFlag::DUND)) {
 			form.edgeType |= EGUND;
 		  }
 		  form.borderColor |= (AppliqueColor << 4U);
@@ -11772,7 +11772,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			}
 		  }
 		  form.edgeType = EDGEPROPSAT;
-		  if (UserFlagMap.test(UserFlag::DUND)) {
+		  if (UserFlagMap->test(UserFlag::DUND)) {
 			form.edgeType |= EGUND;
 		  }
 		  break;
@@ -11852,7 +11852,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   }
   if ((form.edgeType & NEGUND) == EDGEAPPL) {
 	form.edgeType = EDGEANGSAT;
-	if (UserFlagMap.test(UserFlag::DUND)) {
+	if (UserFlagMap->test(UserFlag::DUND)) {
 	  form.edgeType |= EGUND;
 	}
   }
@@ -12703,10 +12703,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto const iFillType = (Msg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
 	  if (StateMap.testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
-		  UserFlagMap.reset(UserFlag::SQRFIL);
+		  UserFlagMap->reset(UserFlag::SQRFIL);
 		}
 		if (iFillType == 4) {
-		  UserFlagMap.set(UserFlag::SQRFIL);
+		  UserFlagMap->set(UserFlag::SQRFIL);
 		}
 	  }
 	  else {
@@ -15037,13 +15037,13 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
-	  UserFlagMap.set(UserFlag::MARQ);
+	  UserFlagMap->set(UserFlag::MARQ);
 	  qchk();
 	  flag = true;
 	  break;
 	}
 	case ID_MARKQ: { // view / Set / Retrieve Mark / Q
-	  UserFlagMap.reset(UserFlag::MARQ);
+	  UserFlagMap->reset(UserFlag::MARQ);
 	  qchk();
 	  flag = true;
 	  break;
@@ -15084,13 +15084,13 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
-	  UserFlagMap.reset(UserFlag::LINSPAC);
+	  UserFlagMap->reset(UserFlag::LINSPAC);
 	  linbmen();
 	  flag = true;
 	  break;
 	}
 	case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
-	  UserFlagMap.set(UserFlag::LINSPAC);
+	  UserFlagMap->set(UserFlag::LINSPAC);
 	  linbmen();
 	  flag = true;
 	  break;
@@ -16271,7 +16271,7 @@ void thred::internal::redini() {
 	  }
 	  {
 		auto const tmp = EnumMap<UserFlag>(IniFile.userFlagMap);
-		UserFlagMap    = tmp;
+		*UserFlagMap    = tmp;
 	  }
 	  if (IniFile.borderWidth != 0.0F) {
 		BorderWidth = IniFile.borderWidth;
@@ -16489,7 +16489,7 @@ void thred::internal::init() {
   ScreenSizeMM.cx   = GetDeviceCaps(ThredDC, HORZSIZE);
   ScreenSizeMM.cy   = GetDeviceCaps(ThredDC, VERTSIZE);
   chkirct();
-  if (!UserFlagMap.test(UserFlag::SAVMAX)) {
+  if (!UserFlagMap->test(UserFlag::SAVMAX)) {
 	MoveWindow(ThrEdWindow,
 	           IniFile.initialWindowCoords.left,
 	           IniFile.initialWindowCoords.top,
@@ -16763,7 +16763,7 @@ void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
 void thred::internal::drwknot() {
   constexpr auto KnotBoxSize  = 5;  // offset of the knot box sides;
   constexpr auto KnotLineSize = 10; // length of the knot line;
-  if (!UserFlagMap.test(UserFlag::KNOTOF) && (KnotCount != 0U) && (!StitchBuffer->empty())) {
+  if (!UserFlagMap->test(UserFlag::KNOTOF) && (KnotCount != 0U) && (!StitchBuffer->empty())) {
 	auto const kOffset = gsl::narrow<int32_t>(MulDiv(KnotBoxSize, *screenDPI, 96));
 	auto const kLine   = gsl::narrow<int32_t>(MulDiv(KnotLineSize, *screenDPI, 96));
 	auto       point   = POINT {0L, 0L};
@@ -17734,15 +17734,15 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  GetClientRect(p_hWnd, &ThredWindowRect);
 	  switch (wParam) {
 		case SIZE_MAXIMIZED: {
-		  UserFlagMap.set(UserFlag::SAVMAX);
+		  UserFlagMap->set(UserFlag::SAVMAX);
 		  break;
 		}
 		case SIZE_MINIMIZED: {
-		  UserFlagMap.reset(UserFlag::SAVMAX);
+		  UserFlagMap->reset(UserFlag::SAVMAX);
 		  break;
 		}
 		case SIZE_RESTORED: {
-		  UserFlagMap.reset(UserFlag::SAVMAX);
+		  UserFlagMap->reset(UserFlag::SAVMAX);
 		  chkirct();
 		  if (StateMap.testAndSet(StateFlag::SIZED)) {
 			auto       screenCenterOffset = 0U;
@@ -17984,6 +17984,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
 	  auto private_UserBMPFileName           = fs::path {};
 	  auto private_UserColorWin              = std::vector<HWND> {};
+	  auto private_UserFlagMap               = EnumMap<UserFlag> {0};
 	  auto private_ValueWindow               = std::vector<HWND> {};
 	  auto private_VersionNames              = std::vector<fs::path> {};
 	  auto private_WorkingFileName           = fs::path {};
@@ -18056,6 +18057,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  TracedMap                 = &private_TracedMap;
 	  UndoBuffer                = &private_UndoBuffer;
 	  UserColorWin              = &private_UserColorWin;
+	  UserFlagMap               = &private_UserFlagMap;
 	  ValueWindow               = &private_ValueWindow;
 	  VersionNames              = &private_VersionNames;
 	  WorkingFileName           = &private_WorkingFileName;
@@ -18106,7 +18108,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, 96);
 	  private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
 	  thi::init();
-	  if (UserFlagMap.test(UserFlag::SAVMAX)) {
+	  if (UserFlagMap->test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
 	  }
 	  else {

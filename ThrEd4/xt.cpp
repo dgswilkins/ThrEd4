@@ -1196,7 +1196,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 
   auto appliqueColor = gsl::narrow<uint32_t>(form.borderColor >> FRMSHFT);
   for (auto iSourceStitch = 0U; iSourceStitch < wrap::toUnsigned(StitchBuffer->size()); iSourceStitch++) {
-	if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
+	if (!UserFlagMap->test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX) && iSourceStitch == ClosestPointIndex) {
 	  ClosestPointIndex = iDestinationStitch;
 	}
 	auto const attribute = StitchBuffer->operator[](iSourceStitch).attribute;
@@ -1336,7 +1336,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	  iDestinationStitch--;
 	}
   }
-  if (!UserFlagMap.test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
+  if (!UserFlagMap->test(UserFlag::FIL2OF) && StateMap.test(StateFlag::SELBOX)) {
 	auto& fillArray = fillStartsData.fillArray;
 	std::fill(std::begin(fillArray), std::end(fillArray), ClosestPointIndex);
   }
@@ -2356,7 +2356,7 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  setstxt(IDC_DESWID, DesignSize.x, designSizeDialog);
 	  setstxt(IDC_DESHI, DesignSize.y, designSizeDialog);
-	  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap.test(UserFlag::CHREF)));
+	  CheckDlgButton(hwndlg, IDC_REFILF, gsl::narrow_cast<UINT>(UserFlagMap->test(UserFlag::CHREF)));
 	  break;
 	}
 	case WM_COMMAND: {
@@ -2370,10 +2370,10 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		  DesignSize.x = getstxt(IDC_DESWID, designSizeDialog);
 		  DesignSize.y = getstxt(IDC_DESHI, designSizeDialog);
 		  if (IsDlgButtonChecked(hwndlg, IDC_REFILF) != 0U) {
-			UserFlagMap.set(UserFlag::CHREF);
+			UserFlagMap->set(UserFlag::CHREF);
 		  }
 		  else {
-			UserFlagMap.reset(UserFlag::CHREF);
+			UserFlagMap->reset(UserFlag::CHREF);
 		  }
 		  EndDialog(hwndlg, 1);
 		  return TRUE;
@@ -2466,7 +2466,7 @@ void xt::nudsiz() {
 		flag              = 1;
 	  }
 	  xi::nudfn(designSizeRect);
-	  if (UserFlagMap.test(UserFlag::CHREF)) {
+	  if (UserFlagMap->test(UserFlag::CHREF)) {
 		form::refilal();
 	  }
 	  if (flag != 0) {
@@ -2531,7 +2531,7 @@ void xt::clrstch() noexcept {
 }
 
 void xt::chgwrn() {
-  UserFlagMap.flip(UserFlag::WRNOF);
+  UserFlagMap->flip(UserFlag::WRNOF);
   thred::wrnmen();
   StateMap.set(StateFlag::DUMEN);
 }

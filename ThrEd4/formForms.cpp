@@ -575,7 +575,7 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI_F * 180.0F)), STR_PRF1);
-  auto choice = (UserFlagMap.test(UserFlag::SQRFIL)) ? StringTable->operator[](STR_SQR)
+  auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? StringTable->operator[](STR_SQR)
                                                      : StringTable->operator[](STR_PNTD);
   ffi::prflin(choice, STR_PRF2);
   ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
@@ -588,10 +588,10 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
   ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
-  choice = (UserFlagMap.test(UserFlag::BLUNT)) ? StringTable->operator[](STR_BLUNT)
+  choice = (UserFlagMap->test(UserFlag::BLUNT)) ? StringTable->operator[](STR_BLUNT)
                                                : StringTable->operator[](STR_TAPR);
   ffi::prflin(choice, STR_PRF15);
-  choice = (UserFlagMap.test(UserFlag::DUND)) ? StringTable->operator[](STR_ON)
+  choice = (UserFlagMap->test(UserFlag::DUND)) ? StringTable->operator[](STR_ON)
                                               : StringTable->operator[](STR_OFF);
   ffi::prflin(choice, STR_PRF19);
   ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
@@ -643,8 +643,8 @@ void formForms::dazdef() {
   IniFile.daisyPetalCount   = DAZPETS;
   IniFile.daisyPetalLen     = DAZPLEN;
   IniFile.daisyHeartCount   = DAZMCNT;
-  UserFlagMap.set(UserFlag::DAZHOL);
-  UserFlagMap.set(UserFlag::DAZD);
+  UserFlagMap->set(UserFlag::DAZHOL);
+  UserFlagMap->set(UserFlag::DAZD);
   IniFile.daisyBorderType = DAZTYP;
 }
 
@@ -659,12 +659,12 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format(L"{}", IniFile.daisyPetalCount).c_str());
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format(L"{:.2f}", IniFile.daisyPetalLen).c_str());
   auto flag = 1U;
-  if (!UserFlagMap.test(UserFlag::DAZHOL)) {
+  if (!UserFlagMap->test(UserFlag::DAZHOL)) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_HOLE, flag);
   flag = 1U;
-  if (!UserFlagMap.test(UserFlag::DAZD)) {
+  if (!UserFlagMap->test(UserFlag::DAZD)) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_DLIN, flag);
@@ -712,16 +712,16 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
 		  IniFile.daisyPetalLen = wrap::wcstof(buffer);
 		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
-			UserFlagMap.set(UserFlag::DAZHOL);
+			UserFlagMap->set(UserFlag::DAZHOL);
 		  }
 		  else {
-			UserFlagMap.reset(UserFlag::DAZHOL);
+			UserFlagMap->reset(UserFlag::DAZHOL);
 		  }
 		  if (IsDlgButtonChecked(hwndlg, IDC_DLIN) != 0U) {
-			UserFlagMap.set(UserFlag::DAZD);
+			UserFlagMap->set(UserFlag::DAZD);
 		  }
 		  else {
-			UserFlagMap.reset(UserFlag::DAZD);
+			UserFlagMap->reset(UserFlag::DAZD);
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 		  wchar_t compareBuffer[HBUFSIZ] = {0};
@@ -798,7 +798,7 @@ void formForms::dasyfrm() {
   form.type    = FRMFPOLY;
   auto iVertex = 0U;
   auto fref    = 0U;
-  if (UserFlagMap.test(UserFlag::DAZHOL)) {
+  if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / holeVertexCount;
@@ -822,7 +822,7 @@ void formForms::dasyfrm() {
   }
   auto const petalSegmentAngle = PI_F2 / petalVertexCount;
   auto const deltaPetalAngle   = PI_F / IniFile.daisyPetalPoints;
-  if (UserFlagMap.test(UserFlag::DAZD)) {
+  if (UserFlagMap->test(UserFlag::DAZD)) {
 	form.satinGuideCount    = IniFile.daisyPetalCount - 1U;
 	form.wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
 	form.satinOrAngle.guide = satin::adsatk(IniFile.daisyPetalCount - 1);
@@ -888,21 +888,21 @@ void formForms::dasyfrm() {
 	  iVertex++;
 	  angle += petalSegmentAngle;
 	  auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
-	  if (UserFlagMap.test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
+	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
 		guideIt[iMacroPetal].start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		guideIt[iMacroPetal].finish = iVertex;
 	  }
 	}
   }
   auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
-  if (UserFlagMap.test(UserFlag::DAZHOL)) {
+  if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	// cppcheck-suppress unreadVariable
 	vertexIt[fref - 1U].y += 0.01F;
 	// cppcheck-suppress unreadVariable
 	vertexIt[fref].y += 0.01F;
   }
   form.vertexCount = iVertex;
-  if (UserFlagMap.test(UserFlag::DAZD)) {
+  if (UserFlagMap->test(UserFlag::DAZD)) {
 	form.type      = SAT;
 	form.attribute = 1;
   }

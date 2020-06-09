@@ -106,7 +106,7 @@ auto form::internal::fplComp(fPOINTLINE const& point1, fPOINTLINE const& point2)
 }
 
 void form::dusqr(FRMHED& form) {
-  if (UserFlagMap.test(UserFlag::SQRFIL)) {
+  if (UserFlagMap->test(UserFlag::SQRFIL)) {
 	form.extendedAttribute |= AT_SQR;
   }
   else {
@@ -156,7 +156,7 @@ auto form::internal::chk2of() -> bool {
   if (!StateMap.test(StateFlag::SELBOX)) {
 	return false;
   }
-  if (UserFlagMap.test(UserFlag::FIL2OF)) {
+  if (UserFlagMap->test(UserFlag::FIL2OF)) {
 	return false;
   }
   return true;
@@ -1409,7 +1409,7 @@ void form::internal::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finis
   auto const length      = hypot(delta.x, delta.y);
   auto       stitchCount = 0U;
   auto       step        = fPOINT {};
-  if (UserFlagMap.test(UserFlag::LINSPAC)) {
+  if (UserFlagMap->test(UserFlag::LINSPAC)) {
 	stitchCount = wrap::ceil<uint32_t>(length / stitchSize);
 	if (stitchCount != 0U) {
 	  step.x = delta.x / stitchCount;
@@ -4979,7 +4979,7 @@ void form::refilfn() {
 }
 
 void form::refil() {
-  if (!UserFlagMap.test(UserFlag::WRNOF)) {
+  if (!UserFlagMap->test(UserFlag::WRNOF)) {
 	auto const codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
 	if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](fPOINTATTR const& m) -> bool {
 	      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
@@ -5526,7 +5526,7 @@ void form::unfil() {
   }
   else {
 	if (StateMap.test(StateFlag::FORMSEL)) {
-	  if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap.test(UserFlag::WRNOF)) {
+	  if (!StateMap.testAndReset(StateFlag::IGNOR) && !UserFlagMap->test(UserFlag::WRNOF)) {
 		auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
 		if (std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](fPOINTATTR const& m) -> bool {
 		      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
@@ -5740,7 +5740,7 @@ void form::internal::sapliq(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
   form.edgeType = EDGEAPPL;
-  if (UserFlagMap.test(UserFlag::DUND)) {
+  if (UserFlagMap->test(UserFlag::DUND)) {
 	form.edgeType |= EGUND;
   }
   form.edgeSpacing = LineSpacing / 2.0F;
@@ -5764,7 +5764,7 @@ void form::apliq() {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  auto& currentForm   = FormList->operator[](ClosestFormToCursor);
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -5779,7 +5779,7 @@ void form::apliq() {
   else {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 	  auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -6758,7 +6758,7 @@ void form::internal::prpsbrd(uint32_t formIndex) {
   if (form.vertexCount > 2) {
 	clip::deleclp(formIndex);
 	form.edgeType = EDGEPROPSAT;
-	if (UserFlagMap.test(UserFlag::DUND)) {
+	if (UserFlagMap->test(UserFlag::DUND)) {
 	  form.edgeType |= EGUND;
 	}
 	form::bsizpar(form);
@@ -6780,7 +6780,7 @@ void form::prpbrd(float borderStitchSpacing) {
 	  ClosestFormToCursor    = selectedForm;
 	  auto& currentForm      = FormList->operator[](ClosestFormToCursor);
 	  currentForm.borderSize = LineSpacing;
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -6795,7 +6795,7 @@ void form::prpbrd(float borderStitchSpacing) {
   else {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 	  auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		currentForm.attribute |= gsl::narrow<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {

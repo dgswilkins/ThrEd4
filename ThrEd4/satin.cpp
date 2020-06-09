@@ -632,7 +632,7 @@ void satin::internal::satsbrd(uint32_t formIndex) {
   auto& currentForm = FormList->operator[](formIndex);
   clip::deleclp(ClosestFormToCursor);
   currentForm.edgeType = EDGEANGSAT;
-  if (UserFlagMap.test(UserFlag::DUND)) {
+  if (UserFlagMap->test(UserFlag::DUND)) {
 	currentForm.edgeType |= EGUND;
   }
   form::bsizpar(currentForm);
@@ -650,7 +650,7 @@ void satin::satbrd() {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow_cast<decltype(form.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -665,7 +665,7 @@ void satin::satbrd() {
   else {
 	if (StateMap.test(StateFlag::FORMSEL)) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  if (UserFlagMap.test(UserFlag::BLUNT)) {
+	  if (UserFlagMap->test(UserFlag::BLUNT)) {
 		form.attribute |= gsl::narrow<decltype(form.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
@@ -732,7 +732,7 @@ void satin::ribon() {
 		if (currentForm.type == FRMLINE) {
 		  // Set blunt flags
 		  auto isBlunt = 0U;
-		  if (UserFlagMap.test(UserFlag::BLUNT)) {
+		  if (UserFlagMap->test(UserFlag::BLUNT)) {
 			isBlunt = SBLNT | FBLNT;
 		  }
 		  si::satends(currentForm, isBlunt, BorderWidth);
@@ -980,13 +980,13 @@ void satin::internal::satfn(FRMHED const&             form,
 			line2Point.x += line2Step.x;
 			line2Point.y += line2Step.y;
 			if (StateMap.testAndFlip(StateFlag::FILDIR)) {
-			  if (UserFlagMap.test(UserFlag::SQRFIL)) {
+			  if (UserFlagMap->test(UserFlag::SQRFIL)) {
 				stitchPoint = form::filinu(line2Point, stitchPoint);
 			  }
 			  stitchPoint = form::filin(line1Point, stitchPoint);
 			}
 			else {
-			  if (UserFlagMap.test(UserFlag::SQRFIL)) {
+			  if (UserFlagMap->test(UserFlag::SQRFIL)) {
 				stitchPoint = form::filinu(line1Point, stitchPoint);
 			  }
 			  stitchPoint = form::filin(line2Point, stitchPoint);
