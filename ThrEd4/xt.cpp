@@ -2349,7 +2349,8 @@ auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool
 
 auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
-  auto* designSizeDialog = hwndlg; // change design size dialog window
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto designSizeDialog = hwndlg; // change design size dialog window
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);

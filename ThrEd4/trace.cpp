@@ -1215,7 +1215,8 @@ void trace::wasTrace() {
   auto        traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
   auto        traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
   auto        traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
-  auto* const BlackBrush          = CreateSolidBrush(0);   // black brush
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const BlackBrush          = CreateSolidBrush(0);   // black brush
   for (auto iRGB = 0; iRGB < 3; iRGB++) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
@@ -1233,7 +1234,8 @@ void trace::wasTrace() {
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
-	  auto*   TempBrush  = BlackBrush;
+	  // NOLINTNEXTLINE(readability-qualified-auto)
+	  auto   TempBrush  = BlackBrush;
 	  wchar_t buffer[10] = {0}; // for integer to string conversion
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);

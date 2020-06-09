@@ -555,7 +555,8 @@ void formForms::prfmsg() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  auto* preferenceDC = GetDC(PreferencesWindow);
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto preferenceDC = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
   LabelWindowCoords.top = ValueWindowCoords.top = 3;

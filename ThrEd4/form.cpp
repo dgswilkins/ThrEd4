@@ -6984,8 +6984,8 @@ void form::internal::doTimeWindow(float                        rangeX,
                                   std::vector<uint32_t> const& xPoints,
                                   std::vector<uint32_t> const& xHistogram) {
   auto checkLength = wrap::round<uint32_t>(SnapLength * 2.0F + 1.0F);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  auto* timeWindow = CreateWindow(L"STATIC",
+  // NOLINTNEXTLINE(hicpp-signed-bitwise,readability-qualified-auto)
+  auto timeWindow = CreateWindow(L"STATIC",
                                   nullptr,
                                   WS_CHILD | WS_VISIBLE | WS_BORDER,
                                   ButtonWidthX3,
@@ -6997,7 +6997,8 @@ void form::internal::doTimeWindow(float                        rangeX,
                                   ThrEdInstance,
                                   nullptr);
 
-  auto*      timeDC       = GetDC(timeWindow);
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto      timeDC       = GetDC(timeWindow);
   auto const timeStep     = gsl::narrow_cast<double>(StitchWindowSize.x) / rangeX;
   auto       timePosition = 0.0;
   auto&      formLines    = *FormLines;

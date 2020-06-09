@@ -66,8 +66,8 @@ auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-	auto* bitmap =
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast  NOLINTNEXTLINE(readability-qualified-auto)
+	auto bitmap =
 	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	if (*ppvBits != nullptr) {
 	  return bitmap;
@@ -81,7 +81,8 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
 
 void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   auto const InverseBackgroundColor = fswap(backgroundColor);
-  auto*      hBitmapFile =
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto      hBitmapFile =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
@@ -143,7 +144,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
-	  auto* bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  // NOLINTNEXTLINE(readability-qualified-auto)
+	  auto bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -155,7 +157,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		         foreground);
 		}
 	  }
-	  auto* deviceContext = CreateCompatibleDC(StitchWindowDC);
+	  // NOLINTNEXTLINE(readability-qualified-auto)
+	  auto deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
@@ -297,7 +300,8 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 		hr          = pFileSave->GetResult(&pItem);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr) && (nullptr != pItem)) {
-		  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+		  // NOLINTNEXTLINE(readability-qualified-auto)
+		  auto pszFilePath = PWSTR {nullptr};
 		  hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
@@ -324,7 +328,8 @@ void bitmap::savmap() {
 	}
 	auto fileName = fs::path {};
 	if (bi::saveName(fileName)) {
-	  auto* hBitmap =
+	  // NOLINTNEXTLINE(readability-qualified-auto)
+	  auto hBitmap =
 	      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (hBitmap == INVALID_HANDLE_VALUE) {
@@ -394,7 +399,8 @@ auto bitmap::internal::loadName(fs::path* fileName) -> bool {
 			hr          = pFileOpen->GetResult(&pItem);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hr) && (nullptr != pItem)) {
-			  auto* pszFilePath = gsl::narrow_cast<PWSTR>(nullptr);
+			  // NOLINTNEXTLINE(readability-qualified-auto)
+			  auto pszFilePath = PWSTR {nullptr};
 			  hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hr)) {
@@ -510,7 +516,8 @@ void bitmap::setBitmapPen(HPEN pen) noexcept {
 }
 
 void bitmap::drawBmpBackground() {
-  auto* deviceContext = BitmapDC;
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto deviceContext = BitmapDC;
   if (StateMap.test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }

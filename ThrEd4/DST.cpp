@@ -567,7 +567,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {0};
   auto colors    = std::vector<uint32_t> {};
   if (di::colfil()) {
-	auto* colorFile =
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (colorFile != INVALID_HANDLE_VALUE) {
@@ -749,7 +750,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
       {gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0xf3)});
   if (di::colfil()) {
 	auto  bytesWritten = DWORD {0};
-	auto* colorFile =
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (colorFile != INVALID_HANDLE_VALUE) {
@@ -852,7 +854,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   if (!thred::getFileSize(newFileName, fileSize)) {
 	return false;
   }
-  auto fileHandle = HANDLE {0};
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto fileHandle = HANDLE {nullptr};
   if (!thred::getFileHandle(newFileName,fileHandle)) {
 	return false;
   }
@@ -884,7 +887,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool {
   auto flag = true;
   if (nullptr != auxName) {
-	auto* fileHandle = CreateFile(
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (fileHandle == INVALID_HANDLE_VALUE) {
