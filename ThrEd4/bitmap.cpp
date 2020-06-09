@@ -109,19 +109,19 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   if (gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
-	if (!StateMap.testAndReset(StateFlag::WASESC)) {
-	  StateMap.reset(StateFlag::TRSET);
+	if (!StateMap->testAndReset(StateFlag::WASESC)) {
+	  StateMap->reset(StateFlag::TRSET);
 	}
 	BitmapWidth  = BitmapFileHeaderV4.bV4Width;
 	BitmapHeight = BitmapFileHeaderV4.bV4Height;
-	StateMap.set(StateFlag::INIT);
+	StateMap->set(StateFlag::INIT);
 	ZoomRect.left   = 0.0F;
 	ZoomRect.bottom = 0.0F;
 	ZoomRect.right  = UnzoomedRect.x;
 	ZoomRect.top    = UnzoomedRect.y;
 	BitmapDC        = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
-	  StateMap.set(StateFlag::MONOMAP);
+	  StateMap->set(StateFlag::MONOMAP);
 	  auto       bitmapWidthBytes = (BitmapWidth >> 5U) << 2U;
 	  auto const widthOverflow    = BitmapWidth % 32;
 	  if (widthOverflow != 0U) {
@@ -171,15 +171,15 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	}
 	else {
 	  CloseHandle(hBitmapFile);
-	  StateMap.reset(StateFlag::MONOMAP);
+	  StateMap->reset(StateFlag::MONOMAP);
 	  hBitmapFile = LoadImage(
 	      ThrEdInstance, UserBMPFileName->wstring().c_str(), IMAGE_BITMAP, BitmapWidth, BitmapHeight, LR_LOADFROMFILE);
 	  SelectObject(BitmapDC, hBitmapFile);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	bitsiz();
 	trace::initColorRef();
-	StateMap.reset(StateFlag::HIDMAP);
+	StateMap->reset(StateFlag::HIDMAP);
   }
   else {
 	CloseHandle(hBitmapFile);
@@ -318,11 +318,11 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 
 void bitmap::savmap() {
   if (PCSBMPFileName[0] != 0) {
-	if (StateMap.test(StateFlag::MONOMAP)) {
+	if (StateMap->test(StateFlag::MONOMAP)) {
 	  displayText::tabmsg(IDS_SAVMAP);
 	  return;
 	}
-	if (!StateMap.test(StateFlag::WASTRAC)) {
+	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  displayText::tabmsg(IDS_MAPCHG);
 	  return;
 	}
@@ -434,7 +434,7 @@ void bitmap::lodbmp() {
 	  displayText::loadString(fmtStr, IDS_BMPLONG);
 	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -518,7 +518,7 @@ void bitmap::setBitmapPen(HPEN pen) noexcept {
 void bitmap::drawBmpBackground() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto deviceContext = BitmapDC;
-  if (StateMap.test(StateFlag::WASTRAC)) {
+  if (StateMap->test(StateFlag::WASTRAC)) {
 	deviceContext = TraceDC;
   }
   if (bi::bitar()) {
@@ -549,11 +549,11 @@ auto bitmap::internal::bitar() -> bool {
                    wrap::floor<int32_t>(zoomedInRect.bottom * BmpStitchRatio.y)};
   if (BitmapSrcRect.right > gsl::narrow<int32_t>(BitmapWidth)) {
 	BitmapSrcRect.right = BitmapWidth;
-	StateMap.reset(StateFlag::LANDSCAP);
+	StateMap->reset(StateFlag::LANDSCAP);
   }
   if (BitmapSrcRect.bottom > gsl::narrow<int32_t>(BitmapHeight)) {
 	BitmapSrcRect.bottom = BitmapHeight;
-	StateMap.set(StateFlag::LANDSCAP);
+	StateMap->set(StateFlag::LANDSCAP);
   }
   auto const backingRect = fRECTANGLE {BitmapSrcRect.left * StitchBmpRatio.x,
                                        BitmapSrcRect.top * StitchBmpRatio.y,
@@ -595,7 +595,7 @@ auto bitmap::getrmap() -> uint32_t {
 	SelectObject(TraceDC, TraceBitmap);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
-	StateMap.set(StateFlag::WASTRAC);
+	StateMap->set(StateFlag::WASTRAC);
 	bitmapSize = (BitmapWidth + 1U) * (BitmapHeight + 1U);
 	TracedMap->resize(bitmapSize);
 	TracedMap->reset();
@@ -621,7 +621,7 @@ void bitmap::bitbltBitmap() noexcept {
 }
 
 auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
-  if (StateMap.test(StateFlag::LANDSCAP)) {
+  if (StateMap->test(StateFlag::LANDSCAP)) {
 	point.y -= (gsl::narrow_cast<float>(UnzoomedRect.y) - BitmapSizeinStitches.y);
   }
   return POINT {wrap::round<int32_t>(BmpStitchRatio.x * point.x),

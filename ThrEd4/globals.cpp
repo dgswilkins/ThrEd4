@@ -192,7 +192,7 @@ float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
 float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
 float      StarRatio         = STARAT;             // star formOrigin to body ratio
 
-EnumMap<StateFlag> StateMap(0); // Flags indicating current run state
+EnumMap<StateFlag>* StateMap; // Flags indicating current run state
 
 fPOINT StitchBmpRatio;                 // stitch hoop to bitmap ratios
 double StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes

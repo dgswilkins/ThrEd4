@@ -430,7 +430,7 @@ void thred::internal::qchk() {
 	CheckMenuItem(MainMenu, ID_MARKESC, MF_UNCHECKED);
 	CheckMenuItem(MainMenu, ID_MARKQ, MF_CHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::nedmen() {
@@ -442,7 +442,7 @@ void thred::internal::nedmen() {
 	CheckMenuItem(MainMenu, ID_SETNEDL, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_UNCHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::knotmen() {
@@ -454,7 +454,7 @@ void thred::internal::knotmen() {
 	CheckMenuItem(MainMenu, ID_KNOTON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_KNOTOF, MF_UNCHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::bsavmen() {
@@ -466,7 +466,7 @@ void thred::internal::bsavmen() {
 	CheckMenuItem(MainMenu, ID_BSAVON, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_BSAVOF, MF_UNCHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::linbmen() {
@@ -478,7 +478,7 @@ void thred::internal::linbmen() {
 	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_CHECKED);
 	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_UNCHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::wrnmen() {
@@ -753,7 +753,7 @@ void thred::internal::ladj() {
 	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_ENABLED);
 	}
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::deldu() {
@@ -761,8 +761,8 @@ void thred::internal::deldu() {
 	undo.reset(nullptr);
   }
   UndoBufferWriteIndex = 0;
-  StateMap.reset(StateFlag::BAKWRAP);
-  StateMap.reset(StateFlag::BAKACT);
+  StateMap->reset(StateFlag::BAKWRAP);
+  StateMap->reset(StateFlag::BAKACT);
 }
 
 void thred::internal::dudat() {
@@ -826,23 +826,23 @@ void thred::internal::dudat() {
 }
 
 void thred::savdo() {
-  StateMap.set(StateFlag::WASDO);
-  StateMap.set(StateFlag::CMPDO);
-  if (StateMap.testAndReset(StateFlag::SAVACT)) {
-	if (StateMap.testAndReset(StateFlag::BAKING)) {
-	  StateMap.reset(StateFlag::REDUSHO);
+  StateMap->set(StateFlag::WASDO);
+  StateMap->set(StateFlag::CMPDO);
+  if (StateMap->testAndReset(StateFlag::SAVACT)) {
+	if (StateMap->testAndReset(StateFlag::BAKING)) {
+	  StateMap->reset(StateFlag::REDUSHO);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
 	}
-	StateMap.set(StateFlag::BAKACT);
+	StateMap->set(StateFlag::BAKACT);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap.set(StateFlag::DUMEN);
+	StateMap->set(StateFlag::DUMEN);
 	thi::dudat();
 	UndoBufferWriteIndex++;
 	UndoBufferWriteIndex &= 0xfU;
 	if (UndoBufferWriteIndex == 0U) {
-	  StateMap.set(StateFlag::BAKWRAP);
+	  StateMap->set(StateFlag::BAKWRAP);
 	}
   }
 }
@@ -857,7 +857,7 @@ void thred::internal::redfils() {
   auto& previousNames = *PreviousNames;
   for (auto iLRU = 0U; iLRU < OLDNUM; iLRU++) {
 	if (!previousNames[iLRU].empty()) {
-	  if (StateMap.test(StateFlag::SAVAS)) {
+	  if (StateMap->test(StateFlag::SAVAS)) {
 		AppendMenu(
 		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
 	  }
@@ -876,7 +876,7 @@ void thred::internal::redfils() {
 	  }
 	}
   }
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::nunams() {
@@ -982,7 +982,7 @@ void thred::internal::unboxs() noexcept {
 
 void thred::internal::stchPars() {
   AspectRatio = gsl::narrow_cast<float>(UnzoomedRect.x) / gsl::narrow_cast<float>(UnzoomedRect.y);
-  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	StitchWindowSize.x = wrap::round<int32_t>(
 	    gsl::narrow_cast<float>(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * AspectRatio);
   }
@@ -992,7 +992,7 @@ void thred::internal::stchPars() {
   }
 
   if ((StitchWindowSize.x + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
-	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  StitchWindowSize.y = ThredWindowRect.bottom - (*ScrollSize * 2);
 	}
 	else {
@@ -1069,18 +1069,18 @@ void thred::movStch() {
                            (ThredWindowRect.bottom)};
   auto verticalOffset = 0;
   thi::unboxs();
-  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	verticalOffset = *ScrollSize;
 	clientSize.y -= *ScrollSize;
   }
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	clientSize.y -= *ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.x, clientSize.y, FALSE);
 	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.x, 0, *ScrollSize, clientSize.y, TRUE);
 	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.y + verticalOffset, clientSize.x, *ScrollSize, TRUE);
 	StitchWindowAspectRatio =
 	    gsl::narrow_cast<float>(clientSize.x) / gsl::narrow_cast<float>(clientSize.y);
-	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.x, *ScrollSize, TRUE);
 	}
 	ShowWindow(VerticalScrollBar, TRUE);
@@ -1094,7 +1094,7 @@ void thred::movStch() {
 	ShowWindow(HorizontalScrollBar, FALSE);
 	StitchWindowAspectRatio =
 	    gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(actualWindowHeight);
-	if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.x, *ScrollSize, TRUE);
 	}
   }
@@ -1104,7 +1104,7 @@ void thred::movStch() {
 }
 
 void thred::unbsho() {
-  if (StateMap.testAndReset(StateFlag::BAKSHO)) {
+  if (StateMap->testAndReset(StateFlag::BAKSHO)) {
 	for (auto& iBackup : BackupViewer) {
 	  DestroyWindow(iBackup);
 	}
@@ -1120,18 +1120,18 @@ void thred::unsid() noexcept {
 }
 
 void thred::internal::insadj() {
-  StateMap.reset(StateFlag::PRELIN);
+  StateMap->reset(StateFlag::PRELIN);
   form::refil();
   thred::coltab();
   form::frmout(ClosestFormToCursor);
 }
 
 void thred::internal::patdun() {
-  StateMap.reset(StateFlag::RUNPAT);
+  StateMap->reset(StateFlag::RUNPAT);
   KillTimer(ThrEdWindow, 0);
-  StateMap.set(StateFlag::WASPAT);
+  StateMap->set(StateFlag::WASPAT);
   thred::movStch();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
   displayText::tabmsg(IDS_END);
 }
 
@@ -1222,7 +1222,7 @@ void thred::internal::shft2box() {
 }
 
 void thred::internal::unbox() {
-  if (StateMap.testAndReset(StateFlag::SELBOX)) {
+  if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	SelectObject(StitchWindowDC, BoxPen[0]);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
 	Polyline(StitchWindowDC, static_cast<POINT const*>(StitchArrow), 3);
@@ -1246,7 +1246,7 @@ void thred::internal::ilin() noexcept {
 }
 
 void thred::internal::xlin() {
-  if (StateMap.testAndReset(StateFlag::ILIN)) {
+  if (StateMap->testAndReset(StateFlag::ILIN)) {
 	ilin();
   }
 }
@@ -1259,7 +1259,7 @@ void thred::internal::ilin1() noexcept {
 }
 
 void thred::internal::xlin1() {
-  if (StateMap.testAndReset(StateFlag::ILIN1)) {
+  if (StateMap->testAndReset(StateFlag::ILIN1)) {
 	ilin1();
   }
 }
@@ -1268,9 +1268,9 @@ void thred::internal::endpnt() {
   unbox();
   xlin();
   xlin1();
-  StateMap.set(StateFlag::LIN1);
-  StateMap.set(StateFlag::INSRT);
-  StateMap.reset(StateFlag::GRPSEL);
+  StateMap->set(StateFlag::LIN1);
+  StateMap->set(StateFlag::INSRT);
+  StateMap->reset(StateFlag::GRPSEL);
   InsertLine[0] = StitchCoordinatesPixels;
   InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 }
@@ -1282,14 +1282,14 @@ void thred::internal::duIns() {
   stch2px1(ClosestPointIndex + 1U);
   InsertLine[2] = StitchCoordinatesPixels;
   xlin();
-  StateMap.set(StateFlag::ILIN);
+  StateMap->set(StateFlag::ILIN);
   ilin();
 }
 
 void thred::internal::movins() {
-  if (StateMap.test(StateFlag::INSRT)) {
-	if (StateMap.test(StateFlag::LIN1)) {
-	  if (StateMap.test(StateFlag::BAKEND)) {
+  if (StateMap->test(StateFlag::INSRT)) {
+	if (StateMap->test(StateFlag::LIN1)) {
+	  if (StateMap->test(StateFlag::BAKEND)) {
 		stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
 	  }
 	  else {
@@ -1307,15 +1307,15 @@ void thred::zumhom() {
   ZoomRect = fRECTANGLE {
       0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
   ZoomFactor = 1;
-  StateMap.reset(StateFlag::ZUMED);
+  StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
   NearestCount = 0;
-  if (StateMap.test(StateFlag::RUNPAT)) {
+  if (StateMap->test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
   }
-  StateMap.set(StateFlag::RESTCH);
-  if (StateMap.test(StateFlag::SELBOX)) {
+  StateMap->set(StateFlag::RESTCH);
+  if (StateMap->test(StateFlag::SELBOX)) {
 	thi::shft2box();
   }
   thred::duzrat();
@@ -1324,7 +1324,7 @@ void thred::zumhom() {
 
 void thred::hupfn() {
   auto checkHoopRect = fRECTANGLE {}; // for checking the hoop size
-  StateMap.reset(StateFlag::HUPCHNG);
+  StateMap->reset(StateFlag::HUPCHNG);
   sizstch(checkHoopRect, *StitchBuffer);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
@@ -1349,21 +1349,21 @@ void thred::hupfn() {
 	  }
 	}
   }
-  if (!StitchBuffer->empty() || !FormVertices->empty() || StateMap.test(StateFlag::HUPEX)) {
+  if (!StitchBuffer->empty() || !FormVertices->empty() || StateMap->test(StateFlag::HUPEX)) {
 	if (checkHoopRect.left < 0 || checkHoopRect.right > IniFile.hoopSizeX ||
 	    checkHoopRect.bottom < 0 || checkHoopRect.top > IniFile.hoopSizeY) {
-	  StateMap.set(StateFlag::HUPEX);
+	  StateMap->set(StateFlag::HUPEX);
 	}
-	if (StateMap.test(StateFlag::HUPEX)) {
+	if (StateMap->test(StateFlag::HUPEX)) {
 	  auto const hoopSize =
 	      fPOINT {checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom};
 	  if (hoopSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = hoopSize.x;
-		StateMap.set(StateFlag::HUPCHNG);
+		StateMap->set(StateFlag::HUPCHNG);
 	  }
 	  if (hoopSize.y > IniFile.hoopSizeY) {
 		IniFile.hoopSizeY = hoopSize.y;
-		StateMap.set(StateFlag::HUPCHNG);
+		StateMap->set(StateFlag::HUPCHNG);
 	  }
 	  auto const designCenter =
 	      fPOINT {hoopSize.x / 2.0F + checkHoopRect.left, hoopSize.y / 2.0F + checkHoopRect.bottom};
@@ -1391,9 +1391,9 @@ void thred::hupfn() {
 }
 
 void thred::internal::chkhup() {
-  StateMap.set(StateFlag::HUPEX);
+  StateMap->set(StateFlag::HUPEX);
   hupfn();
-  if (StateMap.test(StateFlag::INIT)) {
+  if (StateMap->test(StateFlag::INIT)) {
 	formForms::prfmsg();
   }
   xt::setfchk();
@@ -1405,13 +1405,13 @@ void thred::internal::chknum() {
 	value = wrap::bufToFloat(std::begin(MsgBuffer));
   }
   xt::clrstch();
-  if (StateMap.testAndReset(StateFlag::NUROT)) {
+  if (StateMap->testAndReset(StateFlag::NUROT)) {
 	if (value != 0.0F) {
 	  IniFile.rotationAngle = value * PI_F / 180.0F;
 	}
 	return;
   }
-  if (StateMap.testAndReset(StateFlag::ENTRSEG)) {
+  if (StateMap->testAndReset(StateFlag::ENTRSEG)) {
 	if (value != 0.0F) {
 	  IniFile.rotationAngle = 2.0F * PI_F / value;
 	}
@@ -1478,7 +1478,7 @@ void thred::internal::chknum() {
 			thred::coltab();
 		  }
 		  thred::unsid();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
 		case LFRMCOL: {
@@ -1491,7 +1491,7 @@ void thred::internal::chknum() {
 			thred::coltab();
 		  }
 		  thred::unsid();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
 		case LUNDCOL: {
@@ -1505,7 +1505,7 @@ void thred::internal::chknum() {
 			thred::coltab();
 		  }
 		  thred::unsid();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
 		case LBRDCOL: {
@@ -1518,7 +1518,7 @@ void thred::internal::chknum() {
 			thred::coltab();
 		  }
 		  thred::unsid();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return;
 		}
 		case LBRDPIC: {
@@ -1856,7 +1856,7 @@ void thred::internal::chknum() {
 		if (wcslen(std::begin(MsgBuffer)) != 0U) {
 		  value = wrap::bufToFloat(std::begin(MsgBuffer));
 		  do {
-			if (StateMap.testAndReset(StateFlag::ENTRFNUM)) {
+			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 			  if (value < FormList->size()) {
 				form::frmnumfn(wrap::round<uint32_t>(value));
 			  }
@@ -1866,186 +1866,186 @@ void thred::internal::chknum() {
 			  return;
 			}
 			auto uintValue = wrap::floor<uint32_t>(value);
-			if (StateMap.testAndReset(StateFlag::ENTRPOL)) {
+			if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
 			  thred::savdo();
 			  form::durpoli(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTRSTAR)) {
+			if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
 			  thred::savdo();
 			  form::dustar(uintValue,
 			               250.0F / gsl::narrow<float>(value) * ZoomFactor *
 			                   gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTRSPIR)) {
+			if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
 			  thred::savdo();
 			  form::duspir(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTRHART)) {
+			if (StateMap->testAndReset(StateFlag::ENTRHART)) {
 			  thred::savdo();
 			  form::duhart(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTRLENS)) {
+			if (StateMap->testAndReset(StateFlag::ENTRLENS)) {
 			  thred::savdo();
 			  form::dulens(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTREG)) {
+			if (StateMap->testAndReset(StateFlag::ENTREG)) {
 			  thred::savdo();
 			  form::dueg(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTRZIG)) {
+			if (StateMap->testAndReset(StateFlag::ENTRZIG)) {
 			  thred::savdo();
 			  form::duzig(uintValue);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::PIXIN)) {
+			if (StateMap->testAndReset(StateFlag::PIXIN)) {
 			  IniFile.nudgePixels = wrap::round<uint16_t>(pxchk(value));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::STPXIN)) {
+			if (StateMap->testAndReset(StateFlag::STPXIN)) {
 			  IniFile.stitchSizePixels = wrap::round<uint16_t>(pxchk(value));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FRMPXIN)) {
+			if (StateMap->testAndReset(StateFlag::FRMPXIN)) {
 			  IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FRMBOXIN)) {
+			if (StateMap->testAndReset(StateFlag::FRMBOXIN)) {
 			  IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::GETMIN)) {
+			if (StateMap->testAndReset(StateFlag::GETMIN)) {
 			  SmallStitchLength = value * PFGRAN;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTR30)) {
+			if (StateMap->testAndReset(StateFlag::ENTR30)) {
 			  ThreadSize30 = value;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTR40)) {
+			if (StateMap->testAndReset(StateFlag::ENTR40)) {
 			  ThreadSize40 = value;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::ENTR60)) {
+			if (StateMap->testAndReset(StateFlag::ENTR60)) {
 			  ThreadSize60 = value;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::SCLPSPAC)) {
+			if (StateMap->testAndReset(StateFlag::SCLPSPAC)) {
 			  IniFile.clipOffset = value * PFGRAN;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFIND)) {
+			if (StateMap->testAndReset(StateFlag::FSETFIND)) {
 			  xt::dufind(value);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFHI)) {
+			if (StateMap->testAndReset(StateFlag::FSETFHI)) {
 			  if (value != 0.0) {
 				xt::dufhi(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFWID)) {
+			if (StateMap->testAndReset(StateFlag::FSETFWID)) {
 			  if (value != 0.0) {
 				xt::dufwid(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFMAX)) {
+			if (StateMap->testAndReset(StateFlag::FSETFMAX)) {
 			  if (value != 0.0) {
 				xt::dufmax(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFMIN)) {
+			if (StateMap->testAndReset(StateFlag::FSETFMIN)) {
 			  xt::dufmin(value * PFGRAN);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETBMAX)) {
+			if (StateMap->testAndReset(StateFlag::FSETBMAX)) {
 			  if (value != 0.0) {
 				xt::dubmax(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETBMIN)) {
+			if (StateMap->testAndReset(StateFlag::FSETBMIN)) {
 			  xt::dubmin(value * PFGRAN);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETBSPAC)) {
+			if (StateMap->testAndReset(StateFlag::FSETBSPAC)) {
 			  if (value != 0.0) {
 				xt::dubspac(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
+			if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
 			  if (value != 0.0) {
 				xt::dublen(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
+			if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
 			  xt::dubcol(wrap::round<uint32_t>(value));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
+			if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 			  xt::dufcol(wrap::round<uint32_t>(value));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETUCOL)) {
+			if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
 			  xt::dundcol(wrap::round<uint32_t>(value));
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFANG)) {
+			if (StateMap->testAndReset(StateFlag::FSETFANG)) {
 			  xt::dufxang(value);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFSPAC)) {
+			if (StateMap->testAndReset(StateFlag::FSETFSPAC)) {
 			  if (value != 0.0) {
 				xt::dufspac(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETUANG)) {
+			if (StateMap->testAndReset(StateFlag::FSETUANG)) {
 			  xt::dufang(value);
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETFLEN)) {
+			if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
 			  if (value != 0.0) {
 				xt::duflen(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETUSPAC)) {
+			if (StateMap->testAndReset(StateFlag::FSETUSPAC)) {
 			  if (value != 0.0F) {
 				xt::duspac(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::FSETULEN)) {
+			if (StateMap->testAndReset(StateFlag::FSETULEN)) {
 			  if (value != 0.0F) {
 				xt::dusulen(value * PFGRAN);
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::GTUANG)) {
+			if (StateMap->testAndReset(StateFlag::GTUANG)) {
 			  IniFile.underlayAngle = value / 180.0F * PI_F;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::GTUSPAC)) {
+			if (StateMap->testAndReset(StateFlag::GTUSPAC)) {
 			  if (value != 0.0) {
 				IniFile.underlaySpacing = value * PFGRAN;
 			  }
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::GTWLKIND)) {
+			if (StateMap->testAndReset(StateFlag::GTWLKIND)) {
 			  IniFile.underlayIndent = value * PFGRAN;
 			  break;
 			}
-			if (StateMap.testAndReset(StateFlag::GTWLKLEN)) {
+			if (StateMap->testAndReset(StateFlag::GTWLKLEN)) {
 			  if (value != 0.0) {
 				IniFile.underlayStitchLen = value * PFGRAN;
 			  }
@@ -2056,7 +2056,7 @@ void thred::internal::chknum() {
 	  }
 	}
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::noMsg() {
@@ -2072,14 +2072,14 @@ void thred::internal::noMsg() {
 	  GeneralNumberInputBox = nullptr;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::NUMIN) || (FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
+  if (StateMap->testAndReset(StateFlag::NUMIN) || (FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
 	chknum();
   }
-  StateMap.reset(StateFlag::MOVMSG);
-  StateMap.reset(StateFlag::DELFRM);
-  StateMap.reset(StateFlag::FILMSG);
-  StateMap.reset(StateFlag::FORMIN);
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->reset(StateFlag::MOVMSG);
+  StateMap->reset(StateFlag::DELFRM);
+  StateMap->reset(StateFlag::FILMSG);
+  StateMap->reset(StateFlag::FORMIN);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::unmsg() {
@@ -2135,78 +2135,78 @@ auto CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept 
 }
 
 void thred::internal::rstAll() {
-  StateMap.reset(StateFlag::WASFPNT);
-  StateMap.reset(StateFlag::WASFRMFRM);
-  StateMap.reset(StateFlag::FPUNCLP);
-  StateMap.reset(StateFlag::FPSEL);
-  StateMap.reset(StateFlag::CAPT);
-  StateMap.reset(StateFlag::INSRT);
-  StateMap.reset(StateFlag::SELBOX);
-  StateMap.reset(StateFlag::GRPSEL);
-  StateMap.reset(StateFlag::SCROS);
-  StateMap.reset(StateFlag::ECROS);
-  StateMap.reset(StateFlag::LIN1);
-  StateMap.reset(StateFlag::CLPSHO);
-  StateMap.reset(StateFlag::SELPNT);
-  StateMap.reset(StateFlag::ROTAT);
-  StateMap.reset(StateFlag::ROTCAPT);
-  StateMap.reset(StateFlag::FRMPMOV);
-  StateMap.reset(StateFlag::MOVFRM);
-  StateMap.reset(StateFlag::SATCNKT);
-  StateMap.reset(StateFlag::FRMPSEL);
-  StateMap.reset(StateFlag::SHOINSF);
-  StateMap.reset(StateFlag::STRTCH);
-  StateMap.reset(StateFlag::SHOSTRTCH);
-  StateMap.reset(StateFlag::EXPAND);
-  StateMap.reset(StateFlag::POLIMOV);
-  StateMap.reset(StateFlag::BZUMIN);
-  StateMap.reset(StateFlag::OSAV);
-  StateMap.reset(StateFlag::SAVEX);
-  StateMap.reset(StateFlag::MOVFRMS);
-  StateMap.reset(StateFlag::FRMROT);
-  StateMap.reset(StateFlag::DELSFRMS);
-  StateMap.reset(StateFlag::BIGBOX);
-  StateMap.reset(StateFlag::UPTO);
-  StateMap.reset(StateFlag::LENSRCH);
-  StateMap.reset(StateFlag::WASGRP);
-  StateMap.reset(StateFlag::BOXZUM);
-  StateMap.reset(StateFlag::HIDSTCH);
-  StateMap.reset(StateFlag::ENTRPOL);
-  StateMap.reset(StateFlag::ENTRSTAR);
-  StateMap.reset(StateFlag::ENTRSPIR);
-  StateMap.reset(StateFlag::ENTRHART);
-  StateMap.reset(StateFlag::FORMIN);
-  StateMap.reset(StateFlag::GTUANG);
-  StateMap.reset(StateFlag::GTUSPAC);
-  StateMap.reset(StateFlag::GTWLKIND);
-  StateMap.reset(StateFlag::GTWLKLEN);
+  StateMap->reset(StateFlag::WASFPNT);
+  StateMap->reset(StateFlag::WASFRMFRM);
+  StateMap->reset(StateFlag::FPUNCLP);
+  StateMap->reset(StateFlag::FPSEL);
+  StateMap->reset(StateFlag::CAPT);
+  StateMap->reset(StateFlag::INSRT);
+  StateMap->reset(StateFlag::SELBOX);
+  StateMap->reset(StateFlag::GRPSEL);
+  StateMap->reset(StateFlag::SCROS);
+  StateMap->reset(StateFlag::ECROS);
+  StateMap->reset(StateFlag::LIN1);
+  StateMap->reset(StateFlag::CLPSHO);
+  StateMap->reset(StateFlag::SELPNT);
+  StateMap->reset(StateFlag::ROTAT);
+  StateMap->reset(StateFlag::ROTCAPT);
+  StateMap->reset(StateFlag::FRMPMOV);
+  StateMap->reset(StateFlag::MOVFRM);
+  StateMap->reset(StateFlag::SATCNKT);
+  StateMap->reset(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::SHOINSF);
+  StateMap->reset(StateFlag::STRTCH);
+  StateMap->reset(StateFlag::SHOSTRTCH);
+  StateMap->reset(StateFlag::EXPAND);
+  StateMap->reset(StateFlag::POLIMOV);
+  StateMap->reset(StateFlag::BZUMIN);
+  StateMap->reset(StateFlag::OSAV);
+  StateMap->reset(StateFlag::SAVEX);
+  StateMap->reset(StateFlag::MOVFRMS);
+  StateMap->reset(StateFlag::FRMROT);
+  StateMap->reset(StateFlag::DELSFRMS);
+  StateMap->reset(StateFlag::BIGBOX);
+  StateMap->reset(StateFlag::UPTO);
+  StateMap->reset(StateFlag::LENSRCH);
+  StateMap->reset(StateFlag::WASGRP);
+  StateMap->reset(StateFlag::BOXZUM);
+  StateMap->reset(StateFlag::HIDSTCH);
+  StateMap->reset(StateFlag::ENTRPOL);
+  StateMap->reset(StateFlag::ENTRSTAR);
+  StateMap->reset(StateFlag::ENTRSPIR);
+  StateMap->reset(StateFlag::ENTRHART);
+  StateMap->reset(StateFlag::FORMIN);
+  StateMap->reset(StateFlag::GTUANG);
+  StateMap->reset(StateFlag::GTUSPAC);
+  StateMap->reset(StateFlag::GTWLKIND);
+  StateMap->reset(StateFlag::GTWLKLEN);
   trace::untrace();
-  StateMap.reset(StateFlag::WASEDG);
+  StateMap->reset(StateFlag::WASEDG);
   displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
   if (ZoomFactor == 1) {
-	StateMap.reset(StateFlag::ZUMED);
+	StateMap->reset(StateFlag::ZUMED);
   }
   thred::movStch();
   ShowWindow(MainStitchWin, TRUE);
   thred::unbsho();
-  StateMap.reset(StateFlag::SIDACT);
+  StateMap->reset(StateFlag::SIDACT);
   thred::unsid();
-  StateMap.reset(StateFlag::PRFACT);
-  StateMap.reset(StateFlag::WASRT);
+  StateMap->reset(StateFlag::PRFACT);
+  StateMap->reset(StateFlag::WASRT);
   DestroyWindow(PreferencesWindow);
   thred::undat();
-  if (StateMap.testAndReset(StateFlag::INSFRM)) {
+  if (StateMap->testAndReset(StateFlag::INSFRM)) {
 	insadj();
   }
-  StateMap.reset(StateFlag::FUNCLP);
-  if (StateMap.testAndReset(StateFlag::SATPNT)) {
+  StateMap->reset(StateFlag::FUNCLP);
+  if (StateMap->testAndReset(StateFlag::SATPNT)) {
 	satin::satfix();
   }
-  if (StateMap.testAndReset(StateFlag::RUNPAT)) {
+  if (StateMap->testAndReset(StateFlag::RUNPAT)) {
 	patdun();
   }
-  StateMap.reset(StateFlag::FORMSEL);
-  StateMap.reset(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::FRMPSEL);
   thred::unmsg();
   SearchLine->clear();
   SearchLine->shrink_to_fit();
@@ -2291,7 +2291,7 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 
 void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
-  if (StateMap.test(StateFlag::LENSRCH)) {
+  if (StateMap->test(StateFlag::LENSRCH)) {
 	auto       txt        = std::wstring {};
 	auto const stitch     = StitchBuffer->operator[](ClosestPointIndex);
 	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
@@ -2302,13 +2302,13 @@ void thred::internal::lenCalc() {
   }
   else {
 	if (StitchBuffer->size() > 1U) {
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		frmcalc(LargestStitchIndex, SmallestStitchIndex);
 		displayText::butxt(HCOR, blank);
 		return;
 	  }
 	  thred::rngadj();
-	  if (StateMap.test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
+	  if (StateMap->test(StateFlag::GRPSEL) && GroupStartStitch != GroupEndStitch) {
 		lenfn(GroupStartStitch, GroupEndStitch - 1U, LargestStitchIndex, SmallestStitchIndex);
 	  }
 	  else {
@@ -2326,7 +2326,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
   auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
   auto       stitchSize     = 1e38F;
   thred::savdo();
-  if (StateMap.test(StateFlag::FORMSEL)) {
+  if (StateMap->test(StateFlag::FORMSEL)) {
 	auto iPrevStitch = form::find1st();
 	auto iStitch     = iPrevStitch + 1U;
 	auto lastStitch  = StitchBuffer->size();
@@ -2422,7 +2422,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
   rstAll();
   thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
   lenCalc();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::duzero() {
@@ -2431,12 +2431,12 @@ void thred::internal::duzero() {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  formMap.set(selectedForm);
 	}
-	StateMap.reset(StateFlag::CONTIG);
+	StateMap->reset(StateFlag::CONTIG);
 	auto iDestination  = StitchBuffer->begin();
 	auto currentStitch = StitchBuffer->front();
 	for (auto& iStitch : *StitchBuffer) {
 	  if (((iStitch.attribute & TYPMSK) != 0U) && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
-		if (StateMap.testAndSet(StateFlag::CONTIG)) {
+		if (StateMap->testAndSet(StateFlag::CONTIG)) {
 		  auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
 		  if (stitchLength > MinStitchLength) {
 			currentStitch   = iStitch;
@@ -2451,15 +2451,15 @@ void thred::internal::duzero() {
 	  else {
 		(*iDestination) = iStitch;
 		iDestination++;
-		StateMap.reset(StateFlag::CONTIG);
+		StateMap->reset(StateFlag::CONTIG);
 	  }
 	}
 	StitchBuffer->erase(iDestination, StitchBuffer->end());
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	delsmal(GroupStartStitch, GroupEndStitch);
   }
@@ -2474,32 +2474,32 @@ void thred::internal::rshft(POINT const& shiftPoint) {
   ZoomRect.right -= shiftPoint.x;
   ZoomRect.bottom -= shiftPoint.y;
   zRctAdj();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::pgdwn() {
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	auto const scrollPosition = POINT {0, wrap::round<int32_t>((ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
 	rshft(scrollPosition);
   }
 }
 
 void thred::internal::pgup() {
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	auto const scrollPosition = POINT {0, wrap::round<int32_t>(-(ZoomRect.top - ZoomRect.bottom) * PAGSCROL)};
 	rshft(scrollPosition);
   }
 }
 
 void thred::internal::pglft() {
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	auto const scrollPosition = POINT {wrap::round<int32_t>((ZoomRect.right - ZoomRect.left) * PAGSCROL), 0};
 	rshft(scrollPosition);
   }
 }
 
 void thred::internal::pgrit() {
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	auto const scrollPosition =
 	    POINT {wrap::round<int32_t>(-(ZoomRect.right - ZoomRect.left) * PAGSCROL), 0};
 	rshft(scrollPosition);
@@ -2552,24 +2552,24 @@ void thred::internal::cros(uint32_t iStitch) {
 }
 
 void thred::internal::uncros() {
-  if (StateMap.testAndReset(StateFlag::SCROS)) {
+  if (StateMap->testAndReset(StateFlag::SCROS)) {
 	cros(GroupStartStitch);
   }
-  if (StateMap.testAndReset(StateFlag::ECROS)) {
+  if (StateMap->testAndReset(StateFlag::ECROS)) {
 	if (GroupEndStitch != GroupStartStitch) {
 	  cros(GroupEndStitch);
 	}
-	StateMap.set(StateFlag::ELIN);
+	StateMap->set(StateFlag::ELIN);
   }
 }
 
 void thred::internal::ducros(HDC dc) {
   uncros();
-  StateMap.set(StateFlag::SCROS);
+  StateMap->set(StateFlag::SCROS);
   cros(GroupStartStitch);
   if (GroupStartStitch != GroupEndStitch) {
 	cros(GroupEndStitch);
-	StateMap.set(StateFlag::ECROS);
+	StateMap->set(StateFlag::ECROS);
   }
   selin(GroupStartStitch, GroupEndStitch, dc);
 }
@@ -2615,7 +2615,7 @@ void thred::internal::dusel(HDC dc) {
 }
 
 void thred::internal::unsel() {
-  if (StateMap.testAndReset(StateFlag::SELSHO)) {
+  if (StateMap->testAndReset(StateFlag::SELSHO)) {
 	dusel(StitchWindowDC);
   }
 }
@@ -2645,7 +2645,7 @@ void thred::grpAdj() {
   thi::ducros(StitchWindowDC);
   thi::lenCalc();
   thred::selRct(StitchRangeRect);
-  if (StateMap.test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
+  if (StateMap->test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
 	if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1 ||
 	    StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
 	  auto newSize = POINT {wrap::round<int32_t>(StitchRangeRect.right - StitchRangeRect.left),
@@ -2675,7 +2675,7 @@ void thred::grpAdj() {
 		ZoomRect.left = ZoomRect.bottom = 0.0F;
 		ZoomRect.right                  = UnzoomedRect.x;
 		ZoomRect.top                    = UnzoomedRect.y;
-		StateMap.reset(StateFlag::ZUMED);
+		StateMap->reset(StateFlag::ZUMED);
 		ZoomFactor = 1.0;
 		thred::movStch();
 	  }
@@ -2690,7 +2690,7 @@ void thred::grpAdj() {
 	  }
 	}
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::nuAct(uint32_t iStitch) noexcept {
@@ -2722,19 +2722,19 @@ void thred::internal::lensadj() {
 	thred::shft(stitchPoint);
   }
   nuAct(GroupStartStitch);
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::ritlayr() {
   auto layer = 0xffffffffU;
 
-  if (StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) {
 	if (!StitchBuffer->empty()) {
 	  layer = (StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT;
 	}
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::FRMPSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::FRMPSEL)) {
 	  layer = gsl::narrow_cast<decltype(layer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U;
 	}
   }
@@ -2806,9 +2806,9 @@ void thred::internal::dubox() {
 	  RotateAngle           = atan2(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
 	}
 	duar();
-	StateMap.reset(StateFlag::ELIN);
-	StateMap.set(StateFlag::SELBOX);
-	StateMap.reset(StateFlag::FRMPSEL);
+	StateMap->reset(StateFlag::ELIN);
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->reset(StateFlag::FRMPSEL);
 	thred::redraw(ColorBar);
 	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
   }
@@ -2928,7 +2928,7 @@ auto thred::internal::savcmp() noexcept -> bool {
 #ifdef _DEBUG
   return true;
 #else
-  return !StateMap.test(StateFlag::CMPDO);
+  return !StateMap->test(StateFlag::CMPDO);
 #endif
 }
 
@@ -2995,8 +2995,8 @@ void thred::internal::redbal() {
 	  }
 	  thred::coltab();
 	  thred::redraw(ColorBar);
-	  StateMap.set(StateFlag::INIT);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::INIT);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
   CloseHandle(balaradFile);
@@ -3095,10 +3095,10 @@ void thred::internal::reldun() {
 auto thred::internal::chkattr(fs::path const& filename) -> bool {
   constexpr auto writeBits = (fs::perms::owner_write | fs::perms::others_write | fs::perms::group_write);
   if (fs::space(filename.parent_path()).available == 0U) {
-	StateMap.set(StateFlag::NOTFREE);
+	StateMap->set(StateFlag::NOTFREE);
 	return true;
   }
-  StateMap.reset(StateFlag::NOTFREE);
+  StateMap->reset(StateFlag::NOTFREE);
   auto const writePerms = fs::status(filename).permissions() & writeBits;
   if (writePerms == fs::perms::none) {
 	auto buttonPressed =
@@ -3265,13 +3265,13 @@ void thred::internal::thrsav() {
   if (chkattr(*WorkingFileName)) {
 	return;
   }
-  if (!StateMap.testAndReset(StateFlag::IGNAM)) {
+  if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (file != INVALID_HANDLE_VALUE) {
-	  StateMap.reset(StateFlag::CMPDO);
+	  StateMap->reset(StateFlag::CMPDO);
 	  for (auto& version : *VersionNames) {
 		version.clear();
 	  }
@@ -3317,7 +3317,7 @@ void thred::internal::thrsav() {
 
 void thred::internal::chk1col() {
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
   for (auto iColorChange = 0U; iColorChange < ColorChanges; iColorChange++) {
 	if (ColorChangeTable[iColorChange + 1U].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
 	  auto const iStitch = ColorChangeTable[iColorChange].stitchIndex;
@@ -3568,7 +3568,7 @@ void thred::internal::auxmen() {
 #pragma warning(suppress : 26492) // type.3 Don't use const_cast to cast away const or volatile NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
   filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
   SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> bool {
@@ -3679,11 +3679,11 @@ void thred::internal::savAs() {
 		  break;
 		}
 	  }
-	  StateMap.set(StateFlag::SAVAS);
+	  StateMap->set(StateFlag::SAVAS);
 	  nunams();
 	  ritini();
-	  StateMap.reset(StateFlag::SAVAS);
-	  StateMap.reset(StateFlag::CMPDO);
+	  StateMap->reset(StateFlag::SAVAS);
+	  StateMap->reset(StateFlag::CMPDO);
 	  thrsav();
 	  sav();
 	  SetWindowText(ThrEdWindow, ThrName->wstring().c_str());
@@ -3708,9 +3708,9 @@ void thred::internal::dun() {
   texture::savtxt();
   texture::txof();
   texture::rstxt();
-  if (StateMap.testAndReset(StateFlag::PRFACT)) {
+  if (StateMap->testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
-	StateMap.reset(StateFlag::WASRT);
+	StateMap->reset(StateFlag::WASRT);
   }
   thred::unsid();
   thred::unbsho();
@@ -3722,7 +3722,7 @@ void thred::internal::dun() {
   else {
 	if (StitchWindowClientRect.right != 0) {
 	  displayText::savdisc();
-	  StateMap.set(StateFlag::SAVEX);
+	  StateMap->set(StateFlag::SAVEX);
 	}
 	else {
 	  auto fmtStr = std::wstring {};
@@ -3766,7 +3766,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 	GetWindowRect(window, &childListRect);
 	GetWindowRect(FormDataSheet, &parentListRect);
 	form::ispcdclp();
-	if (StateMap.test(StateFlag::FILTYP)) {
+	if (StateMap->test(StateFlag::FILTYP)) {
 	  for (auto iEntry = 0U; iEntry < EDGETYPS + 1U; iEntry++) {
 		if (gsl::narrow<uint32_t>(form.edgeType & NEGUND) == EdgeFillTypes[iEntry]) {
 		  entryCount--;
@@ -3774,7 +3774,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		else {
 		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
 		      EdgeFillTypes[iEntry] == EDGECLIPX) {
-			if (StateMap.test(StateFlag::WASPCDCLP)) {
+			if (StateMap->test(StateFlag::WASPCDCLP)) {
 			  formForms::maxtsiz(strings[iEntry], SideWindowSize);
 			}
 			else {
@@ -3802,7 +3802,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		if (gsl::narrow<uint32_t>(form.edgeType & NEGUND) != EdgeFillTypes[iEntry]) {
 		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
 		      EdgeFillTypes[iEntry] == EDGECLIPX) {
-			if (StateMap.test(StateFlag::WASPCDCLP)) {
+			if (StateMap->test(StateFlag::WASPCDCLP)) {
 			  dusid(iEntry);
 			}
 		  }
@@ -3825,7 +3825,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		else {
 		  for (auto iEntry = 0U; iEntry < entries; iEntry++) {
 			if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
-			  if (StateMap.test(StateFlag::WASPCDCLP)) {
+			  if (StateMap->test(StateFlag::WASPCDCLP)) {
 				formForms::maxtsiz(strings[iEntry], SideWindowSize);
 			  }
 			  else {
@@ -3872,7 +3872,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		  for (auto iEntry = 0U; iEntry < entries; iEntry++) {
 			if (FillTypes[iEntry] != form.fillType) {
 			  if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
-				if (StateMap.test(StateFlag::WASPCDCLP)) {
+				if (StateMap->test(StateFlag::WASPCDCLP)) {
 				  dusid(iEntry);
 				}
 			  }
@@ -3884,7 +3884,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		}
 	  }
 	}
-	StateMap.set(StateFlag::SIDACT);
+	StateMap->set(StateFlag::SIDACT);
   }
 }
 
@@ -3982,7 +3982,7 @@ void thred::internal::redbak() {
 	  StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
 	}
 	else {
-	  StateMap.reset(StateFlag::INIT);
+	  StateMap->reset(StateFlag::INIT);
 	}
 	UnzoomedRect = undoData->zoomRect;
 	FormList->clear();
@@ -4023,61 +4023,61 @@ void thred::internal::redbak() {
 	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
 	}
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
 void thred::internal::redo() {
-  if (StateMap.test(StateFlag::BAKACT) && StateMap.test(StateFlag::REDUSHO)) {
+  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
 	UndoBufferWriteIndex++;
 	UndoBufferWriteIndex &= 0xfU;
 	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & 0xfU;
 	if (nextBufferIndex == UndoBufferReadIndex) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap.reset(StateFlag::REDUSHO);
+	  StateMap->reset(StateFlag::REDUSHO);
 	}
 	else {
-	  if (!StateMap.testAndSet(StateFlag::REDUSHO)) {
+	  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
 	  }
 	}
-	if (!StateMap.testAndSet(StateFlag::UNDUSHO)) {
+	if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
 	}
 	redbak();
-	StateMap.set(StateFlag::DUMEN);
+	StateMap->set(StateFlag::DUMEN);
   }
 }
 
 void thred::internal::bak() {
   thred::unmsg();
-  StateMap.reset(StateFlag::FPSEL);
-  StateMap.reset(StateFlag::FRMPSEL);
-  StateMap.reset(StateFlag::BIGBOX);
+  StateMap->reset(StateFlag::FPSEL);
+  StateMap->reset(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::BIGBOX);
   SelectedFormList->clear();
   thred::undat();
-  if (StateMap.testAndReset(StateFlag::PRFACT)) {
-	StateMap.reset(StateFlag::WASRT);
+  if (StateMap->testAndReset(StateFlag::PRFACT)) {
+	StateMap->reset(StateFlag::WASRT);
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
 	thred::unsid();
   }
-  if (!StateMap.testAndSet(StateFlag::BAKING)) {
+  if (!StateMap->testAndSet(StateFlag::BAKING)) {
 	dudat();
 	UndoBufferReadIndex = UndoBufferWriteIndex + 1U;
   }
-  if (StateMap.test(StateFlag::BAKWRAP)) {
+  if (StateMap->test(StateFlag::BAKWRAP)) {
 	UndoBufferWriteIndex--;
 	UndoBufferWriteIndex &= 0xfU;
 	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
 	if (previousBufferIndex == UndoBufferReadIndex) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap.set(StateFlag::DUMEN);
-	  StateMap.reset(StateFlag::UNDUSHO);
+	  StateMap->set(StateFlag::DUMEN);
+	  StateMap->reset(StateFlag::UNDUSHO);
 	}
   }
   else {
@@ -4087,37 +4087,37 @@ void thred::internal::bak() {
 	if (UndoBufferWriteIndex == 0U) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap.set(StateFlag::DUMEN);
-	  StateMap.reset(StateFlag::UNDUSHO);
+	  StateMap->set(StateFlag::DUMEN);
+	  StateMap->reset(StateFlag::UNDUSHO);
 	}
   }
-  if (!StateMap.testAndSet(StateFlag::REDUSHO)) {
+  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap.set(StateFlag::DUMEN);
+	StateMap->set(StateFlag::DUMEN);
   }
-  StateMap.reset(StateFlag::FORMSEL);
-  StateMap.reset(StateFlag::GRPSEL);
-  StateMap.reset(StateFlag::SCROS);
-  StateMap.reset(StateFlag::ECROS);
+  StateMap->reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::GRPSEL);
+  StateMap->reset(StateFlag::SCROS);
+  StateMap->reset(StateFlag::ECROS);
   redbak();
 }
 
 void thred::internal::prtred() {
   CloseHandle(FileHandle);
-  StateMap.reset(StateFlag::INIT);
+  StateMap->reset(StateFlag::INIT);
   FormList->clear();
   displayText::tabmsg(IDS_PRT);
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::unthum() {
-  if (StateMap.testAndReset(StateFlag::THUMSHO)) {
+  if (StateMap->testAndReset(StateFlag::THUMSHO)) {
 	for (auto& iBackup : BackupViewer) {
 	  DestroyWindow(iBackup);
 	}
-	if (StateMap.test(StateFlag::UPTO)) {
+	if (StateMap->test(StateFlag::UPTO)) {
 	  displayText::butxt(HUPTO, StringTable->operator[](STR_UPON));
 	}
 	else {
@@ -4132,13 +4132,13 @@ void thred::internal::unthum() {
 
 void thred::internal::rstdu() {
   deldu();
-  StateMap.reset(StateFlag::REDUSHO);
-  StateMap.reset(StateFlag::UNDUSHO);
+  StateMap->reset(StateFlag::REDUSHO);
+  StateMap->reset(StateFlag::UNDUSHO);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool {
@@ -4385,7 +4385,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &BytesRead, nullptr);
 	  if (BytesRead != bytesToRead) {
 		// StitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
-		// StateMap.set(StateFlag::BADFIL);
+		// StateMap->set(StateFlag::BADFIL);
 		prtred();
 		return false;
 	  }
@@ -4428,7 +4428,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  ThreadSize[iThread][0] = threadSizeBufW[iThread];
 	}
 	if (thredHeader.formCount != 0) {
-	  StateMap.reset(StateFlag::BADFIL);
+	  StateMap->reset(StateFlag::BADFIL);
 	  MsgBuffer[0]     = 0;
 	  auto bytesToRead = DWORD {0};
 	  if (version < 2) {
@@ -4440,7 +4440,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
 		      BytesRead / sizeof(decltype(formListOriginal.back())));
 		  formListOriginal.resize(thredHeader.formCount);
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 		FormList->reserve(formListOriginal.size());
 		FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
@@ -4454,7 +4454,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  thredHeader.formCount =
 		      gsl::narrow<decltype(thredHeader.formCount)>(BytesRead / sizeof(decltype(inFormList.back())));
 		  inFormList.resize(thredHeader.formCount);
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 		FormList->reserve(inFormList.size());
 		FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
@@ -4466,7 +4466,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ReadFile(fileHandle, FormVertices->data(), bytesToRead, &BytesRead, nullptr);
 		if (BytesRead != bytesToRead) {
 		  FormVertices->resize(BytesRead / sizeof(decltype(FormVertices->back())));
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 	  }
 	  else {
@@ -4481,7 +4481,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ReadFile(fileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
 		if (BytesRead != bytesToRead) {
 		  inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 		SatinGuides->reserve(inGuideList.size());
 		SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
@@ -4493,7 +4493,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ReadFile(fileHandle, ClipPoints->data(), bytesToRead, &BytesRead, nullptr);
 		if (BytesRead != bytesToRead) {
 		  ClipPoints->resize(BytesRead / sizeof(decltype(ClipPoints->back())));
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 	  }
 	  ClipPoints->shrink_to_fit();
@@ -4504,14 +4504,14 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ReadFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &BytesRead, nullptr);
 		if (BytesRead != bytesToRead) {
 		  TexturePointsBuffer->resize(BytesRead / sizeof(decltype(TexturePointsBuffer->back())));
-		  StateMap.set(StateFlag::BADFIL);
+		  StateMap->set(StateFlag::BADFIL);
 		}
 	  }
 	  else {
 		TexturePointsBuffer->clear();
 	  }
 	  TexturePointsBuffer->shrink_to_fit();
-	  if (StateMap.testAndReset(StateFlag::BADFIL)) {
+	  if (StateMap->testAndReset(StateFlag::BADFIL)) {
 		displayText::bfilmsg();
 	  }
 	  // now re-create all the pointers/indexes in the form data
@@ -4585,7 +4585,7 @@ void thred::internal::resetState() {
   form::frmon();
   SelectedFormList->clear();
   SelectedFormList->shrink_to_fit();
-  if (StateMap.test(StateFlag::PRFACT)) {
+  if (StateMap->test(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
   }
@@ -4596,22 +4596,22 @@ void thred::internal::resetState() {
   thred::unmsg();
   ZoomFactor = 1;
   NearestCount = 0;
-  if (StateMap.testAndReset(StateFlag::WASPAT)) {
+  if (StateMap->testAndReset(StateFlag::WASPAT)) {
 	DestroyWindow(SpeedScrollBar);
   }
   auto textureHistoryFlag = false;
-  if (StateMap.test(StateFlag::WASTXBAK)) {
+  if (StateMap->test(StateFlag::WASTXBAK)) {
 	textureHistoryFlag = true;
   }
-  StateMap.reset();
+  StateMap->reset();
   if (textureHistoryFlag) {
-	StateMap.set(StateFlag::WASTXBAK);
+	StateMap->set(StateFlag::WASTXBAK);
   }
 }
 
 void thred::internal::nuFil(fileIndices fileIndex) {
   auto newFileName = *WorkingFileName;
-  if (StateMap.testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, fileStyles::ALL_FILES, fileIndex)) {
+  if (StateMap->testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, fileStyles::ALL_FILES, fileIndex)) {
 	WorkingFileName->assign(newFileName);
 	defNam(newFileName);
 	resetState();
@@ -4625,7 +4625,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  }
 	}
 	else {
-	  StateMap.set(StateFlag::NOTHRFIL);
+	  StateMap->set(StateFlag::NOTHRFIL);
 	  if (firstCharacter == 'p') {
 		if (tolower(fileExt[2]) == 'c') {
 		  if (!readPCSFile(newFileName)) {
@@ -4655,7 +4655,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	thred::movStch();
 	thred::coltab();
-	StateMap.reset(StateFlag::ZUMED);
+	StateMap->reset(StateFlag::ZUMED);
 	wchar_t buffer[3] = {0};
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
@@ -4668,10 +4668,10 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	}
 	thred::redraw(ColorBar);
 	if (!StitchBuffer->empty()) {
-	  StateMap.set(StateFlag::INIT);
+	  StateMap->set(StateFlag::INIT);
 	}
 	nuAct(0);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	nunams();
 	ritini();
 	auto const blank = std::wstring {};
@@ -4688,9 +4688,9 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	    ThrEdWindow,
 	    fmt::format(StringTable->operator[](STR_THRDBY), newFileName.wstring(), *DesignerName).c_str());
 	CloseHandle(FileHandle);
-	StateMap.set(StateFlag::INIT);
-	StateMap.reset(StateFlag::TRSET);
-	if (StateMap.test(StateFlag::NOTHRFIL)) {
+	StateMap->set(StateFlag::INIT);
+	StateMap->reset(StateFlag::TRSET);
+	if (StateMap->test(StateFlag::NOTHRFIL)) {
 	  for (auto& stitch : *StitchBuffer) {
 		stitch.attribute |= NOTFRM;
 	  }
@@ -4740,48 +4740,48 @@ auto thred::inStitchWin() noexcept -> bool {
 }
 
 void thred::internal::zumin() {
-  if (!StateMap.testAndReset(StateFlag::ZUMACT)) {
+  if (!StateMap->testAndReset(StateFlag::ZUMACT)) {
 	ZoomFactor *= ZUMFCT;
   }
   if (ZoomFactor < ZoomMin) {
 	ZoomFactor = ZoomMin;
   }
-  if (!StateMap.testAndSet(StateFlag::ZUMED)) {
+  if (!StateMap->testAndSet(StateFlag::ZUMED)) {
 	thred::movStch();
   }
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
-  if (!StateMap.testAndReset(StateFlag::BZUMIN)) {
+  if (!StateMap->testAndReset(StateFlag::BZUMIN)) {
 	do {
-	  if (StateMap.test(StateFlag::GMRK)) {
+	  if (StateMap->test(StateFlag::GMRK)) {
 		stitchPoint = ZoomMarkPoint;
 		break;
 	  }
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
 
 		stitchPoint = fPOINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                      wrap::midl(boundingRect.top, boundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap.test(StateFlag::FRMPSEL)) {
+	  if (StateMap->test(StateFlag::FRMPSEL)) {
 		auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 		stitchPoint = vertexIt[ClosestVertexToCursor];
 		break;
 	  }
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
 		break;
 	  }
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		auto groupBoundingRect = fRECTANGLE {};
 		thred::selRct(groupBoundingRect);
 		stitchPoint = fPOINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                      wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap.test(StateFlag::INSRT)) {
-		if (StateMap.test(StateFlag::LIN1)) {
-		  if (StateMap.test(StateFlag::BAKEND)) {
+	  if (StateMap->test(StateFlag::INSRT)) {
+		if (StateMap->test(StateFlag::LIN1)) {
+		  if (StateMap->test(StateFlag::BAKEND)) {
 			stitchPoint = StitchBuffer->back();
 		  }
 		  else {
@@ -4833,30 +4833,30 @@ void thred::internal::zumin() {
   ZoomRect             = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
   thred::shft(stitchPoint);
   NearestCount = 0;
-  if (!StateMap.test(StateFlag::GMRK) && StateMap.test(StateFlag::SELBOX)) {
+  if (!StateMap->test(StateFlag::GMRK) && StateMap->test(StateFlag::SELBOX)) {
 	shft2box();
   }
-  if (StateMap.test(StateFlag::RUNPAT)) {
+  if (StateMap->test(StateFlag::RUNPAT)) {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	RunPoint = 0;
   }
   thred::duzrat();
   movins();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
   ilin();
 }
 
 void thred::internal::zumshft() {
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	unboxs();
 	if (thred::inStitchWin()) {
 	  NearestCount = 0;
 	  thred::shft(thred::pxCor2stch(Msg.pt));
-	  if (StateMap.test(StateFlag::RUNPAT)) {
+	  if (StateMap->test(StateFlag::RUNPAT)) {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 		RunPoint = 0;
 	  }
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
   movins();
@@ -4865,36 +4865,36 @@ void thred::internal::zumshft() {
 void thred::internal::zumout() {
   unboxs();
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
-  if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::ZUMED)) {
 	do {
-	  if (StateMap.test(StateFlag::GMRK)) {
+	  if (StateMap->test(StateFlag::GMRK)) {
 		stitchPoint = ZoomMarkPoint;
 		break;
 	  }
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
 
 		stitchPoint = fPOINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                      wrap::midl(boundingRect.top, boundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap.test(StateFlag::FRMPSEL)) {
+	  if (StateMap->test(StateFlag::FRMPSEL)) {
 		auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 		stitchPoint = vertexIt[ClosestVertexToCursor];
 		break;
 	  }
-	  if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT)) {
+	  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT)) {
 		stitchPoint = StitchBuffer->operator[](ClosestPointIndex);
 		break;
 	  }
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		auto groupBoundingRect = fRECTANGLE {};
 		thred::selRct(groupBoundingRect);
 		stitchPoint = fPOINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                      wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
 	  }
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		shft2box();
 		break;
 	  }
@@ -4905,7 +4905,7 @@ void thred::internal::zumout() {
 	ZoomFactor /= ZUMFCT;
 	if (ZoomFactor > 0.98F) {
 	  ZoomFactor = 1;
-	  StateMap.reset(StateFlag::ZUMED);
+	  StateMap->reset(StateFlag::ZUMED);
 	  ZoomRect =
 	      fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0F};
 	  thred::movStch();
@@ -4916,11 +4916,11 @@ void thred::internal::zumout() {
 	  ZoomRect = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
 	  thred::shft(stitchPoint);
 	}
-	if (StateMap.test(StateFlag::RUNPAT)) {
+	if (StateMap->test(StateFlag::RUNPAT)) {
 	  FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	  RunPoint = 0;
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	thred::duzrat();
 	movins();
   }
@@ -4960,7 +4960,7 @@ void thred::internal::closPnt() {
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 	auto const iStitch0 = ColorChangeTable[iColor].stitchIndex;
 	auto const iStitch1 = ColorChangeTable[iColor + 1U].stitchIndex;
-	if (StateMap.test(StateFlag::HID)) {
+	if (StateMap->test(StateFlag::HID)) {
 	  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 		duClos(iStitch0, iStitch1 - iStitch0, stitchPoint);
 	  }
@@ -4984,7 +4984,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 	auto       closestIndex = 0U;
 	auto const pointToCheck =
 	    POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-	if (StateMap.test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
+	if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
 	  if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
 		*closestStitch = ClosestPointIndex;
 		return true;
@@ -5000,7 +5000,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 	}
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 	DistanceToClick        = 1e99;
-	if (StateMap.test(StateFlag::HID)) {
+	if (StateMap->test(StateFlag::HID)) {
 	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 		if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 		  for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
@@ -5046,7 +5046,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 	  return false;
 	}
 	stch2px(closestIndex);
-	if (StateMap.test(StateFlag::IGNTHR)) {
+	if (StateMap->test(StateFlag::IGNTHR)) {
 	  *closestStitch = closestIndex;
 	  return true;
 	}
@@ -5070,20 +5070,20 @@ auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
 }
 
 void thred::internal::toglup() {
-  if (StateMap.testAndFlip(StateFlag::UPTO)) {
+  if (StateMap->testAndFlip(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
   }
   else {
-	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	  thred::rngadj();
 	  ClosestPointIndex = GroupStartStitch;
-	  StateMap.set(StateFlag::SELBOX);
-	  StateMap.reset(StateFlag::FRMPSEL);
+	  StateMap->set(StateFlag::SELBOX);
+	  StateMap->reset(StateFlag::FRMPSEL);
 	}
 	else {
-	  if (!StateMap.test(StateFlag::SELBOX)) {
+	  if (!StateMap->test(StateFlag::SELBOX)) {
 		ClosestPointIndex = 0;
-		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 		  while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size()) &&
 		         form::notfstch(StitchBuffer->operator[](ClosestPointIndex).attribute)) {
 			ClosestPointIndex++;
@@ -5091,33 +5091,33 @@ void thred::internal::toglup() {
 		  if (ClosestPointIndex == StitchBuffer->size()) { // the selected form does not yet have any stitches
 			--ClosestPointIndex;
 		  }
-		  StateMap.set(StateFlag::SELBOX);
-		  StateMap.reset(StateFlag::FRMPSEL);
+		  StateMap->set(StateFlag::SELBOX);
+		  StateMap->reset(StateFlag::FRMPSEL);
 		}
 	  }
 	}
 	displayText::butxt(HUPTO, StringTable->operator[](STR_UPON));
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::toglHid() {
-  if (StateMap.testAndFlip(StateFlag::HID)) {
-	StateMap.reset(StateFlag::FRMOF);
+  if (StateMap->testAndFlip(StateFlag::HID)) {
+	StateMap->reset(StateFlag::FRMOF);
   }
   else {
-	StateMap.set(StateFlag::FRMOF);
+	StateMap->set(StateFlag::FRMOF);
   }
   unthum();
   thred::redraw(ButtonWin->operator[](HHID));
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::dulin() {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
-	if (StateMap.test(StateFlag::ISDWN)) {
+	if (StateMap->test(StateFlag::ISDWN)) {
 	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine0), 2);
 	}
 	else {
@@ -5125,19 +5125,19 @@ void thred::internal::dulin() {
 	}
   }
   else {
-	if (StateMap.test(StateFlag::ISDWN)) {
+	if (StateMap->test(StateFlag::ISDWN)) {
 	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine0), 2);
 	}
-	if (StateMap.test(StateFlag::ISUP)) {
+	if (StateMap->test(StateFlag::ISUP)) {
 	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine1), 2);
 	}
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
-  StateMap.flip(StateFlag::WASLIN);
+  StateMap->flip(StateFlag::WASLIN);
 }
 
 void thred::internal::unlin() {
-  if (StateMap.test(StateFlag::WASLIN)) {
+  if (StateMap->test(StateFlag::WASLIN)) {
 	dulin();
   }
 }
@@ -5155,15 +5155,15 @@ void thred::internal::movbox() {
 	                 stitch.x,
 	                 stitch.y);
 	  dubox();
-	  if (StateMap.test(StateFlag::UPTO)) {
-		StateMap.set(StateFlag::RESTCH);
+	  if (StateMap->test(StateFlag::UPTO)) {
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
 	else {
 	  shft2box();
-	  StateMap.set(StateFlag::SELBOX);
-	  StateMap.reset(StateFlag::FRMPSEL);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::SELBOX);
+	  StateMap->reset(StateFlag::FRMPSEL);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	nuAct(ClosestPointIndex);
 	ritcor(StitchBuffer->operator[](ClosestPointIndex));
@@ -5171,7 +5171,7 @@ void thred::internal::movbox() {
 }
 
 auto thred::internal::chkhid(uint32_t colorToCheck) -> bool {
-  if (StateMap.test(StateFlag::HID)) {
+  if (StateMap->test(StateFlag::HID)) {
 	return ColorChangeTable[colorToCheck].colorIndex == ActiveColor;
   }
 
@@ -5375,7 +5375,7 @@ auto thred::internal::closlin() -> uint32_t {
 void thred::internal::istch() {
   xlin();
   xlin1();
-  if (StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) {
 	if ((ClosestPointIndex != 0U) &&
 	    ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
 	  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
@@ -5399,10 +5399,10 @@ void thred::internal::istch() {
 	ClosestPointIndex = closlin();
   }
   if (ClosestPointIndex == gsl::narrow_cast<decltype(ClosestPointIndex)>(-1)) {
-	StateMap.reset(StateFlag::INSRT);
+	StateMap->reset(StateFlag::INSRT);
   }
   else {
-	StateMap.set(StateFlag::INSRT);
+	StateMap->set(StateFlag::INSRT);
 	duIns();
 	SetCapture(ThrEdWindow);
 	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
@@ -5411,27 +5411,27 @@ void thred::internal::istch() {
 }
 
 void thred::internal::mark() {
-  if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT) || closPnt1(&ClosestPointIndex)) {
+  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT) || closPnt1(&ClosestPointIndex)) {
 	unbox();
 	xlin();
-	StateMap.reset(StateFlag::CAPT);
-	StateMap.reset(StateFlag::SELBOX);
-	StateMap.reset(StateFlag::INSRT);
-	StateMap.reset(StateFlag::SCROS);
-	StateMap.reset(StateFlag::ECROS);
+	StateMap->reset(StateFlag::CAPT);
+	StateMap->reset(StateFlag::SELBOX);
+	StateMap->reset(StateFlag::INSRT);
+	StateMap->reset(StateFlag::SCROS);
+	StateMap->reset(StateFlag::ECROS);
 	GroupStitchIndex = ClosestPointIndex;
-	StateMap.set(StateFlag::GRPSEL);
+	StateMap->set(StateFlag::GRPSEL);
   }
 }
 
 void thred::internal::selCol() {
   if (!StitchBuffer->empty()) {
 	auto iStitch = 0U;
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  iStitch = ClosestPointIndex;
 	}
 	else {
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		iStitch = GroupStitchIndex;
 	  }
 	  else {
@@ -5460,16 +5460,16 @@ void thred::internal::selCol() {
 	if (GroupStitchIndex > gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U)) {
 	  GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
 	}
-	StateMap.set(StateFlag::GRPSEL);
+	StateMap->set(StateFlag::GRPSEL);
 	unbox();
 	thred::grpAdj();
 	ActiveColor = color;
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
 void thred::internal::newFil() {
-  StateMap.reset(StateFlag::CMPDO);
+  StateMap->reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
   deldu();
   auto& desName = IniFile.designerName;
@@ -5484,18 +5484,18 @@ void thred::internal::newFil() {
   rstdu();
   rstAll();
   displayText::clrhbut(3);
-  StateMap.reset(StateFlag::MOVSET);
+  StateMap->reset(StateFlag::MOVSET);
   PCSHeader.leadIn     = 0x32;
   PCSHeader.colorCount = 16U;
   unbox();
   xlin();
   xlin1();
-  StateMap.reset(StateFlag::INIT);
-  StateMap.reset(StateFlag::INSRT);
-  StateMap.reset(StateFlag::LIN1);
-  StateMap.reset(StateFlag::FORMSEL);
-  StateMap.reset(StateFlag::BAKACT);
-  StateMap.reset(StateFlag::GMRK);
+  StateMap->reset(StateFlag::INIT);
+  StateMap->reset(StateFlag::INSRT);
+  StateMap->reset(StateFlag::LIN1);
+  StateMap->reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::BAKACT);
+  StateMap->reset(StateFlag::GMRK);
   StitchBuffer->clear();
   StitchBuffer->shrink_to_fit();
   DisplayedColorBitmap.reset();
@@ -5529,7 +5529,7 @@ void thred::bBox() noexcept {
 }
 
 void thred::unbBox() {
-  if (StateMap.testAndReset(StateFlag::BZUM)) {
+  if (StateMap->testAndReset(StateFlag::BZUM)) {
 	thred::bBox();
   }
 }
@@ -5545,12 +5545,12 @@ void thred::internal::rebox() {
 	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
 	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & TYPMSK) >> TYPSHFT));
 	}
-	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-	  StateMap.reset(StateFlag::SCROS);
-	  StateMap.reset(StateFlag::ECROS);
+	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+	  StateMap->reset(StateFlag::SCROS);
+	  StateMap->reset(StateFlag::ECROS);
 	  SearchLine->clear();
 	  SearchLine->shrink_to_fit();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& window : *UserColorWin) {
 		thred::redraw(window);
 	  }
@@ -5575,7 +5575,7 @@ void thred::internal::duclp() noexcept {
 }
 
 void thred::internal::unclp() {
-  if (StateMap.testAndReset(StateFlag::CLPSHO)) {
+  if (StateMap->testAndReset(StateFlag::CLPSHO)) {
 	duclp();
   }
 }
@@ -5601,7 +5601,7 @@ void thred::internal::clpbox() {
   ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = StitchCoordinatesPixels.y;
   ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + adjustedSize.cx;
   ClipInsertBoxLine[2].y = ClipInsertBoxLine[3].y = ClipInsertBoxLine[0].y + adjustedSize.cy;
-  StateMap.set(StateFlag::CLPSHO);
+  StateMap->set(StateFlag::CLPSHO);
   duclp();
 }
 
@@ -5613,9 +5613,9 @@ void thred::internal::lodclp(uint32_t iStitch) {
 	    clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | LayerIndex | NOTFRM};
   }
   GroupStitchIndex = iStitch - 1U;
-  StateMap.set(StateFlag::GRPSEL);
+  StateMap->set(StateFlag::GRPSEL);
   if (!StitchBuffer->empty()) {
-	StateMap.set(StateFlag::INIT);
+	StateMap->set(StateFlag::INIT);
   }
 }
 
@@ -5653,7 +5653,7 @@ void thred::internal::rSelbox() {
       StitchCoordinatesPixels.y + adjustedSelectSize.cy;
   formControls[2].x = formControls[3].x = formControls[4].x =
       StitchCoordinatesPixels.x + adjustedSelectSize.cx;
-  StateMap.set(StateFlag::SELSHO);
+  StateMap->set(StateFlag::SELSHO);
   dusel(StitchWindowDC);
 }
 
@@ -5710,7 +5710,7 @@ void thred::internal::durot() noexcept {
 }
 
 void thred::internal::unrot() {
-  if (StateMap.testAndReset(StateFlag::ROTSHO)) {
+  if (StateMap->testAndReset(StateFlag::ROTSHO)) {
 	durot();
   }
 }
@@ -5723,7 +5723,7 @@ void thred::internal::durotu() noexcept {
 }
 
 void thred::internal::unrotu() {
-  if (StateMap.testAndReset(StateFlag::ROTUSHO)) {
+  if (StateMap->testAndReset(StateFlag::ROTUSHO)) {
 	durotu();
   }
 }
@@ -5852,7 +5852,7 @@ void thred::internal::rotstch(fPOINTATTR& stitch, float const rotationAngle, fPO
 }
 
 void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) {
-  if (StateMap.test(StateFlag::MOVCNTR)) { // set rotation angle to 0 if we are moving the center point
+  if (StateMap->test(StateFlag::MOVCNTR)) { // set rotation angle to 0 if we are moving the center point
 	rotationAngle = 0.0F;
   }
   auto rotated           = POINT {0L, 0L};
@@ -5881,32 +5881,32 @@ void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) 
   rotang(rotationReference, rotated, rotationAngle, rotationCenter);
   RotateBoxCrossHorzLine[0] = rotated;
   thred::sCor2px(rotationCenter, RotateBoxToCursorLine[0]);
-  StateMap.set(StateFlag::ROTSHO);
+  StateMap->set(StateFlag::ROTSHO);
   durot();
 }
 
 void thred::internal::rot(fPOINT& rotationCenter) {
   do {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  break;
 	}
 	if (!SelectedFormList->empty()) {
 	  break;
 	}
-	if (StateMap.test(StateFlag::BIGBOX)) {
+	if (StateMap->test(StateFlag::BIGBOX)) {
 	  break;
 	}
-	if (StateMap.test(StateFlag::GRPSEL)) {
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  break;
 	}
-	if (StateMap.test(StateFlag::FPSEL)) {
+	if (StateMap->test(StateFlag::FPSEL)) {
 	  break;
 	}
 	// no rotatable selections found
 	displayText::shoseln(IDS_FGRPF, IDS_ROT);
 	return;
   } while (false);
-  StateMap.set(StateFlag::ROTAT);
+  StateMap->set(StateFlag::ROTAT);
   rotationCenter = form::rotpar();
   ritrot(0, rotationCenter);
 }
@@ -6002,7 +6002,7 @@ auto thred::internal::sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex,
 }
 
 void thred::internal::duclip() {
-  if (StateMap.test(StateFlag::FPSEL)) {
+  if (StateMap->test(StateFlag::FPSEL)) {
 	if (OpenClipboard(ThrEdWindow) != 0) {
 	  EmptyClipboard();
 	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
@@ -6014,7 +6014,7 @@ void thred::internal::duclip() {
 		auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
 		clipHeader->clipType    = CLP_FRMPS;
 		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
-		clipHeader->direction   = StateMap.test(StateFlag::PSELDIR);
+		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
 		// skip past the header
 		auto*       vertices                  = convert_ptr<fPOINT*>(&clipHeader[1]);
 		auto const& form                      = FormList->operator[](ClosestFormToCursor);
@@ -6033,7 +6033,7 @@ void thred::internal::duclip() {
 	}
 	return;
   }
-  if (StateMap.test(StateFlag::BIGBOX)) {
+  if (StateMap->test(StateFlag::BIGBOX)) {
 	displayText::tabmsg(IDS_INSF);
   }
   else {
@@ -6165,7 +6165,7 @@ void thred::internal::duclip() {
 		}
 	  }
 	  else {
-		if (StateMap.test(StateFlag::FORMSEL)) {
+		if (StateMap->test(StateFlag::FORMSEL)) {
 		  // clang-format off
 		  auto       firstStitch = 0U; // points to the first stitch in a form
 		  auto       stitchCount = 0U;
@@ -6245,7 +6245,7 @@ void thred::internal::duclip() {
 		  CloseClipboard();
 		}
 		else {
-		  if ((!StitchBuffer->empty()) && StateMap.test(StateFlag::GRPSEL)) {
+		  if ((!StitchBuffer->empty()) && StateMap->test(StateFlag::GRPSEL)) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
 			thred::rngadj();
 			LowerLeftStitch.x = LowerLeftStitch.y = 1e30F;
@@ -6303,7 +6303,7 @@ void thred::delfstchs() {
 }
 
 void thred::internal::f1del(uint32_t formIndex) {
-  if (StateMap.test(StateFlag::DELTO)) {
+  if (StateMap->test(StateFlag::DELTO)) {
 	auto const codedForm = formIndex << FRMSHFT;
 	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
 	                                   StitchBuffer->end(),
@@ -6325,7 +6325,7 @@ void thred::frmdel() {
   auto firstForm = FormList->cbegin();
   FormList->erase(std::next(firstForm, ClosestFormToCursor));
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
-  if (StateMap.testAndReset(StateFlag::DELTO)) {
+  if (StateMap->testAndReset(StateFlag::DELTO)) {
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & NOTFRM) == 0U) {
 		auto const stitchForm = (stitch.attribute & FRMSK);
@@ -6351,7 +6351,7 @@ void thred::frmdel() {
 	  }
 	}
   }
-  StateMap.reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::FORMSEL);
 }
 
 void thred::internal::delsfrms(uint32_t code) {
@@ -6378,7 +6378,7 @@ void thred::internal::delsfrms(uint32_t code) {
 		  deletedFormCount++;
 		}
 	  }
-	  if (StateMap.test(StateFlag::DELTO)) {
+	  if (StateMap->test(StateFlag::DELTO)) {
 		for (auto& stitch : *StitchBuffer) {
 		  if ((stitch.attribute & ALTYPMSK) != 0U) {
 			auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
@@ -6405,9 +6405,9 @@ void thred::internal::delsfrms(uint32_t code) {
 		}
 	  }
 	  SelectedFormList->clear();
-	  StateMap.reset(StateFlag::FORMSEL);
+	  StateMap->reset(StateFlag::FORMSEL);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
@@ -6416,31 +6416,31 @@ void thred::internal::cut() {
   thred::savdo();
   duclip();
   if (!SelectedFormList->empty()) {
-	StateMap.set(StateFlag::DELTO);
+	StateMap->set(StateFlag::DELTO);
 	delsfrms('s');
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::delfstchs();
 	  thred::frmdel();
 	}
 	else {
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::delstchm();
 	  }
 	}
   }
   thred::coltab();
   rstAll();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::unpat() {
-  if (StateMap.testAndReset(StateFlag::WASPAT)) {
+  if (StateMap->testAndReset(StateFlag::WASPAT)) {
 	ShowWindow(SpeedScrollBar, FALSE);
 	DestroyWindow(SpeedScrollBar);
 	thred::movStch();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
@@ -6471,7 +6471,7 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	iStart--;
   } while (length == 0.0F);
   auto const* knots =
-      (StateMap.test(StateFlag::FILDIR)) ? std::begin(KnotAtLastOrder) : std::begin(KnotAtEndOrder);
+      (StateMap->test(StateFlag::FILDIR)) ? std::begin(KnotAtLastOrder) : std::begin(KnotAtEndOrder);
   if (knots != nullptr) {
 	if ((iStart & 0x8000000U) == 0U) {
 	  auto const delta =
@@ -6482,7 +6482,7 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	  for (auto iKnot = 0U; iKnot < 5U; iKnot++) {
 		ofstch(buffer, finish, knots[iKnot]);
 	  }
-	  if (StateMap.test(StateFlag::FILDIR)) {
+	  if (StateMap->test(StateFlag::FILDIR)) {
 		ofstch(buffer, finish, 0);
 	  }
 	}
@@ -6533,7 +6533,7 @@ void thred::internal::delknot() {
 	                   [](fPOINTATTR const& m) -> bool { return (m.attribute & KNOTMSK) != 0U; }),
 	    StitchBuffer->end());
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -6557,7 +6557,7 @@ void thred::internal::setknt() {
   else {
 	iStitch = 1;
   }
-  StateMap.reset(StateFlag::FILDIR);
+  StateMap->reset(StateFlag::FILDIR);
   while (iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	buffer.push_back(StitchBuffer->operator[](iStitch));
 	if (stlen(iStitch) > KNOTLEN) {
@@ -6567,7 +6567,7 @@ void thred::internal::setknt() {
 	}
 	iStitch++;
   }
-  StateMap.set(StateFlag::FILDIR);
+  StateMap->set(StateFlag::FILDIR);
   endknt(buffer, iStitch);
   buffer.back().attribute &= (~KNOTMSK);
   StitchBuffer->resize(buffer.size());
@@ -6601,7 +6601,7 @@ void thred::internal::chkncol() {
   auto initialColor = StitchBuffer->front().attribute & COLMSK;
   auto buffer       = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
-  StateMap.reset(StateFlag::FILDIR);
+  StateMap->reset(StateFlag::FILDIR);
   auto iStitch = 0U;
   for (auto& stitch : *StitchBuffer) {
 	auto const color = stitch.attribute & COLMSK;
@@ -6633,7 +6633,7 @@ void thred::internal::setknots() {
 	fndknt();
 	chkncol();
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
   }
 }
@@ -6646,25 +6646,25 @@ void thred::internal::duhbit(uint32_t cod) noexcept {
 }
 
 void thred::hidbit() {
-  if (StateMap.testAndFlip(StateFlag::HIDMAP)) {
+  if (StateMap->testAndFlip(StateFlag::HIDMAP)) {
 	thi::duhbit(MF_UNCHECKED);
   }
   else {
 	thi::duhbit(MF_CHECKED);
   }
-  StateMap.set(StateFlag::DUMEN);
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::drwlstch(uint32_t finish) {
   if (finish != 0) {
 	auto color = 0U;
-	if (StateMap.test(StateFlag::HID)) {
+	if (StateMap->test(StateFlag::HID)) {
 	  while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
 		RunPoint++;
 	  }
 	}
-	if (StateMap.test(StateFlag::ZUMED)) {
+	if (StateMap->test(StateFlag::ZUMED)) {
 	  auto iMovieFrame = 1U;
 	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint)) {
 		RunPoint++;
@@ -6731,7 +6731,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 }
 
 void thred::internal::stchout() {
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	drwlstch(GroupEndStitch);
   }
   else {
@@ -6770,7 +6770,7 @@ void thred::internal::deltot() {
   StitchBuffer->clear();
   FormVertices->clear();
   SatinGuides->clear();
-  StateMap.reset(StateFlag::GMRK);
+  StateMap->reset(StateFlag::GMRK);
   rstAll();
   thred::coltab();
   thred::zumhom();
@@ -6796,7 +6796,7 @@ auto thred::internal::frmstch() -> bool {
 
 void thred::internal::delet() {
   thred::undat();
-  if (StateMap.testAndReset(StateFlag::FPSEL)) {
+  if (StateMap->testAndReset(StateFlag::FPSEL)) {
 	thred::savdo();
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	// dynamic bitset allows non-contiguous ranges of points to be deleted in later versions
@@ -6861,7 +6861,7 @@ void thred::internal::delet() {
 	}
 	form::refil();
 	fndknt();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_SHIFT)) {
@@ -6872,7 +6872,7 @@ void thred::internal::delet() {
 	auto satinFlag = false;
 	if (!SelectedFormList->empty()) {
 	  if (frmstch()) {
-		StateMap.set(StateFlag::DELSFRMS);
+		StateMap->set(StateFlag::DELSFRMS);
 		displayText::tabmsg(IDS_DELFRM);
 		displayText::okcan();
 		displayText::tomsg();
@@ -6882,24 +6882,24 @@ void thred::internal::delet() {
 	  }
 	  return;
 	}
-	if (StateMap.test(StateFlag::FORMSEL) && !FormList->empty()) {
+	if (StateMap->test(StateFlag::FORMSEL) && !FormList->empty()) {
 	  if (wastch(ClosestFormToCursor)) {
-		StateMap.set(StateFlag::DELFRM);
+		StateMap->set(StateFlag::DELFRM);
 		displayText::tabmsg(IDS_FDEL);
 		displayText::okcan();
 		displayText::tomsg();
 	  }
 	  else {
 		if (!FormList->empty()) {
-		  StateMap.reset(StateFlag::DELTO);
+		  StateMap->reset(StateFlag::DELTO);
 		  thred::frmdel();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 	  }
 	  fndknt();
 	  return;
 	}
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  if (StitchBuffer->size() > 2U) {
 		delstch1(ClosestPointIndex);
 		if (!stch2px(ClosestPointIndex)) {
@@ -6908,24 +6908,24 @@ void thred::internal::delet() {
 	  }
 	  else {
 		StitchBuffer->clear();
-		StateMap.reset(StateFlag::SELBOX);
+		StateMap->reset(StateFlag::SELBOX);
 	  }
 	  thred::coltab();
 	  xt::setfchk();
 	  fndknt();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
-	if (StateMap.test(StateFlag::GRPSEL)) {
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  thred::delstchm();
 	  thred::coltab();
 	  rstAll();
 	  xt::setfchk();
 	  fndknt();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
-	if (StateMap.test(StateFlag::FRMPSEL) || form::closfrm()) {
+	if (StateMap->test(StateFlag::FRMPSEL) || form::closfrm()) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  switch (form.type) {
 		case FRMLINE: {
@@ -6935,7 +6935,7 @@ void thred::internal::delet() {
 			  form::delmfil(ClosestFormToCursor);
 			  form.fillType = 0;
 			  thred::coltab();
-			  StateMap.set(StateFlag::RESTCH);
+			  StateMap->set(StateFlag::RESTCH);
 			  return;
 			}
 			if (form.angleOrClipData.guide.start > ClosestVertexToCursor) {
@@ -6992,7 +6992,7 @@ void thred::internal::delet() {
 		form::refil();
 	  }
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	if (!satinFlag && closPnt1(&ClosestPointIndex)) {
 	  if (StitchBuffer->size() > 2U) {
@@ -7003,12 +7003,12 @@ void thred::internal::delet() {
 	  }
 	  else {
 		StitchBuffer->clear();
-		StateMap.reset(StateFlag::SELBOX);
+		StateMap->reset(StateFlag::SELBOX);
 	  }
 	  thred::coltab();
 	  xt::setfchk();
 	  fndknt();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
   }
@@ -7016,9 +7016,9 @@ void thred::internal::delet() {
 }
 
 void thred::internal::movi() {
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	rstAll();
-	StateMap.set(StateFlag::GRPSEL);
+	StateMap->set(StateFlag::GRPSEL);
   }
   else {
 	rstAll();
@@ -7028,8 +7028,8 @@ void thred::internal::movi() {
 	  DestroyWindow(MsgWindow);
 	  MsgWindow = nullptr;
 	}
-	StateMap.set(StateFlag::RUNPAT);
-	if (StateMap.test(StateFlag::GRPSEL)) {
+	StateMap->set(StateFlag::RUNPAT);
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  thred::rngadj();
 	  RunPoint = GroupStartStitch;
 	}
@@ -7037,7 +7037,7 @@ void thred::internal::movi() {
 	  RunPoint = 0;
 	}
 	thred::movStch();
-	if (!StateMap.test(StateFlag::WASPAT)) {
+	if (!StateMap->test(StateFlag::WASPAT)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  SpeedScrollBar = CreateWindow(L"SCROLLBAR",
 	                                nullptr,
@@ -7052,13 +7052,13 @@ void thred::internal::movi() {
 	                                nullptr);
 	}
 	auto stepCount = 0.0F;
-	if (StateMap.test(StateFlag::ZUMED)) {
+	if (StateMap->test(StateFlag::ZUMED)) {
 	  stepCount = gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor;
 	}
 	else {
 	  stepCount = gsl::narrow_cast<float>(StitchBuffer->size());
 	}
-	if (!StateMap.test(StateFlag::WASPAT)) {
+	if (!StateMap->test(StateFlag::WASPAT)) {
 	  MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0F * MOVITIM / stepCount);
 	}
 	if (MovieTimeStep < MINDELAY) {
@@ -7168,8 +7168,8 @@ void thred::internal::drwmrk(HDC dc) {
 }
 
 void thred::internal::vubak() {
-  if ((FileHandle != nullptr) || StateMap.test(StateFlag::THUMSHO)) {
-	StateMap.set(StateFlag::ZUMED);
+  if ((FileHandle != nullptr) || StateMap->test(StateFlag::THUMSHO)) {
+	StateMap->set(StateFlag::ZUMED);
 	thred::movStch();
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	auto const dx = StitchWindowClientRect.right / 2;
@@ -7192,7 +7192,7 @@ void thred::internal::vubak() {
 	                                        ThrEdInstance,
 	                                        nullptr);
 	}
-	StateMap.set(StateFlag::BAKSHO);
+	StateMap->set(StateFlag::BAKSHO);
   }
 }
 
@@ -7289,7 +7289,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != fileHeader.formCount * sizeof(decltype(inFormList.back()))) {
 			  inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			FormList->reserve(FormList->size() + inFormList.size());
 			FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
@@ -7302,7 +7302,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			wrap::ReadFile(InsertedFileHandle, inFormList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != bytesToRead) {
 			  inFormList.resize(BytesRead / sizeof(decltype(inFormList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			FormList->reserve(FormList->size() + inFormList.size());
 			FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
@@ -7316,13 +7316,13 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			ReadFile(InsertedFileHandle, inVerticeList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != bytesToRead) {
 			  inVerticeList.resize(BytesRead / sizeof(decltype(inVerticeList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			FormVertices->reserve(FormVertices->size() + inVerticeList.size());
 			FormVertices->insert(FormVertices->end(), inVerticeList.cbegin(), inVerticeList.cend());
 		  }
 		  else {
-			StateMap.set(StateFlag::BADFIL);
+			StateMap->set(StateFlag::BADFIL);
 		  }
 		  auto guideOffset = wrap::toUnsigned(SatinGuides->size());
 		  if (fileHeader.dlineCount != 0U) {
@@ -7333,7 +7333,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			ReadFile(InsertedFileHandle, inGuideList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != bytesToRead) {
 			  inGuideList.resize(BytesRead / sizeof(decltype(inGuideList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			SatinGuides->reserve(SatinGuides->size() + inGuideList.size());
 			SatinGuides->insert(SatinGuides->end(), inGuideList.begin(), inGuideList.end());
@@ -7347,7 +7347,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			ReadFile(InsertedFileHandle, inPointList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != bytesToRead) {
 			  inPointList.resize(BytesRead / sizeof(decltype(inPointList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			ClipPoints->reserve(ClipPoints->size() + inPointList.size());
 			ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
@@ -7360,7 +7360,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			ReadFile(InsertedFileHandle, inTextureList.data(), bytesToRead, &BytesRead, nullptr);
 			if (BytesRead != bytesToRead) {
 			  inTextureList.resize(BytesRead / sizeof(decltype(inTextureList.back())));
-			  StateMap.set(StateFlag::BADFIL);
+			  StateMap->set(StateFlag::BADFIL);
 			}
 			TexturePointsBuffer->reserve(TexturePointsBuffer->size() + inTextureList.size());
 			TexturePointsBuffer->insert(
@@ -7394,13 +7394,13 @@ void thred::internal::insfil(fs::path& insertedFile) {
 			}
 		  }
 		  if (newFormVertexIndex != FormVertices->size()) {
-			StateMap.set(StateFlag::BADFIL);
+			StateMap->set(StateFlag::BADFIL);
 		  }
 		  if (newSatinGuideIndex != SatinGuides->size()) {
-			StateMap.set(StateFlag::BADFIL);
+			StateMap->set(StateFlag::BADFIL);
 		  }
 		  if (clipOffset != ClipPoints->size()) {
-			StateMap.set(StateFlag::BADFIL);
+			StateMap->set(StateFlag::BADFIL);
 		  }
 		  if (fileHeader.formCount != 0U) {
 			auto const insertedVertex = FormVertices->operator[](InsertedVertexIndex);
@@ -7477,8 +7477,8 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		    POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
 		insflin(initialInsertPoint);
 		NewFormVertexCount = 5U;
-		StateMap.set(StateFlag::SHOFRM);
-		StateMap.set(StateFlag::INSFIL);
+		StateMap->set(StateFlag::SHOFRM);
+		StateMap->set(StateFlag::INSFIL);
 		form::dufrm();
 	  }
 	}
@@ -7540,8 +7540,8 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		      POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
 		  insflin(initialInsertPoint);
 		  NewFormVertexCount = 5U;
-		  StateMap.set(StateFlag::SHOFRM);
-		  StateMap.set(StateFlag::INSFIL);
+		  StateMap->set(StateFlag::SHOFRM);
+		  StateMap->set(StateFlag::INSFIL);
 		  form::dufrm();
 		  // We did not insert forms so insure that duinsfil does not move forms
 		  InsertedFormIndex   = wrap::toUnsigned(FormList->size());
@@ -7549,7 +7549,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		}
 		else {
 		  // pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
-		  // StateMap.set(StateFlag::BADFIL);
+		  // StateMap->set(StateFlag::BADFIL);
 		  prtred();
 		  return;
 		}
@@ -7563,24 +7563,24 @@ void thred::internal::insfil(fs::path& insertedFile) {
 
 void thred::internal::getbak() {
   // auto thumbSpan = gsl::span<uint32_t, 4>{ ThumbnailsSelected };
-  if (StateMap.test(StateFlag::THUMSHO)) {
+  if (StateMap->test(StateFlag::THUMSHO)) {
 	if (ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)] != 0U) {
 	  *WorkingFileName = *DefaultDirectory /
 	                     Thumbnails->operator[](ThumbnailsSelected[gsl::narrow<uint32_t>(FileVersionIndex)]);
-	  if (StateMap.test(StateFlag::RBUT)) {
+	  if (StateMap->test(StateFlag::RBUT)) {
 		unthum();
-		StateMap.set(StateFlag::FRMOF);
+		StateMap->set(StateFlag::FRMOF);
 		insfil(*WorkingFileName);
 		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap.reset(StateFlag::INSFIL);
-		  StateMap.reset(StateFlag::FRMOF);
-		  StateMap.set(StateFlag::INIT);
+		  StateMap->reset(StateFlag::INSFIL);
+		  StateMap->reset(StateFlag::FRMOF);
+		  StateMap->set(StateFlag::INIT);
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 	  }
 	  else {
-		StateMap.set(StateFlag::REDOLD);
+		StateMap->set(StateFlag::REDOLD);
 		nuFil(fileIndices::THR);
 	  }
 	}
@@ -7607,7 +7607,7 @@ void thred::internal::rebak() {
   }
   fs::rename(safetyFileName, newFileName);
   *WorkingFileName = *ThrName;
-  StateMap.set(StateFlag::REDOLD);
+  StateMap->set(StateFlag::REDOLD);
   nuFil(fileIndices::THR);
   fs::remove(safetyFileName);
 }
@@ -7644,7 +7644,7 @@ void thred::internal::purg() {
 }
 
 void thred::internal::purgdir() {
-  StateMap.set(StateFlag::PRGMSG);
+  StateMap->set(StateFlag::PRGMSG);
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_DELBAK);
   displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
@@ -7684,7 +7684,7 @@ auto thred::internal::chkok() noexcept -> bool {
 }
 
 void thred::internal::mv2f() {
-  if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
 	std::vector<fPOINTATTR> tempStitchBuffer {};
 	// since most of the stitches will be moved into the temp buffer, reserve the space
@@ -7701,10 +7701,10 @@ void thred::internal::mv2f() {
 	}
 	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	  thred::savdo();
 	  std::vector<fPOINTATTR> tempStitchBuffer {};
 	  auto const              grpSize = GroupEndStitch + 1U - GroupStartStitch;
@@ -7721,13 +7721,13 @@ void thred::internal::mv2f() {
 	            StitchBuffer->begin());
 	  std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), grpSize));
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
 
 void thred::internal::mv2b() {
-  if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
 	auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
 	auto       iLowBuffer       = 0U;
@@ -7742,10 +7742,10 @@ void thred::internal::mv2b() {
 	}
 	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), iLowBuffer));
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	  thred::savdo();
 	  thred::rngadj();
 	  std::vector<fPOINTATTR> tempStitchBuffer {};
@@ -7761,7 +7761,7 @@ void thred::internal::mv2b() {
 	            tempStitchBuffer.end(),
 	            std::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
@@ -7876,7 +7876,7 @@ void thred::ritmov(uint32_t formIndex) {
 }
 
 void thred::internal::unmov() {
-  if (StateMap.testAndReset(StateFlag::SHOMOV)) {
+  if (StateMap->testAndReset(StateFlag::SHOMOV)) {
 	thred::ritmov(ClosestFormToCursor);
   }
 }
@@ -7912,14 +7912,14 @@ void thred::setpsel() {
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
   EndPointCross = form::sfCor2px(vertexIt[SelectedFormVertices.finish]);
-  StateMap.set(StateFlag::SHOPSEL);
+  StateMap->set(StateFlag::SHOPSEL);
   form::dupsel(StitchWindowDC);
-  StateMap.set(StateFlag::FPSEL);
+  StateMap->set(StateFlag::FPSEL);
 }
 
 void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
   thred::savdo();
-  if (StateMap.test(StateFlag::FPSEL)) {
+  if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
 	auto& form          = FormList->operator[](ClosestFormToCursor);
 	auto  currentVertex = SelectedFormVertices.start;
@@ -7932,10 +7932,10 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	form::frmout(ClosestFormToCursor);
 	thred::setpsel();
 	form::refil();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap.test(StateFlag::BIGBOX)) {
+  if (StateMap->test(StateFlag::BIGBOX)) {
 	for (auto& FormVertice : *FormVertices) {
 	  thred::rotflt(FormVertice, rotationAngle, rotationCenter);
 	}
@@ -7948,7 +7948,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	form::selal();
 	return;
   }
-  if (StateMap.testAndReset(StateFlag::FRMSROT)) {
+  if (StateMap->testAndReset(StateFlag::FRMSROT)) {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
@@ -7961,10 +7961,10 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	  form::frmout(ClosestFormToCursor);
 	  form::refilfn();
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.testAndReset(StateFlag::FRMROT)) {
+	if (StateMap->testAndReset(StateFlag::FRMROT)) {
 	  auto& form                      = FormList->operator[](ClosestFormToCursor);
 	  auto                   vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
@@ -7972,7 +7972,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	  }
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
@@ -7980,7 +7980,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	  }
 	  thred::rngadj();
 	  thi::selin(GroupStartStitch, GroupEndStitch, StitchWindowDC);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
@@ -7996,20 +7996,20 @@ void thred::internal::nulayr(uint32_t play) {
   LayerIndex  = play / 2;
   ladj();
   if (ActiveLayer != 0U) {
-	if (StateMap.test(StateFlag::FORMSEL) &&
+	if (StateMap->test(StateFlag::FORMSEL) &&
 	    ((gsl::narrow_cast<decltype(ActiveLayer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >>
 	      1U) != ActiveLayer)) {
-	  StateMap.reset(StateFlag::FORMSEL);
+	  StateMap->reset(StateFlag::FORMSEL);
 	}
-	StateMap.reset(StateFlag::GRPSEL);
-	if (StateMap.test(StateFlag::SELBOX)) {
+	StateMap->reset(StateFlag::GRPSEL);
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  if (ActiveLayer != ((StitchBuffer->operator[](ClosestPointIndex).attribute & LAYMSK) >> LAYSHFT) + 1U) {
-		StateMap.reset(StateFlag::SELBOX);
+		StateMap->reset(StateFlag::SELBOX);
 	  }
 	}
 	SelectedFormList->clear();
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto thred::internal::iselpnt() noexcept -> bool {
@@ -8040,7 +8040,7 @@ void thred::strtchbox(std::vector<POINT>& stretchBoxLine) noexcept {
 }
 
 void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
-  if (StateMap.testAndReset(StateFlag::SHOSTRTCH)) {
+  if (StateMap->testAndReset(StateFlag::SHOSTRTCH)) {
 	thred::strtchbox(stretchBoxLine);
   }
 }
@@ -8080,25 +8080,25 @@ auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 	stretchBoxLine[4] = stretchBoxLine[0];
 	thred::strtchbox(stretchBoxLine);
 	if ((SelectedFormControlVertex & 1U) != 0U) {
-	  StateMap.set(StateFlag::STRTCH);
+	  StateMap->set(StateFlag::STRTCH);
 	}
 	else {
-	  StateMap.set(StateFlag::EXPAND);
+	  StateMap->set(StateFlag::EXPAND);
 	  xyRatio = gsl::narrow_cast<float>(SelectedFormsRect.right - SelectedFormsRect.left) /
 	            gsl::narrow_cast<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
 	}
 	SelectedFormControlVertex >>= 1U;
-	StateMap.set(StateFlag::SHOSTRTCH);
+	StateMap->set(StateFlag::SHOSTRTCH);
 	return true;
   }
   SelectedFormControlVertex >>= 1U;
   if (isInBox(pointToTest, SelectedFormsRect) || (minimumLength < CLOSENUF && isLine(formLines))) {
 	SelectedFormsSize = fPOINT {SelectedFormsRect.right - SelectedFormsRect.left,
 	                            SelectedFormsRect.bottom - SelectedFormsRect.top};
-	StateMap.set(StateFlag::MOVFRMS);
+	StateMap->set(StateFlag::MOVFRMS);
 	FormMoveDelta =
 	    fPOINT {pointToTest.x - SelectedFormsRect.left, pointToTest.y - SelectedFormsRect.top};
-	StateMap.set(StateFlag::SHOSTRTCH);
+	StateMap->set(StateFlag::SHOSTRTCH);
 	thred::strtchbox(stretchBoxLine);
 	return true;
   }
@@ -8116,14 +8116,14 @@ void thred::internal::delfre() {
   }
   StitchBuffer->resize(currentStitchCount);
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::setmov() {
-  if (StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) {
 	MoveAnchor = ClosestPointIndex;
-	StateMap.set(StateFlag::MOVSET);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::MOVSET);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -8148,8 +8148,8 @@ void thred::internal::dufsel() {
 
 void thred::internal::selup() {
   if (wrap::pressed(VK_SHIFT)) {
-	StateMap.reset(StateFlag::SELBOX);
-	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+	StateMap->reset(StateFlag::SELBOX);
+	if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor < FormList->size() - 1U) {
 		SelectedFormList->push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor + 1U;
@@ -8167,13 +8167,13 @@ void thred::internal::selup() {
 		}
 	  }
 	  else {
-		StateMap.set(StateFlag::FORMSEL);
+		StateMap->set(StateFlag::FORMSEL);
 	  }
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  unbox();
 	  auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
 	  while (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U) &&
@@ -8185,7 +8185,7 @@ void thred::internal::selup() {
 	}
 	else {
 	  if (!FormList->empty()) {
-		if (StateMap.testAndSet(StateFlag::FORMSEL)) {
+		if (StateMap->testAndSet(StateFlag::FORMSEL)) {
 		  if (ClosestFormToCursor < gsl::narrow<uint32_t>(FormList->size()) - 1U) {
 			ClosestFormToCursor++;
 		  }
@@ -8194,7 +8194,7 @@ void thred::internal::selup() {
 		  ClosestFormToCursor = 0;
 		}
 		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
   }
@@ -8202,8 +8202,8 @@ void thred::internal::selup() {
 
 void thred::internal::seldwn() {
   if (wrap::pressed(VK_SHIFT)) {
-	StateMap.reset(StateFlag::SELBOX);
-	if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+	StateMap->reset(StateFlag::SELBOX);
+	if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	  if (ClosestFormToCursor != 0U) {
 		SelectedFormList->push_back(ClosestFormToCursor);
 		LastFormSelected = ClosestFormToCursor - 1U;
@@ -8221,13 +8221,13 @@ void thred::internal::seldwn() {
 		}
 	  }
 	  else {
-		StateMap.set(StateFlag::FORMSEL);
+		StateMap->set(StateFlag::FORMSEL);
 	  }
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  unbox();
 	  auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
 	  while ((ClosestPointIndex != 0U) &&
@@ -8239,7 +8239,7 @@ void thred::internal::seldwn() {
 	}
 	else {
 	  if (!FormList->empty()) {
-		if (StateMap.testAndSet(StateFlag::FORMSEL)) {
+		if (StateMap->testAndSet(StateFlag::FORMSEL)) {
 		  if (ClosestFormToCursor != 0U) {
 			ClosestFormToCursor--;
 		  }
@@ -8248,7 +8248,7 @@ void thred::internal::seldwn() {
 		  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		}
 		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
   }
@@ -8290,18 +8290,18 @@ auto thred::internal::movstchs(uint32_t destination, uint32_t start, uint32_t fi
 }
 
 void thred::internal::movmrk() {
-  if (StateMap.test(StateFlag::MOVSET)) {
-	if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::MOVSET)) {
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  thred::rngadj();
 	  if (movstchs(MoveAnchor, GroupStartStitch, GroupEndStitch)) {
 		thred::coltab();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
 	else {
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		if (movstchs(MoveAnchor, ClosestPointIndex, ClosestPointIndex + 1U)) {
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  thred::coltab();
 		}
 	  }
@@ -8314,14 +8314,14 @@ void thred::internal::vuthrds() {
   if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap.reset(StateFlag::THRDS);
+	StateMap->reset(StateFlag::THRDS);
   }
   else {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap.set(StateFlag::THRDS);
+	StateMap->set(StateFlag::THRDS);
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::vuselthr() {
@@ -8329,14 +8329,14 @@ void thred::internal::vuselthr() {
   if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap.reset(StateFlag::COL);
+	StateMap->reset(StateFlag::COL);
   }
   else {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap.set(StateFlag::COL);
+	StateMap->set(StateFlag::COL);
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::colchk() {
@@ -8421,13 +8421,13 @@ void thred::internal::rembig() {
 		}
 		break;
 	  }
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto range = RANGE {};
 		form::frmrng(ClosestFormToCursor, range);
 		thi::makbig(range.start, range.finish);
 		break;
 	  }
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		if (GroupEndStitch < gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size())) {
 		  GroupEndStitch++;
@@ -8444,7 +8444,7 @@ void thred::internal::rembig() {
 	  thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
 	} while (false);
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::tabmsg(IDS_REM1);
@@ -8452,7 +8452,7 @@ void thred::internal::rembig() {
 }
 
 void thred::internal::duselrng(RANGE& selectedRange) {
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	selectedRange.start  = GroupStartStitch;
 	selectedRange.finish = GroupEndStitch;
@@ -8578,21 +8578,21 @@ auto thred::internal::finrng(uint32_t find) noexcept -> bool {
 }
 
 void thred::internal::ungrplo() {
-  if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	ClosestPointIndex = GroupStartStitch;
-	StateMap.set(StateFlag::SELBOX);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto flag    = true;
 	  auto iStitch = 0U;
 	  for (auto& stitch : *StitchBuffer) {
 		if (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 		  ClosestPointIndex = iStitch;
-		  StateMap.set(StateFlag::SELBOX);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::SELBOX);
+		  StateMap->set(StateFlag::RESTCH);
 		  flag = false;
 		  break;
 		}
@@ -8609,21 +8609,21 @@ void thred::internal::ungrplo() {
 }
 
 void thred::internal::ungrphi() {
-  if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	ClosestPointIndex = GroupEndStitch;
-	StateMap.set(StateFlag::SELBOX);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto flag = true;
 	  for (auto iStitch = wrap::toUnsigned(StitchBuffer->size()); iStitch != 0; iStitch--) {
 		if (((StitchBuffer->operator[](iStitch - 1U).attribute & NOTFRM) == 0U) &&
 		    ((StitchBuffer->operator[](iStitch - 1U).attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 		  ClosestPointIndex = iStitch - 1U;
-		  StateMap.set(StateFlag::SELBOX);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::SELBOX);
+		  StateMap->set(StateFlag::RESTCH);
 		  flag = false;
 		  break;
 		}
@@ -8708,13 +8708,13 @@ void thred::internal::thumnail() {
 	while (iThumbnail < 4 && iThumbnail < thumbSize) {
 	  rthumnam(iThumbnail++);
 	}
-	StateMap.set(StateFlag::THUMSHO);
+	StateMap->set(StateFlag::THUMSHO);
 	ThumbnailSearchString[0] = 0;
 	SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
 	auto const blank = std::wstring {};
 	displayText::butxt(HBOXSEL, blank);
 	vubak();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -8723,7 +8723,7 @@ void thred::internal::nuthsel() {
 	auto const savedIndex = ThumbnailIndex;
 	auto       iThumbnail = 0U;
 	auto const length     = wcslen(std::begin(ThumbnailSearchString));
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	if (length != 0U) {
 	  while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
 		if (wcsncmp(std::begin(ThumbnailSearchString), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
@@ -8781,7 +8781,7 @@ void thred::internal::nuthbak(uint32_t count) {
 void thred::internal::nuthum(char character) {
   auto length = wcslen(std::begin(ThumbnailSearchString));
   if (length < 16U) {
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	ThumbnailSearchString[length++] = character;
 	ThumbnailSearchString[length]   = 0;
 	auto txt                        = std::wstring(std::begin(ThumbnailSearchString));
@@ -8794,7 +8794,7 @@ void thred::internal::nuthum(char character) {
 void thred::internal::bakthum() {
   auto searchStringLength = wcslen(std::begin(ThumbnailSearchString));
   if (searchStringLength != 0U) {
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	ThumbnailSearchString[--searchStringLength] = 0;
 	ThumbnailIndex                              = 0;
 	auto txt                                    = std::wstring(std::begin(ThumbnailSearchString));
@@ -8809,11 +8809,11 @@ void thred::internal::selalstch() {
 	GroupStitchIndex  = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
 	GroupStartStitch  = ClosestPointIndex;
 	GroupEndStitch    = GroupStitchIndex;
-	StateMap.set(StateFlag::GRPSEL);
-	StateMap.set(StateFlag::SCROS);
-	StateMap.set(StateFlag::ECROS);
+	StateMap->set(StateFlag::GRPSEL);
+	StateMap->set(StateFlag::SCROS);
+	StateMap->set(StateFlag::ECROS);
 	thred::grpAdj();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -8835,24 +8835,24 @@ void thred::internal::duinsfil() {
 	StitchBuffer->operator[](iStitch).x += offset.x;
 	StitchBuffer->operator[](iStitch).y += offset.y;
   }
-  StateMap.reset(StateFlag::FRMOF);
-  StateMap.set(StateFlag::INIT);
+  StateMap->reset(StateFlag::FRMOF);
+  StateMap->set(StateFlag::INIT);
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::gotbox() {
-  StateMap.reset(StateFlag::BZUMIN);
-  StateMap.reset(StateFlag::BOXSLCT);
-  StateMap.reset(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::BZUMIN);
+  StateMap->reset(StateFlag::BOXSLCT);
+  StateMap->reset(StateFlag::FRMPSEL);
   thred::grpAdj();
 }
 
 void thred::internal::rngal() {
-  if (!StateMap.testAndReset(StateFlag::WASFPNT)) {
-	StateMap.reset(StateFlag::GRPSEL);
+  if (!StateMap->testAndReset(StateFlag::WASFPNT)) {
+	StateMap->reset(StateFlag::GRPSEL);
 	auto prng = std::vector<RANGE> {};
-	StateMap.reset(StateFlag::GRPSEL);
+	StateMap->reset(StateFlag::GRPSEL);
 	auto iStitch     = 0U;
 	auto flagInRange = false;
 	for (; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); iStitch++) {
@@ -8885,7 +8885,7 @@ void thred::internal::rngal() {
 	  if (maximumLength != 0U) {
 		ClosestPointIndex = prng[largestRange].start;
 		GroupStitchIndex  = prng[largestRange].finish;
-		StateMap.set(StateFlag::GRPSEL);
+		StateMap->set(StateFlag::GRPSEL);
 	  }
 	  gotbox();
 	}
@@ -9003,7 +9003,7 @@ void thred::internal::desiz() {
 void thred::internal::sidhup() {
   auto hoopRectangle        = RECT {0L, 0L, 0L, 0L};
   auto preferencesRectangle = RECT {0L, 0L, 0L, 0L};
-  StateMap.set(StateFlag::HUPMSG);
+  StateMap->set(StateFlag::HUPMSG);
   GetWindowRect(ValueWindow->operator[](PHUP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -9060,7 +9060,7 @@ void thred::internal::fop() {
 	}
 	else {
 	  displayText::savdisc();
-	  StateMap.set(StateFlag::OSAV);
+	  StateMap->set(StateFlag::OSAV);
 	}
   }
   else {
@@ -9085,7 +9085,7 @@ void thred::internal::clpradj(fRECTANGLE& clipRectAdjusted, fPOINTATTR const& st
 }
 
 void thred::internal::clpadj() {
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	auto iStitch          = GroupStartStitch;
 	auto ClipRectAdjusted = fRECTANGLE {StitchBuffer->operator[](iStitch).x,
@@ -9114,7 +9114,7 @@ void thred::internal::clpadj() {
 	  StitchBuffer->operator[](GroupStartStitch).x = ClipRectAdjusted.right;
 	}
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::shoseln(IDS_GRPMSG, IDS_RNGEND);
@@ -9208,15 +9208,15 @@ void thred::internal::defpref() {
 }
 
 void thred::internal::dumrk(float xCoord, float yCoord) {
-  if (StateMap.testAndReset(StateFlag::GMRK)) {
+  if (StateMap->testAndReset(StateFlag::GMRK)) {
 	drwmrk(StitchWindowDC);
   }
   ZoomMarkPoint.x = xCoord;
   ZoomMarkPoint.y = yCoord;
-  StateMap.set(StateFlag::INIT);
-  StateMap.set(StateFlag::GMRK);
+  StateMap->set(StateFlag::INIT);
+  StateMap->set(StateFlag::GMRK);
   drwmrk(StitchWindowDC);
-  StateMap.set(StateFlag::WASMRK);
+  StateMap->set(StateFlag::WASMRK);
 }
 
 void thred::internal::gselrng() noexcept {
@@ -9258,8 +9258,8 @@ void thred::internal::angdif(float angle) noexcept {
 }
 
 void thred::internal::rotmrk() {
-  if (StateMap.test(StateFlag::GMRK) && (StateMap.test(StateFlag::FORMSEL) || StateMap.test(StateFlag::GRPSEL))) {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+  if (StateMap->test(StateFlag::GMRK) && (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::GRPSEL))) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
 	  LowestAngle               = 0.0F;
 	  HighestAngle              = 0.0F;
@@ -9306,23 +9306,23 @@ void thred::internal::segentr(float rotationAngle) {
 	rotationAngle = PI_F / 180.0F;
   }
   displayText::shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (2.0F * PI_F / rotationAngle)));
-  StateMap.set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
 
 void thred::internal::rotseg() {
   segentr(IniFile.rotationAngle);
-  StateMap.set(StateFlag::ENTRSEG);
+  StateMap->set(StateFlag::ENTRSEG);
 }
 
 void thred::internal::pntmrk() {
   do {
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  dumrk(StitchBuffer->operator[](ClosestPointIndex).x,
 	        StitchBuffer->operator[](ClosestPointIndex).y);
 	  break;
 	}
-	if (StateMap.test(StateFlag::FRMPSEL)) {
+	if (StateMap->test(StateFlag::FRMPSEL)) {
 	  auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 	  auto const& vertex = vertexIt[ClosestVertexToCursor];
 	  dumrk(vertex.x, vertex.y);
@@ -9339,13 +9339,13 @@ void thred::internal::filfrms() {
 	  ClosestFormToCursor = selectedForm;
 	  form::refilfn();
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
 	  form::refil();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
   }
 }
@@ -9373,26 +9373,26 @@ void thred::internal::nuslst(uint32_t find) {
 }
 
 void thred::internal::srchk() {
-  StateMap.reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::FORMSEL);
   SelectedFormList->clear();
-  if (StateMap.testAndSet(StateFlag::LENSRCH)) {
-	if (StateMap.test(StateFlag::WASGRP)) {
+  if (StateMap->testAndSet(StateFlag::LENSRCH)) {
+	if (StateMap->test(StateFlag::WASGRP)) {
 	  ClosestPointIndex = GroupStartStitch = PrevGroupStartStitch;
 	  GroupStitchIndex = GroupEndStitch = PrevGroupEndStitch;
 	}
 	else {
-	  StateMap.reset(StateFlag::GRPSEL);
+	  StateMap->reset(StateFlag::GRPSEL);
 	}
   }
   else {
-	if (StateMap.test(StateFlag::GRPSEL)) {
-	  StateMap.set(StateFlag::WASGRP);
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  StateMap->set(StateFlag::WASGRP);
 	  thred::rngadj();
 	  PrevGroupStartStitch = GroupStartStitch;
 	  PrevGroupEndStitch   = GroupEndStitch;
 	}
 	else {
-	  StateMap.reset(StateFlag::WASGRP);
+	  StateMap->reset(StateFlag::WASGRP);
 	}
   }
   duselrng(SelectedRange);
@@ -9468,32 +9468,32 @@ void thred::internal::nedof() {
 void thred::internal::shoknot() {
   UserFlagMap->reset(UserFlag::KNOTOF);
   knotmen();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::hidknot() {
   UserFlagMap->set(UserFlag::KNOTOF);
   knotmen();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::pcsbsavon() {
   UserFlagMap->reset(UserFlag::BSAVOF);
   bsavmen();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::pcsbsavof() {
   UserFlagMap->set(UserFlag::BSAVOF);
   bsavmen();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::tglhid() {
-  if (!StateMap.testAndFlip(StateFlag::HIDSTCH)) {
-	StateMap.reset(StateFlag::FRMOF);
+  if (!StateMap->testAndFlip(StateFlag::HIDSTCH)) {
+	StateMap->reset(StateFlag::FRMOF);
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::respac(FRMHED& form) noexcept {
@@ -9519,7 +9519,7 @@ auto thred::internal::chkminus(uint32_t code) noexcept -> bool {
 }
 
 void thred::internal::retrac() {
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
 	if (GroupStartStitch == 0U) {
@@ -9531,7 +9531,7 @@ void thred::internal::retrac() {
 	auto endPoint   = std::next(startPoint, count);
 	StitchBuffer->insert(insertPoint, startPoint, endPoint);
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::shoseln(IDS_GRPMSG, IDS_RETRAC);
@@ -9558,18 +9558,18 @@ void thred::internal::setgrd(COLORREF color) {
   }
   GridPen           = nuPen(GridPen, 1, color);
   IniFile.gridColor = color;
-  StateMap.set(StateFlag::RESTCH);
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::ovrlay() {
   auto fileName = fs::path {};
   insfil(fileName);
-  StateMap.reset(StateFlag::INSFIL);
-  StateMap.reset(StateFlag::FRMOF);
-  StateMap.set(StateFlag::INIT);
+  StateMap->reset(StateFlag::INSFIL);
+  StateMap->reset(StateFlag::FRMOF);
+  StateMap->set(StateFlag::INIT);
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::fil2sel(uint32_t stat) {
@@ -9597,7 +9597,7 @@ void thred::internal::rotauxsel(uint32_t stat) {
 	UserFlagMap->reset(UserFlag::ROTAUX);
   }
   rotauxmen();
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::frmcurmen() {
@@ -9617,7 +9617,7 @@ void thred::internal::frmcursel(uint32_t cursorType) {
 	UserFlagMap->reset(UserFlag::FRMX);
   }
   frmcurmen();
-  StateMap.set(StateFlag::DUMEN);
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void thred::internal::stchsnap(uint32_t start, uint32_t finish) {
@@ -9639,7 +9639,7 @@ void thred::internal::frmsnap(uint32_t start, uint32_t count) {
 }
 
 void thred::internal::gsnap() {
-  if (StateMap.test(StateFlag::TXTRED)) {
+  if (StateMap->test(StateFlag::TXTRED)) {
 	texture::txsnap();
 	return;
   }
@@ -9652,23 +9652,23 @@ void thred::internal::gsnap() {
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
 	  auto& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::savdo();
 		thred::rngadj();
 		stchsnap(GroupStartStitch, GroupEndStitch + 1U);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
 		displayText::shoseln(IDS_FGRPF, IDS_SNAP2GRD);
@@ -9839,20 +9839,20 @@ void thred::internal::delstch() {
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
   displayText::butxt(HTOT, blank);
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::chkbit() {
-  if ((PCSBMPFileName[0] != 0) && (StateMap.test(StateFlag::WASDIF) || StateMap.test(StateFlag::WASDSEL) ||
-                                   StateMap.test(StateFlag::WASBLAK))) {
-	StateMap.set(StateFlag::WASESC);
+  if ((PCSBMPFileName[0] != 0) && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
+                                   StateMap->test(StateFlag::WASBLAK))) {
+	StateMap->set(StateFlag::WASESC);
 	bitmap::internal::bfil(BackgroundColor);
   }
 }
 
 void thred::internal::delmap() {
   PCSBMPFileName[0] = 0;
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::closfn() {
@@ -9870,7 +9870,7 @@ void thred::internal::filclos() {
 	closfn();
   }
   else {
-	StateMap.set(StateFlag::FCLOS);
+	StateMap->set(StateFlag::FCLOS);
 	displayText::savdisc();
   }
 }
@@ -9888,11 +9888,11 @@ void thred::internal::frmpos(FRMHED& form, float deltaX, float deltaY) {
 }
 
 void thred::internal::nudgfn(float deltaX, float deltaY) {
-  if (StateMap.test(StateFlag::BIGBOX) || !SelectedFormList->empty() || StateMap.test(StateFlag::FORMSEL) ||
-      StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::BIGBOX) || !SelectedFormList->empty() || StateMap->test(StateFlag::FORMSEL) ||
+      StateMap->test(StateFlag::GRPSEL) || StateMap->test(StateFlag::SELBOX)) {
 	thred::savdo();
   }
-  if (StateMap.test(StateFlag::BIGBOX)) {
+  if (StateMap->test(StateFlag::BIGBOX)) {
 	for (auto& formIt : *FormList) {
 	  frmpos(formIt, deltaX, deltaY);
 	}
@@ -9905,7 +9905,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	AllItemsRect.left += deltaX;
 	AllItemsRect.right += deltaX;
 	form::stchrct2px(AllItemsRect, SelectedFormsRect);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   if (!SelectedFormList->empty()) {
@@ -9923,10 +9923,10 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	  auto& form = FormList->operator[](selectedForm);
 	  frmpos(form, deltaX, deltaY);
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap.test(StateFlag::FORMSEL)) {
+  if (StateMap->test(StateFlag::FORMSEL)) {
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	frmpos(form, deltaX, deltaY);
 	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
@@ -9937,23 +9937,23 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		}
 	  }
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
 	  StitchBuffer->operator[](iStitch).x += deltaX;
 	  StitchBuffer->operator[](iStitch).y += deltaY;
 	}
 	thred::grpAdj();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  if (StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) {
 	StitchBuffer->operator[](ClosestPointIndex).x += deltaX;
 	StitchBuffer->operator[](ClosestPointIndex).y += deltaY;
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return;
   }
   auto pixel = POINT {0L, 0L};
@@ -9987,34 +9987,34 @@ void thred::internal::pixmsg(uint32_t iString, uint32_t pixelCount) {
 
 void thred::internal::getnpix() {
   pixmsg(STR_NUDG, IniFile.nudgePixels);
-  StateMap.set(StateFlag::NUMIN);
-  StateMap.set(StateFlag::PIXIN);
+  StateMap->set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::PIXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getstpix() {
   pixmsg(STR_STCHP, IniFile.stitchSizePixels);
-  StateMap.set(StateFlag::NUMIN);
-  StateMap.set(StateFlag::STPXIN);
+  StateMap->set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::STPXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getfrmpix() {
   pixmsg(STR_FRMP, IniFile.formVertexSizePixels);
-  StateMap.set(StateFlag::NUMIN);
-  StateMap.set(StateFlag::FRMPXIN);
+  StateMap->set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::FRMPXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getfrmbox() {
   pixmsg(STR_FRMBOX, IniFile.formBoxSizePixels);
-  StateMap.set(StateFlag::NUMIN);
-  StateMap.set(StateFlag::FRMBOXIN);
+  StateMap->set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::FRMBOXIN);
   displayText::numWnd();
 }
 
 void thred::internal::bakmrk() {
-  if (StateMap.test(StateFlag::WASMRK)) {
+  if (StateMap->test(StateFlag::WASMRK)) {
 	if (ZoomMarkPoint.x > IniFile.hoopSizeX) {
 	  ZoomMarkPoint.x = IniFile.hoopSizeY / 2;
 	}
@@ -10024,7 +10024,7 @@ void thred::internal::bakmrk() {
 	dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
 	fPOINT const point(ZoomMarkPoint);
 	thred::shft(point);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::tabmsg(IDS_MRK);
@@ -10041,15 +10041,15 @@ void thred::internal::movchk() {
   auto& defaultColorWin = *DefaultColorWin;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
-	if (!StateMap.testAndSet(StateFlag::WASMOV)) {
+	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
 	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
 		DraggedColor = VerticalIndex & 0xfU;
-		StateMap.set(StateFlag::WASCOL);
+		StateMap->set(StateFlag::WASCOL);
 	  }
 	}
   }
   else {
-	if (StateMap.testAndReset(StateFlag::WASMOV) && StateMap.testAndReset(StateFlag::WASCOL)) {
+	if (StateMap->testAndReset(StateFlag::WASMOV) && StateMap->testAndReset(StateFlag::WASCOL)) {
 	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
 		auto const key          = wrap::pressed(VK_SHIFT);
 		auto const switchColors = wrap::pressed(VK_CONTROL);
@@ -10108,7 +10108,7 @@ void thred::internal::movchk() {
 		  nuscol(VerticalIndex);
 		}
 		thred::coltab();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
   }
@@ -10158,7 +10158,7 @@ void thred::internal::inscol() {
 	  nuscol(iColor);
 	}
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
@@ -10200,12 +10200,12 @@ void thred::internal::delcol() {
 	  nuscol(iColor);
 	}
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
 }
 
 void thred::internal::set1knot() {
-  if ((!StitchBuffer->empty()) && StateMap.test(StateFlag::SELBOX)) {
+  if ((!StitchBuffer->empty()) && StateMap->test(StateFlag::SELBOX)) {
 	thred::savdo();
 	auto buffer = std::vector<fPOINTATTR> {};
 	buffer.reserve(StitchBuffer->size() + 5U);
@@ -10213,7 +10213,7 @@ void thred::internal::set1knot() {
 	              StitchBuffer->begin(),
 	              std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(ClosestPointIndex + 1U)));
 	if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
-	  StateMap.set(StateFlag::FILDIR);
+	  StateMap->set(StateFlag::FILDIR);
 	  endknt(buffer, ClosestPointIndex);
 	}
 	else {
@@ -10225,7 +10225,7 @@ void thred::internal::set1knot() {
 	StitchBuffer->resize(buffer.size());
 	*StitchBuffer = buffer;
 	thred::coltab();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::msgstr(IDS_NOSTCHSEL);
@@ -10234,21 +10234,21 @@ void thred::internal::set1knot() {
 }
 
 void thred::internal::selfrm0() {
-  StateMap.reset(StateFlag::GRPSEL);
-  if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-	StateMap.set(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::GRPSEL);
+  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
+	StateMap->set(StateFlag::FRMPSEL);
 	ClosestVertexToCursor = 0;
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::selfrmx() {
-  StateMap.reset(StateFlag::GRPSEL);
-  if (StateMap.testAndReset(StateFlag::FORMSEL)) {
-	StateMap.set(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::GRPSEL);
+  if (StateMap->testAndReset(StateFlag::FORMSEL)) {
+	StateMap->set(StateFlag::FRMPSEL);
 	ClosestVertexToCursor = FormList->operator[](ClosestFormToCursor).vertexCount - 1U;
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::setpclp() {
@@ -10277,7 +10277,7 @@ void thred::internal::dupclp() {
 }
 
 void thred::internal::unpclp() {
-  if (StateMap.testAndReset(StateFlag::SHOP)) {
+  if (StateMap->testAndReset(StateFlag::SHOP)) {
 	dupclp();
   }
 }
@@ -10301,7 +10301,7 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
   }
   form::refil();
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 auto thred::internal::sidclp() -> bool {
@@ -10319,55 +10319,55 @@ auto thred::internal::sidclp() -> bool {
 }
 
 void thred::internal::selfpnt() {
-  StateMap.reset(StateFlag::FORMSEL);
-  StateMap.set(StateFlag::FRMPSEL);
-  StateMap.reset(StateFlag::FPSEL);
-  StateMap.reset(StateFlag::SELBOX);
+  StateMap->reset(StateFlag::FORMSEL);
+  StateMap->set(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::FPSEL);
+  StateMap->reset(StateFlag::SELBOX);
   SelectedFormVertices.start = ClosestVertexToCursor;
   SelectedFormVertices.form  = ClosestFormToCursor;
   auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
   thred::ritfcor(vertexIt[ClosestVertexToCursor]);
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void thred::internal::esccode() {
   chkbit();
   duhbit(MF_UNCHECKED);
   unthum();
-  StateMap.reset(StateFlag::MOVSET);
-  StateMap.reset(StateFlag::HID);
-  StateMap.reset(StateFlag::FRMOF);
-  StateMap.reset(StateFlag::THRDS);
+  StateMap->reset(StateFlag::MOVSET);
+  StateMap->reset(StateFlag::HID);
+  StateMap->reset(StateFlag::FRMOF);
+  StateMap->reset(StateFlag::THRDS);
   thred::redraw(ButtonWin->operator[](HHID));
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap.reset(StateFlag::COL);
+  StateMap->reset(StateFlag::COL);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap.set(StateFlag::DUMEN);
-  StateMap.reset(StateFlag::RUNPAT);
-  StateMap.reset(StateFlag::WASPAT);
-  StateMap.reset(StateFlag::WASBLAK);
-  StateMap.reset(StateFlag::GTUANG);
-  StateMap.reset(StateFlag::GTUSPAC);
-  StateMap.reset(StateFlag::GTWLKIND);
-  StateMap.reset(StateFlag::GTWLKLEN);
+  StateMap->set(StateFlag::DUMEN);
+  StateMap->reset(StateFlag::RUNPAT);
+  StateMap->reset(StateFlag::WASPAT);
+  StateMap->reset(StateFlag::WASBLAK);
+  StateMap->reset(StateFlag::GTUANG);
+  StateMap->reset(StateFlag::GTUSPAC);
+  StateMap->reset(StateFlag::GTWLKIND);
+  StateMap->reset(StateFlag::GTWLKLEN);
   DestroyWindow(SpeedScrollBar);
-  StateMap.reset(StateFlag::GMRK);
-  StateMap.reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::GMRK);
+  StateMap->reset(StateFlag::FORMSEL);
   SelectedFormList->clear();
 }
 
 void thred::internal::qcode() {
   trace::untrace();
-  StateMap.reset(StateFlag::HIDMAP);
-  StateMap.reset(StateFlag::FILDIR);
+  StateMap->reset(StateFlag::HIDMAP);
+  StateMap->reset(StateFlag::FILDIR);
   ReleaseCapture();
   if (StitchBuffer->size() == 1) {
 	StitchBuffer->clear();
-	StateMap.reset(StateFlag::INIT);
+	StateMap->reset(StateFlag::INIT);
   }
-  if (StateMap.testAndReset(StateFlag::POLIMOV)) { // aborting form add
+  if (StateMap->testAndReset(StateFlag::POLIMOV)) { // aborting form add
 	auto& form = FormList->back();
 	if (form.vertexCount != 0U) {
 	  auto first = std::next(FormVertices->begin(), form.vertexIndex);
@@ -10384,22 +10384,22 @@ void thred::internal::qcode() {
 	  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 	}
   }
-  if (StateMap.testAndReset(StateFlag::FUNCLP)) { // aborting form paste
+  if (StateMap->testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 	thi::bak();
 	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
   }
-  if (StateMap.testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
+  if (StateMap->testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 	thi::bak();
 	SelectedFormList->clear();
 	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
   }
   if (!UserFlagMap->test(UserFlag::MARQ)) {
-	StateMap.reset(StateFlag::GMRK);
+	StateMap->reset(StateFlag::GMRK);
   }
-  if (StateMap.testAndReset(StateFlag::PRFACT)) {
-	if (StateMap.testAndReset(StateFlag::WASRT)) {
-	  StateMap.set(StateFlag::INSRT);
-	  StateMap.set(StateFlag::RESTCH);
+  if (StateMap->testAndReset(StateFlag::PRFACT)) {
+	if (StateMap->testAndReset(StateFlag::WASRT)) {
+	  StateMap->set(StateFlag::INSRT);
+	  StateMap->set(StateFlag::RESTCH);
 	  return;
 	}
 
@@ -10408,7 +10408,7 @@ void thred::internal::qcode() {
   else {
 	rstAll();
   }
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
   auto const blank = std::wstring {};
   displayText::butxt(HNUM, blank);
 }
@@ -10558,7 +10558,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
                                       float&              rotationAngle,
                                       fPOINT const&       rotationCenter,
                                       FRMHED const&       textureForm) -> bool {
-  if (StateMap.test(StateFlag::TXTMOV)) {
+  if (StateMap->test(StateFlag::TXTMOV)) {
 	texture::txtrmov(textureForm);
 	return true;
   }
@@ -10572,13 +10572,13 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(Msg.pt));
 	  }
-	  if ((StateMap.test(StateFlag::PRFACT) || StateMap.test(StateFlag::FORMIN) ||
-	       StateMap.test(StateFlag::POLIMOV)) ||
+	  if ((StateMap->test(StateFlag::PRFACT) || StateMap->test(StateFlag::FORMIN) ||
+	       StateMap->test(StateFlag::POLIMOV)) ||
 	      (FormDataSheet != nullptr)) {
 		wrap::setCursor(ArrowCursor);
 		break;
 	  }
-	  if (!StateMap.test(StateFlag::INIT)) {
+	  if (!StateMap->test(StateFlag::INIT)) {
 		if (UserFlagMap->test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
@@ -10587,12 +10587,12 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 		break;
 	  }
-	  if (StateMap.test(StateFlag::INSRT)) {
+	  if (StateMap->test(StateFlag::INSRT)) {
 		if (UserFlagMap->test(UserFlag::NEDOF)) {
 		  wrap::setCursor(CrossCursor);
 		}
 		else {
-		  if (StateMap.test(StateFlag::LIN1)) {
+		  if (StateMap->test(StateFlag::LIN1)) {
 			wrap::setCursor(NeedleUpCursor);
 		  }
 		  else {
@@ -10619,13 +10619,13 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 		break;
 	  }
-	  if (StateMap.test(StateFlag::BZUMIN) || StateMap.test(StateFlag::BOXZUM) ||
-	      StateMap.test(StateFlag::SELPNT)) {
+	  if (StateMap->test(StateFlag::BZUMIN) || StateMap->test(StateFlag::BOXZUM) ||
+	      StateMap->test(StateFlag::SELPNT)) {
 		wrap::setCursor(CrossCursor);
 		break;
 	  }
-	  if (StateMap.test(StateFlag::SATIN) || StateMap.test(StateFlag::SATPNT) ||
-	      StateMap.test(StateFlag::INSFRM)) {
+	  if (StateMap->test(StateFlag::SATIN) || StateMap->test(StateFlag::SATPNT) ||
+	      StateMap->test(StateFlag::INSFRM)) {
 		if (UserFlagMap->test(UserFlag::FRMX)) {
 		  wrap::setCursor(CrossCursor);
 		}
@@ -10634,28 +10634,28 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 		break;
 	  }
-	  if (StateMap.test(StateFlag::SATCNKT)) {
+	  if (StateMap->test(StateFlag::SATCNKT)) {
 		wrap::setCursor(DLineCursor);
 	  }
 	  else {
 		wrap::setCursor(ArrowCursor);
 	  }
 	} while (false);
-	if (StateMap.test(StateFlag::FPUNCLP)) {
+	if (StateMap->test(StateFlag::FPUNCLP)) {
 	  unpclp();
 	  setpclp();
-	  StateMap.set(StateFlag::SHOP);
+	  StateMap->set(StateFlag::SHOP);
 	  dupclp();
 	}
-	if (StateMap.test(StateFlag::INSFIL)) {
+	if (StateMap->test(StateFlag::INSFIL)) {
 	  form::unfrm();
 	  auto const point = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	  insflin(point);
-	  StateMap.set(StateFlag::SHOFRM);
+	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::MOVFRMS)) {
+	if (StateMap->test(StateFlag::MOVFRMS)) {
 	  unstrtch(stretchBoxLine);
 	  stretchBoxLine[0].x = stretchBoxLine[3].x = stretchBoxLine[4].x =
 	      Msg.pt.x - wrap::round<int32_t>(FormMoveDelta.x) - StitchWindowOrigin.x;
@@ -10679,18 +10679,18 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		stretchBoxLine[4].x -= 1;
 		stretchBoxLine[4].y -= 1;
 	  }
-	  StateMap.set(StateFlag::SHOSTRTCH);
+	  StateMap->set(StateFlag::SHOSTRTCH);
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap.test(StateFlag::POLIMOV)) {
+	if (StateMap->test(StateFlag::POLIMOV)) {
 	  form::munfrm();
 	  form::setmfrm();
-	  StateMap.set(StateFlag::SHOFRM);
+	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::EXPAND)) {
+	if (StateMap->test(StateFlag::EXPAND)) {
 	  unstrtch(stretchBoxLine);
 	  auto newSize = fPOINT {gsl::narrow<float>(Msg.pt.x - StitchWindowOrigin.x),
 	                         gsl::narrow<float>(Msg.pt.y - StitchWindowOrigin.y)};
@@ -10729,11 +10729,11 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		stretchBoxLine[iSide].y = wrap::round<int32_t>(newSize.y);
 	  }
 	  stretchBoxLine[4] = stretchBoxLine[0];
-	  StateMap.set(StateFlag::SHOSTRTCH);
+	  StateMap->set(StateFlag::SHOSTRTCH);
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap.test(StateFlag::STRTCH)) {
+	if (StateMap->test(StateFlag::STRTCH)) {
 	  unstrtch(stretchBoxLine);
 	  auto lineLength = 0L;
 	  if ((SelectedFormControlVertex & 1U) != 0U) {
@@ -10755,56 +10755,56 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  stretchBoxLine[4] = stretchBoxLine[0];
-	  StateMap.set(StateFlag::SHOSTRTCH);
+	  StateMap->set(StateFlag::SHOSTRTCH);
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	if (StateMap.test(StateFlag::INSFRM)) {
+	if (StateMap->test(StateFlag::INSFRM)) {
 	  form::uninsf();
 	  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-	  StateMap.set(StateFlag::SHOINSF);
+	  StateMap->set(StateFlag::SHOINSF);
 	  form::duinsf();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::FUNCLP)) {
+	if (StateMap->test(StateFlag::FUNCLP)) {
 	  form::unfrm();
 	  form::setmfrm();
-	  StateMap.set(StateFlag::SHOFRM);
+	  StateMap->set(StateFlag::SHOFRM);
 	  form::dufrm();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::SATCNKT)) {
+	if (StateMap->test(StateFlag::SATCNKT)) {
 	  form::drwcon();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::SATPNT)) {
+	if (StateMap->test(StateFlag::SATPNT)) {
 	  satin::drwsat();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::FRMOV)) {
+	if (StateMap->test(StateFlag::FRMOV)) {
 	  form::munfrm();
 	  form::setmfrm();
-	  StateMap.set(StateFlag::SHOFRM);
+	  StateMap->set(StateFlag::SHOFRM);
 	  form::mdufrm();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::FRMPMOV)) {
+	if (StateMap->test(StateFlag::FRMPMOV)) {
 	  unmov();
 	  RubberBandLine->operator[](1) = {Msg.pt.x - StitchWindowOrigin.x,
 	                                   Msg.pt.y - StitchWindowOrigin.y};
-	  StateMap.set(StateFlag::SHOMOV);
+	  StateMap->set(StateFlag::SHOMOV);
 	  thred::ritmov(ClosestFormToCursor);
 	  if (thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(Msg.pt));
 	  }
 	  return true;
 	}
-	if (StateMap.test(StateFlag::MOVCNTR)) {
+	if (StateMap->test(StateFlag::MOVCNTR)) {
 	  unrot();
 	  ritrot(rotationAngle, thred::pxCor2stch(Msg.pt));
 	  return true;
 	}
-	if (StateMap.test(StateFlag::ROTCAPT)) {
+	if (StateMap->test(StateFlag::ROTCAPT)) {
 	  unrotu();
 	  unrot();
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
@@ -10824,24 +10824,24 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  rotationAngle -= RotationHandleAngle;
 	  ritrot(rotationAngle, rotationCenter);
-	  StateMap.set(StateFlag::ROTUSHO);
+	  StateMap->set(StateFlag::ROTUSHO);
 	  durotu();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::SELPNT)) {
-	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
+	if (StateMap->test(StateFlag::SELPNT)) {
+	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
 	  unsel();
 	  rSelbox();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::CLPSHO)) {
+	if (StateMap->test(StateFlag::CLPSHO)) {
 	  unclp();
 	  clpbox();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::CAPT)) {
+	if (StateMap->test(StateFlag::CAPT)) {
 	  if (thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(Msg.pt));
 	  }
@@ -10850,40 +10850,40 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  dulin();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::INSRT)) {
+	if (StateMap->test(StateFlag::INSRT)) {
 	  if (thred::inStitchWin()) {
 		thred::ritfcor(thred::pxCor2stch(Msg.pt));
 	  }
-	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
+	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
-	  if (StateMap.test(StateFlag::LIN1)) {
+	  if (StateMap->test(StateFlag::LIN1)) {
 		if (!StitchBuffer->empty()) {
 		  xlin1();
 		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-		  StateMap.set(StateFlag::ILIN1);
+		  StateMap->set(StateFlag::ILIN1);
 		  ilin1();
 		}
 		return true;
 	  }
 	  xlin();
 	  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-	  StateMap.set(StateFlag::ILIN);
+	  StateMap->set(StateFlag::ILIN);
 	  ilin();
 	  return true;
 	}
-	if (StateMap.test(StateFlag::BOXZUM) && StateMap.testAndSet(StateFlag::VCAPT)) {
+	if (StateMap->test(StateFlag::BOXZUM) && StateMap->testAndSet(StateFlag::VCAPT)) {
 	  SetCapture(ThrEdWindow);
 	}
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	if (StateMap.test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) {
-	  if (StateMap.testAndSet(StateFlag::VCAPT)) {
+	if (StateMap->test(StateFlag::BZUMIN) && ((Msg.wParam & MK_LBUTTON) != 0U)) {
+	  if (StateMap->testAndSet(StateFlag::VCAPT)) {
 		SetCapture(ThrEdWindow);
 	  }
 	  thred::unbBox();
 	  ZoomBoxLine[1].x = ZoomBoxLine[2].x = Msg.pt.x - StitchWindowOrigin.x;
 	  ZoomBoxLine[2].y = ZoomBoxLine[3].y = Msg.pt.y - StitchWindowOrigin.y;
-	  StateMap.set(StateFlag::BZUM);
+	  StateMap->set(StateFlag::BZUM);
 	  thred::bBox();
 	  return true;
 	}
@@ -10891,7 +10891,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
   else {
 	SetCursor(ArrowCursor);
 	wrap::setCursor(ArrowCursor);
-	if (StateMap.testAndReset(StateFlag::VCAPT)) {
+	if (StateMap->testAndReset(StateFlag::VCAPT)) {
 	  ReleaseCapture();
 	}
   }
@@ -10905,13 +10905,13 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	texture::setshft();
 	return true;
   }
-  if (StateMap.test(StateFlag::TXTRED)) {
+  if (StateMap->test(StateFlag::TXTRED)) {
 	texture::txtrup();
 	return true;
   }
   ReleaseCapture();
   movchk();
-  if (StateMap.testAndReset(StateFlag::MOVFRMS)) {
+  if (StateMap->testAndReset(StateFlag::MOVFRMS)) {
 	thred::savdo();
 	auto const point = POINT {(Msg.pt.x - wrap::round<int32_t>(FormMoveDelta.x) - StitchWindowOrigin.x) -
 	                              SelectedFormsRect.left,
@@ -10919,7 +10919,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	                              SelectedFormsRect.top};
 	form::ratsr();
 	FormMoveDelta = fPOINT {point.x / HorizontalRatio, point.y / VerticalRatio};
-	if (StateMap.test(StateFlag::FPSEL)) {
+	if (StateMap->test(StateFlag::FPSEL)) {
 	  // clang-format off
 	  auto const& form            = FormList->operator[](ClosestFormToCursor);
 	  auto        iSelectedVertex = SelectedFormVertices.start;
@@ -10933,10 +10933,10 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  thred::setpsel();
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
-	  if (StateMap.test(StateFlag::BIGBOX)) {
+	  if (StateMap->test(StateFlag::BIGBOX)) {
 		thred::savdo();
 		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		  form::frmadj(iForm);
@@ -10953,40 +10953,40 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		  form::frmadj(selectedForm);
 		}
 		form::frmsadj();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::EXPAND)) {
+  if (StateMap->testAndReset(StateFlag::EXPAND)) {
 	form::setexpand(xyRatio);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::STRTCH)) {
+  if (StateMap->testAndReset(StateFlag::STRTCH)) {
 	form::setstrtch();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::FRMOV)) {
+  if (StateMap->testAndReset(StateFlag::FRMOV)) {
 	thred::savdo();
 	form::rstfrm();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::FRMPMOV)) {
+  if (StateMap->testAndReset(StateFlag::FRMPMOV)) {
 	thred::savdo();
 	form::setfpnt();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::MOVCNTR)) {
+  if (StateMap->testAndReset(StateFlag::MOVCNTR)) {
 	rotationCenter = thred::pxCor2stch(Msg.pt);
-	StateMap.set(StateFlag::ROTAT);
+	StateMap->set(StateFlag::ROTAT);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::ROTCAPT)) {
+  if (StateMap->testAndReset(StateFlag::ROTCAPT)) {
 	thred::rotfn(rotationAngle, rotationCenter);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::SELPNT)) {
+  if (StateMap->testAndReset(StateFlag::SELPNT)) {
 	thred::savdo();
 	ReleaseCapture();
 	unsel();
@@ -10997,13 +10997,13 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  StitchBuffer->operator[](iStitch).x -= adjustedPoint.x;
 	  StitchBuffer->operator[](iStitch).y -= adjustedPoint.y;
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::CAPT)) {
+  if (StateMap->testAndReset(StateFlag::CAPT)) {
 	unlin();
 	ReleaseCapture();
-	StateMap.reset(StateFlag::CAPT);
+	StateMap->reset(StateFlag::CAPT);
 	thred::savdo();
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 
@@ -11018,14 +11018,14 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  stchbox(ClosestPointIndex + 1, StitchWindowDC);
 	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
-	StateMap.set(StateFlag::SELBOX);
-	StateMap.reset(StateFlag::FRMPSEL);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::SELBOX);
+	StateMap->reset(StateFlag::FRMPSEL);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap.test(StateFlag::BZUMIN)) {
+  if (StateMap->test(StateFlag::BZUMIN)) {
 	auto stitchPoint = thred::pxCor2stch(Msg.pt);
-	if (StateMap.testAndReset(StateFlag::BOXSLCT)) {
+	if (StateMap->testAndReset(StateFlag::BOXSLCT)) {
 	  if (ZoomBoxOrigin.x > stitchPoint.x) {
 		StitchRangeRect.right = ZoomBoxOrigin.x;
 		StitchRangeRect.left  = stitchPoint.x;
@@ -11042,22 +11042,22 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		StitchRangeRect.top    = stitchPoint.y;
 		StitchRangeRect.bottom = ZoomBoxOrigin.y;
 	  }
-	  if (StateMap.testAndReset(StateFlag::GRPSEL)) {
+	  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 		thred::rngadj();
 		for (auto iStitch = GroupStartStitch; iStitch < GroupEndStitch; iStitch++) {
 		  if (inrng(iStitch)) {
 			ClosestPointIndex = iStitch;
-			StateMap.set(StateFlag::SELBOX);
+			StateMap->set(StateFlag::SELBOX);
 			break;
 		  }
 		}
 	  }
-	  if (StateMap.testAndReset(StateFlag::NOSEL)) {
+	  if (StateMap->testAndReset(StateFlag::NOSEL)) {
 		SelectedFormList->clear();
 		// We potentially reserve too much memory, but the cost of reallocatioon is higher than the
 		// small amount overallocated
 		SelectedFormList->reserve(FormList->size());
-		StateMap.reset(StateFlag::FORMSEL);
+		StateMap->reset(StateFlag::FORMSEL);
 		for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); iForm++) {
 		  if (finrng(iForm)) {
 			SelectedFormList->push_back(iForm);
@@ -11070,20 +11070,20 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		  ClosestVertexToCursor = 0;
 		  SelectedFormList->clear();
 		  displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
-		  StateMap.set(StateFlag::RESTCH);
-		  StateMap.set(StateFlag::FORMSEL);
+		  StateMap->set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::FORMSEL);
 		  return true;
 		}
 		if (!SelectedFormList->empty()) {
 		  gotbox();
 		  return true;
 		}
-		StateMap.reset(StateFlag::BZUMIN);
-		StateMap.reset(StateFlag::BOXSLCT);
-		StateMap.reset(StateFlag::FRMPSEL);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->reset(StateFlag::BZUMIN);
+		StateMap->reset(StateFlag::BOXSLCT);
+		StateMap->reset(StateFlag::FRMPSEL);
+		StateMap->set(StateFlag::RESTCH);
 	  }
-	  if (StateMap.testAndReset(StateFlag::SELBOX)) {
+	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
 		if (inrng(ClosestPointIndex)) {
 		  GroupStitchIndex = ClosestPointIndex + 1U;
 		  ClosestPointIndex--;
@@ -11095,12 +11095,12 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 			GroupStitchIndex++;
 		  }
 		  GroupStitchIndex--;
-		  StateMap.set(StateFlag::GRPSEL);
+		  StateMap->set(StateFlag::GRPSEL);
 		  gotbox();
 		  return true;
 		}
 	  }
-	  if (!StateMap.test(StateFlag::INSRT)) {
+	  if (!StateMap->test(StateFlag::INSRT)) {
 		rngal();
 	  }
 	  //				gotbox();
@@ -11131,13 +11131,13 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	}
 	ZoomRect = fRECTANGLE {0.0F, newSize.y, newSize.x, 0.0F};
 	thred::shft(stitchPoint);
-	StateMap.reset(StateFlag::BZUMIN);
-	StateMap.set(StateFlag::RESTCH);
-	if (!StateMap.testAndSet(StateFlag::ZUMED)) {
+	StateMap->reset(StateFlag::BZUMIN);
+	StateMap->set(StateFlag::RESTCH);
+	if (!StateMap->testAndSet(StateFlag::ZUMED)) {
 	  thred::movStch();
 	}
 	return true;
-	//			StateMap.reset(StateFlag::BZUMIN);
+	//			StateMap->reset(StateFlag::BZUMIN);
   }
   retflag = false;
   return false;
@@ -11149,7 +11149,7 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	auto formDataRect = RECT {0L, 0L, 0L, 0L};
 	GetWindowRect(FormDataSheet, &formDataRect);
   }
-  if (StateMap.testAndReset(StateFlag::THUMON)) {
+  if (StateMap->testAndReset(StateFlag::THUMON)) {
 	if (chkok()) {
 	  thred::save();
 	  thumbak();
@@ -11161,34 +11161,34 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	  thred::unmsg();
 	  return true;
 	}
-	StateMap.set(StateFlag::BAKSHO);
+	StateMap->set(StateFlag::BAKSHO);
 	thred::unbsho();
-	StateMap.reset(StateFlag::THUMSHO);
+	StateMap->reset(StateFlag::THUMSHO);
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::BAKSHO)) {
+  if (StateMap->testAndReset(StateFlag::BAKSHO)) {
 	if (Msg.message == WM_RBUTTONDOWN) {
-	  StateMap.set(StateFlag::RBUT);
+	  StateMap->set(StateFlag::RBUT);
 	}
 	else {
-	  StateMap.reset(StateFlag::RBUT);
+	  StateMap->reset(StateFlag::RBUT);
 	}
 	{
 	  auto iVersion = 0U;
 	  for (auto& iBackup : BackupViewer) {
 		if (Msg.hwnd == iBackup) {
 		  FileVersionIndex = gsl::narrow<char>(iVersion);
-		  if (StateMap.test(StateFlag::THUMSHO)) {
+		  if (StateMap->test(StateFlag::THUMSHO)) {
 			if (savcmp()) {
 			  thumbak();
 			}
 			else {
-			  if (StateMap.test(StateFlag::RBUT)) {
+			  if (StateMap->test(StateFlag::RBUT)) {
 				thumbak();
 			  }
 			  else {
-				StateMap.set(StateFlag::THUMON);
+				StateMap->set(StateFlag::THUMON);
 				displayText::savdisc();
 			  }
 			  return true;
@@ -11198,7 +11198,7 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 			rebak();
 		  }
 		  rstAll();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
 		iVersion++;
@@ -11213,22 +11213,22 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	if (Msg.message == WM_RBUTTONDOWN) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if (((Msg.wParam & MK_SHIFT) != 0U) &&
-	      (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL))) {
+	      (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL))) {
 		unbox();
 		GroupStitchIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
-		StateMap.set(StateFlag::GRPSEL);
+		StateMap->set(StateFlag::GRPSEL);
 		thred::grpAdj();
 		nuAct(GroupStitchIndex);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
 		ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
 		nuAct(ClosestPointIndex);
 		movbox();
-		if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-		  StateMap.reset(StateFlag::SCROS);
-		  StateMap.reset(StateFlag::ECROS);
-		  StateMap.set(StateFlag::RESTCH);
+		if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+		  StateMap->reset(StateFlag::SCROS);
+		  StateMap->reset(StateFlag::ECROS);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 	  }
 	}
@@ -11236,7 +11236,7 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	  ClosestPointIndex = wrap::round<uint32_t>(colorBarPosition * StitchBuffer->size());
 	  nuAct(ClosestPointIndex);
 	  rstAll();
-	  StateMap.set(StateFlag::SELBOX);
+	  StateMap->set(StateFlag::SELBOX);
 	  selCol();
 	}
 	thred::redraw(ColorBar);
@@ -11247,59 +11247,59 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 }
 
 auto thred::internal::handleRightButtonDown() -> bool {
-  if (StateMap.test(StateFlag::TXTRED) && (MsgWindow == nullptr)) {
+  if (StateMap->test(StateFlag::TXTRED) && (MsgWindow == nullptr)) {
 	texture::txtrbut();
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
 	if (form::closfrm()) {
-	  if ((StateMap.test(StateFlag::FRMPSEL) || StateMap.test(StateFlag::FPSEL)) &&
+	  if ((StateMap->test(StateFlag::FRMPSEL) || StateMap->test(StateFlag::FPSEL)) &&
 	      SelectedFormVertices.form == ClosestFormToCursor) {
 		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-		StateMap.reset(StateFlag::FRMPSEL);
-		StateMap.set(StateFlag::FPSEL);
+		StateMap->reset(StateFlag::FRMPSEL);
+		StateMap->set(StateFlag::FPSEL);
 		SelectedFormVertices.finish = ClosestVertexToCursor;
 		auto const selectedVertexCount =
 		    (SelectedFormVertices.finish - SelectedFormVertices.start + vertexCount) % vertexCount;
 		if (selectedVertexCount < vertexCount / 2U) {
 		  SelectedFormVertices.vertexCount = selectedVertexCount;
-		  StateMap.set(StateFlag::PSELDIR);
+		  StateMap->set(StateFlag::PSELDIR);
 		}
 		else {
 		  SelectedFormVertices.vertexCount = vertexCount - selectedVertexCount;
-		  StateMap.reset(StateFlag::PSELDIR);
+		  StateMap->reset(StateFlag::PSELDIR);
 		}
 		thred::setpsel();
 		return true;
 	  }
-	  StateMap.reset(StateFlag::FPSEL);
-	  StateMap.set(StateFlag::FRMPSEL);
+	  StateMap->reset(StateFlag::FPSEL);
+	  StateMap->set(StateFlag::FRMPSEL);
 	  SelectedFormVertices.start = ClosestVertexToCursor;
 	  SelectedFormVertices.form  = ClosestFormToCursor;
 	  selfpnt();
 	  return true;
 	}
   }
-  if (StateMap.test(StateFlag::WASTRAC)) {
+  if (StateMap->test(StateFlag::WASTRAC)) {
 	trace::wasTrace1();
 	return true;
   }
   thred::unmsg();
   unboxs();
   unpat();
-  StateMap.reset(StateFlag::SATIN);
-  if (StateMap.testAndReset(StateFlag::SATPNT)) {
+  StateMap->reset(StateFlag::SATIN);
+  if (StateMap->testAndReset(StateFlag::SATPNT)) {
 	satin::satfix();
   }
-  if (StateMap.test(StateFlag::BAKSHO)) {
+  if (StateMap->test(StateFlag::BAKSHO)) {
 	thred::unbsho();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::BIGBOX)) {
-	StateMap.set(StateFlag::RESTCH);
+  if (StateMap->testAndReset(StateFlag::BIGBOX)) {
+	StateMap->set(StateFlag::RESTCH);
   }
-  if (StateMap.test(StateFlag::PRFACT)) {
-	if (StateMap.testAndReset(StateFlag::HUPMSG)) {
+  if (StateMap->test(StateFlag::PRFACT)) {
+	if (StateMap->testAndReset(StateFlag::HUPMSG)) {
 	  thred::unsid();
 	}
 	else {
@@ -11310,30 +11310,30 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  }
 	  else {
 		DestroyWindow(PreferencesWindow);
-		StateMap.reset(StateFlag::PRFACT);
-		if (StateMap.testAndReset(StateFlag::WASRT)) {
-		  StateMap.set(StateFlag::INSRT);
+		StateMap->reset(StateFlag::PRFACT);
+		if (StateMap->testAndReset(StateFlag::WASRT)) {
+		  StateMap->set(StateFlag::INSRT);
 		}
 	  }
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
   if (FormMenuChoice != 0U) {
 	chknum();
 	FormMenuChoice = 0;
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::INSFRM)) {
+  if (StateMap->testAndReset(StateFlag::INSFRM)) {
 	insadj();
-	StateMap.reset(StateFlag::SHOINSF);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->reset(StateFlag::SHOINSF);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (thred::inStitchWin() && !(StateMap.test(StateFlag::SIZSEL) &&
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
                                 thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
-	if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
+	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		TmpFormIndex = ClosestFormToCursor;
@@ -11341,17 +11341,17 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		  // ToDo - I don't think this can ever be hit with closfrm
 		  if (!SelectedFormList->empty()) {
 			nuslst(ClosestFormToCursor);
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 			return true;
 		  }
-		  if (StateMap.testAndReset(StateFlag::FORMSEL) && TmpFormIndex != ClosestFormToCursor) {
+		  if (StateMap->testAndReset(StateFlag::FORMSEL) && TmpFormIndex != ClosestFormToCursor) {
 			if (TmpFormIndex > ClosestFormToCursor) {
 			  std::swap(ClosestFormToCursor, TmpFormIndex);
 			}
 			for (auto iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
 			  SelectedFormList->push_back(iForm);
 			}
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 			return true;
 		  }
 
@@ -11360,8 +11360,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  }
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_CONTROL) != 0U) {
-		if (SelectedFormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
-		  StateMap.set(StateFlag::WASEL);
+		if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
+		  StateMap->set(StateFlag::WASEL);
 		  PreviousFormIndex = ClosestFormToCursor;
 		}
 		if (form::closfrm()) {
@@ -11373,7 +11373,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		}
 		return true;
 	  }
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		do {
 		  if (FormMenuChoice != 0U) {
 			chknum();
@@ -11384,27 +11384,27 @@ auto thred::internal::handleRightButtonDown() -> bool {
 			thred::undat();
 			thred::unsid();
 			FormMenuChoice = 0;
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 			break;
 		  }
 		  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
 		  lenCalc();
-		  if (!StateMap.testAndReset(StateFlag::ENTROT)) {
-			StateMap.reset(StateFlag::FORMSEL);
+		  if (!StateMap->testAndReset(StateFlag::ENTROT)) {
+			StateMap->reset(StateFlag::FORMSEL);
 		  }
-		  StateMap.set(StateFlag::DUMEN);
+		  StateMap->set(StateFlag::DUMEN);
 		  if (!closPnt1(&ClosestPointIndex)) {
 			unbox();
 		  }
 		} while (false);
 	  }
 	  if (form::closfrm()) {
-		StateMap.set(StateFlag::FORMSEL);
-		StateMap.reset(StateFlag::FPSEL);
+		StateMap->set(StateFlag::FORMSEL);
+		StateMap->reset(StateFlag::FPSEL);
 		form::unpsel();
 		form::ritfrct(ClosestFormToCursor, StitchWindowDC);
-		if (StateMap.testAndReset(StateFlag::FRMPSEL) || !SelectedFormList->empty()) {
-		  StateMap.set(StateFlag::RESTCH);
+		if (StateMap->testAndReset(StateFlag::FRMPSEL) || !SelectedFormList->empty()) {
+		  StateMap->set(StateFlag::RESTCH);
 		  SelectedFormList->clear();
 		}
 		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
@@ -11414,30 +11414,30 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  }
 	  if (!SelectedFormList->empty()) {
 		SelectedFormList->clear();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
-	  if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
-		StateMap.set(StateFlag::RESTCH);
+	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
-	if (StateMap.test(StateFlag::INIT) || (FileHandle != nullptr)) {
+	if (StateMap->test(StateFlag::INIT) || (FileHandle != nullptr)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
-		if (StateMap.test(StateFlag::SELBOX)) {
+		if (StateMap->test(StateFlag::SELBOX)) {
 		  auto const code = ClosestPointIndex;
 		  closPnt1(&ClosestPointIndex);
 		  if (ClosestPointIndex != code) {
 			unbox();
 			GroupStitchIndex  = ClosestPointIndex;
 			ClosestPointIndex = code;
-			StateMap.set(StateFlag::GRPSEL);
+			StateMap->set(StateFlag::GRPSEL);
 			thred::grpAdj();
 		  }
 		  nuAct(GroupStitchIndex);
 		  thred::redraw(ColorBar);
 		  return true;
 		}
-		if (StateMap.test(StateFlag::GRPSEL)) {
+		if (StateMap->test(StateFlag::GRPSEL)) {
 		  auto const code = ClosestPointIndex;
 		  closPnt1(&ClosestPointIndex);
 		  GroupStitchIndex  = ClosestPointIndex;
@@ -11450,19 +11450,19 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		rebox();
 	  }
 	  else {
-		StateMap.reset(StateFlag::LENSRCH);
-		StateMap.reset(StateFlag::WASGRP);
-		StateMap.reset(StateFlag::FPSEL);
-		StateMap.reset(StateFlag::WASFRMFRM);
-		StateMap.reset(StateFlag::SIDACT);
-		if (StateMap.testAndReset(StateFlag::INSRT)) {
+		StateMap->reset(StateFlag::LENSRCH);
+		StateMap->reset(StateFlag::WASGRP);
+		StateMap->reset(StateFlag::FPSEL);
+		StateMap->reset(StateFlag::WASFRMFRM);
+		StateMap->reset(StateFlag::SIDACT);
+		if (StateMap->testAndReset(StateFlag::INSRT)) {
 		  ReleaseCapture();
 		  rstAll();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
-		  if (StateMap.testAndReset(StateFlag::GRPSEL)) {
-			StateMap.set(StateFlag::RESTCH);
+		  if (StateMap->testAndReset(StateFlag::GRPSEL)) {
+			StateMap->set(StateFlag::RESTCH);
 		  }
 		  if (!StitchBuffer->empty()) {
 			rebox();
@@ -11470,7 +11470,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		}
 	  }
 	  xt::clrstch();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	return true;
   }
@@ -11482,8 +11482,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		srchk();
 		setsrch(SmallestStitchIndex);
 		lensadj();
-		StateMap.set(StateFlag::GRPSEL);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::GRPSEL);
+		StateMap->set(StateFlag::RESTCH);
 		return true;
 	  }
 	}
@@ -11494,8 +11494,8 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		srchk();
 		setsrch(LargestStitchIndex);
 		lensadj();
-		StateMap.set(StateFlag::GRPSEL);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::GRPSEL);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
   }
@@ -11550,29 +11550,29 @@ auto thred::internal::updateHoopSize() -> bool {
 auto thred::internal::updateFillColor() -> bool {
   do {
 	thred::savdo();
-	if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
+	if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 	  xt::dufcol(VerticalIndex + 1U);
 	  return true;
 	}
-	if (StateMap.testAndReset(StateFlag::BRDSID)) {
+	if (StateMap->testAndReset(StateFlag::BRDSID)) {
 	  form::nubrdcol(VerticalIndex);
 	  break;
 	}
-	if (StateMap.testAndReset(StateFlag::APSID)) {
+	if (StateMap->testAndReset(StateFlag::APSID)) {
 	  form::nulapcol(VerticalIndex);
 	  break;
 	}
-	if (StateMap.testAndReset(StateFlag::FTHSID)) {
+	if (StateMap->testAndReset(StateFlag::FTHSID)) {
 	  form::nufthcol(VerticalIndex);
 	  break;
 	}
-	if (StateMap.testAndReset(StateFlag::UNDCOL)) {
+	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
 	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & 0xfU;
 	  form::refilfn();
 	  thred::coltab();
 	  break;
 	}
-	if (StateMap.testAndReset(StateFlag::FSETUCOL)) {
+	if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
 	  xt::dundcol(VerticalIndex + 1U);
 	  return true;
 	}
@@ -11583,8 +11583,8 @@ auto thred::internal::updateFillColor() -> bool {
   SetWindowText(ValueWindow->operator[](LBRDCOL), static_cast<LPCWSTR>(MsgBuffer));
   thred::unsid();
   thred::coltab();
-  StateMap.set(StateFlag::RESTCH);
-  StateMap.reset(StateFlag::SIDCOL);
+  StateMap->set(StateFlag::RESTCH);
+  StateMap->reset(StateFlag::SIDCOL);
   FormMenuChoice = 0;
   return true;
 }
@@ -11657,7 +11657,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	}
 	if (iLayer < 5U) {
 	  form::movlayr(iLayer * 2U);
-	  StateMap.set(StateFlag::FORMSEL);
+	  StateMap->set(StateFlag::FORMSEL);
 	}
 	thred::unsid();
 	auto layerStr =
@@ -11667,7 +11667,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   form.borderColor &= COLMSK;
-  if (StateMap.testAndReset(StateFlag::BRDACT)) {
+  if (StateMap->testAndReset(StateFlag::BRDACT)) {
 	if (clip::iseclp(form)) {
 	  clip::deleclp(ClosestFormToCursor);
 	}
@@ -11675,7 +11675,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  if (Msg.hwnd == SideWindow[0]) {
 		form.edgeType = 0;
 		thred::coltab();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow[1]) {
@@ -11823,13 +11823,13 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow[10]) {
-		StateMap.set(StateFlag::LINCHN);
+		StateMap->set(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
 	  }
 	  if (Msg.hwnd == SideWindow[11]) {
-		StateMap.reset(StateFlag::LINCHN);
+		StateMap->reset(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
@@ -11843,7 +11843,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	form::refil();
 	thred::unmsg();
 	thred::unsid();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
 
@@ -11863,7 +11863,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::delmfil(ClosestFormToCursor);
 	  form.fillType = 0;
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == SideWindow[1]) { // vertical fill
@@ -11917,7 +11917,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		clip::delmclp(ClosestFormToCursor);
 		break;
 	  }
-	  StateMap.reset(StateFlag::FTHR);
+	  StateMap->reset(StateFlag::FTHR);
 	  form::filsat();
 	  break;
 	}
@@ -11945,18 +11945,18 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  if (sidclp()) {
 		form::vrtsclp();
 	  }
-	  StateMap.reset(StateFlag::CLPSHO);
+	  StateMap->reset(StateFlag::CLPSHO);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == SideWindow[8]) { // horizontal clip
 	  if (sidclp()) {
 		form::horsclp();
 	  }
-	  StateMap.reset(StateFlag::CLPSHO);
+	  StateMap->reset(StateFlag::CLPSHO);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == SideWindow[9]) { // angle clip
@@ -11966,9 +11966,9 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		}
 		form::angsclp(form);
 	  }
-	  StateMap.reset(StateFlag::CLPSHO);
+	  StateMap->reset(StateFlag::CLPSHO);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == SideWindow[10]) { // feather fill
@@ -11976,9 +11976,9 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form.satinOrAngle.guide = 0;
 	  }
 	  xt::fethrf();
-	  StateMap.set(StateFlag::INIT);
+	  StateMap->set(StateFlag::INIT);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == SideWindow[11]) // vertical texture
@@ -12017,14 +12017,14 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	thred::unsid();
 	DestroyWindow(FormDataSheet);
 	FormDataSheet = nullptr;
-	StateMap.set(StateFlag::WASFRMFRM);
+	StateMap->set(StateFlag::WASFRMFRM);
   }
   else {
 	formForms::refrm();
 	form::refil();
 	thred::unmsg();
 	thred::unsid();
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
   }
   return true;
 }
@@ -12089,7 +12089,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  formForms::refrm();
 	  form::refil();
 	  thred::unsid();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHUP) || Msg.hwnd == LabelWindow->operator[](LFTHUP)) {
@@ -12100,7 +12100,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 		choice = StringTable->operator[](STR_ON);
 	  }
 	  SetWindowText(ValueWindow->operator[](LFTHUP), choice.c_str());
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHBTH) || Msg.hwnd == LabelWindow->operator[](LFTHBTH)) {
@@ -12108,7 +12108,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  formForms::refrm();
 	  form::refil();
 	  thred::unsid();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
@@ -12127,19 +12127,19 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  }
 	  thred::coltab();
 	  satin::delsac(ClosestFormToCursor);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  formForms::refrm();
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LLAYR) || Msg.hwnd == LabelWindow->operator[](LLAYR)) {
 	  std::wstring layerText[] = {L"0", L"1", L"2", L"3", L"4"};
 	  FormMenuChoice           = LLAYR;
-	  StateMap.reset(StateFlag::FILTYP);
+	  StateMap->reset(StateFlag::FILTYP);
 	  sidmsg(form, ValueWindow->operator[](LLAYR), std::begin(layerText), 5U);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
-	  StateMap.reset(StateFlag::FILTYP);
+	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
 	  sidmsg(form, ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), 14U);
 	  break;
@@ -12147,21 +12147,21 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
 	  FormMenuChoice = LFRMCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LFRMCOL));
-	  StateMap.set(StateFlag::SIDCOL);
+	  StateMap->set(StateFlag::SIDCOL);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LUNDCOL) || Msg.hwnd == LabelWindow->operator[](LUNDCOL)) {
 	  FormMenuChoice = LUNDCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LUNDCOL));
-	  StateMap.set(StateFlag::SIDCOL);
-	  StateMap.set(StateFlag::UNDCOL);
+	  StateMap->set(StateFlag::SIDCOL);
+	  StateMap->set(StateFlag::UNDCOL);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHCOL) || Msg.hwnd == LabelWindow->operator[](LFTHCOL)) {
 	  FormMenuChoice = LFTHCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LFTHCOL));
-	  StateMap.set(StateFlag::SIDCOL);
-	  StateMap.set(StateFlag::FTHSID);
+	  StateMap->set(StateFlag::SIDCOL);
+	  StateMap->set(StateFlag::FTHSID);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMSPAC) || Msg.hwnd == LabelWindow->operator[](LFRMSPAC)) {
@@ -12175,16 +12175,16 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
-	  StateMap.set(StateFlag::FILTYP);
+	  StateMap->set(StateFlag::FILTYP);
 	  sidmsg(form, ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS + 1U);
-	  StateMap.set(StateFlag::BRDACT);
+	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRDCOL) || Msg.hwnd == LabelWindow->operator[](LBRDCOL)) {
 	  FormMenuChoice = LBRDCOL;
 	  formForms::sidwnd(ValueWindow->operator[](LBRDCOL));
-	  StateMap.set(StateFlag::SIDCOL);
-	  StateMap.set(StateFlag::BRDSID);
+	  StateMap->set(StateFlag::SIDCOL);
+	  StateMap->set(StateFlag::BRDSID);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRDSPAC) || Msg.hwnd == LabelWindow->operator[](LBRDSPAC)) {
@@ -12204,8 +12204,8 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LAPCOL) || Msg.hwnd == LabelWindow->operator[](LAPCOL)) {
 	  FormMenuChoice = LAPCOL;
-	  StateMap.set(StateFlag::SIDCOL);
-	  StateMap.set(StateFlag::APSID);
+	  StateMap->set(StateFlag::SIDCOL);
+	  StateMap->set(StateFlag::APSID);
 	  formForms::sidwnd(ValueWindow->operator[](LAPCOL));
 	  break;
 	}
@@ -12226,7 +12226,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  }
 	  form::refil();
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBFIN) || Msg.hwnd == LabelWindow->operator[](LBFIN)) {
@@ -12241,7 +12241,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  }
 	  form::refil();
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMANG) || Msg.hwnd == LabelWindow->operator[](LFRMANG)) {
@@ -12360,11 +12360,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	xt::dushft();
 	return true;
   }
-  if (StateMap.test(StateFlag::TXTRED) && !StateMap.test(StateFlag::FORMIN)) {
+  if (StateMap->test(StateFlag::TXTRED) && !StateMap->test(StateFlag::FORMIN)) {
 	texture::txtlbut(textureForm);
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::FSETFCOL)) {
+  if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
 	thred::unsid();
 	thred::unmsg();
 	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
@@ -12372,7 +12372,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::FSETBCOL)) {
+  if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
 	thred::unsid();
 	thred::unmsg();
 	if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
@@ -12380,38 +12380,38 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::FPUNCLP)) {
+  if (StateMap->testAndReset(StateFlag::FPUNCLP)) {
 	thred::savdo();
 	fixpclp(ClosestFormToCursor);
 	form::frmout(ClosestFormToCursor);
 	return true;
   }
-  if (StateMap.test(StateFlag::FPSEL) && !StateMap.test(StateFlag::FUNCLP) && !StateMap.test(StateFlag::ROTAT)) {
+  if (StateMap->test(StateFlag::FPSEL) && !StateMap->test(StateFlag::FUNCLP) && !StateMap->test(StateFlag::ROTAT)) {
 	*SelectedFormsLine = *SelectedPointsLine;
 	SelectedFormsRect  = SelectedPixelsRect;
 	if (chkbig(stretchBoxLine, xyRatio)) {
 	  return true;
 	}
   }
-  if (StateMap.test(StateFlag::WASTRAC)) {
+  if (StateMap->test(StateFlag::WASTRAC)) {
 	trace::tracpar();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::HUPMSG)) {
+  if (StateMap->testAndReset(StateFlag::HUPMSG)) {
 	return thi::updateHoopSize();
   }
-  if (StateMap.testAndReset(StateFlag::INSFIL)) {
+  if (StateMap->testAndReset(StateFlag::INSFIL)) {
 	duinsfil();
 	return true;
   }
-  if (StateMap.test(StateFlag::BIGBOX) && chkbig(stretchBoxLine, xyRatio)) {
+  if (StateMap->test(StateFlag::BIGBOX) && chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
+  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
 	auto code = 0U;
 	if (chkok()) {
 	  thred::savdo();
-	  StateMap.reset(StateFlag::DELTO);
+	  StateMap->reset(StateFlag::DELTO);
 	  code = 1;
 	}
 	else {
@@ -12420,7 +12420,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
 	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 		thred::savdo();
-		StateMap.set(StateFlag::DELTO);
+		StateMap->set(StateFlag::DELTO);
 		code = 1;
 	  }
 	}
@@ -12428,19 +12428,19 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::MOVMSG)) {
+  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
 	if (chkok()) {
 	  thred::savdo();
 	  form::refilfn();
 	}
 	thred::unmsg();
-	if (StateMap.testAndReset(StateFlag::WASFRMFRM)) {
+	if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 	  formForms::refrm();
 	}
 	return true;
   }
-  if (StateMap.test(StateFlag::FUNSCLP)) {
-	StateMap.reset(StateFlag::MOVFRMS);
+  if (StateMap->test(StateFlag::FUNSCLP)) {
+	StateMap->reset(StateFlag::MOVFRMS);
 	auto formsRect = fRECTANGLE {};
 	form::pxrct2stch(SelectedFormsRect, formsRect);
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
@@ -12460,18 +12460,18 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
 	}
-	StateMap.reset(StateFlag::FUNSCLP);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->reset(StateFlag::FUNSCLP);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (!SelectedFormList->empty() && !StateMap.test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
+  if (!SelectedFormList->empty() && !StateMap->test(StateFlag::ROTAT) && chkbig(stretchBoxLine, xyRatio)) {
 	return true;
   }
-  if (StateMap.test(StateFlag::SIDCOL) &&
+  if (StateMap->test(StateFlag::SIDCOL) &&
       thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	return thi::updateFillColor();
   }
-  if (StateMap.testAndReset(StateFlag::OSAV)) {
+  if (StateMap->testAndReset(StateFlag::OSAV)) {
 	if (chkok()) {
 	  thred::save();
 	  nuFil(fileIndices::THR);
@@ -12486,7 +12486,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::FCLOS)) {
+  if (StateMap->testAndReset(StateFlag::FCLOS)) {
 	if (chkok()) {
 	  thred::save();
 	}
@@ -12498,7 +12498,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::SAVEX)) {
+  if (StateMap->testAndReset(StateFlag::SAVEX)) {
 	if (chkok()) {
 	  thred::save();
 	  reldun();
@@ -12509,10 +12509,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.test(StateFlag::PRFACT)) {
+  if (StateMap->test(StateFlag::PRFACT)) {
 	return thi::updatePreferences();
   }
-  if (!StateMap.test(StateFlag::ROTAT) && StateMap.test(StateFlag::GRPSEL)) {
+  if (!StateMap->test(StateFlag::ROTAT) && StateMap->test(StateFlag::GRPSEL)) {
 	auto& controlPoint = *FormControlPoints;
 	if (iselpnt()) {
 	  for (auto iSide = 0U; iSide < wrap::toUnsigned(stretchBoxLine.size()); iSide++) {
@@ -12520,15 +12520,15 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  }
 	  stretchBoxLine.back() = stretchBoxLine.front();
 	  if ((SelectedFormControlVertex & 1U) != 0U) {
-		StateMap.set(StateFlag::STRTCH);
+		StateMap->set(StateFlag::STRTCH);
 	  }
 	  else {
-		StateMap.set(StateFlag::EXPAND);
+		StateMap->set(StateFlag::EXPAND);
 		xyRatio = (StitchRangeRect.right - StitchRangeRect.left) /
 		          (StitchRangeRect.top - StitchRangeRect.bottom);
 	  }
 	  SelectedFormControlVertex >>= 1U;
-	  StateMap.set(StateFlag::SHOSTRTCH);
+	  StateMap->set(StateFlag::SHOSTRTCH);
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
@@ -12539,14 +12539,14 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	    StitchCoordinatesPixels.y >= controlPoint[0].y &&
 	    StitchCoordinatesPixels.y <= controlPoint[4].y) {
 	  duSelbox();
-	  StateMap.set(StateFlag::SELPNT);
+	  StateMap->set(StateFlag::SELPNT);
 	  SetCapture(ThrEdWindow);
-	  StateMap.set(StateFlag::VCAPT);
+	  StateMap->set(StateFlag::VCAPT);
 	  rSelbox();
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::NEWBAK)) {
+  if (StateMap->testAndReset(StateFlag::NEWBAK)) {
 	if (chkok()) {
 	  thred::unmsg();
 	  thred::save();
@@ -12561,19 +12561,19 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::PRGMSG)) {
+  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
 	if (chkok()) {
 	  deldir();
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::DUBAK)) {
-	if (StateMap.test(StateFlag::THUMSHO)) {
+  if (StateMap->testAndReset(StateFlag::DUBAK)) {
+	if (StateMap->test(StateFlag::THUMSHO)) {
 	  if (chkok()) {
 		thrsav();
 	  }
 	  getbak();
-	  StateMap.reset(StateFlag::THUMSHO);
+	  StateMap->reset(StateFlag::THUMSHO);
 	  return true;
 	}
 
@@ -12584,7 +12584,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto& workBack = workExt.back();
 	  thrBack        = 't';
 	  ThrName->replace_extension(thrExt);
-	  StateMap.set(StateFlag::IGNAM);
+	  StateMap->set(StateFlag::IGNAM);
 	  thrsav();
 	  thrBack = 'r';
 	  ThrName->replace_extension(thrExt);
@@ -12592,7 +12592,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		workBack = (FileVersionIndex - 1) + '0';
 		WorkingFileName->replace_extension(workExt);
 	  }
-	  StateMap.set(StateFlag::REDOLD);
+	  StateMap->set(StateFlag::REDOLD);
 	  nuFil(fileIndices::THR);
 	  workBack = 'r';
 	  WorkingFileName->replace_extension(workExt);
@@ -12631,11 +12631,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  return true;
 	}
   }
-  if (StateMap.test(StateFlag::DELFRM)) {
+  if (StateMap->test(StateFlag::DELFRM)) {
 	auto code = 0;
 	if (chkok()) {
 	  thred::savdo();
-	  StateMap.reset(StateFlag::DELTO);
+	  StateMap->reset(StateFlag::DELTO);
 	  code = 1;
 	}
 	else {
@@ -12644,29 +12644,29 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
 	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
 		thred::savdo();
-		StateMap.set(StateFlag::DELTO);
+		StateMap->set(StateFlag::DELTO);
 		code = 1;
 	  }
 	}
 	if (code != 0) {
 	  thred::frmdel();
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	thred::unmsg();
 	return true;
   }
-  if (StateMap.test(StateFlag::FILMSG)) {
+  if (StateMap->test(StateFlag::FILMSG)) {
 	if (chkok()) {
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  thred::unmsg();
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::SIZSEL)) {
+  if (StateMap->testAndReset(StateFlag::SIZSEL)) {
 	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2])) {
 	  VerticalIndex -= 13U;
 	  char threadSizeMap[]                = {'3', '4', '6'};
@@ -12676,7 +12676,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[ThreadSizeSelected]), 2);
 	  buffer[2] = 0;
 	  SetWindowText(ThreadSizeWin[ThreadSizeSelected], static_cast<LPTSTR>(buffer));
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
 		if (iWindow != nullptr) {
 		  DestroyWindow(iWindow);
@@ -12690,18 +12690,18 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  }
 	}
   }
-  if (StateMap.testAndReset(StateFlag::POLIMOV)) {
+  if (StateMap->testAndReset(StateFlag::POLIMOV)) {
 	thred::savdo();
 	form::setfrm();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::FORMIN)) {
+  if (StateMap->testAndReset(StateFlag::FORMIN)) {
 	auto windowRect = RECT {0L, 0L, 0L, 0L};
 	GetWindowRect(MsgWindow, &windowRect);
 	if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top &&
 	    Msg.pt.y <= windowRect.bottom) {
 	  auto const iFillType = (Msg.pt.y - windowRect.top - 1) / (ButtonHeight - 4);
-	  if (StateMap.testAndReset(StateFlag::FENDIN)) {
+	  if (StateMap->testAndReset(StateFlag::FENDIN)) {
 		if (iFillType == 3) {
 		  UserFlagMap->reset(UserFlag::SQRFIL);
 		}
@@ -12734,62 +12734,62 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unsid();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::SIDACT)) {
+  if (StateMap->testAndReset(StateFlag::SIDACT)) {
 	return thi::handleSideWindowActive();
   }
   if (FormDataSheet != nullptr) {
 	return thi::handleFormDataSheet();
   }
-  if (StateMap.test(StateFlag::INSFRM)) {
+  if (StateMap->test(StateFlag::INSFRM)) {
 	thred::savdo();
 	form::setins();
 	return true;
   }
-  if (StateMap.test(StateFlag::FUNCLP)) {
-	StateMap.set(StateFlag::INIT);
+  if (StateMap->test(StateFlag::FUNCLP)) {
+	StateMap->set(StateFlag::INIT);
 	form::rstfrm();
 	form::refil();
-	StateMap.reset(StateFlag::FUNCLP);
-	if (StateMap.testAndReset(StateFlag::FPSEL)) {
+	StateMap->reset(StateFlag::FUNCLP);
+	if (StateMap->testAndReset(StateFlag::FPSEL)) {
 	  form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	}
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (StateMap.test(StateFlag::SATCNKT)) {
+  if (StateMap->test(StateFlag::SATCNKT)) {
 	thred::savdo();
 	satin::satknkt();
 	return true;
   }
-  if (StateMap.test(StateFlag::SATPNT)) {
+  if (StateMap->test(StateFlag::SATPNT)) {
 	satin::satpnt1();
 	return true;
   }
-  if (StateMap.testAndReset(StateFlag::SATIN)) {
+  if (StateMap->testAndReset(StateFlag::SATIN)) {
 	satin::satpnt0();
 	return true;
   }
-  if (StateMap.test(StateFlag::FORMSEL)) {
-	if (!StateMap.test(StateFlag::FRMROT) && form::chkfrm(stretchBoxLine, xyRatio)) {
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	if (!StateMap->test(StateFlag::FRMROT) && form::chkfrm(stretchBoxLine, xyRatio)) {
 	  return true;
 	}
   }
-  if (StateMap.testAndReset(StateFlag::MOVFRM)) {
+  if (StateMap->testAndReset(StateFlag::MOVFRM)) {
 	thred::savdo();
 	form::setfrm();
 	return true;
   }
   thred::unmsg();
-  if (thred::inStitchWin() && !(StateMap.test(StateFlag::SIZSEL) &&
+  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
                                 thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
 	unpat();
-	if (StateMap.testAndReset(StateFlag::ROTAT)) {
+	if (StateMap->testAndReset(StateFlag::ROTAT)) {
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	  auto const adjustedPoint =
 	      fPOINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
 	              gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
 	  if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
-		StateMap.set(StateFlag::MOVCNTR);
+		StateMap->set(StateFlag::MOVCNTR);
 		unrot();
 		ritrot(0, thred::pxCor2stch(Msg.pt));
 	  }
@@ -12805,16 +12805,16 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			RotationHandleAngle = -PI_F / 2.0F;
 		  }
 		}
-		StateMap.set(StateFlag::ROTUSHO);
+		StateMap->set(StateFlag::ROTUSHO);
 		durotu();
-		StateMap.set(StateFlag::ROTCAPT);
+		StateMap->set(StateFlag::ROTCAPT);
 	  }
 	  return true;
 	}
-	if (StateMap.testAndReset(StateFlag::CLPSHO)) {
+	if (StateMap->testAndReset(StateFlag::CLPSHO)) {
 	  thred::savdo();
 	  if ((!StitchBuffer->empty()) &&
-	      (StateMap.testAndReset(StateFlag::SELBOX) || StateMap.testAndReset(StateFlag::INSRT)) &&
+	      (StateMap->testAndReset(StateFlag::SELBOX) || StateMap->testAndReset(StateFlag::INSRT)) &&
 	      ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
 		lodclp(ClosestPointIndex);
 	  }
@@ -12836,38 +12836,38 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  formControls[4].y = formControls[5].y = formControls[6].y = wrap::round<int32_t>(formsRect.bottom);
 	  formControls[2].x = formControls[3].x = formControls[4].x = wrap::round<int32_t>(formsRect.right);
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  return true;
 	}
-	if (StateMap.testAndReset(StateFlag::BOXZUM)) {
-	  StateMap.set(StateFlag::BZUMIN);
+	if (StateMap->testAndReset(StateFlag::BOXZUM)) {
+	  StateMap->set(StateFlag::BZUMIN);
 	  ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	  ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	  ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 	  ZoomBoxOrigin                       = thred::pxCor2stch(Msg.pt);
-	  StateMap.set(StateFlag::VCAPT);
+	  StateMap->set(StateFlag::VCAPT);
 	  return true;
 	}
-	if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
-	  if (!StateMap.test(StateFlag::INSRT)) {
-		if (StateMap.testAndReset(StateFlag::FORMSEL)) {
+	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
+	  if (!StateMap->test(StateFlag::INSRT)) {
+		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 		  form::ritfrct(ClosestFormToCursor, StitchWindowDC);
 		}
 		if (form::closfrm()) {
-		  StateMap.set(StateFlag::FRMPMOV);
+		  StateMap->set(StateFlag::FRMPMOV);
 		  form::frmovlin();
 		  return true;
 		}
 	  }
 	}
-	if (StateMap.test(StateFlag::INIT)) {
+	if (StateMap->test(StateFlag::INIT)) {
 	  unlin();
-	  if (StateMap.test(StateFlag::INSRT)) {
+	  if (StateMap->test(StateFlag::INSRT)) {
 		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 		auto       code =
 		    (ActiveColor | USMSK | gsl::narrow_cast<decltype(ActiveColor)>(ActiveLayer << LAYSHFT) | NOTFRM) & NKNOTMSK;
-		if (StateMap.test(StateFlag::LIN1)) {
-		  if (StateMap.test(StateFlag::BAKEND)) {
+		if (StateMap->test(StateFlag::LIN1)) {
+		  if (StateMap->test(StateFlag::BAKEND)) {
 			xlin1();
 			auto const iStitch = wrap::toUnsigned(StitchBuffer->size());
 			StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, code});
@@ -12876,7 +12876,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			InsertLine[0] = StitchCoordinatesPixels;
 			InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 			thred::coltab();
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 			return true;
 		  }
 
@@ -12887,7 +12887,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  InsertLine[0] = StitchCoordinatesPixels;
 		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
 		xlin();
@@ -12909,11 +12909,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		stch2px1(ClosestPointIndex + 1U);
 		InsertLine[2] = StitchCoordinatesPixels;
 		thred::coltab();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 		return true;
 	  }
-	  if ((!StateMap.test(StateFlag::HIDSTCH)) && closPnt1(&ClosestPointIndexClone)) {
+	  if ((!StateMap->test(StateFlag::HIDSTCH)) && closPnt1(&ClosestPointIndexClone)) {
 		ClosestPointIndex = ClosestPointIndexClone;
 		unbox();
 		unboxs();
@@ -12958,10 +12958,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		MoveLine0[1] =
 		    MoveLine1[0] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		if (ClosestPointIndex == 0) {
-		  StateMap.reset(StateFlag::ISDWN);
+		  StateMap->reset(StateFlag::ISDWN);
 		}
 		else {
-		  StateMap.set(StateFlag::ISDWN);
+		  StateMap->set(StateFlag::ISDWN);
 		  stch2px1(ClosestPointIndex - 1);
 		  MoveLine0[0] = StitchCoordinatesPixels;
 		}
@@ -12970,16 +12970,16 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  iStitch--;
 		}
 		if (ClosestPointIndex >= iStitch) {
-		  StateMap.reset(StateFlag::ISUP);
+		  StateMap->reset(StateFlag::ISUP);
 		}
 		else {
-		  StateMap.set(StateFlag::ISUP);
+		  StateMap->set(StateFlag::ISUP);
 		  stch2px1(ClosestPointIndex + 1U);
 		  MoveLine1[1] = StitchCoordinatesPixels;
 		}
 		dulin();
 		SetCapture(ThrEdWindow);
-		StateMap.set(StateFlag::CAPT);
+		StateMap->set(StateFlag::CAPT);
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 	  }
 	}
@@ -12994,23 +12994,23 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		ColorChangeTable[0].colorIndex  = gsl::narrow<uint16_t>(ActiveColor);
 		ColorChangeTable[0].stitchIndex = 0;
 		ColorChangeTable[1].stitchIndex = 1;
-		StateMap.set(StateFlag::LIN1);
-		StateMap.set(StateFlag::INSRT);
+		StateMap->set(StateFlag::LIN1);
+		StateMap->set(StateFlag::INSRT);
 		SetCapture(ThrEdWindow);
 		ClosestPointIndex = 1;
-		StateMap.set(StateFlag::INIT);
-		StateMap.set(StateFlag::BAKEND);
+		StateMap->set(StateFlag::INIT);
+		StateMap->set(StateFlag::BAKEND);
 	  }
 	}
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	StateMap.set(StateFlag::BOXSLCT);
-	StateMap.set(StateFlag::BZUMIN);
-	StateMap.set(StateFlag::NOSEL);
+	StateMap->set(StateFlag::BOXSLCT);
+	StateMap->set(StateFlag::BZUMIN);
+	StateMap->set(StateFlag::NOSEL);
 	ZoomBoxLine[0].x = ZoomBoxLine[3].x = ZoomBoxLine[4].x = Msg.pt.x - StitchWindowOrigin.x;
 	ZoomBoxLine[0].y = ZoomBoxLine[1].y = Msg.pt.y - StitchWindowOrigin.y;
 	ZoomBoxLine[4].y                    = ZoomBoxLine[0].y - 1;
 	ZoomBoxOrigin                       = thred::pxCor2stch(Msg.pt);
-	StateMap.set(StateFlag::VCAPT);
+	StateMap->set(StateFlag::VCAPT);
 	return true;
   }
   if (Msg.hwnd == ButtonWin->operator[](HBOXSEL)) {
@@ -13031,12 +13031,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ActiveColor     = VerticalIndex & 0xfU;
 	  thred::redraw(UserColorWin->operator[](code));
 	  thred::redraw(UserColorWin->operator[](ActiveColor));
-	  if (StateMap.test(StateFlag::HID)) {
-		StateMap.reset(StateFlag::SELBOX);
-		StateMap.reset(StateFlag::GRPSEL);
-		StateMap.reset(StateFlag::SCROS);
-		StateMap.reset(StateFlag::ECROS);
-		StateMap.set(StateFlag::RESTCH);
+	  if (StateMap->test(StateFlag::HID)) {
+		StateMap->reset(StateFlag::SELBOX);
+		StateMap->reset(StateFlag::GRPSEL);
+		StateMap->reset(StateFlag::SCROS);
+		StateMap->reset(StateFlag::ECROS);
+		StateMap->set(StateFlag::RESTCH);
 		thred::redraw(ButtonWin->operator[](HHID));
 	  }
 	  else {
@@ -13044,10 +13044,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  thred::savdo();
 		  nucols();
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
-		if (StateMap.test(StateFlag::FORMSEL)) {
+		if (StateMap->test(StateFlag::FORMSEL)) {
 		  auto& form = FormList->operator[](ClosestFormToCursor);
 		  if ((form.fillType != 0U) || (form.edgeType != 0U) ||
 		      ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U)) {
@@ -13079,22 +13079,22 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			  }
 			}
 			thred::coltab();
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 		  }
 		}
 		else {
-		  if (StateMap.test(StateFlag::GRPSEL)) {
+		  if (StateMap->test(StateFlag::GRPSEL)) {
 			thred::savdo();
 			for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; iStitch++) {
 			  StitchBuffer->operator[](iStitch).attribute &= 0xfffffff0;
 			  StitchBuffer->operator[](iStitch).attribute |= ActiveColor;
 			}
 			thred::coltab();
-			StateMap.set(StateFlag::RESTCH);
+			StateMap->set(StateFlag::RESTCH);
 		  }
 		  else {
-			if (StateMap.test(StateFlag::COL)) {
-			  StateMap.set(StateFlag::RESTCH);
+			if (StateMap->test(StateFlag::COL)) {
+			  StateMap->set(StateFlag::RESTCH);
 			}
 		  }
 		}
@@ -13109,7 +13109,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  UserPen[VerticalIndex]        = nuPen(UserPen[VerticalIndex], 1, UserColor[VerticalIndex]);
 	  UserColorBrush[VerticalIndex] = nuBrush(UserColorBrush[VerticalIndex], UserColor[VerticalIndex]);
 	  thred::redraw(UserColorWin->operator[](VerticalIndex));
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	return true;
   }
@@ -13132,7 +13132,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		                                                ThrEdInstance,
 		                                                nullptr);
 	  }
-	  StateMap.set(StateFlag::SIZSEL);
+	  StateMap->set(StateFlag::SIZSEL);
 	}
 	return true;
   }
@@ -13161,7 +13161,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
 		ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
-		if (StateMap.test(StateFlag::FRMPSEL)) {
+		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = FormList->operator[](ClosestFormToCursor);
 		  auto  vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
@@ -13175,13 +13175,13 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(vertexIt[nextVertex]);
 		  setpclp();
-		  StateMap.set(StateFlag::FPUNCLP);
-		  StateMap.set(StateFlag::SHOP);
+		  StateMap->set(StateFlag::FPUNCLP);
+		  StateMap->set(StateFlag::SHOP);
 		  dupclp();
 		}
 		else {
 		  FormMoveDelta = fPOINT {};
-		  StateMap.set(StateFlag::FUNCLP);
+		  StateMap->set(StateFlag::FUNCLP);
 		  FormList->push_back(FRMHED {});
 		  ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		  auto& formIter       = FormList->back();
@@ -13191,11 +13191,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto*      vertices  = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
 		  auto const vertSpan  = gsl::span<fPOINT>(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), vertSpan.begin(), vertSpan.end());
-		  StateMap.set(StateFlag::INIT);
+		  StateMap->set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
 		  form::setmfrm();
-		  StateMap.set(StateFlag::SHOFRM);
+		  StateMap->set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
 		return true;
@@ -13287,26 +13287,26 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		}
 		SelectedFormsSize.x = gsl::narrow<float>(SelectedFormsRect.right - SelectedFormsRect.left);
 		SelectedFormsSize.y = gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
-		StateMap.set(StateFlag::INIT);
+		StateMap->set(StateFlag::INIT);
 		auto& formLines = *FormLines;
 		formLines.resize(5U);
 		formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
 		formLines[1].x = formLines[2].x = SelectedFormsRect.right;
 		formLines[0].y = formLines[1].y = formLines[4].y = SelectedFormsRect.top;
 		formLines[2].y = formLines[3].y = SelectedFormsRect.bottom;
-		StateMap.set(StateFlag::SHOSTRTCH);
+		StateMap->set(StateFlag::SHOSTRTCH);
 		thred::strtchbox(stretchBoxLine);
 		FormMoveDelta =
 		    fPOINT {gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
 		            gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2)};
-		StateMap.set(StateFlag::MOVFRMS);
-		StateMap.set(StateFlag::FUNSCLP);
+		StateMap->set(StateFlag::MOVFRMS);
+		StateMap->set(StateFlag::FUNSCLP);
 	  }
 	  else {
 		auto* clipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
 		if (clipFormHeader->clipType == CLP_FRM) {
 		  FormMoveDelta = fPOINT {};
-		  StateMap.set(StateFlag::FUNCLP);
+		  StateMap->set(StateFlag::FUNCLP);
 		  FormList->push_back(clipFormHeader->form);
 		  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		  auto& formIter      = FormList->back();
@@ -13348,11 +13348,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  if (formIter.type != FRMLINE) {
 			NewFormVertexCount++;
 		  }
-		  StateMap.set(StateFlag::INIT);
+		  StateMap->set(StateFlag::INIT);
 		  form::unfrm();
 		  thred::duzrat();
 		  form::setmfrm();
-		  StateMap.set(StateFlag::SHOFRM);
+		  StateMap->set(StateFlag::SHOFRM);
 		  form::dufrm();
 		}
 		GlobalUnlock(ClipMemory);
@@ -13366,7 +13366,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 	if (ClipMemory != nullptr) {
 	  thred::redclp();
 	  clpbox();
-	  StateMap.set(StateFlag::CLPSHO);
+	  StateMap->set(StateFlag::CLPSHO);
 	}
 	CloseClipboard();
   }
@@ -13377,12 +13377,12 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 auto thred::internal::handleHomeKey(bool& retflag) -> bool {
   retflag = true;
   if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
-	if (StateMap.testAndReset(StateFlag::SELBOX)) {
+	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  GroupStitchIndex = 0;
-	  StateMap.set(StateFlag::GRPSEL);
+	  StateMap->set(StateFlag::GRPSEL);
 	}
 	else {
-	  if (StateMap.test(StateFlag::GRPSEL)) {
+	  if (StateMap->test(StateFlag::GRPSEL)) {
 		if (GroupStitchIndex > ClosestPointIndex) {
 		  ClosestPointIndex = 0;
 		}
@@ -13391,8 +13391,8 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 		}
 	  }
 	  else {
-		StateMap.set(StateFlag::SELBOX);
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::SELBOX);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
 	thred::grpAdj();
@@ -13401,8 +13401,8 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
   }
   if (wrap::pressed(VK_SHIFT)) {
 	auto iColor = 0U;
-	if (StateMap.testAndReset(StateFlag::SELBOX)) {
-	  StateMap.set(StateFlag::GRPSEL);
+	if (StateMap->testAndReset(StateFlag::SELBOX)) {
+	  StateMap->set(StateFlag::GRPSEL);
 	  iColor = pt2colInd(ClosestPointIndex);
 	}
 	else {
@@ -13417,11 +13417,11 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 	if (wrap::pressed(VK_CONTROL)) {
 	  stch2px1(0);
 	  endpnt();
-	  StateMap.reset(StateFlag::BAKEND);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->reset(StateFlag::BAKEND);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		auto iColor = pt2colInd(ClosestPointIndex);
 		if (iColor != 0U) {
 		  iColor--;
@@ -13429,7 +13429,7 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 		ClosestPointIndex = ColorChangeTable[iColor].stitchIndex;
 	  }
 	  else {
-		if (StateMap.test(StateFlag::LENSRCH)) {
+		if (StateMap->test(StateFlag::LENSRCH)) {
 		  setsrch(SmallestStitchIndex);
 		  return true;
 		}
@@ -13446,12 +13446,12 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
   retflag = 1;
   if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
 	if (!StitchBuffer->empty()) {
-	  if (StateMap.testAndReset(StateFlag::SELBOX)) {
+	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
 		GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
-		StateMap.set(StateFlag::GRPSEL);
+		StateMap->set(StateFlag::GRPSEL);
 	  }
 	  else {
-		if (StateMap.test(StateFlag::GRPSEL)) {
+		if (StateMap->test(StateFlag::GRPSEL)) {
 		  if (GroupStitchIndex > ClosestPointIndex) {
 			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
 		  }
@@ -13460,9 +13460,9 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 		  }
 		}
 		else {
-		  StateMap.set(StateFlag::SELBOX);
+		  StateMap->set(StateFlag::SELBOX);
 		  ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
 	  }
@@ -13475,8 +13475,8 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
   }
   if (wrap::pressed(VK_SHIFT)) {
 	auto iColor = 0U;
-	if (StateMap.testAndReset(StateFlag::SELBOX)) {
-	  StateMap.set(StateFlag::GRPSEL);
+	if (StateMap->testAndReset(StateFlag::SELBOX)) {
+	  StateMap->set(StateFlag::GRPSEL);
 	  iColor = pt2colInd(ClosestPointIndex);
 	}
 	else {
@@ -13492,16 +13492,16 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 		stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
 	  }
 	  endpnt();
-	  StateMap.set(StateFlag::BAKEND);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::BAKEND);
+	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		auto const iColor = pt2colInd(ClosestPointIndex);
 		ClosestPointIndex = ColorChangeTable[iColor].stitchIndex - 1U;
 	  }
 	  else {
-		if (StateMap.test(StateFlag::LENSRCH)) {
+		if (StateMap->test(StateFlag::LENSRCH)) {
 		  setsrch(LargestStitchIndex);
 		  return true;
 		}
@@ -13518,8 +13518,8 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
 	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-	if (StateMap.test(StateFlag::FPSEL)) {
-	  if (StateMap.test(StateFlag::PSELDIR)) {
+	if (StateMap->test(StateFlag::FPSEL)) {
+	  if (StateMap->test(StateFlag::PSELDIR)) {
 		++SelectedFormVertices.vertexCount %= vertexCount;
 		SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % vertexCount;
 	  }
@@ -13531,30 +13531,30 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		}
 		else {
 		  SelectedFormVertices.vertexCount = 1;
-		  StateMap.set(StateFlag::PSELDIR);
+		  StateMap->set(StateFlag::PSELDIR);
 		  SelectedFormVertices.finish = (SelectedFormVertices.start + 1U) % vertexCount;
 		}
 	  }
 	  thred::setpsel();
 	}
 	else {
-	  if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
+	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
 		form::unpsel();
 		SelectedFormVertices.start       = ClosestVertexToCursor;
 		SelectedFormVertices.form        = ClosestFormToCursor;
 		SelectedFormVertices.vertexCount = 1;
 		SelectedFormVertices.finish      = (SelectedFormVertices.start + 1U) % vertexCount;
-		StateMap.set(StateFlag::PSELDIR);
+		StateMap->set(StateFlag::PSELDIR);
 		thred::setpsel();
 	  }
 	  else {
-		StateMap.reset(StateFlag::LENSRCH);
-		StateMap.reset(StateFlag::FORMSEL);
-		if (StateMap.testAndReset(StateFlag::SELBOX)) {
+		StateMap->reset(StateFlag::LENSRCH);
+		StateMap->reset(StateFlag::FORMSEL);
+		if (StateMap->testAndReset(StateFlag::SELBOX)) {
 		  if (!StitchBuffer->empty()) {
 			auto const lastStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 			if (ClosestPointIndex < lastStitch) {
-			  StateMap.set(StateFlag::GRPSEL);
+			  StateMap->set(StateFlag::GRPSEL);
 			  GroupStitchIndex = ClosestPointIndex + 1U;
 			}
 		  }
@@ -13578,12 +13578,12 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 	  nudgfn(IniFile.cursorNudgeStep, 0);
 	}
 	else {
-	  if (StateMap.test(StateFlag::LENSRCH)) {
+	  if (StateMap->test(StateFlag::LENSRCH)) {
 		longer();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
-		if (StateMap.test(StateFlag::FRMPSEL)) {
+		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  ClosestVertexToCursor = form::nxt(FormList->operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 		  auto vertexIt =
@@ -13591,17 +13591,17 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		  auto const& vertex = vertexIt[ClosestVertexToCursor];
 		  thred::ritfcor(vertex);
 		  shftflt(vertex);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
-		  if (StateMap.test(StateFlag::SELBOX)) {
+		  if (StateMap->test(StateFlag::SELBOX)) {
 			if (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
 			  ClosestPointIndex++;
 			}
 			movbox();
 			return true;
 		  }
-		  if (StateMap.test(StateFlag::GRPSEL)) {
+		  if (StateMap->test(StateFlag::GRPSEL)) {
 			if (GroupStitchIndex < gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U)) {
 			  GroupStitchIndex++;
 			  thred::grpAdj();
@@ -13619,9 +13619,9 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 auto thred::internal::handleLeftKey(bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
-	if (StateMap.test(StateFlag::FPSEL)) {
+	if (StateMap->test(StateFlag::FPSEL)) {
 	  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-	  if (!StateMap.test(StateFlag::PSELDIR)) {
+	  if (!StateMap->test(StateFlag::PSELDIR)) {
 		++SelectedFormVertices.vertexCount %= vertexCount;
 		SelectedFormVertices.finish =
 		    (SelectedFormVertices.start + vertexCount - SelectedFormVertices.vertexCount) % vertexCount;
@@ -13635,24 +13635,24 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 		else {
 		  SelectedFormVertices.vertexCount = 1;
 		  SelectedFormVertices.finish = (SelectedFormVertices.start + vertexCount - 1) % vertexCount;
-		  StateMap.reset(StateFlag::PSELDIR);
+		  StateMap->reset(StateFlag::PSELDIR);
 		}
 	  }
 	  thred::setpsel();
 	}
 	else {
-	  if (StateMap.testAndReset(StateFlag::FRMPSEL)) {
+	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
 		form::unpsel();
 		SelectedFormVertices.start       = ClosestVertexToCursor;
 		SelectedFormVertices.vertexCount = 1;
-		StateMap.reset(StateFlag::PSELDIR);
+		StateMap->reset(StateFlag::PSELDIR);
 		thred::setpsel();
 	  }
 	  else {
-		StateMap.reset(StateFlag::LENSRCH);
-		StateMap.reset(StateFlag::FORMSEL);
-		if (StateMap.testAndReset(StateFlag::SELBOX)) {
-		  StateMap.set(StateFlag::GRPSEL);
+		StateMap->reset(StateFlag::LENSRCH);
+		StateMap->reset(StateFlag::FORMSEL);
+		if (StateMap->testAndReset(StateFlag::SELBOX)) {
+		  StateMap->set(StateFlag::GRPSEL);
 		  GroupStitchIndex = ClosestPointIndex - 1U;
 		}
 		else if (GroupStitchIndex != 0U) {
@@ -13669,12 +13669,12 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 	  nudgfn(-IniFile.cursorNudgeStep, 0);
 	}
 	else {
-	  if (StateMap.test(StateFlag::LENSRCH)) {
+	  if (StateMap->test(StateFlag::LENSRCH)) {
 		shorter();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
-		if (StateMap.test(StateFlag::FRMPSEL)) {
+		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  auto form             = FormList->operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
@@ -13682,17 +13682,17 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 		  auto const& vertex   = vertexIt[ClosestVertexToCursor];
 		  thred::ritfcor(vertex);
 		  shftflt(vertex);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
-		  if (StateMap.test(StateFlag::SELBOX)) {
+		  if (StateMap->test(StateFlag::SELBOX)) {
 			if (ClosestPointIndex != 0U) {
 			  ClosestPointIndex--;
 			}
 			movbox();
 			return true;
 		  }
-		  if (StateMap.test(StateFlag::GRPSEL)) {
+		  if (StateMap->test(StateFlag::GRPSEL)) {
 			if (GroupStitchIndex != 0U) {
 			  GroupStitchIndex--;
 			  thred::grpAdj();
@@ -13734,13 +13734,13 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		if (PCSBMPFileName[0] != 0) {
 		  bitmap::internal::bfil(BackgroundColor);
 		}
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
 #if PESACT
 		//				IniFile.auxFileType=AUXPES;
 		//				strcpy_s(WorkingFileName,"u:\\mrd\\t.thr");
-		//				StateMap.set(StateFlag::REDOLD);
+		//				StateMap->set(StateFlag::REDOLD);
 		//				nuFil();
 		//				lodpes();
 		//				savpes();
@@ -13772,14 +13772,14 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  break;
 	}
 	case 0xbd: { //-
-	  StateMap.reset(StateFlag::CNTRH);
-	  StateMap.reset(StateFlag::CNTRV);
+	  StateMap->reset(StateFlag::CNTRH);
+	  StateMap->reset(StateFlag::CNTRV);
 	  if (wrap::pressed(VK_SHIFT)) {
-		StateMap.set(StateFlag::CNTRV);
+		StateMap->set(StateFlag::CNTRV);
 	  }
 	  else {
 		if (wrap::pressed(VK_CONTROL)) {
-		  StateMap.set(StateFlag::CNTRH);
+		  StateMap->set(StateFlag::CNTRH);
 		}
 	  }
 	  form::cntrx();
@@ -13931,16 +13931,16 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  break;
 	}
 	case VK_SPACE: {
-	  if (StateMap.testAndFlip(StateFlag::INSRT)) {
+	  if (StateMap->testAndFlip(StateFlag::INSRT)) {
 		ReleaseCapture();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
 		istch();
 	  }
 	  unbox();
-	  if (StateMap.testAndReset(StateFlag::GRPSEL) || StateMap.testAndReset(StateFlag::FORMSEL)) {
-		StateMap.set(StateFlag::RESTCH);
+	  if (StateMap->testAndReset(StateFlag::GRPSEL) || StateMap->testAndReset(StateFlag::FORMSEL)) {
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  break;
 	}
@@ -14031,22 +14031,22 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap.reset(StateFlag::CNV2FTH);
+		  StateMap->reset(StateFlag::CNV2FTH);
 		  satin::ribon();
 		}
 		else {
-		  StateMap.reset(StateFlag::HIDSTCH);
-		  StateMap.set(StateFlag::IGNTHR);
+		  StateMap->reset(StateFlag::HIDSTCH);
+		  StateMap->set(StateFlag::IGNTHR);
 		  rebox();
-		  StateMap.reset(StateFlag::IGNTHR);
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->reset(StateFlag::IGNTHR);
+		  StateMap->set(StateFlag::RESTCH);
 		}
 	  }
 	  break;
 	}
 	case 'D': {
 	  if (wrap::pressed(VK_SHIFT)) {
-		if (StateMap.test(StateFlag::FORMSEL)) {
+		if (StateMap->test(StateFlag::FORMSEL)) {
 		  PostMessage(ThrEdWindow, WM_SYSCOMMAND, SC_KEYMENU, 'E');
 		  keybd_event('F', 0, 0, 0);
 		}
@@ -14072,12 +14072,12 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap.set(StateFlag::CNV2FTH);
+		  StateMap->set(StateFlag::CNV2FTH);
 		  satin::ribon();
 		}
 		else {
 		  form::frmon();
-		  if (StateMap.test(StateFlag::FORMSEL)) {
+		  if (StateMap->test(StateFlag::FORMSEL)) {
 			formForms::refrm();
 		  }
 		  else {
@@ -14156,7 +14156,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 			dumrk(stitchPoint.x, stitchPoint.y);
 		  }
 		}
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  break;
 	}
@@ -14169,7 +14169,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		  pgdwn();
 		}
 		else {
-		  StateMap.set(StateFlag::TRCUP);
+		  StateMap->set(StateFlag::TRCUP);
 		  trace::trace();
 		}
 	  }
@@ -14187,7 +14187,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_SHIFT)) {
 		thred::movStch();
 		unbox();
-		StateMap.set(StateFlag::RESTCH);
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
 		if (FormDataSheet == nullptr) {
@@ -14243,7 +14243,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		  trace::trdif();
 		}
 		else {
-		  StateMap.reset(StateFlag::TRCUP);
+		  StateMap->reset(StateFlag::TRCUP);
 		  trace::trace();
 		}
 	  }
@@ -14315,7 +14315,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 
 auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) -> bool {
   retflag = true;
-  if (StateMap.test(StateFlag::SCLPSPAC) && code == 0xbd && (MsgIndex == 0U)) {
+  if (StateMap->test(StateFlag::SCLPSPAC) && code == 0xbd && (MsgIndex == 0U)) {
 	MsgBuffer[0] = '-';
 	MsgBuffer[1] = 0;
 	MsgIndex     = 1;
@@ -14323,7 +14323,7 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	return true;
   }
   if (dunum(code)) {
-	if (StateMap.test(StateFlag::TRNIN0)) {
+	if (StateMap->test(StateFlag::TRNIN0)) {
 	  trace::traceNumberInput(NumericCode);
 	}
 	else {
@@ -14344,7 +14344,7 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	case 8: { // backspace
 	  if (MsgIndex != 0U) {
 		MsgIndex--;
-		if (StateMap.test(StateFlag::TRNIN0)) {
+		if (StateMap->test(StateFlag::TRNIN0)) {
 		  trace::traceNumberReset();
 		}
 		else {
@@ -14355,11 +14355,11 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	  return true;
 	}
 	case VK_RETURN: {
-	  if (StateMap.test(StateFlag::TRNIN0)) {
+	  if (StateMap->test(StateFlag::TRNIN0)) {
 		trace::dutrnum2();
 	  }
 	  else {
-		if (StateMap.test(StateFlag::TRNIN1)) {
+		if (StateMap->test(StateFlag::TRNIN1)) {
 		  trace::dutrnum1();
 		}
 	  }
@@ -14551,7 +14551,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_2FTHR: { // edit / Convert / to Feather Ribbon
-	  StateMap.set(StateFlag::CNV2FTH);
+	  StateMap->set(StateFlag::CNV2FTH);
 	  satin::ribon();
 	  flag = true;
 	  break;
@@ -14637,22 +14637,22 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_CNTRX: { // edit / Center / Both
-	  StateMap.reset(StateFlag::CNTRH);
-	  StateMap.reset(StateFlag::CNTRV);
+	  StateMap->reset(StateFlag::CNTRH);
+	  StateMap->reset(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
 	}
 	case ID_CNTRH: { // edit / Center / Horizontal
-	  StateMap.reset(StateFlag::CNTRH);
-	  StateMap.set(StateFlag::CNTRV);
+	  StateMap->reset(StateFlag::CNTRH);
+	  StateMap->set(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
 	}
 	case ID_CNTRV: { // edit / Center / Vertical
-	  StateMap.set(StateFlag::CNTRH);
-	  StateMap.reset(StateFlag::CNTRV);
+	  StateMap->set(StateFlag::CNTRH);
+	  StateMap->reset(StateFlag::CNTRV);
 	  form::cntrx();
 	  flag = true;
 	  break;
@@ -14679,7 +14679,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
 	  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) / 2.0F, gsl::narrow_cast<float>(UnzoomedRect.y) / 2.0F);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -14714,7 +14714,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_RIBON: { // edit / Convert / to Satin Ribbon
-	  StateMap.reset(StateFlag::CNV2FTH);
+	  StateMap->reset(StateFlag::CNV2FTH);
 	  satin::ribon();
 	  flag = true;
 	  break;
@@ -14786,7 +14786,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_CHK: { // edit / Check Range
 	  thred::chkrng(StitchRangeSize);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -14867,7 +14867,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	case ID_DELFRMS: { // edit / Delete / All Forms
 	  form::delfrms();
 	  rstAll();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -14939,7 +14939,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 		UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 		thred::redraw(UserColorWin->operator[](iColor));
 	  }
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -15218,19 +15218,19 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_SIZ30: { // view / Thread Size / 30
 	  displayText::tsizmsg(L"30", ThreadSize30);
-	  StateMap.set(StateFlag::ENTR30);
+	  StateMap->set(StateFlag::ENTR30);
 	  flag = true;
 	  break;
 	}
 	case ID_SIZ40: { // view / Thread Size / 40
 	  displayText::tsizmsg(L"40", ThreadSize40);
-	  StateMap.set(StateFlag::ENTR40);
+	  StateMap->set(StateFlag::ENTR40);
 	  flag = true;
 	  break;
 	}
 	case ID_SIZ60: { // view / Thread Size / 60
 	  displayText::tsizmsg(L"60", ThreadSize60);
-	  StateMap.set(StateFlag::ENTR60);
+	  StateMap->set(StateFlag::ENTR60);
 	  flag = true;
 	  break;
 	}
@@ -15368,8 +15368,8 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  }
 	  else {
 		displayText::savdisc();
-		StateMap.set(StateFlag::NEWBAK);
-		StateMap.reset(StateFlag::PRFACT);
+		StateMap->set(StateFlag::NEWBAK);
+		StateMap->reset(StateFlag::PRFACT);
 		thred::undat();
 	  }
 	  flag = true;
@@ -15385,7 +15385,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
   auto flag = false;
   switch (wParameter) {
 	case ID_BOLD: { // fill / Border / Bean
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::dubold();
@@ -15408,13 +15408,13 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LINCHN: { // fill / Border / Line chain
-	  StateMap.set(StateFlag::LINCHN);
+	  StateMap->set(StateFlag::LINCHN);
 	  form::chain();
 	  flag = true;
 	  break;
 	}
 	case ID_OPNCHN: { // fill / Border / Open chain
-	  StateMap.reset(StateFlag::LINCHN);
+	  StateMap->reset(StateFlag::LINCHN);
 	  form::chain();
 	  flag = true;
 	  break;
@@ -15425,7 +15425,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_HORCLP: { // fill / Clipboard / Horizontal
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::horclp();
@@ -15433,7 +15433,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ANGCLP: { // fill / Clipboard / Angle
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::angclp();
@@ -15441,7 +15441,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VRTCLP: { // fill / Clipboard / Vertical
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::vrtclp();
@@ -15474,7 +15474,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_PERP: { // fill / Border / Perpendicular Satin
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::prpbrd(LineSpacing);
@@ -15482,7 +15482,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILANG: { // fill / Angle
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::filangl();
@@ -15490,7 +15490,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_APLIQ: { // fill / Border / Applique
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::apliq();
@@ -15498,7 +15498,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_SATBRD: { // fill / Border / Angle Satin
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  satin::satbrd();
@@ -15511,7 +15511,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILIN: { // fill / Border / Line
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::bord();
@@ -15522,18 +15522,18 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  thred::savdo();
 	  form::unfil();
 	  thred::coltab();
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
 	case ID_FILSAT: { // fill / Fan
-	  StateMap.reset(StateFlag::FTHR);
+	  StateMap->reset(StateFlag::FTHR);
 	  form::filsat();
 	  flag = true;
 	  break;
 	}
 	case ID_FILL_VERT: { // fill / Vertical
-	  if (StateMap.test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
+	  if (StateMap->test(StateFlag::FORMSEL) || !SelectedFormList->empty()) {
 		thred::savdo();
 	  }
 	  form::filvrt();
@@ -15541,7 +15541,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FILL_HOR: { // fill / Horizontal
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		thred::savdo();
 	  }
 	  form::filhor();
@@ -15607,8 +15607,8 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 		stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1U);
 	  }
 	  endpnt();
-	  StateMap.set(StateFlag::BAKEND);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->set(StateFlag::BAKEND);
+	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
 	}
@@ -15619,7 +15619,7 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 	}
 	case ID_FORM: { // Form
 	  form::frmon();
-	  if (StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::FORMSEL)) {
 		formForms::refrm();
 	  }
 	  else {
@@ -15634,15 +15634,15 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 	  break;
 	}
 	case ZUMIN: { // in
-	  if (StateMap.test(StateFlag::GMRK) || StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::INSRT) ||
-	      StateMap.test(StateFlag::GRPSEL) || StateMap.test(StateFlag::FORMSEL)) {
+	  if (StateMap->test(StateFlag::GMRK) || StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT) ||
+	      StateMap->test(StateFlag::GRPSEL) || StateMap->test(StateFlag::FORMSEL)) {
 		zumin();
 	  }
 	  else {
-		StateMap.reset(StateFlag::BZUM);
-		StateMap.set(StateFlag::BOXZUM);
-		StateMap.reset(StateFlag::BZUMIN);
-		StateMap.set(StateFlag::VCAPT);
+		StateMap->reset(StateFlag::BZUM);
+		StateMap->set(StateFlag::BOXZUM);
+		StateMap->reset(StateFlag::BZUMIN);
+		StateMap->set(StateFlag::VCAPT);
 		SetCapture(ThrEdWindow);
 	  }
 	  flag = true;
@@ -15700,7 +15700,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
   }
   switch (Msg.message) {
 	case WM_TIMER: {
-	  if (StateMap.test(StateFlag::RUNPAT) && (Msg.wParam == 0U)) {
+	  if (StateMap->test(StateFlag::RUNPAT) && (Msg.wParam == 0U)) {
 		stchout();
 	  }
 	  break;
@@ -15713,25 +15713,25 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	}
 	case WM_KEYDOWN: {
 	  auto const code = gsl::narrow<uint32_t>(Msg.wParam & 0xffffU);
-	  if (StateMap.test(StateFlag::TXTRED)) {
+	  if (StateMap->test(StateFlag::TXTRED)) {
 		texture::txtkey(code, textureForm);
 		return true;
 	  }
 	  // ToDo - value passed to duform is wierd because it is dependant on order of enumeration of the form types.
 	  //        and value 'SAT' throws it off
-	  if (StateMap.test(StateFlag::FORMIN)) {
+	  if (StateMap->test(StateFlag::FORMIN)) {
 		if (wrap::pressed(VK_CONTROL)) {
 		  return true;
 		}
 		switch (code) {
 		  case 'E': {
-			StateMap.reset(StateFlag::FORMIN);
+			StateMap->reset(StateFlag::FORMIN);
 			thred::unmsg();
 			form::duform(FRMLINE - 1);
 			return true;
 		  }
 		  case 'F': {
-			StateMap.reset(StateFlag::FORMIN);
+			StateMap->reset(StateFlag::FORMIN);
 			thred::unmsg();
 			form::duform(FRMFPOLY - 1);
 			return true;
@@ -15780,17 +15780,17 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  }
 		}
 	  }
-	  if (StateMap.test(StateFlag::FILMSG)) {
+	  if (StateMap->test(StateFlag::FILMSG)) {
 		if (code == VK_RETURN || code == 0xc0) { // check for return or back tick '`'
 		  thred::savdo();
 		  form::unfil();
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  thred::unmsg();
 		  return true;
 		}
 	  }
-	  if (StateMap.testAndReset(StateFlag::MOVMSG)) {
+	  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
 		if (code == VK_RETURN || code == 0xc0) {
 		  thred::savdo();
 		  form::refilfn();
@@ -15799,56 +15799,56 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		else {
 		  thred::unmsg();
 		}
-		if (StateMap.testAndReset(StateFlag::WASFRMFRM)) {
+		if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 		  formForms::refrm();
 		}
 		return true;
 	  }
-	  if (StateMap.testAndReset(StateFlag::PRGMSG)) {
+	  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
 		if (code == VK_RETURN || code == 0xc0) {
 		  deldir();
 		  return true;
 		}
 	  }
-	  if (StateMap.testAndReset(StateFlag::DELSFRMS)) {
+	  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
 		if (code == 'S' || code == VK_RETURN || code == 0xc0) {
 		  thred::savdo();
 		  if (code == 'S') {
-			StateMap.set(StateFlag::DELTO);
+			StateMap->set(StateFlag::DELTO);
 		  }
 		  else {
-			StateMap.reset(StateFlag::DELTO);
+			StateMap->reset(StateFlag::DELTO);
 		  }
 		  delsfrms(code);
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  thred::unmsg();
 		  return true;
 		}
 	  }
-	  if (StateMap.testAndReset(StateFlag::DELFRM)) {
+	  if (StateMap->testAndReset(StateFlag::DELFRM)) {
 		if (code == 'S' || code == VK_RETURN || code == 0xc0) {
 		  thred::savdo();
 		  if (code == 'S') {
-			StateMap.set(StateFlag::DELTO);
+			StateMap->set(StateFlag::DELTO);
 		  }
 		  else {
-			StateMap.reset(StateFlag::DELTO);
+			StateMap->reset(StateFlag::DELTO);
 		  }
 		  thred::frmdel();
 		  fndknt();
 		  thred::coltab();
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  thred::unmsg();
 		  return true;
 		}
 	  }
-	  if (StateMap.test(StateFlag::THUMSHO)) {
+	  if (StateMap->test(StateFlag::THUMSHO)) {
 		switch (code) {
 		  case VK_ESCAPE:
 		  case 'Q': {
 			unthum();
-			StateMap.reset(StateFlag::BAKSHO);
+			StateMap->reset(StateFlag::BAKSHO);
 			esccode();
 			qcode();
 			break;
@@ -15884,7 +15884,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		return true;
 	  }
-	  if (StateMap.test(StateFlag::FSETFSPAC) || StateMap.test(StateFlag::GTWLKIND)) {
+	  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
 		// Check for keycode 'dash' and numpad 'subtract'
 		if (code == 189 || code == 109) {
 		  MsgBuffer[0] = '-';
@@ -15958,7 +15958,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		unpat();
 	  }
 	  LastKeyCode = code;
-	  if (StateMap.test(StateFlag::NUMIN)) {
+	  if (StateMap->test(StateFlag::NUMIN)) {
 		{
 		  auto       retflag = true;
 		  auto const retval  = handleNumericInput(code, retflag);
@@ -15967,7 +15967,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  }
 		}
 	  }
-	  if (StateMap.testAndReset(StateFlag::ENTRDUP)) {
+	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
 		  auto const value = wrap::bufToFloat(std::begin(MsgBuffer));
 		  if (value != 0.0F) {
@@ -15976,7 +15976,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		form::duprot(IniFile.rotationAngle);
 	  }
-	  if (StateMap.testAndReset(StateFlag::ENTROT)) {
+	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
 		  auto const value = wrap::bufToFloat(std::begin(MsgBuffer));
 		  if (value != 0.0) {
@@ -16003,7 +16003,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		for (auto const iLRU : LRUMenuId) {
 		  if (Msg.wParam == iLRU) {
 			*WorkingFileName = previousNames[iVersion];
-			StateMap.set(StateFlag::REDOLD);
+			StateMap->set(StateFlag::REDOLD);
 			nuFil(fileIndices::THR);
 		  }
 		  iVersion++;
@@ -16174,7 +16174,7 @@ void thred::internal::ducmd() {
 	}
 	else {
 	  WorkingFileName->assign(arg1);
-	  StateMap.set(StateFlag::REDOLD);
+	  StateMap->set(StateFlag::REDOLD);
 	  nuFil(fileIndices::THR);
 	}
   }
@@ -16479,7 +16479,7 @@ void thred::internal::init() {
   CrossCursor = LoadCursor(nullptr, IDC_CROSS);
   crtcurs();
   redfils();
-  StateMap.reset(); // clear the bitmap
+  StateMap->reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
   SetStretchBltMode(ThredDC, COLORONCOLOR);
@@ -16686,7 +16686,7 @@ void thred::internal::init() {
   ritloc();
   frmcurmen();
   texture::redtx();
-  StateMap.set(StateFlag::HIDMAP);
+  StateMap->set(StateFlag::HIDMAP);
   thred::hidbit();
   thred::chkmen();
   // check command line-should be last item in init
@@ -16707,7 +16707,7 @@ void thred::internal::relin() {
   MoveLine0[0] = StitchCoordinatesPixels;
   stch2px1(ClosestPointIndex + 1U);
   MoveLine1[1] = StitchCoordinatesPixels;
-  StateMap.reset(StateFlag::WASLIN);
+  StateMap->reset(StateFlag::WASLIN);
   dulin();
 }
 
@@ -16742,7 +16742,7 @@ void thred::internal::dumov() {
 }
 
 auto thred::internal::chkup(uint32_t count, uint32_t iStitch) -> uint32_t {
-  if (StateMap.test(StateFlag::UPTO) && (ClosestPointIndex != 0U)) {
+  if (StateMap->test(StateFlag::UPTO) && (ClosestPointIndex != 0U)) {
 	if (ColorChangeTable[iStitch].stitchIndex < ClosestPointIndex) {
 	  if (ColorChangeTable[wrap::toSize(iStitch) + 1U].stitchIndex < ClosestPointIndex) {
 		return count;
@@ -16828,7 +16828,7 @@ auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR con
 void thred::internal::drawBackground() {
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
   thred::duzrat();
-  if ((PCSBMPFileName[0] != 0) && !StateMap.test(StateFlag::HIDMAP) && !StateMap.test(StateFlag::UPTO)) {
+  if ((PCSBMPFileName[0] != 0) && !StateMap->test(StateFlag::HIDMAP) && !StateMap->test(StateFlag::UPTO)) {
 	bitmap::drawBmpBackground();
   }
   dugrid();
@@ -16836,16 +16836,16 @@ void thred::internal::drawBackground() {
 
 void thred::internal::drwStch() {
   auto stitchCount = 0U;
-  StateMap.set(StateFlag::RELAYR);
-  StateMap.reset(StateFlag::SELSHO);
-  StateMap.reset(StateFlag::ILIN1);
-  StateMap.reset(StateFlag::BZUM);
+  StateMap->set(StateFlag::RELAYR);
+  StateMap->reset(StateFlag::SELSHO);
+  StateMap->reset(StateFlag::ILIN1);
+  StateMap->reset(StateFlag::BZUM);
   unboxs();
   unrotu();
   unrot();
-  StateMap.reset(StateFlag::ILIN);
+  StateMap->reset(StateFlag::ILIN);
   uncros();
-  StateMap.reset(StateFlag::SHOFRM);
+  StateMap->reset(StateFlag::SHOFRM);
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 	LineIndex = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 	if (LineIndex > stitchCount) {
@@ -16855,8 +16855,8 @@ void thred::internal::drwStch() {
   auto linePoints = std::vector<POINT> {};
   linePoints.resize(wrap::toSize(stitchCount) + 2U);
   thi::drawBackground();
-  if (StateMap.test(StateFlag::INIT)) {
-	if (StateMap.test(StateFlag::ZUMED)) {
+  if (StateMap->test(StateFlag::INIT)) {
+	if (StateMap->test(StateFlag::ZUMED)) {
 	  ScrollInfo.cbSize = sizeof(ScrollInfo);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  ScrollInfo.fMask = SIF_ALL;
@@ -16882,11 +16882,11 @@ void thred::internal::drwStch() {
 	ThreadWidthPixels[1] = wrap::round<int32_t>(dub6 * TSIZ40);
 	ThreadWidthPixels[2] = wrap::round<int32_t>(dub6 * TSIZ60);
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
-	  if (StateMap.test(StateFlag::THRDS)) {
+	  if (StateMap->test(StateFlag::THRDS)) {
 		nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 	  }
 	  else {
-		if (StateMap.test(StateFlag::COL)) {
+		if (StateMap->test(StateFlag::COL)) {
 		  if (iColor == ActiveColor) {
 			nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
 		  }
@@ -16901,12 +16901,12 @@ void thred::internal::drwStch() {
 	}
 	LineIndex = 0;
 	DisplayedColorBitmap.reset();
-	if (StateMap.test(StateFlag::ZUMED)) {
+	if (StateMap->test(StateFlag::ZUMED)) {
 	  LineIndex = 0;
-	  StateMap.reset(StateFlag::LINED);
-	  StateMap.reset(StateFlag::LININ);
+	  StateMap->reset(StateFlag::LINED);
+	  StateMap->reset(StateFlag::LININ);
 	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-		if (StateMap.test(StateFlag::HID)) {
+		if (StateMap->test(StateFlag::HID)) {
 		  if (ColorChangeTable[iColor].colorIndex != ActiveColor) {
 			stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
 			auto const stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable[iColor].stitchIndex);
@@ -16933,8 +16933,8 @@ void thred::internal::drwStch() {
 			  if (stitchIt[iStitch].x >= ZoomRect.left && stitchIt[iStitch].x <= ZoomRect.right &&
 			      stitchIt[iStitch].y >= ZoomRect.bottom && stitchIt[iStitch].y <= ZoomRect.top) {
 				wascol = 1;
-				if (StateMap.testAndSet(StateFlag::LINED)) {
-				  if (StateMap.testAndSet(StateFlag::LININ)) {
+				if (StateMap->testAndSet(StateFlag::LINED)) {
+				  if (StateMap->testAndSet(StateFlag::LININ)) {
 					linePoints[LineIndex++] =
 					    POINT {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 					           wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
@@ -16978,11 +16978,11 @@ void thred::internal::drwStch() {
 					                                               ZoomRatio.y)};
 					LineIndex = 2;
 				  }
-				  StateMap.set(StateFlag::LININ);
+				  StateMap->set(StateFlag::LININ);
 				}
 			  }
 			  else {
-				if (StateMap.testAndReset(StateFlag::LININ)) {
+				if (StateMap->testAndReset(StateFlag::LININ)) {
 				  linePoints[LineIndex++] =
 				      POINT {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 				             wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
@@ -17063,7 +17063,7 @@ void thred::internal::drwStch() {
 	  }
 	}
 	else {
-	  auto const pwid = StateMap.test(StateFlag::HID);
+	  auto const pwid = StateMap->test(StateFlag::HID);
 	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 		DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
 		stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
@@ -17076,7 +17076,7 @@ void thred::internal::drwStch() {
 		}
 	  }
 	}
-	if (StateMap.test(StateFlag::SELBOX)) {
+	if (StateMap->test(StateFlag::SELBOX)) {
 	  if (!StitchBuffer->empty()) {
 		ritcor(StitchBuffer->operator[](ClosestPointIndex));
 		if (stch2px(ClosestPointIndex)) {
@@ -17084,18 +17084,18 @@ void thred::internal::drwStch() {
 		}
 	  }
 	}
-	if (StateMap.test(StateFlag::FRMPSEL)) {
+	if (StateMap->test(StateFlag::FRMPSEL)) {
 	  auto vertexIt = std::next(FormVertices->cbegin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 	  thred::ritfcor(vertexIt[ClosestVertexToCursor]);
 	}
-	if (!StateMap.test(StateFlag::SELBOX) && !StateMap.test(StateFlag::FRMPSEL)) {
+	if (!StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::FRMPSEL)) {
 	  auto const blank = std::wstring {};
 	  displayText::butxt(HCOR, blank);
 	}
-	if (StateMap.test(StateFlag::WASLIN)) {
+	if (StateMap->test(StateFlag::WASLIN)) {
 	  relin();
 	}
-	if (StateMap.test(StateFlag::GRPSEL)) {
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  if (cmpstch(ClosestPointIndex, GroupStitchIndex)) {
 		cros(ClosestPointIndex);
 	  }
@@ -17105,7 +17105,7 @@ void thred::internal::drwStch() {
 	  }
 	  thred::selRct(StitchRangeRect);
 	  nuselrct();
-	  StateMap.set(StateFlag::SELSHO);
+	  StateMap->set(StateFlag::SELSHO);
 	  dusel(StitchWindowMemDC);
 	}
 	if (ZoomFactor < StitchBoxesThreshold) {
@@ -17114,7 +17114,7 @@ void thred::internal::drwStch() {
 	  auto       stitchMap  = boost::dynamic_bitset<>(maxMapSize, 0U);
 	  SelectObject(StitchWindowMemDC, LinePen);
 	  SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	  if (StateMap.test(StateFlag::HID)) {
+	  if (StateMap->test(StateFlag::HID)) {
 		for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 		  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
 			for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
@@ -17141,40 +17141,40 @@ void thred::internal::drwStch() {
 	  }
 	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
-	if (StateMap.test(StateFlag::CLPSHO)) {
+	if (StateMap->test(StateFlag::CLPSHO)) {
 	  duclp();
 	}
   }
-  if (!FormList->empty() && !StateMap.test(StateFlag::FRMOF)) {
+  if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	form::drwfrm();
   }
-  if (StateMap.test(StateFlag::INSFRM)) {
+  if (StateMap->test(StateFlag::INSFRM)) {
 	form::rinfrm();
   }
-  if (StateMap.test(StateFlag::BIGBOX)) {
+  if (StateMap->test(StateFlag::BIGBOX)) {
 	form::dubig();
   }
-  if (StateMap.test(StateFlag::MOVFRM)) {
-	StateMap.set(StateFlag::SHOFRM);
+  if (StateMap->test(StateFlag::MOVFRM)) {
+	StateMap->set(StateFlag::SHOFRM);
 	form::dufrm();
   }
-  if (StateMap.test(StateFlag::SATPNT)) {
+  if (StateMap->test(StateFlag::SATPNT)) {
 	satin::satzum();
   }
-  if (StateMap.test(StateFlag::GMRK)) {
+  if (StateMap->test(StateFlag::GMRK)) {
 	drwmrk(StitchWindowMemDC);
   }
-  if (StateMap.test(StateFlag::PRFACT)) {
+  if (StateMap->test(StateFlag::PRFACT)) {
 	thred::redraw(PreferencesWindow);
   }
-  if (StateMap.test(StateFlag::SELBOX)) {
+  if (StateMap->test(StateFlag::SELBOX)) {
 	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
   }
   thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-  if (StateMap.test(StateFlag::INIT)) {
+  if (StateMap->test(StateFlag::INIT)) {
 	lenCalc();
   }
-  if (StateMap.test(StateFlag::MOVSET)) {
+  if (StateMap->test(StateFlag::MOVSET)) {
 	dumov();
   }
   drwknot();
@@ -17190,7 +17190,7 @@ void thred::internal::dubar() {
 	FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
 	colorBarRect.top = colorBarRect.bottom;
   }
-  if (StateMap.test(StateFlag::SELBOX) || StateMap.test(StateFlag::GRPSEL)) {
+  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL)) {
 	auto selectedIndicator = gsl::narrow_cast<double>(ClosestPointIndex) / StitchBuffer->size();
 	indicatorLine[0].y = indicatorLine[1].y = wrap::ceil<int32_t>(colorBarRect.bottom * selectedIndicator);
 	indicatorLine[0].x                      = colorBarRect.left;
@@ -17198,7 +17198,7 @@ void thred::internal::dubar() {
 	SelectObject(DrawItem->hDC, CrossPen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	Polyline(DrawItem->hDC, static_cast<POINT const*>(indicatorLine), 2);
-	if (StateMap.test(StateFlag::GRPSEL)) {
+	if (StateMap->test(StateFlag::GRPSEL)) {
 	  selectedIndicator = gsl::narrow_cast<double>(GroupStitchIndex) / StitchBuffer->size();
 	  indicatorLine[0].y = indicatorLine[1].y = wrap::ceil<int32_t>(colorBarRect.bottom * selectedIndicator);
 	  indicatorLine[0].x                      = colorBarRect.left;
@@ -17415,21 +17415,21 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_INITMENU: {
-	  if (StateMap.testAndReset(StateFlag::PRFACT)) {
+	  if (StateMap->testAndReset(StateFlag::PRFACT)) {
 		DestroyWindow(PreferencesWindow);
-		StateMap.reset(StateFlag::WASRT);
+		StateMap->reset(StateFlag::WASRT);
 	  }
 	  thred::unmsg();
 	  thred::undat();
-	  StateMap.reset(StateFlag::FORMIN);
-	  StateMap.set(StateFlag::RESTCH);
+	  StateMap->reset(StateFlag::FORMIN);
+	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
 	case WM_HSCROLL: {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
 		case SB_LINELEFT: {
-		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 			MovieTimeStep += SPEDLIN;
 			if (MovieTimeStep > MAXDELAY) {
 			  MovieTimeStep = MAXDELAY;
@@ -17448,7 +17448,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		case SB_LINERIGHT: {
-		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 			MovieTimeStep -= SPEDLIN;
 			if (MovieTimeStep < MINDELAY) {
 			  MovieTimeStep = MINDELAY;
@@ -17467,7 +17467,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		case SB_PAGELEFT: {
-		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 			MovieTimeStep += SPEDPAG;
 			if (MovieTimeStep < MINDELAY) {
 			  MovieTimeStep = MINDELAY;
@@ -17481,7 +17481,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		case SB_PAGERIGHT: {
-		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 			MovieTimeStep -= SPEDPAG;
 			if (MovieTimeStep < MINDELAY) {
 			  MovieTimeStep = MINDELAY;
@@ -17495,7 +17495,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		case SB_THUMBPOSITION: {
-		  if (StateMap.test(StateFlag::RUNPAT) || StateMap.test(StateFlag::WASPAT)) {
+		  if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 			if (reinterpret_cast<HWND>(lParam) == SpeedScrollBar) {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
@@ -17516,7 +17516,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 				ZoomRect.right = UnzoomedRect.x;
 				ZoomRect.left  = UnzoomedRect.x - zoomWidth;
 			  }
-			  StateMap.set(StateFlag::RESTCH);
+			  StateMap->set(StateFlag::RESTCH);
 			}
 		  }
 		  return 1;
@@ -17562,7 +17562,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			ZoomRect.bottom = 0.0F;
 			ZoomRect.top    = zoomHeight;
 		  }
-		  StateMap.set(StateFlag::RESTCH);
+		  StateMap->set(StateFlag::RESTCH);
 		  return 1;
 		}
 	  }
@@ -17573,36 +17573,36 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	  DrawItem = reinterpret_cast<LPDRAWITEMSTRUCT>(lParam);
 	  if (DrawItem->hwndItem == MainStitchWin && DrawItem->itemAction == ODA_DRAWENTIRE) {
-		if (StateMap.test(StateFlag::TXTRED)) {
+		if (StateMap->test(StateFlag::TXTRED)) {
 		  texture::drwtxtr();
 		  return 1;
 		}
-		if (!StateMap.test(StateFlag::RUNPAT)) {
-		  if (!StateMap.test(StateFlag::HIDSTCH) &&
-		      ((FileHandle != nullptr) || StateMap.test(StateFlag::INIT) || !FormList->empty() ||
-		       StateMap.test(StateFlag::SATPNT)) &&
-		      !StateMap.test(StateFlag::BAKSHO)) {
+		if (!StateMap->test(StateFlag::RUNPAT)) {
+		  if (!StateMap->test(StateFlag::HIDSTCH) &&
+		      ((FileHandle != nullptr) || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
+		       StateMap->test(StateFlag::SATPNT)) &&
+		      !StateMap->test(StateFlag::BAKSHO)) {
 			drwStch();
 		  }
 		  else {
 			thi::drawBackground();
-			if (StateMap.test(StateFlag::HIDSTCH)) {
+			if (StateMap->test(StateFlag::HIDSTCH)) {
 			  form::drwfrm();
-			  if (StateMap.test(StateFlag::SATPNT)) {
+			  if (StateMap->test(StateFlag::SATPNT)) {
 				satin::satzum();
 			  }
 			}
-			if (StateMap.test(StateFlag::PRFACT)) {
+			if (StateMap->test(StateFlag::PRFACT)) {
 			  thred::redraw(PreferencesWindow);
 			}
 			else {
-			  if (StateMap.test(StateFlag::MOVFRM)) {
+			  if (StateMap->test(StateFlag::MOVFRM)) {
 				form::unfrm();
-				StateMap.set(StateFlag::SHOFRM);
+				StateMap->set(StateFlag::SHOFRM);
 				form::dufrm();
 			  }
-			  if (StateMap.test(StateFlag::POLIMOV)) {
-				StateMap.set(StateFlag::SHOFRM);
+			  if (StateMap->test(StateFlag::POLIMOV)) {
+				StateMap->set(StateFlag::SHOFRM);
 				form::mdufrm();
 			  }
 			}
@@ -17621,13 +17621,13 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  if (FormDataSheet != nullptr) {
 			thred::redraw(FormDataSheet);
 		  }
-		  if (StateMap.test(StateFlag::ROTSHO)) {
+		  if (StateMap->test(StateFlag::ROTSHO)) {
 			durot();
 		  }
-		  if (StateMap.test(StateFlag::SHOSAT)) {
+		  if (StateMap->test(StateFlag::SHOSAT)) {
 			satin::dusat();
 		  }
-		  if (StateMap.test(StateFlag::SHOINSF)) {
+		  if (StateMap->test(StateFlag::SHOINSF)) {
 			form::duinsf();
 		  }
 		}
@@ -17645,14 +17645,14 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  if (!ButtonWin->empty() && DrawItem->hwndItem == ButtonWin->operator[](HHID) &&
 	      DrawItem->itemAction == ODA_DRAWENTIRE) {
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
-		if (StateMap.test(StateFlag::HID)) {
+		if (StateMap->test(StateFlag::HID)) {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
 		  SetBkColor(DrawItem->hDC, UserColor[ActiveColor]);
 		}
 		else {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
 		}
-		if (StateMap.test(StateFlag::TXTRED)) {
+		if (StateMap->test(StateFlag::TXTRED)) {
 		  texture::writeScreenWidth(position);
 		}
 		else {
@@ -17664,7 +17664,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		return 1;
 	  }
-	  if (StateMap.test(StateFlag::WASTRAC)) {
+	  if (StateMap->test(StateFlag::WASTRAC)) {
 		trace::wasTrace();
 		return 1;
 	  }
@@ -17705,8 +17705,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 	  }
-	  if (StateMap.test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
-		if (StateMap.test(StateFlag::THUMSHO)) {
+	  if (StateMap->test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
+		if (StateMap->test(StateFlag::THUMSHO)) {
 		  for (auto iThumb = 0U; iThumb < 4; iThumb++) {
 			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == BackupViewer[iThumb]) {
 			  ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), DrawItem);
@@ -17744,7 +17744,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		case SIZE_RESTORED: {
 		  UserFlagMap->reset(UserFlag::SAVMAX);
 		  chkirct();
-		  if (StateMap.testAndSet(StateFlag::SIZED)) {
+		  if (StateMap->testAndSet(StateFlag::SIZED)) {
 			auto       screenCenterOffset = 0U;
 			auto const maxWindowDimension = SIZE {ScreenSizePixels.cx - 30, ScreenSizePixels.cy - 30};
 			if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
@@ -17782,7 +17782,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  }
 	  GetClientRect(p_hWnd, &ThredWindowRect);
 	  thred::movStch();
-	  if (StateMap.test(StateFlag::ZUMED)) {
+	  if (StateMap->test(StateFlag::ZUMED)) {
 		auto const bRatio        = StitchWindowClientRect.bottom / (ZoomRect.top - ZoomRect.bottom);
 		auto const adjustedWidth = StitchWindowClientRect.right / bRatio;
 		if (adjustedWidth + ZoomRect.left > UnzoomedRect.x) {
@@ -17798,13 +17798,13 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		    fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0F};
 	  }
 	  NearestCount = 0;
-	  StateMap.set(StateFlag::RESTCH);
-	  if (StateMap.test(StateFlag::SELBOX)) {
+	  StateMap->set(StateFlag::RESTCH);
+	  if (StateMap->test(StateFlag::SELBOX)) {
 		shft2box();
 	  }
-	  if (StateMap.test(StateFlag::RUNPAT)) {
+	  if (StateMap->test(StateFlag::RUNPAT)) {
 		FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-		if (StateMap.test(StateFlag::ZUMED)) {
+		if (StateMap->test(StateFlag::ZUMED)) {
 		  RunPoint = GroupStartStitch;
 		}
 		else {
@@ -17824,7 +17824,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		ThredWindowRect.bottom = 300;
 	  }
 	  thred::movStch();
-	  if (StateMap.test(StateFlag::RUNPAT)) {
+	  if (StateMap->test(StateFlag::RUNPAT)) {
 		thred::duzrat();
 		RunPoint = 0;
 		FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
@@ -17833,7 +17833,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	}
 	case WM_CLOSE: {
 	  dun();
-	  if (StateMap.test(StateFlag::SAVEX)) {
+	  if (StateMap->test(StateFlag::SAVEX)) {
 		return 1;
 	  }
 	  break;
@@ -17972,6 +17972,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_SelectedFormsLine         = std::vector<POINT> {};
 	  auto private_SelectedPointsLine        = std::vector<POINT> {};
 	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
+	  auto private_StateMap                  = EnumMap<StateFlag> {0};
 	  auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
 	  auto private_StringTable               = std::vector<std::wstring> {};
 	  auto private_TempPolygon               = std::vector<fPOINT> {};
@@ -18046,6 +18047,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SelectedFormList          = &private_SelectedFormList;
 	  SelectedFormsLine         = &private_SelectedFormsLine;
 	  SelectedPointsLine        = &private_SelectedPointsLine;
+	  StateMap                  = &private_StateMap;
 	  StitchBuffer              = &private_StitchBuffer;
 	  StringTable               = &private_StringTable;
 	  TempPolygon               = &private_TempPolygon;
@@ -18130,23 +18132,23 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto stretchBoxLine = std::vector<POINT> {};
 	  stretchBoxLine.resize(5U); // stretch and expand
 	  while (GetMessage(&Msg, nullptr, 0, 0)) {
-		StateMap.set(StateFlag::SAVACT);
+		StateMap->set(StateFlag::SAVACT);
 		if (!thi::chkMsg(stretchBoxLine, xyRatio, rotationAngle, rotationCenter, textureForm)) {
 		  DispatchMessage(&Msg);
 		}
-		if (StateMap.testAndReset(StateFlag::FCHK)) {
+		if (StateMap->testAndReset(StateFlag::FCHK)) {
 		  repair::frmchkx();
 		}
-		if (StateMap.testAndReset(StateFlag::RESTCH)) {
+		if (StateMap->testAndReset(StateFlag::RESTCH)) {
 		  thred::redraw(MainStitchWin);
 		}
-		if (StateMap.testAndReset(StateFlag::RELAYR)) {
+		if (StateMap->testAndReset(StateFlag::RELAYR)) {
 		  thi::ritlayr();
 		}
-		if (!StateMap.test(StateFlag::TXTRED)) {
+		if (!StateMap->test(StateFlag::TXTRED)) {
 		  thi::sachk();
 		}
-		if (StateMap.testAndReset(StateFlag::DUMEN)) {
+		if (StateMap->testAndReset(StateFlag::DUMEN)) {
 		  DrawMenuBar(ThrEdWindow);
 		}
 	  }

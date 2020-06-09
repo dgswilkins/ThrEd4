@@ -405,7 +405,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   }
   PEScolorIndex = 1;
   auto loc      = fPOINT {};
-  StateMap.reset(StateFlag::FILDIR);
+  StateMap->reset(StateFlag::FILDIR);
   if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
 	auto       color      = 0U;
 	auto       iPESstitch = 0U;
@@ -442,7 +442,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 		}
 		locof *= 3.0F / 5.0F;
 		// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
-		if (StateMap.testAndFlip(StateFlag::FILDIR)) {
+		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 		  loc.y -= locof;
 		  StitchBuffer->push_back(fPOINTATTR {loc.x, loc.y, color});
 		}

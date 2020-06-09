@@ -189,7 +189,7 @@ auto clip::numclp() -> uint32_t {
 
 void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) {
   auto clipIt = std::next(ClipPoints->begin(), clipIndex);
-  if (!StateMap.test(StateFlag::NOCLP)) {
+  if (!StateMap->test(StateFlag::NOCLP)) {
 	auto& clipBuffer = *ClipBuffer;
 	clipBuffer.clear();
 	if (clipEntries != 0U) {
@@ -404,7 +404,7 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
 
 void clip::clpbrd(FRMHED const& form, fRECTANGLE const& clipRect, uint32_t startVertex) {
   OSequence->clear();
-  StateMap.reset(StateFlag::CLPBAK);
+  StateMap->reset(StateFlag::CLPBAK);
   HorizontalLength           = ClipRectSize.cx;
   auto const clipStitchCount = ClipBuffer->size();
   auto       clipFillData    = std::vector<fPOINT> {};
@@ -724,7 +724,7 @@ void clip::internal::clpcrnr(FRMHED const&        form,
                              fPOINT const&        rotationCenter) {
   auto const  nextVertex = form::nxt(form, vertex);
   auto        vertexIt   = std::next(FormVertices->cbegin(), form.vertexIndex);
-  auto const* points     = StateMap.test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
+  auto const* points     = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints;
   if (points != nullptr) {
 	auto delta = fPOINT {points->operator[](nextVertex).x - vertexIt[nextVertex].x,
 	                     points->operator[](nextVertex).y - vertexIt[nextVertex].y};
@@ -817,7 +817,7 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
   auto const rotationCenter =
       fPOINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   OSequence->clear();
-  StateMap.reset(StateFlag::CLPBAK);
+  StateMap->reset(StateFlag::CLPBAK);
   HorizontalLength = ClipRectSize.cx;
   ClipReference.y  = rotationCenter.y;
   ClipReference.x  = clipRect.left;
@@ -875,7 +875,7 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
   chainPoint[2].x = chainEndPoints[finish].x + delta.x / 4.0F;
   chainPoint[2].y = chainEndPoints[finish].y + delta.y / 4.0F;
   auto chainCount = wrap::toUnsigned(chainSequence.size());
-  if (StateMap.test(StateFlag::LINCHN)) {
+  if (StateMap->test(StateFlag::LINCHN)) {
 	chainCount--;
   }
   for (auto iChain = 0U; iChain < chainCount; iChain++) {
@@ -895,7 +895,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	if (form.type == FRMLINE) {
 	  ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
 	  auto backupAt = 8U;
-	  if (StateMap.test(StateFlag::LINCHN)) {
+	  if (StateMap->test(StateFlag::LINCHN)) {
 		backupAt--;
 	  }
 	  if ((OSequence->size() >= backupAt)) {

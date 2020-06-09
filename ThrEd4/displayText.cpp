@@ -168,7 +168,7 @@ void displayText::msgflt(uint32_t messageId, float value) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, messageId);
   displayText::shoMsg(fmt::format(fmtStr, value));
-  StateMap.set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
 
@@ -176,7 +176,7 @@ void displayText::tsizmsg(wchar_t const* threadSizeText, double threadSize) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_SIZ);
   displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
-  StateMap.set(StateFlag::NUMIN);
+  StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
 
@@ -199,9 +199,9 @@ void displayText::crmsg(fs::path const& fileName) {
 }
 
 void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
-  if (StateMap.test(StateFlag::WASTRAC) && iButton > HNUM) {
+  if (StateMap->test(StateFlag::WASTRAC) && iButton > HNUM) {
 	if (iButton == 5U) {
-	  if (StateMap.test(StateFlag::HIDMAP)) {
+	  if (StateMap->test(StateFlag::HIDMAP)) {
 		SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1H).c_str());
 	  }
 	  else {
@@ -256,7 +256,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
 
 auto displayText::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
-  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap.test(StateFlag::WASPCDCLP)) {
+  if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
 	displayText::tabmsg(IDS_CLPS);
 	return true;
   }
@@ -265,7 +265,7 @@ auto displayText::clpmsgs(uint32_t code) -> bool {
 
 void displayText::frm1pnt() {
   if (FormList->size() == 1) {
-	StateMap.set(StateFlag::FORMSEL);
+	StateMap->set(StateFlag::FORMSEL);
 	ClosestFormToCursor = 0;
   }
 }
@@ -276,7 +276,7 @@ auto displayText::filmsgs(uint32_t code) -> bool {
   }
   if (!FormList->empty()) {
 	displayText::frm1pnt();
-	if (StateMap.test(StateFlag::FORMSEL)) {
+	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto const& form = FormList->operator[](ClosestFormToCursor);
 	  if (form.vertexCount == 2) {
 		if (code < FML_LIN) {
@@ -381,7 +381,7 @@ void displayText::okcan() noexcept {
 void displayText::savdisc() {
   wchar_t buffer[HBUFSIZ];
   di::sdmsg();
-  StateMap.reset(StateFlag::BIGBOX);
+  StateMap->reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
   LoadString(ThrEdInstance, IDS_SAV, std::begin(buffer), HBUFSIZ);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)

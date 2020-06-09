@@ -130,7 +130,7 @@ void trace::internal::trcratnum() {
 auto trace::internal::trcin(COLORREF color) -> bool {
   if (color != 0U) {
 	ti::trcols(color);
-	if (StateMap.test(StateFlag::TRCRED)) {
+	if (StateMap->test(StateFlag::TRCRED)) {
 	  if (PixelColors[0] > HighColors[0]) {
 		return false;
 	  }
@@ -138,7 +138,7 @@ auto trace::internal::trcin(COLORREF color) -> bool {
 		return false;
 	  }
 	}
-	if (StateMap.test(StateFlag::TRCGRN)) {
+	if (StateMap->test(StateFlag::TRCGRN)) {
 	  if (PixelColors[1] > HighColors[1]) {
 		return false;
 	  }
@@ -146,7 +146,7 @@ auto trace::internal::trcin(COLORREF color) -> bool {
 		return false;
 	  }
 	}
-	if (StateMap.test(StateFlag::TRCBLU)) {
+	if (StateMap->test(StateFlag::TRCBLU)) {
 	  if (PixelColors[2] > HighColors[2]) {
 		return false;
 	  }
@@ -232,7 +232,7 @@ auto trace::internal::trsum() noexcept -> uint32_t {
 }
 
 void trace::untrace() {
-  if (StateMap.testAndReset(StateFlag::WASTRAC)) {
+  if (StateMap->testAndReset(StateFlag::WASTRAC)) {
 	DeleteObject(TraceBitmap);
 	DeleteObject(TraceDC);
 	if (!TracedEdges->empty()) {
@@ -241,7 +241,7 @@ void trace::untrace() {
 	if (!TracedMap->empty()) {
 	  TracedMap->resize(0); // allocated in trace
 	}
-	StateMap.reset(StateFlag::WASEDG);
+	StateMap->reset(StateFlag::WASEDG);
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 	  ti::shownd(DefaultColorWin->operator[](iColor));
 	  ti::shownd(UserColorWin->operator[](iColor));
@@ -259,7 +259,7 @@ void trace::untrace() {
 	ti::hidwnd(TraceStepWin);
   }
   else {
-	if (StateMap.test(StateFlag::TRCUP)) {
+	if (StateMap->test(StateFlag::TRCUP)) {
 	  DownPixelColor = 0xffffff;
 	}
 	else {
@@ -273,15 +273,15 @@ void trace::trdif() {
 	displayText::tabmsg(IDS_MAPLOD);
 	return;
   }
-  StateMap.reset(StateFlag::TRSET);
-  StateMap.reset(StateFlag::HIDMAP);
+  StateMap->reset(StateFlag::TRSET);
+  StateMap->reset(StateFlag::HIDMAP);
   trace::untrace();
   if ((bitmap::getBitmapHeight() * bitmap::getBitmapWidth()) != 0U) {
 	auto differenceBitmap = std::vector<uint32_t> {};
 	differenceBitmap.resize(wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
 	auto colorSumMaximum = 0U;
 	auto colorSumMinimum = 0xffffffffU;
-	if (!StateMap.test(StateFlag::WASTRAC)) {
+	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}
 	for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
@@ -315,8 +315,8 @@ void trace::trdif() {
 	  }
 	}
 	bitmap::bitbltBitmap();
-	StateMap.set(StateFlag::WASDIF);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::WASDIF);
+	StateMap->set(StateFlag::RESTCH);
 	ti::tracwnd();
   }
 }
@@ -326,7 +326,7 @@ unsigned trace::internal::colsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
-	if (StateMap.test(TraceRGBFlag[iRGB]))
+	if (StateMap->test(TraceRGBFlag[iRGB]))
 	  colorSum += PixelColors[iRGB];
   }
   return colorSum;
@@ -336,7 +336,7 @@ unsigned trace::internal::icolsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
-	if (StateMap.test(TraceRGBFlag[iRGB]))
+	if (StateMap->test(TraceRGBFlag[iRGB]))
 	  colorSum += 255 - PixelColors[iRGB];
   }
   return colorSum;
@@ -348,9 +348,9 @@ void trace::trace() {
 	trace::untrace();
 	ti::tracwnd();
 	TraceDataSize = bitmap::getrmap();
-	if (thred::inStitchWin() && !StateMap.testAndReset(StateFlag::WASTRCOL)) {
+	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
-	  if (StateMap.test(StateFlag::LANDSCAP)) {
+	  if (StateMap->test(StateFlag::LANDSCAP)) {
 		auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 		stitchPoint.y -= (gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y);
 	  }
@@ -359,7 +359,7 @@ void trace::trace() {
                                 wrap::round<int32_t>(BmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
-	  if (StateMap.test(StateFlag::TRCUP)) {
+	  if (StateMap->test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
 		DownPixelColor = 0xffffff;
 	  }
@@ -367,18 +367,18 @@ void trace::trace() {
 		DownPixelColor = color;
 		UpPixelColor   = 0;
 	  }
-	  StateMap.set(StateFlag::TRCRED);
-	  StateMap.set(StateFlag::TRCGRN);
-	  StateMap.set(StateFlag::TRCBLU);
+	  StateMap->set(StateFlag::TRCRED);
+	  StateMap->set(StateFlag::TRCGRN);
+	  StateMap->set(StateFlag::TRCBLU);
 	}
 	auto traceColorMask = 0xffffffU;
-	if (!StateMap.test(StateFlag::TRCRED)) {
+	if (!StateMap->test(StateFlag::TRCRED)) {
 	  traceColorMask &= REDMSK;
 	}
-	if (!StateMap.test(StateFlag::TRCGRN)) {
+	if (!StateMap->test(StateFlag::TRCGRN)) {
 	  traceColorMask &= GRNMSK;
 	}
-	if (!StateMap.test(StateFlag::TRCBLU)) {
+	if (!StateMap->test(StateFlag::TRCBLU)) {
 	  traceColorMask &= BLUMSK;
 	}
 	if (traceColorMask != 0xffffff) {
@@ -425,8 +425,8 @@ void trace::trace() {
 	  }
 	}
 #endif
-	StateMap.set(StateFlag::TRSET);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::TRSET);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::tabmsg(IDS_MAPLOD);
@@ -434,7 +434,7 @@ void trace::trace() {
 }
 
 void trace::tracedg() {
-  if (!StateMap.test(StateFlag::WASTRAC)) {
+  if (!StateMap->test(StateFlag::WASTRAC)) {
 	trace::trace();
   }
   TracedEdges->resize(TraceDataSize, false);
@@ -491,8 +491,8 @@ void trace::tracedg() {
 	  TraceBitmapData[iPixel] = 0;
 	}
   }
-  StateMap.set(StateFlag::RESTCH);
-  StateMap.set(StateFlag::WASEDG);
+  StateMap->set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::WASEDG);
 }
 
 auto trace::internal::trcbit(uint32_t const       initialDirection,
@@ -616,12 +616,12 @@ void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept {
 void trace::internal::dutrac() {
   if (thred::inStitchWin()) {
 	auto stitchPoint = thred::pxCor2stch(Msg.pt);
-	if (!StateMap.test(StateFlag::WASEDG)) {
+	if (!StateMap->test(StateFlag::WASEDG)) {
 	  trace::tracedg();
 	  return;
 	}
 	thred::savdo();
-	if (StateMap.test(StateFlag::LANDSCAP)) {
+	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= (gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y);
 	}
@@ -786,7 +786,7 @@ void trace::internal::dutrac() {
 	auto iNext           = 0;
 	auto traceLengthSum  = 0.0F;
 	auto landscapeOffset = 0.0F;
-	if (StateMap.test(StateFlag::LANDSCAP)) {
+	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 	  landscapeOffset   = gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y;
 	}
@@ -811,8 +811,8 @@ void trace::internal::dutrac() {
 	form.attribute = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form.satinGuideCount = 0;
-	StateMap.set(StateFlag::RESTCH);
-	StateMap.set(StateFlag::FRMOF);
+	StateMap->set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::FRMOF);
 	form::tglfrm();
   }
 }
@@ -820,15 +820,15 @@ void trace::internal::dutrac() {
 void trace::trinit() {
   uint32_t histogramData[3][256] = {{0}};
   if (PCSBMPFileName[0] != 0) {
-	if (!StateMap.test(StateFlag::TRSET)) {
-	  StateMap.set(StateFlag::TRCRED);
-	  StateMap.set(StateFlag::TRCGRN);
-	  StateMap.set(StateFlag::TRCBLU);
+	if (!StateMap->test(StateFlag::TRSET)) {
+	  StateMap->set(StateFlag::TRCRED);
+	  StateMap->set(StateFlag::TRCGRN);
+	  StateMap->set(StateFlag::TRCBLU);
 	  uint32_t componentPeak[3] = {0U};
-	  if (!StateMap.test(StateFlag::WASTRAC)) {
+	  if (!StateMap->test(StateFlag::WASTRAC)) {
 		bitmap::getrmap();
 	  }
-	  if (StateMap.test(StateFlag::MONOMAP)) {
+	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto iPixel = 0U;
 		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
@@ -880,7 +880,7 @@ void trace::trinit() {
 	  InvertUpColor  = 0xffffffU;
 	  UpPixelColor   = 0U;
 	}
-	StateMap.set(StateFlag::WASTRCOL);
+	StateMap->set(StateFlag::WASTRCOL);
 	trace::trace();
   }
   else {
@@ -890,15 +890,15 @@ void trace::trinit() {
 
 void trace::trcsel() {
   if (PCSBMPFileName[0] != 0) {
-	StateMap.set(StateFlag::WASTRCOL);
-	StateMap.set(StateFlag::TRCRED);
-	StateMap.set(StateFlag::TRCBLU);
-	StateMap.set(StateFlag::TRCGRN);
+	StateMap->set(StateFlag::WASTRCOL);
+	StateMap->set(StateFlag::TRCRED);
+	StateMap->set(StateFlag::TRCBLU);
+	StateMap->set(StateFlag::TRCGRN);
 	DownPixelColor = 0xffffff;
 	UpPixelColor   = 0;
 	trace::trace();
-	StateMap.reset(StateFlag::HIDMAP);
-	StateMap.reset(StateFlag::TRSET);
+	StateMap->reset(StateFlag::HIDMAP);
+	StateMap->reset(StateFlag::TRSET);
 	for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
 	  ti::trcols(TraceBitmapData[iPixel]);
 	  auto maximumColorComponent = PixelColors[0];
@@ -913,8 +913,8 @@ void trace::trcsel() {
 	  TraceBitmapData[iPixel] &= TraceRGB[iRGB];
 	}
 	bitmap::bitbltBitmap();
-	StateMap.set(StateFlag::WASDSEL);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::WASDSEL);
+	StateMap->set(StateFlag::RESTCH);
 	ti::tracwnd();
   }
   else {
@@ -931,9 +931,9 @@ void trace::internal::ritrcol(COLORREF* color, uint32_t number) noexcept {
 }
 
 void trace::internal::dutrnum0(uint32_t color) {
-  StateMap.reset(StateFlag::NUMIN);
-  StateMap.reset(StateFlag::TRNIN0);
-  if (StateMap.test(StateFlag::TRNUP)) {
+  StateMap->reset(StateFlag::NUMIN);
+  StateMap->reset(StateFlag::TRNIN0);
+  if (StateMap->test(StateFlag::TRNUP)) {
 	ti::ritrcol(&InvertUpColor, color);
 	UpPixelColor = InvertUpColor ^ 0xffffffU;
 	thred::redraw(TraceUpWindow[ColumnColor]);
@@ -945,7 +945,7 @@ void trace::internal::dutrnum0(uint32_t color) {
   }
   thred::redraw(TraceControlWindow[ColumnColor]);
   DestroyWindow(TraceNumberInput);
-  StateMap.set(StateFlag::WASTRCOL);
+  StateMap->set(StateFlag::WASTRCOL);
   trace::trace();
 }
 
@@ -955,13 +955,13 @@ void trace::dutrnum2() {
 
 void trace::dutrnum1() {
   DestroyWindow(GeneralNumberInputBox);
-  StateMap.reset(StateFlag::NUMIN);
-  StateMap.reset(StateFlag::TRNIN1);
+  StateMap->reset(StateFlag::NUMIN);
+  StateMap->reset(StateFlag::TRNIN1);
   auto traceLength = wrap::bufToFloat(std::begin(MsgBuffer));
   if (traceLength > 9.0F) {
 	traceLength = 9.0F;
   }
-  if (StateMap.test(StateFlag::TRNUP)) {
+  if (StateMap->test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;
 	ti::trcstpnum();
   }
@@ -1022,15 +1022,15 @@ void trace::blak() {
 	BlackPen = wrap::CreatePen(PS_SOLID, 1, 0);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(TraceDC, BlackPen);
-	if (!StateMap.test(StateFlag::WASTRAC)) {
+	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}
 	for (auto iForm : *FormList) {
 	  bitmap::bfrm(iForm);
 	}
 	DeleteObject(BlackPen);
-	StateMap.set(StateFlag::WASBLAK);
-	StateMap.set(StateFlag::RESTCH);
+	StateMap->set(StateFlag::WASBLAK);
+	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	displayText::tabmsg(IDS_FRMNO);
@@ -1038,10 +1038,10 @@ void trace::blak() {
 }
 
 void trace::tracpar() {
-  if (StateMap.test(StateFlag::TRNIN0)) {
+  if (StateMap->test(StateFlag::TRNIN0)) {
 	trace::dutrnum2();
   }
-  if (StateMap.test(StateFlag::TRNIN1)) {
+  if (StateMap->test(StateFlag::TRNIN1)) {
 	trace::dutrnum1();
   }
   TraceMsgPoint.x = Msg.pt.x - ThredWindowOrigin.x;
@@ -1088,38 +1088,38 @@ void trace::tracpar() {
 	else {
 	  auto const position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
 	  if (position < 16U) {
-		StateMap.flip(TraceRGBFlag[ColumnColor]);
+		StateMap->flip(TraceRGBFlag[ColumnColor]);
 		thred::redraw(TraceSelectWindow[ColumnColor]);
 		trace::trace();
 	  }
 	  else {
 		if (position < 18U) {
-		  StateMap.set(StateFlag::NUMIN);
-		  StateMap.set(StateFlag::TRNIN0);
+		  StateMap->set(StateFlag::NUMIN);
+		  StateMap->set(StateFlag::TRNIN0);
 		  MsgIndex            = 0;
 		  TraceInputBuffer[0] = 0;
 		  if (position < 17U) {
 			ti::trnumwnd0(ButtonHeight * 16);
-			StateMap.set(StateFlag::TRNUP);
+			StateMap->set(StateFlag::TRNUP);
 		  }
 		  else {
 			ti::trnumwnd0(ButtonHeight * 17);
-			StateMap.reset(StateFlag::TRNUP);
+			StateMap->reset(StateFlag::TRNUP);
 		  }
 		}
 		else {
 		  if (position < 20) {
-			StateMap.set(StateFlag::NUMIN);
-			StateMap.set(StateFlag::TRNIN1);
+			StateMap->set(StateFlag::NUMIN);
+			StateMap->set(StateFlag::TRNIN1);
 			MsgIndex            = 0;
 			TraceInputBuffer[0] = 0;
 			if (position < 19U) {
 			  ti::trnumwnd1(ButtonHeight * 18);
-			  StateMap.set(StateFlag::TRNUP);
+			  StateMap->set(StateFlag::TRNUP);
 			}
 			else {
 			  ti::trnumwnd1(ButtonHeight * 19);
-			  StateMap.reset(StateFlag::TRNUP);
+			  StateMap->reset(StateFlag::TRNUP);
 			}
 		  }
 		  else {
@@ -1188,25 +1188,25 @@ void trace::internal::durct(uint32_t    shift,
   traceMiddleMask.top    = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
   ratio                  = gsl::narrow_cast<double>(upperColor) / 255.0;
   traceMiddleMask.bottom = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
-  StateMap.reset(StateFlag::DUHI);
-  StateMap.reset(StateFlag::DULO);
+  StateMap->reset(StateFlag::DUHI);
+  StateMap->reset(StateFlag::DULO);
   if (lowerColor != 0U) {
-	StateMap.set(StateFlag::DULO);
+	StateMap->set(StateFlag::DULO);
 	traceLowMask.bottom = traceMiddleMask.top;
 	traceLowMask.top    = 0;
   }
   if (upperColor != 255U) {
-	StateMap.set(StateFlag::DUHI);
+	StateMap->set(StateFlag::DUHI);
 	traceHighMask.top    = traceMiddleMask.bottom;
 	traceHighMask.bottom = traceControlRect.bottom;
   }
 }
 
 void trace::internal::dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
-  if (StateMap.test(StateFlag::DUHI)) {
+  if (StateMap->test(StateFlag::DUHI)) {
 	FillRect(dc, &traceHighMask, brush);
   }
-  if (StateMap.test(StateFlag::DULO)) {
+  if (StateMap->test(StateFlag::DULO)) {
 	FillRect(dc, &traceLowMask, brush);
   }
 }
@@ -1240,7 +1240,7 @@ void trace::wasTrace() {
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);
 	  SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
-	  if (StateMap.test(TraceRGBFlag[iRGB])) {
+	  if (StateMap->test(TraceRGBFlag[iRGB])) {
 		TempBrush = TraceBrush[iRGB];
 		wcscpy_s(buffer, StringTable->operator[](STR_ON).c_str());
 		SetTextColor(DrawItem->hDC, 0);
@@ -1265,13 +1265,13 @@ void trace::wasTrace() {
 }
 
 void trace::wasTrace1() {
-  if (StateMap.test(StateFlag::TRNIN0)) {
+  if (StateMap->test(StateFlag::TRNIN0)) {
 	trace::dutrnum2();
   }
-  if (StateMap.test(StateFlag::TRNIN1)) {
+  if (StateMap->test(StateFlag::TRNIN1)) {
 	trace::dutrnum1();
   }
-  if (!StateMap.test(StateFlag::WASEDG)) {
+  if (!StateMap->test(StateFlag::WASEDG)) {
 	trace::tracpar();
   }
 }

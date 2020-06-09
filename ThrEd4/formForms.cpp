@@ -72,7 +72,7 @@ auto formForms::maxwid(uint32_t start, uint32_t finish) {
 }
 
 auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
-  if (StateMap.test(StateFlag::REFCNT)) {
+  if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
   }
@@ -91,7 +91,7 @@ auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& loc
 }
 
 auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
-  if (StateMap.test(StateFlag::REFCNT)) {
+  if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
@@ -110,7 +110,7 @@ auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& locat
 }
 
 auto formForms::internal::numwin(std::wstring const& winName, RECT const& location) -> HWND {
-  if (StateMap.test(StateFlag::REFCNT)) {
+  if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
   }
@@ -415,12 +415,12 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 
 void formForms::refrm() {
   auto const& form = FormList->operator[](ClosestFormToCursor);
-  if (StateMap.testAndReset(StateFlag::PRFACT)) {
+  if (StateMap->testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
-	StateMap.reset(StateFlag::WASRT);
+	StateMap->reset(StateFlag::WASRT);
   }
   LabelWindowSize = ValueWindowSize = {};
-  StateMap.set(StateFlag::REFCNT); // don't create windows - just size them
+  StateMap->set(StateFlag::REFCNT); // don't create windows - just size them
   auto formMenuEntryCount = 0U;
   ffi::refrmfn(form, formMenuEntryCount);
   if (FormDataSheet != nullptr) {
@@ -438,7 +438,7 @@ void formForms::refrm() {
                                nullptr,
                                ThrEdInstance,
                                nullptr);
-  StateMap.reset(StateFlag::REFCNT); // this time create the windows
+  StateMap->reset(StateFlag::REFCNT); // this time create the windows
   ffi::refrmfn(form, formMenuEntryCount);
 }
 
@@ -525,10 +525,10 @@ void formForms::internal::prflin(std::wstring const& msg, uint32_t row) noexcept
 
 void formForms::prfmsg() {
   auto preferenceRect = RECT {0L, 0L, 0L, 0L};
-  if (StateMap.testAndReset(StateFlag::INSRT)) {
-	StateMap.set(StateFlag::WASRT);
+  if (StateMap->testAndReset(StateFlag::INSRT)) {
+	StateMap->set(StateFlag::WASRT);
   }
-  StateMap.reset(StateFlag::BIGBOX);
+  StateMap->reset(StateFlag::BIGBOX);
   SelectedFormList->clear();
   if (FormDataSheet != nullptr) {
 	thred::undat();
@@ -602,17 +602,17 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
   ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
   ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
-  StateMap.set(StateFlag::PRFACT);
+  StateMap->set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
 
 void formForms::frmnum() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_FRML);
-  if (!FormList->empty() && StateMap.test(StateFlag::FORMSEL)) {
+  if (!FormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
 	displayText::shoMsg(fmt::format(fmtStr, FormList->size()));
-	StateMap.set(StateFlag::NUMIN);
-	StateMap.set(StateFlag::ENTRFNUM);
+	StateMap->set(StateFlag::NUMIN);
+	StateMap->set(StateFlag::ENTRFNUM);
 	displayText::numWnd();
   }
   else {
@@ -772,7 +772,7 @@ void formForms::dasyfrm() {
   thred::unmsg();
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
   if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) {
-	StateMap.reset(StateFlag::FORMIN);
+	StateMap->reset(StateFlag::FORMIN);
 	return;
   }
   auto const referencePoint =
@@ -906,7 +906,7 @@ void formForms::dasyfrm() {
 	form.type      = SAT;
 	form.attribute = 1;
   }
-  StateMap.set(StateFlag::INIT);
+  StateMap->set(StateFlag::INIT);
   form::frmout(wrap::toUnsigned(FormList->size() - 1U));
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; iMacroPetal++) {
 	vertexIt[iMacroPetal].x -= form.rectangle.left;
@@ -914,7 +914,7 @@ void formForms::dasyfrm() {
   }
   FormMoveDelta      = fPOINT {};
   NewFormVertexCount = iVertex + 1U;
-  StateMap.set(StateFlag::POLIMOV);
+  StateMap->set(StateFlag::POLIMOV);
   form::setmfrm();
   form::mdufrm();
 }
@@ -1047,10 +1047,10 @@ void formForms::setear() {
 	vertexIt[0].y = verticalPosition;
 	form.vertexCount++;
 	NewFormVertexCount++;
-	StateMap.set(StateFlag::FORMSEL);
+	StateMap->set(StateFlag::FORMSEL);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form::flipv();
-	StateMap.reset(StateFlag::FORMSEL);
+	StateMap->reset(StateFlag::FORMSEL);
 	auto const size =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
 	auto horizontalRatio = UnzoomedRect.x / 4.0F / size.x;
@@ -1200,7 +1200,7 @@ void formForms::wavfrm() {
 	form.type        = FRMLINE;
 	form.vertexCount = vertexCount;
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-	StateMap.reset(StateFlag::FORMSEL);
+	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
 	auto horizontalRatio = UnzoomedRect.x / 4.0F / selectedSize.x;

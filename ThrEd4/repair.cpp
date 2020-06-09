@@ -432,7 +432,7 @@ void repair::repar() {
 	ri::reptx();
   }
   repair::lodchk();
-  StateMap.set(StateFlag::RESTCH);
+  StateMap->set(StateFlag::RESTCH);
   displayText::shoMsg(repairMessage);
 }
 

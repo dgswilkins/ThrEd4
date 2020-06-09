@@ -230,7 +230,7 @@ extern float      SnapLength;
 extern float      SpiralWrap;
 extern float      StarRatio;
 
-extern EnumMap<StateFlag> StateMap;
+extern EnumMap<StateFlag>* StateMap;
 
 extern fPOINT StitchBmpRatio;
 extern double StitchBoxesThreshold;
