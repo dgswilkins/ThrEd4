@@ -9419,7 +9419,7 @@ void thred::internal::ritcur() noexcept {
 	auto bitmapBits = std::array<uint8_t, 64> {};
 	GetBitmapBits(iconInfo.hbmMask, 256, bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
-	  for (auto iRow = 0U; iRow < 32; iRow++) {
+	  for (auto iRow = 0; iRow < 32; iRow++) {
 		auto const mask          = byteSwap(bitmapBits[iRow]);
 		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
 		auto       bitMask       = 0x80000000U;
@@ -9439,7 +9439,7 @@ void thred::internal::ritcur() noexcept {
 	  }
 	}
 	else {
-	  for (auto iRow = 0U; iRow < 32; iRow++) {
+	  for (auto iRow = 0; iRow < 32; iRow++) {
 		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
 		auto       bitMask       = 0x80000000U;
 		for (auto iPixel = 0; iPixel < 32; iPixel++) {
@@ -17870,7 +17870,7 @@ auto handle_program_memory_depletion(uint32_t) -> int32_t {
 }
 #endif
 
-#pragma warning(suppress : 26461) // cppcheck-suppress unusedFunction ; pragma suppresses pointer to const con.3
+#pragma warning(suppress : 26461) // pointer to const con.3 NOLINTNEXTLINE(readability-non-const-parameter)
 auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPTSTR lpCmdLine, _In_ int32_t nShowCmd)
     -> int32_t {
   // to keep the compiler from complaining
