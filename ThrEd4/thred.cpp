@@ -9418,9 +9418,9 @@ void thred::internal::ritcur() noexcept {
 	auto bitmapBits = std::array<uint8_t, 64> {};
 	GetBitmapBits(iconInfo.hbmMask, 256, bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
-	  for (auto iRow = 0; iRow < 32; iRow++) {
+	  for (auto iRow = 0U; iRow < 32; iRow++) {
 		auto const mask          = byteSwap(bitmapBits[iRow]);
-		auto const bitmapInverse = byteSwap(bitmapBits[iRow + 32]);
+		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
 		auto       bitMask       = 0x80000000U;
 		for (auto iPixel = 0; iPixel < 32; iPixel++) {
 		  if ((bitMask & mask) == 0U) {
@@ -9438,8 +9438,8 @@ void thred::internal::ritcur() noexcept {
 	  }
 	}
 	else {
-	  for (auto iRow = 0; iRow < 32; iRow++) {
-		auto const bitmapInverse = byteSwap(bitmapBits[iRow + 32]);
+	  for (auto iRow = 0U; iRow < 32; iRow++) {
+		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
 		auto       bitMask       = 0x80000000U;
 		for (auto iPixel = 0; iPixel < 32; iPixel++) {
 		  if ((bitMask & bitmapInverse) != 0U) {
@@ -16158,7 +16158,7 @@ void thred::internal::ducmd() {
 			  *BalaradName1  = balaradFileName;
 			  auto bytesRead = DWORD {0};
 
-			  ReadFile(BalaradFile, readBuffer.data(), readBuffer.size(), &bytesRead, nullptr);
+			  ReadFile(BalaradFile, readBuffer.data(), gsl::narrow<DWORD>(readBuffer.size()), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
 				readBuffer.resize(bytesRead);
 				BalaradName2->assign(readBuffer.data());

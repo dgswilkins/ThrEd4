@@ -76,7 +76,7 @@ void texture::txdun() {
 	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
-		WriteFile(handle, signature.data(), signature.size(), &bytesWritten, nullptr);
+		WriteFile(handle, signature.data(), gsl::narrow<DWORD>(signature.size()), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
 		for (auto const& historyEntry : TextureHistory) {
@@ -139,7 +139,7 @@ void texture::redtx() {
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
 	  auto sig       = std::array<char, 4> {0};
-	  if (ReadFile(handle, sig.data(), sig.size(), &bytesRead, nullptr) != 0) {
+	  if (ReadFile(handle, sig.data(), gsl::narrow<DWORD>(sig.size()), &bytesRead, nullptr) != 0) {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
 			auto historyBytesRead = DWORD {0};

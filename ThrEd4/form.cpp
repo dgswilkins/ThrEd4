@@ -4467,7 +4467,7 @@ void form::internal::bakseq() {
 	auto const rit            = wrap::round<int32_t>(BSequence->operator[](iSequence).x / StitchSpacing2);
 	auto&      bPrevious      = BSequence->operator[](iSequence - 1U);
 	auto&      bCurrent       = BSequence->operator[](iSequence);
-	auto&      bNext          = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto&      bNext          = BSequence->operator[](iSequence + 1U);
 	auto       delta          = fPOINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 	auto       slope          = 1e38F;
 	// clang-format on
