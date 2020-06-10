@@ -7365,8 +7365,8 @@ void form::movlayr(uint32_t codedLayer) {
 void form::join() {
   // clang-format off
   auto const savedFormIndex = ClosestFormToCursor;
-  auto& savedform           = FormList->operator[](ClosestFormToCursor);
-  auto  lastVertex          = std::next(FormVertices->begin(),
+  auto&      savedform      = FormList->operator[](ClosestFormToCursor);
+  auto       lastVertex     = std::next(FormVertices->begin(),
 										gsl::narrow_cast<ptrdiff_t>(savedform.vertexIndex) + savedform.vertexCount - 1U);
   // clang-format on
   StateMap->set(StateFlag::FRMSAM);
