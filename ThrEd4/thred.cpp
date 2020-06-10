@@ -5144,16 +5144,17 @@ void thred::internal::unlin() {
 
 void thred::internal::movbox() {
   if (!StitchBuffer->empty()) {
-	// cppcheck-suppress unreadVariable
-	auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
 	if (stch2px(ClosestPointIndex)) {
 	  unbox();
+#ifdef _DEBUG
+	  auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
 	  outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
 	                 ClosestPointIndex,
 	                 ((stitch.attribute & FRMSK) >> FRMSHFT),
 	                 ((stitch.attribute & TYPMSK) >> TYPSHFT),
 	                 stitch.x,
 	                 stitch.y);
+#endif
 	  dubox();
 	  if (StateMap->test(StateFlag::UPTO)) {
 		StateMap->set(StateFlag::RESTCH);
