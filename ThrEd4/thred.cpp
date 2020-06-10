@@ -4242,81 +4242,85 @@ auto thred::getFileSize(std::filesystem::path const& newFileName, uintmax_t& siz
 
 auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> bool {
   auto fileSize = uintmax_t {0};
-  if (!getFileSize(newFileName, fileSize)) {
-	return false;
-  }
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto fileHandle = HANDLE {nullptr};
-  if (!thred::getFileHandle(newFileName,fileHandle)) {
-	return false;
-  }
-  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &BytesRead, nullptr);
-  if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
-	for (auto iColor = 0U; iColor < 16U; iColor++) {
-	  UserColor[iColor] = PCSHeader.colors[iColor];
-	}
-	fileSize -= sizeof(PCSHeader);
-	auto const pcsStitchCount = fileSize / sizeof(PCSTCH) + 2U;
-	auto       PCSDataBuffer  = std::vector<PCSTCH> {};
-	PCSDataBuffer.resize(pcsStitchCount);
-	ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &BytesRead, nullptr);
-	auto iStitch      = 0U;
-	auto iColorChange = 0U;
-	auto color        = 0U;
-	auto iPCSstitch   = 0U;
-	StitchBuffer->clear();
-	StitchBuffer->reserve(PCSHeader.stitchCount);
-	while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-	  auto& stitch = PCSDataBuffer[iPCSstitch];
-	  if (stitch.tag == 3) {
-		ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
-		ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-		color                                        = NOTFRM | stitch.fx;
-	  }
-	  else {
-		StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0F,
-		                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / 256.0F,
-		                                    color});
-		iStitch++;
-	  }
-	  iPCSstitch++;
-	}
-	// Grab the bitmap filename
-	auto const* tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
-	strcpy_s(PCSBMPFileName, tnam);
-	// wcscpy_s(fileExtention, sizeof(WorkingFileName) - (fileExtention - WorkingFileName), L"thr");
-	IniFile.auxFileType = AUXPCS;
-	if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
-	  PCSHeader.hoopType = LARGHUP;
-	}
-	auto stitchRect = fRECTANGLE {};
-	sizstch(stitchRect, *StitchBuffer);
-	if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 || stitchRect.top > LHUPY) {
-	  IniFile.hoopSizeX = LHUPX;
-	  IniFile.hoopSizeY = LHUPY;
-	  chkhup();
-	}
-	else {
-	  if (PCSHeader.hoopType == LARGHUP) {
-		IniFile.hoopType  = LARGHUP;
-		IniFile.hoopSizeX = LHUPX;
-		IniFile.hoopSizeY = LHUPY;
-	  }
-	  else {
-		if (stitchRect.right > SHUPX || stitchRect.top > SHUPY) {
-		  IniFile.hoopType  = LARGHUP;
-		  IniFile.hoopSizeX = SHUPX;
-		  IniFile.hoopSizeY = SHUPY;
+  if (getFileSize(newFileName, fileSize)) {
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto fileHandle = HANDLE {nullptr};
+	if (thred::getFileHandle(newFileName, fileHandle)) {
+	  auto bytesRead = DWORD {0};
+	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
+	  if (bytesRead == sizeof(PCSHeader)) {
+		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
+		  for (auto iColor = 0U; iColor < 16U; iColor++) {
+			UserColor[iColor] = PCSHeader.colors[iColor];
+		  }
+		  fileSize -= sizeof(PCSHeader);
+		  auto const pcsStitchCount = fileSize / sizeof(PCSTCH) + 2U;
+		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
+		  PCSDataBuffer.resize(pcsStitchCount);
+		  ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &bytesRead, nullptr);
+		  if (bytesRead != fileSize) {
+			auto iStitch      = 0U;
+			auto iColorChange = 0U;
+			auto color        = 0U;
+			auto iPCSstitch   = 0U;
+			StitchBuffer->clear();
+			StitchBuffer->reserve(PCSHeader.stitchCount);
+			while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
+			  auto& stitch = PCSDataBuffer[iPCSstitch];
+			  if (stitch.tag == 3) {
+				ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
+				ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
+				color                                        = NOTFRM | stitch.fx;
+			  }
+			  else {
+				StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0F,
+				                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / 256.0F,
+				                                    color});
+				iStitch++;
+			  }
+			  iPCSstitch++;
+			}
+			// Grab the bitmap filename
+			auto const* tnam = convert_ptr<char*>(&PCSDataBuffer[iPCSstitch]);
+			strcpy_s(PCSBMPFileName, tnam);
+			IniFile.auxFileType = AUXPCS;
+			if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
+			  PCSHeader.hoopType = LARGHUP;
+			}
+			auto stitchRect = fRECTANGLE {};
+			sizstch(stitchRect, *StitchBuffer);
+			if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 ||
+			    stitchRect.top > LHUPY) {
+			  IniFile.hoopSizeX = LHUPX;
+			  IniFile.hoopSizeY = LHUPY;
+			  chkhup();
+			}
+			else {
+			  if (PCSHeader.hoopType == LARGHUP) {
+				IniFile.hoopType  = LARGHUP;
+				IniFile.hoopSizeX = LHUPX;
+				IniFile.hoopSizeY = LHUPY;
+			  }
+			  else {
+				if (stitchRect.right > SHUPX || stitchRect.top > SHUPY) {
+				  IniFile.hoopType  = LARGHUP;
+				  IniFile.hoopSizeX = SHUPX;
+				  IniFile.hoopSizeY = SHUPY;
+				}
+				else {
+				  IniFile.hoopType  = SMALHUP;
+				  IniFile.hoopSizeX = SHUPX;
+				  IniFile.hoopSizeY = SHUPY;
+				}
+			  }
+			}
+			return true;
+		  }
 		}
-		else {
-		  IniFile.hoopType  = SMALHUP;
-		  IniFile.hoopSizeX = SHUPX;
-		  IniFile.hoopSizeY = SHUPY;
-		}
 	  }
 	}
   }
-  return true;
+  return false;
 }
 
 auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> bool {
