@@ -4303,7 +4303,7 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 		IniFile.hoopSizeY = LHUPY;
 	  }
 	  else {
-		if (stitchRect.right > SHUPX || stitchRect.top > SHUPY || PCSHeader.hoopType == LARGHUP) {
+		if (stitchRect.right > SHUPX || stitchRect.top > SHUPY) {
 		  IniFile.hoopType  = LARGHUP;
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
