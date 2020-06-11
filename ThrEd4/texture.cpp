@@ -1653,37 +1653,39 @@ auto texture::internal::inrct(fRECTANGLE const& rectangle, fPOINTATTR const& sti
 }
 
 void texture::setshft() {
-  auto selectionRect = fRECTANGLE {};
-  texture::savtxt();
-  thred::unbBox();
-  StateMap->reset(StateFlag::BZUMIN);
-  selectionRect.top      = ZoomBoxOrigin.y;
-  selectionRect.left     = ZoomBoxOrigin.x;
-  auto const stitchPoint = thred::pxCor2stch(
-      POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
-  selectionRect.bottom = stitchPoint.y;
-  selectionRect.right  = stitchPoint.x;
-  StateMap->reset(StateFlag::TXIN);
-  auto line = 1U;
-  for (auto& stitch : *StitchBuffer) {
-	if (txi::inrct(selectionRect, stitch)) {
-	  StateMap->set(StateFlag::TXIN);
-	  TempTexturePoints->push_back(TXPNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
-	}
-	else {
-	  if (StateMap->testAndReset(StateFlag::TXIN)) {
-		line++;
+  if (ZoomBoxLine[2].x != 0L && ZoomBoxLine[2].y != 0L) {
+	auto selectionRect = fRECTANGLE {};
+	texture::savtxt();
+	thred::unbBox();
+	StateMap->reset(StateFlag::BZUMIN);
+	selectionRect.top      = ZoomBoxOrigin.y;
+	selectionRect.left     = ZoomBoxOrigin.x;
+	auto const stitchPoint = thred::pxCor2stch(
+	    POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
+	selectionRect.bottom = stitchPoint.y;
+	selectionRect.right  = stitchPoint.x;
+	StateMap->reset(StateFlag::TXIN);
+	auto line = 1U;
+	for (auto& stitch : *StitchBuffer) {
+	  if (txi::inrct(selectionRect, stitch)) {
+		StateMap->set(StateFlag::TXIN);
+		TempTexturePoints->push_back(TXPNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
+	  }
+	  else {
+		if (StateMap->testAndReset(StateFlag::TXIN)) {
+		  line++;
+		}
 	  }
 	}
+	if (!TempTexturePoints->empty()) {
+	  line = TempTexturePoints->back().line;
+	}
+	TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / line;
+	TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
+	TextureScreen.width      = TextureScreen.spacing * line + TextureScreen.spacing / 2;
+	StateMap->set(StateFlag::TXTRED);
+	StateMap->set(StateFlag::RESTCH);
   }
-  if (!TempTexturePoints->empty()) {
-	line = TempTexturePoints->back().line;
-  }
-  TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / line;
-  TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
-  TextureScreen.width      = TextureScreen.spacing * line + TextureScreen.spacing / 2;
-  StateMap->set(StateFlag::TXTRED);
-  StateMap->set(StateFlag::RESTCH);
 }
 
 void texture::writeScreenWidth(uint32_t position) {
