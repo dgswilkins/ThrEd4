@@ -253,10 +253,8 @@ void texture::savtxt() {
 	  currentHistoryItem->width   = TextureScreen.width;
 	  currentHistoryItem->spacing = TextureScreen.spacing;
 	  currentHistoryItem->texturePoints.clear();
-	  currentHistoryItem->texturePoints.reserve(TempTexturePoints->size());
-	  for (auto texturePoint : *TempTexturePoints) {
-		currentHistoryItem->texturePoints.push_back(texturePoint);
-	  }
+	  currentHistoryItem->texturePoints.insert(
+	      currentHistoryItem->texturePoints.end(), TempTexturePoints->begin(), TempTexturePoints->end());
 	}
   }
 }
@@ -1665,6 +1663,7 @@ void texture::setshft() {
 	selectionRect.bottom = stitchPoint.y;
 	selectionRect.right  = stitchPoint.x;
 	StateMap->reset(StateFlag::TXIN);
+	TempTexturePoints->clear();
 	auto line = 1U;
 	for (auto& stitch : *StitchBuffer) {
 	  if (txi::inrct(selectionRect, stitch)) {
@@ -1679,6 +1678,9 @@ void texture::setshft() {
 	}
 	if (!TempTexturePoints->empty()) {
 	  line = TempTexturePoints->back().line;
+	}
+	if (IniFile.textureEditorSize == 0U) {
+	  IniFile.textureEditorSize = ITXPIX;
 	}
 	TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / line;
 	TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
