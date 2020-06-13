@@ -1665,13 +1665,15 @@ void texture::setshft() {
 	StateMap->reset(StateFlag::TXIN);
 	TempTexturePoints->clear();
 	auto line = 1U;
+	auto TXin = false;
 	for (auto& stitch : *StitchBuffer) {
 	  if (txi::inrct(selectionRect, stitch)) {
-		StateMap->set(StateFlag::TXIN);
+		TXin = true;
 		TempTexturePoints->push_back(TXPNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
 	  }
 	  else {
-		if (StateMap->testAndReset(StateFlag::TXIN)) {
+		if (TXin) {
+		  TXin = false;
 		  line++;
 		}
 	  }
