@@ -11027,7 +11027,9 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  SelectObject(StitchWindowMemDC, LinePen);
 	  stchbox(ClosestPointIndex - 1, StitchWindowDC);
 	  stchbox(ClosestPointIndex, StitchWindowDC);
-	  stchbox(ClosestPointIndex + 1, StitchWindowDC);
+	  if (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+		stchbox(ClosestPointIndex + 1, StitchWindowDC);
+	  }
 	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
 	StateMap->set(StateFlag::SELBOX);
