@@ -3289,7 +3289,14 @@ void thred::internal::thrsav() {
 		  auto ext   = newFileName.extension().wstring();
 		  ext.back() = gsl::narrow<wchar_t>(iBackup - 1) + 's';
 		  newFileName.replace_extension(ext);
-		  fs::rename(VersionNames->operator[](iBackup - 1U), newFileName);
+		  auto ec = std::error_code {};
+		  fs::rename(VersionNames->operator[](iBackup - 1U), newFileName, ec);
+		  auto msg = ec.message();
+		  if (ec != std::error_code {}) {
+			// ToDo - find better error message
+			displayText::filnopn(IDS_FNOPN, msg);
+			return;
+		  }
 		}
 	  }
 	}
