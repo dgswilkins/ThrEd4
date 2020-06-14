@@ -939,7 +939,7 @@ void form::flipv() {
 	return;
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
-	auto const offset = AllItemsRect.top + AllItemsRect.bottom;
+	auto const offset = AllItemsRect->top + AllItemsRect->bottom;
 	for (auto& formVertice : *FormVertices) {
 	  formVertice.y = offset - formVertice.y;
 	}
@@ -5800,47 +5800,47 @@ void form::setap() {
   displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1U)));
 }
 
-void form::internal::getbig() noexcept {
-  AllItemsRect = fRECTANGLE {1e9F, 0.0F, 0.0F, 1e9F};
+void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
+  *allItemsRect = fRECTANGLE {1e9F, 0.0F, 0.0F, 1e9F};
   for (auto& iForm : *FormList) {
 	auto const& trct = iForm.rectangle;
-	if (trct.left < AllItemsRect.left) {
-	  AllItemsRect.left = trct.left;
+	if (trct.left < allItemsRect->left) {
+	  allItemsRect->left = trct.left;
 	}
-	if (trct.top > AllItemsRect.top) {
-	  AllItemsRect.top = trct.top;
+	if (trct.top > allItemsRect->top) {
+	  allItemsRect->top = trct.top;
 	}
-	if (trct.right > AllItemsRect.right) {
-	  AllItemsRect.right = trct.right;
+	if (trct.right > allItemsRect->right) {
+	  allItemsRect->right = trct.right;
 	}
-	if (trct.bottom < AllItemsRect.bottom) {
-	  AllItemsRect.bottom = trct.bottom;
+	if (trct.bottom < allItemsRect->bottom) {
+	  allItemsRect->bottom = trct.bottom;
 	}
   }
   for (auto stitch : *StitchBuffer) {
-	if (stitch.x < AllItemsRect.left) {
-	  AllItemsRect.left = stitch.x;
+	if (stitch.x < allItemsRect->left) {
+	  allItemsRect->left = stitch.x;
 	}
-	if (stitch.y > AllItemsRect.top) {
-	  AllItemsRect.top = stitch.y;
+	if (stitch.y > allItemsRect->top) {
+	  allItemsRect->top = stitch.y;
 	}
-	if (stitch.x > AllItemsRect.right) {
-	  AllItemsRect.right = stitch.x;
+	if (stitch.x > allItemsRect->right) {
+	  allItemsRect->right = stitch.x;
 	}
-	if (stitch.y < AllItemsRect.bottom) {
-	  AllItemsRect.bottom = stitch.y;
+	if (stitch.y < allItemsRect->bottom) {
+	  allItemsRect->bottom = stitch.y;
 	}
   }
 }
 
-void form::stchrct2px(fRECTANGLE const& stitchRect, RECT& screenRect) {
-  auto stitchCoord = fPOINT {stitchRect.left, stitchRect.top};
+void form::stchrct2px(fRECTANGLE const* stitchRect, RECT& screenRect) {
+  auto stitchCoord = fPOINT {stitchRect->left, stitchRect->top};
   auto screenCoord = POINT {0L, 0L};
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.left = screenCoord.x;
   screenRect.top  = screenCoord.y;
-  stitchCoord.x   = stitchRect.right;
-  stitchCoord.y   = stitchRect.bottom;
+  stitchCoord.x   = stitchRect->right;
+  stitchCoord.y   = stitchRect->bottom;
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.right  = screenCoord.x;
   screenRect.bottom = screenCoord.y;
@@ -5851,7 +5851,7 @@ void form::selal() {
   SelectedFormList->clear();
   StateMap->reset(StateFlag::SELBOX);
   StateMap->reset(StateFlag::GRPSEL);
-  fi::getbig();
+  fi::getbig(AllItemsRect);
   ZoomRect = fRECTANGLE {
       0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
   ZoomFactor = 1;
@@ -6678,7 +6678,7 @@ void form::fliph() {
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
 	thred::savdo();
-	auto const offset = AllItemsRect.right + AllItemsRect.left;
+	auto const offset = AllItemsRect->right + AllItemsRect->left;
 	for (auto& FormVertice : *FormVertices) {
 	  FormVertice.x = offset - FormVertice.x;
 	}
@@ -7116,7 +7116,7 @@ auto form::rotpar() -> fPOINT {
 	  break;
 	}
 	if (StateMap->test(StateFlag::BIGBOX)) {
-	  RotationRect = AllItemsRect;
+	  RotationRect = *AllItemsRect;
 	  break;
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
@@ -8115,9 +8115,9 @@ void form::cntrx() {
 
 void form::centir() {
   StateMap->reset(StateFlag::BIGBOX);
-  fi::getbig();
-  auto const itemCenter = fPOINT {wrap::midl(AllItemsRect.right, AllItemsRect.left),
-                                  wrap::midl(AllItemsRect.top, AllItemsRect.bottom)};
+  fi::getbig(AllItemsRect);
+  auto const itemCenter = fPOINT {wrap::midl(AllItemsRect->right, AllItemsRect->left),
+                                  wrap::midl(AllItemsRect->top, AllItemsRect->bottom)};
   auto const hoopCenter = fPOINT {UnzoomedRect.x / 2.0F, UnzoomedRect.y / 2.0F};
   auto const delta      = fPOINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
   for (auto& stitch : *StitchBuffer) {

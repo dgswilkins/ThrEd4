@@ -175,7 +175,7 @@ void spltfrm();
 void srtbyfrm();
 void srtfrm();
 void stchadj();
-void stchrct2px(fRECTANGLE const& stitchRect, RECT& screenRect);
+void stchrct2px(fRECTANGLE const* stitchRect, RECT& screenRect);
 void stchs2frm();
 void tglfrm();
 void unfil();
@@ -306,7 +306,7 @@ namespace internal {
   void fshor(FRMHED& form);
   void fspic(uint32_t formIndex);
   void fsvrt();
-  void getbig() noexcept;
+  void getbig(fRECTANGLE* allItemsRect) noexcept;
   auto getlen(std::vector<CLIPNT>&       clipStitchPoints,
               std::vector<double> const& lengths,
               uint32_t                   iPoint,

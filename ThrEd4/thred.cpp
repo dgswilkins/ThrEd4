@@ -9905,10 +9905,10 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	  stitch.x += deltaX;
 	  stitch.y += deltaY;
 	}
-	AllItemsRect.bottom += deltaY;
-	AllItemsRect.top += deltaY;
-	AllItemsRect.left += deltaX;
-	AllItemsRect.right += deltaX;
+	AllItemsRect->bottom += deltaY;
+	AllItemsRect->top += deltaY;
+	AllItemsRect->left += deltaX;
+	AllItemsRect->right += deltaX;
 	form::stchrct2px(AllItemsRect, SelectedFormsRect);
 	StateMap->set(StateFlag::RESTCH);
 	return;
@@ -17919,6 +17919,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
 	if (RegisterClassEx(&wc)) {
+	  auto  private_AllItemsRect              = fRECTANGLE {};
 	  auto  private_AngledFormVertices        = std::vector<fPOINT> {};
 	  auto  private_AuxName                   = fs::path {};
 	  auto  private_BSequence                 = std::vector<BSEQPNT> {};
@@ -18014,6 +18015,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  for (auto iVersion = 0; iVersion < OLDVER; iVersion++) {
 		private_VersionNames.emplace_back(L"");
 	  }
+	  AllItemsRect              = &private_AllItemsRect;
 	  AngledFormVertices        = &private_AngledFormVertices;
 	  AuxName                   = &private_AuxName;
 	  BSequence                 = &private_BSequence;
