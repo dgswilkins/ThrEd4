@@ -4110,11 +4110,11 @@ void thred::internal::bak() {
   redbak();
 }
 
-void thred::internal::prtred() {
-  CloseHandle(FileHandle);
+void thred::internal::prtred(HANDLE fileHandle, uint32_t code) {
+  CloseHandle(fileHandle);
   StateMap->reset(StateFlag::INIT);
   FormList->clear();
-  displayText::tabmsg(IDS_PRT);
+  displayText::tabmsg(code);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -4334,13 +4334,14 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = HANDLE {nullptr};
   if (!thred::getFileHandle(newFileName,fileHandle)) {
+	prtred(fileHandle, IDS_PRT);
 	return false;
   }
   auto thredHeader = STRHED {};
   ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &BytesRead, nullptr);
   if ((thredHeader.headerType & 0xffffffU) == 0x746872U) {
 	if (BytesRead != sizeof(thredHeader)) {
-	  displayText::tabmsg(IDS_SHRTF);
+	  prtred(fileHandle, IDS_SHRTF);
 	  return false;
 	}
 	auto const version = (thredHeader.headerType & 0xff000000) >> 24U;
@@ -4371,7 +4372,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  case 2: {
 		ReadFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &BytesRead, nullptr);
 		if (BytesRead != sizeof(*ExtendedHeader)) {
-		  displayText::tabmsg(IDS_SHRTF);
+		  prtred(fileHandle, IDS_SHRTF);
 		  return false;
 		}
 		IniFile.hoopSizeX = ExtendedHeader->hoopSizeX;
@@ -4383,7 +4384,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		break;
 	  }
 	  default: {
-		displayText::tabmsg(IDS_NOTVER);
+		prtred(fileHandle, IDS_NOTVER);
 		return false;
 	  }
 	}
@@ -4397,7 +4398,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  if (BytesRead != bytesToRead) {
 		// StitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
 		// StateMap->set(StateFlag::BADFIL);
-		prtred();
+		prtred(fileHandle, IDS_PRT);
 		return false;
 	  }
 	}
@@ -4405,24 +4406,24 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &BytesRead, nullptr);
 	if (BytesRead != sizeof(PCSBMPFileName)) {
 	  PCSBMPFileName[0] = 0;
-	  prtred();
+	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	ReadFile(fileHandle, &BackgroundColor, sizeof(BackgroundColor), &BytesRead, nullptr);
 	if (BytesRead != sizeof(BackgroundColor)) {
 	  BackgroundColor = IniFile.backgroundColor;
-	  prtred();
+	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
 	ReadFile(fileHandle, static_cast<LPVOID>(UserColor), sizeof(UserColor), &BytesRead, nullptr);
 	if (BytesRead != sizeof(UserColor)) {
-	  prtred();
+	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	ReadFile(fileHandle, static_cast<LPVOID>(CustomColor), sizeof(CustomColor), &BytesRead, nullptr);
 	if (BytesRead != sizeof(CustomColor)) {
-	  prtred();
+	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
@@ -4430,7 +4431,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	char msgBuffer[threadLength];
 	ReadFile(fileHandle, static_cast<LPVOID>(msgBuffer), threadLength, &BytesRead, nullptr);
 	if (BytesRead != threadLength) {
-	  prtred();
+	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	auto threadSizebuf  = std::string(std::begin(msgBuffer), sizeof(msgBuffer));
@@ -4482,7 +4483,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	  else {
 		// We have forms but no vertices - blow up the read
-		prtred();
+		prtred(fileHandle, IDS_PRT);
 		return false;
 	  }
 	  FormVertices->shrink_to_fit();
@@ -4554,9 +4555,10 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	}
   }
   else {
-	displayText::tabmsg(IDS_NOTHR);
+	prtred(fileHandle, IDS_NOTHR);
 	return false;
   }
+  CloseHandle(fileHandle);
   return true;
 }
 
@@ -7565,7 +7567,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		else {
 		  // pcsStitchBuffer->resize(BytesRead / sizeof(decltype(StitchBuffer->back())));
 		  // StateMap->set(StateFlag::BADFIL);
-		  prtred();
+		  prtred(InsertedFileHandle, IDS_SHRTF);
 		  return;
 		}
 	  }
