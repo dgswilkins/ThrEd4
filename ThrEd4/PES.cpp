@@ -370,6 +370,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_NOTPES);
 	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	CloseHandle(fileHandle);
 	return false;
   }
   auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
@@ -459,8 +460,10 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_NOTPES);
 	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	CloseHandle(fileHandle);
 	return false;
   }
+  CloseHandle(fileHandle);
   return true;
 }
 

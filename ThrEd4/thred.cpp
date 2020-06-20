@@ -4321,10 +4321,12 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 				}
 			  }
 			}
+			CloseHandle(fileHandle);
 			return true;
 		  }
 		}
 	  }
+	  CloseHandle(fileHandle);
 	}
   }
   return false;

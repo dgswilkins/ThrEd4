@@ -878,6 +878,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
+  CloseHandle(fileHandle);
   return true;
 }
 
