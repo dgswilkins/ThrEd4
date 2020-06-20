@@ -6364,6 +6364,9 @@ void thred::frmdel() {
 	}
   }
   StateMap->reset(StateFlag::FORMSEL);
+  if (ClosestFormToCursor > (FormList->size() - 1U)) {
+	ClosestFormToCursor = 0U;
+  }
 }
 
 void thred::internal::delsfrms(uint32_t code) {
