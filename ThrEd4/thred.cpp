@@ -7144,7 +7144,7 @@ void thred::internal::drwmrk(HDC dc) {
 }
 
 void thred::internal::vubak() {
-  if ((FileHandle != nullptr) || StateMap->test(StateFlag::THUMSHO)) {
+  if (!WorkingFileName->empty() || StateMap->test(StateFlag::THUMSHO)) {
 	StateMap->set(StateFlag::ZUMED);
 	thred::movStch();
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
