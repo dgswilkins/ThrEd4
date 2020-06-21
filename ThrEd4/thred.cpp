@@ -4659,7 +4659,6 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	SetWindowText(
 	    ThrEdWindow,
 	    fmt::format(StringTable->operator[](STR_THRDBY), newFileName.wstring(), *DesignerName).c_str());
-	CloseHandle(FileHandle);
 	StateMap->set(StateFlag::INIT);
 	StateMap->reset(StateFlag::TRSET);
 	if (StateMap->test(StateFlag::NOTHRFIL)) {
@@ -7206,7 +7205,6 @@ void thred::internal::insfil(fs::path& insertedFile) {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
-	FileHandle = nullptr;
 	CloseHandle(fileHandle);
   }
   else {
