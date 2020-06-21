@@ -4265,7 +4265,7 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
 		  PCSDataBuffer.resize(pcsStitchCount);
 		  ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &bytesRead, nullptr);
-		  if (bytesRead != fileSize) {
+		  if (bytesRead == fileSize) {
 			auto iStitch      = 0U;
 			auto iColorChange = 0U;
 			auto color        = 0U;
