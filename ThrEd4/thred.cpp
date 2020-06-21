@@ -226,14 +226,6 @@ int32_t BoxOffset[4];
 uint32_t VerticalIndex;      // vertical index of the color window, calculated from mouse click
 uint32_t ThreadSizeSelected; // thread selected for size change
 
-#if PESACT
-TCHAR const AllFilter[_MAX_PATH + 1] =
-    L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Brother (PES)\0*.pes\0Tajima (DST)\0*.dst\0";
-#else
-wchar_t const AllFilter[_MAX_PATH + 1] =
-    L"Thredworks (THR)\0*.thr\0Pfaff (PCS)\0*.pcs\0Tajima (DST)\0*.dst\0";
-#endif
-
 fs::path* GeName;
 fs::path* DefaultDirectory;
 fs::path* SearchName;
@@ -242,43 +234,10 @@ fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
 fs::path* IniFileName; //.ini file name
 
-wchar_t  CustomFilter[_MAX_PATH + 1] = L"Thredworks (THR)\0*.thr\0";
 HANDLE   FileHandle                  = nullptr;
 HANDLE   IniFileHandle               = nullptr;
 uint32_t FileSize;           // size of file
 DWORD    BytesRead;          // bytes actually read from file
-
-OPENFILENAME OpenFileName = {
-    sizeof(OpenFileName),     // lStructsize
-    nullptr,                  // hwndOwner
-    nullptr,                  // hInstance
-    std::begin(AllFilter),    // lpstrFilter
-    std::begin(CustomFilter), // lpstrCustomFilter
-    _MAX_PATH,                // nMaxCustFilter
-    0,                        // nFilterIndex
-    nullptr,                  // lpstrFile
-    _MAX_PATH,                // nMaxFile
-    nullptr,                  // lpstrFileTitle
-    0,                        // nMaxFileTitle
-    nullptr,                  // lpstrInitialDir
-    nullptr,                  // lpstrTitle
-    OFN_OVERWRITEPROMPT,      // Flags
-    0,                        // nFileOffset
-    0,                        // nFileExtension
-    L"thr",                   // lpstrDefExt
-    0,                        // lCustData
-    nullptr,                  // lpfnHook
-    nullptr,                  // lpTemplateName
-#ifdef _MAC
-    nullptr, // lpEditInfo
-    0U,      // lpstrPrompt
-#endif
-#if (_WIN32_WINNT >= 0x0500)
-    nullptr, // *pvReserved
-    0U,      // dwReserved
-    0U       // FlagsEx
-#endif
-};
 
 std::vector<fs::path>*     PreviousNames;
 std::vector<std::wstring>* Thumbnails;            // vector of thumbnail names
@@ -286,7 +245,6 @@ uint32_t                   ThumbnailsSelected[4]; // indexes of thumbnails selec
 uint32_t ThumbnailDisplayCount;             // number of thumbnail file names selected for display
 uint32_t ThumbnailIndex;                    // index into the thumbnail filname table
 wchar_t  ThumbnailSearchString[32];         // storage for the thumnail search string
-wchar_t  InsertedFileName[_MAX_PATH] = {0}; // insert file name
 uint32_t InsertedVertexIndex;               // saved float pointer for inserting files
 uint32_t InsertedFormIndex;                 // saved form pointer for inserting files
 uint32_t InsertedStitchIndex;               // saved stitch pointer for inserting files
