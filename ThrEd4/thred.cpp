@@ -7505,17 +7505,19 @@ void thred::internal::insfil(fs::path& insertedFile) {
 	  auto pcsFileHeader = PCSHEADER {};
 	  ReadFile(InsertedFileHandle, &pcsFileHeader, 0x46, &BytesRead, nullptr);
 	  if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16U) {
+		auto fileSize = uintmax_t {0};
+		getFileSize(insertedFile, fileSize);
+		fileSize -= sizeof(PCSHeader);
+		auto const pcsStitchCount = fileSize / sizeof(PCSTCH);
 		auto pcsStitchBuffer = std::vector<PCSTCH> {};
-		pcsStitchBuffer.resize(pcsFileHeader.stitchCount);
-		auto bytesToRead =
-		    gsl::narrow<DWORD>(pcsFileHeader.stitchCount * sizeof(decltype(pcsStitchBuffer.back())));
-		ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), bytesToRead, &BytesRead, nullptr);
-		if (BytesRead == bytesToRead) {
+		pcsStitchBuffer.resize(pcsStitchCount);
+		ReadFile(InsertedFileHandle, pcsStitchBuffer.data(), fileSize, &BytesRead, nullptr);
+		if (BytesRead == fileSize) {
 		  thred::savdo();
 		  auto insertIndex = StitchBuffer->size();
-		  StitchBuffer->reserve(StitchBuffer->size() + pcsFileHeader.stitchCount);
+		  StitchBuffer->reserve(StitchBuffer->size() + pcsStitchCount);
 		  auto newAttribute = 0U;
-		  for (auto iPCSStitch = 0U; iPCSStitch < pcsFileHeader.stitchCount; iPCSStitch++) {
+		  for (auto iPCSStitch = 0U; iPCSStitch < pcsStitchCount; iPCSStitch++) {
 			if (pcsStitchBuffer[iPCSStitch].tag == 3) {
 			  newAttribute = pcsStitchBuffer[iPCSStitch++].fx | NOTFRM;
 			}
