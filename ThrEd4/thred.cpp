@@ -7595,18 +7595,6 @@ void thred::internal::thumbak() {
   getbak();
 }
 
-void thred::internal::movbak(char source, char destination) {
-  auto sourceFileName      = *ThrName;
-  auto destinationFileName = sourceFileName; // initialise from local variable
-  auto ext                 = ThrName->extension().wstring();
-  ext.back()               = source;
-  sourceFileName.replace_extension(ext);
-  ext.back() = destination;
-  destinationFileName.replace_extension(ext);
-  fs::remove(destinationFileName);
-  fs::rename(sourceFileName, destinationFileName);
-}
-
 void thred::internal::purg() {
   if (FileHandle != nullptr) {
 	auto fileName = *ThrName;

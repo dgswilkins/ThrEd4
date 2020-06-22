@@ -293,7 +293,6 @@ namespace internal {
   void makCol() noexcept;
   auto makbig(uint32_t start, uint32_t finish) -> uint32_t;
   void mark();
-  void movbak(char source, char destination);
   void movbox();
   void movchk();
   void movi();
