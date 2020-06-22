@@ -441,7 +441,6 @@ enum class StateFlag {
   DELTO,     // user is deleting a form and the associated stitches
   REDOLD,    // user is opening a file from the old file list
   BAKSHO,    // user is looking at backup files
-  DUBAK,     // user has chosen a backup file to load, but may want to save changes
   IGNAM,     // save the thred file without making backups
   PRGMSG,    // delete all backups message is displayed
   NEWBAK,    // user is starting a new file, but may want to save changes
