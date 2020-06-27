@@ -234,7 +234,6 @@ fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
 fs::path* IniFileName; //.ini file name
 
-HANDLE   FileHandle                  = nullptr;
 HANDLE   IniFileHandle               = nullptr;
 uint32_t FileSize;           // size of file
 DWORD    BytesRead;          // bytes actually read from file
@@ -7596,7 +7595,7 @@ void thred::internal::thumbak() {
 }
 
 void thred::internal::purg() {
-  if (FileHandle != nullptr) {
+  if (!ThrName->empty()) {
 	auto fileName = *ThrName;
 	auto ext      = ThrName->extension().wstring();
 	for (auto iLast = 0U; iLast < OLDVER; iLast++) {
@@ -11386,7 +11385,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
-	if (StateMap->test(StateFlag::INIT) || (FileHandle != nullptr)) {
+	if (StateMap->test(StateFlag::INIT) || (!ThrName->empty())) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		if (StateMap->test(StateFlag::SELBOX)) {
@@ -17481,7 +17480,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		if (!StateMap->test(StateFlag::RUNPAT)) {
 		  if (!StateMap->test(StateFlag::HIDSTCH) &&
-		      ((FileHandle != nullptr) || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
+		      ((!ThrName->empty()) || StateMap->test(StateFlag::INIT) || !FormList->empty() ||
 		       StateMap->test(StateFlag::SATPNT)) &&
 		      !StateMap->test(StateFlag::BAKSHO)) {
 			drwStch();
