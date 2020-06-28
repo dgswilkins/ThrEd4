@@ -5948,28 +5948,30 @@ auto thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) -> 
   return stitchCount;
 }
 
-auto thred::internal::sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount)
-    -> uint32_t {
-  FileSize    = sizeof(FORMCLIP) + form.vertexCount * sizeof(decltype(FormVertices->back()));
-  auto length = FileSize;
+void thred::internal::sizclp(FRMHED const& form,
+                             uint32_t&     formFirstStitchIndex,
+                             uint32_t&     formStitchCount,
+                             uint32_t&     length,
+                             uint32_t&     fileSize) {
+  fileSize = sizeof(FORMCLIP) + form.vertexCount * sizeof(decltype(FormVertices->back()));
+  length = fileSize;
   if (form.type == SAT) {
-	FileSize += form.satinGuideCount * sizeof(decltype(SatinGuides->back()));
+	fileSize += form.satinGuideCount * sizeof(decltype(SatinGuides->back()));
   }
   if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 	formStitchCount = frmcnt(ClosestFormToCursor, formFirstStitchIndex);
 	length += formStitchCount;
-	FileSize += length * sizeof(StitchBuffer->front());
+	fileSize += length * sizeof(StitchBuffer->front());
   }
   if (clip::iseclp(form)) {
-	FileSize += form.clipEntries * sizeof(decltype(ClipPoints->back()));
+	fileSize += form.clipEntries * sizeof(decltype(ClipPoints->back()));
   }
   if (clip::isclpx(form)) {
-	FileSize += form.lengthOrCount.clipCount * sizeof(decltype(ClipPoints->back()));
+	fileSize += form.lengthOrCount.clipCount * sizeof(decltype(ClipPoints->back()));
   }
   if (texture::istx(form)) {
-	FileSize += form.fillInfo.texture.count * sizeof(decltype(TexturePointsBuffer->back()));
+	fileSize += form.fillInfo.texture.count * sizeof(decltype(TexturePointsBuffer->back()));
   }
-  return length;
 }
 
 void thred::internal::duclip() {
@@ -6138,11 +6140,12 @@ void thred::internal::duclip() {
 	  else {
 		if (StateMap->test(StateFlag::FORMSEL)) {
 		  // clang-format off
-		  auto       firstStitch = 0U; // points to the first stitch in a form
-		  auto       stitchCount = 0U;
-		  auto&      form        = FormList->operator[](ClosestFormToCursor);
-		  auto const length      = sizclp(form, firstStitch, stitchCount);
+		  auto  firstStitch = 0U; // points to the first stitch in a form
+		  auto  stitchCount = 0U;
+		  auto& form        = FormList->operator[](ClosestFormToCursor);
+		  auto  length      = 0U;
 		  // clang-format on
+		  sizclp(form, firstStitch, stitchCount, length, FileSize);
 		  FileSize += sizeof(FORMCLIP);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
