@@ -6014,16 +6014,14 @@ void thred::internal::duclip() {
 	  EmptyClipboard();
 	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  if (!SelectedFormList->empty()) {
-		auto msiz   = 0U;
 		auto length = 0U;
 		for (auto& selectedForm : (*SelectedFormList)) {
 		  ClosestFormToCursor = selectedForm;
 		  auto& currentForm   = FormList->operator[](selectedForm);
 		  length += sizfclp(currentForm);
-		  msiz += FileSize;
 		}
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, wrap::toSize(msiz) + length);
+		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
 		if (ThrEdClipPointer != nullptr) {
 		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
 		  clipFormsHeader->clipType  = CLP_FRMS;
