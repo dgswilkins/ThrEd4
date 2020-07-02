@@ -6095,8 +6095,7 @@ void form::setexpand(float xyRatio) {
   auto size0     = fPOINT {};
   auto rectangle = fRECTANGLE {};
   thred::savdo();
-  auto  stitchPoint = fPOINT {};
-  auto& form        = FormList->operator[](ClosestFormToCursor);
+  auto stitchPoint = fPOINT {};
   if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 	rectangle.left   = gsl::narrow_cast<float>(SelectedFormsRect.left);
 	rectangle.top    = gsl::narrow_cast<float>(SelectedFormsRect.top);
@@ -6110,7 +6109,7 @@ void form::setexpand(float xyRatio) {
   else {
 	stitchPoint = thred::pxCor2stch(Msg.pt);
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  rectangle = form.rectangle;
+	  rectangle = FormList->operator[](ClosestFormToCursor).rectangle;
 	}
 	else {
 	  rectangle = StitchRangeRect;
@@ -6135,8 +6134,9 @@ void form::setexpand(float xyRatio) {
 	  ratio.x = size1.x / size0.x;
 	  ratio.y = size1.y / size0.y;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
-		form.rectangle.left = rectangle.right - size1.x;
-		form.rectangle.top  = rectangle.bottom + size1.y;
+		auto& formRect = FormList->operator[](ClosestFormToCursor).rectangle;
+		formRect.left  = rectangle.right - size1.x;
+		formRect.top   = rectangle.bottom + size1.y;
 	  }
 	  break;
 	}
@@ -6154,8 +6154,9 @@ void form::setexpand(float xyRatio) {
 	  ratio.x = size1.x / size0.x;
 	  ratio.y = size1.y / size0.y;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
-		form.rectangle.right = rectangle.left + size1.x;
-		form.rectangle.top   = rectangle.bottom + size1.y;
+		auto& formRect = FormList->operator[](ClosestFormToCursor).rectangle;
+		formRect.right = rectangle.left + size1.x;
+		formRect.top   = rectangle.bottom + size1.y;
 	  }
 	  break;
 	}
@@ -6173,8 +6174,9 @@ void form::setexpand(float xyRatio) {
 	  ratio.x = size1.x / size0.x;
 	  ratio.y = size1.y / size0.y;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
-		form.rectangle.right  = rectangle.left + size1.x;
-		form.rectangle.bottom = rectangle.top - size1.y;
+		auto& formRect  = FormList->operator[](ClosestFormToCursor).rectangle;
+		formRect.right  = rectangle.left + size1.x;
+		formRect.bottom = rectangle.top - size1.y;
 	  }
 	  break;
 	}
@@ -6192,8 +6194,9 @@ void form::setexpand(float xyRatio) {
 	  ratio.x = size1.x / size0.x;
 	  ratio.y = size1.y / size0.y;
 	  if (SelectedFormList->empty() && StateMap->test(StateFlag::FORMSEL)) {
-		form.rectangle.left   = rectangle.right - size1.x;
-		form.rectangle.bottom = rectangle.top - size1.y;
+		auto& formRect  = FormList->operator[](ClosestFormToCursor).rectangle;
+		formRect.left   = rectangle.right - size1.x;
+		formRect.bottom = rectangle.top - size1.y;
 	  }
 	  break;
 	}
@@ -6205,12 +6208,12 @@ void form::setexpand(float xyRatio) {
       POINT {wrap::round<int32_t>(reference.x), wrap::round<int32_t>(reference.y)};
   auto const stitchReference = fi::px2stchf(integerReference);
   if (StateMap->test(StateFlag::FPSEL)) {
-	auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+	auto vertexIt = std::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
 	auto iCurrent = SelectedFormVertices.start;
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; iVertex++) {
 	  vertexIt[iCurrent].x = (vertexIt[iCurrent].x - stitchReference.x) * ratio.x + stitchReference.x;
 	  vertexIt[iCurrent].y = (vertexIt[iCurrent].y - stitchReference.y) * ratio.y + stitchReference.y;
-	  iCurrent             = form::pdir(form, iCurrent);
+	  iCurrent             = form::pdir(FormList->operator[](ClosestFormToCursor), iCurrent);
 	}
 	thred::setpsel();
 	form::frmout(ClosestFormToCursor);
@@ -6224,8 +6227,9 @@ void form::setexpand(float xyRatio) {
 	  auto                       vertexIt = std::next(FormVertices->begin(), formIter.vertexIndex);
 	  auto const&                formVertexCount = formIter.vertexCount;
 	  for (auto iVertex = 0U; iVertex < formVertexCount; iVertex++) {
-		vertexIt[iVertex].x = (vertexIt[iVertex].x - stitchReference.x) * ratio.x + stitchReference.x;
-		vertexIt[iVertex].y = (vertexIt[iVertex].y - stitchReference.y) * ratio.y + stitchReference.y;
+		vertexIt->x = (vertexIt->x - stitchReference.x) * ratio.x + stitchReference.x;
+		vertexIt->y = (vertexIt->y - stitchReference.y) * ratio.y + stitchReference.y;
+		++vertexIt;
 	  }
 	  form::frmout(iForm);
 	}
@@ -6238,12 +6242,14 @@ void form::setexpand(float xyRatio) {
   }
   if (!SelectedFormList->empty()) {
 	for (auto selectedForm : (*SelectedFormList)) {
-	  auto& formIter                      = FormList->operator[](selectedForm);
-	  auto                       vertexIt = std::next(FormVertices->begin(), formIter.vertexIndex);
-	  auto const&                formVertexCount = formIter.vertexCount;
+	  auto& form = FormList->operator[](selectedForm);
+
+	  auto const& formVertexCount = form.vertexCount;
+	  auto        vertexIt        = std::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < formVertexCount; iVertex++) {
-		vertexIt[iVertex].x = (vertexIt[iVertex].x - stitchReference.x) * ratio.x + stitchReference.x;
-		vertexIt[iVertex].y = (vertexIt[iVertex].y - stitchReference.y) * ratio.y + stitchReference.y;
+		vertexIt->x = (vertexIt->x - stitchReference.x) * ratio.x + stitchReference.x;
+		vertexIt->y = (vertexIt->y - stitchReference.y) * ratio.y + stitchReference.y;
+		++vertexIt;
 	  }
 	  form::frmout(selectedForm);
 	  ClosestFormToCursor = selectedForm;
@@ -6252,19 +6258,22 @@ void form::setexpand(float xyRatio) {
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto& form = FormList->operator[](ClosestFormToCursor);
+
 	  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; iVertex++) {
-		vertexIt[iVertex].x = (vertexIt[iVertex].x - reference.x) * ratio.x + reference.x;
-		vertexIt[iVertex].y = (vertexIt[iVertex].y - reference.y) * ratio.y + reference.y;
+		vertexIt->x = (vertexIt->x - reference.x) * ratio.x + reference.x;
+		vertexIt->y = (vertexIt->y - reference.y) * ratio.y + reference.y;
+		++vertexIt;
 	  }
 	  form::refil();
 	}
 	else {
+	  auto stitchIt = std::next(StitchBuffer->begin(), GroupStartStitch);
 	  for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; iStitch++) {
-		StitchBuffer->operator[](iStitch).x =
-		    (StitchBuffer->operator[](iStitch).x - reference.x) * ratio.x + reference.x;
-		StitchBuffer->operator[](iStitch).y =
-		    (StitchBuffer->operator[](iStitch).y - reference.y) * ratio.y + reference.y;
+		stitchIt->x = (stitchIt->x - reference.x) * ratio.x + reference.x;
+		stitchIt->y = (stitchIt->y - reference.y) * ratio.y + reference.y;
+		++stitchIt;
 	  }
 	}
   }
