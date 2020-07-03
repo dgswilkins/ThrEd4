@@ -226,7 +226,6 @@ int32_t BoxOffset[4];
 uint32_t VerticalIndex;      // vertical index of the color window, calculated from mouse click
 uint32_t ThreadSizeSelected; // thread selected for size change
 
-fs::path* GeName;
 fs::path* DefaultDirectory;
 fs::path* SearchName;
 fs::path* BalaradName0; // balarad semaphore file
@@ -853,8 +852,6 @@ void thred::internal::nunams() {
   }
   *ThrName = *WorkingFileName;
   ThrName->replace_extension(L".thr");
-  *GeName = *WorkingFileName;
-  GeName->replace_extension(L".th*");
   auto  flag          = true;
   auto& previousNames = *PreviousNames;
   for (auto iPrevious = 0U; iPrevious < OLDNUM; iPrevious++) {
@@ -3224,7 +3221,9 @@ void thred::internal::thrsav() {
   if (!StateMap->testAndReset(StateFlag::IGNAM)) {
 	auto  fileData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto file     = FindFirstFile(GeName->wstring().c_str(), &fileData);
+	auto geName = *WorkingFileName;
+	geName.replace_extension(L".th*");
+	auto file     = FindFirstFile(geName.wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (file != INVALID_HANDLE_VALUE) {
 	  StateMap->reset(StateFlag::CMPDO);
@@ -17838,7 +17837,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  private_FormOnOff                 = std::wstring {};
 	  auto  private_FormVertices              = std::vector<fPOINT> {};
 	  auto  private_FormVerticesAsLine        = std::vector<POINT> {};
-	  auto  private_GeName                    = fs::path {};
 	  auto  private_HomeDirectory             = fs::path {};
 	  auto  private_IniFileName               = fs::path {};
 	  auto  private_InsidePointList           = std::vector<fPOINT> {};
@@ -17933,7 +17931,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormOnOff                 = &private_FormOnOff;
 	  FormVertices              = &private_FormVertices;
 	  FormVerticesAsLine        = &private_FormVerticesAsLine;
-	  GeName                    = &private_GeName;
 	  HomeDirectory             = &private_HomeDirectory;
 	  IniFileName               = &private_IniFileName;
 	  InsidePointList           = &private_InsidePointList;
