@@ -227,7 +227,6 @@ uint32_t VerticalIndex;      // vertical index of the color window, calculated f
 uint32_t ThreadSizeSelected; // thread selected for size change
 
 fs::path* DefaultDirectory;
-fs::path* SearchName;
 fs::path* BalaradName0; // balarad semaphore file
 fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
@@ -8640,15 +8639,15 @@ void thred::internal::thumnail() {
   thred::undat();
   trace::untrace();
   fs::current_path(*DefaultDirectory);
-  *SearchName = *DefaultDirectory / L"*.thr";
+  auto searchName = *DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto file  = FindFirstFile(SearchName->wstring().c_str(), &fileData);
+  auto file  = FindFirstFile(searchName.wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
 	auto       fmtStr  = std::wstring {};
 	displayText::loadString(fmtStr, IDS_FFINDERR);
-	displayText::shoMsg(fmt::format(fmtStr, SearchName->wstring(), dwError));
+	displayText::shoMsg(fmt::format(fmtStr, searchName.wstring(), dwError));
 	unthum();
   }
   else {
@@ -17868,7 +17867,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_RubberBandLine            = std::vector<POINT> {};
 	  auto private_SatinGuides               = std::vector<SATCON> {};
 	  auto private_SearchLine                = std::vector<POINT> {};
-	  auto private_SearchName                = fs::path {};
 	  auto private_SelectedFormList          = std::vector<uint32_t> {};
 	  auto private_SelectedFormsLine         = std::vector<POINT> {};
 	  auto private_SelectedPointsLine        = std::vector<POINT> {};
@@ -17944,7 +17942,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  RubberBandLine            = &private_RubberBandLine;
 	  SatinGuides               = &private_SatinGuides;
 	  SearchLine                = &private_SearchLine;
-	  SearchName                = &private_SearchName;
 	  SelectedFormList          = &private_SelectedFormList;
 	  SelectedFormsLine         = &private_SelectedFormsLine;
 	  SelectedPointsLine        = &private_SelectedPointsLine;
