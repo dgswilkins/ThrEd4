@@ -235,7 +235,6 @@ fs::path* BalaradName2;
 fs::path* IniFileName; //.ini file name
 
 HANDLE   IniFileHandle               = nullptr;
-uint32_t FileSize;           // size of file
 
 std::vector<fs::path>*     PreviousNames;
 std::vector<std::wstring>* Thumbnails;            // vector of thumbnail names
@@ -6143,10 +6142,11 @@ void thred::internal::duclip() {
 		  auto& form        = FormList->operator[](ClosestFormToCursor);
 		  auto  length      = 0U;
 		  // clang-format on
-		  sizclp(form, firstStitch, stitchCount, length, FileSize);
-		  FileSize += sizeof(FORMCLIP);
+		  auto clipSize = 0U;
+		  sizclp(form, firstStitch, stitchCount, length, clipSize);
+		  clipSize += sizeof(FORMCLIP);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, FileSize);
+		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
 		  if (ThrEdClipPointer != nullptr) {
 			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
 			clipFormHeader->clipType = CLP_FRM;
