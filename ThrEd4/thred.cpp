@@ -806,27 +806,28 @@ void thred::internal::redfils() {
 	  DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
 	}
   }
-  auto& previousNames = *PreviousNames;
-  for (auto iLRU = 0U; iLRU < OLDNUM; iLRU++) {
-	if (!previousNames[iLRU].empty()) {
+  auto previousName = PreviousNames->begin();
+  for (auto iLRU = 0U; iLRU < PreviousNames->size(); iLRU++) {
+	if (!previousName->empty()) {
 	  if (StateMap->test(StateFlag::SAVAS)) {
 		AppendMenu(
-		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
+		    FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto fileHandle = FindFirstFile(previousNames[iLRU].c_str(), &findData);
+		auto fileHandle = FindFirstFile(previousName->c_str(), &findData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (fileHandle == INVALID_HANDLE_VALUE) {
-		  previousNames[iLRU].clear();
+		  previousName->clear();
 		}
 		else {
 		  AppendMenu(
-		      FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousNames[iLRU].wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
+		      FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
 		  FindClose(fileHandle);
 		}
 	  }
 	}
+	++previousName;
   }
   StateMap->set(StateFlag::DUMEN);
 }
@@ -852,32 +853,32 @@ void thred::internal::nunams() {
   *ThrName = *WorkingFileName;
   ThrName->replace_extension(L".thr");
   auto  flag          = true;
-  auto& previousNames = *PreviousNames;
-  for (auto iPrevious = 0U; iPrevious < OLDNUM; iPrevious++) {
-	if (previousNames[iPrevious] == *ThrName) {
+  auto previousName = PreviousNames->begin();
+  for (auto iPrevious = 0U; iPrevious < PreviousNames->size(); iPrevious++) {
+	if (*previousName == *ThrName) {
 	  if (iPrevious != 0U) {
-		std::swap(previousNames[0], previousNames[iPrevious]);
+		std::iter_swap(PreviousNames->begin(), previousName);
 		flag = false;
 		break;
 	  }
-
 	  return;
 	}
+	++previousName;
   }
   if (flag) {
-	for (auto iPrevious = 0U; iPrevious < OLDNUM; iPrevious++) {
-	  if (previousNames[iPrevious].empty()) {
-		previousNames[iPrevious].assign(*ThrName);
+	previousName = PreviousNames->begin();
+	for (auto iPrevious = 0U; iPrevious < PreviousNames->size(); iPrevious++) {
+	  if (previousName->empty()) {
+		previousName->assign(*ThrName);
 		flag = false;
 		break;
 	  }
+	  ++previousName;
 	}
   }
   if (flag) {
-	previousNames[3] = previousNames[2];
-	previousNames[2] = previousNames[1];
-	previousNames[1] = previousNames[0];
-	previousNames[0].assign(*ThrName);
+	PreviousNames->insert(PreviousNames->begin(), *ThrName);
+	PreviousNames->pop_back();
   }
   redfils();
 }
@@ -2808,18 +2809,15 @@ void thred::internal::ritini() {
   constexpr char fillchar         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), fillchar);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
-  auto const& previousNames = *PreviousNames;
-  {
-	auto iVersion = 0U;
-	for (auto& prevName : IniFile.prevNames) {
-	  auto const name = gsl::span<char> {prevName};
-	  std::fill(name.begin(), name.end(), fillchar);
-	  if (!previousNames[iVersion].empty()) {
-		auto previous = utf::Utf16ToUtf8(previousNames[iVersion]);
-		std::copy(previous.cbegin(), previous.cend(), name.begin());
-	  }
-	  iVersion++;
+  auto previousName = PreviousNames->begin();
+  for (auto& prevName : IniFile.prevNames) {
+	auto const name = gsl::span<char> {prevName};
+	std::fill(name.begin(), name.end(), fillchar);
+	if (!previousName->empty()) {
+	  auto previous = utf::Utf16ToUtf8(*previousName);
+	  std::copy(previous.cbegin(), previous.cend(), name.begin());
 	}
+	++previousName;
   }
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
   auto&      desName      = IniFile.designerName;
@@ -15897,15 +15895,14 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	case WM_COMMAND: {
 	  thred::unmsg();
 	  {
-		auto const& previousNames = *PreviousNames;
-		auto        iVersion      = 0U;
+		auto previousName = PreviousNames->begin();
 		for (auto const iLRU : LRUMenuId) {
 		  if (Msg.wParam == iLRU) {
-			*WorkingFileName = previousNames[iVersion];
+			*WorkingFileName = *previousName;
 			StateMap->set(StateFlag::REDOLD);
 			nuFil(fileIndices::THR);
 		  }
-		  iVersion++;
+		  ++previousName;
 		}
 	  }
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
@@ -16117,16 +16114,15 @@ void thred::internal::redini() {
 	  auto directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
 	  {
-		auto& previousNames = *PreviousNames;
-		auto  iVersion      = 0U;
+		auto previousName = PreviousNames->begin();
 		for (auto const& prevName : IniFile.prevNames) {
 		  if (strlen(std::begin(prevName)) != 0U) {
-			previousNames[iVersion].assign(utf::Utf8ToUtf16(std::string(std::begin(prevName))));
+			previousName->assign(utf::Utf8ToUtf16(std::string(std::begin(prevName))));
 		  }
 		  else {
-			previousNames[iVersion].clear();
+			previousName->clear();
 		  }
-		  iVersion++;
+		  ++previousName;
 		}
 	  }
 	  DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
