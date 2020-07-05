@@ -73,7 +73,6 @@ RECT            StitchWindowAbsRect;     // stitch window size,absolute
 POINT           NearestPixel[NERCNT];    // selected points
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
 uint32_t        PrevGroupEndStitch;      // higher end of previous selection
-uint32_t        BufferDigitCount;        // number of decimal digits in the number of stitches
 uint32_t        LineIndex;               // line index for display routine
 float           StitchWindowAspectRatio; // aspect ratio of the stitch window
 FORMVERTEXCLIP* ClipFormVerticesData;    // form points clipboard header
@@ -2157,7 +2156,6 @@ void thred::internal::rstAll() {
 
 void thred::ritot(uint32_t number) {
   auto txt         = fmt::format(StringTable->operator[](STR_TOT), number);
-  BufferDigitCount = wrap::toUnsigned(txt.size());
   displayText::butxt(HTOT, txt);
 }
 
@@ -2685,7 +2683,6 @@ void thred::internal::ritlayr() {
   }
   else {
 	auto txt         = fmt::format(StringTable->operator[](STR_LAYR), layer);
-	BufferDigitCount = wrap::toUnsigned(txt.size());
 	displayText::butxt(HLAYR, txt);
   }
 }
