@@ -69,7 +69,6 @@ uint32_t        CurrentStitchIndex;      // pointer to the current selection for
 HDC             ThredDC;                 // main device context handle
 HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device context
 SIZE            ScreenSizePixels;        // screen size in pixels
-SIZE            ScreenSizeMM;            // screen size in millimeters
 RECT            StitchWindowAbsRect;     // stitch window size,absolute
 POINT           NearestPixel[NERCNT];    // selected points
 POINT           BoxCoordinate = {0, 0};  // single select box point
@@ -16378,8 +16377,6 @@ void thred::internal::init() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   StitchWindowDC    = GetDCEx(MainStitchWin, nullptr, DCX_PARENTCLIP | DCX_CLIPSIBLINGS);
   StitchWindowMemDC = CreateCompatibleDC(StitchWindowDC);
-  ScreenSizeMM.cx   = GetDeviceCaps(ThredDC, HORZSIZE);
-  ScreenSizeMM.cy   = GetDeviceCaps(ThredDC, VERTSIZE);
   chkirct();
   if (!UserFlagMap->test(UserFlag::SAVMAX)) {
 	MoveWindow(ThrEdWindow,
