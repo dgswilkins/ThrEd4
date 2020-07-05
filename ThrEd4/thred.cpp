@@ -71,7 +71,6 @@ HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device 
 SIZE            ScreenSizePixels;        // screen size in pixels
 RECT            StitchWindowAbsRect;     // stitch window size,absolute
 POINT           NearestPixel[NERCNT];    // selected points
-double          DistanceToClick;         // distance of closest point to a mouse click
 uint32_t        ClosestPointIndexClone;  // copy of index of closest point
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
 uint32_t        PrevGroupEndStitch;      // higher end of previous selection
@@ -4957,7 +4956,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 	  }
 	}
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-	DistanceToClick        = 1e99;
+	auto distanceToClick        = 1e99;
 	if (StateMap->test(StateFlag::HID)) {
 	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 		if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
@@ -4972,8 +4971,8 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 			  auto const cy =
 			      ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
 			  auto const currentDistance = hypot(cx, cy);
-			  if (currentDistance < DistanceToClick) {
-				DistanceToClick = currentDistance;
+			  if (currentDistance < distanceToClick) {
+				distanceToClick = currentDistance;
 				closestIndex    = iStitch;
 			  }
 			}
@@ -4991,8 +4990,8 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 			auto const cx              = stitch.x - stitchPoint.x;
 			auto const cy              = stitch.y - stitchPoint.y;
 			auto const currentDistance = hypot(cx, cy);
-			if (currentDistance < DistanceToClick) {
-			  DistanceToClick = currentDistance;
+			if (currentDistance < distanceToClick) {
+			  distanceToClick = currentDistance;
 			  closestIndex    = currentStitch;
 			}
 		  }
@@ -5000,7 +4999,7 @@ auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
 		currentStitch++;
 	  }
 	}
-	if (DistanceToClick == 1e99) {
+	if (distanceToClick == 1e99) {
 	  return false;
 	}
 	stch2px(closestIndex);
