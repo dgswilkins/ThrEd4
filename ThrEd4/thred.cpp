@@ -3220,7 +3220,8 @@ void thred::internal::thrsav() {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto geName = *WorkingFileName;
 	geName.replace_extension(L".th*");
-	auto file     = FindFirstFile(geName.wstring().c_str(), &fileData);
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto file = FindFirstFile(geName.wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (file != INVALID_HANDLE_VALUE) {
 	  StateMap->reset(StateFlag::CMPDO);
@@ -7196,6 +7197,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
   if (insertedFile.empty()) {
 	getNewFileName(insertedFile, fileStyles::INS_FILES, fileIndices::THR);
   }
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
