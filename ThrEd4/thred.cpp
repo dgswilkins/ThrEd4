@@ -4935,82 +4935,78 @@ void thred::internal::closPnt() {
   boxs();
 }
 
-auto thred::internal::closPnt1(uint32_t* closestStitch) -> bool {
-  if (closestStitch != nullptr) {
-	auto       closestIndex = 0U;
-	auto const pointToCheck =
-	    POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-	if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
-	  if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
-		*closestStitch = ClosestPointIndex;
-		return true;
-	  }
+auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
+  auto       closestIndex = 0U;
+  auto const pointToCheck = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
+  if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
+	if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
+	  closestStitch = ClosestPointIndex;
+	  return true;
 	}
-	for (auto iNear = 0U; iNear < NearestCount; iNear++) {
-	  auto const offset = BoxOffset[iNear];
-	  if (pointToCheck.x >= NearestPixel[iNear].x - offset && pointToCheck.x <= NearestPixel[iNear].x + offset &&
-	      pointToCheck.y >= NearestPixel[iNear].y - offset && pointToCheck.y <= NearestPixel[iNear].y + offset) {
-		*closestStitch = NearestPoint[iNear];
-		return true;
-	  }
+  }
+  for (auto iNear = 0U; iNear < NearestCount; iNear++) {
+	auto const offset = BoxOffset[iNear];
+	if (pointToCheck.x >= NearestPixel[iNear].x - offset && pointToCheck.x <= NearestPixel[iNear].x + offset &&
+	    pointToCheck.y >= NearestPixel[iNear].y - offset && pointToCheck.y <= NearestPixel[iNear].y + offset) {
+	  closestStitch = NearestPoint[iNear];
+	  return true;
 	}
-	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-	auto distanceToClick        = 1e99;
-	if (StateMap->test(StateFlag::HID)) {
-	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-		if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
-		  for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
-		       iStitch < ColorChangeTable[iColor + 1U].stitchIndex;
-		       iStitch++) {
-			auto const stitch = StitchBuffer->operator[](iStitch);
-			if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
-			    stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
-			  auto const cx =
-			      ((stitch.x > stitchPoint.x) ? (stitch.x - stitchPoint.x) : (stitchPoint.x - stitch.x));
-			  auto const cy =
-			      ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
-			  auto const currentDistance = hypot(cx, cy);
-			  if (currentDistance < distanceToClick) {
-				distanceToClick = currentDistance;
-				closestIndex    = iStitch;
-			  }
-			}
-		  }
-		}
-	  }
-	}
-	else {
-	  auto currentStitch = 0U;
-	  for (auto& stitch : *StitchBuffer) {
-		auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
-		if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
+  }
+  auto const stitchPoint     = thred::pxCor2stch(Msg.pt);
+  auto       distanceToClick = 1e99;
+  if (StateMap->test(StateFlag::HID)) {
+	for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
+	  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
+		for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
+		     iStitch < ColorChangeTable[iColor + 1U].stitchIndex;
+		     iStitch++) {
+		  auto const stitch = StitchBuffer->operator[](iStitch);
 		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
 		      stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
-			auto const cx              = stitch.x - stitchPoint.x;
-			auto const cy              = stitch.y - stitchPoint.y;
+			auto const cx =
+			    ((stitch.x > stitchPoint.x) ? (stitch.x - stitchPoint.x) : (stitchPoint.x - stitch.x));
+			auto const cy =
+			    ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
 			auto const currentDistance = hypot(cx, cy);
 			if (currentDistance < distanceToClick) {
 			  distanceToClick = currentDistance;
-			  closestIndex    = currentStitch;
+			  closestIndex    = iStitch;
 			}
 		  }
 		}
-		currentStitch++;
 	  }
 	}
-	if (distanceToClick == 1e99) {
-	  return false;
+  }
+  else {
+	auto currentStitch = 0U;
+	for (auto& stitch : *StitchBuffer) {
+	  auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
+	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
+		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
+		    stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
+		  auto const cx              = stitch.x - stitchPoint.x;
+		  auto const cy              = stitch.y - stitchPoint.y;
+		  auto const currentDistance = hypot(cx, cy);
+		  if (currentDistance < distanceToClick) {
+			distanceToClick = currentDistance;
+			closestIndex    = currentStitch;
+		  }
+		}
+	  }
+	  currentStitch++;
 	}
-	stch2px(closestIndex);
-	if (StateMap->test(StateFlag::IGNTHR)) {
-	  *closestStitch = closestIndex;
-	  return true;
-	}
-	if (hypot(pointToCheck.x - StitchCoordinatesPixels.x, pointToCheck.y - StitchCoordinatesPixels.y) < CLOSENUF) {
-	  *closestStitch = closestIndex;
-	  return true;
-	}
+  }
+  if (distanceToClick == 1e99) {
 	return false;
+  }
+  stch2px(closestIndex);
+  if (StateMap->test(StateFlag::IGNTHR)) {
+	closestStitch = closestIndex;
+	return true;
+  }
+  if (hypot(pointToCheck.x - StitchCoordinatesPixels.x, pointToCheck.y - StitchCoordinatesPixels.y) < CLOSENUF) {
+	closestStitch = closestIndex;
+	return true;
   }
   return false;
 }
@@ -5368,7 +5364,7 @@ void thred::internal::istch() {
 }
 
 void thred::internal::mark() {
-  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT) || closPnt1(&ClosestPointIndex)) {
+  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT) || closPnt1(ClosestPointIndex)) {
 	unbox();
 	xlin();
 	StateMap->reset(StateFlag::CAPT);
@@ -5493,7 +5489,7 @@ void thred::unbBox() {
 
 void thred::internal::rebox() {
   unbox();
-  if (closPnt1(&ClosestPointIndex)) {
+  if (closPnt1(ClosestPointIndex)) {
 	nuAct(ClosestPointIndex);
 	if (stch2px(ClosestPointIndex)) {
 	  dubox();
@@ -6956,7 +6952,7 @@ void thred::internal::delet() {
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}
-	if (!satinFlag && closPnt1(&ClosestPointIndex)) {
+	if (!satinFlag && closPnt1(ClosestPointIndex)) {
 	  if (StitchBuffer->size() > 2U) {
 		delstch1(ClosestPointIndex);
 		if (!stch2px(ClosestPointIndex)) {
@@ -11346,7 +11342,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 			StateMap->reset(StateFlag::FORMSEL);
 		  }
 		  StateMap->set(StateFlag::DUMEN);
-		  if (!closPnt1(&ClosestPointIndex)) {
+		  if (!closPnt1(ClosestPointIndex)) {
 			unbox();
 		  }
 		} while (false);
@@ -11378,7 +11374,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
 		if (StateMap->test(StateFlag::SELBOX)) {
 		  auto const code = ClosestPointIndex;
-		  closPnt1(&ClosestPointIndex);
+		  closPnt1(ClosestPointIndex);
 		  if (ClosestPointIndex != code) {
 			unbox();
 			GroupStitchIndex  = ClosestPointIndex;
@@ -11392,7 +11388,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		}
 		if (StateMap->test(StateFlag::GRPSEL)) {
 		  auto const code = ClosestPointIndex;
-		  closPnt1(&ClosestPointIndex);
+		  closPnt1(ClosestPointIndex);
 		  GroupStitchIndex  = ClosestPointIndex;
 		  ClosestPointIndex = code;
 		  thred::grpAdj();
@@ -12803,7 +12799,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		return true;
 	  }
 	  auto closestPointIndexClone = uint32_t {};
-	  if ((!StateMap->test(StateFlag::HIDSTCH)) && closPnt1(&closestPointIndexClone)) {
+	  if ((!StateMap->test(StateFlag::HIDSTCH)) && closPnt1(closestPointIndexClone)) {
 		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
