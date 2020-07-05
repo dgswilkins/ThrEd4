@@ -71,7 +71,6 @@ HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device 
 SIZE            ScreenSizePixels;        // screen size in pixels
 RECT            StitchWindowAbsRect;     // stitch window size,absolute
 POINT           NearestPixel[NERCNT];    // selected points
-POINT           BoxCoordinate = {0, 0};  // single select box point
 double          DistanceToClick;         // distance of closest point to a mouse click
 uint32_t        ClosestPointIndexClone;  // copy of index of closest point
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
