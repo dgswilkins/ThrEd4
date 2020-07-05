@@ -74,7 +74,6 @@ POINT           NearestPixel[NERCNT];    // selected points
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
 uint32_t        PrevGroupEndStitch;      // higher end of previous selection
 float           StitchWindowAspectRatio; // aspect ratio of the stitch window
-FORMVERTEXCLIP* ClipFormVerticesData;    // form points clipboard header
 void*           ThrEdClipPointer;        // for memory allocation for thred format clipboard data
 POINT           ClipOrigin;              // origin of clipboard box in stitch coordinates
 SIZE            SelectBoxSize;           // size of the select box
@@ -13029,11 +13028,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
   if (ClipMemory != nullptr) {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {
-	  ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(ClipPointer);
-	  if (ClipFormVerticesData->clipType == CLP_FRMPS) {
+	  auto formVerticesData = convert_ptr<FORMVERTEXCLIP*>(ClipPointer);
+	  if (formVerticesData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
-		    sizeof(*ClipFormVerticesData) + (wrap::toSize(ClipFormVerticesData->vertexCount) + 1U) *
+		    sizeof(*formVerticesData) + (wrap::toSize(formVerticesData->vertexCount) + 1U) *
 		                                        sizeof(decltype(FormVertices->back()));
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
@@ -13041,17 +13040,17 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.begin(), clipSpan.end());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
-		ClipFormVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
+		formVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = FormList->operator[](ClosestFormToCursor);
 		  auto  vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 		  // clang-format on
 		  InterleaveSequence->clear();
-		  InterleaveSequence->reserve(wrap::toSize(ClipFormVerticesData->vertexCount) + 3U);
+		  InterleaveSequence->reserve(wrap::toSize(formVerticesData->vertexCount) + 3U);
 		  InterleaveSequence->push_back(vertexIt[ClosestVertexToCursor]);
-		  auto*      clipData = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
-		  auto const vertSpan = gsl::span<fPOINT>(clipData, ClipFormVerticesData->vertexCount);
+		  auto*      clipData = convert_ptr<fPOINT*>(&formVerticesData[1]);
+		  auto const vertSpan = gsl::span<fPOINT>(clipData, formVerticesData->vertexCount);
 		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.begin(), vertSpan.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(vertexIt[nextVertex]);
@@ -13067,9 +13066,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
 		  auto& formIter       = FormList->back();
 		  formIter.type        = FRMLINE;
-		  formIter.vertexCount = ClipFormVerticesData->vertexCount + 1U;
+		  formIter.vertexCount = formVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
-		  auto*      vertices  = convert_ptr<fPOINT*>(&ClipFormVerticesData[1]);
+		  auto*      vertices  = convert_ptr<fPOINT*>(&formVerticesData[1]);
 		  auto const vertSpan  = gsl::span<fPOINT>(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), vertSpan.begin(), vertSpan.end());
 		  StateMap->set(StateFlag::INIT);
