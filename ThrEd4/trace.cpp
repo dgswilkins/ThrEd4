@@ -1155,13 +1155,13 @@ void trace::tracpar() {
 }
 
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
-  auto const NumeralWidth = thred::txtWid(L"0");
+  auto const zeroWidth = thred::txtWid(L"0");
   wchar_t    buffer[11]   = {0};
   color >>= shift;
   color &= 0xffU;
   _itow_s(color, buffer, 10);
   auto const bufferLength = gsl::narrow<uint32_t>(wcslen(std::begin(buffer)));
-  auto const xPosition    = NumeralWidth * (3U - bufferLength) + 1U;
+  auto const xPosition    = zeroWidth.cx * (3U - bufferLength) + 1U;
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
   wrap::TextOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
 }

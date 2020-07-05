@@ -87,7 +87,7 @@ void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 void stch2pxr(fPOINT const& stitchCoordinate);
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
-auto txtWid(wchar_t const* string) noexcept -> int32_t;
+auto txtWid(wchar_t const* string) noexcept -> SIZE;
 void unbBox();
 void unbsho();
 void undat() noexcept;

@@ -68,7 +68,6 @@ uint32_t        LargestStitchIndex;      // pointer to the largest stitch in the
 uint32_t        CurrentStitchIndex;      // pointer to the current selection for length search
 HDC             ThredDC;                 // main device context handle
 HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device context
-SIZE            TextSize;                // used for measuring sizes of text items
 SIZE            ScreenSizePixels;        // screen size in pixels
 SIZE            ScreenSizeMM;            // screen size in millimeters
 RECT            StitchWindowAbsRect;     // stitch window size,absolute
@@ -15929,9 +15928,10 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 }
 
 // return the width of a text item
-auto thred::txtWid(wchar_t const* string) noexcept -> int32_t {
-  wrap::GetTextExtentPoint32(ThredDC, string, gsl::narrow<uint32_t>(wcslen(string)), &TextSize);
-  return TextSize.cx;
+auto thred::txtWid(wchar_t const* string) noexcept -> SIZE {
+  auto textSize = SIZE {};
+  wrap::GetTextExtentPoint32(ThredDC, string, gsl::narrow<uint32_t>(wcslen(string)), &textSize);
+  return textSize;
 }
 
 void thred::internal::makCol() noexcept {
@@ -16393,12 +16393,13 @@ void thred::internal::init() {
   auto hFont = displayText::getThrEdFont(400);
   SelectObject(ThredDC, hFont);
   SelectObject(StitchWindowDC, hFont);
-  ButtonWidth               = thred::txtWid(L"MM") + TXTSIDS;
+  auto size = thred::txtWid(L"MM");
+  ButtonWidth               = size.cx + TXTSIDS;
   ButtonWidthX3             = ButtonWidth * 3;
-  ButtonHeight              = TextSize.cy + 4;
+  ButtonHeight              = size.cy + 4;
   auto const offsetStepSize = thred::txtWid(L"0");
   for (auto iOffset = 0U; iOffset < NERCNT; iOffset++) {
-	BoxOffset[iOffset] = offsetStepSize * (iOffset + 1);
+	BoxOffset[iOffset] = offsetStepSize.cx * (iOffset + 1);
   }
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
