@@ -71,7 +71,6 @@ HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device 
 SIZE            ScreenSizePixels;        // screen size in pixels
 RECT            StitchWindowAbsRect;     // stitch window size,absolute
 POINT           NearestPixel[NERCNT];    // selected points
-uint32_t        ClosestPointIndexClone;  // copy of index of closest point
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
 uint32_t        PrevGroupEndStitch;      // higher end of previous selection
 uint32_t        BufferDigitCount;        // number of decimal digits in the number of stitches
@@ -12803,8 +12802,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
 		return true;
 	  }
-	  if ((!StateMap->test(StateFlag::HIDSTCH)) && closPnt1(&ClosestPointIndexClone)) {
-		ClosestPointIndex = ClosestPointIndexClone;
+	  auto closestPointIndexClone = uint32_t {};
+	  if ((!StateMap->test(StateFlag::HIDSTCH)) && closPnt1(&closestPointIndexClone)) {
+		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
 		setbak(ThreadSizePixels[StitchBuffer->operator[](ClosestPointIndex).attribute & 0xfU] + 3U);
