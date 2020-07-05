@@ -67,7 +67,6 @@ uint32_t        SmallestStitchIndex;     // pointer to the smallest stitch in th
 uint32_t        LargestStitchIndex;      // pointer to the largest stitch in the selected range
 uint32_t        CurrentStitchIndex;      // pointer to the current selection for length search
 HDC             ThredDC;                 // main device context handle
-HDC             ColorBarDC;              // color bar device context
 HBITMAP         StitchWindowBmp;         // bitmap for the memory stitch device context
 SIZE            TextSize;                // used for measuring sizes of text items
 SIZE            ScreenSizePixels;        // screen size in pixels
@@ -977,10 +976,6 @@ void thred::redraw(HWND window) noexcept {
 void thred::internal::nuRct() noexcept {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   GetWindowRect(ColorBar, &ColorBarRect);
-  if (ColorBarDC != nullptr) {
-	ReleaseDC(ColorBar, ColorBarDC);
-	ColorBarDC = GetDC(ColorBar);
-  }
   if (StitchWindowMemDC != nullptr) {
 	DeleteDC(StitchWindowMemDC);
   }
