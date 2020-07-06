@@ -84,7 +84,7 @@ void selRct(fRECTANGLE& sourceRect) noexcept;
 void setpsel();
 void shft(fPOINT const& delta) noexcept;
 void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
-void stch2pxr(fPOINT const& stitchCoordinate);
+auto stch2pxr(fPOINT const& stitchCoordinate) -> POINT;
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
 auto txtWid(wchar_t const* string) noexcept -> SIZE;
@@ -166,9 +166,9 @@ namespace internal {
   void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint) noexcept;
   void duIns();
   void duSelbox();
-  void duar();
+  void duar(POINT const& stitchCoordsInPixels);
   void dubar();
-  void dubox();
+  void dubox(POINT const& stitchCoordsInPixels);
   void dubuf(std::vector<char>& buffer);
   void duclip();
   void duclp() noexcept;
@@ -200,7 +200,7 @@ namespace internal {
   void duver(fs::path const& name);
   void duzero();
   void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
-  void endpnt();
+  void endpnt(POINT const& StitchCoordinatesPixels);
 
   auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
@@ -431,8 +431,9 @@ namespace internal {
   void srchk();
   auto srchknot(uint32_t source) noexcept -> uint32_t;
   void stCor2px(fPOINTATTR const& stitch, POINT& point);
-  auto stch2px(uint32_t iStitch) -> bool;
-  void stch2px1(uint32_t iStitch);
+  auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
+  auto stch2px1(uint32_t iStitch) -> POINT;
+  auto stch2px2(uint32_t iStitch) -> bool;
   void stchPars();
   void stchWnd();
   void stchbox(uint32_t iStitch, HDC dc);

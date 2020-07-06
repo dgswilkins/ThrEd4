@@ -1139,15 +1139,15 @@ void thred::shft(fPOINT const& delta) noexcept {
   thi::zRctAdj();
 }
 
-void thred::internal::stch2px1(uint32_t iStitch) {
+auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
   if (!StitchBuffer->empty()) {
-	StitchCoordinatesPixels = POINT {
+	return POINT {
 	    wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
 	    wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
 	                        (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   }
   else {
-	StitchCoordinatesPixels = POINT {0L, StitchWindowClientRect.bottom};
+	return POINT {0L, StitchWindowClientRect.bottom};
   }
 }
 
@@ -1201,23 +1201,21 @@ void thred::internal::xlin1() {
   }
 }
 
-void thred::internal::endpnt() {
+void thred::internal::endpnt(POINT const& stitchCoordsInPixels) {
   unbox();
   xlin();
   xlin1();
   StateMap->set(StateFlag::LIN1);
   StateMap->set(StateFlag::INSRT);
   StateMap->reset(StateFlag::GRPSEL);
-  InsertLine[0] = StitchCoordinatesPixels;
+  InsertLine[0] = stitchCoordsInPixels;
   InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 }
 
 void thred::internal::duIns() {
   InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-  stch2px1(ClosestPointIndex);
-  InsertLine[0] = StitchCoordinatesPixels;
-  stch2px1(ClosestPointIndex + 1U);
-  InsertLine[2] = StitchCoordinatesPixels;
+  InsertLine[0] = stch2px1(ClosestPointIndex);
+  InsertLine[2] = stch2px1(ClosestPointIndex + 1U);
   xlin();
   StateMap->set(StateFlag::ILIN);
   ilin();
@@ -1226,13 +1224,14 @@ void thred::internal::duIns() {
 void thred::internal::movins() {
   if (StateMap->test(StateFlag::INSRT)) {
 	if (StateMap->test(StateFlag::LIN1)) {
+		auto stitchCoordsInPixels = POINT {};
 	  if (StateMap->test(StateFlag::BAKEND)) {
-		stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
+		stitchCoordsInPixels = stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
 	  }
 	  else {
-		stch2px1(0U);
+		stitchCoordsInPixels = stch2px1(0U);
 	  }
-	  endpnt();
+	  endpnt(stitchCoordsInPixels);
 	}
 	else {
 	  duIns();
@@ -2466,21 +2465,21 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
 
 void thred::internal::cros(uint32_t iStitch) {
   auto const armLength = BoxOffset[0];
-  stch2px1(iStitch);
-  InsertLine[0] = {StitchCoordinatesPixels.x - armLength, StitchCoordinatesPixels.y};
-  InsertLine[1] = {StitchCoordinatesPixels.x + armLength, StitchCoordinatesPixels.y};
+  auto const stitchCoordsInPixels = stch2px1(iStitch);
+  InsertLine[0] = {stitchCoordsInPixels.x - armLength, stitchCoordsInPixels.y};
+  InsertLine[1] = {stitchCoordsInPixels.x + armLength, stitchCoordsInPixels.y};
   SelectObject(StitchWindowDC, CrossPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   Polyline(StitchWindowDC, static_cast<POINT const*>(InsertLine), 2);
   SelectObject(StitchWindowMemDC, CrossPen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
   Polyline(StitchWindowMemDC, static_cast<POINT const*>(InsertLine), 2);
-  InsertLine[0] = {StitchCoordinatesPixels.x, StitchCoordinatesPixels.y - armLength};
-  InsertLine[1] = {StitchCoordinatesPixels.x, StitchCoordinatesPixels.y - 1};
+  InsertLine[0] = {stitchCoordsInPixels.x, stitchCoordsInPixels.y - armLength};
+  InsertLine[1] = {stitchCoordsInPixels.x, stitchCoordsInPixels.y - 1};
   Polyline(StitchWindowDC, static_cast<POINT const*>(InsertLine), 2);
   Polyline(StitchWindowMemDC, static_cast<POINT const*>(InsertLine), 2);
-  InsertLine[0].y = StitchCoordinatesPixels.y + 2;
-  InsertLine[1].y = StitchCoordinatesPixels.y + armLength;
+  InsertLine[0].y = stitchCoordsInPixels.y + 2;
+  InsertLine[1].y = stitchCoordsInPixels.y + armLength;
   Polyline(StitchWindowDC, static_cast<POINT const*>(InsertLine), 2);
   SetROP2(StitchWindowDC, R2_COPYPEN);
   Polyline(StitchWindowMemDC, static_cast<POINT const*>(InsertLine), 2);
@@ -2711,13 +2710,13 @@ void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, P
                   wrap::round<int32_t>(rotationCenterPixels.y + distanceToCenter * sin(newAngle))};
 }
 
-void thred::internal::duar() {
+void thred::internal::duar(POINT const& stitchCoordsInPixels) {
   auto const offset = gsl::narrow<int32_t>(MulDiv(10, *screenDPI, 96));
-  auto arrowCenter = POINT {(StitchCoordinatesPixels.x - offset), (StitchCoordinatesPixels.y + offset)};
-  StitchArrow[1] = StitchCoordinatesPixels;
-  rotpix(arrowCenter, StitchArrow[0], StitchCoordinatesPixels);
-  arrowCenter.y = StitchCoordinatesPixels.y - offset;
-  rotpix(arrowCenter, StitchArrow[2], StitchCoordinatesPixels);
+  auto arrowCenter = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
+  StitchArrow[1] = stitchCoordsInPixels;
+  rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
+  arrowCenter.y = stitchCoordsInPixels.y - offset;
+  rotpix(arrowCenter, StitchArrow[2], stitchCoordsInPixels);
   SelectObject(StitchWindowMemDC, BoxPen[0]);
   SelectObject(StitchWindowDC, BoxPen[0]);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
@@ -2728,7 +2727,7 @@ void thred::internal::duar() {
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-void thred::internal::dubox() {
+void thred::internal::dubox(POINT const& stitchCoordsInPixels) {
   if (!StitchBuffer->empty()) {
 	auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
 	if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
@@ -2740,7 +2739,7 @@ void thred::internal::dubox() {
 	  auto const stitchBck1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
 	  RotateAngle           = atan2(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
 	}
-	duar();
+	duar(stitchCoordsInPixels);
 	StateMap->reset(StateFlag::ELIN);
 	StateMap->set(StateFlag::SELBOX);
 	StateMap->reset(StateFlag::FRMPSEL);
@@ -2749,19 +2748,28 @@ void thred::internal::dubox() {
   }
 }
 
-auto thred::internal::stch2px(uint32_t iStitch) -> bool {
-  StitchCoordinatesPixels = {
+auto thred::internal::stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool {
+  stitchCoordsInPixels = {
       wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
       wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
                           (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
-  return StitchCoordinatesPixels.x >= 0 && StitchCoordinatesPixels.x <= StitchWindowClientRect.right &&
-         StitchCoordinatesPixels.y >= 0 && StitchCoordinatesPixels.y <= StitchWindowClientRect.bottom;
+  return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
+         stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
 }
 
-void thred::stch2pxr(fPOINT const& stitchCoordinate) {
-  StitchCoordinatesPixels = {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
-                             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                                 (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y)};
+auto thred::internal::stch2px2(uint32_t iStitch) -> bool {
+  auto stitchCoordsInPixels = POINT {
+      wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
+      wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                          (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
+  return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
+         stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
+}
+
+auto thred::stch2pxr(fPOINT const& stitchCoordinate) -> POINT {
+  return POINT {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
+                wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                                    (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
 void thred::internal::getDocsFolder(fs::path* directory) {
@@ -4920,10 +4928,11 @@ void thred::internal::closPnt() {
 	}
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
+  auto stitchCoordsInPixels = POINT {};
   for (auto const iNear : NearestPoint) {
-	if (stch2px(iNear)) {
+	if (stch2px(iNear, stitchCoordsInPixels)) {
 	  NearestPoint[NearestCount]   = iNear;
-	  NearestPixel[NearestCount++] = StitchCoordinatesPixels;
+	  NearestPixel[NearestCount++] = stitchCoordsInPixels;
 	}
   }
   boxs();
@@ -4932,8 +4941,9 @@ void thred::internal::closPnt() {
 auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto       closestIndex = 0U;
   auto const pointToCheck = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-  if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex)) {
-	if (hypot(StitchCoordinatesPixels.x - pointToCheck.x, StitchCoordinatesPixels.y - pointToCheck.y) < CLOSENUF) {
+  auto stitchCoordsInPixels = POINT {};
+  if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	if (hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
 	  closestStitch = ClosestPointIndex;
 	  return true;
 	}
@@ -4993,12 +5003,12 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   if (distanceToClick == 1e99) {
 	return false;
   }
-  stch2px(closestIndex);
+  stch2px(closestIndex, stitchCoordsInPixels);
   if (StateMap->test(StateFlag::IGNTHR)) {
 	closestStitch = closestIndex;
 	return true;
   }
-  if (hypot(pointToCheck.x - StitchCoordinatesPixels.x, pointToCheck.y - StitchCoordinatesPixels.y) < CLOSENUF) {
+  if (hypot(pointToCheck.x - stitchCoordsInPixels.x, pointToCheck.y - stitchCoordsInPixels.y) < CLOSENUF) {
 	closestStitch = closestIndex;
 	return true;
   }
@@ -5090,7 +5100,8 @@ void thred::internal::unlin() {
 
 void thred::internal::movbox() {
   if (!StitchBuffer->empty()) {
-	if (stch2px(ClosestPointIndex)) {
+	  auto stitchCoordsInPixels = POINT {};
+	if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	  unbox();
 #ifdef _DEBUG
 	  auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
@@ -5101,7 +5112,7 @@ void thred::internal::movbox() {
 	                 stitch.x,
 	                 stitch.y);
 #endif
-	  dubox();
+	  dubox(stitchCoordsInPixels);
 	  if (StateMap->test(StateFlag::UPTO)) {
 		StateMap->set(StateFlag::RESTCH);
 	  }
@@ -5485,8 +5496,9 @@ void thred::internal::rebox() {
   unbox();
   if (closPnt1(ClosestPointIndex)) {
 	nuAct(ClosestPointIndex);
-	if (stch2px(ClosestPointIndex)) {
-	  dubox();
+	auto stitchCoordsInPixels = POINT {};
+	if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+	  dubox(stitchCoordsInPixels);
 	  outDebugString(L"rebox:Stitch [{}] form [{}] type [{}]\n",
 	                 ClosestPointIndex,
 	                 ((StitchBuffer->operator[](ClosestPointIndex).attribute & FRMSK) >> FRMSHFT),
@@ -5540,12 +5552,12 @@ void thred::internal::clpbox() {
   ClipOrigin = {wrap::round<int32_t>(stitchPoint.x), wrap::round<int32_t>(stitchPoint.y)};
   auto const adjustedSize =
       SIZE {wrap::ceil<int32_t>(ClipRectSize.cx * ratio), wrap::ceil<int32_t>(ClipRectSize.cy * ratio)};
-  StitchCoordinatesPixels = {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
-                             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                                 (stitchPoint.y - ZoomRect.bottom) * ratio -
-                                                 adjustedSize.cy)};
-  ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = StitchCoordinatesPixels.x;
-  ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = StitchCoordinatesPixels.y;
+  auto stitchCoordsInPixels =
+      POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
+             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                                 (stitchPoint.y - ZoomRect.bottom) * ratio - adjustedSize.cy)};
+  ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = stitchCoordsInPixels.x;
+  ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = stitchCoordsInPixels.y;
   ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + adjustedSize.cx;
   ClipInsertBoxLine[2].y = ClipInsertBoxLine[3].y = ClipInsertBoxLine[0].y + adjustedSize.cy;
   StateMap->set(StateFlag::CLPSHO);
@@ -5585,21 +5597,22 @@ void thred::internal::rSelbox() {
   if (stitchPoint.y - SelectBoxOffset.y < 0) {
 	stitchPoint.y = SelectBoxOffset.y;
   }
-  StitchCoordinatesPixels = {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio),
-                             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                                 (stitchPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio -
-                                                 adjustedSelectSize.cy)};
+  auto stitchCoordsInPixels =
+      POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio),
+             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                                 (stitchPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio -
+                                 adjustedSelectSize.cy)};
   auto& formControls = *FormControlPoints;
   formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x =
-      StitchCoordinatesPixels.x;
-  formControls[1].x = formControls[5].x = StitchCoordinatesPixels.x + adjustedSelectSize.cx / 2;
+      stitchCoordsInPixels.x;
+  formControls[1].x = formControls[5].x = stitchCoordsInPixels.x + adjustedSelectSize.cx / 2;
   formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y =
-      StitchCoordinatesPixels.y;
-  formControls[3].y = formControls[7].y = StitchCoordinatesPixels.y + adjustedSelectSize.cy / 2;
+      stitchCoordsInPixels.y;
+  formControls[3].y = formControls[7].y = stitchCoordsInPixels.y + adjustedSelectSize.cy / 2;
   formControls[4].y = formControls[5].y = formControls[6].y =
-      StitchCoordinatesPixels.y + adjustedSelectSize.cy;
+      stitchCoordsInPixels.y + adjustedSelectSize.cy;
   formControls[2].x = formControls[3].x = formControls[4].x =
-      StitchCoordinatesPixels.x + adjustedSelectSize.cx;
+      stitchCoordsInPixels.x + adjustedSelectSize.cx;
   StateMap->set(StateFlag::SELSHO);
   dusel(StitchWindowDC);
 }
@@ -5625,12 +5638,12 @@ void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
   auto const layer   = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
   auto const offset  = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
   if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-	stch2px1(iStitch);
-	line[0].x = line[3].x = line[4].x = StitchCoordinatesPixels.x - offset;
-	line[0].y = line[1].y = StitchCoordinatesPixels.y - offset;
-	line[1].x = line[2].x = StitchCoordinatesPixels.x + offset;
-	line[2].y = line[3].y = StitchCoordinatesPixels.y + offset;
-	line[4].y             = StitchCoordinatesPixels.y - offset;
+	auto const stitchCoordsInPixels = stch2px1(iStitch);
+	line[0].x = line[3].x = line[4].x = stitchCoordsInPixels.x - offset;
+	line[0].y = line[1].y = stitchCoordsInPixels.y - offset;
+	line[1].x = line[2].x = stitchCoordsInPixels.x + offset;
+	line[2].y = line[3].y = stitchCoordsInPixels.y + offset;
+	line[4].y             = stitchCoordsInPixels.y - offset;
 	Polyline(dc, static_cast<POINT const*>(line), 5);
   }
 }
@@ -6618,7 +6631,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 	}
 	if (StateMap->test(StateFlag::ZUMED)) {
 	  auto iMovieFrame = 1U;
-	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px(RunPoint)) {
+	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
 		RunPoint++;
 	  }
 	  auto const origin = RunPoint - 1U;
@@ -6627,15 +6640,16 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
 	  while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
 	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		if (stch2px(RunPoint)) {
-		  MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+		  auto stitchCoordsInPixels = POINT {};
+		if (stch2px(RunPoint, stitchCoordsInPixels)) {
+		  MovieLine[iMovieFrame++] = stitchCoordsInPixels;
 		  if (flag) {
 			flag = false;
-			if (stch2px(RunPoint - 1)) {
+			if (stch2px(RunPoint - 1, stitchCoordsInPixels)) {
 			  MovieLine[0] = MovieLine[1];
 			}
 			else {
-			  MovieLine[0] = StitchCoordinatesPixels;
+			  MovieLine[0] = stitchCoordsInPixels;
 			}
 		  }
 		}
@@ -6644,9 +6658,10 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  if (RunPoint == origin) {
 		RunPoint++;
 	  }
-	  if (!stch2px(RunPoint)) {
+	  auto stitchCoordsInPixels = POINT {};
+	  if (!stch2px(RunPoint, stitchCoordsInPixels)) {
 		if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		  MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+		  MovieLine[iMovieFrame++] = stitchCoordsInPixels;
 		  RunPoint++;
 		}
 	  }
@@ -6663,8 +6678,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  SelectObject(StitchWindowDC, UserPen[color]);
 	  while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
 	         ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
-		stch2px1(RunPoint++);
-		MovieLine[iMovieFrame++] = StitchCoordinatesPixels;
+		MovieLine[iMovieFrame++] = stch2px1(RunPoint++);
 	  }
 	  RunPoint--;
 	  wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
@@ -6854,7 +6868,7 @@ void thred::internal::delet() {
 	if (StateMap->test(StateFlag::SELBOX)) {
 	  if (StitchBuffer->size() > 2U) {
 		delstch1(ClosestPointIndex);
-		if (!stch2px(ClosestPointIndex)) {
+		if (!stch2px2(ClosestPointIndex)) {
 		  movbox();
 		}
 	  }
@@ -6949,7 +6963,7 @@ void thred::internal::delet() {
 	if (!satinFlag && closPnt1(ClosestPointIndex)) {
 	  if (StitchBuffer->size() > 2U) {
 		delstch1(ClosestPointIndex);
-		if (!stch2px(ClosestPointIndex)) {
+		if (!stch2px2(ClosestPointIndex)) {
 		  movbox();
 		}
 	  }
@@ -8121,8 +8135,9 @@ void thred::internal::selup() {
 	         (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 		ClosestPointIndex++;
 	  }
-	  stch2px(ClosestPointIndex);
-	  dubox();
+	  auto stitchCoordsInPixels = POINT {};
+	  stch2px(ClosestPointIndex, stitchCoordsInPixels);
+	  dubox(stitchCoordsInPixels);
 	}
 	else {
 	  if (!FormList->empty()) {
@@ -8175,8 +8190,9 @@ void thred::internal::seldwn() {
 	         (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 		ClosestPointIndex--;
 	  }
-	  stch2px(ClosestPointIndex);
-	  dubox();
+	  auto stitchCoordsInPixels = POINT {};
+	  stch2px(ClosestPointIndex, stitchCoordsInPixels);
+	  dubox(stitchCoordsInPixels);
 	}
 	else {
 	  if (!FormList->empty()) {
@@ -12475,12 +12491,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	StitchCoordinatesPixels.x = Msg.pt.x - StitchWindowOrigin.x;
-	StitchCoordinatesPixels.y = Msg.pt.y - StitchWindowOrigin.y;
-	if (StitchCoordinatesPixels.x >= controlPoint[0].x &&
-	    StitchCoordinatesPixels.x <= controlPoint[2].x &&
-	    StitchCoordinatesPixels.y >= controlPoint[0].y &&
-	    StitchCoordinatesPixels.y <= controlPoint[4].y) {
+	auto relativePoint = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	if (relativePoint.x >= controlPoint[0].x &&
+	    relativePoint.x <= controlPoint[2].x &&
+	    relativePoint.y >= controlPoint[0].y &&
+	    relativePoint.y <= controlPoint[4].y) {
 	  duSelbox();
 	  StateMap->set(StateFlag::SELPNT);
 	  SetCapture(ThrEdWindow);
@@ -12751,8 +12766,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 			auto const iStitch = wrap::toUnsigned(StitchBuffer->size());
 			StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, code});
 			thred::duzrat();
-			stch2px1(iStitch);
-			InsertLine[0] = StitchCoordinatesPixels;
+			InsertLine[0] = stch2px1(iStitch);
 			InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 			thred::coltab();
 			StateMap->set(StateFlag::RESTCH);
@@ -12762,8 +12776,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  xlin1();
 		  StitchBuffer->insert(StitchBuffer->begin(), fPOINTATTR {stitchPoint.x, stitchPoint.y, code});
 		  StitchBuffer->front().attribute &= (~KNOTMSK);
-		  stch2px1(0);
-		  InsertLine[0] = StitchCoordinatesPixels;
+		  InsertLine[0] = stch2px1(0);
 		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		  thred::coltab();
 		  StateMap->set(StateFlag::RESTCH);
@@ -12783,10 +12796,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		                     fPOINTATTR {stitchPoint.x, stitchPoint.y, code});
 		xlin();
 		InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-		stch2px1(ClosestPointIndex);
-		InsertLine[0] = StitchCoordinatesPixels;
-		stch2px1(ClosestPointIndex + 1U);
-		InsertLine[2] = StitchCoordinatesPixels;
+		InsertLine[0] = stch2px1(ClosestPointIndex);
+		InsertLine[2] = stch2px1(ClosestPointIndex + 1U);
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
@@ -12841,8 +12852,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		else {
 		  StateMap->set(StateFlag::ISDWN);
-		  stch2px1(ClosestPointIndex - 1);
-		  MoveLine0[0] = StitchCoordinatesPixels;
+		  MoveLine0[0] = stch2px1(ClosestPointIndex - 1);
 		}
 		auto iStitch = wrap::toUnsigned(StitchBuffer->size());
 		if (iStitch != 0U) {
@@ -12853,8 +12863,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		else {
 		  StateMap->set(StateFlag::ISUP);
-		  stch2px1(ClosestPointIndex + 1U);
-		  MoveLine1[1] = StitchCoordinatesPixels;
+		  MoveLine1[1] = stch2px1(ClosestPointIndex + 1U);
 		}
 		dulin();
 		SetCapture(ThrEdWindow);
@@ -13294,8 +13303,8 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
-	  stch2px1(0);
-	  endpnt();
+	  auto const stitchCoordsInPixels = stch2px1(0);
+	  endpnt(stitchCoordsInPixels);
 	  StateMap->reset(StateFlag::BAKEND);
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -13367,10 +13376,11 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
   }
   else {
 	if (wrap::pressed(VK_CONTROL)) {
+		auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
 	  if (!StitchBuffer->empty()) {
-		stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
+		stitchCoordsInPixels = stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
 	  }
-	  endpnt();
+	  endpnt(stitchCoordsInPixels);
 	  StateMap->set(StateFlag::BAKEND);
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -15482,10 +15492,11 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 	  break;
 	}
 	case ID_ADEND: { // add
+	  auto stitchCoordsInPixels = POINT {0L, StitchWindowClientRect.bottom};
 	  if (!StitchBuffer->empty()) {
-		stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1U);
+		stitchCoordsInPixels = stch2px1(wrap::toUnsigned(StitchBuffer->size()) - 1U);
 	  }
-	  endpnt();
+	  endpnt(stitchCoordsInPixels);
 	  StateMap->set(StateFlag::BAKEND);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
@@ -16580,10 +16591,8 @@ auto thred::internal::defTxt(uint32_t iColor) -> COLORREF {
 }
 
 void thred::internal::relin() {
-  stch2px1(ClosestPointIndex - 1);
-  MoveLine0[0] = StitchCoordinatesPixels;
-  stch2px1(ClosestPointIndex + 1U);
-  MoveLine1[1] = StitchCoordinatesPixels;
+  MoveLine0[0] = stch2px1(ClosestPointIndex - 1);
+  MoveLine1[1] = stch2px1(ClosestPointIndex + 1U);
   StateMap->reset(StateFlag::WASLIN);
   dulin();
 }
@@ -16954,8 +16963,9 @@ void thred::internal::drwStch() {
 	if (StateMap->test(StateFlag::SELBOX)) {
 	  if (!StitchBuffer->empty()) {
 		ritcor(StitchBuffer->operator[](ClosestPointIndex));
-		if (stch2px(ClosestPointIndex)) {
-		  dubox();
+		auto stitchCoordsInPixels = POINT {};
+		if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
+		  dubox(stitchCoordsInPixels);
 		}
 	  }
 	}

@@ -199,7 +199,6 @@ double StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
 
 std::vector<fPOINTATTR>* StitchBuffer; // main stitch buffer
 
-POINT      StitchCoordinatesPixels; // converted from stitch to pixel
 fRECTANGLE StitchRangeRect;         // stitch range rectangle
 RECT       StitchWindowClientRect;  // stitch window size,client
 HDC        StitchWindowDC;          // stitch window device context

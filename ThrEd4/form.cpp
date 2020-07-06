@@ -425,8 +425,7 @@ void form::form() {
 void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   POINT line[4]  = {};
   auto  vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
-  thred::stch2pxr(vertexIt[iVertex]);
-  line[1] = StitchCoordinatesPixels;
+  line[1] = thred::stch2pxr(vertexIt[iVertex]);
   auto const ratio =
       gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, gsl::narrow<int32_t>(*screenDPI), 96)) /
       StitchWindowClientRect.right;
@@ -440,11 +439,9 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   length /= 2.0F;
   offset             = fPOINT {length * cos(angle), length * sin(angle)};
   auto adjustedPoint = fPOINT {point.x + offset.x, point.y + offset.y};
-  thred::stch2pxr(adjustedPoint);
-  line[0] = line[3] = StitchCoordinatesPixels;
+  line[0] = line[3] = thred::stch2pxr(adjustedPoint);
   adjustedPoint     = fPOINT {point.x - offset.x, point.y - offset.y};
-  thred::stch2pxr(adjustedPoint);
-  line[2] = StitchCoordinatesPixels;
+  line[2] = thred::stch2pxr(adjustedPoint);
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
 }
 
@@ -1135,9 +1132,9 @@ auto form::closfrm() -> bool {
 	}
 	auto&             vertex =
 	    FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
-	thred::stch2pxr(vertex);
-	minimumLength = hypot(StitchCoordinatesPixels.x - screenCoordinate.x,
-	                      StitchCoordinatesPixels.y - screenCoordinate.y);
+	auto const stitchCoordsInPixels = thred::stch2pxr(vertex);
+	minimumLength =
+	    hypot(stitchCoordsInPixels.x - screenCoordinate.x, stitchCoordsInPixels.y - screenCoordinate.y);
 	if (minimumLength < CLOSENUF) {
 	  ClosestFormToCursor   = closestForm;
 	  ClosestVertexToCursor = closestVertex;
@@ -1146,7 +1143,6 @@ auto form::closfrm() -> bool {
 	}
 	return false;
   }
-
   return false;
 }
 

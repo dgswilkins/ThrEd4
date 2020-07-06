@@ -237,7 +237,6 @@ extern double StitchBoxesThreshold;
 
 extern std::vector<fPOINTATTR>* StitchBuffer;
 
-extern POINT      StitchCoordinatesPixels;
 extern fRECTANGLE StitchRangeRect;
 extern RECT       StitchWindowClientRect;
 extern HDC        StitchWindowDC;
