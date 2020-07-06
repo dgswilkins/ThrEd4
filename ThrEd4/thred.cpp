@@ -85,9 +85,6 @@ uint32_t RunPoint;              // point for animating stitchout
 uint32_t StitchesPerFrame;      // number of stitches to draw in each frame
 int32_t  MovieTimeStep;         // time delay for stitchout
 
-// WARNING the size of the following array must be changed if the maximum movie speed is changed
-POINT MovieLine[100]; // line for movie stitch draw
-
 uint32_t LRUMenuId[] = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 
 uint32_t UndoBufferWriteIndex = 0;      // undo storage pointer
@@ -6622,6 +6619,8 @@ void thred::hidbit() {
 }
 
 void thred::internal::drwlstch(uint32_t finish) {
+   auto movieLine = std::vector<POINT> {}; // line for movie stitch draw
+  movieLine.reserve(100);
   if (finish != 0) {
 	auto color = 0U;
 	if (StateMap->test(StateFlag::HID)) {
@@ -6630,7 +6629,8 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  }
 	}
 	if (StateMap->test(StateFlag::ZUMED)) {
-	  auto iMovieFrame = 1U;
+	  auto stitchCoordsInPixels = POINT {};
+	  movieLine.push_back(stitchCoordsInPixels);
 	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
 		RunPoint++;
 	  }
@@ -6638,18 +6638,17 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  auto       flag   = true;
 
 	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
-	  while (iMovieFrame < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
+	  while (movieLine.size() < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
 	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		  auto stitchCoordsInPixels = POINT {};
 		if (stch2px(RunPoint, stitchCoordsInPixels)) {
-		  MovieLine[iMovieFrame++] = stitchCoordsInPixels;
+		  movieLine.push_back(stitchCoordsInPixels);
 		  if (flag) {
 			flag = false;
-			if (stch2px(RunPoint - 1, stitchCoordsInPixels)) {
-			  MovieLine[0] = MovieLine[1];
+			if ((RunPoint != 0U) && stch2px(RunPoint - 1, stitchCoordsInPixels)) {
+			  movieLine.front() = movieLine.back();
 			}
 			else {
-			  MovieLine[0] = stitchCoordsInPixels;
+			  movieLine.front() = stitchCoordsInPixels;
 			}
 		  }
 		}
@@ -6658,15 +6657,14 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  if (RunPoint == origin) {
 		RunPoint++;
 	  }
-	  auto stitchCoordsInPixels = POINT {};
 	  if (!stch2px(RunPoint, stitchCoordsInPixels)) {
 		if ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
-		  MovieLine[iMovieFrame++] = stitchCoordsInPixels;
+		  movieLine.push_back(stitchCoordsInPixels);
 		  RunPoint++;
 		}
 	  }
 	  SelectObject(StitchWindowDC, UserPen[color]);
-	  wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
+	  wrap::Polyline(StitchWindowDC, movieLine.data(), movieLine.size());
 	  if (!flag) {
 		RunPoint--;
 	  }
@@ -6678,16 +6676,17 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  SelectObject(StitchWindowDC, UserPen[color]);
 	  while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
 	         ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
-		MovieLine[iMovieFrame++] = stch2px1(RunPoint++);
+		movieLine.push_back(stch2px1(RunPoint++));
+		iMovieFrame++;
 	  }
 	  RunPoint--;
-	  wrap::Polyline(StitchWindowDC, static_cast<POINT const*>(MovieLine), iMovieFrame);
+	  wrap::Polyline(StitchWindowDC, movieLine.data(), movieLine.size());
 	}
 	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & 0xfU) != color) {
 	  RunPoint++;
 	}
 	displayText::ritnum(STR_NUMSEL, RunPoint);
-	if (RunPoint + 3 > finish - 1) {
+	if (RunPoint + 3U > finish - 1U) {
 	  patdun();
 	}
   }
@@ -16979,6 +16978,7 @@ void thred::internal::drwStch() {
 	}
 	if (StateMap->test(StateFlag::WASLIN)) {
 	  relin();
+	  throw; // this is here for testing I don't think this code is reachable
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  if (cmpstch(ClosestPointIndex, GroupStitchIndex)) {
