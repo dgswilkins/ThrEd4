@@ -74,7 +74,6 @@ POINT           NearestPixel[NERCNT];    // selected points
 uint32_t        PrevGroupStartStitch;    // lower end of previous selection
 uint32_t        PrevGroupEndStitch;      // higher end of previous selection
 float           StitchWindowAspectRatio; // aspect ratio of the stitch window
-void*           ThrEdClipPointer;        // for memory allocation for thred format clipboard data
 POINT           ClipOrigin;              // origin of clipboard box in stitch coordinates
 SIZE            SelectBoxSize;           // size of the select box
 POINT SelectBoxOffset; // offset of the spot the user selected from the lower left of the select box
@@ -5957,11 +5956,11 @@ void thred::internal::duclip() {
 	  EmptyClipboard();
 	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
+	  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 	                                 (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
 	                                     sizeof(FORMVERTEXCLIP));
-	  if (ThrEdClipPointer != nullptr) {
-		auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(ThrEdClipPointer));
+	  if (clipHandle != nullptr) {
+		auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(clipHandle));
 		clipHeader->clipType    = CLP_FRMPS;
 		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
 		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
@@ -5974,7 +5973,7 @@ void thred::internal::duclip() {
 		  vertices[iVertex] = vertexIt[iSource];
 		  iSource           = form::pdir(form, iSource);
 		}
-		SetClipboardData(ThrEdClip, ThrEdClipPointer);
+		SetClipboardData(ThrEdClip, clipHandle);
 	  }
 	  else {
 		throw;
@@ -5998,9 +5997,9 @@ void thred::internal::duclip() {
 		  length += sizfclp(currentForm);
 		}
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
-		if (ThrEdClipPointer != nullptr) {
-		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(ThrEdClipPointer));
+		auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
+		if (clipHandle != nullptr) {
+		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(clipHandle));
 		  clipFormsHeader->clipType  = CLP_FRMS;
 		  clipFormsHeader->formCount = gsl::narrow<uint16_t>(SelectedFormList->size());
 		  // Skip past the header
@@ -6069,7 +6068,7 @@ void thred::internal::duclip() {
 			  textureCount += form.fillInfo.texture.count;
 			}
 		  }
-		  SetClipboardData(ThrEdClip, ThrEdClipPointer);
+		  SetClipboardData(ThrEdClip, clipHandle);
 		}
 		CloseClipboard();
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
@@ -6124,9 +6123,9 @@ void thred::internal::duclip() {
 		  sizclp(form, firstStitch, stitchCount, length, clipSize);
 		  clipSize += sizeof(FORMCLIP);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  ThrEdClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
-		  if (ThrEdClipPointer != nullptr) {
-			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(ThrEdClipPointer));
+		  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
+		  if (clipHandle != nullptr) {
+			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(clipHandle));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
 			auto* formVertices       = convert_ptr<fPOINT*>(&clipFormHeader[1]);
@@ -6166,7 +6165,7 @@ void thred::internal::duclip() {
 			  auto const dest     = gsl::span<TXPNT>(textures, form.fillInfo.texture.count);
 			  std::copy(startPoint, endPoint, dest.begin());
 			}
-			SetClipboardData(ThrEdClip, ThrEdClipPointer);
+			SetClipboardData(ThrEdClip, clipHandle);
 		  }
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
