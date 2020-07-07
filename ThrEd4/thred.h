@@ -193,14 +193,14 @@ namespace internal {
   void durotu() noexcept;
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize, std::wstring* const strings) noexcept;
+  void dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize, std::wstring const* const strings) noexcept;
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
   void duver(fs::path const& name);
   void duzero();
   void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
-  void endpnt(POINT const& StitchCoordinatesPixels);
+  void endpnt(POINT const& stitchCoordsInPixels);
 
   auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
@@ -424,7 +424,7 @@ namespace internal {
   void shorter();
   auto sidclp() -> bool;
   void sidhup();
-  void sidmsg(FRMHED const& form, HWND window, std::wstring* strings, uint32_t entries);
+  void sidmsg(FRMHED const& form, HWND window, std::wstring const* const strings, uint32_t entries);
   void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();

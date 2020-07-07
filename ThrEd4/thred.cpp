@@ -1137,9 +1137,7 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
 	    wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
 	                        (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   }
-  else {
-	return POINT {0L, StitchWindowClientRect.bottom};
-  }
+  return POINT {0L, StitchWindowClientRect.bottom};
 }
 
 void thred::internal::shft2box() {
@@ -3681,23 +3679,28 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize, std::wstring* const strings) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  SideWindow[entry] = CreateWindow(L"STATIC",
-                                   strings[entry].c_str(),
-                                   SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                   3,
-                                   windowLocation * windowSize.y + 3,
-                                   windowSize.x + 3,
-                                   windowSize.y,
-                                   SideMessageWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
-  windowLocation++;
+void thred::internal::dusid(uint32_t                  entry,
+                            uint32_t&                 windowLocation,
+                            POINT const&              windowSize,
+                            std::wstring const* const strings) noexcept {
+  if (nullptr != strings) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	SideWindow[entry] = CreateWindow(L"STATIC",
+	                                 strings[entry].c_str(),
+	                                 SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                 3,
+	                                 windowLocation * windowSize.y + 3,
+	                                 windowSize.x + 3,
+	                                 windowSize.y,
+	                                 SideMessageWindow,
+	                                 nullptr,
+	                                 ThrEdInstance,
+	                                 nullptr);
+	windowLocation++;
+  }
 }
 
-void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* const strings, uint32_t entries) {
+void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const* const strings, uint32_t entries) {
   if (strings != nullptr) {
 	auto childListRect  = RECT {0L, 0L, 0L, 0L};
 	auto parentListRect = RECT {0L, 0L, 0L, 0L};
@@ -5958,7 +5961,7 @@ void thred::internal::duclip() {
 	if (OpenClipboard(ThrEdWindow) != 0) {
 	  EmptyClipboard();
 	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 	  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 	                                 (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
 	                                     sizeof(FORMVERTEXCLIP));
@@ -5999,7 +6002,7 @@ void thred::internal::duclip() {
 		  auto& currentForm   = FormList->operator[](selectedForm);
 		  length += sizfclp(currentForm);
 		}
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
 		if (clipHandle != nullptr) {
 		  auto* clipFormsHeader      = *(gsl::narrow_cast<FORMSCLIP**>(clipHandle));
@@ -6125,7 +6128,7 @@ void thred::internal::duclip() {
 		  auto clipSize = 0U;
 		  sizclp(form, firstStitch, stitchCount, length, clipSize);
 		  clipSize += sizeof(FORMCLIP);
-		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
 		  if (clipHandle != nullptr) {
 			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(clipHandle));
@@ -6631,8 +6634,8 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  auto       flag   = true;
 
 	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
-	  while (movieLine.size() < StitchesPerFrame + 1 && RunPoint < finish - 2 &&
-	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
+	  while (gsl::narrow<uint32_t>(movieLine.size()) < (StitchesPerFrame + 1U) &&
+	         RunPoint < (finish - 2U) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
 		if (stch2px(RunPoint, stitchCoordsInPixels)) {
 		  movieLine.push_back(stitchCoordsInPixels);
 		  if (flag) {
@@ -13029,7 +13032,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
   if (ClipMemory != nullptr) {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {
-	  auto formVerticesData = convert_ptr<FORMVERTEXCLIP*>(ClipPointer);
+	  auto* formVerticesData = convert_ptr<FORMVERTEXCLIP*>(ClipPointer);
 	  if (formVerticesData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
@@ -16985,9 +16988,8 @@ void thred::internal::drwStch() {
 	  dusel(StitchWindowMemDC);
 	}
 	if (ZoomFactor < StitchBoxesThreshold) {
-	  auto cellSize = fPOINT {(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right,
-	                          (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom};
-
+	  auto const cellSize = fPOINT {(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right,
+	                                (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom};
 	  auto const maxMapSize = StitchWindowClientRect.right * StitchWindowClientRect.bottom;
 	  auto       stitchMap  = boost::dynamic_bitset<>(maxMapSize, 0U);
 	  SelectObject(StitchWindowMemDC, LinePen);
