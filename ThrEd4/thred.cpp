@@ -105,7 +105,6 @@ HWND          FirstWin;           // first window not destroyed for exiting enum
 FRMRANGE      SelectedFormsRange; // range of selected forms
 float         ZoomMin;            // minimum allowed zoom value
 fPOINT        BalaradOffset;      // balarad offset
-POINT         SideWindowSize;     // size of the side message window
 std::wstring* SideWindowsStrings; // string array displayed in sidmsg
 fPOINT        CellSize;           // size of an stitchMap cell for drawing stitch boxes
 uint32_t      DraggedColor;       // color being dragged
@@ -3685,20 +3684,20 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(uint32_t entry, uint32_t& sideWindowLocation) noexcept {
+void thred::internal::dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideWindow[entry] = CreateWindow(L"STATIC",
                                    SideWindowsStrings[entry].c_str(),
                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    3,
-                                   sideWindowLocation * SideWindowSize.y + 3,
-                                   SideWindowSize.x + 3,
-                                   SideWindowSize.y,
+                                   windowLocation * windowSize.y + 3,
+                                   windowSize.x + 3,
+                                   windowSize.y,
                                    SideMessageWindow,
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  sideWindowLocation++;
+  windowLocation++;
 }
 
 void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* const strings, uint32_t entries) {
@@ -3707,7 +3706,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 	auto parentListRect = RECT {0L, 0L, 0L, 0L};
 	auto entryCount     = entries;
 	std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
-	SideWindowSize     = POINT {};
+	auto sideWindowSize     = POINT {};
 	auto sideWindowLocation = 0U;
 	SideWindowsStrings = strings;
 	GetWindowRect(window, &childListRect);
@@ -3722,14 +3721,14 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
 		      EdgeFillTypes[iEntry] == EDGECLIPX) {
 			if (StateMap->test(StateFlag::WASPCDCLP)) {
-			  formForms::maxtsiz(strings[iEntry], SideWindowSize);
+			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			}
 			else {
 			  entryCount--;
 			}
 		  }
 		  else {
-			formForms::maxtsiz(strings[iEntry], SideWindowSize);
+			formForms::maxtsiz(strings[iEntry], sideWindowSize);
 		  }
 		}
 	  }
@@ -3739,8 +3738,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                   parentListRect.right - ThredWindowOrigin.x + 3,
 	                                   childListRect.top - ThredWindowOrigin.y - 3,
-	                                   SideWindowSize.x + 12,
-	                                   SideWindowSize.y * entryCount + 12,
+	                                   sideWindowSize.x + 12,
+	                                   sideWindowSize.y * entryCount + 12,
 	                                   ThrEdWindow,
 	                                   nullptr,
 	                                   ThrEdInstance,
@@ -3750,11 +3749,11 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
 		      EdgeFillTypes[iEntry] == EDGECLIPX) {
 			if (StateMap->test(StateFlag::WASPCDCLP)) {
-			  dusid(iEntry, sideWindowLocation);
+			  dusid(iEntry, sideWindowLocation, sideWindowSize);
 			}
 		  }
 		  else {
-			dusid(iEntry, sideWindowLocation);
+			dusid(iEntry, sideWindowLocation, sideWindowSize);
 		  }
 		}
 	  }
@@ -3762,18 +3761,18 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 	else {
 	  if (FormMenuChoice == LLAYR) {
 		auto zero = std::wstring {L"0"};
-		formForms::maxtsiz(zero, SideWindowSize);
+		formForms::maxtsiz(zero, sideWindowSize);
 	  }
 	  else {
 		if (FormMenuChoice == LFTHTYP) {
 		  entryCount     = 5U;
-		  SideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
+		  sideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
 		}
 		else {
 		  for (auto iEntry = 0U; iEntry < entries; iEntry++) {
 			if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
-				formForms::maxtsiz(strings[iEntry], SideWindowSize);
+				formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			  }
 			  else {
 				entryCount--;
@@ -3784,7 +3783,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 				entryCount--;
 			  }
 			  else {
-				formForms::maxtsiz(strings[iEntry], SideWindowSize);
+				formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			  }
 			}
 		  }
@@ -3796,22 +3795,22 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
 	                                   parentListRect.right - ThredWindowOrigin.x + 3,
 	                                   childListRect.top - ThredWindowOrigin.y - 3,
-	                                   SideWindowSize.x + 12,
-	                                   SideWindowSize.y * entryCount + 12,
+	                                   sideWindowSize.x + 12,
+	                                   sideWindowSize.y * entryCount + 12,
 	                                   ThrEdWindow,
 	                                   nullptr,
 	                                   ThrEdInstance,
 	                                   nullptr);
 	  if (FormMenuChoice == LLAYR) {
 		for (auto iEntry = 0U; iEntry < entries; iEntry++) {
-		  dusid(iEntry, sideWindowLocation);
+		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
 	  }
 	  else {
 		if (FormMenuChoice == LFTHTYP) {
 		  for (auto iEntry = 0U; iEntry < 6U; iEntry++) {
 			if (FeatherFillTypes[iEntry] != form.fillInfo.feather.fillType) {
-			  dusid(iEntry, sideWindowLocation);
+			  dusid(iEntry, sideWindowLocation, sideWindowSize);
 			}
 		  }
 		}
@@ -3820,11 +3819,11 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring* cons
 			if (FillTypes[iEntry] != form.fillType) {
 			  if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
 				if (StateMap->test(StateFlag::WASPCDCLP)) {
-				  dusid(iEntry, sideWindowLocation);
+				  dusid(iEntry, sideWindowLocation, sideWindowSize);
 				}
 			  }
 			  else {
-				dusid(iEntry, sideWindowLocation);
+				dusid(iEntry, sideWindowLocation, sideWindowSize);
 			  }
 			}
 		  }

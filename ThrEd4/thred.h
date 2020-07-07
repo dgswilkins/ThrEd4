@@ -193,7 +193,7 @@ namespace internal {
   void durotu() noexcept;
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(uint32_t entry, uint32_t& sideWindowLocation) noexcept;
+  void dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize) noexcept;
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
