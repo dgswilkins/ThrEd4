@@ -103,7 +103,6 @@ uint8_t       NameEncoder[128];   // designer name encoding
 uint8_t       NameDecoder[256];   // designer name decode
 HWND          FirstWin;           // first window not destroyed for exiting enumerate loop
 FRMRANGE      SelectedFormsRange; // range of selected forms
-uint32_t      TmpFormIndex;       // saved form index
 float         ZoomMin;            // minimum allowed zoom value
 fPOINT        BalaradOffset;      // balarad offset
 uint32_t      SideWindowLocation; // side message window location
@@ -11294,7 +11293,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
-		TmpFormIndex = ClosestFormToCursor;
+		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm()) {
 		  // ToDo - I don't think this can ever be hit with closfrm
 		  if (!SelectedFormList->empty()) {
@@ -11302,11 +11301,11 @@ auto thred::internal::handleRightButtonDown() -> bool {
 			StateMap->set(StateFlag::RESTCH);
 			return true;
 		  }
-		  if (StateMap->testAndReset(StateFlag::FORMSEL) && TmpFormIndex != ClosestFormToCursor) {
-			if (TmpFormIndex > ClosestFormToCursor) {
-			  std::swap(ClosestFormToCursor, TmpFormIndex);
+		  if (StateMap->testAndReset(StateFlag::FORMSEL) && tempIndex != ClosestFormToCursor) {
+			if (tempIndex > ClosestFormToCursor) {
+			  std::swap(ClosestFormToCursor, tempIndex);
 			}
-			for (auto iForm = TmpFormIndex; iForm <= ClosestFormToCursor; iForm++) {
+			for (auto iForm = tempIndex; iForm <= ClosestFormToCursor; iForm++) {
 			  SelectedFormList->push_back(iForm);
 			}
 			StateMap->set(StateFlag::RESTCH);
