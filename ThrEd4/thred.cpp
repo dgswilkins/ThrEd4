@@ -105,7 +105,6 @@ HWND          FirstWin;           // first window not destroyed for exiting enum
 FRMRANGE      SelectedFormsRange; // range of selected forms
 float         ZoomMin;            // minimum allowed zoom value
 fPOINT        BalaradOffset;      // balarad offset
-fPOINT        CellSize;           // size of an stitchMap cell for drawing stitch boxes
 uint32_t      DraggedColor;       // color being dragged
 
 std::vector<POINT>* FormVerticesAsLine; // form vertex clipboard paste into form line
@@ -6659,7 +6658,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 		}
 	  }
 	  SelectObject(StitchWindowDC, UserPen[color]);
-	  wrap::Polyline(StitchWindowDC, movieLine.data(), movieLine.size());
+	  wrap::Polyline(StitchWindowDC, movieLine.data(), gsl::narrow<uint32_t>(movieLine.size()));
 	  if (!flag) {
 		RunPoint--;
 	  }
@@ -6675,7 +6674,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 		iMovieFrame++;
 	  }
 	  RunPoint--;
-	  wrap::Polyline(StitchWindowDC, movieLine.data(), movieLine.size());
+	  wrap::Polyline(StitchWindowDC, movieLine.data(), gsl::narrow<uint32_t>(movieLine.size()));
 	}
 	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & 0xfU) != color) {
 	  RunPoint++;
@@ -16694,14 +16693,11 @@ void thred::internal::dugrid() {
   }
 }
 
-void thred::internal::rint() noexcept {
-  CellSize.x = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
-  CellSize.y = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
-}
-
-auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint) -> bool {
-  auto bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / CellSize.x) *
-                                        floor((stitchPoint.y - ZoomRect.bottom) / CellSize.y));
+auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap,
+                              fPOINTATTR const&        stitchPoint,
+                              fPOINT const&            cellSize) -> bool {
+  auto bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
+                                        floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
 }
 
@@ -16989,7 +16985,9 @@ void thred::internal::drwStch() {
 	  dusel(StitchWindowMemDC);
 	}
 	if (ZoomFactor < StitchBoxesThreshold) {
-	  rint();
+	  auto cellSize = fPOINT {(ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right,
+	                          (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom};
+
 	  auto const maxMapSize = StitchWindowClientRect.right * StitchWindowClientRect.bottom;
 	  auto       stitchMap  = boost::dynamic_bitset<>(maxMapSize, 0U);
 	  SelectObject(StitchWindowMemDC, LinePen);
@@ -17002,7 +17000,7 @@ void thred::internal::drwStch() {
 			     iStitch++) {
 			  auto const stitch = StitchBuffer->operator[](iStitch);
 			  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
-			      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch)) {
+			      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
 				stchbox(iStitch, StitchWindowMemDC);
 			  }
 			}
@@ -17013,7 +17011,7 @@ void thred::internal::drwStch() {
 		auto iStitch = 0U;
 		for (auto& stitch : *StitchBuffer) {
 		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
-		      stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch)) {
+		      stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
 			stchbox(iStitch, StitchWindowMemDC);
 		  }
 		  iStitch++;

@@ -365,7 +365,6 @@ namespace internal {
   void rembig();
   void respac(FRMHED& form) noexcept;
   void retrac();
-  void rint() noexcept;
   void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
   void ritbal();
   void ritcor(fPOINTATTR const& pointAttribute);
@@ -407,7 +406,7 @@ namespace internal {
   void selin(uint32_t start, uint32_t end, HDC dc);
   void selup();
   void set1knot();
-  auto setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint) -> bool;
+  auto setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint, fPOINT const& cellSize) -> bool;
   void setbak(uint32_t penWidth) noexcept;
   void setdst();
   void setgrd(COLORREF color);
