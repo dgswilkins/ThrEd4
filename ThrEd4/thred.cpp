@@ -105,7 +105,6 @@ HWND          FirstWin;           // first window not destroyed for exiting enum
 FRMRANGE      SelectedFormsRange; // range of selected forms
 float         ZoomMin;            // minimum allowed zoom value
 fPOINT        BalaradOffset;      // balarad offset
-uint32_t      DraggedColor;       // color being dragged
 
 std::vector<POINT>* FormVerticesAsLine; // form vertex clipboard paste into form line
 
@@ -9988,12 +9987,13 @@ void thred::internal::nuscol(uint32_t iColor) noexcept {
 }
 
 void thred::internal::movchk() {
+  auto  draggedColor    = uint32_t {};
   auto& defaultColorWin = *DefaultColorWin;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
 	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
-		DraggedColor = VerticalIndex & 0xfU;
+		draggedColor = VerticalIndex & 0xfU;
 		StateMap->set(StateFlag::WASCOL);
 	  }
 	}
@@ -10007,10 +10007,10 @@ void thred::internal::movchk() {
 		  auto const color = stitch.attribute & COLMSK;
 		  if (color == VerticalIndex) {
 			stitch.attribute &= NCOLMSK;
-			stitch.attribute |= DraggedColor;
+			stitch.attribute |= draggedColor;
 		  }
 		  else {
-			if (key && color == DraggedColor) {
+			if (key && color == draggedColor) {
 			  stitch.attribute &= NCOLMSK;
 			  stitch.attribute |= VerticalIndex;
 			}
@@ -10019,19 +10019,19 @@ void thred::internal::movchk() {
 		for (auto& formIter : *FormList) {
 		  if (formIter.fillType != 0U) {
 			if (formIter.fillColor == VerticalIndex) {
-			  formIter.fillColor = gsl::narrow<uint8_t>(DraggedColor);
+			  formIter.fillColor = gsl::narrow<uint8_t>(draggedColor);
 			}
 			else {
-			  if (key && formIter.fillColor == DraggedColor) {
+			  if (key && formIter.fillColor == draggedColor) {
 				formIter.fillColor = gsl::narrow<uint8_t>(VerticalIndex);
 			  }
 			}
 			if (formIter.fillType == FTHF) {
 			  if (formIter.fillInfo.feather.color == VerticalIndex) {
-				formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(DraggedColor);
+				formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(draggedColor);
 			  }
 			  else {
-				if (key && formIter.fillInfo.feather.color == DraggedColor) {
+				if (key && formIter.fillInfo.feather.color == draggedColor) {
 				  formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(VerticalIndex);
 				}
 			  }
@@ -10039,10 +10039,10 @@ void thred::internal::movchk() {
 		  }
 		  if (formIter.edgeType != 0U) {
 			if (formIter.borderColor == VerticalIndex) {
-			  formIter.borderColor = gsl::narrow<uint8_t>(DraggedColor);
+			  formIter.borderColor = gsl::narrow<uint8_t>(draggedColor);
 			}
 			else {
-			  if (key && formIter.borderColor == DraggedColor) {
+			  if (key && formIter.borderColor == draggedColor) {
 				formIter.borderColor = gsl::narrow<uint8_t>(VerticalIndex);
 			  }
 			}
@@ -10050,10 +10050,10 @@ void thred::internal::movchk() {
 		}
 		if (!switchColors) {
 		  auto const swapColor     = UserColor[VerticalIndex];
-		  UserColor[VerticalIndex] = UserColor[DraggedColor];
+		  UserColor[VerticalIndex] = UserColor[draggedColor];
 		  if (!key) {
-			UserColor[DraggedColor] = swapColor;
-			nuscol(DraggedColor);
+			UserColor[draggedColor] = swapColor;
+			nuscol(draggedColor);
 		  }
 		  nuscol(VerticalIndex);
 		}
