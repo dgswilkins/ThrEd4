@@ -158,7 +158,6 @@ HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
 int32_t    NearestPoint[NERCNT];         // indices of the closest points
-fPOINT     StitchRangeSize;              // form check ranges
 uint32_t   MoveAnchor;                   // for resequencing stitches
 double     RotateAngle;                  // angle for pixel rotate
 SIZE       PickColorMsgSize;             // size of the pick color message
@@ -14663,7 +14662,8 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_CHK: { // edit / Check Range
-	  thred::chkrng(StitchRangeSize);
+	  auto stitchRange = fPOINT {};
+	  thred::chkrng(stitchRange);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
