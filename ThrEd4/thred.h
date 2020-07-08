@@ -163,7 +163,7 @@ namespace internal {
   void drwlstch(uint32_t finish);
   void drwmrk(HDC dc);
   void dstcurs() noexcept;
-  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint) noexcept;
+  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<double>& gapToNearest) noexcept;
   void duIns();
   void duSelbox();
   void duar(POINT const& stitchCoordsInPixels);

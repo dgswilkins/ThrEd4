@@ -157,8 +157,6 @@ HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
-double GapToNearest[NERCNT];             // distances of the closest points
-                                         // to a mouse click
 int32_t    NearestPoint[NERCNT];         // indices of the closest points
 fPOINT     StitchRangeSize;              // form check ranges
 uint32_t   MoveAnchor;                   // for resequencing stitches
@@ -4875,7 +4873,7 @@ void thred::internal::zumout() {
   }
 }
 
-void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint) noexcept {
+void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<double>& gapToNearest) noexcept {
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; iStitch++) {
 	auto const stitch = StitchBuffer->operator[](iStitch);
 
@@ -4886,10 +4884,10 @@ void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT 
 	auto sum   = hypot(cx, cy);
 	auto tind0 = iStitch;
 	for (auto iNear = 0U; iNear < NERCNT; iNear++) {
-	  if (sum < GapToNearest[iNear]) {
-		auto const lowestSum = GapToNearest[iNear];
+	  if (sum < gapToNearest[iNear]) {
+		auto const lowestSum = gapToNearest[iNear];
 		auto const tind1     = NearestPoint[iNear];
-		GapToNearest[iNear]  = sum;
+		gapToNearest[iNear]  = sum;
 		NearestPoint[iNear]  = tind0;
 		sum                  = lowestSum;
 		tind0                = tind1;
@@ -4901,21 +4899,22 @@ void thred::internal::duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT 
 void thred::internal::closPnt() {
   unbox();
   unboxs();
-  for (auto iNear = 0U; iNear < 4; iNear++) {
-	GapToNearest[iNear] = 1e99;
+  std::vector<double> gapToNearest; // distances of the closest points
+  gapToNearest.resize(NERCNT, 1e99);                 // to a mouse click
+  for (auto iNear = 0U; iNear < NERCNT; iNear++) {
 	NearestPoint[iNear] = -1;
   }
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 	auto const iStitch0 = ColorChangeTable[iColor].stitchIndex;
-	auto const iStitch1 = ColorChangeTable[iColor + 1U].stitchIndex;
+	auto const iStitch1 = ColorChangeTable[iColor + 1U].stitchIndex - iStitch0;
 	if (StateMap->test(StateFlag::HID)) {
 	  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
-		duClos(iStitch0, iStitch1 - iStitch0, stitchPoint);
+		duClos(iStitch0, iStitch1, stitchPoint, gapToNearest);
 	  }
 	}
 	else {
-	  duClos(iStitch0, iStitch1 - iStitch0, stitchPoint);
+	  duClos(iStitch0, iStitch1, stitchPoint, gapToNearest);
 	}
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
@@ -16757,10 +16756,9 @@ void thred::internal::drwStch() {
 	}
 	thred::duzrat();
 	auto const dub6 = ZoomRatio.x * 6.0F;
-
-	int32_t threadWidth[3] = {wrap::round<int32_t>(dub6 * TSIZ30),
-	                          wrap::round<int32_t>(dub6 * TSIZ40),
-	                          wrap::round<int32_t>(dub6 * TSIZ60)}; // thread sizes in pixels
+	int32_t const threadWidth[3] = {wrap::round<int32_t>(dub6 * TSIZ30),
+	                                wrap::round<int32_t>(dub6 * TSIZ40),
+	                                wrap::round<int32_t>(dub6 * TSIZ60)}; // thread sizes in pixels
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 	  if (StateMap->test(StateFlag::THRDS)) {
 		nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
