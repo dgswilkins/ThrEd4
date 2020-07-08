@@ -156,7 +156,6 @@ HWND  ColorBar;               // color bar
 HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
-COLORREF const BoxColor[] = {0x404040, 0x408040, 0x804040, 0x404080};
 int32_t        ThreadWidthPixels[3];     // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
 double GapToNearest[NERCNT];             // distances of the closest points
@@ -16507,8 +16506,9 @@ void thred::internal::init() {
                           nullptr);
   nuRct();
   // create pens
+  COLORREF const boxColor[] = {0x404040, 0x408040, 0x804040, 0x404080};
   for (auto iRGBK = 0U; iRGBK < 4; iRGBK++) {
-	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, 1, BoxColor[iRGBK]);
+	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, 1, boxColor[iRGBK]);
   }
   LinePen        = wrap::CreatePen(PS_SOLID, 1U, 0x404040U);
   CrossPen       = wrap::CreatePen(PS_SOLID, 5U, 0x804080U);
