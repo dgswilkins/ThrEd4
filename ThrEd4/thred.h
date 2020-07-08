@@ -97,7 +97,7 @@ void wrnmen();
 void zumhom();
 
 namespace internal {
-  void angdif(float angle) noexcept;
+  void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
   void auxmen();
   void bak();
   void bakmrk();
@@ -315,7 +315,7 @@ namespace internal {
   void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
-  auto nuang(float yDelta, float xDelta) noexcept -> float;
+  auto nuang(float OriginalAngle, float yDelta, float xDelta) noexcept -> float;
   void nucols();
   void nudgfn(float deltaX, float deltaY);
   void nulayr(uint32_t play);

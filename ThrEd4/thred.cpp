@@ -164,9 +164,6 @@ SIZE       PickColorMsgSize;             // size of the pick color message
 POINT      InsertSize;                   // size of file insert window
 fPOINT     InsertCenter;                 // center point in inserted file
 uint32_t   NumericCode;                  // keyboard numerical input
-float      LowestAngle;                  // low angle for angle from mark
-float      OriginalAngle;                // original angle for angle from mark
-float      HighestAngle;                 // hi angle for angle from mark
 uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
 uint32_t   KnotAttribute;                // knot stitch attribute
@@ -9175,9 +9172,9 @@ void thred::internal::gselrng() noexcept {
   }
 }
 
-auto thred::internal::nuang(float yDelta, float xDelta) noexcept -> float {
+auto thred::internal::nuang(float originalAngle, float xDelta, float yDelta) noexcept -> float {
   auto const angle         = atan2(yDelta, xDelta);
-  auto       relativeAngle = angle - OriginalAngle;
+  auto       relativeAngle = angle - originalAngle;
   if (fabs(relativeAngle) > PI_F) {
 	if (relativeAngle > 0.0F) {
 	  relativeAngle = 2.0F * PI_F - relativeAngle;
@@ -9189,49 +9186,57 @@ auto thred::internal::nuang(float yDelta, float xDelta) noexcept -> float {
   return relativeAngle;
 }
 
-void thred::internal::angdif(float angle) noexcept {
-  if (angle > HighestAngle) {
-	HighestAngle = angle;
+void thred::internal::angdif(float& lowestAngle, float& highestAngle, float angle) noexcept {
+  if (angle > highestAngle) {
+	highestAngle = angle;
   }
   else {
-	if (angle < LowestAngle) {
-	  LowestAngle = angle;
+	if (angle < lowestAngle) {
+	  lowestAngle = angle;
 	}
   }
 }
 
 void thred::internal::rotmrk() {
   if (StateMap->test(StateFlag::GMRK) && (StateMap->test(StateFlag::FORMSEL) || StateMap->test(StateFlag::GRPSEL))) {
+	auto lowestAngle  = 0.0F;
+	auto highestAngle = 0.0F;
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
-	  LowestAngle               = 0.0F;
-	  HighestAngle              = 0.0F;
 	  // clang-format off
 	  auto& form     = FormList->operator[](ClosestFormToCursor);
 	  auto  vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	  // clang-format on
-	  OriginalAngle = atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
+	  auto const originalAngle =
+	      atan2(vertexIt[0].y - ZoomMarkPoint.y, vertexIt[0].x - ZoomMarkPoint.x);
 	  for (auto iVertex = 1U; iVertex < form.vertexCount; iVertex++) {
-		angdif(nuang(vertexIt[iVertex].y - ZoomMarkPoint.y, vertexIt[iVertex].x - ZoomMarkPoint.x));
+		angdif(lowestAngle,
+		       highestAngle,
+		       nuang(originalAngle,
+		             vertexIt[iVertex].x - ZoomMarkPoint.x,
+		             vertexIt[iVertex].y - ZoomMarkPoint.y));
 	  }
 	  for (auto& stitch : *StitchBuffer) {
 		if ((stitch.attribute & FRMSK) == codedFormIndex) {
-		  angdif(nuang(stitch.y - ZoomMarkPoint.y, stitch.x - ZoomMarkPoint.x));
+		  angdif(lowestAngle,
+		         highestAngle,
+		         nuang(originalAngle, stitch.x - ZoomMarkPoint.x, stitch.y - ZoomMarkPoint.y));
 		}
 	  }
 	}
 	else {
 	  thred::rngadj();
-	  LowestAngle   = 0.0F;
-	  HighestAngle  = 0.0F;
-	  OriginalAngle = atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
-	                        StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
+	  auto const originalAngle = atan2(StitchBuffer->operator[](GroupStartStitch).y - ZoomMarkPoint.y,
+	                                   StitchBuffer->operator[](GroupStartStitch).x - ZoomMarkPoint.x);
 	  for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; iStitch++) {
-		angdif(nuang(StitchBuffer->operator[](iStitch).y - ZoomMarkPoint.y,
-		             StitchBuffer->operator[](iStitch).x - ZoomMarkPoint.x));
+		angdif(lowestAngle,
+		       highestAngle,
+		       nuang(originalAngle,
+		             StitchBuffer->operator[](iStitch).x - ZoomMarkPoint.x,
+		             StitchBuffer->operator[](iStitch).y - ZoomMarkPoint.y));
 	  }
 	}
-	auto const tAngle     = HighestAngle - LowestAngle;
+	auto const tAngle     = highestAngle - lowestAngle;
 	auto const segments   = std::round(2.0F * PI_F / tAngle);
 	IniFile.rotationAngle = 2.0F * PI_F / segments;
 	auto fmtStr           = std::wstring {};
