@@ -10003,7 +10003,8 @@ void thred::internal::movchk() {
   }
   else {
 	if (StateMap->testAndReset(StateFlag::WASMOV) && StateMap->testAndReset(StateFlag::WASCOL)) {
-	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
+	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back()) && draggedColor != VerticalIndex) {
+		thred::savdo();
 		auto const key          = wrap::pressed(VK_SHIFT);
 		auto const switchColors = wrap::pressed(VK_CONTROL);
 		for (auto& stitch : *StitchBuffer) {
