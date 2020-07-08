@@ -166,10 +166,6 @@ fPOINT     InsertCenter;                 // center point in inserted file
 uint32_t   NumericCode;                  // keyboard numerical input
 uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
-fPOINT     KnotStep;                     // knot stepSize
-char const KnotAtStartOrder[] = {2, 3, 1, 4, 0};     // knot spacings
-char       KnotAtEndOrder[]   = {-2, -3, -1, -4, 0}; // reverse knot spacings
-char       KnotAtLastOrder[]  = {0, -4, -1, -3, -2}; // reverse knot spacings
 HANDLE     BalaradFile;                              // balarad file handle
 
 // graphics variables
@@ -6397,10 +6393,10 @@ auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> 
   return StitchBuffer->operator[](iStitchA).y == StitchBuffer->operator[](iStitchB).y;
 }
 
-void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, uint32_t knotAttribute) {
+void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, fPOINT const &knotStep, uint32_t knotAttribute) {
   buffer.emplace_back(
-      fPOINTATTR {StitchBuffer->operator[](iSource).x + KnotStep.x * gsl::narrow_cast<float>(offset),
-                  StitchBuffer->operator[](iSource).y + KnotStep.y * gsl::narrow_cast<float>(offset),
+      fPOINTATTR {StitchBuffer->operator[](iSource).x + knotStep.x * gsl::narrow_cast<float>(offset),
+                  StitchBuffer->operator[](iSource).y + knotStep.y * gsl::narrow_cast<float>(offset),
                   knotAttribute});
 }
 
@@ -6410,27 +6406,28 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
   if (finish == 0U) {
 	iStart++;
   }
-  auto knotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
+  auto const knotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
   do {
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
 	length           = hypot(delta.x, delta.y);
 	iStart--;
   } while (length == 0.0F);
+  char const  knotAtEndOrder[]  = {-2, -3, -1, -4, 0}; // reverse knot spacings
+  char const  knotAtLastOrder[] = {0, -4, -1, -3, -2}; // reverse knot spacings
   auto const* knots =
-      (StateMap->test(StateFlag::FILDIR)) ? std::begin(KnotAtLastOrder) : std::begin(KnotAtEndOrder);
+      (StateMap->test(StateFlag::FILDIR)) ? std::begin(knotAtLastOrder) : std::begin(knotAtEndOrder);
   if (knots != nullptr) {
 	if ((iStart & 0x8000000U) == 0U) {
 	  auto const delta =
 	      fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
 	              StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
-	  KnotStep.x = 2.0F / length * delta.x;
-	  KnotStep.y = 2.0F / length * delta.y;
+	  auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
 	  for (auto iKnot = 0U; iKnot < 5U; iKnot++) {
-		ofstch(buffer, finish, knots[iKnot], knotAttribute);
+		ofstch(buffer, finish, knots[iKnot], knotStep, knotAttribute);
 	  }
 	  if (StateMap->test(StateFlag::FILDIR)) {
-		ofstch(buffer, finish, 0, knotAttribute);
+		ofstch(buffer, finish, 0, knotStep, knotAttribute);
 	  }
 	}
   }
@@ -6448,11 +6445,11 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
   if (finish < wrap::toUnsigned(StitchBuffer->size())) {
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y};
-	auto knotAttribute    = StitchBuffer->operator[](start).attribute | KNOTMSK;
-	KnotStep.x       = 2.0F / length * delta.x;
-	KnotStep.y       = 2.0F / length * delta.y;
-	for (char const iKnot : KnotAtStartOrder) {
-	  ofstch(buffer, start, iKnot, knotAttribute);
+	auto const knotAttribute    = StitchBuffer->operator[](start).attribute | KNOTMSK;
+	auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	char const knotAtStartOrder[] = {2, 3, 1, 4, 0};     // knot spacings
+	for (char const iKnot : knotAtStartOrder) {
+	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
 	}
   }
 }
