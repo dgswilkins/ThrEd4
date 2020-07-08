@@ -156,7 +156,6 @@ HWND  ColorBar;               // color bar
 HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
-int32_t        ThreadWidthPixels[3];     // thread sizes in pixels
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
 double GapToNearest[NERCNT];             // distances of the closest points
                                          // to a mouse click
@@ -16757,18 +16756,19 @@ void thred::internal::drwStch() {
 	  ShowWindow(HorizontalScrollBar, FALSE);
 	}
 	thred::duzrat();
-	auto const dub6      = ZoomRatio.x * 6.0F;
-	ThreadWidthPixels[0] = wrap::round<int32_t>(dub6 * TSIZ30);
-	ThreadWidthPixels[1] = wrap::round<int32_t>(dub6 * TSIZ40);
-	ThreadWidthPixels[2] = wrap::round<int32_t>(dub6 * TSIZ60);
+	auto const dub6 = ZoomRatio.x * 6.0F;
+
+	int32_t threadWidth[3] = {wrap::round<int32_t>(dub6 * TSIZ30),
+	                          wrap::round<int32_t>(dub6 * TSIZ40),
+	                          wrap::round<int32_t>(dub6 * TSIZ60)}; // thread sizes in pixels
 	for (auto iColor = 0U; iColor < 16U; iColor++) {
 	  if (StateMap->test(StateFlag::THRDS)) {
-		nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
+		nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::COL)) {
 		  if (iColor == ActiveColor) {
-			nuStchSiz(iColor, ThreadWidthPixels[ThreadSizeIndex[iColor]]);
+			nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
 		  }
 		  else {
 			nuStchSiz(iColor, 1);
