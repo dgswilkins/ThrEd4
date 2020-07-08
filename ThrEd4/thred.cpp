@@ -166,7 +166,6 @@ fPOINT     InsertCenter;                 // center point in inserted file
 uint32_t   NumericCode;                  // keyboard numerical input
 uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
-uint32_t   KnotAttribute;                // knot stitch attribute
 fPOINT     KnotStep;                     // knot stepSize
 char const KnotAtStartOrder[] = {2, 3, 1, 4, 0};     // knot spacings
 char       KnotAtEndOrder[]   = {-2, -3, -1, -4, 0}; // reverse knot spacings
@@ -6398,11 +6397,11 @@ auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> 
   return StitchBuffer->operator[](iStitchA).y == StitchBuffer->operator[](iStitchB).y;
 }
 
-void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset) {
+void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, uint32_t knotAttribute) {
   buffer.emplace_back(
       fPOINTATTR {StitchBuffer->operator[](iSource).x + KnotStep.x * gsl::narrow_cast<float>(offset),
                   StitchBuffer->operator[](iSource).y + KnotStep.y * gsl::narrow_cast<float>(offset),
-                  KnotAttribute});
+                  knotAttribute});
 }
 
 void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
@@ -6411,7 +6410,7 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
   if (finish == 0U) {
 	iStart++;
   }
-  KnotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
+  auto knotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
   do {
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
@@ -6428,10 +6427,10 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	  KnotStep.x = 2.0F / length * delta.x;
 	  KnotStep.y = 2.0F / length * delta.y;
 	  for (auto iKnot = 0U; iKnot < 5U; iKnot++) {
-		ofstch(buffer, finish, knots[iKnot]);
+		ofstch(buffer, finish, knots[iKnot], knotAttribute);
 	  }
 	  if (StateMap->test(StateFlag::FILDIR)) {
-		ofstch(buffer, finish, 0);
+		ofstch(buffer, finish, 0, knotAttribute);
 	  }
 	}
   }
@@ -6449,11 +6448,11 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
   if (finish < wrap::toUnsigned(StitchBuffer->size())) {
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y};
-	KnotAttribute    = StitchBuffer->operator[](start).attribute | KNOTMSK;
+	auto knotAttribute    = StitchBuffer->operator[](start).attribute | KNOTMSK;
 	KnotStep.x       = 2.0F / length * delta.x;
 	KnotStep.y       = 2.0F / length * delta.y;
 	for (char const iKnot : KnotAtStartOrder) {
-	  ofstch(buffer, start, iKnot);
+	  ofstch(buffer, start, iKnot, knotAttribute);
 	}
   }
 }
