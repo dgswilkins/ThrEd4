@@ -9990,8 +9990,8 @@ void thred::internal::nuscol(uint32_t iColor) noexcept {
 }
 
 void thred::internal::movchk() {
-  auto  draggedColor    = uint32_t {};
-  auto& defaultColorWin = *DefaultColorWin;
+  auto static draggedColor = uint32_t {};
+  auto& defaultColorWin    = *DefaultColorWin;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
@@ -10013,7 +10013,7 @@ void thred::internal::movchk() {
 			stitch.attribute |= draggedColor;
 		  }
 		  else {
-			if (key && color == draggedColor) {
+			if (!key && color == draggedColor) {
 			  stitch.attribute &= NCOLMSK;
 			  stitch.attribute |= VerticalIndex;
 			}
@@ -10025,7 +10025,7 @@ void thred::internal::movchk() {
 			  formIter.fillColor = gsl::narrow<uint8_t>(draggedColor);
 			}
 			else {
-			  if (key && formIter.fillColor == draggedColor) {
+			  if (!key && formIter.fillColor == draggedColor) {
 				formIter.fillColor = gsl::narrow<uint8_t>(VerticalIndex);
 			  }
 			}
@@ -10034,7 +10034,7 @@ void thred::internal::movchk() {
 				formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(draggedColor);
 			  }
 			  else {
-				if (key && formIter.fillInfo.feather.color == draggedColor) {
+				if (!key && formIter.fillInfo.feather.color == draggedColor) {
 				  formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(VerticalIndex);
 				}
 			  }
@@ -10045,7 +10045,7 @@ void thred::internal::movchk() {
 			  formIter.borderColor = gsl::narrow<uint8_t>(draggedColor);
 			}
 			else {
-			  if (key && formIter.borderColor == draggedColor) {
+			  if (!key && formIter.borderColor == draggedColor) {
 				formIter.borderColor = gsl::narrow<uint8_t>(VerticalIndex);
 			  }
 			}
