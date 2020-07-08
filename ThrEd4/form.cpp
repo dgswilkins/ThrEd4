@@ -8140,7 +8140,6 @@ void form::centir() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void form::internal::bean(uint32_t start, uint32_t finish) {
   auto highStitchBuffer = std::vector<fPOINTATTR> {};
   auto iSourceStitch    = start;

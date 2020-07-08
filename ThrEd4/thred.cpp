@@ -611,7 +611,6 @@ void thred::resetColorChanges() noexcept {
   ColorChanges = 0;
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::coltab() {
   if (StitchBuffer->size() > 1) {
 	thred::resetColorChanges();
@@ -5508,7 +5507,6 @@ void thred::internal::rebox() {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::delstchm() {
   thred::rngadj();
   auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
@@ -6235,7 +6233,6 @@ void thred::internal::duclip() {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
@@ -7745,7 +7742,6 @@ void thred::delinf() noexcept {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 void thred::chkrng(fPOINT& range) {
   thred::savdo();
   thred::delinf();
@@ -8307,7 +8303,6 @@ void thred::internal::colchk() {
   }
 }
 
-// suppression required until MSVC /analyze recognizes noexcept(false) used in gsl::narrow
 auto thred::internal::makbig(uint32_t start, uint32_t finish) -> uint32_t {
   auto newStitches = std::vector<fPOINTATTR> {};
   newStitches.reserve(finish - start); // we know that we will have at least this number of Stitches
