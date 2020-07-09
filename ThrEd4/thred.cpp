@@ -166,7 +166,6 @@ fPOINT     InsertCenter;                 // center point in inserted file
 uint32_t   NumericCode;                  // keyboard numerical input
 uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
-HANDLE     BalaradFile;                              // balarad file handle
 
 // graphics variables
 float      AspectRatio = (LHUPX / LHUPY); // aspect ratio of the stitch window
@@ -6413,22 +6412,18 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	length           = hypot(delta.x, delta.y);
 	iStart--;
   } while (length == 0.0F);
-  char const  knotAtEndOrder[]  = {-2, -3, -1, -4, 0}; // reverse knot spacings
-  char const  knotAtLastOrder[] = {0, -4, -1, -3, -2}; // reverse knot spacings
-  auto const* knots =
-      (StateMap->test(StateFlag::FILDIR)) ? std::begin(knotAtLastOrder) : std::begin(knotAtEndOrder);
-  if (knots != nullptr) {
-	if ((iStart & 0x8000000U) == 0U) {
-	  auto const delta =
-	      fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
-	              StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
-	  auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	  for (auto iKnot = 0U; iKnot < 5U; iKnot++) {
-		ofstch(buffer, finish, knots[iKnot], knotStep, knotAttribute);
-	  }
-	  if (StateMap->test(StateFlag::FILDIR)) {
-		ofstch(buffer, finish, 0, knotStep, knotAttribute);
-	  }
+  std::array<char, 5> knotAtEndOrder  = {-2, -3, -1, -4, 0}; // reverse knot spacings
+  std::array<char, 5> knotAtLastOrder = {0, -4, -1, -3, -2}; // reverse knot spacings
+  auto& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
+  if ((iStart & 0x8000000U) == 0U) {
+	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
+	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
+	auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	for (auto knot : knots) {
+	  ofstch(buffer, finish, knot, knotStep, knotAttribute);
+	}
+	if (StateMap->test(StateFlag::FILDIR)) {
+	  ofstch(buffer, finish, 0, knotStep, knotAttribute);
 	}
   }
 }
@@ -16019,7 +16014,7 @@ void thred::internal::ducmd() {
 	auto arg1 = std::wstring {ArgList[1]};
 	if (arg1.compare(0, 4, L"/F1:") == 0) {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
-	  BalaradFile =
+	  auto BalaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (BalaradFile != INVALID_HANDLE_VALUE) {
