@@ -189,7 +189,6 @@ COLORREF const DefaultColors[] = {0x00000000,
 int32_t BoxOffset[4];
 
 uint32_t VerticalIndex;      // vertical index of the color window, calculated from mouse click
-uint32_t ThreadSizeSelected; // thread selected for size change
 
 fs::path* DefaultDirectory;
 fs::path* BalaradName0; // balarad semaphore file
@@ -12301,6 +12300,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
                                            float&              xyRatio,
                                            FRMHED const&       textureForm,
                                            bool&               retflag) -> bool {
+  auto static threadSizeSelected = uint32_t {}; // thread selected for size change
+
   retflag = true;
   if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
 	xt::dushft();
@@ -12550,12 +12551,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2])) {
 	  VerticalIndex -= 13U;
 	  char threadSizeMap[]                = {'3', '4', '6'};
-	  ThreadSize[ThreadSizeSelected][0]   = threadSizeMap[VerticalIndex];
-	  ThreadSizeIndex[ThreadSizeSelected] = VerticalIndex;
+	  ThreadSize[threadSizeSelected][0]   = threadSizeMap[VerticalIndex];
+	  ThreadSizeIndex[threadSizeSelected] = VerticalIndex;
 	  wchar_t buffer[3]                   = {0};
-	  wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[ThreadSizeSelected]), 2);
+	  wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[threadSizeSelected]), 2);
 	  buffer[2] = 0;
-	  SetWindowText(ThreadSizeWin[ThreadSizeSelected], static_cast<LPTSTR>(buffer));
+	  SetWindowText(ThreadSizeWin[threadSizeSelected], static_cast<LPTSTR>(buffer));
 	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
 		if (iWindow != nullptr) {
@@ -12991,7 +12992,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  wchar_t const* const str[] = {L"30", L"40", L"60"};
 	  thred::savdo();
-	  ThreadSizeSelected = VerticalIndex;
+	  threadSizeSelected = VerticalIndex;
 	  for (auto iThreadSize = 0U; iThreadSize < 3; iThreadSize++) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		ChangeThreadSizeWin[iThreadSize] = CreateWindow(L"STATIC",
