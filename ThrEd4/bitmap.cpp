@@ -66,7 +66,7 @@ auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
-#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast  NOLINTNEXTLINE(readability-qualified-auto)
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
 	auto bitmap =
 	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	if (*ppvBits != nullptr) {
@@ -82,7 +82,7 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
 void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   auto const InverseBackgroundColor = fswap(backgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto      hBitmapFile =
+  auto hBitmapFile =
       CreateFile(UserBMPFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
@@ -145,7 +145,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto bitmap                   = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -302,7 +302,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 		if (SUCCEEDED(hr) && (nullptr != pItem)) {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pszFilePath = PWSTR {nullptr};
-		  hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+		  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
 			fileName.assign(pszFilePath);
@@ -401,7 +401,7 @@ auto bitmap::internal::loadName(fs::path* fileName) -> bool {
 			if (SUCCEEDED(hr) && (nullptr != pItem)) {
 			  // NOLINTNEXTLINE(readability-qualified-auto)
 			  auto pszFilePath = PWSTR {nullptr};
-			  hr                = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hr)) {
 				fileName->assign(pszFilePath);

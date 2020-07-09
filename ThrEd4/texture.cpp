@@ -70,10 +70,9 @@ void texture::txdun() {
   if (!TextureHistory[0].texturePoints.empty()) {
 	wchar_t name[_MAX_PATH] = {0};
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
-	  auto  bytesWritten = DWORD {0};
+	  auto bytesWritten = DWORD {0};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto handle =
-	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), gsl::narrow<DWORD>(signature.size()), &bytesWritten, nullptr);

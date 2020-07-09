@@ -29,9 +29,9 @@
 
 namespace fs = std::filesystem;
 
-uint32_t   ActiveColor = 0; // active color selector
-uint8_t    ActiveLayer = 0; // active layer
-fRECTANGLE* AllItemsRect; // rectangle enclosing all forms and stitches
+uint32_t    ActiveColor = 0; // active color selector
+uint8_t     ActiveLayer = 0; // active layer
+fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
@@ -199,12 +199,12 @@ double StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
 
 std::vector<fPOINTATTR>* StitchBuffer; // main stitch buffer
 
-fRECTANGLE StitchRangeRect;         // stitch range rectangle
-RECT       StitchWindowClientRect;  // stitch window size,client
-HDC        StitchWindowDC;          // stitch window device context
-HDC        StitchWindowMemDC;       // stitch window memory device context
-POINT      StitchWindowOrigin;      // offset origin of the stitch window
-POINT      StitchWindowSize;        // size of the stitch window in pixels
+fRECTANGLE StitchRangeRect;        // stitch range rectangle
+RECT       StitchWindowClientRect; // stitch window size,client
+HDC        StitchWindowDC;         // stitch window device context
+HDC        StitchWindowMemDC;      // stitch window memory device context
+POINT      StitchWindowOrigin;     // offset origin of the stitch window
+POINT      StitchWindowSize;       // size of the stitch window in pixels
 
 std::vector<std::wstring>* StringTable; //
 std::vector<fPOINT>*       TempPolygon; // temporary storage when user is entering a polygon;

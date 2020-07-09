@@ -66,8 +66,8 @@
 
 namespace fs = std::filesystem;
 
-extern uint32_t   ActiveColor;
-extern uint8_t    ActiveLayer;
+extern uint32_t    ActiveColor;
+extern uint8_t     ActiveLayer;
 extern fRECTANGLE* AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;

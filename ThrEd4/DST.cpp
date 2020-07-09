@@ -749,7 +749,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   DSTRecords.push_back(
       {gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0xf3)});
   if (di::colfil()) {
-	auto  bytesWritten = DWORD {0};
+	auto bytesWritten = DWORD {0};
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
@@ -856,7 +856,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = HANDLE {nullptr};
-  if (!thred::getFileHandle(newFileName,fileHandle)) {
+  if (!thred::getFileHandle(newFileName, fileHandle)) {
 	return false;
   }
   auto dstHeader = DSTHED {};
@@ -865,8 +865,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   if (bytesRead == sizeof(dstHeader)) {
 	if (di::chkdst(&dstHeader)) {
 	  PCSBMPFileName[0] = 0;
-	  fileSize          -= sizeof(dstHeader);
-	  auto DSTData      = std::vector<DSTREC> {};
+	  fileSize -= sizeof(dstHeader);
+	  auto DSTData = std::vector<DSTREC> {};
 	  DSTData.resize(fileSize / sizeof(DSTREC));
 	  wrap::ReadFile(fileHandle, DSTData.data(), fileSize, &bytesRead, nullptr);
 	  di::dstran(DSTData);

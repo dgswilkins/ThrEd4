@@ -1155,8 +1155,8 @@ void trace::tracpar() {
 }
 
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
-  auto const zeroWidth = thred::txtWid(L"0");
-  wchar_t    buffer[11]   = {0};
+  auto const zeroWidth  = thred::txtWid(L"0");
+  wchar_t    buffer[11] = {0};
   color >>= shift;
   color &= 0xffU;
   _itow_s(color, buffer, 10);
@@ -1212,11 +1212,11 @@ void trace::internal::dublk(HDC dc, RECT const& traceHighMask, RECT const& trace
 }
 
 void trace::wasTrace() {
-  auto        traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
-  auto        traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
-  auto        traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
+  auto traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
+  auto traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
+  auto traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const BlackBrush          = CreateSolidBrush(0);   // black brush
+  auto const BlackBrush = CreateSolidBrush(0); // black brush
   for (auto iRGB = 0; iRGB < 3; iRGB++) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
@@ -1235,7 +1235,7 @@ void trace::wasTrace() {
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto   TempBrush  = BlackBrush;
+	  auto    TempBrush  = BlackBrush;
 	  wchar_t buffer[10] = {0}; // for integer to string conversion
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);

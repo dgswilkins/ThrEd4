@@ -544,7 +544,7 @@ void formForms::prfmsg() {
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  PreferencesWindow  = CreateWindow(L"STATIC",
+  PreferencesWindow = CreateWindow(L"STATIC",
                                    nullptr,
                                    WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    ButtonWidthX3 + 3,
@@ -576,7 +576,7 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle / PI_F * 180.0F)), STR_PRF1);
   auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? StringTable->operator[](STR_SQR)
-                                                     : StringTable->operator[](STR_PNTD);
+                                                      : StringTable->operator[](STR_PNTD);
   ffi::prflin(choice, STR_PRF2);
   ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
   ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
@@ -589,10 +589,10 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
   ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
   choice = (UserFlagMap->test(UserFlag::BLUNT)) ? StringTable->operator[](STR_BLUNT)
-                                               : StringTable->operator[](STR_TAPR);
+                                                : StringTable->operator[](STR_TAPR);
   ffi::prflin(choice, STR_PRF15);
   choice = (UserFlagMap->test(UserFlag::DUND)) ? StringTable->operator[](STR_ON)
-                                              : StringTable->operator[](STR_OFF);
+                                               : StringTable->operator[](STR_OFF);
   ffi::prflin(choice, STR_PRF19);
   ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
   ffi::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);

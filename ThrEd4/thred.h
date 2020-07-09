@@ -329,7 +329,7 @@ namespace internal {
 
   constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
-  void ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, fPOINT const &KnotStep, uint32_t KnotAttribute);
+  void ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, fPOINT const& KnotStep, uint32_t KnotAttribute);
   auto oldwnd(HWND window) noexcept -> bool;
   void ovrlay();
   void patdun();

@@ -270,8 +270,7 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   buffer.push_back(0x0U);
 }
 
-void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer,
-                                     uint8_t const (*image)[ThumbHeight][ThumbWidth]) {
+void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]) {
   if (image != nullptr) {
 	for (auto i = 0U; i < ThumbHeight; i++) {
 	  for (auto j = 0U; j < 6U; j++) {
@@ -358,12 +357,12 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = HANDLE {nullptr};
-  if (!thred::getFileHandle(newFileName,fileHandle)) {
+  if (!thred::getFileHandle(newFileName, fileHandle)) {
 	return false;
   }
   auto  fileBuf    = std::vector<uint8_t>(fileSize);
   auto* fileBuffer = fileBuf.data();
-  auto bytesRead = DWORD {0};
+  auto  bytesRead  = DWORD {0};
   ReadFile(fileHandle, fileBuffer, fileSize, &bytesRead, nullptr);
   auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
   if (strncmp(static_cast<char*>(pesHeader->led), "#PES00", 6) != 0) {
@@ -412,7 +411,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	auto       iPESstitch = 0U;
 	auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
 	StitchBuffer->clear();
-	StitchBuffer->reserve(pecCount/2); // we are still reserving a bit more than necessary
+	StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
 	StitchBuffer->push_back(fPOINTATTR {});
 	while (iPESstitch < pecCount) {
 	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
@@ -671,6 +670,5 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
   return flag;
 }
 #pragma warning(pop)
-
 
 #endif

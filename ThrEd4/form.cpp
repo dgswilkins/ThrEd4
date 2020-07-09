@@ -425,7 +425,7 @@ void form::form() {
 void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   POINT line[4]  = {};
   auto  vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
-  line[1] = thred::stch2pxr(vertexIt[iVertex]);
+  line[1]        = thred::stch2pxr(vertexIt[iVertex]);
   auto const ratio =
       gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, gsl::narrow<int32_t>(*screenDPI), 96)) /
       StitchWindowClientRect.right;
@@ -441,7 +441,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto adjustedPoint = fPOINT {point.x + offset.x, point.y + offset.y};
   line[0] = line[3] = thred::stch2pxr(adjustedPoint);
   adjustedPoint     = fPOINT {point.x - offset.x, point.y - offset.y};
-  line[2] = thred::stch2pxr(adjustedPoint);
+  line[2]           = thred::stch2pxr(adjustedPoint);
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
 }
 
@@ -1265,7 +1265,7 @@ void form::chkseq(bool border) {
 	}
   }
   else {
-	outDebugString(L"chkseq: OSequence empty! border [{}]\n",border);
+	outDebugString(L"chkseq: OSequence empty! border [{}]\n", border);
   }
   if (minimumStitchLength == 0.0F) {
 	return;
@@ -4723,7 +4723,8 @@ void form::refilfn() {
   if (!clip::isclp(form)) {
 	UserStitchLength = form.lengthOrCount.stitchLength;
   }
-  if (!(StateMap->test(StateFlag::WASDO) || StateMap->test(StateFlag::FUNCLP) || StateMap->test(StateFlag::FUNSCLP))) {
+  if (!(StateMap->test(StateFlag::WASDO) || StateMap->test(StateFlag::FUNCLP) ||
+        StateMap->test(StateFlag::FUNSCLP))) {
 	thred::savdo();
   }
   StateMap->reset(StateFlag::WASDO);
@@ -5413,7 +5414,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  }
 	}
 	else {
-	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]",inOutFlag);
+	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", inOutFlag);
 	}
   }
   return minimumLength != 1e99;
@@ -6991,19 +6992,19 @@ void form::internal::doTimeWindow(float                        rangeX,
   auto checkLength = wrap::round<uint32_t>(SnapLength * 2.0F + 1.0F);
   // NOLINTNEXTLINE(hicpp-signed-bitwise,readability-qualified-auto)
   auto timeWindow = CreateWindow(L"STATIC",
-                                  nullptr,
-                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                  ButtonWidthX3,
-                                  0,
-                                  StitchWindowSize.x,
-                                  ButtonHeight,
-                                  ThrEdWindow,
-                                  nullptr,
-                                  ThrEdInstance,
-                                  nullptr);
+                                 nullptr,
+                                 WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                 ButtonWidthX3,
+                                 0,
+                                 StitchWindowSize.x,
+                                 ButtonHeight,
+                                 ThrEdWindow,
+                                 nullptr,
+                                 ThrEdInstance,
+                                 nullptr);
 
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto      timeDC       = GetDC(timeWindow);
+  auto       timeDC       = GetDC(timeWindow);
   auto const timeStep     = gsl::narrow_cast<double>(StitchWindowSize.x) / rangeX;
   auto       timePosition = 0.0;
   auto&      formLines    = *FormLines;

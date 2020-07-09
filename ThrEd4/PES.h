@@ -144,10 +144,10 @@ class PECHDR2
 };
 
 namespace PES {
-  auto readPESFile(std::filesystem::path const& newFileName) -> bool;
-  auto savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
+auto readPESFile(std::filesystem::path const& newFileName) -> bool;
+auto savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
 namespace internal {
-  auto dupcol(uint32_t activeColor)->uint32_t;
+  auto dupcol(uint32_t activeColor) -> uint32_t;
   void pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta);
   void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
   void pecImage(std::vector<uint8_t>& pecBuffer);
