@@ -157,7 +157,7 @@ HWND  SpeedScrollBar;         // speed scroll bar for movie
 HWND  BackupViewer[OLDVER];   // handles of multiple file viewing windows
 
 std::bitset<32> DisplayedColorBitmap(0); // Map of color numbers in design that are actually displayed
-int32_t  NearestPoint[NERCNT];           // indices of the closest points
+auto     NearestPoint = std::array<int32_t, NERCNT> {}; // indices of the closest points
 uint32_t MoveAnchor;                     // for resequencing stitches
 double   RotateAngle;                    // angle for pixel rotate
 SIZE     PickColorMsgSize;               // size of the pick color message
@@ -4889,9 +4889,7 @@ void thred::internal::closPnt() {
   unboxs();
   std::vector<double> gapToNearest;  // distances of the closest points
   gapToNearest.resize(NERCNT, 1e99); // to a mouse click
-  for (auto& iNear : NearestPoint) {
-	iNear = -1;
-  }
+  NearestPoint.fill(-1);
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
 	auto const iStitch0 = ColorChangeTable[iColor].stitchIndex;
