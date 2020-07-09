@@ -16389,12 +16389,6 @@ void thred::internal::init() {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   displayText::lodstr();
-  if (IniFileHandle == nullptr) {
-	// initialize the user color and thread size arrays
-	for (auto iColor = 0U; iColor < 16U; iColor++) {
-	  UserColor[iColor] = DefaultColors[iColor];
-	}
-  }
   for (auto& iSize : ThreadSize) {
 	iSize[0] = '4';
 	iSize[1] = '0';
