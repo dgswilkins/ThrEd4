@@ -168,7 +168,6 @@ uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
 
 // graphics variables
-SCROLLINFO ScrollInfo;                    // scroll bar i/o structure
 
 COLORREF const DefaultColors[] = {0x00000000,
                                   0x00800000,
@@ -7008,14 +7007,15 @@ void thred::internal::movi() {
 	if (MovieTimeStep > MAXDELAY) {
 	  MovieTimeStep = MAXDELAY;
 	}
-	ScrollInfo.cbSize = sizeof(ScrollInfo);
+	auto scrollInfo = SCROLLINFO {};                    // scroll bar i/o structure
+	scrollInfo.cbSize = sizeof(scrollInfo);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	ScrollInfo.fMask = SIF_ALL;
-	ScrollInfo.nMax  = MAXDELAY;
-	ScrollInfo.nMin  = MINDELAY;
-	ScrollInfo.nPage = 1;
-	ScrollInfo.nPos  = MAXDELAY - MovieTimeStep;
-	SetScrollInfo(SpeedScrollBar, SB_CTL, &ScrollInfo, TRUE);
+	scrollInfo.fMask = SIF_ALL;
+	scrollInfo.nMax  = MAXDELAY;
+	scrollInfo.nMin  = MINDELAY;
+	scrollInfo.nPage = 1;
+	scrollInfo.nPos  = MAXDELAY - MovieTimeStep;
+	SetScrollInfo(SpeedScrollBar, SB_CTL, &scrollInfo, TRUE);
 	FillRect(StitchWindowDC, &StitchWindowClientRect, BackgroundBrush);
 	setsped();
   }
@@ -16725,18 +16725,19 @@ void thred::internal::drwStch() {
   thi::drawBackground();
   if (StateMap->test(StateFlag::INIT)) {
 	if (StateMap->test(StateFlag::ZUMED)) {
-	  ScrollInfo.cbSize = sizeof(ScrollInfo);
+	  auto scrollInfo   = SCROLLINFO {}; // scroll bar i/o structure
+	  scrollInfo.cbSize = sizeof(scrollInfo);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  ScrollInfo.fMask = SIF_ALL;
-	  ScrollInfo.nMax  = UnzoomedRect.y;
-	  ScrollInfo.nMin  = 0;
-	  ScrollInfo.nPage = wrap::round<int32_t>(ZoomRect.top - ZoomRect.bottom);
-	  ScrollInfo.nPos  = wrap::round<decltype(ScrollInfo.nPos)>(UnzoomedRect.y - ZoomRect.top);
-	  SetScrollInfo(VerticalScrollBar, SB_CTL, &ScrollInfo, TRUE);
-	  ScrollInfo.nMax  = UnzoomedRect.x;
-	  ScrollInfo.nPage = wrap::round<int32_t>(ZoomRect.right - ZoomRect.left);
-	  ScrollInfo.nPos  = wrap::round<decltype(ScrollInfo.nPos)>(ZoomRect.left);
-	  SetScrollInfo(HorizontalScrollBar, SB_CTL, &ScrollInfo, TRUE);
+	  scrollInfo.fMask = SIF_ALL;
+	  scrollInfo.nMax  = UnzoomedRect.y;
+	  scrollInfo.nMin  = 0;
+	  scrollInfo.nPage = wrap::round<int32_t>(ZoomRect.top - ZoomRect.bottom);
+	  scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(UnzoomedRect.y - ZoomRect.top);
+	  SetScrollInfo(VerticalScrollBar, SB_CTL, &scrollInfo, TRUE);
+	  scrollInfo.nMax  = UnzoomedRect.x;
+	  scrollInfo.nPage = wrap::round<int32_t>(ZoomRect.right - ZoomRect.left);
+	  scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
+	  SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
 	  ShowWindow(HorizontalScrollBar, TRUE);
 	  ShowWindow(VerticalScrollBar, TRUE);
 	}
