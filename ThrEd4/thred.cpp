@@ -868,13 +868,13 @@ void thred::rngadj() {
 
 void thred::internal::box(uint32_t iNearest, HDC dc) noexcept {
   auto const boxWidth = BoxOffset[iNearest];
-  POINT      line[5]  = {};
+  auto line = std::array<POINT, 5> {};
   line[0]             = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y - boxWidth};
   line[1]             = {NearestPixel[iNearest].x + boxWidth, NearestPixel[iNearest].y - boxWidth};
   line[2]             = {NearestPixel[iNearest].x + boxWidth, NearestPixel[iNearest].y + boxWidth};
   line[3]             = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y + boxWidth};
   line[4]             = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y - boxWidth};
-  Polyline(dc, static_cast<POINT const*>(line), 5);
+  Polyline(dc, line.data(), 5);
 }
 
 void thred::internal::boxs() noexcept {
