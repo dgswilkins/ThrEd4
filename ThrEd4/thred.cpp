@@ -168,7 +168,6 @@ uint32_t   Knots[MAXKNOTS];              // pointers to knots
 uint32_t   KnotCount;                    // number of knots in the design
 
 // graphics variables
-float      AspectRatio = (LHUPX / LHUPY); // aspect ratio of the stitch window
 SCROLLINFO ScrollInfo;                    // scroll bar i/o structure
 
 COLORREF const DefaultColors[] = {0x00000000,
@@ -898,14 +897,14 @@ void thred::internal::unboxs() noexcept {
 }
 
 void thred::internal::stchPars() {
-  AspectRatio = gsl::narrow_cast<float>(UnzoomedRect.x) / gsl::narrow_cast<float>(UnzoomedRect.y);
+  auto aspectRatio = gsl::narrow_cast<float>(UnzoomedRect.x) / gsl::narrow_cast<float>(UnzoomedRect.y);
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	StitchWindowSize.x = wrap::round<int32_t>(
-	    gsl::narrow_cast<float>(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * AspectRatio);
+	    gsl::narrow_cast<float>(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
   }
   else {
 	StitchWindowSize.x =
-	    wrap::round<int32_t>(gsl::narrow_cast<float>(ThredWindowRect.bottom - *ScrollSize) * AspectRatio);
+	    wrap::round<int32_t>(gsl::narrow_cast<float>(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
   }
 
   if ((StitchWindowSize.x + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
@@ -919,11 +918,11 @@ void thred::internal::stchPars() {
   else {
 	StitchWindowSize = {ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
 	                    ThredWindowRect.bottom - ThredWindowRect.top};
-	if ((gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(StitchWindowSize.y)) > AspectRatio) {
-	  StitchWindowSize.x = wrap::round<int32_t>(StitchWindowSize.y * AspectRatio);
+	if ((gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(StitchWindowSize.y)) > aspectRatio) {
+	  StitchWindowSize.x = wrap::round<int32_t>(StitchWindowSize.y * aspectRatio);
 	}
 	else {
-	  StitchWindowSize.y = wrap::round<int32_t>(StitchWindowSize.x / AspectRatio);
+	  StitchWindowSize.y = wrap::round<int32_t>(StitchWindowSize.x / aspectRatio);
 	}
   }
 }
