@@ -4889,8 +4889,8 @@ void thred::internal::closPnt() {
   unboxs();
   std::vector<double> gapToNearest;  // distances of the closest points
   gapToNearest.resize(NERCNT, 1e99); // to a mouse click
-  for (auto iNear = 0U; iNear < NERCNT; iNear++) {
-	NearestPoint[iNear] = -1;
+  for (auto& iNear : NearestPoint) {
+	iNear = -1;
   }
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
@@ -16019,6 +16019,7 @@ void thred::internal::ducmd() {
 	auto arg1 = std::wstring {ArgList[1]};
 	if (arg1.compare(0, 4, L"/F1:") == 0) {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
+	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto BalaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
