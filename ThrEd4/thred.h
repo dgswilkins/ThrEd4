@@ -315,7 +315,7 @@ namespace internal {
   void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
-  auto nuang(float OriginalAngle, float yDelta, float xDelta) noexcept -> float;
+  auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
   void nucols();
   void nudgfn(float deltaX, float deltaY);
   void nulayr(uint32_t play);
