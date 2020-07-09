@@ -196,8 +196,6 @@ fs::path* BalaradName1; // balarad data file
 fs::path* BalaradName2;
 fs::path* IniFileName; //.ini file name
 
-HANDLE IniFileHandle = nullptr;
-
 std::vector<fs::path>*     PreviousNames;
 std::vector<std::wstring>* Thumbnails;            // vector of thumbnail names
 uint32_t                   ThumbnailsSelected[4]; // indexes of thumbnails selected for display
@@ -2824,15 +2822,15 @@ void thred::internal::ritini() {
 	IniFile.initialWindowCoords.bottom = windowRect.bottom;
 	IniFile.initialWindowCoords.top    = windowRect.top;
   }
-  IniFileHandle = CreateFile(
+  auto iniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-  if (IniFileHandle != INVALID_HANDLE_VALUE) {
+  if (iniFileHandle != INVALID_HANDLE_VALUE) {
 	auto bytesRead = DWORD {0};
-	WriteFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
+	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
 	// ToDo - Check that file is wriiten completely
   }
-  CloseHandle(IniFileHandle);
+  CloseHandle(iniFileHandle);
 }
 
 auto thred::internal::savcmp() noexcept -> bool {
@@ -16078,16 +16076,16 @@ void thred::internal::redini() {
   duhom();
   *IniFileName = *HomeDirectory;
   *IniFileName /= L"thred.ini";
-  IniFileHandle =
+  auto iniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-  if (IniFileHandle == INVALID_HANDLE_VALUE) {
+  if (iniFileHandle == INVALID_HANDLE_VALUE) {
 	setPrefs();
   }
   else {
 	auto bytesRead = DWORD {0};
-	ReadFile(IniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
-	CloseHandle(IniFileHandle);
+	ReadFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
+	CloseHandle(iniFileHandle);
 	if (bytesRead < sizeof(IniFile)) {
 	  auto newFileName = *IniFileName;
 	  newFileName.replace_filename("thred-ini.bak");
