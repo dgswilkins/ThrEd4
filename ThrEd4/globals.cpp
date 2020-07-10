@@ -226,7 +226,7 @@ boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
 POINT              UnzoomedRect;           // size of the unzoomed stitch window
-COLORREF           UserColor[COLOR_COUNT]; // user colors
+auto               UserColor = std::array<COLORREF, COLOR_COUNT> {}; // user colors
 std::vector<HWND>* UserColorWin;           // user color windows
 EnumMap<UserFlag>* UserFlagMap; // for storage of persistent binary variables set by the user
 HPEN               UserPen[COLOR_COUNT];                 // user color pens

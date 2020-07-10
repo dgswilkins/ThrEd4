@@ -137,10 +137,10 @@ HBRUSH UserColorBrush[16];    // user color brushes
 
 // for the choose color dialog box
 CHOOSECOLOR ColorStruct;
-COLORREF    CustomColor[16];
+auto        CustomColor = std::array<COLORREF, COLOR_COUNT> {};
 // for the background color dialog box
 CHOOSECOLOR BackgroundColorStruct;
-COLORREF    CustomBackgroundColor[16];
+auto CustomBackgroundColor = std::array<COLORREF, COLOR_COUNT>{};
 
 wchar_t  ThreadSize[16][2];    // user selected thread sizes
 uint32_t ThreadSizePixels[16]; // thread sizes in pixels
@@ -205,57 +205,6 @@ wchar_t  ThumbnailSearchString[32]; // storage for the thumnail search string
 uint32_t InsertedVertexIndex;       // saved float pointer for inserting files
 uint32_t InsertedFormIndex;         // saved form pointer for inserting files
 uint32_t InsertedStitchIndex;       // saved stitch pointer for inserting files
-
-COLORREF const DefaultUserColors[] = {0x00000000,
-                                      0x002dffff,
-                                      0x003f87e9,
-                                      0x000762f8,
-                                      0x000000ff,
-                                      0x002f03af,
-                                      0x007248b7,
-                                      0x00ff0080,
-                                      0x00920166,
-                                      0x00a00000,
-                                      0x00ff2424,
-                                      0x006a4d15,
-                                      0x00f5800a,
-                                      0x004b7807,
-                                      0x00156a1e,
-                                      0x00dbe6e3};
-
-COLORREF const DefaultCustomColors[] = {0x00729674,
-                                        0x001a1eb9,
-                                        0x00427347,
-                                        0x0000bfff,
-                                        0x00d3c25f,
-                                        0xc003ced0,
-                                        0x004a8459,
-                                        0x008cacd0,
-                                        0x0081aeb6,
-                                        0x007243a5,
-                                        0x00bdadda,
-                                        0x009976c5,
-                                        0x0096d9f5,
-                                        0x00e2ddd6,
-                                        0x00245322,
-                                        0x007b60ae};
-
-COLORREF const DefaultCustomBackgroundColors[] = {0x00a3c5dc,
-                                                  0x00adc7b6,
-                                                  0x00d1fcfb,
-                                                  0x00dcd7c0,
-                                                  0x00ebddcd,
-                                                  0x00c6b3b3,
-                                                  0x00dec9ce,
-                                                  0x00d2d1e9,
-                                                  0x00dfdffd,
-                                                  0x00bee6ef,
-                                                  0x008fb8b1,
-                                                  0x0085c2e0,
-                                                  0x00abc1c9,
-                                                  0x00d3d3c7,
-                                                  0x007c9c84,
-                                                  0x009acddc};
 
 POINT MoveLine0[2];              // move point line
 POINT MoveLine1[2];              // move point line
@@ -3104,8 +3053,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   }
   durit(buffer, std::begin(PCSBMPFileName), sizeof(PCSBMPFileName));
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
-  durit(buffer, std::begin(UserColor), sizeof(UserColor));
-  durit(buffer, std::begin(CustomColor), sizeof(CustomColor));
+  durit(buffer, UserColor.data(), UserColor.size());
+  durit(buffer, CustomColor.data(), CustomColor.size());
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(threadLength);
   for (auto iThread = 0U; iThread < threadLength; iThread++) {
@@ -4333,13 +4282,13 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
-	ReadFile(fileHandle, static_cast<LPVOID>(UserColor), sizeof(UserColor), &bytesRead, nullptr);
-	if (bytesRead != sizeof(UserColor)) {
+	ReadFile(fileHandle, UserColor.data(), UserColor.size(), &bytesRead, nullptr);
+	if (bytesRead != UserColor.size()) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	ReadFile(fileHandle, static_cast<LPVOID>(CustomColor), sizeof(CustomColor), &bytesRead, nullptr);
-	if (bytesRead != sizeof(CustomColor)) {
+	ReadFile(fileHandle, CustomColor.data(), CustomColor.size(), &bytesRead, nullptr);
+	if (bytesRead != CustomColor.size()) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
@@ -4633,7 +4582,7 @@ auto thred::internal::nuCol(COLORREF init) noexcept -> COLORREF {
   ColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   ColorStruct.hwndOwner      = ThrEdWindow;
   ColorStruct.lCustData      = 0;
-  ColorStruct.lpCustColors   = std::begin(CustomColor);
+  ColorStruct.lpCustColors   = CustomColor.data();
   ColorStruct.lpfnHook       = nullptr;
   ColorStruct.lpTemplateName = nullptr;
   ColorStruct.rgbResult      = init;
@@ -4646,7 +4595,7 @@ auto thred::internal::nuBak() noexcept -> COLORREF {
   BackgroundColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BackgroundColorStruct.hwndOwner      = ThrEdWindow;
   BackgroundColorStruct.lCustData      = 0;
-  BackgroundColorStruct.lpCustColors   = std::begin(CustomBackgroundColor);
+  BackgroundColorStruct.lpCustColors   = CustomBackgroundColor.data();
   BackgroundColorStruct.lpfnHook       = nullptr;
   BackgroundColorStruct.lpTemplateName = nullptr;
   BackgroundColorStruct.rgbResult      = BackgroundColor;
@@ -9071,11 +9020,57 @@ void thred::internal::fil2men() {
 
 void thred::internal::defpref() {
   UserFlagMap->reset();
-  for (auto iColor = 0U; iColor < 16U; iColor++) {
-	UserColor[iColor]             = DefaultUserColors[iColor];
-	CustomColor[iColor]           = DefaultCustomColors[iColor];
-	CustomBackgroundColor[iColor] = DefaultCustomBackgroundColors[iColor];
-  }
+  UserColor = {0x00000000,
+               0x002dffff,
+               0x003f87e9,
+               0x000762f8,
+               0x000000ff,
+               0x002f03af,
+               0x007248b7,
+               0x00ff0080,
+               0x00920166,
+               0x00a00000,
+               0x00ff2424,
+               0x006a4d15,
+               0x00f5800a,
+               0x004b7807,
+               0x00156a1e,
+               0x00dbe6e3};
+
+  CustomColor = {0x00729674,
+                 0x001a1eb9,
+                 0x00427347,
+                 0x0000bfff,
+                 0x00d3c25f,
+                 0xc003ced0,
+                 0x004a8459,
+                 0x008cacd0,
+                 0x0081aeb6,
+                 0x007243a5,
+                 0x00bdadda,
+                 0x009976c5,
+                 0x0096d9f5,
+                 0x00e2ddd6,
+                 0x00245322,
+                 0x007b60ae};
+
+  CustomBackgroundColor = {0x00a3c5dc,
+                           0x00adc7b6,
+                           0x00d1fcfb,
+                           0x00dcd7c0,
+                           0x00ebddcd,
+                           0x00c6b3b3,
+                           0x00dec9ce,
+                           0x00d2d1e9,
+                           0x00dfdffd,
+                           0x00bee6ef,
+                           0x008fb8b1,
+                           0x0085c2e0,
+                           0x00abc1c9,
+                           0x00d3d3c7,
+                           0x007c9c84,
+                           0x009acddc};
+
   bitmap::setBmpBackColor();
   formForms::dazdef();
   AppliqueColor          = 15U;

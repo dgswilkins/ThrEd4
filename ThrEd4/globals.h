@@ -264,7 +264,7 @@ extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;
 
 extern POINT    UnzoomedRect;
-extern COLORREF UserColor[16];
+extern std::array<COLORREF, COLOR_COUNT> UserColor;
 
 extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
