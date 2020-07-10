@@ -206,8 +206,8 @@ uint32_t InsertedVertexIndex;       // saved float pointer for inserting files
 uint32_t InsertedFormIndex;         // saved form pointer for inserting files
 uint32_t InsertedStitchIndex;       // saved stitch pointer for inserting files
 
-POINT MoveLine0[2];              // move point line
-POINT MoveLine1[2];              // move point line
+auto MoveLine0 = std::array<POINT, 2>{};              // move point line
+auto MoveLine1 = std::array<POINT, 2>{};              // move point line
 POINT ClipInsertBoxLine[5];      // for displaying clipboard insert rectangle
 POINT RotateBoxOutline[5];       // for drawing the rotate rectangle
 POINT RotateBoxCrossVertLine[2]; // vertical part of the rotate cross
@@ -2771,6 +2771,7 @@ void thred::internal::ritini() {
 	IniFile.initialWindowCoords.bottom = windowRect.bottom;
 	IniFile.initialWindowCoords.top    = windowRect.top;
   }
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto iniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -3053,8 +3054,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   }
   durit(buffer, std::begin(PCSBMPFileName), sizeof(PCSBMPFileName));
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
-  durit(buffer, UserColor.data(), UserColor.size());
-  durit(buffer, CustomColor.data(), CustomColor.size());
+  durit(buffer, UserColor.data(), gsl::narrow<uint32_t>(UserColor.size()));
+  durit(buffer, CustomColor.data(), gsl::narrow<uint32_t>(CustomColor.size()));
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(threadLength);
   for (auto iThread = 0U; iThread < threadLength; iThread++) {
@@ -4282,12 +4283,12 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
-	ReadFile(fileHandle, UserColor.data(), UserColor.size(), &bytesRead, nullptr);
+	ReadFile(fileHandle, UserColor.data(), gsl::narrow<DWORD>(UserColor.size()), &bytesRead, nullptr);
 	if (bytesRead != UserColor.size()) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	ReadFile(fileHandle, CustomColor.data(), CustomColor.size(), &bytesRead, nullptr);
+	ReadFile(fileHandle, CustomColor.data(), gsl::narrow<DWORD>(CustomColor.size()), &bytesRead, nullptr);
 	if (bytesRead != CustomColor.size()) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
@@ -4991,23 +4992,23 @@ void thred::internal::toglHid() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thred::internal::dulin() {
+void thred::internal::dulin(std::array<POINT, 2>& moveLine0, std::array<POINT, 2>& moveLine1) {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  if (MoveLine0[0].x == MoveLine1[1].x && MoveLine0[0].y == MoveLine1[1].y) {
+  if (moveLine0[0].x == moveLine1[1].x && moveLine0[0].y == moveLine1[1].y) {
 	if (StateMap->test(StateFlag::ISDWN)) {
-	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine0), 2);
+	  Polyline(StitchWindowDC, moveLine0.data(), gsl::narrow<int>(moveLine0.size()));
 	}
 	else {
-	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine1), 2);
+	  Polyline(StitchWindowDC, moveLine1.data(), gsl::narrow<int>(moveLine1.size()));
 	}
   }
   else {
 	if (StateMap->test(StateFlag::ISDWN)) {
-	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine0), 2);
+	  Polyline(StitchWindowDC, moveLine0.data(), gsl::narrow<int>(moveLine0.size()));
 	}
 	if (StateMap->test(StateFlag::ISUP)) {
-	  Polyline(StitchWindowDC, static_cast<POINT const*>(MoveLine1), 2);
+	  Polyline(StitchWindowDC, moveLine1.data(), gsl::narrow<int>(moveLine1.size()));
 	}
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -5016,7 +5017,7 @@ void thred::internal::dulin() {
 
 void thred::internal::unlin() {
   if (StateMap->test(StateFlag::WASLIN)) {
-	dulin();
+	dulin(MoveLine0, MoveLine1);
   }
 }
 
@@ -10132,7 +10133,7 @@ void thred::internal::delcol() {
 	  }
 	}
 	for (auto iColor = VerticalIndex; iColor < 15U; iColor++) {
-	  UserColor[iColor] = UserColor[iColor + 1U];
+	  UserColor[iColor] = UserColor[gsl::narrow_cast<size_t>(iColor) + 1U];
 	  nuscol(iColor);
 	}
 	thred::coltab();
@@ -10783,7 +10784,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  unlin();
 	  MoveLine0[1] = MoveLine1[0] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-	  dulin();
+	  dulin(MoveLine0, MoveLine1);
 	  return true;
 	}
 	if (StateMap->test(StateFlag::INSRT)) {
@@ -12845,7 +12846,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  StateMap->set(StateFlag::ISUP);
 		  MoveLine1[1] = stch2px1(ClosestPointIndex + 1U);
 		}
-		dulin();
+		dulin(MoveLine0, MoveLine1);
 		SetCapture(ThrEdWindow);
 		StateMap->set(StateFlag::CAPT);
 		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
@@ -16071,6 +16072,7 @@ void thred::internal::redini() {
   duhom();
   *IniFileName = *HomeDirectory;
   *IniFileName /= L"thred.ini";
+  // NOLINTNEXTLINE(readability-qualified-auto)
   auto iniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -16572,7 +16574,7 @@ void thred::internal::relin() {
   MoveLine0[0] = stch2px1(ClosestPointIndex - 1);
   MoveLine1[1] = stch2px1(ClosestPointIndex + 1U);
   StateMap->reset(StateFlag::WASLIN);
-  dulin();
+  dulin(MoveLine0, MoveLine1);
 }
 
 void thred::internal::dumov() {

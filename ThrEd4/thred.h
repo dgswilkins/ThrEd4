@@ -181,7 +181,7 @@ namespace internal {
   void duhbit(uint32_t cod) noexcept;
   void duhom();
   void duinsfil();
-  void dulin();
+  void dulin(std::array<POINT, 2>& moveLine0, std::array<POINT, 2>& moveLine1);
   void dumov();
   void dumrk(float xCoord, float yCoord);
   void dun();
