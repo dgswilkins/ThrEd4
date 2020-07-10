@@ -169,22 +169,22 @@ uint32_t KnotCount;                      // number of knots in the design
 
 // graphics variables
 
-COLORREF const DefaultColors[] = {0x00000000,
-                                  0x00800000,
-                                  0x00FF0000,
-                                  0x00808000,
-                                  0x00FFFF00,
-                                  0x00800080,
-                                  0x00FF00FF,
-                                  0x00000080,
-                                  0x000000FF,
-                                  0x00008000,
-                                  0x0000FF00,
-                                  0x00008080,
-                                  0x0000FFFF,
-                                  0x00808080,
-                                  0x00C0C0C0,
-                                  0x00FFFFFF};
+auto const DefaultColors = std::array<COLORREF, COLOR_COUNT> {0x00000000,
+                                                              0x00800000,
+                                                              0x00FF0000,
+                                                              0x00808000,
+                                                              0x00FFFF00,
+                                                              0x00800080,
+                                                              0x00FF00FF,
+                                                              0x00000080,
+                                                              0x000000FF,
+                                                              0x00008000,
+                                                              0x0000FF00,
+                                                              0x00008080,
+                                                              0x0000FFFF,
+                                                              0x00808080,
+                                                              0x00C0C0C0,
+                                                              0x00FFFFFF};
 
 int32_t BoxOffset[4];
 
@@ -206,8 +206,8 @@ uint32_t InsertedVertexIndex;       // saved float pointer for inserting files
 uint32_t InsertedFormIndex;         // saved form pointer for inserting files
 uint32_t InsertedStitchIndex;       // saved stitch pointer for inserting files
 
-auto MoveLine0 = std::array<POINT, 2>{};              // move point line
-auto MoveLine1 = std::array<POINT, 2>{};              // move point line
+auto MoveLine0              = std::array<POINT, 2> {}; // move point line
+auto MoveLine1              = std::array<POINT, 2> {}; // move point line
 auto ClipInsertBoxLine      = std::array<POINT, 5> {}; // for displaying clipboard insert rectangle
 auto RotateBoxOutline       = std::array<POINT, 5> {}; // for drawing the rotate rectangle
 auto RotateBoxCrossVertLine = std::array<POINT, 2> {}; // vertical part of the rotate cross
@@ -4260,8 +4260,9 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	StitchBuffer->resize(thredHeader.stitchCount);
+	auto bytesToRead = DWORD {};
 	if (thredHeader.stitchCount != 0U) {
-	  auto bytesToRead =
+	  bytesToRead =
 	      gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
 	  ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, nullptr);
 	  if (bytesRead != bytesToRead) {
@@ -4270,26 +4271,32 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	}
 	StitchBuffer->shrink_to_fit();
-	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), sizeof(PCSBMPFileName), &bytesRead, nullptr);
-	if (bytesRead != sizeof(PCSBMPFileName)) {
+	bytesToRead = sizeof(PCSBMPFileName);
+	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), bytesToRead, &bytesRead, nullptr);
+	if (bytesRead != bytesToRead) {
 	  PCSBMPFileName[0] = 0;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	ReadFile(fileHandle, &BackgroundColor, sizeof(BackgroundColor), &bytesRead, nullptr);
-	if (bytesRead != sizeof(BackgroundColor)) {
+	bytesToRead = sizeof(BackgroundColor);
+	ReadFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, nullptr);
+	if (bytesRead != bytesToRead) {
 	  BackgroundColor = IniFile.backgroundColor;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
-	ReadFile(fileHandle, UserColor.data(), gsl::narrow<DWORD>(UserColor.size()), &bytesRead, nullptr);
-	if (bytesRead != UserColor.size()) {
+	bytesToRead = gsl::narrow<DWORD>(UserColor.size() * sizeof(decltype(UserColor.back())));
+	ReadFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, nullptr);
+	if (bytesRead != bytesToRead) {
+	  UserColor = DefaultColors;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	ReadFile(fileHandle, CustomColor.data(), gsl::narrow<DWORD>(CustomColor.size()), &bytesRead, nullptr);
-	if (bytesRead != CustomColor.size()) {
+	bytesToRead = gsl::narrow<DWORD>(CustomColor.size() * sizeof(decltype(UserColor.back())));
+	ReadFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, nullptr);
+	if (bytesRead != bytesToRead) {
+	  CustomColor = DefaultColors;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
@@ -4309,13 +4316,12 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	if (thredHeader.formCount != 0) {
 	  StateMap->reset(StateFlag::BADFIL);
 	  MsgBuffer[0]     = 0;
-	  auto bytesToRead = DWORD {0};
 	  if (version < 2) {
 		auto formListOriginal = std::vector<FRMHEDO> {};
 		formListOriginal.resize(thredHeader.formCount);
 		bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
 		wrap::ReadFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
-		if (bytesRead != thredHeader.formCount * sizeof(decltype(formListOriginal.back()))) {
+		if (bytesRead != bytesToRead) {
 		  thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
 		      bytesRead / sizeof(decltype(formListOriginal.back())));
 		  formListOriginal.resize(thredHeader.formCount);
