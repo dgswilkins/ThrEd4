@@ -208,11 +208,11 @@ uint32_t InsertedStitchIndex;       // saved stitch pointer for inserting files
 
 auto MoveLine0 = std::array<POINT, 2>{};              // move point line
 auto MoveLine1 = std::array<POINT, 2>{};              // move point line
-POINT ClipInsertBoxLine[5];      // for displaying clipboard insert rectangle
-POINT RotateBoxOutline[5];       // for drawing the rotate rectangle
-POINT RotateBoxCrossVertLine[2]; // vertical part of the rotate cross
-POINT RotateBoxCrossHorzLine[2]; // horizontal part of the rotate cross
-POINT RotateBoxToCursorLine[2];  // line from the cursor to the center of the rotate cross
+auto ClipInsertBoxLine      = std::array<POINT, 5> {}; // for displaying clipboard insert rectangle
+auto RotateBoxOutline       = std::array<POINT, 5> {}; // for drawing the rotate rectangle
+auto RotateBoxCrossVertLine = std::array<POINT, 2> {}; // vertical part of the rotate cross
+auto RotateBoxCrossHorzLine = std::array<POINT, 2> {}; // horizontal part of the rotate cross
+auto RotateBoxToCursorLine = std::array<POINT, 2> {}; // line from the cursor to the center of the rotate cross
 
 COLCHNG ColorChangeTable[MAXCHNG];
 
@@ -5451,7 +5451,7 @@ void thred::delstchm() {
 void thred::internal::duclp() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  Polyline(StitchWindowDC, static_cast<POINT const*>(ClipInsertBoxLine), 5);
+  Polyline(StitchWindowDC, ClipInsertBoxLine.data(), gsl::narrow<int>(ClipInsertBoxLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5585,9 +5585,9 @@ auto thred::internal::sdCor2px(fPOINTATTR const& stitchPoint) -> POINT {
 void thred::internal::durot() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  Polyline(StitchWindowDC, static_cast<POINT const*>(RotateBoxOutline), 5);
-  Polyline(StitchWindowDC, static_cast<POINT const*>(RotateBoxCrossVertLine), 2);
-  Polyline(StitchWindowDC, static_cast<POINT const*>(RotateBoxCrossHorzLine), 2);
+  Polyline(StitchWindowDC, RotateBoxOutline.data(), gsl::narrow<int>(RotateBoxOutline.size()));
+  Polyline(StitchWindowDC, RotateBoxCrossVertLine.data(), gsl::narrow<int>(RotateBoxCrossVertLine.size()));
+  Polyline(StitchWindowDC, RotateBoxCrossHorzLine.data(), gsl::narrow<int>(RotateBoxCrossHorzLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5600,7 +5600,7 @@ void thred::internal::unrot() {
 void thred::internal::durotu() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  Polyline(StitchWindowDC, static_cast<POINT const*>(RotateBoxToCursorLine), 2);
+  Polyline(StitchWindowDC, RotateBoxToCursorLine.data(), gsl::narrow<int>(RotateBoxToCursorLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
