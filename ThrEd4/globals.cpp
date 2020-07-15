@@ -71,7 +71,6 @@ uint32_t ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a 
 uint32_t ClosestFormToCursor;   // closest form to the cursor
 uint32_t ClosestPointIndex;     // index of closest point
 uint32_t ClosestVertexToCursor; // formOrigin closest to the cursor
-uint32_t ColorChanges;          // number of color changes
 int32_t* ColorBarSize;          // Color bar width scaled for DPI
 HCURSOR  CrossCursor;           // cross
 

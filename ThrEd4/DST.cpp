@@ -810,18 +810,19 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
-  if (ColorChanges < 16U) {
-	for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
+  auto const colorChanges = thred::maxColor() + 1U;
+  if (colorChanges < 16U) {
+	for (auto iColor = 0U; iColor < colorChanges; iColor++) {
 	  if (color == UserColor[iColor]) {
 		return iColor;
 	  }
 	}
-	UserColor[ColorChanges++] = color;
-	return ColorChanges - 1U;
+	UserColor[colorChanges] = color;
+	return colorChanges;
   }
   auto minDistance = DWORD {0xffffffffU};
   auto iDistance   = DWORD {0x00000000U};
-  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; iColor++) {
 	auto const distance = di::coldis(color, UserColor[iColor]);
 	if (distance == 0U) {
 	  return iColor;

@@ -214,7 +214,7 @@ auto RotateBoxCrossVertLine = std::array<POINT, 2> {}; // vertical part of the r
 auto RotateBoxCrossHorzLine = std::array<POINT, 2> {}; // horizontal part of the rotate cross
 auto RotateBoxToCursorLine = std::array<POINT, 2> {}; // line from the cursor to the center of the rotate cross
 
-COLCHNG ColorChangeTable[MAXCHNG];
+std::vector<COLCHNG>* ColorChangeTable;
 
 uint32_t const FillTypes[] = // fill type array for side window display
     {0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
@@ -541,8 +541,21 @@ void thred::internal::fndknt() {
   }
 }
 
+auto thred::maxColor() -> uint32_t {
+  if (!ColorChangeTable->empty()) {
+	return wrap::toUnsigned(ColorChangeTable->size() - 1U);
+  }
+  return 0U;
+}
+
 void thred::resetColorChanges() noexcept {
-  ColorChanges = 0;
+  ColorChangeTable->clear();
+}
+
+void thred::addColor(uint32_t stitch, uint32_t color) {
+	ColorChangeTable->push_back(
+		COLCHNG {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
+		gsl::narrow<decltype(ColorChangeTable->back().colorIndex)>(color)});
 }
 
 void thred::coltab() {
@@ -585,17 +598,13 @@ void thred::coltab() {
 		}
 		auto const nextColor = stitch.attribute & COLMSK;
 		if (currentColor != nextColor) {
-		  ColorChangeTable[iColor].colorIndex =
-		      gsl::narrow<decltype(ColorChangeTable[iColor].colorIndex)>(nextColor);
-		  ColorChangeTable[iColor++].stitchIndex =
-		      gsl::narrow<decltype(ColorChangeTable[iColor].stitchIndex)>(iStitch);
+			addColor(iStitch, nextColor);
+		  ++iColor;
 		  currentColor = nextColor;
 		}
-		iStitch++;
+		++iStitch;
 	  }
-	  ColorChanges = iColor;
-	  ColorChangeTable[iColor].stitchIndex =
-	      gsl::narrow<decltype(ColorChangeTable[iColor].stitchIndex)>(StitchBuffer->size());
+	  addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
 	  if (ClosestPointIndex > gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
 		ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
 	  }
@@ -2801,64 +2810,66 @@ void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t dest
 }
 
 void thred::internal::redbal() {
-  auto balaradHeader = BALHED {};
-  StitchBuffer->clear();
-  FormList->clear();
-  // NOLINTNEXTLINE(readability-qualified-auto)
-  auto balaradFile =
-      CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	auto balaradHeader = BALHED {};
+	StitchBuffer->clear();
+	FormList->clear();
+	// NOLINTNEXTLINE(readability-qualified-auto)
+	auto balaradFile =
+	    CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-  if (balaradFile != INVALID_HANDLE_VALUE) {
-	auto bytesRead = DWORD {0U};
-	ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
-	if (bytesRead == sizeof(balaradHeader)) {
-	  auto balaradStitch = std::vector<BALSTCH> {};
+	if (balaradFile != INVALID_HANDLE_VALUE) {
+	  auto bytesRead = DWORD {0U};
+	  ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
+	  if (bytesRead == sizeof(balaradHeader)) {
+		auto balaradStitch = std::vector<BALSTCH> {};
 	  balaradStitch.resize(MAXITEMS);
 	  ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(decltype(balaradStitch.back())), &bytesRead, nullptr);
-	  auto const stitchCount  = bytesRead / sizeof(decltype(balaradStitch.back()));
-	  BackgroundColor         = balaradHeader.backgroundColor;
-	  IniFile.backgroundColor = balaradHeader.backgroundColor;
-	  BackgroundPen           = nuPen(BackgroundPen, 1, BackgroundColor);
-	  BackgroundPenWidth      = 1;
-	  DeleteObject(BackgroundBrush);
-	  BackgroundBrush        = CreateSolidBrush(BackgroundColor);
-	  constexpr auto IBALRAT = 0.6F;
-	  IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
-	  IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
-	  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-	  BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
-	  BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
-	  PCSHeader.hoopType = CUSTHUP;
-	  IniFile.hoopType   = CUSTHUP;
-	  UserColor[0]       = balaradHeader.color[0];
-	  auto color         = 0U;
-	  auto bColor        = 1U;
-	  ColorChanges       = 1U;
-	  for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
-		switch (balaradStitch[iStitch].code) {
-		  case BALNORM: {
-			StitchBuffer->push_back(fPOINTATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
-			                                    balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
-			                                    color});
-			break;
-		  }
-		  case BALSTOP: {
-			color = DST::colmatch(balaradHeader.color[bColor++]);
-			break;
+		auto const stitchCount  = bytesRead / sizeof(decltype(balaradStitch.back()));
+		BackgroundColor         = balaradHeader.backgroundColor;
+		IniFile.backgroundColor = balaradHeader.backgroundColor;
+		BackgroundPen           = nuPen(BackgroundPen, 1, BackgroundColor);
+		BackgroundPenWidth      = 1;
+		DeleteObject(BackgroundBrush);
+		BackgroundBrush        = CreateSolidBrush(BackgroundColor);
+		constexpr auto IBALRAT = 0.6F;
+		IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
+		IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
+		UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
+		BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
+		BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
+		PCSHeader.hoopType = CUSTHUP;
+		IniFile.hoopType   = CUSTHUP;
+		UserColor[0]       = balaradHeader.color[0];
+		auto color         = 0U;
+		auto bColor        = 1U;
+		thred::addColor(0, color);
+		for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
+		  switch (balaradStitch[iStitch].code) {
+			case BALNORM: {
+			  StitchBuffer->push_back(fPOINTATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
+			                                      balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
+			                                      color});
+			  break;
+			}
+			case BALSTOP: {
+			  color = DST::colmatch(balaradHeader.color[bColor++]);
+			  auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+			  thred::addColor(currentStitch, color);
+			  break;
+			}
 		  }
 		}
+		for (auto iColor = 0U; iColor < COLOR_COUNT; iColor++) {
+		  UserPen[iColor]        = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
+		  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+		}
+		thred::coltab();
+		thred::redraw(ColorBar);
+		StateMap->set(StateFlag::INIT);
+		StateMap->set(StateFlag::RESTCH);
 	  }
-	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-		UserPen[iColor]        = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
-		UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-	  }
-	  thred::coltab();
-	  thred::redraw(ColorBar);
-	  StateMap->set(StateFlag::INIT);
-	  StateMap->set(StateFlag::RESTCH);
 	}
-  }
-  CloseHandle(balaradFile);
+	CloseHandle(balaradFile);
 }
 
 void thred::internal::ritbal() {
@@ -3187,9 +3198,9 @@ void thred::internal::thrsav() {
 void thred::internal::chk1col() {
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-  for (auto iColorChange = 0U; iColorChange < ColorChanges; iColorChange++) {
-	if (ColorChangeTable[iColorChange + 1U].stitchIndex - ColorChangeTable[iColorChange].stitchIndex == 1) {
-	  auto const iStitch = ColorChangeTable[iColorChange].stitchIndex;
+  for (auto iColorChange = 0U; iColorChange < thred::maxColor(); iColorChange++) {
+	if (ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColorChange) + 1U).stitchIndex - ColorChangeTable->operator[](iColorChange).stitchIndex == 1) {
+	  auto const iStitch = ColorChangeTable->operator[](iColorChange).stitchIndex;
 	  auto       color   = 0U;
 	  if (iStitch != 0U) {
 		color = StitchBuffer->operator[](iStitch - 1U).attribute & COLMSK;
@@ -3295,7 +3306,7 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
 		}
 		auto iPCSstitch = 0U;
 		auto savcol     = 0xffU;
-		PCSStitchBuffer.resize(StitchBuffer->size() + ColorChanges + 2U);
+		PCSStitchBuffer.resize(StitchBuffer->size() + thred::maxColor() + 2U);
 		for (auto& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol                           = stitch.attribute & COLMSK;
@@ -4141,9 +4152,9 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 			while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
 			  auto& stitch = PCSDataBuffer[iPCSstitch];
 			  if (stitch.tag == 3) {
-				ColorChangeTable[iColorChange].colorIndex    = stitch.fx;
-				ColorChangeTable[iColorChange++].stitchIndex = gsl::narrow<uint16_t>(iStitch);
-				color                                        = NOTFRM | stitch.fx;
+				ColorChangeTable->push_back(COLCHNG {gsl::narrow<uint16_t>(iStitch), stitch.fx});
+				++iColorChange;
+				color = NOTFRM | stitch.fx;
 			  }
 			  else {
 				StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / 256.0F,
@@ -4844,11 +4855,11 @@ void thred::internal::closPnt() {
   gapToNearest.resize(NERCNT, 1e99); // to a mouse click
   NearestPoint.fill(-1);
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-	auto const iStitch0 = ColorChangeTable[iColor].stitchIndex;
-	auto const iStitch1 = ColorChangeTable[iColor + 1U].stitchIndex - iStitch0;
+  for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
+	auto const iStitch0 = ColorChangeTable->operator[](iColor).stitchIndex;
+	auto const iStitch1 = ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex - iStitch0;
 	if (StateMap->test(StateFlag::HID)) {
-	  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
+	  if (ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
 		duClos(iStitch0, iStitch1, stitchPoint, gapToNearest);
 	  }
 	}
@@ -4888,10 +4899,10 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto const stitchPoint     = thred::pxCor2stch(Msg.pt);
   auto       distanceToClick = 1e99;
   if (StateMap->test(StateFlag::HID)) {
-	for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-	  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
-		for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
-		     iStitch < ColorChangeTable[iColor + 1U].stitchIndex;
+	for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
+	  if (ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
+		for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
+		     iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
 		     iStitch++) {
 		  auto const stitch = StitchBuffer->operator[](iStitch);
 		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
@@ -4944,10 +4955,10 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   return false;
 }
 
-auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
+auto thred::internal::pt2colInd(uint32_t iStitch) -> uint32_t {
   auto iColor = 0U;
-  for (iColor = 0; iColor < ColorChanges; iColor++) {
-	if (ColorChangeTable[iColor].stitchIndex > iStitch) {
+  for (iColor = 0; iColor < thred::maxColor(); iColor++) {
+	if (ColorChangeTable->operator[](iColor).stitchIndex > iStitch) {
 	  break;
 	}
   }
@@ -5059,7 +5070,7 @@ void thred::internal::movbox() {
 
 auto thred::internal::chkhid(uint32_t colorToCheck) -> bool {
   if (StateMap->test(StateFlag::HID)) {
-	return ColorChangeTable[colorToCheck].colorIndex == ActiveColor;
+	return ColorChangeTable->operator[](colorToCheck).colorIndex == ActiveColor;
   }
 
   return true;
@@ -5144,13 +5155,13 @@ auto thred::internal::closlin() -> uint32_t {
   checkedPoint.y       = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
   offset               = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
   auto const tolerance = offset * Tolerance;
-  for (auto iChange = 0U; iChange < ColorChanges; iChange++) {
+  for (auto iChange = 0U; iChange < thred::maxColor(); iChange++) {
 	auto stitchCount = gsl::narrow<uint16_t>(
-	    std::abs(ColorChangeTable[iChange + 1U].stitchIndex - ColorChangeTable[iChange].stitchIndex));
-	if (ColorChangeTable[iChange + 1U].stitchIndex == StitchBuffer->size()) {
+	    std::abs(ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iChange) + 1U).stitchIndex - ColorChangeTable->operator[](iChange).stitchIndex));
+	if (ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iChange) + 1U).stitchIndex == StitchBuffer->size()) {
 	  --stitchCount;
 	}
-	auto const stitches = std::next(StitchBuffer->begin(), ColorChangeTable[iChange].stitchIndex);
+	auto const stitches = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iChange).stitchIndex);
 	if (thi::chkhid(iChange)) {
 	  for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
 		auto const layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
@@ -5246,7 +5257,7 @@ auto thred::internal::closlin() -> uint32_t {
 			} while (false);
 			if (tsum < sum) {
 			  sum          = tsum;
-			  closestPoint = iStitch + ColorChangeTable[iChange].stitchIndex;
+			  closestPoint = iStitch + ColorChangeTable->operator[](iChange).stitchIndex;
 			}
 		  }
 		}
@@ -12865,10 +12876,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 		StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM});
-		ColorChanges                    = 1;
-		ColorChangeTable[0].colorIndex  = gsl::narrow<uint16_t>(ActiveColor);
-		ColorChangeTable[0].stitchIndex = 0;
-		ColorChangeTable[1].stitchIndex = 1;
+		thred::addColor(0, ActiveColor);
 		StateMap->set(StateFlag::LIN1);
 		StateMap->set(StateFlag::INSRT);
 		SetCapture(ThrEdWindow);
@@ -13284,7 +13292,7 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 	  iColor = pt2colInd(GroupStitchIndex);
 	}
 	iColor--;
-	GroupStitchIndex = ColorChangeTable[iColor].stitchIndex;
+	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 	thred::grpAdj();
 	thred::redraw(ColorBar);
   }
@@ -13301,7 +13309,7 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 		if (iColor != 0U) {
 		  iColor--;
 		}
-		ClosestPointIndex = ColorChangeTable[iColor].stitchIndex;
+		ClosestPointIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 	  }
 	  else {
 		if (StateMap->test(StateFlag::LENSRCH)) {
@@ -13357,7 +13365,7 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 	else {
 	  iColor = pt2colInd(GroupStitchIndex);
 	}
-	GroupStitchIndex = ColorChangeTable[iColor].stitchIndex - 1U;
+	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex - 1U;
 	thred::grpAdj();
 	thred::redraw(ColorBar);
   }
@@ -13374,7 +13382,7 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 	else {
 	  if (StateMap->test(StateFlag::SELBOX)) {
 		auto const iColor = pt2colInd(ClosestPointIndex);
-		ClosestPointIndex = ColorChangeTable[iColor].stitchIndex - 1U;
+		ClosestPointIndex = ColorChangeTable->operator[](iColor).stitchIndex - 1U;
 	  }
 	  else {
 		if (StateMap->test(StateFlag::LENSRCH)) {
@@ -16615,11 +16623,11 @@ void thred::internal::dumov() {
 
 auto thred::internal::chkup(uint32_t count, uint32_t iStitch) -> uint32_t {
   if (StateMap->test(StateFlag::UPTO) && (ClosestPointIndex != 0U)) {
-	if (ColorChangeTable[iStitch].stitchIndex < ClosestPointIndex) {
-	  if (ColorChangeTable[wrap::toSize(iStitch) + 1U].stitchIndex < ClosestPointIndex) {
+	if (ColorChangeTable->operator[](iStitch).stitchIndex < ClosestPointIndex) {
+	  if (ColorChangeTable->operator[](wrap::toSize(iStitch) + 1U).stitchIndex < ClosestPointIndex) {
 		return count;
 	  }
-	  return ClosestPointIndex - ColorChangeTable[iStitch].stitchIndex + 1U;
+	  return ClosestPointIndex - ColorChangeTable->operator[](iStitch).stitchIndex + 1U;
 	}
 	return 0;
   }
@@ -16715,9 +16723,9 @@ void thred::internal::drwStch() {
   uncros();
   StateMap->reset(StateFlag::SHOFRM);
   auto stitchCount = 0U;
-  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-	auto deltaCount = gsl::narrow<uint32_t>(ColorChangeTable[iColor + 1U].stitchIndex -
-	                                        ColorChangeTable[iColor].stitchIndex);
+  for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
+	auto deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex -
+	                                        ColorChangeTable->operator[](iColor).stitchIndex);
 	if (deltaCount > stitchCount) {
 	  stitchCount = deltaCount;
 	}
@@ -16774,15 +16782,15 @@ void thred::internal::drwStch() {
 	if (StateMap->test(StateFlag::ZUMED)) {
 	  StateMap->reset(StateFlag::LINED);
 	  StateMap->reset(StateFlag::LININ);
-	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
+	  for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
 		if (StateMap->test(StateFlag::HID)) {
-		  if (ColorChangeTable[iColor].colorIndex != ActiveColor) {
-			stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
-			auto const stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable[iColor].stitchIndex);
+		  if (ColorChangeTable->operator[](iColor).colorIndex != ActiveColor) {
+			stitchCount = ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex - ColorChangeTable->operator[](iColor).stitchIndex;
+			auto const stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 			for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
 			  if (stitchIt[iStitch].x >= ZoomRect.left && stitchIt[iStitch].x <= ZoomRect.right &&
 			      stitchIt[iStitch].y >= ZoomRect.bottom && stitchIt[iStitch].y <= ZoomRect.top) {
-				DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
+				DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
 				break;
 			  }
 			}
@@ -16790,10 +16798,10 @@ void thred::internal::drwStch() {
 		  }
 		}
 		auto wascol = 0U;
-		SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable[iColor].colorIndex]);
-		stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+		SelectObject(StitchWindowMemDC, UserPen[ColorChangeTable->operator[](iColor).colorIndex]);
+		stitchCount = ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex - ColorChangeTable->operator[](iColor).stitchIndex;
 		if (!StitchBuffer->empty()) {
-		  auto const stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable[iColor].stitchIndex);
+		  auto const stitchIt = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 		  stitchCount         = chkup(stitchCount, iColor);
 		  auto const maxYcoord = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
 		  for (auto iStitch = 0U; iStitch < stitchCount; iStitch++) {
@@ -16928,21 +16936,21 @@ void thred::internal::drwStch() {
 		  linePoints.push_back(lastPoint);
 		}
 		if (wascol != 0U) {
-		  DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
+		  DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
 		}
 	  }
 	}
 	else {
 	  auto const pwid = StateMap->test(StateFlag::HID);
-	  for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-		DisplayedColorBitmap.set(ColorChangeTable[iColor].colorIndex);
-		stitchCount = ColorChangeTable[iColor + 1U].stitchIndex - ColorChangeTable[iColor].stitchIndex;
+	  for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
+		DisplayedColorBitmap.set(ColorChangeTable->operator[](iColor).colorIndex);
+		stitchCount = ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex - ColorChangeTable->operator[](iColor).stitchIndex;
 		stitchCount = chkup(stitchCount, iColor);
-		if (!pwid || ColorChangeTable[iColor].colorIndex == ActiveColor) {
+		if (!pwid || ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
 		  drwLin(linePoints,
-		         ColorChangeTable[iColor].stitchIndex,
+		         ColorChangeTable->operator[](iColor).stitchIndex,
 		         stitchCount,
-		         UserPen[ColorChangeTable[iColor].colorIndex]);
+		         UserPen[ColorChangeTable->operator[](iColor).colorIndex]);
 		}
 	  }
 	}
@@ -16988,10 +16996,10 @@ void thred::internal::drwStch() {
 	  SelectObject(StitchWindowMemDC, LinePen);
 	  SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	  if (StateMap->test(StateFlag::HID)) {
-		for (auto iColor = 0U; iColor < ColorChanges; iColor++) {
-		  if (ColorChangeTable[iColor].colorIndex == ActiveColor) {
-			for (auto iStitch = ColorChangeTable[iColor].stitchIndex;
-			     iStitch < ColorChangeTable[iColor + 1U].stitchIndex;
+		for (auto iColor = 0U; iColor < thred::maxColor(); iColor++) {
+		  if (ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
+			for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
+			     iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
 			     iStitch++) {
 			  auto const stitch = StitchBuffer->operator[](iStitch);
 			  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
@@ -17056,11 +17064,11 @@ void thred::internal::drwStch() {
 void thred::internal::dubar() {
   auto colorBarRect = RECT {DrawItem->rcItem.left, 0, DrawItem->rcItem.right, DrawItem->rcItem.bottom};
   POINT indicatorLine[2] = {};
-  for (auto iColorChange = 0U; iColorChange < ColorChanges; iColorChange++) {
+  for (auto iColorChange = 0U; iColorChange < thred::maxColor(); iColorChange++) {
 	auto const barSectionHeight =
-	    gsl::narrow_cast<double>(ColorChangeTable[iColorChange + 1U].stitchIndex) / StitchBuffer->size();
+	    gsl::narrow_cast<double>(ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColorChange) + 1U).stitchIndex) / StitchBuffer->size();
 	colorBarRect.bottom = wrap::round<int32_t>(barSectionHeight * DrawItem->rcItem.bottom);
-	FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable[iColorChange].colorIndex]);
+	FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable->operator[](iColorChange).colorIndex]);
 	colorBarRect.top = colorBarRect.bottom;
   }
   if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL)) {
@@ -17799,6 +17807,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
 	  auto  private_ClipPoints                = std::vector<fPOINT> {};
 	  auto  private_ColorFileName             = fs::path {};
+	  auto  private_ColorChangeTable          = std::vector<COLCHNG> {};
 	  auto  private_DefaultColorWin           = std::vector<HWND> {};
 	  auto  private_DefaultDirectory          = fs::path {};
 	  auto  private_DesignerName              = std::wstring {};
@@ -17892,6 +17901,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ButtonWin                 = &private_ButtonWin;
 	  ClipBuffer                = &private_ClipBuffer;
 	  ClipPoints                = &private_ClipPoints;
+	  ColorChangeTable          = &private_ColorChangeTable;
 	  DefaultColorWin           = &private_DefaultColorWin;
 	  DefaultDirectory          = &private_DefaultDirectory;
 	  DesignerName              = &private_DesignerName;
