@@ -2800,16 +2800,17 @@ auto thred::internal::savcmp() noexcept -> bool {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t destination, uint32_t source, uint32_t code) {
+void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint32_t code, uint32_t flag) {
   constexpr auto BalaradRatio = 10.0F / 6.0F;
-  balaradStitch[destination] =
-      BALSTCH {gsl::narrow<uint8_t>(code),
-               0,
-               (StitchBuffer->operator[](source).x - BalaradOffset.x) * BalaradRatio,
-               (StitchBuffer->operator[](source).y - BalaradOffset.y) * BalaradRatio};
+  balaradStitch.push_back(BALSTCH {gsl::narrow<uint8_t>(code),
+                                   gsl::narrow<uint8_t>(flag),
+                                   (StitchBuffer->operator[](source).x - BalaradOffset.x) * BalaradRatio,
+                                   (StitchBuffer->operator[](source).y - BalaradOffset.y) * BalaradRatio});
 }
 
 void thred::internal::redbal() {
+  auto fileSize = uintmax_t {0};
+  if (getFileSize(*BalaradName2, fileSize)) {
 	auto balaradHeader = BALHED {};
 	StitchBuffer->clear();
 	FormList->clear();
@@ -2822,8 +2823,9 @@ void thred::internal::redbal() {
 	  ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(balaradHeader)) {
 		auto balaradStitch = std::vector<BALSTCH> {};
-	  balaradStitch.resize(MAXITEMS);
-	  ReadFile(balaradFile, balaradStitch.data(), MAXITEMS * sizeof(decltype(balaradStitch.back())), &bytesRead, nullptr);
+		auto const newSize = (fileSize - sizeof(balaradHeader)) / sizeof(decltype(balaradStitch.back()));
+		balaradStitch.resize(newSize);
+		ReadFile(balaradFile, balaradStitch.data(), (fileSize - sizeof(balaradHeader)), &bytesRead, nullptr);
 		auto const stitchCount  = bytesRead / sizeof(decltype(balaradStitch.back()));
 		BackgroundColor         = balaradHeader.backgroundColor;
 		IniFile.backgroundColor = balaradHeader.backgroundColor;
@@ -2839,6 +2841,7 @@ void thred::internal::redbal() {
 		BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
 		PCSHeader.hoopType = CUSTHUP;
 		IniFile.hoopType   = CUSTHUP;
+		UserColor.fill(0);
 		UserColor[0]       = balaradHeader.color[0];
 		auto color         = 0U;
 		auto bColor        = 1U;
@@ -2870,6 +2873,7 @@ void thred::internal::redbal() {
 	  }
 	}
 	CloseHandle(balaradFile);
+  }
 }
 
 void thred::internal::ritbal() {
@@ -2906,26 +2910,27 @@ void thred::internal::ritbal() {
 	BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
 	BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
 	auto balaradStitch = std::vector<BALSTCH> {};
-	balaradStitch.resize(StitchBuffer->size() + 2U);
+	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color = StitchBuffer->front().attribute & COLMSK;
-	// ToDo - does this loop make sense? iOutput is > 2 after one iteration
 	auto iOutput = 0U;
-	thr2bal(balaradStitch, iOutput++, 0, BALJUMP);
-	balaradStitch[iOutput].flag = gsl::narrow<uint8_t>(color);
-	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()) && iOutput < 2U; iStitch++) {
-	  thr2bal(balaradStitch, iOutput++, iStitch, BALNORM);
+	thr2bal(balaradStitch, 0, BALJUMP, 0);
+	++iOutput;
+	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); iStitch++) {
+	  thr2bal(balaradStitch, iStitch, BALNORM, 0);
+	  ++iOutput;
 	  if ((StitchBuffer->operator[](iStitch).attribute & COLMSK) != color) {
-		thr2bal(balaradStitch, iOutput, iStitch, BALSTOP);
-		color                         = StitchBuffer->operator[](iStitch).attribute & COLMSK;
-		balaradStitch[iOutput++].flag = gsl::narrow<uint8_t>(color);
+		color = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+		thr2bal(balaradStitch, iStitch, BALSTOP, color);
+		++iOutput;
 	  }
 	}
 	WriteFile(balaradFile, balaradStitch.data(), iOutput * sizeof(decltype(balaradStitch.back())), &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
 	balaradFile =
 	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	auto outString = utf::Utf16ToUtf8(outputName.wstring());
 	wrap::WriteFile(balaradFile,
-	                outputName.wstring().c_str(),
+	                outString.c_str(),
 	                wrap::toUnsigned(outputName.wstring().size()) + 1U,
 	                &bytesWritten,
 	                nullptr);
