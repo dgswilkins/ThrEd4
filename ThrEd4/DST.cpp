@@ -605,7 +605,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 		color = colmatch(colors[iColor++]);
 	  }
 	  else {
-		color++;
+		++color;
 		color &= 0xfU;
 	  }
 	}
@@ -812,7 +812,7 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 auto DST::colmatch(COLORREF color) -> uint32_t {
   auto const colorChanges = thred::maxColor() + 1U;
   if (colorChanges < 16U) {
-	for (auto iColor = 0U; iColor < colorChanges; iColor++) {
+	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
 	  if (color == UserColor[iColor]) {
 		return iColor;
 	  }
@@ -822,7 +822,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   }
   auto minDistance = DWORD {0xffffffffU};
   auto iDistance   = DWORD {0x00000000U};
-  for (auto iColor = 0U; iColor < COLOR_COUNT; iColor++) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	auto const distance = di::coldis(color, UserColor[iColor]);
 	if (distance == 0U) {
 	  return iColor;
@@ -913,7 +913,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto& dstDesc = dstHeader.desc;
 		std::fill(std::begin(dstDesc), std::end(dstDesc), ' ');
 		if (desc != nullptr) {
-		  for (auto iHeader = 0U; iHeader < wrap::toUnsigned(sizeof(dstHeader.desc)); iHeader++) {
+		  for (auto iHeader = 0U; iHeader < wrap::toUnsigned(sizeof(dstHeader.desc)); ++iHeader) {
 			if ((desc[iHeader] != 0) && desc[iHeader] != '.') {
 			  dstHeader.desc[iHeader] = desc[iHeader];
 			}

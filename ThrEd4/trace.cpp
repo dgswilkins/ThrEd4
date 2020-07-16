@@ -100,7 +100,7 @@ void trace::initTraceWindows() noexcept {
                               nullptr,
                               ThrEdInstance,
                               nullptr);
-  for (auto iRGB = 0; iRGB < 3; iRGB++) {
+  for (auto iRGB = 0; iRGB < 3; ++iRGB) {
 	ti::trcsub(&TraceControlWindow[iRGB], ButtonWidth * iRGB, 0, ButtonHeight * 15);
 	ti::trcsub(&TraceSelectWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 15, ButtonHeight);
 	ti::trcsub(&TraceUpWindow[iRGB], ButtonWidth * iRGB, ButtonHeight * 16, ButtonHeight);
@@ -168,12 +168,12 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 }
 
 void trace::internal::tracwnd() {
-  for (auto iColor = 0U; iColor < 16U; iColor++) {
+  for (auto iColor = 0U; iColor < 16U; ++iColor) {
 	ti::hidwnd(DefaultColorWin->operator[](iColor));
 	ti::hidwnd(UserColorWin->operator[](iColor));
 	ti::hidwnd(ThreadSizeWin[iColor]);
   }
-  for (auto iTrace = 0U; iTrace < 3; iTrace++) {
+  for (auto iTrace = 0U; iTrace < 3; ++iTrace) {
 	ti::shownd(TraceControlWindow[iTrace]);
 	ti::shownd(TraceSelectWindow[iTrace]);
 	ti::shownd(TraceUpWindow[iTrace]);
@@ -188,7 +188,7 @@ void trace::internal::tracwnd() {
 }
 
 void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept {
-  for (auto iPoint = lineStart; iPoint < lineStart + bitmap::getBitmapWidth(); iPoint++) {
+  for (auto iPoint = lineStart; iPoint < lineStart + bitmap::getBitmapWidth(); ++iPoint) {
 	differenceBitmap[iPoint] = 0;
   }
 }
@@ -223,7 +223,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 
 auto trace::internal::trsum() noexcept -> uint32_t {
   auto sumAdjacent = 0U;
-  for (auto iAdjacent = 1U; iAdjacent < 9U; iAdjacent++) {
+  for (auto iAdjacent = 1U; iAdjacent < 9U; ++iAdjacent) {
 	sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0])
 	                    ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0])
 	                    : (TraceAdjacentColors[0] - TraceAdjacentColors[iAdjacent]));
@@ -242,18 +242,18 @@ void trace::untrace() {
 	  TracedMap->resize(0); // allocated in trace
 	}
 	StateMap->reset(StateFlag::WASEDG);
-	for (auto iColor = 0U; iColor < 16U; iColor++) {
+	for (auto iColor = 0U; iColor < 16U; ++iColor) {
 	  ti::shownd(DefaultColorWin->operator[](iColor));
 	  ti::shownd(UserColorWin->operator[](iColor));
 	  ti::shownd(ThreadSizeWin[iColor]);
 	}
-	for (auto iTrace = 0U; iTrace < 3U; iTrace++) {
+	for (auto iTrace = 0U; iTrace < 3U; ++iTrace) {
 	  ti::hidwnd(TraceControlWindow[iTrace]);
 	  ti::hidwnd(TraceSelectWindow[iTrace]);
 	  ti::hidwnd(TraceUpWindow[iTrace]);
 	  ti::hidwnd(TraceDownWindow[iTrace]);
 	}
-	for (auto iButton = 0U; iButton < 9U; iButton++) {
+	for (auto iButton = 0U; iButton < 9U; ++iButton) {
 	  ti::shownd(ButtonWin->operator[](iButton));
 	}
 	ti::hidwnd(TraceStepWin);
@@ -284,16 +284,16 @@ void trace::trdif() {
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}
-	for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
+	for (auto iRGB = 0U; iRGB < 3U; ++iRGB) {
 	  ti::blanklin(differenceBitmap, 0);
-	  for (auto iHeight = 1U; iHeight < bitmap::getBitmapHeight() - 1U; iHeight++) {
+	  for (auto iHeight = 1U; iHeight < bitmap::getBitmapHeight() - 1U; ++iHeight) {
 		auto iPoint                = iHeight * bitmap::getBitmapWidth();
 		differenceBitmap[iPoint++] = 0;
-		for (auto iWidth = 1U; iWidth < bitmap::getBitmapWidth() - 1U; iWidth++) {
+		for (auto iWidth = 1U; iWidth < bitmap::getBitmapWidth() - 1U; ++iWidth) {
 		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[iPoint]);
 		  differenceBitmap[iPoint] = ti::trsum();
 		  auto& colorSum           = differenceBitmap[iPoint];
-		  iPoint++;
+		  ++iPoint;
 		  if (colorSum > colorSumMaximum) {
 			colorSumMaximum = colorSum;
 		  }
@@ -305,7 +305,7 @@ void trace::trdif() {
 	  }
 	  ti::blanklin(differenceBitmap, ((bitmap::getBitmapHeight() - 1) * bitmap::getBitmapWidth()));
 	  auto const ratio = (255.0) / (colorSumMaximum - colorSumMinimum);
-	  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+	  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 		if (differenceBitmap[iPixel] != 0U) {
 		  auto const adjustedColorSum =
@@ -325,7 +325,7 @@ void trace::trdif() {
 unsigned trace::internal::colsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
-  for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
+  for (auto iRGB = 0U; iRGB < 3U; ++iRGB) {
 	if (StateMap->test(TraceRGBFlag[iRGB]))
 	  colorSum += PixelColors[iRGB];
   }
@@ -335,7 +335,7 @@ unsigned trace::internal::colsum(COLORREF col) {
 unsigned trace::internal::icolsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
-  for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
+  for (auto iRGB = 0U; iRGB < 3U; ++iRGB) {
 	if (StateMap->test(TraceRGBFlag[iRGB]))
 	  colorSum += 255 - PixelColors[iRGB];
   }
@@ -382,7 +382,7 @@ void trace::trace() {
 	  traceColorMask &= BLUMSK;
 	}
 	if (traceColorMask != 0xffffff) {
-	  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+	  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		TraceBitmapData[iPixel] &= traceColorMask;
 	  }
 	}
@@ -393,7 +393,7 @@ void trace::trace() {
 	if (TracedMap->empty()) {
 	  TracedMap->resize(TraceDataSize, false);
 	}
-	for (auto index = 0U; index < BitmapWidth * BitmapHeight; index++) {
+	for (auto index = 0U; index < BitmapWidth * BitmapHeight; ++index) {
 	  auto pointBrightness = ti::colsum(TraceBitmapData[index]);
 	  if (upBrightness > pointBrightness && downBrightness < pointBrightness)
 		TracedMap->set(index);
@@ -406,17 +406,17 @@ void trace::trace() {
 	InvertUpColor   = UpPixelColor ^ 0xffffffU;
 	InvertDownColor = DownPixelColor ^ 0xffffffU;
 	ti::trcols(InvertUpColor);
-	for (auto iRGB = 0U; iRGB < 3; iRGB++) {
+	for (auto iRGB = 0U; iRGB < 3; ++iRGB) {
 	  HighColors[iRGB] = PixelColors[iRGB];
 	}
 	ti::trcols(InvertDownColor);
-	for (auto iRGB = 0U; iRGB < 3; iRGB++) {
+	for (auto iRGB = 0U; iRGB < 3; ++iRGB) {
 	  LowColors[iRGB] = PixelColors[iRGB];
 	}
 	if (TracedMap->empty()) {
 	  TracedMap->resize(TraceDataSize, false);
 	}
-	for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+	for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 	  if (ti::trcin(TraceBitmapData[iPixel])) {
 		TracedMap->set(iPixel);
 	  }
@@ -440,9 +440,9 @@ void trace::tracedg() {
   TracedEdges->resize(TraceDataSize, false);
   TracedEdges->reset();
   auto pixelIndex = 0L;
-  for (auto iHeight = 0U; iHeight < bitmap::getBitmapHeight(); iHeight++) {
+  for (auto iHeight = 0U; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	auto flag = false;
-	for (auto iWidth = 0U; iWidth < bitmap::getBitmapWidth(); iWidth++) {
+	for (auto iWidth = 0U; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
 	  if (TracedMap->test(pixelIndex)) {
 		if (!flag) {
 		  TracedEdges->set(pixelIndex);
@@ -455,16 +455,16 @@ void trace::tracedg() {
 		  flag = false;
 		}
 	  }
-	  pixelIndex++;
+	  ++pixelIndex;
 	}
 	if (flag) {
 	  TracedEdges->set(wrap::toSize(pixelIndex) - 1U);
 	}
   }
-  for (auto iWidth = 0U; iWidth < bitmap::getBitmapWidth(); iWidth++) {
+  for (auto iWidth = 0U; iWidth < bitmap::getBitmapWidth(); ++iWidth) {
 	pixelIndex = iWidth;
 	auto flag  = false;
-	for (auto iHeight = 0U; iHeight < bitmap::getBitmapHeight(); iHeight++) {
+	for (auto iHeight = 0U; iHeight < bitmap::getBitmapHeight(); ++iHeight) {
 	  if (TracedMap->test(pixelIndex)) {
 		if (!flag) {
 		  TracedEdges->set(pixelIndex);
@@ -483,7 +483,7 @@ void trace::tracedg() {
 	  TracedEdges->set(wrap::toSize(pixelIndex) - bitmap::getBitmapWidth());
 	}
   }
-  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 	if (TracedEdges->test(iPixel)) {
 	  TraceBitmapData[iPixel] = 0xffffff;
 	}
@@ -507,14 +507,14 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	  }
 	  else {
 		if (TracedEdges->test(pixelIndex)) {
-		  CurrentTracePoint.x++;
-		  CurrentTracePoint.y--;
+		  ++(CurrentTracePoint.x);
+		  --(CurrentTracePoint.y);
 		  traceDirection = TRCD;
 		}
 		else {
 		  pixelIndex += bitmap::getBitmapWidth();
 		  if (TracedEdges->test(pixelIndex)) {
-			CurrentTracePoint.x++;
+			++(CurrentTracePoint.x);
 		  }
 		  else {
 			traceDirection = TRCU;
@@ -530,14 +530,14 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	  }
 	  else {
 		if (TracedEdges->test(pixelIndex)) {
-		  CurrentTracePoint.x--;
-		  CurrentTracePoint.y--;
+		  --(CurrentTracePoint.x);
+		  --(CurrentTracePoint.y);
 		  traceDirection = TRCL;
 		}
 		else {
-		  pixelIndex++;
+		  ++pixelIndex;
 		  if (TracedEdges->test(pixelIndex)) {
-			CurrentTracePoint.y--;
+			--(CurrentTracePoint.y);
 		  }
 		  else {
 			traceDirection = TRCR;
@@ -553,14 +553,14 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	  }
 	  else {
 		if (TracedEdges->test(pixelIndex)) {
-		  CurrentTracePoint.x--;
-		  CurrentTracePoint.y++;
+		  --(CurrentTracePoint.x);
+		  ++(CurrentTracePoint.y);
 		  traceDirection = TRCU;
 		}
 		else {
 		  pixelIndex -= bitmap::getBitmapWidth();
 		  if (TracedEdges->test(pixelIndex)) {
-			CurrentTracePoint.x--;
+			--(CurrentTracePoint.x);
 		  }
 		  else {
 			traceDirection = TRCD;
@@ -576,14 +576,14 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	  }
 	  else {
 		if (TracedEdges->test(pixelIndex)) {
-		  CurrentTracePoint.x++;
-		  CurrentTracePoint.y++;
+		  ++(CurrentTracePoint.x);
+		  ++(CurrentTracePoint.y);
 		  traceDirection = TRCR;
 		}
 		else {
-		  pixelIndex--;
+		  --pixelIndex;
 		  if (TracedEdges->test(pixelIndex)) {
-			CurrentTracePoint.y++;
+			++(CurrentTracePoint.y);
 		  }
 		  else {
 			traceDirection = TRCL;
@@ -641,7 +641,7 @@ void trace::internal::dutrac() {
 	  auto point         = savedPoint;
 	  auto limit         = (CurrentTracePoint.y + 1) * bitmap::getBitmapWidth();
 	  while (point < limit && !TracedEdges->test(point)) {
-		point++;
+		++point;
 	  }
 	  if (point < limit) {
 		findRectangle.right = point - CurrentTracePoint.y * bitmap::getBitmapWidth();
@@ -652,7 +652,7 @@ void trace::internal::dutrac() {
 	  point = savedPoint;
 	  limit = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	  while (point > limit && !TracedEdges->test(point)) {
-		point--;
+		--point;
 	  }
 	  if (point == limit) {
 		findRectangle.left = 0;
@@ -754,7 +754,7 @@ void trace::internal::dutrac() {
 	TRCPNT traceDiff[2] = {};
 	decimatedLine.push_back(tracedPoints[0]);
 	ti::dutdif(traceDiff[0], tracedPoints.data());
-	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); iPoint++) {
+	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); ++iPoint) {
 	  traceDiff[1] = traceDiff[0];
 	  ti::dutdif(traceDiff[0], &tracedPoints[iPoint]);
 	  if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
@@ -765,7 +765,7 @@ void trace::internal::dutrac() {
 	tracedPoints.reserve(decimatedLine.size());
 	tracedPoints.push_back(decimatedLine[0]);
 	auto iNextDec = 0U;
-	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
+	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); ++iCurrent) {
 	  auto const traceLength = hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x,
 	                                 decimatedLine[iCurrent].y - decimatedLine[iNextDec].y);
 	  if (traceLength > IniFile.traceLength) {
@@ -773,7 +773,7 @@ void trace::internal::dutrac() {
 		iNextDec = iCurrent;
 	  }
 	}
-	for (auto iCurrent = iNextDec + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); iCurrent++) {
+	for (auto iCurrent = iNextDec + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); ++iCurrent) {
 	  tracedPoints.push_back(decimatedLine[iCurrent]);
 	}
 #endif
@@ -790,7 +790,7 @@ void trace::internal::dutrac() {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 	  landscapeOffset   = gsl::narrow_cast<float>(UnzoomedRect.y) - BmpSiS.y;
 	}
-	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(tracedPoints.size()); iCurrent++) {
+	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(tracedPoints.size()); ++iCurrent) {
 	  traceLengthSum +=
 	      hypotf(gsl::narrow_cast<float>(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),
 	             gsl::narrow_cast<float>(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1U].y));
@@ -801,7 +801,7 @@ void trace::internal::dutrac() {
 		FormVertices->push_back(fPOINT {
 		    gsl::narrow_cast<float>(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
 		    gsl::narrow_cast<float>(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
-		iCurrent--;
+		--iCurrent;
 		iNext          = iCurrent;
 		traceLengthSum = 0.0;
 	  }
@@ -831,7 +831,7 @@ void trace::trinit() {
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto iPixel = 0U;
-		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		  if (TraceBitmapData[iPixel] != color) {
 			break;
 		  }
@@ -842,7 +842,7 @@ void trace::trinit() {
 		  HighColors[1] = PixelColors[1];
 		  HighColors[2] = PixelColors[2];
 		  ti::trcols(color);
-		  for (auto iRGB = 0U; iRGB < 3; iRGB++) {
+		  for (auto iRGB = 0U; iRGB < 3; ++iRGB) {
 			if (PixelColors[iRGB] > HighColors[iRGB]) {
 			  auto const swapComponent = PixelColors[iRGB];
 			  PixelColors[iRGB]        = HighColors[iRGB];
@@ -853,15 +853,15 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+		for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		  ti::trcols(TraceBitmapData[iPixel]);
-		  for (auto iRGB = 0U; iRGB < 3; iRGB++) {
-			histogramData[iRGB][PixelColors[iRGB]]++;
+		  for (auto iRGB = 0U; iRGB < 3; ++iRGB) {
+			++(histogramData[iRGB][PixelColors[iRGB]]);
 		  }
 		}
 		uint32_t componentPeakCount[3] = {0U};
-		for (auto iLevel = 0U; iLevel < 256U; iLevel++) {
-		  for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
+		for (auto iLevel = 0U; iLevel < 256U; ++iLevel) {
+		  for (auto iRGB = 0U; iRGB < 3U; ++iRGB) {
 			if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
 			  componentPeakCount[iRGB] = histogramData[iRGB][iLevel];
 			  componentPeak[iRGB]      = iLevel;
@@ -870,9 +870,9 @@ void trace::trinit() {
 		}
 	  }
 	  InvertDownColor = 0U;
-	  for (auto iRGB = 0U; iRGB < 3U; iRGB++) {
+	  for (auto iRGB = 0U; iRGB < 3U; ++iRGB) {
 		if (componentPeak[iRGB] != 0U) {
-		  componentPeak[iRGB]--;
+		  --(componentPeak[iRGB]);
 		}
 		InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
 	  }
@@ -899,7 +899,7 @@ void trace::trcsel() {
 	trace::trace();
 	StateMap->reset(StateFlag::HIDMAP);
 	StateMap->reset(StateFlag::TRSET);
-	for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); iPixel++) {
+	for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 	  ti::trcols(TraceBitmapData[iPixel]);
 	  auto maximumColorComponent = PixelColors[0];
 	  auto iRGB                  = 2U;
@@ -1217,7 +1217,7 @@ void trace::wasTrace() {
   auto traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const BlackBrush = CreateSolidBrush(0); // black brush
-  for (auto iRGB = 0; iRGB < 3; iRGB++) {
+  for (auto iRGB = 0; iRGB < 3; ++iRGB) {
 	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
 	  ti::upnum(iRGB);

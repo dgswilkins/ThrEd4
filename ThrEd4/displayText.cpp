@@ -85,7 +85,7 @@ void displayText::shoMsg(std::wstring const& message) {
 		previousStringLength = iString;
 	  }
 	  else {
-		iString++;
+		++iString;
 	  }
 	}
 	strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
@@ -129,7 +129,7 @@ void displayText::tabmsg(uint32_t code) {
 }
 
 void displayText::lodstr() {
-  for (auto iString = 0; iString < STR_LEN; iString++) {
+  for (auto iString = 0; iString < STR_LEN; ++iString) {
 	displayText::loadString(StringTable->operator[](iString), LoadStringSpan[iString]);
   }
 }
@@ -219,7 +219,7 @@ void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
 }
 
 void displayText::clrhbut(uint32_t startButton) noexcept {
-  for (auto iButton = startButton; iButton < 9U; iButton++) {
+  for (auto iButton = startButton; iButton < 9U; ++iButton) {
 	SetWindowText(ButtonWin->operator[](iButton), L"");
   }
 }

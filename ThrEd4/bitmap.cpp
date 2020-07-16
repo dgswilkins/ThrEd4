@@ -149,7 +149,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
-		for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
+		for (auto iHeight = 0U; iHeight < BitmapHeight; ++iHeight) {
 		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
 		         &bits[wrap::toSize(iHeight) * BitmapWidth],
 		         bitmapWidthBytes,
@@ -193,16 +193,16 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
   auto whiteBits = 0U;
   auto blackBits = 0U;
-  for (auto iHeight = 0U; iHeight < BitmapHeight; iHeight++) {
+  for (auto iHeight = 0U; iHeight < BitmapHeight; ++iHeight) {
 	if ((wrap::toSize(bitmapWidthInBytes) * iHeight) < monoBitmapData.size()) {
 	  auto const* bcpnt = &monoBitmapData[wrap::toSize(bitmapWidthInBytes) * iHeight];
-	  for (auto iBytes = 0U; iBytes < bitmapWidthInBytes; iBytes++) {
+	  for (auto iBytes = 0U; iBytes < bitmapWidthInBytes; ++iBytes) {
 		if (bcpnt[iBytes] == 0U) {
-		  blackBits++;
+		  ++blackBits;
 		}
 		else {
 		  if (bcpnt[iBytes] == 0xff) {
-			whiteBits++;
+			++whiteBits;
 		  }
 		}
 	  }
@@ -220,18 +220,18 @@ void bitmap::internal::bitlin(uint8_t const* source,
                               COLORREF       foreground,
                               COLORREF       background) {
   if ((source != nullptr) && (destination != nullptr)) {
-	for (auto i = 0U; i < bitmapWidthBytes; i++) {
+	for (auto i = 0U; i < bitmapWidthBytes; ++i) {
 	  auto bits = std::bitset<8U>(source[i]);
-	  for (auto bitOffset = 0U; bitOffset < 8U; bitOffset++) {
+	  for (auto bitOffset = 0U; bitOffset < 8U; ++bitOffset) {
 		*destination = bits[bitOffset ^ 7U] ? foreground : background;
-		destination++;
+		++destination;
 	  }
 	}
 	if (auto const final = (BitmapWidth % 8)) {
 	  auto bits = std::bitset<8U>(source[bitmapWidthBytes]);
-	  for (auto bitOffset = final; bitOffset < 8U; bitOffset++) {
+	  for (auto bitOffset = final; bitOffset < 8U; ++bitOffset) {
 		*destination = bits[bitOffset ^ 7U] ? foreground : background;
-		destination++;
+		++destination;
 	  }
 	}
   }
@@ -356,7 +356,7 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
   auto* source = TraceBitmapData;
   if (source != nullptr) {
 	auto* destination = buffer;
-	for (auto i = 0U; i < cnt; i++) {
+	for (auto i = 0U; i < cnt; ++i) {
 	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
 	  destination += 3;
 	}
@@ -482,7 +482,7 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-  for (auto iColor = 0U; iColor < 16U; iColor++) {
+  for (auto iColor = 0U; iColor < 16U; ++iColor) {
 	BitmapBackgroundColors[iColor] = DefaultBitmapBackgroundColors[iColor];
   }
 }
@@ -639,7 +639,7 @@ void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish
 
 void bitmap::bfrm(FRMHED const& form) {
   if (form.vertexCount != 0U) {
-	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; iVertex++) {
+	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	  bi::pxlin(form, iVertex, iVertex + 1U);
 	}
 	if (form.type != FRMLINE) {
