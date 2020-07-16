@@ -75,12 +75,13 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
+	constexpr auto newline          = 10;
 	auto       strings              = std::vector<std::wstring> {};
 	auto       iString              = 0U;
 	auto       previousStringLength = 0U;
 	auto const sizeLim              = message.size();
 	while (iString < sizeLim) {
-	  if (message[iString] == 10) {
+	  if (message[iString] == newline) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		previousStringLength = iString;
 	  }
@@ -200,7 +201,7 @@ void displayText::crmsg(fs::path const& fileName) {
 
 void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
   if (StateMap->test(StateFlag::WASTRAC) && iButton > HNUM) {
-	if (iButton == 5U) {
+	if (iButton == HMINLEN) {
 	  if (StateMap->test(StateFlag::HIDMAP)) {
 		SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1H).c_str());
 	  }
@@ -219,7 +220,7 @@ void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
 }
 
 void displayText::clrhbut(uint32_t startButton) noexcept {
-  for (auto iButton = startButton; iButton < 9U; ++iButton) {
+  for (auto iButton = startButton; iButton < BTNCOUNT; ++iButton) {
 	SetWindowText(ButtonWin->operator[](iButton), L"");
   }
 }
@@ -430,7 +431,7 @@ auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 }
 
 void displayText::updateWinFont(HWND hWnd) noexcept {
-  auto const* hFont = displayText::getThrEdFont(400);
+  auto const* hFont = displayText::getThrEdFont(FONTSIZE);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
