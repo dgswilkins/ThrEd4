@@ -103,7 +103,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_Sig) {
-	auto fileHeaderSize = BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader);
+	auto fileHeaderSize = BitmapFileHeader.bfOffBits - gsl::narrow<DWORD>(sizeof(BitmapFileHeader));
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 	  fileHeaderSize = sizeof(BITMAPV4HEADER);
 	}
