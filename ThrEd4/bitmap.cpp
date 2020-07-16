@@ -18,7 +18,7 @@
 
 namespace bi = bitmap::internal;
 
-COLORREF  BitmapBackgroundColors[16]; // for the bitmap color dialog box
+COLORREF  BitmapBackgroundColors[COLOR_COUNT]; // for the bitmap color dialog box
 uint32_t  BitmapColor = BITCOL;       // bitmap color
 HDC       BitmapDC;                   // bitmap device context
 RECT      BitmapDstRect;              // stitch window destination rectangle for zooomed view
@@ -482,7 +482,7 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	BitmapBackgroundColors[iColor] = DefaultBitmapBackgroundColors[iColor];
   }
 }

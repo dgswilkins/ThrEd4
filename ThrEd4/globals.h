@@ -248,7 +248,7 @@ extern std::vector<std::wstring>* StringTable;
 extern std::vector<fPOINT>* TempPolygon;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
-extern HWND                 ThreadSizeWin[16];
+extern HWND                 ThreadSizeWin[COLOR_COUNT];
 extern uint32_t             ThrEdClip;
 extern wchar_t const*       ThrEdClipFormat;
 extern HINSTANCE            ThrEdInstance;
@@ -268,7 +268,7 @@ extern std::array<COLORREF, COLOR_COUNT> UserColor;
 extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
 
-extern HPEN  UserPen[16];
+extern HPEN  UserPen[COLOR_COUNT];
 extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;

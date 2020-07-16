@@ -7985,13 +7985,13 @@ void form::internal::srtf(std::vector<fPOINTATTR> const& tempStitchBuffer, uint3
 
 void form::srtbyfrm() {
   auto colorHistogram = std::vector<uint32_t> {};
-  colorHistogram.resize(16U);
+  colorHistogram.resize(COLOR_COUNT);
   auto color = std::vector<uint32_t> {};
-  color.resize(16U);
+  color.resize(COLOR_COUNT);
   if (!FormList->empty()) {
 	thred::savdo();
 	color[AppliqueColor] = 0U;
-	for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
 		color[iColor] = iColor + 1U;
 	  }
@@ -7999,16 +7999,16 @@ void form::srtbyfrm() {
 	auto tempStitchBuffer = std::vector<fPOINTATTR> {};
 	tempStitchBuffer.resize(StitchBuffer->size());
 	for (auto& stitch : *StitchBuffer) {
-	  ++(colorHistogram[color[stitch.attribute & 0xfU]]);
+	  ++(colorHistogram[color[stitch.attribute & COLOR_BITS]]);
 	}
 	auto colorAccumulator = 0U;
-	for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	  auto value             = colorHistogram[iColor];
 	  colorHistogram[iColor] = colorAccumulator;
 	  colorAccumulator += value;
 	}
 	for (auto& stitch : *StitchBuffer) {
-	  tempStitchBuffer[colorHistogram[color[stitch.attribute & 0xfU]]++] = stitch;
+	  tempStitchBuffer[colorHistogram[color[stitch.attribute & COLOR_BITS]]++] = stitch;
 	}
 	fi::srtf(tempStitchBuffer, 0, colorHistogram[0]);
 	for (auto iColor = 0U; iColor < 15U; ++iColor) {
@@ -8650,7 +8650,7 @@ void form::col2frm() {
 	  }
 	}
 	auto startColorOffset = 0U;
-	auto endColorOffset   = 16U;
+	auto endColorOffset   = COLOR_COUNT;
 	for (auto& formIter : *FormList) {
 	  if (formIter.fillType != 0U) {
 		auto count         = 0U;
@@ -8661,7 +8661,7 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= 0xfU;
+		majorityColor &= COLOR_BITS;
 		if (formIter.fillColor != majorityColor) {
 		  ++colorChangedCount;
 		  formIter.fillColor = gsl::narrow<uint8_t>(majorityColor);
@@ -8674,7 +8674,7 @@ void form::col2frm() {
 			  majorityColor = iColor;
 			}
 		  }
-		  majorityColor &= 0xfU;
+		  majorityColor &= COLOR_BITS;
 		  if (formIter.fillInfo.feather.color != majorityColor) {
 			++colorChangedCount;
 			formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(majorityColor);
@@ -8690,7 +8690,7 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= 0xfU;
+		majorityColor &= COLOR_BITS;
 		if (formIter.borderColor != majorityColor) {
 		  ++colorChangedCount;
 		  formIter.borderColor = gsl::narrow<uint8_t>(majorityColor);
@@ -8705,14 +8705,14 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= 0xfU;
+		majorityColor &= COLOR_BITS;
 		if (formIter.underlayColor != majorityColor) {
 		  ++colorChangedCount;
 		  formIter.underlayColor = gsl::narrow<uint8_t>(majorityColor);
 		}
 	  }
-	  startColorOffset += 16U;
-	  endColorOffset += 16U;
+	  startColorOffset += COLOR_COUNT;
+	  endColorOffset += COLOR_COUNT;
 	}
   }
   auto fmtStr = std::wstring {};

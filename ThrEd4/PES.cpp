@@ -35,7 +35,7 @@ uint8_t* PEScolors;             // pes colors
 uint8_t* PESdata;               // pes card data buffer
 fPOINT   PESstitchCenterOffset; // offset for writing pes files
 PESTCH*  PESstitches;           // pes stitch buffer
-uint8_t  PESequivColors[16];    // pes equivalent colors
+uint8_t  PESequivColors[COLOR_COUNT];    // pes equivalent colors
 uint8_t* PESstitch;             // pes stitches
 uint32_t PEScolorIndex;         // pes color index
 
@@ -389,7 +389,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 		UserColor[activeColor++] = color;
-		if (activeColor >= 16U) {
+		if (activeColor >= COLOR_COUNT) {
 		  break;
 		}
 	  }

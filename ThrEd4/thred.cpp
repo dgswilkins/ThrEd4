@@ -132,8 +132,8 @@ HPEN KnotPen;        // knot pen
 uint32_t BackgroundPenWidth; // width of the background pen
 
 // brushes
-HBRUSH DefaultColorBrush[16]; // default color brushes
-HBRUSH UserColorBrush[16];    // user color brushes
+HBRUSH DefaultColorBrush[COLOR_COUNT]; // default color brushes
+HBRUSH UserColorBrush[COLOR_COUNT];    // user color brushes
 
 // for the choose color dialog box
 CHOOSECOLOR ColorStruct;
@@ -142,9 +142,9 @@ auto        CustomColor = std::array<COLORREF, COLOR_COUNT> {};
 CHOOSECOLOR BackgroundColorStruct;
 auto CustomBackgroundColor = std::array<COLORREF, COLOR_COUNT>{};
 
-wchar_t  ThreadSize[16][2];    // user selected thread sizes
-uint32_t ThreadSizePixels[16]; // thread sizes in pixels
-uint32_t ThreadSizeIndex[16];  // thread size indices
+wchar_t  ThreadSize[COLOR_COUNT][2];    // user selected thread sizes
+uint32_t ThreadSizePixels[COLOR_COUNT]; // thread sizes in pixels
+uint32_t ThreadSizeIndex[COLOR_COUNT];  // thread size indices
 
 HMENU FileMenu;               // file submenu
 HMENU BorderFillMenu;         // border fill submenu
@@ -687,7 +687,7 @@ void thred::internal::dudat() {
 	  auto const dest = gsl::span<COLORREF>(backupData->colors, COLOR_COUNT);
 	  std::copy(std::begin(UserColor), std::end(UserColor), dest.begin());
 	}
-	backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[16]);
+	backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[COLOR_COUNT]);
 	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (!TexturePointsBuffer->empty()) {
 	  auto const dest = gsl::span<TXPNT>(backupData->texturePoints, backupData->texturePointCount);
@@ -1334,7 +1334,7 @@ void thred::internal::chknum() {
 			thred::savdo();
 			form::nufthcol(gsl::narrow_cast<uint32_t>(
 			                   (std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) &
-			               0xfU);
+			               COLOR_BITS);
 			wrap::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1346,7 +1346,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto colVal =
-			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
+			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & COLOR_BITS;
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1359,7 +1359,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto colVal =
-			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
+			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & COLOR_BITS;
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			form::refilfn();
@@ -1373,7 +1373,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto colVal =
-			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & 0xfU;
+			    gsl::narrow_cast<uint32_t>((std::wcstol(std::begin(SideWindowEntryBuffer), nullptr, 10) - 1)) & COLOR_BITS;
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1625,7 +1625,7 @@ void thred::internal::chknum() {
 				  break;
 				}
 				case PAP: {
-				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % 16U;
+				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLOR_COUNT;
 				  SetWindowText(ValueWindow->operator[](PAP),
 				                fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
 				  break;
@@ -1951,7 +1951,7 @@ void thred::unmsg() {
 
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
 auto thred::internal::oldwnd(HWND window) noexcept -> bool {
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	if (window == DefaultColorWin->operator[](iColor) ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin[iColor] == window) {
 	  return false;
@@ -2741,7 +2741,7 @@ void thred::internal::ritini() {
   auto const designerName = gsl::span<char> {desName};
   std::fill(designerName.begin(), designerName.end(), fillchar);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	IniFile.stitchColors[iColor]              = UserColor[iColor];
 	IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
 	IniFile.stitchPreferredColors[iColor]     = CustomColor[iColor];
@@ -3295,7 +3295,7 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
 	else {
 	  auto PCSStitchBuffer  = std::vector<PCSTCH> {};
 	  PCSHeader.stitchCount = gsl::narrow<decltype(PCSHeader.stitchCount)>(StitchBuffer->size());
-	  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 		PCSHeader.colors[iColor] = UserColor[iColor];
 	  }
 	  do {
@@ -4138,8 +4138,8 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 	  auto bytesRead = DWORD {0};
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
-		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == 16U) {
-		  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLOR_COUNT) {
+		  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 			UserColor[iColor] = PCSHeader.colors[iColor];
 		  }
 		  fileSize -= sizeof(PCSHeader);
@@ -4559,7 +4559,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	thred::coltab();
 	StateMap->reset(StateFlag::ZUMED);
 	wchar_t buffer[3] = {0};
-	for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 	  wcsncpy_s(buffer, static_cast<wchar_t const*>(ThreadSize[iColor]), 2);
@@ -5389,7 +5389,7 @@ void thred::internal::newFil() {
   displayText::clrhbut(3);
   StateMap->reset(StateFlag::MOVSET);
   PCSHeader.leadIn     = 0x32;
-  PCSHeader.colorCount = 16U;
+  PCSHeader.colorCount = COLOR_COUNT;
   unbox();
   xlin();
   xlin1();
@@ -5416,7 +5416,7 @@ void thred::internal::newFil() {
   thred::resetColorChanges();
   KnotCount = 0;
   WorkingFileName->clear();
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	thred::redraw(DefaultColorWin->operator[](iColor));
 	thred::redraw(UserColorWin->operator[](iColor));
 	thred::redraw(ThreadSizeWin[iColor]);
@@ -7399,7 +7399,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 	else {
 	  auto pcsFileHeader = PCSHEADER {};
 	  ReadFile(fileHandle, &pcsFileHeader, 0x46, &bytesRead, nullptr);
-	  if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == 16U) {
+	  if (PCSHeader.leadIn == 0x32 && PCSHeader.colorCount == COLOR_COUNT) {
 		auto fileSize = uintmax_t {0};
 		getFileSize(insertedFile, fileSize);
 		fileSize -= sizeof(PCSHeader);
@@ -10001,7 +10001,7 @@ void thred::internal::movchk() {
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
 	  if (thi::chkMsgs(Msg.pt, defaultColorWin.front(), defaultColorWin.back())) {
-		draggedColor = VerticalIndex & 0xfU;
+		draggedColor = VerticalIndex & COLOR_BITS;
 		StateMap->set(StateFlag::WASCOL);
 	  }
 	}
@@ -10074,7 +10074,7 @@ void thred::internal::movchk() {
 }
 
 void thred::internal::inscol() {
-  auto colorMap = boost::dynamic_bitset<>(16U);
+  auto colorMap = boost::dynamic_bitset<>(COLOR_COUNT);
   VerticalIndex &= COLMSK;
   for (auto& stitch : *StitchBuffer) {
 	colorMap.set(stitch.attribute & COLMSK);
@@ -11528,7 +11528,7 @@ auto thred::internal::updateFillColor() -> bool {
 	  break;
 	}
 	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
-	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & 0xfU;
+	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLOR_BITS;
 	  form::refilfn();
 	  thred::coltab();
 	  break;
@@ -12811,7 +12811,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
-		setbak(ThreadSizePixels[StitchBuffer->operator[](ClosestPointIndex).attribute & 0xfU] + 3U);
+		setbak(ThreadSizePixels[StitchBuffer->operator[](ClosestPointIndex).attribute & COLOR_BITS] + 3U);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -12916,7 +12916,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  auto const code = ActiveColor;
-	  ActiveColor     = VerticalIndex & 0xfU;
+	  ActiveColor     = VerticalIndex & COLOR_BITS;
 	  thred::redraw(UserColorWin->operator[](code));
 	  thred::redraw(UserColorWin->operator[](ActiveColor));
 	  if (StateMap->test(StateFlag::HID)) {
@@ -14823,7 +14823,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_EDIT_RESET_COL: { // edit / Reset Colors
-	  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 		UserColor[iColor]      = DefaultColors[iColor];
 		UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 		UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
@@ -15939,7 +15939,7 @@ void thred::internal::makCol() noexcept {
   buffer[2]         = 0;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hFont = displayText::getThrEdFont(400);
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC",
 	                                                   nullptr,
@@ -16124,7 +16124,7 @@ void thred::internal::redini() {
 		}
 	  }
 	  DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
-	  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 		UserColor[iColor]             = IniFile.stitchColors[iColor];
 		CustomColor[iColor]           = IniFile.stitchPreferredColors[iColor];
 		CustomBackgroundColor[iColor] = IniFile.backgroundPreferredColors[iColor];
@@ -16170,7 +16170,7 @@ void thred::internal::redini() {
 		BorderWidth = IniFile.borderWidth;
 	  }
 	  if (IniFile.appliqueColor != 0U) {
-		AppliqueColor = IniFile.appliqueColor & 0xfU;
+		AppliqueColor = IniFile.appliqueColor & COLOR_BITS;
 	  }
 	  if (IniFile.snapLength != 0.0F) {
 		SnapLength = IniFile.snapLength;
@@ -16534,20 +16534,20 @@ void thred::internal::init() {
   LayerPen[4]        = wrap::CreatePen(PS_SOLID, 1U, 0x40c0c0U);
   LayerPen[5]        = wrap::CreatePen(PS_SOLID, 1U, 0xc0c040U);
   BackgroundPenWidth = 1;
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	ThreadSizePixels[iColor] = 1;
 	ThreadSizeIndex[iColor]  = 1;
 	UserPen[iColor]          = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
-  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	DefaultColorBrush[iColor] = CreateSolidBrush(DefaultColors[iColor]);
 	UserColorBrush[iColor]    = CreateSolidBrush(UserColor[iColor]);
   }
   ZoomFactor           = 1;
   PCSHeader.leadIn     = 0x32;
-  PCSHeader.colorCount = 16U;
+  PCSHeader.colorCount = COLOR_COUNT;
   StitchBuffer->clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
   ladj();
@@ -16765,7 +16765,7 @@ void thred::internal::drwStch() {
 	int32_t const threadWidth[3] = {wrap::round<int32_t>(dub6 * TSIZ30),
 	                                wrap::round<int32_t>(dub6 * TSIZ40),
 	                                wrap::round<int32_t>(dub6 * TSIZ60)}; // thread sizes in pixels
-	for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	  if (StateMap->test(StateFlag::THRDS)) {
 		nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
 	  }
@@ -17159,7 +17159,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  auto brushColor = COLORREF {};
 		  ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, nullptr);
 		  auto colors = std::vector<COLORREF> {};
-		  colors.resize(16U);
+		  colors.resize(COLOR_COUNT);
 		  wrap::ReadFile(thrEdFile,
 		                 colors.data(),
 		                 wrap::toUnsigned(colors.size() * sizeof(decltype(colors.back()))),
@@ -17169,12 +17169,12 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  auto brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem->hDC, brush);
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
-		  auto iColor = stitchesToDraw[0].attribute & 0xfU;
+		  auto iColor = stitchesToDraw[0].attribute & COLOR_BITS;
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pen   = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
 		  auto iLine = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
-			if ((stitchesToDraw[iStitch].attribute & 0xfU) == iColor) {
+			if ((stitchesToDraw[iStitch].attribute & COLOR_BITS) == iColor) {
 			  lines[iLine++] = {
 			      wrap::round<int32_t>(stitchesToDraw[iStitch].x * ratio),
 			      wrap::round<int32_t>(drawingDestinationSize.y - stitchesToDraw[iStitch].y * ratio)};
@@ -17184,7 +17184,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			  SelectObject(drawItem->hDC, pen);
 			  wrap::Polyline(drawItem->hDC, lines.data(), iLine);
 			  iLine  = 0;
-			  iColor = stitchesToDraw[iStitch].attribute & 0xfU;
+			  iColor = stitchesToDraw[iStitch].attribute & COLOR_BITS;
 			}
 		  }
 		  if (iLine != 0U) {
@@ -17555,7 +17555,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		trace::wasTrace();
 		return 1;
 	  }
-	  for (auto iColor = 0U; iColor < 16U; ++iColor) {
+	  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 		if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
 		  if (DisplayedColorBitmap.test(iColor)) {
@@ -17878,7 +17878,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_WorkingFileName           = fs::path {};
 	  auto private_textureInputBuffer        = std::wstring {};
 
-	  private_DefaultColorWin.resize(16U);
+	  private_DefaultColorWin.resize(COLOR_COUNT);
 	  private_FormControlPoints.resize(9U);
 	  private_LabelWindow.resize(LASTLIN);
 	  private_RubberBandLine.resize(3U);
@@ -17886,7 +17886,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_SelectedPointsLine.resize(9U);
 	  private_StringTable.resize(STR_LEN);
 	  private_UndoBuffer.resize(16U);
-	  private_UserColorWin.resize(16U);
+	  private_UserColorWin.resize(COLOR_COUNT);
 	  private_ValueWindow.resize(LASTLIN);
 	  private_PreviousNames.reserve(OLDNUM);
 	  private_VersionNames.reserve(OLDVER);

@@ -606,7 +606,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  }
 	  else {
 		++color;
-		color &= 0xfU;
+		color &= COLOR_BITS;
 	  }
 	}
 	else {
@@ -692,11 +692,11 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   DSTOffsetData.Positive.y = wrap::round<int32_t>(boundingRect.top - centerCoordinate.y + 1);
   DSTOffsetData.Negative.x = wrap::round<int32_t>(centerCoordinate.x - boundingRect.left - 1);
   DSTOffsetData.Negative.y = wrap::round<int32_t>(centerCoordinate.y - boundingRect.bottom - 1);
-  auto color               = dstStitchBuffer[0].attribute & 0xfU;
+  auto color               = dstStitchBuffer[0].attribute & COLOR_BITS;
   for (auto& stitch : dstStitchBuffer) {
-	if (color != (stitch.attribute & 0xfU)) {
+	if (color != (stitch.attribute & COLOR_BITS)) {
 	  di::savdst(DSTRecords, 0xc30000);
-	  color = stitch.attribute & 0xfU;
+	  color = stitch.attribute & COLOR_BITS;
 	  colorData.push_back(UserColor[color]);
 	}
 	auto lengths = POINT {wrap::round<int32_t>(gsl::narrow_cast<double>(stitch.x) - centerCoordinate.x),
@@ -811,7 +811,7 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
   auto const colorChanges = thred::maxColor() + 1U;
-  if (colorChanges < 16U) {
+  if (colorChanges < COLOR_COUNT) {
 	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
 	  if (color == UserColor[iColor]) {
 		return iColor;

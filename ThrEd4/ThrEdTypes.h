@@ -19,7 +19,8 @@
 
 constexpr auto RES_SIZE    = 26;       // reserved for expansion in the ThrEd v1.0 header
 constexpr auto NAME_LEN    = 50;       // Length of the name fields in ThrEd headers
-constexpr auto COLOR_COUNT = 16;       // Number of colors in arrays
+constexpr auto COLOR_COUNT = 16U;       // Number of colors in arrays
+constexpr auto COLOR_BITS = 0xfU;       // Number of bits to cover the number of the colors in arrays
 constexpr auto SRTIM       = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes
