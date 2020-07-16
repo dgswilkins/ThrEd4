@@ -56,12 +56,18 @@ COLORREF const DefaultBitmapBackgroundColors[] = {0x00c0d5bf,
                                                   0x00b799ae,
                                                   0x0054667a};
 
+constexpr auto BPB   = 8U;  // bits per byte
+constexpr auto BPP24 = 24U; // 24 bits per pixel
+constexpr auto BPP32 = 32U; // 32 bits per pixel
+
+constexpr auto BMPFileNameLen = 16U; // max length (in bytes) of file name
+
 auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
                  ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
-  return a >> 8U;
+  return a >> BPB;
 }
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
@@ -94,10 +100,10 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto bytesRead = DWORD {0};
-  ReadFile(hBitmapFile, &BitmapFileHeader, 14U, &bytesRead, nullptr);
+  ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_Sig) {
-	auto fileHeaderSize = BitmapFileHeader.bfOffBits - 14U;
+	auto fileHeaderSize = BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader);
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 	  fileHeaderSize = sizeof(BITMAPV4HEADER);
 	}
@@ -122,6 +128,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	BitmapDC        = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
+	  // NOLINTNEXTLINE(readability-magic-numbers)
 	  auto       bitmapWidthBytes = (BitmapWidth >> 5U) << 2U;
 	  auto const widthOverflow    = BitmapWidth % 32;
 	  if (widthOverflow != 0U) {
@@ -140,7 +147,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfoHeader.biWidth       = BitmapWidth;
 	  BitmapInfoHeader.biHeight      = BitmapHeight;
 	  BitmapInfoHeader.biPlanes      = 1U;
-	  BitmapInfoHeader.biBitCount    = 32U;
+	  BitmapInfoHeader.biBitCount    = BPP32;
 	  BitmapInfoHeader.biCompression = BI_RGB;
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
@@ -201,7 +208,7 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
 		  ++blackBits;
 		}
 		else {
-		  if (bcpnt[iBytes] == 0xff) {
+		  if (bcpnt[iBytes] == UCHAR_MAX) {
 			++whiteBits;
 		  }
 		}
@@ -258,8 +265,8 @@ void bitmap::internal::bitsiz() {
 auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
   switch (bitCount) {
 	case 1U:
-	case 24U:
-	case 32U:
+	case BPP24:
+	case BPP32:
 	  return true;
 	default:
 	  return false;
@@ -337,8 +344,8 @@ void bitmap::savmap() {
 		return;
 	  }
 	  auto bytesWritten = DWORD {0};
-	  WriteFile(hBitmap, &BitmapFileHeader, 14U, &bytesWritten, nullptr);
-	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - 14U, &bytesWritten, nullptr);
+	  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
+	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
 	  auto buffer = std::vector<uint8_t> {};
 	  buffer.resize((wrap::toSize(BitmapWidth) * BitmapHeight * 3U) + 1U);
 	  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
@@ -422,7 +429,7 @@ void bitmap::lodbmp() {
 	bitmap::resetBmpFile(false);
 	trace::untrace();
 	auto saveFile = utf::Utf16ToUtf8(UserBMPFileName->filename().wstring());
-	if (!saveFile.empty() && saveFile.size() < 16U) {
+	if (!saveFile.empty() && saveFile.size() < BMPFileNameLen) {
 	  auto const bmpName = gsl::span<char> {PCSBMPFileName};
 	  std::copy(saveFile.cbegin(), saveFile.cend(), bmpName.begin());
 	  bitmap::internal::bfil(BackgroundColor);
@@ -580,7 +587,7 @@ auto bitmap::getrmap() -> uint32_t {
                                   gsl::narrow_cast<LONG>(BitmapWidth),
                                   gsl::narrow_cast<LONG>(BitmapHeight),
                                   1U,
-                                  32U,
+                                  BPP32,
                                   BI_RGB,
                                   0U,
                                   0L,
