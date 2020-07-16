@@ -221,16 +221,16 @@ void bitmap::internal::bitlin(uint8_t const* source,
                               COLORREF       background) {
   if ((source != nullptr) && (destination != nullptr)) {
 	for (auto i = 0U; i < bitmapWidthBytes; ++i) {
-	  auto bits = std::bitset<8U>(source[i]);
-	  for (auto bitOffset = 0U; bitOffset < 8U; ++bitOffset) {
-		*destination = bits[bitOffset ^ 7U] ? foreground : background;
+	  auto bits = std::bitset<CHAR_BIT>(source[i]);
+	  for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
+		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
 		++destination;
 	  }
 	}
-	if (auto const final = (BitmapWidth % 8)) {
-	  auto bits = std::bitset<8U>(source[bitmapWidthBytes]);
-	  for (auto bitOffset = final; bitOffset < 8U; ++bitOffset) {
-		*destination = bits[bitOffset ^ 7U] ? foreground : background;
+	if (auto const final = (BitmapWidth % CHAR_BIT)) {
+	  auto bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
+	  for (auto bitOffset = final; bitOffset < CHAR_BIT; ++bitOffset) {
+		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
 		++destination;
 	  }
 	}
