@@ -586,6 +586,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 		if (colors[0] == COLVER) {
 		  BackgroundColor = colors[1];
 		  thred::resetColorChanges();
+		  UserColor.fill(0);
 		}
 	  }
 	}
@@ -593,7 +594,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto iColor = 2U;
   auto color  = 0U;
   if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
-	color = colmatch(colors[iColor++]);
+	UserColor[0] = colors[iColor];
+	color        = colmatch(colors[iColor++]);
+	thred::addColor(0, color);
   }
   else {
 	color = 0;
@@ -606,7 +609,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   for (auto& record : DSTData) {
 	if ((record.nd & 0x40U) != 0) {
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
-		color = colmatch(colors[iColor++]);
+		color                    = colmatch(colors[iColor++]);
+		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
+		thred::addColor(currentStitch, color);
 	  }
 	  else {
 		++color;
@@ -641,7 +646,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   IniFile.hoopType = CUSTHUP;
   UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
   if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
-	constexpr auto expRatio = 1.1F; // 10% expansion 
+	constexpr auto expRatio = 1.1F; // 10% expansion
 	IniFile.hoopSizeX = dstSize.x * expRatio;
 	IniFile.hoopSizeY = dstSize.y * expRatio;
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
