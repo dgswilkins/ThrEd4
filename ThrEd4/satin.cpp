@@ -168,7 +168,7 @@ void satin::internal::satclos() {
   // clang-format off
   auto&      form              = FormList->operator[](ClosestFormToCursor);
   auto const initialGuideCount = form.satinGuideCount;
-  auto       minimumLength     = 1e99;
+  auto       minimumLength     = BIGDOUBLE;
   // clang-format on
   form::uninsf();
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
@@ -268,7 +268,7 @@ void satin::satknkt() {
 }
 
 auto satin::internal::satselfn() -> bool {
-  auto       minimumLength = 1e99;
+  auto       minimumLength = BIGDOUBLE;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	// clang-format off
@@ -1395,7 +1395,7 @@ void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish,
   auto xOffset = 0.0F;
   auto yOffset = 0.0F;
 
-  if (fabs(FormAngles->operator[](start)) < TINY && fabs(FormAngles->operator[](finish)) < TINY) {
+  if (fabs(FormAngles->operator[](start)) < TINYFLOAT && fabs(FormAngles->operator[](finish)) < TINYFLOAT) {
 	xOffset = 0.0F;
 	yOffset = satinWidth;
   }

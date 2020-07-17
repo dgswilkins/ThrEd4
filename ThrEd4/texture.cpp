@@ -526,7 +526,7 @@ void texture::txtrbut() {
 
 auto texture::internal::txtclos(uint32_t& closestTexturePoint) -> bool {
   if (closestTexturePoint != 0U) {
-	auto minimumLength = 1e99;
+	auto minimumLength = BIGDOUBLE;
 	auto reference     = POINT {0L, 0L};
 	auto point         = POINT {0L, 0L};
 	txi::deorg(reference);
@@ -604,7 +604,7 @@ void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) 
   auto const point0 = txi::ed2stch(point0in);
   auto const point1 = txi::ed2stch(point1in);
   auto const deltaX = point1.x - point0.x;
-  if (fabs(deltaX) < TINY) {
+  if (fabs(deltaX) < TINYFLOAT) {
 	return;
   }
   auto const slope  = (point1.y - point0.y) / deltaX;
