@@ -161,6 +161,13 @@ constexpr float    ITXWID    = (9.0F * PFGRAN); // default texture editor width
 constexpr float    ITXSPAC   = (0.4F * PFGRAN); // default texture editor spacing
 constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross pixels
 constexpr uint32_t ITXBUFLEN = 16U;             // texture buffer depth
+constexpr uint32_t BTNCOUNT  = 9U;              // Maximum number of buttons
+constexpr int32_t  FONTSIZE  = 400;             // default font size
+constexpr uint32_t B1MASK    = 0x0000ffU;       // mask for the least significant byte
+constexpr uint32_t B2MASK    = 0x00ff00U;       // mask for the middle byte
+constexpr uint32_t B3MASK    = 0xff0000U;       // mask for the most significant byte
+constexpr uint32_t B2SHFT    = 8U;              // bits required to shift one byte left
+constexpr uint32_t B3SHFT    = 16U;             // bits required to shift two bytes left
 
 enum stringLabel {
   STR_PIKOL,
