@@ -546,6 +546,10 @@ uint32_t const Ydst[] = {
     0x21a0a0  // 121
 };
 
+constexpr auto DSTMax      = 121;         // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTScale    = 3.0F / 5.0F; // DST stitch scaling factor
+constexpr auto InvDSTScale = 5.0F / 3.0F; // Inverse DST stitch scaling factor
+
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
   auto shift = 1U;
@@ -595,8 +599,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	color = 0;
   }
   auto localStitch       = fPOINT {};
-  auto maximumCoordinate = fPOINT {-1e12F, -1e12F};
-  auto mimimumCoordinate = fPOINT {1e12F, 1e12F};
+  auto maximumCoordinate = fPOINT {-BIGFLOAT, -BIGFLOAT};
+  auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
   StitchBuffer->clear();
   StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
   for (auto& record : DSTData) {
@@ -615,7 +619,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  localStitch.x += dstStitch.x;
 	  localStitch.y += dstStitch.y;
 	  if ((record.nd & 0x80U) == 0U) {
-		StitchBuffer->push_back(fPOINTATTR {localStitch.x * 0.6F, localStitch.y * 0.6F, color | NOTFRM});
+		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTScale, localStitch.y * DSTScale, color | NOTFRM});
 		auto& stitch = StitchBuffer->back();
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
@@ -637,8 +641,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   IniFile.hoopType = CUSTHUP;
   UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
   if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
-	IniFile.hoopSizeX = dstSize.x * 1.1F;
-	IniFile.hoopSizeY = dstSize.y * 1.1F;
+	constexpr auto expRatio = 1.1F; // 10% expansion 
+	IniFile.hoopSizeX = dstSize.x * expRatio;
+	IniFile.hoopSizeY = dstSize.y * expRatio;
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
@@ -656,34 +661,35 @@ auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
 }
 
 void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches) {
-  constexpr auto DSTMax          = 121;
   auto           dstStitchBuffer = std::vector<fPOINTATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
+  // NOLINTNEXTLINE(readability-magic-numbers)
   colorData.reserve(32);
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
   colorData.push_back(UserColor[stitches[0].attribute & COLMSK]);
   auto destination = dstStitchBuffer.begin();
   for (auto const& stitch : stitches) {
-	*destination++ = fPOINTATTR {stitch.x * 5.0F / 3.0F, stitch.y * 5.0F / 3.0F, stitch.attribute};
+	*destination++ = fPOINTATTR {stitch.x * InvDSTScale, stitch.y * InvDSTScale, stitch.attribute};
   }
   auto boundingRect = fRECTANGLE {
       dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
+  constexpr auto margin = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
   for (auto& stitch : dstStitchBuffer) {
 	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x + 0.5F;
+	  boundingRect.right = stitch.x + margin;
 	}
 	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x - 0.5F;
+	  boundingRect.left = stitch.x - margin;
 	}
 	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y + 0.5F;
+	  boundingRect.top = stitch.y + margin;
 	}
 	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y - 0.5F;
+	  boundingRect.bottom = stitch.y - margin;
 	}
   }
   auto centerCoordinate = POINT {wrap::round<int32_t>(wrap::midl(boundingRect.right, boundingRect.left)),
@@ -695,7 +701,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   auto color               = dstStitchBuffer[0].attribute & COLOR_BITS;
   for (auto& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLOR_BITS)) {
-	  di::savdst(DSTRecords, 0xc30000);
+	  constexpr auto stopCode = uint8_t {0xC3}; // note that stop code is thesame as the color change code
+	  DSTRecords.push_back(DSTREC {0, 0, stopCode});
 	  color = stitch.attribute & COLOR_BITS;
 	  colorData.push_back(UserColor[color]);
 	}
@@ -746,8 +753,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  lengths.y -= difference.y;
 	}
   }
-  DSTRecords.push_back(
-      {gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0), gsl::narrow_cast<uint8_t>(0xf3)});
+  constexpr auto endCode = uint8_t {0xF3}; 
+  DSTRecords.push_back(DSTREC {0, 0, endCode});
   if (di::colfil()) {
 	auto bytesWritten = DWORD {0};
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -805,8 +812,9 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   auto       deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
   auto       deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
+  // NOLINTNEXTLINE(readability-magic-numbers)
   return wrap::round<DWORD>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                      (((767 - meanR) * deltaB * deltaB) / 256)));
+                                      (((767 - meanR) * deltaB * deltaB) / 256)));// NOLINT(readability-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
@@ -820,7 +828,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 	UserColor[colorChanges] = color;
 	return colorChanges;
   }
-  auto minDistance = DWORD {0xffffffffU};
+  auto minDistance = DWORD {MAXDWORD};
   auto iDistance   = DWORD {0x00000000U};
   for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	auto const distance = di::coldis(color, UserColor[iColor]);
@@ -837,13 +845,13 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 }
 
 constexpr auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
-  return Xdst[dif.x + 121] | Ydst[dif.y + 121];
+  return Xdst[dif.x + DSTMax] | Ydst[dif.y + DSTMax];
 }
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
-  DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & 0xFFU),
-                               gsl::narrow_cast<uint8_t>((data & 0xFF00U) >> 8U),
-                               gsl::narrow_cast<uint8_t>((data & 0xFF0000U) >> 16U)});
+  DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
+                               gsl::narrow_cast<uint8_t>((data & B2MASK) >> B2SHFT),
+                               gsl::narrow_cast<uint8_t>((data & B3MASK) >> B3SHFT)});
 }
 
 auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
@@ -902,7 +910,8 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto        convAuxName = utf::Utf16ToUtf8(*auxName);
 		auto const* desc        = strrchr(convAuxName.data(), '\\') + 1U;
 		auto        DSTRecords  = std::vector<DSTREC> {};
-		// There are always going to be more records in the DST format because color changes and jumps count as stitches
+		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
+        // NOLINTNEXTLINE(readability-magic-numbers)
 		DSTRecords.reserve(StitchBuffer->size() + 128U);
 		auto DSTOffset = DSTOffsets {};
 		auto dstHeader = DSTHED {};
@@ -923,6 +932,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		  }
 		}
 		// clang-format off
+        // NOLINTNEXTLINE(readability-magic-numbers)
         dstHeader.desc[16] = 0xd;
         strncpy(static_cast<char *>(dstHeader.recshed),    "ST:", sizeof(dstHeader.recshed));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                        
         strncpy(static_cast<char *>(dstHeader.recs),  fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
