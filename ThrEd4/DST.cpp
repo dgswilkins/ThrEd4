@@ -606,8 +606,10 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
   StitchBuffer->clear();
   StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
+  constexpr auto c1Mask = 0x40U;
+  constexpr auto c0Mask = 0x80U;
   for (auto& record : DSTData) {
-	if ((record.nd & 0x40U) != 0) {
+	if ((record.nd & c1Mask) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
 		color                    = colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
@@ -623,7 +625,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  di::dstin(di::dtrn(&record), dstStitch);
 	  localStitch.x += dstStitch.x;
 	  localStitch.y += dstStitch.y;
-	  if ((record.nd & 0x80U) == 0U) {
+	  if ((record.nd & c0Mask) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
 		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTScale, localStitch.y * DSTScale, color | NOTFRM});
 		auto& stitch = StitchBuffer->back();
 		if (stitch.x > maximumCoordinate.x) {
