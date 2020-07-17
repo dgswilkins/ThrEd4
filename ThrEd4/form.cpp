@@ -1099,7 +1099,7 @@ auto form::closfrm() -> bool {
 	fi::rats();
 	auto       closestForm   = 0U;
 	auto       closestVertex = 0U;
-	auto       minimumLength = 1e99;
+	auto       minimumLength = BIGDOUBLE;
 	auto const point         = fi::px2stchf(screenCoordinate);
 	auto const layerCoded    = gsl::narrow_cast<uint8_t>(ActiveLayer << 1U);
 	auto const maxForm       = wrap::toUnsigned(FormList->size());
@@ -1198,7 +1198,7 @@ auto form::internal::ritlin(fPOINT const& start, fPOINT const& finish, float use
 
 auto form::closflt(FRMHED const& form, float xCoordinate, float yCoordinate) -> uint32_t {
   auto closestVertex = 0U;
-  auto minimumLength = 1e99;
+  auto minimumLength = BIGDOUBLE;
   auto vertexIt      = std::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	auto const length = hypot(xCoordinate - vertexIt[iVertex].x, yCoordinate - vertexIt[iVertex].y);
@@ -1325,7 +1325,7 @@ auto form::lastch() noexcept -> bool {
 auto form::getlast(FRMHED const& form) -> uint32_t {
   if (form.fillType != 0U) {
 	form::lastch();
-	auto minimumLength = 1e99;
+	auto minimumLength = BIGDOUBLE;
 	auto closestVertex = 0U;
 	auto vertexIt      = std::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -1506,7 +1506,7 @@ void form::internal::bold(FRMHED const& form) {
 	auto const sequence     = OSequence->operator[](iSequence);
 	auto const sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
 	auto const length       = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y);
-	if (length > TINY) {
+	if (length > TINYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
 	}
   }
@@ -2626,7 +2626,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVe
 auto form::internal::leftsid(std::vector<fPOINT> const& currentFormVertices) -> uint32_t {
   auto leftVertex = 0U;
   auto iVertex    = 0U;
-  auto minimumX   = 1e9F;
+  auto minimumX   = BIGFLOAT;
   auto vertexIt   = currentFormVertices.cbegin();
   for (iVertex = 0; iVertex < wrap::toUnsigned(currentFormVertices.size()); ++iVertex) {
 	if (vertexIt[iVertex].x < minimumX) {
@@ -2756,10 +2756,10 @@ auto form::internal::isect(uint32_t                   vertex0,
 	  }
 	}
   }
-  if (tempIntersection.x < TINY) {
+  if (tempIntersection.x < TINYFLOAT) {
 	tempIntersection.x = 0.0F;
   }
-  if (tempIntersection.y < TINY) {
+  if (tempIntersection.y < TINYFLOAT) {
 	tempIntersection.y = 0.0F;
   }
   intersection.x = gsl::narrow_cast<float>(tempIntersection.x);
@@ -2851,7 +2851,7 @@ auto form::internal::insect(FRMHED const&              form,
 	auto iDestination = 1U;
 	for (iIntersection = 0; iIntersection < count - 1U; ++iIntersection) {
 	  if (fabs(gsl::narrow_cast<double>(arrayOfClipIntersectData[iIntersection]->segmentLength) -
-	           arrayOfClipIntersectData[wrap::toSize(iIntersection) + 1U]->segmentLength) > TINY) {
+	           arrayOfClipIntersectData[wrap::toSize(iIntersection) + 1U]->segmentLength) > TINYFLOAT) {
 		mvpclp(arrayOfClipIntersectData, iDestination++, iIntersection + 1U);
 	  }
 	}
@@ -3710,7 +3710,7 @@ auto form::internal::reglen(std::vector<SMALPNTL*> const& sortedLines,
   lineEndPoints[1]   = &sortedLines[regionsList[iRegion].start][1];
   lineEndPoints[2]   = sortedLines[regionsList[iRegion].end];
   lineEndPoints[3]   = &sortedLines[regionsList[iRegion].end][1];
-  auto minimumLength = 1e99;
+  auto minimumLength = BIGDOUBLE;
   for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
 	for (auto iPoint = 0U; iPoint < 4; ++iPoint) {
 	  auto const length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x,
@@ -3755,7 +3755,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 		lastRegionCorners[3] = lineEndPoint[1];
 	  }
 	  auto       newRegion     = 0U;
-	  auto       minimumLength = 1e99;
+	  auto       minimumLength = BIGDOUBLE;
 	  auto const regionCount   = visitedRegions.size();
 	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 		if (!visitedRegions[iRegion]) {
@@ -4055,7 +4055,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	// clang-format off
 	auto const  firstLine     = sortedLines[sequenceStart]->line;
 	auto const& bpnt          = BSequence->back();
-	auto        minimumLength = 1e99;
+	auto        minimumLength = BIGDOUBLE;
 	auto        mindif        = 0U;
 	// clang-format on
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -5163,7 +5163,7 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   formControls[1].x = formControls[5].x = wrap::round<int32_t>(wrap::midl(rectangle.right, rectangle.left));
   formControls[3].y = formControls[7].y = wrap::round<int32_t>(wrap::midl(rectangle.top, rectangle.bottom));
 
-  auto minimumLength    = 1e99;
+  auto minimumLength    = BIGDOUBLE;
   auto formControlIndex = 0U;
   for (auto iControl : formControls) {
 	auto const length = hypot(iControl.x - point.x, iControl.y - point.y);
@@ -5366,7 +5366,7 @@ void form::filsat() {
 }
 
 auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
-  auto       minimumLength = 1e99;
+  auto       minimumLength = BIGDOUBLE;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& formIter = FormList->operator[](iForm);
@@ -5417,7 +5417,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", inOutFlag);
 	}
   }
-  return minimumLength != 1e99;
+  return minimumLength != BIGDOUBLE;
 }
 
 void form::internal::nufpnt(uint32_t vertex, FRMHED& form, fPOINT const& stitchPoint) {
@@ -5798,7 +5798,7 @@ void form::setap() {
 }
 
 void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
-  *allItemsRect = fRECTANGLE {1e9F, 0.0F, 0.0F, 1e9F};
+  *allItemsRect = fRECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
   for (auto& iForm : *FormList) {
 	auto const& trct = iForm.rectangle;
 	if (trct.left < allItemsRect->left) {
@@ -7383,7 +7383,7 @@ void form::join() {
 	// clang-format on
 	vertexList.reserve(form.vertexCount);
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-	if ((abs(lastVertex->x - vertexIt->x) > TINY) || (abs(lastVertex->y - vertexIt->y) > TINY)) {
+	if ((abs(lastVertex->x - vertexIt->x) > TINYFLOAT) || (abs(lastVertex->y - vertexIt->y) > TINYFLOAT)) {
 	  vertexList.push_back(vertexIt[ClosestVertexToCursor]);
 	}
 	ClosestVertexToCursor = form::nxt(form, ClosestVertexToCursor);
