@@ -71,7 +71,8 @@ constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
 constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
 constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
 constexpr float    USESIZ   = 3.5F;              // user preferred size
-constexpr double   MAXSIZ   = 9.0;               // default maximum stitch size
+constexpr double   MAXSIZ   = 9.0;               // default maximum stitch size as a double
+constexpr auto     MAXSIZF  = 9.0F;              // default maximum stitch size as a float
 constexpr float    PFAFGRAN = 6.0F;              // pfaf stitch points per millimeter
 constexpr int32_t  MINZUM   = 5;                 // minimum zoom in stitch points
 constexpr double   SHOPNTS  = 0.00;              // show stitch points when zoom below this
@@ -166,8 +167,15 @@ constexpr int32_t  FONTSIZE  = 400;             // default font size
 constexpr uint32_t B1MASK    = 0x0000ffU;       // mask for the least significant byte
 constexpr uint32_t B2MASK    = 0x00ff00U;       // mask for the middle byte
 constexpr uint32_t B3MASK    = 0xff0000U;       // mask for the most significant byte
-constexpr uint32_t B2SHFT    = 8U;              // bits required to shift one byte left
-constexpr uint32_t B3SHFT    = 16U;             // bits required to shift two bytes left
+constexpr uint32_t BYTSHFT    = 8U;             // bits required to shift one byte left
+constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
+constexpr uint32_t BYTMASK    = 0xffU;          // Byte mask
+constexpr uint32_t WRDMASK    = 0xffffU;        // word mask
+constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
+constexpr uint32_t SQPNTS     = 5U;             // number of points required to draw a square
+constexpr uint32_t OUTPNTS    = 9U;             // number of points required to draw an outline
+constexpr auto     RADDEGD    = 180.0 / PI;     // double factor to convert radians to degrees
+constexpr auto     RADDEGF    = 180.0F / PI_F;  // float factor to convert radians to degrees
 
 enum stringLabel {
   STR_PIKOL,

@@ -7180,7 +7180,7 @@ void form::internal::rotentr(double rotationAngle) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_ROTA);
   // NOLINTNEXTLINE(readability-magic-numbers)
-  displayText::shoMsg(fmt::format(fmtStr, (rotationAngle / PI * 180.0)));
+  displayText::shoMsg(fmt::format(fmtStr, (rotationAngle * RADDEGD)));
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
