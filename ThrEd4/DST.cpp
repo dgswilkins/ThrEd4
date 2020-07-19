@@ -857,8 +857,8 @@ constexpr auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
   DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
-                               gsl::narrow_cast<uint8_t>((data & B2MASK) >> B2SHFT),
-                               gsl::narrow_cast<uint8_t>((data & B3MASK) >> B3SHFT)});
+                               gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
+                               gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
 }
 
 auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
