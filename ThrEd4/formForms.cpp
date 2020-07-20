@@ -48,7 +48,7 @@ POINT LabelWindowSize;   // size of the left windows in the form data sheet
 RECT  ValueWindowCoords; // location of right windows in the form data sheet
 POINT ValueWindowSize;   // size of the right windows in the form data sheet
 
-uint16_t DaisyTypeStrings[] = {
+auto const DaisyTypeStrings = std::array<uint16_t, 6>{
     IDS_DAZCRV,
     IDS_DAZSAW,
     IDS_DAZRMP,
@@ -198,7 +198,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 	  valueWindow[LUANG] = ffi::txtrwin(
-	      fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.underlayStitchAngle) * RADDEGD)),
+	      fmt::format(L"{:.2f}", (form.underlayStitchAngle * RADDEGF)),
 	      ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
@@ -285,14 +285,14 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 	  valueWindow[LFRMANG] = ffi::numwin(
-	      fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.angleOrClipData.angle) * RADDEGD)),
+	      fmt::format(L"{:.2f}", (form.angleOrClipData.angle * RADDEGF)),
 	      ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
 	  valueWindow[LSACANG] = ffi::numwin(
-	      fmt::format(L"{:.2f}", (gsl::narrow_cast<double>(form.satinOrAngle.angle) * RADDEGD)), ValueWindowCoords);
+	      fmt::format(L"{:.2f}", (form.satinOrAngle.angle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -728,7 +728,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 		  wchar_t compareBuffer[HBUFSIZ] = {0};
-		  for (uint8_t iType = 0U; iType < 6U; ++iType) {
+		  for (uint8_t iType = 0U; iType < DaisyTypeStrings.size(); ++iType) {
 			LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPTSTR>(compareBuffer), HBUFSIZ);
 			if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 			  IniFile.daisyBorderType = iType;
