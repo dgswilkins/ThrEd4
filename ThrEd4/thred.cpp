@@ -3070,8 +3070,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   }
   durit(buffer, std::begin(PCSBMPFileName), sizeof(PCSBMPFileName));
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
-  durit(buffer, UserColor.data(), gsl::narrow<uint32_t>(UserColor.size()));
-  durit(buffer, CustomColor.data(), gsl::narrow<uint32_t>(CustomColor.size()));
+  durit(buffer, UserColor.data(), wrap::toUnsigned(UserColor.size()* sizeof(decltype(UserColor.back()))));
+  durit(buffer, CustomColor.data(), wrap::toUnsigned(CustomColor.size()* sizeof(decltype(CustomColor.back()))));
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(threadLength);
   for (auto iThread = 0U; iThread < threadLength; ++iThread) {
