@@ -271,19 +271,15 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
 }
 
 void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]) {
+  constexpr auto byteWidth = ThumbWidth / 8U;
   if (image != nullptr) {
 	for (auto i = 0U; i < ThumbHeight; ++i) {
-	  for (auto j = 0U; j < 6U; ++j) {
-		auto const offset = j * 8;
+	  for (auto j = 0U; j < byteWidth; ++j) {
+		auto const offset = j * 8U;
 		auto       output = uint8_t {0U};
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset] != 0);
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 1U] != 0U) << 1U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 2U] != 0U) << 2U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 3U] != 0U) << 3U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 4U] != 0U) << 4U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 5U] != 0U) << 5U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 6U] != 0U) << 6U;
-		output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + 7U] != 0U) << 7U;
+		for (auto bitPosition = 0U; bitPosition < 8U; ++bitPosition) {
+		  output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + bitPosition] != 0U) << bitPosition;
+		}
 		buffer.push_back(output);
 	  }
 	}
