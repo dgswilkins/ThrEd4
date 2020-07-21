@@ -726,9 +726,9 @@ void satin::ribon() {
 		// reset vars as push_back may invalidate references
 		currentForm                        = FormList->operator[](ClosestFormToCursor);
 		auto                    iNewVertex = 0U;
-		newForm.maxFillStitchLen           = 9.0F * PFGRAN;
+		newForm.maxFillStitchLen           = MAXSIZF * PFGRAN;
 		newForm.minFillStitchLen           = MinStitchLength;
-		MaxStitchLen                       = 9.0F * PFGRAN;
+		MaxStitchLen                       = MAXSIZF * PFGRAN;
 		if (currentForm.type == FRMLINE) {
 		  // Set blunt flags
 		  auto isBlunt = 0U;
@@ -931,10 +931,13 @@ void satin::internal::satfn(FRMHED const&             form,
 	auto line1Step   = fPOINT {line1Delta.x / line1Count, line1Delta.y / line1Count};
 	auto line2Step   = fPOINT {line2Delta.x / line2Count, line2Delta.y / line2Count};
 	bool flag        = false;
-	auto loop        = 0U;
 	auto iLine1Count = 1U;
 	auto iLine2Count = 1U;
 	auto stitchPoint = vertexIt[line1Start];
+	auto loop        = 0U;
+
+	constexpr auto loopLimit = 20000U; // limit the iterations
+
 	do {
 	  flag = false;
 	  ++loop;
@@ -1019,7 +1022,7 @@ void satin::internal::satfn(FRMHED const&             form,
 		  flag = true;
 		}
 	  }
-	} while (flag && (loop < 20000U));
+	} while (flag && (loop < loopLimit));
   }
 }
 
@@ -1080,7 +1083,7 @@ void satin::satfil(FRMHED& form) {
   form.fillType = SATF;
   auto lengths  = std::vector<float> {};
   lengths.reserve(wrap::toSize(form.vertexCount) + 1U);
-  auto length = 0.0;
+  auto length = 0.0F;
   lengths.push_back(length);
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
   for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
@@ -1112,7 +1115,7 @@ void satin::satfil(FRMHED& form) {
 		si::satfn(form, lengths, 2, 3, 2, 1);
 		break;
 	  }
-	  length       = (length - lengths[1]) / 2.0;
+	  length       = (length - lengths[1]) / 2.0F;
 	  auto iVertex = 1U;
 	  if (!StateMap->test(StateFlag::BARSAT)) {
 		OSequence->push_back(vertexIt[1]);
@@ -1132,7 +1135,7 @@ void satin::satfil(FRMHED& form) {
 	  si::satmf(form, lengths);
 	  break;
 	}
-	length /= 2.0;
+	length /= 2.0F;
 	auto iVertex = 0;
 	if (!StateMap->test(StateFlag::BARSAT) && !StateMap->test(StateFlag::FTHR)) {
 	  OSequence->push_back(vertexIt[0]);
@@ -1272,8 +1275,9 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
 	return;
   }
   auto satinBackup = std::vector<fPOINT> {}; // backup stitches in satin fills
-  satinBackup.resize(8U);
-  std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {1e12F, 1e12F});
+  constexpr auto satBufferSize = 8U;
+  satinBackup.resize(satBufferSize);
+  std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {BIGFLOAT, BIGFLOAT});
   auto const innerStep        = fPOINT {innerDelta.x / count, innerDelta.y / count};
   auto const outerStep        = fPOINT {outerDelta.x / count, outerDelta.y / count};
   auto       satinBackupIndex = 0U;
@@ -1347,8 +1351,9 @@ void satin::satout(FRMHED const& form, float satinWidth) {
 	InsidePointList->resize(form.vertexCount);
 	OutsidePoints = OutsidePointList;
 	InsidePoints  = InsidePointList;
+	constexpr auto defaultWidth = 0.1F;
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	  si::outfn(form, iVertex, iVertex + 1, 0.1F);
+	  si::outfn(form, iVertex, iVertex + 1, defaultWidth);
 	}
 	auto count = 0U;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
