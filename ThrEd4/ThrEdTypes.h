@@ -178,6 +178,20 @@ constexpr uint32_t OUTPNTS    = 9U;             // number of points required to 
 constexpr auto     RADDEGF    = 180.0F / PI_F;  // float factor to convert radians to degrees
 constexpr auto     DEGRADF    = PI_F / 180.0F;  // float factor to convert radians to degrees
 
+constexpr auto penCharcoal  = COLORREF {0x404040U};
+constexpr auto penGray      = COLORREF {0x808080U};
+constexpr auto penLilac     = COLORREF {0xc080c0U};
+constexpr auto penLimeGreen = COLORREF {0x40c040U};
+constexpr auto penOlive     = COLORREF {0xc0c040U};
+constexpr auto penPaleOlive = COLORREF {0xc0c080U};
+constexpr auto penPurple    = COLORREF {0x804080U};
+constexpr auto penRosy      = COLORREF {0xc08080U};
+constexpr auto penSeaGreen  = COLORREF {0x80c080U};
+constexpr auto penSilver    = COLORREF {0xc0c0c0U};
+constexpr auto penTeal      = COLORREF {0x40c0c0U};
+constexpr auto penTurquoise = COLORREF {0x80c0c0U};
+constexpr auto penWhite     = COLORREF {0xffffffU};
+
 enum stringLabel {
   STR_PIKOL,
   STR_UPON,
