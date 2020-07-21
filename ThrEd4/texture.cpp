@@ -443,7 +443,7 @@ void texture::drwtxtr() {
   line[0].y = line[1].y = TextureScreen.bottom;
   Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
   DeleteObject(TextureCrossPen);
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, 1, 0xffffff);
+  TextureCrossPen = wrap::CreatePen(PS_SOLID, 1, penWhite);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   for (auto index = 0U; index < wrap::toUnsigned(TempTexturePoints->size()); ++index) {
@@ -475,7 +475,8 @@ auto texture::internal::px2txt(POINT const& offset) -> bool {
   auto retval    = false;
   txi::px2ed(offset, editPoint);
   auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
-  if (line < -0.5F) {
+  constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
+  if (line < limit) {
 	line = 0.0F;
   }
   auto txPoint = TXPNT {0.0F, wrap::round<uint16_t>(line)};
@@ -553,7 +554,7 @@ void texture::internal::setxmov() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
 }
 
-void texture::internal::ritxrct() noexcept {
+void texture::internal::ritxrct() {
   auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
@@ -561,12 +562,14 @@ void texture::internal::ritxrct() noexcept {
                                (TexturePixelRect.top + offset.y),
                                (TexturePixelRect.right + offset.x),
                                (TexturePixelRect.bottom + offset.y)};
-  POINT      line[5]   = {};
+
+  auto line = std::array<POINT, SQPNTS> {};
+
   line[0].x = line[1].x = line[4].x = rectangle.left;
   line[2].x = line[3].x = rectangle.right;
   line[0].y = line[3].y = line[4].y = rectangle.top;
   line[1].y = line[2].y = rectangle.bottom;
-  Polyline(StitchWindowDC, static_cast<POINT*>(line), 5);
+  Polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
@@ -678,7 +681,8 @@ void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
   auto point = fPOINT {};
   txi::px2ed(offset, point);
   auto val = (point.x - TextureScreen.xOffset) / TextureScreen.spacing;
-  if (val < -0.5F) {
+  constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
+  if (val < limit) {
 	val = 0.0F;
   }
   textureRecord.line = wrap::round<uint16_t>(val);
@@ -1381,11 +1385,12 @@ auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
 	character = gsl::narrow<char>(keyCode);
 	return true;
   }
+  constexpr auto ASCIIoffset = 0x30U; // offset to convert a value to the character equivalent
   if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-	character = gsl::narrow<char>(keyCode - VK_NUMPAD0 + 0x30);
+	character = gsl::narrow<char>(keyCode - VK_NUMPAD0 + ASCIIoffset);
 	return true;
   }
-  if (keyCode == 0xbe || keyCode == 0x6e) {
+  if (keyCode == VK_OEM_PERIOD || keyCode == VK_DECIMAL) {
 	character = '.';
 	return true;
   }
@@ -1466,7 +1471,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
-	  case 8: // backspace
+	  case VK_BACK: // backspace
 	  {
 		if (!TextureInputBuffer->empty()) {
 		  TextureInputBuffer->pop_back();
@@ -1478,7 +1483,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	  }
 	}
 	if (flag) {
-	  if (TextureInputBuffer->size() < 8U) { // floating point 7 digits of precision + '.'
+		constexpr auto bufferLength = 8U; // i.e. floating point 7 digits of precision + '.'
+	  if (TextureInputBuffer->size() < bufferLength) { 
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
 		}
@@ -1496,15 +1502,15 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	case 0xdb: { //[
+	case VK_OEM_4: { //  '[{' for US
 	  txi::txshrnk(textureForm);
 	  break;
 	}
-	case 0xdd: { //]
+	case VK_OEM_6: { //  ']}' for US
 	  txi::txgro(textureForm);
 	  break;
 	}
-	case 192: { //`
+	case VK_OEM_3: { // '`~' for US
 	  xt::tst();
 	  break;
 	}
@@ -1562,7 +1568,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	  }
 	  break;
 	}
-	case 0xbd: { //-
+	case VK_OEM_MINUS: { // '-' any country
 	  txi::txcntrv(textureForm);
 	  break;
 	}

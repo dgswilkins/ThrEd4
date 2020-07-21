@@ -65,7 +65,7 @@ namespace internal {
   auto px2txt(POINT const& offset) -> bool;
   void redtbak();
   void ritxfrm(FRMHED const& textureForm);
-  void ritxrct() noexcept;
+  void ritxrct();
   void setxclp(FRMHED const& form);
   void setxfrm();
   void setxmov();
