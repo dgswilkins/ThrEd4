@@ -31,6 +31,10 @@
 
 namespace pi = PES::internal;
 
+constexpr auto PECScale = 5.0F / 3.0F;
+constexpr auto invPECScale = 3.0F / 5.0F;
+constexpr auto bitsPerByte = 8U;
+
 uint8_t* PEScolors;             // pes colors
 uint8_t* PESdata;               // pes card data buffer
 fPOINT   PESstitchCenterOffset; // offset for writing pes files
@@ -208,25 +212,34 @@ void PES::internal::pecnam(gsl::span<char> label) {
 #pragma warning(pop)
 
 void PES::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta) {
-  auto outputVal = gsl::narrow_cast<uint32_t>(abs(delta)) & 0x7FFU;
+  constexpr auto mask11bits = uint32_t {0x7FFU};  // used to mask the value to 11 bits
+  constexpr auto bit8       = uint32_t {0x80U};   // Set bit 8 on the upper byte
+  constexpr auto bit12      = uint32_t {0x800U};  // Set bit 12 if delta is negative
+  constexpr auto offset     = uint32_t {0x1000U}; // offset used to shift value positive
+  auto           outputVal  = gsl::narrow_cast<uint32_t>(abs(delta)) & mask11bits;
   if (delta < 0) {
-	outputVal = delta + 0x1000U & 0x7FFU;
-	outputVal |= 0x800U;
+	outputVal = (delta + offset) & mask11bits;
+	outputVal |= bit12;
   }
-  auto upperByte = gsl::narrow_cast<uint8_t>(((outputVal >> 8U) & 0x0FU) | 0x80U);
+  // upper byte has upper 4 bits of the encode value
+  auto upperByte = gsl::narrow_cast<uint8_t>(((outputVal >> BYTSHFT) & NIBMASK) | bit8);
   buffer.push_back(upperByte);
-  auto lowerByte = gsl::narrow_cast<uint8_t>(outputVal & 0xffU);
+  // lower byte has lower 8 bits of the encoded value
+  auto lowerByte = gsl::narrow_cast<uint8_t>(outputVal & BYTMASK);
   buffer.push_back(lowerByte);
 }
 
 void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY) {
-  auto deltaX = wrap::round<int32_t>(srcX * 5.0F / 3.0F);
-  auto deltaY = -wrap::round<int32_t>(srcY * 5.0F / 3.0F);
-  if (deltaX < 63 && deltaX > -64 && deltaY < 63 && deltaY > -64) {
+  constexpr auto mask7bits = uint8_t {0x7FU}; // used to mask value to 7 bits
+  constexpr auto maxDeltaVal = int32_t {63};
+  constexpr auto minDeltaVal = int32_t {-64};
+  auto deltaX = wrap::round<int32_t>(srcX * PECScale);
+  auto deltaY = -wrap::round<int32_t>(srcY * PECScale);
+  if (deltaX < maxDeltaVal && deltaX > minDeltaVal && deltaY < maxDeltaVal && deltaY > minDeltaVal) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto xVal = gsl::narrow<uint8_t>(deltaX & 0x7FU);
+	auto xVal = gsl::narrow<uint8_t>(deltaX & mask7bits);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto yVal = gsl::narrow<uint8_t>(deltaY & 0x7FU);
+	auto yVal = gsl::narrow<uint8_t>(deltaY & mask7bits);
 	buffer.push_back(xVal);
 	buffer.push_back(yVal);
   }
@@ -234,8 +247,8 @@ void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, floa
 	pecEncodeint32_t(buffer, deltaX);
 	pecEncodeint32_t(buffer, deltaY);
   }
-  thisStitch.x += deltaX * 0.6F;
-  thisStitch.y += -deltaY * 0.6F;
+  thisStitch.x += deltaX * invPECScale;
+  thisStitch.y += -deltaY * invPECScale;
 }
 
 void PES::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
@@ -275,9 +288,9 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (
   if (image != nullptr) {
 	for (auto i = 0U; i < ThumbHeight; ++i) {
 	  for (auto j = 0U; j < byteWidth; ++j) {
-		auto const offset = j * 8U;
+		auto const offset = j * bitsPerByte;
 		auto       output = uint8_t {0U};
-		for (auto bitPosition = 0U; bitPosition < 8U; ++bitPosition) {
+		for (auto bitPosition = 0U; bitPosition < bitsPerByte; ++bitPosition) {
 		  output |= gsl::narrow_cast<uint32_t>((*image)[i][offset + bitPosition] != 0U) << bitPosition;
 		}
 		buffer.push_back(output);
@@ -296,9 +309,11 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   auto const dest    = gsl::span<uint8_t>(&thumbnail[0][0], sizeof(thumbnail));
   // write the overall thumbnail
   std::copy(&imageWithFrame[0][0], &imageWithFrame[0][0] + sizeof(imageWithFrame), dest.begin());
+  constexpr auto xOffset = uint16_t {4U}; // thumbnail x offset to place it in the frame correctly
+  constexpr auto yOffset = uint16_t {5U}; // thumbnail y offset to place it in the frame correctly
   for (auto& stitch : *StitchBuffer) {
-	auto x          = wrap::floor<uint16_t>((stitch.x) * xFactor) + 4U;
-	auto y          = wrap::floor<uint16_t>((stitch.y) * yFactor) + 5U;
+	auto x          = wrap::floor<uint16_t>((stitch.x) * xFactor) + xOffset;
+	auto y          = wrap::floor<uint16_t>((stitch.y) * yFactor) + yOffset;
 	y               = ThumbHeight - y;
 	thumbnail[y][x] = 1U;
   }
@@ -334,7 +349,7 @@ auto PES::internal::dupcol(uint32_t activeColor) -> uint32_t {
 	  return iColor;
 	}
   }
-  auto minimumDistance = 0xffffffU;
+  auto minimumDistance = std::numeric_limits<uint32_t>::max();
   auto matchIndex      = 0U;
   for (auto iColor = 1U; iColor < activeColor; ++iColor) {
 	auto const matchDistance = pesmtch(color, PEScolors[iColor]);
@@ -361,7 +376,8 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   auto  bytesRead  = DWORD {0};
   ReadFile(fileHandle, fileBuffer, fileSize, &bytesRead, nullptr);
   auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
-  if (strncmp(static_cast<char*>(pesHeader->led), "#PES00", 6) != 0) {
+  constexpr auto PESStr = "#PES00";
+  if (strncmp(static_cast<char*>(pesHeader->led), PESStr, strlen(PESStr)) != 0) {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_NOTPES);
 	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
@@ -409,6 +425,10 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	StitchBuffer->clear();
 	StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
 	StitchBuffer->push_back(fPOINTATTR {});
+	constexpr auto bit8 = uint32_t {0x80U}; // Is bit 8 set on the upper byte
+	constexpr auto bit12  = uint32_t {0x800U};  // Is bit 12 set?
+	constexpr auto offset = uint32_t {0x1000U}; // offset used to shift value negative
+	constexpr auto mask12bits = uint32_t {0xFFFU};  // used to mask the value to 12 bits
 	while (iPESstitch < pecCount) {
 	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
 		break;
@@ -419,10 +439,11 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	  }
 	  else {
 		auto locof = 0.0F;
-		if ((PESstitch[iPESstitch] & 0x80U) != 0U) {
-		  auto pesVal = (((PESstitch[iPESstitch] & 0x0FU) << 8U) | PESstitch[iPESstitch + 1U]) & 0xFFFU;
-		  if ((pesVal & 0x800U) != 0U) {
-			pesVal -= 0x1000;
+		if ((PESstitch[iPESstitch] & bit8) != 0U) {
+		  // combine the 4 bits from the first byte with the 8 bits from the next byte
+		  auto pesVal = (((PESstitch[iPESstitch] & NIBMASK) << BYTSHFT) | PESstitch[iPESstitch + 1U]) & mask12bits;
+		  if ((pesVal & bit12) != 0U) {
+			pesVal -= offset;
 		  }
 		  auto sPesVal = gsl::narrow_cast<int32_t>(pesVal);
 		  locof        = gsl::narrow_cast<decltype(locof)>(sPesVal);
@@ -436,7 +457,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 			locof = PESstitch[iPESstitch];
 		  }
 		}
-		locof *= 3.0F / 5.0F;
+		locof *= invPECScale;
 		// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 		  loc.y -= locof;
@@ -479,18 +500,21 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 	else {
 	  do {
 		auto pesHeader = PESHED {};
+		constexpr auto PESStr    = "#PES0001";
+		constexpr auto EmbStr    = "CEmbOne";
+		constexpr auto SewStr    = "CSewSeg";
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.led), "#PES0001", sizeof(pesHeader.led));
-		pesHeader.celn = 7U;
+		strncpy(static_cast<char*>(pesHeader.led), PESStr, strlen(PESStr));
+		pesHeader.celn = gsl::narrow<decltype(pesHeader.celn)>(strlen(EmbStr));
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.ce), "CEmbOne", sizeof(pesHeader.ce));
-		pesHeader.cslen = 7U;
+		strncpy(static_cast<char*>(pesHeader.ce), EmbStr, pesHeader.celn);
+		pesHeader.cslen = gsl::narrow<decltype(pesHeader.cslen)>(strlen(SewStr));
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.cs), "CSewSeg", sizeof(pesHeader.cs));
+		strncpy(static_cast<char*>(pesHeader.cs), SewStr, pesHeader.cslen);
 		auto iColor = 0;
 		for (auto const color : UserColor) {
 		  auto           matchIndex  = 0U;
-		  auto           matchMin    = 0xffffffffU;
+		  auto           matchMin    = std::numeric_limits<uint32_t>::max();
 		  constexpr auto threadCount = sizeof(PESThread) / sizeof(PESThread[0]);
 		  for (auto iColorMatch = 1U; iColorMatch < threadCount; ++iColorMatch) {
 			auto const match = pi::pesmtch(color, iColorMatch);
@@ -506,8 +530,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		thred::sizstch(boundingRect, *StitchBuffer);
 		PESstitchCenterOffset.x = wrap::midl(boundingRect.right, boundingRect.left);
 		PESstitchCenterOffset.y = wrap::midl(boundingRect.top, boundingRect.bottom);
-		pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * (5.0F / 3.0F));
-		pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * (5.0F / 3.0F));
+		pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * PECScale);
+		pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * PECScale);
 		auto pesBuffer = std::vector<uint8_t> {};
 		// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
@@ -628,11 +652,11 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 		std::fill(fstart, fend, ' ');
-		pecHeader->labnd       = 13; // 13 = carriage return
+		pecHeader->labnd = '\r'; // 13 = carriage return
 		pecHeader->colorCount  = gsl::narrow<uint8_t>(pesThreadCount);
 		pecHeader->hnd1        = 0x00ff;
 		pecHeader->thumbHeight = ThumbHeight;
-		pecHeader->thumbWidth  = ThumbWidth / 8U;
+		pecHeader->thumbWidth  = ThumbWidth / bitsPerByte;
 		pi::pecdat(pecBuffer);
 		auto* pecHeader2            = convert_ptr<PECHDR2*>(&pecBuffer[sizeof(PECHDR)]);
 		pecHeader2->unknown1        = 0;
@@ -643,13 +667,20 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecHeader2->height          = pesHeader.ysiz;
 		pecHeader2->unknown4        = 0x01e0;
 		pecHeader2->unknown5        = 0x01b0;
-
-		auto xInt16_le = wrap::round<uint16_t>(boundingRect.left * (5.0F / 3.0F));
-		auto yInt16_le = wrap::round<uint16_t>(boundingRect.bottom * (5.0F / 3.0F));
-		xInt16_le |= gsl::narrow_cast<uint16_t>(0x9000);
-		yInt16_le |= gsl::narrow<uint16_t>(0x9000U);
-		pecHeader2->xMin = ((xInt16_le & 0xff00U) >> 8U) | ((xInt16_le & 0x00ffU) << 8U);
-		pecHeader2->yMin = ((yInt16_le & 0xff00U) >> 8U) | ((yInt16_le & 0x00ffU) << 8U);
+		constexpr auto PECMask1 = uint16_t {0x9000U};
+		constexpr auto PECLowMask = uint16_t {0x00ffU};
+		constexpr auto PECHighMask = uint16_t {0xff00U};
+		constexpr auto PECShift = uint16_t {8U};
+		auto xInt16_le = wrap::round<uint16_t>(boundingRect.left * PECScale);
+		auto yInt16_le = wrap::round<uint16_t>(boundingRect.bottom * PECScale);
+		xInt16_le |= PECMask1;
+		yInt16_le |= PECMask1;
+		pecHeader2->xMin =
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt16_le & PECHighMask) >> PECShift) |
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt16_le & PECLowMask) << PECShift);
+		pecHeader2->yMin =
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt16_le & PECHighMask) >> PECShift) |
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt16_le & PECLowMask) << PECShift);
 		pi::pecImage(pecBuffer);
 		if (FALSE == WriteFile(fileHandle, pecBuffer.data(), wrap::toUnsigned(pecBuffer.size()), &bytesWritten, nullptr)) {
 		  displayText::riter();
