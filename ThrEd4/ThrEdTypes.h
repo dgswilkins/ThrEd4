@@ -164,18 +164,19 @@ constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross 
 constexpr uint32_t ITXBUFLEN = 16U;             // texture buffer depth
 constexpr uint32_t BTNCOUNT  = 9U;              // Maximum number of buttons
 constexpr int32_t  FONTSIZE  = 400;             // default font size
-constexpr uint32_t B1MASK    = 0x0000ffU;       // mask for the least significant byte
-constexpr uint32_t B2MASK    = 0x00ff00U;       // mask for the middle byte
-constexpr uint32_t B3MASK    = 0xff0000U;       // mask for the most significant byte
+constexpr uint32_t B1MASK    = 0x000000ffU;       // mask for the least significant byte
+constexpr uint32_t B2MASK    = 0x0000ff00U;       // mask for the middle byte
+constexpr uint32_t B3MASK    = 0x00ff0000U;       // mask for the most significant byte
 constexpr uint32_t BYTSHFT    = 8U;             // bits required to shift one byte left
 constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
+constexpr uint32_t NIBMASK    = 0x0fU;          // Nibble mask
 constexpr uint32_t BYTMASK    = 0xffU;          // Byte mask
 constexpr uint32_t WRDMASK    = 0xffffU;        // word mask
 constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
 constexpr uint32_t SQPNTS     = 5U;             // number of points required to draw a square
 constexpr uint32_t OUTPNTS    = 9U;             // number of points required to draw an outline
-constexpr auto     RADDEGD    = 180.0 / PI;     // double factor to convert radians to degrees
 constexpr auto     RADDEGF    = 180.0F / PI_F;  // float factor to convert radians to degrees
+constexpr auto     DEGRADF    = PI_F / 180.0F;  // float factor to convert radians to degrees
 
 enum stringLabel {
   STR_PIKOL,
@@ -932,7 +933,7 @@ enum textureButtons { // text button windows
 
 constexpr uint32_t HLIN = HNUM;
 
-#pragma pack(1)
+#pragma pack(push, 1)
 
 class PCSHEADER // pcs file header structure
 {
@@ -2764,7 +2765,7 @@ class GRDCOD
   //~GRDCOD() = default;
 };
 
-#pragma pack()
+#pragma pack(pop)
 
 class OREC
 {
