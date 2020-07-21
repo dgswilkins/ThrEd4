@@ -2585,7 +2585,7 @@ void form::internal::contf(FRMHED& form) {
 	  }
 	}
 	delta = fPOINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
-	constexpr auto refFactor = 0.9F; // reduction factor for the reference
+	constexpr auto refFactor = 0.9; // reduction factor for the reference
 	if (reference.length > refFactor * LineSpacing) {
 	  auto const polyLine = PVEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
 	  auto const polyDiff = PVEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
