@@ -10,6 +10,9 @@
 #endif
 
 #ifdef PESACT
+
+#pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
+
 class PESLED
 {
   public:
@@ -142,6 +145,8 @@ class PECHDR2
   // PECHDR2& operator=(PECHDR2&&) = default;
   //~PECHDR2() = default;
 };
+
+#pragma pack(pop)
 
 namespace PES {
 auto readPESFile(std::filesystem::path const& newFileName) -> bool;

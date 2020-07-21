@@ -12,6 +12,8 @@
 
 namespace fs = std::filesystem;
 
+#pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
+
 // clang-format off
 class DSTHED // dst file header
 {
@@ -83,6 +85,8 @@ class DSTOffsets
   // DSTOffsets& operator=(DSTOffsets&&) = default;
   //~DSTOffsets() = default;
 };
+
+#pragma pack(pop)
 
 namespace DST {
 auto colmatch(COLORREF color) -> uint32_t;
