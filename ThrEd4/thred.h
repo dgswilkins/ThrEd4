@@ -45,7 +45,7 @@ enum class fileIndices : uint8_t {
 namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
-void bBox() noexcept;
+void bBox();
 void chkmen() noexcept;
 void chkrng(fPOINT& range);
 void addColor(uint32_t stitch, uint32_t color);
@@ -71,7 +71,7 @@ void redclp();
 void redraw(HWND window) noexcept;
 void resetColorChanges() noexcept;
 void ritfcor(fPOINT const& point);
-void ritmov(uint32_t formIndex);
+void ritmov(uint32_t formIndex) noexcept;
 void ritot(uint32_t number);
 void rngadj();
 void rotang1(fPOINTATTR const& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept;
@@ -88,7 +88,7 @@ void shft(fPOINT const& delta) noexcept;
 void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 auto stch2pxr(fPOINT const& stitchCoordinate) -> POINT;
 void stchrct(fRECTANGLE& rectangle) noexcept;
-void strtchbox(std::vector<POINT>& stretchBoxLine) noexcept;
+void strtchbox(std::vector<POINT>& stretchBoxLine);
 auto txtWid(wchar_t const* string) noexcept -> SIZE;
 void unbBox();
 void unbsho();
@@ -105,8 +105,8 @@ namespace internal {
   void bakmrk();
   void bakthum();
   void barnam(HWND window, uint32_t iThumbnail);
-  void box(uint32_t iNearest, HDC dc) noexcept;
-  void boxs() noexcept;
+  void box(uint32_t iNearest, HDC dc);
+  void boxs();
   void bsavmen();
   auto centr() -> fPOINT;
   void chk1col();
@@ -173,7 +173,7 @@ namespace internal {
   void dubox(POINT const& stitchCoordsInPixels);
   void dubuf(std::vector<char>& buffer);
   void duclip();
-  void duclp() noexcept;
+  void duclp();
   void ducmd();
   void ducros(HDC dc);
   void dudat();
@@ -191,8 +191,8 @@ namespace internal {
   void dupclp();
   void duprct(FRMHED const& form);
   void durit(std::vector<char>& destination, const void* source, uint32_t count);
-  void durot() noexcept;
-  void durotu() noexcept;
+  void durot();
+  void durotu();
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
   void dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize, std::wstring const* const strings) noexcept;
@@ -348,7 +348,7 @@ namespace internal {
   auto pt2colInd(uint32_t iStitch) -> uint32_t;
   void purg();
   void purgdir();
-  auto pxchk(double pixelSize) noexcept -> double;
+  auto pxchk(double pixelSize) -> uint16_t;
   void qchk();
   void qcode();
   void rSelbox();
@@ -450,7 +450,7 @@ namespace internal {
   void toglHid();
   void toglup();
   void unbox();
-  void unboxs() noexcept;
+  void unboxs();
   void unclp();
   void uncros();
   void ungrphi();
