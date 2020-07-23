@@ -92,7 +92,7 @@ namespace internal {
   void txtclp(FRMHED& textureForm);
   void txtdel();
   void txtlin();
-  void txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept;
+  void txtxfn(POINT const& reference, uint16_t offsetPixels);
   void txvrt(FRMHED& form);
 } // namespace internal
 } // namespace texture

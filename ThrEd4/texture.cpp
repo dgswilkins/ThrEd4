@@ -323,7 +323,7 @@ void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
       TextureScreen.top);
 }
 
-void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept {
+void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) {
   auto line = std::array<POINT, 2>{};
   line[0]       = POINT {reference.x, reference.y - offsetPixels};
   line[1]       = POINT {reference.x, reference.y + offsetPixels};
