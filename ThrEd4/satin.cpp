@@ -1414,7 +1414,7 @@ void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish,
 	if (length > satinWidth * SATHRESH) {
 	  length = satinWidth * SATHRESH;
 	}
-	angle += FormAngles->operator[](start) + PI_F / 2.0F;
+	angle += FormAngles->operator[](start) + PI_FHALF;
 	xOffset = length * cos(angle);
 	yOffset = length * sin(angle);
   }

@@ -863,7 +863,7 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
 
   auto const& form        = FormList->operator[](ClosestFormToCursor);
   auto const lengthDelta  = fPOINT {(delta.x * form.edgeStitchLen), (delta.y * form.edgeStitchLen)};
-  auto const angle        = atan2(delta.y, delta.x) + PI_F / 2.0F;
+  auto const angle        = atan2(delta.y, delta.x) + PI_FHALF;
   auto const offset       = fPOINT {(cos(angle) * form.borderSize), (sin(angle) * form.borderSize)};
   auto const middleXcoord = chainEndPoints[start].x + lengthDelta.x;
   auto const middleYcoord = chainEndPoints[start].y + lengthDelta.y;

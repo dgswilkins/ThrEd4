@@ -5681,10 +5681,10 @@ void thred::internal::rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float r
   else {
 	distanceToCenter = abs(dy);
 	if (dy > 0) {
-	  newAngle = PI_F / 2.0F + rotationAngle;
+	  newAngle = PI_FHALF + rotationAngle;
 	}
 	else {
-	  newAngle = rotationAngle - PI_F / 2.0F;
+	  newAngle = rotationAngle - PI_FHALF;
 	}
   }
   auto const point = fPOINT {rotationCenter.x + distanceToCenter * cos(newAngle),
@@ -5708,11 +5708,11 @@ void thred::rotang1(fPOINTATTR const& unrotatedPoint,
   else {
 	if (dy > 0.0) {
 	  distanceToCenter = dy;
-	  newAngle         = PI_F / 2.0F + rotationAngle;
+	  newAngle         = PI_FHALF + rotationAngle;
 	}
 	else {
 	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_F / 2.0F;
+	  newAngle         = rotationAngle - PI_FHALF;
 	}
   }
   rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
@@ -5732,11 +5732,11 @@ void thred::rotangf(fPOINT const& unrotatedPoint, fPOINT& rotatedPoint, float ro
   else {
 	if (dy > 0) {
 	  distanceToCenter = dy;
-	  newAngle         = PI_F / 2.0F + rotationAngle;
+	  newAngle         = PI_FHALF + rotationAngle;
 	}
 	else {
 	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_F / 2.0F;
+	  newAngle         = rotationAngle - PI_FHALF;
 	}
   }
   rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
@@ -5756,11 +5756,11 @@ void thred::rotflt(fPOINT& point, float const rotationAngle, fPOINT const& rotat
   else {
 	if (dy > 0) {
 	  len      = dy;
-	  newAngle = PI_F / 2.0F + rotationAngle;
+	  newAngle = PI_FHALF + rotationAngle;
 	}
 	else {
 	  len      = -dy;
-	  newAngle = rotationAngle - PI_F / 2.0F;
+	  newAngle = rotationAngle - PI_FHALF;
 	}
   }
   point.x = rotationCenter.x + len * cos(newAngle);
@@ -5780,11 +5780,11 @@ void thred::internal::rotstch(fPOINTATTR& stitch, float const rotationAngle, fPO
   else {
 	if (dy > 0) {
 	  distanceToCenter = dy;
-	  newAngle         = PI_F / 2.0F + rotationAngle;
+	  newAngle         = PI_FHALF + rotationAngle;
 	}
 	else {
 	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_F / 2.0F;
+	  newAngle         = rotationAngle - PI_FHALF;
 	}
   }
   stitch.y = rotationCenter.y + distanceToCenter * sin(newAngle);
@@ -10818,10 +10818,10 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  }
 	  else {
 		if (adjustedPoint.y > 0) {
-		  rotationAngle = PI_F / 2.0F;
+		  rotationAngle = PI_FHALF;
 		}
 		else {
-		  rotationAngle = -PI_F / 2.0F;
+		  rotationAngle = -PI_FHALF;
 		}
 	  }
 	  rotationAngle -= RotationHandleAngle;
@@ -12739,10 +12739,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		}
 		else {
 		  if (adjustedPoint.y > 0) {
-			RotationHandleAngle = PI_F / 2.0F;
+			RotationHandleAngle = PI_FHALF;
 		  }
 		  else {
-			RotationHandleAngle = -PI_F / 2.0F;
+			RotationHandleAngle = -PI_FHALF;
 		  }
 		}
 		StateMap->set(StateFlag::ROTUSHO);

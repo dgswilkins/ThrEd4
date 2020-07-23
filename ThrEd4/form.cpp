@@ -3443,12 +3443,12 @@ void form::internal::horclpfn(std::vector<RNGCNT> const& textureSegments,
   auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
   for (auto iVertex = 0U; iVertex < angledForm.vertexCount; ++iVertex) {
 	angledFormVertices.push_back(vertexIt[iVertex]);
-	thred::rotflt(angledFormVertices.back(), (PI_F / 2.0F), rotationCenter);
+	thred::rotflt(angledFormVertices.back(), (PI_FHALF), rotationCenter);
   }
   angledForm.vertexIndex = 0;
   angout(angledForm);
   clpcon(angledForm, textureSegments, angledFormVertices);
-  rotbak((-PI_F / 2.0F), rotationCenter);
+  rotbak((-PI_FHALF), rotationCenter);
 }
 
 void form::angclpfn(FRMHED const& form, std::vector<RNGCNT> const& textureSegments, std::vector<fPOINT>& angledFormVertices) {
@@ -3459,7 +3459,7 @@ void form::angclpfn(FRMHED const& form, std::vector<RNGCNT> const& textureSegmen
   angledFormVertices.clear();
   angledFormVertices.reserve(angledForm.vertexCount);
   if (StateMap->test(StateFlag::ISUND)) {
-	rotationAngle = PI_F / 2.0F - angledForm.underlayStitchAngle;
+	rotationAngle = PI_FHALF - angledForm.underlayStitchAngle;
 
 	auto const& vertexList = xt::insid(angledForm);
 	for (auto iVertex = 0U; iVertex < angledForm.vertexCount; ++iVertex) {
@@ -3469,10 +3469,10 @@ void form::angclpfn(FRMHED const& form, std::vector<RNGCNT> const& textureSegmen
   }
   else {
 	if (StateMap->test(StateFlag::TXFIL)) {
-	  rotationAngle = PI_F / 2.0F - angledForm.angleOrClipData.angle;
+	  rotationAngle = PI_FHALF - angledForm.angleOrClipData.angle;
 	}
 	else {
-	  rotationAngle = PI_F / 2.0F - angledForm.satinOrAngle.angle;
+	  rotationAngle = PI_FHALF - angledForm.satinOrAngle.angle;
 	}
 	auto vertexIt = std::next(FormVertices->cbegin(), angledForm.vertexIndex);
 	for (auto iVertex = 0U; iVertex < angledForm.vertexCount; ++iVertex) {
