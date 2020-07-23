@@ -230,7 +230,6 @@ void PES::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta
 }
 
 void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY) {
-  constexpr auto mask7bits = uint8_t {0x7FU}; // used to mask value to 7 bits
   constexpr auto maxDeltaVal = int32_t {63};
   constexpr auto minDeltaVal = int32_t {-64};
   auto deltaX = wrap::round<int32_t>(srcX * PECScale);
