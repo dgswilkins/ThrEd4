@@ -173,6 +173,7 @@ constexpr uint32_t B3MASK    = 0x00ff0000U;       // mask for the more significa
 constexpr uint32_t BYTSHFT    = 8U;             // bits required to shift one byte left
 constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
 constexpr uint32_t TBYTSHFT  = 24U;             // bits required to shift three bytes left
+constexpr uint32_t HBSHFT    = 31U;             // shift required to reach the MSB of uint32
 constexpr uint8_t  NIBMASK    = 0x0fU;          // Nibble mask
 constexpr uint8_t  BYTMASK    = 0xffU;          // Byte mask
 constexpr uint16_t WRDMASK    = 0xffffU;        // word mask

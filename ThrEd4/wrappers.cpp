@@ -110,7 +110,11 @@ auto wrap::toUnsigned(size_t invar) -> uint32_t {
 }
 
 auto wrap::toSize(uint32_t invar) noexcept -> size_t {
+#ifdef _WIN64
   return gsl::narrow_cast<size_t>(invar);
+#else
+	return invar;
+#endif
 }
 
 auto wrap::wcstof(wchar_t const (&buffer)[HBUFSIZ]) noexcept -> float {

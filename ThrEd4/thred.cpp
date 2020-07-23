@@ -9404,7 +9404,8 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
 }
 
 void thred::internal::ritcur() noexcept {
-	constexpr auto iconRows = 32; 
+	constexpr auto iconRows = 32U; // rows in the icon
+	constexpr auto BPINT = 32; // bits in an uint32_t
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto currentCursor = GetCursor();
   if (currentCursor != nullptr) {
@@ -9415,21 +9416,22 @@ void thred::internal::ritcur() noexcept {
 	cursorPosition.x -= (StitchWindowOrigin.x + iconInfo.xHotspot);
 	cursorPosition.y -= (StitchWindowOrigin.y + iconInfo.yHotspot);
 	// ToDo - replace with GetDIBits
-	auto bitmapBits = std::array<uint8_t, 64> {};
-	GetBitmapBits(iconInfo.hbmMask, 256, bitmapBits.data());
+	constexpr auto iconSize = 64U; // size in bytes of an icon bitmap
+	auto bitmapBits = std::array<uint8_t, iconSize> {};
+	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
-	  for (auto iRow = 0; iRow < iconRows; ++iRow) {
+	  for (auto iRow = 0U; iRow < iconRows; ++iRow) {
 		auto const mask          = byteSwap(bitmapBits[iRow]);
-		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
-		auto       bitMask       = 0x80000000U;
-		for (auto iPixel = 0; iPixel < 32; ++iPixel) {
+		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
+		auto       bitMask       = uint32_t {1U} << HBSHFT;
+		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & mask) == 0U) {
 			auto pixelColor = 0U;
 			if ((bitMask & bitmapInverse) != 0U) {
-			  pixelColor = 0xffffff;
+			  pixelColor = penWhite;
 			}
 			else {
-			  pixelColor = 0x000000;
+			  pixelColor = penBlack;
 			}
 			SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, pixelColor);
 		  }
@@ -9440,8 +9442,8 @@ void thred::internal::ritcur() noexcept {
 	else {
 	  for (auto iRow = 0; iRow < iconRows; ++iRow) {
 		auto const bitmapInverse = byteSwap(bitmapBits[gsl::narrow_cast<size_t>(iRow) + 32]);
-		auto       bitMask       = 0x80000000U;
-		for (auto iPixel = 0; iPixel < 32; ++iPixel) {
+		auto       bitMask = uint32_t {1U} << HBSHFT;
+		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & bitmapInverse) != 0U) {
 			SetPixel(StitchWindowDC,
 			         cursorPosition.x + iPixel,
