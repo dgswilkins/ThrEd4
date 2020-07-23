@@ -23,7 +23,7 @@
 
 namespace wrap {
 auto bufToFloat(wchar_t const* buffer) -> float;
-auto CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN;
+auto CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
 

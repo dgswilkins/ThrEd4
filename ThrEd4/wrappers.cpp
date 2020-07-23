@@ -125,8 +125,8 @@ void wrap::setCursor(HCURSOR hCursor) noexcept {
   }
 }
 
-auto wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept -> HPEN {
-  auto const scaledWidth = MulDiv(width, *screenDPI, 96);
+auto wrap::CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN {
+  auto const scaledWidth = MulDiv(width, *screenDPI, stdDPI);
   return ::CreatePen(iStyle, scaledWidth, color);
 }
 

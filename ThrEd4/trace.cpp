@@ -1019,7 +1019,7 @@ void trace::blak() {
   }
   ti::tracwnd();
   if (!FormList->empty()) {
-	BlackPen = wrap::CreatePen(PS_SOLID, 1, 0);
+	BlackPen = wrap::CreatePen(PS_SOLID, penNarrow, penBlack);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(TraceDC, BlackPen);
 	if (!StateMap->test(StateFlag::WASTRAC)) {

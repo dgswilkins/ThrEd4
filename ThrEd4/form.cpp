@@ -433,7 +433,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto  vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
   line[1]        = thred::stch2pxr(vertexIt[iVertex]);
   auto const ratio =
-      gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, gsl::narrow<int32_t>(*screenDPI), 96)) /
+      gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
       StitchWindowClientRect.right;
   // NOLINTNEXTLINE(readability-magic-numbers)
   auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
@@ -456,7 +456,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
 void form::selsqr(POINT const& controlPoint, HDC dc) {
   auto line = std::array<POINT, SQPNTS>{};
   auto const offset =
-      MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), gsl::narrow<int32_t>(*screenDPI), 96);
+      MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *screenDPI, stdDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
   line[0].y = line[1].y = controlPoint.y - offset;
   line[1].x = line[2].x = controlPoint.x + offset;
@@ -468,7 +468,7 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
 void form::internal::frmsqr0(POINT const& controlPoint) {
   auto line = std::array<POINT, SQPNTS>{};
   auto const offset =
-      MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), gsl::narrow<int32_t>(*screenDPI), 96);
+      MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), *screenDPI, stdDPI);
   if (offset != 0) {
 	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 	line[0].y = line[1].y = controlPoint.y - offset;
@@ -481,7 +481,7 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
 
 void form::internal::frmx(POINT const& controlPoint, HDC dc) {
   auto line = std::array<POINT, LNPNTS>{};
-  auto const offset  = MulDiv(8, gsl::narrow<int32_t>(*screenDPI), 96);
+  auto const offset  = MulDiv(8, *screenDPI, stdDPI);
   SelectObject(dc, FormSelectedPen);
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;

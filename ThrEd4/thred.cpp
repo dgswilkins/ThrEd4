@@ -2667,7 +2667,7 @@ void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, P
 }
 
 void thred::internal::duar(POINT const& stitchCoordsInPixels) {
-  auto const offset = gsl::narrow<int32_t>(MulDiv(10, *screenDPI, 96));
+  auto const offset = gsl::narrow<int32_t>(MulDiv(10, *screenDPI, stdDPI));
   auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
   rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
@@ -2896,7 +2896,7 @@ void thred::internal::redbal() {
 		  }
 		}
 		for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
-		  UserPen[iColor]        = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
+		  UserPen[iColor]        = wrap::CreatePen(PS_SOLID, penNarrow, UserColor[iColor]);
 		  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 		}
 		thred::coltab();
@@ -5616,7 +5616,7 @@ void thred::internal::setbak(uint32_t penWidth) noexcept {
 void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
   auto      line = std::array<POINT, SQPNTS>{};
   auto const layer   = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
-  auto const offset  = MulDiv(IniFile.stitchSizePixels, *screenDPI, 96);
+  auto const offset  = MulDiv(IniFile.stitchSizePixels, *screenDPI, stdDPI);
   if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 	auto const stitchCoordsInPixels = stch2px1(iStitch);
 	line[0].x = line[3].x = line[4].x = stitchCoordsInPixels.x - offset;
@@ -7105,7 +7105,7 @@ constexpr auto thred::internal::nxtcrnr(uint32_t corner) -> uint32_t {
 void thred::internal::drwmrk(HDC dc) {
   auto       markCoordinates = POINT {0L, 0L};
   auto      markLine = std::array<POINT, 2>{};
-  auto const markOffset      = gsl::narrow<int32_t>(MulDiv(6, *screenDPI, 96));
+  auto const markOffset      = gsl::narrow<int32_t>(MulDiv(6, *screenDPI, stdDPI));
   thred::sCor2px(fPOINT {ZoomMarkPoint}, markCoordinates);
   SelectObject(dc, ZoomMarkPen);
   SetROP2(dc, R2_XORPEN);
@@ -16553,34 +16553,34 @@ void thred::internal::init() {
   // create pens
   COLORREF const boxColor[] = {0x404040, 0x408040, 0x804040, 0x404080};
   for (auto iRGBK = 0U; iRGBK < 4; ++iRGBK) {
-	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, 1, boxColor[iRGBK]);
+	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, penNarrow, boxColor[iRGBK]);
   }
-  LinePen        = wrap::CreatePen(PS_SOLID, 1U, penCharcoal);
-  CrossPen       = wrap::CreatePen(PS_SOLID, 5U, penPurple);
-  GroupSelectPen = wrap::CreatePen(PS_SOLID, 1U, penPurple);
-  GridPen        = wrap::CreatePen(PS_SOLID, 1U, IniFile.gridColor);
-  BackgroundPen  = wrap::CreatePen(PS_SOLID, 3U, BackgroundColor);
+  LinePen        = wrap::CreatePen(PS_SOLID, penNarrow, penCharcoal);
+  CrossPen       = wrap::CreatePen(PS_SOLID, penWide, penPurple);
+  GroupSelectPen = wrap::CreatePen(PS_SOLID, penNarrow, penPurple);
+  GridPen        = wrap::CreatePen(PS_SOLID, penNarrow, IniFile.gridColor);
+  BackgroundPen  = wrap::CreatePen(PS_SOLID, penMedium, BackgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto bitmapPen = wrap::CreatePen(PS_SOLID, 1U, bitmap::getBmpColor());
+  auto bitmapPen = wrap::CreatePen(PS_SOLID, penNarrow, bitmap::getBmpColor());
   bitmap::setBitmapPen(bitmapPen);
-  FormPen            = wrap::CreatePen(PS_SOLID, 1U, penSilver);
-  MultiFormPen       = wrap::CreatePen(PS_SOLID, 1U, penPaleOlive);
-  FormPen3px         = wrap::CreatePen(PS_SOLID, 3U, penSilver);
-  FormSelectedPen    = wrap::CreatePen(PS_SOLID, 1U, penSeaGreen);
-  ZoomMarkPen        = wrap::CreatePen(PS_SOLID, 3U, penLimeGreen);
-  SelectAllPen       = wrap::CreatePen(PS_SOLID, 1U, penRosy);
-  KnotPen            = wrap::CreatePen(PS_SOLID, 1U, penWhite);
-  LayerPen[0]        = wrap::CreatePen(PS_SOLID, 1U, penSilver);
-  LayerPen[1]        = wrap::CreatePen(PS_SOLID, 1U, penTurquoise);
-  LayerPen[2]        = wrap::CreatePen(PS_SOLID, 1U, penLilac);
-  LayerPen[3]        = wrap::CreatePen(PS_SOLID, 1U, penPaleOlive);
-  LayerPen[4]        = wrap::CreatePen(PS_SOLID, 1U, penTeal);
-  LayerPen[5]        = wrap::CreatePen(PS_SOLID, 1U, penOlive);
+  FormPen            = wrap::CreatePen(PS_SOLID, penNarrow, penSilver);
+  MultiFormPen       = wrap::CreatePen(PS_SOLID, penNarrow, penPaleOlive);
+  FormPen3px         = wrap::CreatePen(PS_SOLID, penMedium, penSilver);
+  FormSelectedPen    = wrap::CreatePen(PS_SOLID, penNarrow, penSeaGreen);
+  ZoomMarkPen        = wrap::CreatePen(PS_SOLID, penMedium, penLimeGreen);
+  SelectAllPen       = wrap::CreatePen(PS_SOLID, penNarrow, penRosy);
+  KnotPen            = wrap::CreatePen(PS_SOLID, penNarrow, penWhite);
+  LayerPen[0]        = wrap::CreatePen(PS_SOLID, penNarrow, penSilver);
+  LayerPen[1]        = wrap::CreatePen(PS_SOLID, penNarrow, penTurquoise);
+  LayerPen[2]        = wrap::CreatePen(PS_SOLID, penNarrow, penLilac);
+  LayerPen[3]        = wrap::CreatePen(PS_SOLID, penNarrow, penPaleOlive);
+  LayerPen[4]        = wrap::CreatePen(PS_SOLID, penNarrow, penTeal);
+  LayerPen[5]        = wrap::CreatePen(PS_SOLID, penNarrow, penOlive);
   BackgroundPenWidth = 1;
   for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	ThreadSizePixels[iColor] = 1;
 	ThreadSizeIndex[iColor]  = 1;
-	UserPen[iColor]          = wrap::CreatePen(PS_SOLID, 1, UserColor[iColor]);
+	UserPen[iColor]          = wrap::CreatePen(PS_SOLID, penNarrow, UserColor[iColor]);
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
@@ -16692,8 +16692,8 @@ void thred::internal::drwknot() {
   constexpr auto KnotBoxSize  = 5;  // offset of the knot box sides;
   constexpr auto KnotLineSize = 10; // length of the knot line;
   if (!UserFlagMap->test(UserFlag::KNOTOF) && (KnotCount != 0U) && (!StitchBuffer->empty())) {
-	auto const kOffset = gsl::narrow<int32_t>(MulDiv(KnotBoxSize, *screenDPI, 96));
-	auto const kLine   = gsl::narrow<int32_t>(MulDiv(KnotLineSize, *screenDPI, 96));
+	auto const kOffset = gsl::narrow<int32_t>(MulDiv(KnotBoxSize, *screenDPI, stdDPI));
+	auto const kLine   = gsl::narrow<int32_t>(MulDiv(KnotLineSize, *screenDPI, stdDPI));
 	auto       point   = POINT {0L, 0L};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};
@@ -17215,7 +17215,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
 		  auto iColor = stitchesToDraw[0].attribute & COLOR_BITS;
 		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto pen   = wrap::CreatePen(PS_SOLID, 1, colors[iColor]);
+		  auto pen   = wrap::CreatePen(PS_SOLID, penNarrow, colors[iColor]);
 		  auto iLine = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
 			if ((stitchesToDraw[iStitch].attribute & COLOR_BITS) == iColor) {
@@ -18036,10 +18036,10 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  auto private_DPI     = GetDpiForWindow(ThrEdWindow);
+	  auto private_DPI     = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
 	  screenDPI            = &private_DPI;
-	  private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, 96);
-	  private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, 96);
+	  private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, stdDPI);
+	  private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, stdDPI);
 	  thi::init();
 	  if (UserFlagMap->test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);

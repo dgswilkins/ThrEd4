@@ -186,6 +186,7 @@ constexpr auto     DEGRADF    = PI_F / 180.0F;  // float factor to convert radia
 
 constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
 
+constexpr auto penBlack     = COLORREF {0x000000U};
 constexpr auto penCharcoal  = COLORREF {0x404040U};
 constexpr auto penGray      = COLORREF {0x808080U};
 constexpr auto penLilac     = COLORREF {0xc080c0U};
@@ -199,6 +200,10 @@ constexpr auto penSilver    = COLORREF {0xc0c0c0U};
 constexpr auto penTeal      = COLORREF {0x40c0c0U};
 constexpr auto penTurquoise = COLORREF {0x80c0c0U};
 constexpr auto penWhite     = COLORREF {0xffffffU};
+constexpr auto penNarrow    = 1;
+constexpr auto penMedium    = 3;
+constexpr auto penWide      = 5;
+constexpr auto stdDPI = int32_t {96};
 
 enum stringLabel {
   STR_PIKOL,

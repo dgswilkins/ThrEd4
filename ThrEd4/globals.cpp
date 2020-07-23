@@ -163,7 +163,7 @@ std::vector<POINT>* RubberBandLine; // points to form points to be moved
 std::vector<SATCON>* SatinGuides; // satin form connects
 
 RECT      scRct;      //
-uint32_t* screenDPI;  // screen DPI
+int32_t* screenDPI;  // screen DPI
 int32_t*  ScrollSize; // Scroll bar width scaled for DPI
 
 std::vector<POINT>* SearchLine; // stitch select line
