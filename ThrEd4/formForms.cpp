@@ -184,17 +184,17 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LULEN] = ffi::txtwin(stringTable[STR_ULEN], LabelWindowCoords);
 	  valueWindow[LULEN] =
-	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayStitchLen / PFGRAN)), ValueWindowCoords);
+	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LWLKIND] = ffi::txtwin(stringTable[STR_UWLKIND], LabelWindowCoords);
 	valueWindow[LWLKIND] =
-	    ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayIndent / PFGRAN)), ValueWindowCoords);
+	    ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayIndent * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & AT_UND) != 0U) {
 	  labelWindow[LUSPAC] = ffi::txtwin(stringTable[STR_FUSPAC], LabelWindowCoords);
 	  valueWindow[LUSPAC] =
-	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlaySpacing / PFGRAN)), ValueWindowCoords);
+	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlaySpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
 	  valueWindow[LUANG] = ffi::txtrwin(
@@ -254,33 +254,33 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	  }
 	  labelWindow[LFTHFLR] = ffi::txtwin(stringTable[STR_FTHFLR], LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.fillInfo.feather.minStitchSize / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.fillInfo.feather.minStitchSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType != CLPF) {
 	  labelWindow[LFRMSPAC] = ffi::txtwin(stringTable[STR_TXT4], LabelWindowCoords);
 	  valueWindow[LFRMSPAC] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.fillSpacing / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.fillSpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (texture::istx(ClosestFormToCursor)) {
 	  labelWindow[LTXOF] = ffi::txtwin(stringTable[STR_TXOF], LabelWindowCoords);
-	  valueWindow[LTXOF] = ffi::numwin(fmt::format(L"{:.2f}", (form.txof / PFGRAN)), ValueWindowCoords);
+	  valueWindow[LTXOF] = ffi::numwin(fmt::format(L"{:.2f}", (form.txof * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMAXFIL] = ffi::txtwin(stringTable[STR_TXT20], LabelWindowCoords);
 	valueWindow[LMAXFIL] =
-	    ffi::numwin(fmt::format(L"{:.2f}", (form.maxFillStitchLen / PFGRAN)), ValueWindowCoords);
+	    ffi::numwin(fmt::format(L"{:.2f}", (form.maxFillStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (!clip::isclp(form) && !texture::istx(ClosestFormToCursor)) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(stringTable[STR_TXT5], LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.lengthOrCount.stitchLength / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.lengthOrCount.stitchLength * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMINFIL] = ffi::txtwin(stringTable[STR_TXT21], LabelWindowCoords);
 	valueWindow[LMINFIL] =
-	    ffi::numwin(fmt::format(L"{:.2f}", (form.minFillStitchLen / PFGRAN)), ValueWindowCoords);
+	    ffi::numwin(fmt::format(L"{:.2f}", (form.minFillStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
@@ -342,37 +342,37 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	if ((edgeArray[iEdge] & BESPAC) != 0) {
 	  labelWindow[LBRDSPAC] = ffi::txtwin(stringTable[STR_TXT9], LabelWindowCoords);
 	  choice = (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
-	               ? fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN))
-	               : fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN * 2));
+	               ? fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN))
+	               : fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN * 2));
 	  valueWindow[LBRDSPAC] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BPICSPAC) != 0) {
 	  labelWindow[LBRDPIC] = ffi::txtwin(stringTable[STR_TXT16], LabelWindowCoords);
-	  valueWindow[LBRDPIC] = ffi::numwin(fmt::format(L"{:.2f}", (form.edgeSpacing / PFGRAN)), ValueWindowCoords);
+	  valueWindow[LBRDPIC] = ffi::numwin(fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BEMAX) != 0) {
 	  labelWindow[LMAXBRD] = ffi::txtwin(stringTable[STR_TXT22], LabelWindowCoords);
 	  valueWindow[LMAXBRD] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.maxBorderStitchLen / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.maxBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BELEN) != 0) {
 	  labelWindow[LBRDLEN] = ffi::txtwin(stringTable[STR_TXT10], LabelWindowCoords);
 	  valueWindow[LBRDLEN] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.edgeStitchLen / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.edgeStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BEMIN) != 0) {
 	  labelWindow[LMINBRD] = ffi::txtwin(stringTable[STR_TXT23], LabelWindowCoords);
 	  valueWindow[LMINBRD] =
-	      ffi::numwin(fmt::format(L"{:.2f}", (form.minBorderStitchLen / PFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.minBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BESIZ) != 0) {
 	  labelWindow[LBRDSIZ] = ffi::txtwin(stringTable[STR_TXT11], LabelWindowCoords);
-	  valueWindow[LBRDSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (form.borderSize / PFGRAN)), ValueWindowCoords);
+	  valueWindow[LBRDSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (form.borderSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BRDPOS) != 0) {
@@ -397,8 +397,8 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BCNRSIZ) != 0) {
-	  choice = (form.edgeType == EDGEBHOL) ? fmt::format(L"{:.2f}", (form::getblen() / PFGRAN))
-	                                       : fmt::format(L"{:.2f}", (form::getplen() / PFGRAN));
+	  choice = (form.edgeType == EDGEBHOL) ? fmt::format(L"{:.2f}", (form::getblen() * IPFGRAN))
+	                                       : fmt::format(L"{:.2f}", (form::getplen() * IPFGRAN));
 	  labelWindow[LBCSIZ] = ffi::txtwin(stringTable[STR_TXT13], LabelWindowCoords);
 	  valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
@@ -569,42 +569,42 @@ void formForms::prfmsg() {
   ValueWindowCoords.left                              = textMargin2 + LabelWindowSize.x;
   ValueWindowCoords.right = textMargin2 + LabelWindowSize.x + ValueWindowSize.x + textMargin2;
   ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), STR_PRF10);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen / PFGRAN)), STR_PRF29);
-  ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth / PFGRAN)), STR_PRF3);
-  ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength / PFGRAN)), STR_PRF14);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace / PFGRAN)), STR_PRF23);
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen * IPFGRAN)), STR_PRF29);
+  ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth * IPFGRAN)), STR_PRF3);
+  ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength * IPFGRAN)), STR_PRF14);
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace * IPFGRAN)), STR_PRF23);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), STR_PRF24);
-  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset / PFGRAN)), STR_PRF21);
+  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset * IPFGRAN)), STR_PRF21);
   ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), STR_PRF22);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), STR_PRF26);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle * RADDEGF)), STR_PRF1);
   auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? StringTable->operator[](STR_SQR)
                                                       : StringTable->operator[](STR_PNTD);
   ffi::prflin(choice, STR_PRF2);
-  ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing / PFGRAN)), STR_PRF0);
+  ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing * IPFGRAN)), STR_PRF0);
   ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), STR_PRF7);
-  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize / PFGRAN)), STR_PRF20);
+  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize * IPFGRAN)), STR_PRF20);
   form::sethup();
   ffi::prflin(fmt::format(L"{}", StringTable->operator[](wrap::toSize(IniFile.hoopType) - 1U + STR_HUP0)), STR_PRF17);
-  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY / PFGRAN)), STR_PRF27);
-  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX / PFGRAN)), STR_PRF18);
+  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY * IPFGRAN)), STR_PRF27);
+  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX * IPFGRAN)), STR_PRF18);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), STR_PRF28);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), STR_PRF25);
-  ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing / PFGRAN)), STR_PRF16);
+  ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing * IPFGRAN)), STR_PRF16);
   choice = (UserFlagMap->test(UserFlag::BLUNT)) ? StringTable->operator[](STR_BLUNT)
                                                 : StringTable->operator[](STR_TAPR);
   ffi::prflin(choice, STR_PRF15);
   choice = (UserFlagMap->test(UserFlag::DUND)) ? StringTable->operator[](STR_ON)
                                                : StringTable->operator[](STR_OFF);
   ffi::prflin(choice, STR_PRF19);
-  ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength / PFGRAN)), STR_PRF9);
-  ffi::prflin(fmt::format(L"{:.2f}", (SnapLength / PFGRAN)), STR_PRF11);
+  ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength * IPFGRAN)), STR_PRF9);
+  ffi::prflin(fmt::format(L"{:.2f}", (SnapLength * IPFGRAN)), STR_PRF11);
   ffi::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), STR_PRF13);
   ffi::prflin(fmt::format(L"{:.2f}", (StarRatio)), STR_PRF12);
   ffi::prflin(fmt::format(L"{}", (thred::duthrsh(StitchBoxesThreshold))), STR_PRF8);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength / PFGRAN)), STR_PRF4);
-  ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength / PFGRAN)), STR_PRF5);
-  ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength / PFGRAN)), STR_PRF6);
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength * IPFGRAN)), STR_PRF4);
+  ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength * IPFGRAN)), STR_PRF5);
+  ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength * IPFGRAN)), STR_PRF6);
   StateMap->set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
@@ -928,7 +928,7 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format(L"{:d}", IniFile.formSides).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format(L"{:.3f}", IniFile.tearTailLength).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP),
-                fmt::format(L"{:.3f}", IniFile.tearTwistStep / PFGRAN).c_str());
+                fmt::format(L"{:.3f}", IniFile.tearTwistStep * IPFGRAN).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(L"{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 

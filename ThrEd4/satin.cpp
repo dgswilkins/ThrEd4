@@ -1184,7 +1184,7 @@ void satin::dusat() noexcept {
   auto const* line        = &formLines[vertexCount - 1U];
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  Polyline(StitchWindowDC, line, 2);
+  wrap::Polyline(StitchWindowDC, line, LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 

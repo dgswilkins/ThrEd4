@@ -118,7 +118,7 @@ void trace::internal::trcols(COLORREF color) noexcept {
 void trace::internal::trcstpnum() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TRCSTP);
-  SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength / PFGRAN)).c_str());
+  SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength * IPFGRAN)).c_str());
 }
 
 void trace::internal::trcratnum() {
@@ -253,7 +253,7 @@ void trace::untrace() {
 	  ti::hidwnd(TraceUpWindow[iTrace]);
 	  ti::hidwnd(TraceDownWindow[iTrace]);
 	}
-	for (auto iButton = 0U; iButton < 9U; ++iButton) {
+	for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	  ti::shownd(ButtonWin->operator[](iButton));
 	}
 	ti::hidwnd(TraceStepWin);
@@ -958,8 +958,8 @@ void trace::dutrnum1() {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN1);
   auto traceLength = wrap::bufToFloat(std::begin(MsgBuffer));
-  if (traceLength > 9.0F) {
-	traceLength = 9.0F;
+  if (traceLength > MAXSIZF) {
+	traceLength = MAXSIZF;
   }
   if (StateMap->test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;

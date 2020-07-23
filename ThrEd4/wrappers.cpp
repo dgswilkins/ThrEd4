@@ -131,5 +131,5 @@ auto wrap::CreatePen(int32_t iStyle, uint32_t width, COLORREF color) noexcept ->
 }
 
 void wrap::setSideWinVal(int index) noexcept {
-  SetWindowText(ValueWindow->operator[](index), static_cast<LPCWSTR>(SideWindowEntryBuffer));
+  SetWindowText(ValueWindow->operator[](index), SideWindowEntryBuffer.data());
 }

@@ -138,7 +138,7 @@ void displayText::lodstr() {
 void displayText::hsizmsg() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_HSIZ);
-  displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x / PFGRAN), (UnzoomedRect.y / PFGRAN)));
+  displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x * IPFGRAN), (UnzoomedRect.y * IPFGRAN)));
 }
 
 void displayText::numWnd() noexcept {
@@ -473,9 +473,9 @@ void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float da
 
 void displayText::drwtxbut(TXTSCR const& textureScreen) {
   di::bxtxt(HTXCLR, IDS_CLEAR);
-  di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight / PFGRAN);
+  di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
   thred::redraw(ButtonWin->operator[](HTXWID));
-  di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing / PFGRAN);
+  di::hlpflt(HTXSPAC, IDS_TXSPAC, textureScreen.spacing * IPFGRAN);
   di::bxtxt(HTXVRT, IDS_TXVRT);
   di::bxtxt(HTXHOR, IDS_TXHOR);
   di::bxtxt(HTXANG, IDS_TXANG);

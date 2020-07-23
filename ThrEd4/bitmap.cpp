@@ -636,12 +636,12 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 }
 
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
-  POINT line[2];
+  auto line      = std::array<POINT, 2> {};
   auto  vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
   line[0]        = bi::stch2bit(vertexIt[start]);
   line[1]        = bi::stch2bit(vertexIt[finish]);
-  Polyline(BitmapDC, static_cast<POINT const*>(line), 2);
-  Polyline(TraceDC, static_cast<POINT const*>(line), 2);
+  wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::Polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void bitmap::bfrm(FRMHED const& form) {

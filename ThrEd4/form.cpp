@@ -429,7 +429,7 @@ void form::form() {
 }
 
 void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
-  POINT line[4]  = {};
+  auto line = std::array<POINT, 4>{};
   auto  vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
   line[1]        = thred::stch2pxr(vertexIt[iVertex]);
   auto const ratio =
@@ -450,7 +450,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   line[0] = line[3] = thred::stch2pxr(adjustedPoint);
   adjustedPoint     = fPOINT {point.x - offset.x, point.y - offset.y};
   line[2]           = thred::stch2pxr(adjustedPoint);
-  Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 4);
+  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void form::selsqr(POINT const& controlPoint, HDC dc) {
@@ -462,7 +462,7 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
   line[1].x = line[2].x = controlPoint.x + offset;
   line[2].y = line[3].y = controlPoint.y + offset;
   line[4].y             = controlPoint.y - offset;
-  Polyline(dc, line.data(), line.size());
+  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void form::internal::frmsqr0(POINT const& controlPoint) {
@@ -475,7 +475,7 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
 	line[1].x = line[2].x = controlPoint.x + offset + 1;
 	line[2].y = line[3].y = controlPoint.y + offset + 1;
 	line[4].y             = controlPoint.y - 1;
-	Polyline(StitchWindowMemDC, line.data(), line.size());
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }
 
@@ -486,11 +486,11 @@ void form::internal::frmx(POINT const& controlPoint, HDC dc) {
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;
   line[1].y             = controlPoint.y - offset;
-  Polyline(dc, line.data(), line.size());
+  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
   line[0].y = line[1].y = controlPoint.y;
   line[0].x             = controlPoint.x - offset;
   line[1].x             = controlPoint.x + offset;
-  Polyline(dc, line.data(), line.size());
+  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
   SelectObject(dc, FormPen);
 }
 
@@ -525,7 +525,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 	auto const dest            = controlPoint % (pixelOutline.size() - 1U);
 	pixelOutline[controlPoint] = form::sfCor2px(formOutline[dest]);
   }
-  Polyline(dc, pixelOutline.data(), pixelOutline.size());
+  wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
   for (auto controlPoint = 0U; controlPoint < pixelOutline.size() - 1U; ++controlPoint) {
 	form::selsqr(pixelOutline[controlPoint], dc);
   }
@@ -591,7 +591,7 @@ void form::fselrct(uint32_t iForm) {
 	SelectedFormsRect.bottom = last.y;
   }
   if (OutLineEverySelectedForm) {
-	Polyline(StitchWindowMemDC, line.data(), line.size());
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }
 
@@ -607,7 +607,7 @@ void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
 void form::dubig() {
   form::rct2sel(SelectedFormsRect, *SelectedFormsLine);
   SelectObject(StitchWindowMemDC, SelectAllPen);
-  Polyline(StitchWindowMemDC, SelectedFormsLine->data(), SelectedFormsLine->size());
+  wrap::Polyline(StitchWindowMemDC, SelectedFormsLine->data(), wrap::toUnsigned(SelectedFormsLine->size()));
   for (auto iPoint = 0U; iPoint < (SelectedFormsLine->size() - 1U); ++iPoint) {
 	form::selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
   }
@@ -617,7 +617,7 @@ void form::internal::frmpoly(POINT const* const line, uint32_t count) noexcept {
   if (line != nullptr) {
 	if (count != 0U) {
 	  for (auto iPoint = 0U; iPoint < count - 1U; ++iPoint) {
-		Polyline(StitchWindowMemDC, &line[iPoint], 2);
+		wrap::Polyline(StitchWindowMemDC, &line[iPoint], LNPNTS);
 	  }
 	}
   }
@@ -626,7 +626,7 @@ void form::internal::frmpoly(POINT const* const line, uint32_t count) noexcept {
 void form::dupsel(HDC dc) {
   SelectObject(dc, FormPen);
   SetROP2(dc, R2_XORPEN);
-  Polyline(dc, SelectedPointsLine->data(), SelectedPointsLine->size());
+  wrap::Polyline(dc, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
   // iPoint = SelectedFormVertices.start;
   for (auto iPoint = 0U; iPoint < (SelectedPointsLine->size() - 1U); ++iPoint) {
 	form::selsqr(SelectedPointsLine->operator[](iPoint), dc);
@@ -662,20 +662,20 @@ void form::drwfrm() {
 	if (!FormLines->empty()) {
 	  auto layer = gsl::narrow_cast<uint32_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-		POINT line[2]   = {};
+		auto line = std::array<POINT, 2>{};
 		auto  lastPoint = 0U;
 		auto  vertexIt  = std::next(FormVertices->cbegin(), form.vertexIndex);
 		if (form.type == SAT) {
 		  if ((form.attribute & FRMEND) != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen3px);
-			Polyline(StitchWindowMemDC, FormLines->data(), 2);
+			wrap::Polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
 			lastPoint = 1;
 		  }
 		  if (form.wordParam != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen);
 			fi::frmpoly(&(FormLines->operator[](1)), form.wordParam);
 			SelectObject(StitchWindowMemDC, FormPen3px);
-			Polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), 2);
+			wrap::Polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), LNPNTS);
 			SelectObject(StitchWindowMemDC, LayerPen[layer]);
 			lastPoint = form.wordParam + 1U;
 		  }
@@ -685,7 +685,7 @@ void form::drwfrm() {
 			line[0] = form::sfCor2px(vertexIt[guideIt[iGuide].start]);
 			line[1] = form::sfCor2px(vertexIt[guideIt[iGuide].finish]);
 			SelectObject(StitchWindowMemDC, FormPen);
-			Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+			wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		  }
 		}
 		SelectObject(StitchWindowMemDC, LayerPen[layer]);
@@ -694,7 +694,7 @@ void form::drwfrm() {
 		  if (form.fillType == CONTF) {
 			thred::sCor2px(vertexIt[form.angleOrClipData.guide.start], line[0]);
 			thred::sCor2px(vertexIt[form.angleOrClipData.guide.finish], line[1]);
-			Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+			wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		  }
 		}
 		else {
@@ -1882,17 +1882,17 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
 	finishDelta.x = fillVerticalRect[finish].bipnt.x - pivot.x;
 	finishDelta.y = fillVerticalRect[finish].bipnt.y - pivot.y;
   }
-  if (hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > 2.0F * PI_F) {
+  if (hypot(stitchPoint.x - pivot.x, stitchPoint.y - pivot.y) > PI_F2) {
 	form::filinsb(pivot, stitchPoint);
   }
   auto       startAngle  = atan2(startDelta.y, startDelta.x);
   auto const finishAngle = atan2(finishDelta.y, finishDelta.x);
   auto       deltaAngle  = finishAngle - startAngle;
   if (deltaAngle > PI_F) {
-	deltaAngle -= 2.0F * PI_F;
+	deltaAngle -= PI_F2;
   }
   if (deltaAngle < -PI_F) {
-	deltaAngle += 2.0F * PI_F;
+	deltaAngle += PI_F2;
   }
   auto const radius    = hypot(startDelta.x, startDelta.y);
   auto const arc       = fabs(radius * deltaAngle);
@@ -5269,7 +5269,7 @@ void form::clrfills() noexcept {
 void form::internal::ducon() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  Polyline(StitchWindowDC, FormLines->data(), 2);
+  wrap::Polyline(StitchWindowDC, FormLines->data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5291,7 +5291,7 @@ void form::drwcon() {
 void form::duinsf() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  Polyline(StitchWindowDC, static_cast<POINT*>(InsertLine), 2);
+  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5599,7 +5599,7 @@ void form::rinfrm() {
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   auto& formLines = *FormLines;
   if ((FormVertexNext != 0U) || FormForInsert->type != FRMLINE) {
-	Polyline(StitchWindowMemDC, &formLines[FormVertexPrev], 2);
+	wrap::Polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0]   = formLines[FormVertexPrev];
   InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -7051,7 +7051,7 @@ void form::internal::doTimeWindow(float                        rangeX,
 	      xHistogram[iColumn],
 	      xHistogram[wrap::toSize(iColumn) + 1U],
 	      xHistogram[wrap::toSize(iColumn) + checkLength]);
-	Polyline(timeDC, formLines.data(), 2);
+	wrap::Polyline(timeDC, formLines.data(), LNPNTS);
 	timePosition += timeStep;
 	formLines[0].x = formLines[1].x = wrap::round<int32_t>(timePosition);
   }
@@ -7217,7 +7217,7 @@ void form::rotagain() {
 }
 
 void form::bakagain() {
-  fi::fnagain(2.0F * PI_F - IniFile.rotationAngle);
+  fi::fnagain(PI_F2 - IniFile.rotationAngle);
 }
 
 void form::rotdup() {
@@ -7846,7 +7846,7 @@ void form::redup() {
 }
 
 void form::bakdup() {
-  fi::dupfn(2.0F * PI_F - IniFile.rotationAngle);
+  fi::dupfn(PI_F2 - IniFile.rotationAngle);
 }
 
 void form::internal::shrnks() {

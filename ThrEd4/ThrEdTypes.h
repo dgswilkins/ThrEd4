@@ -17,10 +17,11 @@
 #define outDebugString(X, ...)
 #endif
 
-constexpr auto RES_SIZE    = 26;       // reserved for expansion in the ThrEd v1.0 header
-constexpr auto NAME_LEN    = 50;       // Length of the name fields in ThrEd headers
-constexpr auto COLOR_COUNT = 16U;       // Number of colors in arrays
-constexpr auto COLOR_BITS = 0xfU;       // Number of bits to cover the number of the colors in arrays
+constexpr auto RES_SIZE    = 26;               // reserved for expansion in the ThrEd v1.0 header
+constexpr auto NAME_LEN    = 50;               // Length of the name fields in ThrEd headers
+constexpr auto COLOR_COUNT = 16U;              // Number of colors in arrays
+constexpr auto COLOR_MAX   = COLOR_COUNT - 1U; // max index in color arrays
+constexpr auto COLOR_BITS  = 0xfU;     // Number of bits to cover the number of the colors in arrays
 constexpr auto SRTIM       = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes
@@ -60,6 +61,7 @@ constexpr float    LHUPX    = 719.0F; // large hoop x size
 constexpr float    LHUPY    = 690.0F; // large hoop y size
 constexpr float    HUP100XY = 600.0F; // 100 millimeter hoop size
 constexpr float    PFGRAN   = 6.0F;   // pfaff "pixels" per millimeter
+constexpr float    IPFGRAN  = 1.0F / 6.0F;   // pfaff "pixels" per millimeter
 constexpr double   TSIZ30   = 0.3;    // #30 thread size in millimeters
 constexpr double   TSIZ40   = 0.2;    // #40 thread size in millimeters
 constexpr double   TSIZ60   = 0.05;   // #60 thread size in millimeters
@@ -166,17 +168,22 @@ constexpr uint32_t BTNCOUNT  = 9U;              // Maximum number of buttons
 constexpr int32_t  FONTSIZE  = 400;             // default font size
 constexpr uint32_t B1MASK    = 0x000000ffU;       // mask for the least significant byte
 constexpr uint32_t B2MASK    = 0x0000ff00U;       // mask for the middle byte
-constexpr uint32_t B3MASK    = 0x00ff0000U;       // mask for the most significant byte
+constexpr uint32_t B3MASK    = 0x00ff0000U;       // mask for the more significant byte
 constexpr uint32_t BYTSHFT    = 8U;             // bits required to shift one byte left
 constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
-constexpr uint32_t NIBMASK    = 0x0fU;          // Nibble mask
-constexpr uint32_t BYTMASK    = 0xffU;          // Byte mask
-constexpr uint32_t WRDMASK    = 0xffffU;        // word mask
+constexpr uint32_t TBYTSHFT  = 24U;             // bits required to shift three bytes left
+constexpr uint8_t  NIBMASK    = 0x0fU;          // Nibble mask
+constexpr uint8_t  BYTMASK    = 0xffU;          // Byte mask
+constexpr uint16_t WRDMASK    = 0xffffU;        // word mask
+constexpr uint8_t  mask7bits = 0x7fU;           // mask value to 7 bits
+
 constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
 constexpr uint32_t SQPNTS     = 5U;             // number of points required to draw a square
 constexpr uint32_t OUTPNTS    = 9U;             // number of points required to draw an outline
 constexpr auto     RADDEGF    = 180.0F / PI_F;  // float factor to convert radians to degrees
 constexpr auto     DEGRADF    = PI_F / 180.0F;  // float factor to convert radians to degrees
+
+constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
 
 constexpr auto penCharcoal  = COLORREF {0x404040U};
 constexpr auto penGray      = COLORREF {0x808080U};
@@ -2304,6 +2311,7 @@ inline auto FRMHED::operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED& {
 */
 
 constexpr uint8_t FRMEND   = 0x01U; // 0000 0001
+constexpr uint8_t NFRMEND  = 0xfeU; // 1111 1110
 constexpr uint8_t FRMLMSK  = 0x0eU; // 0000 1110
 constexpr uint8_t NFRMLMSK = 0xf1U; // 1111 0001
 
@@ -2461,7 +2469,7 @@ class PCSTCH
 class CLPSTCH
 {
   public:
-  uint32_t led {0U};  // ????
+  uint32_t led {0U};  // stitchcount in the first record and color otherwise
   uint8_t  fx {0U};   // fractional part of x coord
   uint16_t x {0U};    // integer part of x coord
   uint8_t  spcx {0U}; // ToDo - Is this structure member needed?

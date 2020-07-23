@@ -149,8 +149,8 @@ extern double    HorizontalLength;
 extern float     HorizontalRatio;
 extern HWND      HorizontalScrollBar;
 extern INIFILE   IniFile;
-extern POINT     InsertLine[3];
 
+extern std::array<POINT, 3> InsertLine;
 extern std::vector<fPOINT>* InsidePointList;
 extern std::vector<fPOINT>* InsidePoints;
 extern std::vector<INSREC>* InterleaveSequenceIndices;
@@ -222,12 +222,14 @@ extern std::vector<POINT>* SelectedPointsLine;
 extern fRECTANGLE SelectedVerticesRect;
 extern double     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
-extern wchar_t    SideWindowEntryBuffer[11];
-extern HWND       SideWindow[16];
-extern float      SmallStitchLength;
-extern float      SnapLength;
-extern float      SpiralWrap;
-extern float      StarRatio;
+
+extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
+
+extern HWND  SideWindow[16];
+extern float SmallStitchLength;
+extern float SnapLength;
+extern float SpiralWrap;
+extern float StarRatio;
 
 extern EnumMap<StateFlag>* StateMap;
 
@@ -262,7 +264,8 @@ extern HDC                  TraceDC;
 extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;
 
-extern POINT    UnzoomedRect;
+extern POINT UnzoomedRect;
+
 extern std::array<COLORREF, COLOR_COUNT> UserColor;
 
 extern std::vector<HWND>* UserColorWin;
@@ -276,7 +279,9 @@ extern std::vector<HWND>* ValueWindow;
 extern float      VerticalRatio;
 extern HWND       VerticalScrollBar;
 extern fs::path*  WorkingFileName;
-extern POINT      ZoomBoxLine[5];
+
+extern std::array<POINT, SQPNTS> ZoomBoxLine;
+
 extern fPOINT     ZoomBoxOrigin;
 extern float      ZoomFactor;
 extern fPOINT     ZoomMarkPoint;

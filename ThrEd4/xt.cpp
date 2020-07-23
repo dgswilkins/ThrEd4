@@ -732,22 +732,22 @@ void xt::dubit(FRMHED& form, uint32_t bit) {
 
 void xt::setuang() {
   StateMap->set(StateFlag::GTUANG);
-  displayText::msgflt(IDS_UANG, IniFile.underlayAngle / PI_F * 180.0F);
+  displayText::msgflt(IDS_UANG, IniFile.underlayAngle * DEGRADF);
 }
 
 void xt::setuspac() {
   StateMap->set(StateFlag::GTUSPAC);
-  displayText::msgflt(IDS_USPAC, IniFile.underlaySpacing / PFGRAN);
+  displayText::msgflt(IDS_USPAC, IniFile.underlaySpacing * IPFGRAN);
 }
 
 void xt::setwlkind() {
   StateMap->set(StateFlag::GTWLKIND);
-  displayText::msgflt(IDS_WLKIND, IniFile.underlayIndent / PFGRAN);
+  displayText::msgflt(IDS_WLKIND, IniFile.underlayIndent * IPFGRAN);
 }
 
 void xt::setulen() {
   StateMap->set(StateFlag::GTWLKLEN);
-  displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen / PFGRAN);
+  displayText::msgflt(IDS_WLKLEN, IniFile.underlayStitchLen * IPFGRAN);
 }
 
 void xt::chkcwlk(FRMHED& form) {
@@ -1713,7 +1713,7 @@ void xt::internal::uangfn(uint32_t formNumber, float angle) {
 
 void xt::dufang(float angle) {
   thred::savdo();
-  angle *= PI_F / 180.0F;
+  angle *= DEGRADF;
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::uangfn(ClosestFormToCursor, angle);
   }
@@ -1855,7 +1855,7 @@ void xt::internal::fangfn(uint32_t formNumber, float angle) {
 
 void xt::dufxang(float angle) {
   thred::savdo();
-  angle *= PI_F / 180.0F;
+  angle *= DEGRADF;
   if (StateMap->test(StateFlag::FORMSEL)) {
 	xi::fangfn(ClosestFormToCursor, angle);
   }
@@ -2331,7 +2331,7 @@ void xt::rtrclp() {
 }
 
 void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
-  SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value / PFGRAN)).c_str());
+  SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value * IPFGRAN)).c_str());
 }
 
 auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
@@ -2515,7 +2515,7 @@ void xt::mvshft() {
 }
 
 void xt::setclpspac() {
-  displayText::msgflt(IDS_CLPSPAC, IniFile.clipOffset / PFGRAN);
+  displayText::msgflt(IDS_CLPSPAC, IniFile.clipOffset * IPFGRAN);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::SCLPSPAC);
   displayText::numWnd();

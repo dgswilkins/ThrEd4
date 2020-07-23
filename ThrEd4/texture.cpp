@@ -324,13 +324,13 @@ void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
 }
 
 void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) noexcept {
-  POINT line[2] = {};
+  auto line = std::array<POINT, 2>{};
   line[0]       = POINT {reference.x, reference.y - offsetPixels};
   line[1]       = POINT {reference.x, reference.y + offsetPixels};
-  Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   line[0] = POINT {reference.x - offsetPixels, reference.y};
   line[1] = POINT {reference.x + offsetPixels, reference.y};
-  Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
@@ -380,7 +380,7 @@ void texture::internal::chktx() {
 }
 
 void texture::drwtxtr() {
-  POINT      line[2] = {};
+  auto       line = std::array<POINT, LNPNTS> {};
   auto const editSpace =
       TextureScreen.areaHeight * 2.0 / (TextureScreen.spacing * (TextureScreen.lines + 2.0));
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
@@ -421,7 +421,7 @@ void texture::drwtxtr() {
   for (auto iGrid = 0U; iGrid < gridLineCount; ++iGrid) {
 	txi::txt2pix(textureRecord, point);
 	line[0].y = line[1].y = point.y;
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
@@ -434,14 +434,14 @@ void texture::drwtxtr() {
 	line[0].x = line[1].x = wrap::round<int32_t>(
 	    (gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset) /
 	    TextureScreen.editToPixelRatio);
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   line[0].x = 0;
   line[1].x = StitchWindowClientRect.right;
   line[0].y = line[1].y = TextureScreen.top;
-  Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   line[0].y = line[1].y = TextureScreen.bottom;
-  Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   DeleteObject(TextureCrossPen);
   TextureCrossPen = wrap::CreatePen(PS_SOLID, 1, penWhite);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
@@ -453,13 +453,13 @@ void texture::drwtxtr() {
 	txi::txrct2rct(TextureRect, TexturePixelRect);
 	line[0] = {TexturePixelRect.left, TexturePixelRect.top};
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[1] = {TexturePixelRect.left, TexturePixelRect.bottom};
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[0] = {TexturePixelRect.right, TexturePixelRect.bottom};
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
-	Polyline(StitchWindowMemDC, static_cast<POINT*>(line), 2);
+	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   for (auto selectedPoint : *SelectedTexturePointsList) {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
@@ -569,7 +569,7 @@ void texture::internal::ritxrct() {
   line[2].x = line[3].x = rectangle.right;
   line[0].y = line[3].y = line[4].y = rectangle.top;
   line[1].y = line[2].y = rectangle.bottom;
-  Polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::Polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
@@ -855,7 +855,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 
 void texture::internal::dutxtlin() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  Polyline(StitchWindowDC, FormLines->data(), 2);
+  wrap::Polyline(StitchWindowDC, FormLines->data(), LNPNTS);
 }
 
 void texture::txtrmov(FRMHED const& textureForm) {
@@ -1700,6 +1700,6 @@ void texture::setshft() {
 void texture::writeScreenWidth(uint32_t position) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TXWID);
-  auto scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width / PFGRAN)));
+  auto scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
   wrap::TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

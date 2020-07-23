@@ -109,9 +109,9 @@ uint32_t  GroupStitchIndex;      // last point selected in group
 fs::path* HomeDirectory;         // directory from which thred was executed
 double    HorizontalLength;      // horizontal length of a clipboard fill
 float     HorizontalRatio; // horizontal ratio between the zoom window and the entire stitch space
-HWND      HorizontalScrollBar; // horizontal scroll bar
-INIFILE   IniFile;             // initialization file
-POINT     InsertLine[3];       // the insert line
+HWND      HorizontalScrollBar;                  // horizontal scroll bar
+INIFILE   IniFile;                              // initialization file
+auto      InsertLine = std::array<POINT, 3> {}; // the insert line
 
 std::vector<fPOINT>* InsidePointList; // list of inside outline points for satin or clipboard fills
 std::vector<fPOINT>* InsidePoints;    // pointer to the list of inside outline points
@@ -184,8 +184,9 @@ std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin sele
 fRECTANGLE SelectedVerticesRect {};       // rectangle enclosing selected form verticess
 double     ShowStitchThreshold = SHOPNTS; // show stitch grid below this zoom level
 HWND       SideMessageWindow   = nullptr; // main side message window
-wchar_t    SideWindowEntryBuffer[11];     // side window number for entering form data sheet numbers
-HWND       SideWindow[16];                // side message windows
+auto       SideWindowEntryBuffer =
+    std::array<wchar_t, SWBLEN> {}; // side window number for entering form data sheet numbers
+HWND       SideWindow[16];          // side message windows
 float      SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
 float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
 float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
@@ -234,7 +235,7 @@ std::vector<HWND>* ValueWindow;                          // data handles for the
 float      VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
 HWND       VerticalScrollBar; // vertical scroll bar
 fs::path*  WorkingFileName;   //
-POINT      ZoomBoxLine[5];    // the zoom box
+auto      ZoomBoxLine = std::array<POINT, SQPNTS>{};    // the zoom box
 fPOINT     ZoomBoxOrigin;     // zoom box origin
 float      ZoomFactor = 1.0F; // zoom factor
 fPOINT     ZoomMarkPoint;     // stitch coordinates of the zoom mark
