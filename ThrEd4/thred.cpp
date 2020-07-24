@@ -626,7 +626,7 @@ void thred::coltab() {
 }
 
 void thred::internal::ladj() {
-  for (auto iLayer = 0U; iLayer < 5U; ++iLayer) {
+  for (auto iLayer = 0U; iLayer < MaxLayer; ++iLayer) {
 	if (iLayer == ActiveLayer) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED);
@@ -1070,7 +1070,7 @@ void thred::internal::zRctAdj() noexcept {
 
 void thred::shft(fPOINT const& delta) noexcept {
   auto const halfZoomRect =
-      fPOINT {((ZoomRect.right - ZoomRect.left) / 2.0F), ((ZoomRect.top - ZoomRect.bottom) / 2.0F)};
+      fPOINT {((ZoomRect.right - ZoomRect.left) * 0.5F), ((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
   auto const center = fPOINT {(ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y)};
   auto const shift  = fPOINT {(center.x - delta.x), (center.y - delta.y)};
   ZoomRect.bottom -= shift.y;
@@ -1241,8 +1241,8 @@ void thred::hupfn() {
 		StateMap->set(StateFlag::HUPCHNG);
 	  }
 	  auto const designCenter =
-	      fPOINT {hoopSize.x / 2.0F + checkHoopRect.left, hoopSize.y / 2.0F + checkHoopRect.bottom};
-	  auto const hoopCenter = fPOINT {IniFile.hoopSizeX / 2.0F, IniFile.hoopSizeY / 2.0F};
+	      fPOINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
+	  auto const hoopCenter = fPOINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
 	  auto const delta      = fPOINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
 	  for (auto& stitch : *StitchBuffer) {
 		stitch.x += delta.x;
@@ -1522,7 +1522,7 @@ void thred::internal::chknum() {
 				  break;
 				}
 				default: {
-				  form.edgeSpacing = value / 2.0F;
+				  form.edgeSpacing = value * 0.5F;
 				}
 			  }
 			  break;
@@ -2871,8 +2871,8 @@ void thred::internal::redbal() {
 		IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
 		IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
 		UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-		BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
-		BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
+		BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
+		BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
 		PCSHeader.hoopType = CUSTHUP;
 		IniFile.hoopType   = CUSTHUP;
 		UserColor.fill(0);
@@ -2941,8 +2941,8 @@ void thred::internal::ritbal() {
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * balaradRatio;
 	auto bytesWritten             = DWORD {0};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
-	BalaradOffset.x    = IniFile.hoopSizeX / 2.0F;
-	BalaradOffset.y    = IniFile.hoopSizeY / 2.0F;
+	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
+	BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
 	auto balaradStitch = std::vector<BALSTCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color = StitchBuffer->front().attribute & COLMSK;
@@ -3814,8 +3814,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 }
 
 auto thred::internal::centr() -> fPOINT {
-  auto const center = POINT {wrap::round<int32_t>((ZoomRect.right - ZoomRect.left) / 2.0F),
-                             wrap::round<int32_t>((ZoomRect.top - ZoomRect.bottom) / 2.0F)};
+  auto const center = POINT {wrap::round<int32_t>((ZoomRect.right - ZoomRect.left) * 0.5F),
+                             wrap::round<int32_t>((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
   return fPOINT {ZoomRect.left + center.x, ZoomRect.bottom + center.y};
 }
 
@@ -11124,7 +11124,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  std::swap(ZoomBoxOrigin.y, stitchPoint.y);
 	}
 	auto newSize = fPOINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
-	stitchPoint  = fPOINT {ZoomBoxOrigin.x + newSize.x / 2.0F, ZoomBoxOrigin.y + newSize.y / 2.0F};
+	stitchPoint  = fPOINT {ZoomBoxOrigin.x + newSize.x * 0.5F, ZoomBoxOrigin.y + newSize.y * 0.5F};
 	auto const saveFactor = ZoomFactor;
 	if (newSize.x > newSize.y) {
 	  newSize.y  = newSize.x / StitchWindowAspectRatio;
@@ -14086,7 +14086,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) / 2.0F, gsl::narrow_cast<float>(UnzoomedRect.y) / 2.0F);
+		  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) * 0.5F, gsl::narrow_cast<float>(UnzoomedRect.y) * 0.5F);
 		}
 		else {
 		  if (thred::inStitchWin()) {
@@ -14621,7 +14621,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-	  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) / 2.0F, gsl::narrow_cast<float>(UnzoomedRect.y) / 2.0F);
+	  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) * 0.5F, gsl::narrow_cast<float>(UnzoomedRect.y) * 0.5F);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
@@ -16131,12 +16131,12 @@ void thred::internal::setPrefs() {
   defpref();
   getDocsFolder(DefaultDirectory);
   if (DesignerName->empty()) {
-	wchar_t designerBuffer[50];
+	  auto designerBuffer = std::array<wchar_t, DNLEN>{};
 	LoadString(ThrEdInstance,
 	           IDS_UNAM,
-	           static_cast<LPTSTR>(designerBuffer),
-	           sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-	DesignerName->assign(static_cast<wchar_t const*>(designerBuffer));
+	           designerBuffer.data(),
+	           designerBuffer.size());
+	DesignerName->assign(designerBuffer.data());
 	getdes();
   }
 }
@@ -16649,6 +16649,7 @@ void thred::internal::relin() {
 }
 
 void thred::internal::dumov() {
+  constexpr auto abPoints = 7U;
   auto const anchorStitch = StitchBuffer->operator[](MoveAnchor);
   RotateAngle             = atan2(StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).y -
                           StitchBuffer->operator[](MoveAnchor).y,
@@ -16656,24 +16657,24 @@ void thred::internal::dumov() {
                           StitchBuffer->operator[](MoveAnchor).x);
   if (anchorStitch.x >= ZoomRect.left && anchorStitch.x <= ZoomRect.right &&
       anchorStitch.y >= ZoomRect.bottom && anchorStitch.y <= ZoomRect.top) {
-	auto      rotationOutline = std::array<POINT, 7>{};
-	auto const rotationCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
-	rotationOutline[0]              = rotationCenterPixels;
-	rotationOutline[6]              = rotationCenterPixels;
-	auto OffsetFromCenter = POINT {rotationCenterPixels.x + 12, rotationCenterPixels.y + 2};
-	rotpix(OffsetFromCenter, rotationOutline[1], rotationCenterPixels);
-	OffsetFromCenter.y = rotationCenterPixels.y - 2;
-	rotpix(OffsetFromCenter, rotationOutline[5], rotationCenterPixels);
-	OffsetFromCenter.y = rotationCenterPixels.y + 6;
-	rotpix(OffsetFromCenter, rotationOutline[2], rotationCenterPixels);
-	OffsetFromCenter.y = rotationCenterPixels.y - 6;
-	rotpix(OffsetFromCenter, rotationOutline[4], rotationCenterPixels);
-	OffsetFromCenter.x = rotationCenterPixels.x + 20;
-	OffsetFromCenter.y = rotationCenterPixels.y;
-	rotpix(OffsetFromCenter, rotationOutline[3], rotationCenterPixels);
+	auto      arrowBox = std::array<POINT, abPoints>{};
+	auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
+	arrowBox[0]              = abCenterPixels;
+	arrowBox[6]              = abCenterPixels;
+	auto OffsetFromCenter = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
+	rotpix(OffsetFromCenter, arrowBox[1], abCenterPixels);
+	OffsetFromCenter.y = abCenterPixels.y - 2;
+	rotpix(OffsetFromCenter, arrowBox[5], abCenterPixels);
+	OffsetFromCenter.y = abCenterPixels.y + 6;
+	rotpix(OffsetFromCenter, arrowBox[2], abCenterPixels);
+	OffsetFromCenter.y = abCenterPixels.y - 6;
+	rotpix(OffsetFromCenter, arrowBox[4], abCenterPixels);
+	OffsetFromCenter.x = abCenterPixels.x + 20;
+	OffsetFromCenter.y = abCenterPixels.y;
+	rotpix(OffsetFromCenter, arrowBox[3], abCenterPixels);
 	SelectObject(StitchWindowMemDC, FormPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	wrap::Polyline(StitchWindowMemDC, rotationOutline.data(), wrap::toUnsigned(rotationOutline.size()));
+	wrap::Polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
 }
