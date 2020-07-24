@@ -69,6 +69,7 @@ constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for fil
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto knotLen  = 5U;                     // length of knot pattern
 constexpr auto arrowPoints = 3U; // points required to draw arrow
+constexpr auto MaxLayer = 5U; // number of layers
 
 // main variables
 int32_t  ArgCount;                // command line argument count
@@ -5549,7 +5550,7 @@ void thred::internal::lodclp(uint32_t iStitch) {
   ClosestPointIndex = iStitch;
   for (auto& clip : *ClipBuffer) {
 	StitchBuffer->operator[](iStitch++) = fPOINTATTR {
-	    clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | LayerIndex | NOTFRM};
+	    clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | ActiveLayer << LAYSHFT | NOTFRM};
   }
   GroupStitchIndex = iStitch - 1U;
   StateMap->set(StateFlag::GRPSEL);
@@ -9404,8 +9405,9 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
 }
 
 void thred::internal::ritcur() noexcept {
-	constexpr auto iconRows = 32U; // rows in the icon
+	constexpr auto iconRows = 32; // rows in the icon
 	constexpr auto BPINT = 32; // bits in an uint32_t
+	constexpr auto InvColorMask = 0xffffffU;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto currentCursor = GetCursor();
   if (currentCursor != nullptr) {
@@ -9420,7 +9422,7 @@ void thred::internal::ritcur() noexcept {
 	auto bitmapBits = std::array<uint8_t, iconSize> {};
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
-	  for (auto iRow = 0U; iRow < iconRows; ++iRow) {
+	  for (auto iRow = 0; iRow < iconRows; ++iRow) {
 		auto const mask          = byteSwap(bitmapBits[iRow]);
 		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
@@ -9448,7 +9450,7 @@ void thred::internal::ritcur() noexcept {
 			SetPixel(StitchWindowDC,
 			         cursorPosition.x + iPixel,
 			         cursorPosition.y + iRow,
-			         GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ 0xffffffU);
+			         GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ InvColorMask);
 		  }
 		  bitMask >>= 1U;
 		}
@@ -9506,7 +9508,7 @@ void thred::internal::respac(FRMHED& form) noexcept {
 }
 
 auto thred::internal::chkminus(uint32_t code) noexcept -> bool {
-  if (code == 189 || code == 109) { // '-' key pressed
+  if (code == VK_OEM_MINUS || code == VK_SUBTRACT) { // '-' key pressed
 	if (PreferenceIndex == PFAZ) {  // Clipboard Offset in preferences
 	  return true;
 	}
@@ -9736,6 +9738,8 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		  constexpr auto NROMask = std::numeric_limits<DWORD>::max() ^ FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
@@ -9753,7 +9757,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  case IDC_UNLOCKAL: {
 			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY;
+			  fileInfo->data[iFile].dwFileAttributes &= NROMask;
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
@@ -9784,7 +9788,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
 				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-				  fileInfo->data[iFile].dwFileAttributes &= 0xffffffffU ^ FILE_ATTRIBUTE_READONLY;
+				  fileInfo->data[iFile].dwFileAttributes &= NROMask;
 				}
 				++fileError;
 			  }
@@ -10128,7 +10132,7 @@ void thred::internal::inscol() {
 	displayText::tabmsg(IDS_COLAL);
   }
   else {
-	auto nextColor = 15U;
+	auto nextColor = COLOR_MAX;
 	while (colorMap.test(nextColor)) {
 	  --nextColor;
 	}
@@ -10199,7 +10203,7 @@ void thred::internal::delcol() {
 		}
 	  }
 	}
-	for (auto iColor = VerticalIndex; iColor < 15U; ++iColor) {
+	for (auto iColor = VerticalIndex; iColor < COLOR_MAX; ++iColor) {
 	  UserColor[iColor] = UserColor[gsl::narrow_cast<size_t>(iColor) + 1U];
 	  nuscol(iColor);
 	}
@@ -10466,7 +10470,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	                fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
-	  for (auto iFeatherStyle = 0U; iFeatherStyle < 6U; ++iFeatherStyle) {
+	  for (auto iFeatherStyle = 0U; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
 		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
@@ -10521,7 +10525,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), static_cast<LPTSTR>(buf), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  wchar_t buf1[HBUFSIZ]   = {0};
-		  for (auto iFeatherStyle = 0U; iFeatherStyle < 6U; ++iFeatherStyle) {
+		  for (auto iFeatherStyle = 0U; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
 			LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, static_cast<LPTSTR>(buf1), HBUFSIZ);
 			if (wcscmp(std::begin(buf), std::begin(buf1)) == 0) {
 			  IniFile.featherFillType = gsl::narrow<uint8_t>(iFeatherStyle + 1U);
@@ -11584,7 +11588,7 @@ auto thred::internal::updateFillColor() -> bool {
 	}
 	form::nufilcol(VerticalIndex);
   } while (false);
-  MsgBuffer[0] = gsl::narrow<char>(VerticalIndex) + 0x30;
+  MsgBuffer[0] = gsl::narrow<char>(VerticalIndex) + ASCIIoffset;
   MsgBuffer[1] = 0;
   SetWindowText(ValueWindow->operator[](LBRDCOL), static_cast<LPCWSTR>(MsgBuffer));
   thred::unsid();
@@ -11643,7 +11647,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto iFillType = 0U; iFillType < 6U; ++iFillType) {
+	for (auto iFillType = 0U; iFillType < FSSIZE; ++iFillType) {
 	  if (Msg.hwnd == SideWindow[iFillType]) {
 		form.fillInfo.feather.fillType = gsl::narrow<uint8_t>(iFillType + 1U);
 		thred::unsid();
@@ -11656,12 +11660,12 @@ auto thred::internal::handleSideWindowActive() -> bool {
   }
   if (FormMenuChoice == LLAYR) {
 	auto iLayer = 0U;
-	for (; iLayer < 5U; ++iLayer) {
+	for (; iLayer < MaxLayer; ++iLayer) {
 	  if (Msg.hwnd == SideWindow[iLayer]) {
 		break;
 	  }
 	}
-	if (iLayer < 5U) {
+	if (iLayer < MaxLayer) {
 	  form::movlayr(iLayer * 2U);
 	  StateMap->set(StateFlag::FORMSEL);
 	}
@@ -12119,7 +12123,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
-	  sidmsg(form, ValueWindow->operator[](LFTHTYP), &StringTable->operator[](STR_FTH0), 6);
+	  sidmsg(form, ValueWindow->operator[](LFTHTYP), &StringTable->operator[](STR_FTH0), FSSIZE);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRM) || Msg.hwnd == LabelWindow->operator[](LFRM)) {
@@ -12141,7 +12145,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  std::wstring layerText[] = {L"0", L"1", L"2", L"3", L"4"};
 	  FormMenuChoice           = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
-	  sidmsg(form, ValueWindow->operator[](LLAYR), std::begin(layerText), 5U);
+	  sidmsg(form, ValueWindow->operator[](LLAYR), std::begin(layerText), MaxLayer);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
@@ -13046,7 +13050,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	return true;
   }
-  if (thi::chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[15])) {
+  if (thi::chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[COLOR_MAX])) {
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  wchar_t const* const str[] = {L"30", L"40", L"60"};
 	  thred::savdo();
@@ -13209,7 +13213,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto const textureSpan = gsl::span<TXPNT>(textureSource, textureCount);
 		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		GlobalUnlock(ClipMemory);
-		SelectedFormsRect.top = SelectedFormsRect.left = 0x7fffffff;
+		SelectedFormsRect.top = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 		form::ratsr();
 		SelectedFormList->clear();
@@ -13222,7 +13226,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		SelectedFormsSize.y = gsl::narrow<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
 		StateMap->set(StateFlag::INIT);
 		auto& formLines = *FormLines;
-		formLines.resize(5U);
+		formLines.resize(SQPNTS);
 		formLines[0].x = formLines[3].x = formLines[4].x = SelectedFormsRect.left;
 		formLines[1].x = formLines[2].x = SelectedFormsRect.right;
 		formLines[0].y = formLines[1].y = formLines[4].y = SelectedFormsRect.top;
@@ -14249,7 +14253,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 
 auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) -> bool {
   retflag = true;
-  if (StateMap->test(StateFlag::SCLPSPAC) && code == 0xbd && (MsgIndex == 0U)) {
+  if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
 	MsgBuffer[0] = '-';
 	MsgBuffer[1] = 0;
 	MsgIndex     = 1;
@@ -14307,7 +14311,12 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 }
 
 auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
-  auto flag = false;
+  constexpr auto toLayer0 = 0U;
+  constexpr auto toLayer1 = 2U;
+  constexpr auto toLayer2 = 4U;
+  constexpr auto toLayer3 = 6U;
+  constexpr auto toLayer4 = 8U;
+  auto           flag     = false;
   switch (wParameter) {
 	case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
 	  set1knot();
@@ -14736,51 +14745,51 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LAYMOV0: { // edit / Move to Layer / 0
-	  form::movlayr(0);
+	  form::movlayr(toLayer0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV1: { // edit / Move to Layer / 1
-	  form::movlayr(2U);
+	  form::movlayr(toLayer1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV2: { // edit / Move to Layer / 2
-	  form::movlayr(4U);
+	  form::movlayr(toLayer2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV3: { // edit / Move to Layer / 3
-	  form::movlayr(6U);
+	  form::movlayr(toLayer3);
 	  break;
 	}
 	case ID_LAYMOV4: { // edit / Move to Layer / 4
-	  form::movlayr(8U);
+	  form::movlayr(toLayer4);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY0: { // edit / Copy to Layer / 0
-	  form::cpylayr(0U);
+	  form::cpylayr(toLayer0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY1: { // edit / Copy to Layer / 1
-	  form::cpylayr(2U);
+	  form::cpylayr(toLayer1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY2: { // edit / Copy to Layer / 2
-	  form::cpylayr(4U);
+	  form::cpylayr(toLayer2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY3: { // edit / Copy to Layer / 3
-	  form::cpylayr(6U);
+	  form::cpylayr(toLayer3);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY4: { // edit / Copy to Layer / 4
-	  form::cpylayr(8U);
+	  form::cpylayr(toLayer4);
 	  flag = true;
 	  break;
 	}
@@ -15718,7 +15727,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->test(StateFlag::FILMSG)) {
-		if (code == VK_RETURN || code == 0xc0) { // check for return or back tick '`'
+		if (code == VK_RETURN || code == VK_OEM_3) { // check for return or back tick '`'
 		  thred::savdo();
 		  form::unfil();
 		  thred::coltab();
@@ -15728,7 +15737,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
-		if (code == VK_RETURN || code == 0xc0) {
+		if (code == VK_RETURN || code == VK_OEM_3) {
 		  thred::savdo();
 		  form::refilfn();
 		  thred::unmsg();
@@ -15742,13 +15751,13 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		return true;
 	  }
 	  if (StateMap->testAndReset(StateFlag::PRGMSG)) {
-		if (code == VK_RETURN || code == 0xc0) {
+		if (code == VK_RETURN || code == VK_OEM_3) {
 		  deldir();
 		  return true;
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::DELSFRMS)) {
-		if (code == 'S' || code == VK_RETURN || code == 0xc0) {
+		if (code == 'S' || code == VK_RETURN || code == VK_OEM_3) {
 		  thred::savdo();
 		  if (code == 'S') {
 			StateMap->set(StateFlag::DELTO);
@@ -15764,7 +15773,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::DELFRM)) {
-		if (code == 'S' || code == VK_RETURN || code == 0xc0) {
+		if (code == 'S' || code == VK_RETURN || code == VK_OEM_3) {
 		  thred::savdo();
 		  if (code == 'S') {
 			StateMap->set(StateFlag::DELTO);
@@ -15843,11 +15852,11 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			MsgBuffer[0] = gsl::narrow<char>(NumericCode);
 			MsgBuffer[1] = 0;
 			if (PreferenceIndex == PSHO + 1U) {
-			  ShowStitchThreshold = unthrsh(NumericCode - 0x30);
+			  ShowStitchThreshold = unthrsh(NumericCode - ASCIIoffset);
 			  SetWindowText(ValueWindow->operator[](PSHO), std::begin(MsgBuffer));
 			}
 			else {
-			  StitchBoxesThreshold = unthrsh(NumericCode - 0x30);
+			  StitchBoxesThreshold = unthrsh(NumericCode - ASCIIoffset);
 			  SetWindowText(ValueWindow->operator[](PBOX), std::begin(MsgBuffer));
 			}
 			thred::unsid();
@@ -15947,7 +15956,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  auto const wParameter = LOWORD(Msg.wParam);
-	  if (wParameter > 40000U && wParameter < 40300U) {
+	  if (!(wParameter < ID_FILE_OPEN1 || wParameter > ID_AUXPES)) {
 		thred::undat();
 	  }
 	  if (thi::handleMainMenu(wParameter, rotationCenter)) {
@@ -16629,9 +16638,7 @@ void thred::internal::init() {
 auto thred::internal::defTxt(uint32_t iColor) -> COLORREF {
   // bitmap for color number. Black or white bit chosen for contrast against the default background colors
   auto const     textColorMap = std::bitset<16>(0xbaf);
-  constexpr auto white        = 0xffffffU;
-  constexpr auto black        = 0U;
-  return textColorMap.test(iColor) ? white : black;
+  return textColorMap.test(iColor) ? penWhite : penBlack;
 }
 
 void thred::internal::relin() {

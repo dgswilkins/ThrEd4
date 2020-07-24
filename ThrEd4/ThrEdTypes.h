@@ -204,7 +204,8 @@ constexpr auto penWhite     = COLORREF {0xffffffU};
 constexpr auto penNarrow    = 1;
 constexpr auto penMedium    = 3;
 constexpr auto penWide      = 5;
-constexpr auto stdDPI = int32_t {96};
+constexpr auto stdDPI       = int32_t {96};
+constexpr auto ASCIIoffset  = 0x30U; // offset to convert a value to the character equivalent
 
 enum stringLabel {
   STR_PIKOL,
@@ -690,6 +691,8 @@ enum featherStyles { // feather fill types
   FTHRMP,            // sawtooth
   FTHFAZ             // phase
 };
+
+constexpr auto FSSIZE = uint32_t {6U}; // count of feather styles
 
 constexpr int32_t FDEFTYP = FTHPSG; // default feather type
 

@@ -1385,7 +1385,6 @@ auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
 	character = gsl::narrow<char>(keyCode);
 	return true;
   }
-  constexpr auto ASCIIoffset = 0x30U; // offset to convert a value to the character equivalent
   if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
 	character = gsl::narrow<char>(keyCode - VK_NUMPAD0 + ASCIIoffset);
 	return true;
