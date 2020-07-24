@@ -1115,7 +1115,7 @@ void thred::internal::ilin() noexcept {
   SetROP2(StitchWindowDC, R2_COPYPEN);
   SelectObject(StitchWindowMemDC, LinePen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::Polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   wrap::Polyline(StitchWindowMemDC, &InsertLine[1], LNPNTS);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
