@@ -11688,7 +11688,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[1]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGELINE]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11700,7 +11700,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::bord();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[2]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEBEAN]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11712,11 +11712,11 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::dubold();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[3]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGECLIP]) {
 		form::fclp();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[4]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEANGSAT]) {
 		if (form.edgeType != 0U) {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
@@ -11742,7 +11742,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		satin::satbrd();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[5]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEAPPL]) {
 		if (form.fillType != 0U) {
 		  form::delmfil(ClosestFormToCursor);
 		  form.fillType = 0;
@@ -11765,7 +11765,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::apliq();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[6]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEPROPSAT]) {
 		if (form.edgeType != 0U) {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
@@ -11790,7 +11790,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::prpbrd(LineSpacing);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[7]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEBHOL]) {
 		if (form.edgeType != 0U) {
 		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
 			form.borderSize  = BorderWidth;
@@ -11805,7 +11805,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::bhol();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[8]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEPICOT]) {
 		if (form.edgeType != 0U) {
 		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
 			form.borderSize  = BorderWidth;
@@ -11820,7 +11820,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::picot();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[9]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEDOUBLE]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11832,19 +11832,19 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::dubsfil(form);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[10]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGELCHAIN]) {
 		StateMap->set(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[11]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEOCHAIN]) {
 		StateMap->reset(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[12]) {
+	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGECLIPX]) {
 		form::filclpx();
 		break;
 	  }
@@ -11876,7 +11876,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[1]) { // vertical fill
+	if (Msg.hwnd == SideWindow[fillStyles::VRTF]) { // vertical fill
 	  thred::savdo();
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
@@ -11889,7 +11889,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filvrt();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[2]) { // horizontal fill
+	if (Msg.hwnd == SideWindow[fillStyles::HORF]) { // horizontal fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		respac(form);
@@ -11900,7 +11900,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filhor();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[3]) { // angle fill
+	if (Msg.hwnd == SideWindow[fillStyles::ANGF]) { // angle fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
@@ -11916,7 +11916,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filangl();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[4]) { // fan fill
+	if (Msg.hwnd == SideWindow[fillStyles::SATF]) { // fan fill
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
@@ -11931,7 +11931,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filsat();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[5]) { // fan clip
+	if (Msg.hwnd == SideWindow[fillStyles::CLPF]) { // fan clip
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
@@ -11939,7 +11939,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::clpfil();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[6]) { // contour fill
+	if (Msg.hwnd == SideWindow[fillStyles::CONTF]) { // contour fill
 	  if (form.fillType != 0U) {
 		if (form.fillType == CLPF) {
 		  form.fillSpacing = LineSpacing;
@@ -11951,7 +11951,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::contfil();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[7]) { // vertical clip
+	if (Msg.hwnd == SideWindow[fillStyles::VCLPF]) { // vertical clip
 	  if (sidclp()) {
 		form::vrtsclp();
 	  }
@@ -11960,7 +11960,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[8]) { // horizontal clip
+	if (Msg.hwnd == SideWindow[fillStyles::HCLPF]) { // horizontal clip
 	  if (sidclp()) {
 		form::horsclp();
 	  }
@@ -11969,7 +11969,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[9]) { // angle clip
+	if (Msg.hwnd == SideWindow[fillStyles::ANGCLPF]) { // angle clip
 	  if (sidclp()) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -11981,7 +11981,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[10]) { // feather fill
+	if (Msg.hwnd == SideWindow[fillStyles::FTHF]) { // feather fill
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
 	  }
@@ -11991,7 +11991,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[11]) // vertical texture
+	if (Msg.hwnd == SideWindow[fillStyles::TXVRTF]) // vertical texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType = TXVRTF;
@@ -12001,7 +12001,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  textureFlag = true;
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[12]) // horizontal texture
+	if (Msg.hwnd == SideWindow[fillStyles::TXHORF]) // horizontal texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType = TXHORF;
@@ -12011,7 +12011,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  textureFlag = true;
 	  break;
 	}
-	if (Msg.hwnd == SideWindow[13]) // angle texture
+	if (Msg.hwnd == SideWindow[fillStyles::TXANGF]) // angle texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType              = TXANGF;
