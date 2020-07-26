@@ -17135,13 +17135,13 @@ void thred::internal::dubar() {
 	indicatorLine[1].x                      = colorBarRect.right;
 	SelectObject(DrawItem->hDC, CrossPen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	wrap::Polyline(StitchWindowMemDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+	wrap::Polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  selectedIndicator = gsl::narrow_cast<double>(GroupStitchIndex) / StitchBuffer->size();
 	  indicatorLine[0].y = indicatorLine[1].y = wrap::ceil<int32_t>(colorBarRect.bottom * selectedIndicator);
 	  indicatorLine[0].x                      = colorBarRect.left;
 	  indicatorLine[1].x                      = colorBarRect.right;
-	  wrap::Polyline(StitchWindowMemDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+	  wrap::Polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
