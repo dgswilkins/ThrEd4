@@ -7293,7 +7293,7 @@ void form::internal::duprots(float rotationAngle, fPOINT const& rotationCenter) 
   StateMap->set(StateFlag::RESTCH);
 }
 
-void form::internal::cplayfn(uint32_t iForm, uint32_t play) {
+void form::internal::cplayfn(uint32_t iForm, uint32_t layer) {
   FormList->push_back(FormList->operator[](iForm));
   // the push_back may invalidate the reference so do it afterwards
   // clang-format off
@@ -7319,28 +7319,28 @@ void form::internal::cplayfn(uint32_t iForm, uint32_t play) {
   currentForm.edgeType                = 0;
   currentForm.fillInfo.texture.index  = 0;
   currentForm.attribute               = srcForm.attribute & NFRMLMSK;
-  currentForm.attribute |= play;
+  currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
   form::dusqr(currentForm);
 }
 
-void form::cpylayr(uint32_t codedLayer) {
+void form::cpylayr(uint32_t layer) {
   if (!SelectedFormList->empty()) {
 	thred::savdo();
 	for (auto selectedForm : (*SelectedFormList)) {
-	  fi::cplayfn(selectedForm, codedLayer);
+	  fi::cplayfn(selectedForm, layer);
 	}
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
-	  fi::cplayfn(ClosestFormToCursor, codedLayer);
+	  fi::cplayfn(ClosestFormToCursor, layer);
 	}
 	else {
 	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::savdo();
 		thred::rngadj();
-		auto const codedStitchLayer = codedLayer << (LAYSHFT - 1);
+		auto const codedStitchLayer = layer << LAYSHFT;
 		auto endStitch = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U);
 		for (auto currentStitch = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch;
 		     ++currentStitch) {
@@ -7354,14 +7354,14 @@ void form::cpylayr(uint32_t codedLayer) {
   }
 }
 
-void form::movlayr(uint32_t codedLayer) {
-  auto const codedStitchLayer = codedLayer << (LAYSHFT - 1);
+void form::movlayr(uint32_t layer) {
+  auto const codedStitchLayer = layer << LAYSHFT;
   if (!SelectedFormList->empty()) {
 	thred::savdo();
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto selectedForm : (*SelectedFormList)) {
 	  auto& formAttr = FormList->operator[](selectedForm).attribute;
-	  formAttr = gsl::narrow<uint8_t>(codedLayer | gsl::narrow_cast<decltype(codedLayer)>(formAttr & NFRMLMSK));
+	  formAttr = gsl::narrow_cast<uint8_t>((formAttr & NFRMLMSK)) | (layer << FLAYSHFT);
 	  formMap.set(selectedForm);
 	}
 	for (auto& stitch : *StitchBuffer) {
@@ -7380,7 +7380,7 @@ void form::movlayr(uint32_t codedLayer) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
 	  auto& formAttr = FormList->operator[](ClosestFormToCursor).attribute;
-	  formAttr = gsl::narrow<uint8_t>(codedLayer | gsl::narrow_cast<decltype(codedLayer)>(formAttr & NFRMLMSK));
+	  formAttr = gsl::narrow<uint8_t>(layer | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK));
 	  StateMap->reset(StateFlag::FORMSEL);
 	  for (auto& stitch : *StitchBuffer) {
 		if (((stitch.attribute & ALTYPMSK) != 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {

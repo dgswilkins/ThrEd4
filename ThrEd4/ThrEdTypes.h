@@ -206,6 +206,7 @@ constexpr auto penMedium    = 3;
 constexpr auto penWide      = 5;
 constexpr auto stdDPI       = int32_t {96};
 constexpr auto ASCIIoffset  = 0x30U; // offset to convert a value to the character equivalent
+constexpr auto MaxLayer = 5U; // number of layers
 
 enum stringLabel {
   STR_PIKOL,
@@ -1386,7 +1387,8 @@ constexpr uint32_t SRTMSK    = 0x61f03fffU; // 0110 0001 1111 0000 0011 1111 111
 constexpr uint32_t SRTYPMSK  = 0x61700000U; // 0110 0001 0111 0000 0000 0000 0000 0000
 constexpr uint32_t NOTFRM    = 0x00080000U; // 0000 0000 0000 1000 0000 0000 0000 0000
 constexpr uint32_t FRMSHFT   = 4U;
-constexpr uint32_t LAYSHFT   = 25U;
+constexpr uint32_t LAYSHFT   = 25U; // shift layer data in stitch attribute
+constexpr uint32_t FLAYSHFT  = 1U; // shift layer data in form attribute
 constexpr uint32_t TYPSHFT   = 29U;
 constexpr uint32_t USHFT     = 31U;
 

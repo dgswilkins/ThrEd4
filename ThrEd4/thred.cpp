@@ -69,7 +69,6 @@ constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for fil
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto knotLen  = 5U;                     // length of knot pattern
 constexpr auto arrowPoints = 3U; // points required to draw arrow
-constexpr auto MaxLayer = 5U; // number of layers
 
 // main variables
 int32_t  ArgCount;                // command line argument count
@@ -5550,7 +5549,8 @@ void thred::internal::lodclp(uint32_t iStitch) {
   ClosestPointIndex = iStitch;
   for (auto& clip : *ClipBuffer) {
 	StitchBuffer->operator[](iStitch++) = fPOINTATTR {
-	    clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | ActiveLayer << LAYSHFT | NOTFRM};
+	  clip.x + ClipOrigin.x, clip.y + ClipOrigin.y, (clip.attribute & COLMSK) | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM
+	};
   }
   GroupStitchIndex = iStitch - 1U;
   StateMap->set(StateFlag::GRPSEL);
@@ -7934,7 +7934,6 @@ void thred::internal::rotfns(float rotationAngle) {
 
 void thred::internal::nulayr(uint32_t play) {
   ActiveLayer = play;
-  LayerIndex  = play / 2;
   ladj();
   if (ActiveLayer != 0U) {
 	if (StateMap->test(StateFlag::FORMSEL) &&
@@ -12929,7 +12928,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		InsertLine[0]          = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-		StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, USMSK | ActiveColor | LayerIndex | NOTFRM});
+		StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, USMSK | ActiveColor | ActiveLayer << LAYSHFT | NOTFRM});
 		thred::addColor(0, ActiveColor);
 		StateMap->set(StateFlag::LIN1);
 		StateMap->set(StateFlag::INSRT);
@@ -13663,7 +13662,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  return true;
 	}
 	case VK_OEM_3: { // '`~' for US
-	  if ((wrap::pressed(VK_CONTROL)) && wrap::pressed(VK_MENU)) {
+	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
 		BackgroundColor    = 0x505050;
 		BackgroundPen      = nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth = 1;
@@ -14053,7 +14052,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  break;
 	}
 	case 'K': {
-	  if (wrap::pressed(VK_MENU) && wrap::pressed(VK_CONTROL)) {
+	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) {  // CTRL + ALT
 		setknots();
 	  }
 	  else {
@@ -14312,10 +14311,10 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 
 auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
   constexpr auto toLayer0 = 0U;
-  constexpr auto toLayer1 = 2U;
-  constexpr auto toLayer2 = 4U;
-  constexpr auto toLayer3 = 6U;
-  constexpr auto toLayer4 = 8U;
+  constexpr auto toLayer1 = 1U;
+  constexpr auto toLayer2 = 2U;
+  constexpr auto toLayer3 = 3U;
+  constexpr auto toLayer4 = 4U;
   auto           flag     = false;
   switch (wParameter) {
 	case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
@@ -16135,7 +16134,7 @@ void thred::internal::setPrefs() {
 	LoadString(ThrEdInstance,
 	           IDS_UNAM,
 	           designerBuffer.data(),
-	           designerBuffer.size());
+	           gsl::narrow<int>(designerBuffer.size()));
 	DesignerName->assign(designerBuffer.data());
 	getdes();
   }
@@ -16586,7 +16585,6 @@ void thred::internal::init() {
   LayerPen[2]        = wrap::CreatePen(PS_SOLID, penNarrow, penLilac);
   LayerPen[3]        = wrap::CreatePen(PS_SOLID, penNarrow, penPaleOlive);
   LayerPen[4]        = wrap::CreatePen(PS_SOLID, penNarrow, penTeal);
-  LayerPen[5]        = wrap::CreatePen(PS_SOLID, penNarrow, penOlive);
   BackgroundPenWidth = 1;
   for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	ThreadSizePixels[iColor] = 1;

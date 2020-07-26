@@ -54,7 +54,7 @@ void clrfills() noexcept;
 void cntrx();
 void col2frm();
 void contfil();
-void cpylayr(uint32_t codedLayer);
+void cpylayr(uint32_t layer);
 void crop();
 void debean();
 void delflt(uint32_t formIndex);
@@ -123,7 +123,7 @@ auto lastch() noexcept -> bool;
 auto linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept
     -> bool;
 void mdufrm() noexcept;
-void movlayr(uint32_t codedLayer);
+void movlayr(uint32_t layer);
 void munfrm();
 auto notfstch(uint32_t attribute) noexcept -> bool;
 void nubrdcol(uint32_t color);
@@ -228,7 +228,7 @@ namespace internal {
   auto fplComp(fPOINTLINE const& point1, fPOINTLINE const& point2) noexcept -> bool;
   void contf(FRMHED& form);
   auto contsf(uint32_t formIndex) -> bool;
-  void cplayfn(uint32_t iForm, uint32_t play);
+  void cplayfn(uint32_t iForm, uint32_t layer);
 
   constexpr auto duat(uint32_t attribute) -> uint32_t;
 
