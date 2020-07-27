@@ -117,7 +117,6 @@ constexpr int32_t  MAXKNOTS  = 16384;           // maximum number of knots
 constexpr float    IBFCLEN   = (4.0F * PFGRAN); // initial buttonhole fill corner length
 constexpr float    IPICSPAC  = 6.0F;            // initial picot border space
 constexpr int32_t  PRFLINS   = 30;              // number of lines on the preference menu
-constexpr uint32_t EDGETYPS  = 12U;             // number of border fill types
 constexpr uint32_t SEED      = 3037000499U;     // pseudo-random-sequence seed
 constexpr uint32_t FSED      = 1340007303U;     // feather sequence seed
 constexpr double   HUPS      = 5U;              // number of hoops the user can select
@@ -714,6 +713,8 @@ enum edgeFillStyles {
   EDGELAST      // must always be the last value
 };
 
+constexpr uint32_t EDGETYPS  = 13U;             // number of border fill types
+
 // form types
 enum formStyles {
   FRMLINE = 1U, // Line form
@@ -865,6 +866,8 @@ enum fillStyles {
   TXHORF,   // Horizontal texture fill
   TXANGF,   // Angle texture fill
 };
+
+constexpr auto FILLTYPS = 14U; // 13 fill types plus 'none'
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
 constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);

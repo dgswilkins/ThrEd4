@@ -3691,7 +3691,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	GetWindowRect(FormDataSheet, &parentListRect);
 	form::ispcdclp();
 	if (StateMap->test(StateFlag::FILTYP)) {
-	  for (auto iEntry = 0U; iEntry < EDGETYPS + 1U; ++iEntry) {
+	  for (auto iEntry = 0U; iEntry < EDGETYPS; ++iEntry) {
 		if (gsl::narrow<uint32_t>(form.edgeType & NEGUND) == EdgeFillTypes[iEntry]) {
 		  --entryCount;
 		}
@@ -12150,7 +12150,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
-	  sidmsg(form, ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), 14U);
+	  sidmsg(form, ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), FILLTYPS);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
@@ -12185,7 +12185,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
-	  sidmsg(form, ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS + 1U);
+	  sidmsg(form, ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS);
 	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}
