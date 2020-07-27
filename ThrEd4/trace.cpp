@@ -57,7 +57,7 @@ POINT     TraceMsgPoint;                             // message point for trace 
 uint32_t  HighColors[3];                             // separated upper reference colors
 uint32_t  LowColors[3];                              // separated lower reference colors
 uint32_t  ColumnColor;                               // trace color column
-uint32_t  TraceShift[] = {0U, 8U, 16U};              // trace shift values
+uint32_t  TraceShift[] = {0U, BYTSHFT, WRDSHFT};     // trace shift values
 HBRUSH    TraceBrush[3];                             // red,green,and blue brushes
 HWND      TraceNumberInput;                          // trace number input window
 HPEN      BlackPen;                                  // black pen
@@ -65,8 +65,8 @@ HPEN      BlackPen;                                  // black pen
 void trace::initColorRef() noexcept {
   UpPixelColor    = 0;
   DownPixelColor  = 0x7f7f7f;
-  InvertUpColor   = 0xffffff;
-  InvertDownColor = 0x808080;
+  InvertUpColor   = penWhite;
+  InvertDownColor = penGray;
 }
 
 #pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
@@ -110,9 +110,9 @@ void trace::initTraceWindows() noexcept {
 }
 
 void trace::internal::trcols(COLORREF color) noexcept {
-  PixelColors[0] = color & 0xffU;
-  PixelColors[1] = (color & 0xff00U) >> 8U;
-  PixelColors[2] = (color & 0xff0000U) >> 16U;
+  PixelColors[0] = color & B1MASK;
+  PixelColors[1] = (color & B2MASK) >> BYTSHFT;
+  PixelColors[2] = (color & B3MASK) >> WRDSHFT;
 }
 
 void trace::internal::trcstpnum() {
@@ -195,7 +195,7 @@ void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t
 
 // Check Translation
 static inline void trace::internal::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
-  destination = (source >> (shift & 0x0fU)) & 0xffU;
+  destination = (source >> (shift & NIBMASK)) & BYTMASK;
 }
 
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
@@ -260,7 +260,7 @@ void trace::untrace() {
   }
   else {
 	if (StateMap->test(StateFlag::TRCUP)) {
-	  DownPixelColor = 0xffffff;
+	  DownPixelColor = penWhite;
 	}
 	else {
 	  UpPixelColor = 0;
@@ -280,7 +280,7 @@ void trace::trdif() {
 	auto differenceBitmap = std::vector<uint32_t> {};
 	differenceBitmap.resize(wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
 	auto colorSumMaximum = 0U;
-	auto colorSumMinimum = 0xffffffffU;
+	auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}
@@ -361,7 +361,7 @@ void trace::trace() {
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
-		DownPixelColor = 0xffffff;
+		DownPixelColor = penWhite;
 	  }
 	  else {
 		DownPixelColor = color;
@@ -371,7 +371,7 @@ void trace::trace() {
 	  StateMap->set(StateFlag::TRCGRN);
 	  StateMap->set(StateFlag::TRCBLU);
 	}
-	auto traceColorMask = 0xffffffU;
+	auto traceColorMask = COLMASK;
 	if (!StateMap->test(StateFlag::TRCRED)) {
 	  traceColorMask &= REDMSK;
 	}
@@ -381,7 +381,7 @@ void trace::trace() {
 	if (!StateMap->test(StateFlag::TRCBLU)) {
 	  traceColorMask &= BLUMSK;
 	}
-	if (traceColorMask != 0xffffff) {
+	if (traceColorMask != COLMASK) {
 	  for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		TraceBitmapData[iPixel] &= traceColorMask;
 	  }
@@ -403,8 +403,8 @@ void trace::trace() {
 #endif
 
 #if TRCMTH == 1
-	InvertUpColor   = UpPixelColor ^ 0xffffffU;
-	InvertDownColor = DownPixelColor ^ 0xffffffU;
+	InvertUpColor   = UpPixelColor ^ COLMASK;
+	InvertDownColor = DownPixelColor ^ COLMASK;
 	ti::trcols(InvertUpColor);
 	for (auto iRGB = 0U; iRGB < 3; ++iRGB) {
 	  HighColors[iRGB] = PixelColors[iRGB];
@@ -485,7 +485,7 @@ void trace::tracedg() {
   }
   for (auto iPixel = 0U; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 	if (TracedEdges->test(iPixel)) {
-	  TraceBitmapData[iPixel] = 0xffffff;
+	  TraceBitmapData[iPixel] = penWhite;
 	}
 	else {
 	  TraceBitmapData[iPixel] = 0;
@@ -687,7 +687,7 @@ void trace::internal::dutrac() {
 		findRectangle.top = bitmap::getBitmapHeight();
 	  }
 	  auto flag                = 0U;
-	  auto minimumEdgeDistance = 0x7fffffff;
+	  auto minimumEdgeDistance = std::numeric_limits<int32_t>::max();
 	  if (findRectangle.left != 0) {
 		minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
 		flag                = TRCL;
@@ -876,8 +876,8 @@ void trace::trinit() {
 		}
 		InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
 	  }
-	  DownPixelColor = InvertDownColor ^ 0xffffffU;
-	  InvertUpColor  = 0xffffffU;
+	  DownPixelColor = InvertDownColor ^ COLMASK;
+	  InvertUpColor  = penWhite;
 	  UpPixelColor   = 0U;
 	}
 	StateMap->set(StateFlag::WASTRCOL);
@@ -894,7 +894,7 @@ void trace::trcsel() {
 	StateMap->set(StateFlag::TRCRED);
 	StateMap->set(StateFlag::TRCBLU);
 	StateMap->set(StateFlag::TRCGRN);
-	DownPixelColor = 0xffffff;
+	DownPixelColor = penWhite;
 	UpPixelColor   = 0;
 	trace::trace();
 	StateMap->reset(StateFlag::HIDMAP);
@@ -925,7 +925,7 @@ void trace::trcsel() {
 void trace::internal::ritrcol(COLORREF* color, uint32_t number) noexcept {
   if (color != nullptr) {
 	*color &= TraceRGBMask[ColumnColor];
-	number &= 0xffU;
+	number &= BYTMASK;
 	*color |= (number << TraceShift[ColumnColor]);
   }
 }
@@ -935,12 +935,12 @@ void trace::internal::dutrnum0(uint32_t color) {
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
 	ti::ritrcol(&InvertUpColor, color);
-	UpPixelColor = InvertUpColor ^ 0xffffffU;
+	UpPixelColor = InvertUpColor ^ COLMASK;
 	thred::redraw(TraceUpWindow[ColumnColor]);
   }
   else {
 	ti::ritrcol(&InvertDownColor, color);
-	DownPixelColor = InvertDownColor ^ 0xffffffU;
+	DownPixelColor = InvertDownColor ^ COLMASK;
 	thred::redraw(TraceDownWindow[ColumnColor]);
   }
   thred::redraw(TraceControlWindow[ColumnColor]);
@@ -1158,7 +1158,7 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto const zeroWidth  = thred::txtWid(L"0");
   wchar_t    buffer[11] = {0};
   color >>= shift;
-  color &= 0xffU;
+  color &= BYTMASK;
   _itow_s(color, buffer, 10);
   auto const bufferLength = gsl::narrow<uint32_t>(wcslen(std::begin(buffer)));
   auto const xPosition    = zeroWidth.cx * (3U - bufferLength) + 1U;

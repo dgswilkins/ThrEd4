@@ -176,6 +176,7 @@ constexpr uint32_t HBSHFT    = 31U;             // shift required to reach the M
 constexpr uint8_t  NIBMASK    = 0x0fU;          // Nibble mask
 constexpr uint8_t  BYTMASK    = 0xffU;          // Byte mask
 constexpr uint16_t WRDMASK    = 0xffffU;        // word mask
+constexpr uint32_t COLMASK    = 0xffffffU;      // COLORREF mask
 constexpr uint8_t  mask7bits = 0x7fU;           // mask value to 7 bits
 
 constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
