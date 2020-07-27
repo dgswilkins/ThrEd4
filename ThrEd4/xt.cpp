@@ -128,14 +128,16 @@ void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEA
 }
 
 auto xt::internal::bpsg() noexcept -> uint32_t {
-  auto testValue = 0U;
+  constexpr auto bit4      = 0x8U;
+  constexpr auto bit31     = 0x40000000U;
+  auto           testValue = 0U;
   if (PseudoRandomValue == 0U) {
 	PseudoRandomValue = FSED;
   }
-  testValue = PseudoRandomValue & 0x40000008U;
+  testValue = PseudoRandomValue & (bit4 | bit31);
   PseudoRandomValue >>= 1U;
-  if (testValue == 0x8U || testValue == 0x40000000U) {
-	PseudoRandomValue |= 0x40000000U;
+  if (testValue == bit4 || testValue == bit31) {
+	PseudoRandomValue |= bit31;
   }
   return PseudoRandomValue;
 }
@@ -770,7 +772,7 @@ void xt::chkwlk(FRMHED& form) {
 
 void xt::internal::fnund(FRMHED& form, std::vector<RNGCNT> const& textureSegments, std::vector<fPOINT>& angledFormVertices) {
   auto const savedStitchSize = UserStitchLength;
-  UserStitchLength           = 1e38F;
+  UserStitchLength           = std::numeric_limits<float>::max();
   if (form.underlaySpacing == 0.0F) {
 	form.underlaySpacing = IniFile.underlaySpacing;
   }
@@ -810,9 +812,9 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
   if (bit == 0) {
 	return 0U;
   }
-  result = ((bit & 0xffU) - 18U);
+  result = ((bit & B1MASK) - 18U);
   if ((result != 12U) || ((maskedAttribute & TYPATMSK) == 0)) {
-	return result & 0xfU;
+	return result & NIBMASK;
   }
   return 1U;
 }
@@ -897,7 +899,7 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
   formFillCounter.resize((FormList->size() + 2U) << 2U);
   auto totalJumps = 0U;
   while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-	double minimumLength = 1e9;
+	auto minimumLength = std::numeric_limits<double>::max();
 	auto stitchIt = (direction) ? std::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
 	                            : std::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
@@ -918,7 +920,8 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 		}
 	  }
 	}
-	if (minimumLength > 9.0 * PFGRAN) {
+	constexpr auto maxStitchLength = 9.0 * PFGRAN; // anything over 9 millimeters should result in another stitch
+	if (minimumLength > maxStitchLength) {
 	  ++totalJumps;
 	}
 	++(formFillCounter[pRecs[currentRegion]->form]);
@@ -1008,7 +1011,8 @@ void xt::fsort() {
   if (!StitchBuffer->empty()) {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
 	auto stitchRegion = std::vector<OREC> {};
-	stitchRegion.reserve(100U);
+	constexpr auto expectedRegions = 100U;
+	stitchRegion.reserve(expectedRegions);
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
 	thred::savdo();
@@ -1053,7 +1057,7 @@ void xt::fsort() {
 	  stitchRange.resize(lastRegion);
 	  stitchRange[0].start = 0;
 	  attribute            = pRecs[0]->color;
-	  auto currentForm     = 0xffffffffU;
+	  auto currentForm     = std::numeric_limits<uint32_t>::max();
 	  auto typeCount       = 0U;
 	  auto iRange          = 0U;
 	  for (auto iRegion = 0U; iRegion < lastRegion; ++iRegion) {
@@ -1087,7 +1091,7 @@ void xt::fsort() {
 		sortRecord.start  = stitchRange[iRange].start;
 		sortRecord.finish = stitchRange[iRange].finish;
 		sortRecord.count  = sortRecord.finish - sortRecord.start;
-		auto minimumJumps = 0xffffffffU;
+		auto minimumJumps = std::numeric_limits<uint32_t>::max();
 		// timeout used to put an upper bound on the number of sorting permutations checked
 		auto fileTime = FILETIME {0U, 0U};
 		GetSystemTimeAsFileTime(&fileTime);
@@ -1152,10 +1156,10 @@ void xt::internal::duatf(uint32_t ind) {
   auto       attributeFields = ATFLD {(attribute & COLMSK),
 									  ((attribute & FRMSK) >> FRMSHFT),
 									  gsl::narrow<uint32_t>(StitchTypes[dutyp(attribute)]),
-									  ((attribute >> LAYSHFT) & 7U),
+									  ((attribute >> LAYSHFT) & mask3bits),
 									  0};
   // clang-format on
-  if ((attribute & 0x80000000) != 0U) {
+  if ((attribute & (1U << USHFT)) != 0U) {
 	attributeFields.user = 1;
   }
   else {
@@ -2336,9 +2340,10 @@ void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
 
 auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
-  wchar_t buffer[16] = {};
-  GetWindowText(GetDlgItem(dialog, stringIndex), static_cast<LPTSTR>(buffer), sizeof(buffer) / sizeof(buffer[0]));
-  return wrap::bufToFloat(std::begin(buffer)) * PFGRAN;
+  constexpr auto bufferSize = 16U;
+  auto buffer = std::array<wchar_t, bufferSize>{};
+  GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
+  return wrap::bufToFloat(buffer.data()) * PFGRAN;
 }
 
 auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool {
@@ -2380,13 +2385,13 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		  return TRUE;
 		}
 		case IDC_DESWID: {
-		  if ((wparam >> 16U) == EN_CHANGE) {
+		  if ((wparam >> WRDSHFT) == EN_CHANGE) {
 			StateMap->reset(StateFlag::DESCHG);
 		  }
 		  break;
 		}
 		case IDC_DESHI: {
-		  if ((wparam >> 16U) == EN_CHANGE) {
+		  if ((wparam >> WRDSHFT) == EN_CHANGE) {
 			StateMap->set(StateFlag::DESCHG);
 		  }
 		  break;
@@ -2456,13 +2461,14 @@ void xt::nudsiz() {
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) {
 	  flag = 0;
+	  constexpr auto hoopRatio = 1.05F; // make the hoop 5% bigger
 	  if (DesignSize.x > IniFile.hoopSizeX) {
-		IniFile.hoopSizeX = DesignSize.x * 1.05F;
+		IniFile.hoopSizeX = DesignSize.x * hoopRatio;
 		UnzoomedRect.x    = wrap::round<int32_t>(IniFile.hoopSizeX);
 		flag              = 1;
 	  }
 	  if (DesignSize.y > IniFile.hoopSizeY) {
-		IniFile.hoopSizeY = DesignSize.y * 1.05F;
+		IniFile.hoopSizeY = DesignSize.y * hoopRatio;
 		UnzoomedRect.y    = wrap::round<int32_t>(IniFile.hoopSizeY);
 		flag              = 1;
 	  }

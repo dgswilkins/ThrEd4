@@ -178,6 +178,7 @@ constexpr uint8_t  BYTMASK    = 0xffU;          // Byte mask
 constexpr uint16_t WRDMASK    = 0xffffU;        // word mask
 constexpr uint32_t COLMASK    = 0xffffffU;      // COLORREF mask
 constexpr uint8_t  mask7bits = 0x7fU;           // mask value to 7 bits
+constexpr uint8_t  mask3bits = 0x7U;           // mask value to 3 bits
 
 constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
 constexpr uint32_t SQPNTS     = 5U;             // number of points required to draw a square
@@ -1394,7 +1395,7 @@ constexpr uint32_t FRMSHFT   = 4U;
 constexpr uint32_t LAYSHFT   = 25U; // shift layer data in stitch attribute
 constexpr uint32_t FLAYSHFT  = 1U; // shift layer data in form attribute
 constexpr uint32_t TYPSHFT   = 29U;
-constexpr uint32_t USHFT     = 31U;
+constexpr uint32_t USHFT     = 31U; // user edited stitches shift
 
 /*
 bit definitions for fPOINTATTR.attribute
