@@ -22,7 +22,7 @@ modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
 performance-*,\
 portability-*,\
-readability-*,-readability-magic-numbers\
+readability-*\
 "
 WarningsAsErrors:  ''
 HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'

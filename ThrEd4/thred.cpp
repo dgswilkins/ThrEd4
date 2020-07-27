@@ -13454,8 +13454,8 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 auto thred::internal::handleRightKey(bool& retflag) -> bool {
   retflag = true;
   if (wrap::pressed(VK_SHIFT)) {
-	auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 	if (StateMap->test(StateFlag::FPSEL)) {
+	  auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 	  if (StateMap->test(StateFlag::PSELDIR)) {
 		++SelectedFormVertices.vertexCount %= vertexCount;
 		SelectedFormVertices.finish = (SelectedFormVertices.start + SelectedFormVertices.vertexCount) % vertexCount;
@@ -13476,6 +13476,7 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 	}
 	else {
 	  if (StateMap->testAndReset(StateFlag::FRMPSEL)) {
+		auto const& vertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 		form::unpsel();
 		SelectedFormVertices.start       = ClosestVertexToCursor;
 		SelectedFormVertices.form        = ClosestFormToCursor;
