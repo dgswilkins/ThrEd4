@@ -440,7 +440,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 		auto locof = 0.0F;
 		if ((PESstitch[iPESstitch] & bit8) != 0U) {
 		  // combine the 4 bits from the first byte with the 8 bits from the next byte
-		  auto pesVal = (((PESstitch[iPESstitch] & NIBMASK) << BYTSHFT) | PESstitch[iPESstitch + 1U]) & mask12bits;
+		  auto pesVal = (gsl::narrow_cast<uint32_t>(PESstitch[iPESstitch] << BYTSHFT) | PESstitch[iPESstitch + 1U]) & mask12bits;
 		  if ((pesVal & bit12) != 0U) {
 			pesVal -= offset;
 		  }
