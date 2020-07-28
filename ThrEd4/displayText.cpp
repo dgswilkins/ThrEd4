@@ -75,11 +75,11 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
-	constexpr auto newline          = 10;
-	auto       strings              = std::vector<std::wstring> {};
-	auto       iString              = 0U;
-	auto       previousStringLength = 0U;
-	auto const sizeLim              = message.size();
+	constexpr auto newline              = 10;
+	auto           strings              = std::vector<std::wstring> {};
+	auto           iString              = 0U;
+	auto           previousStringLength = 0U;
+	auto const     sizeLim              = message.size();
 	while (iString < sizeLim) {
 	  if (message[iString] == newline) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));

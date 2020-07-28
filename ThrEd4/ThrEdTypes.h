@@ -54,19 +54,19 @@ constexpr float    PAGSCROL = 0.9F;        // page scroll factor
 constexpr float    LINSCROL = 0.05F;       // line scroll factor
 constexpr uint32_t TXTSIDS  = 6U;          // extra pixels in a text box
 constexpr uint32_t MAXITEMS = 0x10000U; // maximum number of stitches, sequence items & clipboard points
-constexpr uint32_t MAXCHNG  = 10000U; // maximum number of color changes
-constexpr float    SHUPX    = 480.0F; // small hoop x size
-constexpr float    SHUPY    = 480.0F; // small hoop y size
-constexpr float    LHUPX    = 719.0F; // large hoop x size
-constexpr float    LHUPY    = 690.0F; // large hoop y size
-constexpr float    HUP100XY = 600.0F; // 100 millimeter hoop size
-constexpr float    PFGRAN   = 6.0F;   // pfaf stitch points per millimeter
-constexpr float    IPFGRAN  = 1.0F / 6.0F;   // pfaf millimeters per stitch point
-constexpr double   TSIZ30   = 0.3;    // #30 thread size in millimeters
-constexpr double   TSIZ40   = 0.2;    // #40 thread size in millimeters
-constexpr double   TSIZ60   = 0.05;   // #60 thread size in millimeters
-constexpr int32_t  SCROLSIZ = 12;     // logical pixel width of a scroll bar
-constexpr int32_t  COLSIZ   = 12;     // logical pixel width of the color bar
+constexpr uint32_t MAXCHNG  = 10000U;      // maximum number of color changes
+constexpr float    SHUPX    = 480.0F;      // small hoop x size
+constexpr float    SHUPY    = 480.0F;      // small hoop y size
+constexpr float    LHUPX    = 719.0F;      // large hoop x size
+constexpr float    LHUPY    = 690.0F;      // large hoop y size
+constexpr float    HUP100XY = 600.0F;      // 100 millimeter hoop size
+constexpr float    PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
+constexpr float    IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
+constexpr double   TSIZ30   = 0.3;         // #30 thread size in millimeters
+constexpr double   TSIZ40   = 0.2;         // #40 thread size in millimeters
+constexpr double   TSIZ60   = 0.05;        // #60 thread size in millimeters
+constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll bar
+constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF = 15.0;              // mouse click region for select
 constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
@@ -88,8 +88,8 @@ constexpr float    DEFSPACE = 0.45F;             // default stitch spacing
 constexpr float    DEFANG   = 0.7853981F;        // default fill angle, 45 degrees
 constexpr uint32_t MSGSIZ   = 8192U;             // size of the message buffer
 constexpr float    PI_F     = 3.1415927F;        // PI to single precision
-constexpr float    PI_F2    = PI_F * 2.0F;       // 
-constexpr float    PI_FHALF = PI_F / 2.0F;       // 
+constexpr float    PI_F2    = PI_F * 2.0F;       //
+constexpr float    PI_FHALF = PI_F / 2.0F;       //
 constexpr double   PI       = 3.141592653589793; // PI to double precision
 constexpr double   PI2      = PI * 2.0;          //
 constexpr double MAXSTCH = 54.0; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
@@ -165,27 +165,27 @@ constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross 
 constexpr uint32_t ITXBUFLEN = 16U;             // texture buffer depth
 constexpr uint32_t BTNCOUNT  = 9U;              // Maximum number of buttons
 constexpr int32_t  FONTSIZE  = 400;             // default font size
-constexpr uint32_t B1MASK    = 0x000000ffU;       // mask for the least significant byte
-constexpr uint32_t B2MASK    = 0x0000ff00U;       // mask for the middle byte
-constexpr uint32_t B3MASK    = 0x00ff0000U;       // mask for the more significant byte
-constexpr uint32_t BYTSHFT    = 8U;             // bits required to shift one byte left
+constexpr uint32_t B1MASK    = 0x000000ffU;     // mask for the least significant byte
+constexpr uint32_t B2MASK    = 0x0000ff00U;     // mask for the middle byte
+constexpr uint32_t B3MASK    = 0x00ff0000U;     // mask for the more significant byte
+constexpr uint32_t BYTSHFT   = 8U;              // bits required to shift one byte left
 constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
 constexpr uint32_t TBYTSHFT  = 24U;             // bits required to shift three bytes left
 constexpr uint32_t HBSHFT    = 31U;             // shift required to reach the MSB of uint32
-constexpr uint8_t  NIBMASK    = 0x0fU;          // Nibble mask
-constexpr uint8_t  BYTMASK    = 0xffU;          // Byte mask
-constexpr uint16_t WRDMASK    = 0xffffU;        // word mask
-constexpr uint32_t COLMASK    = 0xffffffU;      // COLORREF mask
+constexpr uint8_t  NIBMASK   = 0x0fU;           // Nibble mask
+constexpr uint8_t  BYTMASK   = 0xffU;           // Byte mask
+constexpr uint16_t WRDMASK   = 0xffffU;         // word mask
+constexpr uint32_t COLMASK   = 0xffffffU;       // COLORREF mask
 constexpr uint8_t  mask7bits = 0x7fU;           // mask value to 7 bits
-constexpr uint8_t  mask3bits = 0x7U;           // mask value to 3 bits
+constexpr uint8_t  mask3bits = 0x7U;            // mask value to 3 bits
 
-constexpr uint32_t LNPNTS     = 2U;             // number of points required to draw a line
-constexpr uint32_t SQPNTS     = 5U;             // number of points required to draw a square
-constexpr uint32_t OUTPNTS    = 9U;             // number of points required to draw an outline
-constexpr auto     RADDEGF    = 180.0F / PI_F;  // float factor to convert radians to degrees
-constexpr auto     DEGRADF    = PI_F / 180.0F;  // float factor to convert radians to degrees
+constexpr uint32_t LNPNTS  = 2U;            // number of points required to draw a line
+constexpr uint32_t SQPNTS  = 5U;            // number of points required to draw a square
+constexpr uint32_t OUTPNTS = 9U;            // number of points required to draw an outline
+constexpr auto     RADDEGF = 180.0F / PI_F; // float factor to convert radians to degrees
+constexpr auto     DEGRADF = PI_F / 180.0F; // float factor to convert radians to degrees
 
-constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
+constexpr auto SWBLEN  = 11U; // Side Window buffer length including the zero terminator
 constexpr auto SWCOUNT = 16U; // number of side windows to create/track
 
 constexpr auto penBlack     = COLORREF {0x000000U};
@@ -207,7 +207,7 @@ constexpr auto penMedium    = 3;
 constexpr auto penWide      = 5;
 constexpr auto stdDPI       = int32_t {96};
 constexpr auto ASCIIoffset  = 0x30U; // offset to convert a value to the character equivalent
-constexpr auto MaxLayer = 5U; // number of layers
+constexpr auto MaxLayer     = 5U;    // number of layers
 
 enum stringLabel {
   STR_PIKOL,
@@ -715,7 +715,7 @@ enum edgeFillStyles {
   EDGELAST      // must always be the last value
 };
 
-constexpr uint32_t EDGETYPS  = 13U;             // number of border fill types
+constexpr uint32_t EDGETYPS = 13U; // number of border fill types
 
 // form types
 enum formStyles {
@@ -1393,7 +1393,7 @@ constexpr uint32_t SRTYPMSK  = 0x61700000U; // 0110 0001 0111 0000 0000 0000 000
 constexpr uint32_t NOTFRM    = 0x00080000U; // 0000 0000 0000 1000 0000 0000 0000 0000
 constexpr uint32_t FRMSHFT   = 4U;
 constexpr uint32_t LAYSHFT   = 25U; // shift layer data in stitch attribute
-constexpr uint32_t FLAYSHFT  = 1U; // shift layer data in form attribute
+constexpr uint32_t FLAYSHFT  = 1U;  // shift layer data in form attribute
 constexpr uint32_t TYPSHFT   = 29U;
 constexpr uint32_t USHFT     = 31U; // user edited stitches shift
 

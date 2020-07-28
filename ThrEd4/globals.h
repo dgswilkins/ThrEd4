@@ -200,9 +200,9 @@ extern std::vector<POINT>* RubberBandLine;
 
 extern std::vector<SATCON>* SatinGuides;
 
-extern RECT      scRct;
+extern RECT     scRct;
 extern int32_t* screenDPI;
-extern int32_t*  ScrollSize;
+extern int32_t* ScrollSize;
 
 extern std::vector<POINT>* SearchLine;
 
@@ -224,7 +224,7 @@ extern double     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 
 extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
-extern std::array<HWND, SWCOUNT> SideWindow;
+extern std::array<HWND, SWCOUNT>   SideWindow;
 
 extern float SmallStitchLength;
 extern float SnapLength;
@@ -276,9 +276,9 @@ extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 
-extern float      VerticalRatio;
-extern HWND       VerticalScrollBar;
-extern fs::path*  WorkingFileName;
+extern float     VerticalRatio;
+extern HWND      VerticalScrollBar;
+extern fs::path* WorkingFileName;
 
 extern std::array<POINT, SQPNTS> ZoomBoxLine;
 

@@ -113,7 +113,7 @@ auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 #ifdef _WIN64
   return gsl::narrow_cast<size_t>(invar);
 #else
-	return invar;
+  return invar;
 #endif
 }
 

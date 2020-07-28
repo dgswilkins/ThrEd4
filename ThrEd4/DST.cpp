@@ -649,8 +649,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
   if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
 	constexpr auto expRatio = 1.1F; // 10% expansion
-	IniFile.hoopSizeX = dstSize.x * expRatio;
-	IniFile.hoopSizeY = dstSize.y * expRatio;
+	IniFile.hoopSizeX       = dstSize.x * expRatio;
+	IniFile.hoopSizeY       = dstSize.y * expRatio;
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
@@ -668,7 +668,7 @@ auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
 }
 
 void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches) {
-  auto           dstStitchBuffer = std::vector<fPOINTATTR> {};
+  auto dstStitchBuffer = std::vector<fPOINTATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
@@ -760,7 +760,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  lengths.y -= difference.y;
 	}
   }
-  constexpr auto endCode = uint8_t {0xF3}; 
+  constexpr auto endCode = uint8_t {0xF3};
   DSTRecords.push_back(DSTREC {0, 0, endCode});
   if (di::colfil()) {
 	auto bytesWritten = DWORD {0};
@@ -821,7 +821,7 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
   // NOLINTNEXTLINE(readability-magic-numbers)
   return wrap::round<DWORD>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                      (((767 - meanR) * deltaB * deltaB) / 256)));// NOLINT(readability-magic-numbers)
+                                      (((767 - meanR) * deltaB * deltaB) / 256))); // NOLINT(readability-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
@@ -918,7 +918,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto const* desc        = strrchr(convAuxName.data(), '\\') + 1U;
 		auto        DSTRecords  = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-        // NOLINTNEXTLINE(readability-magic-numbers)
+		// NOLINTNEXTLINE(readability-magic-numbers)
 		DSTRecords.reserve(StitchBuffer->size() + 128U);
 		auto DSTOffset = DSTOffsets {};
 		auto dstHeader = DSTHED {};

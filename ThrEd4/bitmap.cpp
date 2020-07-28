@@ -19,18 +19,18 @@
 namespace bi = bitmap::internal;
 
 COLORREF  BitmapBackgroundColors[COLOR_COUNT]; // for the bitmap color dialog box
-uint32_t  BitmapColor = BITCOL;       // bitmap color
-HDC       BitmapDC;                   // bitmap device context
-RECT      BitmapDstRect;              // stitch window destination rectangle for zooomed view
-HANDLE    BitmapFileHandle;           // bitmap handle
-uint32_t  BitmapHeight;               // bitmap height
-HPEN      BitmapPen;                  // bitmap pen
-POINT     BitmapPoint;                // a point on the bitmap
-fPOINT    BitmapSizeinStitches;       // bitmap end points in stitch points
-RECT      BitmapSrcRect;              // bitmap source rectangle for zoomed view
-uint32_t  BitmapWidth;                // bitmap width
-fPOINT    BmpStitchRatio;             // bitmap to stitch hoop ratios
-fs::path* UserBMPFileName;            // bitmap file name from user load
+uint32_t  BitmapColor = BITCOL;                // bitmap color
+HDC       BitmapDC;                            // bitmap device context
+RECT      BitmapDstRect;        // stitch window destination rectangle for zooomed view
+HANDLE    BitmapFileHandle;     // bitmap handle
+uint32_t  BitmapHeight;         // bitmap height
+HPEN      BitmapPen;            // bitmap pen
+POINT     BitmapPoint;          // a point on the bitmap
+fPOINT    BitmapSizeinStitches; // bitmap end points in stitch points
+RECT      BitmapSrcRect;        // bitmap source rectangle for zoomed view
+uint32_t  BitmapWidth;          // bitmap width
+fPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
+fs::path* UserBMPFileName;      // bitmap file name from user load
 
 BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
 BITMAPV4HEADER   BitmapFileHeaderV4; // bitmap version4 file header
@@ -636,10 +636,10 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 }
 
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
-  auto line      = std::array<POINT, 2> {};
-  auto  vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
-  line[0]        = bi::stch2bit(vertexIt[start]);
-  line[1]        = bi::stch2bit(vertexIt[finish]);
+  auto line     = std::array<POINT, 2> {};
+  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+  line[0]       = bi::stch2bit(vertexIt[start]);
+  line[1]       = bi::stch2bit(vertexIt[finish]);
   wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
   wrap::Polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }

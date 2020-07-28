@@ -40,7 +40,7 @@
 
 namespace ffi = formForms::internal;
 
-constexpr auto textMargin = 3L;
+constexpr auto textMargin  = 3L;
 constexpr auto textMargin2 = 6L;
 
 RECT  LabelWindowCoords; // location of left windows in the form data sheet
@@ -48,7 +48,7 @@ POINT LabelWindowSize;   // size of the left windows in the form data sheet
 RECT  ValueWindowCoords; // location of right windows in the form data sheet
 POINT ValueWindowSize;   // size of the right windows in the form data sheet
 
-auto const DaisyTypeStrings = std::array<uint16_t, 6>{
+auto const DaisyTypeStrings = std::array<uint16_t, 6> {
     IDS_DAZCRV,
     IDS_DAZSAW,
     IDS_DAZRMP,
@@ -197,9 +197,8 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlaySpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LUANG] = ffi::txtwin(stringTable[STR_FUANG], LabelWindowCoords);
-	  valueWindow[LUANG] = ffi::txtrwin(
-	      fmt::format(L"{:.2f}", (form.underlayStitchAngle * RADDEGF)),
-	      ValueWindowCoords);
+	  valueWindow[LUANG] =
+	      ffi::txtrwin(fmt::format(L"{:.2f}", (form.underlayStitchAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
   }
@@ -284,15 +283,14 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	ffi::nxtlin(formMenuEntryCount);
 	if (form.fillType == ANGF || form.fillType == TXANGF) {
 	  labelWindow[LFRMANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-	  valueWindow[LFRMANG] = ffi::numwin(
-	      fmt::format(L"{:.2f}", (form.angleOrClipData.angle * RADDEGF)),
-	      ValueWindowCoords);
+	  valueWindow[LFRMANG] =
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.angleOrClipData.angle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == ANGCLPF) {
 	  labelWindow[LSACANG] = ffi::txtwin(stringTable[STR_TXT6], LabelWindowCoords);
-	  valueWindow[LSACANG] = ffi::numwin(
-	      fmt::format(L"{:.2f}", (form.satinOrAngle.angle * RADDEGF)), ValueWindowCoords);
+	  valueWindow[LSACANG] =
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.satinOrAngle.angle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VCLPF || form.fillType == HCLPF || form.fillType == ANGCLPF) {
@@ -349,7 +347,8 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	}
 	if ((edgeArray[iEdge] & BPICSPAC) != 0) {
 	  labelWindow[LBRDPIC] = ffi::txtwin(stringTable[STR_TXT16], LabelWindowCoords);
-	  valueWindow[LBRDPIC] = ffi::numwin(fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
+	  valueWindow[LBRDPIC] =
+	      ffi::numwin(fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((edgeArray[iEdge] & BEMAX) != 0) {
@@ -899,6 +898,7 @@ void formForms::dasyfrm() {
 	}
   }
   auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+
   constexpr auto holeMargin = 0.01F;
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	// cppcheck-suppress unreadVariable
@@ -979,7 +979,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  break;
 		}
 		case IDC_DEFTEAR: {
-		  IniFile.formSides      = 20; 
+		  IniFile.formSides      = 20;
 		  IniFile.tearTailLength = 1.1F;
 		  IniFile.tearTwistStep  = 0.0F;
 		  IniFile.tearTwistRatio = 1.6F;
@@ -1017,6 +1017,7 @@ void formForms::setear() {
   if (nResult > 0) {
 	thred::savdo();
 	constexpr auto twistFactor = 4.0F;
+
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
 	auto&      form             = FormList->back();
@@ -1113,6 +1114,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer);
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPTSTR>(buffer), HBUFSIZ);
 		  IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer);
+
 		  constexpr auto wavePointLimit = 100U; // max number of points in a wave form
 		  if (IniFile.wavePoints > wavePointLimit) {
 			IniFile.wavePoints = wavePointLimit;

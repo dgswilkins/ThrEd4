@@ -44,7 +44,7 @@
 
 namespace xi = xt::internal;
 
-fPOINT   DesignSize;     // design size
+fPOINT   DesignSize;              // design size
 uint32_t ColorOrder[COLOR_COUNT]; // color order adjusted for applique
 
 enum stitchStyles {
@@ -928,8 +928,7 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 	if (StateMap->test(StateFlag::DUSRT)) {
 	  if (direction) {
 		if (pRecs[currentRegion]->start != 0U) {
-		  for (auto iRegion = pRecs[currentRegion]->finish - 1U; iRegion >= pRecs[currentRegion]->start;
-		       --iRegion) {
+		  for (auto iRegion = pRecs[currentRegion]->finish - 1U; iRegion >= pRecs[currentRegion]->start; --iRegion) {
 			stitchBuffer.push_back(StitchBuffer->operator[](iRegion));
 		  }
 		}
@@ -1011,6 +1010,7 @@ void xt::fsort() {
   if (!StitchBuffer->empty()) {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
 	auto stitchRegion = std::vector<OREC> {};
+
 	constexpr auto expectedRegions = 100U;
 	stitchRegion.reserve(expectedRegions);
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
@@ -2341,7 +2341,8 @@ void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
 auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto bufferSize = 16U;
-  auto buffer = std::array<wchar_t, bufferSize>{};
+
+  auto buffer = std::array<wchar_t, bufferSize> {};
   GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
   return wrap::bufToFloat(buffer.data()) * PFGRAN;
 }
@@ -2461,6 +2462,7 @@ void xt::nudsiz() {
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) {
 	  flag = 0;
+
 	  constexpr auto hoopRatio = 1.05F; // make the hoop 5% bigger
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * hoopRatio;

@@ -45,7 +45,7 @@
 namespace fi = form::internal;
 
 constexpr auto buttonHoleWidth = 20.0F;
-constexpr auto picoFactor = 256.0F;
+constexpr auto picoFactor      = 256.0F;
 
 FRMHED*  FormForInsert;  // insert form vertex in this form
 uint32_t FormVertexNext; // form vertex storage for form vertex insert
@@ -429,12 +429,11 @@ void form::form() {
 }
 
 void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
-  auto line = std::array<POINT, 4>{};
-  auto  vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
-  line[1]        = thred::stch2pxr(vertexIt[iVertex]);
-  auto const ratio =
-      gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
-      StitchWindowClientRect.right;
+  auto line     = std::array<POINT, 4> {};
+  auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
+  line[1]       = thred::stch2pxr(vertexIt[iVertex]);
+  auto const ratio = gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
+                     StitchWindowClientRect.right;
   // NOLINTNEXTLINE(readability-magic-numbers)
   auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
   auto const delta  = fPOINT {vertexIt[iVertex - 1U].x - vertexIt[iVertex].x,
@@ -454,9 +453,8 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
 }
 
 void form::selsqr(POINT const& controlPoint, HDC dc) {
-  auto line = std::array<POINT, SQPNTS>{};
-  auto const offset =
-      MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *screenDPI, stdDPI);
+  auto       line   = std::array<POINT, SQPNTS> {};
+  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *screenDPI, stdDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
   line[0].y = line[1].y = controlPoint.y - offset;
   line[1].x = line[2].x = controlPoint.x + offset;
@@ -466,9 +464,8 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
 }
 
 void form::internal::frmsqr0(POINT const& controlPoint) {
-  auto line = std::array<POINT, SQPNTS>{};
-  auto const offset =
-      MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), *screenDPI, stdDPI);
+  auto       line   = std::array<POINT, SQPNTS> {};
+  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), *screenDPI, stdDPI);
   if (offset != 0) {
 	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 	line[0].y = line[1].y = controlPoint.y - offset;
@@ -480,8 +477,8 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
 }
 
 void form::internal::frmx(POINT const& controlPoint, HDC dc) {
-  auto line = std::array<POINT, LNPNTS>{};
-  auto const offset  = MulDiv(8, *screenDPI, stdDPI);
+  auto       line   = std::array<POINT, LNPNTS> {};
+  auto const offset = MulDiv(8, *screenDPI, stdDPI);
   SelectObject(dc, FormSelectedPen);
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;
@@ -508,8 +505,8 @@ void form::ratsr() {
 }
 
 void form::ritfrct(uint32_t iForm, HDC dc) {
-  auto pixelOutline = std::array<POINT, OUTPNTS>{};
-  auto formOutline = std::array<fPOINT, OUTPNTS - 1U>{};
+  auto pixelOutline = std::array<POINT, OUTPNTS> {};
+  auto formOutline  = std::array<fPOINT, OUTPNTS - 1U> {};
   ratsr();
   SelectObject(StitchWindowDC, FormPen);
   SetROP2(StitchWindowDC, R2_XORPEN);
@@ -662,9 +659,9 @@ void form::drwfrm() {
 	if (!FormLines->empty()) {
 	  auto layer = gsl::narrow_cast<uint32_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
-		auto line = std::array<POINT, 2>{};
-		auto  lastPoint = 0U;
-		auto  vertexIt  = std::next(FormVertices->cbegin(), form.vertexIndex);
+		auto line      = std::array<POINT, 2> {};
+		auto lastPoint = 0U;
+		auto vertexIt  = std::next(FormVertices->cbegin(), form.vertexIndex);
 		if (form.type == SAT) {
 		  if ((form.attribute & FRMEND) != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen3px);
@@ -1071,8 +1068,8 @@ auto form::internal::findDistanceToSide(fPOINT const& lineStart,
 	diffX    = A;
 	diffY    = B;
 	distance = sqrt(diffX * diffX + diffY * diffY);
-	// Arbitrarily choose the first point since start and end are the same 
-	return -0.1F; //NOLINT(readability-magic-numbers)
+	// Arbitrarily choose the first point since start and end are the same
+	return -0.1F; // NOLINT(readability-magic-numbers)
   }
 
   auto const dot    = A * C + B * D;
@@ -1128,7 +1125,7 @@ auto form::closfrm() -> bool {
 		  if ((length < minimumLength) && (length >= 0.0)) {
 			minimumLength = length;
 			closestForm   = iForm;
-			if (param < 0.5F) { //NOLINT(readability-magic-numbers)
+			if (param < 0.5F) { // NOLINT(readability-magic-numbers)
 			  closestVertex = iVertex;
 			}
 			else {
@@ -1184,7 +1181,7 @@ auto form::internal::ritlin(fPOINT const& start, fPOINT const& finish, float use
 
   InterleaveSequence->push_back(start);
   if (length > MaxStitchLen) {
-	constexpr auto minStitchLen = 1e-1F; // clamp minimum stitch length 
+	constexpr auto minStitchLen = 1e-1F; // clamp minimum stitch length
 	if (userStitchLen < minStitchLen) {
 	  userStitchLen = minStitchLen;
 	}
@@ -1399,6 +1396,7 @@ auto form::getplen() noexcept -> float {
 
 void form::savplen(float length) {
   auto integerPart = 0.0F;
+
   constexpr auto pClamp = 255.0F;
   if (length > pClamp) {
 	length = pClamp;
@@ -1470,6 +1468,7 @@ void form::internal::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t fini
   auto const delta =
       fPOINT {(vertexIt[finish].x - vertexIt[start].x), (vertexIt[finish].y - vertexIt[start].y)};
   auto const length = hypot(delta.x, delta.y);
+
   constexpr auto edgeStitchClamp = 1e-1;
   if (size < edgeStitchClamp) {
 	size = edgeStitchClamp;
@@ -1905,6 +1904,7 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
 	auto const outerPoint = fPOINT {pivot.x + cos(startAngle) * radius, pivot.y + sin(startAngle) * radius};
 	form::filinsb(outerPoint, stitchPoint);
 	auto level = 0U;
+
 	constexpr auto MaskLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
 	if ((count & MaskLSN) != 0U) {
 	  level = form::psg() % count;
@@ -1996,8 +1996,9 @@ void form::internal::pfn(std::vector<VRCT2> const& underlayVerticalRect,
 
 void form::internal::prsmal(float width) {
   constexpr auto ufsFactor   = 0.8F; // set the minimum to 80% of the underlay fill spacing
-  constexpr auto widthFactor   = 0.9F; // or 90% of the actual width
-  auto           iOutput       = 0U;
+  constexpr auto widthFactor = 0.9F; // or 90% of the actual width
+
+  auto iOutput       = 0U;
   auto minimumLength = USPAC * ufsFactor;
   if (minimumLength > width) {
 	minimumLength = width * widthFactor;
@@ -2329,7 +2330,8 @@ void form::internal::fnhor(std::vector<uint32_t>& groupIndexSequence,
 }
 
 void form::internal::prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
-	constexpr auto reducFactor = 0.1F; // reduction factor
+  constexpr auto reducFactor = 0.1F; // reduction factor
+
   auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
   auto delta    = fPOINT {(vertexIt[1].x - vertexIt[0].x), (vertexIt[1].y - vertexIt[0].y)};
   auto ratio    = 0.0F;
@@ -2585,6 +2587,7 @@ void form::internal::contf(FRMHED& form) {
 	  }
 	}
 	delta = fPOINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
+
 	constexpr auto refFactor = 0.9; // reduction factor for the reference
 	if (reference.length > refFactor * LineSpacing) {
 	  auto const polyLine = PVEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
@@ -2624,6 +2627,7 @@ void form::internal::contf(FRMHED& form) {
 
 void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices) {
   constexpr auto safetyOffset = 0.01F; // factor to ensure that formOffset is not 0
+
   auto leftEdge =
       (std::min_element(currentFormVertices.begin(), currentFormVertices.end(), [](fPOINT const& a, fPOINT const& b) {
 	    return a.x < b.x;
@@ -3759,8 +3763,9 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
   while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 	++pathLength;
 	auto maxPathLength = tempPath.size() - sequencePathIndex;
+
 	constexpr auto depthFactor = 8U; // tuneable value. Increasing this increases path discovery time exponentially
-	if (maxPathLength > depthFactor) { 
+	if (maxPathLength > depthFactor) {
 	  maxPathLength = depthFactor;
 	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
@@ -6507,11 +6512,11 @@ void form::duspir(uint32_t stepCount) {
 }
 
 void form::duhart(uint32_t sideCount) {
-  constexpr auto hartAngle = 0.28F;
+  constexpr auto hartAngle      = 0.28F;
   constexpr auto hartInflection = 0.7F;
-  constexpr auto hartStep = 4.5F;
-  constexpr auto sideMin = 6U;
-  constexpr auto sideMax = 100U;
+  constexpr auto hartStep       = 4.5F;
+  constexpr auto sideMin        = 6U;
+  constexpr auto sideMax        = 100U;
   if (sideCount > sideMax) {
 	sideCount = sideMax;
   }
@@ -6643,7 +6648,7 @@ constexpr auto form::internal::shreg(float highValue, float reference, float egg
 }
 
 void form::dueg(uint32_t sides) {
-	constexpr auto sideMin = 8U;
+  constexpr auto sideMin = 8U;
   if (sides < sideMin) {
 	sides = sideMin;
   }
@@ -7178,6 +7183,7 @@ auto form::rotpar() -> fPOINT {
 
 void form::internal::rotentr(double rotationAngle) {
   constexpr auto RADDEGD = 180.0 / PI; // double factor to convert radians to degrees
+
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_ROTA);
   displayText::shoMsg(fmt::format(fmtStr, (rotationAngle * RADDEGD)));
@@ -7361,7 +7367,7 @@ void form::movlayr(uint32_t layer) {
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto selectedForm : (*SelectedFormList)) {
 	  auto& formAttr = FormList->operator[](selectedForm).attribute;
-	  formAttr = gsl::narrow_cast<uint8_t>((formAttr & NFRMLMSK)) | (layer << FLAYSHFT);
+	  formAttr       = gsl::narrow_cast<uint8_t>((formAttr & NFRMLMSK)) | (layer << FLAYSHFT);
 	  formMap.set(selectedForm);
 	}
 	for (auto& stitch : *StitchBuffer) {

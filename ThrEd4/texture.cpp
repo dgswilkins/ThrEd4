@@ -324,9 +324,9 @@ void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
 }
 
 void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) {
-  auto line = std::array<POINT, 2>{};
-  line[0]       = POINT {reference.x, reference.y - offsetPixels};
-  line[1]       = POINT {reference.x, reference.y + offsetPixels};
+  auto line = std::array<POINT, 2> {};
+  line[0]   = POINT {reference.x, reference.y - offsetPixels};
+  line[1]   = POINT {reference.x, reference.y + offsetPixels};
   wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   line[0] = POINT {reference.x - offsetPixels, reference.y};
   line[1] = POINT {reference.x + offsetPixels, reference.y};
@@ -475,6 +475,7 @@ auto texture::internal::px2txt(POINT const& offset) -> bool {
   auto retval    = false;
   txi::px2ed(offset, editPoint);
   auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
+
   constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
   if (line < limit) {
 	line = 0.0F;
@@ -681,6 +682,7 @@ void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
   auto point = fPOINT {};
   txi::px2ed(offset, point);
   auto val = (point.x - TextureScreen.xOffset) / TextureScreen.spacing;
+
   constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
   if (val < limit) {
 	val = 0.0F;
@@ -1482,8 +1484,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	  }
 	}
 	if (flag) {
-		constexpr auto bufferLength = 8U; // i.e. floating point 7 digits of precision + '.'
-	  if (TextureInputBuffer->size() < bufferLength) { 
+	  constexpr auto bufferLength = 8U; // i.e. floating point 7 digits of precision + '.'
+	  if (TextureInputBuffer->size() < bufferLength) {
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
 		}

@@ -1275,6 +1275,7 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
 	return;
   }
   auto satinBackup = std::vector<fPOINT> {}; // backup stitches in satin fills
+
   constexpr auto satBufferSize = 8U;
   satinBackup.resize(satBufferSize);
   std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {BIGFLOAT, BIGFLOAT});
@@ -1351,6 +1352,7 @@ void satin::satout(FRMHED const& form, float satinWidth) {
 	InsidePointList->resize(form.vertexCount);
 	OutsidePoints = OutsidePointList;
 	InsidePoints  = InsidePointList;
+
 	constexpr auto defaultWidth = 0.1F;
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	  si::outfn(form, iVertex, iVertex + 1, defaultWidth);

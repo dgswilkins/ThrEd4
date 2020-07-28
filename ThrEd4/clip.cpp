@@ -253,7 +253,8 @@ void clip::internal::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finis
 
 auto clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords, fPOINT const& stitchPoint) noexcept -> bool {
   constexpr auto iterationLimit = 10U;
-  constexpr auto deltaLimit = 0.01F;
+  constexpr auto deltaLimit     = 0.01F;
+
   auto const sinAngle = sin(clipAngle);
   auto const cosAngle = cos(clipAngle);
   auto       length   = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
@@ -460,7 +461,8 @@ auto clip::internal::fxpnt(uint32_t                  vertexIndex,
                            uint32_t                  currentSide,
                            fPOINT const&             stitchPoint) -> bool {
   constexpr auto iterationLimit = 10U;
-  constexpr auto deltaLimit = 0.2F;
+  constexpr auto deltaLimit     = 0.2F;
+
   auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
   moveToCoords  = vertexIt[NextStart];
   auto length   = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
@@ -556,7 +558,7 @@ void clip::internal::fxlen(FRMHED const&             form,
   auto       initialCount    = 0U;
   auto       smallestSpacing = 0.0F;
   auto       largestSpacing  = 1.0F;
-  
+
   constexpr auto iterationLimit = 50U; // loop at least 50 times to guarantee convergence
   while (loopCount < iterationLimit && (largestSpacing - smallestSpacing) > TINYFLOAT) {
 	BeanCount        = 0;
@@ -707,7 +709,8 @@ void clip::internal::xclpfn(std::vector<fPOINT> const& tempClipPoints,
 
 void clip::duxclp(FRMHED const& form) {
   auto chainEndPoints = std::vector<fPOINT> {};
-  // reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
+  // reserve some memory and rely on push_back behaviour
+  // and geometric memory re-allocation for efficiency
   // NOLINTNEXTLINE(readability-magic-numbers)
   chainEndPoints.reserve(50U);
   ci::dufxlen(form, chainEndPoints);
@@ -828,6 +831,7 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
   HorizontalLength = ClipRectSize.cx;
   ClipReference.y  = rotationCenter.y;
   ClipReference.x  = clipRect.left;
+
   constexpr auto satWidth = 20.0F;
   satin::satout(form, satWidth);
   if (form.type == FRMLINE) {
@@ -856,6 +860,7 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
 void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
   auto const chainSequence = std::vector<uint32_t> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
   auto       chainPoint = std::vector<fPOINT> {};
+
   constexpr auto chainPointSize = 5U;
   chainPoint.resize(chainPointSize);
   auto delta = fPOINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
@@ -882,9 +887,9 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
 	delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1U].y;
   }
   constexpr auto factor = 4.0F;
-  chainPoint[2].x = chainEndPoints[finish].x + delta.x / factor;
-  chainPoint[2].y = chainEndPoints[finish].y + delta.y / factor;
-  auto chainCount = wrap::toUnsigned(chainSequence.size());
+  chainPoint[2].x       = chainEndPoints[finish].x + delta.x / factor;
+  chainPoint[2].y       = chainEndPoints[finish].y + delta.y / factor;
+  auto chainCount       = wrap::toUnsigned(chainSequence.size());
   if (StateMap->test(StateFlag::LINCHN)) {
 	--chainCount;
   }

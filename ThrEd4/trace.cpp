@@ -35,11 +35,11 @@
 
 namespace ti = trace::internal;
 
-constexpr auto pointMax = 500000U; // maximum number of trace points to consider
-constexpr auto levels = 256U; // number of color levels in a byte wide counter
-constexpr auto channels = 3U; // number of color channels i.e. RGB
+constexpr auto pointMax = 500000U;        // maximum number of trace points to consider
+constexpr auto levels   = 256U;           // number of color levels in a byte wide counter
+constexpr auto channels = 3U;             // number of color channels i.e. RGB
 constexpr auto maxLevel = uint8_t {255U}; // max color value in a byte wide counter
-constexpr auto clRatio = (1.0 / 255.0); // color levels range from 0 to 255. This is used to convert to a range from 0 to 1
+constexpr auto clRatio  = (1.0 / 255.0);  // This is used to convert 0-255 to 0-1
 constexpr auto adjCount = 9U; // including the center pixel there are 9 pixels immediately adjacent
 
 uint32_t  PixelColors[channels];        // separated pixel reference colors
@@ -47,10 +47,10 @@ HWND      TraceControlWindow[channels]; // trace control windows
 HWND      TraceDownWindow[channels];    // trace down number windows
 HWND      TraceSelectWindow[channels];  // trace select windows
 HWND      TraceUpWindow[channels];      // trace up number windows
-POINT     CurrentTracePoint;     // current point being traced
-uint32_t  TraceDataSize;         // size of the trace bitmap in double words
-uint32_t* TracedPixels;          // bitmap of selected trace pixels
-HWND      TraceStepWin;          // trace stepSize window
+POINT     CurrentTracePoint;            // current point being traced
+uint32_t  TraceDataSize;                // size of the trace bitmap in double words
+uint32_t* TracedPixels;                 // bitmap of selected trace pixels
+HWND      TraceStepWin;                 // trace stepSize window
 StateFlag TraceRGBFlag[] = {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 uint32_t  TraceRGBMask[] = {REDMSK, GRNMSK, BLUMSK};                                  // trace masks
 uint32_t  TraceRGB[]     = {BLUCOL, GRNCOL, REDCOL}; // trace colors
@@ -212,10 +212,10 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   auto* testPoint = point;
-  auto index = 0U;
+  auto  index     = 0U;
   if (testPoint != nullptr) {
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 0 - center
-	testPoint -= bitmap::getBitmapWidth(); 
+	testPoint -= bitmap::getBitmapWidth();
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 1 - N
 	testPoint -= 1;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 2 - NW
@@ -230,7 +230,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 	testPoint += 1;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 7 - S
 	testPoint += 1;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index]);   // pixel 8 - SE
+	ti::difsub(*testPoint, shift, TraceAdjacentColors[index]); // pixel 8 - SE
   }
 }
 
@@ -1168,7 +1168,7 @@ void trace::tracpar() {
 }
 
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
-  auto const zeroWidth  = thred::txtWid(L"0");
+  auto const zeroWidth      = thred::txtWid(L"0");
   wchar_t    buffer[SWBLEN] = {0};
   color >>= shift;
   color &= BYTMASK;
@@ -1248,7 +1248,7 @@ void trace::wasTrace() {
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto    TempBrush  = BlackBrush;
+	  auto    TempBrush           = BlackBrush;
 	  wchar_t buffer[SWBLEN - 1U] = {0}; // for integer to string conversion
 	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);

@@ -120,7 +120,7 @@ std::vector<fPOINT>* InterleaveSequence;        // storage for interleave points
 std::vector<HWND>*   LabelWindow;               // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
-HPEN   LayerPen[MaxLayer];                     //
+HPEN   LayerPen[MaxLayer];              //
 float  LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 fPOINT LowerLeftStitch;                 // lower left formOrigin in a form
 HMENU  MainMenu;                        // main menu
@@ -130,15 +130,15 @@ float  MaxStitchLen;                    // maximum stitch length
 MENUITEMINFO* MenuInfo;
 
 float    MinStitchLength = MINSIZ * PFGRAN; // minimum stitch size
-MSG      Msg;                                 // main message loop message
-wchar_t  MsgBuffer[MSGSIZ];                   // for user messages
-uint32_t MsgIndex;                            // pointer to the message buffer
-RECT     MsgRect;                             // rectangle containing the text message
-HWND     MsgWindow = nullptr;                 // message window
-HPEN     MultiFormPen;                        // multiple selected forms pen
-uint32_t NearestCount;                        // number of boxes selected
-uint32_t NewFormVertexCount;                  // points in the new form
-HWND     OKButton;                            // ok button
+MSG      Msg;                               // main message loop message
+wchar_t  MsgBuffer[MSGSIZ];                 // for user messages
+uint32_t MsgIndex;                          // pointer to the message buffer
+RECT     MsgRect;                           // rectangle containing the text message
+HWND     MsgWindow = nullptr;               // message window
+HPEN     MultiFormPen;                      // multiple selected forms pen
+uint32_t NearestCount;                      // number of boxes selected
+uint32_t NewFormVertexCount;                // points in the new form
+HWND     OKButton;                          // ok button
 
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
 
@@ -147,7 +147,7 @@ bool OutLineEverySelectedForm = false; // When selecting multiple forms, should 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points
 
-constexpr auto nameSize = 16U; // PCS spec for filename length
+constexpr auto nameSize = 16U;                    // PCS spec for filename length
 char           PCSBMPFileName[nameSize];          // bitmap file name from pcs file
 PCSHEADER      PCSHeader;                         // pcs file header
 wchar_t const* PcdClipFormat   = L"PMust_Format"; //
@@ -163,9 +163,9 @@ std::vector<POINT>* RubberBandLine; // points to form points to be moved
 
 std::vector<SATCON>* SatinGuides; // satin form connects
 
-RECT      scRct;      //
+RECT     scRct;      //
 int32_t* screenDPI;  // screen DPI
-int32_t*  ScrollSize; // Scroll bar width scaled for DPI
+int32_t* ScrollSize; // Scroll bar width scaled for DPI
 
 std::vector<POINT>* SearchLine; // stitch select line
 
@@ -189,10 +189,10 @@ HWND       SideMessageWindow   = nullptr; // main side message window
 auto SideWindowEntryBuffer = std::array<wchar_t, SWBLEN> {}; // buffer for entering form data sheet numbers
 auto SideWindow = std::array<HWND, SWCOUNT> {};              // side message windows
 
-float      SmallStitchLength = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
-float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
-float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
-float      StarRatio         = STARAT;             // star formOrigin to body ratio
+float SmallStitchLength = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
+float SnapLength        = SNPLEN * PFGRAN;  // snap together length
+float SpiralWrap        = SPIRWRAP;         // number of revolutions in a spiral
+float StarRatio         = STARAT;           // star formOrigin to body ratio
 
 EnumMap<StateFlag>* StateMap; // Flags indicating current run state
 
@@ -227,17 +227,19 @@ HDC                 TraceDC;                        // trace device context
 boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
-POINT              UnzoomedRect;           // size of the unzoomed stitch window
+POINT              UnzoomedRect; // size of the unzoomed stitch window
 auto               UserColor = std::array<COLORREF, COLOR_COUNT> {}; // user colors
-std::vector<HWND>* UserColorWin;           // user color windows
+std::vector<HWND>* UserColorWin;                                     // user color windows
 EnumMap<UserFlag>* UserFlagMap; // for storage of persistent binary variables set by the user
-HPEN               UserPen[COLOR_COUNT];                 // user color pens
+HPEN               UserPen[COLOR_COUNT];               // user color pens
 float              UserStitchLength = USESIZ * PFGRAN; // user selected stitch size
-std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
-float      VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
-HWND       VerticalScrollBar; // vertical scroll bar
-fs::path*  WorkingFileName;   //
-auto      ZoomBoxLine = std::array<POINT, SQPNTS>{};    // the zoom box
+std::vector<HWND>* ValueWindow;                        // data handles for the form data sheet
+
+float     VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
+HWND      VerticalScrollBar; // vertical scroll bar
+fs::path* WorkingFileName;   //
+auto      ZoomBoxLine = std::array<POINT, SQPNTS> {}; // the zoom box
+
 fPOINT     ZoomBoxOrigin;     // zoom box origin
 float      ZoomFactor = 1.0F; // zoom factor
 fPOINT     ZoomMarkPoint;     // stitch coordinates of the zoom mark
