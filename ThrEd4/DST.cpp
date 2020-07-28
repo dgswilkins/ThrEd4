@@ -362,7 +362,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   return iDistance;
 }
 
-auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
+auto DST::internal::dudbits(POINT const& dif) noexcept -> uint32_t {
   static constexpr auto dstLen = 243U; // -121 to 121
   static constexpr auto xDST = std::array<uint32_t, dstLen>{
       0x090a0a, //-121
@@ -855,7 +855,7 @@ auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return xDST[dif.x + DSTMax] | yDST[dif.y + DSTMax];
+  return xDST[wrap::toSize(dif.x) + DSTMax] | yDST[wrap::toSize(dif.y) + DSTMax];
 }
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {

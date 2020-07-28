@@ -104,7 +104,7 @@ namespace internal {
   void dstran(std::vector<DSTREC>& DSTData);
   auto dtrn(DSTREC* dpnt) -> uint32_t;
 
-  auto dudbits(POINT const& dif) -> uint32_t;
+  auto dudbits(POINT const& dif) noexcept -> uint32_t;
 
   void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace internal
