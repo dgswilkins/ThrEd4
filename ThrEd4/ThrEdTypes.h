@@ -180,6 +180,7 @@ constexpr uint8_t  mask7bits = 0x7fU;           // mask value to 7 bits
 constexpr uint8_t  mask3bits = 0x7U;            // mask value to 3 bits
 
 constexpr uint32_t LNPNTS  = 2U;            // number of points required to draw a line
+constexpr uint32_t TRIPNTS = 4U;            // number of points required to draw a triangle or arrow
 constexpr uint32_t SQPNTS  = 5U;            // number of points required to draw a square
 constexpr uint32_t OUTPNTS = 9U;            // number of points required to draw an outline
 constexpr auto     RADDEGF = 180.0F / PI_F; // float factor to convert radians to degrees
@@ -208,6 +209,7 @@ constexpr auto penWide      = 5;
 constexpr auto stdDPI       = int32_t {96};
 constexpr auto ASCIIoffset  = 0x30U; // offset to convert a value to the character equivalent
 constexpr auto MaxLayer     = 5U;    // number of layers
+constexpr auto corners      = 4U;    // number of corners in a square
 
 enum stringLabel {
   STR_PIKOL,

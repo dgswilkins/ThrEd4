@@ -53,42 +53,6 @@ uint32_t FormVertexPrev; // form vertex storage for form vertex insert
 
 std::vector<fPOINT>* WorkingFormVertices; // form points for angle fills
 
-// clang-format off
-uint8_t Level00   = 0U;
-uint8_t Level01   = 1U;
-uint8_t Level02[] = { 0U, 1U };
-uint8_t Level03[] = { 1U, 0U, 2U };
-uint8_t Level04[] = { 1U, 3U, 0U, 2U };
-uint8_t Level05[] = { 2U, 0U, 3U, 1U, 4U };
-uint8_t Level06[] = { 3U, 0U, 2U, 4U, 1U, 5U };
-uint8_t Level07[] = { 3U, 0U, 4U, 1U, 6U, 2U,  5U };
-uint8_t Level08[] = { 4U, 0U, 5U, 1U, 3U, 6U,  2U, 7U };
-uint8_t Level09[] = { 4U, 0U, 5U, 1U, 6U, 2U,  7U, 3U,  8U };
-uint8_t Level10[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U,  4U };
-uint8_t Level11[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U, 10U };
-uint8_t Level12[] = { 6U, 0U, 7U, 1U, 8U, 2U,  9U, 3U, 10U,  4U, 11U };
-uint8_t Level13[] = { 6U, 0U, 1U, 7U, 2U, 8U,  3U, 9U,  4U, 10U,  5U, 11U,  6U, 12U };
-uint8_t Level14[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
-uint8_t Level15[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
-// clang-format on
-
-uint8_t* Levels[] = {&Level00,
-                     &Level01,
-                     &Level02[0],
-                     &Level03[0],
-                     &Level04[0],
-                     &Level05[0],
-                     &Level06[0],
-                     &Level07[0],
-                     &Level08[0],
-                     &Level09[0],
-                     &Level10[0],
-                     &Level11[0],
-                     &Level12[0],
-                     &Level13[0],
-                     &Level14[0],
-                     &Level15[0]};
-
 void form::frmclr(FRMHED& destination) noexcept {
   auto head   = FRMHED {};
   destination = head;
@@ -429,7 +393,7 @@ void form::form() {
 }
 
 void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
-  auto line     = std::array<POINT, 4> {};
+  auto line     = std::array<POINT, TRIPNTS> {};
   auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
   line[1]       = thred::stch2pxr(vertexIt[iVertex]);
   auto const ratio = gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
@@ -1859,6 +1823,42 @@ auto form::psg() noexcept -> uint32_t {
 }
 
 void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
+  // clang-format off
+  static constexpr uint8_t level00   = 0U;
+  static constexpr uint8_t level01   = 1U;
+  static constexpr uint8_t level02[] = { 0U, 1U };
+  static constexpr uint8_t level03[] = { 1U, 0U, 2U };
+  static constexpr uint8_t level04[] = { 1U, 3U, 0U, 2U };
+  static constexpr uint8_t level05[] = { 2U, 0U, 3U, 1U, 4U };
+  static constexpr uint8_t level06[] = { 3U, 0U, 2U, 4U, 1U, 5U };
+  static constexpr uint8_t level07[] = { 3U, 0U, 4U, 1U, 6U, 2U,  5U };
+  static constexpr uint8_t level08[] = { 4U, 0U, 5U, 1U, 3U, 6U,  2U, 7U };
+  static constexpr uint8_t level09[] = { 4U, 0U, 5U, 1U, 6U, 2U,  7U, 3U,  8U };
+  static constexpr uint8_t level10[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U,  4U };
+  static constexpr uint8_t level11[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U, 10U };
+  static constexpr uint8_t level12[] = { 6U, 0U, 7U, 1U, 8U, 2U,  9U, 3U, 10U,  4U, 11U };
+  static constexpr uint8_t level13[] = { 6U, 0U, 1U, 7U, 2U, 8U,  3U, 9U,  4U, 10U,  5U, 11U,  6U, 12U };
+  static constexpr uint8_t level14[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
+  static constexpr uint8_t level15[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
+  // clang-format on
+
+  static constexpr uint8_t const* levels[] = {&level00,
+                                              &level01,
+                                              &level02[0],
+                                              &level03[0],
+                                              &level04[0],
+                                              &level05[0],
+                                              &level06[0],
+                                              &level07[0],
+                                              &level08[0],
+                                              &level09[0],
+                                              &level10[0],
+                                              &level11[0],
+                                              &level12[0],
+                                              &level13[0],
+                                              &level14[0],
+                                              &level15[0]};
+
   auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -1910,7 +1910,7 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
 	  level = form::psg() % count;
 	}
 	else {
-	  level = Levels[count][ind];
+	  level = levels[count][ind];
 	}
 	auto const innerRadius = radius * level / count * 0.4;
 	auto const innerPoint =
@@ -3522,13 +3522,13 @@ auto form::internal::isclos(SMALPNTL const* const lineEndPoint0,
                             SMALPNTL const* const lineEndPoint1,
                             double                gapToClosestRegion) noexcept -> bool {
   if ((lineEndPoint0 != nullptr) && (lineEndPoint1 != nullptr)) {
-	auto const low0  = lineEndPoint0[0].y - gapToClosestRegion;
 	auto const high0 = lineEndPoint0[1].y + gapToClosestRegion;
 	auto const low1  = lineEndPoint1[0].y - gapToClosestRegion;
-	auto const high1 = lineEndPoint1[1].y + gapToClosestRegion;
 	if (high0 < low1) {
 	  return false;
 	}
+	auto const high1 = lineEndPoint1[1].y + gapToClosestRegion;
+	auto const low0  = lineEndPoint0[0].y - gapToClosestRegion;
 	if (high1 < low0) {
 	  return false;
 	}
@@ -3585,9 +3585,7 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
   auto const* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
   auto const* lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
   auto const  group0Start        = lineEndPoint0Start->group;
-  auto        group0End          = 0U;
   auto const  group1Start        = lineEndPoint1Start->group;
-  auto        group1End          = 0U;
   auto        groupStart         = 0U;
   auto        lineStart          = 0U;
   auto        prevLine           = 0U;
@@ -3608,11 +3606,12 @@ auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
   }
   auto const* lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
   auto const* lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
-  group1End                    = lineEndPoint1End->group;
-  group0End                    = lineEndPoint0End->group;
-  auto groupEnd                = 0U;
-  auto lineEnd                 = 0U;
-  auto lastLine                = 0U;
+
+  auto const group1End = lineEndPoint1End->group;
+  auto const group0End = lineEndPoint0End->group;
+  auto       groupEnd  = 0U;
+  auto       lineEnd   = 0U;
+  auto       lastLine  = 0U;
   if (group0End < group1End) {
 	groupEnd = group0End;
 	lineEnd  = lineEndPoint0End->line;
@@ -3724,19 +3723,18 @@ auto form::internal::notdun(std::vector<RGSEQ>&            tempPath,
   return false;
 }
 
-auto form::internal::reglen(std::vector<SMALPNTL*> const& sortedLines,
-                            uint32_t                      iRegion,
-                            std::vector<fPOINT> const&    lastRegionCorners,
-                            std::vector<REGION> const&    regionsList) -> double {
-  auto lineEndPoints = std::vector<SMALPNTL*> {};
-  lineEndPoints.resize(4);
+auto form::internal::reglen(std::vector<SMALPNTL*> const&      sortedLines,
+                            uint32_t                           iRegion,
+                            std::array<fPOINT, corners> const& lastRegionCorners,
+                            std::vector<REGION> const&         regionsList) noexcept -> double {
+  auto lineEndPoints = std::array<SMALPNTL*, corners> {};
   lineEndPoints[0]   = sortedLines[regionsList[iRegion].start];
   lineEndPoints[1]   = &sortedLines[regionsList[iRegion].start][1];
   lineEndPoints[2]   = sortedLines[regionsList[iRegion].end];
   lineEndPoints[3]   = &sortedLines[regionsList[iRegion].end][1];
   auto minimumLength = BIGDOUBLE;
-  for (auto iCorner = 0U; iCorner < 4; ++iCorner) {
-	for (auto iPoint = 0U; iPoint < 4; ++iPoint) {
+  for (auto iCorner = 0U; iCorner < corners; ++iCorner) {
+	for (auto iPoint = 0U; iPoint < corners; ++iPoint) {
 	  auto const length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x,
 	                            lastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
 	  if (length < minimumLength) {
@@ -3757,9 +3755,8 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
                             uint32_t                      pathMapIndex,
                             uint32_t&                     sequencePathIndex,
                             uint32_t                      visitedIndex) {
-  auto lastRegionCorners = std::vector<fPOINT> {};
-  lastRegionCorners.resize(4); // corners of last region sequenced
-  auto pathLength = 1U;        // length of the path to the region
+  auto lastRegionCorners = std::array<fPOINT, corners> {};
+  auto pathLength        = 1U; // length of the path to the region
   while (notdun(tempPath, pathMap, mapIndexSequence, visitedRegions, pathLength, doneRegion, sequencePathIndex)) {
 	++pathLength;
 	auto maxPathLength = tempPath.size() - sequencePathIndex;
@@ -4166,7 +4163,7 @@ void form::internal::durgn(FRMHED const&                 form,
 		--seql;
 	  }
 	  else {
-		auto mindif = MAXDWORD;
+		auto mindif = std::numeric_limits<uint32_t>::max();
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  auto const gdif = ((sortedLines[ind]->group > lastGroup) ? (sortedLines[ind]->group - lastGroup)
 		                                                           : (lastGroup - sortedLines[ind]->group));
@@ -4187,7 +4184,7 @@ void form::internal::durgn(FRMHED const&                 form,
 		--seqn;
 	  }
 	  else {
-		auto mindif = MAXDWORD;
+		auto mindif = std::numeric_limits<uint32_t>::max();
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  auto const gdif = ((sortedLines[ind]->group > nextGroup) ? (sortedLines[ind]->group - nextGroup)
 		                                                           : (nextGroup - sortedLines[ind]->group));
@@ -4276,8 +4273,8 @@ void form::internal::lcon(FRMHED const&          form,
   if (!lineEndpoints.empty()) {
 	auto       sortedLines     = std::vector<SMALPNTL*> {};
 	auto const stitchLineCount = lineEndpoints.size();
-	sortedLines.reserve(stitchLineCount / 2);
-	for (auto iLine = 0U; iLine < stitchLineCount; iLine += 2) {
+	sortedLines.reserve(stitchLineCount / 2U);
+	for (auto iLine = 0U; iLine < stitchLineCount; iLine += 2U) {
 	  sortedLines.push_back(&lineEndpoints[iLine]);
 	}
 	std::sort(sortedLines.begin(), sortedLines.end(), fi::spComp);
@@ -4371,7 +4368,7 @@ void form::internal::lcon(FRMHED const&          form,
 	  }
 	  mapIndexSequence.push_back(pathMapIndex);
 	  // find the leftmost region
-	  auto startGroup = MAXDWORD;
+	  auto startGroup = std::numeric_limits<uint32_t>::max();
 	  auto leftRegion = 0U;
 	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 		auto const* lineGroupPoint = sortedLines[regions[iRegion].start];
@@ -4406,12 +4403,12 @@ void form::internal::lcon(FRMHED const&          form,
 	  while (unvis(visitedRegions, visitedIndex)) {
 		nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, regions, doneRegion, pathMapIndex, sequencePathIndex, visitedIndex);
 	  }
-	  auto count = MAXDWORD;
+	  auto count = std::numeric_limits<uint32_t>::max();
 	  sequencePath.reserve(sequencePathIndex);
 	  for (auto iPath = 0U; iPath < sequencePathIndex; ++iPath) {
 		bool const tmpSkip = tempPath[iPath].skp;
 		uint16_t   tmpNode = 0U;
-		if (tempPath[iPath].pcon == MAXDWORD) {
+		if (tempPath[iPath].pcon == std::numeric_limits<uint32_t>::max()) {
 		  tmpNode = gsl::narrow<decltype(tmpNode)>(tempPath[iPath].count);
 		  count   = tempPath[iPath].count;
 		}
@@ -4455,7 +4452,7 @@ void form::internal::bakseq() {
 #else
   constexpr auto RITSIZ = 6;
 
-  uint32_t const seqtab[] = {
+  static constexpr auto seqtab = std::array<uint32_t, RITSIZ> {
       12,
       7,
       15,
@@ -4484,7 +4481,7 @@ void form::internal::bakseq() {
   }
   while (iSequence > 0) {
 	// clang-format off
-	auto const rcnt           = iSequence % RITSIZ;
+	auto const rcnt           = iSequence % seqtab.size();
 	auto const StitchSpacing2 = LineSpacing * 2;
 	auto const rit            = wrap::round<int32_t>(BSequence->operator[](iSequence).x / StitchSpacing2);
 	auto&      bPrevious      = BSequence->operator[](iSequence - 1U);
@@ -8025,10 +8022,8 @@ void form::internal::srtf(std::vector<fPOINTATTR> const& tempStitchBuffer, uint3
 }
 
 void form::srtbyfrm() {
-  auto colorHistogram = std::vector<uint32_t> {};
-  colorHistogram.resize(COLOR_COUNT);
-  auto color = std::vector<uint32_t> {};
-  color.resize(COLOR_COUNT);
+  auto colorHistogram = std::array<uint32_t, COLOR_COUNT> {};
+  auto color = std::array<uint32_t,COLOR_COUNT> {};
   if (!FormList->empty()) {
 	thred::savdo();
 	color[AppliqueColor] = 0U;
@@ -8183,7 +8178,9 @@ void form::centir() {
 }
 
 void form::internal::bean(uint32_t start, uint32_t finish) {
+  auto const stitchRange      = (finish - start) * 3U; // each bean is 3 stitches
   auto highStitchBuffer = std::vector<fPOINTATTR> {};
+  highStitchBuffer.reserve(stitchRange);
   auto iSourceStitch    = start;
   BeanCount             = 0U;
   for (auto loop = 0; loop < 2; ++loop) {
@@ -8254,8 +8251,10 @@ void form::dubean() {
 }
 
 void form::internal::unbean(uint32_t start, uint32_t& finish) {
-  auto highStitchBuffer = std::vector<fPOINTATTR> {};
-  auto lastStitch       = finish;
+  auto const stitchRange      = ((finish - start) / 3U) + 1U; // each bean is 3 stitches
+  auto       highStitchBuffer = std::vector<fPOINTATTR> {};
+  highStitchBuffer.reserve(stitchRange);
+  auto lastStitch = finish;
   if (lastStitch > wrap::toUnsigned(StitchBuffer->size()) - 3U) {
 	lastStitch = wrap::toUnsigned(StitchBuffer->size()) - 3U;
   }
@@ -8294,10 +8293,10 @@ void form::debean() {
 	  GroupStitchIndex = GroupEndStitch;
 	}
 	auto const iEndStitch = wrap::toUnsigned(StitchBuffer->size()) - 1U;
-	if (ClosestPointIndex > gsl::narrow<uint32_t>(iEndStitch) - 1) {
+	if (ClosestPointIndex > iEndStitch - 1U) {
 	  ClosestPointIndex = iEndStitch;
 	}
-	if (GroupStitchIndex > gsl::narrow<uint32_t>(iEndStitch) - 1) {
+	if (GroupStitchIndex > iEndStitch - 1U) {
 	  GroupStitchIndex = iEndStitch;
 	}
 	thred::grpAdj();

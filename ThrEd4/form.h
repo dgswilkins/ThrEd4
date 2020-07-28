@@ -411,10 +411,10 @@ namespace internal {
                std::vector<REGION> const&    regionsList,
                double                        gapToClosestRegion,
                uint32_t&                     nextGroup) noexcept -> bool;
-  auto reglen(std::vector<SMALPNTL*> const& sortedLines,
-              uint32_t                      iRegion,
-              std::vector<fPOINT> const&    lastRegionCorners,
-              std::vector<REGION> const&    regionsList) -> double;
+  auto reglen(std::vector<SMALPNTL*> const&      sortedLines,
+              uint32_t                           iRegion,
+              std::array<fPOINT, corners> const& lastRegionCorners,
+              std::vector<REGION> const&         regionsList) noexcept -> double;
   void ritapbrd();
   void ritbrd(FRMHED const& form);
   void ritfil();
