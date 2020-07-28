@@ -81,7 +81,7 @@ HDC      ThredDC;                 // main device context handle
 HBITMAP  StitchWindowBmp;         // bitmap for the memory stitch device context
 SIZE     ScreenSizePixels;        // screen size in pixels
 RECT     StitchWindowAbsRect;     // stitch window size,absolute
-POINT    NearestPixel[NERCNT];    // selected points
+auto    NearestPixel = std::array<POINT, NERCNT>{};    // selected points
 uint32_t PrevGroupStartStitch;    // lower end of previous selection
 uint32_t PrevGroupEndStitch;      // higher end of previous selection
 float    StitchWindowAspectRatio; // aspect ratio of the stitch window
@@ -96,7 +96,7 @@ uint32_t RunPoint;              // point for animating stitchout
 uint32_t StitchesPerFrame;      // number of stitches to draw in each frame
 int32_t  MovieTimeStep;         // time delay for stitchout
 
-uint32_t LRUMenuId[] = {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
+auto LRUMenuId = std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
 
 uint32_t UndoBufferWriteIndex = 0;      // undo storage pointer
 uint32_t UndoBufferReadIndex  = 0;      // undo retrieval pointers
@@ -16662,7 +16662,7 @@ void thred::internal::init() {
 
 auto thred::internal::defTxt(uint32_t iColor) -> COLORREF {
   // bitmap for color number. Black or white bit chosen for contrast against the default background colors
-  auto const textColorMap = std::bitset<16>(0xbaf);
+  constexpr auto textColorMap = std::bitset<16>(0xbaf);
   return textColorMap.test(iColor) ? penWhite : penBlack;
 }
 
