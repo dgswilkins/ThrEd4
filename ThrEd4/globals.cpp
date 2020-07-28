@@ -129,7 +129,7 @@ float  MaxStitchLen;                    // maximum stitch length
 
 MENUITEMINFO* MenuInfo;
 
-float    MinStitchLength = MINSIZ * PFAFGRAN; // minimum stitch size
+float    MinStitchLength = MINSIZ * PFGRAN; // minimum stitch size
 MSG      Msg;                                 // main message loop message
 wchar_t  MsgBuffer[MSGSIZ];                   // for user messages
 uint32_t MsgIndex;                            // pointer to the message buffer
@@ -147,7 +147,8 @@ bool OutLineEverySelectedForm = false; // When selecting multiple forms, should 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points
 
-char           PCSBMPFileName[16];                // bitmap file name from pcs file
+constexpr auto nameSize = 16U; // PCS spec for filename length
+char           PCSBMPFileName[nameSize];          // bitmap file name from pcs file
 PCSHEADER      PCSHeader;                         // pcs file header
 wchar_t const* PcdClipFormat   = L"PMust_Format"; //
 float          PicotSpacing    = IPICSPAC;        // space between border picots
@@ -184,10 +185,11 @@ std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin sele
 fRECTANGLE SelectedVerticesRect {};       // rectangle enclosing selected form verticess
 double     ShowStitchThreshold = SHOPNTS; // show stitch grid below this zoom level
 HWND       SideMessageWindow   = nullptr; // main side message window
-auto       SideWindowEntryBuffer =
-    std::array<wchar_t, SWBLEN> {}; // side window number for entering form data sheet numbers
-HWND       SideWindow[16];          // side message windows
-float      SmallStitchLength = SMALSIZ * PFAFGRAN; // user can remove stitches smaller than this
+
+auto SideWindowEntryBuffer = std::array<wchar_t, SWBLEN> {}; // buffer for entering form data sheet numbers
+auto SideWindow = std::array<HWND, SWCOUNT> {};              // side message windows
+
+float      SmallStitchLength = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 float      SnapLength        = SNPLEN * PFGRAN;    // snap together length
 float      SpiralWrap        = SPIRWRAP;           // number of revolutions in a spiral
 float      StarRatio         = STARAT;             // star formOrigin to body ratio
@@ -230,7 +232,7 @@ auto               UserColor = std::array<COLORREF, COLOR_COUNT> {}; // user col
 std::vector<HWND>* UserColorWin;           // user color windows
 EnumMap<UserFlag>* UserFlagMap; // for storage of persistent binary variables set by the user
 HPEN               UserPen[COLOR_COUNT];                 // user color pens
-float              UserStitchLength = USESIZ * PFAFGRAN; // user selected stitch size
+float              UserStitchLength = USESIZ * PFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                          // data handles for the form data sheet
 float      VerticalRatio;     // vertical ratio between the zoom window and the entire stitch space
 HWND       VerticalScrollBar; // vertical scroll bar

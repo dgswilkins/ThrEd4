@@ -12928,7 +12928,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		InsertLine[0]          = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		InsertLine[1]          = InsertLine[0];
 		auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-		StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, USMSK | ActiveColor | ActiveLayer << LAYSHFT | NOTFRM});
+		StitchBuffer->push_back({stitchPoint.x, stitchPoint.y, USMSK | ActiveColor | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM});
 		thred::addColor(0, ActiveColor);
 		StateMap->set(StateFlag::LIN1);
 		StateMap->set(StateFlag::INSRT);

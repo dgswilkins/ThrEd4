@@ -728,7 +728,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
 		  wchar_t compareBuffer[HBUFSIZ] = {0};
-		  for (uint8_t iType = 0U; iType < DaisyTypeStrings.size(); ++iType) {
+		  for (auto iType = uint8_t {0U}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
 			LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPTSTR>(compareBuffer), HBUFSIZ);
 			if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
 			  IniFile.daisyBorderType = iType;

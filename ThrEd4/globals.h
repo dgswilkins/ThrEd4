@@ -224,8 +224,8 @@ extern double     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 
 extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
+extern std::array<HWND, SWCOUNT> SideWindow;
 
-extern HWND  SideWindow[16];
 extern float SmallStitchLength;
 extern float SnapLength;
 extern float SpiralWrap;
