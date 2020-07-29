@@ -212,8 +212,8 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   auto* testPoint = point;
-  auto  index     = 0U;
   if (testPoint != nullptr) {
+	auto index = 0U;
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 0 - center
 	testPoint -= bitmap::getBitmapWidth();
 	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 1 - N
@@ -793,7 +793,7 @@ void trace::internal::dutrac() {
 	FormList->push_back(FRMHED {});
 	auto& form = FormList->back();
 	form::frmclr(form);
-	form.vertexIndex = gsl::narrow<decltype(form.vertexIndex)>(FormVertices->size());
+	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	FormVertices->push_back(fPOINT {gsl::narrow_cast<float>(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                gsl::narrow_cast<float>(tracedPoints[0].y) * StitchBmpRatio.y});
 	auto iNext           = 0;
@@ -819,7 +819,7 @@ void trace::internal::dutrac() {
 		traceLengthSum = 0.0;
 	  }
 	}
-	form.vertexCount = gsl::narrow<decltype(form.vertexCount)>(FormVertices->size() - form.vertexIndex);
+	form.vertexCount = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
 	form.type        = FRMFPOLY;
 	form.attribute = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));

@@ -355,7 +355,7 @@ void form::internal::rats() {
 void form::setfrm() {
   if (!FormList->empty()) {
 	fi::rats();
-	ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+	ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
 	auto&      form      = FormList->back();
 	auto const point     = fi::px2stchf(FormLines->front());
 	auto       vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
@@ -707,7 +707,7 @@ void form::drwfrm() {
 	SelectedFormsSize.x =
 	    gsl::narrow<decltype(SelectedFormsSize.x)>(SelectedFormsRect.right - SelectedFormsRect.left);
 	SelectedFormsSize.y =
-	    gsl::narrow<decltype(SelectedFormsSize.x)>(SelectedFormsRect.bottom - SelectedFormsRect.top);
+	    gsl::narrow<decltype(SelectedFormsSize.y)>(SelectedFormsRect.bottom - SelectedFormsRect.top);
 	dubig();
   }
   else {
@@ -833,7 +833,7 @@ void form::durpoli(uint32_t vertexCount) {
   newForm.attribute   = gsl::narrow<decltype(newForm.attribute)>(ActiveLayer << 1U);
   newForm.type        = FRMFPOLY;
   FormList->push_back(newForm);
-  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   auto point          = thred::pxCor2stch(Msg.pt);
   auto angle          = 0.0F;
   auto vertexIt       = std::next(FormVertices->begin(), newForm.vertexIndex);
@@ -6425,7 +6425,7 @@ void form::dustar(uint32_t starCount, float length) {
   newForm.attribute      = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   newForm.type           = FRMFPOLY;
   FormList->push_back(newForm);
-  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   auto point          = thred::pxCor2stch(Msg.pt);
   StateMap->set(StateFlag::FILDIR);
   auto vertexIt = std::next(FormVertices->begin(), newForm.vertexIndex);
@@ -6469,7 +6469,7 @@ void form::duspir(uint32_t stepCount) {
   newForm.vertexCount = vertexCount;
   newForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   FormList->push_back(newForm);
-  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   auto firstSpiral    = std::vector<fPOINT> {};
   firstSpiral.resize(stepCount);
   auto centeredSpiral = std::vector<fPOINT> {};
@@ -6522,7 +6522,7 @@ void form::duhart(uint32_t sideCount) {
   }
   FormList->push_back(FRMHED {});
   auto& currentForm       = FormList->back();
-  currentForm.vertexIndex = gsl::narrow<decltype(currentForm.vertexIndex)>(FormVertices->size());
+  currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   currentForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
   auto       savedVertexIndex = gsl::narrow<uint32_t>(FormVertices->size());
@@ -6572,7 +6572,7 @@ void form::duhart(uint32_t sideCount) {
   NewFormVertexCount      = iDestination + 1U;
   currentForm.vertexCount = iDestination;
   currentForm.type        = FRMFPOLY;
-  ClosestFormToCursor     = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
   form::frmout(ClosestFormToCursor);
   FormMoveDelta = fPOINT {};
   StateMap->set(StateFlag::POLIMOV);
@@ -6604,8 +6604,8 @@ void form::dulens(uint32_t sides) {
   auto const stepLength = 2.0F * radius * std::cos(phi);
   FormList->push_back(FRMHED {});
   auto& currentForm       = FormList->back();
-  ClosestFormToCursor     = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
-  currentForm.vertexIndex = gsl::narrow<decltype(currentForm.vertexIndex)>(FormVertices->size());
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   currentForm.attribute   = ActiveLayer << 1U;
   auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
   auto       point        = stitchPoint;
@@ -6629,7 +6629,7 @@ void form::dulens(uint32_t sides) {
 	--vertexIt;
   }
   currentForm.vertexCount =
-      gsl::narrow<decltype(currentForm.vertexCount)>(FormVertices->size() - currentForm.vertexIndex);
+      wrap::toUnsigned(FormVertices->size() - currentForm.vertexIndex);
   NewFormVertexCount = currentForm.vertexCount + 1U;
   currentForm.type   = FRMFPOLY;
   form::frmout(ClosestFormToCursor);
@@ -6680,7 +6680,7 @@ void form::duzig(uint32_t vertices) {
   newForm.vertexCount = vertices;
   newForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
   FormList->push_back(newForm);
-  ClosestFormToCursor    = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor    = wrap::toUnsigned(FormList->size() - 1U);
   auto       stitchPoint = thred::pxCor2stch(Msg.pt);
   auto const offset      = fPOINT {UnzoomedRect.x / 6.0, UnzoomedRect.y / (6.0 * vertices)};
   auto vertexIt = std::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
@@ -7237,7 +7237,7 @@ void form::internal::adfrm(uint32_t iForm) {
   FormList->push_back(FormList->operator[](iForm));
   auto& currentForm       = FormList->back();
   auto& srcForm           = FormList->operator[](iForm);
-  ClosestFormToCursor     = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   auto vertexIt           = std::next(FormVertices->cbegin(), srcForm.vertexIndex);
   FormVertices->insert(FormVertices->end(), vertexIt, std::next(vertexIt, srcForm.vertexCount));
@@ -7443,7 +7443,7 @@ void form::join() {
 	form::fltspac(toForm.vertexCount, wrap::toUnsigned(vertexList.size()));
 	auto dest = std::next(FormVertices->begin(), insertionPoint);
 	std::copy(vertexList.cbegin(), vertexList.cend(), dest);
-	toForm.vertexCount += gsl::narrow<decltype(toForm.vertexCount)>(vertexList.size());
+	toForm.vertexCount += wrap::toUnsigned(vertexList.size());
 	form::frmout(ClosestFormToCursor);
 	form::refil();
 	thred::coltab();
@@ -7523,7 +7523,7 @@ void form::internal::frmpnts(uint32_t type) {
 	  }
 	}
 	if (!bFlag) {
-	  GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	}
   }
   else {
@@ -7579,7 +7579,7 @@ void form::selalfil() {
 	  if (ClosestPointIndex != 0U) {
 		--ClosestPointIndex;
 	  }
-	  GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	  while (GroupStitchIndex > ClosestPointIndex &&
 	         form::notfstch(StitchBuffer->operator[](GroupStitchIndex).attribute)) {
 		--GroupStitchIndex;
@@ -7914,21 +7914,19 @@ void form::internal::dufdat(std::vector<fPOINT>& tempClipPoints,
 	auto guideStart = std::next(SatinGuides->cbegin(), dest.satinOrAngle.guide);
 	auto guideEnd   = guideStart + dest.satinGuideCount;
 	tempGuides.insert(tempGuides.end(), guideStart, guideEnd);
-	dest.satinOrAngle.guide =
-	    gsl::narrow<decltype(dest.satinOrAngle.guide)>(tempGuides.size() - dest.satinGuideCount);
+	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
   }
   if (clip::iseclpx(formIndex)) {
 	auto const sourceStart = std::next(ClipPoints->cbegin(), dest.borderClipData);
 	auto       sourceEnd   = std::next(sourceStart, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
-	dest.borderClipData = gsl::narrow<decltype(dest.borderClipData)>(tempClipPoints.size() - dest.clipEntries);
+	dest.borderClipData = wrap::toUnsigned(tempClipPoints.size() - dest.clipEntries);
   }
   if (clip::isclpx(formIndex)) {
 	auto sourceStart = std::next(ClipPoints->cbegin(), dest.angleOrClipData.clip);
 	auto sourceEnd   = std::next(sourceStart, dest.lengthOrCount.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), sourceStart, sourceEnd);
-	dest.angleOrClipData.clip =
-	    gsl::narrow<decltype(dest.angleOrClipData.clip)>(tempClipPoints.size() - dest.lengthOrCount.clipCount);
+	dest.angleOrClipData.clip = wrap::toUnsigned(tempClipPoints.size() - dest.lengthOrCount.clipCount);
   }
 }
 
@@ -8432,7 +8430,7 @@ void form::vrtsclp() {
   auto& form = FormList->operator[](ClosestFormToCursor);
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  form.lengthOrCount.clipCount = gsl::narrow<decltype(form.lengthOrCount.clipCount)>(ClipBuffer->size());
+  form.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
   form.angleOrClipData.clip = clip::numclp();
   form.wordParam            = IniFile.fillPhase;
   fi::makpoli();
@@ -8560,7 +8558,7 @@ void form::angsclp(FRMHED& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.angleOrClipData.clip = clip::numclp();
-  form.lengthOrCount.clipCount = gsl::narrow<decltype(form.lengthOrCount.clipCount)>(ClipBuffer->size());
+  form.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
   form.wordParam               = IniFile.fillPhase;
   fi::makpoli();
   form.satinOrAngle.angle = IniFile.fillAngle;

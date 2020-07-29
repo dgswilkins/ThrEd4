@@ -627,7 +627,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pesHeader.hnd2[3] = 0x00;
 		pesHeader.hpsz    = 0;
 		GroupStartStitch  = 0;
-		GroupEndStitch    = gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size() - 1U);
+		GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		auto bytesWritten = DWORD {0};
 		if (FALSE == WriteFile(fileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr)) {
 		  displayText::riter();

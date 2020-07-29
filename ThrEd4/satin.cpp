@@ -384,7 +384,7 @@ void satin::satadj(FRMHED& form) {
 		interiorGuides.push_back(guideIt[iSource]);
 	  }
 	}
-	iDestination = gsl::narrow<decltype(iDestination)>(interiorGuides.size());
+	iDestination = wrap::toUnsigned(interiorGuides.size());
 	if (currentGuidesCount > iDestination) {
 	  outDebugString(L"Removed {} end guides\n", (currentGuidesCount - iDestination));
 	  si::satcpy(form, interiorGuides, iDestination);
@@ -399,7 +399,7 @@ void satin::satadj(FRMHED& form) {
 		  interiorGuides.push_back(guideIt[iSource]);
 		}
 	  }
-	  iDestination = gsl::narrow<decltype(iDestination)>(interiorGuides.size());
+	  iDestination = wrap::toUnsigned(interiorGuides.size());
 	  if (currentGuidesCount > iDestination) {
 		outDebugString(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination));
 		si::satcpy(form, interiorGuides, iDestination);
@@ -792,13 +792,13 @@ void satin::ribon() {
 		  guideIt[iGuide].start  = iGuide + 2U;
 		  guideIt[iGuide].finish = newForm.vertexCount - iGuide - 1U;
 		}
-		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		form::frmout(ClosestFormToCursor);
 		form::refilfn();
 		ClosestFormToCursor = savedFormIndex;
 		StateMap->set(StateFlag::DELTO);
 		thred::frmdel();
-		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		thred::coltab();
 		StateMap->set(StateFlag::FORMSEL);
 		StateMap->set(StateFlag::INIT);

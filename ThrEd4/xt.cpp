@@ -821,7 +821,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 
 void xt::internal::durec(OREC& record) {
   auto const stitchIt = std::next(StitchBuffer->begin(), record.start);
-  record.type         = gsl::narrow<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
+  record.type         = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
   record.color         = attribute & COLOR_BITS;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -1034,7 +1034,7 @@ void xt::fsort() {
 		attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 	  }
 	}
-	stitchRegion.back().finish = gsl::narrow<decltype(stitchRegion.back().finish)>(StitchBuffer->size());
+	stitchRegion.back().finish = wrap::toUnsigned(StitchBuffer->size());
 	stitchRegion.back().endStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	auto const lastRegion         = wrap::toUnsigned(stitchRegion.size());
 	auto       pRecs              = std::vector<OREC*> {};
@@ -1155,7 +1155,7 @@ void xt::internal::duatf(uint32_t ind) {
   auto const attribute       = StitchBuffer->operator[](ind).attribute;
   auto       attributeFields = ATFLD {(attribute & COLMSK),
 									  ((attribute & FRMSK) >> FRMSHFT),
-									  gsl::narrow<uint32_t>(StitchTypes[dutyp(attribute)]),
+									  gsl::narrow_cast<uint32_t>(StitchTypes[dutyp(attribute)]),
 									  ((attribute >> LAYSHFT) & mask3bits),
 									  0};
   // clang-format on
@@ -1196,9 +1196,9 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
   // ToDo - Still not sure what this function does?
   //        I suspect the fillStartsData members are not correctly named
   auto const codedFormIndex = (ClosestFormToCursor << FRMSHFT);
-  auto       bordercolor    = gsl::narrow<uint32_t>(form.borderColor & COLMSK);
+  auto       bordercolor    = gsl::narrow_cast<uint32_t>(form.borderColor & COLMSK);
 
-  auto appliqueColor = gsl::narrow<uint32_t>(form.borderColor >> FRMSHFT);
+  auto appliqueColor = gsl::narrow_cast<uint32_t>(form.borderColor >> FRMSHFT);
   for (auto iSourceStitch = 0U; iSourceStitch < wrap::toUnsigned(StitchBuffer->size()); ++iSourceStitch) {
 	if (!UserFlagMap->test(UserFlag::FIL2OF) && StateMap->test(StateFlag::SELBOX) &&
 	    iSourceStitch == ClosestPointIndex) {
@@ -1277,16 +1277,13 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
   fillStartsMap = tmap;
   StitchBuffer->resize(iDestinationStitch);
   if ((tmap & M_ECOL) == 0U) {
-	fillStartsData.fillNamed.borderColor =
-	    gsl::narrow<decltype(fillStartsData.fillNamed.borderColor)>(StitchBuffer->size());
+	fillStartsData.fillNamed.borderColor = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FTHCOL) == 0U) {
-	fillStartsData.fillNamed.featherColor =
-	    gsl::narrow<decltype(fillStartsData.fillNamed.featherColor)>(StitchBuffer->size());
+	fillStartsData.fillNamed.featherColor = wrap::toUnsigned(StitchBuffer->size());
   }
   if ((tmap & M_FCOL) == 0U) {
-	fillStartsData.fillNamed.fillColor =
-	    gsl::narrow<decltype(fillStartsData.fillNamed.fillColor)>(StitchBuffer->size());
+	fillStartsData.fillNamed.fillColor = wrap::toUnsigned(StitchBuffer->size());
   }
   if (form.edgeType != 0U) {
 	if (form.edgeType == EDGEAPPL) {
@@ -1295,8 +1292,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		  fillStartsData.fillNamed.applique = fillStartsData.fillNamed.appliqueColor + 1U;
 		}
 		else {
-		  fillStartsData.fillNamed.applique =
-		      gsl::narrow<decltype(fillStartsData.fillNamed.applique)>(StitchBuffer->size());
+		  fillStartsData.fillNamed.applique = wrap::toUnsigned(StitchBuffer->size());
 		}
 	  }
 	}
@@ -1305,8 +1301,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		fillStartsData.fillNamed.border = fillStartsData.fillNamed.borderColor + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.border =
-		    gsl::narrow<decltype(fillStartsData.fillNamed.border)>(StitchBuffer->size());
+		fillStartsData.fillNamed.border = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
@@ -1316,8 +1311,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		fillStartsData.fillNamed.fill = fillStartsData.fillNamed.fillColor + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.fill =
-		    gsl::narrow<decltype(fillStartsData.fillNamed.fill)>(StitchBuffer->size());
+		fillStartsData.fillNamed.fill = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
@@ -1327,8 +1321,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 		fillStartsData.fillNamed.feather = fillStartsData.fillNamed.featherColor + 1U;
 	  }
 	  else {
-		fillStartsData.fillNamed.feather =
-		    gsl::narrow<decltype(fillStartsData.fillNamed.feather)>(StitchBuffer->size());
+		fillStartsData.fillNamed.feather = wrap::toUnsigned(StitchBuffer->size());
 	  }
 	}
   }
@@ -1440,7 +1433,7 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
   auto ilData = INTINF {};
   StateMap->reset(StateFlag::ISEND);
   InterleaveSequenceIndices->emplace_back(INSREC {0, 0, wrap::toUnsigned(InterleaveSequence->size()), 0});
-  ilData.layerIndex = (gsl::narrow<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1)) |
+  ilData.layerIndex = (gsl::narrow_cast<uint32_t>(form.attribute & FRMLMSK) << (LAYSHFT - 1)) |
                       (ClosestFormToCursor << FRMSHFT);
   StateMap->reset(StateFlag::DIDSTRT);
   if (!StitchBuffer->empty()) {
@@ -1489,17 +1482,17 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 		  break;
 		}
 	  }
-	  code = gsl::narrow<uint32_t>(ilData.layerIndex |
+	  code = gsl::narrow_cast<uint32_t>(ilData.layerIndex |
 	                               InterleaveSequenceIndices->operator[](ilData.pins).code |
 	                               InterleaveSequenceIndices->operator[](ilData.pins).color);
 	  xi::duint(form, highStitchBuffer, code, ilData);
 	}
 	xi::chkend(form, highStitchBuffer, code, ilData);
-	if ((!StitchBuffer->empty()) &&
-	    ilData.start < gsl::narrow<decltype(ilData.start)>(StitchBuffer->size() - 1U)) {
-	  auto const ine         = wrap::toUnsigned(StitchBuffer->size() - ilData.start);
-	  auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
-	  auto       sourceEnd   = StitchBuffer->end();
+	if ((!StitchBuffer->empty()) && ilData.start < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	  auto const ine = wrap::toUnsigned(StitchBuffer->size() - ilData.start);
+
+	  auto sourceStart = std::next(StitchBuffer->begin(), ilData.start);
+	  auto sourceEnd   = StitchBuffer->end();
 
 	  auto const destination = std::next(highStitchBuffer.begin(), ilData.output);
 	  highStitchBuffer.insert(destination, sourceStart, sourceEnd);
@@ -1514,9 +1507,8 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 	auto code     = 0U;
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
-	  code = gsl::narrow<uint32_t>(ilData.layerIndex |
-	                               InterleaveSequenceIndices->operator[](iSequence).code |
-	                               InterleaveSequenceIndices->operator[](iSequence).color);
+	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
+	         InterleaveSequenceIndices->operator[](iSequence).color;
 	  if ((form.extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		  ilData.output += xi::gucon(
