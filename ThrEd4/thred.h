@@ -443,7 +443,7 @@ namespace internal {
   auto stlen(uint32_t iStitch) noexcept -> float;
   void strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
   void tglhid();
-  void thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint32_t code, uint32_t flag);
+  void thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
   void thrsav();
   void thumbak();
   void thumnail();

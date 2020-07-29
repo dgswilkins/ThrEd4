@@ -403,8 +403,8 @@ void thred::internal::fnamtabs() {
 	auto const destination = form::psg() % nameLength;
 	std::swap(NameOrder[destination], NameOrder[source]);
   }
-  for (auto iName = 0U; iName < NameEncoder.size(); ++iName) {
-	NameEncoder[iName] = gsl::narrow<uint8_t>(iName) + NCODOF;
+  for (auto iName = uint8_t {0U}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
+	NameEncoder[iName] = iName + NCODOF;
   }
   PseudoRandomValue = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
@@ -414,8 +414,8 @@ void thred::internal::fnamtabs() {
   }
   constexpr auto fillval = uint8_t {0};
   std::fill(std::begin(NameDecoder), std::end(NameDecoder), fillval);
-  for (auto iName = 32U; iName < 127U; ++iName) {
-	NameDecoder[NameEncoder[iName]] = gsl::narrow<uint8_t>(iName);
+  for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
+	NameDecoder[NameEncoder[iName]] = iName;
   }
 }
 
@@ -618,8 +618,8 @@ void thred::coltab() {
 		++iStitch;
 	  }
 	  addColor(wrap::toUnsigned(StitchBuffer->size()), 0);
-	  if (ClosestPointIndex > gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
-		ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+	  if (ClosestPointIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+		ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	  }
 	  thi::fndknt();
 	}
@@ -671,25 +671,25 @@ void thred::internal::dudat() {
 	  auto const dest = gsl::span<FRMHED>(backupData->forms, formList.size());
 	  std::copy(formList.cbegin(), formList.cend(), dest.begin());
 	}
-	backupData->stitchCount = gsl::narrow<decltype(backupData->stitchCount)>(StitchBuffer->size());
+	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
 	backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 	if (!StitchBuffer->empty()) {
 	  auto const dest = gsl::span<fPOINTATTR>(backupData->stitches, StitchBuffer->size());
 	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), dest.begin());
 	}
-	backupData->vertexCount = gsl::narrow<decltype(backupData->vertexCount)>(FormVertices->size());
+	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
 	backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[StitchBuffer->size()]);
 	if (!FormVertices->empty()) {
 	  auto const dest = gsl::span<fPOINT>(backupData->vertices, FormVertices->size());
 	  std::copy(FormVertices->cbegin(), FormVertices->cend(), dest.begin());
 	}
-	backupData->guideCount = gsl::narrow<decltype(backupData->guideCount)>(SatinGuides->size());
+	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
 	backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 	if (!SatinGuides->empty()) {
 	  auto const dest = gsl::span<SATCON>(backupData->guide, backupData->guideCount);
 	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), dest.begin());
 	}
-	backupData->clipPointCount = gsl::narrow<decltype(backupData->clipPointCount)>(ClipPoints->size());
+	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
 	backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 	if (!ClipPoints->empty()) {
 	  auto const dest = gsl::span<fPOINT>(backupData->clipPoints, backupData->clipPointCount);
@@ -1165,14 +1165,8 @@ void thred::internal::duIns() {
 void thred::internal::movins() {
   if (StateMap->test(StateFlag::INSRT)) {
 	if (StateMap->test(StateFlag::LIN1)) {
-	  auto stitchCoordsInPixels = POINT {};
-	  if (StateMap->test(StateFlag::BAKEND)) {
-		stitchCoordsInPixels = stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U));
-	  }
-	  else {
-		stitchCoordsInPixels = stch2px1(0U);
-	  }
-	  endpnt(stitchCoordsInPixels);
+	  (StateMap->test(StateFlag::BAKEND)) ? endpnt(stch2px1(wrap::toUnsigned(StitchBuffer->size() - 1U)))
+	                                      : endpnt(stch2px1(0U));
 	}
 	else {
 	  duIns();
@@ -1299,7 +1293,7 @@ void thred::internal::chknum() {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  value      = wrap::bufToFloat(SideWindowEntryBuffer.data()) * PFGRAN;
 
-	  constexpr auto bufferLength = gsl::narrow<int32_t>(SideWindowEntryBuffer.size() - 1U);
+	  auto const bufferLength = wrap::toUnsigned(SideWindowEntryBuffer.size() - 1U);
 	  switch (FormMenuChoice) {
 		case LTXOF: {
 		  thred::savdo();
@@ -1767,7 +1761,7 @@ void thred::internal::chknum() {
 			  thred::savdo();
 			  constexpr auto starSize = 250.0F;
 			  form::dustar(uintValue,
-			               starSize / gsl::narrow<float>(value) * ZoomFactor *
+			               starSize / value * ZoomFactor *
 			                   gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 			  break;
 			}
@@ -2669,7 +2663,7 @@ void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, P
 }
 
 void thred::internal::duar(POINT const& stitchCoordsInPixels) {
-  auto const offset = gsl::narrow<int32_t>(MulDiv(10, *screenDPI, stdDPI));
+  auto const offset = MulDiv(10, *screenDPI, stdDPI);
   auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
   rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
@@ -2836,10 +2830,10 @@ auto thred::internal::savcmp() noexcept -> bool {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint32_t code, uint32_t flag) {
+void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
   constexpr auto BalaradRatio = 10.0F / 6.0F;
-  balaradStitch.push_back(BALSTCH {gsl::narrow<uint8_t>(code),
-                                   gsl::narrow<uint8_t>(flag),
+  balaradStitch.push_back(BALSTCH {code,
+                                   flag,
                                    (StitchBuffer->operator[](source).x - BalaradOffset.x) * BalaradRatio,
                                    (StitchBuffer->operator[](source).y - BalaradOffset.y) * BalaradRatio});
 }
@@ -3024,8 +3018,8 @@ auto thred::internal::chkattr(fs::path const& filename) -> bool {
 }
 
 void thred::internal::duver(fs::path const& name) {
-  auto version = tolower(name.extension().wstring().back()) - 'r';
-  if (version >= 0 && version < gsl::narrow<decltype(version)>(VersionNames->size())) {
+  auto version = gsl::narrow<uint32_t>(tolower(name.extension().wstring().back()) - 'r');
+  if (version >= 0 && version < wrap::toUnsigned(VersionNames->size())) {
 	VersionNames->operator[](version) = name;
   }
 }
@@ -3047,8 +3041,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   constexpr auto headerVersion = 0x02U;
 
   stitchHeader.headerType = headerVersion << TBYTSHFT | headerSignature;
-  stitchHeader.fileLength = gsl::narrow<decltype(stitchHeader.fileLength)>(
-      StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + sizeof(stitchHeader) + sizeof(PCSBMPFileName));
+  stitchHeader.fileLength = wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) +
+                                             sizeof(stitchHeader) + sizeof(PCSBMPFileName));
   stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
   stitchHeader.hoopType    = gsl::narrow<decltype(stitchHeader.hoopType)>(IniFile.hoopType);
   auto       designer      = utf::Utf16ToUtf8(*DesignerName);
@@ -3069,10 +3063,10 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	  }
 	}
   }
-  stitchHeader.formCount      = gsl::narrow<uint16_t>(FormList->size());
-  stitchHeader.vertexCount    = gsl::narrow<uint16_t>(vertexCount);
-  stitchHeader.dlineCount     = gsl::narrow<uint16_t>(guideCount);
-  stitchHeader.clipDataCount  = gsl::narrow<uint16_t>(clipDataCount);
+  stitchHeader.formCount      = gsl::narrow<decltype(stitchHeader.formCount)>(FormList->size());
+  stitchHeader.vertexCount    = gsl::narrow<decltype(stitchHeader.vertexCount)>(vertexCount);
+  stitchHeader.dlineCount     = gsl::narrow<decltype(stitchHeader.dlineCount)>(guideCount);
+  stitchHeader.clipDataCount  = gsl::narrow<decltype(stitchHeader.clipDataCount)>(clipDataCount);
   constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
                                 2; // ThreadSize is defined as a 16 entry array of 2 bytes
   constexpr auto formDataOffset = sizeof(PCSBMPFileName) + sizeof(BackgroundColor) +
@@ -3088,9 +3082,11 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   if (vtxLen > USHRT_MAX) {
 	vtxLen = USHRT_MAX;
   }
-  stitchHeader.vertexLen = gsl::narrow<uint16_t>(vtxLen);
-  stitchHeader.dlineLen = gsl::narrow<uint16_t>(sizeof(decltype(FormVertices->back())) * vertexCount);
-  stitchHeader.clipDataLen = gsl::narrow<uint16_t>(sizeof(decltype(ClipPoints->back())) * clipDataCount);
+  stitchHeader.vertexLen = gsl::narrow<decltype(stitchHeader.vertexLen)>(vtxLen);
+  stitchHeader.dlineLen =
+      gsl::narrow<decltype(stitchHeader.dlineLen)>(sizeof(decltype(FormVertices->back())) * vertexCount);
+  stitchHeader.clipDataLen =
+      gsl::narrow<decltype(stitchHeader.clipDataLen)>(sizeof(decltype(ClipPoints->back())) * clipDataCount);
   durit(buffer, &stitchHeader, sizeof(stitchHeader));
   ExtendedHeader->auxFormat         = IniFile.auxFileType;
   ExtendedHeader->hoopSizeX         = IniFile.hoopSizeX;
@@ -3131,7 +3127,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 		vertices.push_back(vertexIt[iVertex]);
 	  }
 	  if (srcForm.type == SAT) {
-		outForms.back().satinGuideCount = gsl::narrow<uint16_t>(srcForm.satinGuideCount);
+		outForms.back().satinGuideCount = gsl::narrow<decltype(outForms.back().satinGuideCount)>(srcForm.satinGuideCount);
 		auto guideIt = std::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
 		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
 		  guides.emplace_back(guideIt[iGuide]);
@@ -3168,7 +3164,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	if (!TexturePointsBuffer->empty()) {
 	  durit(buffer,
 	        TexturePointsBuffer->data(),
-	        gsl::narrow<uint32_t>(TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()))));
+	        wrap::toUnsigned(TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()))));
 	}
   }
 }
@@ -3356,7 +3352,7 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol                           = stitch.attribute & COLMSK;
 			PCSStitchBuffer[iPCSstitch].tag  = 3;
-			PCSStitchBuffer[iPCSstitch++].fx = gsl::narrow<uint8_t>(savcol);
+			PCSStitchBuffer[iPCSstitch++].fx = gsl::narrow<decltype(PCSStitchBuffer.back().fx)>(savcol);
 		  }
 		  auto integerPart                = 0.0F;
 		  auto fractionalPart             = std::modf(stitch.x, &integerPart);
@@ -4319,9 +4315,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	StitchBuffer->resize(thredHeader.stitchCount);
-	auto bytesToRead = DWORD {};
 	if (thredHeader.stitchCount != 0U) {
-	  bytesToRead = gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
+	  auto bytesToRead = gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
 	  ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, nullptr);
 	  if (bytesRead != bytesToRead) {
 		prtred(fileHandle, IDS_PRT);
@@ -4329,7 +4324,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	}
 	StitchBuffer->shrink_to_fit();
-	bytesToRead = sizeof(PCSBMPFileName);
+	auto bytesToRead = sizeof(PCSBMPFileName);
 	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
 	  PCSBMPFileName[0] = 0;
@@ -5327,7 +5322,7 @@ void thred::internal::istch() {
   xlin1();
   if (StateMap->test(StateFlag::SELBOX)) {
 	if ((ClosestPointIndex != 0U) &&
-	    ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
+	    ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 	  auto& stitch           = StitchBuffer->operator[](ClosestPointIndex);
 	  auto& prvStitch        = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
@@ -5340,7 +5335,7 @@ void thred::internal::istch() {
 	  }
 	}
 	else {
-	  if (ClosestPointIndex == gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
+	  if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 		--ClosestPointIndex;
 	  }
 	}
@@ -5388,8 +5383,8 @@ void thred::internal::selCol() {
 		iStitch = 0;
 	  }
 	}
-	if (iStitch > gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1U)) {
-	  iStitch = gsl::narrow<decltype(iStitch)>(StitchBuffer->size() - 1U);
+	if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	  iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	}
 	GroupStitchIndex  = iStitch;
 	ClosestPointIndex = iStitch;
@@ -5400,15 +5395,15 @@ void thred::internal::selCol() {
 	if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
 	  ++ClosestPointIndex;
 	}
-	while (GroupStitchIndex < gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U) &&
+	while (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
 	       (StitchBuffer->operator[](GroupStitchIndex).attribute & COLMSK) == color) {
 	  ++GroupStitchIndex;
 	}
 	if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {
 	  --ClosestPointIndex;
 	}
-	if (GroupStitchIndex > gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U)) {
-	  GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+	if (GroupStitchIndex > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	}
 	StateMap->set(StateFlag::GRPSEL);
 	unbox();
@@ -6435,13 +6430,13 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	length           = hypot(delta.x, delta.y);
 	--iStart;
   } while (length == 0.0F);
-  std::array<char, knotLen> knotAtEndOrder  = {-2, -3, -1, -4, 0}; // reverse knot spacings
-  std::array<char, knotLen> knotAtLastOrder = {0, -4, -1, -3, -2}; // reverse knot spacings
-  auto& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
   if ((iStart & MAXMSK) == 0U) { // make sure the counter has not underflowed
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
 	auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	constexpr auto knotAtEndOrder = std::array<char, knotLen> {-2, -3, -1, -4, 0}; // reverse knot spacings
+	constexpr auto knotAtLastOrder = std::array<char, knotLen> {0, -4, -1, -3, -2}; // reverse knot spacings
+	auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
 	for (auto knot : knots) {
 	  ofstch(buffer, finish, knot, knotStep, knotAttribute);
 	}
@@ -6500,7 +6495,7 @@ void thred::internal::delknot() {
 }
 
 auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> uint32_t {
-  while (start < gsl::narrow<decltype(start)>(StitchBuffer->size() - 1U) && stlen(start) > KNOTLEN) {
+  while (start < wrap::toUnsigned(StitchBuffer->size() - 1U) && stlen(start) > KNOTLEN) {
 	buffer.push_back(StitchBuffer->operator[](start++));
   }
   strtknt(buffer, start);
@@ -6951,7 +6946,7 @@ void thred::internal::delet() {
 		satin::delspnt();
 	  }
 	  if (ClosestFormToCursor > FormList->size() - 1U) {
-		ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	  }
 	  if (!FormList->empty()) {
 		form::frmout(ClosestFormToCursor);
@@ -7203,7 +7198,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
   }
   else {
 	auto bytesRead      = DWORD {0};
-	InsertedStitchIndex = gsl::narrow<decltype(InsertedStitchIndex)>(StitchBuffer->size());
+	InsertedStitchIndex = wrap::toUnsigned(StitchBuffer->size());
 	if (isthr(insertedFile)) {
 	  auto fileHeader = STRHED {};
 	  ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr);
@@ -7221,10 +7216,10 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		if (version != 0U) {
 		  gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
 		  // ToDo - replace constants with sizes of data structures?
-		  homscor = gsl::narrow<decltype(homscor)>(FormList->size()) * FRMW +
+		  homscor = wrap::toUnsigned(FormList->size()) * FRMW +
 		            gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size())) * HANDW +
-		            gsl::narrow<decltype(homscor)>(FormVertices->size()) * FRMPW +
-		            gsl::narrow<decltype(homscor)>(StitchBuffer->size()) * STCHW;
+		            wrap::toUnsigned(FormVertices->size()) * FRMPW +
+		            wrap::toUnsigned(StitchBuffer->size()) * STCHW;
 		  ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr);
 		}
 		thred::savdo();
@@ -7243,8 +7238,8 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		                                sizeof(UserColor) + sizeof(CustomColor) + threadLength;
 		SetFilePointer(fileHandle, formDataOffset, nullptr, FILE_CURRENT);
 		auto insertedRectangle = fRECTANGLE {TINYFLOAT, BIGFLOAT, TINYFLOAT, BIGFLOAT};
-		InsertedVertexIndex    = gsl::narrow<decltype(InsertedVertexIndex)>(FormVertices->size());
-		InsertedFormIndex      = gsl::narrow<decltype(InsertedFormIndex)>(FormList->size());
+		InsertedVertexIndex    = wrap::toUnsigned(FormVertices->size());
+		InsertedFormIndex      = wrap::toUnsigned(FormList->size());
 		if (fileHeader.formCount != 0U) {
 		  auto const newFormVertexIndex = wrap::toUnsigned(FormVertices->size());
 		  auto       newSatinGuideIndex = wrap::toUnsigned(SatinGuides->size());
@@ -7810,7 +7805,7 @@ void thred::chkrng(fPOINT& range) {
 }
 
 void thred::ritmov(uint32_t formIndex) noexcept {
-  auto& form = FormList->operator[](formIndex);
+  auto const& form = FormList->operator[](formIndex);
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   if (ClosestVertexToCursor != 0U) {
@@ -8133,7 +8128,7 @@ void thred::internal::selup() {
 	if (StateMap->test(StateFlag::SELBOX)) {
 	  unbox();
 	  auto const attribute = StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK;
-	  while (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U) &&
+	  while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U) &&
 	         (StitchBuffer->operator[](ClosestPointIndex).attribute & ATMSK) == attribute) {
 		++ClosestPointIndex;
 	  }
@@ -8204,7 +8199,7 @@ void thred::internal::seldwn() {
 		  }
 		}
 		else {
-		  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		}
 		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
 		StateMap->set(StateFlag::RESTCH);
@@ -8303,7 +8298,7 @@ void thred::internal::colchk() {
 	auto color         = StitchBuffer->front().attribute & COLMSK;
 	auto currentStitch = 0U;
 	// ToDo - Can this loop become a ranged for?
-	for (auto iStitch = 0U; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); ++iStitch) {
+	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  auto const stitch = StitchBuffer->operator[](iStitch);
 	  if (color != (stitch.attribute & COLMSK)) {
 		if ((iStitch - currentStitch == 1) && ((currentStitch) != 0U)) {
@@ -8387,7 +8382,7 @@ void thred::internal::rembig() {
 	  }
 	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::rngadj();
-		if (GroupEndStitch < gsl::narrow<decltype(GroupEndStitch)>(StitchBuffer->size())) {
+		if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
 		  ++GroupEndStitch;
 		}
 		if (ClosestPointIndex < GroupStitchIndex) {
@@ -8417,7 +8412,7 @@ void thred::internal::duselrng(RANGE& selectedRange) {
   }
   else {
 	selectedRange.start  = 0U;
-	selectedRange.finish = gsl::narrow<decltype(selectedRange.finish)>(StitchBuffer->size());
+	selectedRange.finish = wrap::toUnsigned(StitchBuffer->size());
   }
 }
 
@@ -8767,7 +8762,7 @@ void thred::internal::bakthum() {
 void thred::internal::selalstch() {
   if (!StitchBuffer->empty()) {
 	ClosestPointIndex = 0;
-	GroupStitchIndex  = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+	GroupStitchIndex  = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	GroupStartStitch  = ClosestPointIndex;
 	GroupEndStitch    = GroupStitchIndex;
 	StateMap->set(StateFlag::GRPSEL);
@@ -8816,7 +8811,7 @@ void thred::internal::rngal() {
 	StateMap->reset(StateFlag::GRPSEL);
 	auto iStitch     = 0U;
 	auto flagInRange = false;
-	for (; iStitch < gsl::narrow<decltype(iStitch)>(StitchBuffer->size()); ++iStitch) {
+	for (; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  if (inrng(iStitch)) {
 		if (!flagInRange) {
 		  prng.push_back(RANGE {iStitch, 0U});
@@ -10414,17 +10409,17 @@ void thred::internal::qcode() {
 	}
 	FormList->pop_back();
 	if (!FormList->empty()) {
-	  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	}
   }
   if (StateMap->testAndReset(StateFlag::FUNCLP)) { // aborting form paste
 	thi::bak();
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   }
   if (StateMap->testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
 	thi::bak();
 	SelectedFormList->clear();
-	ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   }
   if (!UserFlagMap->test(UserFlag::MARQ)) {
 	StateMap->reset(StateFlag::GMRK);
@@ -12486,7 +12481,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	FormMoveDelta = fPOINT {stitchPoint.x - wrap::midl(formsRect.right, formsRect.left),
 	                        stitchPoint.y - wrap::midl(formsRect.top, formsRect.bottom)};
 	for (auto iForm = 0U; iForm < ClipFormsCount; ++iForm) {
-	  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - iForm - 1U);
+	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - iForm - 1U);
 	  // clang-format off
 	  auto& form     = FormList->operator[](ClosestFormToCursor);
 	  auto  vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
@@ -12786,7 +12781,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::savdo();
 	  if ((!StitchBuffer->empty()) &&
 	      (StateMap->testAndReset(StateFlag::SELBOX) || StateMap->testAndReset(StateFlag::INSRT)) &&
-	      ClosestPointIndex != gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
+	      ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 		lodclp(ClosestPointIndex);
 	  }
 	  else {
@@ -13148,7 +13143,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  FormMoveDelta = fPOINT {};
 		  StateMap->set(StateFlag::FUNCLP);
 		  FormList->push_back(FRMHED {});
-		  ClosestFormToCursor  = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		  ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
 		  auto& formIter       = FormList->back();
 		  formIter.type        = FRMLINE;
 		  formIter.vertexCount = formVerticesData->vertexCount + 1U;
@@ -13273,7 +13268,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  FormMoveDelta = fPOINT {};
 		  StateMap->set(StateFlag::FUNCLP);
 		  FormList->push_back(clipFormHeader->form);
-		  ClosestFormToCursor = gsl::narrow<decltype(ClosestFormToCursor)>(FormList->size() - 1U);
+		  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		  auto& formIter      = FormList->back();
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
@@ -13412,21 +13407,21 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
   if ((wrap::pressed(VK_SHIFT)) && (wrap::pressed(VK_CONTROL))) {
 	if (!StitchBuffer->empty()) {
 	  if (StateMap->testAndReset(StateFlag::SELBOX)) {
-		GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+		GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		StateMap->set(StateFlag::GRPSEL);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::GRPSEL)) {
 		  if (GroupStitchIndex > ClosestPointIndex) {
-			GroupStitchIndex = gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U);
+			GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		  }
 		  else {
-			ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+			ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		  }
 		}
 		else {
 		  StateMap->set(StateFlag::SELBOX);
-		  ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+		  ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		  StateMap->set(StateFlag::RESTCH);
 		  return true;
 		}
@@ -13471,7 +13466,7 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 		  setsrch(LargestStitchIndex);
 		  return true;
 		}
-		ClosestPointIndex = gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U);
+		ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	  }
 	  movbox();
 	}
@@ -13562,14 +13557,14 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		}
 		else {
 		  if (StateMap->test(StateFlag::SELBOX)) {
-			if (ClosestPointIndex < gsl::narrow<decltype(ClosestPointIndex)>(StitchBuffer->size() - 1U)) {
+			if (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 			  ++ClosestPointIndex;
 			}
 			movbox();
 			return true;
 		  }
 		  if (StateMap->test(StateFlag::GRPSEL)) {
-			if (GroupStitchIndex < gsl::narrow<decltype(GroupStitchIndex)>(StitchBuffer->size() - 1U)) {
+			if (GroupStitchIndex < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 			  ++GroupStitchIndex;
 			  thred::grpAdj();
 			  thred::redraw(ColorBar);
