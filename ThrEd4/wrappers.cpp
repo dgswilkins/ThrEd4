@@ -99,8 +99,9 @@ auto wrap::toFloat(uint32_t invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
-#pragma warning(suppress : 26497 26440) // since this is used in other translation units, "constexpr"
-                                        // cannot be used as it implicitly defines the function as inline.
+// since this is used in other translation units, "constexpr"
+// cannot be used as it implicitly defines the function as inline.
+#pragma warning(suppress : 26497 26440)
 auto wrap::toUnsigned(size_t invar) -> uint32_t {
 #ifdef _WIN64
   return gsl::narrow<uint32_t>(invar);
@@ -109,6 +110,9 @@ auto wrap::toUnsigned(size_t invar) -> uint32_t {
 #endif
 }
 
+// since this is used in other translation units, "constexpr"
+// cannot be used as it implicitly defines the function as inline.
+#pragma warning(suppress : 26497 26440)
 auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 #ifdef _WIN64
   return gsl::narrow_cast<size_t>(invar);
