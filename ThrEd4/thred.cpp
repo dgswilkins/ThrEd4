@@ -230,8 +230,6 @@ auto RotateBoxToCursorLine  = std::array<POINT, LNPNTS> {}; // line from the cur
 
 std::vector<COLCHNG>* ColorChangeTable;
 
-uint32_t const FillTypes[] = // fill type array for side window display
-    {0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
 constexpr auto FeatherFillTypes = std::array<uint32_t, 6> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
 
 auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
@@ -3685,6 +3683,9 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	// edge fill type array for side window display
 	constexpr auto edgeFillTypes = std::array<uint8_t, EDGETYPS> {
 	    0, EDGELINE, EDGEBEAN, EDGECLIP, EDGEANGSAT, EDGEAPPL, EDGEPROPSAT, EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX};
+	// fill type array for side window display
+	constexpr auto fillTypes = std::array<uint8_t, FILLTYPS>{
+	    0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
 	auto childListRect  = RECT {0L, 0L, 0L, 0L};
 	auto parentListRect = RECT {0L, 0L, 0L, 0L};
 	auto entryCount     = entries;
@@ -3752,7 +3753,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 		}
 		else {
 		  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-			if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
+			if (((1U << fillTypes[iEntry]) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
 				formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			  }
@@ -3761,7 +3762,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 			  }
 			}
 			else {
-			  if (FillTypes[iEntry] == form.fillType) {
+			  if (fillTypes[iEntry] == form.fillType) {
 				--entryCount;
 			  }
 			  else {
@@ -3798,8 +3799,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 		}
 		else {
 		  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-			if (FillTypes[iEntry] != form.fillType) {
-			  if (((1U << FillTypes[iEntry]) & ClipTypeMap) != 0U) {
+			if (fillTypes[iEntry] != form.fillType) {
+			  if (((1U << fillTypes[iEntry]) & ClipTypeMap) != 0U) {
 				if (StateMap->test(StateFlag::WASPCDCLP)) {
 				  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 				}
