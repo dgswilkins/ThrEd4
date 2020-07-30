@@ -696,8 +696,6 @@ enum featherStyles { // feather fill types
   FTHFAZ             // phase
 };
 
-constexpr auto FSSIZE = uint32_t {6U}; // count of feather styles
-
 constexpr int32_t FDEFTYP = FTHPSG; // default feather type
 
 // edge fill types
@@ -716,8 +714,6 @@ enum edgeFillStyles {
   EDGECLIPX,    // Even Clipboard
   EDGELAST      // must always be the last value
 };
-
-constexpr uint32_t EDGETYPS = 13U; // number of border fill types
 
 // form types
 enum formStyles {
@@ -870,8 +866,6 @@ enum fillStyles {
   TXHORF,   // Horizontal texture fill
   TXANGF,   // Angle texture fill
 };
-
-constexpr auto FILLTYPS = 14U; // 13 fill types plus 'none'
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
 constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);

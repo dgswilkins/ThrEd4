@@ -69,6 +69,9 @@ constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for fil
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto knotLen  = 5U;                     // length of knot pattern
 constexpr auto arrowPoints = 3U;                  // points required to draw arrow
+constexpr auto FILLTYPS = uint32_t {14U}; // 13 fill types plus 'none'
+constexpr auto FSSIZE = uint32_t {6U}; // count of feather styles
+constexpr auto EDGETYPS = uint32_t {13U}; // number of border fill types
 
 // main variables
 int32_t  ArgCount;                // command line argument count
@@ -229,8 +232,6 @@ auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part o
 auto RotateBoxToCursorLine  = std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
 
 std::vector<COLCHNG>* ColorChangeTable;
-
-constexpr auto FeatherFillTypes = std::array<uint32_t, 6> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
 
 auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
@@ -3686,6 +3687,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	// fill type array for side window display
 	constexpr auto fillTypes = std::array<uint8_t, FILLTYPS>{
 	    0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
+	constexpr auto featherFillTypes =
+	    std::array<uint8_t, FSSIZE> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
 	auto childListRect  = RECT {0L, 0L, 0L, 0L};
 	auto parentListRect = RECT {0L, 0L, 0L, 0L};
 	auto entryCount     = entries;
@@ -3748,7 +3751,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	  }
 	  else {
 		if (FormMenuChoice == LFTHTYP) {
-		  entryCount     = wrap::toUnsigned(FeatherFillTypes.size() - 1U);
+		  entryCount     = wrap::toUnsigned(featherFillTypes.size() - 1U);
 		  sideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
 		}
 		else {
@@ -3791,8 +3794,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	  }
 	  else {
 		if (FormMenuChoice == LFTHTYP) {
-		  for (auto iEntry = 0U; iEntry < FeatherFillTypes.size(); ++iEntry) {
-			if (FeatherFillTypes[iEntry] != form.fillInfo.feather.fillType) {
+		  for (auto iEntry = 0U; iEntry < featherFillTypes.size(); ++iEntry) {
+			if (featherFillTypes[iEntry] != form.fillInfo.feather.fillType) {
 			  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 			}
 		  }
