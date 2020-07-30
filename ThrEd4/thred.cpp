@@ -3041,7 +3041,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   stitchHeader.fileLength = wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) +
                                              sizeof(stitchHeader) + sizeof(PCSBMPFileName));
   stitchHeader.stitchCount = gsl::narrow<decltype(stitchHeader.stitchCount)>(StitchBuffer->size());
-  stitchHeader.hoopType    = gsl::narrow<decltype(stitchHeader.hoopType)>(IniFile.hoopType);
+  stitchHeader.hoopType    = gsl::narrow_cast<decltype(stitchHeader.hoopType)>(IniFile.hoopType);
   auto       designer      = utf::Utf16ToUtf8(*DesignerName);
   auto&      modName       = ExtendedHeader->modifierName;
   auto const modifierName  = gsl::span<char> {modName};
@@ -3353,11 +3353,11 @@ auto thred::internal::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& 
 		  }
 		  auto integerPart                = 0.0F;
 		  auto fractionalPart             = std::modf(stitch.x, &integerPart);
-		  PCSStitchBuffer[iPCSstitch].fx  = wrap::floor<uint8_t>(fractionalPart * fractionalFactor);
-		  PCSStitchBuffer[iPCSstitch].x   = gsl::narrow<int16_t>(integerPart);
+		  PCSStitchBuffer[iPCSstitch].fx  = wrap::floor<decltype(PCSStitchBuffer.back().fx)>(fractionalPart * fractionalFactor);
+		  PCSStitchBuffer[iPCSstitch].x   = gsl::narrow<decltype(PCSStitchBuffer.back().x)>(integerPart);
 		  fractionalPart                  = std::modf(stitch.y, &integerPart);
-		  PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<uint8_t>(fractionalPart * fractionalFactor);
-		  PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<int16_t>(integerPart);
+		  PCSStitchBuffer[iPCSstitch].fy  = wrap::floor<decltype(PCSStitchBuffer.back().fy)>(fractionalPart * fractionalFactor);
+		  PCSStitchBuffer[iPCSstitch++].y = gsl::narrow<decltype(PCSStitchBuffer.back().y)>(integerPart);
 		}
 		if (FALSE == WriteFile(fileHandle,
 		                       PCSStitchBuffer.data(),
@@ -4191,7 +4191,7 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 		  PCSDataBuffer.resize(pcsStitchCount);
 		  ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &bytesRead, nullptr);
 		  if (bytesRead == fileSize) {
-			auto iStitch      = 0U;
+			auto iStitch      = uint16_t {0U};
 			auto iColorChange = 0U;
 			auto color        = 0U;
 			auto iPCSstitch   = 0U;
@@ -4200,7 +4200,7 @@ auto thred::internal::readPCSFile(std::filesystem::path const& newFileName) -> b
 			while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
 			  auto& stitch = PCSDataBuffer[iPCSstitch];
 			  if (stitch.tag == 3) {
-				ColorChangeTable->push_back(COLCHNG {gsl::narrow<uint16_t>(iStitch), stitch.fx});
+				ColorChangeTable->push_back(COLCHNG {iStitch, stitch.fx});
 				++iColorChange;
 				color = NOTFRM | stitch.fx;
 			  }
