@@ -797,8 +797,8 @@ enum clipDataType {
 };
 
 // edge underlay bit
-constexpr auto EGUND  = 0x80U;
-constexpr auto NEGUND = 0x7fU;
+constexpr auto EGUND = uint8_t {0x80U};
+constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines
 enum formData {

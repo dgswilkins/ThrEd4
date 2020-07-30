@@ -232,9 +232,7 @@ std::vector<COLCHNG>* ColorChangeTable;
 
 uint32_t const FillTypes[] = // fill type array for side window display
     {0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
-uint32_t const EdgeFillTypes[] = // edge fill type array for side window display
-    {0, EDGELINE, EDGEBEAN, EDGECLIP, EDGEANGSAT, EDGEAPPL, EDGEPROPSAT, EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX};
-const auto FeatherFillTypes = std::array<uint32_t, 6> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
+constexpr auto FeatherFillTypes = std::array<uint32_t, 6> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
 
 auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
@@ -3027,7 +3025,7 @@ void thred::internal::duver(fs::path const& name) {
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
 	auto const src =
-	    gsl::span<char const> {gsl::narrow_cast<char const*>(source), gsl::narrow<size_t>(count)};
+	    gsl::span<char const> {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
 	destination.insert(destination.end(), src.begin(), src.end());
   }
 }
@@ -3684,6 +3682,9 @@ void thred::internal::dusid(uint32_t                  entry,
 
 void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const* const strings, uint32_t entries) {
   if (strings != nullptr) {
+	// edge fill type array for side window display
+	constexpr auto edgeFillTypes = std::array<uint8_t, EDGETYPS> {
+	    0, EDGELINE, EDGEBEAN, EDGECLIP, EDGEANGSAT, EDGEAPPL, EDGEPROPSAT, EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX};
 	auto childListRect  = RECT {0L, 0L, 0L, 0L};
 	auto parentListRect = RECT {0L, 0L, 0L, 0L};
 	auto entryCount     = entries;
@@ -3694,13 +3695,13 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	GetWindowRect(FormDataSheet, &parentListRect);
 	form::ispcdclp();
 	if (StateMap->test(StateFlag::FILTYP)) {
-	  for (auto iEntry = 0U; iEntry < EDGETYPS; ++iEntry) {
-		if (gsl::narrow<uint32_t>(form.edgeType & NEGUND) == EdgeFillTypes[iEntry]) {
+	  for (auto iEntry = 0U; iEntry < edgeFillTypes.size(); ++iEntry) {
+		if ((form.edgeType & NEGUND) == edgeFillTypes[iEntry]) {
 		  --entryCount;
 		}
 		else {
-		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
-		      EdgeFillTypes[iEntry] == EDGECLIPX) {
+		  if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
+		      edgeFillTypes[iEntry] == EDGECLIPX) {
 			if (StateMap->test(StateFlag::WASPCDCLP)) {
 			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			}
@@ -3726,9 +3727,9 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	                                   ThrEdInstance,
 	                                   nullptr);
 	  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-		if (gsl::narrow<uint32_t>(form.edgeType & NEGUND) != EdgeFillTypes[iEntry]) {
-		  if (EdgeFillTypes[iEntry] == EDGECLIP || EdgeFillTypes[iEntry] == EDGEPICOT ||
-		      EdgeFillTypes[iEntry] == EDGECLIPX) {
+		if ((form.edgeType & NEGUND) != edgeFillTypes[iEntry]) {
+		  if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
+		      edgeFillTypes[iEntry] == EDGECLIPX) {
 			if (StateMap->test(StateFlag::WASPCDCLP)) {
 			  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 			}
@@ -4316,7 +4317,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	StitchBuffer->resize(thredHeader.stitchCount);
 	if (thredHeader.stitchCount != 0U) {
-	  auto bytesToRead = gsl::narrow<DWORD>(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
+	  auto const bytesToRead = wrap::toUnsigned(thredHeader.stitchCount * sizeof(decltype(StitchBuffer->back())));
 	  ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, nullptr);
 	  if (bytesRead != bytesToRead) {
 		prtred(fileHandle, IDS_PRT);
@@ -4324,7 +4325,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	}
 	StitchBuffer->shrink_to_fit();
-	auto bytesToRead = sizeof(PCSBMPFileName);
+	auto bytesToRead = wrap::toUnsigned(sizeof(PCSBMPFileName));
 	ReadFile(fileHandle, static_cast<LPVOID>(PCSBMPFileName), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
 	  PCSBMPFileName[0] = 0;
@@ -4339,14 +4340,14 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	BackgroundBrush = CreateSolidBrush(BackgroundColor);
-	bytesToRead     = gsl::narrow<DWORD>(UserColor.size() * sizeof(decltype(UserColor.back())));
+	bytesToRead     = wrap::toUnsigned(UserColor.size() * sizeof(decltype(UserColor.back())));
 	ReadFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
 	  UserColor = DefaultColors;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	bytesToRead = gsl::narrow<DWORD>(CustomColor.size() * sizeof(decltype(UserColor.back())));
+	bytesToRead = wrap::toUnsigned(CustomColor.size() * sizeof(decltype(UserColor.back())));
 	ReadFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
 	  CustomColor = DefaultColors;
@@ -4372,7 +4373,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  if (version < 2) {
 		auto formListOriginal = std::vector<FRMHEDO> {};
 		formListOriginal.resize(thredHeader.formCount);
-		bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
+		bytesToRead = wrap::toUnsigned(thredHeader.formCount * sizeof(decltype(formListOriginal.back())));
 		wrap::ReadFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  thredHeader.formCount = gsl::narrow<decltype(thredHeader.formCount)>(
@@ -4386,7 +4387,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  else {
 		auto inFormList = std::vector<FRMHEDOUT> {};
 		inFormList.resize(thredHeader.formCount);
-		bytesToRead = gsl::narrow<DWORD>(thredHeader.formCount * sizeof(decltype(inFormList.back())));
+		bytesToRead = wrap::toUnsigned(thredHeader.formCount * sizeof(decltype(inFormList.back())));
 		wrap::ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  thredHeader.formCount =
@@ -4400,7 +4401,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  FormList->shrink_to_fit();
 	  if (thredHeader.vertexCount != 0U) {
 		FormVertices->resize(thredHeader.vertexCount);
-		bytesToRead = gsl::narrow<DWORD>(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
+		bytesToRead = wrap::toUnsigned(thredHeader.vertexCount * sizeof(decltype(FormVertices->back())));
 		ReadFile(fileHandle, FormVertices->data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  FormVertices->resize(bytesRead / sizeof(decltype(FormVertices->back())));
@@ -4415,7 +4416,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  FormVertices->shrink_to_fit();
 	  if (thredHeader.dlineCount != 0U) {
 		auto inGuideList = std::vector<SATCONOUT>(thredHeader.dlineCount);
-		bytesToRead = gsl::narrow<DWORD>(thredHeader.dlineCount * sizeof(decltype(inGuideList.back())));
+		bytesToRead = wrap::toUnsigned(thredHeader.dlineCount * sizeof(decltype(inGuideList.back())));
 		ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  inGuideList.resize(bytesRead / sizeof(decltype(inGuideList.back())));
@@ -4427,7 +4428,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  SatinGuides->shrink_to_fit();
 	  if (thredHeader.clipDataCount != 0U) {
 		ClipPoints->resize(thredHeader.clipDataCount);
-		bytesToRead = gsl::narrow<DWORD>(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
+		bytesToRead = wrap::toUnsigned(thredHeader.clipDataCount * sizeof(decltype(ClipPoints->back())));
 		ReadFile(fileHandle, ClipPoints->data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  ClipPoints->resize(bytesRead / sizeof(decltype(ClipPoints->back())));
@@ -4437,8 +4438,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  ClipPoints->shrink_to_fit();
 	  if (ExtendedHeader->texturePointCount != 0U) {
 		TexturePointsBuffer->resize(ExtendedHeader->texturePointCount);
-		bytesToRead = gsl::narrow<DWORD>(ExtendedHeader->texturePointCount *
-		                                 sizeof(decltype(TexturePointsBuffer->back())));
+		bytesToRead = wrap::toUnsigned(ExtendedHeader->texturePointCount *
+		                               sizeof(decltype(TexturePointsBuffer->back())));
 		ReadFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  TexturePointsBuffer->resize(bytesRead / sizeof(decltype(TexturePointsBuffer->back())));
@@ -4846,7 +4847,7 @@ void thred::internal::zumout() {
 	  ZoomFactor = 1;
 	  StateMap->reset(StateFlag::ZUMED);
 	  ZoomRect =
-	      fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0F};
+	      fRECTANGLE {0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
 	  thred::movStch();
 	  NearestCount = 0;
 	}
