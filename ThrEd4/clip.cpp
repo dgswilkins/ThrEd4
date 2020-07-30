@@ -622,7 +622,7 @@ void clip::internal::fxlen(FRMHED const&             form,
 	NextStart = 0;
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint);
   }
-  auto interval = hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
+  auto const interval = hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
   if (interval > halfSpacing) {
 	chainEndPoints.push_back(vertexIt[NextStart]);
   }
