@@ -121,8 +121,8 @@ auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 #endif
 }
 
-auto wrap::wcstof(wchar_t const (&buffer)[HBUFSIZ]) noexcept -> float {
-  return std::wcstof(static_cast<wchar_t const*>(buffer), nullptr);
+auto wrap::wcstof(wchar_t const *buffer) noexcept -> float {
+  return std::wcstof(buffer, nullptr);
 }
 
 void wrap::setCursor(HCURSOR hCursor) noexcept {
