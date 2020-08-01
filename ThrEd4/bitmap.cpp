@@ -41,8 +41,8 @@ BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 CHOOSECOLOR BitMapColorStruct;
 
 constexpr auto BPB   = 8U;  // bits per byte
-constexpr auto BPP24 = 24U; // 24 bits per pixel
-constexpr auto BPP32 = 32U; // 32 bits per pixel
+constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
+constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
 constexpr auto BMPFileNameLen = 16U; // max length (in bytes) of file name
 
@@ -87,9 +87,9 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_Sig) {
-	auto fileHeaderSize = BitmapFileHeader.bfOffBits - gsl::narrow<DWORD>(sizeof(BitmapFileHeader));
-	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
-	  fileHeaderSize = sizeof(BITMAPV4HEADER);
+	auto fileHeaderSize = wrap::toUnsigned(BitmapFileHeader.bfOffBits - wrap::toUnsigned(sizeof(BitmapFileHeader)));
+	if (fileHeaderSize > wrap::toUnsigned(sizeof(BITMAPV4HEADER))) {
+	  fileHeaderSize = wrap::toUnsigned(sizeof(BITMAPV4HEADER));
 	}
 	ReadFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, nullptr);
   }
@@ -581,7 +581,7 @@ auto bitmap::internal::bitar() -> bool {
 }
 
 auto bitmap::getrmap() -> uint32_t {
-  auto header     = BITMAPINFOHEADER {gsl::narrow<DWORD>(sizeof(BITMAPINFOHEADER)),
+  auto header     = BITMAPINFOHEADER {wrap::toUnsigned(sizeof(BITMAPINFOHEADER)),
                                   gsl::narrow_cast<LONG>(BitmapWidth),
                                   gsl::narrow_cast<LONG>(BitmapHeight),
                                   1U,
