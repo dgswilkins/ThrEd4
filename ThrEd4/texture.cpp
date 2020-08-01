@@ -75,13 +75,13 @@ void texture::txdun() {
 	  auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
-		WriteFile(handle, signature.data(), gsl::narrow<DWORD>(signature.size()), &bytesWritten, nullptr);
+		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
 		for (auto const& historyEntry : TextureHistory) {
 		  auto& bufferEntry       = *bufferIter;
 		  bufferEntry.placeholder = nullptr;
-		  bufferEntry.count       = gsl::narrow<uint32_t>(historyEntry.texturePoints.size());
+		  bufferEntry.count       = wrap::toUnsigned(historyEntry.texturePoints.size());
 		  bufferEntry.height      = historyEntry.height;
 		  bufferEntry.width       = historyEntry.width;
 		  bufferEntry.spacing     = historyEntry.spacing;
@@ -138,7 +138,7 @@ void texture::redtx() {
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
 	  auto sig       = std::array<char, 4> {0};
-	  if (ReadFile(handle, sig.data(), gsl::narrow<DWORD>(sig.size()), &bytesRead, nullptr) != 0) {
+	  if (ReadFile(handle, sig.data(), wrap::toUnsigned(sig.size()), &bytesRead, nullptr) != 0) {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
 			auto historyBytesRead = DWORD {0};
@@ -980,7 +980,7 @@ void texture::internal::txpar(FRMHED& form) {
   form.lengthOrCount.stitchLength = IniFile.userStitchLength;
   form.maxFillStitchLen           = IniFile.maxStitchLength;
   form.minFillStitchLen           = IniFile.minStitchLength;
-  form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form::refilfn();
 }
 
@@ -1006,7 +1006,7 @@ void texture::internal::txang(FRMHED& form) {
   if (!TempTexturePoints->empty()) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  form.fillType              = TXANGF;
-	  form.angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
+	  form.angleOrClipData.angle = IniFile.fillAngle;
 	  txi::txpar(form);
 	}
   }
@@ -1096,11 +1096,11 @@ void texture::internal::nutx(FRMHED& form) {
 	TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
-		FormList->operator[](iForm).fillInfo.texture.index += gsl::narrow<uint16_t>(tempPointCount);
+		FormList->operator[](iForm).fillInfo.texture.index += gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(tempPointCount);
 	  }
 	}
-	form.fillInfo.texture.index = gsl::narrow<uint16_t>(index);
-	form.fillInfo.texture.count = gsl::narrow<uint16_t>(tempPointCount);
+	wrap::narrow(form.fillInfo.texture.index, index);
+	wrap::narrow(form.fillInfo.texture.count, tempPointCount);
   }
 }
 
@@ -1193,7 +1193,7 @@ void texture::internal::dutxmir() {
 	auto const iMirrorPoint = iPoint + evenOffset;
 	for (auto index = 0U; index < iMirrorPoint; ++index) {
 	  auto newLine =
-	      gsl::narrow<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
+	      gsl::narrow_cast<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
 	  TempTexturePoints->emplace_back(TXPNT {TempTexturePoints->operator[](index).y, newLine});
 	}
 	StateMap->set(StateFlag::RESTCH);
@@ -1384,11 +1384,11 @@ void texture::internal::txgro(FRMHED const& textureForm) {
 
 auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
   if (isdigit(keyCode) != 0) {
-	character = gsl::narrow<char>(keyCode);
+	wrap::narrow(character, keyCode);
 	return true;
   }
   if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-	character = gsl::narrow<char>(keyCode - VK_NUMPAD0 + ASCIIoffset);
+	wrap::narrow(character, keyCode - VK_NUMPAD0 + ASCIIoffset);
 	return true;
   }
   if (keyCode == VK_OEM_PERIOD || keyCode == VK_DECIMAL) {
@@ -1426,7 +1426,7 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 		}
 	  }
 	  for (auto const point : *SelectedTexturePointsList) {
-		TempTexturePoints->operator[](point).line += gsl::narrow<uint16_t>(deltaX);
+		TempTexturePoints->operator[](point).line += gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
 	  }
 	}
   }
@@ -1622,9 +1622,9 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
 void texture::rtrtx(FRMHED const& form) {
   TempTexturePoints->clear();
   auto const currentIndex = form.fillInfo.texture.index;
-  if (TexturePointsBuffer->size() > gsl::narrow<uint32_t>(currentIndex)) {
+  if (wrap::toUnsigned(TexturePointsBuffer->size()) > gsl::narrow_cast<uint32_t>(currentIndex)) {
 	auto currentCount = form.fillInfo.texture.count;
-	if (TexturePointsBuffer->size() < gsl::narrow<uint32_t>(currentIndex + currentCount)) {
+	if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
 	  currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
 	}
 	TempTexturePoints->resize(currentCount);
