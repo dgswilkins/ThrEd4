@@ -75,7 +75,7 @@ void narrow_cast(outType& dest, inType src) noexcept
     dest = gsl::narrow_cast<outType>(src);
 }
 
-template <class outType> void stoi(outType& t, wchar_t* u) {
+template <class outType> void stoi(outType& t, wchar_t const* u) {
   t = gsl::narrow<outType>(std::stoi(u, nullptr, 10));
 }
 

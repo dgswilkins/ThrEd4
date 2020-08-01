@@ -698,21 +698,21 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  return TRUE;
 		}
 		case IDOK: {
-		  wchar_t buffer[HBUFSIZ] = {0};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyPetalPoints = wrap::wcstoi<uint32_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyHeartCount = wrap::wcstoi<uint16_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyDiameter = wrap::wcstof(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyHoleDiameter = wrap::wcstof(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyInnerCount = wrap::wcstoi<uint32_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyPetalCount = wrap::wcstoi<uint32_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.daisyPetalLen = wrap::wcstof(buffer);
+		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
+		  IniFile.daisyPetalPoints = wrap::wcstoi<uint32_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
+		  IniFile.daisyHeartCount = wrap::wcstoi<uint16_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
+		  IniFile.daisyDiameter = wrap::wcstof(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
+		  IniFile.daisyHoleDiameter = wrap::wcstof(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
+		  IniFile.daisyInnerCount = wrap::wcstoi<uint32_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
+		  IniFile.daisyPetalCount = wrap::wcstoi<uint32_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
+		  IniFile.daisyPetalLen = wrap::wcstof(buffer.data());
 		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
 			UserFlagMap->set(UserFlag::DAZHOL);
 		  }
@@ -725,11 +725,11 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  else {
 			UserFlagMap->reset(UserFlag::DAZD);
 		  }
-		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  wchar_t compareBuffer[HBUFSIZ] = {0};
+		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
+		  auto compareBuffer = std::array<wchar_t, HBUFSIZ>{};
 		  for (auto iType = uint8_t {0U}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
-			LoadString(ThrEdInstance, DaisyTypeStrings[iType], static_cast<LPTSTR>(compareBuffer), HBUFSIZ);
-			if (wcscmp(static_cast<wchar_t*>(buffer), static_cast<wchar_t*>(compareBuffer)) == 0) {
+			LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer.data(), HBUFSIZ);
+			if (wcscmp(buffer.data(), compareBuffer.data()) == 0) {
 			  IniFile.daisyBorderType = iType;
 			  break;
 			}
@@ -966,15 +966,15 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  return TRUE;
 		}
 		case IDOK: {
-		  wchar_t buffer[HBUFSIZ] = {0};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.formSides = wrap::wcstoi<uint16_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.tearTailLength = wrap::wcstof(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.tearTwistStep = wrap::wcstof(buffer) * PFGRAN;
-		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.tearTwistRatio = wrap::wcstof(buffer);
+		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
+		  IniFile.formSides = wrap::wcstoi<uint16_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
+		  IniFile.tearTailLength = wrap::wcstof(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
+		  IniFile.tearTwistStep = wrap::wcstof(buffer.data()) * PFGRAN;
+		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
+		  IniFile.tearTwistRatio = wrap::wcstof(buffer.data());
 		  EndDialog(hwndlg, 1);
 		  break;
 		}
@@ -1105,15 +1105,15 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  return TRUE;
 		}
 		case IDOK: {
-		  wchar_t buffer[HBUFSIZ] = {0};
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.wavePoints = wrap::wcstoi<uint16_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.waveStart = wrap::wcstoi<uint16_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer);
-		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), static_cast<LPTSTR>(buffer), HBUFSIZ);
-		  IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer);
+		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
+		  IniFile.wavePoints = wrap::wcstoi<uint16_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
+		  IniFile.waveStart = wrap::wcstoi<uint16_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
+		  IniFile.waveEnd = wrap::wcstoi<uint8_t>(buffer.data());
+		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
+		  IniFile.waveLobes = wrap::wcstoi<uint8_t>(buffer.data());
 
 		  constexpr auto wavePointLimit = 100U; // max number of points in a wave form
 		  if (IniFile.wavePoints > wavePointLimit) {

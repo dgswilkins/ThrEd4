@@ -46,7 +46,7 @@ namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
 void bBox();
-void chkmen() noexcept;
+void chkmen();
 void chkrng(fPOINT& range);
 void addColor(uint32_t stitch, uint32_t color);
 void coltab();
@@ -89,7 +89,7 @@ void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
 auto stch2pxr(fPOINT const& stitchCoordinate) -> POINT;
 void stchrct(fRECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT>& stretchBoxLine);
-auto txtWid(wchar_t const* string) noexcept -> SIZE;
+auto txtWid(wchar_t const* string) -> SIZE;
 void unbBox();
 void unbsho();
 void undat() noexcept;

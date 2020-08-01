@@ -364,8 +364,8 @@ void thred::wrnmen() {
 
 int32_t datcod[] = {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
 
-void thred::chkmen() noexcept {
-  auto lastCode = wrap::toUnsigned(sizeof(datcod) / sizeof(datcod[0]));
+void thred::chkmen() {
+  auto const lastCode = wrap::toUnsigned(sizeof(datcod) / sizeof(datcod[0]));
   for (auto iCode = 0U; iCode < lastCode; ++iCode) {
 	auto const code = (iCode == IniFile.dataCheck) ? UINT {MF_CHECKED} : UINT {MF_UNCHECKED};
 	CheckMenuItem(MainMenu, datcod[iCode], code);
@@ -7248,7 +7248,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  if (version < 2) {
 			auto inFormList = std::vector<FRMHEDO> {};
 			inFormList.resize(fileHeader.formCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    fileHeader.formCount * wrap::toUnsigned(sizeof(decltype(inFormList.back())));
 			ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != fileHeader.formCount * sizeof(decltype(inFormList.back()))) {
@@ -7261,7 +7261,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  else {
 			auto inFormList = std::vector<FRMHEDOUT> {};
 			inFormList.resize(fileHeader.formCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    fileHeader.formCount * wrap::toUnsigned(sizeof(decltype(inFormList.back())));
 			wrap::ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
@@ -7275,7 +7275,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  if (fileHeader.vertexCount != 0U) {
 			auto inVerticeList = std::vector<fPOINT> {};
 			inVerticeList.resize(fileHeader.vertexCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    fileHeader.vertexCount * wrap::toUnsigned(sizeof(decltype(inVerticeList.back())));
 			ReadFile(fileHandle, inVerticeList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
@@ -7292,7 +7292,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  if (fileHeader.dlineCount != 0U) {
 			auto inGuideList = std::vector<SATCONOUT> {};
 			inGuideList.resize(fileHeader.dlineCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    fileHeader.dlineCount * wrap::toUnsigned(sizeof(decltype(inGuideList.back())));
 			ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
@@ -7306,7 +7306,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  if (fileHeader.clipDataCount != 0U) {
 			auto inPointList = std::vector<fPOINT> {};
 			inPointList.resize(fileHeader.clipDataCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    fileHeader.clipDataCount * wrap::toUnsigned(sizeof(decltype(ClipPoints->back())));
 			ReadFile(fileHandle, inPointList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
@@ -7319,7 +7319,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
 		  if (thredHeader.texturePointCount != 0U) {
 			auto inTextureList = std::vector<TXPNT> {};
 			inTextureList.resize(thredHeader.texturePointCount);
-			auto bytesToRead =
+			auto const bytesToRead =
 			    thredHeader.texturePointCount * wrap::toUnsigned(sizeof(decltype(inTextureList.back())));
 			ReadFile(fileHandle, inTextureList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
@@ -16004,7 +16004,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 }
 
 // return the width of a text item
-auto thred::txtWid(wchar_t const* string) noexcept -> SIZE {
+auto thred::txtWid(wchar_t const* string) -> SIZE {
   auto textSize = SIZE {};
   wrap::GetTextExtentPoint32(ThredDC, string, wrap::toUnsigned(wcslen(string)), &textSize);
   return textSize;
