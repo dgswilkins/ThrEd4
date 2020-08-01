@@ -234,8 +234,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	else {
 	  count = absoluteLengths.y / DSTMax + 1;
 	}
-	auto const stepSize = POINT {gsl::narrow<int32_t>(absoluteLengths.x / count + 1U),
-	                             gsl::narrow<int32_t>(absoluteLengths.y / count + 1U)};
+	auto const stepSize = POINT {gsl::narrow<LONG>(absoluteLengths.x / count + 1U),
+	                             gsl::narrow<LONG>(absoluteLengths.y / count + 1U)};
 
 	auto difference = POINT {0L, 0L};
 	while ((lengths.x != 0) || (lengths.y != 0)) {
