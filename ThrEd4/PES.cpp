@@ -216,7 +216,7 @@ void PES::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta
   constexpr auto bit8       = uint32_t {0x80U};   // Set bit 8 on the upper byte
   constexpr auto bit12      = uint32_t {0x800U};  // Set bit 12 if delta is negative
   constexpr auto offset     = uint32_t {0x1000U}; // offset used to shift value positive
-  auto           outputVal  = gsl::narrow_cast<uint32_t>(abs(delta)) & mask11bits;
+  auto           outputVal  = gsl::narrow_cast<uint32_t>(std::abs(delta)) & mask11bits;
   if (delta < 0) {
 	outputVal = (delta + offset) & mask11bits;
 	outputVal |= bit12;
@@ -448,7 +448,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 			pesVal -= offset;
 		  }
 		  auto sPesVal = gsl::narrow_cast<int32_t>(pesVal);
-		  locof        = gsl::narrow_cast<decltype(locof)>(sPesVal);
+		  wrap::narrow_cast(locof, sPesVal);
 		  ++iPESstitch;
 		}
 		else {
@@ -508,10 +508,10 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		constexpr auto SewStr = "CSewSeg";
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
 		strncpy(static_cast<char*>(pesHeader.led), PESStr, strlen(PESStr));
-		pesHeader.celn = gsl::narrow<decltype(pesHeader.celn)>(strlen(EmbStr));
+		wrap::narrow(pesHeader.celn, strlen(EmbStr));
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
 		strncpy(static_cast<char*>(pesHeader.ce), EmbStr, pesHeader.celn);
-		pesHeader.cslen = gsl::narrow<decltype(pesHeader.cslen)>(strlen(SewStr));
+		wrap::narrow(pesHeader.cslen, strlen(SewStr));
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
 		strncpy(static_cast<char*>(pesHeader.cs), SewStr, pesHeader.cslen);
 		auto iColor = 0;
@@ -526,7 +526,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 			  matchMin   = match;
 			}
 		  }
-		  PESequivColors[iColor++] = gsl::narrow<uint8_t>(matchIndex);
+		  wrap::narrow(PESequivColors[iColor++], matchIndex);
 		}
 		auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
 		auto boundingRect = fRECTANGLE {};
@@ -540,7 +540,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
 		pesBuffer.reserve(pesSize);
 		auto threadList = std::vector<PESCOLORLIST> {};
-		auto blockIndex = gsl::narrow_cast<uint16_t>(0U); // Index into the stitch blocks
+		auto blockIndex = uint16_t {0U}; // Index into the stitch blocks
 		threadList.push_back(PESCOLORLIST {blockIndex, PESequivColors[stitchColor]});
 		pesBuffer.resize(sizeof(PESSTCHLST));
 		// first block is a jump in place
@@ -656,7 +656,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 		std::fill(fstart, fend, ' ');
 		pecHeader->labnd       = '\r'; // 13 = carriage return
-		pecHeader->colorCount  = gsl::narrow<uint8_t>(pesThreadCount);
+		wrap::narrow(pecHeader->colorCount, pesThreadCount);
 		pecHeader->hnd1        = 0x00ff;
 		pecHeader->thumbHeight = ThumbHeight;
 		pecHeader->thumbWidth  = ThumbWidth / bitsPerByte;
