@@ -699,15 +699,13 @@ void form::drwfrm() {
   if (!SelectedFormList->empty()) {
 	SelectObject(StitchWindowMemDC, MultiFormPen);
 	ratsr();
-	SelectedFormsRect.top = SelectedFormsRect.left = LONG_MAX;
+	SelectedFormsRect.top = SelectedFormsRect.left = std::numeric_limits<decltype(SelectedFormsRect.top)>::max();
 	SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
 	for (auto selectedForm : (*SelectedFormList)) {
 	  fselrct(selectedForm);
 	}
-	SelectedFormsSize.x =
-	    gsl::narrow<decltype(SelectedFormsSize.x)>(SelectedFormsRect.right - SelectedFormsRect.left);
-	SelectedFormsSize.y =
-	    gsl::narrow<decltype(SelectedFormsSize.y)>(SelectedFormsRect.bottom - SelectedFormsRect.top);
+	wrap::narrow_cast(SelectedFormsSize.x, SelectedFormsRect.right - SelectedFormsRect.left);
+	wrap::narrow_cast(SelectedFormsSize.y, SelectedFormsRect.bottom - SelectedFormsRect.top);
 	dubig();
   }
   else {
@@ -728,7 +726,7 @@ void form::drwfrm() {
 void form::internal::setpoli() {
   auto form           = FRMHED {};
   form.type           = FRMFPOLY;
-  form.attribute      = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
+  form.attribute      = ActiveLayer << 1U;
   form.underlayIndent = IniFile.underlayIndent;
   FormList->push_back(form);
   StateMap->set(StateFlag::SATIN);
@@ -738,7 +736,7 @@ void form::internal::setpoli() {
 void form::internal::setlin() {
   auto form      = FRMHED {};
   form.type      = FRMLINE;
-  form.attribute = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
+  form.attribute = ActiveLayer << 1U;
   FormList->push_back(form);
   StateMap->set(StateFlag::SATIN);
   StateMap->set(StateFlag::INIT);
@@ -823,14 +821,14 @@ void form::durpoli(uint32_t vertexCount) {
   if (vertexCount < 3) {
 	vertexCount = 3;
   }
-  auto const stepAngle = PI_F * 2.0F / gsl::narrow_cast<float>(vertexCount);
+  auto const stepAngle = PI_F2 / gsl::narrow_cast<float>(vertexCount);
   // 500 gives us a reasonably sized default
   auto const length = 500.0F / gsl::narrow_cast<float>(vertexCount) * ZoomFactor *
                       gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
-  newForm.attribute   = gsl::narrow<decltype(newForm.attribute)>(ActiveLayer << 1U);
+  newForm.attribute   = ActiveLayer << 1U;
   newForm.type        = FRMFPOLY;
   FormList->push_back(newForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
@@ -1260,7 +1258,7 @@ void form::chkseq(bool border) {
 void form::internal::ritbrd(FRMHED const& form) {
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(INSREC {TYPBRD,
-	                                                gsl::narrow<uint32_t>(form.borderColor) & COLMSK,
+	                                                gsl::narrow_cast<uint32_t>(form.borderColor) & COLMSK,
 	                                                wrap::toUnsigned(InterleaveSequence->size()),
 	                                                I_BRD});
 	form::chkseq(true);
@@ -1271,7 +1269,7 @@ void form::internal::ritapbrd() {
   if (!OSequence->empty()) {
 	auto const& form = FormList->operator[](ClosestFormToCursor);
 	InterleaveSequenceIndices->emplace_back(INSREC {
-	    TYPMSK, gsl::narrow<uint32_t>(form.borderColor) >> 4U, wrap::toUnsigned(InterleaveSequence->size()), I_AP});
+	    TYPMSK, gsl::narrow_cast<uint32_t>(form.borderColor) >> 4U, wrap::toUnsigned(InterleaveSequence->size()), I_AP});
 	form::chkseq(true);
   }
 }
@@ -1280,7 +1278,7 @@ void form::internal::ritfil() {
   if (!OSequence->empty()) {
 	auto const& form = FormList->operator[](ClosestFormToCursor);
 	InterleaveSequenceIndices->emplace_back(
-	    INSREC {TYPFRM, form.fillColor, gsl::narrow<uint32_t>(InterleaveSequence->size()), I_FIL});
+	    INSREC {TYPFRM, gsl::narrow_cast<uint32_t>(form.fillColor), wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
 	form::chkseq(false);
   }
 }
@@ -2250,11 +2248,11 @@ void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	projectedPoints.reserve(currentVertexCount);
 	currentX += step;
 	auto iPoint = 0U;
-	for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
+	for (auto iVertex = uint16_t {0U}; iVertex < currentVertexCount; ++iVertex) {
 	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
 	  auto       point       = fPOINT {};
 	  if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
-		auto const a = fPOINTLINE {point.x, point.y, gsl::narrow<uint16_t>(iVertex)};
+		auto const a = fPOINTLINE {point.x, point.y, iVertex};
 		projectedPoints.push_back(a);
 		++iPoint;
 	  }
@@ -2786,8 +2784,8 @@ auto form::internal::isect(uint32_t                   vertex0,
   if (tempIntersection.y < TINYFLOAT) {
 	tempIntersection.y = 0.0F;
   }
-  intersection.x = gsl::narrow_cast<float>(tempIntersection.x);
-  intersection.y = gsl::narrow_cast<float>(tempIntersection.y);
+  intersection.x = tempIntersection.x;
+  intersection.y = tempIntersection.y;
   length = hypot(tempIntersection.x - lineSegmentStart.x, tempIntersection.y - lineSegmentStart.y);
   // ToDo - should length be determined from start or end?
   //	 hypot(tempIntersection.x-lineSegmentEnd.x,tempIntersection.y-lineSegmentEnd.y);
@@ -3068,7 +3066,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   }
   if (StateMap->test(StateFlag::TXFIL)) {
 	if ((!TexturePointsBuffer->empty()) && form.fillInfo.texture.index + form.fillInfo.texture.count <=
-	                                           gsl::narrow<uint16_t>(TexturePointsBuffer->size())) {
+	                                           gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size())) {
 	  clipWidth = form.fillSpacing;
 	}
 	else {
@@ -3144,7 +3142,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   }
   auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
   // reserve a little more than we need. Determined empirically
-  regionCrossingData.reserve((gsl::narrow_cast<size_t>(clipGrid.right) - clipGrid.left) * 5); // NOLINT(readability-magic-numbers)
+  regionCrossingData.reserve((wrap::toSize(clipGrid.right) - clipGrid.left) * 5); // NOLINT(readability-magic-numbers)
   for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	auto start  = wrap::floor<uint32_t>(vertexIt[iVertex].x / clipWidth);
 	auto finish = wrap::floor<uint32_t>(vertexIt[form::nxt(form, iVertex)].x / clipWidth);
@@ -3154,8 +3152,9 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 	if (form.fillSpacing < 0) {
 	  finish += wrap::round<decltype(finish)>(ClipRectSize.cx / clipWidth);
 	}
-	if (finish > gsl::narrow<uint32_t>(clipGrid.right)) {
-	  finish = gsl::narrow<uint32_t>(clipGrid.right);
+	auto const right = gsl::narrow<uint32_t>(clipGrid.right);
+	if (finish > right) {
+	  finish = right;
 	}
 	if (clipNegative) {
 	  start -= wrap::round<uint32_t>(ClipRectSize.cx / clipWidth);
@@ -3818,10 +3817,10 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<RCON> const&     pathMap,
                             std::vector<uint32_t> const& mapIndexSequence,
                             uint32_t                     pathIndex) noexcept {
-  if ((gsl::narrow_cast<size_t>(pathIndex) + 1U) < sequencePath.size()) {
-	const unsigned nextNode = sequencePath[gsl::narrow_cast<size_t>(pathIndex) + 1U].node;
+  if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {
+	const unsigned nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
 	unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
-	while (iPath < mapIndexSequence[gsl::narrow_cast<size_t>(sequencePath[pathIndex].node) + 1U] &&
+	while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1U] &&
 	       pathMap[iPath].node != nextNode) {
 	  ++iPath;
 	}
@@ -4131,7 +4130,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	                                         (gsl::narrow_cast<double>(groupEnd) - groupStart) *
 	                                         (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart) +
 	                                     sequenceStart);
-	seql                    = gsl::narrow<decltype(seql)>(std::abs(intermediate));
+	wrap::narrow(seql, std::abs(intermediate));
   }
   auto const length = (gsl::narrow_cast<double>(groupEnd) - groupStart) *
                       (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart);
@@ -4409,13 +4408,13 @@ void form::internal::lcon(FRMHED const&          form,
 		bool const tmpSkip = tempPath[iPath].skp;
 		uint16_t   tmpNode = 0U;
 		if (tempPath[iPath].pcon == std::numeric_limits<uint32_t>::max()) {
-		  tmpNode = gsl::narrow<decltype(tmpNode)>(tempPath[iPath].count);
+		  wrap::narrow(tmpNode, tempPath[iPath].count);
 		  count   = tempPath[iPath].count;
 		}
 		else {
 		  if (tempPath[iPath].pcon != count) {
 			count   = tempPath[iPath].pcon;
-			tmpNode = gsl::narrow<decltype(tmpNode)>(pathMap[tempPath[iPath].pcon].node);
+			wrap::narrow(tmpNode, pathMap[tempPath[iPath].pcon].node);
 		  }
 		}
 		sequencePath.push_back({tmpNode, 0, tmpSkip});
@@ -4438,7 +4437,7 @@ void form::internal::lcon(FRMHED const&          form,
 	  sequencePath.resize(sequencePathIndex);
 	  auto lastGroup            = 0U;
 	  sequencePath[0].node      = 0;
-	  sequencePath[0].nextGroup = gsl::narrow<uint16_t>(sortedLines[regions[0].end]->group);
+	  wrap::narrow(sequencePath[0].nextGroup, sortedLines[regions[0].end]->group);
 	  sequencePath[0].skp       = false;
 	  durgn(form, sequencePath, visitedRegions, sortedLines, 0, lineCount, regions, lastGroup, sequencePathIndex);
 	}
@@ -5053,7 +5052,7 @@ void form::internal::fsvrt() {
   texture::deltx(ClosestFormToCursor);
   makpoli();
   form.type        = FRMFPOLY;
-  form.fillColor   = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
@@ -5094,11 +5093,11 @@ void form::internal::fshor(FRMHED& form) {
   texture::deltx(ClosestFormToCursor);
   makpoli();
   form.type        = FRMFPOLY;
-  form.fillColor   = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.fillType    = HORF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form.angleOrClipData.angle = gsl::narrow_cast<float>(PI) / 2;
+  form.angleOrClipData.angle = PI_FHALF;
   form::dusqr(form);
   form::refil();
 }
@@ -5135,9 +5134,9 @@ void form::internal::fsangl(FRMHED& form) {
   texture::deltx(ClosestFormToCursor);
   makpoli();
   form.type                  = FRMFPOLY;
-  form.fillColor             = gsl::narrow<decltype(form.fillColor)>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.fillType              = ANGF;
-  form.angleOrClipData.angle = gsl::narrow_cast<float>(IniFile.fillAngle);
+  form.angleOrClipData.angle = IniFile.fillAngle;
   form.fillSpacing           = LineSpacing;
   form::fsizpar(form);
   form::dusqr(form);
@@ -5354,7 +5353,7 @@ void form::internal::filsfn() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.type        = SAT;
-  form.fillColor   = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.fillType    = SATF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
@@ -5678,7 +5677,7 @@ void form::bord() {
 	for (auto selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
-	  form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+	  wrap::narrow(form.borderColor, ActiveColor);
 	  fi::sbord(selectedForm);
 	}
 	StateMap->set(StateFlag::INIT);
@@ -5688,7 +5687,7 @@ void form::bord() {
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto& form       = FormList->operator[](ClosestFormToCursor);
-	  form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+	  wrap::narrow(form.borderColor, ActiveColor);
 	  fi::sbord(ClosestFormToCursor);
 	  thred::coltab();
 	  StateMap->set(StateFlag::INIT);
@@ -5706,7 +5705,7 @@ void form::internal::fsclp(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = ClipRectSize.cx;
-  form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
   for (auto& clip : *ClipBuffer) {
@@ -5767,7 +5766,7 @@ void form::internal::sapliq(uint32_t formIndex) {
   form.edgeSpacing = LineSpacing / 2.0F;
   form.borderSize  = IniFile.borderWidth;
   form::bsizpar(form);
-  form.borderColor = gsl::narrow<uint8_t>(ActiveColor | (AppliqueColor << 4U));
+  wrap::narrow(form.borderColor, ActiveColor | (AppliqueColor << 4U));
   if (form.type != FRMLINE) {
 	if (form.fillType == SAT && (form.satinGuideCount != 0U)) {
 	  satin::delsac(ClosestFormToCursor);
@@ -6118,13 +6117,13 @@ void form::setexpand(float xyRatio) {
   thred::savdo();
   auto stitchPoint = fPOINT {};
   if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
-	rectangle.left   = gsl::narrow_cast<float>(SelectedFormsRect.left);
-	rectangle.top    = gsl::narrow_cast<float>(SelectedFormsRect.top);
-	rectangle.right  = gsl::narrow_cast<float>(SelectedFormsRect.right);
-	rectangle.bottom = gsl::narrow_cast<float>(SelectedFormsRect.bottom);
+	wrap::narrow_cast(rectangle.left, SelectedFormsRect.left);
+	wrap::narrow_cast(rectangle.top, SelectedFormsRect.top);
+	wrap::narrow_cast(rectangle.right, SelectedFormsRect.right);
+	wrap::narrow_cast(rectangle.bottom, SelectedFormsRect.bottom);
 
-	stitchPoint.x = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowOrigin.x);
-	stitchPoint.y = gsl::narrow_cast<float>(Msg.pt.y - StitchWindowOrigin.y);
+	wrap::narrow_cast(stitchPoint.x, Msg.pt.x - StitchWindowOrigin.x);
+	wrap::narrow_cast(stitchPoint.y, Msg.pt.y - StitchWindowOrigin.y);
 	size0.y       = rectangle.bottom - rectangle.top;
   }
   else {
@@ -6304,7 +6303,7 @@ void form::setexpand(float xyRatio) {
 void form::nufilcol(uint32_t color) {
   // clang-format off
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillColor;
-  auto  newColor  = gsl::narrow<uint8_t>(color);
+  auto  newColor  = gsl::narrow<decltype(FormList->back().fillColor)>(color);
   // clang-format on
   if (formColor != newColor) {
 	formColor            = newColor;
@@ -6320,8 +6319,9 @@ void form::nufilcol(uint32_t color) {
 
 void form::nufthcol(uint32_t color) {
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color;
-  if (formColor != gsl::narrow<uint8_t>(color)) {
-	formColor            = gsl::narrow<uint8_t>(color);
+  auto  newColor  = gsl::narrow<decltype(FormList->back().fillInfo.feather.color)>(color);
+  if (formColor != newColor) {
+	formColor            = newColor;
 	auto const attribute = (ClosestFormToCursor << FRMSHFT) | FTHMSK;
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
@@ -6333,7 +6333,7 @@ void form::nufthcol(uint32_t color) {
 }
 
 void form::nubrdcol(uint32_t color) {
-  FormList-> operator[](ClosestFormToCursor).borderColor = gsl::narrow<uint8_t>(color);
+  wrap::narrow(FormList->operator[](ClosestFormToCursor).borderColor, color);
   auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMBFIL;
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & (FRMSK | TYPMSK)) == attribute) {
@@ -6345,7 +6345,7 @@ void form::nubrdcol(uint32_t color) {
 
 void form::nulapcol(uint32_t color) {
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
-  if (gsl::narrow<uint32_t>(currentForm.borderColor >> FRMSHFT) != color) {
+  if (gsl::narrow<decltype(color)>(currentForm.borderColor >> FRMSHFT) != color) {
 	currentForm.borderColor &= COLMSK;
 	currentForm.borderColor |= color << FRMSHFT;
 	auto const attribute = (ClosestFormToCursor << FRMSHFT) | TYPMSK;
@@ -6362,7 +6362,7 @@ void form::internal::sbold(uint32_t formIndex) {
   auto& form = FormList->operator[](formIndex);
   clip::deleclp(formIndex);
   form.edgeType    = EDGEBEAN;
-  form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   form::refilfn();
 }
@@ -6422,7 +6422,7 @@ void form::dustar(uint32_t starCount, float length) {
   auto       newForm     = FRMHED {};
   newForm.vertexIndex    = thred::adflt(vertexCount);
   newForm.vertexCount    = vertexCount;
-  newForm.attribute      = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+  wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   newForm.type           = FRMFPOLY;
   FormList->push_back(newForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
@@ -6460,14 +6460,14 @@ void form::duspir(uint32_t stepCount) {
   if (stepCount > stepMax) {
 	stepCount = stepMax;
   }
-  auto const stepAngle = PI_F * 2.0F / gsl::narrow_cast<float>(stepCount);
+  auto const stepAngle = PI_F2 / gsl::narrow_cast<float>(stepCount);
   auto const length    = 800.0F / gsl::narrow_cast<float>(stepCount) * ZoomFactor *
                       gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
   auto vertexCount    = wrap::round<uint32_t>(gsl::narrow_cast<float>(stepCount) * SpiralWrap);
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
-  newForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+  wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   FormList->push_back(newForm);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   auto firstSpiral    = std::vector<fPOINT> {};
@@ -6523,11 +6523,11 @@ void form::duhart(uint32_t sideCount) {
   FormList->push_back(FRMHED {});
   auto& currentForm       = FormList->back();
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
-  currentForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+  wrap::narrow(currentForm.attribute, ActiveLayer << 1U);
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
-  auto       savedVertexIndex = gsl::narrow<uint32_t>(FormVertices->size());
+  auto const savedVertexIndex = wrap::toUnsigned(FormVertices->size());
   auto       point            = thred::pxCor2stch(Msg.pt);
-  auto       stepAngle        = PI_F * 2.0F / gsl::narrow_cast<float>(sideCount);
+  auto       stepAngle        = PI_F2 / gsl::narrow_cast<float>(sideCount);
   auto const length           = 300.0F / gsl::narrow_cast<float>(sideCount) * ZoomFactor *
                       gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto angle    = PI_F * hartAngle;
@@ -6678,7 +6678,7 @@ void form::duzig(uint32_t vertices) {
   auto newForm        = FRMHED {};
   newForm.vertexIndex = thred::adflt(vertices);
   newForm.vertexCount = vertices;
-  newForm.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+  wrap::narrow(newForm.attribute, ActiveLayer << 1U);
   FormList->push_back(newForm);
   ClosestFormToCursor    = wrap::toUnsigned(FormList->size() - 1U);
   auto       stitchPoint = thred::pxCor2stch(Msg.pt);
@@ -6806,7 +6806,7 @@ void form::internal::prpsbrd(uint32_t formIndex) {
 	form::bsizpar(form);
 	form.borderSize  = BorderWidth;
 	form.edgeSpacing = LineSpacing;
-	form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+	wrap::narrow(form.borderColor, ActiveColor);
 	form::refilfn();
   }
 }
@@ -6838,7 +6838,7 @@ void form::prpbrd(float borderStitchSpacing) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto& currentForm = FormList->operator[](ClosestFormToCursor);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
-		currentForm.attribute |= gsl::narrow<decltype(currentForm.attribute)>(SBLNT | FBLNT);
+		currentForm.attribute |= gsl::narrow_cast<decltype(currentForm.attribute)>(SBLNT | FBLNT);
 	  }
 	  else {
 		currentForm.attribute &= NOBLNT;
@@ -7383,7 +7383,7 @@ void form::movlayr(uint32_t layer) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
 	  auto& formAttr = FormList->operator[](ClosestFormToCursor).attribute;
-	  formAttr = gsl::narrow<uint8_t>(layer | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK));
+	  wrap::narrow(formAttr, (layer | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK)));
 	  StateMap->reset(StateFlag::FORMSEL);
 	  for (auto& stitch : *StitchBuffer) {
 		if (((stitch.attribute & ALTYPMSK) != 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
@@ -7633,7 +7633,7 @@ void form::internal::bholbrd(uint32_t formIndex) {
   form::bsizpar(form);
   form.edgeType    = EDGEBHOL;
   form.edgeSpacing = LineSpacing;
-  form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::savblen(ButtonholeCornerLength);
   form::refilfn();
 }
@@ -7723,7 +7723,7 @@ void form::internal::fspic(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = PicotSpacing;
-  form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);
   auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
@@ -7782,7 +7782,7 @@ auto form::internal::contsf(uint32_t formIndex) -> bool {
 	texture::deltx(ClosestFormToCursor);
 	form::chkcont();
 	form.attribute |= gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
-	form.fillColor   = gsl::narrow<uint8_t>(ActiveColor);
+	wrap::narrow(form.fillColor, ActiveColor);
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
 	form::refilfn();
@@ -8441,7 +8441,7 @@ void form::vrtsclp() {
 	++offsetStart;
   }
   form.fillType  = VCLPF;
-  form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.type      = FRMFPOLY;
   refilfn();
 }
@@ -8506,7 +8506,7 @@ void form::horsclp() {
 	++offsetStart;
   }
   form.fillType  = HCLPF;
-  form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.type      = FRMFPOLY;
   form::refilfn();
 }
@@ -8569,7 +8569,7 @@ void form::angsclp(FRMHED& form) {
 	++offsetStart;
   }
   form.fillType  = ANGCLPF;
-  form.fillColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.fillColor, ActiveColor);
   form.type      = FRMFPOLY;
   form::refilfn();
 }
@@ -8622,7 +8622,7 @@ void form::angclp() {
 void form::dubsfil(FRMHED& form) {
   clip::deleclp(ClosestFormToCursor);
   form.edgeType    = EDGEDOUBLE;
-  form.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   fi::dubfn(form);
   form::refilfn();
@@ -8703,7 +8703,7 @@ void form::col2frm() {
 		majorityColor &= COLOR_BITS;
 		if (formIter.fillColor != majorityColor) {
 		  ++colorChangedCount;
-		  formIter.fillColor = gsl::narrow<uint8_t>(majorityColor);
+		  wrap::narrow(formIter.fillColor, majorityColor);
 		}
 		if (formIter.fillType == FTHF && ((formIter.extendedAttribute & AT_FTHBLND) != 0U)) {
 		  count = majorityColor = 0;
@@ -8716,7 +8716,7 @@ void form::col2frm() {
 		  majorityColor &= COLOR_BITS;
 		  if (formIter.fillInfo.feather.color != majorityColor) {
 			++colorChangedCount;
-			formIter.fillInfo.feather.color = gsl::narrow<uint8_t>(majorityColor);
+			wrap::narrow(formIter.fillInfo.feather.color, majorityColor);
 		  }
 		}
 	  }
@@ -8732,7 +8732,7 @@ void form::col2frm() {
 		majorityColor &= COLOR_BITS;
 		if (formIter.borderColor != majorityColor) {
 		  ++colorChangedCount;
-		  formIter.borderColor = gsl::narrow<uint8_t>(majorityColor);
+		  wrap::narrow(formIter.borderColor, majorityColor);
 		}
 	  }
 	  if ((formIter.extendedAttribute & (AT_WALK | AT_CWLK | AT_UND)) != 0U) {
@@ -8747,7 +8747,7 @@ void form::col2frm() {
 		majorityColor &= COLOR_BITS;
 		if (formIter.underlayColor != majorityColor) {
 		  ++colorChangedCount;
-		  formIter.underlayColor = gsl::narrow<uint8_t>(majorityColor);
+		  wrap::narrow(formIter.underlayColor, majorityColor);
 		}
 	  }
 	  startColorOffset += COLOR_COUNT;
@@ -8761,7 +8761,7 @@ void form::col2frm() {
 
 void form::chan() {
   auto& currentForm              = FormList->operator[](ClosestFormToCursor);
-  currentForm.borderColor        = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(currentForm.borderColor, ActiveColor);
   currentForm.edgeSpacing        = IniFile.chainSpace;
   currentForm.borderSize         = BorderWidth;
   currentForm.edgeStitchLen      = IniFile.chainRatio;
@@ -8832,7 +8832,7 @@ void form::internal::fsclpx(uint32_t formIndex) {
   form.borderClipData = clip::nueclp(ClosestFormToCursor, clipSize);
   form.borderSize     = ClipRectSize.cy;
   form.edgeSpacing    = ClipRectSize.cx;
-  form.borderColor    = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   auto offsetStart = std::next(ClipPoints->begin(), form.borderClipData);
   for (auto& clip : *ClipBuffer) {
