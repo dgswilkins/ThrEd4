@@ -249,7 +249,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	}
 	else {
 	  if (form.vertexIndex < FormVertices->size()) {
-		form.vertexCount = gsl::narrow<uint16_t>(FormVertices->size() - form.vertexIndex);
+		wrap::narrow(form.vertexCount, FormVertices->size() - form.vertexIndex);
 		satin::delsac(iForm);
 		auto sourceStart = std::next(FormVertices->cbegin(), form.vertexIndex);
 		auto sourceEnd   = std::next(sourceStart, form.vertexCount);
@@ -320,7 +320,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	  }
 	  else {
 		if (clipDifference < ClipPoints->size()) {
-		  form.clipEntries = gsl::narrow<uint16_t>(FormVertices->size() - clipDifference);
+		  wrap::narrow(form.clipEntries, FormVertices->size() - clipDifference);
 		  clipPoint.resize(clipPoint.size() + form.clipEntries);
 		  auto sourceStart = std::next(ClipPoints->cbegin(), form.borderClipData);
 		  auto sourceEnd   = std::next(sourceStart, form.clipEntries);
@@ -360,7 +360,7 @@ void repair::internal::repsat() {
 	  }
 	  else {
 		if (guideDifference < SatinGuides->size()) {
-		  form.satinGuideCount   = gsl::narrow<uint16_t>(SatinGuides->size() - guideDifference);
+		  wrap::narrow(form.satinGuideCount, SatinGuides->size() - guideDifference);
 		  auto       sourceStart = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 		  auto       sourceEnd   = std::next(sourceStart, form.satinGuideCount);
 		  auto const destination = std::next(SatinGuides->begin(), guideCount);
@@ -389,19 +389,18 @@ void repair::internal::reptx() {
 		auto sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
 		auto destination = std::next(TexturePointsBuffer->begin(), textureCount);
 		std::copy(sourceStart, sourceEnd, destination);
-		form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
+		wrap::narrow(form.fillInfo.texture.index, textureCount);
 		textureCount += form.fillInfo.texture.count;
 		ri::bcup(form, badData);
 	  }
 	  else {
 		if (TexturePointsBuffer->size() > form.fillInfo.texture.index) {
-		  form.fillInfo.texture.count =
-		      gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - form.fillInfo.texture.index;
+		  wrap::narrow(form.fillInfo.texture.count, TexturePointsBuffer->size() - form.fillInfo.texture.index);
 		  auto sourceStart = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 		  auto sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
 		  auto const destination = std::next(TexturePointsBuffer->begin(), textureCount);
 		  std::copy(sourceStart, sourceEnd, destination);
-		  form.fillInfo.texture.index = gsl::narrow<uint16_t>(textureCount);
+		  wrap::narrow(form.fillInfo.texture.index, textureCount);
 		  ri::bcup(form, badData);
 		  textureCount = badData.tx;
 		}
