@@ -638,7 +638,7 @@ void satin::internal::satsbrd(uint32_t formIndex) {
   form::bsizpar(currentForm);
   currentForm.borderSize  = BorderWidth;
   currentForm.edgeSpacing = LineSpacing / 2;
-  currentForm.borderColor = gsl::narrow<uint8_t>(ActiveColor);
+  wrap::narrow(currentForm.borderColor, ActiveColor);
   form::refilfn();
 }
 
@@ -763,7 +763,7 @@ void satin::ribon() {
 		  }
 		}
 		newForm.type                       = SAT;
-		newForm.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
+		wrap::narrow(newForm.fillColor, ActiveColor);
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 		newForm.vertexCount                = iNewVertex;
