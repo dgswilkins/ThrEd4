@@ -63,16 +63,12 @@ template <class outType> auto wcstoi(wchar_t const *buffer) -> outType {
   return gsl::narrow<outType>(std::wcstoul(buffer, nullptr, 10));
 }
 
-template <class outType, class inType>
-void narrow(outType& dest, inType src) noexcept
-{
-    dest = gsl::narrow<outType>(src);
+template <class outType, class inType> void narrow(outType& dest, inType src) {
+  dest = gsl::narrow<outType>(src);
 }
 
-template <class outType, class inType>
-void narrow_cast(outType& dest, inType src) noexcept
-{
-    dest = gsl::narrow_cast<outType>(src);
+template <class outType, class inType> void narrow_cast(outType& dest, inType src) noexcept {
+  dest = gsl::narrow_cast<outType>(src);
 }
 
 template <class outType> void stoi(outType& t, wchar_t const* u) {
