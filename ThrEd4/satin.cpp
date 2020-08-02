@@ -271,11 +271,10 @@ auto satin::internal::satselfn() -> bool {
   auto       minimumLength = BIGDOUBLE;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	// clang-format off
-	auto&      form      = FormList->operator[](iForm);
-	auto const layerCode =  
-	  gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
-	// clang-format on
+	auto& form = FormList->operator[](iForm);
+
+	auto const layerCode =
+	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);
 	if ((ActiveLayer == 0U) || (layerCode == 0U) || layerCode == ActiveLayer) {
 	  auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -762,7 +761,7 @@ void satin::ribon() {
 			vertexIt[iNewVertex++] = OutsidePoints->operator[](iVertex);
 		  }
 		}
-		newForm.type                       = SAT;
+		newForm.type = SAT;
 		wrap::narrow(newForm.fillColor, ActiveColor);
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
