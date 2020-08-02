@@ -16803,7 +16803,7 @@ void thred::internal::drwStch() {
   auto stitchCount = 0U;
   for (auto iColor = 0U; iColor < thred::maxColor(); ++iColor) {
 	auto deltaCount =
-	    gsl::narrow<uint32_t>(ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex -
+	    gsl::narrow<uint32_t>(ColorChangeTable->operator[](wrap::toSize(iColor) + 1U).stitchIndex -
 	                          ColorChangeTable->operator[](iColor).stitchIndex);
 	if (deltaCount > stitchCount) {
 	  stitchCount = deltaCount;
