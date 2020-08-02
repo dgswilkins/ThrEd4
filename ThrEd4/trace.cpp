@@ -970,7 +970,7 @@ void trace::dutrnum1() {
   DestroyWindow(GeneralNumberInputBox);
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN1);
-  auto traceLength = wrap::stof(std::begin(MsgBuffer));
+  auto traceLength = wrap::wcstof(std::begin(MsgBuffer));
   if (traceLength > MAXSIZF) {
 	traceLength = MAXSIZF;
   }

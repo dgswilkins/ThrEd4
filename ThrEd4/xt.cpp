@@ -2336,7 +2336,7 @@ auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
 
   auto buffer = std::array<wchar_t, bufferSize> {};
   GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
-  return wrap::stof(buffer.data()) * PFGRAN;
+  return wrap::wcstof(buffer.data()) * PFGRAN;
 }
 
 auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool {

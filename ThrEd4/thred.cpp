@@ -1270,7 +1270,7 @@ void thred::internal::chkhup() {
 void thred::internal::chknum() {
   auto value = 0.0F;
   if (std::wcslen(std::begin(MsgBuffer)) != 0U) {
-	value = wrap::stof(std::begin(MsgBuffer));
+	value = wrap::wcstof(std::begin(MsgBuffer));
   }
   xt::clrstch();
   if (StateMap->testAndReset(StateFlag::NUROT)) {
@@ -1288,7 +1288,7 @@ void thred::internal::chknum() {
   if (MsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  value      = wrap::stof(SideWindowEntryBuffer.data()) * PFGRAN;
+	  value      = wrap::wcstof(SideWindowEntryBuffer.data()) * PFGRAN;
 
 	  auto const bufferLength = wrap::toUnsigned(SideWindowEntryBuffer.size() - 1U);
 	  switch (FormMenuChoice) {
@@ -1557,7 +1557,7 @@ void thred::internal::chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) {
-		value = wrap::stof(SideWindowEntryBuffer.data());
+		value = wrap::wcstof(SideWindowEntryBuffer.data());
 		switch (PreferenceIndex - 1) {
 		  case PEG: {
 			IniFile.eggRatio = value;
@@ -1729,7 +1729,7 @@ void thred::internal::chknum() {
 	  }
 	  else {
 		if (wcslen(std::begin(MsgBuffer)) != 0U) {
-		  value = wrap::stof(std::begin(MsgBuffer));
+		  value = wrap::wcstof(std::begin(MsgBuffer));
 		  do {
 			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 			  if (value < FormList->size()) {
@@ -15930,7 +15930,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::stof(std::begin(MsgBuffer));
+		  auto const value = wrap::wcstof(std::begin(MsgBuffer));
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }
@@ -15939,7 +15939,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::stof(std::begin(MsgBuffer));
+		  auto const value = wrap::wcstof(std::begin(MsgBuffer));
 		  if (value != 0.0) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }

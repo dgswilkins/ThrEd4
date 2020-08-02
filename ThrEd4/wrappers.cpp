@@ -24,13 +24,13 @@
 #include "switches.h"
 #include "wrappers.h"
 
-auto wrap::stof(wchar_t const* buffer) -> float {
+auto wrap::wcstof(wchar_t const* buffer) -> float {
   auto value = 0.0F;
   try {
-	value = std::stof(std::wstring(buffer));
+	value = std::wcstof(buffer, nullptr);
   }
   catch (...) {
-	outDebugString(L"stof failed trying to convert '{}'\n", buffer);
+	outDebugString(L"wcstof failed trying to convert '{}'\n", buffer);
 	value = 0.0F;
   }
   return value;
@@ -119,10 +119,6 @@ auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 #else
   return invar;
 #endif
-}
-
-auto wrap::wcstof(wchar_t const *buffer) noexcept -> float {
-  return std::wcstof(buffer, nullptr);
 }
 
 void wrap::setCursor(HCURSOR hCursor) noexcept {
