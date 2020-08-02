@@ -184,7 +184,7 @@ constexpr uint32_t TRIPNTS = 4U;            // number of points required to draw
 constexpr uint32_t SQPNTS  = 5U;            // number of points required to draw a square
 constexpr uint32_t OUTPNTS = 9U;            // number of points required to draw an outline
 constexpr auto     RADDEGF = 180.0F / PI_F; // float factor to convert radians to degrees
-constexpr auto     DEGRADF = PI_F / 180.0F; // float factor to convert radians to degrees
+constexpr auto     DEGRADF = PI_F / 180.0F; // float factor to convert degrees to radians
 
 constexpr auto SWBLEN  = 11U; // Side Window buffer length including the zero terminator
 constexpr auto SWCOUNT = 16U; // number of side windows to create/track
