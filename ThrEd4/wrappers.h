@@ -22,7 +22,7 @@
 #include "ThrEdTypes.h"
 
 namespace wrap {
-auto bufToFloat(wchar_t const* buffer) -> float;
+auto stof(wchar_t const* buffer) -> float;
 auto CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
@@ -59,20 +59,20 @@ template <class outType, class inType> auto round(inType invar) -> outType {
   return gsl::narrow<outType>(std::round(invar));
 }
 
-template <class outType> auto wcstoi(wchar_t const *buffer) -> outType {
-  return gsl::narrow<outType>(std::wcstoul(buffer, nullptr, 10));
+template <class outType> auto wcstol(wchar_t const *buffer) -> outType {
+  return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
 }
 
-template <class outType, class inType> void narrow(outType& dest, inType src) {
-  dest = gsl::narrow<outType>(src);
+template <class outType, class inType> void narrow(outType& outvar, inType invar) {
+  outvar = gsl::narrow<outType>(invar);
 }
 
-template <class outType, class inType> void narrow_cast(outType& dest, inType src) noexcept {
-  dest = gsl::narrow_cast<outType>(src);
+template <class outType, class inType> void narrow_cast(outType& outvar, inType invar) noexcept {
+  outvar = gsl::narrow_cast<outType>(invar);
 }
 
-template <class outType> void stoi(outType& t, wchar_t const* u) {
-  t = gsl::narrow<outType>(std::stoi(u, nullptr, 10));
+template <class outType> void wcstoul(outType& outvar, wchar_t const* invar) {
+  outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
 }
 
 } // namespace wrap

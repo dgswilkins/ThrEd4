@@ -1270,7 +1270,7 @@ void thred::internal::chkhup() {
 void thred::internal::chknum() {
   auto value = 0.0F;
   if (std::wcslen(std::begin(MsgBuffer)) != 0U) {
-	value = wrap::bufToFloat(std::begin(MsgBuffer));
+	value = wrap::stof(std::begin(MsgBuffer));
   }
   xt::clrstch();
   if (StateMap->testAndReset(StateFlag::NUROT)) {
@@ -1288,7 +1288,7 @@ void thred::internal::chknum() {
   if (MsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  value      = wrap::bufToFloat(SideWindowEntryBuffer.data()) * PFGRAN;
+	  value      = wrap::stof(SideWindowEntryBuffer.data()) * PFGRAN;
 
 	  auto const bufferLength = wrap::toUnsigned(SideWindowEntryBuffer.size() - 1U);
 	  switch (FormMenuChoice) {
@@ -1342,9 +1342,7 @@ void thred::internal::chknum() {
 		case LFTHCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol(gsl::narrow_cast<uint32_t>(
-			                   (std::wcstol(SideWindowEntryBuffer.data(), nullptr, bufferLength) - 1)) &
-			               COLOR_BITS);
+			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
 			wrap::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1355,9 +1353,7 @@ void thred::internal::chknum() {
 		case LFRMCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint32_t>(
-			                  (std::wcstol(SideWindowEntryBuffer.data(), nullptr, bufferLength) - 1)) &
-			              COLOR_BITS;
+			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1369,9 +1365,7 @@ void thred::internal::chknum() {
 		case LUNDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint32_t>(
-			                  (std::wcstol(SideWindowEntryBuffer.data(), nullptr, bufferLength) - 1)) &
-			              COLOR_BITS;
+			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			form::refilfn();
@@ -1384,9 +1378,7 @@ void thred::internal::chknum() {
 		case LBRDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint32_t>(
-			                  (std::wcstol(SideWindowEntryBuffer.data(), nullptr, bufferLength) - 1)) &
-			              COLOR_BITS;
+			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1565,7 +1557,7 @@ void thred::internal::chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) {
-		value = wrap::bufToFloat(SideWindowEntryBuffer.data());
+		value = wrap::stof(SideWindowEntryBuffer.data());
 		switch (PreferenceIndex - 1) {
 		  case PEG: {
 			IniFile.eggRatio = value;
@@ -1737,7 +1729,7 @@ void thred::internal::chknum() {
 	  }
 	  else {
 		if (wcslen(std::begin(MsgBuffer)) != 0U) {
-		  value = wrap::bufToFloat(std::begin(MsgBuffer));
+		  value = wrap::stof(std::begin(MsgBuffer));
 		  do {
 			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 			  if (value < FormList->size()) {
@@ -10554,13 +10546,13 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf.data(), HBUFSIZ);
 		  IniFile.featherRatio = wrap::wcstof(buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf.data(), HBUFSIZ);
-		  wrap::stoi(IniFile.featherUpCount, buf.data());
+		  wrap::wcstoul(IniFile.featherUpCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf.data(), HBUFSIZ);
-		  wrap::stoi(IniFile.featherDownCount, buf.data());
+		  wrap::wcstoul(IniFile.featherDownCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf.data(), HBUFSIZ);
 		  IniFile.featherMinStitchSize = wrap::wcstof(buf.data()) * PFGRAN;
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
-		  wrap::stoi(IniFile.featherCount, buf.data());
+		  wrap::wcstoul(IniFile.featherCount, buf.data());
 		  if (IniFile.featherCount < 1) {
 			IniFile.featherCount = 1;
 		  }
@@ -15938,7 +15930,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::bufToFloat(std::begin(MsgBuffer));
+		  auto const value = wrap::stof(std::begin(MsgBuffer));
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }
@@ -15947,7 +15939,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::bufToFloat(std::begin(MsgBuffer));
+		  auto const value = wrap::stof(std::begin(MsgBuffer));
 		  if (value != 0.0) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }

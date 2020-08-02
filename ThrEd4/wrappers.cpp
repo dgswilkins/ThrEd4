@@ -24,13 +24,13 @@
 #include "switches.h"
 #include "wrappers.h"
 
-auto wrap::bufToFloat(wchar_t const* buffer) -> float {
+auto wrap::stof(wchar_t const* buffer) -> float {
   auto value = 0.0F;
   try {
 	value = std::stof(std::wstring(buffer));
   }
   catch (...) {
-	outDebugString(L"bufToFloat:stof failed trying to convert '{}'\n", buffer);
+	outDebugString(L"stof failed trying to convert '{}'\n", buffer);
 	value = 0.0F;
   }
   return value;
