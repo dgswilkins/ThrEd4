@@ -167,9 +167,11 @@ extern float  MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
-extern float    MinStitchLength;
-extern MSG      Msg;
+extern float MinStitchLength;
+extern MSG   Msg;
+
 extern std::array<wchar_t, MSGSIZ> MsgBuffer;
+
 extern uint32_t MsgIndex;
 extern RECT     MsgRect;
 extern HWND     MsgWindow;

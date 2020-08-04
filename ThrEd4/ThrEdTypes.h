@@ -207,8 +207,8 @@ constexpr auto penNarrow    = 1;
 constexpr auto penMedium    = 3;
 constexpr auto penWide      = 5;
 constexpr auto stdDPI       = int32_t {96};
-constexpr auto MaxLayer     = 5U;    // number of layers
-constexpr auto corners      = 4U;    // number of corners in a square
+constexpr auto MaxLayer     = 5U; // number of layers
+constexpr auto corners      = 4U; // number of corners in a square
 
 enum stringLabel {
   STR_PIKOL,
@@ -792,7 +792,7 @@ enum clipDataType {
 };
 
 // edge underlay bit
-constexpr auto EGUND = uint8_t {0x80U};
+constexpr auto EGUND  = uint8_t {0x80U};
 constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines

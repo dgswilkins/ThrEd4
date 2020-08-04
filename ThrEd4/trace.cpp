@@ -821,7 +821,7 @@ void trace::internal::dutrac() {
 	}
 	form.vertexCount = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
 	form.type        = FRMFPOLY;
-	form.attribute = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+	form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form.satinGuideCount = 0;
 	StateMap->set(StateFlag::RESTCH);

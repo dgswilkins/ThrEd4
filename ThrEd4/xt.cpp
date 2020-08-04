@@ -821,7 +821,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 
 void xt::internal::durec(OREC& record) {
   auto const stitchIt = std::next(StitchBuffer->begin(), record.start);
-  record.type         = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
+  record.type = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
   record.color         = attribute & COLOR_BITS;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
@@ -1034,7 +1034,7 @@ void xt::fsort() {
 		attribute                       = StitchBuffer->operator[](iStitch).attribute & SRTMSK;
 	  }
 	}
-	stitchRegion.back().finish = wrap::toUnsigned(StitchBuffer->size());
+	stitchRegion.back().finish    = wrap::toUnsigned(StitchBuffer->size());
 	stitchRegion.back().endStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	auto const lastRegion         = wrap::toUnsigned(stitchRegion.size());
 	auto       pRecs              = std::vector<OREC*> {};
@@ -1483,8 +1483,8 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 		}
 	  }
 	  code = gsl::narrow_cast<uint32_t>(ilData.layerIndex |
-	                               InterleaveSequenceIndices->operator[](ilData.pins).code |
-	                               InterleaveSequenceIndices->operator[](ilData.pins).color);
+	                                    InterleaveSequenceIndices->operator[](ilData.pins).code |
+	                                    InterleaveSequenceIndices->operator[](ilData.pins).color);
 	  xi::duint(form, highStitchBuffer, code, ilData);
 	}
 	xi::chkend(form, highStitchBuffer, code, ilData);
@@ -1508,7 +1508,7 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
 	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
-	         InterleaveSequenceIndices->operator[](iSequence).color;
+	         InterleaveSequenceIndices->                    operator[](iSequence).color;
 	  if ((form.extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
 		  ilData.output += xi::gucon(

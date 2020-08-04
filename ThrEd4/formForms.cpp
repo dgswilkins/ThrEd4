@@ -698,7 +698,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  return TRUE;
 		}
 		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.daisyPetalPoints, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
@@ -726,7 +726,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			UserFlagMap->reset(UserFlag::DAZD);
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
-		  auto compareBuffer = std::array<wchar_t, HBUFSIZ>{};
+		  auto compareBuffer = std::array<wchar_t, HBUFSIZ> {};
 		  for (auto iType = uint8_t {0U}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
 			LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer.data(), HBUFSIZ);
 			if (wcscmp(buffer.data(), compareBuffer.data()) == 0) {
@@ -966,7 +966,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  return TRUE;
 		}
 		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.formSides, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
@@ -1105,7 +1105,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  return TRUE;
 		}
 		case IDOK: {
-		  auto buffer = std::array<wchar_t, HBUFSIZ>{};
+		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.wavePoints, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);

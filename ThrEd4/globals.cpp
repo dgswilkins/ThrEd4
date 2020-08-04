@@ -129,16 +129,16 @@ float  MaxStitchLen;                    // maximum stitch length
 
 MENUITEMINFO* MenuInfo;
 
-float    MinStitchLength = MINSIZ * PFGRAN; // minimum stitch size
-MSG      Msg;                               // main message loop message
+float    MinStitchLength = MINSIZ * PFGRAN;          // minimum stitch size
+MSG      Msg;                                        // main message loop message
 auto     MsgBuffer = std::array<wchar_t, MSGSIZ> {}; // for user messages
-uint32_t MsgIndex;                          // pointer to the message buffer
-RECT     MsgRect;                           // rectangle containing the text message
-HWND     MsgWindow = nullptr;               // message window
-HPEN     MultiFormPen;                      // multiple selected forms pen
-uint32_t NearestCount;                      // number of boxes selected
-uint32_t NewFormVertexCount;                // points in the new form
-HWND     OKButton;                          // ok button
+uint32_t MsgIndex;                                   // pointer to the message buffer
+RECT     MsgRect;                                    // rectangle containing the text message
+HWND     MsgWindow = nullptr;                        // message window
+HPEN     MultiFormPen;                               // multiple selected forms pen
+uint32_t NearestCount;                               // number of boxes selected
+uint32_t NewFormVertexCount;                         // points in the new form
+HWND     OKButton;                                   // ok button
 
 std::vector<fPOINT>* OSequence; // temporary storage for sequencing
 

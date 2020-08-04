@@ -1096,7 +1096,8 @@ void texture::internal::nutx(FRMHED& form) {
 	TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
-		FormList->operator[](iForm).fillInfo.texture.index += gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(tempPointCount);
+		FormList->operator[](iForm).fillInfo.texture.index +=
+		    gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(tempPointCount);
 	  }
 	}
 	wrap::narrow(form.fillInfo.texture.index, index);
@@ -1426,7 +1427,8 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 		}
 	  }
 	  for (auto const point : *SelectedTexturePointsList) {
-		TempTexturePoints->operator[](point).line += gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
+		TempTexturePoints->operator[](point).line +=
+		    gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
 	  }
 	}
   }
