@@ -120,7 +120,6 @@ std::vector<fPOINT>* InterleaveSequence;        // storage for interleave points
 std::vector<HWND>*   LabelWindow;               // text handles for the form data sheet
 
 fPOINT LastPoint;                       // last formOrigin written by line connect routine
-HPEN   LayerPen[MaxLayer];              //
 float  LineSpacing = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 fPOINT LowerLeftStitch;                 // lower left formOrigin in a form
 HMENU  MainMenu;                        // main menu

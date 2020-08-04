@@ -152,6 +152,7 @@ uint32_t BackgroundPenWidth; // width of the background pen
 // brushes
 HBRUSH DefaultColorBrush[COLOR_COUNT]; // default color brushes
 HBRUSH UserColorBrush[COLOR_COUNT];    // user color brushes
+auto   LayerPen = std::array<HPEN, MaxLayer>{};              //
 
 // for the choose color dialog box
 CHOOSECOLOR ColorStruct;
@@ -16403,6 +16404,18 @@ void thred::internal::chkirct() noexcept {
   }
 }
 
+auto thred::getLayerPen(uint32_t layer) -> HPEN {
+	return LayerPen[layer];
+}
+
+void thred::internal::setLayerPens() noexcept {
+	LayerPen[0] = wrap::CreatePen(PS_SOLID, penNarrow, penSilver);
+	LayerPen[1] = wrap::CreatePen(PS_SOLID, penNarrow, penTurquoise);
+	LayerPen[2] = wrap::CreatePen(PS_SOLID, penNarrow, penLilac);
+	LayerPen[3] = wrap::CreatePen(PS_SOLID, penNarrow, penPaleOlive);
+	LayerPen[4] = wrap::CreatePen(PS_SOLID, penNarrow, penTeal);
+}
+
 void thred::internal::init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto       deviceContext   = GetDC(nullptr);
@@ -16596,11 +16609,7 @@ void thred::internal::init() {
   ZoomMarkPen        = wrap::CreatePen(PS_SOLID, penMedium, penLimeGreen);
   SelectAllPen       = wrap::CreatePen(PS_SOLID, penNarrow, penRosy);
   KnotPen            = wrap::CreatePen(PS_SOLID, penNarrow, penWhite);
-  LayerPen[0]        = wrap::CreatePen(PS_SOLID, penNarrow, penSilver);
-  LayerPen[1]        = wrap::CreatePen(PS_SOLID, penNarrow, penTurquoise);
-  LayerPen[2]        = wrap::CreatePen(PS_SOLID, penNarrow, penLilac);
-  LayerPen[3]        = wrap::CreatePen(PS_SOLID, penNarrow, penPaleOlive);
-  LayerPen[4]        = wrap::CreatePen(PS_SOLID, penNarrow, penTeal);
+  setLayerPens();
   BackgroundPenWidth = 1;
   for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
 	ThreadSizePixels[iColor] = 1;

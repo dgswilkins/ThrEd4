@@ -637,7 +637,7 @@ void form::drwfrm() {
 			fi::frmpoly(&(FormLines->operator[](1)), form.wordParam);
 			SelectObject(StitchWindowMemDC, FormPen3px);
 			wrap::Polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), LNPNTS);
-			SelectObject(StitchWindowMemDC, LayerPen[layer]);
+			SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
 			lastPoint = form.wordParam + 1U;
 		  }
 		  auto const maxGuide = FormList->operator[](iForm).satinGuideCount;
@@ -649,7 +649,7 @@ void form::drwfrm() {
 			wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		  }
 		}
-		SelectObject(StitchWindowMemDC, LayerPen[layer]);
+		SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
 		if (form.type == FRMLINE) {
 		  fi::frmpoly(FormLines->data(), form.vertexCount);
 		  if (form.fillType == CONTF) {

@@ -158,7 +158,6 @@ extern std::vector<fPOINT>* InterleaveSequence;
 extern std::vector<HWND>*   LabelWindow;
 
 extern fPOINT LastPoint;
-extern HPEN   LayerPen[MaxLayer];
 extern float  LineSpacing;
 extern fPOINT LowerLeftStitch;
 extern HMENU  MainMenu;
