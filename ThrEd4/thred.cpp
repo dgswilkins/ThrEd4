@@ -1740,7 +1740,7 @@ void thred::internal::chknum() {
 			  }
 			  return;
 			}
-			auto uintValue = wrap::floor<uint32_t>(value);
+			auto uintValue = wrap::floor<uint32_t>(std::abs(value));
 			if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
 			  thred::savdo();
 			  form::durpoli(uintValue);
