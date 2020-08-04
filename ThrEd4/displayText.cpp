@@ -139,7 +139,7 @@ void displayText::hsizmsg() {
   displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x * IPFGRAN), (UnzoomedRect.y * IPFGRAN)));
 }
 
-void displayText::numWnd() noexcept {
+void displayText::numWnd() {
   auto messageRect = RECT {0L, 0L, 0L, 0L};
   GetClientRect(MsgWindow, &messageRect);
   auto wRect = RECT {0L, 0L, 0L, 0L};
@@ -160,7 +160,7 @@ void displayText::numWnd() noexcept {
                                        ThrEdInstance,
                                        nullptr);
   MsgIndex              = 0;
-  MsgBuffer[0]          = 0;
+  MsgBuffer.fill(0);
 }
 
 void displayText::msgflt(uint32_t messageId, float value) {
@@ -225,10 +225,6 @@ void displayText::clrhbut(uint32_t startButton) noexcept {
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
   displayText::butxt(HNUM, fmt::format(StringTable->operator[](code), value));
-}
-
-void displayText::msgstr(uint32_t code) noexcept {
-  LoadString(ThrEdInstance, code, std::begin(MsgBuffer), MSGSIZ);
 }
 
 void displayText::riter() {

@@ -131,7 +131,7 @@ MENUITEMINFO* MenuInfo;
 
 float    MinStitchLength = MINSIZ * PFGRAN; // minimum stitch size
 MSG      Msg;                               // main message loop message
-wchar_t  MsgBuffer[MSGSIZ];                 // for user messages
+auto     MsgBuffer = std::array<wchar_t, MSGSIZ> {}; // for user messages
 uint32_t MsgIndex;                          // pointer to the message buffer
 RECT     MsgRect;                           // rectangle containing the text message
 HWND     MsgWindow = nullptr;               // message window

@@ -1269,8 +1269,9 @@ void thred::internal::chkhup() {
 
 void thred::internal::chknum() {
   auto value = 0.0F;
-  if (std::wcslen(std::begin(MsgBuffer)) != 0U) {
-	value = wrap::wcstof(std::begin(MsgBuffer));
+  if (std::wcslen(MsgBuffer.data()) != 0U) {
+	value = wrap::wcstof(MsgBuffer.data());
+	outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
   }
   xt::clrstch();
   if (StateMap->testAndReset(StateFlag::NUROT)) {
@@ -1289,8 +1290,6 @@ void thred::internal::chknum() {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  value      = wrap::wcstof(SideWindowEntryBuffer.data()) * PFGRAN;
-
-	  auto const bufferLength = wrap::toUnsigned(SideWindowEntryBuffer.size() - 1U);
 	  switch (FormMenuChoice) {
 		case LTXOF: {
 		  thred::savdo();
@@ -1728,8 +1727,9 @@ void thred::internal::chknum() {
 		PreferenceIndex = 0;
 	  }
 	  else {
-		if (wcslen(std::begin(MsgBuffer)) != 0U) {
-		  value = wrap::wcstof(std::begin(MsgBuffer));
+		if (wcslen(MsgBuffer.data()) != 0U) {
+		  outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
+		  value = wrap::wcstof(MsgBuffer.data());
 		  do {
 			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 			  if (value < FormList->size()) {
@@ -4363,7 +4363,6 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	}
 	if (thredHeader.formCount != 0) {
 	  StateMap->reset(StateFlag::BADFIL);
-	  MsgBuffer[0] = 0;
 	  if (version < 2) {
 		auto formListOriginal = std::vector<FRMHEDO> {};
 		formListOriginal.resize(thredHeader.formCount);
@@ -10247,8 +10246,7 @@ void thred::internal::set1knot() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::msgstr(IDS_NOSTCHSEL);
-	displayText::shoMsg(std::wstring(std::begin(MsgBuffer)));
+	displayText::tabmsg(IDS_NOSTCHSEL);
   }
 }
 
@@ -11599,9 +11597,9 @@ auto thred::internal::updateFillColor() -> bool {
 	}
 	form::nufilcol(VerticalIndex);
   } while (false);
-  wrap::narrow(MsgBuffer[0], VerticalIndex + ASCIIoffset);
-  MsgBuffer[1] = 0;
-  SetWindowText(ValueWindow->operator[](LBRDCOL), static_cast<LPCWSTR>(MsgBuffer));
+  auto buffer = std::array<wchar_t, 2>{};
+  wrap::narrow(buffer[0], VerticalIndex + '0');
+  SetWindowText(ValueWindow->operator[](LBRDCOL), buffer.data());
   thred::unsid();
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
@@ -14269,10 +14267,10 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) -> bool {
   retflag = true;
   if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
+	MsgBuffer.fill(0);
 	MsgBuffer[0] = '-';
-	MsgBuffer[1] = 0;
 	MsgIndex     = 1;
-	SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
+	SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	return true;
   }
   if (dunum(code)) {
@@ -14282,7 +14280,7 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	else {
 	  MsgBuffer[MsgIndex++] = NumericCode;
 	  MsgBuffer[MsgIndex]   = 0;
-	  SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	}
 	return true;
   }
@@ -14291,7 +14289,7 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	case VK_OEM_PERIOD: { // period
 	  MsgBuffer[MsgIndex++] = '.';
 	  MsgBuffer[MsgIndex]   = 0;
-	  SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	  return true;
 	}
 	case VK_BACK: { // backspace
@@ -14302,7 +14300,7 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 		}
 		else {
 		  MsgBuffer[MsgIndex] = 0;
-		  SetWindowText(GeneralNumberInputBox, static_cast<LPTSTR>(MsgBuffer));
+		  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 		}
 	  }
 	  return true;
@@ -15848,10 +15846,10 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
 		// Check for keycode 'dash' and numpad 'subtract'
 		if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
+		  MsgBuffer.fill(0);
 		  MsgBuffer[0] = '-';
 		  MsgIndex     = 1;
-		  MsgBuffer[1] = 0;
-		  SetWindowText(GeneralNumberInputBox, std::begin(MsgBuffer));
+		  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 		  return true;
 		}
 	  }
@@ -15864,15 +15862,15 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 		if (dunum(code)) {
 		  if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1U) {
-			wrap::narrow(MsgBuffer[0], NumericCode);
-			MsgBuffer[1] = 0;
+			auto buffer = std::array<wchar_t, 2> {};
+			wrap::narrow(buffer[0], NumericCode);
 			if (PreferenceIndex == PSHO + 1U) {
-			  ShowStitchThreshold = unthrsh(NumericCode - ASCIIoffset);
-			  SetWindowText(ValueWindow->operator[](PSHO), std::begin(MsgBuffer));
+			  ShowStitchThreshold = unthrsh(NumericCode - '0');
+			  SetWindowText(ValueWindow->operator[](PSHO), buffer.data());
 			}
 			else {
-			  StitchBoxesThreshold = unthrsh(NumericCode - ASCIIoffset);
-			  SetWindowText(ValueWindow->operator[](PBOX), std::begin(MsgBuffer));
+			  StitchBoxesThreshold = unthrsh(NumericCode - '0');
+			  SetWindowText(ValueWindow->operator[](PBOX), buffer.data());
 			}
 			thred::unsid();
 		  }
@@ -15929,8 +15927,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
-		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::wcstof(std::begin(MsgBuffer));
+		if (std::wcslen(MsgBuffer.data()) != 0) {
+		  auto const value = wrap::wcstof(MsgBuffer.data());
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }
@@ -15938,8 +15936,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		form::duprot(IniFile.rotationAngle);
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
-		if (std::wcslen(std::begin(MsgBuffer)) != 0) {
-		  auto const value = wrap::wcstof(std::begin(MsgBuffer));
+		if (std::wcslen(MsgBuffer.data()) != 0) {
+		  auto const value = wrap::wcstof(MsgBuffer.data());
 		  if (value != 0.0) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }

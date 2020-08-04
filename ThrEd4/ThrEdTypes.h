@@ -207,7 +207,6 @@ constexpr auto penNarrow    = 1;
 constexpr auto penMedium    = 3;
 constexpr auto penWide      = 5;
 constexpr auto stdDPI       = int32_t {96};
-constexpr auto ASCIIoffset  = 0x30U; // offset to convert a value to the character equivalent
 constexpr auto MaxLayer     = 5U;    // number of layers
 constexpr auto corners      = 4U;    // number of corners in a square
 

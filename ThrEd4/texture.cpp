@@ -1388,7 +1388,7 @@ auto texture::internal::txdig(uint32_t keyCode, char& character) -> bool {
 	return true;
   }
   if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-	wrap::narrow(character, keyCode - VK_NUMPAD0 + ASCIIoffset);
+	wrap::narrow(character, keyCode - VK_NUMPAD0 + '0');
 	return true;
   }
   if (keyCode == VK_OEM_PERIOD || keyCode == VK_DECIMAL) {
