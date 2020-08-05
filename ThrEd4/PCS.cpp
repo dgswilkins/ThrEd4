@@ -107,7 +107,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		}
 		if (FALSE == WriteFile(fileHandle,
 		                       PCSStitchBuffer.data(),
-		                       PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back())),
+		                       wrap::toUnsigned(PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back()))),
 		                       &bytesWritten,
 		                       nullptr)) {
 		  displayText::riter();
@@ -157,8 +157,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  auto const pcsStitchCount = fileSize / sizeof(PCSTCH);
 		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
 		  PCSDataBuffer.resize(pcsStitchCount);
-		  ReadFile(fileHandle, PCSDataBuffer.data(), fileSize, &bytesRead, nullptr);
-		  if (bytesRead == fileSize) {
+		  ReadFile(fileHandle, PCSDataBuffer.data(), wrap::toUnsigned(PCSDataBuffer.size()), &bytesRead, nullptr);
+		  if (bytesRead == wrap::toUnsigned(PCSDataBuffer.size())) {
 			auto iStitch      = uint16_t {0U};
 			auto iColorChange = 0U;
 			auto color        = 0U;
