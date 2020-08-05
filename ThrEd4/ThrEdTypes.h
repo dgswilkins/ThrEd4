@@ -210,6 +210,8 @@ constexpr auto stdDPI       = int32_t {96};
 constexpr auto MaxLayer     = 5U; // number of layers
 constexpr auto corners      = 4U; // number of corners in a square
 
+constexpr auto fractionalFactor = 256.0F; // float factor to convert the fractional part to/from the lower byte
+
 enum stringLabel {
   STR_PIKOL,
   STR_UPON,
@@ -966,22 +968,6 @@ enum textureButtons { // text button windows
 constexpr uint32_t HLIN = HNUM;
 
 #pragma pack(push, 1)
-
-class PCSHEADER // pcs file header structure
-{
-  public:
-  int8_t   leadIn {0};
-  int8_t   hoopType {0};
-  uint16_t colorCount {0};
-  COLORREF colors[COLOR_COUNT] {0}; // NOLINT(modernize-avoid-c-arrays)
-  uint16_t stitchCount {0};
-
-  constexpr PCSHEADER() noexcept = default;
-  // PCSHEADER(PCSHEADER&&) = default;
-  // PCSHEADER& operator=(PCSHEADER const& rhs) = default;
-  // PCSHEADER& operator=(PCSHEADER&&) = default;
-  //~PCSHEADER() = default;
-};
 
 class INIFILE // ini file structure
 {

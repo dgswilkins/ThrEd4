@@ -187,7 +187,6 @@ extern std::vector<fPOINT>* OutsidePointList;
 extern std::vector<fPOINT>* OutsidePoints;
 
 extern char           PCSBMPFileName[16];
-extern PCSHEADER      PCSHeader;
 extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;
 extern uint32_t       PreferenceIndex;

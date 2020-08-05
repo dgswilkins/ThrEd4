@@ -27,6 +27,7 @@
     <ClCompile Include="clip.cpp" />
     <ClCompile Include="globals.cpp" />
     <ClCompile Include="hlp.cpp" />
+    <ClCompile Include="PCS.cpp" />
     <ClCompile Include="PES.cpp" />
     <ClCompile Include="repair.cpp" />
     <ClCompile Include="satin.cpp" />
@@ -52,6 +53,7 @@
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />

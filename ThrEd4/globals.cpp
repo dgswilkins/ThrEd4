@@ -148,7 +148,6 @@ std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline
 
 constexpr auto nameSize = 16U;                    // PCS spec for filename length
 char           PCSBMPFileName[nameSize];          // bitmap file name from pcs file
-PCSHEADER      PCSHeader;                         // pcs file header
 wchar_t const* PcdClipFormat   = L"PMust_Format"; //
 float          PicotSpacing    = IPICSPAC;        // space between border picots
 uint32_t       PreferenceIndex = 0;               // index to the active preference window

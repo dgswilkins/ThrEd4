@@ -46,6 +46,7 @@ namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
 void bBox();
+void chkhup();
 void chkmen();
 void chkrng(fPOINT& range);
 void addColor(uint32_t stitch, uint32_t color);
@@ -63,6 +64,7 @@ auto getLayerPen(uint32_t layer)->HPEN;
 void grpAdj();
 void hidbit();
 void hupfn();
+void insflin(POINT insertPoint);
 auto inStitchWin() noexcept -> bool;
 auto maxColor() -> uint32_t;
 void movStch();
@@ -118,7 +120,6 @@ namespace internal {
   auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
   void chkbit();
   auto chkhid(uint32_t colorToCheck) -> bool;
-  void chkhup();
   void chkirct() noexcept;
   auto chkminus(uint32_t code) noexcept -> bool;
   void chkncol();
@@ -273,7 +274,7 @@ namespace internal {
   void insadj();
   void inscol();
   void insfil(fs::path& insertedFile);
-  void insflin(POINT insertPoint);
+  auto insTHR(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool;
   auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
   auto isLine(std::vector<POINT>& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
@@ -338,7 +339,6 @@ namespace internal {
   void patdun();
   void pcsbsavof();
   void pcsbsavon();
-  auto pcshup(std::vector<fPOINTATTR>& stitches) -> bool;
   void pgdwn();
   void pglft();
   void pgrit();
@@ -353,7 +353,6 @@ namespace internal {
   void qchk();
   void qcode();
   void rSelbox();
-  auto readPCSFile(std::filesystem::path const& newFileName) -> bool;
   auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
   void rebak();
   void rebox();
@@ -394,7 +393,6 @@ namespace internal {
   void rstdu();
   void rthumnam(uint32_t iThumbnail);
   void sachk();
-  auto savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool;
   void sav();
   void savAs();
   auto savcmp() noexcept -> bool;
