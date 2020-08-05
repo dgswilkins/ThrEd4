@@ -60,7 +60,7 @@ void frmdel();
 void frmrct(fRECTANGLE& rectangle) noexcept;
 auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle) -> bool;
 auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
-auto getLayerPen(uint32_t layer)->HPEN;
+auto getLayerPen(uint32_t layer) noexcept -> HPEN;
 void grpAdj();
 void hidbit();
 void hupfn();

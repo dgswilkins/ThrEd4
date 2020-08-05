@@ -115,7 +115,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		}
 		if (UserFlagMap->test(UserFlag::BSAVOF)) {
 		  auto const blank = std::array<char, 14>{};
-		  if (FALSE == WriteFile(fileHandle, blank.data(), blank.size(), &bytesWritten, nullptr)) {
+		  if (FALSE == WriteFile(fileHandle, blank.data(), wrap::toUnsigned(blank.size()), &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -181,7 +181,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  ++iPCSstitch;
 			}
 			// Grab the bitmap filename
-			ReadFile(fileHandle, &PCSBMPFileName, 14, &bytesRead, nullptr);
+			ReadFile(fileHandle, std::begin(PCSBMPFileName), 14, &bytesRead, nullptr);
 			if (bytesRead != 14) {
 				outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 			}

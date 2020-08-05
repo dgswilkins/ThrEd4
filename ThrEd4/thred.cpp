@@ -7125,8 +7125,6 @@ auto thred::internal::insTHR(fs::path const& insertedFile,fRECTANGLE& insertedRe
 				  TexturePointsBuffer->insert(
 					  TexturePointsBuffer->end(), inTextureList.begin(), inTextureList.end());
 			  }
-			  CloseHandle(fileHandle);
-			  fileHandle = nullptr;
 			  // update the form pointer variables
 			  for (auto iFormList = InsertedFormIndex; iFormList < wrap::toUnsigned(FormList->size()); ++iFormList) {
 				  auto& formIter = FormList->operator[](iFormList);
@@ -16114,7 +16112,7 @@ void thred::internal::chkirct() noexcept {
   }
 }
 
-auto thred::getLayerPen(uint32_t layer) -> HPEN {
+auto thred::getLayerPen(uint32_t layer) noexcept -> HPEN {
   return LayerPen[layer];
 }
 
