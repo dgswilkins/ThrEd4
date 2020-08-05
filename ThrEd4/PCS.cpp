@@ -85,28 +85,29 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  flag = false;
 		  break;
 		}
-		auto iPCSstitch = 0U;
 		auto savcol     = COLMSK;
-		PCSStitchBuffer.resize(StitchBuffer->size() + thred::maxColor() + 2U);
+		PCSStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
 		for (auto& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol                          = stitch.attribute & COLMSK;
-			PCSStitchBuffer[iPCSstitch].tag = 3;
-			wrap::narrow(PCSStitchBuffer[iPCSstitch++].fx, savcol);
+			auto colRec = PCSTCH {};
+			colRec.tag = 3;
+			wrap::narrow(colRec.fx, savcol);
+			PCSStitchBuffer.push_back(colRec);
 		  }
+		  auto stitchRec      = PCSTCH {};
 		  auto integerPart    = 0.0F;
 		  auto fractionalPart = std::modf(stitch.x, &integerPart);
-		  PCSStitchBuffer[iPCSstitch].fx =
-		      wrap::floor<decltype(PCSStitchBuffer.back().fx)>(fractionalPart * fractionalFactor);
-		  wrap::narrow(PCSStitchBuffer[iPCSstitch].x, integerPart);
+		  stitchRec.fx = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * fractionalFactor);
+		  wrap::narrow(stitchRec.x, integerPart);
 		  fractionalPart = std::modf(stitch.y, &integerPart);
-		  PCSStitchBuffer[iPCSstitch].fy =
-		      wrap::floor<decltype(PCSStitchBuffer.back().fy)>(fractionalPart * fractionalFactor);
-		  wrap::narrow(PCSStitchBuffer[iPCSstitch++].y, integerPart);
+		  stitchRec.fy = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * fractionalFactor);
+		  wrap::narrow(stitchRec.y, integerPart);
+		  PCSStitchBuffer.push_back(stitchRec);
 		}
 		if (FALSE == WriteFile(fileHandle,
 		                       PCSStitchBuffer.data(),
-		                       iPCSstitch * sizeof(decltype(PCSStitchBuffer.back())),
+		                       PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back())),
 		                       &bytesWritten,
 		                       nullptr)) {
 		  displayText::riter();
