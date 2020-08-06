@@ -279,7 +279,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 	hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
-	auto bmpName = utf::Utf8ToUtf16(UTF8BMPname.data());
+	auto bmpName = UTF16BMPname->filename().wstring();
 	hr += pFileSave->SetFileName(bmpName.c_str());
 	hr += pFileSave->SetDefaultExtension(L"bmp");
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -412,13 +412,22 @@ void bitmap::lodbmp() {
   if (bi::loadName(UTF16BMPname)) {
 	bitmap::resetBmpFile(false);
 	trace::untrace();
+#if USE_SHORT_NAME
+	auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
+	auto dest = std::vector<wchar_t> {};
+	dest.resize(pleng);
+	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), dest.size());
+	auto filePart = fs::path {dest.data()};
+	auto saveFile = utf::Utf16ToUtf8(filePart.filename().wstring());
+#else
 	auto saveFile = utf::Utf16ToUtf8(UTF16BMPname->filename().wstring());
+#endif
 	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	  std::copy(saveFile.cbegin(), saveFile.cend(), UTF8BMPname.begin());
 	  bitmap::internal::bfil(BackgroundColor);
 	}
 	else {
-	  // PCS file can only store a 16 character filename
+	  // THR version 2 file can only store a 16 character filename
 	  // Give the user a little more info why the bitmap has not been loaded
 	  auto fmtStr = std::wstring {};
 	  displayText::loadString(fmtStr, IDS_BMPLONG);
