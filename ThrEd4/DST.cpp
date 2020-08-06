@@ -883,7 +883,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr);
   if (bytesRead == sizeof(dstHeader)) {
 	if (di::chkdst(&dstHeader)) {
-	  PCSBMPFileName[0] = 0;
+	  UTF8BMPname.fill(0);
 	  fileSize -= sizeof(dstHeader);
 	  auto DSTData = std::vector<DSTREC> {};
 	  DSTData.resize(fileSize / sizeof(DSTREC));

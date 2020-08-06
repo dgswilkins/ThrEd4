@@ -22,7 +22,7 @@ auto getBmpColor() noexcept -> COLORREF;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
 auto getBmpStitchRatio() noexcept -> fPOINT;
 auto getrmap() -> uint32_t;
-void resetBmpFile(bool reset) noexcept;
+void resetBmpFile(bool reset);
 void savmap();
 void lodbmp();
 void setBmpBackColor() noexcept;

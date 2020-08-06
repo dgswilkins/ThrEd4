@@ -211,6 +211,7 @@ constexpr auto MaxLayer     = 5U; // number of layers
 constexpr auto corners      = 4U; // number of corners in a square
 
 constexpr auto fractionalFactor = 256.0F; // float factor to convert the fractional part to/from the lower byte
+constexpr auto nameSize = 16U;            // THR spec for BMP filename length
 
 enum stringLabel {
   STR_PIKOL,

@@ -124,7 +124,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		}
 		else {
 		  if (FALSE ==
-		      WriteFile(fileHandle, static_cast<LPCVOID>(PCSBMPFileName), 14, &bytesWritten, nullptr)) {
+		      WriteFile(fileHandle, UTF8BMPname.data(), 14, &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -182,7 +182,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  ++iPCSstitch;
 			}
 			// Grab the bitmap filename
-			ReadFile(fileHandle, std::begin(PCSBMPFileName), 14, &bytesRead, nullptr);
+			ReadFile(fileHandle, UTF8BMPname.data(), 14, &bytesRead, nullptr);
 			if (bytesRead != 14) {
 				outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 			}

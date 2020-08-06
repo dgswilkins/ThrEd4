@@ -282,7 +282,7 @@ void trace::untrace() {
 }
 
 void trace::trdif() {
-  if (PCSBMPFileName[0] == 0) {
+  if (UTF8BMPname[0] == 0) {
 	displayText::tabmsg(IDS_MAPLOD);
 	return;
   }
@@ -357,7 +357,7 @@ unsigned trace::internal::icolsum(COLORREF col) {
 #endif
 
 void trace::trace() {
-  if (PCSBMPFileName[0] != 0) {
+  if (UTF8BMPname[0] != 0) {
 	trace::untrace();
 	ti::tracwnd();
 	TraceDataSize = bitmap::getrmap();
@@ -832,7 +832,7 @@ void trace::internal::dutrac() {
 
 void trace::trinit() {
   uint32_t histogramData[channels][levels] = {{0}};
-  if (PCSBMPFileName[0] != 0) {
+  if (UTF8BMPname[0] != 0) {
 	if (!StateMap->test(StateFlag::TRSET)) {
 	  StateMap->set(StateFlag::TRCRED);
 	  StateMap->set(StateFlag::TRCGRN);
@@ -902,7 +902,7 @@ void trace::trinit() {
 }
 
 void trace::trcsel() {
-  if (PCSBMPFileName[0] != 0) {
+  if (UTF8BMPname[0] != 0) {
 	StateMap->set(StateFlag::WASTRCOL);
 	StateMap->set(StateFlag::TRCRED);
 	StateMap->set(StateFlag::TRCBLU);
@@ -1026,7 +1026,7 @@ void trace::internal::trnumwnd1(int32_t position) noexcept {
 }
 
 void trace::blak() {
-  if (PCSBMPFileName[0] == 0) {
+  if (UTF8BMPname[0] == 0) {
 	displayText::tabmsg(IDS_MAPLOD);
 	return;
   }
