@@ -356,8 +356,8 @@ void bitmap::internal::movmap(uint32_t cnt, uint8_t* buffer) {
   }
 }
 
-auto bitmap::internal::loadName(fs::path* fileName) -> bool {
-  if (nullptr != fileName) {
+auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -> bool {
+  if ((nullptr != fileName) && (nullptr != directory)) {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	auto hr = CoCreateInstance(
@@ -374,14 +374,16 @@ auto bitmap::internal::loadName(fs::path* fileName) -> bool {
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
 		hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 		hr += pFileOpen->SetTitle(L"Open Thred File");
-#if 0
+#if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
 		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-		hr += SHCreateItemFromParsingName(DefaultBMPDirectory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+		hr += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
 		hr += pFileOpen->SetFolder(psiFrom);
 		if (nullptr != psiFrom) {
 		  psiFrom->Release();
 		}
+#else
+		UNREFERENCED_PARAMETER(directory);
 #endif
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr)) {
@@ -410,8 +412,8 @@ auto bitmap::internal::loadName(fs::path* fileName) -> bool {
   return false;
 }
 
-void bitmap::lodbmp() {
-  if (bi::loadName(UTF16BMPname)) {
+void bitmap::lodbmp(fs::path const* directory) {
+  if (bi::loadName(directory, UTF16BMPname)) {
 	bitmap::resetBmpFile(false);
 	trace::untrace();
 #if USE_SHORT_NAME

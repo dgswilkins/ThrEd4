@@ -31,7 +31,7 @@ auto getrmap() -> uint32_t;
 auto ismap() noexcept -> bool;
 void resetBmpFile(bool reset);
 void savmap();
-void lodbmp();
+void lodbmp(fs::path const* directory);
 void setBmpBackColor() noexcept;
 void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;
@@ -47,7 +47,7 @@ namespace internal {
   auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
   void movmap(uint32_t cnt, uint8_t* buffer);
   auto nuBit() noexcept -> COLORREF;
-  auto loadName(fs::path* fileName) -> bool;
+  auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
   void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
   auto saveName(fs::path& fileName);
   auto stch2bit(fPOINT& point) -> POINT;
