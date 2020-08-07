@@ -655,7 +655,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 		std::fill(fstart, fend, ' ');
-		pecHeader->labnd       = '\r'; // 13 = carriage return
+		pecHeader->labnd = '\r'; // 13 = carriage return
 		wrap::narrow(pecHeader->colorCount, pesThreadCount);
 		pecHeader->hnd1        = 0x00ff;
 		pecHeader->thumbHeight = ThumbHeight;

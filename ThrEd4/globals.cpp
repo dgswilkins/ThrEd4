@@ -207,28 +207,30 @@ POINT      StitchWindowSize;       // size of the stitch window in pixels
 std::vector<std::wstring>* StringTable; //
 std::vector<fPOINT>*       TempPolygon; // temporary storage when user is entering a polygon;
 
-std::wstring*       TextureInputBuffer;             // texture fill number buffer
-std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
+std::wstring*       TextureInputBuffer;  // texture fill number buffer
+std::vector<TXPNT>* TexturePointsBuffer; // buffer for textured fill points
 
 auto ThreadSizeWin = std::array<HWND, COLOR_COUNT> {}; // thread size windows
 
-uint32_t            ThrEdClip       = 0;            // thred format
-wchar_t const*      ThrEdClipFormat = L"threditor"; //
-HINSTANCE           ThrEdInstance;                  // main instance handle
-HWND                ThrEdWindow;                    // main window handle
-fs::path*           ThrName;                        //
-POINT               ThredWindowOrigin;              // offset origin of the main window
-HBITMAP             TraceBitmap;                    // trace bitmap
-uint32_t*           TraceBitmapData;                // trace bitmap data
-HDC                 TraceDC;                        // trace device context
+uint32_t       ThrEdClip       = 0U;           // thred format
+wchar_t const* ThrEdClipFormat = L"threditor"; //
+HINSTANCE      ThrEdInstance;                  // main instance handle
+HWND           ThrEdWindow;                    // main window handle
+fs::path*      ThrName;                        //
+POINT          ThredWindowOrigin;              // offset origin of the main window
+HBITMAP        TraceBitmap;                    // trace bitmap
+uint32_t*      TraceBitmapData;                // trace bitmap data
+HDC            TraceDC;                        // trace device context
 
 boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
 
-POINT              UnzoomedRect; // size of the unzoomed stitch window
-auto               UserColor = std::array<COLORREF, COLOR_COUNT> {}; // user colors
-std::vector<HWND>* UserColorWin;                                     // user color windows
-EnumMap<UserFlag>* UserFlagMap; // for storage of persistent binary variables set by the user
+POINT UnzoomedRect; // size of the unzoomed stitch window
+
+auto UserColor = std::array<COLORREF, COLOR_COUNT> {}; // user colors
+
+std::vector<HWND>* UserColorWin; // user color windows
+EnumMap<UserFlag>* UserFlagMap;  // for storage of persistent binary variables set by the user
 HPEN               UserPen[COLOR_COUNT];               // user color pens
 float              UserStitchLength = USESIZ * PFGRAN; // user selected stitch size
 std::vector<HWND>* ValueWindow;                        // data handles for the form data sheet

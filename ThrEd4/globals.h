@@ -252,15 +252,15 @@ extern std::vector<TXPNT>*  TexturePointsBuffer;
 
 extern std::array<HWND, COLOR_COUNT> ThreadSizeWin;
 
-extern uint32_t             ThrEdClip;
-extern wchar_t const*       ThrEdClipFormat;
-extern HINSTANCE            ThrEdInstance;
-extern HWND                 ThrEdWindow;
-extern fs::path*            ThrName;
-extern POINT                ThredWindowOrigin;
-extern HBITMAP              TraceBitmap;
-extern uint32_t*            TraceBitmapData;
-extern HDC                  TraceDC;
+extern uint32_t       ThrEdClip;
+extern wchar_t const* ThrEdClipFormat;
+extern HINSTANCE      ThrEdInstance;
+extern HWND           ThrEdWindow;
+extern fs::path*      ThrName;
+extern POINT          ThredWindowOrigin;
+extern HBITMAP        TraceBitmap;
+extern uint32_t*      TraceBitmapData;
+extern HDC            TraceDC;
 
 extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;

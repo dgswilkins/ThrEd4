@@ -31,7 +31,7 @@ fPOINT    BitmapSizeinStitches; // bitmap end points in stitch points
 RECT      BitmapSrcRect;        // bitmap source rectangle for zoomed view
 uint32_t  BitmapWidth;          // bitmap width
 fPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
-fs::path* UTF16BMPname;      // bitmap file name from user load
+fs::path* UTF16BMPname;         // bitmap file name from user load
 
 auto UTF8BMPname = std::array<char, nameSize> {}; // bitmap file name from pcs file
 
@@ -42,7 +42,7 @@ BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 
 CHOOSECOLOR BitMapColorStruct;
 
-constexpr auto BPB   = 8U;  // bits per byte
+constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
 constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
@@ -89,7 +89,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_Sig) {
-	auto fileHeaderSize = wrap::toUnsigned(BitmapFileHeader.bfOffBits - wrap::toUnsigned(sizeof(BitmapFileHeader)));
+	auto fileHeaderSize =
+	    wrap::toUnsigned(BitmapFileHeader.bfOffBits - wrap::toUnsigned(sizeof(BitmapFileHeader)));
 	if (fileHeaderSize > wrap::toUnsigned(sizeof(BITMAPV4HEADER))) {
 	  fileHeaderSize = wrap::toUnsigned(sizeof(BITMAPV4HEADER));
 	}
@@ -418,7 +419,7 @@ void bitmap::lodbmp(fs::path const* directory) {
 	trace::untrace();
 #if USE_SHORT_NAME
 	auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
-	auto dest = std::vector<wchar_t> {};
+	auto       dest  = std::vector<wchar_t> {};
 	dest.resize(pleng);
 	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
 	auto filePart = fs::path {dest.data()};
@@ -486,22 +487,23 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-constexpr auto DefaultBitmapBackgroundColors = std::array<COLORREF, COLOR_COUNT> {0x00c0d5bf,
-                                                                                  0x00c8dfee,
-                                                                                  0x00708189,
-                                                                                  0x00a5a97a,
-                                                                                  0x00b8d6fe,
-                                                                                  0x008a8371,
-                                                                                  0x004b6cb8,
-                                                                                  0x009cdcc2,
-                                                                                  0x00366d39,
-                                                                                  0x00dcfcfb,
-                                                                                  0x003c4f75,
-                                                                                  0x0095b086,
-                                                                                  0x00c9dcba,
-                                                                                  0x0043377b,
-                                                                                  0x00b799ae,
-                                                                                  0x0054667a};
+  constexpr auto DefaultBitmapBackgroundColors = std::array<COLORREF, COLOR_COUNT> {0x00c0d5bf,
+                                                                                    0x00c8dfee,
+                                                                                    0x00708189,
+                                                                                    0x00a5a97a,
+                                                                                    0x00b8d6fe,
+                                                                                    0x008a8371,
+                                                                                    0x004b6cb8,
+                                                                                    0x009cdcc2,
+                                                                                    0x00366d39,
+                                                                                    0x00dcfcfb,
+                                                                                    0x003c4f75,
+                                                                                    0x0095b086,
+                                                                                    0x00c9dcba,
+                                                                                    0x0043377b,
+                                                                                    0x00b799ae,
+                                                                                    0x0054667a};
+
   BitmapBackgroundColors = DefaultBitmapBackgroundColors;
 }
 
@@ -537,7 +539,7 @@ auto bitmap::getBmpNameLength() -> uint32_t {
   return wrap::toUnsigned(UTF8BMPname.size());
 }
 
-auto bitmap::getBmpNameData() noexcept -> char * {
+auto bitmap::getBmpNameData() noexcept -> char* {
   return UTF8BMPname.data();
 }
 

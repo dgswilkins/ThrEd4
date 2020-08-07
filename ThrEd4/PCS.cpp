@@ -54,7 +54,7 @@ class PCSHEADER // pcs file header structure
 
 namespace pci = PCS::internal;
 
-auto PCSHeader = PCSHEADER {};                         // pcs file header
+auto PCSHeader = PCSHEADER {}; // pcs file header
 
 auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool {
   auto flag = true;
@@ -86,13 +86,13 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  flag = false;
 		  break;
 		}
-		auto savcol     = COLMSK;
+		auto savcol = COLMSK;
 		PCSStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
 		for (auto& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
-			savcol                          = stitch.attribute & COLMSK;
+			savcol      = stitch.attribute & COLMSK;
 			auto colRec = PCSTCH {};
-			colRec.tag = 3;
+			colRec.tag  = 3;
 			wrap::narrow(colRec.fx, savcol);
 			PCSStitchBuffer.push_back(colRec);
 		  }
@@ -102,21 +102,22 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  stitchRec.fx = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * fractionalFactor);
 		  wrap::narrow(stitchRec.x, integerPart);
 		  fractionalPart = std::modf(stitch.y, &integerPart);
-		  stitchRec.fy = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * fractionalFactor);
+		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * fractionalFactor);
 		  wrap::narrow(stitchRec.y, integerPart);
 		  PCSStitchBuffer.push_back(stitchRec);
 		}
-		if (FALSE == WriteFile(fileHandle,
-		                       PCSStitchBuffer.data(),
-		                       wrap::toUnsigned(PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back()))),
-		                       &bytesWritten,
-		                       nullptr)) {
+		if (FALSE ==
+		    WriteFile(fileHandle,
+		              PCSStitchBuffer.data(),
+		              wrap::toUnsigned(PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back()))),
+		              &bytesWritten,
+		              nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;
 		}
 		if (UserFlagMap->test(UserFlag::BSAVOF)) {
-		  auto const blank = std::array<char, 14>{};
+		  auto const blank = std::array<char, 14> {};
 		  if (FALSE == WriteFile(fileHandle, blank.data(), wrap::toUnsigned(blank.size()), &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
@@ -124,8 +125,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  }
 		}
 		else {
-		  if (FALSE ==
-		      WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
+		  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -185,7 +185,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			// Grab the bitmap filename
 			ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr);
 			if (bytesRead != 14) {
-				outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
+			  outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 			}
 			IniFile.auxFileType = AUXPCS;
 			if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
@@ -355,7 +355,7 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 			insertedRectangle.top = stitch.y;
 		  }
 		}
-		retflag             = true;
+		retflag = true;
 	  }
 	  else {
 		StateMap->reset(StateFlag::INIT);

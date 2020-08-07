@@ -395,7 +395,8 @@ void repair::internal::reptx() {
 	  }
 	  else {
 		if (TexturePointsBuffer->size() > form.fillInfo.texture.index) {
-		  wrap::narrow(form.fillInfo.texture.count, TexturePointsBuffer->size() - form.fillInfo.texture.index);
+		  wrap::narrow(form.fillInfo.texture.count,
+		               TexturePointsBuffer->size() - form.fillInfo.texture.index);
 		  auto sourceStart = std::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 		  auto sourceEnd   = std::next(sourceStart, form.fillInfo.texture.count);
 		  auto const destination = std::next(TexturePointsBuffer->begin(), textureCount);

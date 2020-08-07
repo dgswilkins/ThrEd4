@@ -579,7 +579,7 @@ void clip::internal::fxlen(FRMHED const&             form,
 	  smallestSpacing = AdjustedSpace;
 	  minimumInterval =
 	      hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
-	  auto interval       = minimumInterval;
+	  auto interval  = minimumInterval;
 	  minimumSpacing = AdjustedSpace;
 	  interval /= initialCount;
 	  // NOLINTNEXTLINE(readability-magic-numbers)
@@ -587,7 +587,8 @@ void clip::internal::fxlen(FRMHED const&             form,
 	  largestSpacing = smallestSpacing + interval;
 	}
 	else {
-	  auto interval = hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
+	  auto interval =
+	      hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
 	  if (interval > halfSpacing) {
 		interval = form.edgeSpacing - interval;
 	  }
@@ -622,7 +623,8 @@ void clip::internal::fxlen(FRMHED const&             form,
 	NextStart = 0;
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint);
   }
-  auto const interval = hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
+  auto const interval =
+      hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
   if (interval > halfSpacing) {
 	chainEndPoints.push_back(vertexIt[NextStart]);
   }
