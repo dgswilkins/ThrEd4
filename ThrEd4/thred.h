@@ -118,7 +118,6 @@ namespace internal {
   auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept -> bool;
   auto chkattr(fs::path const& filename) -> bool;
   auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
-  void chkbit();
   auto chkhid(uint32_t colorToCheck) -> bool;
   void chkirct() noexcept;
   auto chkminus(uint32_t code) noexcept -> bool;
@@ -149,7 +148,6 @@ namespace internal {
   void delfre();
   void delknot();
   void delknt();
-  void delmap();
   void delsfrms(uint32_t code);
   void delsmal(uint32_t startStitch, uint32_t endStitch);
   void delstch();

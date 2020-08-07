@@ -24,6 +24,7 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
+#include "bitmap.h"
 #include "displayText.h"
 #include "thred.h"
 #include "DST.h"
@@ -883,7 +884,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr);
   if (bytesRead == sizeof(dstHeader)) {
 	if (di::chkdst(&dstHeader)) {
-	  UTF8BMPname.fill(0);
+	  bitmap::resetBmpFile(true);
 	  fileSize -= sizeof(dstHeader);
 	  auto DSTData = std::vector<DSTREC> {};
 	  DSTData.resize(fileSize / sizeof(DSTREC));

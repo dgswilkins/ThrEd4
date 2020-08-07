@@ -25,6 +25,7 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
+#include "bitmap.h"
 #include "displayText.h"
 #include "form.h"
 #include "thred.h"
@@ -124,7 +125,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		}
 		else {
 		  if (FALSE ==
-		      WriteFile(fileHandle, UTF8BMPname.data(), 14, &bytesWritten, nullptr)) {
+		      WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -182,7 +183,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  ++iPCSstitch;
 			}
 			// Grab the bitmap filename
-			ReadFile(fileHandle, UTF8BMPname.data(), 14, &bytesRead, nullptr);
+			ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr);
 			if (bytesRead != 14) {
 				outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 			}

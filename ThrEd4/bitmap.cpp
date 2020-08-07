@@ -33,6 +33,8 @@ uint32_t  BitmapWidth;          // bitmap width
 fPOINT    BmpStitchRatio;       // bitmap to stitch hoop ratios
 fs::path* UTF16BMPname;      // bitmap file name from user load
 
+auto UTF8BMPname = std::array<char, nameSize> {}; // bitmap file name from pcs file
+
 BITMAPFILEHEADER BitmapFileHeader;   // bitmap file header
 BITMAPV4HEADER   BitmapFileHeaderV4; // bitmap version4 file header
 BITMAPINFO       BitmapInfo;         // bitmap info
@@ -80,7 +82,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	displayText::loadString(fmtStr, IDS_UNOPEN);
 	displayText::shoMsg(fmt::format(fmtStr, UTF16BMPname->wstring()));
 	CloseHandle(hBitmapFile);
-	UTF8BMPname.fill(0);
+	bitmap::resetBmpFile(true);
 	return;
   }
   auto bytesRead = DWORD {0};
@@ -95,7 +97,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   }
   else {
 	CloseHandle(hBitmapFile);
-	UTF8BMPname.fill(0);
+	bitmap::resetBmpFile(true);
 	return;
   }
   if (gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
@@ -174,7 +176,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   }
   else {
 	CloseHandle(hBitmapFile);
-	UTF8BMPname.fill(0);
+	bitmap::resetBmpFile(true);
 	displayText::tabmsg(IDS_BMAP);
   }
 }
@@ -258,7 +260,7 @@ auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
 }
 
 void bitmap::resetBmpFile(bool reset) {
-  if (UTF8BMPname[0] != 0) {
+  if (bitmap::ismap()) {
 	DeleteObject(BitmapFileHandle);
 	ReleaseDC(ThrEdWindow, BitmapDC);
 	if (reset) {
@@ -308,7 +310,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 }
 
 void bitmap::savmap() {
-  if (UTF8BMPname[0] != 0) {
+  if (bitmap::ismap()) {
 	if (StateMap->test(StateFlag::MONOMAP)) {
 	  displayText::tabmsg(IDS_SAVMAP);
 	  return;
@@ -416,7 +418,7 @@ void bitmap::lodbmp() {
 	auto const pleng = GetShortPathName(UTF16BMPname->wstring().c_str(), NULL, 0);
 	auto dest = std::vector<wchar_t> {};
 	dest.resize(pleng);
-	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), dest.size());
+	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
 	auto filePart = fs::path {dest.data()};
 	auto saveFile = utf::Utf16ToUtf8(filePart.filename().wstring());
 #else
@@ -453,7 +455,7 @@ auto bitmap::internal::nuBit() noexcept -> COLORREF {
 void bitmap::setBmpColor() {
   if (bi::nuBit() != 0U) {
 	BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
-	if (UTF8BMPname[0] != 0) {
+	if (bitmap::ismap()) {
 	  bitmap::internal::bfil(BackgroundColor);
 	}
 	BitmapPen = thred::nuPen(BitmapPen, 1, BitmapColor);
@@ -468,7 +470,8 @@ void bitmap::setUBfilename(fs::path* fileName) noexcept {
 void bitmap::assignUBFilename(fs::path const& directory) {
   fs::current_path(directory);
   auto BMPfileName = utf::Utf8ToUtf16(std::string(UTF8BMPname.data()));
-  UTF16BMPname->assign(BMPfileName);
+  auto fullPath    = directory / BMPfileName;
+  UTF16BMPname->assign(fullPath);
   bitmap::internal::bfil(BackgroundColor);
 }
 
@@ -526,6 +529,31 @@ void bitmap::setBitmapColor(COLORREF const& newColor) noexcept {
 
 void bitmap::setBitmapPen(HPEN pen) noexcept {
   BitmapPen = pen;
+}
+
+auto bitmap::getBmpNameLength() -> uint32_t {
+  return wrap::toUnsigned(UTF8BMPname.size());
+}
+
+auto bitmap::getBmpNameData() noexcept -> char * {
+  return UTF8BMPname.data();
+}
+
+auto bitmap::ismap() noexcept -> bool {
+  return (UTF8BMPname[0] != 0);
+}
+
+void bitmap::chkbit() {
+  if (bitmap::ismap() && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
+                          StateMap->test(StateFlag::WASBLAK))) {
+	StateMap->set(StateFlag::WASESC);
+	bitmap::internal::bfil(BackgroundColor);
+  }
+}
+
+void bitmap::delmap() {
+  UTF8BMPname.fill(0);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void bitmap::drawBmpBackground() {

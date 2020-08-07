@@ -12,6 +12,8 @@ namespace bitmap {
 void assignUBFilename(fs::path const& directory);
 void bitbltBitmap() noexcept;
 void bfrm(FRMHED const& form);
+void chkbit();
+void delmap();
 void drawBmpBackground();
 auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
 auto getBitmapDC() noexcept -> HDC;
@@ -20,8 +22,13 @@ auto getBitmapSizeinStitches() noexcept -> fPOINT;
 auto getBitmapWidth() noexcept -> uint32_t;
 auto getBmpColor() noexcept -> COLORREF;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
+
+auto getBmpNameLength() -> uint32_t;
+auto getBmpNameData() noexcept -> char*;
+
 auto getBmpStitchRatio() noexcept -> fPOINT;
 auto getrmap() -> uint32_t;
+auto ismap() noexcept -> bool;
 void resetBmpFile(bool reset);
 void savmap();
 void lodbmp();

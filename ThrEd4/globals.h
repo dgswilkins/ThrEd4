@@ -185,7 +185,6 @@ extern bool OutLineEverySelectedForm;
 
 extern std::vector<fPOINT>* OutsidePointList;
 extern std::vector<fPOINT>* OutsidePoints;
-extern std::array<char, nameSize> UTF8BMPname;
 
 extern wchar_t const* PcdClipFormat;
 extern float          PicotSpacing;

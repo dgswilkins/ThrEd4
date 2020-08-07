@@ -3032,7 +3032,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 
   stitchHeader.headerType = headerVersion << TBYTSHFT | headerSignature;
   stitchHeader.fileLength = wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) +
-                                             sizeof(stitchHeader) + UTF8BMPname.size());
+                                             sizeof(stitchHeader) + bitmap::getBmpNameLength());
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
@@ -3059,7 +3059,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.clipDataCount, clipDataCount);
   constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
                                 2; // ThreadSize is defined as a 16 entry array of 2 bytes
-  constexpr auto formDataOffset = UTF8BMPname.size() + sizeof(BackgroundColor) +
+  const auto formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
                                   sizeof(UserColor) + sizeof(CustomColor) + threadLength;
   auto       vtxLen        = sizeof(stitchHeader) + StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + formDataOffset;
   auto const thredDataSize = FormList->size() * sizeof(decltype(FormList->back())) +
@@ -3068,9 +3068,10 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
                              clipDataCount * sizeof(decltype(ClipPoints->back())) +
                              TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()));
   buffer.reserve(vtxLen + thredDataSize);
-  // ToDo - vertexLength overflows if there are more than 5446 stitches, so clamp it until version 3
-  if (vtxLen > USHRT_MAX) {
-	vtxLen = USHRT_MAX;
+  // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
+  constexpr auto limit = std::numeric_limits<decltype(stitchHeader.vertexLen)>::max();
+  if (vtxLen > limit) {
+	vtxLen = limit;
   }
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, sizeof(decltype(FormVertices->back())) * vertexCount);
@@ -3084,10 +3085,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   durit(buffer,
         StitchBuffer->data(),
         wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back()))));
-  if (UTF8BMPname[0] == 0) {
-	UTF8BMPname.fill(0);
-  }
-  durit(buffer, UTF8BMPname.data(), wrap::toUnsigned(UTF8BMPname.size()));
+  durit(buffer, bitmap::getBmpNameData(), bitmap::getBmpNameLength());
   durit(buffer, &BackgroundColor, sizeof(BackgroundColor));
   durit(buffer, UserColor.data(), wrap::toUnsigned(UserColor.size() * sizeof(decltype(UserColor.back()))));
   durit(buffer,
@@ -3359,7 +3357,6 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 	  hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 	  hr += pFileSave->SetFileTypeIndex(1);
 	  hr += pFileSave->SetTitle(L"Save As");
-	  auto bmpName = utf::Utf8ToUtf16(UTF8BMPname.data());
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
 	  hr += pFileSave->SetDefaultExtension(L"thr");
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -3418,7 +3415,7 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 }
 
 void thred::internal::savAs() {
-  if (!StitchBuffer->empty() || !FormList->empty() || (UTF8BMPname[0] != 0)) {
+  if (!StitchBuffer->empty() || !FormList->empty() || bitmap::ismap()) {
 	auto index = fileIndices {};
 	if (getSaveName(WorkingFileName, index)) {
 	  *DefaultDirectory = WorkingFileName->parent_path();
@@ -4092,10 +4089,10 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	}
 	StitchBuffer->shrink_to_fit();
-	auto bytesToRead = wrap::toUnsigned(UTF8BMPname.size());
-	ReadFile(fileHandle, UTF8BMPname.data(), bytesToRead, &bytesRead, nullptr);
+	auto bytesToRead = bitmap::getBmpNameLength();
+	ReadFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
-	  UTF8BMPname.fill(0);
+	  bitmap::resetBmpFile(true);
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
@@ -4293,7 +4290,7 @@ void thred::internal::resetState() {
 	DestroyWindow(PreferencesWindow);
 	PreferenceIndex = 0;
   }
-  UTF8BMPname.fill(0);
+  bitmap::resetBmpFile(true);
   SearchLine->clear();
   SearchLine->shrink_to_fit();
   rstdu();
@@ -4350,7 +4347,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 		}
 	  }
 	}
-	if (UTF8BMPname[0] != 0) {
+	if (bitmap::ismap()) {
 	  bitmap::assignUBFilename(*DefaultDirectory);
 	}
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
@@ -5204,7 +5201,7 @@ void thred::internal::newFil() {
   StitchBuffer->clear();
   StitchBuffer->shrink_to_fit();
   DisplayedColorBitmap.reset();
-  UTF8BMPname.fill(0);
+  bitmap::resetBmpFile(true);
   FormVertices->clear();
   FormVertices->shrink_to_fit();
   TexturePointsBuffer->clear();
@@ -7030,8 +7027,8 @@ auto thred::internal::insTHR(fs::path const& insertedFile,fRECTANGLE& insertedRe
 		  }
 		  constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0][0])) /
 			  2U; // ThreadSize is defined as a 16 entry array of 2 bytes
-		  constexpr auto formDataOffset = UTF8BMPname.size() + sizeof(BackgroundColor) +
-			  sizeof(UserColor) + sizeof(CustomColor) + threadLength;
+		  auto const formDataOffset = gsl::narrow<LONG>(bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
+			  sizeof(UserColor) + sizeof(CustomColor) + threadLength);
 		  SetFilePointer(fileHandle, formDataOffset, nullptr, FILE_CURRENT);
 		  InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
 		  InsertedFormIndex = wrap::toUnsigned(FormList->size());
@@ -9571,24 +9568,11 @@ void thred::internal::delstch() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thred::internal::chkbit() {
-  if ((UTF8BMPname[0] != 0) && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
-                                   StateMap->test(StateFlag::WASBLAK))) {
-	StateMap->set(StateFlag::WASESC);
-	bitmap::internal::bfil(BackgroundColor);
-  }
-}
-
-void thred::internal::delmap() {
-  UTF8BMPname.fill(0);
-  StateMap->set(StateFlag::RESTCH);
-}
-
 void thred::internal::closfn() {
   deltot();
   KnotCount = 0;
   WorkingFileName->clear();
-  UTF8BMPname.fill(0);
+  bitmap::delmap();
   deldu();
   displayText::clrhbut(3);
   SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
@@ -10061,7 +10045,7 @@ void thred::internal::selfpnt() {
 }
 
 void thred::internal::esccode() {
-  chkbit();
+  bitmap::chkbit();
   duhbit(MF_UNCHECKED);
   unthum();
   StateMap->reset(StateFlag::MOVSET);
@@ -13396,7 +13380,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
-		if (UTF8BMPname[0] != 0) {
+		if (bitmap::ismap()) {
 		  bitmap::internal::bfil(BackgroundColor);
 		}
 		StateMap->set(StateFlag::RESTCH);
@@ -14912,7 +14896,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
-		if (UTF8BMPname[0] != 0) {
+		if (bitmap::ismap()) {
 		  bitmap::internal::bfil(BackgroundColor);
 		}
 		thred::zumhom();
@@ -14945,7 +14929,7 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_DELMAP: { // file / Remove Bitmap
-	  delmap();
+	  bitmap::delmap();
 	  flag = true;
 	  break;
 	}
@@ -16493,7 +16477,7 @@ auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap,
 void thred::internal::drawBackground() {
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
   thred::duzrat();
-  if ((UTF8BMPname[0] != 0) && !StateMap->test(StateFlag::HIDMAP) && !StateMap->test(StateFlag::UPTO)) {
+  if (bitmap::ismap() && !StateMap->test(StateFlag::HIDMAP) && !StateMap->test(StateFlag::UPTO)) {
 	bitmap::drawBmpBackground();
   }
   dugrid();

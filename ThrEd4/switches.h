@@ -8,4 +8,4 @@
 #define CLPVU 0
 #define CLPBUG 0
 #define BUGSEQ 0
-#define USE_SHORT_NAME 1 // use the 8.3 version of the BMP file name
+#define USE_SHORT_NAME 0 // use the 8.3 version of the BMP file name

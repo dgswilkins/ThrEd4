@@ -146,7 +146,6 @@ bool OutLineEverySelectedForm = false; // When selecting multiple forms, should 
 std::vector<fPOINT>* OutsidePointList; // list of outside outline points for satin or clipboard fills
 std::vector<fPOINT>* OutsidePoints;    // pointer to the list of outside outline points
 
-auto           UTF8BMPname     = std::array<char, nameSize> {}; // bitmap file name from pcs file
 wchar_t const* PcdClipFormat   = L"PMust_Format"; //
 float          PicotSpacing    = IPICSPAC;        // space between border picots
 uint32_t       PreferenceIndex = 0;               // index to the active preference window
