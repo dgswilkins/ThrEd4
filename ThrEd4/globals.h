@@ -249,7 +249,9 @@ extern std::vector<std::wstring>* StringTable;
 extern std::vector<fPOINT>* TempPolygon;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
-extern HWND                 ThreadSizeWin[COLOR_COUNT];
+
+extern std::array<HWND, COLOR_COUNT> ThreadSizeWin;
+
 extern uint32_t             ThrEdClip;
 extern wchar_t const*       ThrEdClipFormat;
 extern HINSTANCE            ThrEdInstance;

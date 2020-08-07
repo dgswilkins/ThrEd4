@@ -209,7 +209,9 @@ std::vector<fPOINT>*       TempPolygon; // temporary storage when user is enteri
 
 std::wstring*       TextureInputBuffer;             // texture fill number buffer
 std::vector<TXPNT>* TexturePointsBuffer;            // buffer for textured fill points
-HWND                ThreadSizeWin[COLOR_COUNT];     // thread size windows
+
+auto ThreadSizeWin = std::array<HWND, COLOR_COUNT> {}; // thread size windows
+
 uint32_t            ThrEdClip       = 0;            // thred format
 wchar_t const*      ThrEdClipFormat = L"threditor"; //
 HINSTANCE           ThrEdInstance;                  // main instance handle

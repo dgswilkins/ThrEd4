@@ -12759,7 +12759,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	return true;
   }
-  if (thi::chkMsgs(Msg.pt, ThreadSizeWin[0], ThreadSizeWin[COLOR_MAX])) {
+  if (thi::chkMsgs(Msg.pt, ThreadSizeWin.front(), ThreadSizeWin.back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  wchar_t const* const str[] = {L"30", L"40", L"60"};
 	  thred::savdo();
