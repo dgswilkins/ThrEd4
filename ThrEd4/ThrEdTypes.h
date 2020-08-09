@@ -1118,6 +1118,7 @@ class fPOINT
   inline fPOINT(double rhsX, double rhsY) noexcept;
   inline fPOINT(float rhsX, float rhsY) noexcept;
   inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
+  inline fPOINT(LONG rhsX, LONG rhsY) noexcept;
   explicit inline fPOINT(dPOINT const& rhs) noexcept;
   inline auto operator==(fPOINT const& rhs) const noexcept -> bool;
   inline auto operator=(dPOINT const& rhs) noexcept -> fPOINT&;
@@ -1194,6 +1195,11 @@ inline auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
 inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
+  x = gsl::narrow_cast<float>(rhsX);
+  y = gsl::narrow_cast<float>(rhsY);
+}
+
+inline fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
 }
