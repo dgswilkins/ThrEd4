@@ -46,8 +46,6 @@ constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
 constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
-constexpr auto BMPFileNameLen = 16U; // max length (in bytes) of file name
-
 auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version

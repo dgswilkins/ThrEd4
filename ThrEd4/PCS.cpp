@@ -339,7 +339,6 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		  }
 		}
 		auto const newStitchCount = StitchBuffer->size();
-		auto const startStitch    = StitchBuffer->operator[](insertIndex);
 		for (; insertIndex < newStitchCount; ++insertIndex) {
 		  auto const stitch = StitchBuffer->operator[](insertIndex);
 		  if (stitch.x < insertedRectangle.left) {
