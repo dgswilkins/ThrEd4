@@ -252,7 +252,6 @@ extern std::vector<TXPNT>*  TexturePointsBuffer;
 
 extern std::array<HWND, COLOR_COUNT> ThreadSizeWin;
 
-extern uint32_t       ThrEdClip;
 extern wchar_t const* ThrEdClipFormat;
 extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;

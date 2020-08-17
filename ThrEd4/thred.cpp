@@ -5715,7 +5715,7 @@ void thred::internal::duclip() {
   if (StateMap->test(StateFlag::FPSEL)) {
 	if (OpenClipboard(ThrEdWindow) != 0) {
 	  EmptyClipboard();
-	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+	  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 	  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
 	                                (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
@@ -5734,7 +5734,7 @@ void thred::internal::duclip() {
 		  vertices[iVertex] = vertexIt[iSource];
 		  iSource           = form::pdir(form, iSource);
 		}
-		SetClipboardData(ThrEdClip, clipHandle);
+		SetClipboardData(thrEdClip, clipHandle);
 	  }
 	  else {
 		throw;
@@ -5749,7 +5749,7 @@ void thred::internal::duclip() {
   else {
 	if (OpenClipboard(ThrEdWindow) != 0) {
 	  EmptyClipboard();
-	  ThrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+	  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  if (!SelectedFormList->empty()) {
 		auto length = 0U;
 		for (auto& selectedForm : (*SelectedFormList)) {
@@ -5829,7 +5829,7 @@ void thred::internal::duclip() {
 			  textureCount += form.fillInfo.texture.count;
 			}
 		  }
-		  SetClipboardData(ThrEdClip, clipHandle);
+		  SetClipboardData(thrEdClip, clipHandle);
 		}
 		CloseClipboard();
 		auto formMap = boost::dynamic_bitset<>(FormList->size());
@@ -5927,7 +5927,7 @@ void thred::internal::duclip() {
 			  auto const dest     = gsl::span<TXPNT>(textures, form.fillInfo.texture.count);
 			  std::copy(startPoint, endPoint, dest.begin());
 			}
-			SetClipboardData(ThrEdClip, clipHandle);
+			SetClipboardData(thrEdClip, clipHandle);
 		  }
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
@@ -12789,8 +12789,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  ThrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
-  ClipMemory = GetClipboardData(ThrEdClip);
+  auto const thrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
+  ClipMemory = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {

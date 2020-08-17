@@ -212,7 +212,6 @@ std::vector<TXPNT>* TexturePointsBuffer; // buffer for textured fill points
 
 auto ThreadSizeWin = std::array<HWND, COLOR_COUNT> {}; // thread size windows
 
-uint32_t       ThrEdClip       = 0U;           // thred format
 wchar_t const* ThrEdClipFormat = L"threditor"; //
 HINSTANCE      ThrEdInstance;                  // main instance handle
 HWND           ThrEdWindow;                    // main window handle
