@@ -246,8 +246,7 @@ auto trace::internal::trsum() noexcept -> uint32_t {
 
 void trace::untrace() {
   if (StateMap->testAndReset(StateFlag::WASTRAC)) {
-	DeleteObject(TraceBitmap);
-	DeleteObject(TraceDC);
+	  bitmap::resetDC();
 	if (!TracedEdges->empty()) {
 	  TracedEdges->resize(0); // allocated in tracedg
 	}
@@ -1034,7 +1033,7 @@ void trace::blak() {
   if (!FormList->empty()) {
 	BlackPen = wrap::CreatePen(PS_SOLID, penNarrow, penBlack);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
-	SelectObject(TraceDC, BlackPen);
+	SelectObject(bitmap::getTraceDC(), BlackPen);
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}

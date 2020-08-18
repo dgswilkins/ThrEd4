@@ -257,9 +257,7 @@ extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;
 extern fs::path*      ThrName;
 extern POINT          ThredWindowOrigin;
-extern HBITMAP        TraceBitmap;
 extern uint32_t*      TraceBitmapData;
-extern HDC            TraceDC;
 
 extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;

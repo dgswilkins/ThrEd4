@@ -28,8 +28,10 @@ auto getBmpNameData() noexcept -> char*;
 
 auto getBmpStitchRatio() noexcept -> fPOINT;
 auto getrmap() -> uint32_t;
+auto getTraceDC() noexcept -> HDC;
 auto ismap() noexcept -> bool;
 void resetBmpFile(bool reset);
+void resetDC() noexcept;
 void savmap();
 void lodbmp(fs::path const* directory);
 void setBmpBackColor() noexcept;

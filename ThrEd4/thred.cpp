@@ -236,6 +236,7 @@ auto RotateBoxToCursorLine  = std::array<POINT, LNPNTS> {}; // line from the cur
 std::vector<COLCHNG>* ColorChangeTable;
 
 auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1998,6 +1999,7 @@ auto thred::internal::oldwnd(HWND window) noexcept -> bool {
 }
 
 auto CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
 	return DestroyWindow(hwnd);
@@ -10164,6 +10166,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 }
 
 auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {

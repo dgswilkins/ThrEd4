@@ -217,9 +217,7 @@ HINSTANCE      ThrEdInstance;                  // main instance handle
 HWND           ThrEdWindow;                    // main window handle
 fs::path*      ThrName;                        //
 POINT          ThredWindowOrigin;              // offset origin of the main window
-HBITMAP        TraceBitmap;                    // trace bitmap
 uint32_t*      TraceBitmapData;                // trace bitmap data
-HDC            TraceDC;                        // trace device context
 
 boost::dynamic_bitset<>* TracedEdges; // detected edges of trace areas
 boost::dynamic_bitset<>* TracedMap;   // in/out state of trace areas
