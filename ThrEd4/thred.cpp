@@ -15770,7 +15770,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in chkMsg: message [{}]\n", Msg.message);
+	  //outDebugString(L"default hit in chkMsg: message [{}]\n", Msg.message);
 	  break;
 	}
   }
@@ -15877,11 +15877,11 @@ void thred::internal::duhom() {
   *HomeDirectory = arg0.parent_path();
 }
 
-auto thred::getHomeDir() -> fs::path* {
+auto thred::getHomeDir() noexcept -> fs::path* {
   return HomeDirectory;
 }
 
-auto thred::getBackGroundBrush() -> HBRUSH {
+auto thred::getBackGroundBrush() noexcept -> HBRUSH {
   return BackgroundBrush;
 }
 
