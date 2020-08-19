@@ -75,6 +75,7 @@ constexpr auto EDGETYPS    = uint32_t {13U};      // number of border fill types
 int32_t  ArgCount;            // command line argument count
 LPTSTR*   ArgList;                         // command line argument array
 HCURSOR   ArrowCursor;                     // arrow
+HBRUSH   BackgroundBrush;      // background color brush
 HCURSOR  CrossCursor;           // cross
 RECT     ThredWindowRect;     // main window size
 RECT     ColorBarRect;        // color bar rectangle
@@ -15878,6 +15879,10 @@ void thred::internal::duhom() {
 
 auto thred::getHomeDir() -> fs::path* {
 	return HomeDirectory;
+}
+
+auto thred::getBackGroundBrush() -> HBRUSH {
+	return BackgroundBrush;
 }
 
 void thred::internal::ducmd() {

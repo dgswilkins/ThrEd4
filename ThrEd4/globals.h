@@ -77,7 +77,6 @@ extern fs::path* AuxName;
 
 extern std::vector<BSEQPNT>* BSequence;
 
-extern HBRUSH   BackgroundBrush;
 extern COLORREF BackgroundColor;
 extern uint32_t BeanCount; // number of stitches added by convert to bean
 extern float    BorderWidth;

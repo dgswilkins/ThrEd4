@@ -40,7 +40,6 @@ fs::path* AuxName;                         //
 
 std::vector<BSEQPNT>* BSequence; //
 
-HBRUSH   BackgroundBrush;      // background color brush
 COLORREF BackgroundColor;      // stitch window background
 uint32_t BeanCount;            // number of stitches added by convert to bean
 float    BorderWidth = BRDWID; // border width for satin borders
