@@ -231,8 +231,8 @@ void xt::internal::fthfn(uint32_t iSequence, FEATHER& feather) {
 
 void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
-  point.x           = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
-  point.y           = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
+  point.x            = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
+  point.y            = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
 }
 
 auto xt::internal::midpnt(fPOINT const& startPoint, fPOINT const& endPoint) noexcept -> fPOINT {
@@ -1482,7 +1482,8 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 		  break;
 		}
 		default: {
-		  outDebugString(L"default hit in intlv: seq [{}]\n", InterleaveSequenceIndices->operator[](iSequence).seq);
+		  outDebugString(L"default hit in intlv: seq [{}]\n",
+		                 InterleaveSequenceIndices->operator[](iSequence).seq);
 		  break;
 		}
 	  }

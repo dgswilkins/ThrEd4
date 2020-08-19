@@ -72,21 +72,21 @@ constexpr auto FSSIZE      = uint8_t {6U};        // count of feather styles
 constexpr auto EDGETYPS    = uint32_t {13U};      // number of border fill types
 
 // main variables
-int32_t  ArgCount;            // command line argument count
-LPTSTR*   ArgList;                         // command line argument array
-HCURSOR   ArrowCursor;                     // arrow
-HBRUSH   BackgroundBrush;      // background color brush
-HCURSOR  CrossCursor;           // cross
-RECT     ThredWindowRect;     // main window size
-RECT     ColorBarRect;        // color bar rectangle
-fs::path* HomeDirectory;         // directory from which thred was executed
-uint32_t SmallestStitchIndex; // pointer to the smallest stitch in the selected range
-uint32_t LargestStitchIndex;  // pointer to the largest stitch in the selected range
-uint32_t CurrentStitchIndex;  // pointer to the current selection for length search
-HDC      ThredDC;             // main device context handle
-HBITMAP  StitchWindowBmp;     // bitmap for the memory stitch device context
-SIZE     ScreenSizePixels;    // screen size in pixels
-RECT     StitchWindowAbsRect; // stitch window size,absolute
+int32_t   ArgCount;            // command line argument count
+LPTSTR*   ArgList;             // command line argument array
+HCURSOR   ArrowCursor;         // arrow
+HBRUSH    BackgroundBrush;     // background color brush
+HCURSOR   CrossCursor;         // cross
+RECT      ThredWindowRect;     // main window size
+RECT      ColorBarRect;        // color bar rectangle
+fs::path* HomeDirectory;       // directory from which thred was executed
+uint32_t  SmallestStitchIndex; // pointer to the smallest stitch in the selected range
+uint32_t  LargestStitchIndex;  // pointer to the largest stitch in the selected range
+uint32_t  CurrentStitchIndex;  // pointer to the current selection for length search
+HDC       ThredDC;             // main device context handle
+HBITMAP   StitchWindowBmp;     // bitmap for the memory stitch device context
+SIZE      ScreenSizePixels;    // screen size in pixels
+RECT      StitchWindowAbsRect; // stitch window size,absolute
 
 auto NearestPixel = std::array<POINT, NERCNT> {}; // selected points
 
@@ -2171,7 +2171,7 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
   for (auto iStitch = start; iStitch < end; ++iStitch) {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (length > maxLength) {
 	  maxLength          = length;
 	  largestStitchIndex = iStitch;
@@ -2192,10 +2192,10 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
-	auto       txt        = std::wstring {};
+	auto        txt        = std::wstring {};
 	auto const& stitch     = StitchBuffer->operator[](ClosestPointIndex);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-	auto const lenMax     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y) * IPFGRAN;
+	auto const lenMax      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 	displayText::loadString(txt, IDS_SRCH);
 	displayText::butxt(HMAXLEN, txt);
@@ -2263,7 +2263,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
 		auto const& stitch = StitchBuffer->operator[](iStitch);
-		auto outStitch    = StitchBuffer->operator[](iOutputStitch);
+		auto outStitch     = StitchBuffer->operator[](iOutputStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
 			prevPoint = outStitch;
@@ -2698,11 +2698,11 @@ void thred::internal::dubox(POINT const& stitchCoordsInPixels) {
 	if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
 	  // if the selected point is not at the end then aim at the next point
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-	  RotateAngle           = atan2(stitchFwd1.y - stitch.y, stitchFwd1.x - stitch.x);
+	  RotateAngle            = atan2(stitchFwd1.y - stitch.y, stitchFwd1.x - stitch.x);
 	}
 	else { // otherwise aim in the same direction
 	  auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
-	  RotateAngle           = atan2(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
+	  RotateAngle            = atan2(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
 	}
 	duar(stitchCoordsInPixels);
 	StateMap->reset(StateFlag::ELIN);
@@ -8153,8 +8153,8 @@ void thred::internal::longer() {
   if (ClosestPointIndex == LargestStitchIndex) {
 	return;
   }
-  const	auto& start         = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  const auto& start        = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1    = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
   auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   auto const rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
                             ? SelectedRange.finish
@@ -8162,7 +8162,7 @@ void thred::internal::longer() {
   for (iStitch = ClosestPointIndex + 1U; iStitch < rangeEnd; ++iStitch) {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (length == currentLength) {
 	  flag = false;
 	  break;
@@ -8173,7 +8173,7 @@ void thred::internal::longer() {
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; ++currentStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
-	  auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length > currentLength && length < minimumLength) {
 		minimumLength = length;
 		iStitch       = currentStitch;
@@ -8197,11 +8197,11 @@ void thred::internal::shorter() {
   }
   auto const& start     = StitchBuffer->operator[](ClosestPointIndex);
   auto const& startFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  currentLength        = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  currentLength         = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   for (currentStitch = ClosestPointIndex; currentStitch != 0; --currentStitch) {
 	auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
-	auto const length     = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
+	auto const length      = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
 	if (length == currentLength) {
 	  --currentStitch;
 	  flag = false;
@@ -8214,7 +8214,7 @@ void thred::internal::shorter() {
 	for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1U; ++iStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](iStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	  auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	  auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length < currentLength && length > maximumLength) {
 		maximumLength = length;
 		currentStitch = iStitch;
@@ -9569,7 +9569,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  default: {
 			outDebugString(L"default hit in LockPrc 1: wparam [{}]\n", LOWORD(wparam));
 			break;
-		}
+		  }
 		}
 	  }
 	  break;
@@ -12856,8 +12856,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
-  auto const thrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
-  ClipMemory = GetClipboardData(thrEdClip);
+  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+  ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {
@@ -14024,7 +14024,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  break;
 	}
 	default: {
-		outDebugString(L"default hit in handleMainWinKeys: code [{}]\n", code);
+	  outDebugString(L"default hit in handleMainWinKeys: code [{}]\n", code);
 	  break;
 	}
   }
@@ -15878,11 +15878,11 @@ void thred::internal::duhom() {
 }
 
 auto thred::getHomeDir() -> fs::path* {
-	return HomeDirectory;
+  return HomeDirectory;
 }
 
 auto thred::getBackGroundBrush() -> HBRUSH {
-	return BackgroundBrush;
+  return BackgroundBrush;
 }
 
 void thred::internal::ducmd() {
@@ -16456,9 +16456,9 @@ void thred::internal::relin() {
 }
 
 void thred::internal::dumov() {
-  constexpr auto abPoints = 7U;
+  constexpr auto abPoints  = 7U;
   auto const& anchorStitch = StitchBuffer->operator[](MoveAnchor);
-  RotateAngle             = atan2(StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).y -
+  RotateAngle              = atan2(StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).y -
                           StitchBuffer->operator[](MoveAnchor).y,
                       StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).x -
                           StitchBuffer->operator[](MoveAnchor).x);
@@ -17606,7 +17606,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	default: {
-	  //outDebugString(L"default hit in WndProc 4: message [{}]\n", message);
+	  // outDebugString(L"default hit in WndProc 4: message [{}]\n", message);
 	  break;
 	}
   }

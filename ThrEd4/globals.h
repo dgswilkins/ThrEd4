@@ -135,15 +135,15 @@ extern HPEN FormSelectedPen;
 
 extern std::vector<fPOINT>* FormVertices;
 
-extern HWND      GeneralNumberInputBox;
-extern HPEN      GridPen;
-extern uint32_t  GroupEndStitch;
-extern uint32_t  GroupStartStitch;
-extern uint32_t  GroupStitchIndex;
-extern double    HorizontalLength;
-extern float     HorizontalRatio;
-extern HWND      HorizontalScrollBar;
-extern INIFILE   IniFile;
+extern HWND     GeneralNumberInputBox;
+extern HPEN     GridPen;
+extern uint32_t GroupEndStitch;
+extern uint32_t GroupStartStitch;
+extern uint32_t GroupStitchIndex;
+extern double   HorizontalLength;
+extern float    HorizontalRatio;
+extern HWND     HorizontalScrollBar;
+extern INIFILE  IniFile;
 
 extern std::array<POINT, 3> InsertLine;
 extern std::vector<fPOINT>* InsidePointList;

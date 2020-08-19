@@ -827,8 +827,8 @@ void texture::internal::setxfrm() {
 }
 
 void texture::internal::txtclp(FRMHED& textureForm) {
-  auto const thrEdClip  = RegisterClipboardFormat(ThrEdClipFormat);
-  ClipMemory = GetClipboardData(thrEdClip);
+  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
+  ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
 	auto* clipFormHeader = gsl::narrow_cast<FORMCLIP*>(GlobalLock(ClipMemory));
 	if (clipFormHeader != nullptr) {

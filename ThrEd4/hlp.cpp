@@ -36,7 +36,7 @@ void hlp::help() {
   auto helpFileName = std::wstring {};
   displayText::loadString(helpFileName, IDS_HELPFN);
   auto homeDir = thred::getHomeDir();
-  HelpWindow = HtmlHelp(
+  HelpWindow   = HtmlHelp(
       ThrEdWindow, fmt::format(L"{}{}", homeDir->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
   if (HelpWindow == nullptr) {
 	displayText::tabmsg(IDS_NOHLP);

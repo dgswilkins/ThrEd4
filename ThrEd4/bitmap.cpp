@@ -42,8 +42,8 @@ BITMAPINFOHEADER BitmapInfoHeader;   // bitmap info header
 
 CHOOSECOLOR BitMapColorStruct;
 
-HBITMAP        TraceBitmap;                    // trace bitmap
-HDC            TraceDC;                        // trace device context
+HBITMAP TraceBitmap; // trace bitmap
+HDC     TraceDC;     // trace device context
 
 constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
@@ -541,8 +541,8 @@ void bitmap::setBitmapPen(HPEN pen) noexcept {
 }
 
 void bitmap::resetDC() noexcept {
-	DeleteObject(TraceBitmap);
-	DeleteObject(TraceDC);
+  DeleteObject(TraceBitmap);
+  DeleteObject(TraceDC);
 }
 
 auto bitmap::getBmpNameLength() -> uint32_t {
