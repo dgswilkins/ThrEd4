@@ -41,11 +41,15 @@ class DSTDAT
   char val {0};
 
   constexpr DSTDAT() noexcept = default;
+  constexpr DSTDAT(char rhsCor, char rhsVal);
   // DSTDAT(DSTDAT&&) = default;
   // DSTDAT& operator=(DSTDAT const& rhs) = default;
   // DSTDAT& operator=(DSTDAT&&) = default;
   //~DSTDAT() = default;
 };
+
+constexpr DSTDAT::DSTDAT(char rhsCor, char rhsVal) : cor(rhsCor), val(rhsVal) {
+}
 
 constexpr auto XCOR = char {0};
 constexpr auto YCOR = char {1};
