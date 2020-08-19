@@ -58,9 +58,9 @@ void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uin
 }
 
 auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
-  auto texturePath = fs::path(ArgList[0]);
-  texturePath.replace_filename(L"thred.txr");
-  return wcscpy_s(name, sizeName, texturePath.c_str()) == 0;
+  auto texturePath = thred::getHomeDir();
+  auto textureFile = *texturePath / L"thred.txr";
+  return wcscpy_s(name, sizeName, textureFile.c_str()) == 0;
 }
 
 void texture::txdun() {

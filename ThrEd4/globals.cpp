@@ -36,7 +36,6 @@ fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
 uint32_t  AppliqueColor = COLOR_COUNT - 1; // underlay color
-LPTSTR*   ArgList;                         // command line argument array
 HCURSOR   ArrowCursor;                     // arrow
 fs::path* AuxName;                         //
 
@@ -106,7 +105,6 @@ HPEN      GridPen;               // pen for stitch grid
 uint32_t  GroupEndStitch;        // higher end of selected stitches
 uint32_t  GroupStartStitch;      // lower end of selected stitches
 uint32_t  GroupStitchIndex;      // last point selected in group
-fs::path* HomeDirectory;         // directory from which thred was executed
 double    HorizontalLength;      // horizontal length of a clipboard fill
 float     HorizontalRatio; // horizontal ratio between the zoom window and the entire stitch space
 HWND      HorizontalScrollBar;                  // horizontal scroll bar

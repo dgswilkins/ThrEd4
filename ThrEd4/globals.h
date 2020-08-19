@@ -73,7 +73,6 @@ extern fRECTANGLE* AllItemsRect;
 extern std::vector<fPOINT>* AngledFormVertices;
 
 extern uint32_t  AppliqueColor;
-extern LPTSTR*   ArgList; // command line argument array
 extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
 
@@ -144,7 +143,6 @@ extern HPEN      GridPen;
 extern uint32_t  GroupEndStitch;
 extern uint32_t  GroupStartStitch;
 extern uint32_t  GroupStitchIndex;
-extern fs::path* HomeDirectory;
 extern double    HorizontalLength;
 extern float     HorizontalRatio;
 extern HWND      HorizontalScrollBar;

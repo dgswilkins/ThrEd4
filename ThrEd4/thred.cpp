@@ -73,8 +73,10 @@ constexpr auto EDGETYPS    = uint32_t {13U};      // number of border fill types
 
 // main variables
 int32_t  ArgCount;            // command line argument count
+LPTSTR*   ArgList;                         // command line argument array
 RECT     ThredWindowRect;     // main window size
 RECT     ColorBarRect;        // color bar rectangle
+fs::path* HomeDirectory;         // directory from which thred was executed
 uint32_t SmallestStitchIndex; // pointer to the smallest stitch in the selected range
 uint32_t LargestStitchIndex;  // pointer to the largest stitch in the selected range
 uint32_t CurrentStitchIndex;  // pointer to the current selection for length search
@@ -15870,6 +15872,10 @@ void thred::internal::crtcurs() noexcept {
 void thred::internal::duhom() {
   auto arg0      = fs::path {ArgList[0]};
   *HomeDirectory = arg0.parent_path();
+}
+
+auto thred::getHomeDir() -> fs::path* {
+	return HomeDirectory;
 }
 
 void thred::internal::ducmd() {
