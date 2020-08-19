@@ -73,7 +73,6 @@ extern fRECTANGLE* AllItemsRect;
 extern std::vector<fPOINT>* AngledFormVertices;
 
 extern uint32_t  AppliqueColor;
-extern HCURSOR   ArrowCursor;
 extern fs::path* AuxName;
 
 extern std::vector<BSEQPNT>* BSequence;
@@ -106,7 +105,6 @@ extern uint32_t ClosestFormToCursor;
 extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
 extern int32_t* ColorBarSize;
-extern HCURSOR  CrossCursor;
 
 extern std::vector<HWND>* DefaultColorWin;
 

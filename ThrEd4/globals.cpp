@@ -36,7 +36,6 @@ fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
 uint32_t  AppliqueColor = COLOR_COUNT - 1; // underlay color
-HCURSOR   ArrowCursor;                     // arrow
 fs::path* AuxName;                         //
 
 std::vector<BSEQPNT>* BSequence; //
@@ -71,7 +70,6 @@ uint32_t ClosestFormToCursor;   // closest form to the cursor
 uint32_t ClosestPointIndex;     // index of closest point
 uint32_t ClosestVertexToCursor; // formOrigin closest to the cursor
 int32_t* ColorBarSize;          // Color bar width scaled for DPI
-HCURSOR  CrossCursor;           // cross
 
 std::vector<HWND>* DefaultColorWin; // default color windows
 

@@ -74,6 +74,8 @@ constexpr auto EDGETYPS    = uint32_t {13U};      // number of border fill types
 // main variables
 int32_t  ArgCount;            // command line argument count
 LPTSTR*   ArgList;                         // command line argument array
+HCURSOR   ArrowCursor;                     // arrow
+HCURSOR  CrossCursor;           // cross
 RECT     ThredWindowRect;     // main window size
 RECT     ColorBarRect;        // color bar rectangle
 fs::path* HomeDirectory;         // directory from which thred was executed
