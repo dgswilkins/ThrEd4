@@ -457,6 +457,11 @@ void repair::frmchkx() {
 		  repair::repar();
 		  displayText::tabmsg(IDS_DATREP);
 		}
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in frmchkx: dataCheck [{}]\n", IniFile.dataCheck);
+		break;
 	  }
 	}
   }

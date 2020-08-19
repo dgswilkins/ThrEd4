@@ -266,9 +266,16 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
 		  return TRUE;
 		}
+		default: {
+		  outDebugString(L"default hit in dnamproc 1: wparam [{}]\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in dnamproc 2: umsg [{}]\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -1029,7 +1036,7 @@ void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) no
   if (!stitches.empty()) {
 	rectangle.bottom = rectangle.top = stitches[0].y;
 	rectangle.left = rectangle.right = stitches[0].x;
-	for (auto stitch : stitches) {
+	for (auto& stitch : stitches) {
 	  if (stitch.x < rectangle.left) {
 		rectangle.left = stitch.x;
 	  }
@@ -1446,6 +1453,8 @@ void thred::internal::chknum() {
 		  return;
 		}
 		default: {
+		  outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
+		  break;
 		}
 	  }
 	  if (FormMenuChoice == LBCSIZ) {
@@ -1543,6 +1552,8 @@ void thred::internal::chknum() {
 			  break;
 			}
 			default: {
+			  outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
+			  break;
 			}
 		  }
 		}
@@ -1720,6 +1731,10 @@ void thred::internal::chknum() {
 				case PCHN: {
 				  IniFile.chainSpace = value * PFGRAN;
 				  SetWindowText(ValueWindow->operator[](PCHN), fmt::format(L"{:.2f}", value).c_str());
+				  break;
+				}
+				default: {
+				  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
 				  break;
 				}
 			  }
@@ -2108,8 +2123,8 @@ void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestSt
 	auto       minLength = BIGDOUBLE;
 	if (!StitchBuffer->empty()) {
 	  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-		auto const stitch     = StitchBuffer->operator[](iStitch);
-		auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
+		auto const& stitch     = StitchBuffer->operator[](iStitch);
+		auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 		if ((stitch.attribute & FRMSK) == code && ((stitch.attribute & NOTFRM) == 0U) &&
 		    (stitchFwd1.attribute & FRMSK) == code && ((stitchFwd1.attribute & TYPMSK) != 0U)) {
 		  auto const length = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
@@ -2149,8 +2164,8 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
   for (auto iStitch = start; iStitch < end; ++iStitch) {
-	auto const stitch     = StitchBuffer->operator[](iStitch);
-	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
+	auto const& stitch     = StitchBuffer->operator[](iStitch);
+	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (length > maxLength) {
 	  maxLength          = length;
@@ -2173,8 +2188,8 @@ void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
 	auto       txt        = std::wstring {};
-	auto const stitch     = StitchBuffer->operator[](ClosestPointIndex);
-	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+	auto const& stitch     = StitchBuffer->operator[](ClosestPointIndex);
+	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
 	auto const lenMax     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 	displayText::loadString(txt, IDS_SRCH);
@@ -2213,8 +2228,8 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	if (!StitchBuffer->empty()) { // find the first small stitch in the selected form
 	  --lastStitch;
 	  while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
-		auto const stitch     = StitchBuffer->operator[](iStitch);
-		auto const prevStitch = StitchBuffer->operator[](iPrevStitch);
+		auto const& stitch     = StitchBuffer->operator[](iStitch);
+		auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) == 0U) { // is this a knot?
 			auto const delta = fPOINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
@@ -2242,7 +2257,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	if (lastStitch != 0U) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
-		auto const stitch = StitchBuffer->operator[](iStitch);
+		auto const& stitch = StitchBuffer->operator[](iStitch);
 		auto outStitch    = StitchBuffer->operator[](iOutputStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
@@ -2459,7 +2474,7 @@ void thred::selRct(fRECTANGLE& sourceRect) noexcept {
 	sourceRect.left = sourceRect.right = StitchBuffer->operator[](GroupStartStitch).x;
 	sourceRect.top = sourceRect.bottom = StitchBuffer->operator[](GroupStartStitch).y;
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-	  auto const stitch = StitchBuffer->operator[](iStitch);
+	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if (stitch.x > sourceRect.right) {
 		sourceRect.right = stitch.x;
 	  }
@@ -2674,14 +2689,14 @@ void thred::internal::duar(POINT const& stitchCoordsInPixels) {
 
 void thred::internal::dubox(POINT const& stitchCoordsInPixels) {
   if (!StitchBuffer->empty()) {
-	auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
+	auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
 	if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
 	  // if the selected point is not at the end then aim at the next point
-	  auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
 	  RotateAngle           = atan2(stitchFwd1.y - stitch.y, stitchFwd1.x - stitch.x);
 	}
 	else { // otherwise aim in the same direction
-	  auto const stitchBck1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
+	  auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
 	  RotateAngle           = atan2(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
 	}
 	duar(stitchCoordsInPixels);
@@ -2880,6 +2895,10 @@ void thred::internal::redbal() {
 			  color                    = DST::colmatch(balaradHeader.color[bColor++]);
 			  auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 			  thred::addColor(currentStitch, color);
+			  break;
+			}
+			default: {
+			  outDebugString(L"default hit in redbal: code [{}]\n", balaradStitch[iStitch].code);
 			  break;
 			}
 		  }
@@ -3257,7 +3276,7 @@ void thred::internal::sav() {
   saveStitches.resize(StitchBuffer->size());
   if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
-	for (auto stitch : *StitchBuffer) {
+	for (auto& stitch : *StitchBuffer) {
 	  *iDest++ = fPOINTATTR {stitch.y, stitch.x, stitch.attribute};
 	}
   }
@@ -4634,7 +4653,7 @@ void thred::internal::duClos(uint32_t             startStitch,
                              fPOINT const&        stitchPoint,
                              std::vector<double>& gapToNearest) noexcept {
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
-	auto const stitch = StitchBuffer->operator[](iStitch);
+	auto const& stitch = StitchBuffer->operator[](iStitch);
 
 	auto const cx =
 	    ((stitch.x > stitchPoint.x) ? (stitch.x - stitchPoint.x) : (stitchPoint.x - stitch.x));
@@ -4712,7 +4731,7 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 		for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
 		     iStitch < ColorChangeTable->     operator[](wrap::toSize(iColor) + 1U).stitchIndex;
 		     ++iStitch) {
-		  auto const stitch = StitchBuffer->operator[](iStitch);
+		  auto const& stitch = StitchBuffer->operator[](iStitch);
 		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
 		      stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
 			auto const cx =
@@ -4852,7 +4871,7 @@ void thred::internal::movbox() {
 	if (stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	  unbox();
 #ifdef _DEBUG
-	  auto const stitch = StitchBuffer->operator[](ClosestPointIndex);
+	  auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
 	  outDebugString(L"movbox:Stitch [{}] form [{}] type [{}] x [{}] y[{}]\n",
 	                 ClosestPointIndex,
 	                 ((stitch.attribute & FRMSK) >> FRMSHFT),
@@ -5963,7 +5982,7 @@ void thred::internal::duclip() {
 			thred::rngadj();
 			LowerLeftStitch.x = LowerLeftStitch.y = BIGFLOAT;
 			for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
-			  auto const stitch = StitchBuffer->operator[](iStitch);
+			  auto const& stitch = StitchBuffer->operator[](iStitch);
 			  if (stitch.x < LowerLeftStitch.x) {
 				LowerLeftStitch.x = stitch.x;
 			  }
@@ -6698,6 +6717,11 @@ void thred::internal::delet() {
 			  }
 			}
 		  } while (false);
+		  break;
+		}
+		default: {
+		  outDebugString(L"default hit in delet: type [{}]\n", form.type);
+		  break;
 		}
 	  }
 	  if (!satinFlag) {
@@ -8001,7 +8025,7 @@ void thred::internal::colchk() {
 	auto currentStitch = 0U;
 	// ToDo - Can this loop become a ranged for?
 	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
-	  auto const stitch = StitchBuffer->operator[](iStitch);
+	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if (color != (stitch.attribute & COLMSK)) {
 		if ((iStitch - currentStitch == 1) && ((currentStitch) != 0U)) {
 		  auto stitchBck1      = StitchBuffer->operator[](iStitch - 1U);
@@ -8124,15 +8148,15 @@ void thred::internal::longer() {
   if (ClosestPointIndex == LargestStitchIndex) {
 	return;
   }
-  auto const start         = StitchBuffer->operator[](ClosestPointIndex);
-  auto const startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  const	auto& start         = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1     = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
   auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   auto const rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
                             ? SelectedRange.finish
                             : SelectedRange.finish - 1U;
   for (iStitch = ClosestPointIndex + 1U; iStitch < rangeEnd; ++iStitch) {
-	auto const stitch     = StitchBuffer->operator[](iStitch);
-	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
+	auto const& stitch     = StitchBuffer->operator[](iStitch);
+	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	if (length == currentLength) {
 	  flag = false;
@@ -8142,8 +8166,8 @@ void thred::internal::longer() {
   if (flag) {
 	auto minimumLength = BIGDOUBLE;
 	for (auto currentStitch = SelectedRange.start; currentStitch < rangeEnd; ++currentStitch) {
-	  auto const stitch     = StitchBuffer->operator[](currentStitch);
-	  auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
+	  auto const& stitch     = StitchBuffer->operator[](currentStitch);
+	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(currentStitch) + 1U);
 	  auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length > currentLength && length < minimumLength) {
 		minimumLength = length;
@@ -8166,12 +8190,12 @@ void thred::internal::shorter() {
   if (ClosestPointIndex == SmallestStitchIndex) {
 	return;
   }
-  auto const start     = StitchBuffer->operator[](ClosestPointIndex);
-  auto const startFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  auto const& start     = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
   currentLength        = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
   for (currentStitch = ClosestPointIndex; currentStitch != 0; --currentStitch) {
-	auto const stitch     = StitchBuffer->operator[](currentStitch);
-	auto const stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
+	auto const& stitch     = StitchBuffer->operator[](currentStitch);
+	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
 	auto const length     = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
 	if (length == currentLength) {
 	  --currentStitch;
@@ -8183,8 +8207,8 @@ void thred::internal::shorter() {
 	auto maximumLength = 0.0;
 	auto iStitch       = 0U;
 	for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1U; ++iStitch) {
-	  auto const stitch     = StitchBuffer->operator[](iStitch);
-	  auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
+	  auto const& stitch     = StitchBuffer->operator[](iStitch);
+	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	  auto const length     = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
 	  if (length < currentLength && length > maximumLength) {
 		maximumLength = length;
@@ -8210,7 +8234,7 @@ void thred::internal::setsrch(uint32_t stitch) {
 
 auto thred::internal::inrng(uint32_t iStitch) noexcept -> bool {
   if (iStitch < StitchBuffer->size()) {
-	auto const stitch = StitchBuffer->operator[](iStitch);
+	auto const& stitch = StitchBuffer->operator[](iStitch);
 	return stitch.x >= StitchRangeRect.left && stitch.x <= StitchRangeRect.right &&
 	       stitch.y >= StitchRangeRect.bottom && stitch.y <= StitchRangeRect.top;
   }
@@ -8325,6 +8349,8 @@ void thred::internal::rthumnam(uint32_t iThumbnail) {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in rthumbnam: iThumbnail [{}]\n", iThumbnail);
+	  break;
 	}
   }
 }
@@ -9535,10 +9561,17 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			EndDialog(hwndlg, wparam);
 			return TRUE;
 		  }
+		  default: {
+			outDebugString(L"default hit in LockPrc 1: wparam [{}]\n", LOWORD(wparam));
+			break;
+		}
 		}
 	  }
+	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in LockPrc 2: umsg [{}]\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -10257,9 +10290,16 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  EndDialog(hwndlg, 1);
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in fthdefprc 1: wparam [{}]\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in fthdefprc 2: umsg [{}]\n", umsg);
+	  break;
 	}
   }
   return FALSE;
@@ -11254,6 +11294,10 @@ auto thred::internal::updateHoopSize() -> bool {
 		  IniFile.hoopType  = CUSTHUP;
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in updateHoopSize: iHoop [{}]\n", iHoop + 1U);
+		  break;
+		}
 	  }
 	  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
 	  form::sethup();
@@ -11430,8 +11474,11 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
 			  form::bsizpar(form);
+			  [[fallthrough]];
 			}
-			case EDGELINE:
+			case EDGELINE: {
+			  [[fallthrough]];
+			}
 			case EDGEBEAN: {
 			  form.borderSize  = BorderWidth;
 			  form.edgeSpacing = LineSpacing;
@@ -11439,6 +11486,10 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			}
 			case EDGEPROPSAT: {
 			  form.edgeSpacing /= 2;
+			  break;
+			}
+			default: {
+			  outDebugString(L"default hit in handleSideWindowActive 1: edgeType [{}]\n", form.edgeType);
 			  break;
 			}
 		  }
@@ -11479,8 +11530,11 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
 			  form::bsizpar(form);
+			  [[fallthrough]];
 			}
-			case EDGELINE:
+			case EDGELINE: {
+			  [[fallthrough]];
+			}
 			case EDGEBEAN: {
 			  form.borderSize  = BorderWidth;
 			  form.edgeSpacing = LineSpacing;
@@ -11488,6 +11542,11 @@ auto thred::internal::handleSideWindowActive() -> bool {
 			}
 			case EDGEANGSAT: {
 			  form.edgeSpacing *= 2;
+			  break;
+			}
+			default: {
+			  outDebugString(L"default hit in handleSideWindowActive 2: edgeType [{}]\n", form.edgeType);
+			  break;
 			}
 		  }
 		  form.edgeType = EDGEPROPSAT;
@@ -12857,7 +12916,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto*      forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
 		auto const formSpan   = gsl::span<FRMHED>(forms, clipFormsHeader->formCount);
 		auto const formOffset = wrap::toUnsigned(FormList->size());
-		for (auto form : formSpan) {
+		for (auto& form : formSpan) {
 		  FormList->push_back(form);
 		  auto& formIter = FormList->back();
 		  formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
@@ -13327,7 +13386,7 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
-		  auto form             = FormList->operator[](ClosestFormToCursor);
+		  auto const& form      = FormList->operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
 		  auto        vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
@@ -13367,6 +13426,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
   switch (code) {
 	case VK_ESCAPE: {
 	  esccode();
+	  [[fallthrough]];
 	}
 	case 'Q': {
 	  if (wrap::pressed(VK_SHIFT)) {
@@ -13959,6 +14019,8 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  break;
 	}
 	default: {
+		outDebugString(L"default hit in handleMainWinKeys: code [{}]\n", code);
+	  break;
 	}
   }
   retflag = false;
@@ -14018,6 +14080,8 @@ auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) ->
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleNumericInput: code [{}]\n", code);
+	  break;
 	}
   }
   retflag = false;
@@ -14607,6 +14671,8 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleEditMenu: wParameter [{}]\n", wParameter);
+	  break;
 	}
   }
   return flag;
@@ -14918,6 +14984,8 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleViewMenu: wParameter [{}]\n", wParameter);
+	  break;
 	}
   }
   return flag;
@@ -15034,6 +15102,8 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleFileMenu: wParameter [{}]\n", wParameter);
+	  break;
 	}
   }
   return flag;
@@ -15207,6 +15277,8 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleFillMenu: wParameter [{}]\n", wParameter);
+	  break;
 	}
   }
   return flag;
@@ -15319,6 +15391,8 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in handleMainMenu: wParameter [{}]\n", wParameter);
+	  break;
 	}
   }
   return flag;
@@ -15688,6 +15762,10 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if (thi::handleViewMenu(wParameter)) {
 		break;
 	  }
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in chkMsg: message [{}]\n", Msg.message);
 	  break;
 	}
   }
@@ -16366,7 +16444,7 @@ void thred::internal::relin() {
 
 void thred::internal::dumov() {
   constexpr auto abPoints = 7U;
-  auto const anchorStitch = StitchBuffer->operator[](MoveAnchor);
+  auto const& anchorStitch = StitchBuffer->operator[](MoveAnchor);
   RotateAngle             = atan2(StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).y -
                           StitchBuffer->operator[](MoveAnchor).y,
                       StitchBuffer->    operator[](wrap::toSize(MoveAnchor) + 1U).x -
@@ -16783,7 +16861,7 @@ void thred::internal::drwStch() {
 			for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
 			     iStitch < ColorChangeTable->operator[](gsl::narrow_cast<size_t>(iColor) + 1U).stitchIndex;
 			     ++iStitch) {
-			  auto const stitch = StitchBuffer->operator[](iStitch);
+			  auto const& stitch = StitchBuffer->operator[](iStitch);
 			  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right && stitch.y >= ZoomRect.bottom &&
 			      stitch.y <= ZoomRect.top && setRmap(stitchMap, stitch, cellSize)) {
 				stchbox(iStitch, StitchWindowMemDC);
@@ -17187,6 +17265,10 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  }
 		  return 1;
 		}
+		default: {
+		  outDebugString(L"default hit in WndProc 1: wParam [{}]\n", LOWORD(wParam));
+		  break;
+		}
 	  }
 	  break;
 	}
@@ -17230,6 +17312,10 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  }
 		  StateMap->set(StateFlag::RESTCH);
 		  return 1;
+		}
+		default: {
+		  outDebugString(L"default hit in WndProc 2: wParam [{}]\n", LOWORD(wParam));
+		  break;
 		}
 	  }
 	  break;
@@ -17444,6 +17530,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  break;
 		}
 		default: {
+		  outDebugString(L"default hit in WndProc 3: wParam [{}]\n", wParam);
+		  break;
 		}
 	  }
 	  GetClientRect(p_hWnd, &ThredWindowRect);
@@ -17505,6 +17593,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	default: {
+	  //outDebugString(L"default hit in WndProc 4: message [{}]\n", message);
+	  break;
 	}
   }
   return DefWindowProc(p_hWnd, message, wParam, lParam);

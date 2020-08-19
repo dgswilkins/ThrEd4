@@ -1013,6 +1013,9 @@ void form::duform(uint32_t formType) {
 	case FRMDAISY - 1:
 	  formForms::dasyfrm();
 	  break;
+	default:
+		outDebugString(L"default hit in duform: formType [{}]\n", formType);
+	  break;
   }
 }
 
@@ -2207,6 +2210,10 @@ void form::internal::chkbrd(FRMHED const& form) {
 		clip::chnfn(form);
 		break;
 	  }
+	  default: {
+		outDebugString(L"default hit in chkbrd: edgeType [{}]\n", form.edgeType & NEGUND);
+		break;
+	  }
 	}
 	ritbrd(form);
   }
@@ -3335,6 +3342,10 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 		}
 		case 2: { // outside
 		  StateMap->reset(StateFlag::FILDIR);
+		  break;
+		}
+		default: {
+		  outDebugString(L"default hit in clpcon: flag [{}]\n", clipStitchPoints[iPoint].flag);
 		  break;
 		}
 	  }
@@ -4589,6 +4600,11 @@ void form::internal::bakseq() {
 		  }
 		}
 		OSequence->push_back(fPOINT {bCurrent.x, bCurrent.y});
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in bakseq: attribute [{}]\n", bCurrent.attribute);
+		break;
 	  }
 	}
 	--iSequence;
@@ -4849,6 +4865,10 @@ void form::refilfn() {
 		  fi::ritbrd(form);
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in refilfn 1: edgeType [{}]\n", form.edgeType & NEGUND);
+		  break;
+		}
 	  }
 	  if (form.fillType == CONTF && ((form.attribute & FRECONT) != 0)) {
 		fi::contf(form);
@@ -4950,6 +4970,10 @@ void form::refilfn() {
 			doFill = false;
 			break;
 		  }
+		  default: {
+			outDebugString(L"default hit in refilfn 2: fillType [{}]\n", form.fillType);
+			break;
+		  }
 		}
 		if (doFill) {
 		  fi::lcon(form, groupIndexSequence, lineEndpoints);
@@ -4992,8 +5016,17 @@ void form::refilfn() {
 		  xt::fthrfn(form);
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in refilfn 3: fillType [{}]\n", form.fillType);
+		  break;
+		}
 	  }
 	  fi::chkbrd(form);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in refilfn 4: type [{}]\n", form.type);
+	  break;
 	}
   }
   UserStitchLength = savedStitchLength;
@@ -5841,7 +5874,7 @@ void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
 	  allItemsRect->bottom = trct.bottom;
 	}
   }
-  for (auto stitch : *StitchBuffer) {
+  for (auto& stitch : *StitchBuffer) {
 	if (stitch.x < allItemsRect->left) {
 	  allItemsRect->left = stitch.x;
 	}
@@ -7510,7 +7543,7 @@ void form::internal::frmpnts(uint32_t type) {
   if (!StitchBuffer->empty()) {
 	auto       iStitch = 0U;
 	auto const trg     = ((ClosestFormToCursor << 4U) | type);
-	for (auto stitch : *StitchBuffer) {
+	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
 		break;
 	  }
@@ -8115,10 +8148,10 @@ void form::cntrx() {
 		flag = true;
 		thred::savdo();
 		thred::rngadj();
-		auto const startStitch = StitchBuffer->operator[](GroupStartStitch);
+		auto const& startStitch = StitchBuffer->operator[](GroupStartStitch);
 		auto groupRect = fRECTANGLE {startStitch.x, startStitch.y, startStitch.x, startStitch.y};
 		for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-		  auto const stitch = StitchBuffer->operator[](iStitch);
+		  auto const& stitch = StitchBuffer->operator[](iStitch);
 		  if (stitch.x < groupRect.left) {
 			groupRect.left = stitch.x;
 		  }
@@ -8185,9 +8218,9 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
   auto iSourceStitch = start;
   BeanCount          = 0U;
   for (auto loop = 0; loop < 2; ++loop) {
-	auto const stitch     = StitchBuffer->operator[](iSourceStitch);
-	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
-	auto const stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
+	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
 	if (stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) {
 	  highStitchBuffer.push_back(stitchFwd1);
@@ -8197,10 +8230,10 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
 	++iSourceStitch;
   }
   while (iSourceStitch < finish - 1) {
-	auto const stitch      = StitchBuffer->operator[](iSourceStitch);
-	auto const stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
-	auto const stitchFwd2  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
-	auto const stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
+	auto const& stitch      = StitchBuffer->operator[](iSourceStitch);
+	auto const& stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+	auto const& stitchFwd2  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+	auto const& stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
 	highStitchBuffer.push_back(stitch);
 	if ((stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) &&
 	    (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y)) {
@@ -8210,9 +8243,9 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
 	}
 	++iSourceStitch;
   }
-  auto const stitch      = StitchBuffer->operator[](iSourceStitch);
-  auto const stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
-  auto const stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
+  auto const& stitch      = StitchBuffer->operator[](iSourceStitch);
+  auto const& stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
+  auto const& stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
   highStitchBuffer.push_back(stitch);
   if (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y) {
 	highStitchBuffer.push_back(stitchFwd1);
@@ -8261,8 +8294,8 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
   }
   auto iSourceStitch = start;
   for (; iSourceStitch <= lastStitch; ++iSourceStitch) {
-	auto const stitch     = StitchBuffer->operator[](iSourceStitch);
-	auto const stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
+	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
+	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
 	if (stitch.x == stitchFwd2.x && stitch.y == stitchFwd2.y) {
 	  iSourceStitch += 2;
@@ -8685,6 +8718,10 @@ void form::col2frm() {
 			}
 			case FRMBFIL: {
 			  ++(borderColorHistogram[formColorCode]);
+			  break;
+			}
+			default: {
+			  outDebugString(L"default hit in col2frm: attribute [{}]\n", stitch.attribute & TYPMSK);
 			  break;
 			}
 		  }

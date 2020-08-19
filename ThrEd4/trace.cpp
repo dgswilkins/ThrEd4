@@ -605,6 +605,8 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in trcbit: traceDirection [{}]\n", traceDirection);
+	  break;
 	}
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
@@ -1037,7 +1039,7 @@ void trace::blak() {
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  bitmap::getrmap();
 	}
-	for (auto iForm : *FormList) {
+	for (auto& iForm : *FormList) {
 	  bitmap::bfrm(iForm);
 	}
 	DeleteObject(BlackPen);
@@ -1157,6 +1159,8 @@ void trace::tracpar() {
 				break;
 			  }
 			  default: {
+				outDebugString(L"default hit in tracpar: position [{}]\n", position);
+				break;
 			  }
 			}
 		  }
@@ -1307,6 +1311,8 @@ void trace::traceNumberInput(uint32_t NumericCode) {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in traceNumberInput: MsgIndex [{}]\n", MsgIndex);
+	  break;
 	}
   }
   thred::redraw(TraceNumberInput);

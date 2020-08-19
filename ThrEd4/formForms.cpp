@@ -761,6 +761,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  break;
 		}
 	  }
+	  break;
 	}
 	default: {
 	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
@@ -1000,6 +1001,7 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 		  break;
 		}
 	  }
+	  break;
 	}
 	default: {
 	  outDebugString(L"umsg [{}] not handled in dasyproc\n", umsg);
@@ -1144,6 +1146,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  break;
 		}
 	  }
+	  break;
 	}
 	default: {
 	  outDebugString(L"umsg [{}] not handled in wavprc\n", umsg);

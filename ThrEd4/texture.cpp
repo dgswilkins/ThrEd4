@@ -926,6 +926,8 @@ void texture::internal::chktxnum() {
 		break;
 	  }
 	  default: {
+		outDebugString(L"default hit in chktxnum: TextureWindowId [{}]\n", TextureWindowId);
+		break;
 	  }
 	}
   }
@@ -1170,6 +1172,8 @@ void texture::internal::dutxfn(uint32_t textureType) {
 		break;
 	  }
 	  default: {
+		outDebugString(L"default hit in dutxfn: textureType [{}]\n", textureType);
+		break;
 	  }
 	}
   }
@@ -1483,6 +1487,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 		break;
 	  }
 	  default: {
+		outDebugString(L"default hit in txtkey 1: keyCode [{}]\n", keyCode);
+		break;
 	  }
 	}
 	if (flag) {
@@ -1499,6 +1505,7 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
   switch (keyCode) {
 	case VK_ESCAPE: {
 	  texture::txof();
+	  [[fallthrough]];
 	}
 	case 'Q': {
 	  texture::rstxt();
@@ -1596,6 +1603,8 @@ void texture::txtkey(uint32_t keyCode, FRMHED& textureForm) {
 	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in txtkey 2: keyCode [{}]\n", keyCode);
+	  break;
 	}
   }
   StateMap->reset(StateFlag::LASTXBAK);

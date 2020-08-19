@@ -268,7 +268,7 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   auto color   = StitchBuffer->front().attribute & COLMSK;
   PEScolors[0] = PESequivColors[color];
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
-	auto const stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
+	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
 	  color = stitchFwd1.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);

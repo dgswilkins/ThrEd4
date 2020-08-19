@@ -230,7 +230,7 @@ void xt::internal::fthfn(uint32_t iSequence, FEATHER& feather) {
 }
 
 void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept {
-  auto const bPoint = BSequence->operator[](iPoint);
+  auto const& bPoint = BSequence->operator[](iPoint);
   point.x           = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
   point.y           = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
 }
@@ -1481,6 +1481,10 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 		  }
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in intlv: seq [{}]\n", InterleaveSequenceIndices->operator[](iSequence).seq);
+		  break;
+		}
 	  }
 	  code = gsl::narrow_cast<uint32_t>(ilData.layerIndex |
 	                                    InterleaveSequenceIndices->operator[](ilData.pins).code |
@@ -1842,6 +1846,10 @@ void xt::internal::fangfn(uint32_t formNumber, float angle) {
 	  case TXANGF: {
 		form.fillType              = TXANGF;
 		form.angleOrClipData.angle = angle;
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in fangfn: form.fillType [{}]\n", form.fillType);
 		break;
 	  }
 	}
@@ -2402,12 +2410,19 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		  }
 		  break;
 		}
+		default: {
+		  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
+		  break;
+		}
 	  }
+	  break;
 	}
 	default: {
+	  outDebugString(L"default hit in fangfn: umsg [{}]\n", umsg);
+	  break;
 	}
   }
-  return 0;
+  return FALSE;
 }
 
 void xt::internal::sadj(fPOINTATTR& stitch, fPOINT const& designSizeRatio, fRECTANGLE const& designSizeRect) noexcept {

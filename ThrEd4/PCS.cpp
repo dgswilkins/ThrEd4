@@ -231,7 +231,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 
 auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
   auto boundingRect = fRECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
-  for (auto stitch : stitches) {
+  for (auto& stitch : stitches) {
 	if (stitch.x < boundingRect.left) {
 	  boundingRect.left = stitch.x;
 	}
@@ -340,7 +340,7 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		}
 		auto const newStitchCount = StitchBuffer->size();
 		for (; insertIndex < newStitchCount; ++insertIndex) {
-		  auto const stitch = StitchBuffer->operator[](insertIndex);
+		  auto const& stitch = StitchBuffer->operator[](insertIndex);
 		  if (stitch.x < insertedRectangle.left) {
 			insertedRectangle.left = stitch.x;
 		  }
