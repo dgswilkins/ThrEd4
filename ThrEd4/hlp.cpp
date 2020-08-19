@@ -35,10 +35,12 @@ HWND HelpWindow; // help window
 void hlp::help() {
   auto helpFileName = std::wstring {};
   displayText::loadString(helpFileName, IDS_HELPFN);
-  auto homeDir = thred::getHomeDir();
-  HelpWindow   = HtmlHelp(
-      ThrEdWindow, fmt::format(L"{}{}", homeDir->wstring(), helpFileName).c_str(), HH_DISPLAY_TOPIC, 0);
-  if (HelpWindow == nullptr) {
-	displayText::tabmsg(IDS_NOHLP);
+  auto const* homeDir = thred::getHomeDir();
+  if (nullptr != homeDir) {
+	auto helpfile = *homeDir / helpFileName;
+	HelpWindow    = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
+	if (nullptr == HelpWindow) {
+	  displayText::tabmsg(IDS_NOHLP);
+	}
   }
 }
