@@ -486,10 +486,11 @@ void clip::internal::fxlit(uint32_t                  vertexIndex,
                            std::vector<float> const& listCOSINEs,
                            fPOINT&                   moveToCoords,
                            uint32_t                  currentSide,
-                           fPOINT&                   stitchPoint) {
+                           fPOINT&                   stitchPoint,
+                           uint32_t&                 adjCount) {
   if (ci::fxpnt(vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint)) {
 	stitchPoint = moveToCoords;
-	++BeanCount;
+	++adjCount;
 	auto       vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	auto const length =
 	    hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
@@ -498,7 +499,7 @@ void clip::internal::fxlit(uint32_t                  vertexIndex,
 	    fPOINT {AdjustedSpace * listCOSINEs[currentSide], AdjustedSpace * listSINEs[currentSide]};
 	stitchPoint.x += delta.x * count;
 	stitchPoint.y += delta.y * count;
-	BeanCount += count;
+	adjCount += count;
   }
 }
 
@@ -560,22 +561,22 @@ void clip::internal::fxlen(FRMHED const&             form,
 
   constexpr auto iterationLimit = 50U; // loop at least 50 times to guarantee convergence
   while (loopCount < iterationLimit && (largestSpacing - smallestSpacing) > TINYFLOAT) {
-	BeanCount        = 0;
+	auto adjCount        = 0U;
 	auto stitchPoint = vertexIt[0];
 	auto currentSide = 0U;
 	for (currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	  NextStart = currentSide + 1U;
-	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint);
+	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount);
 	}
 	if (form.type != FRMLINE) {
 	  NextStart = 0;
-	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint);
+	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount);
 	}
 	else {
 	  NextStart = form.vertexCount - 1U;
 	}
 	if (initialCount == 0U) {
-	  initialCount    = BeanCount;
+	  initialCount    = adjCount;
 	  smallestSpacing = AdjustedSpace;
 	  minimumInterval =
 	      hypot(vertexIt[NextStart].x - stitchPoint.x, vertexIt[NextStart].y - stitchPoint.y);
@@ -596,11 +597,11 @@ void clip::internal::fxlen(FRMHED const&             form,
 		minimumInterval = interval;
 		minimumSpacing  = AdjustedSpace;
 	  }
-	  if (initialCount == BeanCount) {
+	  if (initialCount == adjCount) {
 		smallestSpacing = AdjustedSpace;
 	  }
 	  else {
-		if (BeanCount > initialCount) {
+		if (adjCount > initialCount) {
 		  largestSpacing = AdjustedSpace;
 		}
 		else {

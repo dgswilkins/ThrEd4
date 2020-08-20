@@ -8211,12 +8211,12 @@ void form::centir() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void form::internal::bean(uint32_t start, uint32_t finish) {
+auto form::internal::bean(uint32_t start, uint32_t finish) -> uint32_t {
   auto const stitchRange      = (finish - start) * 3U; // each bean is 3 stitches
   auto       highStitchBuffer = std::vector<fPOINTATTR> {};
   highStitchBuffer.reserve(stitchRange);
   auto iSourceStitch = start;
-  BeanCount          = 0U;
+  auto beanCount          = 0U;
   for (auto loop = 0; loop < 2; ++loop) {
 	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
@@ -8225,7 +8225,7 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
 	if (stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) {
 	  highStitchBuffer.push_back(stitchFwd1);
 	  highStitchBuffer.push_back(stitch);
-	  BeanCount += 2;
+	  beanCount += 2U;
 	}
 	++iSourceStitch;
   }
@@ -8239,7 +8239,7 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
 	    (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y)) {
 	  highStitchBuffer.push_back(stitchFwd1);
 	  highStitchBuffer.push_back(stitch);
-	  BeanCount += 2U;
+	  beanCount += 2U;
 	}
 	++iSourceStitch;
   }
@@ -8250,7 +8250,7 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
   if (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y) {
 	highStitchBuffer.push_back(stitchFwd1);
 	highStitchBuffer.push_back(stitch);
-	BeanCount += 2U;
+	beanCount += 2U;
   }
   // now copy stitches back up to the end of the original group
   std::copy(highStitchBuffer.begin(),
@@ -8260,6 +8260,7 @@ void form::internal::bean(uint32_t start, uint32_t finish) {
   StitchBuffer->insert(std::next(StitchBuffer->begin(), finish),
                        std::next(highStitchBuffer.begin(), finish - start),
                        highStitchBuffer.end());
+  return beanCount;
 }
 
 void form::dubean() {
@@ -8267,12 +8268,12 @@ void form::dubean() {
 	thred::savdo();
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  thred::rngadj();
-	  fi::bean(GroupStartStitch, GroupEndStitch);
+	  auto const beanCount = fi::bean(GroupStartStitch, GroupEndStitch);
 	  if (ClosestPointIndex > GroupStitchIndex) {
-		ClosestPointIndex += BeanCount;
+		ClosestPointIndex += beanCount;
 	  }
 	  else {
-		GroupStitchIndex += BeanCount;
+		GroupStitchIndex += beanCount;
 	  }
 	  thred::grpAdj();
 	}

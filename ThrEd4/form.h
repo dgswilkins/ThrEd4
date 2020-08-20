@@ -192,7 +192,7 @@ namespace internal {
   void apbrd(FRMHED const& form);
   void bakseq();
   void bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize);
-  void bean(uint32_t start, uint32_t finish);
+  auto bean(uint32_t start, uint32_t finish) -> uint32_t;
   void bhbrd(FRMHED const& form);
   void bhcrnr(FRMHED const& form, uint32_t vertex);
   void bhfn(FRMHED const& form, uint32_t start, uint32_t finish);

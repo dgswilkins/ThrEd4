@@ -83,7 +83,8 @@ namespace internal {
              std::vector<float> const& listCOSINEs,
              fPOINT&                   moveToCoords,
              uint32_t                  currentSide,
-             fPOINT&                   stitchPoint);
+             fPOINT&                   stitchPoint,
+             uint32_t&                 adjCount);
   auto fxpnt(uint32_t                  vertexIndex,
              std::vector<float> const& listSINEs,
              std::vector<float> const& listCOSINEs,
