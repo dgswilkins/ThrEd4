@@ -407,7 +407,6 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
 void clip::clpbrd(FRMHED const& form, fRECTANGLE const& clipRect, uint32_t startVertex) {
   OSequence->clear();
   StateMap->reset(StateFlag::CLPBAK);
-  HorizontalLength           = ClipRectSize.cx;
   auto const clipStitchCount = ClipBuffer->size();
   auto       clipFillData    = std::vector<fPOINT> {};
   clipFillData.resize(clipStitchCount);
@@ -835,7 +834,6 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
       fPOINT {wrap::midl(clipRect.right, clipRect.left), wrap::midl(clipRect.top, clipRect.bottom)};
   OSequence->clear();
   StateMap->reset(StateFlag::CLPBAK);
-  HorizontalLength = ClipRectSize.cx;
   ClipReference.y  = rotationCenter.y;
   ClipReference.x  = clipRect.left;
 

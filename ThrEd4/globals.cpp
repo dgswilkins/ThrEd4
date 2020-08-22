@@ -101,7 +101,6 @@ HPEN     GridPen;               // pen for stitch grid
 uint32_t GroupEndStitch;        // higher end of selected stitches
 uint32_t GroupStartStitch;      // lower end of selected stitches
 uint32_t GroupStitchIndex;      // last point selected in group
-double   HorizontalLength;      // horizontal length of a clipboard fill
 float    HorizontalRatio; // horizontal ratio between the zoom window and the entire stitch space
 HWND     HorizontalScrollBar;                  // horizontal scroll bar
 INIFILE  IniFile;                              // initialization file
