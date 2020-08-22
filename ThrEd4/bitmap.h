@@ -17,9 +17,9 @@ void delmap();
 void drawBmpBackground();
 auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
 auto getBitmapDC() noexcept -> HDC;
-auto getBitmapHeight() noexcept -> uint32_t;
+auto getBitmapHeight() noexcept -> int;
 auto getBitmapSizeinStitches() noexcept -> fPOINT;
-auto getBitmapWidth() noexcept -> uint32_t;
+auto getBitmapWidth() noexcept -> int;
 auto getBmpColor() noexcept -> COLORREF;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
 
@@ -47,8 +47,8 @@ namespace internal {
   void bitsiz();
   auto constexpr fswap(COLORREF color) noexcept -> COLORREF;
   auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
-  void movmap(uint32_t cnt, uint8_t* buffer);
-  auto nuBit() noexcept -> COLORREF;
+  void movmap(int cnt, uint8_t* buffer);
+  auto nuBit() noexcept -> BOOL;
   auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
   void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
   auto saveName(fs::path& fileName);
