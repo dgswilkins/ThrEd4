@@ -77,27 +77,34 @@ namespace internal {
              std::vector<float> const& ListCOSINEs,
              fPOINT&                   moveToCoords,
              uint32_t                  currentSide,
-             fPOINT&                   stitchPoint);
+             fPOINT&                   stitchPoint,
+             float                     adjustedSpace,
+             uint32_t                  nextStart);
   void fxlit(uint32_t                  vertexIndex,
              std::vector<float> const& listSINEs,
              std::vector<float> const& listCOSINEs,
              fPOINT&                   moveToCoords,
              uint32_t                  currentSide,
              fPOINT&                   stitchPoint,
-             uint32_t&                 adjCount);
+             uint32_t&                 adjCount,
+             float                     adjustedSpace,
+             uint32_t                  nextStart);
   auto fxpnt(uint32_t                  vertexIndex,
              std::vector<float> const& listSINEs,
              std::vector<float> const& listCOSINEs,
              fPOINT&                   moveToCoords,
              uint32_t                  currentSide,
-             fPOINT const&             stitchPoint) -> bool;
+             fPOINT const&             stitchPoint,
+             float                     adjustedSpace,
+             uint32_t                  nextStart) -> bool;
   void lincrnr(uint32_t                   vertexIndex,
                std::vector<fPOINT> const& clipReversedData,
                std::vector<fPOINT>&       clipFillData,
                float                      clipAngle,
                fPOINT const&              rotationCenter,
                uint32_t                   currentSide,
-               fPOINT&                    stitchPoint);
+               fPOINT&                    stitchPoint,
+               fPOINT&                    borderClipReference);
   void linsid(uint32_t                   vertexIndex,
               std::vector<fPOINT> const& clipReversedData,
               std::vector<fPOINT>&       clipFillData,
@@ -105,7 +112,8 @@ namespace internal {
               fPOINT const&              vector0,
               fPOINT const&              rotationCenter,
               uint32_t                   currentSide,
-              fPOINT&                    stitchPoint);
+              fPOINT&                    stitchPoint,
+              fPOINT&                    borderClipReference);
   auto nupnt(float clipAngle, fPOINT& moveToCoords, fPOINT const& stitchPoint) noexcept -> bool;
   void picfn(FRMHED const&        form,
              fRECTANGLE const&    clipRect,
