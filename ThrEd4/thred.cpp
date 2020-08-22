@@ -875,7 +875,7 @@ void thred::internal::unboxs() {
 }
 
 void thred::internal::stchPars() {
-  auto aspectRatio = wrap::toFloat(UnzoomedRect.x) / wrap::toFloat(UnzoomedRect.y);
+  auto const aspectRatio = wrap::toFloat(UnzoomedRect.x) / wrap::toFloat(UnzoomedRect.y);
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	StitchWindowSize.x = wrap::round<int32_t>(
 	    wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
@@ -4452,9 +4452,9 @@ auto thred::internal::nuBak() noexcept -> COLORREF {
 }
 
 auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
-  auto ratioX = wrap::toFloat(point.x - StitchWindowAbsRect.left) /
+  auto const ratioX = wrap::toFloat(point.x - StitchWindowAbsRect.left) /
                 wrap::toFloat(StitchWindowClientRect.right);
-  auto ratioY = wrap::toFloat(StitchWindowAbsRect.bottom - point.y) /
+  auto const ratioY = wrap::toFloat(StitchWindowAbsRect.bottom - point.y) /
                 wrap::toFloat(StitchWindowClientRect.bottom);
   return fPOINT {ratioX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
                  ratioY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
