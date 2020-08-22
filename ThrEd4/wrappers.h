@@ -64,8 +64,13 @@ auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
+auto toFloat(int16_t invar) noexcept -> float;
 auto toSize(uint32_t invar) noexcept -> size_t;
+auto toSize(DWORD invar) noexcept -> size_t;
+auto toSize(int invar) noexcept -> size_t;
+auto toSize(long invar) noexcept -> size_t;
 auto toUnsigned(size_t invar) -> uint32_t;
+auto toUnsigned(int invar) -> uint32_t;
 auto wcstof(wchar_t const* buffer) -> float;
 
 template <class outType> void wcstoul(outType& outvar, wchar_t const* invar) {
