@@ -38,7 +38,7 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
   sDest.clear();
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
-	auto const span = gsl::span<wchar_t>(pBuf, len);
+	auto const span = gsl::span<wchar_t>(pBuf, wrap::toSize(len));
 	sDest.insert(sDest.end(), span.begin(), span.end());
   }
 }
@@ -135,7 +135,7 @@ void displayText::lodstr() {
 void displayText::hsizmsg() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_HSIZ);
-  displayText::shoMsg(fmt::format(fmtStr, (UnzoomedRect.x * IPFGRAN), (UnzoomedRect.y * IPFGRAN)));
+  displayText::shoMsg(fmt::format(fmtStr, (wrap::toFloat(UnzoomedRect.x) * IPFGRAN), (wrap::toFloat(UnzoomedRect.y) * IPFGRAN)));
 }
 
 void displayText::numWnd() {
@@ -417,7 +417,7 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+auto static CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
