@@ -104,7 +104,7 @@ namespace internal {
                fPOINT const&              rotationCenter,
                uint32_t                   currentSide,
                fPOINT&                    stitchPoint,
-               fPOINT&                    borderClipReference);
+               fPOINT const&              borderClipReference);
   void linsid(uint32_t                   vertexIndex,
               std::vector<fPOINT> const& clipReversedData,
               std::vector<fPOINT>&       clipFillData,
@@ -113,7 +113,7 @@ namespace internal {
               fPOINT const&              rotationCenter,
               uint32_t                   currentSide,
               fPOINT&                    stitchPoint,
-              fPOINT&                    borderClipReference);
+              fPOINT const&              borderClipReference);
   auto nupnt(float clipAngle, fPOINT& moveToCoords, fPOINT const& stitchPoint) noexcept -> bool;
   void picfn(FRMHED const&        form,
              fRECTANGLE const&    clipRect,

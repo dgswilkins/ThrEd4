@@ -294,9 +294,9 @@ void clip::internal::lincrnr(uint32_t                   vertexIndex,
                              fPOINT const&              rotationCenter,
                              uint32_t                   currentSide,
                              fPOINT&                    stitchPoint,
-                             fPOINT&                    borderClipReference) {
+                             fPOINT const&              borderClipReference) {
   auto vertexIt     = std::next(FormVertices->cbegin(), vertexIndex);
-  auto moveToCoords = vertexIt[wrap::toSize(currentSide) + 2U];
+  auto moveToCoords = vertexIt[gsl::narrow<ptrdiff_t>(currentSide) + 2];
   if (ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	auto const delta = fPOINT {moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y};
 	auto const rotationAngle = atan2(delta.y, delta.x);
@@ -319,9 +319,9 @@ void clip::internal::linsid(uint32_t                   vertexIndex,
                             fPOINT const&              rotationCenter,
                             uint32_t                   currentSide,
                             fPOINT&                    stitchPoint,
-                            fPOINT&                    borderClipReference) {
+                            fPOINT const&              borderClipReference) {
   auto        vertexIt  = std::next(FormVertices->cbegin(), vertexIndex);
-  auto const& point     = vertexIt[wrap::toSize(currentSide) + 1U];
+  auto const& point     = vertexIt[gsl::narrow<ptrdiff_t>(currentSide) + 1];
   auto const  delta     = fPOINT {(point.x - stitchPoint.x), (point.y - stitchPoint.y)};
   auto const  length    = hypot(delta.x, delta.y);
   auto const  clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
@@ -427,7 +427,7 @@ void clip::clpbrd(FRMHED const& form, fRECTANGLE const& clipRect, uint32_t start
 	// Use 0 to align left edge of clip with beginning of line, clipRect.right / 2 if you want to
 	// align the center of the clip with the beginning of the line
 	//auto borderClipReference = fPOINT {clipRect.right / 2.0F, clipRect.top / 2.0F};
-	auto borderClipReference = fPOINT {0.0F, clipRect.top / 2.0F};
+	auto const borderClipReference = fPOINT {0.0F, clipRect.top / 2.0F};
 	auto       currentSide = 0U;
 	auto const sideCount   = form.vertexCount - 2U;
 	for (currentSide = 0U; currentSide < sideCount; ++currentSide) {
@@ -495,12 +495,12 @@ void clip::internal::fxlit(uint32_t                  vertexIndex,
 	auto       vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
 	auto const length =
 	    hypot(vertexIt[nextStart].x - stitchPoint.x, vertexIt[nextStart].y - stitchPoint.y);
-	auto const count = wrap::floor<uint32_t>(length / adjustedSpace);
+	auto const count = std::floor(length / adjustedSpace);
 	auto const delta =
 	    fPOINT {adjustedSpace * listCOSINEs[currentSide], adjustedSpace * listSINEs[currentSide]};
 	stitchPoint.x += delta.x * count;
 	stitchPoint.y += delta.y * count;
-	adjCount += count;
+	adjCount += gsl::narrow_cast<uint32_t>(count);
   }
 }
 
@@ -586,7 +586,7 @@ void clip::internal::fxlen(FRMHED const&             form,
 	      hypot(vertexIt[nextStart].x - stitchPoint.x, vertexIt[nextStart].y - stitchPoint.y);
 	  auto interval  = minimumInterval;
 	  minimumSpacing = adjustedSpace;
-	  interval /= initialCount;
+	  interval /= wrap::toFloat(initialCount);
 	  // NOLINTNEXTLINE(readability-magic-numbers)
 	  adjustedSpace += interval / 2.0F;
 	  largestSpacing = smallestSpacing + interval;
@@ -658,7 +658,7 @@ void clip::internal::dulast(std::vector<fPOINT>& chainEndPoints) {
   auto tempClipPoints = std::vector<fPOINT> {};
   tempClipPoints.reserve(chainEndPoints.size());
   if (form::lastch()) {
-	auto minimumLength = BIGDOUBLE;
+	auto minimumLength = BIGFLOAT;
 	auto minimumIndex  = 0U;
 	for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 1U; ++iPoint) {
 	  auto const length =
@@ -745,7 +745,7 @@ void clip::internal::clpcrnr(FRMHED const&        form,
 	auto delta = fPOINT {points->operator[](nextVertex).x - vertexIt[nextVertex].x,
 	                     points->operator[](nextVertex).y - vertexIt[nextVertex].y};
 
-	auto const rotationAngle = atan2(delta.y, delta.x) + PI / 2;
+	auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
 	auto const referencePoint = fPOINTATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
 	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
