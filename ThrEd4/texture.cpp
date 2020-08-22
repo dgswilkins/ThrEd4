@@ -391,7 +391,7 @@ void texture::drwtxtr() {
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, thred::getBackGroundBrush());
   auto const pixelSpace = (StitchWindowClientRect.bottom * 1.0) / StitchWindowClientRect.right;
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
-  auto const extraWidth = TextureScreen.spacing * gsl::narrow_cast<float>(TextureScreen.lines + 2U);
+  auto const extraWidth = TextureScreen.spacing * wrap::toFloat(TextureScreen.lines + 2U);
   if (StateMap->testAndReset(StateFlag::CHKTX)) {
 	txi::chktx();
   }
@@ -406,8 +406,8 @@ void texture::drwtxtr() {
 	TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2.0F / StitchWindowClientRect.bottom;
 	yOffset                        = StitchWindowClientRect.bottom / 4;
 	TextureScreen.xOffset =
-	    (TextureScreen.editToPixelRatio * gsl::narrow_cast<float>(StitchWindowClientRect.right) -
-	     TextureScreen.spacing * (gsl::narrow_cast<float>(TextureScreen.lines) + 2.0F)) /
+	    (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
+	     TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
 	    2.0F;
   }
   TextureScreen.top          = yOffset;
@@ -489,7 +489,7 @@ auto texture::internal::px2txt(POINT const& offset) -> bool {
   if ((txPoint.line <= TextureScreen.lines) && (txPoint.line >= 1)) {
 	if (offset.y > TextureScreen.top) {
 	  if ((offset.y <= TextureScreen.bottom)) {
-		txPoint.y = TextureScreen.areaHeight - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) /
+		txPoint.y = TextureScreen.areaHeight - ((wrap::toFloat(offset.y) - TextureScreen.top) /
 		                                        TextureScreen.height * TextureScreen.areaHeight);
 		TempTexturePoints->push_back(txPoint);
 		retval = true;
@@ -649,7 +649,7 @@ void texture::internal::setxclp(FRMHED const& form) {
   txi::deorg(screenOffset);
   txi::px2ed(screenOffset, editorOffset);
   if (StateMap->testAndReset(StateFlag::TXHCNTR)) {
-	editorOffset.x = (gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing) / 2.0F +
+	editorOffset.x = (wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing) / 2.0F +
 	                 TextureScreen.xOffset - TextureScreen.formCenter.x + TextureScreen.spacing / 2.0F;
   }
   else {
@@ -693,7 +693,7 @@ void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
 	val = 0.0F;
   }
   textureRecord.line = wrap::round<uint16_t>(val);
-  textureRecord.y = TextureScreen.areaHeight - ((gsl::narrow_cast<float>(offset.y) - TextureScreen.top) /
+  textureRecord.y = TextureScreen.areaHeight - ((wrap::toFloat(offset.y) - TextureScreen.top) /
                                                 TextureScreen.height * TextureScreen.areaHeight);
 }
 
@@ -926,7 +926,7 @@ void texture::internal::chktxnum() {
 		texture::savtxt();
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
-		TextureScreen.width = value * gsl::narrow_cast<float>(TextureScreen.lines) + value / 2.0F;
+		TextureScreen.width = value * wrap::toFloat(TextureScreen.lines) + value / 2.0F;
 		StateMap->set(StateFlag::CHKTX);
 		break;
 	  }
@@ -1650,7 +1650,7 @@ void texture::rtrtx(FRMHED const& form) {
 	TextureScreen.areaHeight = form.fillInfo.texture.height;
 	TextureScreen.spacing    = form.fillSpacing;
 	TextureScreen.lines      = form.fillInfo.texture.lines;
-	TextureScreen.width = gsl::narrow_cast<float>(TextureScreen.lines) * TextureScreen.spacing +
+	TextureScreen.width = wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing +
 	                      TextureScreen.spacing / 2.0F;
 	texture::savtxt();
   }

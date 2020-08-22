@@ -331,10 +331,10 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		  }
 		  else {
 			(*StitchBuffer)
-			    .emplace_back(fPOINTATTR {gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].x) +
-			                                  gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fx) / fractionalFactor,
-			                              gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].y) +
-			                                  gsl::narrow_cast<float>(pcsStitchBuffer[iPCSStitch].fy) / fractionalFactor,
+			    .emplace_back(fPOINTATTR {wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
+			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / fractionalFactor,
+			                              wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
+			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / fractionalFactor,
 			                              newAttribute});
 		  }
 		}

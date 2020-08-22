@@ -171,8 +171,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	displayText::hsizmsg();
   }
   auto const delta =
-      fPOINT {(gsl::narrow_cast<float>(UnzoomedRect.x) - dstSize.x) / 2.0F - mimimumCoordinate.x,
-              (gsl::narrow_cast<float>(UnzoomedRect.y) - dstSize.y) / 2.0F - mimimumCoordinate.y};
+      fPOINT {(wrap::toFloat(UnzoomedRect.x) - dstSize.x) / 2.0F - mimimumCoordinate.x,
+              (wrap::toFloat(UnzoomedRect.y) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
 	iStitch.x += delta.x;
 	iStitch.y += delta.y;

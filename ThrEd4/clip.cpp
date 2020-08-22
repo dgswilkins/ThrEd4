@@ -378,8 +378,8 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
   if (clipCount != 0U) {
 	auto remainder = 0.0F;
 	if (clipCount > 1U) {
-	  remainder = ((length - gsl::narrow_cast<float>(clipCount) * ClipRectSize.cx) /
-	                   (gsl::narrow_cast<float>(clipCount) - 1.0F) +
+	  remainder = ((length - wrap::toFloat(clipCount) * ClipRectSize.cx) /
+	                   (wrap::toFloat(clipCount) - 1.0F) +
 	               ClipRectSize.cx) /
 	              length;
 	}
@@ -787,7 +787,7 @@ void clip::internal::picfn(FRMHED const&        form,
 	auto step = fPOINT {};
 	if (count > 1) {
 	  auto const tdub =
-	      ((length - gsl::narrow_cast<float>(count) * spacing) / (gsl::narrow_cast<float>(count) - 1.0F) + spacing) / length;
+	      ((length - wrap::toFloat(count) * spacing) / (wrap::toFloat(count) - 1.0F) + spacing) / length;
 	  auto const val = fPOINT {delta.x * tdub, delta.y * tdub};
 	  step           = val;
 	}

@@ -394,8 +394,8 @@ void thred::duzrat() noexcept {
   if (ZoomRect.top == 0.0F) {
 	ZoomRect.top = LHUPY;
   }
-  ZoomRatio.x = gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-  ZoomRatio.y = gsl::narrow_cast<float>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+  ZoomRatio.x = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+  ZoomRatio.y = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 }
 
 auto thred::internal::rsed() noexcept -> uint32_t {
@@ -875,14 +875,14 @@ void thred::internal::unboxs() {
 }
 
 void thred::internal::stchPars() {
-  auto aspectRatio = gsl::narrow_cast<float>(UnzoomedRect.x) / gsl::narrow_cast<float>(UnzoomedRect.y);
+  auto aspectRatio = wrap::toFloat(UnzoomedRect.x) / wrap::toFloat(UnzoomedRect.y);
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	StitchWindowSize.x = wrap::round<int32_t>(
-	    gsl::narrow_cast<float>(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
+	    wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
   }
   else {
 	StitchWindowSize.x =
-	    wrap::round<int32_t>(gsl::narrow_cast<float>(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
+	    wrap::round<int32_t>(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
   }
 
   if ((StitchWindowSize.x + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
@@ -896,7 +896,7 @@ void thred::internal::stchPars() {
   else {
 	StitchWindowSize = {ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
 	                    ThredWindowRect.bottom - ThredWindowRect.top};
-	if ((gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(StitchWindowSize.y)) > aspectRatio) {
+	if ((wrap::toFloat(StitchWindowSize.x) / wrap::toFloat(StitchWindowSize.y)) > aspectRatio) {
 	  StitchWindowSize.x = wrap::round<int32_t>(StitchWindowSize.y * aspectRatio);
 	}
 	else {
@@ -969,7 +969,7 @@ void thred::movStch() {
 	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.x, 0, *ScrollSize, clientSize.y, TRUE);
 	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.y + verticalOffset, clientSize.x, *ScrollSize, TRUE);
 	StitchWindowAspectRatio =
-	    gsl::narrow_cast<float>(clientSize.x) / gsl::narrow_cast<float>(clientSize.y);
+	    wrap::toFloat(clientSize.x) / wrap::toFloat(clientSize.y);
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.x, *ScrollSize, TRUE);
 	}
@@ -983,7 +983,7 @@ void thred::movStch() {
 	ShowWindow(VerticalScrollBar, FALSE);
 	ShowWindow(HorizontalScrollBar, FALSE);
 	StitchWindowAspectRatio =
-	    gsl::narrow_cast<float>(StitchWindowSize.x) / gsl::narrow_cast<float>(actualWindowHeight);
+	    wrap::toFloat(StitchWindowSize.x) / wrap::toFloat(actualWindowHeight);
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.x, *ScrollSize, TRUE);
 	}
@@ -1188,7 +1188,7 @@ void thred::internal::movins() {
 
 void thred::zumhom() {
   ZoomRect = fRECTANGLE {
-      0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
+      0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
@@ -1267,7 +1267,7 @@ void thred::hupfn() {
 		form.rectangle.bottom += delta.y;
 	  }
 	  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-	  ZoomMin      = gsl::narrow_cast<float>(MINZUM) / gsl::narrow_cast<float>(UnzoomedRect.x);
+	  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.x);
 	  thred::zumhom();
 	}
   }
@@ -1774,7 +1774,7 @@ void thred::internal::chknum() {
 			  constexpr auto starSize = 250.0F;
 			  form::dustar(uintValue,
 			               starSize / value * ZoomFactor *
-			                   gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
+			                   wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 			  break;
 			}
 			if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
@@ -2581,7 +2581,7 @@ void thred::grpAdj() {
 	  }
 	  else {
 		ZoomRect.right = ZoomRect.left + (newSize.x);
-		ZoomFactor   = gsl::narrow_cast<float>(newSize.x) / gsl::narrow_cast<float>(UnzoomedRect.x);
+		ZoomFactor   = wrap::toFloat(newSize.x) / wrap::toFloat(UnzoomedRect.x);
 		ZoomRect.top = ZoomRect.bottom + (newSize.y);
 		auto const stitchPoint =
 		    fPOINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
@@ -4452,10 +4452,10 @@ auto thred::internal::nuBak() noexcept -> COLORREF {
 }
 
 auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
-  auto ratioX = gsl::narrow_cast<float>(point.x - StitchWindowAbsRect.left) /
-                gsl::narrow_cast<float>(StitchWindowClientRect.right);
-  auto ratioY = gsl::narrow_cast<float>(StitchWindowAbsRect.bottom - point.y) /
-                gsl::narrow_cast<float>(StitchWindowClientRect.bottom);
+  auto ratioX = wrap::toFloat(point.x - StitchWindowAbsRect.left) /
+                wrap::toFloat(StitchWindowClientRect.right);
+  auto ratioY = wrap::toFloat(StitchWindowAbsRect.bottom - point.y) /
+                wrap::toFloat(StitchWindowClientRect.bottom);
   return fPOINT {ratioX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
                  ratioY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
@@ -4634,7 +4634,7 @@ void thred::internal::zumout() {
 	  ZoomFactor = 1;
 	  StateMap->reset(StateFlag::ZUMED);
 	  ZoomRect = fRECTANGLE {
-	      0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
+	      0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
 	  thred::movStch();
 	  NearestCount = 0;
 	}
@@ -4979,11 +4979,11 @@ auto thred::internal::closlin() -> uint32_t {
   auto           checkedPoint = fPOINT {};
   constexpr auto Tolerance    = 20.0F;
   thi::unboxs();
-  auto offset = gsl::narrow_cast<float>(Msg.pt.x - StitchWindowAbsRect.left) /
-                gsl::narrow_cast<float>(StitchWindowAbsRect.right - StitchWindowAbsRect.left);
+  auto offset = wrap::toFloat(Msg.pt.x - StitchWindowAbsRect.left) /
+                wrap::toFloat(StitchWindowAbsRect.right - StitchWindowAbsRect.left);
   checkedPoint.x = offset * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
-  offset         = (gsl::narrow_cast<float>(StitchWindowAbsRect.bottom) - Msg.pt.y) /
-           (gsl::narrow_cast<float>(StitchWindowAbsRect.bottom) - StitchWindowAbsRect.top);
+  offset         = (wrap::toFloat(StitchWindowAbsRect.bottom) - Msg.pt.y) /
+           (wrap::toFloat(StitchWindowAbsRect.bottom) - StitchWindowAbsRect.top);
   checkedPoint.y       = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
   offset               = (ZoomRect.right - ZoomRect.left) / StitchWindowClientRect.right;
   auto const tolerance = offset * Tolerance;
@@ -5051,7 +5051,7 @@ auto thred::internal::closlin() -> uint32_t {
 				  tsum = fabs(dx);
 				  break;
 				}
-				auto const slope = gsl::narrow_cast<float>(xba) / yab;
+				auto const slope = wrap::toFloat(xba) / yab;
 				offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
 				auto const poff  = checkedPoint.x - checkedPoint.y / slope;
 
@@ -5310,7 +5310,7 @@ void thred::internal::unclp() {
 
 void thred::internal::clpbox() {
   auto const ratio =
-      gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+      wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
   if (stitchPoint.x + ClipRectSize.cx > UnzoomedRect.x) {
 	stitchPoint.x = UnzoomedRect.x - ClipRectSize.cx;
@@ -5351,16 +5351,16 @@ void thred::internal::lodclp(uint32_t iStitch) {
 
 void thred::internal::rSelbox() {
   auto const ratio =
-      gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+      wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
   auto const adjustedSelectSize = SIZE {gsl::narrow_cast<int32_t>(lround(SelectBoxSize.cx * ratio)),
                                         gsl::narrow_cast<int32_t>(lround(SelectBoxSize.cy * ratio))};
   unsel();
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
   if (stitchPoint.x - SelectBoxOffset.x + SelectBoxSize.cx >= UnzoomedRect.x) {
-	stitchPoint.x = gsl::narrow_cast<float>(UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x);
+	stitchPoint.x = wrap::toFloat(UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x);
   }
   if (stitchPoint.y - SelectBoxOffset.y + SelectBoxSize.cy >= UnzoomedRect.y) {
-	stitchPoint.y = gsl::narrow_cast<float>(UnzoomedRect.y - SelectBoxSize.cy + SelectBoxOffset.y);
+	stitchPoint.y = wrap::toFloat(UnzoomedRect.y - SelectBoxSize.cy + SelectBoxOffset.y);
   }
   if (stitchPoint.x - SelectBoxOffset.x < 0) {
 	stitchPoint.x = SelectBoxOffset.x;
@@ -6195,8 +6195,8 @@ void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
                              fPOINT const&            knotStep,
                              uint32_t                 knotAttribute) {
   buffer.emplace_back(
-      fPOINTATTR {StitchBuffer->operator[](iSource).x + knotStep.x * gsl::narrow_cast<float>(offset),
-                  StitchBuffer->operator[](iSource).y + knotStep.y * gsl::narrow_cast<float>(offset),
+      fPOINTATTR {StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
+                  StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
                   knotAttribute});
 }
 
@@ -6841,10 +6841,10 @@ void thred::redclp() {
 	auto&       clipBuffer     = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(clipSize);
-	clipBuffer.emplace_back(gsl::narrow_cast<float>(clipStitchData[0].x) +
-	                            gsl::narrow_cast<float>(clipStitchData[0].fx) / fractionalFactor,
-	                        gsl::narrow_cast<float>(clipStitchData[0].y) +
-	                            gsl::narrow_cast<float>(clipStitchData[0].fy) / fractionalFactor,
+	clipBuffer.emplace_back(wrap::toFloat(clipStitchData[0].x) +
+	                            wrap::toFloat(clipStitchData[0].fx) / fractionalFactor,
+	                        wrap::toFloat(clipStitchData[0].y) +
+	                            wrap::toFloat(clipStitchData[0].fy) / fractionalFactor,
 	                        0U);
 
 #if CLPBUG
@@ -6856,10 +6856,10 @@ void thred::redclp() {
 	clipRect.left = clipRect.right = clipBuffer[0].x;
 	clipRect.bottom = clipRect.top = clipBuffer[0].y;
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
-	  clipBuffer.emplace_back(gsl::narrow_cast<float>(clipStitchData[iStitch].x) +
-	                              gsl::narrow_cast<float>(clipStitchData[iStitch].fx) / fractionalFactor,
-	                          gsl::narrow_cast<float>(clipStitchData[iStitch].y) +
-	                              gsl::narrow_cast<float>(clipStitchData[iStitch].fy) / fractionalFactor,
+	  clipBuffer.emplace_back(wrap::toFloat(clipStitchData[iStitch].x) +
+	                              wrap::toFloat(clipStitchData[iStitch].fx) / fractionalFactor,
+	                          wrap::toFloat(clipStitchData[iStitch].y) +
+	                              wrap::toFloat(clipStitchData[iStitch].fy) / fractionalFactor,
 	                          (clipStitchData[iStitch].led & COLMSK) | codedLayer);
 
 #if CLPBUG
@@ -7767,8 +7767,8 @@ auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
 	}
 	else {
 	  StateMap->set(StateFlag::EXPAND);
-	  xyRatio = gsl::narrow_cast<float>(SelectedFormsRect.right - SelectedFormsRect.left) /
-	            gsl::narrow_cast<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
+	  xyRatio = wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left) /
+	            wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
 	}
 	SelectedFormControlVertex >>= 1U;
 	StateMap->set(StateFlag::SHOSTRTCH);
@@ -10191,12 +10191,12 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 	  if (iOffset != 0U) {
 		linePoints.push_back(
 		    {wrap::round<int32_t>((activeStitch[iOffset - 1U].x - ZoomRect.left) * ZoomRatio.x),
-		     wrap::round<int32_t>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom) -
+		     wrap::round<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 		                          (activeStitch[iOffset - 1U].y - ZoomRect.bottom) * ZoomRatio.y)});
 	  }
 	  else {
 		linePoints.push_back({wrap::round<int32_t>((activeStitch[0].x - ZoomRect.left) * ZoomRatio.x),
-		                      wrap::round<int32_t>(gsl::narrow_cast<float>(StitchWindowClientRect.bottom) -
+		                      wrap::round<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 		                                           (activeStitch[0].y - ZoomRect.bottom) * ZoomRatio.y)});
 	  }
 	}
@@ -13865,7 +13865,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) * 0.5F, gsl::narrow_cast<float>(UnzoomedRect.y) * 0.5F);
+		  dumrk(wrap::toFloat(UnzoomedRect.x) * 0.5F, wrap::toFloat(UnzoomedRect.y) * 0.5F);
 		}
 		else {
 		  if (thred::inStitchWin()) {
@@ -14404,7 +14404,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-	  dumrk(gsl::narrow_cast<float>(UnzoomedRect.x) * 0.5F, gsl::narrow_cast<float>(UnzoomedRect.y) * 0.5F);
+	  dumrk(wrap::toFloat(UnzoomedRect.x) * 0.5F, wrap::toFloat(UnzoomedRect.y) * 0.5F);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
@@ -16673,7 +16673,7 @@ void thred::internal::drwStch() {
 		  auto const stitchIt =
 		      std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 		  stitchCount          = chkup(stitchCount, iColor);
-		  auto const maxYcoord = gsl::narrow_cast<float>(DrawItem->rcItem.bottom);
+		  auto const maxYcoord = wrap::toFloat(DrawItem->rcItem.bottom);
 		  for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 			auto const layer = (stitchIt[iStitch].attribute & LAYMSK) >> LAYSHFT;
 			if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
@@ -17317,7 +17317,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-		  ZoomRect.top = gsl::narrow_cast<float>(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam));
+		  ZoomRect.top = wrap::toFloat(UnzoomedRect.y) - gsl::narrow<int32_t>(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
 			ZoomRect.bottom = 0.0F;

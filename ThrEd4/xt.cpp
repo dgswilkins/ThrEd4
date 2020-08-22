@@ -148,15 +148,15 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 	case FTHPSG: {
 	  if (feather.upCount != 0U) {
 		if (feather.countUp != 0U) {
-		  feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) -
-		                   gsl::narrow_cast<float>(form::psg() % feather.totalCount)) /
-		                  gsl::narrow_cast<float>(feather.totalCount);
+		  feather.ratio = (wrap::toFloat(feather.totalCount) -
+		                   wrap::toFloat(form::psg() % feather.totalCount)) /
+		                  wrap::toFloat(feather.totalCount);
 		  --(feather.countUp);
 		}
 		else {
-		  feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) -
-		                   gsl::narrow_cast<float>(bpsg() % feather.totalCount)) /
-		                  gsl::narrow_cast<float>(feather.totalCount);
+		  feather.ratio = (wrap::toFloat(feather.totalCount) -
+		                   wrap::toFloat(bpsg() % feather.totalCount)) /
+		                  wrap::toFloat(feather.totalCount);
 		  if (feather.countDown != 0U) {
 			--(feather.countDown);
 		  }
@@ -168,9 +168,9 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 		}
 	  }
 	  else {
-		feather.ratio = (gsl::narrow_cast<float>(feather.totalCount) -
-		                 gsl::narrow_cast<float>(form::psg() % feather.totalCount)) /
-		                gsl::narrow_cast<float>(feather.totalCount);
+		feather.ratio = (wrap::toFloat(feather.totalCount) -
+		                 wrap::toFloat(form::psg() % feather.totalCount)) /
+		                wrap::toFloat(feather.totalCount);
 	  }
 	  feather.ratio *= feather.formRatio;
 	  break;
@@ -347,9 +347,9 @@ void xt::fthrfn(FRMHED& form) {
 	++ind;
   }
   feather.globalPosition = 0.0F;
-  feather.globalStep = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * gsl::narrow_cast<float>(ind);
-  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / ind;
-  feather.globalRatio = gsl::narrow_cast<float>(feather.countUp) / feather.phaseIndex;
+  feather.globalStep = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
+  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
+  feather.globalRatio = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
   feather.globalUp    = feather.globalPhase * feather.globalRatio;
   feather.globalDown  = feather.globalPhase - feather.globalUp;
   form.fillType       = FTHF;

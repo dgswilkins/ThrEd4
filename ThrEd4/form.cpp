@@ -266,9 +266,9 @@ auto form::sfCor2px(fPOINT const& stitchPoint) -> POINT {
 
 auto form::internal::px2stchf(POINT const& screen) noexcept -> fPOINT {
   auto const factorX =
-      gsl::narrow_cast<float>(screen.x) / gsl::narrow_cast<float>(StitchWindowClientRect.right);
+      wrap::toFloat(screen.x) / wrap::toFloat(StitchWindowClientRect.right);
   auto const factorY =
-      (gsl::narrow_cast<float>(StitchWindowClientRect.bottom) - screen.y) / StitchWindowClientRect.bottom;
+      (wrap::toFloat(StitchWindowClientRect.bottom) - screen.y) / StitchWindowClientRect.bottom;
   return fPOINT {factorX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
                  factorY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
@@ -347,8 +347,8 @@ void form::internal::rats() {
 	VerticalRatio   = (ZoomRect.top - ZoomRect.bottom) / StitchWindowClientRect.bottom;
   }
   else {
-	HorizontalRatio = gsl::narrow_cast<float>(UnzoomedRect.x) / StitchWindowClientRect.right;
-	VerticalRatio   = gsl::narrow_cast<float>(UnzoomedRect.y) / StitchWindowClientRect.bottom;
+	HorizontalRatio = wrap::toFloat(UnzoomedRect.x) / StitchWindowClientRect.right;
+	VerticalRatio   = wrap::toFloat(UnzoomedRect.y) / StitchWindowClientRect.bottom;
   }
 }
 
@@ -396,7 +396,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto line     = std::array<POINT, TRIPNTS> {};
   auto vertexIt = std::next(FormVertices->cbegin(), vertexIndex);
   line[1]       = thred::stch2pxr(vertexIt[iVertex]);
-  auto const ratio = gsl::narrow_cast<float>(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
+  auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *screenDPI, stdDPI)) /
                      StitchWindowClientRect.right;
   // NOLINTNEXTLINE(readability-magic-numbers)
   auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
@@ -458,13 +458,13 @@ void form::internal::frmx(POINT const& controlPoint, HDC dc) {
 void form::ratsr() {
   if (StateMap->test(StateFlag::ZUMED)) {
 	HorizontalRatio =
-	    gsl::narrow_cast<float>(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
+	    wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
 	VerticalRatio =
-	    gsl::narrow_cast<float>(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
+	    wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
   }
   else {
-	HorizontalRatio = gsl::narrow_cast<float>(StitchWindowClientRect.right) / UnzoomedRect.x;
-	VerticalRatio   = gsl::narrow_cast<float>(StitchWindowClientRect.bottom) / UnzoomedRect.y;
+	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / UnzoomedRect.x;
+	VerticalRatio   = wrap::toFloat(StitchWindowClientRect.bottom) / UnzoomedRect.y;
   }
 }
 
@@ -822,10 +822,10 @@ void form::durpoli(uint32_t vertexCount) {
   if (vertexCount < 3) {
 	vertexCount = 3;
   }
-  auto const stepAngle = PI_F2 / gsl::narrow_cast<float>(vertexCount);
+  auto const stepAngle = PI_F2 / wrap::toFloat(vertexCount);
   // 500 gives us a reasonably sized default
-  auto const length = 500.0F / gsl::narrow_cast<float>(vertexCount) * ZoomFactor *
-                      gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+  auto const length = 500.0F / wrap::toFloat(vertexCount) * ZoomFactor *
+                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
@@ -1040,7 +1040,7 @@ auto form::internal::findDistanceToSide(fPOINT const& lineStart,
 
   auto const dot    = A * C + B * D;
   auto const len_sq = C * C + D * D;
-  auto const param  = gsl::narrow_cast<float>(dot / len_sq);
+  auto const param  = wrap::toFloat(dot / len_sq);
 
   if (param < 0) {
 	// point is nearest to the first point i.e lineStart.x and lineStart.y
@@ -1344,7 +1344,7 @@ auto form::getblen() noexcept -> float {
   auto&      form    = FormList->operator[](ClosestFormToCursor);
   auto const iLength = (form.clipEntries << WRDSHFT) | form.picoLength;
   // clang-format on
-  return gsl::narrow_cast<float>(iLength);
+  return wrap::toFloat(iLength);
 }
 
 void form::savblen(float fLength) {
@@ -1359,7 +1359,7 @@ auto form::getplen() noexcept -> float {
   auto const& form  = FormList->operator[](ClosestFormToCursor);
   auto const  value = form.picoLength;
   // clang-format on
-  return (gsl::narrow_cast<float>(value >> BYTSHFT) + gsl::narrow_cast<float>(value & BYTMASK) / picoFactor);
+  return (wrap::toFloat(value >> BYTSHFT) + wrap::toFloat(value & BYTMASK) / picoFactor);
 }
 
 void form::savplen(float length) {
@@ -3218,14 +3218,14 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
 	  else {
 		if (clipGridOffset != 0U) {
 		  clipVerticalOffset =
-		      gsl::narrow_cast<float>(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
+		      wrap::toFloat(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
 		}
 		lineSegmentStart.x = pasteLocation.x + clipBuffer[0].x;
 	  }
 	  lineSegmentStart.y = clipGrid.bottom * ClipRectSize.cy;
 	  if (clipGridOffset != 0U) {
 		clipVerticalOffset =
-		    gsl::narrow_cast<float>(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
+		    wrap::toFloat(iRegion % clipGridOffset) / (clipGridOffset * ClipRectSize.cy);
 	  }
 	  for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; ++iVerticalGrid) {
 		pasteLocation.y = iVerticalGrid * ClipRectSize.cy - clipVerticalOffset;
@@ -4517,7 +4517,7 @@ void form::internal::bakseq() {
 			auto count = wrap::ceil<int32_t>(bCurrent.y / UserStitchLength);
 			do {
 			  OSequence->push_back(fPOINT {
-			      0.0F, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9});
+			      0.0F, count * UserStitchLength + wrap::toFloat(rit % seqtab[rcnt]) * UserStitchLength9});
 			  if (OSequence->back().y > bCurrent.y) {
 				break;
 			  }
@@ -4532,7 +4532,7 @@ void form::internal::bakseq() {
 			auto count = wrap::floor<int32_t>(bCurrent.y / UserStitchLength);
 			do {
 			  OSequence->push_back(fPOINT {
-			      0.0F, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
+			      0.0F, count * UserStitchLength - wrap::toFloat((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
 			  if (OSequence->back().y < bPrevious.y) {
 				break;
 			  }
@@ -4547,7 +4547,7 @@ void form::internal::bakseq() {
 		  auto count = wrap::ceil<int32_t>(bNext.y / UserStitchLength);
 		  do {
 			OSequence->push_back(fPOINT {
-			    0.0F, count * UserStitchLength + gsl::narrow_cast<float>(rit % seqtab[rcnt]) * UserStitchLength9});
+			    0.0F, count * UserStitchLength + wrap::toFloat(rit % seqtab[rcnt]) * UserStitchLength9});
 			if (OSequence->back().y > bCurrent.y) {
 			  break;
 			}
@@ -4565,7 +4565,7 @@ void form::internal::bakseq() {
 		  auto count = wrap::floor<int32_t>(bNext.y / UserStitchLength);
 		  do {
 			OSequence->push_back(fPOINT {
-			    0.0F, count * UserStitchLength - gsl::narrow_cast<float>((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
+			    0.0F, count * UserStitchLength - wrap::toFloat((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
 			if (OSequence->back().y < bCurrent.y) {
 			  break;
 			}
@@ -5910,7 +5910,7 @@ void form::selal() {
   StateMap->reset(StateFlag::GRPSEL);
   fi::getbig(AllItemsRect);
   ZoomRect = fRECTANGLE {
-      0.0F, gsl::narrow_cast<float>(UnzoomedRect.y), gsl::narrow_cast<float>(UnzoomedRect.x), 0.0F};
+      0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
@@ -5946,8 +5946,8 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference          = stitchRect.bottom;
 		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
-		ratio              = gsl::narrow_cast<float>(SelectedFormsRect.bottom - offsetY) /
-		        gsl::narrow_cast<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
+		ratio              = wrap::toFloat(SelectedFormsRect.bottom - offsetY) /
+		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FORMSEL)) {
@@ -5966,8 +5966,8 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference          = stitchRect.left;
 		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
-		ratio              = gsl::narrow_cast<float>(offsetX - SelectedFormsRect.left) /
-		        gsl::narrow_cast<float>(SelectedFormsRect.right - SelectedFormsRect.left);
+		ratio              = wrap::toFloat(offsetX - SelectedFormsRect.left) /
+		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FORMSEL)) {
@@ -5987,8 +5987,8 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference          = stitchRect.top;
 		auto const offsetY = Msg.pt.y - StitchWindowOrigin.y;
-		ratio              = gsl::narrow_cast<float>(offsetY - SelectedFormsRect.top) /
-		        gsl::narrow_cast<float>(SelectedFormsRect.bottom - SelectedFormsRect.top);
+		ratio              = wrap::toFloat(offsetY - SelectedFormsRect.top) /
+		        wrap::toFloat(SelectedFormsRect.bottom - SelectedFormsRect.top);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FORMSEL)) {
@@ -6007,8 +6007,8 @@ void form::setstrtch() {
 	  if (!SelectedFormList->empty() || StateMap->test(StateFlag::BIGBOX) || StateMap->test(StateFlag::FPSEL)) {
 		reference          = stitchRect.right;
 		auto const offsetX = Msg.pt.x - StitchWindowOrigin.x;
-		ratio              = gsl::narrow_cast<float>(SelectedFormsRect.right - offsetX) /
-		        gsl::narrow_cast<float>(SelectedFormsRect.right - SelectedFormsRect.left);
+		ratio              = wrap::toFloat(SelectedFormsRect.right - offsetX) /
+		        wrap::toFloat(SelectedFormsRect.right - SelectedFormsRect.left);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::FORMSEL)) {
@@ -6453,7 +6453,7 @@ void form::dustar(uint32_t starCount, float length) {
   if (starCount > starMax) {
 	starCount = starMax;
   }
-  auto const stepAngle   = PI_F / gsl::narrow_cast<float>(starCount);
+  auto const stepAngle   = PI_F / wrap::toFloat(starCount);
   auto       angle       = stepAngle / 2.0F + PI_F;
   auto const vertexCount = starCount * 2U;
   auto       newForm     = FRMHED {};
@@ -6497,11 +6497,11 @@ void form::duspir(uint32_t stepCount) {
   if (stepCount > stepMax) {
 	stepCount = stepMax;
   }
-  auto const stepAngle = PI_F2 / gsl::narrow_cast<float>(stepCount);
-  auto const length    = 800.0F / gsl::narrow_cast<float>(stepCount) * ZoomFactor *
-                      gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+  auto const stepAngle = PI_F2 / wrap::toFloat(stepCount);
+  auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
+                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
-  auto vertexCount    = wrap::round<uint32_t>(gsl::narrow_cast<float>(stepCount) * SpiralWrap);
+  auto vertexCount    = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
   wrap::narrow(newForm.attribute, ActiveLayer << 1U);
@@ -6564,9 +6564,9 @@ void form::duhart(uint32_t sideCount) {
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
   auto const savedVertexIndex = wrap::toUnsigned(FormVertices->size());
   auto       point            = thred::pxCor2stch(Msg.pt);
-  auto       stepAngle        = PI_F2 / gsl::narrow_cast<float>(sideCount);
-  auto const length           = 300.0F / gsl::narrow_cast<float>(sideCount) * ZoomFactor *
-                      gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+  auto       stepAngle        = PI_F2 / wrap::toFloat(sideCount);
+  auto const length           = 300.0F / wrap::toFloat(sideCount) * ZoomFactor *
+                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   auto angle    = PI_F * hartAngle;
   auto iVertex  = 0U;
   auto maximumX = 0.0F;
@@ -6632,7 +6632,7 @@ void form::dulens(uint32_t sides) {
   auto const theta = std::atan(1.0F / IniFile.lensRatio);
   // now calculate the radius of the lens arc and scale by the zoom factor
   auto const radius = (100.0F / std::sin(theta)) * ZoomFactor *
-                      gsl::narrow_cast<float>(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
   // get the angle subtended by each step
   auto const omega = 2.0F * theta / steps;
   // and the interior angle of every segment
