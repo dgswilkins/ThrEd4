@@ -63,12 +63,14 @@ void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;
+auto toFloat(unsigned long invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
 auto toFloat(int16_t invar) noexcept -> float;
 auto toSize(uint32_t invar) noexcept -> size_t;
 auto toSize(DWORD invar) noexcept -> size_t;
-auto toSize(int invar) noexcept -> size_t;
+auto toSize(int invar) -> size_t;
 auto toSize(long invar) noexcept -> size_t;
+auto toSize(uintmax_t invar) noexcept -> size_t;
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
 auto wcstof(wchar_t const* buffer) -> float;
