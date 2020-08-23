@@ -66,7 +66,7 @@ class DSTREC // dst stitch record
   uint8_t mid {0U};
   uint8_t nd {0U};
 
-  constexpr DSTREC() noexcept = default;
+  // constexpr DSTREC() noexcept = default;
   // DSTREC(DSTREC&&) = default;
   // DSTREC& operator=(DSTREC const& rhs) = default;
   // DSTREC& operator=(DSTREC&&) = default;
