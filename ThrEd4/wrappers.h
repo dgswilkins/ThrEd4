@@ -54,7 +54,7 @@ auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRea
     -> bool;
 
 template <class outType, class inType> auto round(inType invar) -> outType {
-  return gsl::narrow<outType>(std::round(invar));
+  return gsl::narrow<outType>(std::lround(invar));
 }
 
 void setCursor(HCURSOR hCursor) noexcept;
