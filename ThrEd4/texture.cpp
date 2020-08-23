@@ -636,7 +636,7 @@ void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) 
 	while (integerStart <= integerFinish) {
 	  auto const yOffset = slope * (-point0.x + integerStart * TextureScreen.spacing) + point0.y;
 	  if (yOffset > 0 && yOffset < TextureScreen.areaHeight) {
-		TempTexturePoints->push_back({yOffset, gsl::narrow<uint16_t>(integerStart)});
+		TempTexturePoints->push_back(TXPNT {yOffset, gsl::narrow<uint16_t>(integerStart)});
 	  }
 	  ++integerStart;
 	}
@@ -1122,7 +1122,7 @@ void texture::internal::altx() {
 	}
 	for (uint16_t iLine = 1; iLine <= TextureScreen.lines; ++iLine) {
 	  if (!txtLines.test(iLine)) {
-		TempTexturePoints->push_back({halfHeight, iLine});
+		TempTexturePoints->push_back(TXPNT {halfHeight, iLine});
 	  }
 	}
   }

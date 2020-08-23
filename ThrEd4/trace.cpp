@@ -611,7 +611,7 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 	tracedPoints.push_back(
-	    {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	    TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	if (tracedPoints.size() >= pointMax) {
 	  return false;
 	}
@@ -754,7 +754,7 @@ void trace::internal::dutrac() {
 	uint32_t const initialDirection = traceDirection;
 	auto           tracedPoints     = std::vector<TRCPNT> {};
 	tracedPoints.push_back(
-	    {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	    TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) {
 	  ;
 	}
