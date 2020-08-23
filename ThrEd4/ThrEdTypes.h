@@ -12,7 +12,7 @@
 #include "switches.h"
 
 #ifdef _DEBUG
-#define outDebugString(X, ...) OutputDebugString(fmt::format(X, __VA_ARGS__).c_str());
+#define outDebugString(X, ...) OutputDebugString(fmt::format(X, __VA_ARGS__).c_str())
 #else
 #define outDebugString(X, ...)
 #endif
@@ -1155,7 +1155,7 @@ class SMALPNTL
   float    x {0.0F};
   float    y {0.0F};
 
-  constexpr SMALPNTL() noexcept = default;
+  // constexpr SMALPNTL() noexcept = default;
   // SMALPNTL(SMALPNTL&&) = default;
   // SMALPNTL& operator=(SMALPNTL const& rhs) = default;
   // SMALPNTL& operator=(SMALPNTL&&) = default;
@@ -1279,7 +1279,7 @@ class fPOINTLINE
   float    y {0.0F};
   uint16_t line {0U};
 
-  constexpr fPOINTLINE() noexcept = default;
+  // constexpr fPOINTLINE() noexcept = default;
   // fPOINTLINE(fPOINTLINE&&) = default;
   // fPOINTLINE& operator=(fPOINTLINE const& rhs) = default;
   // fPOINTLINE& operator=(fPOINTLINE&&) = default;
@@ -1307,7 +1307,7 @@ class COLCHNG
   uint16_t stitchIndex {0U}; // stitch index
   uint16_t colorIndex {0U};  // color index
 
-  constexpr COLCHNG() noexcept = default;
+  // constexpr COLCHNG() noexcept = default;
   // COLCHNG(COLCHNG&&) = default;
   // COLCHNG& operator=(COLCHNG const& rhs) = default;
   // COLCHNG& operator=(COLCHNG&&) = default;
@@ -2413,7 +2413,7 @@ class TXPNT // textured fill point
   float    y {0.0F};
   uint16_t line {0U};
 
-  constexpr TXPNT() noexcept = default;
+  // constexpr TXPNT() noexcept = default;
   // TXPNT(TXPNT&&) = default;
   // TXPNT& operator=(TXPNT const& rhs) = default;
   // TXPNT& operator=(TXPNT&&) = default;
@@ -2426,7 +2426,7 @@ class TXOFF // textured fill offset
   float   y {0.0F};
   int32_t line {0};
 
-  constexpr TXOFF() noexcept = default;
+  // constexpr TXOFF() noexcept = default;
   // TXOFF(TXOFF&&) = default;
   // TXOFF& operator=(TXOFF const& rhs) = default;
   // TXOFF& operator=(TXOFF&&) = default;
@@ -2522,7 +2522,7 @@ class FLSIZ
   float cx {0.0F};
   float cy {0.0F};
 
-  constexpr FLSIZ() noexcept = default;
+  // constexpr FLSIZ() noexcept = default;
   // FLSIZ(FLSIZ&&) = default;
   // FLSIZ& operator=(FLSIZ const& rhs) = default;
   // FLSIZ& operator=(FLSIZ&&) = default;
@@ -2548,7 +2548,7 @@ class RANGE
   uint32_t start {0U};
   uint32_t finish {0U};
 
-  constexpr RANGE() noexcept = default;
+  // constexpr RANGE() noexcept = default;
   // RANGE(RANGE&&) = default;
   // RANGE& operator=(RANGE const& rhs) = default;
   // RANGE& operator=(RANGE&&) = default;
@@ -2582,7 +2582,7 @@ class RCON // PathMap: path map for sequencing
   bool     isConnected {false};
   uint32_t nextGroup {0U};
 
-  constexpr RCON() noexcept = default;
+  // constexpr RCON() noexcept = default;
   // RCON(RCON&&) = default;
   // RCON& operator=(RCON const& rhs) = default;
   // RCON& operator=(RCON&&) = default;
@@ -2610,7 +2610,7 @@ class FSEQ // SequencePath: path of sequenced regions
   uint16_t nextGroup {0U};
   bool     skp {false}; // path not found
 
-  constexpr FSEQ() noexcept = default;
+  // constexpr FSEQ() noexcept = default;
   // FSEQ(FSEQ&&) = default;
   // FSEQ& operator=(FSEQ const& rhs) = default;
   // FSEQ& operator=(FSEQ&&) = default;
@@ -2626,7 +2626,7 @@ class PVEC
   double angle {0.0};
   double length {0.0};
 
-  constexpr PVEC() noexcept = default;
+  // constexpr PVEC() noexcept = default;
   // PVEC(PVEC&&) = default;
   // PVEC& operator=(PVEC const& rhs) = default;
   // PVEC& operator=(PVEC&&) = default;
@@ -2696,7 +2696,7 @@ class BALSTCH // balarad stitch
   float   x {0.0F};
   float   y {0.0F};
 
-  constexpr BALSTCH() noexcept = default;
+  // constexpr BALSTCH() noexcept = default;
   // BALSTCH(BALSTCH&&) = default;
   // BALSTCH& operator=(BALSTCH const& rhs) = default;
   // BALSTCH& operator=(BALSTCH&&) = default;
@@ -2716,7 +2716,7 @@ class CLPSEG
   uint32_t zsid {0U};
   int8_t   dun {0};
 
-  constexpr CLPSEG() noexcept = default;
+  // constexpr CLPSEG() noexcept = default;
   // CLPSEG(CLPSEG&&) = default;
   // CLPSEG& operator=(CLPSEG const& rhs) = default;
   // CLPSEG& operator=(CLPSEG&&) = default;
@@ -2746,7 +2746,7 @@ class CLIPNT
   uint32_t vertexIndex {0U};
   uint32_t flag {0U};
 
-  constexpr CLIPNT() noexcept = default;
+  // constexpr CLIPNT() noexcept = default;
   // CLIPNT(CLIPNT&&) = default;
   // CLIPNT& operator=(CLIPNT const& rhs) = default;
   // CLIPNT& operator=(CLIPNT&&) = default;
@@ -2759,7 +2759,7 @@ class VCLPX
   uint32_t segment {0U};
   uint32_t vertex {0U};
 
-  constexpr VCLPX() noexcept = default;
+  // constexpr VCLPX() noexcept = default;
   // VCLPX(VCLPX&&) = default;
   // VCLPX& operator=(VCLPX const& rhs) = default;
   // VCLPX& operator=(VCLPX&&) = default;
@@ -2772,7 +2772,7 @@ class TRCPNT
   int16_t x {0};
   int16_t y {0};
 
-  constexpr TRCPNT() noexcept = default;
+  // constexpr TRCPNT() noexcept = default;
   // TRCPNT(TRCPNT&&) = default;
   // TRCPNT& operator=(TRCPNT const& rhs) = default;
   // TRCPNT& operator=(TRCPNT&&) = default;
@@ -2785,7 +2785,7 @@ class GRDCOD
   uint32_t id {0U};
   uint32_t col {0U};
 
-  constexpr GRDCOD() noexcept = default;
+  // constexpr GRDCOD() noexcept = default;
   // GRDCOD(GRDCOD&&) = default;
   // GRDCOD& operator=(GRDCOD const& rhs) = default;
   // GRDCOD& operator=(GRDCOD&&) = default;
@@ -2883,7 +2883,7 @@ class INSREC
   uint32_t index {0U};
   uint32_t seq {0U};
 
-  constexpr INSREC() noexcept = default;
+  // constexpr INSREC() noexcept = default;
   // INSREC(INSREC&&) = default;
   // INSREC& operator=(INSREC const& rhs) = default;
   // INSREC& operator=(INSREC&&) = default;
@@ -3043,7 +3043,7 @@ class LENINFO // Sorted line length info
   bool     isEnd {false};
   float    length {0.0F};
 
-  constexpr LENINFO() noexcept = default;
+  // constexpr LENINFO() noexcept = default;
   // LENINFO(LENINFO&&) = default;
   // LENINFO& operator=(LENINFO const& rhs) = default;
   // LENINFO& operator=(LENINFO&&) = default;
@@ -3057,7 +3057,7 @@ class PECCOLOR
   uint8_t g {0U};
   uint8_t b {0U};
 
-  constexpr PECCOLOR() noexcept = default;
+  // constexpr PECCOLOR() noexcept = default;
   // PECCOLOR(PECCOLOR&&) = default;
   // PECCOLOR& operator=(PECCOLOR const& rhs) = default;
   // PECCOLOR& operator=(PECCOLOR&&) = default;
@@ -3070,7 +3070,7 @@ class PESCOLORLIST
   uint16_t blockIndex {0U};
   uint16_t colorIndex {0U};
 
-  constexpr PESCOLORLIST() noexcept = default;
+  // constexpr PESCOLORLIST() noexcept = default;
   // PESCOLORLIST(PESCOLORLIST&&) = default;
   // PESCOLORLIST& operator=(PECCOLORLIST const& rhs) = default;
   // PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
@@ -3084,7 +3084,7 @@ class THREAD
   char const* description {nullptr};
   char const* catalogNumber {nullptr};
 
-  constexpr THREAD() noexcept = default;
+  // constexpr THREAD() noexcept = default;
   // THREAD(THREAD&&) = default;
   // THREAD& operator=(THREAD const& rhs) = default;
   // THREAD& operator=(THREAD&&) = default;
