@@ -319,10 +319,10 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
-  screenPoint.x = wrap::round<int32_t>(
+  screenPoint.x = std::lround(
       (gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset) /
       TextureScreen.editToPixelRatio);
-  screenPoint.y = wrap::round<int32_t>(
+  screenPoint.y = std::lround(
       gsl::narrow_cast<double>(TextureScreen.height) -
       texturePoint.y / gsl::narrow_cast<double>(TextureScreen.areaHeight) * TextureScreen.height +
       TextureScreen.top);
@@ -365,8 +365,8 @@ void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) {
 }
 
 void texture::internal::ed2px(fPOINT const& editPoint, POINT& point) {
-  point.x = wrap::round<int32_t>(editPoint.x / TextureScreen.editToPixelRatio);
-  point.y = wrap::round<int32_t>(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
+  point.x = std::lround(editPoint.x / TextureScreen.editToPixelRatio);
+  point.y = std::lround(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
 }
 
 void texture::internal::px2ed(POINT const& point, fPOINT& editPoint) noexcept {
@@ -436,7 +436,7 @@ void texture::drwtxtr() {
   line[0].y = 0;
   line[1].y = StitchWindowClientRect.bottom;
   for (auto iVertical = 1U; iVertical < TextureScreen.lines + 1U; ++iVertical) {
-	line[0].x = line[1].x = wrap::round<int32_t>(
+	line[0].x = line[1].x = std::lround(
 	    (gsl::narrow_cast<double>(TextureScreen.spacing) * iVertical + TextureScreen.xOffset) /
 	    TextureScreen.editToPixelRatio);
 	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));

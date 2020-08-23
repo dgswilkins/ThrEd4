@@ -620,10 +620,10 @@ auto bitmap::internal::bitar() -> bool {
       fPOINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
   BitmapDstRect = {
-      wrap::round<int32_t>(differenceRect.left * bitmapStitchRatio.x),
-      wrap::round<int32_t>(differenceRect.top * bitmapStitchRatio.y),
-      wrap::round<int32_t>(wrap::toFloat(StitchWindowClientRect.right) - differenceRect.right * bitmapStitchRatio.x),
-      wrap::round<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) - differenceRect.bottom * bitmapStitchRatio.y)};
+      std::lround(differenceRect.left * bitmapStitchRatio.x),
+      std::lround(differenceRect.top * bitmapStitchRatio.y),
+      std::lround(wrap::toFloat(StitchWindowClientRect.right) - differenceRect.right * bitmapStitchRatio.x),
+      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) - differenceRect.bottom * bitmapStitchRatio.y)};
   return true;
 }
 

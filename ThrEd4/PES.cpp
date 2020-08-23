@@ -233,8 +233,8 @@ void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, floa
   constexpr auto maxDeltaVal = int32_t {63};
   constexpr auto minDeltaVal = int32_t {-64};
 
-  auto deltaX = wrap::round<int32_t>(srcX * PECScale);
-  auto deltaY = -wrap::round<int32_t>(srcY * PECScale);
+  auto deltaX = std::lround(srcX * PECScale);
+  auto deltaY = -std::lround(srcY * PECScale);
   if (deltaX < maxDeltaVal && deltaX > minDeltaVal && deltaY < maxDeltaVal && deltaY > minDeltaVal) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	auto xVal = gsl::narrow<uint8_t>(deltaX & mask7bits);

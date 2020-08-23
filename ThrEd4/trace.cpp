@@ -367,8 +367,8 @@ void trace::trace() {
 		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
 	  }
 	  auto const BmpSR       = bitmap::getBmpStitchRatio();
-	  auto       bitmapPoint = POINT {wrap::round<int32_t>(BmpSR.x * stitchPoint.x),
-                                wrap::round<int32_t>(BmpSR.y * stitchPoint.y - 1.0F)};
+	  auto       bitmapPoint = POINT {std::lround(BmpSR.x * stitchPoint.x),
+                                std::lround(BmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
@@ -640,8 +640,8 @@ void trace::internal::dutrac() {
 	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
 	}
 	auto const bmpSR  = bitmap::getBmpStitchRatio();
-	CurrentTracePoint = POINT {wrap::round<int32_t>(bmpSR.x * stitchPoint.x),
-	                           wrap::round<int32_t>(bmpSR.y * stitchPoint.y)};
+	CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x),
+	                           std::lround(bmpSR.y * stitchPoint.y)};
 	if (CurrentTracePoint.x > bitmap::getBitmapHeight()) {
 	  CurrentTracePoint.x = bitmap::getBitmapWidth();
 	}
@@ -1201,9 +1201,9 @@ void trace::internal::durct(uint32_t    shift,
   auto       ratio         = gsl::narrow_cast<double>(lowerColor) * clRatio;
   traceHighMask.left = traceLowMask.left = traceMiddleMask.left = traceControlRect.left;
   traceHighMask.right = traceLowMask.right = traceMiddleMask.right = traceControlRect.right;
-  traceMiddleMask.top    = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
+  traceMiddleMask.top    = std::lround(controlHeight * ratio + traceControlRect.top);
   ratio                  = gsl::narrow_cast<double>(upperColor) * clRatio;
-  traceMiddleMask.bottom = wrap::round<int32_t>(controlHeight * ratio + traceControlRect.top);
+  traceMiddleMask.bottom = std::lround(controlHeight * ratio + traceControlRect.top);
   StateMap->reset(StateFlag::DUHI);
   StateMap->reset(StateFlag::DULO);
   if (lowerColor != 0U) {

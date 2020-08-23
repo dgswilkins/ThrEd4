@@ -2474,12 +2474,12 @@ void xt::nudsiz() {
 	  constexpr auto hoopRatio = 1.05F; // make the hoop 5% bigger
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * hoopRatio;
-		UnzoomedRect.x    = wrap::round<int32_t>(IniFile.hoopSizeX);
+		UnzoomedRect.x    = std::lround(IniFile.hoopSizeX);
 		flag              = 1;
 	  }
 	  if (DesignSize.y > IniFile.hoopSizeY) {
 		IniFile.hoopSizeY = DesignSize.y * hoopRatio;
-		UnzoomedRect.y    = wrap::round<int32_t>(IniFile.hoopSizeY);
+		UnzoomedRect.y    = std::lround(IniFile.hoopSizeY);
 		flag              = 1;
 	  }
 	  xi::nudfn(designSizeRect);
