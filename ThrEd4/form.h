@@ -201,7 +201,7 @@ namespace internal {
   void bold(FRMHED const& form);
   void boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, double size);
   void brdfil(FRMHED const& form);
-  void brkdun(std::vector<SMALPNTL*> const& sortedLines, uint32_t start, uint32_t finish);
+  void brkdun(std::vector<SMALPNTL*> const& sortedLines, uint32_t start, uint32_t finish, std::vector<fPOINT>& workingFormVertices);
   void brkseq(std::vector<SMALPNTL*> const& sortedLines,
               uint32_t                      start,
               uint32_t                      finish,
@@ -256,7 +256,8 @@ namespace internal {
              uint32_t                      lineCount,
              std::vector<REGION> const&    regionsList,
              uint32_t&                     lastGroup,
-             uint32_t                      sequencePathIndex);
+             uint32_t                      sequencePathIndex,
+             std::vector<fPOINT>&          workingFormVertices);
   void duromb(fPOINT const& start0, fPOINT const& finish0, fPOINT const& start1, fPOINT const& finish1, fPOINT& stitchPoint);
   void duseq(std::vector<SMALPNTL*> const& sortedLines,
              uint32_t                      start,
@@ -275,7 +276,7 @@ namespace internal {
               fPOINT&                   stitchPoint);
   void filsclp();
   void filsfn();
-  auto findDistanceToSide(fPOINT const& lineStart, fPOINT const& lineEnd, fPOINT const& point, double& distance) noexcept
+  auto findDistanceToSide(fPOINT const& lineStart, fPOINT const& lineEnd, fPOINT const& point, double& distance)
       -> float;
   void fmclp(FRMHED& form);
   void fnagain(float rotationAngle);
@@ -340,7 +341,10 @@ namespace internal {
             fRECTANGLE const&          boundingRect,
             std::vector<fPOINT> const& currentFormVertices) -> bool;
   void lapbrd(FRMHED const& form);
-  void lcon(FRMHED const& form, std::vector<uint32_t>& groupIndexSequence, std::vector<SMALPNTL>& lineEndpoints);
+  void lcon(FRMHED const&          form,
+            std::vector<uint32_t>& groupIndexSequence,
+            std::vector<SMALPNTL>& lineEndpoints,
+            std::vector<fPOINT>&   workingFormVertices);
   auto lenComp(LENINFO const& arg1, LENINFO const& arg2) noexcept -> bool;
   auto clipComp(CLIPSORT const* arg1, CLIPSORT const* arg2) noexcept -> bool;
   auto lnclos(std::vector<uint32_t>& groupIndexSequence,
@@ -378,7 +382,7 @@ namespace internal {
   void nxtseq(std::vector<FSEQ>&           sequencePath,
               std::vector<RCON> const&     pathMap,
               std::vector<uint32_t> const& mapIndexSequence,
-              uint32_t                     pathIndex) noexcept;
+              uint32_t                     pathIndex);
   void pbrd(FRMHED const& form);
   void pfn(std::vector<VRCT2> const& underlayVerticalRect,
            std::vector<VRCT2> const& fillVerticalRect,
