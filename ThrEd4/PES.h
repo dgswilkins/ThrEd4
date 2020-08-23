@@ -93,7 +93,7 @@ class PESSTCHLST
   uint16_t threadIndex {0U};
   uint16_t stitchcount {0U};
 
-  constexpr PESSTCHLST() noexcept = default;
+  // constexpr PESSTCHLST() noexcept = default;
   // PESSTCHLST(PESSTCHLST&&) = default;
   // PESSTCHLST& operator=(PESSTCHLST const& rhs) = default;
   // PESSTCHLST& operator=(PESSTCHLST&&) = default;
