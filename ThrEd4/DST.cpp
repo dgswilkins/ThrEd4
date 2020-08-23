@@ -31,8 +31,8 @@
 
 namespace di = DST::internal;
 
-fs::path* ColorFileName; //.thw file name
-fs::path* RGBFileName;   //.rgb file name
+auto static ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+auto static RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 
 class DSTDAT
 {
@@ -139,8 +139,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	else {
 	  auto dstStitch = POINT {0L, 0L};
 	  di::dstin(di::dtrn(&record), dstStitch);
-	  localStitch.x += dstStitch.x;
-	  localStitch.y += dstStitch.y;
+	  localStitch.x += wrap::toFloat(dstStitch.x);
+	  localStitch.y += wrap::toFloat(dstStitch.y);
 	  if ((record.nd & c0Mask) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
 		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTScale, localStitch.y * DSTScale, color | NOTFRM});
 		auto& stitch = StitchBuffer->back();
@@ -162,12 +162,12 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto const dstSize =
       fPOINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
   IniFile.hoopType = CUSTHUP;
-  UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
-  if (dstSize.x > UnzoomedRect.x || dstSize.y > UnzoomedRect.y) {
+  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  if (dstSize.x > wrap::toFloat(UnzoomedRect.x) || dstSize.y > wrap::toFloat(UnzoomedRect.y)) {
 	constexpr auto expRatio = 1.1F; // 10% expansion
 	IniFile.hoopSizeX       = dstSize.x * expRatio;
 	IniFile.hoopSizeY       = dstSize.y * expRatio;
-	UnzoomedRect = {wrap::round<int32_t>(IniFile.hoopSizeX), wrap::round<int32_t>(IniFile.hoopSizeY)};
+	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
   auto const delta =
@@ -215,32 +215,32 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  boundingRect.bottom = stitch.y - margin;
 	}
   }
-  auto centerCoordinate = POINT {wrap::round<int32_t>(wrap::midl(boundingRect.right, boundingRect.left)),
-                                 wrap::round<int32_t>(wrap::midl(boundingRect.top, boundingRect.bottom))};
-  DSTOffsetData.Positive.x = wrap::round<int32_t>(boundingRect.right - centerCoordinate.x + 1);
-  DSTOffsetData.Positive.y = wrap::round<int32_t>(boundingRect.top - centerCoordinate.y + 1);
-  DSTOffsetData.Negative.x = wrap::round<int32_t>(centerCoordinate.x - boundingRect.left - 1);
-  DSTOffsetData.Negative.y = wrap::round<int32_t>(centerCoordinate.y - boundingRect.bottom - 1);
+  auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
+                                 std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
+  DSTOffsetData.Positive.x = std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1));
+  DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
+  DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
+  DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
   auto color               = dstStitchBuffer[0].attribute & COLOR_BITS;
   for (auto& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLOR_BITS)) {
-	  constexpr auto stopCode = uint8_t {0xC3}; // note that stop code is thesame as the color change code
+	  constexpr auto stopCode = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, stopCode});
 	  color = stitch.attribute & COLOR_BITS;
 	  colorData.push_back(UserColor[color]);
 	}
-	auto lengths = POINT {wrap::round<int32_t>(gsl::narrow_cast<double>(stitch.x) - centerCoordinate.x),
-	                      wrap::round<int32_t>(gsl::narrow_cast<double>(stitch.y) - centerCoordinate.y)};
+	auto lengths = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
+	                      std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = POINT {abs(lengths.x), abs(lengths.y)};
-	auto       count           = 0U;
+	auto       count           = 0;
 	if (absoluteLengths.x > absoluteLengths.y) {
 	  count = absoluteLengths.x / DSTMax + 1;
 	}
 	else {
 	  count = absoluteLengths.y / DSTMax + 1;
 	}
-	auto const stepSize = POINT {gsl::narrow<LONG>(absoluteLengths.x / count + 1U),
-	                             gsl::narrow<LONG>(absoluteLengths.y / count + 1U)};
+	auto const stepSize = POINT {(absoluteLengths.x / count + 1),
+	                             (absoluteLengths.y / count + 1)};
 
 	auto difference = POINT {0L, 0L};
 	while ((lengths.x != 0) || (lengths.y != 0)) {
@@ -336,8 +336,8 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   auto       deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
   // NOLINTNEXTLINE(readability-magic-numbers)
-  return wrap::round<DWORD>(std::sqrt((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                      (((767 - meanR) * deltaB * deltaB) / 256))); // NOLINT(readability-magic-numbers)
+  return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
+                                      (((767 - meanR) * deltaB * deltaB) / 256)))); // NOLINT(readability-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
@@ -891,8 +891,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	  bitmap::resetBmpFile(true);
 	  fileSize -= sizeof(dstHeader);
 	  auto DSTData = std::vector<DSTREC> {};
-	  DSTData.resize(fileSize / sizeof(DSTREC));
-	  wrap::ReadFile(fileHandle, DSTData.data(), fileSize, &bytesRead, nullptr);
+	  DSTData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
+	  ReadFile(fileHandle, DSTData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 	  di::dstran(DSTData);
 	  IniFile.auxFileType = AUXDST;
 	}
