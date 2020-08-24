@@ -7213,12 +7213,10 @@ auto form::rotpar() -> fPOINT {
                  wrap::midl(RotationRect.top, RotationRect.bottom)};
 }
 
-void form::internal::rotentr(double rotationAngle) {
-  constexpr auto RADDEGD = 180.0 / PI; // double factor to convert radians to degrees
-
+void form::internal::rotentr(float rotationAngle) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_ROTA);
-  displayText::shoMsg(fmt::format(fmtStr, (rotationAngle * RADDEGD)));
+  displayText::shoMsg(fmt::format(fmtStr, (rotationAngle * RADDEGF)));
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }

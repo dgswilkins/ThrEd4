@@ -430,7 +430,7 @@ namespace internal {
               uint32_t&                  clipIntersectSide,
               std::vector<fPOINT> const& currentFormVertices);
   void rotbak(float rotationAngle, fPOINT const& rotationCenter) noexcept;
-  void rotentr(double rotationAngle);
+  void rotentr(float rotationAngle);
   void sapliq(uint32_t formIndex);
   void sbold(uint32_t formIndex);
   void sbord(uint32_t formIndex);
