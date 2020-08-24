@@ -318,7 +318,7 @@ void texture::dutxtfil() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) {
+void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) noexcept {
   screenPoint.x = std::lround(
       (gsl::narrow_cast<double>(TextureScreen.spacing) * texturePoint.line + TextureScreen.xOffset) /
       TextureScreen.editToPixelRatio);
@@ -364,7 +364,7 @@ void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) {
   rectangle.bottom = point.y + IniFile.textureEditorSize;
 }
 
-void texture::internal::ed2px(fPOINT const& editPoint, POINT& point) {
+void texture::internal::ed2px(fPOINT const& editPoint, POINT& point) noexcept {
   point.x = std::lround(editPoint.x / TextureScreen.editToPixelRatio);
   point.y = std::lround(StitchWindowClientRect.bottom - editPoint.y / TextureScreen.editToPixelRatio);
 }

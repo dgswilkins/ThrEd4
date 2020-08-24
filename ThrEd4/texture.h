@@ -55,7 +55,7 @@ namespace internal {
   void dutxrct(TXTRCT& textureRect);
   void dutxtlin() noexcept;
   void dutxtx(uint32_t index, uint16_t offsetPixels);
-  void ed2px(fPOINT const& editPoint, POINT& point);
+  void ed2px(fPOINT const& editPoint, POINT& point) noexcept;
   auto ed2stch(fPOINT const& point) noexcept -> fPOINT;
   void ed2txp(POINT const& offset, TXPNT& textureRecord);
   auto inrct(fRECTANGLE const& rectangle, fPOINTATTR const& stitch) noexcept -> bool;
@@ -87,7 +87,7 @@ namespace internal {
   void txrfor() noexcept;
   void txshrnk(FRMHED const& textureForm);
   void txsiz(float ratio, FRMHED const& textureForm);
-  void txt2pix(TXPNT const& texturePoint, POINT& screenPoint);
+  void txt2pix(TXPNT const& texturePoint, POINT& screenPoint) noexcept;
   auto txtclos(uint32_t& closestTexturePoint) -> bool;
   void txtclp(FRMHED& textureForm);
   void txtdel();
