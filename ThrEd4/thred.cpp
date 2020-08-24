@@ -2665,7 +2665,7 @@ auto thred::internal::nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH {
   return CreateSolidBrush(color);
 }
 
-void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) {
+void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept {
   // won't handle vertical lines
   auto const dx               = unrotatedPoint.x - rotationCenterPixels.x;
   auto const dy               = unrotatedPoint.y - rotationCenterPixels.y;
@@ -3692,7 +3692,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
   }
 }
 
-auto thred::internal::centr() -> fPOINT {
+auto thred::internal::centr() noexcept -> fPOINT {
   auto const center = POINT {std::lround((ZoomRect.right - ZoomRect.left) * 0.5F),
                              std::lround((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
   return fPOINT {ZoomRect.left + center.x, ZoomRect.bottom + center.y};
@@ -5291,7 +5291,7 @@ void thred::internal::rebox() {
 void thred::delstchm() {
   thred::rngadj();
   auto start = std::next(StitchBuffer->begin(), GroupStartStitch);
-  auto end   = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch + 1U));
+  auto end   = std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch + 1U));
   StitchBuffer->erase(start, end);
 }
 
@@ -5388,7 +5388,7 @@ void thred::internal::rSelbox() {
   dusel(StitchWindowDC);
 }
 
-void thred::internal::duSelbox() {
+void thred::internal::duSelbox() noexcept {
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 
   SelectBoxSize = {std::lround(StitchRangeRect.right - StitchRangeRect.left),
@@ -7398,11 +7398,11 @@ void thred::internal::mv2f() {
 	  std::copy(StitchBuffer->begin(),
 	            std::next(StitchBuffer->begin(), GroupStartStitch),
 	            tempStitchBuffer.begin());
-	  std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U),
+	  std::copy(std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U),
 	            StitchBuffer->end(),
 	            std::next(tempStitchBuffer.begin(), GroupStartStitch));
 	  std::copy(std::next(StitchBuffer->begin(), GroupStartStitch),
-	            std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U),
+	            std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U),
 	            StitchBuffer->begin());
 	  std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), std::next(StitchBuffer->begin(), grpSize));
 	  thred::coltab();
@@ -7437,9 +7437,9 @@ void thred::internal::mv2b() {
 	  auto const              grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	  tempStitchBuffer.resize(grpSize);
 	  std::copy(std::next(StitchBuffer->begin(), GroupStartStitch),
-	            std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U),
+	            std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U),
 	            tempStitchBuffer.begin());
-	  std::copy(std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U),
+	  std::copy(std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U),
 	            StitchBuffer->end(),
 	            std::next(StitchBuffer->begin(), GroupStartStitch));
 	  std::copy(tempStitchBuffer.begin(),
@@ -9155,7 +9155,7 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
   return a;
 }
 
-void thred::internal::ritcur() noexcept {
+void thred::internal::ritcur() {
   constexpr auto iconRows     = 32; // rows in the icon
   constexpr auto BPINT        = 32; // bits in an uint32_t
   constexpr auto InvColorMask = 0xffffffU;
@@ -9282,7 +9282,7 @@ void thred::internal::retrac() {
 	  ++GroupStartStitch;
 	}
 	auto const count = GroupEndStitch - GroupStartStitch;
-	auto insertPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U);
+	auto insertPoint = std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U);
 	auto startPoint = std::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
 	auto endPoint   = std::next(startPoint, count);
 	StitchBuffer->insert(insertPoint, startPoint, endPoint);
@@ -10047,7 +10047,7 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
   auto const             nextVertex = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
-  auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + nextVertex);
+  auto vertexIt = std::next(FormVertices->begin(), gsl::narrow<ptrdiff_t>(form.vertexIndex) + nextVertex);
   for (auto iOutput = 1U; iOutput < wrap::toUnsigned(InterleaveSequence->size()) - 1U; ++iOutput) {
 	*vertexIt = fPOINT {it->x + offset.x, it->y + offset.y};
 	++vertexIt;
@@ -12934,7 +12934,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto& form        = FormList->operator[](offset);
 		  form.vertexIndex  = wrap::toUnsigned(FormVertices->size());
 		  auto const currentVertices =
-		      gsl::span<fPOINT>(formVertices, gsl::narrow_cast<ptrdiff_t>(currentVertex) + form.vertexCount);
+		      gsl::span<fPOINT>(formVertices, gsl::narrow<ptrdiff_t>(currentVertex) + form.vertexCount);
 		  FormVertices->insert(FormVertices->end(),
 		                       std::next(currentVertices.begin(), currentVertex),
 		                       currentVertices.end());

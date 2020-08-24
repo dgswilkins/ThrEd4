@@ -113,7 +113,7 @@ namespace internal {
   void box(uint32_t iNearest, HDC dc);
   void boxs();
   void bsavmen();
-  auto centr() -> fPOINT;
+  auto centr() noexcept -> fPOINT;
   void chk1col();
   auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, fPOINT& rotationCenter, FRMHED& textureForm)
       -> bool;
@@ -169,7 +169,7 @@ namespace internal {
   void dstcurs() noexcept;
   void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<double>& gapToNearest) noexcept;
   void duIns();
-  void duSelbox();
+  void duSelbox() noexcept;
   void duar(POINT const& stitchCoordsInPixels);
   void dubar();
   void dubox(POINT const& stitchCoordsInPixels);
@@ -370,7 +370,7 @@ namespace internal {
   void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
   void ritbal();
   void ritcor(fPOINTATTR const& pointAttribute);
-  void ritcur() noexcept;
+  void ritcur();
   void ritfnam(std::wstring const& designerName);
   void ritini();
   void ritlayr();
@@ -384,7 +384,7 @@ namespace internal {
   void rotauxsel(uint32_t stat);
   void rotfns(float rotationAngle);
   void rotmrk();
-  void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels);
+  void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
   void rotseg();
   void rotstch(fPOINTATTR& stitch, float rotationAngle, fPOINT const& rotationCenter) noexcept;
   auto rsed() noexcept -> uint32_t;
