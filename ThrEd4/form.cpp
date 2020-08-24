@@ -5576,7 +5576,7 @@ void form::unfil() {
 		*iDestination++ = stitch;
 	  }
 	}
-	StitchBuffer->resize(&(*iDestination) - &(StitchBuffer->front()));
+	StitchBuffer->resize(std::distance(StitchBuffer->begin(), iDestination));
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
