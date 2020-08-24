@@ -5058,7 +5058,7 @@ void form::setfpnt() {
   auto const& form             = FormList->operator[](ClosestFormToCursor);
   auto const  screenCoordinate = POINT {(Msg.pt.x - StitchWindowOrigin.x), 
 										(Msg.pt.y - StitchWindowOrigin.y)};
-  auto vertexIt = std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + ClosestVertexToCursor);
+  auto vertexIt = std::next(FormVertices->begin(), gsl::narrow<ptrdiff_t>(form.vertexIndex) + ClosestVertexToCursor);
   // clang-format on
   form::unfrm();
   fi::rats();
@@ -5483,7 +5483,7 @@ void form::internal::nufpnt(uint32_t vertex, FRMHED& form, fPOINT const& stitchP
   form::fltspac(vertex + 1U, 1U);
   ++(form.vertexCount);
   auto vertexIt =
-      std::next(FormVertices->begin(), gsl::narrow_cast<ptrdiff_t>(form.vertexIndex) + vertex + 1U);
+      std::next(FormVertices->begin(), gsl::narrow<ptrdiff_t>(form.vertexIndex) + vertex + 1U);
   *vertexIt = stitchPoint;
   if (form.satinGuideCount != 0U) {
 	auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
@@ -6658,7 +6658,7 @@ void form::dulens(uint32_t sides) {
   }
   FormVertices->push_back(point);
   auto       vertexIt = std::next(FormVertices->begin(),
-                            gsl::narrow_cast<ptrdiff_t>(currentForm.vertexIndex + iVertex - 1U));
+                            gsl::narrow<ptrdiff_t>(currentForm.vertexIndex + iVertex - 1U));
   auto const av       = stitchPoint.x;
   for (; iVertex != 1; --iVertex) {
 	FormVertices->push_back(fPOINT {av + av - (*vertexIt).x, (*vertexIt).y});
@@ -7318,7 +7318,7 @@ void form::internal::duprots(float rotationAngle, fPOINT const& rotationCenter) 
   thred::rngadj();
   ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size());
   auto sourceIt     = std::next(StitchBuffer->begin(), GroupStartStitch);
-  auto endPoint = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U);
+  auto endPoint = std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U);
   while (sourceIt < endPoint) {
 	StitchBuffer->push_back(
 	    fPOINTATTR {(*sourceIt).x, (*sourceIt).y, (*sourceIt).attribute & (~(FRMSK | TYPMSK))});
@@ -7379,7 +7379,7 @@ void form::cpylayr(uint32_t layer) {
 		thred::savdo();
 		thred::rngadj();
 		auto const codedStitchLayer = layer << LAYSHFT;
-		auto endStitch = std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(GroupEndStitch) + 1U);
+		auto endStitch = std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch) + 1U);
 		for (auto currentStitch = std::next(StitchBuffer->begin(), GroupStartStitch); currentStitch < endStitch;
 		     ++currentStitch) {
 		  StitchBuffer->push_back(fPOINTATTR {
@@ -7446,7 +7446,7 @@ void form::join() {
   auto const savedFormIndex = ClosestFormToCursor;
   auto&      savedform      = FormList->operator[](ClosestFormToCursor);
   auto       lastVertex     = std::next(FormVertices->begin(),
-										gsl::narrow_cast<ptrdiff_t>(savedform.vertexIndex) + savedform.vertexCount - 1U);
+										gsl::narrow<ptrdiff_t>(savedform.vertexIndex) + savedform.vertexCount - 1U);
   // clang-format on
   StateMap->set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap->test(StateFlag::FORMSEL) && form::closfrm()) {
@@ -8310,7 +8310,7 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	auto stitchStart = std::next(StitchBuffer->begin(), start);
 	std::copy(highStitchBuffer.begin(), highStitchBuffer.end(), stitchStart);
 	StitchBuffer->erase(std::next(StitchBuffer->begin(), start + highStitchBuffer.size()),
-	                    std::next(StitchBuffer->begin(), gsl::narrow_cast<ptrdiff_t>(finish) + 1U));
+	                    std::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(finish) + 1U));
   }
   finish = start + wrap::toUnsigned(highStitchBuffer.size() - 1U);
 }
@@ -8374,7 +8374,7 @@ auto form::internal::spltlin() -> bool {
 	return false;
   }
   auto vertexIt = std::next(FormVertices->begin(),
-                            gsl::narrow_cast<ptrdiff_t>(srcForm.vertexIndex) + ClosestVertexToCursor);
+                            gsl::narrow<ptrdiff_t>(srcForm.vertexIndex) + ClosestVertexToCursor);
 
   auto const stitchPoint = *vertexIt;
   fi::nufpnt(ClosestVertexToCursor, srcForm, stitchPoint);
