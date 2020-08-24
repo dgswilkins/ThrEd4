@@ -122,6 +122,13 @@ auto wrap::toUnsigned(int invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
 }
 
+// this is used in 64bit mode only. In 32 bit, ptrdiff_t is an int
+#ifdef _WIN64
+auto wrap::toUnsigned(ptrdiff_t invar) -> uint32_t {
+  return gsl::narrow<uint32_t>(invar);
+}
+#endif
+
 // since this is used in other translation units, "constexpr"
 // cannot be used as it implicitly defines the function as inline.
 #pragma warning(suppress : 26497 26440)

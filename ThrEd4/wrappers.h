@@ -73,6 +73,9 @@ auto toSize(long invar) noexcept -> size_t;
 auto toSize(uintmax_t invar) noexcept -> size_t;
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
+#ifdef _WIN64
+auto toUnsigned(ptrdiff_t invar) -> uint32_t;
+#endif
 auto wcstof(wchar_t const* buffer) -> float;
 
 template <class outType> void wcstoul(outType& outvar, wchar_t const* invar) {
