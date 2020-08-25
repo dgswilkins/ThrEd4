@@ -87,6 +87,10 @@ auto wrap::toFloat(double invar) -> float {
   return result;
 }
 
+auto wrap::toFloat(int16_t invar) noexcept -> float {
+  return gsl::narrow_cast<float>(invar);
+}
+
 auto wrap::toFloat(int32_t invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
@@ -95,27 +99,12 @@ auto wrap::toFloat(LONG invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
-auto wrap::toFloat(unsigned long invar) noexcept -> float {
-  return gsl::narrow_cast<float>(invar);
-}
-
 auto wrap::toFloat(uint32_t invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
-auto wrap::toFloat(int16_t invar) noexcept -> float {
+auto wrap::toFloat(unsigned long invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
-}
-
-// since this is used in other translation units, "constexpr"
-// cannot be used as it implicitly defines the function as inline.
-#pragma warning(suppress : 26497 26440)
-auto wrap::toUnsigned(size_t invar) -> uint32_t {
-#ifdef _WIN64
-  return gsl::narrow<uint32_t>(invar);
-#else
-  return invar;
-#endif
 }
 
 auto wrap::toUnsigned(int invar) -> uint32_t {
@@ -132,11 +121,49 @@ auto wrap::toUnsigned(ptrdiff_t invar) -> uint32_t {
 // since this is used in other translation units, "constexpr"
 // cannot be used as it implicitly defines the function as inline.
 #pragma warning(suppress : 26497 26440)
+auto wrap::toUnsigned(size_t invar) -> uint32_t {
+#ifdef _WIN64
+  return gsl::narrow<uint32_t>(invar);
+#else
+  return invar;
+#endif
+}
+
+auto wrap::toSize(int invar) -> size_t {
+  return gsl::narrow_cast<size_t>(invar);
+}
+
+auto wrap::toSize(long invar) noexcept -> size_t {
+  return gsl::narrow<size_t>(invar);
+}
+
+// this is used in 64bit mode only. In 32 bit, ptrdiff_t is an int
+#ifdef _WIN64
+auto wrap::toSize(ptrdiff_t invar) -> size_t {
+  return gsl::narrow_cast<size_t>(invar);
+}
+#endif
+
+auto wrap::toSize(uint16_t invar) -> size_t {
+  return gsl::narrow_cast<size_t>(invar);
+}
+
+// since this is used in other translation units, "constexpr"
+// cannot be used as it implicitly defines the function as inline.
+#pragma warning(suppress : 26497 26440)
 auto wrap::toSize(uint32_t invar) noexcept -> size_t {
 #ifdef _WIN64
   return gsl::narrow_cast<size_t>(invar);
 #else
   return invar;
+#endif
+}
+
+auto wrap::toSize(DWORD invar) noexcept -> size_t {
+#ifdef _WIN64
+  return gsl::narrow_cast<size_t>(invar);
+#else
+  return gsl::narrow<size_t>(invar);
 #endif
 }
 
@@ -149,18 +176,6 @@ auto wrap::toSize(uintmax_t invar) noexcept -> size_t {
 #else
   return gsl::narrow<size_t>(invar);
 #endif
-}
-
-auto wrap::toSize(DWORD invar) noexcept -> size_t {
-  return gsl::narrow_cast<size_t>(invar);
-}
-
-auto wrap::toSize(int invar) -> size_t {
-  return gsl::narrow<size_t>(invar);
-}
-
-auto wrap::toSize(long invar) noexcept -> size_t {
-  return gsl::narrow<size_t>(invar);
 }
 
 void wrap::setCursor(HCURSOR hCursor) noexcept {

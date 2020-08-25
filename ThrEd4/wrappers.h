@@ -40,6 +40,10 @@ template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
 }
 
+template <class inIt, class inIn> auto next(inIt iterator, inIn index) -> inIt {
+  return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
+}
+
 template <class outType, class inType> void narrow(outType& outvar, inType invar) {
   outvar = gsl::narrow<outType>(invar);
 }
@@ -66,9 +70,13 @@ auto toFloat(LONG invar) noexcept -> float;
 auto toFloat(unsigned long invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
 auto toFloat(int16_t invar) noexcept -> float;
+auto toSize(uint16_t invar) noexcept -> size_t;
 auto toSize(uint32_t invar) noexcept -> size_t;
 auto toSize(DWORD invar) noexcept -> size_t;
 auto toSize(int invar) -> size_t;
+#ifdef _WIN64
+auto toSize(ptrdiff_t invar) -> size_t;
+#endif
 auto toSize(long invar) noexcept -> size_t;
 auto toSize(uintmax_t invar) noexcept -> size_t;
 auto toUnsigned(size_t invar) -> uint32_t;
