@@ -351,7 +351,7 @@ void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
   txi::txtxfn(ref, offsetPixels);
 }
 
-void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) {
+void texture::internal::txrct2rct(TXTRCT const& textureRect, RECT& rectangle) noexcept {
   auto texturePoint = TXPNT {textureRect.top, textureRect.left};
   auto point        = POINT {0L, 0L};
   txi::txt2pix(texturePoint, point);
@@ -808,7 +808,7 @@ void texture::internal::ritxfrm(FRMHED const& textureForm) {
   wrap::Polyline(StitchWindowDC, formLines.data(), vertexCount);
 }
 
-void texture::internal::setxfrm() {
+void texture::internal::setxfrm() noexcept {
   auto angleRect = fRECTANGLE {};
   txi::angrct(angleRect);
   auto& angledFormVertices = *AngledFormVertices;

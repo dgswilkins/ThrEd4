@@ -67,7 +67,7 @@ namespace internal {
   void ritxfrm(FRMHED const& textureForm);
   void ritxrct();
   void setxclp(FRMHED const& form);
-  void setxfrm();
+  void setxfrm() noexcept;
   void setxmov();
   void stxlin();
   void txang(FRMHED& form);
@@ -83,7 +83,7 @@ namespace internal {
   void txnudg(int32_t deltaX, float deltaY);
   void txpar(FRMHED& form);
   void txrbak() noexcept;
-  void txrct2rct(TXTRCT const& textureRect, RECT& rectangle);
+  void txrct2rct(TXTRCT const& textureRect, RECT& rectangle) noexcept;
   void txrfor() noexcept;
   void txshrnk(FRMHED const& textureForm);
   void txsiz(float ratio, FRMHED const& textureForm);

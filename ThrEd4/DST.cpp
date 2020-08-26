@@ -367,7 +367,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   return iDistance;
 }
 
-auto DST::internal::dudbits(POINT const& dif) noexcept -> uint32_t {
+auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
   static constexpr auto dstLen = 243U; // -121 to 121
   static constexpr auto xDST   = std::array<uint32_t, dstLen> {
       0x090a0a, //-121
