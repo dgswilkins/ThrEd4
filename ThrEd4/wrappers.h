@@ -61,6 +61,16 @@ template <class outType, class inType> auto round(inType invar) -> outType {
   return gsl::narrow<outType>(std::lround(invar));
 }
 
+#ifdef _WIN64
+template <class inType> auto ptrdiff(inType invar) noexcept -> ptrdiff_t {
+    return gsl::narrow_cast<ptrdiff_t>(invar);
+}
+#else
+ template <class inType> auto ptrdiff(inType invar) -> ptrdiff_t {
+   return gsl::narrow<ptrdiff_t>(invar);
+}
+#endif
+
 void setCursor(HCURSOR hCursor) noexcept;
 void setSideWinVal(int index) noexcept;
 void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
@@ -70,15 +80,23 @@ auto toFloat(LONG invar) noexcept -> float;
 auto toFloat(unsigned long invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
 auto toFloat(int16_t invar) noexcept -> float;
+auto toSize(int32_t invar) -> size_t;
+auto toSize(long invar) -> size_t;
 auto toSize(uint16_t invar) noexcept -> size_t;
 auto toSize(uint32_t invar) noexcept -> size_t;
-auto toSize(DWORD invar) noexcept -> size_t;
-auto toSize(int invar) -> size_t;
 #ifdef _WIN64
-auto toSize(ptrdiff_t invar) -> size_t;
+auto toSize(DWORD invar) noexcept -> size_t;
+#else
+auto toSize(DWORD invar) -> size_t;
 #endif
-auto toSize(long invar) noexcept -> size_t;
+#ifdef _WIN64
+auto toSize(ptrdiff_t invar) noexcept -> size_t;
+#endif
+#ifdef _WIN64
 auto toSize(uintmax_t invar) noexcept -> size_t;
+#else
+auto toSize(uintmax_t invar) -> size_t;
+#endif
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
 #ifdef _WIN64
