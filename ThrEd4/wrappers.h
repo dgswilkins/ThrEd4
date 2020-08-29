@@ -82,6 +82,9 @@ auto toFloat(uint32_t invar) noexcept -> float;
 auto toFloat(int16_t invar) noexcept -> float;
 auto toSize(int32_t invar) -> size_t;
 auto toSize(long invar) -> size_t;
+#ifdef _WIN64
+auto toSize(ptrdiff_t invar) noexcept -> size_t;
+#endif
 auto toSize(uint16_t invar) noexcept -> size_t;
 auto toSize(uint32_t invar) noexcept -> size_t;
 #ifdef _WIN64
@@ -90,15 +93,13 @@ auto toSize(DWORD invar) noexcept -> size_t;
 auto toSize(DWORD invar) -> size_t;
 #endif
 #ifdef _WIN64
-auto toSize(ptrdiff_t invar) noexcept -> size_t;
-#endif
-#ifdef _WIN64
 auto toSize(uintmax_t invar) noexcept -> size_t;
 #else
 auto toSize(uintmax_t invar) -> size_t;
 #endif
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
+auto toUnsigned(long invar) -> uint32_t;
 #ifdef _WIN64
 auto toUnsigned(ptrdiff_t invar) -> uint32_t;
 #endif

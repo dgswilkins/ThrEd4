@@ -111,6 +111,10 @@ auto wrap::toUnsigned(int invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
 }
 
+auto wrap::toUnsigned(long invar) -> uint32_t {
+  return gsl::narrow<uint32_t>(invar);
+}
+
 // this is used in 64bit mode only. In 32 bit, ptrdiff_t is an int
 #ifdef _WIN64
 auto wrap::toUnsigned(ptrdiff_t invar) -> uint32_t {
