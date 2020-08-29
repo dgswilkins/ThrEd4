@@ -69,6 +69,7 @@ constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll ba
 constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF = 15.0;              // mouse click region for select
+constexpr auto     FCLOSENUF = gsl::narrow_cast<float>(CLOSENUF);
 constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
 constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
 constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
@@ -92,7 +93,6 @@ constexpr float    PI_F2    = PI_F * 2.0F;       //
 constexpr float    PI_FHALF = PI_F / 2.0F;       //
 constexpr double   PI       = 3.141592653589793; // PI to double precision
 constexpr double   PI2      = PI * 2.0;          //
-constexpr double MAXSTCH = 54.0; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
 constexpr float  USPAC   = 15.0F;          // underlay fill spacing
 constexpr float  APSPAC  = 10.8F;          // applique border spacing
 constexpr uint32_t OSEQLEN = 0x40000U;     // output sequence length
@@ -406,7 +406,7 @@ enum daisyStyles { // daisy form types
 };
 
 // bitmap
-enum class StateFlag {
+enum class StateFlag : uint32_t {
   SATIN,   // user is entering a satin stitch form
   SATPNT,  // user is entering points for a satin stitch form
   BOXZUM,  // box zoom select mode
@@ -669,7 +669,7 @@ enum class StateFlag {
 };
 
 // user bitmap
-enum class UserFlag {
+enum class UserFlag : uint32_t {
   SQRFIL,   // square ends on fills
   BLUNT,    // blunt ends on satin lines
   NEDOF,    // needle cursor off
@@ -686,6 +686,7 @@ enum class UserFlag {
   DAZD,     // daisy d-lines
   CHREF,    // refill forms when changing design size
   WRNOF,    // warn if edited off
+
   EnumCount // must be the last entry in the enum
 };
 
@@ -2623,8 +2624,8 @@ constexpr auto SEQBOT = 3;
 class PVEC
 {
   public:
-  double angle {0.0};
-  double length {0.0};
+  float angle {0.0F};
+  float length {0.0F};
 
   // constexpr PVEC() noexcept = default;
   // PVEC(PVEC&&) = default;
