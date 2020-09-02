@@ -20,9 +20,9 @@
 
 // C RunTime Header Files
 #include <commdlg.h>
-#include <htmlhelp.h>
+#include <HtmlHelp.h>
 #include <shellapi.h>
-#include <shlobj.h>
+#include <ShlObj.h>
 
 // Standard Libraries
 #include <bitset>
