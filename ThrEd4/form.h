@@ -361,7 +361,7 @@ namespace internal {
               std::vector<RCON> const&       pathMap,
               std::vector<uint32_t> const&   mapIndexSequence,
               boost::dynamic_bitset<> const& visitedRegions,
-              uint32_t                       pathLength,
+              ptrdiff_t                      pathLength,
               uint32_t                       doneRegion,
               uint32_t                       sequencePathIndex) -> bool;
   auto nucseg(std::vector<CLPSEG> const&  clipSegments,
@@ -467,7 +467,7 @@ namespace internal {
              fPOINT const& topRightPoint);
   void unbean(uint32_t start, uint32_t& finish);
   void uncon();
-  auto leftsid(std::vector<fPOINT> const& currentFormVertices) -> uint32_t;
+  auto leftsid(std::vector<fPOINT> const& currentFormVertices) noexcept -> uint32_t;
   auto unvis(boost::dynamic_bitset<> const& visitedRegions, int32_t& visitedIndex) -> bool;
   auto vscmp(uint32_t index1, uint32_t index2) noexcept -> bool;
 } // namespace internal
