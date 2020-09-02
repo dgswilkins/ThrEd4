@@ -43,10 +43,10 @@ namespace ffi = formForms::internal;
 constexpr auto textMargin  = 3L;
 constexpr auto textMargin2 = 6L;
 
-RECT  LabelWindowCoords; // location of left windows in the form data sheet
-POINT LabelWindowSize;   // size of the left windows in the form data sheet
-RECT  ValueWindowCoords; // location of right windows in the form data sheet
-POINT ValueWindowSize;   // size of the right windows in the form data sheet
+static auto LabelWindowCoords = RECT {};  // location of left windows in the form data sheet
+static auto LabelWindowSize   = POINT {}; // size of the left windows in the form data sheet
+static auto ValueWindowCoords = RECT {};  // location of right windows in the form data sheet
+static auto ValueWindowSize   = POINT {}; // size of the right windows in the form data sheet
 
 auto const DaisyTypeStrings = std::array<uint16_t, 6> {
     IDS_DAZCRV,
@@ -325,7 +325,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	ffi::nxtlin(formMenuEntryCount);
   }
   labelWindow[LBRD] = ffi::txtwin(stringTable[STR_TXT7], LabelWindowCoords);
-  auto edgeFillType = form.edgeType & NEGUND;
+  auto edgeFillType = gsl::narrow_cast<uint8_t>(form.edgeType & NEGUND);
   if (edgeFillType >= EDGELAST) {
 	edgeFillType = EDGELAST - 1U;
   }
@@ -435,7 +435,7 @@ void formForms::refrm() {
                                ButtonWidthX3 + 3,
                                3,
                                LabelWindowSize.x + ValueWindowSize.x + 18,
-                               LabelWindowSize.y * formMenuEntryCount + 12,
+                               LabelWindowSize.y * gsl::narrow<LONG>(formMenuEntryCount) + 12,
                                ThrEdWindow,
                                nullptr,
                                ThrEdInstance,
@@ -805,7 +805,7 @@ void formForms::dasyfrm() {
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
-	auto const holeSegmentAngle = PI_F2 / holeVertexCount;
+	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
 	FormVertices->push_back(
 	    fPOINT {referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle)});
 	++iVertex;
@@ -824,8 +824,8 @@ void formForms::dasyfrm() {
 	petalPointCount  = (IniFile.daisyHeartCount + 1U) * 2U;
 	petalVertexCount = IniFile.daisyPetalCount * petalPointCount;
   }
-  auto const petalSegmentAngle = PI_F2 / petalVertexCount;
-  auto const deltaPetalAngle   = PI_F / IniFile.daisyPetalPoints;
+  auto const petalSegmentAngle = PI_F2 / wrap::toFloat(petalVertexCount);
+  auto const deltaPetalAngle   = PI_F / wrap::toFloat(IniFile.daisyPetalPoints);
   if (UserFlagMap->test(UserFlag::DAZD)) {
 	form.satinGuideCount    = IniFile.daisyPetalCount - 1U;
 	form.wordParam          = IniFile.daisyPetalCount * IniFile.daisyInnerCount + 1U;
@@ -891,21 +891,23 @@ void formForms::dasyfrm() {
 	                                  referencePoint.y + sin(angle) * distanceFromDaisyCenter});
 	  ++iVertex;
 	  angle += petalSegmentAngle;
-	  auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		guideIt[iMacroPetal].start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
-		guideIt[iMacroPetal].finish = iVertex;
+		auto guideIt   = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
+		guideIt->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
+		guideIt->finish = iVertex;
 	  }
 	}
   }
-  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
+  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
 
   constexpr auto holeMargin = 0.01F;
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
+	  auto vRef = wrap::next(vertexIt, fref - 1U);
 	// cppcheck-suppress unreadVariable
-	vertexIt[fref - 1U].y += holeMargin;
+	vRef->y += holeMargin;
+	++vRef;
 	// cppcheck-suppress unreadVariable
-	vertexIt[fref].y += holeMargin;
+	vRef->y += holeMargin;
   }
   form.vertexCount = iVertex;
   if (UserFlagMap->test(UserFlag::DAZD)) {
@@ -915,8 +917,9 @@ void formForms::dasyfrm() {
   StateMap->set(StateFlag::INIT);
   form::frmout(wrap::toUnsigned(FormList->size() - 1U));
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; ++iMacroPetal) {
-	vertexIt[iMacroPetal].x -= form.rectangle.left;
-	vertexIt[iMacroPetal].y -= form.rectangle.bottom;
+	vertexIt->x -= form.rectangle.left;
+	vertexIt->y -= form.rectangle.bottom;
+	++vertexIt;
   }
   FormMoveDelta      = fPOINT {};
   NewFormVertexCount = iVertex + 1U;
@@ -1023,37 +1026,41 @@ void formForms::setear() {
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
 	auto&      form             = FormList->back();
-	auto       vertexIt         = std::next(FormVertices->begin(), form.vertexIndex);
+	auto       vBegin           = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto vNext = std::next(vBegin);
 	auto const count            = wrap::toSize(form.vertexCount) / 4U;
-	auto const middle           = wrap::midl(vertexIt[1].x, vertexIt[0].x);
-	auto       step             = vertexIt[count + 1U].y - vertexIt[count].y;
-	auto       verticalPosition = vertexIt[count + 1U].y;
-	auto       iLeftVertices    = wrap::toSize(form.vertexCount) - count;
-	auto       iRightVertices   = count + 1U;
+	auto const middle           = wrap::midl(vNext->x, vBegin->x);
+	auto       vLast            = wrap::next(vBegin, count + 1U);
+	auto       verticalPosition = vLast->y;
+	--vLast;
+	auto step           = verticalPosition - vLast->y;
+	auto vLeft = wrap::next(vBegin, wrap::toSize(form.vertexCount) - count);
+	auto vRight = wrap::next(vBegin, count + 1U);
 	for (auto iStep = 0U; iStep < count; ++iStep) {
-	  vertexIt[iLeftVertices].y  = verticalPosition;
-	  vertexIt[iRightVertices].y = vertexIt[iLeftVertices].y;
-	  vertexIt[iRightVertices].x += twistStep;
-	  vertexIt[iLeftVertices].x += twistStep;
+	  vLeft->y  = verticalPosition;
+	  vRight->y = vLeft->y;
+	  vRight->x += twistStep;
+	  vLeft->x += twistStep;
 	  twistStep *= IniFile.tearTwistRatio;
 	  verticalPosition -= step;
 	  step *= IniFile.tearTailLength;
-	  --iRightVertices;
-	  ++iLeftVertices;
+	  --vRight;
+	  ++vLeft;
 	}
-	vertexIt[0].y = vertexIt[1].y = verticalPosition;
-	vertexIt[0].x += twistStep;
-	vertexIt[1].x += twistStep;
+	vBegin->y = vNext->y = verticalPosition;
+	vBegin->x += twistStep;
+	vNext->x += twistStep;
 	verticalPosition -= step / 2.0F;
-	FormVertices->push_back(vertexIt[0]);
-	vertexIt = std::next(FormVertices->begin(), form.vertexIndex); // iterator invalidated by push_back
+	FormVertices->push_back(*vBegin);
+	vBegin = wrap::next(FormVertices->begin(), form.vertexIndex); // iterator invalidated by push_back
+	vNext = std::next(vBegin);
 	if (twistStep != 0.0F) {
-	  vertexIt[0].x = vertexIt[1].x + twistStep / twistFactor;
+	  vBegin->x = vNext->x + twistStep / twistFactor;
 	}
 	else {
-	  vertexIt[0].x = middle;
+	  vBegin->x = middle;
 	}
-	vertexIt[0].y = verticalPosition;
+	vBegin->y = verticalPosition;
 	++(form.vertexCount);
 	++NewFormVertexCount;
 	StateMap->set(StateFlag::FORMSEL);
@@ -1062,24 +1069,28 @@ void formForms::setear() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const size =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = UnzoomedRect.x / twistFactor / size.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / twistFactor / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = UnzoomedRect.y / twistFactor / size.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / twistFactor / size.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}
 	if (horizontalRatio < 1.0F) {
+		auto vScaled = vBegin;
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		vertexIt[iVertex].x = (vertexIt[iVertex].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
-		vertexIt[iVertex].y = (vertexIt[iVertex].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
+		vScaled->x = (vScaled->x - vBegin->x) * horizontalRatio + vBegin->x;
+		vScaled->y = (vScaled->y - vBegin->y) * horizontalRatio + vBegin->y;
+		++vScaled;
 	  }
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	auto vShifted = vBegin;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  vertexIt[iVertex].x -= form.rectangle.left;
-	  vertexIt[iVertex].y -= form.rectangle.bottom;
+	  vShifted->x -= form.rectangle.left;
+	  vShifted->y -= form.rectangle.bottom;
+	  ++vShifted;
 	}
   }
 }
@@ -1170,45 +1181,50 @@ void formForms::wavfrm() {
 	form::mdufrm();
 	auto iPoint    = 0U;
 	auto waveIndex = IniFile.waveStart;
-	auto vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
+	auto vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  points.emplace_back(-vertexIt[iNextVertex].x + vertexIt[waveIndex].x,
-	                      -vertexIt[iNextVertex].y + vertexIt[waveIndex].y);
+	  auto vNext = wrap::next(vBegin, iNextVertex);
+	  auto vWave = wrap::next(vBegin, waveIndex);
+	  points.emplace_back(-vNext->x + vWave->x,
+	                      -vNext->y + vWave->y);
 	  ++iPoint;
 	  waveIndex = iNextVertex;
 	}
 	auto const count            = iPoint;
-	auto       iVertex          = 0U;
 	auto       currentPosition  = fPOINT {};
 	auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
 	                              IniFile.wavePoints; // account for vertices already allocated by durpoli above
 	FormVertices->resize(FormVertices->size() + formVerticesSize);
-	vertexIt = std::next(FormVertices->begin(), form.vertexIndex); // resize may invalidate iterator
+	vBegin = wrap::next(FormVertices->begin(), form.vertexIndex); // resize may invalidate iterator
+	auto vertexIt = vBegin;
 	for (auto iLobe = 0U; iLobe < IniFile.waveLobes; ++iLobe) {
 	  if ((iLobe & 1U) != 0U) {
 		for (auto index = 0U; index < count; ++index) {
-		  vertexIt[iVertex] = currentPosition;
-		  ++iVertex;
+		  *vertexIt = currentPosition;
+		  ++vertexIt;
 		  currentPosition.x += points[index].x;
 		  currentPosition.y += points[index].y;
 		}
 	  }
 	  else {
 		for (auto index = count; index != 0; --index) {
-		  vertexIt[iVertex] = currentPosition;
-		  ++iVertex;
+		  *vertexIt = currentPosition;
+		  ++vertexIt;
 		  currentPosition.x += points[index - 1U].x;
 		  currentPosition.y += points[index - 1U].y;
 		}
 	  }
 	}
-	vertexIt[iVertex]      = currentPosition;
-	auto const vertexCount = iVertex + 1U;
-	auto const rotationAngle =
-	    -atan2(vertexIt[iVertex].y - vertexIt[0].y, vertexIt[iVertex].x - vertexIt[0].x);
+	*vertexIt = currentPosition;
+
+	auto const vertexCount   = wrap::distance<uint32_t>(vBegin, vertexIt) + 1U;
+	auto const rotationAngle = -atan2(vertexIt->y - vBegin->y, vertexIt->x - vBegin->x);
+
+	auto vRotate = vBegin;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  thred::rotflt(vertexIt[index], rotationAngle, {0.0, 0.0});
+	  thred::rotflt(*vRotate, rotationAngle, {0.0, 0.0});
+	  ++vRotate;
 	}
 	form.type        = FRMLINE;
 	form.vertexCount = vertexCount;
@@ -1216,24 +1232,28 @@ void formForms::wavfrm() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = UnzoomedRect.x / wavSize / selectedSize.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / wavSize / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = UnzoomedRect.y / wavSize / selectedSize.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / wavSize / selectedSize.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}
 	if (horizontalRatio < 1.0F) {
+	  auto vScaled = vBegin;
 	  for (auto index = 0U; index < vertexCount; ++index) {
-		vertexIt[index].x = (vertexIt[index].x - vertexIt[0].x) * horizontalRatio + vertexIt[0].x;
-		vertexIt[index].y = (vertexIt[index].y - vertexIt[0].y) * horizontalRatio + vertexIt[0].y;
+		vScaled->x = (vScaled->x - vBegin->x) * horizontalRatio + vBegin->x;
+		vScaled->y = (vScaled->y - vBegin->y) * horizontalRatio + vBegin->y;
+		++vScaled;
 	  }
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	auto vShifted = vBegin;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  vertexIt[index].x -= form.rectangle.left;
-	  vertexIt[index].y -= form.rectangle.bottom;
+	  vShifted->x -= form.rectangle.left;
+	  vShifted->y -= form.rectangle.bottom;
+	  ++vShifted;
 	}
 	FormMoveDelta      = fPOINT {};
 	NewFormVertexCount = vertexCount + 1U;
