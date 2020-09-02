@@ -54,7 +54,7 @@ class PCSHEADER // pcs file header structure
 
 namespace pci = PCS::internal;
 
-auto PCSHeader = PCSHEADER {}; // pcs file header
+auto static PCSHeader = PCSHEADER {}; // pcs file header
 
 auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool {
   auto flag = true;
@@ -155,7 +155,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			UserColor[iColor] = PCSHeader.colors[iColor];
 		  }
 		  fileSize -= sizeof(PCSHeader) + 14;
-		  auto const pcsStitchCount = fileSize / sizeof(PCSTCH);
+		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));
 		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
 		  PCSDataBuffer.resize(pcsStitchCount);
 		  ReadFile(fileHandle, PCSDataBuffer.data(), wrap::toUnsigned(PCSDataBuffer.size()), &bytesRead, nullptr);
@@ -316,10 +316,10 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 	  auto fileSize = uintmax_t {0};
 	  thred::getFileSize(insertedFile, fileSize);
 	  fileSize -= sizeof(pcsFileHeader) + 14;
-	  auto const pcsStitchCount  = fileSize / sizeof(PCSTCH);
+	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCSTCH));
 	  auto       pcsStitchBuffer = std::vector<PCSTCH> {};
 	  pcsStitchBuffer.resize(pcsStitchCount);
-	  ReadFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, nullptr);
+	  ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 	  if (bytesRead == fileSize) {
 		thred::savdo();
 		auto insertIndex = StitchBuffer->size();
