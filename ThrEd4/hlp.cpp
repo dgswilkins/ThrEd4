@@ -30,15 +30,13 @@
 #include "thred.h"
 #include "hlp.h"
 
-HWND HelpWindow; // help window
-
 void hlp::help() {
   auto helpFileName = std::wstring {};
   displayText::loadString(helpFileName, IDS_HELPFN);
   auto const* homeDir = thred::getHomeDir();
   if (nullptr != homeDir) {
-	auto helpfile = *homeDir / helpFileName;
-	HelpWindow    = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
+	auto       helpfile   = *homeDir / helpFileName;
+	auto const HelpWindow = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
 	if (nullptr == HelpWindow) {
 	  displayText::tabmsg(IDS_NOHLP);
 	}
