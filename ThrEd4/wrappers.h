@@ -40,6 +40,10 @@ template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
 }
 
+template <class outType, class inIt> auto distance(inIt start, inIt end) noexcept -> outType {
+  return gsl::narrow<outType>(std::distance(start, end));
+}
+
 template <class inIt, class inIn> auto next(inIt iterator, inIn index) -> inIt {
   return std::next(iterator, gsl::narrow<ptrdiff_t>(index));
 }
