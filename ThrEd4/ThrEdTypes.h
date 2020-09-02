@@ -702,8 +702,8 @@ enum featherStyles { // feather fill types
 constexpr int32_t FDEFTYP = FTHPSG; // default feather type
 
 // edge fill types
-enum edgeFillStyles {
-  EDGELINE = 1, // Line
+enum edgeFillStyles : uint8_t {
+  EDGELINE = 1U, // Line
   EDGEBEAN,     // Bean
   EDGECLIP,     // Clipboard
   EDGEANGSAT,   // Angle Satin
