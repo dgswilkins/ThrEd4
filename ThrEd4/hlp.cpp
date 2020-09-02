@@ -36,6 +36,7 @@ void hlp::help() {
   auto const* homeDir = thred::getHomeDir();
   if (nullptr != homeDir) {
 	auto       helpfile   = *homeDir / helpFileName;
+	#pragma warning(suppress : 26462) // con.4
 	auto const HelpWindow = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
 	if (nullptr == HelpWindow) {
 	  displayText::tabmsg(IDS_NOHLP);
