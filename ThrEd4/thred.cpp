@@ -12507,7 +12507,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto const adjustedPoint =
 	      fPOINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
 	              gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
-	  if (hypot(adjustedPoint.x, adjustedPoint.y) < CLOSENUF) {
+	  if (hypot(adjustedPoint.x, adjustedPoint.y) < FCLOSENUF) {
 		StateMap->set(StateFlag::MOVCNTR);
 		unrot();
 		ritrot(0, thred::pxCor2stch(Msg.pt));
