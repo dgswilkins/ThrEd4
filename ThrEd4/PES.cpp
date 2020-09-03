@@ -35,13 +35,8 @@ constexpr auto PECScale    = 5.0F / 3.0F;
 constexpr auto invPECScale = 3.0F / 5.0F;
 constexpr auto bitsPerByte = 8U;
 
-uint8_t* PEScolors;                   // pes colors
-uint8_t* PESdata;                     // pes card data buffer
-fPOINT   PESstitchCenterOffset;       // offset for writing pes files
-PESTCH*  PESstitches;                 // pes stitch buffer
-uint8_t  PESequivColors[COLOR_COUNT]; // pes equivalent colors
-uint8_t* PESstitch;                   // pes stitches
-uint32_t PEScolorIndex;               // pes color index
+auto static PEScolors             = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
+auto static PESequivColors        = std::array<uint8_t, COLOR_COUNT> {}; // pes equivalent colors
 
 THREAD const PESThread[] = {
     {{0x00, 0x00, 0x00}, "Unknown", ""},                // Index  00
@@ -167,13 +162,13 @@ auto PES::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& color
                                          (((767 - meanR) * deltaB * deltaB) / 256)));
 }
 
-void PES::internal::ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch) {
+void PES::internal::ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch, fPOINT const& offset) {
   constexpr auto factor  = 3.0F / 5.0F;
   auto const     oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESTCH));
   auto*      pesStitch    = convert_ptr<PESTCH*>(&buffer[oldSize]);
-  auto const scaledStitch = fPOINT {-stitch.x * factor + PESstitchCenterOffset.x,
-                                    stitch.y * factor - PESstitchCenterOffset.y};
+  auto const scaledStitch = fPOINT {-stitch.x * factor + offset.x,
+                                    stitch.y * factor - offset.y};
   pesStitch->x            = wrap::round<int16_t>(scaledStitch.x);
   pesStitch->y            = wrap::round<int16_t>(scaledStitch.y);
 }
@@ -260,7 +255,6 @@ void PES::internal::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
 void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader = convert_ptr<PECHDR*>(buffer.data());
   auto& pad       = pecHeader->pad;
-  PESdata         = buffer.data();
   PEScolors       = std::begin(pad);
   auto thisStitch = fPOINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
@@ -339,9 +333,9 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   pi::writeThumbnail(pecBuffer, p_thumbnail);
 }
 
-auto PES::internal::dupcol(uint32_t activeColor) -> uint32_t {
+auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
   constexpr auto threadSize  = sizeof(PESThread) / sizeof(PESThread[0]);
-  auto const     threadColor = PESThread[PEScolors[PEScolorIndex++] % threadSize];
+  auto const     threadColor = PESThread[PEScolors[index++] % threadSize];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
@@ -388,7 +382,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
   // auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
   auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-  PESstitch                  = &fileBuffer[pecOffset];
+  auto       PESstitch       = &fileBuffer[pecOffset];
   auto const pesColorCount   = pecHeader->colorCount + 1U;
   auto&      pad             = pecHeader->pad;
   PEScolors                  = std::begin(pad);
@@ -416,7 +410,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	  UserColor[activeColor++] = color;
 	}
   }
-  PEScolorIndex = 1;
+  auto PEScolorIndex = 1U;
   auto loc      = fPOINT {};
   StateMap->reset(StateFlag::FILDIR);
   if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
@@ -435,7 +429,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 		break;
 	  }
 	  if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1U] == 0xb0) {
-		color = pi::dupcol(activeColor);
+		color = pi::dupcol(activeColor, PEScolorIndex);
 		iPESstitch += 2;
 	  }
 	  else {
@@ -531,8 +525,9 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto stitchColor  = StitchBuffer->front().attribute & COLMSK;
 		auto boundingRect = fRECTANGLE {};
 		thred::sizstch(boundingRect, *StitchBuffer);
-		PESstitchCenterOffset.x = wrap::midl(boundingRect.right, boundingRect.left);
-		PESstitchCenterOffset.y = wrap::midl(boundingRect.top, boundingRect.bottom);
+		auto const offset = fPOINT {wrap::midl(boundingRect.right, boundingRect.left),
+		                            wrap::midl(boundingRect.top, boundingRect.bottom)};
+
 		pesHeader.xsiz = wrap::round<uint16_t>((boundingRect.right - boundingRect.left) * PECScale);
 		pesHeader.ysiz = wrap::round<uint16_t>((boundingRect.top - boundingRect.bottom) * PECScale);
 		auto pesBuffer = std::vector<uint8_t> {};
@@ -546,20 +541,20 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// first block is a jump in place
 		pi::ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		++blockIndex;
-		pi::ritpes(pesBuffer, saveStitches[0]);
-		pi::ritpes(pesBuffer, saveStitches[0]);
+		pi::ritpes(pesBuffer, saveStitches[0], offset);
+		pi::ritpes(pesBuffer, saveStitches[0], offset);
 		pi::ritpesCode(pesBuffer);
 		// then a normal stitch in place
 		pi::ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 2});
 		++blockIndex;
-		pi::ritpes(pesBuffer, saveStitches[0]);
-		pi::ritpes(pesBuffer, saveStitches[0]);
+		pi::ritpes(pesBuffer, saveStitches[0], offset);
+		pi::ritpes(pesBuffer, saveStitches[0], offset);
 		pi::ritpesCode(pesBuffer);
 		// then a jump to the first location
 		pi::ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 		++blockIndex;
-		pi::ritpes(pesBuffer, saveStitches[0]);
-		pi::ritpes(pesBuffer, saveStitches[1]);
+		pi::ritpes(pesBuffer, saveStitches[0], offset);
+		pi::ritpes(pesBuffer, saveStitches[1], offset);
 		pi::ritpesCode(pesBuffer);
 		// now stitch out.
 		auto pesThreadCount = 0U;
@@ -570,7 +565,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 		  if (stitchColor == (StitchBuffer->operator[](iStitch).attribute & COLMSK)) {
 			// we are in the same color block, so write the stitch
-			pi::ritpes(pesBuffer, saveStitches[iStitch]);
+			pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
 			++stitchCount;
 		  }
 		  else {
@@ -586,15 +581,15 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 			// then create the jump block
 			pi::ritpesBlock(pesBuffer, PESSTCHLST {1, PESequivColors[stitchColor], 2});
 			++blockIndex;
-			pi::ritpes(pesBuffer, saveStitches[iStitch - 1U]);
-			pi::ritpes(pesBuffer, saveStitches[iStitch]);
+			pi::ritpes(pesBuffer, saveStitches[iStitch - 1U], offset);
+			pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
 			pi::ritpesCode(pesBuffer);
 			// and finally start the next block
 			stitchCount = 0;
 			lastIndex   = pesBuffer.size();
 			pi::ritpesBlock(pesBuffer, PESSTCHLST {0, PESequivColors[stitchColor], 0});
 			++blockIndex;
-			pi::ritpes(pesBuffer, saveStitches[iStitch]);
+			pi::ritpes(pesBuffer, saveStitches[iStitch], offset);
 			++stitchCount;
 		  }
 		}
