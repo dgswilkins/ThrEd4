@@ -268,7 +268,7 @@ void satin::satknkt() {
 }
 
 auto satin::internal::satselfn() -> bool {
-  auto       minimumLength = BIGDOUBLE;
+  auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
@@ -289,7 +289,7 @@ auto satin::internal::satselfn() -> bool {
 	  }
 	}
   }
-  return minimumLength < CLOSENUF;
+  return minimumLength < FCLOSENUF;
 }
 
 void satin::satsel() {
