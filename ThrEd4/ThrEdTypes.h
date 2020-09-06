@@ -1195,6 +1195,7 @@ inline auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
 
 inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
+
 inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
