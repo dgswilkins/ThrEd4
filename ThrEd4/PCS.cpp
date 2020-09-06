@@ -158,8 +158,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));
 		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
 		  PCSDataBuffer.resize(pcsStitchCount);
-		  ReadFile(fileHandle, PCSDataBuffer.data(), wrap::toUnsigned(PCSDataBuffer.size()), &bytesRead, nullptr);
-		  if (bytesRead == wrap::toUnsigned(PCSDataBuffer.size())) {
+		  ReadFile(fileHandle, PCSDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
 			auto iStitch      = uint16_t {0U};
 			auto iColorChange = 0U;
 			auto color        = 0U;
