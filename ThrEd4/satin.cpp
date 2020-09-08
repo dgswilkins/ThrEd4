@@ -71,14 +71,16 @@ auto satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t
 }
 
 void satin::spltsat(uint32_t guideIndex) {
-  auto& currentForm = FormList->operator[](ClosestFormToCursor);
-  auto guideIt      = std::next(SatinGuides->begin(), currentForm.satinOrAngle.guide);
+  {
+	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), currentForm);
+  }
+  auto&      form     = FormList->operator[](ClosestFormToCursor); // insert may have invalidated reference
+  auto guideIt = std::next(SatinGuides->begin(), form.satinOrAngle.guide);
   // We are adding two additional vertices when splitting the form
   auto vertexBuffer = std::vector<fPOINT> {};
-  vertexBuffer.resize(wrap::toSize(currentForm.vertexCount) + 2U);
-  FormList->insert(std::next(FormList->cbegin(), ClosestFormToCursor), currentForm);
+  vertexBuffer.resize(wrap::toSize(form.vertexCount) + 2U);
   // clang-format off
-  auto&      form     = FormList->operator[](ClosestFormToCursor); // insert may have invalidated
   auto const maxForm  = FormList->size();
   auto       position = std::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + form.vertexCount);
   // clang-format on
@@ -88,10 +90,10 @@ void satin::spltsat(uint32_t guideIndex) {
   }
   auto       iOldVertex   = 0U;
   auto       currentGuide = guideIt[guideIndex];
-  auto const oldLastVertex = currentGuide.start + (currentForm.vertexCount - currentGuide.finish) + 1U;
+  auto const oldLastVertex = currentGuide.start + (form.vertexCount - currentGuide.finish) + 1U;
   auto       iNewVertex    = oldLastVertex + 1U;
   auto       vertexIt      = std::next(FormVertices->begin(), form.vertexIndex);
-  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
 	  vertexBuffer[iOldVertex++] = vertexIt[iVertex];
 	  if (iVertex == currentGuide.start) {
