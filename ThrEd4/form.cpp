@@ -8197,14 +8197,11 @@ void form::srtbyfrm() {
 }
 
 void form::cntrx() {
-  auto markCenter = fPOINT {};
-  bool flag       = false;
-  if (StateMap->test(StateFlag::GMRK)) {
-	markCenter = ZoomMarkPoint;
-  }
-  else {
-	markCenter = fPOINT {wrap::toFloat(UnzoomedRect.x) / 2.0F, wrap::toFloat(UnzoomedRect.y) / 2.0F};
-  }
+  auto const markCenter =
+      StateMap->test(StateFlag::GMRK)
+          ? ZoomMarkPoint
+          : fPOINT {wrap::toFloat(UnzoomedRect.x) / 2.0F, wrap::toFloat(UnzoomedRect.y) / 2.0F};
+  bool flag = false;
   if (!SelectedFormList->empty()) {
 	flag = true;
 	thred::savdo();

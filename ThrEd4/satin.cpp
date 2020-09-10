@@ -757,7 +757,6 @@ void satin::ribon() {
 		// reset vars as push_back may invalidate references
 		currentForm = FormList->operator[](ClosestFormToCursor);
 
-		auto iNewVertex          = uint32_t {0U};
 		newForm.maxFillStitchLen = MAXSIZF * PFGRAN;
 		newForm.minFillStitchLen = MinStitchLength;
 		MaxStitchLen             = MAXSIZF * PFGRAN;
@@ -768,23 +767,22 @@ void satin::ribon() {
 			isBlunt = SBLNT | FBLNT;
 		  }
 		  si::satends(currentForm, isBlunt, BorderWidth);
-		  newForm.vertexIndex = thred::adflt(currentForm.vertexCount * 2U);
-		  auto vertexIt       = wrap::next(FormVertices->begin(), newForm.vertexIndex);
-		  auto vBegin         = vertexIt;
-		  *(vertexIt++)         = OutsidePoints->front();
+		}
+		newForm.vertexIndex = (currentForm.type == FRMLINE)
+		                          ? thred::adflt(currentForm.vertexCount * 2U)
+		                          : thred::adflt((currentForm.vertexCount * 2U) + 2U);
+		auto vertexIt = wrap::next(FormVertices->begin(), newForm.vertexIndex);
+		auto vBegin   = vertexIt;
+		*(vertexIt++) = OutsidePoints->front();
+		if (currentForm.type == FRMLINE) {
 		  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
 			*(vertexIt++) = InsidePoints->operator[](iVertex);
 		  }
 		  for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; --iVertex) {
 			*(vertexIt++) = OutsidePoints->operator[](iVertex);
 		  }
-		  iNewVertex = wrap::distance<uint32_t>(vBegin, vertexIt);
 		}
 		else {
-		  newForm.vertexIndex = thred::adflt((currentForm.vertexCount * 2U) + 2U);
-		  auto vertexIt       = wrap::next(FormVertices->begin(), newForm.vertexIndex);
-		  auto vBegin         = vertexIt;
-		  *(vertexIt++)        = OutsidePoints->front();
 		  newForm.underlayIndent = IniFile.underlayIndent;
 		  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
 			*(vertexIt++) = InsidePoints->operator[](iVertex);
@@ -794,9 +792,9 @@ void satin::ribon() {
 		  for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; --iVertex) {
 			*(vertexIt++) = OutsidePoints->operator[](iVertex);
 		  }
-		  iNewVertex = wrap::distance<uint32_t>(vBegin, vertexIt);
 		}
-		newForm.type = SAT;
+		auto iNewVertex = wrap::distance<uint32_t>(vBegin, vertexIt);
+		newForm.type    = SAT;
 		wrap::narrow(newForm.fillColor, ActiveColor);
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
