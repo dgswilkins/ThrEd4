@@ -2514,7 +2514,7 @@ void form::internal::blbrd(FRMHED const& form) {
 
 void form::internal::contf(FRMHED& form) {
   auto const start  = form.angleOrClipData.guide.start;
-  auto       finish = form.angleOrClipData.guide.finish;
+  auto const finish = form.angleOrClipData.guide.finish;
   // ToDo - Find a better way to avoid crashing than clamping it if start is after finish
   if (start < finish) {
 	auto       vBegin          = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -7545,7 +7545,7 @@ void form::movlayr(uint32_t layer) {
 void form::join() {
   auto const savedFormIndex = ClosestFormToCursor;
 
-  auto& savedform = FormList->operator[](ClosestFormToCursor);
+  auto const& savedform = FormList->operator[](ClosestFormToCursor);
   auto lastVertex = wrap::next(FormVertices->cbegin(), savedform.vertexIndex + savedform.vertexCount - 1U);
   StateMap->set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap->test(StateFlag::FORMSEL) && form::closfrm()) {
