@@ -2556,11 +2556,11 @@ void form::internal::contf(FRMHED& form) {
 		--vertex;
 	  }
 	}
-	auto       selind              = 0U;
 	auto const selectedVertexCount = finish - start;
 	auto       polyLines           = std::vector<PVEC> {};
 	polyLines.resize(selectedVertexCount);
 	{
+	  auto selind = 0U;
 	  auto vertex = wrap::next(vBegin, start + 1);
 	  for (auto iVertex = start + 1U; iVertex <= finish; ++iVertex) {
 		auto const delta  = fPOINT {vertex->x - selectionStart->x, vertex->y - selectionStart->y};

@@ -411,7 +411,6 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	  UserColor[activeColor++] = color;
 	}
   }
-  auto PEScolorIndex = 1U;
   auto loc      = fPOINT {};
   StateMap->reset(StateFlag::FILDIR);
   if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
@@ -425,6 +424,8 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	constexpr auto bit12      = uint32_t {0x800U};  // Is bit 12 set?
 	constexpr auto offset     = uint32_t {0x1000U}; // offset used to shift value negative
 	constexpr auto mask12bits = uint32_t {0xFFFU};  // used to mask the value to 12 bits
+
+	auto PEScolorIndex = uint32_t {1U};
 	while (iPESstitch < pecCount) {
 	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
 		break;
