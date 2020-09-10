@@ -902,11 +902,9 @@ void formForms::dasyfrm() {
 
   constexpr auto holeMargin = 0.01F;
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
-	  auto vRef = wrap::next(vertexIt, fref - 1U);
-	// cppcheck-suppress unreadVariable
+	auto vRef = wrap::next(vertexIt, fref - 1U);
 	vRef->y += holeMargin;
 	++vRef;
-	// cppcheck-suppress unreadVariable
 	vRef->y += holeMargin;
   }
   form.vertexCount = iVertex;
