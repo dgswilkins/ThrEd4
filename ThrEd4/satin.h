@@ -54,10 +54,10 @@ namespace internal {
   void satends(FRMHED const& form, uint32_t isBlunt, float width);
   void satfn(FRMHED const&             form,
              std::vector<float> const& lengths,
-             uint32_t                  line1Start,
-             uint32_t                  line1End,
-             uint32_t                  line2Start,
-             uint32_t                  line2End);
+             uint32_t const            line1Start,
+             uint32_t const            line1End,
+             uint32_t const            line2Start,
+             uint32_t const            line2End);
   void satmf(FRMHED const& form, std::vector<float> const& lengths);
   void satsbrd(uint32_t formIndex);
   auto satselfn() -> bool;
