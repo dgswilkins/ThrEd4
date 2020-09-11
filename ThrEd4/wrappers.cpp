@@ -73,7 +73,7 @@ auto wrap::toFloat(double invar) -> float {
   catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
 	UNREFERENCED_PARAMETER(e);
 	auto const var  = gsl::narrow_cast<float>(invar);
-	auto const diff = abs(invar - var);
+	auto const diff = abs(invar - gsl::narrow_cast<double>(var));
 	if (diff < 4e-5) {
 	  result = var;
 	}
@@ -103,6 +103,7 @@ auto wrap::toFloat(uint32_t invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
+// NOLINTNEXTLINE(google-runtime-int)
 auto wrap::toFloat(unsigned long invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
@@ -111,6 +112,7 @@ auto wrap::toUnsigned(int invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
 }
 
+// NOLINTNEXTLINE(google-runtime-int)
 auto wrap::toUnsigned(long invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
 }
@@ -137,6 +139,7 @@ auto wrap::toSize(int32_t invar) -> size_t {
   return gsl::narrow<size_t>(invar);
 }
 
+// NOLINTNEXTLINE(google-runtime-int)
 auto wrap::toSize(long invar) -> size_t {
   return gsl::narrow<size_t>(invar);
 }
@@ -199,6 +202,6 @@ auto wrap::CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> 
   return ::CreatePen(iStyle, scaledWidth, color);
 }
 
-void wrap::setSideWinVal(int index) noexcept {
-  SetWindowText(ValueWindow->operator[](index), SideWindowEntryBuffer.data());
+void wrap::setSideWinVal(int index) {
+  SetWindowText(ValueWindow->operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
 }

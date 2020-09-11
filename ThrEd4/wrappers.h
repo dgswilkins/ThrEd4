@@ -76,7 +76,7 @@ template <class inType> auto ptrdiff(inType invar) noexcept -> ptrdiff_t {
 #endif
 
 void setCursor(HCURSOR hCursor) noexcept;
-void setSideWinVal(int index) noexcept;
+void setSideWinVal(int index);
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
