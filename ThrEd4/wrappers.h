@@ -33,8 +33,8 @@ template <class outType, class inType> auto floor(inType invar) -> outType {
   return gsl::narrow<outType>(std::floor(invar));
 }
 
-void GetTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
-void GetTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
+void getTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
+void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
 
 template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
@@ -77,7 +77,7 @@ template <class inType> auto ptrdiff(inType invar) noexcept -> ptrdiff_t {
 
 void setCursor(HCURSOR hCursor) noexcept;
 void setSideWinVal(int index) noexcept;
-void TextOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
+void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;

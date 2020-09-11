@@ -15780,7 +15780,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 // return the width of a text item
 auto thred::txtWid(wchar_t const* string) -> SIZE {
   auto textSize = SIZE {};
-  wrap::GetTextExtentPoint32(ThredDC, string, wrap::toUnsigned(wcslen(string)), &textSize);
+  wrap::getTextExtentPoint32(ThredDC, string, wrap::toUnsigned(wcslen(string)), &textSize);
   return textSize;
 }
 
@@ -16412,7 +16412,7 @@ void thred::internal::init() {
   StitchBuffer->clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
   ladj();
-  wrap::GetTextExtentPoint32(ThredDC,
+  wrap::getTextExtentPoint32(ThredDC,
                              StringTable->operator[](STR_PIKOL).c_str(),
                              wrap::toUnsigned(StringTable->operator[](STR_PIKOL).size()),
                              &PickColorMsgSize);
@@ -17421,7 +17421,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  texture::writeScreenWidth(position);
 		}
 		else {
-		  wrap::TextOut(DrawItem->hDC,
+		  wrap::textOut(DrawItem->hDC,
 		                position,
 		                1,
 		                StringTable->operator[](STR_PIKOL).c_str(),
@@ -17441,9 +17441,9 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
 			auto textSize = SIZE {0L, 0L};
-			wrap::GetTextExtentPoint32(
+			wrap::getTextExtentPoint32(
 			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
-			wrap::TextOut(DrawItem->hDC,
+			wrap::textOut(DrawItem->hDC,
 			              (ButtonWidth - textSize.cx) / 2,
 			              0,
 			              colorNum.c_str(),

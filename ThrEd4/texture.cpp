@@ -1718,5 +1718,5 @@ void texture::writeScreenWidth(uint32_t position) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TXWID);
   auto scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
-  wrap::TextOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
+  wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

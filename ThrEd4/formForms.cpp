@@ -59,7 +59,7 @@ auto const DaisyTypeStrings = std::array<uint16_t, 6> {
 
 void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
   auto labelSize = SIZE {0L, 0L};
-  wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
+  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
   textSize.y = labelSize.cy;
   if (labelSize.cx > textSize.x) {
 	textSize.x = labelSize.cx;

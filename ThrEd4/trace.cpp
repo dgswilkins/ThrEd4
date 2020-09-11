@@ -1179,7 +1179,7 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto const bufferLength = gsl::narrow<uint32_t>(wcslen(std::begin(buffer)));
   auto const xPosition    = zeroWidth.cx * (3U - bufferLength) + 1U;
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-  wrap::TextOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
+  wrap::textOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
 }
 
 void trace::internal::upnum(uint32_t iRGB) {
@@ -1263,14 +1263,14 @@ void trace::wasTrace() {
 		SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	  }
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-	  wrap::TextOut(
+	  wrap::textOut(
 	      DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(buffer), gsl::narrow<uint32_t>(wcslen(std::begin(buffer))));
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
 	  SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
-	  wrap::TextOut(DrawItem->hDC,
+	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
 	                static_cast<LPCTSTR>(TraceInputBuffer),

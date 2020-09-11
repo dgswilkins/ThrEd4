@@ -63,7 +63,7 @@ void displayText::shoMsg(std::wstring const& message) {
 	auto textSize    = SIZE {0L, 0L};
 	auto messageSize = SIZE {0L, 0L};
 	for (auto& string : strings) {
-	  wrap::GetTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
+	  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
 	  if (textSize.cx > messageSize.cx) {
 		messageSize.cx = textSize.cx;
 	  }
@@ -433,7 +433,7 @@ void displayText::tomsg() {
   auto OKrect   = RECT {0L, 0L, 0L, 0L};
   auto textSize = SIZE {0L, 0L};
   GetWindowRect(OKButton, &OKrect);
-  wrap::GetTextExtentPoint32(GetDC(ThrEdWindow),
+  wrap::getTextExtentPoint32(GetDC(ThrEdWindow),
                              StringTable->operator[](STR_DELST2).c_str(),
                              wrap::toUnsigned(StringTable->operator[](STR_DELST2).size()),
                              &textSize);
