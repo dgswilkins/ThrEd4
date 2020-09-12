@@ -7519,7 +7519,7 @@ void form::movlayr(uint32_t layer) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
 	  auto& formAttr = FormList->operator[](ClosestFormToCursor).attribute;
-	  wrap::narrow(formAttr, (layer | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK)));
+	  wrap::narrow(formAttr, (layer << FLAYSHFT | gsl::narrow_cast<decltype(layer)>(formAttr & NFRMLMSK)));
 	  StateMap->reset(StateFlag::FORMSEL);
 	  for (auto& stitch : *StitchBuffer) {
 		if (((stitch.attribute & ALTYPMSK) != 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
