@@ -33,12 +33,12 @@ void setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments);
 void txdun();
 void txof();
 void txsnap();
-void txtkey(uint32_t keyCode, FRMHED& textureForm);
+void txtkey(int16_t keyCode, FRMHED& textureForm);
 void txtlbut(FRMHED const& textureForm);
 void txtrbut();
 void txtrmov(FRMHED const& textureForm);
 void txtrup();
-void writeScreenWidth(uint32_t position);
+void writeScreenWidth(int32_t position);
 
 namespace internal {
   void altx();
@@ -46,7 +46,7 @@ namespace internal {
   void butsid(uint32_t windowId);
   auto chkbut() -> bool;
   void chktx();
-  auto chktxh(_In_ TXHST const* historyItem) -> bool;
+  auto chktxh(_In_ TXHST const& historyItem) -> bool;
   void chktxnum();
   void deorg(POINT& point) noexcept;
   void dutxfn(uint32_t textureType);
@@ -76,7 +76,7 @@ namespace internal {
   auto tpComp(TXPNT const& texturePoint0, TXPNT const& texturePoint1) noexcept -> bool;
   void txcntrv(FRMHED const& textureForm);
   void txdelal();
-  auto txdig(uint32_t keyCode, char& character) -> bool;
+  auto txdig(int16_t keyCode, wchar_t& character) -> bool;
   void txgro(FRMHED const& textureForm);
   void txhor(FRMHED& form);
   auto txnam(wchar_t* name, int32_t sizeName) -> bool;
