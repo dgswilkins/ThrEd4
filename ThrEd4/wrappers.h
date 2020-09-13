@@ -62,7 +62,12 @@ auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRea
     -> bool;
 
 template <class outType, class inType> auto round(inType invar) -> outType {
-  return gsl::narrow<outType>(std::lround(invar));
+  if constexpr (std::is_same<inType, float>::value) {
+	return gsl::narrow<outType>(std::lroundf(invar));
+  }
+  else {
+	return gsl::narrow<outType>(std::lround(invar));
+  }
 }
 
 #ifdef _WIN64
