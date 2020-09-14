@@ -212,7 +212,7 @@ extern RECT   SelectedPixelsRect;
 extern std::vector<POINT>* SelectedPointsLine;
 
 extern fRECTANGLE SelectedVerticesRect;
-extern double     ShowStitchThreshold;
+extern float     ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 
 extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
@@ -226,7 +226,7 @@ extern float StarRatio;
 extern EnumMap<StateFlag>* StateMap;
 
 extern fPOINT StitchBmpRatio;
-extern double StitchBoxesThreshold;
+extern float  StitchBoxesThreshold;
 
 extern std::vector<fPOINTATTR>* StitchBuffer;
 

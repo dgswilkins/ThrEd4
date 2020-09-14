@@ -172,7 +172,7 @@ RECT   SelectedPixelsRect; // display form vertex select rectangle
 std::vector<POINT>* SelectedPointsLine; // line derived from the formOrigin select rectangle
 
 fRECTANGLE SelectedVerticesRect {};       // rectangle enclosing selected form verticess
-double     ShowStitchThreshold = SHOPNTS; // show stitch grid below this zoom level
+float     ShowStitchThreshold = SHOPNTS; // show stitch grid below this zoom level
 HWND       SideMessageWindow   = nullptr; // main side message window
 
 auto SideWindowEntryBuffer = std::array<wchar_t, SWBLEN> {}; // buffer for entering form data sheet numbers
@@ -186,7 +186,7 @@ float StarRatio         = STARAT;           // star formOrigin to body ratio
 EnumMap<StateFlag>* StateMap; // Flags indicating current run state
 
 fPOINT StitchBmpRatio;                 // stitch hoop to bitmap ratios
-double StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
+float StitchBoxesThreshold = STCHBOX; // threshold for drawing stitch boxes
 
 std::vector<fPOINTATTR>* StitchBuffer; // main stitch buffer
 
