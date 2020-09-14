@@ -62,9 +62,9 @@ constexpr float    LHUPY    = 690.0F;      // large hoop y size
 constexpr float    HUP100XY = 600.0F;      // 100 millimeter hoop size
 constexpr float    PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
 constexpr float    IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
-constexpr double   TSIZ30   = 0.3;         // #30 thread size in millimeters
-constexpr double   TSIZ40   = 0.2;         // #40 thread size in millimeters
-constexpr double   TSIZ60   = 0.05;        // #60 thread size in millimeters
+constexpr float    TSIZ30   = 0.3F;        // #30 thread size in millimeters
+constexpr float    TSIZ40   = 0.2F;        // #40 thread size in millimeters
+constexpr float    TSIZ60   = 0.05F;       // #60 thread size in millimeters
 constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll bar
 constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
@@ -77,8 +77,8 @@ constexpr float    USESIZ   = 3.5F;              // user preferred size
 constexpr double   MAXSIZ   = 9.0;               // default maximum stitch size as a double
 constexpr auto     MAXSIZF  = 9.0F;              // default maximum stitch size as a float
 constexpr int32_t  MINZUM   = 5;                 // minimum zoom in stitch points
-constexpr double   SHOPNTS  = 0.00;              // show stitch points when zoom below this
-constexpr double   STCHBOX  = 0.4226;            // show stitch boxes when zoom below this
+constexpr float    SHOPNTS  = 0.00F;             // show stitch points when zoom below this
+constexpr float    STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
 constexpr uint32_t BITCOL   = 0xffff00U;         // default bitmap color
 constexpr uint32_t MAXFORMS = 1024U;             // maximum number of forms
 constexpr double   FORMFCT  = 0.05;              // new forms part of screen
@@ -981,14 +981,14 @@ class INIFILE // ini file structure
   COLORREF backgroundColor {0U};                        // background color
   COLORREF bitmapColor {0U};                            // bitmap color
   float    minStitchLength {0.0F};                      // minimum stitch length
-  double   showStitchThreshold {0.0};                   // show stitch points
-  double   threadSize30 {0.0};                          // millimeter size of 30 weight thread
-  double   threadSize40 {0.0};                          // millimeter size of 40 weight thread
-  double   threadSize60 {0.0};                          // millimeter size of 60 weight thread
+  float    showStitchThreshold {0.0F};                  // show stitch points
+  float    threadSize30 {0.0F};                         // millimeter size of 30 weight thread
+  float    threadSize40 {0.0F};                         // millimeter size of 40 weight thread
+  float    threadSize60 {0.0F};                         // millimeter size of 60 weight thread
   float    userStitchLength {0.0F};                     // user stitch length
   float    maxStitchLength {0.0F};                      // maximum stitch length
   float    smallStitchLength {0.0F};                    // small stitch size
-  double   stitchBoxesThreshold {0.0};                  // show sitch box level
+  float   stitchBoxesThreshold {0.0F};                  // show sitch box level
   float    stitchSpace {0.0F};                          // stitch spacing between lines of stitches
   float    fillAngle {0.0F};                            // fill angle
   uint32_t userFlagMap {0U};                            // bitmap for user variables
