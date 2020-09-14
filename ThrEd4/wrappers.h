@@ -24,7 +24,12 @@
 namespace wrap {
 
 template <class outType, class inType> auto ceil(inType invar) -> outType {
-  return gsl::narrow<outType>(std::ceil(invar));
+  if constexpr (std::is_same<inType, float>::value) {
+	return gsl::narrow<outType>(std::ceilf(invar));
+  }
+  else {
+	return gsl::narrow<outType>(std::ceil(invar));
+  }
 }
 
 auto CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
