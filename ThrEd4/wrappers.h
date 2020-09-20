@@ -93,6 +93,7 @@ auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;
 auto toFloat(unsigned long invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
+auto toFloat(size_t invar) noexcept -> float;
 auto toFloat(int16_t invar) noexcept -> float;
 auto toSize(int32_t invar) -> size_t;
 auto toSize(long invar) -> size_t;

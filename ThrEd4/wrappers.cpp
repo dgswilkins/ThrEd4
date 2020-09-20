@@ -103,6 +103,13 @@ auto wrap::toFloat(uint32_t invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
+// this is used in 64bit mode only. In 32 bit, size_t is an int
+#ifdef _WIN64
+auto wrap::toFloat(size_t invar) noexcept -> float {
+  return gsl::narrow_cast<float>(invar);
+}
+#endif
+
 // NOLINTNEXTLINE(google-runtime-int)
 auto wrap::toFloat(unsigned long invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
