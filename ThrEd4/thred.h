@@ -47,14 +47,14 @@ auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
 void bBox();
 void chkhup();
-void chkmen();
+void chkmen() noexcept;
 void chkrng(fPOINT& range);
 void addColor(uint32_t stitch, uint32_t color);
 void coltab();
 void delfstchs();
 void delinf() noexcept;
 void delstchm();
-auto duthrsh(double threshold) noexcept -> uint32_t;
+auto duthrsh(float threshold) noexcept -> uint32_t;
 void duzrat() noexcept;
 void frmdel();
 void frmrct(fRECTANGLE& rectangle) noexcept;
@@ -68,9 +68,9 @@ void hidbit();
 void hupfn();
 void insflin(POINT insertPoint);
 auto inStitchWin() noexcept -> bool;
-auto maxColor() -> uint32_t;
+auto maxColor() noexcept -> size_t;
 void movStch();
-auto nuPen(HPEN pen, uint32_t width, COLORREF color) noexcept -> HPEN;
+auto nuPen(HPEN pen, int32_t width, COLORREF color) noexcept -> HPEN;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
@@ -117,16 +117,16 @@ namespace internal {
   void chk1col();
   auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, fPOINT& rotationCenter, FRMHED& textureForm)
       -> bool;
-  auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) noexcept -> bool;
+  auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
   auto chkattr(fs::path const& filename) -> bool;
   auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
-  auto chkhid(uint32_t colorToCheck) -> bool;
+  auto chkhid(size_t colorToCheck) -> bool;
   void chkirct() noexcept;
-  auto chkminus(uint32_t code) noexcept -> bool;
+  auto chkminus(wchar_t code) noexcept -> bool;
   void chkncol();
   void chknum();
   auto chkok() noexcept -> bool;
-  auto chkup(uint32_t count, uint32_t iStitch) -> uint32_t;
+  auto chkup(uint32_t count, size_t iStitch) -> uint32_t;
   auto chkwnd(HWND window) noexcept -> bool;
   void closPnt();
   auto closPnt1(uint32_t& closestStitch) -> bool;
@@ -150,7 +150,7 @@ namespace internal {
   void delfre();
   void delknot();
   void delknt();
-  void delsfrms(uint32_t code);
+  void delsfrms(wchar_t code);
   void delsmal(uint32_t startStitch, uint32_t endStitch);
   void delstch();
   void delstch1(uint32_t iStitch);
@@ -167,7 +167,7 @@ namespace internal {
   void drwlstch(uint32_t finish);
   void drwmrk(HDC dc);
   void dstcurs() noexcept;
-  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<double>& gapToNearest) noexcept;
+  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<float>& gapToNearest) noexcept;
   void duIns();
   void duSelbox() noexcept;
   void duar(POINT const& stitchCoordsInPixels);
@@ -197,7 +197,7 @@ namespace internal {
   void durotu();
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(uint32_t entry, uint32_t& windowLocation, POINT const& windowSize, std::wstring const* const strings) noexcept;
+  void dusid(uint32_t entry, int32_t& windowLocation, POINT const& windowSize, std::wstring const* const strings) noexcept;
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
@@ -253,7 +253,7 @@ namespace internal {
   auto handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) -> bool;
   auto handleLeftKey(bool& retflag) -> bool;
   auto handleMainMenu(WORD const& wParameter, fPOINT& rotationCenter) -> bool;
-  auto handleMainWinKeys(uint32_t const& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag)
+  auto handleMainWinKeys(wchar_t const& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag)
       -> bool;
   auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                        float               xyRatio,
@@ -312,24 +312,24 @@ namespace internal {
   auto getSaveName(fs::path* fileName, fileIndices& fileType) -> bool;
   void noMsg();
   void nuAct(uint32_t iStitch) noexcept;
-  auto nuBak() noexcept -> COLORREF;
+  auto nuBak() noexcept -> BOOL;
   auto nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH;
-  auto nuCol(COLORREF init) noexcept -> COLORREF;
+  auto nuCol(COLORREF init) noexcept -> BOOL;
   void resetState();
   void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
-  void nuStchSiz(uint32_t iColor, uint32_t width) noexcept;
+  void nuStchSiz(uint32_t iColor, int32_t width) noexcept;
   auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
   void nucols();
   void nudgfn(float deltaX, float deltaY);
-  void nulayr(uint32_t play);
+  void nulayr(uint8_t play);
   void nunams();
-  void nuscol(uint32_t iColor) noexcept;
+  void nuscol(size_t iColor) noexcept;
   void nuselrct();
   void nuslst(uint32_t find);
   void nuthbak(uint32_t count);
   void nuthsel();
-  void nuthum(char character);
+  void nuthum(wchar_t character);
 
   constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
@@ -346,10 +346,10 @@ namespace internal {
   void pixmsg(uint32_t iString, uint32_t pixelCount);
   void pntmrk();
   void prtred(HANDLE fileHandle, uint32_t code);
-  auto pt2colInd(uint32_t iStitch) -> uint32_t;
+  auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
   void purg();
   void purgdir();
-  auto pxchk(double pixelSize) -> uint16_t;
+  auto pxchk(float pixelSize) -> uint16_t;
   void qchk();
   void qcode();
   void rSelbox();
@@ -408,7 +408,7 @@ namespace internal {
   void selup();
   void set1knot();
   auto setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint, fPOINT const& cellSize) -> bool;
-  void setbak(uint32_t penWidth) noexcept;
+  void setbak(int32_t penWidth) noexcept;
   void setdst();
   void setgrd(COLORREF color);
   void setknots();
@@ -421,7 +421,7 @@ namespace internal {
   void setsped();
   void setsrch(uint32_t stitch);
   void shft2box();
-  void shftflt(fPOINT point) noexcept;
+  void shftflt(fPOINT const& point) noexcept;
   void shoknot();
   void shorter();
   auto sidclp() -> bool;
@@ -463,12 +463,12 @@ namespace internal {
   void unrotu();
   void unsel();
   void unstrtch(std::vector<POINT>& stretchBoxLine);
-  auto unthrsh(uint32_t level) noexcept -> double;
+  auto unthrsh(wchar_t level) noexcept -> float;
   void unthum();
   auto updateHoopSize() -> bool;
   auto updateFillColor() -> bool;
   auto updatePreferences() -> bool;
-  auto usedcol(uint8_t& VerticalIndex) -> bool;
+  auto usedcol(uint8_t VerticalIndex) -> bool;
   void vubak();
   void vuselthr();
   void vuthrds();
