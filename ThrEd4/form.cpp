@@ -984,8 +984,8 @@ void form::flipv() {
   }
 }
 
-void form::duform(uint32_t formType) {
-  switch (formType + 1U) {
+void form::duform(int32_t formType) {
+  switch (formType + 1) {
 	case FRMLINE:
 	  thred::savdo();
 	  fi::setlin();
@@ -6420,13 +6420,12 @@ void form::setexpand(float xyRatio) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void form::nufilcol(uint32_t color) {
+void form::nufilcol(uint8_t color) noexcept {
   // clang-format off
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillColor;
-  auto  newColor  = gsl::narrow<decltype(FormList->back().fillColor)>(color);
   // clang-format on
-  if (formColor != newColor) {
-	formColor            = newColor;
+  if (formColor != color) {
+	formColor            = color;
 	auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMFIL;
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (FRMSK | TYPMSK | FTHMSK)) == attribute) {
@@ -6437,11 +6436,10 @@ void form::nufilcol(uint32_t color) {
   }
 }
 
-void form::nufthcol(uint32_t color) {
+void form::nufthcol(uint8_t color) noexcept {
   auto& formColor = FormList->operator[](ClosestFormToCursor).fillInfo.feather.color;
-  auto newColor   = gsl::narrow<decltype(FormList->back().fillInfo.feather.color)>(color);
-  if (formColor != newColor) {
-	formColor            = newColor;
+  if (formColor != color) {
+	formColor            = color;
 	auto const attribute = (ClosestFormToCursor << FRMSHFT) | FTHMSK;
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (FRMSK | FTHMSK)) == attribute) {
@@ -6452,8 +6450,8 @@ void form::nufthcol(uint32_t color) {
   }
 }
 
-void form::nubrdcol(uint32_t color) {
-  wrap::narrow(FormList->operator[](ClosestFormToCursor).borderColor, color);
+void form::nubrdcol(uint8_t color) noexcept {
+  FormList->operator[](ClosestFormToCursor).borderColor = color;
   auto const attribute = (ClosestFormToCursor << FRMSHFT) | FRMBFIL;
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & (FRMSK | TYPMSK)) == attribute) {
@@ -6463,7 +6461,7 @@ void form::nubrdcol(uint32_t color) {
   }
 }
 
-void form::nulapcol(uint32_t color) {
+void form::nulapcol(uint8_t color) {
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
   if (gsl::narrow<decltype(color)>(currentForm.borderColor >> FRMSHFT) != color) {
 	currentForm.borderColor &= COLMSK;

@@ -1356,7 +1356,8 @@ void thred::internal::chknum() {
 		case LFTHCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
+			auto colVal = gsl::narrow_cast<uint8_t>((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
+			form::nufthcol(colVal);
 			wrap::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1367,7 +1368,7 @@ void thred::internal::chknum() {
 		case LFRMCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
+			auto colVal = gsl::narrow_cast<uint8_t>((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1379,7 +1380,7 @@ void thred::internal::chknum() {
 		case LUNDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
+			auto colVal = gsl::narrow_cast<uint8_t>((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			form::refilfn();
@@ -1392,7 +1393,7 @@ void thred::internal::chknum() {
 		case LBRDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS;
+			auto colVal = gsl::narrow_cast<uint8_t>((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLOR_BITS);
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
