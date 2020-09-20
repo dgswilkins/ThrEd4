@@ -1387,17 +1387,17 @@ void texture::internal::txgro(FRMHED const& textureForm) {
   txi::txsiz(1.0F / TXTRAT, textureForm);
 }
 
-auto texture::internal::txdig(int16_t keyCode, wchar_t& character) -> bool {
+auto texture::internal::txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool {
   if (isdigit(keyCode) != 0) {
-	wrap::narrow(character, keyCode);
+	character = keyCode;
 	return true;
   }
   if (keyCode >= VK_NUMPAD0 && keyCode <= VK_NUMPAD9) {
-	wrap::narrow(character, keyCode - VK_NUMPAD0 + '0');
+	character = keyCode - VK_NUMPAD0 + L'0';
 	return true;
   }
   if (keyCode == VK_OEM_PERIOD || keyCode == VK_DECIMAL) {
-	character = '.';
+	character = L'.';
 	return true;
   }
   return false;
@@ -1463,7 +1463,7 @@ void texture::txsnap() {
   }
 }
 
-void texture::txtkey(int16_t keyCode, FRMHED& textureForm) {
+void texture::txtkey(wchar_t keyCode, FRMHED& textureForm) {
   if (SideWindowButton != nullptr) {
 	auto flag = true;
 	switch (keyCode) {

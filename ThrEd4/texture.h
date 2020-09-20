@@ -33,7 +33,7 @@ void setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments);
 void txdun();
 void txof();
 void txsnap();
-void txtkey(int16_t keyCode, FRMHED& textureForm);
+void txtkey(wchar_t keyCode, FRMHED& textureForm);
 void txtlbut(FRMHED const& textureForm);
 void txtrbut();
 void txtrmov(FRMHED const& textureForm);
@@ -76,7 +76,7 @@ namespace internal {
   auto tpComp(TXPNT const& texturePoint0, TXPNT const& texturePoint1) noexcept -> bool;
   void txcntrv(FRMHED const& textureForm);
   void txdelal();
-  auto txdig(int16_t keyCode, wchar_t& character) -> bool;
+  auto txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool;
   void txgro(FRMHED const& textureForm);
   void txhor(FRMHED& form);
   auto txnam(wchar_t* name, int32_t sizeName) -> bool;
