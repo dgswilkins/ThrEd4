@@ -972,8 +972,8 @@ void trace::dutrnum1() {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN1);
   auto traceLength = wrap::wcstof(MsgBuffer.data());
-  if (traceLength > MAXSIZF) {
-	traceLength = MAXSIZF;
+  if (traceLength > MAXSIZ) {
+	traceLength = MAXSIZ;
   }
   if (StateMap->test(StateFlag::TRNUP)) {
 	IniFile.traceLength = traceLength * PFGRAN;

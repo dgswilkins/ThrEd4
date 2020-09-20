@@ -1215,7 +1215,7 @@ void form::chkseq(bool border) {
 	}
 	MaxStitchLen = form.maxBorderStitchLen;
 	if (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) {
-	  userStitchLen = MAXSIZF * PFGRAN;
+	  userStitchLen = MAXSIZ * PFGRAN;
 	}
 	else {
 	  userStitchLen = form.edgeStitchLen;
@@ -4573,7 +4573,7 @@ void form::internal::bakseq() {
 	if (delta.y != 0.0F) {
 	  slope = delta.x / delta.y;
 	}
-	auto const  UserStitchLength9 = UserStitchLength / MAXSIZF;
+	auto const  UserStitchLength9 = UserStitchLength / MAXSIZ;
 	auto const& form              = FormList->operator[](ClosestFormToCursor);
 	switch (bCurrent.attribute) {
 	  case SEQTOP: {

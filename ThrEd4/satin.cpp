@@ -757,9 +757,9 @@ void satin::ribon() {
 		// reset vars as push_back may invalidate references
 		currentForm = FormList->operator[](ClosestFormToCursor);
 
-		newForm.maxFillStitchLen = MAXSIZF * PFGRAN;
+		newForm.maxFillStitchLen = MAXSIZ * PFGRAN;
 		newForm.minFillStitchLen = MinStitchLength;
-		MaxStitchLen             = MAXSIZF * PFGRAN;
+		MaxStitchLen             = MAXSIZ * PFGRAN;
 		if (currentForm.type == FRMLINE) {
 		  // Set blunt flags
 		  auto isBlunt = 0U;
