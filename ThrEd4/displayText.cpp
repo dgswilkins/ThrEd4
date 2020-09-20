@@ -170,7 +170,7 @@ void displayText::msgflt(uint32_t messageId, float value) {
   displayText::numWnd();
 }
 
-void displayText::tsizmsg(wchar_t const* threadSizeText, double threadSize) {
+void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_SIZ);
   displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));

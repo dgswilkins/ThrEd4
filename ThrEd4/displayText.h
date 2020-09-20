@@ -36,7 +36,7 @@ void shord();
 void shoseln(uint32_t code0, uint32_t code1);
 void spltmsg();
 void tomsg();
-void tsizmsg(wchar_t const* threadSizeText, double threadSize);
+void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
 
 namespace internal {

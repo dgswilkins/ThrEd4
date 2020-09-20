@@ -98,9 +98,9 @@ SIZE     SelectBoxSize;           // size of the select box
 POINT    SelectBoxOffset;         // offset of the spot the user selected from the
                                   // lower left of the select box
 float    RotationHandleAngle;     // angle of the rotation handle
-double   ThreadSize30 = TSIZ30;   //#30 thread size
-double   ThreadSize40 = TSIZ40;   //#40 thread size
-double   ThreadSize60 = TSIZ60;   //#40 thread size
+auto static ThreadSize30            = TSIZ30;      //#30 thread size
+auto static ThreadSize40            = TSIZ40;      //#40 thread size
+auto static ThreadSize60            = TSIZ60;      //#60 thread size
 uint32_t RunPoint;                // point for animating stitchout
 uint32_t StitchesPerFrame;        // number of stitches to draw in each frame
 int32_t  MovieTimeStep;           // time delay for stitchout
