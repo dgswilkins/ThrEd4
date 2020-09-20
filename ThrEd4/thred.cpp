@@ -5174,8 +5174,8 @@ void thred::internal::selCol() {
 	}
 	GroupStitchIndex  = iStitch;
 	ClosestPointIndex = iStitch;
-	auto const color  = StitchBuffer->operator[](iStitch).attribute & COLMSK;
-	while ((ClosestPointIndex != 0U) && (StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
+	auto const color  = gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](iStitch).attribute & COLMSK);
+	while ((ClosestPointIndex != 0U) && gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
 	  --ClosestPointIndex;
 	}
 	if ((StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) != color) {

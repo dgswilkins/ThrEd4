@@ -29,13 +29,13 @@
 
 namespace fs = std::filesystem;
 
-uint32_t    ActiveColor = 0; // active color selector
-uint8_t     ActiveLayer = 0; // active layer
+uint8_t    ActiveColor = 0U; // active color selector
+uint8_t     ActiveLayer = 0U; // active layer
 fRECTANGLE* AllItemsRect;    // rectangle enclosing all forms and stitches
 
 std::vector<fPOINT>* AngledFormVertices; // form formOrigin data for angle fills
 
-uint32_t  AppliqueColor = COLOR_COUNT - 1; // underlay color
+uint8_t  AppliqueColor = COLOR_COUNT - 1U; // underlay color
 fs::path* AuxName;                         //
 
 std::vector<BSEQPNT>* BSequence; //

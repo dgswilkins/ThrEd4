@@ -66,13 +66,13 @@
 
 namespace fs = std::filesystem;
 
-extern uint32_t    ActiveColor;
+extern uint8_t    ActiveColor;
 extern uint8_t     ActiveLayer;
 extern fRECTANGLE* AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
-extern uint32_t  AppliqueColor;
+extern uint8_t  AppliqueColor;
 extern fs::path* AuxName;
 
 extern std::vector<BSEQPNT>* BSequence;
