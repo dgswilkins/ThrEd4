@@ -211,7 +211,7 @@ auto const DefaultColors = std::array<COLORREF, COLOR_COUNT> {0x00000000,
 
 int32_t BoxOffset[4];
 
-uint32_t VerticalIndex; // vertical index of the color window, calculated from mouse click
+auto static VerticalIndex = uint8_t {}; // vertical index of the color window, calculated from mouse click
 
 fs::path* DefaultDirectory;
 fs::path* BalaradName0; // balarad semaphore file
@@ -1887,15 +1887,15 @@ void thred::internal::chknum() {
 			  break;
 			}
 			if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
-			  xt::dubcol(wrap::round<uint32_t>(value));
+			  xt::dubcol(wrap::round<uint8_t>(value));
 			  break;
 			}
 			if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
-			  xt::dufcol(wrap::round<uint32_t>(value));
+			  xt::dufcol(wrap::round<uint8_t>(value));
 			  break;
 			}
 			if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
-			  xt::dundcol(wrap::round<uint32_t>(value));
+			  xt::dundcol(wrap::round<uint8_t>(value));
 			  break;
 			}
 			if (StateMap->testAndReset(StateFlag::FSETFANG)) {
@@ -3757,7 +3757,7 @@ auto thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
   GetWindowRect(bottomWindow, &bottomRect);
   if (clickCoord.x > topRect.left && clickCoord.x < bottomRect.right &&
       clickCoord.y > topRect.top && clickCoord.y < bottomRect.bottom) {
-	VerticalIndex = COLOR_MAX - (bottomRect.bottom - clickCoord.y) / ButtonHeight;
+	VerticalIndex = COLOR_MAX - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
 	if (VerticalIndex > COLOR_MAX) { // Something has broken so do something reasonable
 	  VerticalIndex &= COLOR_BITS;
 	}
@@ -9791,7 +9791,7 @@ void thred::internal::nuscol(uint32_t iColor) noexcept {
 }
 
 void thred::internal::movchk() {
-  auto static draggedColor = uint32_t {};
+  auto static draggedColor = uint8_t {};
   auto& defaultColorWin    = *DefaultColorWin;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
@@ -9809,7 +9809,7 @@ void thred::internal::movchk() {
 		auto const key          = wrap::pressed(VK_SHIFT);
 		auto const switchColors = wrap::pressed(VK_CONTROL);
 		for (auto& stitch : *StitchBuffer) {
-		  auto const color = stitch.attribute & COLMSK;
+		  auto const color = gsl::narrow_cast<uint8_t>(stitch.attribute & COLMSK);
 		  if (color == VerticalIndex) {
 			stitch.attribute &= NCOLMSK;
 			stitch.attribute |= draggedColor;
@@ -9824,40 +9824,40 @@ void thred::internal::movchk() {
 		for (auto& formIter : *FormList) {
 		  if (formIter.fillType != 0U) {
 			if (formIter.fillColor == VerticalIndex) {
-			  wrap::narrow(formIter.fillColor, draggedColor);
+			  formIter.fillColor = draggedColor;
 			}
 			else {
 			  if (!key && formIter.fillColor == draggedColor) {
-				wrap::narrow(formIter.fillColor, VerticalIndex);
+				formIter.fillColor = VerticalIndex;
 			  }
 			}
 			if (formIter.fillType == FTHF) {
 			  if (formIter.fillInfo.feather.color == VerticalIndex) {
-				wrap::narrow(formIter.fillInfo.feather.color, draggedColor);
+				formIter.fillInfo.feather.color = draggedColor;
 			  }
 			  else {
 				if (!key && formIter.fillInfo.feather.color == draggedColor) {
-				  wrap::narrow(formIter.fillInfo.feather.color, VerticalIndex);
+				  formIter.fillInfo.feather.color = VerticalIndex;
 				}
 			  }
 			}
 		  }
 		  if (formIter.edgeType != 0U) {
 			if (formIter.borderColor == VerticalIndex) {
-			  wrap::narrow(formIter.borderColor, draggedColor);
+			  formIter.borderColor = draggedColor;
 			}
 			else {
 			  if (!key && formIter.borderColor == draggedColor) {
-				wrap::narrow(formIter.borderColor, VerticalIndex);
+				formIter.borderColor = VerticalIndex;
 			  }
 			}
 		  }
 		}
 		if (!switchColors) {
-		  auto const swapColor     = UserColor[VerticalIndex];
-		  UserColor[VerticalIndex] = UserColor[draggedColor];
+		  auto const swapColor     = UserColor[wrap::toSize(VerticalIndex)];
+		  UserColor[wrap::toSize(VerticalIndex)] = UserColor[wrap::toSize(draggedColor)];
 		  if (!key) {
-			UserColor[draggedColor] = swapColor;
+			UserColor[wrap::toSize(draggedColor)] = swapColor;
 			nuscol(draggedColor);
 		  }
 		  nuscol(VerticalIndex);
@@ -9884,7 +9884,7 @@ void thred::internal::inscol() {
 	  --nextColor;
 	}
 	for (auto& stitch : *StitchBuffer) {
-	  auto const color = stitch.attribute & COLMSK;
+	  auto const color = gsl::narrow<uint8_t>(stitch.attribute & COLMSK);
 	  if (color >= VerticalIndex && color < nextColor) {
 		stitch.attribute &= NCOLMSK;
 		stitch.attribute |= color + 1U;
@@ -9917,7 +9917,7 @@ void thred::internal::inscol() {
   }
 }
 
-auto thred::internal::usedcol(uint32_t& index) -> bool {
+auto thred::internal::usedcol(uint8_t& index) -> bool {
   return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](fPOINTATTR const& m) -> bool {
 	return (m.attribute & COLMSK) == index;
   });
@@ -9929,7 +9929,7 @@ void thred::internal::delcol() {
   }
   else {
 	for (auto& stitch : *StitchBuffer) {
-	  auto const color = stitch.attribute & COLMSK;
+	  auto const color = gsl::narrow<uint8_t>(stitch.attribute & COLMSK);
 	  if (color > VerticalIndex && (color != 0U)) {
 		stitch.attribute &= NCOLMSK;
 		stitch.attribute |= color - 1U;

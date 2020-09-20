@@ -1880,16 +1880,16 @@ void xt::setfang() {
   displayText::numWnd();
 }
 
-void xt::internal::ucolfn(uint32_t formNumber, uint32_t color) {
+void xt::internal::ucolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   auto& form          = FormList->operator[](formNumber);
   if ((form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
-	form.underlayColor = gsl::narrow<uint8_t>(color);
+	form.underlayColor = color;
 	form::refilfn();
   }
 }
 
-void xt::dundcol(uint32_t color) {
+void xt::dundcol(uint8_t color) {
   thred::savdo();
   if (color != 0U) {
 	--color;
@@ -1914,16 +1914,16 @@ void xt::setucol() {
   displayText::numWnd();
 }
 
-void xt::internal::fcolfn(uint32_t formNumber, uint32_t color) {
+void xt::internal::fcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   auto& form          = FormList->operator[](formNumber);
   if (form.fillType != 0U) {
-	form.fillColor = gsl::narrow<uint8_t>(color);
+	form.fillColor = color;
 	form::refilfn();
   }
 }
 
-void xt::dufcol(uint32_t color) {
+void xt::dufcol(uint8_t color) {
   thred::savdo();
   if (color != 0U) {
 	--color;
@@ -1948,16 +1948,16 @@ void xt::setfcol() {
   displayText::numWnd();
 }
 
-void xt::internal::bcolfn(uint32_t formNumber, uint32_t color) {
+void xt::internal::bcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   auto& form          = FormList->operator[](formNumber);
   if (form.edgeType != 0U) {
-	form.borderColor = gsl::narrow<uint8_t>(color);
+	form.borderColor = color;
 	form::refilfn();
   }
 }
 
-void xt::dubcol(uint32_t color) {
+void xt::dubcol(uint8_t color) {
   thred::savdo();
   if (color != 0U) {
 	--color;

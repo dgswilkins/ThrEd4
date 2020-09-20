@@ -468,7 +468,7 @@ namespace internal {
   auto updateHoopSize() -> bool;
   auto updateFillColor() -> bool;
   auto updatePreferences() -> bool;
-  auto usedcol(uint32_t& VerticalIndex) -> bool;
+  auto usedcol(uint8_t& VerticalIndex) -> bool;
   void vubak();
   void vuselthr();
   void vuthrds();

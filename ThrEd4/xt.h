@@ -34,14 +34,14 @@ void dmpat();
 #endif
 
 void duauxnam();
-void dubcol(uint32_t color);
+void dubcol(uint8_t color);
 void dubit(FRMHED& form, uint32_t bit);
 void dublen(float length);
 void dubmax(float length);
 void dubmin(float length);
 void dubspac(float length);
 void dufang(float angle);
-void dufcol(uint32_t color);
+void dufcol(uint8_t color);
 void dufhi(float length);
 void dufind(float indent);
 void duflen(float length);
@@ -50,7 +50,7 @@ void dufmin(float length);
 void dufspac(float spacing);
 void dufwid(float length);
 void dufxang(float angle);
-void dundcol(uint32_t color);
+void dundcol(uint8_t color);
 void dushft();
 void duspac(float spacing);
 void dusulen(float length);
@@ -102,7 +102,7 @@ void uspac();
 
 namespace internal {
 
-  void bcolfn(uint32_t formNumber, uint32_t color);
+  void bcolfn(uint32_t formNumber, uint8_t color);
   void blenfn(FRMHED& form, float length);
   void bmaxfn(uint32_t formNumber, float length);
   void bminfn(uint32_t formNumber, float length);
@@ -134,7 +134,7 @@ namespace internal {
   auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
   void fangfn(uint32_t formNumber, float angle);
-  void fcolfn(uint32_t formNumber, uint32_t color);
+  void fcolfn(uint32_t formNumber, uint8_t color);
   void fhifn(uint32_t formNumber, float length);
   void findfn(uint32_t formNumber, float indent);
   void flenfn(uint32_t formNumber, float length);
@@ -182,7 +182,7 @@ namespace internal {
   constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
 
   void uangfn(uint32_t formNumber, float angle);
-  void ucolfn(uint32_t formNumber, uint32_t color);
+  void ucolfn(uint32_t formNumber, uint8_t color);
   void ulenfn(uint32_t formNumber, float length);
   void undclp(FRMHED const& form);
   void uspacfn(uint32_t formNumber, float spacing);
