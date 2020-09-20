@@ -20,7 +20,7 @@ void initColorRef() noexcept;
 void initTraceWindows() noexcept;
 void trace();
 void tracedg();
-void traceNumberInput(uint32_t NumericCode);
+void traceNumberInput(wchar_t NumericCode);
 void traceNumberReset() noexcept;
 void tracpar();
 void trcsel();

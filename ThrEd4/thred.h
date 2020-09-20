@@ -189,7 +189,7 @@ namespace internal {
   void dumov();
   void dumrk(float xCoord, float yCoord);
   void dun();
-  auto dunum(uint32_t code) noexcept -> bool;
+  auto dunum(wchar_t code) noexcept -> bool;
   void dupclp();
   void duprct(FRMHED const& form);
   void durit(std::vector<char>& destination, const void* source, uint32_t count);
@@ -260,7 +260,7 @@ namespace internal {
                        float&              rotationAngle,
                        fPOINT const&       rotationCenter,
                        FRMHED const&       textureForm) -> bool;
-  auto handleNumericInput(uint32_t const& code, bool& retflag) -> bool;
+  auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
   auto handleRightButtonDown() -> bool;
   auto handleRightKey(bool& retflag) -> bool;
   auto handleSideWindowActive() -> bool;

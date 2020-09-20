@@ -186,7 +186,7 @@ double   RotateAngle;      // angle for pixel rotate
 SIZE     PickColorMsgSize; // size of the pick color message
 POINT    InsertSize;       // size of file insert window
 fPOINT   InsertCenter;     // center point in inserted file
-uint32_t NumericCode;      // keyboard numerical input
+auto static NumericCode      = wchar_t {};                        // keyboard numerical input
 uint32_t Knots[MAXKNOTS];  // pointers to knots
 uint32_t KnotCount;        // number of knots in the design
 
@@ -8607,13 +8607,13 @@ void thred::internal::nucols() {
   }
 }
 
-auto thred::internal::dunum(uint32_t code) noexcept -> bool {
-  if (code >= '0' && code <= '9') {
+auto thred::internal::dunum(wchar_t code) noexcept -> bool {
+  if (code >= L'0' && code <= L'9') {
 	NumericCode = code;
 	return true;
   }
   if (code >= VK_NUMPAD0 && code <= VK_NUMPAD9) {
-	NumericCode = code - '0';
+	NumericCode = code - L'0';
 	return true;
   }
   return false;
@@ -14032,7 +14032,7 @@ auto thred::internal::handleMainWinKeys(uint32_t const&     code,
   return {};
 }
 
-auto thred::internal::handleNumericInput(uint32_t const& code, bool& retflag) -> bool {
+auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   retflag = true;
   if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
 	MsgBuffer.fill(0);
@@ -15451,7 +15451,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  break;
 	}
 	case WM_KEYDOWN: {
-	  auto const code = gsl::narrow<uint32_t>(Msg.wParam & 0xffffU);
+	  auto const code = gsl::narrow<wchar_t>(Msg.wParam & 0xffffU);
 	  if (StateMap->test(StateFlag::TXTRED)) {
 		texture::txtkey(code, textureForm);
 		return true;
@@ -15463,55 +15463,55 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		switch (code) {
-		  case 'E': {
+		  case L'E': {
 			StateMap->reset(StateFlag::FORMIN);
 			thred::unmsg();
 			form::duform(FRMLINE - 1);
 			return true;
 		  }
-		  case 'F': {
+		  case L'F': {
 			StateMap->reset(StateFlag::FORMIN);
 			thred::unmsg();
 			form::duform(FRMFPOLY - 1);
 			return true;
 		  }
-		  case 'R': {
+		  case L'R': {
 			form::duform(FRMRPOLY - 1);
 			return true;
 		  }
-		  case 'S': {
+		  case L'S': {
 			form::duform(FRMSTAR - 1);
 			return true;
 		  }
-		  case 'A': {
+		  case L'A': {
 			form::duform(FRMSPIRAL - 1);
 			return true;
 		  }
-		  case 'H': {
+		  case L'H': {
 			form::duform(FRMHEART - 2);
 			return true;
 		  }
-		  case 'L': {
+		  case L'L': {
 			form::duform(FRMLENS - 2);
 			return true;
 		  }
-		  case 'G': {
+		  case L'G': {
 			form::duform(FRMEGG - 2);
 			return true;
 		  }
-		  case 'T': {
+		  case L'T': {
 			form::duform(FRMTEAR - 2);
 			return true;
 		  }
-		  case 'Z': {
+		  case L'Z': {
 			form::duform(FRMZIGZAG - 2);
 			return true;
 		  }
-		  case 'W': {
+		  case L'W': {
 			form::duform(FRMWAVE - 2);
 			return true;
 		  }
-		  case 'D': {
+		  case L'D': {
 			form::duform(FRMDAISY - 2);
 			return true;
 		  }
@@ -15643,13 +15643,13 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (dunum(code)) {
 		  if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1U) {
 			auto buffer = std::array<wchar_t, 2> {};
-			wrap::narrow(buffer[0], NumericCode);
+			buffer[0] = NumericCode;
 			if (PreferenceIndex == PSHO + 1U) {
-			  ShowStitchThreshold = unthrsh(NumericCode - '0');
+			  ShowStitchThreshold = unthrsh(NumericCode - L'0');
 			  SetWindowText(ValueWindow->operator[](PSHO), buffer.data());
 			}
 			else {
-			  StitchBoxesThreshold = unthrsh(NumericCode - '0');
+			  StitchBoxesThreshold = unthrsh(NumericCode - L'0');
 			  SetWindowText(ValueWindow->operator[](PBOX), buffer.data());
 			}
 			thred::unsid();

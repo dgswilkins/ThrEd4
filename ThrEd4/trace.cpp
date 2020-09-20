@@ -1292,7 +1292,7 @@ void trace::wasTrace1() {
   }
 }
 
-void trace::traceNumberInput(uint32_t NumericCode) {
+void trace::traceNumberInput(wchar_t NumericCode) {
   TraceInputBuffer[MsgIndex++] = NumericCode;
   TraceInputBuffer[MsgIndex]   = 0;
   auto traceColor              = std::stoi(std::begin(TraceInputBuffer));
