@@ -32,7 +32,7 @@ void wasTrace1();
 
 namespace internal {
 
-  void blanklin(std::vector<uint32_t>& differenceBitmap, uint32_t lineStart) noexcept;
+  void blanklin(std::vector<uint32_t>& differenceBitmap, int32_t lineStart) noexcept;
   void difbits(uint32_t shift, uint32_t* point) noexcept;
 
   static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
@@ -54,7 +54,7 @@ namespace internal {
   void trcols(COLORREF color) noexcept;
   void trcratnum();
   void trcstpnum();
-  void trcsub(HWND* window, uint32_t xCoordinate, uint32_t yCoordinate, uint32_t buttonHeight) noexcept;
+  void trcsub(HWND* window, int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) noexcept;
   void trnumwnd0(int32_t position) noexcept;
   void trnumwnd1(int32_t position) noexcept;
   auto trsum() noexcept -> uint32_t;
