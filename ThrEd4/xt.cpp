@@ -44,8 +44,8 @@
 
 namespace xi = xt::internal;
 
-fPOINT   DesignSize;              // design size
-uint32_t ColorOrder[COLOR_COUNT]; // color order adjusted for applique
+auto static DesignSize = fPOINT {};              // design size
+auto static ColorOrder = std::array<uint32_t, COLOR_COUNT>{}; // color order adjusted for applique
 
 enum stitchStyles {
   TYPE_APPLIQUE = 1, // applique
@@ -57,7 +57,7 @@ enum stitchStyles {
   TYPE_BORDER        // border
 };
 
-char StitchTypes[] = {
+auto static constexpr StitchTypes = std::array<char, 13>{
     0,             // 0 no type
     TYPE_APPLIQUE, // 1 applique
     TYPE_CWALK,    // 2 center walk
@@ -450,11 +450,12 @@ constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
 auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
   satin::satout(form, fabs(form.underlayIndent));
   if (form.underlayIndent > 0) {
-	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
+	auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!form::cisin(form, InsidePoints->operator[](iVertex).x, InsidePoints->operator[](iVertex).y)) {
-		InsidePoints->operator[](iVertex) = vertexIt[iVertex];
+		InsidePoints->operator[](iVertex) = *vertexIt;
 	  }
+	  ++vertexIt;
 	}
 #pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
 	return *InsidePoints;
@@ -500,7 +501,7 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 	  auto const length       = hypot(delta.x, delta.y);
 	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
 	  if (stitchCount != 0U) {
-		auto const step  = fPOINT {delta.x / stitchCount, delta.y / stitchCount};
+		auto const step  = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 		auto       point = sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
@@ -575,8 +576,8 @@ auto xt::internal::gucon(FRMHED const&            form,
 	length           = hypot(delta.x, delta.y);
 
 	auto const stitchCount = wrap::round<uint32_t>(length / UserStitchLength);
-	if (stitchCount > 1) {
-	  auto const step = fPOINT {delta.x / stitchCount, delta.y / stitchCount};
+	if (stitchCount > 1U) {
+	  auto const step = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 	  auto       localPoint =
 	      fPOINT {indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y};
 	  for (auto iStep = 0U; iStep < stitchCount - 1U; ++iStep) {
@@ -634,19 +635,20 @@ void xt::internal::fncwlk(FRMHED& form) {
   OSequence->clear();
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
-	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	if (form.wordParam != 0U) {
-	  auto const  iVertex    = form.wordParam;
-	  auto const& thisVertex = vertexIt[iVertex];
-	  auto const& nextVertex = vertexIt[wrap::toSize(iVertex) + 1U];
+	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
+	  auto const nextVertex = std::next(thisVertex);
 	  OSequence->push_back(
-	      fPOINT {wrap::midl(thisVertex.x, nextVertex.x), wrap::midl(thisVertex.y, nextVertex.y)});
+	      fPOINT {wrap::midl(thisVertex->x, nextVertex->x), wrap::midl(thisVertex->y, nextVertex->y)});
 	}
-	auto guideIt = std::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
+	auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount; iGuide != 0; --iGuide) {
-	  OSequence->push_back(fPOINT {
-	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].x, vertexIt[guideIt[iGuide - 1U].start].x),
-	      wrap::midl(vertexIt[guideIt[iGuide - 1U].finish].y, vertexIt[guideIt[iGuide - 1U].start].y)});
+	  auto vStart  = wrap::next(vertexIt, guideIt->start);
+	  auto vFinish = wrap::next(vertexIt, guideIt->finish);
+	  OSequence->push_back(fPOINT {wrap::midl(vFinish->x, vStart->x),
+	                               wrap::midl(vFinish->y, vStart->y)});
+	  --guideIt;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
 	  OSequence->push_back(fPOINT {wrap::midl(vertexIt[0].x, vertexIt[1].x),
@@ -658,20 +660,23 @@ void xt::internal::fncwlk(FRMHED& form) {
 	if ((form.extendedAttribute & AT_STRT) != 0U) {
 	  start = form.fillStart;
 	}
-	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
-	OSequence->push_back(vertexIt[start]);
+	auto vEndPoint = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+	OSequence->push_back(*vEndPoint);
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); ++iGuide) {
-	  auto const pnt = fPOINT {wrap::midl(vertexIt[finish].x, vertexIt[start].x),
-	                           wrap::midl(vertexIt[finish].y, vertexIt[start].y)};
+		auto vStart = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+		auto vFinish = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+	  auto const pnt = fPOINT {wrap::midl(vFinish->x, vStart->x),
+	                           wrap::midl(vFinish->y, vStart->y)};
 	  if (form::cisin(form, pnt.x, pnt.y)) {
 		OSequence->push_back(pnt);
 	  }
 	  start  = form::nxt(form, start);
 	  finish = form::prv(form, finish);
 	}
-	OSequence->push_back(vertexIt[start]);
+	vEndPoint = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+	OSequence->push_back(*vEndPoint);
   }
   ritwlk(form, CWLKMSK);
 }
@@ -820,7 +825,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
 }
 
 void xt::internal::durec(OREC& record) {
-  auto const stitchIt = std::next(StitchBuffer->begin(), record.start);
+  auto const stitchIt = wrap::next(StitchBuffer->begin(), record.start);
   record.type = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
   record.color         = attribute & COLOR_BITS;
@@ -899,9 +904,9 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
   formFillCounter.resize((FormList->size() + 2U) << 2U);
   auto totalJumps = 0U;
   while (chkrdun(formFillCounter, pRecs, sortRecord)) {
-	auto minimumLength = std::numeric_limits<double>::max();
-	auto stitchIt = (direction) ? std::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
-	                            : std::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
+	auto minimumLength = std::numeric_limits<float>::max();
+	auto stitchIt = (direction) ? wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->finish - 1U)
+	                            : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 		auto& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
@@ -920,7 +925,7 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 		}
 	  }
 	}
-	constexpr auto maxStitchLength = 9.0 * PFGRAN; // anything over 9 millimeters should result in another stitch
+	constexpr auto maxStitchLength = 9.0F * PFGRAN; // anything over 9 millimeters should result in another stitch
 	if (minimumLength > maxStitchLength) {
 	  ++totalJumps;
 	}
@@ -1143,7 +1148,7 @@ class ATFLD
   uint32_t layer {0U};
   uint32_t user {0U};
 
-  constexpr ATFLD() noexcept = default;
+  // constexpr ATFLD() noexcept = default;
   // ATFLD(ATFLD&&) = default;
   // ATFLD& operator=(ATFLD const& rhs) = default;
   // ATFLD& operator=(ATFLD&&) = default;
@@ -1358,20 +1363,20 @@ void xt::internal::duint(FRMHED const& form, std::vector<fPOINTATTR>& buffer, ui
 	auto const count = ilData.coloc > StitchBuffer->size()
 	                       ? wrap::toUnsigned(StitchBuffer->size()) - ilData.start
 	                       : ilData.coloc - ilData.start;
-	auto       sourceStart = std::next(StitchBuffer->begin(), ilData.start);
-	auto       sourceEnd   = sourceStart + count;
-	auto const destination = std::next(buffer.begin(), ilData.output);
+	auto       sourceStart = wrap::next(StitchBuffer->begin(), ilData.start);
+	auto       sourceEnd   = wrap::next(sourceStart, count);
+	auto const destination = wrap::next(buffer.begin(), ilData.output);
 	buffer.insert(destination, sourceStart, sourceEnd);
 	ilData.start += count;
 	ilData.output += count;
   }
   if ((form.extendedAttribute & AT_STRT) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
-	  auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
 	  ilData.output +=
 	      gucon(form,
 	            buffer,
-	            vertexIt[form.fillStart],
+	            *vertexIt,
 	            InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 	            ilData.output,
 	            code);
@@ -1422,9 +1427,9 @@ void xt::internal::chkend(FRMHED const& form, std::vector<fPOINTATTR>& buffer, u
   if (isfil(form)) {
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
-	  auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillEnd);
 	  ilData.output +=
-	      gucon(form, buffer, InterleaveSequence->back(), vertexIt[form.fillEnd], ilData.output, code);
+	      gucon(form, buffer, InterleaveSequence->back(), *vertexIt, ilData.output, code);
 	}
   }
 }
@@ -1496,30 +1501,30 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 	if ((!StitchBuffer->empty()) && ilData.start < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  auto const ine = wrap::toUnsigned(StitchBuffer->size() - ilData.start);
 
-	  auto sourceStart = std::next(StitchBuffer->begin(), ilData.start);
+	  auto sourceStart = wrap::next(StitchBuffer->begin(), ilData.start);
 	  auto sourceEnd   = StitchBuffer->end();
 
-	  auto const destination = std::next(highStitchBuffer.begin(), ilData.output);
+	  auto const destination = wrap::next(highStitchBuffer.begin(), ilData.output);
 	  highStitchBuffer.insert(destination, sourceStart, sourceEnd);
 	  ilData.output += ine;
 	}
 	auto sourceStart = highStitchBuffer.begin();
-	auto sourceEnd   = sourceStart + ilData.output;
+	auto sourceEnd   = wrap::next(sourceStart, ilData.output);
 	StitchBuffer->clear();
 	StitchBuffer->insert(StitchBuffer->begin(), sourceStart, sourceEnd);
   }
   else { // no stitches added so far
 	auto code     = 0U;
-	auto vertexIt = std::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
 	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
 	         InterleaveSequenceIndices->                    operator[](iSequence).color;
 	  if ((form.extendedAttribute & AT_STRT) != 0U) {
 		if (!StateMap->testAndSet(StateFlag::DIDSTRT)) {
+		  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillStart);
 		  ilData.output += xi::gucon(
 		      form,
 		      *StitchBuffer,
-		      vertexIt[form.fillStart],
+		      *vertexIt,
 		      InterleaveSequence->operator[](InterleaveSequenceIndices->operator[](ilData.pins).index),
 		      ilData.output,
 		      code);
@@ -2168,10 +2173,11 @@ void xt::internal::fwidfn(uint32_t formNumber, float length) {
   auto const& form      = FormList->operator[](formNumber);
   auto const  reference = form.rectangle.left;
   auto const  ratio     = length / (form.rectangle.right - reference);
-  auto        vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
+  auto        vertexIt  = wrap::next(FormVertices->begin(), form.vertexIndex);
   // clang-format on
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	vertexIt[iVertex].x = (vertexIt[iVertex].x - reference) * ratio + reference;
+	vertexIt->x = (vertexIt->x - reference) * ratio + reference;
+	++vertexIt;
   }
   form::frmout(formNumber);
   form::refilfn();
@@ -2211,10 +2217,11 @@ void xt::internal::fhifn(uint32_t formNumber, float length) {
   auto const& form      = FormList->operator[](formNumber);
   auto const  reference = form.rectangle.bottom;
   auto const  ratio     = length / (form.rectangle.top - reference);
-  auto        vertexIt  = std::next(FormVertices->begin(), form.vertexIndex);
+  auto        vertexIt  = wrap::next(FormVertices->begin(), form.vertexIndex);
   // clang-format on
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	vertexIt[iVertex].y = (vertexIt[iVertex].y - reference) * ratio + reference;
+	vertexIt->y = (vertexIt->y - reference) * ratio + reference;
+	++vertexIt;
   }
   form::frmout(formNumber);
   form::refilfn();
@@ -2335,11 +2342,11 @@ void xt::rtrclp() {
   }
 }
 
-void xt::internal::setstxt(uint32_t stringIndex, float value, HWND dialog) {
+void xt::internal::setstxt(int32_t stringIndex, float value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value * IPFGRAN)).c_str());
 }
 
-auto xt::internal::getstxt(uint32_t stringIndex, HWND dialog) -> float {
+auto xt::internal::getstxt(int32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto bufferSize = 16U;
 
@@ -2412,6 +2419,7 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
 		  break;
 		}
 		default: {
+		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  outDebugString(L"default hit in fangfn: wparam [{}]\n", LOWORD(wparam));
 		  break;
 		}
@@ -2545,7 +2553,6 @@ auto CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 
 void xt::clrstch() noexcept {
   while (EnumChildWindows(MainStitchWin, xi::enumch, 0) != 0) {
-	;
   }
 }
 

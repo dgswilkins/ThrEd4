@@ -150,7 +150,7 @@ namespace internal {
   void fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPOINT>& featherSequence);
   void fthvars(FRMHED const& form, FEATHER& feather);
   void fwidfn(uint32_t formNumber, float length);
-  auto getstxt(uint32_t stringIndex, HWND dialog) -> float;
+  auto getstxt(int32_t stringIndex, HWND dialog) -> float;
   auto gucon(FRMHED const&            form,
              std::vector<fPOINTATTR>& buffer,
              fPOINT const&            start,
@@ -175,7 +175,7 @@ namespace internal {
 
   auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  void setstxt(uint32_t stringIndex, float value, HWND dialog);
+  void setstxt(int32_t stringIndex, float value, HWND dialog);
   void setundfn(uint32_t code);
   auto srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) noexcept -> bool;
 
