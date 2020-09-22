@@ -5874,7 +5874,7 @@ void form::internal::sapliq(uint32_t formIndex) {
   form.edgeSpacing = LineSpacing / 2.0F;
   form.borderSize  = IniFile.borderWidth;
   form::bsizpar(form);
-  wrap::narrow(form.borderColor, ActiveColor | (AppliqueColor << 4U));
+  wrap::narrow_cast(form.borderColor, ActiveColor | gsl::narrow_cast<uint8_t>(AppliqueColor << 4U));
   if (form.type != FRMLINE) {
 	if (form.fillType == SAT && (form.satinGuideCount != 0U)) {
 	  satin::delsac(ClosestFormToCursor);
@@ -6465,7 +6465,7 @@ void form::nulapcol(uint8_t color) {
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
   if (gsl::narrow<decltype(color)>(currentForm.borderColor >> FRMSHFT) != color) {
 	currentForm.borderColor &= COLMSK;
-	currentForm.borderColor |= color << FRMSHFT;
+	currentForm.borderColor |= gsl::narrow_cast<uint8_t>(color << FRMSHFT);
 	auto const attribute = (ClosestFormToCursor << FRMSHFT) | TYPMSK;
 	for (auto& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (TYPMSK | FRMSK)) == attribute) {
