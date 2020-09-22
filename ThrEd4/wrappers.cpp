@@ -30,6 +30,7 @@ auto wrap::wcstof(wchar_t const* buffer) -> float {
 	value = std::wcstof(buffer, nullptr);
   }
   catch (...) {
+	// NOLINTNEXTLINE
 	outDebugString(L"wcstof failed trying to convert '{}'\n", buffer);
 	value = 0.0F;
   }

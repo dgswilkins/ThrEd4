@@ -126,6 +126,7 @@ void trace::internal::trcols(COLORREF color) noexcept {
 void trace::internal::trcstpnum() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TRCSTP);
+  // NOLINTNEXTLINE
   SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength * IPFGRAN)).c_str());
 }
 

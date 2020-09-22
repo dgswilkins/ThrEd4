@@ -185,6 +185,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			// Grab the bitmap filename
 			ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr);
 			if (bytesRead != 14) {
+			  // NOLINTNEXTLINE
 			  outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
 			}
 			IniFile.auxFileType = AUXPCS;

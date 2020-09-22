@@ -44,6 +44,7 @@ void repair::internal::adbad(std::wstring& repairMessage, uint32_t code, uint32_
   displayText::loadString(fmtStr, code);
   repairMessage += fmtStr;
   displayText::loadString(fmtStr, IDS_NOTREP);
+  // NOLINTNEXTLINE
   repairMessage += fmt::format(fmtStr, count);
 }
 

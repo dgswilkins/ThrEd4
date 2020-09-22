@@ -1025,6 +1025,7 @@ void form::duform(int32_t formType) {
 	  formForms::dasyfrm();
 	  break;
 	default:
+		// NOLINTNEXTLINE
 		outDebugString(L"default hit in duform: formType [{}]\n", formType);
 	  break;
   }

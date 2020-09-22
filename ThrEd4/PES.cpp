@@ -376,6 +376,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   if (strncmp(static_cast<char*>(pesHeader->led), PESStr, strlen(PESStr)) != 0) {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_NOTPES);
+	// NOLINTNEXTLINE
 	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
 	CloseHandle(fileHandle);
 	return false;

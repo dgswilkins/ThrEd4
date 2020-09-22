@@ -972,6 +972,7 @@ auto xt::internal::duprecs(std::vector<fPOINTATTR>& stitchBuffer, std::vector<OR
 
 void xt::internal::dmprec(std::vector<OREC*> const& stitchRegion, uint32_t count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
+	// NOLINTNEXTLINE
 	outDebugString(
 	    L"{:4d} attrb: 0x{:08x} form: {:4d} type: {} color: {:2d} start: {:5d} finish: {:5d}\n",
 	    iRegion,

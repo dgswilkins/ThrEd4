@@ -266,6 +266,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		                sizeof(designerBuffer) / sizeof(designerBuffer[0]));
 		  DesignerName->assign(std::begin(designerBuffer));
 		  EndDialog(hwndlg, 0);
+		  // NOLINTNEXTLINE
 		  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
 		  return TRUE;
 		}

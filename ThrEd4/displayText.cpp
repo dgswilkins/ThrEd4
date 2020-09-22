@@ -135,6 +135,7 @@ void displayText::lodstr() {
 void displayText::hsizmsg() {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_HSIZ);
+  // NOLINTNEXTLINE
   displayText::shoMsg(fmt::format(fmtStr, (wrap::toFloat(UnzoomedRect.x) * IPFGRAN), (wrap::toFloat(UnzoomedRect.y) * IPFGRAN)));
 }
 
