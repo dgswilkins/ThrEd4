@@ -195,7 +195,7 @@ void trace::internal::tracwnd() {
   displayText::clrhbut(4);
 }
 
-void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, int32_t lineStart) noexcept {
+void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, int32_t lineStart) {
   for (auto iPoint = lineStart; iPoint < lineStart + bitmap::getBitmapWidth(); ++iPoint) {
 	differenceBitmap[wrap::toSize(iPoint)] = 0;
   }
@@ -1272,7 +1272,7 @@ void trace::wasTrace() {
 	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
-	                static_cast<LPCTSTR>(TraceInputBuffer.data()),
+	                TraceInputBuffer.data(),
 	                gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
 	  break;
 	}
