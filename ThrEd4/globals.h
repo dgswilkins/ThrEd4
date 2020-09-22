@@ -262,7 +262,7 @@ extern std::array<COLORREF, COLOR_COUNT> UserColor;
 extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
 
-extern HPEN  UserPen[COLOR_COUNT];
+extern std::array<HPEN, COLOR_COUNT> UserPen;
 extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
