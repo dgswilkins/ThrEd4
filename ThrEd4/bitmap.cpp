@@ -77,6 +77,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
 	auto fmtStr = std::wstring {};
 	displayText::loadString(fmtStr, IDS_UNOPEN);
+	// NOLINTNEXTLINE
 	displayText::shoMsg(fmt::format(fmtStr, UTF16BMPname->wstring()));
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
@@ -682,9 +683,11 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
   auto line     = std::array<POINT, 2> {};
-  auto vertexIt = std::next(FormVertices->begin(), form.vertexIndex);
-  line[0]       = bi::stch2bit(vertexIt[start]);
-  line[1]       = bi::stch2bit(vertexIt[finish]);
+  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto vStart = wrap::next(vertexIt, start);
+  auto vFinish = wrap::next(vertexIt, finish);
+  line[0]       = bi::stch2bit(*vStart);
+  line[1]       = bi::stch2bit(*vFinish);
   wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
   wrap::Polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }
