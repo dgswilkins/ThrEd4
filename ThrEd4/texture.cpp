@@ -39,6 +39,8 @@
 
 namespace txi = texture::internal;
 
+constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
+
 static auto TextureWindowId           = uint32_t {}; // id of the window being updated
 static auto SideWindowButton          = HWND {};     // button side window
 static auto TexturePixelRect          = RECT {};     // screen selected texture points rectangle
@@ -477,8 +479,7 @@ auto texture::internal::px2txt(POINT const& offset) -> bool {
   txi::px2ed(offset, editPoint);
   auto line = (editPoint.x - TextureScreen.xOffset) / TextureScreen.spacing;
 
-  constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
-  if (line < limit) {
+  if (line < OSCLAMP) {
 	line = 0.0F;
   }
   auto txPoint = TXPNT {0.0F, wrap::round<uint16_t>(line)};
@@ -683,8 +684,7 @@ void texture::internal::ed2txp(POINT const& offset, TXPNT& textureRecord) {
   txi::px2ed(offset, point);
   auto val = (point.x - TextureScreen.xOffset) / TextureScreen.spacing;
 
-  constexpr auto limit = -0.5F; // values below this are off screen and should be clamped
-  if (val < limit) {
+  if (val < OSCLAMP) {
 	val = 0.0F;
   }
   textureRecord.line = wrap::round<uint16_t>(val);
@@ -1492,9 +1492,9 @@ void texture::txtkey(wchar_t keyCode, FRMHED& textureForm) {
 	  }
 	}
 	if (flag) {
-	  constexpr auto bufferLength = 8U; // i.e. floating point 7 digits of precision + '.'
+	  constexpr auto BUFFLEN = 8U; // i.e. floating point 7 digits of precision + '.'
 	  auto           character    = wchar_t {};
-	  if (TextureInputBuffer->size() < bufferLength) {
+	  if (TextureInputBuffer->size() < BUFFLEN) {
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
 		}
