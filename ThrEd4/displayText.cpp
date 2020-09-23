@@ -45,13 +45,13 @@ void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
-	constexpr auto newline              = 10;
+	constexpr auto NEWLINE              = 10;
 	auto           strings              = std::vector<std::wstring> {};
 	auto           iString              = 0U;
 	auto           previousStringLength = 0U;
 	auto const     sizeLim              = message.size();
 	while (iString < sizeLim) {
-	  if (message[iString] == newline) {
+	  if (message[iString] == NEWLINE) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		previousStringLength = iString;
 	  }
@@ -100,7 +100,7 @@ void displayText::tabmsg(uint32_t code) {
 }
 
 void displayText::lodstr() {
-  static constexpr auto loadStringList = std::array<uint16_t, STR_LEN> {
+  static constexpr auto LSTRINGL = std::array<uint16_t, STR_LEN> {
       // strings to load into memory at init time
       IDS_PIKOL,     IDS_UPON,    IDS_UPOF,    IDS_AUXTXT,  IDS_HUP0,    IDS_HUP1,    IDS_HUP2,
       IDS_HUP3,      IDS_HUP4,    IDS_TRC0,    IDS_TRC1S,   IDS_TRC2,    IDS_TRC3,    IDS_TRC4,
@@ -127,8 +127,8 @@ void displayText::lodstr() {
       IDS_UWLKIND,   IDS_UND,     IDS_ULEN,    IDS_FUANG,   IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,
       IDS_FRMBOX,    IDS_TXOF};
 
-  for (auto iString = 0U; iString < loadStringList.size(); ++iString) {
-	displayText::loadString(StringTable->operator[](iString), loadStringList[iString]);
+  for (auto iString = 0U; iString < LSTRINGL.size(); ++iString) {
+	displayText::loadString(StringTable->operator[](iString), LSTRINGL[iString]);
   }
 }
 
