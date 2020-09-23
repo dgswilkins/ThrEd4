@@ -243,7 +243,7 @@ extern std::vector<fPOINT>* TempPolygon;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 
-extern std::array<HWND, COLOR_COUNT> ThreadSizeWin;
+extern std::array<HWND, COLORCNT> ThreadSizeWin;
 
 extern wchar_t const* ThrEdClipFormat;
 extern HINSTANCE      ThrEdInstance;
@@ -257,12 +257,12 @@ extern boost::dynamic_bitset<>* TracedMap;
 
 extern POINT UnzoomedRect;
 
-extern std::array<COLORREF, COLOR_COUNT> UserColor;
+extern std::array<COLORREF, COLORCNT> UserColor;
 
 extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
 
-extern std::array<HPEN, COLOR_COUNT> UserPen;
+extern std::array<HPEN, COLORCNT> UserPen;
 extern float UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;

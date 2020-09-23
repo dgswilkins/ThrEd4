@@ -133,7 +133,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  }
 	  else {
 		++color;
-		color &= COLOR_BITS;
+		color &= COLORBTS;
 	  }
 	}
 	else {
@@ -221,12 +221,12 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
   DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
   DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
-  auto color               = dstStitchBuffer[0].attribute & COLOR_BITS;
+  auto color               = dstStitchBuffer[0].attribute & COLORBTS;
   for (auto& stitch : dstStitchBuffer) {
-	if (color != (stitch.attribute & COLOR_BITS)) {
+	if (color != (stitch.attribute & COLORBTS)) {
 	  constexpr auto stopCode = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, stopCode});
-	  color = stitch.attribute & COLOR_BITS;
+	  color = stitch.attribute & COLORBTS;
 	  colorData.push_back(UserColor[color]);
 	}
 	auto lengths = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
@@ -342,7 +342,7 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
   auto const colorChanges = thred::maxColor() + 1U;
-  if (colorChanges < COLOR_COUNT) {
+  if (colorChanges < COLORCNT) {
       for (auto iColor = size_t {}; iColor < colorChanges; ++iColor) {
 	  if (color == UserColor[iColor]) {
 		return wrap::toUnsigned(iColor);
@@ -353,7 +353,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   }
   auto minDistance = std::numeric_limits<DWORD>::max();
   auto iDistance = uint32_t {};
-  for (auto iColor = size_t {}; iColor < COLOR_COUNT; ++iColor) {
+  for (auto iColor = size_t {}; iColor < COLORCNT; ++iColor) {
 	auto const distance = di::coldis(color, UserColor[iColor]);
 	if (distance == 0U) {
 	  return wrap::toUnsigned(iColor);

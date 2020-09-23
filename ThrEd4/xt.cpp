@@ -45,7 +45,7 @@
 namespace xi = xt::internal;
 
 static auto DesignSize = fPOINT {};              // design size
-static auto ColorOrder = std::array<uint32_t, COLOR_COUNT>{}; // color order adjusted for applique
+static auto ColorOrder = std::array<uint32_t, COLORCNT>{}; // color order adjusted for applique
 
 enum stitchStyles {
   TYPE_APPLIQUE = 1, // applique
@@ -682,7 +682,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 }
 
 void xt::srtcol() {
-  constexpr auto colorSize = COLOR_COUNT;
+  constexpr auto colorSize = COLORCNT;
   auto           histogram = std::vector<uint32_t> {};
   histogram.resize(colorSize);
   auto colorStartStitch = std::vector<uint32_t> {};
@@ -828,7 +828,7 @@ void xt::internal::durec(OREC& record) {
   auto const stitchIt = wrap::next(StitchBuffer->begin(), record.start);
   record.type = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
-  record.color         = attribute & COLOR_BITS;
+  record.color         = attribute & COLORBTS;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
@@ -1025,7 +1025,7 @@ void xt::fsort() {
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = 0;
 	ColorOrder[AppliqueColor]       = 0;
-	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
+	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
 		ColorOrder[iColor] = iColor + 1U;
 	  }
@@ -1162,7 +1162,7 @@ void xt::internal::duatf(uint32_t ind) {
   auto       attributeFields = ATFLD {(attribute & COLMSK),
 									  ((attribute & FRMSK) >> FRMSHFT),
 									  gsl::narrow_cast<uint32_t>(StitchTypes[dutyp(attribute)]),
-									  ((attribute >> LAYSHFT) & mask3bits),
+									  ((attribute >> LAYSHFT) & MSK3BITS),
 									  0};
   // clang-format on
   if ((attribute & (1U << USHFT)) != 0U) {

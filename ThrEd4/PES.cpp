@@ -36,7 +36,7 @@ constexpr auto invPECScale = 3.0F / 5.0F;
 constexpr auto bitsPerByte = 8U;
 
 static auto PEScolors             = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
-static auto PESequivColors        = std::array<uint8_t, COLOR_COUNT> {}; // pes equivalent colors
+static auto PESequivColors        = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
 
 THREAD const PESThread[] = {
     {{0x00, 0x00, 0x00}, "Unknown", ""},                // Index  00
@@ -232,9 +232,9 @@ void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, floa
   auto const deltaY = -std::lround(srcY * PECScale);
   if (deltaX < maxDeltaVal && deltaX > minDeltaVal && deltaY < maxDeltaVal && deltaY > minDeltaVal) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto xVal = gsl::narrow<uint8_t>(deltaX & mask7bits);
+	auto xVal = gsl::narrow<uint8_t>(deltaX & MSK7BITS);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto yVal = gsl::narrow<uint8_t>(deltaY & mask7bits);
+	auto yVal = gsl::narrow<uint8_t>(deltaY & MSK7BITS);
 	buffer.push_back(xVal);
 	buffer.push_back(yVal);
   }
@@ -398,7 +398,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 		UserColor[activeColor++] = color;
-		if (activeColor >= COLOR_COUNT) {
+		if (activeColor >= COLORCNT) {
 		  break;
 		}
 	  }

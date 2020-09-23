@@ -294,7 +294,7 @@ auto satin::internal::satselfn() -> bool {
 	  }
 	}
   }
-  return minimumLength < FCLOSENUF;
+  return minimumLength < FCLOSNUF;
 }
 
 void satin::satsel() {
@@ -1445,7 +1445,7 @@ void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish,
   auto xOffset = 0.0F;
   auto yOffset = 0.0F;
 
-  if (fabs(FormAngles->operator[](start)) < TINYFLOAT && fabs(FormAngles->operator[](finish)) < TINYFLOAT) {
+  if (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT) {
 	xOffset = 0.0F;
 	yOffset = satinWidth;
   }

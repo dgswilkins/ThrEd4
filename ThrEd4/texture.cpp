@@ -46,7 +46,7 @@ static auto TextureRect               = TXTRCT {};   // selected texture points 
 static auto SelectTexturePointsOrigin = POINT {};    // original location of selected texture points
 static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
 static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
-static auto TextureHistory      = std::array<TXHST, ITXBUFLEN> {}; // texture editor history headers
+static auto TextureHistory      = std::array<TXHST, ITXBUFSZ> {}; // texture editor history headers
 static auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
 static auto TempTexturePoints   = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
@@ -69,7 +69,7 @@ auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
 void texture::txdun() {
   auto signature            = std::array<char, 4> {"txh"};
   auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
-  textureHistoryBuffer.resize(ITXBUFLEN);
+  textureHistoryBuffer.resize(ITXBUFSZ);
   if (!TextureHistory[0].texturePoints.empty()) {
 	wchar_t name[_MAX_PATH] = {0};
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
@@ -92,7 +92,7 @@ void texture::txdun() {
 		}
 		wrap::WriteFile(handle,
 		                textureHistoryBuffer.data(),
-		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFLEN),
+		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
 		                &bytesWritten,
 		                nullptr);
 		for (auto& item : TextureHistory) {
@@ -131,8 +131,8 @@ void texture::internal::redtbak() {
 void texture::redtx() {
   wchar_t name[_MAX_PATH]      = {0};
   auto    textureHistoryBuffer = std::vector<TXHSTBUF> {};
-  textureHistoryBuffer.resize(ITXBUFLEN);
-  TextureHistoryIndex = ITXBUFLEN - 1U;
+  textureHistoryBuffer.resize(ITXBUFSZ);
+  TextureHistoryIndex = ITXBUFSZ - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -146,7 +146,7 @@ void texture::redtx() {
 			auto historyBytesRead = DWORD {0};
 			if (wrap::ReadFile(handle,
 			                   textureHistoryBuffer.data(),
-			                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFLEN),
+			                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
 			                   &historyBytesRead,
 			                   nullptr)) {
 			  for (auto index = 0U;
@@ -207,7 +207,7 @@ auto texture::istx(FRMHED const& form) noexcept -> bool {
 }
 
 void texture::internal::txrfor() noexcept {
-  if (TextureHistoryIndex < (ITXBUFLEN - 1U)) {
+  if (TextureHistoryIndex < (ITXBUFSZ - 1U)) {
 	++TextureHistoryIndex;
   }
   else {
@@ -263,7 +263,7 @@ void texture::internal::txrbak() noexcept {
 	--TextureHistoryIndex;
   }
   else {
-	TextureHistoryIndex = ITXBUFLEN - 1U;
+	TextureHistoryIndex = ITXBUFSZ - 1U;
   }
 }
 
@@ -426,7 +426,7 @@ void texture::drwtxtr() {
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, penNarrow, UserColor[ActiveColor]);
+  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, UserColor[ActiveColor]);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;
@@ -444,7 +444,7 @@ void texture::drwtxtr() {
   line[0].y = line[1].y = TextureScreen.bottom;
   wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   DeleteObject(TextureCrossPen);
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, penNarrow, penWhite);
+  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, PENWHITE);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   for (auto index = 0U; index < wrap::toUnsigned(TempTexturePoints->size()); ++index) {
@@ -529,7 +529,7 @@ void texture::txtrbut() {
 
 auto texture::internal::txtclos(uint32_t& closestTexturePoint) -> bool {
   if (closestTexturePoint != 0U) {
-	auto minimumLength = BIGDOUBLE;
+	auto minimumLength = BIGDBL;
 	auto reference     = POINT {0L, 0L};
 	auto point         = POINT {0L, 0L};
 	txi::deorg(reference);
@@ -609,7 +609,7 @@ void texture::internal::dutxlin(fPOINT const& point0in, fPOINT const& point1in) 
   auto const point0 = txi::ed2stch(point0in);
   auto const point1 = txi::ed2stch(point1in);
   auto const deltaX = point1.x - point0.x;
-  if (fabs(deltaX) < TINYFLOAT) {
+  if (fabs(deltaX) < TNYFLOAT) {
 	return;
   }
   auto const slope  = (point1.y - point0.y) / deltaX;
@@ -1298,7 +1298,7 @@ void texture::internal::txbak() {
   if (StateMap->test(StateFlag::WASTXBAK)) {
 	SelectedTexturePointsList->clear();
 	auto flag = false;
-	for (auto iHistory = 0U; iHistory < ITXBUFLEN; ++iHistory) {
+	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
 	  if (TextureHistory[TextureHistoryIndex].width != 0.0F) {
 		flag = true;
 		break;
@@ -1315,7 +1315,7 @@ void texture::internal::txbak() {
 void texture::internal::nxbak() {
   if (StateMap->test(StateFlag::WASTXBAK)) {
 	auto flag = false;
-	for (auto iHistory = 0U; iHistory < ITXBUFLEN; ++iHistory) {
+	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
 	  txi::txrfor();
 	  if (TextureHistory[TextureHistoryIndex].width != 0.0F) {
 		flag = true;

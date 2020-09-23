@@ -569,7 +569,7 @@ void clip::internal::fxlen(FRMHED const&             form,
   auto       nextStart       = 0U;
 
   constexpr auto iterationLimit = 50U; // loop at least 50 times to guarantee convergence
-  while (loopCount < iterationLimit && (largestSpacing - smallestSpacing) > TINYFLOAT) {
+  while (loopCount < iterationLimit && (largestSpacing - smallestSpacing) > TNYFLOAT) {
 	auto adjCount        = 0U;
 	auto stitchPoint = *vBegin;
 	auto currentSide = 0U;

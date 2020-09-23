@@ -40,7 +40,7 @@ class PCSHEADER // pcs file header structure
   int8_t   leadIn {0};
   int8_t   hoopType {0};
   uint16_t colorCount {0};
-  COLORREF colors[COLOR_COUNT] {0}; // NOLINT(modernize-avoid-c-arrays)
+  COLORREF colors[COLORCNT] {0}; // NOLINT(modernize-avoid-c-arrays)
   uint16_t stitchCount {0};
 
   constexpr PCSHEADER() noexcept = default;
@@ -69,10 +69,10 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 	}
 	else {
 	  PCSHeader.leadIn     = 0x32;
-	  PCSHeader.colorCount = COLOR_COUNT;
+	  PCSHeader.colorCount = COLORCNT;
 	  auto PCSStitchBuffer = std::vector<PCSTCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
-	  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
+	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 		PCSHeader.colors[iColor] = UserColor[iColor];
 	  }
 	  do {
@@ -99,10 +99,10 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  auto stitchRec      = PCSTCH {};
 		  auto integerPart    = 0.0F;
 		  auto fractionalPart = std::modf(stitch.x, &integerPart);
-		  stitchRec.fx = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * fractionalFactor);
+		  stitchRec.fx = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
 		  wrap::narrow(stitchRec.x, integerPart);
 		  fractionalPart = std::modf(stitch.y, &integerPart);
-		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * fractionalFactor);
+		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * FRACFACT);
 		  wrap::narrow(stitchRec.y, integerPart);
 		  PCSStitchBuffer.push_back(stitchRec);
 		}
@@ -150,8 +150,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  auto bytesRead = DWORD {0};
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
-		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLOR_COUNT) {
-		  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
+		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
+		  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 			UserColor[iColor] = PCSHeader.colors[iColor];
 		  }
 		  fileSize -= sizeof(PCSHeader) + 14;
@@ -175,8 +175,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  }
 			  else {
 				StitchBuffer->push_back(
-				    fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / fractionalFactor,
-				                wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / fractionalFactor,
+				    fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+				                wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
 				                color});
 				++iStitch;
 			  }
@@ -313,7 +313,7 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 	auto bytesRead     = DWORD {0};
 
 	ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr);
-	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLOR_COUNT) {
+	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLORCNT) {
 	  auto fileSize = uintmax_t {0};
 	  thred::getFileSize(insertedFile, fileSize);
 	  fileSize -= sizeof(pcsFileHeader) + 14;
@@ -333,9 +333,9 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		  else {
 			(*StitchBuffer)
 			    .emplace_back(fPOINTATTR {wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / fractionalFactor,
+			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
 			                              wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / fractionalFactor,
+			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
 			                              newAttribute});
 		  }
 		}

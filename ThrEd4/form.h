@@ -417,7 +417,7 @@ namespace internal {
                uint32_t&                     nextGroup) noexcept -> bool;
   auto reglen(std::vector<SMALPNTL*> const&      sortedLines,
               uint32_t                           iRegion,
-              std::array<fPOINT, corners> const& lastRegionCorners,
+              std::array<fPOINT, SQRCORNS> const& lastRegionCorners,
               std::vector<REGION> const&         regionsList) noexcept -> float;
   void ritapbrd();
   void ritbrd(FRMHED const& form);

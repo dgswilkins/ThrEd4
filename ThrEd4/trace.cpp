@@ -72,8 +72,8 @@ static auto BlackPen         = gsl::narrow_cast<HPEN>(nullptr); // black pen
 void trace::initColorRef() noexcept {
   UpPixelColor    = 0;
   DownPixelColor  = 0x7f7f7f;
-  InvertUpColor   = penWhite;
-  InvertDownColor = penGray;
+  InvertUpColor   = PENWHITE;
+  InvertDownColor = PENGRAY;
 }
 
 #pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
@@ -177,7 +177,7 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 }
 
 void trace::internal::tracwnd() {
-  for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
+  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	ti::hidwnd(DefaultColorWin->operator[](iColor));
 	ti::hidwnd(UserColorWin->operator[](iColor));
 	ti::hidwnd(ThreadSizeWin[iColor]);
@@ -256,7 +256,7 @@ void trace::untrace() {
 	  TracedMap->resize(0); // allocated in trace
 	}
 	StateMap->reset(StateFlag::WASEDG);
-	for (auto iColor = 0U; iColor < COLOR_COUNT; ++iColor) {
+	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  ti::shownd(DefaultColorWin->operator[](iColor));
 	  ti::shownd(UserColorWin->operator[](iColor));
 	  ti::shownd(ThreadSizeWin[iColor]);
@@ -274,7 +274,7 @@ void trace::untrace() {
   }
   else {
 	if (StateMap->test(StateFlag::TRCUP)) {
-	  DownPixelColor = penWhite;
+	  DownPixelColor = PENWHITE;
 	}
 	else {
 	  UpPixelColor = 0;
@@ -375,7 +375,7 @@ void trace::trace() {
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
-		DownPixelColor = penWhite;
+		DownPixelColor = PENWHITE;
 	  }
 	  else {
 		DownPixelColor = color;
@@ -499,7 +499,7 @@ void trace::tracedg() {
   }
   for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 	if (TracedEdges->test(wrap::toSize(iPixel))) {
-	  TraceBitmapData[iPixel] = penWhite;
+	  TraceBitmapData[iPixel] = PENWHITE;
 	}
 	else {
 	  TraceBitmapData[iPixel] = 0;
@@ -891,7 +891,7 @@ void trace::trinit() {
 		InvertDownColor |= componentPeak[iRGB] << TraceShift[iRGB];
 	  }
 	  DownPixelColor = InvertDownColor ^ COLMASK;
-	  InvertUpColor  = penWhite;
+	  InvertUpColor  = PENWHITE;
 	  UpPixelColor   = 0U;
 	}
 	StateMap->set(StateFlag::WASTRCOL);
@@ -908,7 +908,7 @@ void trace::trcsel() {
 	StateMap->set(StateFlag::TRCRED);
 	StateMap->set(StateFlag::TRCBLU);
 	StateMap->set(StateFlag::TRCGRN);
-	DownPixelColor = penWhite;
+	DownPixelColor = PENWHITE;
 	UpPixelColor   = 0;
 	trace::trace();
 	StateMap->reset(StateFlag::HIDMAP);
@@ -1033,7 +1033,7 @@ void trace::blak() {
   }
   ti::tracwnd();
   if (!FormList->empty()) {
-	BlackPen = wrap::CreatePen(PS_SOLID, penNarrow, penBlack);
+	BlackPen = wrap::CreatePen(PS_SOLID, PENNWID, PENBLK);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(bitmap::getTraceDC(), BlackPen);
 	if (!StateMap->test(StateFlag::WASTRAC)) {

@@ -20,7 +20,7 @@ namespace bi = bitmap::internal;
 
 static auto BitMapColorStruct = CHOOSECOLOR {};
 
-static auto BitmapBackgroundColors = std::array<COLORREF, COLOR_COUNT> {}; // for the bitmap color dialog box
+static auto BitmapBackgroundColors = std::array<COLORREF, COLORCNT> {}; // for the bitmap color dialog box
 
 static auto BitmapColor          = BITCOL;  // bitmap color
 static auto BitmapDC             = HDC {};  // bitmap device context
@@ -39,7 +39,7 @@ static auto BmpStitchRatio       = fPOINT {};           // bitmap to stitch hoop
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = static_cast<fs::path*>(nullptr); // bitmap file name from user load
-static auto UTF8BMPname  = std::array<char, nameSize> {};   // bitmap file name from pcs file
+static auto UTF8BMPname  = std::array<char, SZBMPNM> {};   // bitmap file name from pcs file
 
 constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
@@ -486,7 +486,7 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-  constexpr auto DefaultBitmapBackgroundColors = std::array<COLORREF, COLOR_COUNT> {0x00c0d5bf,
+  constexpr auto DefaultBitmapBackgroundColors = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
                                                                                     0x00c8dfee,
                                                                                     0x00708189,
                                                                                     0x00a5a97a,
