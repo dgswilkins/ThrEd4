@@ -3898,7 +3898,7 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
                             std::vector<uint32_t> const& mapIndexSequence,
                             uint32_t                     pathIndex) {
   if ((wrap::toSize(pathIndex) + 1U) < sequencePath.size()) {
-	const unsigned nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
+	unsigned const nextNode = sequencePath[wrap::toSize(pathIndex) + 1U].node;
 	unsigned       iPath    = mapIndexSequence[sequencePath[pathIndex].node];
 	while (iPath < mapIndexSequence[wrap::toSize(sequencePath[pathIndex].node) + 1U] &&
 	       pathMap[iPath].node != nextNode) {
