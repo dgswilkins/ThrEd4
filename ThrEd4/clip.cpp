@@ -252,19 +252,19 @@ void clip::internal::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finis
 }
 
 auto clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords, fPOINT const& stitchPoint) noexcept -> bool {
-  constexpr auto iterationLimit = 10U;
-  constexpr auto deltaLimit     = 0.01F;
+  constexpr auto ITLIMIT  = 10U;   // Iteration limit
+  constexpr auto DLTLIMIT = 0.01F; // Delta limit
 
   auto const sinAngle = sin(clipAngle);
   auto const cosAngle = cos(clipAngle);
   auto       length   = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
   if (length > ClipRectSize.cx) {
-	for (auto step = 0U; step < iterationLimit; ++step) {
+	for (auto step = 0U; step < ITLIMIT; ++step) {
 	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	  auto const delta = ClipRectSize.cx - length;
 	  moveToCoords.x += delta * cosAngle;
 	  moveToCoords.y += delta * sinAngle;
-	  if (fabs(delta) < deltaLimit) {
+	  if (fabs(delta) < DLTLIMIT) {
 		break;
 	  }
 	}
@@ -461,19 +461,19 @@ auto clip::internal::fxpnt(uint32_t                  vertexIndex,
                            fPOINT const&             stitchPoint,
                            float                     adjustedSpace,
                            uint32_t                  nextStart) -> bool {
-  constexpr auto iterationLimit = 10U;
-  constexpr auto deltaLimit     = 0.2F;
+  constexpr auto ITLIMIT  = 10U;   // Iteration limit
+  constexpr auto DLTLIMIT = 0.01F; // Delta limit
 
   auto vertexIt = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords  = *vertexIt;
   auto length   = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
   if (length > adjustedSpace) {
-	for (auto iGuess = 0U; iGuess < iterationLimit; ++iGuess) {
+	for (auto iGuess = 0U; iGuess < ITLIMIT; ++iGuess) {
 	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	  auto const delta = adjustedSpace - length;
 	  moveToCoords.x += delta * listCOSINEs[currentSide];
 	  moveToCoords.y += delta * listSINEs[currentSide];
-	  if (fabs(delta) < deltaLimit) {
+	  if (fabs(delta) < DLTLIMIT) {
 		break;
 	  }
 	}
@@ -568,8 +568,8 @@ void clip::internal::fxlen(FRMHED const&             form,
   auto       largestSpacing  = 1.0F;
   auto       nextStart       = 0U;
 
-  constexpr auto iterationLimit = 50U; // loop at least 50 times to guarantee convergence
-  while (loopCount < iterationLimit && (largestSpacing - smallestSpacing) > TNYFLOAT) {
+  constexpr auto ITLIMIT = 50U; // Iterate at least 50 times to guarantee convergence
+  while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
 	auto adjCount        = 0U;
 	auto stitchPoint = *vBegin;
 	auto currentSide = 0U;
@@ -844,8 +844,8 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
   ClipReference.y  = rotationCenter.y;
   ClipReference.x  = clipRect.left;
 
-  constexpr auto satWidth = 20.0F;
-  satin::satout(form, satWidth);
+  constexpr auto SATWIDTH = 20.0F;
+  satin::satout(form, SATWIDTH);
   if (form.type == FRMLINE) {
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 2U; ++iVertex) {
 	  ci::picfn(form, clipRect, clipFillData, iVertex, iVertex + 1, form.edgeSpacing, rotationCenter);
@@ -871,12 +871,12 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
 }
 
 void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
-  constexpr auto chainLen = 10U;
-  constexpr auto chainSequence = std::array<uint32_t, chainLen> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
+  constexpr auto CHAINLEN = 10U; // Chain length
+  constexpr auto CHAINSEQ = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
   auto           chainPoint = std::vector<fPOINT> {};
 
-  constexpr auto chainPointSize = 5U;
-  chainPoint.resize(chainPointSize);
+  constexpr auto CHPOINTS = 5U; // chainPoint size
+  chainPoint.resize(CHPOINTS);
   auto delta = fPOINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
                        (chainEndPoints[finish].y - chainEndPoints[start].y)};
 
@@ -900,15 +900,15 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
 	delta.x = chainEndPoints[finish].x - chainEndPoints[finish - 1U].x;
 	delta.y = chainEndPoints[finish].y - chainEndPoints[finish - 1U].y;
   }
-  constexpr auto factor = 4.0F;
-  chainPoint[2].x       = chainEndPoints[finish].x + delta.x / factor;
-  chainPoint[2].y       = chainEndPoints[finish].y + delta.y / factor;
-  auto chainCount       = chainLen;
+  constexpr auto CHFACTOR = 4.0F; // Chain factor
+  chainPoint[2].x       = chainEndPoints[finish].x + delta.x / CHFACTOR;
+  chainPoint[2].y       = chainEndPoints[finish].y + delta.y / CHFACTOR;
+  auto chainCount       = CHAINLEN;
   if (StateMap->test(StateFlag::LINCHN)) {
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
-	OSequence->push_back(chainPoint[chainSequence[iChain]]);
+	OSequence->push_back(chainPoint[CHAINSEQ[iChain]]);
   }
 }
 
