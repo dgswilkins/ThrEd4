@@ -54,13 +54,13 @@ constexpr DSTDAT::DSTDAT(char rhsCor, char rhsVal) : cor(rhsCor), val(rhsVal) {
 constexpr auto XCOR = char {0};
 constexpr auto YCOR = char {1};
 
-constexpr auto DSTMax      = 121;         // maximum stitch/jump length of 121 in DST format
-constexpr auto DSTScale    = 3.0F / 5.0F; // DST stitch scaling factor
-constexpr auto InvDSTScale = 5.0F / 3.0F; // Inverse DST stitch scaling factor
+constexpr auto DSTMAX    = 121;         // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTSCALE  = 3.0F / 5.0F; // DST stitch scaling factor
+constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
-  static constexpr auto DSTValues = std::array<DSTDAT, 22> {
+  static constexpr auto DSTVALS = std::array<DSTDAT, 22> { // DST offset values
       DSTDAT {XCOR, 1},   DSTDAT {XCOR, -1}, DSTDAT {XCOR, 9},  DSTDAT {XCOR, -9},
       DSTDAT {YCOR, -9},  DSTDAT {YCOR, 9},  DSTDAT {YCOR, -1}, DSTDAT {YCOR, 1},
       DSTDAT {XCOR, 3},   DSTDAT {XCOR, -3}, DSTDAT {XCOR, 27}, DSTDAT {XCOR, -27},
@@ -70,7 +70,7 @@ void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
 
   auto shift = 1U;
   pout       = POINT {};
-  for (auto const& DSTValue : DSTValues) {
+  for (auto const& DSTValue : DSTVALS) {
 	if ((number & shift) != 0U) {
 	  if (DSTValue.cor != XCOR) {
 		pout.y += DSTValue.val;
@@ -122,10 +122,10 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
   StitchBuffer->clear();
   StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
-  constexpr auto c1Mask = 0x40U;
-  constexpr auto c0Mask = 0x80U;
+  constexpr auto C1MASK = 0x40U;
+  constexpr auto C0MASK = 0x80U;
   for (auto& record : DSTData) {
-	if ((record.nd & c1Mask) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
+	if ((record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
 		color                    = colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
@@ -141,8 +141,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  di::dstin(di::dtrn(&record), dstStitch);
 	  localStitch.x += wrap::toFloat(dstStitch.x);
 	  localStitch.y += wrap::toFloat(dstStitch.y);
-	  if ((record.nd & c0Mask) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTScale, localStitch.y * DSTScale, color | NOTFRM});
+	  if ((record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
+		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM});
 		auto& stitch = StitchBuffer->back();
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
@@ -164,9 +164,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   IniFile.hoopType = CUSTHUP;
   UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   if (dstSize.x > wrap::toFloat(UnzoomedRect.x) || dstSize.y > wrap::toFloat(UnzoomedRect.y)) {
-	constexpr auto expRatio = 1.1F; // 10% expansion
-	IniFile.hoopSizeX       = dstSize.x * expRatio;
-	IniFile.hoopSizeY       = dstSize.y * expRatio;
+	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio
+	IniFile.hoopSizeX       = dstSize.x * EXPRATIO;
+	IniFile.hoopSizeY       = dstSize.y * EXPRATIO;
 	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
@@ -196,23 +196,23 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   colorData.push_back(UserColor[stitches[0].attribute & COLMSK]);
   auto destination = dstStitchBuffer.begin();
   for (auto const& stitch : stitches) {
-	*destination++ = fPOINTATTR {stitch.x * InvDSTScale, stitch.y * InvDSTScale, stitch.attribute};
+	*destination++ = fPOINTATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
   }
   auto boundingRect = fRECTANGLE {
       dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
-  constexpr auto margin = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
+  constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
   for (auto& stitch : dstStitchBuffer) {
 	if (stitch.x > boundingRect.right) {
-	  boundingRect.right = stitch.x + margin;
+	  boundingRect.right = stitch.x + MARGIN;
 	}
 	if (stitch.x < boundingRect.left) {
-	  boundingRect.left = stitch.x - margin;
+	  boundingRect.left = stitch.x - MARGIN;
 	}
 	if (stitch.y > boundingRect.top) {
-	  boundingRect.top = stitch.y + margin;
+	  boundingRect.top = stitch.y + MARGIN;
 	}
 	if (stitch.y < boundingRect.bottom) {
-	  boundingRect.bottom = stitch.y - margin;
+	  boundingRect.bottom = stitch.y - MARGIN;
 	}
   }
   auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
@@ -224,8 +224,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   auto color               = dstStitchBuffer[0].attribute & COLORBTS;
   for (auto& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLORBTS)) {
-	  constexpr auto stopCode = uint8_t {0xC3}; // note that stop code is the same as the color change code
-	  DSTRecords.push_back(DSTREC {0, 0, stopCode});
+	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
+	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});
 	  color = stitch.attribute & COLORBTS;
 	  colorData.push_back(UserColor[color]);
 	}
@@ -234,10 +234,10 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto const absoluteLengths = POINT {abs(lengths.x), abs(lengths.y)};
 	auto       count           = 0;
 	if (absoluteLengths.x > absoluteLengths.y) {
-	  count = absoluteLengths.x / DSTMax + 1;
+	  count = absoluteLengths.x / DSTMAX + 1;
 	}
 	else {
-	  count = absoluteLengths.y / DSTMax + 1;
+	  count = absoluteLengths.y / DSTMAX + 1;
 	}
 	auto const stepSize = POINT {(absoluteLengths.x / count + 1),
 	                             (absoluteLengths.y / count + 1)};
@@ -276,8 +276,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  lengths.y -= difference.y;
 	}
   }
-  constexpr auto endCode = uint8_t {0xF3};
-  DSTRecords.push_back(DSTREC {0, 0, endCode});
+  constexpr auto ENDCODE = uint8_t {0xF3};
+  DSTRecords.push_back(DSTREC {0, 0, ENDCODE});
   if (di::colfil()) {
 	auto bytesWritten = DWORD {0};
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -368,8 +368,8 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 }
 
 auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
-  static constexpr auto dstLen = 243U; // -121 to 121
-  static constexpr auto xDST   = std::array<uint32_t, dstLen> {
+  static constexpr auto DSTLEN = 243U; // -121 to 121
+  static constexpr auto xDST   = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
       0x090a08, //-120
       0x090a09, //-119
@@ -615,7 +615,7 @@ auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
       0x050505  // 121
   };
 
-  static constexpr auto yDST = std::array<uint32_t, dstLen> {
+  static constexpr auto yDST = std::array<uint32_t, DSTLEN> {
       0x115050, //-121
       0x115010, //-120
       0x115090, //-119
@@ -860,7 +860,7 @@ auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return xDST[wrap::toSize(dif.x) + DSTMax] | yDST[wrap::toSize(dif.y) + DSTMax];
+  return xDST[wrap::toSize(dif.x) + DSTMAX] | yDST[wrap::toSize(dif.y) + DSTMAX];
 }
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
