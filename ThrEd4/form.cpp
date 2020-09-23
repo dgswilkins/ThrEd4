@@ -44,8 +44,7 @@
 
 namespace fi = form::internal;
 
-constexpr auto buttonHoleWidth = 20.0F;
-constexpr auto picoFactor      = 256.0F;
+constexpr auto BHWIDTH = 20.0F;
 
 static auto FormForInsert  = static_cast<FRMHED*>(nullptr); // insert form vertex in this form
 static auto FormVertexNext = uint32_t {0U}; // form vertex storage for form vertex insert
@@ -1376,7 +1375,7 @@ auto form::getplen() noexcept -> float {
   auto const& form  = FormList->operator[](ClosestFormToCursor);
   auto const  value = form.picoLength;
   // clang-format on
-  return (wrap::toFloat(value >> BYTSHFT) + wrap::toFloat(value & BYTMASK) / picoFactor);
+  return (wrap::toFloat(value >> BYTSHFT) + wrap::toFloat(value & BYTMASK) / fractionalFactor);
 }
 
 void form::savplen(float length) {
@@ -1387,7 +1386,7 @@ void form::savplen(float length) {
 	length = pClamp;
   }
   auto const fractionalPart = std::modf(length, &integerPart);
-  auto       fr             = wrap::floor<uint16_t>(fractionalPart * picoFactor);
+  auto       fr             = wrap::floor<uint16_t>(fractionalPart * fractionalFactor);
   auto       num            = gsl::narrow<uint32_t>(integerPart);
   FormList-> operator[](ClosestFormToCursor).picoLength = ((num << BYTSHFT) & B2MASK) | fr;
 }
@@ -2209,7 +2208,7 @@ void form::internal::chkbrd(FRMHED const& form) {
 	  case EDGEBHOL: { // BH Buttonhole
 		auto const length      = ButtonholeCornerLength;
 		ButtonholeCornerLength = form::getblen();
-		satin::satout(form, buttonHoleWidth);
+		satin::satout(form, BHWIDTH);
 		bhbrd(form);
 		ButtonholeCornerLength = length;
 		break;
@@ -4895,7 +4894,7 @@ void form::refilfn() {
 		case EDGEBHOL: {
 		  auto const length      = ButtonholeCornerLength;
 		  ButtonholeCornerLength = form::getblen();
-		  satin::satout(form, buttonHoleWidth);
+		  satin::satout(form, BHWIDTH);
 		  fi::blbrd(form);
 		  ButtonholeCornerLength = length;
 		  fi::ritbrd(form);
