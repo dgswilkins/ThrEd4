@@ -16310,9 +16310,7 @@ void thred::internal::init() {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   displayText::lodstr();
-  for (auto& iSize : ThreadSize) {
-	iSize = L'4';
-  }
+  ThreadSize.fill(L'4');
   if (IniFile.traceLength == 0.0F) {
 	IniFile.traceLength = TRACLEN;
   }
