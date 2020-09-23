@@ -1153,16 +1153,16 @@ auto form::internal::ritlin(fPOINT const& start, fPOINT const& finish, float use
   auto const delta  = fPOINT {finish.x - start.x, finish.y - start.y};
   auto       length = hypot(delta.x, delta.y);
   // This clamp is temporary to avoid overflow when BH corner value is too large. Find a better fix
-  constexpr auto clamp = 200.0F;
-  if (length > clamp) {
-	length = clamp;
+  constexpr auto CLAMP = 200.0F;
+  if (length > CLAMP) {
+	length = CLAMP;
   }
 
   InterleaveSequence->push_back(start);
   if (length > MaxStitchLen) {
-	constexpr auto minStitchLen = 1e-1F; // clamp minimum stitch length
-	if (userStitchLen < minStitchLen) {
-	  userStitchLen = minStitchLen;
+	constexpr auto MINSTLEN = 1e-1F; // clamp minimum stitch length
+	if (userStitchLen < MINSTLEN) {
+	  userStitchLen = MINSTLEN;
 	}
 	auto count = wrap::ceil<uint32_t>(length / userStitchLen);
 	if (count == 0U) {
@@ -1381,9 +1381,9 @@ auto form::getplen() noexcept -> float {
 void form::savplen(float length) {
   auto integerPart = 0.0F;
 
-  constexpr auto pClamp = 255.0F;
-  if (length > pClamp) {
-	length = pClamp;
+  constexpr auto PCLAMP = 255.0F;
+  if (length > PCLAMP) {
+	length = PCLAMP;
   }
   auto const fractionalPart = std::modf(length, &integerPart);
   auto       fr             = wrap::floor<uint16_t>(fractionalPart * FRACFACT);
@@ -1454,9 +1454,9 @@ void form::internal::boldlin(uint32_t vertexIndex, uint32_t start, uint32_t fini
   auto const delta  = fPOINT {(vEnd->x - vStart->x), (vEnd->y - vStart->y)};
   auto const length = hypot(delta.x, delta.y);
 
-  constexpr auto edgeStitchClamp = 1e-1F;
-  if (size < edgeStitchClamp) {
-	size = edgeStitchClamp;
+  constexpr auto ESCLAMP = 1e-1F; // edge stitch minimum length clamp
+  if (size < ESCLAMP) {
+	size = ESCLAMP;
   }
   auto count = wrap::round<uint32_t>(length / size);
   if (count != 0U) {
@@ -1931,8 +1931,8 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
 	form::filinsb(outerPoint, stitchPoint);
 	auto level = 0U;
 
-	constexpr auto MaskLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
-	if ((count & MaskLSN) != 0U) {
+	constexpr auto MASKLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
+	if ((count & MASKLSN) != 0U) {
 	  level = form::psg() % count;
 	}
 	else {
@@ -2021,13 +2021,13 @@ void form::internal::pfn(std::vector<VRCT2> const& underlayVerticalRect,
 }
 
 void form::internal::prsmal(float width) {
-  constexpr auto ufsFactor   = 0.8F; // set the minimum to 80% of the underlay fill spacing
-  constexpr auto widthFactor = 0.9F; // or 90% of the actual width
+  constexpr auto UFSFACT   = 0.8F; // set the minimum to 80% of the underlay fill spacing
+  constexpr auto WIDFACT = 0.9F; // or 90% of the actual width
 
   auto iOutput       = 0U;
-  auto minimumLength = USPAC * ufsFactor;
+  auto minimumLength = USPAC * UFSFACT;
   if (minimumLength > width) {
-	minimumLength = width * widthFactor;
+	minimumLength = width * WIDFACT;
   }
   auto iReference = 0U;
   for (auto iSequence = 1U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
@@ -2362,7 +2362,7 @@ void form::internal::fnhor(std::vector<uint32_t>& groupIndexSequence,
 }
 
 void form::internal::prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices) {
-  constexpr auto reducFactor = 0.1F; // reduction factor
+  constexpr auto REDFACT = 0.1F; // reduction factor
 
   auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const nextV = std::next(vertexIt, 1);
@@ -2373,10 +2373,10 @@ void form::internal::prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<
   ++output;
   std::copy(vertexIt, wrap::next(vertexIt, form.vertexCount), output);
   if (fabs(delta.x) > fabs(delta.y)) {
-	ratio = fabs(reducFactor / delta.x);
+	ratio = fabs(REDFACT / delta.x);
   }
   else {
-	ratio = fabs(reducFactor / delta.y);
+	ratio = fabs(REDFACT / delta.y);
   }
   angledFormVertices[0].x = vertexIt->x - delta.x * ratio;
   angledFormVertices[0].y = vertexIt->y - delta.y * ratio;
@@ -2388,10 +2388,10 @@ void form::internal::prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<
   delta.x = lastV->x - prevV->x;
   delta.y = lastV->y - prevV->y;
   if (fabs(delta.x) > fabs(delta.y)) {
-	ratio = fabs(reducFactor / delta.x);
+	ratio = fabs(REDFACT / delta.x);
   }
   else {
-	ratio = fabs(reducFactor / delta.y);
+	ratio = fabs(REDFACT / delta.y);
   }
   angledFormVertices[angledForm.vertexCount - 1U].x = lastV->x + delta.x * ratio;
   angledFormVertices[angledForm.vertexCount - 1U].y = lastV->y + delta.y * ratio;
@@ -2639,8 +2639,8 @@ void form::internal::contf(FRMHED& form) {
 	  }
 	  delta = fPOINT {highPoint.x - lowPoint.x, highPoint.y - lowPoint.y};
 
-	  constexpr auto refFactor = 0.9F; // reduction factor for the reference
-	  if (reference.length > refFactor * LineSpacing) {
+	  constexpr auto REFFACT = 0.9F; // reduction factor for the reference
+	  if (reference.length > REFFACT * LineSpacing) {
 		auto const polyLine = PVEC {atan2(delta.y, delta.x), hypot(delta.x, delta.y)};
 		auto const polyDiff = PVEC {polyLine.angle - reference.angle, polyLine.length / reference.length};
 		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
@@ -2679,7 +2679,7 @@ void form::internal::contf(FRMHED& form) {
 }
 
 void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices) {
-  constexpr auto safetyOffset = 0.01F; // factor to ensure that formOffset is not 0
+  constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
 
   auto leftEdge =
       (std::min_element(currentFormVertices.begin(), currentFormVertices.end(), [](fPOINT const& a, fPOINT const& b) {
@@ -2687,7 +2687,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVe
       }))->x;
   if (leftEdge < ClipRectSize.cx) {
 	StateMap->set(StateFlag::WASNEG);
-	formOffset = ClipRectSize.cx + fabs(leftEdge) + safetyOffset;
+	formOffset = ClipRectSize.cx + fabs(leftEdge) + SAFOFFST;
 	for (auto& vertex : currentFormVertices) {
 	  vertex.x += formOffset;
 	}
@@ -3837,9 +3837,9 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 	++pathLength;
 	auto maxPathLength = gsl::narrow<ptrdiff_t>(tempPath.size() - sequencePathIndex);
 
-	constexpr auto depthFactor = 8; // tuneable value. Increasing this increases path discovery time exponentially
-	if (maxPathLength > depthFactor) {
-	  maxPathLength = depthFactor;
+	constexpr auto DEPFACT = 8; // tuneable value. Increasing this increases path discovery time exponentially
+	if (maxPathLength > DEPFACT) {
+	  maxPathLength = DEPFACT;
 	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength > maxPathLength) {
@@ -4372,7 +4372,7 @@ void form::internal::lcon(FRMHED const&          form,
 	regions.back().end            = lineCount - 1U;
 	auto const     regionCount    = wrap::toUnsigned(regions.size());
 	auto           visitedRegions = boost::dynamic_bitset<>(regionCount);
-	constexpr auto iStartLine     = 0U;
+	constexpr auto STLINE     = 0U;
 	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	  auto count = 0U;
 	  if ((regions[iRegion].end - regions[iRegion].start) > 1) {
@@ -4381,7 +4381,7 @@ void form::internal::lcon(FRMHED const&          form,
 		  ++startGroup;
 		  if (sortedLines[iLine]->group != startGroup) {
 			if (count == 0U) {
-			  regions[iRegion].regionBreak = iStartLine;
+			  regions[iRegion].regionBreak = STLINE;
 			}
 			++count;
 			startGroup = sortedLines[iLine]->group;
@@ -4514,13 +4514,13 @@ void form::internal::lcon(FRMHED const&          form,
 	  }
 	}
 	else {
-	  constexpr auto sequencePathIndex = 1U;
-	  sequencePath.resize(sequencePathIndex);
+	  constexpr auto SPATHIDX = 1U; // Sequence path index
+	  sequencePath.resize(SPATHIDX);
 	  auto lastGroup       = 0U;
 	  sequencePath[0].node = 0;
 	  wrap::narrow(sequencePath[0].nextGroup, sortedLines[regions[0].end]->group);
 	  sequencePath[0].skp = false;
-	  durgn(form, sequencePath, visitedRegions, sortedLines, 0, lineCount, regions, lastGroup, sequencePathIndex, workingFormVertices);
+	  durgn(form, sequencePath, visitedRegions, sortedLines, 0, lineCount, regions, lastGroup, SPATHIDX, workingFormVertices);
 	}
 
 #endif
@@ -4825,12 +4825,12 @@ void form::refilfn() {
   auto fillStartsMap  = 0U;            // fill starts bitmap
   xt::fdelstch(form, fillStartsData, fillStartsMap);
   StateMap->set(StateFlag::WASREFIL);
-  constexpr auto minSpace = 0.5F;
-  if (form.fillSpacing < minSpace && !clip::isclp(form)) {
-	form.fillSpacing = minSpace;
+  constexpr auto MINSPACE = 0.5F;
+  if (form.fillSpacing < MINSPACE && !clip::isclp(form)) {
+	form.fillSpacing = MINSPACE;
   }
-  if (form.edgeSpacing < minSpace) {
-	form.edgeSpacing = minSpace;
+  if (form.edgeSpacing < MINSPACE) {
+	form.edgeSpacing = MINSPACE;
   }
   if (!clip::isclp(form)) {
 	UserStitchLength = form.lengthOrCount.stitchLength;
@@ -6526,13 +6526,13 @@ void form::sethup() noexcept {
 }
 
 void form::dustar(uint32_t starCount, float length) {
-  constexpr auto starMin = 3U;
-  constexpr auto starMax = 100U;
-  if (starCount < starMin) {
-	starCount = starMin;
+  constexpr auto STARMIN = 3U; // minimum star vertices
+  constexpr auto STARMAX = 100U; // maximum star vertices
+  if (starCount < STARMIN) {
+	starCount = STARMIN;
   }
-  if (starCount > starMax) {
-	starCount = starMax;
+  if (starCount > STARMAX) {
+	starCount = STARMAX;
   }
   auto const stepAngle   = PI_F / wrap::toFloat(starCount);
   auto       angle       = stepAngle / 2.0F + PI_F;
@@ -6577,13 +6577,13 @@ void form::dustar(uint32_t starCount, float length) {
 }
 
 void form::duspir(uint32_t stepCount) {
-  constexpr auto stepMin = 3U;
-  constexpr auto stepMax = 100U;
-  if (stepCount < stepMin) {
-	stepCount = stepMin;
+  constexpr auto STEPMIN = 3U; // Spiral step minmum
+  constexpr auto STEPMAX = 100U; // spiral step maximum
+  if (stepCount < STEPMIN) {
+	stepCount = STEPMIN;
   }
-  if (stepCount > stepMax) {
-	stepCount = stepMax;
+  if (stepCount > STEPMAX) {
+	stepCount = STEPMAX;
   }
   auto const stepAngle = PI_F2 / wrap::toFloat(stepCount);
   auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
@@ -6635,16 +6635,16 @@ void form::duspir(uint32_t stepCount) {
 }
 
 void form::duhart(uint32_t sideCount) {
-  constexpr auto hartAngle      = 0.28F;
-  constexpr auto hartInflection = 0.7F;
-  constexpr auto hartStep       = 4.5F;
-  constexpr auto sideMin        = 6U;
-  constexpr auto sideMax        = 100U;
-  if (sideCount > sideMax) {
-	sideCount = sideMax;
+  constexpr auto HARTANG      = 0.28F; // heart angle in radians
+  constexpr auto HARTINFL = 0.7F; // heart inflection point in radians
+  constexpr auto HARTSTEP       = 4.5F;
+  constexpr auto HSIDEMIN        = 6U; // minimum number of heart vertices
+  constexpr auto HSIDEMAX        = 100U; // maximum number of heart vertices
+  if (sideCount > HSIDEMAX) {
+	sideCount = HSIDEMAX;
   }
-  if (sideCount < sideMin) {
-	sideCount = sideMin;
+  if (sideCount < HSIDEMIN) {
+	sideCount = HSIDEMIN;
   }
   FormList->push_back(FRMHED {});
   auto& currentForm       = FormList->back();
@@ -6656,10 +6656,10 @@ void form::duhart(uint32_t sideCount) {
   auto       stepAngle        = PI_F2 / wrap::toFloat(sideCount);
   auto const length           = 300.0F / wrap::toFloat(sideCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
-  auto angle    = PI_F * hartAngle;
+  auto angle    = PI_F * HARTANG;
   auto iVertex = ptrdiff_t {0};
   auto maximumX = 0.0F;
-  while (angle > -PI_F * hartInflection) {
+  while (angle > -PI_F * HARTINFL) {
 	if (point.x > maximumX) {
 	  maximumX = point.x;
 	}
@@ -6669,10 +6669,10 @@ void form::duhart(uint32_t sideCount) {
 	point.y += length * sin(angle);
 	angle -= stepAngle;
   }
-  stepAngle /= hartStep;
+  stepAngle /= HARTSTEP;
   auto lastVertex = iVertex;
   auto vBegin   = wrap::next(FormVertices->begin(), savedVertexIndex);
-  while (point.x > vBegin->x && iVertex < wrap::ptrdiff(2U * sideMax)) {
+  while (point.x > vBegin->x && iVertex < wrap::ptrdiff(2U * HSIDEMAX)) {
 	FormVertices->push_back(fPOINT {point.x, point.y});
 	++iVertex;
 	point.x += length * cos(angle);
@@ -6772,9 +6772,9 @@ constexpr auto form::internal::shreg(float highValue, float reference, float egg
 }
 
 void form::dueg(uint32_t sides) {
-  constexpr auto sideMin = 8U;
-  if (sides < sideMin) {
-	sides = sideMin;
+  constexpr auto ESIDEMIN = 8U; // mimimum number of egg vertices
+  if (sides < ESIDEMIN) {
+	sides = ESIDEMIN;
   }
   form::durpoli(sides);
   auto const& form      = FormList->back();
@@ -6797,13 +6797,13 @@ void form::dueg(uint32_t sides) {
 }
 
 void form::duzig(uint32_t vertices) {
-  constexpr auto vertMin = 3U;
-  constexpr auto vertMax = 100U;
-  if (vertices < vertMin) {
-	vertices = vertMin;
+  constexpr auto ZVERTMIN = 3U; // mimimum number of zig-zag vertices
+  constexpr auto ZVERTMAX = 100U; // maximum number of zig-zag vertices
+  if (vertices < ZVERTMIN) {
+	vertices = ZVERTMIN;
   }
-  if (vertices > vertMax) {
-	vertices = vertMax;
+  if (vertices > ZVERTMAX) {
+	vertices = ZVERTMAX;
   }
   auto newForm        = FRMHED {};
   newForm.vertexIndex = thred::adflt(vertices);
@@ -8452,12 +8452,12 @@ void form::clpspac(uint32_t const insertPoint, uint32_t count) {
 
 void form::stchadj() {
   auto const     codedClosest = ClosestFormToCursor << FRMSHFT;
-  constexpr auto offset       = 1U << FRMSHFT;
+  constexpr auto OFFSET       = 1U << FRMSHFT; // coded next form offset
   for (auto& stitch : *StitchBuffer) {
 	auto codedForm = stitch.attribute & FRMSK;
 	if (codedForm > codedClosest) {
 	  stitch.attribute &= NFRMSK;
-	  codedForm += offset;
+	  codedForm += OFFSET;
 	  stitch.attribute |= codedForm;
 	}
   }
@@ -8534,8 +8534,8 @@ void form::stchs2frm() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
-	constexpr auto stitchMax = 12000U;
-	if ((GroupEndStitch - GroupStartStitch) > stitchMax) {
+	constexpr auto STITCHMX = 12000U; // maximum number of stitches in a group
+	if ((GroupEndStitch - GroupStartStitch) > STITCHMX) {
 	  displayText::tabmsg(IDS_STMAX);
 	  return;
 	}
