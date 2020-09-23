@@ -47,9 +47,9 @@ namespace fi = form::internal;
 constexpr auto buttonHoleWidth = 20.0F;
 constexpr auto picoFactor      = 256.0F;
 
-auto static FormForInsert  = static_cast<FRMHED*>(nullptr); // insert form vertex in this form
-auto static FormVertexNext = uint32_t {0U}; // form vertex storage for form vertex insert
-auto static FormVertexPrev = uint32_t {0U}; // form vertex storage for form vertex insert
+static auto FormForInsert  = static_cast<FRMHED*>(nullptr); // insert form vertex in this form
+static auto FormVertexNext = uint32_t {0U}; // form vertex storage for form vertex insert
+static auto FormVertexPrev = uint32_t {0U}; // form vertex storage for form vertex insert
 
 void form::frmclr(FRMHED& destination) noexcept {
   auto head   = FRMHED {};
@@ -1334,7 +1334,7 @@ auto form::getlast(FRMHED const& form) -> uint32_t {
 }
 
 void form::filinsb(fPOINT const& point, fPOINT& stitchPoint) {
-  auto constexpr MAXSTCH = 54.0F; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
+  constexpr auto MAXSTCH = 54.0F; // maximum permitted stitch length for pfaf in pfaf "stitch pixels"
   auto const delta  = fPOINT {(point.x - stitchPoint.x), (point.y - stitchPoint.y)};
   auto const length = hypot(delta.x, delta.y);
   auto       count  = wrap::round<uint32_t>(length / MAXSTCH + 1.0F);

@@ -39,7 +39,7 @@
 
 namespace ci = clip::internal;
 
-auto static ClipReference = fPOINT {}; // clipboard reference formOrigin
+static auto ClipReference = fPOINT {}; // clipboard reference formOrigin
 
 auto clip::iseclp(uint32_t iForm) noexcept -> bool {
   auto const& form = FormList->operator[](iForm);

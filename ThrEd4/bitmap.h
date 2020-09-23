@@ -45,8 +45,8 @@ namespace internal {
   auto bitar() -> bool;
   void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
   void bitsiz();
-  auto constexpr fswap(COLORREF color) noexcept -> COLORREF;
-  auto constexpr gudtyp(WORD bitCount) noexcept -> bool;
+  constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
   void movmap(int cnt, uint8_t* buffer);
   auto nuBit() noexcept -> BOOL;
   auto loadName(fs::path const* directory, fs::path* fileName) -> bool;

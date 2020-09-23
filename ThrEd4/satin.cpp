@@ -25,7 +25,7 @@
 
 namespace si = satin::internal;
 
-auto static StartPoint = uint32_t {0U}; // starting formOrigin for a satin stitch guide-line
+static auto StartPoint = uint32_t {0U}; // starting formOrigin for a satin stitch guide-line
 
 void satin::delsac(uint32_t formIndex) {
   auto& formList = *FormList;

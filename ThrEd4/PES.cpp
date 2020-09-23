@@ -35,8 +35,8 @@ constexpr auto PECScale    = 5.0F / 3.0F;
 constexpr auto invPECScale = 3.0F / 5.0F;
 constexpr auto bitsPerByte = 8U;
 
-auto static PEScolors             = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
-auto static PESequivColors        = std::array<uint8_t, COLOR_COUNT> {}; // pes equivalent colors
+static auto PEScolors             = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
+static auto PESequivColors        = std::array<uint8_t, COLOR_COUNT> {}; // pes equivalent colors
 
 THREAD const PESThread[] = {
     {{0x00, 0x00, 0x00}, "Unknown", ""},                // Index  00

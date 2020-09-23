@@ -44,8 +44,8 @@
 
 namespace xi = xt::internal;
 
-auto static DesignSize = fPOINT {};              // design size
-auto static ColorOrder = std::array<uint32_t, COLOR_COUNT>{}; // color order adjusted for applique
+static auto DesignSize = fPOINT {};              // design size
+static auto ColorOrder = std::array<uint32_t, COLOR_COUNT>{}; // color order adjusted for applique
 
 enum stitchStyles {
   TYPE_APPLIQUE = 1, // applique
@@ -57,7 +57,7 @@ enum stitchStyles {
   TYPE_BORDER        // border
 };
 
-auto static constexpr StitchTypes = std::array<char, 13>{
+static constexpr auto StitchTypes = std::array<char, 13>{
     0,             // 0 no type
     TYPE_APPLIQUE, // 1 applique
     TYPE_CWALK,    // 2 center walk

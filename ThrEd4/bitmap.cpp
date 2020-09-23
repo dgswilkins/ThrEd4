@@ -45,7 +45,7 @@ constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
 constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
-auto constexpr bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
+constexpr auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
@@ -247,7 +247,7 @@ void bitmap::internal::bitsiz() {
   StitchBmpRatio.y = BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight);
 }
 
-auto constexpr bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
+constexpr auto bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
   switch (bitCount) {
 	case 1U:
 	case BPP24:
@@ -276,7 +276,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 	COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-	auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	constexpr auto aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
 	hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
@@ -368,7 +368,7 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-		auto constexpr aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+		constexpr auto aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
 		hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));

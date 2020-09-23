@@ -31,8 +31,8 @@
 
 namespace di = DST::internal;
 
-auto static ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
-auto static RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
+static auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
+static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 
 class DSTDAT
 {

@@ -418,7 +418,7 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-auto static CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+static auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;

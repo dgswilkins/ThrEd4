@@ -54,7 +54,7 @@ class PCSHEADER // pcs file header structure
 
 namespace pci = PCS::internal;
 
-auto static PCSHeader = PCSHEADER {}; // pcs file header
+static auto PCSHeader = PCSHEADER {}; // pcs file header
 
 auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool {
   auto flag = true;
