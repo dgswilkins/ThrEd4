@@ -971,7 +971,7 @@ void satin::internal::satfn(FRMHED const&             form,
 	auto stitchPoint = *(wrap::next(vBegin, line1Start));
 	auto loop        = 0U;
 
-	constexpr auto loopLimit = 20000U; // limit the iterations
+	constexpr auto LOOPLIM = 20000U; // limit the iterations
 
 	do {
 	  flag = false;
@@ -1059,7 +1059,7 @@ void satin::internal::satfn(FRMHED const&             form,
 		  flag = true;
 		}
 	  }
-	} while (flag && (loop < loopLimit));
+	} while (flag && (loop < LOOPLIM));
   }
 }
 
@@ -1319,8 +1319,8 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
   }
   auto satinBackup = std::vector<fPOINT> {}; // backup stitches in satin fills
 
-  constexpr auto satBufferSize = 8U;
-  satinBackup.resize(satBufferSize);
+  constexpr auto SATBUFSZ = 8U; // satin buffer size
+  satinBackup.resize(SATBUFSZ);
   std::fill(satinBackup.begin(), satinBackup.end(), fPOINT {BIGFLOAT, BIGFLOAT});
   auto const innerStep        = fPOINT {innerDelta.x / wrap::toFloat(count), innerDelta.y / wrap::toFloat(count)};
   auto const outerStep        = fPOINT {outerDelta.x / wrap::toFloat(count), outerDelta.y / wrap::toFloat(count)};
@@ -1396,9 +1396,9 @@ void satin::satout(FRMHED const& form, float satinWidth) {
 	OutsidePoints = OutsidePointList;
 	InsidePoints  = InsidePointList;
 
-	constexpr auto defaultWidth = 0.1F;
+	constexpr auto DEFWIDTH = 0.1F; // default satin width
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	  si::outfn(form, iVertex, iVertex + 1, defaultWidth);
+	  si::outfn(form, iVertex, iVertex + 1, DEFWIDTH);
 	}
 	auto count = 0U;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
