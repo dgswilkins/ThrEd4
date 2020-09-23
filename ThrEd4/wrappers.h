@@ -38,7 +38,6 @@ template <class outType, class inType> auto floor(inType invar) -> outType {
   return gsl::narrow<outType>(std::floor(invar));
 }
 
-void getTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept;
 void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
 
 template <class inType> auto midl(inType high, inType low) noexcept -> float {

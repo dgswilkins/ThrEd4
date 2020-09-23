@@ -62,10 +62,6 @@ void wrap::textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, 
   TextOut(hdc, nXStart, nYStart, lpString, gsl::narrow<int32_t>(cchString));
 }
 
-void wrap::getTextExtentPoint(HDC hdc, LPCTSTR lpString, uint32_t cbString, LPSIZE lpSize) noexcept {
-  GetTextExtentPoint(hdc, lpString, gsl::narrow<int32_t>(cbString), lpSize);
-}
-
 auto wrap::toFloat(double invar) -> float {
   auto result = 0.0F;
   try {
