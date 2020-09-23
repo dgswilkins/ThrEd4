@@ -85,8 +85,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   }
   auto bytesRead = DWORD {0};
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
-  constexpr auto MB_Sig = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-  if (BitmapFileHeader.bfType == MB_Sig) {
+  constexpr auto MB_SIG = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+  if (BitmapFileHeader.bfType == MB_SIG) {
 	auto fileHeaderSize =
 	    wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
@@ -275,9 +275,9 @@ auto bitmap::internal::saveName(fs::path& fileName) {
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
-	COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-	constexpr auto aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-	hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	COMDLG_FILTERSPEC const filterFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
+	constexpr auto FILTERCNT        = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // File filter count
+	hr = pFileSave->SetFileTypes(FILTERCNT, static_cast<COMDLG_FILTERSPEC const*>(filterFileTypes));
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
 	auto bmpName = UTF16BMPname->filename().wstring();
@@ -367,11 +367,11 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 	  hr             = pFileOpen->GetOptions(&dwOptions);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
-		COMDLG_FILTERSPEC const aFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-		constexpr auto aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+		COMDLG_FILTERSPEC const filterFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
+		constexpr auto FILTERCNT        = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // Filter file types count
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+		hr += pFileOpen->SetFileTypes(FILTERCNT, static_cast<COMDLG_FILTERSPEC const*>(filterFileTypes));
 		hr += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
@@ -486,24 +486,24 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-  constexpr auto DefaultBitmapBackgroundColors = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
-                                                                                    0x00c8dfee,
-                                                                                    0x00708189,
-                                                                                    0x00a5a97a,
-                                                                                    0x00b8d6fe,
-                                                                                    0x008a8371,
-                                                                                    0x004b6cb8,
-                                                                                    0x009cdcc2,
-                                                                                    0x00366d39,
-                                                                                    0x00dcfcfb,
-                                                                                    0x003c4f75,
-                                                                                    0x0095b086,
-                                                                                    0x00c9dcba,
-                                                                                    0x0043377b,
-                                                                                    0x00b799ae,
-                                                                                    0x0054667a};
+  constexpr auto DFCOLORS = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
+                                                            0x00c8dfee,
+                                                            0x00708189,
+                                                            0x00a5a97a,
+                                                            0x00b8d6fe,
+                                                            0x008a8371,
+                                                            0x004b6cb8,
+                                                            0x009cdcc2,
+                                                            0x00366d39,
+                                                            0x00dcfcfb,
+                                                            0x003c4f75,
+                                                            0x0095b086,
+                                                            0x00c9dcba,
+                                                            0x0043377b,
+                                                            0x00b799ae,
+                                                            0x0054667a};
 
-  BitmapBackgroundColors = DefaultBitmapBackgroundColors;
+  BitmapBackgroundColors = DFCOLORS;
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {
