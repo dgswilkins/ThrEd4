@@ -40,8 +40,8 @@
 
 namespace ffi = formForms::internal;
 
-constexpr auto textMargin  = 3L;
-constexpr auto textMargin2 = 6L;
+constexpr auto TXTMARG  = 3L; // text margin in pixels
+constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
 static auto LabelWindowCoords = RECT {};  // location of left windows in the form data sheet
 static auto LabelWindowSize   = POINT {}; // size of the left windows in the form data sheet
@@ -71,7 +71,7 @@ auto formForms::maxwid(uint32_t start, uint32_t finish) {
   while (start <= finish) {
 	formForms::maxtsiz(StringTable->operator[](start++), textSize);
   }
-  return textSize.x + textMargin2;
+  return textSize.x + TXTMARG2;
 }
 
 auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
@@ -149,14 +149,14 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   auto const& stringTable  = *StringTable;
   auto&       labelWindow  = *LabelWindow;
   auto&       valueWindow  = *ValueWindow;
-  ValueWindowCoords.top    = textMargin;
+  ValueWindowCoords.top    = TXTMARG;
   LabelWindowCoords.top    = ValueWindowCoords.top;
-  ValueWindowCoords.bottom = textMargin + LabelWindowSize.y;
+  ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.y;
   LabelWindowCoords.bottom = ValueWindowCoords.bottom;
-  LabelWindowCoords.left   = textMargin;
-  LabelWindowCoords.right  = textMargin + LabelWindowSize.x;
-  ValueWindowCoords.left   = textMargin2 + LabelWindowSize.x;
-  ValueWindowCoords.right  = textMargin2 + LabelWindowSize.x + ValueWindowSize.x + textMargin2;
+  LabelWindowCoords.left   = TXTMARG;
+  LabelWindowCoords.right  = TXTMARG + LabelWindowSize.x;
+  ValueWindowCoords.left   = TXTMARG2 + LabelWindowSize.x;
+  ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.x + ValueWindowSize.x + TXTMARG2;
   labelWindow[LFRM]        = ffi::txtwin(stringTable[STR_TXT0], LabelWindowCoords);
   auto choice              = (form.type == FRMLINE) ? stringTable[STR_EDG1] : stringTable[STR_FREH];
   valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
@@ -561,12 +561,12 @@ void formForms::prfmsg() {
   auto preferenceDC = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
-  LabelWindowCoords.top = ValueWindowCoords.top = textMargin;
-  LabelWindowCoords.bottom = ValueWindowCoords.bottom = textMargin + LabelWindowSize.y;
-  LabelWindowCoords.left                              = textMargin;
-  LabelWindowCoords.right                             = textMargin + LabelWindowSize.x;
-  ValueWindowCoords.left                              = textMargin2 + LabelWindowSize.x;
-  ValueWindowCoords.right = textMargin2 + LabelWindowSize.x + ValueWindowSize.x + textMargin2;
+  LabelWindowCoords.top = ValueWindowCoords.top = TXTMARG;
+  LabelWindowCoords.bottom = ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.y;
+  LabelWindowCoords.left                              = TXTMARG;
+  LabelWindowCoords.right                             = TXTMARG + LabelWindowSize.x;
+  ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.x;
+  ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.x + ValueWindowSize.x + TXTMARG2;
   ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), STR_PRF10);
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen * IPFGRAN)), STR_PRF29);
   ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth * IPFGRAN)), STR_PRF3);
@@ -772,7 +772,7 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 }
 
 void formForms::dasyfrm() {
-  constexpr auto dasySize = 6.0F; // ratio of default daisy form to the screen size
+  constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
   if (!DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc))) {
@@ -791,7 +791,7 @@ void formForms::dasyfrm() {
   if (maximumYsize > maximumXsize) {
 	maximumXsize = maximumYsize;
   }
-  maximumXsize /= dasySize;
+  maximumXsize /= DASYSIZE;
   auto       diameter     = IniFile.daisyDiameter;
   auto       petalLength  = IniFile.daisyPetalLen;
   auto       holeDiameter = IniFile.daisyHoleDiameter;
@@ -900,12 +900,12 @@ void formForms::dasyfrm() {
   }
   auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
 
-  constexpr auto holeMargin = 0.01F;
+  constexpr auto HOLEMARG = 0.01F; // hole margin offset
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	auto vRef = wrap::next(vertexIt, fref - 1U);
-	vRef->y += holeMargin;
+	vRef->y += HOLEMARG;
 	++vRef;
-	vRef->y += holeMargin;
+	vRef->y += HOLEMARG;
   }
   form.vertexCount = iVertex;
   if (UserFlagMap->test(UserFlag::DAZD)) {
@@ -1019,7 +1019,7 @@ void formForms::setear() {
       ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc));
   if (nResult > 0) {
 	thred::savdo();
-	constexpr auto twistFactor = 4.0F;
+	constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
 
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
@@ -1053,7 +1053,7 @@ void formForms::setear() {
 	vBegin = wrap::next(FormVertices->begin(), form.vertexIndex); // iterator invalidated by push_back
 	vNext = std::next(vBegin);
 	if (twistStep != 0.0F) {
-	  vBegin->x = vNext->x + twistStep / twistFactor;
+	  vBegin->x = vNext->x + twistStep / TWSTFACT;
 	}
 	else {
 	  vBegin->x = middle;
@@ -1067,11 +1067,11 @@ void formForms::setear() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const size =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / twistFactor / size.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / twistFactor / size.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / TWSTFACT / size.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}
@@ -1126,9 +1126,9 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.waveLobes, buffer.data());
 
-		  constexpr auto wavePointLimit = 100U; // max number of points in a wave form
-		  if (IniFile.wavePoints > wavePointLimit) {
-			IniFile.wavePoints = wavePointLimit;
+		  constexpr auto WPCLAMP = 100U; // max number of points in a wave form
+		  if (IniFile.wavePoints > WPCLAMP) {
+			IniFile.wavePoints = WPCLAMP;
 		  }
 		  if (IniFile.wavePoints < 3) {
 			IniFile.wavePoints = 3;
@@ -1167,7 +1167,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
-  constexpr auto wavSize = 4.0F;
+  constexpr auto WAVSIZE = 4.0F; // wave size factor
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
   if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) {
 	thred::savdo();
@@ -1230,11 +1230,11 @@ void formForms::wavfrm() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / wavSize / selectedSize.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / wavSize / selectedSize.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / WAVSIZE / selectedSize.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}
