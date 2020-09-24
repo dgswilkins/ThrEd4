@@ -128,16 +128,16 @@ void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEA
 }
 
 auto xt::internal::bpsg() noexcept -> uint32_t {
-  constexpr auto bit4      = 0x8U;
-  constexpr auto bit31     = 0x40000000U;
+  constexpr auto BIT4      = 0x8U;
+  constexpr auto BIT31     = 0x40000000U;
   auto           testValue = 0U;
   if (PseudoRandomValue == 0U) {
 	PseudoRandomValue = FSED;
   }
-  testValue = PseudoRandomValue & (bit4 | bit31);
+  testValue = PseudoRandomValue & (BIT4 | BIT31);
   PseudoRandomValue >>= 1U;
-  if (testValue == bit4 || testValue == bit31) {
-	PseudoRandomValue |= bit31;
+  if (testValue == BIT4 || testValue == BIT31) {
+	PseudoRandomValue |= BIT31;
   }
   return PseudoRandomValue;
 }
@@ -682,11 +682,10 @@ void xt::internal::fncwlk(FRMHED& form) {
 }
 
 void xt::srtcol() {
-  constexpr auto colorSize = COLORCNT;
   auto           histogram = std::vector<uint32_t> {};
-  histogram.resize(colorSize);
+  histogram.resize(COLORCNT);
   auto colorStartStitch = std::vector<uint32_t> {};
-  colorStartStitch.resize(colorSize);
+  colorStartStitch.resize(COLORCNT);
   for (auto& stitch : *StitchBuffer) {
 	++(histogram[stitch.attribute & COLMSK]);
   }
@@ -925,8 +924,8 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 		}
 	  }
 	}
-	constexpr auto maxStitchLength = 9.0F * PFGRAN; // anything over 9 millimeters should result in another stitch
-	if (minimumLength > maxStitchLength) {
+	constexpr auto SLMAX = 9.0F * PFGRAN; // anything over 9 millimeters should result in another stitch
+	if (minimumLength > SLMAX) {
 	  ++totalJumps;
 	}
 	++(formFillCounter[pRecs[currentRegion]->form]);
@@ -1017,8 +1016,8 @@ void xt::fsort() {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
 	auto stitchRegion = std::vector<OREC> {};
 
-	constexpr auto expectedRegions = 100U;
-	stitchRegion.reserve(expectedRegions);
+	constexpr auto EXPREGION = 100U;  //expected regions
+	stitchRegion.reserve(EXPREGION);
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
 	thred::savdo();
@@ -2349,9 +2348,9 @@ void xt::internal::setstxt(int32_t stringIndex, float value, HWND dialog) {
 
 auto xt::internal::getstxt(int32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
-  constexpr auto bufferSize = 16U;
+  constexpr auto SZBUFFER = 16U;
 
-  auto buffer = std::array<wchar_t, bufferSize> {};
+  auto buffer = std::array<wchar_t, SZBUFFER> {};
   GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
   return wrap::wcstof(buffer.data()) * PFGRAN;
 }
@@ -2480,14 +2479,14 @@ void xt::nudsiz() {
 	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) {
 	  flag = 0;
 
-	  constexpr auto hoopRatio = 1.05F; // make the hoop 5% bigger
+	  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
 	  if (DesignSize.x > IniFile.hoopSizeX) {
-		IniFile.hoopSizeX = DesignSize.x * hoopRatio;
+		IniFile.hoopSizeX = DesignSize.x * HUPRATIO;
 		UnzoomedRect.x    = std::lround(IniFile.hoopSizeX);
 		flag              = 1;
 	  }
 	  if (DesignSize.y > IniFile.hoopSizeY) {
-		IniFile.hoopSizeY = DesignSize.y * hoopRatio;
+		IniFile.hoopSizeY = DesignSize.y * HUPRATIO;
 		UnzoomedRect.y    = std::lround(IniFile.hoopSizeY);
 		flag              = 1;
 	  }
