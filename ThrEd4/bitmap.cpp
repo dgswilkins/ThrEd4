@@ -486,24 +486,24 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() noexcept {
-  constexpr auto DFCOLORS = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
-                                                            0x00c8dfee,
-                                                            0x00708189,
-                                                            0x00a5a97a,
-                                                            0x00b8d6fe,
-                                                            0x008a8371,
-                                                            0x004b6cb8,
-                                                            0x009cdcc2,
-                                                            0x00366d39,
-                                                            0x00dcfcfb,
-                                                            0x003c4f75,
-                                                            0x0095b086,
-                                                            0x00c9dcba,
-                                                            0x0043377b,
-                                                            0x00b799ae,
-                                                            0x0054667a};
+  constexpr auto defaultColors = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
+                                                                 0x00c8dfee,
+                                                                 0x00708189,
+                                                                 0x00a5a97a,
+                                                                 0x00b8d6fe,
+                                                                 0x008a8371,
+                                                                 0x004b6cb8,
+                                                                 0x009cdcc2,
+                                                                 0x00366d39,
+                                                                 0x00dcfcfb,
+                                                                 0x003c4f75,
+                                                                 0x0095b086,
+                                                                 0x00c9dcba,
+                                                                 0x0043377b,
+                                                                 0x00b799ae,
+                                                                 0x0054667a};
 
-  BitmapBackgroundColors = DFCOLORS;
+  BitmapBackgroundColors = defaultColors;
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {

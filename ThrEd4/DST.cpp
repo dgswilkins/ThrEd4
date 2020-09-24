@@ -60,7 +60,7 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
-  static constexpr auto DSTVALS = std::array<DSTDAT, 22> { // DST offset values
+  static constexpr auto DSTvalues = std::array<DSTDAT, 22> { // DST offset values
       DSTDAT {XCOR, 1},   DSTDAT {XCOR, -1}, DSTDAT {XCOR, 9},  DSTDAT {XCOR, -9},
       DSTDAT {YCOR, -9},  DSTDAT {YCOR, 9},  DSTDAT {YCOR, -1}, DSTDAT {YCOR, 1},
       DSTDAT {XCOR, 3},   DSTDAT {XCOR, -3}, DSTDAT {XCOR, 27}, DSTDAT {XCOR, -27},
@@ -70,7 +70,7 @@ void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
 
   auto shift = 1U;
   pout       = POINT {};
-  for (auto const& DSTValue : DSTVALS) {
+  for (auto const& DSTValue : DSTvalues) {
 	if ((number & shift) != 0U) {
 	  if (DSTValue.cor != XCOR) {
 		pout.y += DSTValue.val;

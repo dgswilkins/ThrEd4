@@ -872,7 +872,7 @@ void clip::clpic(FRMHED const& form, fRECTANGLE const& clipRect) {
 
 void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
   constexpr auto CHAINLEN = 10U; // Chain length
-  constexpr auto CHAINSEQ = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
+  constexpr auto chainSequence = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
   auto           chainPoint = std::vector<fPOINT> {};
 
   constexpr auto CHPOINTS = 5U; // chainPoint size
@@ -908,7 +908,7 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
-	OSequence->push_back(chainPoint[CHAINSEQ[iChain]]);
+	OSequence->push_back(chainPoint[chainSequence[iChain]]);
   }
 }
 

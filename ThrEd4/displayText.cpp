@@ -100,7 +100,7 @@ void displayText::tabmsg(uint32_t code) {
 }
 
 void displayText::lodstr() {
-  static constexpr auto LSTRINGL = std::array<uint16_t, STR_LEN> {
+  static constexpr auto loadStringIDs = std::array<uint16_t, STR_LEN> {
       // strings to load into memory at init time
       IDS_PIKOL,     IDS_UPON,    IDS_UPOF,    IDS_AUXTXT,  IDS_HUP0,    IDS_HUP1,    IDS_HUP2,
       IDS_HUP3,      IDS_HUP4,    IDS_TRC0,    IDS_TRC1S,   IDS_TRC2,    IDS_TRC3,    IDS_TRC4,
@@ -127,8 +127,8 @@ void displayText::lodstr() {
       IDS_UWLKIND,   IDS_UND,     IDS_ULEN,    IDS_FUANG,   IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,
       IDS_FRMBOX,    IDS_TXOF};
 
-  for (auto iString = 0U; iString < LSTRINGL.size(); ++iString) {
-	displayText::loadString(StringTable->operator[](iString), LSTRINGL[iString]);
+  for (auto iString = 0U; iString < loadStringIDs.size(); ++iString) {
+	displayText::loadString(StringTable->operator[](iString), loadStringIDs[iString]);
   }
 }
 
