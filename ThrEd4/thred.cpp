@@ -9196,7 +9196,7 @@ void thred::internal::ritcur() {
 	// ToDo - replace with GetDIBits
 	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
-	auto bitmapBits = std::array<uint8_t, iconSize> {};
+	auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
