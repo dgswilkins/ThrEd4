@@ -112,7 +112,7 @@ THREAD const PESThread[] = {
 constexpr auto THTYPCNT  = sizeof(PESThread) / sizeof(PESThread[0]); // Count of thread colors available in the PES format
 
 // clang-format off
-char const imageWithFrame[ThumbHeight][ThumbWidth]= { 
+char const imageWithFrame[THUMBHGT][THUMBWID]= { 
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
 	{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
@@ -278,10 +278,10 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   buffer.push_back(0x0U);
 }
 
-void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]) {
-  constexpr auto BYTEWID = ThumbWidth / 8U; // thumbnail width in bytes
+void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[THUMBHGT][THUMBWID]) {
+  constexpr auto BYTEWID = THUMBWID / 8U; // thumbnail width in bytes
   if (image != nullptr) {
-	for (auto i = 0U; i < ThumbHeight; ++i) {
+	for (auto i = 0U; i < THUMBHGT; ++i) {
 	  for (auto j = 0U; j < BYTEWID; ++j) {
 		auto const offset = j * BTSPBYTE;
 		auto       output = uint8_t {0U};
@@ -295,9 +295,9 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (
 }
 
 void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
-  uint8_t thumbnail[ThumbHeight][ThumbWidth] = {};
+  uint8_t thumbnail[THUMBHGT][THUMBWID] = {};
 #pragma warning(suppress : 26485) // bounds.3 No array to pointer decay
-  uint8_t const(*p_thumbnail)[ThumbHeight][ThumbWidth] = &thumbnail; // 2D arrays are painful to pass as parameters
+  uint8_t const(*p_thumbnail)[THUMBHGT][THUMBWID] = &thumbnail; // 2D arrays are painful to pass as parameters
 
   auto const yFactor = 31.0F / IniFile.hoopSizeY;
   auto const xFactor = 40.0F / IniFile.hoopSizeX;
@@ -309,7 +309,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   for (auto& stitch : *StitchBuffer) {
 	auto x          = wrap::floor<uint16_t>((stitch.x) * xFactor) + XOFFSET;
 	auto y          = wrap::floor<uint16_t>((stitch.y) * yFactor) + YOFFSET;
-	y               = ThumbHeight - y;
+	y               = THUMBHGT - y;
 	thumbnail[y][x] = 1U;
   }
   pi::writeThumbnail(pecBuffer, p_thumbnail);
@@ -320,7 +320,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   for (auto& stitch : *StitchBuffer) {
 	auto x = wrap::round<uint16_t>((stitch.x) * xFactor) + 3U;
 	auto y = wrap::round<uint16_t>((stitch.y) * yFactor) + 3U;
-	y      = ThumbHeight - y;
+	y      = THUMBHGT - y;
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  thumbnail[y][x] = 1;
 	}
@@ -638,7 +638,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// make a reasonable guess for the size of data in the PEC buffer. Assume all stitch coordinates
 		// are 2 bytes and pad by 1000 to account for jumps. Also reserve memory for thumbnails
 		auto const pecSize = sizeof(PECHDR) + sizeof(PECHDR2) + StitchBuffer->size() * 2 + 1000 +
-		                     (wrap::toSize(pesThreadCount) + 1U) * ThumbHeight * (ThumbWidth / 8);
+		                     (wrap::toSize(pesThreadCount) + 1U) * THUMBHGT * (THUMBWID / 8);
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
@@ -651,8 +651,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecHeader->labnd = '\r'; // 13 = carriage return
 		wrap::narrow(pecHeader->colorCount, pesThreadCount);
 		pecHeader->hnd1        = 0x00ff;
-		pecHeader->thumbHeight = ThumbHeight;
-		pecHeader->thumbWidth  = ThumbWidth / BTSPBYTE;
+		pecHeader->thumbHeight = THUMBHGT;
+		pecHeader->thumbWidth  = THUMBWID / BTSPBYTE;
 		pi::pecdat(pecBuffer);
 		auto* pecHeader2            = convert_ptr<PECHDR2*>(&pecBuffer[sizeof(PECHDR)]);
 		pecHeader2->unknown1        = 0;

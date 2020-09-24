@@ -122,8 +122,8 @@ class PECHDR
   //~PECHDR() = default;
 };
 
-static constexpr uint8_t ThumbHeight = 38U;
-static constexpr uint8_t ThumbWidth  = 48U;
+static constexpr uint8_t THUMBHGT = 38U;
+static constexpr uint8_t THUMBWID  = 48U;
 
 class PECHDR2
 {
@@ -163,7 +163,7 @@ namespace internal {
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
   void ritpesCode(std::vector<uint8_t>& buffer);
   void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
-  void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[ThumbHeight][ThumbWidth]);
+  void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[THUMBHGT][THUMBWID]);
 } // namespace internal
 } // namespace PES
 #endif
