@@ -15,7 +15,6 @@
 #include <limits>
 
 // Open Source headers
-#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #pragma warning(disable : 4127)  // supress warning for fmt library header
@@ -27,7 +26,6 @@
 
 // Local Headers
 #include "switches.h"
-#include "ExtendedBitSet.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"
@@ -35,7 +33,6 @@
 #include "clip.h"
 #include "displayText.h"
 #include "formForms.h"
-#include "hlp.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
