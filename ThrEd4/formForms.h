@@ -12,16 +12,8 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
-#include <vector>
 
 // Open Source headers
-#include "warnings.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26814)
-#include <boost/dynamic_bitset.hpp>
-#pragma warning(pop)
 
 // Local Headers
 #include "ThrEdTypes.h"
