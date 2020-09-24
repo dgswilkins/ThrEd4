@@ -316,12 +316,13 @@ void texture::dutxtfil() {
 }
 
 void texture::internal::txt2pix(TXPNT const& texturePoint, POINT& screenPoint) noexcept {
-  screenPoint.x = std::lround(((TextureScreen.spacing) * wrap::toFloat(texturePoint.line) + TextureScreen.xOffset) /
-                              TextureScreen.editToPixelRatio);
-  screenPoint.y = std::lround(wrap::toFloat(TextureScreen.height) -
-                              texturePoint.y / TextureScreen.areaHeight *
-                                  wrap::toFloat(TextureScreen.height) +
-                              wrap::toFloat(TextureScreen.top));
+  screenPoint.x =
+      std::lround(((TextureScreen.spacing) * wrap::toFloat(texturePoint.line) + TextureScreen.xOffset) /
+                  TextureScreen.editToPixelRatio);
+  screenPoint.y =
+      std::lround(wrap::toFloat(TextureScreen.height) -
+                  texturePoint.y / TextureScreen.areaHeight * wrap::toFloat(TextureScreen.height) +
+                  wrap::toFloat(TextureScreen.top));
 }
 
 void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) {
@@ -381,11 +382,12 @@ void texture::internal::chktx() {
 }
 
 void texture::drwtxtr() {
-  auto       line = std::array<POINT, LNPNTS> {};
-  auto const editSpace =
-      TextureScreen.areaHeight * 2.0F / (TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F));
+  auto       line      = std::array<POINT, LNPNTS> {};
+  auto const editSpace = TextureScreen.areaHeight * 2.0F /
+                         (TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F));
   FillRect(StitchWindowMemDC, &StitchWindowClientRect, thred::getBackGroundBrush());
-  auto const pixelSpace = wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(StitchWindowClientRect.right);
+  auto const pixelSpace =
+      wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(StitchWindowClientRect.right);
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
   auto const extraWidth = TextureScreen.spacing * wrap::toFloat(TextureScreen.lines + 2U);
   if (StateMap->testAndReset(StateFlag::CHKTX)) {
@@ -401,19 +403,19 @@ void texture::drwtxtr() {
 	                                         2.0F);
   }
   else {
-	TextureScreen.editToPixelRatio = TextureScreen.areaHeight * 2.0F / wrap::toFloat(StitchWindowClientRect.bottom);
-	yOffset                        = StitchWindowClientRect.bottom / 4;
-	TextureScreen.xOffset =
-	    (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
-	     TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
-	    2.0F;
+	TextureScreen.editToPixelRatio =
+	    TextureScreen.areaHeight * 2.0F / wrap::toFloat(StitchWindowClientRect.bottom);
+	yOffset               = StitchWindowClientRect.bottom / 4;
+	TextureScreen.xOffset = (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
+	                         TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
+	                        2.0F;
   }
-  TextureScreen.top          = yOffset;
-  TextureScreen.bottom       = StitchWindowClientRect.bottom - yOffset;
-  TextureScreen.height       = TextureScreen.bottom - TextureScreen.top;
-  TextureScreen.halfHeight   = StitchWindowClientRect.bottom / 2;
+  TextureScreen.top        = yOffset;
+  TextureScreen.bottom     = StitchWindowClientRect.bottom - yOffset;
+  TextureScreen.height     = TextureScreen.bottom - TextureScreen.top;
+  TextureScreen.halfHeight = StitchWindowClientRect.bottom / 2;
   TextureScreen.screenHeight = wrap::toFloat(StitchWindowClientRect.bottom) * TextureScreen.editToPixelRatio;
-  TextureScreen.yOffset      = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
+  TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, GridPen);
   auto gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
@@ -434,9 +436,9 @@ void texture::drwtxtr() {
   line[0].y = 0;
   line[1].y = StitchWindowClientRect.bottom;
   for (auto iVertical = 1U; iVertical < TextureScreen.lines + 1U; ++iVertical) {
-	line[0].x = line[1].x = std::lroundf(
-	    (TextureScreen.spacing * wrap::toFloat(iVertical) + TextureScreen.xOffset) /
-	    TextureScreen.editToPixelRatio);
+	line[0].x = line[1].x =
+	    std::lroundf((TextureScreen.spacing * wrap::toFloat(iVertical) + TextureScreen.xOffset) /
+	                 TextureScreen.editToPixelRatio);
 	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   line[0].x = 0;
@@ -486,8 +488,9 @@ auto texture::internal::px2txt(POINT const& offset) -> bool {
   if ((txPoint.line <= TextureScreen.lines) && (txPoint.line >= 1)) {
 	if (offset.y > TextureScreen.top) {
 	  if ((offset.y <= TextureScreen.bottom)) {
-		txPoint.y = TextureScreen.areaHeight - (wrap::toFloat(offset.y - TextureScreen.top) /
-		                                        (wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight));
+		txPoint.y = TextureScreen.areaHeight -
+		            (wrap::toFloat(offset.y - TextureScreen.top) /
+		             (wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight));
 		TempTexturePoints->push_back(txPoint);
 		retval = true;
 	  }
@@ -922,7 +925,7 @@ void texture::internal::chktxnum() {
 		texture::savtxt();
 		TextureScreen.spacing  = value;
 		IniFile.textureSpacing = value;
-		TextureScreen.width = value * wrap::toFloat(TextureScreen.lines) + value / 2.0F;
+		TextureScreen.width    = value * wrap::toFloat(TextureScreen.lines) + value / 2.0F;
 		StateMap->set(StateFlag::CHKTX);
 		break;
 	  }
@@ -976,7 +979,7 @@ auto texture::internal::tpComp(TXPNT const& texturePoint0, TXPNT const& textureP
 }
 
 void texture::internal::txpar(FRMHED& form) {
-  form.type                       = FRMFPOLY;
+  form.type = FRMFPOLY;
   wrap::narrow(form.fillInfo.texture.lines, TextureScreen.lines);
   form.fillInfo.texture.height    = TextureScreen.areaHeight;
   form.fillSpacing                = TextureScreen.spacing;
@@ -1492,8 +1495,8 @@ void texture::txtkey(wchar_t keyCode, FRMHED& textureForm) {
 	  }
 	}
 	if (flag) {
-	  constexpr auto BUFFLEN = 8U; // i.e. floating point 7 digits of precision + '.'
-	  auto           character    = wchar_t {};
+	  constexpr auto BUFFLEN   = 8U; // i.e. floating point 7 digits of precision + '.'
+	  auto           character = wchar_t {};
 	  if (TextureInputBuffer->size() < BUFFLEN) {
 		if (txi::txdig(keyCode, character)) {
 		  TextureInputBuffer->push_back(character);
@@ -1621,7 +1624,8 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
   ClipRectSize.cy = form.fillInfo.texture.height;
   if (currentCount != 0U) {
 	for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	  auto const currentPoint = TexturePointsBuffer->at(wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
+	  auto const currentPoint =
+	      TexturePointsBuffer->at(wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
 	  if (currentPoint.line != 0U) {
 		auto const iSegment            = currentPoint.line - 1U;
 		textureSegments[iSegment].line = iTexturePoint;
@@ -1646,8 +1650,8 @@ void texture::rtrtx(FRMHED const& form) {
 	TextureScreen.areaHeight = form.fillInfo.texture.height;
 	TextureScreen.spacing    = form.fillSpacing;
 	TextureScreen.lines      = gsl::narrow<uint16_t>(form.fillInfo.texture.lines);
-	TextureScreen.width = wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing +
-	                      TextureScreen.spacing / 2.0F;
+	TextureScreen.width =
+	    wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
 	texture::savtxt();
   }
 }
@@ -1704,7 +1708,7 @@ void texture::setshft() {
 	}
 	TextureScreen.spacing    = (selectionRect.right - selectionRect.left) / wrap::toFloat(line);
 	TextureScreen.areaHeight = selectionRect.top - selectionRect.bottom;
-	TextureScreen.width      = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing / 2.0F;
+	TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing / 2.0F;
 	StateMap->set(StateFlag::TXTRED);
 	StateMap->set(StateFlag::RESTCH);
   }

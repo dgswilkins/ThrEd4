@@ -17,12 +17,12 @@
 #define outDebugString(X, ...)
 #endif
 
-constexpr auto RES_SIZE    = 26;               // reserved for expansion in the ThrEd v1.0 header
-constexpr auto NAME_LEN    = 50;               // Length of the name fields in ThrEd headers
-constexpr auto COLORCNT = gsl::narrow_cast<uint8_t>(16U);              // Number of colors in arrays
-constexpr auto COLORMAX   = gsl::narrow_cast<uint8_t>(COLORCNT - 1U); // max index in color arrays
-constexpr auto COLORBTS  = 0xfU;     // Number of bits to cover the number of the colors in arrays
-constexpr auto SRTIM       = 20000000; // sort time limit in 100 ns intervals
+constexpr auto RES_SIZE = 26; // reserved for expansion in the ThrEd v1.0 header
+constexpr auto NAME_LEN = 50; // Length of the name fields in ThrEd headers
+constexpr auto COLORCNT = gsl::narrow_cast<uint8_t>(16U);           // Number of colors in arrays
+constexpr auto COLORMAX = gsl::narrow_cast<uint8_t>(COLORCNT - 1U); // max index in color arrays
+constexpr auto COLORBTS = 0xfU;     // Number of bits to cover the number of the colors in arrays
+constexpr auto SRTIM    = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes
 constexpr auto DAZPETS = 5U;  // petals
@@ -67,13 +67,13 @@ constexpr float    TSIZ60   = 0.05F;       // #60 thread size in millimeters
 constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll bar
 constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
-constexpr double   CLOSENUF = 15.0;              // mouse click region for select
+constexpr double   CLOSENUF = 15.0; // mouse click region for select
 constexpr auto     FCLOSNUF = gsl::narrow_cast<float>(CLOSENUF);
 constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
 constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
 constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
 constexpr float    USESIZ   = 3.5F;              // user preferred size
-constexpr auto     MAXSIZ    = 9.0F;             // default maximum stitch size
+constexpr auto     MAXSIZ   = 9.0F;              // default maximum stitch size
 constexpr int32_t  MINZUM   = 5;                 // minimum zoom in stitch points
 constexpr float    SHOPNTS  = 0.00F;             // show stitch points when zoom below this
 constexpr float    STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
@@ -91,89 +91,89 @@ constexpr float    PI_F2    = PI_F * 2.0F;       //
 constexpr float    PI_FHALF = PI_F / 2.0F;       //
 constexpr double   PI       = 3.141592653589793; // PI to double precision
 constexpr double   PI2      = PI * 2.0;          //
-constexpr float  USPAC   = 15.0F;          // underlay fill spacing
-constexpr float  APSPAC  = 10.8F;          // applique border spacing
-constexpr uint32_t OSEQLEN = 0x40000U;     // output sequence length
-constexpr uint32_t BSEQLEN = OSEQLEN * 2U; // reverse sequence length
-constexpr float    URAT    = 0.75F;        // ratio of underlay stitch to satin border size
-constexpr double   PURAT   = 0.6;          // for proportional satin corners
+constexpr float    USPAC    = 15.0F;             // underlay fill spacing
+constexpr float    APSPAC   = 10.8F;             // applique border spacing
+constexpr uint32_t OSEQLEN  = 0x40000U;          // output sequence length
+constexpr uint32_t BSEQLEN  = OSEQLEN * 2U;      // reverse sequence length
+constexpr float    URAT     = 0.75F;             // ratio of underlay stitch to satin border size
+constexpr double   PURAT    = 0.6;               // for proportional satin corners
 
 constexpr float DIURAT = (1.0F - URAT) / 2.0F;        //(1-URAT)/2
 constexpr float DOURAT = (1.0F - URAT) / 2.0F + URAT; //(1-URAT)/2+URAT
 
-constexpr float    MINRCT    = 12.0F;           // minimum dimension of a form select rectangle
-constexpr uint32_t OLDNUM    = 4U;              // number of old filenames saved on file menu
-constexpr float    TNYFLOAT  = 1e-9F;           // tiny number for single precision float stuff
-constexpr float    BIGFLOAT  = 1e9F;            // large number for single precision float stuff
-constexpr double   BIGDBL    = 1e99;            // large number for double precision float stuff
-constexpr int32_t  SPEDLIN   = 30;              // speed change for line message on speed scroll bar
-constexpr int32_t  SPEDPAG   = 120;             // speed change for page message on speed scroll bar
-constexpr int32_t  KNOTLEN   = 54;              // set knots for stitches longer than this
-constexpr int32_t  MAXKNOTS  = 16384;           // maximum number of knots
-constexpr float    IBFCLEN   = (4.0F * PFGRAN); // initial buttonhole fill corner length
-constexpr float    IPICSPAC  = 6.0F;            // initial picot border space
-constexpr int32_t  PRFLINS   = 30;              // number of lines on the preference menu
-constexpr uint32_t SEED      = 3037000499U;     // pseudo-random-sequence seed
-constexpr uint32_t FSED      = 1340007303U;     // feather sequence seed
-constexpr uint32_t NORDSED   = 0x5a5a5a5aU;     // name order seed
-constexpr uint32_t NCODSED   = 0x73ef5a7eU;     // name encoding seed
-constexpr uint8_t  NCODOF    = 80U;             // name encoding offset
-constexpr auto     CLPMIN    = 0.5F;            // if clipboard data width less than this, then don't fill
-constexpr float    CLPMINVT  = 1.2F;            // Minimum clip width for skinny vertical clips
-constexpr float    BRDWID    = 18.0F;           // default satin border size
-constexpr float    SNPLEN    = 0.15F;           // default snap together length size
-constexpr float    STARAT    = 0.4F;            // default star ratio
-constexpr float    SPIRWRAP  = 1.52F;           // default spiral wrap
-constexpr uint8_t  BALNORM   = 0x80U;           // normal balarad stitch
-constexpr uint8_t  BALJUMP   = 0x81U;           // balarad jump stitch
-constexpr uint8_t  BALSTOP   = 0U;              // balarad stop
-constexpr uint32_t COLVER    = 0x776874U;       // color file version
-constexpr uint32_t REDCOL    = 0x0000ffU;       // code for the color red
-constexpr uint32_t GRNCOL    = 0x00ff00U;       // code for the color green
-constexpr uint32_t BLUCOL    = 0xff0000U;       // code for the color blue
-constexpr uint32_t REDMSK    = 0xffff00U;       // mask for the color red
-constexpr uint32_t GRNMSK    = 0xff00ffU;       // mask for the color green
-constexpr uint32_t BLUMSK    = 0x00ffffU;       // mask for the color blue
-constexpr float    TRACLEN   = 1.0F;            // initial trace length
-constexpr float    TRACRAT   = 1.00001F;        // initial trace ratio
-constexpr float    CHSDEF    = 24.0F;           // default chain stitch length
-constexpr double   CHRDEF    = 0.25;            // default chain stitch ratio
-constexpr float    NUGINI    = 2.0F;            // default nudge step
-constexpr uint16_t DEFPIX    = 2U;              // default nudge pixels
-constexpr double   DEFEGRAT  = 1.5;             // default egg ratio
-constexpr uint16_t DEFPNTPX = 4U;              // default form and stitch point pixels
-constexpr int32_t  HBUFSIZ   = 1024;            // help buffer size
-constexpr uint32_t HIGRD     = 0xffffffU;       // grid high color
-constexpr uint32_t MEDGRD    = 0x404040U;       // grid medium color
-constexpr uint32_t DEFGRD    = 0x202020U;       // grid default color
-constexpr uint32_t REDGRD    = 0xff2020U;       // grid red color
-constexpr uint32_t BLUGRD    = 0x20ff20U;       // grid green color
-constexpr uint32_t GRNGRD    = 0x2020ffU;       // grid blue color
-constexpr float    FDEFRAT   = 0.6F;            // default feather ratio
-constexpr uint8_t  FDEFUP    = 10U;             // default feather up count
-constexpr uint8_t  FDEFDWN   = 5;               // default feather down count
-constexpr float    FDEFFLR   = 9.0F;            // default feather floor
-constexpr uint16_t FDEFNUM   = 10U;             // default feather number
-constexpr float    ITXHI     = (9.0F * PFGRAN); // default texture editor height
-constexpr float    ITXWID    = (9.0F * PFGRAN); // default texture editor width
-constexpr float    ITXSPAC   = (0.4F * PFGRAN); // default texture editor spacing
-constexpr uint16_t ITXPIX    = 5U;              // default texture editor cross pixels
+constexpr float    MINRCT   = 12.0F;           // minimum dimension of a form select rectangle
+constexpr uint32_t OLDNUM   = 4U;              // number of old filenames saved on file menu
+constexpr float    TNYFLOAT = 1e-9F;           // tiny number for single precision float stuff
+constexpr float    BIGFLOAT = 1e9F;            // large number for single precision float stuff
+constexpr double   BIGDBL   = 1e99;            // large number for double precision float stuff
+constexpr int32_t  SPEDLIN  = 30;              // speed change for line message on speed scroll bar
+constexpr int32_t  SPEDPAG  = 120;             // speed change for page message on speed scroll bar
+constexpr int32_t  KNOTLEN  = 54;              // set knots for stitches longer than this
+constexpr int32_t  MAXKNOTS = 16384;           // maximum number of knots
+constexpr float    IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner length
+constexpr float    IPICSPAC = 6.0F;            // initial picot border space
+constexpr int32_t  PRFLINS  = 30;              // number of lines on the preference menu
+constexpr uint32_t SEED     = 3037000499U;     // pseudo-random-sequence seed
+constexpr uint32_t FSED     = 1340007303U;     // feather sequence seed
+constexpr uint32_t NORDSED  = 0x5a5a5a5aU;     // name order seed
+constexpr uint32_t NCODSED  = 0x73ef5a7eU;     // name encoding seed
+constexpr uint8_t  NCODOF   = 80U;             // name encoding offset
+constexpr auto     CLPMIN   = 0.5F;      // if clipboard data width less than this, then don't fill
+constexpr float    CLPMINVT = 1.2F;      // Minimum clip width for skinny vertical clips
+constexpr float    BRDWID   = 18.0F;     // default satin border size
+constexpr float    SNPLEN   = 0.15F;     // default snap together length size
+constexpr float    STARAT   = 0.4F;      // default star ratio
+constexpr float    SPIRWRAP = 1.52F;     // default spiral wrap
+constexpr uint8_t  BALNORM  = 0x80U;     // normal balarad stitch
+constexpr uint8_t  BALJUMP  = 0x81U;     // balarad jump stitch
+constexpr uint8_t  BALSTOP  = 0U;        // balarad stop
+constexpr uint32_t COLVER   = 0x776874U; // color file version
+constexpr uint32_t REDCOL   = 0x0000ffU; // code for the color red
+constexpr uint32_t GRNCOL   = 0x00ff00U; // code for the color green
+constexpr uint32_t BLUCOL   = 0xff0000U; // code for the color blue
+constexpr uint32_t REDMSK   = 0xffff00U; // mask for the color red
+constexpr uint32_t GRNMSK   = 0xff00ffU; // mask for the color green
+constexpr uint32_t BLUMSK   = 0x00ffffU; // mask for the color blue
+constexpr float    TRACLEN  = 1.0F;      // initial trace length
+constexpr float    TRACRAT  = 1.00001F;  // initial trace ratio
+constexpr float    CHSDEF   = 24.0F;     // default chain stitch length
+constexpr double   CHRDEF   = 0.25;      // default chain stitch ratio
+constexpr float    NUGINI   = 2.0F;      // default nudge step
+constexpr uint16_t DEFPIX   = 2U;        // default nudge pixels
+constexpr double   DEFEGRAT = 1.5;       // default egg ratio
+constexpr uint16_t DEFPNTPX = 4U;        // default form and stitch point pixels
+constexpr int32_t  HBUFSIZ  = 1024;      // help buffer size
+constexpr uint32_t HIGRD    = 0xffffffU; // grid high color
+constexpr uint32_t MEDGRD   = 0x404040U; // grid medium color
+constexpr uint32_t DEFGRD   = 0x202020U; // grid default color
+constexpr uint32_t REDGRD   = 0xff2020U; // grid red color
+constexpr uint32_t BLUGRD   = 0x20ff20U; // grid green color
+constexpr uint32_t GRNGRD   = 0x2020ffU; // grid blue color
+constexpr float    FDEFRAT  = 0.6F;      // default feather ratio
+constexpr uint8_t  FDEFUP   = 10U;       // default feather up count
+constexpr uint8_t  FDEFDWN  = 5;         // default feather down count
+constexpr float    FDEFFLR  = 9.0F;      // default feather floor
+constexpr uint16_t FDEFNUM  = 10U;       // default feather number
+constexpr float    ITXHI    = (9.0F * PFGRAN); // default texture editor height
+constexpr float    ITXWID   = (9.0F * PFGRAN); // default texture editor width
+constexpr float    ITXSPAC  = (0.4F * PFGRAN); // default texture editor spacing
+constexpr uint16_t ITXPIX   = 5U;              // default texture editor cross pixels
 constexpr uint32_t ITXBUFSZ = 16U;             // texture buffer depth
-constexpr uint32_t BTNCOUNT  = 9U;              // Maximum number of buttons
-constexpr int32_t  FONTSIZE  = 400;             // default font size
-constexpr uint32_t B1MASK    = 0x000000ffU;     // mask for the least significant byte
-constexpr uint32_t B2MASK    = 0x0000ff00U;     // mask for the middle byte
-constexpr uint32_t B3MASK    = 0x00ff0000U;     // mask for the more significant byte
-constexpr uint32_t BYTSHFT   = 8U;              // bits required to shift one byte left
-constexpr uint32_t WRDSHFT   = 16U;             // bits required to shift two bytes left
-constexpr uint32_t TBYTSHFT  = 24U;             // bits required to shift three bytes left
-constexpr uint32_t HBSHFT    = 31U;             // shift required to reach the MSB of uint32
-constexpr uint8_t  NIBMASK   = 0x0fU;           // Nibble mask
-constexpr uint8_t  BYTMASK   = 0xffU;           // Byte mask
-constexpr uint16_t WRDMASK   = 0xffffU;         // word mask
-constexpr uint32_t COLMASK   = 0xffffffU;       // COLORREF mask
-constexpr uint8_t  MSK7BITS  = 0x7fU;           // mask value to 7 bits
-constexpr uint8_t  MSK3BITS  = 0x7U;            // mask value to 3 bits
+constexpr uint32_t BTNCOUNT = 9U;              // Maximum number of buttons
+constexpr int32_t  FONTSIZE = 400;             // default font size
+constexpr uint32_t B1MASK   = 0x000000ffU;     // mask for the least significant byte
+constexpr uint32_t B2MASK   = 0x0000ff00U;     // mask for the middle byte
+constexpr uint32_t B3MASK   = 0x00ff0000U;     // mask for the more significant byte
+constexpr uint32_t BYTSHFT  = 8U;              // bits required to shift one byte left
+constexpr uint32_t WRDSHFT  = 16U;             // bits required to shift two bytes left
+constexpr uint32_t TBYTSHFT = 24U;             // bits required to shift three bytes left
+constexpr uint32_t HBSHFT   = 31U;             // shift required to reach the MSB of uint32
+constexpr uint8_t  NIBMASK  = 0x0fU;           // Nibble mask
+constexpr uint8_t  BYTMASK  = 0xffU;           // Byte mask
+constexpr uint16_t WRDMASK  = 0xffffU;         // word mask
+constexpr uint32_t COLMASK  = 0xffffffU;       // COLORREF mask
+constexpr uint8_t  MSK7BITS = 0x7fU;           // mask value to 7 bits
+constexpr uint8_t  MSK3BITS = 0x7U;            // mask value to 3 bits
 
 constexpr uint32_t LNPNTS  = 2U;            // number of points required to draw a line
 constexpr uint32_t TRIPNTS = 4U;            // number of points required to draw a triangle or arrow
@@ -666,22 +666,22 @@ enum class StateFlag : uint32_t {
 
 // user bitmap
 enum class UserFlag : uint32_t {
-  SQRFIL,   // square ends on fills
-  BLUNT,    // blunt ends on satin lines
-  NEDOF,    // needle cursor off
-  KNOTOF,   // don't show knots
-  BSAVOF,   // don't save PCS bitmaps
-  LINSPAC,  // evenly space border line points
-  DUND,     // underlay in satin borders
-  FIL2OF,   // fill to select off
-  ROTAUX,   // rotate the aux file when saving
-  SAVMAX,   // thred window maximized
-  MARQ,     // remove mark when user hits escape only
-  FRMX,     // cross cursor for form entry
-  DAZHOL,   // daisy hole
-  DAZD,     // daisy d-lines
-  CHREF,    // refill forms when changing design size
-  WRNOF,    // warn if edited off
+  SQRFIL,  // square ends on fills
+  BLUNT,   // blunt ends on satin lines
+  NEDOF,   // needle cursor off
+  KNOTOF,  // don't show knots
+  BSAVOF,  // don't save PCS bitmaps
+  LINSPAC, // evenly space border line points
+  DUND,    // underlay in satin borders
+  FIL2OF,  // fill to select off
+  ROTAUX,  // rotate the aux file when saving
+  SAVMAX,  // thred window maximized
+  MARQ,    // remove mark when user hits escape only
+  FRMX,    // cross cursor for form entry
+  DAZHOL,  // daisy hole
+  DAZD,    // daisy d-lines
+  CHREF,   // refill forms when changing design size
+  WRNOF,   // warn if edited off
 
   EnumCount // must be the last entry in the enum
 };
@@ -700,18 +700,18 @@ constexpr int32_t FDEFTYP = FTHPSG; // default feather type
 // edge fill types
 enum edgeFillStyles : uint8_t {
   EDGELINE = 1U, // Line
-  EDGEBEAN,     // Bean
-  EDGECLIP,     // Clipboard
-  EDGEANGSAT,   // Angle Satin
-  EDGEAPPL,     // Applique
-  EDGEPROPSAT,  // Proportional Satin
-  EDGEBHOL,     // Buttonhole
-  EDGEPICOT,    // Picot
-  EDGEDOUBLE,   // Double
-  EDGELCHAIN,   // Line Chain
-  EDGEOCHAIN,   // Open Chain
-  EDGECLIPX,    // Even Clipboard
-  EDGELAST      // must always be the last value
+  EDGEBEAN,      // Bean
+  EDGECLIP,      // Clipboard
+  EDGEANGSAT,    // Angle Satin
+  EDGEAPPL,      // Applique
+  EDGEPROPSAT,   // Proportional Satin
+  EDGEBHOL,      // Buttonhole
+  EDGEPICOT,     // Picot
+  EDGEDOUBLE,    // Double
+  EDGELCHAIN,    // Line Chain
+  EDGEOCHAIN,    // Open Chain
+  EDGECLIPX,     // Even Clipboard
+  EDGELAST       // must always be the last value
 };
 
 // form types
@@ -970,30 +970,30 @@ constexpr uint32_t HLIN = HNUM;
 class INIFILE // ini file structure
 {
   public:
-  char     defaultDirectory[180] {0};                   // default directory
+  char     defaultDirectory[180] {0};                // default directory
   COLORREF stitchColors[COLORCNT] {0U};              // colors
   COLORREF stitchPreferredColors[COLORCNT] {0U};     // stitch preference colors
   COLORREF backgroundPreferredColors[COLORCNT] {0U}; // background preference colors
-  COLORREF backgroundColor {0U};                        // background color
-  COLORREF bitmapColor {0U};                            // bitmap color
-  float    minStitchLength {0.0F};                      // minimum stitch length
-  float    showStitchThreshold {0.0F};                  // show stitch points
-  float    threadSize30 {0.0F};                         // millimeter size of 30 weight thread
-  float    threadSize40 {0.0F};                         // millimeter size of 40 weight thread
-  float    threadSize60 {0.0F};                         // millimeter size of 60 weight thread
-  float    userStitchLength {0.0F};                     // user stitch length
-  float    maxStitchLength {0.0F};                      // maximum stitch length
-  float    smallStitchLength {0.0F};                    // small stitch size
-  float   stitchBoxesThreshold {0.0F};                  // show sitch box level
-  float    stitchSpace {0.0F};                          // stitch spacing between lines of stitches
-  float    fillAngle {0.0F};                            // fill angle
-  uint32_t userFlagMap {0U};                            // bitmap for user variables
-  float    borderWidth {0.0F};                          // border width
-  uint32_t appliqueColor {0U};                          // applique color
-  char     prevNames[OLDNUM][_MAX_PATH] {{0}};          // last file names
-  float    snapLength {0.0F};                           // snap together length
-  float    starRatio {0.0F};                            // star ratio
-  float    spiralWrap {0.0F};                           // spiral wrap
+  COLORREF backgroundColor {0U};                     // background color
+  COLORREF bitmapColor {0U};                         // bitmap color
+  float    minStitchLength {0.0F};                   // minimum stitch length
+  float    showStitchThreshold {0.0F};               // show stitch points
+  float    threadSize30 {0.0F};                      // millimeter size of 30 weight thread
+  float    threadSize40 {0.0F};                      // millimeter size of 40 weight thread
+  float    threadSize60 {0.0F};                      // millimeter size of 60 weight thread
+  float    userStitchLength {0.0F};                  // user stitch length
+  float    maxStitchLength {0.0F};                   // maximum stitch length
+  float    smallStitchLength {0.0F};                 // small stitch size
+  float    stitchBoxesThreshold {0.0F};              // show sitch box level
+  float    stitchSpace {0.0F};                       // stitch spacing between lines of stitches
+  float    fillAngle {0.0F};                         // fill angle
+  uint32_t userFlagMap {0U};                         // bitmap for user variables
+  float    borderWidth {0.0F};                       // border width
+  uint32_t appliqueColor {0U};                       // applique color
+  char     prevNames[OLDNUM][_MAX_PATH] {{0}};       // last file names
+  float    snapLength {0.0F};                        // snap together length
+  float    starRatio {0.0F};                         // star ratio
+  float    spiralWrap {0.0F};                        // spiral wrap
   COLORREF bitmapBackgroundColors[COLORCNT] {0U}; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
   float    buttonholeCornerLength {0.0F};    // buttonhole fill corner length
   float    picotSpace {0.0F};                // space between border picots
@@ -1246,10 +1246,12 @@ inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept 
   attribute = rhsA;
 }
 
-inline dPOINT::dPOINT(fPOINT const& rhs) noexcept : x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
+inline dPOINT::dPOINT(fPOINT const& rhs) noexcept :
+    x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
 }
 
-inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept : x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
+inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept :
+    x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }
 
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {

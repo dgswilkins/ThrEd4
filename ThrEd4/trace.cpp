@@ -35,11 +35,11 @@
 
 namespace ti = trace::internal;
 
-constexpr auto POINTMAX = 500000U;        // maximum number of trace points to consider
-constexpr auto LEVELCNT   = 256U;           // number of color levels in a byte wide counter
-constexpr auto CHANLCNT = 3U;             // number of color channels i.e. RGB
-constexpr auto BYTEMAXV = uint8_t {255U}; // max color value in a byte wide counter
-constexpr auto CCRATIO  = (1.0F / 255.0F);  // This is used to convert 0-255 to 0-1
+constexpr auto POINTMAX = 500000U;         // maximum number of trace points to consider
+constexpr auto LEVELCNT = 256U;            // number of color levels in a byte wide counter
+constexpr auto CHANLCNT = 3U;              // number of color channels i.e. RGB
+constexpr auto BYTEMAXV = uint8_t {255U};  // max color value in a byte wide counter
+constexpr auto CCRATIO  = (1.0F / 255.0F); // This is used to convert 0-255 to 0-1
 constexpr auto ADJCOUNT = 9U; // including the center pixel there are 9 pixels immediately adjacent
 
 static auto PixelColors = std::array<uint32_t, CHANLCNT> {};    // separated pixel reference colors
@@ -49,7 +49,7 @@ static auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select 
 static auto TraceUpWindow      = std::array<HWND, CHANLCNT> {}; // trace up number windows
 static auto CurrentTracePoint  = POINT {};                      // current point being traced
 static auto TraceDataSize      = uint32_t {}; // size of the trace bitmap in double words
-static auto TraceStepWin = gsl::narrow_cast<HWND>(nullptr);      // trace stepSize window
+static auto TraceStepWin       = gsl::narrow_cast<HWND>(nullptr); // trace stepSize window
 static auto TraceRGBFlag =
     std::array<StateFlag, 3> {StateFlag::TRCRED, StateFlag::TRCGRN, StateFlag::TRCBLU}; // trace bits
 static auto TraceRGBMask = std::array<uint32_t, 3> {REDMSK, GRNMSK, BLUMSK}; // trace masks
@@ -108,7 +108,7 @@ void trace::initTraceWindows() noexcept {
                               ThrEdInstance,
                               nullptr);
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  auto channel = gsl::narrow_cast<int32_t>(iRGB);
+	auto channel = gsl::narrow_cast<int32_t>(iRGB);
 	ti::trcsub(&TraceControlWindow[iRGB], ButtonWidth * channel, 0, ButtonHeight * 15);
 	ti::trcsub(&TraceSelectWindow[iRGB], ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
 	ti::trcsub(&TraceUpWindow[iRGB], ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
@@ -248,7 +248,7 @@ auto trace::internal::trsum() noexcept -> uint32_t {
 
 void trace::untrace() {
   if (StateMap->testAndReset(StateFlag::WASTRAC)) {
-	  bitmap::resetDC();
+	bitmap::resetDC();
 	if (!TracedEdges->empty()) {
 	  TracedEdges->resize(0); // allocated in tracedg
 	}
@@ -301,12 +301,12 @@ void trace::trdif() {
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	  ti::blanklin(differenceBitmap, 0);
 	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
-		auto iPoint                = iHeight * bitmap::getBitmapWidth();
+		auto iPoint                              = iHeight * bitmap::getBitmapWidth();
 		differenceBitmap[wrap::toSize(iPoint++)] = 0;
 		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
 		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[wrap::toSize(iPoint)]);
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
-		  auto& colorSum           = differenceBitmap[wrap::toSize(iPoint)];
+		  auto& colorSum                         = differenceBitmap[wrap::toSize(iPoint)];
 		  ++iPoint;
 		  if (colorSum > colorSumMaximum) {
 			colorSumMaximum = colorSum;
@@ -322,8 +322,8 @@ void trace::trdif() {
 	  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
 		if (differenceBitmap[wrap::toSize(iPixel)] != 0U) {
-		  auto const adjustedColorSum =
-		      wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[wrap::toSize(iPixel)] - colorSumMinimum) * ratio);
+		  auto const adjustedColorSum = wrap::round<uint32_t>(
+		      wrap::toFloat(differenceBitmap[wrap::toSize(iPixel)] - colorSumMinimum) * ratio);
 		  TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
 		}
 	  }
@@ -368,9 +368,9 @@ void trace::trace() {
 		auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
 	  }
-	  auto const BmpSR       = bitmap::getBmpStitchRatio();
-	  auto       bitmapPoint = POINT {std::lround(BmpSR.x * stitchPoint.x),
-                                std::lround(BmpSR.y * stitchPoint.y - 1.0F)};
+	  auto const BmpSR = bitmap::getBmpStitchRatio();
+	  auto       bitmapPoint =
+	      POINT {std::lround(BmpSR.x * stitchPoint.x), std::lround(BmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
@@ -612,8 +612,8 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	}
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
-	tracedPoints.push_back(
-	    TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	tracedPoints.push_back(TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
+	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	if (tracedPoints.size() >= POINTMAX) {
 	  return false;
 	}
@@ -641,9 +641,9 @@ void trace::internal::dutrac() {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
 	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
 	}
-	auto const bmpSR  = bitmap::getBmpStitchRatio();
-	CurrentTracePoint = POINT {std::lround(bmpSR.x * stitchPoint.x),
-	                           std::lround(bmpSR.y * stitchPoint.y)};
+	auto const bmpSR = bitmap::getBmpStitchRatio();
+	CurrentTracePoint =
+	    POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y)};
 	if (CurrentTracePoint.x > bitmap::getBitmapHeight()) {
 	  CurrentTracePoint.x = bitmap::getBitmapWidth();
 	}
@@ -755,8 +755,8 @@ void trace::internal::dutrac() {
 	}
 	uint32_t const initialDirection = traceDirection;
 	auto           tracedPoints     = std::vector<TRCPNT> {};
-	tracedPoints.push_back(
-	    TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x), gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	tracedPoints.push_back(TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
+	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
 	if (tracedPoints.size() >= POINTMAX) {
 	  displayText::tabmsg(IDS_FRM2L);
@@ -780,8 +780,9 @@ void trace::internal::dutrac() {
 	tracedPoints.push_back(decimatedLine[0]);
 	auto iNextDec = 0U;
 	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); ++iCurrent) {
-	  auto const traceLength = wrap::toFloat(std::hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x,
-	                                 decimatedLine[iCurrent].y - decimatedLine[iNextDec].y));
+	  auto const traceLength =
+	      wrap::toFloat(std::hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x,
+	                               decimatedLine[iCurrent].y - decimatedLine[iNextDec].y));
 	  if (traceLength > IniFile.traceLength) {
 		tracedPoints.push_back(decimatedLine[iNextDec]);
 		iNextDec = iCurrent;
@@ -797,7 +798,7 @@ void trace::internal::dutrac() {
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	FormVertices->push_back(fPOINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
-	auto iNext = size_t {};
+	auto iNext           = size_t {};
 	auto traceLengthSum  = 0.0F;
 	auto landscapeOffset = 0.0F;
 	if (StateMap->test(StateFlag::LANDSCAP)) {
@@ -805,16 +806,14 @@ void trace::internal::dutrac() {
 	  landscapeOffset   = wrap::toFloat(UnzoomedRect.y) - BmpSiS.y;
 	}
 	for (auto iCurrent = size_t {1U}; iCurrent < tracedPoints.size(); ++iCurrent) {
-	  traceLengthSum +=
-	      hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),
-	             wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1U].y));
-	  auto const traceLength =
-	      hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
-	             wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
+	  traceLengthSum += hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),
+	                           wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1U].y));
+	  auto const traceLength = hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
+	                                  wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
 	  if (traceLengthSum > traceLength * IniFile.traceRatio) {
-		FormVertices->push_back(fPOINT {
-		    wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
-		    wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
+		FormVertices->push_back(
+		    fPOINT {wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
+		            wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
 		--iCurrent;
 		iNext          = iCurrent;
 		traceLengthSum = 0.0;

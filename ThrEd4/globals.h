@@ -66,13 +66,13 @@
 
 namespace fs = std::filesystem;
 
-extern uint8_t    ActiveColor;
+extern uint8_t     ActiveColor;
 extern uint8_t     ActiveLayer;
 extern fRECTANGLE* AllItemsRect;
 
 extern std::vector<fPOINT>* AngledFormVertices;
 
-extern uint8_t  AppliqueColor;
+extern uint8_t   AppliqueColor;
 extern fs::path* AuxName;
 
 extern std::vector<BSEQPNT>* BSequence;
@@ -212,7 +212,7 @@ extern RECT   SelectedPixelsRect;
 extern std::vector<POINT>* SelectedPointsLine;
 
 extern fRECTANGLE SelectedVerticesRect;
-extern float     ShowStitchThreshold;
+extern float      ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 
 extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
@@ -263,7 +263,7 @@ extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
 
 extern std::array<HPEN, COLORCNT> UserPen;
-extern float UserStitchLength;
+extern float                      UserStitchLength;
 
 extern std::vector<HWND>* ValueWindow;
 

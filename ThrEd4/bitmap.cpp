@@ -28,18 +28,18 @@ static auto BitmapDstRect        = RECT {}; // stitch window destination rectang
 static auto BitmapFileHandle     = HANDLE {};           // bitmap handle
 static auto BitmapFileHeader     = BITMAPFILEHEADER {}; // bitmap file header
 static auto BitmapFileHeaderV4   = BITMAPV4HEADER {};   // bitmap version4 file header
-static auto BitmapHeight         = int {};         // bitmap height
+static auto BitmapHeight         = int {};              // bitmap height
 static auto BitmapInfo           = BITMAPINFO {};       // bitmap info
 static auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
 static auto BitmapPen            = HPEN {};             // bitmap pen
 static auto BitmapSizeinStitches = fPOINT {};           // bitmap end points in stitch points
 static auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
-static auto BitmapWidth          = int {};         // bitmap width
+static auto BitmapWidth          = int {};              // bitmap width
 static auto BmpStitchRatio       = fPOINT {};           // bitmap to stitch hoop ratios
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = static_cast<fs::path*>(nullptr); // bitmap file name from user load
-static auto UTF8BMPname  = std::array<char, SZBMPNM> {};   // bitmap file name from pcs file
+static auto UTF8BMPname  = std::array<char, SZBMPNM> {};    // bitmap file name from pcs file
 
 constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
@@ -87,8 +87,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_SIG = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_SIG) {
-	auto fileHeaderSize =
-	    wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
+	auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 	  fileHeaderSize = sizeof(BITMAPV4HEADER);
 	}
@@ -103,14 +102,14 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	if (!StateMap->testAndReset(StateFlag::WASESC)) {
 	  StateMap->reset(StateFlag::TRSET);
 	}
-	BitmapWidth = BitmapFileHeaderV4.bV4Width;
+	BitmapWidth  = BitmapFileHeaderV4.bV4Width;
 	BitmapHeight = BitmapFileHeaderV4.bV4Height;
 	StateMap->set(StateFlag::INIT);
 	ZoomRect.left   = 0.0F;
 	ZoomRect.bottom = 0.0F;
 	wrap::narrow_cast(ZoomRect.right, UnzoomedRect.x);
 	wrap::narrow_cast(ZoomRect.top, UnzoomedRect.y);
-	BitmapDC        = CreateCompatibleDC(StitchWindowDC);
+	BitmapDC = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
 	  // NOLINTNEXTLINE(readability-magic-numbers)
@@ -120,7 +119,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		bitmapWidthBytes += 4U;
 	  }
 	  auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
-	  auto       monoBitmapData  = std::vector<uint8_t> {};
+	  auto monoBitmapData = std::vector<uint8_t> {};
 	  monoBitmapData.resize(bitmapSizeBytes);
 	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
 	  CloseHandle(hBitmapFile);
@@ -129,8 +128,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : InverseBackgroundColor);
 	  BitmapInfoHeader      = {};
 	  BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
-	  BitmapInfoHeader.biWidth = BitmapWidth;
-	  BitmapInfoHeader.biHeight = BitmapHeight;
+	  BitmapInfoHeader.biWidth       = BitmapWidth;
+	  BitmapInfoHeader.biHeight      = BitmapHeight;
 	  BitmapInfoHeader.biPlanes      = 1U;
 	  BitmapInfoHeader.biBitCount    = BPP32;
 	  BitmapInfoHeader.biCompression = BI_RGB;
@@ -186,8 +185,8 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
   auto whiteBits = 0U;
   auto blackBits = 0U;
   for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-	if ((wrap::toSize(iHeight)*bitmapWidthInBytes) < monoBitmapData.size()) {
-	  auto const* bcpnt = &monoBitmapData[wrap::toSize(iHeight)*bitmapWidthInBytes];
+	if ((wrap::toSize(iHeight) * bitmapWidthInBytes) < monoBitmapData.size()) {
+	  auto const* bcpnt = &monoBitmapData[wrap::toSize(iHeight) * bitmapWidthInBytes];
 	  for (auto iBytes = 0U; iBytes < bitmapWidthInBytes; ++iBytes) {
 		if (bcpnt[iBytes] == 0U) {
 		  ++blackBits;
@@ -276,7 +275,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 	COMDLG_FILTERSPEC const filterFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-	constexpr auto FILTERCNT        = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // File filter count
+	constexpr auto          FILTERCNT = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // File filter count
 	hr = pFileSave->SetFileTypes(FILTERCNT, static_cast<COMDLG_FILTERSPEC const*>(filterFileTypes));
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
@@ -368,7 +367,7 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		COMDLG_FILTERSPEC const filterFileTypes[] = {{L"Bitmap Files", L"*.bmp"}, {L"All files", L"*.*"}};
-		constexpr auto FILTERCNT        = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // Filter file types count
+		constexpr auto          FILTERCNT         = (sizeof(filterFileTypes) / sizeof(filterFileTypes[0])); // Filter file types count
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
 		hr += pFileOpen->SetFileTypes(FILTERCNT, static_cast<COMDLG_FILTERSPEC const*>(filterFileTypes));
@@ -591,8 +590,10 @@ void bitmap::drawBmpBackground() {
 }
 
 auto bitmap::internal::bitar() -> bool {
-  auto const zoomedInRect = fRECTANGLE {
-      ZoomRect.left, (wrap::toFloat(UnzoomedRect.y) - ZoomRect.top), ZoomRect.right, (wrap::toFloat(UnzoomedRect.y) - ZoomRect.bottom)};
+  auto const zoomedInRect = fRECTANGLE {ZoomRect.left,
+                                        (wrap::toFloat(UnzoomedRect.y) - ZoomRect.top),
+                                        ZoomRect.right,
+                                        (wrap::toFloat(UnzoomedRect.y) - ZoomRect.bottom)};
   if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 	return false;
   }
@@ -620,11 +621,12 @@ auto bitmap::internal::bitar() -> bool {
   auto const bitmapStitchRatio =
       fPOINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
-  BitmapDstRect = {
-      std::lround(differenceRect.left * bitmapStitchRatio.x),
-      std::lround(differenceRect.top * bitmapStitchRatio.y),
-      std::lround(wrap::toFloat(StitchWindowClientRect.right) - differenceRect.right * bitmapStitchRatio.x),
-      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) - differenceRect.bottom * bitmapStitchRatio.y)};
+  BitmapDstRect = {std::lround(differenceRect.left * bitmapStitchRatio.x),
+                   std::lround(differenceRect.top * bitmapStitchRatio.y),
+                   std::lround(wrap::toFloat(StitchWindowClientRect.right) -
+                               differenceRect.right * bitmapStitchRatio.x),
+                   std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
+                               differenceRect.bottom * bitmapStitchRatio.y)};
   return true;
 }
 
@@ -684,8 +686,8 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
   auto line     = std::array<POINT, 2> {};
   auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto vStart = wrap::next(vertexIt, start);
-  auto vFinish = wrap::next(vertexIt, finish);
+  auto vStart   = wrap::next(vertexIt, start);
+  auto vFinish  = wrap::next(vertexIt, finish);
   line[0]       = bi::stch2bit(*vStart);
   line[1]       = bi::stch2bit(*vFinish);
   wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));

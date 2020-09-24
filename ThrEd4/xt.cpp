@@ -44,8 +44,8 @@
 
 namespace xi = xt::internal;
 
-static auto DesignSize = fPOINT {};              // design size
-static auto ColorOrder = std::array<uint32_t, COLORCNT>{}; // color order adjusted for applique
+static auto DesignSize = fPOINT {};                         // design size
+static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
 
 enum stitchStyles {
   TYPE_APPLIQUE = 1, // applique
@@ -57,7 +57,7 @@ enum stitchStyles {
   TYPE_BORDER        // border
 };
 
-static constexpr auto StitchTypes = std::array<char, 13>{
+static constexpr auto StitchTypes = std::array<char, 13> {
     0,             // 0 no type
     TYPE_APPLIQUE, // 1 applique
     TYPE_CWALK,    // 2 center walk
@@ -148,14 +148,13 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 	case FTHPSG: {
 	  if (feather.upCount != 0U) {
 		if (feather.countUp != 0U) {
-		  feather.ratio = (wrap::toFloat(feather.totalCount) -
-		                   wrap::toFloat(form::psg() % feather.totalCount)) /
-		                  wrap::toFloat(feather.totalCount);
+		  feather.ratio =
+		      (wrap::toFloat(feather.totalCount) - wrap::toFloat(form::psg() % feather.totalCount)) /
+		      wrap::toFloat(feather.totalCount);
 		  --(feather.countUp);
 		}
 		else {
-		  feather.ratio = (wrap::toFloat(feather.totalCount) -
-		                   wrap::toFloat(bpsg() % feather.totalCount)) /
+		  feather.ratio = (wrap::toFloat(feather.totalCount) - wrap::toFloat(bpsg() % feather.totalCount)) /
 		                  wrap::toFloat(feather.totalCount);
 		  if (feather.countDown != 0U) {
 			--(feather.countDown);
@@ -168,8 +167,7 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
 		}
 	  }
 	  else {
-		feather.ratio = (wrap::toFloat(feather.totalCount) -
-		                 wrap::toFloat(form::psg() % feather.totalCount)) /
+		feather.ratio = (wrap::toFloat(feather.totalCount) - wrap::toFloat(form::psg() % feather.totalCount)) /
 		                wrap::toFloat(feather.totalCount);
 	  }
 	  feather.ratio *= feather.formRatio;
@@ -347,13 +345,13 @@ void xt::fthrfn(FRMHED& form) {
 	++ind;
   }
   feather.globalPosition = 0.0F;
-  feather.globalStep = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
-  feather.globalPhase = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
-  feather.globalRatio = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
-  feather.globalUp    = feather.globalPhase * feather.globalRatio;
-  feather.globalDown  = feather.globalPhase - feather.globalUp;
-  form.fillType       = FTHF;
-  feather.phase       = 1U;
+  feather.globalStep     = (4.0F / gsl::narrow_cast<float>(BSequence->size())) * wrap::toFloat(ind);
+  feather.globalPhase    = gsl::narrow_cast<float>(BSequence->size()) / wrap::toFloat(ind);
+  feather.globalRatio    = wrap::toFloat(feather.countUp) / wrap::toFloat(feather.phaseIndex);
+  feather.globalUp       = feather.globalPhase * feather.globalRatio;
+  feather.globalDown     = feather.globalPhase - feather.globalUp;
+  form.fillType          = FTHF;
+  feather.phase          = 1U;
   BSequence->push_back(BSequence->operator[](BSequence->size() - 2U));
   BSequence->push_back(BSequence->operator[](BSequence->size() - 1U));
   if ((feather.extendedAttribute & AT_FTHBLND) != 0U) {
@@ -501,8 +499,8 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 	  auto const length       = hypot(delta.x, delta.y);
 	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
 	  if (stitchCount != 0U) {
-		auto const step  = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
-		auto       point = sequence;
+		auto const step = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
+		auto point = sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
 		  point.x += step.x;
@@ -578,7 +576,7 @@ auto xt::internal::gucon(FRMHED const&            form,
 	auto const stitchCount = wrap::round<uint32_t>(length / UserStitchLength);
 	if (stitchCount > 1U) {
 	  auto const step = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
-	  auto       localPoint =
+	  auto localPoint =
 	      fPOINT {indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y};
 	  for (auto iStep = 0U; iStep < stitchCount - 1U; ++iStep) {
 		buffer.emplace_back(fPOINTATTR {localPoint.x, localPoint.y, code});
@@ -638,16 +636,15 @@ void xt::internal::fncwlk(FRMHED& form) {
 	if (form.wordParam != 0U) {
 	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
-	  OSequence->push_back(
-	      fPOINT {wrap::midl(thisVertex->x, nextVertex->x), wrap::midl(thisVertex->y, nextVertex->y)});
+	  OSequence->push_back(fPOINT {wrap::midl(thisVertex->x, nextVertex->x),
+	                               wrap::midl(thisVertex->y, nextVertex->y)});
 	}
 	auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
 	auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iGuide = form.satinGuideCount; iGuide != 0; --iGuide) {
 	  auto vStart  = wrap::next(vertexIt, guideIt->start);
 	  auto vFinish = wrap::next(vertexIt, guideIt->finish);
-	  OSequence->push_back(fPOINT {wrap::midl(vFinish->x, vStart->x),
-	                               wrap::midl(vFinish->y, vStart->y)});
+	  OSequence->push_back(fPOINT {wrap::midl(vFinish->x, vStart->x), wrap::midl(vFinish->y, vStart->y)});
 	  --guideIt;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
@@ -665,10 +662,9 @@ void xt::internal::fncwlk(FRMHED& form) {
 	auto finish = form::prv(form, start);
 	start       = form::nxt(form, start);
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); ++iGuide) {
-		auto vStart = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
-		auto vFinish = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-	  auto const pnt = fPOINT {wrap::midl(vFinish->x, vStart->x),
-	                           wrap::midl(vFinish->y, vStart->y)};
+	  auto       vStart  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
+	  auto       vFinish = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+	  auto const pnt = fPOINT {wrap::midl(vFinish->x, vStart->x), wrap::midl(vFinish->y, vStart->y)};
 	  if (form::cisin(form, pnt.x, pnt.y)) {
 		OSequence->push_back(pnt);
 	  }
@@ -682,7 +678,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 }
 
 void xt::srtcol() {
-  auto           histogram = std::vector<uint32_t> {};
+  auto histogram = std::vector<uint32_t> {};
   histogram.resize(COLORCNT);
   auto colorStartStitch = std::vector<uint32_t> {};
   colorStartStitch.resize(COLORCNT);
@@ -1016,7 +1012,7 @@ void xt::fsort() {
 	auto attribute    = StitchBuffer->front().attribute & SRTMSK;
 	auto stitchRegion = std::vector<OREC> {};
 
-	constexpr auto EXPREGION = 100U;  //expected regions
+	constexpr auto EXPREGION = 100U; // expected regions
 	stitchRegion.reserve(EXPREGION);
 	// ToDo - fsort does not appear to be capable of handling the case where the underlay, fill and border colors
 	//        in a single form are not in ascending order already.
@@ -1428,8 +1424,7 @@ void xt::internal::chkend(FRMHED const& form, std::vector<fPOINTATTR>& buffer, u
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
 	  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.fillEnd);
-	  ilData.output +=
-	      gucon(form, buffer, InterleaveSequence->back(), *vertexIt, ilData.output, code);
+	  ilData.output += gucon(form, buffer, InterleaveSequence->back(), *vertexIt, ilData.output, code);
 	}
   }
 }
@@ -1514,7 +1509,7 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 	StitchBuffer->insert(StitchBuffer->begin(), sourceStart, sourceEnd);
   }
   else { // no stitches added so far
-	auto code     = 0U;
+	auto code = 0U;
 	for (auto iSequence = 0U; iSequence < wrap::toUnsigned(InterleaveSequenceIndices->size() - 1U); ++iSequence) {
 	  code = ilData.layerIndex | InterleaveSequenceIndices->operator[](iSequence).code |
 	         InterleaveSequenceIndices->                    operator[](iSequence).color;
@@ -2552,8 +2547,7 @@ auto CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 }
 
 void xt::clrstch() noexcept {
-  while (EnumChildWindows(MainStitchWin, xi::enumch, 0) != 0) {
-  }
+  while (EnumChildWindows(MainStitchWin, xi::enumch, 0) != 0) { }
 }
 
 void xt::chgwrn() {

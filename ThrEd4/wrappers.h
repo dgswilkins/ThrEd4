@@ -76,11 +76,11 @@ template <class outType, class inType> auto round(inType invar) -> outType {
 
 #ifdef _WIN64
 template <class inType> auto ptrdiff(inType invar) noexcept -> ptrdiff_t {
-    return gsl::narrow_cast<ptrdiff_t>(invar);
+  return gsl::narrow_cast<ptrdiff_t>(invar);
 }
 #else
- template <class inType> auto ptrdiff(inType invar) -> ptrdiff_t {
-   return gsl::narrow<ptrdiff_t>(invar);
+template <class inType> auto ptrdiff(inType invar) -> ptrdiff_t {
+  return gsl::narrow<ptrdiff_t>(invar);
 }
 #endif
 

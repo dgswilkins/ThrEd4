@@ -99,7 +99,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  auto stitchRec      = PCSTCH {};
 		  auto integerPart    = 0.0F;
 		  auto fractionalPart = std::modf(stitch.x, &integerPart);
-		  stitchRec.fx = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
+		  stitchRec.fx        = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
 		  wrap::narrow(stitchRec.x, integerPart);
 		  fractionalPart = std::modf(stitch.y, &integerPart);
 		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * FRACFACT);
@@ -174,10 +174,9 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 				color = NOTFRM | stitch.fx;
 			  }
 			  else {
-				StitchBuffer->push_back(
-				    fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-				                wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-				                color});
+				StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+				                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+				                                    color});
 				++iStitch;
 			  }
 			  ++iPCSstitch;

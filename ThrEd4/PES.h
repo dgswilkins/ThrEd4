@@ -123,7 +123,7 @@ class PECHDR
 };
 
 static constexpr uint8_t THUMBHGT = 38U;
-static constexpr uint8_t THUMBWID  = 48U;
+static constexpr uint8_t THUMBWID = 48U;
 
 class PECHDR2
 {

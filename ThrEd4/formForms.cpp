@@ -162,8 +162,9 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-  valueWindow[LLAYR] = ffi::txtrwin(
-      fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U)), ValueWindowCoords); // NOLINT
+  valueWindow[LLAYR] =
+      ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U)),
+                   ValueWindowCoords); // NOLINT
   ffi::nxtlin(formMenuEntryCount);
   if (form.type != FRMLINE) {
 	labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
@@ -1025,14 +1026,14 @@ void formForms::setear() {
 	form::durpoli(IniFile.formSides);
 	auto&      form             = FormList->back();
 	auto       vBegin           = wrap::next(FormVertices->begin(), form.vertexIndex);
-	auto vNext = std::next(vBegin);
+	auto       vNext            = std::next(vBegin);
 	auto const count            = wrap::toSize(form.vertexCount) / 4U;
 	auto const middle           = wrap::midl(vNext->x, vBegin->x);
 	auto       vLast            = wrap::next(vBegin, count + 1U);
 	auto       verticalPosition = vLast->y;
 	--vLast;
-	auto step           = verticalPosition - vLast->y;
-	auto vLeft = wrap::next(vBegin, wrap::toSize(form.vertexCount) - count);
+	auto step   = verticalPosition - vLast->y;
+	auto vLeft  = wrap::next(vBegin, wrap::toSize(form.vertexCount) - count);
 	auto vRight = wrap::next(vBegin, count + 1U);
 	for (auto iStep = 0U; iStep < count; ++iStep) {
 	  vLeft->y  = verticalPosition;
@@ -1051,7 +1052,7 @@ void formForms::setear() {
 	verticalPosition -= step / 2.0F;
 	FormVertices->push_back(*vBegin);
 	vBegin = wrap::next(FormVertices->begin(), form.vertexIndex); // iterator invalidated by push_back
-	vNext = std::next(vBegin);
+	vNext  = std::next(vBegin);
 	if (twistStep != 0.0F) {
 	  vBegin->x = vNext->x + twistStep / TWSTFACT;
 	}
@@ -1076,7 +1077,7 @@ void formForms::setear() {
 	  horizontalRatio = verticalRatio;
 	}
 	if (horizontalRatio < 1.0F) {
-		auto vScaled = vBegin;
+	  auto vScaled = vBegin;
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		vScaled->x = (vScaled->x - vBegin->x) * horizontalRatio + vBegin->x;
 		vScaled->y = (vScaled->y - vBegin->y) * horizontalRatio + vBegin->y;
@@ -1167,7 +1168,7 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
-  constexpr auto WAVSIZE = 4.0F; // wave size factor
+  constexpr auto WAVSIZE = 4.0F;        // wave size factor
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
   if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) {
 	thred::savdo();
@@ -1179,13 +1180,12 @@ void formForms::wavfrm() {
 	form::mdufrm();
 	auto iPoint    = 0U;
 	auto waveIndex = IniFile.waveStart;
-	auto vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto vBegin    = wrap::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  auto vNext = wrap::next(vBegin, iNextVertex);
-	  auto vWave = wrap::next(vBegin, waveIndex);
-	  points.emplace_back(-vNext->x + vWave->x,
-	                      -vNext->y + vWave->y);
+	  auto           vNext       = wrap::next(vBegin, iNextVertex);
+	  auto           vWave       = wrap::next(vBegin, waveIndex);
+	  points.emplace_back(-vNext->x + vWave->x, -vNext->y + vWave->y);
 	  ++iPoint;
 	  waveIndex = iNextVertex;
 	}

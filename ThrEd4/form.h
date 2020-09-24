@@ -217,7 +217,7 @@ namespace internal {
   void clpfm();
   auto clpnseg(std::vector<CLIPNT>&       clipStitchPoints,
                std::vector<CLPSEG>&       clipSegments,
-               std::vector<float> const& lengths,
+               std::vector<float> const&  lengths,
                uint32_t                   start,
                uint32_t                   finish,
                std::vector<fPOINT> const& currentFormVertices) -> uint32_t;
@@ -309,7 +309,7 @@ namespace internal {
   void fsvrt();
   void getbig(fRECTANGLE* allItemsRect) noexcept;
   auto getlen(std::vector<CLIPNT>&       clipStitchPoints,
-              std::vector<float> const& lengths,
+              std::vector<float> const&  lengths,
               uint32_t                   iPoint,
               std::vector<fPOINT> const& currentFormVertices) -> float;
   void horclpfn(std::vector<RNGCNT> const& textureSegments, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
@@ -378,7 +378,7 @@ namespace internal {
               uint32_t&                     doneRegion,
               uint32_t                      pathMapIndex,
               uint32_t&                     sequencePathIndex,
-              int32_t                      visitedIndex);
+              int32_t                       visitedIndex);
   void nxtseq(std::vector<FSEQ>&           sequencePath,
               std::vector<RCON> const&     pathMap,
               std::vector<uint32_t> const& mapIndexSequence,
@@ -415,10 +415,10 @@ namespace internal {
                std::vector<REGION> const&    regionsList,
                float                         gapToClosestRegion,
                uint32_t&                     nextGroup) noexcept -> bool;
-  auto reglen(std::vector<SMALPNTL*> const&      sortedLines,
-              uint32_t                           iRegion,
+  auto reglen(std::vector<SMALPNTL*> const&       sortedLines,
+              uint32_t                            iRegion,
               std::array<fPOINT, SQRCORNS> const& lastRegionCorners,
-              std::vector<REGION> const&         regionsList) noexcept -> float;
+              std::vector<REGION> const&          regionsList) noexcept -> float;
   void ritapbrd();
   void ritbrd(FRMHED const& form);
   void ritfil();

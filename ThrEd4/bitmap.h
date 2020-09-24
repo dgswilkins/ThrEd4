@@ -47,6 +47,7 @@ namespace internal {
   void bitsiz();
   constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
   constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
+
   void movmap(int cnt, uint8_t* buffer);
   auto nuBit() noexcept -> BOOL;
   auto loadName(fs::path const* directory, fs::path* fileName) -> bool;

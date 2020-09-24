@@ -60,7 +60,8 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
-  static constexpr auto DSTvalues = std::array<DSTDAT, 22> { // DST offset values
+  static constexpr auto DSTvalues = std::array<DSTDAT, 22> {
+      // DST offset values
       DSTDAT {XCOR, 1},   DSTDAT {XCOR, -1}, DSTDAT {XCOR, 9},  DSTDAT {XCOR, -9},
       DSTDAT {YCOR, -9},  DSTDAT {YCOR, 9},  DSTDAT {YCOR, -1}, DSTDAT {YCOR, 1},
       DSTDAT {XCOR, 3},   DSTDAT {XCOR, -3}, DSTDAT {XCOR, 27}, DSTDAT {XCOR, -27},
@@ -162,17 +163,16 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto const dstSize =
       fPOINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
   IniFile.hoopType = CUSTHUP;
-  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+  UnzoomedRect     = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   if (dstSize.x > wrap::toFloat(UnzoomedRect.x) || dstSize.y > wrap::toFloat(UnzoomedRect.y)) {
 	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio
 	IniFile.hoopSizeX       = dstSize.x * EXPRATIO;
 	IniFile.hoopSizeY       = dstSize.y * EXPRATIO;
-	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
+	UnzoomedRect            = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
-  auto const delta =
-      fPOINT {(wrap::toFloat(UnzoomedRect.x) - dstSize.x) / 2.0F - mimimumCoordinate.x,
-              (wrap::toFloat(UnzoomedRect.y) - dstSize.y) / 2.0F - mimimumCoordinate.y};
+  auto const delta = fPOINT {(wrap::toFloat(UnzoomedRect.x) - dstSize.x) / 2.0F - mimimumCoordinate.x,
+                             (wrap::toFloat(UnzoomedRect.y) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
 	iStitch.x += delta.x;
 	iStitch.y += delta.y;
@@ -215,7 +215,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  boundingRect.bottom = stitch.y - MARGIN;
 	}
   }
-  auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
+  auto centerCoordinate    = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
                                  std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
   DSTOffsetData.Positive.x = std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1));
   DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
@@ -229,8 +229,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  color = stitch.attribute & COLORBTS;
 	  colorData.push_back(UserColor[color]);
 	}
-	auto lengths = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
-	                      std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
+	auto       lengths         = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
+                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = POINT {abs(lengths.x), abs(lengths.y)};
 	auto       count           = 0;
 	if (absoluteLengths.x > absoluteLengths.y) {
@@ -239,8 +239,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	else {
 	  count = absoluteLengths.y / DSTMAX + 1;
 	}
-	auto const stepSize = POINT {(absoluteLengths.x / count + 1),
-	                             (absoluteLengths.y / count + 1)};
+	auto const stepSize = POINT {(absoluteLengths.x / count + 1), (absoluteLengths.y / count + 1)};
 
 	auto difference = POINT {0L, 0L};
 	while ((lengths.x != 0) || (lengths.y != 0)) {
@@ -337,13 +336,13 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
   // NOLINTNEXTLINE(readability-magic-numbers)
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                      (((767 - meanR) * deltaB * deltaB) / 256)))); // NOLINT(readability-magic-numbers)
+                                                     (((767 - meanR) * deltaB * deltaB) / 256)))); // NOLINT(readability-magic-numbers)
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
   auto const colorChanges = thred::maxColor() + 1U;
   if (colorChanges < COLORCNT) {
-      for (auto iColor = size_t {}; iColor < colorChanges; ++iColor) {
+	for (auto iColor = size_t {}; iColor < colorChanges; ++iColor) {
 	  if (color == UserColor[iColor]) {
 		return wrap::toUnsigned(iColor);
 	  }
@@ -352,7 +351,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 	return wrap::toUnsigned(colorChanges);
   }
   auto minDistance = std::numeric_limits<DWORD>::max();
-  auto iDistance = uint32_t {};
+  auto iDistance   = uint32_t {};
   for (auto iColor = size_t {}; iColor < COLORCNT; ++iColor) {
 	auto const distance = di::coldis(color, UserColor[iColor]);
 	if (distance == 0U) {

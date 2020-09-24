@@ -38,8 +38,8 @@ constexpr auto BIT8     = uint32_t {0x80U};  // Set bit 8 on the upper byte
 constexpr auto BIT12    = uint32_t {0x800U}; // Set bit 12 if delta is negative
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
-static auto PEScolors             = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
-static auto PESequivColors        = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
+static auto PEScolors      = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
+static auto PESequivColors = std::array<uint8_t, COLORCNT> {};    // pes equivalent colors
 
 THREAD const PESThread[] = {
     {{0x00, 0x00, 0x00}, "Unknown", ""},                // Index  00
@@ -109,7 +109,8 @@ THREAD const PESThread[] = {
     {{0xff, 0xc8, 0xc8}, "Applique", ""}                // Index 64
 };
 
-constexpr auto THTYPCNT  = sizeof(PESThread) / sizeof(PESThread[0]); // Count of thread colors available in the PES format
+constexpr auto THTYPCNT =
+    sizeof(PESThread) / sizeof(PESThread[0]); // Count of thread colors available in the PES format
 
 // clang-format off
 char const imageWithFrame[THUMBHGT][THUMBWID]= { 
@@ -168,18 +169,17 @@ auto PES::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& color
 }
 
 void PES::internal::ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch, fPOINT const& offset) {
-  auto const     oldSize = buffer.size();
+  auto const oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(PESTCH));
   auto*      pesStitch    = convert_ptr<PESTCH*>(&buffer[oldSize]);
-  auto const scaledStitch = fPOINT {-stitch.x * IPECFACT + offset.x,
-                                    stitch.y * IPECFACT - offset.y};
+  auto const scaledStitch = fPOINT {-stitch.x * IPECFACT + offset.x, stitch.y * IPECFACT - offset.y};
   pesStitch->x            = wrap::round<int16_t>(scaledStitch.x);
   pesStitch->y            = wrap::round<int16_t>(scaledStitch.y);
 }
 
 void PES::internal::ritpesCode(std::vector<uint8_t>& buffer) {
-  constexpr auto ENDCODE = uint16_t {0x8003U}; // Block end code 
-  auto const     oldSize      = buffer.size();
+  constexpr auto ENDCODE = uint16_t {0x8003U}; // Block end code
+  auto const     oldSize = buffer.size();
   buffer.resize(oldSize + sizeof(uint16_t));
   auto* contCode = convert_ptr<uint16_t*>(&buffer[oldSize]);
   if (contCode != nullptr) {
@@ -226,7 +226,7 @@ void PES::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta
 }
 
 void PES::internal::rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY) {
-  constexpr auto DELTAMAX = int32_t {63}; // maximum value of the delta
+  constexpr auto DELTAMAX = int32_t {63};  // maximum value of the delta
   constexpr auto DELTAMIN = int32_t {-64}; // minimum value of the delta
 
   auto const deltaX = std::lround(srcX * PECFACT);
@@ -335,7 +335,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 }
 
 auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
-  auto const     threadColor = PESThread[PEScolors[index++] % THTYPCNT];
+  auto const threadColor = PESThread[PEScolors[index++] % THTYPCNT];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
@@ -365,7 +365,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   if (!thred::getFileHandle(newFileName, fileHandle)) {
 	return false;
   }
-  auto  fileBuf = std::vector<uint8_t> {};
+  auto fileBuf = std::vector<uint8_t> {};
   fileBuf.reserve(wrap::toSize(fileSize));
   auto* fileBuffer = fileBuf.data();
   auto  bytesRead  = DWORD {0};
@@ -383,13 +383,13 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
   // auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
-  auto pecOffset             = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-  auto*      PESstitch       = &fileBuffer[pecOffset];
-  auto const pesColorCount   = pecHeader->colorCount + 1U;
-  auto&      pad             = pecHeader->pad;
-  PEScolors                  = std::begin(pad);
-  auto           colorMap    = boost::dynamic_bitset<>(THTYPCNT);
-  auto           activeColor = 0U;
+  auto       pecOffset     = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+  auto*      PESstitch     = &fileBuffer[pecOffset];
+  auto const pesColorCount = pecHeader->colorCount + 1U;
+  auto&      pad           = pecHeader->pad;
+  PEScolors                = std::begin(pad);
+  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
+  auto activeColor         = 0U;
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
 	if (PEScolors[iColor] < THTYPCNT) {
 	  if (!colorMap.test_set(PEScolors[iColor])) {
@@ -411,7 +411,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	  UserColor[activeColor++] = color;
 	}
   }
-  auto loc      = fPOINT {};
+  auto loc = fPOINT {};
   StateMap->reset(StateFlag::FILDIR);
   if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
 	auto       color      = 0U;
@@ -420,7 +420,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	StitchBuffer->clear();
 	StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
 	StitchBuffer->push_back(fPOINTATTR {});
-	constexpr auto MSK12BIT = uint32_t {0xFFFU};  // used to mask the value to 12 bits
+	constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
 	auto PEScolorIndex = uint32_t {1U};
 	while (iPESstitch < pecCount) {
@@ -497,8 +497,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto pesHeader = PESHED {};
 
 		constexpr auto PESSTR = "#PES0001"; // PES lead in
-		constexpr auto EMBSTR = "CEmbOne"; // emb section lead in 
-		constexpr auto SEWSTR = "CSewSeg"; // sewing segment leadin
+		constexpr auto EMBSTR = "CEmbOne";  // emb section lead in
+		constexpr auto SEWSTR = "CSewSeg";  // sewing segment leadin
 		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
 		strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR));
 		wrap::narrow(pesHeader.celn, strlen(EMBSTR));
@@ -509,8 +509,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen);
 		auto iColor = 0U;
 		for (auto const color : UserColor) {
-		  auto           matchIndex  = 0U;
-		  auto           matchMin    = std::numeric_limits<uint32_t>::max();
+		  auto matchIndex = 0U;
+		  auto matchMin   = std::numeric_limits<uint32_t>::max();
 		  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {
 			auto const match = pi::pesmtch(color, gsl::narrow_cast<uint8_t>(iColorMatch));
 			if (match < matchMin) {
