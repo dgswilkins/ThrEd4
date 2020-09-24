@@ -56,7 +56,7 @@ constexpr auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
   if (ppvBits != nullptr) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
-	auto bitmap =
+	auto const bitmap =
 	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	if (*ppvBits != nullptr) {
 	  return bitmap;
@@ -136,7 +136,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  BitmapInfo.bmiHeader           = BitmapInfoHeader;
 	  auto* bits                     = gsl::narrow_cast<uint32_t*>(nullptr);
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
+	  auto const bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
@@ -149,7 +149,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		}
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto deviceContext = CreateCompatibleDC(StitchWindowDC);
+	  auto const deviceContext = CreateCompatibleDC(StitchWindowDC);
 	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
@@ -279,7 +279,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 	hr = pFileSave->SetFileTypes(FILTERCNT, static_cast<COMDLG_FILTERSPEC const*>(filterFileTypes));
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
-	auto bmpName = UTF16BMPname->filename().wstring();
+	auto const bmpName = UTF16BMPname->filename().wstring();
 	hr += pFileSave->SetFileName(bmpName.c_str());
 	hr += pFileSave->SetDefaultExtension(L"bmp");
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -320,7 +320,7 @@ void bitmap::savmap() {
 	auto fileName = fs::path {};
 	if (bi::saveName(fileName)) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto hBitmap =
+	  auto const hBitmap =
 	      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (hBitmap == INVALID_HANDLE_VALUE) {
@@ -423,7 +423,7 @@ void bitmap::lodbmp(fs::path const* directory) {
 	auto filePart = fs::path {dest.data()};
 	auto saveFile = utf::Utf16ToUtf8(filePart.filename().wstring());
 #else
-	auto saveFile = utf::Utf16ToUtf8(UTF16BMPname->filename().wstring());
+	auto const saveFile = utf::Utf16ToUtf8(UTF16BMPname->filename().wstring());
 #endif
 	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	  std::copy(saveFile.cbegin(), saveFile.cend(), UTF8BMPname.begin());
@@ -470,8 +470,8 @@ void bitmap::setUBfilename(fs::path* fileName) noexcept {
 
 void bitmap::assignUBFilename(fs::path const& directory) {
   fs::current_path(directory);
-  auto BMPfileName = utf::Utf8ToUtf16(std::string(UTF8BMPname.data()));
-  auto fullPath    = directory / BMPfileName;
+  auto const BMPfileName = utf::Utf8ToUtf16(std::string(UTF8BMPname.data()));
+  auto const fullPath    = directory / BMPfileName;
   UTF16BMPname->assign(fullPath);
   bitmap::internal::bfil(BackgroundColor);
 }
@@ -631,17 +631,17 @@ auto bitmap::internal::bitar() -> bool {
 }
 
 auto bitmap::getrmap() -> uint32_t {
-  auto header     = BITMAPINFOHEADER {wrap::toUnsigned(sizeof(BITMAPINFOHEADER)),
-                                  gsl::narrow_cast<LONG>(BitmapWidth),
-                                  gsl::narrow_cast<LONG>(BitmapHeight),
-                                  1U,
-                                  BPP32,
-                                  BI_RGB,
-                                  0U,
-                                  0L,
-                                  0L,
-                                  0U,
-                                  0U};
+  auto const header = BITMAPINFOHEADER {wrap::toUnsigned(sizeof(BITMAPINFOHEADER)),
+                                        gsl::narrow_cast<LONG>(BitmapWidth),
+                                        gsl::narrow_cast<LONG>(BitmapHeight),
+                                        1U,
+                                        BPP32,
+                                        BI_RGB,
+                                        0U,
+                                        0L,
+                                        0L,
+                                        0U,
+                                        0U};
   auto info       = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
   TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
@@ -685,9 +685,9 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
   auto line     = std::array<POINT, 2> {};
-  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto vStart   = wrap::next(vertexIt, start);
-  auto vFinish  = wrap::next(vertexIt, finish);
+  auto const vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto const vStart   = wrap::next(vertexIt, start);
+  auto const vFinish  = wrap::next(vertexIt, finish);
   line[0]       = bi::stch2bit(*vStart);
   line[1]       = bi::stch2bit(*vFinish);
   wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
