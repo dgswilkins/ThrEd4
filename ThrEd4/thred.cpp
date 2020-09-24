@@ -61,17 +61,18 @@ constexpr auto NERCNT          = 4U;   // number of entries in the near array;
 constexpr auto DNLEN           = 50U;  // designer name order table length
 constexpr auto DNELEN          = 128U; // designer name encoding table length
 constexpr auto DNDLEN          = 256U; // designer name decoding table length
-constexpr auto UndoLength      = 16U;  // UndoBuffer length
-constexpr auto headerSignature = uint32_t {0x746872U};
+constexpr auto UNDOLEN         = 16U;  // UndoBuffer length
+constexpr auto THREDSIG        = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
-constexpr auto knotLen  = 5U;                     // length of knot pattern
-constexpr auto arrowPoints = 3U;                  // points required to draw arrow
+constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
+constexpr auto ARROWPNT = 3U;                     // points required to draw arrow
 constexpr auto FILLTYPS    = uint32_t {14U};      // 13 fill types plus 'none'
 constexpr auto FSSIZE      = uint8_t {6U};        // count of feather styles
 constexpr auto EDGETYPS    = uint32_t {13U};      // number of border fill types
 constexpr auto OLDVER      = wchar_t {4};         // number of old file versions kept
 constexpr auto HUPS        = 5;                   // number of hoops the user can select
+constexpr auto BALRATIO = 10.0F / 6.0F; //Balarad stitch size ration
 
 // main variables
 static auto ArgCount        = int32_t {};                         // command line argument count
@@ -108,7 +109,7 @@ static auto VersionNames =
     gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
 static auto FileVersionIndex   = uint8_t {};           // points to old version to be read
 static auto ClipFormsCount     = uint32_t {};          // number of forms the on the clipboard
-static auto StitchArrow        = std::array<POINT, arrowPoints> {}; // arrow for selected stitch
+static auto StitchArrow        = std::array<POINT, ARROWPNT> {}; // arrow for selected stitch
 static auto SelectedRange      = RANGE {}; // first and last stitch for min/max stitch select
 static auto NameOrder          = std::array<uint32_t, DNLEN> {}; // designer name order table
 static auto NameEncoder        = std::array<uint8_t, DNELEN> {}; // designer name encoding
@@ -162,6 +163,8 @@ static auto ThreadSize          = std::array<wchar_t, COLORCNT> {}; // user sele
 static auto ThreadSizePixels    = std::array<int32_t, COLORCNT> {}; // thread sizes in pixels
 static auto ThreadSizeIndex     = std::array<uint32_t, COLORCNT> {}; // thread size indices
 static auto ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size change windows
+constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
+
 
 // menus
 static auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
@@ -380,8 +383,8 @@ void thred::wrnmen() {
 static auto datcod = std::array<UINT, 4U>{ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
 
 void thred::chkmen() noexcept {
-  constexpr auto lastCode = datcod.size();
-  for (auto iCode = 0U; iCode < lastCode; ++iCode) {
+  constexpr auto LASTCODE = datcod.size();
+  for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
 	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
 	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
 	CheckMenuItem(MainMenu, datcod[iCode], code);
@@ -406,14 +409,14 @@ auto thred::internal::rsed() noexcept -> uint32_t {
 }
 
 void thred::internal::fnamtabs() {
-  constexpr auto nameLength = NameOrder.size();
-  for (auto iName = 0U; iName < nameLength; ++iName) {
+  constexpr auto NAMELEN = NameOrder.size();
+  for (auto iName = 0U; iName < NAMELEN; ++iName) {
 	NameOrder[iName] = iName;
   }
   PseudoRandomValue = NORDSED;
-  for (auto iName = 0U; iName < 2 * nameLength; ++iName) {
-	auto const source      = form::psg() % nameLength;
-	auto const destination = form::psg() % nameLength;
+  for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
+	auto const source      = form::psg() % NAMELEN;
+	auto const destination = form::psg() % NAMELEN;
 	std::swap(NameOrder[destination], NameOrder[source]);
   }
   for (auto iName = uint8_t {0U}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
@@ -425,8 +428,7 @@ void thred::internal::fnamtabs() {
 	auto const destination = form::psg() & MSK7BITS;
 	std::swap(NameEncoder[destination], NameEncoder[source]);
   }
-  constexpr auto fillval = uint8_t {0};
-  std::fill(std::begin(NameDecoder), std::end(NameDecoder), fillval);
+  NameDecoder.fill(0);
   for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
 	NameDecoder[NameEncoder[iName]] = iName;
   }
@@ -669,9 +671,8 @@ void thred::internal::dudat() {
   auto& undoBuffer = *UndoBuffer;
   undoBuffer[UndoBufferWriteIndex].reset(nullptr);
   auto const&    formList  = *FormList;
-  auto const     formCount = wrap::toUnsigned(formList.size());
-  constexpr auto formSize  = sizeof(decltype(formList.back()));
-  auto const     size      = sizeof(BAKHED) + formSize * formList.size() +
+  auto const  formCount = wrap::toUnsigned(formList.size());
+  auto const  size      = sizeof(BAKHED) + sizeof(decltype(formList.back())) * formList.size() +
                     sizeof(decltype(StitchBuffer->back())) * StitchBuffer->size() +
                     sizeof(decltype(FormVertices->back())) * FormVertices->size() +
                     sizeof(decltype(ClipPoints->back())) * ClipPoints->size() +
@@ -740,7 +741,7 @@ void thred::savdo() {
 	StateMap->set(StateFlag::DUMEN);
 	thi::dudat();
 	++UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UndoLength - 1U);
+	UndoBufferWriteIndex &= (UNDOLEN - 1U);
 	if (UndoBufferWriteIndex == 0U) {
 	  StateMap->set(StateFlag::BAKWRAP);
 	}
@@ -1032,13 +1033,13 @@ void thred::internal::patdun() {
 }
 
 auto thred::internal::pxchk(float pixelSize) -> uint16_t {
-  constexpr auto minLimit = 1.0F;
-  constexpr auto maxLimit = 20.0F;
-  if (pixelSize < minLimit) {
-	pixelSize = minLimit;
+  constexpr auto MINLIMIT = 1.0F;
+  constexpr auto MAXLIMIT = 20.0F;
+  if (pixelSize < MINLIMIT) {
+	pixelSize = MINLIMIT;
   }
-  else if (pixelSize > maxLimit) {
-	pixelSize = maxLimit;
+  else if (pixelSize > MAXLIMIT) {
+	pixelSize = MAXLIMIT;
   }
   return wrap::round<uint16_t>(pixelSize);
 }
@@ -1354,9 +1355,9 @@ void thred::internal::chknum() {
 		case LFTHUPCNT: {
 		  thred::savdo();
 		  value *= IPFGRAN;
-		  constexpr auto featherLimit = 255.0F; // clamp
-		  if (value > featherLimit) {
-			value = featherLimit;
+		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
+		  if (value > FUPCLAMP) {
+			value = FUPCLAMP;
 		  }
 		  form.fillInfo.feather.upCount = wrap::round<uint8_t>(value);
 		  break;
@@ -1500,9 +1501,9 @@ void thred::internal::chknum() {
 			case LFTHDWNCNT: {
 			  thred::savdo();
 			  value *= IPFGRAN;
-			  constexpr auto featherDownLimit = 255.0F;
-			  if (value > featherDownLimit) {
-				value = featherDownLimit;
+			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
+			  if (value > FDNCLAMP) {
+				value = FDNCLAMP;
 			  }
 			  form.fillInfo.feather.downCount = wrap::round<uint8_t>(value);
 			  break;
@@ -1675,13 +1676,13 @@ void thred::internal::chknum() {
 				case PSTAR: {
 				  StarRatio = value;
 
-				  constexpr auto minLimit = 0.01F;
-				  constexpr auto maxLimit = 1.0F;
-				  if (StarRatio > maxLimit) {
-					StarRatio = maxLimit;
+				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
+				  constexpr auto SRMAXLIM = 1.0F; // star ratio maximum limit
+				  if (StarRatio > SRMAXLIM) {
+					StarRatio = SRMAXLIM;
 				  }
-				  if (StarRatio < minLimit) {
-					StarRatio = minLimit;
+				  if (StarRatio < SRMINLIM) {
+					StarRatio = SRMINLIM;
 				  }
 				  SetWindowText(ValueWindow->operator[](PSTAR), fmt::format(L"{:.2f}", StarRatio).c_str());
 				  break;
@@ -1689,13 +1690,13 @@ void thred::internal::chknum() {
 				case PLRAT: {
 				  IniFile.lensRatio = value;
 
-				  constexpr auto minLimit = 0.1F;
-				  constexpr auto maxLimit = 10.0F;
-				  if (IniFile.lensRatio > maxLimit) {
-					IniFile.lensRatio = maxLimit;
+				  constexpr auto LRMINLIM = 0.1F; // lens ratio minimum limit
+				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
+				  if (IniFile.lensRatio > LRMAXLIM) {
+					IniFile.lensRatio = LRMAXLIM;
 				  }
-				  if (IniFile.lensRatio < minLimit) {
-					IniFile.lensRatio = minLimit;
+				  if (IniFile.lensRatio < LRMINLIM) {
+					IniFile.lensRatio = LRMINLIM;
 				  }
 				  SetWindowText(ValueWindow->operator[](PLRAT),
 				                fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
@@ -1704,13 +1705,13 @@ void thred::internal::chknum() {
 				case PSPIR: {
 				  SpiralWrap = value;
 				  // ToDo - Are these limits correct?
-				  constexpr auto minLimit = 0.3F;
-				  constexpr auto maxLimit = 20.0F;
-				  if (SpiralWrap > maxLimit) {
-					SpiralWrap = maxLimit;
+				  constexpr auto SRMINLIM = 0.3F; // spiral wrap minimum limit
+				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
+				  if (SpiralWrap > SRMAXLIM) {
+					SpiralWrap = SRMINLIM;
 				  }
-				  if (SpiralWrap < minLimit) {
-					SpiralWrap = minLimit;
+				  if (SpiralWrap < SRMINLIM) {
+					SpiralWrap = SRMINLIM;
 				  }
 				  SetWindowText(ValueWindow->operator[](PSPIR), fmt::format(L"{:.2f}", SpiralWrap).c_str());
 				  break;
@@ -1779,9 +1780,9 @@ void thred::internal::chknum() {
 			}
 			if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
 			  thred::savdo();
-			  constexpr auto starSize = 250.0F;
+			  constexpr auto STARSIZE = 250.0F; // star size factor
 			  form::dustar(uintValue,
-			               starSize / value * ZoomFactor *
+			               STARSIZE / value * ZoomFactor *
 			                   wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
 			  break;
 			}
@@ -2152,13 +2153,13 @@ void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestSt
 		}
 	  }
 	}
-	constexpr auto digitLimit = 10000.0F; // value that represents the max width that can be displayed
-	if (fabs(maxLength) < digitLimit) {
+	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
+	if (fabs(maxLength) < DIGITLIM) {
 	  auto strMax = std::wstring {};
 	  displayText::loadString(strMax, IDS_LENMAX);
 	  displayText::butxt(HMAXLEN, fmt::format(strMax, (maxLength * IPFGRAN)));
 	}
-	if (fabs(minLength) < digitLimit) {
+	if (fabs(minLength) < DIGITLIM) {
 	  auto strMin = std::wstring {};
 	  displayText::loadString(strMin, IDS_LENMIN);
 	  displayText::butxt(HMINLEN, fmt::format(strMin, (minLength * IPFGRAN)));
@@ -2773,13 +2774,13 @@ void thred::internal::ritini() {
   auto           directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
   auto&          defDir           = IniFile.defaultDirectory;
   auto const     defaultDirectory = gsl::span<char> {defDir};
-  constexpr char fillchar         = '\0';
-  std::fill(defaultDirectory.begin(), defaultDirectory.end(), fillchar);
+  constexpr char FILLCHAR         = '\0';
+  std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
   auto previousName = PreviousNames->begin();
   for (auto& prevName : IniFile.prevNames) {
 	auto const name = gsl::span<char> {prevName};
-	std::fill(name.begin(), name.end(), fillchar);
+	std::fill(name.begin(), name.end(), FILLCHAR);
 	if (!previousName->empty()) {
 	  auto previous = utf::Utf16ToUtf8(*previousName);
 	  std::copy(previous.cbegin(), previous.cend(), name.begin());
@@ -2789,7 +2790,7 @@ void thred::internal::ritini() {
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
   auto&      desName      = IniFile.designerName;
   auto const designerName = gsl::span<char> {desName};
-  std::fill(designerName.begin(), designerName.end(), fillchar);
+  std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	IniFile.stitchColors[iColor]              = UserColor[iColor];
@@ -2801,13 +2802,13 @@ void thred::internal::ritini() {
   IniFile.bitmapColor     = bitmap::getBmpColor();
   IniFile.minStitchLength = MinStitchLength;
 
-  constexpr auto thresholdMax = 9.0F;
-  constexpr auto thresholdMin = 0.0F;
-  if (ShowStitchThreshold < thresholdMin) {
-	ShowStitchThreshold = thresholdMin;
+  constexpr auto SSMAX = 9.0F; // Show stitch threshold maximum
+  constexpr auto SSMIN = 0.0F; // Show stitch threshold minimum
+  if (ShowStitchThreshold < SSMIN) {
+	ShowStitchThreshold = SSMIN;
   }
-  if (ShowStitchThreshold > thresholdMax) {
-	ShowStitchThreshold = thresholdMax;
+  if (ShowStitchThreshold > SSMAX) {
+	ShowStitchThreshold = SSMAX;
   }
   IniFile.showStitchThreshold    = ShowStitchThreshold;
   IniFile.threadSize30           = ThreadSize30;
@@ -2854,11 +2855,10 @@ auto thred::internal::savcmp() noexcept -> bool {
 }
 
 void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
-  constexpr auto BalaradRatio = 10.0F / 6.0F;
   balaradStitch.push_back(BALSTCH {code,
                                    flag,
-                                   (StitchBuffer->operator[](source).x - BalaradOffset.x) * BalaradRatio,
-                                   (StitchBuffer->operator[](source).y - BalaradOffset.y) * BalaradRatio});
+                                   (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,
+                                   (StitchBuffer->operator[](source).y - BalaradOffset.y) * BALRATIO});
 }
 
 void thred::internal::redbal() {
@@ -2886,7 +2886,7 @@ void thred::internal::redbal() {
 		BackgroundPenWidth      = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush        = CreateSolidBrush(BackgroundColor);
-		constexpr auto IBALRAT = 0.6F;
+		constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
 		IniFile.hoopSizeX      = balaradHeader.hoopSizeX * IBALRAT;
 		IniFile.hoopSizeY      = balaradHeader.hoopSizeY * IBALRAT;
 		UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
@@ -2934,7 +2934,6 @@ void thred::internal::redbal() {
 
 void thred::internal::ritbal() {
   auto           balaradHeader = BALHED {};
-  constexpr auto balaradRatio  = 10.0F / 6.0F;
   if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
 	auto outputName = (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
 	outputName.replace_extension(L".thv");
@@ -2960,8 +2959,8 @@ void thred::internal::ritbal() {
 	// NOLINTNEXTLINE(clang-diagnostic-four-char-constants)
 	balaradHeader.signature       = 'drbm';
 	balaradHeader.backgroundColor = BackgroundColor;
-	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * balaradRatio;
-	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * balaradRatio;
+	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRATIO;
+	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
 	auto bytesWritten             = DWORD {0};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
@@ -3021,13 +3020,13 @@ void thred::internal::reldun() {
 }
 
 auto thred::internal::chkattr(fs::path const& filename) -> bool {
-  constexpr auto writeBits = (fs::perms::owner_write | fs::perms::others_write | fs::perms::group_write);
+  constexpr auto WRBITS = (fs::perms::owner_write | fs::perms::others_write | fs::perms::group_write); // Write permissions bits
   if (fs::space(filename.parent_path()).available == 0U) {
 	StateMap->set(StateFlag::NOTFREE);
 	return true;
   }
   StateMap->reset(StateFlag::NOTFREE);
-  auto const writePerms = fs::status(filename).permissions() & writeBits;
+  auto const writePerms = fs::status(filename).permissions() & WRBITS;
   if (writePerms == fs::perms::none) {
 	auto buttonPressed =
 	    MessageBox(ThrEdWindow,
@@ -3035,7 +3034,7 @@ auto thred::internal::chkattr(fs::path const& filename) -> bool {
 	               StringTable->operator[](STR_OVRIT).c_str(),
 	               MB_YESNO);
 	if (buttonPressed == IDYES) {
-	  fs::permissions(filename, writeBits, fs::perm_options::add);
+	  fs::permissions(filename, WRBITS, fs::perm_options::add);
 	}
 	else {
 	  return true;
@@ -3065,9 +3064,9 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   auto guideCount    = 0U;
   auto clipDataCount = 0U;
 
-  constexpr auto headerVersion = 0x02U;
+  constexpr auto HDRVERS = 0x02U; // ThrEd file version signature 
 
-  stitchHeader.headerType = headerVersion << TBYTSHFT | headerSignature;
+  stitchHeader.headerType = HDRVERS << TBYTSHFT | THREDSIG;
   stitchHeader.fileLength = wrap::toUnsigned(StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) +
                                              sizeof(stitchHeader) + bitmap::getBmpNameLength());
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
@@ -3094,9 +3093,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.vertexCount, vertexCount);
   wrap::narrow(stitchHeader.dlineCount, guideCount);
   wrap::narrow(stitchHeader.clipDataCount, clipDataCount);
-  constexpr auto threadLength = ThreadSize.size(); 
   auto const formDataOffset = bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
-                              sizeof(UserColor) + sizeof(CustomColor) + threadLength;
+                              sizeof(UserColor) + sizeof(CustomColor) + TSSIZE;
   auto       vtxLen        = sizeof(stitchHeader) + StitchBuffer->size() * sizeof(decltype(StitchBuffer->back())) + formDataOffset;
   auto const thredDataSize = FormList->size() * sizeof(decltype(FormList->back())) +
                              vertexCount * sizeof(decltype(FormVertices->back())) +
@@ -3105,9 +3103,9 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
                              TexturePointsBuffer->size() * sizeof(decltype(TexturePointsBuffer->back()));
   buffer.reserve(vtxLen + thredDataSize);
   // ToDo - vertexLength overflows a 16 bit integer if there are more than 5446 stitches, so clamp it until version 3
-  constexpr auto limit = std::numeric_limits<decltype(stitchHeader.vertexLen)>::max();
-  if (vtxLen > limit) {
-	vtxLen = limit;
+  constexpr auto VTXCLAMP = std::numeric_limits<decltype(stitchHeader.vertexLen)>::max();
+  if (vtxLen > VTXCLAMP) {
+	vtxLen = VTXCLAMP;
   }
   wrap::narrow(stitchHeader.vertexLen, vtxLen);
   wrap::narrow(stitchHeader.dlineLen, sizeof(decltype(FormVertices->back())) * vertexCount);
@@ -3128,8 +3126,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
         CustomColor.data(),
         wrap::toUnsigned(CustomColor.size() * sizeof(decltype(CustomColor.back()))));
   auto threadSizeBuffer = std::string {};
-  threadSizeBuffer.resize(threadLength);
-  for (auto iThread = 0U; iThread < threadLength; ++iThread) {
+  threadSizeBuffer.resize(TSSIZE);
+  for (auto iThread = 0U; iThread < TSSIZE; ++iThread) {
 	threadSizeBuffer[iThread] = gsl::narrow<char>(ThreadSize[iThread]);
   }
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
@@ -3325,7 +3323,7 @@ void thred::internal::sav() {
 }
 
 void thred::internal::auxmen() {
-  constexpr auto cch = 13; // length of the menu item text???
+  constexpr auto CCH = 13; // length of the menu item text???
 
   auto filinfo = MENUITEMINFO {sizeof(MENUITEMINFO),
                                MIIM_TYPE,
@@ -3337,7 +3335,7 @@ void thred::internal::auxmen() {
                                nullptr,
                                0,
                                nullptr, // dwTypeData
-                               cch,
+                               CCH,
                                nullptr};
   auto auxMsg  = std::wstring {};
   CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
@@ -3386,13 +3384,13 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 #if PESACT
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}};
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}}; // All possible file types for save
 #else
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}}; // All possible file types for save
 #endif
-	  constexpr auto aFileTypesSize = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-	  hr = pFileSave->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	  constexpr auto SFTSIZE = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
+	  hr = pFileSave->SetFileTypes(SFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 	  hr += pFileSave->SetFileTypeIndex(1);
 	  hr += pFileSave->SetTitle(L"Save As");
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
@@ -3822,11 +3820,11 @@ void thred::internal::redbak() {
 	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
 	}
 	// ToDo - add field in BAKHED to keep track of number of colors
-	constexpr auto sizeColors = (sizeof(UserColor) / sizeof(UserColor[0]));
-	auto const undoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(sizeColors)};
+	constexpr auto UCOLSIZE = UserColor.size();
+	auto const undoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
 	auto const userColors = gsl::span<COLORREF> {UserColor};
 	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
-	for (auto iColor = 0U; iColor < sizeColors; ++iColor) {
+	for (auto iColor = 0U; iColor < UCOLSIZE; ++iColor) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 	}
@@ -3846,8 +3844,8 @@ void thred::internal::redbak() {
 void thred::internal::redo() {
   if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
 	++UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UndoLength - 1U);
-	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UndoLength - 1U);
+	UndoBufferWriteIndex &= (UNDOLEN - 1U);
+	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
 	if (nextBufferIndex == UndoBufferReadIndex) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
@@ -3887,7 +3885,7 @@ void thred::internal::bak() {
   }
   if (StateMap->test(StateFlag::BAKWRAP)) {
 	--UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UndoLength - 1U);
+	UndoBufferWriteIndex &= (UNDOLEN - 1U);
 	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
 	if (previousBufferIndex == UndoBufferReadIndex) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -3971,21 +3969,21 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
 #if PESACT
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}};
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}}; // All possible file types for save
 #else
 	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}};
+	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}}; // All possible file types for save
 #endif
-	  COMDLG_FILTERSPEC const iFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"*.pcs"}};
-	  constexpr auto aFileTypesSize        = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-	  constexpr auto iFileTypesSize        = (sizeof(iFileTypes) / sizeof(iFileTypes[0]));
+	  COMDLG_FILTERSPEC const iFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"*.pcs"}}; // All possible file types that can be inserted into current design
+	  constexpr auto AFTSIZE        = (sizeof(aFileTypes) / sizeof(aFileTypes[0])); // Size of array of all file types
+	  constexpr auto IFTSIZE        = (sizeof(iFileTypes) / sizeof(iFileTypes[0])); // Size of array of file types that can be inserted
 	  switch (fileTypes) {
 		case fileStyles::ALL_FILES: {
-		  hr += pFileOpen->SetFileTypes(aFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+		  hr += pFileOpen->SetFileTypes(AFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
 		  break;
 		}
 		case fileStyles::INS_FILES: {
-		  hr += pFileOpen->SetFileTypes(iFileTypesSize, static_cast<COMDLG_FILTERSPEC const*>(iFileTypes));
+		  hr += pFileOpen->SetFileTypes(IFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(iFileTypes));
 		  break;
 		}
 	  }
@@ -4066,7 +4064,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
   auto bytesRead   = DWORD {0};
   auto thredHeader = STRHED {};
   ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr);
-  if ((thredHeader.headerType & SIGMASK) == headerSignature) {
+  if ((thredHeader.headerType & SIGMASK) == THREDSIG) {
 	if (bytesRead != sizeof(thredHeader)) {
 	  prtred(fileHandle, IDS_SHRTF);
 	  return false;
@@ -4156,16 +4154,15 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	constexpr auto threadLength = ThreadSize.size(); 
-	char msgBuffer[threadLength];
-	ReadFile(fileHandle, static_cast<LPVOID>(msgBuffer), threadLength, &bytesRead, nullptr);
-	if (bytesRead != threadLength) {
+	auto msgBuffer = std::array<char, TSSIZE>{};
+	ReadFile(fileHandle, msgBuffer.data(), MsgBuffer.size(), &bytesRead, nullptr);
+	if (bytesRead != TSSIZE) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	auto threadSizebuf  = std::string(std::begin(msgBuffer), sizeof(msgBuffer));
+	auto threadSizebuf  = std::string(msgBuffer.data(), MsgBuffer.size());
 	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
-	for (auto iThread = 0U; iThread < threadLength; ++iThread) {
+	for (auto iThread = 0U; iThread < TSSIZE; ++iThread) {
 	  ThreadSize[iThread] = threadSizeBufW[iThread];
 	}
 	if (thredHeader.formCount != 0) {
@@ -4641,8 +4638,8 @@ void thred::internal::zumout() {
 	  }
 	} while (false);
 	ZoomFactor /= ZUMFCT;
-	constexpr auto zoomLimit = 0.98F;
-	if (ZoomFactor > zoomLimit) {
+	constexpr auto ZMCLAMP = 0.98F; // clamp the zoom factor
+	if (ZoomFactor > ZMCLAMP) {
 	  ZoomFactor = 1;
 	  StateMap->reset(StateFlag::ZUMED);
 	  ZoomRect = fRECTANGLE {
@@ -4988,7 +4985,7 @@ auto thred::internal::closlin() -> uint32_t {
   // ToDo - This function needs to be thoroughly checked and compared to findDistanceToSide
   auto           closestPoint = std::numeric_limits<uint32_t>::max();
   auto           checkedPoint = fPOINT {};
-  constexpr auto toleranceRatio    = 20.0F;
+  constexpr auto TLFACTOR    = 20.0F; // tolerance ratio
   thi::unboxs();
   auto offset = wrap::toFloat(Msg.pt.x - StitchWindowAbsRect.left) /
                 wrap::toFloat(StitchWindowAbsRect.right - StitchWindowAbsRect.left);
@@ -4999,7 +4996,7 @@ auto thred::internal::closlin() -> uint32_t {
   checkedPoint.y = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
   offset         = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
   auto           sum          = BIGFLOAT;
-  auto const tolerance = offset * toleranceRatio;
+  auto const tolerance = offset * TLFACTOR;
   for (auto iChange = size_t {}; iChange < thred::maxColor(); ++iChange) {
 	auto stitchCount = gsl::narrow_cast<ptrdiff_t>(
 	    std::abs(ColorChangeTable->operator[](iChange + 1U).stitchIndex -
@@ -5885,8 +5882,8 @@ void thred::internal::duclip() {
 		}
 		auto astch = std::vector<fPOINTATTR> {};
 		// Reserve a reasonable amount space, probably not enough though
-		constexpr auto reserveFactor = 16U;
-		astch.reserve(StitchBuffer->size() / reserveFactor);
+		constexpr auto RESRATIO = 16U; // reserve space factor
+		astch.reserve(StitchBuffer->size() / RESRATIO);
 		LowerLeftStitch.x = LowerLeftStitch.y = BIGFLOAT;
 		for (auto& stitch : *StitchBuffer) {
 		  if (((stitch.attribute & NOTFRM) == 0U) && formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
@@ -6240,8 +6237,8 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
 	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
 	auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	constexpr auto knotAtEndOrder = std::array<char, knotLen> {-2, -3, -1, -4, 0}; // reverse knot spacings
-	constexpr auto knotAtLastOrder = std::array<char, knotLen> {0, -4, -1, -3, -2}; // reverse knot spacings
+	constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
+	constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
 	auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
 	for (auto knot : knots) {
 	  ofstch(buffer, finish, knot, knotStep, knotAttribute);
@@ -6345,16 +6342,16 @@ auto thred::internal::srchknot(uint32_t source) noexcept -> uint32_t {
   if (knotIndex != 0U) {
 	--knotIndex;
   }
-  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < knotLen) {
+  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
 	++knotIndex;
-	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < knotLen) {
+	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
 	  return 0;
 	}
 	return 2;
   }
 
   ++knotIndex;
-  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < knotLen) {
+  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
 	return 1;
   }
   return 3;
@@ -6421,8 +6418,8 @@ void thred::hidbit() {
 
 void thred::internal::drwlstch(uint32_t finish) {
   auto           movieLine = std::vector<POINT> {}; // line for movie stitch draw
-  constexpr auto lineLen   = 100U;                  // expected max line length
-  movieLine.reserve(lineLen);
+  constexpr auto LNMAXPTS   = 100U;                  // maximum number of points in a line
+  movieLine.reserve(LNMAXPTS);
   if (finish != 0) {
 	auto color = 0U;
 	if (StateMap->test(StateFlag::HID)) {
@@ -6514,9 +6511,9 @@ void thred::internal::setsped() {
   auto const userTimePerFrame = gsl::narrow_cast<double>(MovieTimeStep) / 10.0;
   if (userTimePerFrame < 10.0) {
 	StitchesPerFrame           = wrap::round<uint32_t>(elapsedTimePerFrame / userTimePerFrame);
-	constexpr auto stitchLimit = 99U; // maximum stitches per frame
-	if (StitchesPerFrame > stitchLimit) {
-	  StitchesPerFrame = stitchLimit;
+	constexpr auto SPFCLAMP = 99U; // maximum stitches per frame
+	if (StitchesPerFrame > SPFCLAMP) {
+	  StitchesPerFrame = SPFCLAMP;
 	}
   }
   else {
@@ -7054,7 +7051,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 	auto fileHeader = STRHED {};
 	auto bytesRead  = DWORD {0};
 	ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr);
-	if ((fileHeader.headerType & SIGMASK) != headerSignature) {
+	if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
 	  displayText::tabmsg(IDS_NOTHR);
 	  retflag = false;
 	}
@@ -7085,9 +7082,8 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		         &bytesRead,
 		         nullptr);
 	  }
-	  constexpr auto threadLength = (sizeof(ThreadSize) / sizeof(ThreadSize[0])); // ThreadSize is defined as a 16 entry array
 	  auto const formDataOffset = gsl::narrow<LONG>(bitmap::getBmpNameLength() + sizeof(BackgroundColor) +
-	                                                sizeof(UserColor) + sizeof(CustomColor) + threadLength);
+	                                                sizeof(UserColor) + sizeof(CustomColor) + TSSIZE);
 	  SetFilePointer(fileHandle, formDataOffset, nullptr, FILE_CURRENT);
 	  InsertedVertexIndex = wrap::toUnsigned(FormVertices->size());
 	  InsertedFormIndex   = wrap::toUnsigned(FormList->size());
@@ -7260,8 +7256,8 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  }
 		}
 	  }
-	  constexpr auto versionOne = (0x01U << TBYTSHFT);
-	  if ((fileHeader.headerType & versionOne) != 0U) {
+	  constexpr auto VERSION1 = (0x01U << TBYTSHFT); // ThrEd version 1 signature
+	  if ((fileHeader.headerType & VERSION1) != 0U) {
 		// ToDo - Replace constants with sizes of data structures
 		auto const filscor = (fileHeader.formCount) * FRMW +
 		                     gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW +
@@ -8353,9 +8349,9 @@ void thred::internal::ungrphi() {
 void thred::internal::barnam(HWND window, uint32_t iThumbnail) {
   if (iThumbnail < ThumbnailDisplayCount) {
 	auto thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
-	constexpr auto nameLen = 12U; // how many characters to display with each thumbnail
+	constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
-	auto name = thumbPath.stem().wstring().substr(0U, nameLen);
+	auto name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
 	SetWindowText(window, name.c_str());
   }
   else {
@@ -8688,7 +8684,7 @@ void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void thred::internal::desiz() {
-  constexpr auto inchFactor = 1 / 25.4F; // conversion factor for millimeters to inches
+  constexpr auto MMTOINCH = 1 / 25.4F; // conversion factor for millimeters to inches
 
   auto  rectangle   = fRECTANGLE {};
   auto  info        = std::wstring {};
@@ -8704,16 +8700,16 @@ void thred::internal::desiz() {
 	info += fmt::format(stringTable[STR_STCHS],
 	                    wrap::toUnsigned(StitchBuffer->size()),
 	                    xSize,
-	                    (xSize * inchFactor),
+	                    (xSize * MMTOINCH),
 	                    ySize,
-	                    (ySize * inchFactor));
+	                    (ySize * MMTOINCH));
   }
   if (!FormList->empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
 	info += fmt::format(
-	    stringTable[STR_FORMS], FormList->size(), xSize, (xSize * inchFactor), ySize, (ySize * inchFactor));
+	    stringTable[STR_FORMS], FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
   info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
@@ -9185,9 +9181,9 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
 }
 
 void thred::internal::ritcur() {
-  constexpr auto iconRows     = 32; // rows in the icon
+  constexpr auto ICONROWS     = 32; // rows in the icon
   constexpr auto BPINT        = 32; // bits in an uint32_t
-  constexpr auto InvColorMask = 0xffffffU;
+  constexpr auto ICOLMASK = 0xffffffU;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto currentCursor = GetCursor();
   if (currentCursor != nullptr) {
@@ -9198,12 +9194,12 @@ void thred::internal::ritcur() {
 	cursorPosition.x -= (StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot));
 	cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
 	// ToDo - replace with GetDIBits
-	constexpr auto iconSize = 64U; // size in bytes of an icon bitmap
+	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
 	auto bitmapBits = std::array<uint8_t, iconSize> {};
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
-	  for (auto iRow = 0; iRow < iconRows; ++iRow) {
+	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 		auto const mask          = byteSwap(bitmapBits[wrap::toSize(iRow)]);
 		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
@@ -9223,7 +9219,7 @@ void thred::internal::ritcur() {
 	  }
 	}
 	else {
-	  for (auto iRow = 0; iRow < iconRows; ++iRow) {
+	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
@@ -9231,7 +9227,7 @@ void thred::internal::ritcur() {
 			SetPixel(StitchWindowDC,
 			         cursorPosition.x + iPixel,
 			         cursorPosition.y + iRow,
-			         GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ InvColorMask);
+			         GetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow) ^ ICOLMASK);
 		  }
 		  bitMask >>= 1U;
 		}
@@ -9519,7 +9515,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		constexpr auto NROMask = std::numeric_limits<DWORD>::max() ^
+		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
@@ -9538,7 +9534,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  case IDC_UNLOCKAL: {
 			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  fileInfo->data[iFile].dwFileAttributes &= NROMask;
+			  fileInfo->data[iFile].dwFileAttributes &= NROMASK;
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
@@ -9569,7 +9565,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
 				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-				  fileInfo->data[iFile].dwFileAttributes &= NROMask;
+				  fileInfo->data[iFile].dwFileAttributes &= NROMASK;
 				}
 				++fileError;
 			  }
@@ -14133,11 +14129,11 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 }
 
 auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
-  constexpr auto toLayer0 = 0U;
-  constexpr auto toLayer1 = 1U;
-  constexpr auto toLayer2 = 2U;
-  constexpr auto toLayer3 = 3U;
-  constexpr auto toLayer4 = 4U;
+  constexpr auto TOLAYER0 = 0U;
+  constexpr auto TOLAYER1 = 1U;
+  constexpr auto TOLAYER2 = 2U;
+  constexpr auto TOLAYER3 = 3U;
+  constexpr auto TOLAYER4 = 4U;
   auto           flag     = false;
   switch (wParameter) {
 	case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
@@ -14567,51 +14563,51 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LAYMOV0: { // edit / Move to Layer / 0
-	  form::movlayr(toLayer0);
+	  form::movlayr(TOLAYER0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV1: { // edit / Move to Layer / 1
-	  form::movlayr(toLayer1);
+	  form::movlayr(TOLAYER1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV2: { // edit / Move to Layer / 2
-	  form::movlayr(toLayer2);
+	  form::movlayr(TOLAYER2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV3: { // edit / Move to Layer / 3
-	  form::movlayr(toLayer3);
+	  form::movlayr(TOLAYER3);
 	  break;
 	}
 	case ID_LAYMOV4: { // edit / Move to Layer / 4
-	  form::movlayr(toLayer4);
+	  form::movlayr(TOLAYER4);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY0: { // edit / Copy to Layer / 0
-	  form::cpylayr(toLayer0);
+	  form::cpylayr(TOLAYER0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY1: { // edit / Copy to Layer / 1
-	  form::cpylayr(toLayer1);
+	  form::cpylayr(TOLAYER1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY2: { // edit / Copy to Layer / 2
-	  form::cpylayr(toLayer2);
+	  form::cpylayr(TOLAYER2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY3: { // edit / Copy to Layer / 3
-	  form::cpylayr(toLayer3);
+	  form::cpylayr(TOLAYER3);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY4: { // edit / Copy to Layer / 4
-	  form::cpylayr(toLayer4);
+	  form::cpylayr(TOLAYER4);
 	  flag = true;
 	  break;
 	}
@@ -16492,13 +16488,13 @@ void thred::internal::relin() {
 }
 
 void thred::internal::dumov() {
-  constexpr auto abPoints  = 7U;
+  constexpr auto ABPOINTS  = 7U; // Number of arrow box points
   auto sCurr = wrap::next(StitchBuffer->begin(), MoveAnchor);
   auto sNext = std::next(sCurr);
   RotateAngle              = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   if (sCurr->x >= ZoomRect.left && sCurr->x <= ZoomRect.right && sCurr->y >= ZoomRect.bottom &&
       sCurr->y <= ZoomRect.top) {
-	auto       arrowBox       = std::array<POINT, abPoints> {};
+	auto       arrowBox       = std::array<POINT, ABPOINTS> {};
 	auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
 	arrowBox[0]               = abCenterPixels;
 	arrowBox[6]               = abCenterPixels;
@@ -16540,11 +16536,11 @@ void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
 }
 
 void thred::internal::drwknot() {
-  constexpr auto KnotBoxSize  = 5;  // offset of the knot box sides;
-  constexpr auto KnotLineSize = 10; // length of the knot line;
+  constexpr auto KBOFFSET  = 5;  // offset of the knot box sides;
+  constexpr auto KLINELEN = 10; // length of the knot line;
   if (!UserFlagMap->test(UserFlag::KNOTOF) && (KnotCount != 0U) && (!StitchBuffer->empty())) {
-	auto const kOffset  = MulDiv(KnotBoxSize, *screenDPI, STDDPI);
-	auto const kLine    = MulDiv(KnotLineSize, *screenDPI, STDDPI);
+	auto const kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
+	auto const kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
 	auto       point    = POINT {0L, 0L};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};
@@ -17009,7 +17005,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 	if (bytesRead == sizeof(stitchHeader)) {
 	  auto       stitchSourceSize = fPOINT {1.0F, 1.0F};
 	  auto const fileTypeVersion  = (stitchHeader.headerType & FTYPMASK) >> TBYTSHFT;
-	  if ((stitchHeader.headerType & SIGMASK) == headerSignature) {
+	  if ((stitchHeader.headerType & SIGMASK) == THREDSIG) {
 		switch (fileTypeVersion) {
 		  case 0: {
 			if (stitchHeader.hoopType == SMALHUP) {
@@ -17799,7 +17795,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
 	  private_StringTable.resize(STR_LEN);
-	  private_UndoBuffer.resize(UndoLength);
+	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
 	  private_ValueWindow.resize(LASTLIN);
 	  private_PreviousNames.reserve(OLDNUM);
