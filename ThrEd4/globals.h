@@ -52,7 +52,6 @@
 #include <filesystem>
 
 // Open Source headers
-#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #pragma warning(disable : 26455) // supress warning for library headers
