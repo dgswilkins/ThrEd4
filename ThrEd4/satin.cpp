@@ -12,7 +12,6 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Open Source headers
-#include "warnings.h"
 
 // Local Headers
 #include "Resources/resource.h"

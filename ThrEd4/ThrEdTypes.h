@@ -2,14 +2,12 @@
 #pragma once
 
 // Open Source headers
-#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
 #pragma warning(pop)
 
 // Local Headers
-#include "switches.h"
 
 #ifdef _DEBUG
 #define outDebugString(X, ...) OutputDebugString(fmt::format(X, __VA_ARGS__).c_str())

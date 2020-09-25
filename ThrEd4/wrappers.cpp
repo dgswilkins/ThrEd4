@@ -13,7 +13,6 @@
 #include <iostream>
 
 // Open Source headers
-#include "warnings.h"
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include <gsl/gsl>
@@ -21,7 +20,6 @@
 
 // Local Headers
 #include "globals.h"
-#include "switches.h"
 #include "wrappers.h"
 
 auto wrap::wcstof(wchar_t const* buffer) -> float {

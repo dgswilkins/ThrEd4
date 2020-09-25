@@ -21,15 +21,11 @@
 // Open Source headers
 
 // Local Headers
-#include "switches.h"
-
 #include "Resources/resource.h"
 #include "globals.h"
 #include "bitmap.h"
 #include "displayText.h"
-#include "form.h"
 #include "thred.h"
-//#include "PES.h"
 #include "PCS.h"
 
 #pragma pack(push, 1)
