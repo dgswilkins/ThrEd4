@@ -23,16 +23,14 @@
 #include "wrappers.h"
 
 auto wrap::wcstof(wchar_t const* buffer) -> float {
-  auto value = 0.0F;
   try {
-	value = std::wcstof(buffer, nullptr);
+	return std::wcstof(buffer, nullptr);
   }
   catch (...) {
 	// NOLINTNEXTLINE
 	outDebugString(L"wcstof failed trying to convert '{}'\n", buffer);
-	value = 0.0F;
+	return 0.0F;
   }
-  return value;
 }
 
 void wrap::Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
@@ -61,16 +59,15 @@ void wrap::textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, 
 }
 
 auto wrap::toFloat(double invar) -> float {
-  auto result = 0.0F;
   try {
-	result = gsl::narrow<float>(invar);
+	return gsl::narrow<float>(invar);
   }
   catch (gsl::narrowing_error const& e) { // check if we are seeing a rounding error
 	UNREFERENCED_PARAMETER(e);
 	auto const var  = gsl::narrow_cast<float>(invar);
 	auto const diff = abs(invar - gsl::narrow_cast<double>(var));
 	if (diff < 4e-5) {
-	  result = var;
+	  return var;
 	}
 	else {
 	  throw;
@@ -79,7 +76,6 @@ auto wrap::toFloat(double invar) -> float {
   catch (...) { // otherwise throw
 	throw;
   }
-  return result;
 }
 
 auto wrap::toFloat(int16_t invar) noexcept -> float {
