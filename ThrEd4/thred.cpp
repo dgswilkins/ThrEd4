@@ -4152,12 +4152,12 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto msgBuffer = std::array<char, TSSIZE> {};
-	ReadFile(fileHandle, msgBuffer.data(), MsgBuffer.size(), &bytesRead, nullptr);
+	ReadFile(fileHandle, msgBuffer.data(), msgBuffer.size(), &bytesRead, nullptr);
 	if (bytesRead != TSSIZE) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	auto threadSizebuf  = std::string(msgBuffer.data(), MsgBuffer.size());
+	auto threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
 	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
 	for (auto iThread = 0U; iThread < TSSIZE; ++iThread) {
 	  ThreadSize[iThread] = threadSizeBufW[iThread];
