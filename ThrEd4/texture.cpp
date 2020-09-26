@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 #include "stdafx.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
