@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 #pragma once
 
 // compile switches
