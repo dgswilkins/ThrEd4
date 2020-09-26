@@ -1,3 +1,4 @@
+// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by ThrEd4.rc
