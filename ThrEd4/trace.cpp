@@ -293,13 +293,13 @@ void trace::trdif() {
 	}
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
-		auto iPoint                              = iHeight * bitmap::getBitmapWidth();
+		auto iPoint = iHeight * bitmap::getBitmapWidth();
 		++iPoint;
 		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
 		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[wrap::toSize(iPoint)]);
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
-		  auto& colorSum                         = differenceBitmap[wrap::toSize(iPoint)];
-		  ++iPoint;
+
+		  auto& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
 		  if (colorSum > colorSumMaximum) {
 			colorSumMaximum = colorSum;
 		  }
@@ -307,7 +307,6 @@ void trace::trdif() {
 			colorSumMinimum = colorSum;
 		  }
 		}
-		++iPoint;
 	  }
 	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
