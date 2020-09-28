@@ -2269,7 +2269,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
 		auto const& stitch = StitchBuffer->operator[](iStitch);
-		auto outStitch     = StitchBuffer->operator[](iOutputStitch);
+		auto& outStitch     = StitchBuffer->operator[](iOutputStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
 			prevPoint = outStitch;
@@ -6911,9 +6911,6 @@ void thred::redclp() {
 		clip.x -= clipRect.left;
 		clip.y -= clipRect.bottom;
 	  }
-	  clipRect.top -= clipRect.bottom;
-	  clipRect.right -= clipRect.left;
-	  clipRect.bottom = clipRect.left = 0;
 	}
   }
 }
