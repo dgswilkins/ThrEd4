@@ -24,6 +24,7 @@
 #pragma warning(pop)
 
 // Local Headers
+#include "switches.h"
 #include "ThrEdTypes.h"
 
 namespace fs = std::filesystem;
@@ -485,10 +486,6 @@ namespace internal {
   void zumin();
   void zumout();
   void zumshft();
-
-#if PESACT
-  void setpes();
-#endif
 
 #ifdef ALLOCFAILURE
   auto handle_program_memory_depletion(uint32_t) -> int32_t;

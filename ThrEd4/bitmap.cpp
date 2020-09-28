@@ -16,11 +16,6 @@
 #include "thred.h"
 #include "bitmap.h"
 
-// using the OS mechanism for last used directory NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define USE_DEFBDIR 0
-// Use the 8.3 version of the bitmap file when saving the name into the ThrEd file NOLINTNEXTLINE(cppcoreguidelines-macro-usage)
-#define USE_SHORT_NAME 0 
-
 namespace bi = bitmap::internal;
 
 static auto BitMapColorStruct = CHOOSECOLOR {};
