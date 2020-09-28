@@ -246,7 +246,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto hwnd = GetDlgItem(hwndlg, IDC_DESED);
+	  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
 	  SetWindowText(hwnd, DesignerName->c_str());
 	  SetFocus(hwnd);
 	  SendMessage(hwnd, EM_SETSEL, 0, -1);
@@ -261,7 +261,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		}
 		case IDOK: {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto    hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		  auto    const hwnd = GetDlgItem(hwndlg, IDC_DESED);
 		  wchar_t designerBuffer[NameOrder.size()];
 		  GetWindowText(hwnd,
 		                static_cast<LPTSTR>(designerBuffer),
@@ -488,7 +488,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	  break;
 	}
   }
-  auto decoded = utf::Utf8ToUtf16(designer);
+  auto const decoded = utf::Utf8ToUtf16(designer);
   designerName.assign(decoded);
 }
 
@@ -762,7 +762,7 @@ void thred::internal::redfils() {
 	  }
 	  else {
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto fileHandle = FindFirstFile(previousName->c_str(), &findData);
+		auto const fileHandle = FindFirstFile(previousName->c_str(), &findData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (fileHandle == INVALID_HANDLE_VALUE) {
 		  previousName->clear();
@@ -1214,7 +1214,7 @@ void thred::hupfn() {
   sizstch(checkHoopRect, *StitchBuffer);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
-	  auto vertexIt        = FormVertices->cbegin();
+	  auto const vertexIt        = FormVertices->cbegin();
 	  checkHoopRect.top    = vertexIt->y;
 	  checkHoopRect.bottom = vertexIt->y;
 	  checkHoopRect.right  = vertexIt->x;
@@ -1370,7 +1370,7 @@ void thred::internal::chknum() {
 		case LFRMCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint8_t>(
+			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
@@ -1383,7 +1383,7 @@ void thred::internal::chknum() {
 		case LUNDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint8_t>(
+			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
@@ -1397,7 +1397,7 @@ void thred::internal::chknum() {
 		case LBRDCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			auto colVal = gsl::narrow_cast<uint8_t>(
+			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
@@ -1621,7 +1621,7 @@ void thred::internal::chknum() {
 		  }
 		  default: {
 			if (value != 0.0F) {
-			  auto bufVal = fmt::format(L"{:.2f}", value);
+			  auto const bufVal = fmt::format(L"{:.2f}", value);
 			  switch (PreferenceIndex - 1) {
 				case PSPAC: {
 				  LineSpacing = value * PFGRAN;
@@ -1769,7 +1769,7 @@ void thred::internal::chknum() {
 			  }
 			  return;
 			}
-			auto uintValue = wrap::floor<uint32_t>(std::abs(value));
+			auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
 			if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
 			  thred::savdo();
 			  form::durpoli(uintValue);
@@ -2121,7 +2121,7 @@ void thred::internal::rstAll() {
 }
 
 void thred::ritot(uint32_t number) {
-  auto txt = fmt::format(StringTable->operator[](STR_TOT), number);
+  auto const txt = fmt::format(StringTable->operator[](STR_TOT), number);
   displayText::butxt(HTOT, txt);
 }
 
@@ -2650,7 +2650,7 @@ void thred::internal::ritlayr() {
 	displayText::butxt(HLAYR, blank);
   }
   else {
-	auto txt = fmt::format(StringTable->operator[](STR_LAYR), layer);
+	auto const txt = fmt::format(StringTable->operator[](STR_LAYR), layer);
 	displayText::butxt(HLAYR, txt);
   }
 }
@@ -2730,7 +2730,7 @@ auto thred::internal::stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> 
 }
 
 auto thred::internal::stch2px2(uint32_t iStitch) -> bool {
-  auto stitchCoordsInPixels =
+  auto const stitchCoordsInPixels =
       POINT {wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
                                  (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
@@ -2767,7 +2767,7 @@ void thred::internal::defNam(fs::path const& fileName) {
 }
 
 void thred::internal::ritini() {
-  auto           directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+  auto const directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
   auto&          defDir           = IniFile.defaultDirectory;
   auto const     defaultDirectory = gsl::span<char> {defDir};
   constexpr char FILLCHAR         = '\0';
@@ -2783,7 +2783,7 @@ void thred::internal::ritini() {
 	}
 	++previousName;
   }
-  auto       designer     = utf::Utf16ToUtf8(*DesignerName);
+  auto const designer     = utf::Utf16ToUtf8(*DesignerName);
   auto&      desName      = IniFile.designerName;
   auto const designerName = gsl::span<char> {desName};
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
@@ -2831,7 +2831,7 @@ void thred::internal::ritini() {
 	IniFile.initialWindowCoords.top    = windowRect.top;
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto iniFileHandle = CreateFile(
+  auto const iniFileHandle = CreateFile(
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
@@ -2864,7 +2864,7 @@ void thred::internal::redbal() {
 	StitchBuffer->clear();
 	FormList->clear();
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto balaradFile =
+	auto const balaradFile =
 	    CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (balaradFile != INVALID_HANDLE_VALUE) {
@@ -2980,14 +2980,14 @@ void thred::internal::ritbal() {
 	CloseHandle(balaradFile);
 	balaradFile =
 	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	auto outString = utf::Utf16ToUtf8(outputName.wstring());
+	auto const outString = utf::Utf16ToUtf8(outputName.wstring());
 	wrap::WriteFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
   }
   else {
 	if (!BalaradName1->empty()) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto balaradFile =
+	  auto const balaradFile =
 	      CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	  CloseHandle(balaradFile);
 	}
@@ -3024,7 +3024,7 @@ auto thred::internal::chkattr(fs::path const& filename) -> bool {
   StateMap->reset(StateFlag::NOTFREE);
   auto const writePerms = fs::status(filename).permissions() & WRBITS;
   if (writePerms == fs::perms::none) {
-	auto buttonPressed =
+	auto const buttonPressed =
 	    MessageBox(ThrEdWindow,
 	               fmt::format(StringTable->operator[](STR_OVRLOK), filename.wstring()).c_str(),
 	               StringTable->operator[](STR_OVRIT).c_str(),
@@ -3040,8 +3040,8 @@ auto thred::internal::chkattr(fs::path const& filename) -> bool {
 }
 
 void thred::internal::duver(fs::path const& name) {
-  auto version = gsl::narrow<uint32_t>(tolower(name.extension().wstring().back()) - 'r');
-  if (version < wrap::toUnsigned(VersionNames->size())) {
+  auto const version = wrap::toSize(tolower(name.extension().wstring().back()) - 'r');
+  if (version < VersionNames->size()) {
 	VersionNames->operator[](version) = name;
   }
 }
@@ -3197,7 +3197,7 @@ void thred::internal::thrsav() {
 	auto geName = *WorkingFileName;
 	geName.replace_extension(L".th*");
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto file = FindFirstFile(geName.wstring().c_str(), &fileData);
+	auto const file = FindFirstFile(geName.wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (file != INVALID_HANDLE_VALUE) {
 	  StateMap->reset(StateFlag::CMPDO);
@@ -3220,7 +3220,7 @@ void thred::internal::thrsav() {
 		  newFileName.replace_extension(ext);
 		  auto ec = std::error_code {};
 		  fs::rename(VersionNames->operator[](iBackup - 1U), newFileName, ec);
-		  auto msg = ec.message();
+		  auto const msg = ec.message();
 		  if (ec != std::error_code {}) {
 			// ToDo - find better error message
 			displayText::filnopn(IDS_FNOPN, msg);
@@ -3231,7 +3231,7 @@ void thred::internal::thrsav() {
 	}
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto fileHandle =
+  auto const fileHandle =
       CreateFile(ThrName->wstring().c_str(), (GENERIC_WRITE), 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (fileHandle == INVALID_HANDLE_VALUE) {
@@ -3625,7 +3625,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 	}
 	else {
 	  if (FormMenuChoice == LLAYR) {
-		auto zero = std::wstring {L"0"};
+		auto const zero = std::wstring {L"0"};
 		formForms::maxtsiz(zero, sideWindowSize);
 	  }
 	  else {
@@ -3721,7 +3721,7 @@ void thred::internal::stchWnd() {
                                ThrEdInstance,
                                nullptr);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto hFont = displayText::getThrEdFont(FONTSIZE);
+  auto const hFont = displayText::getThrEdFont(FONTSIZE);
   SelectObject(GetDC(MainStitchWin), hFont);
   if (MainStitchWin != nullptr) {
 	GetWindowRect(MainStitchWin, &StitchWindowAbsRect);
@@ -4286,7 +4286,7 @@ auto thred::getFileHandle(std::filesystem::path const& newFileName, HANDLE& file
   // ToDo - use ifstream?
   // ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto handle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  auto const handle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (handle == INVALID_HANDLE_VALUE) {
 	if (GetLastError() == ERROR_SHARING_VIOLATION) {
@@ -4497,7 +4497,7 @@ void thred::internal::zumin() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto vertexIt = wrap::next(FormVertices->cbegin(),
+		auto const vertexIt = wrap::next(FormVertices->cbegin(),
 		                           FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		stitchPoint   = *vertexIt;
 		break;
@@ -4532,7 +4532,7 @@ void thred::internal::zumin() {
 		break;
 	  }
 	  if (!SelectedFormList->empty()) {
-		auto        firstForm = SelectedFormList->front();
+		auto const  firstForm = SelectedFormList->front();
 		auto const& firstRect = FormList->operator[](firstForm).rectangle;
 
 		SelectedFormsRect = {std::lround(firstRect.left),
@@ -4613,7 +4613,7 @@ void thred::internal::zumout() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto vertexIt = wrap::next(FormVertices->cbegin(),
+		auto const vertexIt = wrap::next(FormVertices->cbegin(),
 		                           FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		stitchPoint   = *vertexIt;
 		break;
@@ -5216,7 +5216,7 @@ void thred::internal::newFil() {
   SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
   *ThrName = *DefaultDirectory / (StringTable->operator[](STR_NUFIL).c_str());
   ritfnam(*DesignerName);
-  auto       designer     = utf::Utf16ToUtf8(*DesignerName);
+  auto const designer     = utf::Utf16ToUtf8(*DesignerName);
   auto&      modName      = ExtendedHeader->modifierName;
   auto const modifierName = gsl::span<char> {modName};
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
@@ -5299,8 +5299,8 @@ void thred::internal::rebox() {
 
 void thred::delstchm() {
   thred::rngadj();
-  auto start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-  auto end   = wrap::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch + 1U));
+  auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
+  auto const end   = wrap::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch + 1U));
   StitchBuffer->erase(start, end);
 }
 
@@ -5331,7 +5331,7 @@ void thred::internal::clpbox() {
   ClipOrigin = {std::lround(stitchPoint.x), std::lround(stitchPoint.y)};
   auto const adjustedSize =
       SIZE {wrap::ceil<int32_t>(ClipRectSize.cx * ratio), wrap::ceil<int32_t>(ClipRectSize.cy * ratio)};
-  auto stitchCoordsInPixels =
+  auto const stitchCoordsInPixels =
       POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
                                  (stitchPoint.y - ZoomRect.bottom) * ratio - adjustedSize.cy)};
@@ -5381,7 +5381,7 @@ void thred::internal::rSelbox() {
   if (stitchPoint.y - wrap::toFloat(SelectBoxOffset.y) < 0.0F) {
 	stitchPoint.y = wrap::toFloat(SelectBoxOffset.y);
   }
-  auto stitchCoordsInPixels =
+  auto const stitchCoordsInPixels =
       POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio),
              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
                                  (stitchPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio -
@@ -6042,7 +6042,7 @@ void thred::internal::duclip() {
 void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
-  auto firstStitch =
+  auto const firstStitch =
       std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](fPOINTATTR const& m) -> bool {
 	    return ((m.attribute & (FRMSK | NOTFRM)) == codedForm);
       });
@@ -6077,7 +6077,7 @@ void thred::internal::f1del(uint32_t formIndex) {
 
 void thred::frmdel() {
   thi::f1del(ClosestFormToCursor);
-  auto firstForm = FormList->cbegin();
+  auto const firstForm = FormList->cbegin();
   FormList->erase(wrap::next(firstForm, ClosestFormToCursor));
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   if (StateMap->testAndReset(StateFlag::DELTO)) {
@@ -6279,7 +6279,7 @@ void thred::internal::delknt() {
 
 void thred::internal::delknot() {
   // Find the first knot stitch, if any
-  auto firstStitch = std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](fPOINTATTR const& m) -> bool {
+  auto const firstStitch = std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](fPOINTATTR const& m) -> bool {
 	return ((m.attribute & KNOTMSK) != 0U);
   });
   if (firstStitch != StitchBuffer->end()) {
@@ -6568,7 +6568,7 @@ void thred::internal::delet() {
 	  vertexMap.set(currentFormVertex);
 	  currentFormVertex = form::pdir(form, currentFormVertex);
 	}
-	auto vBegin   = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto const vBegin   = wrap::next(FormVertices->begin(), form.vertexIndex);
 	auto vCurr    = vBegin;
 	auto vertexIt = vBegin;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -6579,8 +6579,8 @@ void thred::internal::delet() {
 	  ++vertexIt;
 	}
 	auto const eraseCount = wrap::toUnsigned(std::distance(vBegin, vCurr));
-	auto eraseStart = wrap::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + eraseCount);
-	auto eraseEnd   = wrap::next(eraseStart, (form.vertexCount - eraseCount));
+	auto const eraseStart = wrap::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + eraseCount);
+	auto const eraseEnd   = wrap::next(eraseStart, (form.vertexCount - eraseCount));
 	FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 	auto const nextForm = wrap::toSize(ClosestFormToCursor) + 1U;
 	for (auto iForm = wrap::next(FormList->begin(), nextForm); iForm < FormList->end(); ++iForm) {
@@ -6978,7 +6978,7 @@ void thred::insflin(POINT insertPoint) {
 }
 
 auto thred::internal::isthr(fs::path const& thredPath) -> bool {
-  auto extention = thredPath.extension().wstring();
+  auto const extention = thredPath.extension().wstring();
   return (extention.compare(0, 3, L".th") == 0);
 }
 
@@ -7608,7 +7608,7 @@ void thred::setpsel() {
   thi::duprct(form);
   SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + SelectedFormVertices.finish);
+  auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + SelectedFormVertices.finish);
   EndPointCross = form::sfCor2px(*vertexIt);
   StateMap->set(StateFlag::SHOPSEL);
   form::dupsel(StitchWindowDC);
@@ -7621,7 +7621,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	// clang-format off
 	auto& form          = FormList->operator[](ClosestFormToCursor);
 	auto  currentVertex = SelectedFormVertices.start;
-	auto  vBegin      = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto  const vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	  auto vertexIt = wrap::next(vBegin, currentVertex);
@@ -8341,10 +8341,10 @@ void thred::internal::ungrphi() {
 
 void thred::internal::barnam(HWND window, uint32_t iThumbnail) {
   if (iThumbnail < ThumbnailDisplayCount) {
-	auto thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
+	auto const thumbPath = fs::path(Thumbnails->operator[](ThumbnailsSelected[iThumbnail]).data());
 	constexpr auto TNAMELEN = 12U; // how many characters to display with each thumbnail
 
-	auto name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
+	auto const name = thumbPath.stem().wstring().substr(0U, TNAMELEN);
 	SetWindowText(window, name.c_str());
   }
   else {
@@ -8383,9 +8383,9 @@ void thred::internal::thumnail() {
   thred::undat();
   trace::untrace();
   fs::current_path(*DefaultDirectory);
-  auto searchName = *DefaultDirectory / L"*.thr";
+  auto const searchName = *DefaultDirectory / L"*.thr";
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto file = FindFirstFile(searchName.wstring().c_str(), &fileData);
+  auto const file = FindFirstFile(searchName.wstring().c_str(), &fileData);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
@@ -8490,7 +8490,7 @@ void thred::internal::nuthum(wchar_t character) {
 	ThumbnailSearchString[length++] = character;
 	ThumbnailSearchString[length]   = 0;
 
-	auto txt = std::wstring(ThumbnailSearchString.data());
+	auto const txt = std::wstring(ThumbnailSearchString.data());
 	displayText::butxt(HBOXSEL, txt);
 	ThumbnailIndex = 0;
 	nuthsel();
@@ -8503,7 +8503,7 @@ void thred::internal::bakthum() {
 	StateMap->set(StateFlag::RESTCH);
 	ThumbnailSearchString[--searchStringLength] = 0;
 	ThumbnailIndex                              = 0;
-	auto txt                                    = std::wstring(ThumbnailSearchString.data());
+	auto const txt                              = std::wstring(ThumbnailSearchString.data());
 	displayText::butxt(HBOXSEL, txt);
 	nuthsel();
   }
@@ -9087,7 +9087,7 @@ void thred::internal::pntmrk() {
 	  break;
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto vertexIt = wrap::next(FormVertices->cbegin(),
+	  auto const vertexIt = wrap::next(FormVertices->cbegin(),
 	                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	  dumrk(vertexIt->x, vertexIt->y);
 	  break;
@@ -9173,7 +9173,7 @@ void thred::internal::ritcur() {
   constexpr auto BPINT    = 32; // bits in an uint32_t
   constexpr auto ICOLMASK = 0xffffffU;
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto currentCursor = GetCursor();
+  auto const currentCursor = GetCursor();
   if (currentCursor != nullptr) {
 	auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
 	GetIconInfo(currentCursor, &iconInfo);
@@ -9295,9 +9295,9 @@ void thred::internal::retrac() {
 	  ++GroupStartStitch;
 	}
 	auto const count       = GroupEndStitch - GroupStartStitch;
-	auto       insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
-	auto startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
-	auto endPoint   = wrap::next(startPoint, count);
+	auto const insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
+	auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
+	auto const endPoint   = wrap::next(startPoint, count);
 	StitchBuffer->insert(insertPoint, startPoint, endPoint);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
@@ -9479,9 +9479,9 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
 	  fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 	  if (fileInfo != nullptr) {
-		auto searchName = *DefaultDirectory / L"*.thr";
+		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
+		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  auto fmtStr = std::wstring {};
@@ -9529,7 +9529,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  case IDC_LOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
+			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
@@ -9546,7 +9546,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  case IDC_UNLOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
-			auto lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
+			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
 			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
@@ -10089,7 +10089,7 @@ void thred::internal::selfpnt() {
   StateMap->reset(StateFlag::SELBOX);
   SelectedFormVertices.start = ClosestVertexToCursor;
   SelectedFormVertices.form  = ClosestFormToCursor;
-  auto vertexIt              = wrap::next(FormVertices->cbegin(),
+  auto const vertexIt        = wrap::next(FormVertices->cbegin(),
                              FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*vertexIt);
   StateMap->set(StateFlag::RESTCH);
@@ -10135,13 +10135,13 @@ void thred::internal::qcode() {
   if (StateMap->testAndReset(StateFlag::POLIMOV)) { // aborting form add
 	auto& form = FormList->back();
 	if (form.vertexCount != 0U) {
-	  auto first = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  auto last  = wrap::next(first, form.vertexCount);
+	  auto const first = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto const last  = wrap::next(first, form.vertexCount);
 	  FormVertices->erase(first, last);
 	}
 	if (form.satinGuideCount != 0U) {
-	  auto first = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
-	  auto last  = wrap::next(first, form.satinGuideCount);
+	  auto const first = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+	  auto const last  = wrap::next(first, form.satinGuideCount);
 	  SatinGuides->erase(first, last);
 	}
 	FormList->pop_back();
@@ -10701,7 +10701,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  // clang-format off
 	  auto const& form            = FormList->operator[](ClosestFormToCursor);
 	  auto        iSelectedVertex = SelectedFormVertices.start;
-	  auto        vertexIt        = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto const vertexIt        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 		auto thisIt = wrap::next(vertexIt, iSelectedVertex);
@@ -11446,7 +11446,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::FORMSEL);
 	}
 	thred::unsid();
-	auto layerStr =
+	auto const layerStr =
 	    fmt::format(L"{}", (gsl::narrow_cast<decltype(form.attribute)>(form.attribute & FRMLMSK) >> 1U));
 	SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
 	formForms::refrm();
@@ -12337,7 +12337,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::strtchbox(stretchBoxLine);
 	  return true;
 	}
-	auto relativePoint = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+	auto const relativePoint = POINT {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	if (relativePoint.x >= controlPoint[0].x && relativePoint.x <= controlPoint[2].x &&
 	    relativePoint.y >= controlPoint[0].y && relativePoint.y <= controlPoint[4].y) {
 	  duSelbox();
@@ -13323,7 +13323,7 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  ClosestVertexToCursor = form::nxt(FormList->operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-		  auto vertexIt = wrap::next(FormVertices->cbegin(),
+		  auto const vertexIt = wrap::next(FormVertices->cbegin(),
 		                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*vertexIt);
 		  shftflt(*vertexIt);
@@ -13414,7 +13414,7 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 		  auto const& form      = FormList->operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-		  auto vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
+		  auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*vertexIt);
 		  shftflt(*vertexIt);
 		  StateMap->set(StateFlag::RESTCH);
@@ -15807,7 +15807,7 @@ void thred::internal::makCol() noexcept {
   wchar_t buffer[3] = {0};
   buffer[1]         = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto hFont = displayText::getThrEdFont(FONTSIZE);
+  auto const hFont = displayText::getThrEdFont(FONTSIZE);
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC",
@@ -15863,7 +15863,7 @@ void thred::internal::ritloc() {
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (lockFile != INVALID_HANDLE_VALUE) {
 	  auto bytesWritten = DWORD {0};
@@ -15891,7 +15891,7 @@ void thred::internal::crtcurs() noexcept {
 #pragma warning(pop)
 
 void thred::internal::duhom() {
-  auto arg0      = fs::path {ArgList[0]};
+  auto const arg0      = fs::path {ArgList[0]};
   *HomeDirectory = arg0.parent_path();
 }
 
@@ -15905,7 +15905,7 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 
 void thred::internal::ducmd() {
   if (ArgCount > 1) {
-	auto arg1 = std::wstring {ArgList[1]};
+	auto const arg1 = std::wstring {ArgList[1]};
 	if (arg1.compare(0, 4, L"/F1:") == 0) {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  // NOLINTNEXTLINE(readability-qualified-auto)
@@ -15916,7 +15916,7 @@ void thred::internal::ducmd() {
 		CloseHandle(BalaradFile);
 		*BalaradName0 = balaradFileName;
 		if (ArgCount > 2) {
-		  auto arg2 = std::wstring {ArgList[2]};
+		  auto const arg2 = std::wstring {ArgList[2]};
 		  if (arg2.compare(0, 4, L"/F2:") == 0) {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
 			BalaradFile     = CreateFile(
@@ -15966,7 +15966,7 @@ void thred::internal::redini() {
   *IniFileName = *HomeDirectory;
   *IniFileName /= L"thred.ini";
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto iniFileHandle =
+  auto const iniFileHandle =
       CreateFile(IniFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (iniFileHandle == INVALID_HANDLE_VALUE) {
@@ -15983,7 +15983,7 @@ void thred::internal::redini() {
 	  setPrefs();
 	}
 	else {
-	  auto directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
+	  auto const directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
@@ -16155,7 +16155,7 @@ void thred::internal::redini() {
 	IniFile.fillAngle = PI_F / 6.0F;
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto deviceContext = GetDC(nullptr);
+  auto const deviceContext = GetDC(nullptr);
   ScreenSizePixels = {GetDeviceCaps(deviceContext, HORZRES), GetDeviceCaps(deviceContext, VERTRES)};
   if (IniFile.initialWindowCoords.left < 0) {
 	IniFile.initialWindowCoords.left = 0;
@@ -16222,9 +16222,8 @@ void thred::internal::setLayerPens() noexcept {
 
 void thred::internal::init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto       deviceContext   = GetDC(nullptr);
+  auto const deviceContext   = GetDC(nullptr);
   auto const screenHalfWidth = (GetDeviceCaps(deviceContext, HORZRES)) / 2;
-  auto       blank           = std::wstring {};
   ReleaseDC(nullptr, deviceContext);
   TexturePointsBuffer->clear();
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -16275,7 +16274,7 @@ void thred::internal::init() {
 	           0);
   }
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto hFont = displayText::getThrEdFont(FONTSIZE);
+  auto const hFont = displayText::getThrEdFont(FONTSIZE);
   SelectObject(ThredDC, hFont);
   SelectObject(StitchWindowDC, hFont);
   constexpr int32_t TXTSIDS = 6; // extra pixels in a text box
@@ -16336,6 +16335,7 @@ void thred::internal::init() {
   setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
   ButtonWin->resize(BTNCOUNT);
+  auto blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	DWORD windowFlags = 0U;
 	auto* buttonTxt   = &blank;
@@ -16402,7 +16402,7 @@ void thred::internal::init() {
   GridPen        = wrap::CreatePen(PS_SOLID, PENNWID, IniFile.gridColor);
   BackgroundPen  = wrap::CreatePen(PS_SOLID, PENMWID, BackgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto bitmapPen = wrap::CreatePen(PS_SOLID, PENNWID, bitmap::getBmpColor());
+  auto const bitmapPen = wrap::CreatePen(PS_SOLID, PENNWID, bitmap::getBmpColor());
   bitmap::setBitmapPen(bitmapPen);
   FormPen         = wrap::CreatePen(PS_SOLID, PENNWID, PENSILVR);
   MultiFormPen    = wrap::CreatePen(PS_SOLID, PENNWID, PENPOLIV);
@@ -16473,8 +16473,8 @@ void thred::internal::relin() {
 
 void thred::internal::dumov() {
   constexpr auto ABPOINTS = 7U; // Number of arrow box points
-  auto           sCurr    = wrap::next(StitchBuffer->begin(), MoveAnchor);
-  auto           sNext    = std::next(sCurr);
+  auto const sCurr    = wrap::next(StitchBuffer->begin(), MoveAnchor);
+  auto const sNext    = std::next(sCurr);
   RotateAngle             = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   if (sCurr->x >= ZoomRect.left && sCurr->x <= ZoomRect.right && sCurr->y >= ZoomRect.bottom &&
       sCurr->y <= ZoomRect.top) {
@@ -16578,7 +16578,7 @@ void thred::internal::dugrid() {
 auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap,
                               fPOINTATTR const&        stitchPoint,
                               fPOINT const&            cellSize) -> bool {
-  auto bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
+  auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
                                         floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
 }
@@ -16605,7 +16605,7 @@ void thred::internal::drwStch() {
   StateMap->reset(StateFlag::SHOFRM);
   auto stitchCount = 0U;
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	auto deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
+	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
 	                                        ColorChangeTable->operator[](iColor).stitchIndex);
 	if (deltaCount > stitchCount) {
 	  stitchCount = deltaCount;
@@ -16852,7 +16852,7 @@ void thred::internal::drwStch() {
 	  }
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto vertexIt = wrap::next(FormVertices->cbegin(),
+	  auto const vertexIt = wrap::next(FormVertices->cbegin(),
 	                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	  thred::ritfcor(*vertexIt);
 	}
@@ -17454,7 +17454,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  if (DisplayedColorBitmap.test(iColor)) {
 			SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
-			auto colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
+			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
 			auto textSize = SIZE {0L, 0L};
 			wrap::getTextExtentPoint32(
 			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);

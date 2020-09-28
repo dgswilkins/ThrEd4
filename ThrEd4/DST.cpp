@@ -89,7 +89,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto colors    = std::vector<uint32_t> {};
   if (di::colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto colorFile =
+	auto const colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (colorFile != INVALID_HANDLE_VALUE) {
@@ -330,9 +330,9 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto       color2 = PECCOLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
-  auto       deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
-  auto       deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
-  auto       deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
+  auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
+  auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
+  auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
   // NOLINTNEXTLINE(readability-magic-numbers)
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
@@ -913,7 +913,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
   auto flag = true;
   if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto fileHandle = CreateFile(
+	auto const fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (fileHandle == INVALID_HANDLE_VALUE) {

@@ -61,7 +61,7 @@ void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uin
 auto texture::internal::txnam(wchar_t* name, int32_t sizeName) -> bool {
   auto const* texturePath = thred::getHomeDir();
   if (nullptr != texturePath) {
-	auto textureFile = *texturePath / L"thred.txr";
+	auto const textureFile = *texturePath / L"thred.txr";
 	return wcscpy_s(name, gsl::narrow_cast<rsize_t>(sizeName), textureFile.c_str()) == 0;
   }
   return false;
@@ -76,7 +76,7 @@ void texture::txdun() {
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	  auto bytesWritten = DWORD {0};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto const handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
@@ -136,7 +136,7 @@ void texture::redtx() {
   TextureHistoryIndex = ITXBUFSZ - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	auto const handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
@@ -417,7 +417,7 @@ void texture::drwtxtr() {
   TextureScreen.yOffset = (TextureScreen.screenHeight - TextureScreen.areaHeight) / 2;
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, GridPen);
-  auto gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
+  auto const gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
   auto textureRecord = TXPNT {};
   line[0].x          = 0;
   line[1].x          = StitchWindowClientRect.right;
@@ -766,7 +766,7 @@ void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
   rectangle.right                = angledFormVertices[0].x;
   rectangle.bottom               = angledFormVertices[0].y;
   rectangle.top                  = angledFormVertices[0].y;
-  for (auto vertex : angledFormVertices) {
+  for (auto const& vertex : angledFormVertices) {
 	if (vertex.x < rectangle.left) {
 	  rectangle.left = vertex.x;
 	}
@@ -1049,10 +1049,10 @@ void texture::deltx(uint32_t formIndex) {
 	  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
 		if (texture::istx(iForm)) {
 		  auto& fillInfo   = FormList->operator[](iForm).fillInfo;
-		  auto startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto endSource   = wrap::next(startSource, fillInfo.texture.count);
+		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-		  auto destination = std::next(textureBuffer.begin(), iBuffer);
+		  auto const destination = std::next(textureBuffer.begin(), iBuffer);
 		  std::copy(startSource, endSource, destination);
 		  fillInfo.texture.index = iBuffer;
 		  iBuffer += fillInfo.texture.count;
@@ -1061,10 +1061,10 @@ void texture::deltx(uint32_t formIndex) {
 	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 		if (texture::istx(iForm)) {
 		  auto& fillInfo   = FormList->operator[](iForm).fillInfo;
-		  auto startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto endSource   = wrap::next(startSource, fillInfo.texture.count);
+		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-		  auto destination = wrap::next(textureBuffer.begin(), iBuffer);
+		  auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
 		  std::copy(startSource, endSource, destination);
 		  fillInfo.texture.index = iBuffer;
 		  iBuffer += fillInfo.texture.count;
@@ -1097,7 +1097,7 @@ void texture::internal::nutx(FRMHED& form) {
   }
   if (!TempTexturePoints->empty()) {
 	auto const tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-	auto       insertIt       = wrap::next(TexturePointsBuffer->begin(), index);
+	auto const insertIt       = wrap::next(TexturePointsBuffer->begin(), index);
 	TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
@@ -1200,7 +1200,7 @@ void texture::internal::dutxmir() {
 	TempTexturePoints->resize(wrap::toSize(iPoint) + 1U);
 	auto const iMirrorPoint = iPoint + evenOffset;
 	for (auto index = 0U; index < iMirrorPoint; ++index) {
-	  auto newLine =
+	  auto const newLine =
 	      gsl::narrow_cast<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
 	  TempTexturePoints->emplace_back(TXPNT {TempTexturePoints->operator[](index).y, newLine});
 	}
@@ -1643,8 +1643,8 @@ void texture::rtrtx(FRMHED const& form) {
 	  currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
 	}
 	TempTexturePoints->resize(currentCount);
-	auto startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
-	auto endSource   = std::next(startSource, currentCount);
+	auto const startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
+	auto const endSource   = std::next(startSource, currentCount);
 	std::copy(startSource, endSource, TempTexturePoints->begin());
 	TextureScreen.areaHeight = form.fillInfo.texture.height;
 	TextureScreen.spacing    = form.fillSpacing;
@@ -1716,6 +1716,6 @@ void texture::setshft() {
 void texture::writeScreenWidth(int32_t position) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TXWID);
-  auto scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
+  auto const scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

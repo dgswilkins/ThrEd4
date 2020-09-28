@@ -107,7 +107,7 @@ void trace::initTraceWindows() noexcept {
                               ThrEdInstance,
                               nullptr);
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	auto channel = gsl::narrow_cast<int32_t>(iRGB);
+	auto const channel = gsl::narrow_cast<int32_t>(iRGB);
 	ti::trcsub(&TraceControlWindow[iRGB], ButtonWidth * channel, 0, ButtonHeight * 15);
 	ti::trcsub(&TraceSelectWindow[iRGB], ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
 	ti::trcsub(&TraceUpWindow[iRGB], ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
@@ -360,7 +360,7 @@ void trace::trace() {
 		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
 	  }
 	  auto const BmpSR = bitmap::getBmpStitchRatio();
-	  auto       bitmapPoint =
+	  auto const bitmapPoint =
 	      POINT {std::lround(BmpSR.x * stitchPoint.x), std::lround(BmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
@@ -813,7 +813,7 @@ void trace::trinit() {
 		TraceDataSize = bitmap::getrmap();
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
-		auto color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
+		auto const color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto iPixel = 0;
 		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		  if (TraceBitmapData[iPixel] != color) {

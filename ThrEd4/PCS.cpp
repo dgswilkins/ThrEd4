@@ -57,7 +57,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
   auto flag = true;
   if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto fileHandle = CreateFile(
+	auto const fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (fileHandle == INVALID_HANDLE_VALUE) {
@@ -297,7 +297,7 @@ auto PCS::isPCS(fs::path const& path) -> bool {
 auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool {
   auto retflag = true;
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto fileHandle =
+  auto const fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (fileHandle == INVALID_HANDLE_VALUE) {

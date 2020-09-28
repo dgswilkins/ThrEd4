@@ -554,7 +554,7 @@ void formForms::prfmsg() {
                                    ThrEdInstance,
                                    nullptr);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto preferenceDC = GetDC(PreferencesWindow);
+  auto const preferenceDC = GetDC(PreferencesWindow);
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
   LabelWindowCoords.top = ValueWindowCoords.top = TXTMARG;
@@ -888,7 +888,7 @@ void formForms::dasyfrm() {
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		auto guideIt   = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
+		auto const guideIt   = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
 		guideIt->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		guideIt->finish = iVertex;
 	  }
@@ -1178,8 +1178,8 @@ void formForms::wavfrm() {
 	auto vBegin    = wrap::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  auto           vNext       = wrap::next(vBegin, iNextVertex);
-	  auto           vWave       = wrap::next(vBegin, waveIndex);
+	  auto const vNext       = wrap::next(vBegin, iNextVertex);
+	  auto const vWave       = wrap::next(vBegin, waveIndex);
 	  points.emplace_back(-vNext->x + vWave->x, -vNext->y + vWave->y);
 	  ++iPoint;
 	  waveIndex = iNextVertex;
