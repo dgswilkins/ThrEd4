@@ -1,4 +1,4 @@
-
+// ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 #pragma once
 
 // Open Source headers
@@ -10,7 +10,19 @@
 // Local Headers
 
 #ifdef _DEBUG
-#define outDebugString(X, ...) OutputDebugString(fmt::format(X, __VA_ARGS__).c_str())
+// ReSharper disable cppcoreguidelines-macro-usage 
+#define WIDEN2(x) L ## x
+#define WIDEN(x) WIDEN2(x)
+#define WFILE WIDEN(__FILE__)
+#define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
+// ReSharper restore cppcoreguidelines-macro-usage
+template <typename... Args>
+constexpr void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&... args) {
+  auto const x = fmt::format(L"{}({}) : {}", fileName, line, X);
+  auto const y = fmt::format(x, std::forward<Args>(args)...);
+  OutputDebugString(y.c_str());
+}
+
 #else
 #define outDebugString(X, ...)
 #endif
