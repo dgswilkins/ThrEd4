@@ -197,7 +197,7 @@ namespace internal {
   void durotu();
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(uint32_t entry, int32_t& windowLocation, POINT const& windowSize, std::wstring const* const strings) noexcept;
+  void dusid(uint32_t entry, int32_t& windowLocation, POINT const& windowSize, std::wstring const* strings) noexcept;
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
@@ -416,6 +416,9 @@ namespace internal {
   void setLayerPens() noexcept;
   void setmov();
   void setpclp();
+#if PESACT
+  void setpes();
+#endif
   void setpcs();
   void setPrefs();
   void setsped();
@@ -426,7 +429,7 @@ namespace internal {
   void shorter();
   auto sidclp() -> bool;
   void sidhup();
-  void sidmsg(FRMHED const& form, HWND window, std::wstring const* const strings, uint32_t entries);
+  void sidmsg(FRMHED const& form, HWND window, std::wstring const* strings, uint32_t entries);
   void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
