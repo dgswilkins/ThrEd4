@@ -8043,18 +8043,18 @@ void thred::internal::vuselthr() {
 
 void thred::internal::colchk() {
   if (!StitchBuffer->empty()) {
-	auto color         = StitchBuffer->front().attribute & COLMSK;
-	auto currentStitch = 0U;
+	auto color       = StitchBuffer->front().attribute & COLMSK;
+	auto startStitch = 0U;
 	// ToDo - Can this loop become a ranged for?
 	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if (color != (stitch.attribute & COLMSK)) {
-		if ((iStitch - currentStitch == 1) && ((currentStitch) != 0U)) {
-		  auto stitchBck1      = StitchBuffer->operator[](iStitch - 1U);
-		  stitchBck1.attribute = (stitch.attribute & NCOLMSK) | (stitchBck1.attribute & COLMSK);
+		if ((iStitch - startStitch == 1) && ((startStitch) != 0U)) {
+		  auto& prevStitch     = StitchBuffer->operator[](iStitch - 1U);
+		  prevStitch.attribute = (stitch.attribute & NCOLMSK) | (prevStitch.attribute & COLMSK);
 		}
-		color         = stitch.attribute & COLMSK;
-		currentStitch = iStitch;
+		color       = stitch.attribute & COLMSK;
+		startStitch = iStitch;
 	  }
 	}
   }
