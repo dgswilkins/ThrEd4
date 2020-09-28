@@ -1,3 +1,4 @@
+//  ReSharper disable CppDeprecatedEntity CppClangTidyClangDiagnosticDeprecatedDeclarations
 ////////////////////////////////////////////////////////////////////////////////
 //
 // This header file defines a couple of C++ functions to convert between
