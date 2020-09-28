@@ -644,30 +644,20 @@ void trace::internal::dutrac() {
 	auto const savedPoint = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
 	auto       traceDirection = 0U;
 	if (!TracedEdges->test(wrap::toSize(savedPoint))) {
-	  auto findRectangle = RECT {0L, 0L, 0L, 0L};
-	  auto point         = savedPoint;
-	  auto limit         = (CurrentTracePoint.y + 1) * bitmap::getBitmapWidth();
+	  auto point = savedPoint;
+	  auto limit = (CurrentTracePoint.y + 1) * bitmap::getBitmapWidth();
 	  while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
 		++point;
 	  }
-	  if (point < limit) {
-		findRectangle.right = point - CurrentTracePoint.y * bitmap::getBitmapWidth();
-	  }
-	  else {
-		findRectangle.right = bitmap::getBitmapWidth();
-	  }
+	  auto const right = (point < limit) ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
+	                               : bitmap::getBitmapWidth();
 	  point = savedPoint;
 	  limit = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	  while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
 		--point;
 	  }
-	  if (point == limit) {
-		findRectangle.left = 0;
-	  }
-	  else {
-		findRectangle.left = point - limit;
-	  }
-	  point = savedPoint;
+	  auto const left = (point == limit) ? 0 : point - limit;
+	  point     = savedPoint;
 	  while (point > 0 && !TracedEdges->test(wrap::toSize(point))) {
 		if (point > bitmap::getBitmapWidth()) {
 		  point -= bitmap::getBitmapWidth();
@@ -676,67 +666,57 @@ void trace::internal::dutrac() {
 		  point = 0;
 		}
 	  }
-	  if (point > 0) {
-		findRectangle.bottom = point / bitmap::getBitmapWidth();
-	  }
-	  else {
-		findRectangle.bottom = 0;
-	  }
-	  point = savedPoint;
-	  limit = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+	  auto const bottom = (point > 0) ? point / bitmap::getBitmapWidth() : 0;
+	  point       = savedPoint;
+	  limit       = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	  while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
 		point += bitmap::getBitmapWidth();
 	  }
-	  if (point < limit) {
-		findRectangle.top = point / bitmap::getBitmapWidth();
-	  }
-	  else {
-		findRectangle.top = bitmap::getBitmapHeight();
-	  }
+	  auto const top = (point < limit) ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
 	  auto flag                = 0U;
 	  auto minimumEdgeDistance = std::numeric_limits<int32_t>::max();
-	  if (findRectangle.left != 0) {
-		minimumEdgeDistance = CurrentTracePoint.x - findRectangle.left;
+	  if (left != 0) {
+		minimumEdgeDistance = CurrentTracePoint.x - left;
 		flag                = TRCL;
 	  }
-	  if (findRectangle.right < bitmap::getBitmapWidth()) {
-		auto const edgeDistance = findRectangle.right - CurrentTracePoint.x;
+	  if (right < bitmap::getBitmapWidth()) {
+		auto const edgeDistance = right - CurrentTracePoint.x;
 		if (edgeDistance < minimumEdgeDistance) {
 		  minimumEdgeDistance = edgeDistance;
 		  flag                = TRCR;
 		}
 	  }
-	  if (findRectangle.bottom != 0) {
-		auto const edgeDistance = CurrentTracePoint.y - findRectangle.bottom;
+	  if (bottom != 0) {
+		auto const edgeDistance = CurrentTracePoint.y - bottom;
 		if (edgeDistance < minimumEdgeDistance) {
 		  minimumEdgeDistance = edgeDistance;
 		  flag                = TRCD;
 		}
 	  }
-	  if (findRectangle.top < bitmap::getBitmapHeight()) {
-		auto const edgeDistance = findRectangle.top - CurrentTracePoint.y;
+	  if (top < bitmap::getBitmapHeight()) {
+		auto const edgeDistance = top - CurrentTracePoint.y;
 		if (edgeDistance < minimumEdgeDistance) {
 		  flag = TRCU;
 		}
 	  }
 	  switch (flag) {
 		case TRCU: {
-		  CurrentTracePoint.y = findRectangle.top;
+		  CurrentTracePoint.y = top;
 		  traceDirection      = TRCR;
 		  break;
 		}
 		case TRCR: {
-		  CurrentTracePoint.x = findRectangle.right;
+		  CurrentTracePoint.x = right;
 		  traceDirection      = TRCD;
 		  break;
 		}
 		case TRCD: {
-		  CurrentTracePoint.y = findRectangle.bottom;
+		  CurrentTracePoint.y = bottom;
 		  traceDirection      = TRCL;
 		  break;
 		}
 		case TRCL: {
-		  CurrentTracePoint.x = findRectangle.left;
+		  CurrentTracePoint.x = left;
 		  traceDirection      = TRCU;
 		  break;
 		}
