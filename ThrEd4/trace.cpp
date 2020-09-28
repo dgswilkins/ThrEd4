@@ -195,12 +195,6 @@ void trace::internal::tracwnd() {
   displayText::clrhbut(4);
 }
 
-void trace::internal::blanklin(std::vector<uint32_t>& differenceBitmap, int32_t lineStart) {
-  for (auto iPoint = lineStart; iPoint < lineStart + bitmap::getBitmapWidth(); ++iPoint) {
-	differenceBitmap[wrap::toSize(iPoint)] = 0;
-  }
-}
-
 // Check Translation
 static inline void trace::internal::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
   destination = (source >> (shift & NIBMASK)) & BYTMASK;
@@ -295,13 +289,12 @@ void trace::trdif() {
 	auto colorSumMaximum = 0U;
 	auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
 	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  bitmap::getrmap();
+	  TraceDataSize = bitmap::getrmap();
 	}
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  ti::blanklin(differenceBitmap, 0);
 	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
 		auto iPoint                              = iHeight * bitmap::getBitmapWidth();
-		differenceBitmap[wrap::toSize(iPoint++)] = 0;
+		++iPoint;
 		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
 		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[wrap::toSize(iPoint)]);
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
@@ -314,9 +307,8 @@ void trace::trdif() {
 			colorSumMinimum = colorSum;
 		  }
 		}
-		differenceBitmap[wrap::toSize(iPoint++)] = 0;
+		++iPoint;
 	  }
-	  ti::blanklin(differenceBitmap, ((bitmap::getBitmapHeight() - 1) * bitmap::getBitmapWidth()));
 	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
@@ -838,7 +830,7 @@ void trace::trinit() {
 	  StateMap->set(StateFlag::TRCBLU);
 	  uint32_t componentPeak[CHANLCNT] = {0U};
 	  if (!StateMap->test(StateFlag::WASTRAC)) {
-		bitmap::getrmap();
+		TraceDataSize = bitmap::getrmap();
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
@@ -1035,7 +1027,7 @@ void trace::blak() {
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(bitmap::getTraceDC(), BlackPen);
 	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  bitmap::getrmap();
+	  TraceDataSize = bitmap::getrmap();
 	}
 	for (auto& iForm : *FormList) {
 	  bitmap::bfrm(iForm);
