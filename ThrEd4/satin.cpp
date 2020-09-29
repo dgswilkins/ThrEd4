@@ -208,10 +208,9 @@ void satin::internal::satclos() {
 	}
 	if (closestVertex - StartPoint < 2U) {
 	  closestVertex = StartPoint + 2U;
-	  if (closestVertex > (form.vertexCount) - 2) {
-		closestVertex = closestVertex - form.vertexCount - 2U;
-		closestVertex -= closestVertex;
-		StartPoint -= closestVertex;
+	  if (closestVertex > form.vertexCount - 2) {
+		closestVertex = (form.vertexCount - 2U);
+		StartPoint = closestVertex - 2U;
 	  }
 	}
 	form.angleOrClipData.guide.start  = StartPoint;
