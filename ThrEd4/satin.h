@@ -15,7 +15,6 @@
 //#include <vector>
 
 // Open Source headers
-#include "warnings.h"
 
 // Local Headers
 #include "ThrEdTypes.h"
