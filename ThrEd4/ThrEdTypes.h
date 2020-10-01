@@ -1528,6 +1528,7 @@ union FANGCLP {
   //~FANGCLP() = default;
 };
 
+// ReSharper disable once cppcoreguidelines-pro-type-member-init
 inline FANGCLP::FANGCLP() noexcept {
   guide.start  = 0U;
   guide.finish = 0U;
@@ -1567,6 +1568,7 @@ union FLENCNT {
   inline auto operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT&;
 };
 
+// ReSharper disable once cppcoreguidelines-pro-type-member-init
 inline FLENCNT::FLENCNT() noexcept {
   clipCount = 0U;
 }
@@ -1627,6 +1629,7 @@ union SATINANGLE {
   inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
 };
 
+// ReSharper disable once cppcoreguidelines-pro-type-member-init
 inline SATINANGLE::SATINANGLE() noexcept {
   angle = 0.0;
 }
