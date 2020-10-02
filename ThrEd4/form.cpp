@@ -110,7 +110,7 @@ void form::delflt(uint32_t formIndex) {
 	auto const eraseStart  = wrap::next(FormVertices->cbegin(), form->vertexIndex);
 	auto const eraseEnd    = wrap::next(eraseStart, form->vertexCount);
 	FormVertices->erase(eraseStart, eraseEnd);
-	for (form++; form < FormList->end(); ++form) {
+	for (++form; form < FormList->end(); ++form) {
 	  form->vertexIndex -= vertexCount;
 	}
   }
@@ -7623,7 +7623,7 @@ void form::frmadj(uint32_t formIndex) {
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	vertexIt->x += FormMoveDelta.x;
 	vertexIt->y -= FormMoveDelta.y;
-	vertexIt++;
+	++vertexIt;
   }
   form::frmout(formIndex);
 }
@@ -7824,7 +7824,7 @@ void form::fcntr() {
 	  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
 		vertexIt->x += delta.x;
 		vertexIt->y += delta.y;
-		vertexIt++;
+		++vertexIt;
 	  }
 	  form::frmout(selectedForm);
 	  auto const codedForm = (selectedForm << FRMSHFT);
@@ -8511,7 +8511,7 @@ void form::spltfrm() {
 			satin::spltsat(guideIndex);
 			return;
 		  }
-		  guideIt++;
+		  ++guideIt;
 		}
 	  }
 	}
