@@ -18,7 +18,6 @@
 #pragma warning(pop)
 
 // Local Headers
-#include "ExtendedBitSet.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"
