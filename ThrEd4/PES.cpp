@@ -198,15 +198,15 @@ void PES::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBloc
 #pragma warning(push)
 #pragma warning(disable : 4996)
 void PES::internal::pecnam(gsl::span<char> label) {
-  // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-  strncpy(label.data(), "LA:", 3);
+  // ReSharper disable once CppDeprecatedEntity
+  strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
   auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
-  // NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-  strncpy(&label[3], fileStem.c_str(), lblSize);
+  // ReSharper disable once CppDeprecatedEntity 
+  strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
 }
 #pragma warning(pop)
 
@@ -497,14 +497,14 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		constexpr auto PESSTR = "#PES0001"; // PES lead in
 		constexpr auto EMBSTR = "CEmbOne";  // emb section lead in
 		constexpr auto SEWSTR = "CSewSeg";  // sewing segment leadin
-		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR));
+		// ReSharper disable once CppDeprecatedEntity
+		strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		wrap::narrow(pesHeader.celn, strlen(EMBSTR));
-		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn);
+		// ReSharper disable once CppDeprecatedEntity
+		strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn); // NOLINT(clang-diagnostic-deprecated-declarations)
 		wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
-		// NOLINTNEXTLINE(clang-diagnostic-deprecated-declarations)
-		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen);
+		// ReSharper disable once CppDeprecatedEntity 
+		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto iColor = 0U;
 		for (auto const color : UserColor) {
 		  auto matchIndex = 0U;
