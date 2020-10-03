@@ -498,7 +498,7 @@ void form::delfrms() {
   ClipPoints->clear();
   FormList->clear();
   SatinGuides->clear();
-  for (auto stitch : *StitchBuffer) {
+  for (auto& stitch : *StitchBuffer) {
 	stitch.attribute &= NFRM_NTYP;
 	stitch.attribute |= NOTFRM;
   }
@@ -1754,7 +1754,6 @@ void form::internal::sprct(std::vector<fPOINT> const* vertices,
 	  }
 	  else {
 		verticalRect.copnt = opFinish;
-		point.y            = opFinish.y;
 		projh(opFinish.y, ipStart, ipFinish, verticalRect.cipnt);
 	  }
 	}
@@ -3903,14 +3902,14 @@ void form::internal::nxtseq(std::vector<FSEQ>&           sequencePath,
 	  ++iPath;
 	}
 	if (iPath < pathMap.size()) {
-	  sequencePath[pathIndex++].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
+	  sequencePath[pathIndex].nextGroup = gsl::narrow<uint16_t>(pathMap[iPath].nextGroup);
 	}
 	else {
-	  sequencePath[pathIndex++].nextGroup = 0;
+	  sequencePath[pathIndex].nextGroup = 0;
 	}
   }
   else {
-	sequencePath[pathIndex++].nextGroup = 0;
+	sequencePath[pathIndex].nextGroup = 0;
   }
 }
 
@@ -4590,7 +4589,6 @@ void form::internal::bakseq() {
 			  if (OSequence->back().y > bCurrent.y) {
 				break;
 			  }
-			  delta.y             = OSequence->back().y - bCurrent.y;
 			  OSequence->back().x = bCurrent.x;
 			  ++count;
 			} while (true);
@@ -4606,7 +4604,6 @@ void form::internal::bakseq() {
 			  if (OSequence->back().y < bPrevious.y) {
 				break;
 			  }
-			  delta.y             = OSequence->back().y - bPrevious.y;
 			  OSequence->back().x = bCurrent.x;
 			  --count;
 			} while (true);

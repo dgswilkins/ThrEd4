@@ -58,7 +58,7 @@ void displayText::shoMsg(std::wstring const& message) {
 		++iString;
 	  }
 	}
-	strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
+	strings.push_back(message.substr(previousStringLength, (iString - previousStringLength)));
 	auto textSize    = SIZE {0L, 0L};
 	auto messageSize = SIZE {0L, 0L};
 	for (auto& string : strings) {
