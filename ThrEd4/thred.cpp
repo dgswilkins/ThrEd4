@@ -5476,127 +5476,46 @@ void thred::internal::unrotu() {
   }
 }
 
-void thred::internal::rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) {
-  auto       distanceToCenter = 0.0F;
-  auto       newAngle         = 0.0F;
+auto thred::rotangf(fPOINT const& unrotatedPoint, float const rotationAngle, fPOINT const& rotationCenter) noexcept
+    -> fPOINT {
   auto const dx               = unrotatedPoint.x - rotationCenter.x;
   auto const dy               = unrotatedPoint.y - rotationCenter.y;
+  auto const distanceToCenter = (dx != 0.0F) ? hypot(dx, dy) : std::abs(dy);
+  auto       newAngle         = rotationAngle;
   if (dx != 0.0F) {
-	distanceToCenter = hypot(dx, dy);
-	newAngle         = atan2(dy, dx);
-	newAngle += rotationAngle;
-  }
-  else {
-	distanceToCenter = abs(dy);
-	if (dy > 0) {
-	  newAngle = PI_FHALF + rotationAngle;
-	}
-	else {
-	  newAngle = rotationAngle - PI_FHALF;
-	}
-  }
-  auto const point = fPOINT {rotationCenter.x + distanceToCenter * cos(newAngle),
-                             rotationCenter.y + distanceToCenter * sin(newAngle)};
-  thred::sCor2px(point, rotatedPoint);
-}
-
-void thred::rotang1(fPOINTATTR const& unrotatedPoint,
-                    fPOINT&           rotatedPoint,
-                    float             rotationAngle,
-                    fPOINT const&     rotationCenter) noexcept {
-  auto       distanceToCenter = 0.0F;
-  auto       newAngle         = 0.0F;
-  auto const dx               = unrotatedPoint.x - rotationCenter.x;
-  auto const dy               = unrotatedPoint.y - rotationCenter.y;
-  if (dx != 0.0F) {
-	distanceToCenter = hypot(dx, dy);
-	newAngle         = atan2(dy, dx);
-	newAngle += rotationAngle;
+	newAngle += atan2(dy, dx);
   }
   else {
 	if (dy > 0.0F) {
-	  distanceToCenter = dy;
-	  newAngle         = PI_FHALF + rotationAngle;
+	  newAngle += PI_FHALF;
 	}
 	else {
-	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_FHALF;
+	  newAngle -= PI_FHALF;
 	}
   }
-  rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
-  rotatedPoint.y = rotationCenter.y + distanceToCenter * sin(newAngle);
+  return fPOINT {rotationCenter.x + distanceToCenter * cos(newAngle),
+                 rotationCenter.y + distanceToCenter * sin(newAngle)};
 }
 
-void thred::rotangf(fPOINT const& unrotatedPoint, fPOINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept {
-  auto       distanceToCenter = 0.0F;
-  auto       newAngle         = 0.0F;
-  auto const dx               = unrotatedPoint.x - rotationCenter.x;
-  auto const dy               = unrotatedPoint.y - rotationCenter.y;
-  if (dx != 0.0F) {
-	distanceToCenter = hypot(dx, dy);
-	newAngle         = atan2(dy, dx);
-	newAngle += rotationAngle;
-  }
-  else {
-	if (dy > 0) {
-	  distanceToCenter = dy;
-	  newAngle         = PI_FHALF + rotationAngle;
-	}
-	else {
-	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_FHALF;
-	}
-  }
-  rotatedPoint.x = rotationCenter.x + distanceToCenter * cos(newAngle);
-  rotatedPoint.y = rotationCenter.y + distanceToCenter * sin(newAngle);
+void thred::internal::rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) {
+  auto const point = rotangf(unrotatedPoint, rotationAngle, rotationCenter);
+  thred::sCor2px(point, rotatedPoint);
+}
+
+auto thred::rotang1(fPOINTATTR const& unrotatedPoint, float const rotationAngle, fPOINT const& rotationCenter) noexcept
+    -> fPOINT {
+  auto const point = fPOINT {unrotatedPoint.x, unrotatedPoint.y};
+  return thred::rotangf(point, rotationAngle, rotationCenter);
 }
 
 void thred::rotflt(fPOINT& point, float const rotationAngle, fPOINT const& rotationCenter) noexcept {
-  auto       len      = 0.0F;
-  auto       newAngle = 0.0F;
-  auto const dx       = point.x - rotationCenter.x;
-  auto const dy       = point.y - rotationCenter.y;
-  if (dx != 0.0F) {
-	len      = hypot(dx, dy);
-	newAngle = atan2(dy, dx);
-	newAngle += rotationAngle;
-  }
-  else {
-	if (dy > 0) {
-	  len      = dy;
-	  newAngle = PI_FHALF + rotationAngle;
-	}
-	else {
-	  len      = -dy;
-	  newAngle = rotationAngle - PI_FHALF;
-	}
-  }
-  point.x = rotationCenter.x + len * cos(newAngle);
-  point.y = rotationCenter.y + len * sin(newAngle);
+  point = thred::rotangf(point, rotationAngle, rotationCenter);
 }
 
 void thred::internal::rotstch(fPOINTATTR& stitch, float const rotationAngle, fPOINT const& rotationCenter) noexcept {
-  auto       distanceToCenter = 0.0F;
-  auto       newAngle         = 0.0F;
-  auto const dx               = stitch.x - rotationCenter.x;
-  auto const dy               = stitch.y - rotationCenter.y;
-  if (dx != 0.0F) {
-	distanceToCenter = hypot(dx, dy);
-	newAngle         = atan2(dy, dx);
-	newAngle += rotationAngle;
-  }
-  else {
-	if (dy > 0) {
-	  distanceToCenter = dy;
-	  newAngle         = PI_FHALF + rotationAngle;
-	}
-	else {
-	  distanceToCenter = -dy;
-	  newAngle         = rotationAngle - PI_FHALF;
-	}
-  }
-  stitch.y = rotationCenter.y + distanceToCenter * sin(newAngle);
-  stitch.x = rotationCenter.x + distanceToCenter * cos(newAngle);
+  auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
+  stitch.x   = point.x;
+  stitch.y   = point.y;
 }
 
 void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) {

@@ -294,10 +294,10 @@ void clip::internal::lincrnr(uint32_t                   vertexIndex,
   if (ci::nupnt(clipAngle, moveToCoords, stitchPoint)) {
 	auto const delta = fPOINT {moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y};
 	auto const rotationAngle = atan2(delta.y, delta.x);
-	thred::rotangf(borderClipReference, ClipReference, rotationAngle, rotationCenter);
+	ClipReference = thred::rotangf(borderClipReference, rotationAngle, rotationCenter);
 	auto reversedData = clipReversedData.begin();
 	for (auto& data : clipFillData) {
-	  thred::rotangf(*reversedData, data, rotationAngle, rotationCenter);
+	  data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
 	  ++reversedData;
 	}
 	ci::ritclp(clipFillData, stitchPoint);
@@ -319,10 +319,10 @@ void clip::internal::linsid(uint32_t                   vertexIndex,
   auto const length    = hypot(delta.x, delta.y);
   auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
   if (clipCount != 0U) {
-	thred::rotangf(borderClipReference, ClipReference, clipAngle, rotationCenter);
+	ClipReference = thred::rotangf(borderClipReference, clipAngle, rotationCenter);
 	auto reversedData = clipReversedData.begin();
 	for (auto& data : clipFillData) {
-	  thred::rotangf(*reversedData, data, clipAngle, rotationCenter);
+	  data = thred::rotangf(*reversedData, clipAngle, rotationCenter);
 	  ++reversedData;
 	}
 	for (auto iClip = 0U; iClip < clipCount; ++iClip) {
@@ -362,7 +362,7 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
   auto const length             = hypot(delta.x, delta.y);
   auto const clipReferencePoint = fPOINTATTR {clipRect.left, clipRect.bottom, 0U};
   auto const rotationAngle      = atan2(delta.y, delta.x);
-  thred::rotang1(clipReferencePoint, ClipReference, rotationAngle, rotationCenter);
+  ClipReference = thred::rotang1(clipReferencePoint, rotationAngle, rotationCenter);
   if (ClipRectSize.cx == 0.0F) {
 	return false;
   }
@@ -381,7 +381,7 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
 	auto       insertPoint  = *vStart;
 	auto       reversedData = clipReversedData.begin();
 	for (auto& data : clipFillData) {
-	  thred::rotangf(*reversedData, data, rotationAngle, rotationCenter);
+	  data = thred::rotangf(*reversedData, rotationAngle, rotationCenter);
 	  ++reversedData;
 	}
 	for (auto stepCount = 0U; stepCount < clipCount; ++stepCount) {
@@ -739,10 +739,10 @@ void clip::internal::clpcrnr(FRMHED const&        form,
 
 	auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
 	auto const referencePoint = fPOINTATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
-	thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+	ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
-	  thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
+	  *iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	  ++iClip;
 	}
 	auto const length = hypot(delta.x, delta.y);
@@ -778,7 +778,7 @@ void clip::internal::picfn(FRMHED const&        form,
   spacing += ClipRectSize.cx;
   auto const count = wrap::round<uint32_t>(length / spacing);
   rotationAngle    = atan2(delta.y, delta.x);
-  thred::rotang1(referencePoint, ClipReference, rotationAngle, rotationCenter);
+  ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
   if (count != 0U) {
 	auto step = fPOINT {};
 	if (count > 1) {
@@ -789,7 +789,7 @@ void clip::internal::picfn(FRMHED const&        form,
 	}
 	auto iClip = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
-	  thred::rotang1(clip, *iClip, rotationAngle, rotationCenter);
+	  *iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	  ++iClip;
 	}
 	auto flag       = true;
