@@ -2557,23 +2557,21 @@ void thred::grpAdj() {
 	    StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
 	  auto newSize = fPOINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
 	                         std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
-
-	  auto coordinate = 0.0F;
 	  if (newSize.x < MINZUM) {
 		if (newSize.x < 1.0F) {
 		  newSize.x = 1.0F;
 		}
-		coordinate = gsl::narrow_cast<decltype(coordinate)>(MINZUM) / newSize.x;
+		auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
 		newSize    = fPOINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
 	  }
 	  if (newSize.x > newSize.y) {
-		coordinate = newSize.x * ZMARGIN;
+		auto coordinate = newSize.x * ZMARGIN;
 		newSize.x += std::round(coordinate);
 		coordinate = newSize.x / StitchWindowAspectRatio;
 		newSize.y  = std::round(coordinate);
 	  }
 	  else {
-		coordinate = newSize.y * ZMARGIN;
+		auto coordinate = newSize.y * ZMARGIN;
 		newSize.y  = std::round(coordinate);
 		coordinate = newSize.y * StitchWindowAspectRatio;
 		newSize.x  = std::round(coordinate);
@@ -3255,20 +3253,16 @@ void thred::internal::chk1col() {
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
   for (auto iColorChange = size_t {}; iColorChange < thred::maxColor(); ++iColorChange) {
-	if (ColorChangeTable->    operator[](iColorChange + 1U).stitchIndex -
-	        ColorChangeTable->operator[](iColorChange).stitchIndex ==
-	    1) {
-	  auto const iStitch = ColorChangeTable->operator[](iColorChange).stitchIndex;
-
-	  auto color = 0U;
-	  if (iStitch != 0U) {
-		color = StitchBuffer->operator[](iStitch - 1U).attribute & COLMSK;
-	  }
-	  else {
-		color = StitchBuffer->operator[](iStitch).attribute & COLMSK;
-	  }
-	  StitchBuffer->operator[](iStitch).attribute &= NCOLMSK;
-	  StitchBuffer->operator[](iStitch).attribute |= color;
+	auto const ccTableIt     = wrap::next(ColorChangeTable->begin(), iColorChange);
+	auto const ccTableNextIt = std::next(ccTableIt);
+	if (ccTableNextIt->stitchIndex - ccTableIt->stitchIndex == 1) {
+	  auto const iStitch = ccTableIt->stitchIndex;
+	  auto       stitchIt =
+	      (iStitch != 0U) ? wrap::next(StitchBuffer->begin(), iStitch - 1U) : StitchBuffer->begin();
+	  auto const color = stitchIt->attribute & COLMSK;
+	  ++stitchIt;
+	  stitchIt->attribute &= NCOLMSK;
+	  stitchIt->attribute |= color;
 	}
   }
 }
@@ -3294,6 +3288,7 @@ void thred::internal::sav() {
   else {
 	std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
   }
+  // Resharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
   switch (IniFile.auxFileType) {
 	case AUXDST: {
@@ -3343,14 +3338,14 @@ void thred::internal::auxmen() {
   CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  auxMsg = fmt::format(StringTable->operator[](STR_AUXTXT), L"DST");
+	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"DST"));
 	  CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 	  break;
 	}
 	case AUXPES:
 #if PESACT
 	{
-	  auxMsg = fmt::format(StringTable->operator[](STR_AUXTXT), L"PES");
+	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"PES"));
 	  CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
 	  break;
 	}
@@ -3360,7 +3355,7 @@ void thred::internal::auxmen() {
 	}
 #endif
 	default: {
-	  auxMsg = fmt::format(StringTable->operator[](STR_AUXTXT), L"PCS");
+	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"PCS"));
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }
@@ -4153,7 +4148,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto msgBuffer = std::array<char, TSSIZE> {};
-	ReadFile(fileHandle, msgBuffer.data(), msgBuffer.size(), &bytesRead, nullptr);
+	ReadFile(fileHandle, msgBuffer.data(), wrap::toUnsigned(msgBuffer.size()), &bytesRead, nullptr);
 	if (bytesRead != TSSIZE) {
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
@@ -4798,7 +4793,7 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 
 auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
   auto iColor = 0U;
-  for (iColor = 0; iColor < thred::maxColor(); ++iColor) {
+  for (; iColor < thred::maxColor(); ++iColor) {
 	if (ColorChangeTable->operator[](iColor).stitchIndex > iStitch) {
 	  break;
 	}
@@ -4984,16 +4979,15 @@ the distance from the point to the line is given by
 auto thred::internal::closlin() -> uint32_t {
   // ToDo - This function needs to be thoroughly checked and compared to findDistanceToSide
   auto           closestPoint = std::numeric_limits<uint32_t>::max();
-  auto           checkedPoint = fPOINT {};
   constexpr auto TLFACTOR     = 20.0F; // tolerance ratio
   thi::unboxs();
   auto offset = wrap::toFloat(Msg.pt.x - StitchWindowAbsRect.left) /
                 wrap::toFloat(StitchWindowAbsRect.right - StitchWindowAbsRect.left);
-  checkedPoint.x = offset * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
+  auto const offsetX = offset * (ZoomRect.right - ZoomRect.left) + ZoomRect.left;
 
   offset = wrap::toFloat(StitchWindowAbsRect.bottom - Msg.pt.y) /
            wrap::toFloat(StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
-  checkedPoint.y = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
+  auto const offsetY   = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
   offset         = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
   auto       sum = BIGFLOAT;
   auto const tolerance = offset * TLFACTOR;
@@ -5009,27 +5003,14 @@ auto thred::internal::closlin() -> uint32_t {
 	  for (auto iStitch = ptrdiff_t {}; iStitch < stitchCount; ++iStitch) {
 		auto const layer = (stitches[iStitch].attribute & LAYMSK) >> LAYSHFT;
 		if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
-		  auto       boundingRect = fRECTANGLE {};
-		  auto const xba          = std::lround(stitches[iStitch + 1].x - stitches[iStitch].x);
-		  auto const yab          = std::lround(stitches[iStitch].y - stitches[iStitch + 1].y);
-		  if (xba > 0) {
-			boundingRect.left  = stitches[iStitch].x - tolerance;
-			boundingRect.right = stitches[iStitch + 1].x + tolerance;
-		  }
-		  else {
-			boundingRect.left  = stitches[iStitch + 1].x - tolerance;
-			boundingRect.right = stitches[iStitch].x + tolerance;
-		  }
-		  if (yab < 0) {
-			boundingRect.bottom = stitches[iStitch].y - tolerance;
-			boundingRect.top    = stitches[iStitch + 1].y + tolerance;
-		  }
-		  else {
-			boundingRect.bottom = stitches[iStitch + 1].y - tolerance;
-			boundingRect.top    = stitches[iStitch].y + tolerance;
-		  }
-		  if (checkedPoint.x > boundingRect.left && checkedPoint.x < boundingRect.right &&
-		      checkedPoint.y > boundingRect.bottom && checkedPoint.y < boundingRect.top) {
+		  auto const xba = std::lround(stitches[iStitch + 1].x - stitches[iStitch].x);
+		  auto const yab = std::lround(stitches[iStitch].y - stitches[iStitch + 1].y);
+		  auto left = (xba > 0) ? stitches[iStitch].x - tolerance : stitches[iStitch + 1].x - tolerance;
+		  auto right = (xba > 0) ? stitches[iStitch + 1].x + tolerance : stitches[iStitch].x + tolerance;
+		  auto bottom = (yab < 0) ? stitches[iStitch].y - tolerance : stitches[iStitch + 1].y - tolerance;
+		  auto top = (yab < 0) ? stitches[iStitch + 1].y + tolerance : stitches[iStitch].y + tolerance;
+		  if (offsetX > left && offsetX < right && offsetY > bottom && offsetY < top) {
+			// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 			auto tsum         = 0.0F;
 			auto intersection = fPOINT {};
 			auto dx           = 0.0F;
@@ -5037,22 +5018,22 @@ auto thred::internal::closlin() -> uint32_t {
 			do {
 			  if (yab == 0) {
 				// stitch is horizontal
-				intersection.x = checkedPoint.x;
+				intersection.x = offsetX;
 				intersection.y = stitches[iStitch].y;
 			  }
 			  else {
 				if (xba == 0) {
 				  // stitch is vertical
-				  dx = stitches[iStitch].x - checkedPoint.x;
-				  boundingRect.top -= tolerance;
-				  boundingRect.bottom += tolerance;
-				  if (checkedPoint.y > boundingRect.top) {
-					dy   = checkedPoint.y - boundingRect.top;
+				  dx = stitches[iStitch].x - offsetX;
+				  top -= tolerance;
+				  bottom += tolerance;
+				  if (offsetY > top) {
+					dy   = offsetY - top;
 					tsum = hypot(dx, dy);
 					break;
 				  }
-				  if (checkedPoint.y < boundingRect.bottom) {
-					dy   = checkedPoint.y - boundingRect.bottom;
+				  if (offsetY < bottom) {
+					dy   = offsetY - bottom;
 					tsum = hypot(dx, dy);
 					break;
 				  }
@@ -5061,36 +5042,36 @@ auto thred::internal::closlin() -> uint32_t {
 				}
 				auto const slope = wrap::toFloat(xba) / wrap::toFloat(yab);
 				offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
-				auto const poff  = checkedPoint.x - checkedPoint.y / slope;
+				auto const poff  = offsetX - offsetY / slope;
 
 				intersection = fPOINT {offset - slope * intersection.y,
 				                       slope * (offset - poff) / (slope * slope + 1.0F)};
-				dx           = intersection.x - checkedPoint.x;
-				dy           = intersection.y - checkedPoint.y;
+				dx           = intersection.x - offsetX;
+				dy           = intersection.y - offsetY;
 			  }
-			  boundingRect.top -= tolerance;
-			  boundingRect.bottom += tolerance;
-			  boundingRect.left += tolerance;
-			  boundingRect.right -= tolerance;
-			  if (intersection.x < boundingRect.left) {
-				if (intersection.y < boundingRect.bottom) {
-				  dx = checkedPoint.x - boundingRect.left;
-				  dy = checkedPoint.y - boundingRect.bottom;
+			  top -= tolerance;
+			  bottom += tolerance;
+			  left += tolerance;
+			  right -= tolerance;
+			  if (intersection.x < left) {
+				if (intersection.y < bottom) {
+				  dx = offsetX - left;
+				  dy = offsetY - bottom;
 				}
 				else {
-				  dx = checkedPoint.x - boundingRect.left;
-				  dy = checkedPoint.y - boundingRect.top;
+				  dx = offsetX - left;
+				  dy = offsetY - top;
 				}
 			  }
 			  else {
-				if (intersection.x > boundingRect.right) {
-				  if (intersection.y < boundingRect.bottom) {
-					dx = checkedPoint.x - boundingRect.right;
-					dy = checkedPoint.y - boundingRect.bottom;
+				if (intersection.x > right) {
+				  if (intersection.y < bottom) {
+					dx = offsetX - right;
+					dy = offsetY - bottom;
 				  }
 				  else {
-					dx = checkedPoint.x - boundingRect.right;
-					dy = checkedPoint.y - boundingRect.top;
+					dx = offsetX - right;
+					dy = offsetY - top;
 				  }
 				}
 			  }
@@ -5164,18 +5145,9 @@ void thred::internal::mark() {
 
 void thred::internal::selCol() {
   if (!StitchBuffer->empty()) {
-	auto iStitch = 0U;
-	if (StateMap->test(StateFlag::SELBOX)) {
-	  iStitch = ClosestPointIndex;
-	}
-	else {
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		iStitch = GroupStitchIndex;
-	  }
-	  else {
-		iStitch = 0;
-	  }
-	}
+	auto iStitch = (StateMap->test(StateFlag::SELBOX))
+	                   ? ClosestPointIndex
+	                   : (StateMap->test(StateFlag::GRPSEL)) ? GroupStitchIndex : 0;
 	if (iStitch > wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	  iStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 	}
@@ -6120,11 +6092,11 @@ void thred::internal::unpat() {
 	StateMap->set(StateFlag::RESTCH);
   }
 }
+
 auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
-  if (StitchBuffer->operator[](iStitchA).x != StitchBuffer->operator[](iStitchB).x) {
-	return false;
-  }
-  return StitchBuffer->operator[](iStitchA).y == StitchBuffer->operator[](iStitchB).y;
+  return (StitchBuffer->operator[](iStitchA).x != StitchBuffer->operator[](iStitchB).x)
+             ? false
+             : StitchBuffer->operator[](iStitchA).y == StitchBuffer->operator[](iStitchB).y;
 }
 
 void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
@@ -6138,47 +6110,43 @@ void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
 }
 
 void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
-  auto length = 0.0F;
-  auto iStart = finish - 1U;
-  if (finish == 0U) {
-	++iStart;
+  auto const finishIt  = wrap::next(StitchBuffer->begin(), finish);
+  auto startIt = (finish != 0)?std::next(finishIt, -1): finishIt;
+  auto const knotAttribute = startIt->attribute | KNOTMSK;
+  auto delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto length = hypot(delta.x, delta.y);
+  while (length == 0.0F && startIt != StitchBuffer->begin()) {
+	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	length = hypot(delta.x, delta.y);
+	--startIt;
   }
-  auto const knotAttribute = StitchBuffer->operator[](iStart).attribute | KNOTMSK;
-  do {
-	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
-	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
-	length           = hypot(delta.x, delta.y);
-	--iStart;
-  } while (length == 0.0F);
-  if ((iStart & MAXMSK) == 0U) { // make sure the counter has not underflowed
-	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](iStart).x,
-	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](iStart).y};
-	auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
-	constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
-	auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
-	for (auto knot : knots) {
-	  ofstch(buffer, finish, knot, knotStep, knotAttribute);
-	}
-	if (StateMap->test(StateFlag::FILDIR)) {
-	  ofstch(buffer, finish, 0, knotStep, knotAttribute);
-	}
+  delta               = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto const knotStep = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
+  constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
+  auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
+  for (auto knot : knots) {
+	ofstch(buffer, finish, knot, knotStep, knotAttribute);
+  }
+  if (StateMap->test(StateFlag::FILDIR)) {
+	ofstch(buffer, finish, 0, knotStep, knotAttribute);
   }
 }
 
 void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
-  auto length = 0.0F;
-  auto finish = start + 1U;
-  do {
-	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
-	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y};
-	length           = hypot(delta.x, delta.y);
-	++finish;
-  } while (length < 2.0F && finish < wrap::toUnsigned(StitchBuffer->size()));
-  if (finish < wrap::toUnsigned(StitchBuffer->size())) {
-	auto const delta = fPOINT {StitchBuffer->operator[](finish).x - StitchBuffer->operator[](start).x,
-	                           StitchBuffer->operator[](finish).y - StitchBuffer->operator[](start).y};
-	auto const knotAttribute      = StitchBuffer->operator[](start).attribute | KNOTMSK;
+  auto const startIt  = wrap::next(StitchBuffer->begin(), start);
+  auto finishIt = std::next(startIt);
+  auto delta    = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto length   = hypot(delta.x, delta.y);
+  ++finishIt;
+  while (length < 2.0F && finishIt != StitchBuffer->end()) {
+	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	length = hypot(delta.x, delta.y);
+	++finishIt;
+  }
+  if (finishIt != StitchBuffer->end()) {
+	delta                         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	auto const knotAttribute      = startIt->attribute | KNOTMSK;
 	auto const knotStep           = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
 	char const knotAtStartOrder[] = {2, 3, 1, 4, 0}; // knot spacings
 	for (char const iKnot : knotAtStartOrder) {
@@ -6223,17 +6191,11 @@ auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> u
 }
 
 void thred::internal::setknt() {
-  auto iStitch = 0U;
   auto buffer  = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
   buffer.push_back(StitchBuffer->front());
   strtknt(buffer, 0);
-  if (stlen(0) > KNOTLEN) {
-	iStitch = kjmp(buffer, 1);
-  }
-  else {
-	iStitch = 1;
-  }
+  auto iStitch = (stlen(0) > KNOTLEN) ? kjmp(buffer, 1) : 1;
   StateMap->reset(StateFlag::FILDIR);
   while (iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U)) {
 	buffer.push_back(StitchBuffer->operator[](iStitch));
@@ -6338,22 +6300,23 @@ void thred::internal::drwlstch(uint32_t finish) {
   constexpr auto LNMAXPTS  = 100U;                  // maximum number of points in a line
   movieLine.reserve(LNMAXPTS);
   if (finish != 0) {
-	auto color = 0U;
 	if (StateMap->test(StateFlag::HID)) {
 	  while (RunPoint < (finish - 1) && (StitchBuffer->operator[](RunPoint).attribute & COLMSK) != ActiveColor) {
 		++RunPoint;
 	  }
 	}
 	if (StateMap->test(StateFlag::ZUMED)) {
-	  auto stitchCoordsInPixels = POINT {};
+	  auto const stitchCoordsInPixels = POINT {};
 	  movieLine.push_back(stitchCoordsInPixels);
 	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
 		++RunPoint;
 	  }
-	  auto const origin = RunPoint - 1U;
-	  auto       flag   = true;
-
-	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+	}
+	auto const color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
+	if (StateMap->test(StateFlag::ZUMED)) {
+	  auto       stitchCoordsInPixels = POINT {};
+	  auto const origin               = RunPoint - 1U;
+	  auto       flag                 = true;
 	  while (wrap::toUnsigned(movieLine.size()) < (StitchesPerFrame + 1U) && RunPoint < (finish - 2U) &&
 	         (StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color) {
 		if (stch2px(RunPoint, stitchCoordsInPixels)) {
@@ -6388,7 +6351,6 @@ void thred::internal::drwlstch(uint32_t finish) {
 	else {
 	  auto iMovieFrame = 0U;
 
-	  color = StitchBuffer->operator[](RunPoint).attribute & COLMSK;
 	  SelectObject(StitchWindowDC, UserPen[color]);
 	  while (iMovieFrame < StitchesPerFrame && (RunPoint + 1 < finish - 1) &&
 	         ((StitchBuffer->operator[](RunPoint).attribute & COLMSK) == color)) {
@@ -6742,13 +6704,9 @@ void thred::internal::movi() {
 	                                ThrEdInstance,
 	                                nullptr);
 	}
-	auto stepCount = 0.0F;
-	if (StateMap->test(StateFlag::ZUMED)) {
-	  stepCount = gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor;
-	}
-	else {
-	  stepCount = gsl::narrow_cast<float>(StitchBuffer->size());
-	}
+	auto const stepCount = (StateMap->test(StateFlag::ZUMED))
+	                           ? gsl::narrow_cast<float>(StitchBuffer->size()) * ZoomFactor * ZoomFactor
+	                           : gsl::narrow_cast<float>(StitchBuffer->size());
 	if (!StateMap->test(StateFlag::WASPAT)) {
 	  MovieTimeStep = wrap::round<decltype(MovieTimeStep)>(10000.0F * MOVITIM / stepCount);
 	}
@@ -6773,7 +6731,6 @@ void thred::internal::movi() {
 }
 
 void thred::redclp() {
-  auto       clipRect   = fRECTANGLE {};
   auto const codedLayer = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
@@ -6794,8 +6751,7 @@ void thred::redclp() {
 	                              clipBuffer.back().y)
 	                      .c_str());
 #endif
-	clipRect.left = clipRect.right = clipBuffer[0].x;
-	clipRect.bottom = clipRect.top = clipBuffer[0].y;
+	auto clipRect = fRECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
 	  clipBuffer.emplace_back(
 	      wrap::toFloat(clipStitchData[iStitch].x) + wrap::toFloat(clipStitchData[iStitch].fx) / FRACFACT,
@@ -7744,16 +7700,8 @@ void thred::internal::setmov() {
 }
 
 void thred::internal::dufsel() {
-  auto start  = 0U;
-  auto finish = 0U;
-  if (LastFormSelected > ClosestFormToCursor) {
-	start  = ClosestFormToCursor;
-	finish = LastFormSelected;
-  }
-  else {
-	start  = LastFormSelected;
-	finish = ClosestFormToCursor;
-  }
+  auto start = (LastFormSelected > ClosestFormToCursor) ? ClosestFormToCursor : LastFormSelected;
+  auto const finish = (LastFormSelected > ClosestFormToCursor) ? LastFormSelected : ClosestFormToCursor;
   SelectedFormList->clear();
   SelectedFormList->reserve(wrap::toSize(finish) - start + 1U);
   while (start <= finish) {
@@ -8081,7 +8029,6 @@ void thred::internal::duselrng(RANGE& selectedRange) {
 }
 
 void thred::internal::longer() {
-  auto iStitch = 0U;
   auto flag    = true;
   if (ClosestPointIndex == LargestStitchIndex) {
 	return;
@@ -8092,7 +8039,8 @@ void thred::internal::longer() {
   auto const rangeEnd      = ((wrap::toSize(SelectedRange.finish) + 1U) < StitchBuffer->size())
                             ? SelectedRange.finish
                             : SelectedRange.finish - 1U;
-  for (iStitch = ClosestPointIndex + 1U; iStitch < rangeEnd; ++iStitch) {
+  auto iStitch = ClosestPointIndex + 1U;
+  for (; iStitch < rangeEnd; ++iStitch) {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
@@ -8122,16 +8070,15 @@ void thred::internal::longer() {
 }
 
 void thred::internal::shorter() {
-  auto currentStitch = 0U;
-  auto currentLength = 0.0F;
   auto flag          = true;
   if (ClosestPointIndex == SmallestStitchIndex) {
 	return;
   }
-  auto const& start     = StitchBuffer->operator[](ClosestPointIndex);
-  auto const& startFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-  currentLength         = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
-  for (currentStitch = ClosestPointIndex; currentStitch != 0; --currentStitch) {
+  auto const& start        = StitchBuffer->operator[](ClosestPointIndex);
+  auto const& startFwd1    = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
+  auto const currentLength = hypot(startFwd1.x - start.x, startFwd1.y - start.y);
+  auto       currentStitch = ClosestPointIndex;
+  for (; currentStitch != 0; --currentStitch) {
 	auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
 	auto const length      = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
@@ -8143,8 +8090,8 @@ void thred::internal::shorter() {
   }
   if (flag) {
 	auto maximumLength = 0.0F;
-	auto iStitch       = 0U;
-	for (iStitch = SelectedRange.start; iStitch < SelectedRange.finish - 1U; ++iStitch) {
+	auto iStitch       = SelectedRange.start;
+	for (; iStitch < SelectedRange.finish - 1U; ++iStitch) {
 	  auto const& stitch     = StitchBuffer->operator[](iStitch);
 	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	  auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
@@ -8643,20 +8590,20 @@ void thred::internal::sidhup() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
-  for (auto iHoop = 0; iHoop < HUPS; ++iHoop) {
+  for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
+	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	SideWindow[wrap::toSize(iHoop)] =
-	    CreateWindow(L"STATIC",
-	                 StringTable->operator[](wrap::toSize(iHoop) + STR_HUP0).c_str(),
-	                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                 3,
-	                 ButtonHeight * iHoop + 3,
-	                 ButtonWidthX3 + ButtonWidth * 2,
-	                 ButtonHeight,
-	                 SideMessageWindow,
-	                 nullptr,
-	                 ThrEdInstance,
-	                 nullptr);
+	SideWindow[iHoop] = CreateWindow(L"STATIC",
+	                                 StringTable->operator[](iHoop + STR_HUP0).c_str(),
+	                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                 3,
+	                                 ButtonHeight * idx + 3,
+	                                 ButtonWidthX3 + ButtonWidth * 2,
+	                                 ButtonHeight,
+	                                 SideMessageWindow,
+	                                 nullptr,
+	                                 ThrEdInstance,
+	                                 nullptr);
   }
 }
 
@@ -9109,13 +9056,7 @@ void thred::internal::ritcur() {
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & mask) == 0U) {
-			auto pixelColor = 0U;
-			if ((bitMask & bitmapInverse) != 0U) {
-			  pixelColor = PENWHITE;
-			}
-			else {
-			  pixelColor = PENBLK;
-			}
+			auto const pixelColor = ((bitMask & bitmapInverse) != 0U) ? PENWHITE : PENBLK;
 			SetPixel(StitchWindowDC, cursorPosition.x + iPixel, cursorPosition.y + iRow, pixelColor);
 		  }
 		  bitMask >>= 1U;
@@ -9387,13 +9328,13 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 }
 
 auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  auto* fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
+  //auto* fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-	  fileInfo = reinterpret_cast<FINDINFO*>(lparam);
+	  auto* fileInfo = reinterpret_cast<FINDINFO*>(lparam);
 	  if (fileInfo != nullptr) {
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
@@ -9415,7 +9356,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	}
 	case WM_COMMAND: {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-	  fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+	  auto* fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
@@ -10100,7 +10041,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 	  linePoints.clear();
 	}
 	auto iOffset = 0U;
-	for (iOffset = 0; iOffset < length; ++iOffset) {
+	for (; iOffset < length; ++iOffset) {
 	  auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
 	  if ((ActiveLayer == 0U) || (layer == 0U) || (layer == ActiveLayer)) {
 		linePoints.push_back({std::lround((activeStitch->x - ZoomRect.left) * ZoomRatio.x),
@@ -10155,27 +10096,11 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		            reinterpret_cast<LPARAM>(featherStyle.c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	  }
 	  SendMessage(GetDlgItem(hwndlg, IDC_FDTYP), CB_SETCURSEL, IniFile.featherFillType - 1, 0);
-	  auto state = 0U;
-	  if ((featherType & AT_FTHBLND) != 0) {
-		state = BST_CHECKED;
-	  }
-	  else {
-		state = BST_UNCHECKED;
-	  }
+	  auto state = wrap::toUnsigned(((featherType & AT_FTHBLND) != 0) ? BST_CHECKED : BST_UNCHECKED);
 	  CheckDlgButton(hwndlg, IDC_FDBLND, state);
-	  if ((featherType & AT_FTHUP) != 0) {
-		state = BST_CHECKED;
-	  }
-	  else {
-		state = BST_UNCHECKED;
-	  }
+	  state = ((featherType & AT_FTHUP) != 0) ? BST_CHECKED : BST_UNCHECKED;
 	  CheckDlgButton(hwndlg, IDC_FDUP, state);
-	  if ((featherType & AT_FTHBTH) != 0) {
-		state = BST_CHECKED;
-	  }
-	  else {
-		state = BST_UNCHECKED;
-	  }
+	  state = ((featherType & AT_FTHBTH) != 0) ? BST_CHECKED : BST_UNCHECKED;
 	  CheckDlgButton(hwndlg, IDC_FBTH, state);
 	  break;
 	}
@@ -10429,13 +10354,9 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::STRTCH)) {
 	  unstrtch(stretchBoxLine);
-	  auto lineLength = 0L;
-	  if ((SelectedFormControlVertex & 1U) != 0U) {
-		lineLength = Msg.pt.x - StitchWindowOrigin.x;
-	  }
-	  else {
-		lineLength = Msg.pt.y - StitchWindowOrigin.y;
-	  }
+	  auto const lineLength = ((SelectedFormControlVertex & 1U) != 0U)
+	                              ? Msg.pt.x - StitchWindowOrigin.x
+	                              : Msg.pt.y - StitchWindowOrigin.y;
 	  auto const dst  = (SelectedFormControlVertex + 2U) % 4U;
 	  auto const code = nxtcrnr(dst);
 	  for (auto iSide = 0U; iSide < 4; ++iSide) {
@@ -12763,20 +12684,20 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  wchar_t const* const str[] = {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
-	  for (auto iThreadSize = 0U; iThreadSize < 3; ++iThreadSize) {
+	  for (auto iThrSize = 0U; iThrSize < 3; ++iThrSize) {
+		auto const idx = gsl::narrow_cast<int32_t>(VerticalIndex + iThrSize);
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		ChangeThreadSizeWin[iThreadSize] =
-		    CreateWindow(L"STATIC",
-		                 str[iThreadSize],
-		                 WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                 ButtonWidthX3,
-		                 ButtonHeight * gsl::narrow_cast<int32_t>(iThreadSize + VerticalIndex),
-		                 ButtonWidth,
-		                 ButtonHeight,
-		                 ThrEdWindow,
-		                 nullptr,
-		                 ThrEdInstance,
-		                 nullptr);
+		ChangeThreadSizeWin[iThrSize] = CreateWindow(L"STATIC",
+		                                             str[iThrSize],
+		                                             WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                                             ButtonWidthX3,
+		                                             ButtonHeight * idx,
+		                                             ButtonWidth,
+		                                             ButtonHeight,
+		                                             ThrEdWindow,
+		                                             nullptr,
+		                                             ThrEdInstance,
+		                                             nullptr);
 	  }
 	  StateMap->set(StateFlag::SIZSEL);
 	}
@@ -13050,15 +12971,14 @@ auto thred::internal::handleHomeKey(bool& retflag) -> bool {
 	return true;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto iColor = 0U;
+	auto iColor = (StateMap->testAndReset(StateFlag::SELBOX)) ? pt2colInd(ClosestPointIndex)
+	                                                          : pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
-	  iColor = pt2colInd(ClosestPointIndex);
 	}
-	else {
-	  iColor = pt2colInd(GroupStitchIndex);
+	if (iColor != 0U) {
+	  --iColor;
 	}
-	--iColor;
 	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex;
 	thred::grpAdj();
 	thred::redraw(ColorBar);
@@ -13124,13 +13044,10 @@ auto thred::internal::handleEndKey(int32_t& retflag) -> bool {
 	return false;
   }
   if (wrap::pressed(VK_SHIFT)) {
-	auto iColor = 0U;
+	auto const iColor = (StateMap->testAndReset(StateFlag::SELBOX)) ? pt2colInd(ClosestPointIndex)
+	                                                                : pt2colInd(GroupStitchIndex);
 	if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	  StateMap->set(StateFlag::GRPSEL);
-	  iColor = pt2colInd(ClosestPointIndex);
-	}
-	else {
-	  iColor = pt2colInd(GroupStitchIndex);
 	}
 	GroupStitchIndex = ColorChangeTable->operator[](iColor).stitchIndex - 1U;
 	thred::grpAdj();
@@ -16250,47 +16167,45 @@ void thred::internal::init() {
   setgrd(IniFile.gridColor);
   makCol(); // make the color change windows
   ButtonWin->resize(BTNCOUNT);
-  auto blank = std::wstring {};
+  auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
-	DWORD windowFlags = 0U;
-	auto* buttonTxt   = &blank;
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	auto windowFlags     = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
+	auto buttonTxt = std::wstring {};
 	switch (iButton) {
 	  case HBOXSEL: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt   = &StringTable->operator[](STR_BOXSEL);
+		buttonTxt.assign(StringTable->operator[](STR_BOXSEL));
 		break;
 	  }
 	  case HUPTO: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt   = &StringTable->operator[](STR_UPOF);
+		buttonTxt.assign(StringTable->operator[](STR_UPOF));
 		break;
 	  }
 	  case HHID: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt   = &StringTable->operator[](STR_PIKOL);
+		buttonTxt.assign(StringTable->operator[](STR_PIKOL));
 		break;
 	  }
 	  default: {
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
+		buttonTxt.assign(blank);
 	  }
 	}
-	if (buttonTxt != nullptr) {
-	  ButtonWin->operator[](iButton) = CreateWindow(L"STATIC",
-	                                                buttonTxt->c_str(),
-	                                                windowFlags,
-	                                                0,
-	                                                ButtonHeight * (16 + gsl::narrow_cast<int32_t>(iButton)),
-	                                                ButtonWidthX3,
-	                                                ButtonHeight,
-	                                                ThrEdWindow,
-	                                                nullptr,
-	                                                ThrEdInstance,
-	                                                nullptr);
-	}
+	ButtonWin->operator[](iButton) = CreateWindow(L"STATIC",
+	                                              buttonTxt.c_str(),
+	                                              windowFlags,
+	                                              0,
+	                                              ButtonHeight * (16 + gsl::narrow_cast<int32_t>(iButton)),
+	                                              ButtonWidthX3,
+	                                              ButtonHeight,
+	                                              ThrEdWindow,
+	                                              nullptr,
+	                                              ThrEdInstance,
+	                                              nullptr);
   }
   trace::initTraceWindows();
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
