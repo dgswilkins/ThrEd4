@@ -274,12 +274,11 @@ void repair::internal::repclp(std::wstring& repairMessage) {
   auto clipCount    = 0U;
   auto clipPoint    = std::vector<fPOINT> {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	// clang-format off
-	auto& form           = FormList->operator[](iForm);
-	auto  clipDifference = 0U;
-	// clang-format on
+	auto& form = FormList->operator[](iForm);
+
+	auto const clipDifference = (clip::isclp(form)) ? form.angleOrClipData.clip
+	                                                : (clip::iseclp(form)) ? form.borderClipData : 0U;
 	if (clip::isclp(form)) {
-	  clipDifference = form.angleOrClipData.clip;
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 		auto const sourceStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
@@ -307,7 +306,6 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	  }
 	}
 	if (clip::iseclp(form)) {
-	  clipDifference = form.borderClipData;
 	  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.clipEntries);
 		auto const sourceStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
