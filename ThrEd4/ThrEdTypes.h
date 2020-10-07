@@ -1125,16 +1125,16 @@ class fPOINT
   float y {};
 
   constexpr fPOINT() noexcept = default;
-  inline fPOINT(double rhsX, double rhsY) noexcept;
-  inline fPOINT(float rhsX, float rhsY) noexcept;
-  inline fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
-  inline fPOINT(LONG rhsX, LONG rhsY) noexcept;
-  explicit inline fPOINT(dPOINT const& rhs) noexcept;
-  inline auto operator==(fPOINT const& rhs) const noexcept -> bool;
-  inline auto operator=(dPOINT const& rhs) noexcept -> fPOINT&;
-  inline auto operator=(fPOINTATTR const& rhs) noexcept -> fPOINT&;
-  inline auto operator=(SMALPNTL const& rhs) noexcept -> fPOINT&;
-  inline auto operator=(BSEQPNT const& rhs) noexcept -> fPOINT&;
+  inline constexpr fPOINT(double rhsX, double rhsY) noexcept;
+  inline constexpr fPOINT(float rhsX, float rhsY) noexcept;
+  inline constexpr fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
+  inline constexpr fPOINT(LONG rhsX, LONG rhsY) noexcept;
+  explicit inline constexpr fPOINT(dPOINT const& rhs) noexcept;
+  inline constexpr auto operator==(fPOINT const& rhs) const noexcept -> bool;
+  inline constexpr auto operator=(dPOINT const& rhs) noexcept -> fPOINT&;
+  inline constexpr auto operator=(fPOINTATTR const& rhs) noexcept -> fPOINT&;
+  inline constexpr auto operator=(SMALPNTL const& rhs) noexcept -> fPOINT&;
+  inline constexpr auto operator=(BSEQPNT const& rhs) noexcept -> fPOINT&;
   // fPOINT(fPOINT const&) = default;
   // fPOINT(fPOINT&&) = default;
   // fPOINT& operator=(fPOINT const& rhs) = default;
@@ -1202,52 +1202,52 @@ inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rh
   attribute = gsl::narrow<int8_t>(rhsAttr);
 }
 
-inline auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
+inline constexpr auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
   return (x == rhs.x) && (y == rhs.y);
 }
 
-inline fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
+inline constexpr fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
-inline fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
+inline constexpr fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
 }
 
-inline fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept {
+inline constexpr fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
 }
 
-inline fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
+inline constexpr fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
   x = gsl::narrow_cast<float>(rhsX);
   y = gsl::narrow_cast<float>(rhsY);
 }
 
-inline fPOINT::fPOINT(dPOINT const& rhs) noexcept {
+inline constexpr fPOINT::fPOINT(dPOINT const& rhs) noexcept {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
 }
 
-inline auto fPOINT::operator=(dPOINT const& rhs) noexcept -> fPOINT& {
-  x = gsl::narrow_cast<float>(rhs.x);
-  y = gsl::narrow_cast<float>(rhs.y);
-  return *this;
-}
-
-inline auto fPOINT::operator=(SMALPNTL const& rhs) noexcept -> fPOINT& {
+inline constexpr auto fPOINT::operator=(dPOINT const& rhs) noexcept -> fPOINT& {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
 
-inline auto fPOINT::operator=(fPOINTATTR const& rhs) noexcept -> fPOINT& {
+inline constexpr auto fPOINT::operator=(SMALPNTL const& rhs) noexcept -> fPOINT& {
+  x = gsl::narrow_cast<float>(rhs.x);
+  y = gsl::narrow_cast<float>(rhs.y);
+  return *this;
+}
+
+inline constexpr auto fPOINT::operator=(fPOINTATTR const& rhs) noexcept -> fPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline auto fPOINT::operator=(BSEQPNT const& rhs) noexcept -> fPOINT& {
+inline constexpr auto fPOINT::operator=(BSEQPNT const& rhs) noexcept -> fPOINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
