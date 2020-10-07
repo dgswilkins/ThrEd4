@@ -832,8 +832,8 @@ void formForms::dasyfrm() {
   for (auto iMacroPetal = 0U; iMacroPetal < IniFile.daisyPetalCount; ++iMacroPetal) {
 	auto petalPointAngle         = 0.0F;
 	PseudoRandomValue            = SEED;
-	auto distanceFromDaisyCenter = 0.0F;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
+	  auto distanceFromDaisyCenter = 0.0F;
 	  switch (borderType) {
 		case DSIN: {
 		  distanceFromDaisyCenter = diameter + sin(petalPointAngle) * petalLength;
@@ -846,15 +846,10 @@ void formForms::dasyfrm() {
 		  break;
 		}
 		case DSAW: {
-		  auto sawPointCount = 0U;
-		  if (iPoint > halfPetalPointCount) {
-			sawPointCount = IniFile.daisyPetalPoints - iPoint;
-		  }
-		  else {
-			sawPointCount = iPoint;
-		  }
-		  distanceFromDaisyCenter =
-		      diameter + (wrap::toFloat(sawPointCount) / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
+		  auto const sawPointCount =
+		      wrap::toFloat((iPoint > halfPetalPointCount) ? IniFile.daisyPetalPoints - iPoint : iPoint);
+		  auto const offset = (sawPointCount / wrap::toFloat(IniFile.daisyPetalPoints) * petalLength);
+		  distanceFromDaisyCenter = diameter + offset;
 		  break;
 		}
 		case DRAG: {
@@ -880,7 +875,8 @@ void formForms::dasyfrm() {
 		  break;
 		}
 		default: {
-		  throw;
+		  outDebugString(L"Unknown borderType [{}]", borderType);
+		  break;
 		}
 	  }
 	  FormVertices->push_back(fPOINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
