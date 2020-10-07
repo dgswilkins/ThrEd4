@@ -34,11 +34,11 @@
 class PCSHEADER // pcs file header structure
 {
   public:
-  int8_t   leadIn {0};
-  int8_t   hoopType {0};
-  uint16_t colorCount {0};
-  COLORREF colors[COLORCNT] {0}; // NOLINT(modernize-avoid-c-arrays)
-  uint16_t stitchCount {0};
+  int8_t   leadIn {};
+  int8_t   hoopType {};
+  uint16_t colorCount {};
+  COLORREF colors[COLORCNT] {}; // NOLINT(modernize-avoid-c-arrays)
+  uint16_t stitchCount {};
 
   constexpr PCSHEADER() noexcept = default;
   // PCSHEADER(PCSHEADER&&) = default;
@@ -50,6 +50,9 @@ class PCSHEADER // pcs file header structure
 #pragma pack(pop)
 
 namespace pci = PCS::internal;
+
+constexpr auto smallHoop = fPOINT {SHUPX, SHUPY};
+constexpr auto largeHoop = fPOINT {LHUPX, LHUPY};
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header
 
@@ -248,24 +251,11 @@ auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 	displayText::tabmsg(IDS_PFAF2L);
 	return true;
   }
-  auto hoopSize = fPOINT {};
-  if (boundingSize.x > SHUPX || boundingSize.y > SHUPY) {
-	PCSHeader.hoopType = LARGHUP;
-	hoopSize.x         = LHUPX;
-	hoopSize.y         = LHUPY;
-  }
-  else {
-	if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
-	  PCSHeader.hoopType = LARGHUP;
-	  hoopSize.x         = LHUPX;
-	  hoopSize.y         = LHUPY;
-	}
-	else {
-	  PCSHeader.hoopType = SMALHUP;
-	  hoopSize.x         = SHUPX;
-	  hoopSize.y         = SHUPY;
-	}
-  }
+  auto const largeFlag = (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
+                   (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY);
+  auto const hoopSize      = largeFlag ? largeHoop : smallHoop;
+#pragma warning(suppress : 26812) // enum type is unscoped 
+  PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP; 
   auto delta = fPOINT {};
   if (boundingRect.right > hoopSize.x) {
 	delta.x = hoopSize.x - boundingRect.right;
@@ -295,14 +285,13 @@ auto PCS::isPCS(fs::path const& path) -> bool {
 }
 
 auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool {
-  auto retflag = true;
+  auto retflag = false;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
-	retflag = false;
   }
   else {
 	auto pcsFileHeader = PCSHEADER {};
@@ -358,11 +347,7 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		displayText::tabmsg(IDS_SHRTF);
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
-		retflag = false;
 	  }
-	}
-	else {
-	  retflag = false;
 	}
   }
   CloseHandle(fileHandle);
