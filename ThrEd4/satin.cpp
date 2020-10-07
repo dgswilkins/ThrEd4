@@ -1280,28 +1280,26 @@ void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t sta
   auto       outerPoint  = fPOINT {outsidePoints[start].x, outsidePoints[start].y};
   auto       innerFlag   = false;
   auto       outerFlag   = false;
-  auto       count       = 0U;
   if (!StateMap->testAndSet(StateFlag::SAT1)) {
 	stitchPoint = insidePoints[start];
   }
   if (outerLength > innerLength) {
-	count             = wrap::round<uint32_t>(outerLength / LineSpacing);
 	innerFlag         = true;
 	auto intersection = fPOINT {};
 	if (form::linx(insidePoints, start, finish, intersection)) {
-	  innerDelta = fPOINT {0.0F, 0.0F};
+	  innerDelta = fPOINT {};
 	  innerPoint = intersection;
 	}
   }
   else {
-	count             = wrap::round<uint32_t>(innerLength / LineSpacing);
 	outerFlag         = true;
 	auto intersection = fPOINT {};
 	if (form::linx(insidePoints, start, finish, intersection)) {
-	  outerDelta = fPOINT {0.0F, 0.0F};
+	  outerDelta = fPOINT {};
 	  outerPoint = intersection;
 	}
   }
+  auto count = wrap::round<uint32_t>(((outerLength > innerLength) ? outerLength : innerLength) / LineSpacing);
   if (count == 0U) {
 	count = 1;
   }
@@ -1434,35 +1432,32 @@ void satin::sbrd(FRMHED const& form) {
   LineSpacing = savedSpacing;
 }
 
-void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish, float satinWidth) {
-  auto xOffset = 0.0F;
-  auto yOffset = 0.0F;
+auto satin::internal::satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> fPOINT{
+  constexpr auto SATHRESH = 10.0F;
+  auto angle    = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
+  auto length   = satinWidth / cos(angle);
+  if (length < -satinWidth * SATHRESH) {
+	length = -satinWidth * SATHRESH;
+  }
+  if (length > satinWidth * SATHRESH) {
+	length = satinWidth * SATHRESH;
+  }
+  angle += FormAngles->operator[](start) + PI_FHALF;
+  return fPOINT {length * cos(angle), length * sin(angle)};
+}
 
-  if (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT) {
-	xOffset = 0.0F;
-	yOffset = satinWidth;
-  }
-  else {
-	constexpr auto SATHRESH = 10.0F;
-	auto           angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
-	auto           length = satinWidth / cos(angle);
-	if (length < -satinWidth * SATHRESH) {
-	  length = -satinWidth * SATHRESH;
-	}
-	if (length > satinWidth * SATHRESH) {
-	  length = satinWidth * SATHRESH;
-	}
-	angle += FormAngles->operator[](start) + PI_FHALF;
-	xOffset = length * cos(angle);
-	yOffset = length * sin(angle);
-  }
+void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish, float satinWidth) {
+  auto const offset =
+      (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT)
+          ? fPOINT {0.0F, satinWidth}
+          : satOffset(finish, start, satinWidth);
   auto const vertexIt = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
-                      ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
-                      : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-  InsidePoints-> operator[](finish).x = vertexIt->x - xOffset;
-  InsidePoints-> operator[](finish).y = vertexIt->y - yOffset;
-  OutsidePoints->operator[](finish).x = vertexIt->x + xOffset;
-  OutsidePoints->operator[](finish).y = vertexIt->y + yOffset;
+                            ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
+                            : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+  InsidePoints-> operator[](finish).x = vertexIt->x - offset.x;
+  InsidePoints-> operator[](finish).y = vertexIt->y - offset.y;
+  OutsidePoints->operator[](finish).x = vertexIt->x + offset.x;
+  OutsidePoints->operator[](finish).y = vertexIt->y + offset.y;
 }
 
 auto satin::internal::chkbak(std::vector<fPOINT> const& satinBackup, fPOINT const& pnt) noexcept -> bool {

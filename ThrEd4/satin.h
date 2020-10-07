@@ -58,6 +58,7 @@ namespace internal {
              uint32_t                  line2Start,
              uint32_t                  line2End);
   void satmf(FRMHED const& form, std::vector<float> const& lengths);
+  auto satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> fPOINT;
   void satsbrd(uint32_t formIndex);
   auto satselfn() -> bool;
   void sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish, fPOINT& stitchPoint);
