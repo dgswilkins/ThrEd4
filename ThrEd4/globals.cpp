@@ -159,6 +159,7 @@ auto StitchWindowOrigin     = POINT {};                       // offset origin o
 auto StitchWindowSize       = POINT {};                       // size of the stitch window in pixels
 auto StringTable            = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); //
 auto TempPolygon            = gsl::narrow_cast<std::vector<fPOINT>*>(nullptr); // temporary storage when user is entering a polygon;
+auto TextureHistory         = gsl::narrow_cast<std::array<TXHST, ITXBUFSZ>*>(nullptr); // texture editor history headers
 auto TextureInputBuffer = gsl::narrow_cast<std::wstring*>(nullptr); // texture fill number buffer
 auto TexturePointsBuffer = gsl::narrow_cast<std::vector<TXPNT>*>(nullptr); // buffer for textured fill points
 auto ThreadSizeWin     = std::array<HWND, COLORCNT> {};                    // thread size windows

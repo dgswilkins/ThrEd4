@@ -47,7 +47,6 @@ static auto TextureRect               = TXTRCT {};   // selected texture points 
 static auto SelectTexturePointsOrigin = POINT {};    // original location of selected texture points
 static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
 static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
-static auto TextureHistory      = std::array<TXHST, ITXBUFSZ> {}; // texture editor history headers
 static auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
 static auto TempTexturePoints   = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
@@ -71,7 +70,7 @@ void texture::txdun() {
   auto signature            = std::array<char, 4> {"txh"};
   auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
-  if (!TextureHistory[0].texturePoints.empty()) {
+  if (!TextureHistory->operator[](0).texturePoints.empty()) {
 	wchar_t name[_MAX_PATH] = {0};
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	  auto bytesWritten = DWORD {0};
@@ -82,7 +81,7 @@ void texture::txdun() {
 		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
-		for (auto const& historyEntry : TextureHistory) {
+		for (auto const& historyEntry : *TextureHistory) {
 		  auto& bufferEntry       = *bufferIter;
 		  bufferEntry.placeholder = nullptr;
 		  bufferEntry.count       = wrap::toUnsigned(historyEntry.texturePoints.size());
@@ -96,12 +95,12 @@ void texture::txdun() {
 		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
 		                &bytesWritten,
 		                nullptr);
-		for (auto& item : TextureHistory) {
+		for (auto& item : *TextureHistory) {
 		  if (!item.texturePoints.empty()) {
 			wrap::WriteFile(handle,
 			                item.texturePoints.data(),
 			                wrap::toUnsigned(item.texturePoints.size() *
-			                                 sizeof(decltype(TextureHistory[0].texturePoints.back()))),
+			                                 sizeof(decltype(TextureHistory->operator[](0).texturePoints.back()))),
 			                &bytesWritten,
 			                nullptr);
 		  }
@@ -115,7 +114,7 @@ void texture::txdun() {
 void texture::internal::redtbak() {
   // NOLINTNEXTLINE
   outDebugString(L"retrieving texture history {}\n", TextureHistoryIndex);
-  auto const& textureHistoryItem = TextureHistory[TextureHistoryIndex];
+  auto const& textureHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
   TextureScreen.areaHeight       = textureHistoryItem.height;
   TextureScreen.width            = textureHistoryItem.width;
   TextureScreen.spacing          = textureHistoryItem.spacing;
@@ -153,19 +152,19 @@ void texture::redtx() {
 			  for (auto index = 0U;
 			       index < (historyBytesRead / wrap::toUnsigned(sizeof(decltype(textureHistoryBuffer.back()))));
 			       ++index) {
-				TextureHistory[index].height  = textureHistoryBuffer[index].height;
-				TextureHistory[index].width   = textureHistoryBuffer[index].width;
-				TextureHistory[index].spacing = textureHistoryBuffer[index].spacing;
+				TextureHistory->operator[](index).height  = textureHistoryBuffer[index].height;
+				TextureHistory->operator[](index).width   = textureHistoryBuffer[index].width;
+				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
 				if (textureHistoryBuffer[index].count != 0U) {
-				  TextureHistory[index].texturePoints.resize(textureHistoryBuffer[index].count);
+				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
 				  if (!wrap::ReadFile(handle,
-				                      TextureHistory[index].texturePoints.data(),
-				                      sizeof(decltype(TextureHistory[0].texturePoints.back())) *
+				                      TextureHistory->operator[](index).texturePoints.data(),
+				                      sizeof(decltype(TextureHistory->operator[](0).texturePoints.back())) *
 				                          textureHistoryBuffer[index].count,
 				                      &bytesRead,
 				                      nullptr)) {
-					TextureHistory[index].texturePoints.clear();
-					TextureHistory[index].texturePoints.shrink_to_fit();
+					TextureHistory->operator[](index).texturePoints.clear();
+					TextureHistory->operator[](index).texturePoints.shrink_to_fit();
 				  }
 				}
 			  }
@@ -242,13 +241,13 @@ auto texture::internal::chktxh(_In_ TXHST const& historyItem) -> bool {
 
 void texture::savtxt() {
   if (!TempTexturePoints->empty()) {
-	auto& currentHistoryItem = TextureHistory[TextureHistoryIndex];
+	auto& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
 	if (txi::chktxh(currentHistoryItem)) {
 	  StateMap->set(StateFlag::WASTXBAK);
 	  StateMap->reset(StateFlag::TXBDIR);
 	  StateMap->reset(StateFlag::LASTXBAK);
 	  txi::txrfor();
-	  auto& currentItem   = TextureHistory[TextureHistoryIndex];
+	  auto& currentItem   = TextureHistory->operator[](TextureHistoryIndex);
 	  currentItem.height  = TextureScreen.areaHeight;
 	  currentItem.width   = TextureScreen.width;
 	  currentItem.spacing = TextureScreen.spacing;
@@ -392,23 +391,19 @@ void texture::drwtxtr() {
   if (StateMap->testAndReset(StateFlag::CHKTX)) {
 	txi::chktx();
   }
-  auto yOffset = 0;
-  if (pixelSpace > editSpace) {
-	TextureScreen.xOffset          = 0.0F;
-	TextureScreen.editToPixelRatio = extraWidth / wrap::toFloat(StitchWindowClientRect.bottom);
-
-	yOffset = wrap::round<decltype(yOffset)>((wrap::toFloat(StitchWindowClientRect.bottom) -
-	                                          TextureScreen.areaHeight / TextureScreen.editToPixelRatio) /
-	                                         2.0F);
-  }
-  else {
-	TextureScreen.editToPixelRatio =
-	    TextureScreen.areaHeight * 2.0F / wrap::toFloat(StitchWindowClientRect.bottom);
-	yOffset               = StitchWindowClientRect.bottom / 4;
-	TextureScreen.xOffset = (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
-	                         TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
-	                        2.0F;
-  }
+  auto const flag = (pixelSpace > editSpace);
+  TextureScreen.editToPixelRatio =
+      flag ? extraWidth / wrap::toFloat(StitchWindowClientRect.bottom)
+           : TextureScreen.areaHeight * 2.0F / wrap::toFloat(StitchWindowClientRect.bottom);
+  TextureScreen.xOffset =
+      flag ? 0.0F
+           : (TextureScreen.editToPixelRatio * wrap::toFloat(StitchWindowClientRect.right) -
+              TextureScreen.spacing * (wrap::toFloat(TextureScreen.lines) + 2.0F)) /
+                 2.0F;
+  auto const yOffset = flag ? wrap::round<LONG>((wrap::toFloat(StitchWindowClientRect.bottom) -
+                                                 TextureScreen.areaHeight / TextureScreen.editToPixelRatio) /
+                                                2.0F)
+                            : StitchWindowClientRect.bottom / 4;
   TextureScreen.top        = yOffset;
   TextureScreen.bottom     = StitchWindowClientRect.bottom - yOffset;
   TextureScreen.height     = TextureScreen.bottom - TextureScreen.top;
@@ -783,12 +778,10 @@ void texture::internal::angrct(fRECTANGLE& rectangle) noexcept {
 }
 
 void texture::internal::ritxfrm(FRMHED const& textureForm) {
-  auto offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
-                       (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
+  auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
+                             (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
-  offset.x        = TextureCursorLocation.x - SelectTexturePointsOrigin.x;
-  offset.y        = TextureCursorLocation.y - SelectTexturePointsOrigin.y;
-  auto& formLines = *FormLines;
+  auto&      formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto&      angledFormVertices = *AngledFormVertices;
   auto const maxVertex          = wrap::toUnsigned(angledFormVertices.size());
@@ -1301,7 +1294,7 @@ void texture::internal::txbak() {
 	SelectedTexturePointsList->clear();
 	auto flag = false;
 	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
-	  if (TextureHistory[TextureHistoryIndex].width != 0.0F) {
+	  if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 		flag = true;
 		break;
 	  }
@@ -1319,7 +1312,7 @@ void texture::internal::nxbak() {
 	auto flag = false;
 	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
 	  txi::txrfor();
-	  if (TextureHistory[TextureHistoryIndex].width != 0.0F) {
+	  if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
 		flag = true;
 		break;
 	  }
@@ -1673,16 +1666,12 @@ auto texture::internal::inrct(fRECTANGLE const& rectangle, fPOINTATTR const& sti
 
 void texture::setshft() {
   if (ZoomBoxLine[2].x != 0L && ZoomBoxLine[2].y != 0L) {
-	auto selectionRect = fRECTANGLE {};
 	texture::savtxt();
 	thred::unbBox();
 	StateMap->reset(StateFlag::BZUMIN);
-	selectionRect.top      = ZoomBoxOrigin.y;
-	selectionRect.left     = ZoomBoxOrigin.x;
 	auto const stitchPoint = thred::pxCor2stch(
 	    POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
-	selectionRect.bottom = stitchPoint.y;
-	selectionRect.right  = stitchPoint.x;
+	auto const selectionRect = fRECTANGLE {ZoomBoxOrigin.x, ZoomBoxOrigin.y, stitchPoint.x, stitchPoint.y};
 	StateMap->reset(StateFlag::TXIN);
 	TempTexturePoints->clear();
 	auto line = 1U;

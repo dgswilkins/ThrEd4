@@ -17593,6 +17593,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_StringTable               = std::vector<std::wstring> {};
 	  auto private_TempPolygon               = std::vector<fPOINT> {};
 	  auto private_TempTexturePoints         = std::vector<TXPNT> {};
+	  auto private_TextureHistory            = std::array<TXHST, ITXBUFSZ> {};
 	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
 	  auto private_ThrName                   = fs::path {};
 	  auto private_Thumbnails                = std::vector<std::wstring> {};
@@ -17667,6 +17668,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  StitchBuffer              = &private_StitchBuffer;
 	  StringTable               = &private_StringTable;
 	  TempPolygon               = &private_TempPolygon;
+	  TextureHistory            = &private_TextureHistory;
 	  TextureInputBuffer        = &private_textureInputBuffer;
 	  TexturePointsBuffer       = &private_TexturePointsBuffer;
 	  ThrName                   = &private_ThrName;

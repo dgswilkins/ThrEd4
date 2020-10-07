@@ -238,9 +238,10 @@ extern POINT      StitchWindowSize;
 
 extern std::vector<std::wstring>* StringTable;
 
-extern std::vector<fPOINT>* TempPolygon;
-extern std::wstring*        TextureInputBuffer;
-extern std::vector<TXPNT>*  TexturePointsBuffer;
+extern std::vector<fPOINT>*         TempPolygon;
+extern std::array<TXHST, ITXBUFSZ>* TextureHistory;
+extern std::wstring*                TextureInputBuffer;
+extern std::vector<TXPNT>*          TexturePointsBuffer;
 
 extern std::array<HWND, COLORCNT> ThreadSizeWin;
 
