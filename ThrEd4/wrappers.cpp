@@ -101,12 +101,16 @@ auto wrap::toFloat(size_t invar) noexcept -> float {
 }
 #endif
 
+auto wrap::toUnsigned(int invar) -> uint32_t {
+  return gsl::narrow<uint32_t>(invar);
+}
+
 // NOLINTNEXTLINE(google-runtime-int)
 auto wrap::toFloat(unsigned long invar) noexcept -> float {
   return gsl::narrow_cast<float>(invar);
 }
 
-auto wrap::toUnsigned(int invar) -> uint32_t {
+auto wrap::toUnsigned(float invar) -> uint32_t {
   return gsl::narrow<uint32_t>(invar);
 }
 

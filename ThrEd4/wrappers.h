@@ -111,6 +111,7 @@ auto toSize(uintmax_t invar) noexcept -> size_t;
 #else
 auto toSize(uintmax_t invar) -> size_t;
 #endif
+auto toUnsigned(float invar) -> uint32_t;
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
 auto toUnsigned(long invar) -> uint32_t;
