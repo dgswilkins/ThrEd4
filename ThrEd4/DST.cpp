@@ -115,9 +115,6 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	color        = colmatch(colors[iColor++]);
 	thred::addColor(0, color);
   }
-  else {
-	color = 0;
-  }
   auto localStitch       = fPOINT {};
   auto maximumCoordinate = fPOINT {-BIGFLOAT, -BIGFLOAT};
   auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
@@ -232,14 +229,10 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	auto       lengths         = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                           std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = POINT {abs(lengths.x), abs(lengths.y)};
-	auto       count           = 0;
-	if (absoluteLengths.x > absoluteLengths.y) {
-	  count = absoluteLengths.x / DSTMAX + 1;
-	}
-	else {
-	  count = absoluteLengths.y / DSTMAX + 1;
-	}
-	auto const stepSize = POINT {(absoluteLengths.x / count + 1), (absoluteLengths.y / count + 1)};
+	auto const count = ((absoluteLengths.x > absoluteLengths.y) ? absoluteLengths.x / DSTMAX + 1
+	                                                            : absoluteLengths.y / DSTMAX + 1) +
+	                   1;
+	auto const stepSize = POINT {(absoluteLengths.x / count), (absoluteLengths.y / count)};
 
 	auto difference = POINT {0L, 0L};
 	while ((lengths.x != 0) || (lengths.y != 0)) {
