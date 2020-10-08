@@ -322,6 +322,7 @@ void displayText::spltmsg() {
 }
 
 void displayText::datmsg(uint32_t code) {
+  // Resharper disable once CppInitializedValueIsAlwaysRewritten
   auto dataErrorID = 0U;
   auto dataError   = std::wstring {};
   switch (code) {
