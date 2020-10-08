@@ -10,7 +10,7 @@
 #endif
 
 // Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
+#include <windows.h> // Win32 Platform SDK main header
 
 // Open Source headers
 #pragma warning(push)
