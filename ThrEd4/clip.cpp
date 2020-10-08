@@ -368,15 +368,11 @@ auto clip::internal::clpsid(uint32_t                   vertexIndex,
   }
   auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
   if (clipCount != 0U) {
-	auto remainder = 0.0F;
-	if (clipCount > 1U) {
-	  remainder = ((length - wrap::toFloat(clipCount) * ClipRectSize.cx) / (wrap::toFloat(clipCount) - 1.0F) +
-	               ClipRectSize.cx) /
-	              length;
-	}
-	else {
-	  remainder = (length - ClipRectSize.cx) / 2;
-	}
+	auto const remainder = (clipCount > 1U) ? ((length - wrap::toFloat(clipCount) * ClipRectSize.cx) /
+	                                               (wrap::toFloat(clipCount) - 1.0F) +
+	                                           ClipRectSize.cx) /
+	                                              length
+	                                        : (length - ClipRectSize.cx) / 2;
 	auto const step         = fPOINT {delta.x * remainder, delta.y * remainder};
 	auto       insertPoint  = *vStart;
 	auto       reversedData = clipReversedData.begin();
@@ -420,14 +416,13 @@ void clip::clpbrd(FRMHED const& form, fRECTANGLE const& clipRect, uint32_t start
 	// align the center of the clip with the beginning of the line
 	// auto borderClipReference = fPOINT {clipRect.right / 2.0F, clipRect.top / 2.0F};
 	auto const borderClipReference = fPOINT {0.0F, clipRect.top / 2.0F};
-	auto       currentSide         = 0U;
 	auto const sideCount           = form.vertexCount - 2U;
-	for (currentSide = 0U; currentSide < sideCount; ++currentSide) {
+	for (auto currentSide = 0U; currentSide < sideCount; ++currentSide) {
 	  ci::linsid(form.vertexIndex, clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide, stitchPoint, borderClipReference);
 	  ci::setvct(form.vertexIndex, currentSide + 1, currentSide + 2, clipAngle, vector0);
 	  ci::lincrnr(form.vertexIndex, clipReversedData, clipFillData, clipAngle, rotationCenter, currentSide, stitchPoint, borderClipReference);
 	}
-	ci::linsid(form.vertexIndex, clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, currentSide, stitchPoint, borderClipReference);
+	ci::linsid(form.vertexIndex, clipReversedData, clipFillData, clipAngle, vector0, rotationCenter, sideCount, stitchPoint, borderClipReference);
   }
   else {
 	clpout(ClipRectSize.cx / 2);
@@ -560,14 +555,13 @@ void clip::internal::fxlen(FRMHED const&             form,
   while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
 	auto adjCount    = 0U;
 	auto stitchPoint = *vBegin;
-	auto currentSide = 0U;
-	for (currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
+	for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	  nextStart = currentSide + 1U;
 	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
 	if (form.type != FRMLINE) {
 	  nextStart = 0;
-	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjCount, adjustedSpace, nextStart);
+	  ci::fxlit(form.vertexIndex, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjCount, adjustedSpace, nextStart);
 	}
 	else {
 	  nextStart = form.vertexCount - 1U;
@@ -611,14 +605,13 @@ void clip::internal::fxlen(FRMHED const&             form,
   auto stitchPoint = *vBegin;
   adjustedSpace    = minimumSpacing;
   chainEndPoints.push_back(stitchPoint);
-  auto currentSide = 0U;
-  for (currentSide = 0; currentSide < form.vertexCount - 1U; ++currentSide) {
+  for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	nextStart = currentSide + 1U;
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart);
   }
   if (form.type != FRMLINE) {
 	nextStart = 0;
-	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart);
+	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
   vertexIt            = wrap::next(vBegin, nextStart);
   auto const interval = hypot(vertexIt->x - stitchPoint.x, vertexIt->y - stitchPoint.y);
