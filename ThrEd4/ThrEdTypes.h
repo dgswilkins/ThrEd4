@@ -738,7 +738,7 @@ enum formStyles {
   FRMTEAR,      // Teardrop form
   FRMZIGZAG,    // Zig-Zag form
   FRMWAVE,      // Wave Form
-  FRMDAISY     // Daisy form
+  FRMDAISY      // Daisy form
 };
 
 // main menu items
@@ -794,12 +794,7 @@ enum fillMenuItems {
 };
 
 // clipboard data types
-enum clipDataType {
-  CLP_STCH = 1,
-  CLP_FRM,
-  CLP_FRMS,
-  CLP_FRMPS
-};
+enum clipDataType { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
 
 // edge underlay bit
 constexpr auto EGUND  = uint8_t {0x80U};
@@ -873,7 +868,7 @@ enum fillStyles {
   FTHF,     // Feather fill
   TXVRTF,   // Vertical texture fill
   TXHORF,   // Horizontal texture fill
-  TXANGF   // Angle texture fill
+  TXANGF    // Angle texture fill
 };
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
@@ -912,7 +907,7 @@ enum preferenceItems {
   PEG,    // 26
   PHUPY,  // 27
   PLRAT,  // 28
-  PAPSL  // 29
+  PAPSL   // 29
 };
 
 // file menu items

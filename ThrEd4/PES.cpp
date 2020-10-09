@@ -205,7 +205,7 @@ void PES::internal::pecnam(gsl::span<char> label) {
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
-  // ReSharper disable once CppDeprecatedEntity 
+  // ReSharper disable once CppDeprecatedEntity
   strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
 }
 #pragma warning(pop)
@@ -503,7 +503,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn); // NOLINT(clang-diagnostic-deprecated-declarations)
 		wrap::narrow(pesHeader.cslen, strlen(SEWSTR));
-		// ReSharper disable once CppDeprecatedEntity 
+		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto iColor = 0U;
 		for (auto const color : UserColor) {

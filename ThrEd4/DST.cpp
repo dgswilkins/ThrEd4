@@ -901,7 +901,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
-// ReSharper disable CppDeprecatedEntity 
+// ReSharper disable CppDeprecatedEntity
 auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool {
   auto flag = true;
   if (nullptr != auxName) {

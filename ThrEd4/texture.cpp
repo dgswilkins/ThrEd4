@@ -47,8 +47,8 @@ static auto TextureRect               = TXTRCT {};   // selected texture points 
 static auto SelectTexturePointsOrigin = POINT {};    // original location of selected texture points
 static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
 static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
-static auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
-static auto TempTexturePoints   = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
+static auto TextureHistoryIndex       = uint32_t {}; // pointer to the next texture history buffer
+static auto TempTexturePoints         = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
 static auto TextureScreen = TXTSCR {}; // texture editor layout parameters
 
@@ -75,7 +75,8 @@ void texture::txdun() {
 	if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	  auto bytesWritten = DWORD {0};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto const handle =
+	      CreateFile(static_cast<LPCWSTR>(name), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
@@ -97,12 +98,13 @@ void texture::txdun() {
 		                nullptr);
 		for (auto& item : *TextureHistory) {
 		  if (!item.texturePoints.empty()) {
-			wrap::WriteFile(handle,
-			                item.texturePoints.data(),
-			                wrap::toUnsigned(item.texturePoints.size() *
-			                                 sizeof(decltype(TextureHistory->operator[](0).texturePoints.back()))),
-			                &bytesWritten,
-			                nullptr);
+			wrap::WriteFile(
+			    handle,
+			    item.texturePoints.data(),
+			    wrap::toUnsigned(item.texturePoints.size() *
+			                     sizeof(decltype(TextureHistory->operator[](0).texturePoints.back()))),
+			    &bytesWritten,
+			    nullptr);
 		  }
 		}
 	  }
@@ -135,7 +137,8 @@ void texture::redtx() {
   TextureHistoryIndex = ITXBUFSZ - 1U;
   if (txi::txnam(static_cast<wchar_t*>(name), sizeof(name) / sizeof(name[0]))) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const handle = CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	auto const handle =
+	    CreateFile(static_cast<LPCWSTR>(name), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
@@ -413,10 +416,10 @@ void texture::drwtxtr() {
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, GridPen);
   auto const gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
-  auto textureRecord = TXPNT {};
-  line[0].x          = 0;
-  line[1].x          = StitchWindowClientRect.right;
-  auto point         = POINT {0L, 0L};
+  auto       textureRecord = TXPNT {};
+  line[0].x                = 0;
+  line[1].x                = StitchWindowClientRect.right;
+  auto point               = POINT {0L, 0L};
   for (auto iGrid = 0U; iGrid < gridLineCount; ++iGrid) {
 	txi::txt2pix(textureRecord, point);
 	line[0].y = line[1].y = point.y;
@@ -781,7 +784,7 @@ void texture::internal::ritxfrm(FRMHED const& textureForm) {
   auto const offset = POINT {(TextureCursorLocation.x - SelectTexturePointsOrigin.x),
                              (TextureCursorLocation.y - SelectTexturePointsOrigin.y)};
 
-  auto&      formLines = *FormLines;
+  auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
   auto&      angledFormVertices = *AngledFormVertices;
   auto const maxVertex          = wrap::toUnsigned(angledFormVertices.size());
@@ -1041,7 +1044,7 @@ void texture::deltx(uint32_t formIndex) {
 	  auto iBuffer = uint16_t {};
 	  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
 		if (texture::istx(iForm)) {
-		  auto& fillInfo   = FormList->operator[](iForm).fillInfo;
+		  auto& fillInfo         = FormList->operator[](iForm).fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
@@ -1053,7 +1056,7 @@ void texture::deltx(uint32_t formIndex) {
 	  }
 	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 		if (texture::istx(iForm)) {
-		  auto& fillInfo   = FormList->operator[](iForm).fillInfo;
+		  auto& fillInfo         = FormList->operator[](iForm).fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
@@ -1136,11 +1139,7 @@ void texture::txof() {
   StateMap->reset(StateFlag::TXTRED);
 }
 
-enum textureStyles {
-  VRTYP,
-  HORTYP,
-  ANGTYP
-};
+enum textureStyles { VRTYP, HORTYP, ANGTYP };
 
 void texture::internal::dutxfn(uint32_t textureType) {
   if (StateMap->test(StateFlag::FORMSEL)) {
@@ -1671,7 +1670,8 @@ void texture::setshft() {
 	StateMap->reset(StateFlag::BZUMIN);
 	auto const stitchPoint = thred::pxCor2stch(
 	    POINT {ZoomBoxLine[2].x + StitchWindowOrigin.x, ZoomBoxLine[2].y + StitchWindowOrigin.y});
-	auto const selectionRect = fRECTANGLE {ZoomBoxOrigin.x, ZoomBoxOrigin.y, stitchPoint.x, stitchPoint.y};
+	auto const selectionRect =
+	    fRECTANGLE {ZoomBoxOrigin.x, ZoomBoxOrigin.y, stitchPoint.x, stitchPoint.y};
 	StateMap->reset(StateFlag::TXIN);
 	TempTexturePoints->clear();
 	auto line = 1U;

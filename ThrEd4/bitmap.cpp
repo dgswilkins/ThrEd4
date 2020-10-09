@@ -642,6 +642,7 @@ auto bitmap::getrmap() -> uint32_t {
                                         0L,
                                         0U,
                                         0U};
+
   auto info       = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
   TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
@@ -684,12 +685,13 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
 }
 
 void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
-  auto line     = std::array<POINT, 2> {};
+  auto       line     = std::array<POINT, 2> {};
   auto const vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const vStart   = wrap::next(vertexIt, start);
   auto const vFinish  = wrap::next(vertexIt, finish);
-  line[0]       = bi::stch2bit(*vStart);
-  line[1]       = bi::stch2bit(*vFinish);
+
+  line[0] = bi::stch2bit(*vStart);
+  line[1] = bi::stch2bit(*vFinish);
   wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
   wrap::Polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }

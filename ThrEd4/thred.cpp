@@ -261,8 +261,8 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		}
 		case IDOK: {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto    const hwnd = GetDlgItem(hwndlg, IDC_DESED);
-		  wchar_t designerBuffer[NameOrder.size()];
+		  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		  wchar_t    designerBuffer[NameOrder.size()];
 		  GetWindowText(hwnd,
 		                static_cast<LPTSTR>(designerBuffer),
 		                sizeof(designerBuffer) / sizeof(designerBuffer[0]));
@@ -1214,7 +1214,7 @@ void thred::hupfn() {
   sizstch(checkHoopRect, *StitchBuffer);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
-	  auto const vertexIt        = FormVertices->cbegin();
+	  auto const vertexIt  = FormVertices->cbegin();
 	  checkHoopRect.top    = vertexIt->y;
 	  checkHoopRect.bottom = vertexIt->y;
 	  checkHoopRect.right  = vertexIt->x;
@@ -2269,7 +2269,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	  --lastStitch;
 	  while (iStitch < lastStitch) {
 		auto const& stitch = StitchBuffer->operator[](iStitch);
-		auto& outStitch     = StitchBuffer->operator[](iOutputStitch);
+		auto& outStitch    = StitchBuffer->operator[](iOutputStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) != 0U) { // is this a knot?
 			prevPoint = outStitch;
@@ -2562,7 +2562,7 @@ void thred::grpAdj() {
 		  newSize.x = 1.0F;
 		}
 		auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
-		newSize    = fPOINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+		newSize               = fPOINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
 	  }
 	  if (newSize.x > newSize.y) {
 		auto coordinate = newSize.x * ZMARGIN;
@@ -2572,9 +2572,9 @@ void thred::grpAdj() {
 	  }
 	  else {
 		auto coordinate = newSize.y * ZMARGIN;
-		newSize.y  = std::round(coordinate);
-		coordinate = newSize.y * StitchWindowAspectRatio;
-		newSize.x  = std::round(coordinate);
+		newSize.y       = std::round(coordinate);
+		coordinate      = newSize.y * StitchWindowAspectRatio;
+		newSize.x       = std::round(coordinate);
 	  }
 	  if (newSize.x > wrap::toFloat(UnzoomedRect.x) || newSize.y > wrap::toFloat(UnzoomedRect.y)) {
 		ZoomRect.left = ZoomRect.bottom = 0.0F;
@@ -2765,7 +2765,7 @@ void thred::internal::defNam(fs::path const& fileName) {
 }
 
 void thred::internal::ritini() {
-  auto const directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+  auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
   auto&          defDir           = IniFile.defaultDirectory;
   auto const     defaultDirectory = gsl::span<char> {defDir};
   constexpr char FILLCHAR         = '\0';
@@ -4281,7 +4281,8 @@ auto thred::getFileHandle(std::filesystem::path const& newFileName, HANDLE& file
   // ToDo - use ifstream?
   // ifstream file(WorkingFileName, ios::in | ios::binary | ios::ate);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const handle = CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+  auto const handle =
+      CreateFile(newFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (handle == INVALID_HANDLE_VALUE) {
 	if (GetLastError() == ERROR_SHARING_VIOLATION) {
@@ -4492,9 +4493,10 @@ void thred::internal::zumin() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto const vertexIt = wrap::next(FormVertices->cbegin(),
-		                           FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		stitchPoint   = *vertexIt;
+		auto const vertexIt =
+		    wrap::next(FormVertices->cbegin(),
+		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+		stitchPoint = *vertexIt;
 		break;
 	  }
 	  if (StateMap->test(StateFlag::SELBOX)) {
@@ -4608,9 +4610,10 @@ void thred::internal::zumout() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto const vertexIt = wrap::next(FormVertices->cbegin(),
-		                           FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		stitchPoint   = *vertexIt;
+		auto const vertexIt =
+		    wrap::next(FormVertices->cbegin(),
+		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+		stitchPoint = *vertexIt;
 		break;
 	  }
 	  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT)) {
@@ -4987,7 +4990,7 @@ auto thred::internal::closlin() -> uint32_t {
 
   offset = wrap::toFloat(StitchWindowAbsRect.bottom - Msg.pt.y) /
            wrap::toFloat(StitchWindowAbsRect.bottom - StitchWindowAbsRect.top);
-  auto const offsetY   = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
+  auto const offsetY = (offset * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom);
   offset         = (ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right);
   auto       sum = BIGFLOAT;
   auto const tolerance = offset * TLFACTOR;
@@ -5486,8 +5489,8 @@ void thred::rotflt(fPOINT& point, float const rotationAngle, fPOINT const& rotat
 
 void thred::internal::rotstch(fPOINTATTR& stitch, float const rotationAngle, fPOINT const& rotationCenter) noexcept {
   auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
-  stitch.x   = point.x;
-  stitch.y   = point.y;
+  stitch.x         = point.x;
+  stitch.y         = point.y;
 }
 
 void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) {
@@ -6110,11 +6113,11 @@ void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
 }
 
 void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
-  auto const finishIt  = wrap::next(StitchBuffer->begin(), finish);
-  auto startIt = (finish != 0)?std::next(finishIt, -1): finishIt;
+  auto const finishIt      = wrap::next(StitchBuffer->begin(), finish);
+  auto       startIt       = (finish != 0) ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
-  auto delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto length = hypot(delta.x, delta.y);
+  auto       delta         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto       length        = hypot(delta.x, delta.y);
   while (length == 0.0F && startIt != StitchBuffer->begin()) {
 	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	length = hypot(delta.x, delta.y);
@@ -6135,9 +6138,9 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
 
 void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
   auto const startIt  = wrap::next(StitchBuffer->begin(), start);
-  auto finishIt = std::next(startIt);
-  auto delta    = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto length   = hypot(delta.x, delta.y);
+  auto       finishIt = std::next(startIt);
+  auto       delta    = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto       length   = hypot(delta.x, delta.y);
   ++finishIt;
   while (length < 2.0F && finishIt != StitchBuffer->end()) {
 	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
@@ -6166,9 +6169,10 @@ void thred::internal::delknt() {
 
 void thred::internal::delknot() {
   // Find the first knot stitch, if any
-  auto const firstStitch = std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](fPOINTATTR const& m) -> bool {
-	return ((m.attribute & KNOTMSK) != 0U);
-  });
+  auto const firstStitch =
+      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](fPOINTATTR const& m) -> bool {
+	    return ((m.attribute & KNOTMSK) != 0U);
+      });
   if (firstStitch != StitchBuffer->end()) {
 	thred::savdo();
 	// delete the knot stitches
@@ -6191,7 +6195,7 @@ auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> u
 }
 
 void thred::internal::setknt() {
-  auto buffer  = std::vector<fPOINTATTR> {};
+  auto buffer = std::vector<fPOINTATTR> {};
   buffer.reserve(StitchBuffer->size());
   buffer.push_back(StitchBuffer->front());
   strtknt(buffer, 0);
@@ -6450,8 +6454,8 @@ void thred::internal::delet() {
 	  currentFormVertex = form::pdir(form, currentFormVertex);
 	}
 	auto const vBegin   = wrap::next(FormVertices->begin(), form.vertexIndex);
-	auto vCurr    = vBegin;
-	auto vertexIt = vBegin;
+	auto       vCurr    = vBegin;
+	auto       vertexIt = vBegin;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!vertexMap.test(iVertex)) {
 		*vCurr = *vertexIt;
@@ -6461,7 +6465,7 @@ void thred::internal::delet() {
 	}
 	auto const eraseCount = wrap::toUnsigned(std::distance(vBegin, vCurr));
 	auto const eraseStart = wrap::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + eraseCount);
-	auto const eraseEnd   = wrap::next(eraseStart, (form.vertexCount - eraseCount));
+	auto const eraseEnd = wrap::next(eraseStart, (form.vertexCount - eraseCount));
 	FormVertices->erase(eraseStart, eraseEnd); // This invalidates iterators
 	auto const nextForm = wrap::toSize(ClosestFormToCursor) + 1U;
 	for (auto iForm = wrap::next(FormList->begin(), nextForm); iForm < FormList->end(); ++iForm) {
@@ -8029,7 +8033,7 @@ void thred::internal::duselrng(RANGE& selectedRange) {
 }
 
 void thred::internal::longer() {
-  auto flag    = true;
+  auto flag = true;
   if (ClosestPointIndex == LargestStitchIndex) {
 	return;
   }
@@ -8070,7 +8074,7 @@ void thred::internal::longer() {
 }
 
 void thred::internal::shorter() {
-  auto flag          = true;
+  auto flag = true;
   if (ClosestPointIndex == SmallestStitchIndex) {
 	return;
   }
@@ -8950,8 +8954,9 @@ void thred::internal::pntmrk() {
 	  break;
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto const vertexIt = wrap::next(FormVertices->cbegin(),
-	                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	  auto const vertexIt =
+	      wrap::next(FormVertices->cbegin(),
+	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	  dumrk(vertexIt->x, vertexIt->y);
 	  break;
 	}
@@ -9328,7 +9333,6 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
 }
 
 auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
-  //auto* fileInfo = gsl::narrow_cast<FINDINFO*>(nullptr);
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -9453,7 +9457,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 
 void thred::internal::lock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
-  auto lockInfo  = FINDINFO {};
+  auto lockInfo = FINDINFO {};
   // ToDo - Replace 512 with maximum files in subdirectory
   lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT(cppcoreguidelines-owning-memory)
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast)
@@ -9945,8 +9949,9 @@ void thred::internal::selfpnt() {
   StateMap->reset(StateFlag::SELBOX);
   SelectedFormVertices.start = ClosestVertexToCursor;
   SelectedFormVertices.form  = ClosestFormToCursor;
-  auto const vertexIt        = wrap::next(FormVertices->cbegin(),
-                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+  auto const vertexIt =
+      wrap::next(FormVertices->cbegin(),
+                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*vertexIt);
   StateMap->set(StateFlag::RESTCH);
 }
@@ -13155,8 +13160,9 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  ClosestVertexToCursor = form::nxt(FormList->operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
-		  auto const vertexIt = wrap::next(FormVertices->cbegin(),
-		                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+		  auto const vertexIt =
+		      wrap::next(FormVertices->cbegin(),
+		                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*vertexIt);
 		  shftflt(*vertexIt);
 		  StateMap->set(StateFlag::RESTCH);
@@ -15695,7 +15701,8 @@ void thred::internal::ritloc() {
 	fs::create_directory(lockFilePath);
 	lockFilePath /= L"thredloc.txt";
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const lockFile = CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	auto const lockFile =
+	    CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (lockFile != INVALID_HANDLE_VALUE) {
 	  auto bytesWritten = DWORD {0};
@@ -15723,8 +15730,8 @@ void thred::internal::crtcurs() noexcept {
 #pragma warning(pop)
 
 void thred::internal::duhom() {
-  auto const arg0      = fs::path {ArgList[0]};
-  *HomeDirectory = arg0.parent_path();
+  auto const arg0 = fs::path {ArgList[0]};
+  *HomeDirectory  = arg0.parent_path();
 }
 
 auto thred::getHomeDir() noexcept -> fs::path* {
@@ -15815,7 +15822,8 @@ void thred::internal::redini() {
 	  setPrefs();
 	}
 	else {
-	  auto const directory = utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
+	  auto const directory =
+	      utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
@@ -16170,7 +16178,7 @@ void thred::internal::init() {
   auto const blank = std::wstring {};
   for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	auto windowFlags     = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
+	auto windowFlags = gsl::narrow_cast<DWORD>(SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER);
 	auto buttonTxt = std::wstring {};
 	switch (iButton) {
 	  case HBOXSEL: {
@@ -16303,8 +16311,8 @@ void thred::internal::relin() {
 
 void thred::internal::dumov() {
   constexpr auto ABPOINTS = 7U; // Number of arrow box points
-  auto const sCurr    = wrap::next(StitchBuffer->begin(), MoveAnchor);
-  auto const sNext    = std::next(sCurr);
+  auto const     sCurr    = wrap::next(StitchBuffer->begin(), MoveAnchor);
+  auto const     sNext    = std::next(sCurr);
   RotateAngle             = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   if (sCurr->x >= ZoomRect.left && sCurr->x <= ZoomRect.right && sCurr->y >= ZoomRect.bottom &&
       sCurr->y <= ZoomRect.top) {
@@ -16409,7 +16417,7 @@ auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap,
                               fPOINTATTR const&        stitchPoint,
                               fPOINT const&            cellSize) -> bool {
   auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
-                                        floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
+                                              floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
 }
 
@@ -16436,7 +16444,7 @@ void thred::internal::drwStch() {
   auto stitchCount = 0U;
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	auto const deltaCount = gsl::narrow<uint32_t>(ColorChangeTable->operator[](iColor + 1U).stitchIndex -
-	                                        ColorChangeTable->operator[](iColor).stitchIndex);
+	                                              ColorChangeTable->operator[](iColor).stitchIndex);
 	if (deltaCount > stitchCount) {
 	  stitchCount = deltaCount;
 	}
@@ -16682,8 +16690,9 @@ void thred::internal::drwStch() {
 	  }
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto const vertexIt = wrap::next(FormVertices->cbegin(),
-	                             FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
+	  auto const vertexIt =
+	      wrap::next(FormVertices->cbegin(),
+	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
 	  thred::ritfcor(*vertexIt);
 	}
 	if (!StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::FRMPSEL)) {
@@ -17285,7 +17294,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
-			auto textSize = SIZE {0L, 0L};
+			auto       textSize = SIZE {0L, 0L};
 			wrap::getTextExtentPoint32(
 			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 			wrap::textOut(DrawItem->hDC,

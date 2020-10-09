@@ -829,8 +829,8 @@ void formForms::dasyfrm() {
   auto const halfPetalPointCount = IniFile.daisyPetalPoints / 2;
   auto       angle               = 0.0F;
   for (auto iMacroPetal = 0U; iMacroPetal < IniFile.daisyPetalCount; ++iMacroPetal) {
-	auto petalPointAngle         = 0.0F;
-	PseudoRandomValue            = SEED;
+	auto petalPointAngle = 0.0F;
+	PseudoRandomValue    = SEED;
 	for (auto iPoint = 0U; iPoint < petalPointCount; ++iPoint) {
 	  auto distanceFromDaisyCenter = 0.0F;
 	  switch (borderType) {
@@ -883,7 +883,7 @@ void formForms::dasyfrm() {
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
-		auto const guideIt   = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
+		auto const guideIt = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide + iMacroPetal);
 		guideIt->start = (IniFile.daisyPetalCount - iMacroPetal - 1) * IniFile.daisyInnerCount + 1U;
 		guideIt->finish = iVertex;
 	  }
@@ -1173,8 +1173,8 @@ void formForms::wavfrm() {
 	auto vBegin    = wrap::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  auto const vNext       = wrap::next(vBegin, iNextVertex);
-	  auto const vWave       = wrap::next(vBegin, waveIndex);
+	  auto const     vNext       = wrap::next(vBegin, iNextVertex);
+	  auto const     vWave       = wrap::next(vBegin, waveIndex);
 	  points.emplace_back(-vNext->x + vWave->x, -vNext->y + vWave->y);
 	  ++iPoint;
 	  waveIndex = iNextVertex;

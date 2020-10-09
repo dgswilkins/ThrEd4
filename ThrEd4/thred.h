@@ -80,7 +80,8 @@ void ritfcor(fPOINT const& point);
 void ritmov(uint32_t formIndex) noexcept;
 void ritot(uint32_t number);
 void rngadj();
-auto rotang1(fPOINTATTR const& unrotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept -> fPOINT;
+auto rotang1(fPOINTATTR const& unrotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept
+    -> fPOINT;
 auto rotangf(fPOINT const& unrotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept -> fPOINT;
 void rotflt(fPOINT& point, float rotationAngle, fPOINT const& rotationCenter) noexcept;
 void rotfn(float rotationAngle, fPOINT const& rotationCenter);

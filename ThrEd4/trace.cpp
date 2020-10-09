@@ -649,14 +649,14 @@ void trace::internal::dutrac() {
 		++point;
 	  }
 	  auto const right = (point < limit) ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
-	                               : bitmap::getBitmapWidth();
+	                                     : bitmap::getBitmapWidth();
 	  point = savedPoint;
 	  limit = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	  while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
 		--point;
 	  }
 	  auto const left = (point == limit) ? 0 : point - limit;
-	  point     = savedPoint;
+	  point           = savedPoint;
 	  while (point > 0 && !TracedEdges->test(wrap::toSize(point))) {
 		if (point > bitmap::getBitmapWidth()) {
 		  point -= bitmap::getBitmapWidth();
@@ -666,14 +666,14 @@ void trace::internal::dutrac() {
 		}
 	  }
 	  auto const bottom = (point > 0) ? point / bitmap::getBitmapWidth() : 0;
-	  point       = savedPoint;
-	  limit       = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+	  point             = savedPoint;
+	  limit             = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	  while (point < limit && !TracedEdges->test(wrap::toSize(point))) {
 		point += bitmap::getBitmapWidth();
 	  }
 	  auto const top = (point < limit) ? point / bitmap::getBitmapWidth() : bitmap::getBitmapHeight();
-	  auto flag                = 0U;
-	  auto minimumEdgeDistance = std::numeric_limits<int32_t>::max();
+	  auto       flag                = 0U;
+	  auto       minimumEdgeDistance = std::numeric_limits<int32_t>::max();
 	  if (left != 0) {
 		minimumEdgeDistance = CurrentTracePoint.x - left;
 		flag                = TRCL;
@@ -813,7 +813,7 @@ void trace::trinit() {
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
-		auto iPixel = 0;
+		auto       iPixel = 0;
 		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
 		  if (TraceBitmapData[iPixel] != color) {
 			break;

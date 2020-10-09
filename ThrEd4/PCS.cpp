@@ -252,11 +252,11 @@ auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 	return true;
   }
   auto const largeFlag = (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
-                   (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY);
-  auto const hoopSize      = largeFlag ? largeHoop : smallHoop;
-#pragma warning(suppress : 26812) // enum type is unscoped 
-  PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP; 
-  auto delta = fPOINT {};
+                         (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY);
+  auto const hoopSize = largeFlag ? largeHoop : smallHoop;
+#pragma warning(suppress : 26812) // enum type is unscoped
+  PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP;
+  auto delta         = fPOINT {};
   if (boundingRect.right > hoopSize.x) {
 	delta.x = hoopSize.x - boundingRect.right;
   }

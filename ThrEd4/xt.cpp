@@ -127,8 +127,8 @@ void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEA
 }
 
 auto xt::internal::bpsg() noexcept -> uint32_t {
-  constexpr auto BIT4      = 0x8U;
-  constexpr auto BIT31     = 0x40000000U;
+  constexpr auto BIT4  = 0x8U;
+  constexpr auto BIT31 = 0x40000000U;
   if (PseudoRandomValue == 0U) {
 	PseudoRandomValue = FSED;
   }
@@ -437,7 +437,7 @@ void xt::fethr() {
 }
 
 constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
-  auto const op     = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
+  auto const op = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
   return op;
 }
 
@@ -530,8 +530,8 @@ auto xt::internal::gucon(FRMHED const&            form,
 	return 0;
   }
   auto const& indentedPoint = xt::insid(form);
-  auto up = startVertex;
-  auto down = startVertex;
+  auto        up            = startVertex;
+  auto        down          = startVertex;
   do {
 	if (up == endVertex) {
 	  StateMap->reset(StateFlag::WLKDIR);
