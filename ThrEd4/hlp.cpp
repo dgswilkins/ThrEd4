@@ -9,7 +9,7 @@
 #endif
 
 // Windows Header Files:
-#include <windows.h> // Win32 Platform SDK main header
+#include <Windows.h> // Win32 Platform SDK main header
 #include <HtmlHelp.h>
 
 // Open Source headers

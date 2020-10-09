@@ -10,7 +10,7 @@
 #endif
 
 // Windows Header Files:
-#include <windows.h> // Win32 Platform SDK main header
+#include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
 #include <filesystem>

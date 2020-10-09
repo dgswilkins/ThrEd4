@@ -66,12 +66,10 @@ auto wrap::toFloat(double invar) -> float {
 	UNREFERENCED_PARAMETER(e);
 	auto const var  = gsl::narrow_cast<float>(invar);
 	auto const diff = abs(invar - gsl::narrow_cast<double>(var));
-	if (diff < 4e-5) {
-	  return var;
-	}
-	else {
+	if (diff > 4e-5) {
 	  throw;
 	}
+	return var;
   }
   catch (...) { // otherwise throw
 	throw;
