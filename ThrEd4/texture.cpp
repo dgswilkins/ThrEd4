@@ -1139,7 +1139,7 @@ void texture::txof() {
 enum textureStyles {
   VRTYP,
   HORTYP,
-  ANGTYP,
+  ANGTYP
 };
 
 void texture::internal::dutxfn(uint32_t textureType) {

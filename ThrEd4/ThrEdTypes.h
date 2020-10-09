@@ -383,7 +383,7 @@ enum stringLabel {
   STR_UNDCOL,
   STR_FRMBOX,
   STR_TXOF,
-  STR_LEN, // must be last entry in enum
+  STR_LEN // must be last entry in enum
 };
 
 // edge tracing directions
@@ -738,7 +738,7 @@ enum formStyles {
   FRMTEAR,      // Teardrop form
   FRMZIGZAG,    // Zig-Zag form
   FRMWAVE,      // Wave Form
-  FRMDAISY,     // Daisy form
+  FRMDAISY     // Daisy form
 };
 
 // main menu items
@@ -761,7 +761,7 @@ enum mainMenuItems {
   M_2,
   M_3,
   M_4,
-  M_HELP,
+  M_HELP
 };
 
 // view menu items
@@ -776,7 +776,7 @@ enum viewMenuItems {
   MVW_DSGN,
   MVW_KNOT,
   MVW_MARK,
-  MVW_ABOUT,
+  MVW_ABOUT
 };
 
 // fill menu items
@@ -798,7 +798,7 @@ enum clipDataType {
   CLP_STCH = 1,
   CLP_FRM,
   CLP_FRMS,
-  CLP_FRMPS,
+  CLP_FRMPS
 };
 
 // edge underlay bit
@@ -873,7 +873,7 @@ enum fillStyles {
   FTHF,     // Feather fill
   TXVRTF,   // Vertical texture fill
   TXHORF,   // Horizontal texture fill
-  TXANGF,   // Angle texture fill
+  TXANGF   // Angle texture fill
 };
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
@@ -912,7 +912,7 @@ enum preferenceItems {
   PEG,    // 26
   PHUPY,  // 27
   PLRAT,  // 28
-  PAPSL,  // 29
+  PAPSL  // 29
 };
 
 // file menu items
@@ -956,7 +956,7 @@ enum fillMessageCodes {
   FML_PIC,
   FMX_UNF,
   FML_CONT,
-  FML_CHAIN,
+  FML_CHAIN
 };
 
 // button windows
@@ -970,7 +970,7 @@ enum textureButtons { // text button windows
   HTXVRT,
   HTXHOR,
   HTXANG,
-  HTXMIR,
+  HTXMIR
 };
 
 constexpr uint32_t HLIN = HNUM;
@@ -2858,7 +2858,7 @@ enum interleaveTypes { // interleave sequence identifiers
   I_AP,
   I_FIL,
   I_FTH,
-  I_BRD,
+  I_BRD
 };
 
 class INTINF
