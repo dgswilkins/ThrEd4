@@ -394,14 +394,12 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   line[1]          = thred::stch2pxr(*vCurr);
   auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *screenDPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
-  // NOLINTNEXTLINE(readability-magic-numbers)
   auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
   auto const delta  = fPOINT {vPrev->x - vCurr->x, vPrev->y - vCurr->y};
   auto       angle  = atan2(delta.y, delta.x);
   auto       offset = fPOINT {length * cos(angle), length * sin(angle)};
   auto const point  = fPOINT {vCurr->x + offset.x, vCurr->y + offset.y};
   angle             = atan2(-delta.x, delta.y);
-  // NOLINTNEXTLINE(readability-magic-numbers)
   length /= 2.0F;
   offset             = fPOINT {length * cos(angle), length * sin(angle)};
   auto adjustedPoint = fPOINT {point.x + offset.x, point.y + offset.y};
@@ -1034,7 +1032,7 @@ auto form::internal::findDistanceToSide(fPOINT const& lineStart,
   if ((C == 0.0F) && (D == 0.0F)) {
 	distance = sqrt(A * B);
 	// Arbitrarily choose the first point since start and end are the same
-	return -0.1F; // NOLINT(readability-magic-numbers)
+	return -0.1F; 
   }
   auto const dot    = A * C + B * D;
   auto const len_sq = C * C + D * D;
@@ -1080,7 +1078,7 @@ auto form::closfrm() -> bool {
 		  if ((length < minimumLength) && (length >= 0.0F)) {
 			minimumLength = length;
 			closestForm   = iForm;
-			if (param < 0.5F) { // NOLINT(readability-magic-numbers)
+			if (param < 0.5F) { 
 			  closestVertex = iVertex;
 			}
 			else {
@@ -1786,10 +1784,8 @@ auto form::psg() noexcept -> uint32_t {
   if (PseudoRandomValue == 0U) {
 	PseudoRandomValue = SEED;
   }
-  // NOLINTNEXTLINE(readability-magic-numbers)
   auto const temp = PseudoRandomValue & 0x48000000U;
   PseudoRandomValue <<= 1U;
-  // NOLINTNEXTLINE(readability-magic-numbers)
   if (temp == 0x40000000U || temp == 0x8000000U) {
 	++PseudoRandomValue;
   }
@@ -3099,7 +3095,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   }
   auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
   // reserve a little more than we need. Determined empirically
-  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U); // NOLINT(readability-magic-numbers)
+  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U); 
   auto vCurr = vBegin;
   for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	auto const vNext  = wrap::next(vBegin, form::nxt(form, iVertex));
@@ -3137,7 +3133,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   iclpx.push_back(wrap::toUnsigned(regionCrossingData.size()));
   auto clipStitchPoints = std::vector<CLIPNT> {};
   // Reserve some memory, but probably not enough
-  clipStitchPoints.reserve(1000U); // NOLINT(readability-magic-numbers)
+  clipStitchPoints.reserve(1000U); 
   auto pasteLocation = fPOINT {};
   auto texture       = TexturePointsBuffer->begin();
   auto iclpxSize     = wrap::toUnsigned(iclpx.size());
@@ -3279,7 +3275,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   if (endPoint != 0U) {
 	--endPoint;
 	// reserve a reasonable amount but not the full amount potentially required
-	clipSegments.reserve(endPoint / 10U); // NOLINT(readability-magic-numbers)
+	clipSegments.reserve(endPoint / 10U); 
 	auto previousPoint = 0U;
 	for (auto iPoint = 0U; iPoint < endPoint; ++iPoint) {
 	  switch (clipStitchPoints[iPoint].flag) {

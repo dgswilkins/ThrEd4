@@ -575,7 +575,6 @@ void clip::internal::fxlen(FRMHED const&             form,
 	  auto interval   = minimumInterval;
 	  minimumSpacing  = adjustedSpace;
 	  interval /= wrap::toFloat(initialCount);
-	  // NOLINTNEXTLINE(readability-magic-numbers)
 	  adjustedSpace += interval / 2.0F;
 	  largestSpacing = smallestSpacing + interval;
 	}
@@ -703,7 +702,6 @@ void clip::duxclp(FRMHED const& form) {
   auto chainEndPoints = std::vector<fPOINT> {};
   // reserve some memory and rely on push_back behaviour
   // and geometric memory re-allocation for efficiency
-  // NOLINTNEXTLINE(readability-magic-numbers)
   chainEndPoints.reserve(50U);
   ci::dufxlen(form, chainEndPoints);
   auto tempClipPoints = std::vector<fPOINT> {};
@@ -902,7 +900,6 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 	auto const& form = FormList->operator[](ClosestFormToCursor);
 	if (form.type == FRMLINE) {
 	  ci::duchfn(chainEndPoints, chainLength - 1, chainLength);
-	  // NOLINTNEXTLINE(readability-magic-numbers)
 	  auto backupAt = 8U;
 	  if (StateMap->test(StateFlag::LINCHN)) {
 		--backupAt;
@@ -924,7 +921,7 @@ void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
 
 void clip::chnfn(FRMHED const& form) {
   auto chainEndPoints = std::vector<fPOINT> {};
-  // reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency NOLINTNEXTLINE(readability-magic-numbers)
+  // reserve some memory and rely on push_back behaviour and geometric memory re-allocation for efficiency
   chainEndPoints.reserve(50U);
   clip::deleclp(ClosestFormToCursor);
   ci::dufxlen(form, chainEndPoints);

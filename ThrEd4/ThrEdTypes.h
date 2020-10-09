@@ -999,7 +999,7 @@ class INIFILE // ini file structure
   float    snapLength {};                          // snap together length
   float    starRatio {};                           // star ratio
   float    spiralWrap {};                          // spiral wrap
-  COLORREF bitmapBackgroundColors[COLORCNT] {}; // bitmap background color preferences NOLINT(modernize-avoid-c-arrays)
+  COLORREF bitmapBackgroundColors[COLORCNT] {}; // bitmap background color preferences 
   float    buttonholeCornerLength {}; // buttonhole fill corner length
   float    picotSpace {};             // space between border picots
   int8_t   hoopType {};               // hoop type
@@ -1040,7 +1040,7 @@ class INIFILE // ini file structure
   float    featherRatio {};           // feather ratio
   float    featherMinStitchSize {};   // feather floor
   uint16_t featherCount {};           // feather fill psg granularity
-  char p2cName[MAX_PATH] {}; // pes2card file                       NOLINT(modernize-avoid-c-arrays)
+  char p2cName[MAX_PATH] {}; // pes2card file                       
   float    underlayIndent {};    // edge walk/underlay indent
   float    underlayAngle {};     // underlay angle
   float    underlaySpacing {};   // underlay spacing
@@ -1060,7 +1060,7 @@ class INIFILE // ini file structure
   uint16_t daisyHeartCount {};   // daisy heart count
   uint16_t textureEditorSize {}; // texture editor pixels
   float    clpspc {};            // clipboard fill spacing
-  char designerName[NAME_LEN] {}; // designer name                       NOLINT(modernize-avoid-c-arrays)
+  char designerName[NAME_LEN] {}; // designer name                       
 
   // constexpr INIFILE() noexcept = default;
   // INIFILE(INIFILE const&) = default;
@@ -2367,12 +2367,12 @@ class STREX // thred v1.0 file header extension
   float    hoopSizeX {};              // hoop size x dimension
   float    hoopSizeY {};              // hoop size y dimension
   float    stgran {};                 // stitches per millimeter
-  char     creatorName[NAME_LEN] {};  // name of the file creator NOLINT(modernize-avoid-c-arrays)
-  char     modifierName[NAME_LEN] {}; // name of last file modifier NOLINT(modernize-avoid-c-arrays)
+  char     creatorName[NAME_LEN] {};  // name of the file creator 
+  char     modifierName[NAME_LEN] {}; // name of last file modifier 
   int8_t   auxFormat {};              // auxillary file format
   int8_t   stres {};                  // reserved
   uint32_t texturePointCount {};      // textured fill point count
-  int8_t   res[RES_SIZE] {};          // reserved for expansion NOLINT(modernize-avoid-c-arrays)
+  int8_t   res[RES_SIZE] {};          // reserved for expansion 
 
   // constexpr STREX() noexcept = default;
   // STREX(STREX const&) = default;
@@ -2596,13 +2596,13 @@ class VRCT2
 class CURSORMASK
 {
   public:
-  uint8_t form[128] {};            // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t dline[128] {};           // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t uprightNeedle[128] {};   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t leftUpNeedle[128] {};    // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t leftDownNeedle[128] {};  // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t rightUpNeedle[128] {};   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  uint8_t rightDownNeedle[128] {}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t form[128] {};            
+  uint8_t dline[128] {};           
+  uint8_t uprightNeedle[128] {};   
+  uint8_t leftUpNeedle[128] {};    
+  uint8_t leftDownNeedle[128] {};  
+  uint8_t rightUpNeedle[128] {};   
+  uint8_t rightDownNeedle[128] {}; 
 
   // constexpr CURSORMASK() noexcept = default;
   // CURSORMASK(CURSORMASK const&) = default;
@@ -2615,13 +2615,13 @@ class CURSORMASK
 class BALHED // balarad file header
 {
   public:
-  COLORREF color[256] {}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  COLORREF color[256] {}; 
   uint32_t signature {};
   uint16_t version {};
   float    hoopSizeX {};
   float    hoopSizeY {};
   COLORREF backgroundColor {};
-  uint8_t  res[1006] {}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t  res[1006] {}; 
 
   // constexpr BALHED() noexcept = default;
   // BALHED(BALHED const&) = default;

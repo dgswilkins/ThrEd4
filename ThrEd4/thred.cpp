@@ -4379,7 +4379,6 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  bitmap::assignUBFilename(*DefaultDirectory);
 	}
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	// BufferIndex     = 0;
 	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	thred::movStch();

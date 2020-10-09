@@ -16,7 +16,7 @@
 class PESLED
 {
   public:
-  int8_t   ver[8] {0}; // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  int8_t   ver[8] {0}; 
   uint32_t pec {0U};
 
   constexpr PESLED() noexcept = default;
@@ -30,14 +30,14 @@ class PESLED
 class PESHED
 {
   public:
-  char     led[8]  {0};    //   0-7  Identification and version (#PES0001)         // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char     led[8]  {0};    //   0-7  Identification and version (#PES0001)         
   uint32_t off     {0U};   //   8-b  Absolute PEC section byte offset
   uint16_t hpsz    {0U};   //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
   uint16_t usdn    {0U};   //   e,f  Use existing design area (1)
   uint16_t blct    {0U};   // 10,11  CSewSeg segment block count (1)
-  uint8_t  hnd1[4] {0};    // 12-15  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint8_t  hnd1[4] {0};    // 12-15  header end (FF FF 00 00)                      
   uint16_t celn    {0U};   // 16,17  Length of following string (7)
-  char     ce[7]   {0};    // 18-1e  CEmbOne identification (CEmbOne)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char     ce[7]   {0};    // 18-1e  CEmbOne identification (CEmbOne)              
   int16_t  xlft    {0};    // 1f,20  Extent left
   int16_t  xtop    {0};    // 21,22  Extent top
   int16_t  xrht    {0};    // 23,24  Extent right
@@ -57,11 +57,11 @@ class PESHED
   int16_t  ytrn    {0};    // 4b,4c  CSewSeg y coordinate translation (0)
   int16_t  xsiz    {0};    // 4d,4e  CSewSeg width
   int16_t  ysiz    {0};    // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {0};    // 51,58  unknown (0)                                   // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  int8_t   ukn2[8] {0};    // 51,58  unknown (0)                                   
   uint16_t bcnt    {0U};   // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  uint8_t  hnd2[4] {0};    // 5b-5e  header end (FF FF 00 00)                      // NOLINT(modernize-avoid-c-arrays)
+  uint8_t  hnd2[4] {0};    // 5b-5e  header end (FF FF 00 00)                      
   uint16_t cslen   {0U};   // 5f,60  CSewSeg length (7)
-  char     cs[7]   {0};    // 61-67  CSewSeg identification (CSewSeg)              // NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char     cs[7]   {0};    // 61-67  CSewSeg identification (CSewSeg)              
 // uint16_t styp1;        // 68,69  Stitch type (0)
 // uint16_t scol;         // 6a,6b  Stitch Palette thread index
 
@@ -103,17 +103,17 @@ class PESSTCHLST
 class PECHDR
 {
   public:
-  char    label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char    label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       
   int8_t  labnd {0};     // carriage return character
-  uint8_t ukn1[11] {0U}; // Unknown (' ') NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t ukn1[11] {0U}; // Unknown (' ') 
   uint8_t  ukn2 {0U};    // Unknown
   uint16_t hnd1 {0U};    // Unknown (0x00ff)
   uint8_t  thumbWidth {0U}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                             // Thus, 6 would mean 6×8 = 48 pixels per line
   uint8_t thumbHeight {0U}; // Thumbnail image height in pixels (38)
-  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         
   uint8_t colorCount {0U}; // Number of colors minus one, 0xFF means 0 colors
-  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         
 
   constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;

@@ -112,7 +112,6 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	BitmapDC = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
-	  // NOLINTNEXTLINE(readability-magic-numbers)
 	  auto       bitmapWidthBytes = gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U << 2U;
 	  auto const widthOverflow    = BitmapWidth % 32;
 	  if (widthOverflow != 0U) {

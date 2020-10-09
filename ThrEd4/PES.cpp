@@ -380,7 +380,6 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	return false;
   }
   auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
-  // auto pecHeader2          = convert_ptr<PECHDR2*>(&fileBuffer[pesHeader->off + sizeof(PECHDR)]);
   auto const pecOffset     = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
   auto*      PESstitch     = &fileBuffer[pecOffset];
   auto const pesColorCount = pecHeader->colorCount + 1U;
@@ -462,7 +461,6 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	  }
 	  ++iPESstitch;
 	}
-	// IniFile.auxFileType=AUXPES;
 	thred::hupfn();
   }
   else {

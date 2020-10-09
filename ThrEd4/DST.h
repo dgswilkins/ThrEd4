@@ -18,32 +18,32 @@ namespace fs = std::filesystem;
 class DSTHED // dst file header
 {
   public:
-  char desched[3]  {0}; // 00  00	description  NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char desc[17]    {0}; // 03  03                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char recshed[3]  {0}; // 20  14	record count NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char recs[8]     {0}; // 23  17                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char cohed[3]    {0}; // 31  1F                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char co[4]       {0}; // 34  22                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char xplushed[3] {0}; // 38  26	x+ size      NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char xplus[6]    {0}; // 41  29                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char xminhed[3]  {0}; // 47  2F	x- size      NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char xmin[6]     {0}; // 50  32                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char yplushed[3] {0}; // 56  38                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char yplus[6]    {0}; // 59  3B	y+ size      NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char yminhed[3]  {0}; // 65  41                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char ymin[6]     {0}; // 68  44	y- size      NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char axhed[3]    {0}; // 74  4A                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char ax[7]       {0}; // 77  4D                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char ayhed[3]    {0}; // 84  54                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char ay[7]       {0}; // 87  57                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char mxhed[3]    {0}; // 94  5E                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char mx[7]       {0}; // 97  61                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char myhed[3]    {0}; // 104 68                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char my[7]       {0}; // 107 6B                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char pdhed[2]    {0}; // 114 72                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char pd[7]       {0}; // 116 74                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char eof[1]      {0}; // 123 7B                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
-  char res[388]    {0}; // 124 7C                NOLINT(modernize-avoid-c-arrays, readability-magic-numbers)
+  char desched[3]  {0}; // 00  00	description
+  char desc[17]    {0}; // 03  03
+  char recshed[3]  {0}; // 20  14	record count
+  char recs[8]     {0}; // 23  17
+  char cohed[3]    {0}; // 31  1F
+  char co[4]       {0}; // 34  22
+  char xplushed[3] {0}; // 38  26	x+ size
+  char xplus[6]    {0}; // 41  29
+  char xminhed[3]  {0}; // 47  2F	x- size
+  char xmin[6]     {0}; // 50  32
+  char yplushed[3] {0}; // 56  38
+  char yplus[6]    {0}; // 59  3B	y+ size
+  char yminhed[3]  {0}; // 65  41
+  char ymin[6]     {0}; // 68  44	y- size
+  char axhed[3]    {0}; // 74  4A
+  char ax[7]       {0}; // 77  4D
+  char ayhed[3]    {0}; // 84  54
+  char ay[7]       {0}; // 87  57
+  char mxhed[3]    {0}; // 94  5E
+  char mx[7]       {0}; // 97  61
+  char myhed[3]    {0}; // 104 68
+  char my[7]       {0}; // 107 6B
+  char pdhed[2]    {0}; // 114 72
+  char pd[7]       {0}; // 116 74
+  char eof[1]      {0}; // 123 7B
+  char res[388]    {0}; // 124 7C
 
   constexpr DSTHED() noexcept = default;
   // DSTHED(DSTHED&&) = default;

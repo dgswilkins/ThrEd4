@@ -8,7 +8,7 @@
 // this does NOT validate that the EnumCount element is the last element
 template <class T> struct has_enum_count {
   using yes = char;
-  using no  = yes (&)[2]; // NOLINT(modernize-avoid-c-arrays)
+  using no  = yes (&)[2];
 
   template <class U> static auto test(decltype(U::EnumCount)*) -> yes;
   template <class U> static auto test(...) -> no;

@@ -415,7 +415,6 @@ void repair::repar() {
   auto       repairMessage = std::wstring {};
   auto const repairType    = ri::frmchkfn();
   thred::savdo();
-  // RepairString = MsgBuffer;
   if ((repairType & BADFLT) != 0U) {
 	ri::repflt(repairMessage);
   }

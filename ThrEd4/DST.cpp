@@ -186,7 +186,6 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
-  // NOLINTNEXTLINE(readability-magic-numbers)
   colorData.reserve(32);
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
@@ -327,9 +326,8 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
   auto const deltaB = gsl::narrow_cast<int32_t>(color1.b) - gsl::narrow_cast<int32_t>(color2.b);
   // From https://www.compuphase.com/cmetric.htm a more perceptually accurate color distance formula
-  // NOLINTNEXTLINE(readability-magic-numbers)
   return wrap::round<DWORD>(std::sqrtf(wrap::toFloat((((512 + meanR) * deltaR * deltaR) / 256) + 4 * deltaG * deltaG +
-                                                     (((767 - meanR) * deltaB * deltaB) / 256)))); // NOLINT(readability-magic-numbers)
+                                                     (((767 - meanR) * deltaB * deltaB) / 256))));
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
@@ -919,7 +917,6 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto const* desc        = strrchr(convAuxName.data(), '\\') + 1U;
 		auto        DSTRecords  = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-		// NOLINTNEXTLINE(readability-magic-numbers)
 		DSTRecords.reserve(StitchBuffer->size() + 128U);
 		auto DSTOffset = DSTOffsets {};
 		auto dstHeader = DSTHED {};
@@ -940,7 +937,6 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		  }
 		}
 		// clang-format off
-        // NOLINTNEXTLINE(readability-magic-numbers)
         dstHeader.desc[16] = 0xd;
         strncpy(static_cast<char *>(dstHeader.recshed),    "ST:", sizeof(dstHeader.recshed));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                        
         strncpy(static_cast<char *>(dstHeader.recs),  fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
