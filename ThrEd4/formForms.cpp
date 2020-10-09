@@ -157,9 +157,8 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(stringTable[STR_TXT1], LabelWindowCoords);
-  valueWindow[LLAYR] =
-      ffi::txtrwin(fmt::format(L"{}", (gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U)),
-                   ValueWindowCoords); // NOLINT
+  // NOLINTNEXTLINE hicpp-signed-bitwise
+  valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (form.attribute & FRMLMSK) >> 1U), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (form.type != FRMLINE) {
 	labelWindow[LCWLK] = ffi::txtwin(stringTable[STR_CWLK], LabelWindowCoords);
