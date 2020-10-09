@@ -14,8 +14,10 @@ clang-analyzer-security*,\
 clang-analyzer-unix*,\
 clang-analyzer-valist*,\
 clang-diagnostic-*,\
--clang-diagnostic-missing-variable-declarations,\
-cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
+-clang-diagnostic-missing-variable-declarations,-clang-diagnostic-nonportable-system-include-path,\
+cppcoreguidelines-*,-cppcoreguidelines-avoid-c-arrays,-cppcoreguidelines-avoid-magic-numbers,\
+-cppcoreguidelines-pro-type-union-access,-cppcoreguidelines-pro-bounds-constant-array-index,\
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
 google-*,-google-runtime-references,\
 hicpp-*,-hicpp-avoid-c-arrays,-hicpp-member-init,-hicpp-use-nullptr,\
 llvm-*,-llvm-include-order,-llvm-header-guard,-llvm-qualified-auto,\
