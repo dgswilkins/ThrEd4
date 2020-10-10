@@ -1,26 +1,24 @@
 #pragma once
 
 // Standard Libraries
+#include <type_traits>
 #include <bitset>
 #include <cstddef>
 
 // struct for ensuring an enum has a count element.
 // this does NOT validate that the EnumCount element is the last element
-template <class T> struct has_enum_count {
-  using yes = char;
-  using no  = yes (&)[2];
+// default template:
+template <class, class = void> struct has_EnumCount : std::false_type { };
 
-  template <class U> static auto test(decltype(U::EnumCount)*) -> yes;
-  template <class U> static auto test(...) -> no;
-
-  // SFINAE magic.
-  static bool const value = sizeof(test<T>(nullptr)) == sizeof(yes);
-};
+// specialized as has_EnumCount< T , void > or sfinae
+template <class T>
+struct has_EnumCount<T, std::void_t<decltype(T::EnumCount)>>
+    : std::is_same<T, decltype(T::EnumCount)> { };
 
 template <typename EnumType> class EnumMap
 {
   static_assert(std::is_enum<EnumType>::value, "Type for EnumMap must be an Enum");
-  static_assert(has_enum_count<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
+  static_assert(has_EnumCount<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
   public:
   explicit constexpr EnumMap(uint32_t i_val) : mask_(i_val) {
