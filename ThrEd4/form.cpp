@@ -612,6 +612,7 @@ void form::drwfrm() {
 	auto const& form = FormList->operator[](iForm);
 	form::frmlin(form);
 	if (!FormLines->empty()) {
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  auto const layer = gsl::narrow_cast<uint8_t>((form.attribute & FRMLMSK) >> 1U);
 	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 		auto line      = std::array<POINT, 2> {};
@@ -1015,7 +1016,7 @@ void form::duform(int32_t formType) {
 	  formForms::dasyfrm();
 	  break;
 	default:
-	  // NOLINTNEXTLINE
+	  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion) ToDo - why is this neccessary?
 	  outDebugString(L"default hit in duform: formType [{}]\n", formType);
 	  break;
   }
