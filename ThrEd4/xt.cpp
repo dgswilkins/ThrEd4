@@ -1118,6 +1118,7 @@ void xt::fsort() {
 	else {
 	  auto str = std::wstring {};
 	  displayText::loadString(str, IDS_SRTER);
+	  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
 	  displayText::shoMsg(fmt::format(str, pFRecs[badForm]->form));
 	}
   }

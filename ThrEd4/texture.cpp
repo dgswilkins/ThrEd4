@@ -1705,6 +1705,7 @@ void texture::setshft() {
 void texture::writeScreenWidth(int32_t position) {
   auto fmtStr = std::wstring {};
   displayText::loadString(fmtStr, IDS_TXWID);
+  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
   auto const scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }
