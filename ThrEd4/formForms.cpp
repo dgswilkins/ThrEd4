@@ -139,7 +139,7 @@ void formForms::internal::nxtlinprf() noexcept {
 }
 
 void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount) {
-  constexpr auto edgeArray = std::array<uint16_t, 13> {
+  static constexpr auto edgeArray = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const& stringTable  = *StringTable;
   auto&       labelWindow  = *LabelWindow;

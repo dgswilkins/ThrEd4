@@ -366,9 +366,9 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 	  hr             = pFileOpen->GetOptions(&dwOptions);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
-		constexpr auto filter1         = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
-		constexpr auto filter2         = COMDLG_FILTERSPEC {L"All files", L"*.*"};
-		constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {filter1, filter2};
+		static constexpr auto filter1         = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
+		static constexpr auto filter2         = COMDLG_FILTERSPEC {L"All files", L"*.*"};
+		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {filter1, filter2};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
 		hr += pFileOpen->SetFileTypes(filterFileTypes.size(), filterFileTypes.data());
