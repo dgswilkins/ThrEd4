@@ -121,7 +121,7 @@ static auto BalaradOffset      = fPOINT {};   // balarad offset
 static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
-static auto UndoBuffer = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(nullptr); // backup data
+static auto UndoBuffer = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(nullptr); // backup data NOLINT (modernize-avoid-c-arrays)
 
 // cursors
 static auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -677,7 +677,7 @@ void thred::internal::dudat() {
                     sizeof(decltype(ClipPoints->back())) * ClipPoints->size() +
                     sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor) +
                     sizeof(decltype(TexturePointsBuffer->back())) * TexturePointsBuffer->size();
-  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size);
+  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size);  // NOLINT (modernize-avoid-c-arrays)
   auto* backupData                 = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
   if (backupData != nullptr) {
 	backupData->zoomRect  = UnzoomedRect;
