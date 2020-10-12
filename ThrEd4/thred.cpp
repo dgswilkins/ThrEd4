@@ -3374,15 +3374,11 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 #if PESACT
-	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}}; // All possible file types for save
+	  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
-	  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Thredworks", L"*.thr"},
-	                                          {L"Pfaff", L"* .pcs"},
-	                                          {L"Tajima", L"*.dst"}}; // All possible file types for save
+	  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-	  constexpr auto SFTSIZE = (sizeof(aFileTypes) / sizeof(aFileTypes[0]));
-	  hr = pFileSave->SetFileTypes(SFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+	  hr = pFileSave->SetFileTypes(aFileTypes.size(), aFileTypes.data());
 	  hr += pFileSave->SetFileTypeIndex(1);
 	  hr += pFileSave->SetTitle(L"Save As");
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
@@ -3959,25 +3955,20 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr)) {
 	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
-#if PESACT
-	  COMDLG_FILTERSPEC const aFileTypes[] = {
-	      {L"Thredworks", L"*.thr"}, {L"Pfaff", L"* .pcs"}, {L"Tajima", L"*.dst"}, {L"Brother", L"*.pes"}}; // All possible file types for save
-#else
-	  COMDLG_FILTERSPEC const aFileTypes[] = {{L"Thredworks", L"*.thr"},
-	                                          {L"Pfaff", L"* .pcs"},
-	                                          {L"Tajima", L"*.dst"}}; // All possible file types for save
-#endif
-	  COMDLG_FILTERSPEC const iFileTypes[] = {{L"Thredworks", L"*.thr"}, {L"Pfaff", L"*.pcs"}}; // All possible file types that can be inserted into current design
-	  constexpr auto          AFTSIZE = (sizeof(aFileTypes) / sizeof(aFileTypes[0])); // Size of array of all file types
-	  constexpr auto          IFTSIZE =
-	      (sizeof(iFileTypes) / sizeof(iFileTypes[0])); // Size of array of file types that can be inserted
 	  switch (fileTypes) {
 		case fileStyles::ALL_FILES: {
-		  hr += pFileOpen->SetFileTypes(AFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(aFileTypes));
+#if PESACT
+		  static constexpr auto aFileTypes =
+		      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
+#else
+		  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
+#endif
+		  hr += pFileOpen->SetFileTypes(aFileTypes.size(), aFileTypes.data());
 		  break;
 		}
 		case fileStyles::INS_FILES: {
-		  hr += pFileOpen->SetFileTypes(IFTSIZE, static_cast<COMDLG_FILTERSPEC const*>(iFileTypes));
+		  static constexpr auto iFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
+		  hr += pFileOpen->SetFileTypes(iFileTypes.size(), iFileTypes.data());
 		  break;
 		}
 	  }

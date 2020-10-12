@@ -273,9 +273,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
-	constexpr auto filter1         = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
-	constexpr auto filter2         = COMDLG_FILTERSPEC {L"All files", L"*.*"};
-	constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {filter1, filter2};
+	constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 	hr = pFileSave->SetFileTypes(filterFileTypes.size(), filterFileTypes.data());
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
@@ -366,9 +364,7 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 	  hr             = pFileOpen->GetOptions(&dwOptions);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
-		static constexpr auto filter1         = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
-		static constexpr auto filter2         = COMDLG_FILTERSPEC {L"All files", L"*.*"};
-		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {filter1, filter2};
+		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
 		hr += pFileOpen->SetFileTypes(filterFileTypes.size(), filterFileTypes.data());
