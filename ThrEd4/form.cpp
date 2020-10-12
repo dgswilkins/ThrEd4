@@ -1795,40 +1795,40 @@ auto form::psg() noexcept -> uint32_t {
 
 void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   // clang-format off
-  static constexpr uint8_t level00   = 0U;
-  static constexpr uint8_t level01   = 1U;
-  static constexpr uint8_t level02[] = { 0U, 1U };
-  static constexpr uint8_t level03[] = { 1U, 0U, 2U };
-  static constexpr uint8_t level04[] = { 1U, 3U, 0U, 2U };
-  static constexpr uint8_t level05[] = { 2U, 0U, 3U, 1U, 4U };
-  static constexpr uint8_t level06[] = { 3U, 0U, 2U, 4U, 1U, 5U };
-  static constexpr uint8_t level07[] = { 3U, 0U, 4U, 1U, 6U, 2U,  5U };
-  static constexpr uint8_t level08[] = { 4U, 0U, 5U, 1U, 3U, 6U,  2U, 7U };
-  static constexpr uint8_t level09[] = { 4U, 0U, 5U, 1U, 6U, 2U,  7U, 3U,  8U };
-  static constexpr uint8_t level10[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U,  4U };
-  static constexpr uint8_t level11[] = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U, 10U };
-  static constexpr uint8_t level12[] = { 6U, 0U, 7U, 1U, 8U, 2U,  9U, 3U, 10U,  4U, 11U };
-  static constexpr uint8_t level13[] = { 6U, 0U, 1U, 7U, 2U, 8U,  3U, 9U,  4U, 10U,  5U, 11U,  6U, 12U };
-  static constexpr uint8_t level14[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
-  static constexpr uint8_t level15[] = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
+  static constexpr std::array<uint8_t,  1U>level00 = { 0U };
+  static constexpr std::array<uint8_t,  1U>level01 = { 1U };
+  static constexpr std::array<uint8_t,  2U>level02 = { 0U, 1U };
+  static constexpr std::array<uint8_t,  3U>level03 = { 1U, 0U, 2U };
+  static constexpr std::array<uint8_t,  4U>level04 = { 1U, 3U, 0U, 2U };
+  static constexpr std::array<uint8_t,  5U>level05 = { 2U, 0U, 3U, 1U, 4U };
+  static constexpr std::array<uint8_t,  6U>level06 = { 3U, 0U, 2U, 4U, 1U, 5U };
+  static constexpr std::array<uint8_t,  7U>level07 = { 3U, 0U, 4U, 1U, 6U, 2U,  5U };
+  static constexpr std::array<uint8_t,  8U>level08 = { 4U, 0U, 5U, 1U, 3U, 6U,  2U, 7U };
+  static constexpr std::array<uint8_t,  9U>level09 = { 4U, 0U, 5U, 1U, 6U, 2U,  7U, 3U,  8U };
+  static constexpr std::array<uint8_t, 10U>level10 = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U,  4U };
+  static constexpr std::array<uint8_t, 10U>level11 = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U, 10U };
+  static constexpr std::array<uint8_t, 11U>level12 = { 6U, 0U, 7U, 1U, 8U, 2U,  9U, 3U, 10U,  4U, 11U };
+  static constexpr std::array<uint8_t, 14U>level13 = { 6U, 0U, 1U, 7U, 2U, 8U,  3U, 9U,  4U, 10U,  5U, 11U,  6U, 12U };
+  static constexpr std::array<uint8_t, 14U>level14 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
+  static constexpr std::array<uint8_t, 17U>level15 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
   // clang-format on
-
-  static constexpr uint8_t const* levels[] = {&level00,
-                                              &level01,
-                                              &level02[0],
-                                              &level03[0],
-                                              &level04[0],
-                                              &level05[0],
-                                              &level06[0],
-                                              &level07[0],
-                                              &level08[0],
-                                              &level09[0],
-                                              &level10[0],
-                                              &level11[0],
-                                              &level12[0],
-                                              &level13[0],
-                                              &level14[0],
-                                              &level15[0]};
+  
+  static constexpr std::array<uint8_t const*, 16> levels = {level00.data(),
+                                                            level01.data(),
+                                                            level02.data(),
+                                                            level03.data(),
+                                                            level04.data(),
+                                                            level05.data(),
+                                                            level06.data(),
+                                                            level07.data(),
+                                                            level08.data(),
+                                                            level09.data(),
+                                                            level10.data(),
+                                                            level11.data(),
+                                                            level12.data(),
+                                                            level13.data(),
+                                                            level14.data(),
+                                                            level15.data()};
   auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -5789,6 +5789,7 @@ void form::setap() {
   std::wstring fmtStr;
   displayText::loadString(fmtStr, IDS_APCOL);
   AppliqueColor = ActiveColor;
+  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
   displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1U)));
 }
 
