@@ -37,7 +37,7 @@ class PCSHEADER // pcs file header structure
   int8_t   leadIn {};
   int8_t   hoopType {};
   uint16_t colorCount {};
-  COLORREF colors[COLORCNT] {}; 
+  COLORREF colors[COLORCNT] {}; // NOLINT (modernize-avoid-c-arrays)
   uint16_t stitchCount {};
 
   constexpr PCSHEADER() noexcept = default;
