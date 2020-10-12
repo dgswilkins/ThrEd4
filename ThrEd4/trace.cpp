@@ -735,7 +735,7 @@ void trace::internal::dutrac() {
 #ifndef TESTTRC
 	auto decimatedLine = std::vector<TRCPNT> {};
 	decimatedLine.reserve(tracedPoints.size());
-	TRCPNT traceDiff[2] = {};
+	auto traceDiff = std::array<TRCPNT, 2> {};
 	decimatedLine.push_back(tracedPoints[0]);
 	ti::dutdif(traceDiff[0], tracedPoints.data());
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); ++iPoint) {
@@ -801,13 +801,13 @@ void trace::internal::dutrac() {
 }
 
 void trace::trinit() {
-  uint32_t histogramData[CHANLCNT][LEVELCNT] = {{0}};
+  auto histogramData = std::array<std::array<uint32_t, LEVELCNT>, CHANLCNT> {};
   if (bitmap::ismap()) {
 	if (!StateMap->test(StateFlag::TRSET)) {
 	  StateMap->set(StateFlag::TRCRED);
 	  StateMap->set(StateFlag::TRCGRN);
 	  StateMap->set(StateFlag::TRCBLU);
-	  uint32_t componentPeak[CHANLCNT] = {0U};
+	  auto componentPeak = std::array < uint32_t, CHANLCNT>{};
 	  if (!StateMap->test(StateFlag::WASTRAC)) {
 		TraceDataSize = bitmap::getrmap();
 	  }
@@ -842,7 +842,7 @@ void trace::trinit() {
 			++(histogramData[iRGB][PixelColors[iRGB]]);
 		  }
 		}
-		uint32_t componentPeakCount[CHANLCNT] = {0U};
+		auto componentPeakCount = std::array < uint32_t, CHANLCNT>{};
 		for (auto iLevel = 0U; iLevel < LEVELCNT; ++iLevel) {
 		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 			if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
@@ -1141,14 +1141,12 @@ void trace::tracpar() {
 
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto const zeroWidth      = thred::txtWid(L"0");
-  wchar_t    buffer[SWBLEN] = {0};
   color >>= shift;
   color &= BYTMASK;
-  _itow_s(gsl::narrow<int32_t>(color), buffer, SWBLEN - 1U);
-  auto const bufferLength = wrap::toUnsigned(wcslen(std::begin(buffer)));
-  auto const xPosition    = zeroWidth.cx * gsl::narrow<int32_t>((3U - bufferLength) + 1U);
+  auto val = std::to_wstring(color);
+  auto const xPosition    = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-  wrap::textOut(DrawItem->hDC, xPosition, 1, static_cast<LPCTSTR>(buffer), bufferLength);
+  wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), val.size());
 }
 
 void trace::internal::upnum(uint32_t iRGB) {
@@ -1221,19 +1219,19 @@ void trace::wasTrace() {
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto    TempBrush           = BlackBrush;
-	  wchar_t buffer[SWBLEN - 1U] = {0}; // for integer to string conversion
-	  wcscpy_s(buffer, StringTable->operator[](STR_OFF).c_str());
 	  SetBkColor(DrawItem->hDC, 0);
 	  SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 	  if (StateMap->test(TraceRGBFlag[iRGB])) {
 		TempBrush = TraceBrush[iRGB];
-		wcscpy_s(buffer, StringTable->operator[](STR_ON).c_str());
 		SetTextColor(DrawItem->hDC, 0);
 		SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	  }
+	  auto const onOff = (StateMap->test(TraceRGBFlag[iRGB])) ? STR_ON : STR_OFF;
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-	  wrap::textOut(
-	      DrawItem->hDC, 1, 1, static_cast<LPCTSTR>(buffer), gsl::narrow<uint32_t>(wcslen(std::begin(buffer))));
+	  wrap::textOut(DrawItem->hDC,
+	                1,
+	                1,
+	                StringTable->operator[](onOff).c_str(), StringTable->operator[](onOff).size());
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {

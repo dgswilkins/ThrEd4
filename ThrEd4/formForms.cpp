@@ -721,10 +721,10 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			UserFlagMap->reset(UserFlag::DAZD);
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
-		  auto compareBuffer = std::array<wchar_t, HBUFSIZ> {};
-		  for (auto iType = uint8_t {0U}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
-			LoadString(ThrEdInstance, DaisyTypeStrings[iType], compareBuffer.data(), HBUFSIZ);
-			if (wcscmp(buffer.data(), compareBuffer.data()) == 0) {
+		  auto compareBuffer = std::wstring {};
+		  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
+			displayText::loadString(compareBuffer, DaisyTypeStrings[iType]);
+			if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
 			  IniFile.daisyBorderType = iType;
 			  break;
 			}

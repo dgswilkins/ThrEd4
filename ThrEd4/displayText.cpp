@@ -375,14 +375,14 @@ void displayText::okcan() noexcept {
 }
 
 void displayText::savdisc() {
-  wchar_t buffer[HBUFSIZ];
   di::sdmsg();
   StateMap->reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  LoadString(ThrEdInstance, IDS_SAV, std::begin(buffer), HBUFSIZ);
+  auto buffer = std::wstring {};
+  displayText::loadString(buffer, IDS_SAV);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   OKButton = CreateWindow(L"STATIC",
-                          std::begin(buffer),
+                          buffer.c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
                           MsgRect.bottom + 15,
@@ -392,10 +392,10 @@ void displayText::savdisc() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  LoadString(ThrEdInstance, IDS_DISC, std::begin(buffer), HBUFSIZ);
+  displayText::loadString(buffer, IDS_DISC);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   DiscardButton = CreateWindow(L"STATIC",
-                               std::begin(buffer),
+                               buffer.c_str(),
                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 15,
                                MsgRect.bottom + 15,
