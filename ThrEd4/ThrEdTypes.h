@@ -219,6 +219,14 @@ constexpr auto SQRCORNS = 4U;                   // number of corners in a square
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
 constexpr auto SZBMPNM = 16U;     // THR spec for BMP filename length
 
+// Filter Specifications
+constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"};
+constexpr auto FLTPCS = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
+constexpr auto FLTDST = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
+constexpr auto FLTPES = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
+constexpr auto FLTBMP = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
+constexpr auto FLTALL = COMDLG_FILTERSPEC {L"All files", L"*.*"};
+
 enum stringLabel {
   STR_PIKOL,
   STR_UPON,
