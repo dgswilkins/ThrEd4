@@ -3528,54 +3528,102 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(uint32_t                  entry,
-                            int32_t&                  windowLocation,
-                            POINT const&              windowSize,
-                            std::wstring const* const strings) noexcept {
-  if (nullptr != strings) {
+void thred::internal::dusid(uint32_t                   entry,
+                            int32_t&                   windowLocation,
+                            POINT const&               windowSize,
+                            std::vector<std::wstring> const& strings) noexcept {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  SideWindow[entry] = CreateWindow(L"STATIC",
+                                   strings[entry].c_str(),
+                                   SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                   3,
+                                   windowLocation * windowSize.y + 3,
+                                   windowSize.x + 3,
+                                   windowSize.y,
+                                   SideMessageWindow,
+                                   nullptr,
+                                   ThrEdInstance,
+                                   nullptr);
+  ++windowLocation;
+}
+
+void thred::internal::sidmsg(FRMHED const& form, HWND window, std::vector<std::wstring> const& strings) {
+  // edge fill type array for side window display
+  constexpr auto edgeFillTypes = std::array<uint8_t, EDGETYPS> {
+      0, EDGELINE, EDGEBEAN, EDGECLIP, EDGEANGSAT, EDGEAPPL, EDGEPROPSAT, EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX};
+  // fill type array for side window display
+  constexpr auto fillTypes = std::array<uint8_t, FILLTYPS> {
+      0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
+  constexpr auto featherFillTypes =
+      std::array<uint8_t, FSSIZE> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
+  auto childListRect  = RECT {0L, 0L, 0L, 0L};
+  auto parentListRect = RECT {0L, 0L, 0L, 0L};
+  auto entryCount     = gsl::narrow<int32_t>(strings.size());
+  std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
+  auto sideWindowSize     = POINT {};
+  auto sideWindowLocation = int32_t {};
+  GetWindowRect(window, &childListRect);
+  GetWindowRect(FormDataSheet, &parentListRect);
+  form::ispcdclp();
+  if (StateMap->test(StateFlag::FILTYP)) {
+	for (auto iEntry = 0U; iEntry < edgeFillTypes.size(); ++iEntry) {
+	  if ((form.edgeType & NEGUND) == edgeFillTypes[iEntry]) {
+		--entryCount;
+	  }
+	  else {
+		if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
+		    edgeFillTypes[iEntry] == EDGECLIPX) {
+		  if (StateMap->test(StateFlag::WASPCDCLP)) {
+			formForms::maxtsiz(strings[iEntry], sideWindowSize);
+		  }
+		  else {
+			--entryCount;
+		  }
+		}
+		else {
+		  formForms::maxtsiz(strings[iEntry], sideWindowSize);
+		}
+	  }
+	}
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	SideWindow[entry] = CreateWindow(L"STATIC",
-	                                 strings[entry].c_str(),
-	                                 SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                 3,
-	                                 windowLocation * windowSize.y + 3,
-	                                 windowSize.x + 3,
-	                                 windowSize.y,
-	                                 SideMessageWindow,
+	SideMessageWindow = CreateWindow(L"STATIC",
+	                                 nullptr,
+	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
+	                                 parentListRect.right - ThredWindowOrigin.x + 3,
+	                                 childListRect.top - ThredWindowOrigin.y - 3,
+	                                 sideWindowSize.x + 12,
+	                                 sideWindowSize.y * entryCount + 12,
+	                                 ThrEdWindow,
 	                                 nullptr,
 	                                 ThrEdInstance,
 	                                 nullptr);
-	++windowLocation;
-  }
-}
-
-void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const* const strings, uint32_t entries) {
-  if (strings != nullptr) {
-	// edge fill type array for side window display
-	constexpr auto edgeFillTypes = std::array<uint8_t, EDGETYPS> {
-	    0, EDGELINE, EDGEBEAN, EDGECLIP, EDGEANGSAT, EDGEAPPL, EDGEPROPSAT, EDGEBHOL, EDGEPICOT, EDGEDOUBLE, EDGELCHAIN, EDGEOCHAIN, EDGECLIPX};
-	// fill type array for side window display
-	constexpr auto fillTypes = std::array<uint8_t, FILLTYPS> {
-	    0, VRTF, HORF, ANGF, SATF, CLPF, CONTF, VCLPF, HCLPF, ANGCLPF, FTHF, TXVRTF, TXHORF, TXANGF};
-	constexpr auto featherFillTypes =
-	    std::array<uint8_t, FSSIZE> {FTHSIN, FTHSIN2, FTHLIN, FTHPSG, FTHRMP, FTHFAZ}; // feather fill types
-	auto childListRect  = RECT {0L, 0L, 0L, 0L};
-	auto parentListRect = RECT {0L, 0L, 0L, 0L};
-	auto entryCount     = gsl::narrow<int32_t>(entries);
-	std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
-	auto sideWindowSize     = POINT {};
-	auto sideWindowLocation = int32_t {};
-	GetWindowRect(window, &childListRect);
-	GetWindowRect(FormDataSheet, &parentListRect);
-	form::ispcdclp();
-	if (StateMap->test(StateFlag::FILTYP)) {
-	  for (auto iEntry = 0U; iEntry < edgeFillTypes.size(); ++iEntry) {
-		if ((form.edgeType & NEGUND) == edgeFillTypes[iEntry]) {
-		  --entryCount;
+	for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
+	  if ((form.edgeType & NEGUND) != edgeFillTypes[iEntry]) {
+		if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
+		    edgeFillTypes[iEntry] == EDGECLIPX) {
+		  if (StateMap->test(StateFlag::WASPCDCLP)) {
+			dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+		  }
 		}
 		else {
-		  if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
-		      edgeFillTypes[iEntry] == EDGECLIPX) {
+		  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+		}
+	  }
+	}
+  }
+  else {
+	if (FormMenuChoice == LLAYR) {
+	  auto const zero = std::wstring {L"0"};
+	  formForms::maxtsiz(zero, sideWindowSize);
+	}
+	else {
+	  if (FormMenuChoice == LFTHTYP) {
+		entryCount     = gsl::narrow<int32_t>(featherFillTypes.size() - 1U);
+		sideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
+	  }
+	  else {
+		for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
+		  if (((1U << fillTypes[iEntry]) & ClipTypeMap) != 0U) {
 			if (StateMap->test(StateFlag::WASPCDCLP)) {
 			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
 			}
@@ -3584,110 +3632,58 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::wstring const
 			}
 		  }
 		  else {
-			formForms::maxtsiz(strings[iEntry], sideWindowSize);
+			if (fillTypes[iEntry] == form.fillType) {
+			  --entryCount;
+			}
+			else {
+			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
+			}
 		  }
 		}
 	  }
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  SideMessageWindow = CreateWindow(L"STATIC",
-	                                   nullptr,
-	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
-	                                   parentListRect.right - ThredWindowOrigin.x + 3,
-	                                   childListRect.top - ThredWindowOrigin.y - 3,
-	                                   sideWindowSize.x + 12,
-	                                   sideWindowSize.y * entryCount + 12,
-	                                   ThrEdWindow,
-	                                   nullptr,
-	                                   ThrEdInstance,
-	                                   nullptr);
-	  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-		if ((form.edgeType & NEGUND) != edgeFillTypes[iEntry]) {
-		  if (edgeFillTypes[iEntry] == EDGECLIP || edgeFillTypes[iEntry] == EDGEPICOT ||
-		      edgeFillTypes[iEntry] == EDGECLIPX) {
-			if (StateMap->test(StateFlag::WASPCDCLP)) {
-			  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
-			}
-		  }
-		  else {
+	}
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	SideMessageWindow = CreateWindow(L"STATIC",
+	                                 nullptr,
+	                                 WS_BORDER | WS_CHILD | WS_VISIBLE,
+	                                 parentListRect.right - ThredWindowOrigin.x + 3,
+	                                 childListRect.top - ThredWindowOrigin.y - 3,
+	                                 sideWindowSize.x + 12,
+	                                 sideWindowSize.y * entryCount + 12,
+	                                 ThrEdWindow,
+	                                 nullptr,
+	                                 ThrEdInstance,
+	                                 nullptr);
+	if (FormMenuChoice == LLAYR) {
+	  for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
+		dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+	  }
+	}
+	else {
+	  if (FormMenuChoice == LFTHTYP) {
+		for (auto iEntry = 0U; iEntry < featherFillTypes.size(); ++iEntry) {
+		  if (featherFillTypes[iEntry] != form.fillInfo.feather.fillType) {
 			dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 		  }
 		}
 	  }
-	}
-	else {
-	  if (FormMenuChoice == LLAYR) {
-		auto const zero = std::wstring {L"0"};
-		formForms::maxtsiz(zero, sideWindowSize);
-	  }
 	  else {
-		if (FormMenuChoice == LFTHTYP) {
-		  entryCount     = gsl::narrow<int32_t>(featherFillTypes.size() - 1U);
-		  sideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
-		}
-		else {
-		  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
+		for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
+		  if (fillTypes[iEntry] != form.fillType) {
 			if (((1U << fillTypes[iEntry]) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
-				formForms::maxtsiz(strings[iEntry], sideWindowSize);
-			  }
-			  else {
-				--entryCount;
+				dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 			  }
 			}
 			else {
-			  if (fillTypes[iEntry] == form.fillType) {
-				--entryCount;
-			  }
-			  else {
-				formForms::maxtsiz(strings[iEntry], sideWindowSize);
-			  }
-			}
-		  }
-		}
-	  }
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  SideMessageWindow = CreateWindow(L"STATIC",
-	                                   nullptr,
-	                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
-	                                   parentListRect.right - ThredWindowOrigin.x + 3,
-	                                   childListRect.top - ThredWindowOrigin.y - 3,
-	                                   sideWindowSize.x + 12,
-	                                   sideWindowSize.y * entryCount + 12,
-	                                   ThrEdWindow,
-	                                   nullptr,
-	                                   ThrEdInstance,
-	                                   nullptr);
-	  if (FormMenuChoice == LLAYR) {
-		for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-		  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
-		}
-	  }
-	  else {
-		if (FormMenuChoice == LFTHTYP) {
-		  for (auto iEntry = 0U; iEntry < featherFillTypes.size(); ++iEntry) {
-			if (featherFillTypes[iEntry] != form.fillInfo.feather.fillType) {
 			  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
 			}
 		  }
 		}
-		else {
-		  for (auto iEntry = 0U; iEntry < entries; ++iEntry) {
-			if (fillTypes[iEntry] != form.fillType) {
-			  if (((1U << fillTypes[iEntry]) & ClipTypeMap) != 0U) {
-				if (StateMap->test(StateFlag::WASPCDCLP)) {
-				  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
-				}
-			  }
-			  else {
-				dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
-			  }
-			}
-		  }
-		}
 	  }
 	}
-	StateMap->set(StateFlag::SIDACT);
   }
+  StateMap->set(StateFlag::SIDACT);
 }
 
 auto thred::internal::centr() noexcept -> fPOINT {
@@ -11745,7 +11741,10 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
-	  sidmsg(form, ValueWindow->operator[](LFTHTYP), &StringTable->operator[](STR_FTH0), FSSIZE);
+	  auto start = wrap::next(StringTable->begin(), STR_FTH0);
+	  auto end = wrap::next(start, FSSIZE);
+	  auto fthStr    = std::vector<std::wstring>(start,end);
+	  sidmsg(form, ValueWindow->operator[](LFTHTYP), fthStr);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRM) || Msg.hwnd == LabelWindow->operator[](LFRM)) {
@@ -11764,16 +11763,19 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LLAYR) || Msg.hwnd == LabelWindow->operator[](LLAYR)) {
-	  std::wstring layerText[] = {L"0", L"1", L"2", L"3", L"4"};
+	  auto const layerText = std::vector<std::wstring> {L"0", L"1", L"2", L"3", L"4"};
 	  FormMenuChoice           = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
-	  sidmsg(form, ValueWindow->operator[](LLAYR), std::begin(layerText), MAXLAYER);
+	  sidmsg(form, ValueWindow->operator[](LLAYR), layerText);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
-	  sidmsg(form, ValueWindow->operator[](LFRMFIL), &StringTable->operator[](STR_FIL0), FILLTYPS);
+	  auto start     = wrap::next(StringTable->begin(), STR_FIL0);
+	  auto end       = wrap::next(start, FILLTYPS);
+	  auto fillStr    = std::vector<std::wstring>(start, end);
+	  sidmsg(form, ValueWindow->operator[](LFRMFIL), fillStr);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
@@ -11808,7 +11810,10 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
-	  sidmsg(form, ValueWindow->operator[](LBRD), &StringTable->operator[](STR_EDG0), EDGETYPS);
+	  auto start   = wrap::next(StringTable->begin(), STR_EDG0);
+	  auto end     = wrap::next(start, EDGETYPS);
+	  auto edgeStr = std::vector<std::wstring>(start, end);
+	  sidmsg(form, ValueWindow->operator[](LBRD), edgeStr);
 	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}
