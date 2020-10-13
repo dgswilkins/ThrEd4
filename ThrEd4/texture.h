@@ -79,7 +79,7 @@ namespace internal {
   auto txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool;
   void txgro(FRMHED const& textureForm);
   void txhor(FRMHED& form);
-  auto txnam(wchar_t* name, int32_t sizeName) -> bool;
+  auto txnam(std::wstring& name) -> bool;
   void txnudg(int32_t deltaX, float deltaY);
   void txpar(FRMHED& form);
   void txrbak() noexcept;
