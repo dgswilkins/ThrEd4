@@ -262,11 +262,11 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		case IDOK: {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
-		  wchar_t    designerBuffer[NameOrder.size()];
+		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
 		  GetWindowText(hwnd,
-		                static_cast<LPTSTR>(designerBuffer),
-		                sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-		  DesignerName->assign(std::begin(designerBuffer));
+		                designerBuffer.data(),
+		                designerBuffer.size());
+		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  // NOLINTNEXTLINE
 		  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
