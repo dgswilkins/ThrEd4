@@ -10116,11 +10116,11 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  auto buf = std::array<wchar_t, HBUFSIZ> {0};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
-		  auto buf1               = std::array<wchar_t, HBUFSIZ> {};
-		  for (auto iFeatherStyle = 0U; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
-			LoadString(ThrEdInstance, IDS_FTH0 + iFeatherStyle, buf1.data(), HBUFSIZ);
-			if (wcscmp(buf.data(), buf1.data()) == 0) {
-			  wrap::narrow(IniFile.featherFillType, iFeatherStyle + 1U);
+		  auto buffer               = std::wstring {};
+		  for (auto iFeatherStyle = uint8_t {}; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
+			displayText::loadString(buffer, IDS_FTH0 + iFeatherStyle);
+			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
+			  IniFile.featherFillType = iFeatherStyle + 1U;
 			  break;
 			}
 		  }
@@ -15788,9 +15788,7 @@ void thred::internal::setPrefs() {
   defpref();
   getDocsFolder(DefaultDirectory);
   if (DesignerName->empty()) {
-	auto designerBuffer = std::array<wchar_t, DNLEN> {};
-	LoadString(ThrEdInstance, IDS_UNAM, designerBuffer.data(), gsl::narrow<int>(designerBuffer.size()));
-	DesignerName->assign(designerBuffer.data());
+	displayText::loadString(*DesignerName, IDS_UNAM);
 	getdes();
   }
 }
@@ -17739,12 +17737,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		ShowWindow(ThrEdWindow, SW_SHOW);
 	  }
 	  if (DesignerName->empty()) {
-		wchar_t designerBuffer[DNLEN];
-		LoadString(ThrEdInstance,
-		           IDS_UNAM,
-		           static_cast<LPTSTR>(designerBuffer),
-		           sizeof(designerBuffer) / sizeof(designerBuffer[0]));
-		DesignerName->assign(static_cast<wchar_t const*>(designerBuffer));
+		auto designerBuffer = std::wstring {};
+		displayText::loadString(*DesignerName, IDS_UNAM);
 		thi::getdes();
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio
