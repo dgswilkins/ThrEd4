@@ -4371,13 +4371,13 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	thred::movStch();
 	thred::coltab();
 	StateMap->reset(StateFlag::ZUMED);
-	wchar_t buffer[3] = {0};
+	auto buffer = std::array < wchar_t, 3>{};
 	buffer[1]         = L'0';
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
 	  buffer[0]              = ThreadSize[iColor];
-	  SetWindowText(ThreadSizeWin[iColor], static_cast<LPCWSTR>(buffer));
+	  SetWindowText(ThreadSizeWin[iColor], buffer.data());
 	}
 	for (auto& iColor : *UserColorWin) {
 	  thred::redraw(iColor);
@@ -6137,7 +6137,7 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 	delta                         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	auto const knotAttribute      = startIt->attribute | KNOTMSK;
 	auto const knotStep           = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	char const knotAtStartOrder[] = {2, 3, 1, 4, 0}; // knot spacings
+	static constexpr auto knotAtStartOrder = std::array < char , 5>{2, 3, 1, 4, 0}; // knot spacings
 	for (char const iKnot : knotAtStartOrder) {
 	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
 	}
@@ -9156,14 +9156,13 @@ void thred::internal::retrac() {
 }
 
 void thred::internal::setgrd(COLORREF color) {
-  GRDCOD const gridCodes[] = {
-      {ID_GRDHI, HIGRD},
-      {ID_GRDMED, MEDGRD},
-      {ID_GRDEF, DEFGRD},
-      {ID_GRDRED, REDGRD},
-      {ID_GRDBLU, BLUGRD},
-      {ID_GRDGRN, GRNGRD},
-  };
+  static constexpr auto gcHigh    = GRDCOD {ID_GRDHI, HIGRD};
+  static constexpr auto gcMedium  = GRDCOD {ID_GRDMED, MEDGRD};
+  static constexpr auto gcDefault = GRDCOD {ID_GRDEF, DEFGRD};
+  static constexpr auto gcRed     = GRDCOD {ID_GRDRED, REDGRD};
+  static constexpr auto gcBlue    = GRDCOD {ID_GRDBLU, BLUGRD};
+  static constexpr auto gcGreen   = GRDCOD {ID_GRDGRN, GRNGRD};
+  static constexpr auto gridCodes = std::array<GRDCOD, 6> {gcHigh, gcMedium, gcDefault, gcRed, gcBlue, gcGreen};
 
   for (auto const gridCode : gridCodes) {
 	if (color == gridCode.col) {
@@ -12243,13 +12242,13 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::SIZSEL)) {
 	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2])) {
 	  VerticalIndex -= 13U;
-	  wchar_t threadSizeMap[]             = {L'3', L'4', L'6'};
+	  static constexpr auto threadSizeMap = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 	  ThreadSize[threadSizeSelected]      = threadSizeMap[VerticalIndex];
 	  ThreadSizeIndex[threadSizeSelected] = VerticalIndex;
-	  wchar_t buffer[3]                   = {0};
+	  auto buffer = std::array<wchar_t, 3> {};
 	  buffer[0]                           = ThreadSize[threadSizeSelected];
 	  buffer[1]                           = L'0';
-	  SetWindowText(ThreadSizeWin[threadSizeSelected], static_cast<LPTSTR>(buffer));
+	  SetWindowText(ThreadSizeWin[threadSizeSelected], buffer.data());
 	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
 		if (iWindow != nullptr) {
@@ -12681,7 +12680,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (thi::chkMsgs(Msg.pt, ThreadSizeWin.front(), ThreadSizeWin.back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
-	  wchar_t const* const str[] = {L"30", L"40", L"60"};
+	  static constexpr auto str = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
 	  for (auto iThrSize = 0U; iThrSize < 3; ++iThrSize) {
@@ -15637,7 +15636,7 @@ auto thred::txtWid(wchar_t const* string) -> SIZE {
 }
 
 void thred::internal::makCol() noexcept {
-  wchar_t buffer[3] = {0};
+  auto buffer = std::array<wchar_t, 3> {};
   buffer[1]         = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont = displayText::getThrEdFont(FONTSIZE);
@@ -15670,7 +15669,7 @@ void thred::internal::makCol() noexcept {
 	buffer[0]                        = ThreadSize[iColor];
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
-	                                     static_cast<LPCTSTR>(buffer),
+	                                     buffer.data(),
 	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                     ButtonWidth * 2,
 	                                     ButtonHeight * gsl::narrow_cast<int32_t>(iColor),
@@ -16223,7 +16222,7 @@ void thred::internal::init() {
                           nullptr);
   nuRct();
   // create pens
-  COLORREF const boxColor[] = {0x404040, 0x408040, 0x804040, 0x404080};
+  static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
   for (auto iRGBK = 0U; iRGBK < 4; ++iRGBK) {
 	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, PENNWID, boxColor[iRGBK]);
   }
@@ -16470,9 +16469,8 @@ void thred::internal::drwStch() {
 	}
 	thred::duzrat();
 	auto const    dub6           = ZoomRatio.x * 6.0F;
-	int32_t const threadWidth[3] = {std::lround(dub6 * TSIZ30),
-	                                std::lround(dub6 * TSIZ40),
-	                                std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
+	const auto threadWidth = std::array<int32_t, 3> {
+	    std::lround(dub6 * TSIZ30), std::lround(dub6 * TSIZ40), std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (StateMap->test(StateFlag::THRDS)) {
 		nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
