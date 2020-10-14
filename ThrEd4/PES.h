@@ -11,6 +11,10 @@
 
 #ifdef PESACT
 
+static constexpr uint8_t THUMBHGT = 38U;
+static constexpr uint8_t THUMBWID = 48U;
+using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
+
 #pragma pack(push, 1) // make sure that the PES data structures are aligned on byte boundaries
 
 class PESLED
@@ -122,9 +126,6 @@ class PECHDR
   //~PECHDR() = default;
 };
 
-static constexpr uint8_t THUMBHGT = 38U;
-static constexpr uint8_t THUMBWID = 48U;
-
 class PECHDR2
 {
   public:
@@ -163,7 +164,7 @@ namespace internal {
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
   void ritpesCode(std::vector<uint8_t>& buffer);
   void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
-  void writeThumbnail(std::vector<uint8_t>& buffer, uint8_t const (*image)[THUMBHGT][THUMBWID]);
+  void writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image);
 } // namespace internal
 } // namespace PES
 #endif
