@@ -40,16 +40,12 @@ class DSTDAT
   char cor {0};
   char val {0};
 
-  constexpr DSTDAT() noexcept = default;
-  constexpr DSTDAT(char rhsCor, char rhsVal);
+  //constexpr DSTDAT() noexcept = default;
   // DSTDAT(DSTDAT&&) = default;
   // DSTDAT& operator=(DSTDAT const& rhs) = default;
   // DSTDAT& operator=(DSTDAT&&) = default;
   //~DSTDAT() = default;
 };
-
-constexpr DSTDAT::DSTDAT(char rhsCor, char rhsVal) : cor(rhsCor), val(rhsVal) {
-}
 
 constexpr auto XCOR = char {0};
 constexpr auto YCOR = char {1};
@@ -60,14 +56,12 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
-  static constexpr auto DSTvalues = std::array<DSTDAT, 22> {
-      // DST offset values
-      DSTDAT {XCOR, 1},   DSTDAT {XCOR, -1}, DSTDAT {XCOR, 9},  DSTDAT {XCOR, -9},
-      DSTDAT {YCOR, -9},  DSTDAT {YCOR, 9},  DSTDAT {YCOR, -1}, DSTDAT {YCOR, 1},
-      DSTDAT {XCOR, 3},   DSTDAT {XCOR, -3}, DSTDAT {XCOR, 27}, DSTDAT {XCOR, -27},
-      DSTDAT {YCOR, -27}, DSTDAT {YCOR, 27}, DSTDAT {YCOR, -3}, DSTDAT {YCOR, 3},
-      DSTDAT {XCOR, 0},   DSTDAT {XCOR, 0},  DSTDAT {XCOR, 81}, DSTDAT {XCOR, -81},
-      DSTDAT {YCOR, -81}, DSTDAT {YCOR, 81}};
+  static constexpr auto DSTvalues = std::array<DSTDAT, 22> {{// DST offset values
+    {XCOR, 1},   {XCOR, -1},  {XCOR, 9},   {XCOR, -9}, {YCOR, -9}, {YCOR, 9},
+    {YCOR, -1},  {YCOR, 1},   {XCOR, 3},   {XCOR, -3}, {XCOR, 27}, {XCOR, -27},
+    {YCOR, -27}, {YCOR, 27},  {YCOR, -3},  {YCOR, 3},  {XCOR, 0},  {XCOR, 0},
+    {XCOR, 81},  {XCOR, -81}, {YCOR, -81}, {YCOR, 81}
+  }};
 
   auto shift = 1U;
   pout       = POINT {};
