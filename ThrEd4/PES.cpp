@@ -303,11 +303,11 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   auto const yFactor = 31.0F / IniFile.hoopSizeY;
   auto const xFactor = 40.0F / IniFile.hoopSizeX;
   // write the overall thumbnail
-  constexpr auto XOFFSET = uint16_t {4U}; // thumbnail x offset to place it in the frame correctly
-  constexpr auto YOFFSET = uint16_t {5U}; // thumbnail y offset to place it in the frame correctly
+  constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
+  constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
   for (auto& stitch : *StitchBuffer) {
-	auto const x    = wrap::floor<uint16_t>((stitch.x) * xFactor) + XOFFSET;
-	auto const y    = THUMBHGT - (wrap::floor<uint16_t>((stitch.y) * yFactor) + YOFFSET);
+	auto const x    = wrap::toSize(wrap::floor<uint8_t>(stitch.x * xFactor) + XOFFSET);
+	auto const y    = wrap::toSize(THUMBHGT - (wrap::floor<uint8_t>(stitch.y * yFactor) + YOFFSET));
 	thumbnail[y][x] = 1U;
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
