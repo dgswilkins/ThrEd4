@@ -291,7 +291,7 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image
 	  auto const offset = j * BTSPBYTE;
 	  auto       output = uint8_t {0U};
 	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
-		output |= gsl::narrow_cast<uint32_t>(image[i][offset + bitPosition] != 0U) << bitPosition;
+		output |= gsl::narrow_cast<uint8_t>(image[i][wrap::toSize(offset) + bitPosition] != 0U) << bitPosition;
 	  }
 	  buffer.push_back(output);
 	}
