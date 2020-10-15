@@ -274,7 +274,7 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 	constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-	hr = pFileSave->SetFileTypes(filterFileTypes.size(), filterFileTypes.data());
+	hr = pFileSave->SetFileTypes(wrap::toUnsigned(filterFileTypes.size()), filterFileTypes.data());
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
 	auto const bmpName = UTF16BMPname->filename().wstring();
@@ -367,7 +367,7 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hr += pFileOpen->SetFileTypes(filterFileTypes.size(), filterFileTypes.data());
+		hr += pFileOpen->SetFileTypes(wrap::toUnsigned(filterFileTypes.size()), filterFileTypes.data());
 		hr += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used

@@ -265,7 +265,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
 		  GetWindowText(hwnd,
 		                designerBuffer.data(),
-		                designerBuffer.size());
+		                wrap::toUnsigned(designerBuffer.size()));
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  // NOLINTNEXTLINE
@@ -3378,7 +3378,7 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 #else
 	  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-	  hr = pFileSave->SetFileTypes(aFileTypes.size(), aFileTypes.data());
+	  hr = pFileSave->SetFileTypes(wrap::toUnsigned(aFileTypes.size()), aFileTypes.data());
 	  hr += pFileSave->SetFileTypeIndex(1);
 	  hr += pFileSave->SetTitle(L"Save As");
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
@@ -3959,12 +3959,12 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 #else
 		  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-		  hr += pFileOpen->SetFileTypes(aFileTypes.size(), aFileTypes.data());
+		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(aFileTypes.size()), aFileTypes.data());
 		  break;
 		}
 		case fileStyles::INS_FILES: {
 		  static constexpr auto iFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
-		  hr += pFileOpen->SetFileTypes(iFileTypes.size(), iFileTypes.data());
+		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(iFileTypes.size()), iFileTypes.data());
 		  break;
 		}
 	  }

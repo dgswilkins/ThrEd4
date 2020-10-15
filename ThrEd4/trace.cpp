@@ -1146,7 +1146,7 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto val = std::to_wstring(color);
   auto const xPosition    = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
-  wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), val.size());
+  wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
 void trace::internal::upnum(uint32_t iRGB) {
@@ -1231,7 +1231,7 @@ void trace::wasTrace() {
 	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
-	                StringTable->operator[](onOff).c_str(), StringTable->operator[](onOff).size());
+	                StringTable->operator[](onOff).c_str(), wrap::toUnsigned(StringTable->operator[](onOff).size()));
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {
