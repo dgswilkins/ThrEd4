@@ -268,8 +268,9 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		                wrap::toUnsigned(designerBuffer.size()));
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
-		  // NOLINTNEXTLINE
-		  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
+		  auto const fmtStr = displayText::loadStr(IDS_THRED);
+		  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+		  SetWindowText(ThrEdWindow, fmt::format(fmtStr, *DesignerName).c_str());
 		  return TRUE;
 		}
 		default: {
@@ -2088,7 +2089,7 @@ void thred::internal::rstAll() {
   StateMap->reset(StateFlag::GTWLKLEN);
   trace::untrace();
   StateMap->reset(StateFlag::WASEDG);
-  displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
+  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   if (ZoomFactor == 1) {
 	StateMap->reset(StateFlag::ZUMED);
   }
@@ -2121,7 +2122,7 @@ void thred::internal::rstAll() {
 }
 
 void thred::ritot(uint32_t number) {
-  auto const txt = fmt::format(StringTable->operator[](STR_TOT), number);
+  auto const txt = fmt::format(displayText::loadStr(IDS_TOT), number);
   displayText::butxt(HTOT, txt);
 }
 
@@ -2152,13 +2153,11 @@ void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestSt
 	}
 	constexpr auto DIGITLIM = 10000.0F; // value that represents the max width that can be displayed
 	if (fabs(maxLength) < DIGITLIM) {
-	  auto strMax = std::wstring {};
-	  displayText::loadString(strMax, IDS_LENMAX);
+	  auto const strMax = displayText::loadStr(IDS_LENMAX);
 	  displayText::butxt(HMAXLEN, fmt::format(strMax, (maxLength * IPFGRAN)));
 	}
 	if (fabs(minLength) < DIGITLIM) {
-	  auto strMin = std::wstring {};
-	  displayText::loadString(strMin, IDS_LENMIN);
+	  auto const strMin = displayText::loadStr(IDS_LENMIN);
 	  displayText::butxt(HMINLEN, fmt::format(strMin, (minLength * IPFGRAN)));
 	}
   }
@@ -2187,24 +2186,18 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 	  smallestStitchIndex = iStitch;
 	}
   }
-  auto strMax = std::wstring {};
-  auto strMin = std::wstring {};
-  displayText::loadString(strMax, IDS_LENMAX);
-  displayText::loadString(strMin, IDS_LENMIN);
-  displayText::butxt(HMAXLEN, fmt::format(strMax, (maxLength * IPFGRAN)));
-  displayText::butxt(HMINLEN, fmt::format(strMin, (minLength * IPFGRAN)));
+  displayText::butxt(HMAXLEN, fmt::format(displayText::loadStr(IDS_LENMAX), (maxLength * IPFGRAN)));
+  displayText::butxt(HMINLEN, fmt::format(displayText::loadStr(IDS_LENMIN), (minLength * IPFGRAN)));
 }
 
 void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
-	auto        txt        = std::wstring {};
 	auto const& stitch     = StitchBuffer->operator[](ClosestPointIndex);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
 	auto const lenMax      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
-	displayText::loadString(txt, IDS_SRCH);
-	displayText::butxt(HMAXLEN, txt);
+	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
   }
   else {
 	if (StitchBuffer->size() > 1U) {
@@ -2648,7 +2641,7 @@ void thred::internal::ritlayr() {
 	displayText::butxt(HLAYR, blank);
   }
   else {
-	auto const txt = fmt::format(StringTable->operator[](STR_LAYR), layer);
+	auto const txt = fmt::format(displayText::loadStr(IDS_LAYR), layer);
 	displayText::butxt(HLAYR, txt);
   }
 }
@@ -2714,7 +2707,7 @@ void thred::internal::dubox(POINT const& stitchCoordsInPixels) {
 	StateMap->set(StateFlag::SELBOX);
 	StateMap->reset(StateFlag::FRMPSEL);
 	thred::redraw(ColorBar);
-	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
   }
 }
 
@@ -3024,8 +3017,8 @@ auto thred::internal::chkattr(fs::path const& filename) -> bool {
   if (writePerms == fs::perms::none) {
 	auto const buttonPressed =
 	    MessageBox(ThrEdWindow,
-	               fmt::format(StringTable->operator[](STR_OVRLOK), filename.wstring()).c_str(),
-	               StringTable->operator[](STR_OVRIT).c_str(),
+	               fmt::format(displayText::loadStr(IDS_OVRLOK), filename.wstring()).c_str(),
+	               displayText::loadStr(IDS_OVRIT).c_str(),
 	               MB_YESNO);
 	if (buttonPressed == IDYES) {
 	  fs::permissions(filename, WRBITS, fs::perm_options::add);
@@ -3241,9 +3234,7 @@ void thred::internal::thrsav() {
 	auto bytesWritten = DWORD {0};
 	WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
 	if (bytesWritten != output.size()) {
-	  auto fmtStr = std::wstring {};
-	  displayText::loadString(fmtStr, IDS_FWERR);
-	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+	  displayText::showMessage(IDS_FWERR, ThrName->wstring());
 	}
 	CloseHandle(fileHandle);
   }
@@ -3336,16 +3327,17 @@ void thred::internal::auxmen() {
   EnableMenuItem(MainMenu, ID_AUXPES, MF_DISABLED | MF_GRAYED);
 #endif
   CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
+  auto const auxTxt = displayText::loadStr(IDS_AUXTXT);
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"DST"));
+	  auxMsg.assign(fmt::format(auxTxt, L"DST"));
 	  CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
 	  break;
 	}
 	case AUXPES:
 #if PESACT
 	{
-	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"PES"));
+	  auxMsg.assign(fmt::format(auxTxt, L"PES"));
 	  CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
 	  break;
 	}
@@ -3355,7 +3347,7 @@ void thred::internal::auxmen() {
 	}
 #endif
 	default: {
-	  auxMsg.assign(fmt::format(StringTable->operator[](STR_AUXTXT), L"PCS"));
+	  auxMsg.assign(fmt::format(auxTxt, L"PCS"));
 	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
 	}
   }
@@ -3515,11 +3507,10 @@ void thred::internal::dun() {
 	  StateMap->set(StateFlag::SAVEX);
 	}
 	else {
-	  auto fmtStr = std::wstring {};
-	  displayText::loadString(fmtStr, IDS_SAVFIL);
+	  auto const fmtStr = displayText::loadStr(IDS_SAVFIL);
 	  if (MessageBox(ThrEdWindow,
 	                 fmt::format(fmtStr, ThrName->wstring()).c_str(),
-	                 StringTable->operator[](STR_CLOS).c_str(),
+	                 displayText::loadStr(IDS_CLOS).c_str(),
 	                 MB_YESNO) == IDYES) {
 		thred::save();
 	  }
@@ -3916,15 +3907,15 @@ void thred::internal::unthum() {
 	  DestroyWindow(iBackup);
 	}
 	if (StateMap->test(StateFlag::UPTO)) {
-	  displayText::butxt(HUPTO, StringTable->operator[](STR_UPON));
+	  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
 	}
 	else {
-	  displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
+	  displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
 	}
 	auto const blank = std::wstring {};
 	displayText::butxt(HNUM, blank);
 	thred::redraw(ButtonWin->operator[](HHID));
-	displayText::butxt(HBOXSEL, StringTable->operator[](STR_BOXSEL));
+	displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
   }
 }
 
@@ -4402,7 +4393,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	lenCalc();
 	SetWindowText(
 	    ThrEdWindow,
-	    fmt::format(StringTable->operator[](STR_THRDBY), newFileName.wstring(), *DesignerName).c_str());
+	    fmt::format(displayText::loadStr(IDS_THRDBY), newFileName.wstring(), *DesignerName).c_str());
 	StateMap->set(StateFlag::INIT);
 	StateMap->reset(StateFlag::TRSET);
 	if (StateMap->test(StateFlag::NOTHRFIL)) {
@@ -4792,7 +4783,7 @@ auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
 
 void thred::internal::toglup() {
   if (StateMap->testAndFlip(StateFlag::UPTO)) {
-	displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   }
   else {
 	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
@@ -4817,7 +4808,7 @@ void thred::internal::toglup() {
 		}
 	  }
 	}
-	displayText::butxt(HUPTO, StringTable->operator[](STR_UPON));
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
   StateMap->set(StateFlag::RESTCH);
 }
@@ -5113,7 +5104,7 @@ void thred::internal::istch() {
 	StateMap->set(StateFlag::INSRT);
 	duIns();
 	SetCapture(ThrEdWindow);
-	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 	nuAct(ClosestPointIndex);
   }
 }
@@ -5174,8 +5165,8 @@ void thred::internal::newFil() {
   deldu();
   auto& desName = IniFile.designerName;
   DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
-  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
-  *ThrName = *DefaultDirectory / (StringTable->operator[](STR_NUFIL).c_str());
+  SetWindowText(ThrEdWindow, fmt::format(displayText::loadStr(IDS_THRED), *DesignerName).c_str());
+  *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
   auto&      modName      = ExtendedHeader->modifierName;
@@ -6353,7 +6344,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
 	  ++RunPoint;
 	}
-	displayText::ritnum(STR_NUMSEL, RunPoint);
+	displayText::ritnum(IDS_NUMSEL, RunPoint);
 	if (RunPoint + 3U > finish - 1U) {
 	  patdun();
 	}
@@ -6407,8 +6398,9 @@ void thred::internal::deltot() {
   rstAll();
   thred::coltab();
   thred::zumhom();
-  SetWindowText(ThrEdWindow,
-                fmt::format(StringTable->operator[](STR_THRDBY), ThrName->wstring(), *DesignerName).c_str());
+  auto const fmtStr = displayText::loadStr(IDS_THRDBY);
+  auto const wTxt   = fmt::format(fmtStr, ThrName->wstring(), *DesignerName);
+  SetWindowText(ThrEdWindow, wTxt.c_str());
 }
 
 auto thred::internal::wastch(uint32_t const& formIndex) -> bool {
@@ -7126,7 +7118,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  redfnam(*DesignerName);
 		  SetWindowText(
 		      ThrEdWindow,
-		      fmt::format(StringTable->operator[](STR_THRDBY), ThrName->wstring(), *DesignerName).c_str());
+		      fmt::format(displayText::loadStr(IDS_THRDBY), ThrName->wstring(), *DesignerName).c_str());
 		}
 	  }
 	  auto dest = StitchBuffer->end();
@@ -7208,9 +7200,7 @@ void thred::internal::purg() {
 
 void thred::internal::purgdir() {
   StateMap->set(StateFlag::PRGMSG);
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_DELBAK);
-  displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
+  displayText::showMessage(IDS_DELBAK, DefaultDirectory->wstring());
   displayText::okcan();
 }
 
@@ -7748,7 +7738,7 @@ void thred::internal::selup() {
 		else {
 		  ClosestFormToCursor = 0;
 		}
-		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
+		displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
@@ -7803,7 +7793,7 @@ void thred::internal::seldwn() {
 		else {
 		  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		}
-		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
+		displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
@@ -8056,7 +8046,7 @@ void thred::internal::longer() {
   }
   CurrentStitchIndex = iStitch;
   lensadj();
-  displayText::ritnum(STR_NUMSCH, ClosestPointIndex);
+  displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
 void thred::internal::shorter() {
@@ -8098,13 +8088,13 @@ void thred::internal::shorter() {
   }
   CurrentStitchIndex = currentStitch;
   lensadj();
-  displayText::ritnum(STR_NUMSCH, ClosestPointIndex);
+  displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
 void thred::internal::setsrch(uint32_t stitch) {
   CurrentStitchIndex = stitch;
   lensadj();
-  displayText::ritnum(STR_NUMSCH, ClosestPointIndex);
+  displayText::ritnum(IDS_NUMSCH, ClosestPointIndex);
 }
 
 auto thred::internal::inrng(uint32_t iStitch) noexcept -> bool {
@@ -8242,8 +8232,7 @@ void thred::internal::thumnail() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
-	auto       fmtStr  = std::wstring {};
-	displayText::loadString(fmtStr, IDS_FFINDERR);
+	auto const fmtStr  = displayText::loadStr(IDS_FFINDERR);
 	displayText::shoMsg(fmt::format(fmtStr, searchName.wstring(), dwError));
 	unthum();
   }
@@ -8534,30 +8523,29 @@ void thred::internal::desiz() {
 
   auto  rectangle   = fRECTANGLE {};
   auto  info        = std::wstring {};
-  auto& stringTable = *StringTable;
   if (!StitchBuffer->empty()) {
 	thred::stchrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
 	if ((rectangle.left < 0) || (rectangle.bottom < 0) || (rectangle.right > IniFile.hoopSizeX) ||
 	    (rectangle.top > IniFile.hoopSizeY)) {
-	  info += stringTable[STR_STCHOUT];
+	  info += displayText::loadStr(IDS_STCHOUT);
 	}
 	info += fmt::format(
-	    stringTable[STR_STCHS], wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	    displayText::loadStr(IDS_STCHS), wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
   if (!FormList->empty()) {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
 	info += fmt::format(
-	    stringTable[STR_FORMS], FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	    displayText::loadStr(IDS_FORMS), FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
-  info += fmt::format(stringTable[STR_HUPWID], (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
+  info += fmt::format(displayText::loadStr(IDS_HUPWID), (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
 	auto  modifier     = utf::Utf8ToUtf16(std::string(std::begin(modifierName)));
-	info += fmt::format(stringTable[STR_CREATBY], *DesignerName, modifier);
+	info += fmt::format(displayText::loadStr(IDS_CREATBY), *DesignerName, modifier);
   }
   displayText::shoMsg(info);
 }
@@ -8584,7 +8572,7 @@ void thred::internal::sidhup() {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	SideWindow[iHoop] = CreateWindow(L"STATIC",
-	                                 StringTable->operator[](iHoop + STR_HUP0).c_str(),
+	                                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
 	                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                                 3,
 	                                 ButtonHeight * idx + 3,
@@ -8908,8 +8896,7 @@ void thred::internal::rotmrk() {
 	auto const tAngle     = highestAngle - lowestAngle;
 	auto const segments   = std::round(PI_F2 / tAngle);
 	IniFile.rotationAngle = PI_F2 / segments;
-	auto fmtStr           = std::wstring {};
-	displayText::loadString(fmtStr, IDS_ROTMARK);
+	auto const fmtStr     = displayText::loadStr(IDS_ROTMARK);
 	// ToDo - should this be IniFile.rotationAngle?
 	displayText::shoMsg(fmt::format(fmtStr, IniFile.fillAngle * RADDEGF, segments));
   }
@@ -8922,7 +8909,7 @@ void thred::internal::segentr(float rotationAngle) {
   if (rotationAngle == 0.0F) {
 	rotationAngle = 1 * DEGRADF;
   }
-  displayText::shoMsg(fmt::format(StringTable->operator[](STR_ENTROT), (PI_F2 / rotationAngle)));
+  displayText::showMessage(IDS_ENTROT, (PI_F2 / rotationAngle));
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
@@ -9330,9 +9317,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (searchResult == INVALID_HANDLE_VALUE) {
-		  auto fmtStr = std::wstring {};
-		  displayText::loadString(fmtStr, IDS_NOTHRFIL);
-		  displayText::shoMsg(fmt::format(fmtStr, DefaultDirectory->wstring()));
+		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
 		  EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
 		  return TRUE;
 		}
@@ -9416,9 +9401,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 			  }
 			}
 			if (fileError != 0U) {
-			  auto fmtStr = std::wstring {};
-			  displayText::loadString(fmtStr, IDS_LOCKNOT);
-			  displayText::shoMsg(fmt::format(fmtStr, fileError));
+			  displayText::showMessage(IDS_LOCKNOT, fileError);
 			}
 			EndDialog(hwndlg, gsl::narrow_cast<INT_PTR>(wparam));
 			return TRUE;
@@ -9472,7 +9455,8 @@ void thred::internal::closfn() {
   bitmap::delmap();
   deldu();
   displayText::clrhbut(3);
-  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
+  auto const fmtStr = displayText::loadStr(IDS_THRED);
+  SetWindowText(ThrEdWindow, fmt::format(fmtStr, *DesignerName).c_str());
 }
 
 void thred::internal::filclos() {
@@ -9592,33 +9576,29 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
   SendInput(1, &input, sizeof(INPUT));
 }
 
-void thred::internal::pixmsg(uint32_t iString, uint32_t pixelCount) {
-  displayText::shoMsg(fmt::format(StringTable->operator[](iString), pixelCount));
-}
-
 void thred::internal::getnpix() {
-  pixmsg(STR_NUDG, IniFile.nudgePixels);
+  displayText::showMessage(IDS_NUDG, IniFile.nudgePixels);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::PIXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getstpix() {
-  pixmsg(STR_STCHP, IniFile.stitchSizePixels);
+  displayText::showMessage(IDS_STCHP, IniFile.stitchSizePixels);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::STPXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getfrmpix() {
-  pixmsg(STR_FRMP, IniFile.formVertexSizePixels);
+  displayText::showMessage(IDS_FRMP, IniFile.formVertexSizePixels);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::FRMPXIN);
   displayText::numWnd();
 }
 
 void thred::internal::getfrmbox() {
-  pixmsg(STR_FRMBOX, IniFile.formBoxSizePixels);
+  displayText::showMessage(IDS_FRMBOX, IniFile.formBoxSizePixels);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::FRMBOXIN);
   displayText::numWnd();
@@ -10078,7 +10058,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
 	  for (auto iFeatherStyle = 0U; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
-		displayText::loadString(featherStyle, (IDS_FTH0 + iFeatherStyle));
+		featherStyle = displayText::loadStr((IDS_FTH0 + iFeatherStyle));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
 		            CB_ADDSTRING,
@@ -10117,7 +10097,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer               = std::wstring {};
 		  for (auto iFeatherStyle = uint8_t {}; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
-			displayText::loadString(buffer, IDS_FTH0 + iFeatherStyle);
+			buffer = displayText::loadStr(IDS_FTH0 + iFeatherStyle);
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 			  IniFile.featherFillType = iFeatherStyle + 1U;
 			  break;
@@ -10677,7 +10657,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 		  ClosestFormToCursor   = SelectedFormList->front();
 		  ClosestVertexToCursor = 0;
 		  SelectedFormList->clear();
-		  displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
+		  displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		  StateMap->set(StateFlag::RESTCH);
 		  StateMap->set(StateFlag::FORMSEL);
 		  return true;
@@ -11015,7 +10995,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 		  StateMap->set(StateFlag::RESTCH);
 		  SelectedFormList->clear();
 		}
-		displayText::ritnum(STR_NUMFORM, ClosestFormToCursor);
+		displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
 		lenCalc();
 		unrot();
 		return true;
@@ -11205,28 +11185,28 @@ auto thred::internal::updatePreferences() -> bool {
   chknum();
   if (Msg.hwnd == ValueWindow->operator[](PSQR)) {
 	if (UserFlagMap->testAndFlip(UserFlag::SQRFIL)) {
-	  SetWindowText(ValueWindow->operator[](PSQR), StringTable->operator[](STR_PNTD).c_str());
+	  SetWindowText(ValueWindow->operator[](PSQR), displayText::loadStr(IDS_PNTD).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PSQR), StringTable->operator[](STR_SQR).c_str());
+	  SetWindowText(ValueWindow->operator[](PSQR), displayText::loadStr(IDS_SQR).c_str());
 	}
 	return true;
   }
   if (Msg.hwnd == ValueWindow->operator[](PBLNT)) {
 	if (UserFlagMap->testAndFlip(UserFlag::BLUNT)) {
-	  SetWindowText(ValueWindow->operator[](PBLNT), StringTable->operator[](STR_TAPR).c_str());
+	  SetWindowText(ValueWindow->operator[](PBLNT), displayText::loadStr(IDS_TAPR).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PBLNT), StringTable->operator[](STR_BLUNT).c_str());
+	  SetWindowText(ValueWindow->operator[](PBLNT), displayText::loadStr(IDS_BLUNT).c_str());
 	}
 	return true;
   }
   if (Msg.hwnd == ValueWindow->operator[](PUND)) {
 	if (UserFlagMap->testAndFlip(UserFlag::DUND)) {
-	  SetWindowText(ValueWindow->operator[](PUND), StringTable->operator[](STR_OFF).c_str());
+	  SetWindowText(ValueWindow->operator[](PUND), displayText::loadStr(IDS_OFF).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PUND), StringTable->operator[](STR_ON).c_str());
+	  SetWindowText(ValueWindow->operator[](PUND), displayText::loadStr(IDS_ON).c_str());
 	}
 	return true;
   }
@@ -11722,10 +11702,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFTHUP) || Msg.hwnd == LabelWindow->operator[](LFTHUP)) {
 	  form.extendedAttribute ^= AT_FTHUP;
 	  form::refil();
-	  auto choice = StringTable->operator[](STR_OFF);
-	  if ((form.extendedAttribute & AT_FTHUP) != 0U) {
-		choice = StringTable->operator[](STR_ON);
-	  }
+	  auto const choice = displayText::loadStr(((form.extendedAttribute & AT_FTHUP) == 0U) ? IDS_OFF : IDS_ON);
 	  SetWindowText(ValueWindow->operator[](LFTHUP), choice.c_str());
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
@@ -11740,10 +11717,13 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
-	  auto start = wrap::next(StringTable->begin(), STR_FTH0);
-	  auto end = wrap::next(start, FSSIZE);
-	  auto fthStr    = std::vector<std::wstring>(start,end);
-	  sidmsg(form, ValueWindow->operator[](LFTHTYP), fthStr);
+	  auto fthrList = std::array<uint32_t, FSSIZE> {IDS_FTH0, IDS_FTH1, IDS_FTH2, IDS_FTH3, IDS_FTH4, IDS_FTH5};
+	  auto fthStrings = std::vector<std::wstring> {};
+	  fthStrings.reserve(FSSIZE);
+	  for (auto item : fthrList) {
+		fthStrings.push_back(displayText::loadStr(item));
+	  }
+	  sidmsg(form, ValueWindow->operator[](LFTHTYP), fthStrings);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRM) || Msg.hwnd == LabelWindow->operator[](LFRM)) {
@@ -11771,10 +11751,14 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
-	  auto start     = wrap::next(StringTable->begin(), STR_FIL0);
-	  auto end       = wrap::next(start, FILLTYPS);
-	  auto fillStr    = std::vector<std::wstring>(start, end);
-	  sidmsg(form, ValueWindow->operator[](LFRMFIL), fillStr);
+	  auto fillList = std::array<uint32_t, FILLTYPS> {
+          IDS_FIL0, IDS_FIL1, IDS_FIL2, IDS_FIL3, IDS_FIL4, IDS_FIL5, IDS_FIL6, IDS_FIL7, IDS_FIL8, IDS_FIL9, IDS_FIL10, IDS_FIL11, IDS_FIL12, IDS_FIL13};
+	  auto fillStrings = std::vector<std::wstring> {};
+	  fillStrings.reserve(FILLTYPS);
+	  for (auto item : fillList) {
+		fillStrings.push_back(displayText::loadStr(item));
+	  }
+	  sidmsg(form, ValueWindow->operator[](LFRMFIL), fillStrings);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
@@ -11809,10 +11793,14 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
-	  auto start   = wrap::next(StringTable->begin(), STR_EDG0);
-	  auto end     = wrap::next(start, EDGETYPS);
-	  auto edgeStr = std::vector<std::wstring>(start, end);
-	  sidmsg(form, ValueWindow->operator[](LBRD), edgeStr);
+	  auto edgeList = std::array<uint32_t, EDGETYPS> {
+	      IDS_EDG0, IDS_EDG1, IDS_EDG2, IDS_EDG3, IDS_EDG4, IDS_EDG5, IDS_EDG6, IDS_EDG7, IDS_EDG8, IDS_EDG9, IDS_EDG10, IDS_EDG11, IDS_EDG12};
+	  auto edgeStrings = std::vector<std::wstring> {};
+	  edgeStrings.reserve(EDGETYPS);
+	  for (auto item : edgeList) {
+		edgeStrings.push_back(displayText::loadStr(item));
+	  }
+	  sidmsg(form, ValueWindow->operator[](LBRD), edgeStrings);
 	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}
@@ -11852,13 +11840,13 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBSTRT) || Msg.hwnd == LabelWindow->operator[](LBSTRT)) {
 	  auto const code = form.attribute & SBLNT;
+	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
+	  SetWindowText(ValueWindow->operator[](LBSTRT), bluntStr.c_str());
 	  if (code != 0U) {
 		form.attribute &= NSBLNT;
-		SetWindowText(ValueWindow->operator[](LBSTRT), StringTable->operator[](STR_TAPR).c_str());
 	  }
 	  else {
 		form.attribute |= SBLNT;
-		SetWindowText(ValueWindow->operator[](LBSTRT), StringTable->operator[](STR_BLUNT).c_str());
 	  }
 	  form::refil();
 	  thred::coltab();
@@ -11867,13 +11855,13 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBFIN) || Msg.hwnd == LabelWindow->operator[](LBFIN)) {
 	  auto const code = form.attribute & FBLNT;
+	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
+	  SetWindowText(ValueWindow->operator[](LBFIN), bluntStr.c_str());
 	  if (code != 0U) {
 		form.attribute &= NFBLNT;
-		SetWindowText(ValueWindow->operator[](LBFIN), StringTable->operator[](STR_TAPR).c_str());
 	  }
 	  else {
 		form.attribute |= FBLNT;
-		SetWindowText(ValueWindow->operator[](LBFIN), StringTable->operator[](STR_BLUNT).c_str());
 	  }
 	  form::refil();
 	  thred::coltab();
@@ -11894,12 +11882,8 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  form.edgeType ^= EGUND;
 	  form::refil();
 	  auto const code = form.edgeType & EGUND;
-	  if (code != 0U) {
-		SetWindowText(ValueWindow->operator[](LBRDUND), StringTable->operator[](STR_ON).c_str());
-	  }
-	  else {
-		SetWindowText(ValueWindow->operator[](LBRDUND), StringTable->operator[](STR_OFF).c_str());
-	  }
+	  auto const bUndStr = displayText::loadStr((code != 0U) ? IDS_ON : IDS_OFF);
+	  SetWindowText(ValueWindow->operator[](LBRDUND), bUndStr.c_str());
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LSACANG) || Msg.hwnd == LabelWindow->operator[](LSACANG)) {
@@ -11919,10 +11903,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBFILSQR) || Msg.hwnd == LabelWindow->operator[](LBFILSQR)) {
 	  xt::dubit(form, AT_SQR);
-	  auto choice = StringTable->operator[](STR_PNTD);
-	  if ((form.extendedAttribute & AT_SQR) != 0U) {
-		choice = StringTable->operator[](STR_SQR);
-	  }
+	  auto const choice = displayText::loadStr(((form.extendedAttribute & AT_SQR) == 0U) ? IDS_PNTD : IDS_SQR);
 	  SetWindowText(ValueWindow->operator[](LBFILSQR), choice.c_str());
 	  break;
 	}
@@ -12477,7 +12458,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		InsertLine[2] = stch2px1(ClosestPointIndex + 1U);
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
-		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+		displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 		return true;
 	  }
 	  auto closestPointIndexClone = uint32_t {};
@@ -12545,7 +12526,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		dulin(MoveLine0, MoveLine1);
 		SetCapture(ThrEdWindow);
 		StateMap->set(StateFlag::CAPT);
-		displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+		displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
 	  }
 	}
 	else {
@@ -13153,7 +13134,7 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 	  else {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  ClosestVertexToCursor = form::nxt(FormList->operator[](ClosestFormToCursor), ClosestVertexToCursor);
-		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
+		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const vertexIt =
 		      wrap::next(FormVertices->cbegin(),
 		                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
@@ -13245,7 +13226,7 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  auto const& form      = FormList->operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
-		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
+		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		  auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
 		  thred::ritfcor(*vertexIt);
 		  shftflt(*vertexIt);
@@ -15771,7 +15752,7 @@ void thred::internal::ducmd() {
 			}
 		  }
 		}
-		SetWindowText(ThrEdWindow, StringTable->operator[](STR_EMB).c_str());
+		SetWindowText(ThrEdWindow, displayText::loadStr(IDS_EMB).c_str());
 	  }
 	  fs::remove(*BalaradName1);
 	}
@@ -15787,7 +15768,7 @@ void thred::internal::setPrefs() {
   defpref();
   getDocsFolder(DefaultDirectory);
   if (DesignerName->empty()) {
-	displayText::loadString(*DesignerName, IDS_UNAM);
+	DesignerName->assign(displayText::loadStr(IDS_UNAM));
 	getdes();
   }
 }
@@ -16120,7 +16101,6 @@ void thred::internal::init() {
   }
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
-  displayText::lodstr();
   ThreadSize.fill(L'4');
   if (IniFile.traceLength == 0.0F) {
 	IniFile.traceLength = TRACLEN;
@@ -16176,19 +16156,19 @@ void thred::internal::init() {
 	  case HBOXSEL: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt.assign(StringTable->operator[](STR_BOXSEL));
+		buttonTxt.assign(displayText::loadStr(IDS_BOXSEL));
 		break;
 	  }
 	  case HUPTO: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt.assign(StringTable->operator[](STR_UPOF));
+		buttonTxt.assign(displayText::loadStr(IDS_UPOF));
 		break;
 	  }
 	  case HHID: {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		windowFlags = SS_OWNERDRAW | SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER;
-		buttonTxt.assign(StringTable->operator[](STR_PIKOL));
+		buttonTxt.assign(displayText::loadStr(IDS_PIKOL));
 		break;
 	  }
 	  default: {
@@ -16258,10 +16238,8 @@ void thred::internal::init() {
   StitchBuffer->clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
   ladj();
-  wrap::getTextExtentPoint32(ThredDC,
-                             StringTable->operator[](STR_PIKOL).c_str(),
-                             wrap::toUnsigned(StringTable->operator[](STR_PIKOL).size()),
-                             &PickColorMsgSize);
+  auto const pikol = displayText::loadStr(IDS_PIKOL);
+  wrap::getTextExtentPoint32(ThredDC, pikol.c_str(), wrap::toUnsigned(pikol.size()), &PickColorMsgSize);
   auxmen();
   fnamtabs();
   ritfnam(*DesignerName);
@@ -16285,7 +16263,7 @@ void thred::internal::init() {
   thred::chkmen();
   // check command line-should be last item in init
   ducmd();
-  SetWindowText(ThrEdWindow, fmt::format(StringTable->operator[](STR_THRED), *DesignerName).c_str());
+  SetWindowText(ThrEdWindow, fmt::format(displayText::loadStr(IDS_THRED), *DesignerName).c_str());
 }
 
 auto thred::internal::defTxt(uint32_t iColor) -> COLORREF {
@@ -16769,7 +16747,7 @@ void thred::internal::drwStch() {
 	thred::redraw(PreferencesWindow);
   }
   if (StateMap->test(StateFlag::SELBOX)) {
-	displayText::ritnum(STR_NUMSEL, ClosestPointIndex);
+	displayText::ritnum(IDS_NUMSEL, ClosestPointIndex);
   }
   thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
   if (StateMap->test(StateFlag::INIT)) {
@@ -17266,11 +17244,12 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  texture::writeScreenWidth(position);
 		}
 		else {
+		  auto const pikol = displayText::loadStr(IDS_PIKOL);
 		  wrap::textOut(DrawItem->hDC,
 		                position,
 		                1,
-		                StringTable->operator[](STR_PIKOL).c_str(),
-		                wrap::toUnsigned(StringTable->operator[](STR_PIKOL).size()));
+		                pikol.c_str(),
+		                wrap::toUnsigned(pikol.size()));
 		}
 		return 1;
 	  }
@@ -17614,7 +17593,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
-	  private_StringTable.resize(STR_LEN);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
 	  private_ValueWindow.resize(LASTLIN);
@@ -17666,7 +17644,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SelectedPointsLine        = &private_SelectedPointsLine;
 	  StateMap                  = &private_StateMap;
 	  StitchBuffer              = &private_StitchBuffer;
-	  StringTable               = &private_StringTable;
 	  TempPolygon               = &private_TempPolygon;
 	  TextureHistory            = &private_TextureHistory;
 	  TextureInputBuffer        = &private_textureInputBuffer;
@@ -17735,8 +17712,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		ShowWindow(ThrEdWindow, SW_SHOW);
 	  }
 	  if (DesignerName->empty()) {
-		auto designerBuffer = std::wstring {};
-		displayText::loadString(*DesignerName, IDS_UNAM);
+		DesignerName->assign(displayText::loadStr(IDS_UNAM));
 		thi::getdes();
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio

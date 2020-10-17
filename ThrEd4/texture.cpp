@@ -1124,13 +1124,13 @@ void texture::internal::altx() {
 }
 
 void texture::txof() {
-  displayText::butxt(HBOXSEL, StringTable->operator[](STR_BOXSEL));
+  displayText::butxt(HBOXSEL, displayText::loadStr(IDS_BOXSEL));
   thred::redraw(ButtonWin->operator[](HHID));
   if (StateMap->test(StateFlag::UPTO)) {
-	displayText::butxt(HUPTO, StringTable->operator[](STR_UPON));
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPON));
   }
   else {
-	displayText::butxt(HUPTO, StringTable->operator[](STR_UPOF));
+	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
   }
   SetWindowText(ButtonWin->operator[](HTXSPAC), L"");
   texture::savtxt();
@@ -1704,9 +1704,7 @@ void texture::setshft() {
 }
 
 void texture::writeScreenWidth(int32_t position) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_TXWID);
-  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
-  auto const scrWidth = std::wstring(fmt::format(fmtStr, (TextureScreen.width * IPFGRAN)));
+  auto const scrWidth =
+      fmt::format(displayText::loadStr(IDS_TXWID), (TextureScreen.width * IPFGRAN));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

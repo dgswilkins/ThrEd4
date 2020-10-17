@@ -20,11 +20,10 @@ auto getThrEdFont(int32_t weight) noexcept -> HFONT;
 void grpmsg();
 void grpmsg1();
 void hsizmsg();
-void loadString(std::wstring& sDest, uint32_t stringID);
-void lodstr();
+auto loadStr(uint32_t stringID) -> std::wstring;
 void msgflt(uint32_t messageId, float value);
 void numWnd();
-void okcan() noexcept;
+void okcan();
 void pntmsg(uint32_t msgID);
 void riter();
 void ritnum(uint32_t code, uint32_t value);
@@ -32,6 +31,10 @@ void tabmsg(uint32_t code);
 void savdisc();
 void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
 void shoMsg(std::wstring const& message);
+template <class inType> void showMessage(uint32_t messageId, inType value) {
+  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+  displayText::shoMsg(fmt::format(displayText::loadStr(messageId), value));
+}
 void shord();
 void shoseln(uint32_t code0, uint32_t code1);
 void spltmsg();

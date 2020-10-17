@@ -75,10 +75,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
       CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (hBitmapFile == INVALID_HANDLE_VALUE) {
-	auto fmtStr = std::wstring {};
-	displayText::loadString(fmtStr, IDS_UNOPEN);
-	// NOLINTNEXTLINE
-	displayText::shoMsg(fmt::format(fmtStr, UTF16BMPname->wstring()));
+	displayText::showMessage(IDS_UNOPEN, UTF16BMPname->wstring());
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
 	return;
@@ -429,9 +426,7 @@ void bitmap::lodbmp(fs::path const* directory) {
 	else {
 	  // THR version 2 file can only store a 16 character filename
 	  // Give the user a little more info why the bitmap has not been loaded
-	  auto fmtStr = std::wstring {};
-	  displayText::loadString(fmtStr, IDS_BMPLONG);
-	  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+	  displayText::showMessage(IDS_BMPLONG, ThrName->wstring());
 	}
 	StateMap->set(StateFlag::RESTCH);
   }

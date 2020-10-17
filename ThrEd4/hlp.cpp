@@ -22,11 +22,9 @@
 #include "hlp.h"
 
 void hlp::help() {
-  auto helpFileName = std::wstring {};
-  displayText::loadString(helpFileName, IDS_HELPFN);
   auto const* homeDir = thred::getHomeDir();
   if (nullptr != homeDir) {
-	auto const helpfile = *homeDir / helpFileName;
+	auto const helpfile = *homeDir / displayText::loadStr(IDS_HELPFN);
 #pragma warning(suppress : 26462) // con.4 NOLINTNEXTLINE(readability-qualified-auto)
 	auto const HelpWindow = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
 	if (nullptr == HelpWindow) {

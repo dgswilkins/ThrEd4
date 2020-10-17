@@ -123,16 +123,13 @@ void trace::internal::trcols(COLORREF color) noexcept {
 }
 
 void trace::internal::trcstpnum() {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_TRCSTP);
-  // NOLINTNEXTLINE
+  auto const fmtStr = displayText::loadStr(IDS_TRCSTP);
+  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
   SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength * IPFGRAN)).c_str());
 }
 
 void trace::internal::trcratnum() {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_TRCRAT);
-  displayText::butxt(HLIN, fmt::format(fmtStr, -log10(IniFile.traceRatio - 1.0F)));
+  displayText::butxt(HLIN, fmt::format(displayText::loadStr(IDS_TRCRAT), -log10(IniFile.traceRatio - 1.0F)));
 }
 
 auto trace::internal::trcin(COLORREF color) -> bool {
@@ -1143,7 +1140,7 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
   auto const zeroWidth      = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
-  auto val = std::to_wstring(color);
+  auto const val = std::to_wstring(color);
   auto const xPosition    = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
@@ -1226,12 +1223,13 @@ void trace::wasTrace() {
 		SetTextColor(DrawItem->hDC, 0);
 		SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
 	  }
-	  auto const onOff = (StateMap->test(TraceRGBFlag[iRGB])) ? STR_ON : STR_OFF;
+#pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
+	  auto const strOnOff = displayText::loadStr((StateMap->test(TraceRGBFlag[iRGB])) ? IDS_ON : IDS_OFF);
 	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
-	                StringTable->operator[](onOff).c_str(), wrap::toUnsigned(StringTable->operator[](onOff).size()));
+	                strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {

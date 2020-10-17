@@ -291,7 +291,8 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image
 	  auto const offset = j * BTSPBYTE;
 	  auto       output = uint8_t {0U};
 	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
-		output |= gsl::narrow_cast<uint8_t>(image[i][wrap::toSize(offset) + bitPosition] != 0U) << bitPosition;
+		auto const imgBit = image[i][wrap::toSize(offset) + bitPosition];
+		output |= gsl::narrow_cast<uint8_t>(imgBit << bitPosition);
 	  }
 	  buffer.push_back(output);
 	}
@@ -371,10 +372,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 
   constexpr auto PESSTR = "#PES00"; // PES lead in value
   if (strncmp(static_cast<char*>(pesHeader->led), PESSTR, strlen(PESSTR)) != 0) {
-	auto fmtStr = std::wstring {};
-	displayText::loadString(fmtStr, IDS_NOTPES);
-	// NOLINTNEXTLINE
-	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
   }
@@ -463,9 +461,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	thred::hupfn();
   }
   else {
-	auto fmtStr = std::wstring {};
-	displayText::loadString(fmtStr, IDS_NOTPES);
-	displayText::shoMsg(fmt::format(fmtStr, newFileName.wstring()));
+	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
   }

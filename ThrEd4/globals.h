@@ -236,8 +236,6 @@ extern HDC        StitchWindowMemDC;
 extern POINT      StitchWindowOrigin;
 extern POINT      StitchWindowSize;
 
-extern std::vector<std::wstring>* StringTable;
-
 extern std::vector<fPOINT>*         TempPolygon;
 extern std::array<TXHST, ITXBUFSZ>* TextureHistory;
 extern std::wstring*                TextureInputBuffer;

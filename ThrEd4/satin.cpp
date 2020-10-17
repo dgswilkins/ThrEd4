@@ -647,7 +647,7 @@ void satin::delspnt() {
   }
   auto const vertexIt = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*vertexIt);
-  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
+  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
   form::frmout(ClosestFormToCursor);
   if (vertexIt->x < ZoomRect.left || vertexIt->x > ZoomRect.right ||
       vertexIt->y < ZoomRect.bottom || vertexIt->y > ZoomRect.top) {

@@ -345,7 +345,6 @@ namespace internal {
   void pglft();
   void pgrit();
   void pgup();
-  void pixmsg(uint32_t iString, uint32_t pixelCount);
   void pntmrk();
   void prtred(HANDLE fileHandle, uint32_t code);
   auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;

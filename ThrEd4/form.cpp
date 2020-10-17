@@ -381,7 +381,7 @@ void form::setfrm() {
 }
 
 void form::form() {
-  displayText::shoMsg(StringTable->operator[](STR_FMEN));
+  displayText::shoMsg(displayText::loadStr(IDS_FMEN));
   StateMap->set(StateFlag::FORMIN);
   StateMap->reset(StateFlag::INSRT);
   thred::duzrat();
@@ -675,7 +675,7 @@ void form::drwfrm() {
 		  else {
 			fi::frmx(formLines[0], StitchWindowMemDC);
 		  }
-		  displayText::ritnum(STR_NUMPNT, ClosestVertexToCursor);
+		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		}
 		else {
 		  auto& formLines = *FormLines;
@@ -5786,11 +5786,9 @@ void form::apliq() {
 }
 
 void form::setap() {
-  std::wstring fmtStr;
-  displayText::loadString(fmtStr, IDS_APCOL);
   AppliqueColor = ActiveColor;
   // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
-  displayText::shoMsg(fmt::format(fmtStr, (AppliqueColor + 1U)));
+  displayText::showMessage(IDS_APCOL, (AppliqueColor + 1U));
 }
 
 void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
@@ -6856,10 +6854,10 @@ void form::tglfrm() {
   }
   StateMap->reset(StateFlag::HIDSTCH);
   if (StateMap->testAndFlip(StateFlag::FRMOF)) {
-	FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
+	FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
   }
   else {
-	FormOnOff->assign(StringTable->operator[](STR_FRMINUS));
+	FormOnOff->assign(displayText::loadStr(IDS_FRMINUS));
 	StateMap->reset(StateFlag::FORMSEL);
 	StateMap->reset(StateFlag::FORMIN);
 	StateMap->reset(StateFlag::MOVFRM);
@@ -6881,7 +6879,7 @@ void form::tglfrm() {
 void form::frmon() {
   thred::unbsho();
   StateMap->reset(StateFlag::FRMOF);
-  FormOnOff->assign(StringTable->operator[](STR_FRMPLUS));
+  FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
   SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
   StateMap->set(StateFlag::DUMEN);
 }
@@ -7178,9 +7176,7 @@ auto form::rotpar() -> fPOINT {
 }
 
 void form::internal::rotentr(float rotationAngle) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_ROTA);
-  displayText::shoMsg(fmt::format(fmtStr, (rotationAngle * RADDEGF)));
+  displayText::showMessage(IDS_ROTA, (rotationAngle * RADDEGF));
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
@@ -7991,7 +7987,7 @@ void form::frmnumfn(uint32_t newFormIndex) {
 	  }
 	}
 	ClosestFormToCursor = newFormIndex;
-	displayText::ritnum(STR_NUMFRM, ClosestFormToCursor);
+	displayText::ritnum(IDS_NUMFRM, ClosestFormToCursor);
   }
 }
 
@@ -8755,9 +8751,7 @@ void form::col2frm() {
 	  endColorOffset += COLORCNT;
 	}
   }
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_NCOLCHG);
-  displayText::shoMsg(fmt::format(fmtStr, colorChangedCount));
+  displayText::showMessage(IDS_NCOLCHG, colorChangedCount);
 }
 
 void form::chan() {

@@ -23,7 +23,6 @@ void dazdef();
 void dasyfrm();
 void frmnum();
 void maxtsiz(std::wstring const& label, POINT& textSize);
-auto maxwid(uint32_t start, uint32_t finish);
 void prfmsg();
 void prfsid(HWND wnd) noexcept;
 void refrm();
@@ -38,10 +37,11 @@ namespace internal {
 
   void initdaz(HWND hWinDialog);
   void initTearDlg(HWND hwndlg);
+  auto maxwid();
   auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
   void nxtlin(uint32_t& formMenuEntryCount) noexcept;
   void nxtlinprf() noexcept;
-  void prflin(std::wstring const& msg, uint32_t row) noexcept;
+  void prflin(std::wstring const& msg, uint32_t row);
   auto prfnwin(std::wstring const& text) noexcept -> HWND;
   void prftwin(std::wstring const& text) noexcept;
   void refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount);

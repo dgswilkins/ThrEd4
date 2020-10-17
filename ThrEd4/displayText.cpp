@@ -32,14 +32,15 @@
 
 namespace di = displayText::internal;
 
-void displayText::loadString(std::wstring& sDest, uint32_t stringID) {
-  auto* pBuf = gsl::narrow_cast<wchar_t*>(nullptr);
-  sDest.clear();
+auto displayText::loadStr(uint32_t stringID) -> std::wstring {
+  auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
+  auto  sDest = std::wstring {};
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
   if (auto const len = LoadString(ThrEdInstance, stringID, reinterpret_cast<LPTSTR>(&pBuf), 0)) {
 	auto const span = gsl::span<wchar_t>(pBuf, wrap::toSize(len));
 	sDest.insert(sDest.end(), span.begin(), span.end());
   }
+  return sDest;
 }
 
 void displayText::shoMsg(std::wstring const& message) {
@@ -93,50 +94,14 @@ void displayText::shoMsg(std::wstring const& message) {
 }
 
 void displayText::tabmsg(uint32_t code) {
-  auto message = std::wstring {};
-  displayText::loadString(message, code);
-  displayText::shoMsg(message);
-}
-
-void displayText::lodstr() {
-  static constexpr auto loadStringIDs = std::array<uint16_t, STR_LEN> {
-      // strings to load into memory at init time
-      IDS_PIKOL,     IDS_UPON,    IDS_UPOF,    IDS_AUXTXT,  IDS_HUP0,    IDS_HUP1,    IDS_HUP2,
-      IDS_HUP3,      IDS_HUP4,    IDS_TRC0,    IDS_TRC1S,   IDS_TRC2,    IDS_TRC3,    IDS_TRC4,
-      IDS_TRC1H,     IDS_NUMPNT,  IDS_NUMFRM,  IDS_NUMSCH,  IDS_NUMFORM, IDS_NUMSEL,  IDS_BOXSEL,
-      IDS_CLOS,      IDS_TOT,     IDS_LAYR,    IDS_OVRLOK,  IDS_OVRIT,   IDS_THRED,   IDS_NUFIL,
-      IDS_EMB,       IDS_ON,      IDS_OFF,     IDS_FMEN,    IDS_TXT0,    IDS_TXT1,    IDS_TXT2,
-      IDS_TXT3,      IDS_TXT4,    IDS_TXT5,    IDS_TXT6,    IDS_TXT7,    IDS_TXT8,    IDS_TXT9,
-      IDS_TXT10,     IDS_TXT11,   IDS_TXT12,   IDS_TXT13,   IDS_TXT14,   IDS_TXT15,   IDS_TXT16,
-      IDS_TXT17,     IDS_TXT18,   IDS_TXT19,   IDS_TXT20,   IDS_TXT21,   IDS_TXT22,   IDS_TXT23,
-      IDS_FIL0,      IDS_FIL1,    IDS_FIL2,    IDS_FIL3,    IDS_FIL4,    IDS_FIL5,    IDS_FIL6,
-      IDS_FIL7,      IDS_FIL8,    IDS_FIL9,    IDS_FIL10,   IDS_FIL11,   IDS_FIL12,   IDS_FIL13,
-      IDS_EDG0,      IDS_EDG1,    IDS_EDG2,    IDS_EDG3,    IDS_EDG4,    IDS_EDG5,    IDS_EDG6,
-      IDS_EDG7,      IDS_EDG8,    IDS_EDG9,    IDS_EDG10,   IDS_EDG11,   IDS_EDG12,   IDS_PRF0,
-      IDS_PRF1,      IDS_PRF2,    IDS_PRF3,    IDS_PRF4,    IDS_PRF5,    IDS_PRF6,    IDS_PRF7,
-      IDS_PRF8,      IDS_PRF9,    IDS_PRF10,   IDS_PRF11,   IDS_PRF12,   IDS_PRF13,   IDS_PRF14,
-      IDS_PRF15,     IDS_PRF16,   IDS_PRF17,   IDS_PRF18,   IDS_PRF19,   IDS_PRF20,   IDS_PRF21,
-      IDS_PRF22,     IDS_PRF23,   IDS_PRF24,   IDS_PRF25,   IDS_PRF26,   IDS_PRF27,   IDS_PRF28,
-      IDS_PRF29,     IDS_FRMPLUS, IDS_FRMINUS, IDS_OKENT,   IDS_CANCEL,  IDS_FREH,    IDS_BLUNT,
-      IDS_TAPR,      IDS_PNTD,    IDS_SQR,     IDS_DELST2,  IDS_THRDBY,  IDS_STCHOUT, IDS_STCHS,
-      IDS_FORMS,     IDS_HUPWID,  IDS_CREATBY, IDS_CUSTHUP, IDS_STCHP,   IDS_FRMP,    IDS_ENTROT,
-      IDS_NUDG,      IDS_ALLX,    IDS_FTHCOL,  IDS_FTHTYP,  IDS_FTH0,    IDS_FTH1,    IDS_FTH2,
-      IDS_FTH3,      IDS_FTH4,    IDS_FTH5,    IDS_FTHBLND, IDS_FTHUP,   IDS_FTHBOTH, IDS_FTHUPCNT,
-      IDS_FTHDWNCNT, IDS_FTHSIZ,  IDS_FTHNUM,  IDS_FTHFLR,  IDS_FSTRT,   IDS_FEND,    IDS_WALK,
-      IDS_UWLKIND,   IDS_UND,     IDS_ULEN,    IDS_FUANG,   IDS_FUSPAC,  IDS_CWLK,    IDS_UNDCOL,
-      IDS_FRMBOX,    IDS_TXOF};
-
-  for (auto iString = 0U; iString < loadStringIDs.size(); ++iString) {
-	displayText::loadString(StringTable->operator[](iString), loadStringIDs[iString]);
-  }
+  displayText::shoMsg(displayText::loadStr(code));
 }
 
 void displayText::hsizmsg() {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_HSIZ);
-  // NOLINTNEXTLINE
-  displayText::shoMsg(fmt::format(
-      fmtStr, (wrap::toFloat(UnzoomedRect.x) * IPFGRAN), (wrap::toFloat(UnzoomedRect.y) * IPFGRAN)));
+  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+  displayText::shoMsg(fmt::format(displayText::loadStr(IDS_HSIZ),
+                                  (wrap::toFloat(UnzoomedRect.x) * IPFGRAN),
+                                  (wrap::toFloat(UnzoomedRect.y) * IPFGRAN)));
 }
 
 void displayText::numWnd() {
@@ -164,52 +129,45 @@ void displayText::numWnd() {
 }
 
 void displayText::msgflt(uint32_t messageId, float value) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, messageId);
-  displayText::shoMsg(fmt::format(fmtStr, value));
+  displayText::showMessage(messageId, value);
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_SIZ);
+  auto const fmtStr = displayText::loadStr(IDS_SIZ);
   displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
 
 void displayText::bfilmsg() {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_BADFIL);
-  displayText::shoMsg(fmt::format(fmtStr, WorkingFileName->wstring()));
+  displayText::showMessage(IDS_BADFIL, WorkingFileName->wstring());
 }
 
 void displayText::filnopn(uint32_t code, fs::path const& fileName) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, code);
-  displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
+  displayText::showMessage(code, fileName.wstring());
 }
 
 void displayText::crmsg(fs::path const& fileName) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, IDS_CREAT);
-  displayText::shoMsg(fmt::format(fmtStr, fileName.wstring()));
+  displayText::showMessage(IDS_CREAT, fileName.wstring());
 }
 
 void displayText::butxt(uint32_t iButton, std::wstring const& buttonText) {
   if (StateMap->test(StateFlag::WASTRAC) && iButton > HNUM) {
 	if (iButton == HMINLEN) {
 	  if (StateMap->test(StateFlag::HIDMAP)) {
-		SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1H).c_str());
+		auto const bText = displayText::loadStr(IDS_TRC1H);
+		SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 	  }
 	  else {
-		SetWindowText(ButtonWin->operator[](iButton), StringTable->operator[](STR_TRC1S).c_str());
+		auto const bText = displayText::loadStr(IDS_TRC1S);
+		SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 	  }
 	}
 	else {
-	  SetWindowText(ButtonWin->  operator[](iButton),
-	                StringTable->operator[](wrap::toSize(iButton) - 4U + STR_TRC0).c_str());
+	  auto const bText = displayText::loadStr(iButton - 4U + IDS_TRC0);
+	  SetWindowText(ButtonWin->operator[](iButton), bText.c_str());
 	}
   }
   else {
@@ -224,7 +182,7 @@ void displayText::clrhbut(uint32_t startButton) noexcept {
 }
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
-  displayText::butxt(HNUM, fmt::format(StringTable->operator[](code), value));
+  displayText::butxt(HNUM, fmt::format(displayText::loadStr(code), value));
 }
 
 void displayText::riter() {
@@ -232,20 +190,14 @@ void displayText::riter() {
 }
 
 void displayText::pntmsg(uint32_t msgID) {
-  auto fmtStr  = std::wstring {};
-  auto message = std::wstring {};
-  displayText::loadString(fmtStr, IDS_PNT);
-  displayText::loadString(message, msgID);
-  displayText::shoMsg(fmt::format(fmtStr, message));
+  auto const message = displayText::loadStr(msgID);
+  displayText::showMessage(IDS_PNT, message);
 }
 
 void displayText::shoseln(uint32_t code0, uint32_t code1) {
-  auto fmtStr = std::wstring {};
-  auto msg0   = std::wstring {};
-  auto msg1   = std::wstring {};
-  displayText::loadString(fmtStr, IDS_SHOSEL);
-  displayText::loadString(msg0, code0);
-  displayText::loadString(msg1, code1);
+  auto const msg0 = displayText::loadStr(code0);
+  auto const msg1   = displayText::loadStr(code1);
+  auto const fmtStr = displayText::loadStr(IDS_SHOSEL);
   displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));
 }
 
@@ -303,10 +255,7 @@ void displayText::grpmsg1() {
 }
 
 void displayText::internal::sdmsg() {
-  auto fmtStr = std::wstring {};
-
-  displayText::loadString(fmtStr, IDS_SAVDISC);
-  displayText::shoMsg(fmt::format(fmtStr, ThrName->wstring()));
+  displayText::showMessage(IDS_SAVDISC, ThrName->wstring());
 }
 
 void displayText::alrotmsg() {
@@ -322,9 +271,7 @@ void displayText::spltmsg() {
 }
 
 void displayText::datmsg(uint32_t code) {
-  // Resharper disable once CppInitializedValueIsAlwaysRewritten
-  auto dataErrorID = 0U;
-  auto dataError   = std::wstring {};
+  auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
   switch (code) {
 	case BADFLT:
 	  dataErrorID = IDS_BADFLT;
@@ -339,18 +286,16 @@ void displayText::datmsg(uint32_t code) {
 	  dataErrorID = IDS_BADTX;
 	  break;
 	default:
-	  dataErrorID = IDS_BADUKN;
 	  break;
   }
-  displayText::loadString(dataError, dataErrorID);
-  displayText::shoMsg(dataError);
+  displayText::shoMsg(displayText::loadStr(dataErrorID));
 }
 
-void displayText::okcan() noexcept {
+void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   OKButton = CreateWindow(L"STATIC",
-                          StringTable->operator[](STR_OKENT).c_str(),
+                          displayText::loadStr(IDS_OKENT).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
                           MsgRect.bottom + 15,
@@ -362,7 +307,7 @@ void displayText::okcan() noexcept {
                           nullptr);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CancelButton = CreateWindow(L"STATIC",
-                              StringTable->operator[](STR_CANCEL).c_str(),
+                              displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               ButtonWidth * 5,
                               MsgRect.bottom + 15,
@@ -378,11 +323,9 @@ void displayText::savdisc() {
   di::sdmsg();
   StateMap->reset(StateFlag::BIGBOX);
   GetClientRect(MsgWindow, &MsgRect);
-  auto buffer = std::wstring {};
-  displayText::loadString(buffer, IDS_SAV);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   OKButton = CreateWindow(L"STATIC",
-                          buffer.c_str(),
+                          displayText::loadStr(IDS_SAV).c_str(),
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
                           MsgRect.bottom + 15,
@@ -392,10 +335,9 @@ void displayText::savdisc() {
                           nullptr,
                           ThrEdInstance,
                           nullptr);
-  displayText::loadString(buffer, IDS_DISC);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   DiscardButton = CreateWindow(L"STATIC",
-                               buffer.c_str(),
+                               displayText::loadStr(IDS_DISC).c_str(),
                                SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 15,
                                MsgRect.bottom + 15,
@@ -407,7 +349,7 @@ void displayText::savdisc() {
                                nullptr);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CancelButton = CreateWindow(L"STATIC",
-                              StringTable->operator[](STR_CANCEL).c_str(),
+                              displayText::loadStr(IDS_CANCEL).c_str(),
                               SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                               2 * ButtonWidthX3 + 25,
                               MsgRect.bottom + 15,
@@ -435,13 +377,11 @@ void displayText::tomsg() {
   auto OKrect   = RECT {0L, 0L, 0L, 0L};
   auto textSize = SIZE {0L, 0L};
   GetWindowRect(OKButton, &OKrect);
-  wrap::getTextExtentPoint32(GetDC(ThrEdWindow),
-                             StringTable->operator[](STR_DELST2).c_str(),
-                             wrap::toUnsigned(StringTable->operator[](STR_DELST2).size()),
-                             &textSize);
+  auto const winName = displayText::loadStr(IDS_DELST2);
+  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   DeleteStitchesDialog = CreateWindow(L"STATIC",
-                                      StringTable->operator[](STR_DELST2).c_str(),
+                                      winName.c_str(),
                                       SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                       3,
                                       OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
@@ -455,14 +395,11 @@ void displayText::tomsg() {
 }
 
 void displayText::internal::bxtxt(uint32_t iButton, uint32_t iMessage) {
-  auto message = std::wstring {};
-  displayText::loadString(message, iMessage);
-  SetWindowText(ButtonWin->operator[](iButton), message.c_str());
+  SetWindowText(ButtonWin->operator[](iButton), displayText::loadStr(iMessage).c_str());
 }
 
 void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
-  auto fmtStr = std::wstring {};
-  displayText::loadString(fmtStr, iMessage);
+  auto const fmtStr = displayText::loadStr(iMessage);
   SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }
 

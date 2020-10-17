@@ -153,7 +153,6 @@ HDC                            StitchWindowDC            = nullptr; // stitch wi
 HDC                            StitchWindowMemDC         = nullptr; // stitch window memory device context
 POINT                          StitchWindowOrigin        = {};      // offset origin of the stitch window
 POINT                          StitchWindowSize          = {};      // size of the stitch window in pixels
-std::vector<std::wstring>*     StringTable               = nullptr; //
 std::vector<fPOINT>*           TempPolygon               = nullptr; // temporary storage when user is entering a polygon;
 std::array<TXHST, ITXBUFSZ>*   TextureHistory            = nullptr; // texture editor history headers
 std::wstring*                  TextureInputBuffer        = nullptr; // texture fill number buffer
