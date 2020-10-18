@@ -8,6 +8,7 @@
 #pragma warning(pop)
 
 // Local Headers
+#include "Resources\resource.h"
 
 #ifdef _DEBUG
 // ReSharper disable cppcoreguidelines-macro-usage
@@ -537,16 +538,39 @@ enum class UserFlag : uint32_t {
   EnumCount // must be the last entry in the enum
 };
 
-enum featherStyles { // feather fill types
-  FTHSIN = 1,        // sine
-  FTHSIN2,           // half sine
-  FTHLIN,            // line
-  FTHPSG,            // psuedo-random sequence
-  FTHRMP,            // sawtooth
-  FTHFAZ             // phase
+// Feather types
+enum featherStyles : uint8_t { 
+  FTHSIN = 1,                  // sine
+  FTHSIN2,                     // half sine
+  FTHLIN,                      // line
+  FTHPSG,                      // ragged
+  FTHRMP,                      // sawtooth
+  FTHFAZ                       // picket
 };
 
 constexpr int32_t FDEFTYP = FTHPSG; // default feather type
+
+// fill types
+enum fillStyles : uint8_t {
+  VRTF = 1, // Vertical fill
+  HORF,     // Horizontal fill
+  ANGF,     // Angle fill
+  SATF,     // Fan fill ?
+  CLPF,     // Fan clip Fill
+  CONTF,    // Contour fill
+  VCLPF,    // Vertical clip fill
+  HCLPF,    // Horizontal clip fill
+  ANGCLPF,  // Angle clip fill
+  FTHF,     // Feather fill
+  TXVRTF,   // Vertical texture fill
+  TXHORF,   // Horizontal texture fill
+  TXANGF    // Angle texture fill
+};
+
+constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
+constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
+constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
+constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 
 // edge fill types
 enum edgeFillStyles : uint8_t {
@@ -564,6 +588,40 @@ enum edgeFillStyles : uint8_t {
   EDGECLIPX,     // Even Clipboard
   EDGELAST       // must always be the last value
 };
+
+constexpr auto FSSIZE   = uint8_t {6U};   // count of feather styles
+constexpr auto FILLTYPS = uint32_t {14U}; // 13 fill types plus 'none'
+constexpr auto EDGETYPS = uint32_t {13U}; // number of border fill types
+
+constexpr auto fthrList =
+    std::array<uint32_t, FSSIZE> {IDS_FTH0, IDS_FTH1, IDS_FTH2, IDS_FTH3, IDS_FTH4, IDS_FTH5};
+constexpr auto fillList = std::array<uint32_t, FILLTYPS> {IDS_FIL0,
+                                                          IDS_FIL1,
+                                                          IDS_FIL2,
+                                                          IDS_FIL3,
+                                                          IDS_FIL4,
+                                                          IDS_FIL5,
+                                                          IDS_FIL6,
+                                                          IDS_FIL7,
+                                                          IDS_FIL8,
+                                                          IDS_FIL9,
+                                                          IDS_FIL10,
+                                                          IDS_FIL11,
+                                                          IDS_FIL12,
+                                                          IDS_FIL13};
+constexpr auto edgeList = std::array<uint32_t, EDGETYPS> {IDS_EDG0,
+                                                          IDS_EDG1,
+                                                          IDS_EDG2,
+                                                          IDS_EDG3,
+                                                          IDS_EDG4,
+                                                          IDS_EDG5,
+                                                          IDS_EDG6,
+                                                          IDS_EDG7,
+                                                          IDS_EDG8,
+                                                          IDS_EDG9,
+                                                          IDS_EDG10,
+                                                          IDS_EDG11,
+                                                          IDS_EDG12};
 
 // form types
 enum formStyles {
@@ -694,28 +752,6 @@ enum formData {
   LTXOF,      // texture fill spacing
   LASTLIN     // must be the last entry
 };
-
-// fill types
-enum fillStyles {
-  VRTF = 1, // Vertical fill
-  HORF,     // Horizontal fill
-  ANGF,     // Angle fill
-  SATF,     // Fan fill ?
-  CLPF,     // Fan clip Fill
-  CONTF,    // Contour fill
-  VCLPF,    // Vertical clip fill
-  HCLPF,    // Horizontal clip fill
-  ANGCLPF,  // Angle clip fill
-  FTHF,     // Feather fill
-  TXVRTF,   // Vertical texture fill
-  TXHORF,   // Horizontal texture fill
-  TXANGF    // Angle texture fill
-};
-
-constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
-constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
-constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
-constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 
 // preference window
 enum preferenceItems {

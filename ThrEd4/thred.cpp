@@ -35,7 +35,6 @@
 #include "utf8conv.h"
 #include "wrappers.h"
 
-#include "Resources/resource.h"
 #include "globals.h"
 #include "bitmap.h"
 #include "clip.h"
@@ -67,9 +66,6 @@ constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for fil
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto ARROWPNT = 3U;                     // points required to draw arrow
-constexpr auto FILLTYPS = uint32_t {14U};         // 13 fill types plus 'none'
-constexpr auto FSSIZE   = uint8_t {6U};           // count of feather styles
-constexpr auto EDGETYPS = uint32_t {13U};         // number of border fill types
 constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
 constexpr auto HUPS     = 5;                      // number of hoops the user can select
 constexpr auto BALRATIO = 10.0F / 6.0F;           // Balarad stitch size ration
@@ -10057,8 +10053,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	                fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
-	  for (auto iFeatherStyle = 0U; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
-		featherStyle = displayText::loadStr((IDS_FTH0 + iFeatherStyle));
+	  for (auto iFeatherStyle : fthrList) {
+		featherStyle.assign(displayText::loadStr(iFeatherStyle));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
 		            CB_ADDSTRING,
@@ -10096,8 +10092,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer               = std::wstring {};
-		  for (auto iFeatherStyle = uint8_t {}; iFeatherStyle < FSSIZE; ++iFeatherStyle) {
-			buffer = displayText::loadStr(IDS_FTH0 + iFeatherStyle);
+		  for (auto iFeatherStyle = uint8_t {}; iFeatherStyle < fthrList.size(); ++iFeatherStyle) {
+			buffer = displayText::loadStr(fthrList[iFeatherStyle]);
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 			  IniFile.featherFillType = iFeatherStyle + 1U;
 			  break;
@@ -11270,7 +11266,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		StateMap->set(StateFlag::RESTCH);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGELINE]) {
+	  if (Msg.hwnd == SideWindow[EDGELINE]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11282,7 +11278,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::bord();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEBEAN]) {
+	  if (Msg.hwnd == SideWindow[EDGEBEAN]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11294,11 +11290,11 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::dubold();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGECLIP]) {
+	  if (Msg.hwnd == SideWindow[EDGECLIP]) {
 		form::fclp();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEANGSAT]) {
+	  if (Msg.hwnd == SideWindow[EDGEANGSAT]) {
 		if (form.edgeType != 0U) {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
@@ -11331,7 +11327,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		satin::satbrd();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEAPPL]) {
+	  if (Msg.hwnd == SideWindow[EDGEAPPL]) {
 		if (form.fillType != 0U) {
 		  form::delmfil(ClosestFormToCursor);
 		  form.fillType = 0;
@@ -11354,7 +11350,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::apliq();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEPROPSAT]) {
+	  if (Msg.hwnd == SideWindow[EDGEPROPSAT]) {
 		if (form.edgeType != 0U) {
 		  switch (form.edgeType) {
 			case EDGECLIP: {
@@ -11387,7 +11383,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::prpbrd(LineSpacing);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEBHOL]) {
+	  if (Msg.hwnd == SideWindow[EDGEBHOL]) {
 		if (form.edgeType != 0U) {
 		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
 			form.borderSize  = BorderWidth;
@@ -11402,7 +11398,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::bhol();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEPICOT]) {
+	  if (Msg.hwnd == SideWindow[EDGEPICOT]) {
 		if (form.edgeType != 0U) {
 		  if (form.edgeType == EDGELINE || form.edgeType == EDGEBEAN || form.edgeType == EDGECLIP) {
 			form.borderSize  = BorderWidth;
@@ -11417,7 +11413,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::picot();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEDOUBLE]) {
+	  if (Msg.hwnd == SideWindow[EDGEDOUBLE]) {
 		if (form.edgeType != 0U) {
 		  auto const code = form.edgeType & NEGUND;
 		  if (code == EDGECLIP || code == EDGEANGSAT || code == EDGEAPPL) {
@@ -11429,19 +11425,19 @@ auto thred::internal::handleSideWindowActive() -> bool {
 		form::dubsfil(form);
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGELCHAIN]) {
+	  if (Msg.hwnd == SideWindow[EDGELCHAIN]) {
 		StateMap->set(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGEOCHAIN]) {
+	  if (Msg.hwnd == SideWindow[EDGEOCHAIN]) {
 		StateMap->reset(StateFlag::LINCHN);
 		form::chan();
 		thred::coltab();
 		break;
 	  }
-	  if (Msg.hwnd == SideWindow[edgeFillStyles::EDGECLIPX]) {
+	  if (Msg.hwnd == SideWindow[EDGECLIPX]) {
 		form::filclpx();
 		break;
 	  }
@@ -11717,7 +11713,6 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
-	  auto fthrList = std::array<uint32_t, FSSIZE> {IDS_FTH0, IDS_FTH1, IDS_FTH2, IDS_FTH3, IDS_FTH4, IDS_FTH5};
 	  auto fthStrings = std::vector<std::wstring> {};
 	  fthStrings.reserve(FSSIZE);
 	  for (auto item : fthrList) {
@@ -11751,8 +11746,6 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice = LFRMFIL;
-	  auto fillList = std::array<uint32_t, FILLTYPS> {
-          IDS_FIL0, IDS_FIL1, IDS_FIL2, IDS_FIL3, IDS_FIL4, IDS_FIL5, IDS_FIL6, IDS_FIL7, IDS_FIL8, IDS_FIL9, IDS_FIL10, IDS_FIL11, IDS_FIL12, IDS_FIL13};
 	  auto fillStrings = std::vector<std::wstring> {};
 	  fillStrings.reserve(FILLTYPS);
 	  for (auto item : fillList) {
@@ -11793,8 +11786,6 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
-	  auto edgeList = std::array<uint32_t, EDGETYPS> {
-	      IDS_EDG0, IDS_EDG1, IDS_EDG2, IDS_EDG3, IDS_EDG4, IDS_EDG5, IDS_EDG6, IDS_EDG7, IDS_EDG8, IDS_EDG9, IDS_EDG10, IDS_EDG11, IDS_EDG12};
 	  auto edgeStrings = std::vector<std::wstring> {};
 	  edgeStrings.reserve(EDGETYPS);
 	  for (auto item : edgeList) {
