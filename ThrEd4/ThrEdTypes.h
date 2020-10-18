@@ -593,35 +593,53 @@ constexpr auto FSSIZE   = uint8_t {6U};   // count of feather styles
 constexpr auto FILLTYPS = uint32_t {14U}; // 13 fill types plus 'none'
 constexpr auto EDGETYPS = uint32_t {13U}; // number of border fill types
 
-constexpr auto fthrList =
-    std::array<uint32_t, FSSIZE> {IDS_FTH0, IDS_FTH1, IDS_FTH2, IDS_FTH3, IDS_FTH4, IDS_FTH5};
-constexpr auto fillList = std::array<uint32_t, FILLTYPS> {IDS_FIL0,
-                                                          IDS_FIL1,
-                                                          IDS_FIL2,
-                                                          IDS_FIL3,
-                                                          IDS_FIL4,
-                                                          IDS_FIL5,
-                                                          IDS_FIL6,
-                                                          IDS_FIL7,
-                                                          IDS_FIL8,
-                                                          IDS_FIL9,
-                                                          IDS_FIL10,
-                                                          IDS_FIL11,
-                                                          IDS_FIL12,
-                                                          IDS_FIL13};
-constexpr auto edgeList = std::array<uint32_t, EDGETYPS> {IDS_EDG0,
-                                                          IDS_EDG1,
-                                                          IDS_EDG2,
-                                                          IDS_EDG3,
-                                                          IDS_EDG4,
-                                                          IDS_EDG5,
-                                                          IDS_EDG6,
-                                                          IDS_EDG7,
-                                                          IDS_EDG8,
-                                                          IDS_EDG9,
-                                                          IDS_EDG10,
-                                                          IDS_EDG11,
-                                                          IDS_EDG12};
+class LSTTYPE
+{
+  public:
+  uint32_t stringID {}; // feather fill type
+  uint8_t  value {};    // feather up count
+
+  // LSTTYPE() noexcept = default;
+  // LSTTYPE(FTHINFO const&) = default;
+  // LSTTYPE(FTHINFO&&) = default;
+  // LSTTYPE& operator=(FTHINFO const& rhs) = default;
+  // LSTTYPE& operator=(FTHINFO&&) = default;
+  //~LSTTYPE() = default;
+};
+
+constexpr auto fthrList = std::array<LSTTYPE, FSSIZE> {{{IDS_FTH0, FTHSIN},
+														{IDS_FTH1, FTHSIN2}, 
+														{IDS_FTH2, FTHLIN}, 
+														{IDS_FTH3, FTHPSG}, 
+														{IDS_FTH4, FTHRMP},
+														{IDS_FTH5, FTHFAZ}}};
+constexpr auto fillList = std::array<LSTTYPE, FILLTYPS> {{{IDS_FIL0, 0},
+                                                          {IDS_FIL1, VRTF},
+                                                          {IDS_FIL2, HORF},
+                                                          {IDS_FIL3, ANGF},
+                                                          {IDS_FIL4, SATF},
+                                                          {IDS_FIL5, CLPF},
+                                                          {IDS_FIL6, CONTF},
+                                                          {IDS_FIL7, VCLPF},
+                                                          {IDS_FIL8, HCLPF},
+                                                          {IDS_FIL9, ANGCLPF},
+                                                          {IDS_FIL10, FTHF},
+                                                          {IDS_FIL11, TXVRTF},
+                                                          {IDS_FIL12, TXHORF},
+                                                          {IDS_FIL13, TXANGF}}};
+constexpr auto edgeList = std::array<LSTTYPE, EDGETYPS> {{{IDS_EDG0, 0},
+                                                          {IDS_EDG1, EDGELINE},
+                                                          {IDS_EDG2, EDGEBEAN},
+                                                          {IDS_EDG3, EDGECLIP},
+                                                          {IDS_EDG4, EDGEANGSAT},
+                                                          {IDS_EDG5, EDGEAPPL},
+                                                          {IDS_EDG6, EDGEPROPSAT},
+                                                          {IDS_EDG7, EDGEBHOL},
+                                                          {IDS_EDG8, EDGEPICOT},
+                                                          {IDS_EDG9, EDGEDOUBLE},
+                                                          {IDS_EDG10, EDGELCHAIN},
+                                                          {IDS_EDG11, EDGEOCHAIN},
+                                                          {IDS_EDG12, EDGECLIPX}}};
 
 // form types
 enum formStyles {
