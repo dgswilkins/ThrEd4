@@ -1145,8 +1145,10 @@ auto form::internal::ritlin(fPOINT const& start, fPOINT const& finish, float use
 	if (count == 0U) {
 	  count = 1;
 	}
-	while (length / wrap::toFloat(count) > MaxStitchLen) {
+	auto newLength = length / wrap::toFloat(count);
+	while ((newLength > MaxStitchLen) && (newLength > MINSTLEN)) {
 	  ++count;
+	  newLength = length / wrap::toFloat(count);
 	}
 	auto const step  = fPOINT {delta.x / wrap::toFloat(count), delta.y / wrap::toFloat(count)};
 	auto       point = fPOINT {start.x + step.x, start.y + step.y};
@@ -1188,7 +1190,6 @@ void form::chkseq(bool border) {
   auto userStitchLen =
       border ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
              : (clip::isclp(form)) ? MaxStitchLen : form.lengthOrCount.stitchLength;
-  MaxStitchLen                   = border ? form.maxBorderStitchLen : form.maxFillStitchLen;
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
 	if (form.maxBorderStitchLen == 0.0F) {
@@ -1200,6 +1201,7 @@ void form::chkseq(bool border) {
 	  form.maxFillStitchLen = IniFile.maxStitchLength;
 	}
   }
+  MaxStitchLen = border ? form.maxBorderStitchLen : form.maxFillStitchLen;
   if (userStitchLen > MaxStitchLen) {
 	userStitchLen = MaxStitchLen;
   }
