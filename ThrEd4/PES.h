@@ -20,7 +20,7 @@ using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, TH
 class PESLED
 {
   public:
-  int8_t   ver[8] {0}; 
+  int8_t   ver[8] {0};
   uint32_t pec {0U};
 
   constexpr PESLED() noexcept = default;
@@ -107,17 +107,17 @@ class PESSTCHLST
 class PECHDR
 {
   public:
-  char    label[19] {0}; // Label string prefixed with "LA:" and padded with space (0x20)       
-  int8_t  labnd {0};     // carriage return character
-  uint8_t ukn1[11] {0U}; // Unknown (' ') 
-  uint8_t  ukn2 {0U};    // Unknown
-  uint16_t hnd1 {0U};    // Unknown (0x00ff)
+  char     label[19] {0};   // Label string prefixed with "LA:" and padded with space (0x20)
+  int8_t   labnd {0};       // carriage return character
+  uint8_t  ukn1[11] {0U};   // Unknown (' ')
+  uint8_t  ukn2 {0U};       // Unknown
+  uint16_t hnd1 {0U};       // Unknown (0x00ff)
   uint8_t  thumbWidth {0U}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
                             // Thus, 6 would mean 6×8 = 48 pixels per line
   uint8_t thumbHeight {0U}; // Thumbnail image height in pixels (38)
-  uint8_t ukn3[12] {0U}; // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20         
-  uint8_t colorCount {0U}; // Number of colors minus one, 0xFF means 0 colors
-  uint8_t pad[463] {0U}; // Pad bytes up to 512.                                         
+  uint8_t ukn3[12] {0U};    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
+  uint8_t colorCount {0U};  // Number of colors minus one, 0xFF means 0 colors
+  uint8_t pad[463] {0U};    // Pad bytes up to 512.
 
   constexpr PECHDR() noexcept = default;
   // PECHDR(PECHDR&&) = default;

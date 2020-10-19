@@ -12,8 +12,7 @@ template <class, class = void> struct has_EnumCount : std::false_type { };
 
 // specialized as has_EnumCount< T , void > or sfinae
 template <class T>
-struct has_EnumCount<T, std::void_t<decltype(T::EnumCount)>>
-    : std::is_same<T, decltype(T::EnumCount)> { };
+struct has_EnumCount<T, std::void_t<decltype(T::EnumCount)>> : std::is_same<T, decltype(T::EnumCount)> { };
 
 template <typename EnumType> class EnumMap
 {

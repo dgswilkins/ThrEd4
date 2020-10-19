@@ -804,7 +804,7 @@ void trace::trinit() {
 	  StateMap->set(StateFlag::TRCRED);
 	  StateMap->set(StateFlag::TRCGRN);
 	  StateMap->set(StateFlag::TRCBLU);
-	  auto componentPeak = std::array < uint32_t, CHANLCNT>{};
+	  auto componentPeak = std::array<uint32_t, CHANLCNT> {};
 	  if (!StateMap->test(StateFlag::WASTRAC)) {
 		TraceDataSize = bitmap::getrmap();
 	  }
@@ -839,7 +839,7 @@ void trace::trinit() {
 			++(histogramData[iRGB][PixelColors[iRGB]]);
 		  }
 		}
-		auto componentPeakCount = std::array < uint32_t, CHANLCNT>{};
+		auto componentPeakCount = std::array<uint32_t, CHANLCNT> {};
 		for (auto iLevel = 0U; iLevel < LEVELCNT; ++iLevel) {
 		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 			if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
@@ -1137,11 +1137,11 @@ void trace::tracpar() {
 }
 
 void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
-  auto const zeroWidth      = thred::txtWid(L"0");
+  auto const zeroWidth = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
-  auto const val = std::to_wstring(color);
-  auto const xPosition    = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
+  auto const val       = std::to_wstring(color);
+  auto const xPosition = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
   SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
@@ -1215,7 +1215,7 @@ void trace::wasTrace() {
 	}
 	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto    TempBrush           = BlackBrush;
+	  auto TempBrush = BlackBrush;
 	  SetBkColor(DrawItem->hDC, 0);
 	  SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
 	  if (StateMap->test(TraceRGBFlag[iRGB])) {
@@ -1226,10 +1226,7 @@ void trace::wasTrace() {
 #pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
 	  auto const strOnOff = displayText::loadStr((StateMap->test(TraceRGBFlag[iRGB])) ? IDS_ON : IDS_OFF);
-	  wrap::textOut(DrawItem->hDC,
-	                1,
-	                1,
-	                strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
+	  wrap::textOut(DrawItem->hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {

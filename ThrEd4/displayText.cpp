@@ -195,7 +195,7 @@ void displayText::pntmsg(uint32_t msgID) {
 }
 
 void displayText::shoseln(uint32_t code0, uint32_t code1) {
-  auto const msg0 = displayText::loadStr(code0);
+  auto const msg0   = displayText::loadStr(code0);
   auto const msg1   = displayText::loadStr(code1);
   auto const fmtStr = displayText::loadStr(IDS_SHOSEL);
   displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));

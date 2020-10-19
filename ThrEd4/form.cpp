@@ -1033,7 +1033,7 @@ auto form::internal::findDistanceToSide(fPOINT const& lineStart,
   if ((C == 0.0F) && (D == 0.0F)) {
 	distance = sqrt(A * B);
 	// Arbitrarily choose the first point since start and end are the same
-	return -0.1F; 
+	return -0.1F;
   }
   auto const dot    = A * C + B * D;
   auto const len_sq = C * C + D * D;
@@ -1079,7 +1079,7 @@ auto form::closfrm() -> bool {
 		  if ((length < minimumLength) && (length >= 0.0F)) {
 			minimumLength = length;
 			closestForm   = iForm;
-			if (param < 0.5F) { 
+			if (param < 0.5F) {
 			  closestVertex = iVertex;
 			}
 			else {
@@ -1814,7 +1814,7 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
   static constexpr std::array<uint8_t, 14U>level14 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
   static constexpr std::array<uint8_t, 17U>level15 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
   // clang-format on
-  
+
   static constexpr std::array<uint8_t const*, 16> levels = {level00.data(),
                                                             level01.data(),
                                                             level02.data(),
@@ -3098,7 +3098,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   }
   auto regionCrossingData = std::vector<VCLPX> {}; // region crossing data for vertical clipboard fills
   // reserve a little more than we need. Determined empirically
-  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U); 
+  regionCrossingData.reserve(wrap::toSize(clipGrid.right - clipGrid.left) * 5U);
   auto vCurr = vBegin;
   for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 	auto const vNext  = wrap::next(vBegin, form::nxt(form, iVertex));
@@ -3136,7 +3136,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   iclpx.push_back(wrap::toUnsigned(regionCrossingData.size()));
   auto clipStitchPoints = std::vector<CLIPNT> {};
   // Reserve some memory, but probably not enough
-  clipStitchPoints.reserve(1000U); 
+  clipStitchPoints.reserve(1000U);
   auto pasteLocation = fPOINT {};
   auto texture       = TexturePointsBuffer->begin();
   auto iclpxSize     = wrap::toUnsigned(iclpx.size());
@@ -3278,7 +3278,7 @@ void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegm
   if (endPoint != 0U) {
 	--endPoint;
 	// reserve a reasonable amount but not the full amount potentially required
-	clipSegments.reserve(endPoint / 10U); 
+	clipSegments.reserve(endPoint / 10U);
 	auto previousPoint = 0U;
 	for (auto iPoint = 0U; iPoint < endPoint; ++iPoint) {
 	  switch (clipStitchPoints[iPoint].flag) {

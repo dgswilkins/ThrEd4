@@ -301,8 +301,8 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image
 
 void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   auto       thumbnail = imageWithFrame;
-  auto const yFactor = 31.0F / IniFile.hoopSizeY;
-  auto const xFactor = 40.0F / IniFile.hoopSizeX;
+  auto const yFactor   = 31.0F / IniFile.hoopSizeY;
+  auto const xFactor   = 40.0F / IniFile.hoopSizeX;
   // write the overall thumbnail
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
@@ -376,7 +376,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  auto* pecHeader = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
+  auto*      pecHeader     = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
   auto const pecOffset     = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
   auto*      PESstitch     = &fileBuffer[pecOffset];
   auto const pesColorCount = pecHeader->colorCount + 1U;

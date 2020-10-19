@@ -117,7 +117,8 @@ static auto BalaradOffset      = fPOINT {};   // balarad offset
 static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
-static auto UndoBuffer = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(nullptr); // backup data NOLINT (modernize-avoid-c-arrays)
+static auto UndoBuffer       = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(
+    nullptr); // backup data NOLINT (modernize-avoid-c-arrays)
 
 // cursors
 static auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -257,11 +258,9 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		}
 		case IDOK: {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto const hwnd = GetDlgItem(hwndlg, IDC_DESED);
+		  auto const hwnd           = GetDlgItem(hwndlg, IDC_DESED);
 		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
-		  GetWindowText(hwnd,
-		                designerBuffer.data(),
-		                wrap::toUnsigned(designerBuffer.size()));
+		  GetWindowText(hwnd, designerBuffer.data(), wrap::toUnsigned(designerBuffer.size()));
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  auto const fmtStr = displayText::loadStr(IDS_THRED);
@@ -674,7 +673,7 @@ void thred::internal::dudat() {
                     sizeof(decltype(ClipPoints->back())) * ClipPoints->size() +
                     sizeof(decltype(SatinGuides->back())) * SatinGuides->size() + sizeof(UserColor) +
                     sizeof(decltype(TexturePointsBuffer->back())) * TexturePointsBuffer->size();
-  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size);  // NOLINT (modernize-avoid-c-arrays)
+  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT (modernize-avoid-c-arrays)
   auto* backupData                 = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
   if (backupData != nullptr) {
 	backupData->zoomRect  = UnzoomedRect;
@@ -3515,21 +3514,19 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(LSTTYPE                          entry,
-                            int32_t&                   windowLocation,
-                            POINT const&               windowSize) {
+void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, POINT const& windowSize) {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideWindow[entry.value] = CreateWindow(L"STATIC",
-                                   displayText::loadStr(entry.stringID).c_str(),
-                                   SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                   3,
-                                   windowLocation * windowSize.y + 3,
-                                   windowSize.x + 3,
-                                   windowSize.y,
-                                   SideMessageWindow,
-                                   nullptr,
-                                   ThrEdInstance,
-                                   nullptr);
+                                         displayText::loadStr(entry.stringID).c_str(),
+                                         SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                         3,
+                                         windowLocation * windowSize.y + 3,
+                                         windowSize.x + 3,
+                                         windowSize.y,
+                                         SideMessageWindow,
+                                         nullptr,
+                                         ThrEdInstance,
+                                         nullptr);
   ++windowLocation;
 }
 
@@ -3550,8 +3547,9 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 		--entryCount;
 	  }
 	  else {
-		if ((iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) && (!StateMap->test(StateFlag::WASPCDCLP))) {
-			--entryCount;
+		if ((iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) &&
+		    (!StateMap->test(StateFlag::WASPCDCLP))) {
+		  --entryCount;
 		}
 		else {
 		  formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
@@ -3591,7 +3589,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	}
 	else {
 	  if (FormMenuChoice == LFTHTYP) {
-		entryCount     = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
+		entryCount         = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
 		auto const fthrWid = displayText::loadStr(IDS_FTH3);
 		formForms::maxtsiz(fthrWid, sideWindowSize);
 	  }
@@ -3603,7 +3601,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 		  }
 		  else {
 			if ((((1U << iEntry.value) & ClipTypeMap) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
-				--entryCount;
+			  --entryCount;
 			}
 			else {
 			  formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
@@ -4341,8 +4339,8 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	thred::movStch();
 	thred::coltab();
 	StateMap->reset(StateFlag::ZUMED);
-	auto buffer = std::array < wchar_t, 3>{};
-	buffer[1]         = L'0';
+	auto buffer = std::array<wchar_t, 3> {};
+	buffer[1]   = L'0';
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  UserPen[iColor]        = nuPen(UserPen[iColor], 1, UserColor[iColor]);
 	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
@@ -6104,10 +6102,10 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 	++finishIt;
   }
   if (finishIt != StitchBuffer->end()) {
-	delta                         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	auto const knotAttribute      = startIt->attribute | KNOTMSK;
-	auto const knotStep           = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	static constexpr auto knotAtStartOrder = std::array < char , 5>{2, 3, 1, 4, 0}; // knot spacings
+	delta = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	auto const            knotAttribute = startIt->attribute | KNOTMSK;
+	auto const            knotStep      = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	static constexpr auto knotAtStartOrder = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
 	for (char const iKnot : knotAtStartOrder) {
 	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
 	}
@@ -8500,8 +8498,8 @@ void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 void thred::internal::desiz() {
   constexpr auto MMTOINCH = 1 / 25.4F; // conversion factor for millimeters to inches
 
-  auto  rectangle   = fRECTANGLE {};
-  auto  info        = std::wstring {};
+  auto rectangle = fRECTANGLE {};
+  auto info      = std::wstring {};
   if (!StitchBuffer->empty()) {
 	thred::stchrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
@@ -8510,8 +8508,12 @@ void thred::internal::desiz() {
 	    (rectangle.top > IniFile.hoopSizeY)) {
 	  info += displayText::loadStr(IDS_STCHOUT);
 	}
-	info += fmt::format(
-	    displayText::loadStr(IDS_STCHS), wrap::toUnsigned(StitchBuffer->size()), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	info += fmt::format(displayText::loadStr(IDS_STCHS),
+	                    wrap::toUnsigned(StitchBuffer->size()),
+	                    xSize,
+	                    (xSize * MMTOINCH),
+	                    ySize,
+	                    (ySize * MMTOINCH));
   }
   if (!FormList->empty()) {
 	thred::frmrct(rectangle);
@@ -8520,7 +8522,8 @@ void thred::internal::desiz() {
 	info += fmt::format(
 	    displayText::loadStr(IDS_FORMS), FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
   }
-  info += fmt::format(displayText::loadStr(IDS_HUPWID), (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
+  info += fmt::format(
+      displayText::loadStr(IDS_HUPWID), (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
 	auto  modifier     = utf::Utf8ToUtf16(std::string(std::begin(modifierName)));
@@ -10074,8 +10077,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  auto buf = std::array<wchar_t, HBUFSIZ> {0};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
-		  auto buffer               = std::wstring {};
-		  for (auto iFeatherStyle:FTHRLIST) {
+		  auto buffer             = std::wstring {};
+		  for (auto iFeatherStyle : FTHRLIST) {
 			buffer = displayText::loadStr(iFeatherStyle.stringID);
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 			  IniFile.featherFillType = iFeatherStyle.value;
@@ -11711,14 +11714,14 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LLAYR) || Msg.hwnd == LabelWindow->operator[](LLAYR)) {
-	  FormMenuChoice          = LLAYR;
+	  FormMenuChoice = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
 	  sidmsg(form, ValueWindow->operator[](LLAYR));
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
-	  FormMenuChoice   = LFRMFIL;
+	  FormMenuChoice = LFRMFIL;
 	  sidmsg(form, ValueWindow->operator[](LFRMFIL));
 	  break;
 	}
@@ -11793,7 +11796,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBSTRT) || Msg.hwnd == LabelWindow->operator[](LBSTRT)) {
-	  auto const code = form.attribute & SBLNT;
+	  auto const code     = form.attribute & SBLNT;
 	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
 	  SetWindowText(ValueWindow->operator[](LBSTRT), bluntStr.c_str());
 	  if (code != 0U) {
@@ -11808,7 +11811,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBFIN) || Msg.hwnd == LabelWindow->operator[](LBFIN)) {
-	  auto const code = form.attribute & FBLNT;
+	  auto const code     = form.attribute & FBLNT;
 	  auto const bluntStr = displayText::loadStr((code != 0U) ? IDS_TAPR : IDS_BLUNT);
 	  SetWindowText(ValueWindow->operator[](LBFIN), bluntStr.c_str());
 	  if (code != 0U) {
@@ -11835,7 +11838,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LBRDUND) || Msg.hwnd == LabelWindow->operator[](LBRDUND)) {
 	  form.edgeType ^= EGUND;
 	  form::refil();
-	  auto const code = form.edgeType & EGUND;
+	  auto const code    = form.edgeType & EGUND;
 	  auto const bUndStr = displayText::loadStr((code != 0U) ? IDS_ON : IDS_OFF);
 	  SetWindowText(ValueWindow->operator[](LBRDUND), bUndStr.c_str());
 	  break;
@@ -12180,7 +12183,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  static constexpr auto threadSizeMap = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 	  ThreadSize[threadSizeSelected]      = threadSizeMap[VerticalIndex];
 	  ThreadSizeIndex[threadSizeSelected] = VerticalIndex;
-	  auto buffer = std::array<wchar_t, 3> {};
+	  auto buffer                         = std::array<wchar_t, 3> {};
 	  buffer[0]                           = ThreadSize[threadSizeSelected];
 	  buffer[1]                           = L'0';
 	  SetWindowText(ThreadSizeWin[threadSizeSelected], buffer.data());
@@ -15582,7 +15585,7 @@ auto thred::txtWid(wchar_t const* string) -> SIZE {
 
 void thred::internal::makCol() noexcept {
   auto buffer = std::array<wchar_t, 3> {};
-  buffer[1]         = L'0';
+  buffer[1]   = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const hFont = displayText::getThrEdFont(FONTSIZE);
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
@@ -16410,7 +16413,7 @@ void thred::internal::drwStch() {
 	  ShowWindow(HorizontalScrollBar, FALSE);
 	}
 	thred::duzrat();
-	auto const    dub6           = ZoomRatio.x * 6.0F;
+	auto const dub6        = ZoomRatio.x * 6.0F;
 	const auto threadWidth = std::array<int32_t, 3> {
 	    std::lround(dub6 * TSIZ30), std::lround(dub6 * TSIZ40), std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
@@ -17209,11 +17212,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		else {
 		  auto const pikol = displayText::loadStr(IDS_PIKOL);
-		  wrap::textOut(DrawItem->hDC,
-		                position,
-		                1,
-		                pikol.c_str(),
-		                wrap::toUnsigned(pikol.size()));
+		  wrap::textOut(DrawItem->hDC, position, 1, pikol.c_str(), wrap::toUnsigned(pikol.size()));
 		}
 		return 1;
 	  }

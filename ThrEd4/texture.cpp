@@ -76,8 +76,7 @@ void texture::txdun() {
 	if (txi::txnam(name)) {
 	  auto bytesWritten = DWORD {0};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const handle =
-	      CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+	  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
@@ -132,14 +131,13 @@ void texture::internal::redtbak() {
 }
 
 void texture::redtx() {
-  auto name = std::wstring{};
-  auto    textureHistoryBuffer = std::vector<TXHSTBUF> {};
+  auto name                 = std::wstring {};
+  auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
   TextureHistoryIndex = ITXBUFSZ - 1U;
   if (txi::txnam(name)) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const handle =
-	    CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
+	auto const handle = CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {0};
@@ -1704,7 +1702,6 @@ void texture::setshft() {
 }
 
 void texture::writeScreenWidth(int32_t position) {
-  auto const scrWidth =
-      fmt::format(displayText::loadStr(IDS_TXWID), (TextureScreen.width * IPFGRAN));
+  auto const scrWidth = fmt::format(displayText::loadStr(IDS_TXWID), (TextureScreen.width * IPFGRAN));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }
