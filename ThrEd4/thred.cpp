@@ -11234,7 +11234,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  }
 	}
 	if (iLayer < LayerList.size()) {
-	  form::movlayr(iLayer * 2U);
+	  form::movlayr(iLayer);
 	  StateMap->set(StateFlag::FORMSEL);
 	}
 	thred::unsid();
