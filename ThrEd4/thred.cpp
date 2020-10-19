@@ -641,14 +641,14 @@ void thred::coltab() {
 }
 
 void thred::internal::ladj() {
-  for (auto iLayer = 0U; iLayer < LayerList.size(); ++iLayer) {
-	if (iLayer == ActiveLayer) {
+  for (auto iLayer : LAYRLIST) {
+	if (iLayer.value == ActiveLayer) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED);
+	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_GRAYED);
 	}
 	else {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_ENABLED);
+	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_ENABLED);
 	}
   }
   StateMap->set(StateFlag::DUMEN);
@@ -3515,13 +3515,12 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(uint32_t                   entry,
+void thred::internal::dusid(LSTTYPE                          entry,
                             int32_t&                   windowLocation,
-                            POINT const&               windowSize,
-                            std::vector<std::wstring> const& strings) noexcept {
+                            POINT const&               windowSize) {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  SideWindow[entry] = CreateWindow(L"STATIC",
-                                   strings[entry].c_str(),
+  SideWindow[entry.value] = CreateWindow(L"STATIC",
+                                   displayText::loadStr(entry.stringID).c_str(),
                                    SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                    3,
                                    windowLocation * windowSize.y + 3,
@@ -3534,10 +3533,10 @@ void thred::internal::dusid(uint32_t                   entry,
   ++windowLocation;
 }
 
-void thred::internal::sidmsg(FRMHED const& form, HWND window, std::vector<std::wstring> const& strings) {
+void thred::internal::sidmsg(FRMHED const& form, HWND window) {
   auto childListRect  = RECT {0L, 0L, 0L, 0L};
   auto parentListRect = RECT {0L, 0L, 0L, 0L};
-  auto entryCount     = gsl::narrow<int32_t>(strings.size());
+  auto entryCount     = 0;
   std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
   auto sideWindowSize     = POINT {};
   auto sideWindowLocation = int32_t {};
@@ -3545,21 +3544,17 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::vector<std::w
   GetWindowRect(FormDataSheet, &parentListRect);
   form::ispcdclp();
   if (StateMap->test(StateFlag::FILTYP)) {
-	for (auto iEntry = 0U; iEntry < edgeList.size(); ++iEntry) {
-	  if ((form.edgeType & NEGUND) == edgeList[iEntry].value) {
+	entryCount = gsl::narrow<int32_t>(EDGELIST.size());
+	for (auto iEntry : EDGELIST) {
+	  if ((form.edgeType & NEGUND) == iEntry.value) {
 		--entryCount;
 	  }
 	  else {
-		if (edgeList[iEntry].value == EDGECLIP || edgeList[iEntry].value == EDGEPICOT || edgeList[iEntry].value == EDGECLIPX) {
-		  if (StateMap->test(StateFlag::WASPCDCLP)) {
-			formForms::maxtsiz(strings[iEntry], sideWindowSize);
-		  }
-		  else {
+		if ((iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) && (!StateMap->test(StateFlag::WASPCDCLP))) {
 			--entryCount;
-		  }
 		}
 		else {
-		  formForms::maxtsiz(strings[iEntry], sideWindowSize);
+		  formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
 		}
 	  }
 	}
@@ -3575,45 +3570,43 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::vector<std::w
 	                                 nullptr,
 	                                 ThrEdInstance,
 	                                 nullptr);
-	for (auto iEntry = 0U; iEntry < edgeList.size(); ++iEntry) {
-	  if ((form.edgeType & NEGUND) != edgeList[iEntry].value) {
-		if (edgeList[iEntry].value == EDGECLIP || edgeList[iEntry].value == EDGEPICOT || edgeList[iEntry].value == EDGECLIPX) {
+	for (auto iEntry : EDGELIST) {
+	  if ((form.edgeType & NEGUND) != iEntry.value) {
+		if (iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) {
 		  if (StateMap->test(StateFlag::WASPCDCLP)) {
-			dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+			dusid(iEntry, sideWindowLocation, sideWindowSize);
 		  }
 		}
 		else {
-		  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
 	  }
 	}
   }
   else {
 	if (FormMenuChoice == LLAYR) {
-	  auto const zero = std::wstring {L"0"};
+	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
+	  auto const zero = displayText::loadStr(IDS_LAY03);
 	  formForms::maxtsiz(zero, sideWindowSize);
 	}
 	else {
 	  if (FormMenuChoice == LFTHTYP) {
-		entryCount     = gsl::narrow<int32_t>(fthrList.size() - 1U);
-		sideWindowSize = POINT {ButtonWidthX3, ButtonHeight};
+		entryCount     = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
+		auto const fthrWid = displayText::loadStr(IDS_FTH3);
+		formForms::maxtsiz(fthrWid, sideWindowSize);
 	  }
 	  else {
-		for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
-		  if (((1U << fillList[iEntry].value) & ClipTypeMap) != 0U) {
-			if (StateMap->test(StateFlag::WASPCDCLP)) {
-			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
-			}
-			else {
-			  --entryCount;
-			}
+		entryCount = gsl::narrow<int32_t>(FILLLIST.size());
+		for (auto iEntry : FILLLIST) {
+		  if (iEntry.value == form.fillType) {
+			--entryCount;
 		  }
 		  else {
-			if (fillList[iEntry].value == form.fillType) {
-			  --entryCount;
+			if ((((1U << iEntry.value) & ClipTypeMap) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
+				--entryCount;
 			}
 			else {
-			  formForms::maxtsiz(strings[iEntry], sideWindowSize);
+			  formForms::maxtsiz(displayText::loadStr(iEntry.stringID), sideWindowSize);
 			}
 		  }
 		}
@@ -3632,28 +3625,28 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window, std::vector<std::w
 	                                 ThrEdInstance,
 	                                 nullptr);
 	if (FormMenuChoice == LLAYR) {
-	  for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
-		dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+	  for (auto iEntry : LAYRLIST) {
+		dusid(iEntry, sideWindowLocation, sideWindowSize);
 	  }
 	}
 	else {
 	  if (FormMenuChoice == LFTHTYP) {
-		for (auto iEntry = 0U; iEntry < fthrList.size(); ++iEntry) {
-		  if (fthrList[iEntry].value != form.fillInfo.feather.fillType) {
-			dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+		for (auto iEntry : FTHRLIST) {
+		  if (iEntry.value != form.fillInfo.feather.fillType) {
+			dusid(iEntry, sideWindowLocation, sideWindowSize);
 		  }
 		}
 	  }
 	  else {
-		for (auto iEntry = 0U; iEntry < strings.size(); ++iEntry) {
-		  if (fillList[iEntry].value != form.fillType) {
-			if (((1U << fillList[iEntry].value) & ClipTypeMap) != 0U) {
+		for (auto iEntry : FILLLIST) {
+		  if (iEntry.value != form.fillType) {
+			if (((1U << iEntry.value) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
-				dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+				dusid(iEntry, sideWindowLocation, sideWindowSize);
 			  }
 			}
 			else {
-			  dusid(iEntry, sideWindowLocation, sideWindowSize, strings);
+			  dusid(iEntry, sideWindowLocation, sideWindowSize);
 			}
 		  }
 		}
@@ -10043,7 +10036,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	                fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
-	  for (auto iFeatherStyle : fthrList) {
+	  for (auto iFeatherStyle : FTHRLIST) {
 		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
@@ -10082,10 +10075,10 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer               = std::wstring {};
-		  for (auto iFeatherStyle = uint8_t {}; iFeatherStyle < fthrList.size(); ++iFeatherStyle) {
-			buffer = displayText::loadStr(fthrList[iFeatherStyle].stringID);
+		  for (auto iFeatherStyle:FTHRLIST) {
+			buffer = displayText::loadStr(iFeatherStyle.stringID);
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
-			  IniFile.featherFillType = iFeatherStyle + 1U;
+			  IniFile.featherFillType = iFeatherStyle.value;
 			  break;
 			}
 		  }
@@ -11215,9 +11208,9 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto iFillType = uint8_t {0U}; iFillType < FSTYLMAX; ++iFillType) {
-	  if (Msg.hwnd == SideWindow[iFillType]) {
-		form.fillInfo.feather.fillType = iFillType + 1U;
+	for (auto iFillType : FTHRLIST) {
+	  if (Msg.hwnd == SideWindow[iFillType.value]) {
+		form.fillInfo.feather.fillType = iFillType.value;
 		thred::unsid();
 		form::refil();
 		formForms::refrm();
@@ -11227,20 +11220,16 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	auto iLayer = 0U;
-	for (; iLayer < LayerList.size(); ++iLayer) {
-	  if (Msg.hwnd == SideWindow[iLayer]) {
+	for (auto iLayer : LAYRLIST) {
+	  if (Msg.hwnd == SideWindow[iLayer.value]) {
+		form::movlayr(iLayer.value);
+		StateMap->set(StateFlag::FORMSEL);
+		auto const layerStr = displayText::loadStr(iLayer.stringID);
+		SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
 		break;
 	  }
 	}
-	if (iLayer < LayerList.size()) {
-	  form::movlayr(iLayer);
-	  StateMap->set(StateFlag::FORMSEL);
-	}
 	thred::unsid();
-	auto const layerStr =
-	    fmt::format(L"{}", (gsl::narrow_cast<decltype(form.attribute)>(form.attribute & FRMLMSK) >> 1U));
-	SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
 	formForms::refrm();
 	return true;
   }
@@ -11703,12 +11692,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
-	  auto fthStrings = std::vector<std::wstring> {};
-	  fthStrings.reserve(FSTYLMAX);
-	  for (auto item : fthrList) {
-		fthStrings.push_back(displayText::loadStr(item.stringID));
-	  }
-	  sidmsg(form, ValueWindow->operator[](LFTHTYP), fthStrings);
+	  sidmsg(form, ValueWindow->operator[](LFTHTYP));
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRM) || Msg.hwnd == LabelWindow->operator[](LFRM)) {
@@ -11727,21 +11711,15 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LLAYR) || Msg.hwnd == LabelWindow->operator[](LLAYR)) {
-	  auto const layerStrings = std::vector<std::wstring> {L"0", L"1", L"2", L"3", L"4"};
 	  FormMenuChoice          = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
-	  sidmsg(form, ValueWindow->operator[](LLAYR), layerStrings);
+	  sidmsg(form, ValueWindow->operator[](LLAYR));
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
 	  FormMenuChoice   = LFRMFIL;
-	  auto fillStrings = std::vector<std::wstring> {};
-	  fillStrings.reserve(FILLTMAX);
-	  for (auto item : fillList) {
-		fillStrings.push_back(displayText::loadStr(item.stringID));
-	  }
-	  sidmsg(form, ValueWindow->operator[](LFRMFIL), fillStrings);
+	  sidmsg(form, ValueWindow->operator[](LFRMFIL));
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMCOL) || Msg.hwnd == LabelWindow->operator[](LFRMCOL)) {
@@ -11776,12 +11754,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
-	  auto edgeStrings = std::vector<std::wstring> {};
-	  edgeStrings.reserve(EDGETMAX);
-	  for (auto item : edgeList) {
-		edgeStrings.push_back(displayText::loadStr(item.stringID));
-	  }
-	  sidmsg(form, ValueWindow->operator[](LBRD), edgeStrings);
+	  sidmsg(form, ValueWindow->operator[](LBRD));
 	  StateMap->set(StateFlag::BRDACT);
 	  break;
 	}

@@ -615,18 +615,18 @@ class LSTTYPE
   //~LSTTYPE() = default;
 };
 
-constexpr auto LayerList = std::array<LSTTYPE, LAYERMAX> {{{IDS_LAY00, LAYER0},
+constexpr auto LAYRLIST = std::array<LSTTYPE, LAYERMAX> {{{IDS_LAY00, LAYER0},
 														   {IDS_LAY01, LAYER1}, 
 														   {IDS_LAY02, LAYER2}, 
 														   {IDS_LAY03, LAYER3}, 
 														   {IDS_LAY04, LAYER4}}};
-constexpr auto fthrList = std::array<LSTTYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN},
+constexpr auto FTHRLIST = std::array<LSTTYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN},
 														{IDS_FTH1, FTHSIN2}, 
 														{IDS_FTH2, FTHLIN}, 
 														{IDS_FTH3, FTHPSG}, 
 														{IDS_FTH4, FTHRMP},
 														{IDS_FTH5, FTHFAZ}}};
-constexpr auto fillList = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0, 0},
+constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0, 0},
                                                           {IDS_FIL1, VRTF},
                                                           {IDS_FIL2, HORF},
                                                           {IDS_FIL3, ANGF},
@@ -640,7 +640,7 @@ constexpr auto fillList = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0, 0},
                                                           {IDS_FIL11, TXVRTF},
                                                           {IDS_FIL12, TXHORF},
                                                           {IDS_FIL13, TXANGF}}};
-constexpr auto edgeList = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0, 0},
+constexpr auto EDGELIST = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0, 0},
                                                           {IDS_EDG1, EDGELINE},
                                                           {IDS_EDG2, EDGEBEAN},
                                                           {IDS_EDG3, EDGECLIP},

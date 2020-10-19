@@ -199,7 +199,7 @@ namespace internal {
   void durotu();
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(uint32_t entry, int32_t& windowLocation, POINT const& windowSize, std::vector<std::wstring> const& strings) noexcept;
+  void dusid(LSTTYPE entry, int32_t& windowLocation, POINT const& windowSize);
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
@@ -430,7 +430,7 @@ namespace internal {
   void shorter();
   auto sidclp() -> bool;
   void sidhup();
-  void sidmsg(FRMHED const& form, HWND window, std::vector<std::wstring> const& strings);
+  void sidmsg(FRMHED const& form, HWND window);
   void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
