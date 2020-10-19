@@ -113,7 +113,9 @@
 #define IDS_NOTPES                      105
 #define IDS_INVKEY                      106
 #define IDS_PRF29                       106
+#define IDS_LAY01                       107
 #define IDS_DAYKEY                      108
+#define IDS_LAY00                       108
 #define IDS_SHRTF                       109
 #define IDS_TRC0                        110
 #define IDS_TRC1S                       111
@@ -121,6 +123,8 @@
 #define IDS_TRC3                        113
 #define IDD_DLOCK                       114
 #define IDS_TRC4                        114
+#define IDS_LAY02                       115
+#define IDS_LAY03                       116
 #define IDS_TRC1H                       117
 #define IDD_TEAR                        117
 #define IDS_SRCH                        118
@@ -159,6 +163,7 @@
 #define IDS_THRED                       138
 #define IDS_NUFIL                       139
 #define IDS_SIZ                         140
+#define IDS_LAY04                       141
 #define IDS_EMB                         142
 #define IDS_ON                          143
 #define IDS_OFF                         144
