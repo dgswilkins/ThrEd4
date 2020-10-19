@@ -13397,8 +13397,18 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 	  break;
 	}
 	case VK_F12: {
-	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) {
-		reldun();
+	  if (wrap::pressed(VK_CONTROL)) {
+		if (wrap::pressed(VK_MENU)) {
+		  reldun();
+		}
+#ifdef _DEBUG
+		else {
+		  if (OpenClipboard(ThrEdWindow) != 0) {
+			EmptyClipboard();
+		  }
+		  CloseClipboard();
+		}
+#endif
 	  }
 	  else {
 #ifdef _DEBUG
