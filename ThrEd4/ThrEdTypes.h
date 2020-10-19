@@ -214,7 +214,6 @@ constexpr auto PENNWID  = 1;                    // Narrow pen width
 constexpr auto PENMWID  = 3;                    // Medium pen width
 constexpr auto PENWWID  = 5;                    // Wide pen width
 constexpr auto STDDPI   = int32_t {96};         // Default DPI
-constexpr auto MAXLAYER = 5U;                   // number of layers
 constexpr auto SQRCORNS = 4U;                   // number of corners in a square
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
@@ -538,8 +537,17 @@ enum class UserFlag : uint32_t {
   EnumCount // must be the last entry in the enum
 };
 
+// Layer values
+enum layers : uint8_t {
+  LAYER0, // All Layers
+  LAYER1, // Layer 1
+  LAYER2, // Layer 2
+  LAYER3, // Layer 3
+  LAYER4  // Layer 4
+};
+
 // Feather types
-enum featherStyles : uint8_t { 
+enum featherStyles : uint8_t {
   FTHSIN = 1,                  // sine
   FTHSIN2,                     // half sine
   FTHLIN,                      // line
@@ -585,13 +593,13 @@ enum edgeFillStyles : uint8_t {
   EDGEDOUBLE,    // Double
   EDGELCHAIN,    // Line Chain
   EDGEOCHAIN,    // Open Chain
-  EDGECLIPX,     // Even Clipboard
-  EDGELAST       // must always be the last value
+  EDGECLIPX      // Even Clipboard
 };
 
-constexpr auto FSSIZE   = uint8_t {6U};   // count of feather styles
-constexpr auto FILLTYPS = uint32_t {14U}; // 13 fill types plus 'none'
-constexpr auto EDGETYPS = uint32_t {13U}; // number of border fill types
+constexpr auto LAYERMAX = 5U;             // number of layers
+constexpr auto FSTYLMAX = uint8_t {6U};   // count of feather styles
+constexpr auto FILLTMAX = uint32_t {14U}; // number of fill types
+constexpr auto EDGETMAX = uint32_t {13U}; // number of border fill types
 
 class LSTTYPE
 {
@@ -607,13 +615,18 @@ class LSTTYPE
   //~LSTTYPE() = default;
 };
 
-constexpr auto fthrList = std::array<LSTTYPE, FSSIZE> {{{IDS_FTH0, FTHSIN},
+constexpr auto LayerList = std::array<LSTTYPE, LAYERMAX> {{{IDS_LAY00, LAYER0},
+														   {IDS_LAY01, LAYER1}, 
+														   {IDS_LAY02, LAYER2}, 
+														   {IDS_LAY03, LAYER3}, 
+														   {IDS_LAY04, LAYER4}}};
+constexpr auto fthrList = std::array<LSTTYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN},
 														{IDS_FTH1, FTHSIN2}, 
 														{IDS_FTH2, FTHLIN}, 
 														{IDS_FTH3, FTHPSG}, 
 														{IDS_FTH4, FTHRMP},
 														{IDS_FTH5, FTHFAZ}}};
-constexpr auto fillList = std::array<LSTTYPE, FILLTYPS> {{{IDS_FIL0, 0},
+constexpr auto fillList = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0, 0},
                                                           {IDS_FIL1, VRTF},
                                                           {IDS_FIL2, HORF},
                                                           {IDS_FIL3, ANGF},
@@ -627,7 +640,7 @@ constexpr auto fillList = std::array<LSTTYPE, FILLTYPS> {{{IDS_FIL0, 0},
                                                           {IDS_FIL11, TXVRTF},
                                                           {IDS_FIL12, TXHORF},
                                                           {IDS_FIL13, TXANGF}}};
-constexpr auto edgeList = std::array<LSTTYPE, EDGETYPS> {{{IDS_EDG0, 0},
+constexpr auto edgeList = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0, 0},
                                                           {IDS_EDG1, EDGELINE},
                                                           {IDS_EDG2, EDGEBEAN},
                                                           {IDS_EDG3, EDGECLIP},

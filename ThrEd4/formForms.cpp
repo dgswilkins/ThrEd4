@@ -164,7 +164,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(displayText::loadStr(IDS_TXT1), LabelWindowCoords);
   // NOLINTNEXTLINE hicpp-signed-bitwise
-  valueWindow[LLAYR] = ffi::txtrwin(fmt::format(L"{}", (form.attribute & FRMLMSK) >> 1U), ValueWindowCoords);
+  valueWindow[LLAYR] = ffi::txtrwin(displayText::loadStr(LayerList[(form.attribute & FRMLMSK) >> 1U].stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (form.type != FRMLINE) {
 	labelWindow[LCWLK] = ffi::txtwin(displayText::loadStr(IDS_CWLK), LabelWindowCoords);
@@ -327,8 +327,8 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   }
   labelWindow[LBRD] = ffi::txtwin(displayText::loadStr(IDS_TXT7), LabelWindowCoords);
   auto edgeFillType = gsl::narrow_cast<uint8_t>(form.edgeType & NEGUND);
-  if (edgeFillType >= EDGELAST) {
-	edgeFillType = EDGELAST - 1U;
+  if (edgeFillType >= EDGETMAX) {
+	edgeFillType = EDGETMAX - 1U;
   }
   auto const iEdge = edgeFillType - 1U;
   valueWindow[LBRD] = ffi::txtrwin(displayText::loadStr(edgeList[edgeFillType].stringID), ValueWindowCoords);

@@ -131,7 +131,7 @@ static auto ArrowCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // arrow
 static auto CrossCursor           = gsl::narrow_cast<HCURSOR>(nullptr); // cross
 
 // Pens
-static auto LayerPen       = std::array<HPEN, MAXLAYER> {};   //
+static auto LayerPen       = std::array<HPEN, LAYERMAX> {};   //
 static auto LinePen        = gsl::narrow_cast<HPEN>(nullptr); // line pen for stitch move lines
 static auto BoxPen         = std::array<HPEN, 4> {};          // box pens
 static auto CrossPen       = gsl::narrow_cast<HPEN>(nullptr); // pen for crosses in color windows
@@ -641,7 +641,7 @@ void thred::coltab() {
 }
 
 void thred::internal::ladj() {
-  for (auto iLayer = 0U; iLayer < MAXLAYER; ++iLayer) {
+  for (auto iLayer = 0U; iLayer < LayerList.size(); ++iLayer) {
 	if (iLayer == ActiveLayer) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer + M_ALL, MF_BYPOSITION | MF_GRAYED);
@@ -11215,7 +11215,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto iFillType = uint8_t {0U}; iFillType < FSSIZE; ++iFillType) {
+	for (auto iFillType = uint8_t {0U}; iFillType < FSTYLMAX; ++iFillType) {
 	  if (Msg.hwnd == SideWindow[iFillType]) {
 		form.fillInfo.feather.fillType = iFillType + 1U;
 		thred::unsid();
@@ -11228,12 +11228,12 @@ auto thred::internal::handleSideWindowActive() -> bool {
   }
   if (FormMenuChoice == LLAYR) {
 	auto iLayer = 0U;
-	for (; iLayer < MAXLAYER; ++iLayer) {
+	for (; iLayer < LayerList.size(); ++iLayer) {
 	  if (Msg.hwnd == SideWindow[iLayer]) {
 		break;
 	  }
 	}
-	if (iLayer < MAXLAYER) {
+	if (iLayer < LayerList.size()) {
 	  form::movlayr(iLayer * 2U);
 	  StateMap->set(StateFlag::FORMSEL);
 	}
@@ -11704,7 +11704,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LFTHTYP) || Msg.hwnd == LabelWindow->operator[](LFTHTYP)) {
 	  FormMenuChoice = LFTHTYP;
 	  auto fthStrings = std::vector<std::wstring> {};
-	  fthStrings.reserve(FSSIZE);
+	  fthStrings.reserve(FSTYLMAX);
 	  for (auto item : fthrList) {
 		fthStrings.push_back(displayText::loadStr(item.stringID));
 	  }
@@ -11728,16 +11728,16 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LLAYR) || Msg.hwnd == LabelWindow->operator[](LLAYR)) {
 	  auto const layerStrings = std::vector<std::wstring> {L"0", L"1", L"2", L"3", L"4"};
-	  FormMenuChoice           = LLAYR;
+	  FormMenuChoice          = LLAYR;
 	  StateMap->reset(StateFlag::FILTYP);
 	  sidmsg(form, ValueWindow->operator[](LLAYR), layerStrings);
 	  break;
 	}
 	if (Msg.hwnd == ValueWindow->operator[](LFRMFIL) || Msg.hwnd == LabelWindow->operator[](LFRMFIL)) {
 	  StateMap->reset(StateFlag::FILTYP);
-	  FormMenuChoice = LFRMFIL;
+	  FormMenuChoice   = LFRMFIL;
 	  auto fillStrings = std::vector<std::wstring> {};
-	  fillStrings.reserve(FILLTYPS);
+	  fillStrings.reserve(FILLTMAX);
 	  for (auto item : fillList) {
 		fillStrings.push_back(displayText::loadStr(item.stringID));
 	  }
@@ -11777,7 +11777,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 	if (Msg.hwnd == ValueWindow->operator[](LBRD) || Msg.hwnd == LabelWindow->operator[](LBRD)) {
 	  StateMap->set(StateFlag::FILTYP);
 	  auto edgeStrings = std::vector<std::wstring> {};
-	  edgeStrings.reserve(EDGETYPS);
+	  edgeStrings.reserve(EDGETMAX);
 	  for (auto item : edgeList) {
 		edgeStrings.push_back(displayText::loadStr(item.stringID));
 	  }
