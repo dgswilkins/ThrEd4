@@ -640,7 +640,7 @@ void thred::coltab() {
 }
 
 void thred::internal::ladj() {
-  for (auto iLayer : LAYRLIST) {
+  for (auto const iLayer : LAYRLIST) {
 	if (iLayer.value == ActiveLayer) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_GRAYED);
@@ -3533,7 +3533,6 @@ void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, POINT const&
 void thred::internal::sidmsg(FRMHED const& form, HWND window) {
   auto childListRect  = RECT {0L, 0L, 0L, 0L};
   auto parentListRect = RECT {0L, 0L, 0L, 0L};
-  auto entryCount     = 0;
   std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
   auto sideWindowSize     = POINT {};
   auto sideWindowLocation = int32_t {};
@@ -3541,8 +3540,8 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
   GetWindowRect(FormDataSheet, &parentListRect);
   form::ispcdclp();
   if (StateMap->test(StateFlag::FILTYP)) {
-	entryCount = gsl::narrow<int32_t>(EDGELIST.size());
-	for (auto iEntry : EDGELIST) {
+	auto entryCount = gsl::narrow<int32_t>(EDGELIST.size());
+	for (auto const iEntry : EDGELIST) {
 	  if ((form.edgeType & NEGUND) == iEntry.value) {
 		--entryCount;
 	  }
@@ -3568,7 +3567,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	                                 nullptr,
 	                                 ThrEdInstance,
 	                                 nullptr);
-	for (auto iEntry : EDGELIST) {
+	for (auto const iEntry : EDGELIST) {
 	  if ((form.edgeType & NEGUND) != iEntry.value) {
 		if (iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) {
 		  if (StateMap->test(StateFlag::WASPCDCLP)) {
@@ -3582,20 +3581,23 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	}
   }
   else {
-	if (FormMenuChoice == LLAYR) {
-	  entryCount      = gsl::narrow<int32_t>(LAYRLIST.size());
-	  auto const zero = displayText::loadStr(IDS_LAY03);
-	  formForms::maxtsiz(zero, sideWindowSize);
-	}
-	else {
-	  if (FormMenuChoice == LFTHTYP) {
-		entryCount         = gsl::narrow<int32_t>(FTHRLIST.size() - 1U);
+	auto entryCount = (FormMenuChoice == LLAYR)
+	                      ? gsl::narrow<int32_t>(LAYRLIST.size())
+	                      : (FormMenuChoice == LFTHTYP) ? gsl::narrow<int32_t>(FTHRLIST.size() - 1U)
+	                                                    : gsl::narrow<int32_t>(FILLLIST.size());
+	switch (FormMenuChoice) {
+	  case LLAYR: {
+		auto const zero = displayText::loadStr(IDS_LAY03);
+		formForms::maxtsiz(zero, sideWindowSize);
+		break;
+	  }
+	  case LFTHTYP: {
 		auto const fthrWid = displayText::loadStr(IDS_FTH3);
 		formForms::maxtsiz(fthrWid, sideWindowSize);
+		break;
 	  }
-	  else {
-		entryCount = gsl::narrow<int32_t>(FILLLIST.size());
-		for (auto iEntry : FILLLIST) {
+	  case LFRMFIL: {
+		for (auto const iEntry : FILLLIST) {
 		  if (iEntry.value == form.fillType) {
 			--entryCount;
 		  }
@@ -3608,6 +3610,11 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 			}
 		  }
 		}
+		break;
+	  }
+	  default: {
+		outDebugString(L"default hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+		break;
 	  }
 	}
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -3622,21 +3629,23 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	                                 nullptr,
 	                                 ThrEdInstance,
 	                                 nullptr);
-	if (FormMenuChoice == LLAYR) {
-	  for (auto iEntry : LAYRLIST) {
-		dusid(iEntry, sideWindowLocation, sideWindowSize);
+	switch (FormMenuChoice) {
+	  case LLAYR: {
+		for (auto const iEntry : LAYRLIST) {
+		  dusid(iEntry, sideWindowLocation, sideWindowSize);
+		}
+		break;
 	  }
-	}
-	else {
-	  if (FormMenuChoice == LFTHTYP) {
-		for (auto iEntry : FTHRLIST) {
+	  case LFTHTYP: {
+		for (auto const iEntry : FTHRLIST) {
 		  if (iEntry.value != form.fillInfo.feather.fillType) {
 			dusid(iEntry, sideWindowLocation, sideWindowSize);
 		  }
 		}
+		break;
 	  }
-	  else {
-		for (auto iEntry : FILLLIST) {
+	  case LFRMFIL: {
+		for (auto const iEntry : FILLLIST) {
 		  if (iEntry.value != form.fillType) {
 			if (((1U << iEntry.value) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
@@ -3648,6 +3657,11 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 			}
 		  }
 		}
+		break;
+	  }
+	  default: {
+		outDebugString(L"default 2 hit in sidmsg: FormMenuChoice [{}]\n", FormMenuChoice);
+		break;
 	  }
 	}
   }
@@ -10039,7 +10053,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	                fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
-	  for (auto iFeatherStyle : FTHRLIST) {
+	  for (auto const iFeatherStyle : FTHRLIST) {
 		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
@@ -10078,8 +10092,8 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer             = std::wstring {};
-		  for (auto iFeatherStyle : FTHRLIST) {
-			buffer = displayText::loadStr(iFeatherStyle.stringID);
+		  for (auto const iFeatherStyle : FTHRLIST) {
+			buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 			  IniFile.featherFillType = iFeatherStyle.value;
 			  break;
@@ -11211,7 +11225,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto iFillType : FTHRLIST) {
+	for (auto const iFillType : FTHRLIST) {
 	  if (Msg.hwnd == SideWindow[iFillType.value]) {
 		form.fillInfo.feather.fillType = iFillType.value;
 		thred::unsid();
@@ -11223,7 +11237,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	for (auto iLayer : LAYRLIST) {
+	for (auto const iLayer : LAYRLIST) {
 	  if (Msg.hwnd == SideWindow[iLayer.value]) {
 		form::movlayr(iLayer.value);
 		StateMap->set(StateFlag::FORMSEL);
