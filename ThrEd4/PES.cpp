@@ -499,7 +499,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto iColor = 0U;
-		for (auto const color : UserColor) {
+		for (auto const& color : UserColor) {
 		  auto matchIndex = 0U;
 		  auto matchMin   = std::numeric_limits<uint32_t>::max();
 		  for (auto iColorMatch = 1U; iColorMatch < THTYPCNT; ++iColorMatch) {

@@ -672,7 +672,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_DLIN, flag);
-  for (auto const DaisyTypeString : DaisyTypeStrings) {
+  for (auto const& DaisyTypeString : DaisyTypeStrings) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
 	            CB_ADDSTRING,

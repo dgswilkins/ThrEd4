@@ -476,7 +476,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	}
   }
   designer.reserve(tmpName.size());
-  for (auto const character : tmpName) {
+  for (auto const& character : tmpName) {
 	if (NameDecoder[character] != 0U) {
 	  designer.push_back(gsl::narrow<char>(NameDecoder[character]));
 	}
@@ -640,7 +640,7 @@ void thred::coltab() {
 }
 
 void thred::internal::ladj() {
-  for (auto const iLayer : LAYRLIST) {
+  for (auto const& iLayer : LAYRLIST) {
 	if (iLayer.value == ActiveLayer) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_GRAYED);
@@ -745,7 +745,7 @@ void thred::savdo() {
 
 void thred::internal::redfils() {
   auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-  for (auto const iLRU : LRUMenuId) {
+  for (auto const& iLRU : LRUMenuId) {
 	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {
 	  DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
 	}
@@ -3541,7 +3541,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
   form::ispcdclp();
   if (StateMap->test(StateFlag::FILTYP)) {
 	auto entryCount = gsl::narrow<int32_t>(EDGELIST.size());
-	for (auto const iEntry : EDGELIST) {
+	for (auto const& iEntry : EDGELIST) {
 	  if ((form.edgeType & NEGUND) == iEntry.value) {
 		--entryCount;
 	  }
@@ -3567,7 +3567,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	                                 nullptr,
 	                                 ThrEdInstance,
 	                                 nullptr);
-	for (auto const iEntry : EDGELIST) {
+	for (auto const& iEntry : EDGELIST) {
 	  if ((form.edgeType & NEGUND) != iEntry.value) {
 		if (iEntry.value == EDGECLIP || iEntry.value == EDGEPICOT || iEntry.value == EDGECLIPX) {
 		  if (StateMap->test(StateFlag::WASPCDCLP)) {
@@ -3597,7 +3597,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 		break;
 	  }
 	  case LFRMFIL: {
-		for (auto const iEntry : FILLLIST) {
+		for (auto const& iEntry : FILLLIST) {
 		  if (iEntry.value == form.fillType) {
 			--entryCount;
 		  }
@@ -3631,13 +3631,13 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 	                                 nullptr);
 	switch (FormMenuChoice) {
 	  case LLAYR: {
-		for (auto const iEntry : LAYRLIST) {
+		for (auto const& iEntry : LAYRLIST) {
 		  dusid(iEntry, sideWindowLocation, sideWindowSize);
 		}
 		break;
 	  }
 	  case LFTHTYP: {
-		for (auto const iEntry : FTHRLIST) {
+		for (auto const& iEntry : FTHRLIST) {
 		  if (iEntry.value != form.fillInfo.feather.fillType) {
 			dusid(iEntry, sideWindowLocation, sideWindowSize);
 		  }
@@ -3645,7 +3645,7 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
 		break;
 	  }
 	  case LFRMFIL: {
-		for (auto const iEntry : FILLLIST) {
+		for (auto const& iEntry : FILLLIST) {
 		  if (iEntry.value != form.fillType) {
 			if (((1U << iEntry.value) & ClipTypeMap) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
@@ -4676,7 +4676,7 @@ void thred::internal::closPnt() {
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
   auto stitchCoordsInPixels = POINT {};
-  for (auto const iNear : NearestPoint) {
+  for (auto const& iNear : NearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
 	  NearestPoint[NearestCount]   = iNear;
 	  NearestPixel[NearestCount++] = stitchCoordsInPixels;
@@ -9147,7 +9147,7 @@ void thred::internal::setgrd(COLORREF color) {
   static constexpr auto gcGreen   = GRDCOD {ID_GRDGRN, GRNGRD};
   static constexpr auto gridCodes = std::array<GRDCOD, 6> {gcHigh, gcMedium, gcDefault, gcRed, gcBlue, gcGreen};
 
-  for (auto const gridCode : gridCodes) {
+  for (auto const& gridCode : gridCodes) {
 	if (color == gridCode.col) {
 	  CheckMenuItem(MainMenu, gridCode.id, MF_CHECKED);
 	}
@@ -10053,7 +10053,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 	                fmt::format(L"{:.2f}", (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(L"{}", IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
-	  for (auto const iFeatherStyle : FTHRLIST) {
+	  for (auto const& iFeatherStyle : FTHRLIST) {
 		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 		SendMessage(GetDlgItem(hwndlg, IDC_FDTYP),
@@ -10092,7 +10092,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer             = std::wstring {};
-		  for (auto const iFeatherStyle : FTHRLIST) {
+		  for (auto const& iFeatherStyle : FTHRLIST) {
 			buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
 			  IniFile.featherFillType = iFeatherStyle.value;
@@ -11225,7 +11225,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto const iFillType : FTHRLIST) {
+	for (auto const& iFillType : FTHRLIST) {
 	  if (Msg.hwnd == SideWindow[iFillType.value]) {
 		form.fillInfo.feather.fillType = iFillType.value;
 		thred::unsid();
@@ -11237,7 +11237,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	for (auto const iLayer : LAYRLIST) {
+	for (auto const& iLayer : LAYRLIST) {
 	  if (Msg.hwnd == SideWindow[iLayer.value]) {
 		form::movlayr(iLayer.value);
 		StateMap->set(StateFlag::FORMSEL);
@@ -15551,7 +15551,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  thred::unmsg();
 	  {
 		auto previousName = PreviousNames->begin();
-		for (auto const iLRU : LRUMenuId) {
+		for (auto const& iLRU : LRUMenuId) {
 		  if (Msg.wParam == iLRU) {
 			*WorkingFileName = *previousName;
 			StateMap->set(StateFlag::REDOLD);

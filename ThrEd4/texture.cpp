@@ -1424,7 +1424,7 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 		  return;
 		}
 	  }
-	  for (auto const point : *SelectedTexturePointsList) {
+	  for (auto const& point : *SelectedTexturePointsList) {
 		TempTexturePoints->operator[](point).line +=
 		    gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
 	  }
