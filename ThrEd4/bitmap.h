@@ -34,7 +34,7 @@ void resetBmpFile(bool reset);
 void resetDC() noexcept;
 void savmap();
 void lodbmp(fs::path const* directory);
-void setBBCV(std::vector<COLORREF>* value);
+void setBBCV(std::vector<COLORREF>* value) noexcept;
 void setBmpBackColor();
 void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;

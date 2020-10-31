@@ -457,7 +457,7 @@ void bitmap::setBmpColor() {
   }
 }
 
-void bitmap::setBBCV(std::vector<COLORREF>* value) {
+void bitmap::setBBCV(std::vector<COLORREF>* value) noexcept {
   BitmapBackgroundColors = value;
 }
 
@@ -500,7 +500,7 @@ void bitmap::setBmpBackColor() {
                                                                  0x0054667a};
   BitmapBackgroundColors->clear();
   BitmapBackgroundColors->reserve(defaultColors.size());
-  for (auto& color : defaultColors) {
+  for (auto const& color : defaultColors) {
 	BitmapBackgroundColors->push_back(color);
   }
 }
