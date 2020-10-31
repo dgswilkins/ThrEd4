@@ -17489,6 +17489,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  private_AllItemsRect              = fRECTANGLE {};
 	  auto  private_AngledFormVertices        = std::vector<fPOINT> {};
 	  auto  private_AuxName                   = fs::path {};
+	  auto  private_BitmapBackgroundColor     = std::vector<COLORREF> {};
 	  auto  private_BSequence                 = std::vector<BSEQPNT> {};
 	  auto  private_BalaradName0              = fs::path {};
 	  auto  private_BalaradName1              = fs::path {};
@@ -17635,6 +17636,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  ValueWindow               = &private_ValueWindow;
 	  VersionNames              = &private_VersionNames;
 	  WorkingFileName           = &private_WorkingFileName;
+	  bitmap::setBBCV(&private_BitmapBackgroundColor);
 	  bitmap::setUBfilename(&private_UserBMPFileName);
 	  DST::setColFilename(&private_ColorFileName);
 	  DST::setRGBFilename(&private_RGBFileName);

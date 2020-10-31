@@ -20,7 +20,8 @@ namespace bi = bitmap::internal;
 
 static auto BitMapColorStruct = CHOOSECOLOR {};
 
-static auto BitmapBackgroundColors = std::array<COLORREF, COLORCNT> {}; // for the bitmap color dialog box
+static auto BitmapBackgroundColors =
+    gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
 
 static auto BitmapColor          = BITCOL;  // bitmap color
 static auto BitmapDC             = HDC {};  // bitmap device context
@@ -38,7 +39,7 @@ static auto BitmapWidth          = int {};              // bitmap width
 static auto BmpStitchRatio       = fPOINT {};           // bitmap to stitch hoop ratios
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
-static auto UTF16BMPname = static_cast<fs::path*>(nullptr); // bitmap file name from user load
+static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
 static auto UTF8BMPname  = std::array<char, SZBMPNM> {};    // bitmap file name from pcs file
 
 constexpr auto BPB   = 8U;          // bits per byte
@@ -437,7 +438,7 @@ auto bitmap::internal::nuBit() noexcept -> BOOL {
   BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
   BitMapColorStruct.lCustData      = 0;
-  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors.data();
+  BitMapColorStruct.lpCustColors   = BitmapBackgroundColors->data();
   BitMapColorStruct.lpfnHook       = nullptr;
   BitMapColorStruct.lpTemplateName = nullptr;
   BitMapColorStruct.rgbResult      = BitmapColor;
@@ -454,6 +455,10 @@ void bitmap::setBmpColor() {
 	BitmapPen = thred::nuPen(BitmapPen, 1, BitmapColor);
 	thred::zumhom();
   }
+}
+
+void bitmap::setBBCV(std::vector<COLORREF>* value) {
+  BitmapBackgroundColors = value;
 }
 
 void bitmap::setUBfilename(fs::path* fileName) noexcept {
@@ -473,10 +478,10 @@ auto bitmap::getBitmapSizeinStitches() noexcept -> fPOINT {
 }
 
 auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
-  return BitmapBackgroundColors[index];
+  return BitmapBackgroundColors->operator[](index);
 }
 
-void bitmap::setBmpBackColor() noexcept {
+void bitmap::setBmpBackColor() {
   constexpr auto defaultColors = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
                                                                  0x00c8dfee,
                                                                  0x00708189,
@@ -493,8 +498,11 @@ void bitmap::setBmpBackColor() noexcept {
                                                                  0x0043377b,
                                                                  0x00b799ae,
                                                                  0x0054667a};
-
-  BitmapBackgroundColors = defaultColors;
+  BitmapBackgroundColors->clear();
+  BitmapBackgroundColors->reserve(defaultColors.size());
+  for (auto& color : defaultColors) {
+	BitmapBackgroundColors->push_back(color);
+  }
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {
