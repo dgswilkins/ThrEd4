@@ -25,7 +25,7 @@
 //#pragma warning(disable:26474)	// type.1   	Don't cast between pointer types when the conversion could be implicit
 #pragma warning(disable : 26476)	// type.7   	Don't use a naked union 'union ' with multiple type pointers: Use variant instead
 #pragma warning(disable : 26481)    // bounds.1 	Don't use pointer arithmetic. Use span instead
-#pragma warning(disable : 26482)    // bounds.2 	Only index into arrays using constant expressions
+//#pragma warning(disable : 26482)    // bounds.2 	Only index into arrays using constant expressions
 //#pragma warning(disable : 26485)  // bounds.3 	No array to pointer decay
 #pragma warning(disable : 26486)    // lifetime.1	Don't pass a pointer that may be invalid to a function
 #pragma warning(disable : 26489)    // lifetime.1	Don't dereference a pointer that may be invalid
