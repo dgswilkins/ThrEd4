@@ -473,13 +473,18 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
   formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
   formOutline[1].x = formOutline[5].x = wrap::midl(rectangle.right, rectangle.left);
   formOutline[3].y = formOutline[7].y = wrap::midl(rectangle.top, rectangle.bottom);
+
+  auto ipixelOutline = pixelOutline.begin();
   for (auto controlPoint = 0U; controlPoint < pixelOutline.size(); ++controlPoint) {
 	auto const dest            = controlPoint % (pixelOutline.size() - 1U);
-	pixelOutline[controlPoint] = form::sfCor2px(formOutline[dest]);
+	*ipixelOutline  = form::sfCor2px(formOutline[dest]);
+	++ipixelOutline;
   }
   wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
-  for (auto controlPoint = 0U; controlPoint < pixelOutline.size() - 1U; ++controlPoint) {
-	form::selsqr(pixelOutline[controlPoint], dc);
+  auto const sp    = gsl::make_span(pixelOutline);
+  auto subsp = sp.subspan(0, pixelOutline.size() - 1U);
+  for (auto const& controlPoint : subsp) {
+	form::selsqr(controlPoint, dc);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
@@ -512,21 +517,23 @@ void form::fselrct(uint32_t iForm) {
   formOutline[0].y = formOutline[1].y = formOutline[4].y = form.rectangle.top;
   formOutline[1].x = formOutline[2].x = form.rectangle.right;
   formOutline[2].y = formOutline[3].y = form.rectangle.bottom;
-  for (auto iPoint = 0U; iPoint < line.size(); ++iPoint) {
-	line[iPoint].x = std::lround((formOutline[iPoint].x - ZoomRect.left) * HorizontalRatio);
-	line[iPoint].y = std::lround((ZoomRect.top - formOutline[iPoint].y) * VerticalRatio);
-	if (line[iPoint].x < SelectedFormsRect.left) {
-	  SelectedFormsRect.left = line[iPoint].x;
+  auto iFormOutline                   = formOutline.begin();
+  for (auto& point : line) {
+	point.x = std::lround((iFormOutline->x - ZoomRect.left) * HorizontalRatio);
+	point.y = std::lround((ZoomRect.top - iFormOutline->y) * VerticalRatio);
+	if (point.x < SelectedFormsRect.left) {
+	  SelectedFormsRect.left = point.x;
 	}
-	if (line[iPoint].y < SelectedFormsRect.top) {
-	  SelectedFormsRect.top = line[iPoint].y;
+	if (point.y < SelectedFormsRect.top) {
+	  SelectedFormsRect.top = point.y;
 	}
-	if (line[iPoint].x > SelectedFormsRect.right) {
-	  SelectedFormsRect.right = line[iPoint].x;
+	if (point.x > SelectedFormsRect.right) {
+	  SelectedFormsRect.right = point.x;
 	}
-	if (line[iPoint].y > SelectedFormsRect.bottom) {
-	  SelectedFormsRect.bottom = line[iPoint].y;
+	if (point.y > SelectedFormsRect.bottom) {
+	  SelectedFormsRect.bottom = point.y;
 	}
+	++iFormOutline;
   }
   auto const last = POINT {std::lround((formOutline[0].x - ZoomRect.left) * HorizontalRatio),
                            std::lround((ZoomRect.top - formOutline[0].y) * VerticalRatio)};
@@ -3685,10 +3692,9 @@ auto form::internal::reglen(std::vector<SMALPNTL*> const&       sortedLines,
   lineEndPoints[2]   = sortedLines[regionsList[iRegion].end];
   lineEndPoints[3]   = &sortedLines[regionsList[iRegion].end][1];
   auto minimumLength = BIGFLOAT;
-  for (auto iCorner = 0U; iCorner < SQRCORNS; ++iCorner) {
-	for (auto iPoint = 0U; iPoint < SQRCORNS; ++iPoint) {
-	  auto const length = hypot(lastRegionCorners[iCorner].x - lineEndPoints[iPoint]->x,
-	                            lastRegionCorners[iCorner].y - lineEndPoints[iPoint]->y);
+  for (auto const& corner : lastRegionCorners) {
+	for (auto const& point : lineEndPoints) {
+	  auto const length = hypot(corner.x - point->x, corner.y - point->y);
 	  if (length < minimumLength) {
 		minimumLength = length;
 	  }
@@ -8020,16 +8026,17 @@ void form::internal::srtf(std::vector<fPOINTATTR> const& tempStitchBuffer, uint3
 }
 
 void form::srtbyfrm() {
-  auto colorHistogram = std::array<uint32_t, COLORCNT> {};
-  auto color          = std::array<uint32_t, COLORCNT> {};
+  auto colorHistogram = std::vector<uint32_t> {};
+  colorHistogram.resize(COLORCNT);
+  auto color          = std::vector<uint32_t> {};
+  color.resize(COLORCNT);
   if (!FormList->empty()) {
 	thred::savdo();
-	color[AppliqueColor] = 0U;
-	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	  if (iColor != AppliqueColor) {
-		color[iColor] = iColor + 1U;
-	  }
+	auto seqColor = 1U;
+	for (auto& col : color) {
+		col = seqColor++;
 	}
+	color[AppliqueColor]  = 0U;
 	auto tempStitchBuffer = std::vector<fPOINTATTR> {};
 	tempStitchBuffer.resize(StitchBuffer->size());
 	for (auto& stitch : *StitchBuffer) {
