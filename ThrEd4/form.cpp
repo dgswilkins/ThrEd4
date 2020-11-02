@@ -461,23 +461,22 @@ void form::ratsr() {
 
 void form::ritfrct(uint32_t iForm, HDC dc) {
   auto pixelOutline = std::array<POINT, OUTPNTS> {};
-  auto formOutline  = std::array<fPOINT, OUTPNTS - 1U> {};
+  auto formOutline  = std::array<fPOINT, OUTPNTS> {};
   ratsr();
   SelectObject(StitchWindowDC, FormPen);
   SetROP2(StitchWindowDC, R2_XORPEN);
   auto const& rectangle = FormList->operator[](iForm).rectangle;
   SelectObject(dc, FormSelectedPen);
-  formOutline[0].x = formOutline[6].x = formOutline[7].x = rectangle.left;
-  formOutline[0].y = formOutline[1].y = formOutline[2].y = rectangle.top;
+  formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
+  formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
   formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
   formOutline[4].y = formOutline[5].y = formOutline[6].y = rectangle.bottom;
   formOutline[1].x = formOutline[5].x = wrap::midl(rectangle.right, rectangle.left);
   formOutline[3].y = formOutline[7].y = wrap::midl(rectangle.top, rectangle.bottom);
 
   auto ipixelOutline = pixelOutline.begin();
-  for (auto controlPoint = 0U; controlPoint < pixelOutline.size(); ++controlPoint) {
-	auto const dest            = controlPoint % (pixelOutline.size() - 1U);
-	*ipixelOutline  = form::sfCor2px(formOutline[dest]);
+  for (auto controlPoint : formOutline) {
+	*ipixelOutline  = form::sfCor2px(controlPoint);
 	++ipixelOutline;
   }
   wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
@@ -1802,43 +1801,52 @@ auto form::psg() noexcept -> uint32_t {
   return PseudoRandomValue;
 }
 
+void form::internal::fillSB(const fPOINT& pivot, float angle, float const& radius, fPOINT& stitchPoint, float const& level) {
+  auto const outerPoint = fPOINT {pivot.x + cos(angle) * radius, pivot.y + sin(angle) * radius};
+  form::filinsb(outerPoint, stitchPoint);
+  auto const innerRadius = radius * level * 0.4F;
+  auto const innerPoint = fPOINT {pivot.x + cos(angle) * innerRadius, pivot.y + sin(angle) * innerRadius};
+  form::filinsb(innerPoint, stitchPoint);
+}
+
 void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   // clang-format off
-  static constexpr std::array<uint8_t,  1U>level00 = { 0U };
-  static constexpr std::array<uint8_t,  1U>level01 = { 1U };
-  static constexpr std::array<uint8_t,  2U>level02 = { 0U, 1U };
-  static constexpr std::array<uint8_t,  3U>level03 = { 1U, 0U, 2U };
-  static constexpr std::array<uint8_t,  4U>level04 = { 1U, 3U, 0U, 2U };
-  static constexpr std::array<uint8_t,  5U>level05 = { 2U, 0U, 3U, 1U, 4U };
-  static constexpr std::array<uint8_t,  6U>level06 = { 3U, 0U, 2U, 4U, 1U, 5U };
-  static constexpr std::array<uint8_t,  7U>level07 = { 3U, 0U, 4U, 1U, 6U, 2U,  5U };
-  static constexpr std::array<uint8_t,  8U>level08 = { 4U, 0U, 5U, 1U, 3U, 6U,  2U, 7U };
-  static constexpr std::array<uint8_t,  9U>level09 = { 4U, 0U, 5U, 1U, 6U, 2U,  7U, 3U,  8U };
-  static constexpr std::array<uint8_t, 10U>level10 = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U,  4U };
-  static constexpr std::array<uint8_t, 10U>level11 = { 5U, 0U, 6U, 1U, 7U, 2U,  8U, 3U,  9U, 10U };
-  static constexpr std::array<uint8_t, 11U>level12 = { 6U, 0U, 7U, 1U, 8U, 2U,  9U, 3U, 10U,  4U, 11U };
-  static constexpr std::array<uint8_t, 14U>level13 = { 6U, 0U, 1U, 7U, 2U, 8U,  3U, 9U,  4U, 10U,  5U, 11U,  6U, 12U };
-  static constexpr std::array<uint8_t, 14U>level14 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U };
-  static constexpr std::array<uint8_t, 17U>level15 = { 7U, 0U, 8U, 1U, 9U, 2U, 10U, 3U, 11U,  4U, 12U,  5U, 13U,  6U, 14U, 7U, 15U };
+  constexpr auto level00 = std::array<float,  1U>{ 0.0F };
+  constexpr auto level01 = std::array<float,  1U>{ 1.0F       };
+  constexpr auto level02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
+  constexpr auto level03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
+  constexpr auto level04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
+  constexpr auto level05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
+  constexpr auto level06 = std::array<float,  6U>{ 3.0F/6.0F , 0.0F/6.0F , 2.0F/6.0F , 4.0F/6.0F , 1.0F/6.0F , 5.0F/6.0F  };
+  constexpr auto level07 = std::array<float,  7U>{ 3.0F/7.0F , 0.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 6.0F/7.0F , 2.0F/7.0F ,  5.0F/7.0F  };
+  constexpr auto level08 = std::array<float,  8U>{ 4.0F/8.0F , 0.0F/8.0F , 5.0F/8.0F , 1.0F/8.0F , 3.0F/8.0F , 6.0F/8.0F ,  2.0F/8.0F , 7.0F/8.0F  };
+  constexpr auto level09 = std::array<float,  9U>{ 4.0F/9.0F , 0.0F/9.0F , 5.0F/9.0F , 1.0F/9.0F , 6.0F/9.0F , 2.0F/9.0F ,  7.0F/9.0F , 3.0F/9.0F ,  8.0F/9.0F  };
+  constexpr auto level10 = std::array<float, 10U>{ 5.0F/10.0F, 0.0F/10.0F, 6.0F/10.0F, 1.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 3.0F/10.0F,  9.0F/10.0F,  4.0F/10.0F };
+  constexpr auto level11 = std::array<float, 11U>{ 5.0F/11.0F, 0.0F/11.0F, 6.0F/11.0F, 1.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 3.0F/11.0F,  9.0F/11.0F,  4.0F/11.0F,  2.0F/11.0F };
+  constexpr auto level12 = std::array<float, 12U>{ 6.0F/12.0F, 0.0F/12.0F, 7.0F/12.0F, 1.0F/12.0F, 8.0F/12.0F, 2.0F/12.0F,  9.0F/12.0F, 3.0F/12.0F, 10.0F/12.0F,  4.0F/12.0F,  9.0F/12.0F,  2.0F/12.0F };
+  constexpr auto level13 = std::array<float, 13U>{ 6.0F/13.0F, 0.0F/13.0F, 1.0F/13.0F, 7.0F/13.0F, 2.0F/13.0F, 8.0F/13.0F,  3.0F/13.0F, 9.0F/13.0F,  4.0F/13.0F, 10.0F/13.0F,  5.0F/13.0F, 10.0F/13.0F,  2.0F/13.0F };
+  constexpr auto level14 = std::array<float, 14U>{ 7.0F/14.0F, 0.0F/14.0F, 8.0F/14.0F, 1.0F/14.0F, 9.0F/14.0F, 2.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  4.0F/14.0F, 12.0F/14.0F,  5.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F };
+  constexpr auto level15 = std::array<float, 15U>{ 7.0F/15.0F, 0.0F/15.0F, 8.0F/15.0F, 1.0F/15.0F, 9.0F/15.0F, 2.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  4.0F/15.0F, 12.0F/15.0F,  4.0F/15.0F, 13.0F/15.0F,  6.0F/15.0F,  2.0F/15.0F };
   // clang-format on
 
-  static constexpr std::array<uint8_t const*, 16> levels = {level00.data(),
-                                                            level01.data(),
-                                                            level02.data(),
-                                                            level03.data(),
-                                                            level04.data(),
-                                                            level05.data(),
-                                                            level06.data(),
-                                                            level07.data(),
-                                                            level08.data(),
-                                                            level09.data(),
-                                                            level10.data(),
-                                                            level11.data(),
-                                                            level12.data(),
-                                                            level13.data(),
-                                                            level14.data(),
-                                                            level15.data()};
-  auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
+  static auto levels = std::array<float const*, 16> {level00.data(),
+                                                     level01.data(),
+                                                     level02.data(),
+                                                     level03.data(),
+                                                     level04.data(),
+                                                     level05.data(),
+                                                     level06.data(),
+                                                     level07.data(),
+                                                     level08.data(),
+                                                     level09.data(),
+                                                     level10.data(),
+                                                     level11.data(),
+                                                     level12.data(),
+                                                     level13.data(),
+                                                     level14.data(),
+                                                     level15.data()};
+
+   auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
   auto const outerDelta = fPOINT {(fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
@@ -1873,16 +1881,23 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
   if (count == 0U) {
 	count = 1;
   }
-  for (auto ind = 0U; ind < count; ++ind) {
-	auto const outerPoint = fPOINT {pivot.x + cos(startAngle) * radius, pivot.y + sin(startAngle) * radius};
-	form::filinsb(outerPoint, stitchPoint);
-	constexpr auto MASKLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
-	auto const level       = ((count & MASKLSN) != 0U) ? form::psg() % count : levels[count][ind];
-	auto const innerRadius = radius * wrap::toFloat(level) / wrap::toFloat(count) * 0.4F;
-	auto const innerPoint =
-	    fPOINT {pivot.x + cos(startAngle) * innerRadius, pivot.y + sin(startAngle) * innerRadius};
-	form::filinsb(innerPoint, stitchPoint);
-	startAngle += stepAngle;
+  constexpr auto MASKLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
+  if ((count & MASKLSN) != 0U) {
+	for (auto iCount = 0U; iCount < count; ++iCount) {
+	  auto const level = wrap::toFloat(form::psg() % count) / wrap::toFloat(count);
+	  fillSB(pivot, startAngle, radius, stitchPoint, level);
+	  startAngle += stepAngle;
+	}
+  }
+  else {
+	auto const* levelData = levels.operator[](count);
+	if (nullptr != levelData) {
+	  for (auto iCount = 0U; iCount < count; ++iCount) {
+		fillSB(pivot, startAngle, radius, stitchPoint, *levelData);
+		++levelData;
+		startAngle += stepAngle;
+	  }
+	}
   }
 }
 
@@ -8044,7 +8059,7 @@ void form::srtbyfrm() {
 	}
 	auto colorAccumulator = 0U;
 	for (auto& iColor : colorHistogram) {
-	  auto value = iColor;
+	  auto const value = iColor;
 	  iColor     = colorAccumulator;
 	  colorAccumulator += value;
 	}

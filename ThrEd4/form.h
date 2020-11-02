@@ -274,6 +274,7 @@ namespace internal {
               uint32_t                  finish,
               float                     width,
               fPOINT&                   stitchPoint);
+  void fillSB(const fPOINT& pivot, float angle, float const& radius, fPOINT& stitchPoint, float const& level);
   void filsclp();
   void filsfn();
   auto findDistanceToSide(fPOINT const& lineStart, fPOINT const& lineEnd, fPOINT const& point, float& distance) noexcept
