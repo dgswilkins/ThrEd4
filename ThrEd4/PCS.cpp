@@ -72,9 +72,9 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 	  PCSHeader.colorCount = COLORCNT;
 	  auto PCSStitchBuffer = std::vector<PCSTCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
-	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-		PCSHeader.colors[iColor] = UserColor[iColor];
-	  }
+	  auto&      phCol    = PCSHeader.colors;
+	  auto const spColors = gsl::span<COLORREF> {phCol};
+	  std::copy(UserColor.begin(), UserColor.end(), spColors.begin());
 	  do {
 		if (pci::pcshup(saveStitches)) {
 		  flag = false;
@@ -151,9 +151,9 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
-		  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-			UserColor[iColor] = PCSHeader.colors[iColor];
-		  }
+		  auto&      phCol    = PCSHeader.colors;
+		  auto const spColors = gsl::span<COLORREF> {phCol};
+		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));
 		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
