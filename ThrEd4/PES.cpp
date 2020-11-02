@@ -308,8 +308,8 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
   auto const spThumbnail    = gsl::span<std::array<uint8_t, THUMBWID>> {thumbnail};
   for (auto& stitch : *StitchBuffer) {
-	auto const x    = wrap::toSize(wrap::floor<uint8_t>(stitch.x * xFactor) + XOFFSET);
-	auto const y    = wrap::toSize(THUMBHGT - (wrap::floor<uint8_t>(stitch.y * yFactor) + YOFFSET));
+	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
 	spRow[x]         = 1U;
   }
@@ -317,10 +317,9 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   // now write out the individual thread thumbnails
   thumbnail        = imageWithFrame;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
-  // ToDo - check that this is still writing out the thumbnails correctly when starting from index 0 instead of 1
   for (auto& stitch : *StitchBuffer) {
-	auto const x = wrap::round<uint16_t>((stitch.x) * xFactor) + 3U;
-	auto const y = THUMBHGT - (wrap::round<uint16_t>((stitch.y) * yFactor) + 3U);
+	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  spRow[x] = 1U;
