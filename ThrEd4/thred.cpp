@@ -17550,7 +17550,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_StringTable               = std::vector<std::wstring> {};
 	  auto private_TempPolygon               = std::vector<fPOINT> {};
 	  auto private_TempTexturePoints         = std::vector<TXPNT> {};
-	  auto private_TextureHistory            = std::array<TXHST, ITXBUFSZ> {};
+	  auto private_TextureHistory            = std::vector<TXHST> {};
 	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
 	  auto private_ThrName                   = fs::path {};
 	  auto private_Thumbnails                = std::vector<std::wstring> {};
@@ -17571,6 +17571,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
+	  private_TextureHistory.resize(ITXBUFSZ);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
 	  private_ValueWindow.resize(LASTLIN);
@@ -17623,7 +17624,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  StateMap                  = &private_StateMap;
 	  StitchBuffer              = &private_StitchBuffer;
 	  TempPolygon               = &private_TempPolygon;
-	  TextureHistory            = &private_TextureHistory;
 	  TextureInputBuffer        = &private_textureInputBuffer;
 	  TexturePointsBuffer       = &private_TexturePointsBuffer;
 	  ThrName                   = &private_ThrName;
@@ -17640,7 +17640,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  bitmap::setUBfilename(&private_UserBMPFileName);
 	  DST::setColFilename(&private_ColorFileName);
 	  DST::setRGBFilename(&private_RGBFileName);
-	  texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList);
+	  texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList, &private_TextureHistory);
 	  thi::redini();
 	  CreateParams createParams {};
 	  createParams.bEnableNonClientDpiScaling = TRUE;

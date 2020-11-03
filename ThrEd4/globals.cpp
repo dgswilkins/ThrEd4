@@ -154,7 +154,6 @@ HDC                            StitchWindowMemDC         = nullptr; // stitch wi
 POINT                          StitchWindowOrigin        = {};      // offset origin of the stitch window
 POINT                          StitchWindowSize          = {};      // size of the stitch window in pixels
 std::vector<fPOINT>*           TempPolygon               = nullptr; // temporary storage when user is entering a polygon;
-std::array<TXHST, ITXBUFSZ>*   TextureHistory            = nullptr; // texture editor history headers
 std::wstring*                  TextureInputBuffer        = nullptr; // texture fill number buffer
 std::vector<TXPNT>*            TexturePointsBuffer       = nullptr; // buffer for textured fill points
 std::array<HWND, COLORCNT>     ThreadSizeWin             = {};      // thread size windows

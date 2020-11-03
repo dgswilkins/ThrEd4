@@ -47,14 +47,18 @@ static auto TextureRect               = TXTRCT {};   // selected texture points 
 static auto SelectTexturePointsOrigin = POINT {};    // original location of selected texture points
 static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
 static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
+static auto TextureHistory = gsl::narrow_cast<std::vector<TXHST>*>(nullptr); // texture editor history headers
 static auto TextureHistoryIndex       = uint32_t {}; // pointer to the next texture history buffer
 static auto TempTexturePoints         = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
 static auto TextureScreen = TXTSCR {}; // texture editor layout parameters
 
-void texture::initTextures(std::vector<TXPNT>* ptrTexturePoints, std::vector<uint32_t>* ptrTexturePointsList) noexcept {
+void texture::initTextures(std::vector<TXPNT>*    ptrTexturePoints,
+                           std::vector<uint32_t>* ptrTexturePointsList,
+                           std::vector<TXHST>*    ptrTextureHistory) noexcept {
   TempTexturePoints         = ptrTexturePoints;
   SelectedTexturePointsList = ptrTexturePointsList;
+  TextureHistory            = ptrTextureHistory;
 }
 
 auto texture::internal::txnam(std::wstring& name) -> bool {
@@ -426,7 +430,8 @@ void texture::drwtxtr() {
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, UserColor[ActiveColor]);
+  auto const spUserColor = gsl::span<COLORREF> {UserColor};
+  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, spUserColor[ActiveColor]);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;
