@@ -75,44 +75,37 @@ void trace::initColorRef() noexcept {
   InvertDownColor = PENGRAY;
 }
 
-#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
-void trace::internal::trcsub(HWND* window, int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) noexcept {
+auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  constexpr auto dwStyle = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const window = CreateWindowEx(
+      0L, L"STATIC", L"", dwStyle, xCoordinate, yCoordinate, ButtonWidth, buttonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   if (nullptr != window) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	*window = CreateWindow(L"STATIC",
-	                       L"",
-	                       SS_OWNERDRAW | WS_CHILD | WS_BORDER,
-	                       xCoordinate,
-	                       yCoordinate,
-	                       ButtonWidth,
-	                       buttonHeight,
-	                       ThrEdWindow,
-	                       nullptr,
-	                       ThrEdInstance,
-	                       nullptr);
+	return window;
   }
+  // No window created so blow up
+  throw;
 }
 
-void trace::initTraceWindows() noexcept {
+void trace::initTraceWindows() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  TraceStepWin = CreateWindow(L"STATIC",
-                              L"",
-                              SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER,
-                              0,
-                              ButtonHeight * 18,
-                              ButtonWidthX3,
-                              ButtonHeight,
-                              ThrEdWindow,
-                              nullptr,
-                              ThrEdInstance,
-                              nullptr);
-  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+  constexpr auto dwStyle = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
+  TraceStepWin = CreateWindowEx(
+      0L, L"STATIC", L"", dwStyle, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+  auto iTraceControlWindow = TraceControlWindow.begin();
+  auto iTraceDownWindow    = TraceDownWindow.begin();
+  auto iTraceSelectWindow  = TraceSelectWindow.begin();
+  auto iTraceUpWindow      = TraceUpWindow.begin();
+  auto iTraceBrush         = TraceBrush.begin();
+  auto iTraceRGB           = TraceRGB.begin();
+  for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
 	auto const channel = gsl::narrow_cast<int32_t>(iRGB);
-	ti::trcsub(&TraceControlWindow[iRGB], ButtonWidth * channel, 0, ButtonHeight * 15);
-	ti::trcsub(&TraceSelectWindow[iRGB], ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
-	ti::trcsub(&TraceUpWindow[iRGB], ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
-	ti::trcsub(&TraceDownWindow[iRGB], ButtonWidth * channel, ButtonHeight * 17, ButtonHeight);
-	TraceBrush[iRGB] = CreateSolidBrush(TraceRGB[iRGB]);
+	*(iTraceControlWindow++) = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * 15);
+	*(iTraceSelectWindow++)  = ti::trcsub(ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
+	*(iTraceUpWindow++)      = ti::trcsub(ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
+	*(iTraceDownWindow++)    = ti::trcsub(ButtonWidth * channel, ButtonHeight * 17, ButtonHeight);
+	*(iTraceBrush++)         = CreateSolidBrush(*(iTraceRGB++));
   }
 }
 
@@ -173,16 +166,21 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 }
 
 void trace::internal::tracwnd() {
-  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	ti::hidwnd(DefaultColorWin->operator[](iColor));
-	ti::hidwnd(UserColorWin->operator[](iColor));
-	ti::hidwnd(ThreadSizeWin[iColor]);
+  auto iDefaultColorWin = DefaultColorWin->begin();
+  auto iUserColorWin = UserColorWin->begin();
+  for (auto& iThreadSizeWin : ThreadSizeWin) {
+	ti::hidwnd(*(iDefaultColorWin++));
+	ti::hidwnd(*(iUserColorWin++));
+	ti::hidwnd(iThreadSizeWin);
   }
-  for (auto iTrace = 0U; iTrace < CHANLCNT; ++iTrace) {
-	ti::shownd(TraceControlWindow[iTrace]);
-	ti::shownd(TraceSelectWindow[iTrace]);
-	ti::shownd(TraceUpWindow[iTrace]);
-	ti::shownd(TraceDownWindow[iTrace]);
+  auto iTraceSelectWindow = TraceSelectWindow.begin();
+  auto iTraceUpWindow     = TraceUpWindow.begin();
+  auto iTraceDownWindow   = TraceDownWindow.begin();
+  for (auto& iTraceControlWindow : TraceControlWindow) {
+	ti::shownd(iTraceControlWindow);
+	ti::shownd(*(iTraceSelectWindow++));
+	ti::shownd(*(iTraceUpWindow++));
+	ti::shownd(*(iTraceDownWindow++));
   }
   ti::hidwnd(ButtonWin->operator[](HBOXSEL));
   ti::hidwnd(ButtonWin->operator[](HUPTO));
@@ -205,33 +203,34 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   auto* testPoint = point;
   if (testPoint != nullptr) {
-	auto index = 0U;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 0 - center
+	auto iTrcAdjClrs = TraceAdjacentColors.begin();
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 0 - center
 	testPoint -= bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 1 - N
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 1 - N
 	testPoint -= 1;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 2 - NW
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
 	testPoint += 2;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 3 - NE
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
 	testPoint += bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 4 - E
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 4 - E
 	testPoint -= 2;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 5 - W
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 5 - W
 	testPoint += bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 6 - SW
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
 	testPoint += 1;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index++]); // pixel 7 - S
+	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 7 - S
 	testPoint += 1;
-	ti::difsub(*testPoint, shift, TraceAdjacentColors[index]); // pixel 8 - SE
+	ti::difsub(*testPoint, shift, *iTrcAdjClrs); // pixel 8 - SE
   }
 }
 
 auto trace::internal::trsum() noexcept -> uint32_t {
-  auto sumAdjacent = 0U;
-  for (auto iAdjacent = 1U; iAdjacent < ADJCOUNT; ++iAdjacent) {
-	sumAdjacent += ((TraceAdjacentColors[iAdjacent] > TraceAdjacentColors[0])
-	                    ? (TraceAdjacentColors[iAdjacent] - TraceAdjacentColors[0])
-	                    : (TraceAdjacentColors[0] - TraceAdjacentColors[iAdjacent]));
+  auto       sumAdjacent           = 0U;
+  auto const spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
+  auto       subTrcAdjCol          = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size());
+  for (auto iAdjacent : subTrcAdjCol) {
+	sumAdjacent += ((iAdjacent > TraceAdjacentColors.front()) ? (iAdjacent - TraceAdjacentColors.front())
+	                                                          : (TraceAdjacentColors.front() - iAdjacent));
   }
   return sumAdjacent;
 }
@@ -246,19 +245,24 @@ void trace::untrace() {
 	  TracedMap->resize(0); // allocated in trace
 	}
 	StateMap->reset(StateFlag::WASEDG);
-	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	  ti::shownd(DefaultColorWin->operator[](iColor));
-	  ti::shownd(UserColorWin->operator[](iColor));
-	  ti::shownd(ThreadSizeWin[iColor]);
+	auto iDefaultColorWin = DefaultColorWin->begin();
+	auto iUserColorWin    = UserColorWin->begin();
+	for (auto& iThreadSizeWin : ThreadSizeWin) {
+	  ti::shownd(*(iDefaultColorWin++));
+	  ti::shownd(*(iUserColorWin++));
+	  ti::shownd(iThreadSizeWin);
 	}
-	for (auto iTrace = 0U; iTrace < CHANLCNT; ++iTrace) {
-	  ti::hidwnd(TraceControlWindow[iTrace]);
-	  ti::hidwnd(TraceSelectWindow[iTrace]);
-	  ti::hidwnd(TraceUpWindow[iTrace]);
-	  ti::hidwnd(TraceDownWindow[iTrace]);
+	auto iTraceSelectWindow = TraceSelectWindow.begin();
+	auto iTraceUpWindow   = TraceUpWindow.begin();
+	auto iTraceDownWindow = TraceDownWindow.begin();
+	for (auto& iTraceControlWindow : TraceControlWindow) {
+	  ti::hidwnd(iTraceControlWindow);
+	  ti::hidwnd(*(iTraceSelectWindow++));
+	  ti::hidwnd(*(iTraceUpWindow++));
+	  ti::hidwnd(*(iTraceDownWindow++));
 	}
-	for (auto iButton = 0U; iButton < BTNCOUNT; ++iButton) {
-	  ti::shownd(ButtonWin->operator[](iButton));
+	for (auto& iButton : *ButtonWin) {
+	  ti::shownd(iButton);
 	}
 	ti::hidwnd(TraceStepWin);
   }
@@ -810,43 +814,53 @@ void trace::trinit() {
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
-		auto       iPixel = 0;
-		for (; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-		  if (TraceBitmapData[iPixel] != color) {
+		auto       flag   = false;
+		auto       highColor = color;
+		auto       spTBD =
+		    gsl::span<uint32_t> {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+		for (auto pixel : spTBD) {
+		  if (pixel != color) {
+			highColor = pixel;
+			flag = true;
 			break;
 		  }
 		}
-		if (iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight()) {
-		  ti::trcols(TraceBitmapData[iPixel]);
-		  HighColors[0] = PixelColors[0];
-		  HighColors[1] = PixelColors[1];
-		  HighColors[2] = PixelColors[2];
+		if (flag) {
+		  ti::trcols(highColor);
+		  std::copy(PixelColors.begin(), PixelColors.end(), HighColors.begin());
 		  ti::trcols(color);
 		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 			if (PixelColors[iRGB] > HighColors[iRGB]) {
-			  auto const swapComponent = PixelColors[iRGB];
-			  PixelColors[iRGB]        = HighColors[iRGB];
-			  HighColors[iRGB]         = swapComponent;
+			  std::swap(PixelColors[iRGB], HighColors[iRGB]);
 			}
 			componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) / 2) + PixelColors[iRGB];
 		  }
 		}
 	  }
 	  else {
-		for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-		  ti::trcols(TraceBitmapData[iPixel]);
-		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-			++(histogramData[iRGB][PixelColors[iRGB]]);
+		auto spTBD = gsl::span<uint32_t> {
+		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+		for (auto pixel : spTBD) {
+		  ti::trcols(pixel);
+		  auto iPixelColors = PixelColors.begin();
+		  for (auto& iHistogramData : histogramData) {
+			auto const spHD = gsl::span<uint32_t> {iHistogramData};
+			++(spHD[*(iPixelColors++)]);
 		  }
 		}
 		auto componentPeakCount = std::array<uint32_t, CHANLCNT> {};
-		for (auto iLevel = 0U; iLevel < LEVELCNT; ++iLevel) {
-		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-			if (histogramData[iRGB][iLevel] > componentPeakCount[iRGB]) {
-			  componentPeakCount[iRGB] = histogramData[iRGB][iLevel];
-			  componentPeak[iRGB]      = iLevel;
+		auto iComponentPeakCount = componentPeakCount.begin();
+		auto iComponentPeak      = componentPeak.begin();
+		for (auto iHistogramData : histogramData) {
+		  auto const spHD = gsl::span<uint32_t> {iHistogramData};
+		  for (auto iLevel = 0U; iLevel < iHistogramData.size(); ++iLevel) {
+			if (spHD[iLevel] > *iComponentPeakCount) {
+			  *iComponentPeakCount = spHD[iLevel];
+			  *iComponentPeak      = iLevel;
 			}
 		  }
+		  ++iComponentPeakCount;
+		  ++iComponentPeak;
 		}
 	  }
 	  InvertDownColor = 0U;
@@ -914,23 +928,26 @@ void trace::internal::dutrnum0(uint32_t color) {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
+	auto const iTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
 	ti::ritrcol(&InvertUpColor, color);
 	UpPixelColor = InvertUpColor ^ COLMASK;
-	thred::redraw(TraceUpWindow[ColumnColor]);
+	thred::redraw(*iTraceUpWindow);
   }
   else {
+	auto const iTraceDownWindow = wrap::next(TraceDownWindow.begin(), ColumnColor);
 	ti::ritrcol(&InvertDownColor, color);
 	DownPixelColor = InvertDownColor ^ COLMASK;
-	thred::redraw(TraceDownWindow[ColumnColor]);
+	thred::redraw(*iTraceDownWindow);
   }
-  thred::redraw(TraceControlWindow[ColumnColor]);
+  auto const iTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
+  thred::redraw(*iTraceControlWindow);
   DestroyWindow(TraceNumberInput);
   StateMap->set(StateFlag::WASTRCOL);
   trace::trace();
 }
 
 void trace::dutrnum2() {
-  ti::dutrnum0(wrap::toUnsigned(std::stoi(TraceInputBuffer.data())));
+  ti::dutrnum0(wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10)));
 }
 
 void trace::dutrnum1() {
@@ -964,32 +981,16 @@ auto trace::internal::ducolm() -> uint32_t {
 
 void trace::internal::trnumwnd0(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  TraceNumberInput = CreateWindow(L"STATIC",
-                                  nullptr,
-                                  SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                  ButtonWidthX3,
-                                  position,
-                                  ButtonWidth,
-                                  ButtonHeight,
-                                  ThrEdWindow,
-                                  nullptr,
-                                  ThrEdInstance,
-                                  nullptr);
+  constexpr auto dwStyle = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
+  TraceNumberInput       = CreateWindowEx(
+      0L, L"STATIC", nullptr, dwStyle, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void trace::internal::trnumwnd1(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  GeneralNumberInputBox = CreateWindow(L"STATIC",
-                                       nullptr,
-                                       WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                       ButtonWidthX3,
-                                       position,
-                                       ButtonWidthX3,
-                                       ButtonHeight,
-                                       ThrEdWindow,
-                                       nullptr,
-                                       ThrEdInstance,
-                                       nullptr);
+  constexpr auto dwStyle = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
+  GeneralNumberInputBox  = CreateWindowEx(
+      0L, L"STATIC", nullptr, dwStyle, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void trace::blak() {
@@ -1062,14 +1063,16 @@ void trace::tracpar() {
 		  DownPixelColor |= position << TraceShift[ColumnColor];
 		}
 	  } while (false);
-	  thred::redraw(TraceControlWindow[ColumnColor]);
+	  auto const iTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
+	  thred::redraw(*iTraceControlWindow);
 	  trace::trace();
 	}
 	else {
 	  auto const position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
 	  if (position < 16U) {
 		StateMap->flip(TraceRGBFlag[ColumnColor]);
-		thred::redraw(TraceSelectWindow[ColumnColor]);
+		auto const iTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
+		thred::redraw(*iTraceSelectWindow);
 		trace::trace();
 	  }
 	  else {
@@ -1136,22 +1139,22 @@ void trace::tracpar() {
   }
 }
 
-void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t iRGB) {
+void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
   auto const zeroWidth = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
   auto const val       = std::to_wstring(color);
   auto const xPosition = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
-  SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
+  SetBkColor(DrawItem->hDC, backColor);
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
 void trace::internal::upnum(uint32_t iRGB) {
-  ti::trcnum(TraceShift[iRGB], InvertUpColor, iRGB);
+  ti::trcnum(TraceShift[iRGB], InvertUpColor, TraceRGB[iRGB]);
 }
 
 void trace::internal::dwnum(uint32_t iRGB) {
-  ti::trcnum(TraceShift[iRGB], InvertDownColor, iRGB);
+  ti::trcnum(TraceShift[iRGB], InvertDownColor, TraceRGB[iRGB]);
 }
 
 void trace::internal::durct(uint32_t    shift,
@@ -1197,41 +1200,51 @@ void trace::wasTrace() {
   auto traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const BlackBrush = CreateSolidBrush(0); // black brush
-  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	if (DrawItem->hwndItem == TraceUpWindow[iRGB]) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
-	  ti::upnum(iRGB);
+  auto       iTraceUpWindow = TraceUpWindow.begin();
+  auto       iTraceDownWindow = TraceDownWindow.begin();
+  auto       iTraceControlWindow = TraceControlWindow.begin();
+  auto       iTraceSelectWindow  = TraceSelectWindow.begin();
+  auto       iTraceShift         = TraceShift.begin();
+  auto       iTraceRGB           = TraceRGB.begin();
+  auto       iTraceRGBFlag       = TraceRGBFlag.begin();
+  auto       iRGB                = 0U;
+  for (auto& brush : TraceBrush) {
+	if (DrawItem->hwndItem == *(iTraceUpWindow++)) {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
+	  ti::trcnum(*iTraceShift, InvertUpColor, *iTraceRGB);
 	  break;
 	}
-	if (DrawItem->hwndItem == TraceDownWindow[iRGB]) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[iRGB]);
-	  ti::dwnum(iRGB);
+	if (DrawItem->hwndItem == *(iTraceDownWindow++)) {
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
+	  ti::trcnum(*iTraceShift, InvertDownColor, *iTraceRGB);
 	}
-	if (DrawItem->hwndItem == TraceControlWindow[iRGB]) {
-	  ti::durct(TraceShift[iRGB], DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
-	  FillRect(DrawItem->hDC, &traceMiddleMaskRect, TraceBrush[iRGB]);
+	if (DrawItem->hwndItem == *(iTraceControlWindow++)) {
+	  ti::durct(*iTraceShift, DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
+	  FillRect(DrawItem->hDC, &traceMiddleMaskRect, brush);
 	  ti::dublk(DrawItem->hDC, traceHighMaskRect, traceLowMaskRect, BlackBrush);
 	  break;
 	}
-	if (DrawItem->hwndItem == TraceSelectWindow[iRGB]) {
+	if (DrawItem->hwndItem == *(iTraceSelectWindow++)) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto TempBrush = BlackBrush;
 	  SetBkColor(DrawItem->hDC, 0);
-	  SetTextColor(DrawItem->hDC, TraceRGB[iRGB]);
-	  if (StateMap->test(TraceRGBFlag[iRGB])) {
-		TempBrush = TraceBrush[iRGB];
+	  SetTextColor(DrawItem->hDC, *iTraceRGB);
+	  if (StateMap->test(*iTraceRGBFlag)) {
+		TempBrush = brush;
 		SetTextColor(DrawItem->hDC, 0);
-		SetBkColor(DrawItem->hDC, TraceRGB[iRGB]);
+		SetBkColor(DrawItem->hDC, *iTraceRGB);
 	  }
 #pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
-	  auto const strOnOff = displayText::loadStr((StateMap->test(TraceRGBFlag[iRGB])) ? IDS_ON : IDS_OFF);
+	  auto const strOnOff = displayText::loadStr((StateMap->test(*iTraceRGBFlag)) ? IDS_ON : IDS_OFF);
 	  wrap::textOut(DrawItem->hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TraceBrush[ColumnColor]);
-	  SetBkColor(DrawItem->hDC, TraceRGB[ColumnColor]);
+	  auto const iColTraceBrush = wrap::next(TraceBrush.begin(), ColumnColor);
+	  auto const iColTraceRGB   = wrap::next(TraceRGB.begin(), ColumnColor);
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *iColTraceBrush);
+	  SetBkColor(DrawItem->hDC, *iColTraceRGB);
 	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
@@ -1239,6 +1252,10 @@ void trace::wasTrace() {
 	                gsl::narrow<uint32_t>(wcslen(TraceInputBuffer.data())));
 	  break;
 	}
+	++iTraceShift;
+	++iTraceRGB;
+	++iTraceRGBFlag;
+	++iRGB;
   }
 }
 
@@ -1255,8 +1272,10 @@ void trace::wasTrace1() {
 }
 
 void trace::traceNumberInput(wchar_t NumericCode) {
-  TraceInputBuffer[MsgIndex++] = NumericCode;
-  TraceInputBuffer[MsgIndex]   = 0;
+  auto iTraceInputBuffer       = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  *(iTraceInputBuffer++)           = NumericCode;
+  *iTraceInputBuffer   = 0;
+  ++MsgIndex;
   auto traceColor              = wrap::toUnsigned(std::stoi(TraceInputBuffer.data()));
   switch (MsgIndex) {
 	case 2: {
@@ -1280,7 +1299,8 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   thred::redraw(TraceNumberInput);
 }
 
-void trace::traceNumberReset() noexcept {
-  TraceInputBuffer[MsgIndex] = 0;
+void trace::traceNumberReset() {
+  auto const iTraceInputBuffer     = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  *iTraceInputBuffer = 0;
   thred::redraw(TraceNumberInput);
 }
