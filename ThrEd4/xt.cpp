@@ -825,10 +825,11 @@ void xt::internal::durec(OREC& record) {
 auto xt::internal::orComp(OREC const* record1, OREC const* record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1 != nullptr && record2 != nullptr) {
-	if (ColorOrder[record1->color] < ColorOrder[record2->color]) {
+	auto const spColorOrder = gsl::span<uint32_t> {ColorOrder};
+	if (spColorOrder[record1->color] < spColorOrder[record2->color]) {
 	  return true;
 	}
-	if (ColorOrder[record2->color] < ColorOrder[record1->color]) {
+	if (spColorOrder[record2->color] < spColorOrder[record1->color]) {
 	  return false;
 	}
 	if (record1->form < record2->form) {
@@ -983,7 +984,8 @@ auto xt::internal::srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count
   auto color     = stitchRegion[0]->color;
   for (auto iRegion = 1U; iRegion < count; ++iRegion) {
 	if (stitchRegion[iRegion]->form == formIndex) {
-	  if (ColorOrder[stitchRegion[iRegion]->color] < ColorOrder[color]) {
+	  auto const spColorOrder = gsl::span<uint32_t> {ColorOrder};
+	  if (spColorOrder[stitchRegion[iRegion]->color] < spColorOrder[color]) {
 		auto& form = FormList->operator[](formIndex);
 		if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
 		    stitchRegion[iRegion]->color == form.fillColor) {
@@ -1015,10 +1017,11 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = 0;
-	ColorOrder[AppliqueColor]       = 0;
+	auto const spColorOrder         = gsl::span<uint32_t> {ColorOrder};
+	spColorOrder[AppliqueColor]     = 0;
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
-		ColorOrder[iColor] = iColor + 1U;
+		spColorOrder[iColor] = iColor + 1U;
 	  }
 	}
 	for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
@@ -1321,10 +1324,12 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
+	auto&      fillArray   = fillStartsData.fillArray;
+	auto const spFillArray   = gsl::span<uint32_t> {fillArray};
 	iDestinationStitch = ind - 1U;
 	while (iDestinationStitch < ind) {
-	  if (fillStartsData.fillArray[iDestinationStitch] > fillStartsData.fillArray[ind]) {
-		fillStartsData.fillArray[ind] = fillStartsData.fillArray[iDestinationStitch];
+	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {
+		spFillArray[ind] = spFillArray[iDestinationStitch];
 	  }
 	  --iDestinationStitch;
 	}
