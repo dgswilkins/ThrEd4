@@ -451,11 +451,17 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 	  }
 	  ++vertexIt;
 	}
-#pragma warning(suppress : 26487) // lifetime.4 Don't return a pointer that may be invalid
-	return *InsidePoints;
+	if (nullptr != InsidePoints) {
+	  return *InsidePoints;
+	}
+	// null pointer, so blow up
+	throw;
   }
-
-  return *OutsidePoints;
+  if (nullptr != OutsidePoints) {
+	return *OutsidePoints;
+  }
+  // null pointer, so blow up
+  throw;
 }
 
 void xt::internal::delwlk(uint32_t code) {
