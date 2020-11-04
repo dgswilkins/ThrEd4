@@ -1276,7 +1276,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
   *(iTraceInputBuffer++)           = NumericCode;
   *iTraceInputBuffer   = 0;
   ++MsgIndex;
-  auto traceColor              = wrap::toUnsigned(std::stoi(TraceInputBuffer.data()));
+  auto traceColor              = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(),nullptr, 10));
   switch (MsgIndex) {
 	case 2: {
 	  if (traceColor > 25) {
