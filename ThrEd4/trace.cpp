@@ -228,7 +228,7 @@ auto trace::internal::trsum() noexcept -> uint32_t {
   auto       sumAdjacent           = 0U;
   auto const spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
   auto       subTrcAdjCol          = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size());
-  for (auto iAdjacent : subTrcAdjCol) {
+  for (auto& iAdjacent : subTrcAdjCol) {
 	sumAdjacent += ((iAdjacent > TraceAdjacentColors.front()) ? (iAdjacent - TraceAdjacentColors.front())
 	                                                          : (TraceAdjacentColors.front() - iAdjacent));
   }
@@ -297,7 +297,7 @@ void trace::trdif() {
 		auto iPoint = iHeight * bitmap::getBitmapWidth();
 		++iPoint;
 		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
-		  ti::difbits(TraceShift[iRGB], &TraceBitmapData[wrap::toSize(iPoint)]);
+		  ti::difbits(TraceShift[iRGB], wrap::next(TraceBitmapData, iPoint));
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
 		  auto& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
