@@ -1436,14 +1436,18 @@ void satin::sbrd(FRMHED const& form) {
 auto satin::internal::satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept
     -> fPOINT {
   constexpr auto SATHRESH = 10.0F;
-  auto           angle    = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
-  auto           length   = satinWidth / cos(angle);
-  if (length < -satinWidth * SATHRESH) {
-	length = -satinWidth * SATHRESH;
+
+  auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;
+  auto factor = 1.0F / cos(angle);
+  if (factor < -SATHRESH) {
+	factor = -SATHRESH;
   }
-  if (length > satinWidth * SATHRESH) {
-	length = satinWidth * SATHRESH;
+  else {
+	if (factor > SATHRESH) {
+	  factor = SATHRESH;
+	}
   }
+  auto const           length = satinWidth * factor;
   angle += FormAngles->operator[](start) + PI_FHALF;
   return fPOINT {length * cos(angle), length * sin(angle)};
 }
