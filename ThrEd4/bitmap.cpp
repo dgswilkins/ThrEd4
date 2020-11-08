@@ -499,10 +499,8 @@ void bitmap::setBmpBackColor() {
                                                                  0x00b799ae,
                                                                  0x0054667a};
   BitmapBackgroundColors->clear();
-  BitmapBackgroundColors->reserve(defaultColors.size());
-  for (auto const& color : defaultColors) {
-	BitmapBackgroundColors->push_back(color);
-  }
+  BitmapBackgroundColors->resize(defaultColors.size());
+  std::copy(defaultColors.begin(), defaultColors.end(), BitmapBackgroundColors->begin());
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {
