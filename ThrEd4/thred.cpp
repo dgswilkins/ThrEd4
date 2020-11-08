@@ -405,80 +405,97 @@ auto thred::internal::rsed() noexcept -> uint32_t {
 
 void thred::internal::fnamtabs() {
   constexpr auto NAMELEN = NameOrder.size();
+  auto           iNameOrder = NameOrder.begin();
   for (auto iName = 0U; iName < NAMELEN; ++iName) {
-	NameOrder[iName] = iName;
+	*(iNameOrder++) = iName;
   }
+  auto const spNameOrder         = gsl::span<uint32_t> {NameOrder};
   PseudoRandomValue = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = form::psg() % NAMELEN;
 	auto const destination = form::psg() % NAMELEN;
-	std::swap(NameOrder[destination], NameOrder[source]);
+	std::swap(spNameOrder[destination], spNameOrder[source]);
   }
+  auto iNameEncoder = NameEncoder.begin();
   for (auto iName = uint8_t {0U}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
-	NameEncoder[iName] = iName + NCODOF;
+	*(iNameEncoder++) = iName + NCODOF;
   }
+  auto const spNameEncoder         = gsl::span<uint8_t> {NameEncoder};
   PseudoRandomValue = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = form::psg() & MSK7BITS;
 	auto const destination = form::psg() & MSK7BITS;
-	std::swap(NameEncoder[destination], NameEncoder[source]);
+	std::swap(spNameEncoder[destination], spNameEncoder[source]);
   }
   NameDecoder.fill(0);
+  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
   for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
-	NameDecoder[NameEncoder[iName]] = iName;
+	spNameDecoder[spNameEncoder[iName]] = iName;
   }
 }
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
-  auto designer = utf::Utf16ToUtf8(designerName);
+  constexpr auto NAMELEN  = NameOrder.size();
+  auto           designer = utf::Utf16ToUtf8(designerName);
   auto tmpName  = std::array<uint8_t, NameOrder.size()> {0};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
   PseudoRandomValue = rsed();
   auto iName        = 0U;
-  for (; iName < NameOrder.size(); ++iName) {
-	tmpName[iName] = (form::psg() & BYTMASK);
+  for (auto& iTmpName : tmpName) {
+	iTmpName = (form::psg() & BYTMASK);
   }
-  for (iName = 0U; iName < NameOrder.size(); ++iName) {
-	if (designer[iName] != 0) {
-	  tmpName[iName] = (NameEncoder[wrap::toSize(designer[iName])]);
+  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
+  auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
+  for (auto& iTmpName : tmpName) {
+	if (designer[iName++] != 0) {
+	  iTmpName = (spNameEncoder[wrap::toSize(designer[iName])]);
 	}
 	else {
-	  while (NameDecoder[wrap::toSize(tmpName[iName])] != 0U) {
-		tmpName[iName] = (form::psg() & BYTMASK);
+	  while (spNameDecoder[wrap::toSize(iTmpName)] != 0U) {
+		iTmpName = (form::psg() & BYTMASK);
 	  }
 	  break;
 	}
   }
-  if (iName == NameOrder.size()) {
-	auto& index = tmpName[NameOrder.size() - 1U];
-	while (NameDecoder[wrap::toSize(index)] != 0U) {
+  if (iName == NAMELEN) {
+	auto& index = tmpName.back();
+	while (spNameDecoder[wrap::toSize(index)] != 0U) {
 	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
 	}
   }
-  for (iName = 0U; iName < NameOrder.size(); ++iName) {
-	if (NameOrder[iName] < NameOrder.size()) {
-	  ExtendedHeader->creatorName[NameOrder[iName]] = gsl::narrow_cast<char>(tmpName[iName]);
+  auto iTmpName = tmpName.begin();
+  auto& EHCN    = ExtendedHeader->creatorName;
+  auto  const spCreatorName = gsl::span<char> {EHCN};
+  for (auto& iNameOrder : NameOrder) {
+	if (iNameOrder < NAMELEN) {
+	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
 	}
   }
 }
 
 void thred::internal::redfnam(std::wstring& designerName) {
-  auto tmpName  = std::array<uint8_t, NameOrder.size()> {};
+  constexpr auto NAMELEN    = NameOrder.size();
+  auto           tmpName    = std::array<uint8_t, NameOrder.size()> {};
   auto designer = std::string {};
-  for (auto iName = 0U; iName < tmpName.size(); ++iName) {
-	if (NameOrder[iName] < NameOrder.size()) {
-	  tmpName[iName] = gsl::narrow_cast<uint8_t>(ExtendedHeader->creatorName[NameOrder[iName]]);
+  auto iNameOrder = NameOrder.begin();
+  auto&          EHCN          = ExtendedHeader->creatorName;
+  auto const     spCreatorName = gsl::span<char> {EHCN};
+  for (auto& iTmpName : tmpName) {
+	if (*iNameOrder < NAMELEN) {
+	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[*iNameOrder]);
 	}
 	else {
-	  tmpName[iName] = 111;
+	  iTmpName = 111;
 	}
+	iNameOrder++;
   }
   designer.reserve(tmpName.size());
+  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
   for (auto const& character : tmpName) {
-	if (NameDecoder[character] != 0U) {
-	  designer.push_back(gsl::narrow<char>(NameDecoder[character]));
+	if (spNameDecoder[character] != 0U) {
+	  designer.push_back(gsl::narrow<char>(spNameDecoder[character]));
 	}
 	else {
 	  break;
