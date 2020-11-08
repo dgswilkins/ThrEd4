@@ -8047,10 +8047,7 @@ void form::srtbyfrm() {
   color.resize(COLORCNT);
   if (!FormList->empty()) {
 	thred::savdo();
-	auto seqColor = 1U;
-	for (auto& col : color) {
-		col = seqColor++;
-	}
+	std::iota(color.begin(), color.end(), 1);
 	color[AppliqueColor]  = 0U;
 	auto tempStitchBuffer = std::vector<fPOINTATTR> {};
 	tempStitchBuffer.resize(StitchBuffer->size());
