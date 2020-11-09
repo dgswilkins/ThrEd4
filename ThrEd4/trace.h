@@ -56,7 +56,7 @@ namespace internal {
   auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
   void trnumwnd0(int32_t position) noexcept;
   void trnumwnd1(int32_t position) noexcept;
-  auto trsum() noexcept -> uint32_t;
+  auto trsum() -> uint32_t;
   void upnum(uint32_t iRGB);
 
 #if TRCMTH == 0

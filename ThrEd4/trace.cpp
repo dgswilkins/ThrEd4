@@ -224,15 +224,15 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   }
 }
 
-auto trace::internal::trsum() noexcept -> uint32_t {
-  auto       sumAdjacent           = 0U;
+
+auto trace::internal::trsum() -> uint32_t {
+  auto&      firstColor            = TraceAdjacentColors.front();
   auto const spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
-  auto       subTrcAdjCol          = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size());
-  for (auto& iAdjacent : subTrcAdjCol) {
-	sumAdjacent += ((iAdjacent > TraceAdjacentColors.front()) ? (iAdjacent - TraceAdjacentColors.front())
-	                                                          : (TraceAdjacentColors.front() - iAdjacent));
-  }
-  return sumAdjacent;
+  auto const subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
+  auto const fold         = [firstColor](uint32_t a, uint32_t b) {
+    return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
+  };
+  return wrap::toUnsigned(std::accumulate(subTrcAdjCol.begin(), subTrcAdjCol.end(), 0, fold));
 }
 
 void trace::untrace() {
