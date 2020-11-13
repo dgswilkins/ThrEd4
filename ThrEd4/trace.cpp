@@ -814,27 +814,22 @@ void trace::trinit() {
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
-		auto       flag   = false;
 		auto       highColor = color;
-		auto       spTBD =
+		auto const spTBD =
 		    gsl::span<uint32_t> {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
-		for (auto pixel : spTBD) {
-		  if (pixel != color) {
-			highColor = pixel;
-			flag = true;
-			break;
-		  }
+		auto pixel = std::find_if(
+		    spTBD.begin(), spTBD.end(), [color](uint32_t& m) -> bool { return m != color; });
+		if (pixel != spTBD.end()) {
+		  highColor = *pixel;
 		}
-		if (flag) {
-		  ti::trcols(highColor);
-		  std::copy(PixelColors.begin(), PixelColors.end(), HighColors.begin());
-		  ti::trcols(color);
-		  for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-			if (PixelColors[iRGB] > HighColors[iRGB]) {
-			  std::swap(PixelColors[iRGB], HighColors[iRGB]);
-			}
-			componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) / 2) + PixelColors[iRGB];
+		ti::trcols(highColor);
+		std::copy(PixelColors.begin(), PixelColors.end(), HighColors.begin());
+		ti::trcols(color);
+		for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
+		  if (PixelColors[iRGB] > HighColors[iRGB]) {
+			std::swap(PixelColors[iRGB], HighColors[iRGB]);
 		  }
+		  componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) / 2) + PixelColors[iRGB];
 		}
 	  }
 	  else {
@@ -1147,14 +1142,6 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t backColor)
   auto const xPosition = zeroWidth.cx * gsl::narrow<int32_t>((3U - val.size()) + 1U);
   SetBkColor(DrawItem->hDC, backColor);
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
-}
-
-void trace::internal::upnum(uint32_t iRGB) {
-  ti::trcnum(TraceShift[iRGB], InvertUpColor, TraceRGB[iRGB]);
-}
-
-void trace::internal::dwnum(uint32_t iRGB) {
-  ti::trcnum(TraceShift[iRGB], InvertDownColor, TraceRGB[iRGB]);
 }
 
 void trace::internal::durct(uint32_t    shift,

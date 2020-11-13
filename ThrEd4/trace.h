@@ -42,7 +42,6 @@ namespace internal {
   void dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept;
   void dutrac();
   void dutrnum0(uint32_t color);
-  void dwnum(uint32_t iRGB);
   void hidwnd(HWND hwnd) noexcept;
   void ritrcol(COLORREF* color, uint32_t number) noexcept;
   void shownd(HWND hwnd) noexcept;
@@ -57,7 +56,6 @@ namespace internal {
   void trnumwnd0(int32_t position) noexcept;
   void trnumwnd1(int32_t position) noexcept;
   auto trsum() -> uint32_t;
-  void upnum(uint32_t iRGB);
 
 #if TRCMTH == 0
   auto colsum(COLORREF col) -> uint32_t;
