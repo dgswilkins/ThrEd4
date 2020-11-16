@@ -7606,7 +7606,7 @@ void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
 }
 
 // Does the outline have zero width or zero height?
-auto thred::internal::isLine(std::vector<POINT>& boxOutline) noexcept -> bool {
+auto thred::internal::isLine(std::vector<POINT> const& boxOutline) noexcept -> bool {
   return (boxOutline[0].x == boxOutline[1].x) || (boxOutline[1].y == boxOutline[2].y);
 }
 

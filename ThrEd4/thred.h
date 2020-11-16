@@ -278,7 +278,7 @@ namespace internal {
   void insfil(fs::path& insertedFile);
   auto insTHR(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool;
   auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
-  auto isLine(std::vector<POINT>& boxOutline) noexcept -> bool;
+  auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
   auto isfclp() noexcept -> bool;
   void istch();
