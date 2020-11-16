@@ -226,7 +226,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 
 
 auto trace::internal::trsum() -> uint32_t {
-  auto&      firstColor            = TraceAdjacentColors.front();
+  auto const& firstColor            = TraceAdjacentColors.front();
   auto const spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
   auto const subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
   auto const fold         = [firstColor](uint32_t a, uint32_t b) {
