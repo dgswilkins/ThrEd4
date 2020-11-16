@@ -2707,20 +2707,13 @@ union FILLSTARTS {
   FSTRTS   fillNamed;
   uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)] {};
 
-  inline FILLSTARTS() noexcept;
+  // inline FILLSTARTS() noexcept;
   // FILLSTARTS(FILLSTARTS const&) = default;
   // FILLSTARTS(FILLSTARTS&&) = default;
   // FILLSTARTS& operator=(FILLSTARTS const& rhs) = default;
   // FILLSTARTS& operator=(FILLSTARTS&&) = default;
   //~FILLSTARTS() = default;
 };
-
-inline FILLSTARTS::FILLSTARTS() noexcept {
-  auto fSpan = gsl::span<uint32_t> {&fillArray[0], sizeof(FSTRTS) / sizeof(uint32_t)};
-  for (auto& el : fSpan) {
-	el = 0U;
-  }
-}
 
 constexpr auto M_AP     = 1U << 1U;
 constexpr auto M_CWLK   = 1U << 2U;
