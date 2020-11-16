@@ -17563,7 +17563,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
 	  auto private_StateMap                  = EnumMap<StateFlag> {0};
 	  auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
-	  auto private_StringTable               = std::vector<std::wstring> {};
 	  auto private_TempPolygon               = std::vector<fPOINT> {};
 	  auto private_TempTexturePoints         = std::vector<TXPNT> {};
 	  auto private_TextureHistory            = std::vector<TXHST> {};
