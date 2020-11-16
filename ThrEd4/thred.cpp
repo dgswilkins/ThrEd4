@@ -6731,8 +6731,8 @@ void thred::redclp() {
 	auto&       clipBuffer     = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(clipSize);
-	clipBuffer.emplace_back(wrap::toFloat(clipStitchData[0].x) + wrap::toFloat(clipStitchData[0].fx) / FRACFACT,
-	                        wrap::toFloat(clipStitchData[0].y) + wrap::toFloat(clipStitchData[0].fy) / FRACFACT,
+	clipBuffer.emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
+	                        wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
 	                        0U);
 
 #if CLPBUG
