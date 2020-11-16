@@ -212,7 +212,7 @@ void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) 
   }
 }
 
-void clip::internal::durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData) {
+void clip::internal::durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData) noexcept {
   if (!ClipBuffer->empty()) {
 	auto const midpoint   = wrap::midl(clipRect.right, clipRect.left);
 	auto&      clipBuffer = *ClipBuffer;

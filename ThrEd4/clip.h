@@ -59,7 +59,7 @@ namespace internal {
   void duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t start, uint32_t finish);
   void dufxlen(FRMHED const& form, std::vector<fPOINT>& chainEndPoints);
   void dulast(std::vector<fPOINT>& chainEndPoints);
-  void durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData);
+  void durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData) noexcept;
   auto findclp(uint32_t formIndex) noexcept -> uint32_t;
   void fxlen(FRMHED const&             form,
              std::vector<fPOINT>&      chainEndPoints,
