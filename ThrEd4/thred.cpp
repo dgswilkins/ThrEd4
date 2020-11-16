@@ -443,9 +443,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   }
   PseudoRandomValue = rsed();
   auto iName        = 0U;
-  for (auto& iTmpName : tmpName) {
-	iTmpName = (form::psg() & BYTMASK);
-  }
+  std::generate(tmpName.begin(), tmpName.end(), []() -> uint8_t { return (form::psg() & BYTMASK); });
   auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
   auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
   for (auto& iTmpName : tmpName) {
