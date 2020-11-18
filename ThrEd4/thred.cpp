@@ -443,7 +443,8 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   }
   PseudoRandomValue = rsed();
   auto iName        = 0U;
-  std::generate(tmpName.begin(), tmpName.end(), []() -> uint8_t { return (form::psg() & BYTMASK); });
+  std::generate(
+      tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
   auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
   auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
   for (auto& iTmpName : tmpName) {
@@ -5570,7 +5571,7 @@ auto thred::internal::sizfclp(FRMHED const& form) -> uint32_t {
   return clipSize;
 }
 
-auto thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) -> uint32_t {
+auto thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t {
   auto const codedAttribute = iForm << FRMSHFT;
   auto       iStitch        = StitchBuffer->begin();
   auto       stitchCount    = 0U;
@@ -11239,26 +11240,26 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	for (auto const& iFillType : FTHRLIST) {
-	  if (Msg.hwnd == SideWindow[iFillType.value]) {
-		form.fillInfo.feather.fillType = iFillType.value;
-		thred::unsid();
-		form::refil();
-		formForms::refrm();
-		break;
-	  }
+	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LSTTYPE const& m) -> bool {
+	  return Msg.hwnd == SideWindow[m.value];
+	});
+	if (iFeather != FTHRLIST.end()) {
+	  form.fillInfo.feather.fillType = iFeather->value;
+	  thred::unsid();
+	  form::refil();
+	  formForms::refrm();
 	}
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	for (auto const& iLayer : LAYRLIST) {
-	  if (Msg.hwnd == SideWindow[iLayer.value]) {
-		form::movlayr(iLayer.value);
-		StateMap->set(StateFlag::FORMSEL);
-		auto const layerStr = displayText::loadStr(iLayer.stringID);
-		SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
-		break;
-	  }
+	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LSTTYPE const& m) -> bool {
+	  return Msg.hwnd == SideWindow[m.value];
+	  });
+	if (iLayer != LAYRLIST.end()) {
+	  form::movlayr(iLayer->value);
+	  StateMap->set(StateFlag::FORMSEL);
+	  auto const layerStr = displayText::loadStr(iLayer->stringID);
+	  SetWindowText(ValueWindow->operator[](LLAYR), layerStr.c_str());
 	}
 	thred::unsid();
 	formForms::refrm();

@@ -222,7 +222,7 @@ namespace internal {
   void fndknt();
   void fop();
   void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
-  auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) -> uint32_t;
+  auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
   void frmcurmen();
   void frmcursel(uint32_t cursorType);
   void frmpos(FRMHED& form, float deltaX, float deltaY);
