@@ -816,7 +816,7 @@ void trace::trinit() {
 		auto       highColor = color;
 		auto const spTBD     = gsl::span<uint32_t> {
             TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
-		auto pixel = std::find_if(
+		auto const pixel = std::find_if(
 		    spTBD.begin(), spTBD.end(), [color](uint32_t& m) -> bool { return m != color; });
 		if (pixel != spTBD.end()) {
 		  highColor = *pixel;

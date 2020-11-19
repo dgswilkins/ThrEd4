@@ -1447,9 +1447,11 @@ auto satin::internal::satOffset(const uint32_t& finish, const uint32_t& start, f
 	  factor = SATHRESH;
 	}
   }
-  auto const           length = satinWidth * factor;
+  auto const length = satinWidth * factor;
+
   angle += FormAngles->operator[](start) + PI_FHALF;
-  auto                 retval = fPOINT {length * cos(angle), length * sin(angle)};
+
+  auto const retval = fPOINT {length * cos(angle), length * sin(angle)};
   return retval;
 }
 
