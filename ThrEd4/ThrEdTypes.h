@@ -546,6 +546,8 @@ enum layers : uint8_t {
   LAYER4  // Layer 4
 };
 
+constexpr auto LAYERMAX = 5U; // number of layers
+
 // Feather types
 enum featherStyles : uint8_t {
   FTHSIN = 1, // sine
@@ -556,7 +558,8 @@ enum featherStyles : uint8_t {
   FTHFAZ      // picket
 };
 
-constexpr int32_t FDEFTYP = FTHPSG; // default feather type
+constexpr auto FSTYLMAX = uint8_t {6U};     // count of feather styles
+constexpr auto FDEFTYP  = int32_t {FTHPSG}; // default feather type
 
 // fill types
 enum fillStyles : uint8_t {
@@ -574,6 +577,8 @@ enum fillStyles : uint8_t {
   TXHORF,   // Horizontal texture fill
   TXANGF    // Angle texture fill
 };
+
+constexpr auto FILLTMAX = uint32_t {14U}; // number of fill types
 
 constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
 constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
@@ -596,16 +601,49 @@ enum edgeFillStyles : uint8_t {
   EDGECLIPX      // Even Clipboard
 };
 
-constexpr auto LAYERMAX = 5U;             // number of layers
-constexpr auto FSTYLMAX = uint8_t {6U};   // count of feather styles
-constexpr auto FILLTMAX = uint32_t {14U}; // number of fill types
-constexpr auto EDGETMAX = uint32_t {13U}; // number of border fill types
+constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
+
+// preference window entries
+enum prefWin : uint32_t {
+  PRFAPPCOL, // Applique color
+  PRFAPSLEN, // Applique stitchLen
+  PRFBRDWID, // Border width
+  PRFBCNLEN, // Button corner length
+  PRFCHFLEN, // Chain fill length
+  PRFCHFPOS, // Chain fill position
+  PRFCLPOFF, // Clipboard offset
+  PRFCLPPHS, // Clipboard phase
+  PRFEGGRAT, // Egg ratio
+  PRFFILANG, // Fill angle
+  PRFFILEND, // Fill ends
+  PRFFILSPC, // Fill spacing
+  PRFGRDCUT, // Grid cutoff
+  PRFGRDSIZ, // Grid size
+  PRFHUPTYP, // Hoop type
+  PRFHUPHGT, // Hoop height
+  PRFHUPWID, // Hoop width
+  PRFLENRAT, // Lens ratio
+  PRFNUGSTP, // Nudge
+  PRFPCTSPC, // Picot spacing
+  PRFSATEND, // Satin form ends
+  PRFSATUND, // Satin underlay
+  PRFSMLSTH, // Small stitch size
+  PRFSNPSIZ, // Snap to size
+  PRFSPLWRP, // Spiral wrap
+  PRFSTRRAT, // Star ratio
+  PRFSBXCUT, // Stitch box cutoff
+  PRFSTCMAX, // Stitch length, maximum
+  PRFSTCUSR, // Stitch length, user
+  PRFSTCMIN  // Stitch length, minimum
+};
+
+constexpr auto PREFTMAX = uint32_t {30U}; // number of edge fill types
 
 class LSTTYPE
 {
   public:
-  uint32_t stringID {}; // feather fill type
-  uint8_t  value {};    // feather up count
+  uint32_t stringID {}; // String resource ID
+  uint8_t  value {};    // value index
 
   // LSTTYPE() noexcept = default;
   // LSTTYPE(FTHINFO const&) = default;
@@ -619,33 +657,65 @@ constexpr auto LAYRLIST = std::array<LSTTYPE, LAYERMAX> {
     {{IDS_LAY00, LAYER0}, {IDS_LAY01, LAYER1}, {IDS_LAY02, LAYER2}, {IDS_LAY03, LAYER3}, {IDS_LAY04, LAYER4}}};
 constexpr auto FTHRLIST = std::array<LSTTYPE, FSTYLMAX> {
     {{IDS_FTH0, FTHSIN}, {IDS_FTH1, FTHSIN2}, {IDS_FTH2, FTHLIN}, {IDS_FTH3, FTHPSG}, {IDS_FTH4, FTHRMP}, {IDS_FTH5, FTHFAZ}}};
-constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0, 0},
-                                                          {IDS_FIL1, VRTF},
-                                                          {IDS_FIL2, HORF},
-                                                          {IDS_FIL3, ANGF},
-                                                          {IDS_FIL4, SATF},
-                                                          {IDS_FIL5, CLPF},
-                                                          {IDS_FIL6, CONTF},
-                                                          {IDS_FIL7, VCLPF},
-                                                          {IDS_FIL8, HCLPF},
-                                                          {IDS_FIL9, ANGCLPF},
+constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0,  0},
+                                                          {IDS_FIL1,  VRTF},
+                                                          {IDS_FIL2,  HORF},
+                                                          {IDS_FIL3,  ANGF},
+                                                          {IDS_FIL4,  SATF},
+                                                          {IDS_FIL5,  CLPF},
+                                                          {IDS_FIL6,  CONTF},
+                                                          {IDS_FIL7,  VCLPF},
+                                                          {IDS_FIL8,  HCLPF},
+                                                          {IDS_FIL9,  ANGCLPF},
                                                           {IDS_FIL10, FTHF},
                                                           {IDS_FIL11, TXVRTF},
                                                           {IDS_FIL12, TXHORF},
                                                           {IDS_FIL13, TXANGF}}};
-constexpr auto EDGELIST = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0, 0},
-                                                          {IDS_EDG1, EDGELINE},
-                                                          {IDS_EDG2, EDGEBEAN},
-                                                          {IDS_EDG3, EDGECLIP},
-                                                          {IDS_EDG4, EDGEANGSAT},
-                                                          {IDS_EDG5, EDGEAPPL},
-                                                          {IDS_EDG6, EDGEPROPSAT},
-                                                          {IDS_EDG7, EDGEBHOL},
-                                                          {IDS_EDG8, EDGEPICOT},
-                                                          {IDS_EDG9, EDGEDOUBLE},
+
+constexpr auto EDGELIST = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0,  0},
+                                                          {IDS_EDG1,  EDGELINE},
+                                                          {IDS_EDG2,  EDGEBEAN},
+                                                          {IDS_EDG3,  EDGECLIP},
+                                                          {IDS_EDG4,  EDGEANGSAT},
+                                                          {IDS_EDG5,  EDGEAPPL},
+                                                          {IDS_EDG6,  EDGEPROPSAT},
+                                                          {IDS_EDG7,  EDGEBHOL},
+                                                          {IDS_EDG8,  EDGEPICOT},
+                                                          {IDS_EDG9,  EDGEDOUBLE},
                                                           {IDS_EDG10, EDGELCHAIN},
                                                           {IDS_EDG11, EDGEOCHAIN},
                                                           {IDS_EDG12, EDGECLIPX}}};
+
+constexpr auto PREFLIST = std::array<LSTTYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCOL},
+														  {IDS_PRF29, PRFAPSLEN},
+														  {IDS_PRF3,  PRFBRDWID},
+														  {IDS_PRF14, PRFBCNLEN},
+														  {IDS_PRF23, PRFCHFLEN},
+														  {IDS_PRF24, PRFCHFPOS},
+														  {IDS_PRF21, PRFCLPOFF},
+														  {IDS_PRF22, PRFCLPPHS},
+														  {IDS_PRF26, PRFEGGRAT},
+														  {IDS_PRF1,  PRFFILANG},
+														  {IDS_PRF2,  PRFFILEND},
+														  {IDS_PRF0,  PRFFILSPC},
+														  {IDS_PRF7,  PRFGRDCUT},
+														  {IDS_PRF20, PRFGRDSIZ},
+														  {IDS_PRF17, PRFHUPTYP},
+														  {IDS_PRF27, PRFHUPHGT},
+														  {IDS_PRF18, PRFHUPWID},
+														  {IDS_PRF28, PRFLENRAT},
+														  {IDS_PRF25, PRFNUGSTP},
+														  {IDS_PRF16, PRFPCTSPC},
+														  {IDS_PRF15, PRFSATEND},
+														  {IDS_PRF19, PRFSATUND},
+														  {IDS_PRF9,  PRFSMLSTH},
+														  {IDS_PRF11, PRFSNPSIZ},
+														  {IDS_PRF13, PRFSPLWRP},
+														  {IDS_PRF12, PRFSTRRAT},
+														  {IDS_PRF8,  PRFSBXCUT},
+														  {IDS_PRF4,  PRFSTCMAX},
+														  {IDS_PRF5,  PRFSTCUSR},
+														  {IDS_PRF6,  PRFSTCMIN}}};
 
 // form types
 enum formStyles {

@@ -64,10 +64,10 @@ void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
 
 auto formForms::internal::maxwid() {
   auto prfList = std::array<uint32_t, 28> {
-      IDS_PRF0,  IDS_PRF1,  IDS_PRF2,  IDS_PRF3,  IDS_PRF4,  IDS_PRF5,  IDS_PRF6,
-      IDS_PRF7,  IDS_PRF8,  IDS_PRF9,  IDS_PRF10, IDS_PRF11, IDS_PRF12, IDS_PRF13,
-      IDS_PRF14, IDS_PRF15, IDS_PRF16, IDS_PRF17, IDS_PRF18, IDS_PRF19, IDS_PRF20,
-      IDS_PRF21, IDS_PRF22, IDS_PRF23, IDS_PRF24, IDS_PRF25, IDS_PRF26, IDS_PRF27};
+	IDS_PRF0,  IDS_PRF1,  IDS_PRF2,  IDS_PRF3,  IDS_PRF4,  IDS_PRF5,  IDS_PRF6,
+	  IDS_PRF7,  IDS_PRF8,  IDS_PRF9,  IDS_PRF10, IDS_PRF11, IDS_PRF12, IDS_PRF13,
+	  IDS_PRF14, IDS_PRF15, IDS_PRF16, IDS_PRF17, IDS_PRF18, IDS_PRF19, IDS_PRF20,
+	  IDS_PRF21, IDS_PRF22, IDS_PRF23, IDS_PRF24, IDS_PRF25, IDS_PRF26, IDS_PRF27};
   auto textSize = POINT {0L, 0L};
   for (auto item : prfList) {
 	formForms::maxtsiz(dT::loadStr(item), textSize);
@@ -305,7 +305,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	}
 	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF ||
 	    texture::istx(ClosestFormToCursor)) {
-	  labelWindow[LBFILSQR] = ffi::txtwin(dT::loadStr(IDS_PRF2), LabelWindowCoords);
+	  labelWindow[LBFILSQR] = ffi::txtwin(dT::loadStr(PREFLIST[PRFFILEND].stringID), LabelWindowCoords);
 	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? dT::loadStr(IDS_SQR) : dT::loadStr(IDS_PNTD);
 	  valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
@@ -525,9 +525,9 @@ auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
                       nullptr);
 }
 
-void formForms::internal::prflin(std::wstring const& msg, uint32_t row) {
-  ffi::prftwin(dT::loadStr(row));
-  ValueWindow->operator[](row - IDS_PRF0) = ffi::prfnwin(msg);
+void formForms::internal::prflin(std::wstring const& msg, LSTTYPE const& row) {
+  ffi::prftwin(dT::loadStr(row.stringID));
+  ValueWindow->operator[](row.value) = ffi::prfnwin(msg);
   ffi::nxtlinprf();
 }
 
@@ -573,40 +573,41 @@ void formForms::prfmsg() {
   LabelWindowCoords.right                             = TXTMARG + LabelWindowSize.x;
   ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.x;
   ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.x + ValueWindowSize.x + TXTMARG2;
-  ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), IDS_PRF10);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen * IPFGRAN)), IDS_PRF29);
-  ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth * IPFGRAN)), IDS_PRF3);
-  ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength * IPFGRAN)), IDS_PRF14);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace * IPFGRAN)), IDS_PRF23);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), IDS_PRF24);
-  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset * IPFGRAN)), IDS_PRF21);
-  ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), IDS_PRF22);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), IDS_PRF26);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle * RADDEGF)), IDS_PRF1);
+  auto row                = PREFLIST.begin();
+  ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (BorderWidth * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (ButtonholeCornerLength * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainSpace * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.chainRatio)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.clipOffset * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle * RADDEGF)), *(row++));
   auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? dT::loadStr(IDS_SQR) : dT::loadStr(IDS_PNTD);
-  ffi::prflin(choice, IDS_PRF2);
-  ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing * IPFGRAN)), IDS_PRF0);
-  ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), IDS_PRF7);
-  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize * IPFGRAN)), IDS_PRF20);
+  ffi::prflin(choice, *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize * IPFGRAN)), *(row++));
   form::sethup();
-  ffi::prflin(fmt::format(L"{}", dT::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)), IDS_PRF17);
-  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY * IPFGRAN)), IDS_PRF27);
-  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX * IPFGRAN)), IDS_PRF18);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), IDS_PRF28);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), IDS_PRF25);
-  ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing * IPFGRAN)), IDS_PRF16);
+  ffi::prflin(fmt::format(L"{}", dT::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)), *(row++));
+  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing * IPFGRAN)), *(row++));
   choice = (UserFlagMap->test(UserFlag::BLUNT)) ? dT::loadStr(IDS_BLUNT) : dT::loadStr(IDS_TAPR);
-  ffi::prflin(choice, IDS_PRF15);
+  ffi::prflin(choice, *(row++));
   choice = (UserFlagMap->test(UserFlag::DUND)) ? dT::loadStr(IDS_ON) : dT::loadStr(IDS_OFF);
-  ffi::prflin(choice, IDS_PRF19);
-  ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength * IPFGRAN)), IDS_PRF9);
-  ffi::prflin(fmt::format(L"{:.2f}", (SnapLength * IPFGRAN)), IDS_PRF11);
-  ffi::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), IDS_PRF13);
-  ffi::prflin(fmt::format(L"{:.2f}", (StarRatio)), IDS_PRF12);
-  ffi::prflin(fmt::format(L"{}", (thred::duthrsh(StitchBoxesThreshold))), IDS_PRF8);
-  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength * IPFGRAN)), IDS_PRF4);
-  ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength * IPFGRAN)), IDS_PRF5);
-  ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength * IPFGRAN)), IDS_PRF6);
+  ffi::prflin(choice, *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (SmallStitchLength * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (SnapLength * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (SpiralWrap)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (StarRatio)), *(row++));
+  ffi::prflin(fmt::format(L"{}", (thred::duthrsh(StitchBoxesThreshold))), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (IniFile.maxStitchLength * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (UserStitchLength * IPFGRAN)), *(row++));
+  ffi::prflin(fmt::format(L"{:.2f}", (MinStitchLength * IPFGRAN)), *row);
   StateMap->set(StateFlag::PRFACT);
   ReleaseDC(ThrEdWindow, preferenceDC);
 }
