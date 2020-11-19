@@ -40,7 +40,7 @@ static auto BmpStitchRatio       = fPOINT {};           // bitmap to stitch hoop
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
-static auto UTF8BMPname  = std::array<char, SZBMPNM> {};    // bitmap file name from pcs file
+static auto UTF8BMPname  = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
 
 constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel

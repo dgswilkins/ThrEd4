@@ -177,7 +177,7 @@ auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
 void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<fPOINTATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
-  auto colorData = std::vector<uint32_t> {};
+  auto       colorData   = std::vector<uint32_t> {};
   auto const spUserColor = gsl::span<COLORREF> {UserColor};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number

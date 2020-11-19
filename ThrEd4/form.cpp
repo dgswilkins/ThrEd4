@@ -476,12 +476,12 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 
   auto ipixelOutline = pixelOutline.begin();
   for (auto controlPoint : formOutline) {
-	*ipixelOutline  = form::sfCor2px(controlPoint);
+	*ipixelOutline = form::sfCor2px(controlPoint);
 	++ipixelOutline;
   }
   wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
   auto const sp    = gsl::make_span(pixelOutline);
-  auto subsp = sp.subspan(0, pixelOutline.size() - 1U);
+  auto       subsp = sp.subspan(0, pixelOutline.size() - 1U);
   for (auto const& controlPoint : subsp) {
 	form::selsqr(controlPoint, dc);
   }
@@ -1846,7 +1846,7 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
                                                      level14.data(),
                                                      level15.data()};
 
-   auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
+  auto const innerDelta = fPOINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
   auto const outerDelta = fPOINT {(fillVerticalRect[finish].copnt.x - fillVerticalRect[start].bopnt.x),
@@ -8043,7 +8043,7 @@ void form::internal::srtf(std::vector<fPOINTATTR> const& tempStitchBuffer, uint3
 void form::srtbyfrm() {
   auto colorHistogram = std::vector<uint32_t> {};
   colorHistogram.resize(COLORCNT);
-  auto color          = std::vector<uint32_t> {};
+  auto color = std::vector<uint32_t> {};
   color.resize(COLORCNT);
   if (!FormList->empty()) {
 	thred::savdo();
@@ -8057,7 +8057,7 @@ void form::srtbyfrm() {
 	auto colorAccumulator = 0U;
 	for (auto& iColor : colorHistogram) {
 	  auto const value = iColor;
-	  iColor     = colorAccumulator;
+	  iColor           = colorAccumulator;
 	  colorAccumulator += value;
 	}
 	for (auto& stitch : *StitchBuffer) {

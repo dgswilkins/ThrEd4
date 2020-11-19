@@ -48,8 +48,8 @@ static auto SelectTexturePointsOrigin = POINT {};    // original location of sel
 static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
 static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
 static auto TextureHistory = gsl::narrow_cast<std::vector<TXHST>*>(nullptr); // texture editor history headers
-static auto TextureHistoryIndex       = uint32_t {}; // pointer to the next texture history buffer
-static auto TempTexturePoints         = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
+static auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
+static auto TempTexturePoints   = static_cast<std::vector<TXPNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
 static auto TextureScreen = TXTSCR {}; // texture editor layout parameters
 
@@ -431,7 +431,7 @@ void texture::drwtxtr() {
   }
   DeleteObject(TextureCrossPen);
   auto const spUserColor = gsl::span<COLORREF> {UserColor};
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, spUserColor[ActiveColor]);
+  TextureCrossPen        = wrap::CreatePen(PS_SOLID, PENNWID, spUserColor[ActiveColor]);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;

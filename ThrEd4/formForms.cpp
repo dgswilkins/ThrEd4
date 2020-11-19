@@ -160,7 +160,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(dT::loadStr(IDS_TXT1), LabelWindowCoords);
   // NOLINTNEXTLINE hicpp-signed-bitwise
-  auto       pLayr   = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
+  auto pLayr         = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
   valueWindow[LLAYR] = ffi::txtrwin(dT::loadStr(pLayr->stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (form.type != FRMLINE) {
@@ -329,9 +329,9 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   if (edgeFillType >= EDGETMAX) {
 	edgeFillType = EDGETMAX - 1U;
   }
-  auto const edgeIdx  = edgeFillType - 1U;
-  auto       pEdge  = wrap::next(EDGELIST.begin(), edgeFillType);
-  valueWindow[LBRD] = ffi::txtrwin(dT::loadStr(pEdge->stringID), ValueWindowCoords);
+  auto const edgeIdx = edgeFillType - 1U;
+  auto       pEdge   = wrap::next(EDGELIST.begin(), edgeFillType);
+  valueWindow[LBRD]  = ffi::txtrwin(dT::loadStr(pEdge->stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (edgeFillType != 0U) {
 	labelWindow[LBRDCOL] = ffi::txtwin(dT::loadStr(IDS_TXT8), LabelWindowCoords);
@@ -540,7 +540,7 @@ void formForms::prfmsg() {
   }
   LabelWindowSize.x = LabelWindowSize.y = 0;
   ValueWindowSize.x = ValueWindowSize.y = 0;
-  LabelWindowSize = formForms::internal::maxwid();
+  LabelWindowSize                       = formForms::internal::maxwid();
   LabelWindowSize.x += TXTMARG2;
   formForms::maxtsiz(dT::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);

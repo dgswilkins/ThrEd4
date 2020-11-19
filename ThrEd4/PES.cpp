@@ -265,10 +265,10 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   PEScolors       = std::begin(pad);
   auto thisStitch = fPOINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto iColor  = 1U;
-  auto color   = StitchBuffer->front().attribute & COLMSK;
-  auto const spPESequivColors   = gsl::span<uint8_t> {PESequivColors};
-  PEScolors[0] = spPESequivColors[color];
+  auto       iColor           = 1U;
+  auto       color            = StitchBuffer->front().attribute & COLMSK;
+  auto const spPESequivColors = gsl::span<uint8_t> {PESequivColors};
+  PEScolors[0]                = spPESequivColors[color];
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
@@ -306,7 +306,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   // write the overall thumbnail
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
-  auto const spThumbnail    = gsl::span<std::array<uint8_t, THUMBWID>> {thumbnail};
+  auto const     spThumbnail = gsl::span<std::array<uint8_t, THUMBWID>> {thumbnail};
   for (auto& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
@@ -326,9 +326,9 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	}
 	else {
 	  pi::writeThumbnail(pecBuffer, thumbnail);
-	  thumbnail       = imageWithFrame;
-	  stitchColor     = (stitch.attribute & COLMSK);
-	  spRow[x]        = 1U;
+	  thumbnail   = imageWithFrame;
+	  stitchColor = (stitch.attribute & COLMSK);
+	  spRow[x]    = 1U;
 	}
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
@@ -337,8 +337,8 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto const& threadColor = PESThread[PEScolors[index++] % THTYPCNT];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-  auto       iUserColor   = UserColor.cbegin();
+  auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+  auto       iUserColor = UserColor.cbegin();
   for (auto iColor = 0U; iColor < activeColor; ++iColor) {
 	if (*iUserColor == color) {
 	  return iColor;
@@ -394,7 +394,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 		auto const& threadColor = PESThread[PEScolors[iColor]];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-		*iUserColor             = color;
+		*iUserColor      = color;
 		++iUserColor;
 		if (iUserColor == UserColor.end()) {
 		  break;
@@ -491,11 +491,11 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 	}
 	else {
 	  do {
-		auto pesHeader = PESHED {};
-		auto const spPESequivColors = gsl::span<uint8_t> {PESequivColors};
-		constexpr auto PESSTR = "#PES0001"; // PES lead in
-		constexpr auto EMBSTR = "CEmbOne";  // emb section lead in
-		constexpr auto SEWSTR = "CSewSeg";  // sewing segment leadin
+		auto           pesHeader        = PESHED {};
+		auto const     spPESequivColors = gsl::span<uint8_t> {PESequivColors};
+		constexpr auto PESSTR           = "#PES0001"; // PES lead in
+		constexpr auto EMBSTR           = "CEmbOne";  // emb section lead in
+		constexpr auto SEWSTR           = "CSewSeg";  // sewing segment leadin
 		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		wrap::narrow(pesHeader.celn, strlen(EMBSTR));
@@ -505,7 +505,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.cs), SEWSTR, pesHeader.cslen); // NOLINT(clang-diagnostic-deprecated-declarations)
 		{
-		  auto iPEC   = PESequivColors.begin();
+		  auto iPEC = PESequivColors.begin();
 		  for (auto const& color : UserColor) {
 			auto matchIndex = 0U;
 			auto matchMin   = std::numeric_limits<uint32_t>::max();
@@ -532,8 +532,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
 		pesBuffer.reserve(pesSize);
-		auto threadList = std::vector<PESCOLORLIST> {};
-		auto blockIndex = uint16_t {0U}; // Index into the stitch blocks
+		auto threadList   = std::vector<PESCOLORLIST> {};
+		auto blockIndex   = uint16_t {0U}; // Index into the stitch blocks
 		auto currentColor = spPESequivColors[stitchColor];
 		threadList.push_back(PESCOLORLIST {blockIndex, currentColor});
 		pesBuffer.resize(sizeof(PESSTCHLST));
@@ -575,7 +575,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 			blockHeader->stitchcount = gsl::narrow<uint16_t>(stitchCount);
 			// save the thread/color information
 			++pesThreadCount;
-			stitchColor = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+			stitchColor  = StitchBuffer->operator[](iStitch).attribute & COLMSK;
 			currentColor = spPESequivColors[stitchColor];
 			threadList.push_back(PESCOLORLIST {blockIndex, currentColor});
 			// then create the jump block

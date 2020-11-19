@@ -23,7 +23,7 @@ void drwtxtr();
 void dutxtfil();
 void initTextures(std::vector<TXPNT>*    ptrTexturePoints,
                   std::vector<uint32_t>* ptrTexturePointsList,
-                  std::vector<TXHST>* ptrTextureHistory) noexcept;
+                  std::vector<TXHST>*    ptrTextureHistory) noexcept;
 auto istx(uint32_t iForm) noexcept -> bool;
 auto istx(FRMHED const& form) noexcept -> bool;
 void redtx();

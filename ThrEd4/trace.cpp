@@ -91,7 +91,7 @@ auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t b
 void trace::initTraceWindows() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto dwStyle = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
-  TraceStepWin = CreateWindowEx(
+  TraceStepWin           = CreateWindowEx(
       0L, L"STATIC", L"", dwStyle, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   auto iTraceControlWindow = TraceControlWindow.begin();
   auto iTraceDownWindow    = TraceDownWindow.begin();
@@ -100,7 +100,7 @@ void trace::initTraceWindows() {
   auto iTraceBrush         = TraceBrush.begin();
   auto iTraceRGB           = TraceRGB.begin();
   for (auto iRGB = 0U; iRGB < TraceControlWindow.size(); ++iRGB) {
-	auto const channel = gsl::narrow_cast<int32_t>(iRGB);
+	auto const channel       = gsl::narrow_cast<int32_t>(iRGB);
 	*(iTraceControlWindow++) = ti::trcsub(ButtonWidth * channel, 0, ButtonHeight * 15);
 	*(iTraceSelectWindow++)  = ti::trcsub(ButtonWidth * channel, ButtonHeight * 15, ButtonHeight);
 	*(iTraceUpWindow++)      = ti::trcsub(ButtonWidth * channel, ButtonHeight * 16, ButtonHeight);
@@ -167,7 +167,7 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
 
 void trace::internal::tracwnd() {
   auto iDefaultColorWin = DefaultColorWin->begin();
-  auto iUserColorWin = UserColorWin->begin();
+  auto iUserColorWin    = UserColorWin->begin();
   for (auto& iThreadSizeWin : ThreadSizeWin) {
 	ti::hidwnd(*(iDefaultColorWin++));
 	ti::hidwnd(*(iUserColorWin++));
@@ -224,12 +224,11 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   }
 }
 
-
 auto trace::internal::trsum() -> uint32_t {
   auto const& firstColor            = TraceAdjacentColors.front();
-  auto const spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
-  auto const subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
-  auto const fold         = [firstColor](uint32_t a, uint32_t b) {
+  auto const  spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
+  auto const  subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
+  auto const  fold         = [firstColor](uint32_t a, uint32_t b) {
     return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
   };
   return wrap::toUnsigned(std::accumulate(subTrcAdjCol.begin(), subTrcAdjCol.end(), 0, fold));
@@ -253,8 +252,8 @@ void trace::untrace() {
 	  ti::shownd(iThreadSizeWin);
 	}
 	auto iTraceSelectWindow = TraceSelectWindow.begin();
-	auto iTraceUpWindow   = TraceUpWindow.begin();
-	auto iTraceDownWindow = TraceDownWindow.begin();
+	auto iTraceUpWindow     = TraceUpWindow.begin();
+	auto iTraceDownWindow   = TraceDownWindow.begin();
 	for (auto& iTraceControlWindow : TraceControlWindow) {
 	  ti::hidwnd(iTraceControlWindow);
 	  ti::hidwnd(*(iTraceSelectWindow++));
@@ -813,10 +812,10 @@ void trace::trinit() {
 		TraceDataSize = bitmap::getrmap();
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
-		auto const color  = gsl::narrow<COLORREF>(TraceBitmapData[0]);
+		auto const color     = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto       highColor = color;
-		auto const spTBD =
-		    gsl::span<uint32_t> {TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+		auto const spTBD     = gsl::span<uint32_t> {
+            TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
 		auto pixel = std::find_if(
 		    spTBD.begin(), spTBD.end(), [color](uint32_t& m) -> bool { return m != color; });
 		if (pixel != spTBD.end()) {
@@ -843,7 +842,7 @@ void trace::trinit() {
 			++(spHD[*(iPixelColors++)]);
 		  }
 		}
-		auto componentPeakCount = std::array<uint32_t, CHANLCNT> {};
+		auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
 		auto iComponentPeakCount = componentPeakCount.begin();
 		auto iComponentPeak      = componentPeak.begin();
 		for (auto iHistogramData : histogramData) {
@@ -1186,9 +1185,9 @@ void trace::wasTrace() {
   auto traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
   auto traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const BlackBrush = CreateSolidBrush(0); // black brush
-  auto       iTraceUpWindow = TraceUpWindow.begin();
-  auto       iTraceDownWindow = TraceDownWindow.begin();
+  auto const BlackBrush          = CreateSolidBrush(0); // black brush
+  auto       iTraceUpWindow      = TraceUpWindow.begin();
+  auto       iTraceDownWindow    = TraceDownWindow.begin();
   auto       iTraceControlWindow = TraceControlWindow.begin();
   auto       iTraceSelectWindow  = TraceSelectWindow.begin();
   auto       iTraceShift         = TraceShift.begin();
@@ -1259,11 +1258,11 @@ void trace::wasTrace1() {
 }
 
 void trace::traceNumberInput(wchar_t NumericCode) {
-  auto iTraceInputBuffer       = wrap::next(TraceInputBuffer.begin(), MsgIndex);
-  *(iTraceInputBuffer++)           = NumericCode;
-  *iTraceInputBuffer   = 0;
+  auto iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  *(iTraceInputBuffer++) = NumericCode;
+  *iTraceInputBuffer     = 0;
   ++MsgIndex;
-  auto traceColor              = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(),nullptr, 10));
+  auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10));
   switch (MsgIndex) {
 	case 2: {
 	  if (traceColor > 25) {
@@ -1287,7 +1286,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
 }
 
 void trace::traceNumberReset() {
-  auto const iTraceInputBuffer     = wrap::next(TraceInputBuffer.begin(), MsgIndex);
-  *iTraceInputBuffer = 0;
+  auto const iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  *iTraceInputBuffer           = 0;
   thred::redraw(TraceNumberInput);
 }

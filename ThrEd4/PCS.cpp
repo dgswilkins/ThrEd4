@@ -152,7 +152,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
 		  auto&      phCol    = PCSHeader.colors;
-		  auto const spColors = gsl::span<COLORREF>(phCol,sizeof(phCol)/sizeof(phCol[0]));
+		  auto const spColors = gsl::span<COLORREF>(phCol, sizeof(phCol) / sizeof(phCol[0]));
 		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));

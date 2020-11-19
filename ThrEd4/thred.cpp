@@ -404,13 +404,13 @@ auto thred::internal::rsed() noexcept -> uint32_t {
 }
 
 void thred::internal::fnamtabs() {
-  constexpr auto NAMELEN = NameOrder.size();
+  constexpr auto NAMELEN    = NameOrder.size();
   auto           iNameOrder = NameOrder.begin();
   for (auto iName = 0U; iName < NAMELEN; ++iName) {
 	*(iNameOrder++) = iName;
   }
-  auto const spNameOrder         = gsl::span<uint32_t> {NameOrder};
-  PseudoRandomValue = NORDSED;
+  auto const spNameOrder = gsl::span<uint32_t> {NameOrder};
+  PseudoRandomValue      = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = form::psg() % NAMELEN;
 	auto const destination = form::psg() % NAMELEN;
@@ -420,8 +420,8 @@ void thred::internal::fnamtabs() {
   for (auto iName = uint8_t {0U}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
 	*(iNameEncoder++) = iName + NCODOF;
   }
-  auto const spNameEncoder         = gsl::span<uint8_t> {NameEncoder};
-  PseudoRandomValue = NCODSED;
+  auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
+  PseudoRandomValue        = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = form::psg() & MSK7BITS;
 	auto const destination = form::psg() & MSK7BITS;
@@ -437,7 +437,7 @@ void thred::internal::fnamtabs() {
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN  = NameOrder.size();
   auto           designer = utf::Utf16ToUtf8(designerName);
-  auto tmpName  = std::array<uint8_t, NameOrder.size()> {0};
+  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {0};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
@@ -464,9 +464,9 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
 	}
   }
-  auto iTmpName = tmpName.begin();
-  auto& EHCN    = ExtendedHeader->creatorName;
-  auto  const spCreatorName = gsl::span<char> {EHCN};
+  auto       iTmpName      = tmpName.begin();
+  auto&      EHCN          = ExtendedHeader->creatorName;
+  auto const spCreatorName = gsl::span<char> {EHCN};
   for (auto& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
@@ -475,10 +475,10 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 }
 
 void thred::internal::redfnam(std::wstring& designerName) {
-  constexpr auto NAMELEN    = NameOrder.size();
-  auto           tmpName    = std::array<uint8_t, NameOrder.size()> {};
-  auto designer = std::string {};
-  auto iNameOrder = NameOrder.begin();
+  constexpr auto NAMELEN       = NameOrder.size();
+  auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
+  auto           designer      = std::string {};
+  auto           iNameOrder    = NameOrder.begin();
   auto&          EHCN          = ExtendedHeader->creatorName;
   auto const     spCreatorName = gsl::span<char> {EHCN};
   for (auto& iTmpName : tmpName) {
@@ -11254,7 +11254,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   if (FormMenuChoice == LLAYR) {
 	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LSTTYPE const& m) -> bool {
 	  return Msg.hwnd == SideWindow[m.value];
-	  });
+	});
 	if (iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
 	  StateMap->set(StateFlag::FORMSEL);
