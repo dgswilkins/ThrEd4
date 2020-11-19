@@ -488,7 +488,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	else {
 	  iTmpName = 111;
 	}
-	iNameOrder++;
+	++iNameOrder;
   }
   designer.reserve(tmpName.size());
   auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
@@ -5607,7 +5607,7 @@ void thred::internal::sizclp(FRMHED const& form,
                              uint32_t&     formFirstStitchIndex,
                              uint32_t&     formStitchCount,
                              uint32_t&     length,
-                             uint32_t&     fileSize) {
+                             uint32_t&     fileSize) noexcept {
   fileSize = sizeof(FORMCLIP) + form.vertexCount * sizeof(decltype(FormVertices->back()));
   length   = fileSize;
   if (form.type == SAT) {

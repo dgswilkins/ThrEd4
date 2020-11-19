@@ -431,7 +431,7 @@ namespace internal {
   auto sidclp() -> bool;
   void sidhup();
   void sidmsg(FRMHED const& form, HWND window);
-  void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
+  void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize) noexcept;
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
   auto srchknot(uint32_t source) noexcept -> uint32_t;
