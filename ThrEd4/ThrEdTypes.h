@@ -653,10 +653,20 @@ class LSTTYPE
   //~LSTTYPE() = default;
 };
 
-constexpr auto LAYRLIST = std::array<LSTTYPE, LAYERMAX> {
-    {{IDS_LAY00, LAYER0}, {IDS_LAY01, LAYER1}, {IDS_LAY02, LAYER2}, {IDS_LAY03, LAYER3}, {IDS_LAY04, LAYER4}}};
-constexpr auto FTHRLIST = std::array<LSTTYPE, FSTYLMAX> {
-    {{IDS_FTH0, FTHSIN}, {IDS_FTH1, FTHSIN2}, {IDS_FTH2, FTHLIN}, {IDS_FTH3, FTHPSG}, {IDS_FTH4, FTHRMP}, {IDS_FTH5, FTHFAZ}}};
+// clang-format off
+constexpr auto LAYRLIST = std::array<LSTTYPE, LAYERMAX> {{{IDS_LAY00, LAYER0}, 
+														  {IDS_LAY01, LAYER1}, 
+														  {IDS_LAY02, LAYER2}, 
+														  {IDS_LAY03, LAYER3},
+														  {IDS_LAY04, LAYER4}}};
+
+constexpr auto FTHRLIST = std::array<LSTTYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN}, 
+														  {IDS_FTH1, FTHSIN2}, 
+														  {IDS_FTH2, FTHLIN}, 
+														  {IDS_FTH3, FTHPSG}, 
+														  {IDS_FTH4, FTHRMP}, 
+														  {IDS_FTH5, FTHFAZ}}};
+
 constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0,  0},
                                                           {IDS_FIL1,  VRTF},
                                                           {IDS_FIL2,  HORF},
@@ -716,6 +726,7 @@ constexpr auto PREFLIST = std::array<LSTTYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCOL}
 														  {IDS_PRF4,  PRFSTCMAX},
 														  {IDS_PRF5,  PRFSTCUSR},
 														  {IDS_PRF6,  PRFSTCMIN}}};
+// clang-format on
 
 // form types
 enum formStyles {
