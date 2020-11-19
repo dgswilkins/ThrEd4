@@ -37,7 +37,7 @@ namespace internal {
 
   void initdaz(HWND hWinDialog);
   void initTearDlg(HWND hwndlg);
-  auto maxwid();
+  auto maxwid() -> POINT;
   auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
   void nxtlin(uint32_t& formMenuEntryCount) noexcept;
   void nxtlinprf() noexcept;

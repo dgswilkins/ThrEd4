@@ -62,17 +62,12 @@ void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
   }
 }
 
-auto formForms::internal::maxwid() {
-  auto prfList = std::array<uint32_t, 28> {
-	IDS_PRF0,  IDS_PRF1,  IDS_PRF2,  IDS_PRF3,  IDS_PRF4,  IDS_PRF5,  IDS_PRF6,
-	  IDS_PRF7,  IDS_PRF8,  IDS_PRF9,  IDS_PRF10, IDS_PRF11, IDS_PRF12, IDS_PRF13,
-	  IDS_PRF14, IDS_PRF15, IDS_PRF16, IDS_PRF17, IDS_PRF18, IDS_PRF19, IDS_PRF20,
-	  IDS_PRF21, IDS_PRF22, IDS_PRF23, IDS_PRF24, IDS_PRF25, IDS_PRF26, IDS_PRF27};
+auto formForms::internal::maxwid() -> POINT {
   auto textSize = POINT {0L, 0L};
-  for (auto item : prfList) {
-	formForms::maxtsiz(dT::loadStr(item), textSize);
+  for (auto const& item : PREFLIST) {
+	formForms::maxtsiz(dT::loadStr(item.stringID), textSize);
   }
-  return textSize.x + TXTMARG2;
+  return textSize;
 }
 
 auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
@@ -545,10 +540,9 @@ void formForms::prfmsg() {
   }
   LabelWindowSize.x = LabelWindowSize.y = 0;
   ValueWindowSize.x = ValueWindowSize.y = 0;
-  formForms::maxtsiz(dT::loadStr(IDS_PRF4), LabelWindowSize); // PRF4 has the most characters
+  LabelWindowSize = formForms::internal::maxwid();
+  LabelWindowSize.x += TXTMARG2;
   formForms::maxtsiz(dT::loadStr(IDS_TAPR), ValueWindowSize);
-  LabelWindowSize.x = formForms::internal::maxwid();
-  LabelWindowSize.x += 4;
   DestroyWindow(PreferencesWindow);
   auto const windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
