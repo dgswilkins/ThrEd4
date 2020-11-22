@@ -1595,94 +1595,94 @@ void thred::internal::chknum() {
 	  if (PreferenceIndex != 0U) {
 		value = wrap::wcstof(SideWindowEntryBuffer.data());
 		switch (PreferenceIndex - 1) {
-		  case PEG: {
+		  case PRFEGGRAT: {
 			IniFile.eggRatio = value;
-			SetWindowText(ValueWindow->operator[](PEG), fmt::format(L"{:.2f}", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFEGGRAT), fmt::format(L"{:.2f}", value).c_str());
 			break;
 		  }
-		  case PNUDG: {
+		  case PRFNUGSTP: {
 			IniFile.cursorNudgeStep = value;
 			IniFile.nudgePixels     = pxchk(value);
-			SetWindowText(ValueWindow->operator[](PNUDG), fmt::format(L"{:.2f}", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFNUGSTP), fmt::format(L"{:.2f}", value).c_str());
 			break;
 		  }
-		  case PPIC: {
+		  case PRFPCTSPC: {
 			PicotSpacing = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PPIC), fmt::format(L"{:.2f}", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFPCTSPC), fmt::format(L"{:.2f}", value).c_str());
 			break;
 		  }
-		  case PCLPOF: {
+		  case PRFCLPOFF: {
 			IniFile.clipOffset = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PCLPOF), fmt::format(L"{:.2f} mm", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFCLPOFF), fmt::format(L"{:.2f} mm", value).c_str());
 			break;
 		  }
-		  case PFAZ: {
+		  case PRFCLPPHS: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-			SetWindowText(ValueWindow->operator[](PFAZ), fmt::format(L"{}", IniFile.fillPhase).c_str());
+			SetWindowText(ValueWindow->operator[](PRFCLPPHS), fmt::format(L"{}", IniFile.fillPhase).c_str());
 			break;
 		  }
-		  case PCHRAT: {
+		  case PRFCHFPOS: {
 			IniFile.chainRatio = value;
-			SetWindowText(ValueWindow->operator[](PCHRAT), fmt::format(L"{:.2f}", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFCHFPOS), fmt::format(L"{:.2f}", value).c_str());
 			break;
 		  }
-		  case PMIN: {
+		  case PRFSTCMIN: {
 			MinStitchLength = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PMIN), fmt::format(L"{:.2f}", value).c_str());
+			SetWindowText(ValueWindow->operator[](PRFSTCMIN), fmt::format(L"{:.2f}", value).c_str());
 			break;
 		  }
 		  default: {
 			if (value != 0.0F) {
 			  auto const bufVal = fmt::format(L"{:.2f}", value);
 			  switch (PreferenceIndex - 1) {
-				case PSPAC: {
+				case PRFFILSPC: {
 				  LineSpacing = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PSPAC), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFFILSPC), bufVal.c_str());
 				  break;
 				}
-				case PANGL: {
+				case PRFFILANG: {
 				  IniFile.fillAngle = value * DEGRADF;
-				  SetWindowText(ValueWindow->operator[](PANGL), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFFILANG), bufVal.c_str());
 				  break;
 				}
-				case PSAT: {
+				case PRFBRDWID: {
 				  BorderWidth         = value * PFGRAN;
 				  IniFile.borderWidth = BorderWidth;
-				  SetWindowText(ValueWindow->operator[](PSAT), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFBRDWID), bufVal.c_str());
 				  break;
 				}
-				case PMAX: {
+				case PRFSTCMAX: {
 				  IniFile.maxStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PMAX), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSTCMAX), bufVal.c_str());
 				  break;
 				}
-				case PUSE: {
+				case PRFSTCUSR: {
 				  UserStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PUSE), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSTCUSR), bufVal.c_str());
 				  break;
 				}
-				case PSMAL: {
+				case PRFSMLSTH: {
 				  SmallStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PSMAL), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSMLSTH), bufVal.c_str());
 				  break;
 				}
-				case PAP: {
+				case PRFAPPCOL: {
 				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-				  SetWindowText(ValueWindow->operator[](PAP),
+				  SetWindowText(ValueWindow->operator[](PRFAPPCOL),
 				                fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
 				  break;
 				}
-				case PAPSL: {
+				case PRFAPSLEN: {
 				  IniFile.AppStitchLen = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PAPSL), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFAPSLEN), bufVal.c_str());
 				  break;
 				}
-				case PSNP: {
+				case PRFSNPSIZ: {
 				  SnapLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PSNP), bufVal.c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSNPSIZ), bufVal.c_str());
 				  break;
 				}
-				case PSTAR: {
+				case PRFSTRRAT: {
 				  StarRatio = value;
 
 				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
@@ -1693,10 +1693,10 @@ void thred::internal::chknum() {
 				  if (StarRatio < SRMINLIM) {
 					StarRatio = SRMINLIM;
 				  }
-				  SetWindowText(ValueWindow->operator[](PSTAR), fmt::format(L"{:.2f}", StarRatio).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
 				  break;
 				}
-				case PLRAT: {
+				case PRFLENRAT: {
 				  IniFile.lensRatio = value;
 
 				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
@@ -1707,11 +1707,11 @@ void thred::internal::chknum() {
 				  if (IniFile.lensRatio < LRMINLIM) {
 					IniFile.lensRatio = LRMINLIM;
 				  }
-				  SetWindowText(ValueWindow->operator[](PLRAT),
+				  SetWindowText(ValueWindow->operator[](PRFLENRAT),
 				                fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
 				  break;
 				}
-				case PSPIR: {
+				case PRFSPLWRP: {
 				  SpiralWrap = value;
 				  // ToDo - Are these limits correct?
 				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
@@ -1722,38 +1722,38 @@ void thred::internal::chknum() {
 				  if (SpiralWrap < SRMINLIM) {
 					SpiralWrap = SRMINLIM;
 				  }
-				  SetWindowText(ValueWindow->operator[](PSPIR), fmt::format(L"{:.2f}", SpiralWrap).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
 				  break;
 				}
-				case PBUT: {
+				case PRFBCNLEN: {
 				  ButtonholeCornerLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PBUT), fmt::format(L"{:.2f}", value).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFBCNLEN), fmt::format(L"{:.2f}", value).c_str());
 				  break;
 				}
-				case PHUPX: {
+				case PRFHUPWID: {
 				  IniFile.hoopSizeX = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PHUPX), fmt::format(L"{:.0f} mm", value).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFHUPWID), fmt::format(L"{:.0f} mm", value).c_str());
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
 				  break;
 				}
-				case PHUPY: {
+				case PRFHUPHGT: {
 				  IniFile.hoopSizeY = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PHUPY), fmt::format(L"{:.0f} mm", value).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFHUPHGT), fmt::format(L"{:.0f} mm", value).c_str());
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
 				  break;
 				}
-				case PGRD: {
+				case PRFGRDSIZ: {
 				  IniFile.gridSize = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PGRD), fmt::format(L"{:.2f} mm", value).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFGRDSIZ), fmt::format(L"{:.2f} mm", value).c_str());
 				  break;
 				}
-				case PCHN: {
+				case PRFCHFLEN: {
 				  IniFile.chainSpace = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PCHN), fmt::format(L"{:.2f}", value).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFCHFLEN), fmt::format(L"{:.2f}", value).c_str());
 				  break;
 				}
 				default: {
@@ -8565,7 +8565,7 @@ void thred::internal::sidhup() {
   auto hoopRectangle        = RECT {0L, 0L, 0L, 0L};
   auto preferencesRectangle = RECT {0L, 0L, 0L, 0L};
   StateMap->set(StateFlag::HUPMSG);
-  GetWindowRect(ValueWindow->operator[](PHUP), &hoopRectangle);
+  GetWindowRect(ValueWindow->operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideMessageWindow = CreateWindow(L"STATIC",
@@ -9120,7 +9120,7 @@ void thred::internal::respac(FRMHED& form) noexcept {
 
 auto thred::internal::chkminus(wchar_t code) noexcept -> bool {
   if (code == VK_OEM_MINUS || code == VK_SUBTRACT) { // '-' key pressed
-	if (PreferenceIndex == PFAZ) {                   // Clipboard Offset in preferences
+	if (PreferenceIndex == PRFCLPPHS) {                   // Clipboard Offset in preferences
 	  return true;
 	}
 	if (FormMenuChoice == LFRMSPAC && isfclp()) { // Fill Spacing for fan clip fill
@@ -11194,34 +11194,34 @@ auto thred::internal::updateFillColor() -> bool {
 
 auto thred::internal::updatePreferences() -> bool {
   chknum();
-  if (Msg.hwnd == ValueWindow->operator[](PSQR)) {
+  if (Msg.hwnd == ValueWindow->operator[](PRFFILEND)) {
 	if (UserFlagMap->testAndFlip(UserFlag::SQRFIL)) {
-	  SetWindowText(ValueWindow->operator[](PSQR), displayText::loadStr(IDS_PNTD).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFFILEND), displayText::loadStr(IDS_PNTD).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PSQR), displayText::loadStr(IDS_SQR).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFFILEND), displayText::loadStr(IDS_SQR).c_str());
 	}
 	return true;
   }
-  if (Msg.hwnd == ValueWindow->operator[](PBLNT)) {
+  if (Msg.hwnd == ValueWindow->operator[](PRFSATEND)) {
 	if (UserFlagMap->testAndFlip(UserFlag::BLUNT)) {
-	  SetWindowText(ValueWindow->operator[](PBLNT), displayText::loadStr(IDS_TAPR).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFSATEND), displayText::loadStr(IDS_TAPR).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PBLNT), displayText::loadStr(IDS_BLUNT).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFSATEND), displayText::loadStr(IDS_BLUNT).c_str());
 	}
 	return true;
   }
-  if (Msg.hwnd == ValueWindow->operator[](PUND)) {
+  if (Msg.hwnd == ValueWindow->operator[](PRFSATUND)) {
 	if (UserFlagMap->testAndFlip(UserFlag::DUND)) {
-	  SetWindowText(ValueWindow->operator[](PUND), displayText::loadStr(IDS_OFF).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFSATUND), displayText::loadStr(IDS_OFF).c_str());
 	}
 	else {
-	  SetWindowText(ValueWindow->operator[](PUND), displayText::loadStr(IDS_ON).c_str());
+	  SetWindowText(ValueWindow->operator[](PRFSATUND), displayText::loadStr(IDS_ON).c_str());
 	}
 	return true;
   }
-  if (Msg.hwnd == ValueWindow->operator[](PHUP)) {
+  if (Msg.hwnd == ValueWindow->operator[](PRFHUPTYP)) {
 	sidhup();
 	return true;
   }
@@ -12268,9 +12268,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (PreferenceIndex == PAP + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
+  if (PreferenceIndex == PRFAPPCOL + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	AppliqueColor = VerticalIndex;
-	SetWindowText(ValueWindow->operator[](PAP), fmt::format(L"{}", VerticalIndex).c_str());
+	SetWindowText(ValueWindow->operator[](PRFAPPCOL), fmt::format(L"{}", VerticalIndex).c_str());
 	thred::unsid();
 	return true;
   }
@@ -15469,16 +15469,16 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  return true;
 		}
 		if (dunum(code)) {
-		  if (PreferenceIndex == PSHO + 1 || PreferenceIndex == PBOX + 1U) {
+		  if (PreferenceIndex == PRFGRDCUT + 1 || PreferenceIndex == PRFSBXCUT + 1U) {
 			auto buffer = std::array<wchar_t, 2> {};
 			buffer[0]   = NumericCode;
-			if (PreferenceIndex == PSHO + 1U) {
+			if (PreferenceIndex == PRFGRDCUT + 1U) {
 			  ShowStitchThreshold = unthrsh(NumericCode - L'0');
-			  SetWindowText(ValueWindow->operator[](PSHO), buffer.data());
+			  SetWindowText(ValueWindow->operator[](PRFGRDCUT), buffer.data());
 			}
 			else {
 			  StitchBoxesThreshold = unthrsh(NumericCode - L'0');
-			  SetWindowText(ValueWindow->operator[](PBOX), buffer.data());
+			  SetWindowText(ValueWindow->operator[](PRFSBXCUT), buffer.data());
 			}
 			thred::unsid();
 		  }

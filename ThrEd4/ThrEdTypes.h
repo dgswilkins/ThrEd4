@@ -858,40 +858,6 @@ enum formData {
   LASTLIN     // must be the last entry
 };
 
-// preference window
-enum preferenceItems {
-  PSPAC,  // 0
-  PANGL,  // 1
-  PSQR,   // 2
-  PSAT,   // 3
-  PMAX,   // 4
-  PUSE,   // 5
-  PMIN,   // 6
-  PSHO,   // 7
-  PBOX,   // 8
-  PSMAL,  // 9
-  PAP,    // 10
-  PSNP,   // 11
-  PSTAR,  // 12
-  PSPIR,  // 13
-  PBUT,   // 14
-  PBLNT,  // 15
-  PPIC,   // 16
-  PHUP,   // 17
-  PHUPX,  // 18
-  PUND,   // 19
-  PGRD,   // 20
-  PCLPOF, // 21
-  PFAZ,   // 22
-  PCHN,   // 23
-  PCHRAT, // 24
-  PNUDG,  // 25
-  PEG,    // 26
-  PHUPY,  // 27
-  PLRAT,  // 28
-  PAPSL   // 29
-};
-
 // file menu items
 enum fileMenuItems {
   FM_NEW,
