@@ -541,7 +541,7 @@ void bitmap::resetDC() noexcept {
 }
 
 auto bitmap::getBmpNameLength() -> uint32_t {
-  return wrap::toUnsigned(UTF8BMPname.size());
+  return wrap::toUnsigned(UTF8BMPname.size() - 1); // -1 to account for zero termination
 }
 
 auto bitmap::getBmpNameData() noexcept -> char* {

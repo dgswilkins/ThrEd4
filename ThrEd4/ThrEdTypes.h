@@ -217,7 +217,7 @@ constexpr auto STDDPI   = int32_t {96};         // Default DPI
 constexpr auto SQRCORNS = 4U;                   // number of corners in a square
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
-constexpr auto SZBMPNM = 16U;     // THR spec for BMP filename length
+constexpr auto SZBMPNM = 17U;     // THR spec for BMP filename length (+ 1 for zero terminator)
 
 // Filter Specifications
 constexpr auto FLTTHR = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"};
