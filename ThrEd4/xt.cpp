@@ -637,7 +637,7 @@ void xt::internal::fncwlk(FRMHED& form) {
 	}
 	auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
 	auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	for (auto iGuide = form.satinGuideCount; iGuide != 0; --iGuide) {
+	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const vStart  = wrap::next(vertexIt, guideIt->start);
 	  auto const vFinish = wrap::next(vertexIt, guideIt->finish);
 	  OSequence->push_back(fPOINT {wrap::midl(vFinish->x, vStart->x), wrap::midl(vFinish->y, vStart->y)});
