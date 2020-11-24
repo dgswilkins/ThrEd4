@@ -481,8 +481,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
   }
   wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
   auto const sp    = gsl::make_span(pixelOutline);
-  auto       subsp = sp.subspan(0, pixelOutline.size() - 1U);
-  for (auto const& controlPoint : subsp) {
+  for (auto const& controlPoint : sp) {
 	form::selsqr(controlPoint, dc);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
