@@ -480,10 +480,11 @@ void thred::internal::redfnam(std::wstring& designerName) {
   auto           designer      = std::string {};
   auto           iNameOrder    = NameOrder.begin();
   auto&          EHCN          = ExtendedHeader->creatorName;
-  auto const     spCreatorName = gsl::span<char> {EHCN};
+  auto const     spCreatorName = gsl::make_span(EHCN);
   for (auto& iTmpName : tmpName) {
-	if (*iNameOrder < NAMELEN) {
-	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[*iNameOrder]);
+	auto& index = *iNameOrder;
+	if (index < spCreatorName.size()) {
+	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
 	}
 	else {
 	  iTmpName = 111;

@@ -203,7 +203,7 @@ void PES::internal::ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBloc
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
-void PES::internal::pecnam(gsl::span<char> label) {
+void PES::internal::pecnam(gsl::span<char> const& label) {
   // ReSharper disable once CppDeprecatedEntity
   strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
@@ -211,8 +211,9 @@ void PES::internal::pecnam(gsl::span<char> label) {
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
+  auto ptr = std::next(label.data(), 3);
   // ReSharper disable once CppDeprecatedEntity
-  strncpy(&label[3], fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
+  strncpy(ptr, fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
 }
 #pragma warning(pop)
 

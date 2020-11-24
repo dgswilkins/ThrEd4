@@ -158,7 +158,7 @@ namespace internal {
   void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
   void pecImage(std::vector<uint8_t>& pecBuffer);
   void pecdat(std::vector<uint8_t>& buffer);
-  void pecnam(gsl::span<char> label);
+  void pecnam(gsl::span<char> const& label);
   auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
   void ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch, fPOINT const& offset);
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
