@@ -475,7 +475,6 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 }
 
 void thred::internal::redfnam(std::wstring& designerName) {
-  constexpr auto NAMELEN       = NameOrder.size();
   auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
   auto           designer      = std::string {};
   auto           iNameOrder    = NameOrder.begin();
