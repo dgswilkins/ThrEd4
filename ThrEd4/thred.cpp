@@ -465,8 +465,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 	}
   }
   auto       iTmpName      = tmpName.begin();
-  auto&      EHCN          = ExtendedHeader->creatorName;
-  auto const spCreatorName = gsl::span<char> {EHCN};
+  auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
   for (auto& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
@@ -2770,8 +2769,7 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto&          defDir           = IniFile.defaultDirectory;
-  auto const     defaultDirectory = gsl::span<char> {defDir};
+  auto const     defaultDirectory = gsl::make_span(IniFile.defaultDirectory);
   constexpr char FILLCHAR         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
@@ -2786,8 +2784,7 @@ void thred::internal::ritini() {
 	++previousName;
   }
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      desName      = IniFile.designerName;
-  auto const designerName = gsl::span<char> {desName};
+  auto const designerName = gsl::make_span(IniFile.designerName);
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
@@ -3070,8 +3067,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      modName      = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char> {modName};
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -4064,8 +4060,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  UnzoomedRect = POINT {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 		}
 		ritfnam(*DesignerName);
-		auto&      modName      = ExtendedHeader->modifierName;
-		auto const modifierName = gsl::span<char> {modName};
+		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
 		std::copy(&IniFile.designerName[0],
 		          &IniFile.designerName[strlen(std::begin(desName))],
 		          modifierName.begin());
@@ -5176,8 +5171,7 @@ void thred::internal::newFil() {
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      modName      = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char> {modName};
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   rstdu();
   rstAll();
@@ -16240,8 +16234,7 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      modName      = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char> {modName};
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.begin(), designer.end(), modifierName.begin());
   thred::chkhup();
   nedmen();
