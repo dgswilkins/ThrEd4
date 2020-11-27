@@ -184,8 +184,7 @@ static auto PickColorMsgSize = SIZE {};                           // size of the
 static auto InsertSize       = POINT {};                          // size of file insert window
 static auto InsertCenter     = fPOINT {};                         // center point in inserted file
 static auto NumericCode      = wchar_t {};                        // keyboard numerical input
-static auto Knots            = std::array<uint32_t, MAXKNOTS> {}; // pointers to knots
-static auto KnotCount        = uint32_t {};                       // number of knots in the design
+static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
 // graphics variables
 
@@ -564,11 +563,11 @@ void thred::internal::fndknt() {
 	endStitch -= 4U;
 	// ToDo - Is flag initialized and used correctly?
 	auto flag = false;
-	KnotCount = 0U;
+	Knots->clear();
 	for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
 	  if ((StitchBuffer->operator[](iStitch).attribute & KNOTMSK) != 0U) {
 		if (!flag) {
-		  Knots[KnotCount++] = iStitch;
+		  Knots->push_back(iStitch);
 		}
 	  }
 	  else {
@@ -577,7 +576,7 @@ void thred::internal::fndknt() {
 	}
   }
   else {
-	KnotCount = 0U;
+	Knots->clear();
   }
 }
 
@@ -5201,7 +5200,7 @@ void thred::internal::newFil() {
   FormList->clear();
   FormList->shrink_to_fit();
   thred::resetColorChanges();
-  KnotCount = 0;
+  Knots->clear();
   WorkingFileName->clear();
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	thred::redraw(DefaultColorWin->operator[](iColor));
@@ -6197,22 +6196,22 @@ void thred::internal::setknt() {
 
 auto thred::internal::srchknot(uint32_t source) noexcept -> uint32_t {
   auto knotIndex = 0U;
-  while (knotIndex < KnotCount && Knots[knotIndex] < source) {
+  while (knotIndex < Knots->size() && Knots->operator[](knotIndex) < source) {
 	++knotIndex;
   }
   if (knotIndex != 0U) {
 	--knotIndex;
   }
-  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
+  if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
 	++knotIndex;
-	if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
+	if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
 	  return 0;
 	}
 	return 2;
   }
 
   ++knotIndex;
-  if (((Knots[knotIndex] > source) ? (Knots[knotIndex] - source) : (source - Knots[knotIndex])) < KNOTSCNT) {
+  if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
 	return 1;
   }
   return 3;
@@ -9455,7 +9454,7 @@ void thred::internal::delstch() {
 
 void thred::internal::closfn() {
   deltot();
-  KnotCount = 0;
+  Knots->clear();
   WorkingFileName->clear();
   bitmap::delmap();
   deldu();
@@ -16319,14 +16318,14 @@ void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
 void thred::internal::drwknot() {
   constexpr auto KBOFFSET = 5;  // offset of the knot box sides;
   constexpr auto KLINELEN = 10; // length of the knot line;
-  if (!UserFlagMap->test(UserFlag::KNOTOF) && (KnotCount != 0U) && (!StitchBuffer->empty())) {
+  if (!UserFlagMap->test(UserFlag::KNOTOF) && (!Knots->empty()) && (!StitchBuffer->empty())) {
 	auto const kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
 	auto const kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
 	auto       point    = POINT {0L, 0L};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};
-	for (auto ind = 0U; ind < KnotCount; ++ind) {
-	  stCor2px(StitchBuffer->operator[](Knots[ind]), point);
+	for (auto knot : *Knots) {
+	  stCor2px(StitchBuffer->operator[](knot), point);
 	  SelectObject(StitchWindowMemDC, KnotPen);
 	  SetROP2(StitchWindowMemDC, R2_XORPEN);
 	  kOutline[0].x = kOutline[3].x = kOutline[4].x = point.x - kOffset;
@@ -17523,6 +17522,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  private_InsidePointList           = std::vector<fPOINT> {};
 	  auto  private_InterleaveSequence        = std::vector<fPOINT> {};
 	  auto  private_InterleaveSequenceIndices = std::vector<INSREC> {};
+	  auto  private_Knots                     = std::vector<uint32_t> {};
 	  auto  private_LabelWindow               = std::vector<HWND> {};
 	  auto* formOnOff                         = private_FormOnOff.data();
 
@@ -17617,6 +17617,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  InsidePointList           = &private_InsidePointList;
 	  InterleaveSequence        = &private_InterleaveSequence;
 	  InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
+	  Knots                     = &private_Knots;
 	  LabelWindow               = &private_LabelWindow;
 	  MenuInfo                  = &private_MenuInfo;
 	  OSequence                 = &private_OSequence;
