@@ -6125,6 +6125,7 @@ void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
 	++finishIt;
   }
   if (finishIt != StitchBuffer->end()) {
+	--finishIt;
 	delta = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	auto const            knotAttribute = startIt->attribute | KNOTMSK;
 	auto const            knotStep      = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
