@@ -434,7 +434,7 @@ namespace internal {
   void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize) noexcept;
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
-  auto srchknot(uint32_t source) noexcept -> uint32_t;
+  auto srchknot(uint32_t source) -> uint32_t;
   void stCor2px(fPOINTATTR const& stitch, POINT& point);
   auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
   auto stch2px1(uint32_t iStitch) -> POINT;

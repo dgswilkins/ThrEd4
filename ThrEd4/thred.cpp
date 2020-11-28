@@ -6194,24 +6194,19 @@ void thred::internal::setknt() {
   *StitchBuffer = buffer;
 }
 
-auto thred::internal::srchknot(uint32_t source) noexcept -> uint32_t {
-  auto knotIndex = 0U;
-  while (knotIndex < Knots->size() && Knots->operator[](knotIndex) < source) {
-	++knotIndex;
-  }
-  if (knotIndex != 0U) {
-	--knotIndex;
-  }
-  if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
-	++knotIndex;
-	if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
+auto thred::internal::srchknot(uint32_t source) -> uint32_t {
+  auto upper = std::find(Knots->begin(), Knots->end(), source);
+  --upper;
+  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
+	++upper;
+	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
 	  return 0;
 	}
 	return 2;
   }
 
-  ++knotIndex;
-  if (((Knots->operator[](knotIndex) > source) ? (Knots->operator[](knotIndex) - source) : (source - Knots->operator[](knotIndex))) < KNOTSCNT) {
+  ++upper;
+  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
 	return 1;
   }
   return 3;
