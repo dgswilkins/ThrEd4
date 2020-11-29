@@ -1119,8 +1119,7 @@ void xt::fsort() {
 		sortRecord.direction     = (minimumDirection != 0U);
 		xi::precjmps(tempStitchBuffer, pRecs, sortRecord);
 	  }
-	  StitchBuffer->resize(tempStitchBuffer.size());
-	  std::copy(tempStitchBuffer.cbegin(), tempStitchBuffer.cend(), StitchBuffer->begin());
+	  *StitchBuffer = std::move(tempStitchBuffer);
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}

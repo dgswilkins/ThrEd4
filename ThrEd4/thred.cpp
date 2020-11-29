@@ -6191,8 +6191,7 @@ void thred::internal::setknt() {
   StateMap->set(StateFlag::FILDIR);
   endknt(buffer, iStitch);
   buffer.back().attribute &= (~KNOTMSK);
-  StitchBuffer->resize(buffer.size());
-  *StitchBuffer = buffer;
+  *StitchBuffer = std::move(buffer);
 }
 
 auto thred::internal::srchknot(uint32_t source) -> uint32_t {
@@ -6237,8 +6236,7 @@ void thred::internal::chkncol() {
 	}
 	++iStitch;
   }
-  StitchBuffer->resize(buffer.size());
-  *StitchBuffer = buffer;
+  *StitchBuffer = std::move(buffer);
 }
 
 void thred::internal::setknots() {
@@ -9812,8 +9810,7 @@ void thred::internal::set1knot() {
 	}
 	buffer.insert(
 	    buffer.end(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U), StitchBuffer->end());
-	StitchBuffer->resize(buffer.size());
-	*StitchBuffer = buffer;
+	*StitchBuffer = std::move(buffer);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
