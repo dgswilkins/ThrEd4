@@ -165,14 +165,7 @@ void trace::internal::hidwnd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_HIDE);
 }
 
-void trace::internal::tracwnd() {
-  auto iDefaultColorWin = DefaultColorWin->begin();
-  auto iUserColorWin    = UserColorWin->begin();
-  for (auto& iThreadSizeWin : ThreadSizeWin) {
-	ti::hidwnd(*(iDefaultColorWin++));
-	ti::hidwnd(*(iUserColorWin++));
-	ti::hidwnd(iThreadSizeWin);
-  }
+void trace::internal::showTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
@@ -182,12 +175,17 @@ void trace::internal::tracwnd() {
 	ti::shownd(*(iTraceUpWindow++));
 	ti::shownd(*(iTraceDownWindow++));
   }
+}
+
+void trace::internal::tracwnd() {
+  thred::hideColorWin();
   ti::hidwnd(ButtonWin->operator[](HBOXSEL));
   ti::hidwnd(ButtonWin->operator[](HUPTO));
   ti::shownd(TraceStepWin);
   ti::trcstpnum();
   ti::trcratnum();
   displayText::clrhbut(4);
+  showTraceWin();
 }
 
 // Check Translation
@@ -234,6 +232,18 @@ auto trace::internal::trsum() -> uint32_t {
   return wrap::toUnsigned(std::accumulate(subTrcAdjCol.begin(), subTrcAdjCol.end(), 0, fold));
 }
 
+void trace::internal::hideTraceWin() noexcept {
+  auto iTraceSelectWindow = TraceSelectWindow.begin();
+  auto iTraceUpWindow     = TraceUpWindow.begin();
+  auto iTraceDownWindow   = TraceDownWindow.begin();
+  for (auto& iTraceControlWindow : TraceControlWindow) {
+	ti::hidwnd(iTraceControlWindow);
+	ti::hidwnd(*(iTraceSelectWindow++));
+	ti::hidwnd(*(iTraceUpWindow++));
+	ti::hidwnd(*(iTraceDownWindow++));
+  }
+}
+
 void trace::untrace() {
   if (StateMap->testAndReset(StateFlag::WASTRAC)) {
 	bitmap::resetDC();
@@ -244,26 +254,12 @@ void trace::untrace() {
 	  TracedMap->resize(0); // allocated in trace
 	}
 	StateMap->reset(StateFlag::WASEDG);
-	auto iDefaultColorWin = DefaultColorWin->begin();
-	auto iUserColorWin    = UserColorWin->begin();
-	for (auto& iThreadSizeWin : ThreadSizeWin) {
-	  ti::shownd(*(iDefaultColorWin++));
-	  ti::shownd(*(iUserColorWin++));
-	  ti::shownd(iThreadSizeWin);
-	}
-	auto iTraceSelectWindow = TraceSelectWindow.begin();
-	auto iTraceUpWindow     = TraceUpWindow.begin();
-	auto iTraceDownWindow   = TraceDownWindow.begin();
-	for (auto& iTraceControlWindow : TraceControlWindow) {
-	  ti::hidwnd(iTraceControlWindow);
-	  ti::hidwnd(*(iTraceSelectWindow++));
-	  ti::hidwnd(*(iTraceUpWindow++));
-	  ti::hidwnd(*(iTraceDownWindow++));
-	}
+	ti::hideTraceWin();
+	ti::hidwnd(TraceStepWin);
+	thred::showColorWin();
 	for (auto& iButton : *ButtonWin) {
 	  ti::shownd(iButton);
 	}
-	ti::hidwnd(TraceStepWin);
   }
   else {
 	if (StateMap->test(StateFlag::TRCUP)) {

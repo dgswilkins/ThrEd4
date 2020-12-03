@@ -173,6 +173,8 @@ static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
 static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 static auto BackupViewer = std::array<HWND, OLDVER> {}; // handles of multiple file viewing windows
+static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
+static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
@@ -281,6 +283,34 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 	}
   }
   return FALSE;
+}
+
+void thred::internal::shownd(HWND hwnd) noexcept {
+  ShowWindow(hwnd, SW_SHOW);
+}
+
+void thred::internal::hidwnd(HWND hwnd) noexcept {
+  ShowWindow(hwnd, SW_HIDE);
+}
+
+void thred::hideColorWin() noexcept {
+  auto iDefaultColorWin = DefaultColorWin->begin();
+  auto iUserColorWin    = UserColorWin->begin();
+  for (auto& iThreadSizeWin : ThreadSizeWin) {
+	thi::hidwnd(*(iDefaultColorWin++));
+	thi::hidwnd(*(iUserColorWin++));
+	thi::hidwnd(iThreadSizeWin);
+  }
+}
+
+void thred::showColorWin() noexcept {
+  auto iDefaultColorWin = DefaultColorWin->begin();
+  auto iUserColorWin    = UserColorWin->begin();
+  for (auto& iThreadSizeWin : ThreadSizeWin) {
+	thi::shownd(*(iDefaultColorWin++));
+	thi::shownd(*(iUserColorWin++));
+	thi::shownd(iThreadSizeWin);
+  }
 }
 
 void thred::internal::getdes() noexcept {
@@ -6800,16 +6830,16 @@ void thred::internal::vubak() {
 	  }
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  BackupViewer[iVersion] = CreateWindow(L"STATIC",
-	                                        L"",
-	                                        SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                        dx * gsl::narrow_cast<int32_t>(iVersion & 1U) + ButtonWidthX3,
-	                                        verticalLocation,
-	                                        dx,
-	                                        dy,
-	                                        ThrEdWindow,
-	                                        nullptr,
-	                                        ThrEdInstance,
-	                                        nullptr);
+		L"",
+		SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+		dx * gsl::narrow_cast<int32_t>(iVersion & 1U) + ButtonWidthX3,
+		verticalLocation,
+		dx,
+		dy,
+		ThrEdWindow,
+		nullptr,
+		ThrEdInstance,
+		nullptr);
 	}
 	StateMap->set(StateFlag::BAKSHO);
   }

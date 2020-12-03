@@ -103,8 +103,6 @@ extern uint32_t ClosestPointIndex;
 extern uint32_t ClosestVertexToCursor;
 extern int32_t* ColorBarSize;
 
-extern std::vector<HWND>* DefaultColorWin;
-
 extern HWND DeleteStitchesDialog;
 
 extern std::wstring*   DesignerName;
@@ -256,7 +254,6 @@ extern POINT UnzoomedRect;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 
-extern std::vector<HWND>* UserColorWin;
 extern EnumMap<UserFlag>* UserFlagMap;
 
 extern std::array<HPEN, COLORCNT> UserPen;

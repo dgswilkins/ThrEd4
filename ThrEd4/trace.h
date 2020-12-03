@@ -43,8 +43,10 @@ namespace internal {
   void dutrac();
   void dutrnum0(uint32_t color);
   void hidwnd(HWND hwnd) noexcept;
+  void hideTraceWin() noexcept;
   void ritrcol(COLORREF* color, uint32_t number) noexcept;
   void shownd(HWND hwnd) noexcept;
+  void showTraceWin() noexcept;
   void tracwnd();
   auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints) -> bool;
   auto trcin(COLORREF color) -> bool;
