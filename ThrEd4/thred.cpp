@@ -2948,9 +2948,12 @@ void thred::internal::redbal() {
 			}
 		  }
 		}
-		for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-		  UserPen->operator[](iColor)        = wrap::CreatePen(PS_SOLID, PENNWID, UserColor[iColor]);
-		  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+		auto up = UserPen->begin();
+		auto ucb = UserColorBrush.begin();
+		for (auto& ucolor : UserColor) {
+		  *(up++) = wrap::CreatePen(PS_SOLID, PENNWID, ucolor);
+		  *ucb    = nuBrush(*ucb, ucolor);
+		  ++ucb;
 		}
 		thred::coltab();
 		thred::redraw(ColorBar);
@@ -3837,9 +3840,13 @@ void thred::internal::redbak() {
 	auto const undoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
 	auto const userColors = gsl::span<COLORREF> {UserColor};
 	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
-	for (auto iColor = 0U; iColor < UCOLSIZE; ++iColor) {
-	  UserPen->operator[](iColor)        = nuPen(UserPen->operator[](iColor), 1, UserColor[iColor]);
-	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+	auto up  = UserPen->begin();
+	auto ucb = UserColorBrush.begin();
+	for (auto& color : UserColor) {
+	  *up  = nuPen(*up, 1, color);
+	  *ucb = nuBrush(*ucb, color);
+	  ++up;
+	  ++ucb;
 	}
 	for (auto& iColor : *UserColorWin) {
 	  thred::redraw(iColor);
@@ -4401,11 +4408,17 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	StateMap->reset(StateFlag::ZUMED);
 	auto buffer = std::array<wchar_t, 3> {};
 	buffer[1]   = L'0';
-	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	  UserPen->operator[](iColor)        = nuPen(UserPen->operator[](iColor), 1, UserColor[iColor]);
-	  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-	  buffer[0]              = ThreadSize[iColor];
-	  SetWindowText(ThreadSizeWin[iColor], buffer.data());
+	auto up  = UserPen->begin();
+	auto ucb = UserColorBrush.begin();
+	auto ts = ThreadSize.begin();
+	auto tsw = ThreadSizeWin.begin();
+	for (auto color : UserColor) {
+	  *up = nuPen(*up, 1, color);
+	  ++up;
+	  *ucb = nuBrush(*ucb, color);
+	  ++ucb;
+	  buffer[0] = *(ts++);
+	  SetWindowText(*(tsw++), buffer.data());
 	}
 	for (auto& iColor : *UserColorWin) {
 	  thred::redraw(iColor);
@@ -9665,8 +9678,11 @@ void thred::internal::bakmrk() {
 }
 
 void thred::internal::nuscol(size_t iColor) noexcept {
-  UserPen->operator[](iColor)        = nuPen(UserPen->operator[](iColor), 1, UserColor[iColor]);
-  UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
+  auto uc  = wrap::next(UserColor.begin(), iColor);
+  auto up  = wrap::next(UserPen->begin(), iColor);
+  *up      = nuPen(*up, 1, *uc);
+  auto ucb = wrap::next(UserColorBrush.begin(), iColor);
+  *ucb     = nuBrush(*ucb, *uc);
   thred::redraw(UserColorWin->operator[](iColor));
 }
 
@@ -12667,9 +12683,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thi::chkMsgs(Msg.pt, UserColorWin->front(), UserColorWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN && (nuCol(UserColor[VerticalIndex]) != 0U)) {
 	  thred::savdo();
-	  UserColor[VerticalIndex]      = ColorStruct.rgbResult;
-	  UserPen->operator[](VerticalIndex)        = nuPen(UserPen->operator[](VerticalIndex), 1, UserColor[VerticalIndex]);
-	  UserColorBrush[VerticalIndex] = nuBrush(UserColorBrush[VerticalIndex], UserColor[VerticalIndex]);
+	  auto uc  = wrap::next(UserColor.begin(), VerticalIndex);
+	  *uc      = ColorStruct.rgbResult;
+	  auto up  = wrap::next(UserPen->begin(), VerticalIndex);
+	  *up      = nuPen(*up, 1, *uc);
+	  auto ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
+	  *ucb     = nuBrush(*ucb, *uc);
 	  thred::redraw(UserColorWin->operator[](VerticalIndex));
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -14518,11 +14537,19 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_EDIT_RESET_COL: { // edit / Reset Colors
-	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-		UserColor[iColor]      = DefaultColors[iColor];
-		UserColorBrush[iColor] = nuBrush(UserColorBrush[iColor], UserColor[iColor]);
-		UserPen->operator[](iColor)        = nuPen(UserPen->operator[](iColor), 1, UserColor[iColor]);
-		thred::redraw(UserColorWin->operator[](iColor));
+	  auto ucb = UserColorBrush.begin();
+	  auto uc = UserColor.begin();
+	  auto up = UserPen->begin();
+	  auto ucw = UserColorWin->begin();
+	  for (auto color : DefaultColors) {
+		*uc      = color;
+		*ucb = nuBrush(*ucb, *uc);
+		*up        = nuPen(*up, 1, *uc);
+		thred::redraw(*ucw);
+		++ucb;
+		++uc;
+		++up;
+		++ucw;
 	  }
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
@@ -16059,6 +16086,17 @@ void thred::internal::setLayerPens() noexcept {
   LayerPen[4] = wrap::CreatePen(PS_SOLID, PENNWID, PENTEAL);
 }
 
+void thred::internal::createBrushes()
+{
+  auto dcb = DefaultColorBrush.begin();
+  auto ucb = UserColorBrush.begin();
+  auto uc = UserColor.begin();
+  for (auto color : DefaultColors) {
+	*(dcb++) = CreateSolidBrush(color);
+	*(ucb++) = CreateSolidBrush(*(uc++));
+  }
+}
+
 void thred::internal::init() {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const deviceContext   = GetDC(nullptr);
@@ -16256,10 +16294,7 @@ void thred::internal::init() {
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
-  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	DefaultColorBrush[iColor] = CreateSolidBrush(DefaultColors[iColor]);
-	UserColorBrush[iColor]    = CreateSolidBrush(UserColor[iColor]);
-  }
+  createBrushes();
   ZoomFactor = 1;
   StitchBuffer->clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
@@ -16792,7 +16827,8 @@ void thred::internal::dubar() {
 	auto const barSectionHeight =
 	    wrap::toFloat(ColorChangeTable->operator[](iColorChange + 1U).stitchIndex) / buffSize;
 	colorBarRect.bottom = std::lround(barSectionHeight * wrap::toFloat(DrawItem->rcItem.bottom));
-	FillRect(DrawItem->hDC, &colorBarRect, UserColorBrush[ColorChangeTable->operator[](iColorChange).colorIndex]);
+	auto ucb = wrap::next(UserColorBrush.begin(), ColorChangeTable->operator[](iColorChange).colorIndex);
+	FillRect(DrawItem->hDC, &colorBarRect, *ucb);
 	colorBarRect.top = colorBarRect.bottom;
   }
   if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::GRPSEL)) {
@@ -17259,8 +17295,10 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	      DrawItem->itemAction == ODA_DRAWENTIRE) {
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 		if (StateMap->test(StateFlag::HID)) {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[ActiveColor]);
-		  SetBkColor(DrawItem->hDC, UserColor[ActiveColor]);
+		  auto ucb = wrap::next(UserColorBrush.begin(), ActiveColor);
+		  auto uc = wrap::next(UserColor.begin(), ActiveColor);
+		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
+		  SetBkColor(DrawItem->hDC, *uc);
 		}
 		else {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, GetSysColorBrush(COLOR_BTNFACE));
@@ -17297,7 +17335,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		if (DrawItem->hwndItem == UserColorWin->operator[](iColor)) {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, UserColorBrush[iColor]);
+		  auto ucb = wrap::next(UserColorBrush.begin(), iColor);
+		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  if (iColor == ActiveColor) {
 			SelectObject(DrawItem->hDC, CrossPen);
 			SetROP2(StitchWindowMemDC, R2_NOTXORPEN);

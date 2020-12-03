@@ -275,6 +275,7 @@ namespace internal {
   void ilin() noexcept;
   void ilin1() noexcept;
   void infadj(float& xCoordinate, float& yCoordinate) noexcept;
+  void createBrushes();
   void init();
   auto inrng(uint32_t stitch) noexcept -> bool;
   void insadj();
