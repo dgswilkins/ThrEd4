@@ -910,8 +910,9 @@ void thred::internal::box(uint32_t iNearest, HDC dc) {
 
 void thred::internal::boxs() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
+  auto bp = BoxPen.begin();
   for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
-	SelectObject(StitchWindowDC, BoxPen[iNear]);
+	SelectObject(StitchWindowDC, *(bp++));
 	box(iNear, StitchWindowDC);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -16271,8 +16272,9 @@ void thred::internal::init() {
   nuRct();
   // create pens
   static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  for (auto iRGBK = 0U; iRGBK < 4; ++iRGBK) {
-	BoxPen[iRGBK] = wrap::CreatePen(PS_SOLID, PENNWID, boxColor[iRGBK]);
+  auto bc = boxColor.begin();
+  for (auto& pen : BoxPen) {
+	pen = wrap::CreatePen(PS_SOLID, PENNWID, *(bc++));
   }
   LinePen        = wrap::CreatePen(PS_SOLID, PENNWID, PENCHCL);
   CrossPen       = wrap::CreatePen(PS_SOLID, PENWWID, PENPRPLE);
