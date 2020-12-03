@@ -291,8 +291,8 @@ void texture::dutxtfil() {
   StateMap->reset(StateFlag::WASPAT);
   StateMap->reset(StateFlag::RUNPAT);
   thred::movStch();
-  ShowWindow(VerticalScrollBar, FALSE);
-  ShowWindow(HorizontalScrollBar, FALSE);
+  ShowWindow(VerticalScrollBar, SW_HIDE);
+  ShowWindow(HorizontalScrollBar, SW_HIDE);
   SelectedTexturePointsList->clear();
   StateMap->set(StateFlag::INIT);
   SideWindowButton = nullptr;

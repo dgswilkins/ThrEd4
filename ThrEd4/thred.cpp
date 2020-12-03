@@ -1016,15 +1016,15 @@ void thred::movStch() {
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.x, *ScrollSize, TRUE);
 	}
-	ShowWindow(VerticalScrollBar, TRUE);
-	ShowWindow(HorizontalScrollBar, TRUE);
+	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
+	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
   }
   else {
 	thi::stchPars();
 	auto const actualWindowHeight = StitchWindowSize.y + *ScrollSize;
 	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
-	ShowWindow(VerticalScrollBar, FALSE);
-	ShowWindow(HorizontalScrollBar, FALSE);
+	ShowWindow(VerticalScrollBar, SW_HIDE);
+	ShowWindow(HorizontalScrollBar, SW_HIDE);
 	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.x) / wrap::toFloat(actualWindowHeight);
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.x, *ScrollSize, TRUE);
@@ -2133,7 +2133,7 @@ void thred::internal::rstAll() {
 	StateMap->reset(StateFlag::ZUMED);
   }
   thred::movStch();
-  ShowWindow(MainStitchWin, TRUE);
+  ShowWindow(MainStitchWin, SW_SHOWNORMAL);
   thred::unbsho();
   StateMap->reset(StateFlag::SIDACT);
   thred::unsid();
@@ -3759,8 +3759,8 @@ void thred::internal::stchWnd() {
 	                                   nullptr,
 	                                   ThrEdInstance,
 	                                   nullptr);
-	ShowWindow(VerticalScrollBar, FALSE);
-	ShowWindow(HorizontalScrollBar, FALSE);
+	ShowWindow(VerticalScrollBar, SW_HIDE);
+	ShowWindow(HorizontalScrollBar, SW_HIDE);
   }
 }
 
@@ -6096,7 +6096,7 @@ void thred::internal::cut() {
 
 void thred::internal::unpat() {
   if (StateMap->testAndReset(StateFlag::WASPAT)) {
-	ShowWindow(SpeedScrollBar, FALSE);
+	ShowWindow(SpeedScrollBar, SW_HIDE);
 	DestroyWindow(SpeedScrollBar);
 	thred::movStch();
 	StateMap->set(StateFlag::RESTCH);
@@ -16449,12 +16449,12 @@ void thred::internal::drwStch() {
 	  scrollInfo.nPage = wrap::round<UINT>(ZoomRect.right - ZoomRect.left);
 	  scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
 	  SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
-	  ShowWindow(HorizontalScrollBar, TRUE);
-	  ShowWindow(VerticalScrollBar, TRUE);
+	  ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
+	  ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
 	}
 	else {
-	  ShowWindow(VerticalScrollBar, FALSE);
-	  ShowWindow(HorizontalScrollBar, FALSE);
+	  ShowWindow(VerticalScrollBar, SW_HIDE);
+	  ShowWindow(HorizontalScrollBar, SW_HIDE);
 	}
 	thred::duzrat();
 	auto const dub6        = ZoomRatio.x * 6.0F;
