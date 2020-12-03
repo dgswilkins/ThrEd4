@@ -4413,7 +4413,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	auto ucb = UserColorBrush.begin();
 	auto ts = ThreadSize.begin();
 	auto tsw = ThreadSizeWin.begin();
-	for (auto color : UserColor) {
+	for (auto const& color : UserColor) {
 	  nuPen(*up, 1, color);
 	  ++up;
 	  nuBrush(*ucb, color);
@@ -14547,7 +14547,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  auto uc = UserColor.begin();
 	  auto up = UserPen->begin();
 	  auto ucw = UserColorWin->begin();
-	  for (auto color : DefaultColors) {
+	  for (auto const& color : DefaultColors) {
 		*uc      = color;
 		nuBrush(*ucb, *uc);
 		nuPen(*up, 1, *uc);
@@ -16096,7 +16096,7 @@ void thred::internal::createBrushes() noexcept {
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
   auto uc  = UserColor.begin();
-  for (auto color : DefaultColors) {
+  for (auto const& color : DefaultColors) {
 	*(dcb++) = CreateSolidBrush(color);
 	*(ucb++) = CreateSolidBrush(*(uc++));
   }
@@ -16296,7 +16296,7 @@ void thred::internal::init() {
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
   auto up            = UserPen->begin();
-  for (auto color : UserColor) {
+  for (auto const& color : UserColor) {
 	*(tsp++) = 1;
 	*(tsi++) = 1;
 	*(up++)  = wrap::CreatePen(PS_SOLID, PENNWID, color);
