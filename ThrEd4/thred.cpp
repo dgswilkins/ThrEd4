@@ -17316,26 +17316,27 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		trace::wasTrace();
 		return 1;
 	  }
+	  auto dcb = DefaultColorBrush.begin();
+	  auto ucb = UserColorBrush.begin();
 	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 		if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
-		  FillRect(DrawItem->hDC, &DrawItem->rcItem, DefaultColorBrush[iColor]);
+		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
 		  if (DisplayedColorBitmap.test(iColor)) {
 			SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
 			auto       textSize = SIZE {0L, 0L};
 			wrap::getTextExtentPoint32(
-			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
+			  DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 			wrap::textOut(DrawItem->hDC,
-			              (ButtonWidth - textSize.cx) / 2,
-			              0,
-			              colorNum.c_str(),
-			              wrap::toUnsigned(colorNum.size()));
+			  (ButtonWidth - textSize.cx) / 2,
+			  0,
+			  colorNum.c_str(),
+			  wrap::toUnsigned(colorNum.size()));
 		  }
 		  return 1;
 		}
 		if (DrawItem->hwndItem == UserColorWin->operator[](iColor)) {
-		  auto ucb = wrap::next(UserColorBrush.begin(), iColor);
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  if (iColor == ActiveColor) {
 			SelectObject(DrawItem->hDC, CrossPen);
@@ -17353,6 +17354,8 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  }
 		  return 1;
 		}
+		++dcb;
+		++ucb;
 	  }
 	  if (StateMap->test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap->test(StateFlag::THUMSHO)) {
