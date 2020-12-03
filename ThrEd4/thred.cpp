@@ -12256,12 +12256,17 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2])) {
 	  VerticalIndex -= 13U;
 	  static constexpr auto threadSizeMap = std::array<wchar_t, 3> {L'3', L'4', L'6'};
-	  ThreadSize[threadSizeSelected]      = threadSizeMap[VerticalIndex];
-	  ThreadSizeIndex[threadSizeSelected] = VerticalIndex;
-	  auto buffer                         = std::array<wchar_t, 3> {};
-	  buffer[0]                           = ThreadSize[threadSizeSelected];
-	  buffer[1]                           = L'0';
-	  SetWindowText(ThreadSizeWin[threadSizeSelected], buffer.data());
+
+	  auto ts     = wrap::next(ThreadSize.begin(), threadSizeSelected);
+	  auto tsm    = wrap::next(threadSizeMap.begin(), VerticalIndex);
+	  *ts         = *tsm;
+	  auto tsi    = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
+	  *tsi        = VerticalIndex;
+	  auto buffer = std::array<wchar_t, 3> {};
+	  buffer[0]   = *ts;
+	  buffer[1]   = L'0';
+	  auto tsw    = wrap::next(ThreadSizeWin.begin(), threadSizeSelected);
+	  SetWindowText(*tsw, buffer.data());
 	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
 		if (iWindow != nullptr) {
@@ -16286,10 +16291,13 @@ void thred::internal::init() {
   KnotPen         = wrap::CreatePen(PS_SOLID, PENNWID, PENWHITE);
   setLayerPens();
   BackgroundPenWidth = 1;
-  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	ThreadSizePixels[iColor] = 1;
-	ThreadSizeIndex[iColor]  = 1;
-	UserPen->operator[](iColor)          = wrap::CreatePen(PS_SOLID, PENNWID, UserColor[iColor]);
+  auto tsp           = ThreadSizePixels.begin();
+  auto tsi           = ThreadSizeIndex.begin();
+  auto up            = UserPen->begin();
+  for (auto color : UserColor) {
+	*(tsp++) = 1;
+	*(tsi++) = 1;
+	*(up++)  = wrap::CreatePen(PS_SOLID, PENNWID, color);
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
