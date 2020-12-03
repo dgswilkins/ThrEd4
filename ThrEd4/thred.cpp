@@ -67,7 +67,8 @@ constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto ARROWPNT = 3U;                     // points required to draw arrow
 constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
-constexpr auto HUPS     = 5;                      // number of hoops the user can select
+constexpr auto QUADRT   = uint32_t {4U};          // split display into quadrants
+constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto BALRATIO = 10.0F / 6.0F;           // Balarad stitch size ration
 
 // main variables
@@ -172,7 +173,7 @@ static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
 // windows
 static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
-static auto BackupViewer = std::array<HWND, OLDVER> {}; // handles of multiple file viewing windows
+static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
 static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 
@@ -190,22 +191,22 @@ static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr)
 
 // graphics variables
 
-auto const DefaultColors = std::array<COLORREF, COLORCNT> {0x00000000,
-                                                           0x00800000,
-                                                           0x00FF0000,
-                                                           0x00808000,
-                                                           0x00FFFF00,
-                                                           0x00800080,
-                                                           0x00FF00FF,
-                                                           0x00000080,
-                                                           0x000000FF,
-                                                           0x00008000,
-                                                           0x0000FF00,
-                                                           0x00008080,
-                                                           0x0000FFFF,
-                                                           0x00808080,
-                                                           0x00C0C0C0,
-                                                           0x00FFFFFF};
+static constexpr auto DefaultColors = std::array<COLORREF, COLORCNT> {0x00000000,
+                                                                      0x00800000,
+                                                                      0x00FF0000,
+                                                                      0x00808000,
+                                                                      0x00FFFF00,
+                                                                      0x00800080,
+                                                                      0x00FF00FF,
+                                                                      0x00000080,
+                                                                      0x000000FF,
+                                                                      0x00008000,
+                                                                      0x0000FF00,
+                                                                      0x00008080,
+                                                                      0x0000FFFF,
+                                                                      0x00808080,
+                                                                      0x00C0C0C0,
+                                                                      0x00FFFFFF};
 
 static auto BoxOffset = std::array<int32_t, 4> {};
 
@@ -6823,23 +6824,25 @@ void thred::internal::vubak() {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	auto const dx = StitchWindowClientRect.right / 2;
 	auto const dy = StitchWindowClientRect.bottom / 2;
-	for (auto iVersion = 0U; iVersion < 4; ++iVersion) { // there are 4 quadrants
+	auto bv = BackupViewer.begin();
+	for (auto iPosition = uint32_t {}; iPosition < QUADRT; ++iPosition) { // there are 4 quadrants
 	  auto verticalLocation = 0L;
-	  if ((iVersion & 2U) != 0U) {
+	  if ((iPosition & 2U) != 0U) {
 		verticalLocation = dy;
 	  }
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  BackupViewer[iVersion] = CreateWindow(L"STATIC",
-		L"",
-		SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-		dx * gsl::narrow_cast<int32_t>(iVersion & 1U) + ButtonWidthX3,
-		verticalLocation,
-		dx,
-		dy,
-		ThrEdWindow,
-		nullptr,
-		ThrEdInstance,
-		nullptr);
+	  *bv = CreateWindow(L"STATIC",
+	                     L"",
+	                     SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                     dx * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
+	                     verticalLocation,
+	                     dx,
+	                     dy,
+	                     ThrEdWindow,
+	                     nullptr,
+	                     ThrEdInstance,
+	                     nullptr);
+	  ++bv;
 	}
 	StateMap->set(StateFlag::BAKSHO);
   }
@@ -8291,28 +8294,34 @@ void thred::internal::thumnail() {
 void thred::internal::nuthsel() {
   if (ThumbnailIndex < Thumbnails->size()) {
 	auto const savedIndex = ThumbnailIndex;
-	auto       iThumbnail = 0U;
+	auto       iThumbnail = uint32_t {};
 	auto const length     = wcslen(ThumbnailSearchString.data());
 	StateMap->set(StateFlag::RESTCH);
 	if (length != 0U) {
-	  while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
+	  auto bv = BackupViewer.begin();
+	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
 		if (wcsncmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
-		  thred::redraw(BackupViewer[iThumbnail++]);
+		  thred::redraw(*bv);
+		  ++bv;
+		  ++iThumbnail;
 		}
 		++ThumbnailIndex;
 	  }
 	}
 	else {
-	  while (iThumbnail < 4 && ThumbnailIndex < Thumbnails->size()) {
+	  auto bv = BackupViewer.begin();
+	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
 		ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
-		thred::redraw(BackupViewer[iThumbnail++]);
+		thred::redraw(*bv);
+		++bv;
+		++iThumbnail;
 		++ThumbnailIndex;
 	  }
 	}
 	if (iThumbnail != 0U) {
 	  ThumbnailDisplayCount = iThumbnail;
-	  while (iThumbnail < 4) {
+	  while (iThumbnail < OLDVER) {
 		rthumnam(iThumbnail++);
 	  }
 	}
@@ -17303,17 +17312,20 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  }
 	  if (StateMap->test(StateFlag::BAKSHO) && DrawItem->itemAction == ODA_DRAWENTIRE) {
 		if (StateMap->test(StateFlag::THUMSHO)) {
-		  for (auto iThumb = 0U; iThumb < 4; ++iThumb) {
-			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == BackupViewer[iThumb]) {
+		  auto bv = BackupViewer.begin();
+		  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
+			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *bv) {
 			  ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), DrawItem);
 			  rthumnam(iThumb);
 			  return 1;
 			}
+			++bv;
 		  }
 		}
 		else {
+		  auto bv = BackupViewer.begin();
 		  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-			if (DrawItem->hwndItem == BackupViewer[iVersion]) {
+			if (DrawItem->hwndItem == *bv) {
 			  auto fileName = *ThrName;
 			  auto ext      = fileName.extension().wstring();
 			  ext.back()    = iVersion + 's';
@@ -17321,6 +17333,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			  ritbak(fileName, DrawItem);
 			  return 1;
 			}
+			++bv;
 		  }
 		}
 	  }
