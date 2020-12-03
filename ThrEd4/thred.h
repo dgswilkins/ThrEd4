@@ -64,6 +64,7 @@ auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle)
 auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
 auto getHomeDir() noexcept -> fs::path*;
 auto getLayerPen(uint32_t layer) noexcept -> HPEN;
+auto getUserPen(uint32_t iPen) noexcept -> HPEN;
 void grpAdj();
 void hidbit();
 void hideColorWin() noexcept;

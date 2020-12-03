@@ -7068,7 +7068,7 @@ void form::internal::doTimeWindow(float                        rangeX,
   formLines.clear();
   formLines.push_back(POINT {0, 0});
   formLines.push_back(POINT {0, ButtonHeight});
-  SelectObject(timeDC, UserPen[0]);
+  SelectObject(timeDC, thred::getUserPen(0U));
   for (auto iColumn = 1U; iColumn < wrap::round<uint32_t>(rangeX) - checkLength - 1U; ++iColumn) {
 	snpfn(xPoints,
 	      xHistogram[iColumn],

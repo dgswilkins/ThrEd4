@@ -167,7 +167,6 @@ boost::dynamic_bitset<>*       TracedMap                 = nullptr; // in/out st
 POINT                          UnzoomedRect              = {};      // size of the unzoomed stitch window
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors
 EnumMap<UserFlag>*             UserFlagMap               = nullptr; // for storage of persistent binary variables set by the user
-std::array<HPEN, COLORCNT>     UserPen                   = {};      // user color pens
 float                          UserStitchLength          = USESIZ * PFGRAN; // user selected stitch size
 std::vector<HWND>*             ValueWindow               = nullptr; // data handles for the form data sheet
 float                          VerticalRatio             = 0.0F;    // vertical ratio between the zoom window and the entire stitch space
