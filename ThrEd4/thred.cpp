@@ -16508,16 +16508,17 @@ void thred::internal::drwStch() {
 	auto const dub6        = ZoomRatio.x * 6.0F;
 	auto const threadWidth = std::array<int32_t, 3> {
 	    std::lround(dub6 * TSIZ30), std::lround(dub6 * TSIZ40), std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
-	auto tw  = gsl::make_span(threadWidth);
 	auto tsi = ThreadSizeIndex.begin();
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (StateMap->test(StateFlag::THRDS)) {
-		nuStchSiz(iColor, tw[*tsi]);
+		auto tw = wrap::next(threadWidth.begin(), *tsi);
+		nuStchSiz(iColor, *tw);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::COL)) {
 		  if (iColor == ActiveColor) {
-			nuStchSiz(iColor, tw[*tsi]);
+			auto tw = wrap::next(threadWidth.begin(), *tsi);
+			nuStchSiz(iColor, *tw);
 		  }
 		  else {
 			nuStchSiz(iColor, 1);
