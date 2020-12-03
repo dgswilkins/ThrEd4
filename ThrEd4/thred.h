@@ -275,7 +275,7 @@ namespace internal {
   void ilin() noexcept;
   void ilin1() noexcept;
   void infadj(float& xCoordinate, float& yCoordinate) noexcept;
-  void createBrushes();
+  void createBrushes() noexcept;
   void init();
   auto inrng(uint32_t stitch) noexcept -> bool;
   void insadj();
@@ -331,7 +331,7 @@ namespace internal {
   void nudgfn(float deltaX, float deltaY);
   void nulayr(uint8_t play);
   void nunams();
-  void nuscol(size_t iColor) noexcept;
+  void nuscol(size_t iColor);
   void nuselrct();
   void nuslst(uint32_t find);
   void nuthbak(uint32_t count);

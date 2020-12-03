@@ -9677,7 +9677,7 @@ void thred::internal::bakmrk() {
   }
 }
 
-void thred::internal::nuscol(size_t iColor) noexcept {
+void thred::internal::nuscol(size_t iColor) {
   auto uc  = wrap::next(UserColor.begin(), iColor);
   auto up  = wrap::next(UserPen->begin(), iColor);
   nuPen(*up, 1, *uc);
@@ -16086,11 +16086,10 @@ void thred::internal::setLayerPens() noexcept {
   LayerPen[4] = wrap::CreatePen(PS_SOLID, PENNWID, PENTEAL);
 }
 
-void thred::internal::createBrushes()
-{
+void thred::internal::createBrushes() noexcept {
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
-  auto uc = UserColor.begin();
+  auto uc  = UserColor.begin();
   for (auto color : DefaultColors) {
 	*(dcb++) = CreateSolidBrush(color);
 	*(ucb++) = CreateSolidBrush(*(uc++));
