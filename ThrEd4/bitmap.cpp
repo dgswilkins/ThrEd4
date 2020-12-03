@@ -452,7 +452,7 @@ void bitmap::setBmpColor() {
 	if (bitmap::ismap()) {
 	  bitmap::internal::bfil(BackgroundColor);
 	}
-	BitmapPen = thred::nuPen(BitmapPen, 1, BitmapColor);
+	thred::nuPen(BitmapPen, 1, BitmapColor);
 	thred::zumhom();
   }
 }

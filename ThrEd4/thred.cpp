@@ -2691,21 +2691,21 @@ void thred::internal::ritlayr() {
   }
 }
 
-auto thred::nuPen(HPEN pen, int32_t width, COLORREF color) noexcept -> HPEN {
+void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
   DeleteObject(pen);
-  return wrap::CreatePen(PS_SOLID, width, color);
+  pen = wrap::CreatePen(PS_SOLID, width, color);
 }
 
 void thred::internal::nuStchSiz(uint32_t iColor, int32_t width) noexcept {
   if (width != ThreadSizePixels[iColor]) {
-	UserPen->operator[](iColor)          = nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
+	nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
 	ThreadSizePixels[iColor] = width;
   }
 }
 
-auto thred::internal::nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH {
+void thred::internal::nuBrush(HBRUSH& brush, COLORREF color) noexcept {
   DeleteObject(brush);
-  return CreateSolidBrush(color);
+  brush = CreateSolidBrush(color);
 }
 
 void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept {
@@ -2912,7 +2912,7 @@ void thred::internal::redbal() {
 		auto const stitchCount  = bytesRead / sizeof(decltype(balaradStitch.back()));
 		BackgroundColor         = balaradHeader.backgroundColor;
 		IniFile.backgroundColor = balaradHeader.backgroundColor;
-		BackgroundPen           = nuPen(BackgroundPen, 1, BackgroundColor);
+		nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth      = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush        = CreateSolidBrush(BackgroundColor);
@@ -2952,7 +2952,7 @@ void thred::internal::redbal() {
 		auto ucb = UserColorBrush.begin();
 		for (auto& ucolor : UserColor) {
 		  *(up++) = wrap::CreatePen(PS_SOLID, PENNWID, ucolor);
-		  *ucb    = nuBrush(*ucb, ucolor);
+		  nuBrush(*ucb, ucolor);
 		  ++ucb;
 		}
 		thred::coltab();
@@ -3843,8 +3843,8 @@ void thred::internal::redbak() {
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
 	for (auto& color : UserColor) {
-	  *up  = nuPen(*up, 1, color);
-	  *ucb = nuBrush(*ucb, color);
+	  nuPen(*up, 1, color);
+	  nuBrush(*ucb, color);
 	  ++up;
 	  ++ucb;
 	}
@@ -4413,9 +4413,9 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	auto ts = ThreadSize.begin();
 	auto tsw = ThreadSizeWin.begin();
 	for (auto color : UserColor) {
-	  *up = nuPen(*up, 1, color);
+	  nuPen(*up, 1, color);
 	  ++up;
-	  *ucb = nuBrush(*ucb, color);
+	  nuBrush(*ucb, color);
 	  ++ucb;
 	  buffer[0] = *(ts++);
 	  SetWindowText(*(tsw++), buffer.data());
@@ -5415,7 +5415,7 @@ void thred::internal::duSelbox() noexcept {
 void thred::internal::setbak(int32_t penWidth) noexcept {
   if (BackgroundPenWidth != penWidth) {
 	BackgroundPenWidth = penWidth;
-	BackgroundPen      = nuPen(BackgroundPen, penWidth, BackgroundColor);
+	nuPen(BackgroundPen, penWidth, BackgroundColor);
   }
 }
 
@@ -9214,7 +9214,7 @@ void thred::internal::setgrd(COLORREF color) {
 	  CheckMenuItem(MainMenu, gridCode.id, MF_UNCHECKED);
 	}
   }
-  GridPen           = nuPen(GridPen, 1, color);
+  nuPen(GridPen, 1, color);
   IniFile.gridColor = color;
   StateMap->set(StateFlag::RESTCH);
   StateMap->set(StateFlag::DUMEN);
@@ -9680,9 +9680,9 @@ void thred::internal::bakmrk() {
 void thred::internal::nuscol(size_t iColor) noexcept {
   auto uc  = wrap::next(UserColor.begin(), iColor);
   auto up  = wrap::next(UserPen->begin(), iColor);
-  *up      = nuPen(*up, 1, *uc);
+  nuPen(*up, 1, *uc);
   auto ucb = wrap::next(UserColorBrush.begin(), iColor);
-  *ucb     = nuBrush(*ucb, *uc);
+  nuBrush(*ucb, *uc);
   thred::redraw(UserColorWin->operator[](iColor));
 }
 
@@ -12686,9 +12686,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto uc  = wrap::next(UserColor.begin(), VerticalIndex);
 	  *uc      = ColorStruct.rgbResult;
 	  auto up  = wrap::next(UserPen->begin(), VerticalIndex);
-	  *up      = nuPen(*up, 1, *uc);
+	  nuPen(*up, 1, *uc);
 	  auto ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
-	  *ucb     = nuBrush(*ucb, *uc);
+	  nuBrush(*ucb, *uc);
 	  thred::redraw(UserColorWin->operator[](VerticalIndex));
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -13311,7 +13311,7 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 	case VK_OEM_3: {                                             // '`~' for US
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
 		BackgroundColor    = 0x505050;
-		BackgroundPen      = nuPen(BackgroundPen, 1, BackgroundColor);
+		nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
@@ -14543,8 +14543,8 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  auto ucw = UserColorWin->begin();
 	  for (auto color : DefaultColors) {
 		*uc      = color;
-		*ucb = nuBrush(*ucb, *uc);
-		*up        = nuPen(*up, 1, *uc);
+		nuBrush(*ucb, *uc);
+		nuPen(*up, 1, *uc);
 		thred::redraw(*ucw);
 		++ucb;
 		++uc;
@@ -14851,7 +14851,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	case ID_VIEW_STCHBAK: { // view / Set / Background Color
 	  if (nuBak() != 0U) {
 		BackgroundColor    = BackgroundColorStruct.rgbResult;
-		BackgroundPen      = nuPen(BackgroundPen, 1, BackgroundColor);
+		nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
@@ -16931,7 +16931,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			                                stitchesToDraw[iStitch].y * ratio)};
 			}
 			else {
-			  pen = nuPen(pen, 1, colors[iColor]);
+			  nuPen(pen, 1, colors[iColor]);
 			  SelectObject(drawItem->hDC, pen);
 			  wrap::Polyline(drawItem->hDC, lines.data(), iLine);
 			  iLine  = 0;
@@ -16939,7 +16939,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			}
 		  }
 		  if (iLine != 0U) {
-			pen = nuPen(pen, 1, colors[iColor]);
+			nuPen(pen, 1, colors[iColor]);
 			SelectObject(drawItem->hDC, pen);
 			wrap::Polyline(drawItem->hDC, lines.data(), iLine);
 		  }

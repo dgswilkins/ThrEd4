@@ -73,7 +73,7 @@ void insflin(POINT insertPoint);
 auto inStitchWin() noexcept -> bool;
 auto maxColor() noexcept -> size_t;
 void movStch();
-auto nuPen(HPEN pen, int32_t width, COLORREF color) noexcept -> HPEN;
+void nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
@@ -320,7 +320,7 @@ namespace internal {
   void noMsg();
   void nuAct(uint32_t iStitch) noexcept;
   auto nuBak() noexcept -> BOOL;
-  auto nuBrush(HBRUSH brush, COLORREF color) noexcept -> HBRUSH;
+  void nuBrush(HBRUSH& brush, COLORREF color) noexcept;
   auto nuCol(COLORREF init) noexcept -> BOOL;
   void resetState();
   void nuFil(fileIndices fileIndex);
