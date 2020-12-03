@@ -16506,16 +16506,18 @@ void thred::internal::drwStch() {
 	}
 	thred::duzrat();
 	auto const dub6        = ZoomRatio.x * 6.0F;
-	const auto threadWidth = std::array<int32_t, 3> {
+	auto const threadWidth = std::array<int32_t, 3> {
 	    std::lround(dub6 * TSIZ30), std::lround(dub6 * TSIZ40), std::lround(dub6 * TSIZ60)}; // thread sizes in pixels
+	auto tw  = gsl::make_span(threadWidth);
+	auto tsi = ThreadSizeIndex.begin();
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (StateMap->test(StateFlag::THRDS)) {
-		nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
+		nuStchSiz(iColor, tw[*tsi]);
 	  }
 	  else {
 		if (StateMap->test(StateFlag::COL)) {
 		  if (iColor == ActiveColor) {
-			nuStchSiz(iColor, threadWidth[ThreadSizeIndex[iColor]]);
+			nuStchSiz(iColor, tw[*tsi]);
 		  }
 		  else {
 			nuStchSiz(iColor, 1);
@@ -16525,6 +16527,7 @@ void thred::internal::drwStch() {
 		  nuStchSiz(iColor, 1);
 		}
 	  }
+	  ++tsi;
 	}
 	DisplayedColorBitmap.reset();
 	if (StateMap->test(StateFlag::ZUMED)) {
