@@ -897,14 +897,18 @@ void thred::rngadj() {
 }
 
 void thred::internal::box(uint32_t iNearest, HDC dc) {
-  auto const boxWidth = BoxOffset[iNearest];
+  auto       bw       = wrap::next(BoxOffset.begin(), iNearest);
+  auto const boxWidth = *bw;
+  auto       np       = wrap::next(NearestPixel.begin(), iNearest);
+  auto npx = np->x;
+  auto npy = np->y;
   auto       line     = std::array<POINT, SQPNTS> {};
 
-  line[0] = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y - boxWidth};
-  line[1] = {NearestPixel[iNearest].x + boxWidth, NearestPixel[iNearest].y - boxWidth};
-  line[2] = {NearestPixel[iNearest].x + boxWidth, NearestPixel[iNearest].y + boxWidth};
-  line[3] = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y + boxWidth};
-  line[4] = {NearestPixel[iNearest].x - boxWidth, NearestPixel[iNearest].y - boxWidth};
+  line[0] = {npx - boxWidth, npy - boxWidth};
+  line[1] = {npx + boxWidth, npy - boxWidth};
+  line[2] = {npx + boxWidth, npy + boxWidth};
+  line[3] = {npx - boxWidth, npy + boxWidth};
+  line[4] = {npx - boxWidth, npy - boxWidth};
   wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
 }
 
@@ -4755,13 +4759,18 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	  return true;
 	}
   }
+  auto bo = BoxOffset.begin();
+  auto npi = NearestPixel.begin();
+  auto npo = NearestPoint.begin();
   for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
-	auto const offset = BoxOffset[iNear];
-	if (pointToCheck.x >= NearestPixel[iNear].x - offset && pointToCheck.x <= NearestPixel[iNear].x + offset &&
-	    pointToCheck.y >= NearestPixel[iNear].y - offset && pointToCheck.y <= NearestPixel[iNear].y + offset) {
-	  closestStitch = NearestPoint[iNear];
+	auto const offset = *(bo++);
+	auto const pixel = *(npi++);
+	if (pointToCheck.x >= pixel.x - offset && pointToCheck.x <= pixel.x + offset &&
+	    pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
+	  closestStitch = *npo;
 	  return true;
 	}
+	++npo;
   }
   auto const stitchPoint     = thred::pxCor2stch(Msg.pt);
   auto       distanceToClick = BIGFLOAT;
@@ -16165,8 +16174,9 @@ void thred::internal::init() {
   ButtonWidthX3             = ButtonWidth * 3;
   ButtonHeight              = size.cy + 4;
   auto const offsetStepSize = thred::txtWid(L"0");
-  for (auto iOffset = 0U; iOffset < NERCNT; ++iOffset) {
-	BoxOffset[iOffset] = offsetStepSize.cx * (gsl::narrow_cast<int32_t>(iOffset) + 1);
+  auto       step           = int32_t {1};
+  for (auto& offset : BoxOffset) {
+	offset = offsetStepSize.cx * step++;
   }
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
