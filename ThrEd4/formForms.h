@@ -24,10 +24,10 @@ void dasyfrm();
 void frmnum();
 void maxtsiz(std::wstring const& label, POINT& textSize);
 void prfmsg();
-void prfsid(HWND wnd) noexcept;
+void prfsid(HWND wnd);
 void refrm();
 void setear();
-void sidwnd(HWND wnd) noexcept;
+void sidwnd(HWND wnd);
 void wavfrm();
 
 namespace internal {

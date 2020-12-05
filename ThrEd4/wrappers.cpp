@@ -201,7 +201,3 @@ auto wrap::CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> 
   auto const scaledWidth = MulDiv(width, *screenDPI, STDDPI);
   return ::CreatePen(iStyle, scaledWidth, color);
 }
-
-void wrap::setSideWinVal(int index) {
-  SetWindowText(ValueWindow->operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
-}

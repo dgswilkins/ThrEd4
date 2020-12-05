@@ -445,10 +445,9 @@ void formForms::refrm() {
   ffi::refrmfn(form, formMenuEntryCount);
 }
 
-void formForms::sidwnd(HWND wnd) noexcept {
+void formForms::sidwnd(HWND wnd) {
   auto windowRect          = RECT {0L, 0L, 0L, 0L};
-  MsgIndex                 = 0;
-  SideWindowEntryBuffer[0] = 0;
+  thred::resetBuffer();
   auto const savedChoice   = FormMenuChoice;
   thred::unsid();
   FormMenuChoice = savedChoice;
@@ -468,11 +467,10 @@ void formForms::sidwnd(HWND wnd) noexcept {
                                    nullptr);
 }
 
-void formForms::prfsid(HWND wnd) noexcept {
-  auto windowRect          = RECT {0L, 0L, 0L, 0L};
-  MsgIndex                 = 0;
-  SideWindowEntryBuffer[0] = 0;
+void formForms::prfsid(HWND wnd) {
+  thred::resetBuffer();
   thred::unsid();
+  auto windowRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)

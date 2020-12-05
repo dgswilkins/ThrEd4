@@ -212,7 +212,6 @@ extern fRECTANGLE SelectedVerticesRect;
 extern float      ShowStitchThreshold;
 extern HWND       SideMessageWindow;
 
-extern std::array<wchar_t, SWBLEN> SideWindowEntryBuffer;
 extern std::array<HWND, SWCOUNT>   SideWindow;
 
 extern float SmallStitchLength;

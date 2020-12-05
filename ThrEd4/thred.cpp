@@ -190,6 +190,8 @@ static auto InsertCenter     = fPOINT {};                         // center poin
 static auto NumericCode      = wchar_t {};                        // keyboard numerical input
 static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
+static auto SideWindowEntryBuffer     = std::array<wchar_t, SWBLEN>{};      // buffer for entering form data sheet numbers
+
 // graphics variables
 
 static constexpr auto DefaultColors = std::array<COLORREF, COLORCNT> {0x00000000,
@@ -317,6 +319,11 @@ void thred::showColorWin() noexcept {
 
 auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
   return UserPen->operator[](iPen);
+}
+
+void thred::resetBuffer() {
+  MsgIndex                 = 0;
+  SideWindowEntryBuffer.fill(0);
 }
 
 void thred::internal::getdes() noexcept {
@@ -1336,6 +1343,10 @@ void thred::chkhup() {
   xt::setfchk();
 }
 
+void thred::internal::setSideWinVal(int index) {
+  SetWindowText(ValueWindow->operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
+}
+
 void thred::internal::chknum() {
   auto value = 0.0F;
   if (std::wcslen(MsgBuffer.data()) != 0U) {
@@ -1411,7 +1422,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
-			wrap::setSideWinVal(LFTHCOL);
+			thi::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
 		  thred::unsid();
@@ -1462,7 +1473,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.edgeSpacing = value;
 		  thred::unsid();
-		  wrap::setSideWinVal(LBRDPIC);
+		  thi::setSideWinVal(LBRDPIC);
 		  form::refil();
 		  return;
 		}
@@ -1470,7 +1481,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
 		  thred::unsid();
-		  wrap::setSideWinVal(LFRMFAZ);
+		  thi::setSideWinVal(LFRMFAZ);
 		  form::refil();
 		  return;
 		}
@@ -1478,7 +1489,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.edgeStitchLen = value * IPFGRAN;
 		  thred::unsid();
-		  wrap::setSideWinVal(LBRDPOS);
+		  thi::setSideWinVal(LBRDPOS);
 		  form::refil();
 		  return;
 		}
@@ -1486,7 +1497,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.maxFillStitchLen = value;
 		  thred::unsid();
-		  wrap::setSideWinVal(LMAXFIL);
+		  thi::setSideWinVal(LMAXFIL);
 		  form::refil();
 		  return;
 		}
@@ -1494,7 +1505,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.minFillStitchLen = value;
 		  thred::unsid();
-		  wrap::setSideWinVal(LMINFIL);
+		  thi::setSideWinVal(LMINFIL);
 		  form::refil();
 		  return;
 		}
@@ -1502,7 +1513,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.maxBorderStitchLen = value;
 		  thred::unsid();
-		  wrap::setSideWinVal(LMAXBRD);
+		  thi::setSideWinVal(LMAXBRD);
 		  form::refil();
 		  return;
 		}
@@ -1510,7 +1521,7 @@ void thred::internal::chknum() {
 		  thred::savdo();
 		  form.minBorderStitchLen = value;
 		  thred::unsid();
-		  wrap::setSideWinVal(LMINBRD);
+		  thi::setSideWinVal(LMINBRD);
 		  form::refil();
 		  return;
 		}

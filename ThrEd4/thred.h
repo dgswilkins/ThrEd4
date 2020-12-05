@@ -77,6 +77,7 @@ void nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
+void resetBuffer();
 void resetColorChanges() noexcept;
 void ritfcor(fPOINT const& point);
 void ritmov(uint32_t formIndex) noexcept;
@@ -415,6 +416,7 @@ namespace internal {
   void selup();
   void set1knot();
   auto setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint, fPOINT const& cellSize) -> bool;
+  void setSideWinVal(int index);
   void setbak(int32_t penWidth) noexcept;
   void setdst();
   void setgrd(COLORREF color);
