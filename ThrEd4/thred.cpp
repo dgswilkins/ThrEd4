@@ -900,8 +900,8 @@ void thred::internal::box(uint32_t iNearest, HDC dc) {
   auto       bw       = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth = *bw;
   auto       np       = wrap::next(NearestPixel.begin(), iNearest);
-  auto npx = np->x;
-  auto npy = np->y;
+  auto const npx = np->x;
+  auto const npy = np->y;
   auto       line     = std::array<POINT, SQPNTS> {};
 
   line[0] = {npx - boxWidth, npy - boxWidth};
@@ -15688,47 +15688,53 @@ void thred::internal::makCol() noexcept {
   auto buffer = std::array<wchar_t, 3> {};
   buffer[1]   = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const hFont = displayText::getThrEdFont(FONTSIZE);
-  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
+  auto const hFont   = displayText::getThrEdFont(FONTSIZE);
+  auto       dcw     = DefaultColorWin->begin();
+  auto       ucw     = UserColorWin->begin();
+  auto       ts      = ThreadSize.begin();
+  auto       yOffset = int32_t {};
+
+  for (auto& tsw : ThreadSizeWin) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	DefaultColorWin->operator[](iColor) = CreateWindow(L"STATIC",
-	                                                   nullptr,
-	                                                   SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                                   0,
-	                                                   ButtonHeight * gsl::narrow_cast<int32_t>(iColor),
-	                                                   ButtonWidth,
-	                                                   ButtonHeight,
-	                                                   ThrEdWindow,
-	                                                   nullptr,
-	                                                   ThrEdInstance,
-	                                                   nullptr);
-	displayText::setWindowFont(DefaultColorWin->operator[](iColor), hFont);
+	*dcw = CreateWindow(L"STATIC",
+	                        nullptr,
+	                        SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                        0,
+	                        yOffset,
+	                        ButtonWidth,
+	                        ButtonHeight,
+	                        ThrEdWindow,
+	                        nullptr,
+	                        ThrEdInstance,
+	                        nullptr);
+	displayText::setWindowFont(*(dcw++), hFont);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	UserColorWin->operator[](iColor) = CreateWindow(L"STATIC",
-	                                                nullptr,
-	                                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                                ButtonWidth,
-	                                                ButtonHeight * gsl::narrow_cast<int32_t>(iColor),
-	                                                ButtonWidth,
-	                                                ButtonHeight,
-	                                                ThrEdWindow,
-	                                                nullptr,
-	                                                ThrEdInstance,
-	                                                nullptr);
-	buffer[0]                        = ThreadSize[iColor];
+	*(ucw++)  = CreateWindow(L"STATIC",
+                            nullptr,
+                            SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                            ButtonWidth,
+                            yOffset,
+                            ButtonWidth,
+                            ButtonHeight,
+                            ThrEdWindow,
+                            nullptr,
+                            ThrEdInstance,
+                            nullptr);
+	buffer[0] = *(ts++);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	ThreadSizeWin[iColor] = CreateWindow(L"STATIC",
-	                                     buffer.data(),
-	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                     ButtonWidth * 2,
-	                                     ButtonHeight * gsl::narrow_cast<int32_t>(iColor),
-	                                     ButtonWidth,
-	                                     ButtonHeight,
-	                                     ThrEdWindow,
-	                                     nullptr,
-	                                     ThrEdInstance,
-	                                     nullptr);
-	displayText::setWindowFont(ThreadSizeWin[iColor], hFont);
+	tsw = CreateWindow(L"STATIC",
+	                   buffer.data(),
+	                   SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                   ButtonWidth * 2,
+	                   yOffset,
+	                   ButtonWidth,
+	                   ButtonHeight,
+	                   ThrEdWindow,
+	                   nullptr,
+	                   ThrEdInstance,
+	                   nullptr);
+	displayText::setWindowFont(tsw, hFont);
+	yOffset += ButtonHeight;
   }
 }
 
@@ -15841,6 +15847,22 @@ void thred::internal::setPrefs() {
   }
 }
 
+void thred::internal::loadColors() noexcept {
+  auto const isc   = gsl::make_span(IniFile.stitchColors);
+  auto iisc  = isc.begin();
+  auto const ispc  = gsl::make_span(IniFile.stitchPreferredColors);
+  auto iispc = ispc.begin();
+  auto const ibpc  = gsl::make_span(IniFile.backgroundPreferredColors);
+  auto iibpc = ibpc.begin();
+  auto cc    = CustomColor.begin();
+  auto cbc   = CustomBackgroundColor.begin();
+  for (auto& color : UserColor) {
+	color    = *(iisc++);
+	*(cc++)  = *(iispc++);
+	*(cbc++) = *(iibpc++);
+  }
+}
+
 void thred::internal::redini() {
   duhom();
   *IniFileName = *HomeDirectory;
@@ -15879,11 +15901,7 @@ void thred::internal::redini() {
 		}
 	  }
 	  DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
-	  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-		UserColor[iColor]             = IniFile.stitchColors[iColor];
-		CustomColor[iColor]           = IniFile.stitchPreferredColors[iColor];
-		CustomBackgroundColor[iColor] = IniFile.backgroundPreferredColors[iColor];
-	  }
+	  thi::loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
 	  bitmap::setBitmapColor(IniFile.bitmapColor);
@@ -16089,8 +16107,9 @@ void thred::internal::chkirct() noexcept {
   }
 }
 
-auto thred::getLayerPen(uint32_t layer) noexcept -> HPEN {
-  return LayerPen[layer];
+auto thred::getLayerPen(uint32_t layer) -> HPEN {
+  auto lp = wrap::next(LayerPen.begin(), layer);
+  return *lp;
 }
 
 void thred::internal::setLayerPens() noexcept {
