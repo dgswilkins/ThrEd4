@@ -16212,11 +16212,11 @@ void thred::internal::init() {
   ButtonWidth               = size.cx + TXTSIDS;
   ButtonWidthX3             = ButtonWidth * 3;
   ButtonHeight              = size.cy + 4;
-  auto const offsetStepSize = thred::txtWid(L"0");
-  auto       step           = int32_t {1};
-  for (auto& offset : BoxOffset) {
-	offset = offsetStepSize.cx * step++;
-  }
+  std::generate(BoxOffset.begin(),
+                BoxOffset.end(),
+                [step = int32_t {1}, offsetStepSize = thred::txtWid(L"0")]() mutable -> int32_t {
+	              return offsetStepSize.cx * step++;
+                });
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   ThreadSize.fill(L'4');
@@ -16321,10 +16321,9 @@ void thred::internal::init() {
   nuRct();
   // create pens
   static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  auto bc = boxColor.begin();
-  for (auto& pen : BoxPen) {
-	pen = wrap::CreatePen(PS_SOLID, PENNWID, *(bc++));
-  }
+  std::generate(BoxPen.begin(), BoxPen.end(), [bc = boxColor.begin()]() mutable -> HPEN {
+	return wrap::CreatePen(PS_SOLID, PENNWID, *(bc++));
+  });
   LinePen        = wrap::CreatePen(PS_SOLID, PENNWID, PENCHCL);
   CrossPen       = wrap::CreatePen(PS_SOLID, PENWWID, PENPRPLE);
   GroupSelectPen = wrap::CreatePen(PS_SOLID, PENNWID, PENPRPLE);
