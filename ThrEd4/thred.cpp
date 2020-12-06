@@ -190,7 +190,7 @@ static auto InsertCenter     = fPOINT {};                         // center poin
 static auto NumericCode      = wchar_t {};                        // keyboard numerical input
 static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
-static auto SideWindowEntryBuffer     = std::array<wchar_t, SWBLEN>{};      // buffer for entering form data sheet numbers
+static auto SideWindowEntryBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr);      // buffer for entering form data sheet numbers
 
 // graphics variables
 
@@ -323,7 +323,7 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 
 void thred::resetBuffer() {
   MsgIndex                 = 0;
-  SideWindowEntryBuffer.fill(0);
+  std::fill(SideWindowEntryBuffer->begin(), SideWindowEntryBuffer->end(), 0);
 }
 
 void thred::internal::getdes() noexcept {
@@ -1345,7 +1345,7 @@ void thred::chkhup() {
 }
 
 void thred::internal::setSideWinVal(int index) {
-  SetWindowText(ValueWindow->operator[](wrap::toSize(index)), SideWindowEntryBuffer.data());
+  SetWindowText(ValueWindow->operator[](wrap::toSize(index)), SideWindowEntryBuffer->data());
 }
 
 void thred::internal::chknum() {
@@ -1370,7 +1370,7 @@ void thred::internal::chknum() {
   if (MsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  value      = wrap::wcstof(SideWindowEntryBuffer.data()) * PFGRAN;
+	  value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
 		case LTXOF: {
 		  thred::savdo();
@@ -1422,7 +1422,7 @@ void thred::internal::chknum() {
 		case LFTHCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
+			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
 			thi::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1434,7 +1434,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1447,7 +1447,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			form::refilfn();
@@ -1461,7 +1461,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer.data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1644,7 +1644,7 @@ void thred::internal::chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) {
-		value = wrap::wcstof(SideWindowEntryBuffer.data());
+		value = wrap::wcstof(SideWindowEntryBuffer->data());
 		switch (PreferenceIndex - 1) {
 		  case PRFEGGRAT: {
 			IniFile.eggRatio = value;
@@ -15552,9 +15552,9 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
 		if (chkminus(code)) {
-		  MsgIndex                      = 1;
-		  SideWindowEntryBuffer.front() = '-';
-		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+		  thred::resetBuffer();
+		  SideWindowEntryBuffer->operator[](MsgIndex++) = '-';
+		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 		  return true;
 		}
 		if (dunum(code)) {
@@ -15572,10 +15572,10 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			thred::unsid();
 		  }
 		  else {
-			if (MsgIndex < (SideWindowEntryBuffer.size() - 1U)) {
-			  SideWindowEntryBuffer[MsgIndex++] = NumericCode;
-			  SideWindowEntryBuffer[MsgIndex]   = 0;
-			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+			if (MsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](MsgIndex++) = NumericCode;
+			  SideWindowEntryBuffer->operator[](MsgIndex)   = 0;
+			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 		  }
 		  return true;
@@ -15583,15 +15583,17 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		switch (code) {
 		  case VK_DECIMAL:      // numpad period
 		  case VK_OEM_PERIOD: { // period
-			SideWindowEntryBuffer[MsgIndex++] = '.';
-			SideWindowEntryBuffer[MsgIndex]   = 0;
-			SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+			if (MsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](MsgIndex++) = '.';
+			  SideWindowEntryBuffer->operator[](MsgIndex) = 0;
+			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+			}
 			return true;
 		  }
 		  case VK_BACK: { // backspace
 			if (MsgIndex != 0U) {
-			  SideWindowEntryBuffer[--MsgIndex] = 0;
-			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer.data());
+			  SideWindowEntryBuffer->operator[](--MsgIndex) = 0;
+			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
 		  }
@@ -17698,6 +17700,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_SelectedFormsLine         = std::vector<POINT> {};
 	  auto private_SelectedPointsLine        = std::vector<POINT> {};
 	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
+	  auto private_SideWindowEntryBuffer          = std::vector<wchar_t> {};
 	  auto private_StateMap                  = EnumMap<StateFlag> {0};
 	  auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
 	  auto private_TempPolygon               = std::vector<fPOINT> {};
@@ -17724,6 +17727,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
+	  private_SideWindowEntryBuffer.resize(SWBLEN);
 	  private_TextureHistory.resize(ITXBUFSZ);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
@@ -17776,6 +17780,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  SelectedFormList          = &private_SelectedFormList;
 	  SelectedFormsLine         = &private_SelectedFormsLine;
 	  SelectedPointsLine        = &private_SelectedPointsLine;
+	  SideWindowEntryBuffer     = &private_SideWindowEntryBuffer;
 	  StateMap                  = &private_StateMap;
 	  StitchBuffer              = &private_StitchBuffer;
 	  TempPolygon               = &private_TempPolygon;
