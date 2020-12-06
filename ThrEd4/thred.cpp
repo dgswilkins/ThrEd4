@@ -507,7 +507,8 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 	}
   }
   auto       iTmpName      = tmpName.begin();
-  auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
+  auto& ecn = ExtendedHeader->creatorName;
+  auto const spCreatorName = gsl::span<char, sizeof(ecn)/sizeof(ecn[0])>(ecn);
   for (auto& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
@@ -904,9 +905,9 @@ void thred::rngadj() {
 }
 
 void thred::internal::box(uint32_t iNearest, HDC dc) {
-  auto       bw       = wrap::next(BoxOffset.begin(), iNearest);
+  auto const bw       = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth = *bw;
-  auto       np       = wrap::next(NearestPixel.begin(), iNearest);
+  auto const np       = wrap::next(NearestPixel.begin(), iNearest);
   auto const npx = np->x;
   auto const npy = np->y;
   auto       line     = std::array<POINT, SQPNTS> {};
@@ -2820,7 +2821,8 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto const     defaultDirectory = gsl::make_span(IniFile.defaultDirectory);
+  auto& idd = IniFile.defaultDirectory;
+  auto const     defaultDirectory = gsl::span<char, sizeof(idd) / sizeof(idd[0])>(idd);
   constexpr char FILLCHAR         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
@@ -2835,7 +2837,8 @@ void thred::internal::ritini() {
 	++previousName;
   }
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const designerName = gsl::make_span(IniFile.designerName);
+  auto& idn = IniFile.designerName;
+  auto const designerName = gsl::span<char, sizeof(idn)/sizeof(idn[0])>(idn);
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
@@ -3102,7 +3105,7 @@ void thred::internal::duver(fs::path const& name) {
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
 	auto const src =
-	    gsl::span<char const> {gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count)};
+	    gsl::span<char const>(gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count));
 	destination.insert(destination.end(), src.begin(), src.end());
   }
 }
@@ -3121,7 +3124,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
+  auto& emn = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -3853,7 +3857,7 @@ void thred::internal::redbak() {
 	}
 	// ToDo - add field in BAKHED to keep track of number of colors
 	constexpr auto UCOLSIZE = UserColor.size();
-	auto const undoColors = gsl::span<COLORREF> {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+	auto const undoColors = gsl::span<COLORREF>(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
 	auto const userColors = gsl::span<COLORREF> {UserColor};
 	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
 	auto up  = UserPen->begin();
@@ -4118,7 +4122,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  UnzoomedRect = POINT {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 		}
 		ritfnam(*DesignerName);
-		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
+		auto& emn = ExtendedHeader->modifierName;
+		auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
 		std::copy(&IniFile.designerName[0],
 		          &IniFile.designerName[strlen(std::begin(desName))],
 		          modifierName.begin());
@@ -5240,7 +5245,8 @@ void thred::internal::newFil() {
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
+  auto& emn = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   rstdu();
   rstAll();
@@ -9700,7 +9706,7 @@ void thred::internal::bakmrk() {
 
 void thred::internal::nuscol(size_t iColor) {
   auto uc  = wrap::next(UserColor.begin(), iColor);
-  auto up  = wrap::next(UserPen->begin(), iColor);
+  auto const up  = wrap::next(UserPen->begin(), iColor);
   nuPen(*up, 1, *uc);
   auto ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *uc);
@@ -15859,11 +15865,14 @@ void thred::internal::setPrefs() {
 }
 
 void thred::internal::loadColors() noexcept {
-  auto const isc   = gsl::make_span(IniFile.stitchColors);
+  auto& risc = IniFile.stitchColors;
+  auto const isc   = gsl::span<COLORREF, sizeof(risc) / sizeof(risc[0])>(risc);
   auto iisc  = isc.begin();
-  auto const ispc  = gsl::make_span(IniFile.stitchPreferredColors);
+  auto& rispc = IniFile.stitchPreferredColors;
+  auto const ispc  = gsl::span<COLORREF, sizeof(rispc) / sizeof(rispc[0])>(rispc);
   auto iispc = ispc.begin();
-  auto const ibpc  = gsl::make_span(IniFile.backgroundPreferredColors);
+  auto& ribpc = IniFile.backgroundPreferredColors;
+  auto const ibpc  = gsl::span<COLORREF, sizeof(ribpc) / sizeof(ribpc[0])>(ribpc);
   auto iibpc = ibpc.begin();
   auto cc    = CustomColor.begin();
   auto cbc   = CustomBackgroundColor.begin();
@@ -16119,7 +16128,7 @@ void thred::internal::chkirct() noexcept {
 }
 
 auto thred::getLayerPen(uint32_t layer) -> HPEN {
-  auto lp = wrap::next(LayerPen.begin(), layer);
+  auto const lp = wrap::next(LayerPen.begin(), layer);
   return *lp;
 }
 
@@ -16354,7 +16363,8 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
+  auto& emn = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
   std::copy(designer.begin(), designer.end(), modifierName.begin());
   thred::chkhup();
   nedmen();

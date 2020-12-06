@@ -307,7 +307,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   // write the overall thumbnail
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
-  auto const     spThumbnail = gsl::span<std::array<uint8_t, THUMBWID>> {thumbnail};
+  auto const     spThumbnail = gsl::span<std::array<uint8_t, THUMBWID>>(thumbnail);
   for (auto& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
@@ -645,7 +645,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto const pecLabel  = gsl::make_span(pecHeader->label);
+		auto& phl = pecHeader->label;
+		auto const pecLabel  = gsl::span<char, sizeof(phl)/sizeof(phl[0])>(phl);
 		pi::pecnam(pecLabel);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));

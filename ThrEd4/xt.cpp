@@ -1323,7 +1323,8 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	auto const spFillArray = gsl::make_span(fillStartsData.fillArray);
+	auto& ffa = fillStartsData.fillArray;
+	auto const spFillArray = gsl::span<uint32_t, sizeof(ffa)/sizeof(ffa[0])>(ffa);
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
 	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {
