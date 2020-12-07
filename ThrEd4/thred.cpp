@@ -191,6 +191,7 @@ static auto NumericCode      = wchar_t {};                        // keyboard nu
 static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
 static auto SideWindowEntryBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr);      // buffer for entering form data sheet numbers
+static auto swMsgIndex = uint32_t {}; // track current position in SideWindowEntryBuffer
 
 // graphics variables
 
@@ -322,7 +323,7 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 }
 
 void thred::resetBuffer() {
-  MsgIndex                 = 0;
+  swMsgIndex = 0;
   std::fill(SideWindowEntryBuffer->begin(), SideWindowEntryBuffer->end(), 0);
 }
 
@@ -15553,7 +15554,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
 		if (chkminus(code)) {
 		  thred::resetBuffer();
-		  SideWindowEntryBuffer->operator[](MsgIndex++) = '-';
+		  SideWindowEntryBuffer->operator[](swMsgIndex++) = '-';
 		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 		  return true;
 		}
@@ -15572,9 +15573,9 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			thred::unsid();
 		  }
 		  else {
-			if (MsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](MsgIndex++) = NumericCode;
-			  SideWindowEntryBuffer->operator[](MsgIndex)   = 0;
+			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](swMsgIndex++) = NumericCode;
+			  SideWindowEntryBuffer->operator[](swMsgIndex)   = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 		  }
@@ -15583,16 +15584,16 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		switch (code) {
 		  case VK_DECIMAL:      // numpad period
 		  case VK_OEM_PERIOD: { // period
-			if (MsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](MsgIndex++) = '.';
-			  SideWindowEntryBuffer->operator[](MsgIndex) = 0;
+			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](swMsgIndex++) = '.';
+			  SideWindowEntryBuffer->operator[](swMsgIndex) = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
 		  }
 		  case VK_BACK: { // backspace
-			if (MsgIndex != 0U) {
-			  SideWindowEntryBuffer->operator[](--MsgIndex) = 0;
+			if (swMsgIndex != 0U) {
+			  SideWindowEntryBuffer->operator[](--swMsgIndex) = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
@@ -16323,7 +16324,7 @@ void thred::internal::init() {
   nuRct();
   // create pens
   static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  std::generate(BoxPen.begin(), BoxPen.end(), [bc = boxColor.begin()]() mutable -> HPEN {
+  std::generate(BoxPen.begin(), BoxPen.end(), [bc = boxColor.begin()]() mutable noexcept -> HPEN {
 	return wrap::CreatePen(PS_SOLID, PENNWID, *(bc++));
   });
   LinePen        = wrap::CreatePen(PS_SOLID, PENNWID, PENCHCL);
