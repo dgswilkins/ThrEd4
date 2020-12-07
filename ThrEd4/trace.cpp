@@ -55,6 +55,7 @@ static auto TraceRGBMask = std::array<uint32_t, 3> {REDMSK, GRNMSK, BLUMSK}; // 
 static auto TraceRGB     = std::array<uint32_t, 3> {BLUCOL, GRNCOL, REDCOL}; // trace colors
 static auto TraceAdjacentColors = std::array<uint32_t, ADJCOUNT> {}; // separated colors for adjacent pixels
 static auto TraceInputBuffer = std::array<wchar_t, 4> {};            // for user input color numbers
+static auto TraceMsgIndex    = uint32_t {}; // pointer to the trace buffer
 static auto UpPixelColor     = COLORREF {}; // color of the up reference pixel
 static auto DownPixelColor   = COLORREF {}; // color of the down reference pixel
 static auto InvertUpColor    = COLORREF {}; // complement color of the up reference pixel
@@ -944,7 +945,7 @@ void trace::dutrnum1() {
   DestroyWindow(GeneralNumberInputBox);
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN1);
-  auto traceLength = wrap::wcstof(MsgBuffer.data());
+  auto traceLength = thred::getMsgBufferValue();
   if (traceLength > MAXSIZ) {
 	traceLength = MAXSIZ;
   }
@@ -1069,7 +1070,7 @@ void trace::tracpar() {
 		if (position < 18U) {
 		  StateMap->set(StateFlag::NUMIN);
 		  StateMap->set(StateFlag::TRNIN0);
-		  MsgIndex            = 0;
+		  TraceMsgIndex       = 0;
 		  TraceInputBuffer[0] = 0;
 		  if (position < 17U) {
 			ti::trnumwnd0(ButtonHeight * 16);
@@ -1084,7 +1085,7 @@ void trace::tracpar() {
 		  if (position < 20) {
 			StateMap->set(StateFlag::NUMIN);
 			StateMap->set(StateFlag::TRNIN1);
-			MsgIndex            = 0;
+			TraceMsgIndex       = 0;
 			TraceInputBuffer[0] = 0;
 			if (position < 19U) {
 			  ti::trnumwnd1(ButtonHeight * 18);
@@ -1254,12 +1255,12 @@ void trace::wasTrace1() {
 }
 
 void trace::traceNumberInput(wchar_t NumericCode) {
-  auto iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  auto iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
   *(iTraceInputBuffer++) = NumericCode;
   *iTraceInputBuffer     = 0;
-  ++MsgIndex;
+  ++TraceMsgIndex;
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10));
-  switch (MsgIndex) {
+  switch (TraceMsgIndex) {
 	case 2: {
 	  if (traceColor > 25) {
 		ti::dutrnum0(traceColor);
@@ -1274,7 +1275,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in traceNumberInput: MsgIndex [{}]\n", MsgIndex);
+	  outDebugString(L"default hit in traceNumberInput: TraceMsgIndex [{}]\n", TraceMsgIndex);
 	  break;
 	}
   }
@@ -1282,7 +1283,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
 }
 
 void trace::traceNumberReset() {
-  auto const iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), MsgIndex);
+  auto const iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
   *iTraceInputBuffer           = 0;
   thred::redraw(TraceNumberInput);
 }

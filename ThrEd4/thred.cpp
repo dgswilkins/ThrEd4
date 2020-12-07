@@ -190,8 +190,11 @@ static auto InsertCenter     = fPOINT {};                         // center poin
 static auto NumericCode      = wchar_t {};                        // keyboard numerical input
 static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
-static auto SideWindowEntryBuffer     = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr);      // buffer for entering form data sheet numbers
+static auto SideWindowEntryBuffer =
+    gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
 static auto swMsgIndex = uint32_t {}; // track current position in SideWindowEntryBuffer
+static auto MsgBuffer  = std::array<wchar_t, MSGSIZ> {}; // for user messages
+static auto MsgIndex   = uint32_t {};                    // pointer to the message buffer
 
 // graphics variables
 
@@ -322,9 +325,18 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
   return UserPen->operator[](iPen);
 }
 
-void thred::resetBuffer() {
+void thred::resetSideBuffer() {
   swMsgIndex = 0;
   std::fill(SideWindowEntryBuffer->begin(), SideWindowEntryBuffer->end(), 0);
+}
+
+void thred::resetMsgBuffer() {
+  MsgIndex = 0;
+  std::fill(MsgBuffer.begin(), MsgBuffer.end(), 0);
+}
+
+auto thred::getMsgBufferValue() -> float {
+  return wrap::wcstof(MsgBuffer.data());
 }
 
 void thred::internal::getdes() noexcept {
@@ -1352,7 +1364,7 @@ void thred::internal::setSideWinVal(int index) {
 void thred::internal::chknum() {
   auto value = 0.0F;
   if (std::wcslen(MsgBuffer.data()) != 0U) {
-	value = wrap::wcstof(MsgBuffer.data());
+	value = thred::getMsgBufferValue();
 	outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
   }
   xt::clrstch();
@@ -1822,7 +1834,7 @@ void thred::internal::chknum() {
 	  else {
 		if (wcslen(MsgBuffer.data()) != 0U) {
 		  outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
-		  value = wrap::wcstof(MsgBuffer.data());
+		  value = thred::getMsgBufferValue();
 		  do {
 			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
 			  if (wrap::round<uint32_t>(value) < FormList->size()) {
@@ -13945,9 +13957,8 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   retflag = true;
   if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
-	MsgBuffer.fill(0);
-	MsgBuffer[0] = '-';
-	MsgIndex     = 1;
+	resetMsgBuffer();
+	MsgBuffer[MsgIndex++] = '-';
 	SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 	return true;
   }
@@ -15544,16 +15555,15 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
 		// Check for keycode 'dash' and numpad 'subtract'
 		if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
-		  MsgBuffer.fill(0);
-		  MsgBuffer[0] = '-';
-		  MsgIndex     = 1;
+		  resetMsgBuffer();
+		  MsgBuffer[MsgIndex++] = '-';
 		  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
 		  return true;
 		}
 	  }
 	  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
 		if (chkminus(code)) {
-		  thred::resetBuffer();
+		  thred::resetSideBuffer();
 		  SideWindowEntryBuffer->operator[](swMsgIndex++) = '-';
 		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 		  return true;
@@ -15628,7 +15638,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
 		if (std::wcslen(MsgBuffer.data()) != 0) {
-		  auto const value = wrap::wcstof(MsgBuffer.data());
+		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }
@@ -15637,7 +15647,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (std::wcslen(MsgBuffer.data()) != 0) {
-		  auto const value = wrap::wcstof(MsgBuffer.data());
+		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
 		  }

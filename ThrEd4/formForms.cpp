@@ -447,7 +447,7 @@ void formForms::refrm() {
 
 void formForms::sidwnd(HWND wnd) {
   auto windowRect          = RECT {0L, 0L, 0L, 0L};
-  thred::resetBuffer();
+  thred::resetSideBuffer();
   auto const savedChoice   = FormMenuChoice;
   thred::unsid();
   FormMenuChoice = savedChoice;
@@ -468,7 +468,7 @@ void formForms::sidwnd(HWND wnd) {
 }
 
 void formForms::prfsid(HWND wnd) {
-  thred::resetBuffer();
+  thred::resetSideBuffer();
   thred::unsid();
   auto windowRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(wnd, &windowRect);

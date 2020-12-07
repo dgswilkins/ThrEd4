@@ -64,6 +64,7 @@ auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle)
 auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
 auto getHomeDir() noexcept -> fs::path*;
 auto getLayerPen(uint32_t layer) -> HPEN;
+auto getMsgBufferValue() -> float;
 auto getUserPen(uint32_t iPen) noexcept -> HPEN;
 void grpAdj();
 void hidbit();
@@ -77,7 +78,8 @@ void nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept;
 auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
 void redclp();
 void redraw(HWND window) noexcept;
-void resetBuffer();
+void resetMsgBuffer();
+void resetSideBuffer();
 void resetColorChanges() noexcept;
 void ritfcor(fPOINT const& point);
 void ritmov(uint32_t formIndex) noexcept;

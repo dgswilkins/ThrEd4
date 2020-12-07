@@ -105,9 +105,9 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() {
-  auto messageRect = RECT {0L, 0L, 0L, 0L};
+  auto messageRect = RECT{ 0L, 0L, 0L, 0L };
   GetClientRect(MsgWindow, &messageRect);
-  auto wRect = RECT {0L, 0L, 0L, 0L};
+  auto wRect = RECT{ 0L, 0L, 0L, 0L };
   GetWindowRect(MainStitchWin, &wRect);
   auto xOffset = wRect.left;
   GetWindowRect(ThrEdWindow, &wRect);
@@ -124,8 +124,7 @@ void displayText::numWnd() {
                                        nullptr,
                                        ThrEdInstance,
                                        nullptr);
-  MsgIndex              = 0;
-  MsgBuffer.fill(0);
+  thred::resetMsgBuffer();
 }
 
 void displayText::msgflt(uint32_t messageId, float value) {
