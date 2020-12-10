@@ -1362,187 +1362,170 @@ void thred::internal::setSideWinVal(int index) {
 }
 
 void thred::internal::chknum() {
-  auto value = 0.0F;
-  if (std::wcslen(MsgBuffer.data()) != 0U) {
-	value = thred::getMsgBufferValue();
-	outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
-  }
   xt::clrstch();
-  if (StateMap->testAndReset(StateFlag::NUROT)) {
-	if (value != 0.0F) {
-	  IniFile.rotationAngle = value * DEGRADF;
-	}
-	return;
-  }
-  if (StateMap->testAndReset(StateFlag::ENTRSEG)) {
-	if (value != 0.0F) {
-	  IniFile.rotationAngle = PI_F2 / value;
-	}
-	return;
-  }
   if (swMsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
+	  auto const value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
-		case LTXOF: {
+	  case LTXOF: {
+		thred::savdo();
+		form.txof = value;
+		break;
+	  }
+	  case LUANG: {
+		thred::savdo();
+		form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
+		break;
+	  }
+	  case LUSPAC: {
+		thred::savdo();
+		form.underlaySpacing = value;
+		break;
+	  }
+	  case LWLKIND: {
+		thred::savdo();
+		form.underlayIndent = value;
+		break;
+	  }
+	  case LULEN: {
+		thred::savdo();
+		form.underlayStitchLen = value;
+		break;
+	  }
+	  case LDSTRT: {
+		thred::savdo();
+		form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
+		form.fillStart %= form.vertexCount;
+		break;
+	  }
+	  case LDEND: {
+		thred::savdo();
+		form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
+		form.fillEnd %= form.vertexCount;
+		break;
+	  }
+	  case LFTHUPCNT: {
+		thred::savdo();
+		auto upcnt = value * IPFGRAN;
+		constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
+		if (upcnt > FUPCLAMP) {
+		  upcnt = FUPCLAMP;
+		}
+		form.fillInfo.feather.upCount = wrap::round<uint8_t>(upcnt);
+		break;
+	  }
+	  case LFTHCOL: {
+		if (value != 0.0F) {
 		  thred::savdo();
-		  form.txof = value;
-		  break;
+		  form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+		  thi::setSideWinVal(LFTHCOL);
+		  thred::coltab();
 		}
-		case LUANG: {
+		thred::unsid();
+		StateMap->set(StateFlag::RESTCH);
+		return;
+	  }
+	  case LFRMCOL: {
+		if (value != 0.0F) {
 		  thred::savdo();
-		  form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
-		  break;
+		  auto const colVal = gsl::narrow_cast<uint8_t>(
+			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+		  form::nufilcol(colVal);
+		  SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
+		  thred::coltab();
 		}
-		case LUSPAC: {
+		thred::unsid();
+		StateMap->set(StateFlag::RESTCH);
+		return;
+	  }
+	  case LUNDCOL: {
+		if (value != 0.0F) {
 		  thred::savdo();
-		  form.underlaySpacing = value;
-		  break;
+		  auto const colVal = gsl::narrow_cast<uint8_t>(
+			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+		  form.underlayColor = colVal;
+		  SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
+		  form::refilfn();
+		  thred::coltab();
 		}
-		case LWLKIND: {
+		thred::unsid();
+		StateMap->set(StateFlag::RESTCH);
+		return;
+	  }
+	  case LBRDCOL: {
+		if (value != 0.0F) {
 		  thred::savdo();
-		  form.underlayIndent = value;
-		  break;
+		  auto const colVal = gsl::narrow_cast<uint8_t>(
+			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+		  form::nubrdcol(colVal);
+		  SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
+		  thred::coltab();
 		}
-		case LULEN: {
-		  thred::savdo();
-		  form.underlayStitchLen = value;
-		  break;
-		}
-		case LDSTRT: {
-		  thred::savdo();
-		  form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
-		  form.fillStart %= form.vertexCount;
-		  break;
-		}
-		case LDEND: {
-		  thred::savdo();
-		  form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
-		  form.fillEnd %= form.vertexCount;
-		  break;
-		}
-		case LFTHUPCNT: {
-		  thred::savdo();
-		  value *= IPFGRAN;
-		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
-		  if (value > FUPCLAMP) {
-			value = FUPCLAMP;
-		  }
-		  form.fillInfo.feather.upCount = wrap::round<uint8_t>(value);
-		  break;
-		}
-		case LFTHCOL: {
-		  if (value != 0.0F) {
-			thred::savdo();
-			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-			thi::setSideWinVal(LFTHCOL);
-			thred::coltab();
-		  }
-		  thred::unsid();
-		  StateMap->set(StateFlag::RESTCH);
-		  return;
-		}
-		case LFRMCOL: {
-		  if (value != 0.0F) {
-			thred::savdo();
-			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-			form::nufilcol(colVal);
-			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
-			thred::coltab();
-		  }
-		  thred::unsid();
-		  StateMap->set(StateFlag::RESTCH);
-		  return;
-		}
-		case LUNDCOL: {
-		  if (value != 0.0F) {
-			thred::savdo();
-			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-			form.underlayColor = colVal;
-			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
-			form::refilfn();
-			thred::coltab();
-		  }
-		  thred::unsid();
-		  StateMap->set(StateFlag::RESTCH);
-		  return;
-		}
-		case LBRDCOL: {
-		  if (value != 0.0F) {
-			thred::savdo();
-			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-			form::nubrdcol(colVal);
-			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
-			thred::coltab();
-		  }
-		  thred::unsid();
-		  StateMap->set(StateFlag::RESTCH);
-		  return;
-		}
-		case LBRDPIC: {
-		  thred::savdo();
-		  form.edgeSpacing = value;
-		  thred::unsid();
-		  thi::setSideWinVal(LBRDPIC);
-		  form::refil();
-		  return;
-		}
-		case LFRMFAZ: {
-		  thred::savdo();
-		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
-		  thred::unsid();
-		  thi::setSideWinVal(LFRMFAZ);
-		  form::refil();
-		  return;
-		}
-		case LBRDPOS: {
-		  thred::savdo();
-		  form.edgeStitchLen = value * IPFGRAN;
-		  thred::unsid();
-		  thi::setSideWinVal(LBRDPOS);
-		  form::refil();
-		  return;
-		}
-		case LMAXFIL: {
-		  thred::savdo();
-		  form.maxFillStitchLen = value;
-		  thred::unsid();
-		  thi::setSideWinVal(LMAXFIL);
-		  form::refil();
-		  return;
-		}
-		case LMINFIL: {
-		  thred::savdo();
-		  form.minFillStitchLen = value;
-		  thred::unsid();
-		  thi::setSideWinVal(LMINFIL);
-		  form::refil();
-		  return;
-		}
-		case LMAXBRD: {
-		  thred::savdo();
-		  form.maxBorderStitchLen = value;
-		  thred::unsid();
-		  thi::setSideWinVal(LMAXBRD);
-		  form::refil();
-		  return;
-		}
-		case LMINBRD: {
-		  thred::savdo();
-		  form.minBorderStitchLen = value;
-		  thred::unsid();
-		  thi::setSideWinVal(LMINBRD);
-		  form::refil();
-		  return;
-		}
-		default: {
-		  outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
-		  break;
-		}
+		thred::unsid();
+		StateMap->set(StateFlag::RESTCH);
+		return;
+	  }
+	  case LBRDPIC: {
+		thred::savdo();
+		form.edgeSpacing = value;
+		thred::unsid();
+		thi::setSideWinVal(LBRDPIC);
+		form::refil();
+		return;
+	  }
+	  case LFRMFAZ: {
+		thred::savdo();
+		form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
+		thred::unsid();
+		thi::setSideWinVal(LFRMFAZ);
+		form::refil();
+		return;
+	  }
+	  case LBRDPOS: {
+		thred::savdo();
+		form.edgeStitchLen = value * IPFGRAN;
+		thred::unsid();
+		thi::setSideWinVal(LBRDPOS);
+		form::refil();
+		return;
+	  }
+	  case LMAXFIL: {
+		thred::savdo();
+		form.maxFillStitchLen = value;
+		thred::unsid();
+		thi::setSideWinVal(LMAXFIL);
+		form::refil();
+		return;
+	  }
+	  case LMINFIL: {
+		thred::savdo();
+		form.minFillStitchLen = value;
+		thred::unsid();
+		thi::setSideWinVal(LMINFIL);
+		form::refil();
+		return;
+	  }
+	  case LMAXBRD: {
+		thred::savdo();
+		form.maxBorderStitchLen = value;
+		thred::unsid();
+		thi::setSideWinVal(LMAXBRD);
+		form::refil();
+		return;
+	  }
+	  case LMINBRD: {
+		thred::savdo();
+		form.minBorderStitchLen = value;
+		thred::unsid();
+		thi::setSideWinVal(LMINBRD);
+		form::refil();
+		return;
+	  }
+	  default: {
+		outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
+		break;
+	  }
 	  }
 	  if (FormMenuChoice == LBCSIZ) {
 		thred::savdo();
@@ -1556,92 +1539,92 @@ void thred::internal::chknum() {
 	  else {
 		if (value != 0.0F) {
 		  switch (FormMenuChoice) {
-			case LFTHSIZ: {
-			  thred::savdo();
-			  form.fillInfo.feather.ratio = value * IPFGRAN;
-			  break;
+		  case LFTHSIZ: {
+			thred::savdo();
+			form.fillInfo.feather.ratio = value * IPFGRAN;
+			break;
+		  }
+		  case LFTHNUM: {
+			thred::savdo();
+			form.fillInfo.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
+			break;
+		  }
+		  case LFTHFLR: {
+			thred::savdo();
+			form.fillInfo.feather.minStitchSize = value;
+			break;
+		  }
+		  case LFTHDWNCNT: {
+			thred::savdo();
+			auto dncnt = value * IPFGRAN;
+			constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
+			if (dncnt > FDNCLAMP) {
+			  dncnt = FDNCLAMP;
 			}
-			case LFTHNUM: {
-			  thred::savdo();
-			  form.fillInfo.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
-			  break;
-			}
-			case LFTHFLR: {
-			  thred::savdo();
-			  form.fillInfo.feather.minStitchSize = value;
-			  break;
-			}
-			case LFTHDWNCNT: {
-			  thred::savdo();
-			  value *= IPFGRAN;
-			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
-			  if (value > FDNCLAMP) {
-				value = FDNCLAMP;
-			  }
-			  form.fillInfo.feather.downCount = wrap::round<uint8_t>(value);
-			  break;
-			}
-			case LFRMSPAC: {
-			  thred::savdo();
-			  form.fillSpacing = value;
-			  break;
-			}
-			case LFRMLEN: {
-			  thred::savdo();
-			  form.lengthOrCount.stitchLength = value;
-			  break;
-			}
-			case LBRDSPAC: {
-			  thred::savdo();
-			  auto const edgeType = form.edgeType & NEGUND;
-			  switch (edgeType) {
-				case EDGEPROPSAT:
-				case EDGEOCHAIN:
-				case EDGELCHAIN: {
-				  form.edgeSpacing = value;
-				  break;
-				}
-				default: {
-				  form.edgeSpacing = value * 0.5F;
-				}
-			  }
-			  break;
-			}
-			case LBRDLEN: {
-			  thred::savdo();
-			  form.edgeStitchLen = value;
-			  break;
-			}
-			case LBRDSIZ: {
-			  thred::savdo();
-			  form.borderSize = value;
-			  break;
-			}
-			case LFRMANG: {
-			  thred::savdo();
-			  form.angleOrClipData.angle = value * DEGRADF * IPFGRAN;
-			  break;
-			}
-			case LSACANG: {
-			  thred::savdo();
-			  form.satinOrAngle.angle = value * DEGRADF * IPFGRAN;
-			  break;
-			}
-			case LAPCOL: {
-			  thred::savdo();
-			  form.borderColor &= COLMSK;
-			  auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
-			  if (borderColor != 0U) {
-				--borderColor;
-			  }
-			  borderColor &= COLMSK;
-			  form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>((borderColor) << 4U);
+			form.fillInfo.feather.downCount = wrap::round<uint8_t>(dncnt);
+			break;
+		  }
+		  case LFRMSPAC: {
+			thred::savdo();
+			form.fillSpacing = value;
+			break;
+		  }
+		  case LFRMLEN: {
+			thred::savdo();
+			form.lengthOrCount.stitchLength = value;
+			break;
+		  }
+		  case LBRDSPAC: {
+			thred::savdo();
+			auto const edgeType = form.edgeType & NEGUND;
+			switch (edgeType) {
+			case EDGEPROPSAT:
+			case EDGEOCHAIN:
+			case EDGELCHAIN: {
+			  form.edgeSpacing = value;
 			  break;
 			}
 			default: {
-			  outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
-			  break;
+			  form.edgeSpacing = value * 0.5F;
 			}
+			}
+			break;
+		  }
+		  case LBRDLEN: {
+			thred::savdo();
+			form.edgeStitchLen = value;
+			break;
+		  }
+		  case LBRDSIZ: {
+			thred::savdo();
+			form.borderSize = value;
+			break;
+		  }
+		  case LFRMANG: {
+			thred::savdo();
+			form.angleOrClipData.angle = value * DEGRADF * IPFGRAN;
+			break;
+		  }
+		  case LSACANG: {
+			thred::savdo();
+			form.satinOrAngle.angle = value * DEGRADF * IPFGRAN;
+			break;
+		  }
+		  case LAPCOL: {
+			thred::savdo();
+			form.borderColor &= COLMSK;
+			auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
+			if (borderColor != 0U) {
+			  --borderColor;
+			}
+			borderColor &= COLMSK;
+			form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>((borderColor) << 4U);
+			break;
+		  }
+		  default: {
+			outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
+			break;
+		  }
 		  }
 		}
 		else {
@@ -1657,386 +1640,397 @@ void thred::internal::chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) {
-		value = wrap::wcstof(SideWindowEntryBuffer->data());
+		auto const value = wrap::wcstof(SideWindowEntryBuffer->data());
 		switch (PreferenceIndex - 1) {
-		  case PRFEGGRAT: {
-			IniFile.eggRatio = value;
-			SetWindowText(ValueWindow->operator[](PRFEGGRAT), fmt::format(L"{:.2f}", value).c_str());
-			break;
-		  }
-		  case PRFNUGSTP: {
-			IniFile.cursorNudgeStep = value;
-			IniFile.nudgePixels     = pxchk(value);
-			SetWindowText(ValueWindow->operator[](PRFNUGSTP), fmt::format(L"{:.2f}", value).c_str());
-			break;
-		  }
-		  case PRFPCTSPC: {
-			PicotSpacing = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PRFPCTSPC), fmt::format(L"{:.2f}", value).c_str());
-			break;
-		  }
-		  case PRFCLPOFF: {
-			IniFile.clipOffset = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PRFCLPOFF), fmt::format(L"{:.2f} mm", value).c_str());
-			break;
-		  }
-		  case PRFCLPPHS: {
-			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-			SetWindowText(ValueWindow->operator[](PRFCLPPHS), fmt::format(L"{}", IniFile.fillPhase).c_str());
-			break;
-		  }
-		  case PRFCHFPOS: {
-			IniFile.chainRatio = value;
-			SetWindowText(ValueWindow->operator[](PRFCHFPOS), fmt::format(L"{:.2f}", value).c_str());
-			break;
-		  }
-		  case PRFSTCMIN: {
-			MinStitchLength = value * PFGRAN;
-			SetWindowText(ValueWindow->operator[](PRFSTCMIN), fmt::format(L"{:.2f}", value).c_str());
-			break;
-		  }
-		  default: {
-			if (value != 0.0F) {
-			  auto const bufVal = fmt::format(L"{:.2f}", value);
-			  switch (PreferenceIndex - 1) {
-				case PRFFILSPC: {
-				  LineSpacing = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFFILSPC), bufVal.c_str());
-				  break;
-				}
-				case PRFFILANG: {
-				  IniFile.fillAngle = value * DEGRADF;
-				  SetWindowText(ValueWindow->operator[](PRFFILANG), bufVal.c_str());
-				  break;
-				}
-				case PRFBRDWID: {
-				  BorderWidth         = value * PFGRAN;
-				  IniFile.borderWidth = BorderWidth;
-				  SetWindowText(ValueWindow->operator[](PRFBRDWID), bufVal.c_str());
-				  break;
-				}
-				case PRFSTCMAX: {
-				  IniFile.maxStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFSTCMAX), bufVal.c_str());
-				  break;
-				}
-				case PRFSTCUSR: {
-				  UserStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFSTCUSR), bufVal.c_str());
-				  break;
-				}
-				case PRFSMLSTH: {
-				  SmallStitchLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFSMLSTH), bufVal.c_str());
-				  break;
-				}
-				case PRFAPPCOL: {
-				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-				  SetWindowText(ValueWindow->operator[](PRFAPPCOL),
-				                fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
-				  break;
-				}
-				case PRFAPSLEN: {
-				  IniFile.AppStitchLen = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFAPSLEN), bufVal.c_str());
-				  break;
-				}
-				case PRFSNPSIZ: {
-				  SnapLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFSNPSIZ), bufVal.c_str());
-				  break;
-				}
-				case PRFSTRRAT: {
-				  StarRatio = value;
+		case PRFEGGRAT: {
+		  IniFile.eggRatio = value;
+		  SetWindowText(ValueWindow->operator[](PRFEGGRAT), fmt::format(L"{:.2f}", value).c_str());
+		  break;
+		}
+		case PRFNUGSTP: {
+		  IniFile.cursorNudgeStep = value;
+		  IniFile.nudgePixels     = pxchk(value);
+		  SetWindowText(ValueWindow->operator[](PRFNUGSTP), fmt::format(L"{:.2f}", value).c_str());
+		  break;
+		}
+		case PRFPCTSPC: {
+		  PicotSpacing = value * PFGRAN;
+		  SetWindowText(ValueWindow->operator[](PRFPCTSPC), fmt::format(L"{:.2f}", value).c_str());
+		  break;
+		}
+		case PRFCLPOFF: {
+		  IniFile.clipOffset = value * PFGRAN;
+		  SetWindowText(ValueWindow->operator[](PRFCLPOFF), fmt::format(L"{:.2f} mm", value).c_str());
+		  break;
+		}
+		case PRFCLPPHS: {
+		  IniFile.fillPhase = wrap::floor<uint32_t>(value);
+		  SetWindowText(ValueWindow->operator[](PRFCLPPHS), fmt::format(L"{}", IniFile.fillPhase).c_str());
+		  break;
+		}
+		case PRFCHFPOS: {
+		  IniFile.chainRatio = value;
+		  SetWindowText(ValueWindow->operator[](PRFCHFPOS), fmt::format(L"{:.2f}", value).c_str());
+		  break;
+		}
+		case PRFSTCMIN: {
+		  MinStitchLength = value * PFGRAN;
+		  SetWindowText(ValueWindow->operator[](PRFSTCMIN), fmt::format(L"{:.2f}", value).c_str());
+		  break;
+		}
+		default: {
+		  if (value != 0.0F) {
+			auto const bufVal = fmt::format(L"{:.2f}", value);
+			switch (PreferenceIndex - 1) {
+			case PRFFILSPC: {
+			  LineSpacing = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFFILSPC), bufVal.c_str());
+			  break;
+			}
+			case PRFFILANG: {
+			  IniFile.fillAngle = value * DEGRADF;
+			  SetWindowText(ValueWindow->operator[](PRFFILANG), bufVal.c_str());
+			  break;
+			}
+			case PRFBRDWID: {
+			  BorderWidth         = value * PFGRAN;
+			  IniFile.borderWidth = BorderWidth;
+			  SetWindowText(ValueWindow->operator[](PRFBRDWID), bufVal.c_str());
+			  break;
+			}
+			case PRFSTCMAX: {
+			  IniFile.maxStitchLength = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFSTCMAX), bufVal.c_str());
+			  break;
+			}
+			case PRFSTCUSR: {
+			  UserStitchLength = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFSTCUSR), bufVal.c_str());
+			  break;
+			}
+			case PRFSMLSTH: {
+			  SmallStitchLength = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFSMLSTH), bufVal.c_str());
+			  break;
+			}
+			case PRFAPPCOL: {
+			  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
+			  SetWindowText(ValueWindow->operator[](PRFAPPCOL),
+				fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
+			  break;
+			}
+			case PRFAPSLEN: {
+			  IniFile.AppStitchLen = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFAPSLEN), bufVal.c_str());
+			  break;
+			}
+			case PRFSNPSIZ: {
+			  SnapLength = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFSNPSIZ), bufVal.c_str());
+			  break;
+			}
+			case PRFSTRRAT: {
+			  StarRatio = value;
 
-				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
-				  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
-				  if (StarRatio > SRMAXLIM) {
-					StarRatio = SRMAXLIM;
-				  }
-				  if (StarRatio < SRMINLIM) {
-					StarRatio = SRMINLIM;
-				  }
-				  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
-				  break;
-				}
-				case PRFLENRAT: {
-				  IniFile.lensRatio = value;
-
-				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
-				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
-				  if (IniFile.lensRatio > LRMAXLIM) {
-					IniFile.lensRatio = LRMAXLIM;
-				  }
-				  if (IniFile.lensRatio < LRMINLIM) {
-					IniFile.lensRatio = LRMINLIM;
-				  }
-				  SetWindowText(ValueWindow->operator[](PRFLENRAT),
-				                fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
-				  break;
-				}
-				case PRFSPLWRP: {
-				  SpiralWrap = value;
-				  // ToDo - Are these limits correct?
-				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
-				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
-				  if (SpiralWrap > SRMAXLIM) {
-					SpiralWrap = SRMINLIM;
-				  }
-				  if (SpiralWrap < SRMINLIM) {
-					SpiralWrap = SRMINLIM;
-				  }
-				  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
-				  break;
-				}
-				case PRFBCNLEN: {
-				  ButtonholeCornerLength = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFBCNLEN), fmt::format(L"{:.2f}", value).c_str());
-				  break;
-				}
-				case PRFHUPWID: {
-				  IniFile.hoopSizeX = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFHUPWID), fmt::format(L"{:.0f} mm", value).c_str());
-				  form::sethup();
-				  formForms::prfmsg();
-				  thred::chkhup();
-				  break;
-				}
-				case PRFHUPHGT: {
-				  IniFile.hoopSizeY = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFHUPHGT), fmt::format(L"{:.0f} mm", value).c_str());
-				  form::sethup();
-				  formForms::prfmsg();
-				  thred::chkhup();
-				  break;
-				}
-				case PRFGRDSIZ: {
-				  IniFile.gridSize = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFGRDSIZ), fmt::format(L"{:.2f} mm", value).c_str());
-				  break;
-				}
-				case PRFCHFLEN: {
-				  IniFile.chainSpace = value * PFGRAN;
-				  SetWindowText(ValueWindow->operator[](PRFCHFLEN), fmt::format(L"{:.2f}", value).c_str());
-				  break;
-				}
-				default: {
-				  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
-				  break;
-				}
+			  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
+			  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
+			  if (StarRatio > SRMAXLIM) {
+				StarRatio = SRMAXLIM;
 			  }
+			  if (StarRatio < SRMINLIM) {
+				StarRatio = SRMINLIM;
+			  }
+			  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
+			  break;
+			}
+			case PRFLENRAT: {
+			  IniFile.lensRatio = value;
+
+			  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
+			  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
+			  if (IniFile.lensRatio > LRMAXLIM) {
+				IniFile.lensRatio = LRMAXLIM;
+			  }
+			  if (IniFile.lensRatio < LRMINLIM) {
+				IniFile.lensRatio = LRMINLIM;
+			  }
+			  SetWindowText(ValueWindow->operator[](PRFLENRAT),
+				fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
+			  break;
+			}
+			case PRFSPLWRP: {
+			  SpiralWrap = value;
+			  // ToDo - Are these limits correct?
+			  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
+			  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
+			  if (SpiralWrap > SRMAXLIM) {
+				SpiralWrap = SRMINLIM;
+			  }
+			  if (SpiralWrap < SRMINLIM) {
+				SpiralWrap = SRMINLIM;
+			  }
+			  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
+			  break;
+			}
+			case PRFBCNLEN: {
+			  ButtonholeCornerLength = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFBCNLEN), fmt::format(L"{:.2f}", value).c_str());
+			  break;
+			}
+			case PRFHUPWID: {
+			  IniFile.hoopSizeX = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFHUPWID), fmt::format(L"{:.0f} mm", value).c_str());
+			  form::sethup();
+			  formForms::prfmsg();
+			  thred::chkhup();
+			  break;
+			}
+			case PRFHUPHGT: {
+			  IniFile.hoopSizeY = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFHUPHGT), fmt::format(L"{:.0f} mm", value).c_str());
+			  form::sethup();
+			  formForms::prfmsg();
+			  thred::chkhup();
+			  break;
+			}
+			case PRFGRDSIZ: {
+			  IniFile.gridSize = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFGRDSIZ), fmt::format(L"{:.2f} mm", value).c_str());
+			  break;
+			}
+			case PRFCHFLEN: {
+			  IniFile.chainSpace = value * PFGRAN;
+			  SetWindowText(ValueWindow->operator[](PRFCHFLEN), fmt::format(L"{:.2f}", value).c_str());
+			  break;
+			}
+			default: {
+			  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
+			  break;
+			}
 			}
 		  }
+		}
 		}
 		thred::unsid();
 		PreferenceIndex = 0;
 	  }
-	  else {
-		if (wcslen(MsgBuffer.data()) != 0U) {
-		  outDebugString(L"chknum: buffer length [{}]\n", wcslen(MsgBuffer.data()));
-		  value = thred::getMsgBufferValue();
-		  do {
-			if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
-			  if (wrap::round<uint32_t>(value) < FormList->size()) {
-				form::frmnumfn(wrap::round<uint32_t>(value));
-			  }
-			  else {
-				displayText::tabmsg(IDS_FRMN1);
-			  }
-			  return;
-			}
-			auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
-			if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
-			  thred::savdo();
-			  form::durpoli(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
-			  thred::savdo();
-			  constexpr auto STARSIZE = 250.0F; // star size factor
-			  form::dustar(uintValue,
-			               STARSIZE / value * ZoomFactor *
-			                   wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
-			  thred::savdo();
-			  form::duspir(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTRHART)) {
-			  thred::savdo();
-			  form::duhart(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTRLENS)) {
-			  thred::savdo();
-			  form::dulens(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTREG)) {
-			  thred::savdo();
-			  form::dueg(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTRZIG)) {
-			  thred::savdo();
-			  form::duzig(uintValue);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::PIXIN)) {
-			  IniFile.nudgePixels = pxchk(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::STPXIN)) {
-			  IniFile.stitchSizePixels = pxchk(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FRMPXIN)) {
-			  IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FRMBOXIN)) {
-			  IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::GETMIN)) {
-			  SmallStitchLength = value * PFGRAN;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTR30)) {
-			  ThreadSize30 = value;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTR40)) {
-			  ThreadSize40 = value;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::ENTR60)) {
-			  ThreadSize60 = value;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::SCLPSPAC)) {
-			  IniFile.clipOffset = value * PFGRAN;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFIND)) {
-			  xt::dufind(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFHI)) {
-			  if (value != 0.0F) {
-				xt::dufhi(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFWID)) {
-			  if (value != 0.0F) {
-				xt::dufwid(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFMAX)) {
-			  if (value != 0.0F) {
-				xt::dufmax(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFMIN)) {
-			  xt::dufmin(value * PFGRAN);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETBMAX)) {
-			  if (value != 0.0F) {
-				xt::dubmax(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETBMIN)) {
-			  xt::dubmin(value * PFGRAN);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETBSPAC)) {
-			  if (value != 0.0F) {
-				xt::dubspac(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
-			  if (value != 0.0F) {
-				xt::dublen(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
-			  xt::dubcol(wrap::round<uint8_t>(value));
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
-			  xt::dufcol(wrap::round<uint8_t>(value));
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
-			  xt::dundcol(wrap::round<uint8_t>(value));
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFANG)) {
-			  xt::dufxang(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFSPAC)) {
-			  if (value != 0.0F) {
-				xt::dufspac(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETUANG)) {
-			  xt::dufang(value);
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
-			  if (value != 0.0F) {
-				xt::duflen(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETUSPAC)) {
-			  if (value != 0.0F) {
-				xt::duspac(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::FSETULEN)) {
-			  if (value != 0.0F) {
-				xt::dusulen(value * PFGRAN);
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::GTUANG)) {
-			  IniFile.underlayAngle = value * DEGRADF;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::GTUSPAC)) {
-			  if (value != 0.0F) {
-				IniFile.underlaySpacing = value * PFGRAN;
-			  }
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::GTWLKIND)) {
-			  IniFile.underlayIndent = value * PFGRAN;
-			  break;
-			}
-			if (StateMap->testAndReset(StateFlag::GTWLKLEN)) {
-			  if (value != 0.0F) {
-				IniFile.underlayStitchLen = value * PFGRAN;
-			  }
-			  break;
-			}
-		  } while (false);
-		}
-	  }
 	}
   }
+  if (wcslen(MsgBuffer.data()) != 0U) {
+	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
+	auto const value = thred::getMsgBufferValue();
+	if (StateMap->testAndReset(StateFlag::NUROT)) {
+	  if (value != 0.0F) {
+		IniFile.rotationAngle = value * DEGRADF;
+	  }
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRSEG)) {
+	  if (value != 0.0F) {
+		IniFile.rotationAngle = PI_F2 / value;
+	  }
+	  return;
+	}
+	if (StateMap->testAndReset(StateFlag::ENTRFNUM)) {
+	  if (wrap::round<uint32_t>(value) < FormList->size()) {
+		form::frmnumfn(wrap::round<uint32_t>(value));
+	  }
+	  else {
+		displayText::tabmsg(IDS_FRMN1);
+	  }
+	  return;
+	}
+	do {
+	  auto const uintValue = wrap::floor<uint32_t>(std::abs(value));
+	  if (StateMap->testAndReset(StateFlag::ENTRPOL)) {
+		thred::savdo();
+		form::durpoli(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTRSTAR)) {
+		thred::savdo();
+		constexpr auto STARSIZE = 250.0F; // star size factor
+		form::dustar(uintValue,
+		  STARSIZE / value * ZoomFactor *
+		  wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
+		thred::savdo();
+		form::duspir(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTRHART)) {
+		thred::savdo();
+		form::duhart(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTRLENS)) {
+		thred::savdo();
+		form::dulens(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTREG)) {
+		thred::savdo();
+		form::dueg(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTRZIG)) {
+		thred::savdo();
+		form::duzig(uintValue);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::PIXIN)) {
+		IniFile.nudgePixels = pxchk(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::STPXIN)) {
+		IniFile.stitchSizePixels = pxchk(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FRMPXIN)) {
+		IniFile.formVertexSizePixels = wrap::round<uint16_t>(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FRMBOXIN)) {
+		IniFile.formBoxSizePixels = wrap::round<uint16_t>(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::GETMIN)) {
+		SmallStitchLength = value * PFGRAN;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTR30)) {
+		ThreadSize30 = value;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTR40)) {
+		ThreadSize40 = value;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::ENTR60)) {
+		ThreadSize60 = value;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::SCLPSPAC)) {
+		IniFile.clipOffset = value * PFGRAN;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFIND)) {
+		xt::dufind(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFHI)) {
+		if (value != 0.0F) {
+		  xt::dufhi(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFWID)) {
+		if (value != 0.0F) {
+		  xt::dufwid(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFMAX)) {
+		if (value != 0.0F) {
+		  xt::dufmax(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFMIN)) {
+		xt::dufmin(value * PFGRAN);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETBMAX)) {
+		if (value != 0.0F) {
+		  xt::dubmax(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETBMIN)) {
+		xt::dubmin(value * PFGRAN);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETBSPAC)) {
+		if (value != 0.0F) {
+		  xt::dubspac(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
+		if (value != 0.0F) {
+		  xt::dublen(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETBCOL)) {
+		xt::dubcol(wrap::round<uint8_t>(value));
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFCOL)) {
+		xt::dufcol(wrap::round<uint8_t>(value));
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETUCOL)) {
+		xt::dundcol(wrap::round<uint8_t>(value));
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFANG)) {
+		xt::dufxang(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFSPAC)) {
+		if (value != 0.0F) {
+		  xt::dufspac(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETUANG)) {
+		xt::dufang(value);
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETFLEN)) {
+		if (value != 0.0F) {
+		  xt::duflen(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETUSPAC)) {
+		if (value != 0.0F) {
+		  xt::duspac(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::FSETULEN)) {
+		if (value != 0.0F) {
+		  xt::dusulen(value * PFGRAN);
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::GTUANG)) {
+		IniFile.underlayAngle = value * DEGRADF;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::GTUSPAC)) {
+		if (value != 0.0F) {
+		  IniFile.underlaySpacing = value * PFGRAN;
+		}
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::GTWLKIND)) {
+		IniFile.underlayIndent = value * PFGRAN;
+		break;
+	  }
+	  if (StateMap->testAndReset(StateFlag::GTWLKLEN)) {
+		if (value != 0.0F) {
+		  IniFile.underlayStitchLen = value * PFGRAN;
+		}
+		break;
+	  }
+	} while (false);
+  }
+
   StateMap->set(StateFlag::RESTCH);
 }
 
