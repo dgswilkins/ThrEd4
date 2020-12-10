@@ -1380,7 +1380,7 @@ void thred::internal::chknum() {
 	}
 	return;
   }
-  if (MsgIndex != 0U) {
+  if (swMsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
