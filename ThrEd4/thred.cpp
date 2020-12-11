@@ -193,7 +193,7 @@ static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr)
 static auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
 static auto swMsgIndex = uint32_t {}; // track current position in SideWindowEntryBuffer
-static auto MsgBuffer  = std::array<wchar_t, MSGSIZ> {}; // for user messages
+static auto MsgBuffer  = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
 static auto MsgIndex   = uint32_t {};                    // pointer to the message buffer
 
 // graphics variables
@@ -332,11 +332,11 @@ void thred::resetSideBuffer() {
 
 void thred::resetMsgBuffer() {
   MsgIndex = 0;
-  std::fill(MsgBuffer.begin(), MsgBuffer.end(), 0);
+  std::fill(MsgBuffer->begin(), MsgBuffer->end(), 0);
 }
 
 auto thred::getMsgBufferValue() -> float {
-  return wrap::wcstof(MsgBuffer.data());
+  return wrap::wcstof(MsgBuffer->data());
 }
 
 void thred::internal::getdes() noexcept {
@@ -1368,164 +1368,164 @@ void thred::internal::chknum() {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 	  auto const value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
-	  case LTXOF: {
-		thred::savdo();
-		form.txof = value;
-		break;
-	  }
-	  case LUANG: {
-		thred::savdo();
-		form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
-		break;
-	  }
-	  case LUSPAC: {
-		thred::savdo();
-		form.underlaySpacing = value;
-		break;
-	  }
-	  case LWLKIND: {
-		thred::savdo();
-		form.underlayIndent = value;
-		break;
-	  }
-	  case LULEN: {
-		thred::savdo();
-		form.underlayStitchLen = value;
-		break;
-	  }
-	  case LDSTRT: {
-		thred::savdo();
-		form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
-		form.fillStart %= form.vertexCount;
-		break;
-	  }
-	  case LDEND: {
-		thred::savdo();
-		form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
-		form.fillEnd %= form.vertexCount;
-		break;
-	  }
-	  case LFTHUPCNT: {
-		thred::savdo();
-		auto upcnt = value * IPFGRAN;
-		constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
-		if (upcnt > FUPCLAMP) {
-		  upcnt = FUPCLAMP;
-		}
-		form.fillInfo.feather.upCount = wrap::round<uint8_t>(upcnt);
-		break;
-	  }
-	  case LFTHCOL: {
-		if (value != 0.0F) {
+		case LTXOF: {
 		  thred::savdo();
-		  form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-		  thi::setSideWinVal(LFTHCOL);
-		  thred::coltab();
+		  form.txof = value;
+		  break;
 		}
-		thred::unsid();
-		StateMap->set(StateFlag::RESTCH);
-		return;
-	  }
-	  case LFRMCOL: {
-		if (value != 0.0F) {
+		case LUANG: {
 		  thred::savdo();
-		  auto const colVal = gsl::narrow_cast<uint8_t>(
-			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-		  form::nufilcol(colVal);
-		  SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
-		  thred::coltab();
+		  form.underlayStitchAngle = value * DEGRADF * IPFGRAN;
+		  break;
 		}
-		thred::unsid();
-		StateMap->set(StateFlag::RESTCH);
-		return;
-	  }
-	  case LUNDCOL: {
-		if (value != 0.0F) {
+		case LUSPAC: {
 		  thred::savdo();
-		  auto const colVal = gsl::narrow_cast<uint8_t>(
-			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-		  form.underlayColor = colVal;
-		  SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
-		  form::refilfn();
-		  thred::coltab();
+		  form.underlaySpacing = value;
+		  break;
 		}
-		thred::unsid();
-		StateMap->set(StateFlag::RESTCH);
-		return;
-	  }
-	  case LBRDCOL: {
-		if (value != 0.0F) {
+		case LWLKIND: {
 		  thred::savdo();
-		  auto const colVal = gsl::narrow_cast<uint8_t>(
-			(wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
-		  form::nubrdcol(colVal);
-		  SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
-		  thred::coltab();
+		  form.underlayIndent = value;
+		  break;
 		}
-		thred::unsid();
-		StateMap->set(StateFlag::RESTCH);
-		return;
-	  }
-	  case LBRDPIC: {
-		thred::savdo();
-		form.edgeSpacing = value;
-		thred::unsid();
-		thi::setSideWinVal(LBRDPIC);
-		form::refil();
-		return;
-	  }
-	  case LFRMFAZ: {
-		thred::savdo();
-		form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
-		thred::unsid();
-		thi::setSideWinVal(LFRMFAZ);
-		form::refil();
-		return;
-	  }
-	  case LBRDPOS: {
-		thred::savdo();
-		form.edgeStitchLen = value * IPFGRAN;
-		thred::unsid();
-		thi::setSideWinVal(LBRDPOS);
-		form::refil();
-		return;
-	  }
-	  case LMAXFIL: {
-		thred::savdo();
-		form.maxFillStitchLen = value;
-		thred::unsid();
-		thi::setSideWinVal(LMAXFIL);
-		form::refil();
-		return;
-	  }
-	  case LMINFIL: {
-		thred::savdo();
-		form.minFillStitchLen = value;
-		thred::unsid();
-		thi::setSideWinVal(LMINFIL);
-		form::refil();
-		return;
-	  }
-	  case LMAXBRD: {
-		thred::savdo();
-		form.maxBorderStitchLen = value;
-		thred::unsid();
-		thi::setSideWinVal(LMAXBRD);
-		form::refil();
-		return;
-	  }
-	  case LMINBRD: {
-		thred::savdo();
-		form.minBorderStitchLen = value;
-		thred::unsid();
-		thi::setSideWinVal(LMINBRD);
-		form::refil();
-		return;
-	  }
-	  default: {
-		outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
-		break;
-	  }
+		case LULEN: {
+		  thred::savdo();
+		  form.underlayStitchLen = value;
+		  break;
+		}
+		case LDSTRT: {
+		  thred::savdo();
+		  form.fillStart = wrap::round<uint32_t>(value * IPFGRAN);
+		  form.fillStart %= form.vertexCount;
+		  break;
+		}
+		case LDEND: {
+		  thred::savdo();
+		  form.fillEnd = wrap::round<uint32_t>(value * IPFGRAN);
+		  form.fillEnd %= form.vertexCount;
+		  break;
+		}
+		case LFTHUPCNT: {
+		  thred::savdo();
+		  auto upcnt = value * IPFGRAN;
+		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
+		  if (upcnt > FUPCLAMP) {
+			upcnt = FUPCLAMP;
+		  }
+		  form.fillInfo.feather.upCount = wrap::round<uint8_t>(upcnt);
+		  break;
+		}
+		case LFTHCOL: {
+		  if (value != 0.0F) {
+			thred::savdo();
+			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			thi::setSideWinVal(LFTHCOL);
+			thred::coltab();
+		  }
+		  thred::unsid();
+		  StateMap->set(StateFlag::RESTCH);
+		  return;
+		}
+		case LFRMCOL: {
+		  if (value != 0.0F) {
+			thred::savdo();
+			auto const colVal = gsl::narrow_cast<uint8_t>(
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			form::nufilcol(colVal);
+			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
+			thred::coltab();
+		  }
+		  thred::unsid();
+		  StateMap->set(StateFlag::RESTCH);
+		  return;
+		}
+		case LUNDCOL: {
+		  if (value != 0.0F) {
+			thred::savdo();
+			auto const colVal = gsl::narrow_cast<uint8_t>(
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			form.underlayColor = colVal;
+			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
+			form::refilfn();
+			thred::coltab();
+		  }
+		  thred::unsid();
+		  StateMap->set(StateFlag::RESTCH);
+		  return;
+		}
+		case LBRDCOL: {
+		  if (value != 0.0F) {
+			thred::savdo();
+			auto const colVal = gsl::narrow_cast<uint8_t>(
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			form::nubrdcol(colVal);
+			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
+			thred::coltab();
+		  }
+		  thred::unsid();
+		  StateMap->set(StateFlag::RESTCH);
+		  return;
+		}
+		case LBRDPIC: {
+		  thred::savdo();
+		  form.edgeSpacing = value;
+		  thred::unsid();
+		  thi::setSideWinVal(LBRDPIC);
+		  form::refil();
+		  return;
+		}
+		case LFRMFAZ: {
+		  thred::savdo();
+		  form.wordParam = wrap::floor<uint32_t>(value * IPFGRAN);
+		  thred::unsid();
+		  thi::setSideWinVal(LFRMFAZ);
+		  form::refil();
+		  return;
+		}
+		case LBRDPOS: {
+		  thred::savdo();
+		  form.edgeStitchLen = value * IPFGRAN;
+		  thred::unsid();
+		  thi::setSideWinVal(LBRDPOS);
+		  form::refil();
+		  return;
+		}
+		case LMAXFIL: {
+		  thred::savdo();
+		  form.maxFillStitchLen = value;
+		  thred::unsid();
+		  thi::setSideWinVal(LMAXFIL);
+		  form::refil();
+		  return;
+		}
+		case LMINFIL: {
+		  thred::savdo();
+		  form.minFillStitchLen = value;
+		  thred::unsid();
+		  thi::setSideWinVal(LMINFIL);
+		  form::refil();
+		  return;
+		}
+		case LMAXBRD: {
+		  thred::savdo();
+		  form.maxBorderStitchLen = value;
+		  thred::unsid();
+		  thi::setSideWinVal(LMAXBRD);
+		  form::refil();
+		  return;
+		}
+		case LMINBRD: {
+		  thred::savdo();
+		  form.minBorderStitchLen = value;
+		  thred::unsid();
+		  thi::setSideWinVal(LMINBRD);
+		  form::refil();
+		  return;
+		}
+		default: {
+		  outDebugString(L"default hit in chknum 1: FormMenuChoice [{}]\n", FormMenuChoice);
+		  break;
+		}
 	  }
 	  if (FormMenuChoice == LBCSIZ) {
 		thred::savdo();
@@ -1539,92 +1539,92 @@ void thred::internal::chknum() {
 	  else {
 		if (value != 0.0F) {
 		  switch (FormMenuChoice) {
-		  case LFTHSIZ: {
-			thred::savdo();
-			form.fillInfo.feather.ratio = value * IPFGRAN;
-			break;
-		  }
-		  case LFTHNUM: {
-			thred::savdo();
-			form.fillInfo.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
-			break;
-		  }
-		  case LFTHFLR: {
-			thred::savdo();
-			form.fillInfo.feather.minStitchSize = value;
-			break;
-		  }
-		  case LFTHDWNCNT: {
-			thred::savdo();
-			auto dncnt = value * IPFGRAN;
-			constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
-			if (dncnt > FDNCLAMP) {
-			  dncnt = FDNCLAMP;
+			case LFTHSIZ: {
+			  thred::savdo();
+			  form.fillInfo.feather.ratio = value * IPFGRAN;
+			  break;
 			}
-			form.fillInfo.feather.downCount = wrap::round<uint8_t>(dncnt);
-			break;
-		  }
-		  case LFRMSPAC: {
-			thred::savdo();
-			form.fillSpacing = value;
-			break;
-		  }
-		  case LFRMLEN: {
-			thred::savdo();
-			form.lengthOrCount.stitchLength = value;
-			break;
-		  }
-		  case LBRDSPAC: {
-			thred::savdo();
-			auto const edgeType = form.edgeType & NEGUND;
-			switch (edgeType) {
-			case EDGEPROPSAT:
-			case EDGEOCHAIN:
-			case EDGELCHAIN: {
-			  form.edgeSpacing = value;
+			case LFTHNUM: {
+			  thred::savdo();
+			  form.fillInfo.feather.count = wrap::round<uint16_t>(value * IPFGRAN);
+			  break;
+			}
+			case LFTHFLR: {
+			  thred::savdo();
+			  form.fillInfo.feather.minStitchSize = value;
+			  break;
+			}
+			case LFTHDWNCNT: {
+			  thred::savdo();
+			  auto dncnt = value * IPFGRAN;
+			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
+			  if (dncnt > FDNCLAMP) {
+				dncnt = FDNCLAMP;
+			  }
+			  form.fillInfo.feather.downCount = wrap::round<uint8_t>(dncnt);
+			  break;
+			}
+			case LFRMSPAC: {
+			  thred::savdo();
+			  form.fillSpacing = value;
+			  break;
+			}
+			case LFRMLEN: {
+			  thred::savdo();
+			  form.lengthOrCount.stitchLength = value;
+			  break;
+			}
+			case LBRDSPAC: {
+			  thred::savdo();
+			  auto const edgeType = form.edgeType & NEGUND;
+			  switch (edgeType) {
+				case EDGEPROPSAT:
+				case EDGEOCHAIN:
+				case EDGELCHAIN: {
+				  form.edgeSpacing = value;
+				  break;
+				}
+				default: {
+				  form.edgeSpacing = value * 0.5F;
+				}
+			  }
+			  break;
+			}
+			case LBRDLEN: {
+			  thred::savdo();
+			  form.edgeStitchLen = value;
+			  break;
+			}
+			case LBRDSIZ: {
+			  thred::savdo();
+			  form.borderSize = value;
+			  break;
+			}
+			case LFRMANG: {
+			  thred::savdo();
+			  form.angleOrClipData.angle = value * DEGRADF * IPFGRAN;
+			  break;
+			}
+			case LSACANG: {
+			  thred::savdo();
+			  form.satinOrAngle.angle = value * DEGRADF * IPFGRAN;
+			  break;
+			}
+			case LAPCOL: {
+			  thred::savdo();
+			  form.borderColor &= COLMSK;
+			  auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
+			  if (borderColor != 0U) {
+				--borderColor;
+			  }
+			  borderColor &= COLMSK;
+			  form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>((borderColor) << 4U);
 			  break;
 			}
 			default: {
-			  form.edgeSpacing = value * 0.5F;
+			  outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
+			  break;
 			}
-			}
-			break;
-		  }
-		  case LBRDLEN: {
-			thred::savdo();
-			form.edgeStitchLen = value;
-			break;
-		  }
-		  case LBRDSIZ: {
-			thred::savdo();
-			form.borderSize = value;
-			break;
-		  }
-		  case LFRMANG: {
-			thred::savdo();
-			form.angleOrClipData.angle = value * DEGRADF * IPFGRAN;
-			break;
-		  }
-		  case LSACANG: {
-			thred::savdo();
-			form.satinOrAngle.angle = value * DEGRADF * IPFGRAN;
-			break;
-		  }
-		  case LAPCOL: {
-			thred::savdo();
-			form.borderColor &= COLMSK;
-			auto borderColor = wrap::round<uint8_t>(value * IPFGRAN);
-			if (borderColor != 0U) {
-			  --borderColor;
-			}
-			borderColor &= COLMSK;
-			form.borderColor |= gsl::narrow_cast<decltype(form.borderColor)>((borderColor) << 4U);
-			break;
-		  }
-		  default: {
-			outDebugString(L"default hit in chknum 2: FormMenuChoice [{}]\n", FormMenuChoice);
-			break;
-		  }
 		  }
 		}
 		else {
@@ -1642,182 +1642,182 @@ void thred::internal::chknum() {
 	  if (PreferenceIndex != 0U) {
 		auto const value = wrap::wcstof(SideWindowEntryBuffer->data());
 		switch (PreferenceIndex - 1) {
-		case PRFEGGRAT: {
-		  IniFile.eggRatio = value;
-		  SetWindowText(ValueWindow->operator[](PRFEGGRAT), fmt::format(L"{:.2f}", value).c_str());
-		  break;
-		}
-		case PRFNUGSTP: {
-		  IniFile.cursorNudgeStep = value;
-		  IniFile.nudgePixels     = pxchk(value);
-		  SetWindowText(ValueWindow->operator[](PRFNUGSTP), fmt::format(L"{:.2f}", value).c_str());
-		  break;
-		}
-		case PRFPCTSPC: {
-		  PicotSpacing = value * PFGRAN;
-		  SetWindowText(ValueWindow->operator[](PRFPCTSPC), fmt::format(L"{:.2f}", value).c_str());
-		  break;
-		}
-		case PRFCLPOFF: {
-		  IniFile.clipOffset = value * PFGRAN;
-		  SetWindowText(ValueWindow->operator[](PRFCLPOFF), fmt::format(L"{:.2f} mm", value).c_str());
-		  break;
-		}
-		case PRFCLPPHS: {
-		  IniFile.fillPhase = wrap::floor<uint32_t>(value);
-		  SetWindowText(ValueWindow->operator[](PRFCLPPHS), fmt::format(L"{}", IniFile.fillPhase).c_str());
-		  break;
-		}
-		case PRFCHFPOS: {
-		  IniFile.chainRatio = value;
-		  SetWindowText(ValueWindow->operator[](PRFCHFPOS), fmt::format(L"{:.2f}", value).c_str());
-		  break;
-		}
-		case PRFSTCMIN: {
-		  MinStitchLength = value * PFGRAN;
-		  SetWindowText(ValueWindow->operator[](PRFSTCMIN), fmt::format(L"{:.2f}", value).c_str());
-		  break;
-		}
-		default: {
-		  if (value != 0.0F) {
-			auto const bufVal = fmt::format(L"{:.2f}", value);
-			switch (PreferenceIndex - 1) {
-			case PRFFILSPC: {
-			  LineSpacing = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFFILSPC), bufVal.c_str());
-			  break;
-			}
-			case PRFFILANG: {
-			  IniFile.fillAngle = value * DEGRADF;
-			  SetWindowText(ValueWindow->operator[](PRFFILANG), bufVal.c_str());
-			  break;
-			}
-			case PRFBRDWID: {
-			  BorderWidth         = value * PFGRAN;
-			  IniFile.borderWidth = BorderWidth;
-			  SetWindowText(ValueWindow->operator[](PRFBRDWID), bufVal.c_str());
-			  break;
-			}
-			case PRFSTCMAX: {
-			  IniFile.maxStitchLength = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFSTCMAX), bufVal.c_str());
-			  break;
-			}
-			case PRFSTCUSR: {
-			  UserStitchLength = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFSTCUSR), bufVal.c_str());
-			  break;
-			}
-			case PRFSMLSTH: {
-			  SmallStitchLength = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFSMLSTH), bufVal.c_str());
-			  break;
-			}
-			case PRFAPPCOL: {
-			  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-			  SetWindowText(ValueWindow->operator[](PRFAPPCOL),
-				fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
-			  break;
-			}
-			case PRFAPSLEN: {
-			  IniFile.AppStitchLen = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFAPSLEN), bufVal.c_str());
-			  break;
-			}
-			case PRFSNPSIZ: {
-			  SnapLength = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFSNPSIZ), bufVal.c_str());
-			  break;
-			}
-			case PRFSTRRAT: {
-			  StarRatio = value;
+		  case PRFEGGRAT: {
+			IniFile.eggRatio = value;
+			SetWindowText(ValueWindow->operator[](PRFEGGRAT), fmt::format(L"{:.2f}", value).c_str());
+			break;
+		  }
+		  case PRFNUGSTP: {
+			IniFile.cursorNudgeStep = value;
+			IniFile.nudgePixels     = pxchk(value);
+			SetWindowText(ValueWindow->operator[](PRFNUGSTP), fmt::format(L"{:.2f}", value).c_str());
+			break;
+		  }
+		  case PRFPCTSPC: {
+			PicotSpacing = value * PFGRAN;
+			SetWindowText(ValueWindow->operator[](PRFPCTSPC), fmt::format(L"{:.2f}", value).c_str());
+			break;
+		  }
+		  case PRFCLPOFF: {
+			IniFile.clipOffset = value * PFGRAN;
+			SetWindowText(ValueWindow->operator[](PRFCLPOFF), fmt::format(L"{:.2f} mm", value).c_str());
+			break;
+		  }
+		  case PRFCLPPHS: {
+			IniFile.fillPhase = wrap::floor<uint32_t>(value);
+			SetWindowText(ValueWindow->operator[](PRFCLPPHS), fmt::format(L"{}", IniFile.fillPhase).c_str());
+			break;
+		  }
+		  case PRFCHFPOS: {
+			IniFile.chainRatio = value;
+			SetWindowText(ValueWindow->operator[](PRFCHFPOS), fmt::format(L"{:.2f}", value).c_str());
+			break;
+		  }
+		  case PRFSTCMIN: {
+			MinStitchLength = value * PFGRAN;
+			SetWindowText(ValueWindow->operator[](PRFSTCMIN), fmt::format(L"{:.2f}", value).c_str());
+			break;
+		  }
+		  default: {
+			if (value != 0.0F) {
+			  auto const bufVal = fmt::format(L"{:.2f}", value);
+			  switch (PreferenceIndex - 1) {
+				case PRFFILSPC: {
+				  LineSpacing = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFFILSPC), bufVal.c_str());
+				  break;
+				}
+				case PRFFILANG: {
+				  IniFile.fillAngle = value * DEGRADF;
+				  SetWindowText(ValueWindow->operator[](PRFFILANG), bufVal.c_str());
+				  break;
+				}
+				case PRFBRDWID: {
+				  BorderWidth         = value * PFGRAN;
+				  IniFile.borderWidth = BorderWidth;
+				  SetWindowText(ValueWindow->operator[](PRFBRDWID), bufVal.c_str());
+				  break;
+				}
+				case PRFSTCMAX: {
+				  IniFile.maxStitchLength = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFSTCMAX), bufVal.c_str());
+				  break;
+				}
+				case PRFSTCUSR: {
+				  UserStitchLength = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFSTCUSR), bufVal.c_str());
+				  break;
+				}
+				case PRFSMLSTH: {
+				  SmallStitchLength = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFSMLSTH), bufVal.c_str());
+				  break;
+				}
+				case PRFAPPCOL: {
+				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
+				  SetWindowText(ValueWindow->operator[](PRFAPPCOL),
+				                fmt::format(L"{}", (AppliqueColor + 1U)).c_str());
+				  break;
+				}
+				case PRFAPSLEN: {
+				  IniFile.AppStitchLen = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFAPSLEN), bufVal.c_str());
+				  break;
+				}
+				case PRFSNPSIZ: {
+				  SnapLength = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFSNPSIZ), bufVal.c_str());
+				  break;
+				}
+				case PRFSTRRAT: {
+				  StarRatio = value;
 
-			  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
-			  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
-			  if (StarRatio > SRMAXLIM) {
-				StarRatio = SRMAXLIM;
-			  }
-			  if (StarRatio < SRMINLIM) {
-				StarRatio = SRMINLIM;
-			  }
-			  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
-			  break;
-			}
-			case PRFLENRAT: {
-			  IniFile.lensRatio = value;
+				  constexpr auto SRMINLIM = 0.01F; // star ratio minimum limit
+				  constexpr auto SRMAXLIM = 1.0F;  // star ratio maximum limit
+				  if (StarRatio > SRMAXLIM) {
+					StarRatio = SRMAXLIM;
+				  }
+				  if (StarRatio < SRMINLIM) {
+					StarRatio = SRMINLIM;
+				  }
+				  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
+				  break;
+				}
+				case PRFLENRAT: {
+				  IniFile.lensRatio = value;
 
-			  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
-			  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
-			  if (IniFile.lensRatio > LRMAXLIM) {
-				IniFile.lensRatio = LRMAXLIM;
+				  constexpr auto LRMINLIM = 0.1F;  // lens ratio minimum limit
+				  constexpr auto LRMAXLIM = 10.0F; // lens ratio maximum limit
+				  if (IniFile.lensRatio > LRMAXLIM) {
+					IniFile.lensRatio = LRMAXLIM;
+				  }
+				  if (IniFile.lensRatio < LRMINLIM) {
+					IniFile.lensRatio = LRMINLIM;
+				  }
+				  SetWindowText(ValueWindow->operator[](PRFLENRAT),
+				                fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
+				  break;
+				}
+				case PRFSPLWRP: {
+				  SpiralWrap = value;
+				  // ToDo - Are these limits correct?
+				  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
+				  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
+				  if (SpiralWrap > SRMAXLIM) {
+					SpiralWrap = SRMINLIM;
+				  }
+				  if (SpiralWrap < SRMINLIM) {
+					SpiralWrap = SRMINLIM;
+				  }
+				  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
+				  break;
+				}
+				case PRFBCNLEN: {
+				  ButtonholeCornerLength = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFBCNLEN), fmt::format(L"{:.2f}", value).c_str());
+				  break;
+				}
+				case PRFHUPWID: {
+				  IniFile.hoopSizeX = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFHUPWID), fmt::format(L"{:.0f} mm", value).c_str());
+				  form::sethup();
+				  formForms::prfmsg();
+				  thred::chkhup();
+				  break;
+				}
+				case PRFHUPHGT: {
+				  IniFile.hoopSizeY = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFHUPHGT), fmt::format(L"{:.0f} mm", value).c_str());
+				  form::sethup();
+				  formForms::prfmsg();
+				  thred::chkhup();
+				  break;
+				}
+				case PRFGRDSIZ: {
+				  IniFile.gridSize = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFGRDSIZ), fmt::format(L"{:.2f} mm", value).c_str());
+				  break;
+				}
+				case PRFCHFLEN: {
+				  IniFile.chainSpace = value * PFGRAN;
+				  SetWindowText(ValueWindow->operator[](PRFCHFLEN), fmt::format(L"{:.2f}", value).c_str());
+				  break;
+				}
+				default: {
+				  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
+				  break;
+				}
 			  }
-			  if (IniFile.lensRatio < LRMINLIM) {
-				IniFile.lensRatio = LRMINLIM;
-			  }
-			  SetWindowText(ValueWindow->operator[](PRFLENRAT),
-				fmt::format(L"{:.2f}", IniFile.lensRatio).c_str());
-			  break;
-			}
-			case PRFSPLWRP: {
-			  SpiralWrap = value;
-			  // ToDo - Are these limits correct?
-			  constexpr auto SRMINLIM = 0.3F;  // spiral wrap minimum limit
-			  constexpr auto SRMAXLIM = 20.0F; // spiral wrap maximum limit
-			  if (SpiralWrap > SRMAXLIM) {
-				SpiralWrap = SRMINLIM;
-			  }
-			  if (SpiralWrap < SRMINLIM) {
-				SpiralWrap = SRMINLIM;
-			  }
-			  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
-			  break;
-			}
-			case PRFBCNLEN: {
-			  ButtonholeCornerLength = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFBCNLEN), fmt::format(L"{:.2f}", value).c_str());
-			  break;
-			}
-			case PRFHUPWID: {
-			  IniFile.hoopSizeX = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFHUPWID), fmt::format(L"{:.0f} mm", value).c_str());
-			  form::sethup();
-			  formForms::prfmsg();
-			  thred::chkhup();
-			  break;
-			}
-			case PRFHUPHGT: {
-			  IniFile.hoopSizeY = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFHUPHGT), fmt::format(L"{:.0f} mm", value).c_str());
-			  form::sethup();
-			  formForms::prfmsg();
-			  thred::chkhup();
-			  break;
-			}
-			case PRFGRDSIZ: {
-			  IniFile.gridSize = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFGRDSIZ), fmt::format(L"{:.2f} mm", value).c_str());
-			  break;
-			}
-			case PRFCHFLEN: {
-			  IniFile.chainSpace = value * PFGRAN;
-			  SetWindowText(ValueWindow->operator[](PRFCHFLEN), fmt::format(L"{:.2f}", value).c_str());
-			  break;
-			}
-			default: {
-			  outDebugString(L"default hit in chknum 3: PreferenceIndex [{}]\n", PreferenceIndex - 1);
-			  break;
-			}
 			}
 		  }
-		}
 		}
 		thred::unsid();
 		PreferenceIndex = 0;
 	  }
 	}
   }
-  if (wcslen(MsgBuffer.data()) != 0U) {
-	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer.data()), MsgBuffer.size());
+  if (wcslen(MsgBuffer->data()) != 0U) {
+	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 	auto const value = thred::getMsgBufferValue();
 	if (StateMap->testAndReset(StateFlag::NUROT)) {
 	  if (value != 0.0F) {
@@ -13952,8 +13952,8 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
   retflag = true;
   if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
 	resetMsgBuffer();
-	MsgBuffer[MsgIndex++] = '-';
-	SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	MsgBuffer->operator[](MsgIndex++) = '-';
+	SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	return true;
   }
   if (dunum(code)) {
@@ -13961,18 +13961,19 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 	  trace::traceNumberInput(NumericCode);
 	}
 	else {
-	  MsgBuffer[MsgIndex++] = NumericCode;
-	  MsgBuffer[MsgIndex]   = 0;
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  MsgBuffer->operator[](MsgIndex++) = NumericCode;
+	  MsgBuffer->operator[](MsgIndex)   = 0;
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	}
 	return true;
   }
   switch (code) {
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period
-	  MsgBuffer[MsgIndex++] = '.';
-	  MsgBuffer[MsgIndex]   = 0;
-	  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+	  // ToDo - only allow entry if there is not already a period in the buffer
+	  MsgBuffer->operator[](MsgIndex++) = '.';
+	  MsgBuffer->operator[](MsgIndex)   = 0;
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	  return true;
 	}
 	case VK_BACK: { // backspace
@@ -13982,8 +13983,8 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 		  trace::traceNumberReset();
 		}
 		else {
-		  MsgBuffer[MsgIndex] = 0;
-		  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+		  MsgBuffer->operator[](MsgIndex) = 0;
+		  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 		}
 	  }
 	  return true;
@@ -15550,8 +15551,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		// Check for keycode 'dash' and numpad 'subtract'
 		if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
 		  resetMsgBuffer();
-		  MsgBuffer[MsgIndex++] = '-';
-		  SetWindowText(GeneralNumberInputBox, MsgBuffer.data());
+		  MsgBuffer->operator[](MsgIndex++) = '-';
+		  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 		  return true;
 		}
 	  }
@@ -15588,6 +15589,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		switch (code) {
 		  case VK_DECIMAL:      // numpad period
 		  case VK_OEM_PERIOD: { // period
+			// ToDo - only allow entry if there is not already a period in the buffer
 			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
 			  SideWindowEntryBuffer->operator[](swMsgIndex++) = '.';
 			  SideWindowEntryBuffer->operator[](swMsgIndex) = 0;
@@ -15631,7 +15633,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
-		if (std::wcslen(MsgBuffer.data()) != 0) {
+		if (std::wcslen(MsgBuffer->data()) != 0) {
+		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
@@ -15640,7 +15643,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		form::duprot(IniFile.rotationAngle);
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
-		if (std::wcslen(MsgBuffer.data()) != 0) {
+		if (std::wcslen(MsgBuffer->data()) != 0) {
+		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
@@ -17694,6 +17698,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		    nullptr // bmpItem
 #endif              /* WINVER >= 0x0500 */
 	  };
+
+	  auto private_MsgBuffer                 = std::vector<wchar_t> {};
 	  auto private_OSequence                 = std::vector<fPOINT> {};
 	  auto private_OutsidePointList          = std::vector<fPOINT> {};
 	  auto private_PreviousNames             = std::vector<fs::path> {};
@@ -17729,6 +17735,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_DefaultColorWin.resize(COLORCNT);
 	  private_FormControlPoints.resize(OUTPNTS);
 	  private_LabelWindow.resize(LASTLIN);
+	  private_MsgBuffer.resize(MSGSIZ);
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
@@ -17776,6 +17783,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  Knots                     = &private_Knots;
 	  LabelWindow               = &private_LabelWindow;
 	  MenuInfo                  = &private_MenuInfo;
+	  MsgBuffer                 = &private_MsgBuffer;
 	  OSequence                 = &private_OSequence;
 	  OutsidePointList          = &private_OutsidePointList;
 	  PreviousNames             = &private_PreviousNames;
