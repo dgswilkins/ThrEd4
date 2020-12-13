@@ -194,7 +194,6 @@ static auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
 static auto swMsgIndex = uint32_t {}; // track current position in SideWindowEntryBuffer
 static auto MsgBuffer  = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
-static auto MsgIndex   = uint32_t {};                    // pointer to the message buffer
 
 // graphics variables
 
@@ -331,8 +330,8 @@ void thred::resetSideBuffer() {
 }
 
 void thred::resetMsgBuffer() {
-  MsgIndex = 0;
-  std::fill(MsgBuffer->begin(), MsgBuffer->end(), 0);
+  MsgBuffer->clear();
+  MsgBuffer->push_back(0);
 }
 
 auto thred::getMsgBufferValue() -> float {
@@ -1816,7 +1815,7 @@ void thred::internal::chknum() {
 	  }
 	}
   }
-  if (wcslen(MsgBuffer->data()) != 0U) {
+  if (MsgBuffer->size() > 1) {
 	outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 	auto const value = thred::getMsgBufferValue();
 	if (StateMap->testAndReset(StateFlag::NUROT)) {
@@ -13950,10 +13949,13 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 
 auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> bool {
   retflag = true;
-  if (StateMap->test(StateFlag::SCLPSPAC) && code == VK_OEM_MINUS && (MsgIndex == 0U)) {
-	resetMsgBuffer();
-	MsgBuffer->operator[](MsgIndex++) = '-';
-	SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+  if (StateMap->test(StateFlag::SCLPSPAC) && (code == VK_OEM_MINUS || code == VK_SUBTRACT)) {
+	if (MsgBuffer->front() != '-') {
+	  resetMsgBuffer();
+	  MsgBuffer->back() = '-';
+	  MsgBuffer->push_back(0);
+	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+	}
 	return true;
   }
   if (dunum(code)) {
@@ -13961,8 +13963,8 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 	  trace::traceNumberInput(NumericCode);
 	}
 	else {
-	  MsgBuffer->operator[](MsgIndex++) = NumericCode;
-	  MsgBuffer->operator[](MsgIndex)   = 0;
+	  MsgBuffer->back() = NumericCode;
+	  MsgBuffer->push_back(0);
 	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	}
 	return true;
@@ -13971,21 +13973,19 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 	case VK_DECIMAL:      // numpad period
 	case VK_OEM_PERIOD: { // period
 	  // ToDo - only allow entry if there is not already a period in the buffer
-	  MsgBuffer->operator[](MsgIndex++) = '.';
-	  MsgBuffer->operator[](MsgIndex)   = 0;
+	  MsgBuffer->back() = '.';
+	  MsgBuffer->push_back(0);
 	  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	  return true;
 	}
 	case VK_BACK: { // backspace
-	  if (MsgIndex != 0U) {
-		--MsgIndex;
-		if (StateMap->test(StateFlag::TRNIN0)) {
-		  trace::traceNumberReset();
-		}
-		else {
-		  MsgBuffer->operator[](MsgIndex) = 0;
-		  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
-		}
+	  if (StateMap->test(StateFlag::TRNIN0)) {
+		trace::traceNumberReset();
+	  }
+	  if (MsgBuffer->size() > 1) {
+		MsgBuffer->pop_back();
+		MsgBuffer->back() = 0;
+		SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
 	  }
 	  return true;
 	}
@@ -15550,17 +15550,22 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if (StateMap->test(StateFlag::FSETFSPAC) || StateMap->test(StateFlag::GTWLKIND)) {
 		// Check for keycode 'dash' and numpad 'subtract'
 		if (code == VK_OEM_MINUS || code == VK_SUBTRACT) {
-		  resetMsgBuffer();
-		  MsgBuffer->operator[](MsgIndex++) = '-';
-		  SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+		  if (MsgBuffer->front() != '-') {
+			resetMsgBuffer();
+			MsgBuffer->back() = '-';
+			MsgBuffer->push_back(0);
+			SetWindowText(GeneralNumberInputBox, MsgBuffer->data());
+		  }
 		  return true;
 		}
 	  }
 	  if ((FormMenuChoice != 0U) || (PreferenceIndex != 0U)) {
 		if (chkminus(code)) {
-		  thred::resetSideBuffer();
-		  SideWindowEntryBuffer->operator[](swMsgIndex++) = '-';
-		  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+		  if (SideWindowEntryBuffer->front() != '-') {
+			thred::resetSideBuffer();
+			SideWindowEntryBuffer->operator[](swMsgIndex++) = '-';
+			SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
+		  }
 		  return true;
 		}
 		if (dunum(code)) {
@@ -15633,7 +15638,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
-		if (std::wcslen(MsgBuffer->data()) != 0) {
+		if (MsgBuffer->size() > 1) {
 		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
@@ -15643,7 +15648,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		form::duprot(IniFile.rotationAngle);
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
-		if (std::wcslen(MsgBuffer->data()) != 0) {
+		if (MsgBuffer->size() > 1) {
 		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
@@ -17735,7 +17740,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_DefaultColorWin.resize(COLORCNT);
 	  private_FormControlPoints.resize(OUTPNTS);
 	  private_LabelWindow.resize(LASTLIN);
-	  private_MsgBuffer.resize(MSGSIZ);
+	  private_MsgBuffer.reserve(MSGSIZ);
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
