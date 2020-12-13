@@ -2532,7 +2532,6 @@ void xt::setclpspac() {
   displayText::msgflt(IDS_CLPSPAC, IniFile.clipOffset * IPFGRAN);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(StateFlag::SCLPSPAC);
-  displayText::numWnd();
 }
 
 auto CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
