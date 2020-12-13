@@ -112,18 +112,23 @@ void displayText::numWnd() {
   auto xOffset = wRect.left;
   GetWindowRect(ThrEdWindow, &wRect);
   xOffset -= wRect.left;
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  GeneralNumberInputBox = CreateWindow(L"STATIC",
-                                       nullptr,
-                                       SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                       xOffset + 5,
-                                       messageRect.bottom + 15,
-                                       ButtonWidthX3,
-                                       ButtonHeight,
-                                       ThrEdWindow,
-                                       nullptr,
-                                       ThrEdInstance,
-                                       nullptr);
+  if (nullptr == GeneralNumberInputBox) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	GeneralNumberInputBox = CreateWindow(L"STATIC",
+	  nullptr,
+	  SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	  xOffset + 5,
+	  messageRect.bottom + 15,
+	  ButtonWidthX3,
+	  ButtonHeight,
+	  ThrEdWindow,
+	  nullptr,
+	  ThrEdInstance,
+	  nullptr);
+  }
+  else {
+	throw; // we should never reach this 
+  }
   thred::resetMsgBuffer();
 }
 
