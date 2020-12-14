@@ -292,8 +292,8 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 	feather.ratioLocal = 0.5F;
 	duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
 	feather.ratioLocal      = feather.minStitch / length / 2;
-	auto const sequence     = OSequence->operator[](iSequence);
-	auto const sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto const& sequence     = OSequence->operator[](iSequence);
+	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
 	xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
 	xratf(adjustedPoint, sequenceFwd1, nextPoint, feather.ratioLocal);
 	feather.ratioLocal = feather.ratio;
@@ -494,15 +494,15 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 	}
 	auto const underlayStitchLength = form.underlayStitchLen;
 	auto const iSeqMax              = OSequence->size() - 1U;
+	auto sequence = OSequence->begin();
+	auto sequenceFwd1 = std::next(sequence);
 	for (auto iSequence = size_t {0U}; iSequence < iSeqMax; ++iSequence) {
-	  auto const sequence     = OSequence->operator[](iSequence);
-	  auto const sequenceFwd1 = OSequence->operator[](iSequence + 1U);
-	  auto const delta        = fPOINT {sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y};
+	  auto const delta        = fPOINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
 	  auto const length       = hypot(delta.x, delta.y);
 	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
 	  if (stitchCount != 0U) {
 		auto const step = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
-		auto point = sequence;
+		auto point = *sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
 		  point.x += step.x;
@@ -510,8 +510,10 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 		}
 	  }
 	  else {
-		InterleaveSequence->push_back(OSequence->operator[](iSequence));
+		InterleaveSequence->push_back(*sequence);
 	  }
+	  ++sequence;
+	  ++sequenceFwd1;
 	}
 	InterleaveSequence->push_back(OSequence->back());
 	// ToDo - should this be front or (back - 1) ?
