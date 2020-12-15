@@ -2367,7 +2367,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	auto iNextStitch = startStitch + 1U;
 	auto prevPoint   = StitchBuffer->operator[](startStitch);
 	for (auto iStitch = iNextStitch; iStitch < endStitch; ++iStitch) {
-	  auto const stitch = StitchBuffer->operator[](iStitch);
+	  auto const& stitch = StitchBuffer->operator[](iStitch);
 	  if ((StitchBuffer->operator[](iNextStitch).attribute & KNOTMSK) != 0U) {
 		prevPoint = StitchBuffer->operator[](iNextStitch);
 
@@ -4786,7 +4786,7 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto npo = NearestPoint.begin();
   for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	auto const offset = *(bo++);
-	auto const pixel = *(npi++);
+	auto const& pixel = *(npi++);
 	if (pointToCheck.x >= pixel.x - offset && pointToCheck.x <= pixel.x + offset &&
 	    pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
 	  closestStitch = *npo;
@@ -7138,14 +7138,14 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  StateMap->set(StateFlag::BADFIL);
 		}
 		if (fileHeader.formCount != 0U) {
-		  auto const insertedVertex = FormVertices->operator[](InsertedVertexIndex);
+		  auto const& insertedVertex = FormVertices->operator[](InsertedVertexIndex);
 		  insertedRectangle.left    = insertedVertex.x;
 		  insertedRectangle.right   = insertedVertex.x;
 		  insertedRectangle.bottom  = insertedVertex.y;
 		  insertedRectangle.top     = insertedVertex.y;
 		  for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
 		       ++iVertex) {
-			auto const vertex = FormVertices->operator[](iVertex);
+			auto const& vertex = FormVertices->operator[](iVertex);
 			if (vertex.x < insertedRectangle.left) {
 			  insertedRectangle.left = vertex.x;
 			}
@@ -7647,7 +7647,7 @@ auto thred::internal::iselpnt() noexcept -> bool {
   auto       closestControlPoint = 0U;
   auto       minimumLength       = BIGDBL;
   auto       iControlPoint       = 0U;
-  for (auto controlPoint : *FormControlPoints) {
+  for (auto& controlPoint : *FormControlPoints) {
 	auto const length = hypot(pointToTest.x - controlPoint.x, pointToTest.y - controlPoint.y);
 	if (length < minimumLength) {
 	  minimumLength       = length;
@@ -16763,7 +16763,7 @@ void thred::internal::drwStch() {
 		}
 		if (!linePoints.empty()) {
 		  wrap::Polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
-		  auto lastPoint = linePoints.back();
+		  auto const lastPoint = linePoints.back();
 		  linePoints.clear();
 		  linePoints.push_back(lastPoint);
 		}
