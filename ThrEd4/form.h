@@ -401,8 +401,8 @@ namespace internal {
   void prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
   auto proj(fPOINT const& point, float slope, fPOINT const& point0, fPOINT const& point1, fPOINT& intersectionPoint) noexcept
       -> bool;
-  auto projh(float yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept -> bool;
-  auto projv(float xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
+  auto projh(float const yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept -> bool;
+  auto projv(float const xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
       -> bool;
   void prpsbrd(uint32_t formIndex);
   void prsmal(float width);

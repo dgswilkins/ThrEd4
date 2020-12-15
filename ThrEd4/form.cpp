@@ -1493,7 +1493,7 @@ void form::duangs(FRMHED const& form) {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-auto form::internal::projv(float xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
+auto form::internal::projv(float const xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
     -> bool {
   auto const deltaX = upperPoint.x - lowerPoint.x;
   intersection.x    = xCoordinate;
@@ -1612,7 +1612,7 @@ auto form::linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t fini
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-auto form::internal::projh(float yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept
+auto form::internal::projh(float const yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept
     -> bool {
   auto const deltaX = point1.x - point0.x;
   intersection.y    = yCoordinate;
@@ -1988,8 +1988,8 @@ void form::internal::prsmal(float width) {
   auto iReference = 0U;
   for (auto iSequence = 1U; iSequence < wrap::toUnsigned(OSequence->size()); ++iSequence) {
 	// clang-format off
-	auto const seq    = OSequence->operator[](iSequence);
-	auto const seqRef = OSequence->operator[](iReference);
+	auto const& seq    = OSequence->operator[](iSequence);
+	auto const& seqRef = OSequence->operator[](iReference);
 	auto const delta  = fPOINT {seq.x - seqRef.x, seq.y - seqRef.y};
 	auto const length = hypot(delta.x, delta.y);
 	// clang-format on
@@ -2741,21 +2741,20 @@ auto form::internal::isect(uint32_t                   vertex0,
                            std::vector<fPOINT> const& currentFormVertices) -> bool {
   auto const delta =
       fPOINT {(lineSegmentEnd.x - lineSegmentStart.x), (lineSegmentEnd.y - lineSegmentStart.y)};
-  auto const point            = lineSegmentStart;
   auto       tempIntersection = fPOINT {};
   auto       flag             = false;
   auto const vertexZero       = wrap::next(currentFormVertices.cbegin(), vertex0);
   auto const vertexOne        = wrap::next(currentFormVertices.cbegin(), vertex1);
   if ((delta.x != 0.0F) && (delta.y != 0.0F)) {
-	flag = proj(point, delta.y / delta.x, *vertexZero, *vertexOne, tempIntersection);
+	flag = proj(lineSegmentStart, delta.y / delta.x, *vertexZero, *vertexOne, tempIntersection);
   }
   else {
 	if (delta.y != 0.0F) {
-	  flag = projv(point.x, *vertexZero, *vertexOne, tempIntersection);
+	  flag = projv(lineSegmentStart.x, *vertexZero, *vertexOne, tempIntersection);
 	}
 	else {
 	  if (delta.x != 0.0F) {
-		flag = projh(point.y, *vertexZero, *vertexOne, tempIntersection);
+		flag = projh(lineSegmentStart.y, *vertexZero, *vertexOne, tempIntersection);
 	  }
 	  else if (vertexZero->y == lineSegmentStart.y && vertexOne->y == lineSegmentStart.y) {
 		auto left  = vertexZero->x;
@@ -6674,7 +6673,7 @@ void form::dueg(uint32_t sides) {
   }
   auto const eggRatio = maximumY / (vertexIt[sides >> 2U].y - vertexIt[0].y);
   vertexIt            = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto const ref      = vertexIt[0];
+  auto const ref      = *vertexIt;
   for (uint32_t iVertex = 1; iVertex < form.vertexCount; ++iVertex) {
 	*vertexIt = fPOINT {fi::shreg(vertexIt->x, ref.x, eggRatio), fi::shreg(vertexIt->y, ref.y, eggRatio)};
 	++vertexIt;
