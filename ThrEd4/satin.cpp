@@ -88,7 +88,7 @@ void satin::spltsat(uint32_t guideIndex) {
   }
   auto       iOldVertex    = 0U;
   auto       guideIt       = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
-  auto const currentGuide  = *(wrap::next(guideIt, guideIndex));
+  auto const& currentGuide  = *(wrap::next(guideIt, guideIndex));
   auto const oldLastVertex = currentGuide.start + (form.vertexCount - currentGuide.finish) + 1U;
   auto       iNewVertex    = oldLastVertex + 1U;
   auto const vBegin        = wrap::next(FormVertices->begin(), form.vertexIndex);
