@@ -6009,7 +6009,7 @@ void form::setstrtch() {
 		}
 		form::frmout(iForm);
 	  }
-	  for (auto stitch : *StitchBuffer) {
+	  for (auto& stitch : *StitchBuffer) {
 		stitch.x = (stitch.x - reference) * ratio + reference;
 	  }
 	  selal();
