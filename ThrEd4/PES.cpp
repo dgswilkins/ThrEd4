@@ -287,8 +287,8 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
 }
 
 void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image) {
-  for (auto imageRow : image) {
-	auto& iRow = imageRow;
+  for (auto const& imageRow : image) {
+	auto const& iRow = imageRow;
 	for (auto iPixel = iRow.begin(); iPixel != iRow.end();) {
 	  auto output = uint8_t {0U};
 	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
@@ -309,8 +309,8 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
   auto const     spThumbnail = gsl::span<std::array<uint8_t, THUMBWID>>(thumbnail);
   for (auto& stitch : *StitchBuffer) {
-	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
 	spRow[x]         = 1U;
   }
@@ -319,8 +319,8 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   thumbnail        = imageWithFrame;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
   for (auto& stitch : *StitchBuffer) {
-	auto const x = wrap::toSize(wrap::round<uint16_t>(stitch.x * xFactor) + XOFFSET);
-	auto const y = wrap::toSize(THUMBHGT - (wrap::round<uint16_t>(stitch.y * yFactor) + YOFFSET));
+	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
+	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  spRow[x] = 1U;
