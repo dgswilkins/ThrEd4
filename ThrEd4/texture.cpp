@@ -1619,8 +1619,8 @@ void texture::setxt(FRMHED& form, std::vector<RNGCNT>& textureSegments) {
   ClipRectSize.cy = form.fillInfo.texture.height;
   if (currentCount != 0U) {
 	for (auto iTexturePoint = currentCount - 1; iTexturePoint >= 0; --iTexturePoint) {
-	  auto const currentPoint =
-	      TexturePointsBuffer->at(wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
+	  auto const& currentPoint =
+	      TexturePointsBuffer->operator[](wrap::toSize(currentIndex) + wrap::toSize(iTexturePoint));
 	  if (currentPoint.line != 0U) {
 		auto const iSegment            = currentPoint.line - 1U;
 		textureSegments[iSegment].line = iTexturePoint;
