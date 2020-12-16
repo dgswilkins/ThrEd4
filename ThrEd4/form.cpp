@@ -475,7 +475,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
   formOutline[3].y = formOutline[7].y = wrap::midl(rectangle.top, rectangle.bottom);
 
   auto ipixelOutline = pixelOutline.begin();
-  for (auto controlPoint : formOutline) {
+  for (auto& controlPoint : formOutline) {
 	*ipixelOutline = form::sfCor2px(controlPoint);
 	++ipixelOutline;
   }
@@ -1233,8 +1233,8 @@ void form::chkseq(bool border) {
   auto destination = wrap::toUnsigned(savedIndex + 1U);
   for (auto iSequence = savedIndex + 1U; iSequence < InterleaveSequence->size(); ++iSequence) {
 	// clang-format off
-	auto const seq      = InterleaveSequence->operator[](iSequence);
-	auto const seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
+	auto const& seq      = InterleaveSequence->operator[](iSequence);
+	auto const& seqBack1 = InterleaveSequence->operator[](iSequence - 1U);
 	auto const len      = hypot(seq.x - seqBack1.x, seq.y - seqBack1.y);
 	// clang-format on
 	if (len > minimumStitchLength) {
@@ -1465,8 +1465,8 @@ void form::internal::bold(FRMHED const& form) {
 	boldlin(form.vertexIndex, iLine, iNextLine, form.edgeStitchLen);
   }
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); ++iSequence) {
-	auto const sequence     = OSequence->operator[](iSequence);
-	auto const sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto const& sequence     = OSequence->operator[](iSequence);
+	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
 	auto const length       = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y);
 	if (length > TNYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
@@ -1596,7 +1596,7 @@ auto form::linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t fini
   if (OutsidePoints != nullptr) {
 	auto const delta = fPOINT {(OutsidePoints->operator[](start).x - points[start].x),
 	                           (OutsidePoints->operator[](start).y - points[start].y)};
-	auto const point = points[start];
+	auto const& point = points[start];
 
 	if ((delta.x == 0.0F) && (delta.y == 0.0F)) {
 	  return false;
@@ -1810,7 +1810,7 @@ void form::internal::fillSB(const fPOINT& pivot, float angle, float const& radiu
   form::filinsb(innerPoint, stitchPoint);
 }
 
-void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
+void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t const start, uint32_t const finish, fPOINT& stitchPoint) {
   // clang-format off
   constexpr auto level00 = std::array<float,  1U>{ 0.0F };
   constexpr auto level01 = std::array<float,  1U>{ 1.0F       };
@@ -1902,12 +1902,12 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
   }
 }
 
-void form::internal::duspnd(float                     stitchLen,
+void form::internal::duspnd(float const               stitchLen,
                             std::vector<VRCT2> const& underlayVerticalRect,
                             std::vector<VRCT2> const& fillVerticalRect,
-                            uint32_t                  start,
-                            uint32_t                  finish,
-                            float                     width,
+                            uint32_t const            start,
+                            uint32_t const            finish,
+                            float const               width,
                             fPOINT&                   stitchPoint) {
   if (StateMap->test(StateFlag::UND)) {
 	if (StateMap->test(StateFlag::UNDPHAS)) {
@@ -1954,7 +1954,7 @@ void form::internal::duspnd(float                     stitchLen,
 
 void form::internal::pfn(std::vector<VRCT2> const& underlayVerticalRect,
                          std::vector<VRCT2> const& fillVerticalRect,
-                         uint32_t                  startVertex,
+                         uint32_t const            startVertex,
                          std::vector<VRCT2> const& vrct,
                          float                     width) {
   // clang-format off
@@ -5187,7 +5187,7 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 
   auto minimumLength    = BIGDBL;
   auto formControlIndex = 0U;
-  for (auto iControl : formControls) {
+  for (auto& iControl : formControls) {
 	auto const length = hypot(iControl.x - point.x, iControl.y - point.y);
 	if (length < minimumLength) {
 	  minimumLength             = length;
@@ -6674,7 +6674,7 @@ void form::dueg(uint32_t sides) {
   auto const eggRatio = maximumY / (vertexIt[sides >> 2U].y - vertexIt[0].y);
   vertexIt            = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const ref      = *vertexIt;
-  for (uint32_t iVertex = 1; iVertex < form.vertexCount; ++iVertex) {
+  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 	*vertexIt = fPOINT {fi::shreg(vertexIt->x, ref.x, eggRatio), fi::shreg(vertexIt->y, ref.y, eggRatio)};
 	++vertexIt;
   }
