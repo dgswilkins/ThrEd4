@@ -842,7 +842,7 @@ void trace::trinit() {
 		auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
 		auto iComponentPeakCount = componentPeakCount.begin();
 		auto iComponentPeak      = componentPeak.begin();
-		for (auto iHistogramData : histogramData) {
+		for (auto& iHistogramData : histogramData) {
 		  auto const spHD = gsl::span<uint32_t> {iHistogramData};
 		  for (auto iLevel = 0U; iLevel < iHistogramData.size(); ++iLevel) {
 			if (spHD[iLevel] > *iComponentPeakCount) {
