@@ -11010,7 +11010,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	return true;
   }
   if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
-                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
@@ -12286,7 +12286,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
   }
   if (StateMap->testAndReset(StateFlag::SIZSEL)) {
-	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2])) {
+	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back())) {
 	  VerticalIndex -= 13U;
 	  static constexpr auto threadSizeMap = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 
@@ -12405,7 +12405,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   thred::unmsg();
   if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
-                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin[0], ChangeThreadSizeWin[2]))) {
+                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
 	unpat();
 	if (StateMap->testAndReset(StateFlag::ROTAT)) {
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};

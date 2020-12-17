@@ -692,7 +692,7 @@ void clip::internal::xclpfn(std::vector<fPOINT> const& tempClipPoints,
   auto const rotationAngle = atan2(delta.y, delta.x);
   auto const& chainEndPoint = chainEndPoints[start];
   for (auto const& clip : tempClipPoints) {
-	auto point = thred::rotangf(clip, rotationAngle, rotationCenter);
+	auto const point = thred::rotangf(clip, rotationAngle, rotationCenter);
 	OSequence->push_back(fPOINT {chainEndPoint.x + point.x, chainEndPoint.y + point.y});
   }
 }
