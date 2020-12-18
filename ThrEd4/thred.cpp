@@ -12536,7 +12536,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
-		setbak(ThreadSizePixels[StitchBuffer->operator[](ClosestPointIndex).attribute & COLORBTS] + 3);
+		auto const spTSP = gsl::span<int32_t> {ThreadSizePixels};
+		setbak(spTSP[StitchBuffer->operator[](ClosestPointIndex).attribute & COLORBTS] + 3);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -12737,20 +12738,21 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  static constexpr auto str = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
-	  for (auto iThrSize = 0U; iThrSize < 3; ++iThrSize) {
-		auto const idx = gsl::narrow_cast<int32_t>(VerticalIndex + iThrSize);
+	  auto idx = gsl::narrow_cast<int32_t>(VerticalIndex);
+	  auto iStr = str.begin();
+	  for (auto& win : ChangeThreadSizeWin) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		ChangeThreadSizeWin[iThrSize] = CreateWindow(L"STATIC",
-		                                             str[iThrSize],
-		                                             WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                                             ButtonWidthX3,
-		                                             ButtonHeight * idx,
-		                                             ButtonWidth,
-		                                             ButtonHeight,
-		                                             ThrEdWindow,
-		                                             nullptr,
-		                                             ThrEdInstance,
-		                                             nullptr);
+		win = CreateWindow(L"STATIC",
+		                   *(iStr++),
+		                   WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                   ButtonWidthX3,
+		                   ButtonHeight * idx++,
+		                   ButtonWidth,
+		                   ButtonHeight,
+		                   ThrEdWindow,
+		                   nullptr,
+		                   ThrEdInstance,
+		                   nullptr);
 	  }
 	  StateMap->set(StateFlag::SIZSEL);
 	}
