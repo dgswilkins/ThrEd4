@@ -2386,7 +2386,7 @@ class BAKHED
   COLORREF*   colors {};
   TXPNT*      texturePoints {};
   uint32_t    texturePointCount {};
-  POINT       zoomRect {0, 0};
+  SIZE        zoomRect {};
 
   // constexpr BAKHED() noexcept = default;
   // BAKHED(CLPSTCH const&) = default;

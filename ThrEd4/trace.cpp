@@ -353,7 +353,7 @@ void trace::trace() {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap->test(StateFlag::LANDSCAP)) {
 		auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
+		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y);
 	  }
 	  auto const BmpSR = bitmap::getBmpStitchRatio();
 	  auto const bitmapPoint =
@@ -626,7 +626,7 @@ void trace::internal::dutrac() {
 	thred::savdo();
 	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.y) - BmpSiS.y);
+	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y);
 	}
 	auto const bmpSR = bitmap::getBmpStitchRatio();
 	CurrentTracePoint =
@@ -770,7 +770,7 @@ void trace::internal::dutrac() {
 	auto landscapeOffset = 0.0F;
 	if (StateMap->test(StateFlag::LANDSCAP)) {
 	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-	  landscapeOffset   = wrap::toFloat(UnzoomedRect.y) - BmpSiS.y;
+	  landscapeOffset   = wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y;
 	}
 	for (auto iCurrent = size_t {1U}; iCurrent < tracedPoints.size(); ++iCurrent) {
 	  traceLengthSum += hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),

@@ -342,8 +342,8 @@ void form::internal::rats() {
 	VerticalRatio = (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom);
   }
   else {
-	HorizontalRatio = wrap::toFloat(UnzoomedRect.x) / wrap::toFloat(StitchWindowClientRect.right);
-	VerticalRatio   = wrap::toFloat(UnzoomedRect.y) / wrap::toFloat(StitchWindowClientRect.bottom);
+	HorizontalRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(StitchWindowClientRect.right);
+	VerticalRatio   = wrap::toFloat(UnzoomedRect.cy) / wrap::toFloat(StitchWindowClientRect.bottom);
   }
 }
 
@@ -454,8 +454,8 @@ void form::ratsr() {
 	VerticalRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
   }
   else {
-	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / wrap::toFloat(UnzoomedRect.x);
-	VerticalRatio   = wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(UnzoomedRect.y);
+	HorizontalRatio = wrap::toFloat(StitchWindowClientRect.right) / wrap::toFloat(UnzoomedRect.cx);
+	VerticalRatio   = wrap::toFloat(StitchWindowClientRect.bottom) / wrap::toFloat(UnzoomedRect.cy);
   }
 }
 
@@ -831,7 +831,7 @@ void form::durpoli(uint32_t vertexCount) {
   auto const stepAngle = PI_F2 / wrap::toFloat(vertexCount);
   // 500 gives us a reasonably sized default
   auto const length = 500.0F / wrap::toFloat(vertexCount) * ZoomFactor *
-                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+                      wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
   newForm.vertexIndex = thred::adflt(vertexCount);
   newForm.vertexCount = vertexCount;
@@ -5866,7 +5866,7 @@ void form::selal() {
   StateMap->reset(StateFlag::SELBOX);
   StateMap->reset(StateFlag::GRPSEL);
   fi::getbig(AllItemsRect);
-  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
+  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
@@ -6471,7 +6471,7 @@ void form::duspir(uint32_t stepCount) {
   }
   auto const stepAngle = PI_F2 / wrap::toFloat(stepCount);
   auto const length    = 800.0F / wrap::toFloat(stepCount) * ZoomFactor *
-                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+                      wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto newForm        = FRMHED {};
   auto vertexCount    = wrap::round<uint32_t>(wrap::toFloat(stepCount) * SpiralWrap);
   newForm.vertexIndex = thred::adflt(vertexCount);
@@ -6539,7 +6539,7 @@ void form::duhart(uint32_t sideCount) {
   auto       point            = thred::pxCor2stch(Msg.pt);
   auto       stepAngle        = PI_F2 / wrap::toFloat(sideCount);
   auto const length           = 300.0F / wrap::toFloat(sideCount) * ZoomFactor *
-                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+                      wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto angle    = PI_F * HARTANG;
   auto iVertex  = ptrdiff_t {0};
   auto maximumX = 0.0F;
@@ -6608,7 +6608,7 @@ void form::dulens(uint32_t sides) {
   auto const theta = std::atan(1.0F / IniFile.lensRatio);
   // now calculate the radius of the lens arc and scale by the zoom factor
   auto const radius = (100.0F / std::sin(theta)) * ZoomFactor *
-                      wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY);
+                      wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   // get the angle subtended by each step
   auto const omega = 2.0F * theta / wrap::toFloat(steps);
   // and the interior angle of every segment
@@ -6696,7 +6696,7 @@ void form::duzig(uint32_t vertices) {
   FormList->push_back(newForm);
   ClosestFormToCursor    = wrap::toUnsigned(FormList->size() - 1U);
   auto       stitchPoint = thred::pxCor2stch(Msg.pt);
-  auto const offset      = fPOINT {UnzoomedRect.x / 6.0, UnzoomedRect.y / (6.0 * vertices)};
+  auto const offset      = fPOINT {UnzoomedRect.cx / 6.0, UnzoomedRect.cy / (6.0 * vertices)};
   auto vertexIt = wrap::next(FormVertices->begin(), FormList->operator[](ClosestFormToCursor).vertexIndex);
   for (auto iVertex = 0U; iVertex < vertices; ++iVertex) {
 	*vertexIt = stitchPoint;
@@ -8079,7 +8079,7 @@ void form::cntrx() {
   auto const markCenter =
       StateMap->test(StateFlag::GMRK)
           ? ZoomMarkPoint
-          : fPOINT {wrap::toFloat(UnzoomedRect.x) / 2.0F, wrap::toFloat(UnzoomedRect.y) / 2.0F};
+          : fPOINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   bool flag = false;
   if (!SelectedFormList->empty()) {
 	flag = true;
@@ -8173,7 +8173,7 @@ void form::centir() {
   fi::getbig(AllItemsRect);
   auto const itemCenter = fPOINT {wrap::midl(AllItemsRect->right, AllItemsRect->left),
                                   wrap::midl(AllItemsRect->top, AllItemsRect->bottom)};
-  auto const hoopCenter = fPOINT {wrap::toFloat(UnzoomedRect.x) / 2.0F, wrap::toFloat(UnzoomedRect.y) / 2.0F};
+  auto const hoopCenter = fPOINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   auto const delta = fPOINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
   for (auto& stitch : *StitchBuffer) {
 	stitch.x += delta.x;

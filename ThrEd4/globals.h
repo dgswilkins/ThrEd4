@@ -244,7 +244,7 @@ extern uint32_t*      TraceBitmapData;
 extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;
 
-extern POINT UnzoomedRect;
+extern SIZE UnzoomedRect;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 

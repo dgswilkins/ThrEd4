@@ -1054,11 +1054,11 @@ void formForms::setear() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const size =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / TWSTFACT / size.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / TWSTFACT / size.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / TWSTFACT / size.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}
@@ -1216,11 +1216,11 @@ void formForms::wavfrm() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize =
 	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.x) / WAVSIZE / selectedSize.x;
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
 	}
-	auto const verticalRatio = wrap::toFloat(UnzoomedRect.y) / WAVSIZE / selectedSize.y;
+	auto const verticalRatio = wrap::toFloat(UnzoomedRect.cy) / WAVSIZE / selectedSize.y;
 	if (verticalRatio < horizontalRatio) {
 	  horizontalRatio = verticalRatio;
 	}

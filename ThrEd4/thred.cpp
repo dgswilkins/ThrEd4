@@ -676,10 +676,10 @@ void thred::coltab() {
 	  auto iColor      = 0U;
 	  auto iStitch     = 0U;
 	  currentColor     = std::numeric_limits<decltype(currentColor)>::max();
-	  auto const range = fRECTANGLE {wrap::toFloat(UnzoomedRect.x) * -1.0F,
-	                                 wrap::toFloat(UnzoomedRect.y) * 2.0F,
-	                                 wrap::toFloat(UnzoomedRect.x) * 2.0F,
-	                                 wrap::toFloat(UnzoomedRect.y) * -1.0F};
+	  auto const range = fRECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
+	                                 wrap::toFloat(UnzoomedRect.cy) * 2.0F,
+	                                 wrap::toFloat(UnzoomedRect.cx) * 2.0F,
+	                                 wrap::toFloat(UnzoomedRect.cy) * -1.0F};
 	  for (auto& stitch : *StitchBuffer) {
 		if (stitch.x < range.left) {
 		  stitch.x = range.left;
@@ -951,7 +951,7 @@ void thred::internal::unboxs() {
 }
 
 void thred::internal::stchPars() {
-  auto const aspectRatio = wrap::toFloat(UnzoomedRect.x) / wrap::toFloat(UnzoomedRect.y);
+  auto const aspectRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(UnzoomedRect.cy);
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	StitchWindowSize.x = std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
   }
@@ -1136,7 +1136,7 @@ void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) no
 }
 
 void thred::internal::zRctAdj() noexcept {
-  auto const unzoomedY = wrap::toFloat(UnzoomedRect.y);
+  auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy);
   if (ZoomRect.top > unzoomedY) {
 	auto const adjustment = ZoomRect.top - unzoomedY;
 	ZoomRect.top -= adjustment;
@@ -1146,7 +1146,7 @@ void thred::internal::zRctAdj() noexcept {
 	ZoomRect.top -= ZoomRect.bottom;
 	ZoomRect.bottom = 0.0F;
   }
-  auto const unzoomedX = wrap::toFloat(UnzoomedRect.x);
+  auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
   if (ZoomRect.right > unzoomedX) {
 	auto const adjustment = ZoomRect.right - unzoomedX;
 	ZoomRect.right -= adjustment;
@@ -1263,7 +1263,7 @@ void thred::internal::movins() {
 }
 
 void thred::zumhom() {
-  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
+  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
@@ -1342,7 +1342,7 @@ void thred::hupfn() {
 		form.rectangle.bottom += delta.y;
 	  }
 	  UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-	  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.x);
+	  ZoomMin      = wrap::toFloat(MINZUM) / wrap::toFloat(UnzoomedRect.cx);
 	  thred::zumhom();
 	}
   }
@@ -1852,7 +1852,7 @@ void thred::internal::chknum() {
 		constexpr auto STARSIZE = 250.0F; // star size factor
 		form::dustar(uintValue,
 		  STARSIZE / value * ZoomFactor *
-		  wrap::toFloat(UnzoomedRect.x + UnzoomedRect.y) / (LHUPX + LHUPY));
+		  wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
 		break;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
@@ -2638,17 +2638,17 @@ void thred::grpAdj() {
 		coordinate      = newSize.y * StitchWindowAspectRatio;
 		newSize.x       = std::round(coordinate);
 	  }
-	  if (newSize.x > wrap::toFloat(UnzoomedRect.x) || newSize.y > wrap::toFloat(UnzoomedRect.y)) {
+	  if (newSize.x > wrap::toFloat(UnzoomedRect.cx) || newSize.y > wrap::toFloat(UnzoomedRect.cy)) {
 		ZoomRect.left = ZoomRect.bottom = 0.0F;
-		ZoomRect.right                  = wrap::toFloat(UnzoomedRect.x);
-		ZoomRect.top                    = wrap::toFloat(UnzoomedRect.y);
+		ZoomRect.right                  = wrap::toFloat(UnzoomedRect.cx);
+		ZoomRect.top                    = wrap::toFloat(UnzoomedRect.cy);
 		StateMap->reset(StateFlag::ZUMED);
 		ZoomFactor = 1.0;
 		thred::movStch();
 	  }
 	  else {
 		ZoomRect.right = ZoomRect.left + newSize.x;
-		ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.x);
+		ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
 		ZoomRect.top   = ZoomRect.bottom + newSize.y;
 		auto const stitchPoint =
 		    fPOINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
@@ -4121,12 +4121,12 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		if (thredHeader.hoopType == SMALHUP) {
 		  IniFile.hoopSizeX = SHUPX;
 		  IniFile.hoopSizeY = SHUPY;
-		  UnzoomedRect = POINT {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
+		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(SHUPX), gsl::narrow_cast<int32_t>(SHUPY)};
 		}
 		else {
 		  IniFile.hoopSizeX = LHUPX;
 		  IniFile.hoopSizeY = LHUPY;
-		  UnzoomedRect = POINT {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
+		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 		}
 		ritfnam(*DesignerName);
 		auto& emn = ExtendedHeader->modifierName;
@@ -4615,7 +4615,7 @@ void thred::internal::zumin() {
 	  }
 	} while (false);
   }
-  auto const zoomRight = wrap::toFloat(UnzoomedRect.x) * ZoomFactor;
+  auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
   ZoomRect             = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
   thred::shft(stitchPoint);
   NearestCount = 0;
@@ -4695,12 +4695,12 @@ void thred::internal::zumout() {
 	if (ZoomFactor > ZMCLAMP) {
 	  ZoomFactor = 1;
 	  StateMap->reset(StateFlag::ZUMED);
-	  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.y), wrap::toFloat(UnzoomedRect.x), 0.0F};
+	  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
 	  thred::movStch();
 	  NearestCount = 0;
 	}
 	else {
-	  auto const zoomRight = wrap::toFloat(UnzoomedRect.x) * ZoomFactor;
+	  auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
 	  ZoomRect = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
 	  thred::shft(stitchPoint);
 	}
@@ -5355,11 +5355,11 @@ void thred::internal::unclp() {
 void thred::internal::clpbox() {
   auto const ratio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
   auto       stitchPoint = thred::pxCor2stch(Msg.pt);
-  auto const unzoomedX   = wrap::toFloat(UnzoomedRect.x);
+  auto const unzoomedX   = wrap::toFloat(UnzoomedRect.cx);
   if (stitchPoint.x + ClipRectSize.cx > unzoomedX) {
 	stitchPoint.x = unzoomedX - ClipRectSize.cx;
   }
-  auto const unzoomedY = wrap::toFloat(UnzoomedRect.y);
+  auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy);
   if (stitchPoint.y + ClipRectSize.cy > unzoomedY) {
 	stitchPoint.y = unzoomedY - ClipRectSize.cy;
   }
@@ -5403,12 +5403,12 @@ void thred::internal::rSelbox() {
   unsel();
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
   if (stitchPoint.x - wrap::toFloat(SelectBoxOffset.x + SelectBoxSize.cx) >=
-      wrap::toFloat(UnzoomedRect.x)) {
-	stitchPoint.x = wrap::toFloat(UnzoomedRect.x - SelectBoxSize.cx + SelectBoxOffset.x);
+      wrap::toFloat(UnzoomedRect.cx)) {
+	stitchPoint.x = wrap::toFloat(UnzoomedRect.cx - SelectBoxSize.cx + SelectBoxOffset.x);
   }
   if (stitchPoint.y - wrap::toFloat(SelectBoxOffset.y + SelectBoxSize.cy) >=
-      wrap::toFloat(UnzoomedRect.y)) {
-	stitchPoint.y = wrap::toFloat(UnzoomedRect.y - SelectBoxSize.cy + SelectBoxOffset.y);
+      wrap::toFloat(UnzoomedRect.cy)) {
+	stitchPoint.y = wrap::toFloat(UnzoomedRect.cy - SelectBoxSize.cy + SelectBoxOffset.y);
   }
   if (stitchPoint.x - wrap::toFloat(SelectBoxOffset.x) < 0.0F) {
 	stitchPoint.x = wrap::toFloat(SelectBoxOffset.x);
@@ -7400,7 +7400,7 @@ void thred::internal::mv2b() {
 
 void thred::internal::infadj(float& xCoordinate, float& yCoordinate) noexcept {
   if (isfinite(xCoordinate)) {
-	auto const unzoomedX = wrap::toFloat(UnzoomedRect.x);
+	auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
 	if (xCoordinate > unzoomedX) {
 	  xCoordinate = unzoomedX;
 	}
@@ -7411,7 +7411,7 @@ void thred::internal::infadj(float& xCoordinate, float& yCoordinate) noexcept {
 	}
   }
   if (isfinite(yCoordinate)) {
-	auto const unzoomedY = wrap::toFloat(UnzoomedRect.y);
+	auto const unzoomedY = wrap::toFloat(UnzoomedRect.cy);
 	if (yCoordinate > unzoomedY) {
 	  yCoordinate = unzoomedY;
 	}
@@ -7435,8 +7435,8 @@ void thred::delinf() noexcept {
 void thred::chkrng(fPOINT& range) {
   thred::savdo();
   thred::delinf();
-  wrap::narrow(range.x, UnzoomedRect.x);
-  wrap::narrow(range.y, UnzoomedRect.y);
+  wrap::narrow(range.x, UnzoomedRect.cx);
+  wrap::narrow(range.y, UnzoomedRect.cy);
   if (!FormList->empty()) {
 	// ToDo - Why do we treat the forms differently?
 	auto iDestination = StitchBuffer->begin();
@@ -8872,8 +8872,8 @@ void thred::internal::defpref() {
   UserFlagMap->set(UserFlag::FIL2OF);
   fil2men();
   BackgroundColor              = 0xa8c4b1;
-  UnzoomedRect.x               = std::lround(IniFile.hoopSizeX);
-  UnzoomedRect.y               = std::lround(IniFile.hoopSizeY);
+  UnzoomedRect.cx               = std::lround(IniFile.hoopSizeX);
+  UnzoomedRect.cy               = std::lround(IniFile.hoopSizeY);
   IniFile.waveEnd              = IWAVEND;
   IniFile.wavePoints           = IWAVPNTS;
   IniFile.waveLobes            = IWAVS;
@@ -10797,11 +10797,11 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	auto const saveFactor = ZoomFactor;
 	if (newSize.x > newSize.y) {
 	  newSize.y  = newSize.x / StitchWindowAspectRatio;
-	  ZoomFactor = newSize.x / wrap::toFloat(UnzoomedRect.x);
+	  ZoomFactor = newSize.x / wrap::toFloat(UnzoomedRect.cx);
 	}
 	else {
 	  newSize.x  = newSize.y * StitchWindowAspectRatio;
-	  ZoomFactor = newSize.y / wrap::toFloat(UnzoomedRect.x);
+	  ZoomFactor = newSize.y / wrap::toFloat(UnzoomedRect.cx);
 	}
 	if (ZoomFactor < ZoomMin) {
 	  ZoomFactor = saveFactor;
@@ -13783,7 +13783,7 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
-		  dumrk(wrap::toFloat(UnzoomedRect.x) * 0.5F, wrap::toFloat(UnzoomedRect.y) * 0.5F);
+		  dumrk(wrap::toFloat(UnzoomedRect.cx) * 0.5F, wrap::toFloat(UnzoomedRect.cy) * 0.5F);
 		}
 		else {
 		  if (thred::inStitchWin()) {
@@ -14323,7 +14323,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_MRKCNTR: { // edit / Set / Zoom Mark at Center
-	  dumrk(wrap::toFloat(UnzoomedRect.x) * 0.5F, wrap::toFloat(UnzoomedRect.y) * 0.5F);
+	  dumrk(wrap::toFloat(UnzoomedRect.cx) * 0.5F, wrap::toFloat(UnzoomedRect.cy) * 0.5F);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
 	  break;
@@ -16565,13 +16565,13 @@ void thred::internal::drwStch() {
 	  scrollInfo.cbSize = sizeof(scrollInfo);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  scrollInfo.fMask = SIF_ALL;
-	  scrollInfo.nMax  = UnzoomedRect.y;
+	  scrollInfo.nMax  = UnzoomedRect.cy;
 	  scrollInfo.nMin  = 0;
 	  scrollInfo.nPage = wrap::round<UINT>(ZoomRect.top - ZoomRect.bottom);
 	  scrollInfo.nPos =
-	      wrap::round<decltype(scrollInfo.nPos)>(wrap::toFloat(UnzoomedRect.y) - ZoomRect.top);
+	      wrap::round<decltype(scrollInfo.nPos)>(wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top);
 	  SetScrollInfo(VerticalScrollBar, SB_CTL, &scrollInfo, TRUE);
-	  scrollInfo.nMax  = UnzoomedRect.x;
+	  scrollInfo.nMax  = UnzoomedRect.cx;
 	  scrollInfo.nPage = wrap::round<UINT>(ZoomRect.right - ZoomRect.left);
 	  scrollInfo.nPos  = wrap::round<decltype(scrollInfo.nPos)>(ZoomRect.left);
 	  SetScrollInfo(HorizontalScrollBar, SB_CTL, &scrollInfo, TRUE);
@@ -17231,7 +17231,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 			  ZoomRect.left        = wrap::toFloat(HIWORD(wParam));
 			  ZoomRect.right       = ZoomRect.left + zoomWidth;
-			  auto const unzoomedX = wrap::toFloat(UnzoomedRect.x);
+			  auto const unzoomedX = wrap::toFloat(UnzoomedRect.cx);
 			  if (ZoomRect.right > unzoomedX) {
 				ZoomRect.right = unzoomedX;
 				ZoomRect.left  = unzoomedX - zoomWidth;
@@ -17281,7 +17281,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		case SB_THUMBPOSITION: {
 		  auto const zoomHeight = ZoomRect.top - ZoomRect.bottom;
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-		  ZoomRect.top    = wrap::toFloat(UnzoomedRect.y) - wrap::toFloat(HIWORD(wParam));
+		  ZoomRect.top    = wrap::toFloat(UnzoomedRect.cy) - wrap::toFloat(HIWORD(wParam));
 		  ZoomRect.bottom = ZoomRect.top - zoomHeight;
 		  if (ZoomRect.bottom < 0) {
 			ZoomRect.bottom = 0.0F;
@@ -17524,7 +17524,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  if (StateMap->test(StateFlag::ZUMED)) {
 		auto const bRatio = wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom);
 		auto const adjustedWidth = wrap::toFloat(StitchWindowClientRect.right) / bRatio;
-		auto const unzoomedX     = wrap::toFloat(UnzoomedRect.x);
+		auto const unzoomedX     = wrap::toFloat(UnzoomedRect.cx);
 		if (adjustedWidth + ZoomRect.left > unzoomedX) {
 		  ZoomRect.right = unzoomedX;
 		  ZoomRect.left  = unzoomedX - adjustedWidth;
@@ -17535,7 +17535,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  }
 	  else {
 		ZoomRect =
-		    fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.y), gsl::narrow<float>(UnzoomedRect.x), 0.0F};
+		    fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
 	  }
 	  NearestCount = 0;
 	  StateMap->set(StateFlag::RESTCH);

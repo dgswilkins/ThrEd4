@@ -155,15 +155,15 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
       fPOINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
   IniFile.hoopType = CUSTHUP;
   UnzoomedRect     = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
-  if (dstSize.x > wrap::toFloat(UnzoomedRect.x) || dstSize.y > wrap::toFloat(UnzoomedRect.y)) {
+  if (dstSize.x > wrap::toFloat(UnzoomedRect.cx) || dstSize.y > wrap::toFloat(UnzoomedRect.cy)) {
 	constexpr auto EXPRATIO = 1.1F; // 10% expansion ratio
 	IniFile.hoopSizeX       = dstSize.x * EXPRATIO;
 	IniFile.hoopSizeY       = dstSize.y * EXPRATIO;
 	UnzoomedRect            = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
-  auto const delta = fPOINT {(wrap::toFloat(UnzoomedRect.x) - dstSize.x) / 2.0F - mimimumCoordinate.x,
-                             (wrap::toFloat(UnzoomedRect.y) - dstSize.y) / 2.0F - mimimumCoordinate.y};
+  auto const delta = fPOINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
+                             (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
 	iStitch.x += delta.x;
 	iStitch.y += delta.y;

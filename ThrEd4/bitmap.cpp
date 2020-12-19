@@ -105,8 +105,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	StateMap->set(StateFlag::INIT);
 	ZoomRect.left   = 0.0F;
 	ZoomRect.bottom = 0.0F;
-	wrap::narrow_cast(ZoomRect.right, UnzoomedRect.x);
-	wrap::narrow_cast(ZoomRect.top, UnzoomedRect.y);
+	wrap::narrow_cast(ZoomRect.right, UnzoomedRect.cx);
+	wrap::narrow_cast(ZoomRect.top, UnzoomedRect.cy);
 	BitmapDC = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
@@ -227,15 +227,15 @@ void bitmap::internal::bitlin(uint8_t const* source,
 
 void bitmap::internal::bitsiz() {
   auto const screenAspectRatio =
-      gsl::narrow<float>(UnzoomedRect.x) / gsl::narrow<float>(UnzoomedRect.y);
+      gsl::narrow<float>(UnzoomedRect.cx) / gsl::narrow<float>(UnzoomedRect.cy);
   auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
   if (bitmapAspectRatio > screenAspectRatio) {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.x);
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.x) / bitmapAspectRatio;
+	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.cx);
+	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.cx) / bitmapAspectRatio;
   }
   else {
-	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.y) * bitmapAspectRatio;
-	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.y);
+	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.cy) * bitmapAspectRatio;
+	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.cy);
   }
   BmpStitchRatio.x = wrap::toFloat(BitmapWidth) / BitmapSizeinStitches.x;
   BmpStitchRatio.y = wrap::toFloat(BitmapHeight) / BitmapSizeinStitches.y;
@@ -589,9 +589,9 @@ void bitmap::drawBmpBackground() {
 
 auto bitmap::internal::bitar() -> bool {
   auto const zoomedInRect = fRECTANGLE {ZoomRect.left,
-                                        (wrap::toFloat(UnzoomedRect.y) - ZoomRect.top),
+                                        (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
                                         ZoomRect.right,
-                                        (wrap::toFloat(UnzoomedRect.y) - ZoomRect.bottom)};
+                                        (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
   if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 	return false;
   }
@@ -676,7 +676,7 @@ void bitmap::bitbltBitmap() noexcept {
 
 auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
   if (StateMap->test(StateFlag::LANDSCAP)) {
-	point.y -= (wrap::toFloat(UnzoomedRect.y) - BitmapSizeinStitches.y);
+	point.y -= (wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y);
   }
   return POINT {wrap::round<LONG>(BmpStitchRatio.x * point.x),
                 wrap::round<LONG>(BitmapHeight - BmpStitchRatio.y * point.y)};
