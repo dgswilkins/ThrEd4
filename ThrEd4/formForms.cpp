@@ -54,7 +54,7 @@ auto const DaisyTypeStrings = std::array<uint16_t, 6> {
 };
 
 void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) {
-  auto labelSize = SIZE {0L, 0L};
+  auto labelSize = SIZE {};
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
   textSize.cy = labelSize.cy;
   if (labelSize.cx > textSize.cx) {
@@ -446,7 +446,7 @@ void formForms::refrm() {
 }
 
 void formForms::sidwnd(HWND wnd) {
-  auto windowRect          = RECT {0L, 0L, 0L, 0L};
+  auto windowRect          = RECT {};
   thred::resetSideBuffer();
   auto const savedChoice   = FormMenuChoice;
   thred::unsid();
@@ -470,7 +470,7 @@ void formForms::sidwnd(HWND wnd) {
 void formForms::prfsid(HWND wnd) {
   thred::resetSideBuffer();
   thred::unsid();
-  auto windowRect = RECT {0L, 0L, 0L, 0L};
+  auto windowRect = RECT {};
   GetWindowRect(wnd, &windowRect);
   GetClientRect(PreferencesWindow, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -525,7 +525,7 @@ void formForms::internal::prflin(std::wstring const& msg, LSTTYPE const& row) {
 }
 
 void formForms::prfmsg() {
-  auto preferenceRect = RECT {0L, 0L, 0L, 0L};
+  auto preferenceRect = RECT {};
   if (StateMap->testAndReset(StateFlag::INSRT)) {
 	StateMap->set(StateFlag::WASRT);
   }
@@ -1207,7 +1207,7 @@ void formForms::wavfrm() {
 
 	auto vRotate = vBegin;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  thred::rotflt(*vRotate, rotationAngle, {0.0, 0.0});
+	  thred::rotflt(*vRotate, rotationAngle, fPOINT{});
 	  ++vRotate;
 	}
 	form.type        = FRMLINE;

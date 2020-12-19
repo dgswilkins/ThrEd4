@@ -37,8 +37,8 @@ static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 class DSTDAT
 {
   public:
-  char cor {0};
-  char val {0};
+  char cor {};
+  char val {};
 
   // constexpr DSTDAT() noexcept = default;
   // DSTDAT(DSTDAT&&) = default;
@@ -79,7 +79,7 @@ void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
 }
 
 void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
-  auto bytesRead = DWORD {0};
+  auto bytesRead = DWORD {};
   auto colors    = std::vector<uint32_t> {};
   if (di::colfil()) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -863,7 +863,7 @@ auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
 }
 
 auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
-  auto fileSize = uintmax_t {0};
+  auto fileSize = uintmax_t {};
   if (!thred::getFileSize(newFileName, fileSize)) {
 	return false;
   }
@@ -964,7 +964,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// clang-format on
 		auto& res = dstHeader.res;
 		std::fill(std::begin(res), std::end(res), ' ');
-		auto bytesWritten = DWORD {0};
+		auto bytesWritten = DWORD {};
 		if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;

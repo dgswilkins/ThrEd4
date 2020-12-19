@@ -496,7 +496,7 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 	auto const iSeqMax              = OSequence->size() - 1U;
 	auto sequence = OSequence->begin();
 	auto sequenceFwd1 = std::next(sequence);
-	for (auto iSequence = size_t {0U}; iSequence < iSeqMax; ++iSequence) {
+	for (auto iSequence = size_t {}; iSequence < iSeqMax; ++iSequence) {
 	  auto const delta        = fPOINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
 	  auto const length       = hypot(delta.x, delta.y);
 	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
@@ -802,7 +802,7 @@ void xt::selalfrm() {
 }
 
 auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
-  auto       bit             = DWORD {0};
+  auto       bit             = DWORD {};
   auto const maskedAttribute = gsl::narrow_cast<DWORD>(attribute & SRTYPMSK);
   // ToDo - replace
   _BitScanReverse(&bit, maskedAttribute);
@@ -1095,7 +1095,7 @@ void xt::fsort() {
 		sortRecord.count  = sortRecord.finish - sortRecord.start;
 		auto minimumJumps = std::numeric_limits<uint32_t>::max();
 		// timeout used to put an upper bound on the number of sorting permutations checked
-		auto fileTime = FILETIME {0U, 0U};
+		auto fileTime = FILETIME {};
 		GetSystemTimeAsFileTime(&fileTime);
 		auto const startTime        = xi::tim2int(fileTime);
 		auto       minimumIndex     = 0U;
@@ -1136,11 +1136,11 @@ void xt::fsort() {
 class ATFLD
 {
   public:
-  uint32_t color {0U};
-  uint32_t form {0U};
-  uint32_t type {0U};
-  uint32_t layer {0U};
-  uint32_t user {0U};
+  uint32_t color {};
+  uint32_t form {};
+  uint32_t type {};
+  uint32_t layer {};
+  uint32_t user {};
 
   // constexpr ATFLD() noexcept = default;
   // ATFLD(ATFLD&&) = default;

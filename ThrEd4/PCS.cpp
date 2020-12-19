@@ -80,7 +80,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  flag = false;
 		  break;
 		}
-		auto bytesWritten = DWORD {0};
+		auto bytesWritten = DWORD {};
 		if (FALSE == WriteFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
@@ -142,12 +142,12 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 }
 
 auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
-  auto fileSize = uintmax_t {0};
+  auto fileSize = uintmax_t {};
   if (thred::getFileSize(newFileName, fileSize)) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto fileHandle = HANDLE {nullptr};
 	if (thred::getFileHandle(newFileName, fileHandle)) {
-	  auto bytesRead = DWORD {0};
+	  auto bytesRead = DWORD {};
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
@@ -160,7 +160,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  PCSDataBuffer.resize(pcsStitchCount);
 		  ReadFile(fileHandle, PCSDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
-			auto iStitch      = uint16_t {0U};
+			auto iStitch      = uint16_t {};
 			auto iColorChange = 0U;
 			auto color        = 0U;
 			auto iPCSstitch   = 0U;
@@ -295,11 +295,11 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
   }
   else {
 	auto pcsFileHeader = PCSHEADER {};
-	auto bytesRead     = DWORD {0};
+	auto bytesRead     = DWORD {};
 
 	ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr);
 	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLORCNT) {
-	  auto fileSize = uintmax_t {0};
+	  auto fileSize = uintmax_t {};
 	  thred::getFileSize(insertedFile, fileSize);
 	  fileSize -= sizeof(pcsFileHeader) + 14;
 	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCSTCH));

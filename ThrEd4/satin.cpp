@@ -24,7 +24,7 @@
 
 namespace si = satin::internal;
 
-static auto StartPoint = uint32_t {0U}; // starting formOrigin for a satin stitch guide-line
+static auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
 
 void satin::delsac(uint32_t formIndex) {
   auto& formList = *FormList;
@@ -1419,7 +1419,7 @@ void satin::sbrd(FRMHED const& form) {
   StateMap->reset(StateFlag::SAT1);
   StateMap->reset(StateFlag::FILDIR);
   OSequence->clear();
-  OSequence->push_back(fPOINT {0.0, 0.0});
+  OSequence->push_back(fPOINT {});
   if ((form.edgeType & EGUND) != 0U) {
 	LineSpacing = USPAC;
 	satin::satout(form, form.borderSize * URAT);

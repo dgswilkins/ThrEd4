@@ -1044,8 +1044,8 @@ class BSEQPNT;
 class dPOINT
 {
   public:
-  double x {0.0};
-  double y {0.0};
+  double x {};
+  double y {};
 
   // constexpr dPOINT() noexcept = default;
   explicit inline dPOINT(fPOINT const& rhs) noexcept;
@@ -1250,10 +1250,10 @@ class fPOINTLINE
 class dRECTANGLE
 {
   public:
-  double top {0.0};
-  double bottom {0.0};
-  double left {0.0};
-  double right {0.0};
+  double top {};
+  double bottom {};
+  double left {};
+  double right {};
 
   // constexpr dRECTANGLE() noexcept = default;
   // dRECTANGLE(dRECTANGLE const&) = default;

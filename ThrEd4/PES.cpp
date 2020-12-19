@@ -290,7 +290,7 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image
   for (auto const& imageRow : image) {
 	auto const& iRow = imageRow;
 	for (auto iPixel = iRow.begin(); iPixel != iRow.end();) {
-	  auto output = uint8_t {0U};
+	  auto output = uint8_t {};
 	  for (auto bitPosition = 0U; bitPosition < BTSPBYTE; ++bitPosition) {
 		output |= gsl::narrow_cast<uint8_t>(*iPixel << bitPosition);
 		++iPixel;
@@ -359,7 +359,7 @@ auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
 }
 
 auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
-  auto fileSize = uintmax_t {0};
+  auto fileSize = uintmax_t {};
   if (!thred::getFileSize(newFileName, fileSize)) {
 	return false;
   }
@@ -371,7 +371,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   auto fileBuf = std::vector<uint8_t> {};
   fileBuf.reserve(wrap::toSize(fileSize));
   auto* fileBuffer = fileBuf.data();
-  auto  bytesRead  = DWORD {0};
+  auto  bytesRead  = DWORD {};
   wrap::ReadFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
   auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
 
@@ -534,7 +534,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
 		pesBuffer.reserve(pesSize);
 		auto threadList   = std::vector<PESCOLORLIST> {};
-		auto blockIndex   = uint16_t {0U}; // Index into the stitch blocks
+		auto blockIndex   = uint16_t {}; // Index into the stitch blocks
 		auto currentColor = spPESequivColors[stitchColor];
 		threadList.push_back(PESCOLORLIST {blockIndex, currentColor});
 		pesBuffer.resize(sizeof(PESSTCHLST));
@@ -624,7 +624,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pesHeader.hpsz    = 0;
 		GroupStartStitch  = 0;
 		GroupEndStitch    = wrap::toUnsigned(StitchBuffer->size() - 1U);
-		auto bytesWritten = DWORD {0};
+		auto bytesWritten = DWORD {};
 		if (FALSE == WriteFile(fileHandle, convert_ptr<PESHED*>(&pesHeader), sizeof(pesHeader), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;

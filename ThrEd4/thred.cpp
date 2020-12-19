@@ -472,7 +472,7 @@ void thred::internal::fnamtabs() {
 	std::swap(spNameOrder[destination], spNameOrder[source]);
   }
   auto iNameEncoder = NameEncoder.begin();
-  for (auto iName = uint8_t {0U}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
+  for (auto iName = uint8_t {}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
 	*(iNameEncoder++) = iName + NCODOF;
   }
   auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
@@ -492,7 +492,7 @@ void thred::internal::fnamtabs() {
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN  = NameOrder.size();
   auto           designer = utf::Utf16ToUtf8(designerName);
-  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {0};
+  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
@@ -2883,7 +2883,7 @@ void thred::internal::ritini() {
   IniFile.buttonholeCornerLength = ButtonholeCornerLength;
   IniFile.picotSpace             = PicotSpacing;
   if (!UserFlagMap->test(UserFlag::SAVMAX)) {
-	auto windowRect = RECT {0L, 0L, 0L, 0L};
+	auto windowRect = RECT {};
 	GetWindowRect(ThrEdWindow, &windowRect);
 	IniFile.initialWindowCoords.left   = windowRect.left;
 	IniFile.initialWindowCoords.right  = windowRect.right;
@@ -2895,7 +2895,7 @@ void thred::internal::ritini() {
       IniFileName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (iniFileHandle != INVALID_HANDLE_VALUE) {
-	auto bytesRead = DWORD {0};
+	auto bytesRead = DWORD {};
 	WriteFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
 	// ToDo - Check that file is wriiten completely
   }
@@ -2918,7 +2918,7 @@ void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t sour
 }
 
 void thred::internal::redbal() {
-  auto fileSize = uintmax_t {0};
+  auto fileSize = uintmax_t {};
   if (getFileSize(*BalaradName2, fileSize)) {
 	auto balaradHeader = BALHED {};
 	StitchBuffer->clear();
@@ -2928,7 +2928,7 @@ void thred::internal::redbal() {
 	    CreateFile(BalaradName2->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (balaradFile != INVALID_HANDLE_VALUE) {
-	  auto bytesRead = DWORD {0U};
+	  auto bytesRead = DWORD {};
 	  ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(balaradHeader)) {
 		auto       balaradStitch = std::vector<BALSTCH> {};
@@ -3020,7 +3020,7 @@ void thred::internal::ritbal() {
 	balaradHeader.backgroundColor = BackgroundColor;
 	balaradHeader.hoopSizeX       = IniFile.hoopSizeX * BALRATIO;
 	balaradHeader.hoopSizeY       = IniFile.hoopSizeY * BALRATIO;
-	auto bytesWritten             = DWORD {0};
+	auto bytesWritten             = DWORD {};
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
 	BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
@@ -3303,7 +3303,7 @@ void thred::internal::thrsav() {
   else {
 	auto output = std::vector<char> {};
 	dubuf(output);
-	auto bytesWritten = DWORD {0};
+	auto bytesWritten = DWORD {};
 	WriteFile(fileHandle, output.data(), wrap::toUnsigned(output.size()), &bytesWritten, nullptr);
 	if (bytesWritten != output.size()) {
 	  displayText::showMessage(IDS_FWERR, ThrName->wstring());
@@ -3608,8 +3608,8 @@ void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, SIZE const& 
 }
 
 void thred::internal::sidmsg(FRMHED const& form, HWND window) {
-  auto childListRect  = RECT {0L, 0L, 0L, 0L};
-  auto parentListRect = RECT {0L, 0L, 0L, 0L};
+  auto childListRect  = RECT {};
+  auto parentListRect = RECT {};
   std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
@@ -3804,8 +3804,8 @@ void thred::internal::stchWnd() {
 // and calculate which window had the click
 auto thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool {
   auto flag       = false;
-  auto topRect    = RECT {0L, 0L, 0L, 0L};
-  auto bottomRect = RECT {0L, 0L, 0L, 0L};
+  auto topRect    = RECT {};
+  auto bottomRect = RECT {};
   GetWindowRect(topWindow, &topRect);
   GetWindowRect(bottomWindow, &bottomRect);
   if (clickCoord.x > topRect.left && clickCoord.x < bottomRect.right &&
@@ -4105,7 +4105,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	prtred(fileHandle, IDS_PRT);
 	return false;
   }
-  auto bytesRead   = DWORD {0};
+  auto bytesRead   = DWORD {};
   auto thredHeader = STRHED {};
   ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr);
   if ((thredHeader.headerType & SIGMASK) == THREDSIG) {
@@ -5813,7 +5813,7 @@ void thred::internal::duclip() {
 		  }
 		  // Skip past the points
 		  auto* textures     = convert_ptr<TXPNT*>(&points[pointCount]);
-		  auto  textureCount = uint16_t {0U};
+		  auto  textureCount = uint16_t {};
 		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6977,7 +6977,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
   }
   else {
 	auto fileHeader = STRHED {};
-	auto bytesRead  = DWORD {0};
+	auto bytesRead  = DWORD {};
 	ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr);
 	if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
 	  displayText::tabmsg(IDS_NOTHR);
@@ -7305,7 +7305,7 @@ void thred::internal::deldir() {
 }
 
 auto thred::internal::chkwnd(HWND window) noexcept -> bool {
-  auto windowRect = RECT {0L, 0L, 0L, 0L};
+  auto windowRect = RECT {};
   GetWindowRect(window, &windowRect);
   return Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
          Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom;
@@ -8640,8 +8640,8 @@ void thred::internal::desiz() {
 }
 
 void thred::internal::sidhup() {
-  auto hoopRectangle        = RECT {0L, 0L, 0L, 0L};
-  auto preferencesRectangle = RECT {0L, 0L, 0L, 0L};
+  auto hoopRectangle        = RECT {};
+  auto preferencesRectangle = RECT {};
   StateMap->set(StateFlag::HUPMSG);
   GetWindowRect(ValueWindow->operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
@@ -10183,7 +10183,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  if (IsDlgButtonChecked(hwndlg, IDC_FBTH) != 0U) {
 			IniFile.featherType |= AT_FTHBTH;
 		  }
-		  auto buf = std::array<wchar_t, HBUFSIZ> {0};
+		  auto buf = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.featherFillType = FDEFTYP;
 		  auto buffer             = std::wstring {};
@@ -10825,7 +10825,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
   retflag = true;
   if (FormDataSheet != nullptr) {
-	auto formDataRect = RECT {0L, 0L, 0L, 0L};
+	auto formDataRect = RECT {};
 	GetWindowRect(FormDataSheet, &formDataRect);
   }
   if (StateMap->testAndReset(StateFlag::THUMON)) {
@@ -12101,7 +12101,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  code = 1;
 	}
 	else {
-	  auto windowRect = RECT {0L, 0L, 0L, 0L};
+	  auto windowRect = RECT {};
 	  GetWindowRect(DeleteStitchesDialog, &windowRect);
 	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
 	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
@@ -12259,7 +12259,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  code = 1;
 	}
 	else {
-	  auto windowRect = RECT {0L, 0L, 0L, 0L};
+	  auto windowRect = RECT {};
 	  GetWindowRect(DeleteStitchesDialog, &windowRect);
 	  if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right &&
 	      Msg.pt.y >= windowRect.top && Msg.pt.y <= windowRect.bottom) {
@@ -12321,7 +12321,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (StateMap->testAndReset(StateFlag::FORMIN)) {
-	auto windowRect = RECT {0L, 0L, 0L, 0L};
+	auto windowRect = RECT {};
 	GetWindowRect(MsgWindow, &windowRect);
 	if (Msg.pt.x >= windowRect.left && Msg.pt.x <= windowRect.right && Msg.pt.y >= windowRect.top &&
 	    Msg.pt.y <= windowRect.bottom) {
@@ -15790,7 +15790,7 @@ void thred::internal::ritloc() {
 	    CreateFile(lockFilePath.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (lockFile != INVALID_HANDLE_VALUE) {
-	  auto bytesWritten = DWORD {0};
+	  auto bytesWritten = DWORD {};
 	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
 	  wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	  CloseHandle(lockFile);
@@ -15850,7 +15850,7 @@ void thred::internal::ducmd() {
 			  auto readBuffer = std::vector<char> {};
 			  readBuffer.resize(_MAX_PATH + 1);
 			  *BalaradName1  = balaradFileName;
-			  auto bytesRead = DWORD {0};
+			  auto bytesRead = DWORD {};
 
 			  ReadFile(BalaradFile, readBuffer.data(), wrap::toUnsigned(readBuffer.size()), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
@@ -15914,7 +15914,7 @@ void thred::internal::redini() {
 	setPrefs();
   }
   else {
-	auto bytesRead = DWORD {0};
+	auto bytesRead = DWORD {};
 	ReadFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr);
 	CloseHandle(iniFileHandle);
 	if (bytesRead < sizeof(IniFile)) {
@@ -16178,9 +16178,9 @@ void thred::internal::init() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   LoadMenu(ThrEdInstance, MAKEINTRESOURCE(IDR_MENU1));
   MainMenu   = GetMenu(ThrEdWindow);
-  auto wRect = RECT {0L, 0L, 0L, 0L};
+  auto wRect = RECT {};
   GetWindowRect(ThrEdWindow, &wRect);
-  auto mRect = RECT {0L, 0L, 0L, 0L};
+  auto mRect = RECT {};
   GetMenuItemRect(ThrEdWindow, MainMenu, 0, &mRect);
   wRect.left  = mRect.left;
   wRect.right = mRect.right;
@@ -16938,7 +16938,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
   auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (thrEdFile != INVALID_HANDLE_VALUE) {
-	auto bytesRead    = DWORD {0};
+	auto bytesRead    = DWORD {};
 	auto stitchHeader = STRHED {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &bytesRead, nullptr);
 	if (bytesRead == sizeof(stitchHeader)) {
@@ -17406,7 +17406,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
-			auto       textSize = SIZE {0L, 0L};
+			auto       textSize = SIZE {};
 			wrap::getTextExtentPoint32(
 			  DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 			wrap::textOut(DrawItem->hDC,

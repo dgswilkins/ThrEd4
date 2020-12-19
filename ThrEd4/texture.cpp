@@ -78,7 +78,7 @@ void texture::txdun() {
   if (!TextureHistory->operator[](0).texturePoints.empty()) {
 	auto name = std::wstring {};
 	if (txi::txnam(name)) {
-	  auto bytesWritten = DWORD {0};
+	  auto bytesWritten = DWORD {};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -144,12 +144,12 @@ void texture::redtx() {
 	auto const handle = CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (handle != INVALID_HANDLE_VALUE) {
-	  auto bytesRead = DWORD {0};
-	  auto sig       = std::array<char, 4> {0};
+	  auto bytesRead = DWORD {};
+	  auto sig       = std::array<char, 4> {};
 	  if (ReadFile(handle, sig.data(), wrap::toUnsigned(sig.size()), &bytesRead, nullptr) != 0) {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
-			auto historyBytesRead = DWORD {0};
+			auto historyBytesRead = DWORD {};
 			if (wrap::ReadFile(handle,
 			                   textureHistoryBuffer.data(),
 			                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
@@ -940,7 +940,7 @@ void texture::internal::chktxnum() {
 }
 
 void texture::internal::butsid(uint32_t windowId) {
-  auto buttonRect = RECT {0L, 0L, 0L, 0L};
+  auto buttonRect = RECT {};
   txi::chktxnum();
   TextureWindowId = windowId;
   GetWindowRect(ButtonWin->operator[](windowId), &buttonRect);

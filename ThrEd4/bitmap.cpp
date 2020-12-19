@@ -81,7 +81,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	bitmap::resetBmpFile(true);
 	return;
   }
-  auto bytesRead = DWORD {0};
+  auto bytesRead = DWORD {};
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
   constexpr auto MB_SIG = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
   if (BitmapFileHeader.bfType == MB_SIG) {
@@ -323,7 +323,7 @@ void bitmap::savmap() {
 		displayText::crmsg(*UTF16BMPname);
 		return;
 	  }
-	  auto bytesWritten = DWORD {0};
+	  auto bytesWritten = DWORD {};
 	  WriteFile(hBitmap, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesWritten, nullptr);
 	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
 	  auto buffer = std::vector<uint8_t> {};

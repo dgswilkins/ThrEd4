@@ -1178,9 +1178,9 @@ void trace::internal::dublk(HDC dc, RECT const& traceHighMask, RECT const& trace
 }
 
 void trace::wasTrace() {
-  auto traceHighMaskRect   = RECT {0L, 0L, 0L, 0L}; // high trace mask rectangle
-  auto traceMiddleMaskRect = RECT {0L, 0L, 0L, 0L}; // middle trace mask rectangle
-  auto traceLowMaskRect    = RECT {0L, 0L, 0L, 0L}; // low trace mask rectangle
+  auto traceHighMaskRect   = RECT {}; // high trace mask rectangle
+  auto traceMiddleMaskRect = RECT {}; // middle trace mask rectangle
+  auto traceLowMaskRect    = RECT {}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const BlackBrush          = CreateSolidBrush(0); // black brush
   auto       iTraceUpWindow      = TraceUpWindow.begin();

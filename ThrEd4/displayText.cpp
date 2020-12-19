@@ -60,8 +60,8 @@ void displayText::shoMsg(std::wstring const& message) {
 	  }
 	}
 	strings.push_back(message.substr(previousStringLength, (iString - previousStringLength)));
-	auto textSize    = SIZE {0L, 0L};
-	auto messageSize = SIZE {0L, 0L};
+	auto textSize    = SIZE {};
+	auto messageSize = SIZE {};
 	for (auto& string : strings) {
 	  wrap::getTextExtentPoint32(GetDC(ThrEdWindow), string.c_str(), wrap::toUnsigned(string.size()), &textSize);
 	  if (textSize.cx > messageSize.cx) {
@@ -72,7 +72,7 @@ void displayText::shoMsg(std::wstring const& message) {
 	  }
 	}
 	messageSize.cy *= gsl::narrow<int32_t>(strings.size());
-	auto mainRect = RECT {0L, 0L, 0L, 0L};
+	auto mainRect = RECT {};
 	GetWindowRect(MainStitchWin, &mainRect);
 	auto xOffset = mainRect.left;
 	GetWindowRect(ThrEdWindow, &mainRect);
@@ -378,8 +378,8 @@ void displayText::updateWinFont(HWND hWnd) noexcept {
 }
 
 void displayText::tomsg() {
-  auto OKrect   = RECT {0L, 0L, 0L, 0L};
-  auto textSize = SIZE {0L, 0L};
+  auto OKrect   = RECT {};
+  auto textSize = SIZE {};
   GetWindowRect(OKButton, &OKrect);
   auto const winName = displayText::loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);

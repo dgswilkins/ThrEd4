@@ -45,8 +45,8 @@ namespace fi = form::internal;
 constexpr auto BHWIDTH = 20.0F;
 
 static auto FormForInsert  = static_cast<FRMHED*>(nullptr); // insert form vertex in this form
-static auto FormVertexNext = uint32_t {0U}; // form vertex storage for form vertex insert
-static auto FormVertexPrev = uint32_t {0U}; // form vertex storage for form vertex insert
+static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
+static auto FormVertexPrev = uint32_t {}; // form vertex storage for form vertex insert
 
 void form::frmclr(FRMHED& destination) noexcept {
   auto const head = FRMHED {};
@@ -1484,7 +1484,7 @@ void form::duangs(FRMHED const& form) {
 	vertexIt = wrap::next(AngledFormVertices->cbegin(), form.vertexIndex);
   }
   auto const vMax = gsl::narrow<ptrdiff_t>(form.vertexCount - 1U);
-  for (auto iVertex = ptrdiff_t {0}; iVertex < vMax; ++iVertex) {
+  for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const& thisVertex = vertexIt[iVertex];
 	auto const& nextVertex = vertexIt[iVertex + 1];
 	FormAngles->push_back(atan2(nextVertex.y - thisVertex.y, nextVertex.x - thisVertex.x));
@@ -2233,7 +2233,7 @@ void form::internal::fnvrt(std::vector<fPOINT>&   currentFillVertices,
 	projectedPoints.reserve(currentVertexCount);
 	currentX += step;
 	auto iPoint = 0U;
-	for (auto iVertex = uint16_t {0U}; iVertex < currentVertexCount; ++iVertex) {
+	for (auto iVertex = uint16_t {}; iVertex < currentVertexCount; ++iVertex) {
 	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
 	  auto       point       = fPOINT {};
 	  if (projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
@@ -3779,7 +3779,7 @@ void form::internal::nxtrgn(std::vector<RGSEQ>&           tempPath,
 	}
   }
   auto regionPath = wrap::next(tempPath.cbegin(), sequencePathIndex);
-  for (auto iPath = ptrdiff_t {0}; iPath < pathLength; ++iPath) {
+  for (auto iPath = ptrdiff_t {}; iPath < pathLength; ++iPath) {
 	tempPath[sequencePathIndex].skp    = false;
 	tempPath[sequencePathIndex++].pcon = regionPath->pcon;
 	visitedRegions.set(pathMap[regionPath->pcon].node);
@@ -6541,7 +6541,7 @@ void form::duhart(uint32_t sideCount) {
   auto const length           = 300.0F / wrap::toFloat(sideCount) * ZoomFactor *
                       wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY);
   auto angle    = PI_F * HARTANG;
-  auto iVertex  = ptrdiff_t {0};
+  auto iVertex  = ptrdiff_t {};
   auto maximumX = 0.0F;
   while (angle > -PI_F * HARTINFL) {
 	if (point.x > maximumX) {
@@ -7065,7 +7065,7 @@ void form::internal::doTimeWindow(float                        rangeX,
   auto       timePosition = 0.0F;
   auto&      formLines    = *FormLines;
   formLines.clear();
-  formLines.push_back(POINT {0, 0});
+  formLines.push_back(POINT {});
   formLines.push_back(POINT {0, ButtonHeight});
   SelectObject(timeDC, thred::getUserPen(0U));
   for (auto iColumn = 1U; iColumn < wrap::round<uint32_t>(rangeX) - checkLength - 1U; ++iColumn) {
@@ -7881,7 +7881,7 @@ void form::internal::shrnks() {
   clip::oclp(clipRect, currentForm.borderClipData, currentForm.clipEntries);
   auto const vertexIt = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
   auto const vMax     = gsl::narrow<ptrdiff_t>(currentForm.vertexCount - 1U);
-  for (auto iVertex = ptrdiff_t {0}; iVertex < vMax; ++iVertex) {
+  for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto& thisVertex = vertexIt[iVertex];
 	auto& nextVertex = vertexIt[iVertex + 1];
 	deltas.emplace_back(fPOINT {nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y});
@@ -7889,7 +7889,7 @@ void form::internal::shrnks() {
   }
   auto length = lengths.begin();
   auto delta  = deltas.begin();
-  for (auto iVertex = ptrdiff_t {0}; iVertex < vMax; ++iVertex) {
+  for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const fLen       = wrap::toFloat(*length);
 	auto const count      = std::floor(fLen / ClipRectSize.cx);
 	auto const ratio      = (ClipRectSize.cx * count + 0.004F) / fLen;

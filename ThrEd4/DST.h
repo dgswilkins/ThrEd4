@@ -18,32 +18,32 @@ namespace fs = std::filesystem;
 class DSTHED // dst file header
 {
   public:
-  char desched[3]  {0}; // 00  00	description
-  char desc[17]    {0}; // 03  03
-  char recshed[3]  {0}; // 20  14	record count
-  char recs[8]     {0}; // 23  17
-  char cohed[3]    {0}; // 31  1F
-  char co[4]       {0}; // 34  22
-  char xplushed[3] {0}; // 38  26	x+ size
-  char xplus[6]    {0}; // 41  29
-  char xminhed[3]  {0}; // 47  2F	x- size
-  char xmin[6]     {0}; // 50  32
-  char yplushed[3] {0}; // 56  38
-  char yplus[6]    {0}; // 59  3B	y+ size
-  char yminhed[3]  {0}; // 65  41
-  char ymin[6]     {0}; // 68  44	y- size
-  char axhed[3]    {0}; // 74  4A
-  char ax[7]       {0}; // 77  4D
-  char ayhed[3]    {0}; // 84  54
-  char ay[7]       {0}; // 87  57
-  char mxhed[3]    {0}; // 94  5E
-  char mx[7]       {0}; // 97  61
-  char myhed[3]    {0}; // 104 68
-  char my[7]       {0}; // 107 6B
-  char pdhed[2]    {0}; // 114 72
-  char pd[7]       {0}; // 116 74
-  char eof[1]      {0}; // 123 7B
-  char res[388]    {0}; // 124 7C
+  char desched[3]  {}; // 00  00	description
+  char desc[17]    {}; // 03  03
+  char recshed[3]  {}; // 20  14	record count
+  char recs[8]     {}; // 23  17
+  char cohed[3]    {}; // 31  1F
+  char co[4]       {}; // 34  22
+  char xplushed[3] {}; // 38  26	x+ size
+  char xplus[6]    {}; // 41  29
+  char xminhed[3]  {}; // 47  2F	x- size
+  char xmin[6]     {}; // 50  32
+  char yplushed[3] {}; // 56  38
+  char yplus[6]    {}; // 59  3B	y+ size
+  char yminhed[3]  {}; // 65  41
+  char ymin[6]     {}; // 68  44	y- size
+  char axhed[3]    {}; // 74  4A
+  char ax[7]       {}; // 77  4D
+  char ayhed[3]    {}; // 84  54
+  char ay[7]       {}; // 87  57
+  char mxhed[3]    {}; // 94  5E
+  char mx[7]       {}; // 97  61
+  char myhed[3]    {}; // 104 68
+  char my[7]       {}; // 107 6B
+  char pdhed[2]    {}; // 114 72
+  char pd[7]       {}; // 116 74
+  char eof[1]      {}; // 123 7B
+  char res[388]    {}; // 124 7C
 
   constexpr DSTHED() noexcept = default;
   // DSTHED(DSTHED&&) = default;
@@ -62,9 +62,9 @@ constexpr auto REGTYP = 0x030000U;
 class DSTREC // dst stitch record
 {
   public:
-  uint8_t led {0U};
-  uint8_t mid {0U};
-  uint8_t nd {0U};
+  uint8_t led {};
+  uint8_t mid {};
+  uint8_t nd {};
 
   // constexpr DSTREC() noexcept = default;
   // DSTREC(DSTREC&&) = default;
