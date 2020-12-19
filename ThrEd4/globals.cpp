@@ -134,7 +134,6 @@ std::vector<POINT>*            SelectedPointsLine        = nullptr; // line deri
 fRECTANGLE                     SelectedVerticesRect      = {};      // rectangle enclosing selected form verticess
 float                          ShowStitchThreshold       = SHOPNTS; // show stitch grid below this zoom level
 HWND                           SideMessageWindow         = nullptr; // main side message window
-std::array<HWND, SWCOUNT>      SideWindow                = {};      // side message windows
 float                          SmallStitchLength         = SMALSIZ * PFGRAN; // user can remove stitches smaller than this
 float                          SnapLength                = SNPLEN * PFGRAN;  // snap together length
 float                          SpiralWrap                = SPIRWRAP;// number of revolutions in a spiral

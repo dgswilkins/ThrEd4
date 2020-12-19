@@ -206,11 +206,9 @@ extern RECT   SelectedPixelsRect;
 extern std::vector<POINT>* SelectedPointsLine;
 
 extern fRECTANGLE SelectedVerticesRect;
+
 extern float      ShowStitchThreshold;
 extern HWND       SideMessageWindow;
-
-extern std::array<HWND, SWCOUNT>   SideWindow;
-
 extern float SmallStitchLength;
 extern float SnapLength;
 extern float SpiralWrap;

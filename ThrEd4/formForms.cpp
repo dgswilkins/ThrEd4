@@ -40,9 +40,9 @@ constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
 static auto LabelWindowCoords = RECT {};  // location of left windows in the form data sheet
-static auto LabelWindowSize   = POINT {}; // size of the left windows in the form data sheet
+static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
 static auto ValueWindowCoords = RECT {};  // location of right windows in the form data sheet
-static auto ValueWindowSize   = POINT {}; // size of the right windows in the form data sheet
+static auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
 
 auto const DaisyTypeStrings = std::array<uint16_t, 6> {
     IDS_DAZCRV,
@@ -53,17 +53,17 @@ auto const DaisyTypeStrings = std::array<uint16_t, 6> {
     IDS_DAZHART,
 };
 
-void formForms::maxtsiz(std::wstring const& label, POINT& textSize) {
+void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) {
   auto labelSize = SIZE {0L, 0L};
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), label.data(), wrap::toUnsigned(label.size()), &labelSize);
-  textSize.y = labelSize.cy;
-  if (labelSize.cx > textSize.x) {
-	textSize.x = labelSize.cx;
+  textSize.cy = labelSize.cy;
+  if (labelSize.cx > textSize.cx) {
+	textSize.cx = labelSize.cx;
   }
 }
 
-auto formForms::internal::maxwid() -> POINT {
-  auto textSize = POINT {0L, 0L};
+auto formForms::internal::maxwid() -> SIZE {
+  auto textSize = SIZE {};
   for (auto const& item : PREFLIST) {
 	formForms::maxtsiz(dT::loadStr(item.stringID), textSize);
   }
@@ -133,10 +133,10 @@ void formForms::internal::nxtlin(uint32_t& formMenuEntryCount) noexcept {
 }
 
 void formForms::internal::nxtlinprf() noexcept {
-  LabelWindowCoords.top += LabelWindowSize.y;
-  LabelWindowCoords.bottom += LabelWindowSize.y;
-  ValueWindowCoords.top += ValueWindowSize.y;
-  ValueWindowCoords.bottom += ValueWindowSize.y;
+  LabelWindowCoords.top += LabelWindowSize.cy;
+  LabelWindowCoords.bottom += LabelWindowSize.cy;
+  ValueWindowCoords.top += ValueWindowSize.cy;
+  ValueWindowCoords.bottom += ValueWindowSize.cy;
 }
 
 void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount) {
@@ -148,12 +148,12 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   auto&      valueWindow   = *ValueWindow;
   ValueWindowCoords.top    = TXTMARG;
   LabelWindowCoords.top    = ValueWindowCoords.top;
-  ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.y;
+  ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.cy;
   LabelWindowCoords.bottom = ValueWindowCoords.bottom;
   LabelWindowCoords.left   = TXTMARG;
-  LabelWindowCoords.right  = TXTMARG + LabelWindowSize.x;
-  ValueWindowCoords.left   = TXTMARG2 + LabelWindowSize.x;
-  ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.x + ValueWindowSize.x + TXTMARG2;
+  LabelWindowCoords.right  = TXTMARG + LabelWindowSize.cx;
+  ValueWindowCoords.left   = TXTMARG2 + LabelWindowSize.cx;
+  ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   labelWindow[LFRM]        = ffi::txtwin(dT::loadStr(IDS_TXT0), LabelWindowCoords);
   auto choice              = (form.type == FRMLINE) ? dT::loadStr(IDS_EDG1) : dT::loadStr(IDS_FREH);
   valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
@@ -435,8 +435,8 @@ void formForms::refrm() {
                                WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3 + 3,
                                3,
-                               LabelWindowSize.x + ValueWindowSize.x + 18,
-                               LabelWindowSize.y * gsl::narrow<LONG>(formMenuEntryCount) + 12,
+                               LabelWindowSize.cx + ValueWindowSize.cx + 18,
+                               LabelWindowSize.cy * gsl::narrow<LONG>(formMenuEntryCount) + 12,
                                ThrEdWindow,
                                nullptr,
                                ThrEdInstance,
@@ -479,7 +479,7 @@ void formForms::prfsid(HWND wnd) {
                                    WS_BORDER | WS_CHILD | WS_VISIBLE,
                                    windowRect.right - ThredWindowOrigin.x + 6,
                                    windowRect.top - ThredWindowOrigin.y - 3,
-                                   ValueWindowSize.x,
+                                   ValueWindowSize.cx,
                                    windowRect.bottom - windowRect.top + 3,
                                    ThrEdWindow,
                                    nullptr,
@@ -536,13 +536,13 @@ void formForms::prfmsg() {
 	thred::unsid();
 	FormMenuChoice = 0U;
   }
-  LabelWindowSize.x = LabelWindowSize.y = 0;
-  ValueWindowSize.x = ValueWindowSize.y = 0;
+  LabelWindowSize.cx = LabelWindowSize.cy = 0;
+  ValueWindowSize.cx = ValueWindowSize.cy = 0;
   LabelWindowSize                       = formForms::internal::maxwid();
-  LabelWindowSize.x += TXTMARG2;
+  LabelWindowSize.cx += TXTMARG2;
   formForms::maxtsiz(dT::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
-  auto const windowWidth = LabelWindowSize.x + ValueWindowSize.x + 18;
+  auto const windowWidth = LabelWindowSize.cx + ValueWindowSize.cx + 18;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   PreferencesWindow = CreateWindow(L"STATIC",
                                    nullptr,
@@ -550,7 +550,7 @@ void formForms::prfmsg() {
                                    ButtonWidthX3 + 3,
                                    3,
                                    windowWidth,
-                                   LabelWindowSize.y * PRFLINS + 12,
+                                   LabelWindowSize.cy * PRFLINS + 12,
                                    ThrEdWindow,
                                    nullptr,
                                    ThrEdInstance,
@@ -560,11 +560,11 @@ void formForms::prfmsg() {
   GetClientRect(PreferencesWindow, &preferenceRect);
   FillRect(preferenceDC, &preferenceRect, GetSysColorBrush(COLOR_WINDOW));
   LabelWindowCoords.top = ValueWindowCoords.top = TXTMARG;
-  LabelWindowCoords.bottom = ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.y;
+  LabelWindowCoords.bottom = ValueWindowCoords.bottom = TXTMARG + LabelWindowSize.cy;
   LabelWindowCoords.left                              = TXTMARG;
-  LabelWindowCoords.right                             = TXTMARG + LabelWindowSize.x;
-  ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.x;
-  ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.x + ValueWindowSize.x + TXTMARG2;
+  LabelWindowCoords.right                             = TXTMARG + LabelWindowSize.cx;
+  ValueWindowCoords.left                              = TXTMARG2 + LabelWindowSize.cx;
+  ValueWindowCoords.right = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   auto row                = PREFLIST.begin();
   ffi::prflin(fmt::format(L"{}", (AppliqueColor + 1U)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.AppStitchLen * IPFGRAN)), *(row++));

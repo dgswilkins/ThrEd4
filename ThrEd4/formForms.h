@@ -22,7 +22,7 @@ namespace formForms {
 void dazdef();
 void dasyfrm();
 void frmnum();
-void maxtsiz(std::wstring const& label, POINT& textSize);
+void maxtsiz(std::wstring const& label, SIZE& textSize);
 void prfmsg();
 void prfsid(HWND wnd);
 void refrm();
@@ -37,7 +37,7 @@ namespace internal {
 
   void initdaz(HWND hWinDialog);
   void initTearDlg(HWND hwndlg);
-  auto maxwid() -> POINT;
+  auto maxwid() -> SIZE;
   auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
   void nxtlin(uint32_t& formMenuEntryCount) noexcept;
   void nxtlinprf() noexcept;
