@@ -231,7 +231,7 @@ static auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumb
 static auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 static auto ThumbnailIndex = uint32_t {};        // index into the thumbnail filname table
 
-static auto ThumbnailSearchString = std::array<wchar_t, 32> {}; // storage for the thumnail search string
+static auto ThumbnailSearchString = std::array<wchar_t, 32> {}; // storage for the thumbnail search string
 
 static auto InsertedVertexIndex = uint32_t {}; // saved vertex pointer for inserting files
 static auto InsertedFormIndex   = uint32_t {}; // saved form pointer for inserting files
@@ -9115,11 +9115,12 @@ void thred::internal::ritcur() {
 	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
 	auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
-	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
+	auto const spBMB = gsl::span<uint8_t>{ bitmapBits };
+	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(spBMB.size()), spBMB.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const mask          = byteSwap(bitmapBits[wrap::toSize(iRow)]);
-		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
+		auto const mask          = byteSwap(spBMB[wrap::toSize(iRow)]);
+		auto const bitmapInverse = byteSwap(spBMB[wrap::toSize(iRow) + 32]);
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & mask) == 0U) {
@@ -9132,7 +9133,7 @@ void thred::internal::ritcur() {
 	}
 	else {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const bitmapInverse = byteSwap(bitmapBits[wrap::toSize(iRow) + 32]);
+		auto const bitmapInverse = byteSwap(spBMB[wrap::toSize(iRow) + 32]);
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & bitmapInverse) != 0U) {
@@ -11320,7 +11321,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LSTTYPE const& m) -> bool {
+	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LSTTYPE const& m) noexcept -> bool {
 	  return Msg.hwnd == SideWindow->operator[](m.value);
 	});
 	if (iFeather != FTHRLIST.end()) {
@@ -11332,7 +11333,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LSTTYPE const& m) -> bool {
+	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LSTTYPE const& m) noexcept -> bool {
 	  return Msg.hwnd == SideWindow->operator[](m.value);
 	});
 	if (iLayer != LAYRLIST.end()) {
