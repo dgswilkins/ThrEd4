@@ -186,7 +186,7 @@ static auto NearestPoint     = std::array<uint32_t, NERCNT> {};   // indices of 
 static auto MoveAnchor       = uint32_t {};                       // for resequencing stitches
 static auto RotateAngle      = float {};                          // angle for pixel rotate
 static auto PickColorMsgSize = SIZE {};                           // size of the pick color message
-static auto InsertSize       = POINT {};                          // size of file insert window
+static auto InsertSize       = SIZE {};                          // size of file insert window
 static auto InsertCenter     = fPOINT {};                         // center point in inserted file
 static auto NumericCode      = wchar_t {};                        // keyboard numerical input
 static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
@@ -953,30 +953,30 @@ void thred::internal::unboxs() {
 void thred::internal::stchPars() {
   auto const aspectRatio = wrap::toFloat(UnzoomedRect.cx) / wrap::toFloat(UnzoomedRect.cy);
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	StitchWindowSize.x = std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
+	StitchWindowSize.cx = std::lround(wrap::toFloat(ThredWindowRect.bottom - ((*ScrollSize) * 2)) * aspectRatio);
   }
   else {
-	StitchWindowSize.x = std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
+	StitchWindowSize.cx = std::lround(wrap::toFloat(ThredWindowRect.bottom - *ScrollSize) * aspectRatio);
   }
 
-  if ((StitchWindowSize.x + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
+  if ((StitchWindowSize.cx + ButtonWidthX3 + *ScrollSize + *ColorBarSize) < ThredWindowRect.right) {
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	  StitchWindowSize.y = ThredWindowRect.bottom - (*ScrollSize * 2);
+	  StitchWindowSize.cy = ThredWindowRect.bottom - (*ScrollSize * 2);
 	}
 	else {
-	  StitchWindowSize.y = ThredWindowRect.bottom - *ScrollSize;
+	  StitchWindowSize.cy = ThredWindowRect.bottom - *ScrollSize;
 	}
   }
   else {
 	StitchWindowSize = {ThredWindowRect.right - ButtonWidthX3 - *ColorBarSize,
 	                    ThredWindowRect.bottom - ThredWindowRect.top};
-	auto const sizeX = wrap::toFloat(StitchWindowSize.x);
-	auto const sizeY = wrap::toFloat(StitchWindowSize.y);
+	auto const sizeX = wrap::toFloat(StitchWindowSize.cx);
+	auto const sizeY = wrap::toFloat(StitchWindowSize.cy);
 	if ((sizeX / sizeY) > aspectRatio) {
-	  StitchWindowSize.x = std::lround(sizeY * aspectRatio);
+	  StitchWindowSize.cx = std::lround(sizeY * aspectRatio);
 	}
 	else {
-	  StitchWindowSize.y = std::lround(sizeX / aspectRatio);
+	  StitchWindowSize.cy = std::lround(sizeX / aspectRatio);
 	}
   }
 }
@@ -1031,35 +1031,35 @@ void thred::internal::nuRct() noexcept {
 }
 
 void thred::movStch() {
-  auto clientSize = POINT {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + *ColorBarSize)),
+  auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + *ColorBarSize)),
                            (ThredWindowRect.bottom)};
   auto verticalOffset = 0;
   thi::unboxs();
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
 	verticalOffset = *ScrollSize;
-	clientSize.y -= *ScrollSize;
+	clientSize.cy -= *ScrollSize;
   }
   if (StateMap->test(StateFlag::ZUMED)) {
-	clientSize.y -= *ScrollSize;
-	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.x, clientSize.y, FALSE);
-	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.x, 0, *ScrollSize, clientSize.y, TRUE);
-	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.y + verticalOffset, clientSize.x, *ScrollSize, TRUE);
-	StitchWindowAspectRatio = wrap::toFloat(clientSize.x) / wrap::toFloat(clientSize.y);
+	clientSize.cy -= *ScrollSize;
+	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, clientSize.cx, clientSize.cy, FALSE);
+	MoveWindow(VerticalScrollBar, ButtonWidthX3 + clientSize.cx, 0, *ScrollSize, clientSize.cy, TRUE);
+	MoveWindow(HorizontalScrollBar, ButtonWidthX3, clientSize.cy + verticalOffset, clientSize.cx, *ScrollSize, TRUE);
+	StitchWindowAspectRatio = wrap::toFloat(clientSize.cx) / wrap::toFloat(clientSize.cy);
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.x, *ScrollSize, TRUE);
+	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, clientSize.cx, *ScrollSize, TRUE);
 	}
 	ShowWindow(VerticalScrollBar, SW_SHOWNORMAL);
 	ShowWindow(HorizontalScrollBar, SW_SHOWNORMAL);
   }
   else {
 	thi::stchPars();
-	auto const actualWindowHeight = StitchWindowSize.y + *ScrollSize;
-	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.x, actualWindowHeight, TRUE);
+	auto const actualWindowHeight = StitchWindowSize.cy + *ScrollSize;
+	MoveWindow(MainStitchWin, ButtonWidthX3, verticalOffset, StitchWindowSize.cx, actualWindowHeight, TRUE);
 	ShowWindow(VerticalScrollBar, SW_HIDE);
 	ShowWindow(HorizontalScrollBar, SW_HIDE);
-	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.x) / wrap::toFloat(actualWindowHeight);
+	StitchWindowAspectRatio = wrap::toFloat(StitchWindowSize.cx) / wrap::toFloat(actualWindowHeight);
 	if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
-	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.x, *ScrollSize, TRUE);
+	  MoveWindow(SpeedScrollBar, ButtonWidthX3, 0, StitchWindowSize.cx, *ScrollSize, TRUE);
 	}
   }
   MoveWindow(ColorBar, ThredWindowRect.right - *ColorBarSize, 0, *ColorBarSize, ThredWindowRect.bottom, TRUE);
@@ -3760,8 +3760,8 @@ void thred::internal::stchWnd() {
                                SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                ButtonWidthX3,
                                0,
-                               StitchWindowSize.x,
-                               StitchWindowSize.y,
+                               StitchWindowSize.cx,
+                               StitchWindowSize.cy,
                                ThrEdWindow,
                                nullptr,
                                ThrEdInstance,
@@ -3775,10 +3775,10 @@ void thred::internal::stchWnd() {
 	VerticalScrollBar = CreateWindow(L"SCROLLBAR",
 	                                 nullptr,
 	                                 SBS_VERT | WS_CHILD | WS_VISIBLE,
-	                                 StitchWindowSize.x + ButtonWidthX3,
+	                                 StitchWindowSize.cx + ButtonWidthX3,
 	                                 0,
 	                                 *ScrollSize,
-	                                 StitchWindowSize.y,
+	                                 StitchWindowSize.cy,
 	                                 ThrEdWindow,
 	                                 nullptr,
 	                                 ThrEdInstance,
@@ -3788,8 +3788,8 @@ void thred::internal::stchWnd() {
 	                                   nullptr,
 	                                   SBS_HORZ | WS_CHILD | WS_VISIBLE,
 	                                   ButtonWidthX3,
-	                                   StitchWindowSize.y,
-	                                   StitchWindowSize.x,
+	                                   StitchWindowSize.cy,
+	                                   StitchWindowSize.cx,
 	                                   *ScrollSize,
 	                                   ThrEdWindow,
 	                                   nullptr,
@@ -5557,7 +5557,7 @@ void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) 
   if (StateMap->test(StateFlag::MOVCNTR)) { // set rotation angle to 0 if we are moving the center point
 	rotationAngle = 0.0F;
   }
-  auto rotated           = POINT {0L, 0L};
+  auto rotated           = POINT {};
   auto rotationReference = fPOINT {RotationRect.left, RotationRect.top};
   rotang(rotationReference, rotated, rotationAngle, rotationCenter);
   RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
@@ -6756,7 +6756,7 @@ void thred::internal::movi() {
 	                                SBS_HORZ | WS_CHILD | WS_VISIBLE,
 	                                ButtonWidthX3,
 	                                0,
-	                                StitchWindowSize.x,
+	                                StitchWindowSize.cx,
 	                                *ScrollSize,
 	                                ThrEdWindow,
 	                                nullptr,
@@ -6854,7 +6854,7 @@ constexpr auto thred::internal::nxtcrnr(uint32_t corner) -> uint32_t {
 }
 
 void thred::internal::drwmrk(HDC dc) {
-  auto       markCoordinates = POINT {0L, 0L};
+  auto       markCoordinates = POINT {};
   auto       markLine        = std::array<POINT, 2> {};
   auto const markOffset      = MulDiv(6, *screenDPI, STDDPI);
   thred::sCor2px(fPOINT {ZoomMarkPoint}, markCoordinates);
@@ -6901,7 +6901,7 @@ void thred::internal::vubak() {
 }
 
 void thred::insflin(POINT insertPoint) {
-  auto const offset    = POINT {InsertSize.x / 2, InsertSize.y / 2};
+  auto const offset    = POINT {InsertSize.cx / 2, InsertSize.cy / 2};
   auto&      formLines = *FormLines;
   formLines.resize(SQPNTS);
   formLines[0].x = formLines[3].x = formLines[4].x = insertPoint.x - offset.x;
@@ -6952,9 +6952,9 @@ void thred::internal::insfil(fs::path& insertedFile) {
 	auto const insertedSize = fPOINT {insertedRectangle.right - insertedRectangle.left,
 	                                  insertedRectangle.top - insertedRectangle.bottom};
 	form::ratsr();
-	InsertSize.x = std::lround(insertedSize.x * HorizontalRatio);
+	InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
 	// ToDo - Should this be vertical ratio?
-	InsertSize.y = std::lround(insertedSize.y * HorizontalRatio);
+	InsertSize.cy = std::lround(insertedSize.y * HorizontalRatio);
 	auto const initialInsertPoint =
 	    POINT {StitchWindowClientRect.right / 2, StitchWindowClientRect.bottom / 2};
 	thred::insflin(initialInsertPoint);
@@ -9107,7 +9107,7 @@ void thred::internal::ritcur() {
   if (currentCursor != nullptr) {
 	auto iconInfo = ICONINFO {FALSE, 0U, 0U, nullptr, nullptr};
 	GetIconInfo(currentCursor, &iconInfo);
-	auto cursorPosition = POINT {0L, 0L};
+	auto cursorPosition = POINT {};
 	GetCursorPos(&cursorPosition);
 	cursorPosition.x -= (StitchWindowOrigin.x + gsl::narrow_cast<LONG>(iconInfo.xHotspot));
 	cursorPosition.y -= (StitchWindowOrigin.y + gsl::narrow_cast<LONG>(iconInfo.yHotspot));
@@ -9640,7 +9640,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 	StateMap->set(StateFlag::RESTCH);
 	return;
   }
-  auto pixel = POINT {0L, 0L};
+  auto pixel = POINT {};
   if (deltaX != 0.0F) {
 	if (deltaX > 0) {
 	  pixel.x = IniFile.nudgePixels;
@@ -16111,12 +16111,12 @@ void thred::internal::redini() {
 }
 
 void thred::internal::chkirct() noexcept {
-  auto const screenLimits = POINT {ScreenSizePixels.cx - 1, ScreenSizePixels.cy - 1};
-  if (IniFile.initialWindowCoords.left > screenLimits.x) {
-	IniFile.initialWindowCoords.left = screenLimits.x;
+  auto const screenLimits = SIZE {ScreenSizePixels.cx - 1, ScreenSizePixels.cy - 1};
+  if (IniFile.initialWindowCoords.left > screenLimits.cx) {
+	IniFile.initialWindowCoords.left = screenLimits.cx;
   }
-  if (IniFile.initialWindowCoords.right > screenLimits.x) {
-	IniFile.initialWindowCoords.right = screenLimits.x;
+  if (IniFile.initialWindowCoords.right > screenLimits.cx) {
+	IniFile.initialWindowCoords.right = screenLimits.cx;
   }
   if (IniFile.initialWindowCoords.left < 0) {
 	IniFile.initialWindowCoords.left = 0;
@@ -16124,11 +16124,11 @@ void thred::internal::chkirct() noexcept {
   if (IniFile.initialWindowCoords.right < 0) {
 	IniFile.initialWindowCoords.right = 0;
   }
-  if (IniFile.initialWindowCoords.top > screenLimits.y) {
-	IniFile.initialWindowCoords.top = screenLimits.y;
+  if (IniFile.initialWindowCoords.top > screenLimits.cy) {
+	IniFile.initialWindowCoords.top = screenLimits.cy;
   }
-  if (IniFile.initialWindowCoords.bottom > screenLimits.y) {
-	IniFile.initialWindowCoords.bottom = screenLimits.y;
+  if (IniFile.initialWindowCoords.bottom > screenLimits.cy) {
+	IniFile.initialWindowCoords.bottom = screenLimits.cy;
   }
   if (IniFile.initialWindowCoords.top < 0) {
 	IniFile.initialWindowCoords.top = 0;
@@ -16138,11 +16138,11 @@ void thred::internal::chkirct() noexcept {
   }
   if (IniFile.initialWindowCoords.right - IniFile.initialWindowCoords.left < 300) {
 	IniFile.initialWindowCoords.left  = 0;
-	IniFile.initialWindowCoords.right = screenLimits.x / 2;
+	IniFile.initialWindowCoords.right = screenLimits.cx / 2;
   }
   if (IniFile.initialWindowCoords.bottom - IniFile.initialWindowCoords.top < 300) {
 	IniFile.initialWindowCoords.top    = 0;
-	IniFile.initialWindowCoords.bottom = screenLimits.y / 2;
+	IniFile.initialWindowCoords.bottom = screenLimits.cy / 2;
   }
 }
 
@@ -16470,7 +16470,7 @@ void thred::internal::drwknot() {
   if (!UserFlagMap->test(UserFlag::KNOTOF) && (!Knots->empty()) && (!StitchBuffer->empty())) {
 	auto const kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
 	auto const kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
-	auto       point    = POINT {0L, 0L};
+	auto       point    = POINT {};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};
 	for (auto knot : *Knots) {
@@ -16973,10 +16973,10 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  }
 		}
 	  }
-	  auto const drawingDestinationSize = POINT {(drawItem->rcItem.right - drawItem->rcItem.left),
+	  auto const drawingDestinationSize = SIZE {(drawItem->rcItem.right - drawItem->rcItem.left),
 	                                             (drawItem->rcItem.bottom - drawItem->rcItem.top)};
-	  auto const xRatio = wrap::toFloat(drawingDestinationSize.x) / stitchSourceSize.x;
-	  auto const yRatio = wrap::toFloat(drawingDestinationSize.y) / stitchSourceSize.y;
+	  auto const xRatio = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
+	  auto const yRatio = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
 	  auto const ratio  = (xRatio < yRatio) ? xRatio : yRatio;
 	  if (stitchHeader.stitchCount != 0U) {
 		auto stitchesToDraw = std::vector<fPOINTATTR> {};
@@ -17008,7 +17008,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
 			if ((stitchesToDraw[iStitch].attribute & COLORBTS) == iColor) {
 			  lines[iLine++] = {std::lround(stitchesToDraw[iStitch].x * ratio),
-			                    std::lround(wrap::toFloat(drawingDestinationSize.y) -
+			                    std::lround(wrap::toFloat(drawingDestinationSize.cy) -
 			                                stitchesToDraw[iStitch].y * ratio)};
 			}
 			else {
@@ -17085,12 +17085,12 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			     (iVertexInForm < formList[iForm].vertexCount) && (iVertex < stitchHeader.vertexCount);
 			     ++iVertexInForm) {
 			  lines[iVertexInForm] = {std::lround(vertexList[iVertex].x * ratio),
-			                          std::lround(wrap::toFloat(drawingDestinationSize.y) -
+			                          std::lround(wrap::toFloat(drawingDestinationSize.cy) -
 			                                      vertexList[iVertex++].y * ratio)};
 			}
 			lines[formList[iForm].vertexCount] = {
 			    std::lround(vertexList[iLine].x * ratio),
-			    std::lround(wrap::toFloat(drawingDestinationSize.y) - vertexList[iLine].y * ratio)};
+			    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
 			SelectObject(drawItem->hDC, FormPen);
 			SetROP2(drawItem->hDC, R2_XORPEN);
 			if (formList[iForm].type == FRMLINE) {
@@ -17157,7 +17157,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 		  }
 		  else {
-			auto scrollPoint = POINT {0L, 0L}; // for scroll bar functions
+			auto scrollPoint = POINT {}; // for scroll bar functions
 			scrollPoint.x    = std::lround((ZoomRect.right - ZoomRect.left) * LINSCROL);
 			if (scrollPoint.x == 0) {
 			  scrollPoint.x = 1;
@@ -17176,7 +17176,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			SetScrollPos(SpeedScrollBar, SB_CTL, MAXDELAY - MovieTimeStep, TRUE);
 		  }
 		  else {
-			auto scrollPoint = POINT {0L, 0L}; // for scroll bar functions
+			auto scrollPoint = POINT {}; // for scroll bar functions
 			scrollPoint.x    = std::lround(-(ZoomRect.right - ZoomRect.left) * LINSCROL);
 			if (scrollPoint.x == 0) {
 			  scrollPoint.x = -1;
@@ -17253,7 +17253,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (LOWORD(wParam)) {
 		case SB_LINEDOWN: {
-		  auto scrollPoint = POINT {0L, 0L};
+		  auto scrollPoint = POINT {};
 		  scrollPoint.y    = std::lround((ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 		  if (scrollPoint.y == 0) {
 			scrollPoint.y = 1;
@@ -17262,7 +17262,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  return 1;
 		}
 		case SB_LINEUP: {
-		  auto scrollPoint = POINT {0L, 0L};
+		  auto scrollPoint = POINT {};
 		  scrollPoint.y    = std::lround(-(ZoomRect.top - ZoomRect.bottom) * LINSCROL);
 		  if (scrollPoint.y == 0) {
 			scrollPoint.y = -1;

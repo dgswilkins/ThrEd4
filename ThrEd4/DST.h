@@ -76,8 +76,8 @@ class DSTREC // dst stitch record
 class DSTOffsets
 {
   public:
-  POINT Positive {0, 0}; // plus offset written into the destination file header
-  POINT Negative {0, 0}; // minus offset written into the destination file header
+  POINT Positive {}; // plus offset written into the destination file header
+  POINT Negative {}; // minus offset written into the destination file header
 
   constexpr DSTOffsets() noexcept = default;
   // DSTOffsets(DSTOffsets&&) = default;
@@ -104,7 +104,7 @@ namespace internal {
   void dstran(std::vector<DSTREC>& DSTData);
   auto dtrn(DSTREC* dpnt) -> uint32_t;
 
-  auto dudbits(POINT const& dif) -> uint32_t;
+  auto dudbits(SIZE const& dif) -> uint32_t;
 
   void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace internal

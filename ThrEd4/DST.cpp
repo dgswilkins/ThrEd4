@@ -129,7 +129,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  }
 	}
 	else {
-	  auto dstStitch = POINT {0L, 0L};
+	  auto dstStitch = POINT {};
 	  di::dstin(di::dtrn(&record), dstStitch);
 	  localStitch.x += wrap::toFloat(dstStitch.x);
 	  localStitch.y += wrap::toFloat(dstStitch.y);
@@ -220,52 +220,52 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  color = stitch.attribute & COLORBTS;
 	  colorData.push_back(spUserColor[color]);
 	}
-	auto       lengths         = POINT {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
+	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                           std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
-	auto const absoluteLengths = POINT {abs(lengths.x), abs(lengths.y)};
-	auto const count = ((absoluteLengths.x > absoluteLengths.y) ? absoluteLengths.x / DSTMAX + 1
-	                                                            : absoluteLengths.y / DSTMAX + 1) +
+	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
+	auto const count = ((absoluteLengths.cx > absoluteLengths.cy) ? absoluteLengths.cx / DSTMAX + 1
+	                                                            : absoluteLengths.cy / DSTMAX + 1) +
 	                   1;
-	auto const stepSize = POINT {(absoluteLengths.x / count), (absoluteLengths.y / count)};
+	auto const stepSize = SIZE {(absoluteLengths.cx / count), (absoluteLengths.cy / count)};
 
-	auto difference = POINT {0L, 0L};
-	while ((lengths.x != 0) || (lengths.y != 0)) {
+	auto difference = SIZE {};
+	while ((lengths.cx != 0) || (lengths.cy != 0)) {
 	  auto dstType = REGTYP;
-	  if (abs(lengths.x) > stepSize.x) {
+	  if (abs(lengths.cx) > stepSize.cx) {
 		dstType = JMPTYP;
-		if (lengths.x > 0) {
-		  difference.x = stepSize.x;
+		if (lengths.cx > 0) {
+		  difference.cx = stepSize.cx;
 		}
 		else {
-		  difference.x = -stepSize.x;
+		  difference.cx = -stepSize.cx;
 		}
 	  }
 	  else {
-		difference.x = lengths.x;
+		difference.cx = lengths.cx;
 	  }
-	  if (abs(lengths.y) > stepSize.y) {
+	  if (abs(lengths.cy) > stepSize.cy) {
 		dstType = JMPTYP;
-		if (lengths.y > 0) {
-		  difference.y = stepSize.y;
+		if (lengths.cy > 0) {
+		  difference.cy = stepSize.cy;
 		}
 		else {
-		  difference.y = -stepSize.y;
+		  difference.cy = -stepSize.cy;
 		}
 	  }
 	  else {
-		difference.y = lengths.y;
+		difference.cy = lengths.cy;
 	  }
 	  di::savdst(DSTRecords, di::dudbits(difference) | dstType);
-	  centerCoordinate.x += difference.x;
-	  centerCoordinate.y += difference.y;
-	  lengths.x -= difference.x;
-	  lengths.y -= difference.y;
+	  centerCoordinate.x += difference.cx;
+	  centerCoordinate.y += difference.cy;
+	  lengths.cx -= difference.cx;
+	  lengths.cy -= difference.cy;
 	}
   }
   constexpr auto ENDCODE = uint8_t {0xF3};
   DSTRecords.push_back(DSTREC {0, 0, ENDCODE});
   if (di::colfil()) {
-	auto bytesWritten = DWORD {0};
+	auto bytesWritten = DWORD {};
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto colorFile =
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
@@ -356,7 +356,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   return iDistance;
 }
 
-auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
+auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
   static constexpr auto DSTLEN = 243U; // -121 to 121
   static constexpr auto xDST   = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
@@ -849,7 +849,7 @@ auto DST::internal::dudbits(POINT const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return xDST[wrap::toSize(dif.x) + DSTMAX] | yDST[wrap::toSize(dif.y) + DSTMAX];
+  return xDST[wrap::toSize(dif.cx) + DSTMAX] | yDST[wrap::toSize(dif.cy) + DSTMAX];
 }
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {

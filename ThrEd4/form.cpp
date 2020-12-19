@@ -5849,7 +5849,7 @@ void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
 
 void form::stchrct2px(fRECTANGLE const* stitchRect, RECT& screenRect) {
   auto stitchCoord = fPOINT {stitchRect->left, stitchRect->top};
-  auto screenCoord = POINT {0L, 0L};
+  auto screenCoord = POINT {};
   thred::sCor2px(stitchCoord, screenCoord);
   screenRect.left = screenCoord.x;
   screenRect.top  = screenCoord.y;
@@ -7052,7 +7052,7 @@ void form::internal::doTimeWindow(float                        rangeX,
                                        WS_CHILD | WS_VISIBLE | WS_BORDER,
                                        ButtonWidthX3,
                                        0,
-                                       StitchWindowSize.x,
+                                       StitchWindowSize.cx,
                                        ButtonHeight,
                                        ThrEdWindow,
                                        nullptr,
@@ -7061,7 +7061,7 @@ void form::internal::doTimeWindow(float                        rangeX,
 
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const timeDC       = GetDC(timeWindow);
-  auto const timeStep     = wrap::toFloat(StitchWindowSize.x) / rangeX;
+  auto const timeStep     = wrap::toFloat(StitchWindowSize.cx) / rangeX;
   auto       timePosition = 0.0F;
   auto&      formLines    = *FormLines;
   formLines.clear();
