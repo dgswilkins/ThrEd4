@@ -267,12 +267,12 @@ namespace internal {
              SMALPNTL*                     sequenceLines);
   void duseq1(SMALPNTL const* sequenceLines);
   void duseq2(SMALPNTL const* sequenceLines);
-  void duspnd(float const               stitchLen,
+  void duspnd(float                     stitchLen,
               std::vector<VRCT2> const& underlayVerticalRect,
               std::vector<VRCT2> const& fillVerticalRect,
-              uint32_t const            start,
-              uint32_t const            finish,
-              float const               width,
+              uint32_t                  start,
+              uint32_t                  finish,
+              float                     width,
               fPOINT&                   stitchPoint);
   void fillSB(const fPOINT& pivot, float angle, float const& radius, fPOINT& stitchPoint, float const& level);
   void filsclp();
@@ -387,7 +387,7 @@ namespace internal {
   void pbrd(FRMHED const& form);
   void pfn(std::vector<VRCT2> const& underlayVerticalRect,
            std::vector<VRCT2> const& fillVerticalRect,
-           uint32_t const            startVertex,
+           uint32_t                  startVertex,
            std::vector<VRCT2> const& vrct,
            float                     width);
   void plbak(uint32_t backPoint);
@@ -401,8 +401,8 @@ namespace internal {
   void prebrd(FRMHED const& form, FRMHED& angledForm, std::vector<fPOINT>& angledFormVertices);
   auto proj(fPOINT const& point, float slope, fPOINT const& point0, fPOINT const& point1, fPOINT& intersectionPoint) noexcept
       -> bool;
-  auto projh(float const yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept -> bool;
-  auto projv(float const xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
+  auto projh(float yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept -> bool;
+  auto projv(float xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
       -> bool;
   void prpsbrd(uint32_t formIndex);
   void prsmal(float width);
@@ -450,7 +450,7 @@ namespace internal {
   void shrnks();
   void snp(uint32_t start, uint32_t finish);
   void snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
-  void spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t const start, uint32_t const finish, fPOINT& stitchPoint);
+  void spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint);
   auto spltlin() -> bool;
   void sprct(std::vector<fPOINT> const* vertices,
              uint32_t                   vertexIndex,

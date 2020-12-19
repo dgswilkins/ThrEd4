@@ -1493,7 +1493,7 @@ void form::duangs(FRMHED const& form) {
 }
 
 // find the intersection of a line defined by it's endpoints and a vertical line defined by it's x coordinate
-auto form::internal::projv(float const xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
+auto form::internal::projv(float xCoordinate, fPOINT const& lowerPoint, fPOINT const& upperPoint, fPOINT& intersection) noexcept
     -> bool {
   auto const deltaX = upperPoint.x - lowerPoint.x;
   intersection.x    = xCoordinate;
@@ -1612,7 +1612,7 @@ auto form::linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t fini
 }
 
 // find the intersection of a line defined by it's endpoints and a horizontal line defined by it's y coordinate
-auto form::internal::projh(float const yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept
+auto form::internal::projh(float yCoordinate, fPOINT const& point0, fPOINT const& point1, fPOINT& intersection) noexcept
     -> bool {
   auto const deltaX = point1.x - point0.x;
   intersection.y    = yCoordinate;
@@ -1810,7 +1810,7 @@ void form::internal::fillSB(const fPOINT& pivot, float angle, float const& radiu
   form::filinsb(innerPoint, stitchPoint);
 }
 
-void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t const start, uint32_t const finish, fPOINT& stitchPoint) {
+void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   // clang-format off
   constexpr auto level00 = std::array<float,  1U>{ 0.0F };
   constexpr auto level01 = std::array<float,  1U>{ 1.0F       };
@@ -1902,12 +1902,12 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
   }
 }
 
-void form::internal::duspnd(float const               stitchLen,
+void form::internal::duspnd(float                     stitchLen,
                             std::vector<VRCT2> const& underlayVerticalRect,
                             std::vector<VRCT2> const& fillVerticalRect,
-                            uint32_t const            start,
-                            uint32_t const            finish,
-                            float const               width,
+                            uint32_t                  start,
+                            uint32_t                  finish,
+                            float                     width,
                             fPOINT&                   stitchPoint) {
   if (StateMap->test(StateFlag::UND)) {
 	if (StateMap->test(StateFlag::UNDPHAS)) {
@@ -1954,7 +1954,7 @@ void form::internal::duspnd(float const               stitchLen,
 
 void form::internal::pfn(std::vector<VRCT2> const& underlayVerticalRect,
                          std::vector<VRCT2> const& fillVerticalRect,
-                         uint32_t const            startVertex,
+                         uint32_t                  startVertex,
                          std::vector<VRCT2> const& vrct,
                          float                     width) {
   // clang-format off
