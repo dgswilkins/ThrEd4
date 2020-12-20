@@ -8329,7 +8329,8 @@ void thred::internal::thumnail() {
 	  rthumnam(iThumbnail++);
 	}
 	StateMap->set(StateFlag::THUMSHO);
-	ThumbnailSearchString->front() = 0;
+	ThumbnailSearchString->clear();
+	ThumbnailSearchString->push_back(0);
 	SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
 	auto const blank = std::wstring {};
 	displayText::butxt(HBOXSEL, blank);
@@ -8347,7 +8348,7 @@ void thred::internal::nuthsel() {
 	if (length != 0U) {
 	  auto bv = BackupViewer.begin();
 	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-		if (wcsncmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 		  thred::redraw(*bv);
 		  ++bv;
@@ -8385,7 +8386,7 @@ void thred::internal::nuthbak(uint32_t count) {
 	  while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
 		if (ThumbnailIndex != 0U) {
 		  --ThumbnailIndex;
-		  if (wcsncmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		  if (_wcsnicmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 			--count;
 		  }
 		}
@@ -8405,25 +8406,21 @@ void thred::internal::nuthbak(uint32_t count) {
 }
 
 void thred::internal::nuthum(wchar_t character) {
-  auto length = wcslen(ThumbnailSearchString->data());
-  if (length < 16U) {
-	StateMap->set(StateFlag::RESTCH);
-	ThumbnailSearchString->operator[](length++) = character;
-	ThumbnailSearchString->operator[](length)   = 0;
+  StateMap->set(StateFlag::RESTCH);
+  ThumbnailSearchString->back() = character;
+  ThumbnailSearchString->push_back(0);
 
-	auto const txt = std::wstring(ThumbnailSearchString->data());
-	displayText::butxt(HBOXSEL, txt);
-	ThumbnailIndex = 0;
-	nuthsel();
-  }
+  auto const txt = std::wstring(ThumbnailSearchString->data());
+  displayText::butxt(HBOXSEL, txt);
+  ThumbnailIndex = 0;
+  nuthsel();
 }
 
 void thred::internal::bakthum() {
-  auto searchStringLength = wcslen(ThumbnailSearchString->data());
-  if (searchStringLength != 0U) {
+  if (ThumbnailSearchString->size() > 1) {
 	StateMap->set(StateFlag::RESTCH);
-	ThumbnailSearchString->operator[](--searchStringLength) = 0;
-
+	ThumbnailSearchString->pop_back();
+	ThumbnailSearchString->back() = 0;
 	ThumbnailIndex = 0;
 	auto const txt = std::wstring(ThumbnailSearchString->data());
 	displayText::butxt(HBOXSEL, txt);
@@ -17749,7 +17746,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_SideWindow.resize(SWCOUNT);
 	  private_SideWindowEntryBuffer.resize(SWBLEN);
 	  private_TextureHistory.resize(ITXBUFSZ);
-	  private_ThumbnailSearchString.resize(32);
+	  private_ThumbnailSearchString.reserve(32);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
 	  private_UserPen.resize(COLORCNT);
