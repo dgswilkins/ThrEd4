@@ -231,7 +231,7 @@ static auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumb
 static auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 static auto ThumbnailIndex = uint32_t {};        // index into the thumbnail filname table
 
-static auto ThumbnailSearchString = std::array<wchar_t, 32> {}; // storage for the thumbnail search string
+static auto ThumbnailSearchString = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
 
 static auto InsertedVertexIndex = uint32_t {}; // saved vertex pointer for inserting files
 static auto InsertedFormIndex   = uint32_t {}; // saved form pointer for inserting files
@@ -8334,7 +8334,7 @@ void thred::internal::thumnail() {
 	  rthumnam(iThumbnail++);
 	}
 	StateMap->set(StateFlag::THUMSHO);
-	ThumbnailSearchString.front() = 0;
+	ThumbnailSearchString->front() = 0;
 	SetWindowText(ButtonWin->operator[](HBOXSEL), L"");
 	auto const blank = std::wstring {};
 	displayText::butxt(HBOXSEL, blank);
@@ -8347,12 +8347,12 @@ void thred::internal::nuthsel() {
   if (ThumbnailIndex < Thumbnails->size()) {
 	auto const savedIndex = ThumbnailIndex;
 	auto       iThumbnail = uint32_t {};
-	auto const length     = wcslen(ThumbnailSearchString.data());
+	auto const length     = wcslen(ThumbnailSearchString->data());
 	StateMap->set(StateFlag::RESTCH);
 	if (length != 0U) {
 	  auto bv = BackupViewer.begin();
 	  while (iThumbnail < QUADRT && ThumbnailIndex < Thumbnails->size()) { // there are 4 quadrants
-		if (wcsncmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		if (wcsncmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 		  ThumbnailsSelected[iThumbnail] = ThumbnailIndex;
 		  thred::redraw(*bv);
 		  ++bv;
@@ -8385,12 +8385,12 @@ void thred::internal::nuthsel() {
 
 void thred::internal::nuthbak(uint32_t count) {
   if (ThumbnailIndex != 0U) {
-	auto const length = wcslen(ThumbnailSearchString.data());
+	auto const length = wcslen(ThumbnailSearchString->data());
 	if (length != 0U) {
 	  while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
 		if (ThumbnailIndex != 0U) {
 		  --ThumbnailIndex;
-		  if (wcsncmp(ThumbnailSearchString.data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
+		  if (wcsncmp(ThumbnailSearchString->data(), Thumbnails->operator[](ThumbnailIndex).data(), length) == 0) {
 			--count;
 		  }
 		}
@@ -8410,13 +8410,13 @@ void thred::internal::nuthbak(uint32_t count) {
 }
 
 void thred::internal::nuthum(wchar_t character) {
-  auto length = wcslen(ThumbnailSearchString.data());
+  auto length = wcslen(ThumbnailSearchString->data());
   if (length < 16U) {
 	StateMap->set(StateFlag::RESTCH);
-	ThumbnailSearchString[length++] = character;
-	ThumbnailSearchString[length]   = 0;
+	ThumbnailSearchString->operator[](length++) = character;
+	ThumbnailSearchString->operator[](length)   = 0;
 
-	auto const txt = std::wstring(ThumbnailSearchString.data());
+	auto const txt = std::wstring(ThumbnailSearchString->data());
 	displayText::butxt(HBOXSEL, txt);
 	ThumbnailIndex = 0;
 	nuthsel();
@@ -8424,12 +8424,13 @@ void thred::internal::nuthum(wchar_t character) {
 }
 
 void thred::internal::bakthum() {
-  auto searchStringLength = wcslen(ThumbnailSearchString.data());
+  auto searchStringLength = wcslen(ThumbnailSearchString->data());
   if (searchStringLength != 0U) {
 	StateMap->set(StateFlag::RESTCH);
-	ThumbnailSearchString[--searchStringLength] = 0;
-	ThumbnailIndex                              = 0;
-	auto const txt                              = std::wstring(ThumbnailSearchString.data());
+	ThumbnailSearchString->operator[](--searchStringLength) = 0;
+
+	ThumbnailIndex = 0;
+	auto const txt = std::wstring(ThumbnailSearchString->data());
 	displayText::butxt(HBOXSEL, txt);
 	nuthsel();
   }
@@ -17729,6 +17730,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_TextureHistory            = std::vector<TXHST> {};
 	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
 	  auto private_ThrName                   = fs::path {};
+	  auto private_ThumbnailSearchString     = std::vector<wchar_t> {};
 	  auto private_Thumbnails                = std::vector<std::wstring> {};
 	  auto private_TracedEdges               = boost::dynamic_bitset<> {};
 	  auto private_TracedMap                 = boost::dynamic_bitset<> {};
@@ -17752,6 +17754,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_SideWindow.resize(SWCOUNT);
 	  private_SideWindowEntryBuffer.resize(SWBLEN);
 	  private_TextureHistory.resize(ITXBUFSZ);
+	  private_ThumbnailSearchString.resize(32);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
 	  private_UserPen.resize(COLORCNT);
@@ -17812,6 +17815,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  TextureInputBuffer        = &private_textureInputBuffer;
 	  TexturePointsBuffer       = &private_TexturePointsBuffer;
 	  ThrName                   = &private_ThrName;
+	  ThumbnailSearchString     = &private_ThumbnailSearchString;
 	  Thumbnails                = &private_Thumbnails;
 	  TracedEdges               = &private_TracedEdges;
 	  TracedMap                 = &private_TracedMap;
