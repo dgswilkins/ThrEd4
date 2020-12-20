@@ -377,7 +377,7 @@ enum class StateFlag : uint32_t {
   HUPMSG,    // user is selecting a hoop size
   IGNTHR,    // ignore the close enough threshold for 'C' hotkey
   MONOMAP,   // set if a color bitmap is loaded
-  THUMON,    // user is loading a thumnail
+  THUMON,    // user is loading a thumbnail
   CLPOVR,    // can't fit another clipboard fill on the current line
   CONTIG,    // contiguous point flag
   NUROT,     // user is entering a rotate angle
