@@ -7211,27 +7211,22 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 
 void thred::internal::getbak() {
   if (StateMap->test(StateFlag::THUMSHO)) {
-	if (ThumbnailsSelected[FileVersionIndex] != 0U) {
-	  *WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
-	  if (StateMap->test(StateFlag::RBUT)) {
-		unthum();
-		StateMap->set(StateFlag::FRMOF);
-		insfil(*WorkingFileName);
-		if (wrap::pressed(VK_SHIFT)) {
-		  StateMap->reset(StateFlag::INSFIL);
-		  StateMap->reset(StateFlag::FRMOF);
-		  StateMap->set(StateFlag::INIT);
-		  thred::coltab();
-		  StateMap->set(StateFlag::RESTCH);
-		}
-	  }
-	  else {
-		StateMap->set(StateFlag::REDOLD);
-		nuFil(fileIndices::THR);
+	*WorkingFileName = *DefaultDirectory / Thumbnails->operator[](ThumbnailsSelected[FileVersionIndex]);
+	if (StateMap->test(StateFlag::RBUT)) {
+	  unthum();
+	  StateMap->set(StateFlag::FRMOF);
+	  insfil(*WorkingFileName);
+	  if (wrap::pressed(VK_SHIFT)) {
+		StateMap->reset(StateFlag::INSFIL);
+		StateMap->reset(StateFlag::FRMOF);
+		StateMap->set(StateFlag::INIT);
+		thred::coltab();
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	}
 	else {
-	  unthum();
+	  StateMap->set(StateFlag::REDOLD);
+	  nuFil(fileIndices::THR);
 	}
   }
 }
