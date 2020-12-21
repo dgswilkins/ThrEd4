@@ -178,6 +178,7 @@ static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple f
 static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
 static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 static auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
+std::array<HWND, COLORCNT>     ThreadSizeWin             = {};      // thread size windows
 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
@@ -7191,9 +7192,9 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		                     gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW +
 		                     fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
 		if (filscor > homscor) {
-		  for (auto iName = 0U; iName < DNLEN; ++iName) {
-			ExtendedHeader->creatorName[iName] = thredHeader.creatorName[iName];
-		  }
+		  auto const ehcn = gsl::make_span(ExtendedHeader->creatorName);
+		  auto const thcn = gsl::make_span(thredHeader.creatorName);
+		  std::copy(thcn.begin(), thcn.end(), ehcn.begin());
 		  redfnam(*DesignerName);
 		  SetWindowText(
 		      ThrEdWindow,

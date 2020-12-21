@@ -232,8 +232,6 @@ extern std::vector<fPOINT>* TempPolygon;
 extern std::wstring*        TextureInputBuffer;
 extern std::vector<TXPNT>*  TexturePointsBuffer;
 
-extern std::array<HWND, COLORCNT> ThreadSizeWin;
-
 extern wchar_t const* ThrEdClipFormat;
 extern HINSTANCE      ThrEdInstance;
 extern HWND           ThrEdWindow;

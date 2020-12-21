@@ -151,7 +151,6 @@ SIZE                           StitchWindowSize          = {};      // size of t
 std::vector<fPOINT>*           TempPolygon               = nullptr; // temporary storage when user is entering a polygon;
 std::wstring*                  TextureInputBuffer        = nullptr; // texture fill number buffer
 std::vector<TXPNT>*            TexturePointsBuffer       = nullptr; // buffer for textured fill points
-std::array<HWND, COLORCNT>     ThreadSizeWin             = {};      // thread size windows
 wchar_t const*                 ThrEdClipFormat           = L"threditor"; //
 HINSTANCE                      ThrEdInstance             = {};      // main instance handle
 HWND                           ThrEdWindow               = nullptr; // main window handle
