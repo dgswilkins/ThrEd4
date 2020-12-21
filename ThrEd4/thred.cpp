@@ -178,7 +178,7 @@ static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple f
 static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
 static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
 static auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
-std::array<HWND, COLORCNT>     ThreadSizeWin             = {};      // thread size windows
+static auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
@@ -305,7 +305,7 @@ void thred::internal::hidwnd(HWND hwnd) noexcept {
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto& iThreadSizeWin : ThreadSizeWin) {
+  for (auto& iThreadSizeWin : *ThreadSizeWin) {
 	thi::hidwnd(*(iDefaultColorWin++));
 	thi::hidwnd(*(iUserColorWin++));
 	thi::hidwnd(iThreadSizeWin);
@@ -315,7 +315,7 @@ void thred::hideColorWin() noexcept {
 void thred::showColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto& iThreadSizeWin : ThreadSizeWin) {
+  for (auto& iThreadSizeWin : *ThreadSizeWin) {
 	thi::shownd(*(iDefaultColorWin++));
 	thi::shownd(*(iUserColorWin++));
 	thi::shownd(iThreadSizeWin);
@@ -2068,7 +2068,7 @@ void thred::unmsg() {
 auto thred::internal::oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	if (window == DefaultColorWin->operator[](iColor) ||
-	    UserColorWin->operator[](iColor) == window || ThreadSizeWin[iColor] == window) {
+	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
 	  return false;
 	}
   }
@@ -4440,7 +4440,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
 	auto ts = ThreadSize.begin();
-	auto tsw = ThreadSizeWin.begin();
+	auto tsw = ThreadSizeWin->begin();
 	for (auto const& color : UserColor) {
 	  nuPen(*up, 1, color);
 	  ++up;
@@ -5289,7 +5289,7 @@ void thred::internal::newFil() {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	thred::redraw(DefaultColorWin->operator[](iColor));
 	thred::redraw(UserColorWin->operator[](iColor));
-	thred::redraw(ThreadSizeWin[iColor]);
+	thred::redraw(ThreadSizeWin->operator[](iColor));
   }
   thred::zumhom();
 }
@@ -12294,7 +12294,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto buffer = std::array<wchar_t, 3> {};
 	  buffer[0]   = *ts;
 	  buffer[1]   = L'0';
-	  auto tsw    = wrap::next(ThreadSizeWin.begin(), threadSizeSelected);
+	  auto tsw    = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
 	  SetWindowText(*tsw, buffer.data());
 	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
@@ -12729,7 +12729,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	}
 	return true;
   }
-  if (thi::chkMsgs(Msg.pt, ThreadSizeWin.front(), ThreadSizeWin.back())) {
+  if (thi::chkMsgs(Msg.pt, ThreadSizeWin->front(), ThreadSizeWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  static constexpr auto str = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
@@ -15725,7 +15725,7 @@ void thred::internal::makCol() noexcept {
   auto       ts      = ThreadSize.begin();
   auto       yOffset = int32_t {};
 
-  for (auto& tsw : ThreadSizeWin) {
+  for (auto& tsw : *ThreadSizeWin) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	*dcw = CreateWindow(L"STATIC",
 	                        nullptr,
@@ -17723,6 +17723,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_TextureHistory            = std::vector<TXHST> {};
 	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
 	  auto private_ThrName                   = fs::path {};
+	  auto private_ThreadSizeWin             = std::vector<HWND> {};
 	  auto private_ThumbnailSearchString     = std::vector<wchar_t> {};
 	  auto private_Thumbnails                = std::vector<std::wstring> {};
 	  auto private_TracedEdges               = boost::dynamic_bitset<> {};
@@ -17747,6 +17748,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_SideWindow.resize(SWCOUNT);
 	  private_SideWindowEntryBuffer.resize(SWBLEN);
 	  private_TextureHistory.resize(ITXBUFSZ);
+	  private_ThreadSizeWin.resize(COLORCNT);
 	  private_ThumbnailSearchString.reserve(32);
 	  private_UndoBuffer.resize(UNDOLEN);
 	  private_UserColorWin.resize(COLORCNT);
@@ -17808,6 +17810,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  TextureInputBuffer        = &private_textureInputBuffer;
 	  TexturePointsBuffer       = &private_TexturePointsBuffer;
 	  ThrName                   = &private_ThrName;
+	  ThreadSizeWin             = &private_ThreadSizeWin;
 	  ThumbnailSearchString     = &private_ThumbnailSearchString;
 	  Thumbnails                = &private_Thumbnails;
 	  TracedEdges               = &private_TracedEdges;
