@@ -83,7 +83,8 @@ static auto CurrentStitchIndex = uint32_t {}; // pointer to the current selectio
 static auto ThredDC            = gsl::narrow_cast<HDC>(nullptr);    // main device context handle
 static auto ScreenSizePixels   = SIZE {};                           // screen size in pixels
 static auto StitchWindowAbsRect     = RECT {};                      // stitch window size,absolute
-static auto NearestPixel            = std::array<POINT, NERCNT> {}; // selected points
+static auto NearestPixel        = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // selected points
+static auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
 static auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
 static auto PrevGroupEndStitch      = uint32_t {}; // higher end of previous selection
 static auto StitchWindowAspectRatio = float {};    // aspect ratio of the stitch window
@@ -183,7 +184,6 @@ static auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
     std::bitset<32> {}; // Map of color numbers in design that are actually displayed
-static auto NearestPoint     = std::array<uint32_t, NERCNT> {};   // indices of the closest points
 static auto MoveAnchor       = uint32_t {};                       // for resequencing stitches
 static auto RotateAngle      = float {};                          // angle for pixel rotate
 static auto PickColorMsgSize = SIZE {};                           // size of the pick color message
@@ -921,7 +921,7 @@ void thred::rngadj() {
 void thred::internal::box(uint32_t iNearest, HDC dc) {
   auto const bw       = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth = *bw;
-  auto const np       = wrap::next(NearestPixel.begin(), iNearest);
+  auto const np       = wrap::next(NearestPixel->begin(), iNearest);
   auto const npx = np->x;
   auto const npy = np->y;
   auto       line     = std::array<POINT, SQPNTS> {};
@@ -4731,9 +4731,9 @@ void thred::internal::duClos(uint32_t            startStitch,
 	for (auto iNear = 0U; iNear < NERCNT; ++iNear) {
 	  if (sum < gapToNearest[iNear]) {
 		auto const lowestSum = gapToNearest[iNear];
-		auto const tind1     = NearestPoint[iNear];
+		auto const tind1     = NearestPoint->operator[](iNear);
 		gapToNearest[iNear]  = sum;
-		NearestPoint[iNear]  = tind0;
+		NearestPoint->operator[](iNear)  = tind0;
 		sum                  = lowestSum;
 		tind0                = tind1;
 	  }
@@ -4746,7 +4746,7 @@ void thred::internal::closPnt() {
   unboxs();
   std::vector<float> gapToNearest;       // distances of the closest points
   gapToNearest.resize(NERCNT, BIGFLOAT); // to a mouse click
-  NearestPoint.fill(std::numeric_limits<uint32_t>::max());
+  NearestPoint->assign(wrap::toSize(NERCNT), std::numeric_limits<uint32_t>::max());
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	auto const iStitch0 = ColorChangeTable->operator[](iColor).stitchIndex;
@@ -4764,10 +4764,10 @@ void thred::internal::closPnt() {
   }
   GetClientRect(MainStitchWin, &StitchWindowClientRect);
   auto stitchCoordsInPixels = POINT {};
-  for (auto const& iNear : NearestPoint) {
+  for (auto const& iNear : *NearestPoint) {
 	if (stch2px(iNear, stitchCoordsInPixels)) {
-	  NearestPoint[NearestCount]   = iNear;
-	  NearestPixel[NearestCount++] = stitchCoordsInPixels;
+	  NearestPoint->operator[](NearestCount)   = iNear;
+	  NearestPixel->operator[](NearestCount++) = stitchCoordsInPixels;
 	}
   }
   boxs();
@@ -4784,8 +4784,8 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	}
   }
   auto bo = BoxOffset.begin();
-  auto npi = NearestPixel.begin();
-  auto npo = NearestPoint.begin();
+  auto npi = NearestPixel->begin();
+  auto npo = NearestPoint->begin();
   for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	auto const offset = *(bo++);
 	auto const& pixel = *(npi++);
@@ -17703,6 +17703,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  };
 
 	  auto private_MsgBuffer                 = std::vector<wchar_t> {};
+	  auto private_NearestPixel              = std::vector<POINT> {};
+	  auto private_NearestPoint              = std::vector<uint32_t> {};
 	  auto private_OSequence                 = std::vector<fPOINT> {};
 	  auto private_OutsidePointList          = std::vector<fPOINT> {};
 	  auto private_PreviousNames             = std::vector<fs::path> {};
@@ -17742,6 +17744,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  private_FormControlPoints.resize(OUTPNTS);
 	  private_LabelWindow.resize(LASTLIN);
 	  private_MsgBuffer.reserve(MSGSIZ);
+	  private_NearestPixel.resize(NERCNT);
+	  private_NearestPoint.resize(NERCNT);
 	  private_RubberBandLine.resize(3U);
 	  private_SelectedFormsLine.resize(OUTPNTS);
 	  private_SelectedPointsLine.resize(OUTPNTS);
@@ -17793,6 +17797,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  LabelWindow               = &private_LabelWindow;
 	  MenuInfo                  = &private_MenuInfo;
 	  MsgBuffer                 = &private_MsgBuffer;
+	  NearestPixel              = &private_NearestPixel;
+	  NearestPoint              = &private_NearestPoint;
 	  OSequence                 = &private_OSequence;
 	  OutsidePointList          = &private_OutsidePointList;
 	  PreviousNames             = &private_PreviousNames;
