@@ -4728,14 +4728,16 @@ void thred::internal::duClos(uint32_t            startStitch,
 	    ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
 	auto sum   = hypot(cx, cy);
 	auto tind0 = iStitch;
-	for (auto iNear = 0U; iNear < NERCNT; ++iNear) {
-	  if (sum < gapToNearest[iNear]) {
-		auto const lowestSum = gapToNearest[iNear];
-		auto const tind1     = NearestPoint->operator[](iNear);
-		gapToNearest[iNear]  = sum;
-		NearestPoint->operator[](iNear)  = tind0;
-		sum                  = lowestSum;
-		tind0                = tind1;
+	auto gap = gapToNearest.begin();
+	for (auto& point : *NearestPoint) {
+	  if (sum < *gap) {
+		auto const lowestSum = *gap;
+		auto const tind1     = point;
+
+		*gap  = sum;
+		point = tind0;
+		sum   = lowestSum;
+		tind0 = tind1;
 	  }
 	}
   }
@@ -4745,8 +4747,8 @@ void thred::internal::closPnt() {
   unbox();
   unboxs();
   std::vector<float> gapToNearest;       // distances of the closest points
-  gapToNearest.resize(NERCNT, BIGFLOAT); // to a mouse click
-  NearestPoint->assign(wrap::toSize(NERCNT), std::numeric_limits<uint32_t>::max());
+  gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
+  NearestPoint->assign(NearestPoint->size(), std::numeric_limits<uint32_t>::max());
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
   for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
 	auto const iStitch0 = ColorChangeTable->operator[](iColor).stitchIndex;
