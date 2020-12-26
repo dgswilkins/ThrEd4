@@ -2721,10 +2721,11 @@ void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
   pen = wrap::CreatePen(PS_SOLID, width, color);
 }
 
-void thred::internal::nuStchSiz(uint32_t iColor, int32_t width) noexcept {
-  if (width != ThreadSizePixels[iColor]) {
+void thred::internal::nuStchSiz(uint32_t iColor, int32_t width) {
+  auto tsp = wrap::next(ThreadSizePixels.begin(), iColor);
+  if (width != *tsp) {
 	nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
-	ThreadSizePixels[iColor] = width;
+	*tsp = width;
   }
 }
 
@@ -2956,9 +2957,10 @@ void thred::internal::redbal() {
 		BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
 		IniFile.hoopType       = CUSTHUP;
 		UserColor.fill(0);
-		UserColor[0] = balaradHeader.color[0];
+		auto const bhc = gsl::make_span(balaradHeader.color);
+		auto iBHC = bhc.begin();
+		UserColor[0] = *iBHC;
 		auto color   = 0U;
-		auto bColor  = 1U;
 		thred::addColor(0, color);
 		for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 		  switch (balaradStitch[iStitch].code) {
@@ -2969,7 +2971,8 @@ void thred::internal::redbal() {
 			  break;
 			}
 			case BALSTOP: {
-			  color                    = DST::colmatch(balaradHeader.color[bColor++]);
+			  color                    = DST::colmatch(*(iBHC++));
+
 			  auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 			  thred::addColor(currentStitch, color);
 			  break;
@@ -3010,13 +3013,15 @@ void thred::internal::ritbal() {
 	  return;
 	}
 	auto color             = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
-	balaradHeader.color[0] = UserColor[color];
-	auto iColor            = 1U;
+	auto const bhc = gsl::make_span(balaradHeader.color);
+	auto iBHC = bhc.begin();
+	auto const bhcEnd = std::next(bhc.begin(), UserColor.size());
+	*iBHC = UserColor[color];
 	for (auto& stitch : *StitchBuffer) {
 	  if (color != (stitch.attribute & COLMSK)) {
-		color                         = stitch.attribute & COLMSK;
-		balaradHeader.color[iColor++] = UserColor[color];
-		if ((iColor & NCOLMSK) != 0U) {
+		color     = stitch.attribute & COLMSK;
+		*(iBHC++) = UserColor[color];
+		if (iBHC == bhcEnd) {
 		  break;
 		}
 	  }

@@ -329,7 +329,7 @@ namespace internal {
   void resetState();
   void nuFil(fileIndices fileIndex);
   void nuRct() noexcept;
-  void nuStchSiz(uint32_t iColor, int32_t width) noexcept;
+  void nuStchSiz(uint32_t iColor, int32_t width);
   auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
   void nucols();
   void nudgfn(float deltaX, float deltaY);
