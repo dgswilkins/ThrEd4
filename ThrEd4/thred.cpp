@@ -4739,6 +4739,7 @@ void thred::internal::duClos(uint32_t            startStitch,
 		sum   = lowestSum;
 		tind0 = tind1;
 	  }
+	  ++gap;
 	}
   }
 }
