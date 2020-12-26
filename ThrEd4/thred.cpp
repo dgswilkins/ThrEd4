@@ -2856,8 +2856,9 @@ void thred::internal::ritini() {
   std::copy(std::begin(IniFile.stitchPreferredColors),
             std::end(IniFile.stitchPreferredColors),
             CustomColor.begin());
-  for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	IniFile.bitmapBackgroundColors[iColor] = bitmap::getBmpBackColor(iColor);
+  auto ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
+  for (auto iColor : ibbc) {
+	iColor = bitmap::getBmpBackColor(iColor);
   }
   IniFile.backgroundColor = BackgroundColor;
   IniFile.bitmapColor     = bitmap::getBmpColor();
@@ -3191,8 +3192,9 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
         wrap::toUnsigned(CustomColor.size() * sizeof(decltype(CustomColor.back()))));
   auto threadSizeBuffer = std::string {};
   threadSizeBuffer.resize(TSSIZE);
-  for (auto iThread = 0U; iThread < TSSIZE; ++iThread) {
-	threadSizeBuffer[iThread] = gsl::narrow<char>(ThreadSize[iThread]);
+  auto iBuffer = threadSizeBuffer.begin();
+  for (auto& iThread : ThreadSize) {
+	*(iBuffer++) = gsl::narrow<char>(iThread);
   }
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
   if (!FormList->empty()) {
@@ -4119,8 +4121,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
-	auto&      desName = IniFile.designerName;
-	DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
+	auto const desName = gsl::make_span(IniFile.designerName);
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(desName.data())));
 	switch (version) {
 	  case 0: {
 		if (thredHeader.hoopType == SMALHUP) {
@@ -4134,11 +4136,10 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 		}
 		ritfnam(*DesignerName);
-		auto& emn = ExtendedHeader->modifierName;
-		auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
-		std::copy(&IniFile.designerName[0],
-		          &IniFile.designerName[strlen(std::begin(desName))],
-		          modifierName.begin());
+		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
+		std::copy(desName.begin(),
+		  std::next(desName.begin(), strlen(desName.data()) + 1U),
+		  modifierName.begin());
 		break;
 	  }
 	  case 1:
@@ -4210,8 +4211,9 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	}
 	auto threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
 	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
-	for (auto iThread = 0U; iThread < TSSIZE; ++iThread) {
-	  ThreadSize[iThread] = threadSizeBufW[iThread];
+	auto tsBuffer = threadSizeBufW.begin();
+	for (auto& ts : ThreadSize) {
+	  ts = *(tsBuffer++);
 	}
 	if (thredHeader.formCount != 0) {
 	  StateMap->reset(StateFlag::BADFIL);
