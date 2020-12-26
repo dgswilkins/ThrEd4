@@ -4785,18 +4785,20 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	  return true;
 	}
   }
-  auto bo = BoxOffset.begin();
-  auto npi = NearestPixel->begin();
-  auto npo = NearestPoint->begin();
-  for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
-	auto const offset = *(bo++);
-	auto const& pixel = *(npi++);
-	if (pointToCheck.x >= pixel.x - offset && pointToCheck.x <= pixel.x + offset &&
-	    pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
-	  closestStitch = *npo;
-	  return true;
+  if (NearestCount != 0) {
+	auto bo = BoxOffset.begin();
+	auto npi = NearestPixel->begin();
+	auto npo = NearestPoint->begin();
+	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
+	  auto const offset = *(bo++);
+	  auto const& pixel = *(npi++);
+	  if (pointToCheck.x >= pixel.x - offset && pointToCheck.x <= pixel.x + offset &&
+		pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
+		closestStitch = *npo;
+		return true;
+	  }
+	  ++npo;
 	}
-	++npo;
   }
   auto const stitchPoint     = thred::pxCor2stch(Msg.pt);
   auto       distanceToClick = BIGFLOAT;
