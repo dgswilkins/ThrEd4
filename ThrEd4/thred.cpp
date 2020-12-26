@@ -2849,11 +2849,15 @@ void thred::internal::ritini() {
   auto const designerName = gsl::span<char, sizeof(idn)/sizeof(idn[0])>(idn);
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
+  std::copy(std::begin(IniFile.stitchColors), std::end(IniFile.stitchColors), UserColor.begin());
+  std::copy(std::begin(IniFile.backgroundPreferredColors),
+            std::end(IniFile.backgroundPreferredColors),
+            CustomBackgroundColor.begin());
+  std::copy(std::begin(IniFile.stitchPreferredColors),
+            std::end(IniFile.stitchPreferredColors),
+            CustomColor.begin());
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	IniFile.stitchColors[iColor]              = UserColor[iColor];
-	IniFile.backgroundPreferredColors[iColor] = CustomBackgroundColor[iColor];
-	IniFile.stitchPreferredColors[iColor]     = CustomColor[iColor];
-	IniFile.bitmapBackgroundColors[iColor]    = bitmap::getBmpBackColor(iColor);
+	IniFile.bitmapBackgroundColors[iColor] = bitmap::getBmpBackColor(iColor);
   }
   IniFile.backgroundColor = BackgroundColor;
   IniFile.bitmapColor     = bitmap::getBmpColor();
