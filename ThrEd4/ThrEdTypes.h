@@ -30,8 +30,8 @@ void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&
 
 constexpr auto RES_SIZE = 26; // reserved for expansion in the ThrEd v1.0 header
 constexpr auto NAME_LEN = 50; // Length of the name fields in ThrEd headers
-constexpr auto COLORCNT = gsl::narrow_cast<uint8_t>(16U);           // Number of colors in arrays
-constexpr auto COLORMAX = gsl::narrow_cast<uint8_t>(COLORCNT - 1U); // max index in color arrays
+constexpr auto COLORCNT = uint8_t {16U};                            // Number of colors in arrays
+constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr auto COLORBTS = 0xfU;     // Number of bits to cover the number of the colors in arrays
 constexpr auto SRTIM    = 20000000; // sort time limit in 100 ns intervals
 
@@ -79,7 +79,7 @@ constexpr int32_t  SCROLSIZ = 12;          // logical pixel width of a scroll ba
 constexpr int32_t  COLSIZ   = 12;          // logical pixel width of the color bar
 // ToDo - Should this be a configurable parameter?
 constexpr double   CLOSENUF = 15.0; // mouse click region for select
-constexpr auto     FCLOSNUF = gsl::narrow_cast<float>(CLOSENUF);
+constexpr auto     FCLOSNUF = float {CLOSENUF};
 constexpr float    ZMARGIN  = 1.25F;             // zoom margin for select zooms
 constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
 constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
