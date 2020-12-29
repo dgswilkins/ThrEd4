@@ -207,8 +207,8 @@ extern std::vector<POINT>* SelectedPointsLine;
 
 extern fRECTANGLE SelectedVerticesRect;
 
-extern float      ShowStitchThreshold;
-extern HWND       SideMessageWindow;
+extern float ShowStitchThreshold;
+extern HWND  SideMessageWindow;
 extern float SmallStitchLength;
 extern float SnapLength;
 extern float SpiralWrap;

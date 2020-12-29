@@ -1467,7 +1467,7 @@ void form::internal::bold(FRMHED const& form) {
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(OSequence->size() - 1U); ++iSequence) {
 	auto const& sequence     = OSequence->operator[](iSequence);
 	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto const length       = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y);
+	auto const length        = hypot(sequenceFwd1.x - sequence.x, sequenceFwd1.y - sequence.y);
 	if (length > TNYFLOAT) {
 	  OSequence->operator[](iOutput++) = sequence;
 	}
@@ -1594,8 +1594,8 @@ auto form::internal::proj(fPOINT const& point, float slope, fPOINT const& point0
 auto form::linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept
     -> bool {
   if (OutsidePoints != nullptr) {
-	auto const delta = fPOINT {(OutsidePoints->operator[](start).x - points[start].x),
-	                           (OutsidePoints->operator[](start).y - points[start].y)};
+	auto const  delta = fPOINT {(OutsidePoints->operator[](start).x - points[start].x),
+                               (OutsidePoints->operator[](start).y - points[start].y)};
 	auto const& point = points[start];
 
 	if ((delta.x == 0.0F) && (delta.y == 0.0F)) {
@@ -8173,7 +8173,8 @@ void form::centir() {
   fi::getbig(AllItemsRect);
   auto const itemCenter = fPOINT {wrap::midl(AllItemsRect->right, AllItemsRect->left),
                                   wrap::midl(AllItemsRect->top, AllItemsRect->bottom)};
-  auto const hoopCenter = fPOINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
+  auto const hoopCenter =
+      fPOINT {wrap::toFloat(UnzoomedRect.cx) / 2.0F, wrap::toFloat(UnzoomedRect.cy) / 2.0F};
   auto const delta = fPOINT {hoopCenter.x - itemCenter.x, hoopCenter.y - itemCenter.y};
   for (auto& stitch : *StitchBuffer) {
 	stitch.x += delta.x;

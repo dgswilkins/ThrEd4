@@ -221,10 +221,10 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  colorData.push_back(spUserColor[color]);
 	}
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
-                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
+                         std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
 	auto const absoluteLengths = SIZE {abs(lengths.cx), abs(lengths.cy)};
 	auto const count = ((absoluteLengths.cx > absoluteLengths.cy) ? absoluteLengths.cx / DSTMAX + 1
-	                                                            : absoluteLengths.cy / DSTMAX + 1) +
+	                                                              : absoluteLengths.cy / DSTMAX + 1) +
 	                   1;
 	auto const stepSize = SIZE {(absoluteLengths.cx / count), (absoluteLengths.cy / count)};
 

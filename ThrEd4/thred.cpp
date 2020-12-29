@@ -80,9 +80,9 @@ static auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory f
 static auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
 static auto LargestStitchIndex = uint32_t {}; // pointer to the largest stitch in the selected range
 static auto CurrentStitchIndex = uint32_t {}; // pointer to the current selection for length search
-static auto ThredDC            = gsl::narrow_cast<HDC>(nullptr);    // main device context handle
-static auto ScreenSizePixels   = SIZE {};                           // screen size in pixels
-static auto StitchWindowAbsRect     = RECT {};                      // stitch window size,absolute
+static auto ThredDC            = gsl::narrow_cast<HDC>(nullptr); // main device context handle
+static auto ScreenSizePixels   = SIZE {};                        // screen size in pixels
+static auto StitchWindowAbsRect = RECT {};                       // stitch window size,absolute
 static auto NearestPixel        = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // selected points
 static auto NearestPoint = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of the closest points
 static auto PrevGroupStartStitch    = uint32_t {}; // lower end of previous selection
@@ -177,20 +177,20 @@ static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
-static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
-static auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
-static auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
+static auto UserColorWin  = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // user color windows
+static auto SideWindow    = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // side message windows
+static auto ThreadSizeWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // thread size windows
 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
     std::bitset<32> {}; // Map of color numbers in design that are actually displayed
-static auto MoveAnchor       = uint32_t {};                       // for resequencing stitches
-static auto RotateAngle      = float {};                          // angle for pixel rotate
-static auto PickColorMsgSize = SIZE {};                           // size of the pick color message
-static auto InsertSize       = SIZE {};                          // size of file insert window
-static auto InsertCenter     = fPOINT {};                         // center point in inserted file
-static auto NumericCode      = wchar_t {};                        // keyboard numerical input
-static auto Knots            = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
+static auto MoveAnchor       = uint32_t {}; // for resequencing stitches
+static auto RotateAngle      = float {};    // angle for pixel rotate
+static auto PickColorMsgSize = SIZE {};     // size of the pick color message
+static auto InsertSize       = SIZE {};     // size of file insert window
+static auto InsertCenter     = fPOINT {};   // center point in inserted file
+static auto NumericCode      = wchar_t {};  // keyboard numerical input
+static auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
 static auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
@@ -232,7 +232,8 @@ static auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumb
 static auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
 static auto ThumbnailIndex = uint32_t {};        // index into the thumbnail filname table
 
-static auto ThumbnailSearchString = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
+static auto ThumbnailSearchString =
+    gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
 
 static auto InsertedVertexIndex = uint32_t {}; // saved vertex pointer for inserting files
 static auto InsertedFormIndex   = uint32_t {}; // saved form pointer for inserting files
@@ -521,8 +522,8 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 	}
   }
   auto       iTmpName      = tmpName.begin();
-  auto& ecn = ExtendedHeader->creatorName;
-  auto const spCreatorName = gsl::span<char, sizeof(ecn)/sizeof(ecn[0])>(ecn);
+  auto&      ecn           = ExtendedHeader->creatorName;
+  auto const spCreatorName = gsl::span<char, sizeof(ecn) / sizeof(ecn[0])>(ecn);
   for (auto& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
@@ -531,11 +532,11 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 }
 
 void thred::internal::redfnam(std::wstring& designerName) {
-  auto           tmpName       = std::array<uint8_t, NameOrder.size()> {};
-  auto           designer      = std::string {};
-  auto           iNameOrder    = NameOrder.begin();
-  auto&          EHCN          = ExtendedHeader->creatorName;
-  auto const     spCreatorName = gsl::make_span(EHCN);
+  auto       tmpName       = std::array<uint8_t, NameOrder.size()> {};
+  auto       designer      = std::string {};
+  auto       iNameOrder    = NameOrder.begin();
+  auto&      EHCN          = ExtendedHeader->creatorName;
+  auto const spCreatorName = gsl::make_span(EHCN);
   for (auto& iTmpName : tmpName) {
 	auto& index = *iNameOrder;
 	if (index < spCreatorName.size()) {
@@ -922,8 +923,8 @@ void thred::internal::box(uint32_t iNearest, HDC dc) {
   auto const bw       = wrap::next(BoxOffset.begin(), iNearest);
   auto const boxWidth = *bw;
   auto const np       = wrap::next(NearestPixel->begin(), iNearest);
-  auto const npx = np->x;
-  auto const npy = np->y;
+  auto const npx      = np->x;
+  auto const npy      = np->y;
   auto       line     = std::array<POINT, SQPNTS> {};
 
   line[0] = {npx - boxWidth, npy - boxWidth};
@@ -1033,7 +1034,7 @@ void thred::internal::nuRct() noexcept {
 
 void thred::movStch() {
   auto clientSize = SIZE {(ThredWindowRect.right - ButtonWidthX3 - (*ScrollSize + *ColorBarSize)),
-                           (ThredWindowRect.bottom)};
+                          (ThredWindowRect.bottom)};
   auto verticalOffset = 0;
   thi::unboxs();
   if (StateMap->test(StateFlag::RUNPAT) || StateMap->test(StateFlag::WASPAT)) {
@@ -1367,7 +1368,8 @@ void thred::internal::chknum() {
   if (swMsgIndex != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
-	  auto const value      = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
+
+	  auto const value = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
 		case LTXOF: {
 		  thred::savdo();
@@ -1408,7 +1410,7 @@ void thred::internal::chknum() {
 		}
 		case LFTHUPCNT: {
 		  thred::savdo();
-		  auto upcnt = value * IPFGRAN;
+		  auto           upcnt    = value * IPFGRAN;
 		  constexpr auto FUPCLAMP = 255.0F; // clamp the feather up count
 		  if (upcnt > FUPCLAMP) {
 			upcnt = FUPCLAMP;
@@ -1557,7 +1559,7 @@ void thred::internal::chknum() {
 			}
 			case LFTHDWNCNT: {
 			  thred::savdo();
-			  auto dncnt = value * IPFGRAN;
+			  auto           dncnt    = value * IPFGRAN;
 			  constexpr auto FDNCLAMP = 255.0F; // clamp the feather down count
 			  if (dncnt > FDNCLAMP) {
 				dncnt = FDNCLAMP;
@@ -1741,7 +1743,8 @@ void thred::internal::chknum() {
 				  if (StarRatio < SRMINLIM) {
 					StarRatio = SRMINLIM;
 				  }
-				  SetWindowText(ValueWindow->operator[](PRFSTRRAT), fmt::format(L"{:.2f}", StarRatio).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSTRRAT),
+				                fmt::format(L"{:.2f}", StarRatio).c_str());
 				  break;
 				}
 				case PRFLENRAT: {
@@ -1770,7 +1773,8 @@ void thred::internal::chknum() {
 				  if (SpiralWrap < SRMINLIM) {
 					SpiralWrap = SRMINLIM;
 				  }
-				  SetWindowText(ValueWindow->operator[](PRFSPLWRP), fmt::format(L"{:.2f}", SpiralWrap).c_str());
+				  SetWindowText(ValueWindow->operator[](PRFSPLWRP),
+				                fmt::format(L"{:.2f}", SpiralWrap).c_str());
 				  break;
 				}
 				case PRFBCNLEN: {
@@ -1852,8 +1856,8 @@ void thred::internal::chknum() {
 		thred::savdo();
 		constexpr auto STARSIZE = 250.0F; // star size factor
 		form::dustar(uintValue,
-		  STARSIZE / value * ZoomFactor *
-		  wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
+		             STARSIZE / value * ZoomFactor *
+		                 wrap::toFloat(UnzoomedRect.cx + UnzoomedRect.cy) / (LHUPX + LHUPY));
 		break;
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRSPIR)) {
@@ -2830,7 +2834,7 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto& idd = IniFile.defaultDirectory;
+  auto&          idd              = IniFile.defaultDirectory;
   auto const     defaultDirectory = gsl::span<char, sizeof(idd) / sizeof(idd[0])>(idd);
   constexpr char FILLCHAR         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
@@ -2847,9 +2851,9 @@ void thred::internal::ritini() {
   }
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
   auto const designerName = gsl::make_span(IniFile.designerName);
-  auto const spISC = gsl::make_span(IniFile.stitchColors);
-  auto const spIBPC = gsl::make_span(IniFile.backgroundPreferredColors);
-  auto const spISPC = gsl::make_span(IniFile.stitchPreferredColors);
+  auto const spISC        = gsl::make_span(IniFile.stitchColors);
+  auto const spIBPC       = gsl::make_span(IniFile.backgroundPreferredColors);
+  auto const spISPC       = gsl::make_span(IniFile.stitchPreferredColors);
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   std::copy(spISC.begin(), spISC.end(), UserColor.begin());
@@ -2944,7 +2948,7 @@ void thred::internal::redbal() {
 		BackgroundColor         = balaradHeader.backgroundColor;
 		IniFile.backgroundColor = balaradHeader.backgroundColor;
 		nuPen(BackgroundPen, 1, BackgroundColor);
-		BackgroundPenWidth      = 1;
+		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush        = CreateSolidBrush(BackgroundColor);
 		constexpr auto IBALRAT = 6.0F / 10.0F; // Inverse balarad stitch size ratio
@@ -2955,10 +2959,10 @@ void thred::internal::redbal() {
 		BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
 		IniFile.hoopType       = CUSTHUP;
 		UserColor.fill(0);
-		auto const bhc = gsl::make_span(balaradHeader.color);
-		auto iBHC = bhc.begin();
-		UserColor[0] = *iBHC;
-		auto color   = 0U;
+		auto const bhc  = gsl::make_span(balaradHeader.color);
+		auto       iBHC = bhc.begin();
+		UserColor[0]    = *iBHC;
+		auto color      = 0U;
 		thred::addColor(0, color);
 		for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 		  switch (balaradStitch[iStitch].code) {
@@ -2969,7 +2973,7 @@ void thred::internal::redbal() {
 			  break;
 			}
 			case BALSTOP: {
-			  color                    = DST::colmatch(*(iBHC++));
+			  color = DST::colmatch(*(iBHC++));
 
 			  auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 			  thred::addColor(currentStitch, color);
@@ -2981,7 +2985,7 @@ void thred::internal::redbal() {
 			}
 		  }
 		}
-		auto up = UserPen->begin();
+		auto up  = UserPen->begin();
 		auto ucb = UserColorBrush.begin();
 		for (auto& ucolor : UserColor) {
 		  *(up++) = wrap::CreatePen(PS_SOLID, PENNWID, ucolor);
@@ -3010,11 +3014,11 @@ void thred::internal::ritbal() {
 	if (balaradFile == INVALID_HANDLE_VALUE) {
 	  return;
 	}
-	auto color             = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
-	auto const bhc = gsl::make_span(balaradHeader.color);
-	auto iBHC = bhc.begin();
+	auto       color  = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
+	auto const bhc    = gsl::make_span(balaradHeader.color);
+	auto       iBHC   = bhc.begin();
 	auto const bhcEnd = std::next(bhc.begin(), UserColor.size());
-	*iBHC = UserColor[color];
+	*iBHC             = UserColor[color];
 	for (auto& stitch : *StitchBuffer) {
 	  if (color != (stitch.attribute & COLMSK)) {
 		color     = stitch.attribute & COLMSK;
@@ -3140,8 +3144,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto& emn = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
+  auto&      emn          = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -3604,16 +3608,16 @@ void thred::internal::dun() {
 void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideWindow->operator[](entry.value) = CreateWindow(L"STATIC",
-                                         displayText::loadStr(entry.stringID).c_str(),
-                                         SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
-                                         3,
-                                         windowLocation * windowSize.cy + 3,
-                                         windowSize.cx + 3,
-                                         windowSize.cy,
-                                         SideMessageWindow,
-                                         nullptr,
-                                         ThrEdInstance,
-                                         nullptr);
+                                                     displayText::loadStr(entry.stringID).c_str(),
+                                                     SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
+                                                     3,
+                                                     windowLocation * windowSize.cy + 3,
+                                                     windowSize.cx + 3,
+                                                     windowSize.cy,
+                                                     SideMessageWindow,
+                                                     nullptr,
+                                                     ThrEdInstance,
+                                                     nullptr);
   ++windowLocation;
 }
 
@@ -4141,8 +4145,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ritfnam(*DesignerName);
 		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
 		std::copy(desName.begin(),
-		  wrap::next(desName.begin(), strlen(desName.data()) + 1U),
-		  modifierName.begin());
+		          wrap::next(desName.begin(), strlen(desName.data()) + 1U),
+		          modifierName.begin());
 		break;
 	  }
 	  case 1:
@@ -4445,10 +4449,10 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	StateMap->reset(StateFlag::ZUMED);
 	auto buffer = std::array<wchar_t, 3> {};
 	buffer[1]   = L'0';
-	auto up  = UserPen->begin();
-	auto ucb = UserColorBrush.begin();
-	auto ts = ThreadSize.begin();
-	auto tsw = ThreadSizeWin->begin();
+	auto up     = UserPen->begin();
+	auto ucb    = UserColorBrush.begin();
+	auto ts     = ThreadSize.begin();
+	auto tsw    = ThreadSizeWin->begin();
 	for (auto const& color : UserColor) {
 	  nuPen(*up, 1, color);
 	  ++up;
@@ -4736,7 +4740,7 @@ void thred::internal::duClos(uint32_t            startStitch,
 	    ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
 	auto sum   = hypot(cx, cy);
 	auto tind0 = iStitch;
-	auto gap = gapToNearest.begin();
+	auto gap   = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
 	  if (sum < *gap) {
 		auto const lowestSum = *gap;
@@ -4755,7 +4759,7 @@ void thred::internal::duClos(uint32_t            startStitch,
 void thred::internal::closPnt() {
   unbox();
   unboxs();
-  std::vector<float> gapToNearest;       // distances of the closest points
+  std::vector<float> gapToNearest;                     // distances of the closest points
   gapToNearest.resize(NearestPoint->size(), BIGFLOAT); // to a mouse click
   NearestPoint->assign(NearestPoint->size(), std::numeric_limits<uint32_t>::max());
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
@@ -4795,14 +4799,14 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	}
   }
   if (NearestCount != 0) {
-	auto bo = BoxOffset.begin();
+	auto bo  = BoxOffset.begin();
 	auto npi = NearestPixel->begin();
 	auto npo = NearestPoint->begin();
 	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
-	  auto const offset = *(bo++);
-	  auto const& pixel = *(npi++);
+	  auto const  offset = *(bo++);
+	  auto const& pixel  = *(npi++);
 	  if (pointToCheck.x >= pixel.x - offset && pointToCheck.x <= pixel.x + offset &&
-		pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
+	      pointToCheck.y >= pixel.y - offset && pointToCheck.y <= pixel.y + offset) {
 		closestStitch = *npo;
 		return true;
 	  }
@@ -5266,8 +5270,8 @@ void thred::internal::newFil() {
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto& emn = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
+  auto&      emn          = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   rstdu();
   rstAll();
@@ -6890,7 +6894,7 @@ void thred::internal::vubak() {
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
 	auto const dx = StitchWindowClientRect.right / 2;
 	auto const dy = StitchWindowClientRect.bottom / 2;
-	auto bv = BackupViewer.begin();
+	auto       bv = BackupViewer.begin();
 	for (auto iPosition = uint32_t {}; iPosition < QUADRT; ++iPosition) { // there are 4 quadrants
 	  auto verticalLocation = 0L;
 	  if ((iPosition & 2U) != 0U) {
@@ -7154,10 +7158,10 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		}
 		if (fileHeader.formCount != 0U) {
 		  auto const& insertedVertex = FormVertices->operator[](InsertedVertexIndex);
-		  insertedRectangle.left    = insertedVertex.x;
-		  insertedRectangle.right   = insertedVertex.x;
-		  insertedRectangle.bottom  = insertedVertex.y;
-		  insertedRectangle.top     = insertedVertex.y;
+		  insertedRectangle.left     = insertedVertex.x;
+		  insertedRectangle.right    = insertedVertex.x;
+		  insertedRectangle.bottom   = insertedVertex.y;
+		  insertedRectangle.top      = insertedVertex.y;
 		  for (auto iVertex = InsertedVertexIndex + 1U; iVertex < wrap::toUnsigned(FormVertices->size());
 		       ++iVertex) {
 			auto const& vertex = FormVertices->operator[](iVertex);
@@ -8435,8 +8439,8 @@ void thred::internal::bakthum() {
 	StateMap->set(StateFlag::RESTCH);
 	ThumbnailSearchString->pop_back();
 	ThumbnailSearchString->back() = 0;
-	ThumbnailIndex = 0;
-	auto const txt = std::wstring(ThumbnailSearchString->data());
+	ThumbnailIndex                = 0;
+	auto const txt                = std::wstring(ThumbnailSearchString->data());
 	displayText::butxt(HBOXSEL, txt);
 	nuthsel();
   }
@@ -8667,17 +8671,18 @@ void thred::internal::sidhup() {
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	SideWindow->operator[](iHoop) = CreateWindow(L"STATIC",
-	                                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
-	                                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                                 3,
-	                                 ButtonHeight * idx + 3,
-	                                 ButtonWidthX3 + ButtonWidth * 2,
-	                                 ButtonHeight,
-	                                 SideMessageWindow,
-	                                 nullptr,
-	                                 ThrEdInstance,
-	                                 nullptr);
+	SideWindow->operator[](iHoop) =
+	    CreateWindow(L"STATIC",
+	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
+	                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                 3,
+	                 ButtonHeight * idx + 3,
+	                 ButtonWidthX3 + ButtonWidth * 2,
+	                 ButtonHeight,
+	                 SideMessageWindow,
+	                 nullptr,
+	                 ThrEdInstance,
+	                 nullptr);
   }
 }
 
@@ -8879,8 +8884,8 @@ void thred::internal::defpref() {
   UserFlagMap->set(UserFlag::FIL2OF);
   fil2men();
   BackgroundColor              = 0xa8c4b1;
-  UnzoomedRect.cx               = std::lround(IniFile.hoopSizeX);
-  UnzoomedRect.cy               = std::lround(IniFile.hoopSizeY);
+  UnzoomedRect.cx              = std::lround(IniFile.hoopSizeX);
+  UnzoomedRect.cy              = std::lround(IniFile.hoopSizeY);
   IniFile.waveEnd              = IWAVEND;
   IniFile.wavePoints           = IWAVPNTS;
   IniFile.waveLobes            = IWAVS;
@@ -9121,8 +9126,8 @@ void thred::internal::ritcur() {
 	// ToDo - replace with GetDIBits
 	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
-	auto bitmapBits = std::array<uint8_t, ICONSIZE> {};
-	auto const spBMB = gsl::span<uint8_t>{ bitmapBits };
+	auto       bitmapBits = std::array<uint8_t, ICONSIZE> {};
+	auto const spBMB      = gsl::span<uint8_t> {bitmapBits};
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(spBMB.size()), spBMB.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
@@ -9206,7 +9211,7 @@ void thred::internal::respac(FRMHED& form) noexcept {
 
 auto thred::internal::chkminus(wchar_t code) noexcept -> bool {
   if (code == VK_OEM_MINUS || code == VK_SUBTRACT) { // '-' key pressed
-	if (PreferenceIndex == PRFCLPPHS) {                   // Clipboard Offset in preferences
+	if (PreferenceIndex == PRFCLPPHS) {              // Clipboard Offset in preferences
 	  return true;
 	}
 	if (FormMenuChoice == LFRMSPAC && isfclp()) { // Fill Spacing for fan clip fill
@@ -9720,8 +9725,8 @@ void thred::internal::bakmrk() {
 }
 
 void thred::internal::nuscol(size_t iColor) {
-  auto const uc  = wrap::next(UserColor.begin(), iColor);
-  auto const up  = wrap::next(UserPen->begin(), iColor);
+  auto const uc = wrap::next(UserColor.begin(), iColor);
+  auto const up = wrap::next(UserPen->begin(), iColor);
   nuPen(*up, 1, *uc);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *uc);
@@ -11018,8 +11023,9 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	StateMap->set(StateFlag::RESTCH);
 	return true;
   }
-  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
-                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
+  if (thred::inStitchWin() &&
+      !(StateMap->test(StateFlag::SIZSEL) &&
+        thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
@@ -12361,7 +12367,8 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	thred::unmsg();
 	return true;
   }
-  if (PreferenceIndex == PRFAPPCOL + 1 && thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
+  if (PreferenceIndex == PRFAPPCOL + 1 &&
+      thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	AppliqueColor = VerticalIndex;
 	SetWindowText(ValueWindow->operator[](PRFAPPCOL), fmt::format(L"{}", VerticalIndex).c_str());
 	thred::unsid();
@@ -12413,8 +12420,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   thred::unmsg();
-  if (thred::inStitchWin() && !(StateMap->test(StateFlag::SIZSEL) &&
-                                thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
+  if (thred::inStitchWin() &&
+      !(StateMap->test(StateFlag::SIZSEL) &&
+        thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back()))) {
 	unpat();
 	if (StateMap->testAndReset(StateFlag::ROTAT)) {
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
@@ -12731,9 +12739,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thi::chkMsgs(Msg.pt, UserColorWin->front(), UserColorWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN && (nuCol(UserColor[VerticalIndex]) != 0U)) {
 	  thred::savdo();
-	  auto uc  = wrap::next(UserColor.begin(), VerticalIndex);
-	  *uc      = ColorStruct.rgbResult;
-	  auto up  = wrap::next(UserPen->begin(), VerticalIndex);
+	  auto uc = wrap::next(UserColor.begin(), VerticalIndex);
+	  *uc     = ColorStruct.rgbResult;
+	  auto up = wrap::next(UserPen->begin(), VerticalIndex);
 	  nuPen(*up, 1, *uc);
 	  auto ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	  nuBrush(*ucb, *uc);
@@ -13359,7 +13367,7 @@ auto thred::internal::handleMainWinKeys(wchar_t const&      code,
 	}
 	case VK_OEM_3: {                                             // '`~' for US
 	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
-		BackgroundColor    = 0x505050;
+		BackgroundColor = 0x505050;
 		nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
@@ -14588,11 +14596,11 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_EDIT_RESET_COL: { // edit / Reset Colors
 	  auto ucb = UserColorBrush.begin();
-	  auto uc = UserColor.begin();
-	  auto up = UserPen->begin();
+	  auto uc  = UserColor.begin();
+	  auto up  = UserPen->begin();
 	  auto ucw = UserColorWin->begin();
 	  for (auto const& color : DefaultColors) {
-		*uc      = color;
+		*uc = color;
 		nuBrush(*ucb, *uc);
 		nuPen(*up, 1, *uc);
 		thred::redraw(*ucw);
@@ -14900,7 +14908,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_VIEW_STCHBAK: { // view / Set / Background Color
 	  if (nuBak() != 0U) {
-		BackgroundColor    = BackgroundColorStruct.rgbResult;
+		BackgroundColor = BackgroundColorStruct.rgbResult;
 		nuPen(BackgroundPen, 1, BackgroundColor);
 		BackgroundPenWidth = 1;
 		DeleteObject(BackgroundBrush);
@@ -15608,7 +15616,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			// ToDo - only allow entry if there is not already a period in the buffer
 			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
 			  SideWindowEntryBuffer->operator[](swMsgIndex++) = '.';
-			  SideWindowEntryBuffer->operator[](swMsgIndex) = 0;
+			  SideWindowEntryBuffer->operator[](swMsgIndex)   = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
@@ -15650,7 +15658,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTRDUP)) {
 		if (MsgBuffer->size() > 1) {
-		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+		  outDebugString(
+		      L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
@@ -15660,7 +15669,8 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (MsgBuffer->size() > 1) {
-		  outDebugString(L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
+		  outDebugString(
+		      L"chknum: buffer length [{}] size [{}]\n", wcslen(MsgBuffer->data()), MsgBuffer->size());
 		  auto const value = getMsgBufferValue();
 		  if (value != 0.0F) {
 			IniFile.rotationAngle = value * DEGRADF;
@@ -15741,16 +15751,16 @@ void thred::internal::makCol() noexcept {
   for (auto& tsw : *ThreadSizeWin) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	*dcw = CreateWindow(L"STATIC",
-	                        nullptr,
-	                        SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                        0,
-	                        yOffset,
-	                        ButtonWidth,
-	                        ButtonHeight,
-	                        ThrEdWindow,
-	                        nullptr,
-	                        ThrEdInstance,
-	                        nullptr);
+	                    nullptr,
+	                    SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                    0,
+	                    yOffset,
+	                    ButtonWidth,
+	                    ButtonHeight,
+	                    ThrEdWindow,
+	                    nullptr,
+	                    ThrEdInstance,
+	                    nullptr);
 	displayText::setWindowFont(*(dcw++), hFont);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	*(ucw++)  = CreateWindow(L"STATIC",
@@ -15892,17 +15902,17 @@ void thred::internal::setPrefs() {
 }
 
 void thred::internal::loadColors() noexcept {
-  auto& risc = IniFile.stitchColors;
+  auto&      risc  = IniFile.stitchColors;
   auto const isc   = gsl::span<COLORREF, sizeof(risc) / sizeof(risc[0])>(risc);
-  auto iisc  = isc.begin();
-  auto& rispc = IniFile.stitchPreferredColors;
+  auto       iisc  = isc.begin();
+  auto&      rispc = IniFile.stitchPreferredColors;
   auto const ispc  = gsl::span<COLORREF, sizeof(rispc) / sizeof(rispc[0])>(rispc);
-  auto iispc = ispc.begin();
-  auto& ribpc = IniFile.backgroundPreferredColors;
+  auto       iispc = ispc.begin();
+  auto&      ribpc = IniFile.backgroundPreferredColors;
   auto const ibpc  = gsl::span<COLORREF, sizeof(ribpc) / sizeof(ribpc[0])>(ribpc);
-  auto iibpc = ibpc.begin();
-  auto cc    = CustomColor.begin();
-  auto cbc   = CustomBackgroundColor.begin();
+  auto       iibpc = ibpc.begin();
+  auto       cc    = CustomColor.begin();
+  auto       cbc   = CustomBackgroundColor.begin();
   for (auto& color : UserColor) {
 	color    = *(iisc++);
 	*(cc++)  = *(iispc++);
@@ -16389,8 +16399,8 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto& emn = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn)/sizeof(emn[0])>(emn);
+  auto&      emn          = ExtendedHeader->modifierName;
+  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
   std::copy(designer.begin(), designer.end(), modifierName.begin());
   thred::chkhup();
   nedmen();
@@ -16982,7 +16992,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		}
 	  }
 	  auto const drawingDestinationSize = SIZE {(drawItem->rcItem.right - drawItem->rcItem.left),
-	                                             (drawItem->rcItem.bottom - drawItem->rcItem.top)};
+	                                            (drawItem->rcItem.bottom - drawItem->rcItem.top)};
 	  auto const xRatio = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
 	  auto const yRatio = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
 	  auto const ratio  = (xRatio < yRatio) ? xRatio : yRatio;
@@ -17385,7 +17395,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 		if (StateMap->test(StateFlag::HID)) {
 		  auto ucb = wrap::next(UserColorBrush.begin(), ActiveColor);
-		  auto uc = wrap::next(UserColor.begin(), ActiveColor);
+		  auto uc  = wrap::next(UserColor.begin(), ActiveColor);
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  SetBkColor(DrawItem->hDC, *uc);
 		}
@@ -17416,12 +17426,12 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
 			auto       textSize = SIZE {};
 			wrap::getTextExtentPoint32(
-			  DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
+			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
 			wrap::textOut(DrawItem->hDC,
-			  (ButtonWidth - textSize.cx) / 2,
-			  0,
-			  colorNum.c_str(),
-			  wrap::toUnsigned(colorNum.size()));
+			              (ButtonWidth - textSize.cx) / 2,
+			              0,
+			              colorNum.c_str(),
+			              wrap::toUnsigned(colorNum.size()));
 		  }
 		  return 1;
 		}

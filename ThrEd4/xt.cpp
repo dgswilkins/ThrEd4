@@ -291,7 +291,7 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
 	auto nextPoint     = fPOINT {};
 	feather.ratioLocal = 0.5F;
 	duxrats(iSequence + 1, iSequence, adjustedPoint, feather.ratioLocal);
-	feather.ratioLocal      = feather.minStitch / length / 2;
+	feather.ratioLocal       = feather.minStitch / length / 2;
 	auto const& sequence     = OSequence->operator[](iSequence);
 	auto const& sequenceFwd1 = OSequence->operator[](wrap::toSize(iSequence) + 1U);
 	xratf(adjustedPoint, sequence, currentPoint, feather.ratioLocal);
@@ -494,12 +494,12 @@ void xt::internal::ritwlk(FRMHED& form, uint32_t walkMask) {
 	}
 	auto const underlayStitchLength = form.underlayStitchLen;
 	auto const iSeqMax              = OSequence->size() - 1U;
-	auto sequence = OSequence->begin();
-	auto sequenceFwd1 = std::next(sequence);
+	auto       sequence             = OSequence->begin();
+	auto       sequenceFwd1         = std::next(sequence);
 	for (auto iSequence = size_t {}; iSequence < iSeqMax; ++iSequence) {
-	  auto const delta        = fPOINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
-	  auto const length       = hypot(delta.x, delta.y);
-	  auto const stitchCount  = wrap::round<uint32_t>(length / underlayStitchLength);
+	  auto const delta  = fPOINT {sequenceFwd1->x - sequence->x, sequenceFwd1->y - sequence->y};
+	  auto const length = hypot(delta.x, delta.y);
+	  auto const stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
 	  if (stitchCount != 0U) {
 		auto const step = fPOINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 		auto point = *sequence;
@@ -1325,8 +1325,8 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	auto& ffa = fillStartsData.fillArray;
-	auto const spFillArray = gsl::span<uint32_t, sizeof(ffa)/sizeof(ffa[0])>(ffa);
+	auto&      ffa         = fillStartsData.fillArray;
+	auto const spFillArray = gsl::span<uint32_t, sizeof(ffa) / sizeof(ffa[0])>(ffa);
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
 	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {
@@ -2474,12 +2474,12 @@ void xt::nudsiz() {
 	  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
 	  if (DesignSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = DesignSize.x * HUPRATIO;
-		UnzoomedRect.cx    = std::lround(IniFile.hoopSizeX);
+		UnzoomedRect.cx   = std::lround(IniFile.hoopSizeX);
 		flag              = 1;
 	  }
 	  if (DesignSize.y > IniFile.hoopSizeY) {
 		IniFile.hoopSizeY = DesignSize.y * HUPRATIO;
-		UnzoomedRect.cy    = std::lround(IniFile.hoopSizeY);
+		UnzoomedRect.cy   = std::lround(IniFile.hoopSizeY);
 		flag              = 1;
 	  }
 	  xi::nudfn(designSizeRect);

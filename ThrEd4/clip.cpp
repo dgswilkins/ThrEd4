@@ -687,9 +687,9 @@ void clip::internal::xclpfn(std::vector<fPOINT> const& tempClipPoints,
                             uint32_t                   start,
                             uint32_t                   finish,
                             fPOINT const&              rotationCenter) {
-  auto const delta         = fPOINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
+  auto const  delta         = fPOINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
                              (chainEndPoints[finish].y - chainEndPoints[start].y)};
-  auto const rotationAngle = atan2(delta.y, delta.x);
+  auto const  rotationAngle = atan2(delta.y, delta.x);
   auto const& chainEndPoint = chainEndPoints[start];
   for (auto const& clip : tempClipPoints) {
 	auto const point = thred::rotangf(clip, rotationAngle, rotationCenter);

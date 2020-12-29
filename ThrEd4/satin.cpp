@@ -86,13 +86,13 @@ void satin::spltsat(uint32_t guideIndex) {
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
 	FormList->operator[](iForm).vertexIndex += 2;
   }
-  auto       iOldVertex    = 0U;
-  auto       guideIt       = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+  auto        iOldVertex    = 0U;
+  auto        guideIt       = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
   auto const& currentGuide  = *(wrap::next(guideIt, guideIndex));
-  auto const oldLastVertex = currentGuide.start + (form.vertexCount - currentGuide.finish) + 1U;
-  auto       iNewVertex    = oldLastVertex + 1U;
-  auto const vBegin        = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto       vertexIt      = vBegin;
+  auto const  oldLastVertex = currentGuide.start + (form.vertexCount - currentGuide.finish) + 1U;
+  auto        iNewVertex    = oldLastVertex + 1U;
+  auto const  vBegin        = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto        vertexIt      = vBegin;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	if (iVertex == currentGuide.start || iVertex == currentGuide.finish) {
 	  vertexBuffer[iOldVertex++] = *vertexIt;

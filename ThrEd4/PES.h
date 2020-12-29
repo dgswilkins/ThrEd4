@@ -107,13 +107,13 @@ class PESSTCHLST
 class PECHDR
 {
   public:
-  char     label[19] {};   // Label string prefixed with "LA:" and padded with space (0x20)
-  int8_t   labnd {};       // carriage return character
+  char     label[19] {};  // Label string prefixed with "LA:" and padded with space (0x20)
+  int8_t   labnd {};      // carriage return character
   uint8_t  ukn1[11] {};   // Unknown (' ')
   uint8_t  ukn2 {};       // Unknown
   uint16_t hnd1 {};       // Unknown (0x00ff)
   uint8_t  thumbWidth {}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-                            // Thus, 6 would mean 6×8 = 48 pixels per line
+                          // Thus, 6 would mean 6×8 = 48 pixels per line
   uint8_t thumbHeight {}; // Thumbnail image height in pixels (38)
   uint8_t ukn3[12] {};    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
   uint8_t colorCount {};  // Number of colors minus one, 0xFF means 0 colors
@@ -133,8 +133,8 @@ class PECHDR2
   uint16_t thumbnailOffset {}; // Offset to thumbnail image subsection relative to the PEC section offset plus 512 bytes
   uint16_t unknown2 {}; // typical 0x3100
   uint16_t unknown3 {}; // typical 0xf0ff
-  int16_t  width {};     // Width
-  int16_t  height {};    // height
+  int16_t  width {};    // Width
+  int16_t  height {};   // height
   uint16_t unknown4 {}; // typical 0x01e0
   uint16_t unknown5 {}; // typical 0x01b0
   uint16_t xMin {};     // starting X val (Bigendian)

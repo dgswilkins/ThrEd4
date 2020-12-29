@@ -39,9 +39,9 @@ namespace dT  = displayText;
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
-static auto LabelWindowCoords = RECT {};  // location of left windows in the form data sheet
+static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
-static auto ValueWindowCoords = RECT {};  // location of right windows in the form data sheet
+static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
 static auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
 
 auto const DaisyTypeStrings = std::array<uint16_t, 6> {
@@ -446,9 +446,9 @@ void formForms::refrm() {
 }
 
 void formForms::sidwnd(HWND wnd) {
-  auto windowRect          = RECT {};
+  auto windowRect = RECT {};
   thred::resetSideBuffer();
-  auto const savedChoice   = FormMenuChoice;
+  auto const savedChoice = FormMenuChoice;
   thred::unsid();
   FormMenuChoice = savedChoice;
   GetWindowRect(wnd, &windowRect);
@@ -536,9 +536,11 @@ void formForms::prfmsg() {
 	thred::unsid();
 	FormMenuChoice = 0U;
   }
-  LabelWindowSize.cx = LabelWindowSize.cy = 0;
-  ValueWindowSize.cx = ValueWindowSize.cy = 0;
-  LabelWindowSize                       = formForms::internal::maxwid();
+  LabelWindowSize.cx = 0;
+  LabelWindowSize.cy = 0;
+  ValueWindowSize.cx = 0;
+  ValueWindowSize.cy = 0;
+  LabelWindowSize    = formForms::internal::maxwid();
   LabelWindowSize.cx += TXTMARG2;
   formForms::maxtsiz(dT::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
@@ -1207,7 +1209,7 @@ void formForms::wavfrm() {
 
 	auto vRotate = vBegin;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  thred::rotflt(*vRotate, rotationAngle, fPOINT{});
+	  thred::rotflt(*vRotate, rotationAngle, fPOINT {});
 	  ++vRotate;
 	}
 	form.type        = FRMLINE;

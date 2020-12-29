@@ -105,9 +105,9 @@ void displayText::hsizmsg() {
 }
 
 void displayText::numWnd() {
-  auto messageRect = RECT{ 0L, 0L, 0L, 0L };
+  auto messageRect = RECT {0L, 0L, 0L, 0L};
   GetClientRect(MsgWindow, &messageRect);
-  auto wRect = RECT{ 0L, 0L, 0L, 0L };
+  auto wRect = RECT {0L, 0L, 0L, 0L};
   GetWindowRect(MainStitchWin, &wRect);
   auto xOffset = wRect.left;
   GetWindowRect(ThrEdWindow, &wRect);
@@ -115,19 +115,19 @@ void displayText::numWnd() {
   if (nullptr == GeneralNumberInputBox) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	GeneralNumberInputBox = CreateWindow(L"STATIC",
-	  nullptr,
-	  SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	  xOffset + 5,
-	  messageRect.bottom + 15,
-	  ButtonWidthX3,
-	  ButtonHeight,
-	  ThrEdWindow,
-	  nullptr,
-	  ThrEdInstance,
-	  nullptr);
+	                                     nullptr,
+	                                     SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                                     xOffset + 5,
+	                                     messageRect.bottom + 15,
+	                                     ButtonWidthX3,
+	                                     ButtonHeight,
+	                                     ThrEdWindow,
+	                                     nullptr,
+	                                     ThrEdInstance,
+	                                     nullptr);
   }
   else {
-	throw; // we should never reach this 
+	throw; // we should never reach this
   }
   thred::resetMsgBuffer();
 }

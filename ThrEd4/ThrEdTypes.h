@@ -28,9 +28,9 @@ void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&
 #define outDebugString(X, ...)
 #endif
 
-constexpr auto RES_SIZE = 26; // reserved for expansion in the ThrEd v1.0 header
-constexpr auto NAME_LEN = 50; // Length of the name fields in ThrEd headers
-constexpr auto COLORCNT = uint8_t {16U};                            // Number of colors in arrays
+constexpr auto RES_SIZE = 26;            // reserved for expansion in the ThrEd v1.0 header
+constexpr auto NAME_LEN = 50;            // Length of the name fields in ThrEd headers
+constexpr auto COLORCNT = uint8_t {16U}; // Number of colors in arrays
 constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr auto COLORBTS = 0xfU;     // Number of bits to cover the number of the colors in arrays
 constexpr auto SRTIM    = 20000000; // sort time limit in 100 ns intervals
