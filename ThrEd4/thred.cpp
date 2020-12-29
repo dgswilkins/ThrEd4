@@ -2856,8 +2856,9 @@ void thred::internal::ritini() {
   std::copy(spIBPC.begin(), spIBPC.end(), CustomBackgroundColor.begin());
   std::copy(spISPC.begin(), spISPC.end(), CustomColor.begin());
   auto ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
-  for (auto iColor : ibbc) {
-	iColor = bitmap::getBmpBackColor(iColor);
+  auto bcIndex = 0U;
+  for (auto& iColor : ibbc) {
+	iColor = bitmap::getBmpBackColor(bcIndex++);
   }
   IniFile.backgroundColor = BackgroundColor;
   IniFile.bitmapColor     = bitmap::getBmpColor();
