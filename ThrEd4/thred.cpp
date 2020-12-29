@@ -2855,11 +2855,10 @@ void thred::internal::ritini() {
   std::copy(spISC.begin(), spISC.end(), UserColor.begin());
   std::copy(spIBPC.begin(), spIBPC.end(), CustomBackgroundColor.begin());
   std::copy(spISPC.begin(), spISPC.end(), CustomColor.begin());
-  auto ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
-  auto bcIndex = 0U;
-  for (auto& iColor : ibbc) {
-	iColor = bitmap::getBmpBackColor(bcIndex++);
-  }
+  auto const ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
+  std::generate(ibbc.begin(), ibbc.end(), [bcIndex = 0U]() mutable noexcept -> COLORREF {
+	return bitmap::getBmpBackColor(bcIndex++);
+  });
   IniFile.backgroundColor = BackgroundColor;
   IniFile.bitmapColor     = bitmap::getBmpColor();
   IniFile.minStitchLength = MinStitchLength;
@@ -4214,11 +4213,10 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
-	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
-	auto tsBuffer = threadSizeBufW.begin();
-	for (auto& ts : ThreadSize) {
-	  ts = *(tsBuffer++);
-	}
+	auto       threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
+	std::generate(ThreadSize.begin(), ThreadSize.end(), [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
+	  return *(tsBuffer++);
+	});
 	if (thredHeader.formCount != 0) {
 	  StateMap->reset(StateFlag::BADFIL);
 	  if (version < 2) {
@@ -12749,22 +12747,22 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  static constexpr auto str = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
-	  auto idx = gsl::narrow_cast<int32_t>(VerticalIndex);
-	  auto iStr = str.begin();
-	  for (auto& win : ChangeThreadSizeWin) {
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		win = CreateWindow(L"STATIC",
-		                   *(iStr++),
-		                   WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                   ButtonWidthX3,
-		                   ButtonHeight * idx++,
-		                   ButtonWidth,
-		                   ButtonHeight,
-		                   ThrEdWindow,
-		                   nullptr,
-		                   ThrEdInstance,
-		                   nullptr);
-	  }
+	  std::generate(ChangeThreadSizeWin.begin(),
+	                ChangeThreadSizeWin.end(),
+	                [idx = gsl::narrow_cast<int32_t>(VerticalIndex), iStr = str.begin()]() mutable noexcept -> HWND {
+		              // NOLINTNEXTLINE(hicpp-signed-bitwise)
+		              return CreateWindow(L"STATIC",
+		                                  *(iStr++),
+		                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                                  ButtonWidthX3,
+		                                  ButtonHeight * idx++,
+		                                  ButtonWidth,
+		                                  ButtonHeight,
+		                                  ThrEdWindow,
+		                                  nullptr,
+		                                  ThrEdInstance,
+		                                  nullptr);
+	                });
 	  StateMap->set(StateFlag::SIZSEL);
 	}
 	return true;
