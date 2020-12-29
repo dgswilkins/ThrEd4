@@ -2722,7 +2722,7 @@ void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
 }
 
 void thred::internal::nuStchSiz(uint32_t iColor, int32_t width) {
-  auto tsp = wrap::next(ThreadSizePixels.begin(), iColor);
+  auto const tsp = wrap::next(ThreadSizePixels.begin(), iColor);
   if (width != *tsp) {
 	nuPen(UserPen->operator[](iColor), width, UserColor[iColor]);
 	*tsp = width;
@@ -2852,11 +2852,11 @@ void thred::internal::ritini() {
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
   std::copy(std::begin(IniFile.stitchColors), std::end(IniFile.stitchColors), UserColor.begin());
   std::copy(std::begin(IniFile.backgroundPreferredColors),
-            std::end(IniFile.backgroundPreferredColors),
-            CustomBackgroundColor.begin());
+	std::end(IniFile.backgroundPreferredColors),
+	CustomBackgroundColor.begin());
   std::copy(std::begin(IniFile.stitchPreferredColors),
-            std::end(IniFile.stitchPreferredColors),
-            CustomColor.begin());
+	std::end(IniFile.stitchPreferredColors),
+	CustomColor.begin());
   auto ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
   for (auto iColor : ibbc) {
 	iColor = bitmap::getBmpBackColor(iColor);
@@ -4143,7 +4143,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		ritfnam(*DesignerName);
 		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
 		std::copy(desName.begin(),
-		  std::next(desName.begin(), strlen(desName.data()) + 1U),
+		  wrap::next(desName.begin(), strlen(desName.data()) + 1U),
 		  modifierName.begin());
 		break;
 	  }
@@ -4214,7 +4214,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
-	auto threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
+	auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
 	auto threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
 	auto tsBuffer = threadSizeBufW.begin();
 	for (auto& ts : ThreadSize) {
@@ -9723,10 +9723,10 @@ void thred::internal::bakmrk() {
 }
 
 void thred::internal::nuscol(size_t iColor) {
-  auto uc  = wrap::next(UserColor.begin(), iColor);
+  auto const uc  = wrap::next(UserColor.begin(), iColor);
   auto const up  = wrap::next(UserPen->begin(), iColor);
   nuPen(*up, 1, *uc);
-  auto ucb = wrap::next(UserColorBrush.begin(), iColor);
+  auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *uc);
   thred::redraw(UserColorWin->operator[](iColor));
 }
