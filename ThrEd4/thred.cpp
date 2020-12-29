@@ -2846,17 +2846,15 @@ void thred::internal::ritini() {
 	++previousName;
   }
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto& idn = IniFile.designerName;
-  auto const designerName = gsl::span<char, sizeof(idn)/sizeof(idn[0])>(idn);
+  auto const designerName = gsl::make_span(IniFile.designerName);
+  auto const spISC = gsl::make_span(IniFile.stitchColors);
+  auto const spIBPC = gsl::make_span(IniFile.backgroundPreferredColors);
+  auto const spISPC = gsl::make_span(IniFile.stitchPreferredColors);
   std::fill(designerName.begin(), designerName.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), designerName.begin());
-  std::copy(std::begin(IniFile.stitchColors), std::end(IniFile.stitchColors), UserColor.begin());
-  std::copy(std::begin(IniFile.backgroundPreferredColors),
-	std::end(IniFile.backgroundPreferredColors),
-	CustomBackgroundColor.begin());
-  std::copy(std::begin(IniFile.stitchPreferredColors),
-	std::end(IniFile.stitchPreferredColors),
-	CustomColor.begin());
+  std::copy(spISC.begin(), spISC.end(), UserColor.begin());
+  std::copy(spIBPC.begin(), spIBPC.end(), CustomBackgroundColor.begin());
+  std::copy(spISPC.begin(), spISPC.end(), CustomColor.begin());
   auto ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
   for (auto iColor : ibbc) {
 	iColor = bitmap::getBmpBackColor(iColor);
