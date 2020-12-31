@@ -166,7 +166,7 @@ namespace internal {
   auto precjmps(std::vector<fPOINTATTR>& tempStitchBuffer, std::vector<OREC*> const& pRecs, SRTREC const& sortRecord)
       -> double;
   void ratpnt(uint32_t iPoint, uint32_t iNextPoint, fPOINT& point, float featherRatio) noexcept;
-  auto orComp(OREC const* record1, OREC const* record2) noexcept -> bool;
+  auto orComp(OREC const* record1, OREC const* record2) -> bool;
   auto orfComp(OREC const* record1, OREC const* record2) noexcept -> bool;
   void rtrclpfn(FRMHED const& form);
   void ritwlk(FRMHED& form, uint32_t walkMask);
@@ -177,7 +177,7 @@ namespace internal {
 
   void setstxt(int32_t stringIndex, float value, HWND dialog);
   void setundfn(uint32_t code);
-  auto srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) noexcept -> bool;
+  auto srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool;
 
   constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
 

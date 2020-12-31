@@ -466,28 +466,27 @@ void thred::internal::fnamtabs() {
   for (auto iName = 0U; iName < NAMELEN; ++iName) {
 	*(iNameOrder++) = iName;
   }
-  auto const spNameOrder = gsl::make_span(NameOrder);
   PseudoRandomValue      = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
-	auto const source      = form::psg() % NAMELEN;
-	auto const destination = form::psg() % NAMELEN;
-	std::swap(spNameOrder[destination], spNameOrder[source]);
+	auto const source      = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
+	auto const destination = wrap::next(NameOrder.begin(), form::psg() % NAMELEN);
+	std::swap(*destination, *source);
   }
   auto iNameEncoder = NameEncoder.begin();
   for (auto iName = uint8_t {}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
 	*(iNameEncoder++) = iName + NCODOF;
   }
-  auto const spNameEncoder = gsl::make_span(NameEncoder);
   PseudoRandomValue        = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
-	auto const source      = form::psg() & MSK7BITS;
-	auto const destination = form::psg() & MSK7BITS;
-	std::swap(spNameEncoder[destination], spNameEncoder[source]);
+	auto const source      = wrap::next(NameEncoder.begin(), form::psg() & MSK7BITS);
+	auto const destination = wrap::next(NameEncoder.begin(), form::psg() & MSK7BITS);
+	std::swap(*destination, *source);
   }
   NameDecoder.fill(0);
-  auto const spNameDecoder = gsl::make_span(NameDecoder);
+  auto index = wrap::next(NameEncoder.begin(), 32U);
   for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
-	spNameDecoder[spNameEncoder[iName]] = iName;
+	auto iND = wrap::next(NameDecoder.begin(), *(index++));
+	*iND = iName;
   }
 }
 
@@ -503,14 +502,16 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   std::generate(
       tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
   auto const spNameDecoder = gsl::make_span(NameDecoder);
-  auto const spNameEncoder = gsl::make_span(NameEncoder);
   for (auto& iTmpName : tmpName) {
 	if (designer[iName++] != 0) {
-	  iTmpName = (spNameEncoder[wrap::toSize(designer[iName])]);
+	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
+	  iTmpName = *iNE;
 	}
 	else {
-	  while (spNameDecoder[wrap::toSize(iTmpName)] != 0U) {
+	  auto iND = wrap::next(NameDecoder.begin(), iTmpName);
+	  while (*iND != 0U) {
 		iTmpName = (form::psg() & BYTMASK);
+		iND = wrap::next(NameDecoder.begin(), iTmpName);
 	  }
 	  break;
 	}
@@ -547,10 +548,10 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	++iNameOrder;
   }
   designer.reserve(tmpName.size());
-  auto const spNameDecoder = gsl::make_span(NameDecoder);
   for (auto const& character : tmpName) {
-	if (spNameDecoder[character] != 0U) {
-	  designer.push_back(gsl::narrow<char>(spNameDecoder[character]));
+	auto iND = wrap::next(NameDecoder.begin(), character);
+	if (*iND != 0U) {
+	  designer.push_back(gsl::narrow<char>(*iND));
 	}
 	else {
 	  break;
@@ -5834,7 +5835,7 @@ void thred::internal::duclip() {
 			if (texture::istx(selectedForm)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const dest = gsl::make_span(&textures[textureCount], form.fillInfo.texture.count);
+			  auto const dest = gsl::make_span(std::next(textures, textureCount), form.fillInfo.texture.count);
 			  std::copy(startPoint, endPoint, dest.begin());
 			  forms[iForm++].fillInfo.texture.index = textureCount;
 			  textureCount += form.fillInfo.texture.count;
@@ -6825,11 +6826,11 @@ void thred::redclp() {
 	                      .c_str());
 #endif
 	auto clipRect = fRECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
+	auto iCSD = std::next(clipStitchData.begin());
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
-	  clipBuffer.emplace_back(
-	      wrap::toFloat(clipStitchData[iStitch].x) + wrap::toFloat(clipStitchData[iStitch].fx) / FRACFACT,
-	      wrap::toFloat(clipStitchData[iStitch].y) + wrap::toFloat(clipStitchData[iStitch].fy) / FRACFACT,
-	      (clipStitchData[iStitch].led & COLMSK) | codedLayer);
+	  clipBuffer.emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
+	                          wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
+	                          (iCSD->led & COLMSK) | codedLayer);
 
 #if CLPBUG
 	  OutputDebugString(fmt::format(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n",
@@ -6850,6 +6851,7 @@ void thred::redclp() {
 	  if (clipBuffer.back().y > clipRect.top) {
 		clipRect.top = clipBuffer.back().y;
 	  }
+	  ++iCSD;
 	}
 	clipBuffer.front().attribute = ActiveColor | codedLayer;
 	ClipRectSize                 = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
@@ -8653,9 +8655,10 @@ void thred::internal::sidhup() {
   GetWindowRect(ValueWindow->operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  constexpr auto smwFlags = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
   SideMessageWindow = CreateWindow(L"STATIC",
                                    nullptr,
-                                   WS_BORDER | WS_CHILD | WS_VISIBLE,
+                                   smwFlags,
                                    preferencesRectangle.right + 3 - ThredWindowOrigin.x,
                                    hoopRectangle.top - ThredWindowOrigin.y,
                                    ButtonWidthX3 + ButtonWidth * 2 + 6,
@@ -8664,13 +8667,14 @@ void thred::internal::sidhup() {
                                    nullptr,
                                    ThrEdInstance,
                                    nullptr);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  constexpr auto swFlags = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const idx = gsl::narrow_cast<int32_t>(iHoop);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	SideWindow->operator[](iHoop) =
 	    CreateWindow(L"STATIC",
 	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
-	                 SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                 swFlags,
 	                 3,
 	                 ButtonHeight * idx + 3,
 	                 ButtonWidthX3 + ButtonWidth * 2,
@@ -9123,12 +9127,13 @@ void thred::internal::ritcur() {
 	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
 	auto       bitmapBits = std::array<uint8_t, ICONSIZE> {};
-	auto const spBMB      = gsl::make_span(bitmapBits);
-	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(spBMB.size()), spBMB.data());
+	auto iBMB      = bitmapBits.begin();
+	auto iIBMB      = std::next(bitmapBits.begin(), 32);
+	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const mask          = byteSwap(spBMB[wrap::toSize(iRow)]);
-		auto const bitmapInverse = byteSwap(spBMB[wrap::toSize(iRow) + 32]);
+		auto const mask          = byteSwap(*(iBMB++));
+		auto const bitmapInverse = byteSwap(*(iIBMB++));
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & mask) == 0U) {
@@ -9141,7 +9146,7 @@ void thred::internal::ritcur() {
 	}
 	else {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
-		auto const bitmapInverse = byteSwap(spBMB[wrap::toSize(iRow) + 32]);
+		auto const bitmapInverse = byteSwap(*(iIBMB++));
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & bitmapInverse) != 0U) {
@@ -12549,8 +12554,9 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
-		auto const spTSP = gsl::make_span(ThreadSizePixels);
-		setbak(spTSP[StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK] + 3);
+		auto const index = StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK;
+		auto const spTSP = wrap::next(ThreadSizePixels.begin(), index);
+		setbak(*spTSP + 3);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);

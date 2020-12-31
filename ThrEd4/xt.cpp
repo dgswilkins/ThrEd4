@@ -824,14 +824,15 @@ void xt::internal::durec(OREC& record) {
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-auto xt::internal::orComp(OREC const* record1, OREC const* record2) noexcept -> bool {
+auto xt::internal::orComp(OREC const* record1, OREC const* record2) -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1 != nullptr && record2 != nullptr) {
-	auto const spColorOrder = gsl::make_span(ColorOrder);
-	if (spColorOrder[record1->color] < spColorOrder[record2->color]) {
+	auto const ir1 = wrap::next(ColorOrder.begin(), record1->color);
+	auto const ir2 = wrap::next(ColorOrder.begin(), record2->color);
+	if (*ir1 < *ir2) {
 	  return true;
 	}
-	if (spColorOrder[record2->color] < spColorOrder[record1->color]) {
+	if (*ir2 < *ir1) {
 	  return false;
 	}
 	if (record1->form < record2->form) {
@@ -980,29 +981,32 @@ void xt::internal::dmprec(std::vector<OREC*> const& stitchRegion, uint32_t count
 }
 #endif
 
-auto xt::internal::srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) noexcept
-    -> bool {
-  auto formIndex = stitchRegion[0]->form;
-  auto color     = stitchRegion[0]->color;
+auto xt::internal::srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool {
+  auto iStitchRegion = stitchRegion.begin();
+  auto formIndex     = (*iStitchRegion)->form;
+  auto color         = (*iStitchRegion)->color;
+  ++iStitchRegion;
   for (auto iRegion = 1U; iRegion < count; ++iRegion) {
-	if (stitchRegion[iRegion]->form == formIndex) {
-	  auto const spColorOrder = gsl::make_span(ColorOrder);
-	  if (spColorOrder[stitchRegion[iRegion]->color] < spColorOrder[color]) {
+	if ((*iStitchRegion)->form == formIndex) {
+	  auto const iSRColorOrder = wrap::next(ColorOrder.begin(), (*iStitchRegion)->color);
+	  auto const iColorOrder   = wrap::next(ColorOrder.begin(), color);
+	  if (*iSRColorOrder < *iColorOrder) {
 		auto& form = FormList->operator[](formIndex);
 		if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
-		    stitchRegion[iRegion]->color == form.fillColor) {
+		    (*iStitchRegion)->color == form.fillColor) {
 		  continue;
 		}
 		badForm = iRegion;
 		return false;
 	  }
 
-	  color = stitchRegion[iRegion]->color;
+	  color = (*iStitchRegion)->color;
 	}
 	else {
-	  color     = stitchRegion[iRegion]->color;
-	  formIndex = stitchRegion[iRegion]->form;
+	  color     = (*iStitchRegion)->color;
+	  formIndex = (*iStitchRegion)->form;
 	}
+	++iStitchRegion;
   }
   return true;
 }
@@ -1019,12 +1023,14 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = 0;
-	auto const spColorOrder         = gsl::make_span(ColorOrder);
-	spColorOrder[AppliqueColor]     = 0;
+	auto iColorOrder                = wrap::next(ColorOrder.begin(), AppliqueColor);
+	*iColorOrder                    = 0;
+	iColorOrder                     = ColorOrder.begin();
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
-		spColorOrder[iColor] = iColor + 1U;
+		*iColorOrder = iColor + 1U;
 	  }
+	  ++iColorOrder;
 	}
 	for (auto iStitch = 1U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  if ((StitchBuffer->operator[](iStitch).attribute & SRTMSK) != attribute) {

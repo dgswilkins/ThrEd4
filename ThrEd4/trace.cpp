@@ -225,12 +225,12 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 
 auto trace::internal::trsum() -> uint32_t {
   auto const& firstColor            = TraceAdjacentColors.front();
-  auto const  spTraceAdjacentColors = gsl::make_span(TraceAdjacentColors);
-  auto const  subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
+  auto const  iBegin = std::next(TraceAdjacentColors.begin());
+  auto const  iEnd = std::next(TraceAdjacentColors.end(), -1);
   auto const  fold         = [firstColor](uint32_t a, uint32_t b) {
     return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
   };
-  return wrap::toUnsigned(std::accumulate(subTrcAdjCol.begin(), subTrcAdjCol.end(), 0, fold));
+  return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
 }
 
 void trace::internal::hideTraceWin() noexcept {
@@ -829,26 +829,27 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto spTBD = gsl::make_span(
-		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+		auto spTBD = gsl::make_span(TraceBitmapData,
+		                            wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto pixel : spTBD) {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();
 		  for (auto& iHistogramData : histogramData) {
-			auto const spHD = gsl::make_span(iHistogramData);
-			++(spHD[*(iPixelColors++)]);
+			auto const spHD = wrap::next(iHistogramData.begin(), *(iPixelColors++));
+			++(*spHD);
 		  }
 		}
 		auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
 		auto iComponentPeakCount = componentPeakCount.begin();
 		auto iComponentPeak      = componentPeak.begin();
-		for (auto& iHistogramData : histogramData) {
-		  auto const spHD = gsl::make_span(iHistogramData);
-		  for (auto iLevel = 0U; iLevel < iHistogramData.size(); ++iLevel) {
-			if (spHD[iLevel] > *iComponentPeakCount) {
-			  *iComponentPeakCount = spHD[iLevel];
+		for (auto& channelData : histogramData) {
+		  auto iLevel = 0U;
+		  for (auto& channel : channelData) {
+			if (channel > *iComponentPeakCount) {
+			  *iComponentPeakCount = channel;
 			  *iComponentPeak      = iLevel;
 			}
+			++iLevel;
 		  }
 		  ++iComponentPeakCount;
 		  ++iComponentPeak;

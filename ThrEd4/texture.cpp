@@ -430,8 +430,8 @@ void texture::drwtxtr() {
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
-  auto const spUserColor = gsl::make_span(UserColor);
-  TextureCrossPen        = wrap::CreatePen(PS_SOLID, PENNWID, spUserColor[ActiveColor]);
+  auto const iUserColor = wrap::next(UserColor.begin(), ActiveColor);
+  TextureCrossPen        = wrap::CreatePen(PS_SOLID, PENNWID, *iUserColor);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;
