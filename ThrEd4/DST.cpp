@@ -125,7 +125,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  }
 	  else {
 		++color;
-		color &= COLORBTS;
+		color &= COLMSK;
 	  }
 	}
 	else {
@@ -212,12 +212,12 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
   DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
   DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
-  auto color               = dstStitchBuffer[0].attribute & COLORBTS;
+  auto color               = dstStitchBuffer[0].attribute & COLMSK;
   for (auto& stitch : dstStitchBuffer) {
-	if (color != (stitch.attribute & COLORBTS)) {
+	if (color != (stitch.attribute & COLMSK)) {
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});
-	  color = stitch.attribute & COLORBTS;
+	  color = stitch.attribute & COLMSK;
 	  colorData.push_back(spUserColor[color]);
 	}
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),

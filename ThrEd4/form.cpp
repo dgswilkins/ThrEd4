@@ -8052,7 +8052,7 @@ void form::srtbyfrm() {
 	auto tempStitchBuffer = std::vector<fPOINTATTR> {};
 	tempStitchBuffer.resize(StitchBuffer->size());
 	for (auto& stitch : *StitchBuffer) {
-	  ++(colorHistogram[color[stitch.attribute & COLORBTS]]);
+	  ++(colorHistogram[color[stitch.attribute & COLMSK]]);
 	}
 	auto colorAccumulator = 0U;
 	for (auto& iColor : colorHistogram) {
@@ -8061,7 +8061,7 @@ void form::srtbyfrm() {
 	  colorAccumulator += value;
 	}
 	for (auto& stitch : *StitchBuffer) {
-	  tempStitchBuffer[colorHistogram[color[stitch.attribute & COLORBTS]]++] = stitch;
+	  tempStitchBuffer[colorHistogram[color[stitch.attribute & COLMSK]]++] = stitch;
 	}
 	fi::srtf(tempStitchBuffer, 0, colorHistogram[0]);
 	for (auto iColor = 0U; iColor < (colorHistogram.size() - 1U); ++iColor) {
@@ -8719,7 +8719,7 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= COLORBTS;
+		majorityColor &= COLMSK;
 		if (formIter.fillColor != majorityColor) {
 		  ++colorChangedCount;
 		  wrap::narrow(formIter.fillColor, majorityColor);
@@ -8732,7 +8732,7 @@ void form::col2frm() {
 			  majorityColor = iColor;
 			}
 		  }
-		  majorityColor &= COLORBTS;
+		  majorityColor &= COLMSK;
 		  if (formIter.fillInfo.feather.color != majorityColor) {
 			++colorChangedCount;
 			wrap::narrow(formIter.fillInfo.feather.color, majorityColor);
@@ -8748,7 +8748,7 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= COLORBTS;
+		majorityColor &= COLMSK;
 		if (formIter.borderColor != majorityColor) {
 		  ++colorChangedCount;
 		  wrap::narrow(formIter.borderColor, majorityColor);
@@ -8763,7 +8763,7 @@ void form::col2frm() {
 			majorityColor = iColor;
 		  }
 		}
-		majorityColor &= COLORBTS;
+		majorityColor &= COLMSK;
 		if (formIter.underlayColor != majorityColor) {
 		  ++colorChangedCount;
 		  wrap::narrow(formIter.underlayColor, majorityColor);

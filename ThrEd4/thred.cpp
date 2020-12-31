@@ -1421,7 +1421,7 @@ void thred::internal::chknum() {
 		case LFTHCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			thi::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1433,7 +1433,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nufilcol(colVal);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -1446,7 +1446,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			form::refilfn();
@@ -1460,7 +1460,7 @@ void thred::internal::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLORBTS);
+			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nubrdcol(colVal);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmt::format(L"{}", colVal + 1U).c_str());
 			thred::coltab();
@@ -3826,7 +3826,7 @@ auto thred::internal::chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindo
       clickCoord.y > topRect.top && clickCoord.y < bottomRect.bottom) {
 	VerticalIndex = COLORMAX - gsl::narrow<uint8_t>((bottomRect.bottom - clickCoord.y) / ButtonHeight);
 	if (VerticalIndex > COLORMAX) { // Something has broken so do something reasonable
-	  VerticalIndex &= COLORBTS;
+	  VerticalIndex &= COLMSK;
 	}
 	else { // we have a valid Index
 	  flag = true;
@@ -11264,7 +11264,7 @@ auto thred::internal::updateFillColor() -> bool {
 	  break;
 	}
 	if (StateMap->testAndReset(StateFlag::UNDCOL)) {
-	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLORBTS;
+	  FormList->operator[](ClosestFormToCursor).underlayColor = VerticalIndex & COLMSK;
 	  form::refilfn();
 	  thred::coltab();
 	  break;
@@ -12554,7 +12554,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		unbox();
 		unboxs();
 		auto const spTSP = gsl::span<int32_t> {ThreadSizePixels};
-		setbak(spTSP[StitchBuffer->operator[](ClosestPointIndex).attribute & COLORBTS] + 3);
+		setbak(spTSP[StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK] + 3);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
 		SetROP2(StitchWindowDC, R2_NOTXORPEN);
@@ -12662,7 +12662,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
 	  auto const code = ActiveColor;
-	  ActiveColor     = VerticalIndex & COLORBTS;
+	  ActiveColor     = VerticalIndex & COLMSK;
 	  thred::redraw(UserColorWin->operator[](code));
 	  thred::redraw(UserColorWin->operator[](ActiveColor));
 	  if (StateMap->test(StateFlag::HID)) {
@@ -16000,7 +16000,7 @@ void thred::internal::redini() {
 		BorderWidth = IniFile.borderWidth;
 	  }
 	  if (IniFile.appliqueColor != 0U) {
-		AppliqueColor = IniFile.appliqueColor & COLORBTS;
+		AppliqueColor = IniFile.appliqueColor & COLMSK;
 	  }
 	  if (IniFile.snapLength != 0.0F) {
 		SnapLength = IniFile.snapLength;
@@ -17019,12 +17019,12 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  auto brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem->hDC, brush);
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
-		  auto iColor = stitchesToDraw[0].attribute & COLORBTS;
+		  auto iColor = stitchesToDraw[0].attribute & COLMSK;
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pen   = wrap::CreatePen(PS_SOLID, PENNWID, colors[iColor]);
 		  auto iLine = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
-			if ((stitchesToDraw[iStitch].attribute & COLORBTS) == iColor) {
+			if ((stitchesToDraw[iStitch].attribute & COLMSK) == iColor) {
 			  lines[iLine++] = {std::lround(stitchesToDraw[iStitch].x * ratio),
 			                    std::lround(wrap::toFloat(drawingDestinationSize.cy) -
 			                                stitchesToDraw[iStitch].y * ratio)};
@@ -17034,7 +17034,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			  SelectObject(drawItem->hDC, pen);
 			  wrap::Polyline(drawItem->hDC, lines.data(), iLine);
 			  iLine  = 0;
-			  iColor = stitchesToDraw[iStitch].attribute & COLORBTS;
+			  iColor = stitchesToDraw[iStitch].attribute & COLMSK;
 			}
 		  }
 		  if (iLine != 0U) {

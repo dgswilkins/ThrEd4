@@ -32,7 +32,6 @@ constexpr auto RES_SIZE = 26;            // reserved for expansion in the ThrEd 
 constexpr auto NAME_LEN = 50;            // Length of the name fields in ThrEd headers
 constexpr auto COLORCNT = uint8_t {16U}; // Number of colors in arrays
 constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
-constexpr auto COLORBTS = 0xfU;     // Number of bits to cover the number of the colors in arrays
 constexpr auto SRTIM    = 20000000; // sort time limit in 100 ns intervals
 
 // daisy codes

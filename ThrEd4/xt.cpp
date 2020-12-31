@@ -820,7 +820,7 @@ void xt::internal::durec(OREC& record) {
   auto const stitchIt = wrap::next(StitchBuffer->begin(), record.start);
   record.type = gsl::narrow_cast<decltype(record.type)>(StitchTypes[dutyp(stitchIt->attribute)]);
   auto const attribute = stitchIt->attribute & SRTMSK;
-  record.color         = attribute & COLORBTS;
+  record.color         = attribute & COLMSK;
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
