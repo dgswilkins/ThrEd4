@@ -827,7 +827,7 @@ void xt::internal::durec(OREC& record) {
 auto xt::internal::orComp(OREC const* record1, OREC const* record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1 != nullptr && record2 != nullptr) {
-	auto const spColorOrder = gsl::span<uint32_t> {ColorOrder};
+	auto const spColorOrder = gsl::make_span(ColorOrder);
 	if (spColorOrder[record1->color] < spColorOrder[record2->color]) {
 	  return true;
 	}
@@ -986,7 +986,7 @@ auto xt::internal::srtchk(std::vector<OREC*> const& stitchRegion, uint32_t count
   auto color     = stitchRegion[0]->color;
   for (auto iRegion = 1U; iRegion < count; ++iRegion) {
 	if (stitchRegion[iRegion]->form == formIndex) {
-	  auto const spColorOrder = gsl::span<uint32_t> {ColorOrder};
+	  auto const spColorOrder = gsl::make_span(ColorOrder);
 	  if (spColorOrder[stitchRegion[iRegion]->color] < spColorOrder[color]) {
 		auto& form = FormList->operator[](formIndex);
 		if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
@@ -1019,7 +1019,7 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = 0;
-	auto const spColorOrder         = gsl::span<uint32_t> {ColorOrder};
+	auto const spColorOrder         = gsl::make_span(ColorOrder);
 	spColorOrder[AppliqueColor]     = 0;
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
@@ -1325,8 +1325,7 @@ void xt::fdelstch(FRMHED const& form, FILLSTARTS& fillStartsData, uint32_t& fill
 	}
   }
   for (auto ind = 3U; ind != 0U; --ind) {
-	auto&      ffa         = fillStartsData.fillArray;
-	auto const spFillArray = gsl::span<uint32_t, sizeof(ffa) / sizeof(ffa[0])>(ffa);
+	auto const spFillArray = gsl::make_span(fillStartsData.fillArray);
 	iDestinationStitch     = ind - 1U;
 	while (iDestinationStitch < ind) {
 	  if (spFillArray[iDestinationStitch] > spFillArray[ind]) {

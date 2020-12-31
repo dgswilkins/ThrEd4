@@ -225,7 +225,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 
 auto trace::internal::trsum() -> uint32_t {
   auto const& firstColor            = TraceAdjacentColors.front();
-  auto const  spTraceAdjacentColors = gsl::span<uint32_t>(TraceAdjacentColors);
+  auto const  spTraceAdjacentColors = gsl::make_span(TraceAdjacentColors);
   auto const  subTrcAdjCol = spTraceAdjacentColors.subspan(1, TraceAdjacentColors.size() - 1U);
   auto const  fold         = [firstColor](uint32_t a, uint32_t b) {
     return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
@@ -811,8 +811,8 @@ void trace::trinit() {
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color     = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto       highColor = color;
-		auto const spTBD     = gsl::span<uint32_t> {
-            TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+		auto const spTBD     = gsl::make_span(
+            TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		auto const pixel = std::find_if(
 		    spTBD.begin(), spTBD.end(), [color](uint32_t& m) -> bool { return m != color; });
 		if (pixel != spTBD.end()) {
@@ -829,13 +829,13 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto spTBD = gsl::span<uint32_t> {
-		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight())};
+		auto spTBD = gsl::make_span(
+		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto pixel : spTBD) {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();
 		  for (auto& iHistogramData : histogramData) {
-			auto const spHD = gsl::span<uint32_t> {iHistogramData};
+			auto const spHD = gsl::make_span(iHistogramData);
 			++(spHD[*(iPixelColors++)]);
 		  }
 		}
@@ -843,7 +843,7 @@ void trace::trinit() {
 		auto iComponentPeakCount = componentPeakCount.begin();
 		auto iComponentPeak      = componentPeak.begin();
 		for (auto& iHistogramData : histogramData) {
-		  auto const spHD = gsl::span<uint32_t> {iHistogramData};
+		  auto const spHD = gsl::make_span(iHistogramData);
 		  for (auto iLevel = 0U; iLevel < iHistogramData.size(); ++iLevel) {
 			if (spHD[iLevel] > *iComponentPeakCount) {
 			  *iComponentPeakCount = spHD[iLevel];

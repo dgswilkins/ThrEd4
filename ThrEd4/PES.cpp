@@ -268,7 +268,7 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto       iColor           = 1U;
   auto       color            = StitchBuffer->front().attribute & COLMSK;
-  auto const spPESequivColors = gsl::span<uint8_t> {PESequivColors};
+  auto const spPESequivColors = gsl::make_span(PESequivColors);
   PEScolors[0]                = spPESequivColors[color];
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
@@ -307,11 +307,11 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   // write the overall thumbnail
   constexpr auto XOFFSET = uint8_t {4U}; // thumbnail x offset to place it in the frame correctly
   constexpr auto YOFFSET = uint8_t {5U}; // thumbnail y offset to place it in the frame correctly
-  auto const     spThumbnail = gsl::span<std::array<uint8_t, THUMBWID>>(thumbnail);
+  auto const     spThumbnail = gsl::make_span(thumbnail);
   for (auto& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
-	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
+	auto const spRow = gsl::make_span(spThumbnail[y]);
 	spRow[x]         = 1U;
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
@@ -321,7 +321,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   for (auto& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
-	auto const spRow = gsl::span<uint8_t> {spThumbnail[y]};
+	auto const spRow = gsl::make_span(spThumbnail[y]);
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  spRow[x] = 1U;
 	}
@@ -493,7 +493,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 	else {
 	  do {
 		auto           pesHeader        = PESHED {};
-		auto const     spPESequivColors = gsl::span<uint8_t> {PESequivColors};
+		auto const     spPESequivColors = gsl::make_span(PESequivColors);
 		constexpr auto PESSTR           = "#PES0001"; // PES lead in
 		constexpr auto EMBSTR           = "CEmbOne";  // emb section lead in
 		constexpr auto SEWSTR           = "CSewSeg";  // sewing segment leadin
@@ -645,8 +645,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto&      phl       = pecHeader->label;
-		auto const pecLabel  = gsl::span<char, sizeof(phl) / sizeof(phl[0])>(phl);
+		auto const pecLabel  = gsl::make_span(pecHeader->label);
 		pi::pecnam(pecLabel);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));

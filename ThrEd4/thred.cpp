@@ -466,7 +466,7 @@ void thred::internal::fnamtabs() {
   for (auto iName = 0U; iName < NAMELEN; ++iName) {
 	*(iNameOrder++) = iName;
   }
-  auto const spNameOrder = gsl::span<uint32_t> {NameOrder};
+  auto const spNameOrder = gsl::make_span(NameOrder);
   PseudoRandomValue      = NORDSED;
   for (auto iName = 0U; iName < 2 * NAMELEN; ++iName) {
 	auto const source      = form::psg() % NAMELEN;
@@ -477,7 +477,7 @@ void thred::internal::fnamtabs() {
   for (auto iName = uint8_t {}; iName < gsl::narrow<uint8_t>(NameEncoder.size()); ++iName) {
 	*(iNameEncoder++) = iName + NCODOF;
   }
-  auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
+  auto const spNameEncoder = gsl::make_span(NameEncoder);
   PseudoRandomValue        = NCODSED;
   for (auto iName = 0U; iName < 2 * NameEncoder.size(); ++iName) {
 	auto const source      = form::psg() & MSK7BITS;
@@ -485,7 +485,7 @@ void thred::internal::fnamtabs() {
 	std::swap(spNameEncoder[destination], spNameEncoder[source]);
   }
   NameDecoder.fill(0);
-  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
+  auto const spNameDecoder = gsl::make_span(NameDecoder);
   for (auto iName = uint8_t {32U}; iName < uint8_t {127U}; ++iName) {
 	spNameDecoder[spNameEncoder[iName]] = iName;
   }
@@ -502,8 +502,8 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   auto iName        = 0U;
   std::generate(
       tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
-  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
-  auto const spNameEncoder = gsl::span<uint8_t> {NameEncoder};
+  auto const spNameDecoder = gsl::make_span(NameDecoder);
+  auto const spNameEncoder = gsl::make_span(NameEncoder);
   for (auto& iTmpName : tmpName) {
 	if (designer[iName++] != 0) {
 	  iTmpName = (spNameEncoder[wrap::toSize(designer[iName])]);
@@ -522,8 +522,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
 	}
   }
   auto       iTmpName      = tmpName.begin();
-  auto&      ecn           = ExtendedHeader->creatorName;
-  auto const spCreatorName = gsl::span<char, sizeof(ecn) / sizeof(ecn[0])>(ecn);
+  auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
   for (auto& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
@@ -548,7 +547,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	++iNameOrder;
   }
   designer.reserve(tmpName.size());
-  auto const spNameDecoder = gsl::span<uint8_t> {NameDecoder};
+  auto const spNameDecoder = gsl::make_span(NameDecoder);
   for (auto const& character : tmpName) {
 	if (spNameDecoder[character] != 0U) {
 	  designer.push_back(gsl::narrow<char>(spNameDecoder[character]));
@@ -753,42 +752,42 @@ void thred::internal::dudat() {
 	backupData->formCount = formCount;
 	backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 	if (formCount != 0) {
-	  auto const dest = gsl::span<FRMHED>(backupData->forms, formList.size());
+	  auto const dest = gsl::make_span(backupData->forms, formList.size());
 	  std::copy(formList.cbegin(), formList.cend(), dest.begin());
 	}
 	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
 	backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 	if (!StitchBuffer->empty()) {
-	  auto const dest = gsl::span<fPOINTATTR>(backupData->stitches, StitchBuffer->size());
+	  auto const dest = gsl::make_span(backupData->stitches, StitchBuffer->size());
 	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), dest.begin());
 	}
 	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
 	backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[StitchBuffer->size()]);
 	if (!FormVertices->empty()) {
-	  auto const dest = gsl::span<fPOINT>(backupData->vertices, FormVertices->size());
+	  auto const dest = gsl::make_span(backupData->vertices, FormVertices->size());
 	  std::copy(FormVertices->cbegin(), FormVertices->cend(), dest.begin());
 	}
 	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
 	backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 	if (!SatinGuides->empty()) {
-	  auto const dest = gsl::span<SATCON>(backupData->guide, backupData->guideCount);
+	  auto const dest = gsl::make_span(backupData->guide, backupData->guideCount);
 	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), dest.begin());
 	}
 	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
 	backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 	if (!ClipPoints->empty()) {
-	  auto const dest = gsl::span<fPOINT>(backupData->clipPoints, backupData->clipPointCount);
+	  auto const dest = gsl::make_span(backupData->clipPoints, backupData->clipPointCount);
 	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), dest.begin());
 	}
 	backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 	{
-	  auto const dest = gsl::span<COLORREF>(backupData->colors, COLORCNT);
+	  auto const dest = gsl::make_span(backupData->colors, COLORCNT);
 	  std::copy(std::begin(UserColor), std::end(UserColor), dest.begin());
 	}
 	backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[COLORCNT]);
 	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (!TexturePointsBuffer->empty()) {
-	  auto const dest = gsl::span<TXPNT>(backupData->texturePoints, backupData->texturePointCount);
+	  auto const dest = gsl::make_span(backupData->texturePoints, backupData->texturePointCount);
 	  std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), dest.begin());
 	}
   }
@@ -2834,14 +2833,13 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto&          idd              = IniFile.defaultDirectory;
-  auto const     defaultDirectory = gsl::span<char, sizeof(idd) / sizeof(idd[0])>(idd);
+  auto const     defaultDirectory = gsl::make_span(IniFile.defaultDirectory);
   constexpr char FILLCHAR         = '\0';
   std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
   std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
   auto previousName = PreviousNames->begin();
   for (auto& prevName : IniFile.prevNames) {
-	auto const name = gsl::span<char> {prevName};
+	auto const name = gsl::make_span(prevName);
 	std::fill(name.begin(), name.end(), FILLCHAR);
 	if (!previousName->empty()) {
 	  auto previous = utf::Utf16ToUtf8(*previousName);
@@ -3125,7 +3123,7 @@ void thred::internal::duver(fs::path const& name) {
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
 	auto const src =
-	    gsl::span<char const>(gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count));
+	    gsl::make_span(gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count));
 	destination.insert(destination.end(), src.begin(), src.end());
   }
 }
@@ -3144,8 +3142,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      emn          = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -3849,7 +3846,7 @@ void thred::internal::redbak() {
   if (undoData != nullptr) {
 	StitchBuffer->clear();
 	if (undoData->stitchCount != 0U) {
-	  auto const span = gsl::span<fPOINTATTR>(undoData->stitches, undoData->stitchCount);
+	  auto const span = gsl::make_span(undoData->stitches, undoData->stitchCount);
 	  StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
 	}
 	else {
@@ -3858,28 +3855,28 @@ void thred::internal::redbak() {
 	UnzoomedRect = undoData->zoomRect;
 	FormList->clear();
 	if (undoData->formCount != 0U) {
-	  auto const span = gsl::span<FRMHED>(undoData->forms, undoData->formCount);
+	  auto const span = gsl::make_span(undoData->forms, undoData->formCount);
 	  FormList->insert(FormList->end(), span.begin(), span.end());
 	}
 	FormVertices->clear();
 	if (undoData->vertexCount != 0U) {
-	  auto const span = gsl::span<fPOINT>(undoData->vertices, undoData->vertexCount);
+	  auto const span = gsl::make_span(undoData->vertices, undoData->vertexCount);
 	  FormVertices->insert(FormVertices->end(), span.begin(), span.end());
 	}
 	SatinGuides->clear();
 	if (undoData->guideCount != 0U) {
-	  auto const span = gsl::span<SATCON>(undoData->guide, undoData->guideCount);
+	  auto const span = gsl::make_span(undoData->guide, undoData->guideCount);
 	  SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
 	}
 	ClipPoints->clear();
 	if (undoData->clipPointCount != 0U) {
-	  auto const span = gsl::span<fPOINT>(undoData->clipPoints, undoData->clipPointCount);
+	  auto const span = gsl::make_span(undoData->clipPoints, undoData->clipPointCount);
 	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
 	}
 	// ToDo - add field in BAKHED to keep track of number of colors
 	constexpr auto UCOLSIZE = UserColor.size();
-	auto const undoColors = gsl::span<COLORREF>(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
-	auto const userColors = gsl::span<COLORREF> {UserColor};
+	auto const undoColors = gsl::make_span(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
+	auto const userColors = gsl::make_span(UserColor);
 	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
@@ -3894,7 +3891,7 @@ void thred::internal::redbak() {
 	}
 	TexturePointsBuffer->clear();
 	if (undoData->texturePointCount != 0U) {
-	  auto const span = gsl::span<TXPNT>(undoData->texturePoints, undoData->texturePointCount);
+	  auto const span = gsl::make_span(undoData->texturePoints, undoData->texturePointCount);
 	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
 	}
 	thred::coltab();
@@ -5270,8 +5267,7 @@ void thred::internal::newFil() {
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      emn          = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
   rstdu();
   rstAll();
@@ -5838,7 +5834,7 @@ void thred::internal::duclip() {
 			if (texture::istx(selectedForm)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const dest = gsl::span<TXPNT>(&textures[textureCount], form.fillInfo.texture.count);
+			  auto const dest = gsl::make_span(&textures[textureCount], form.fillInfo.texture.count);
 			  std::copy(startPoint, endPoint, dest.begin());
 			  forms[iForm++].fillInfo.texture.index = textureCount;
 			  textureCount += form.fillInfo.texture.count;
@@ -5941,7 +5937,7 @@ void thred::internal::duclip() {
 			if (texture::istx(ClosestFormToCursor)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const dest     = gsl::span<TXPNT>(textures, form.fillInfo.texture.count);
+			  auto const dest     = gsl::make_span(textures, form.fillInfo.texture.count);
 			  std::copy(startPoint, endPoint, dest.begin());
 			}
 			SetClipboardData(thrEdClip, clipHandle);
@@ -6814,7 +6810,7 @@ void thred::redclp() {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
 	auto* const clipStitchPtr  = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
 	auto const  clipSize       = clipStitchPtr[0].led;
-	auto const  clipStitchData = gsl::span<CLPSTCH>(clipStitchPtr, clipSize);
+	auto const  clipStitchData = gsl::make_span(clipStitchPtr, clipSize);
 	auto&       clipBuffer     = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(clipSize);
@@ -9127,7 +9123,7 @@ void thred::internal::ritcur() {
 	constexpr auto ICONSIZE = 64U; // size in bytes of an icon bitmap
 
 	auto       bitmapBits = std::array<uint8_t, ICONSIZE> {};
-	auto const spBMB      = gsl::span<uint8_t> {bitmapBits};
+	auto const spBMB      = gsl::make_span(bitmapBits);
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(spBMB.size()), spBMB.data());
 	if (currentCursor == ArrowCursor) {
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
@@ -12553,7 +12549,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		ClosestPointIndex = closestPointIndexClone;
 		unbox();
 		unboxs();
-		auto const spTSP = gsl::span<int32_t> {ThreadSizePixels};
+		auto const spTSP = gsl::make_span(ThreadSizePixels);
 		setbak(spTSP[StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK] + 3);
 		auto linePoints = std::vector<POINT> {};
 		linePoints.resize(3);
@@ -12795,7 +12791,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                                    sizeof(decltype(FormVertices->back()));
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
-		auto const  clipSpan       = gsl::span<uint8_t>(clipP, byteCount);
+		auto const  clipSpan       = gsl::make_span(clipP, byteCount);
 		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.begin(), clipSpan.end());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
@@ -12810,7 +12806,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto const closestIt = wrap::next(vertexIt, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(*closestIt);
 		  auto*      clipData = convert_ptr<fPOINT*>(&formVerticesData[1]);
-		  auto const vertSpan = gsl::span<fPOINT>(clipData, formVerticesData->vertexCount);
+		  auto const vertSpan = gsl::make_span(clipData, formVerticesData->vertexCount);
 		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.begin(), vertSpan.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
 		  auto const nextIt     = wrap::next(vertexIt, nextVertex);
@@ -12830,7 +12826,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.vertexCount = formVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
 		  auto*      vertices  = convert_ptr<fPOINT*>(&formVerticesData[1]);
-		  auto const vertSpan  = gsl::span<fPOINT>(vertices, formIter.vertexCount);
+		  auto const vertSpan  = gsl::make_span(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), vertSpan.begin(), vertSpan.end());
 		  StateMap->set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
@@ -12847,7 +12843,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto iForm            = 0U;
 		ClipFormsCount        = clipFormsHeader->formCount;
 		auto*      forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
-		auto const formSpan   = gsl::span<FRMHED>(forms, clipFormsHeader->formCount);
+		auto const formSpan   = gsl::make_span(forms, clipFormsHeader->formCount);
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto& form : formSpan) {
 		  FormList->push_back(form);
@@ -12862,7 +12858,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto& form        = FormList->operator[](offset);
 		  form.vertexIndex  = wrap::toUnsigned(FormVertices->size());
 		  auto const currentVertices =
-		      gsl::span<fPOINT>(formVertices, wrap::toSize(currentVertex + form.vertexCount));
+		      gsl::make_span(formVertices, wrap::toSize(currentVertex + form.vertexCount));
 		  FormVertices->insert(FormVertices->end(),
 		                       wrap::next(currentVertices.begin(), currentVertex),
 		                       currentVertices.end());
@@ -12916,7 +12912,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			    gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size());
 		  }
 		}
-		auto const textureSpan = gsl::span<TXPNT>(textureSource, textureCount);
+		auto const textureSpan = gsl::make_span(textureSource, textureCount);
 		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
@@ -12957,11 +12953,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
 		  auto*      formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
-		  auto const verticesSpan = gsl::span<fPOINT>(formVertices, formIter.vertexCount);
+		  auto const verticesSpan = gsl::make_span(formVertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), verticesSpan.begin(), verticesSpan.end());
 		  auto* guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
-			auto const guideSpan        = gsl::span<SATCON>(guides, formIter.satinGuideCount);
+			auto const guideSpan        = gsl::make_span(guides, formIter.satinGuideCount);
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), guideSpan.begin(), guideSpan.end());
 		  }
@@ -12969,21 +12965,21 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto       clipCount     = 0U;
 		  auto const lastFormIndex = wrap::toUnsigned(FormList->size() - 1U);
 		  if (clip::isclpx(lastFormIndex)) {
-			auto const clipSpan = gsl::span<fPOINT>(clipData, formIter.lengthOrCount.clipCount);
+			auto const clipSpan = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (clip::iseclpx(lastFormIndex)) {
 			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]);
-			auto const clipSpan     = gsl::span<fPOINT>(clipData, formIter.clipEntries);
+			auto const clipSpan     = gsl::make_span(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (texture::istx(lastFormIndex)) {
 			auto*      textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
-			auto const textureSpan = gsl::span<TXPNT>(textureSource, formIter.fillInfo.texture.count);
+			auto const textureSpan = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
 		  }
@@ -15902,14 +15898,11 @@ void thred::internal::setPrefs() {
 }
 
 void thred::internal::loadColors() noexcept {
-  auto&      risc  = IniFile.stitchColors;
-  auto const isc   = gsl::span<COLORREF, sizeof(risc) / sizeof(risc[0])>(risc);
+  auto const isc   = gsl::make_span(IniFile.stitchColors);
   auto       iisc  = isc.begin();
-  auto&      rispc = IniFile.stitchPreferredColors;
-  auto const ispc  = gsl::span<COLORREF, sizeof(rispc) / sizeof(rispc[0])>(rispc);
+  auto const ispc  = gsl::make_span(IniFile.stitchPreferredColors);
   auto       iispc = ispc.begin();
-  auto&      ribpc = IniFile.backgroundPreferredColors;
-  auto const ibpc  = gsl::span<COLORREF, sizeof(ribpc) / sizeof(ribpc[0])>(ribpc);
+  auto const ibpc  = gsl::make_span(IniFile.backgroundPreferredColors);
   auto       iibpc = ibpc.begin();
   auto       cc    = CustomColor.begin();
   auto       cbc   = CustomBackgroundColor.begin();
@@ -16399,8 +16392,7 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto&      emn          = ExtendedHeader->modifierName;
-  auto const modifierName = gsl::span<char, sizeof(emn) / sizeof(emn[0])>(emn);
+  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.begin(), designer.end(), modifierName.begin());
   thred::chkhup();
   nedmen();

@@ -430,7 +430,7 @@ void texture::drwtxtr() {
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
-  auto const spUserColor = gsl::span<COLORREF> {UserColor};
+  auto const spUserColor = gsl::make_span(UserColor);
   TextureCrossPen        = wrap::CreatePen(PS_SOLID, PENNWID, spUserColor[ActiveColor]);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
@@ -840,7 +840,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 		if (nullptr != clipForm) {
 		  textureForm         = *clipForm;
 		  auto*      vertices = convert_ptr<fPOINT*>(&clipForm[1]);
-		  auto const source   = gsl::span<fPOINT>(vertices, textureForm.vertexCount);
+		  auto const source   = gsl::make_span(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), source.begin(), source.end());
 		  textureForm.vertexIndex = 0;

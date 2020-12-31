@@ -72,8 +72,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 	  PCSHeader.colorCount = COLORCNT;
 	  auto PCSStitchBuffer = std::vector<PCSTCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
-	  auto&      phCol    = PCSHeader.colors;
-	  auto const spColors = gsl::span<COLORREF, sizeof(phCol) / sizeof(phCol[0])>(phCol);
+	  auto const spColors = gsl::make_span(PCSHeader.colors);
 	  std::copy(UserColor.begin(), UserColor.end(), spColors.begin());
 	  do {
 		if (pci::pcshup(saveStitches)) {
@@ -151,8 +150,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
-		  auto&      phCol    = PCSHeader.colors;
-		  auto const spColors = gsl::span<COLORREF, sizeof(phCol) / sizeof(phCol[0])>(phCol);
+		  auto const spColors = gsl::make_span(PCSHeader.colors);
 		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));
