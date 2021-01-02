@@ -268,15 +268,15 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto       iColor           = 1U;
   auto       color            = StitchBuffer->front().attribute & COLMSK;
-  auto       ispec = wrap::next(PESequivColors.begin(), color);
-  PEScolors[0]                = *ispec;
+  auto iPEC   = wrap::next(PESequivColors.begin(), color);
+  PEScolors[0] = *iPEC;
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
 	  color = stitchFwd1.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
-	  ispec = wrap::next(PESequivColors.begin(), color);
-	  PEScolors[iColor] = *ispec;
+	  iPEC             = wrap::next(PESequivColors.begin(), color);
+	  PEScolors[iColor] = *iPEC;
 	  ++iColor;
 	}
 	auto const xDelta = stitchFwd1.x - thisStitch.x;
@@ -648,8 +648,8 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto const pecLabel  = gsl::make_span(pecHeader->label);
-		pi::pecnam(pecLabel);
+		auto const spPHL  = gsl::make_span(pecHeader->label);
+		pi::pecnam(spPHL);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
 		std::fill(fstart, fend, ' ');

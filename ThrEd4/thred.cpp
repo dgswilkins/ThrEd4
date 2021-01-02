@@ -535,8 +535,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
   auto       tmpName       = std::array<uint8_t, NameOrder.size()> {};
   auto       designer      = std::string {};
   auto       iNameOrder    = NameOrder.begin();
-  auto&      EHCN          = ExtendedHeader->creatorName;
-  auto const spCreatorName = gsl::make_span(EHCN);
+  auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
   for (auto& iTmpName : tmpName) {
 	auto& index = *iNameOrder;
 	if (index < spCreatorName.size()) {
@@ -753,43 +752,43 @@ void thred::internal::dudat() {
 	backupData->formCount = formCount;
 	backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
 	if (formCount != 0) {
-	  auto const dest = gsl::make_span(backupData->forms, formList.size());
-	  std::copy(formList.cbegin(), formList.cend(), dest.begin());
+	  auto const spForms = gsl::make_span(backupData->forms, formList.size());
+	  std::copy(formList.cbegin(), formList.cend(), spForms.begin());
 	}
 	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
 	backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
 	if (!StitchBuffer->empty()) {
-	  auto const dest = gsl::make_span(backupData->stitches, StitchBuffer->size());
-	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), dest.begin());
+	  auto const spStitches = gsl::make_span(backupData->stitches, StitchBuffer->size());
+	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
 	}
 	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
 	backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[StitchBuffer->size()]);
 	if (!FormVertices->empty()) {
-	  auto const dest = gsl::make_span(backupData->vertices, FormVertices->size());
-	  std::copy(FormVertices->cbegin(), FormVertices->cend(), dest.begin());
+	  auto const spVertices = gsl::make_span(backupData->vertices, FormVertices->size());
+	  std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
 	}
 	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
 	backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
 	if (!SatinGuides->empty()) {
-	  auto const dest = gsl::make_span(backupData->guide, backupData->guideCount);
-	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), dest.begin());
+	  auto const spGuides = gsl::make_span(backupData->guide, backupData->guideCount);
+	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
 	}
 	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
 	backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
 	if (!ClipPoints->empty()) {
-	  auto const dest = gsl::make_span(backupData->clipPoints, backupData->clipPointCount);
-	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), dest.begin());
+	  auto const spClipPoints = gsl::make_span(backupData->clipPoints, backupData->clipPointCount);
+	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
 	}
 	backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 	{
-	  auto const dest = gsl::make_span(backupData->colors, COLORCNT);
-	  std::copy(std::begin(UserColor), std::end(UserColor), dest.begin());
+	  auto const spColors = gsl::make_span(backupData->colors, COLORCNT);
+	  std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
 	}
 	backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[COLORCNT]);
 	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (!TexturePointsBuffer->empty()) {
-	  auto const dest = gsl::make_span(backupData->texturePoints, backupData->texturePointCount);
-	  std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), dest.begin());
+	  auto const spTexturePoints = gsl::make_span(backupData->texturePoints, backupData->texturePointCount);
+	  std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
 	}
   }
 }
@@ -1288,11 +1287,11 @@ void thred::hupfn() {
   sizstch(checkHoopRect, *StitchBuffer);
   if (!FormList->empty()) {
 	if (StitchBuffer->empty()) {
-	  auto const vertexIt  = FormVertices->cbegin();
-	  checkHoopRect.top    = vertexIt->y;
-	  checkHoopRect.bottom = vertexIt->y;
-	  checkHoopRect.right  = vertexIt->x;
-	  checkHoopRect.left   = vertexIt->x;
+	  auto const itVertex  = FormVertices->cbegin();
+	  checkHoopRect.top    = itVertex->y;
+	  checkHoopRect.bottom = itVertex->y;
+	  checkHoopRect.right  = itVertex->x;
+	  checkHoopRect.left   = itVertex->x;
 	}
 	for (auto& FormVertice : *FormVertices) {
 	  if (FormVertice.x < checkHoopRect.left) {
@@ -2834,32 +2833,32 @@ void thred::internal::defNam(fs::path const& fileName) {
 
 void thred::internal::ritini() {
   auto const     directory        = utf::Utf16ToUtf8(DefaultDirectory->wstring());
-  auto const     defaultDirectory = gsl::make_span(IniFile.defaultDirectory);
+  auto const     spIDD = gsl::make_span(IniFile.defaultDirectory);
   constexpr char FILLCHAR         = '\0';
-  std::fill(defaultDirectory.begin(), defaultDirectory.end(), FILLCHAR);
-  std::copy(directory.cbegin(), directory.cend(), defaultDirectory.begin());
+  std::fill(spIDD.begin(), spIDD.end(), FILLCHAR);
+  std::copy(directory.cbegin(), directory.cend(), spIDD.begin());
   auto previousName = PreviousNames->begin();
   for (auto& prevName : IniFile.prevNames) {
-	auto const name = gsl::make_span(prevName);
-	std::fill(name.begin(), name.end(), FILLCHAR);
+	auto const spName = gsl::make_span(prevName);
+	std::fill(spName.begin(), spName.end(), FILLCHAR);
 	if (!previousName->empty()) {
 	  auto previous = utf::Utf16ToUtf8(*previousName);
-	  std::copy(previous.cbegin(), previous.cend(), name.begin());
+	  std::copy(previous.cbegin(), previous.cend(), spName.begin());
 	}
 	++previousName;
   }
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const designerName = gsl::make_span(IniFile.designerName);
+  auto const spIDN    = gsl::make_span(IniFile.designerName);
   auto const spISC        = gsl::make_span(IniFile.stitchColors);
   auto const spIBPC       = gsl::make_span(IniFile.backgroundPreferredColors);
   auto const spISPC       = gsl::make_span(IniFile.stitchPreferredColors);
-  std::fill(designerName.begin(), designerName.end(), FILLCHAR);
-  std::copy(designer.cbegin(), designer.cend(), designerName.begin());
+  std::fill(spIDN.begin(), spIDN.end(), FILLCHAR);
+  std::copy(designer.cbegin(), designer.cend(), spIDN.begin());
   std::copy(spISC.begin(), spISC.end(), UserColor.begin());
   std::copy(spIBPC.begin(), spIBPC.end(), CustomBackgroundColor.begin());
   std::copy(spISPC.begin(), spISPC.end(), CustomColor.begin());
-  auto const ibbc = gsl::make_span(IniFile.bitmapBackgroundColors);
-  std::generate(ibbc.begin(), ibbc.end(), [bcIndex = 0U]() mutable noexcept -> COLORREF {
+  auto const iIBBC = gsl::make_span(IniFile.bitmapBackgroundColors);
+  std::generate(iIBBC.begin(), iIBBC.end(), [bcIndex = 0U]() mutable noexcept -> COLORREF {
 	return bitmap::getBmpBackColor(bcIndex++);
   });
   IniFile.backgroundColor = BackgroundColor;
@@ -2958,8 +2957,8 @@ void thred::internal::redbal() {
 		BalaradOffset.y        = IniFile.hoopSizeY * 0.5F;
 		IniFile.hoopType       = CUSTHUP;
 		UserColor.fill(0);
-		auto const bhc  = gsl::make_span(balaradHeader.color);
-		auto       iBHC = bhc.begin();
+		auto const spBHC  = gsl::make_span(balaradHeader.color);
+		auto       iBHC = spBHC.begin();
 		UserColor[0]    = *iBHC;
 		auto color      = 0U;
 		thred::addColor(0, color);
@@ -3014,9 +3013,9 @@ void thred::internal::ritbal() {
 	  return;
 	}
 	auto       color  = gsl::narrow_cast<uint8_t>(StitchBuffer->front().attribute & COLMSK);
-	auto const bhc    = gsl::make_span(balaradHeader.color);
-	auto       iBHC   = bhc.begin();
-	auto const bhcEnd = std::next(bhc.begin(), UserColor.size());
+	auto const spBHC    = gsl::make_span(balaradHeader.color);
+	auto       iBHC   = spBHC.begin();
+	auto const bhcEnd = std::next(spBHC.begin(), UserColor.size());
 	*iBHC             = UserColor[color];
 	for (auto& stitch : *StitchBuffer) {
 	  if (color != (stitch.attribute & COLMSK)) {
@@ -3123,9 +3122,8 @@ void thred::internal::duver(fs::path const& name) {
 
 void thred::internal::durit(std::vector<char>& destination, const void* source, uint32_t count) {
   if (source != nullptr) {
-	auto const src =
-	    gsl::make_span(gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count));
-	destination.insert(destination.end(), src.begin(), src.end());
+	auto const spSrc = gsl::make_span(gsl::narrow_cast<char const*>(source), gsl::narrow_cast<size_t>(count));
+	destination.insert(destination.end(), spSrc.begin(), spSrc.end());
   }
 }
 
@@ -3143,8 +3141,8 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
-  std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
+  auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
+  std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
 	  vertexCount += form.vertexCount;
@@ -3213,17 +3211,17 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	points.reserve(clipDataCount);
 	for (auto& srcForm : (*FormList)) {
 	  outForms.emplace_back(srcForm);
-	  auto vertexIt = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
+	  auto itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < srcForm.vertexCount; ++iVertex) {
-		vertices.push_back(*vertexIt);
-		++vertexIt;
+		vertices.push_back(*itVertex);
+		++itVertex;
 	  }
 	  if (srcForm.type == SAT) {
 		wrap::narrow(outForms.back().satinGuideCount, srcForm.satinGuideCount);
-		auto guideIt = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
+		auto itGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
 		for (auto iGuide = 0U; iGuide < srcForm.satinGuideCount; ++iGuide) {
-		  guides.emplace_back(*guideIt);
-		  ++guideIt;
+		  guides.emplace_back(*itGuide);
+		  ++itGuide;
 		}
 	  }
 	  if (clip::isclp(srcForm)) {
@@ -3876,9 +3874,9 @@ void thred::internal::redbak() {
 	}
 	// ToDo - add field in BAKHED to keep track of number of colors
 	constexpr auto UCOLSIZE = UserColor.size();
-	auto const undoColors = gsl::make_span(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
-	auto const userColors = gsl::make_span(UserColor);
-	std::copy(undoColors.begin(), undoColors.end(), userColors.begin());
+	auto const     spUndoColors = gsl::make_span(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
+	auto const     spUserColors = gsl::make_span(UserColor);
+	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
 	for (auto& color : UserColor) {
@@ -4126,8 +4124,8 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
-	auto const desName = gsl::make_span(IniFile.designerName);
-	DesignerName->assign(utf::Utf8ToUtf16(std::string(desName.data())));
+	auto const spIDN = gsl::make_span(IniFile.designerName);
+	DesignerName->assign(utf::Utf8ToUtf16(std::string(spIDN.data())));
 	switch (version) {
 	  case 0: {
 		if (thredHeader.hoopType == SMALHUP) {
@@ -4141,10 +4139,10 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  UnzoomedRect = SIZE {gsl::narrow_cast<int32_t>(LHUPX), gsl::narrow_cast<int32_t>(LHUPY)};
 		}
 		ritfnam(*DesignerName);
-		auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
-		std::copy(desName.begin(),
-		          wrap::next(desName.begin(), strlen(desName.data()) + 1U),
-		          modifierName.begin());
+		auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
+		std::copy(spIDN.begin(),
+		          wrap::next(spIDN.begin(), strlen(spIDN.data()) + 1U),
+		          spModifierName.begin());
 		break;
 	  }
 	  case 1:
@@ -4559,10 +4557,10 @@ void thred::internal::zumin() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto const vertexIt =
+		auto const itVertex =
 		    wrap::next(FormVertices->cbegin(),
 		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		stitchPoint = *vertexIt;
+		stitchPoint = *itVertex;
 		break;
 	  }
 	  if (StateMap->test(StateFlag::SELBOX)) {
@@ -4676,10 +4674,10 @@ void thred::internal::zumout() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FRMPSEL)) {
-		auto const vertexIt =
+		auto const itVertex =
 		    wrap::next(FormVertices->cbegin(),
 		               FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		stitchPoint = *vertexIt;
+		stitchPoint = *itVertex;
 		break;
 	  }
 	  if (StateMap->test(StateFlag::SELBOX) || StateMap->test(StateFlag::INSRT)) {
@@ -5268,8 +5266,8 @@ void thred::internal::newFil() {
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
   auto const designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
-  std::copy(designer.cbegin(), designer.cend(), modifierName.begin());
+  auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
+  std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
   rstdu();
   rstAll();
   displayText::clrhbut(3);
@@ -5737,10 +5735,10 @@ void thred::internal::duclip() {
 		// skip past the header
 		auto*       vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
 		auto const& form     = FormList->operator[](ClosestFormToCursor);
-		auto vertexIt        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		auto itVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		auto iSource         = SelectedFormVertices.start;
 		for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-		  auto sourceIt     = wrap::next(vertexIt, iSource);
+		  auto sourceIt     = wrap::next(itVertex, iSource);
 		  vertices[iVertex] = *sourceIt;
 		  iSource           = form::pdir(form, iSource);
 		}
@@ -5786,11 +5784,11 @@ void thred::internal::duclip() {
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			// clang-format off
 			  auto& form     = FormList->operator[](selectedForm);
-			  auto  vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+			  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 			// clang-format on
 			for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
-			  formVertices[iVertex++] = *vertexIt;
-			  ++vertexIt;
+			  formVertices[iVertex++] = *itVertex;
+			  ++itVertex;
 			}
 		  }
 		  // skip past the vertex list
@@ -5799,10 +5797,10 @@ void thred::internal::duclip() {
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
 			if (form.type == SAT) {
-			  auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 			  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-				guides[guideCount++] = *guideIt;
-				++guideIt;
+				guides[guideCount++] = *itGuide;
+				++itGuide;
 			  }
 			}
 		  }
@@ -5835,8 +5833,9 @@ void thred::internal::duclip() {
 			if (texture::istx(selectedForm)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const dest = gsl::make_span(std::next(textures, textureCount), form.fillInfo.texture.count);
-			  std::copy(startPoint, endPoint, dest.begin());
+			  auto const spDest =
+			      gsl::make_span(std::next(textures, textureCount), form.fillInfo.texture.count);
+			  std::copy(startPoint, endPoint, spDest.begin());
 			  forms[iForm++].fillInfo.texture.index = textureCount;
 			  textureCount += form.fillInfo.texture.count;
 			}
@@ -5903,18 +5902,18 @@ void thred::internal::duclip() {
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
 			auto* formVertices       = convert_ptr<fPOINT*>(&clipFormHeader[1]);
-			auto  vertexIt           = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+			auto  itVertex           = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
-			  formVertices[iSide] = *vertexIt;
-			  ++vertexIt;
+			  formVertices[iSide] = *itVertex;
+			  ++itVertex;
 			}
 			auto* guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
 			auto  iGuide = 0U;
 			if (form.type == SAT) {
-			  auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 			  for (iGuide = 0; iGuide < form.satinGuideCount; ++iGuide) {
-				guides[iGuide] = *guideIt;
-				++guideIt;
+				guides[iGuide] = *itGuide;
+				++itGuide;
 			  }
 			}
 			auto* mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
@@ -5938,8 +5937,8 @@ void thred::internal::duclip() {
 			if (texture::istx(ClosestFormToCursor)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const dest     = gsl::make_span(textures, form.fillInfo.texture.count);
-			  std::copy(startPoint, endPoint, dest.begin());
+			  auto const spDest     = gsl::make_span(textures, form.fillInfo.texture.count);
+			  std::copy(startPoint, endPoint, spDest.begin());
 			}
 			SetClipboardData(thrEdClip, clipHandle);
 		  }
@@ -6525,13 +6524,13 @@ void thred::internal::delet() {
 	}
 	auto const vBegin   = wrap::next(FormVertices->begin(), form.vertexIndex);
 	auto       vCurr    = vBegin;
-	auto       vertexIt = vBegin;
+	auto       itVertex = vBegin;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  if (!vertexMap.test(iVertex)) {
-		*vCurr = *vertexIt;
+		*vCurr = *itVertex;
 		++vCurr;
 	  }
-	  ++vertexIt;
+	  ++itVertex;
 	}
 	auto const eraseCount = wrap::toUnsigned(std::distance(vBegin, vCurr));
 	auto const eraseStart = wrap::next(FormVertices->cbegin(), wrap::toSize(form.vertexIndex) + eraseCount);
@@ -6555,29 +6554,29 @@ void thred::internal::delet() {
 	  }
 
 	  // ToDo - Is there a better way to do this than iterating through?
-	  auto guideIt = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+	  auto itGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
 		auto newGuideVal = 0U;
 		for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		  if (vertexMap.test(iVertex)) {
-			if (guideIt->finish == iVertex) {
-			  guideIt->finish = guideIt->start;
+			if (itGuide->finish == iVertex) {
+			  itGuide->finish = itGuide->start;
 			}
-			if (guideIt->start == iVertex) {
-			  guideIt->start = guideIt->finish;
+			if (itGuide->start == iVertex) {
+			  itGuide->start = itGuide->finish;
 			}
 		  }
 		  else {
-			if (guideIt->finish == iVertex) {
-			  guideIt->finish = newGuideVal;
+			if (itGuide->finish == iVertex) {
+			  itGuide->finish = newGuideVal;
 			}
-			if (guideIt->start == iVertex) {
-			  guideIt->start = newGuideVal;
+			if (itGuide->start == iVertex) {
+			  itGuide->start = newGuideVal;
 			}
 			++newGuideVal;
 		  }
 		}
-		++guideIt;
+		++itGuide;
 	  }
 	  satin::satadj(form);
 	}
@@ -6691,14 +6690,14 @@ void thred::internal::delet() {
 				break;
 			  }
 			}
-			auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-			  if (guideIt->start == ClosestVertexToCursor || guideIt->finish == ClosestVertexToCursor) {
+			  if (itGuide->start == ClosestVertexToCursor || itGuide->finish == ClosestVertexToCursor) {
 				satin::delcon(form, iGuide);
 				satinFlag = true;
 				break;
 			  }
-			  ++guideIt;
+			  ++itGuide;
 			}
 		  } while (false);
 		  break;
@@ -6811,7 +6810,7 @@ void thred::redclp() {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
 	auto* const clipStitchPtr  = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
 	auto const  clipSize       = clipStitchPtr[0].led;
-	auto const  clipStitchData = gsl::make_span(clipStitchPtr, clipSize);
+	auto const  spClipStitchData = gsl::make_span(clipStitchPtr, clipSize);
 	auto&       clipBuffer     = *ClipBuffer;
 	clipBuffer.clear();
 	clipBuffer.reserve(clipSize);
@@ -6826,7 +6825,7 @@ void thred::redclp() {
 	                      .c_str());
 #endif
 	auto clipRect = fRECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
-	auto iCSD = std::next(clipStitchData.begin());
+	auto iCSD     = std::next(spClipStitchData.begin());
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
 	  clipBuffer.emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
 	                          wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
@@ -7207,9 +7206,9 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		                     gethand(fileStitchBuffer, fileHeader.stitchCount) * HANDW +
 		                     fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
 		if (filscor > homscor) {
-		  auto const ehcn = gsl::make_span(ExtendedHeader->creatorName);
-		  auto const thcn = gsl::make_span(thredHeader.creatorName);
-		  std::copy(thcn.begin(), thcn.end(), ehcn.begin());
+		  auto const spEHCN = gsl::make_span(ExtendedHeader->creatorName);
+		  auto const spTHCN = gsl::make_span(thredHeader.creatorName);
+		  std::copy(spTHCN.begin(), spTHCN.end(), spEHCN.begin());
 		  redfnam(*DesignerName);
 		  SetWindowText(
 		      ThrEdWindow,
@@ -7522,23 +7521,23 @@ void thred::internal::unmov() {
 
 void thred::internal::duprct(FRMHED const& form) {
   auto currentVertex        = SelectedFormVertices.start;
-  auto vertexIt             = wrap::next(FormVertices->cbegin(), form.vertexIndex + currentVertex);
-  SelectedVerticesRect.left = SelectedVerticesRect.right = vertexIt->x;
-  SelectedVerticesRect.top = SelectedVerticesRect.bottom = vertexIt->y;
+  auto itVertex             = wrap::next(FormVertices->cbegin(), form.vertexIndex + currentVertex);
+  SelectedVerticesRect.left = SelectedVerticesRect.right = itVertex->x;
+  SelectedVerticesRect.top = SelectedVerticesRect.bottom = itVertex->y;
   currentVertex                                          = form::pdir(form, currentVertex);
   for (auto iVertex = 0U; iVertex < SelectedFormVertices.vertexCount; ++iVertex) {
-	vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + currentVertex);
-	if (vertexIt->x < SelectedVerticesRect.left) {
-	  SelectedVerticesRect.left = vertexIt->x;
+	itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + currentVertex);
+	if (itVertex->x < SelectedVerticesRect.left) {
+	  SelectedVerticesRect.left = itVertex->x;
 	}
-	if (vertexIt->x > SelectedVerticesRect.right) {
-	  SelectedVerticesRect.right = vertexIt->x;
+	if (itVertex->x > SelectedVerticesRect.right) {
+	  SelectedVerticesRect.right = itVertex->x;
 	}
-	if (vertexIt->y < SelectedVerticesRect.bottom) {
-	  SelectedVerticesRect.bottom = vertexIt->y;
+	if (itVertex->y < SelectedVerticesRect.bottom) {
+	  SelectedVerticesRect.bottom = itVertex->y;
 	}
-	if (vertexIt->y > SelectedVerticesRect.top) {
-	  SelectedVerticesRect.top = vertexIt->y;
+	if (itVertex->y > SelectedVerticesRect.top) {
+	  SelectedVerticesRect.top = itVertex->y;
 	}
 	currentVertex = form::pdir(form, currentVertex);
   }
@@ -7550,8 +7549,8 @@ void thred::setpsel() {
   thi::duprct(form);
   SelectedPixelsRect = form::sRct2px(SelectedVerticesRect);
   form::rct2sel(SelectedPixelsRect, *SelectedPointsLine);
-  auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + SelectedFormVertices.finish);
-  EndPointCross = form::sfCor2px(*vertexIt);
+  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + SelectedFormVertices.finish);
+  EndPointCross = form::sfCor2px(*itVertex);
   StateMap->set(StateFlag::SHOPSEL);
   form::dupsel(StitchWindowDC);
   StateMap->set(StateFlag::FPSEL);
@@ -7566,8 +7565,8 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	auto  const vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-	  auto vertexIt = wrap::next(vBegin, currentVertex);
-	  thred::rotflt(*vertexIt, rotationAngle, rotationCenter);
+	  auto itVertex = wrap::next(vBegin, currentVertex);
+	  thred::rotflt(*itVertex, rotationAngle, rotationCenter);
 	  currentVertex = form::pdir(form, currentVertex);
 	}
 	form::frmout(ClosestFormToCursor);
@@ -7594,10 +7593,10 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
 	  auto& form     = FormList->operator[](selectedForm);
-	  auto  vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		thred::rotflt(*vertexIt, rotationAngle, rotationCenter);
+		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
 	  }
 	  form::frmout(ClosestFormToCursor);
 	  form::refilfn();
@@ -7608,10 +7607,10 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	if (StateMap->testAndReset(StateFlag::FRMROT)) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 
-	  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		thred::rotflt(*vertexIt, rotationAngle, rotationCenter);
-		++vertexIt;
+		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+		++itVertex;
 	  }
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
@@ -8964,15 +8963,15 @@ void thred::internal::rotmrk() {
 	  auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
 	  // clang-format off
 	  auto& form     = FormList->operator[](ClosestFormToCursor);
-	  auto  vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	  // clang-format on
-	  auto const originalAngle = atan2(vertexIt->y - ZoomMarkPoint.y, vertexIt->x - ZoomMarkPoint.x);
-	  ++vertexIt;
+	  auto const originalAngle = atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
+	  ++itVertex;
 	  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 		angdif(lowestAngle,
 		       highestAngle,
-		       nuang(originalAngle, vertexIt->x - ZoomMarkPoint.x, vertexIt->y - ZoomMarkPoint.y));
-		++vertexIt;
+		       nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
+		++itVertex;
 	  }
 	  for (auto& stitch : *StitchBuffer) {
 		if ((stitch.attribute & FRMSK) == codedFormIndex) {
@@ -9028,10 +9027,10 @@ void thred::internal::pntmrk() {
 	  break;
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto const vertexIt =
+	  auto const itVertex =
 	      wrap::next(FormVertices->cbegin(),
 	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-	  dumrk(vertexIt->x, vertexIt->y);
+	  dumrk(itVertex->x, itVertex->y);
 	  break;
 	}
 	displayText::shoseln(IDS_STCH_FRM, IDS_SETMRK);
@@ -9336,11 +9335,11 @@ void thred::internal::stchsnap(uint32_t start, uint32_t finish) {
 }
 
 void thred::internal::frmsnap(uint32_t start, uint32_t count) {
-  auto vertexIt = wrap::next(FormVertices->begin(), start);
+  auto itVertex = wrap::next(FormVertices->begin(), start);
   for (auto i = 0U; i < count; ++i) {
-	vertexIt->x = rintf(vertexIt->x / IniFile.gridSize) * IniFile.gridSize;
-	vertexIt->y = rintf(vertexIt->y / IniFile.gridSize) * IniFile.gridSize;
-	++vertexIt;
+	itVertex->x = rintf(itVertex->x / IniFile.gridSize) * IniFile.gridSize;
+	itVertex->y = rintf(itVertex->y / IniFile.gridSize) * IniFile.gridSize;
+	++itVertex;
   }
 }
 
@@ -9573,11 +9572,11 @@ void thred::internal::filclos() {
 }
 
 void thred::internal::frmpos(FRMHED& form, float deltaX, float deltaY) {
-  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	vertexIt->x += deltaX;
-	vertexIt->y += deltaY;
-	++vertexIt;
+	itVertex->x += deltaX;
+	itVertex->y += deltaY;
+	++itVertex;
   }
   form.rectangle.bottom += deltaY;
   form.rectangle.top += deltaY;
@@ -9987,10 +9986,10 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
   auto const             nextVertex = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
-  auto vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex + nextVertex);
+  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + nextVertex);
   for (auto iOutput = size_t {1U}; iOutput < InterleaveSequence->size() - 1U; ++iOutput) {
-	*vertexIt = fPOINT {it->x + offset.x, it->y + offset.y};
-	++vertexIt;
+	*itVertex = fPOINT {it->x + offset.x, it->y + offset.y};
+	++itVertex;
 	++it;
   }
   form::refil();
@@ -10019,10 +10018,10 @@ void thred::internal::selfpnt() {
   StateMap->reset(StateFlag::SELBOX);
   SelectedFormVertices.start = ClosestVertexToCursor;
   SelectedFormVertices.form  = ClosestFormToCursor;
-  auto const vertexIt =
+  auto const itVertex =
       wrap::next(FormVertices->cbegin(),
                  FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-  thred::ritfcor(*vertexIt);
+  thred::ritfcor(*itVertex);
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -10612,10 +10611,10 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  // clang-format off
 	  auto const& form            = FormList->operator[](ClosestFormToCursor);
 	  auto        iSelectedVertex = SelectedFormVertices.start;
-	  auto const vertexIt        = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-		auto thisIt = wrap::next(vertexIt, iSelectedVertex);
+		auto thisIt = wrap::next(itVertex, iSelectedVertex);
 		thisIt->x += FormMoveDelta.x;
 		thisIt->y -= FormMoveDelta.y;
 		iSelectedVertex = form::pdir(form, iSelectedVertex);
@@ -12152,12 +12151,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - iForm - 1U);
 	  // clang-format off
 	  auto& form     = FormList->operator[](ClosestFormToCursor);
-	  auto  vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
+	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-		vertexIt->x += FormMoveDelta.x;
-		vertexIt->y += FormMoveDelta.y;
-		++vertexIt;
+		itVertex->x += FormMoveDelta.x;
+		itVertex->y += FormMoveDelta.y;
+		++itVertex;
 	  }
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
@@ -12797,25 +12796,25 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                                    sizeof(decltype(FormVertices->back()));
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
 		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
-		auto const  clipSpan       = gsl::make_span(clipP, byteCount);
-		clipCopyBuffer.insert(clipCopyBuffer.end(), clipSpan.begin(), clipSpan.end());
+		auto const  spClip       = gsl::make_span(clipP, byteCount);
+		clipCopyBuffer.insert(clipCopyBuffer.end(), spClip.begin(), spClip.end());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
 		formVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = FormList->operator[](ClosestFormToCursor);
-		  auto  vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+		  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		  // clang-format on
 		  InterleaveSequence->clear();
 		  InterleaveSequence->reserve(wrap::toSize(formVerticesData->vertexCount) + 3U);
-		  auto const closestIt = wrap::next(vertexIt, ClosestVertexToCursor);
+		  auto const closestIt = wrap::next(itVertex, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(*closestIt);
 		  auto*      clipData = convert_ptr<fPOINT*>(&formVerticesData[1]);
-		  auto const vertSpan = gsl::make_span(clipData, formVerticesData->vertexCount);
-		  InterleaveSequence->insert(InterleaveSequence->end(), vertSpan.begin(), vertSpan.end());
+		  auto const spVertices = gsl::make_span(clipData, formVerticesData->vertexCount);
+		  InterleaveSequence->insert(InterleaveSequence->end(), spVertices.begin(), spVertices.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
-		  auto const nextIt     = wrap::next(vertexIt, nextVertex);
+		  auto const nextIt     = wrap::next(itVertex, nextVertex);
 		  InterleaveSequence->push_back(*nextIt);
 		  setpclp();
 		  StateMap->set(StateFlag::FPUNCLP);
@@ -12832,8 +12831,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  formIter.vertexCount = formVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex = wrap::toUnsigned(FormVertices->size());
 		  auto*      vertices  = convert_ptr<fPOINT*>(&formVerticesData[1]);
-		  auto const vertSpan  = gsl::make_span(vertices, formIter.vertexCount);
-		  FormVertices->insert(FormVertices->end(), vertSpan.begin(), vertSpan.end());
+		  auto const spVertices  = gsl::make_span(vertices, formIter.vertexCount);
+		  FormVertices->insert(FormVertices->end(), spVertices.begin(), spVertices.end());
 		  StateMap->set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
@@ -12849,9 +12848,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto iForm            = 0U;
 		ClipFormsCount        = clipFormsHeader->formCount;
 		auto*      forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
-		auto const formSpan   = gsl::make_span(forms, clipFormsHeader->formCount);
+		auto const spForm   = gsl::make_span(forms, clipFormsHeader->formCount);
 		auto const formOffset = wrap::toUnsigned(FormList->size());
-		for (auto& form : formSpan) {
+		for (auto& form : spForm) {
 		  FormList->push_back(form);
 		  auto& formIter = FormList->back();
 		  formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
@@ -12863,11 +12862,11 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto const offset = formOffset + iForm;
 		  auto& form        = FormList->operator[](offset);
 		  form.vertexIndex  = wrap::toUnsigned(FormVertices->size());
-		  auto const currentVertices =
+		  auto const spCurrentVertices =
 		      gsl::make_span(formVertices, wrap::toSize(currentVertex + form.vertexCount));
 		  FormVertices->insert(FormVertices->end(),
-		                       wrap::next(currentVertices.begin(), currentVertex),
-		                       currentVertices.end());
+		                       wrap::next(spCurrentVertices.begin(), currentVertex),
+		                       spCurrentVertices.end());
 		  currentVertex += form.vertexCount;
 		}
 		auto* guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
@@ -12877,10 +12876,10 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  auto& form        = FormList->operator[](offset);
 		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
 			form.satinOrAngle.guide = satin::adsatk(form.satinGuideCount);
-			auto guideIt            = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
+			auto itGuide            = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
 			for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-			  *guideIt = guides[currentGuide++];
-			  ++guideIt;
+			  *itGuide = guides[currentGuide++];
+			  ++itGuide;
 			}
 		  }
 		}
@@ -12918,8 +12917,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 			    gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size());
 		  }
 		}
-		auto const textureSpan = gsl::make_span(textureSource, textureCount);
-		TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
+		auto const spTexture = gsl::make_span(textureSource, textureCount);
+		TexturePointsBuffer->insert(TexturePointsBuffer->end(), spTexture.begin(), spTexture.end());
 		GlobalUnlock(ClipMemory);
 		SelectedFormsRect.top = SelectedFormsRect.left = std::numeric_limits<LONG>::max();
 		SelectedFormsRect.bottom = SelectedFormsRect.right = 0;
@@ -12959,35 +12958,35 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
 		  auto*      formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
-		  auto const verticesSpan = gsl::make_span(formVertices, formIter.vertexCount);
-		  FormVertices->insert(FormVertices->end(), verticesSpan.begin(), verticesSpan.end());
+		  auto const spVertices = gsl::make_span(formVertices, formIter.vertexCount);
+		  FormVertices->insert(FormVertices->end(), spVertices.begin(), spVertices.end());
 		  auto* guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
-			auto const guideSpan        = gsl::make_span(guides, formIter.satinGuideCount);
+			auto const spGuide        = gsl::make_span(guides, formIter.satinGuideCount);
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
-			SatinGuides->insert(SatinGuides->end(), guideSpan.begin(), guideSpan.end());
+			SatinGuides->insert(SatinGuides->end(), spGuide.begin(), spGuide.end());
 		  }
 		  auto*      clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
 		  auto       clipCount     = 0U;
 		  auto const lastFormIndex = wrap::toUnsigned(FormList->size() - 1U);
 		  if (clip::isclpx(lastFormIndex)) {
-			auto const clipSpan = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
+			auto const spClip = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
+			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (clip::iseclpx(lastFormIndex)) {
 			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]);
-			auto const clipSpan     = gsl::make_span(clipData, formIter.clipEntries);
+			auto const spClip     = gsl::make_span(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
-			ClipPoints->insert(ClipPoints->end(), clipSpan.begin(), clipSpan.end());
+			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (texture::istx(lastFormIndex)) {
 			auto*      textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
-			auto const textureSpan = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
+			auto const spTexture = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
-			TexturePointsBuffer->insert(TexturePointsBuffer->end(), textureSpan.begin(), textureSpan.end());
+			TexturePointsBuffer->insert(TexturePointsBuffer->end(), spTexture.begin(), spTexture.end());
 		  }
 		  NewFormVertexCount = formIter.vertexCount;
 		  if (formIter.type != FRMLINE) {
@@ -13229,11 +13228,11 @@ auto thred::internal::handleRightKey(bool& retflag) -> bool {
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  ClosestVertexToCursor = form::nxt(FormList->operator[](ClosestFormToCursor), ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-		  auto const vertexIt =
+		  auto const itVertex =
 		      wrap::next(FormVertices->cbegin(),
 		                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-		  thred::ritfcor(*vertexIt);
-		  shftflt(*vertexIt);
+		  thred::ritfcor(*itVertex);
+		  shftflt(*itVertex);
 		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
@@ -13321,9 +13320,9 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 		  auto const& form      = FormList->operator[](ClosestFormToCursor);
 		  ClosestVertexToCursor = form::prv(form, ClosestVertexToCursor);
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-		  auto const vertexIt = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
-		  thred::ritfcor(*vertexIt);
-		  shftflt(*vertexIt);
+		  auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
+		  thred::ritfcor(*itVertex);
+		  shftflt(*itVertex);
 		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
@@ -15904,18 +15903,18 @@ void thred::internal::setPrefs() {
 }
 
 void thred::internal::loadColors() noexcept {
-  auto const isc   = gsl::make_span(IniFile.stitchColors);
-  auto       iisc  = isc.begin();
-  auto const ispc  = gsl::make_span(IniFile.stitchPreferredColors);
-  auto       iispc = ispc.begin();
-  auto const ibpc  = gsl::make_span(IniFile.backgroundPreferredColors);
-  auto       iibpc = ibpc.begin();
-  auto       cc    = CustomColor.begin();
-  auto       cbc   = CustomBackgroundColor.begin();
+  auto const spISC   = gsl::make_span(IniFile.stitchColors);
+  auto       iISC  = spISC.begin();
+  auto const spISPC  = gsl::make_span(IniFile.stitchPreferredColors);
+  auto       iISPC = spISPC.begin();
+  auto const spIBPC  = gsl::make_span(IniFile.backgroundPreferredColors);
+  auto       iIBPC = spIBPC.begin();
+  auto       iCC    = CustomColor.begin();
+  auto       iCBC   = CustomBackgroundColor.begin();
   for (auto& color : UserColor) {
-	color    = *(iisc++);
-	*(cc++)  = *(iispc++);
-	*(cbc++) = *(iibpc++);
+	color    = *(iISC++);
+	*(iCC++)  = *(iISPC++);
+	*(iCBC++) = *(iIBPC++);
   }
 }
 
@@ -16398,8 +16397,8 @@ void thred::internal::init() {
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer     = utf::Utf16ToUtf8(*DesignerName);
-  auto const modifierName = gsl::make_span(ExtendedHeader->modifierName);
-  std::copy(designer.begin(), designer.end(), modifierName.begin());
+  auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
+  std::copy(designer.begin(), designer.end(), spModifierName.begin());
   thred::chkhup();
   nedmen();
   fil2men();
@@ -16816,10 +16815,10 @@ void thred::internal::drwStch() {
 	  }
 	}
 	if (StateMap->test(StateFlag::FRMPSEL)) {
-	  auto const vertexIt =
+	  auto const itVertex =
 	      wrap::next(FormVertices->cbegin(),
 	                 FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
-	  thred::ritfcor(*vertexIt);
+	  thred::ritfcor(*itVertex);
 	}
 	if (!StateMap->test(StateFlag::SELBOX) && !StateMap->test(StateFlag::FRMPSEL)) {
 	  auto const blank = std::wstring {};
@@ -17606,15 +17605,15 @@ void thred::internal::sachk() {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto const& form = FormList->operator[](iForm);
 	if (form.type == SAT && (form.satinGuideCount != 0U)) {
-	  auto guideIt = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+	  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
 	  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-		if (guideIt->start > form.vertexCount || guideIt->finish > form.vertexCount) {
+		if (itGuide->start > form.vertexCount || itGuide->finish > form.vertexCount) {
 		  auto const bakclo   = ClosestFormToCursor;
 		  ClosestFormToCursor = iForm;
 		  satin::delsac(iForm);
 		  ClosestFormToCursor = bakclo;
 		}
-		++guideIt;
+		++itGuide;
 	  }
 	}
   }

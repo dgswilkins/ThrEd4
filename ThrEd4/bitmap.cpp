@@ -70,7 +70,7 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
 }
 
 void bitmap::internal::bfil(COLORREF const& backgroundColor) {
-  auto const InverseBackgroundColor = fswap(backgroundColor);
+  auto const inverseBackgroundColor = fswap(backgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hBitmapFile =
       CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -121,8 +121,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
 	  CloseHandle(hBitmapFile);
 	  auto const flag       = binv(monoBitmapData, bitmapWidthBytes);
-	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? InverseBackgroundColor : BitmapColor);
-	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : InverseBackgroundColor);
+	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
+	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
 	  BitmapInfoHeader      = {};
 	  BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
 	  BitmapInfoHeader.biWidth       = BitmapWidth;

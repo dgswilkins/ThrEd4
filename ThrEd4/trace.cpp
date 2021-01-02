@@ -228,7 +228,7 @@ auto trace::internal::trsum() -> uint32_t {
   auto const  iBegin = std::next(TraceAdjacentColors.begin());
   auto const  iEnd = std::next(TraceAdjacentColors.end(), -1);
   auto const  fold         = [firstColor](uint32_t a, uint32_t b) {
-    return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
+	return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
   };
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
 }
@@ -835,8 +835,8 @@ void trace::trinit() {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();
 		  for (auto& iHistogramData : histogramData) {
-			auto const spHD = wrap::next(iHistogramData.begin(), *(iPixelColors++));
-			++(*spHD);
+			auto const itHD = wrap::next(iHistogramData.begin(), *(iPixelColors++));
+			++(*itHD);
 		  }
 		}
 		auto componentPeakCount  = std::array<uint32_t, CHANLCNT> {};
@@ -920,19 +920,19 @@ void trace::internal::dutrnum0(uint32_t color) {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
-	auto const iTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
+	auto const itTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
 	ti::ritrcol(&InvertUpColor, color);
 	UpPixelColor = InvertUpColor ^ COLMASK;
-	thred::redraw(*iTraceUpWindow);
+	thred::redraw(*itTraceUpWindow);
   }
   else {
-	auto const iTraceDownWindow = wrap::next(TraceDownWindow.begin(), ColumnColor);
+	auto const itTraceDownWindow = wrap::next(TraceDownWindow.begin(), ColumnColor);
 	ti::ritrcol(&InvertDownColor, color);
 	DownPixelColor = InvertDownColor ^ COLMASK;
-	thred::redraw(*iTraceDownWindow);
+	thred::redraw(*itTraceDownWindow);
   }
-  auto const iTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
-  thred::redraw(*iTraceControlWindow);
+  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
+  thred::redraw(*itTraceControlWindow);
   DestroyWindow(TraceNumberInput);
   StateMap->set(StateFlag::WASTRCOL);
   trace::trace();
@@ -1055,16 +1055,16 @@ void trace::tracpar() {
 		  DownPixelColor |= position << TraceShift[ColumnColor];
 		}
 	  } while (false);
-	  auto const iTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
-	  thred::redraw(*iTraceControlWindow);
+	  auto const itTraceControlWindow = wrap::next(TraceControlWindow.begin(), ColumnColor);
+	  thred::redraw(*itTraceControlWindow);
 	  trace::trace();
 	}
 	else {
 	  auto const position = wrap::floor<uint32_t>(TraceMsgPoint.y / ButtonHeight);
 	  if (position < 16U) {
 		StateMap->flip(TraceRGBFlag[ColumnColor]);
-		auto const iTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
-		thred::redraw(*iTraceSelectWindow);
+		auto const itTraceSelectWindow = wrap::next(TraceSelectWindow.begin(), ColumnColor);
+		thred::redraw(*itTraceSelectWindow);
 		trace::trace();
 	  }
 	  else {
@@ -1225,10 +1225,10 @@ void trace::wasTrace() {
 	  break;
 	}
 	if (DrawItem->hwndItem == TraceNumberInput) {
-	  auto const iColTraceBrush = wrap::next(TraceBrush.begin(), ColumnColor);
-	  auto const iColTraceRGB   = wrap::next(TraceRGB.begin(), ColumnColor);
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *iColTraceBrush);
-	  SetBkColor(DrawItem->hDC, *iColTraceRGB);
+	  auto const itColTraceBrush = wrap::next(TraceBrush.begin(), ColumnColor);
+	  auto const itColTraceRGB   = wrap::next(TraceRGB.begin(), ColumnColor);
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, *itColTraceBrush);
+	  SetBkColor(DrawItem->hDC, *itColTraceRGB);
 	  wrap::textOut(DrawItem->hDC,
 	                1,
 	                1,
@@ -1256,9 +1256,9 @@ void trace::wasTrace1() {
 }
 
 void trace::traceNumberInput(wchar_t NumericCode) {
-  auto iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
-  *(iTraceInputBuffer++) = NumericCode;
-  *iTraceInputBuffer     = 0;
+  auto itTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
+  *(itTraceInputBuffer++) = NumericCode;
+  *itTraceInputBuffer     = 0;
   ++TraceMsgIndex;
   auto traceColor = wrap::toUnsigned(std::wcstol(TraceInputBuffer.data(), nullptr, 10));
   switch (TraceMsgIndex) {
@@ -1284,7 +1284,7 @@ void trace::traceNumberInput(wchar_t NumericCode) {
 }
 
 void trace::traceNumberReset() {
-  auto const iTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
-  *iTraceInputBuffer           = 0;
+  auto const itTraceInputBuffer = wrap::next(TraceInputBuffer.begin(), TraceMsgIndex);
+  *itTraceInputBuffer           = 0;
   thred::redraw(TraceNumberInput);
 }

@@ -184,8 +184,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
   auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
-  auto ispuc = wrap::next(UserColor.begin(), index);
-  colorData.push_back(*ispuc);
+  auto       iUC = wrap::next(UserColor.begin(), index);
+  colorData.push_back(*iUC);
   auto destination = dstStitchBuffer.begin();
   for (auto const& stitch : stitches) {
 	*destination++ = fPOINTATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
@@ -219,8 +219,8 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});
 	  color = stitch.attribute & COLMSK;
-      ispuc = wrap::next(UserColor.begin(), color);
-	  colorData.push_back(*ispuc);
+	  iUC = wrap::next(UserColor.begin(), color);
+	  colorData.push_back(*iUC);
 	}
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),
                          std::lround(stitch.y - wrap::toFloat(centerCoordinate.y))};
@@ -923,12 +923,12 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// dstHeader fields are fixed width, so use strncpy in its intended way.
 		// Use sizeof to ensure no overrun if the format string is wrong length
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
-		auto dstHdrDesc = gsl::make_span(dstHeader.desc);
-		std::fill(dstHdrDesc.begin(), dstHdrDesc.end(), ' ');
+		auto spDstHdrDesc = gsl::make_span(dstHeader.desc);
+		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
 		auto        convAuxName = utf::Utf16ToUtf8(*auxName);
 		auto const* desc        = strrchr(convAuxName.data(), '\\') + 1U;
 		if (desc != nullptr) {
-		  for (auto& iDHD : dstHdrDesc) {
+		  for (auto& iDHD : spDstHdrDesc) {
 			if ((*desc != 0) && *desc != '.') {
 			  iDHD = *desc;
 			}
@@ -939,7 +939,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		  }
 		}
 		// clang-format off
-        dstHdrDesc.back() = 0xd;
+        spDstHdrDesc.back() = 0xd;
         strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
         strncpy(static_cast<char *>(dstHeader.recs),  fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
         strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            

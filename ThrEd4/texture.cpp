@@ -840,9 +840,9 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 		if (nullptr != clipForm) {
 		  textureForm         = *clipForm;
 		  auto*      vertices = convert_ptr<fPOINT*>(&clipForm[1]);
-		  auto const source   = gsl::make_span(vertices, textureForm.vertexCount);
+		  auto const spVertices   = gsl::make_span(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
-		  AngledFormVertices->insert(AngledFormVertices->end(), source.begin(), source.end());
+		  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
 		  textureForm.vertexIndex = 0;
 		  StateMap->reset(StateFlag::TXTLIN);
 		  StateMap->set(StateFlag::TXTCLP);
@@ -1097,8 +1097,8 @@ void texture::internal::nutx(FRMHED& form) {
   }
   if (!TempTexturePoints->empty()) {
 	auto const tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-	auto const insertIt       = wrap::next(TexturePointsBuffer->begin(), index);
-	TexturePointsBuffer->insert(insertIt, TempTexturePoints->cbegin(), TempTexturePoints->cend());
+	auto const it       = wrap::next(TexturePointsBuffer->begin(), index);
+	TexturePointsBuffer->insert(it, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
 		FormList->operator[](iForm).fillInfo.texture.index +=
