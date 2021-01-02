@@ -224,11 +224,11 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 }
 
 auto trace::internal::trsum() -> uint32_t {
-  auto const& firstColor            = TraceAdjacentColors.front();
-  auto const  iBegin = std::next(TraceAdjacentColors.begin());
-  auto const  iEnd = std::next(TraceAdjacentColors.end(), -1);
-  auto const  fold         = [firstColor](uint32_t a, uint32_t b) {
-	return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
+  auto const& firstColor = TraceAdjacentColors.front();
+  auto const  iBegin     = std::next(TraceAdjacentColors.begin());
+  auto const  iEnd       = std::next(TraceAdjacentColors.end(), -1);
+  auto const  fold       = [firstColor](uint32_t a, uint32_t b) {
+    return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
   };
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
 }

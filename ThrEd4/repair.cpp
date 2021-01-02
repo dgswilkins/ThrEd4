@@ -279,8 +279,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	if (clip::isclp(form)) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-		auto const startClip = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-		auto const endClip   = wrap::next(startClip, form.lengthOrCount.clipCount);
+		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+		auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
 		auto const destination = wrap::next(clipPoint.begin(), clipCount);
 		std::copy(startClip, endClip, destination);
 		form.angleOrClipData.clip = clipCount;
@@ -290,8 +290,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		if (clipDifference < ClipPoints->size()) {
 		  form.lengthOrCount.clipCount = wrap::toUnsigned(FormVertices->size() - clipDifference);
 		  clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
-		  auto const startClip = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-		  auto const endClip   = wrap::next(startClip, form.lengthOrCount.clipCount);
+		  auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+		  auto const endClip     = wrap::next(startClip, form.lengthOrCount.clipCount);
 		  auto const destination = wrap::next(clipPoint.begin(), clipCount);
 		  std::copy(startClip, endClip, destination);
 		  form.angleOrClipData.clip = clipCount;
@@ -306,8 +306,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 	if (clip::iseclp(form)) {
 	  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.clipEntries);
-		auto const startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-		auto const endClip   = wrap::next(startClip, form.clipEntries);
+		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+		auto const endClip     = wrap::next(startClip, form.clipEntries);
 		auto const destination = wrap::next(clipPoint.begin(), clipCount);
 		std::copy(startClip, endClip, destination);
 		form.borderClipData = clipCount;
@@ -317,8 +317,8 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		if (clipDifference < ClipPoints->size()) {
 		  wrap::narrow(form.clipEntries, FormVertices->size() - clipDifference);
 		  clipPoint.resize(clipPoint.size() + form.clipEntries);
-		  auto const startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-		  auto const endClip   = wrap::next(startClip, form.clipEntries);
+		  auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+		  auto const endClip     = wrap::next(startClip, form.clipEntries);
 		  auto const destination = wrap::next(clipPoint.begin(), clipCount);
 		  std::copy(startClip, endClip, destination);
 		  form.borderClipData = clipCount;
@@ -345,8 +345,8 @@ void repair::internal::repsat() {
 	if (form.type == SAT) {
 	  auto const guideDifference = form.satinOrAngle.guide;
 	  if (FormVertices->size() > wrap::toSize(guideDifference) + form.vertexCount) {
-		auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		auto const endGuide   = wrap::next(startGuide, form.satinGuideCount);
+		auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+		auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 		auto const destination = wrap::next(SatinGuides->begin(), guideCount);
 		std::copy(startGuide, endGuide, destination);
 		form.satinOrAngle.guide = guideCount;
@@ -356,8 +356,8 @@ void repair::internal::repsat() {
 	  else {
 		if (guideDifference < SatinGuides->size()) {
 		  wrap::narrow(form.satinGuideCount, SatinGuides->size() - guideDifference);
-		  auto const startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-		  auto const endGuide   = wrap::next(startGuide, form.satinGuideCount);
+		  auto const startGuide  = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+		  auto const endGuide    = wrap::next(startGuide, form.satinGuideCount);
 		  auto const destination = wrap::next(SatinGuides->begin(), guideCount);
 		  std::copy(startGuide, endGuide, destination);
 		  ri::bcup(form, badData);
@@ -381,7 +381,7 @@ void repair::internal::reptx() {
 	  if (wrap::toUnsigned(TexturePointsBuffer->size()) >
 	      wrap::toUnsigned(form.fillInfo.texture.index) + form.fillInfo.texture.count) {
 		auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-		auto const endTexture   = wrap::next(startTexture, form.fillInfo.texture.count);
+		auto const endTexture  = wrap::next(startTexture, form.fillInfo.texture.count);
 		auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		std::copy(startTexture, endTexture, destination);
 		wrap::narrow(form.fillInfo.texture.index, textureCount);
@@ -393,7 +393,7 @@ void repair::internal::reptx() {
 		  wrap::narrow(form.fillInfo.texture.count,
 		               TexturePointsBuffer->size() - form.fillInfo.texture.index);
 		  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-		  auto const endTexture   = wrap::next(startTexture, form.fillInfo.texture.count);
+		  auto const endTexture  = wrap::next(startTexture, form.fillInfo.texture.count);
 		  auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		  std::copy(startTexture, endTexture, destination);
 		  wrap::narrow(form.fillInfo.texture.index, textureCount);

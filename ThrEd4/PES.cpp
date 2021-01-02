@@ -266,16 +266,16 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   PEScolors       = std::begin(pad);
   auto thisStitch = fPOINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
-  auto       iColor           = 1U;
-  auto       color            = StitchBuffer->front().attribute & COLMSK;
-  auto iPEC   = wrap::next(PESequivColors.begin(), color);
+  auto iColor  = 1U;
+  auto color   = StitchBuffer->front().attribute & COLMSK;
+  auto iPEC    = wrap::next(PESequivColors.begin(), color);
   PEScolors[0] = *iPEC;
   for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size() - 1U); ++iStitch) {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	if ((stitchFwd1.attribute & COLMSK) != color) {
 	  color = stitchFwd1.attribute & COLMSK;
 	  pecEncodeStop(buffer, (iColor % 2U) + 1U);
-	  iPEC             = wrap::next(PESequivColors.begin(), color);
+	  iPEC              = wrap::next(PESequivColors.begin(), color);
 	  PEScolors[iColor] = *iPEC;
 	  ++iColor;
 	}
@@ -312,8 +312,8 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = wrap::next(thumbnail.begin(), y);
-	auto const iRow = wrap::next((*iThumbnail).begin(), x);
-	*iRow         = 1U;
+	auto const iRow       = wrap::next((*iThumbnail).begin(), x);
+	*iRow                 = 1U;
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
   // now write out the individual thread thumbnails
@@ -323,7 +323,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = wrap::next(thumbnail.begin(), y);
-	auto const iRow = wrap::next((*iThumbnail).begin(), x);
+	auto const iRow       = wrap::next((*iThumbnail).begin(), x);
 	if (stitchColor == (stitch.attribute & COLMSK)) {
 	  *iRow = 1U;
 	}
@@ -331,7 +331,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	  pi::writeThumbnail(pecBuffer, thumbnail);
 	  thumbnail   = imageWithFrame;
 	  stitchColor = (stitch.attribute & COLMSK);
-	  *iRow    = 1U;
+	  *iRow       = 1U;
 	}
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
@@ -494,10 +494,10 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 	}
 	else {
 	  do {
-		auto           pesHeader        = PESHED {};
-		constexpr auto PESSTR           = "#PES0001"; // PES lead in
-		constexpr auto EMBSTR           = "CEmbOne";  // emb section lead in
-		constexpr auto SEWSTR           = "CSewSeg";  // sewing segment leadin
+		auto           pesHeader = PESHED {};
+		constexpr auto PESSTR    = "#PES0001"; // PES lead in
+		constexpr auto EMBSTR    = "CEmbOne";  // emb section lead in
+		constexpr auto SEWSTR    = "CSewSeg";  // sewing segment leadin
 		// ReSharper disable once CppDeprecatedEntity
 		strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		wrap::narrow(pesHeader.celn, strlen(EMBSTR));
@@ -534,10 +534,10 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		// ToDo - make a reasonable guess for the size of data in the PES buffer. err on the side of caution
 		auto const pesSize = sizeof(PESSTCHLST) + StitchBuffer->size() * sizeof(PESTCH) + 1000U;
 		pesBuffer.reserve(pesSize);
-		auto threadList   = std::vector<PESCOLORLIST> {};
-		auto blockIndex   = uint16_t {}; // Index into the stitch blocks
+		auto threadList      = std::vector<PESCOLORLIST> {};
+		auto blockIndex      = uint16_t {}; // Index into the stitch blocks
 		auto iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
-		auto currentColor = *iPESequivColors;
+		auto currentColor    = *iPESequivColors;
 		threadList.push_back(PESCOLORLIST {blockIndex, currentColor});
 		pesBuffer.resize(sizeof(PESSTCHLST));
 		// first block is a jump in place
@@ -578,9 +578,9 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 			blockHeader->stitchcount = gsl::narrow<uint16_t>(stitchCount);
 			// save the thread/color information
 			++pesThreadCount;
-			stitchColor  = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+			stitchColor     = StitchBuffer->operator[](iStitch).attribute & COLMSK;
 			iPESequivColors = wrap::next(PESequivColors.begin(), stitchColor);
-			currentColor = *iPESequivColors;
+			currentColor    = *iPESequivColors;
 			threadList.push_back(PESCOLORLIST {blockIndex, currentColor});
 			// then create the jump block
 			pi::ritpesBlock(pesBuffer, PESSTCHLST {1, currentColor, 2});
@@ -648,7 +648,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convert_ptr<PECHDR*>(pecBuffer.data());
-		auto const spPHL  = gsl::make_span(pecHeader->label);
+		auto const spPHL     = gsl::make_span(pecHeader->label);
 		pi::pecnam(spPHL);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));

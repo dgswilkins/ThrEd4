@@ -431,7 +431,7 @@ void texture::drwtxtr() {
   }
   DeleteObject(TextureCrossPen);
   auto const iUserColor = wrap::next(UserColor.begin(), ActiveColor);
-  TextureCrossPen        = wrap::CreatePen(PS_SOLID, PENNWID, *iUserColor);
+  TextureCrossPen       = wrap::CreatePen(PS_SOLID, PENNWID, *iUserColor);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;
@@ -838,9 +838,9 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 	  if (clipFormHeader->clipType == CLP_FRM) {
 		auto* clipForm = &clipFormHeader->form;
 		if (nullptr != clipForm) {
-		  textureForm         = *clipForm;
-		  auto*      vertices = convert_ptr<fPOINT*>(&clipForm[1]);
-		  auto const spVertices   = gsl::make_span(vertices, textureForm.vertexCount);
+		  textureForm           = *clipForm;
+		  auto*      vertices   = convert_ptr<fPOINT*>(&clipForm[1]);
+		  auto const spVertices = gsl::make_span(vertices, textureForm.vertexCount);
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
 		  textureForm.vertexIndex = 0;
@@ -1097,7 +1097,7 @@ void texture::internal::nutx(FRMHED& form) {
   }
   if (!TempTexturePoints->empty()) {
 	auto const tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-	auto const it       = wrap::next(TexturePointsBuffer->begin(), index);
+	auto const it             = wrap::next(TexturePointsBuffer->begin(), index);
 	TexturePointsBuffer->insert(it, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {

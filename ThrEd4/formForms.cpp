@@ -160,7 +160,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(dT::loadStr(IDS_TXT1), LabelWindowCoords);
   // NOLINTNEXTLINE hicpp-signed-bitwise
-  auto itLayer         = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
+  auto itLayer       = wrap::next(LAYRLIST.begin(), (form.attribute & FRMLMSK) >> 1U);
   valueWindow[LLAYR] = ffi::txtrwin(dT::loadStr(itLayer->stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (form.type != FRMLINE) {
@@ -202,7 +202,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	}
   }
   labelWindow[LFRMFIL] = ffi::txtwin(dT::loadStr(IDS_TXT2), LabelWindowCoords);
-  auto itFill           = wrap::next(FILLLIST.begin(), form.fillType);
+  auto itFill          = wrap::next(FILLLIST.begin(), form.fillType);
   valueWindow[LFRMFIL] = ffi::txtrwin(dT::loadStr(itFill->stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (form.fillType != 0U) {
@@ -215,7 +215,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	      ffi::numwin(fmt::format(L"{}", (form.fillInfo.feather.color + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHTYP] = ffi::txtwin(dT::loadStr(IDS_FTHTYP), LabelWindowCoords);
-	  auto itFeather           = wrap::next(FTHRLIST.begin(), form.fillInfo.feather.fillType - 1U);
+	  auto itFeather       = wrap::next(FTHRLIST.begin(), form.fillInfo.feather.fillType - 1U);
 	  valueWindow[LFTHTYP] = ffi::numwin(dT::loadStr(itFeather->stringID), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LFTHBLND] = ffi::txtwin(dT::loadStr(IDS_FTHBLND), LabelWindowCoords);
@@ -330,7 +330,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	edgeFillType = EDGETMAX - 1U;
   }
   auto const edgeIdx = edgeFillType - 1U;
-  auto       itEdge   = wrap::next(EDGELIST.begin(), edgeFillType);
+  auto       itEdge  = wrap::next(EDGELIST.begin(), edgeFillType);
   valueWindow[LBRD]  = ffi::txtrwin(dT::loadStr(itEdge->stringID), ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   if (edgeFillType != 0U) {
@@ -1013,14 +1013,14 @@ void formForms::setear() {
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
 	auto&      form             = FormList->back();
-	auto       firstVertex           = wrap::next(FormVertices->begin(), form.vertexIndex);
-	auto       nextVertex            = std::next(firstVertex);
+	auto       firstVertex      = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto       nextVertex       = std::next(firstVertex);
 	auto const count            = wrap::toSize(form.vertexCount) / 4U;
 	auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
-	auto       lastVertex            = wrap::next(firstVertex, count + 1U);
+	auto       lastVertex       = wrap::next(firstVertex, count + 1U);
 	auto       verticalPosition = lastVertex->y;
 	--lastVertex;
-	auto step   = verticalPosition - lastVertex->y;
+	auto step        = verticalPosition - lastVertex->y;
 	auto leftVertex  = wrap::next(firstVertex, wrap::toSize(form.vertexCount) - count);
 	auto rightVertex = wrap::next(firstVertex, count + 1U);
 	for (auto iStep = 0U; iStep < count; ++iStep) {
@@ -1166,13 +1166,13 @@ void formForms::wavfrm() {
 	form::durpoli(IniFile.wavePoints);
 	auto& form = FormList->back();
 	form::mdufrm();
-	auto iPoint    = 0U;
-	auto waveIndex = IniFile.waveStart;
-	auto firstVertex    = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto iPoint      = 0U;
+	auto waveIndex   = IniFile.waveStart;
+	auto firstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
-	  auto const     nextVertex       = wrap::next(firstVertex, iNextVertex);
-	  auto const     waveVertex       = wrap::next(firstVertex, waveIndex);
+	  auto const     nextVertex  = wrap::next(firstVertex, iNextVertex);
+	  auto const     waveVertex  = wrap::next(firstVertex, waveIndex);
 	  points.emplace_back(-nextVertex->x + waveVertex->x, -nextVertex->y + waveVertex->y);
 	  ++iPoint;
 	  waveIndex = iNextVertex;

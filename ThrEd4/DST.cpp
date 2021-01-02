@@ -177,14 +177,14 @@ auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
 void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<fPOINTATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
-  auto       colorData   = std::vector<uint32_t> {};
+  auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
   // but we only need to reserve a reasonable number
   colorData.reserve(32);
   colorData.push_back(COLVER);
   colorData.push_back(BackgroundColor);
   auto const index = gsl::narrow_cast<uint8_t>(stitches[0].attribute & COLMSK);
-  auto       iUC = wrap::next(UserColor.begin(), index);
+  auto       iUC   = wrap::next(UserColor.begin(), index);
   colorData.push_back(*iUC);
   auto destination = dstStitchBuffer.begin();
   for (auto const& stitch : stitches) {
@@ -219,7 +219,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});
 	  color = stitch.attribute & COLMSK;
-	  iUC = wrap::next(UserColor.begin(), color);
+	  iUC   = wrap::next(UserColor.begin(), color);
 	  colorData.push_back(*iUC);
 	}
 	auto       lengths         = SIZE {std::lround(stitch.x - wrap::toFloat(centerCoordinate.x)),

@@ -642,7 +642,8 @@ void xt::internal::fncwlk(FRMHED& form) {
 	for (auto iGuide = form.satinGuideCount - 1U; iGuide != 0; --iGuide) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
-	  OSequence->push_back(fPOINT {wrap::midl(finishVertex->x, startVertex->x), wrap::midl(finishVertex->y, startVertex->y)});
+	  OSequence->push_back(fPOINT {wrap::midl(finishVertex->x, startVertex->x),
+	                               wrap::midl(finishVertex->y, startVertex->y)});
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
@@ -662,7 +663,8 @@ void xt::internal::fncwlk(FRMHED& form) {
 	for (auto iGuide = 1U; iGuide < (form.vertexCount / 2U); ++iGuide) {
 	  auto const startVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
 	  auto const finishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
-	  auto const pnt = fPOINT {wrap::midl(finishVertex->x, startVertex->x), wrap::midl(finishVertex->y, startVertex->y)};
+	  auto const pnt          = fPOINT {wrap::midl(finishVertex->x, startVertex->x),
+                               wrap::midl(finishVertex->y, startVertex->y)};
 	  if (form::cisin(form, pnt.x, pnt.y)) {
 		OSequence->push_back(pnt);
 	  }
@@ -1023,9 +1025,9 @@ void xt::fsort() {
 	thred::savdo();
 	stitchRegion.emplace_back(OREC {});
 	stitchRegion.back().startStitch = 0;
-	auto itColorOrder                = wrap::next(ColorOrder.begin(), AppliqueColor);
-	*itColorOrder                    = 0;
-	itColorOrder                     = ColorOrder.begin();
+	auto itColorOrder               = wrap::next(ColorOrder.begin(), AppliqueColor);
+	*itColorOrder                   = 0;
+	itColorOrder                    = ColorOrder.begin();
 	for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	  if (iColor != AppliqueColor) {
 		*itColorOrder = iColor + 1U;
