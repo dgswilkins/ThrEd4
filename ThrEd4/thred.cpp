@@ -2854,9 +2854,9 @@ void thred::internal::ritini() {
   auto const spISPC   = gsl::make_span(IniFile.stitchPreferredColors);
   std::fill(spIDN.begin(), spIDN.end(), FILLCHAR);
   std::copy(designer.cbegin(), designer.cend(), spIDN.begin());
-  std::copy(spISC.begin(), spISC.end(), UserColor.begin());
-  std::copy(spIBPC.begin(), spIBPC.end(), CustomBackgroundColor.begin());
-  std::copy(spISPC.begin(), spISPC.end(), CustomColor.begin());
+  std::copy(UserColor.begin(), UserColor.end(), spISC.begin());
+  std::copy(CustomBackgroundColor.begin(), CustomBackgroundColor.end(), spIBPC.begin());
+  std::copy(CustomColor.begin(), CustomColor.end(), spISPC.begin());
   auto const iIBBC = gsl::make_span(IniFile.bitmapBackgroundColors);
   std::generate(iIBBC.begin(), iIBBC.end(), [bcIndex = 0U]() mutable noexcept -> COLORREF {
 	return bitmap::getBmpBackColor(bcIndex++);
