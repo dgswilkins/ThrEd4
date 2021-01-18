@@ -8430,11 +8430,11 @@ void form::stchs2frm() {
 	  return;
 	}
 	auto const vertexCount = GroupEndStitch - GroupStartStitch + 1U;
-	FormList->push_back(FRMHED {});
-	auto& currentForm       = FormList->back();
+	auto currentForm = FRMHED{};
 	currentForm.type        = FRMLINE;
 	currentForm.vertexCount = vertexCount;
 	currentForm.vertexIndex = thred::adflt(vertexCount);
+	FormList->push_back(currentForm);
 	auto itVertex           = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	  *itVertex = StitchBuffer->operator[](iStitch);
