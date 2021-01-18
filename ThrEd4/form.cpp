@@ -7321,22 +7321,20 @@ void form::internal::duprots(float rotationAngle, fPOINT const& rotationCenter) 
 }
 
 void form::internal::cplayfn(uint32_t iForm, uint32_t layer) {
-  FormList->push_back(FormList->operator[](iForm));
-  // the push_back may invalidate the reference so do it afterwards
-  // clang-format off
-  auto& srcForm           = FormList->operator[](iForm);
-  auto& currentForm       = FormList->back();
-  currentForm.vertexIndex = thred::adflt(srcForm.vertexCount);
-  auto const itVertex           = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
-  // clang-format on
+  auto currentForm = FormList->operator[](iForm);
+
+  auto const originalVertexIndex = currentForm.vertexIndex;
+  currentForm.vertexIndex  = thred::adflt(currentForm.vertexCount);
+  auto const itVertex      = wrap::next(FormVertices->cbegin(), originalVertexIndex);
   std::copy(itVertex,
-            wrap::next(itVertex, srcForm.vertexCount),
+            wrap::next(itVertex, currentForm.vertexCount),
             wrap::next(FormVertices->begin(), currentForm.vertexIndex));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
+	auto const originalGuide             = currentForm.satinOrAngle.guide;
 	currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
-	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
-	auto const itEndGuide   = wrap::next(itStartGuide, srcForm.satinGuideCount);
+	auto const itStartGuide = wrap::next(SatinGuides->cbegin(), originalGuide);
+	auto const itEndGuide   = wrap::next(itStartGuide, currentForm.satinGuideCount);
 	auto const destination  = SatinGuides->end();
 	SatinGuides->insert(destination, itStartGuide, itEndGuide);
   }
@@ -7345,9 +7343,10 @@ void form::internal::cplayfn(uint32_t iForm, uint32_t layer) {
   currentForm.lengthOrCount.clipCount = 0;
   currentForm.edgeType                = 0;
   currentForm.fillInfo.texture.index  = 0;
-  currentForm.attribute               = srcForm.attribute & NFRMLMSK;
+  currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
+  FormList->push_back(currentForm);
   form::dusqr(currentForm);
 }
 
