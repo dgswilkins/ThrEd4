@@ -134,8 +134,8 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  localStitch.x += wrap::toFloat(dstStitch.x);
 	  localStitch.y += wrap::toFloat(dstStitch.y);
 	  if ((record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-		StitchBuffer->push_back(fPOINTATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM});
-		auto& stitch = StitchBuffer->back();
+        auto const stitch = fPOINTATTR{ localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM };
+		StitchBuffer->push_back(stitch);
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
 		}
