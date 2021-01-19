@@ -7257,32 +7257,35 @@ void form::rotdup() {
 }
 
 void form::internal::adfrm(uint32_t iForm) {
-  FormList->push_back(FormList->operator[](iForm));
-  auto& currentForm       = FormList->back();
-  auto& srcForm           = FormList->operator[](iForm);
+  auto currentForm       = FormList->operator[](iForm);
   ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  auto originalVertexIndex = currentForm.vertexIndex;
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
-  auto const itVertex     = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex);
-  FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, srcForm.vertexCount));
-  if (srcForm.type == SAT && (srcForm.satinGuideCount != 0U)) {
+  auto const itVertex     = wrap::next(FormVertices->cbegin(), originalVertexIndex);
+  FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
+  if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
+	auto originalGuide = currentForm.satinOrAngle.guide;
 	currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
-	auto const itGuides = wrap::next(SatinGuides->cbegin(), srcForm.satinOrAngle.guide);
-	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, srcForm.satinGuideCount));
+	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
+	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
-  if (clip::iseclpx(srcForm)) {
+  if (clip::iseclpx(currentForm)) {
+	auto originalBCData = currentForm.borderClipData;
 	currentForm.borderClipData = wrap::toUnsigned(ClipPoints->size());
 
-	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
-	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, srcForm.clipEntries));
+	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalBCData);
+	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
   }
-  if (clip::isclpx(srcForm)) {
+  if (clip::isclpx(currentForm)) {
+	auto originalClip = currentForm.angleOrClipData.clip;
 	currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
-	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
+	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalClip);
 	ClipPoints->insert(
-	    ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, srcForm.lengthOrCount.clipCount));
+	    ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.lengthOrCount.clipCount));
   }
+  FormList->push_back(currentForm);
 }
 
 void form::duprot(float rotationAngle) {
