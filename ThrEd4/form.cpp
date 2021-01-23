@@ -6537,8 +6537,7 @@ void form::duhart(uint32_t sideCount) {
   if (sideCount < HSIDEMIN) {
 	sideCount = HSIDEMIN;
   }
-  FormList->push_back(FRMHED {});
-  auto& currentForm       = FormList->back();
+  auto currentForm       = FRMHED {};
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   wrap::narrow(currentForm.attribute, ActiveLayer << 1U);
   FormVertices->reserve(FormVertices->size() + wrap::toSize(sideCount) * 2U - 2U);
@@ -6592,6 +6591,7 @@ void form::duhart(uint32_t sideCount) {
   NewFormVertexCount      = iDestination + 1U;
   currentForm.vertexCount = iDestination;
   currentForm.type        = FRMFPOLY;
+  FormList->push_back(currentForm);
   ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
   form::frmout(ClosestFormToCursor);
   FormMoveDelta = fPOINT {};
