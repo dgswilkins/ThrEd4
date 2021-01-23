@@ -6622,9 +6622,7 @@ void form::dulens(uint32_t sides) {
   auto const phi = (PI_F - omega) / 2.0F;
   // as well as the length of every segment
   auto const stepLength = 2.0F * radius * std::cos(phi);
-  FormList->push_back(FRMHED {});
-  auto& currentForm       = FormList->back();
-  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  auto currentForm       = FRMHED {};
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   currentForm.attribute   = gsl::narrow_cast<decltype(currentForm.attribute)>(ActiveLayer << 1U);
   auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
@@ -6650,6 +6648,8 @@ void form::dulens(uint32_t sides) {
   currentForm.vertexCount = wrap::toUnsigned(FormVertices->size() - currentForm.vertexIndex);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   currentForm.type        = FRMFPOLY;
+  FormList->push_back(currentForm);
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
   form::frmout(ClosestFormToCursor);
   FormMoveDelta = fPOINT {};
   StateMap->set(StateFlag::POLIMOV);
