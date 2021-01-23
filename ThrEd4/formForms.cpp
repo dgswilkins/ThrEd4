@@ -1164,11 +1164,11 @@ void formForms::wavfrm() {
 	points.reserve(IniFile.wavePoints);
 	// reuse regular polygon code to build the template for points
 	form::durpoli(IniFile.wavePoints);
-	auto& form = FormList->back();
+	auto formVertexIndex = FormList->back().vertexIndex;
 	form::mdufrm();
 	auto iPoint      = 0U;
 	auto waveIndex   = IniFile.waveStart;
-	auto firstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto firstVertex = wrap::next(FormVertices->begin(), formVertexIndex);
 	while (waveIndex != IniFile.waveEnd && iPoint < IniFile.wavePoints) {
 	  uint16_t const iNextVertex = (waveIndex + 1U) % IniFile.wavePoints;
 	  auto const     nextVertex  = wrap::next(firstVertex, iNextVertex);
@@ -1182,7 +1182,7 @@ void formForms::wavfrm() {
 	auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
 	                              IniFile.wavePoints; // account for vertices already allocated by durpoli above
 	FormVertices->resize(FormVertices->size() + formVerticesSize);
-	firstVertex = wrap::next(FormVertices->begin(), form.vertexIndex); // resize may invalidate iterator
+	firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // resize may invalidate iterator
 	auto itVertex = firstVertex;
 	for (auto iLobe = 0U; iLobe < IniFile.waveLobes; ++iLobe) {
 	  if ((iLobe & 1U) != 0U) {
@@ -1212,12 +1212,12 @@ void formForms::wavfrm() {
 	  thred::rotflt(*rotatedVertex, rotationAngle, fPOINT {});
 	  ++rotatedVertex;
 	}
-	form.type        = FRMLINE;
-	form.vertexCount = vertexCount;
+	FormList->back().type        = FRMLINE;
+	FormList->back().vertexCount = vertexCount;
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const selectedSize =
-	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
+	auto const selectedSize = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
+	                                  FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
@@ -1236,9 +1236,11 @@ void formForms::wavfrm() {
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	auto vShifted = firstVertex;
+	auto const left = FormList->back().rectangle.left;
+	auto const bottom = FormList->back().rectangle.bottom;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  vShifted->x -= form.rectangle.left;
-	  vShifted->y -= form.rectangle.bottom;
+	  vShifted->x -= left;
+	  vShifted->y -= bottom;
 	  ++vShifted;
 	}
 	FormMoveDelta      = fPOINT {};
