@@ -351,11 +351,10 @@ void form::setfrm() {
   if (!FormList->empty()) {
 	fi::rats();
 	ClosestFormToCursor  = wrap::toUnsigned(FormList->size() - 1U);
-	auto&      form      = FormList->back();
 	auto const point     = fi::px2stchf(FormLines->front());
-	auto       itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto       itVertex  = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
 	auto const delta     = fPOINT {point.x - itVertex->x, point.y - itVertex->y};
-	auto&      rectangle = form.rectangle;
+	auto&      rectangle = FormList->back().rectangle;
 	rectangle            = fRECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
 	for (auto iVertex = 0U; iVertex < NewFormVertexCount - 1U; ++iVertex) {
 	  itVertex->x += delta.x;
