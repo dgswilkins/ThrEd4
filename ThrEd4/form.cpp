@@ -7258,27 +7258,26 @@ void form::rotdup() {
 
 void form::internal::adfrm(uint32_t iForm) {
   auto currentForm       = FormList->operator[](iForm);
-  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
-  auto originalVertexIndex = currentForm.vertexIndex;
+  auto const originalVertexIndex = currentForm.vertexIndex;
   currentForm.vertexIndex = wrap::toUnsigned(FormVertices->size());
   auto const itVertex     = wrap::next(FormVertices->cbegin(), originalVertexIndex);
   FormVertices->insert(FormVertices->end(), itVertex, wrap::next(itVertex, currentForm.vertexCount));
   if (currentForm.type == SAT && (currentForm.satinGuideCount != 0U)) {
-	auto originalGuide = currentForm.satinOrAngle.guide;
+	auto const originalGuide = currentForm.satinOrAngle.guide;
 	currentForm.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 
 	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
 	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
   if (clip::iseclpx(currentForm)) {
-	auto originalBCData = currentForm.borderClipData;
+	auto const originalBCData = currentForm.borderClipData;
 	currentForm.borderClipData = wrap::toUnsigned(ClipPoints->size());
 
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalBCData);
 	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
   }
   if (clip::isclpx(currentForm)) {
-	auto originalClip = currentForm.angleOrClipData.clip;
+	auto const originalClip = currentForm.angleOrClipData.clip;
 	currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalClip);
@@ -7286,6 +7285,7 @@ void form::internal::adfrm(uint32_t iForm) {
 	    ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.lengthOrCount.clipCount));
   }
   FormList->push_back(currentForm);
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
 }
 
 void form::duprot(float rotationAngle) {
