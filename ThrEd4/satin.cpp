@@ -743,50 +743,47 @@ void satin::internal::satends(FRMHED const& form, uint32_t isBlunt, float width)
 void satin::ribon() {
   displayText::frm1pnt();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
-	if (currentForm.vertexCount > 2) {
+	if (FormList->operator[](ClosestFormToCursor).vertexCount > 2) {
 	  thred::savdo();
 	  auto const savedFormIndex = ClosestFormToCursor;
-	  satin::satout(currentForm, BorderWidth);
+	  satin::satout(FormList->operator[](ClosestFormToCursor), BorderWidth);
 	  if (!FormList->empty()) {
-		FormList->push_back(FRMHED {});
-		auto& newForm = FormList->back();
-		// reset vars as push_back may invalidate references
-		currentForm = FormList->operator[](ClosestFormToCursor);
-
+		auto       newForm            = FRMHED {};
+		auto const currentType        = FormList->operator[](ClosestFormToCursor).type;
+		auto const currentVertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
 		newForm.maxFillStitchLen = MAXSIZ * PFGRAN;
 		newForm.minFillStitchLen = MinStitchLength;
 		MaxStitchLen             = MAXSIZ * PFGRAN;
-		if (currentForm.type == FRMLINE) {
+		if (currentType == FRMLINE) {
 		  // Set blunt flags
 		  auto isBlunt = 0U;
 		  if (UserFlagMap->test(UserFlag::BLUNT)) {
 			isBlunt = SBLNT | FBLNT;
 		  }
-		  si::satends(currentForm, isBlunt, BorderWidth);
+		  si::satends(FormList->operator[](ClosestFormToCursor), isBlunt, BorderWidth);
 		}
-		newForm.vertexIndex = (currentForm.type == FRMLINE)
-		                          ? thred::adflt(currentForm.vertexCount * 2U)
-		                          : thred::adflt((currentForm.vertexCount * 2U) + 2U);
+		newForm.vertexIndex = (currentType == FRMLINE)
+		                          ? thred::adflt(currentVertexCount * 2U)
+		                          : thred::adflt((currentVertexCount * 2U) + 2U);
 		auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
 		auto       itVertex    = startVertex;
 		*(itVertex++)          = OutsidePoints->front();
-		if (currentForm.type == FRMLINE) {
-		  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
+		if (currentType == FRMLINE) {
+		  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 			*(itVertex++) = InsidePoints->operator[](iVertex);
 		  }
-		  for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; --iVertex) {
+		  for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
 			*(itVertex++) = OutsidePoints->operator[](iVertex);
 		  }
 		}
 		else {
 		  newForm.underlayIndent = IniFile.underlayIndent;
-		  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
+		  for (auto iVertex = 0U; iVertex < currentVertexCount; ++iVertex) {
 			*(itVertex++) = InsidePoints->operator[](iVertex);
 		  }
 		  *(itVertex++) = InsidePoints->front();
 		  *(itVertex++) = OutsidePoints->front();
-		  for (auto iVertex = currentForm.vertexCount - 1U; iVertex != 0; --iVertex) {
+		  for (auto iVertex = currentVertexCount - 1U; iVertex != 0; --iVertex) {
 			*(itVertex++) = OutsidePoints->operator[](iVertex);
 		  }
 		}
@@ -796,7 +793,7 @@ void satin::ribon() {
 		newForm.fillSpacing                = LineSpacing;
 		newForm.lengthOrCount.stitchLength = IniFile.maxStitchLength;
 		newForm.vertexCount                = iNewVertex;
-		newForm.attribute                  = currentForm.attribute;
+		newForm.attribute                  = FormList->operator[](ClosestFormToCursor).attribute;
 		newForm.attribute &= FRMLMSK;
 		newForm.attribute |= FRMEND;
 		newForm.wordParam          = iNewVertex / 2;
@@ -822,6 +819,7 @@ void satin::ribon() {
 		  itGuide->finish = newForm.vertexCount - iGuide - 1U;
 		  ++itGuide;
 		}
+		FormList->push_back(newForm);
 		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		form::frmout(ClosestFormToCursor);
 		form::refilfn();
@@ -1193,19 +1191,18 @@ void satin::satfil(FRMHED& form) {
 
 void satin::satfix() {
   auto const vertexCount = wrap::toUnsigned(TempPolygon->size());
-  auto&      form        = FormList->back();
   auto       minSize     = 1U;
-  if (form.type == FRMFPOLY) {
+  if (FormList->back().type == FRMFPOLY) {
 	minSize = 2U;
   }
   if (TempPolygon->size() > minSize) {
-	form.vertexIndex    = thred::adflt(vertexCount);
-	auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+	FormList->back().vertexIndex    = thred::adflt(vertexCount);
+	auto const itVertex = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
 	std::copy(TempPolygon->cbegin(), TempPolygon->cend(), itVertex);
 	TempPolygon->clear();
-	form.vertexCount = vertexCount;
+	FormList->back().vertexCount = vertexCount;
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-	form.satinGuideCount = 0;
+	FormList->back().satinGuideCount = 0;
 	StateMap->set(StateFlag::INIT);
   }
   else {
