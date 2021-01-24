@@ -774,9 +774,7 @@ void formForms::dasyfrm() {
   }
   auto const referencePoint =
       fPOINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
-  FormList->push_back(FRMHED {});
-  auto& form              = FormList->back();
-  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  auto form              = FRMHED {};
   form.vertexIndex        = wrap::toUnsigned(FormVertices->size());
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -902,7 +900,9 @@ void formForms::dasyfrm() {
 	form.attribute = 1;
   }
   StateMap->set(StateFlag::INIT);
-  form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+  FormList->push_back(form);
+  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  form::frmout(ClosestFormToCursor);
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; ++iMacroPetal) {
 	itVertex->x -= form.rectangle.left;
 	itVertex->y -= form.rectangle.bottom;
