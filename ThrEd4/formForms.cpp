@@ -1012,16 +1012,17 @@ void formForms::setear() {
 
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
-	auto&      form             = FormList->back();
-	auto       firstVertex      = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto const formVertexIndex  = FormList->back().vertexIndex;
+	auto const formVertexCount  = FormList->back().vertexCount;
+	auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
 	auto       nextVertex       = std::next(firstVertex);
-	auto const count            = wrap::toSize(form.vertexCount) / 4U;
+	auto const count            = wrap::toSize(formVertexCount) / 4U;
 	auto const middle           = wrap::midl(nextVertex->x, firstVertex->x);
 	auto       lastVertex       = wrap::next(firstVertex, count + 1U);
 	auto       verticalPosition = lastVertex->y;
 	--lastVertex;
 	auto step        = verticalPosition - lastVertex->y;
-	auto leftVertex  = wrap::next(firstVertex, wrap::toSize(form.vertexCount) - count);
+	auto leftVertex  = wrap::next(firstVertex, wrap::toSize(formVertexCount) - count);
 	auto rightVertex = wrap::next(firstVertex, count + 1U);
 	for (auto iStep = 0U; iStep < count; ++iStep) {
 	  leftVertex->y  = verticalPosition;
@@ -1039,7 +1040,7 @@ void formForms::setear() {
 	nextVertex->x += twistStep;
 	verticalPosition -= step / 2.0F;
 	FormVertices->push_back(*firstVertex);
-	firstVertex = wrap::next(FormVertices->begin(), form.vertexIndex); // iterator invalidated by push_back
+	firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
 	nextVertex  = std::next(firstVertex);
 	if (twistStep != 0.0F) {
 	  firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
@@ -1048,15 +1049,15 @@ void formForms::setear() {
 	  firstVertex->x = middle;
 	}
 	firstVertex->y = verticalPosition;
-	++(form.vertexCount);
+	++(FormList->back().vertexCount);
 	++NewFormVertexCount;
 	StateMap->set(StateFlag::FORMSEL);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form::flipv();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const size =
-	    fPOINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
+	auto const size = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
+	                          FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	auto       horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
 	}
@@ -1066,7 +1067,8 @@ void formForms::setear() {
 	}
 	if (horizontalRatio < 1.0F) {
 	  auto scaledVertex = firstVertex;
-	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
+	  auto const vertexMax = FormList->back().vertexCount;
+	  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 		scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
 		scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
 		++scaledVertex;
@@ -1074,9 +1076,12 @@ void formForms::setear() {
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	auto shiftedVertex = firstVertex;
-	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  shiftedVertex->x -= form.rectangle.left;
-	  shiftedVertex->y -= form.rectangle.bottom;
+	auto const left = FormList->back().rectangle.left;
+	auto const bottom = FormList->back().rectangle.bottom;
+	auto const vertexMax = FormList->back().vertexCount;
+	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
+	  shiftedVertex->x -= left;
+	  shiftedVertex->y -= bottom;
 	  ++shiftedVertex;
 	}
   }
