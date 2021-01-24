@@ -10061,15 +10061,14 @@ void thred::internal::qcode() {
 	StateMap->reset(StateFlag::INIT);
   }
   if (StateMap->testAndReset(StateFlag::POLIMOV)) { // aborting form add
-	auto& form = FormList->back();
-	if (form.vertexCount != 0U) {
-	  auto const first = wrap::next(FormVertices->begin(), form.vertexIndex);
-	  auto const last  = wrap::next(first, form.vertexCount);
+	if (FormList->back().vertexCount != 0U) {
+	  auto const first = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
+	  auto const last  = wrap::next(first, FormList->back().vertexCount);
 	  FormVertices->erase(first, last);
 	}
-	if (form.satinGuideCount != 0U) {
-	  auto const first = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
-	  auto const last  = wrap::next(first, form.satinGuideCount);
+	if (FormList->back().satinGuideCount != 0U) {
+	  auto const first = wrap::next(SatinGuides->begin(), FormList->back().satinOrAngle.guide);
+	  auto const last  = wrap::next(first, FormList->back().satinGuideCount);
 	  SatinGuides->erase(first, last);
 	}
 	FormList->pop_back();
