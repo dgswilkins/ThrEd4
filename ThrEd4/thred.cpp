@@ -12822,15 +12822,15 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		else {
 		  FormMoveDelta = fPOINT {};
 		  StateMap->set(StateFlag::FUNCLP);
-		  FormList->push_back(FRMHED {});
-		  ClosestFormToCursor   = wrap::toUnsigned(FormList->size() - 1U);
-		  auto& formIter        = FormList->back();
+		  auto formIter = FRMHED{};
 		  formIter.type         = FRMLINE;
 		  formIter.vertexCount  = formVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex  = wrap::toUnsigned(FormVertices->size());
 		  auto*      vertices   = convert_ptr<fPOINT*>(&formVerticesData[1]);
 		  auto const spVertices = gsl::make_span(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), spVertices.begin(), spVertices.end());
+		  FormList->push_back(formIter);
+		  ClosestFormToCursor   = wrap::toUnsigned(FormList->size() - 1U);
 		  StateMap->set(StateFlag::INIT);
 		  NewFormVertexCount = formIter.vertexCount;
 		  form::unfrm();
@@ -12850,9 +12850,9 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto& form : spForm) {
 		  FormList->push_back(form);
-		  auto& formIter = FormList->back();
-		  formIter.attribute = (gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
-		                        gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U));
+		  FormList->back().attribute =
+		      (gsl::narrow_cast<decltype(form.attribute)>(form.attribute & NFRMLMSK) |
+		       gsl::narrow_cast<decltype(form.attribute)>(ActiveLayer << 1U));
 		}
 		auto* formVertices  = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
 		auto  currentVertex = 0U;
