@@ -12949,9 +12949,7 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		if (clipFormHeader->clipType == CLP_FRM) {
 		  FormMoveDelta = fPOINT {};
 		  StateMap->set(StateFlag::FUNCLP);
-		  FormList->push_back(clipFormHeader->form);
-		  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-		  auto& formIter      = FormList->back();
+		  auto formIter      = clipFormHeader->form;
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
@@ -12966,21 +12964,20 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  }
 		  auto*      clipData      = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
 		  auto       clipCount     = 0U;
-		  auto const lastFormIndex = wrap::toUnsigned(FormList->size() - 1U);
-		  if (clip::isclpx(lastFormIndex)) {
+		  if (clip::isclpx(formIter)) {
 			auto const spClip = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
-		  if (clip::iseclpx(lastFormIndex)) {
+		  if (clip::iseclpx(formIter)) {
 			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]);
 			auto const spClip       = gsl::make_span(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.clipEntries;
 		  }
-		  if (texture::istx(lastFormIndex)) {
+		  if (texture::istx(formIter)) {
 			auto*      textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
 			auto const spTexture = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
@@ -12990,6 +12987,8 @@ auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag)
 		  if (formIter.type != FRMLINE) {
 			++NewFormVertexCount;
 		  }
+		  FormList->push_back(formIter);
+		  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 		  StateMap->set(StateFlag::INIT);
 		  form::unfrm();
 		  thred::duzrat();
