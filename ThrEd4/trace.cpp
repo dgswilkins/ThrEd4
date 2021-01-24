@@ -759,9 +759,7 @@ void trace::internal::dutrac() {
 	  tracedPoints.push_back(decimatedLine[iCurrent]);
 	}
 #endif
-	FormList->push_back(FRMHED {});
-	auto& form = FormList->back();
-	form::frmclr(form);
+	auto form = FRMHED{};
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	FormVertices->push_back(fPOINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
@@ -789,8 +787,9 @@ void trace::internal::dutrac() {
 	form.vertexCount = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
 	form.type        = FRMFPOLY;
 	form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form.satinGuideCount = 0;
+	FormList->push_back(form);
+	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	StateMap->set(StateFlag::RESTCH);
 	StateMap->set(StateFlag::FRMOF);
 	form::tglfrm();
