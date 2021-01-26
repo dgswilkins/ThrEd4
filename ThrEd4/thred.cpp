@@ -7296,15 +7296,14 @@ void thred::internal::deldir() {
   thred::unmsg();
   displayText::tabmsg(IDS_BAKDEL);
   auto  backSpec = std::wstring {L".th0"};
-  auto& backChar = backSpec.back();
   for (auto const& p : fs::directory_iterator(*DefaultDirectory)) {
 	if (!fs::is_directory(p)) {
 	  auto fileExt = p.path().extension().wstring();
-	  backChar     = 's';
+	  backSpec.back()     = 's';
 	  for (auto iLastChar = wchar_t {}; iLastChar < OLDVER; ++iLastChar) {
 		if (fileExt == backSpec) {
 		  fs::remove(p.path());
-		  ++backChar;
+		  ++(backSpec.back());
 		}
 	  }
 	}
