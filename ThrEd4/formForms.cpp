@@ -1169,7 +1169,7 @@ void formForms::wavfrm() {
 	points.reserve(IniFile.wavePoints);
 	// reuse regular polygon code to build the template for points
 	form::durpoli(IniFile.wavePoints);
-	auto formVertexIndex = FormList->back().vertexIndex;
+	auto const formVertexIndex = FormList->back().vertexIndex;
 	form::mdufrm();
 	auto iPoint      = 0U;
 	auto waveIndex   = IniFile.waveStart;
