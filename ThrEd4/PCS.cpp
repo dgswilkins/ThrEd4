@@ -108,7 +108,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		if (FALSE ==
 		    WriteFile(fileHandle,
 		              PCSStitchBuffer.data(),
-		              wrap::toUnsigned(PCSStitchBuffer.size() * sizeof(decltype(PCSStitchBuffer.back()))),
+		              wrap::sizeofVector(PCSStitchBuffer),
 		              &bytesWritten,
 		              nullptr)) {
 		  displayText::riter();

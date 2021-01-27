@@ -105,8 +105,7 @@ void texture::txdun() {
 			wrap::WriteFile(
 			    handle,
 			    item.texturePoints.data(),
-			    wrap::toUnsigned(item.texturePoints.size() *
-			                     sizeof(decltype(TextureHistory->operator[](0).texturePoints.back()))),
+			    wrap::sizeofVector(item.texturePoints),
 			    &bytesWritten,
 			    nullptr);
 		  }
@@ -156,7 +155,7 @@ void texture::redtx() {
 			                   &historyBytesRead,
 			                   nullptr)) {
 			  for (auto index = 0U;
-			       index < (historyBytesRead / wrap::toUnsigned(sizeof(decltype(textureHistoryBuffer.back()))));
+			       index < (historyBytesRead / wrap::sizeofType(textureHistoryBuffer));
 			       ++index) {
 				TextureHistory->operator[](index).height  = textureHistoryBuffer[index].height;
 				TextureHistory->operator[](index).width   = textureHistoryBuffer[index].width;
@@ -165,7 +164,7 @@ void texture::redtx() {
 				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
 				  if (!wrap::ReadFile(handle,
 				                      TextureHistory->operator[](index).texturePoints.data(),
-				                      sizeof(decltype(TextureHistory->operator[](0).texturePoints.back())) *
+				                      wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
 				                          textureHistoryBuffer[index].count,
 				                      &bytesRead,
 				                      nullptr)) {

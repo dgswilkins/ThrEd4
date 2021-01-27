@@ -90,10 +90,10 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  auto colorFileSize = LARGE_INTEGER {};
 	  GetFileSizeEx(colorFile, &colorFileSize);
 	  // There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
-	  colors.resize(colorFileSize.u.LowPart / sizeof(decltype(colors.back())));
+	  colors.resize(colorFileSize.u.LowPart / wrap::sizeofType(colors));
 	  ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr);
 	  CloseHandle(colorFile);
-	  if (bytesRead > (sizeof(decltype(colors.back())) * 2)) {
+	  if (bytesRead > (wrap::sizeofType(colors) * 2)) {
 		if (colors[0] == COLVER) {
 		  BackgroundColor = colors[1];
 		  thred::resetColorChanges();
@@ -104,7 +104,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   }
   auto iColor = 2U;
   auto color  = 0U;
-  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
+  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
 	UserColor[0] = colors[iColor];
 	color        = colmatch(colors[iColor++]);
 	thred::addColor(0, color);
@@ -118,7 +118,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   constexpr auto C0MASK = 0x80U;
   for (auto& record : DSTData) {
 	if ((record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
-	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * sizeof(decltype(colors.back())))) {
+	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
 		color                    = colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		thred::addColor(currentStitch, color);
@@ -275,7 +275,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	if (colorFile != INVALID_HANDLE_VALUE) {
 	  wrap::WriteFile(colorFile,
 	                  &colorData[0],
-	                  wrap::toUnsigned(colorData.size() * sizeof(decltype(colorData.data()))),
+	                  wrap::toUnsigned(colorData.size() * wrap::sizeofType(colorData)),
 	                  &bytesWritten,
 	                  nullptr);
 	}
@@ -285,7 +285,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	if (colorFile != INVALID_HANDLE_VALUE) {
 	  wrap::WriteFile(colorFile,
 	                  &colorData[2],
-	                  wrap::toUnsigned((colorData.size() - 2U) * sizeof(decltype(colorData.data()))),
+	                  wrap::toUnsigned((colorData.size() - 2U) * wrap::sizeofType(colorData)),
 	                  &bytesWritten,
 	                  nullptr);
 	}
@@ -974,7 +974,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		}
 		if (FALSE == WriteFile(fileHandle,
 		                       DSTRecords.data(),
-		                       wrap::toUnsigned(sizeof(decltype(DSTRecords.back())) * DSTRecords.size()),
+		                       wrap::sizeofVector(DSTRecords),
 		                       &bytesWritten,
 		                       nullptr)) {
 		  displayText::riter();
