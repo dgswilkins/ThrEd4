@@ -5686,7 +5686,7 @@ void thred::internal::sizclp(FRMHED const& form,
                              uint32_t&     formFirstStitchIndex,
                              uint32_t&     formStitchCount,
                              uint32_t&     length,
-                             uint32_t&     fileSize) noexcept {
+                             uint32_t&     fileSize) {
   fileSize = wrap::toUnsigned(sizeof(FORMCLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   length   = fileSize;
   if (form.type == SAT) {

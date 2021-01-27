@@ -446,7 +446,7 @@ namespace internal {
               uint32_t&     formFirstStitchIndex,
               uint32_t&     formStitchCount,
               uint32_t&     length,
-              uint32_t&     fileSize) noexcept;
+              uint32_t&     fileSize);
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
   auto srchknot(uint32_t source) -> uint32_t;
