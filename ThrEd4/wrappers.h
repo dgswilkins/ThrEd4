@@ -21,7 +21,48 @@
 
 namespace wrap {
 
-template <class outType, class inType> auto ceil(inType invar) -> outType {
+#ifdef _WIN64
+  template <typename T> constexpr auto sizeofType([[maybe_unused]] const typename std::vector<T>& vec) -> uint32_t {
+	return gsl::narrow<uint32_t>(sizeof(T));
+  }
+
+  template <typename T> constexpr auto sizeofType([[maybe_unused]] const typename std::vector<T>* vec) -> uint32_t {
+	return gsl::narrow<uint32_t>(sizeof(T));
+  }
+
+  template <typename T> auto sizeofVector(const typename std::vector<T>& vec) noexcept -> uint32_t {
+	return gsl::narrow<uint32_t>(sizeof(T) * vec.size());
+  }
+
+  template <typename T> auto sizeofVector(const typename std::vector<T>* vec) noexcept -> uint32_t {
+    if (nullptr != vec) {
+	  return gsl::narrow<uint32_t>(sizeof(T) * vec->size());
+    }
+    return 0;
+  }
+#else 
+  template <typename T> constexpr auto sizeofType([[maybe_unused]] const typename std::vector<T>& vec) -> uint32_t {
+	return sizeof(T);
+  }
+
+#pragma warning (suppress: 4100)
+  template <typename T> constexpr auto sizeofType([[maybe_unused]] const typename std::vector<T>* vec) -> uint32_t {
+	return sizeof(T);
+  }
+
+  template <typename T> auto sizeofVector(const typename std::vector<T>& vec) noexcept -> uint32_t {
+	return sizeof(T) * vec.size();
+  }
+
+  template <typename T> auto sizeofVector(const typename std::vector<T>* vec) noexcept -> uint32_t {
+	if (nullptr != vec) {
+	  return sizeof(T) * vec->size();
+	}
+	return 0;
+  }
+#endif // _win64
+
+  template <class outType, class inType> auto ceil(inType invar) -> outType {
   if constexpr (std::is_same<inType, float>::value) {
 	return gsl::narrow<outType>(std::ceilf(invar));
   }
