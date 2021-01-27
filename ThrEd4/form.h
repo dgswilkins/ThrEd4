@@ -99,7 +99,6 @@ void fltspac(uint32_t vertexOffset, uint32_t count);
 void form();
 void frm0();
 void frmadj(uint32_t formIndex);
-void frmclr(FRMHED& destination) noexcept;
 void frmlin(FRMHED const& form);
 void frmlin(std::vector<fPOINT> const& vertices);
 void frmnumfn(uint32_t newFormIndex);

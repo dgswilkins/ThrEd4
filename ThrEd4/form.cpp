@@ -48,11 +48,6 @@ static auto FormForInsert  = static_cast<FRMHED*>(nullptr); // insert form verte
 static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
 static auto FormVertexPrev = uint32_t {}; // form vertex storage for form vertex insert
 
-void form::frmclr(FRMHED& destination) noexcept {
-  auto const head = FRMHED {};
-  destination     = head;
-}
-
 auto form::internal::fplComp(fPOINTLINE const& point1, fPOINTLINE const& point2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (point1.y < point2.y) {
