@@ -6675,7 +6675,7 @@ void form::dueg(uint32_t sides) {
   itVertex            = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const eggRatio = maximumY / (itVertex[sides >> 2U].y - itVertex[0].y);
   auto const ref      = *itVertex;
-  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
+  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	*itVertex = fPOINT {fi::shreg(itVertex->x, ref.x, eggRatio), fi::shreg(itVertex->y, ref.y, eggRatio)};
 	++itVertex;
   }
