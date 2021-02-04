@@ -8361,8 +8361,7 @@ auto form::internal::spltlin() -> bool {
 	return false;
   }
   auto const itVertex = wrap::next(FormVertices->cbegin(), srcForm.vertexIndex + ClosestVertexToCursor);
-  auto const stitchPoint = *itVertex;
-  fi::nufpnt(ClosestVertexToCursor, srcForm, stitchPoint);
+  fi::nufpnt(ClosestVertexToCursor, srcForm, *itVertex);
   form::frmlin(srcForm);
   FormList->insert(wrap::next(FormList->cbegin(), ClosestFormToCursor), 1, srcForm);
   // insert may invalidate the srcForm reference, so build a new one
