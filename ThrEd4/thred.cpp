@@ -6283,18 +6283,20 @@ void thred::internal::setknt() {
 
 auto thred::internal::srchknot(uint32_t source) -> uint32_t {
   auto upper = std::find(Knots->begin(), Knots->end(), source);
-  --upper;
-  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
+  if (upper != Knots->end()) {
+	--upper;
+	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
+	  ++upper;
+	  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
+		return 0;
+	  }
+	  return 2;
+	}
+
 	++upper;
 	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
-	  return 0;
+	  return 1;
 	}
-	return 2;
-  }
-
-  ++upper;
-  if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
-	return 1;
   }
   return 3;
 }
