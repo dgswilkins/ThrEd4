@@ -619,18 +619,13 @@ void thred::internal::fndknt() {
   auto endStitch = wrap::toUnsigned(StitchBuffer->size());
   if (endStitch > 4U) {
 	endStitch -= 4U;
-	// ToDo - Is flag initialized and used correctly?
-	auto flag = false;
 	Knots->clear();
+	auto iterStitch = StitchBuffer->begin();
 	for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-	  if ((StitchBuffer->operator[](iStitch).attribute & KNOTMSK) != 0U) {
-		if (!flag) {
+	  if ((iterStitch->attribute & KNOTMSK) != 0U) {
 		  Knots->push_back(iStitch);
-		}
 	  }
-	  else {
-		flag = false;
-	  }
+	  ++iterStitch;
 	}
   }
   else {
