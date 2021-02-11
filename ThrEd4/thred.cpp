@@ -352,9 +352,9 @@ auto thred::internal::isfclp() noexcept -> bool {
 }
 
 auto thred::internal::stlen(uint32_t iStitch) noexcept -> float {
-  return hypot(
-      StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).x - StitchBuffer->operator[](iStitch).x,
-      StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y - StitchBuffer->operator[](iStitch).y);
+  auto currStitch = std::next(StitchBuffer->begin(), iStitch);
+  auto nextStitch = std::next(currStitch);
+  return hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
 }
 
 void thred::undat() noexcept {
