@@ -1167,17 +1167,17 @@ void thred::shft(fPOINT const& delta) noexcept {
 
 auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
   if (!StitchBuffer->empty()) {
-	return POINT {
-	    wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
-	    wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-	                        (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
+	auto current = std::next(StitchBuffer->begin(), iStitch);
+	return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
+	              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+	                                  (current->y - ZoomRect.bottom) * ZoomRatio.y)};
   }
   return POINT {0L, StitchWindowClientRect.bottom};
 }
 
 void thred::internal::shft2box() {
-  auto const stitchPoint = fPOINT {StitchBuffer->operator[](ClosestPointIndex).x,
-                                   StitchBuffer->operator[](ClosestPointIndex).y};
+  auto       current     = std::next(StitchBuffer->begin(), ClosestPointIndex);
+  auto const stitchPoint = fPOINT {current->x, current->y};
   thred::shft(stitchPoint);
   stch2px1(ClosestPointIndex);
 }
@@ -2202,11 +2202,11 @@ void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestSt
 	auto       minLength = BIGFLOAT;
 	if (!StitchBuffer->empty()) {
 	  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-		auto const& stitch     = StitchBuffer->operator[](iStitch);
-		auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-		if ((stitch.attribute & FRMSK) == code && ((stitch.attribute & NOTFRM) == 0U) &&
-		    (stitchFwd1.attribute & FRMSK) == code && ((stitchFwd1.attribute & TYPMSK) != 0U)) {
-		  auto const length = std::hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+		auto const stitch     = std::next(StitchBuffer->begin(), iStitch);
+		auto const stitchFwd1 = std::next(stitch);
+		if ((stitch->attribute & FRMSK) == code && ((stitch->attribute & NOTFRM) == 0U) &&
+		    (stitchFwd1->attribute & FRMSK) == code && ((stitchFwd1->attribute & TYPMSK) != 0U)) {
+		  auto const length = std::hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
 		  if (length > maxLength) {
 			maxLength          = length;
 			largestStitchIndex = iStitch;
@@ -2240,10 +2240,10 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
   auto minLength      = BIGFLOAT;
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
+  auto stitch     = std::next(StitchBuffer->begin(), start);
+  auto stitchFwd1 = std::next(stitch);
   for (auto iStitch = start; iStitch < end; ++iStitch) {
-	auto const& stitch     = StitchBuffer->operator[](iStitch);
-	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
-	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
+	auto const length      = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
 	if (length > maxLength) {
 	  maxLength          = length;
 	  largestStitchIndex = iStitch;
@@ -2252,6 +2252,8 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 	  minLength           = length;
 	  smallestStitchIndex = iStitch;
 	}
+	++stitch;
+	++stitchFwd1;
   }
   displayText::butxt(HMAXLEN, fmt::format(displayText::loadStr(IDS_LENMAX), (maxLength * IPFGRAN)));
   displayText::butxt(HMINLEN, fmt::format(displayText::loadStr(IDS_LENMIN), (minLength * IPFGRAN)));
@@ -2260,9 +2262,9 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
-	auto const& stitch     = StitchBuffer->operator[](ClosestPointIndex);
-	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-	auto const lenMax      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y) * IPFGRAN;
+	auto const stitch     = std::next(StitchBuffer->begin(), ClosestPointIndex);
+	auto const stitchFwd1 = std::next(stitch);
+	auto const lenMax      = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
   }
@@ -2484,11 +2486,12 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
   }
   SearchLine->clear();
   if (!StitchBuffer->empty()) {
+	auto stitch = std::next(StitchBuffer->begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
-	  SearchLine->push_back(POINT {
-	      wrap::ceil<int32_t>(((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x)),
-	      wrap::ceil<int32_t>((StitchWindowClientRect.bottom -
-	                           (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y))});
+	  SearchLine->push_back(POINT {wrap::ceil<int32_t>(((stitch->x - ZoomRect.left) * ZoomRatio.x)),
+	                               wrap::ceil<int32_t>((StitchWindowClientRect.bottom -
+	                                                    (stitch->y - ZoomRect.bottom) * ZoomRatio.y))});
+	  ++stitch;
 	}
 	wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
   }
