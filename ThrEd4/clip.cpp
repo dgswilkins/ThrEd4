@@ -315,8 +315,7 @@ void clip::internal::linsid(uint32_t                   vertexIndex,
                             fPOINT&                    stitchPoint,
                             fPOINT const&              borderClipReference) {
   auto const itVertex  = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 1);
-  auto const delta     = fPOINT {(itVertex->x - stitchPoint.x), (itVertex->y - stitchPoint.y)};
-  auto const length    = hypot(delta.x, delta.y);
+  auto const length    = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y);
   auto const clipCount = wrap::floor<uint32_t>(length / ClipRectSize.cx);
   if (clipCount != 0U) {
 	ClipReference     = thred::rotangf(borderClipReference, clipAngle, rotationCenter);

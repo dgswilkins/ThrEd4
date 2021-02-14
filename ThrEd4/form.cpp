@@ -1286,9 +1286,7 @@ auto form::getlast(FRMHED const& form) -> uint32_t {
 	auto closestVertex = 0U;
 	auto itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  auto const dx     = LastPoint.x - itVertex->x;
-	  auto const dy     = LastPoint.y - itVertex->y;
-	  auto const length = hypot(dx, dy);
+	  auto const length = hypot(LastPoint.x - itVertex->x, LastPoint.y - itVertex->y);
 	  if (length < minimumLength) {
 		minimumLength = length;
 		closestVertex = iVertex;
@@ -1750,10 +1748,8 @@ void form::internal::duromb(fPOINT const& start0,
                             fPOINT const& finish1,
                             fPOINT&       stitchPoint) {
   if (!StateMap->test(StateFlag::UND)) {
-	auto const delta0  = fPOINT {stitchPoint.x - start0.x, stitchPoint.y - start0.y};
-	auto const delta1  = fPOINT {stitchPoint.x - start1.x, stitchPoint.y - start1.y};
-	auto const length0 = hypot(delta0.x, delta0.y);
-	auto const length1 = hypot(delta1.x, delta1.y);
+	auto const length0 = hypot(stitchPoint.x - start0.x, stitchPoint.y - start0.y);
+	auto const length1 = hypot(stitchPoint.x - start1.x, stitchPoint.y - start1.y);
 	if (length0 > length1) {
 	  StateMap->set(StateFlag::FILDIR);
 	}
@@ -1852,7 +1848,8 @@ void form::internal::spend(std::vector<VRCT2> const& fillVerticalRect, uint32_t 
   auto const outerLength = hypot(outerDelta.x, outerDelta.y);
   auto const flag        = (outerLength > innerLength);
   auto const pivot       = flag ? fillVerticalRect[start].cipnt : fillVerticalRect[start].copnt;
-  auto const startDelta  = flag ? fPOINT {fillVerticalRect[start].copnt.x - pivot.x,
+
+  auto const startDelta = flag ? fPOINT {fillVerticalRect[start].copnt.x - pivot.x,
                                          fillVerticalRect[start].copnt.y - pivot.y}
                                : fPOINT {fillVerticalRect[start].cipnt.x - pivot.x,
                                          fillVerticalRect[start].cipnt.y - pivot.y};
@@ -1987,8 +1984,7 @@ void form::internal::prsmal(float width) {
 	// clang-format off
 	auto const& seq    = OSequence->operator[](iSequence);
 	auto const& seqRef = OSequence->operator[](iReference);
-	auto const delta  = fPOINT {seq.x - seqRef.x, seq.y - seqRef.y};
-	auto const length = hypot(delta.x, delta.y);
+	auto const length = hypot(seq.x - seqRef.x, seq.y - seqRef.y);
 	// clang-format on
 	if (length > minimumLength) {
 	  OSequence->operator[](iOutput++) = seq;
@@ -7901,8 +7897,8 @@ void form::internal::shrnks() {
 	auto const ratio      = (ClipRectSize.cx * count + 0.004F) / fLen;
 	auto&      thisVertex = itVertex[iVertex];
 	auto&      nextVertex = itVertex[iVertex + 1];
-	nextVertex.x          = thisVertex.x + (*delta).x * ratio;
-	nextVertex.y          = thisVertex.y + (*delta).y * ratio;
+	nextVertex.x          = thisVertex.x + delta->x * ratio;
+	nextVertex.y          = thisVertex.y + delta->y * ratio;
 	++length;
 	++delta;
   }

@@ -2546,22 +2546,24 @@ void thred::internal::ducros(HDC dc) {
 
 void thred::selRct(fRECTANGLE& sourceRect) noexcept {
   if (!StitchBuffer->empty()) {
-	sourceRect.left = sourceRect.right = StitchBuffer->operator[](GroupStartStitch).x;
-	sourceRect.top = sourceRect.bottom = StitchBuffer->operator[](GroupStartStitch).y;
+	auto stitch = std::next(StitchBuffer->begin(), GroupStartStitch);
+	sourceRect.left = sourceRect.right = stitch->x;
+	sourceRect.top = sourceRect.bottom = stitch->y;
+	++stitch;
 	for (auto iStitch = GroupStartStitch + 1U; iStitch <= GroupEndStitch; ++iStitch) {
-	  auto const& stitch = StitchBuffer->operator[](iStitch);
-	  if (stitch.x > sourceRect.right) {
-		sourceRect.right = stitch.x;
+	  if (stitch->x > sourceRect.right) {
+		sourceRect.right = stitch->x;
 	  }
-	  if (stitch.x < sourceRect.left) {
-		sourceRect.left = stitch.x;
+	  if (stitch->x < sourceRect.left) {
+		sourceRect.left = stitch->x;
 	  }
-	  if (stitch.y < sourceRect.bottom) {
-		sourceRect.bottom = stitch.y;
+	  if (stitch->y < sourceRect.bottom) {
+		sourceRect.bottom = stitch->y;
 	  }
-	  if (stitch.y > sourceRect.top) {
-		sourceRect.top = stitch.y;
+	  if (stitch->y > sourceRect.top) {
+		sourceRect.top = stitch->y;
 	  }
+	  ++stitch;
 	}
   }
   if (sourceRect.right - sourceRect.left == 0) {
@@ -3038,14 +3040,16 @@ void thred::internal::ritbal() {
 	auto iOutput = 0U;
 	thr2bal(balaradStitch, 0, BALJUMP, 0);
 	++iOutput;
+	auto stitch = StitchBuffer->begin();
 	for (auto iStitch = 0U; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
 	  thr2bal(balaradStitch, iStitch, BALNORM, 0);
 	  ++iOutput;
-	  if ((StitchBuffer->operator[](iStitch).attribute & COLMSK) != color) {
-		color = StitchBuffer->operator[](iStitch).attribute & COLMSK;
+	  if ((stitch->attribute & COLMSK) != color) {
+		color = stitch->attribute & COLMSK;
 		thr2bal(balaradStitch, iStitch, BALSTOP, color);
 		++iOutput;
 	  }
+	  ++stitch;
 	}
 	WriteFile(balaradFile, balaradStitch.data(), iOutput * wrap::sizeofType(balaradStitch), &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
@@ -4715,16 +4719,13 @@ void thred::internal::duClos(uint32_t            startStitch,
                              uint32_t            stitchCount,
                              fPOINT const&       stitchPoint,
                              std::vector<float>& gapToNearest) noexcept {
+  auto stitch = std::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
-	auto const& stitch = StitchBuffer->operator[](iStitch);
-
-	auto const cx =
-	    ((stitch.x > stitchPoint.x) ? (stitch.x - stitchPoint.x) : (stitchPoint.x - stitch.x));
-	auto const cy =
-	    ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
-	auto sum   = hypot(cx, cy);
-	auto tind0 = iStitch;
-	auto gap   = gapToNearest.begin();
+	auto const cx    = std::abs(stitch->x - stitchPoint.x);
+	auto const cy    = std::abs(stitch->y - stitchPoint.y);
+	auto       sum   = hypot(cx, cy);
+	auto       tind0 = iStitch;
+	auto       gap   = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
 	  if (sum < *gap) {
 		auto const lowestSum = *gap;
@@ -4737,6 +4738,7 @@ void thred::internal::duClos(uint32_t            startStitch,
 	  }
 	  ++gap;
 	}
+	++stitch;
   }
 }
 
@@ -4801,23 +4803,20 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto       distanceToClick = BIGFLOAT;
   if (StateMap->test(StateFlag::HID)) {
 	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	  if (ColorChangeTable->operator[](iColor).colorIndex == ActiveColor) {
-		for (auto iStitch = ColorChangeTable->operator[](iColor).stitchIndex;
-		     iStitch < ColorChangeTable->     operator[](iColor + 1U).stitchIndex;
-		     ++iStitch) {
-		  auto const& stitch = StitchBuffer->operator[](iStitch);
-		  if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
-		      stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
-			auto const cx =
-			    ((stitch.x > stitchPoint.x) ? (stitch.x - stitchPoint.x) : (stitchPoint.x - stitch.x));
-			auto const cy =
-			    ((stitch.y > stitchPoint.y) ? (stitch.y - stitchPoint.y) : (stitchPoint.y - stitch.y));
-			auto const currentDistance = hypot(cx, cy);
-			if (currentDistance < distanceToClick) {
-			  distanceToClick = currentDistance;
+	  auto color = std::next(ColorChangeTable->begin(), iColor);
+	  if (color->colorIndex == ActiveColor) {
+		auto stitch = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
+		auto maxColor = std::next(color)->stitchIndex;
+		for (auto iStitch = color->stitchIndex; iStitch < maxColor; ++iStitch) {
+		  if (stitch->x >= ZoomRect.left && stitch->x <= ZoomRect.right &&
+		      stitch->y >= ZoomRect.bottom && stitch->y <= ZoomRect.top) {
+			auto const distance = hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
+			if (distance < distanceToClick) {
+			  distanceToClick = distance;
 			  closestIndex    = iStitch;
 			}
 		  }
+		  ++stitch;
 		}
 	  }
 	}
@@ -4829,11 +4828,9 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
 		    stitch.y >= ZoomRect.bottom && stitch.y <= ZoomRect.top) {
-		  auto const cx              = stitch.x - stitchPoint.x;
-		  auto const cy              = stitch.y - stitchPoint.y;
-		  auto const currentDistance = hypot(cx, cy);
-		  if (currentDistance < distanceToClick) {
-			distanceToClick = currentDistance;
+		  auto const distance = hypot(stitch.x - stitchPoint.x, stitch.y - stitchPoint.y);
+		  if (distance < distanceToClick) {
+			distanceToClick = distance;
 			closestIndex    = currentStitch;
 		  }
 		}
