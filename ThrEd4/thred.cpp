@@ -4863,6 +4863,34 @@ auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
   return iColor;
 }
 
+auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
+  auto const formFirstStitch =
+	std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](fPOINTATTR const& m) -> bool {
+	if ((m.attribute & NOTFRM) != 0U) {
+	  return false;
+	}
+	return ((m.attribute & FRMSK) >> FRMSHFT) == form;
+	  });
+  if (formFirstStitch != StitchBuffer->end()) {
+	return std::distance(StitchBuffer->begin(), formFirstStitch);
+  }
+  return StitchBuffer->size() - 1U;
+}
+
+auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
+  auto const formFirstStitch =
+	std::find_if(StitchBuffer->rbegin(), StitchBuffer->rend(), [form](fPOINTATTR const& m) -> bool {
+	if ((m.attribute & NOTFRM) != 0U) {
+	  return false;
+	}
+	return ((m.attribute & FRMSK) >> FRMSHFT) == form;
+	  });
+  if (formFirstStitch != StitchBuffer->rend()) {
+	return (std::distance(formFirstStitch, StitchBuffer->rend()) - 1U);
+  }
+  return (StitchBuffer->size() - 1U);
+}
+
 void thred::internal::toglup() {
   if (StateMap->testAndFlip(StateFlag::UPTO)) {
 	displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
@@ -4878,13 +4906,7 @@ void thred::internal::toglup() {
 	  if (!StateMap->test(StateFlag::SELBOX)) {
 		ClosestPointIndex = 0;
 		if (StateMap->testAndReset(StateFlag::FORMSEL)) {
-		  while (ClosestPointIndex < wrap::toUnsigned(StitchBuffer->size()) &&
-		         form::notfstch(StitchBuffer->operator[](ClosestPointIndex).attribute)) {
-			++ClosestPointIndex;
-		  }
-		  if (ClosestPointIndex == StitchBuffer->size()) { // the selected form does not yet have any stitches
-			--ClosestPointIndex;
-		  }
+		  ClosestPointIndex = thred::findFirstStitch(ClosestFormToCursor);
 		  StateMap->set(StateFlag::SELBOX);
 		  StateMap->reset(StateFlag::FRMPSEL);
 		}
@@ -8035,15 +8057,17 @@ void thred::internal::rembig() {
 	  if (!SelectedFormList->empty()) {
 		auto range = RANGE {};
 		for (auto selectedForm : (*SelectedFormList)) {
-		  form::frmrng(selectedForm, range);
-		  thi::makbig(range.start, range.finish);
+		  if (form::frmrng(selectedForm, range)) {
+			thi::makbig(range.start, range.finish);
+		  }
 		}
 		break;
 	  }
 	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto range = RANGE {};
-		form::frmrng(ClosestFormToCursor, range);
-		thi::makbig(range.start, range.finish);
+		if (form::frmrng(ClosestFormToCursor, range)) {
+		  thi::makbig(range.start, range.finish);
+		}
 		break;
 	  }
 	  if (StateMap->test(StateFlag::GRPSEL)) {

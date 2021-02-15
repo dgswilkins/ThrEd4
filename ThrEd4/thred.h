@@ -57,6 +57,8 @@ void delinf() noexcept;
 void delstchm();
 auto duthrsh(float threshold) noexcept -> uint32_t;
 void duzrat() noexcept;
+auto findFirstStitch(uint32_t form) -> uint32_t;
+auto findLastStitch(uint32_t form) -> uint32_t;
 void frmdel();
 void frmrct(fRECTANGLE& rectangle) noexcept;
 auto getBackGroundBrush() noexcept -> HBRUSH;

@@ -124,7 +124,6 @@ auto linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t finish, fP
 void mdufrm() noexcept;
 void movlayr(uint32_t layer);
 void munfrm();
-auto notfstch(uint32_t attribute) noexcept -> bool;
 void nubrdcol(uint8_t color) noexcept;
 void nufilcol(uint8_t color) noexcept;
 void nufsel();

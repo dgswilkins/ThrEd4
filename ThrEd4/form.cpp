@@ -7579,31 +7579,16 @@ void form::selfil(uint32_t type) {
   }
 }
 
-auto form::notfstch(uint32_t attribute) noexcept -> bool {
-  if ((attribute & NOTFRM) != 0U) {
-	return true;
-  }
-  return ((attribute & FRMSK) >> FRMSHFT) != ClosestFormToCursor;
-}
-
 void form::selalfil() {
   displayText::frm1pnt();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto const savedIndex = ClosestPointIndex;
-	ClosestPointIndex     = 0U;
-	while (ClosestPointIndex < StitchBuffer->size() &&
-	       form::notfstch(StitchBuffer->operator[](ClosestPointIndex).attribute)) {
-	  ++ClosestPointIndex;
-	}
+	ClosestPointIndex = thred::findFirstStitch(ClosestFormToCursor);
 	if (ClosestPointIndex != StitchBuffer->size()) {
 	  if (ClosestPointIndex != 0U) {
 		--ClosestPointIndex;
 	  }
-	  GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	  while (GroupStitchIndex > ClosestPointIndex &&
-	         form::notfstch(StitchBuffer->operator[](GroupStitchIndex).attribute)) {
-		--GroupStitchIndex;
-	  }
+	  GroupStitchIndex = thred::findLastStitch(ClosestFormToCursor);
 	  StateMap->set(StateFlag::GRPSEL);
 	  StateMap->reset(StateFlag::FORMSEL);
 	  thred::rngadj();
@@ -7629,13 +7614,8 @@ auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
 	ClosestFormToCursor  = iForm;
 	// clang-format on
 	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
-	  while (range.start < StitchBuffer->size() && notfstch(StitchBuffer->operator[](range.start).attribute)) {
-		++(range.start);
-	  }
-	  range.finish = wrap::toUnsigned(StitchBuffer->size() - 1U);
-	  while (range.finish > range.start && notfstch(StitchBuffer->operator[](range.finish).attribute)) {
-		--(range.finish);
-	  }
+	  range.start = thred::findFirstStitch(ClosestFormToCursor);
+	  range.finish = thred::findLastStitch(ClosestFormToCursor);
 	  retval = range.finish > range.start;
 	}
 	else {
