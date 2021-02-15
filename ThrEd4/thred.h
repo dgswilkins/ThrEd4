@@ -96,7 +96,7 @@ void sCor2px(fPOINT const& stitchCoordinate, POINT& pixelCoordinate);
 void savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led);
 void savdo();
 void save();
-void selRct(fRECTANGLE& sourceRect) noexcept;
+void selRct(fRECTANGLE& sourceRect);
 void setpsel();
 void shft(fPOINT const& delta) noexcept;
 void showColorWin() noexcept;
@@ -177,7 +177,7 @@ namespace internal {
   void drwlstch(uint32_t finish);
   void drwmrk(HDC dc);
   void dstcurs() noexcept;
-  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<float>& gapToNearest) noexcept;
+  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<float>& gapToNearest);
   void duIns();
   void duSelbox() noexcept;
   void duar(POINT const& stitchCoordsInPixels);
@@ -461,7 +461,7 @@ namespace internal {
   void stchbox(uint32_t iStitch, HDC dc);
   void stchout();
   void stchsnap(uint32_t start, uint32_t finish);
-  auto stlen(uint32_t iStitch) noexcept -> float;
+  auto stlen(uint32_t iStitch) -> float;
   void strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
   void tglhid();
   void thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);

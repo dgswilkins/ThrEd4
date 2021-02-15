@@ -351,8 +351,8 @@ auto thred::internal::isfclp() noexcept -> bool {
   return clip::isclp(form) && form.fillType != CLPF;
 }
 
-auto thred::internal::stlen(uint32_t iStitch) noexcept -> float {
-  auto currStitch = std::next(StitchBuffer->begin(), iStitch);
+auto thred::internal::stlen(uint32_t iStitch) -> float {
+  auto currStitch = wrap::next(StitchBuffer->begin(), iStitch);
   auto nextStitch = std::next(currStitch);
   return hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
 }
@@ -1167,7 +1167,7 @@ void thred::shft(fPOINT const& delta) noexcept {
 
 auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
   if (!StitchBuffer->empty()) {
-	auto current = std::next(StitchBuffer->begin(), iStitch);
+	auto current = wrap::next(StitchBuffer->begin(), iStitch);
 	return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
 	              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
 	                                  (current->y - ZoomRect.bottom) * ZoomRatio.y)};
@@ -1176,7 +1176,7 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
 }
 
 void thred::internal::shft2box() {
-  auto       current     = std::next(StitchBuffer->begin(), ClosestPointIndex);
+  auto       current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
   auto const stitchPoint = fPOINT {current->x, current->y};
   thred::shft(stitchPoint);
   stch2px1(ClosestPointIndex);
@@ -2202,7 +2202,7 @@ void thred::internal::frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestSt
 	auto       minLength = BIGFLOAT;
 	if (!StitchBuffer->empty()) {
 	  for (auto iStitch = 0U; iStitch < endStitch; ++iStitch) {
-		auto const stitch     = std::next(StitchBuffer->begin(), iStitch);
+		auto const stitch     = wrap::next(StitchBuffer->begin(), iStitch);
 		auto const stitchFwd1 = std::next(stitch);
 		if ((stitch->attribute & FRMSK) == code && ((stitch->attribute & NOTFRM) == 0U) &&
 		    (stitchFwd1->attribute & FRMSK) == code && ((stitchFwd1->attribute & TYPMSK) != 0U)) {
@@ -2240,7 +2240,7 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
   auto minLength      = BIGFLOAT;
   smallestStitchIndex = 0U;
   largestStitchIndex  = 0U;
-  auto stitch     = std::next(StitchBuffer->begin(), start);
+  auto stitch     = wrap::next(StitchBuffer->begin(), start);
   auto stitchFwd1 = std::next(stitch);
   for (auto iStitch = start; iStitch < end; ++iStitch) {
 	auto const length      = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y);
@@ -2262,7 +2262,7 @@ void thred::internal::lenfn(uint32_t start, uint32_t end, uint32_t& largestStitc
 void thred::internal::lenCalc() {
   auto const blank = std::wstring {};
   if (StateMap->test(StateFlag::LENSRCH)) {
-	auto const stitch     = std::next(StitchBuffer->begin(), ClosestPointIndex);
+	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
 	auto const lenMax      = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
 	displayText::butxt(HMINLEN, fmt::format(L"{:.2f}", lenMax));
@@ -2486,7 +2486,7 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
   }
   SearchLine->clear();
   if (!StitchBuffer->empty()) {
-	auto stitch = std::next(StitchBuffer->begin(), start);
+	auto stitch = wrap::next(StitchBuffer->begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
 	  SearchLine->push_back(POINT {wrap::ceil<int32_t>(((stitch->x - ZoomRect.left) * ZoomRatio.x)),
 	                               wrap::ceil<int32_t>((StitchWindowClientRect.bottom -
@@ -2544,9 +2544,9 @@ void thred::internal::ducros(HDC dc) {
   selin(GroupStartStitch, GroupEndStitch, dc);
 }
 
-void thred::selRct(fRECTANGLE& sourceRect) noexcept {
+void thred::selRct(fRECTANGLE& sourceRect) {
   if (!StitchBuffer->empty()) {
-	auto stitch = std::next(StitchBuffer->begin(), GroupStartStitch);
+	auto stitch = wrap::next(StitchBuffer->begin(), GroupStartStitch);
 	sourceRect.left = sourceRect.right = stitch->x;
 	sourceRect.top = sourceRect.bottom = stitch->y;
 	++stitch;
@@ -4718,8 +4718,8 @@ void thred::internal::zumout() {
 void thred::internal::duClos(uint32_t            startStitch,
                              uint32_t            stitchCount,
                              fPOINT const&       stitchPoint,
-                             std::vector<float>& gapToNearest) noexcept {
-  auto stitch = std::next(StitchBuffer->begin(), startStitch);
+                             std::vector<float>& gapToNearest) {
+  auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
 	auto const cx    = std::abs(stitch->x - stitchPoint.x);
 	auto const cy    = std::abs(stitch->y - stitchPoint.y);
@@ -4803,7 +4803,7 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto       distanceToClick = BIGFLOAT;
   if (StateMap->test(StateFlag::HID)) {
 	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	  auto color = std::next(ColorChangeTable->begin(), iColor);
+	  auto color = wrap::next(ColorChangeTable->begin(), iColor);
 	  if (color->colorIndex == ActiveColor) {
 		auto stitch = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
 		auto maxColor = std::next(color)->stitchIndex;
@@ -4872,9 +4872,9 @@ auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitc
 	return ((m.attribute & FRMSK) >> FRMSHFT) == form;
 	  });
   if (formFirstStitch != StitchBuffer->end()) {
-	return std::distance(StitchBuffer->begin(), formFirstStitch);
+	return wrap::toUnsigned(std::distance(StitchBuffer->begin(), formFirstStitch));
   }
-  return StitchBuffer->size() - 1U;
+  return wrap::toUnsigned(StitchBuffer->size() - 1U);
 }
 
 auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
@@ -4886,9 +4886,9 @@ auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch
 	return ((m.attribute & FRMSK) >> FRMSHFT) == form;
 	  });
   if (formFirstStitch != StitchBuffer->rend()) {
-	return (std::distance(formFirstStitch, StitchBuffer->rend()) - 1U);
+	return wrap::toUnsigned(std::distance(formFirstStitch, StitchBuffer->rend()) - 1);
   }
-  return (StitchBuffer->size() - 1U);
+  return wrap::toUnsigned(StitchBuffer->size() - 1U);
 }
 
 void thred::internal::toglup() {
