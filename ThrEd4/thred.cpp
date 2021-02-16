@@ -4802,12 +4802,12 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto const stitchPoint     = thred::pxCor2stch(Msg.pt);
   auto       distanceToClick = BIGFLOAT;
   if (StateMap->test(StateFlag::HID)) {
-	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	  auto const color = wrap::next(ColorChangeTable->begin(), iColor);
-	  if (color->colorIndex == ActiveColor) {
-		auto stitch = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
-		auto const maxColor = std::next(color)->stitchIndex;
-		for (auto iStitch = color->stitchIndex; iStitch < maxColor; ++iStitch) {
+	auto const maxIt = wrap::next(ColorChangeTable->end(), -1);
+	for (auto colorIt = ColorChangeTable->begin(); colorIt != maxIt; ++colorIt) {
+	  if (colorIt->colorIndex == ActiveColor) {
+		auto stitch = std::next(StitchBuffer->begin(), colorIt->stitchIndex);
+		auto const maxColor = std::next(colorIt)->stitchIndex;
+		for (auto iStitch = colorIt->stitchIndex; iStitch < maxColor; ++iStitch) {
 		  if (stitch->x >= ZoomRect.left && stitch->x <= ZoomRect.right &&
 		      stitch->y >= ZoomRect.bottom && stitch->y <= ZoomRect.top) {
 			auto const distance = hypot(stitch->x - stitchPoint.x, stitch->y - stitchPoint.y);
