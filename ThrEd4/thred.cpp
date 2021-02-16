@@ -352,8 +352,8 @@ auto thred::internal::isfclp() noexcept -> bool {
 }
 
 auto thred::internal::stlen(uint32_t iStitch) -> float {
-  auto currStitch = wrap::next(StitchBuffer->begin(), iStitch);
-  auto nextStitch = std::next(currStitch);
+  auto const currStitch = wrap::next(StitchBuffer->begin(), iStitch);
+  auto const nextStitch = std::next(currStitch);
   return hypot(nextStitch->x - currStitch->x, nextStitch->y - currStitch->y);
 }
 
@@ -1167,7 +1167,7 @@ void thred::shft(fPOINT const& delta) noexcept {
 
 auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
   if (!StitchBuffer->empty()) {
-	auto current = wrap::next(StitchBuffer->begin(), iStitch);
+	auto const current = wrap::next(StitchBuffer->begin(), iStitch);
 	return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
 	              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
 	                                  (current->y - ZoomRect.bottom) * ZoomRatio.y)};
@@ -1176,7 +1176,7 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
 }
 
 void thred::internal::shft2box() {
-  auto       current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+  auto const current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
   auto const stitchPoint = fPOINT {current->x, current->y};
   thred::shft(stitchPoint);
   stch2px1(ClosestPointIndex);
@@ -4803,10 +4803,10 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
   auto       distanceToClick = BIGFLOAT;
   if (StateMap->test(StateFlag::HID)) {
 	for (auto iColor = size_t {}; iColor < thred::maxColor(); ++iColor) {
-	  auto color = wrap::next(ColorChangeTable->begin(), iColor);
+	  auto const color = wrap::next(ColorChangeTable->begin(), iColor);
 	  if (color->colorIndex == ActiveColor) {
 		auto stitch = std::next(StitchBuffer->begin(), ColorChangeTable->operator[](iColor).stitchIndex);
-		auto maxColor = std::next(color)->stitchIndex;
+		auto const maxColor = std::next(color)->stitchIndex;
 		for (auto iStitch = color->stitchIndex; iStitch < maxColor; ++iStitch) {
 		  if (stitch->x >= ZoomRect.left && stitch->x <= ZoomRect.right &&
 		      stitch->y >= ZoomRect.bottom && stitch->y <= ZoomRect.top) {
