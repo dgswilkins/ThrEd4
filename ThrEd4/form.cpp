@@ -111,16 +111,6 @@ void form::delflt(uint32_t formIndex) {
   }
 }
 
-auto form::internal::chk2of() -> bool {
-  if (!StateMap->test(StateFlag::SELBOX)) {
-	return false;
-  }
-  if (UserFlagMap->test(UserFlag::FIL2OF)) {
-	return false;
-  }
-  return true;
-}
-
 void form::internal::rotbak(float rotationAngle, fPOINT const& rotationCenter) noexcept {
   for (auto& iSequence : *OSequence) {
 	thred::rotflt(iSequence, rotationAngle, rotationCenter);
@@ -184,23 +174,6 @@ void form::chkcont() {
   form.attribute |= FRECONT;
   form.type     = FRMLINE;
   form.fillType = CONTF;
-}
-
-auto form::find1st() -> uint32_t {
-  if (fi::chk2of()) {
-	return ClosestPointIndex;
-  }
-  auto const attribute = ClosestFormToCursor << 4U;
-  auto       iStitch   = 0U;
-  for (auto& stitch : *StitchBuffer) {
-	if ((stitch.attribute & FRMSK) == attribute) {
-	  if ((stitch.attribute & NOTFRM) == 0U) {
-		break;
-	  }
-	}
-	++iStitch;
-  }
-  return iStitch;
 }
 
 void form::ispcdclp() {

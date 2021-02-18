@@ -91,7 +91,6 @@ void filinsb(fPOINT const& point, fPOINT& stitchPoint);
 auto filinu(fPOINT const& inPoint, fPOINT const& stitchPoint) -> fPOINT;
 void filsat();
 void filvrt();
-auto find1st() -> uint32_t;
 void fliph();
 void flipv();
 void flpord();
@@ -206,7 +205,6 @@ namespace internal {
               boost::dynamic_bitset<>&      sequenceMap,
               uint32_t&                     lastGroup,
               SMALPNTL*                     sequenceLines);
-  auto chk2of() -> bool;
   void chkbrd(FRMHED const& form);
   void chksid(FRMHED const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<fPOINT> const& currentFormVertices);
   auto closat(intersectionStyles& inOutFlag) -> bool;

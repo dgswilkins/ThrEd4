@@ -125,6 +125,7 @@ namespace internal {
   void bsavmen();
   auto centr() noexcept -> fPOINT;
   void chk1col();
+  auto chk2of() -> bool;
   auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, fPOINT& rotationCenter, FRMHED& textureForm)
       -> bool;
   auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
@@ -224,6 +225,7 @@ namespace internal {
   void fil2sel(uint32_t stat);
   void filclos();
   void filfrms();
+  auto find1st()->uint32_t;
   auto finrng(uint32_t find) noexcept -> bool;
   void fixpclp(uint32_t closestFormToCursor);
   void fnamtabs();

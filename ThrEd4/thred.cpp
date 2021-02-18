@@ -2290,12 +2290,30 @@ void thred::internal::lenCalc() {
   }
 }
 
+auto thred::internal::chk2of() -> bool {
+  if (!StateMap->test(StateFlag::SELBOX)) {
+	return false;
+  }
+  if (UserFlagMap->test(UserFlag::FIL2OF)) {
+	return false;
+  }
+  return true;
+}
+
+
+auto thred::internal::find1st() -> uint32_t {
+  if (thi::chk2of()) {
+	return ClosestPointIndex;
+  }
+  return thred::findFirstStitch(ClosestFormToCursor);
+}
+
 void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
   auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
   auto       stitchSize = BIGFLOAT; // to ensure that it is larger than SmallStitchLength first time through
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto iPrevStitch = form::find1st();
+	auto iPrevStitch = thi::find1st();
 	auto iStitch     = iPrevStitch + 1U;
 	auto lastStitch  = StitchBuffer->size();
 	if (!StitchBuffer->empty()) { // find the first small stitch in the selected form
