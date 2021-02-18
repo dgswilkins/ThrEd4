@@ -2765,15 +2765,15 @@ void thred::internal::duar(POINT const& stitchCoordsInPixels) {
 
 void thred::internal::dubox(POINT const& stitchCoordsInPixels) {
   if (!StitchBuffer->empty()) {
-	auto const& stitch = StitchBuffer->operator[](ClosestPointIndex);
+	auto const stitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	if (ClosestPointIndex != (StitchBuffer->size() - 1U)) {
 	  // if the selected point is not at the end then aim at the next point
-	  auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-	  RotateAngle            = atan2f(stitchFwd1.y - stitch.y, stitchFwd1.x - stitch.x);
+	  auto const stitchFwd1 = std::next(stitch);
+	  RotateAngle            = atan2f(stitchFwd1->y - stitch->y, stitchFwd1->x - stitch->x);
 	}
 	else { // otherwise aim in the same direction
-	  auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
-	  RotateAngle            = atan2f(stitch.y - stitchBck1.y, stitch.x - stitchBck1.x);
+	  auto const stitchBck1 = std::next(stitch, -1);
+	  RotateAngle            = atan2f(stitch->y - stitchBck1->y, stitch->x - stitchBck1->x);
 	}
 	duar(stitchCoordsInPixels);
 	StateMap->reset(StateFlag::ELIN);
@@ -4865,12 +4865,12 @@ auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
 
 auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
   auto const formFirstStitch =
-	std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](fPOINTATTR const& m) -> bool {
-	if ((m.attribute & NOTFRM) != 0U) {
-	  return false;
-	}
-	return ((m.attribute & FRMSK) >> FRMSHFT) == form;
-	  });
+      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](fPOINTATTR const& m) -> bool {
+	    if ((m.attribute & NOTFRM) != 0U) {
+	      return false;
+	    }
+	    return ((m.attribute & FRMSK) >> FRMSHFT) == form;
+      });
   if (formFirstStitch != StitchBuffer->end()) {
 	return wrap::toUnsigned(std::distance(StitchBuffer->begin(), formFirstStitch));
   }
@@ -5181,13 +5181,13 @@ void thred::internal::istch() {
   xlin1();
   if (StateMap->test(StateFlag::SELBOX)) {
 	if ((ClosestPointIndex != 0U) && ClosestPointIndex != wrap::toUnsigned(StitchBuffer->size() - 1U)) {
+	  auto const prvStitch   = wrap::next(StitchBuffer->begin(), ClosestPointIndex - 1U);
+	  auto const stitch      = std::next(prvStitch);
+	  auto const angb        = atan2(stitch->y - prvStitch->y, stitch->x - prvStitch->x);
 	  auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-	  auto& stitch           = StitchBuffer->operator[](ClosestPointIndex);
-	  auto& prvStitch        = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) - 1U);
-	  auto& nxtStitch        = StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U);
-	  auto const angt        = atan2(stitch.y - stitchPoint.y, stitch.x - stitchPoint.x);
-	  auto const angb        = atan2(stitch.y - prvStitch.y, stitch.x - prvStitch.x);
-	  auto const angf        = atan2(stitch.y - nxtStitch.y, stitch.x - nxtStitch.x);
+	  auto const angt        = atan2(stitch->y - stitchPoint.y, stitch->x - stitchPoint.x);
+	  auto const nxtStitch   = std::next(stitch);
+	  auto const angf        = atan2(stitch->y - nxtStitch->y, stitch->x - nxtStitch->x);
 	  if (fabs(angf - angt) > fabs(angb - angt)) {
 		--ClosestPointIndex;
 	  }
@@ -5237,7 +5237,8 @@ void thred::internal::selCol() {
 	}
 	GroupStitchIndex  = iStitch;
 	ClosestPointIndex = iStitch;
-	auto const color = gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](iStitch).attribute & COLMSK);
+	auto stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
+	auto const color = gsl::narrow_cast<uint8_t>(stitchIt->attribute & COLMSK);
 	while ((ClosestPointIndex != 0U) &&
 	       gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
 	  --ClosestPointIndex;
