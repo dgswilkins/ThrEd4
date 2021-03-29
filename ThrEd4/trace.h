@@ -11,6 +11,9 @@
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
+// Local Headers
+#include "switches.h"
+
 namespace trace {
 
 void blak();
