@@ -14,9 +14,9 @@ clang-analyzer-security*,\
 clang-analyzer-unix*,\
 clang-analyzer-valist*,\
 clang-diagnostic-*,-clang-diagnostic-nonportable-system-include-path,\
-google-*,\
+google-*,-google-runtime-references,\
 hicpp-*,-hicpp-avoid-c-arrays,\
-llvm-*,-llvm-include-order,-llvm-qualified-auto,\
+llvm-*,-llvm-include-order,-llvm-qualified-auto,-llvm-header-guard,\
 misc-*,-misc-non-private-member-variables-in-classes,\
 modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
