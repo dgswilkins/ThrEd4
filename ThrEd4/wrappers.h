@@ -83,7 +83,7 @@ template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
 }
 
-template <class outType, class inIt> auto distance(inIt start, inIt end) noexcept -> outType {
+template <class outType, class inIt> auto distance(inIt start, inIt end) -> outType {
   return gsl::narrow<outType>(std::distance(start, end));
 }
 
@@ -128,6 +128,7 @@ void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;
+// NOLINTNEXTLINE(google-runtime-int)
 auto toFloat(unsigned long invar) noexcept -> float;
 auto toFloat(uint32_t invar) noexcept -> float;
 #ifdef _WIN64
@@ -135,6 +136,7 @@ auto toFloat(size_t invar) noexcept -> float;
 #endif
 auto toFloat(int16_t invar) noexcept -> float;
 auto toSize(int32_t invar) -> size_t;
+// NOLINTNEXTLINE(google-runtime-int)
 auto toSize(long invar) -> size_t;
 #ifdef _WIN64
 auto toSize(ptrdiff_t invar) noexcept -> size_t;
@@ -154,6 +156,7 @@ auto toSize(uintmax_t invar) -> size_t;
 auto toUnsigned(float invar) -> uint32_t;
 auto toUnsigned(size_t invar) -> uint32_t;
 auto toUnsigned(int invar) -> uint32_t;
+// NOLINTNEXTLINE(google-runtime-int)
 auto toUnsigned(long invar) -> uint32_t;
 #ifdef _WIN64
 auto toUnsigned(ptrdiff_t invar) -> uint32_t;
