@@ -43,7 +43,7 @@ inline auto Utf8ToUtf16(std::string const& utf8) -> std::wstring {
 
   // handle the special case of empty input string
   if (utf8.empty()) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-vararg)
 	_ASSERTE(utf16.empty());
 	return utf16;
   }
@@ -57,7 +57,7 @@ inline auto Utf16ToUtf8(std::wstring const& utf16) -> std::string {
   std::string utf8;
 
   if (utf16.empty()) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-vararg)
 	_ASSERTE(utf8.empty());
 	return utf8;
   }
