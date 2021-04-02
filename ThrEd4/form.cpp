@@ -1503,17 +1503,17 @@ auto form::cisin(FRMHED const& form, float xCoordinate, float yCoordinate) -> bo
 	auto const itNextVertex = wrap::next(itVertex, nxt(form, iVertex));
 	if (fi::projv(xCoordinate, *itThisVertex, *itNextVertex, intersection)) {
 	  if (intersection.y >= yCoordinate) {
-		if (itThisVertex->x != xCoordinate && itNextVertex->x != xCoordinate) {
+		if (!util::closeEnough(itThisVertex->x, xCoordinate) && !util::closeEnough(itNextVertex->x, xCoordinate)) {
 		  ++count;
 		}
 		else {
 		  if (itThisVertex->x < itNextVertex->x) {
-			if (itNextVertex->x != xCoordinate) {
+			if (!util::closeEnough(itNextVertex->x, xCoordinate)) {
 			  ++count;
 			}
 		  }
 		  else {
-			if (itThisVertex->x != xCoordinate) {
+			if (!util::closeEnough(itThisVertex->x, xCoordinate)) {
 			  ++count;
 			}
 		  }
@@ -2670,17 +2670,17 @@ auto form::internal::isin(FRMHED const&              form,
 	auto const itEndVertex   = wrap::next(currentFormVertices.cbegin(), form::nxt(form, iVertex));
 	if (projv(xCoordinate, *itStartVertex, *itEndVertex, point)) {
 	  if (point.y > yCoordinate) {
-		if (itStartVertex->x != xCoordinate && itEndVertex->x != xCoordinate) {
+		if (!util::closeEnough(itStartVertex->x, xCoordinate) && !util::closeEnough(itEndVertex->x, xCoordinate)) {
 		  ++count;
 		}
 		else {
 		  if (itStartVertex->x < itEndVertex->x) {
-			if (itEndVertex->x != xCoordinate) {
+			if (!util::closeEnough(itEndVertex->x, xCoordinate)) {
 			  ++count;
 			}
 		  }
 		  else {
-			if (itStartVertex->x != xCoordinate) {
+			if (!util::closeEnough(itStartVertex->x, xCoordinate)) {
 			  ++count;
 			}
 		  }
@@ -2725,7 +2725,7 @@ auto form::internal::isect(uint32_t                   vertex0,
 	  if (delta.x != 0.0F) {
 		flag = projh(lineSegmentStart.y, *itVertexZero, *itVertexOne, tempIntersection);
 	  }
-	  else if (itVertexZero->y == lineSegmentStart.y && itVertexOne->y == lineSegmentStart.y) {
+	  else if (util::closeEnough(itVertexZero->y, lineSegmentStart.y) && util::closeEnough(itVertexOne->y, lineSegmentStart.y)) {
 		auto left  = itVertexZero->x;
 		auto right = itVertexOne->x;
 		if (itVertexZero->x > itVertexOne->x) {
@@ -2983,10 +2983,9 @@ auto form::internal::nucseg(std::vector<CLPSEG> const&  clipSegments,
 }
 
 auto form::internal::vscmp(uint32_t index1, uint32_t index2) noexcept -> bool {
-  if (OSequence->operator[](index1).x != OSequence->operator[](index2).x) {
-	return true;
-  }
-  return OSequence->operator[](index1).y != OSequence->operator[](index2).y;
+  return util::closeEnough(OSequence->operator[](index1).x, OSequence->operator[](index2).x)
+             ? !util::closeEnough(OSequence->operator[](index1).y, OSequence->operator[](index2).y)
+             : true;
 }
 
 void form::internal::clpcon(FRMHED& form, std::vector<RNGCNT> const& textureSegments, std::vector<fPOINT>& currentFormVertices) {
@@ -3884,7 +3883,7 @@ void form::internal::dunseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t 
 	  minimumY = deltaY;
 	}
   }
-  if (minimumY == BIGFLOAT) {
+  if (util::closeEnough(minimumY, BIGFLOAT)) {
 	minimumY = 0.0F;
   }
   else {
@@ -5405,7 +5404,7 @@ auto form::internal::closat(intersectionStyles& inOutFlag) -> bool {
 	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", inOutFlag);
 	}
   }
-  return minimumLength != BIGFLOAT;
+  return !util::closeEnough(minimumLength, BIGFLOAT);
 }
 
 void form::internal::nufpnt(uint32_t vertex, FRMHED& form, fPOINT const& stitchPoint) {
@@ -6363,15 +6362,15 @@ void form::dubold() {
 }
 
 void form::sethup() noexcept {
-  if (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY) {
+  if (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY)) {
 	IniFile.hoopType = LARGHUP;
 	return;
   }
-  if (IniFile.hoopSizeX == SHUPX && IniFile.hoopSizeY == SHUPY) {
+  if (util::closeEnough(IniFile.hoopSizeX, SHUPX) && util::closeEnough(IniFile.hoopSizeY, SHUPY)) {
 	IniFile.hoopType = SMALHUP;
 	return;
   }
-  if (IniFile.hoopSizeX == HUP100XY && IniFile.hoopSizeY == HUP100XY) {
+  if (util::closeEnough(IniFile.hoopSizeX, HUP100XY) && util::closeEnough(IniFile.hoopSizeY, HUP100XY)) {
 	IniFile.hoopType = HUP100;
 	return;
   }
@@ -8157,7 +8156,7 @@ auto form::internal::bean(uint32_t start, uint32_t finish) -> uint32_t {
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
 	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
-	if (stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) {
+	if (!util::closeEnough(stitchFwd2.x, stitch.x) || !util::closeEnough(stitchFwd2.y, stitch.y)) {
 	  highStitchBuffer.push_back(stitchFwd1);
 	  highStitchBuffer.push_back(stitch);
 	  beanCount += 2U;
@@ -8170,8 +8169,8 @@ auto form::internal::bean(uint32_t start, uint32_t finish) -> uint32_t {
 	auto const& stitchFwd2  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	auto const& stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
 	highStitchBuffer.push_back(stitch);
-	if ((stitchFwd2.x != stitch.x || stitchFwd2.y != stitch.y) &&
-	    (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y)) {
+	if ((!util::closeEnough(stitchFwd2.x, stitch.x) || !util::closeEnough(stitchFwd2.y, stitch.y)) &&
+	    (!util::closeEnough(stitchBack2.x, stitch.x) || !util::closeEnough(stitchBack2.y, stitch.y))) {
 	  highStitchBuffer.push_back(stitchFwd1);
 	  highStitchBuffer.push_back(stitch);
 	  beanCount += 2U;
@@ -8182,7 +8181,7 @@ auto form::internal::bean(uint32_t start, uint32_t finish) -> uint32_t {
   auto const& stitchFwd1  = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 1U);
   auto const& stitchBack2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) - 2U);
   highStitchBuffer.push_back(stitch);
-  if (stitchBack2.x != stitch.x || stitchBack2.y != stitch.y) {
+  if (!util::closeEnough(stitchBack2.x, stitch.x) || !util::closeEnough(stitchBack2.y, stitch.y)) {
 	highStitchBuffer.push_back(stitchFwd1);
 	highStitchBuffer.push_back(stitch);
 	beanCount += 2U;
@@ -8233,7 +8232,7 @@ void form::internal::unbean(uint32_t start, uint32_t& finish) {
 	auto const& stitch     = StitchBuffer->operator[](iSourceStitch);
 	auto const& stitchFwd2 = StitchBuffer->operator[](wrap::toSize(iSourceStitch) + 2U);
 	highStitchBuffer.push_back(stitch);
-	if (stitch.x == stitchFwd2.x && stitch.y == stitchFwd2.y) {
+	if (util::closeEnough(stitch.x, stitchFwd2.x) && util::closeEnough(stitch.y, stitchFwd2.y)) {
 	  iSourceStitch += 2;
 	}
   }

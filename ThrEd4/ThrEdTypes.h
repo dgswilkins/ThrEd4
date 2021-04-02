@@ -28,6 +28,20 @@ void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&
 #define outDebugString(X, ...)
 #endif
 
+namespace util {
+auto constexpr closeEnough(float f1, float f2) -> bool {
+  // test if the floats are so close together that they can be considered equal
+  auto const val = (f1 > f2) ? (f1 - f2) : (f2 - f1);
+  return (val < FLT_EPSILON);
+}
+
+auto constexpr closeEnough(double d1, double d2) -> bool {
+  // test if the floats are so close together that they can be considered equal
+  auto const val = (d1 > d2) ? (d1 - d2) : (d2 - d1);
+  return (val < DBL_EPSILON);
+}
+} // namespace util
+
 constexpr auto RES_SIZE = 26;            // reserved for expansion in the ThrEd v1.0 header
 constexpr auto NAME_LEN = 50;            // Length of the name fields in ThrEd headers
 constexpr auto COLORCNT = uint8_t {16U}; // Number of colors in arrays
@@ -1145,7 +1159,7 @@ inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rh
 }
 
 inline constexpr auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
-  return (x == rhs.x) && (y == rhs.y);
+  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
 inline constexpr fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
@@ -1216,7 +1230,7 @@ inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept :
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool {
-  return (x == rhs.x) && (y == rhs.y);
+  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
 inline auto dPOINT::operator=(fPOINT const& rhs) noexcept -> dPOINT& {

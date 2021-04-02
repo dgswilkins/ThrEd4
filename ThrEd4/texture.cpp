@@ -224,20 +224,20 @@ auto texture::internal::chktxh(_In_ TXHST const& historyItem) -> bool {
   if (historyItem.texturePoints.size() != TempTexturePoints->size()) {
 	return true;
   }
-  if (historyItem.height != TextureScreen.areaHeight) {
+  if (!util::closeEnough(historyItem.height, TextureScreen.areaHeight)) {
 	return true;
   }
-  if (historyItem.spacing != TextureScreen.spacing) {
+  if (!util::closeEnough(historyItem.spacing, TextureScreen.spacing)) {
 	return true;
   }
-  if (historyItem.width != TextureScreen.width) {
+  if (!util::closeEnough(historyItem.width, TextureScreen.width)) {
 	return true;
   }
   for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
 	if (TempTexturePoints->operator[](iPoint).line != historyItem.texturePoints[iPoint].line) {
 	  return true;
 	}
-	if (TempTexturePoints->operator[](iPoint).y != historyItem.texturePoints[iPoint].y) {
+	if (!util::closeEnough(TempTexturePoints->operator[](iPoint).y, historyItem.texturePoints[iPoint].y)) {
 	  return true;
 	}
   }

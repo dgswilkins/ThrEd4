@@ -2157,7 +2157,7 @@ void thred::internal::rstAll() {
   trace::untrace();
   StateMap->reset(StateFlag::WASEDG);
   displayText::butxt(HUPTO, displayText::loadStr(IDS_UPOF));
-  if (ZoomFactor == 1) {
+  if (util::closeEnough(ZoomFactor, 1.0F)) {
 	StateMap->reset(StateFlag::ZUMED);
   }
   thred::movStch();
@@ -2584,11 +2584,11 @@ void thred::selRct(fRECTANGLE& sourceRect) {
 	  ++stitch;
 	}
   }
-  if (sourceRect.right - sourceRect.left == 0) {
+  if (util::closeEnough(sourceRect.right, sourceRect.left)) {
 	++sourceRect.right;
 	--sourceRect.left;
   }
-  if (sourceRect.top - sourceRect.bottom == 0) {
+  if (util::closeEnough(sourceRect.top, sourceRect.bottom)) {
 	++sourceRect.top;
 	--sourceRect.bottom;
   }
@@ -4856,7 +4856,7 @@ auto thred::internal::closPnt1(uint32_t& closestStitch) -> bool {
 	  ++currentStitch;
 	}
   }
-  if (distanceToClick == BIGFLOAT) {
+  if (util::closeEnough(distanceToClick, BIGFLOAT)) {
 	return false;
   }
   stch2px(closestIndex, stitchCoordsInPixels);
@@ -5255,7 +5255,7 @@ void thred::internal::selCol() {
 	}
 	GroupStitchIndex  = iStitch;
 	ClosestPointIndex = iStitch;
-	auto stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
+	auto const stitchIt = wrap::next(StitchBuffer->begin(), iStitch);
 	auto const color = gsl::narrow_cast<uint8_t>(stitchIt->attribute & COLMSK);
 	while ((ClosestPointIndex != 0U) &&
 	       gsl::narrow_cast<uint8_t>(StitchBuffer->operator[](ClosestPointIndex).attribute & COLMSK) == color) {
@@ -6197,9 +6197,10 @@ void thred::internal::unpat() {
 }
 
 auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
-  return (StitchBuffer->operator[](iStitchA).x != StitchBuffer->operator[](iStitchB).x)
-             ? false
-             : StitchBuffer->operator[](iStitchA).y == StitchBuffer->operator[](iStitchB).y;
+  return util::closeEnough(StitchBuffer->operator[](iStitchA).x, StitchBuffer->operator[](iStitchB).x)
+             ? util::closeEnough(StitchBuffer->operator[](iStitchA).y,
+                                 StitchBuffer->operator[](iStitchB).y)
+             : false;
 }
 
 void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
@@ -8141,7 +8142,7 @@ void thred::internal::longer() {
 	auto const& stitch     = StitchBuffer->operator[](iStitch);
 	auto const& stitchFwd1 = StitchBuffer->operator[](wrap::toSize(iStitch) + 1U);
 	auto const length      = hypot(stitchFwd1.x - stitch.x, stitchFwd1.y - stitch.y);
-	if (length == currentLength) {
+	if (util::closeEnough(length, currentLength)) {
 	  flag = false;
 	  break;
 	}
@@ -8157,7 +8158,7 @@ void thred::internal::longer() {
 		iStitch       = currentStitch;
 	  }
 	}
-	if (minimumLength == BIGFLOAT) {
+	if (util::closeEnough(minimumLength, BIGFLOAT)) {
 	  return;
 	}
   }
@@ -8179,7 +8180,7 @@ void thred::internal::shorter() {
 	auto const& stitch     = StitchBuffer->operator[](currentStitch);
 	auto const& stitchBck1 = StitchBuffer->operator[](wrap::toSize(currentStitch) - 1U);
 	auto const length      = hypot(stitch.x - stitchBck1.x, stitch.y - stitchBck1.y);
-	if (length == currentLength) {
+	if (util::closeEnough(length, currentLength)) {
 	  --currentStitch;
 	  flag = false;
 	  break;

@@ -555,8 +555,8 @@ auto xt::internal::gucon(FRMHED const&            form,
   auto iStitch = destination;
   while (startVertex != endVertex) {
 	if (iStitch != 0U) {
-	  if (buffer[iStitch - 1U].x != indentedPoint[startVertex].x ||
-	      buffer[iStitch - 1U].y != indentedPoint[startVertex].y) {
+	  if (!util::closeEnough(buffer[iStitch - 1U].x, indentedPoint[startVertex].x) ||
+	      !util::closeEnough(buffer[iStitch - 1U].y, indentedPoint[startVertex].y)) {
 		buffer.emplace_back(fPOINTATTR {indentedPoint[startVertex].x, indentedPoint[startVertex].y, code});
 		++iStitch;
 	  }
@@ -1400,7 +1400,7 @@ void xt::internal::duint(FRMHED const& form, std::vector<fPOINTATTR>& buffer, ui
        ++iSequence) {
 	if (ilData.output > 0) {
 	  auto& interleave = InterleaveSequence->operator[](iSequence);
-	  if (interleave.x != buffer[ilData.output - 1U].x || interleave.y != buffer[ilData.output - 1U].y) {
+	  if (!util::closeEnough(interleave.x, buffer[ilData.output - 1U].x) || !util::closeEnough(interleave.y, buffer[ilData.output - 1U].y)) {
 		buffer.emplace_back(fPOINTATTR {interleave.x, interleave.y, code});
 		++(ilData.output);
 	  }
@@ -1548,7 +1548,7 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 		if (ilData.output > 0) {
 		  auto& interleave = InterleaveSequence->operator[](index);
 		  auto& stitch     = StitchBuffer->operator[](ilData.output - 1U);
-		  if (interleave.x != stitch.x || interleave.y != stitch.y) {
+		  if (!util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
 			StitchBuffer->push_back({interleave.x, interleave.y, code});
 			++(ilData.output);
 		  }
@@ -2361,7 +2361,7 @@ auto xt::internal::chkasp(fPOINT& point, float aspectRatio, HWND dialog) -> bool
   point.x = getstxt(IDC_DESWID, dialog);
   point.y = getstxt(IDC_DESHI, dialog);
   // ToDo - should this have a range? aspectRatio +/- %
-  return (point.y / point.x) == aspectRatio;
+  return util::closeEnough((point.y / point.x), aspectRatio);
 }
 
 auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {

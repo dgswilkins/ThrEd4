@@ -249,8 +249,9 @@ auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 	displayText::tabmsg(IDS_PFAF2L);
 	return true;
   }
-  auto const largeFlag = (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
-                         (IniFile.hoopSizeX == LHUPX && IniFile.hoopSizeY == LHUPY);
+  auto const largeFlag =
+      (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
+      (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
   auto const hoopSize = largeFlag ? largeHoop : smallHoop;
 #pragma warning(suppress : 26812) // enum type is unscoped
   PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP;
