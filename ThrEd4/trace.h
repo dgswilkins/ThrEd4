@@ -42,7 +42,7 @@ namespace internal {
   void dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
   auto ducolm() -> uint32_t;
   void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
-  void dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept;
+  void dutdif(TRCPNT& traceDiff, TRCPNT const* point);
   void dutrac();
   void dutrnum0(uint32_t color);
   void hidwnd(HWND hwnd) noexcept;

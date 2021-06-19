@@ -609,10 +609,10 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
            CurrentTracePoint.y == tracedPoints[0].y);
 }
 
-void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) noexcept {
+void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) {
   if (point != nullptr) {
-	traceDiff.x = point[1].x - point[0].x;
-	traceDiff.y = point[1].y - point[0].y;
+	wrap::narrow(traceDiff.x, point[1].x - point[0].x);
+	wrap::narrow(traceDiff.y , point[1].y - point[0].y);
   }
 }
 
