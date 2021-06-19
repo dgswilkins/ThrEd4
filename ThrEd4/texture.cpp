@@ -81,7 +81,7 @@ void texture::txdun() {
 	  auto bytesWritten = DWORD {};
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	  if (handle != INVALID_HANDLE_VALUE) {
 		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
@@ -141,7 +141,7 @@ void texture::redtx() {
   if (txi::txnam(name)) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const handle = CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {};
 	  auto sig       = std::array<char, 4> {};
