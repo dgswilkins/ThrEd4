@@ -224,7 +224,7 @@ void form::frmout(uint32_t formIndex) {
 
 auto form::sfCor2px(fPOINT const& stitchPoint) -> POINT {
   return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     (stitchPoint.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
@@ -245,12 +245,12 @@ void form::frmlin(FRMHED const& form) {
 	auto       itCurrentVertex = itFirstVertex;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	  formLines.push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
-	                             std::lround(StitchWindowClientRect.bottom -
+	                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                         (itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
 	  ++itCurrentVertex;
 	}
 	formLines.push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
-	                           std::lround(StitchWindowClientRect.bottom -
+	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                       (itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
   }
 }
@@ -264,12 +264,12 @@ void form::frmlin(std::vector<fPOINT> const& vertices) {
 	formLines.reserve(vertexMax);
 	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 	  formLines.push_back(POINT {std::lround((vertices[iVertex].x - ZoomRect.left) * ZoomRatio.x),
-	                             std::lround(StitchWindowClientRect.bottom -
+	                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                         (vertices[iVertex].y - ZoomRect.bottom) * ZoomRatio.y)});
 	}
 	formLines.push_back(POINT {
 	    std::lround((vertices[0].x - ZoomRect.left) * ZoomRatio.x),
-	    std::lround(StitchWindowClientRect.bottom - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y)});
+	    std::lround(wrap::toFloat(StitchWindowClientRect.bottom) - (vertices[0].y - ZoomRect.bottom) * ZoomRatio.y)});
   }
 }
 
@@ -569,10 +569,10 @@ void form::unpsel() {
 
 auto form::sRct2px(fRECTANGLE const& stitchRect) -> RECT {
   return RECT {wrap::ceil<int32_t>((stitchRect.left - ZoomRect.left) * ZoomRatio.x),
-               wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
+               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                    (stitchRect.top - ZoomRect.bottom) * ZoomRatio.y),
                wrap::ceil<int32_t>((stitchRect.right - ZoomRect.left) * ZoomRatio.x),
-               wrap::ceil<int32_t>((StitchWindowClientRect.bottom) -
+               wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                    (stitchRect.bottom - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
@@ -6630,10 +6630,12 @@ void form::dueg(uint32_t sides) {
 	sides = ESIDEMIN;
   }
   form::durpoli(sides);
+  auto const halfSides = gsl::narrow<ptrdiff_t>(sides >> 1U);
+  auto const quarterSides = gsl::narrow<ptrdiff_t>(sides >> 2U);
   auto const& form      = FormList->back();
   auto        itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto const  reference = wrap::midl(itVertex[sides / 2].y, itVertex[0].y);
-  auto const  maximumY  = itVertex[sides >> 2U].y - itVertex[0].y;
+  auto const  reference = wrap::midl(itVertex[halfSides].y, itVertex[0].y);
+  auto const  maximumY  = itVertex[quarterSides].y - itVertex[0].y;
   for (uint32_t iVertex = 0; iVertex < sides; ++iVertex) {
 	if (itVertex->y < reference) {
 	  itVertex->y = reference - (reference - itVertex->y) * IniFile.eggRatio;
@@ -6641,7 +6643,7 @@ void form::dueg(uint32_t sides) {
 	++itVertex;
   }
   itVertex            = wrap::next(FormVertices->begin(), form.vertexIndex);
-  auto const eggRatio = maximumY / (itVertex[sides >> 2U].y - itVertex[0].y);
+  auto const eggRatio = maximumY / (itVertex[quarterSides].y - itVertex[0].y);
   auto const ref      = *itVertex;
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	*itVertex = fPOINT {fi::shreg(itVertex->x, ref.x, eggRatio), fi::shreg(itVertex->y, ref.y, eggRatio)};
