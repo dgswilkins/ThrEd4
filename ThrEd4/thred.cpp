@@ -271,7 +271,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto const hwnd           = GetDlgItem(hwndlg, IDC_DESED);
 		  auto       designerBuffer = std::array<wchar_t, NameOrder.size()> {};
-		  GetWindowText(hwnd, designerBuffer.data(), wrap::toUnsigned(designerBuffer.size()));
+		  GetWindowText(hwnd, designerBuffer.data(), gsl::narrow<int>(designerBuffer.size()));
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  auto const fmtStr = displayText::loadStr(IDS_THRED);
@@ -1169,7 +1169,7 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
   if (!StitchBuffer->empty()) {
 	auto const current = wrap::next(StitchBuffer->begin(), iStitch);
 	return POINT {wrap::ceil<int32_t>((current->x - ZoomRect.left) * ZoomRatio.x),
-	              wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+	              wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                  (current->y - ZoomRect.bottom) * ZoomRatio.y)};
   }
   return POINT {0L, StitchWindowClientRect.bottom};
@@ -2507,7 +2507,7 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
 	auto stitch = wrap::next(StitchBuffer->begin(), start);
 	for (auto iStitch = start; iStitch <= end; ++iStitch) {
 	  SearchLine->push_back(POINT {wrap::ceil<int32_t>(((stitch->x - ZoomRect.left) * ZoomRatio.x)),
-	                               wrap::ceil<int32_t>((StitchWindowClientRect.bottom -
+	                               wrap::ceil<int32_t>((wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                                    (stitch->y - ZoomRect.bottom) * ZoomRatio.y))});
 	  ++stitch;
 	}
@@ -2814,7 +2814,7 @@ auto thred::internal::stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> 
 auto thred::internal::stch2px2(uint32_t iStitch) -> bool {
   auto const stitchCoordsInPixels =
       POINT {wrap::ceil<int32_t>((StitchBuffer->operator[](iStitch).x - ZoomRect.left) * ZoomRatio.x),
-             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+             wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                  (StitchBuffer->operator[](iStitch).y - ZoomRect.bottom) * ZoomRatio.y)};
   return stitchCoordsInPixels.x >= 0 && stitchCoordsInPixels.x <= StitchWindowClientRect.right &&
          stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
@@ -2822,7 +2822,7 @@ auto thred::internal::stch2px2(uint32_t iStitch) -> bool {
 
 auto thred::stch2pxr(fPOINT const& stitchCoordinate) -> POINT {
   return POINT {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
-                wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
+                wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
@@ -5407,8 +5407,8 @@ void thred::internal::clpbox() {
       SIZE {wrap::ceil<int32_t>(ClipRectSize.cx * ratio), wrap::ceil<int32_t>(ClipRectSize.cy * ratio)};
   auto const stitchCoordsInPixels =
       POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ratio),
-             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                 (stitchPoint.y - ZoomRect.bottom) * ratio - adjustedSize.cy)};
+             wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                 (stitchPoint.y - ZoomRect.bottom) * ratio - wrap::toFloat(adjustedSize.cy))};
   ClipInsertBoxLine[0].x = ClipInsertBoxLine[3].x = ClipInsertBoxLine[4].x = stitchCoordsInPixels.x;
   ClipInsertBoxLine[0].y = ClipInsertBoxLine[1].y = ClipInsertBoxLine[4].y = stitchCoordsInPixels.y;
   ClipInsertBoxLine[1].x = ClipInsertBoxLine[2].x = ClipInsertBoxLine[0].x + adjustedSize.cx;
@@ -5437,8 +5437,8 @@ void thred::internal::lodclp(uint32_t iStitch) {
 
 void thred::internal::rSelbox() {
   auto const ratio = wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left);
-  auto const adjustedSelectSize = SIZE {gsl::narrow_cast<int32_t>(lround(SelectBoxSize.cx * ratio)),
-                                        gsl::narrow_cast<int32_t>(lround(SelectBoxSize.cy * ratio))};
+  auto const adjustedSelectSize = SIZE {gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cx) * ratio)),
+                                        gsl::narrow_cast<int32_t>(lround(wrap::toFloat(SelectBoxSize.cy) * ratio))};
   unsel();
   auto stitchPoint = thred::pxCor2stch(Msg.pt);
   if (stitchPoint.x - wrap::toFloat(SelectBoxOffset.x + SelectBoxSize.cx) >=
@@ -5456,10 +5456,10 @@ void thred::internal::rSelbox() {
 	stitchPoint.y = wrap::toFloat(SelectBoxOffset.y);
   }
   auto const stitchCoordsInPixels =
-      POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - SelectBoxOffset.x) * ratio),
-             wrap::ceil<int32_t>(StitchWindowClientRect.bottom -
-                                 (stitchPoint.y - ZoomRect.bottom - SelectBoxOffset.y) * ratio -
-                                 adjustedSelectSize.cy)};
+      POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left - wrap::toFloat(SelectBoxOffset.x)) * ratio),
+             wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
+                                 (stitchPoint.y - ZoomRect.bottom - wrap::toFloat(SelectBoxOffset.y)) * ratio -
+			   wrap::toFloat(adjustedSelectSize.cy))};
   auto& formControls = *FormControlPoints;
   formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x =
       stitchCoordsInPixels.x;
