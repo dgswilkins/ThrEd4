@@ -705,8 +705,8 @@ void texture::txtrup() {
 	offset.y -= SelectTexturePointsOrigin.y;
 	auto const Xmagnitude = abs(offset.x);
 	auto       textureOffset =
-	    TXOFF {wrap::toFloat(-offset.y) / TextureScreen.height * TextureScreen.areaHeight,
-	           wrap::ceil<int32_t>(Xmagnitude * TextureScreen.editToPixelRatio / TextureScreen.spacing)};
+	    TXOFF {wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
+	           wrap::ceil<int32_t>(wrap::toFloat(Xmagnitude) * TextureScreen.editToPixelRatio / TextureScreen.spacing)};
 	if (offset.x < 0) {
 	  textureOffset.line = -textureOffset.line;
 	}
