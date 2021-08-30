@@ -114,10 +114,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
   StitchBuffer->clear();
   StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
-  constexpr auto C1MASK = 0x40U;
-  constexpr auto C0MASK = 0x80U;
   for (auto& record : DSTData) {
-	if ((record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
+	if (constexpr auto C1MASK = 0x40U;
+	    (record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
 		color                    = colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
@@ -133,8 +132,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  di::dstin(di::dtrn(&record), dstStitch);
 	  localStitch.x += wrap::toFloat(dstStitch.x);
 	  localStitch.y += wrap::toFloat(dstStitch.y);
-	  if ((record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-        auto const stitch = fPOINTATTR{ localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM };
+	  if (constexpr auto C0MASK = 0x80U;
+	      (record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
+		auto const stitch = fPOINTATTR{ localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM };
 		StitchBuffer->push_back(stitch);
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
@@ -328,8 +328,7 @@ auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 }
 
 auto DST::colmatch(COLORREF color) -> uint32_t {
-  auto const colorChanges = thred::maxColor() + 1U;
-  if (colorChanges < UserColor.size()) {
+  if (auto const colorChanges = thred::maxColor() + 1U; colorChanges < UserColor.size()) {
 	auto iUserColor = UserColor.begin();
 	for (auto iColor = 0U; iColor < colorChanges; ++iColor) {
 	  if (color == *iUserColor) {
@@ -926,8 +925,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		auto spDstHdrDesc = gsl::make_span(dstHeader.desc);
 		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
 		auto        convAuxName = utf::Utf16ToUtf8(*auxName);
-		auto const* desc        = strrchr(convAuxName.data(), '\\') + 1U;
-		if (desc != nullptr) {
+		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
 		  for (auto& iDHD : spDstHdrDesc) {
 			if ((*desc != 0) && *desc != '.') {
 			  iDHD = *desc;
@@ -972,12 +970,12 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		  flag = false;
 		  break;
 		}
-		if (FALSE == WriteFile(fileHandle,
-		                       DSTRecords.data(),
-		                       wrap::sizeofVector(DSTRecords),
-		                       &bytesWritten,
-		                       nullptr)) {
-		  displayText::riter();
+        if (FALSE == WriteFile(fileHandle,
+          DSTRecords.data(),
+          wrap::sizeofVector(DSTRecords),
+          &bytesWritten,
+          nullptr)) {
+          displayText::riter();
 		  flag = false;
 		  break;
 		}

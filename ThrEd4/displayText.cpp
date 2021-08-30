@@ -45,13 +45,12 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
-	constexpr auto NEWLINE              = 10;
 	auto           strings              = std::vector<std::wstring> {};
 	auto           iString              = 0U;
 	auto           previousStringLength = 0U;
 	auto const     sizeLim              = message.size();
 	while (iString < sizeLim) {
-	  if (message[iString] == NEWLINE) {
+	  if (constexpr auto NEWLINE = 10; message[iString] == NEWLINE) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));
 		previousStringLength = iString;
 	  }
@@ -228,8 +227,7 @@ auto displayText::filmsgs(uint32_t code) -> bool {
   if (!FormList->empty()) {
 	displayText::frm1pnt();
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  auto const& form = FormList->operator[](ClosestFormToCursor);
-	  if (form.vertexCount == 2) {
+	  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
 		  displayText::tabmsg(IDS_FRM3X);
 		  return true;

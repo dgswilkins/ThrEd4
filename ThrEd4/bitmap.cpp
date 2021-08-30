@@ -83,8 +83,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
   }
   auto bytesRead = DWORD {};
   ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
-  constexpr auto MB_SIG = 0x4D42; // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-  if (BitmapFileHeader.bfType == MB_SIG) {
+  // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+  if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType == MB_SIG) {
 	auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
 	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 	  fileHeaderSize = sizeof(BITMAPV4HEADER);
@@ -111,8 +111,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
 	  auto       bitmapWidthBytes = gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U << 2U;
-	  auto const widthOverflow    = BitmapWidth % 32;
-	  if (widthOverflow != 0U) {
+	  if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
 		bitmapWidthBytes += 4U;
 	  }
 	  auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
@@ -146,8 +145,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		}
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const deviceContext = CreateCompatibleDC(StitchWindowDC);
-	  if ((bitmap != nullptr) && (deviceContext != nullptr)) {
+	  if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC);
+	      (bitmap != nullptr) && (deviceContext != nullptr)) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
 		SelectObject(BitmapDC, hBitmapFile);
@@ -216,7 +215,7 @@ void bitmap::internal::bitlin(uint8_t const* source,
 	  }
 	}
 	if (auto const final = (gsl::narrow<uint32_t>(BitmapWidth) % CHAR_BIT)) {
-	  auto bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
+	  auto const bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
 	  for (auto bitOffset = final; bitOffset < CHAR_BIT; ++bitOffset) {
 		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
 		++destination;
@@ -228,8 +227,8 @@ void bitmap::internal::bitlin(uint8_t const* source,
 void bitmap::internal::bitsiz() {
   auto const screenAspectRatio =
       gsl::narrow<float>(UnzoomedRect.cx) / gsl::narrow<float>(UnzoomedRect.cy);
-  auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
-  if (bitmapAspectRatio > screenAspectRatio) {
+  if (auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
+      bitmapAspectRatio > screenAspectRatio) {
 	BitmapSizeinStitches.x = gsl::narrow<float>(UnzoomedRect.cx);
 	BitmapSizeinStitches.y = gsl::narrow<float>(UnzoomedRect.cx) / bitmapAspectRatio;
   }
@@ -313,8 +312,7 @@ void bitmap::savmap() {
 	  displayText::tabmsg(IDS_MAPCHG);
 	  return;
 	}
-	auto fileName = fs::path {};
-	if (bi::saveName(fileName)) {
+	if (auto fileName = fs::path {}; bi::saveName(fileName)) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  auto const hBitmap =
 	      CreateFile(fileName.wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
@@ -340,8 +338,7 @@ void bitmap::savmap() {
 
 // Move unpacked 24BPP data into packed 24BPP data
 void bitmap::internal::movmap(int cnt, uint8_t* buffer) {
-  auto* source = TraceBitmapData;
-  if (source != nullptr) {
+  if (auto* source = TraceBitmapData; source != nullptr) {
 	auto* destination = buffer;
 	for (auto i = 0; i < cnt; ++i) {
 	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
