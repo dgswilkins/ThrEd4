@@ -22,9 +22,12 @@ modernize-*,-modernize-avoid-c-arrays,\
 nullability-*,\
 performance-*,\
 portability-*,\
-readability-*,-readability-magic-numbers\
+readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity\
 "
 WarningsAsErrors:  ''
 HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
 User:              dwilkins
+CheckOptions:
+  - key:             readability-function-cognitive-complexity.Threshold
+    value:           '35'
