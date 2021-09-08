@@ -1928,11 +1928,11 @@ void form::internal::pfn(std::vector<VRCT2> const& underlayVerticalRect,
 
 void form::internal::prsmal(float width) {
   constexpr auto UFSFACT = 0.8F; // set the minimum to 80% of the underlay fill spacing
-  constexpr auto WIDFACT = 0.9F; // or 90% of the actual width
 
   auto iOutput       = 0U;
   auto minimumLength = USPAC * UFSFACT;
   if (minimumLength > width) {
+    constexpr auto WIDFACT = 0.9F; // or 90% of the actual width
 	minimumLength = width * WIDFACT;
   }
   auto iReference = 0U;
@@ -2569,7 +2569,6 @@ void form::internal::contf(FRMHED& form) {
 }
 
 void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVertices) {
-  constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
 
   if (auto const leftEdge =
           (std::min_element(currentFormVertices.begin(),
@@ -2578,6 +2577,7 @@ void form::internal::duflt(float& formOffset, std::vector<fPOINT>& currentFormVe
               ->x;
       leftEdge < ClipRectSize.cx) {
 	StateMap->set(StateFlag::WASNEG);
+	constexpr auto SAFOFFST = 0.01F; // factor to ensure that formOffset is not 0
 	formOffset = ClipRectSize.cx + fabs(leftEdge) + SAFOFFST;
 	for (auto& vertex : currentFormVertices) {
 	  vertex.x += formOffset;

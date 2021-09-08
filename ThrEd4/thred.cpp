@@ -9140,9 +9140,6 @@ constexpr auto thred::internal::byteSwap(uint32_t data) noexcept -> uint32_t {
 }
 
 void thred::internal::ritcur() {
-  constexpr auto ICONROWS = 32; // rows in the icon
-  constexpr auto BPINT    = 32; // bits in an uint32_t
-  constexpr auto ICOLMASK = 0xffffffU;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const currentCursor = GetCursor();
   if (currentCursor != nullptr) {
@@ -9160,10 +9157,12 @@ void thred::internal::ritcur() {
 	auto iIBMB      = std::next(bitmapBits.begin(), 32);
 	GetBitmapBits(iconInfo.hbmMask, gsl::narrow<LONG>(bitmapBits.size()), bitmapBits.data());
 	if (currentCursor == ArrowCursor) {
+	  constexpr auto ICONROWS = 32; // rows in the icon
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 		auto const mask          = byteSwap(*(iBMB++));
 		auto const bitmapInverse = byteSwap(*(iIBMB++));
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
+		constexpr auto BPINT         = 32; // bits in an uint32_t
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & mask) == 0U) {
 			auto const pixelColor = ((bitMask & bitmapInverse) != 0U) ? PENWHITE : PENBLK;
@@ -9174,11 +9173,14 @@ void thred::internal::ritcur() {
 	  }
 	}
 	else {
+	  constexpr auto ICONROWS = 32; // rows in the icon
 	  for (auto iRow = 0; iRow < ICONROWS; ++iRow) {
 		auto const bitmapInverse = byteSwap(*(iIBMB++));
 		auto       bitMask       = uint32_t {1U} << HBSHFT;
+		constexpr auto BPINT         = 32; // bits in an uint32_t
 		for (auto iPixel = 0; iPixel < BPINT; ++iPixel) {
 		  if ((bitMask & bitmapInverse) != 0U) {
+			constexpr auto ICOLMASK = 0xffffffU;
 			SetPixel(StitchWindowDC,
 			         cursorPosition.x + iPixel,
 			         cursorPosition.y + iRow,
@@ -14058,11 +14060,6 @@ auto thred::internal::handleNumericInput(wchar_t const& code, bool& retflag) -> 
 }
 
 auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
-  constexpr auto TOLAYER0 = 0U;
-  constexpr auto TOLAYER1 = 1U;
-  constexpr auto TOLAYER2 = 2U;
-  constexpr auto TOLAYER3 = 3U;
-  constexpr auto TOLAYER4 = 4U;
   auto           flag     = false;
   switch (wParameter) {
 	case ID_KNOTAT: { // edit / Set / Knot at Selected Stitch
@@ -14492,50 +14489,60 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LAYMOV0: { // edit / Move to Layer / 0
+	  constexpr auto TOLAYER0 = 0U;
 	  form::movlayr(TOLAYER0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV1: { // edit / Move to Layer / 1
+	  constexpr auto TOLAYER1 = 1U;
 	  form::movlayr(TOLAYER1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV2: { // edit / Move to Layer / 2
+	  constexpr auto TOLAYER2 = 2U;
 	  form::movlayr(TOLAYER2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYMOV3: { // edit / Move to Layer / 3
+	  constexpr auto TOLAYER3 = 3U;
 	  form::movlayr(TOLAYER3);
 	  break;
 	}
 	case ID_LAYMOV4: { // edit / Move to Layer / 4
+	  constexpr auto TOLAYER4 = 4U;
 	  form::movlayr(TOLAYER4);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY0: { // edit / Copy to Layer / 0
+	  constexpr auto TOLAYER0 = 0U;
 	  form::cpylayr(TOLAYER0);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY1: { // edit / Copy to Layer / 1
+	  constexpr auto TOLAYER1 = 1U;
 	  form::cpylayr(TOLAYER1);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY2: { // edit / Copy to Layer / 2
+	  constexpr auto TOLAYER2 = 2U;
 	  form::cpylayr(TOLAYER2);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY3: { // edit / Copy to Layer / 3
+	  constexpr auto TOLAYER3 = 3U;
 	  form::cpylayr(TOLAYER3);
 	  flag = true;
 	  break;
 	}
 	case ID_LAYCPY4: { // edit / Copy to Layer / 4
+	  constexpr auto TOLAYER4 = 4U;
 	  form::cpylayr(TOLAYER4);
 	  flag = true;
 	  break;
@@ -16460,13 +16467,13 @@ void thred::internal::relin() {
 }
 
 void thred::internal::dumov() {
-  constexpr auto ABPOINTS = 7U; // Number of arrow box points
   auto const     sCurr    = wrap::next(StitchBuffer->begin(), MoveAnchor);
   auto const     sNext    = std::next(sCurr);
   RotateAngle             = atan2f(sNext->y - sCurr->y, sNext->x - sCurr->x);
   if (sCurr->x >= ZoomRect.left && sCurr->x <= ZoomRect.right && sCurr->y >= ZoomRect.bottom &&
       sCurr->y <= ZoomRect.top) {
-	auto       arrowBox       = std::array<POINT, ABPOINTS> {};
+	constexpr auto ABPOINTS       = 7U; // Number of arrow box points
+	auto           arrowBox       = std::array<POINT, ABPOINTS> {};
 	auto const abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
 	arrowBox[0]               = abCenterPixels;
 	arrowBox[6]               = abCenterPixels;
@@ -16508,11 +16515,11 @@ void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
 }
 
 void thred::internal::drwknot() {
-  constexpr auto KBOFFSET = 5;  // offset of the knot box sides;
-  constexpr auto KLINELEN = 10; // length of the knot line;
   if (!UserFlagMap->test(UserFlag::KNOTOF) && (!Knots->empty()) && (!StitchBuffer->empty())) {
-	auto const kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
-	auto const kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
+	constexpr auto KBOFFSET = 5; // offset of the knot box sides;
+	auto const     kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
+	constexpr auto KLINELEN = 10; // length of the knot line;
+	auto const     kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
 	auto       point    = POINT {};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};

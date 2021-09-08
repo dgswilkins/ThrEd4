@@ -1388,8 +1388,8 @@ void satin::satout(FRMHED const& form, float satinWidth) {
 	OutsidePoints = OutsidePointList;
 	InsidePoints  = InsidePointList;
 
-	constexpr auto DEFWIDTH = 0.1F; // default satin width
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
+	  constexpr auto DEFWIDTH = 0.1F; // default satin width
 	  si::outfn(form, iVertex, iVertex + 1, DEFWIDTH);
 	}
 	auto count = 0U;

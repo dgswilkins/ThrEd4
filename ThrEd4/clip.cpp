@@ -237,12 +237,11 @@ void clip::internal::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finis
 }
 
 auto clip::internal::nupnt(float clipAngle, fPOINT& moveToCoords, fPOINT const& stitchPoint) noexcept -> bool {
-  constexpr auto ITLIMIT  = 10U;   // Iteration limit
-
   auto const sinAngle = sin(clipAngle);
   auto const cosAngle = cos(clipAngle);
   if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
       length > ClipRectSize.cx) {
+	constexpr auto ITLIMIT = 10U; // Iteration limit
 	for (auto step = 0U; step < ITLIMIT; ++step) {
 	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	  auto const delta = ClipRectSize.cx - length;
@@ -436,11 +435,11 @@ auto clip::internal::fxpnt(uint32_t                  vertexIndex,
                            fPOINT const&             stitchPoint,
                            float                     adjustedSpace,
                            uint32_t                  nextStart) -> bool {
-  constexpr auto ITLIMIT  = 10U;   // Iteration limit
 
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
   moveToCoords        = *itVertex;
   if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y); length > adjustedSpace) {
+	constexpr auto ITLIMIT = 10U; // Iteration limit
 	for (auto iGuess = 0U; iGuess < ITLIMIT; ++iGuess) {
 	  length           = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
 	  auto const delta = adjustedSpace - length;

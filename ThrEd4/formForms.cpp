@@ -887,9 +887,9 @@ void formForms::dasyfrm() {
   }
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 
-  constexpr auto HOLEMARG = 0.01F; // hole margin offset
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
 	auto ReferenceVertex = wrap::next(itVertex, fref - 1U);
+	constexpr auto HOLEMARG = 0.01F; // hole margin offset
 	ReferenceVertex->y += HOLEMARG;
 	++ReferenceVertex;
 	ReferenceVertex->y += HOLEMARG;
@@ -1161,7 +1161,6 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
-  constexpr auto WAVSIZE = 4.0F;        // wave size factor
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc))) {
 	thred::savdo();
@@ -1223,6 +1222,7 @@ void formForms::wavfrm() {
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
 	                                  FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	constexpr auto WAVSIZE         = 4.0F; // wave size factor
 	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
