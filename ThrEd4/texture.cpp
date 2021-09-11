@@ -72,7 +72,7 @@ auto texture::internal::txnam(std::wstring& name) -> bool {
 }
 
 void texture::txdun() {
-  auto signature            = std::array<char, 4> {"txh"};
+  auto const signature      = std::array<char, 4> {"txh"};
   auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
   if (!TextureHistory->operator[](0).texturePoints.empty()) {
@@ -466,7 +466,7 @@ void texture::drwtxtr() {
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
 	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
-  for (auto selectedPoint : *SelectedTexturePointsList) {
+  for (auto const selectedPoint : *SelectedTexturePointsList) {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize * 2U);
   }
@@ -726,7 +726,7 @@ void texture::txtrup() {
 	if (xCoord > 0) {
 	  textureOffset.line -= xCoord;
 	}
-	for (auto point : *SelectedTexturePointsList) {
+	for (auto const point : *SelectedTexturePointsList) {
 	  auto& texturePoint = TempTexturePoints->operator[](point);
 	  texturePoint.line += textureOffset.line;
 	  texturePoint.y += textureOffset.y;
@@ -1405,7 +1405,7 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
   if (!SelectedTexturePointsList->empty()) {
 	if (deltaY != 0.0F) {
 	  auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-	  for (auto point : *SelectedTexturePointsList) {
+	  for (auto const point : *SelectedTexturePointsList) {
 		auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
 		if (yCoord < 0.0F) {
 		  return;
@@ -1414,12 +1414,12 @@ void texture::internal::txnudg(int32_t deltaX, float deltaY) {
 		  return;
 		}
 	  }
-	  for (auto point : *SelectedTexturePointsList) {
+	  for (auto const point : *SelectedTexturePointsList) {
 		TempTexturePoints->operator[](point).y += screenDeltaY;
 	  }
 	}
 	else {
-	  for (auto point : *SelectedTexturePointsList) {
+	  for (auto const point : *SelectedTexturePointsList) {
 		auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
 		if (textureLine < 1) {
 		  return;

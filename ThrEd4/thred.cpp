@@ -492,7 +492,7 @@ void thred::internal::fnamtabs() {
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN  = NameOrder.size();
-  auto           designer = utf::Utf16ToUtf8(designerName);
+  auto const     designer = utf::Utf16ToUtf8(designerName);
   auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
@@ -653,10 +653,10 @@ void thred::coltab() {
   if (StitchBuffer->size() > 1) {
 	thred::resetColorChanges();
 	if (!StitchBuffer->empty()) {
-	  auto firstStitch = StitchBuffer->begin();
+	  auto const firstStitch = StitchBuffer->begin();
 	  firstStitch->attribute &= NCOLMSK;
 	  firstStitch->attribute |= (firstStitch + 1)->attribute & COLMSK;
-	  auto lastStitch = StitchBuffer->rbegin();
+	  auto const lastStitch = StitchBuffer->rbegin();
 	  lastStitch->attribute &= NCOLMSK;
 	  lastStitch->attribute |= (lastStitch + 1)->attribute & COLMSK;
 	  auto currentColor = StitchBuffer->front().attribute & COLMSK;
@@ -2414,7 +2414,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 void thred::internal::duzero() {
   if (!SelectedFormList->empty()) {
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  formMap.set(selectedForm);
 	}
 	StateMap->reset(StateFlag::CONTIG);
@@ -4413,7 +4413,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	WorkingFileName->assign(newFileName);
 	defNam(newFileName);
 	resetState();
-	auto       fileExt        = newFileName.extension().wstring();
+	auto const fileExt        = newFileName.extension().wstring();
 	auto const firstCharacter = tolower(fileExt[1]);
 	if (firstCharacter == 't') {
 	  {
@@ -4610,7 +4610,7 @@ void thred::internal::zumin() {
 		                     std::lround(firstRect.top),
 		                     std::lround(firstRect.right),
 		                     std::lround(firstRect.bottom)};
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto const selectedForm : (*SelectedFormList)) {
 		  auto const& rect = FormList->operator[](selectedForm).rectangle;
 		  if (rect.bottom < wrap::toFloat(SelectedFormsRect.bottom)) {
 			SelectedFormsRect.bottom = std::lround(rect.bottom);
@@ -6112,7 +6112,7 @@ void thred::internal::delsfrms(wchar_t code) {
 	  auto formIndices = std::vector<uint32_t> {};
 	  formIndices.resize(FormList->size());
 	  auto formMap = boost::dynamic_bitset<>(FormList->size());
-	  for (auto selectedForm : (*SelectedFormList)) {
+	  for (auto const selectedForm : (*SelectedFormList)) {
 		ClosestFormToCursor = selectedForm;
 		formMap.set(ClosestFormToCursor);
 		f1del(selectedForm);
@@ -6229,7 +6229,7 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
   constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
   constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
   auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
-  for (auto knot : knots) {
+  for (auto const knot : knots) {
 	ofstch(buffer, finish, knot, knotStep, knotAttribute);
   }
   if (StateMap->test(StateFlag::FILDIR)) {
@@ -6531,8 +6531,8 @@ auto thred::internal::wastch(uint32_t const& formIndex) -> bool {
 
 auto thred::internal::frmstch() -> bool {
   auto formMap = boost::dynamic_bitset<>(FormList->size());
-  for (auto form : (*SelectedFormList)) {
-	formMap.set(form);
+  for (auto const selectedForm : (*SelectedFormList)) {
+	formMap.set(selectedForm);
   }
   return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](fPOINTATTR const& m) -> bool {
 	return formMap.test((m.attribute & FRMSK) >> FRMSHFT);
@@ -7617,7 +7617,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	return;
   }
   if (StateMap->testAndReset(StateFlag::FRMSROT)) {
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
 	  auto& form     = FormList->operator[](selectedForm);
@@ -8076,7 +8076,7 @@ void thred::internal::rembig() {
 	do {
 	  if (!SelectedFormList->empty()) {
 		auto range = RANGE {};
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto const selectedForm : (*SelectedFormList)) {
 		  if (form::frmrng(selectedForm, range)) {
 			thi::makbig(range.start, range.finish);
 		  }
@@ -8564,7 +8564,7 @@ void thred::internal::rngal() {
 
 void thred::internal::nucols() {
   auto formMap = boost::dynamic_bitset<>(FormList->size());
-  for (auto selectedForm : (*SelectedFormList)) {
+  for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
 	auto& form = FormList->operator[](selectedForm);
 	if (form.fillType != 0U) {
@@ -8949,7 +8949,7 @@ void thred::internal::dumrk(float xCoord, float yCoord) {
 void thred::internal::gselrng() noexcept {
   auto const& selectedFormList = *SelectedFormList;
   SelectedFormsRange.start = SelectedFormsRange.finish = selectedFormList[0];
-  for (auto selectedForm : selectedFormList) {
+  for (auto const selectedForm : selectedFormList) {
 	if (selectedForm < SelectedFormsRange.start) {
 	  SelectedFormsRange.start = selectedForm;
 	}
@@ -9070,7 +9070,7 @@ void thred::internal::pntmrk() {
 void thred::internal::filfrms() {
   if (!SelectedFormList->empty()) {
 	thred::savdo();
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  form::refilfn();
 	}
@@ -9382,7 +9382,7 @@ void thred::internal::gsnap() {
   }
   if (!SelectedFormList->empty()) {
 	thred::savdo();
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  auto& formIter      = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
@@ -9639,7 +9639,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
   }
   if (!SelectedFormList->empty()) {
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  formMap.set(selectedForm);
 	}
 	for (auto& stitch : *StitchBuffer) {
@@ -9648,7 +9648,7 @@ void thred::internal::nudgfn(float deltaX, float deltaY) {
 		stitch.y += deltaY;
 	  }
 	}
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  auto& form = FormList->operator[](selectedForm);
 	  frmpos(form, deltaX, deltaY);
 	}
@@ -10645,7 +10645,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
-		auto thisIt = wrap::next(itVertex, iSelectedVertex);
+		auto const thisIt = wrap::next(itVertex, iSelectedVertex);
 		thisIt->x += FormMoveDelta.x;
 		thisIt->y -= FormMoveDelta.y;
 		iSelectedVertex = form::pdir(form, iSelectedVertex);
@@ -10669,7 +10669,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  }
 	  else {
 		thred::savdo();
-		for (auto selectedForm : (*SelectedFormList)) {
+		for (auto const selectedForm : (*SelectedFormList)) {
 		  form::frmadj(selectedForm);
 		}
 		form::frmsadj();
@@ -15845,7 +15845,7 @@ void thred::internal::ritloc() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (lockFile != INVALID_HANDLE_VALUE) {
 	  auto bytesWritten = DWORD {};
-	  auto value        = utf::Utf16ToUtf8(*HomeDirectory);
+	  auto const value  = utf::Utf16ToUtf8(*HomeDirectory);
 	  wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	  CloseHandle(lockFile);
 	}
@@ -16523,7 +16523,7 @@ void thred::internal::drwknot() {
 	auto       point    = POINT {};
 	auto       kOutline = std::array<POINT, SQPNTS> {};
 	auto       tLine    = std::array<POINT, LNPNTS> {};
-	for (auto knot : *Knots) {
+	for (auto const knot : *Knots) {
 	  stCor2px(StitchBuffer->operator[](knot), point);
 	  SelectObject(StitchWindowMemDC, KnotPen);
 	  SetROP2(StitchWindowMemDC, R2_XORPEN);

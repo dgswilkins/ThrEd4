@@ -638,7 +638,7 @@ auto bitmap::getrmap() -> uint32_t {
                                         0U,
                                         0U};
 
-  auto info       = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
+  auto const info       = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
   TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;

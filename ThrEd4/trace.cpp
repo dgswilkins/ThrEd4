@@ -828,9 +828,9 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto spTBD = gsl::make_span(TraceBitmapData,
+		auto const spTBD = gsl::make_span(TraceBitmapData,
 		                            wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
-		for (auto pixel : spTBD) {
+		for (auto const pixel : spTBD) {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();
 		  for (auto& iHistogramData : histogramData) {

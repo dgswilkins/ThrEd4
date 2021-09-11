@@ -675,7 +675,7 @@ void satin::satbrd() {
 	return;
   }
   if (!SelectedFormList->empty()) {
-	for (auto selectedForm : (*SelectedFormList)) {
+	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  auto& form          = FormList->operator[](selectedForm);
 	  if (UserFlagMap->test(UserFlag::BLUNT)) {
