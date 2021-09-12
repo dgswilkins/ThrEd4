@@ -580,7 +580,7 @@ void texture::internal::ritxrct() {
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
   if (!SelectedTexturePointsList->empty()) {
-	auto* texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->front());
+	auto const* texturePoint = &TempTexturePoints->operator[](SelectedTexturePointsList->front());
 	textureRect.left = textureRect.right = texturePoint->line;
 	textureRect.top = textureRect.bottom = texturePoint->y;
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(SelectedTexturePointsList->size()); ++iPoint) {
