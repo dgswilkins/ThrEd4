@@ -3472,8 +3472,8 @@ auto form::internal::isclos(SMALPNTL const* const lineEndPoint0,
   return true;
 }
 
-auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
-                            std::vector<SMALPNTL>& lineEndpoints,
+auto form::internal::lnclos(std::vector<uint32_t> const& groupIndexSequence,
+                            std::vector<SMALPNTL> const& lineEndpoints,
                             uint32_t               group0,
                             uint32_t               line0,
                             uint32_t               group1,
@@ -3510,8 +3510,8 @@ auto form::internal::lnclos(std::vector<uint32_t>& groupIndexSequence,
   return false;
 }
 
-auto form::internal::regclos(std::vector<uint32_t>&        groupIndexSequence,
-                             std::vector<SMALPNTL>&        lineEndpoints,
+auto form::internal::regclos(std::vector<uint32_t> const&  groupIndexSequence,
+                             std::vector<SMALPNTL> const&  lineEndpoints,
                              std::vector<SMALPNTL*> const& sortedLines,
                              uint32_t                      iRegion0,
                              uint32_t                      iRegion1,
@@ -3880,7 +3880,7 @@ void form::internal::duseq(std::vector<SMALPNTL*> const& sortedLines,
                            uint32_t                      finish,
                            boost::dynamic_bitset<>&      sequenceMap,
                            uint32_t&                     lastGroup,
-                           SMALPNTL*                     sequenceLines) {
+                           SMALPNTL const*               sequenceLines) {
   auto savedTopLine = sortedLines[start][1].line;
   StateMap->reset(StateFlag::SEQDUN);
   if (bool flag = false; start > finish) {
@@ -4178,7 +4178,7 @@ void form::internal::durgn(FRMHED const&                 form,
 }
 
 void form::internal::lcon(FRMHED const&          form,
-                          std::vector<uint32_t>& groupIndexSequence,
+                          std::vector<uint32_t> const& groupIndexSequence,
                           std::vector<SMALPNTL>& lineEndpoints,
                           std::vector<fPOINT>&   workingFormVertices) {
 #if BUGSEQ

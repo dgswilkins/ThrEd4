@@ -1106,7 +1106,7 @@ auto thred::internal::pxchk(float pixelSize) -> uint16_t {
   return wrap::round<uint16_t>(pixelSize);
 }
 
-void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept {
+void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR> const& stitches) noexcept {
   if (!stitches.empty()) {
 	rectangle.bottom = rectangle.top = stitches[0].y;
 	rectangle.left = rectangle.right = stitches[0].x;
@@ -4946,7 +4946,7 @@ void thred::internal::toglHid() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thred::internal::dulin(std::array<POINT, 2>& moveLine0, std::array<POINT, 2>& moveLine1) {
+void thred::internal::dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1) {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   if (moveLine0[0].x == moveLine1[1].x && moveLine0[0].y == moveLine1[1].y) {
@@ -7700,14 +7700,14 @@ auto thred::internal::iselpnt() noexcept -> bool {
   return false;
 }
 
-void thred::strtchbox(std::vector<POINT>& stretchBoxLine) {
+void thred::strtchbox(std::vector<POINT> const& stretchBoxLine) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   wrap::Polyline(StitchWindowDC, stretchBoxLine.data(), wrap::toUnsigned(stretchBoxLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
-void thred::internal::unstrtch(std::vector<POINT>& stretchBoxLine) {
+void thred::internal::unstrtch(std::vector<POINT> const& stretchBoxLine) {
   if (StateMap->testAndReset(StateFlag::SHOSTRTCH)) {
 	thred::strtchbox(stretchBoxLine);
   }
@@ -12810,7 +12810,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   return false;
 }
 
-auto thred::internal::doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool {
+auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool {
   retflag = true;
   thred::savdo();
   auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
@@ -13379,7 +13379,7 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 
 auto thred::internal::handleMainWinKeys(wchar_t const&      code,
                                         fPOINT&             rotationCenter,
-                                        std::vector<POINT>& stretchBoxLine,
+                                        std::vector<POINT> const& stretchBoxLine,
                                         bool&               retflag) -> bool {
   retflag = true;
   switch (code) {

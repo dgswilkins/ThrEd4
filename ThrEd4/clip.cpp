@@ -872,7 +872,7 @@ void clip::internal::duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t 
   }
 }
 
-void clip::internal::duch(std::vector<fPOINT>& chainEndPoints) {
+void clip::internal::duch(std::vector<fPOINT> const& chainEndPoints) {
   OSequence->clear();
   if (auto chainLength = wrap::toUnsigned(chainEndPoints.size()); chainLength > 2U) {
 	--chainLength;

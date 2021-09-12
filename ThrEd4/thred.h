@@ -100,10 +100,10 @@ void selRct(fRECTANGLE& sourceRect);
 void setpsel();
 void shft(fPOINT const& delta) noexcept;
 void showColorWin() noexcept;
-void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) noexcept;
+void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR> const& stitches) noexcept;
 auto stch2pxr(fPOINT const& stitchCoordinate) -> POINT;
 void stchrct(fRECTANGLE& rectangle) noexcept;
-void strtchbox(std::vector<POINT>& stretchBoxLine);
+void strtchbox(std::vector<POINT> const& stretchBoxLine);
 auto txtWid(wchar_t const* string) -> SIZE;
 void unbBox();
 void unbsho();
@@ -170,7 +170,7 @@ namespace internal {
 
   auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  auto doPaste(std::vector<POINT>& stretchBoxLine, bool& retflag) -> bool;
+  auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
   void drawBackground();
   void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
   void drwStch();
@@ -196,7 +196,7 @@ namespace internal {
   void duhbit(uint32_t cod) noexcept;
   void duhom();
   void duinsfil();
-  void dulin(std::array<POINT, 2>& moveLine0, std::array<POINT, 2>& moveLine1);
+  void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
   void dumov();
   void dumrk(float xCoord, float yCoord);
   void dun();
@@ -265,7 +265,10 @@ namespace internal {
   auto handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) -> bool;
   auto handleLeftKey(bool& retflag) -> bool;
   auto handleMainMenu(WORD const& wParameter, fPOINT& rotationCenter) -> bool;
-  auto handleMainWinKeys(wchar_t const& code, fPOINT& rotationCenter, std::vector<POINT>& stretchBoxLine, bool& retflag)
+  auto handleMainWinKeys(wchar_t const&            code,
+                         fPOINT&                   rotationCenter,
+                         std::vector<POINT> const& stretchBoxLine,
+                         bool&                     retflag)
       -> bool;
   auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                        float               xyRatio,
@@ -485,7 +488,7 @@ namespace internal {
   void unrot();
   void unrotu();
   void unsel();
-  void unstrtch(std::vector<POINT>& stretchBoxLine);
+  void unstrtch(std::vector<POINT> const& stretchBoxLine);
   auto unthrsh(wchar_t level) noexcept -> float;
   void unthum();
   auto updateHoopSize() -> bool;

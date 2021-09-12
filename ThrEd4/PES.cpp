@@ -287,7 +287,7 @@ void PES::internal::pecdat(std::vector<uint8_t>& buffer) {
   buffer.push_back(0x0U);
 }
 
-void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image) {
+void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image) {
   for (auto const& imageRow : image) {
 	auto const& iRow = imageRow;
 	for (auto iPixel = iRow.begin(); iPixel != iRow.end();) {

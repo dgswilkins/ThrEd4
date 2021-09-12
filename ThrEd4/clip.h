@@ -55,7 +55,7 @@ namespace internal {
               fPOINT const&              rotationCenter) -> bool;
   void clpsub(uint32_t fpnt, uint32_t cnt);
   void clpxadj(std::vector<fPOINT>& tempClipPoints, std::vector<fPOINT>& chainEndPoints);
-  void duch(std::vector<fPOINT>& chainEndPoints);
+  void duch(std::vector<fPOINT> const& chainEndPoints);
   void duchfn(std::vector<fPOINT> const& chainEndPoints, uint32_t start, uint32_t finish);
   void dufxlen(FRMHED const& form, std::vector<fPOINT>& chainEndPoints);
   void dulast(std::vector<fPOINT>& chainEndPoints);

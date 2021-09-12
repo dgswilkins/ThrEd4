@@ -260,7 +260,7 @@ namespace internal {
              uint32_t                      finish,
              boost::dynamic_bitset<>&      sequenceMap,
              uint32_t&                     lastGroup,
-             SMALPNTL*                     sequenceLines);
+             SMALPNTL const*               sequenceLines);
   void duseq1(SMALPNTL const* sequenceLines);
   void duseq2(SMALPNTL const* sequenceLines);
   void duspnd(float                     stitchLen,
@@ -339,13 +339,13 @@ namespace internal {
             std::vector<fPOINT> const& currentFormVertices) -> bool;
   void lapbrd(FRMHED const& form);
   void lcon(FRMHED const&          form,
-            std::vector<uint32_t>& groupIndexSequence,
+            std::vector<uint32_t> const& groupIndexSequence,
             std::vector<SMALPNTL>& lineEndpoints,
             std::vector<fPOINT>&   workingFormVertices);
   auto lenComp(LENINFO const& arg1, LENINFO const& arg2) noexcept -> bool;
   auto clipComp(CLIPSORT const* arg1, CLIPSORT const* arg2) noexcept -> bool;
-  auto lnclos(std::vector<uint32_t>& groupIndexSequence,
-              std::vector<SMALPNTL>& lineEndpoints,
+  auto lnclos(std::vector<uint32_t> const& groupIndexSequence,
+              std::vector<SMALPNTL> const& lineEndpoints,
               uint32_t               group0,
               uint32_t               line0,
               uint32_t               group1,
@@ -404,8 +404,8 @@ namespace internal {
   void prsmal(float width);
   auto px2stchf(POINT const& screen) noexcept -> fPOINT;
   void rats();
-  auto regclos(std::vector<uint32_t>&        groupIndexSequence,
-               std::vector<SMALPNTL>&        lineEndpoints,
+  auto regclos(std::vector<uint32_t> const&  groupIndexSequence,
+               std::vector<SMALPNTL> const&  lineEndpoints,
                std::vector<SMALPNTL*> const& sortedLines,
                uint32_t                      iRegion0,
                uint32_t                      iRegion1,

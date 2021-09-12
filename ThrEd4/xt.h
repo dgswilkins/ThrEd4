@@ -143,7 +143,7 @@ namespace internal {
   void fncwlk(FRMHED& form);
   void fnund(FRMHED& form, std::vector<RNGCNT> const& textureSegments, std::vector<fPOINT>& angledFormVertices);
   void fnwlk(FRMHED& form);
-  void fritfil(FRMHED const& form, std::vector<fPOINT>& featherSequence);
+  void fritfil(FRMHED const& form, std::vector<fPOINT> const& featherSequence);
   void fspacfn(uint32_t formNumber, float spacing);
   void fthdfn(uint32_t iSequence, FEATHER& feather);
   void fthfn(uint32_t iSequence, FEATHER& feather);

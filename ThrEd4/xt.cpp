@@ -302,7 +302,7 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
   }
 }
 
-void xt::internal::fritfil(FRMHED const& form, std::vector<fPOINT>& featherSequence) {
+void xt::internal::fritfil(FRMHED const& form, std::vector<fPOINT> const& featherSequence) {
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(
 	    INSREC {TYPFRM, form.fillColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});

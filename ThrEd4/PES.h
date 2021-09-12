@@ -164,7 +164,7 @@ namespace internal {
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
   void ritpesCode(std::vector<uint8_t>& buffer);
   void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
-  void writeThumbnail(std::vector<uint8_t>& buffer, imgArray& image);
+  void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace internal
 } // namespace PES
 #endif
