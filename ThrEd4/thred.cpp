@@ -1572,8 +1572,7 @@ void thred::internal::chknum() {
 			}
 			case LBRDSPAC: {
 			  thred::savdo();
-			  auto const edgeType = form.edgeType & NEGUND;
-			  switch (edgeType) {
+			  switch (auto const edgeType = form.edgeType & NEGUND; edgeType) {
 				case EDGEPROPSAT:
 				case EDGEOCHAIN:
 				case EDGELCHAIN: {
