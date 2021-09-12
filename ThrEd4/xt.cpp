@@ -110,8 +110,8 @@ void xt::internal::duxrats(uint32_t start, uint32_t finish, fPOINT& point, float
 
 void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
   if (sequence != nullptr) {
-	auto& bCurrent                        = BSequence->operator[](iSequence);
-	auto& bNext                           = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto const& bCurrent = BSequence->operator[](iSequence);
+	auto const& bNext = BSequence->operator[](wrap::toSize(iSequence) + 1U);
 	auto const               stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 	if (stitchLength < feather.minStitch) {
 	  sequence->push_back(fPOINT {bCurrent.x, bCurrent.y});
@@ -244,7 +244,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
   // clang-format off
   auto       currentPoint = fPOINT {};
   auto       nextPoint    = fPOINT {};
-  auto&      bCurrent     = BSequence->operator[](iSequence);
+  auto const& bCurrent    = BSequence->operator[](iSequence);
   auto&      bNext        = BSequence->operator[](wrap::toSize(iSequence) + 1U);
   auto const length       = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   // clang-format on
@@ -278,8 +278,8 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 
 void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
   // clang-format off
-  auto&      bCurrent = BSequence->operator[](iSequence);
-  auto&      bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+  auto const& bCurrent = BSequence->operator[](iSequence);
+  auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
   auto const length   = hypot(bNext.y - bCurrent.y, bNext.x - bCurrent.x);
   // clang-format on
   nurat(feather);
@@ -906,14 +906,14 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 	                               : wrap::next(StitchBuffer->begin(), pRecs[currentRegion]->start);
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
-		auto& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
+		auto const& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
 		auto length       = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
 		  direction     = false;
 		  currentRegion = iRegion;
 		}
-		auto& endStitch = StitchBuffer->operator[](pRecs[iRegion]->endStitch);
+		auto const& endStitch = StitchBuffer->operator[](pRecs[iRegion]->endStitch);
 		length          = hypot(endStitch.x - stitchIt->x, endStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
@@ -1184,7 +1184,7 @@ void xt::dmpat() {
   auto attribute = StitchBuffer->front().attribute;
   auto iStitch   = 0U;
   xi::duatf(iStitch);
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	if (attribute != stitch.attribute) {
 	  xi::duatf(iStitch);
 	  attribute = stitch.attribute;
@@ -1394,7 +1394,7 @@ void xt::internal::duint(FRMHED const& form, std::vector<fPOINTATTR>& buffer, ui
        iSequence < InterleaveSequenceIndices->     operator[](wrap::toSize(ilData.pins) + 1U).index;
        ++iSequence) {
 	if (ilData.output > 0) {
-	  if (auto& interleave = InterleaveSequence->operator[](iSequence);
+	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
 	      !util::closeEnough(interleave.x, buffer[ilData.output - 1U].x) ||
 	      !util::closeEnough(interleave.y, buffer[ilData.output - 1U].y)) {
 		buffer.emplace_back(fPOINTATTR {interleave.x, interleave.y, code});
@@ -1402,7 +1402,7 @@ void xt::internal::duint(FRMHED const& form, std::vector<fPOINTATTR>& buffer, ui
 	  }
 	}
 	else {
-	  auto& interleave = InterleaveSequence->operator[](iSequence);
+	  auto const& interleave = InterleaveSequence->operator[](iSequence);
 	  buffer.emplace_back(fPOINTATTR {interleave.x, interleave.y, code});
 	  ++(ilData.output);
 	}
@@ -1542,7 +1542,7 @@ void xt::intlv(FRMHED const& form, FILLSTARTS const& fillStartsData, uint32_t fi
 	  for (auto index = thisIndex; index < nextIndex; ++index) {
 		if (ilData.output > 0) {
 		  auto& interleave = InterleaveSequence->operator[](index);
-		  if (auto& stitch = StitchBuffer->operator[](ilData.output - 1U);
+		  if (auto const& stitch = StitchBuffer->operator[](ilData.output - 1U);
 		      !util::closeEnough(interleave.x, stitch.x) || !util::closeEnough(interleave.y, stitch.y)) {
 			StitchBuffer->push_back({interleave.x, interleave.y, code});
 			++(ilData.output);

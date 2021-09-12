@@ -192,7 +192,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   }
   auto boundingRect = fRECTANGLE {
       dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
-  for (auto& stitch : dstStitchBuffer) {
+  for (auto const& stitch : dstStitchBuffer) {
 	constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
 	if (stitch.x > boundingRect.right) {
 	  boundingRect.right = stitch.x + MARGIN;

@@ -246,7 +246,7 @@ auto texture::internal::chktxh(_In_ TXHST const& historyItem) -> bool {
 
 void texture::savtxt() {
   if (!TempTexturePoints->empty()) {
-	auto& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
+	auto const& currentHistoryItem = TextureHistory->operator[](TextureHistoryIndex);
 	if (txi::chktxh(currentHistoryItem)) {
 	  StateMap->set(StateFlag::WASTXBAK);
 	  StateMap->reset(StateFlag::TXBDIR);
@@ -789,7 +789,7 @@ void texture::internal::ritxfrm(FRMHED const& textureForm) {
 
   auto& formLines = *FormLines;
   formLines.resize(wrap::toSize(textureForm.vertexCount) + 1U);
-  auto&      angledFormVertices = *AngledFormVertices;
+  auto const& angledFormVertices = *AngledFormVertices;
   auto const maxVertex          = wrap::toUnsigned(angledFormVertices.size());
   for (auto iVertex = 0U; iVertex < maxVertex; ++iVertex) {
 	txi::ed2px(angledFormVertices[iVertex], formLines[iVertex]);
@@ -1026,7 +1026,7 @@ void texture::deltx(uint32_t formIndex) {
 	// First check to see if the texture is shared between forms
 	for (auto iForm = 0U; iForm < formIndex; ++iForm) {
 	  if (texture::istx(iForm)) {
-		auto& formIter = FormList->operator[](iForm);
+		auto const& formIter = FormList->operator[](iForm);
 		if (formIter.fillInfo.texture.index == currentIndex) {
 		  flag = true;
 		}
@@ -1034,7 +1034,7 @@ void texture::deltx(uint32_t formIndex) {
 	}
 	for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
-		auto& formIter = FormList->operator[](iForm);
+		auto const& formIter = FormList->operator[](iForm);
 		if (formIter.fillInfo.texture.index == currentIndex) {
 		  flag = true;
 		}
@@ -1114,7 +1114,7 @@ void texture::internal::altx() {
   auto txtLines = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto const halfHeight = TextureScreen.areaHeight / 2.0F;
-	for (auto& texturePoint : *TempTexturePoints) {
+	for (auto const& texturePoint : *TempTexturePoints) {
 	  txtLines.set(texturePoint.line);
 	}
 	for (uint16_t iLine = 1; iLine <= TextureScreen.lines; ++iLine) {
@@ -1329,8 +1329,8 @@ void texture::internal::txtdel() {
   if (!SelectedTexturePointsList->empty()) {
 	texture::savtxt();
 	auto texturePointsMap = boost::dynamic_bitset<>(TempTexturePoints->size());
-	for (auto& p : *SelectedTexturePointsList) {
-	  texturePointsMap.set(p);
+	for (auto const& point : *SelectedTexturePointsList) {
+	  texturePointsMap.set(point);
 	}
 	auto index = 0U;
 	TempTexturePoints->erase(remove_if(TempTexturePoints->begin(),

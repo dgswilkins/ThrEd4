@@ -170,7 +170,7 @@ void trace::internal::showTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
-  for (auto& iTraceControlWindow : TraceControlWindow) {
+  for (auto const& iTraceControlWindow : TraceControlWindow) {
 	ti::shownd(iTraceControlWindow);
 	ti::shownd(*(iTraceSelectWindow++));
 	ti::shownd(*(iTraceUpWindow++));
@@ -237,7 +237,7 @@ void trace::internal::hideTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
-  for (auto& iTraceControlWindow : TraceControlWindow) {
+  for (auto const& iTraceControlWindow : TraceControlWindow) {
 	ti::hidwnd(iTraceControlWindow);
 	ti::hidwnd(*(iTraceSelectWindow++));
 	ti::hidwnd(*(iTraceUpWindow++));
@@ -258,7 +258,7 @@ void trace::untrace() {
 	ti::hideTraceWin();
 	ti::hidwnd(TraceStepWin);
 	thred::showColorWin();
-	for (auto& iButton : *ButtonWin) {
+	for (auto const& iButton : *ButtonWin) {
 	  ti::shownd(iButton);
 	}
   }
@@ -296,7 +296,7 @@ void trace::trdif() {
 		  ti::difbits(TraceShift[iRGB], wrap::next(TraceBitmapData, iPoint));
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
-		  auto& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
+		  auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
 		  if (colorSum > colorSumMaximum) {
 			colorSumMaximum = colorSum;
 		  }
@@ -843,7 +843,7 @@ void trace::trinit() {
 		auto iComponentPeak      = componentPeak.begin();
 		for (auto& channelData : histogramData) {
 		  auto iLevel = 0U;
-		  for (auto& channel : channelData) {
+		  for (auto const& channel : channelData) {
 			if (channel > *iComponentPeakCount) {
 			  *iComponentPeakCount = channel;
 			  *iComponentPeak      = iLevel;
@@ -1191,7 +1191,7 @@ void trace::wasTrace() {
   auto       iTraceRGB           = TraceRGB.begin();
   auto       iTraceRGBFlag       = TraceRGBFlag.begin();
   auto       iRGB                = 0U;
-  for (auto& brush : TraceBrush) {
+  for (auto const& brush : TraceBrush) {
 	if (DrawItem->hwndItem == *(iTraceUpWindow++)) {
 	  FillRect(DrawItem->hDC, &DrawItem->rcItem, brush);
 	  ti::trcnum(*iTraceShift, InvertUpColor, *iTraceRGB);

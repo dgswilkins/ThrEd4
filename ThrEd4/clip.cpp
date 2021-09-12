@@ -184,7 +184,7 @@ void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) 
 	  }
 	  clipRect.left = clipRect.right = clipBuffer[0].x;
 	  clipRect.bottom = clipRect.top = clipBuffer[0].y;
-	  for (auto& clip : *ClipBuffer) {
+	  for (auto const& clip : *ClipBuffer) {
 		if (clip.x < clipRect.left) {
 		  clipRect.left = clip.x;
 		}
@@ -210,7 +210,7 @@ void clip::oclp(fRECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) 
 void clip::internal::durev(fRECTANGLE const& clipRect, std::vector<fPOINT>& clipReversedData) noexcept {
   if (!ClipBuffer->empty()) {
 	auto const midpoint   = wrap::midl(clipRect.right, clipRect.left);
-	if (auto& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
+	if (auto const& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
 	  auto iBuffer = clipBuffer.begin();
 	  for (auto& reversed : clipReversedData) {
 		reversed = fPOINT {clipRect.right - iBuffer->x, iBuffer->y};

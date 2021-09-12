@@ -71,7 +71,7 @@ auto satin::internal::nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t
 
 void satin::spltsat(uint32_t guideIndex) {
   {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	auto const& currentForm = FormList->operator[](ClosestFormToCursor);
 	FormList->insert(wrap::next(FormList->cbegin(), ClosestFormToCursor), currentForm);
   }
   auto& form = FormList->operator[](ClosestFormToCursor); // insert may have invalidated reference
@@ -1215,7 +1215,7 @@ void satin::satfix() {
 
 void satin::dusat() noexcept {
   auto const  vertexCount = TempPolygon->size();
-  auto&       formLines   = *FormLines;
+  auto const& formLines   = *FormLines;
   auto const* line        = &formLines[vertexCount - 1U];
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
@@ -1269,7 +1269,7 @@ void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup,
 }
 
 void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
-  auto& outsidePoints = *OutsidePoints;
+  auto const& outsidePoints = *OutsidePoints;
   auto  innerDelta    = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
                             (insidePoints[finish].y - insidePoints[start].y)};
   auto  outerDelta    = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),

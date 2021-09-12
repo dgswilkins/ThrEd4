@@ -89,7 +89,7 @@ void repair::lodchk() {
 	  }
 	}
 	formMap.reset();
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  auto const attribute = stitch.attribute;
 	  if ((attribute & TYPBRD) != 0U) {
 		formMap.set((attribute & FRMSK) >> FRMSHFT);

@@ -1063,7 +1063,7 @@ auto form::closfrm() -> bool {
 	  }
 	}
 
-	auto&             vertex =
+	auto const& vertex =
 	    FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
 	auto const stitchCoordsInPixels = thred::stch2pxr(vertex);
 	minimumLength = wrap::toFloat(hypot(stitchCoordsInPixels.x - screenCoordinate.x,
@@ -1287,7 +1287,7 @@ void form::filinsb(fPOINT const& point, fPOINT& stitchPoint) {
 
 auto form::getblen() noexcept -> float {
   // clang-format off
-  auto&      form    = FormList->operator[](ClosestFormToCursor);
+  auto const& form   = FormList->operator[](ClosestFormToCursor);
   auto const iLength = (form.clipEntries << WRDSHFT) | form.picoLength;
   // clang-format on
   return wrap::toFloat(iLength);
@@ -4396,9 +4396,9 @@ void form::internal::bakseq() {
 	auto const rcnt           = iSequence % seqtab.size();
 	auto const StitchSpacing2 = LineSpacing * 2;
 	auto const rit            = std::lround(BSequence->operator[](iSequence).x / StitchSpacing2);
-	auto&      bPrevious      = BSequence->operator[](iSequence - 1U);
+	auto const& bPrevious     = BSequence->operator[](iSequence - 1U);
 	auto&      bCurrent       = BSequence->operator[](iSequence);
-	auto&      bNext          = BSequence->operator[](iSequence + 1U);
+	auto const& bNext         = BSequence->operator[](iSequence + 1U);
 	auto       delta          = fPOINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 	auto       slope          = std::numeric_limits<float>::max(); // initialize to the max value i.e. slope when y is zero
 	// clang-format on
@@ -4575,7 +4575,7 @@ void form::internal::trfrm(fPOINT const& bottomLeftPoint,
   dudif(bottomLeftPoint, bottomRightPoint, bottomDelta);
   dudif(bottomLeftPoint, topLeftPoint, leftDelta);
   dudif(bottomRightPoint, topRightPoint, rightDelta);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	auto const clipRatio      = fPOINT {clip.x / ClipRectSize.cx, clip.y / ClipRectSize.cy};
 	auto const topMidpoint    = fPOINT {clipRatio.x * (topDelta.x) + topLeftPoint.x,
                                      clipRatio.x * (topDelta.y) + topLeftPoint.y};
@@ -4590,10 +4590,10 @@ void form::internal::trfrm(fPOINT const& bottomLeftPoint,
 
 void form::internal::clpfm() {
   for (auto iSequence = 0U; iSequence < wrap::toUnsigned(BSequence->size()) - 2U; iSequence += 2) {
-	auto& bSeq0 = BSequence->operator[](iSequence);
-	auto& bSeq1 = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto& bSeq2 = BSequence->operator[](wrap::toSize(iSequence) + 2U);
-	auto& bSeq3 = BSequence->operator[](wrap::toSize(iSequence) + 3U);
+	auto const& bSeq0 = BSequence->operator[](iSequence);
+	auto const& bSeq1 = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto const& bSeq2 = BSequence->operator[](wrap::toSize(iSequence) + 2U);
+	auto const& bSeq3 = BSequence->operator[](wrap::toSize(iSequence) + 3U);
 
 	auto const leftLength  = hypot(bSeq1.x - bSeq0.x, bSeq1.y - bSeq0.y);
 	auto const rightLength = hypot(bSeq3.x - bSeq2.x, bSeq3.y - bSeq2.y);
@@ -5115,7 +5115,7 @@ auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
 
   auto minimumLength    = BIGDBL;
   auto formControlIndex = 0U;
-  for (auto& iControl : formControls) {
+  for (auto const& iControl : formControls) {
 	if (auto const length = hypot(iControl.x - point.x, iControl.y - point.y); length < minimumLength) {
 	  minimumLength             = length;
 	  SelectedFormControlVertex = formControlIndex;
@@ -5516,7 +5516,7 @@ void form::rinfrm() {
   form::frmlin(*FormForInsert);
   SelectObject(StitchWindowMemDC, FormPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  auto& formLines = *FormLines;
+  auto const& formLines = *FormLines;
   if ((FormVertexNext != 0U) || FormForInsert->type != FRMLINE) {
 	wrap::Polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
@@ -5623,7 +5623,7 @@ void form::internal::fsclp(uint32_t formIndex) {
   wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -5749,7 +5749,7 @@ void form::internal::getbig(fRECTANGLE* allItemsRect) noexcept {
 	  allItemsRect->bottom = trct.bottom;
 	}
   }
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	if (stitch.x < allItemsRect->left) {
 	  allItemsRect->left = stitch.x;
 	}
@@ -6676,7 +6676,7 @@ void form::fliph() {
 	  ClosestFormToCursor = selectedForm;
 	  formMap.set(selectedForm);
 	  // clang-format off
-	  auto& formIter = FormList->operator[](selectedForm);
+	  auto const& formIter = FormList->operator[](selectedForm);
 	  auto  itVertex = wrap::next(FormVertices->begin(), formIter.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < formIter.vertexCount; ++iVertex) {
@@ -6890,7 +6890,7 @@ void form::internal::filsclp() {
   currentForm.angleOrClipData.clip    = clip::numclp();
   currentForm.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
   auto itClipPoints = wrap::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
@@ -7036,7 +7036,7 @@ void form::internal::snp(uint32_t start, uint32_t finish) {
   }
   else {
 	auto iStitch = 0U;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  auto const iColumn             = wrap::floor<uint32_t>(stitch.x);
 	  xPoints[xHistogram[iColumn]++] = iStitch;
 	  ++iStitch;
@@ -7345,7 +7345,7 @@ void form::join() {
   StateMap->set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap->test(StateFlag::FORMSEL) && form::closfrm()) {
 	// clang-format off
-	auto& form       = FormList->operator[](ClosestFormToCursor);
+	auto const& form = FormList->operator[](ClosestFormToCursor);
 	auto  vertexList = std::vector<fPOINT> {};
 	// clang-format on
 	vertexList.reserve(form.vertexCount);
@@ -7523,7 +7523,7 @@ auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
   if (!StitchBuffer->empty()) {
 	// clang-format off
 	range.start          = 0;
-	auto&      form      = FormList->operator[](iForm);
+	auto const& form     = FormList->operator[](iForm);
 	auto const saveClose = ClosestFormToCursor;
 	ClosestFormToCursor  = iForm;
 	// clang-format on
@@ -7594,7 +7594,7 @@ void form::fcntr() {
 	  auto const  currentCenter = fPOINT {wrap::midl(formRect.right, formRect.left), 
 										  wrap::midl(formRect.top, formRect.bottom)};
 	  auto const  delta         = fPOINT {initialCenter.x - currentCenter.x, initialCenter.y - currentCenter.y};
-	  auto&       currentForm   = FormList->operator[](selectedForm);
+	  auto const& currentForm   = FormList->operator[](selectedForm);
 	  auto        itVertex      = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < currentForm.vertexCount; ++iVertex) {
@@ -7642,7 +7642,7 @@ void form::internal::fspic(uint32_t formIndex) {
   form::bsizpar(form);
   form::savplen(ButtonholeCornerLength);
   auto itClipPoints = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoints = clip;
 	++itClipPoints;
   }
@@ -7770,15 +7770,15 @@ void form::internal::shrnks() {
   auto  clipRect    = fRECTANGLE {};
   auto  lengths     = std::vector<uint32_t> {};
   auto  deltas      = std::vector<fPOINT> {};
-  auto& currentForm = FormList->operator[](ClosestFormToCursor);
+  auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   lengths.reserve(currentForm.vertexCount);
   deltas.reserve(currentForm.vertexCount - 1U);
   clip::oclp(clipRect, currentForm.borderClipData, currentForm.clipEntries);
   auto const itVertex = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
   auto const vMax     = gsl::narrow<ptrdiff_t>(currentForm.vertexCount - 1U);
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
-	auto& thisVertex = itVertex[iVertex];
-	auto& nextVertex = itVertex[iVertex + 1];
+	auto const& thisVertex = itVertex[iVertex];
+	auto const& nextVertex = itVertex[iVertex + 1];
 	deltas.emplace_back(fPOINT {nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y});
 	lengths.emplace_back(hypot(deltas.back().x, deltas.back().y));
   }
@@ -7788,7 +7788,7 @@ void form::internal::shrnks() {
 	auto const fLen       = wrap::toFloat(*length);
 	auto const count      = std::floor(fLen / ClipRectSize.cx);
 	auto const ratio      = (ClipRectSize.cx * count + 0.004F) / fLen;
-	auto&      thisVertex = itVertex[iVertex];
+	auto const& thisVertex = itVertex[iVertex];
 	auto&      nextVertex = itVertex[iVertex + 1];
 	nextVertex.x          = thisVertex.x + delta->x * ratio;
 	nextVertex.y          = thisVertex.y + delta->y * ratio;
@@ -8342,7 +8342,7 @@ void form::vrtsclp() {
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -8407,7 +8407,7 @@ void form::horsclp() {
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -8470,7 +8470,7 @@ void form::angsclp(FRMHED& form) {
   form.satinOrAngle.angle = IniFile.fillAngle;
   form.fillSpacing        = IniFile.clipOffset;
   auto itClipPoint        = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }
@@ -8716,7 +8716,7 @@ void form::crop() {
 	auto const& form         = FormList->operator[](ClosestFormToCursor);
 	auto        iDestination = StitchBuffer->begin();
 	// clang-format on
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (form::cisin(form, stitch.x, stitch.y)) {
 		*iDestination++ = stitch;
 	  }
@@ -8742,7 +8742,7 @@ void form::internal::fsclpx(uint32_t formIndex) {
   wrap::narrow(form.borderColor, ActiveColor);
   form::bsizpar(form);
   auto itClipPoint = wrap::next(ClipPoints->begin(), form.borderClipData);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	*itClipPoint = clip;
 	++itClipPoint;
   }

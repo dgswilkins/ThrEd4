@@ -165,7 +165,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			StitchBuffer->clear();
 			StitchBuffer->reserve(PCSHeader.stitchCount);
 			while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-			  auto& stitch = PCSDataBuffer[iPCSstitch];
+			  auto const& stitch = PCSDataBuffer[iPCSstitch];
 			  if (stitch.tag == 3) {
 				thred::addColor(iStitch, stitch.fx);
 				++iColorChange;
@@ -229,7 +229,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 
 auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
   auto boundingRect = fRECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
-  for (auto& stitch : stitches) {
+  for (auto const& stitch : stitches) {
 	if (stitch.x < boundingRect.left) {
 	  boundingRect.left = stitch.x;
 	}

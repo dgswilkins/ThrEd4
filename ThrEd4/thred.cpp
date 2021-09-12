@@ -306,7 +306,7 @@ void thred::internal::hidwnd(HWND hwnd) noexcept {
 void thred::hideColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto& iThreadSizeWin : *ThreadSizeWin) {
+  for (auto const& iThreadSizeWin : *ThreadSizeWin) {
 	thi::hidwnd(*(iDefaultColorWin++));
 	thi::hidwnd(*(iUserColorWin++));
 	thi::hidwnd(iThreadSizeWin);
@@ -316,7 +316,7 @@ void thred::hideColorWin() noexcept {
 void thred::showColorWin() noexcept {
   auto iDefaultColorWin = DefaultColorWin->begin();
   auto iUserColorWin    = UserColorWin->begin();
-  for (auto& iThreadSizeWin : *ThreadSizeWin) {
+  for (auto const& iThreadSizeWin : *ThreadSizeWin) {
 	thi::shownd(*(iDefaultColorWin++));
 	thi::shownd(*(iUserColorWin++));
 	thi::shownd(iThreadSizeWin);
@@ -524,7 +524,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   }
   auto       iTmpName      = tmpName.begin();
   auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
-  for (auto& iNameOrder : NameOrder) {
+  for (auto const& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
 	}
@@ -537,7 +537,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
   auto       iNameOrder    = NameOrder.begin();
   auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
   for (auto& iTmpName : tmpName) {
-	auto& index = *iNameOrder;
+	auto const& index = *iNameOrder;
 	if (index < spCreatorName.size()) {
 	  iTmpName = gsl::narrow_cast<uint8_t>(spCreatorName[index]);
 	}
@@ -979,7 +979,7 @@ void thred::internal::stchPars() {
 void thred::redraw(HWND window) noexcept {
   RedrawWindow(window, nullptr, nullptr, RDW_INVALIDATE);
   if (window == MainStitchWin) {
-	for (auto& iWindow : *DefaultColorWin) {
+	for (auto const& iWindow : *DefaultColorWin) {
 	  if (iWindow != nullptr) {
 		RedrawWindow(iWindow, nullptr, nullptr, RDW_INVALIDATE);
 	  }
@@ -1064,7 +1064,7 @@ void thred::movStch() {
 
 void thred::unbsho() {
   if (StateMap->testAndReset(StateFlag::BAKSHO)) {
-	for (auto& iBackup : BackupViewer) {
+	for (auto const& iBackup : BackupViewer) {
 	  DestroyWindow(iBackup);
 	}
   }
@@ -1110,7 +1110,7 @@ void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR>& stitches) no
   if (!stitches.empty()) {
 	rectangle.bottom = rectangle.top = stitches[0].y;
 	rectangle.left = rectangle.right = stitches[0].x;
-	for (auto& stitch : stitches) {
+	for (auto const& stitch : stitches) {
 	  if (stitch.x < rectangle.left) {
 		rectangle.left = stitch.x;
 	  }
@@ -1287,7 +1287,7 @@ void thred::hupfn() {
 	  checkHoopRect.right  = itVertex->x;
 	  checkHoopRect.left   = itVertex->x;
 	}
-	for (auto& FormVertice : *FormVertices) {
+	for (auto const& FormVertice : *FormVertices) {
 	  if (FormVertice.x < checkHoopRect.left) {
 		checkHoopRect.left = FormVertice.x;
 	  }
@@ -3002,7 +3002,7 @@ void thred::internal::redbal() {
 		}
 		auto up  = UserPen->begin();
 		auto ucb = UserColorBrush.begin();
-		for (auto& ucolor : UserColor) {
+		for (auto const& ucolor : UserColor) {
 		  *(up++) = wrap::CreatePen(PS_SOLID, PENNWID, ucolor);
 		  nuBrush(*ucb, ucolor);
 		  ++ucb;
@@ -3367,7 +3367,7 @@ void thred::internal::sav() {
   saveStitches.resize(StitchBuffer->size());
   if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  *iDest++ = fPOINTATTR {stitch.y, stitch.x, stitch.attribute};
 	}
   }
@@ -3892,13 +3892,13 @@ void thred::internal::redbak() {
 	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
-	for (auto& color : UserColor) {
+	for (auto const& color : UserColor) {
 	  nuPen(*up, 1, color);
 	  nuBrush(*ucb, color);
 	  ++up;
 	  ++ucb;
 	}
-	for (auto& iColor : *UserColorWin) {
+	for (auto const& iColor : *UserColorWin) {
 	  thred::redraw(iColor);
 	}
 	TexturePointsBuffer->clear();
@@ -3998,7 +3998,7 @@ void thred::internal::prtred(HANDLE fileHandle, uint32_t code) {
 
 void thred::internal::unthum() {
   if (StateMap->testAndReset(StateFlag::THUMSHO)) {
-	for (auto& iBackup : BackupViewer) {
+	for (auto const& iBackup : BackupViewer) {
 	  DestroyWindow(iBackup);
 	}
 	if (StateMap->test(StateFlag::UPTO)) {
@@ -4467,7 +4467,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  buffer[0] = *(ts++);
 	  SetWindowText(*(tsw++), buffer.data());
 	}
-	for (auto& iColor : *UserColorWin) {
+	for (auto const& iColor : *UserColorWin) {
 	  thred::redraw(iColor);
 	}
 	thred::redraw(ColorBar);
@@ -5363,7 +5363,7 @@ void thred::internal::rebox() {
 	  SearchLine->clear();
 	  SearchLine->shrink_to_fit();
 	  StateMap->set(StateFlag::RESTCH);
-	  for (auto& window : *UserColorWin) {
+	  for (auto const& window : *UserColorWin) {
 		thred::redraw(window);
 	  }
 	}
@@ -7276,7 +7276,7 @@ void thred::internal::getbak() {
 }
 
 void thred::internal::rebak() {
-  for (auto& iVersion : BackupViewer) {
+  for (auto const& iVersion : BackupViewer) {
 	DestroyWindow(iVersion);
   }
   auto newFileName    = *ThrName;
@@ -7298,7 +7298,7 @@ void thred::internal::rebak() {
 }
 
 void thred::internal::thumbak() {
-  for (auto& iVersion : BackupViewer) {
+  for (auto const& iVersion : BackupViewer) {
 	DestroyWindow(iVersion);
   }
   getbak();
@@ -7588,7 +7588,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
   thred::savdo();
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
-	auto& form          = FormList->operator[](ClosestFormToCursor);
+	auto const& form    = FormList->operator[](ClosestFormToCursor);
 	auto  currentVertex = SelectedFormVertices.start;
 	auto  const vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
@@ -7620,7 +7620,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
-	  auto& form     = FormList->operator[](selectedForm);
+	  auto const& form     = FormList->operator[](selectedForm);
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -7633,7 +7633,7 @@ void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
   }
   else {
 	if (StateMap->testAndReset(StateFlag::FRMROT)) {
-	  auto& form = FormList->operator[](ClosestFormToCursor);
+	  auto const& form = FormList->operator[](ClosestFormToCursor);
 
 	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -7686,7 +7686,7 @@ auto thred::internal::iselpnt() noexcept -> bool {
   auto       closestControlPoint = 0U;
   auto       minimumLength       = BIGDBL;
   auto       iControlPoint       = 0U;
-  for (auto& controlPoint : *FormControlPoints) {
+  for (auto const& controlPoint : *FormControlPoints) {
 	auto const length = hypot(pointToTest.x - controlPoint.x, pointToTest.y - controlPoint.y);
 	if (length < minimumLength) {
 	  minimumLength       = length;
@@ -8604,7 +8604,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
   if (!StitchBuffer->empty()) {
 	rectangle.bottom = rectangle.left = BIGFLOAT;
 	rectangle.top = rectangle.right = 0;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (stitch.x < rectangle.left) {
 		rectangle.left = stitch.x;
 	  }
@@ -8624,7 +8624,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
 void thred::frmrct(fRECTANGLE& rectangle) noexcept {
   rectangle.left = rectangle.right = FormVertices->front().x;
   rectangle.top = rectangle.bottom = FormVertices->front().y;
-  for (auto& FormVertice : *FormVertices) {
+  for (auto const& FormVertice : *FormVertices) {
 	if (FormVertice.x < rectangle.left) {
 	  rectangle.left = FormVertice.x;
 	}
@@ -8992,7 +8992,7 @@ void thred::internal::rotmrk() {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
 	  // clang-format off
-	  auto& form     = FormList->operator[](ClosestFormToCursor);
+	  auto const& form     = FormList->operator[](ClosestFormToCursor);
 	  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	  // clang-format on
 	  auto const originalAngle = atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
@@ -9384,7 +9384,7 @@ void thred::internal::gsnap() {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
-	  auto& formIter      = FormList->operator[](ClosestFormToCursor);
+	  auto const& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
@@ -9394,7 +9394,7 @@ void thred::internal::gsnap() {
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
-	  auto& formIter = FormList->operator[](ClosestFormToCursor);
+	  auto const& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  form::frmout(ClosestFormToCursor);
 	  form::refil();
@@ -9767,7 +9767,7 @@ void thred::internal::nuscol(size_t iColor) {
 
 void thred::internal::movchk() {
   static auto draggedColor    = uint8_t {};
-  auto&       defaultColorWin = *DefaultColorWin;
+  auto const& defaultColorWin = *DefaultColorWin;
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((Msg.wParam & MK_LBUTTON) != 0U) {
 	if (!StateMap->testAndSet(StateFlag::WASMOV)) {
@@ -10899,7 +10899,7 @@ auto thred::internal::handleEitherButtonDown(bool& retflag) -> bool {
 	}
 	{
 	  auto iVersion = uint8_t {};
-	  for (auto& iBackup : BackupViewer) {
+	  for (auto const& iBackup : BackupViewer) {
 		if (Msg.hwnd == iBackup) {
 		  FileVersionIndex = iVersion;
 		  if (StateMap->test(StateFlag::THUMSHO)) {
