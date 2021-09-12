@@ -116,7 +116,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  break;
 		}
 		if (UserFlagMap->test(UserFlag::BSAVOF)) {
-		  auto const blank = std::array<char, 14> {};
+		  constexpr auto blank = std::array<char, 14> {};
 		  if (FALSE == WriteFile(fileHandle, blank.data(), wrap::toUnsigned(blank.size()), &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;

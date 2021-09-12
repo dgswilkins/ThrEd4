@@ -6407,7 +6407,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  }
 	}
 	if (StateMap->test(StateFlag::ZUMED)) {
-	  auto const stitchCoordsInPixels = POINT {};
+	  constexpr auto stitchCoordsInPixels = POINT {};
 	  movieLine.push_back(stitchCoordsInPixels);
 	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
 		++RunPoint;

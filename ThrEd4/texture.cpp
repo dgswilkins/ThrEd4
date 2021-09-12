@@ -72,7 +72,7 @@ auto texture::internal::txnam(std::wstring& name) -> bool {
 }
 
 void texture::txdun() {
-  auto const signature      = std::array<char, 4> {"txh"};
+  constexpr auto signature  = std::array<char, 4> {"txh"};
   auto textureHistoryBuffer = std::vector<TXHSTBUF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
   if (!TextureHistory->operator[](0).texturePoints.empty()) {
