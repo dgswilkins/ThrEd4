@@ -16,7 +16,7 @@ struct has_EnumCount<T, std::void_t<decltype(T::EnumCount)>> : std::is_same<T, d
 
 template <typename EnumType> class EnumMap
 {
-  static_assert(std::is_enum<EnumType>::value, "Type for EnumMap must be an Enum");
+  static_assert(std::is_enum_v<EnumType>, "Type for EnumMap must be an Enum");
   static_assert(has_EnumCount<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
   public:

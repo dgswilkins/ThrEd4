@@ -63,7 +63,7 @@ namespace wrap {
 #endif // _win64
 
   template <class outType, class inType> auto ceil(inType invar) -> outType {
-  if constexpr (std::is_same<inType, float>::value) {
+  if constexpr (std::is_same_v<inType, float>) {
 	return gsl::narrow<outType>(std::ceilf(invar));
   }
   else {
@@ -105,7 +105,7 @@ auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRea
     -> bool;
 
 template <class outType, class inType> auto round(inType invar) -> outType {
-  if constexpr (std::is_same<inType, float>::value) {
+  if constexpr (std::is_same_v<inType, float>) {
 	return gsl::narrow<outType>(std::lroundf(invar));
   }
   else {
