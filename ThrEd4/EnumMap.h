@@ -23,39 +23,39 @@ template <typename EnumType> class EnumMap
   explicit constexpr EnumMap(uint32_t i_val) : mask_(i_val) {
   }
   [[nodiscard]] inline auto test(EnumType const i_key) const -> bool {
-	return mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	return mask_.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
   inline void set() {
 	mask_.set();
   }
   inline void set(EnumType const i_key, bool i_val = true) {
-	mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
+	mask_.set(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key), i_val);
   }
   inline auto testAndSet(EnumType const i_key, bool i_val = true) -> bool {
-	bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
-	mask_.set(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key), i_val);
+	bool const val = mask_.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
+	mask_.set(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key), i_val);
 	return val;
   }
   inline void reset() noexcept {
 	mask_.reset();
   }
   inline void reset(EnumType const i_key) {
-	mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	mask_.reset(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
   inline auto testAndReset(EnumType const i_key) -> bool {
-	bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
-	mask_.reset(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	bool const val = mask_.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
+	mask_.reset(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	return val;
   }
   inline void flip() {
 	mask_.flip();
   }
   inline void flip(EnumType const i_key) {
-	mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	mask_.flip(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
   }
   inline auto testAndFlip(EnumType const i_key) -> bool {
-	bool const val = mask_.test(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
-	mask_.flip(gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(i_key));
+	bool const val = mask_.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
+	mask_.flip(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	return val;
   }
   inline auto to_ulong() -> uint32_t {
@@ -77,11 +77,11 @@ template <typename EnumType> class EnumMap
 	return mask_.all();
   }
   [[nodiscard]] inline auto mask() const
-      -> std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> {
+      -> std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> {
 	return mask_;
   }
   inline void
-  mask(std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> const& i_mask) {
+  mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {
 	mask_ = i_mask;
   }
 
@@ -121,5 +121,5 @@ template <typename EnumType> class EnumMap
   }
 
   private:
-  std::bitset<gsl::narrow_cast<typename std::underlying_type<EnumType>::type>(EnumType::EnumCount)> mask_;
+  std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> mask_;
 };
