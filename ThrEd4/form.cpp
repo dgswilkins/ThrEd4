@@ -5898,7 +5898,7 @@ void form::setstrtch() {
 	  break;
 	}
 	default: {
-	  throw; // we should never reach here
+	  throw std::runtime_error("no valid control selected"); // we should never reach here
 	}
   }
   if ((SelectedFormControlVertex & 1U) != 0U) { // right or left control selected
@@ -6138,7 +6138,7 @@ void form::setexpand(float xyRatio) {
 	  break;
 	}
 	default: {
-	  throw; // we should never reach here
+	  throw std::runtime_error("no valid control vertex"); // we should never reach here
 	}
   }
   auto const integerReference = POINT {std::lround(reference.x), std::lround(reference.y)};

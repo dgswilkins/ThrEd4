@@ -5770,7 +5770,7 @@ void thred::internal::duclip() {
 		SetClipboardData(thrEdClip, clipHandle);
 	  }
 	  else {
-		throw;
+		throw std::runtime_error("clipHandle is null");
 	  }
 	  CloseClipboard();
 	}
@@ -10171,7 +10171,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 		                      std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 		                                  (activeStitch->y - ZoomRect.bottom) * ZoomRatio.y)});
 		// Todo - I am not sure how we could ever reach here. Leave throw to test
-		throw;
+		throw std::runtime_error("iOffset was zero");
 	  }
 	}
   }
@@ -16860,7 +16860,7 @@ void thred::internal::drwStch() {
 	}
 	if (StateMap->test(StateFlag::WASLIN)) {
 	  relin();
-	  throw; // this is here for testing I don't think this code is reachable
+	  throw std::runtime_error("testing WASLIN"); // this is here for testing I don't think this code is reachable
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  if (cmpstch(ClosestPointIndex, GroupStitchIndex)) {

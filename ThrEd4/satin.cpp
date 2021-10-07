@@ -833,7 +833,7 @@ void satin::ribon() {
 		StateMap->set(StateFlag::RESTCH);
 	  }
 	  else {
-		throw;
+		throw std::runtime_error("FormList is empty");
 	  }
 	}
 	else {

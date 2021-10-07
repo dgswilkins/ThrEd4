@@ -454,14 +454,12 @@ auto xt::insid(FRMHED const& form) -> std::vector<fPOINT>& {
 	if (nullptr != InsidePoints) {
 	  return *InsidePoints;
 	}
-	// null pointer, so blow up
-	throw;
+	throw std::runtime_error("InsidePoints is null");
   }
   if (nullptr != OutsidePoints) {
 	return *OutsidePoints;
   }
-  // null pointer, so blow up
-  throw;
+  throw std::runtime_error("OutsidePoints is null");
 }
 
 void xt::internal::delwlk(uint32_t code) {

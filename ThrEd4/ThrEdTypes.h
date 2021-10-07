@@ -1,6 +1,11 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 #pragma once
 
+// Windows Header Files:
+
+// Standard Libraries
+#include <stdexcept>
+
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
@@ -3038,5 +3043,5 @@ template <class T2, class T1> inline _Ret_notnull_ auto convert_ptr(T1* pointer)
 	return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
   }
 
-  throw;
+  throw std::runtime_error("Could Not cast pointer");
 }

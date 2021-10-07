@@ -126,7 +126,7 @@ void displayText::numWnd() {
 	                                     nullptr);
   }
   else {
-	throw; // we should never reach this
+	throw std::runtime_error("GeneralNumberInputBox is null"); // we should never reach this
   }
   thred::resetMsgBuffer();
 }

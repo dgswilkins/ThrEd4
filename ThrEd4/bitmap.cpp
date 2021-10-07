@@ -63,10 +63,10 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
 	  return bitmap;
 	}
 	DeleteObject(bitmap);
-	throw;
+	throw std::runtime_error("CreateDIBSection failed");
   }
 
-  throw;
+  throw std::runtime_error("ppvBits was null");
 }
 
 void bitmap::internal::bfil(COLORREF const& backgroundColor) {
@@ -195,7 +195,7 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
 	  }
 	}
 	else {
-	  throw;
+	  throw std::runtime_error("BMP data larger than monoBitmapData");
 	}
   }
   return whiteBits > blackBits;

@@ -85,8 +85,7 @@ auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t b
   if (nullptr != window) {
 	return window;
   }
-  // No window created so blow up
-  throw;
+  throw std::runtime_error("No window created in trcsub");
 }
 
 void trace::initTraceWindows() {
