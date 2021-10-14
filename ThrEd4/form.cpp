@@ -22,7 +22,7 @@
 #pragma warning(disable : 6387)  // supress warning for fmt library header
 #pragma warning(disable : 26455) // supress warning for library headers
 #include <boost/dynamic_bitset.hpp>
-#include <fmt/format.h>
+#include <fmt/xchar.h>
 #pragma warning(pop)
 
 // Local Headers

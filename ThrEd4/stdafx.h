@@ -41,7 +41,7 @@
 #pragma warning(disable : 26812) // supress warning for fmt library header
 #pragma warning(disable : 26814) // supress warning for boost library header
 #include <boost/dynamic_bitset.hpp>
-#include <fmt/format.h>
+#include <fmt/xchar.h>
 #include <gsl/gsl>
 #pragma warning(pop)
 

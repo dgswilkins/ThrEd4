@@ -17,7 +17,7 @@
 #pragma warning(disable : 4127)  // supress warning for fmt library header
 #pragma warning(disable : 6387)  // supress warning for fmt library header
 #pragma warning(disable : 26455) // supress warning for library headers
-#include <fmt/format.h>
+#include <fmt/xchar.h>
 #pragma warning(pop)
 
 // Local Headers
