@@ -1602,12 +1602,12 @@ void form::internal::sprct(std::vector<fPOINT> const* vertices,
   auto const& ipStart       = InsidePoints->operator[](start);
   auto const& ipFinish      = InsidePoints->operator[](finish);
   auto const delta          = fPOINT {(opFinish.x - opStart.x), (opFinish.y - opStart.y)};
-  auto&      verticalRect   = fillVerticalRect[start];
   auto const itStartVertex  = wrap::next(vertices->cbegin(), vertexIndex + start);
   if (auto const itFinishVertex = wrap::next(vertices->cbegin(), vertexIndex + finish);
       (delta.x != 0.0F) && (delta.y != 0.0F)) {
 	auto const slope = -delta.x / delta.y;
 	auto       point = *itFinishVertex;
+	auto&      verticalRect = fillVerticalRect[start];
 	proj(point, slope, opStart, opFinish, verticalRect.dopnt);
 	proj(point, slope, ipStart, ipFinish, verticalRect.dipnt);
 	point = *itStartVertex;
@@ -1635,6 +1635,7 @@ void form::internal::sprct(std::vector<fPOINT> const* vertices,
   else {
 	if (delta.x != 0.0F) {
 	  auto pointX = itFinishVertex->x;
+	  auto& verticalRect = fillVerticalRect[start];
 	  projv(pointX, opStart, opFinish, verticalRect.dopnt);
 	  projv(pointX, ipStart, ipFinish, verticalRect.dipnt);
 	  pointX = itStartVertex->x;
@@ -1657,6 +1658,7 @@ void form::internal::sprct(std::vector<fPOINT> const* vertices,
 	}
 	else {
 	  auto pointY = itFinishVertex->y;
+	  auto& verticalRect = fillVerticalRect[start];
 	  projh(pointY, opStart, opFinish, verticalRect.dopnt);
 	  projh(pointY, ipStart, ipFinish, verticalRect.dipnt);
 	  pointY = itStartVertex->y;
@@ -3494,9 +3496,9 @@ auto form::internal::lnclos(std::vector<uint32_t> const& groupIndexSequence,
 	  index0 += 2;
 	}
 	if (count0 != 0U) {
-	  auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
 	  if (auto const* lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
 		auto index1 = 0U;
+		auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
 		while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
 		  --count1;
 		  index1 += 2;
@@ -4252,6 +4254,7 @@ void form::internal::lcon(FRMHED const&          form,
 		auto gapToClosestRegion = 0.0F;
 		for (auto iNode = 0U; iNode < regionCount; ++iNode) {
 		  if (iSequence != iNode) {
+			// cppcheck-suppress variableScope
 			auto       nextGroup   = 0U;
 			if (auto const isConnected = regclos(
 			        groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
@@ -4267,6 +4270,7 @@ void form::internal::lcon(FRMHED const&          form,
 		  count = 0;
 		  for (auto iNode = 0U; iNode < regionCount; ++iNode) {
 			if (iSequence != iNode) {
+			  // cppcheck-suppress variableScope
 			  auto       nextGroup   = 0U;
 			  if (auto const isConnected = regclos(
 			          groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);

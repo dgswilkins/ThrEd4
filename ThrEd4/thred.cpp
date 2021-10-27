@@ -11059,6 +11059,7 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
+		// cppcheck-suppress variableScope
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm()) {
 		  // ToDo - I don't think this can ever be hit with closfrm
