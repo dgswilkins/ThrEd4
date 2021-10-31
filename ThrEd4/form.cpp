@@ -362,11 +362,15 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto const delta =
       fPOINT {itPreviousVertex->x - itCurrentVertex->x, itPreviousVertex->y - itCurrentVertex->y};
   auto       angle  = atan2(delta.y, delta.x);
-  auto       offset = fPOINT {length * cos(angle), length * sin(angle)};
+  auto xVal   = length * cos(angle);
+  auto yVal   = length * sin(angle);
+  auto       offset = fPOINT {xVal, yVal};
   auto const point  = fPOINT {itCurrentVertex->x + offset.x, itCurrentVertex->y + offset.y};
   angle             = atan2(-delta.x, delta.y);
   length /= 2.0F;
-  offset             = fPOINT {length * cos(angle), length * sin(angle)};
+  xVal               = length * cos(angle);
+  yVal               = length * sin(angle);
+  offset             = fPOINT {xVal, yVal};
   auto adjustedPoint = fPOINT {point.x + offset.x, point.y + offset.y};
   line[0] = line[3] = thred::stch2pxr(adjustedPoint);
   adjustedPoint     = fPOINT {point.x - offset.x, point.y - offset.y};

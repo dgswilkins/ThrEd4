@@ -1451,8 +1451,9 @@ auto satin::internal::satOffset(const uint32_t& finish, const uint32_t& start, f
 
   angle += FormAngles->operator[](start) + PI_FHALF;
 
-  auto const retval = fPOINT {length * cos(angle), length * sin(angle)};
-  return retval;
+  auto const xVal   = length * cos(angle);
+  auto const yVal   = length * sin(angle);
+  return fPOINT {xVal, yVal};
 }
 
 void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish, float satinWidth) {
