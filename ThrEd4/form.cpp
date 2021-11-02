@@ -1520,18 +1520,19 @@ auto form::cisin(FRMHED const& form, float xCoordinate, float yCoordinate) -> bo
    of the endpoints. */
 auto form::internal::proj(fPOINT const& point, float slope, fPOINT const& point0, fPOINT const& point1, fPOINT& intersectionPoint) noexcept
     -> bool {
-  auto const delta = fPOINT {point1.x - point0.x, point1.y - point0.y};
+  auto const delta = dPOINT {point1.x - point0.x, point1.y - point0.y};
+  auto       intersect = dPOINT {intersectionPoint};
   if (delta.x != 0.0F) {
 	auto const sideSlope     = delta.y / delta.x;
 	auto const sideConstant  = point0.y - sideSlope * point0.x;
 	auto const pointConstant = point.y - slope * point.x;
-	intersectionPoint.x      = (sideConstant - pointConstant) / (slope - sideSlope);
-	intersectionPoint.y      = intersectionPoint.x * slope + pointConstant;
+	intersect.x      = (sideConstant - pointConstant) / (slope - sideSlope);
+	intersect.y      = intersect.x * slope + pointConstant;
   }
   else {
-	intersectionPoint.x      = point0.x;
+	intersect.x      = point0.x;
 	auto const pointConstant = point.y - slope * point.x;
-	intersectionPoint.y      = intersectionPoint.x * slope + pointConstant;
+	intersect.y      = intersect.x * slope + pointConstant;
   }
   auto xMinimum = point0.x;
   auto xMaximum = point1.x;
@@ -1544,11 +1545,12 @@ auto form::internal::proj(fPOINT const& point, float slope, fPOINT const& point0
 	if (yMinimum > yMaximum) {
 	  std::swap(yMinimum, yMaximum);
 	}
-	return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum ||
-	         intersectionPoint.y < yMinimum || intersectionPoint.y > yMaximum);
+	intersectionPoint = intersect;
+	return !(intersect.x <= xMinimum || intersect.x > xMaximum ||
+	         intersect.y < yMinimum || intersect.y > yMaximum);
   }
-
-  return !(intersectionPoint.x <= xMinimum || intersectionPoint.x > xMaximum);
+  intersectionPoint = intersect;
+  return !(intersect.x <= xMinimum || intersect.x > xMaximum);
 }
 
 auto form::linx(std::vector<fPOINT> const& points, uint32_t start, uint32_t finish, fPOINT& intersection) noexcept
