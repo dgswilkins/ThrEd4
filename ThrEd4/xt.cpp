@@ -28,7 +28,6 @@
 // Local Headers
 #include "switches.h"
 #include "EnumMap.h"
-#include "utf8conv.h"
 #include "wrappers.h"
 
 #include "Resources/resource.h"

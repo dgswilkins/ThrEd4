@@ -27,7 +27,6 @@
 #endif
 
 // Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
 
 // C RunTime Header Files
 #include <crtdbg.h> // For _ASSERTE()
