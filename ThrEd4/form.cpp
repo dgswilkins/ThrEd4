@@ -1522,26 +1522,26 @@ auto form::internal::proj(fPOINT const& point, float slope, fPOINT const& point0
     -> bool {
   auto const delta = dPOINT {point1.x - point0.x, point1.y - point0.y};
   auto       intersect = dPOINT {intersectionPoint};
-  if (delta.x != 0.0F) {
+  if (delta.x != 0.0) {
 	auto const sideSlope     = delta.y / delta.x;
-	auto const sideConstant  = point0.y - sideSlope * point0.x;
-	auto const pointConstant = point.y - slope * point.x;
-	intersect.x      = (sideConstant - pointConstant) / (slope - sideSlope);
-	intersect.y      = intersect.x * slope + pointConstant;
+	auto const sideConstant  = gsl::narrow_cast<double>(point0.y) - sideSlope * gsl::narrow_cast<double>(point0.x);
+	auto const pointConstant = gsl::narrow_cast<double>(point.y) - gsl::narrow_cast<double>(slope) * gsl::narrow_cast<double>(point.x);
+	intersect.x      = (sideConstant - pointConstant) / (gsl::narrow_cast<double>(slope) - sideSlope);
+	intersect.y      = intersect.x * gsl::narrow_cast<double>(slope) + pointConstant;
   }
   else {
-	intersect.x      = point0.x;
-	auto const pointConstant = point.y - slope * point.x;
-	intersect.y      = intersect.x * slope + pointConstant;
+	intersect.x      = gsl::narrow_cast<double>(point0.x);
+	auto const pointConstant = gsl::narrow_cast<double>(point.y) - gsl::narrow_cast<double>(slope) * gsl::narrow_cast<double>(point.x);
+	intersect.y      = intersect.x * gsl::narrow_cast<double>(slope) + pointConstant;
   }
-  auto xMinimum = point0.x;
-  auto xMaximum = point1.x;
+  auto xMinimum = gsl::narrow_cast<double>(point0.x);
+  auto xMaximum = gsl::narrow_cast<double>(point1.x);
   if (xMinimum > xMaximum) {
 	std::swap(xMinimum, xMaximum);
   }
-  if (delta.y != 0.0F) {
-	auto yMinimum = point0.y;
-	auto yMaximum = point1.y;
+  if (delta.y != 0.0) {
+	auto yMinimum = gsl::narrow_cast<double>(point0.y);
+	auto yMaximum = gsl::narrow_cast<double>(point1.y);
 	if (yMinimum > yMaximum) {
 	  std::swap(yMinimum, yMaximum);
 	}
