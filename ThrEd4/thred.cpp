@@ -6487,7 +6487,7 @@ void thred::internal::setsped() {
   if (MovieTimeStep == 0) {
 	MovieTimeStep = 1;
   }
-  auto const userTimePerFrame = gsl::narrow_cast<double>(MovieTimeStep) / 10.0;
+  auto const userTimePerFrame = wrap::toDouble(MovieTimeStep) / 10.0;
   if (userTimePerFrame < 10.0) {
 	StitchesPerFrame        = wrap::round<uint32_t>(elapsedTimePerFrame / userTimePerFrame);
 	constexpr auto SPFCLAMP = 99U; // maximum stitches per frame

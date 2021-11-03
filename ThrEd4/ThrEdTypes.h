@@ -1225,11 +1225,11 @@ inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept 
 }
 
 inline dPOINT::dPOINT(fPOINT const& rhs) noexcept :
-    x(gsl::narrow_cast<double>(rhs.x)), y(gsl::narrow_cast<double>(rhs.y)) {
+    x(wrap::toDouble(rhs.x)), y(wrap::toDouble(rhs.y)) {
 }
 
 inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept :
-    x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
+    x(wrap::toDouble(rhsX)), y(wrap::toDouble(rhsY)) {
 }
 
 inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
@@ -1239,14 +1239,14 @@ inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool {
 }
 
 inline auto dPOINT::operator=(fPOINT const& rhs) noexcept -> dPOINT& {
-  x = gsl::narrow_cast<double>(rhs.x);
-  y = gsl::narrow_cast<double>(rhs.y);
+  x = wrap::toDouble(rhs.x);
+  y = wrap::toDouble(rhs.y);
   return *this;
 }
 
 inline auto dPOINT::operator=(BSEQPNT const& rhs) noexcept -> dPOINT& {
-  x = gsl::narrow_cast<double>(rhs.x);
-  y = gsl::narrow_cast<double>(rhs.y);
+  x = wrap::toDouble(rhs.x);
+  y = wrap::toDouble(rhs.y);
   return *this;
 }
 

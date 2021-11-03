@@ -125,6 +125,11 @@ template <class inType> auto ptrdiff(inType invar) -> ptrdiff_t {
 
 void setCursor(HCURSOR hCursor) noexcept;
 void textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept;
+
+template <class inType> auto toDouble(inType invar) noexcept -> double {
+  return gsl::narrow_cast<double>(invar);
+}
+
 auto toFloat(double invar) -> float;
 auto toFloat(int32_t invar) noexcept -> float;
 auto toFloat(LONG invar) noexcept -> float;

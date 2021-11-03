@@ -1524,24 +1524,24 @@ auto form::internal::proj(fPOINT const& point, float slope, fPOINT const& point0
   auto       intersect = dPOINT {intersectionPoint};
   if (delta.x != 0.0) {
 	auto const sideSlope     = delta.y / delta.x;
-	auto const sideConstant  = gsl::narrow_cast<double>(point0.y) - sideSlope * gsl::narrow_cast<double>(point0.x);
-	auto const pointConstant = gsl::narrow_cast<double>(point.y) - gsl::narrow_cast<double>(slope) * gsl::narrow_cast<double>(point.x);
-	intersect.x      = (sideConstant - pointConstant) / (gsl::narrow_cast<double>(slope) - sideSlope);
-	intersect.y      = intersect.x * gsl::narrow_cast<double>(slope) + pointConstant;
+	auto const sideConstant  = wrap::toDouble(point0.y) - sideSlope * wrap::toDouble(point0.x);
+	auto const pointConstant = wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
+	intersect.x      = (sideConstant - pointConstant) / (wrap::toDouble(slope) - sideSlope);
+	intersect.y      = intersect.x * wrap::toDouble(slope) + pointConstant;
   }
   else {
-	intersect.x      = gsl::narrow_cast<double>(point0.x);
-	auto const pointConstant = gsl::narrow_cast<double>(point.y) - gsl::narrow_cast<double>(slope) * gsl::narrow_cast<double>(point.x);
-	intersect.y      = intersect.x * gsl::narrow_cast<double>(slope) + pointConstant;
+	intersect.x      = wrap::toDouble(point0.x);
+	auto const pointConstant = wrap::toDouble(point.y) - wrap::toDouble(slope) * wrap::toDouble(point.x);
+	intersect.y      = intersect.x * wrap::toDouble(slope) + pointConstant;
   }
-  auto xMinimum = gsl::narrow_cast<double>(point0.x);
-  auto xMaximum = gsl::narrow_cast<double>(point1.x);
+  auto xMinimum = wrap::toDouble(point0.x);
+  auto xMaximum = wrap::toDouble(point1.x);
   if (xMinimum > xMaximum) {
 	std::swap(xMinimum, xMaximum);
   }
   if (delta.y != 0.0) {
-	auto yMinimum = gsl::narrow_cast<double>(point0.y);
-	auto yMaximum = gsl::narrow_cast<double>(point1.y);
+	auto yMinimum = wrap::toDouble(point0.y);
+	auto yMaximum = wrap::toDouble(point1.y);
 	if (yMinimum > yMaximum) {
 	  std::swap(yMinimum, yMaximum);
 	}
@@ -4048,20 +4048,20 @@ void form::internal::durgn(FRMHED const&                 form,
   auto const groupEnd   = sortedLines[currentRegion.end]->group;
   auto       seql       = 0U;
   if (groupEnd != groupStart) {
-	auto const intermediate = std::round((gsl::narrow_cast<double>(lastGroup) - groupStart) /
-	                                         (gsl::narrow_cast<double>(groupEnd) - groupStart) *
-	                                         (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart) +
+	auto const intermediate = std::round((wrap::toDouble(lastGroup) - groupStart) /
+	                                         (wrap::toDouble(groupEnd) - groupStart) *
+	                                         (wrap::toDouble(sequenceEnd) - sequenceStart) +
 	                                     sequenceStart);
 	wrap::narrow(seql, std::abs(intermediate));
   }
-  auto const length = (gsl::narrow_cast<double>(groupEnd) - groupStart) *
-                      (gsl::narrow_cast<double>(sequenceEnd) - sequenceStart);
+  auto const length = (wrap::toDouble(groupEnd) - groupStart) *
+                      (wrap::toDouble(sequenceEnd) - sequenceStart);
   auto seqn = sequenceEnd;
   if (length != 0.0) {
 	if (nextGroup == 0 || nextGroup < groupStart) {
 	  nextGroup = groupStart;
 	}
-	seqn = wrap::round<decltype(seqn)>((gsl::narrow_cast<double>(nextGroup) - groupStart) / length + sequenceStart);
+	seqn = wrap::round<decltype(seqn)>((wrap::toDouble(nextGroup) - groupStart) / length + sequenceStart);
   }
   if (seql < sequenceStart) {
 	seql = sequenceStart;
