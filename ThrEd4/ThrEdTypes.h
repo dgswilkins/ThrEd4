@@ -1153,14 +1153,12 @@ class BSEQPNT
   //~BSEQPNT() = default;
 };
 
-inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) {
-  x         = gsl::narrow<float>(rhsX);
-  y         = gsl::narrow<float>(rhsY);
-  attribute = gsl::narrow<int8_t>(rhsAttr);
+inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) :
+    x(gsl::narrow<float>(rhsX)), y(gsl::narrow<float>(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) : x(rhsX), y(rhsY) {
-  attribute = gsl::narrow<int8_t>(rhsAttr);
+inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) :
+    x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
 inline constexpr auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
@@ -1170,24 +1168,24 @@ inline constexpr auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bo
 inline constexpr fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
-inline constexpr fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept {
-  x = gsl::narrow_cast<float>(rhsX);
-  y = gsl::narrow_cast<float>(rhsY);
+inline constexpr fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept :
+  x(gsl::narrow_cast<float>(rhsX)),
+  y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept {
-  x = gsl::narrow_cast<float>(rhsX);
-  y = gsl::narrow_cast<float>(rhsY);
+inline constexpr fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept :
+  x(gsl::narrow_cast<float>(rhsX)),
+  y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(double rhsX, double rhsY) noexcept {
-  x = gsl::narrow_cast<float>(rhsX);
-  y = gsl::narrow_cast<float>(rhsY);
+inline constexpr fPOINT::fPOINT(double rhsX, double rhsY) noexcept :
+  x(gsl::narrow_cast<float>(rhsX)),
+  y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(dPOINT const& rhs) noexcept {
-  x = gsl::narrow_cast<float>(rhs.x);
-  y = gsl::narrow_cast<float>(rhs.y);
+inline constexpr fPOINT::fPOINT(dPOINT const& rhs) noexcept :
+  x(gsl::narrow_cast<float>(rhs.x)),
+  y(gsl::narrow_cast<float>(rhs.y)) {
 }
 
 inline constexpr auto fPOINT::operator=(dPOINT const& rhs) noexcept -> fPOINT& {
@@ -1218,10 +1216,8 @@ inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept :
     x(rhsX), y(rhsY), attribute(rhsA) {
 }
 
-inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept {
-  x         = gsl::narrow_cast<float>(rhsX);
-  y         = gsl::narrow_cast<float>(rhsY);
-  attribute = rhsA;
+inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept :
+    x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)), attribute(rhsA) {
 }
 
 inline dPOINT::dPOINT(fPOINT const& rhs) noexcept :
@@ -1465,9 +1461,8 @@ class SATCONOUT
   inline auto operator=(SATCON const& rhs) -> SATCONOUT&;
 };
 
-inline SATCONOUT::SATCONOUT(SATCON const& rhs) {
-  start  = gsl::narrow<uint16_t>(rhs.start);
-  finish = gsl::narrow<uint16_t>(rhs.finish);
+inline SATCONOUT::SATCONOUT(SATCON const& rhs) :
+    start(gsl::narrow<uint16_t>(rhs.start)), finish(gsl::narrow<uint16_t>(rhs.finish)) {
 }
 
 inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
@@ -1477,9 +1472,7 @@ inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
   return *this;
 }
 
-inline SATCON::SATCON(SATCONOUT const& rhs) noexcept {
-  start  = rhs.start;
-  finish = rhs.finish;
+inline SATCON::SATCON(SATCONOUT const& rhs) noexcept : start(rhs.start), finish(rhs.finish) {
 }
 
 inline auto SATCON::operator=(SATCONOUT const& rhs) noexcept -> SATCON& {
@@ -1563,8 +1556,7 @@ union FLENCNTOUT {
   inline auto operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT&;
 };
 
-inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept {
-  clipCount = rhs.clipCount;
+inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept : clipCount(rhs.clipCount) {
 }
 
 inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
@@ -1573,8 +1565,7 @@ inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
   return *this;
 }
 
-inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept { // NOLINT(cppcoreguidelines-pro-type-member-init)
-  clipCount = rhs.clipCount;
+inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept : clipCount(rhs.clipCount) {
 }
 
 inline auto FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT& {
@@ -1617,8 +1608,8 @@ union SATINANGLEOUT {
   inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
 };
 
-inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept {
-  angle = rhs.angle;
+inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept :
+  angle(rhs.angle) {
 }
 
 inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT& {
@@ -1627,8 +1618,8 @@ inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANG
   return *this;
 }
 
-inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept { // NOLINT(cppcoreguidelines-pro-type-member-init)
-  angle = rhs.angle;
+inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept :
+    angle(rhs.angle) { 
 }
 
 inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
@@ -1825,20 +1816,35 @@ class FRMHED
 };
 
 inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
-    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
-  attribute       = rhs.attribute;
-  vertexCount     = rhs.vertexCount;
-  type            = rhs.type;
-  fillColor       = rhs.fillColor;
-  borderColor     = rhs.borderColor;
-  clipEntries     = rhs.clipEntries;
-  vertexIndex     = 0;
-  borderClipData  = rhs.borderClipData; // Todo - Should we be copying this value?
-  satinGuideCount = rhs.satinGuideCount;
-  wordParam       = rhs.wordParam;
-  fillType        = rhs.fillType;
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
+  attribute(rhs.attribute),
+  vertexCount(rhs.vertexCount),
+  type(rhs.type),
+  fillColor(rhs.fillColor),
+  borderColor(rhs.borderColor),
+  clipEntries(rhs.clipEntries),
+  satinOrAngle(rhs.satinOrAngle), 
+  borderClipData(rhs.borderClipData), // Todo - Should we be copying this value?
+  satinGuideCount(rhs.satinGuideCount),
+  wordParam(rhs.wordParam), 
+  rectangle(rhs.rectangle),
+  fillType(rhs.fillType),
+  edgeType(rhs.edgeType),
+  fillSpacing(rhs.fillSpacing),
+  lengthOrCount(rhs.lengthOrCount),
+  borderSize(rhs.borderSize),
+  edgeSpacing(rhs.edgeSpacing),
+  edgeStitchLen(rhs.edgeStitchLen),
+  picoLength(rhs.res),
+  maxFillStitchLen(0.0F),
+  minFillStitchLen(0.0F),
+  maxBorderStitchLen(0.0F),
+  minBorderStitchLen(0.0F),
+  underlaySpacing(0.0F),
+  underlayStitchLen(0.0F),
+  underlayStitchAngle(0.0F),
+  underlayIndent(0.0F),
+  txof(0.0F)
+{
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
       ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
@@ -1854,26 +1860,6 @@ inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
 	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
   }
-
-  borderSize    = rhs.borderSize;
-  edgeSpacing   = rhs.edgeSpacing;
-  edgeStitchLen = rhs.edgeStitchLen;
-  picoLength    = rhs.res;
-
-  extendedAttribute   = 0U;
-  maxFillStitchLen    = 0.0F;
-  minFillStitchLen    = 0.0F;
-  maxBorderStitchLen  = 0.0F;
-  minBorderStitchLen  = 0.0F;
-  fillStart           = 0U;
-  fillEnd             = 0U;
-  underlaySpacing     = 0.0F;
-  underlayStitchLen   = 0.0F;
-  underlayStitchAngle = 0.0F;
-  underlayIndent      = 0.0F;
-  txof                = 0.0F;
-  underlayColor       = 0U;
-  cres                = 0U;
 }
 
 inline auto FRMHED::operator=(FRMHEDO const& rhs) noexcept -> FRMHED& {
@@ -1971,20 +1957,40 @@ class FRMHEDOUT
 };
 
 inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
-    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
-  attribute       = rhs.attribute;
-  vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
-  type            = rhs.type;
-  fillColor       = rhs.fillColor;
-  borderColor     = rhs.borderColor;
-  clipEntries     = gsl::narrow<uint16_t>(rhs.clipEntries);
-  vertexIndex     = 0U; // do not write the pointer value to file
-  borderClipData  = 0U; // do not write the pointer value to file
-  satinGuideCount = gsl::narrow<uint16_t>(rhs.satinGuideCount);
-  wordParam       = gsl::narrow<uint16_t>(rhs.wordParam);
-  fillType        = rhs.fillType;
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
+  attribute(rhs.attribute),
+  vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)),
+  type(rhs.type),
+  fillColor(rhs.fillColor),
+  borderColor(rhs.borderColor),
+  clipEntries(gsl::narrow<uint16_t>(rhs.clipEntries)), 
+  satinOrAngle(rhs.satinOrAngle),
+  satinGuideCount(gsl::narrow<uint16_t>(rhs.satinGuideCount)),
+  wordParam(gsl::narrow<uint16_t>(rhs.wordParam)), 
+  rectangle(rhs.rectangle), 
+  fillType(rhs.fillType),
+  edgeType(rhs.edgeType),
+  fillSpacing(rhs.fillSpacing), 
+  lengthOrCount(rhs.lengthOrCount), 
+  borderSize(rhs.borderSize),
+  edgeSpacing(rhs.edgeSpacing),
+  edgeStitchLen(rhs.edgeStitchLen),
+  picoLength(rhs.picoLength),
+  extendedAttribute(rhs.extendedAttribute),
+  maxFillStitchLen(rhs.maxFillStitchLen),
+  minFillStitchLen(rhs.minFillStitchLen),
+  maxBorderStitchLen(rhs.maxBorderStitchLen),
+  minBorderStitchLen(rhs.minBorderStitchLen),
+  fillInfo(rhs.fillInfo),
+  fillStart(gsl::narrow<uint16_t>(rhs.fillStart)),
+  fillEnd(gsl::narrow<uint16_t>(rhs.fillEnd)),
+  underlaySpacing(rhs.underlaySpacing),
+  underlayStitchLen(rhs.underlayStitchLen),
+  underlayStitchAngle(rhs.underlayStitchAngle),
+  underlayIndent(rhs.underlayIndent),
+  txof(rhs.txof),
+  underlayColor(rhs.underlayColor),
+  cres(rhs.cres)
+  {
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
       ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
@@ -2002,27 +2008,6 @@ inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
 	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
   }
-
-  borderSize    = rhs.borderSize;
-  edgeSpacing   = rhs.edgeSpacing;
-  edgeStitchLen = rhs.edgeStitchLen;
-  picoLength    = rhs.picoLength;
-
-  extendedAttribute   = rhs.extendedAttribute;
-  maxFillStitchLen    = rhs.maxFillStitchLen;
-  minFillStitchLen    = rhs.minFillStitchLen;
-  maxBorderStitchLen  = rhs.maxBorderStitchLen;
-  minBorderStitchLen  = rhs.minBorderStitchLen;
-  fillInfo            = rhs.fillInfo;
-  fillStart           = gsl::narrow<uint16_t>(rhs.fillStart);
-  fillEnd             = gsl::narrow<uint16_t>(rhs.fillEnd);
-  underlaySpacing     = rhs.underlaySpacing;
-  underlayStitchLen   = rhs.underlayStitchLen;
-  underlayStitchAngle = rhs.underlayStitchAngle;
-  underlayIndent      = rhs.underlayIndent;
-  txof                = rhs.txof;
-  underlayColor       = rhs.underlayColor;
-  cres                = rhs.cres;
 }
 
 inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
@@ -2085,20 +2070,40 @@ inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
 }
 
 inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
-    satinOrAngle(rhs.satinOrAngle), rectangle(rhs.rectangle), lengthOrCount(rhs.lengthOrCount) {
-  attribute       = rhs.attribute;
-  vertexCount     = rhs.vertexCount;
-  type            = rhs.type;
-  fillColor       = rhs.fillColor;
-  borderColor     = rhs.borderColor;
-  clipEntries     = rhs.clipEntries;
-  vertexIndex     = 0U; // do not read the index from a v2 file
-  borderClipData  = 0U; // do not read the index from a v2 file
-  satinGuideCount = rhs.satinGuideCount;
-  wordParam       = rhs.wordParam;
-  fillType        = rhs.fillType;
-  edgeType        = rhs.edgeType;
-  fillSpacing     = rhs.fillSpacing;
+  attribute(rhs.attribute), 
+  vertexCount(rhs.vertexCount), 
+  type(rhs.type),
+  fillColor(rhs.fillColor), 
+  borderColor(rhs.borderColor), 
+  clipEntries(rhs.clipEntries),
+  satinOrAngle(rhs.satinOrAngle), 
+  satinGuideCount(rhs.satinGuideCount),
+  wordParam(rhs.wordParam), 
+  rectangle(rhs.rectangle),
+  fillType(rhs.fillType), 
+  edgeType(rhs.edgeType), 
+  fillSpacing(rhs.fillSpacing),
+  lengthOrCount(rhs.lengthOrCount),
+  borderSize(rhs.borderSize),
+  edgeSpacing(rhs.edgeSpacing),
+  edgeStitchLen(rhs.edgeStitchLen),
+  picoLength(rhs.picoLength),
+  extendedAttribute(rhs.extendedAttribute),
+  maxFillStitchLen(rhs.maxFillStitchLen),
+  minFillStitchLen(rhs.minFillStitchLen),
+  maxBorderStitchLen(rhs.maxBorderStitchLen),
+  minBorderStitchLen(rhs.minBorderStitchLen),
+  fillInfo(rhs.fillInfo),
+  fillStart(rhs.fillStart),
+  fillEnd(rhs.fillEnd),
+  underlaySpacing(rhs.underlaySpacing),
+  underlayStitchLen(rhs.underlayStitchLen),
+  underlayStitchAngle(rhs.underlayStitchAngle),
+  underlayIndent(rhs.underlayIndent),
+  txof(rhs.txof),
+  underlayColor(rhs.underlayColor),
+  cres(rhs.cres)
+{ 
   if (((edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX) && (clipEntries != 0U)) ||
       ((((1U << fillType) & (MCLPF | MVCLPF | MHCLPF | MANGCLPF)) != 0) && (lengthOrCount.clipCount != 0U))) {
 	angleOrClipData.clip = rhs.angleOrClipData.clip;
@@ -2114,27 +2119,6 @@ inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
 	  angleOrClipData.angle = rhs.angleOrClipData.angle;
 	}
   }
-
-  borderSize    = rhs.borderSize;
-  edgeSpacing   = rhs.edgeSpacing;
-  edgeStitchLen = rhs.edgeStitchLen;
-  picoLength    = rhs.picoLength;
-
-  extendedAttribute   = rhs.extendedAttribute;
-  maxFillStitchLen    = rhs.maxFillStitchLen;
-  minFillStitchLen    = rhs.minFillStitchLen;
-  maxBorderStitchLen  = rhs.maxBorderStitchLen;
-  minBorderStitchLen  = rhs.minBorderStitchLen;
-  fillInfo            = rhs.fillInfo;
-  fillStart           = rhs.fillStart;
-  fillEnd             = rhs.fillEnd;
-  underlaySpacing     = rhs.underlaySpacing;
-  underlayStitchLen   = rhs.underlayStitchLen;
-  underlayStitchAngle = rhs.underlayStitchAngle;
-  underlayIndent      = rhs.underlayIndent;
-  txof                = rhs.txof;
-  underlayColor       = rhs.underlayColor;
-  cres                = rhs.cres;
 }
 
 inline auto FRMHED::operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED& {
