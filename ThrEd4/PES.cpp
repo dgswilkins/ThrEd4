@@ -373,6 +373,9 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   auto fileBuf = std::vector<uint8_t> {};
   fileBuf.reserve(wrap::toSize(fileSize));
   auto* fileBuffer = fileBuf.data();
+  if (fileBuffer == nullptr) {
+	return false;
+  }
   auto  bytesRead  = DWORD {};
   wrap::ReadFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
   auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
@@ -386,6 +389,9 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   auto*      pecHeader     = convert_ptr<PECHDR*>(&fileBuffer[pesHeader->off]);
   auto const pecOffset     = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
   auto*      PESstitch     = &fileBuffer[pecOffset];
+  if (PESstitch == nullptr) {
+	return false;
+  }
   auto const pesColorCount = pecHeader->colorCount + 1U;
   auto&      pad           = pecHeader->pad;
   PEScolors                = std::begin(pad);
@@ -604,12 +610,20 @@ auto PES::savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		lastIndex = pesBuffer.size();
 		pesBuffer.resize(lastIndex + sizeof(uint16_t));
 		auto* colorIndex = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
+		if (colorIndex == nullptr) {
+		  flag = false;
+		  break;
+		}
 		*colorIndex      = gsl::narrow_cast<uint16_t>(pesThreadCount);
 		for (auto paletteIndex = 0U; paletteIndex < pesThreadCount; ++paletteIndex) {
 		  lastIndex = pesBuffer.size();
 		  pesBuffer.resize(lastIndex + 2 * sizeof(uint16_t));
 		  auto* colorEntry = convert_ptr<uint16_t*>(&pesBuffer[lastIndex]);
-		  *colorEntry      = threadList[paletteIndex].blockIndex;
+		  if (colorEntry == nullptr) {
+			flag = false;
+			break;
+		  }
+		  *colorEntry = threadList[paletteIndex].blockIndex;
 		  ++colorEntry;
 		  *colorEntry = threadList[paletteIndex].colorIndex;
 		}
