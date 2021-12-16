@@ -58,7 +58,7 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
   if (ppvBits != nullptr) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
 	auto const bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0);
 	if (*ppvBits != nullptr) {
 	  return bitmap;
 	}
@@ -150,7 +150,6 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
 		SelectObject(BitmapDC, hBitmapFile);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, deviceContext, 0, 0, SRCCOPY);
 		DeleteObject(bitmap);
 		DeleteObject(deviceContext);
@@ -268,7 +267,6 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hr = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 	constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 	hr = pFileSave->SetFileTypes(wrap::toUnsigned(filterFileTypes.size()), filterFileTypes.data());
@@ -277,19 +275,15 @@ auto bitmap::internal::saveName(fs::path& fileName) {
 	auto const bmpName = UTF16BMPname->filename().wstring();
 	hr += pFileSave->SetFileName(bmpName.c_str());
 	hr += pFileSave->SetDefaultExtension(L"bmp");
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr)) {
 	  hr = pFileSave->Show(nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 		hr          = pFileSave->GetResult(&pItem);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr) && (nullptr != pItem)) {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pszFilePath = PWSTR {nullptr};
 		  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
 			fileName.assign(pszFilePath);
 			CoTaskMemFree(pszFilePath);
@@ -353,11 +347,9 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	auto hr = CoCreateInstance(
 	    CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
 	  auto dwOptions = DWORD {};
 	  hr             = pFileOpen->GetOptions(&dwOptions);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hr)) {
 		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -376,19 +368,15 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 #else
 		UNREFERENCED_PARAMETER(directory);
 #endif
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hr)) {
 		  hr = pFileOpen->Show(nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hr)) {
 			auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
 			hr          = pFileOpen->GetResult(&pItem);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hr) && (nullptr != pItem)) {
 			  // NOLINTNEXTLINE(readability-qualified-auto)
 			  auto pszFilePath = PWSTR {nullptr};
 			  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hr)) {
 				fileName->assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);
@@ -569,7 +557,6 @@ void bitmap::drawBmpBackground() {
 	deviceContext = TraceDC;
   }
   if (bi::bitar()) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	StretchBlt(StitchWindowMemDC,
 	           BitmapDstRect.left,
 	           BitmapDstRect.top,
@@ -645,13 +632,11 @@ auto bitmap::getrmap() -> uint32_t {
   auto bitmapSize = 0U;
   if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
 	SelectObject(TraceDC, TraceBitmap);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 	StateMap->set(StateFlag::WASTRAC);
 	bitmapSize = (wrap::toUnsigned(BitmapWidth) + 1U) * (wrap::toUnsigned(BitmapHeight) + 1U);
 	TracedMap->resize(bitmapSize);
 	TracedMap->reset();
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	StretchBlt(StitchWindowMemDC,
 	           BitmapDstRect.left,
 	           BitmapDstRect.top,
@@ -668,7 +653,6 @@ auto bitmap::getrmap() -> uint32_t {
 }
 
 void bitmap::bitbltBitmap() noexcept {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 }
 
