@@ -1,24 +1,61 @@
 ---
-Checks:            "\
+Checks:            "-*,\
+altera-*,\
+-altera-id-dependent-backward-branch,\
+-altera-struct-pack-align,\
+-altera-unroll-loops,\
 boost-*,\
 bugprone-*,\
-cert-*,-cert-dcl16-c,\
+-bugprone-easily-swappable-parameters,\
+cert-*,\
 clang-analyzer-*,\
-clang-diagnostic-*,-clang-diagnostic-nonportable-system-include-path,\
-cppcoreguidelines-*
-google-*,-google-runtime-references,\
-hicpp-*,-hicpp-avoid-c-arrays,\
-llvm-*,-llvm-include-order,-llvm-qualified-auto,-llvm-header-guard,\
-misc-*,-misc-non-private-member-variables-in-classes,\
-modernize-*,-modernize-avoid-c-arrays,\
+cppcoreguidelines-*,\
+-cppcoreguidelines-avoid-c-arrays,\
+-cppcoreguidelines-avoid-magic-numbers,\
+-cppcoreguidelines-avoid-non-const-global-variables,\
+-cppcoreguidelines-macro-usage,\
+-cppcoreguidelines-pro-bounds-constant-array-index,\
+-cppcoreguidelines-pro-bounds-pointer-arithmetic,\
+-cppcoreguidelines-pro-type-reinterpret-cast,\
+-cppcoreguidelines-pro-type-union-access,\
+-cppcoreguidelines-pro-type-vararg,\
+fuchsia-*,\
+-fuchsia-default-arguments-calls,\
+-fuchsia-default-arguments-declarations,\
+-fuchsia-overloaded-operator,\
+-fuchsia-trailing-return,\
+google-*,\
+hicpp-*,\
+-hicpp-avoid-c-arrays,\
+llvm-*,\
+-llvm-header-guard,\
+-llvm-include-order,\
+-llvm-qualified-auto,\
+llvmlibc-*,\
+-llvmlibc-callee-namespace,\
+-llvmlibc-implementation-in-namespace,\
+-llvmlibc-restrict-system-libc-headers,\
+misc-*,\
+-misc-non-private-member-variables-in-classes,\
+modernize-*,\
+-modernize-avoid-c-arrays,\
+-modernize-use-default-member-init,\
 performance-*,\
 portability-*,\
-readability-*,-readability-magic-numbers,-readability-function-cognitive-complexity\
-"
+readability-*,\
+-readability-function-cognitive-complexity,\
+-readability-magic-numbers"
 WarningsAsErrors:  ''
 HeaderFilterRegex: '^.*ThrEd4\\ThrEd4\\(?!Resources\\).*\.(h|hxx|cxx)$'
 FormatStyle:       'file'
 User:              dwilkins
 CheckOptions:
-  - key:             readability-function-cognitive-complexity.Threshold
-    value:           '35'
+  - { key: readability-function-cognitive-complexity.Threshold, value: '55'}
+  - { key: readability-identifier-naming.NamespaceCase,       value: camelBack }
+  - { key: readability-identifier-naming.ClassCase,           value: camelBack  }
+  - { key: readability-identifier-naming.PrivateMemberPrefix, value: m_         }
+  - { key: readability-identifier-naming.StructCase,          value: camelBack  }
+  - { key: readability-identifier-naming.FunctionCase,        value: camelBack }
+  - { key: readability-identifier-naming.VariableCase,        value: camelBack }
+  - { key: readability-identifier-naming.GlobalVariableCase,  value: CamelCase }
+  - { key: readability-identifier-naming.GlobalConstantCase,  value: UPPER_CASE }
