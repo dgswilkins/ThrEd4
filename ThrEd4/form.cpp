@@ -90,7 +90,7 @@ auto form::chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool {
 void form::fltspac(uint32_t vertexOffset, uint32_t count) {
   auto const currentVertex = FormList->operator[](ClosestFormToCursor).vertexIndex + vertexOffset;
   auto const startVertex   = wrap::next(FormVertices->cbegin(), currentVertex);
-  auto const val           = fPOINT {};
+  auto constexpr val       = fPOINT {};
   FormVertices->insert(startVertex, count, val);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);

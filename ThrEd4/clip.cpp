@@ -133,7 +133,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	find += form.lengthOrCount.clipCount;
   }
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
-  auto const val         = fPOINT {};
+  auto constexpr val     = fPOINT {};
   ClipPoints->insert(itClipPoint, count, val);
   for (auto iForm = ClosestFormToCursor; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (auto& thisForm = FormList->operator[](iForm); clip::iseclpx(thisForm)) {
@@ -152,7 +152,7 @@ auto clip::numclp() -> uint32_t {
   auto const clipSize    = wrap::toUnsigned(ClipBuffer->size());
   auto const find        = ci::findclp(ClosestFormToCursor);
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
-  auto const val         = fPOINT {};
+  auto constexpr val     = fPOINT {};
   ClipPoints->insert(itClipPoint, clipSize, val);
   auto& formList = *FormList;
 
@@ -692,7 +692,7 @@ void clip::duxclp(FRMHED const& form) {
   tempClipPoints.reserve(ClipBuffer->size());
   ci::clpxadj(tempClipPoints, chainEndPoints);
   OSequence->clear();
-  auto const rotationCenter = fPOINT {};
+  auto constexpr rotationCenter = fPOINT {};
   for (auto iPoint = 1U; iPoint < wrap::toUnsigned(chainEndPoints.size()); ++iPoint) {
 	ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
   }

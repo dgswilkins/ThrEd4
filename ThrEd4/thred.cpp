@@ -563,7 +563,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 auto thred::adflt(uint32_t count) -> uint32_t {
   auto const startVertex = wrap::toUnsigned(FormVertices->size());
   auto const it          = FormVertices->end();
-  auto const val         = fPOINT {};
+  auto constexpr val     = fPOINT {};
   FormVertices->insert(it, count, val);
   return startVertex;
 }
@@ -571,7 +571,7 @@ auto thred::adflt(uint32_t count) -> uint32_t {
 auto thred::adclp(uint32_t count) -> uint32_t {
   auto const iClipPoint = wrap::toUnsigned(ClipPoints->size());
   auto const it         = ClipPoints->end();
-  auto const val        = fPOINT {};
+  auto constexpr val    = fPOINT {};
   ClipPoints->insert(it, count, val);
   return iClipPoint;
 }
