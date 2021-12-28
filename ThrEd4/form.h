@@ -338,19 +338,19 @@ namespace internal {
             fRECTANGLE const&          boundingRect,
             std::vector<fPOINT> const& currentFormVertices) -> bool;
   void lapbrd(FRMHED const& form);
-  void lcon(FRMHED const&          form,
+  void lcon(FRMHED const&                form,
             std::vector<uint32_t> const& groupIndexSequence,
-            std::vector<SMALPNTL>& lineEndpoints,
-            std::vector<fPOINT>&   workingFormVertices);
+            std::vector<SMALPNTL>&       lineEndpoints,
+            std::vector<fPOINT>&         workingFormVertices);
   auto lenComp(LENINFO const& arg1, LENINFO const& arg2) noexcept -> bool;
   auto clipComp(CLIPSORT const* arg1, CLIPSORT const* arg2) noexcept -> bool;
   auto lnclos(std::vector<uint32_t> const& groupIndexSequence,
               std::vector<SMALPNTL> const& lineEndpoints,
-              uint32_t               group0,
-              uint32_t               line0,
-              uint32_t               group1,
-              uint32_t               line1,
-              float                  gapToClosestRegion) noexcept -> bool;
+              uint32_t                     group0,
+              uint32_t                     line0,
+              uint32_t                     group1,
+              uint32_t                     line1,
+              float                        gapToClosestRegion) noexcept -> bool;
   void makpoli();
   void movseq(std::vector<SMALPNTL*> const& sortedLines, uint32_t ind);
   void mvpclp(std::vector<CLIPSORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;

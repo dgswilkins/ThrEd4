@@ -45,10 +45,10 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
 
 void displayText::shoMsg(std::wstring const& message) {
   if (!message.empty()) {
-	auto           strings              = std::vector<std::wstring> {};
-	auto           iString              = 0U;
-	auto           previousStringLength = 0U;
-	auto const     sizeLim              = message.size();
+	auto       strings              = std::vector<std::wstring> {};
+	auto       iString              = 0U;
+	auto       previousStringLength = 0U;
+	auto const sizeLim              = message.size();
 	while (iString < sizeLim) {
 	  if (constexpr auto NEWLINE = 10; message[iString] == NEWLINE) {
 		strings.push_back(message.substr(previousStringLength, (iString++ - previousStringLength)));

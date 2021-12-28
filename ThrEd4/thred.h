@@ -225,7 +225,7 @@ namespace internal {
   void fil2sel(uint32_t stat);
   void filclos();
   void filfrms();
-  auto find1st()->uint32_t;
+  auto find1st() -> uint32_t;
   auto finrng(uint32_t find) noexcept -> bool;
   void fixpclp(uint32_t closestFormToCursor);
   void fnamtabs();
@@ -268,8 +268,7 @@ namespace internal {
   auto handleMainWinKeys(wchar_t const&            code,
                          fPOINT&                   rotationCenter,
                          std::vector<POINT> const& stretchBoxLine,
-                         bool&                     retflag)
-      -> bool;
+                         bool&                     retflag) -> bool;
   auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                        float               xyRatio,
                        float&              rotationAngle,
@@ -449,11 +448,7 @@ namespace internal {
   auto sidclp() -> bool;
   void sidhup();
   void sidmsg(FRMHED const& form, HWND window);
-  void sizclp(FRMHED const& form,
-              uint32_t&     formFirstStitchIndex,
-              uint32_t&     formStitchCount,
-              uint32_t&     length,
-              uint32_t&     fileSize);
+  void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
   auto sizfclp(FRMHED const& form) -> uint32_t;
   void srchk();
   auto srchknot(uint32_t source) -> uint32_t;

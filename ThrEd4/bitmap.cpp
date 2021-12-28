@@ -110,7 +110,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	BitmapDC = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
-	  auto       bitmapWidthBytes = gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U << 2U;
+	  auto bitmapWidthBytes = gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U << 2U;
 	  if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
 		bitmapWidthBytes += 4U;
 	  }
@@ -625,7 +625,7 @@ auto bitmap::getrmap() -> uint32_t {
                                         0U,
                                         0U};
 
-  auto const info       = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
+  auto const info = BITMAPINFO {header, {RGBQUAD {0, 0, 0, 0}}};
   TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;

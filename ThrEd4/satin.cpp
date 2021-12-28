@@ -751,9 +751,9 @@ void satin::ribon() {
 		auto       newForm            = FRMHED {};
 		auto const currentType        = FormList->operator[](ClosestFormToCursor).type;
 		auto const currentVertexCount = FormList->operator[](ClosestFormToCursor).vertexCount;
-		newForm.maxFillStitchLen = MAXSIZ * PFGRAN;
-		newForm.minFillStitchLen = MinStitchLength;
-		MaxStitchLen             = MAXSIZ * PFGRAN;
+		newForm.maxFillStitchLen      = MAXSIZ * PFGRAN;
+		newForm.minFillStitchLen      = MinStitchLength;
+		MaxStitchLen                  = MAXSIZ * PFGRAN;
 		if (currentType == FRMLINE) {
 		  // Set blunt flags
 		  auto isBlunt = 0U;
@@ -762,9 +762,8 @@ void satin::ribon() {
 		  }
 		  si::satends(FormList->operator[](ClosestFormToCursor), isBlunt, BorderWidth);
 		}
-		newForm.vertexIndex = (currentType == FRMLINE)
-		                          ? thred::adflt(currentVertexCount * 2U)
-		                          : thred::adflt((currentVertexCount * 2U) + 2U);
+		newForm.vertexIndex    = (currentType == FRMLINE) ? thred::adflt(currentVertexCount * 2U)
+		                                                  : thred::adflt((currentVertexCount * 2U) + 2U);
 		auto const startVertex = wrap::next(FormVertices->begin(), newForm.vertexIndex);
 		auto       itVertex    = startVertex;
 		*(itVertex++)          = OutsidePoints->front();
@@ -953,10 +952,10 @@ void satin::internal::satfn(FRMHED const&             form,
 	auto itLine1Vertex = wrap::next(itFirstVertex, iLine1Vertex);
 	auto line1Delta    = fPOINT {line1Next->x - itLine1Vertex->x, line1Next->y - itLine1Vertex->y};
 	auto line2Point    = (iLine2Vertex == form.vertexCount) ? *itFirstVertex
-	                                                     : *(wrap::next(itFirstVertex, iLine2Vertex));
-	auto line2Delta = fPOINT {line2Previous->x - line2Point.x, line2Previous->y - line2Point.y};
-	iLine1Vertex    = form::nxt(form, iLine1Vertex);
-	iLine2Vertex    = form::prv(form, iLine2Vertex);
+	                                                        : *(wrap::next(itFirstVertex, iLine2Vertex));
+	auto line2Delta    = fPOINT {line2Previous->x - line2Point.x, line2Previous->y - line2Point.y};
+	iLine1Vertex       = form::nxt(form, iLine1Vertex);
+	iLine2Vertex       = form::prv(form, iLine2Vertex);
 	auto line1Step =
 	    fPOINT {line1Delta.x / wrap::toFloat(line1Count), line1Delta.y / wrap::toFloat(line1Count)};
 	auto line2Step =
@@ -1196,8 +1195,8 @@ void satin::satfix() {
 	minSize = 2U;
   }
   if (TempPolygon->size() > minSize) {
-	FormList->back().vertexIndex    = thred::adflt(vertexCount);
-	auto const itVertex = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
+	FormList->back().vertexIndex = thred::adflt(vertexCount);
+	auto const itVertex          = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
 	std::copy(TempPolygon->cbegin(), TempPolygon->cend(), itVertex);
 	TempPolygon->clear();
 	FormList->back().vertexCount = vertexCount;
@@ -1270,9 +1269,9 @@ void satin::internal::filinsbw(std::vector<fPOINT>& satinBackup,
 
 void satin::internal::sbfn(std::vector<fPOINT> const& insidePoints, uint32_t start, uint32_t finish, fPOINT& stitchPoint) {
   auto const& outsidePoints = *OutsidePoints;
-  auto  innerDelta    = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
+  auto        innerDelta    = fPOINT {(insidePoints[finish].x - insidePoints[start].x),
                             (insidePoints[finish].y - insidePoints[start].y)};
-  auto  outerDelta    = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),
+  auto        outerDelta    = fPOINT {(outsidePoints[finish].x - outsidePoints[start].x),
                             (outsidePoints[finish].y - outsidePoints[start].y)};
 
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
@@ -1451,8 +1450,8 @@ auto satin::internal::satOffset(const uint32_t& finish, const uint32_t& start, f
 
   angle += FormAngles->operator[](start) + PI_FHALF;
 
-  auto const xVal   = length * cos(angle);
-  auto const yVal   = length * sin(angle);
+  auto const xVal = length * cos(angle);
+  auto const yVal = length * sin(angle);
   return fPOINT {xVal, yVal};
 }
 
@@ -1461,9 +1460,9 @@ void satin::internal::outfn(FRMHED const& form, uint32_t start, uint32_t finish,
       (fabs(FormAngles->operator[](start)) < TNYFLOAT && fabs(FormAngles->operator[](finish)) < TNYFLOAT)
           ? fPOINT {0.0F, satinWidth}
           : satOffset(finish, start, satinWidth);
-  auto const itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
-                            ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
-                            : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
+  auto const     itVertex = ((form.type == FRMLINE) && ((form.edgeType & NEGUND) == EDGEPROPSAT))
+                                ? wrap::next(AngledFormVertices->cbegin(), form.vertexIndex + finish)
+                                : wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
   InsidePoints-> operator[](finish).x = itVertex->x - offset.x;
   InsidePoints-> operator[](finish).y = itVertex->y - offset.y;
   OutsidePoints->operator[](finish).x = itVertex->x + offset.x;

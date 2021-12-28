@@ -223,10 +223,10 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
 }
 
 auto trace::internal::trsum() -> uint32_t {
-  auto const  firstColor = TraceAdjacentColors.front();
-  auto const  iBegin     = std::next(TraceAdjacentColors.begin());
-  auto const  iEnd       = std::next(TraceAdjacentColors.end(), -1);
-  auto const  fold       = [firstColor](uint32_t a, uint32_t b) {
+  auto const firstColor = TraceAdjacentColors.front();
+  auto const iBegin     = std::next(TraceAdjacentColors.begin());
+  auto const iEnd       = std::next(TraceAdjacentColors.end(), -1);
+  auto const fold       = [firstColor](uint32_t a, uint32_t b) {
     return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
   };
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
@@ -611,7 +611,7 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) {
   if (point != nullptr) {
 	wrap::narrow(traceDiff.x, point[1].x - point[0].x);
-	wrap::narrow(traceDiff.y , point[1].y - point[0].y);
+	wrap::narrow(traceDiff.y, point[1].y - point[0].y);
   }
 }
 
@@ -646,8 +646,8 @@ void trace::internal::dutrac() {
 	  }
 	  auto const right = (point < limit) ? point - CurrentTracePoint.y * bitmap::getBitmapWidth()
 	                                     : bitmap::getBitmapWidth();
-	  point = savedPoint;
-	  limit = CurrentTracePoint.y * bitmap::getBitmapWidth();
+	  point            = savedPoint;
+	  limit            = CurrentTracePoint.y * bitmap::getBitmapWidth();
 	  while (point > limit && !TracedEdges->test(wrap::toSize(point))) {
 		--point;
 	  }
@@ -758,7 +758,7 @@ void trace::internal::dutrac() {
 	  tracedPoints.push_back(decimatedLine[iCurrent]);
 	}
 #endif
-	auto form = FRMHED{};
+	auto form        = FRMHED {};
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	FormVertices->push_back(fPOINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
@@ -783,9 +783,9 @@ void trace::internal::dutrac() {
 		traceLengthSum = 0.0;
 	  }
 	}
-	form.vertexCount = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
-	form.type        = FRMFPOLY;
-	form.attribute   = gsl::narrow<uint8_t>(ActiveLayer << 1U);
+	form.vertexCount     = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
+	form.type            = FRMFPOLY;
+	form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form.satinGuideCount = 0;
 	FormList->push_back(form);
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
@@ -827,8 +827,8 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto const spTBD = gsl::make_span(TraceBitmapData,
-		                            wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+		auto const spTBD = gsl::make_span(
+		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto const pixel : spTBD) {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();

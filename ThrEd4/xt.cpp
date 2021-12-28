@@ -110,8 +110,8 @@ void xt::internal::duxrats(uint32_t start, uint32_t finish, fPOINT& point, float
 void xt::internal::durats(uint32_t iSequence, std::vector<fPOINT>* sequence, FEATHER& feather) {
   if (sequence != nullptr) {
 	auto const& bCurrent = BSequence->operator[](iSequence);
-	auto const& bNext = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto const               stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
+	auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+	auto const                     stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
 	if (stitchLength < feather.minStitch) {
 	  sequence->push_back(fPOINT {bCurrent.x, bCurrent.y});
 	}
@@ -904,14 +904,14 @@ auto xt::internal::precjmps(std::vector<fPOINTATTR>&  stitchBuffer,
 	for (auto iRegion = sortRecord.start; iRegion < sortRecord.finish; ++iRegion) {
 	  if (pRecs[iRegion]->otyp == formFillCounter[pRecs[iRegion]->form]) {
 		auto const& startStitch = StitchBuffer->operator[](pRecs[iRegion]->startStitch);
-		auto length       = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
+		auto length             = hypot(startStitch.x - stitchIt->x, startStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
 		  direction     = false;
 		  currentRegion = iRegion;
 		}
 		auto const& endStitch = StitchBuffer->operator[](pRecs[iRegion]->endStitch);
-		length          = hypot(endStitch.x - stitchIt->x, endStitch.y - stitchIt->y);
+		length                = hypot(endStitch.x - stitchIt->x, endStitch.y - stitchIt->y);
 		if (length < minimumLength) {
 		  minimumLength = length;
 		  direction     = true;
@@ -2449,10 +2449,12 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
+	// clang-format off
 	// ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
 	auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	// ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
+	// clang-format on
 	if (nResult != 0) {
 	  flag = 0;
 

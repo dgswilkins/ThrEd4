@@ -80,8 +80,7 @@ template <typename EnumType> class EnumMap
       -> std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> {
 	return mask_;
   }
-  inline void
-  mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {
+  inline void mask(std::bitset<gsl::narrow_cast<std::underlying_type_t<EnumType>>(EnumType::EnumCount)> const& i_mask) {
 	mask_ = i_mask;
   }
 

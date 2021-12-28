@@ -106,11 +106,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		  PCSStitchBuffer.push_back(stitchRec);
 		}
 		if (FALSE ==
-		    WriteFile(fileHandle,
-		              PCSStitchBuffer.data(),
-		              wrap::sizeofVector(PCSStitchBuffer),
-		              &bytesWritten,
-		              nullptr)) {
+		    WriteFile(fileHandle, PCSStitchBuffer.data(), wrap::sizeofVector(PCSStitchBuffer), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;

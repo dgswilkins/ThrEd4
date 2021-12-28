@@ -767,17 +767,19 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 void formForms::dasyfrm() {
   constexpr auto DASYSIZE = 6.0F; // ratio of default daisy form to the screen size
   thred::unmsg();
+  // clang-format off
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
-  if (nResult != 0) {   
+  // clang-format on
+  if (nResult != 0) {
 	StateMap->reset(StateFlag::FORMIN);
 	return;
   }
   auto const referencePoint =
       fPOINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
-  auto form              = FRMHED {};
+  auto form               = FRMHED {};
   form.vertexIndex        = wrap::toUnsigned(FormVertices->size());
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -891,8 +893,8 @@ void formForms::dasyfrm() {
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
-	auto ReferenceVertex = wrap::next(itVertex, fref - 1U);
-	constexpr auto HOLEMARG = 0.01F; // hole margin offset
+	auto           ReferenceVertex = wrap::next(itVertex, fref - 1U);
+	constexpr auto HOLEMARG        = 0.01F; // hole margin offset
 	ReferenceVertex->y += HOLEMARG;
 	++ReferenceVertex;
 	ReferenceVertex->y += HOLEMARG;
@@ -904,7 +906,7 @@ void formForms::dasyfrm() {
   }
   StateMap->set(StateFlag::INIT);
   FormList->push_back(form);
-  ClosestFormToCursor     = wrap::toUnsigned(FormList->size() - 1U);
+  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   form::frmout(ClosestFormToCursor);
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; ++iMacroPetal) {
 	itVertex->x -= form.rectangle.left;
@@ -1006,10 +1008,12 @@ auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam
 
 void formForms::setear() {
   thred::unmsg();
+  // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
-  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); //NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
+  auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // clang-format on
   if (nResult != 0) {
 	thred::savdo();
 	constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
@@ -1045,7 +1049,7 @@ void formForms::setear() {
 	verticalPosition -= step / 2.0F;
 	FormVertices->push_back(*firstVertex);
 	firstVertex = wrap::next(FormVertices->begin(), formVertexIndex); // iterator invalidated by push_back
-	nextVertex  = std::next(firstVertex);
+	nextVertex = std::next(firstVertex);
 	if (twistStep != 0.0F) {
 	  firstVertex->x = nextVertex->x + twistStep / TWSTFACT;
 	}
@@ -1070,8 +1074,8 @@ void formForms::setear() {
 	  horizontalRatio = verticalRatio;
 	}
 	if (horizontalRatio < 1.0F) {
-	  auto scaledVertex = firstVertex;
-	  auto const vertexMax = FormList->back().vertexCount;
+	  auto       scaledVertex = firstVertex;
+	  auto const vertexMax    = FormList->back().vertexCount;
 	  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 		scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
 		scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
@@ -1079,10 +1083,10 @@ void formForms::setear() {
 	  }
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-	auto shiftedVertex = firstVertex;
-	auto const left = FormList->back().rectangle.left;
-	auto const bottom = FormList->back().rectangle.bottom;
-	auto const vertexMax = FormList->back().vertexCount;
+	auto       shiftedVertex = firstVertex;
+	auto const left          = FormList->back().rectangle.left;
+	auto const bottom        = FormList->back().rectangle.bottom;
+	auto const vertexMax     = FormList->back().vertexCount;
 	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 	  shiftedVertex->x -= left;
 	  shiftedVertex->y -= bottom;
@@ -1165,10 +1169,12 @@ auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam,
 
 void formForms::wavfrm() {
   thred::unmsg();
+  // clang-format off
   // resharper disable CppClangTidyClangDiagnosticCastFunctionType
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-      // resharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // resharper restore CppClangTidyClangDiagnosticCastFunctionType
+  // clang-format on
   if (nResult != 0) {
 	thred::savdo();
 	auto points = std::vector<fPOINT> {};
@@ -1230,7 +1236,7 @@ void formForms::wavfrm() {
 	auto const selectedSize = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
 	                                  FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	constexpr auto WAVSIZE         = 4.0F; // wave size factor
-	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
+	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
 	  horizontalRatio = 1.0F;
 	}
@@ -1247,9 +1253,9 @@ void formForms::wavfrm() {
 	  }
 	}
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-	auto vShifted = firstVertex;
-	auto const left = FormList->back().rectangle.left;
-	auto const bottom = FormList->back().rectangle.bottom;
+	auto       vShifted = firstVertex;
+	auto const left     = FormList->back().rectangle.left;
+	auto const bottom   = FormList->back().rectangle.bottom;
 	for (auto index = 0U; index < vertexCount; ++index) {
 	  vShifted->x -= left;
 	  vShifted->y -= bottom;

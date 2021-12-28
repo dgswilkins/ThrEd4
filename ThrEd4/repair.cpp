@@ -274,8 +274,9 @@ void repair::internal::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
-	auto const clipDifference = (clip::isclp(form)) ? form.angleOrClipData.clip
-	                                                : (clip::iseclp(form)) ? form.borderClipData : 0U;
+	auto const clipDifference = (clip::isclp(form))    ? form.angleOrClipData.clip
+	                            : (clip::iseclp(form)) ? form.borderClipData
+	                                                   : 0U;
 	if (clip::isclp(form)) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);

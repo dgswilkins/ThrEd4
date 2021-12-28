@@ -134,7 +134,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  localStitch.y += wrap::toFloat(dstStitch.y);
 	  if (constexpr auto C0MASK = 0x80U;
 	      (record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-		auto const stitch = fPOINTATTR{ localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM };
+		auto const stitch = fPOINTATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
 		StitchBuffer->push_back(stitch);
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
@@ -924,7 +924,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto const spDstHdrDesc = gsl::make_span(dstHeader.desc);
 		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
-		auto        convAuxName = utf::Utf16ToUtf8(*auxName);
+		auto convAuxName = utf::Utf16ToUtf8(*auxName);
 		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
 		  for (auto& iDHD : spDstHdrDesc) {
 			if ((*desc != 0) && *desc != '.') {
@@ -970,12 +970,8 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		  flag = false;
 		  break;
 		}
-        if (FALSE == WriteFile(fileHandle,
-          DSTRecords.data(),
-          wrap::sizeofVector(DSTRecords),
-          &bytesWritten,
-          nullptr)) {
-          displayText::riter();
+		if (FALSE == WriteFile(fileHandle, DSTRecords.data(), wrap::sizeofVector(DSTRecords), &bytesWritten, nullptr)) {
+		  displayText::riter();
 		  flag = false;
 		  break;
 		}
