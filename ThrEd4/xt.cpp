@@ -2449,11 +2449,10 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
-	// ReSharper disable clang-diagnostic-cast-function-type
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	auto const nResult = DialogBox(
-	    ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc));
-	// ReSharper restore clang-diagnostic-cast-function-type
+	// ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
+	auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+	// ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 	if (nResult != 0) {
 	  flag = 0;
 

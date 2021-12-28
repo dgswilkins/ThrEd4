@@ -342,10 +342,10 @@ auto thred::getMsgBufferValue() -> float {
 }
 
 void thred::internal::getdes() noexcept {
-  // ReSharper disable clang-diagnostic-cast-function-type
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc));
-  // ReSharper restore clang-diagnostic-cast-function-type
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 }
 
 auto thred::internal::isfclp() noexcept -> bool {
@@ -3375,7 +3375,7 @@ void thred::internal::sav() {
   else {
 	std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
   }
-  // Resharper disable once CppInitializedValueIsAlwaysRewritten
+  // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
   switch (IniFile.auxFileType) {
 	case AUXDST: {
@@ -10272,10 +10272,10 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
-  // ReSharper disable clang-diagnostic-cast-function-type
-#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc));
-  // ReSharper restore clang-diagnostic-cast-function-type
+  // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
+#pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts 
+  DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+      // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 }
 
 auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,

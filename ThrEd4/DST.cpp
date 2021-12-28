@@ -903,9 +903,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool {
   auto flag = true;
   if (nullptr != auxName) {
-	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const fileHandle = CreateFile(
-	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise, readability-qualified-auto)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (fileHandle == INVALID_HANDLE_VALUE) {
 	  displayText::crmsg(*auxName);

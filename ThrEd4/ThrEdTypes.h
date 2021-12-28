@@ -16,12 +16,10 @@
 #include "Resources\resource.h"
 
 #ifdef _DEBUG
-// ReSharper disable cppcoreguidelines-macro-usage
 #define WIDEN2(x) L##x
 #define WIDEN(x) WIDEN2(x)
 #define WFILE WIDEN(__FILE__)
 #define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
-// ReSharper restore cppcoreguidelines-macro-usage
 template <typename... Args>
 void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&... args) {
   auto const x = fmt::format(L"{}({}) : {}", fileName, line, X);
