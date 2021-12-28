@@ -2449,8 +2449,12 @@ void xt::nudsiz() {
   if (flag != 0) {
 	DesignSize.x = designSizeRect.right - designSizeRect.left;
 	DesignSize.y = designSizeRect.top - designSizeRect.bottom;
+	// ReSharper disable clang-diagnostic-cast-function-type
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc))) {
+	auto const nResult = DialogBox(
+	    ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc));
+	// ReSharper restore clang-diagnostic-cast-function-type
+	if (nResult != 0) {
 	  flag = 0;
 
 	  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger

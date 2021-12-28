@@ -342,8 +342,10 @@ auto thred::getMsgBufferValue() -> float {
 }
 
 void thred::internal::getdes() noexcept {
+  // ReSharper disable clang-diagnostic-cast-function-type
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc));
+  // ReSharper restore clang-diagnostic-cast-function-type
 }
 
 auto thred::internal::isfclp() noexcept -> bool {
@@ -10270,8 +10272,10 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
+  // ReSharper disable clang-diagnostic-cast-function-type
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc));
+  // ReSharper restore clang-diagnostic-cast-function-type
 }
 
 auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
