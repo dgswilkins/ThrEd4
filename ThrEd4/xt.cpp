@@ -266,7 +266,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<fPO
 	duxrats(iSequence + 3, iSequence + 2, nextHighPoint, feather.ratioLocal);
 	feather.ratioLocal = feather.ratio;
 	xratf(currentLowPoint, currentHighPoint, currentPoint, feather.ratioLocal);
-	xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal);
+	xratf(nextLowPoint, nextHighPoint, nextPoint, feather.ratioLocal); // NOLINT readability-suspicious-call-argument
   }
   auto const midPoint = midpnt(currentPoint, nextPoint);
   OSequence->push_back(fPOINT {bCurrent.x, bCurrent.y});

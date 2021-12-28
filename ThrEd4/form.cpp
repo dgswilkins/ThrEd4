@@ -4127,7 +4127,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	}
 	else {
 	  if (lastGroup >= groupEnd) {
-		brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+		brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
 		  brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 		}
@@ -4135,7 +4135,7 @@ void form::internal::durgn(FRMHED const&                 form,
 	  else {
 		if (groupStart <= nextGroup) {
 		  if (seql != sequenceStart) {
-			brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+			brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		  }
 		  brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
@@ -4146,7 +4146,7 @@ void form::internal::durgn(FRMHED const&                 form,
 		  if (seql != sequenceEnd) {
 			brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 		  }
-		  brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+		  brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
 			brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 		  }
@@ -4160,13 +4160,13 @@ void form::internal::durgn(FRMHED const&                 form,
 	}
 	else {
 	  if (lastGroup >= groupEnd) {
-		duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+		duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 	  }
 	  else {
 		if (groupStart <= nextGroup) {
 		  if (seql != sequenceStart) {
-			duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+			duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		  }
 		  duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
@@ -4177,7 +4177,7 @@ void form::internal::durgn(FRMHED const&                 form,
 		  if (seql != sequenceEnd) {
 			duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
 		  }
-		  duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines);
+		  duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT readability-suspicious-call-argument
 		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
 			duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
 		  }
