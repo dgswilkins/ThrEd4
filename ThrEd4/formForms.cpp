@@ -178,7 +178,7 @@ void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCou
 	ffi::nxtlin(formMenuEntryCount);
 	if ((form.extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0U) {
 	  labelWindow[LUNDCOL] = ffi::txtwin(dT::loadStr(IDS_UNDCOL), LabelWindowCoords);
-	  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+	  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
 	  valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(L"{}", (form.underlayColor + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LULEN] = ffi::txtwin(dT::loadStr(IDS_ULEN), LabelWindowCoords);

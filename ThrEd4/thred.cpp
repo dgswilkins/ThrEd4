@@ -120,7 +120,7 @@ static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
 static auto UndoBuffer       = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(
-    nullptr); // backup data NOLINT (modernize-avoid-c-arrays)
+    nullptr); // backup data NOLINT(modernize-avoid-c-arrays)
 
 // cursors
 static auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -275,7 +275,7 @@ auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, L
 		  DesignerName->assign(designerBuffer.data());
 		  EndDialog(hwndlg, 0);
 		  auto const fmtStr = displayText::loadStr(IDS_THRED);
-		  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+		  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
 		  SetWindowText(ThrEdWindow, fmt::format(fmtStr, *DesignerName).c_str());
 		  return TRUE;
 		}
@@ -741,7 +741,7 @@ void thred::internal::dudat() {
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BAKHED)) + wrap::toUnsigned(sizeof(UserColor));
-  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT (modernize-avoid-c-arrays)
+  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT(modernize-avoid-c-arrays)
   auto* backupData                 = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
   if (backupData != nullptr) {
 	backupData->zoomRect  = UnzoomedRect;

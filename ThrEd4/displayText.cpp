@@ -97,7 +97,7 @@ void displayText::tabmsg(uint32_t code) {
 }
 
 void displayText::hsizmsg() {
-  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   displayText::shoMsg(fmt::format(displayText::loadStr(IDS_HSIZ),
                                   (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN),
                                   (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN)));

@@ -33,7 +33,7 @@ void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
 void shoMsg(std::wstring const& message);
 
 template <class inType> void showMessage(uint32_t messageId, inType value) {
-  // NOLINTNEXTLINE (clang-diagnostic-sign-conversion)
+  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   displayText::shoMsg(fmt::format(displayText::loadStr(messageId), value));
 }
 
