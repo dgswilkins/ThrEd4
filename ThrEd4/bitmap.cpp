@@ -140,8 +140,8 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
 		         &bits[wrap::toSize(iHeight * BitmapWidth)],
 		         bitmapWidthBytes,
-		         background,
-		         foreground);
+		         foreground,
+		         background);
 		}
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
