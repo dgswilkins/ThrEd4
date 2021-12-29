@@ -186,8 +186,7 @@ extern std::vector<POINT>* RubberBandLine;
 
 extern std::vector<SATCON>* SatinGuides;
 
-extern RECT     scRct;
-extern int32_t* screenDPI;
+extern int32_t* ScreenDPI;
 extern int32_t* ScrollSize;
 
 extern std::vector<POINT>* SearchLine;

@@ -356,7 +356,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   auto const itCurrentVertex  = wrap::next(FormVertices->cbegin(), vertexIndex + iVertex);
   auto const itPreviousVertex = std::next(itCurrentVertex, -1);
   line[1]                     = thred::stch2pxr(*itCurrentVertex);
-  auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *screenDPI, STDDPI)) /
+  auto const ratio = wrap::toFloat(MulDiv(IniFile.formVertexSizePixels, *ScreenDPI, STDDPI)) /
                      wrap::toFloat(StitchWindowClientRect.right);
   auto       length = (ZoomRect.right - ZoomRect.left) * ratio * 2.0F;
   auto const delta =
@@ -380,7 +380,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
 
 void form::selsqr(POINT const& controlPoint, HDC dc) {
   auto       line   = std::array<POINT, SQPNTS> {};
-  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *screenDPI, STDDPI);
+  auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *ScreenDPI, STDDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
   line[0].y = line[1].y = controlPoint.y - offset;
   line[1].x = line[2].x = controlPoint.x + offset;
@@ -391,7 +391,7 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
 
 void form::internal::frmsqr0(POINT const& controlPoint) {
   auto line = std::array<POINT, SQPNTS> {};
-  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), *screenDPI, STDDPI);
+  if (auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formBoxSizePixels), *ScreenDPI, STDDPI);
       offset != 0) {
 	line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
 	line[0].y = line[1].y = controlPoint.y - offset;
@@ -404,7 +404,7 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
 
 void form::internal::frmx(POINT const& controlPoint, HDC dc) {
   auto       line   = std::array<POINT, LNPNTS> {};
-  auto const offset = MulDiv(8, *screenDPI, STDDPI);
+  auto const offset = MulDiv(8, *ScreenDPI, STDDPI);
   SelectObject(dc, FormSelectedPen);
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;

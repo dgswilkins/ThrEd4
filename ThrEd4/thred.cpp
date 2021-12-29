@@ -2764,7 +2764,7 @@ void thred::internal::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, P
 }
 
 void thred::internal::duar(POINT const& stitchCoordsInPixels) {
-  auto const offset = MulDiv(10, *screenDPI, STDDPI);
+  auto const offset = MulDiv(10, *ScreenDPI, STDDPI);
   auto arrowCenter  = POINT {(stitchCoordsInPixels.x - offset), (stitchCoordsInPixels.y + offset)};
   StitchArrow[1]    = stitchCoordsInPixels;
   rotpix(arrowCenter, StitchArrow[0], stitchCoordsInPixels);
@@ -5493,7 +5493,7 @@ void thred::internal::setbak(int32_t penWidth) noexcept {
 void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
   auto       line   = std::array<POINT, SQPNTS> {};
   auto const layer  = (StitchBuffer->operator[](iStitch).attribute & LAYMSK) >> LAYSHFT;
-  auto const offset = MulDiv(IniFile.stitchSizePixels, *screenDPI, STDDPI);
+  auto const offset = MulDiv(IniFile.stitchSizePixels, *ScreenDPI, STDDPI);
   if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 	auto const stitchCoordsInPixels = stch2px1(iStitch);
 	line[0].x = line[3].x = line[4].x = stitchCoordsInPixels.x - offset;
@@ -6897,7 +6897,7 @@ constexpr auto thred::internal::nxtcrnr(uint32_t corner) -> uint32_t {
 void thred::internal::drwmrk(HDC dc) {
   auto       markCoordinates = POINT {};
   auto       markLine        = std::array<POINT, 2> {};
-  auto const markOffset      = MulDiv(6, *screenDPI, STDDPI);
+  auto const markOffset      = MulDiv(6, *ScreenDPI, STDDPI);
   thred::sCor2px(fPOINT {ZoomMarkPoint}, markCoordinates);
   SelectObject(dc, ZoomMarkPen);
   SetROP2(dc, R2_XORPEN);
@@ -16510,9 +16510,9 @@ void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
 void thred::internal::drwknot() {
   if (!UserFlagMap->test(UserFlag::KNOTOF) && (!Knots->empty()) && (!StitchBuffer->empty())) {
 	constexpr auto KBOFFSET = 5; // offset of the knot box sides;
-	auto const     kOffset  = MulDiv(KBOFFSET, *screenDPI, STDDPI);
+	auto const     kOffset  = MulDiv(KBOFFSET, *ScreenDPI, STDDPI);
 	constexpr auto KLINELEN = 10; // length of the knot line;
-	auto const     kLine    = MulDiv(KLINELEN, *screenDPI, STDDPI);
+	auto const     kLine    = MulDiv(KLINELEN, *ScreenDPI, STDDPI);
 	auto           point    = POINT {};
 	auto           kOutline = std::array<POINT, SQPNTS> {};
 	auto           tLine    = std::array<POINT, LNPNTS> {};
@@ -17913,9 +17913,9 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
 	  auto private_DPI     = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  screenDPI            = &private_DPI;
-	  private_ScrollSize   = MulDiv(private_ScrollSize, *screenDPI, STDDPI);
-	  private_ColorBarSize = MulDiv(private_ColorBarSize, *screenDPI, STDDPI);
+	  ScreenDPI            = &private_DPI;
+	  private_ScrollSize   = MulDiv(private_ScrollSize, *ScreenDPI, STDDPI);
+	  private_ColorBarSize = MulDiv(private_ColorBarSize, *ScreenDPI, STDDPI);
 	  thi::init();
 	  if (UserFlagMap->test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
