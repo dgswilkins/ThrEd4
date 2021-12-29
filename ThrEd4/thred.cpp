@@ -926,7 +926,7 @@ void thred::internal::box(uint32_t iNearest, HDC dc) {
   line[2] = {npx + boxWidth, npy + boxWidth};
   line[3] = {npx - boxWidth, npy + boxWidth};
   line[4] = {npx - boxWidth, npy - boxWidth};
-  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void thred::internal::boxs() {
@@ -1187,7 +1187,7 @@ void thred::internal::unbox() {
   if (StateMap->testAndReset(StateFlag::SELBOX)) {
 	SelectObject(StitchWindowDC, BoxPen[0]);
 	SetROP2(StitchWindowDC, R2_NOTXORPEN);
-	wrap::Polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
+	wrap::polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
 	SetROP2(StitchWindowDC, R2_COPYPEN);
   }
 }
@@ -1195,15 +1195,15 @@ void thred::internal::unbox() {
 void thred::internal::ilin() noexcept {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_XORPEN);
-  wrap::Polyline(StitchWindowDC, &InsertLine[1], LNPNTS);
+  wrap::polyline(StitchWindowDC, &InsertLine[1], LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
   SelectObject(StitchWindowMemDC, LinePen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
-  wrap::Polyline(StitchWindowMemDC, &InsertLine[1], LNPNTS);
+  wrap::polyline(StitchWindowMemDC, &InsertLine[1], LNPNTS);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
@@ -1216,7 +1216,7 @@ void thred::internal::xlin() {
 void thred::internal::ilin1() noexcept {
   SelectObject(StitchWindowDC, LinePen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -2496,7 +2496,7 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
   SelectObject(dc, GroupSelectPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   if (!SearchLine->empty()) {
-	wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
+	wrap::polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
   }
   if (start > end) {
 	std::swap(start, end);
@@ -2510,7 +2510,7 @@ void thred::internal::selin(uint32_t start, uint32_t end, HDC dc) {
 	                                                    (stitch->y - ZoomRect.bottom) * ZoomRatio.y))});
 	  ++stitch;
 	}
-	wrap::Polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
+	wrap::polyline(dc, SearchLine->data(), wrap::toUnsigned(SearchLine->size()));
   }
   SetROP2(dc, R2_COPYPEN);
 }
@@ -2522,19 +2522,19 @@ void thred::internal::cros(uint32_t iStitch) {
   InsertLine[1]                   = {stitchCoordsInPixels.x + armLength, stitchCoordsInPixels.y};
   SelectObject(StitchWindowDC, CrossPen);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SelectObject(StitchWindowMemDC, CrossPen);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
   InsertLine[0] = {stitchCoordsInPixels.x, stitchCoordsInPixels.y - armLength};
   InsertLine[1] = {stitchCoordsInPixels.x, stitchCoordsInPixels.y - 1};
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
-  wrap::Polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
   InsertLine[0].y = stitchCoordsInPixels.y + 2;
   InsertLine[1].y = stitchCoordsInPixels.y + armLength;
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
-  wrap::Polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowMemDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
 
@@ -2596,7 +2596,7 @@ void thred::selRct(fRECTANGLE& sourceRect) {
 void thred::internal::dusel(HDC dc) {
   SetROP2(dc, R2_NOTXORPEN);
   SelectObject(dc, LinePen);
-  wrap::Polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1U));
+  wrap::polyline(dc, FormControlPoints->data(), wrap::toUnsigned(FormControlPoints->size() - 1U));
   for (auto iPoint = 0U; iPoint < wrap::toUnsigned(FormControlPoints->size() - 1U); ++iPoint) {
 	form::selsqr(FormControlPoints->operator[](iPoint), dc);
   }
@@ -2774,8 +2774,8 @@ void thred::internal::duar(POINT const& stitchCoordsInPixels) {
   SelectObject(StitchWindowDC, BoxPen[0]);
   SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowMemDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
-  wrap::Polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
+  wrap::polyline(StitchWindowMemDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
+  wrap::polyline(StitchWindowDC, StitchArrow.data(), wrap::toUnsigned(StitchArrow.size()));
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
@@ -3073,7 +3073,7 @@ void thred::internal::ritbal() {
 	balaradFile =
 	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 	auto const outString = utf::Utf16ToUtf8(outputName.wstring());
-	wrap::WriteFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
+	wrap::writeFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
   }
   else {
@@ -4231,7 +4231,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		auto formListOriginal = std::vector<FRMHEDO> {};
 		formListOriginal.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
-		wrap::ReadFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
+		wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
 		  formListOriginal.resize(thredHeader.formCount);
@@ -4244,7 +4244,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		auto inFormList = std::vector<FRMHEDOUT> {};
 		inFormList.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
-		wrap::ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+		wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
 		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
 		  inFormList.resize(thredHeader.formCount);
@@ -4949,18 +4949,18 @@ void thred::internal::dulin(std::array<POINT, 2> const& moveLine0, std::array<PO
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   if (moveLine0[0].x == moveLine1[1].x && moveLine0[0].y == moveLine1[1].y) {
 	if (StateMap->test(StateFlag::ISDWN)) {
-	  wrap::Polyline(StitchWindowDC, moveLine0.data(), wrap::toUnsigned(moveLine0.size()));
+	  wrap::polyline(StitchWindowDC, moveLine0.data(), wrap::toUnsigned(moveLine0.size()));
 	}
 	else {
-	  wrap::Polyline(StitchWindowDC, moveLine1.data(), wrap::toUnsigned(moveLine1.size()));
+	  wrap::polyline(StitchWindowDC, moveLine1.data(), wrap::toUnsigned(moveLine1.size()));
 	}
   }
   else {
 	if (StateMap->test(StateFlag::ISDWN)) {
-	  wrap::Polyline(StitchWindowDC, moveLine0.data(), wrap::toUnsigned(moveLine0.size()));
+	  wrap::polyline(StitchWindowDC, moveLine0.data(), wrap::toUnsigned(moveLine0.size()));
 	}
 	if (StateMap->test(StateFlag::ISUP)) {
-	  wrap::Polyline(StitchWindowDC, moveLine1.data(), wrap::toUnsigned(moveLine1.size()));
+	  wrap::polyline(StitchWindowDC, moveLine1.data(), wrap::toUnsigned(moveLine1.size()));
 	}
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
@@ -5332,7 +5332,7 @@ void thred::internal::newFil() {
 void thred::bBox() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  wrap::Polyline(StitchWindowDC, ZoomBoxLine.data(), wrap::toUnsigned(ZoomBoxLine.size()));
+  wrap::polyline(StitchWindowDC, ZoomBoxLine.data(), wrap::toUnsigned(ZoomBoxLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5378,7 +5378,7 @@ void thred::delstchm() {
 void thred::internal::duclp() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  wrap::Polyline(StitchWindowDC, ClipInsertBoxLine.data(), wrap::toUnsigned(ClipInsertBoxLine.size()));
+  wrap::polyline(StitchWindowDC, ClipInsertBoxLine.data(), wrap::toUnsigned(ClipInsertBoxLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5501,7 +5501,7 @@ void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
 	line[1].x = line[2].x = stitchCoordsInPixels.x + offset;
 	line[2].y = line[3].y = stitchCoordsInPixels.y + offset;
 	line[4].y             = stitchCoordsInPixels.y - offset;
-	wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
   }
 }
 
@@ -5520,10 +5520,10 @@ auto thred::internal::sdCor2px(fPOINTATTR const& stitchPoint) -> POINT {
 void thred::internal::durot() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  wrap::Polyline(StitchWindowDC, RotateBoxOutline.data(), wrap::toUnsigned(RotateBoxOutline.size()));
-  wrap::Polyline(
+  wrap::polyline(StitchWindowDC, RotateBoxOutline.data(), wrap::toUnsigned(RotateBoxOutline.size()));
+  wrap::polyline(
       StitchWindowDC, RotateBoxCrossVertLine.data(), wrap::toUnsigned(RotateBoxCrossVertLine.size()));
-  wrap::Polyline(
+  wrap::polyline(
       StitchWindowDC, RotateBoxCrossHorzLine.data(), wrap::toUnsigned(RotateBoxCrossHorzLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
@@ -5537,7 +5537,7 @@ void thred::internal::unrot() {
 void thred::internal::durotu() {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
   SelectObject(StitchWindowDC, LinePen);
-  wrap::Polyline(
+  wrap::polyline(
       StitchWindowDC, RotateBoxToCursorLine.data(), wrap::toUnsigned(RotateBoxToCursorLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
@@ -6441,7 +6441,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 		}
 	  }
 	  SelectObject(StitchWindowDC, UserPen->operator[](color));
-	  wrap::Polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
+	  wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
 	  if (!flag) {
 		--RunPoint;
 	  }
@@ -6456,7 +6456,7 @@ void thred::internal::drwlstch(uint32_t finish) {
 		++iMovieFrame;
 	  }
 	  --RunPoint;
-	  wrap::Polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
+	  wrap::polyline(StitchWindowDC, movieLine.data(), wrap::toUnsigned(movieLine.size()));
 	}
 	if ((StitchBuffer->operator[](wrap::toSize(RunPoint) + 1U).attribute & COLMSK) != color) {
 	  ++RunPoint;
@@ -6903,10 +6903,10 @@ void thred::internal::drwmrk(HDC dc) {
   SetROP2(dc, R2_XORPEN);
   markLine[0] = {markCoordinates.x - markOffset, markCoordinates.y - markOffset};
   markLine[1] = {markCoordinates.x + markOffset, markCoordinates.y + markOffset};
-  wrap::Polyline(dc, markLine.data(), wrap::toUnsigned(markLine.size()));
+  wrap::polyline(dc, markLine.data(), wrap::toUnsigned(markLine.size()));
   markLine[0] = {markCoordinates.x - markOffset, markCoordinates.y + markOffset};
   markLine[1] = {markCoordinates.x + markOffset, markCoordinates.y - markOffset};
-  wrap::Polyline(dc, markLine.data(), wrap::toUnsigned(markLine.size()));
+  wrap::polyline(dc, markLine.data(), wrap::toUnsigned(markLine.size()));
   SetROP2(dc, R2_COPYPEN);
 }
 
@@ -7077,7 +7077,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  auto inFormList = std::vector<FRMHEDOUT> {};
 		  inFormList.resize(fileHeader.formCount);
 		  auto const bytesToRead = fileHeader.formCount * wrap::sizeofType(inFormList);
-		  wrap::ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+		  wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 		  if (bytesRead != bytesToRead) {
 			inFormList.resize(bytesRead / wrap::sizeofType(inFormList));
 			StateMap->set(StateFlag::BADFIL);
@@ -7695,7 +7695,7 @@ auto thred::internal::iselpnt() noexcept -> bool {
 void thred::strtchbox(std::vector<POINT> const& stretchBoxLine) {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, stretchBoxLine.data(), wrap::toUnsigned(stretchBoxLine.size()));
+  wrap::polyline(StitchWindowDC, stretchBoxLine.data(), wrap::toUnsigned(stretchBoxLine.size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -9988,7 +9988,7 @@ void thred::internal::setpclp() {
 void thred::internal::dupclp() {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
+  wrap::polyline(StitchWindowDC, FormVerticesAsLine->data(), wrap::toUnsigned(FormVerticesAsLine->size()));
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -10148,7 +10148,7 @@ void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentSti
 	}
 	--activeStitch;
 	SelectObject(StitchWindowMemDC, hPen);
-	wrap::Polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
+	wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
 	linePoints.clear();
 	auto const layer = (activeStitch->attribute & LAYMSK) >> LAYSHFT;
 	if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
@@ -15839,7 +15839,7 @@ void thred::internal::ritloc() {
 	if (lockFile != INVALID_HANDLE_VALUE) {
 	  auto       bytesWritten = DWORD {};
 	  auto const value        = utf::Utf16ToUtf8(*HomeDirectory);
-	  wrap::WriteFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
+	  wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	  CloseHandle(lockFile);
 	}
   }
@@ -16483,7 +16483,7 @@ void thred::internal::dumov() {
 	rotpix(OffsetFromCenter, arrowBox[3], abCenterPixels);
 	SelectObject(StitchWindowMemDC, FormPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
-	wrap::Polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
+	wrap::polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
 }
@@ -16524,11 +16524,11 @@ void thred::internal::drwknot() {
 	  kOutline[1].x = kOutline[2].x = point.x + kOffset;
 	  kOutline[0].y = kOutline[1].y = kOutline[4].y = point.y + kOffset;
 	  kOutline[2].y = kOutline[3].y = point.y - kOffset;
-	  wrap::Polyline(StitchWindowMemDC, kOutline.data(), wrap::toUnsigned(kOutline.size()));
+	  wrap::polyline(StitchWindowMemDC, kOutline.data(), wrap::toUnsigned(kOutline.size()));
 	  tLine[0].x = point.x - kLine;
 	  tLine[1].x = point.x + kLine;
 	  tLine[0].y = tLine[1].y = point.y;
-	  wrap::Polyline(StitchWindowMemDC, tLine.data(), wrap::toUnsigned(tLine.size()));
+	  wrap::polyline(StitchWindowMemDC, tLine.data(), wrap::toUnsigned(tLine.size()));
 	  SetROP2(StitchWindowMemDC, R2_COPYPEN);
 	}
   }
@@ -16550,14 +16550,14 @@ void thred::internal::dugrid() {
 	  gridLine[0].y = gridLine[1].y = wrap::ceil<int32_t>(
 	      wrap::toFloat(StitchWindowClientRect.bottom) -
 	      (wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.bottom) * ZoomRatio.y);
-	  wrap::Polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
+	  wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
 	}
 	gridLine[0].y = 0;
 	gridLine[1].y = StitchWindowClientRect.bottom;
 	for (auto iGrid = gridRect.left; iGrid <= gridRect.right; ++iGrid) {
 	  gridLine[0].x = gridLine[1].x =
 	      wrap::ceil<int32_t>((wrap::toFloat(iGrid) * IniFile.gridSize - ZoomRect.left) * ZoomRatio.x);
-	  wrap::Polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
+	  wrap::polyline(StitchWindowMemDC, gridLine.data(), wrap::toUnsigned(gridLine.size()));
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
@@ -16739,7 +16739,7 @@ void thred::internal::drwStch() {
 				      {wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 				       wrap::ceil<int32_t>(maxYcoord -
 				                           (stitchIt[iStitch].y - ZoomRect.bottom) * ZoomRatio.y)});
-				  wrap::Polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
+				  wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
 				  linePoints.clear();
 				}
 				else {
@@ -16763,7 +16763,7 @@ void thred::internal::drwStch() {
 						    wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 						    wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
 						                                        ZoomRatio.x)};
-						wrap::Polyline(
+						wrap::polyline(
 						    StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 						break;
 					  }
@@ -16779,7 +16779,7 @@ void thred::internal::drwStch() {
 						    wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 						    wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
 						                                        ZoomRatio.y)};
-						wrap::Polyline(
+						wrap::polyline(
 						    StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 						break;
 					  }
@@ -16796,7 +16796,7 @@ void thred::internal::drwStch() {
 						      wrap::ceil<int32_t>((stitchIt[iStitch].x - ZoomRect.left) * ZoomRatio.x),
 						      wrap::ceil<int32_t>(maxYcoord - (stitchIt[iStitch].y - ZoomRect.bottom) *
 						                                          ZoomRatio.y)};
-						  wrap::Polyline(
+						  wrap::polyline(
 						      StitchWindowMemDC, stitchLine.data(), wrap::toUnsigned(stitchLine.size()));
 						}
 					  }
@@ -16808,7 +16808,7 @@ void thred::internal::drwStch() {
 		  }
 		}
 		if (!linePoints.empty()) {
-		  wrap::Polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
+		  wrap::polyline(StitchWindowMemDC, linePoints.data(), wrap::toUnsigned(linePoints.size()));
 		  auto const lastPoint = linePoints.back();
 		  linePoints.clear();
 		  linePoints.push_back(lastPoint);
@@ -16963,14 +16963,14 @@ void thred::internal::dubar() {
 	indicatorLine[1].x = colorBarRect.right;
 	SelectObject(DrawItem->hDC, CrossPen);
 	SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
-	wrap::Polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+	wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  selectedIndicator  = wrap::toFloat(GroupStitchIndex) / buffSize;
 	  indicatorLine[0].y = indicatorLine[1].y =
 	      wrap::ceil<decltype(indicatorLine[0].y)>(wrap::toFloat(colorBarRect.bottom) * selectedIndicator);
 	  indicatorLine[0].x = colorBarRect.left;
 	  indicatorLine[1].x = colorBarRect.right;
-	  wrap::Polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
+	  wrap::polyline(DrawItem->hDC, indicatorLine.data(), wrap::toUnsigned(indicatorLine.size()));
 	}
 	SetROP2(StitchWindowMemDC, R2_COPYPEN);
   }
@@ -17035,7 +17035,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, nullptr);
 		  auto colors = std::vector<COLORREF> {};
 		  colors.resize(COLORCNT);
-		  wrap::ReadFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, nullptr);
+		  wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, nullptr);
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem->hDC, brush);
@@ -17053,7 +17053,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			else {
 			  nuPen(pen, 1, colors[iColor]);
 			  SelectObject(drawItem->hDC, pen);
-			  wrap::Polyline(drawItem->hDC, lines.data(), iLine);
+			  wrap::polyline(drawItem->hDC, lines.data(), iLine);
 			  iLine  = 0;
 			  iColor = stitchesToDraw[iStitch].attribute & COLMSK;
 			}
@@ -17061,7 +17061,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  if (iLine != 0U) {
 			nuPen(pen, 1, colors[iColor]);
 			SelectObject(drawItem->hDC, pen);
-			wrap::Polyline(drawItem->hDC, lines.data(), iLine);
+			wrap::polyline(drawItem->hDC, lines.data(), iLine);
 		  }
 		  DeleteObject(brush);
 		  DeleteObject(pen);
@@ -17095,7 +17095,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			auto inFormList = std::vector<FRMHEDOUT> {};
 			inFormList.resize(stitchHeader.formCount);
 			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
-			wrap::ReadFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+			wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, nullptr);
 			if (bytesRead != bytesToRead) {
 			  break;
 			}
@@ -17130,10 +17130,10 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			SelectObject(drawItem->hDC, FormPen);
 			SetROP2(drawItem->hDC, R2_XORPEN);
 			if (formList[iForm].type == FRMLINE) {
-			  wrap::Polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount);
+			  wrap::polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount);
 			}
 			else {
-			  wrap::Polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount + 1U);
+			  wrap::polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount + 1U);
 			}
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		  }
@@ -17462,11 +17462,11 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 			line[0].x = line[1].x = DrawItem->rcItem.right / 2;
 			line[0].y             = 0;
 			line[1].y             = DrawItem->rcItem.bottom;
-			wrap::Polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
+			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
 			line[0].y = line[1].y = DrawItem->rcItem.bottom / 2;
 			line[0].x             = 0;
 			line[1].x             = DrawItem->rcItem.right;
-			wrap::Polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
+			wrap::polyline(DrawItem->hDC, line.data(), wrap::toUnsigned(line.size()));
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		  }
 		  return 1;

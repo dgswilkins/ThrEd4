@@ -273,7 +273,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	    CreateFile(ColorFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (colorFile != INVALID_HANDLE_VALUE) {
-	  wrap::WriteFile(colorFile,
+	  wrap::writeFile(colorFile,
 	                  &colorData[0],
 	                  wrap::toUnsigned(colorData.size() * wrap::sizeofType(colorData)),
 	                  &bytesWritten,
@@ -283,7 +283,7 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
 	colorFile = CreateFile(RGBFileName->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (colorFile != INVALID_HANDLE_VALUE) {
-	  wrap::WriteFile(colorFile,
+	  wrap::writeFile(colorFile,
 	                  &colorData[2],
 	                  wrap::toUnsigned((colorData.size() - 2U) * wrap::sizeofType(colorData)),
 	                  &bytesWritten,

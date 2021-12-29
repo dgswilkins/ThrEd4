@@ -33,7 +33,7 @@ auto wrap::wcstof(wchar_t const* buffer) -> float {
   }
 }
 
-void wrap::Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
+void wrap::polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept {
   Polyline(hdc, apt, gsl::narrow<int32_t>(cpt));
 }
 
@@ -41,11 +41,11 @@ auto wrap::pressed(int virtKey) noexcept -> bool {
   return (gsl::narrow_cast<uint16_t>(GetKeyState(virtKey)) & 0x8000U) != 0U;
 }
 
-void wrap::WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
+void wrap::writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept {
   WriteFile(file, buffer, gsl::narrow<DWORD>(bytesToWrite), bytesWritten, overlapped);
 }
 
-auto wrap::ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
+auto wrap::readFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
     -> bool {
   return (ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped) == TRUE);
 }

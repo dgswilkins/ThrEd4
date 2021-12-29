@@ -671,8 +671,8 @@ void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish
 
   line[0] = bi::stch2bit(*vStart);
   line[1] = bi::stch2bit(*vFinish);
-  wrap::Polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
-  wrap::Polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(BitmapDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void bitmap::bfrm(FRMHED const& form) {

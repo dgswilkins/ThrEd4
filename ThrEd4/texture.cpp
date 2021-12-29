@@ -95,14 +95,14 @@ void texture::txdun() {
 		  bufferEntry.spacing     = historyEntry.spacing;
 		  ++bufferIter;
 		}
-		wrap::WriteFile(handle,
+		wrap::writeFile(handle,
 		                textureHistoryBuffer.data(),
 		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
 		                &bytesWritten,
 		                nullptr);
 		for (auto& item : *TextureHistory) {
 		  if (!item.texturePoints.empty()) {
-			wrap::WriteFile(handle, item.texturePoints.data(), wrap::sizeofVector(item.texturePoints), &bytesWritten, nullptr);
+			wrap::writeFile(handle, item.texturePoints.data(), wrap::sizeofVector(item.texturePoints), &bytesWritten, nullptr);
 		  }
 		}
 	  }
@@ -144,7 +144,7 @@ void texture::redtx() {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
 			auto historyBytesRead = DWORD {};
-			if (wrap::ReadFile(handle,
+			if (wrap::readFile(handle,
 			                   textureHistoryBuffer.data(),
 			                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
 			                   &historyBytesRead,
@@ -155,7 +155,7 @@ void texture::redtx() {
 				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
 				if (textureHistoryBuffer[index].count != 0U) {
 				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
-				  if (!wrap::ReadFile(handle,
+				  if (!wrap::readFile(handle,
 				                      TextureHistory->operator[](index).texturePoints.data(),
 				                      wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
 				                          textureHistoryBuffer[index].count,
@@ -326,10 +326,10 @@ void texture::internal::txtxfn(POINT const& reference, uint16_t offsetPixels) {
   auto line = std::array<POINT, 2> {};
   line[0]   = POINT {reference.x, reference.y - offsetPixels};
   line[1]   = POINT {reference.x, reference.y + offsetPixels};
-  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   line[0] = POINT {reference.x - offsetPixels, reference.y};
   line[1] = POINT {reference.x + offsetPixels, reference.y};
-  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void texture::internal::dutxtx(uint32_t index, uint16_t offsetPixels) {
@@ -419,7 +419,7 @@ void texture::drwtxtr() {
   for (auto iGrid = 0U; iGrid < gridLineCount; ++iGrid) {
 	txi::txt2pix(textureRecord, point);
 	line[0].y = line[1].y = point.y;
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	textureRecord.y += IniFile.gridSize;
   }
   DeleteObject(TextureCrossPen);
@@ -433,14 +433,14 @@ void texture::drwtxtr() {
 	line[0].x = line[1].x =
 	    std::lroundf((TextureScreen.spacing * wrap::toFloat(iVertical) + TextureScreen.xOffset) /
 	                 TextureScreen.editToPixelRatio);
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   line[0].x = 0;
   line[1].x = StitchWindowClientRect.right;
   line[0].y = line[1].y = TextureScreen.top;
-  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   line[0].y = line[1].y = TextureScreen.bottom;
-  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   DeleteObject(TextureCrossPen);
   TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, PENWHITE);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
@@ -452,13 +452,13 @@ void texture::drwtxtr() {
 	txi::txrct2rct(TextureRect, TexturePixelRect);
 	line[0] = {TexturePixelRect.left, TexturePixelRect.top};
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[1] = {TexturePixelRect.left, TexturePixelRect.bottom};
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[0] = {TexturePixelRect.right, TexturePixelRect.bottom};
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 	line[1] = {TexturePixelRect.right, TexturePixelRect.top};
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
   for (auto const selectedPoint : *SelectedTexturePointsList) {
 	txi::dutxtx(selectedPoint, IniFile.textureEditorSize);
@@ -569,7 +569,7 @@ void texture::internal::ritxrct() {
   line[2].x = line[3].x = rectangle.right;
   line[0].y = line[3].y = line[4].y = rectangle.top;
   line[1].y = line[2].y = rectangle.bottom;
-  wrap::Polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void texture::internal::dutxrct(TXTRCT& textureRect) {
@@ -797,7 +797,7 @@ void texture::internal::ritxfrm(FRMHED const& textureForm) {
 	++vertexCount;
   }
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, formLines.data(), vertexCount);
+  wrap::polyline(StitchWindowDC, formLines.data(), vertexCount);
 }
 
 void texture::internal::setxfrm() noexcept {
@@ -854,7 +854,7 @@ void texture::internal::txtclp(FRMHED& textureForm) {
 
 void texture::internal::dutxtlin() noexcept {
   SetROP2(StitchWindowDC, R2_NOTXORPEN);
-  wrap::Polyline(StitchWindowDC, FormLines->data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, FormLines->data(), LNPNTS);
 }
 
 void texture::txtrmov(FRMHED const& textureForm) {

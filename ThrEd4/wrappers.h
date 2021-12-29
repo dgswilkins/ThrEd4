@@ -99,13 +99,14 @@ template <class outType, class inType> void narrow(outType& outvar, inType invar
   outvar = gsl::narrow<outType>(invar);
 }
 
-template <class outType, class inType> void narrow_cast(outType& outvar, inType invar) noexcept {
+template <class outType, class inType>
+void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability-identifier-naming)
   outvar = gsl::narrow_cast<outType>(invar);
 }
 
-void Polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
+void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
-auto ReadFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
+auto readFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
     -> bool;
 
 template <class outType, class inType> auto round(inType invar) -> outType {
@@ -180,5 +181,5 @@ template <class outType> auto wcstol(wchar_t const* buffer) -> outType {
   return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
 }
 
-void WriteFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
+void writeFile(HANDLE file, LPCVOID buffer, uint32_t bytesToWrite, LPDWORD bytesWritten, LPOVERLAPPED overlapped) noexcept;
 } // namespace wrap
