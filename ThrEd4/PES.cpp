@@ -207,7 +207,7 @@ void PES::internal::pecnam(gsl::span<char> const& label) {
   // ReSharper disable once CppDeprecatedEntity
   strncpy(label.data(), "LA:", 3); // NOLINT(clang-diagnostic-deprecated-declarations)
   auto const lblSize  = wrap::toUnsigned(label.size() - 3U);
-  auto       fileStem = utf::Utf16ToUtf8(AuxName->stem());
+  auto       fileStem = utf::utf16ToUtf8(AuxName->stem());
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }

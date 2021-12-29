@@ -924,7 +924,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveSt
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		auto const spDstHdrDesc = gsl::make_span(dstHeader.desc);
 		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
-		auto convAuxName = utf::Utf16ToUtf8(*auxName);
+		auto convAuxName = utf::utf16ToUtf8(*auxName);
 		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
 		  for (auto& iDHD : spDstHdrDesc) {
 			if ((*desc != 0) && *desc != '.') {

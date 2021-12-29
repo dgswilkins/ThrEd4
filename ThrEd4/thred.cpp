@@ -493,7 +493,7 @@ void thred::internal::fnamtabs() {
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN  = NameOrder.size();
-  auto const     designer = utf::Utf16ToUtf8(designerName);
+  auto const     designer = utf::utf16ToUtf8(designerName);
   auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
@@ -557,7 +557,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 	  break;
 	}
   }
-  auto const decoded = utf::Utf8ToUtf16(designer);
+  auto const decoded = utf::utf8ToUtf16(designer);
   designerName.assign(decoded);
 }
 
@@ -2848,7 +2848,7 @@ void thred::internal::defNam(fs::path const& fileName) {
 }
 
 void thred::internal::ritini() {
-  auto const     directory = utf::Utf16ToUtf8(DefaultDirectory->wstring());
+  auto const     directory = utf::utf16ToUtf8(DefaultDirectory->wstring());
   auto const     spIDD     = gsl::make_span(IniFile.defaultDirectory);
   constexpr char FILLCHAR  = '\0';
   std::fill(spIDD.begin(), spIDD.end(), FILLCHAR);
@@ -2858,12 +2858,12 @@ void thred::internal::ritini() {
 	auto const spName = gsl::make_span(prevName);
 	std::fill(spName.begin(), spName.end(), FILLCHAR);
 	if (!previousName->empty()) {
-	  auto previous = utf::Utf16ToUtf8(*previousName);
+	  auto previous = utf::utf16ToUtf8(*previousName);
 	  std::copy(previous.cbegin(), previous.cend(), spName.begin());
 	}
 	++previousName;
   }
-  auto const designer = utf::Utf16ToUtf8(*DesignerName);
+  auto const designer = utf::utf16ToUtf8(*DesignerName);
   auto const spIDN    = gsl::make_span(IniFile.designerName);
   auto const spISC    = gsl::make_span(IniFile.stitchColors);
   auto const spIBPC   = gsl::make_span(IniFile.backgroundPreferredColors);
@@ -3072,7 +3072,7 @@ void thred::internal::ritbal() {
 	CloseHandle(balaradFile);
 	balaradFile =
 	    CreateFile(BalaradName1->wstring().c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-	auto const outString = utf::Utf16ToUtf8(outputName.wstring());
+	auto const outString = utf::utf16ToUtf8(outputName.wstring());
 	wrap::writeFile(balaradFile, outString.c_str(), wrap::toUnsigned(outputName.wstring().size()) + 1U, &bytesWritten, nullptr);
 	CloseHandle(balaradFile);
   }
@@ -3158,7 +3158,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
       wrap::sizeofVector(StitchBuffer) + sizeof(stitchHeader) + bitmap::getBmpNameLength();
   wrap::narrow(stitchHeader.stitchCount, StitchBuffer->size());
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
-  auto       designer       = utf::Utf16ToUtf8(*DesignerName);
+  auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
   if (!FormList->empty()) {
@@ -4135,7 +4135,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	}
 	auto const version = (thredHeader.headerType & FTYPMASK) >> TBYTSHFT;
 	auto const spIDN   = gsl::make_span(IniFile.designerName);
-	DesignerName->assign(utf::Utf8ToUtf16(std::string(spIDN.data())));
+	DesignerName->assign(utf::utf8ToUtf16(std::string(spIDN.data())));
 	switch (version) {
 	  case 0: {
 		if (thredHeader.hoopType == SMALHUP) {
@@ -4221,7 +4221,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  return false;
 	}
 	auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
-	auto       threadSizeBufW = utf::Utf8ToUtf16(threadSizebuf);
+	auto       threadSizeBufW = utf::utf8ToUtf16(threadSizebuf);
 	std::generate(ThreadSize.begin(), ThreadSize.end(), [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
 	  return *(tsBuffer++);
 	});
@@ -5284,11 +5284,11 @@ void thred::internal::newFil() {
   bitmap::resetBmpFile(true);
   deldu();
   auto& desName = IniFile.designerName;
-  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
+  DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
   SetWindowText(ThrEdWindow, fmt::format(displayText::loadStr(IDS_THRED), *DesignerName).c_str());
   *ThrName = *DefaultDirectory / (displayText::loadStr(IDS_NUFIL).c_str());
   ritfnam(*DesignerName);
-  auto const designer       = utf::Utf16ToUtf8(*DesignerName);
+  auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
   rstdu();
@@ -6505,7 +6505,7 @@ void thred::internal::setsped() {
 
 void thred::internal::deltot() {
   auto& desName = IniFile.designerName;
-  DesignerName->assign(utf::Utf8ToUtf16(std::string(std::begin(desName))));
+  DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
   TexturePointsBuffer->clear();
   FormList->clear();
   StitchBuffer->clear();
@@ -8662,7 +8662,7 @@ void thred::internal::desiz() {
       displayText::loadStr(IDS_HUPWID), (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
-	auto  modifier     = utf::Utf8ToUtf16(std::string(std::begin(modifierName)));
+	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
 	info += fmt::format(displayText::loadStr(IDS_CREATBY), *DesignerName, modifier);
   }
   displayText::shoMsg(info);
@@ -15838,7 +15838,7 @@ void thred::internal::ritloc() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (lockFile != INVALID_HANDLE_VALUE) {
 	  auto       bytesWritten = DWORD {};
-	  auto const value        = utf::Utf16ToUtf8(*HomeDirectory);
+	  auto const value        = utf::utf16ToUtf8(*HomeDirectory);
 	  wrap::writeFile(lockFile, value.data(), wrap::toUnsigned(value.size()) + 1U, &bytesWritten, nullptr);
 	  CloseHandle(lockFile);
 	}
@@ -15969,13 +15969,13 @@ void thred::internal::redini() {
 	}
 	else {
 	  auto const directory =
-	      utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
+	      utf::utf8ToUtf16(std::string(static_cast<char const*>(IniFile.defaultDirectory)));
 	  DefaultDirectory->assign(directory);
 	  {
 		auto previousName = PreviousNames->begin();
 		for (auto const& prevName : IniFile.prevNames) {
 		  if (strlen(std::begin(prevName)) != 0U) {
-			previousName->assign(utf::Utf8ToUtf16(std::string(std::begin(prevName))));
+			previousName->assign(utf::utf8ToUtf16(std::string(std::begin(prevName))));
 		  }
 		  else {
 			previousName->clear();
@@ -15983,7 +15983,7 @@ void thred::internal::redini() {
 		  ++previousName;
 		}
 	  }
-	  DesignerName->assign(utf::Utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
+	  DesignerName->assign(utf::utf8ToUtf16(std::string(static_cast<char const*>(IniFile.designerName))));
 	  thi::loadColors();
 	  bitmap::setBmpBackColor();
 	  BackgroundColor = IniFile.backgroundColor;
@@ -16424,7 +16424,7 @@ void thred::internal::init() {
   auxmen();
   fnamtabs();
   ritfnam(*DesignerName);
-  auto       designer       = utf::Utf16ToUtf8(*DesignerName);
+  auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.begin(), designer.end(), spModifierName.begin());
   thred::chkhup();

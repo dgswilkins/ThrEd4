@@ -401,9 +401,9 @@ void bitmap::lodbmp(fs::path const* directory) {
 	dest.resize(pleng);
 	GetShortPathName(UTF16BMPname->wstring().c_str(), dest.data(), wrap::toUnsigned(dest.size()));
 	auto filePart = fs::path {dest.data()};
-	auto saveFile = utf::Utf16ToUtf8(filePart.filename().wstring());
+	auto saveFile = utf::utf16ToUtf8(filePart.filename().wstring());
 #else
-	auto const saveFile = utf::Utf16ToUtf8(UTF16BMPname->filename().wstring());
+	auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
 #endif
 	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	  std::copy(saveFile.cbegin(), saveFile.cend(), UTF8BMPname.begin());
@@ -452,7 +452,7 @@ void bitmap::setUBfilename(fs::path* fileName) noexcept {
 
 void bitmap::assignUBFilename(fs::path const& directory) {
   fs::current_path(directory);
-  auto const BMPfileName = utf::Utf8ToUtf16(std::string(UTF8BMPname.data()));
+  auto const BMPfileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / BMPfileName;
   UTF16BMPname->assign(fullPath);
   bitmap::internal::bfil(BackgroundColor);

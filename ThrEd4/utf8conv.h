@@ -37,7 +37,7 @@
 
 namespace utf {
 
-inline auto Utf8ToUtf16(std::string const& utf8) -> std::wstring {
+inline auto utf8ToUtf16(std::string const& utf8) -> std::wstring {
   std::wstring utf16;
 
   // handle the special case of empty input string
@@ -52,7 +52,7 @@ inline auto Utf8ToUtf16(std::string const& utf8) -> std::wstring {
   return utf16;
 }
 
-inline auto Utf16ToUtf8(std::wstring const& utf16) -> std::string {
+inline auto utf16ToUtf8(std::wstring const& utf16) -> std::string {
   std::string utf8;
 
   if (utf16.empty()) {
