@@ -2737,7 +2737,7 @@ void thred::internal::ritlayr() {
 
 void thred::nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept {
   DeleteObject(pen);
-  pen = wrap::CreatePen(PS_SOLID, width, color);
+  pen = wrap::createPen(PS_SOLID, width, color);
 }
 
 void thred::internal::nuStchSiz(uint32_t iColor, int32_t width) {
@@ -3002,7 +3002,7 @@ void thred::internal::redbal() {
 		auto up  = UserPen->begin();
 		auto ucb = UserColorBrush.begin();
 		for (auto const& ucolor : UserColor) {
-		  *(up++) = wrap::CreatePen(PS_SOLID, PENNWID, ucolor);
+		  *(up++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
 		  nuBrush(*ucb, ucolor);
 		  ++ucb;
 		}
@@ -16196,11 +16196,11 @@ auto thred::getLayerPen(uint32_t layer) -> HPEN {
 }
 
 void thred::internal::setLayerPens() noexcept {
-  LayerPen[0] = wrap::CreatePen(PS_SOLID, PENNWID, PENSILVR);
-  LayerPen[1] = wrap::CreatePen(PS_SOLID, PENNWID, PENTRQSE);
-  LayerPen[2] = wrap::CreatePen(PS_SOLID, PENNWID, PENLILAC);
-  LayerPen[3] = wrap::CreatePen(PS_SOLID, PENNWID, PENPOLIV);
-  LayerPen[4] = wrap::CreatePen(PS_SOLID, PENNWID, PENTEAL);
+  LayerPen[0] = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
+  LayerPen[1] = wrap::createPen(PS_SOLID, PENNWID, PENTRQSE);
+  LayerPen[2] = wrap::createPen(PS_SOLID, PENNWID, PENLILAC);
+  LayerPen[3] = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
+  LayerPen[4] = wrap::createPen(PS_SOLID, PENNWID, PENTEAL);
 }
 
 void thred::internal::createBrushes() noexcept {
@@ -16385,23 +16385,23 @@ void thred::internal::init() {
   // create pens
   static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
   std::generate(BoxPen.begin(), BoxPen.end(), [bc = boxColor.begin()]() mutable noexcept -> HPEN {
-	return wrap::CreatePen(PS_SOLID, PENNWID, *(bc++));
+	return wrap::createPen(PS_SOLID, PENNWID, *(bc++));
   });
-  LinePen        = wrap::CreatePen(PS_SOLID, PENNWID, PENCHCL);
-  CrossPen       = wrap::CreatePen(PS_SOLID, PENWWID, PENPRPLE);
-  GroupSelectPen = wrap::CreatePen(PS_SOLID, PENNWID, PENPRPLE);
-  GridPen        = wrap::CreatePen(PS_SOLID, PENNWID, IniFile.gridColor);
-  BackgroundPen  = wrap::CreatePen(PS_SOLID, PENMWID, BackgroundColor);
+  LinePen        = wrap::createPen(PS_SOLID, PENNWID, PENCHCL);
+  CrossPen       = wrap::createPen(PS_SOLID, PENWWID, PENPRPLE);
+  GroupSelectPen = wrap::createPen(PS_SOLID, PENNWID, PENPRPLE);
+  GridPen        = wrap::createPen(PS_SOLID, PENNWID, IniFile.gridColor);
+  BackgroundPen  = wrap::createPen(PS_SOLID, PENMWID, BackgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const bitmapPen = wrap::CreatePen(PS_SOLID, PENNWID, bitmap::getBmpColor());
+  auto const bitmapPen = wrap::createPen(PS_SOLID, PENNWID, bitmap::getBmpColor());
   bitmap::setBitmapPen(bitmapPen);
-  FormPen         = wrap::CreatePen(PS_SOLID, PENNWID, PENSILVR);
-  MultiFormPen    = wrap::CreatePen(PS_SOLID, PENNWID, PENPOLIV);
-  FormPen3px      = wrap::CreatePen(PS_SOLID, PENMWID, PENSILVR);
-  FormSelectedPen = wrap::CreatePen(PS_SOLID, PENNWID, PENSEGRN);
-  ZoomMarkPen     = wrap::CreatePen(PS_SOLID, PENMWID, PENLMGRN);
-  SelectAllPen    = wrap::CreatePen(PS_SOLID, PENNWID, PENROSY);
-  KnotPen         = wrap::CreatePen(PS_SOLID, PENNWID, PENWHITE);
+  FormPen         = wrap::createPen(PS_SOLID, PENNWID, PENSILVR);
+  MultiFormPen    = wrap::createPen(PS_SOLID, PENNWID, PENPOLIV);
+  FormPen3px      = wrap::createPen(PS_SOLID, PENMWID, PENSILVR);
+  FormSelectedPen = wrap::createPen(PS_SOLID, PENNWID, PENSEGRN);
+  ZoomMarkPen     = wrap::createPen(PS_SOLID, PENMWID, PENLMGRN);
+  SelectAllPen    = wrap::createPen(PS_SOLID, PENNWID, PENROSY);
+  KnotPen         = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
   setLayerPens();
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
@@ -16410,7 +16410,7 @@ void thred::internal::init() {
   for (auto const& color : UserColor) {
 	*(tsp++) = 1;
 	*(tsi++) = 1;
-	*(up++)  = wrap::CreatePen(PS_SOLID, PENNWID, color);
+	*(up++)  = wrap::createPen(PS_SOLID, PENNWID, color);
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
@@ -17042,7 +17042,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
 		  auto iColor = stitchesToDraw[0].attribute & COLMSK;
 		  // NOLINTNEXTLINE(readability-qualified-auto)
-		  auto pen   = wrap::CreatePen(PS_SOLID, PENNWID, colors[iColor]);
+		  auto pen   = wrap::createPen(PS_SOLID, PENNWID, colors[iColor]);
 		  auto iLine = 0U;
 		  for (auto iStitch = 0U; iStitch < stitchHeader.stitchCount; ++iStitch) {
 			if ((stitchesToDraw[iStitch].attribute & COLMSK) == iColor) {

@@ -75,7 +75,7 @@ template <class outType, class inType> auto ceil(inType invar) -> outType {
   }
 }
 
-auto CreatePen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
+auto createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> HPEN;
 
 template <class outType, class inType> auto floor(inType invar) -> outType {
   return gsl::narrow<outType>(std::floor(invar));

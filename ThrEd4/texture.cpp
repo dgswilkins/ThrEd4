@@ -424,7 +424,7 @@ void texture::drwtxtr() {
   }
   DeleteObject(TextureCrossPen);
   auto const iUserColor = wrap::next(UserColor.begin(), ActiveColor);
-  TextureCrossPen       = wrap::CreatePen(PS_SOLID, PENNWID, *iUserColor);
+  TextureCrossPen       = wrap::createPen(PS_SOLID, PENNWID, *iUserColor);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   line[0].y = 0;
@@ -442,7 +442,7 @@ void texture::drwtxtr() {
   line[0].y = line[1].y = TextureScreen.bottom;
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   DeleteObject(TextureCrossPen);
-  TextureCrossPen = wrap::CreatePen(PS_SOLID, PENNWID, PENWHITE);
+  TextureCrossPen = wrap::createPen(PS_SOLID, PENNWID, PENWHITE);
   SelectObject(StitchWindowMemDC, TextureCrossPen);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   for (auto index = 0U; index < wrap::toUnsigned(TempTexturePoints->size()); ++index) {

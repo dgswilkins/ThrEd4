@@ -377,7 +377,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	return false;
   }
   auto bytesRead = DWORD {};
-  wrap::ReadFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+  wrap::readFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
   auto* pesHeader = convert_ptr<PESHED*>(fileBuffer);
 
   constexpr auto PESSTR = "#PES00"; // PES lead in value

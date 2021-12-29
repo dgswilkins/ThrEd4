@@ -273,7 +273,7 @@ void form::frmlin(std::vector<fPOINT> const& vertices) {
 void form::dufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
+  wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -287,10 +287,10 @@ void form::mdufrm() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
   if (FormList->operator[](ClosestFormToCursor).type == FRMLINE) {
-	wrap::Polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount - 1);
+	wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount - 1);
   }
   else {
-	wrap::Polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
+	wrap::polyline(StitchWindowDC, FormLines->data(), NewFormVertexCount);
   }
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
 }
@@ -375,7 +375,7 @@ void form::internal::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   line[0] = line[3] = thred::stch2pxr(adjustedPoint);
   adjustedPoint     = fPOINT {point.x - offset.x, point.y - offset.y};
   line[2]           = thred::stch2pxr(adjustedPoint);
-  wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void form::selsqr(POINT const& controlPoint, HDC dc) {
@@ -386,7 +386,7 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
   line[1].x = line[2].x = controlPoint.x + offset;
   line[2].y = line[3].y = controlPoint.y + offset;
   line[4].y             = controlPoint.y - offset;
-  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void form::internal::frmsqr0(POINT const& controlPoint) {
@@ -398,7 +398,7 @@ void form::internal::frmsqr0(POINT const& controlPoint) {
 	line[1].x = line[2].x = controlPoint.x + offset + 1;
 	line[2].y = line[3].y = controlPoint.y + offset + 1;
 	line[4].y             = controlPoint.y - 1;
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }
 
@@ -409,11 +409,11 @@ void form::internal::frmx(POINT const& controlPoint, HDC dc) {
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;
   line[1].y             = controlPoint.y - offset;
-  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
   line[0].y = line[1].y = controlPoint.y;
   line[0].x             = controlPoint.x - offset;
   line[1].x             = controlPoint.x + offset;
-  wrap::Polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
   SelectObject(dc, FormPen);
 }
 
@@ -448,7 +448,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 	*ipixelOutline = form::sfCor2px(controlPoint);
 	++ipixelOutline;
   }
-  wrap::Polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
+  wrap::polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
   auto const sp = gsl::make_span(pixelOutline);
   // drawing the boxes on corners and sides, so don't overwrite the first box which will "erase" it
   auto const subsp = sp.subspan(0, sp.size() - 1);
@@ -519,7 +519,7 @@ void form::fselrct(uint32_t iForm) {
 	SelectedFormsRect.bottom = last.y;
   }
   if (OutLineEverySelectedForm) {
-	wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+	wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
   }
 }
 
@@ -535,7 +535,7 @@ void form::rct2sel(RECT const& rectangle, std::vector<POINT>& line) noexcept {
 void form::dubig() {
   form::rct2sel(SelectedFormsRect, *SelectedFormsLine);
   SelectObject(StitchWindowMemDC, SelectAllPen);
-  wrap::Polyline(StitchWindowMemDC, SelectedFormsLine->data(), wrap::toUnsigned(SelectedFormsLine->size()));
+  wrap::polyline(StitchWindowMemDC, SelectedFormsLine->data(), wrap::toUnsigned(SelectedFormsLine->size()));
   for (auto iPoint = 0U; iPoint < (SelectedFormsLine->size() - 1U); ++iPoint) {
 	form::selsqr(SelectedFormsLine->operator[](iPoint), StitchWindowMemDC);
   }
@@ -545,7 +545,7 @@ void form::internal::frmpoly(POINT const* const line, uint32_t count) noexcept {
   if (line != nullptr) {
 	if (count != 0U) {
 	  for (auto iPoint = 0U; iPoint < count - 1U; ++iPoint) {
-		wrap::Polyline(StitchWindowMemDC, &line[iPoint], LNPNTS);
+		wrap::polyline(StitchWindowMemDC, &line[iPoint], LNPNTS);
 	  }
 	}
   }
@@ -554,7 +554,7 @@ void form::internal::frmpoly(POINT const* const line, uint32_t count) noexcept {
 void form::dupsel(HDC dc) {
   SelectObject(dc, FormPen);
   SetROP2(dc, R2_XORPEN);
-  wrap::Polyline(dc, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
+  wrap::polyline(dc, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
   // iPoint = SelectedFormVertices.start;
   for (auto iPoint = 0U; iPoint < (SelectedPointsLine->size() - 1U); ++iPoint) {
 	form::selsqr(SelectedPointsLine->operator[](iPoint), dc);
@@ -596,14 +596,14 @@ void form::drwfrm() {
 		if (form.type == SAT) {
 		  if ((form.attribute & FRMEND) != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen3px);
-			wrap::Polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
+			wrap::polyline(StitchWindowMemDC, FormLines->data(), LNPNTS);
 			lastPoint = 1;
 		  }
 		  if (form.wordParam != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen);
 			fi::frmpoly(&(FormLines->operator[](1)), form.wordParam);
 			SelectObject(StitchWindowMemDC, FormPen3px);
-			wrap::Polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), LNPNTS);
+			wrap::polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), LNPNTS);
 			SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
 			lastPoint = form.wordParam + 1U;
 		  }
@@ -616,7 +616,7 @@ void form::drwfrm() {
 			line[0]                   = form::sfCor2px(*itStartVertex);
 			line[1]                   = form::sfCor2px(*itFinishVertex);
 			SelectObject(StitchWindowMemDC, FormPen);
-			wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+			wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 			++itGuide;
 		  }
 		}
@@ -629,7 +629,7 @@ void form::drwfrm() {
 			auto const itFinishVertex = wrap::next(itFirstVertex, form.angleOrClipData.guide.finish);
 			thred::sCor2px(*itStartVertex, line[0]);
 			thred::sCor2px(*itFinishVertex, line[1]);
-			wrap::Polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
+			wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		  }
 		}
 		else {
@@ -5209,7 +5209,7 @@ void form::clrfills() noexcept {
 void form::internal::ducon() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, FormLines->data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, FormLines->data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5231,7 +5231,7 @@ void form::drwcon() {
 void form::duinsf() noexcept {
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
+  wrap::polyline(StitchWindowDC, InsertLine.data(), LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -5530,7 +5530,7 @@ void form::rinfrm() {
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   auto const& formLines = *FormLines;
   if ((FormVertexNext != 0U) || FormForInsert->type != FRMLINE) {
-	wrap::Polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
+	wrap::polyline(StitchWindowMemDC, &formLines[FormVertexPrev], LNPNTS);
   }
   InsertLine[0]   = formLines[FormVertexPrev];
   InsertLine[1].x = Msg.pt.x - StitchWindowOrigin.x;
@@ -6998,7 +6998,7 @@ void form::internal::doTimeWindow(float                        rangeX,
 	      xHistogram[iColumn],
 	      xHistogram[wrap::toSize(iColumn) + 1U],
 	      xHistogram[wrap::toSize(iColumn) + checkLength]);
-	wrap::Polyline(timeDC, formLines.data(), LNPNTS);
+	wrap::polyline(timeDC, formLines.data(), LNPNTS);
 	timePosition += timeStep;
 	formLines[0].x = formLines[1].x = std::lround(timePosition);
   }

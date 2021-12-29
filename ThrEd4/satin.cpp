@@ -1218,7 +1218,7 @@ void satin::dusat() noexcept {
   auto const* line        = &formLines[vertexCount - 1U];
   SetROP2(StitchWindowDC, R2_XORPEN);
   SelectObject(StitchWindowDC, FormPen);
-  wrap::Polyline(StitchWindowDC, line, LNPNTS);
+  wrap::polyline(StitchWindowDC, line, LNPNTS);
   SetROP2(StitchWindowDC, R2_COPYPEN);
 }
 
@@ -1374,7 +1374,7 @@ void satin::satzum() {
   form::frmlin(*TempPolygon);
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, FormPen);
-  wrap::Polyline(StitchWindowMemDC, FormLines->data(), vertexCount);
+  wrap::polyline(StitchWindowMemDC, FormLines->data(), vertexCount);
   SetROP2(StitchWindowMemDC, R2_COPYPEN);
   satin::drwsat();
 }
