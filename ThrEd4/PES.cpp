@@ -41,85 +41,85 @@ constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value posit
 static auto PEScolors      = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
 static auto PESequivColors = std::array<uint8_t, COLORCNT> {};    // pes equivalent colors
 
-static constexpr auto index00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
-static constexpr auto index01 = THREAD {{0x1a, 0x0a, 0x94}, "Prussian Blue", "ETP007"};
-static constexpr auto index02 = THREAD {{0x0f, 0x75, 0xff}, "Blue", "ETP405"};
-static constexpr auto index03 = THREAD {{0x00, 0x93, 0x4c}, "Teal Green", "ETP534"};
-static constexpr auto index04 = THREAD {{0xba, 0xbd, 0xfe}, "Corn Flower Blue", "ETP070"};
-static constexpr auto index05 = THREAD {{0xec, 0x00, 0x00}, "Red", "ETP800"};
-static constexpr auto index06 = THREAD {{0xe4, 0x99, 0x5a}, "Reddish Brown", "ETP337"};
-static constexpr auto index07 = THREAD {{0xcc, 0x48, 0xab}, "Magenta", "ETP620"};
-static constexpr auto index08 = THREAD {{0xfd, 0xc4, 0xfa}, "Light Lilac", "ETP810"};
-static constexpr auto index09 = THREAD {{0xdd, 0x84, 0xcd}, "Lilac", "ETP612"};
-static constexpr auto index10 = THREAD {{0x6b, 0xd3, 0x8a}, "Mint Green", "ETP502"};
-static constexpr auto index11 = THREAD {{0xe4, 0xa9, 0x45}, "Deep Gold", "ETP214"};
-static constexpr auto index12 = THREAD {{0xff, 0xbd, 0x42}, "Orange", "ETP208"};
-static constexpr auto index13 = THREAD {{0xff, 0xe6, 0x00}, "Yellow", "ETP205"};
-static constexpr auto index14 = THREAD {{0x6c, 0xd9, 0x00}, "Lime Green", "ETP513"};
-static constexpr auto index15 = THREAD {{0xc1, 0xa9, 0x41}, "Brass", "ETP328"};
-static constexpr auto index16 = THREAD {{0xb5, 0xad, 0x97}, "Silver", "ETP005"};
-static constexpr auto index17 = THREAD {{0xba, 0x9c, 0x5f}, "Russet Brown", "ETP330"};
-static constexpr auto index18 = THREAD {{0xfa, 0xf5, 0x9e}, "Cream Brown", "ETP010"};
-static constexpr auto index19 = THREAD {{0x80, 0x80, 0x80}, "Pewter", "ETP704"};
-static constexpr auto index20 = THREAD {{0x00, 0x00, 0x00}, "Black", "ETP900"};
-static constexpr auto index21 = THREAD {{0x00, 0x1c, 0xdf}, "Ultramarine", "ETP406"};
-static constexpr auto index22 = THREAD {{0xdf, 0x00, 0xb8}, "Royal Purple", "ETP869"};
-static constexpr auto index23 = THREAD {{0x62, 0x62, 0x62}, "Dark Gray", "ETP707"};
-static constexpr auto index24 = THREAD {{0x69, 0x26, 0x0d}, "Dark Brown", "ETP058"};
-static constexpr auto index25 = THREAD {{0xff, 0x00, 0x60}, "Deep Rose", "ETP086"};
-static constexpr auto index26 = THREAD {{0xbf, 0x82, 0x00}, "Light Brown", "ETP323"};
-static constexpr auto index27 = THREAD {{0xf3, 0x91, 0x78}, "Salmon Pink", "ETP079"};
-static constexpr auto index28 = THREAD {{0xff, 0x68, 0x05}, "Vermilion", "ETP030"};
-static constexpr auto index29 = THREAD {{0xf0, 0xf0, 0xf0}, "White", "ETP001"};
-static constexpr auto index30 = THREAD {{0xc8, 0x32, 0xcd}, "Violet", "ETP613"};
-static constexpr auto index31 = THREAD {{0xb0, 0xbf, 0x9b}, "Seacrest", "ETP542"};
-static constexpr auto index32 = THREAD {{0x65, 0xbf, 0xeb}, "Sky Blue", "ETP019"};
-static constexpr auto index33 = THREAD {{0xff, 0xba, 0x04}, "Pumpkin", "ETP126"};
-static constexpr auto index34 = THREAD {{0xff, 0xf0, 0x6c}, "Cream Yellow", "ETP010"};
-static constexpr auto index35 = THREAD {{0xfe, 0xca, 0x15}, "Khaki", "ETP348"};
-static constexpr auto index36 = THREAD {{0xf3, 0x81, 0x01}, "Clay Brown", "ETP339"};
-static constexpr auto index37 = THREAD {{0x37, 0xa9, 0x23}, "Leaf Green", "ETP509"};
-static constexpr auto index38 = THREAD {{0x23, 0x46, 0x5f}, "Peacock Blue", "ETP405"};
-static constexpr auto index39 = THREAD {{0xa6, 0xa6, 0x95}, "Gray", "ETP707"};
-static constexpr auto index40 = THREAD {{0xce, 0xbf, 0xa6}, "Warm Gray", "ETP399"};
-static constexpr auto index41 = THREAD {{0x96, 0xaa, 0x02}, "Dark Olive", "ETP517"};
-static constexpr auto index42 = THREAD {{0xff, 0xe3, 0xc6}, "Linen", "ETP307"};
-static constexpr auto index43 = THREAD {{0xff, 0x99, 0xd7}, "Pink", "ETP085"};
-static constexpr auto index44 = THREAD {{0x00, 0x70, 0x04}, "Deep Green", "ETP808"};
-static constexpr auto index45 = THREAD {{0xed, 0xcc, 0xfb}, "Lavender", "ETP804"};
-static constexpr auto index46 = THREAD {{0xc0, 0x89, 0xd8}, "Wisteria Violet", "ETP607"};
-static constexpr auto index47 = THREAD {{0xe7, 0xd9, 0xb4}, "Beige", "ETP843"};
-static constexpr auto index48 = THREAD {{0xe9, 0x0e, 0x86}, "Carmine", "ETP807"};
-static constexpr auto index49 = THREAD {{0xcf, 0x68, 0x29}, "Amber Red", "ETP333"};
-static constexpr auto index50 = THREAD {{0x40, 0x86, 0x15}, "Olive Green", "ETP519"};
-static constexpr auto index51 = THREAD {{0xdb, 0x17, 0x97}, "Dark Fuchsia", "ETP107"};
-static constexpr auto index52 = THREAD {{0xff, 0xa7, 0x04}, "Tangerine", "ETP209"};
-static constexpr auto index53 = THREAD {{0xb9, 0xff, 0xff}, "Light Blue", "ETP017"};
-static constexpr auto index54 = THREAD {{0x22, 0x89, 0x27}, "Emerald Green", "ETP507"};
-static constexpr auto index55 = THREAD {{0xb6, 0x12, 0xcd}, "Purple", "ETP614"};
-static constexpr auto index56 = THREAD {{0x00, 0xaa, 0x00}, "Moss Green", "ETP515"};
-static constexpr auto index57 = THREAD {{0xfe, 0xa9, 0xdc}, "Flesh Pink", "ETP124"};
-static constexpr auto index58 = THREAD {{0xfe, 0xd5, 0x10}, "Harvest Gold", "ETP206"};
-static constexpr auto index59 = THREAD {{0x00, 0x97, 0xdf}, "Electric Blue", "ETP420"};
-static constexpr auto index60 = THREAD {{0xff, 0xff, 0x84}, "Lemon Yellow", "ETP205"};
-static constexpr auto index61 = THREAD {{0xcf, 0xe7, 0x74}, "Fresh Green", "ETP027"};
-static constexpr auto index62 = THREAD {{0xff, 0xc8, 0x64}, "Applique Material", ""};
-static constexpr auto index63 = THREAD {{0xff, 0xc8, 0xc8}, "Applique Position", ""};
-static constexpr auto index64 = THREAD {{0xff, 0xc8, 0xc8}, "Applique", ""};
+static constexpr auto INDEX00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
+static constexpr auto INDEX01 = THREAD {{0x1a, 0x0a, 0x94}, "Prussian Blue", "ETP007"};
+static constexpr auto INDEX02 = THREAD {{0x0f, 0x75, 0xff}, "Blue", "ETP405"};
+static constexpr auto INDEX03 = THREAD {{0x00, 0x93, 0x4c}, "Teal Green", "ETP534"};
+static constexpr auto INDEX04 = THREAD {{0xba, 0xbd, 0xfe}, "Corn Flower Blue", "ETP070"};
+static constexpr auto INDEX05 = THREAD {{0xec, 0x00, 0x00}, "Red", "ETP800"};
+static constexpr auto INDEX06 = THREAD {{0xe4, 0x99, 0x5a}, "Reddish Brown", "ETP337"};
+static constexpr auto INDEX07 = THREAD {{0xcc, 0x48, 0xab}, "Magenta", "ETP620"};
+static constexpr auto INDEX08 = THREAD {{0xfd, 0xc4, 0xfa}, "Light Lilac", "ETP810"};
+static constexpr auto INDEX09 = THREAD {{0xdd, 0x84, 0xcd}, "Lilac", "ETP612"};
+static constexpr auto INDEX10 = THREAD {{0x6b, 0xd3, 0x8a}, "Mint Green", "ETP502"};
+static constexpr auto INDEX11 = THREAD {{0xe4, 0xa9, 0x45}, "Deep Gold", "ETP214"};
+static constexpr auto INDEX12 = THREAD {{0xff, 0xbd, 0x42}, "Orange", "ETP208"};
+static constexpr auto INDEX13 = THREAD {{0xff, 0xe6, 0x00}, "Yellow", "ETP205"};
+static constexpr auto INDEX14 = THREAD {{0x6c, 0xd9, 0x00}, "Lime Green", "ETP513"};
+static constexpr auto INDEX15 = THREAD {{0xc1, 0xa9, 0x41}, "Brass", "ETP328"};
+static constexpr auto INDEX16 = THREAD {{0xb5, 0xad, 0x97}, "Silver", "ETP005"};
+static constexpr auto INDEX17 = THREAD {{0xba, 0x9c, 0x5f}, "Russet Brown", "ETP330"};
+static constexpr auto INDEX18 = THREAD {{0xfa, 0xf5, 0x9e}, "Cream Brown", "ETP010"};
+static constexpr auto INDEX19 = THREAD {{0x80, 0x80, 0x80}, "Pewter", "ETP704"};
+static constexpr auto INDEX20 = THREAD {{0x00, 0x00, 0x00}, "Black", "ETP900"};
+static constexpr auto INDEX21 = THREAD {{0x00, 0x1c, 0xdf}, "Ultramarine", "ETP406"};
+static constexpr auto INDEX22 = THREAD {{0xdf, 0x00, 0xb8}, "Royal Purple", "ETP869"};
+static constexpr auto INDEX23 = THREAD {{0x62, 0x62, 0x62}, "Dark Gray", "ETP707"};
+static constexpr auto INDEX24 = THREAD {{0x69, 0x26, 0x0d}, "Dark Brown", "ETP058"};
+static constexpr auto INDEX25 = THREAD {{0xff, 0x00, 0x60}, "Deep Rose", "ETP086"};
+static constexpr auto INDEX26 = THREAD {{0xbf, 0x82, 0x00}, "Light Brown", "ETP323"};
+static constexpr auto INDEX27 = THREAD {{0xf3, 0x91, 0x78}, "Salmon Pink", "ETP079"};
+static constexpr auto INDEX28 = THREAD {{0xff, 0x68, 0x05}, "Vermilion", "ETP030"};
+static constexpr auto INDEX29 = THREAD {{0xf0, 0xf0, 0xf0}, "White", "ETP001"};
+static constexpr auto INDEX30 = THREAD {{0xc8, 0x32, 0xcd}, "Violet", "ETP613"};
+static constexpr auto INDEX31 = THREAD {{0xb0, 0xbf, 0x9b}, "Seacrest", "ETP542"};
+static constexpr auto INDEX32 = THREAD {{0x65, 0xbf, 0xeb}, "Sky Blue", "ETP019"};
+static constexpr auto INDEX33 = THREAD {{0xff, 0xba, 0x04}, "Pumpkin", "ETP126"};
+static constexpr auto INDEX34 = THREAD {{0xff, 0xf0, 0x6c}, "Cream Yellow", "ETP010"};
+static constexpr auto INDEX35 = THREAD {{0xfe, 0xca, 0x15}, "Khaki", "ETP348"};
+static constexpr auto INDEX36 = THREAD {{0xf3, 0x81, 0x01}, "Clay Brown", "ETP339"};
+static constexpr auto INDEX37 = THREAD {{0x37, 0xa9, 0x23}, "Leaf Green", "ETP509"};
+static constexpr auto INDEX38 = THREAD {{0x23, 0x46, 0x5f}, "Peacock Blue", "ETP405"};
+static constexpr auto INDEX39 = THREAD {{0xa6, 0xa6, 0x95}, "Gray", "ETP707"};
+static constexpr auto INDEX40 = THREAD {{0xce, 0xbf, 0xa6}, "Warm Gray", "ETP399"};
+static constexpr auto INDEX41 = THREAD {{0x96, 0xaa, 0x02}, "Dark Olive", "ETP517"};
+static constexpr auto INDEX42 = THREAD {{0xff, 0xe3, 0xc6}, "Linen", "ETP307"};
+static constexpr auto INDEX43 = THREAD {{0xff, 0x99, 0xd7}, "Pink", "ETP085"};
+static constexpr auto INDEX44 = THREAD {{0x00, 0x70, 0x04}, "Deep Green", "ETP808"};
+static constexpr auto INDEX45 = THREAD {{0xed, 0xcc, 0xfb}, "Lavender", "ETP804"};
+static constexpr auto INDEX46 = THREAD {{0xc0, 0x89, 0xd8}, "Wisteria Violet", "ETP607"};
+static constexpr auto INDEX47 = THREAD {{0xe7, 0xd9, 0xb4}, "Beige", "ETP843"};
+static constexpr auto INDEX48 = THREAD {{0xe9, 0x0e, 0x86}, "Carmine", "ETP807"};
+static constexpr auto INDEX49 = THREAD {{0xcf, 0x68, 0x29}, "Amber Red", "ETP333"};
+static constexpr auto INDEX50 = THREAD {{0x40, 0x86, 0x15}, "Olive Green", "ETP519"};
+static constexpr auto INDEX51 = THREAD {{0xdb, 0x17, 0x97}, "Dark Fuchsia", "ETP107"};
+static constexpr auto INDEX52 = THREAD {{0xff, 0xa7, 0x04}, "Tangerine", "ETP209"};
+static constexpr auto INDEX53 = THREAD {{0xb9, 0xff, 0xff}, "Light Blue", "ETP017"};
+static constexpr auto INDEX54 = THREAD {{0x22, 0x89, 0x27}, "Emerald Green", "ETP507"};
+static constexpr auto INDEX55 = THREAD {{0xb6, 0x12, 0xcd}, "Purple", "ETP614"};
+static constexpr auto INDEX56 = THREAD {{0x00, 0xaa, 0x00}, "Moss Green", "ETP515"};
+static constexpr auto INDEX57 = THREAD {{0xfe, 0xa9, 0xdc}, "Flesh Pink", "ETP124"};
+static constexpr auto INDEX58 = THREAD {{0xfe, 0xd5, 0x10}, "Harvest Gold", "ETP206"};
+static constexpr auto INDEX59 = THREAD {{0x00, 0x97, 0xdf}, "Electric Blue", "ETP420"};
+static constexpr auto INDEX60 = THREAD {{0xff, 0xff, 0x84}, "Lemon Yellow", "ETP205"};
+static constexpr auto INDEX61 = THREAD {{0xcf, 0xe7, 0x74}, "Fresh Green", "ETP027"};
+static constexpr auto INDEX62 = THREAD {{0xff, 0xc8, 0x64}, "Applique Material", ""};
+static constexpr auto INDEX63 = THREAD {{0xff, 0xc8, 0xc8}, "Applique Position", ""};
+static constexpr auto INDEX64 = THREAD {{0xff, 0xc8, 0xc8}, "Applique", ""};
 
-static constexpr auto PESThread = std::array<THREAD, 65> {
-    index00, index01, index02, index03, index04, index05, index06, index07, index08, index09,
-    index10, index11, index12, index13, index14, index15, index16, index17, index18, index19,
-    index20, index21, index22, index23, index24, index25, index26, index27, index28, index29,
-    index30, index31, index32, index33, index34, index35, index36, index37, index38, index39,
-    index40, index41, index42, index43, index44, index45, index46, index47, index48, index49,
-    index50, index51, index52, index53, index54, index55, index56, index57, index58, index59,
-    index60, index61, index62, index63, index64};
+static constexpr auto PES_THREAD = std::array<THREAD, 65> {
+    INDEX00, INDEX01, INDEX02, INDEX03, INDEX04, INDEX05, INDEX06, INDEX07, INDEX08, INDEX09,
+    INDEX10, INDEX11, INDEX12, INDEX13, INDEX14, INDEX15, INDEX16, INDEX17, INDEX18, INDEX19,
+    INDEX20, INDEX21, INDEX22, INDEX23, INDEX24, INDEX25, INDEX26, INDEX27, INDEX28, INDEX29,
+    INDEX30, INDEX31, INDEX32, INDEX33, INDEX34, INDEX35, INDEX36, INDEX37, INDEX38, INDEX39,
+    INDEX40, INDEX41, INDEX42, INDEX43, INDEX44, INDEX45, INDEX46, INDEX47, INDEX48, INDEX49,
+    INDEX50, INDEX51, INDEX52, INDEX53, INDEX54, INDEX55, INDEX56, INDEX57, INDEX58, INDEX59,
+    INDEX60, INDEX61, INDEX62, INDEX63, INDEX64};
 
-constexpr auto THTYPCNT = PESThread.size(); // Count of thread colors available in the PES format
+constexpr auto THTYPCNT = PES_THREAD.size(); // Count of thread colors available in the PES format
 
 // clang-format off
-static constexpr auto imageWithFrame = imgArray{{ 
+static constexpr auto IMAGE_WITH_FRAME = imgArray{{ 
 	{ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
 	{ 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0 },
 	{ 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0 },
@@ -164,7 +164,7 @@ static constexpr auto imageWithFrame = imgArray{{
 auto PES::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto translatedColor = PESThread[colorIndex].color;
+  auto       translatedColor = PES_THREAD[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
@@ -217,7 +217,7 @@ void PES::internal::pecnam(gsl::span<char> const& label) {
 }
 #pragma warning(pop)
 
-void PES::internal::pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta) {
+void PES::internal::pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta) {
   constexpr auto MSK11BIT  = uint32_t {0x7FFU}; // used to mask the value to 11 bits
   auto           outputVal = gsl::narrow_cast<uint32_t>(std::abs(delta)) & MSK11BIT;
   if (delta < 0) {
@@ -247,8 +247,8 @@ void PES::internal::rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, flo
 	buffer.push_back(yVal);
   }
   else {
-	pecEncodeint32_t(buffer, deltaX);
-	pecEncodeint32_t(buffer, deltaY);
+	pecEncodeInt(buffer, deltaX);
+	pecEncodeInt(buffer, deltaY);
   }
   thisStitch.x += wrap::toFloat(deltaX) * IPECFACT;
   thisStitch.y += -wrap::toFloat(deltaY) * IPECFACT;
@@ -302,7 +302,7 @@ void PES::internal::writeThumbnail(std::vector<uint8_t>& buffer, imgArray const&
 }
 
 void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
-  auto       thumbnail = imageWithFrame;
+  auto       thumbnail = IMAGE_WITH_FRAME;
   auto const yFactor   = 31.0F / IniFile.hoopSizeY;
   auto const xFactor   = 40.0F / IniFile.hoopSizeX;
   // write the overall thumbnail
@@ -317,7 +317,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
   }
   pi::writeThumbnail(pecBuffer, thumbnail);
   // now write out the individual thread thumbnails
-  thumbnail        = imageWithFrame;
+  thumbnail        = IMAGE_WITH_FRAME;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
   for (auto& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
@@ -329,7 +329,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 	}
 	else {
 	  pi::writeThumbnail(pecBuffer, thumbnail);
-	  thumbnail   = imageWithFrame;
+	  thumbnail   = IMAGE_WITH_FRAME;
 	  stitchColor = (stitch.attribute & COLMSK);
 	  *iRow       = 1U;
 	}
@@ -338,7 +338,7 @@ void PES::internal::pecImage(std::vector<uint8_t>& pecBuffer) {
 }
 
 auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
-  auto const& threadColor = PESThread[PEScolors[index++] % THTYPCNT];
+  auto const& threadColor = PES_THREAD[PEScolors[index++] % THTYPCNT];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   auto       iUserColor = UserColor.cbegin();
@@ -388,8 +388,8 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto*      pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
   auto const pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-  auto*      PESstitch = &fileBuffer[pecOffset];
-  if (PESstitch == nullptr) {
+  auto*      pesStitch = &fileBuffer[pecOffset];
+  if (pesStitch == nullptr) {
 	return false;
   }
   auto const pesColorCount = pecHeader->colorCount + 1U;
@@ -400,7 +400,7 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
   for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
 	if (PEScolors[iColor] < THTYPCNT) {
 	  if (!colorMap.test_set(PEScolors[iColor])) {
-		auto const& threadColor = PESThread[PEScolors[iColor]];
+		auto const& threadColor = PES_THREAD[PEScolors[iColor]];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 		*iUserColor      = color;
@@ -412,9 +412,9 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	}
 	else {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-	  auto const color = RGB(PESThread[0].color.r,
-	                         PESThread[0].color.g,
-	                         PESThread[0].color.b); // color unknown
+	  auto const color = RGB(PES_THREAD[0].color.r,
+	                         PES_THREAD[0].color.g,
+	                         PES_THREAD[0].color.b); // color unknown
 
 	  *iUserColor = color;
 	  ++iUserColor;
@@ -431,21 +431,21 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 	StitchBuffer->push_back(F_POINT_ATTR {});
 	constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
-	auto PEScolorIndex = uint32_t {1U};
+	auto pesColorIndex = uint32_t {1U};
 	while (iPESstitch < pecCount) {
-	  if (PESstitch[iPESstitch] == 0xff && PESstitch[iPESstitch + 1U] == 0) {
+	  if (pesStitch[iPESstitch] == 0xff && pesStitch[iPESstitch + 1U] == 0) {
 		break;
 	  }
-	  if (PESstitch[iPESstitch] == 0xfe && PESstitch[iPESstitch + 1U] == 0xb0) {
-		color = pi::dupcol(wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), PEScolorIndex);
+	  if (pesStitch[iPESstitch] == 0xfe && pesStitch[iPESstitch + 1U] == 0xb0) {
+		color = pi::dupcol(wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 		iPESstitch += 2;
 	  }
 	  else {
 		auto locof = 0.0F;
-		if ((PESstitch[iPESstitch] & BIT8) != 0U) {
+		if ((pesStitch[iPESstitch] & BIT8) != 0U) {
 		  // combine the 4 bits from the first byte with the 8 bits from the next byte
 		  auto pesVal =
-		      (gsl::narrow_cast<uint32_t>(PESstitch[iPESstitch] << BYTSHFT) | PESstitch[iPESstitch + 1U]) & MSK12BIT;
+		      (gsl::narrow_cast<uint32_t>(pesStitch[iPESstitch] << BYTSHFT) | pesStitch[iPESstitch + 1U]) & MSK12BIT;
 		  if ((pesVal & BIT12) != 0U) {
 			pesVal -= POSOFF;
 		  }
@@ -454,11 +454,11 @@ auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
 		  ++iPESstitch;
 		}
 		else {
-		  if (PESstitch[iPESstitch] > 0x3f) {
-			locof = wrap::toFloat(PESstitch[iPESstitch]) - 128.0F;
+		  if (pesStitch[iPESstitch] > 0x3f) {
+			locof = wrap::toFloat(pesStitch[iPESstitch]) - 128.0F;
 		  }
 		  else {
-			locof = PESstitch[iPESstitch];
+			locof = pesStitch[iPESstitch];
 		  }
 		}
 		locof *= IPECFACT;
@@ -688,16 +688,16 @@ auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		constexpr auto HIGHBMSK = uint16_t {0xff00U}; // high byte mask
 		constexpr auto PECSHIFT = uint16_t {8U};      // byte shift
 
-		auto xInt16_le = wrap::round<uint16_t>(boundingRect.left * PECFACT);
-		auto yInt16_le = wrap::round<uint16_t>(boundingRect.bottom * PECFACT);
-		xInt16_le |= PECMASK1;
-		yInt16_le |= PECMASK1;
+		auto xInt = wrap::round<uint16_t>(boundingRect.left * PECFACT);
+		auto yInt = wrap::round<uint16_t>(boundingRect.bottom * PECFACT);
+		xInt |= PECMASK1;
+		yInt |= PECMASK1;
 		pecHeader2->xMin =
-		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt16_le & HIGHBMSK) >> PECSHIFT) |
-		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt16_le & LOWBMASK) << PECSHIFT);
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt & HIGHBMSK) >> PECSHIFT) |
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(xInt & LOWBMASK) << PECSHIFT);
 		pecHeader2->yMin =
-		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt16_le & HIGHBMSK) >> PECSHIFT) |
-		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt16_le & LOWBMASK) << PECSHIFT);
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt & HIGHBMSK) >> PECSHIFT) |
+		    gsl::narrow_cast<uint16_t>(gsl::narrow_cast<uint16_t>(yInt & LOWBMASK) << PECSHIFT);
 		pi::pecImage(pecBuffer);
 		if (FALSE == WriteFile(fileHandle, pecBuffer.data(), wrap::toUnsigned(pecBuffer.size()), &bytesWritten, nullptr)) {
 		  displayText::riter();

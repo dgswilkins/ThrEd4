@@ -154,7 +154,7 @@ auto readPESFile(std::filesystem::path const& newFileName) -> bool;
 auto savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 namespace internal {
   auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
-  void pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta);
+  void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
   void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
   void pecImage(std::vector<uint8_t>& pecBuffer);
   void pecdat(std::vector<uint8_t>& buffer);
