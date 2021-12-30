@@ -56,7 +56,7 @@ constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
 void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
-  static constexpr auto DSTvalues = std::array<DSTDAT, 22> {
+  static constexpr auto DST_VALUES = std::array<DSTDAT, 22> {
       {// DST offset values
        {XCOR, 1},   {XCOR, -1},  {XCOR, 9},   {XCOR, -9}, {YCOR, -9}, {YCOR, 9},
        {YCOR, -1},  {YCOR, 1},   {XCOR, 3},   {XCOR, -3}, {XCOR, 27}, {XCOR, -27},
@@ -65,13 +65,13 @@ void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
 
   auto shift = 1U;
   pout       = POINT {};
-  for (auto const& DSTValue : DSTvalues) {
+  for (auto const& dstValue : DST_VALUES) {
 	if ((number & shift) != 0U) {
-	  if (DSTValue.cor != XCOR) {
-		pout.y += DSTValue.val;
+	  if (dstValue.cor != XCOR) {
+		pout.y += dstValue.val;
 	  }
 	  else {
-		pout.x += DSTValue.val;
+		pout.x += dstValue.val;
 	  }
 	}
 	shift <<= 1U;
@@ -359,7 +359,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 
 auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
   static constexpr auto DSTLEN = 243U; // -121 to 121
-  static constexpr auto xDST   = std::array<uint32_t, DSTLEN> {
+  static constexpr auto X_DST   = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
       0x090a08, //-120
       0x090a09, //-119
@@ -605,7 +605,7 @@ auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
       0x050505  // 121
   };
 
-  static constexpr auto yDST = std::array<uint32_t, DSTLEN> {
+  static constexpr auto Y_DST = std::array<uint32_t, DSTLEN> {
       0x115050, //-121
       0x115010, //-120
       0x115090, //-119
@@ -850,7 +850,7 @@ auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return xDST[wrap::toSize(dif.cx) + DSTMAX] | yDST[wrap::toSize(dif.cy) + DSTMAX];
+  return X_DST[wrap::toSize(dif.cx) + DSTMAX] | Y_DST[wrap::toSize(dif.cy) + DSTMAX];
 }
 
 void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
@@ -880,10 +880,10 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	if (di::chkdst(&dstHeader)) {
 	  bitmap::resetBmpFile(true);
 	  fileSize -= sizeof(dstHeader);
-	  auto DSTData = std::vector<DSTREC> {};
-	  DSTData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
-	  ReadFile(fileHandle, DSTData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
-	  di::dstran(DSTData);
+	  auto dstData = std::vector<DSTREC> {};
+	  dstData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
+	  ReadFile(fileHandle, dstData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+	  di::dstran(dstData);
 	  IniFile.auxFileType = AUXDST;
 	}
   }
@@ -913,12 +913,12 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 	}
 	else {
 	  do {
-		auto DSTRecords = std::vector<DSTREC> {};
+		auto dstRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-		DSTRecords.reserve(StitchBuffer->size() + 128U);
-		auto DSTOffset = DST_OFFSETS {};
+		dstRecords.reserve(StitchBuffer->size() + 128U);
+		auto dstOffset = DST_OFFSETS {};
 		auto dstHeader = DSTHED {};
-		DST::ritdst(DSTOffset, DSTRecords, saveStitches);
+		DST::ritdst(dstOffset, dstRecords, saveStitches);
 		// dstHeader fields are fixed width, so use strncpy in its intended way.
 		// Use sizeof to ensure no overrun if the format string is wrong length
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
@@ -939,17 +939,17 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		// clang-format off
         spDstHdrDesc.back() = 0xd;
         strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-        strncpy(static_cast<char *>(dstHeader.recs),  fmt::format("{:7d}\r", DSTRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
+        strncpy(static_cast<char *>(dstHeader.recs),  fmt::format("{:7d}\r", dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
         strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            
         strncpy(static_cast<char *>(dstHeader.co),         "  0\xd",   sizeof(dstHeader.co));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                            
         strncpy(static_cast<char *>(dstHeader.xplushed),   "+X:",      sizeof(dstHeader.xplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-        strncpy(static_cast<char *>(dstHeader.xplus), fmt::format("{:5d}\xd", DSTOffset.Negative.x).c_str(), sizeof(dstHeader.xplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
+        strncpy(static_cast<char *>(dstHeader.xplus), fmt::format("{:5d}\xd", dstOffset.Negative.x).c_str(), sizeof(dstHeader.xplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.xminhed),    "-X:",      sizeof(dstHeader.xminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.xmin),  fmt::format( "{:5d}\xd", DSTOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));  // NOLINT(clang-diagnostic-deprecated-declarations)
+        strncpy(static_cast<char *>(dstHeader.xmin),  fmt::format( "{:5d}\xd", dstOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));  // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.yplushed),   "+Y:",      sizeof(dstHeader.yplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.yplus), fmt::format("{:5d}\xd", DSTOffset.Positive.y).c_str(), sizeof(dstHeader.yplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
+        strncpy(static_cast<char *>(dstHeader.yplus), fmt::format("{:5d}\xd", dstOffset.Positive.y).c_str(), sizeof(dstHeader.yplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.yminhed),    "-Y:",      sizeof(dstHeader.yminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.ymin),  fmt::format( "{:5d}\xd", DSTOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));  // NOLINT(clang-diagnostic-deprecated-declarations)
+        strncpy(static_cast<char *>(dstHeader.ymin),  fmt::format( "{:5d}\xd", dstOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));  // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.axhed),      "AX:",      sizeof(dstHeader.axhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.ax),         "-    0\r", sizeof(dstHeader.ax));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.ayhed),      "AY:",      sizeof(dstHeader.ayhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
@@ -970,7 +970,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		  flag = false;
 		  break;
 		}
-		if (FALSE == WriteFile(fileHandle, DSTRecords.data(), wrap::sizeofVector(DSTRecords), &bytesWritten, nullptr)) {
+		if (FALSE == WriteFile(fileHandle, dstRecords.data(), wrap::sizeofVector(dstRecords), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;
