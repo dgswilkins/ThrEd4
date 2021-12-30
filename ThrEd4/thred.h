@@ -30,13 +30,13 @@
 namespace fs = std::filesystem;
 
 // File open types
-enum class fileStyles : uint8_t {
+enum class FileStyles : uint8_t {
   ALL_FILES, // All file Types
   INS_FILES  // Insert file types
 };
 
 // File Indices
-enum class fileIndices : uint8_t {
+enum class FileIndices : uint8_t {
   THR, // Thredworks
   PCS, // Pfaff
   PES, // Brother
@@ -217,7 +217,7 @@ namespace internal {
   void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
   void endpnt(POINT const& stitchCoordsInPixels);
 
-  auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
+  auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
   void esccode();
   void f1del(uint32_t formIndex);
@@ -247,7 +247,7 @@ namespace internal {
   void getfrmbox();
   void getfrmpix();
   auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
-  auto getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool;
+  auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
   void getnpix();
   void getstpix();
   void gotbox();
@@ -307,7 +307,7 @@ namespace internal {
   void loadColors() noexcept;
   void lock();
 
-  auto CALLBACK LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
+  auto CALLBACK lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
   void lodclp(uint32_t iStitch);
   void longer();
@@ -326,14 +326,14 @@ namespace internal {
   void nedof();
   void nedon();
   void newFil();
-  auto getSaveName(fs::path* fileName, fileIndices& fileType) -> bool;
+  auto getSaveName(fs::path* fileName, FileIndices& fileType) -> bool;
   void noMsg();
   void nuAct(uint32_t iStitch) noexcept;
   auto nuBak() noexcept -> BOOL;
   void nuBrush(HBRUSH& brush, COLORREF color) noexcept;
   auto nuCol(COLORREF init) noexcept -> BOOL;
   void resetState();
-  void nuFil(fileIndices fileIndex);
+  void nuFil(FileIndices fileIndex);
   void nuRct() noexcept;
   void nuStchSiz(uint32_t iColor, int32_t width);
   auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
@@ -494,7 +494,7 @@ namespace internal {
   void vuselthr();
   void vuthrds();
 
-  auto CALLBACK WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
+  auto CALLBACK wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
   auto wastch(uint32_t const& formIndex) -> bool;
   void xlin();

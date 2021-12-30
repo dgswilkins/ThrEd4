@@ -2092,7 +2092,7 @@ auto thred::internal::oldwnd(HWND window) noexcept -> bool {
   return true;
 }
 
-auto CALLBACK thred::internal::EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
+auto CALLBACK thred::internal::enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   UNREFERENCED_PARAMETER(lParam);
   if (oldwnd(hwnd)) {
@@ -2185,7 +2185,7 @@ void thred::internal::rstAll() {
   SearchLine->clear();
   SearchLine->shrink_to_fit();
   FirstWin = nullptr;
-  while (EnumChildWindows(MainStitchWin, thi::EnumChildProc, 0) != 0) { }
+  while (EnumChildWindows(MainStitchWin, thi::enumChildProc, 0) != 0) { }
 }
 
 void thred::ritot(uint32_t number) {
@@ -3450,7 +3450,7 @@ void thred::internal::auxmen() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> bool {
+auto thred::internal::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
   if (nullptr != fileName) {
 	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
@@ -3483,25 +3483,25 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 			if (SUCCEEDED(hr)) {
 			  switch (reply) {
 				case 1: {
-				  fileType = fileIndices::THR;
+				  fileType = FileIndices::THR;
 				  break;
 				}
 				case 2: {
-				  fileType = fileIndices::PCS;
+				  fileType = FileIndices::PCS;
 				  break;
 				}
 				case 3: {
-				  fileType = fileIndices::DST;
+				  fileType = FileIndices::DST;
 				  break;
 				}
 #if PESACT
 				case 4: {
-				  fileType = fileIndices::PES;
+				  fileType = FileIndices::PES;
 				  break;
 				}
 #endif
 				default: {
-				  fileType = fileIndices::THR;
+				  fileType = FileIndices::THR;
 				  break;
 				}
 			  }
@@ -3525,29 +3525,29 @@ auto thred::internal::getSaveName(fs::path* fileName, fileIndices& fileType) -> 
 
 void thred::internal::savAs() {
   if (!StitchBuffer->empty() || !FormList->empty() || bitmap::ismap()) {
-	auto index = fileIndices {};
+	auto index = FileIndices {};
 	if (getSaveName(WorkingFileName, index)) {
 	  *DefaultDirectory = WorkingFileName->parent_path();
 	  switch (index) {
-		case fileIndices::THR: {
+		case FileIndices::THR: {
 		  WorkingFileName->replace_extension(L".thr");
 		  break;
 		}
-		case fileIndices::PCS: {
+		case FileIndices::PCS: {
 		  WorkingFileName->replace_extension(L".pcs");
 		  IniFile.auxFileType = AUXPCS;
 		  auxmen();
 		  break;
 		}
 #if PESACT
-		case fileIndices::PES: {
+		case FileIndices::PES: {
 		  WorkingFileName->replace_extension(L".pes");
 		  IniFile.auxFileType = AUXPES;
 		  auxmen();
 		  break;
 		}
 #endif
-		case fileIndices::DST: {
+		case FileIndices::DST: {
 		  WorkingFileName->replace_extension(L".dst");
 		  IniFile.auxFileType = AUXDST;
 		  auxmen();
@@ -4022,7 +4022,7 @@ void thred::internal::rstdu() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool {
+auto thred::internal::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hr = CoCreateInstance(
@@ -4035,7 +4035,7 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 	if (SUCCEEDED(hr)) {
 	  hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
 	  switch (fileTypes) {
-		case fileStyles::ALL_FILES: {
+		case FileStyles::ALL_FILES: {
 #if PESACT
 		  static constexpr auto aFileTypes =
 		      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
@@ -4045,27 +4045,27 @@ auto thred::internal::getNewFileName(fs::path& newFileName, fileStyles fileTypes
 		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(aFileTypes.size()), aFileTypes.data());
 		  break;
 		}
-		case fileStyles::INS_FILES: {
+		case FileStyles::INS_FILES: {
 		  static constexpr auto iFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
 		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(iFileTypes.size()), iFileTypes.data());
 		  break;
 		}
 	  }
 	  switch (fileIndex) {
-		case fileIndices::THR: {
+		case FileIndices::THR: {
 		  hr += pFileOpen->SetFileTypeIndex(1);
 		  break;
 		}
-		case fileIndices::PCS: {
+		case FileIndices::PCS: {
 		  hr += pFileOpen->SetFileTypeIndex(2);
 		  break;
 		}
-		case fileIndices::DST: {
+		case FileIndices::DST: {
 		  hr += pFileOpen->SetFileTypeIndex(3);
 		  break;
 		}
 #if PESACT
-		case fileIndices::PES: {
+		case FileIndices::PES: {
 		  hr += pFileOpen->SetFileTypeIndex(4);
 		  break;
 		}
@@ -4404,9 +4404,9 @@ void thred::internal::resetState() {
   }
 }
 
-void thred::internal::nuFil(fileIndices fileIndex) {
+void thred::internal::nuFil(FileIndices fileIndex) {
   auto newFileName = *WorkingFileName;
-  if (StateMap->testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, fileStyles::ALL_FILES, fileIndex)) {
+  if (StateMap->testAndReset(StateFlag::REDOLD) || getNewFileName(newFileName, FileStyles::ALL_FILES, fileIndex)) {
 	WorkingFileName->assign(newFileName);
 	defNam(newFileName);
 	resetState();
@@ -6970,7 +6970,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
   auto insertedRectangle = F_RECTANGLE {BIGFLOAT, TNYFLOAT, TNYFLOAT, BIGFLOAT};
   if (insertedFile.empty()) {
-	getNewFileName(insertedFile, fileStyles::INS_FILES, fileIndices::THR);
+	getNewFileName(insertedFile, FileStyles::INS_FILES, FileIndices::THR);
   }
   InsertedStitchIndex = wrap::toUnsigned(StitchBuffer->size());
   if (isthr(insertedFile)) {
@@ -7261,7 +7261,7 @@ void thred::internal::getbak() {
 	}
 	else {
 	  StateMap->set(StateFlag::REDOLD);
-	  nuFil(fileIndices::THR);
+	  nuFil(FileIndices::THR);
 	}
   }
 }
@@ -7284,7 +7284,7 @@ void thred::internal::rebak() {
   fs::rename(safetyFileName, newFileName);
   *WorkingFileName = *ThrName;
   StateMap->set(StateFlag::REDOLD);
-  nuFil(fileIndices::THR);
+  nuFil(FileIndices::THR);
   fs::remove(safetyFileName);
 }
 
@@ -8727,7 +8727,7 @@ void thred::internal::fop() {
   trace::untrace();
   if (!FormList->empty() || (!StitchBuffer->empty())) {
 	if (savcmp()) {
-	  nuFil(fileIndices::THR);
+	  nuFil(FileIndices::THR);
 	  nulayr(0U);
 	}
 	else {
@@ -8736,7 +8736,7 @@ void thred::internal::fop() {
 	}
   }
   else {
-	nuFil(fileIndices::THR);
+	nuFil(FileIndices::THR);
 	nulayr(0U);
   }
 }
@@ -9429,7 +9429,7 @@ void thred::internal::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileInde
   }
 }
 
-auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
+auto CALLBACK thred::internal::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR {
   switch (umsg) {
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
@@ -9533,7 +9533,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 		  }
 		  default: {
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			outDebugString(L"default hit in LockPrc 1: wparam [{}]\n", LOWORD(wparam));
+			outDebugString(L"default hit in lockPrc 1: wparam [{}]\n", LOWORD(wparam));
 			break;
 		  }
 		}
@@ -9541,7 +9541,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  break;
 	}
 	default: {
-	  outDebugString(L"default hit in LockPrc 2: umsg [{}]\n", umsg);
+	  outDebugString(L"default hit in lockPrc 2: umsg [{}]\n", umsg);
 	  break;
 	}
   }
@@ -9554,7 +9554,7 @@ void thred::internal::lock() {
   // ToDo - Replace 512 with maximum files in subdirectory
   lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT(cppcoreguidelines-owning-memory)
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, LockPrc, reinterpret_cast<LPARAM>(&lockInfo));
+  DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
   delete[] lockInfo.data; // NOLINT(cppcoreguidelines-owning-memory)
 }
 
@@ -12200,12 +12200,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::OSAV)) {
 	if (chkok()) {
 	  thred::save();
-	  nuFil(fileIndices::THR);
+	  nuFil(FileIndices::THR);
 	  thred::unmsg();
 	  return true;
 	}
 	if (chkwnd(DiscardButton)) {
-	  nuFil(fileIndices::THR);
+	  nuFil(FileIndices::THR);
 	  thred::unmsg();
 	  return true;
 	}
@@ -15020,17 +15020,17 @@ auto thred::internal::handleFileMenu(WORD const& wParameter) -> bool {
 	case ID_OPNPCD: { // file / Open Auxiliary file
 	  switch (IniFile.auxFileType) {
 		case AUXDST: {
-		  nuFil(fileIndices::DST);
+		  nuFil(FileIndices::DST);
 		  break;
 		}
 #if PESACT
 		case AUXPES: {
-		  nuFil(fileIndices::PES);
+		  nuFil(FileIndices::PES);
 		  break;
 		}
 #endif
 		default: {
-		  nuFil(fileIndices::PCS);
+		  nuFil(FileIndices::PCS);
 		}
 	  }
 	  nulayr(0U);
@@ -15725,7 +15725,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  if (Msg.wParam == iLRU) {
 			*WorkingFileName = *previousName;
 			StateMap->set(StateFlag::REDOLD);
-			nuFil(fileIndices::THR);
+			nuFil(FileIndices::THR);
 		  }
 		  ++previousName;
 		}
@@ -15916,7 +15916,7 @@ void thred::internal::ducmd() {
 	else {
 	  WorkingFileName->assign(arg1);
 	  StateMap->set(StateFlag::REDOLD);
-	  nuFil(fileIndices::THR);
+	  nuFil(FileIndices::THR);
 	}
   }
 }
@@ -17148,7 +17148,7 @@ struct CreateParams {
   BOOL bEnableNonClientDpiScaling;
 };
 
-auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
+auto CALLBACK thred::internal::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
   switch (message) {
 #if HIGHDPI
 	case WM_NCCREATE: {
@@ -17279,7 +17279,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		default: {
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  outDebugString(L"default hit in WndProc 1: wParam [{}]\n", LOWORD(wParam));
+		  outDebugString(L"default hit in wndProc 1: wParam [{}]\n", LOWORD(wParam));
 		  break;
 		}
 	  }
@@ -17328,7 +17328,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		}
 		default: {
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  outDebugString(L"default hit in WndProc 2: wParam [{}]\n", LOWORD(wParam));
+		  outDebugString(L"default hit in wndProc 2: wParam [{}]\n", LOWORD(wParam));
 		  break;
 		}
 	  }
@@ -17551,7 +17551,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		  break;
 		}
 		default: {
-		  outDebugString(L"default hit in WndProc 3: wParam [{}]\n", wParam);
+		  outDebugString(L"default hit in wndProc 3: wParam [{}]\n", wParam);
 		  break;
 		}
 	  }
@@ -17615,7 +17615,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	default: {
-	  // outDebugString(L"default hit in WndProc 4: message [{}]\n", message);
+	  // outDebugString(L"default hit in wndProc 4: message [{}]\n", message);
 	  break;
 	}
   }
@@ -17672,7 +17672,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	wc.cbSize = sizeof(WNDCLASSEX);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	wc.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
-	wc.lpfnWndProc = thi::WndProc;
+	wc.lpfnWndProc = thi::wndProc;
 	wc.cbClsExtra  = 0;
 	wc.cbWndExtra  = 0;
 	wc.hInstance   = ThrEdInstance;
