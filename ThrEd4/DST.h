@@ -73,25 +73,25 @@ class DSTREC // dst stitch record
   //~DSTREC() = default;
 };
 
-class DSTOffsets
+class DST_OFFSETS
 {
   public:
   POINT Positive {}; // plus offset written into the destination file header
   POINT Negative {}; // minus offset written into the destination file header
 
-  constexpr DSTOffsets() noexcept = default;
-  // DSTOffsets(DSTOffsets&&) = default;
-  // DSTOffsets& operator=(DSTOffsets const& rhs) = default;
-  // DSTOffsets& operator=(DSTOffsets&&) = default;
-  //~DSTOffsets() = default;
+  constexpr DST_OFFSETS() noexcept = default;
+  // DST_OFFSETS(DST_OFFSETS&&) = default;
+  // DST_OFFSETS& operator=(DST_OFFSETS const& rhs) = default;
+  // DST_OFFSETS& operator=(DST_OFFSETS&&) = default;
+  //~DST_OFFSETS() = default;
 };
 
 #pragma pack(pop)
 
-namespace DST {
+namespace DST { // NOLINT(readability-identifier-naming)
 auto colmatch(COLORREF color) -> uint32_t;
 auto readDSTFile(std::filesystem::path const& newFileName) -> bool;
-void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
+void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 auto saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 void setColFilename(fs::path* directory) noexcept;
 void setRGBFilename(fs::path* directory) noexcept;

@@ -174,7 +174,7 @@ auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
   return *(convertFromPtr<uint32_t*>(dpnt));
 }
 
-void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
+void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
   auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
@@ -916,7 +916,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		auto DSTRecords = std::vector<DSTREC> {};
 		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
 		DSTRecords.reserve(StitchBuffer->size() + 128U);
-		auto DSTOffset = DSTOffsets {};
+		auto DSTOffset = DST_OFFSETS {};
 		auto dstHeader = DSTHED {};
 		DST::ritdst(DSTOffset, DSTRecords, saveStitches);
 		// dstHeader fields are fixed width, so use strncpy in its intended way.
