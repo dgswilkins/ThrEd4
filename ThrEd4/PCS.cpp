@@ -51,8 +51,8 @@ class PCSHEADER // pcs file header structure
 
 namespace pci = PCS::internal;
 
-constexpr auto smallHoop = F_POINT {SHUPX, SHUPY};
-constexpr auto largeHoop = F_POINT {LHUPX, LHUPY};
+constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY};
+constexpr auto LARGE_HOOP = F_POINT {LHUPX, LHUPY};
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header
 
@@ -70,7 +70,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitch
 	else {
 	  PCSHeader.leadIn     = 0x32;
 	  PCSHeader.colorCount = COLORCNT;
-	  auto PCSStitchBuffer = std::vector<PCS_STITCH> {};
+	  auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
 	  auto const spColors = gsl::make_span(PCSHeader.colors);
 	  std::copy(UserColor.begin(), UserColor.end(), spColors.begin());
@@ -86,14 +86,14 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitch
 		  break;
 		}
 		auto savcol = COLMSK;
-		PCSStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
+		pcsStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
 		for (auto& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol      = stitch.attribute & COLMSK;
 			auto colRec = PCS_STITCH {};
 			colRec.tag  = 3;
 			wrap::narrow(colRec.fx, savcol);
-			PCSStitchBuffer.push_back(colRec);
+			pcsStitchBuffer.push_back(colRec);
 		  }
 		  auto stitchRec      = PCS_STITCH {};
 		  auto integerPart    = 0.0F;
@@ -103,17 +103,17 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitch
 		  fractionalPart = std::modf(stitch.y, &integerPart);
 		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * FRACFACT);
 		  wrap::narrow(stitchRec.y, integerPart);
-		  PCSStitchBuffer.push_back(stitchRec);
+		  pcsStitchBuffer.push_back(stitchRec);
 		}
 		if (FALSE ==
-		    WriteFile(fileHandle, PCSStitchBuffer.data(), wrap::sizeofVector(PCSStitchBuffer), &bytesWritten, nullptr)) {
+		    WriteFile(fileHandle, pcsStitchBuffer.data(), wrap::sizeofVector(pcsStitchBuffer), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;
 		}
 		if (UserFlagMap->test(UserFlag::BSAVOF)) {
-		  constexpr auto blank = std::array<char, 14> {};
-		  if (FALSE == WriteFile(fileHandle, blank.data(), wrap::toUnsigned(blank.size()), &bytesWritten, nullptr)) {
+		  constexpr auto BLANK = std::array<char, 14> {};
+		  if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
 			displayText::riter();
 			flag = false;
 			break;
@@ -150,9 +150,9 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
-		  auto       PCSDataBuffer  = std::vector<PCS_STITCH> {};
-		  PCSDataBuffer.resize(pcsStitchCount);
-		  ReadFile(fileHandle, PCSDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+		  auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
+		  pcsDataBuffer.resize(pcsStitchCount);
+		  ReadFile(fileHandle, pcsDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
 			auto iStitch      = uint16_t {};
 			auto iColorChange = 0U;
@@ -161,7 +161,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			StitchBuffer->clear();
 			StitchBuffer->reserve(PCSHeader.stitchCount);
 			while (iStitch < PCSHeader.stitchCount && iPCSstitch < pcsStitchCount) {
-			  auto const& stitch = PCSDataBuffer[iPCSstitch];
+			  auto const& stitch = pcsDataBuffer[iPCSstitch];
 			  if (stitch.tag == 3) {
 				thred::addColor(iStitch, stitch.fx);
 				++iColorChange;
@@ -248,7 +248,7 @@ auto PCS::internal::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   auto const largeFlag =
       (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
       (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
-  auto const hoopSize = largeFlag ? largeHoop : smallHoop;
+  auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
 #pragma warning(suppress : 26812) // enum type is unscoped
   PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP;
   auto delta         = F_POINT {};
