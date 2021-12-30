@@ -268,8 +268,8 @@ auto bitmap::internal::saveName(fs::path& fileName) {
   auto hr = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
   if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
-	constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-	hr = pFileSave->SetFileTypes(wrap::toUnsigned(filterFileTypes.size()), filterFileTypes.data());
+	constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+	hr = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
 	hr += pFileSave->SetFileTypeIndex(0);
 	hr += pFileSave->SetTitle(L"Save Bitmap");
 	auto const bmpName = UTF16BMPname->filename().wstring();
@@ -351,10 +351,10 @@ auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -
 	  auto dwOptions = DWORD {};
 	  hr             = pFileOpen->GetOptions(&dwOptions);
 	  if (SUCCEEDED(hr)) {
-		static constexpr auto filterFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+		static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hr += pFileOpen->SetFileTypes(wrap::toUnsigned(filterFileTypes.size()), filterFileTypes.data());
+		hr += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
 		hr += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
@@ -452,8 +452,8 @@ void bitmap::setUBfilename(fs::path* fileName) noexcept {
 
 void bitmap::assignUBFilename(fs::path const& directory) {
   fs::current_path(directory);
-  auto const BMPfileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
-  auto const fullPath    = directory / BMPfileName;
+  auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
+  auto const fullPath    = directory / bmpFileName;
   UTF16BMPname->assign(fullPath);
   bitmap::internal::bfil(BackgroundColor);
 }
@@ -467,25 +467,25 @@ auto bitmap::getBmpBackColor(uint32_t const& index) noexcept -> COLORREF {
 }
 
 void bitmap::setBmpBackColor() {
-  constexpr auto defaultColors = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
-                                                                 0x00c8dfee,
-                                                                 0x00708189,
-                                                                 0x00a5a97a,
-                                                                 0x00b8d6fe,
-                                                                 0x008a8371,
-                                                                 0x004b6cb8,
-                                                                 0x009cdcc2,
-                                                                 0x00366d39,
-                                                                 0x00dcfcfb,
-                                                                 0x003c4f75,
-                                                                 0x0095b086,
-                                                                 0x00c9dcba,
-                                                                 0x0043377b,
-                                                                 0x00b799ae,
-                                                                 0x0054667a};
+  constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00c0d5bf,
+                                                                  0x00c8dfee,
+                                                                  0x00708189,
+                                                                  0x00a5a97a,
+                                                                  0x00b8d6fe,
+                                                                  0x008a8371,
+                                                                  0x004b6cb8,
+                                                                  0x009cdcc2,
+                                                                  0x00366d39,
+                                                                  0x00dcfcfb,
+                                                                  0x003c4f75,
+                                                                  0x0095b086,
+                                                                  0x00c9dcba,
+                                                                  0x0043377b,
+                                                                  0x00b799ae,
+                                                                  0x0054667a};
   BitmapBackgroundColors->clear();
-  BitmapBackgroundColors->resize(defaultColors.size());
-  std::copy(defaultColors.begin(), defaultColors.end(), BitmapBackgroundColors->begin());
+  BitmapBackgroundColors->resize(DEFAULT_COLORS.size());
+  std::copy(DEFAULT_COLORS.begin(), DEFAULT_COLORS.end(), BitmapBackgroundColors->begin());
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {
