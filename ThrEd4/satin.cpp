@@ -45,9 +45,9 @@ void satin::delsac(uint32_t formIndex) {
 }
 
 void satin::internal::sacspac(uint32_t startGuide, uint32_t guideCount) {
-  auto constexpr val = SAT_CON {};
+  auto constexpr VAL = SAT_CON {};
   auto const itGuide = wrap::next(SatinGuides->cbegin(), startGuide);
-  SatinGuides->insert(itGuide, val);
+  SatinGuides->insert(itGuide, VAL);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 	if (form.type == SAT) {
@@ -1483,7 +1483,7 @@ auto satin::internal::chkbak(std::vector<F_POINT> const& satinBackup, F_POINT co
 auto satin::adsatk(uint32_t count) -> uint32_t {
   auto const oldSize = wrap::toUnsigned(SatinGuides->size());
   auto const dest    = SatinGuides->end();
-  auto constexpr val = SAT_CON {};
-  SatinGuides->insert(dest, count, val);
+  auto constexpr VAL = SAT_CON {};
+  SatinGuides->insert(dest, count, VAL);
   return oldSize;
 }
