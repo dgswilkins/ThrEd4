@@ -33,10 +33,10 @@ static auto BitmapHeight         = int {};              // bitmap height
 static auto BitmapInfo           = BITMAPINFO {};       // bitmap info
 static auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
 static auto BitmapPen            = HPEN {};             // bitmap pen
-static auto BitmapSizeinStitches = fPOINT {};           // bitmap end points in stitch points
+static auto BitmapSizeinStitches = F_POINT {};           // bitmap end points in stitch points
 static auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
 static auto BitmapWidth          = int {};              // bitmap width
-static auto BmpStitchRatio       = fPOINT {};           // bitmap to stitch hoop ratios
+static auto BmpStitchRatio       = F_POINT {};           // bitmap to stitch hoop ratios
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
@@ -335,7 +335,7 @@ void bitmap::internal::movmap(int cnt, uint8_t* buffer) {
   if (auto* source = TraceBitmapData; source != nullptr) {
 	auto* destination = buffer;
 	for (auto i = 0; i < cnt; ++i) {
-	  *(convert_ptr<uint32_t*>(destination)) = *(source++);
+	  *(convertFromPtr<uint32_t*>(destination)) = *(source++);
 	  destination += 3;
 	}
   }
@@ -458,7 +458,7 @@ void bitmap::assignUBFilename(fs::path const& directory) {
   bitmap::internal::bfil(BackgroundColor);
 }
 
-auto bitmap::getBitmapSizeinStitches() noexcept -> fPOINT {
+auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
   return BitmapSizeinStitches;
 }
 
@@ -492,7 +492,7 @@ auto bitmap::getBmpColor() noexcept -> COLORREF {
   return BitmapColor;
 }
 
-auto bitmap::getBmpStitchRatio() noexcept -> fPOINT {
+auto bitmap::getBmpStitchRatio() noexcept -> F_POINT {
   return BmpStitchRatio;
 }
 
@@ -572,7 +572,7 @@ void bitmap::drawBmpBackground() {
 }
 
 auto bitmap::internal::bitar() -> bool {
-  auto const zoomedInRect = fRECTANGLE {ZoomRect.left,
+  auto const zoomedInRect = F_RECTANGLE {ZoomRect.left,
                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
                                         ZoomRect.right,
                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
@@ -591,17 +591,17 @@ auto bitmap::internal::bitar() -> bool {
 	BitmapSrcRect.bottom = BitmapHeight;
 	StateMap->set(StateFlag::LANDSCAP);
   }
-  auto const backingRect = fRECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
+  auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
                                        wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
                                        wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
                                        wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
 
-  auto const differenceRect = fRECTANGLE {backingRect.left - zoomedInRect.left,
+  auto const differenceRect = F_RECTANGLE {backingRect.left - zoomedInRect.left,
                                           backingRect.top - zoomedInRect.top,
                                           zoomedInRect.right - backingRect.right,
                                           zoomedInRect.bottom - backingRect.bottom};
   auto const bitmapStitchRatio =
-      fPOINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
+      F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
   BitmapDstRect = {std::lround(differenceRect.left * bitmapStitchRatio.x),
                    std::lround(differenceRect.top * bitmapStitchRatio.y),
@@ -655,7 +655,7 @@ void bitmap::bitbltBitmap() noexcept {
   BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 }
 
-auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
+auto bitmap::internal::stch2bit(F_POINT& point) -> POINT {
   if (StateMap->test(StateFlag::LANDSCAP)) {
 	point.y -= (wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y);
   }
@@ -663,7 +663,7 @@ auto bitmap::internal::stch2bit(fPOINT& point) -> POINT {
                 wrap::round<LONG>(wrap::toFloat(BitmapHeight) - BmpStitchRatio.y * point.y)};
 }
 
-void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish) {
+void bitmap::internal::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   auto       line     = std::array<POINT, 2> {};
   auto const vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const vStart   = wrap::next(vertexIt, start);
@@ -675,7 +675,7 @@ void bitmap::internal::pxlin(FRMHED const& form, uint32_t start, uint32_t finish
   wrap::polyline(TraceDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
-void bitmap::bfrm(FRMHED const& form) {
+void bitmap::bfrm(FRM_HEAD const& form) {
   if (form.vertexCount != 0U) {
 	for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
 	  bi::pxlin(form, iVertex, iVertex + 1U);

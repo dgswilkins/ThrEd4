@@ -109,9 +109,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	color        = colmatch(colors[iColor++]);
 	thred::addColor(0, color);
   }
-  auto localStitch       = fPOINT {};
-  auto maximumCoordinate = fPOINT {-BIGFLOAT, -BIGFLOAT};
-  auto mimimumCoordinate = fPOINT {BIGFLOAT, BIGFLOAT};
+  auto localStitch       = F_POINT {};
+  auto maximumCoordinate = F_POINT {-BIGFLOAT, -BIGFLOAT};
+  auto mimimumCoordinate = F_POINT {BIGFLOAT, BIGFLOAT};
   StitchBuffer->clear();
   StitchBuffer->reserve(DSTData.size()); // we will be reserving a little more than we need
   for (auto& record : DSTData) {
@@ -134,7 +134,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	  localStitch.y += wrap::toFloat(dstStitch.y);
 	  if (constexpr auto C0MASK = 0x80U;
 	      (record.nd & C0MASK) == 0U) { // if c0 is not set, we assume a normal stitch and not a sequin, which would have c1 set
-		auto const stitch = fPOINTATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
+		auto const stitch = F_POINT_ATTR {localStitch.x * DSTSCALE, localStitch.y * DSTSCALE, color | NOTFRM};
 		StitchBuffer->push_back(stitch);
 		if (stitch.x > maximumCoordinate.x) {
 		  maximumCoordinate.x = stitch.x;
@@ -152,7 +152,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	}
   }
   auto const dstSize =
-      fPOINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
+      F_POINT {maximumCoordinate.x - mimimumCoordinate.x, maximumCoordinate.y - mimimumCoordinate.y};
   IniFile.hoopType = CUSTHUP;
   UnzoomedRect     = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
   if (dstSize.x > wrap::toFloat(UnzoomedRect.cx) || dstSize.y > wrap::toFloat(UnzoomedRect.cy)) {
@@ -162,7 +162,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	UnzoomedRect            = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
-  auto const delta = fPOINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
+  auto const delta = F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
                              (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
 	iStitch.x += delta.x;
@@ -171,11 +171,11 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 }
 
 auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
-  return *(convert_ptr<uint32_t*>(dpnt));
+  return *(convertFromPtr<uint32_t*>(dpnt));
 }
 
-void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches) {
-  auto dstStitchBuffer = std::vector<fPOINTATTR> {};
+void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches) {
+  auto dstStitchBuffer = std::vector<F_POINT_ATTR> {};
   dstStitchBuffer.resize(StitchBuffer->size());
   auto colorData = std::vector<uint32_t> {};
   // there could be as many colors as there are stitches
@@ -188,9 +188,9 @@ void DST::ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std
   colorData.push_back(*iUC);
   auto destination = dstStitchBuffer.begin();
   for (auto const& stitch : stitches) {
-	*destination++ = fPOINTATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
+	*destination++ = F_POINT_ATTR {stitch.x * IDSTSCALE, stitch.y * IDSTSCALE, stitch.attribute};
   }
-  auto boundingRect = fRECTANGLE {
+  auto boundingRect = F_RECTANGLE {
       dstStitchBuffer[0].x, dstStitchBuffer[0].y, dstStitchBuffer[0].x, dstStitchBuffer[0].y};
   for (auto const& stitch : dstStitchBuffer) {
 	constexpr auto MARGIN = 0.5F; // margin added on all sides to ensure bounding rectangle area is not zero
@@ -315,9 +315,9 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
 
 auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  auto color1 = PECCOLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
+  auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  auto       color2 = PECCOLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
+  auto       color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
@@ -900,7 +900,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
-auto DST::saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool {
+auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   auto flag = true;
   if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)

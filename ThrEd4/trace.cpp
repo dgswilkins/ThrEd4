@@ -497,7 +497,7 @@ void trace::tracedg() {
 
 auto trace::internal::trcbit(uint32_t const       initialDirection,
                              uint32_t&            traceDirection,
-                             std::vector<TRCPNT>& tracedPoints) -> bool {
+                             std::vector<TRACE_PNT>& tracedPoints) -> bool {
   auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
   switch (traceDirection) {
 	case TRCR: {
@@ -598,7 +598,7 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
 	}
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
-	tracedPoints.push_back(TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
+	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
 	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	if (tracedPoints.size() >= POINTMAX) {
 	  return false;
@@ -608,7 +608,7 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
            CurrentTracePoint.y == tracedPoints[0].y);
 }
 
-void trace::internal::dutdif(TRCPNT& traceDiff, TRCPNT const* point) {
+void trace::internal::dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point) {
   if (point != nullptr) {
 	wrap::narrow(traceDiff.x, point[1].x - point[0].x);
 	wrap::narrow(traceDiff.y, point[1].y - point[0].y);
@@ -720,8 +720,8 @@ void trace::internal::dutrac() {
 	  }
 	}
 	uint32_t const initialDirection = traceDirection;
-	auto           tracedPoints     = std::vector<TRCPNT> {};
-	tracedPoints.push_back(TRCPNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
+	auto           tracedPoints     = std::vector<TRACE_PNT> {};
+	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
 	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
 	if (tracedPoints.size() >= POINTMAX) {
@@ -729,9 +729,9 @@ void trace::internal::dutrac() {
 	  return;
 	}
 #ifndef TESTTRC
-	auto decimatedLine = std::vector<TRCPNT> {};
+	auto decimatedLine = std::vector<TRACE_PNT> {};
 	decimatedLine.reserve(tracedPoints.size());
-	auto traceDiff = std::array<TRCPNT, 2> {};
+	auto traceDiff = std::array<TRACE_PNT, 2> {};
 	decimatedLine.push_back(tracedPoints[0]);
 	ti::dutdif(traceDiff[0], tracedPoints.data());
 	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); ++iPoint) {
@@ -758,9 +758,9 @@ void trace::internal::dutrac() {
 	  tracedPoints.push_back(decimatedLine[iCurrent]);
 	}
 #endif
-	auto form        = FRMHED {};
+	auto form        = FRM_HEAD {};
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
-	FormVertices->push_back(fPOINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
+	FormVertices->push_back(F_POINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
 	                                wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
 	auto iNext           = size_t {};
 	auto traceLengthSum  = 0.0F;
@@ -776,7 +776,7 @@ void trace::internal::dutrac() {
 	                                  wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
 	  if (traceLengthSum > traceLength * IniFile.traceRatio) {
 		FormVertices->push_back(
-		    fPOINT {wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
+		    F_POINT {wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
 		            wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
 		--iCurrent;
 		iNext          = iCurrent;

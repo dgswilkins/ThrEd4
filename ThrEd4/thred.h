@@ -49,7 +49,7 @@ auto adflt(uint32_t count) -> uint32_t;
 void bBox();
 void chkhup();
 void chkmen() noexcept;
-void chkrng(fPOINT& range);
+void chkrng(F_POINT& range);
 void addColor(uint32_t stitch, uint32_t color);
 void coltab();
 void delfstchs();
@@ -60,7 +60,7 @@ void duzrat() noexcept;
 auto findFirstStitch(uint32_t form) -> uint32_t;
 auto findLastStitch(uint32_t form) -> uint32_t;
 void frmdel();
-void frmrct(fRECTANGLE& rectangle) noexcept;
+void frmrct(F_RECTANGLE& rectangle) noexcept;
 auto getBackGroundBrush() noexcept -> HBRUSH;
 auto getFileHandle(std::filesystem::path const& newFileName, HANDLE& fileHandle) -> bool;
 auto getFileSize(std::filesystem::path const& newFileName, uintmax_t& size) -> bool;
@@ -77,32 +77,32 @@ auto inStitchWin() noexcept -> bool;
 auto maxColor() noexcept -> size_t;
 void movStch();
 void nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept;
-auto pxCor2stch(POINT const& point) noexcept -> fPOINT;
+auto pxCor2stch(POINT const& point) noexcept -> F_POINT;
 void redclp();
 void redraw(HWND window) noexcept;
 void resetMsgBuffer();
 void resetSideBuffer();
 void resetColorChanges() noexcept;
-void ritfcor(fPOINT const& point);
+void ritfcor(F_POINT const& point);
 void ritmov(uint32_t formIndex) noexcept;
 void ritot(uint32_t number);
 void rngadj();
-auto rotang1(fPOINTATTR const& unrotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept
-    -> fPOINT;
-auto rotangf(fPOINT const& unrotatedPoint, float rotationAngle, fPOINT const& rotationCenter) noexcept -> fPOINT;
-void rotflt(fPOINT& point, float rotationAngle, fPOINT const& rotationCenter) noexcept;
-void rotfn(float rotationAngle, fPOINT const& rotationCenter);
-void sCor2px(fPOINT const& stitchCoordinate, POINT& pixelCoordinate);
-void savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led);
+auto rotang1(F_POINT_ATTR const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept
+    -> F_POINT;
+auto rotangf(F_POINT const& unrotatedPoint, float rotationAngle, F_POINT const& rotationCenter) noexcept -> F_POINT;
+void rotflt(F_POINT& point, float rotationAngle, F_POINT const& rotationCenter) noexcept;
+void rotfn(float rotationAngle, F_POINT const& rotationCenter);
+void sCor2px(F_POINT const& stitchCoordinate, POINT& pixelCoordinate);
+void savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t led);
 void savdo();
 void save();
-void selRct(fRECTANGLE& sourceRect);
+void selRct(F_RECTANGLE& sourceRect);
 void setpsel();
-void shft(fPOINT const& delta) noexcept;
+void shft(F_POINT const& delta) noexcept;
 void showColorWin() noexcept;
-void sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR> const& stitches) noexcept;
-auto stch2pxr(fPOINT const& stitchCoordinate) -> POINT;
-void stchrct(fRECTANGLE& rectangle) noexcept;
+void sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept;
+auto stch2pxr(F_POINT const& stitchCoordinate) -> POINT;
+void stchrct(F_RECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT> const& stretchBoxLine);
 auto txtWid(wchar_t const* string) -> SIZE;
 void unbBox();
@@ -123,10 +123,10 @@ namespace internal {
   void box(uint32_t iNearest, HDC dc);
   void boxs();
   void bsavmen();
-  auto centr() noexcept -> fPOINT;
+  auto centr() noexcept -> F_POINT;
   void chk1col();
   auto chk2of() -> bool;
-  auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, fPOINT& rotationCenter, FRMHED& textureForm)
+  auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
       -> bool;
   auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
   auto chkattr(fs::path const& filename) -> bool;
@@ -145,7 +145,7 @@ namespace internal {
   auto closlin() -> uint32_t;
   void clpadj();
   void clpbox();
-  void clpradj(fRECTANGLE& clipRectAdjusted, fPOINTATTR const& stitch) noexcept;
+  void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
   auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
   void colchk();
   void cros(uint32_t iStitch);
@@ -178,7 +178,7 @@ namespace internal {
   void drwlstch(uint32_t finish);
   void drwmrk(HDC dc);
   void dstcurs() noexcept;
-  void duClos(uint32_t startStitch, uint32_t stitchCount, fPOINT const& stitchPoint, std::vector<float>& gapToNearest);
+  void duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest);
   void duIns();
   void duSelbox() noexcept;
   void duar(POINT const& stitchCoordsInPixels);
@@ -202,19 +202,19 @@ namespace internal {
   void dun();
   auto dunum(wchar_t code) noexcept -> bool;
   void dupclp();
-  void duprct(FRMHED const& form);
+  void duprct(FRM_HEAD const& form);
   void durit(std::vector<char>& destination, const void* source, uint32_t count);
   void durot();
   void durotu();
   void dusel(HDC dc);
   void duselrng(RANGE& selectedRange);
-  void dusid(LSTTYPE entry, int32_t& windowLocation, SIZE const& windowSize);
+  void dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize);
 
   constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
   void duver(fs::path const& name);
   void duzero();
-  void endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish);
+  void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
   void endpnt(POINT const& stitchCoordsInPixels);
 
   auto CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
@@ -235,7 +235,7 @@ namespace internal {
   auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
   void frmcurmen();
   void frmcursel(uint32_t cursorType);
-  void frmpos(FRMHED& form, float deltaX, float deltaY);
+  void frmpos(FRM_HEAD& form, float deltaX, float deltaY);
   void frmsnap(uint32_t start, uint32_t count);
   auto frmstch() -> bool;
 
@@ -246,7 +246,7 @@ namespace internal {
   void getDocsFolder(fs::path* directory);
   void getfrmbox();
   void getfrmpix();
-  auto gethand(std::vector<fPOINTATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
+  auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
   auto getNewFileName(fs::path& newFileName, fileStyles fileTypes, fileIndices fileIndex) -> bool;
   void getnpix();
   void getstpix();
@@ -260,20 +260,20 @@ namespace internal {
   auto handleFillMenu(WORD const& wParameter) -> bool;
   auto handleFormDataSheet() -> bool;
   auto handleHomeKey(bool& retflag) -> bool;
-  auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRMHED const& textureForm, bool& retflag)
+  auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
       -> bool;
-  auto handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag) -> bool;
+  auto handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool;
   auto handleLeftKey(bool& retflag) -> bool;
-  auto handleMainMenu(WORD const& wParameter, fPOINT& rotationCenter) -> bool;
+  auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
   auto handleMainWinKeys(wchar_t const&            code,
-                         fPOINT&                   rotationCenter,
+                         F_POINT&                   rotationCenter,
                          std::vector<POINT> const& stretchBoxLine,
                          bool&                     retflag) -> bool;
   auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                        float               xyRatio,
                        float&              rotationAngle,
-                       fPOINT const&       rotationCenter,
-                       FRMHED const&       textureForm) -> bool;
+                       F_POINT const&       rotationCenter,
+                       FRM_HEAD const&       textureForm) -> bool;
   auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
   auto handleRightButtonDown() -> bool;
   auto handleRightKey(bool& retflag) -> bool;
@@ -290,14 +290,14 @@ namespace internal {
   void insadj();
   void inscol();
   void insfil(fs::path& insertedFile);
-  auto insTHR(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool;
+  auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool;
   auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
   auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
   auto isfclp() noexcept -> bool;
   void istch();
   auto isthr(fs::path const& thredPath) -> bool;
-  auto kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> uint32_t;
+  auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;
   void knotmen();
   void ladj();
   void lenCalc();
@@ -350,7 +350,7 @@ namespace internal {
 
   constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
-  void ofstch(std::vector<fPOINTATTR>& buffer, uint32_t iSource, char offset, fPOINT const& KnotStep, uint32_t KnotAttribute);
+  void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& KnotStep, uint32_t KnotAttribute);
   auto oldwnd(HWND window) noexcept -> bool;
   void ovrlay();
   void patdun();
@@ -381,28 +381,28 @@ namespace internal {
   void reldun();
   void relin();
   void rembig();
-  void respac(FRMHED& form) noexcept;
+  void respac(FRM_HEAD& form) noexcept;
   void retrac();
   void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
   void ritbal();
-  void ritcor(fPOINTATTR const& pointAttribute);
+  void ritcor(F_POINT_ATTR const& pointAttribute);
   void ritcur();
   void ritfnam(std::wstring const& designerName);
   void ritini();
   void ritlayr();
   void ritloc();
   void ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
-  void ritrot(float rotationAngle, fPOINT const& rotationCenter);
+  void ritrot(float rotationAngle, F_POINT const& rotationCenter);
   void rngal();
-  void rot(fPOINT& rotationCenter);
-  void rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter);
+  void rot(F_POINT& rotationCenter);
+  void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
   void rotauxmen();
   void rotauxsel(uint32_t stat);
   void rotfns(float rotationAngle);
   void rotmrk();
   void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
   void rotseg();
-  void rotstch(fPOINTATTR& stitch, float rotationAngle, fPOINT const& rotationCenter) noexcept;
+  void rotstch(F_POINT_ATTR& stitch, float rotationAngle, F_POINT const& rotationCenter) noexcept;
   auto rsed() noexcept -> uint32_t;
   void rshft(POINT const& shiftPoint);
   void rstAll();
@@ -412,7 +412,7 @@ namespace internal {
   void sav();
   void savAs();
   auto savcmp() noexcept -> bool;
-  auto sdCor2px(fPOINTATTR const& stitchPoint) -> POINT;
+  auto sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT;
   void segentr(float rotationAngle);
   void selCol();
   void selalstch();
@@ -423,7 +423,7 @@ namespace internal {
   void selin(uint32_t start, uint32_t end, HDC dc);
   void selup();
   void set1knot();
-  auto setRmap(boost::dynamic_bitset<>& stitchMap, fPOINTATTR const& stitchPoint, fPOINT const& cellSize) -> bool;
+  auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool;
   void setSideWinVal(int index);
   void setbak(int32_t penWidth) noexcept;
   void setdst();
@@ -441,18 +441,18 @@ namespace internal {
   void setsped();
   void setsrch(uint32_t stitch);
   void shft2box();
-  void shftflt(fPOINT const& point) noexcept;
+  void shftflt(F_POINT const& point) noexcept;
   void shoknot();
   void shorter();
   void shownd(HWND hwnd) noexcept;
   auto sidclp() -> bool;
   void sidhup();
-  void sidmsg(FRMHED const& form, HWND window);
-  void sizclp(FRMHED const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
-  auto sizfclp(FRMHED const& form) -> uint32_t;
+  void sidmsg(FRM_HEAD const& form, HWND window);
+  void sizclp(FRM_HEAD const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
+  auto sizfclp(FRM_HEAD const& form) -> uint32_t;
   void srchk();
   auto srchknot(uint32_t source) -> uint32_t;
-  void stCor2px(fPOINTATTR const& stitch, POINT& point);
+  void stCor2px(F_POINT_ATTR const& stitch, POINT& point);
   auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
   auto stch2px1(uint32_t iStitch) -> POINT;
   auto stch2px2(uint32_t iStitch) -> bool;
@@ -462,9 +462,9 @@ namespace internal {
   void stchout();
   void stchsnap(uint32_t start, uint32_t finish);
   auto stlen(uint32_t iStitch) -> float;
-  void strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start);
+  void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
   void tglhid();
-  void thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
+  void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
   void thrsav();
   void thumbak();
   void thumnail();

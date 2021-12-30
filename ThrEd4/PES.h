@@ -151,7 +151,7 @@ class PECHDR2
 
 namespace PES {
 auto readPESFile(std::filesystem::path const& newFileName) -> bool;
-auto savePES(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
+auto savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 namespace internal {
   auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
   void pecEncodeint32_t(std::vector<uint8_t>& buffer, int32_t delta);
@@ -160,10 +160,10 @@ namespace internal {
   void pecdat(std::vector<uint8_t>& buffer);
   void pecnam(gsl::span<char> const& label);
   auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
-  void ritpes(std::vector<uint8_t>& buffer, fPOINTATTR const& stitch, fPOINT const& offset);
+  void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset);
   void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
   void ritpesCode(std::vector<uint8_t>& buffer);
-  void rpcrd(std::vector<uint8_t>& buffer, fPOINT& thisStitch, float srcX, float srcY);
+  void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY);
   void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace internal
 } // namespace PES

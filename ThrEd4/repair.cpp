@@ -104,7 +104,7 @@ void repair::lodchk() {
   }
 }
 
-void repair::internal::chkclp(FRMHED const& formHeader, BADCNTS& badData) noexcept {
+void repair::internal::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
   if (badData.clip == formHeader.angleOrClipData.clip) {
 	badData.clip += formHeader.lengthOrCount.clipCount;
   }
@@ -113,7 +113,7 @@ void repair::internal::chkclp(FRMHED const& formHeader, BADCNTS& badData) noexce
   }
 }
 
-void repair::internal::chkeclp(FRMHED const& formHeader, BADCNTS& badData) noexcept {
+void repair::internal::chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
   if (badData.clip == formHeader.borderClipData) {
 	badData.clip += formHeader.clipEntries;
   }
@@ -122,7 +122,7 @@ void repair::internal::chkeclp(FRMHED const& formHeader, BADCNTS& badData) noexc
   }
 }
 
-void repair::internal::chkVrtx(FRMHED const& form, BADCNTS& badData) noexcept {
+void repair::internal::chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.flt == form.vertexIndex) {
 	badData.flt += form.vertexCount;
   }
@@ -131,7 +131,7 @@ void repair::internal::chkVrtx(FRMHED const& form, BADCNTS& badData) noexcept {
   }
 }
 
-void repair::internal::chkSat(FRMHED const& form, BADCNTS& badData) noexcept {
+void repair::internal::chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.guideCount == form.satinOrAngle.guide) {
 	badData.guideCount += form.satinGuideCount;
   }
@@ -140,7 +140,7 @@ void repair::internal::chkSat(FRMHED const& form, BADCNTS& badData) noexcept {
   }
 }
 
-void repair::internal::chkTxt(FRMHED const& form, BADCNTS& badData) noexcept {
+void repair::internal::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.tx == form.fillInfo.texture.index) {
 	badData.tx += form.fillInfo.texture.count;
   }
@@ -150,7 +150,7 @@ void repair::internal::chkTxt(FRMHED const& form, BADCNTS& badData) noexcept {
 }
 
 auto repair::internal::frmchkfn() -> uint32_t {
-  auto badData = BADCNTS {};
+  auto badData = BAD_COUNTS {};
   if (!FormList->empty()) {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  auto const& form = FormList->operator[](iForm);
@@ -198,7 +198,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
   return badData.attribute;
 }
 
-void repair::internal::bcup(FRMHED const& form, BADCNTS& badData) noexcept {
+void repair::internal::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (clip::isclp(form)) {
 	badData.clip += form.lengthOrCount.clipCount;
   }
@@ -224,7 +224,7 @@ void repair::internal::chkfstch() noexcept {
 
 void repair::internal::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
-  auto  badData      = BADCNTS {};
+  auto  badData      = BAD_COUNTS {};
   auto& formList     = *FormList;
   for (auto form : *FormList) {
 	if (form.vertexCount != 0U) {
@@ -232,7 +232,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 	}
   }
   formList.resize(iDestination);
-  auto vertexPoint = std::vector<fPOINT> {};
+  auto vertexPoint = std::vector<F_POINT> {};
   auto iVertex     = 0U;
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = formList[iForm];
@@ -270,7 +270,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
 void repair::internal::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
-  auto clipPoint    = std::vector<fPOINT> {};
+  auto clipPoint    = std::vector<F_POINT> {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
@@ -340,7 +340,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 
 void repair::internal::repsat() {
   auto guideCount = 0U;
-  auto badData    = BADCNTS {};
+  auto badData    = BAD_COUNTS {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 	if (form.type == SAT) {
@@ -375,7 +375,7 @@ void repair::internal::repsat() {
 
 void repair::internal::reptx() {
   auto textureCount = 0U;
-  auto badData      = BADCNTS {};
+  auto badData      = BAD_COUNTS {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (texture::istx(iForm)) {
 	  auto& form = FormList->operator[](iForm);

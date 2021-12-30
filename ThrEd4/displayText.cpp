@@ -405,7 +405,7 @@ void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float da
   SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }
 
-void displayText::drwtxbut(TXTSCR const& textureScreen) {
+void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {
   di::bxtxt(HTXCLR, IDS_CLEAR);
   di::hlpflt(HTXHI, IDS_TXHI, textureScreen.areaHeight * IPFGRAN);
   thred::redraw(ButtonWin->operator[](HTXWID));

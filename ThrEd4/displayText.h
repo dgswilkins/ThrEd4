@@ -12,7 +12,7 @@ void clrhbut(uint32_t startButton) noexcept;
 auto clpmsgs(uint32_t code) -> bool;
 void crmsg(fs::path const& fileName);
 void datmsg(uint32_t code);
-void drwtxbut(TXTSCR const& textureScreen);
+void drwtxbut(TXTR_SCREEN const& textureScreen);
 auto filmsgs(uint32_t code) -> bool;
 void filnopn(uint32_t code, fs::path const& fileName);
 void frm1pnt();

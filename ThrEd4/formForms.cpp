@@ -139,7 +139,7 @@ void formForms::internal::nxtlinprf() noexcept {
   ValueWindowCoords.bottom += ValueWindowSize.cy;
 }
 
-void formForms::internal::refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount) {
+void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryCount) {
   static constexpr auto edgeArray = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn         = dT::loadStr(IDS_ON);
@@ -518,7 +518,7 @@ auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
                       nullptr);
 }
 
-void formForms::internal::prflin(std::wstring const& msg, LSTTYPE const& row) {
+void formForms::internal::prflin(std::wstring const& msg, LIST_TYPE const& row) {
   ffi::prftwin(dT::loadStr(row.stringID));
   ValueWindow->operator[](row.value) = ffi::prfnwin(msg);
   ffi::nxtlinprf();
@@ -778,8 +778,8 @@ void formForms::dasyfrm() {
 	return;
   }
   auto const referencePoint =
-      fPOINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
-  auto form               = FRMHED {};
+      F_POINT {wrap::midl(ZoomRect.right, ZoomRect.left), wrap::midl(ZoomRect.top, ZoomRect.bottom)};
+  auto form               = FRM_HEAD {};
   form.vertexIndex        = wrap::toUnsigned(FormVertices->size());
   form.attribute          = gsl::narrow<decltype(form.attribute)>(ActiveLayer << 1U);
   auto       maximumXsize = ZoomRect.right - ZoomRect.left;
@@ -803,10 +803,10 @@ void formForms::dasyfrm() {
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
 	FormVertices->push_back(
-	    fPOINT {referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle)});
+	    F_POINT {referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle)});
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
-	  FormVertices->push_back(fPOINT {referencePoint.x + holeDiameter * cos(angle),
+	  FormVertices->push_back(F_POINT {referencePoint.x + holeDiameter * cos(angle),
 	                                  referencePoint.y + holeDiameter * sin(angle)});
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
@@ -879,7 +879,7 @@ void formForms::dasyfrm() {
 		  break;
 		}
 	  }
-	  FormVertices->push_back(fPOINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
+	  FormVertices->push_back(F_POINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
 	                                  referencePoint.y + sin(angle) * distanceFromDaisyCenter});
 	  ++iVertex;
 	  angle += petalSegmentAngle;
@@ -913,7 +913,7 @@ void formForms::dasyfrm() {
 	itVertex->y -= form.rectangle.bottom;
 	++itVertex;
   }
-  FormMoveDelta      = fPOINT {};
+  FormMoveDelta      = F_POINT {};
   NewFormVertexCount = iVertex + 1U;
   StateMap->set(StateFlag::POLIMOV);
   form::setmfrm();
@@ -1063,7 +1063,7 @@ void formForms::setear() {
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form::flipv();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const size = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
+	auto const size = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
 	                          FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	auto       horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
@@ -1177,7 +1177,7 @@ void formForms::wavfrm() {
   // clang-format on
   if (nResult != 0) {
 	thred::savdo();
-	auto points = std::vector<fPOINT> {};
+	auto points = std::vector<F_POINT> {};
 	points.reserve(IniFile.wavePoints);
 	// reuse regular polygon code to build the template for points
 	form::durpoli(IniFile.wavePoints);
@@ -1195,7 +1195,7 @@ void formForms::wavfrm() {
 	  waveIndex = iNextVertex;
 	}
 	auto const count            = iPoint;
-	auto       currentPosition  = fPOINT {};
+	auto       currentPosition  = F_POINT {};
 	auto const formVerticesSize = (IniFile.waveLobes * count) + 1 -
 	                              IniFile.wavePoints; // account for vertices already allocated by durpoli above
 	FormVertices->resize(FormVertices->size() + formVerticesSize);
@@ -1226,14 +1226,14 @@ void formForms::wavfrm() {
 
 	auto rotatedVertex = firstVertex;
 	for (auto index = 0U; index < vertexCount; ++index) {
-	  thred::rotflt(*rotatedVertex, rotationAngle, fPOINT {});
+	  thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
 	  ++rotatedVertex;
 	}
 	FormList->back().type        = FRMLINE;
 	FormList->back().vertexCount = vertexCount;
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const selectedSize = fPOINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
+	auto const selectedSize = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
 	                                  FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	constexpr auto WAVSIZE         = 4.0F; // wave size factor
 	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
@@ -1261,7 +1261,7 @@ void formForms::wavfrm() {
 	  vShifted->y -= bottom;
 	  ++vShifted;
 	}
-	FormMoveDelta      = fPOINT {};
+	FormMoveDelta      = F_POINT {};
 	NewFormVertexCount = vertexCount + 1U;
 	form::setmfrm();
 	form::mdufrm();

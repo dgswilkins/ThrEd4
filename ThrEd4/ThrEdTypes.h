@@ -244,14 +244,14 @@ constexpr auto FLTBMP = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"};
 constexpr auto FLTALL = COMDLG_FILTERSPEC {L"All files", L"*.*"};
 
 // edge tracing directions
-enum traceDirection {
+enum TraceDirection {
   TRCU, // top edge
   TRCR, // right edge
   TRCD, // bottom edge
   TRCL  // left edge
 };
 
-enum hoopSize {
+enum HoopSize {
   SETCUST = 1, // set the custom hoop
   SMALHUP = 2, // pfaf code for small hoop
   LARGHUP,     // pfaf code for large hoop
@@ -259,7 +259,7 @@ enum hoopSize {
   CUSTHUP      // user defined hoop size
 };
 
-enum daisyStyles { // daisy form types
+enum DaisyStyles { // daisy form types
   DSIN,            // Sine shape
   DRAMP,           // Ramp shape
   DSAW,            // Sawtooth shape
@@ -554,7 +554,7 @@ enum class UserFlag : uint32_t {
 };
 
 // Layer values
-enum layers : uint8_t {
+enum Layers : uint8_t {
   LAYER0, // All Layers
   LAYER1, // Layer 1
   LAYER2, // Layer 2
@@ -565,7 +565,7 @@ enum layers : uint8_t {
 constexpr auto LAYERMAX = 5U; // number of layers
 
 // Feather types
-enum featherStyles : uint8_t {
+enum FeatherStyles : uint8_t {
   FTHSIN = 1, // sine
   FTHSIN2,    // half sine
   FTHLIN,     // line
@@ -578,7 +578,7 @@ constexpr auto FSTYLMAX = uint8_t {6U};     // count of feather styles
 constexpr auto FDEFTYP  = int32_t {FTHPSG}; // default feather type
 
 // fill types
-enum fillStyles : uint8_t {
+enum FillStyles : uint8_t {
   VRTF = 1, // Vertical fill
   HORF,     // Horizontal fill
   ANGF,     // Angle fill
@@ -602,7 +602,7 @@ constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
 constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 
 // edge fill types
-enum edgeFillStyles : uint8_t {
+enum EdgeFillStyles : uint8_t {
   EDGELINE = 1U, // Line
   EDGEBEAN,      // Bean
   EDGECLIP,      // Clipboard
@@ -620,7 +620,7 @@ enum edgeFillStyles : uint8_t {
 constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
 
 // preference window entries
-enum prefWin : uint32_t {
+enum PrefWin : uint32_t {
   PRFAPPCOL, // Applique color
   PRFAPSLEN, // Applique stitchLen
   PRFBRDWID, // Border width
@@ -655,35 +655,35 @@ enum prefWin : uint32_t {
 
 constexpr auto PREFTMAX = uint32_t {30U}; // number of edge fill types
 
-class LSTTYPE
+class LIST_TYPE
 {
   public:
   uint32_t stringID {}; // String resource ID
   uint8_t  value {};    // value index
 
-  // LSTTYPE() noexcept = default;
-  // LSTTYPE(FTHINFO const&) = default;
-  // LSTTYPE(FTHINFO&&) = default;
-  // LSTTYPE& operator=(FTHINFO const& rhs) = default;
-  // LSTTYPE& operator=(FTHINFO&&) = default;
-  //~LSTTYPE() = default;
+  // LIST_TYPE() noexcept = default;
+  // LIST_TYPE(FTHR_INFO const&) = default;
+  // LIST_TYPE(FTHR_INFO&&) = default;
+  // LIST_TYPE& operator=(FTHR_INFO const& rhs) = default;
+  // LIST_TYPE& operator=(FTHR_INFO&&) = default;
+  //~LIST_TYPE() = default;
 };
 
 // clang-format off
-constexpr auto LAYRLIST = std::array<LSTTYPE, LAYERMAX> {{{IDS_LAY00, LAYER0}, 
+constexpr auto LAYRLIST = std::array<LIST_TYPE, LAYERMAX> {{{IDS_LAY00, LAYER0}, 
 														  {IDS_LAY01, LAYER1}, 
 														  {IDS_LAY02, LAYER2}, 
 														  {IDS_LAY03, LAYER3},
 														  {IDS_LAY04, LAYER4}}};
 
-constexpr auto FTHRLIST = std::array<LSTTYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN}, 
+constexpr auto FTHRLIST = std::array<LIST_TYPE, FSTYLMAX> {{{IDS_FTH0, FTHSIN}, 
 														  {IDS_FTH1, FTHSIN2}, 
 														  {IDS_FTH2, FTHLIN}, 
 														  {IDS_FTH3, FTHPSG}, 
 														  {IDS_FTH4, FTHRMP}, 
 														  {IDS_FTH5, FTHFAZ}}};
 
-constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0,  0},
+constexpr auto FILLLIST = std::array<LIST_TYPE, FILLTMAX> {{{IDS_FIL0,  0},
                                                           {IDS_FIL1,  VRTF},
                                                           {IDS_FIL2,  HORF},
                                                           {IDS_FIL3,  ANGF},
@@ -698,7 +698,7 @@ constexpr auto FILLLIST = std::array<LSTTYPE, FILLTMAX> {{{IDS_FIL0,  0},
                                                           {IDS_FIL12, TXHORF},
                                                           {IDS_FIL13, TXANGF}}};
 
-constexpr auto EDGELIST = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0,  0},
+constexpr auto EDGELIST = std::array<LIST_TYPE, EDGETMAX> {{{IDS_EDG0,  0},
                                                           {IDS_EDG1,  EDGELINE},
                                                           {IDS_EDG2,  EDGEBEAN},
                                                           {IDS_EDG3,  EDGECLIP},
@@ -712,7 +712,7 @@ constexpr auto EDGELIST = std::array<LSTTYPE, EDGETMAX> {{{IDS_EDG0,  0},
                                                           {IDS_EDG11, EDGEOCHAIN},
                                                           {IDS_EDG12, EDGECLIPX}}};
 
-constexpr auto PREFLIST = std::array<LSTTYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCOL},
+constexpr auto PREFLIST = std::array<LIST_TYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCOL},
 														  {IDS_PRF29, PRFAPSLEN},
 														  {IDS_PRF3,  PRFBRDWID},
 														  {IDS_PRF14, PRFBCNLEN},
@@ -745,7 +745,7 @@ constexpr auto PREFLIST = std::array<LSTTYPE, PREFTMAX> {{{IDS_PRF10, PRFAPPCOL}
 // clang-format on
 
 // form types
-enum formStyles {
+enum FormStyles {
   FRMLINE = 1U, // Line form
   FRMFPOLY,     // Freehand polygon form
   FRMRPOLY,     // Regular polygon form
@@ -762,7 +762,7 @@ enum formStyles {
 };
 
 // main menu items
-enum mainMenuItems {
+enum MainMenuItems {
   M_FILE,
   M_VIEW,
   M_FORM,
@@ -785,7 +785,7 @@ enum mainMenuItems {
 };
 
 // view menu items
-enum viewMenuItems {
+enum ViewMenuItems {
   MVW_MOVIE,
   MVW_SET,
   MVW_BACK,
@@ -800,7 +800,7 @@ enum viewMenuItems {
 };
 
 // fill menu items
-enum fillMenuItems {
+enum FillMenuItems {
   MFIL_SAT,
   MFIL_FTH,
   MFIL_VERT,
@@ -814,14 +814,14 @@ enum fillMenuItems {
 };
 
 // clipboard data types
-enum clipDataType { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
+enum ClipDataType { CLP_STCH = 1, CLP_FRM, CLP_FRMS, CLP_FRMPS };
 
 // edge underlay bit
 constexpr auto EGUND  = uint8_t {0x80U};
 constexpr auto NEGUND = uint8_t {0x7fU};
 
 // form data lines
-enum formData {
+enum FormData {
   LFRM,       // form 0
   LLAYR,      // layer 1
   LFRMFIL,    // form fill 2
@@ -875,7 +875,7 @@ enum formData {
 };
 
 // file menu items
-enum fileMenuItems {
+enum FileMenuItems {
   FM_NEW,
   FM_OPEN,
   FM_CLOS,
@@ -898,7 +898,7 @@ enum fileMenuItems {
 };
 
 // fill message codes
-enum fillMessageCodes {
+enum FillMessageCodes {
   FMM_FAN,
   FMM_VRT,
   FMM_HOR,
@@ -919,9 +919,9 @@ enum fillMessageCodes {
 };
 
 // button windows
-enum stitchButtons { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
+enum StitchButtons { HBOXSEL, HUPTO, HHID, HNUM, HTOT, HMINLEN, HMAXLEN, HCOR, HLAYR };
 
-enum textureButtons { // text button windows
+enum TextureButtons { // text button windows
   HTXCLR,
   HTXHI,
   HTXWID,
@@ -936,7 +936,7 @@ constexpr uint32_t HLIN = HNUM;
 
 #pragma pack(push, 1)
 
-class INIFILE // ini file structure
+class INI_FILE // ini file structure
 {
   public:
   char     defaultDirectory[180] {};               // default directory
@@ -1026,17 +1026,17 @@ class INIFILE // ini file structure
   float    clpspc {};                              // clipboard fill spacing
   char     designerName[NAME_LEN] {};              // designer name
 
-  // constexpr INIFILE() noexcept = default;
-  // INIFILE(INIFILE const&) = default;
-  // INIFILE(INIFILE&&) = default;
-  // INIFILE& operator=(INIFILE const& rhs) = default;
-  // INIFILE& operator=(INIFILE&&) = default;
-  //~INIFILE() = default;
+  // constexpr INI_FILE() noexcept = default;
+  // INI_FILE(INI_FILE const&) = default;
+  // INI_FILE(INI_FILE&&) = default;
+  // INI_FILE& operator=(INI_FILE const& rhs) = default;
+  // INI_FILE& operator=(INI_FILE&&) = default;
+  //~INI_FILE() = default;
 };
 
-enum machineType { AUXPCS, AUXDST, AUXPES };
+enum MachineType { AUXPCS, AUXDST, AUXPES };
 
-class FORMVERTICES
+class FORM_VERTICES
 {
   public:
   uint32_t start {};
@@ -1044,81 +1044,81 @@ class FORMVERTICES
   uint32_t finish {};
   uint32_t form {};
 
-  // constexpr FORMVERTICES() noexcept = default;
-  // FORMVERTICES(FORMVERTICES const&) = default;
-  // FORMVERTICES(FORMVERTICES&&) = default;
-  // FORMVERTICES& operator=(FORMVERTICES const& rhs) = default;
-  // FORMVERTICES& operator=(FORMVERTICES&&) = default;
-  //~FORMVERTICES() = default;
+  // constexpr FORM_VERTICES() noexcept = default;
+  // FORM_VERTICES(FORM_VERTICES const&) = default;
+  // FORM_VERTICES(FORM_VERTICES&&) = default;
+  // FORM_VERTICES& operator=(FORM_VERTICES const& rhs) = default;
+  // FORM_VERTICES& operator=(FORM_VERTICES&&) = default;
+  //~FORM_VERTICES() = default;
 };
 
-class fPOINT;
-class fPOINTATTR;
-class SMALPNTL;
-class BSEQPNT;
+class F_POINT;
+class F_POINT_ATTR;
+class SMAL_PNT_L;
+class B_SEQ_PNT;
 
-class dPOINT
+class D_POINT
 {
   public:
   double x {};
   double y {};
 
-  // constexpr dPOINT() noexcept = default;
-  explicit inline dPOINT(fPOINT const& rhs) noexcept;
-  inline dPOINT(float rhsX, float rhsY) noexcept;
-  inline dPOINT(double rhsX, double rhsY) noexcept;
-  inline auto operator==(dPOINT const& rhs) const noexcept -> bool;
-  inline auto operator=(fPOINT const& rhs) noexcept -> dPOINT&;
-  inline auto operator=(BSEQPNT const& rhs) noexcept -> dPOINT&;
-  // dPOINT(dPOINT const&) = default;
-  // dPOINT(dPOINT&&) = default;
-  // dPOINT& operator=(dPOINT const& rhs) = default;
-  // dPOINT& operator=(dPOINT&&) = default;
-  //~dPOINT() = default;
+  // constexpr D_POINT() noexcept = default;
+  explicit inline D_POINT(F_POINT const& rhs) noexcept;
+  inline D_POINT(float rhsX, float rhsY) noexcept;
+  inline D_POINT(double rhsX, double rhsY) noexcept;
+  inline auto operator==(D_POINT const& rhs) const noexcept -> bool;
+  inline auto operator=(F_POINT const& rhs) noexcept -> D_POINT&;
+  inline auto operator=(B_SEQ_PNT const& rhs) noexcept -> D_POINT&;
+  // D_POINT(D_POINT const&) = default;
+  // D_POINT(D_POINT&&) = default;
+  // D_POINT& operator=(D_POINT const& rhs) = default;
+  // D_POINT& operator=(D_POINT&&) = default;
+  //~D_POINT() = default;
 };
 
-class fPOINT
+class F_POINT
 {
   public:
   float x {};
   float y {};
 
-  constexpr fPOINT() noexcept = default;
-  inline constexpr fPOINT(double rhsX, double rhsY) noexcept;
-  inline constexpr fPOINT(float rhsX, float rhsY) noexcept;
-  inline constexpr fPOINT(int32_t rhsX, int32_t rhsY) noexcept;
-  inline constexpr fPOINT(LONG rhsX, LONG rhsY) noexcept;
-  explicit inline constexpr fPOINT(dPOINT const& rhs) noexcept;
-  inline constexpr auto operator==(fPOINT const& rhs) const noexcept -> bool;
-  inline constexpr auto operator=(dPOINT const& rhs) noexcept -> fPOINT&;
-  inline constexpr auto operator=(fPOINTATTR const& rhs) noexcept -> fPOINT&;
-  inline constexpr auto operator=(SMALPNTL const& rhs) noexcept -> fPOINT&;
-  inline constexpr auto operator=(BSEQPNT const& rhs) noexcept -> fPOINT&;
-  // fPOINT(fPOINT const&) = default;
-  // fPOINT(fPOINT&&) = default;
-  // fPOINT& operator=(fPOINT const& rhs) = default;
-  // fPOINT& operator=(fPOINT&&) = default;
-  //~fPOINT() = default;
+  constexpr F_POINT() noexcept = default;
+  inline constexpr F_POINT(double rhsX, double rhsY) noexcept;
+  inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
+  inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
+  inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
+  explicit inline constexpr F_POINT(D_POINT const& rhs) noexcept;
+  inline constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
+  inline constexpr auto operator=(D_POINT const& rhs) noexcept -> F_POINT&;
+  inline constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
+  inline constexpr auto operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT&;
+  inline constexpr auto operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT&;
+  // F_POINT(F_POINT const&) = default;
+  // F_POINT(F_POINT&&) = default;
+  // F_POINT& operator=(F_POINT const& rhs) = default;
+  // F_POINT& operator=(F_POINT&&) = default;
+  //~F_POINT() = default;
 };
 
-class fPOINTATTR
+class F_POINT_ATTR
 {
   public:
   float    x {};
   float    y {};
   uint32_t attribute {};
 
-  constexpr fPOINTATTR() noexcept = default;
-  inline fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
-  inline fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
-  // fPOINTATTR(fPOINTATTR const&) = default;
-  // fPOINTATTR(fPOINTATTR&&) = default;
-  // fPOINTATTR& operator=(fPOINTATTR const& rhs) = default;
-  // fPOINTATTR& operator=(fPOINTATTR&&) = default;
-  //~fPOINTATTR() = default;
+  constexpr F_POINT_ATTR() noexcept = default;
+  inline F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept;
+  inline F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept;
+  // F_POINT_ATTR(F_POINT_ATTR const&) = default;
+  // F_POINT_ATTR(F_POINT_ATTR&&) = default;
+  // F_POINT_ATTR& operator=(F_POINT_ATTR const& rhs) = default;
+  // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
+  //~F_POINT_ATTR() = default;
 };
 
-class SMALPNTL
+class SMAL_PNT_L
 {
   public:
   uint32_t line {}; // line and group must remain in this order for sort to work
@@ -1126,136 +1126,136 @@ class SMALPNTL
   float    x {};
   float    y {};
 
-  // constexpr SMALPNTL() noexcept = default;
-  // SMALPNTL(SMALPNTL const&) = default;
-  // SMALPNTL(SMALPNTL&&) = default;
-  // SMALPNTL& operator=(SMALPNTL const& rhs) = default;
-  // SMALPNTL& operator=(SMALPNTL&&) = default;
-  //~SMALPNTL() = default;
+  // constexpr SMAL_PNT_L() noexcept = default;
+  // SMAL_PNT_L(SMAL_PNT_L const&) = default;
+  // SMAL_PNT_L(SMAL_PNT_L&&) = default;
+  // SMAL_PNT_L& operator=(SMAL_PNT_L const& rhs) = default;
+  // SMAL_PNT_L& operator=(SMAL_PNT_L&&) = default;
+  //~SMAL_PNT_L() = default;
 };
 
-class BSEQPNT
+class B_SEQ_PNT
 {
   public:
   float  x {};
   float  y {};
   int8_t attribute {};
 
-  inline BSEQPNT() noexcept = default;
-  inline BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr);
-  inline BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr);
-  // BSEQPNT(BSEQPNT const&) = default;
-  // BSEQPNT(BSEQPNT&&) = default;
-  // BSEQPNT& operator=(BSEQPNT const& rhs) = default;
-  // BSEQPNT& operator=(BSEQPNT&&) = default;
-  //~BSEQPNT() = default;
+  inline B_SEQ_PNT() noexcept = default;
+  inline B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr);
+  inline B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr);
+  // B_SEQ_PNT(B_SEQ_PNT const&) = default;
+  // B_SEQ_PNT(B_SEQ_PNT&&) = default;
+  // B_SEQ_PNT& operator=(B_SEQ_PNT const& rhs) = default;
+  // B_SEQ_PNT& operator=(B_SEQ_PNT&&) = default;
+  //~B_SEQ_PNT() = default;
 };
 
-inline BSEQPNT::BSEQPNT(double rhsX, double rhsY, int32_t rhsAttr) :
+inline B_SEQ_PNT::B_SEQ_PNT(double rhsX, double rhsY, int32_t rhsAttr) :
     x(gsl::narrow<float>(rhsX)), y(gsl::narrow<float>(rhsY)), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline BSEQPNT::BSEQPNT(float rhsX, float rhsY, int32_t rhsAttr) :
+inline B_SEQ_PNT::B_SEQ_PNT(float rhsX, float rhsY, int32_t rhsAttr) :
     x(rhsX), y(rhsY), attribute(gsl::narrow<int8_t>(rhsAttr)) {
 }
 
-inline constexpr auto fPOINT::operator==(fPOINT const& rhs) const noexcept -> bool {
+inline constexpr auto F_POINT::operator==(F_POINT const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
-inline constexpr fPOINT::fPOINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
+inline constexpr F_POINT::F_POINT(float rhsX, float rhsY) noexcept : x(rhsX), y(rhsY) {
 }
 
-inline constexpr fPOINT::fPOINT(int32_t rhsX, int32_t rhsY) noexcept :
+inline constexpr F_POINT::F_POINT(int32_t rhsX, int32_t rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(LONG rhsX, LONG rhsY) noexcept :
+inline constexpr F_POINT::F_POINT(LONG rhsX, LONG rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(double rhsX, double rhsY) noexcept :
+inline constexpr F_POINT::F_POINT(double rhsX, double rhsY) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)) {
 }
 
-inline constexpr fPOINT::fPOINT(dPOINT const& rhs) noexcept :
+inline constexpr F_POINT::F_POINT(D_POINT const& rhs) noexcept :
     x(gsl::narrow_cast<float>(rhs.x)), y(gsl::narrow_cast<float>(rhs.y)) {
 }
 
-inline constexpr auto fPOINT::operator=(dPOINT const& rhs) noexcept -> fPOINT& {
+inline constexpr auto F_POINT::operator=(D_POINT const& rhs) noexcept -> F_POINT& {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
 
-inline constexpr auto fPOINT::operator=(SMALPNTL const& rhs) noexcept -> fPOINT& {
+inline constexpr auto F_POINT::operator=(SMAL_PNT_L const& rhs) noexcept -> F_POINT& {
   x = gsl::narrow_cast<float>(rhs.x);
   y = gsl::narrow_cast<float>(rhs.y);
   return *this;
 }
 
-inline constexpr auto fPOINT::operator=(fPOINTATTR const& rhs) noexcept -> fPOINT& {
+inline constexpr auto F_POINT::operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline constexpr auto fPOINT::operator=(BSEQPNT const& rhs) noexcept -> fPOINT& {
+inline constexpr auto F_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> F_POINT& {
   x = rhs.x;
   y = rhs.y;
   return *this;
 }
 
-inline fPOINTATTR::fPOINTATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept :
+inline F_POINT_ATTR::F_POINT_ATTR(float rhsX, float rhsY, uint32_t rhsA) noexcept :
     x(rhsX), y(rhsY), attribute(rhsA) {
 }
 
-inline fPOINTATTR::fPOINTATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept :
+inline F_POINT_ATTR::F_POINT_ATTR(double rhsX, double rhsY, uint32_t rhsA) noexcept :
     x(gsl::narrow_cast<float>(rhsX)), y(gsl::narrow_cast<float>(rhsY)), attribute(rhsA) {
 }
 
-inline dPOINT::dPOINT(fPOINT const& rhs) noexcept :
+inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
     x(wrap::toDouble(rhs.x)), y(wrap::toDouble(rhs.y)) {
 }
 
-inline dPOINT::dPOINT(float rhsX, float rhsY) noexcept :
+inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
     x(wrap::toDouble(rhsX)), y(wrap::toDouble(rhsY)) {
 }
 
-inline dPOINT::dPOINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
+inline D_POINT::D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
 }
-inline auto dPOINT::operator==(dPOINT const& rhs) const noexcept -> bool {
+inline auto D_POINT::operator==(D_POINT const& rhs) const noexcept -> bool {
   return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
 }
 
-inline auto dPOINT::operator=(fPOINT const& rhs) noexcept -> dPOINT& {
+inline auto D_POINT::operator=(F_POINT const& rhs) noexcept -> D_POINT& {
   x = wrap::toDouble(rhs.x);
   y = wrap::toDouble(rhs.y);
   return *this;
 }
 
-inline auto dPOINT::operator=(BSEQPNT const& rhs) noexcept -> dPOINT& {
+inline auto D_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> D_POINT& {
   x = wrap::toDouble(rhs.x);
   y = wrap::toDouble(rhs.y);
   return *this;
 }
 
-class fPOINTLINE
+class F_POINT_LINE
 {
   public:
   float    x {};
   float    y {};
   uint16_t line {};
 
-  // constexpr fPOINTLINE() noexcept = default;
-  // fPOINTLINE(fPOINTLINE const&) = default;
-  // fPOINTLINE(fPOINTLINE&&) = default;
-  // fPOINTLINE& operator=(fPOINTLINE const& rhs) = default;
-  // fPOINTLINE& operator=(fPOINTLINE&&) = default;
-  //~fPOINTLINE() = default;
+  // constexpr F_POINT_LINE() noexcept = default;
+  // F_POINT_LINE(F_POINT_LINE const&) = default;
+  // F_POINT_LINE(F_POINT_LINE&&) = default;
+  // F_POINT_LINE& operator=(F_POINT_LINE const& rhs) = default;
+  // F_POINT_LINE& operator=(F_POINT_LINE&&) = default;
+  //~F_POINT_LINE() = default;
 };
 
-class dRECTANGLE
+class D_RECTANGLE
 {
   public:
   double top {};
@@ -1263,26 +1263,26 @@ class dRECTANGLE
   double left {};
   double right {};
 
-  // constexpr dRECTANGLE() noexcept = default;
-  // dRECTANGLE(dRECTANGLE const&) = default;
-  // dRECTANGLE(dRECTANGLE&&) = default;
-  // dRECTANGLE& operator=(dRECTANGLE const& rhs) = default;
-  // dRECTANGLE& operator=(dRECTANGLE&&) = default;
-  //~dRECTANGLE() = default;
+  // constexpr D_RECTANGLE() noexcept = default;
+  // D_RECTANGLE(D_RECTANGLE const&) = default;
+  // D_RECTANGLE(D_RECTANGLE&&) = default;
+  // D_RECTANGLE& operator=(D_RECTANGLE const& rhs) = default;
+  // D_RECTANGLE& operator=(D_RECTANGLE&&) = default;
+  //~D_RECTANGLE() = default;
 };
 
-class COLCHNG
+class COL_CHANGE
 {
   public:
   uint16_t stitchIndex {}; // stitch index
   uint16_t colorIndex {};  // color index
 
-  // constexpr COLCHNG() noexcept = default;
-  // COLCHNG(COLCHNG const&) = default;
-  // COLCHNG(COLCHNG&&) = default;
-  // COLCHNG& operator=(COLCHNG const& rhs) = default;
-  // COLCHNG& operator=(COLCHNG&&) = default;
-  //~COLCHNG() = default;
+  // constexpr COL_CHANGE() noexcept = default;
+  // COL_CHANGE(COL_CHANGE const&) = default;
+  // COL_CHANGE(COL_CHANGE&&) = default;
+  // COL_CHANGE& operator=(COL_CHANGE const& rhs) = default;
+  // COL_CHANGE& operator=(COL_CHANGE&&) = default;
+  //~COL_CHANGE() = default;
 };
 
 class FEATHER
@@ -1358,7 +1358,7 @@ constexpr uint32_t TYPSHFT   = 29U;
 constexpr uint32_t USHFT     = 31U; // user edited stitches shift
 
 /*
-bit definitions for fPOINTATTR.attribute
+bit definitions for F_POINT_ATTR.attribute
 0-3		stitch color
 4-14	form pointer
 15-18	spares
@@ -1378,7 +1378,7 @@ constexpr uint32_t FRMFIL   = 0x20000000U;
 constexpr uint32_t FRMBFIL  = 0x40000000U;
 constexpr uint32_t FRMAPFIL = 0x60000000U;
 
-class fRECTANGLE
+class F_RECTANGLE
 {
   public:
   float left {};
@@ -1386,90 +1386,90 @@ class fRECTANGLE
   float right {};
   float bottom {};
 
-  constexpr fRECTANGLE() noexcept = default;
-  // fRECTANGLE(fRECTANGLE const&) = default;
-  // fRECTANGLE(fRECTANGLE&&) = default;
-  // fRECTANGLE& operator=(fRECTANGLE const& rhs) = default;
-  // fRECTANGLE& operator=(fRECTANGLE&&) = default;
-  //~fRECTANGLE() = default;
+  constexpr F_RECTANGLE() noexcept = default;
+  // F_RECTANGLE(F_RECTANGLE const&) = default;
+  // F_RECTANGLE(F_RECTANGLE&&) = default;
+  // F_RECTANGLE& operator=(F_RECTANGLE const& rhs) = default;
+  // F_RECTANGLE& operator=(F_RECTANGLE&&) = default;
+  //~F_RECTANGLE() = default;
 
-  inline fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
+  inline F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
 };
 
-inline fRECTANGLE::fRECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
+inline F_RECTANGLE::F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
     left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
 }
 
-class FORMINFO
+class FORM_INFO
 {
   public:
   uint32_t type {};
   uint32_t attribute {};
   uint32_t sideCount {};
 
-  // constexpr FORMINFO() noexcept = default;
-  // FORMINFO(FORMINFO const&) = default;
-  // FORMINFO(FORMINFO&&) = default;
-  // FORMINFO& operator=(FORMINFO const& rhs) = default;
-  // FORMINFO& operator=(FORMINFO&&) = default;
-  //~FORMINFO() = default;
+  // constexpr FORM_INFO() noexcept = default;
+  // FORM_INFO(FORM_INFO const&) = default;
+  // FORM_INFO(FORM_INFO&&) = default;
+  // FORM_INFO& operator=(FORM_INFO const& rhs) = default;
+  // FORM_INFO& operator=(FORM_INFO&&) = default;
+  //~FORM_INFO() = default;
 };
 
-class SATCONOUT;
+class SAT_CON_OUT;
 
-class SATCON
+class SAT_CON
 {
   public:
   uint32_t start {};
   uint32_t finish {};
 
-  constexpr SATCON() noexcept = default;
-  // SATCON(SATCON const&) = default;
-  // SATCON(SATCON&&) = default;
-  // SATCON& operator=(SATCON const& rhs) = default;
-  // SATCON& operator=(SATCON&&) = default;
-  //~SATCON() = default;
+  constexpr SAT_CON() noexcept = default;
+  // SAT_CON(SAT_CON const&) = default;
+  // SAT_CON(SAT_CON&&) = default;
+  // SAT_CON& operator=(SAT_CON const& rhs) = default;
+  // SAT_CON& operator=(SAT_CON&&) = default;
+  //~SAT_CON() = default;
 
-  explicit SATCON(SATCONOUT const& rhs) noexcept;
-  inline SATCON(uint32_t rStart, uint32_t rFinish) noexcept;
-  inline auto operator=(SATCONOUT const& rhs) noexcept -> SATCON&;
+  explicit SAT_CON(SAT_CON_OUT const& rhs) noexcept;
+  inline SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept;
+  inline auto operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON&;
 };
 
-inline SATCON::SATCON(uint32_t rStart, uint32_t rFinish) noexcept : start(rStart), finish(rFinish) {
+inline SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept : start(rStart), finish(rFinish) {
 }
 
-class SATCONOUT
+class SAT_CON_OUT
 {
   public:
   uint16_t start {};
   uint16_t finish {};
 
-  constexpr SATCONOUT() noexcept = default;
-  // SATCONOUT(SATCONOUT const&) = default;
-  // SATCONOUT(SATCONOUT&&) = default;
-  // SATCONOUT& operator=(SATCONOUT const& rhs) = default;
-  // SATCONOUT& operator=(SATCONOUT&&) = default;
-  //~SATCONOUT() = default;
+  constexpr SAT_CON_OUT() noexcept = default;
+  // SAT_CON_OUT(SAT_CON_OUT const&) = default;
+  // SAT_CON_OUT(SAT_CON_OUT&&) = default;
+  // SAT_CON_OUT& operator=(SAT_CON_OUT const& rhs) = default;
+  // SAT_CON_OUT& operator=(SAT_CON_OUT&&) = default;
+  //~SAT_CON_OUT() = default;
 
-  explicit SATCONOUT(SATCON const& rhs);
-  inline auto operator=(SATCON const& rhs) -> SATCONOUT&;
+  explicit SAT_CON_OUT(SAT_CON const& rhs);
+  inline auto operator=(SAT_CON const& rhs) -> SAT_CON_OUT&;
 };
 
-inline SATCONOUT::SATCONOUT(SATCON const& rhs) :
+inline SAT_CON_OUT::SAT_CON_OUT(SAT_CON const& rhs) :
     start(gsl::narrow<uint16_t>(rhs.start)), finish(gsl::narrow<uint16_t>(rhs.finish)) {
 }
 
-inline auto SATCONOUT::operator=(SATCON const& rhs) -> SATCONOUT& {
+inline auto SAT_CON_OUT::operator=(SAT_CON const& rhs) -> SAT_CON_OUT& {
   start  = gsl::narrow<uint16_t>(rhs.start);
   finish = gsl::narrow<uint16_t>(rhs.finish);
 
   return *this;
 }
 
-inline SATCON::SATCON(SATCONOUT const& rhs) noexcept : start(rhs.start), finish(rhs.finish) {
+inline SAT_CON::SAT_CON(SAT_CON_OUT const& rhs) noexcept : start(rhs.start), finish(rhs.finish) {
 }
 
-inline auto SATCON::operator=(SATCONOUT const& rhs) noexcept -> SATCON& {
+inline auto SAT_CON::operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON& {
   start  = rhs.start;
   finish = rhs.finish;
 
@@ -1482,7 +1482,7 @@ union FANGCLP {
   public:
   float    angle;
   uint32_t clip; // pointer to start of fill clipboard data
-  SATCON   guide {};
+  SAT_CON   guide {};
 
   inline FANGCLP() noexcept;
   // FANGCLP(FANGCLP const&) = default;
@@ -1501,7 +1501,7 @@ union FANGCLPOUT {
   public:
   float angle;
   DWORD clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-  SATCONOUT guide;
+  SAT_CON_OUT guide;
 
   inline FANGCLPOUT() noexcept;
   // FANGCLPOUT(FANGCLPOUT const&) = default;
@@ -1668,7 +1668,7 @@ constexpr auto EGHOL_LINS = 7U;
 constexpr auto EGPIC_LINS = 7U;
 constexpr auto EGCHN_LINS = 6U;
 
-class FTHINFO
+class FTHR_INFO
 {
   public:
   uint8_t  fillType {};      // feather fill type
@@ -1679,15 +1679,15 @@ class FTHINFO
   float    minStitchSize {}; // feather floor
   uint16_t count {};         // feather fill psg granularity
 
-  // FTHINFO() noexcept = default;
-  // FTHINFO(FTHINFO const&) = default;
-  // FTHINFO(FTHINFO&&) = default;
-  // FTHINFO& operator=(FTHINFO const& rhs) = default;
-  // FTHINFO& operator=(FTHINFO&&) = default;
-  //~FTHINFO() = default;
+  // FTHR_INFO() noexcept = default;
+  // FTHR_INFO(FTHR_INFO const&) = default;
+  // FTHR_INFO(FTHR_INFO&&) = default;
+  // FTHR_INFO& operator=(FTHR_INFO const& rhs) = default;
+  // FTHR_INFO& operator=(FTHR_INFO&&) = default;
+  //~FTHR_INFO() = default;
 };
 
-class TXTRINFO
+class TXTR_INFO
 {
   public:
   int16_t  lines {};
@@ -1695,28 +1695,28 @@ class TXTRINFO
   uint16_t count {};
   float    height {};
 
-  // TXTRINFO() noexcept = default;
-  // TXTRINFO(TXTRINFO const&) = default;
-  // TXTRINFO(TXTRINFO&&) = default;
-  // TXTRINFO& operator=(TXTRINFO const& rhs) = default;
-  // TXTRINFO& operator=(TXTRINFO&&) = default;
-  //~TXTRINFO() = default;
+  // TXTR_INFO() noexcept = default;
+  // TXTR_INFO(TXTR_INFO const&) = default;
+  // TXTR_INFO(TXTR_INFO&&) = default;
+  // TXTR_INFO& operator=(TXTR_INFO const& rhs) = default;
+  // TXTR_INFO& operator=(TXTR_INFO&&) = default;
+  //~TXTR_INFO() = default;
 };
 
-union TFINFO {
+union TF_INFO {
   public:
-  FTHINFO  feather;
-  TXTRINFO texture {};
+  FTHR_INFO  feather;
+  TXTR_INFO texture {};
 
-  // TFINFO() noexcept = default;
-  // TFINFO(TFINFO const&) = default;
-  // TFINFO(TFINFO&&) = default;
-  // TFINFO& operator=(TFINFO const& rhs) = default;
-  // TFINFO& operator=(TFINFO&&) = default;
-  //~TFINFO() = default;
+  // TF_INFO() noexcept = default;
+  // TF_INFO(TF_INFO const&) = default;
+  // TF_INFO(TF_INFO&&) = default;
+  // TF_INFO& operator=(TF_INFO const& rhs) = default;
+  // TF_INFO& operator=(TF_INFO&&) = default;
+  //~TF_INFO() = default;
 };
 
-class FRMHEDO // Original form header used prior to version 2
+class FRM_HEAD_O // Original form header used prior to version 2
 {
   public:
   uint8_t  attribute {};   // attribute
@@ -1732,7 +1732,7 @@ class FRMHEDO // Original form header used prior to version 2
   DWORD      borderClipData {};  // border clipboard data
   uint16_t   satinGuideCount {}; // number of satin guidelines
   uint16_t   wordParam {};       // word parameter
-  fRECTANGLE rectangle {};       // rectangle
+  F_RECTANGLE rectangle {};       // rectangle
   uint8_t    fillType {};        // fill type
   uint8_t    edgeType {};        // edge type
   float      fillSpacing {};     // fill spacing
@@ -1743,17 +1743,17 @@ class FRMHEDO // Original form header used prior to version 2
   float      edgeStitchLen {};   // edge stitch length
   uint16_t   res {};             // pico length
 
-  FRMHEDO() noexcept = default;
-  // FRMHEDO(FRMHEDO const&) = default;
-  // FRMHEDO(FRMHEDO&&) = default;
-  // FRMHEDO& operator=(FRMHEDO const& rhs) = default;
-  // FRMHEDO& operator=(FRMHEDO&&) = default;
-  //~FRMHEDO() = default;
+  FRM_HEAD_O() noexcept = default;
+  // FRM_HEAD_O(FRM_HEAD_O const&) = default;
+  // FRM_HEAD_O(FRM_HEAD_O&&) = default;
+  // FRM_HEAD_O& operator=(FRM_HEAD_O const& rhs) = default;
+  // FRM_HEAD_O& operator=(FRM_HEAD_O&&) = default;
+  //~FRM_HEAD_O() = default;
 };
 
-class FRMHEDOUT;
+class FRM_HEAD_OUT;
 
-class FRMHED
+class FRM_HEAD
 {
   public:
   uint8_t    attribute {};           // attribute
@@ -1767,7 +1767,7 @@ class FRMHED
   uint32_t   borderClipData {};      // pointer to start of border clipboard data
   uint32_t   satinGuideCount {};     // number of satin guidelines
   uint32_t   wordParam {};           // clipboard/textured fill phase or satin end guide
-  fRECTANGLE rectangle {};           // rectangle
+  F_RECTANGLE rectangle {};           // rectangle
   uint8_t    fillType {};            // fill type
   uint8_t    edgeType {};            // edge type
   float      fillSpacing {};         // fill spacing
@@ -1782,7 +1782,7 @@ class FRMHED
   float      minFillStitchLen {};    // minimum fill stitch length
   float      maxBorderStitchLen {};  // maximum border stitch length
   float      minBorderStitchLen {};  // minimum border stitch length
-  TFINFO     fillInfo {};            // feather/texture info
+  TF_INFO     fillInfo {};            // feather/texture info
   uint32_t   fillStart {};           // fill start point
   uint32_t   fillEnd {};             // fill end point
   float      underlaySpacing {};     // underlay spacing
@@ -1793,21 +1793,21 @@ class FRMHED
   uint8_t    underlayColor {};       // underlay color
   uint8_t    cres {};                // reserved
 
-  FRMHED() noexcept = default;
-  // FRMHED(FRMHED const&) = default;
-  // FRMHED(FRMHED&&) = default;
-  // FRMHED& operator=(FRMHED const& rhs) = default;
-  // FRMHED& operator=(FRMHED&&) = default;
-  //~FRMHED() = default;
+  FRM_HEAD() noexcept = default;
+  // FRM_HEAD(FRM_HEAD const&) = default;
+  // FRM_HEAD(FRM_HEAD&&) = default;
+  // FRM_HEAD& operator=(FRM_HEAD const& rhs) = default;
+  // FRM_HEAD& operator=(FRM_HEAD&&) = default;
+  //~FRM_HEAD() = default;
 
-  explicit inline FRMHED(FRMHEDO const& rhs) noexcept;
-  explicit inline FRMHED(FRMHEDOUT const& rhs) noexcept;
+  explicit inline FRM_HEAD(FRM_HEAD_O const& rhs) noexcept;
+  explicit inline FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept;
 
-  inline auto operator=(FRMHEDO const& rhs) noexcept -> FRMHED&;
-  inline auto operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED&;
+  inline auto operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
+  inline auto operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
 };
 
-inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
+inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
     borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinOrAngle(rhs.satinOrAngle),
     borderClipData(rhs.borderClipData), // Todo - Should we be copying this value?
@@ -1834,7 +1834,7 @@ inline FRMHED::FRMHED(FRMHEDO const& rhs) noexcept :
   }
 }
 
-inline auto FRMHED::operator=(FRMHEDO const& rhs) noexcept -> FRMHED& {
+inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -1874,7 +1874,7 @@ inline auto FRMHED::operator=(FRMHEDO const& rhs) noexcept -> FRMHED& {
   return *this;
 }
 
-class FRMHEDOUT
+class FRM_HEAD_OUT
 {
   public:
   uint8_t  attribute {};   // attribute
@@ -1890,7 +1890,7 @@ class FRMHEDOUT
   DWORD      borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
   uint16_t   satinGuideCount {}; // number of satin guidelines
   uint16_t   wordParam {};       // clipboard/textured fill phase or satin end guide
-  fRECTANGLE rectangle {};       // rectangle
+  F_RECTANGLE rectangle {};       // rectangle
   uint8_t    fillType {};        // fill type
   uint8_t    edgeType {};        // edge type
   float      fillSpacing {};     // fill spacing
@@ -1906,7 +1906,7 @@ class FRMHEDOUT
   float    minFillStitchLen {};    // minimum fill stitch length
   float    maxBorderStitchLen {};  // maximum border stitch length
   float    minBorderStitchLen {};  // minimum border stitch length
-  TFINFO   fillInfo {};            // feather/texture info
+  TF_INFO   fillInfo {};            // feather/texture info
   uint16_t fillStart {};           // fill start point
   uint16_t fillEnd {};             // fill end point
   float    underlaySpacing {};     // underlay spacing
@@ -1917,18 +1917,18 @@ class FRMHEDOUT
   uint8_t  underlayColor {};       // underlay color
   uint8_t  cres {};                // reserved
 
-  inline FRMHEDOUT() noexcept = default;
-  // FRMHEDOUT(FRMHEDOUT const&) = default;
-  // FRMHEDOUT(FRMHEDOUT&&) = default;
-  // FRMHEDOUT& operator=(FRMHEDOUT const& rhs) = default;
-  // FRMHEDOUT& operator=(FRMHEDOUT&&) = default;
-  //~FRMHEDOUT() = default;
+  inline FRM_HEAD_OUT() noexcept = default;
+  // FRM_HEAD_OUT(FRM_HEAD_OUT const&) = default;
+  // FRM_HEAD_OUT(FRM_HEAD_OUT&&) = default;
+  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT const& rhs) = default;
+  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT&&) = default;
+  //~FRM_HEAD_OUT() = default;
 
-  explicit inline FRMHEDOUT(FRMHED const& rhs);
-  inline auto operator=(FRMHED const& rhs) -> FRMHEDOUT&;
+  explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
+  inline auto operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT&;
 };
 
-inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
+inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     attribute(rhs.attribute), vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)), type(rhs.type),
     fillColor(rhs.fillColor), borderColor(rhs.borderColor),
     clipEntries(gsl::narrow<uint16_t>(rhs.clipEntries)), satinOrAngle(rhs.satinOrAngle),
@@ -1962,7 +1962,7 @@ inline FRMHEDOUT::FRMHEDOUT(FRMHED const& rhs) :
   }
 }
 
-inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
+inline auto FRM_HEAD_OUT::operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT& {
   attribute       = rhs.attribute;
   vertexCount     = gsl::narrow<uint16_t>(rhs.vertexCount);
   type            = rhs.type;
@@ -2021,7 +2021,7 @@ inline auto FRMHEDOUT::operator=(FRMHED const& rhs) -> FRMHEDOUT& {
   return *this;
 }
 
-inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
+inline FRM_HEAD::FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type),
     fillColor(rhs.fillColor), borderColor(rhs.borderColor), clipEntries(rhs.clipEntries),
     satinOrAngle(rhs.satinOrAngle), satinGuideCount(rhs.satinGuideCount), wordParam(rhs.wordParam),
@@ -2051,7 +2051,7 @@ inline FRMHED::FRMHED(FRMHEDOUT const& rhs) noexcept :
   }
 }
 
-inline auto FRMHED::operator=(FRMHEDOUT const& rhs) noexcept -> FRMHED& {
+inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   attribute       = rhs.attribute;
   vertexCount     = rhs.vertexCount;
   type            = rhs.type;
@@ -2145,52 +2145,52 @@ constexpr auto AT_UND     = 1U << 6U; // underlay flag
 constexpr auto AT_WALK    = 1U << 7U; // edge walk
 constexpr auto AT_CWLK    = 1U << 8U; // center walk
 
-class FORMCLIP // form data clipboard header
+class FORM_CLIP // form data clipboard header
 {
   public:
   uint32_t clipType {};
   uint32_t reserved {};
-  FRMHED   form {};
+  FRM_HEAD   form {};
 
-  // constexpr FORMCLIP() noexcept = default;
-  // FORMCLIP(FORMCLIP const&) = default;
-  // FORMCLIP(FORMCLIP&&) = default;
-  // FORMCLIP& operator=(FORMCLIP const& rhs) = default;
-  // FORMCLIP& operator=(FORMCLIP&&) = default;
-  //~FORMCLIP() = default;
+  // constexpr FORM_CLIP() noexcept = default;
+  // FORM_CLIP(FORM_CLIP const&) = default;
+  // FORM_CLIP(FORM_CLIP&&) = default;
+  // FORM_CLIP& operator=(FORM_CLIP const& rhs) = default;
+  // FORM_CLIP& operator=(FORM_CLIP&&) = default;
+  //~FORM_CLIP() = default;
 };
 
-class FORMSCLIP // multiple forms clipboard header
+class FORMS_CLIP // multiple forms clipboard header
 {
   public:
   uint32_t clipType {};
   uint16_t formCount {};
   uint16_t reserved {};
 
-  // constexpr FORMSCLIP() noexcept = default;
-  // FORMSCLIP(FORMSCLIP const&) = default;
-  // FORMSCLIP(FORMSCLIP&&) = default;
-  // FORMSCLIP& operator=(FORMSCLIP const& rhs) = default;
-  // FORMSCLIP& operator=(FORMSCLIP&&) = default;
-  //~FORMSCLIP() = default;
+  // constexpr FORMS_CLIP() noexcept = default;
+  // FORMS_CLIP(FORMS_CLIP const&) = default;
+  // FORMS_CLIP(FORMS_CLIP&&) = default;
+  // FORMS_CLIP& operator=(FORMS_CLIP const& rhs) = default;
+  // FORMS_CLIP& operator=(FORMS_CLIP&&) = default;
+  //~FORMS_CLIP() = default;
 };
 
-class FORMVERTEXCLIP // form points clipboard header
+class FORM_VERTEX_CLIP // form points clipboard header
 {
   public:
   uint32_t clipType {};
   uint32_t vertexCount {};
   bool     direction {};
 
-  // constexpr FORMVERTEXCLIP() noexcept = default;
-  // FORMVERTEXCLIP(FORMVERTEXCLIP const&) = default;
-  // FORMVERTEXCLIP(FORMVERTEXCLIP&&) = default;
-  // FORMVERTEXCLIP& operator=(FORMVERTEXCLIP const& rhs) = default;
-  // FORMVERTEXCLIP& operator=(FORMVERTEXCLIP&&) = default;
-  //~FORMVERTEXCLIP() = default;
+  // constexpr FORM_VERTEX_CLIP() noexcept = default;
+  // FORM_VERTEX_CLIP(FORM_VERTEX_CLIP const&) = default;
+  // FORM_VERTEX_CLIP(FORM_VERTEX_CLIP&&) = default;
+  // FORM_VERTEX_CLIP& operator=(FORM_VERTEX_CLIP const& rhs) = default;
+  // FORM_VERTEX_CLIP& operator=(FORM_VERTEX_CLIP&&) = default;
+  //~FORM_VERTEX_CLIP() = default;
 };
 
-class STRHED // thred file header
+class THR_HEAD // thred file header
 {
   public:
   uint32_t headerType {};
@@ -2205,43 +2205,43 @@ class STRHED // thred file header
   uint16_t clipDataLen {};   // points to clipboard data
   uint16_t clipDataCount {}; // clipboard data count
 
-  // constexpr STRHED() noexcept = default;
-  // STRHED(STRHED const&) = default;
-  // STRHED(STRHED&&) = default;
-  // STRHED& operator=(STRHED const& rhs) = default;
-  // STRHED& operator=(STRHED&&) = default;
-  //~STRHED() = default;
+  // constexpr THR_HEAD() noexcept = default;
+  // THR_HEAD(THR_HEAD const&) = default;
+  // THR_HEAD(THR_HEAD&&) = default;
+  // THR_HEAD& operator=(THR_HEAD const& rhs) = default;
+  // THR_HEAD& operator=(THR_HEAD&&) = default;
+  //~THR_HEAD() = default;
 };
 
-class TXPNT // textured fill point
+class TX_PNT // textured fill point
 {
   public:
   float    y {};
   uint16_t line {};
 
-  // constexpr TXPNT() noexcept = default;
-  // TXPNT(TXPNT const&) = default;
-  // TXPNT(TXPNT&&) = default;
-  // TXPNT& operator=(TXPNT const& rhs) = default;
-  // TXPNT& operator=(TXPNT&&) = default;
-  //~TXPNT() = default;
+  // constexpr TX_PNT() noexcept = default;
+  // TX_PNT(TX_PNT const&) = default;
+  // TX_PNT(TX_PNT&&) = default;
+  // TX_PNT& operator=(TX_PNT const& rhs) = default;
+  // TX_PNT& operator=(TX_PNT&&) = default;
+  //~TX_PNT() = default;
 };
 
-class TXOFF // textured fill offset
+class TX_OFF // textured fill offset
 {
   public:
   float   y {};
   int32_t line {};
 
-  // constexpr TXOFF() noexcept = default;
-  // TXOFF(TXOFF const&) = default;
-  // TXOFF(TXOFF&&) = default;
-  // TXOFF& operator=(TXOFF const& rhs) = default;
-  // TXOFF& operator=(TXOFF&&) = default;
-  //~TXOFF() = default;
+  // constexpr TX_OFF() noexcept = default;
+  // TX_OFF(TX_OFF const&) = default;
+  // TX_OFF(TX_OFF&&) = default;
+  // TX_OFF& operator=(TX_OFF const& rhs) = default;
+  // TX_OFF& operator=(TX_OFF&&) = default;
+  //~TX_OFF() = default;
 };
 
-class STREX // thred v1.0 file header extension
+class THR_HEAD_EX // thred v1.0 file header extension
 {
   public:
   float    hoopSizeX {};              // hoop size x dimension
@@ -2254,15 +2254,15 @@ class STREX // thred v1.0 file header extension
   uint32_t texturePointCount {};      // textured fill point count
   int8_t   res[RES_SIZE] {};          // reserved for expansion
 
-  // constexpr STREX() noexcept = default;
-  // STREX(STREX const&) = default;
-  // STREX(STREX&&) = default;
-  // STREX& operator=(STREX const& rhs) = default;
-  // STREX& operator=(STREX&&) = default;
-  //~STREX() = default;
+  // constexpr THR_HEAD_EX() noexcept = default;
+  // THR_HEAD_EX(THR_HEAD_EX const&) = default;
+  // THR_HEAD_EX(THR_HEAD_EX&&) = default;
+  // THR_HEAD_EX& operator=(THR_HEAD_EX const& rhs) = default;
+  // THR_HEAD_EX& operator=(THR_HEAD_EX&&) = default;
+  //~THR_HEAD_EX() = default;
 };
 
-class PCSTCH
+class PCS_STITCH
 {
   public:
   uint8_t fx {}; // fractional part of x coord or color if tag = 3
@@ -2273,15 +2273,15 @@ class PCSTCH
   uint8_t ny {};
   uint8_t tag {};
 
-  // constexpr PCSTCH() noexcept = default;
-  // PCSTCH(PCSTCH const&) = default;
-  // PCSTCH(PCSTCH&&) = default;
-  // PCSTCH& operator=(PCSTCH const& rhs) = default;
-  // PCSTCH& operator=(PCSTCH&&) = default;
-  //~PCSTCH() = default;
+  // constexpr PCS_STITCH() noexcept = default;
+  // PCS_STITCH(PCS_STITCH const&) = default;
+  // PCS_STITCH(PCS_STITCH&&) = default;
+  // PCS_STITCH& operator=(PCS_STITCH const& rhs) = default;
+  // PCS_STITCH& operator=(PCS_STITCH&&) = default;
+  //~PCS_STITCH() = default;
 };
 
-class CLPSTCH
+class CLIP_STITCH
 {
   public:
   uint32_t led {};  // stitchcount in the first record and color otherwise
@@ -2294,66 +2294,66 @@ class CLPSTCH
   uint8_t  myst {}; // ToDo - Is this structure member needed?
   uint8_t  tag {};  // ToDo - Is this structure member needed?
 
-  // constexpr CLPSTCH() noexcept = default;
-  // CLPSTCH(CLPSTCH const&) = default;
-  // CLPSTCH(CLPSTCH&&) = default;
-  // CLPSTCH& operator=(CLPSTCH const& rhs) = default;
-  // CLPSTCH& operator=(CLPSTCH&&) = default;
-  //~CLPSTCH() = default;
+  // constexpr CLIP_STITCH() noexcept = default;
+  // CLIP_STITCH(CLIP_STITCH const&) = default;
+  // CLIP_STITCH(CLIP_STITCH&&) = default;
+  // CLIP_STITCH& operator=(CLIP_STITCH const& rhs) = default;
+  // CLIP_STITCH& operator=(CLIP_STITCH&&) = default;
+  //~CLIP_STITCH() = default;
 };
 
-class BAKHED
+class BACK_HEAD // Backup header
 {
   public:
   uint32_t    formCount {};
-  FRMHED*     forms {};
+  FRM_HEAD*     forms {};
   uint32_t    stitchCount {};
-  fPOINTATTR* stitches {};
+  F_POINT_ATTR* stitches {};
   uint32_t    vertexCount {};
-  fPOINT*     vertices {};
+  F_POINT*     vertices {};
   uint32_t    guideCount {};
-  SATCON*     guide {};
+  SAT_CON*     guide {};
   uint32_t    clipPointCount {};
-  fPOINT*     clipPoints {};
+  F_POINT*     clipPoints {};
   COLORREF*   colors {};
-  TXPNT*      texturePoints {};
+  TX_PNT*      texturePoints {};
   uint32_t    texturePointCount {};
   SIZE        zoomRect {};
 
-  // constexpr BAKHED() noexcept = default;
-  // BAKHED(CLPSTCH const&) = default;
-  // BAKHED(CLPSTCH&&) = default;
-  // BAKHED& operator=(BAKHED const& rhs) = default;
-  // BAKHED& operator=(BAKHED&&) = default;
-  //~BAKHED() = default;
+  // constexpr BACK_HEAD() noexcept = default;
+  // BACK_HEAD(CLIP_STITCH const&) = default;
+  // BACK_HEAD(CLIP_STITCH&&) = default;
+  // BACK_HEAD& operator=(BACK_HEAD const& rhs) = default;
+  // BACK_HEAD& operator=(BACK_HEAD&&) = default;
+  //~BACK_HEAD() = default;
 };
 
-class FLSIZ
+class F_LSIZ
 {
   public:
   float cx {};
   float cy {};
 
-  // constexpr FLSIZ() noexcept = default;
-  // FLSIZ(FLSIZ const&) = default;
-  // FLSIZ(FLSIZ&&) = default;
-  // FLSIZ& operator=(FLSIZ const& rhs) = default;
-  // FLSIZ& operator=(FLSIZ&&) = default;
-  //~FLSIZ() = default;
+  // constexpr F_LSIZ() noexcept = default;
+  // F_LSIZ(F_LSIZ const&) = default;
+  // F_LSIZ(F_LSIZ&&) = default;
+  // F_LSIZ& operator=(F_LSIZ const& rhs) = default;
+  // F_LSIZ& operator=(F_LSIZ&&) = default;
+  //~F_LSIZ() = default;
 };
 
-class FRMRANGE
+class FORM_RANGE
 {
   public:
   uint32_t start {};
   uint32_t finish {};
 
-  // constexpr FRMRANGE() noexcept = default;
-  // FRMRANGE(FRMRANGE const&) = default;
-  // FRMRANGE(FRMRANGE&&) = default;
-  // FRMRANGE& operator=(FRMRANGE const& rhs) = default;
-  // FRMRANGE& operator=(FRMRANGE&&) = default;
-  //~FRMRANGE() = default;
+  // constexpr FORM_RANGE() noexcept = default;
+  // FORM_RANGE(FORM_RANGE const&) = default;
+  // FORM_RANGE(FORM_RANGE&&) = default;
+  // FORM_RANGE& operator=(FORM_RANGE const& rhs) = default;
+  // FORM_RANGE& operator=(FORM_RANGE&&) = default;
+  //~FORM_RANGE() = default;
 };
 
 class RANGE
@@ -2391,89 +2391,89 @@ inline REGION::REGION(uint32_t rhsStart, uint32_t rhsEnd, uint32_t rhsBreak, uin
     start(rhsStart), end(rhsEnd), regionBreak(rhsBreak), breakCount(rhsCount) {
 }
 
-class RCON // PathMap: path map for sequencing
+class R_CON // PathMap: path map for sequencing
 {
   public:
   uint32_t node {};
   bool     isConnected {};
   uint32_t nextGroup {};
 
-  // constexpr RCON() noexcept = default;
-  // RCON(RCON const&) = default;
-  // RCON(RCON&&) = default;
-  // RCON& operator=(RCON const& rhs) = default;
-  // RCON& operator=(RCON&&) = default;
-  //~RCON() = default;
+  // constexpr R_CON() noexcept = default;
+  // R_CON(R_CON const&) = default;
+  // R_CON(R_CON&&) = default;
+  // R_CON& operator=(R_CON const& rhs) = default;
+  // R_CON& operator=(R_CON&&) = default;
+  //~R_CON() = default;
 };
 
-class RGSEQ // TempPath: temporary path connections
+class RG_SEQ // TempPath: temporary path connections
 {
   public:
   uint32_t pcon {}; // pointer to PathMap entry
   int32_t  count {};
   bool     skp {}; // path not found
 
-  // constexpr RGSEQ() noexcept = default;
-  // RGSEQ(RGSEQ const&) = default;
-  // RGSEQ(RGSEQ&&) = default;
-  // RGSEQ& operator=(RGSEQ const& rhs) = default;
-  // RGSEQ& operator=(RGSEQ&&) = default;
-  //~RGSEQ() = default;
+  // constexpr RG_SEQ() noexcept = default;
+  // RG_SEQ(RG_SEQ const&) = default;
+  // RG_SEQ(RG_SEQ&&) = default;
+  // RG_SEQ& operator=(RG_SEQ const& rhs) = default;
+  // RG_SEQ& operator=(RG_SEQ&&) = default;
+  //~RG_SEQ() = default;
 };
 
-class FSEQ // SequencePath: path of sequenced regions
+class F_SEQ // SequencePath: path of sequenced regions
 {
   public:
   uint16_t node {};
   uint16_t nextGroup {};
   bool     skp {}; // path not found
 
-  // constexpr FSEQ() noexcept = default;
-  // FSEQ(FSEQ const&) = default;
-  // FSEQ(FSEQ&&) = default;
-  // FSEQ& operator=(FSEQ const& rhs) = default;
-  // FSEQ& operator=(FSEQ&&) = default;
-  //~FSEQ() = default;
+  // constexpr F_SEQ() noexcept = default;
+  // F_SEQ(F_SEQ const&) = default;
+  // F_SEQ(F_SEQ&&) = default;
+  // F_SEQ& operator=(F_SEQ const& rhs) = default;
+  // F_SEQ& operator=(F_SEQ&&) = default;
+  //~F_SEQ() = default;
 };
 
 constexpr auto SEQTOP = 2;
 constexpr auto SEQBOT = 3;
 
-class PVEC
+class P_VEC
 {
   public:
   float angle {};
   float length {};
 
-  // constexpr PVEC() noexcept = default;
-  // PVEC(PVEC const&) = default;
-  // PVEC(PVEC&&) = default;
-  // PVEC& operator=(PVEC const& rhs) = default;
-  // PVEC& operator=(PVEC&&) = default;
-  //~PVEC() = default;
+  // constexpr P_VEC() noexcept = default;
+  // P_VEC(P_VEC const&) = default;
+  // P_VEC(P_VEC&&) = default;
+  // P_VEC& operator=(P_VEC const& rhs) = default;
+  // P_VEC& operator=(P_VEC&&) = default;
+  //~P_VEC() = default;
 };
 
-class VRCT2
+class V_RECT_2
 {
   public:
-  fPOINT aipnt {};
-  fPOINT aopnt {};
-  fPOINT bipnt {};
-  fPOINT bopnt {};
-  fPOINT cipnt {};
-  fPOINT copnt {};
-  fPOINT dipnt {};
-  fPOINT dopnt {};
+  F_POINT aipnt {};
+  F_POINT aopnt {};
+  F_POINT bipnt {};
+  F_POINT bopnt {};
+  F_POINT cipnt {};
+  F_POINT copnt {};
+  F_POINT dipnt {};
+  F_POINT dopnt {};
 
-  // constexpr VRCT2() noexcept = default;
-  // VRCT2(VRCT2 const&) = default;
-  // VRCT2(VRCT2&&) = default;
-  // VRCT2& operator=(VRCT2 const& rhs) = default;
-  // VRCT2& operator=(VRCT2&&) = default;
-  //~VRCT2() = default;
+  // constexpr V_RECT_2() noexcept = default;
+  // V_RECT_2(V_RECT_2 const&) = default;
+  // V_RECT_2(V_RECT_2&&) = default;
+  // V_RECT_2& operator=(V_RECT_2 const& rhs) = default;
+  // V_RECT_2& operator=(V_RECT_2&&) = default;
+  //~V_RECT_2() = default;
 };
 
-class CURSORMASK
+class CURSOR_MASK
 {
   public:
   uint8_t form[128] {};
@@ -2484,15 +2484,15 @@ class CURSORMASK
   uint8_t rightUpNeedle[128] {};
   uint8_t rightDownNeedle[128] {};
 
-  // constexpr CURSORMASK() noexcept = default;
-  // CURSORMASK(CURSORMASK const&) = default;
-  // CURSORMASK(CURSORMASK&&) = default;
-  // CURSORMASK& operator=(CURSORMASK const& rhs) = default;
-  // CURSORMASK& operator=(CURSORMASK&&) = default;
-  //~CURSORMASK() = default;
+  // constexpr CURSOR_MASK() noexcept = default;
+  // CURSOR_MASK(CURSOR_MASK const&) = default;
+  // CURSOR_MASK(CURSOR_MASK&&) = default;
+  // CURSOR_MASK& operator=(CURSOR_MASK const& rhs) = default;
+  // CURSOR_MASK& operator=(CURSOR_MASK&&) = default;
+  //~CURSOR_MASK() = default;
 };
 
-class BALHED // balarad file header
+class BAL_HEAD // balarad file header
 {
   public:
   COLORREF color[256] {};
@@ -2503,15 +2503,15 @@ class BALHED // balarad file header
   COLORREF backgroundColor {};
   uint8_t  res[1006] {};
 
-  // constexpr BALHED() noexcept = default;
-  // BALHED(BALHED const&) = default;
-  // BALHED(BALHED&&) = default;
-  // BALHED& operator=(BALHED const& rhs) = default;
-  // BALHED& operator=(BALHED&&) = default;
-  //~BALHED() = default;
+  // constexpr BAL_HEAD() noexcept = default;
+  // BAL_HEAD(BAL_HEAD const&) = default;
+  // BAL_HEAD(BAL_HEAD&&) = default;
+  // BAL_HEAD& operator=(BAL_HEAD const& rhs) = default;
+  // BAL_HEAD& operator=(BAL_HEAD&&) = default;
+  //~BAL_HEAD() = default;
 };
 
-class BALSTCH // balarad stitch
+class BAL_STITCH // balarad stitch
 {
   public:
   uint8_t code {};
@@ -2519,15 +2519,15 @@ class BALSTCH // balarad stitch
   float   x {};
   float   y {};
 
-  // constexpr BALSTCH() noexcept = default;
-  // BALSTCH(BALSTCH const&) = default;
-  // BALSTCH(BALSTCH&&) = default;
-  // BALSTCH& operator=(BALSTCH const& rhs) = default;
-  // BALSTCH& operator=(BALSTCH&&) = default;
-  //~BALSTCH() = default;
+  // constexpr BAL_STITCH() noexcept = default;
+  // BAL_STITCH(BAL_STITCH const&) = default;
+  // BAL_STITCH(BAL_STITCH&&) = default;
+  // BAL_STITCH& operator=(BAL_STITCH const& rhs) = default;
+  // BAL_STITCH& operator=(BAL_STITCH&&) = default;
+  //~BAL_STITCH() = default;
 };
 
-class CLPSEG
+class CLIP_SEG
 {
   public:
   uint32_t start {};
@@ -2540,31 +2540,31 @@ class CLPSEG
   uint32_t zsid {};
   int8_t   dun {};
 
-  // constexpr CLPSEG() noexcept = default;
-  // CLPSEG(CLPSEG const&) = default;
-  // CLPSEG(CLPSEG&&) = default;
-  // CLPSEG& operator=(CLPSEG const& rhs) = default;
-  // CLPSEG& operator=(CLPSEG&&) = default;
-  //~CLPSEG() = default;
+  // constexpr CLIP_SEG() noexcept = default;
+  // CLIP_SEG(CLIP_SEG const&) = default;
+  // CLIP_SEG(CLIP_SEG&&) = default;
+  // CLIP_SEG& operator=(CLIP_SEG const& rhs) = default;
+  // CLIP_SEG& operator=(CLIP_SEG&&) = default;
+  //~CLIP_SEG() = default;
 };
 
-class CLIPSORT
+class CLIP_SORT
 {
   public:
   float    segmentLength {};
   float    sideLength {};
   uint32_t vertexIndex {};
-  fPOINT   point;
+  F_POINT   point;
 
-  // constexpr CLIPSORT() noexcept = default;
-  // CLIPSORT(CLIPSORT const&) = default;
-  // CLIPSORT(CLIPSORT&&) = default;
-  // CLIPSORT& operator=(CLIPSORT const& rhs) = default;
-  // CLIPSORT& operator=(CLIPSORT&&) = default;
-  //~CLIPSORT() = default;
+  // constexpr CLIP_SORT() noexcept = default;
+  // CLIP_SORT(CLIP_SORT const&) = default;
+  // CLIP_SORT(CLIP_SORT&&) = default;
+  // CLIP_SORT& operator=(CLIP_SORT const& rhs) = default;
+  // CLIP_SORT& operator=(CLIP_SORT&&) = default;
+  //~CLIP_SORT() = default;
 };
 
-class CLIPNT
+class CLIP_PNT
 {
   public:
   float    x {};
@@ -2572,59 +2572,59 @@ class CLIPNT
   uint32_t vertexIndex {};
   uint32_t flag {};
 
-  // constexpr CLIPNT() noexcept = default;
-  // CLIPNT(CLIPNT const&) = default;
-  // CLIPNT(CLIPNT&&) = default;
-  // CLIPNT& operator=(CLIPNT const& rhs) = default;
-  // CLIPNT& operator=(CLIPNT&&) = default;
-  //~CLIPNT() = default;
+  // constexpr CLIP_PNT() noexcept = default;
+  // CLIP_PNT(CLIP_PNT const&) = default;
+  // CLIP_PNT(CLIP_PNT&&) = default;
+  // CLIP_PNT& operator=(CLIP_PNT const& rhs) = default;
+  // CLIP_PNT& operator=(CLIP_PNT&&) = default;
+  //~CLIP_PNT() = default;
 };
 
-class VCLPX
+class V_CLP_X
 {
   public:
   uint32_t segment {};
   uint32_t vertex {};
 
-  // constexpr VCLPX() noexcept = default;
-  // VCLPX(VCLPX const&) = default;
-  // VCLPX(VCLPX&&) = default;
-  // VCLPX& operator=(VCLPX const& rhs) = default;
-  // VCLPX& operator=(VCLPX&&) = default;
-  //~VCLPX() = default;
+  // constexpr V_CLP_X() noexcept = default;
+  // V_CLP_X(V_CLP_X const&) = default;
+  // V_CLP_X(V_CLP_X&&) = default;
+  // V_CLP_X& operator=(V_CLP_X const& rhs) = default;
+  // V_CLP_X& operator=(V_CLP_X&&) = default;
+  //~V_CLP_X() = default;
 };
 
-class TRCPNT
+class TRACE_PNT
 {
   public:
   int16_t x {};
   int16_t y {};
 
-  // constexpr TRCPNT() noexcept = default;
-  // TRCPNT(TRCPNT const&) = default;
-  // TRCPNT(TRCPNT&&) = default;
-  // TRCPNT& operator=(TRCPNT const& rhs) = default;
-  // TRCPNT& operator=(TRCPNT&&) = default;
-  //~TRCPNT() = default;
+  // constexpr TRACE_PNT() noexcept = default;
+  // TRACE_PNT(TRACE_PNT const&) = default;
+  // TRACE_PNT(TRACE_PNT&&) = default;
+  // TRACE_PNT& operator=(TRACE_PNT const& rhs) = default;
+  // TRACE_PNT& operator=(TRACE_PNT&&) = default;
+  //~TRACE_PNT() = default;
 };
 
-class GRDCOD
+class GRID_COL
 {
   public:
   uint32_t id {};
   uint32_t col {};
 
-  // constexpr GRDCOD() noexcept = default;
-  // GRDCOD(GRDCOD const&) = default;
-  // GRDCOD(GRDCOD&&) = default;
-  // GRDCOD& operator=(GRDCOD const& rhs) = default;
-  // GRDCOD& operator=(GRDCOD&&) = default;
-  //~GRDCOD() = default;
+  // constexpr GRID_COL() noexcept = default;
+  // GRID_COL(GRID_COL const&) = default;
+  // GRID_COL(GRID_COL&&) = default;
+  // GRID_COL& operator=(GRID_COL const& rhs) = default;
+  // GRID_COL& operator=(GRID_COL&&) = default;
+  //~GRID_COL() = default;
 };
 
 #pragma pack(pop)
 
-class OREC
+class O_REC
 {
   public:
   uint32_t start {};
@@ -2636,15 +2636,15 @@ class OREC
   uint32_t form {};
   uint32_t otyp {};
 
-  // constexpr OREC() noexcept = default;
-  // OREC(OREC const&) = default;
-  // OREC(OREC&&) = default;
-  // OREC& operator=(OREC const& rhs) = default;
-  // OREC& operator=(OREC&&) = default;
-  //~OREC() = default;
+  // constexpr O_REC() noexcept = default;
+  // O_REC(O_REC const&) = default;
+  // O_REC(O_REC&&) = default;
+  // O_REC& operator=(O_REC const& rhs) = default;
+  // O_REC& operator=(O_REC&&) = default;
+  //~O_REC() = default;
 };
 
-class SRTREC
+class SORT_REC
 {
   public:
   uint32_t start {};          // start region index
@@ -2653,15 +2653,15 @@ class SRTREC
   uint32_t currentRegion {};  // current region index
   bool     direction = false; // direction of sort
 
-  // constexpr SRTREC() noexcept = default;
-  // SRTREC(SRTREC const&) = default;
-  // SRTREC(SRTREC&&) = default;
-  // SRTREC& operator=(SRTREC const& rhs) = default;
-  // SRTREC& operator=(SRTREC&&) = default;
-  //~SRTREC() = default;
+  // constexpr SORT_REC() noexcept = default;
+  // SORT_REC(SORT_REC const&) = default;
+  // SORT_REC(SORT_REC&&) = default;
+  // SORT_REC& operator=(SORT_REC const& rhs) = default;
+  // SORT_REC& operator=(SORT_REC&&) = default;
+  //~SORT_REC() = default;
 };
 
-class FSTRTS
+class F_STARTS
 {
   public:
   uint32_t applique {};
@@ -2673,25 +2673,25 @@ class FSTRTS
   uint32_t featherColor {};
   uint32_t borderColor {};
 
-  // constexpr FSTRTS() noexcept = default;
-  // FSTRTS(FSTRTS const&) = default;
-  // FSTRTS(FSTRTS&&) = default;
-  // FSTRTS& operator=(FSTRTS const& rhs) = default;
-  // FSTRTS& operator=(FSTRTS&&) = default;
-  //~FSTRTS() = default;
+  // constexpr F_STARTS() noexcept = default;
+  // F_STARTS(F_STARTS const&) = default;
+  // F_STARTS(F_STARTS&&) = default;
+  // F_STARTS& operator=(F_STARTS const& rhs) = default;
+  // F_STARTS& operator=(F_STARTS&&) = default;
+  //~F_STARTS() = default;
 };
 
-union FILLSTARTS {
+union FILL_STARTS {
   public:
-  FSTRTS   fillNamed;
-  uint32_t fillArray[sizeof(FSTRTS) / sizeof(uint32_t)] {};
+  F_STARTS   fillNamed;
+  uint32_t fillArray[sizeof(F_STARTS) / sizeof(uint32_t)] {};
 
-  // inline FILLSTARTS() noexcept;
-  // FILLSTARTS(FILLSTARTS const&) = default;
-  // FILLSTARTS(FILLSTARTS&&) = default;
-  // FILLSTARTS& operator=(FILLSTARTS const& rhs) = default;
-  // FILLSTARTS& operator=(FILLSTARTS&&) = default;
-  //~FILLSTARTS() = default;
+  // inline FILL_STARTS() noexcept;
+  // FILL_STARTS(FILL_STARTS const&) = default;
+  // FILL_STARTS(FILL_STARTS&&) = default;
+  // FILL_STARTS& operator=(FILL_STARTS const& rhs) = default;
+  // FILL_STARTS& operator=(FILL_STARTS&&) = default;
+  //~FILL_STARTS() = default;
 };
 
 constexpr auto M_AP     = 1U << 1U;
@@ -2706,7 +2706,7 @@ constexpr auto M_FCOL   = 1U << 9U;
 constexpr auto M_FTHCOL = 1U << 10U;
 constexpr auto M_ECOL   = 1U << 11U;
 
-class INSREC
+class INS_REC
 {
   public:
   uint32_t code {};
@@ -2714,22 +2714,22 @@ class INSREC
   uint32_t index {};
   uint32_t seq {};
 
-  // constexpr INSREC() noexcept = default;
-  // INSREC(INSREC const&) = default;
-  // INSREC(INSREC&&) = default;
-  // INSREC& operator=(INSREC const& rhs) = default;
-  // INSREC& operator=(INSREC&&) = default;
-  //~INSREC() = default;
+  // constexpr INS_REC() noexcept = default;
+  // INS_REC(INS_REC const&) = default;
+  // INS_REC(INS_REC&&) = default;
+  // INS_REC& operator=(INS_REC const& rhs) = default;
+  // INS_REC& operator=(INS_REC&&) = default;
+  //~INS_REC() = default;
 };
 
-enum interleaveTypes { // interleave sequence identifiers
+enum InterleaveTypes { // interleave sequence identifiers
   I_AP,
   I_FIL,
   I_FTH,
   I_BRD
 };
 
-class INTINF
+class INT_INFO
 {
   public:
   uint32_t    pins {};
@@ -2737,17 +2737,17 @@ class INTINF
   uint32_t    layerIndex {};
   uint32_t    start {};
   uint32_t    output {};
-  fPOINTATTR* highStitchBuffer {};
+  F_POINT_ATTR* highStitchBuffer {};
 
-  // constexpr INTINF() noexcept = default;
-  // INTINF(INTINF const&) = default;
-  // INTINF(INTINF&&) = default;
-  // INTINF& operator=(INTINF const& rhs) = default;
-  // INTINF& operator=(INTINF&&) = default;
-  //~INTINF() = default;
+  // constexpr INT_INFO() noexcept = default;
+  // INT_INFO(INT_INFO const&) = default;
+  // INT_INFO(INT_INFO&&) = default;
+  // INT_INFO& operator=(INT_INFO const& rhs) = default;
+  // INT_INFO& operator=(INT_INFO&&) = default;
+  //~INT_INFO() = default;
 };
 
-class TXTSCR
+class TXTR_SCREEN
 {
   public:
   int32_t  top {};              // pixel top line
@@ -2762,17 +2762,17 @@ class TXTSCR
   float    spacing {};          // edit space between lines
   uint16_t lines {};            // number of lines
   float    editToPixelRatio {}; // edit to pixel ratio
-  fPOINT   formCenter;          // middle of the form
+  F_POINT   formCenter;          // middle of the form
 
-  // constexpr TXTSCR() noexcept = default;
-  // TXTSCR(TXTSCR const&) = default;
-  // TXTSCR(TXTSCR&&) = default;
-  // TXTSCR& operator=(TXTSCR const& rhs) = default;
-  // TXTSCR& operator=(TXTSCR&&) = default;
-  //~TXTSCR() = default;
+  // constexpr TXTR_SCREEN() noexcept = default;
+  // TXTR_SCREEN(TXTR_SCREEN const&) = default;
+  // TXTR_SCREEN(TXTR_SCREEN&&) = default;
+  // TXTR_SCREEN& operator=(TXTR_SCREEN const& rhs) = default;
+  // TXTR_SCREEN& operator=(TXTR_SCREEN&&) = default;
+  //~TXTR_SCREEN() = default;
 };
 
-class TXTRCT
+class TXTR_RECT
 {
   public:
   uint16_t left {};
@@ -2780,32 +2780,32 @@ class TXTRCT
   float    top {};
   float    bottom {};
 
-  // constexpr TXTRCT() noexcept = default;
-  // TXTRCT(TXTRCT const&) = default;
-  // TXTRCT(TXTRCT&&) = default;
-  // TXTRCT& operator=(TXTRCT const& rhs) = default;
-  // TXTRCT& operator=(TXTRCT&&) = default;
-  //~TXTRCT() = default;
+  // constexpr TXTR_RECT() noexcept = default;
+  // TXTR_RECT(TXTR_RECT const&) = default;
+  // TXTR_RECT(TXTR_RECT&&) = default;
+  // TXTR_RECT& operator=(TXTR_RECT const& rhs) = default;
+  // TXTR_RECT& operator=(TXTR_RECT&&) = default;
+  //~TXTR_RECT() = default;
 };
 
-class TXHST
+class TX_HIST
 {
   public:
-  std::vector<TXPNT> texturePoints {};
+  std::vector<TX_PNT> texturePoints {};
 
   float height {};
   float width {};
   float spacing {};
 
-  // constexpr TXHST() noexcept = default;
-  // TXHST(TXHST const&) = default;
-  // TXHST(TXHST&&) = default;
-  // TXHST& operator=(TXHST const& rhs) = default;
-  // TXHST& operator=(TXHST&&) = default;
-  //~TXHST() = default;
+  // constexpr TX_HIST() noexcept = default;
+  // TX_HIST(TX_HIST const&) = default;
+  // TX_HIST(TX_HIST&&) = default;
+  // TX_HIST& operator=(TX_HIST const& rhs) = default;
+  // TX_HIST& operator=(TX_HIST&&) = default;
+  //~TX_HIST() = default;
 };
 
-class TXHSTBUF
+class TX_HIST_BUFF
 {
   public:
   uint32_t* placeholder {};
@@ -2815,26 +2815,26 @@ class TXHSTBUF
   float width {};
   float spacing {};
 
-  // constexpr TXHSTBUF() noexcept = default;
-  // TXHSTBUF(TXHSTBUF const&) = default;
-  // TXHSTBUF(TXHSTBUF&&) = default;
-  // TXHSTBUF& operator=(TXHSTBUF const& rhs) = default;
-  // TXHSTBUF& operator=(TXHSTBUF&&) = default;
-  //~TXHSTBUF() = default;
+  // constexpr TX_HIST_BUFF() noexcept = default;
+  // TX_HIST_BUFF(TX_HIST_BUFF const&) = default;
+  // TX_HIST_BUFF(TX_HIST_BUFF&&) = default;
+  // TX_HIST_BUFF& operator=(TX_HIST_BUFF const& rhs) = default;
+  // TX_HIST_BUFF& operator=(TX_HIST_BUFF&&) = default;
+  //~TX_HIST_BUFF() = default;
 };
 
-class RNGCNT
+class RNG_COUNT
 {
   public:
   int32_t line {};
   int32_t stitchCount {};
 
-  // constexpr RNGCNT() noexcept = default;
-  // RNGCNT(RNGCNT const&) = default;
-  // RNGCNT(RNGCNT&&) = default;
-  // RNGCNT& operator=(RNGCNT const& rhs) = default;
-  // RNGCNT& operator=(RNGCNT&&) = default;
-  //~RNGCNT() = default;
+  // constexpr RNG_COUNT() noexcept = default;
+  // RNG_COUNT(RNG_COUNT const&) = default;
+  // RNG_COUNT(RNG_COUNT&&) = default;
+  // RNG_COUNT& operator=(RNG_COUNT const& rhs) = default;
+  // RNG_COUNT& operator=(RNG_COUNT&&) = default;
+  //~RNG_COUNT() = default;
 };
 
 constexpr auto BADFLT = 1U;
@@ -2842,7 +2842,7 @@ constexpr auto BADCLP = 1U << 1U;
 constexpr auto BADSAT = 1U << 2U;
 constexpr auto BADTX  = 1U << 3U;
 
-class BADCNTS
+class BAD_COUNTS
 {
   public:
   uint32_t attribute {};
@@ -2851,79 +2851,79 @@ class BADCNTS
   uint32_t guideCount {}; // ToDo - is this an accurate description?
   uint32_t tx {};
 
-  // constexpr BADCNTS() noexcept = default;
-  // BADCNTS(BADCNTS const&) = default;
-  // BADCNTS(BADCNTS&&) = default;
-  // BADCNTS& operator=(BADCNTS const& rhs) = default;
-  // BADCNTS& operator=(BADCNTS&&) = default;
-  //~BADCNTS() = default;
+  // constexpr BAD_COUNTS() noexcept = default;
+  // BAD_COUNTS(BAD_COUNTS const&) = default;
+  // BAD_COUNTS(BAD_COUNTS&&) = default;
+  // BAD_COUNTS& operator=(BAD_COUNTS const& rhs) = default;
+  // BAD_COUNTS& operator=(BAD_COUNTS&&) = default;
+  //~BAD_COUNTS() = default;
 };
 
-class FINDINFO
+class FIND_INFO
 {
   public:
   uint32_t         count {};
   WIN32_FIND_DATA* data {};
 
-  // constexpr FINDINFO() noexcept = default;
-  // FINDINFO(FINDINFO const&) = default;
-  // FINDINFO(FINDINFO&&) = default;
-  // FINDINFO& operator=(FINDINFO const& rhs) = default;
-  // FINDINFO& operator=(FINDINFO&&) = default;
-  //~FINDINFO() = default;
+  // constexpr FIND_INFO() noexcept = default;
+  // FIND_INFO(FIND_INFO const&) = default;
+  // FIND_INFO(FIND_INFO&&) = default;
+  // FIND_INFO& operator=(FIND_INFO const& rhs) = default;
+  // FIND_INFO& operator=(FIND_INFO&&) = default;
+  //~FIND_INFO() = default;
 };
 
 // is intersection of line and cursor in, before or after the line
-enum class intersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
+enum class IntersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
 
-class LENINFO // Sorted line length info
+class LEN_INFO // Sorted line length info
 {
   public:
   uint32_t index {};
   bool     isEnd {};
   float    length {};
 
-  // constexpr LENINFO() noexcept = default;
-  // LENINFO(LENINFO const&) = default;
-  // LENINFO(LENINFO&&) = default;
-  // LENINFO& operator=(LENINFO const& rhs) = default;
-  // LENINFO& operator=(LENINFO&&) = default;
-  //~LENINFO() = default;
+  // constexpr LEN_INFO() noexcept = default;
+  // LEN_INFO(LEN_INFO const&) = default;
+  // LEN_INFO(LEN_INFO&&) = default;
+  // LEN_INFO& operator=(LEN_INFO const& rhs) = default;
+  // LEN_INFO& operator=(LEN_INFO&&) = default;
+  //~LEN_INFO() = default;
 };
 
-class PECCOLOR
+class PEC_COLOR
 {
   public:
   uint8_t r {};
   uint8_t g {};
   uint8_t b {};
 
-  // constexpr PECCOLOR() noexcept = default;
-  // PECCOLOR(PECCOLOR const&) = default;
-  // PECCOLOR(PECCOLOR&&) = default;
-  // PECCOLOR& operator=(PECCOLOR const& rhs) = default;
-  // PECCOLOR& operator=(PECCOLOR&&) = default;
-  //~PECCOLOR() = default;
+  // constexpr PEC_COLOR() noexcept = default;
+  // PEC_COLOR(PEC_COLOR const&) = default;
+  // PEC_COLOR(PEC_COLOR&&) = default;
+  // PEC_COLOR& operator=(PEC_COLOR const& rhs) = default;
+  // PEC_COLOR& operator=(PEC_COLOR&&) = default;
+  //~PEC_COLOR() = default;
 };
 
-class PESCOLORLIST
+class PES_COLOR_LIST
 {
   public:
   uint16_t blockIndex {};
   uint16_t colorIndex {};
 
-  // constexpr PESCOLORLIST() noexcept = default;
-  // PESCOLORLIST(PESCOLORLIST const&) = default;
-  // PESCOLORLIST(PESCOLORLIST&&) = default;
-  // PESCOLORLIST& operator=(PECCOLORLIST const& rhs) = default;
-  // PESCOLORLIST& operator=(PESCOLORLIST&&) = default;
-  //~PESCOLORLIST() = default;
+  // constexpr PES_COLOR_LIST() noexcept = default;
+  // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
+  // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
+  // PES_COLOR_LIST& operator=(PECCOLORLIST const& rhs) = default;
+  // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
+  //~PES_COLOR_LIST() = default;
 };
 
 class THREAD
 {
   public:
-  PECCOLOR    color {};
+  PEC_COLOR    color {};
   char const* description {};
   char const* catalogNumber {};
 
@@ -2935,24 +2935,24 @@ class THREAD
   //~THREAD() = default;
 };
 
-class TYPLIST
+class STR_TYPE_LIST
 {
   public:
   uint32_t stringID {};
   uint32_t stringIndex {};
 
-  // constexpr TYPLIST() noexcept = default;
-  // TYPLIST(TYPLIST const&) = default;
-  // TYPLIST(TYPLIST&&) = default;
-  // TYPLIST& operator=(TYPLIST const& rhs) = default;
-  // TYPLIST& operator=(TYPLIST&&) = default;
-  //~TYPLIST() = default;
+  // constexpr STR_TYPE_LIST() noexcept = default;
+  // STR_TYPE_LIST(STR_TYPE_LIST const&) = default;
+  // STR_TYPE_LIST(STR_TYPE_LIST&&) = default;
+  // STR_TYPE_LIST& operator=(STR_TYPE_LIST const& rhs) = default;
+  // STR_TYPE_LIST& operator=(STR_TYPE_LIST&&) = default;
+  //~STR_TYPE_LIST() = default;
 };
 
 // Do the type punning while ensuring that the returned pointer is non_null
 // use the encapsulation recommended in I.30
 // (https://github.com/isocpp/CppCoreGuidelines/blob/master/CppCoreGuidelines.md#i30-encapsulate-rule-violations)
-template <class T2, class T1> inline _Ret_notnull_ auto convert_ptr(T1* pointer) -> T2 {
+template <class T2, class T1> inline _Ret_notnull_ auto convertFromPtr(T1* pointer) -> T2 {
   if (pointer) {
 	return gsl::narrow_cast<T2>(gsl::narrow_cast<void*>(pointer));
   }

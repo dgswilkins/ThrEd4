@@ -91,8 +91,8 @@ class DSTOffsets
 namespace DST {
 auto colmatch(COLORREF color) -> uint32_t;
 auto readDSTFile(std::filesystem::path const& newFileName) -> bool;
-void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<fPOINTATTR> const& stitches);
-auto saveDST(fs::path const* auxName, std::vector<fPOINTATTR> const& saveStitches) -> bool;
+void ritdst(DSTOffsets& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
+auto saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 void setColFilename(fs::path* directory) noexcept;
 void setRGBFilename(fs::path* directory) noexcept;
 

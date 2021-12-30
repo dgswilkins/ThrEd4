@@ -11,14 +11,14 @@
 namespace bitmap {
 void assignUBFilename(fs::path const& directory);
 void bitbltBitmap() noexcept;
-void bfrm(FRMHED const& form);
+void bfrm(FRM_HEAD const& form);
 void chkbit();
 void delmap();
 void drawBmpBackground();
 auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
 auto getBitmapDC() noexcept -> HDC;
 auto getBitmapHeight() noexcept -> int;
-auto getBitmapSizeinStitches() noexcept -> fPOINT;
+auto getBitmapSizeinStitches() noexcept -> F_POINT;
 auto getBitmapWidth() noexcept -> int;
 auto getBmpColor() noexcept -> COLORREF;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
@@ -26,7 +26,7 @@ auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
 auto getBmpNameLength() -> uint32_t;
 auto getBmpNameData() noexcept -> char*;
 
-auto getBmpStitchRatio() noexcept -> fPOINT;
+auto getBmpStitchRatio() noexcept -> F_POINT;
 auto getrmap() -> uint32_t;
 auto getTraceDC() noexcept -> HDC;
 auto ismap() noexcept -> bool;
@@ -52,8 +52,8 @@ namespace internal {
   void movmap(int cnt, uint8_t* buffer);
   auto nuBit() noexcept -> BOOL;
   auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
-  void pxlin(FRMHED const& form, uint32_t start, uint32_t finish);
+  void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
   auto saveName(fs::path& fileName);
-  auto stch2bit(fPOINT& point) -> POINT;
+  auto stch2bit(F_POINT& point) -> POINT;
 } // namespace internal
 } // namespace bitmap

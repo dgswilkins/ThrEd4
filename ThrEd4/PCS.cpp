@@ -51,12 +51,12 @@ class PCSHEADER // pcs file header structure
 
 namespace pci = PCS::internal;
 
-constexpr auto smallHoop = fPOINT {SHUPX, SHUPY};
-constexpr auto largeHoop = fPOINT {LHUPX, LHUPY};
+constexpr auto smallHoop = F_POINT {SHUPX, SHUPY};
+constexpr auto largeHoop = F_POINT {LHUPX, LHUPY};
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header
 
-auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches) -> bool {
+auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   auto flag = true;
   if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -70,7 +70,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 	else {
 	  PCSHeader.leadIn     = 0x32;
 	  PCSHeader.colorCount = COLORCNT;
-	  auto PCSStitchBuffer = std::vector<PCSTCH> {};
+	  auto PCSStitchBuffer = std::vector<PCS_STITCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
 	  auto const spColors = gsl::make_span(PCSHeader.colors);
 	  std::copy(UserColor.begin(), UserColor.end(), spColors.begin());
@@ -90,12 +90,12 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<fPOINTATTR>& saveStitches
 		for (auto& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol      = stitch.attribute & COLMSK;
-			auto colRec = PCSTCH {};
+			auto colRec = PCS_STITCH {};
 			colRec.tag  = 3;
 			wrap::narrow(colRec.fx, savcol);
 			PCSStitchBuffer.push_back(colRec);
 		  }
-		  auto stitchRec      = PCSTCH {};
+		  auto stitchRec      = PCS_STITCH {};
 		  auto integerPart    = 0.0F;
 		  auto fractionalPart = std::modf(stitch.x, &integerPart);
 		  stitchRec.fx        = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
@@ -149,8 +149,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  auto const spColors = gsl::make_span(PCSHeader.colors);
 		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
-		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCSTCH));
-		  auto       PCSDataBuffer  = std::vector<PCSTCH> {};
+		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
+		  auto       PCSDataBuffer  = std::vector<PCS_STITCH> {};
 		  PCSDataBuffer.resize(pcsStitchCount);
 		  ReadFile(fileHandle, PCSDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
@@ -168,7 +168,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 				color = NOTFRM | stitch.fx;
 			  }
 			  else {
-				StitchBuffer->push_back(fPOINTATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+				StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
 				                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
 				                                    color});
 				++iStitch;
@@ -185,7 +185,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			if (PCSHeader.hoopType != LARGHUP && PCSHeader.hoopType != SMALHUP) {
 			  PCSHeader.hoopType = LARGHUP;
 			}
-			auto stitchRect = fRECTANGLE {};
+			auto stitchRect = F_RECTANGLE {};
 			thred::sizstch(stitchRect, *StitchBuffer);
 			if (stitchRect.left < 0 || stitchRect.right > LHUPY || stitchRect.bottom < 0 ||
 			    stitchRect.top > LHUPY) {
@@ -223,8 +223,8 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
   return false;
 }
 
-auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
-  auto boundingRect = fRECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
+auto PCS::internal::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
+  auto boundingRect = F_RECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
   for (auto const& stitch : stitches) {
 	if (stitch.x < boundingRect.left) {
 	  boundingRect.left = stitch.x;
@@ -239,7 +239,7 @@ auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
 	  boundingRect.top = stitch.y;
 	}
   }
-  fPOINT const boundingSize = {boundingRect.right - boundingRect.left,
+  F_POINT const boundingSize = {boundingRect.right - boundingRect.left,
                                boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L);
@@ -251,7 +251,7 @@ auto PCS::internal::pcshup(std::vector<fPOINTATTR>& stitches) -> bool {
   auto const hoopSize = largeFlag ? largeHoop : smallHoop;
 #pragma warning(suppress : 26812) // enum type is unscoped
   PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP;
-  auto delta         = fPOINT {};
+  auto delta         = F_POINT {};
   if (boundingRect.right > hoopSize.x) {
 	delta.x = hoopSize.x - boundingRect.right;
   }
@@ -279,7 +279,7 @@ auto PCS::isPCS(fs::path const& path) -> bool {
   return (extention.compare(0, 4, L".pcs") == 0);
 }
 
-auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool {
+auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
   auto retflag = false;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle =
@@ -297,8 +297,8 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 	  auto fileSize = uintmax_t {};
 	  thred::getFileSize(insertedFile, fileSize);
 	  fileSize -= sizeof(pcsFileHeader) + 14;
-	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCSTCH));
-	  auto       pcsStitchBuffer = std::vector<PCSTCH> {};
+	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
+	  auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
 	  pcsStitchBuffer.resize(pcsStitchCount);
 	  ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
 	  if (bytesRead == fileSize) {
@@ -312,7 +312,7 @@ auto PCS::insPCS(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) ->
 		  }
 		  else {
 			(*StitchBuffer)
-			    .emplace_back(fPOINTATTR {wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
+			    .emplace_back(F_POINT_ATTR {wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
 			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
 			                              wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
 			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,

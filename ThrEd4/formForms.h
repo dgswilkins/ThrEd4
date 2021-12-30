@@ -41,10 +41,10 @@ namespace internal {
   auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
   void nxtlin(uint32_t& formMenuEntryCount) noexcept;
   void nxtlinprf() noexcept;
-  void prflin(std::wstring const& msg, LSTTYPE const& row);
+  void prflin(std::wstring const& msg, LIST_TYPE const& row);
   auto prfnwin(std::wstring const& text) noexcept -> HWND;
   void prftwin(std::wstring const& text) noexcept;
-  void refrmfn(FRMHED const& form, uint32_t& formMenuEntryCount);
+  void refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryCount);
 
   auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 

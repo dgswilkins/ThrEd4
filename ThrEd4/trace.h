@@ -42,7 +42,7 @@ namespace internal {
   void dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
   auto ducolm() -> uint32_t;
   void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
-  void dutdif(TRCPNT& traceDiff, TRCPNT const* point);
+  void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
   void dutrac();
   void dutrnum0(uint32_t color);
   void hidwnd(HWND hwnd) noexcept;
@@ -51,7 +51,7 @@ namespace internal {
   void shownd(HWND hwnd) noexcept;
   void showTraceWin() noexcept;
   void tracwnd();
-  auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRCPNT>& tracedPoints) -> bool;
+  auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
   auto trcin(COLORREF color) -> bool;
   void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
   void trcols(COLORREF color) noexcept;

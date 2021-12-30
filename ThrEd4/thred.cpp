@@ -113,9 +113,9 @@ static auto NameOrder        = std::array<uint32_t, DNLEN> {}; // designer name 
 static auto NameEncoder      = std::array<uint8_t, DNELEN> {}; // designer name encoding
 static auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
 static auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-static auto SelectedFormsRange = FRMRANGE {}; // range of selected forms
+static auto SelectedFormsRange = FORM_RANGE {}; // range of selected forms
 static auto ZoomMin            = float {};    // minimum allowed zoom value
-static auto BalaradOffset      = fPOINT {};   // balarad offset
+static auto BalaradOffset      = F_POINT {};   // balarad offset
 static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
@@ -187,7 +187,7 @@ static auto MoveAnchor       = uint32_t {}; // for resequencing stitches
 static auto RotateAngle      = float {};    // angle for pixel rotate
 static auto PickColorMsgSize = SIZE {};     // size of the pick color message
 static auto InsertSize       = SIZE {};     // size of file insert window
-static auto InsertCenter     = fPOINT {};   // center point in inserted file
+static auto InsertCenter     = F_POINT {};   // center point in inserted file
 static auto NumericCode      = wchar_t {};  // keyboard numerical input
 static auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indices of knot stitches
 
@@ -245,7 +245,7 @@ static auto RotateBoxCrossVertLine = std::array<POINT, LNPNTS> {}; // vertical p
 static auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal part of the rotate cross
 static auto RotateBoxToCursorLine =
     std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
-static auto ColorChangeTable = gsl::narrow_cast<std::vector<COLCHNG>*>(nullptr);
+static auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
 
 auto CALLBACK thred::internal::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
@@ -564,7 +564,7 @@ void thred::internal::redfnam(std::wstring& designerName) {
 auto thred::adflt(uint32_t count) -> uint32_t {
   auto const startVertex = wrap::toUnsigned(FormVertices->size());
   auto const it          = FormVertices->end();
-  auto constexpr val     = fPOINT {};
+  auto constexpr val     = F_POINT {};
   FormVertices->insert(it, count, val);
   return startVertex;
 }
@@ -572,7 +572,7 @@ auto thred::adflt(uint32_t count) -> uint32_t {
 auto thred::adclp(uint32_t count) -> uint32_t {
   auto const iClipPoint = wrap::toUnsigned(ClipPoints->size());
   auto const it         = ClipPoints->end();
-  auto constexpr val    = fPOINT {};
+  auto constexpr val    = F_POINT {};
   ClipPoints->insert(it, count, val);
   return iClipPoint;
 }
@@ -607,12 +607,12 @@ auto thred::internal::unthrsh(wchar_t level) noexcept -> float {
   return zoom;
 }
 
-void thred::ritfcor(fPOINT const& point) {
+void thred::ritfcor(F_POINT const& point) {
   displayText::butxt(HCOR, fmt::format(L"x{:.0f} y{:.0f}", (point.x * IPFGRAN), (point.y * IPFGRAN)));
 }
 
-void thred::internal::ritcor(fPOINTATTR const& pointAttribute) {
-  auto const point = fPOINT {pointAttribute.x, pointAttribute.y};
+void thred::internal::ritcor(F_POINT_ATTR const& pointAttribute) {
+  auto const point = F_POINT {pointAttribute.x, pointAttribute.y};
   thred::ritfcor(point);
 }
 
@@ -646,7 +646,7 @@ void thred::resetColorChanges() noexcept {
 }
 
 void thred::addColor(uint32_t stitch, uint32_t color) {
-  ColorChangeTable->push_back(COLCHNG {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
+  ColorChangeTable->push_back(COL_CHANGE {gsl::narrow<decltype(ColorChangeTable->back().stitchIndex)>(stitch),
                                        gsl::narrow<decltype(ColorChangeTable->back().colorIndex)>(color)});
 }
 
@@ -673,7 +673,7 @@ void thred::coltab() {
 	  auto iColor      = 0U;
 	  auto iStitch     = 0U;
 	  currentColor     = std::numeric_limits<decltype(currentColor)>::max();
-	  auto const range = fRECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
+	  auto const range = F_RECTANGLE {wrap::toFloat(UnzoomedRect.cx) * -1.0F,
 	                                 wrap::toFloat(UnzoomedRect.cy) * 2.0F,
 	                                 wrap::toFloat(UnzoomedRect.cx) * 2.0F,
 	                                 wrap::toFloat(UnzoomedRect.cy) * -1.0F};
@@ -739,47 +739,47 @@ void thred::internal::dudat() {
   auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
-                    wrap::toUnsigned(sizeof(BAKHED)) + wrap::toUnsigned(sizeof(UserColor));
+                    wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
   undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT(modernize-avoid-c-arrays)
-  auto* backupData                 = convert_ptr<BAKHED*>(undoBuffer[UndoBufferWriteIndex].get());
+  auto* backupData                 = convertFromPtr<BACK_HEAD*>(undoBuffer[UndoBufferWriteIndex].get());
   if (backupData != nullptr) {
 	backupData->zoomRect  = UnzoomedRect;
 	backupData->formCount = formCount;
-	backupData->forms     = convert_ptr<FRMHED*>(&backupData[1]);
+	backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
 	if (formCount != 0) {
 	  auto const spForms = gsl::make_span(backupData->forms, formList.size());
 	  std::copy(formList.cbegin(), formList.cend(), spForms.begin());
 	}
 	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
-	backupData->stitches    = convert_ptr<fPOINTATTR*>(&backupData->forms[formCount]);
+	backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
 	if (!StitchBuffer->empty()) {
 	  auto const spStitches = gsl::make_span(backupData->stitches, StitchBuffer->size());
 	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
 	}
 	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
-	backupData->vertices    = convert_ptr<fPOINT*>(&backupData->stitches[StitchBuffer->size()]);
+	backupData->vertices    = convertFromPtr<F_POINT*>(&backupData->stitches[StitchBuffer->size()]);
 	if (!FormVertices->empty()) {
 	  auto const spVertices = gsl::make_span(backupData->vertices, FormVertices->size());
 	  std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
 	}
 	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
-	backupData->guide      = convert_ptr<SATCON*>(&backupData->vertices[FormVertices->size()]);
+	backupData->guide      = convertFromPtr<SAT_CON*>(&backupData->vertices[FormVertices->size()]);
 	if (!SatinGuides->empty()) {
 	  auto const spGuides = gsl::make_span(backupData->guide, backupData->guideCount);
 	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
 	}
 	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
-	backupData->clipPoints     = convert_ptr<fPOINT*>(&backupData->guide[SatinGuides->size()]);
+	backupData->clipPoints     = convertFromPtr<F_POINT*>(&backupData->guide[SatinGuides->size()]);
 	if (!ClipPoints->empty()) {
 	  auto const spClipPoints = gsl::make_span(backupData->clipPoints, backupData->clipPointCount);
 	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
 	}
-	backupData->colors = convert_ptr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
+	backupData->colors = convertFromPtr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
 	{
 	  auto const spColors = gsl::make_span(backupData->colors, COLORCNT);
 	  std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
 	}
-	backupData->texturePoints     = convert_ptr<TXPNT*>(&backupData->colors[COLORCNT]);
+	backupData->texturePoints     = convertFromPtr<TX_PNT*>(&backupData->colors[COLORCNT]);
 	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
 	if (!TexturePointsBuffer->empty()) {
 	  auto const spTexturePoints = gsl::make_span(backupData->texturePoints, backupData->texturePointCount);
@@ -1107,7 +1107,7 @@ auto thred::internal::pxchk(float pixelSize) -> uint16_t {
   return wrap::round<uint16_t>(pixelSize);
 }
 
-void thred::sizstch(fRECTANGLE& rectangle, std::vector<fPOINTATTR> const& stitches) noexcept {
+void thred::sizstch(F_RECTANGLE& rectangle, std::vector<F_POINT_ATTR> const& stitches) noexcept {
   if (!stitches.empty()) {
 	rectangle.bottom = rectangle.top = stitches[0].y;
 	rectangle.left = rectangle.right = stitches[0].x;
@@ -1154,11 +1154,11 @@ void thred::internal::zRctAdj() noexcept {
   }
 }
 
-void thred::shft(fPOINT const& delta) noexcept {
+void thred::shft(F_POINT const& delta) noexcept {
   auto const halfZoomRect =
-      fPOINT {((ZoomRect.right - ZoomRect.left) * 0.5F), ((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
-  auto const center = fPOINT {(ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y)};
-  auto const shift  = fPOINT {(center.x - delta.x), (center.y - delta.y)};
+      F_POINT {((ZoomRect.right - ZoomRect.left) * 0.5F), ((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
+  auto const center = F_POINT {(ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y)};
+  auto const shift  = F_POINT {(center.x - delta.x), (center.y - delta.y)};
   ZoomRect.bottom -= shift.y;
   ZoomRect.top -= shift.y;
   ZoomRect.left -= shift.x;
@@ -1178,7 +1178,7 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
 
 void thred::internal::shft2box() {
   auto const current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
-  auto const stitchPoint = fPOINT {current->x, current->y};
+  auto const stitchPoint = F_POINT {current->x, current->y};
   thred::shft(stitchPoint);
   stch2px1(ClosestPointIndex);
 }
@@ -1259,7 +1259,7 @@ void thred::internal::movins() {
 }
 
 void thred::zumhom() {
-  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
+  ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
   thred::movStch();
@@ -1277,7 +1277,7 @@ void thred::zumhom() {
 }
 
 void thred::hupfn() {
-  auto checkHoopRect = fRECTANGLE {}; // for checking the hoop size
+  auto checkHoopRect = F_RECTANGLE {}; // for checking the hoop size
   StateMap->reset(StateFlag::HUPCHNG);
   sizstch(checkHoopRect, *StitchBuffer);
   if (!FormList->empty()) {
@@ -1310,7 +1310,7 @@ void thred::hupfn() {
 	}
 	if (StateMap->test(StateFlag::HUPEX)) {
 	  auto const hoopSize =
-	      fPOINT {checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom};
+	      F_POINT {checkHoopRect.right - checkHoopRect.left, checkHoopRect.top - checkHoopRect.bottom};
 	  if (hoopSize.x > IniFile.hoopSizeX) {
 		IniFile.hoopSizeX = hoopSize.x;
 		StateMap->set(StateFlag::HUPCHNG);
@@ -1320,9 +1320,9 @@ void thred::hupfn() {
 		StateMap->set(StateFlag::HUPCHNG);
 	  }
 	  auto const designCenter =
-	      fPOINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
-	  auto const hoopCenter = fPOINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
-	  auto const delta      = fPOINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
+	      F_POINT {hoopSize.x * 0.5F + checkHoopRect.left, hoopSize.y * 0.5F + checkHoopRect.bottom};
+	  auto const hoopCenter = F_POINT {IniFile.hoopSizeX * 0.5F, IniFile.hoopSizeY * 0.5F};
+	  auto const delta      = F_POINT {hoopCenter.x - designCenter.x, hoopCenter.y - designCenter.y};
 	  for (auto& stitch : *StitchBuffer) {
 		stitch.x += delta.x;
 		stitch.y += delta.y;
@@ -2322,7 +2322,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
 		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
 		  if ((stitch.attribute & KNOTMSK) == 0U) { // is this a knot?
-			auto const delta = fPOINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
+			auto const delta = F_POINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
 			stitchSize       = hypot(delta.x, delta.y);
 			if (stitchSize > SmallStitchLength) {
 			  ++iPrevStitch;
@@ -2356,7 +2356,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 			++iOutputStitch;
 		  }
 		  else {
-			auto const delta = fPOINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
+			auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
 			stitchSize       = hypot(delta.x, delta.y);
 			if (stitchSize > SmallStitchLength) {
 			  outStitch = stitch;
@@ -2392,7 +2392,7 @@ void thred::internal::delsmal(uint32_t startStitch, uint32_t endStitch) {
 		StitchBuffer->operator[](iNextStitch++) = stitch;
 	  }
 	  else {
-		auto const delta = fPOINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
+		auto const delta = F_POINT {stitch.x - prevPoint.x, stitch.y - prevPoint.y};
 		stitchSize       = hypot(delta.x, delta.y);
 		if (stitchSize > SmallStitchLength) {
 		  StitchBuffer->operator[](iNextStitch++) = stitch;
@@ -2561,7 +2561,7 @@ void thred::internal::ducros(HDC dc) {
   selin(GroupStartStitch, GroupEndStitch, dc);
 }
 
-void thred::selRct(fRECTANGLE& sourceRect) {
+void thred::selRct(F_RECTANGLE& sourceRect) {
   if (!StitchBuffer->empty()) {
 	auto stitch     = wrap::next(StitchBuffer->begin(), GroupStartStitch);
 	sourceRect.left = sourceRect.right = stitch->x;
@@ -2610,7 +2610,7 @@ void thred::internal::unsel() {
 }
 
 void thred::internal::nuselrct() {
-  auto outline = std::vector<fPOINT> {};
+  auto outline = std::vector<F_POINT> {};
   outline.resize(FormControlPoints->size());
   unsel();
   outline[0].x = outline[6].x = outline[7].x = outline[8].x = StitchRangeRect.left;
@@ -2637,14 +2637,14 @@ void thred::grpAdj() {
   if (StateMap->test(StateFlag::ZUMED) && GroupEndStitch != GroupStartStitch) {
 	if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1 ||
 	    StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
-	  auto newSize = fPOINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
+	  auto newSize = F_POINT {std::round(StitchRangeRect.right - StitchRangeRect.left),
 	                         std::round(StitchRangeRect.top - StitchRangeRect.bottom)};
 	  if (newSize.x < MINZUM) {
 		if (newSize.x < 1.0F) {
 		  newSize.x = 1.0F;
 		}
 		auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
-		newSize               = fPOINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
+		newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
 	  }
 	  if (newSize.x > newSize.y) {
 		auto coordinate = newSize.x * ZMARGIN;
@@ -2671,7 +2671,7 @@ void thred::grpAdj() {
 		ZoomFactor     = newSize.x / wrap::toFloat(UnzoomedRect.cx);
 		ZoomRect.top   = ZoomRect.bottom + newSize.y;
 		auto const stitchPoint =
-		    fPOINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
+		    F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
 		            ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
 		thred::shft(stitchPoint);
 	  }
@@ -2704,7 +2704,7 @@ void thred::internal::lensadj() {
   if (StitchRangeRect.top > ZoomRect.top - 1 || StitchRangeRect.bottom < ZoomRect.bottom - 1 ||
       StitchRangeRect.left < ZoomRect.left + 1 || StitchRangeRect.right > ZoomRect.right - 1) {
 	auto const stitchPoint =
-	    fPOINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
+	    F_POINT {((StitchRangeRect.right - StitchRangeRect.left) / 2) + StitchRangeRect.left,
 	            ((StitchRangeRect.top - StitchRangeRect.bottom) / 2) + StitchRangeRect.bottom};
 	thred::shft(stitchPoint);
   }
@@ -2819,7 +2819,7 @@ auto thred::internal::stch2px2(uint32_t iStitch) -> bool {
          stitchCoordsInPixels.y >= 0 && stitchCoordsInPixels.y <= StitchWindowClientRect.bottom;
 }
 
-auto thred::stch2pxr(fPOINT const& stitchCoordinate) -> POINT {
+auto thred::stch2pxr(F_POINT const& stitchCoordinate) -> POINT {
   return POINT {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
                 wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                     (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y)};
@@ -2933,8 +2933,8 @@ auto thred::internal::savcmp() noexcept -> bool {
 #endif
 }
 
-void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
-  balaradStitch.push_back(BALSTCH {code,
+void thred::internal::thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag) {
+  balaradStitch.push_back(BAL_STITCH {code,
                                    flag,
                                    (StitchBuffer->operator[](source).x - BalaradOffset.x) * BALRATIO,
                                    (StitchBuffer->operator[](source).y - BalaradOffset.y) * BALRATIO});
@@ -2943,7 +2943,7 @@ void thred::internal::thr2bal(std::vector<BALSTCH>& balaradStitch, uint32_t sour
 void thred::internal::redbal() {
   auto fileSize = uintmax_t {};
   if (getFileSize(*BalaradName2, fileSize)) {
-	auto balaradHeader = BALHED {};
+	auto balaradHeader = BAL_HEAD {};
 	StitchBuffer->clear();
 	FormList->clear();
 	// NOLINTNEXTLINE(readability-qualified-auto)
@@ -2954,7 +2954,7 @@ void thred::internal::redbal() {
 	  auto bytesRead = DWORD {};
 	  ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(balaradHeader)) {
-		auto       balaradStitch = std::vector<BALSTCH> {};
+		auto       balaradStitch = std::vector<BAL_STITCH> {};
 		auto const newSize = (fileSize - sizeof(balaradHeader)) / wrap::sizeofType(balaradStitch);
 		balaradStitch.resize(gsl::narrow<size_t>(newSize));
 		ReadFile(balaradFile, balaradStitch.data(), gsl::narrow<DWORD>(fileSize - sizeof(balaradHeader)), &bytesRead, nullptr);
@@ -2981,7 +2981,7 @@ void thred::internal::redbal() {
 		for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 		  switch (balaradStitch[iStitch].code) {
 			case BALNORM: {
-			  StitchBuffer->push_back(fPOINTATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
+			  StitchBuffer->push_back(F_POINT_ATTR {balaradStitch[iStitch].x * IBALRAT + BalaradOffset.x,
 			                                      balaradStitch[iStitch].y * IBALRAT + BalaradOffset.y,
 			                                      color});
 			  break;
@@ -3017,7 +3017,7 @@ void thred::internal::redbal() {
 }
 
 void thred::internal::ritbal() {
-  auto balaradHeader = BALHED {};
+  auto balaradHeader = BAL_HEAD {};
   if (!BalaradName0->empty() && !BalaradName1->empty() && (!StitchBuffer->empty())) {
 	auto outputName = (WorkingFileName->empty()) ? (*DefaultDirectory / L"balfil.thr") : *WorkingFileName;
 	outputName.replace_extension(L".thv");
@@ -3051,7 +3051,7 @@ void thred::internal::ritbal() {
 	WriteFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesWritten, nullptr);
 	BalaradOffset.x    = IniFile.hoopSizeX * 0.5F;
 	BalaradOffset.y    = IniFile.hoopSizeY * 0.5F;
-	auto balaradStitch = std::vector<BALSTCH> {};
+	auto balaradStitch = std::vector<BAL_STITCH> {};
 	balaradStitch.reserve(StitchBuffer->size() + 2U);
 	color        = StitchBuffer->front().attribute & COLMSK;
 	auto iOutput = 0U;
@@ -3146,7 +3146,7 @@ void thred::internal::durit(std::vector<char>& destination, const void* source, 
 }
 
 void thred::internal::dubuf(std::vector<char>& buffer) {
-  auto stitchHeader  = STRHED {};
+  auto stitchHeader  = THR_HEAD {};
   auto vertexCount   = 0U;
   auto guideCount    = 0U;
   auto clipDataCount = 0U;
@@ -3214,13 +3214,13 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   }
   durit(buffer, threadSizeBuffer.c_str(), wrap::toUnsigned(threadSizeBuffer.size() * sizeof(threadSizeBuffer[0])));
   if (!FormList->empty()) {
-	auto outForms = std::vector<FRMHEDOUT> {};
+	auto outForms = std::vector<FRM_HEAD_OUT> {};
 	outForms.reserve(FormList->size());
-	auto vertices = std::vector<fPOINT> {};
+	auto vertices = std::vector<F_POINT> {};
 	vertices.reserve(vertexCount);
-	auto guides = std::vector<SATCONOUT> {};
+	auto guides = std::vector<SAT_CON_OUT> {};
 	guides.reserve(guideCount);
-	auto points = std::vector<fPOINT> {};
+	auto points = std::vector<F_POINT> {};
 	points.reserve(clipDataCount);
 	for (auto& srcForm : (*FormList)) {
 	  outForms.emplace_back(srcForm);
@@ -3361,12 +3361,12 @@ void thred::internal::sav() {
   }
   chk1col();
   thred::coltab();
-  auto saveStitches = std::vector<fPOINTATTR> {};
+  auto saveStitches = std::vector<F_POINT_ATTR> {};
   saveStitches.resize(StitchBuffer->size());
   if (UserFlagMap->test(UserFlag::ROTAUX)) {
 	auto iDest = saveStitches.begin();
 	for (auto const& stitch : *StitchBuffer) {
-	  *iDest++ = fPOINTATTR {stitch.y, stitch.x, stitch.attribute};
+	  *iDest++ = F_POINT_ATTR {stitch.y, stitch.x, stitch.attribute};
 	}
   }
   else {
@@ -3612,7 +3612,7 @@ void thred::internal::dun() {
   }
 }
 
-void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
+void thred::internal::dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize) {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   SideWindow->operator[](entry.value) = CreateWindow(L"STATIC",
                                                      displayText::loadStr(entry.stringID).c_str(),
@@ -3628,7 +3628,7 @@ void thred::internal::dusid(LSTTYPE entry, int32_t& windowLocation, SIZE const& 
   ++windowLocation;
 }
 
-void thred::internal::sidmsg(FRMHED const& form, HWND window) {
+void thred::internal::sidmsg(FRM_HEAD const& form, HWND window) {
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
   std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
@@ -3765,10 +3765,10 @@ void thred::internal::sidmsg(FRMHED const& form, HWND window) {
   StateMap->set(StateFlag::SIDACT);
 }
 
-auto thred::internal::centr() noexcept -> fPOINT {
+auto thred::internal::centr() noexcept -> F_POINT {
   auto const center = POINT {std::lround((ZoomRect.right - ZoomRect.left) * 0.5F),
                              std::lround((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
-  return fPOINT {ZoomRect.left + wrap::toFloat(center.x), ZoomRect.bottom + wrap::toFloat(center.y)};
+  return F_POINT {ZoomRect.left + wrap::toFloat(center.x), ZoomRect.bottom + wrap::toFloat(center.y)};
 }
 
 void thred::internal::stchWnd() {
@@ -3851,7 +3851,7 @@ void thred::internal::delstch1(uint32_t iStitch) {
 }
 
 void thred::internal::redbak() {
-  auto const* undoData = convert_ptr<BAKHED*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
+  auto const* undoData = convertFromPtr<BACK_HEAD*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
   if (undoData != nullptr) {
 	StitchBuffer->clear();
 	if (undoData->stitchCount != 0U) {
@@ -3882,7 +3882,7 @@ void thred::internal::redbak() {
 	  auto const span = gsl::make_span(undoData->clipPoints, undoData->clipPointCount);
 	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
 	}
-	// ToDo - add field in BAKHED to keep track of number of colors
+	// ToDo - add field in BACK_HEAD to keep track of number of colors
 	constexpr auto UCOLSIZE = UserColor.size();
 	auto const spUndoColors = gsl::make_span(undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE));
 	auto const spUserColors = gsl::make_span(UserColor);
@@ -4126,7 +4126,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	return false;
   }
   auto bytesRead   = DWORD {};
-  auto thredHeader = STRHED {};
+  auto thredHeader = THR_HEAD {};
   ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr);
   if ((thredHeader.headerType & SIGMASK) == THREDSIG) {
 	if (bytesRead != sizeof(thredHeader)) {
@@ -4173,7 +4173,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		return false;
 	  }
 	}
-	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+	ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	StitchBuffer->resize(thredHeader.stitchCount);
 	if (thredHeader.stitchCount != 0U) {
@@ -4228,7 +4228,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	if (thredHeader.formCount != 0) {
 	  StateMap->reset(StateFlag::BADFIL);
 	  if (version < 2) {
-		auto formListOriginal = std::vector<FRMHEDO> {};
+		auto formListOriginal = std::vector<FRM_HEAD_O> {};
 		formListOriginal.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
 		wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
@@ -4241,7 +4241,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		FormList->insert(FormList->end(), formListOriginal.begin(), formListOriginal.end());
 	  }
 	  else {
-		auto inFormList = std::vector<FRMHEDOUT> {};
+		auto inFormList = std::vector<FRM_HEAD_OUT> {};
 		inFormList.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
 		wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
@@ -4270,7 +4270,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  }
 	  FormVertices->shrink_to_fit();
 	  if (thredHeader.dlineCount != 0U) {
-		auto inGuideList = std::vector<SATCONOUT>(thredHeader.dlineCount);
+		auto inGuideList = std::vector<SAT_CON_OUT>(thredHeader.dlineCount);
 		bytesToRead      = thredHeader.dlineCount * wrap::sizeofType(inGuideList);
 		ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr);
 		if (bytesRead != bytesToRead) {
@@ -4445,7 +4445,7 @@ void thred::internal::nuFil(fileIndices fileIndex) {
 	  bitmap::assignUBFilename(*DefaultDirectory);
 	}
 	thred::ritot(wrap::toUnsigned(StitchBuffer->size()));
-	ZoomRect     = fRECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
+	ZoomRect     = F_RECTANGLE {0.0F, IniFile.hoopSizeY, IniFile.hoopSizeX, 0.0F};
 	UnzoomedRect = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	thred::movStch();
 	thred::coltab();
@@ -4525,12 +4525,12 @@ auto thred::internal::nuBak() noexcept -> BOOL {
   return ChooseColor(&BackgroundColorStruct);
 }
 
-auto thred::pxCor2stch(POINT const& point) noexcept -> fPOINT {
+auto thred::pxCor2stch(POINT const& point) noexcept -> F_POINT {
   auto const ratioX =
       wrap::toFloat(point.x - StitchWindowAbsRect.left) / wrap::toFloat(StitchWindowClientRect.right);
   auto const ratioY =
       wrap::toFloat(StitchWindowAbsRect.bottom - point.y) / wrap::toFloat(StitchWindowClientRect.bottom);
-  return fPOINT {ratioX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
+  return F_POINT {ratioX * (ZoomRect.right - ZoomRect.left) + ZoomRect.left,
                  ratioY * (ZoomRect.top - ZoomRect.bottom) + ZoomRect.bottom};
 }
 
@@ -4559,7 +4559,7 @@ void thred::internal::zumin() {
 	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
 
-		stitchPoint = fPOINT {wrap::midl(boundingRect.right, boundingRect.left),
+		stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                      wrap::midl(boundingRect.top, boundingRect.bottom)};
 		break;
 	  }
@@ -4575,9 +4575,9 @@ void thred::internal::zumin() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::GRPSEL)) {
-		auto groupBoundingRect = fRECTANGLE {};
+		auto groupBoundingRect = F_RECTANGLE {};
 		thred::selRct(groupBoundingRect);
-		stitchPoint = fPOINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
+		stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                      wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
 	  }
@@ -4592,7 +4592,7 @@ void thred::internal::zumin() {
 		}
 		else {
 		  stitchPoint =
-		      fPOINT {wrap::midl(StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).x,
+		      F_POINT {wrap::midl(StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).x,
 		                         StitchBuffer->operator[](ClosestPointIndex).x),
 		              wrap::midl(StitchBuffer->operator[](wrap::toSize(ClosestPointIndex) + 1U).y,
 		                         StitchBuffer->operator[](ClosestPointIndex).y)};
@@ -4622,7 +4622,7 @@ void thred::internal::zumin() {
 			SelectedFormsRect.right = std::lround(rect.right);
 		  }
 		}
-		stitchPoint = fPOINT {wrap::midl(SelectedFormsRect.right, SelectedFormsRect.left),
+		stitchPoint = F_POINT {wrap::midl(SelectedFormsRect.right, SelectedFormsRect.left),
 		                      wrap::midl(SelectedFormsRect.top, SelectedFormsRect.bottom)};
 		break;
 	  }
@@ -4632,7 +4632,7 @@ void thred::internal::zumin() {
 	} while (false);
   }
   auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
-  ZoomRect             = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
+  ZoomRect             = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
   thred::shft(stitchPoint);
   NearestCount = 0;
   if (!StateMap->test(StateFlag::GMRK) && StateMap->test(StateFlag::SELBOX)) {
@@ -4676,7 +4676,7 @@ void thred::internal::zumout() {
 	  if (StateMap->test(StateFlag::FORMSEL)) {
 		auto const& boundingRect = FormList->operator[](ClosestFormToCursor).rectangle;
 
-		stitchPoint = fPOINT {wrap::midl(boundingRect.right, boundingRect.left),
+		stitchPoint = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
 		                      wrap::midl(boundingRect.top, boundingRect.bottom)};
 		break;
 	  }
@@ -4692,9 +4692,9 @@ void thred::internal::zumout() {
 		break;
 	  }
 	  if (StateMap->test(StateFlag::GRPSEL)) {
-		auto groupBoundingRect = fRECTANGLE {};
+		auto groupBoundingRect = F_RECTANGLE {};
 		thred::selRct(groupBoundingRect);
-		stitchPoint = fPOINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
+		stitchPoint = F_POINT {wrap::midl(groupBoundingRect.right, groupBoundingRect.left),
 		                      wrap::midl(groupBoundingRect.top, groupBoundingRect.bottom)};
 		break;
 	  }
@@ -4711,13 +4711,13 @@ void thred::internal::zumout() {
 	if (ZoomFactor > ZMCLAMP) {
 	  ZoomFactor = 1;
 	  StateMap->reset(StateFlag::ZUMED);
-	  ZoomRect = fRECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
+	  ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
 	  thred::movStch();
 	  NearestCount = 0;
 	}
 	else {
 	  auto const zoomRight = wrap::toFloat(UnzoomedRect.cx) * ZoomFactor;
-	  ZoomRect = fRECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
+	  ZoomRect = F_RECTANGLE {0.0F, zoomRight / StitchWindowAspectRatio, zoomRight, 0.0F};
 	  thred::shft(stitchPoint);
 	}
 	if (StateMap->test(StateFlag::RUNPAT)) {
@@ -4732,7 +4732,7 @@ void thred::internal::zumout() {
 
 void thred::internal::duClos(uint32_t            startStitch,
                              uint32_t            stitchCount,
-                             fPOINT const&       stitchPoint,
+                             F_POINT const&       stitchPoint,
                              std::vector<float>& gapToNearest) {
   auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
@@ -4880,7 +4880,7 @@ auto thred::internal::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
 
 auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
   auto const formFirstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](fPOINTATTR const& m) -> bool {
+      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](F_POINT_ATTR const& m) -> bool {
 	    if ((m.attribute & NOTFRM) != 0U) {
 	      return false;
 	    }
@@ -4894,7 +4894,7 @@ auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitc
 
 auto thred::findLastStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
   auto const formFirstStitch =
-      std::find_if(StitchBuffer->rbegin(), StitchBuffer->rend(), [form](fPOINTATTR const& m) -> bool {
+      std::find_if(StitchBuffer->rbegin(), StitchBuffer->rend(), [form](F_POINT_ATTR const& m) -> bool {
 	    if ((m.attribute & NOTFRM) != 0U) {
 	      return false;
 	    }
@@ -5111,7 +5111,7 @@ auto thred::internal::closlin() -> uint32_t {
 		  if (offsetX > left && offsetX < right && offsetY > bottom && offsetY < top) {
 			// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 			auto tsum         = 0.0F;
-			auto intersection = fPOINT {};
+			auto intersection = F_POINT {};
 			auto dx           = 0.0F;
 			auto dy           = 0.0F;
 			do {
@@ -5143,7 +5143,7 @@ auto thred::internal::closlin() -> uint32_t {
 				offset           = stitches[iStitch].x + slope * stitches[iStitch].y;
 				auto const poff  = offsetX - offsetY / slope;
 
-				intersection = fPOINT {offset - slope * intersection.y,
+				intersection = F_POINT {offset - slope * intersection.y,
 				                       slope * (offset - poff) / (slope * slope + 1.0F)};
 				dx           = intersection.x - offsetX;
 				dy           = intersection.y - offsetY;
@@ -5415,13 +5415,13 @@ void thred::internal::clpbox() {
 }
 
 void thred::internal::lodclp(uint32_t iStitch) {
-  StitchBuffer->insert(wrap::next(StitchBuffer->begin(), iStitch), ClipBuffer->size(), fPOINTATTR {});
+  StitchBuffer->insert(wrap::next(StitchBuffer->begin(), iStitch), ClipBuffer->size(), F_POINT_ATTR {});
   ClosestPointIndex  = iStitch;
   auto const originX = wrap::toFloat(ClipOrigin.x);
   auto const originY = wrap::toFloat(ClipOrigin.y);
   for (auto& clip : *ClipBuffer) {
 	StitchBuffer->operator[](iStitch++) =
-	    fPOINTATTR {clip.x + originX,
+	    F_POINT_ATTR {clip.x + originX,
 	                clip.y + originY,
 	                (clip.attribute & COLMSK) | gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT) | NOTFRM};
   }
@@ -5505,13 +5505,13 @@ void thred::internal::stchbox(uint32_t iStitch, HDC dc) {
   }
 }
 
-void thred::sCor2px(fPOINT const& stitchCoordinate, POINT& pixelCoordinate) {
+void thred::sCor2px(F_POINT const& stitchCoordinate, POINT& pixelCoordinate) {
   pixelCoordinate = {wrap::ceil<int32_t>((stitchCoordinate.x - ZoomRect.left) * ZoomRatio.x),
                      wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) +
                                          (ZoomRect.bottom - stitchCoordinate.y) * ZoomRatio.y)};
 }
 
-auto thred::internal::sdCor2px(fPOINTATTR const& stitchPoint) -> POINT {
+auto thred::internal::sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT {
   return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
                 wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) +
                                     (ZoomRect.bottom - stitchPoint.y) * ZoomRatio.y)};
@@ -5548,8 +5548,8 @@ void thred::internal::unrotu() {
   }
 }
 
-auto thred::rotangf(fPOINT const& unrotatedPoint, float const rotationAngle, fPOINT const& rotationCenter) noexcept
-    -> fPOINT {
+auto thred::rotangf(F_POINT const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
+    -> F_POINT {
   auto const dx               = unrotatedPoint.x - rotationCenter.x;
   auto const dy               = unrotatedPoint.y - rotationCenter.y;
   auto const distanceToCenter = (dx != 0.0F) ? hypot(dx, dy) : std::abs(dy);
@@ -5565,37 +5565,37 @@ auto thred::rotangf(fPOINT const& unrotatedPoint, float const rotationAngle, fPO
 	  newAngle -= PI_FHALF;
 	}
   }
-  return fPOINT {rotationCenter.x + distanceToCenter * cos(newAngle),
+  return F_POINT {rotationCenter.x + distanceToCenter * cos(newAngle),
                  rotationCenter.y + distanceToCenter * sin(newAngle)};
 }
 
-void thred::internal::rotang(fPOINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, fPOINT const& rotationCenter) {
+void thred::internal::rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter) {
   auto const point = rotangf(unrotatedPoint, rotationAngle, rotationCenter);
   thred::sCor2px(point, rotatedPoint);
 }
 
-auto thred::rotang1(fPOINTATTR const& unrotatedPoint, float const rotationAngle, fPOINT const& rotationCenter) noexcept
-    -> fPOINT {
-  auto const point = fPOINT {unrotatedPoint.x, unrotatedPoint.y};
+auto thred::rotang1(F_POINT_ATTR const& unrotatedPoint, float const rotationAngle, F_POINT const& rotationCenter) noexcept
+    -> F_POINT {
+  auto const point = F_POINT {unrotatedPoint.x, unrotatedPoint.y};
   return thred::rotangf(point, rotationAngle, rotationCenter);
 }
 
-void thred::rotflt(fPOINT& point, float const rotationAngle, fPOINT const& rotationCenter) noexcept {
+void thred::rotflt(F_POINT& point, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
   point = thred::rotangf(point, rotationAngle, rotationCenter);
 }
 
-void thred::internal::rotstch(fPOINTATTR& stitch, float const rotationAngle, fPOINT const& rotationCenter) noexcept {
+void thred::internal::rotstch(F_POINT_ATTR& stitch, float const rotationAngle, F_POINT const& rotationCenter) noexcept {
   auto const point = thred::rotang1(stitch, rotationAngle, rotationCenter);
   stitch.x         = point.x;
   stitch.y         = point.y;
 }
 
-void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) {
+void thred::internal::ritrot(float rotationAngle, F_POINT const& rotationCenter) {
   if (StateMap->test(StateFlag::MOVCNTR)) { // set rotation angle to 0 if we are moving the center point
 	rotationAngle = 0.0F;
   }
   auto rotated           = POINT {};
-  auto rotationReference = fPOINT {RotationRect.left, RotationRect.top};
+  auto rotationReference = F_POINT {RotationRect.left, RotationRect.top};
   rotang(rotationReference, rotated, rotationAngle, rotationCenter);
   RotateBoxOutline[0] = RotateBoxOutline[4] = rotated;
   rotationReference.x                       = rotationCenter.x;
@@ -5624,7 +5624,7 @@ void thred::internal::ritrot(float rotationAngle, fPOINT const& rotationCenter) 
   durot();
 }
 
-void thred::internal::rot(fPOINT& rotationCenter) {
+void thred::internal::rot(F_POINT& rotationCenter) {
   do {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  break;
@@ -5650,7 +5650,7 @@ void thred::internal::rot(fPOINT& rotationCenter) {
   ritrot(0, rotationCenter);
 }
 
-void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led) {
+void thred::savclp(CLIP_STITCH& destination, F_POINT_ATTR const& source, uint32_t led) {
   auto integer    = 0.0F;
   destination.led = led;
   auto fractional = std::modf(source.x - LowerLeftStitch.x, &integer);
@@ -5666,8 +5666,8 @@ void thred::savclp(CLPSTCH& destination, fPOINTATTR const& source, uint32_t led)
   destination.tag  = 0x14;
 }
 
-auto thred::internal::sizfclp(FRMHED const& form) -> uint32_t {
-  auto clipSize = wrap::toUnsigned(sizeof(FORMCLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
+auto thred::internal::sizfclp(FRM_HEAD const& form) -> uint32_t {
+  auto clipSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   if (form.type == SAT) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
@@ -5700,7 +5700,7 @@ auto thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noe
   }
   formFirstStitchIndex = stitchCount;
   stitchCount          = 0U;
-  LowerLeftStitch      = fPOINT {BIGFLOAT, BIGFLOAT};
+  LowerLeftStitch      = F_POINT {BIGFLOAT, BIGFLOAT};
   for (; iStitch != StitchBuffer->end(); ++iStitch) {
 	if ((iStitch->attribute & FRMSK) == codedAttribute && ((iStitch->attribute & TYPMSK) != 0U)) {
 	  if (iStitch->x < LowerLeftStitch.x) {
@@ -5715,12 +5715,12 @@ auto thred::internal::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noe
   return stitchCount;
 }
 
-void thred::internal::sizclp(FRMHED const& form,
+void thred::internal::sizclp(FRM_HEAD const& form,
                              uint32_t&     formFirstStitchIndex,
                              uint32_t&     formStitchCount,
                              uint32_t&     length,
                              uint32_t&     fileSize) {
-  fileSize = wrap::toUnsigned(sizeof(FORMCLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
+  fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   length   = fileSize;
   if (form.type == SAT) {
 	fileSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
@@ -5748,15 +5748,15 @@ void thred::internal::duclip() {
 	  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 	  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
-	                                (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(fPOINT) +
-	                                    sizeof(FORMVERTEXCLIP));
+	                                (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) +
+	                                    sizeof(FORM_VERTEX_CLIP));
 	  if (clipHandle != nullptr) {
-		auto* clipHeader        = *(gsl::narrow_cast<FORMVERTEXCLIP**>(clipHandle));
+		auto* clipHeader        = *(gsl::narrow_cast<FORM_VERTEX_CLIP**>(clipHandle));
 		clipHeader->clipType    = CLP_FRMPS;
 		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
 		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
 		// skip past the header
-		auto*       vertices = convert_ptr<fPOINT*>(&clipHeader[1]);
+		auto*       vertices = convertFromPtr<F_POINT*>(&clipHeader[1]);
 		auto const& form     = FormList->operator[](ClosestFormToCursor);
 		auto itVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		auto iSource         = SelectedFormVertices.start;
@@ -5791,18 +5791,18 @@ void thred::internal::duclip() {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
 		if (clipHandle != nullptr) {
-		  auto* clipFormsHeader     = *(gsl::narrow_cast<FORMSCLIP**>(clipHandle));
+		  auto* clipFormsHeader     = *(gsl::narrow_cast<FORMS_CLIP**>(clipHandle));
 		  clipFormsHeader->clipType = CLP_FRMS;
 		  wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
 		  // Skip past the header
-		  auto* forms = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
+		  auto* forms = convertFromPtr<FRM_HEAD*>(&clipFormsHeader[1]);
 		  auto  iForm = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& currentForm = FormList->operator[](selectedForm);
 			forms[iForm++]    = currentForm;
 		  }
 		  // skip past the forms
-		  auto* formVertices = convert_ptr<fPOINT*>(&forms[iForm]);
+		  auto* formVertices = convertFromPtr<F_POINT*>(&forms[iForm]);
 		  auto  iVertex      = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			// clang-format off
@@ -5815,7 +5815,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // skip past the vertex list
-		  auto* guides     = convert_ptr<SATCON*>(&formVertices[iVertex]);
+		  auto* guides     = convertFromPtr<SAT_CON*>(&formVertices[iVertex]);
 		  auto  guideCount = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -5828,7 +5828,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // skip past the guides
-		  auto* points     = convert_ptr<fPOINT*>(&guides[guideCount]);
+		  auto* points     = convertFromPtr<F_POINT*>(&guides[guideCount]);
 		  auto  pointCount = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -5848,7 +5848,7 @@ void thred::internal::duclip() {
 			}
 		  }
 		  // Skip past the points
-		  auto* textures     = convert_ptr<TXPNT*>(&points[pointCount]);
+		  auto* textures     = convertFromPtr<TX_PNT*>(&points[pointCount]);
 		  auto  textureCount = uint16_t {};
 		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
@@ -5870,7 +5870,7 @@ void thred::internal::duclip() {
 		for (auto& selectedForm : (*SelectedFormList)) {
 		  formMap.set(selectedForm);
 		}
-		auto astch = std::vector<fPOINTATTR> {};
+		auto astch = std::vector<F_POINT_ATTR> {};
 		// Reserve a reasonable amount space, probably not enough though
 		constexpr auto RESRATIO = 16U; // reserve space factor
 		astch.reserve(StitchBuffer->size() / RESRATIO);
@@ -5890,9 +5890,9 @@ void thred::internal::duclip() {
 		if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 		  Clip = RegisterClipboardFormat(PcdClipFormat);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U);
+		  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLIP_STITCH) + 2U);
 		  if (ClipPointer != nullptr) {
-			ClipStitchData    = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
+			ClipStitchData    = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			auto iStitch      = 0U;
 			auto iDestination = 0U;
 			savclp(ClipStitchData[0], astch[0], stitchCount);
@@ -5917,20 +5917,20 @@ void thred::internal::duclip() {
 		  // clang-format on
 		  auto clipSize = 0U;
 		  sizclp(form, firstStitch, stitchCount, length, clipSize);
-		  clipSize += sizeof(FORMCLIP);
+		  clipSize += sizeof(FORM_CLIP);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
 		  if (clipHandle != nullptr) {
-			auto* clipFormHeader     = *(gsl::narrow_cast<FORMCLIP**>(clipHandle));
+			auto* clipFormHeader     = *(gsl::narrow_cast<FORM_CLIP**>(clipHandle));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
-			auto* formVertices       = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+			auto* formVertices       = convertFromPtr<F_POINT*>(&clipFormHeader[1]);
 			auto  itVertex           = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 			for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
 			  formVertices[iSide] = *itVertex;
 			  ++itVertex;
 			}
-			auto* guides = convert_ptr<SATCON*>(&formVertices[form.vertexCount]);
+			auto* guides = convertFromPtr<SAT_CON*>(&formVertices[form.vertexCount]);
 			auto  iGuide = 0U;
 			if (form.type == SAT) {
 			  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
@@ -5939,7 +5939,7 @@ void thred::internal::duclip() {
 				++itGuide;
 			  }
 			}
-			auto* mclp  = convert_ptr<fPOINT*>(&guides[iGuide]);
+			auto* mclp  = convertFromPtr<F_POINT*>(&guides[iGuide]);
 			auto  iClip = 0U;
 			if (clip::isclpx(ClosestFormToCursor)) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
@@ -5948,7 +5948,7 @@ void thred::internal::duclip() {
 				++offsetStart;
 			  }
 			}
-			auto* points = convert_ptr<fPOINT*>(&mclp[iClip]);
+			auto* points = convertFromPtr<F_POINT*>(&mclp[iClip]);
 			if (clip::iseclpx(ClosestFormToCursor)) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 			  for (iClip = 0; iClip < form.clipEntries; ++iClip) {
@@ -5956,7 +5956,7 @@ void thred::internal::duclip() {
 				++offsetStart;
 			  }
 			}
-			auto* textures = convert_ptr<TXPNT*>(&points[iClip]);
+			auto* textures = convertFromPtr<TX_PNT*>(&points[iClip]);
 			if (texture::istx(ClosestFormToCursor)) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
@@ -5968,9 +5968,9 @@ void thred::internal::duclip() {
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLPSTCH) + 2U);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
-			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
+			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			  auto iTexture  = firstStitch;
 			  savclp(ClipStitchData[0], StitchBuffer->operator[](iTexture), length);
 			  ++iTexture;
@@ -6008,9 +6008,9 @@ void thred::internal::duclip() {
 			auto const length  = GroupEndStitch - GroupStartStitch + 1U;
 			auto       iSource = GroupStartStitch;
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLPSTCH) + 2U);
+			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
-			  ClipStitchData = *(gsl::narrow_cast<CLPSTCH**>(ClipPointer));
+			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			  savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
 			  ++iSource;
 			  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
@@ -6034,14 +6034,14 @@ void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
   auto const firstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](fPOINTATTR const& m) -> bool {
+      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](F_POINT_ATTR const& m) -> bool {
 	    return ((m.attribute & (FRMSK | NOTFRM)) == codedForm);
       });
   if (firstStitch != StitchBuffer->end()) {
 	// we found the first stitch, so now delete the stitches in the form
 	StitchBuffer->erase(std::remove_if(firstStitch,
 	                                   StitchBuffer->end(),
-	                                   [codedForm](fPOINTATTR const& m) -> bool {
+	                                   [codedForm](F_POINT_ATTR const& m) -> bool {
 	                                     return (m.attribute & FRMSK) == codedForm;
 	                                   }),
 	                    StitchBuffer->end());
@@ -6053,7 +6053,7 @@ void thred::internal::f1del(uint32_t formIndex) {
 	auto const codedForm = formIndex << FRMSHFT;
 	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
 	                                   StitchBuffer->end(),
-	                                   [codedForm](fPOINTATTR const& m) -> bool {
+	                                   [codedForm](F_POINT_ATTR const& m) -> bool {
 	                                     return (((m.attribute & NOTFRM) == 0U) &&
 	                                             ((m.attribute & FRMSK) == codedForm));
 	                                   }),
@@ -6200,29 +6200,29 @@ auto thred::internal::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> 
              : false;
 }
 
-void thred::internal::ofstch(std::vector<fPOINTATTR>& buffer,
+void thred::internal::ofstch(std::vector<F_POINT_ATTR>& buffer,
                              uint32_t                 iSource,
                              char                     offset,
-                             fPOINT const&            knotStep,
+                             F_POINT const&            knotStep,
                              uint32_t                 knotAttribute) {
-  buffer.emplace_back(fPOINTATTR {StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
+  buffer.emplace_back(F_POINT_ATTR {StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
                                   StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
                                   knotAttribute});
 }
 
-void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
+void thred::internal::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
   auto const finishIt      = wrap::next(StitchBuffer->begin(), finish);
   auto       startIt       = (finish != 0) ? std::next(finishIt, -1) : finishIt;
   auto const knotAttribute = startIt->attribute | KNOTMSK;
-  auto       delta         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto       delta         = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
   auto       length        = hypot(delta.x, delta.y);
   while (length == 0.0F && startIt != StitchBuffer->begin()) {
-	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	length = hypot(delta.x, delta.y);
 	--startIt;
   }
-  delta                         = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto const knotStep           = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  delta                         = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto const knotStep           = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
   constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
   constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
   auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
@@ -6234,22 +6234,22 @@ void thred::internal::endknt(std::vector<fPOINTATTR>& buffer, uint32_t finish) {
   }
 }
 
-void thred::internal::strtknt(std::vector<fPOINTATTR>& buffer, uint32_t start) {
+void thred::internal::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
   auto const startIt  = wrap::next(StitchBuffer->begin(), start);
   auto       finishIt = std::next(startIt);
-  auto       delta    = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto       delta    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
   auto       length   = hypot(delta.x, delta.y);
   ++finishIt;
   while (length < 2.0F && finishIt != StitchBuffer->end()) {
-	delta  = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	delta  = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	length = hypot(delta.x, delta.y);
 	++finishIt;
   }
   if (finishIt != StitchBuffer->end()) {
 	--finishIt;
-	delta = fPOINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	delta = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	auto const            knotAttribute = startIt->attribute | KNOTMSK;
-	auto const            knotStep      = fPOINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	auto const            knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
 	static constexpr auto knotAtStartOrder = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
 	for (char const iKnot : knotAtStartOrder) {
 	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
@@ -6262,14 +6262,14 @@ void thred::internal::delknt() {
   StitchBuffer->erase(
       std::remove_if(StitchBuffer->begin(),
                      StitchBuffer->end(),
-                     [](fPOINTATTR const& m) -> bool { return (m.attribute & KNOTMSK) != 0U; }),
+                     [](F_POINT_ATTR const& m) -> bool { return (m.attribute & KNOTMSK) != 0U; }),
       StitchBuffer->end());
 }
 
 void thred::internal::delknot() {
   // Find the first knot stitch, if any
   auto const firstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](fPOINTATTR const& m) -> bool {
+      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](F_POINT_ATTR const& m) -> bool {
 	    return ((m.attribute & KNOTMSK) != 0U);
       });
   if (firstStitch != StitchBuffer->end()) {
@@ -6278,14 +6278,14 @@ void thred::internal::delknot() {
 	StitchBuffer->erase(
 	    std::remove_if(firstStitch,
 	                   StitchBuffer->end(),
-	                   [](fPOINTATTR const& m) -> bool { return (m.attribute & KNOTMSK) != 0U; }),
+	                   [](F_POINT_ATTR const& m) -> bool { return (m.attribute & KNOTMSK) != 0U; }),
 	    StitchBuffer->end());
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
 }
 
-auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> uint32_t {
+auto thred::internal::kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t {
   while (start < wrap::toUnsigned(StitchBuffer->size() - 1U) && stlen(start) > KNOTLEN) {
 	buffer.push_back(StitchBuffer->operator[](start++));
   }
@@ -6294,7 +6294,7 @@ auto thred::internal::kjmp(std::vector<fPOINTATTR>& buffer, uint32_t start) -> u
 }
 
 void thred::internal::setknt() {
-  auto buffer = std::vector<fPOINTATTR> {};
+  auto buffer = std::vector<F_POINT_ATTR> {};
   buffer.reserve(StitchBuffer->size());
   buffer.push_back(StitchBuffer->front());
   strtknt(buffer, 0);
@@ -6337,7 +6337,7 @@ auto thred::internal::srchknot(uint32_t source) -> uint32_t {
 
 void thred::internal::chkncol() {
   auto initialColor = StitchBuffer->front().attribute & COLMSK;
-  auto buffer       = std::vector<fPOINTATTR> {};
+  auto buffer       = std::vector<F_POINT_ATTR> {};
   buffer.reserve(StitchBuffer->size());
   StateMap->reset(StateFlag::FILDIR);
   auto iStitch = 0U;
@@ -6521,7 +6521,7 @@ void thred::internal::deltot() {
 }
 
 auto thred::internal::wastch(uint32_t const& formIndex) -> bool {
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](fPOINTATTR const& m) -> bool {
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](F_POINT_ATTR const& m) -> bool {
 	return (m.attribute & FRMSK) >> FRMSHFT == formIndex;
   });
 }
@@ -6531,7 +6531,7 @@ auto thred::internal::frmstch() -> bool {
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
   }
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](fPOINTATTR const& m) -> bool {
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](F_POINT_ATTR const& m) -> bool {
 	return formMap.test((m.attribute & FRMSK) >> FRMSHFT);
   });
 }
@@ -6834,7 +6834,7 @@ void thred::redclp() {
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
-	auto* const clipStitchPtr    = gsl::narrow_cast<CLPSTCH*>(ClipPointer);
+	auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH*>(ClipPointer);
 	auto const  clipSize         = clipStitchPtr[0].led;
 	auto const  spClipStitchData = gsl::make_span(clipStitchPtr, clipSize);
 	auto&       clipBuffer       = *ClipBuffer;
@@ -6850,7 +6850,7 @@ void thred::redclp() {
 	                              clipBuffer.back().y)
 	                      .c_str());
 #endif
-	auto clipRect = fRECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
+	auto clipRect = F_RECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
 	auto iCSD     = std::next(spClipStitchData.begin());
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
 	  clipBuffer.emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
@@ -6898,7 +6898,7 @@ void thred::internal::drwmrk(HDC dc) {
   auto       markCoordinates = POINT {};
   auto       markLine        = std::array<POINT, 2> {};
   auto const markOffset      = MulDiv(6, *ScreenDPI, STDDPI);
-  thred::sCor2px(fPOINT {ZoomMarkPoint}, markCoordinates);
+  thred::sCor2px(F_POINT {ZoomMarkPoint}, markCoordinates);
   SelectObject(dc, ZoomMarkPen);
   SetROP2(dc, R2_XORPEN);
   markLine[0] = {markCoordinates.x - markOffset, markCoordinates.y - markOffset};
@@ -6956,7 +6956,7 @@ auto thred::internal::isthr(fs::path const& thredPath) -> bool {
   return (extention.compare(0, 3, L".th") == 0);
 }
 
-auto thred::internal::gethand(std::vector<fPOINTATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t {
+auto thred::internal::gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t {
   auto userStitchCount = 0U;
   for (auto iStitch = 0U; iStitch < stitchCount; ++iStitch) {
 	if ((stitch[iStitch].attribute & USMSK) != 0U) {
@@ -6968,7 +6968,7 @@ auto thred::internal::gethand(std::vector<fPOINTATTR> const& stitch, uint32_t st
 
 void thred::internal::insfil(fs::path& insertedFile) {
   auto successFlag       = false;
-  auto insertedRectangle = fRECTANGLE {BIGFLOAT, TNYFLOAT, TNYFLOAT, BIGFLOAT};
+  auto insertedRectangle = F_RECTANGLE {BIGFLOAT, TNYFLOAT, TNYFLOAT, BIGFLOAT};
   if (insertedFile.empty()) {
 	getNewFileName(insertedFile, fileStyles::INS_FILES, fileIndices::THR);
   }
@@ -6987,10 +6987,10 @@ void thred::internal::insfil(fs::path& insertedFile) {
 	}
   }
   if (successFlag) {
-	InsertCenter = fPOINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
+	InsertCenter = F_POINT {wrap::midl(insertedRectangle.right, insertedRectangle.left),
 	                       wrap::midl(insertedRectangle.top, insertedRectangle.bottom)};
 
-	auto const insertedSize = fPOINT {insertedRectangle.right - insertedRectangle.left,
+	auto const insertedSize = F_POINT {insertedRectangle.right - insertedRectangle.left,
 	                                  insertedRectangle.top - insertedRectangle.bottom};
 	form::ratsr();
 	InsertSize.cx = std::lround(insertedSize.x * HorizontalRatio);
@@ -7006,7 +7006,7 @@ void thred::internal::insfil(fs::path& insertedFile) {
   }
 }
 
-auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedRectangle) -> bool {
+auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
   auto retflag = true;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle =
@@ -7017,7 +7017,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 	retflag = false;
   }
   else {
-	auto fileHeader = STRHED {};
+	auto fileHeader = THR_HEAD {};
 	auto bytesRead  = DWORD {};
 	ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr);
 	if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
@@ -7030,7 +7030,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 	  constexpr auto FRMPW       = 2;
 	  constexpr auto STCHW       = 1;
 	  auto           homscor     = 0U;
-	  auto           thredHeader = STREX {};
+	  auto           thredHeader = THR_HEAD_EX {};
 	  auto const     version     = (fileHeader.headerType & FTYPMASK) >> TBYTSHFT;
 	  if (version != 0U) {
 		gethand(*StitchBuffer, wrap::toUnsigned(StitchBuffer->size()));
@@ -7042,7 +7042,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr);
 	  }
 	  thred::savdo();
-	  auto fileStitchBuffer = std::vector<fPOINTATTR> {};
+	  auto fileStitchBuffer = std::vector<F_POINT_ATTR> {};
 	  if (fileHeader.stitchCount != 0U) {
 		fileStitchBuffer.resize(fileHeader.stitchCount);
 		ReadFile(fileHandle,
@@ -7062,7 +7062,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		auto       clipOffset         = wrap::toUnsigned(ClipPoints->size());
 		auto       textureOffset      = wrap::toUnsigned(TexturePointsBuffer->size());
 		if (version < 2) {
-		  auto inFormList = std::vector<FRMHEDO> {};
+		  auto inFormList = std::vector<FRM_HEAD_O> {};
 		  inFormList.resize(fileHeader.formCount);
 		  auto const bytesToRead = fileHeader.formCount * wrap::sizeofType(inFormList);
 		  ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7074,7 +7074,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  FormList->insert(FormList->end(), inFormList.begin(), inFormList.end());
 		}
 		else {
-		  auto inFormList = std::vector<FRMHEDOUT> {};
+		  auto inFormList = std::vector<FRM_HEAD_OUT> {};
 		  inFormList.resize(fileHeader.formCount);
 		  auto const bytesToRead = fileHeader.formCount * wrap::sizeofType(inFormList);
 		  wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7087,7 +7087,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		}
 		auto vertexOffset = wrap::toUnsigned(FormVertices->size());
 		if (fileHeader.vertexCount != 0U) {
-		  auto inVerticeList = std::vector<fPOINT> {};
+		  auto inVerticeList = std::vector<F_POINT> {};
 		  inVerticeList.resize(fileHeader.vertexCount);
 		  auto const bytesToRead = fileHeader.vertexCount * wrap::sizeofType(inVerticeList);
 		  ReadFile(fileHandle, inVerticeList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7103,7 +7103,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		}
 		auto guideOffset = wrap::toUnsigned(SatinGuides->size());
 		if (fileHeader.dlineCount != 0U) {
-		  auto inGuideList = std::vector<SATCONOUT> {};
+		  auto inGuideList = std::vector<SAT_CON_OUT> {};
 		  inGuideList.resize(fileHeader.dlineCount);
 		  auto const bytesToRead = fileHeader.dlineCount * wrap::sizeofType(inGuideList);
 		  ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7116,7 +7116,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  newSatinGuideIndex += wrap::toUnsigned(inGuideList.size());
 		}
 		if (fileHeader.clipDataCount != 0U) {
-		  auto inPointList = std::vector<fPOINT> {};
+		  auto inPointList = std::vector<F_POINT> {};
 		  inPointList.resize(fileHeader.clipDataCount);
 		  auto const bytesToRead = fileHeader.clipDataCount * wrap::sizeofType(ClipPoints);
 		  ReadFile(fileHandle, inPointList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7128,7 +7128,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, fRECTANGLE& insertedR
 		  ClipPoints->insert(ClipPoints->end(), inPointList.begin(), inPointList.end());
 		}
 		if (thredHeader.texturePointCount != 0U) {
-		  auto inTextureList = std::vector<TXPNT> {};
+		  auto inTextureList = std::vector<TX_PNT> {};
 		  inTextureList.resize(thredHeader.texturePointCount);
 		  auto const bytesToRead = thredHeader.texturePointCount * wrap::sizeofType(inTextureList);
 		  ReadFile(fileHandle, inTextureList.data(), bytesToRead, &bytesRead, nullptr);
@@ -7347,7 +7347,7 @@ auto thred::internal::chkok() noexcept -> bool {
 void thred::internal::mv2f() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
-	std::vector<fPOINTATTR> tempStitchBuffer {};
+	std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	// since most of the stitches will be moved into the temp buffer, reserve the space
 	tempStitchBuffer.reserve(StitchBuffer->size());
 	auto       iLowBuffer = 0U;
@@ -7367,7 +7367,7 @@ void thred::internal::mv2f() {
   else {
 	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	  thred::savdo();
-	  std::vector<fPOINTATTR> tempStitchBuffer {};
+	  std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	  auto const              grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	  tempStitchBuffer.resize(StitchBuffer->size() - grpSize);
 	  thred::rngadj();
@@ -7390,7 +7390,7 @@ void thred::internal::mv2f() {
 void thred::internal::mv2b() {
   if (StateMap->testAndReset(StateFlag::FORMSEL)) {
 	thred::savdo();
-	auto       tempStitchBuffer = std::vector<fPOINTATTR> {};
+	auto       tempStitchBuffer = std::vector<F_POINT_ATTR> {};
 	auto       iLowBuffer       = 0U;
 	auto const attribute        = ClosestFormToCursor << FRMSHFT;
 	for (auto& stitch : *StitchBuffer) {
@@ -7409,7 +7409,7 @@ void thred::internal::mv2b() {
 	if (StateMap->testAndReset(StateFlag::GRPSEL)) {
 	  thred::savdo();
 	  thred::rngadj();
-	  std::vector<fPOINTATTR> tempStitchBuffer {};
+	  std::vector<F_POINT_ATTR> tempStitchBuffer {};
 	  auto const              grpSize = GroupEndStitch + 1U - GroupStartStitch;
 	  tempStitchBuffer.resize(grpSize);
 	  std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
@@ -7461,7 +7461,7 @@ void thred::delinf() noexcept {
   }
 }
 
-void thred::chkrng(fPOINT& range) {
+void thred::chkrng(F_POINT& range) {
   thred::savdo();
   thred::delinf();
   wrap::narrow(range.x, UnzoomedRect.cx);
@@ -7538,7 +7538,7 @@ void thred::internal::unmov() {
   }
 }
 
-void thred::internal::duprct(FRMHED const& form) {
+void thred::internal::duprct(FRM_HEAD const& form) {
   auto currentVertex        = SelectedFormVertices.start;
   auto itVertex             = wrap::next(FormVertices->cbegin(), form.vertexIndex + currentVertex);
   SelectedVerticesRect.left = SelectedVerticesRect.right = itVertex->x;
@@ -7575,7 +7575,7 @@ void thred::setpsel() {
   StateMap->set(StateFlag::FPSEL);
 }
 
-void thred::rotfn(float rotationAngle, fPOINT const& rotationCenter) {
+void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
   thred::savdo();
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
@@ -7752,11 +7752,11 @@ auto thred::internal::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio)
   }
   SelectedFormControlVertex >>= 1U;
   if (isInBox(pointToTest, SelectedFormsRect) || (minimumLength < CLOSENUF && isLine(formLines))) {
-	SelectedFormsSize = fPOINT {SelectedFormsRect.right - SelectedFormsRect.left,
+	SelectedFormsSize = F_POINT {SelectedFormsRect.right - SelectedFormsRect.left,
 	                            SelectedFormsRect.bottom - SelectedFormsRect.top};
 	StateMap->set(StateFlag::MOVFRMS);
 	FormMoveDelta =
-	    fPOINT {pointToTest.x - SelectedFormsRect.left, pointToTest.y - SelectedFormsRect.top};
+	    F_POINT {pointToTest.x - SelectedFormsRect.left, pointToTest.y - SelectedFormsRect.top};
 	StateMap->set(StateFlag::SHOSTRTCH);
 	thred::strtchbox(stretchBoxLine);
 	return true;
@@ -7908,7 +7908,7 @@ void thred::internal::seldwn() {
 }
 
 auto thred::internal::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool {
-  auto tempStitchBuffer = std::vector<fPOINTATTR> {};
+  auto tempStitchBuffer = std::vector<F_POINT_ATTR> {};
   if ((destination + 1U) < wrap::toUnsigned(StitchBuffer->size())) {
 	++destination;
   }
@@ -8012,20 +8012,20 @@ void thred::internal::colchk() {
 }
 
 auto thred::internal::makbig(uint32_t start, uint32_t finish) -> uint32_t {
-  auto newStitches = std::vector<fPOINTATTR> {};
+  auto newStitches = std::vector<F_POINT_ATTR> {};
   newStitches.reserve(finish - start); // we know that we will have at least this number of Stitches
   auto adcnt = 0U;
   --finish;
   auto stitchIt     = wrap::next(StitchBuffer->begin(), start);
   auto nextStitchIt = stitchIt + 1U;
   for (auto iSource = start; iSource < finish; ++iSource) {
-	auto const delta = fPOINT {(*nextStitchIt).x - (*stitchIt).x, (*nextStitchIt).y - (*stitchIt).y};
+	auto const delta = F_POINT {(*nextStitchIt).x - (*stitchIt).x, (*nextStitchIt).y - (*stitchIt).y};
 	auto const length = hypot(delta.x, delta.y);
 	newStitches.push_back(*stitchIt);
 	if (length > IniFile.maxStitchLength) {
 	  auto const stitchCount = std::ceil(length / UserStitchLength);
-	  auto const step        = fPOINT {delta.x / stitchCount, delta.y / stitchCount};
-	  auto       point       = fPOINT {(*stitchIt).x + step.x, (*stitchIt).y + step.y};
+	  auto const step        = F_POINT {delta.x / stitchCount, delta.y / stitchCount};
+	  auto       point       = F_POINT {(*stitchIt).x + step.x, (*stitchIt).y + step.y};
 	  auto       attribute   = (*stitchIt).attribute;
 	  if (attribute != (*nextStitchIt).attribute) {
 		if (((attribute & NOTFRM) == 0U) && (((*nextStitchIt).attribute & TYPMSK) != 0U)) {
@@ -8041,7 +8041,7 @@ auto thred::internal::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 	  }
 	  attribute &= (~KNOTMSK);
 	  for (auto iStitch = 0U; iStitch < wrap::round<decltype(iStitch)>(stitchCount) - 1U; ++iStitch) {
-		newStitches.emplace_back(fPOINTATTR {point.x, point.y, attribute});
+		newStitches.emplace_back(F_POINT_ATTR {point.x, point.y, attribute});
 		point.x += step.x;
 		point.y += step.y;
 		++adcnt;
@@ -8480,7 +8480,7 @@ void thred::internal::selalstch() {
 
 void thred::internal::duinsfil() {
   auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-  auto const offset      = fPOINT {stitchPoint.x - InsertCenter.x, stitchPoint.y - InsertCenter.y};
+  auto const offset      = F_POINT {stitchPoint.x - InsertCenter.x, stitchPoint.y - InsertCenter.y};
   for (auto iForm = InsertedFormIndex; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& formRectangle = FormList->operator[](iForm).rectangle;
 	formRectangle.bottom += offset.y;
@@ -8591,7 +8591,7 @@ auto thred::internal::dunum(wchar_t code) noexcept -> bool {
   return false;
 }
 
-void thred::stchrct(fRECTANGLE& rectangle) noexcept {
+void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
   if (!StitchBuffer->empty()) {
 	rectangle.bottom = rectangle.left = BIGFLOAT;
 	rectangle.top = rectangle.right = 0;
@@ -8612,7 +8612,7 @@ void thred::stchrct(fRECTANGLE& rectangle) noexcept {
   }
 }
 
-void thred::frmrct(fRECTANGLE& rectangle) noexcept {
+void thred::frmrct(F_RECTANGLE& rectangle) noexcept {
   rectangle.left = rectangle.right = FormVertices->front().x;
   rectangle.top = rectangle.bottom = FormVertices->front().y;
   for (auto const& FormVertice : *FormVertices) {
@@ -8634,7 +8634,7 @@ void thred::frmrct(fRECTANGLE& rectangle) noexcept {
 void thred::internal::desiz() {
   constexpr auto MMTOINCH = 1 / 25.4F; // conversion factor for millimeters to inches
 
-  auto rectangle = fRECTANGLE {};
+  auto rectangle = F_RECTANGLE {};
   auto info      = std::wstring {};
   if (!StitchBuffer->empty()) {
 	thred::stchrct(rectangle);
@@ -8741,7 +8741,7 @@ void thred::internal::fop() {
   }
 }
 
-void thred::internal::clpradj(fRECTANGLE& clipRectAdjusted, fPOINTATTR const& stitch) noexcept {
+void thred::internal::clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept {
   if (stitch.x < clipRectAdjusted.left) {
 	clipRectAdjusted.left = stitch.x;
   }
@@ -8760,7 +8760,7 @@ void thred::internal::clpadj() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	auto iStitch          = GroupStartStitch;
-	auto ClipRectAdjusted = fRECTANGLE {StitchBuffer->operator[](iStitch).x,
+	auto ClipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
 	                                    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
 	                                    StitchBuffer->operator[](iStitch).x,
 	                                    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
@@ -8793,7 +8793,7 @@ void thred::internal::clpadj() {
   }
 }
 
-void thred::internal::shftflt(fPOINT const& point) noexcept {
+void thred::internal::shftflt(F_POINT const& point) noexcept {
   if (point.x <= ZoomRect.left || point.x >= ZoomRect.right || point.y <= ZoomRect.bottom ||
       point.y >= ZoomRect.top) {
 	thred::shft(point);
@@ -9225,7 +9225,7 @@ void thred::internal::tglhid() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void thred::internal::respac(FRMHED& form) noexcept {
+void thred::internal::respac(FRM_HEAD& form) noexcept {
   if (clip::isclp(form)) {
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
@@ -9268,13 +9268,13 @@ void thred::internal::retrac() {
 }
 
 void thred::internal::setgrd(COLORREF color) {
-  static constexpr auto gcHigh    = GRDCOD {ID_GRDHI, HIGRD};
-  static constexpr auto gcMedium  = GRDCOD {ID_GRDMED, MEDGRD};
-  static constexpr auto gcDefault = GRDCOD {ID_GRDEF, DEFGRD};
-  static constexpr auto gcRed     = GRDCOD {ID_GRDRED, REDGRD};
-  static constexpr auto gcBlue    = GRDCOD {ID_GRDBLU, BLUGRD};
-  static constexpr auto gcGreen   = GRDCOD {ID_GRDGRN, GRNGRD};
-  static constexpr auto gridCodes = std::array<GRDCOD, 6> {gcHigh, gcMedium, gcDefault, gcRed, gcBlue, gcGreen};
+  static constexpr auto gcHigh    = GRID_COL {ID_GRDHI, HIGRD};
+  static constexpr auto gcMedium  = GRID_COL {ID_GRDMED, MEDGRD};
+  static constexpr auto gcDefault = GRID_COL {ID_GRDEF, DEFGRD};
+  static constexpr auto gcRed     = GRID_COL {ID_GRDRED, REDGRD};
+  static constexpr auto gcBlue    = GRID_COL {ID_GRDBLU, BLUGRD};
+  static constexpr auto gcGreen   = GRID_COL {ID_GRDGRN, GRNGRD};
+  static constexpr auto gridCodes = std::array<GRID_COL, 6> {gcHigh, gcMedium, gcDefault, gcRed, gcBlue, gcGreen};
 
   for (auto const& gridCode : gridCodes) {
 	if (color == gridCode.col) {
@@ -9435,7 +9435,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto* fileInfo = reinterpret_cast<FINDINFO*>(lparam);
+	  auto* fileInfo = reinterpret_cast<FIND_INFO*>(lparam);
 	  if (fileInfo != nullptr) {
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
@@ -9455,7 +9455,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 	}
 	case WM_COMMAND: {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto* fileInfo = reinterpret_cast<FINDINFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+	  auto* fileInfo = reinterpret_cast<FIND_INFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
@@ -9550,7 +9550,7 @@ auto CALLBACK thred::internal::LockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LP
 
 void thred::internal::lock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
-  auto lockInfo = FINDINFO {};
+  auto lockInfo = FIND_INFO {};
   // ToDo - Replace 512 with maximum files in subdirectory
   lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT(cppcoreguidelines-owning-memory)
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
@@ -9594,7 +9594,7 @@ void thred::internal::filclos() {
   }
 }
 
-void thred::internal::frmpos(FRMHED& form, float deltaX, float deltaY) {
+void thred::internal::frmpos(FRM_HEAD& form, float deltaX, float deltaY) {
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x += deltaX;
@@ -9738,7 +9738,7 @@ void thred::internal::bakmrk() {
 	  ZoomMarkPoint.y = IniFile.hoopSizeY / 2;
 	}
 	dumrk(ZoomMarkPoint.x, ZoomMarkPoint.y);
-	fPOINT const point(ZoomMarkPoint);
+	F_POINT const point(ZoomMarkPoint);
 	thred::shft(point);
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -9884,7 +9884,7 @@ void thred::internal::inscol() {
 }
 
 auto thred::internal::usedcol(uint8_t index) -> bool {
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](fPOINTATTR const& m) -> bool {
+  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](F_POINT_ATTR const& m) -> bool {
 	return (m.attribute & COLMSK) == index;
   });
 }
@@ -9928,7 +9928,7 @@ void thred::internal::delcol() {
 void thred::internal::set1knot() {
   if ((!StitchBuffer->empty()) && StateMap->test(StateFlag::SELBOX)) {
 	thred::savdo();
-	auto buffer = std::vector<fPOINTATTR> {};
+	auto buffer = std::vector<F_POINT_ATTR> {};
 	buffer.reserve(StitchBuffer->size() + 5U);
 	buffer.insert(buffer.begin(), StitchBuffer->begin(), wrap::next(StitchBuffer->begin(), ClosestPointIndex + 1U));
 	if (ClosestPointIndex == wrap::toUnsigned(StitchBuffer->size() - 1U)) {
@@ -10003,7 +10003,7 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
                             (Msg.pt.y + gsl::narrow_cast<decltype(Msg.pt.y)>(FormMoveDelta.y))};
   auto       it    = std::next(InterleaveSequence->begin());
   auto const stitchPoint            = thred::pxCor2stch(point);
-  auto const offset                 = fPOINT {stitchPoint.x - it->x, stitchPoint.y - it->y};
+  auto const offset                 = F_POINT {stitchPoint.x - it->x, stitchPoint.y - it->y};
   auto const count                  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
   auto& form                        = FormList->operator[](closestFormToCursor);
   auto const             nextVertex = form::nxt(form, ClosestVertexToCursor);
@@ -10011,7 +10011,7 @@ void thred::internal::fixpclp(uint32_t closestFormToCursor) {
   form.vertexCount += count;
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + nextVertex);
   for (auto iOutput = size_t {1U}; iOutput < InterleaveSequence->size() - 1U; ++iOutput) {
-	*itVertex = fPOINT {it->x + offset.x, it->y + offset.y};
+	*itVertex = F_POINT {it->x + offset.x, it->y + offset.y};
 	++itVertex;
 	++it;
   }
@@ -10271,8 +10271,8 @@ void thred::internal::dufdef() noexcept {
 auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
                                       float               xyRatio,
                                       float&              rotationAngle,
-                                      fPOINT const&       rotationCenter,
-                                      FRMHED const&       textureForm) -> bool {
+                                      F_POINT const&       rotationCenter,
+                                      FRM_HEAD const&       textureForm) -> bool {
   if (StateMap->test(StateFlag::TXTMOV)) {
 	texture::txtrmov(textureForm);
 	return true;
@@ -10405,7 +10405,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	}
 	if (StateMap->test(StateFlag::EXPAND)) {
 	  unstrtch(stretchBoxLine);
-	  auto newSize = fPOINT {gsl::narrow<float>(Msg.pt.x - StitchWindowOrigin.x),
+	  auto newSize = F_POINT {gsl::narrow<float>(Msg.pt.x - StitchWindowOrigin.x),
 	                         gsl::narrow<float>(Msg.pt.y - StitchWindowOrigin.y)};
 
 	  auto       iSide = (SelectedFormControlVertex + 2U) % 4U;
@@ -10522,7 +10522,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
 	  unrot();
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	  auto const adjustedPoint =
-	      fPOINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
+	      F_POINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
 	              gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
 	  if (adjustedPoint.x != 0.0F) {
 		rotationAngle = -atan2(adjustedPoint.y, adjustedPoint.x);
@@ -10611,7 +10611,7 @@ auto thred::internal::handleMouseMove(std::vector<POINT>& stretchBoxLine,
   return true;
 }
 
-auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPOINT& rotationCenter, bool& retflag)
+auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag)
     -> bool {
   retflag = true;
   if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
@@ -10630,7 +10630,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	    POINT {(Msg.pt.x - std::lround(FormMoveDelta.x) - StitchWindowOrigin.x) - SelectedFormsRect.left,
 	           (Msg.pt.y - std::lround(FormMoveDelta.y) - StitchWindowOrigin.y) - SelectedFormsRect.top};
 	form::ratsr();
-	FormMoveDelta = fPOINT {wrap::toFloat(point.x) / HorizontalRatio, wrap::toFloat(point.y) / VerticalRatio};
+	FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, wrap::toFloat(point.y) / VerticalRatio};
 	if (StateMap->test(StateFlag::FPSEL)) {
 	  // clang-format off
 	  auto const& form            = FormList->operator[](ClosestFormToCursor);
@@ -10705,7 +10705,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	unsel();
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 	auto const adjustedPoint =
-	    fPOINT {(StitchRangeRect.left + wrap::toFloat(SelectBoxOffset.x)) - stitchPoint.x,
+	    F_POINT {(StitchRangeRect.left + wrap::toFloat(SelectBoxOffset.x)) - stitchPoint.x,
 	            (StitchRangeRect.bottom + wrap::toFloat(SelectBoxOffset.y)) - stitchPoint.y};
 	for (auto iStitch = GroupStartStitch; iStitch <= GroupEndStitch; ++iStitch) {
 	  StitchBuffer->operator[](iStitch).x -= adjustedPoint.x;
@@ -10829,8 +10829,8 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	if (stitchPoint.y < ZoomBoxOrigin.y) {
 	  std::swap(ZoomBoxOrigin.y, stitchPoint.y);
 	}
-	auto newSize = fPOINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
-	stitchPoint  = fPOINT {ZoomBoxOrigin.x + newSize.x * 0.5F, ZoomBoxOrigin.y + newSize.y * 0.5F};
+	auto newSize = F_POINT {stitchPoint.x - ZoomBoxOrigin.x, stitchPoint.y - ZoomBoxOrigin.y};
+	stitchPoint  = F_POINT {ZoomBoxOrigin.x + newSize.x * 0.5F, ZoomBoxOrigin.y + newSize.y * 0.5F};
 	auto const saveFactor = ZoomFactor;
 	if (newSize.x > newSize.y) {
 	  newSize.y  = newSize.x / StitchWindowAspectRatio;
@@ -10845,7 +10845,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, fPO
 	  zumin();
 	  return true;
 	}
-	ZoomRect = fRECTANGLE {0.0F, newSize.y, newSize.x, 0.0F};
+	ZoomRect = F_RECTANGLE {0.0F, newSize.y, newSize.x, 0.0F};
 	thred::shft(stitchPoint);
 	StateMap->reset(StateFlag::BZUMIN);
 	StateMap->set(StateFlag::RESTCH);
@@ -11359,7 +11359,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LSTTYPE const& m) noexcept -> bool {
+	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LIST_TYPE const& m) noexcept -> bool {
 	  return Msg.hwnd == SideWindow->operator[](m.value);
 	});
 	if (iFeather != FTHRLIST.end()) {
@@ -11371,7 +11371,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LSTTYPE const& m) noexcept -> bool {
+	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LIST_TYPE const& m) noexcept -> bool {
 	  return Msg.hwnd == SideWindow->operator[](m.value);
 	});
 	if (iLayer != LAYRLIST.end()) {
@@ -11599,7 +11599,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::VRTF)) { // vertical fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::VRTF)) { // vertical fill
 	  thred::savdo();
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
@@ -11612,7 +11612,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filvrt();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::HORF)) { // horizontal fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::HORF)) { // horizontal fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		respac(form);
@@ -11623,7 +11623,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filhor();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::ANGF)) { // angle fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::ANGF)) { // angle fill
 	  form.type = FRMFPOLY;
 	  if (form.fillType != 0U) {
 		if (form.satinGuideCount != 0U) {
@@ -11639,7 +11639,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filangl();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::SATF)) { // fan fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::SATF)) { // fan fill
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
@@ -11654,7 +11654,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::filsat();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::CLPF)) { // fan clip
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::CLPF)) { // fan clip
 	  form.type = SAT;
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
@@ -11662,7 +11662,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::clpfil();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::CONTF)) { // contour fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::CONTF)) { // contour fill
 	  if (form.fillType != 0U) {
 		if (form.fillType == CLPF) {
 		  form.fillSpacing = LineSpacing;
@@ -11674,7 +11674,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  form::contfil();
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::VCLPF)) { // vertical clip
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::VCLPF)) { // vertical clip
 	  if (sidclp()) {
 		form::vrtsclp();
 	  }
@@ -11683,7 +11683,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::HCLPF)) { // horizontal clip
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::HCLPF)) { // horizontal clip
 	  if (sidclp()) {
 		form::horsclp();
 	  }
@@ -11692,7 +11692,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::ANGCLPF)) { // angle clip
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::ANGCLPF)) { // angle clip
 	  if (sidclp()) {
 		if (form.satinGuideCount != 0U) {
 		  satin::delsac(ClosestFormToCursor);
@@ -11704,7 +11704,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::FTHF)) { // feather fill
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::FTHF)) { // feather fill
 	  if ((form.fillType == ANGF) || (form.fillType == ANGCLPF) || (form.fillType == TXANGF)) {
 		form.satinOrAngle.guide = 0;
 	  }
@@ -11714,7 +11714,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  StateMap->set(StateFlag::RESTCH);
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::TXVRTF)) // vertical texture
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXVRTF)) // vertical texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType = TXVRTF;
@@ -11724,7 +11724,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  textureFlag = true;
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::TXHORF)) // horizontal texture
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXHORF)) // horizontal texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType = TXHORF;
@@ -11734,7 +11734,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	  textureFlag = true;
 	  break;
 	}
-	if (Msg.hwnd == SideWindow->operator[](fillStyles::TXANGF)) // angle texture
+	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
 	{
 	  if (texture::istx(ClosestFormToCursor)) {
 		form.fillType              = TXANGF;
@@ -12075,7 +12075,7 @@ auto thred::internal::handleFormDataSheet() -> bool {
 
 auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
                                            float&              xyRatio,
-                                           FRMHED const&       textureForm,
+                                           FRM_HEAD const&       textureForm,
                                            bool&               retflag) -> bool {
   static auto threadSizeSelected = uint32_t {}; // thread selected for size change
 
@@ -12166,11 +12166,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (StateMap->test(StateFlag::FUNSCLP)) {
 	StateMap->reset(StateFlag::MOVFRMS);
-	auto formsRect = fRECTANGLE {};
+	auto formsRect = F_RECTANGLE {};
 	form::pxrct2stch(SelectedFormsRect, formsRect);
 	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
 
-	FormMoveDelta = fPOINT {stitchPoint.x - wrap::midl(formsRect.right, formsRect.left),
+	FormMoveDelta = F_POINT {stitchPoint.x - wrap::midl(formsRect.right, formsRect.left),
 	                        stitchPoint.y - wrap::midl(formsRect.top, formsRect.bottom)};
 	for (auto iForm = 0U; iForm < ClipFormsCount; ++iForm) {
 	  ClosestFormToCursor = wrap::toUnsigned(FormList->size() - iForm - 1U);
@@ -12452,7 +12452,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	if (StateMap->testAndReset(StateFlag::ROTAT)) {
 	  RotateBoxToCursorLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 	  auto const adjustedPoint =
-	      fPOINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
+	      F_POINT {gsl::narrow<float>(RotateBoxToCursorLine[0].x - RotateBoxToCursorLine[1].x),
 	              gsl::narrow<float>(RotateBoxToCursorLine[0].y - RotateBoxToCursorLine[1].y)};
 	  if (hypot(adjustedPoint.x, adjustedPoint.y) < FCLOSNUF) {
 		StateMap->set(StateFlag::MOVCNTR);
@@ -12488,7 +12488,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		lodclp(wrap::toUnsigned(StitchBuffer->size()));
 	  }
 	  thred::rngadj();
-	  auto formsRect = fRECTANGLE {};
+	  auto formsRect = F_RECTANGLE {};
 	  thred::selRct(formsRect);
 	  auto& formControls = *FormControlPoints;
 	  formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x =
@@ -12544,7 +12544,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		  }
 
 		  xlin1();
-		  StitchBuffer->insert(StitchBuffer->begin(), fPOINTATTR {stitchPoint.x, stitchPoint.y, code});
+		  StitchBuffer->insert(StitchBuffer->begin(), F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		  StitchBuffer->front().attribute &= (~KNOTMSK);
 		  InsertLine[0] = stch2px1(0);
 		  InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
@@ -12563,7 +12563,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		++ClosestPointIndex;
 		thred::savdo();
 		StitchBuffer->insert(wrap::next(StitchBuffer->begin(), ClosestPointIndex),
-		                     fPOINTATTR {stitchPoint.x, stitchPoint.y, code});
+		                     F_POINT_ATTR {stitchPoint.x, stitchPoint.y, code});
 		xlin();
 		InsertLine[1] = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		InsertLine[0] = stch2px1(ClosestPointIndex);
@@ -12813,19 +12813,19 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
   if (ClipMemory != nullptr) {
 	ClipPointer = GlobalLock(ClipMemory);
 	if (ClipPointer != nullptr) {
-	  auto* formVerticesData = convert_ptr<FORMVERTEXCLIP*>(ClipPointer);
+	  auto* formVerticesData = convertFromPtr<FORM_VERTEX_CLIP*>(ClipPointer);
 	  if (formVerticesData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
 		    sizeof(*formVerticesData) +
 		    (wrap::toSize(formVerticesData->vertexCount) + 1U) * wrap::sizeofType(FormVertices);
 		auto        clipCopyBuffer = std::vector<uint8_t> {};
-		auto* const clipP          = convert_ptr<uint8_t*>(ClipPointer);
+		auto* const clipP          = convertFromPtr<uint8_t*>(ClipPointer);
 		auto const  spClip         = gsl::make_span(clipP, byteCount);
 		clipCopyBuffer.insert(clipCopyBuffer.end(), spClip.begin(), spClip.end());
 		GlobalUnlock(ClipMemory);
 		CloseClipboard();
-		formVerticesData = convert_ptr<FORMVERTEXCLIP*>(clipCopyBuffer.data());
+		formVerticesData = convertFromPtr<FORM_VERTEX_CLIP*>(clipCopyBuffer.data());
 		if (StateMap->test(StateFlag::FRMPSEL)) {
 		  // clang-format off
 		  auto& form     = FormList->operator[](ClosestFormToCursor);
@@ -12835,7 +12835,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  InterleaveSequence->reserve(wrap::toSize(formVerticesData->vertexCount) + 3U);
 		  auto const closestIt = wrap::next(itVertex, ClosestVertexToCursor);
 		  InterleaveSequence->push_back(*closestIt);
-		  auto*      clipData   = convert_ptr<fPOINT*>(&formVerticesData[1]);
+		  auto*      clipData   = convertFromPtr<F_POINT*>(&formVerticesData[1]);
 		  auto const spVertices = gsl::make_span(clipData, formVerticesData->vertexCount);
 		  InterleaveSequence->insert(InterleaveSequence->end(), spVertices.begin(), spVertices.end());
 		  auto const nextVertex = form::nxt(form, ClosestVertexToCursor);
@@ -12847,13 +12847,13 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  dupclp();
 		}
 		else {
-		  FormMoveDelta = fPOINT {};
+		  FormMoveDelta = F_POINT {};
 		  StateMap->set(StateFlag::FUNCLP);
-		  auto formIter         = FRMHED {};
+		  auto formIter         = FRM_HEAD {};
 		  formIter.type         = FRMLINE;
 		  formIter.vertexCount  = formVerticesData->vertexCount + 1U;
 		  formIter.vertexIndex  = wrap::toUnsigned(FormVertices->size());
-		  auto*      vertices   = convert_ptr<fPOINT*>(&formVerticesData[1]);
+		  auto*      vertices   = convertFromPtr<F_POINT*>(&formVerticesData[1]);
 		  auto const spVertices = gsl::make_span(vertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), spVertices.begin(), spVertices.end());
 		  FormList->push_back(formIter);
@@ -12868,11 +12868,11 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		return true;
 	  }
 	  // ToDo - Add more information to the clipboard so that memory can be allocated
-	  auto* clipFormsHeader = gsl::narrow_cast<FORMSCLIP*>(ClipPointer);
+	  auto* clipFormsHeader = gsl::narrow_cast<FORMS_CLIP*>(ClipPointer);
 	  if (clipFormsHeader->clipType == CLP_FRMS) {
 		auto iForm            = 0U;
 		ClipFormsCount        = clipFormsHeader->formCount;
-		auto*      forms      = convert_ptr<FRMHED*>(&clipFormsHeader[1]);
+		auto*      forms      = convertFromPtr<FRM_HEAD*>(&clipFormsHeader[1]);
 		auto const spForm     = gsl::make_span(forms, clipFormsHeader->formCount);
 		auto const formOffset = wrap::toUnsigned(FormList->size());
 		for (auto& form : spForm) {
@@ -12880,7 +12880,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  FormList->back().attribute = (gsl::narrow_cast<decltype(form.attribute)>(form.attribute & NFRMLMSK) |
 		                                gsl::narrow_cast<decltype(form.attribute)>(ActiveLayer << 1U));
 		}
-		auto* formVertices  = convert_ptr<fPOINT*>(&forms[clipFormsHeader->formCount]);
+		auto* formVertices  = convertFromPtr<F_POINT*>(&forms[clipFormsHeader->formCount]);
 		auto  currentVertex = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
@@ -12893,7 +12893,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		                       spCurrentVertices.end());
 		  currentVertex += form.vertexCount;
 		}
-		auto* guides       = convert_ptr<SATCON*>(&formVertices[currentVertex]);
+		auto* guides       = convertFromPtr<SAT_CON*>(&formVertices[currentVertex]);
 		auto  currentGuide = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
@@ -12907,7 +12907,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			}
 		  }
 		}
-		auto* clipData    = convert_ptr<fPOINT*>(&guides[currentGuide]);
+		auto* clipData    = convertFromPtr<F_POINT*>(&guides[currentGuide]);
 		auto  currentClip = 0U;
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  // clang-format off
@@ -12931,7 +12931,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			}
 		  }
 		}
-		auto* textureSource = convert_ptr<TXPNT*>(&clipData[currentClip]);
+		auto* textureSource = convertFromPtr<TX_PNT*>(&clipData[currentClip]);
 		auto  textureCount  = size_t {};
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  if (texture::istx(formOffset + iForm)) {
@@ -12965,30 +12965,30 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		StateMap->set(StateFlag::SHOSTRTCH);
 		thred::strtchbox(stretchBoxLine);
 		FormMoveDelta =
-		    fPOINT {gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
+		    F_POINT {gsl::narrow<float>((SelectedFormsRect.right - SelectedFormsRect.left) / 2),
 		            gsl::narrow<float>((SelectedFormsRect.bottom - SelectedFormsRect.top) / 2)};
 		StateMap->set(StateFlag::MOVFRMS);
 		StateMap->set(StateFlag::FUNSCLP);
 	  }
 	  else {
-		auto* clipFormHeader = gsl::narrow_cast<FORMCLIP*>(ClipPointer);
+		auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(ClipPointer);
 		if (clipFormHeader->clipType == CLP_FRM) {
-		  FormMoveDelta = fPOINT {};
+		  FormMoveDelta = F_POINT {};
 		  StateMap->set(StateFlag::FUNCLP);
 		  auto formIter = clipFormHeader->form;
 		  formIter.attribute = gsl::narrow_cast<decltype(formIter.attribute)>(formIter.attribute & NFRMLMSK) |
 		                       gsl::narrow_cast<decltype(formIter.attribute)>(ActiveLayer << 1U);
 		  formIter.vertexIndex    = wrap::toUnsigned(FormVertices->size());
-		  auto*      formVertices = convert_ptr<fPOINT*>(&clipFormHeader[1]);
+		  auto*      formVertices = convertFromPtr<F_POINT*>(&clipFormHeader[1]);
 		  auto const spVertices   = gsl::make_span(formVertices, formIter.vertexCount);
 		  FormVertices->insert(FormVertices->end(), spVertices.begin(), spVertices.end());
-		  auto* guides = convert_ptr<SATCON*>(&formVertices[formIter.vertexCount]);
+		  auto* guides = convertFromPtr<SAT_CON*>(&formVertices[formIter.vertexCount]);
 		  if (formIter.type == SAT && (formIter.satinGuideCount != 0U)) {
 			auto const spGuide          = gsl::make_span(guides, formIter.satinGuideCount);
 			formIter.satinOrAngle.guide = wrap::toUnsigned(SatinGuides->size());
 			SatinGuides->insert(SatinGuides->end(), spGuide.begin(), spGuide.end());
 		  }
-		  auto* clipData  = convert_ptr<fPOINT*>(&guides[formIter.satinGuideCount]);
+		  auto* clipData  = convertFromPtr<F_POINT*>(&guides[formIter.satinGuideCount]);
 		  auto  clipCount = 0U;
 		  if (clip::isclpx(formIter)) {
 			auto const spClip = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
@@ -12997,14 +12997,14 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
 		  if (clip::iseclpx(formIter)) {
-			clipData                = convert_ptr<fPOINT*>(&clipData[clipCount]);
+			clipData                = convertFromPtr<F_POINT*>(&clipData[clipCount]);
 			auto const spClip       = gsl::make_span(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.clipEntries;
 		  }
 		  if (texture::istx(formIter)) {
-			auto*      textureSource = convert_ptr<TXPNT*>(&clipData[clipCount]);
+			auto*      textureSource = convertFromPtr<TX_PNT*>(&clipData[clipCount]);
 			auto const spTexture = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(TexturePointsBuffer->end(), spTexture.begin(), spTexture.end());
@@ -13372,7 +13372,7 @@ auto thred::internal::handleLeftKey(bool& retflag) -> bool {
 }
 
 auto thred::internal::handleMainWinKeys(wchar_t const&            code,
-                                        fPOINT&                   rotationCenter,
+                                        F_POINT&                   rotationCenter,
                                         std::vector<POINT> const& stretchBoxLine,
                                         bool&                     retflag) -> bool {
   retflag = true;
@@ -14465,7 +14465,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_CHK: { // edit / Check Range
-	  auto stitchRange = fPOINT {};
+	  auto stitchRange = F_POINT {};
 	  thred::chkrng(stitchRange);
 	  StateMap->set(StateFlag::RESTCH);
 	  flag = true;
@@ -15261,7 +15261,7 @@ auto thred::internal::handleFillMenu(WORD const& wParameter) -> bool {
   return flag;
 }
 
-auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCenter) -> bool {
+auto thred::internal::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool {
   auto flag = false;
   switch (wParameter) {
 	case ID_HLP: { // help
@@ -15378,8 +15378,8 @@ auto thred::internal::handleMainMenu(WORD const& wParameter, fPOINT& rotationCen
 auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
                              float&              xyRatio,
                              float&              angle,
-                             fPOINT&             rotationCenter,
-                             FRMHED&             textureForm) -> bool {
+                             F_POINT&             rotationCenter,
+                             FRM_HEAD&             textureForm) -> bool {
   if (Msg.message == WM_MOUSEMOVE) {
 	return thi::handleMouseMove(stretchBoxLine, xyRatio, angle, rotationCenter, textureForm);
   }
@@ -16501,7 +16501,7 @@ auto thred::internal::chkup(uint32_t count, size_t iStitch) -> uint32_t {
   return count;
 }
 
-void thred::internal::stCor2px(fPOINTATTR const& stitch, POINT& point) {
+void thred::internal::stCor2px(F_POINT_ATTR const& stitch, POINT& point) {
   point = {wrap::ceil<int32_t>((stitch.x - ZoomRect.left) * ZoomRatio.x),
            wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -
                                (stitch.y - ZoomRect.bottom) * ZoomRatio.y)};
@@ -16564,8 +16564,8 @@ void thred::internal::dugrid() {
 }
 
 auto thred::internal::setRmap(boost::dynamic_bitset<>& stitchMap,
-                              fPOINTATTR const&        stitchPoint,
-                              fPOINT const&            cellSize) -> bool {
+                              F_POINT_ATTR const&        stitchPoint,
+                              F_POINT const&            cellSize) -> bool {
   auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
                                               floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
@@ -16871,7 +16871,7 @@ void thred::internal::drwStch() {
 	}
 	if (ZoomFactor < StitchBoxesThreshold) {
 	  auto const cellSize =
-	      fPOINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
+	      F_POINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
 	              (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom)};
 	  auto const maxMapSize = wrap::toSize(StitchWindowClientRect.right * StitchWindowClientRect.bottom);
 	  auto       stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
@@ -16982,10 +16982,10 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (thrEdFile != INVALID_HANDLE_VALUE) {
 	auto bytesRead    = DWORD {};
-	auto stitchHeader = STRHED {};
+	auto stitchHeader = THR_HEAD {};
 	ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &bytesRead, nullptr);
 	if (bytesRead == sizeof(stitchHeader)) {
-	  auto       stitchSourceSize = fPOINT {1.0F, 1.0F};
+	  auto       stitchSourceSize = F_POINT {1.0F, 1.0F};
 	  auto const fileTypeVersion  = (stitchHeader.headerType & FTYPMASK) >> TBYTSHFT;
 	  if ((stitchHeader.headerType & SIGMASK) == THREDSIG) {
 		switch (fileTypeVersion) {
@@ -17002,7 +17002,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 		  }
 		  case 1:
 		  case 2: {
-			auto extendedHeader = STREX {};
+			auto extendedHeader = THR_HEAD_EX {};
 			ReadFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &bytesRead, nullptr);
 			if (bytesRead != sizeof(extendedHeader)) {
 			  return;
@@ -17022,7 +17022,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 	  auto const yRatio = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
 	  auto const ratio  = (xRatio < yRatio) ? xRatio : yRatio;
 	  if (stitchHeader.stitchCount != 0U) {
-		auto stitchesToDraw = std::vector<fPOINTATTR> {};
+		auto stitchesToDraw = std::vector<F_POINT_ATTR> {};
 		stitchesToDraw.resize(stitchHeader.stitchCount);
 		auto lines = std::vector<POINT> {};
 		lines.resize(stitchHeader.stitchCount);
@@ -17077,12 +17077,12 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 	  if (stitchHeader.formCount != 0U) {
 		do {
 		  SetFilePointer(thrEdFile, 80, nullptr, FILE_CURRENT);
-		  auto formList = std::vector<FRMHED> {};
+		  auto formList = std::vector<FRM_HEAD> {};
 		  formList.resize(stitchHeader.formCount);
-		  auto vertexList = std::vector<fPOINT> {};
+		  auto vertexList = std::vector<F_POINT> {};
 		  vertexList.resize(stitchHeader.vertexCount);
 		  if (fileTypeVersion < 2) {
-			auto formListOriginal = std::vector<FRMHEDO> {};
+			auto formListOriginal = std::vector<FRM_HEAD_O> {};
 			formListOriginal.resize(stitchHeader.formCount);
 			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(formListOriginal);
 			ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
@@ -17092,7 +17092,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
 			std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
 		  }
 		  else {
-			auto inFormList = std::vector<FRMHEDOUT> {};
+			auto inFormList = std::vector<FRM_HEAD_OUT> {};
 			inFormList.resize(stitchHeader.formCount);
 			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
 			wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, nullptr);
@@ -17571,7 +17571,7 @@ auto CALLBACK thred::internal::WndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  }
 	  else {
 		ZoomRect =
-		    fRECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
+		    F_RECTANGLE {0.0F, gsl::narrow<float>(UnzoomedRect.cy), gsl::narrow<float>(UnzoomedRect.cx), 0.0F};
 	  }
 	  NearestCount = 0;
 	  StateMap->set(StateFlag::RESTCH);
@@ -17693,35 +17693,35 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
 	if (RegisterClassEx(&wc)) {
-	  auto  private_AllItemsRect              = fRECTANGLE {};
-	  auto  private_AngledFormVertices        = std::vector<fPOINT> {};
+	  auto  private_AllItemsRect              = F_RECTANGLE {};
+	  auto  private_AngledFormVertices        = std::vector<F_POINT> {};
 	  auto  private_AuxName                   = fs::path {};
 	  auto  private_BitmapBackgroundColor     = std::vector<COLORREF> {};
-	  auto  private_BSequence                 = std::vector<BSEQPNT> {};
+	  auto  private_BSequence                 = std::vector<B_SEQ_PNT> {};
 	  auto  private_BalaradName0              = fs::path {};
 	  auto  private_BalaradName1              = fs::path {};
 	  auto  private_BalaradName2              = fs::path {};
 	  auto  private_ButtonWin                 = std::vector<HWND> {};
-	  auto  private_ClipBuffer                = std::vector<fPOINTATTR> {};
-	  auto  private_ClipPoints                = std::vector<fPOINT> {};
+	  auto  private_ClipBuffer                = std::vector<F_POINT_ATTR> {};
+	  auto  private_ClipPoints                = std::vector<F_POINT> {};
 	  auto  private_ColorFileName             = fs::path {};
-	  auto  private_ColorChangeTable          = std::vector<COLCHNG> {};
+	  auto  private_ColorChangeTable          = std::vector<COL_CHANGE> {};
 	  auto  private_DefaultColorWin           = std::vector<HWND> {};
 	  auto  private_DefaultDirectory          = fs::path {};
 	  auto  private_DesignerName              = std::wstring {};
-	  auto  private_ExtendedHeader            = STREX {};
+	  auto  private_ExtendedHeader            = THR_HEAD_EX {};
 	  auto  private_FormAngles                = std::vector<float> {};
 	  auto  private_FormControlPoints         = std::vector<POINT> {};
 	  auto  private_FormLines                 = std::vector<POINT> {};
-	  auto  private_FormList                  = std::vector<FRMHED> {};
+	  auto  private_FormList                  = std::vector<FRM_HEAD> {};
 	  auto  private_FormOnOff                 = std::wstring {};
-	  auto  private_FormVertices              = std::vector<fPOINT> {};
+	  auto  private_FormVertices              = std::vector<F_POINT> {};
 	  auto  private_FormVerticesAsLine        = std::vector<POINT> {};
 	  auto  private_HomeDirectory             = fs::path {};
 	  auto  private_IniFileName               = fs::path {};
-	  auto  private_InsidePointList           = std::vector<fPOINT> {};
-	  auto  private_InterleaveSequence        = std::vector<fPOINT> {};
-	  auto  private_InterleaveSequenceIndices = std::vector<INSREC> {};
+	  auto  private_InsidePointList           = std::vector<F_POINT> {};
+	  auto  private_InterleaveSequence        = std::vector<F_POINT> {};
+	  auto  private_InterleaveSequenceIndices = std::vector<INS_REC> {};
 	  auto  private_Knots                     = std::vector<uint32_t> {};
 	  auto  private_LabelWindow               = std::vector<HWND> {};
 	  auto* formOnOff                         = private_FormOnOff.data();
@@ -17746,12 +17746,12 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_MsgBuffer                 = std::vector<wchar_t> {};
 	  auto private_NearestPixel              = std::vector<POINT> {};
 	  auto private_NearestPoint              = std::vector<uint32_t> {};
-	  auto private_OSequence                 = std::vector<fPOINT> {};
-	  auto private_OutsidePointList          = std::vector<fPOINT> {};
+	  auto private_OSequence                 = std::vector<F_POINT> {};
+	  auto private_OutsidePointList          = std::vector<F_POINT> {};
 	  auto private_PreviousNames             = std::vector<fs::path> {};
 	  auto private_RGBFileName               = fs::path {};
 	  auto private_RubberBandLine            = std::vector<POINT> {};
-	  auto private_SatinGuides               = std::vector<SATCON> {};
+	  auto private_SatinGuides               = std::vector<SAT_CON> {};
 	  auto private_SearchLine                = std::vector<POINT> {};
 	  auto private_SelectedFormList          = std::vector<uint32_t> {};
 	  auto private_SelectedFormsLine         = std::vector<POINT> {};
@@ -17760,11 +17760,11 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_SideWindow                = std::vector<HWND> {};
 	  auto private_SideWindowEntryBuffer     = std::vector<wchar_t> {};
 	  auto private_StateMap                  = EnumMap<StateFlag> {0};
-	  auto private_StitchBuffer              = std::vector<fPOINTATTR> {};
-	  auto private_TempPolygon               = std::vector<fPOINT> {};
-	  auto private_TempTexturePoints         = std::vector<TXPNT> {};
-	  auto private_TextureHistory            = std::vector<TXHST> {};
-	  auto private_TexturePointsBuffer       = std::vector<TXPNT> {};
+	  auto private_StitchBuffer              = std::vector<F_POINT_ATTR> {};
+	  auto private_TempPolygon               = std::vector<F_POINT> {};
+	  auto private_TempTexturePoints         = std::vector<TX_PNT> {};
+	  auto private_TextureHistory            = std::vector<TX_HIST> {};
+	  auto private_TexturePointsBuffer       = std::vector<TX_PNT> {};
 	  auto private_ThrName                   = fs::path {};
 	  auto private_ThreadSizeWin             = std::vector<HWND> {};
 	  auto private_ThumbnailSearchString     = std::vector<wchar_t> {};
@@ -17929,8 +17929,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  }
 	  auto xyRatio        = 1.0F; // expand form aspect ratio
 	  auto rotationAngle  = 0.0F;
-	  auto rotationCenter = fPOINT {};
-	  auto textureForm    = FRMHED {};
+	  auto rotationCenter = F_POINT {};
+	  auto textureForm    = FRM_HEAD {};
 	  auto stretchBoxLine = std::vector<POINT> {};
 	  stretchBoxLine.resize(SQPNTS); // stretch and expand
 	  while (GetMessage(&Msg, nullptr, 0, 0)) {
