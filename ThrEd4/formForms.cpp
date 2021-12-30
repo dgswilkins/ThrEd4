@@ -44,7 +44,7 @@ static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form
 static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
 static auto ValueWindowSize   = SIZE {}; // size of the right windows in the form data sheet
 
-auto const DaisyTypeStrings = std::array<uint16_t, 6> {
+auto const DAISY_TYPE_STRINGS = std::array<uint16_t, 6> {
     IDS_DAZCRV,
     IDS_DAZSAW,
     IDS_DAZRMP,
@@ -140,7 +140,7 @@ void formForms::internal::nxtlinprf() noexcept {
 }
 
 void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryCount) {
-  static constexpr auto edgeArray = std::array<uint16_t, 13> {
+  static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn         = dT::loadStr(IDS_ON);
   auto const strOff        = dT::loadStr(IDS_OFF);
@@ -338,7 +338,7 @@ void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryC
 	valueWindow[LBRDCOL] =
 	    ffi::numwin(fmt::format(L"{}", ((form.borderColor & COLMSK) + 1U)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if ((edgeArray[edgeIdx] & BESPAC) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BESPAC) != 0) {
 	  labelWindow[LBRDSPAC] = ffi::txtwin(dT::loadStr(IDS_TXT9), LabelWindowCoords);
 	  choice = (edgeFillType == EDGEPROPSAT || edgeFillType == EDGEOCHAIN || edgeFillType == EDGELCHAIN)
 	               ? fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN))
@@ -346,41 +346,41 @@ void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryC
 	  valueWindow[LBRDSPAC] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BPICSPAC) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BPICSPAC) != 0) {
 	  labelWindow[LBRDPIC] = ffi::txtwin(dT::loadStr(IDS_TXT16), LabelWindowCoords);
 	  valueWindow[LBRDPIC] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.edgeSpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BEMAX) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BEMAX) != 0) {
 	  labelWindow[LMAXBRD] = ffi::txtwin(dT::loadStr(IDS_TXT22), LabelWindowCoords);
 	  valueWindow[LMAXBRD] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.maxBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BELEN) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BELEN) != 0) {
 	  labelWindow[LBRDLEN] = ffi::txtwin(dT::loadStr(IDS_TXT10), LabelWindowCoords);
 	  valueWindow[LBRDLEN] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.edgeStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BEMIN) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BEMIN) != 0) {
 	  labelWindow[LMINBRD] = ffi::txtwin(dT::loadStr(IDS_TXT23), LabelWindowCoords);
 	  valueWindow[LMINBRD] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.minBorderStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BESIZ) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BESIZ) != 0) {
 	  labelWindow[LBRDSIZ] = ffi::txtwin(dT::loadStr(IDS_TXT11), LabelWindowCoords);
 	  valueWindow[LBRDSIZ] = ffi::numwin(fmt::format(L"{:.2f}", (form.borderSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BRDPOS) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BRDPOS) != 0) {
 	  labelWindow[LBRDPOS] = ffi::txtwin(dT::loadStr(IDS_TXT18), LabelWindowCoords);
 	  valueWindow[LBRDPOS] = ffi::numwin(fmt::format(L"{:.2f}", (form.edgeStitchLen)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & CHNPOS) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & CHNPOS) != 0) {
 	  labelWindow[LBRDPOS] = ffi::txtwin(dT::loadStr(IDS_TXT19), LabelWindowCoords);
 	  valueWindow[LBRDPOS] = ffi::numwin(fmt::format(L"{:.2f}", (form.edgeStitchLen)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
@@ -396,14 +396,14 @@ void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryC
 	  valueWindow[LBRDUND] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if ((edgeArray[edgeIdx] & BCNRSIZ) != 0) {
+	if ((EDGE_ARRAY[edgeIdx] & BCNRSIZ) != 0) {
 	  choice = (form.edgeType == EDGEBHOL) ? fmt::format(L"{:.2f}", (form::getblen() * IPFGRAN))
 	                                       : fmt::format(L"{:.2f}", (form::getplen() * IPFGRAN));
 	  labelWindow[LBCSIZ] = ffi::txtwin(dT::loadStr(IDS_TXT13), LabelWindowCoords);
 	  valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if (form.type == FRMLINE && ((edgeArray[edgeIdx] & BRDEND) != 0)) {
+	if (form.type == FRMLINE && ((EDGE_ARRAY[edgeIdx] & BRDEND) != 0)) {
 	  labelWindow[LBSTRT] = ffi::txtwin(dT::loadStr(IDS_TXT14), LabelWindowCoords);
 	  choice = ((form.attribute & SBLNT) != 0U) ? dT::loadStr(IDS_BLUNT) : dT::loadStr(IDS_TAPR);
 	  valueWindow[LBSTRT] = ffi::numwin(choice, ValueWindowCoords);
@@ -666,12 +666,12 @@ void formForms::internal::initdaz(HWND hWinDialog) {
 	flag = 0U;
   }
   CheckDlgButton(hWinDialog, IDC_DLIN, flag);
-  for (auto const& DaisyTypeString : DaisyTypeStrings) {
+  for (auto const& daisyTypeString : DAISY_TYPE_STRINGS) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP),
 	            CB_ADDSTRING,
 	            0,
-	            reinterpret_cast<LPARAM>(dT::loadStr(DaisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	            reinterpret_cast<LPARAM>(dT::loadStr(daisyTypeString).c_str())); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
   }
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
@@ -720,8 +720,8 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 			UserFlagMap->reset(UserFlag::DAZD);
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZTYP), buffer.data(), HBUFSIZ);
-		  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DaisyTypeStrings.size()); ++iType) {
-			auto compareBuffer = dT::loadStr(DaisyTypeStrings[iType]);
+		  for (auto iType = uint8_t {}; iType < gsl::narrow_cast<uint8_t>(DAISY_TYPE_STRINGS.size()); ++iType) {
+			auto compareBuffer = dT::loadStr(DAISY_TYPE_STRINGS[iType]);
 			if (wcscmp(buffer.data(), compareBuffer.c_str()) == 0) {
 			  IniFile.daisyBorderType = iType;
 			  break;
@@ -893,11 +893,11 @@ void formForms::dasyfrm() {
   auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 
   if (UserFlagMap->test(UserFlag::DAZHOL)) {
-	auto           ReferenceVertex = wrap::next(itVertex, fref - 1U);
+	auto           referenceVertex = wrap::next(itVertex, fref - 1U);
 	constexpr auto HOLEMARG        = 0.01F; // hole margin offset
-	ReferenceVertex->y += HOLEMARG;
-	++ReferenceVertex;
-	ReferenceVertex->y += HOLEMARG;
+	referenceVertex->y += HOLEMARG;
+	++referenceVertex;
+	referenceVertex->y += HOLEMARG;
   }
   form.vertexCount = iVertex;
   if (UserFlagMap->test(UserFlag::DAZD)) {
