@@ -363,7 +363,7 @@ void displayText::savdisc() {
                               nullptr);
 }
 
-static auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
+static auto CALLBACK enumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   SendMessage(p_hWnd, WM_SETFONT, gsl::narrow_cast<WPARAM>(lParam), MAKELPARAM(TRUE, 0));
   return TRUE;
@@ -372,13 +372,13 @@ static auto CALLBACK EnumChildProc(HWND p_hWnd, LPARAM lParam) noexcept -> BOOL 
 void displayText::updateWinFont(HWND hWnd) noexcept {
   auto const* hFont = displayText::getThrEdFont(FONTSIZE);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast)
-  EnumChildWindows(hWnd, EnumChildProc, reinterpret_cast<LPARAM>(hFont));
+  EnumChildWindows(hWnd, enumChildProc, reinterpret_cast<LPARAM>(hFont));
 }
 
 void displayText::tomsg() {
-  auto OKrect   = RECT {};
+  auto okRect   = RECT {};
   auto textSize = SIZE {};
-  GetWindowRect(OKButton, &OKrect);
+  GetWindowRect(OKButton, &okRect);
   auto const winName = displayText::loadStr(IDS_DELST2);
   wrap::getTextExtentPoint32(GetDC(ThrEdWindow), winName.c_str(), wrap::toUnsigned(winName.size()), &textSize);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -386,7 +386,7 @@ void displayText::tomsg() {
                                       winName.c_str(),
                                       SS_NOTIFY | WS_CHILD | WS_VISIBLE | WS_BORDER,
                                       3,
-                                      OKrect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
+                                      okRect.bottom - StitchWindowOrigin.y + 6 + textSize.cy,
                                       textSize.cx + 6,
                                       textSize.cy + 6,
                                       MainStitchWin,
