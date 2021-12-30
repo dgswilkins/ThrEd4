@@ -193,27 +193,27 @@ static auto Knots = gsl::narrow_cast<std::vector<uint32_t>*>(nullptr); // indice
 
 static auto SideWindowEntryBuffer =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // buffer for entering form data sheet numbers
-static auto swMsgIndex = uint32_t {}; // track current position in SideWindowEntryBuffer
+static auto SideWinMsgIdx = uint32_t {}; // track current position in SideWindowEntryBuffer
 static auto MsgBuffer  = gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // for user messages
 
 // graphics variables
 
-static constexpr auto DefaultColors = std::array<COLORREF, COLORCNT> {0x00000000,
-                                                                      0x00800000,
-                                                                      0x00FF0000,
-                                                                      0x00808000,
-                                                                      0x00FFFF00,
-                                                                      0x00800080,
-                                                                      0x00FF00FF,
-                                                                      0x00000080,
-                                                                      0x000000FF,
-                                                                      0x00008000,
-                                                                      0x0000FF00,
-                                                                      0x00008080,
-                                                                      0x0000FFFF,
-                                                                      0x00808080,
-                                                                      0x00C0C0C0,
-                                                                      0x00FFFFFF};
+static constexpr auto DEFAULT_COLORS = std::array<COLORREF, COLORCNT> {0x00000000,
+                                                                       0x00800000,
+                                                                       0x00FF0000,
+                                                                       0x00808000,
+                                                                       0x00FFFF00,
+                                                                       0x00800080,
+                                                                       0x00FF00FF,
+                                                                       0x00000080,
+                                                                       0x000000FF,
+                                                                       0x00008000,
+                                                                       0x0000FF00,
+                                                                       0x00008080,
+                                                                       0x0000FFFF,
+                                                                       0x00808080,
+                                                                       0x00C0C0C0,
+                                                                       0x00FFFFFF};
 
 static auto BoxOffset = std::array<int32_t, 4> {};
 
@@ -327,7 +327,7 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 }
 
 void thred::resetSideBuffer() {
-  swMsgIndex = 0;
+  SideWinMsgIdx = 0;
   std::fill(SideWindowEntryBuffer->begin(), SideWindowEntryBuffer->end(), 0);
 }
 
@@ -433,14 +433,14 @@ void thred::wrnmen() {
   CheckMenuItem(MainMenu, ID_WARNOF, code);
 }
 
-static auto datcod = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
+static auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
 
 void thred::chkmen() noexcept {
-  constexpr auto LASTCODE = datcod.size();
+  constexpr auto LASTCODE = DataCode.size();
   for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
 	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
 	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
-	CheckMenuItem(MainMenu, datcod[iCode], code);
+	CheckMenuItem(MainMenu, DataCode[iCode], code);
   }
 }
 
@@ -564,16 +564,16 @@ void thred::internal::redfnam(std::wstring& designerName) {
 auto thred::adflt(uint32_t count) -> uint32_t {
   auto const startVertex = wrap::toUnsigned(FormVertices->size());
   auto const it          = FormVertices->end();
-  auto constexpr val     = F_POINT {};
-  FormVertices->insert(it, count, val);
+  auto constexpr VAL     = F_POINT {};
+  FormVertices->insert(it, count, VAL);
   return startVertex;
 }
 
 auto thred::adclp(uint32_t count) -> uint32_t {
   auto const iClipPoint = wrap::toUnsigned(ClipPoints->size());
   auto const it         = ClipPoints->end();
-  auto constexpr val    = F_POINT {};
-  ClipPoints->insert(it, count, val);
+  auto constexpr VAL    = F_POINT {};
+  ClipPoints->insert(it, count, VAL);
   return iClipPoint;
 }
 
@@ -1288,18 +1288,18 @@ void thred::hupfn() {
 	  checkHoopRect.right  = itVertex->x;
 	  checkHoopRect.left   = itVertex->x;
 	}
-	for (auto const& FormVertice : *FormVertices) {
-	  if (FormVertice.x < checkHoopRect.left) {
-		checkHoopRect.left = FormVertice.x;
+	for (auto const& formVertice : *FormVertices) {
+	  if (formVertice.x < checkHoopRect.left) {
+		checkHoopRect.left = formVertice.x;
 	  }
-	  if (FormVertice.x > checkHoopRect.right) {
-		checkHoopRect.right = FormVertice.x;
+	  if (formVertice.x > checkHoopRect.right) {
+		checkHoopRect.right = formVertice.x;
 	  }
-	  if (FormVertice.y < checkHoopRect.bottom) {
-		checkHoopRect.bottom = FormVertice.y;
+	  if (formVertice.y < checkHoopRect.bottom) {
+		checkHoopRect.bottom = formVertice.y;
 	  }
-	  if (FormVertice.y > checkHoopRect.top) {
-		checkHoopRect.top = FormVertice.y;
+	  if (formVertice.y > checkHoopRect.top) {
+		checkHoopRect.top = formVertice.y;
 	  }
 	}
   }
@@ -1327,9 +1327,9 @@ void thred::hupfn() {
 		stitch.x += delta.x;
 		stitch.y += delta.y;
 	  }
-	  for (auto& FormVertice : *FormVertices) {
-		FormVertice.x += delta.x;
-		FormVertice.y += delta.y;
+	  for (auto& formVertice : *FormVertices) {
+		formVertice.x += delta.x;
+		formVertice.y += delta.y;
 	  }
 	  for (auto& form : *FormList) {
 		form.rectangle.left += delta.x;
@@ -1359,7 +1359,7 @@ void thred::internal::setSideWinVal(int index) {
 
 void thred::internal::chknum() {
   xt::clrstch();
-  if (swMsgIndex != 0U) {
+  if (SideWinMsgIdx != 0U) {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 
@@ -3459,11 +3459,11 @@ auto thred::internal::getSaveName(fs::path* fileName, FileIndices& fileType) -> 
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
 #if PESACT
-	  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
+	  static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
-	  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
+	  static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-	  hr = pFileSave->SetFileTypes(wrap::toUnsigned(aFileTypes.size()), aFileTypes.data());
+	  hr = pFileSave->SetFileTypes(wrap::toUnsigned(ALL_FILE_TYPES.size()), ALL_FILE_TYPES.data());
 	  hr += pFileSave->SetFileTypeIndex(1);
 	  hr += pFileSave->SetTitle(L"Save As");
 	  hr += pFileSave->SetFileName(fileName->filename().c_str());
@@ -4037,17 +4037,17 @@ auto thred::internal::getNewFileName(fs::path& newFileName, FileStyles fileTypes
 	  switch (fileTypes) {
 		case FileStyles::ALL_FILES: {
 #if PESACT
-		  static constexpr auto aFileTypes =
+		  static constexpr auto ALL_FILE_TYPES =
 		      std::array<COMDLG_FILTERSPEC, 4> {FLTTHR, FLTPCS, FLTDST, FLTPES}; // All possible file types for save
 #else
-		  static constexpr auto aFileTypes = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
+		  static constexpr auto ALL_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 3> {FLTTHR, FLTPCS, FLTDST}; // All possible file types for save
 #endif
-		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(aFileTypes.size()), aFileTypes.data());
+		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(ALL_FILE_TYPES.size()), ALL_FILE_TYPES.data());
 		  break;
 		}
 		case FileStyles::INS_FILES: {
-		  static constexpr auto iFileTypes = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
-		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(iFileTypes.size()), iFileTypes.data());
+		  static constexpr auto INSERT_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
+		  hr += pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()), INSERT_FILE_TYPES.data());
 		  break;
 		}
 	  }
@@ -4203,14 +4203,14 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	bytesToRead     = sizeof(UserColor);
 	ReadFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
-	  UserColor = DefaultColors;
+	  UserColor = DEFAULT_COLORS;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
 	bytesToRead = sizeof(CustomColor);
 	ReadFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, nullptr);
 	if (bytesRead != bytesToRead) {
-	  CustomColor = DefaultColors;
+	  CustomColor = DEFAULT_COLORS;
 	  prtred(fileHandle, IDS_PRT);
 	  return false;
 	}
@@ -6223,9 +6223,9 @@ void thred::internal::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish)
   }
   delta                         = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
   auto const knotStep           = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-  constexpr auto knotAtEndOrder = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
-  constexpr auto knotAtLastOrder = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
-  auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? knotAtLastOrder : knotAtEndOrder;
+  constexpr auto KNOT_AT_END_ORDER = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
+  constexpr auto KNOT_AT_LAST_ORDER = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
+  auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? KNOT_AT_LAST_ORDER : KNOT_AT_END_ORDER;
   for (auto const knot : knots) {
 	ofstch(buffer, finish, knot, knotStep, knotAttribute);
   }
@@ -6250,8 +6250,8 @@ void thred::internal::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start)
 	delta = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
 	auto const            knotAttribute = startIt->attribute | KNOTMSK;
 	auto const            knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
-	static constexpr auto knotAtStartOrder = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
-	for (char const iKnot : knotAtStartOrder) {
+	static constexpr auto KNOT_AT_START_ORDER = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
+	for (char const iKnot : KNOT_AT_START_ORDER) {
 	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
 	}
   }
@@ -6404,8 +6404,8 @@ void thred::internal::drwlstch(uint32_t finish) {
 	  }
 	}
 	if (StateMap->test(StateFlag::ZUMED)) {
-	  constexpr auto stitchCoordsInPixels = POINT {};
-	  movieLine.push_back(stitchCoordsInPixels);
+	  constexpr auto STITCH_COORDS_IN_PIXELS = POINT {};
+	  movieLine.push_back(STITCH_COORDS_IN_PIXELS);
 	  while (RunPoint < StitchesPerFrame + 1 && RunPoint < finish - 2 && !stch2px2(RunPoint)) {
 		++RunPoint;
 	  }
@@ -7456,8 +7456,8 @@ void thred::delinf() noexcept {
   for (auto& iStitch : *StitchBuffer) {
 	thi::infadj(iStitch.x, iStitch.y);
   }
-  for (auto& FormVertice : *FormVertices) {
-	thi::infadj(FormVertice.x, FormVertice.y);
+  for (auto& formVertice : *FormVertices) {
+	thi::infadj(formVertice.x, formVertice.y);
   }
 }
 
@@ -7595,8 +7595,8 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	return;
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
-	for (auto& FormVertice : *FormVertices) {
-	  thred::rotflt(FormVertice, rotationAngle, rotationCenter);
+	for (auto& formVertice : *FormVertices) {
+	  thred::rotflt(formVertice, rotationAngle, rotationCenter);
 	}
 	for (auto& stitch : *StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
@@ -8615,18 +8615,18 @@ void thred::stchrct(F_RECTANGLE& rectangle) noexcept {
 void thred::frmrct(F_RECTANGLE& rectangle) noexcept {
   rectangle.left = rectangle.right = FormVertices->front().x;
   rectangle.top = rectangle.bottom = FormVertices->front().y;
-  for (auto const& FormVertice : *FormVertices) {
-	if (FormVertice.x < rectangle.left) {
-	  rectangle.left = FormVertice.x;
+  for (auto const& formVertice : *FormVertices) {
+	if (formVertice.x < rectangle.left) {
+	  rectangle.left = formVertice.x;
 	}
-	if (FormVertice.x > rectangle.right) {
-	  rectangle.right = FormVertice.x;
+	if (formVertice.x > rectangle.right) {
+	  rectangle.right = formVertice.x;
 	}
-	if (FormVertice.y > rectangle.top) {
-	  rectangle.top = FormVertice.y;
+	if (formVertice.y > rectangle.top) {
+	  rectangle.top = formVertice.y;
 	}
-	if (FormVertice.y < rectangle.bottom) {
-	  rectangle.bottom = FormVertice.y;
+	if (formVertice.y < rectangle.bottom) {
+	  rectangle.bottom = formVertice.y;
 	}
   }
 }
@@ -8675,10 +8675,10 @@ void thred::internal::sidhup() {
   GetWindowRect(ValueWindow->operator[](PRFHUPTYP), &hoopRectangle);
   GetWindowRect(PreferencesWindow, &preferencesRectangle);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto smwFlags = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
+  constexpr auto SMW_FLAGS = DWORD {WS_BORDER | WS_CHILD | WS_VISIBLE};
   SideMessageWindow       = CreateWindow(L"STATIC",
                                    nullptr,
-                                   smwFlags,
+                                   SMW_FLAGS,
                                    preferencesRectangle.right + 3 - ThredWindowOrigin.x,
                                    hoopRectangle.top - ThredWindowOrigin.y,
                                    ButtonWidthX3 + ButtonWidth * 2 + 6,
@@ -8688,13 +8688,13 @@ void thred::internal::sidhup() {
                                    ThrEdInstance,
                                    nullptr);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto swFlags = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
+  constexpr auto SW_FLAGS = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER};
   for (auto iHoop = size_t {}; iHoop < HUPS; ++iHoop) {
 	auto const  idx = gsl::narrow_cast<int32_t>(iHoop);
 	SideWindow->operator[](iHoop) =
 	    CreateWindow(L"STATIC",
 	                 displayText::loadStr(wrap::toUnsigned(iHoop) + IDS_HUP0).c_str(),
-	                 swFlags,
+	                 SW_FLAGS,
 	                 3,
 	                 ButtonHeight * idx + 3,
 	                 ButtonWidthX3 + ButtonWidth * 2,
@@ -8760,30 +8760,30 @@ void thred::internal::clpadj() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::rngadj();
 	auto iStitch          = GroupStartStitch;
-	auto ClipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
-	                                    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
-	                                    StitchBuffer->operator[](iStitch).x,
-	                                    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
+	auto clipRectAdjusted = F_RECTANGLE {StitchBuffer->operator[](iStitch).x,
+	                                     StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y,
+	                                     StitchBuffer->operator[](iStitch).x,
+	                                     StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y};
 	++iStitch;
 	while (iStitch < GroupEndStitch) {
-	  clpradj(ClipRectAdjusted, StitchBuffer->operator[](iStitch++));
+	  clpradj(clipRectAdjusted, StitchBuffer->operator[](iStitch++));
 	}
-	if (StitchBuffer->operator[](iStitch).x < ClipRectAdjusted.left) {
-	  ClipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
+	if (StitchBuffer->operator[](iStitch).x < clipRectAdjusted.left) {
+	  clipRectAdjusted.left = StitchBuffer->operator[](iStitch).x;
 	}
-	if (StitchBuffer->operator[](iStitch).x > ClipRectAdjusted.right) {
-	  ClipRectAdjusted.right = StitchBuffer->operator[](iStitch).x;
+	if (StitchBuffer->operator[](iStitch).x > clipRectAdjusted.right) {
+	  clipRectAdjusted.right = StitchBuffer->operator[](iStitch).x;
 	}
-	auto const clipMiddle = wrap::midl(ClipRectAdjusted.right, ClipRectAdjusted.left);
-	StitchBuffer->operator[](GroupStartStitch).y = wrap::midl(ClipRectAdjusted.top, ClipRectAdjusted.bottom);
+	auto const clipMiddle = wrap::midl(clipRectAdjusted.right, clipRectAdjusted.left);
+	StitchBuffer->operator[](GroupStartStitch).y = wrap::midl(clipRectAdjusted.top, clipRectAdjusted.bottom);
 	StitchBuffer->operator[](GroupEndStitch).y = StitchBuffer->operator[](GroupStartStitch).y;
 	if (StitchBuffer->operator[](GroupStartStitch).x < clipMiddle) {
-	  StitchBuffer->operator[](GroupStartStitch).x = ClipRectAdjusted.left;
-	  StitchBuffer->operator[](GroupEndStitch).x   = ClipRectAdjusted.right;
+	  StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.left;
+	  StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.right;
 	}
 	else {
-	  StitchBuffer->operator[](GroupEndStitch).x   = ClipRectAdjusted.left;
-	  StitchBuffer->operator[](GroupStartStitch).x = ClipRectAdjusted.right;
+	  StitchBuffer->operator[](GroupEndStitch).x   = clipRectAdjusted.left;
+	  StitchBuffer->operator[](GroupStartStitch).x = clipRectAdjusted.right;
 	}
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
@@ -9268,15 +9268,16 @@ void thred::internal::retrac() {
 }
 
 void thred::internal::setgrd(COLORREF color) {
-  static constexpr auto gcHigh    = GRID_COL {ID_GRDHI, HIGRD};
-  static constexpr auto gcMedium  = GRID_COL {ID_GRDMED, MEDGRD};
-  static constexpr auto gcDefault = GRID_COL {ID_GRDEF, DEFGRD};
-  static constexpr auto gcRed     = GRID_COL {ID_GRDRED, REDGRD};
-  static constexpr auto gcBlue    = GRID_COL {ID_GRDBLU, BLUGRD};
-  static constexpr auto gcGreen   = GRID_COL {ID_GRDGRN, GRNGRD};
-  static constexpr auto gridCodes = std::array<GRID_COL, 6> {gcHigh, gcMedium, gcDefault, gcRed, gcBlue, gcGreen};
+  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, HIGRD};
+  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, MEDGRD};
+  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, DEFGRD};
+  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, REDGRD};
+  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, BLUGRD};
+  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRNGRD};
+  static constexpr auto GRID_CODES =
+      std::array<GRID_COL, 6> {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
 
-  for (auto const& gridCode : gridCodes) {
+  for (auto const& gridCode : GRID_CODES) {
 	if (color == gridCode.col) {
 	  CheckMenuItem(MainMenu, gridCode.id, MF_CHECKED);
 	}
@@ -12328,10 +12329,10 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::SIZSEL)) {
 	if (thi::chkMsgs(Msg.pt, ChangeThreadSizeWin.front(), ChangeThreadSizeWin.back())) {
 	  VerticalIndex -= 13U;
-	  static constexpr auto threadSizeMap = std::array<wchar_t, 3> {L'3', L'4', L'6'};
+	  static constexpr auto THREAD_SIZE_MAP = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 
 	  auto ts     = wrap::next(ThreadSize.begin(), threadSizeSelected);
-	  auto tsm    = wrap::next(threadSizeMap.begin(), VerticalIndex);
+	  auto tsm    = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
 	  *ts         = *tsm;
 	  auto tsi    = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
 	  *tsi        = VerticalIndex;
@@ -12778,12 +12779,12 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   }
   if (thi::chkMsgs(Msg.pt, ThreadSizeWin->front(), ThreadSizeWin->back())) {
 	if (Msg.message == WM_LBUTTONDOWN) {
-	  static constexpr auto str = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
+	  static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
 	  std::generate(ChangeThreadSizeWin.begin(),
 	                ChangeThreadSizeWin.end(),
-	                [idx = gsl::narrow_cast<int32_t>(VerticalIndex), iStr = str.begin()]() mutable noexcept -> HWND {
+	                [idx = gsl::narrow_cast<int32_t>(VerticalIndex), iStr = THREAD_SIZES.begin()]() mutable noexcept -> HWND {
 		              // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		              return CreateWindow(L"STATIC",
 		                                  *(iStr++),
@@ -14628,7 +14629,7 @@ auto thred::internal::handleEditMenu(WORD const& wParameter) -> bool {
 	  auto uc  = UserColor.begin();
 	  auto up  = UserPen->begin();
 	  auto ucw = UserColorWin->begin();
-	  for (auto const& color : DefaultColors) {
+	  for (auto const& color : DEFAULT_COLORS) {
 		*uc = color;
 		nuBrush(*ucb, *uc);
 		nuPen(*up, 1, *uc);
@@ -15611,7 +15612,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (chkminus(code)) {
 		  if (SideWindowEntryBuffer->front() != '-') {
 			thred::resetSideBuffer();
-			SideWindowEntryBuffer->operator[](swMsgIndex++) = '-';
+			SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '-';
 			SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 		  }
 		  return true;
@@ -15631,9 +15632,9 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 			thred::unsid();
 		  }
 		  else {
-			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](swMsgIndex++) = NumericCode;
-			  SideWindowEntryBuffer->operator[](swMsgIndex)   = 0;
+			if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = NumericCode;
+			  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 		  }
@@ -15643,16 +15644,16 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		  case VK_DECIMAL:      // numpad period
 		  case VK_OEM_PERIOD: { // period
 			// ToDo - only allow entry if there is not already a period in the buffer
-			if (swMsgIndex < (SideWindowEntryBuffer->size() - 1U)) {
-			  SideWindowEntryBuffer->operator[](swMsgIndex++) = '.';
-			  SideWindowEntryBuffer->operator[](swMsgIndex)   = 0;
+			if (SideWinMsgIdx < (SideWindowEntryBuffer->size() - 1U)) {
+			  SideWindowEntryBuffer->operator[](SideWinMsgIdx++) = '.';
+			  SideWindowEntryBuffer->operator[](SideWinMsgIdx)   = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
 		  }
 		  case VK_BACK: { // backspace
-			if (swMsgIndex != 0U) {
-			  SideWindowEntryBuffer->operator[](--swMsgIndex) = 0;
+			if (SideWinMsgIdx != 0U) {
+			  SideWindowEntryBuffer->operator[](--SideWinMsgIdx) = 0;
 			  SetWindowText(SideMessageWindow, SideWindowEntryBuffer->data());
 			}
 			return true;
@@ -15880,32 +15881,32 @@ void thred::internal::ducmd() {
 	if (arg1.compare(0, 4, L"/F1:") == 0) {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto BalaradFile =
+	  auto balaradFile =
 	      CreateFile(balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	  if (BalaradFile != INVALID_HANDLE_VALUE) {
-		CloseHandle(BalaradFile);
+	  if (balaradFile != INVALID_HANDLE_VALUE) {
+		CloseHandle(balaradFile);
 		*BalaradName0 = balaradFileName;
 		if (ArgCount > 2) {
 		  auto const arg2 = std::wstring {ArgList[2]};
 		  if (arg2.compare(0, 4, L"/F2:") == 0) {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
-			BalaradFile     = CreateFile(
+			balaradFile     = CreateFile(
                 balaradFileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-			if (BalaradFile != INVALID_HANDLE_VALUE) {
+			if (balaradFile != INVALID_HANDLE_VALUE) {
 			  auto readBuffer = std::vector<char> {};
 			  readBuffer.resize(_MAX_PATH + 1);
 			  *BalaradName1  = balaradFileName;
 			  auto bytesRead = DWORD {};
 
-			  ReadFile(BalaradFile, readBuffer.data(), wrap::toUnsigned(readBuffer.size()), &bytesRead, nullptr);
+			  ReadFile(balaradFile, readBuffer.data(), wrap::toUnsigned(readBuffer.size()), &bytesRead, nullptr);
 			  if (bytesRead != 0U) {
 				readBuffer.resize(bytesRead);
 				BalaradName2->assign(readBuffer.data());
 				redbal();
 			  }
-			  CloseHandle(BalaradFile);
+			  CloseHandle(balaradFile);
 			}
 		  }
 		}
@@ -16207,7 +16208,7 @@ void thred::internal::createBrushes() noexcept {
   auto dcb = DefaultColorBrush.begin();
   auto ucb = UserColorBrush.begin();
   auto uc  = UserColor.begin();
-  for (auto const& color : DefaultColors) {
+  for (auto const& color : DEFAULT_COLORS) {
 	*(dcb++) = CreateSolidBrush(color);
 	*(ucb++) = CreateSolidBrush(*(uc++));
   }
@@ -16383,8 +16384,8 @@ void thred::internal::init() {
                           nullptr);
   nuRct();
   // create pens
-  static constexpr auto boxColor = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  std::generate(BoxPen.begin(), BoxPen.end(), [bc = boxColor.begin()]() mutable noexcept -> HPEN {
+  static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
+  std::generate(BoxPen.begin(), BoxPen.end(), [bc = BOX_COLOR.begin()]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(bc++));
   });
   LinePen        = wrap::createPen(PS_SOLID, PENNWID, PENCHCL);
@@ -16448,8 +16449,8 @@ void thred::internal::init() {
 
 auto thred::internal::defTxt(uint32_t iColor) -> COLORREF {
   // bitmap for color number. Black or white bit chosen for contrast against the default background colors
-  constexpr auto textColorMap = std::bitset<16>(0xbaf);
-  return textColorMap.test(iColor) ? PENWHITE : PENBLK;
+  constexpr auto TEXT_COLOR_MAP = std::bitset<16>(0xbaf);
+  return TEXT_COLOR_MAP.test(iColor) ? PENWHITE : PENBLK;
 }
 
 void thred::internal::relin() {
@@ -16470,17 +16471,17 @@ void thred::internal::dumov() {
 	auto const     abCenterPixels = sdCor2px(StitchBuffer->operator[](MoveAnchor));
 	arrowBox[0]                   = abCenterPixels;
 	arrowBox[6]                   = abCenterPixels;
-	auto OffsetFromCenter         = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
-	rotpix(OffsetFromCenter, arrowBox[1], abCenterPixels);
-	OffsetFromCenter.y = abCenterPixels.y - 2;
-	rotpix(OffsetFromCenter, arrowBox[5], abCenterPixels);
-	OffsetFromCenter.y = abCenterPixels.y + 6;
-	rotpix(OffsetFromCenter, arrowBox[2], abCenterPixels);
-	OffsetFromCenter.y = abCenterPixels.y - 6;
-	rotpix(OffsetFromCenter, arrowBox[4], abCenterPixels);
-	OffsetFromCenter.x = abCenterPixels.x + 20;
-	OffsetFromCenter.y = abCenterPixels.y;
-	rotpix(OffsetFromCenter, arrowBox[3], abCenterPixels);
+	auto offsetFromCenter         = POINT {abCenterPixels.x + 12, abCenterPixels.y + 2};
+	rotpix(offsetFromCenter, arrowBox[1], abCenterPixels);
+	offsetFromCenter.y = abCenterPixels.y - 2;
+	rotpix(offsetFromCenter, arrowBox[5], abCenterPixels);
+	offsetFromCenter.y = abCenterPixels.y + 6;
+	rotpix(offsetFromCenter, arrowBox[2], abCenterPixels);
+	offsetFromCenter.y = abCenterPixels.y - 6;
+	rotpix(offsetFromCenter, arrowBox[4], abCenterPixels);
+	offsetFromCenter.x = abCenterPixels.x + 20;
+	offsetFromCenter.y = abCenterPixels.y;
+	rotpix(offsetFromCenter, arrowBox[3], abCenterPixels);
 	SelectObject(StitchWindowMemDC, FormPen);
 	SetROP2(StitchWindowMemDC, R2_XORPEN);
 	wrap::polyline(StitchWindowMemDC, arrowBox.data(), wrap::toUnsigned(arrowBox.size()));
@@ -17144,7 +17145,7 @@ void thred::internal::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem)
   }
 }
 
-struct CreateParams {
+struct createParams {
   BOOL bEnableNonClientDpiScaling;
 };
 
@@ -17439,7 +17440,7 @@ auto CALLBACK thred::internal::wndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 		if (DrawItem->hwndItem == DefaultColorWin->operator[](iColor)) {
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *dcb);
 		  if (DisplayedColorBitmap.test(iColor)) {
-			SetBkColor(DrawItem->hDC, DefaultColors[iColor]);
+			SetBkColor(DrawItem->hDC, DEFAULT_COLORS[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
 			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
 			auto       textSize = SIZE {};
@@ -17693,40 +17694,40 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
 	if (RegisterClassEx(&wc)) {
-	  auto  private_AllItemsRect              = F_RECTANGLE {};
-	  auto  private_AngledFormVertices        = std::vector<F_POINT> {};
-	  auto  private_AuxName                   = fs::path {};
-	  auto  private_BitmapBackgroundColor     = std::vector<COLORREF> {};
-	  auto  private_BSequence                 = std::vector<B_SEQ_PNT> {};
-	  auto  private_BalaradName0              = fs::path {};
-	  auto  private_BalaradName1              = fs::path {};
-	  auto  private_BalaradName2              = fs::path {};
-	  auto  private_ButtonWin                 = std::vector<HWND> {};
-	  auto  private_ClipBuffer                = std::vector<F_POINT_ATTR> {};
-	  auto  private_ClipPoints                = std::vector<F_POINT> {};
-	  auto  private_ColorFileName             = fs::path {};
-	  auto  private_ColorChangeTable          = std::vector<COL_CHANGE> {};
-	  auto  private_DefaultColorWin           = std::vector<HWND> {};
-	  auto  private_DefaultDirectory          = fs::path {};
-	  auto  private_DesignerName              = std::wstring {};
-	  auto  private_ExtendedHeader            = THR_HEAD_EX {};
-	  auto  private_FormAngles                = std::vector<float> {};
-	  auto  private_FormControlPoints         = std::vector<POINT> {};
-	  auto  private_FormLines                 = std::vector<POINT> {};
-	  auto  private_FormList                  = std::vector<FRM_HEAD> {};
-	  auto  private_FormOnOff                 = std::wstring {};
-	  auto  private_FormVertices              = std::vector<F_POINT> {};
-	  auto  private_FormVerticesAsLine        = std::vector<POINT> {};
-	  auto  private_HomeDirectory             = fs::path {};
-	  auto  private_IniFileName               = fs::path {};
-	  auto  private_InsidePointList           = std::vector<F_POINT> {};
-	  auto  private_InterleaveSequence        = std::vector<F_POINT> {};
-	  auto  private_InterleaveSequenceIndices = std::vector<INS_REC> {};
-	  auto  private_Knots                     = std::vector<uint32_t> {};
-	  auto  private_LabelWindow               = std::vector<HWND> {};
-	  auto* formOnOff                         = private_FormOnOff.data();
+	  auto  privateAllItemsRect              = F_RECTANGLE {};
+	  auto  privateAngledFormVertices        = std::vector<F_POINT> {};
+	  auto  privateAuxName                   = fs::path {};
+	  auto  privateBitmapBackgroundColor     = std::vector<COLORREF> {};
+	  auto  privateBSequence                 = std::vector<B_SEQ_PNT> {};
+	  auto  privateBalaradName0              = fs::path {};
+	  auto  privateBalaradName1              = fs::path {};
+	  auto  privateBalaradName2              = fs::path {};
+	  auto  privateButtonWin                 = std::vector<HWND> {};
+	  auto  privateClipBuffer                = std::vector<F_POINT_ATTR> {};
+	  auto  privateClipPoints                = std::vector<F_POINT> {};
+	  auto  privateColorFileName             = fs::path {};
+	  auto  privateColorChangeTable          = std::vector<COL_CHANGE> {};
+	  auto  privateDefaultColorWin           = std::vector<HWND> {};
+	  auto  privateDefaultDirectory          = fs::path {};
+	  auto  privateDesignerName              = std::wstring {};
+	  auto  privateExtendedHeader            = THR_HEAD_EX {};
+	  auto  privateFormAngles                = std::vector<float> {};
+	  auto  privateFormControlPoints         = std::vector<POINT> {};
+	  auto  privateFormLines                 = std::vector<POINT> {};
+	  auto  privateFormList                  = std::vector<FRM_HEAD> {};
+	  auto  privateFormOnOff                 = std::wstring {};
+	  auto  privateFormVertices              = std::vector<F_POINT> {};
+	  auto  privateFormVerticesAsLine        = std::vector<POINT> {};
+	  auto  privateHomeDirectory             = fs::path {};
+	  auto  privateIniFileName               = fs::path {};
+	  auto  privateInsidePointList           = std::vector<F_POINT> {};
+	  auto  privateInterleaveSequence        = std::vector<F_POINT> {};
+	  auto  privateInterleaveSequenceIndices = std::vector<INS_REC> {};
+	  auto  privateKnots                     = std::vector<uint32_t> {};
+	  auto  privateLabelWindow               = std::vector<HWND> {};
+	  auto* formOnOff                         = privateFormOnOff.data();
 
-	  auto private_MenuInfo = MENUITEMINFO {
+	  auto privateMenuInfo = MENUITEMINFO {
 		sizeof(MENUITEMINFO), // Size
 		    MIIM_TYPE,        // Mask
 		    MFT_STRING,       // Type
@@ -17743,144 +17744,144 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif              /* WINVER >= 0x0500 */
 	  };
 
-	  auto private_MsgBuffer                 = std::vector<wchar_t> {};
-	  auto private_NearestPixel              = std::vector<POINT> {};
-	  auto private_NearestPoint              = std::vector<uint32_t> {};
-	  auto private_OSequence                 = std::vector<F_POINT> {};
-	  auto private_OutsidePointList          = std::vector<F_POINT> {};
-	  auto private_PreviousNames             = std::vector<fs::path> {};
-	  auto private_RGBFileName               = fs::path {};
-	  auto private_RubberBandLine            = std::vector<POINT> {};
-	  auto private_SatinGuides               = std::vector<SAT_CON> {};
-	  auto private_SearchLine                = std::vector<POINT> {};
-	  auto private_SelectedFormList          = std::vector<uint32_t> {};
-	  auto private_SelectedFormsLine         = std::vector<POINT> {};
-	  auto private_SelectedPointsLine        = std::vector<POINT> {};
-	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
-	  auto private_SideWindow                = std::vector<HWND> {};
-	  auto private_SideWindowEntryBuffer     = std::vector<wchar_t> {};
-	  auto private_StateMap                  = ENUM_MAP<StateFlag> {0};
-	  auto private_StitchBuffer              = std::vector<F_POINT_ATTR> {};
-	  auto private_TempPolygon               = std::vector<F_POINT> {};
-	  auto private_TempTexturePoints         = std::vector<TX_PNT> {};
-	  auto private_TextureHistory            = std::vector<TX_HIST> {};
-	  auto private_TexturePointsBuffer       = std::vector<TX_PNT> {};
-	  auto private_ThrName                   = fs::path {};
-	  auto private_ThreadSizeWin             = std::vector<HWND> {};
-	  auto private_ThumbnailSearchString     = std::vector<wchar_t> {};
-	  auto private_Thumbnails                = std::vector<std::wstring> {};
-	  auto private_TracedEdges               = boost::dynamic_bitset<> {};
-	  auto private_TracedMap                 = boost::dynamic_bitset<> {};
-	  auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
-	  auto private_UserBMPFileName           = fs::path {};
-	  auto private_UserColorWin              = std::vector<HWND> {};
-	  auto private_UserFlagMap               = ENUM_MAP<UserFlag> {0};
-	  auto private_UserPen                   = std::vector<HPEN> {};
-	  auto private_ValueWindow               = std::vector<HWND> {};
-	  auto private_VersionNames              = std::vector<fs::path> {};
-	  auto private_WorkingFileName           = fs::path {};
-	  auto private_textureInputBuffer        = std::wstring {};
+	  auto privateMsgBuffer                 = std::vector<wchar_t> {};
+	  auto privateNearestPixel              = std::vector<POINT> {};
+	  auto privateNearestPoint              = std::vector<uint32_t> {};
+	  auto privateOSequence                 = std::vector<F_POINT> {};
+	  auto privateOutsidePointList          = std::vector<F_POINT> {};
+	  auto privatePreviousNames             = std::vector<fs::path> {};
+	  auto privateRGBFileName               = fs::path {};
+	  auto privateRubberBandLine            = std::vector<POINT> {};
+	  auto privateSatinGuides               = std::vector<SAT_CON> {};
+	  auto privateSearchLine                = std::vector<POINT> {};
+	  auto privateSelectedFormList          = std::vector<uint32_t> {};
+	  auto privateSelectedFormsLine         = std::vector<POINT> {};
+	  auto privateSelectedPointsLine        = std::vector<POINT> {};
+	  auto privateSelectedTexturePointsList = std::vector<uint32_t> {};
+	  auto privateSideWindow                = std::vector<HWND> {};
+	  auto privateSideWindowEntryBuffer     = std::vector<wchar_t> {};
+	  auto privateStateMap                  = ENUM_MAP<StateFlag> {0};
+	  auto privateStitchBuffer              = std::vector<F_POINT_ATTR> {};
+	  auto privateTempPolygon               = std::vector<F_POINT> {};
+	  auto privateTempTexturePoints         = std::vector<TX_PNT> {};
+	  auto privateTextureHistory            = std::vector<TX_HIST> {};
+	  auto privateTexturePointsBuffer       = std::vector<TX_PNT> {};
+	  auto privateThrName                   = fs::path {};
+	  auto privateThreadSizeWin             = std::vector<HWND> {};
+	  auto privateThumbnailSearchString     = std::vector<wchar_t> {};
+	  auto privateThumbnails                = std::vector<std::wstring> {};
+	  auto privateTracedEdges               = boost::dynamic_bitset<> {};
+	  auto privateTracedMap                 = boost::dynamic_bitset<> {};
+	  auto privateUndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
+	  auto privateUserBMPFileName           = fs::path {};
+	  auto privateUserColorWin              = std::vector<HWND> {};
+	  auto privateUserFlagMap               = ENUM_MAP<UserFlag> {0};
+	  auto privateUserPen                   = std::vector<HPEN> {};
+	  auto privateValueWindow               = std::vector<HWND> {};
+	  auto privateVersionNames              = std::vector<fs::path> {};
+	  auto privateWorkingFileName           = fs::path {};
+	  auto privatetextureInputBuffer        = std::wstring {};
 
-	  private_DefaultColorWin.resize(COLORCNT);
-	  private_FormControlPoints.resize(OUTPNTS);
-	  private_LabelWindow.resize(LASTLIN);
-	  private_MsgBuffer.reserve(MSGSIZ);
-	  private_NearestPixel.resize(NERCNT);
-	  private_NearestPoint.resize(NERCNT);
-	  private_RubberBandLine.resize(3U);
-	  private_SelectedFormsLine.resize(OUTPNTS);
-	  private_SelectedPointsLine.resize(OUTPNTS);
-	  private_SideWindow.resize(SWCOUNT);
-	  private_SideWindowEntryBuffer.resize(SWBLEN);
-	  private_TextureHistory.resize(ITXBUFSZ);
-	  private_ThreadSizeWin.resize(COLORCNT);
-	  private_ThumbnailSearchString.reserve(32);
-	  private_UndoBuffer.resize(UNDOLEN);
-	  private_UserColorWin.resize(COLORCNT);
-	  private_UserPen.resize(COLORCNT);
-	  private_ValueWindow.resize(LASTLIN);
-	  private_PreviousNames.reserve(OLDNUM);
-	  private_VersionNames.reserve(OLDVER);
+	  privateDefaultColorWin.resize(COLORCNT);
+	  privateFormControlPoints.resize(OUTPNTS);
+	  privateLabelWindow.resize(LASTLIN);
+	  privateMsgBuffer.reserve(MSGSIZ);
+	  privateNearestPixel.resize(NERCNT);
+	  privateNearestPoint.resize(NERCNT);
+	  privateRubberBandLine.resize(3U);
+	  privateSelectedFormsLine.resize(OUTPNTS);
+	  privateSelectedPointsLine.resize(OUTPNTS);
+	  privateSideWindow.resize(SWCOUNT);
+	  privateSideWindowEntryBuffer.resize(SWBLEN);
+	  privateTextureHistory.resize(ITXBUFSZ);
+	  privateThreadSizeWin.resize(COLORCNT);
+	  privateThumbnailSearchString.reserve(32);
+	  privateUndoBuffer.resize(UNDOLEN);
+	  privateUserColorWin.resize(COLORCNT);
+	  privateUserPen.resize(COLORCNT);
+	  privateValueWindow.resize(LASTLIN);
+	  privatePreviousNames.reserve(OLDNUM);
+	  privateVersionNames.reserve(OLDVER);
 	  for (auto iVersion = 0U; iVersion < OLDNUM; ++iVersion) {
-		private_PreviousNames.emplace_back(L"");
+		privatePreviousNames.emplace_back(L"");
 	  }
 	  for (auto iVersion = wchar_t {}; iVersion < OLDVER; ++iVersion) {
-		private_VersionNames.emplace_back(L"");
+		privateVersionNames.emplace_back(L"");
 	  }
-	  AllItemsRect              = &private_AllItemsRect;
-	  AngledFormVertices        = &private_AngledFormVertices;
-	  AuxName                   = &private_AuxName;
-	  BSequence                 = &private_BSequence;
-	  BalaradName0              = &private_BalaradName0;
-	  BalaradName1              = &private_BalaradName1;
-	  BalaradName2              = &private_BalaradName2;
-	  ButtonWin                 = &private_ButtonWin;
-	  ClipBuffer                = &private_ClipBuffer;
-	  ClipPoints                = &private_ClipPoints;
-	  ColorChangeTable          = &private_ColorChangeTable;
-	  DefaultColorWin           = &private_DefaultColorWin;
-	  DefaultDirectory          = &private_DefaultDirectory;
-	  DesignerName              = &private_DesignerName;
-	  ExtendedHeader            = &private_ExtendedHeader;
-	  FormAngles                = &private_FormAngles;
-	  FormControlPoints         = &private_FormControlPoints;
-	  FormLines                 = &private_FormLines;
-	  FormList                  = &private_FormList;
-	  FormOnOff                 = &private_FormOnOff;
-	  FormVertices              = &private_FormVertices;
-	  FormVerticesAsLine        = &private_FormVerticesAsLine;
-	  HomeDirectory             = &private_HomeDirectory;
-	  IniFileName               = &private_IniFileName;
-	  InsidePointList           = &private_InsidePointList;
-	  InterleaveSequence        = &private_InterleaveSequence;
-	  InterleaveSequenceIndices = &private_InterleaveSequenceIndices;
-	  Knots                     = &private_Knots;
-	  LabelWindow               = &private_LabelWindow;
-	  MenuInfo                  = &private_MenuInfo;
-	  MsgBuffer                 = &private_MsgBuffer;
-	  NearestPixel              = &private_NearestPixel;
-	  NearestPoint              = &private_NearestPoint;
-	  OSequence                 = &private_OSequence;
-	  OutsidePointList          = &private_OutsidePointList;
-	  PreviousNames             = &private_PreviousNames;
-	  RubberBandLine            = &private_RubberBandLine;
-	  SatinGuides               = &private_SatinGuides;
-	  SearchLine                = &private_SearchLine;
-	  SelectedFormList          = &private_SelectedFormList;
-	  SelectedFormsLine         = &private_SelectedFormsLine;
-	  SelectedPointsLine        = &private_SelectedPointsLine;
-	  SideWindow                = &private_SideWindow;
-	  SideWindowEntryBuffer     = &private_SideWindowEntryBuffer;
-	  StateMap                  = &private_StateMap;
-	  StitchBuffer              = &private_StitchBuffer;
-	  TempPolygon               = &private_TempPolygon;
-	  TextureInputBuffer        = &private_textureInputBuffer;
-	  TexturePointsBuffer       = &private_TexturePointsBuffer;
-	  ThrName                   = &private_ThrName;
-	  ThreadSizeWin             = &private_ThreadSizeWin;
-	  ThumbnailSearchString     = &private_ThumbnailSearchString;
-	  Thumbnails                = &private_Thumbnails;
-	  TracedEdges               = &private_TracedEdges;
-	  TracedMap                 = &private_TracedMap;
-	  UndoBuffer                = &private_UndoBuffer;
-	  UserColorWin              = &private_UserColorWin;
-	  UserFlagMap               = &private_UserFlagMap;
-	  UserPen                   = &private_UserPen;
-	  ValueWindow               = &private_ValueWindow;
-	  VersionNames              = &private_VersionNames;
-	  WorkingFileName           = &private_WorkingFileName;
-	  bitmap::setBBCV(&private_BitmapBackgroundColor);
-	  bitmap::setUBfilename(&private_UserBMPFileName);
-	  DST::setColFilename(&private_ColorFileName);
-	  DST::setRGBFilename(&private_RGBFileName);
-	  texture::initTextures(&private_TempTexturePoints, &private_SelectedTexturePointsList, &private_TextureHistory);
+	  AllItemsRect              = &privateAllItemsRect;
+	  AngledFormVertices        = &privateAngledFormVertices;
+	  AuxName                   = &privateAuxName;
+	  BSequence                 = &privateBSequence;
+	  BalaradName0              = &privateBalaradName0;
+	  BalaradName1              = &privateBalaradName1;
+	  BalaradName2              = &privateBalaradName2;
+	  ButtonWin                 = &privateButtonWin;
+	  ClipBuffer                = &privateClipBuffer;
+	  ClipPoints                = &privateClipPoints;
+	  ColorChangeTable          = &privateColorChangeTable;
+	  DefaultColorWin           = &privateDefaultColorWin;
+	  DefaultDirectory          = &privateDefaultDirectory;
+	  DesignerName              = &privateDesignerName;
+	  ExtendedHeader            = &privateExtendedHeader;
+	  FormAngles                = &privateFormAngles;
+	  FormControlPoints         = &privateFormControlPoints;
+	  FormLines                 = &privateFormLines;
+	  FormList                  = &privateFormList;
+	  FormOnOff                 = &privateFormOnOff;
+	  FormVertices              = &privateFormVertices;
+	  FormVerticesAsLine        = &privateFormVerticesAsLine;
+	  HomeDirectory             = &privateHomeDirectory;
+	  IniFileName               = &privateIniFileName;
+	  InsidePointList           = &privateInsidePointList;
+	  InterleaveSequence        = &privateInterleaveSequence;
+	  InterleaveSequenceIndices = &privateInterleaveSequenceIndices;
+	  Knots                     = &privateKnots;
+	  LabelWindow               = &privateLabelWindow;
+	  MenuInfo                  = &privateMenuInfo;
+	  MsgBuffer                 = &privateMsgBuffer;
+	  NearestPixel              = &privateNearestPixel;
+	  NearestPoint              = &privateNearestPoint;
+	  OSequence                 = &privateOSequence;
+	  OutsidePointList          = &privateOutsidePointList;
+	  PreviousNames             = &privatePreviousNames;
+	  RubberBandLine            = &privateRubberBandLine;
+	  SatinGuides               = &privateSatinGuides;
+	  SearchLine                = &privateSearchLine;
+	  SelectedFormList          = &privateSelectedFormList;
+	  SelectedFormsLine         = &privateSelectedFormsLine;
+	  SelectedPointsLine        = &privateSelectedPointsLine;
+	  SideWindow                = &privateSideWindow;
+	  SideWindowEntryBuffer     = &privateSideWindowEntryBuffer;
+	  StateMap                  = &privateStateMap;
+	  StitchBuffer              = &privateStitchBuffer;
+	  TempPolygon               = &privateTempPolygon;
+	  TextureInputBuffer        = &privatetextureInputBuffer;
+	  TexturePointsBuffer       = &privateTexturePointsBuffer;
+	  ThrName                   = &privateThrName;
+	  ThreadSizeWin             = &privateThreadSizeWin;
+	  ThumbnailSearchString     = &privateThumbnailSearchString;
+	  Thumbnails                = &privateThumbnails;
+	  TracedEdges               = &privateTracedEdges;
+	  TracedMap                 = &privateTracedMap;
+	  UndoBuffer                = &privateUndoBuffer;
+	  UserColorWin              = &privateUserColorWin;
+	  UserFlagMap               = &privateUserFlagMap;
+	  UserPen                   = &privateUserPen;
+	  ValueWindow               = &privateValueWindow;
+	  VersionNames              = &privateVersionNames;
+	  WorkingFileName           = &privateWorkingFileName;
+	  bitmap::setBBCV(&privateBitmapBackgroundColor);
+	  bitmap::setUBfilename(&privateUserBMPFileName);
+	  DST::setColFilename(&privateColorFileName);
+	  DST::setRGBFilename(&privateRGBFileName);
+	  texture::initTextures(&privateTempTexturePoints, &privateSelectedTexturePointsList, &privateTextureHistory);
 	  thi::redini();
-	  CreateParams createParams {};
+	  createParams createParams {};
 	  createParams.bEnableNonClientDpiScaling = TRUE;
-	  auto private_ScrollSize                 = SCROLSIZ;
-	  ScrollSize                              = &private_ScrollSize;
-	  auto private_ColorBarSize               = COLSIZ;
-	  ColorBarSize                            = &private_ColorBarSize;
+	  auto privateScrollSize                 = SCROLSIZ;
+	  ScrollSize                              = &privateScrollSize;
+	  auto privateColorBarSize               = COLSIZ;
+	  ColorBarSize                            = &privateColorBarSize;
 	  if (IniFile.initialWindowCoords.right != 0) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		ThrEdWindow = CreateWindow(L"thred",
@@ -17912,10 +17913,10 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		IniFile.initialWindowCoords = ThredWindowRect;
 	  }
 	  // Adjust the scroll width for the screen DPI now that we have a window handle
-	  auto private_DPI     = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
-	  ScreenDPI            = &private_DPI;
-	  private_ScrollSize   = MulDiv(private_ScrollSize, *ScreenDPI, STDDPI);
-	  private_ColorBarSize = MulDiv(private_ColorBarSize, *ScreenDPI, STDDPI);
+	  auto privateDPI     = gsl::narrow<int32_t>(GetDpiForWindow(ThrEdWindow));
+	  ScreenDPI            = &privateDPI;
+	  privateScrollSize   = MulDiv(privateScrollSize, *ScreenDPI, STDDPI);
+	  privateColorBarSize = MulDiv(privateColorBarSize, *ScreenDPI, STDDPI);
 	  thi::init();
 	  if (UserFlagMap->test(UserFlag::SAVMAX)) {
 		ShowWindow(ThrEdWindow, SW_SHOWMAXIMIZED);
