@@ -90,8 +90,8 @@ auto form::chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool {
 void form::fltspac(uint32_t vertexOffset, uint32_t count) {
   auto const currentVertex = FormList->operator[](ClosestFormToCursor).vertexIndex + vertexOffset;
   auto const startVertex   = wrap::next(FormVertices->cbegin(), currentVertex);
-  auto constexpr val       = F_POINT {};
-  FormVertices->insert(startVertex, count, val);
+  auto constexpr VAL       = F_POINT {};
+  FormVertices->insert(startVertex, count, VAL);
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 	form.vertexIndex += count;
@@ -1002,25 +1002,25 @@ auto form::internal::findDistanceToSide(F_POINT const& lineStart,
                                         F_POINT const& lineEnd,
                                         F_POINT const& point,
                                         float&        distance) noexcept -> float {
-  auto const A = point.x - lineStart.x;
-  auto const B = point.y - lineStart.y;
-  auto const C = lineEnd.x - lineStart.x;
-  auto const D = lineEnd.y - lineStart.y;
-  if ((C == 0.0F) && (D == 0.0F)) {
-	distance = sqrt(A * B);
+  auto const a = point.x - lineStart.x;
+  auto const b = point.y - lineStart.y;
+  auto const c = lineEnd.x - lineStart.x;
+  auto const d = lineEnd.y - lineStart.y;
+  if ((c == 0.0F) && (d == 0.0F)) {
+	distance = sqrt(a * b);
 	// Arbitrarily choose the first point since start and end are the same
 	return -0.1F;
   }
-  auto const dot    = A * C + B * D;
-  auto const len_sq = C * C + D * D;
-  auto const param  = dot / len_sq;
+  auto const dot    = a * c + b * d;
+  auto const lenSqrd = c * c + d * d;
+  auto const param  = dot / lenSqrd;
   // param < 0 = before the first point
   // param > 1 = after last point
   // 0 < param < 1 = between endpoints
   auto const diff =
       (param < 0)   ? F_POINT {point.x - lineStart.x, point.y - lineStart.y}
       : (param > 1) ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y}
-                    : F_POINT {point.x - (lineStart.x + param * C), point.y - (lineStart.y + param * D)};
+                    : F_POINT {point.x - (lineStart.x + param * c), point.y - (lineStart.y + param * d)};
   // returning shortest distance
   distance = sqrt(diff.x * diff.x + diff.y * diff.y);
   return param;
@@ -1775,40 +1775,40 @@ void form::internal::fillSB(const F_POINT& pivot, float angle, float const& radi
 
 void form::internal::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint) {
   // clang-format off
-  constexpr auto level00 = std::array<float,  1U>{ 0.0F };
-  constexpr auto level01 = std::array<float,  1U>{ 1.0F       };
-  constexpr auto level02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
-  constexpr auto level03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
-  constexpr auto level04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
-  constexpr auto level05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
-  constexpr auto level06 = std::array<float,  6U>{ 3.0F/6.0F , 0.0F/6.0F , 2.0F/6.0F , 4.0F/6.0F , 1.0F/6.0F , 5.0F/6.0F  };
-  constexpr auto level07 = std::array<float,  7U>{ 3.0F/7.0F , 0.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 6.0F/7.0F , 2.0F/7.0F ,  5.0F/7.0F  };
-  constexpr auto level08 = std::array<float,  8U>{ 4.0F/8.0F , 0.0F/8.0F , 5.0F/8.0F , 1.0F/8.0F , 3.0F/8.0F , 6.0F/8.0F ,  2.0F/8.0F , 7.0F/8.0F  };
-  constexpr auto level09 = std::array<float,  9U>{ 4.0F/9.0F , 0.0F/9.0F , 5.0F/9.0F , 1.0F/9.0F , 6.0F/9.0F , 2.0F/9.0F ,  7.0F/9.0F , 3.0F/9.0F ,  8.0F/9.0F  };
-  constexpr auto level10 = std::array<float, 10U>{ 5.0F/10.0F, 0.0F/10.0F, 6.0F/10.0F, 1.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 3.0F/10.0F,  9.0F/10.0F,  4.0F/10.0F };
-  constexpr auto level11 = std::array<float, 11U>{ 5.0F/11.0F, 0.0F/11.0F, 6.0F/11.0F, 1.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 3.0F/11.0F,  9.0F/11.0F,  4.0F/11.0F,  2.0F/11.0F };
-  constexpr auto level12 = std::array<float, 12U>{ 6.0F/12.0F, 0.0F/12.0F, 7.0F/12.0F, 1.0F/12.0F, 8.0F/12.0F, 2.0F/12.0F,  9.0F/12.0F, 3.0F/12.0F, 10.0F/12.0F,  4.0F/12.0F,  9.0F/12.0F,  2.0F/12.0F };
-  constexpr auto level13 = std::array<float, 13U>{ 6.0F/13.0F, 0.0F/13.0F, 1.0F/13.0F, 7.0F/13.0F, 2.0F/13.0F, 8.0F/13.0F,  3.0F/13.0F, 9.0F/13.0F,  4.0F/13.0F, 10.0F/13.0F,  5.0F/13.0F, 10.0F/13.0F,  2.0F/13.0F };
-  constexpr auto level14 = std::array<float, 14U>{ 7.0F/14.0F, 0.0F/14.0F, 8.0F/14.0F, 1.0F/14.0F, 9.0F/14.0F, 2.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  4.0F/14.0F, 12.0F/14.0F,  5.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F };
-  constexpr auto level15 = std::array<float, 15U>{ 7.0F/15.0F, 0.0F/15.0F, 8.0F/15.0F, 1.0F/15.0F, 9.0F/15.0F, 2.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  4.0F/15.0F, 12.0F/15.0F,  4.0F/15.0F, 13.0F/15.0F,  6.0F/15.0F,  2.0F/15.0F };
+  constexpr auto LEVEL00 = std::array<float,  1U>{ 0.0F };
+  constexpr auto LEVEL01 = std::array<float,  1U>{ 1.0F       };
+  constexpr auto LEVEL02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
+  constexpr auto LEVEL03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
+  constexpr auto LEVEL04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
+  constexpr auto LEVEL05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
+  constexpr auto LEVEL06 = std::array<float,  6U>{ 3.0F/6.0F , 0.0F/6.0F , 2.0F/6.0F , 4.0F/6.0F , 1.0F/6.0F , 5.0F/6.0F  };
+  constexpr auto LEVEL07 = std::array<float,  7U>{ 3.0F/7.0F , 0.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 6.0F/7.0F , 2.0F/7.0F ,  5.0F/7.0F  };
+  constexpr auto LEVEL08 = std::array<float,  8U>{ 4.0F/8.0F , 0.0F/8.0F , 5.0F/8.0F , 1.0F/8.0F , 3.0F/8.0F , 6.0F/8.0F ,  2.0F/8.0F , 7.0F/8.0F  };
+  constexpr auto LEVEL09 = std::array<float,  9U>{ 4.0F/9.0F , 0.0F/9.0F , 5.0F/9.0F , 1.0F/9.0F , 6.0F/9.0F , 2.0F/9.0F ,  7.0F/9.0F , 3.0F/9.0F ,  8.0F/9.0F  };
+  constexpr auto LEVEL10 = std::array<float, 10U>{ 5.0F/10.0F, 0.0F/10.0F, 6.0F/10.0F, 1.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 3.0F/10.0F,  9.0F/10.0F,  4.0F/10.0F };
+  constexpr auto LEVEL11 = std::array<float, 11U>{ 5.0F/11.0F, 0.0F/11.0F, 6.0F/11.0F, 1.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 3.0F/11.0F,  9.0F/11.0F,  4.0F/11.0F,  2.0F/11.0F };
+  constexpr auto LEVEL12 = std::array<float, 12U>{ 6.0F/12.0F, 0.0F/12.0F, 7.0F/12.0F, 1.0F/12.0F, 8.0F/12.0F, 2.0F/12.0F,  9.0F/12.0F, 3.0F/12.0F, 10.0F/12.0F,  4.0F/12.0F,  9.0F/12.0F,  2.0F/12.0F };
+  constexpr auto LEVEL13 = std::array<float, 13U>{ 6.0F/13.0F, 0.0F/13.0F, 1.0F/13.0F, 7.0F/13.0F, 2.0F/13.0F, 8.0F/13.0F,  3.0F/13.0F, 9.0F/13.0F,  4.0F/13.0F, 10.0F/13.0F,  5.0F/13.0F, 10.0F/13.0F,  2.0F/13.0F };
+  constexpr auto LEVEL14 = std::array<float, 14U>{ 7.0F/14.0F, 0.0F/14.0F, 8.0F/14.0F, 1.0F/14.0F, 9.0F/14.0F, 2.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  4.0F/14.0F, 12.0F/14.0F,  5.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F };
+  constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 0.0F/15.0F, 8.0F/15.0F, 1.0F/15.0F, 9.0F/15.0F, 2.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  4.0F/15.0F, 12.0F/15.0F,  4.0F/15.0F, 13.0F/15.0F,  6.0F/15.0F,  2.0F/15.0F };
   // clang-format on
 
-  static auto levels = std::array<float const*, 16> {level00.data(),
-                                                     level01.data(),
-                                                     level02.data(),
-                                                     level03.data(),
-                                                     level04.data(),
-                                                     level05.data(),
-                                                     level06.data(),
-                                                     level07.data(),
-                                                     level08.data(),
-                                                     level09.data(),
-                                                     level10.data(),
-                                                     level11.data(),
-                                                     level12.data(),
-                                                     level13.data(),
-                                                     level14.data(),
-                                                     level15.data()};
+  static auto levels = std::array<float const*, 16> {LEVEL00.data(),
+                                                     LEVEL01.data(),
+                                                     LEVEL02.data(),
+                                                     LEVEL03.data(),
+                                                     LEVEL04.data(),
+                                                     LEVEL05.data(),
+                                                     LEVEL06.data(),
+                                                     LEVEL07.data(),
+                                                     LEVEL08.data(),
+                                                     LEVEL09.data(),
+                                                     LEVEL10.data(),
+                                                     LEVEL11.data(),
+                                                     LEVEL12.data(),
+                                                     LEVEL13.data(),
+                                                     LEVEL14.data(),
+                                                     LEVEL15.data()};
 
   auto const innerDelta = F_POINT {(fillVerticalRect[finish].cipnt.x - fillVerticalRect[start].bipnt.x),
                                   (fillVerticalRect[finish].cipnt.y - fillVerticalRect[start].bipnt.y)};
@@ -4376,7 +4376,7 @@ void form::internal::bakseq() {
 #else
   constexpr auto RITSIZ = 6;
 
-  static constexpr auto seqtab = std::array<int32_t, RITSIZ> {
+  static constexpr auto SEQ_TABLE = std::array<int32_t, RITSIZ> {
       12,
       7,
       15,
@@ -4405,9 +4405,9 @@ void form::internal::bakseq() {
   }
   while (iSequence > 0) {
 	// clang-format off
-	auto const rcnt           = iSequence % seqtab.size();
-	auto const StitchSpacing2 = LineSpacing * 2;
-	auto const rit            = std::lround(BSequence->operator[](iSequence).x / StitchSpacing2);
+	auto const rcnt           = iSequence % SEQ_TABLE.size();
+	auto const stitchSpacing2 = LineSpacing * 2;
+	auto const rit            = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
 	auto const& bPrevious     = BSequence->operator[](iSequence - 1U);
 	auto&      bCurrent       = BSequence->operator[](iSequence);
 	auto const& bNext         = BSequence->operator[](iSequence + 1U);
@@ -4417,7 +4417,7 @@ void form::internal::bakseq() {
 	if (delta.y != 0.0F) {
 	  slope = delta.x / delta.y;
 	}
-	auto const  UserStitchLength9 = UserStitchLength / MAXSIZ;
+	auto const  userStitchLength9 = UserStitchLength / MAXSIZ;
 	auto const& form              = FormList->operator[](ClosestFormToCursor);
 	switch (bCurrent.attribute) {
 	  case SEQTOP: {
@@ -4427,8 +4427,8 @@ void form::internal::bakseq() {
 			auto count = wrap::ceil<int32_t>(bCurrent.y / UserStitchLength);
 			do {
 			  OSequence->push_back(F_POINT {0.0F,
-			                               wrap::toFloat(count) * UserStitchLength +
-			                                   wrap::toFloat(rit % seqtab[rcnt]) * UserStitchLength9});
+			                                wrap::toFloat(count) * UserStitchLength +
+			                                    wrap::toFloat(rit % SEQ_TABLE[rcnt]) * userStitchLength9});
 			  if (OSequence->back().y > bCurrent.y) {
 				break;
 			  }
@@ -4442,8 +4442,8 @@ void form::internal::bakseq() {
 			auto count = wrap::floor<int32_t>(bCurrent.y / UserStitchLength);
 			do {
 			  OSequence->push_back(F_POINT {0.0F,
-			                               wrap::toFloat(count) * UserStitchLength -
-			                                   wrap::toFloat((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
+			                                wrap::toFloat(count) * UserStitchLength -
+			                                    wrap::toFloat((rit + 2) % SEQ_TABLE[rcnt]) * userStitchLength9});
 			  if (OSequence->back().y < bPrevious.y) {
 				break;
 			  }
@@ -4457,8 +4457,8 @@ void form::internal::bakseq() {
 		  auto count = wrap::ceil<int32_t>(bNext.y / UserStitchLength);
 		  do {
 			OSequence->push_back(F_POINT {0.0F,
-			                             wrap::toFloat(count) * UserStitchLength +
-			                                 wrap::toFloat(rit % seqtab[rcnt]) * UserStitchLength9});
+			                              wrap::toFloat(count) * UserStitchLength +
+			                                  wrap::toFloat(rit % SEQ_TABLE[rcnt]) * userStitchLength9});
 			if (OSequence->back().y > bCurrent.y) {
 			  break;
 			}
@@ -4476,8 +4476,8 @@ void form::internal::bakseq() {
 		  auto count = wrap::floor<int32_t>(bNext.y / UserStitchLength);
 		  do {
 			OSequence->push_back(F_POINT {0.0F,
-			                             wrap::toFloat(count) * UserStitchLength -
-			                                 wrap::toFloat((rit + 2) % seqtab[rcnt]) * UserStitchLength9});
+			                              wrap::toFloat(count) * UserStitchLength -
+			                                  wrap::toFloat((rit + 2) % SEQ_TABLE[rcnt]) * userStitchLength9});
 			if (OSequence->back().y < bCurrent.y) {
 			  break;
 			}
@@ -4494,7 +4494,7 @@ void form::internal::bakseq() {
 		delta = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
 		StateMap->reset(StateFlag::FILDIR);
 		if (auto const length = hypot(delta.x, delta.y); length != 0.0F) {
-		  if (auto const UserStitchLength2 = UserStitchLength * 2.0F; length > UserStitchLength2) {
+		  if (auto const userStitchLength2 = UserStitchLength * 2.0F; length > userStitchLength2) {
 			auto point = bNext;
 			auto count = wrap::round<uint32_t>(length / UserStitchLength - 1.0F);
 			if (form::chkmax(count, wrap::toUnsigned(OSequence->size()))) {
@@ -6664,8 +6664,8 @@ void form::fliph() {
   if (StateMap->test(StateFlag::BIGBOX)) {
 	thred::savdo();
 	auto const offset = AllItemsRect->right + AllItemsRect->left;
-	for (auto& FormVertice : *FormVertices) {
-	  FormVertice.x = offset - FormVertice.x;
+	for (auto& formVertice : *FormVertices) {
+	  formVertice.x = offset - formVertice.x;
 	}
 	for (auto& stitch : *StitchBuffer) {
 	  stitch.x = offset - stitch.x;
@@ -6956,10 +6956,10 @@ void form::internal::snpfn(std::vector<uint32_t> const& xPoints, uint32_t start,
 	  auto const reference = xPoints[current];
 	  for (auto iPoint = current + 1U; iPoint < finish; ++iPoint) {
 		auto const check = xPoints[iPoint];
-		if (auto const CheckLength =
+		if (auto const checkLength =
 		        hypot(StitchBuffer->operator[](check).x - StitchBuffer->operator[](reference).x,
 		              StitchBuffer->operator[](check).y - StitchBuffer->operator[](reference).y);
-		    CheckLength < SnapLength) {
+		    checkLength < SnapLength) {
 		  StitchBuffer->operator[](check) = StitchBuffer->operator[](reference);
 		}
 	  }
@@ -8087,9 +8087,9 @@ void form::centir() {
 	stitch.x += delta.x;
 	stitch.y += delta.y;
   }
-  for (auto& FormVertice : *FormVertices) {
-	FormVertice.x += delta.x;
-	FormVertice.y += delta.y;
+  for (auto& formVertice : *FormVertices) {
+	formVertice.x += delta.x;
+	formVertice.y += delta.y;
   }
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	form::frmout(iForm);
