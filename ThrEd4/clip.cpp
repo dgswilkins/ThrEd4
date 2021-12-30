@@ -133,8 +133,8 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	find += form.lengthOrCount.clipCount;
   }
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
-  auto constexpr val     = F_POINT {};
-  ClipPoints->insert(itClipPoint, count, val);
+  auto constexpr VAL     = F_POINT {};
+  ClipPoints->insert(itClipPoint, count, VAL);
   for (auto iForm = ClosestFormToCursor; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	if (auto& thisForm = FormList->operator[](iForm); clip::iseclpx(thisForm)) {
 	  thisForm.borderClipData += count;
@@ -152,8 +152,8 @@ auto clip::numclp() -> uint32_t {
   auto const clipSize    = wrap::toUnsigned(ClipBuffer->size());
   auto const find        = ci::findclp(ClosestFormToCursor);
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
-  auto constexpr val     = F_POINT {};
-  ClipPoints->insert(itClipPoint, clipSize, val);
+  auto constexpr VAL     = F_POINT {};
+  ClipPoints->insert(itClipPoint, clipSize, VAL);
   auto& formList = *FormList;
 
   formList[ClosestFormToCursor].angleOrClipData.clip = find;
@@ -691,9 +691,9 @@ void clip::duxclp(FRM_HEAD const& form) {
   tempClipPoints.reserve(ClipBuffer->size());
   ci::clpxadj(tempClipPoints, chainEndPoints);
   OSequence->clear();
-  auto constexpr rotationCenter = F_POINT {};
+  auto constexpr ROTATION_CENTER = F_POINT {};
   for (auto iPoint = 1U; iPoint < wrap::toUnsigned(chainEndPoints.size()); ++iPoint) {
-	ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, rotationCenter);
+	ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, ROTATION_CENTER);
   }
   if (form.type != FRMLINE) {
 	OSequence->push_back(chainEndPoints[0]);
@@ -832,7 +832,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 
 void clip::internal::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
   constexpr auto CHAINLEN = 10U; // Chain length
-  constexpr auto chainSequence = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
+  constexpr auto CHAIN_SEQUENCE = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
   auto           chainPoint = std::vector<F_POINT> {};
 
   constexpr auto CHPOINTS = 5U; // chainPoint size
@@ -868,7 +868,7 @@ void clip::internal::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t
 	--chainCount;
   }
   for (auto iChain = 0U; iChain < chainCount; ++iChain) {
-	OSequence->push_back(chainPoint[chainSequence[iChain]]);
+	OSequence->push_back(chainPoint[CHAIN_SEQUENCE[iChain]]);
   }
 }
 
