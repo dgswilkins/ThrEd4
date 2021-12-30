@@ -72,7 +72,7 @@ auto texture::internal::txnam(std::wstring& name) -> bool {
 }
 
 void texture::txdun() {
-  constexpr auto signature            = std::array<char, 4> {"txh"};
+  constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
   if (!TextureHistory->operator[](0).texturePoints.empty()) {
@@ -83,7 +83,7 @@ void texture::txdun() {
 	  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	  if (handle != INVALID_HANDLE_VALUE) {
-		WriteFile(handle, signature.data(), wrap::toUnsigned(signature.size()), &bytesWritten, nullptr);
+		WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
 		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
 		auto bufferIter = textureHistoryBuffer.begin();
 		for (auto const& historyEntry : *TextureHistory) {
@@ -697,10 +697,10 @@ void texture::txtrup() {
 	txi::deorg(offset);
 	offset.x -= SelectTexturePointsOrigin.x;
 	offset.y -= SelectTexturePointsOrigin.y;
-	auto const Xmagnitude = abs(offset.x);
+	auto const xMagnitude = abs(offset.x);
 	auto       textureOffset =
 	    TX_OFF {wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
-	           wrap::ceil<int32_t>(wrap::toFloat(Xmagnitude) * TextureScreen.editToPixelRatio /
+	           wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
 	                               TextureScreen.spacing)};
 	if (offset.x < 0) {
 	  textureOffset.line = -textureOffset.line;
@@ -1137,7 +1137,7 @@ void texture::txof() {
   StateMap->reset(StateFlag::TXTRED);
 }
 
-enum textureStyles { VRTYP, HORTYP, ANGTYP };
+enum TextureStyles { VRTYP, HORTYP, ANGTYP };
 
 void texture::internal::dutxfn(uint32_t textureType) {
   if (StateMap->test(StateFlag::FORMSEL)) {
@@ -1673,15 +1673,15 @@ void texture::setshft() {
 	StateMap->reset(StateFlag::TXIN);
 	TempTexturePoints->clear();
 	auto line = 1U;
-	auto TXin = false;
+	auto txIn = false;
 	for (auto& stitch : *StitchBuffer) {
 	  if (txi::inrct(selectionRect, stitch)) {
-		TXin = true;
+		txIn = true;
 		TempTexturePoints->push_back(TX_PNT {(stitch.y - selectionRect.bottom), gsl::narrow<uint16_t>(line)});
 	  }
 	  else {
-		if (TXin) {
-		  TXin = false;
+		if (txIn) {
+		  txIn = false;
 		  ++line;
 		}
 	  }
