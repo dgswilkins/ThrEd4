@@ -339,7 +339,7 @@ void satin::satadj(FRM_HEAD& form) {
   auto  interiorGuides     = std::vector<SAT_CON> {};
   interiorGuides.reserve(currentGuidesCount);
   auto const savedGuideCount = form.satinGuideCount;
-  auto       satinMap        = ExtendedBitSet<>(form.vertexCount);
+  auto       satinMap        = BIT_SET_EX<>(form.vertexCount);
   // ensure all guide endpoints are on valid vertices
   auto itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide);
   {

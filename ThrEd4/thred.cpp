@@ -16019,7 +16019,7 @@ void thred::internal::redini() {
 		LineSpacing = IniFile.stitchSpace;
 	  }
 	  {
-		auto const tmp = EnumMap<UserFlag>(IniFile.userFlagMap);
+		auto const tmp = ENUM_MAP<UserFlag>(IniFile.userFlagMap);
 		*UserFlagMap   = tmp;
 	  }
 	  if (IniFile.borderWidth != 0.0F) {
@@ -17759,7 +17759,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_SelectedTexturePointsList = std::vector<uint32_t> {};
 	  auto private_SideWindow                = std::vector<HWND> {};
 	  auto private_SideWindowEntryBuffer     = std::vector<wchar_t> {};
-	  auto private_StateMap                  = EnumMap<StateFlag> {0};
+	  auto private_StateMap                  = ENUM_MAP<StateFlag> {0};
 	  auto private_StitchBuffer              = std::vector<F_POINT_ATTR> {};
 	  auto private_TempPolygon               = std::vector<F_POINT> {};
 	  auto private_TempTexturePoints         = std::vector<TX_PNT> {};
@@ -17774,7 +17774,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto private_UndoBuffer                = std::vector<std::unique_ptr<uint32_t[]>> {};
 	  auto private_UserBMPFileName           = fs::path {};
 	  auto private_UserColorWin              = std::vector<HWND> {};
-	  auto private_UserFlagMap               = EnumMap<UserFlag> {0};
+	  auto private_UserFlagMap               = ENUM_MAP<UserFlag> {0};
 	  auto private_UserPen                   = std::vector<HPEN> {};
 	  auto private_ValueWindow               = std::vector<HWND> {};
 	  auto private_VersionNames              = std::vector<fs::path> {};

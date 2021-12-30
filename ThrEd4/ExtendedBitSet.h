@@ -9,13 +9,13 @@
 #pragma warning(pop)
 
 template <typename Block = uint32_t, typename Allocator = std::allocator<uint32_t>>
-class ExtendedBitSet : public boost::dynamic_bitset<Block, Allocator>
+class BIT_SET_EX : public boost::dynamic_bitset<Block, Allocator>
 {
   using super = boost::dynamic_bitset<Block, Allocator>;
 
   public:
 #pragma warning(suppress : 26434) // Function hides a non-virtual function  (c.128)
-  explicit ExtendedBitSet(std::size_t bits) : super::dynamic_bitset(bits) {
+  explicit BIT_SET_EX(std::size_t bits) : super::dynamic_bitset(bits) {
   }
 
   /*

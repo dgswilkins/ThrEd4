@@ -213,7 +213,7 @@ extern float SnapLength;
 extern float SpiralWrap;
 extern float StarRatio;
 
-extern EnumMap<StateFlag>* StateMap;
+extern ENUM_MAP<StateFlag>* StateMap;
 
 extern F_POINT StitchBmpRatio;
 extern float  StitchBoxesThreshold;
@@ -245,7 +245,7 @@ extern SIZE UnzoomedRect;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 
-extern EnumMap<UserFlag>* UserFlagMap;
+extern ENUM_MAP<UserFlag>* UserFlagMap;
 
 extern float UserStitchLength;
 

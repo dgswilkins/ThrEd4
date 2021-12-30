@@ -14,13 +14,13 @@ template <class, class = void> struct hasEnumCount : std::false_type { };
 template <class T>
 struct hasEnumCount<T, std::void_t<decltype(T::EnumCount)>> : std::is_same<T, decltype(T::EnumCount)> { };
 
-template <typename EnumType> class EnumMap
+template <typename EnumType> class ENUM_MAP
 {
   static_assert(std::is_enum_v<EnumType>, "Type for EnumMap must be an Enum");
   static_assert(hasEnumCount<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
   public:
-  explicit constexpr EnumMap(uint32_t i_val) : m_mask(i_val) {
+  explicit constexpr ENUM_MAP(uint32_t i_val) : m_mask(i_val) {
   }
   [[nodiscard]] inline auto test(EnumType const i_key) const -> bool {
 	return m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
@@ -84,37 +84,37 @@ template <typename EnumType> class EnumMap
 	m_mask = i_mask;
   }
 
-  auto operator==(EnumMap<EnumType> const& i_other) const -> bool {
+  auto operator==(ENUM_MAP<EnumType> const& i_other) const -> bool {
 	return m_mask == i_other.m_mask;
   }
-  auto operator!=(EnumMap<EnumType> const& i_other) const -> bool {
+  auto operator!=(ENUM_MAP<EnumType> const& i_other) const -> bool {
 	return m_mask != i_other.m_mask;
   }
 
-  auto operator&=(EnumMap<EnumType> const& i_other) -> EnumMap<EnumType> {
+  auto operator&=(ENUM_MAP<EnumType> const& i_other) -> ENUM_MAP<EnumType> {
 	m_mask &= i_other.m_mask;
 	return *this;
   }
 
-  auto operator|=(EnumMap<EnumType> const& i_other) -> EnumMap<EnumType> {
+  auto operator|=(ENUM_MAP<EnumType> const& i_other) -> ENUM_MAP<EnumType> {
 	m_mask |= i_other.m_mask;
 	return *this;
   }
 
-  auto operator&(EnumMap<EnumType> const& i_other) const -> EnumMap<EnumType> {
-	EnumMap<EnumType> newMask;
+  auto operator&(ENUM_MAP<EnumType> const& i_other) const -> ENUM_MAP<EnumType> {
+	ENUM_MAP<EnumType> newMask;
 	newMask.m_mask = m_mask & i_other.m_mask;
 	return newMask;
   }
 
-  auto operator|(EnumMap<EnumType> const& i_other) const -> EnumMap<EnumType> {
-	EnumMap<EnumType> newMask;
+  auto operator|(ENUM_MAP<EnumType> const& i_other) const -> ENUM_MAP<EnumType> {
+	ENUM_MAP<EnumType> newMask;
 	newMask.m_mask = m_mask | i_other.m_mask;
 	return newMask;
   }
 
-  auto operator~() const -> EnumMap<EnumType> {
-	EnumMap<EnumType> newMask;
+  auto operator~() const -> ENUM_MAP<EnumType> {
+	ENUM_MAP<EnumType> newMask;
 	newMask.m_mask = ~m_mask;
 	return newMask;
   }
