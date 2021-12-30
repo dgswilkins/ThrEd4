@@ -78,10 +78,10 @@ void trace::initColorRef() noexcept {
 
 auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto dwStyle = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
+  constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const window = CreateWindowEx(
-      0L, L"STATIC", L"", dwStyle, xCoordinate, yCoordinate, ButtonWidth, buttonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", L"", DW_STYLE, xCoordinate, yCoordinate, ButtonWidth, buttonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   if (nullptr != window) {
 	return window;
   }
@@ -90,9 +90,9 @@ auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t b
 
 void trace::initTraceWindows() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto dwStyle = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
+  constexpr auto DW_STYLE = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
   TraceStepWin           = CreateWindowEx(
-      0L, L"STATIC", L"", dwStyle, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   auto iTraceControlWindow = TraceControlWindow.begin();
   auto iTraceDownWindow    = TraceDownWindow.begin();
   auto iTraceSelectWindow  = TraceSelectWindow.begin();
@@ -351,12 +351,12 @@ void trace::trace() {
 	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap->test(StateFlag::LANDSCAP)) {
-		auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y);
+		auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+		stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
 	  }
-	  auto const BmpSR = bitmap::getBmpStitchRatio();
+	  auto const bmpSR = bitmap::getBmpStitchRatio();
 	  auto const bitmapPoint =
-	      POINT {std::lround(BmpSR.x * stitchPoint.x), std::lround(BmpSR.y * stitchPoint.y - 1.0F)};
+	      POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
 
 	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
@@ -624,8 +624,8 @@ void trace::internal::dutrac() {
 	}
 	thred::savdo();
 	if (StateMap->test(StateFlag::LANDSCAP)) {
-	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y);
+	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+	  stitchPoint.y -= (wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y);
 	}
 	auto const bmpSR = bitmap::getBmpStitchRatio();
 	CurrentTracePoint =
@@ -766,8 +766,8 @@ void trace::internal::dutrac() {
 	auto traceLengthSum  = 0.0F;
 	auto landscapeOffset = 0.0F;
 	if (StateMap->test(StateFlag::LANDSCAP)) {
-	  auto const BmpSiS = bitmap::getBitmapSizeinStitches();
-	  landscapeOffset   = wrap::toFloat(UnzoomedRect.cy) - BmpSiS.y;
+	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+	  landscapeOffset   = wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
 	}
 	for (auto iCurrent = size_t {1U}; iCurrent < tracedPoints.size(); ++iCurrent) {
 	  traceLengthSum += hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),
@@ -971,16 +971,16 @@ auto trace::internal::ducolm() -> uint32_t {
 
 void trace::internal::trnumwnd0(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto dwStyle = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
+  constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
   TraceNumberInput       = CreateWindowEx(
-      0L, L"STATIC", nullptr, dwStyle, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void trace::internal::trnumwnd1(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  constexpr auto dwStyle = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
+  constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
   GeneralNumberInputBox  = CreateWindowEx(
-      0L, L"STATIC", nullptr, dwStyle, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void trace::blak() {
@@ -1181,7 +1181,7 @@ void trace::wasTrace() {
   auto traceMiddleMaskRect = RECT {}; // middle trace mask rectangle
   auto traceLowMaskRect    = RECT {}; // low trace mask rectangle
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const BlackBrush          = CreateSolidBrush(0); // black brush
+  auto const blackBrush          = CreateSolidBrush(0); // black brush
   auto       iTraceUpWindow      = TraceUpWindow.begin();
   auto       iTraceDownWindow    = TraceDownWindow.begin();
   auto       iTraceControlWindow = TraceControlWindow.begin();
@@ -1203,21 +1203,21 @@ void trace::wasTrace() {
 	if (DrawItem->hwndItem == *(iTraceControlWindow++)) {
 	  ti::durct(*iTraceShift, DrawItem->rcItem, traceHighMaskRect, traceMiddleMaskRect, traceLowMaskRect);
 	  FillRect(DrawItem->hDC, &traceMiddleMaskRect, brush);
-	  ti::dublk(DrawItem->hDC, traceHighMaskRect, traceLowMaskRect, BlackBrush);
+	  ti::dublk(DrawItem->hDC, traceHighMaskRect, traceLowMaskRect, blackBrush);
 	  break;
 	}
 	if (DrawItem->hwndItem == *(iTraceSelectWindow++)) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto TempBrush = BlackBrush;
+	  auto tempBrush = blackBrush;
 	  SetBkColor(DrawItem->hDC, 0);
 	  SetTextColor(DrawItem->hDC, *iTraceRGB);
 	  if (StateMap->test(*iTraceRGBFlag)) {
-		TempBrush = brush;
+		tempBrush = brush;
 		SetTextColor(DrawItem->hDC, 0);
 		SetBkColor(DrawItem->hDC, *iTraceRGB);
 	  }
 #pragma warning(suppress : 26812) // Enum.3 prefer 'enum class' over 'enum'
-	  FillRect(DrawItem->hDC, &DrawItem->rcItem, TempBrush);
+	  FillRect(DrawItem->hDC, &DrawItem->rcItem, tempBrush);
 	  auto const strOnOff = displayText::loadStr((StateMap->test(*iTraceRGBFlag)) ? IDS_ON : IDS_OFF);
 	  wrap::textOut(DrawItem->hDC, 1, 1, strOnOff.c_str(), wrap::toUnsigned(strOnOff.size()));
 	  break;
