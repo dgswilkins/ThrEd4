@@ -11,7 +11,7 @@
 
 namespace fs = std::filesystem;
 
-namespace PCS {
+namespace PCS { // NOLINT(readability-identifier-naming)
 auto readPCSFile(fs::path const& newFileName) -> bool;
 auto savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool;
 auto insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool;

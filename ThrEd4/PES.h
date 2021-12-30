@@ -149,7 +149,7 @@ class PECHDR2
 
 #pragma pack(pop)
 
-namespace PES {
+namespace PES { // NOLINT(readability-identifier-naming)
 auto readPESFile(std::filesystem::path const& newFileName) -> bool;
 auto savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 namespace internal {
