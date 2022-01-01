@@ -773,7 +773,7 @@ void formForms::dasyfrm() {
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DASY), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::dasyproc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
   // clang-format on
-  if (nResult != 0) {
+  if (nResult < 1) {
 	StateMap->reset(StateFlag::FORMIN);
 	return;
   }
@@ -1014,7 +1014,7 @@ void formForms::setear() {
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_TEAR), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::tearprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionType
   // clang-format on
-  if (nResult != 0) {
+  if (nResult > 0) {
 	thred::savdo();
 	constexpr auto TWSTFACT = 4.0F; // teardrop twist factor
 
@@ -1175,7 +1175,7 @@ void formForms::wavfrm() {
   auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_WAV), ThrEdWindow, reinterpret_cast<DLGPROC>(ffi::wavprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   // resharper restore CppClangTidyClangDiagnosticCastFunctionType
   // clang-format on
-  if (nResult != 0) {
+  if (nResult > 0) {
 	thred::savdo();
 	auto points = std::vector<F_POINT> {};
 	points.reserve(IniFile.wavePoints);

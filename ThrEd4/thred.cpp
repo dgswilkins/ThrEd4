@@ -341,6 +341,7 @@ auto thred::getMsgBufferValue() -> float {
 }
 
 void thred::internal::getdes() noexcept {
+  // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_DESNAM), ThrEdWindow, reinterpret_cast<DLGPROC>(dnamproc)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
@@ -10263,6 +10264,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 }
 
 void thred::internal::dufdef() noexcept {
+  // ToDo - don't update values in DialogBox as then 'cancel' does not work
   // ReSharper disable CppClangTidyClangDiagnosticCastFunctionType
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts
   DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_FETHDEF), ThrEdWindow, reinterpret_cast<DLGPROC>(fthdefprc)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)

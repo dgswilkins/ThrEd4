@@ -2455,7 +2455,7 @@ void xt::nudsiz() {
 	auto const nResult = DialogBox(ThrEdInstance, MAKEINTRESOURCE(IDD_SIZ), ThrEdWindow, reinterpret_cast<DLGPROC>(xi::setsprc)); //  NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	// ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 	// clang-format on
-	if (nResult != 0) {
+	if (nResult > 0) {
 	  flag = 0;
 
 	  constexpr auto HUPRATIO = 1.05F; // make the hoop 5% bigger
