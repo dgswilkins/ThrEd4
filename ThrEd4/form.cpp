@@ -866,8 +866,9 @@ void form::pxrct2stch(RECT const& screenRect, F_RECTANGLE& stitchRect) noexcept 
 }
 
 void form::flipv() {
-  auto const& form = FormList->operator[](ClosestFormToCursor);
   if (StateMap->test(StateFlag::FPSEL)) {
+	auto const& form = FormList->operator[](ClosestFormToCursor);
+
 	auto const offset        = SelectedVerticesRect.top + SelectedVerticesRect.bottom;
 	auto       currentVertex = SelectedFormVertices.start;
 	auto const itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
@@ -920,6 +921,8 @@ void form::flipv() {
   }
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
+	  auto const& form = FormList->operator[](ClosestFormToCursor);
+
 	  auto const offset   = form.rectangle.top + form.rectangle.bottom;
 	  auto       itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
