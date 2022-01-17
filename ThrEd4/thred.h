@@ -148,6 +148,7 @@ namespace internal {
   void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
   auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
   void colchk();
+  void contract();
   void cros(uint32_t iStitch);
   void crtcurs() noexcept;
   void cut();
@@ -171,6 +172,7 @@ namespace internal {
   auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
   auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
+  void doStretch(uint32_t start, uint32_t end);
   void drawBackground();
   void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
   void drwStch();
@@ -231,6 +233,7 @@ namespace internal {
   void fnamtabs();
   void fndknt();
   void fop();
+  void formStretch(uint32_t form);
   void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
   auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
   void frmcurmen();
@@ -462,6 +465,7 @@ namespace internal {
   void stchout();
   void stchsnap(uint32_t start, uint32_t finish);
   auto stlen(uint32_t iStitch) -> float;
+  void stretch();
   void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
   void tglhid();
   void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
