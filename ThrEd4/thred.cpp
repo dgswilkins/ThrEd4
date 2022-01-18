@@ -5295,6 +5295,7 @@ void thred::internal::newFil() {
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  spModifierName[designer.length()] = 0;
   rstdu();
   rstAll();
   displayText::clrhbut(3);
@@ -16522,6 +16523,7 @@ void thred::internal::init() {
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.begin(), designer.end(), spModifierName.begin());
+  spModifierName[designer.length()] = 0;
   thred::chkhup();
   nedmen();
   fil2men();
