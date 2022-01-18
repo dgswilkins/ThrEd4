@@ -1178,10 +1178,12 @@ auto thred::internal::stch2px1(uint32_t iStitch) -> POINT {
 }
 
 void thred::internal::shft2box() {
-  auto const current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
-  auto const stitchPoint = F_POINT {current->x, current->y};
-  thred::shft(stitchPoint);
-  stch2px1(ClosestPointIndex);
+  if (!StitchBuffer->empty()) {
+	auto const current     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+	auto const stitchPoint = F_POINT {current->x, current->y};
+	thred::shft(stitchPoint);
+	stch2px1(ClosestPointIndex);
+  }
 }
 
 void thred::internal::unbox() {
