@@ -3164,6 +3164,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
 	  vertexCount += form.vertexCount;
