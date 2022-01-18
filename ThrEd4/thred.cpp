@@ -6185,6 +6185,85 @@ void thred::internal::cut() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+// https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors
+void thred::internal::doStretch(uint32_t start, uint32_t end) {
+  constexpr auto FACTOR = 0.1f;
+
+  auto       firstStitch  = wrap::next(StitchBuffer->begin(), start);
+  auto       centerStitch = std::next(firstStitch);
+  auto       lastStitch   = std::next(centerStitch);
+  auto       offsetStitch = centerStitch - StitchBuffer->begin();
+  auto const endStitch    = wrap::next(StitchBuffer->begin(), end);
+  thred::savdo();
+  while (lastStitch != endStitch) {
+	if (((firstStitch->attribute & COLMSK) == (centerStitch->attribute & COLMSK)) &&
+	    ((centerStitch->attribute & COLMSK) == (lastStitch->attribute & COLMSK))) {
+	  auto const delta1 = F_POINT {centerStitch->x - firstStitch->x, centerStitch->y - firstStitch->y};
+	  //auto const delta2 = F_POINT {lastStitch->x - centerStitch->x, lastStitch->y - centerStitch->y};
+	  auto const point = F_POINT {lastStitch->x - delta1.x, lastStitch->y - delta1.y};
+	  auto const delta3 = F_POINT {centerStitch->x - point.x, centerStitch->y - point.y};
+	  //auto const det    = delta1.x * delta2.y - delta1.y * delta2.x;
+	  //auto const dot    = delta1.x * delta2.x + delta1.y * delta2.y;
+	  //auto const angle  = (atan2f(det, dot));
+	  //auto const halfAngle   = angle / 2.0f;
+	  //auto const angleFactor = FACTOR * sinf(halfAngle);
+	  //auto const offsetY     = (delta1.x + delta2.x) * angleFactor;
+	  //auto const offsetX     = (delta1.y + delta2.y) * angleFactor;
+	  //centerStitch->x -= offsetX;
+	  //centerStitch->y += offsetY;
+	  centerStitch->x += delta3.x * FACTOR;
+	  centerStitch->y += delta3.y * FACTOR;
+	}
+	++firstStitch;
+	++centerStitch;
+	++lastStitch;
+	++offsetStitch;
+  }
+  StateMap->set(StateFlag::RESTCH);
+}
+
+void thred::internal::formStretch(uint32_t form) {
+  auto stitch  = StitchBuffer->begin();
+  auto iStitch = 0U;
+  for (; iStitch < wrap::toUnsigned(StitchBuffer->size()); ++iStitch) {
+	if ((stitch->attribute & FRMSK) >> FRMSHFT == form && ((stitch->attribute & TYPFRM) != 0U)) {
+	  break;
+	}
+	++stitch;
+  }
+  auto const firstStitch = iStitch;
+  while ((stitch != StitchBuffer->end()) && ((stitch->attribute & FRMSK) >> FRMSHFT == form)) {
+	++iStitch;
+	++stitch;
+  }
+  doStretch(firstStitch, iStitch);
+}
+
+void thred::internal::stretch() {
+  if (!SelectedFormList->empty()) {
+	auto formMap = boost::dynamic_bitset<>(FormList->size());
+	for (auto const selectedForm : (*SelectedFormList)) {
+	  formStretch(selectedForm);
+	}
+	return;
+  }
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	formStretch(ClosestFormToCursor);
+	return;
+  }
+  if (StateMap->test(StateFlag::GRPSEL)) {
+	thred::rngadj();
+	doStretch(GroupStartStitch, GroupEndStitch);
+  }
+  else {
+	doStretch(0, wrap::toUnsigned(StitchBuffer->size()));
+  }
+}
+
+void thred::internal::contract() {
+  thred::savdo();
+}
+
 void thred::internal::unpat() {
   if (StateMap->testAndReset(StateFlag::WASPAT)) {
 	ShowWindow(SpeedScrollBar, SW_HIDE);
@@ -13941,11 +14020,21 @@ auto thred::internal::handleMainWinKeys(wchar_t const&            code,
 	  break;
 	}
 	case L'W': {
-	  if (wrap::pressed(VK_SHIFT)) {
-		form::crop();
+	  if (wrap::pressed(VK_CONTROL) && wrap::pressed(VK_MENU)) { // CTRL + ALT
+		thi::contract();
 	  }
 	  else {
-		form::insat();
+		if (wrap::pressed(VK_CONTROL)) {
+		  thi::stretch();
+		}
+		else {
+		  if (wrap::pressed(VK_SHIFT)) {
+			form::crop();
+		  }
+		  else {
+			form::insat();
+		  }
+		}
 	  }
 	  break;
 	}
