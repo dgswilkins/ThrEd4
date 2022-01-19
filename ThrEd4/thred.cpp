@@ -16951,7 +16951,6 @@ void thred::internal::drwStch() {
 	}
 	if (StateMap->test(StateFlag::WASLIN)) {
 	  relin();
-	  throw std::runtime_error("testing WASLIN"); // this is here for testing I don't think this code is reachable
 	}
 	if (StateMap->test(StateFlag::GRPSEL)) {
 	  if (cmpstch(ClosestPointIndex, GroupStitchIndex)) {
