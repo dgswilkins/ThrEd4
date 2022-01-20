@@ -6191,7 +6191,6 @@ void thred::internal::cut() {
 
 // https://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors
 void thred::internal::doStretch(uint32_t start, uint32_t end) {
-  constexpr auto FACTOR = 0.1f;
 
   auto       firstStitch  = wrap::next(StitchBuffer->begin(), start);
   auto       centerStitch = std::next(firstStitch);
@@ -6202,6 +6201,7 @@ void thred::internal::doStretch(uint32_t start, uint32_t end) {
   while (lastStitch != endStitch) {
 	if (((firstStitch->attribute & COLMSK) == (centerStitch->attribute & COLMSK)) &&
 	    ((centerStitch->attribute & COLMSK) == (lastStitch->attribute & COLMSK))) {
+	  constexpr auto FACTOR = 0.1f;
 	  auto const delta1 = F_POINT {centerStitch->x - firstStitch->x, centerStitch->y - firstStitch->y};
 	  //auto const delta2 = F_POINT {lastStitch->x - centerStitch->x, lastStitch->y - centerStitch->y};
 	  auto const point = F_POINT {lastStitch->x - delta1.x, lastStitch->y - delta1.y};
@@ -15615,7 +15615,7 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 		if (code == VK_RETURN || code == VK_OEM_3) {
 		  thred::savdo();
 		  if (!SelectedFormList->empty()) {
-			for (auto selectedForm : (*SelectedFormList)) {
+			for (auto const selectedForm : (*SelectedFormList)) {
 			  ClosestFormToCursor = selectedForm;
 			  form::refilfn();
 			}
