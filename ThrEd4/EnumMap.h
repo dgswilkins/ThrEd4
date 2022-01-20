@@ -20,7 +20,7 @@ template <typename EnumType> class ENUM_MAP
   static_assert(hasEnumCount<EnumType>::value, "Enum provided to EnumMap must have a \"EnumCount\" option as the last element in the enum.");
 
   public:
-  explicit constexpr ENUM_MAP(uint32_t i_val) : m_mask(i_val) {
+  constexpr explicit ENUM_MAP(uint32_t i_val) : m_mask(i_val) {
   }
   [[nodiscard]] inline auto test(EnumType const i_key) const -> bool {
 	return m_mask.test(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));

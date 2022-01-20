@@ -1088,7 +1088,7 @@ class F_POINT
   inline constexpr F_POINT(float rhsX, float rhsY) noexcept;
   inline constexpr F_POINT(int32_t rhsX, int32_t rhsY) noexcept;
   inline constexpr F_POINT(LONG rhsX, LONG rhsY) noexcept;
-  explicit inline constexpr F_POINT(D_POINT const& rhs) noexcept;
+  inline constexpr explicit F_POINT(D_POINT const& rhs) noexcept;
   inline constexpr auto operator==(F_POINT const& rhs) const noexcept -> bool;
   inline constexpr auto operator=(D_POINT const& rhs) noexcept -> F_POINT&;
   inline constexpr auto operator=(F_POINT_ATTR const& rhs) noexcept -> F_POINT&;
