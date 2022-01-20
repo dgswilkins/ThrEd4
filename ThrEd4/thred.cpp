@@ -10218,6 +10218,9 @@ void thred::internal::qcode() {
 void thred::internal::drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen) {
   if (!StitchBuffer->empty() && length != 0) {
 	auto activeStitch = wrap::next(StitchBuffer->cbegin(), currentStitch);
+	if ((currentStitch + length) > StitchBuffer->size()) {
+	  throw std::runtime_error("drwLin parameters faulty");
+	}
 	if (ActiveLayer != 0U) {
 	  linePoints.clear();
 	}
