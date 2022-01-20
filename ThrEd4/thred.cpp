@@ -12242,9 +12242,20 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::MOVMSG)) {
 	if (chkok()) {
 	  thred::savdo();
-	  form::refilfn();
+	  if (!SelectedFormList->empty()) {
+		for (auto selectedForm : (*SelectedFormList)) {
+		  ClosestFormToCursor = selectedForm;
+		  form::refilfn();
+		}
+	  }
+	  else {
+		form::refilfn();
+	  }
+	  thred::unmsg();
 	}
-	thred::unmsg();
+	else {
+	  thi::bak();
+	}
 	if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 	  formForms::refrm();
 	}
@@ -15600,11 +15611,19 @@ auto thred::internal::chkMsg(std::vector<POINT>& stretchBoxLine,
 	  if (StateMap->testAndReset(StateFlag::MOVMSG)) {
 		if (code == VK_RETURN || code == VK_OEM_3) {
 		  thred::savdo();
-		  form::refilfn();
+		  if (!SelectedFormList->empty()) {
+			for (auto selectedForm : (*SelectedFormList)) {
+			  ClosestFormToCursor = selectedForm;
+			  form::refilfn();
+			}
+		  }
+		  else {
+			form::refilfn();
+		  }
 		  thred::unmsg();
 		}
 		else {
-		  thred::unmsg();
+		  thi::bak();
 		}
 		if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 		  formForms::refrm();
