@@ -4953,9 +4953,11 @@ void form::refil() {
 		StateMap->set(StateFlag::WASFRMFRM);
 	  }
 	  thred::undat();
-	  displayText::tabmsg(IDS_REFIL);
+	  if (nullptr == MsgWindow) {
+		displayText::tabmsg(IDS_REFIL);
+		displayText::okcan();
+	  }
 	  StateMap->set(StateFlag::MOVMSG);
-	  displayText::okcan();
 	  return;
 	}
   }
