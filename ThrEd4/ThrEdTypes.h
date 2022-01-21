@@ -1435,7 +1435,8 @@ class SAT_CON
   inline auto operator=(SAT_CON_OUT const& rhs) noexcept -> SAT_CON&;
 };
 
-inline SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept : start(rStart), finish(rFinish) {
+inline SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept :
+    start(rStart), finish(rFinish) {
 }
 
 class SAT_CON_OUT
@@ -1482,7 +1483,7 @@ union FANGCLP {
   public:
   float    angle;
   uint32_t clip; // pointer to start of fill clipboard data
-  SAT_CON   guide {};
+  SAT_CON  guide {};
 
   inline FANGCLP() noexcept;
   // FANGCLP(FANGCLP const&) = default;
@@ -1705,7 +1706,7 @@ class TXTR_INFO
 
 union TF_INFO {
   public:
-  FTHR_INFO  feather;
+  FTHR_INFO feather;
   TXTR_INFO texture {};
 
   // TF_INFO() noexcept = default;
@@ -1729,19 +1730,19 @@ class FRM_HEAD_O // Original form header used prior to version 2
 
   SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
 
-  DWORD      borderClipData {};  // border clipboard data
-  uint16_t   satinGuideCount {}; // number of satin guidelines
-  uint16_t   wordParam {};       // word parameter
+  DWORD       borderClipData {};  // border clipboard data
+  uint16_t    satinGuideCount {}; // number of satin guidelines
+  uint16_t    wordParam {};       // word parameter
   F_RECTANGLE rectangle {};       // rectangle
-  uint8_t    fillType {};        // fill type
-  uint8_t    edgeType {};        // edge type
-  float      fillSpacing {};     // fill spacing
-  FLENCNTOUT lengthOrCount {};   // fill stitch length or clipboard count
-  FANGCLPOUT angleOrClipData {}; // fill angle or clipboard data pointer
-  float      borderSize {};      // border size
-  float      edgeSpacing {};     // edge spacing
-  float      edgeStitchLen {};   // edge stitch length
-  uint16_t   res {};             // pico length
+  uint8_t     fillType {};        // fill type
+  uint8_t     edgeType {};        // edge type
+  float       fillSpacing {};     // fill spacing
+  FLENCNTOUT  lengthOrCount {};   // fill stitch length or clipboard count
+  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
+  float       borderSize {};      // border size
+  float       edgeSpacing {};     // edge spacing
+  float       edgeStitchLen {};   // edge stitch length
+  uint16_t    res {};             // pico length
 
   FRM_HEAD_O() noexcept = default;
   // FRM_HEAD_O(FRM_HEAD_O const&) = default;
@@ -1756,42 +1757,42 @@ class FRM_HEAD_OUT;
 class FRM_HEAD
 {
   public:
-  uint8_t    attribute {};           // attribute
-  uint32_t   vertexCount {};         // number of sides
-  uint8_t    type {};                // type
-  uint8_t    fillColor {};           // fill color
-  uint8_t    borderColor {};         // border color
-  uint32_t   clipEntries {};         // number of border clipboard entries
-  uint32_t   vertexIndex {};         // index into FormVertices
-  SATINANGLE satinOrAngle {};        // satin guidelines or angle clipboard fill angle
-  uint32_t   borderClipData {};      // pointer to start of border clipboard data
-  uint32_t   satinGuideCount {};     // number of satin guidelines
-  uint32_t   wordParam {};           // clipboard/textured fill phase or satin end guide
+  uint8_t     attribute {};           // attribute
+  uint32_t    vertexCount {};         // number of sides
+  uint8_t     type {};                // type
+  uint8_t     fillColor {};           // fill color
+  uint8_t     borderColor {};         // border color
+  uint32_t    clipEntries {};         // number of border clipboard entries
+  uint32_t    vertexIndex {};         // index into FormVertices
+  SATINANGLE  satinOrAngle {};        // satin guidelines or angle clipboard fill angle
+  uint32_t    borderClipData {};      // pointer to start of border clipboard data
+  uint32_t    satinGuideCount {};     // number of satin guidelines
+  uint32_t    wordParam {};           // clipboard/textured fill phase or satin end guide
   F_RECTANGLE rectangle {};           // rectangle
-  uint8_t    fillType {};            // fill type
-  uint8_t    edgeType {};            // edge type
-  float      fillSpacing {};         // fill spacing
-  FLENCNT    lengthOrCount {};       // fill stitch length or clipboard count
-  FANGCLP    angleOrClipData {};     // fill angle or clipboard data pointer
-  float      borderSize {};          // border size
-  float      edgeSpacing {};         // edge spacing
-  float      edgeStitchLen {};       // edge stitch length
-  uint16_t   picoLength {};          // pico length
-  uint32_t   extendedAttribute {};   // attribute extension
-  float      maxFillStitchLen {};    // maximum fill stitch length
-  float      minFillStitchLen {};    // minimum fill stitch length
-  float      maxBorderStitchLen {};  // maximum border stitch length
-  float      minBorderStitchLen {};  // minimum border stitch length
+  uint8_t     fillType {};            // fill type
+  uint8_t     edgeType {};            // edge type
+  float       fillSpacing {};         // fill spacing
+  FLENCNT     lengthOrCount {};       // fill stitch length or clipboard count
+  FANGCLP     angleOrClipData {};     // fill angle or clipboard data pointer
+  float       borderSize {};          // border size
+  float       edgeSpacing {};         // edge spacing
+  float       edgeStitchLen {};       // edge stitch length
+  uint16_t    picoLength {};          // pico length
+  uint32_t    extendedAttribute {};   // attribute extension
+  float       maxFillStitchLen {};    // maximum fill stitch length
+  float       minFillStitchLen {};    // minimum fill stitch length
+  float       maxBorderStitchLen {};  // maximum border stitch length
+  float       minBorderStitchLen {};  // minimum border stitch length
   TF_INFO     fillInfo {};            // feather/texture info
-  uint32_t   fillStart {};           // fill start point
-  uint32_t   fillEnd {};             // fill end point
-  float      underlaySpacing {};     // underlay spacing
-  float      underlayStitchLen {};   // underlay stitch length
-  float      underlayStitchAngle {}; // underlay stitch angle
-  float      underlayIndent {};      // underlay/edge walk indent
-  float      txof {};                // gradient end density
-  uint8_t    underlayColor {};       // underlay color
-  uint8_t    cres {};                // reserved
+  uint32_t    fillStart {};           // fill start point
+  uint32_t    fillEnd {};             // fill end point
+  float       underlaySpacing {};     // underlay spacing
+  float       underlayStitchLen {};   // underlay stitch length
+  float       underlayStitchAngle {}; // underlay stitch angle
+  float       underlayIndent {};      // underlay/edge walk indent
+  float       txof {};                // gradient end density
+  uint8_t     underlayColor {};       // underlay color
+  uint8_t     cres {};                // reserved
 
   FRM_HEAD() noexcept = default;
   // FRM_HEAD(FRM_HEAD const&) = default;
@@ -1887,15 +1888,15 @@ class FRM_HEAD_OUT
 
   SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
 
-  DWORD      borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-  uint16_t   satinGuideCount {}; // number of satin guidelines
-  uint16_t   wordParam {};       // clipboard/textured fill phase or satin end guide
+  DWORD       borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  uint16_t    satinGuideCount {}; // number of satin guidelines
+  uint16_t    wordParam {};       // clipboard/textured fill phase or satin end guide
   F_RECTANGLE rectangle {};       // rectangle
-  uint8_t    fillType {};        // fill type
-  uint8_t    edgeType {};        // edge type
-  float      fillSpacing {};     // fill spacing
-  FLENCNTOUT lengthOrCount {};   // fill stitch length or clipboard count
-  FANGCLPOUT angleOrClipData {}; // fill angle or clipboard data pointer
+  uint8_t     fillType {};        // fill type
+  uint8_t     edgeType {};        // edge type
+  float       fillSpacing {};     // fill spacing
+  FLENCNTOUT  lengthOrCount {};   // fill stitch length or clipboard count
+  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
 
   float    borderSize {};          // border size
   float    edgeSpacing {};         // edge spacing
@@ -1906,7 +1907,7 @@ class FRM_HEAD_OUT
   float    minFillStitchLen {};    // minimum fill stitch length
   float    maxBorderStitchLen {};  // maximum border stitch length
   float    minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO   fillInfo {};            // feather/texture info
+  TF_INFO  fillInfo {};            // feather/texture info
   uint16_t fillStart {};           // fill start point
   uint16_t fillEnd {};             // fill end point
   float    underlaySpacing {};     // underlay spacing
@@ -2150,7 +2151,7 @@ class FORM_CLIP // form data clipboard header
   public:
   uint32_t clipType {};
   uint32_t reserved {};
-  FRM_HEAD   form {};
+  FRM_HEAD form {};
 
   // constexpr FORM_CLIP() noexcept = default;
   // FORM_CLIP(FORM_CLIP const&) = default;
@@ -2305,20 +2306,20 @@ class CLIP_STITCH
 class BACK_HEAD // Backup header
 {
   public:
-  uint32_t    formCount {};
+  uint32_t      formCount {};
   FRM_HEAD*     forms {};
-  uint32_t    stitchCount {};
+  uint32_t      stitchCount {};
   F_POINT_ATTR* stitches {};
-  uint32_t    vertexCount {};
-  F_POINT*     vertices {};
-  uint32_t    guideCount {};
-  SAT_CON*     guide {};
-  uint32_t    clipPointCount {};
-  F_POINT*     clipPoints {};
-  COLORREF*   colors {};
-  TX_PNT*      texturePoints {};
-  uint32_t    texturePointCount {};
-  SIZE        zoomRect {};
+  uint32_t      vertexCount {};
+  F_POINT*      vertices {};
+  uint32_t      guideCount {};
+  SAT_CON*      guide {};
+  uint32_t      clipPointCount {};
+  F_POINT*      clipPoints {};
+  COLORREF*     colors {};
+  TX_PNT*       texturePoints {};
+  uint32_t      texturePointCount {};
+  SIZE          zoomRect {};
 
   // constexpr BACK_HEAD() noexcept = default;
   // BACK_HEAD(CLIP_STITCH const&) = default;
@@ -2554,7 +2555,7 @@ class CLIP_SORT
   float    segmentLength {};
   float    sideLength {};
   uint32_t vertexIndex {};
-  F_POINT   point;
+  F_POINT  point;
 
   // constexpr CLIP_SORT() noexcept = default;
   // CLIP_SORT(CLIP_SORT const&) = default;
@@ -2683,7 +2684,7 @@ class F_STARTS
 
 union FILL_STARTS {
   public:
-  F_STARTS   fillNamed;
+  F_STARTS fillNamed;
   uint32_t fillArray[sizeof(F_STARTS) / sizeof(uint32_t)] {};
 
   // inline FILL_STARTS() noexcept;
@@ -2732,11 +2733,11 @@ enum InterleaveTypes { // interleave sequence identifiers
 class INT_INFO
 {
   public:
-  uint32_t    pins {};
-  uint32_t    coloc {};
-  uint32_t    layerIndex {};
-  uint32_t    start {};
-  uint32_t    output {};
+  uint32_t      pins {};
+  uint32_t      coloc {};
+  uint32_t      layerIndex {};
+  uint32_t      start {};
+  uint32_t      output {};
   F_POINT_ATTR* highStitchBuffer {};
 
   // constexpr INT_INFO() noexcept = default;
@@ -2762,7 +2763,7 @@ class TXTR_SCREEN
   float    spacing {};          // edit space between lines
   uint16_t lines {};            // number of lines
   float    editToPixelRatio {}; // edit to pixel ratio
-  F_POINT   formCenter;          // middle of the form
+  F_POINT  formCenter;          // middle of the form
 
   // constexpr TXTR_SCREEN() noexcept = default;
   // TXTR_SCREEN(TXTR_SCREEN const&) = default;
@@ -2923,7 +2924,7 @@ class PES_COLOR_LIST
 class THREAD
 {
   public:
-  PEC_COLOR    color {};
+  PEC_COLOR   color {};
   char const* description {};
   char const* catalogNumber {};
 

@@ -269,14 +269,14 @@ namespace internal {
   auto handleLeftKey(bool& retflag) -> bool;
   auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
   auto handleMainWinKeys(wchar_t const&            code,
-                         F_POINT&                   rotationCenter,
+                         F_POINT&                  rotationCenter,
                          std::vector<POINT> const& stretchBoxLine,
                          bool&                     retflag) -> bool;
   auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
                        float               xyRatio,
                        float&              rotationAngle,
-                       F_POINT const&       rotationCenter,
-                       FRM_HEAD const&       textureForm) -> bool;
+                       F_POINT const&      rotationCenter,
+                       FRM_HEAD const&     textureForm) -> bool;
   auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
   auto handleRightButtonDown() -> bool;
   auto handleRightKey(bool& retflag) -> bool;
@@ -426,7 +426,8 @@ namespace internal {
   void selin(uint32_t start, uint32_t end, HDC dc);
   void selup();
   void set1knot();
-  auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool;
+  auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
+      -> bool;
   void setSideWinVal(int index);
   void setbak(int32_t penWidth) noexcept;
   void setdst();

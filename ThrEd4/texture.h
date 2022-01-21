@@ -21,9 +21,9 @@ namespace texture {
 void deltx(uint32_t formIndex);
 void drwtxtr();
 void dutxtfil();
-void initTextures(std::vector<TX_PNT>*    ptrTexturePoints,
+void initTextures(std::vector<TX_PNT>*   ptrTexturePoints,
                   std::vector<uint32_t>* ptrTexturePointsList,
-                  std::vector<TX_HIST>*    ptrTextureHistory) noexcept;
+                  std::vector<TX_HIST>*  ptrTextureHistory) noexcept;
 auto istx(uint32_t iForm) noexcept -> bool;
 auto istx(FRM_HEAD const& form) noexcept -> bool;
 void redtx();

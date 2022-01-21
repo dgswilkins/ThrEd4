@@ -111,8 +111,8 @@ namespace internal {
   auto chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool;
   void chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData);
   auto chkrdun(std::vector<uint32_t> const& formFillCounter,
-               std::vector<O_REC*> const&    pRecs,
-               SORT_REC const&                stitchRecord) noexcept -> bool;
+               std::vector<O_REC*> const&   pRecs,
+               SORT_REC const&              stitchRecord) noexcept -> bool;
   void delwlk(uint32_t code);
 
 #ifdef _DEBUG
@@ -153,18 +153,19 @@ namespace internal {
   auto getstxt(int32_t stringIndex, HWND dialog) -> float;
   auto gucon(FRM_HEAD const&            form,
              std::vector<F_POINT_ATTR>& buffer,
-             F_POINT const&            start,
-             F_POINT const&            finish,
-             uint32_t                 destination,
-             uint32_t                 code) -> uint32_t;
+             F_POINT const&             start,
+             F_POINT const&             finish,
+             uint32_t                   destination,
+             uint32_t                   code) -> uint32_t;
   auto isfil(FRM_HEAD const& form) noexcept -> bool;
   auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool;
   auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT;
   void notundfn(uint32_t code);
   void nudfn(F_RECTANGLE const& designSizeRect);
   void nurat(FEATHER& feather) noexcept;
-  auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
-      -> double;
+  auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
+                std::vector<O_REC*> const& pRecs,
+                SORT_REC const&            sortRecord) -> double;
   void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
   auto orComp(O_REC const* record1, O_REC const* record2) -> bool;
   auto orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool;

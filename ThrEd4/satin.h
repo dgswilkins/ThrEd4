@@ -51,7 +51,7 @@ namespace internal {
   void satclos();
   void satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t size);
   void satends(FRM_HEAD const& form, uint32_t isBlunt, float width);
-  void satfn(FRM_HEAD const&             form,
+  void satfn(FRM_HEAD const&           form,
              std::vector<float> const& lengths,
              uint32_t                  line1Start,
              uint32_t                  line1End,

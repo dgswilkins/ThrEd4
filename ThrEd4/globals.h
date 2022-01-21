@@ -65,8 +65,8 @@
 
 namespace fs = std::filesystem;
 
-extern uint8_t     ActiveColor;
-extern uint8_t     ActiveLayer;
+extern uint8_t      ActiveColor;
+extern uint8_t      ActiveLayer;
 extern F_RECTANGLE* AllItemsRect;
 
 extern std::vector<F_POINT>* AngledFormVertices;
@@ -95,13 +95,13 @@ extern void*   ClipPointer;
 
 extern std::vector<F_POINT>* ClipPoints;
 
-extern F_LSIZ    ClipRectSize;
+extern F_LSIZ       ClipRectSize;
 extern CLIP_STITCH* ClipStitchData;
-extern uint32_t ClipTypeMap;
-extern uint32_t ClosestFormToCursor;
-extern uint32_t ClosestPointIndex;
-extern uint32_t ClosestVertexToCursor;
-extern int32_t* ColorBarSize;
+extern uint32_t     ClipTypeMap;
+extern uint32_t     ClosestFormToCursor;
+extern uint32_t     ClosestPointIndex;
+extern uint32_t     ClosestVertexToCursor;
+extern int32_t*     ColorBarSize;
 
 extern HWND DeleteStitchesDialog;
 
@@ -109,7 +109,7 @@ extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
-extern THR_HEAD_EX*          ExtendedHeader;
+extern THR_HEAD_EX*    ExtendedHeader;
 extern HMENU           FillMenu;
 
 extern std::vector<float>* FormAngles;
@@ -117,11 +117,11 @@ extern std::vector<POINT>* FormControlPoints;
 
 extern HWND FormDataSheet;
 
-extern std::vector<POINT>*  FormLines;
+extern std::vector<POINT>*    FormLines;
 extern std::vector<FRM_HEAD>* FormList;
 
 extern uint32_t FormMenuChoice;
-extern F_POINT   FormMoveDelta;
+extern F_POINT  FormMoveDelta;
 
 extern std::wstring* FormOnOff;
 
@@ -138,21 +138,21 @@ extern uint32_t GroupStartStitch;
 extern uint32_t GroupStitchIndex;
 extern float    HorizontalRatio;
 extern HWND     HorizontalScrollBar;
-extern INI_FILE  IniFile;
+extern INI_FILE IniFile;
 
-extern std::array<POINT, 3> InsertLine;
+extern std::array<POINT, 3>  InsertLine;
 extern std::vector<F_POINT>* InsidePointList;
 extern std::vector<F_POINT>* InsidePoints;
 extern std::vector<INS_REC>* InterleaveSequenceIndices;
 extern std::vector<F_POINT>* InterleaveSequence;
-extern std::vector<HWND>*   LabelWindow;
+extern std::vector<HWND>*    LabelWindow;
 
 extern F_POINT LastPoint;
-extern float  LineSpacing;
+extern float   LineSpacing;
 extern F_POINT LowerLeftStitch;
-extern HMENU  MainMenu;
-extern HWND   MainStitchWin;
-extern float  MaxStitchLen;
+extern HMENU   MainMenu;
+extern HWND    MainStitchWin;
+extern float   MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 
@@ -180,7 +180,7 @@ extern int32_t        PreferenceWindowWidth;
 extern HWND           PreferencesWindow;
 extern uint32_t       PreviousFormIndex;
 extern uint32_t       PseudoRandomValue;
-extern F_RECTANGLE     RotationRect;
+extern F_RECTANGLE    RotationRect;
 
 extern std::vector<POINT>* RubberBandLine;
 
@@ -195,12 +195,12 @@ extern HPEN     SelectAllPen;
 extern uint32_t SelectedFormControlVertex;
 
 extern std::vector<uint32_t>* SelectedFormList;
-extern FORM_VERTICES           SelectedFormVertices;
+extern FORM_VERTICES          SelectedFormVertices;
 extern std::vector<POINT>*    SelectedFormsLine;
 
-extern RECT   SelectedFormsRect;
+extern RECT    SelectedFormsRect;
 extern F_POINT SelectedFormsSize;
-extern RECT   SelectedPixelsRect;
+extern RECT    SelectedPixelsRect;
 
 extern std::vector<POINT>* SelectedPointsLine;
 
@@ -216,19 +216,19 @@ extern float StarRatio;
 extern ENUM_MAP<StateFlag>* StateMap;
 
 extern F_POINT StitchBmpRatio;
-extern float  StitchBoxesThreshold;
+extern float   StitchBoxesThreshold;
 
 extern std::vector<F_POINT_ATTR>* StitchBuffer;
 
 extern F_RECTANGLE StitchRangeRect;
-extern RECT       StitchWindowClientRect;
-extern HDC        StitchWindowDC;
-extern HDC        StitchWindowMemDC;
-extern POINT      StitchWindowOrigin;
-extern SIZE       StitchWindowSize;
+extern RECT        StitchWindowClientRect;
+extern HDC         StitchWindowDC;
+extern HDC         StitchWindowMemDC;
+extern POINT       StitchWindowOrigin;
+extern SIZE        StitchWindowSize;
 
 extern std::vector<F_POINT>* TempPolygon;
-extern std::wstring*        TextureInputBuffer;
+extern std::wstring*         TextureInputBuffer;
 extern std::vector<TX_PNT>*  TexturePointsBuffer;
 
 extern wchar_t const* ThrEdClipFormat;
@@ -258,7 +258,7 @@ extern fs::path* WorkingFileName;
 extern std::array<POINT, SQPNTS> ZoomBoxLine;
 
 extern F_POINT     ZoomBoxOrigin;
-extern float      ZoomFactor;
+extern float       ZoomFactor;
 extern F_POINT     ZoomMarkPoint;
 extern F_POINT     ZoomRatio;
 extern F_RECTANGLE ZoomRect;
