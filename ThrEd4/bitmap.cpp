@@ -33,10 +33,10 @@ static auto BitmapHeight         = int {};              // bitmap height
 static auto BitmapInfo           = BITMAPINFO {};       // bitmap info
 static auto BitmapInfoHeader     = BITMAPINFOHEADER {}; // bitmap info header
 static auto BitmapPen            = HPEN {};             // bitmap pen
-static auto BitmapSizeinStitches = F_POINT {};           // bitmap end points in stitch points
+static auto BitmapSizeinStitches = F_POINT {};          // bitmap end points in stitch points
 static auto BitmapSrcRect        = RECT {};             // bitmap source rectangle for zoomed view
 static auto BitmapWidth          = int {};              // bitmap width
-static auto BmpStitchRatio       = F_POINT {};           // bitmap to stitch hoop ratios
+static auto BmpStitchRatio       = F_POINT {};          // bitmap to stitch hoop ratios
 static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
@@ -573,9 +573,9 @@ void bitmap::drawBmpBackground() {
 
 auto bitmap::internal::bitar() -> bool {
   auto const zoomedInRect = F_RECTANGLE {ZoomRect.left,
-                                        (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
-                                        ZoomRect.right,
-                                        (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
+                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
+                                         ZoomRect.right,
+                                         (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.bottom)};
   if (zoomedInRect.top > BitmapSizeinStitches.y || zoomedInRect.left > BitmapSizeinStitches.x) {
 	return false;
   }
@@ -592,17 +592,17 @@ auto bitmap::internal::bitar() -> bool {
 	StateMap->set(StateFlag::LANDSCAP);
   }
   auto const backingRect = F_RECTANGLE {wrap::toFloat(BitmapSrcRect.left) * StitchBmpRatio.x,
-                                       wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
-                                       wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
-                                       wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
+                                        wrap::toFloat(BitmapSrcRect.top) * StitchBmpRatio.y,
+                                        wrap::toFloat(BitmapSrcRect.right) * StitchBmpRatio.x,
+                                        wrap::toFloat(BitmapSrcRect.bottom) * StitchBmpRatio.y};
 
   auto const differenceRect = F_RECTANGLE {backingRect.left - zoomedInRect.left,
-                                          backingRect.top - zoomedInRect.top,
-                                          zoomedInRect.right - backingRect.right,
-                                          zoomedInRect.bottom - backingRect.bottom};
+                                           backingRect.top - zoomedInRect.top,
+                                           zoomedInRect.right - backingRect.right,
+                                           zoomedInRect.bottom - backingRect.bottom};
   auto const bitmapStitchRatio =
       F_POINT {wrap::toFloat(StitchWindowClientRect.right) / (ZoomRect.right - ZoomRect.left),
-              wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
+               wrap::toFloat(StitchWindowClientRect.bottom) / (ZoomRect.top - ZoomRect.bottom)};
   BitmapDstRect = {std::lround(differenceRect.left * bitmapStitchRatio.x),
                    std::lround(differenceRect.top * bitmapStitchRatio.y),
                    std::lround(wrap::toFloat(StitchWindowClientRect.right) -

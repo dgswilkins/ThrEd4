@@ -802,12 +802,12 @@ void formForms::dasyfrm() {
 	auto       angle            = PI_F2;
 	auto const holeVertexCount  = IniFile.daisyPetalCount * IniFile.daisyInnerCount;
 	auto const holeSegmentAngle = PI_F2 / wrap::toFloat(holeVertexCount);
-	FormVertices->push_back(
-	    F_POINT {referencePoint.x + diameter * cos(angle), referencePoint.y + diameter * sin(angle)});
+	FormVertices->push_back(F_POINT {referencePoint.x + diameter * cos(angle),
+	                                 referencePoint.y + diameter * sin(angle)});
 	++iVertex;
 	for (auto iSegment = 0U; iSegment < holeVertexCount + 1U; ++iSegment) {
 	  FormVertices->push_back(F_POINT {referencePoint.x + holeDiameter * cos(angle),
-	                                  referencePoint.y + holeDiameter * sin(angle)});
+	                                   referencePoint.y + holeDiameter * sin(angle)});
 	  ++iVertex;
 	  angle -= holeSegmentAngle;
 	}
@@ -880,7 +880,7 @@ void formForms::dasyfrm() {
 		}
 	  }
 	  FormVertices->push_back(F_POINT {referencePoint.x + cos(angle) * distanceFromDaisyCenter,
-	                                  referencePoint.y + sin(angle) * distanceFromDaisyCenter});
+	                                   referencePoint.y + sin(angle) * distanceFromDaisyCenter});
 	  ++iVertex;
 	  angle += petalSegmentAngle;
 	  if (UserFlagMap->test(UserFlag::DAZD) && iMacroPetal != IniFile.daisyPetalCount - 1) {
@@ -1064,7 +1064,7 @@ void formForms::setear() {
 	form::flipv();
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const size = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
-	                          FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	                           FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	auto       horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
@@ -1234,7 +1234,7 @@ void formForms::wavfrm() {
 	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	StateMap->reset(StateFlag::FORMSEL);
 	auto const selectedSize = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
-	                                  FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	                                   FormList->back().rectangle.top - FormList->back().rectangle.bottom};
 	constexpr auto WAVSIZE         = 4.0F; // wave size factor
 	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {

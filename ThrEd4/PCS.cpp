@@ -168,9 +168,10 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 				color = NOTFRM | stitch.fx;
 			  }
 			  else {
-				StitchBuffer->push_back(F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
-				                                    wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
-				                                    color});
+				StitchBuffer->push_back(
+				    F_POINT_ATTR {wrap::toFloat(stitch.x) + wrap::toFloat(stitch.fx) / FRACFACT,
+				                  wrap::toFloat(stitch.y) + wrap::toFloat(stitch.fy) / FRACFACT,
+				                  color});
 				++iStitch;
 			  }
 			  ++iPCSstitch;
@@ -240,7 +241,7 @@ auto PCS::internal::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 	}
   }
   F_POINT const boundingSize = {boundingRect.right - boundingRect.left,
-                               boundingRect.top - boundingRect.bottom};
+                                boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
 	displayText::tabmsg(IDS_PFAF2L);
 	return true;
@@ -313,10 +314,10 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  else {
 			(*StitchBuffer)
 			    .emplace_back(F_POINT_ATTR {wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
-			                              wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-			                                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
-			                              newAttribute});
+			                                    wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
+			                                wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
+			                                    wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
+			                                newAttribute});
 		  }
 		}
 		auto const newStitchCount = StitchBuffer->size();

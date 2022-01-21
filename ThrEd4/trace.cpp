@@ -91,7 +91,7 @@ auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t b
 void trace::initTraceWindows() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_NOTIFY | SS_CENTER | WS_CHILD | WS_BORDER};
-  TraceStepWin           = CreateWindowEx(
+  TraceStepWin            = CreateWindowEx(
       0L, L"STATIC", L"", DW_STYLE, 0, ButtonHeight * 18, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
   auto iTraceControlWindow = TraceControlWindow.begin();
   auto iTraceDownWindow    = TraceDownWindow.begin();
@@ -495,8 +495,8 @@ void trace::tracedg() {
   StateMap->set(StateFlag::WASEDG);
 }
 
-auto trace::internal::trcbit(uint32_t const       initialDirection,
-                             uint32_t&            traceDirection,
+auto trace::internal::trcbit(uint32_t const          initialDirection,
+                             uint32_t&               traceDirection,
                              std::vector<TRACE_PNT>& tracedPoints) -> bool {
   auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
   switch (traceDirection) {
@@ -599,7 +599,7 @@ auto trace::internal::trcbit(uint32_t const       initialDirection,
   }
   if (tracedPoints.back().x != CurrentTracePoint.x || tracedPoints.back().y != CurrentTracePoint.y) {
 	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
-	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	                                  gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	if (tracedPoints.size() >= POINTMAX) {
 	  return false;
 	}
@@ -722,7 +722,7 @@ void trace::internal::dutrac() {
 	uint32_t const initialDirection = traceDirection;
 	auto           tracedPoints     = std::vector<TRACE_PNT> {};
 	tracedPoints.push_back(TRACE_PNT {gsl::narrow<int16_t>(CurrentTracePoint.x),
-	                               gsl::narrow<int16_t>(CurrentTracePoint.y)});
+	                                  gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
 	if (tracedPoints.size() >= POINTMAX) {
 	  displayText::tabmsg(IDS_FRM2L);
@@ -761,7 +761,7 @@ void trace::internal::dutrac() {
 	auto form        = FRM_HEAD {};
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
 	FormVertices->push_back(F_POINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
-	                                wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
+	                                 wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
 	auto iNext           = size_t {};
 	auto traceLengthSum  = 0.0F;
 	auto landscapeOffset = 0.0F;
@@ -777,7 +777,7 @@ void trace::internal::dutrac() {
 	  if (traceLengthSum > traceLength * IniFile.traceRatio) {
 		FormVertices->push_back(
 		    F_POINT {wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
-		            wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
+		             wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
 		--iCurrent;
 		iNext          = iCurrent;
 		traceLengthSum = 0.0;
@@ -972,14 +972,14 @@ auto trace::internal::ducolm() -> uint32_t {
 void trace::internal::trnumwnd0(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
-  TraceNumberInput       = CreateWindowEx(
+  TraceNumberInput        = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
 void trace::internal::trnumwnd1(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
-  GeneralNumberInputBox  = CreateWindowEx(
+  GeneralNumberInputBox   = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidthX3, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 

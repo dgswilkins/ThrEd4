@@ -42,7 +42,7 @@
 
 namespace xi = xt::internal;
 
-static auto DesignSize = F_POINT {};                         // design size
+static auto DesignSize = F_POINT {};                        // design size
 static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
 
 enum StitchStyles {
@@ -118,9 +118,9 @@ void xt::internal::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FE
 	else {
 	  feather.ratioLocal       = feather.minStitch / stitchLength;
 	  auto const adjustedPoint = F_POINT {durat(bNext.x, bCurrent.x, feather.ratioLocal),
-	                                     durat(bNext.y, bCurrent.y, feather.ratioLocal)};
+	                                      durat(bNext.y, bCurrent.y, feather.ratioLocal)};
 	  sequence->push_back(F_POINT {durat(adjustedPoint.x, bCurrent.x, feather.ratio),
-	                              durat(adjustedPoint.y, bCurrent.y, feather.ratio)});
+	                               durat(adjustedPoint.y, bCurrent.y, feather.ratio)});
 	}
   }
 }
@@ -498,7 +498,8 @@ void xt::internal::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	  auto const length = hypot(delta.x, delta.y);
 	  auto const stitchCount = wrap::round<uint32_t>(length / underlayStitchLength);
 	  if (stitchCount != 0U) {
-		auto const step = F_POINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
+		auto const step =
+		    F_POINT {delta.x / wrap::toFloat(stitchCount), delta.y / wrap::toFloat(stitchCount)};
 		auto point = *sequence;
 		for (auto index = 0U; index < stitchCount; ++index) {
 		  InterleaveSequence->push_back(point);
@@ -521,10 +522,10 @@ void xt::internal::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 
 auto xt::internal::gucon(FRM_HEAD const&            form,
                          std::vector<F_POINT_ATTR>& buffer,
-                         F_POINT const&            start,
-                         F_POINT const&            finish,
-                         uint32_t                 destination,
-                         uint32_t                 code) -> uint32_t {
+                         F_POINT const&             start,
+                         F_POINT const&             finish,
+                         uint32_t                   destination,
+                         uint32_t                   code) -> uint32_t {
   auto       length      = hypot(finish.x - start.x, finish.y - start.y);
   auto       startVertex = form::closflt(form, start.x, start.y);
   auto const endVertex   = form::closflt(form, finish.x, finish.y);
@@ -565,7 +566,7 @@ auto xt::internal::gucon(FRM_HEAD const&            form,
 	auto const intermediateVertex = StateMap->test(StateFlag::WLKDIR) ? form::prv(form, startVertex)
 	                                                                  : form::nxt(form, startVertex);
 	auto const delta = F_POINT {indentedPoint[intermediateVertex].x - indentedPoint[startVertex].x,
-	                           indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y};
+	                            indentedPoint[intermediateVertex].y - indentedPoint[startVertex].y};
 	length           = hypot(delta.x, delta.y);
 
 	auto const stitchCount = wrap::round<uint32_t>(length / UserStitchLength);
@@ -632,7 +633,7 @@ void xt::internal::fncwlk(FRM_HEAD& form) {
 	  auto const thisVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.wordParam);
 	  auto const nextVertex = std::next(thisVertex);
 	  OSequence->push_back(F_POINT {wrap::midl(thisVertex->x, nextVertex->x),
-	                               wrap::midl(thisVertex->y, nextVertex->y)});
+	                                wrap::midl(thisVertex->y, nextVertex->y)});
 	}
 	auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide + form.satinGuideCount - 1U);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -640,12 +641,12 @@ void xt::internal::fncwlk(FRM_HEAD& form) {
 	  auto const startVertex  = wrap::next(itVertex, itGuide->start);
 	  auto const finishVertex = wrap::next(itVertex, itGuide->finish);
 	  OSequence->push_back(F_POINT {wrap::midl(finishVertex->x, startVertex->x),
-	                               wrap::midl(finishVertex->y, startVertex->y)});
+	                                wrap::midl(finishVertex->y, startVertex->y)});
 	  --itGuide;
 	}
 	if ((form.attribute & FRMEND) != 0U) {
 	  OSequence->push_back(F_POINT {wrap::midl(itVertex[0].x, itVertex[1].x),
-	                               wrap::midl(itVertex[0].y, itVertex[1].y)});
+	                                wrap::midl(itVertex[0].y, itVertex[1].y)});
 	}
   }
   else {
@@ -661,7 +662,7 @@ void xt::internal::fncwlk(FRM_HEAD& form) {
 	  auto const startVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
 	  auto const finishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
 	  auto const pnt          = F_POINT {wrap::midl(finishVertex->x, startVertex->x),
-                               wrap::midl(finishVertex->y, startVertex->y)};
+                                wrap::midl(finishVertex->y, startVertex->y)};
 	  if (form::cisin(form, pnt.x, pnt.y)) {
 		OSequence->push_back(pnt);
 	  }
@@ -767,7 +768,9 @@ void xt::chkwlk(FRM_HEAD& form) {
   }
 }
 
-void xt::internal::fnund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices) {
+void xt::internal::fnund(FRM_HEAD&                     form,
+                         std::vector<RNG_COUNT> const& textureSegments,
+                         std::vector<F_POINT>&         angledFormVertices) {
   auto const savedStitchSize = UserStitchLength;
   UserStitchLength           = std::numeric_limits<float>::max();
   if (form.underlaySpacing == 0.0F) {
@@ -878,8 +881,8 @@ auto xt::internal::orfComp(O_REC const* record1, O_REC const* record2) noexcept 
 }
 
 auto xt::internal::chkrdun(std::vector<uint32_t> const& formFillCounter,
-                           std::vector<O_REC*> const&    pRecs,
-                           SORT_REC const&                stitchRecord) noexcept -> bool {
+                           std::vector<O_REC*> const&   pRecs,
+                           SORT_REC const&              stitchRecord) noexcept -> bool {
   for (auto iStitch = stitchRecord.start; iStitch < stitchRecord.finish; ++iStitch) {
 	if (pRecs[iStitch]->otyp == formFillCounter[pRecs[iStitch]->form]) {
 	  return true;
@@ -888,9 +891,9 @@ auto xt::internal::chkrdun(std::vector<uint32_t> const& formFillCounter,
   return false;
 }
 
-auto xt::internal::precjmps(std::vector<F_POINT_ATTR>&  stitchBuffer,
+auto xt::internal::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer,
                             std::vector<O_REC*> const& pRecs,
-                            SORT_REC const&             sortRecord) -> double {
+                            SORT_REC const&            sortRecord) -> double {
   auto currentRegion   = sortRecord.currentRegion;
   auto direction       = sortRecord.direction;
   auto formFillCounter = std::vector<uint32_t> {};
@@ -948,8 +951,9 @@ auto xt::internal::precjmps(std::vector<F_POINT_ATTR>&  stitchBuffer,
   return totalJumps;
 }
 
-auto xt::internal::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
-    -> uint32_t {
+auto xt::internal::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer,
+                           std::vector<O_REC*> const& pRecs,
+                           SORT_REC&                  sortRecord) -> uint32_t {
   sortRecord.direction = false;
   auto const jumps0    = wrap::round<uint32_t>(precjmps(stitchBuffer, pRecs, sortRecord));
   sortRecord.direction = true;
@@ -2420,8 +2424,8 @@ void xt::internal::sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTAN
 }
 
 void xt::internal::nudfn(F_RECTANGLE const& designSizeRect) {
-  auto const newSize =
-      F_POINT {(designSizeRect.right - designSizeRect.left), (designSizeRect.top - designSizeRect.bottom)};
+  auto const newSize         = F_POINT {(designSizeRect.right - designSizeRect.left),
+                                (designSizeRect.top - designSizeRect.bottom)};
   auto const designSizeRatio = F_POINT {(DesignSize.x / newSize.x), (DesignSize.y / newSize.y)};
   for (auto& stitch : *StitchBuffer) {
 	sadj(stitch, designSizeRatio, designSizeRect);

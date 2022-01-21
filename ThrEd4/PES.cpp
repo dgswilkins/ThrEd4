@@ -164,7 +164,7 @@ static constexpr auto IMAGE_WITH_FRAME = imgArray{{
 auto PES::internal::pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color = PEC_COLOR {GetRValue(referenceColor), GetGValue(referenceColor), GetBValue(referenceColor)};
-  auto       translatedColor = PES_THREAD[colorIndex].color;
+  auto translatedColor = PES_THREAD[colorIndex].color;
   auto const meanR = (gsl::narrow_cast<int32_t>(color.r) + gsl::narrow_cast<int32_t>(translatedColor.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color.r) - gsl::narrow_cast<int32_t>(translatedColor.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color.g) - gsl::narrow_cast<int32_t>(translatedColor.g);
@@ -532,7 +532,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		auto boundingRect = F_RECTANGLE {};
 		thred::sizstch(boundingRect, *StitchBuffer);
 		auto const offset = F_POINT {wrap::midl(boundingRect.right, boundingRect.left),
-		                            wrap::midl(boundingRect.top, boundingRect.bottom)};
+		                             wrap::midl(boundingRect.top, boundingRect.bottom)};
 
 		pesHeader.xsiz = wrap::round<int16_t>((boundingRect.right - boundingRect.left) * PECFACT);
 		pesHeader.ysiz = wrap::round<int16_t>((boundingRect.top - boundingRect.bottom) * PECFACT);

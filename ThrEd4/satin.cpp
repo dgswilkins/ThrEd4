@@ -727,7 +727,7 @@ void satin::internal::satends(FRM_HEAD const& form, uint32_t isBlunt, float widt
   itVertex                = wrap::next(itVertex, vertexCount - 1U);
   if ((isBlunt & FBLNT) != 0U) {
 	auto step = F_POINT {sin(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F,
-	                    cos(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F};
+	                     cos(FormAngles->operator[](vertexCount - 2U)) * width / 2.0F};
 	if (StateMap->test(StateFlag::INDIR)) {
 	  step.x = -step.x;
 	  step.y = -step.y;
@@ -873,7 +873,7 @@ void satin::slbrd(FRM_HEAD const& form) {
   LineSpacing = savedSpacing;
 }
 
-void satin::internal::satfn(FRM_HEAD const&             form,
+void satin::internal::satfn(FRM_HEAD const&           form,
                             std::vector<float> const& lengths,
                             uint32_t                  line1Start,
                             uint32_t                  line1End,
@@ -1260,7 +1260,7 @@ void satin::satpnt1() {
 
 void satin::internal::filinsbw(std::vector<F_POINT>& satinBackup,
                                F_POINT const&        point,
-                               uint32_t&            satinBackupIndex,
+                               uint32_t&             satinBackupIndex,
                                F_POINT&              stitchPoint) {
   satinBackup[satinBackupIndex++] = point;
   satinBackupIndex &= (satinBackup.size() - 1U); // make sure that satinBackupIndex rolls over when it reaches the end of the buffer
@@ -1270,9 +1270,9 @@ void satin::internal::filinsbw(std::vector<F_POINT>& satinBackup,
 void satin::internal::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t finish, F_POINT& stitchPoint) {
   auto const& outsidePoints = *OutsidePoints;
   auto        innerDelta    = F_POINT {(insidePoints[finish].x - insidePoints[start].x),
-                            (insidePoints[finish].y - insidePoints[start].y)};
+                             (insidePoints[finish].y - insidePoints[start].y)};
   auto        outerDelta    = F_POINT {(outsidePoints[finish].x - outsidePoints[start].x),
-                            (outsidePoints[finish].y - outsidePoints[start].y)};
+                             (outsidePoints[finish].y - outsidePoints[start].y)};
 
   auto const innerLength = hypot(innerDelta.x, innerDelta.y);
   auto const outerLength = hypot(outerDelta.x, outerDelta.y);
@@ -1325,7 +1325,7 @@ void satin::internal::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t st
 		auto const offsetLength = hypot(offsetDelta.x, offsetDelta.y);
 		auto const offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
-                                        offsetDelta.y / wrap::toFloat(offsetCount)};
+                                         offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = innerPoint;
 		while (si::chkbak(satinBackup, offset)) {
 		  offset.x -= offsetStep.x;
@@ -1343,7 +1343,7 @@ void satin::internal::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t st
 		auto const offsetLength = hypot(offsetDelta.x, offsetDelta.y);
 		auto const offsetCount  = wrap::round<uint32_t>(offsetLength / LineSpacing);
 		auto const offsetStep   = F_POINT {offsetDelta.x / wrap::toFloat(offsetCount),
-                                        offsetDelta.y / wrap::toFloat(offsetCount)};
+                                         offsetDelta.y / wrap::toFloat(offsetCount)};
 		auto       offset       = outerPoint;
 		while (si::chkbak(satinBackup, offset)) {
 		  offset.x -= offsetStep.x;

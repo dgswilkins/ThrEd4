@@ -162,8 +162,9 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	UnzoomedRect            = {std::lround(IniFile.hoopSizeX), std::lround(IniFile.hoopSizeY)};
 	displayText::hsizmsg();
   }
-  auto const delta = F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
-                             (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
+  auto const delta =
+      F_POINT {(wrap::toFloat(UnzoomedRect.cx) - dstSize.x) / 2.0F - mimimumCoordinate.x,
+               (wrap::toFloat(UnzoomedRect.cy) - dstSize.y) / 2.0F - mimimumCoordinate.y};
   for (auto& iStitch : *StitchBuffer) {
 	iStitch.x += delta.x;
 	iStitch.y += delta.y;
@@ -359,7 +360,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
 
 auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
   static constexpr auto DSTLEN = 243U; // -121 to 121
-  static constexpr auto X_DST   = std::array<uint32_t, DSTLEN> {
+  static constexpr auto X_DST  = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
       0x090a08, //-120
       0x090a09, //-119

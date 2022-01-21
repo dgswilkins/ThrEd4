@@ -273,12 +273,12 @@ auto clip::internal::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT co
   return retval;
 }
 
-void clip::internal::lincrnr(uint32_t                   vertexIndex,
+void clip::internal::lincrnr(uint32_t                    vertexIndex,
                              std::vector<F_POINT> const& clipReversedData,
                              std::vector<F_POINT>&       clipFillData,
-                             float                      clipAngle,
+                             float                       clipAngle,
                              F_POINT const&              rotationCenter,
-                             uint32_t                   currentSide,
+                             uint32_t                    currentSide,
                              F_POINT&                    stitchPoint,
                              F_POINT const&              borderClipReference) {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 2);
@@ -296,13 +296,13 @@ void clip::internal::lincrnr(uint32_t                   vertexIndex,
   }
 }
 
-void clip::internal::linsid(uint32_t                   vertexIndex,
+void clip::internal::linsid(uint32_t                    vertexIndex,
                             std::vector<F_POINT> const& clipReversedData,
                             std::vector<F_POINT>&       clipFillData,
-                            float                      clipAngle,
+                            float                       clipAngle,
                             F_POINT const&              vector0,
                             F_POINT const&              rotationCenter,
-                            uint32_t                   currentSide,
+                            uint32_t                    currentSide,
                             F_POINT&                    stitchPoint,
                             F_POINT const&              borderClipReference) {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + currentSide + 1);
@@ -336,12 +336,12 @@ void clip::clpout(float width) {
   }
 }
 
-auto clip::internal::clpsid(uint32_t                   vertexIndex,
+auto clip::internal::clpsid(uint32_t                    vertexIndex,
                             F_RECTANGLE const&          clipRect,
                             std::vector<F_POINT> const& clipReversedData,
                             std::vector<F_POINT>&       clipFillData,
-                            uint32_t                   start,
-                            uint32_t                   finish,
+                            uint32_t                    start,
+                            uint32_t                    finish,
                             F_POINT const&              rotationCenter) -> bool {
   auto const itVertex       = wrap::next(FormVertices->cbegin(), vertexIndex);
   auto const itFinishVertex = wrap::next(itVertex, finish);
@@ -397,7 +397,7 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t st
   if (form.type == FRMLINE) {
 	auto const itVertex    = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	auto       stitchPoint = *itVertex;
-	auto       clipAngle   = 0.0F;      // for clipboard border fill
+	auto       clipAngle   = 0.0F;       // for clipboard border fill
 	auto       vector0     = F_POINT {}; // x size of the clipboard fill at the fill angle
 	ci::setvct(form.vertexIndex, 0, 1, clipAngle, vector0);
 	// Since clipRect.bottom is always 0
@@ -430,9 +430,9 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t st
 auto clip::internal::fxpnt(uint32_t                  vertexIndex,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs,
-                           F_POINT&                   moveToCoords,
+                           F_POINT&                  moveToCoords,
                            uint32_t                  currentSide,
-                           F_POINT const&             stitchPoint,
+                           F_POINT const&            stitchPoint,
                            float                     adjustedSpace,
                            uint32_t                  nextStart) -> bool {
   auto const itVertex = wrap::next(FormVertices->cbegin(), vertexIndex + nextStart);
@@ -456,9 +456,9 @@ auto clip::internal::fxpnt(uint32_t                  vertexIndex,
 void clip::internal::fxlit(uint32_t                  vertexIndex,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs,
-                           F_POINT&                   moveToCoords,
+                           F_POINT&                  moveToCoords,
                            uint32_t                  currentSide,
-                           F_POINT&                   stitchPoint,
+                           F_POINT&                  stitchPoint,
                            uint32_t&                 adjCount,
                            float                     adjustedSpace,
                            uint32_t                  nextStart) {
@@ -477,12 +477,12 @@ void clip::internal::fxlit(uint32_t                  vertexIndex,
 }
 
 void clip::internal::fxlin(uint32_t                  vertexIndex,
-                           std::vector<F_POINT>&      chainEndPoints,
+                           std::vector<F_POINT>&     chainEndPoints,
                            std::vector<float> const& ListSINEs,
                            std::vector<float> const& ListCOSINEs,
-                           F_POINT&                   moveToCoords,
+                           F_POINT&                  moveToCoords,
                            uint32_t                  currentSide,
-                           F_POINT&                   stitchPoint,
+                           F_POINT&                  stitchPoint,
                            float                     adjustedSpace,
                            uint32_t                  nextStart) {
   if (ci::fxpnt(vertexIndex, ListSINEs, ListCOSINEs, moveToCoords, currentSide, stitchPoint, adjustedSpace, nextStart)) {
@@ -501,8 +501,8 @@ void clip::internal::fxlin(uint32_t                  vertexIndex,
   }
 }
 
-void clip::internal::fxlen(FRM_HEAD const&             form,
-                           std::vector<F_POINT>&      chainEndPoints,
+void clip::internal::fxlen(FRM_HEAD const&           form,
+                           std::vector<F_POINT>&     chainEndPoints,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs) {
   auto       moveToCoords  = F_POINT {}; // moving formOrigin for clipboard fill
@@ -668,11 +668,11 @@ void clip::internal::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F
 
 void clip::internal::xclpfn(std::vector<F_POINT> const& tempClipPoints,
                             std::vector<F_POINT> const& chainEndPoints,
-                            uint32_t                   start,
-                            uint32_t                   finish,
+                            uint32_t                    start,
+                            uint32_t                    finish,
                             F_POINT const&              rotationCenter) {
   auto const  delta         = F_POINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
-                             (chainEndPoints[finish].y - chainEndPoints[start].y)};
+                              (chainEndPoints[finish].y - chainEndPoints[start].y)};
   auto const  rotationAngle = atan2(delta.y, delta.x);
   auto const& chainEndPoint = chainEndPoints[start];
   for (auto const& clip : tempClipPoints) {
@@ -700,16 +700,16 @@ void clip::duxclp(FRM_HEAD const& form) {
   }
 }
 
-void clip::internal::clpcrnr(FRM_HEAD const&        form,
+void clip::internal::clpcrnr(FRM_HEAD const&       form,
                              F_RECTANGLE const&    clipRect,
                              std::vector<F_POINT>& clipFillData,
-                             uint32_t             vertex,
+                             uint32_t              vertex,
                              F_POINT const&        rotationCenter) {
   auto const nextVertex = form::nxt(form, vertex);
   auto const itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
   if (auto const* points = StateMap->test(StateFlag::INDIR) ? OutsidePoints : InsidePoints; points != nullptr) {
 	auto delta = F_POINT {points->operator[](nextVertex).x - itVertex->x,
-	                     points->operator[](nextVertex).y - itVertex->y};
+	                      points->operator[](nextVertex).y - itVertex->y};
 
 	auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
 	auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
@@ -735,12 +735,12 @@ void clip::internal::clpcrnr(FRM_HEAD const&        form,
   }
 }
 
-void clip::internal::picfn(FRM_HEAD const&        form,
+void clip::internal::picfn(FRM_HEAD const&       form,
                            F_RECTANGLE const&    clipRect,
                            std::vector<F_POINT>& clipFillData,
-                           uint32_t             start,
-                           uint32_t             finish,
-                           float                spacing,
+                           uint32_t              start,
+                           uint32_t              finish,
+                           float                 spacing,
                            F_POINT const&        rotationCenter) {
   auto const itStartVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex + start);
   auto const itFinishVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + finish);
@@ -838,12 +838,12 @@ void clip::internal::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t
   constexpr auto CHPOINTS = 5U; // chainPoint size
   chainPoint.resize(CHPOINTS);
   auto delta = F_POINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
-                       (chainEndPoints[finish].y - chainEndPoints[start].y)};
+                        (chainEndPoints[finish].y - chainEndPoints[start].y)};
 
-  auto const& form        = FormList->operator[](ClosestFormToCursor);
-  auto const lengthDelta  = F_POINT {(delta.x * form.edgeStitchLen), (delta.y * form.edgeStitchLen)};
-  auto const angle        = atan2(delta.y, delta.x) + PI_FHALF;
-  auto const offset       = F_POINT {(cos(angle) * form.borderSize), (sin(angle) * form.borderSize)};
+  auto const& form       = FormList->operator[](ClosestFormToCursor);
+  auto const lengthDelta = F_POINT {(delta.x * form.edgeStitchLen), (delta.y * form.edgeStitchLen)};
+  auto const angle       = atan2(delta.y, delta.x) + PI_FHALF;
+  auto const offset      = F_POINT {(cos(angle) * form.borderSize), (sin(angle) * form.borderSize)};
   auto const middleXcoord = chainEndPoints[start].x + lengthDelta.x;
   auto const middleYcoord = chainEndPoints[start].y + lengthDelta.y;
   chainPoint[0]           = chainEndPoints[start];

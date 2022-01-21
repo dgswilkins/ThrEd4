@@ -40,22 +40,23 @@ namespace txi = texture::internal;
 
 constexpr auto OSCLAMP = -0.5F; // values below this are off screen and should be clamped
 
-static auto TextureWindowId           = uint32_t {}; // id of the window being updated
-static auto SideWindowButton          = HWND {};     // button side window
-static auto TexturePixelRect          = RECT {};     // screen selected texture points rectangle
-static auto TextureRect               = TXTR_RECT {};   // selected texture points rectangle
-static auto SelectTexturePointsOrigin = POINT {};    // original location of selected texture points
-static auto TextureCursorLocation     = POINT {};    // texture editor move cursor location
-static auto TextureCrossPen           = HPEN {};     // texture editor cross pen
+static auto TextureWindowId           = uint32_t {};  // id of the window being updated
+static auto SideWindowButton          = HWND {};      // button side window
+static auto TexturePixelRect          = RECT {};      // screen selected texture points rectangle
+static auto TextureRect               = TXTR_RECT {}; // selected texture points rectangle
+static auto SelectTexturePointsOrigin = POINT {}; // original location of selected texture points
+static auto TextureCursorLocation     = POINT {}; // texture editor move cursor location
+static auto TextureCrossPen           = HPEN {};  // texture editor cross pen
 static auto TextureHistory = gsl::narrow_cast<std::vector<TX_HIST>*>(nullptr); // texture editor history headers
 static auto TextureHistoryIndex = uint32_t {}; // pointer to the next texture history buffer
-static auto TempTexturePoints = static_cast<std::vector<TX_PNT>*>(nullptr); // temporary storage for textured fill data
+static auto TempTexturePoints =
+    static_cast<std::vector<TX_PNT>*>(nullptr); // temporary storage for textured fill data
 static auto SelectedTexturePointsList = static_cast<std::vector<uint32_t>*>(nullptr); // list of selected points
 static auto TextureScreen = TXTR_SCREEN {}; // texture editor layout parameters
 
-void texture::initTextures(std::vector<TX_PNT>*    ptrTexturePoints,
+void texture::initTextures(std::vector<TX_PNT>*   ptrTexturePoints,
                            std::vector<uint32_t>* ptrTexturePointsList,
-                           std::vector<TX_HIST>*    ptrTextureHistory) noexcept {
+                           std::vector<TX_HIST>*  ptrTextureHistory) noexcept {
   TempTexturePoints         = ptrTexturePoints;
   SelectedTexturePointsList = ptrTexturePointsList;
   TextureHistory            = ptrTextureHistory;
@@ -700,8 +701,8 @@ void texture::txtrup() {
 	auto const xMagnitude = abs(offset.x);
 	auto       textureOffset =
 	    TX_OFF {wrap::toFloat(-offset.y) / wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight,
-	           wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
-	                               TextureScreen.spacing)};
+	            wrap::ceil<int32_t>(wrap::toFloat(xMagnitude) * TextureScreen.editToPixelRatio /
+	                                TextureScreen.spacing)};
 	if (offset.x < 0) {
 	  textureOffset.line = -textureOffset.line;
 	}
