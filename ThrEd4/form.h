@@ -198,12 +198,15 @@ namespace internal {
   void bold(FRM_HEAD const& form);
   void boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float size);
   void brdfil(FRM_HEAD const& form);
-  void brkdun(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, std::vector<F_POINT>& workingFormVertices);
+  void brkdun(std::vector<SMAL_PNT_L*> const& sortedLines,
+              uint32_t                        start,
+              uint32_t                        finish,
+              std::vector<F_POINT>&           workingFormVertices);
   void brkseq(std::vector<SMAL_PNT_L*> const& sortedLines,
-              uint32_t                      start,
-              uint32_t                      finish,
-              boost::dynamic_bitset<>&      sequenceMap,
-              uint32_t&                     lastGroup,
+              uint32_t                        start,
+              uint32_t                        finish,
+              boost::dynamic_bitset<>&        sequenceMap,
+              uint32_t&                       lastGroup,
               SMAL_PNT_L*                     sequenceLines);
   void chkbrd(FRM_HEAD const& form);
   void chksid(FRM_HEAD const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<F_POINT> const& currentFormVertices);
@@ -211,16 +214,16 @@ namespace internal {
   auto vclpComp(V_CLP_X const& vclpx1, V_CLP_X const& vclpx2) noexcept -> bool;
   void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& currentFormVertices);
   void clpfm();
-  auto clpnseg(std::vector<CLIP_PNT>&       clipStitchPoints,
-               std::vector<CLIP_SEG>&       clipSegments,
-               std::vector<float> const&  lengths,
-               uint32_t                   start,
-               uint32_t                   finish,
+  auto clpnseg(std::vector<CLIP_PNT>&      clipStitchPoints,
+               std::vector<CLIP_SEG>&      clipSegments,
+               std::vector<float> const&   lengths,
+               uint32_t                    start,
+               uint32_t                    finish,
                std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
-  auto clpnxt(std::vector<CLIP_SEG> const&  clipSegments,
+  auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
               std::vector<LEN_INFO> const& sortedLengths,
-              uint32_t                    sind,
-              uint32_t&                   outIndex) -> bool;
+              uint32_t                     sind,
+              uint32_t&                    outIndex) -> bool;
   auto fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool;
   void contf(FRM_HEAD& form);
   auto contsf(uint32_t formIndex) -> bool;
@@ -232,44 +235,44 @@ namespace internal {
   void ducon() noexcept;
   void dudif(F_POINT const& start, F_POINT const& finish, F_POINT& delta) noexcept;
   void dufcntr(F_POINT& center) noexcept;
-  void dufdat(std::vector<F_POINT>& tempClipPoints,
-              std::vector<SAT_CON>& tempGuides,
-              std::vector<F_POINT>& destFormVertices,
+  void dufdat(std::vector<F_POINT>&  tempClipPoints,
+              std::vector<SAT_CON>&  tempGuides,
+              std::vector<F_POINT>&  destFormVertices,
               std::vector<FRM_HEAD>& destFormList,
-              uint32_t             formIndex,
-              uint32_t&            formRelocationIndex,
-              uint32_t&            formSourceIndex);
+              uint32_t               formIndex,
+              uint32_t&              formRelocationIndex,
+              uint32_t&              formSourceIndex);
   void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices);
   void dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup);
   void dupfn(float rotationAngle);
   void duprotfs(float rotationAngle);
   void duprots(float rotationAngle, F_POINT const& rotationCenter);
   void durgn(FRM_HEAD const&                 form,
-             std::vector<F_SEQ> const&      sequencePath,
-             boost::dynamic_bitset<>&      visitedRegions,
+             std::vector<F_SEQ> const&       sequencePath,
+             boost::dynamic_bitset<>&        visitedRegions,
              std::vector<SMAL_PNT_L*> const& sortedLines,
-             uint32_t                      pthi,
-             uint32_t                      lineCount,
-             std::vector<REGION> const&    regionsList,
-             uint32_t&                     lastGroup,
-             uint32_t                      sequencePathIndex,
-             std::vector<F_POINT>&          workingFormVertices);
+             uint32_t                        pthi,
+             uint32_t                        lineCount,
+             std::vector<REGION> const&      regionsList,
+             uint32_t&                       lastGroup,
+             uint32_t                        sequencePathIndex,
+             std::vector<F_POINT>&           workingFormVertices);
   void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1, F_POINT const& finish1, F_POINT& stitchPoint);
   void duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
-             uint32_t                      start,
-             uint32_t                      finish,
-             boost::dynamic_bitset<>&      sequenceMap,
-             uint32_t&                     lastGroup,
+             uint32_t                        start,
+             uint32_t                        finish,
+             boost::dynamic_bitset<>&        sequenceMap,
+             uint32_t&                       lastGroup,
              SMAL_PNT_L const*               sequenceLines);
   void duseq1(SMAL_PNT_L const* sequenceLines);
   void duseq2(SMAL_PNT_L const* sequenceLines);
-  void duspnd(float                     stitchLen,
+  void duspnd(float                        stitchLen,
               std::vector<V_RECT_2> const& underlayVerticalRect,
               std::vector<V_RECT_2> const& fillVerticalRect,
-              uint32_t                  start,
-              uint32_t                  finish,
-              float                     width,
-              F_POINT&                   stitchPoint);
+              uint32_t                     start,
+              uint32_t                     finish,
+              float                        width,
+              F_POINT&                     stitchPoint);
   void fillSB(const F_POINT& pivot, float angle, float const& radius, F_POINT& stitchPoint, float const& level);
   void filsclp();
   void filsfn();
@@ -277,21 +280,21 @@ namespace internal {
       -> float;
   void fmclp(FRM_HEAD& form);
   void fnagain(float rotationAngle);
-  void fnang(std::vector<uint32_t>& groupIndexSequence,
+  void fnang(std::vector<uint32_t>&   groupIndexSequence,
              std::vector<SMAL_PNT_L>& lineEndpoints,
-             float                  rotationAngle,
-             F_POINT&                rotationCenter,
+             float                    rotationAngle,
+             F_POINT&                 rotationCenter,
              FRM_HEAD&                angledForm,
-             std::vector<F_POINT>&   angledFormVertices);
-  void fnhor(std::vector<uint32_t>& groupIndexSequence,
+             std::vector<F_POINT>&    angledFormVertices);
+  void fnhor(std::vector<uint32_t>&   groupIndexSequence,
              std::vector<SMAL_PNT_L>& lineEndpoints,
-             float                  rotationAngle,
-             F_POINT&                rotationCenter,
+             float                    rotationAngle,
+             F_POINT&                 rotationCenter,
              FRM_HEAD&                angledForm,
-             std::vector<F_POINT>&   angledFormVertices);
+             std::vector<F_POINT>&    angledFormVertices);
   void fnord();
-  void fnvrt(std::vector<F_POINT>&   currentFillVertices,
-             std::vector<uint32_t>& groupIndexSequence,
+  void fnvrt(std::vector<F_POINT>&    currentFillVertices,
+             std::vector<uint32_t>&   groupIndexSequence,
              std::vector<SMAL_PNT_L>& lineEndpoints);
   void frmpnts(uint32_t type);
   void frmpoly(POINT const* line, uint32_t count) noexcept;
@@ -305,117 +308,118 @@ namespace internal {
   void fspic(uint32_t formIndex);
   void fsvrt();
   void getbig(F_RECTANGLE* allItemsRect) noexcept;
-  auto getlen(std::vector<CLIP_PNT>&       clipStitchPoints,
-              std::vector<float> const&  lengths,
-              uint32_t                   iPoint,
+  auto getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
+              std::vector<float> const&   lengths,
+              uint32_t                    iPoint,
               std::vector<F_POINT> const& currentFormVertices) -> float;
   void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-  auto insect(FRM_HEAD const&              form,
+  auto insect(FRM_HEAD const&             form,
               std::vector<CLIP_SORT>&     clipIntersectData,
-              std::vector<V_CLP_X> const&  regionCrossingData,
+              std::vector<V_CLP_X> const& regionCrossingData,
               std::vector<CLIP_SORT*>&    arrayOfClipIntersectData,
-              uint32_t                   regionCrossingStart,
-              uint32_t                   regionCrossingEnd,
+              uint32_t                    regionCrossingStart,
+              uint32_t                    regionCrossingEnd,
               F_POINT const&              lineSegmentStart,
               F_POINT const&              lineSegmentEnd,
               std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
   void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
   auto isclos(SMAL_PNT_L const* lineEndPoint0, SMAL_PNT_L const* lineEndPoint1, float gapToClosestRegion) noexcept
       -> bool;
-  auto isect(uint32_t                   vertex0,
-             uint32_t                   vertex1,
+  auto isect(uint32_t                    vertex0,
+             uint32_t                    vertex1,
              F_POINT&                    intersection,
-             float&                     length,
+             float&                      length,
              F_POINT const&              lineSegmentStart,
              F_POINT const&              lineSegmentEnd,
              std::vector<F_POINT> const& currentFormVertices) -> bool;
-  auto isin(FRM_HEAD const&              form,
-            std::vector<V_CLP_X> const&  regionCrossingData,
-            float                      xCoordinate,
-            float                      yCoordinate,
-            uint32_t                   regionCrossingStart,
-            uint32_t                   regionCrossingEnd,
+  auto isin(FRM_HEAD const&             form,
+            std::vector<V_CLP_X> const& regionCrossingData,
+            float                       xCoordinate,
+            float                       yCoordinate,
+            uint32_t                    regionCrossingStart,
+            uint32_t                    regionCrossingEnd,
             F_RECTANGLE const&          boundingRect,
             std::vector<F_POINT> const& currentFormVertices) -> bool;
   void lapbrd(FRM_HEAD const& form);
-  void lcon(FRM_HEAD const&                form,
+  void lcon(FRM_HEAD const&              form,
             std::vector<uint32_t> const& groupIndexSequence,
-            std::vector<SMAL_PNT_L>&       lineEndpoints,
-            std::vector<F_POINT>&         workingFormVertices);
+            std::vector<SMAL_PNT_L>&     lineEndpoints,
+            std::vector<F_POINT>&        workingFormVertices);
   auto lenComp(LEN_INFO const& arg1, LEN_INFO const& arg2) noexcept -> bool;
   auto clipComp(CLIP_SORT const* arg1, CLIP_SORT const* arg2) noexcept -> bool;
-  auto lnclos(std::vector<uint32_t> const& groupIndexSequence,
+  auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
               std::vector<SMAL_PNT_L> const& lineEndpoints,
-              uint32_t                     group0,
-              uint32_t                     line0,
-              uint32_t                     group1,
-              uint32_t                     line1,
-              float                        gapToClosestRegion) noexcept -> bool;
+              uint32_t                       group0,
+              uint32_t                       line0,
+              uint32_t                       group1,
+              uint32_t                       line1,
+              float                          gapToClosestRegion) noexcept -> bool;
   void makpoli();
   void movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind);
   void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;
-  auto notdun(std::vector<RG_SEQ>&            tempPath,
-              std::vector<R_CON> const&       pathMap,
+  auto notdun(std::vector<RG_SEQ>&           tempPath,
+              std::vector<R_CON> const&      pathMap,
               std::vector<uint32_t> const&   mapIndexSequence,
               boost::dynamic_bitset<> const& visitedRegions,
               ptrdiff_t                      pathLength,
               uint32_t                       doneRegion,
               uint32_t                       sequencePathIndex) -> bool;
-  auto nucseg(std::vector<CLIP_SEG> const&  clipSegments,
+  auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
               std::vector<LEN_INFO> const& sortedLengths,
-              uint32_t&                   currentSegmentIndex) -> bool;
+              uint32_t&                    currentSegmentIndex) -> bool;
   void nufpnt(uint32_t vertex, FRM_HEAD& formForInsert, F_POINT const& stitchPoint);
   void doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram);
-  void nxtrgn(std::vector<RG_SEQ>&           tempPath,
-              std::vector<R_CON> const&      pathMap,
-              std::vector<uint32_t> const&  mapIndexSequence,
-              boost::dynamic_bitset<>&      visitedRegions,
+  void nxtrgn(std::vector<RG_SEQ>&            tempPath,
+              std::vector<R_CON> const&       pathMap,
+              std::vector<uint32_t> const&    mapIndexSequence,
+              boost::dynamic_bitset<>&        visitedRegions,
               std::vector<SMAL_PNT_L*> const& sortedLines,
-              std::vector<REGION> const&    regionsList,
-              uint32_t&                     doneRegion,
-              uint32_t                      pathMapIndex,
-              uint32_t&                     sequencePathIndex,
-              int32_t                       visitedIndex);
-  void nxtseq(std::vector<F_SEQ>&           sequencePath,
-              std::vector<R_CON> const&     pathMap,
+              std::vector<REGION> const&      regionsList,
+              uint32_t&                       doneRegion,
+              uint32_t                        pathMapIndex,
+              uint32_t&                       sequencePathIndex,
+              int32_t                         visitedIndex);
+  void nxtseq(std::vector<F_SEQ>&          sequencePath,
+              std::vector<R_CON> const&    pathMap,
               std::vector<uint32_t> const& mapIndexSequence,
               uint32_t                     pathIndex);
   void pbrd(FRM_HEAD const& form);
   void pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
            std::vector<V_RECT_2> const& fillVerticalRect,
-           uint32_t                  startVertex,
+           uint32_t                     startVertex,
            std::vector<V_RECT_2> const& vrct,
-           float                     width);
+           float                        width);
   void plbak(uint32_t backPoint);
   void plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
-  void plfn(FRM_HEAD const&             form,
+  void plfn(FRM_HEAD const&              form,
             std::vector<V_RECT_2> const& underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
             std::vector<V_RECT_2> const& prct,
-            float                     width,
-            F_POINT&                   stitchPoint);
+            float                        width,
+            F_POINT&                     stitchPoint);
   void prebrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
   auto proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT const& point1, F_POINT& intersectionPoint) noexcept
       -> bool;
-  auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept -> bool;
+  auto projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, F_POINT& intersection) noexcept
+      -> bool;
   auto projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& upperPoint, F_POINT& intersection) noexcept
       -> bool;
   void prpsbrd(uint32_t formIndex);
   void prsmal(float width);
   auto px2stchf(POINT const& screen) noexcept -> F_POINT;
   void rats();
-  auto regclos(std::vector<uint32_t> const&  groupIndexSequence,
+  auto regclos(std::vector<uint32_t> const&    groupIndexSequence,
                std::vector<SMAL_PNT_L> const&  lineEndpoints,
                std::vector<SMAL_PNT_L*> const& sortedLines,
-               uint32_t                      iRegion0,
-               uint32_t                      iRegion1,
-               std::vector<REGION> const&    regionsList,
-               float                         gapToClosestRegion,
-               uint32_t&                     nextGroup) noexcept -> bool;
-  auto reglen(std::vector<SMAL_PNT_L*> const&       sortedLines,
-              uint32_t                            iRegion,
+               uint32_t                        iRegion0,
+               uint32_t                        iRegion1,
+               std::vector<REGION> const&      regionsList,
+               float                           gapToClosestRegion,
+               uint32_t&                       nextGroup) noexcept -> bool;
+  auto reglen(std::vector<SMAL_PNT_L*> const&      sortedLines,
+              uint32_t                             iRegion,
               std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
-              std::vector<REGION> const&          regionsList) noexcept -> float;
+              std::vector<REGION> const&           regionsList) noexcept -> float;
   void ritapbrd();
   void ritbrd(FRM_HEAD const& form);
   void ritfil();
@@ -423,9 +427,9 @@ namespace internal {
   void ritseg(FRM_HEAD const&              form,
               std::vector<CLIP_PNT> const& clipStitchPoints,
               std::vector<CLIP_SEG>&       clipSegments,
-              uint32_t                   currentSegmentIndex,
-              uint32_t&                  clipIntersectSide,
-              std::vector<F_POINT> const& currentFormVertices);
+              uint32_t                     currentSegmentIndex,
+              uint32_t&                    clipIntersectSide,
+              std::vector<F_POINT> const&  currentFormVertices);
   void rotbak(float rotationAngle, F_POINT const& rotationCenter) noexcept;
   void rotentr(float rotationAngle);
   void sapliq(uint32_t formIndex);
@@ -449,11 +453,13 @@ namespace internal {
   void spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
   auto spltlin() -> bool;
   void sprct(std::vector<F_POINT> const* vertices,
-             uint32_t                   vertexIndex,
-             std::vector<V_RECT_2>&        fillVerticalRect,
-             uint32_t                   start,
-             uint32_t                   finish);
-  void spurct(std::vector<V_RECT_2>& underlayVerticalRect, std::vector<V_RECT_2> const& fillVerticalRect, uint32_t iRect) noexcept;
+             uint32_t                    vertexIndex,
+             std::vector<V_RECT_2>&      fillVerticalRect,
+             uint32_t                    start,
+             uint32_t                    finish);
+  void spurct(std::vector<V_RECT_2>&       underlayVerticalRect,
+              std::vector<V_RECT_2> const& fillVerticalRect,
+              uint32_t                     iRect) noexcept;
   void spurfn(F_POINT const& innerPoint, F_POINT const& outerPoint, F_POINT& underlayInnerPoint, F_POINT& underlayOuterPoint) noexcept;
   auto spComp(SMAL_PNT_L const* arg1, SMAL_PNT_L const* arg2) noexcept -> bool;
   void srtf(std::vector<F_POINT_ATTR> const& tempStitchBuffer, uint32_t start, uint32_t finish);
