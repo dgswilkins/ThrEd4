@@ -6243,7 +6243,6 @@ void thred::internal::formStretch(uint32_t form) {
 
 void thred::internal::stretch() {
   if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  formStretch(selectedForm);
 	}
