@@ -6714,11 +6714,9 @@ void thred::internal::delet() {
 		displayText::tomsg();
 	  }
 	  else {
-		if (!FormList->empty()) {
-		  StateMap->reset(StateFlag::DELTO);
-		  thred::frmdel();
-		  StateMap->set(StateFlag::RESTCH);
-		}
+		StateMap->reset(StateFlag::DELTO);
+		thred::frmdel();
+		StateMap->set(StateFlag::RESTCH);
 	  }
 	  fndknt();
 	  return;
