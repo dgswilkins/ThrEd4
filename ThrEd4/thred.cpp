@@ -494,13 +494,15 @@ void thred::internal::fnamtabs() {
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN  = NameOrder.size();
+  // cppcheck-suppress unreadVariable
   auto const     designer = utf::utf16ToUtf8(designerName);
   auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
   PseudoRandomValue = rsed();
-  auto iName        = 0U;
+  // cppcheck-suppress unreadVariable
+  auto iName = 0U;
   std::generate(
       tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
   auto const spNameDecoder = gsl::make_span(NameDecoder);
@@ -528,6 +530,7 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   auto const spCreatorName = gsl::make_span(ExtendedHeader->creatorName);
   for (auto const& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
+	  // cppcheck-suppress unreadVariable
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
 	}
   }
@@ -3165,6 +3168,7 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  // cppcheck-suppress unreadVariable
   spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -5299,6 +5303,7 @@ void thred::internal::newFil() {
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::make_span(ExtendedHeader->modifierName);
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  // cppcheck-suppress unreadVariable
   spModifierName[designer.length()] = 0;
   rstdu();
   rstAll();
