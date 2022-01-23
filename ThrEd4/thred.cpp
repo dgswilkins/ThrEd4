@@ -2068,9 +2068,9 @@ void thred::unmsg() {
 }
 
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
-auto thred::internal::oldwnd(HWND window) noexcept -> bool {
+auto thred::internal::oldwnd(HWND window) noexcept -> bool { // cppcheck-suppress constParameter
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
-	if (window == DefaultColorWin->operator[](iColor) ||
+	if (DefaultColorWin->operator[](iColor) == window ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
 	  return false;
 	}
@@ -7086,13 +7086,14 @@ void thred::internal::insfil(fs::path& insertedFile) {
 }
 
 auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool {
-  auto retflag = true;
+  auto retflag = true; // default return value
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle =
       CreateFile(insertedFile.wstring().c_str(), (GENERIC_READ), 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
+	// cppcheck-suppress redundantAssignment
 	retflag = false;
   }
   else {
