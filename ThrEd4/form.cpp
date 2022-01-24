@@ -2926,8 +2926,9 @@ void form::internal::ritseg(FRM_HEAD const&              form,
 	  }
 	}
 	else {
-	  while (iPoint < clipSegments[currentSegmentIndex].start) {
-		OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint--].y});
+	  // while (iPoint < clipSegments[currentSegmentIndex].start) { // This line makes no sense. Maybe the replacement does?
+	  while (iPoint--) {
+		OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y});
 	  }
 	}
 	clipIntersectSide = clipSegments[currentSegmentIndex].asid;
