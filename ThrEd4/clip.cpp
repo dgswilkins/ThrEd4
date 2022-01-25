@@ -32,11 +32,6 @@ namespace ci = clip::internal;
 
 static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 
-auto clip::iseclp(uint32_t iForm) noexcept -> bool {
-  auto const& form = FormList->operator[](iForm);
-  return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
-}
-
 auto clip::iseclp(FRM_HEAD const& form) noexcept -> bool {
   return form.edgeType == EDGECLIP || form.edgeType == EDGEPICOT || form.edgeType == EDGECLIPX;
 }
@@ -56,7 +51,7 @@ auto clip::isclpx(FRM_HEAD const& form) noexcept -> bool {
 
 auto clip::iseclpx(uint32_t iForm) noexcept -> bool {
   auto const& form = FormList->operator[](iForm);
-  return clip::iseclp(iForm) && (form.clipEntries != 0U);
+  return clip::iseclp(form) && (form.clipEntries != 0U);
 }
 
 auto clip::iseclpx(FRM_HEAD const& form) noexcept -> bool {
