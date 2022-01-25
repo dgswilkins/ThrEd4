@@ -8,6 +8,8 @@
 // Local Headers
 #include "ThrEdTypes.h"
 
+#pragma pack(push, 1)
+
 class FRM_HEAD_O // Original form header used prior to version 2
 {
   public:
@@ -103,6 +105,62 @@ class FRM_HEAD
   inline auto iseclpx() noexcept -> bool;
 };
 
+class FRM_HEAD_OUT
+{
+  public:
+  uint8_t  attribute {};   // attribute
+  uint16_t vertexCount {}; // number of sides
+  uint8_t  type {};        // type
+  uint8_t  fillColor {};   // fill color
+  uint8_t  borderColor {}; // border color
+  uint16_t clipEntries {}; // number of border clipboard entries
+  DWORD    vertexIndex {}; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
+
+  SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
+
+  DWORD       borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  uint16_t    satinGuideCount {}; // number of satin guidelines
+  uint16_t    wordParam {};       // clipboard/textured fill phase or satin end guide
+  F_RECTANGLE rectangle {};       // rectangle
+  uint8_t     fillType {};        // fill type
+  uint8_t     edgeType {};        // edge type
+  float       fillSpacing {};     // fill spacing
+  FLENCNTOUT  lengthOrCount {};   // fill stitch length or clipboard count
+  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
+
+  float    borderSize {};          // border size
+  float    edgeSpacing {};         // edge spacing
+  float    edgeStitchLen {};       // edge stitch length
+  uint16_t picoLength {};          // pico length
+  uint32_t extendedAttribute {};   // attribute extension
+  float    maxFillStitchLen {};    // maximum fill stitch length
+  float    minFillStitchLen {};    // minimum fill stitch length
+  float    maxBorderStitchLen {};  // maximum border stitch length
+  float    minBorderStitchLen {};  // minimum border stitch length
+  TF_INFO  fillInfo {};            // feather/texture info
+  uint16_t fillStart {};           // fill start point
+  uint16_t fillEnd {};             // fill end point
+  float    underlaySpacing {};     // underlay spacing
+  float    underlayStitchLen {};   // underlay stitch length
+  float    underlayStitchAngle {}; // underlay stitch angle
+  float    underlayIndent {};      // underlay/edge walk indent
+  float    txof {};                // gradient end density
+  uint8_t  underlayColor {};       // underlay color
+  uint8_t  cres {};                // reserved
+
+  inline FRM_HEAD_OUT() noexcept = default;
+  // FRM_HEAD_OUT(FRM_HEAD_OUT const&) = default;
+  // FRM_HEAD_OUT(FRM_HEAD_OUT&&) = default;
+  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT const& rhs) = default;
+  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT&&) = default;
+  //~FRM_HEAD_OUT() = default;
+
+  explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
+  inline auto operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT&;
+};
+
+#pragma pack(pop)
+
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
     attribute(rhs.attribute), vertexCount(rhs.vertexCount), type(rhs.type), fillColor(rhs.fillColor),
     borderColor(rhs.borderColor), clipEntries(rhs.clipEntries), satinOrAngle(rhs.satinOrAngle),
@@ -169,60 +227,6 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD& {
   picoLength    = rhs.res;
   return *this;
 }
-
-class FRM_HEAD_OUT
-{
-  public:
-  uint8_t  attribute {};   // attribute
-  uint16_t vertexCount {}; // number of sides
-  uint8_t  type {};        // type
-  uint8_t  fillColor {};   // fill color
-  uint8_t  borderColor {}; // border color
-  uint16_t clipEntries {}; // number of border clipboard entries
-  DWORD    vertexIndex {}; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
-
-  SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
-
-  DWORD       borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
-  uint16_t    satinGuideCount {}; // number of satin guidelines
-  uint16_t    wordParam {};       // clipboard/textured fill phase or satin end guide
-  F_RECTANGLE rectangle {};       // rectangle
-  uint8_t     fillType {};        // fill type
-  uint8_t     edgeType {};        // edge type
-  float       fillSpacing {};     // fill spacing
-  FLENCNTOUT  lengthOrCount {};   // fill stitch length or clipboard count
-  FANGCLPOUT  angleOrClipData {}; // fill angle or clipboard data pointer
-
-  float    borderSize {};          // border size
-  float    edgeSpacing {};         // edge spacing
-  float    edgeStitchLen {};       // edge stitch length
-  uint16_t picoLength {};          // pico length
-  uint32_t extendedAttribute {};   // attribute extension
-  float    maxFillStitchLen {};    // maximum fill stitch length
-  float    minFillStitchLen {};    // minimum fill stitch length
-  float    maxBorderStitchLen {};  // maximum border stitch length
-  float    minBorderStitchLen {};  // minimum border stitch length
-  TF_INFO  fillInfo {};            // feather/texture info
-  uint16_t fillStart {};           // fill start point
-  uint16_t fillEnd {};             // fill end point
-  float    underlaySpacing {};     // underlay spacing
-  float    underlayStitchLen {};   // underlay stitch length
-  float    underlayStitchAngle {}; // underlay stitch angle
-  float    underlayIndent {};      // underlay/edge walk indent
-  float    txof {};                // gradient end density
-  uint8_t  underlayColor {};       // underlay color
-  uint8_t  cres {};                // reserved
-
-  inline FRM_HEAD_OUT() noexcept = default;
-  // FRM_HEAD_OUT(FRM_HEAD_OUT const&) = default;
-  // FRM_HEAD_OUT(FRM_HEAD_OUT&&) = default;
-  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT const& rhs) = default;
-  // FRM_HEAD_OUT& operator=(FRM_HEAD_OUT&&) = default;
-  //~FRM_HEAD_OUT() = default;
-
-  explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
-  inline auto operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT&;
-};
 
 inline FRM_HEAD_OUT::FRM_HEAD_OUT(FRM_HEAD const& rhs) :
     attribute(rhs.attribute), vertexCount(gsl::narrow<uint16_t>(rhs.vertexCount)), type(rhs.type),

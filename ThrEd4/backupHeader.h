@@ -20,6 +20,8 @@
 #include "formHeader.h"
 #include "ThrEdTypes.h"
 
+#pragma pack(push, 1)
+
 class BACK_HEAD // Backup header
 {
   public:
@@ -45,3 +47,5 @@ class BACK_HEAD // Backup header
   // BACK_HEAD& operator=(BACK_HEAD&&) = default;
   //~BACK_HEAD() = default;
 };
+
+#pragma pack(pop)

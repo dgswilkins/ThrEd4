@@ -8,6 +8,8 @@
 // Local Headers
 #include "formHeader.h"
 
+#pragma pack(push, 1)
+
 class FORM_CLIP // form data clipboard header
 {
   public:
@@ -52,3 +54,5 @@ class FORM_VERTEX_CLIP // form points clipboard header
   // FORM_VERTEX_CLIP& operator=(FORM_VERTEX_CLIP&&) = default;
   //~FORM_VERTEX_CLIP() = default;
 };
+
+#pragma pack(pop)
