@@ -98,7 +98,6 @@ extern std::vector<F_POINT>* ClipPoints;
 
 extern F_LSIZ       ClipRectSize;
 extern CLIP_STITCH* ClipStitchData;
-extern uint32_t     ClipTypeMap;
 extern uint32_t     ClosestFormToCursor;
 extern uint32_t     ClosestPointIndex;
 extern uint32_t     ClosestVertexToCursor;

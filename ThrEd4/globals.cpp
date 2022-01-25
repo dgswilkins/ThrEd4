@@ -51,7 +51,6 @@ void*                          ClipPointer               = nullptr; // for memor
 std::vector<F_POINT>*           ClipPoints                = nullptr; // main clipboard fill points for forms
 F_LSIZ                          ClipRectSize              = {};      // clipboard rectangle size
 CLIP_STITCH*                       ClipStitchData            = nullptr; // for pcs clipboard data
-uint32_t                       ClipTypeMap               = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
