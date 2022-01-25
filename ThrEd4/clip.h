@@ -31,7 +31,6 @@ void duxclp(FRM_HEAD const& form);
 auto isclp(FRM_HEAD const& form) noexcept -> bool;
 auto isclpx(FRM_HEAD const& form) noexcept -> bool;
 auto iseclp(FRM_HEAD const& form) noexcept -> bool;
-auto iseclpx(uint32_t iForm) noexcept -> bool;
 auto iseclpx(FRM_HEAD const& form) noexcept -> bool;
 auto nueclp(uint32_t currentForm, uint32_t count) -> uint32_t;
 auto numclp() -> uint32_t;

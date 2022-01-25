@@ -44,11 +44,6 @@ auto clip::isclpx(FRM_HEAD const& form) noexcept -> bool {
   return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
 }
 
-auto clip::iseclpx(uint32_t iForm) noexcept -> bool {
-  auto const& form = FormList->operator[](iForm);
-  return clip::iseclp(form) && (form.clipEntries != 0U);
-}
-
 auto clip::iseclpx(FRM_HEAD const& form) noexcept -> bool {
   return clip::iseclp(form) && (form.clipEntries != 0U);
 }
@@ -72,7 +67,7 @@ void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
 	if (clip::isclpx(form)) {
 	  form.angleOrClipData.clip -= cnt;
 	}
-	if (clip::iseclpx(iForm)) {
+	if (clip::iseclpx(form)) {
 	  form.borderClipData -= cnt;
 	}
   }
@@ -146,7 +141,7 @@ auto clip::numclp() -> uint32_t {
   ClipPoints->insert(itClipPoint, clipSize, VAL);
   auto& form                = FormList->operator[](ClosestFormToCursor);
   form.angleOrClipData.clip = find;
-  if (clip::iseclpx(ClosestFormToCursor)) {
+  if (clip::iseclpx(form)) {
 	form.borderClipData += clipSize;
   }
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
@@ -154,7 +149,7 @@ auto clip::numclp() -> uint32_t {
 	if (clip::isclpx(formNext)) {
 	  formNext.angleOrClipData.clip += clipSize;
 	}
-	if (clip::iseclpx(iForm)) {
+	if (clip::iseclpx(formNext)) {
 	  formNext.borderClipData += clipSize;
 	}
   }

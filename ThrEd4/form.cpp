@@ -7860,7 +7860,7 @@ void form::internal::dufdat(std::vector<F_POINT>&  tempClipPoints,
 	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
   }
   auto& form = FormList->operator[](formIndex);
-  if (clip::iseclpx(formIndex)) {
+  if (clip::iseclpx(form)) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.borderClipData);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);

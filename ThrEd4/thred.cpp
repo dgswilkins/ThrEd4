@@ -4339,7 +4339,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		  form.angleOrClipData.clip = clipOffset;
 		  clipOffset += form.lengthOrCount.clipCount;
 		}
-		if (clip::iseclpx(iForm)) {
+		if (clip::iseclpx(form)) {
 		  form.borderClipData = clipOffset;
 		  clipOffset += form.clipEntries;
 		}
@@ -5963,7 +5963,7 @@ void thred::internal::duclip() {
 			  }
 			}
 			auto* points = convertFromPtr<F_POINT*>(&mclp[iClip]);
-			if (clip::iseclpx(ClosestFormToCursor)) {
+			if (clip::iseclpx(form)) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 			  for (iClip = 0; iClip < form.clipEntries; ++iClip) {
 				points[iClip] = *offsetStart;
@@ -7235,7 +7235,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& inserted
 			formIter.angleOrClipData.clip = clipOffset;
 			clipOffset += formIter.lengthOrCount.clipCount;
 		  }
-		  if (clip::iseclpx(iFormList)) {
+		  if (clip::iseclpx(formIter)) {
 			formIter.borderClipData = clipOffset;
 			clipOffset += formIter.clipEntries;
 		  }
@@ -13019,7 +13019,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			  ++offsetStart;
 			}
 		  }
-		  if (clip::iseclpx(offset)) {
+		  if (clip::iseclpx(form)) {
 			form.borderClipData = thred::adclp(form.clipEntries);
 			auto offsetStart    = wrap::next(ClipPoints->begin(), form.borderClipData);
 			for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
