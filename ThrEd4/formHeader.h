@@ -97,6 +97,10 @@ class FRM_HEAD
 
   inline auto operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
   inline auto operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
+  inline auto iseclp() noexcept -> bool;
+  inline auto isclp() noexcept -> bool;
+  inline auto isclpx() noexcept -> bool;
+  inline auto iseclpx() noexcept -> bool;
 };
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
@@ -398,4 +402,20 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   cres                = rhs.cres;
 
   return *this;
+}
+
+inline auto FRM_HEAD::iseclp() noexcept -> bool {
+  return edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX;
+}
+
+inline auto FRM_HEAD::isclp() noexcept -> bool {
+  return ((1U << fillType) & ClipTypeMap) != 0;
+}
+
+inline auto FRM_HEAD::isclpx() noexcept -> bool {
+  return isclp() && (lengthOrCount.clipCount != 0U);
+}
+
+inline auto FRM_HEAD::iseclpx() noexcept -> bool {
+  return iseclp() && (clipEntries != 0U);
 }
