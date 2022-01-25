@@ -44,7 +44,9 @@
     <ClCompile Include="xt.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="backupHeader.h" />
     <ClInclude Include="bitmap.h" />
+    <ClInclude Include="clipboardHeader.h" />
     <ClInclude Include="displayText.h" />
     <ClInclude Include="DST.h" />
     <ClInclude Include="EnumMap.h" />
@@ -52,6 +54,7 @@
     <ClInclude Include="form.h" />
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
+    <ClInclude Include="formHeader.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />

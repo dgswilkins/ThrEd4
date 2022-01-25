@@ -62,6 +62,7 @@
 // Local Headers
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
+#include "formHeader.h"
 
 namespace fs = std::filesystem;
 

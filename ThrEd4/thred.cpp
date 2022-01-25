@@ -36,8 +36,10 @@
 #include "wrappers.h"
 
 #include "globals.h"
+#include "backupHeader.h"
 #include "bitmap.h"
 #include "clip.h"
+#include "clipboardHeader.h"
 #include "displayText.h"
 #include "form.h"
 #include "formForms.h"
