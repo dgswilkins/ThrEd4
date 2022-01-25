@@ -7845,10 +7845,10 @@ void form::internal::dufdat(std::vector<F_POINT>&  tempClipPoints,
                             uint32_t               formIndex,
                             uint32_t&              formRelocationIndex,
                             uint32_t&              formSourceIndex) {
-  auto& dest = destFormList[formRelocationIndex];
-
-  destFormList[formRelocationIndex++] = FormList->operator[](formIndex);
-
+  auto& dest = destFormList.operator[](formRelocationIndex);
+ 
+  dest = FormList->operator[](formIndex);
+  ++formRelocationIndex;
   auto const itVertex = wrap::next(FormVertices->cbegin(), dest.vertexIndex);
   std::copy(itVertex, wrap::next(itVertex, dest.vertexCount), wrap::next(destFormVertices.begin(), formSourceIndex));
   dest.vertexIndex = formSourceIndex;
@@ -7859,13 +7859,14 @@ void form::internal::dufdat(std::vector<F_POINT>&  tempClipPoints,
 	tempGuides.insert(tempGuides.end(), itStartGuide, itEndGuide);
 	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
   }
+  auto& form = FormList->operator[](formIndex);
   if (clip::iseclpx(formIndex)) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.borderClipData);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
 	dest.borderClipData = wrap::toUnsigned(tempClipPoints.size() - dest.clipEntries);
   }
-  if (clip::isclpx(formIndex)) {
+  if (clip::isclpx(form)) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.angleOrClipData.clip);
 	auto const itEndClip   = wrap::next(itStartClip, dest.lengthOrCount.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);

@@ -40,11 +40,6 @@ auto clip::isclp(FRM_HEAD const& form) noexcept -> bool {
   return ((1U << form.fillType) & ClipTypeMap) != 0;
 }
 
-auto clip::isclpx(uint32_t iForm) noexcept -> bool {
-  auto const& form = FormList->operator[](iForm);
-  return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
-}
-
 auto clip::isclpx(FRM_HEAD const& form) noexcept -> bool {
   return clip::isclp(form) && (form.lengthOrCount.clipCount != 0U);
 }
@@ -72,13 +67,13 @@ auto clip::internal::findclp(uint32_t formIndex) noexcept -> uint32_t {
 }
 
 void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
-  auto& formList = *FormList;
   for (auto iForm = fpnt + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (clip::isclpx(iForm)) {
-	  formList[iForm].angleOrClipData.clip -= cnt;
+	auto& form = FormList->operator[](iForm);
+	if (clip::isclpx(form)) {
+	  form.angleOrClipData.clip -= cnt;
 	}
 	if (clip::iseclpx(iForm)) {
-	  formList[iForm].borderClipData -= cnt;
+	  form.borderClipData -= cnt;
 	}
   }
 }
@@ -149,18 +144,18 @@ auto clip::numclp() -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, clipSize, VAL);
-  auto& formList = *FormList;
-
-  formList[ClosestFormToCursor].angleOrClipData.clip = find;
+  auto& form                = FormList->operator[](ClosestFormToCursor);
+  form.angleOrClipData.clip = find;
   if (clip::iseclpx(ClosestFormToCursor)) {
-	formList[ClosestFormToCursor].borderClipData += clipSize;
+	form.borderClipData += clipSize;
   }
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (clip::isclpx(iForm)) {
-	  formList[iForm].angleOrClipData.clip += clipSize;
+	auto& formNext = FormList->operator[](iForm);
+	if (clip::isclpx(formNext)) {
+	  formNext.angleOrClipData.clip += clipSize;
 	}
 	if (clip::iseclpx(iForm)) {
-	  formList[iForm].borderClipData += clipSize;
+	  formNext.borderClipData += clipSize;
 	}
   }
   return find;

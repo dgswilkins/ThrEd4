@@ -5955,7 +5955,7 @@ void thred::internal::duclip() {
 			}
 			auto* mclp  = convertFromPtr<F_POINT*>(&guides[iGuide]);
 			auto  iClip = 0U;
-			if (clip::isclpx(ClosestFormToCursor)) {
+			if (clip::isclpx(form)) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 			  for (iClip = 0; iClip < form.lengthOrCount.clipCount; ++iClip) {
 				mclp[iClip] = *offsetStart;
@@ -13011,7 +13011,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
-		  if (clip::isclpx(offset)) {
+		  if (clip::isclpx(form)) {
 			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.clipCount);
 			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
 			for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
