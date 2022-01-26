@@ -44,7 +44,7 @@ namespace internal {
   void prflin(std::wstring const& msg, LIST_TYPE const& row);
   auto prfnwin(std::wstring const& text) noexcept -> HWND;
   void prftwin(std::wstring const& text) noexcept;
-  void refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryCount);
+  void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount);
 
   auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 

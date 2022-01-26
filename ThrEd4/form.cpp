@@ -1166,7 +1166,7 @@ void form::chkseq(bool border) {
 
   auto userStitchLen =
       border                ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
-      : (clip::isclp(form)) ? MaxStitchLen
+      : (form.isclp()) ? MaxStitchLen
                             : form.lengthOrCount.stitchLength;
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
@@ -4675,13 +4675,13 @@ void form::refilfn() {
   xt::fdelstch(form, fillStartsData, fillStartsMap);
   StateMap->set(StateFlag::WASREFIL);
   constexpr auto MINSPACE = 0.5F;
-  if (form.fillSpacing < MINSPACE && !clip::isclp(form)) {
+  if (form.fillSpacing < MINSPACE && !form.isclp()) {
 	form.fillSpacing = MINSPACE;
   }
   if (form.edgeSpacing < MINSPACE) {
 	form.edgeSpacing = MINSPACE;
   }
-  if (!clip::isclp(form)) {
+  if (!form.isclp()) {
 	UserStitchLength = form.lengthOrCount.stitchLength;
   }
   if (!(StateMap->test(StateFlag::WASDO) || StateMap->test(StateFlag::FUNCLP) ||
@@ -7202,14 +7202,14 @@ void form::internal::adfrm(uint32_t iForm) {
 	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
 	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
-  if (clip::iseclpx(currentForm)) {
+  if (currentForm.iseclpx()) {
 	auto const originalBCData  = currentForm.borderClipData;
 	currentForm.borderClipData = wrap::toUnsigned(ClipPoints->size());
 
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalBCData);
 	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
   }
-  if (clip::isclpx(currentForm)) {
+  if (currentForm.isclpx()) {
 	auto const originalClip          = currentForm.angleOrClipData.clip;
 	currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
@@ -7860,13 +7860,13 @@ void form::internal::dufdat(std::vector<F_POINT>&  tempClipPoints,
 	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
   }
   auto const& form = FormList->operator[](formIndex);
-  if (clip::iseclpx(form)) {
+  if (form.iseclpx()) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.borderClipData);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
 	dest.borderClipData = wrap::toUnsigned(tempClipPoints.size() - dest.clipEntries);
   }
-  if (clip::isclpx(form)) {
+  if (form.isclpx()) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.angleOrClipData.clip);
 	auto const itEndClip   = wrap::next(itStartClip, dest.lengthOrCount.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
@@ -8287,7 +8287,7 @@ auto form::internal::spltlin() -> bool {
   dstForm.vertexIndex = form.vertexIndex + form.vertexCount;
   form::frmout(ClosestFormToCursor);
   form::frmout(ClosestFormToCursor + 1U);
-  if (clip::iseclp(form)) {
+  if (form.iseclp()) {
 	form::clpspac(form.borderClipData, form.clipEntries);
 	auto const maxForm = FormList->size();
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; ++iForm) {

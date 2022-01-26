@@ -25,7 +25,6 @@
 
 #include "Resources/resource.h"
 #include "globals.h"
-#include "clip.h"
 #include "displayText.h"
 #include "form.h"
 #include "satin.h"
@@ -139,7 +138,7 @@ void formForms::internal::nxtlinprf() noexcept {
   ValueWindowCoords.bottom += ValueWindowSize.cy;
 }
 
-void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryCount) {
+void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn         = dT::loadStr(IDS_ON);
@@ -271,7 +270,7 @@ void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryC
 	valueWindow[LMAXFIL] =
 	    ffi::numwin(fmt::format(L"{:.2f}", (form.maxFillStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if (!clip::isclp(form) && !texture::istx(ClosestFormToCursor)) {
+	if (!form.isclp() && !texture::istx(ClosestFormToCursor)) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(dT::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.lengthOrCount.stitchLength * IPFGRAN)), ValueWindowCoords);
@@ -417,7 +416,7 @@ void formForms::internal::refrmfn(FRM_HEAD const& form, uint32_t& formMenuEntryC
 }
 
 void formForms::refrm() {
-  auto const& form = FormList->operator[](ClosestFormToCursor);
+  auto& form = FormList->operator[](ClosestFormToCursor);
   if (StateMap->testAndReset(StateFlag::PRFACT)) {
 	DestroyWindow(PreferencesWindow);
 	StateMap->reset(StateFlag::WASRT);

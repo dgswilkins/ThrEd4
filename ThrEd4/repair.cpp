@@ -27,7 +27,6 @@
 // Local Headers
 #include "Resources/resource.h"
 #include "globals.h"
-#include "clip.h"
 #include "displayText.h"
 #include "form.h"
 #include "satin.h"
@@ -153,7 +152,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
   auto badData = BAD_COUNTS {};
   if (!FormList->empty()) {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto const& form = FormList->operator[](iForm);
+	  auto& form = FormList->operator[](iForm);
 	  if ((badData.attribute & BADFLT) == 0U) {
 		if (form.vertexCount == 0U) {
 		  badData.attribute |= BADFLT;
@@ -161,10 +160,10 @@ auto repair::internal::frmchkfn() -> uint32_t {
 		ri::chkVrtx(form, badData);
 	  }
 	  if ((badData.attribute & BADCLP) == 0U) {
-		if (clip::isclp(form)) {
+		if (form.isclp()) {
 		  ri::chkclp(form, badData);
 		}
-		if (clip::iseclp(form)) {
+		if (form.iseclp()) {
 		  ri::chkeclp(form, badData);
 		}
 	  }
@@ -199,10 +198,10 @@ auto repair::internal::frmchkfn() -> uint32_t {
 }
 
 void repair::internal::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
-  if (clip::isclp(form)) {
+  if (form.isclp()) {
 	badData.clip += form.lengthOrCount.clipCount;
   }
-  if (clip::iseclp(form)) {
+  if (form.iseclp()) {
 	badData.clip += form.clipEntries;
   }
   if (form.type == SAT) {
@@ -274,10 +273,10 @@ void repair::internal::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
-	auto const clipDifference = (clip::isclp(form))    ? form.angleOrClipData.clip
-	                            : (clip::iseclp(form)) ? form.borderClipData
+	auto const clipDifference = (form.isclp())    ? form.angleOrClipData.clip
+	                            : (form.iseclp()) ? form.borderClipData
 	                                                   : 0U;
-	if (clip::isclp(form)) {
+	if (form.isclp()) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
@@ -304,7 +303,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 		}
 	  }
 	}
-	if (clip::iseclp(form)) {
+	if (form.iseclp()) {
 	  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.clipEntries);
 		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);

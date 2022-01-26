@@ -1735,7 +1735,7 @@ void xt::sfuang() {
 
 void xt::internal::flenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
-  if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !clip::isclp(form)) {
+  if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isclp()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn();
   }
@@ -1766,7 +1766,7 @@ void xt::internal::fspacfn(uint32_t formNumber, float spacing) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	if (spacing < 0) {
-	  if (!clip::isclp(form)) {
+	  if (!form.isclp()) {
 		return;
 	  }
 	}
@@ -1977,7 +1977,7 @@ void xt::setbcol() {
 }
 
 void xt::internal::blenfn(FRM_HEAD& form, float length) {
-  if ((form.edgeType != 0U) && !clip::iseclp(form)) {
+  if ((form.edgeType != 0U) && !form.iseclp()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn();
   }
@@ -2283,12 +2283,12 @@ void xt::duauxnam() {
 void xt::internal::rtrclpfn(FRM_HEAD const& form) {
   if (OpenClipboard(ThrEdWindow) != 0) {
 	auto count = 0U;
-	if (auto clipRect = F_RECTANGLE {}; clip::iseclp(form)) {
+	if (auto clipRect = F_RECTANGLE {}; form.iseclp()) {
 	  count = form.clipEntries;
 	  clip::oclp(clipRect, form.borderClipData, count);
 	}
 	else {
-	  if (clip::isclp(form)) {
+	  if (form.isclp()) {
 		count = form.lengthOrCount.clipCount;
 		clip::oclp(clipRect, form.angleOrClipData.clip, count);
 	  }

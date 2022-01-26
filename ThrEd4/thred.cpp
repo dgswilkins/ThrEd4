@@ -352,7 +352,7 @@ void thred::internal::getdes() noexcept {
 
 auto thred::internal::isfclp() noexcept -> bool {
   auto const& form = FormList->operator[](ClosestFormToCursor);
-  return clip::isclp(form) && form.fillType != CLPF;
+  return form.isclp() && form.fillType != CLPF;
 }
 
 auto thred::internal::stlen(uint32_t iStitch) -> float {
@@ -3178,10 +3178,10 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 	  if (form.type == SAT) {
 		guideCount += form.satinGuideCount;
 	  }
-	  if (clip::isclp(form)) {
+	  if (form.isclp()) {
 		clipDataCount += form.lengthOrCount.clipCount;
 	  }
-	  if (clip::iseclp(form)) {
+	  if (form.iseclp()) {
 		clipDataCount += form.clipEntries;
 	  }
 	}
@@ -3248,14 +3248,14 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
 		  ++itGuide;
 		}
 	  }
-	  if (clip::isclp(srcForm)) {
+	  if (srcForm.isclp()) {
 		auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
 		for (auto iClip = 0U; iClip < srcForm.lengthOrCount.clipCount; ++iClip) {
 		  points.push_back(*offsetStart);
 		  ++offsetStart;
 		}
 	  }
-	  if (clip::iseclpx(srcForm)) {
+	  if (srcForm.iseclpx()) {
 		auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
 		auto const clipCount   = srcForm.clipEntries;
 		for (auto iClip = 0U; iClip < clipCount; ++iClip) {
@@ -4337,11 +4337,11 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 		}
 		// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 		// where we could not store the pointer in v2)
-		if (clip::isclp(form)) {
+		if (form.isclp()) {
 		  form.angleOrClipData.clip = clipOffset;
 		  clipOffset += form.lengthOrCount.clipCount;
 		}
-		if (clip::iseclpx(form)) {
+		if (form.iseclpx()) {
 		  form.borderClipData = clipOffset;
 		  clipOffset += form.clipEntries;
 		}
@@ -5687,10 +5687,10 @@ auto thred::internal::sizfclp(FRM_HEAD const& form) -> uint32_t {
   if (form.type == SAT) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
-  if (clip::iseclp(form)) {
+  if (form.iseclp()) {
 	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
-  if (clip::isclpx(form)) {
+  if (form.isclpx()) {
 	clipSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (texture::istx(form)) {
@@ -5746,10 +5746,10 @@ void thred::internal::sizclp(FRM_HEAD const& form,
 	length += formStitchCount;
 	fileSize += length * wrap::sizeofType(StitchBuffer);
   }
-  if (clip::iseclp(form)) {
+  if (form.iseclp()) {
 	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
-  if (clip::isclpx(form)) {
+  if (form.isclpx()) {
 	fileSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (texture::istx(form)) {
@@ -5848,14 +5848,14 @@ void thred::internal::duclip() {
 		  auto  pointCount = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
-			if (clip::isclpx(form)) {
+			if (form.isclpx()) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 			  for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
 				points[pointCount++] = *offsetStart;
 				++offsetStart;
 			  }
 			}
-			if (clip::iseclp(form)) {
+			if (form.iseclp()) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 			  for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
 				points[pointCount++] = *offsetStart;
@@ -5957,7 +5957,7 @@ void thred::internal::duclip() {
 			}
 			auto* mclp  = convertFromPtr<F_POINT*>(&guides[iGuide]);
 			auto  iClip = 0U;
-			if (clip::isclpx(form)) {
+			if (form.isclpx()) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 			  for (iClip = 0; iClip < form.lengthOrCount.clipCount; ++iClip) {
 				mclp[iClip] = *offsetStart;
@@ -5965,7 +5965,7 @@ void thred::internal::duclip() {
 			  }
 			}
 			auto* points = convertFromPtr<F_POINT*>(&mclp[iClip]);
-			if (clip::iseclpx(form)) {
+			if (form.iseclpx()) {
 			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 			  for (iClip = 0; iClip < form.clipEntries; ++iClip) {
 				points[iClip] = *offsetStart;
@@ -7233,11 +7233,11 @@ auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& inserted
 			  guideOffset += formIter.satinGuideCount;
 			}
 		  }
-		  if (clip::isclp(formIter)) {
+		  if (formIter.isclp()) {
 			formIter.angleOrClipData.clip = clipOffset;
 			clipOffset += formIter.lengthOrCount.clipCount;
 		  }
-		  if (clip::iseclpx(formIter)) {
+		  if (formIter.iseclpx()) {
 			formIter.borderClipData = clipOffset;
 			clipOffset += formIter.clipEntries;
 		  }
@@ -9308,7 +9308,7 @@ void thred::internal::tglhid() {
 }
 
 void thred::internal::respac(FRM_HEAD& form) noexcept {
-  if (clip::isclp(form)) {
+  if (form.isclp()) {
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
   }
@@ -11473,7 +11473,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
   }
   form.borderColor &= COLMSK;
   if (StateMap->testAndReset(StateFlag::BRDACT)) {
-	if (clip::iseclp(form)) {
+	if (form.iseclp()) {
 	  clip::deleclp(ClosestFormToCursor);
 	}
 	do {
@@ -13013,7 +13013,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
-		  if (clip::isclpx(form)) {
+		  if (form.isclpx()) {
 			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.clipCount);
 			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
 			for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
@@ -13021,7 +13021,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			  ++offsetStart;
 			}
 		  }
-		  if (clip::iseclpx(form)) {
+		  if (form.iseclpx()) {
 			form.borderClipData = thred::adclp(form.clipEntries);
 			auto offsetStart    = wrap::next(ClipPoints->begin(), form.borderClipData);
 			for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
@@ -13089,13 +13089,13 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  }
 		  auto* clipData  = convertFromPtr<F_POINT*>(&guides[formIter.satinGuideCount]);
 		  auto  clipCount = 0U;
-		  if (clip::isclpx(formIter)) {
+		  if (formIter.isclpx()) {
 			auto const spClip = gsl::make_span(clipData, formIter.lengthOrCount.clipCount);
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
-		  if (clip::iseclpx(formIter)) {
+		  if (formIter.iseclpx()) {
 			clipData                = convertFromPtr<F_POINT*>(&clipData[clipCount]);
 			auto const spClip       = gsl::make_span(clipData, formIter.clipEntries);
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());

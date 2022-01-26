@@ -155,7 +155,7 @@ void satin::spltsat(uint32_t guideIndex) {
 	  --(formIter.satinOrAngle.guide);
 	}
   }
-  if (clip::iseclp(form)) {
+  if (form.iseclp()) {
 	form::clpspac(form.borderClipData, form.clipEntries);
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; ++iForm) {
 	  auto& formIter = FormList->operator[](iForm);
