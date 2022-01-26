@@ -1063,7 +1063,7 @@ void texture::internal::nutx(FRM_HEAD& form) {
   auto index = 0U;
   std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
   if (!FormList->empty()) {
-	if (texture::istx(ClosestFormToCursor)) {
+	if (form.istx()) {
 	  auto const& texture = form.fillInfo.texture;
 	  index               = texture.index;
 	  texture::deltx(ClosestFormToCursor);

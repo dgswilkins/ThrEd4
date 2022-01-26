@@ -375,33 +375,32 @@ void repair::internal::repsat() {
 void repair::internal::reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
-  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (texture::istx(iForm)) {
-	  auto& form = FormList->operator[](iForm);
+  for (auto formIter = FormList->begin(); formIter != FormList->end(); ++formIter) {
+	if (formIter->istx()) {
 	  if (wrap::toUnsigned(TexturePointsBuffer->size()) >
-	      wrap::toUnsigned(form.fillInfo.texture.index) + form.fillInfo.texture.count) {
-		auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-		auto const endTexture  = wrap::next(startTexture, form.fillInfo.texture.count);
+	      wrap::toUnsigned(formIter->fillInfo.texture.index) + formIter->fillInfo.texture.count) {
+		auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
+		auto const endTexture  = wrap::next(startTexture, formIter->fillInfo.texture.count);
 		auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		std::copy(startTexture, endTexture, destination);
-		wrap::narrow(form.fillInfo.texture.index, textureCount);
-		textureCount += form.fillInfo.texture.count;
-		ri::bcup(form, badData);
+		wrap::narrow(formIter->fillInfo.texture.index, textureCount);
+		textureCount += formIter->fillInfo.texture.count;
+		ri::bcup(*formIter, badData);
 	  }
 	  else {
-		if (TexturePointsBuffer->size() > form.fillInfo.texture.index) {
-		  wrap::narrow(form.fillInfo.texture.count,
-		               TexturePointsBuffer->size() - form.fillInfo.texture.index);
-		  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-		  auto const endTexture  = wrap::next(startTexture, form.fillInfo.texture.count);
+		if (TexturePointsBuffer->size() > formIter->fillInfo.texture.index) {
+		  wrap::narrow(formIter->fillInfo.texture.count,
+		               TexturePointsBuffer->size() - formIter->fillInfo.texture.index);
+		  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
+		  auto const endTexture  = wrap::next(startTexture, formIter->fillInfo.texture.count);
 		  auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		  std::copy(startTexture, endTexture, destination);
-		  wrap::narrow(form.fillInfo.texture.index, textureCount);
-		  ri::bcup(form, badData);
+		  wrap::narrow(formIter->fillInfo.texture.index, textureCount);
+		  ri::bcup(*formIter, badData);
 		  textureCount = badData.tx;
 		}
 		else {
-		  form.fillType = 0;
+		  formIter->fillType = 0;
 		}
 	  }
 	}
