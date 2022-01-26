@@ -193,19 +193,6 @@ auto texture::istx(uint32_t iForm) noexcept -> bool {
   return false;
 }
 
-auto texture::istx(FRM_HEAD const& form) noexcept -> bool {
-  if (form.fillType == TXVRTF) {
-	return true;
-  }
-  if (form.fillType == TXHORF) {
-	return true;
-  }
-  if (form.fillType == TXANGF) {
-	return true;
-  }
-  return false;
-}
-
 void texture::internal::txrfor() noexcept {
   if (TextureHistoryIndex < (ITXBUFSZ - 1U)) {
 	++TextureHistoryIndex;
@@ -1018,7 +1005,7 @@ void texture::deltx(uint32_t formIndex) {
   auto&       form         = FormList->operator[](formIndex);
   auto const& currentIndex = form.fillInfo.texture.index;
   // clang-format on
-  if ((!TexturePointsBuffer->empty()) && texture::istx(formIndex) && (form.fillInfo.texture.count != 0U)) {
+  if ((!TexturePointsBuffer->empty()) && form.istx() && (form.fillInfo.texture.count != 0U)) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
 	for (auto iForm = 0U; iForm < formIndex; ++iForm) {

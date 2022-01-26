@@ -173,7 +173,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
 		}
 	  }
 	  if ((badData.attribute & BADTX) == 0U) {
-		if (texture::istx(iForm)) {
+		if (form.istx()) {
 		  ri::chkTxt(form, badData);
 		}
 	  }
@@ -207,7 +207,7 @@ void repair::internal::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept 
   if (form.type == SAT) {
 	badData.guideCount += form.satinGuideCount;
   }
-  if (texture::istx(form)) {
+  if (form.istx()) {
 	badData.tx += form.fillInfo.texture.count;
   }
 }

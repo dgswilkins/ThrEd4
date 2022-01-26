@@ -103,6 +103,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto iseclp() const noexcept -> bool;
   [[nodiscard]] inline auto isclpx() const noexcept -> bool;
   [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
+  [[nodiscard]] inline auto istx() const noexcept -> bool;
 };
 
 class FRM_HEAD_OUT
@@ -422,4 +423,17 @@ inline auto FRM_HEAD::isclpx() const noexcept -> bool {
 
 inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
   return iseclp() && (clipEntries != 0U);
+}
+
+inline auto FRM_HEAD::istx() const noexcept -> bool {
+  if (fillType == TXVRTF) {
+	return true;
+  }
+  if (fillType == TXHORF) {
+	return true;
+  }
+  if (fillType == TXANGF) {
+	return true;
+  }
+  return false;
 }

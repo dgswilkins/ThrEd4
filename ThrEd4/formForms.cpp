@@ -261,7 +261,7 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.fillSpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if (texture::istx(ClosestFormToCursor)) {
+	if (form.istx()) {
 	  labelWindow[LTXOF] = ffi::txtwin(dT::loadStr(IDS_TXOF), LabelWindowCoords);
 	  valueWindow[LTXOF] = ffi::numwin(fmt::format(L"{:.2f}", (form.txof * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
@@ -270,7 +270,7 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	valueWindow[LMAXFIL] =
 	    ffi::numwin(fmt::format(L"{:.2f}", (form.maxFillStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if (!form.isclp() && !texture::istx(ClosestFormToCursor)) {
+	if (!form.isclp() && !form.istx()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(dT::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
 	      ffi::numwin(fmt::format(L"{:.2f}", (form.lengthOrCount.stitchLength * IPFGRAN)), ValueWindowCoords);
@@ -298,7 +298,7 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF ||
-	    texture::istx(ClosestFormToCursor)) {
+	    form.istx()) {
 	  labelWindow[LBFILSQR] = ffi::txtwin(dT::loadStr(PREFLIST[PRFFILEND].stringID), LabelWindowCoords);
 	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? dT::loadStr(IDS_SQR) : dT::loadStr(IDS_PNTD);
 	  valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);

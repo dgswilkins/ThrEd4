@@ -5693,7 +5693,7 @@ auto thred::internal::sizfclp(FRM_HEAD const& form) -> uint32_t {
   if (form.isclpx()) {
 	clipSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
-  if (texture::istx(form)) {
+  if (form.istx()) {
 	clipSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
   return clipSize;
@@ -5752,7 +5752,7 @@ void thred::internal::sizclp(FRM_HEAD const& form,
   if (form.isclpx()) {
 	fileSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
-  if (texture::istx(form)) {
+  if (form.istx()) {
 	fileSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
 }
@@ -5869,7 +5869,7 @@ void thred::internal::duclip() {
 		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
-			if (texture::istx(selectedForm)) {
+			if (form.istx()) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
 			  auto const spDest =
@@ -5973,7 +5973,7 @@ void thred::internal::duclip() {
 			  }
 			}
 			auto* textures = convertFromPtr<TX_PNT*>(&points[iClip]);
-			if (texture::istx(ClosestFormToCursor)) {
+			if (form.istx()) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
 			  auto const spDest   = gsl::make_span(textures, form.fillInfo.texture.count);
@@ -7241,7 +7241,7 @@ auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& inserted
 			formIter.borderClipData = clipOffset;
 			clipOffset += formIter.clipEntries;
 		  }
-		  if (texture::istx(iFormList)) {
+		  if (formIter.istx()) {
 			wrap::narrow(formIter.fillInfo.texture.index, textureOffset);
 			textureOffset += formIter.fillInfo.texture.count;
 		  }
@@ -11803,7 +11803,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXVRTF)) // vertical texture
 	{
-	  if (texture::istx(ClosestFormToCursor)) {
+	  if (form.istx()) {
 		form.fillType = TXVRTF;
 		break;
 	  }
@@ -11813,7 +11813,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXHORF)) // horizontal texture
 	{
-	  if (texture::istx(ClosestFormToCursor)) {
+	  if (form.istx()) {
 		form.fillType = TXHORF;
 		break;
 	  }
@@ -11823,7 +11823,7 @@ auto thred::internal::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
 	{
-	  if (texture::istx(ClosestFormToCursor)) {
+	  if (form.istx()) {
 		form.fillType              = TXANGF;
 		form.angleOrClipData.angle = IniFile.fillAngle;
 		break;
@@ -13102,7 +13102,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.clipEntries;
 		  }
-		  if (texture::istx(formIter)) {
+		  if (formIter.istx()) {
 			auto*      textureSource = convertFromPtr<TX_PNT*>(&clipData[clipCount]);
 			auto const spTexture = gsl::make_span(textureSource, formIter.fillInfo.texture.count);
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());

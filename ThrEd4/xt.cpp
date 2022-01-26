@@ -2315,7 +2315,7 @@ void xt::internal::rtrclpfn(FRM_HEAD const& form) {
 
 void xt::rtrclp() {
   if (StateMap->test(StateFlag::FORMSEL)) {
-	if (auto const& form = FormList->operator[](ClosestFormToCursor); texture::istx(ClosestFormToCursor)) {
+	if (auto const& form = FormList->operator[](ClosestFormToCursor); form.istx()) {
 	  texture::rtrtx(form);
 	}
 	else {
