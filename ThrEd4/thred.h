@@ -297,7 +297,6 @@ namespace internal {
   auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
   auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
   auto iselpnt() noexcept -> bool;
-  auto isfclp() noexcept -> bool;
   void istch();
   auto isthr(fs::path const& thredPath) -> bool;
   auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;

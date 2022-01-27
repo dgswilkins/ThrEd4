@@ -104,6 +104,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto isclpx() const noexcept -> bool;
   [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
   [[nodiscard]] inline auto istx() const noexcept -> bool;
+  [[nodiscard]] inline auto isfclp() noexcept -> bool;
 };
 
 #pragma pack(push, 1)
@@ -423,6 +424,10 @@ inline auto FRM_HEAD::isclpx() const noexcept -> bool {
 
 inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
   return iseclp() && (clipEntries != 0U);
+}
+
+inline auto FRM_HEAD::isfclp() noexcept -> bool {
+  return isclp() && fillType != CLPF;
 }
 
 inline auto FRM_HEAD::istx() const noexcept -> bool {

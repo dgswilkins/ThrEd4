@@ -350,11 +350,6 @@ void thred::internal::getdes() noexcept {
       // ReSharper restore CppClangTidyClangDiagnosticCastFunctionType
 }
 
-auto thred::internal::isfclp() noexcept -> bool {
-  auto const& form = FormList->operator[](ClosestFormToCursor);
-  return form.isclp() && form.fillType != CLPF;
-}
-
 auto thred::internal::stlen(uint32_t iStitch) -> float {
   auto const currStitch = wrap::next(StitchBuffer->begin(), iStitch);
   auto const nextStitch = std::next(currStitch);
@@ -1633,7 +1628,7 @@ void thred::internal::chknum() {
 		}
 		else {
 		  thred::savdo();
-		  if (FormMenuChoice == LFRMSPAC && isfclp()) {
+		  if (FormMenuChoice == LFRMSPAC && form.isfclp()) {
 			form.fillSpacing = 0;
 		  }
 		}
@@ -9319,7 +9314,8 @@ auto thred::internal::chkminus(wchar_t code) noexcept -> bool {
 	if (PreferenceIndex == PRFCLPPHS) {              // Clipboard Offset in preferences
 	  return true;
 	}
-	if (FormMenuChoice == LFRMSPAC && isfclp()) { // Fill Spacing for fan clip fill
+	if (auto& form = FormList->operator[](ClosestFormToCursor);
+	    FormMenuChoice == LFRMSPAC && form.isfclp()) { // Fill Spacing for fan clip fill
 	  return true;
 	}
 	if (FormMenuChoice == LWLKIND) { // Indent
