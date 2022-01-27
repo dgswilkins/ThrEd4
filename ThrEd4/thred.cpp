@@ -734,10 +734,9 @@ void thred::internal::deldu() {
 void thred::internal::dudat() {
   auto& undoBuffer = *UndoBuffer;
   undoBuffer[UndoBufferWriteIndex].reset(nullptr);
-  auto const& formList  = *FormList;
-  auto const  formCount = wrap::toUnsigned(formList.size());
+  auto const  formCount = wrap::toUnsigned(FormList->size());
 
-  auto const size = wrap::sizeofVector(formList) + wrap::sizeofVector(StitchBuffer) +
+  auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
                     wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
                     wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
@@ -748,8 +747,8 @@ void thred::internal::dudat() {
 	backupData->formCount = formCount;
 	backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
 	if (formCount != 0) {
-	  auto const spForms = gsl::make_span(backupData->forms, formList.size());
-	  std::copy(formList.cbegin(), formList.cend(), spForms.begin());
+	  auto const spForms = gsl::make_span(backupData->forms, FormList->size());
+	  std::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
 	}
 	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
 	backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
