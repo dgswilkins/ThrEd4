@@ -936,7 +936,6 @@ enum TextureButtons { // text button windows
 constexpr uint32_t HLIN = HNUM;
 
 #pragma pack(push, 1)
-
 class INI_FILE // ini file structure
 {
   public:
@@ -1034,6 +1033,7 @@ class INI_FILE // ini file structure
   // INI_FILE& operator=(INI_FILE&&) = default;
   //~INI_FILE() = default;
 };
+#pragma pack(pop)
 
 enum MachineType { AUXPCS, AUXDST, AUXPES };
 
@@ -1078,6 +1078,7 @@ class D_POINT
   //~D_POINT() = default;
 };
 
+#pragma pack(push, 1)
 class F_POINT
 {
   public:
@@ -1101,7 +1102,8 @@ class F_POINT
   // F_POINT& operator=(F_POINT&&) = default;
   //~F_POINT() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class F_POINT_ATTR
 {
   public:
@@ -1118,6 +1120,7 @@ class F_POINT_ATTR
   // F_POINT_ATTR& operator=(F_POINT_ATTR&&) = default;
   //~F_POINT_ATTR() = default;
 };
+#pragma pack(pop)
 
 class SMAL_PNT_L
 {
@@ -1379,6 +1382,7 @@ constexpr uint32_t FRMFIL   = 0x20000000U;
 constexpr uint32_t FRMBFIL  = 0x40000000U;
 constexpr uint32_t FRMAPFIL = 0x60000000U;
 
+#pragma pack(push, 1)
 class F_RECTANGLE
 {
   public:
@@ -1396,6 +1400,7 @@ class F_RECTANGLE
 
   inline F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept;
 };
+#pragma pack(pop)
 
 inline F_RECTANGLE::F_RECTANGLE(float rhsLeft, float rhsTop, float rhsRight, float rhsBottom) noexcept :
     left(rhsLeft), top(rhsTop), right(rhsRight), bottom(rhsBottom) {
@@ -1440,6 +1445,7 @@ inline SAT_CON::SAT_CON(uint32_t rStart, uint32_t rFinish) noexcept :
     start(rStart), finish(rFinish) {
 }
 
+#pragma pack(push, 1)
 class SAT_CON_OUT
 {
   public:
@@ -1456,6 +1462,7 @@ class SAT_CON_OUT
   explicit SAT_CON_OUT(SAT_CON const& rhs);
   inline auto operator=(SAT_CON const& rhs) -> SAT_CON_OUT&;
 };
+#pragma pack(pop)
 
 inline SAT_CON_OUT::SAT_CON_OUT(SAT_CON const& rhs) :
     start(gsl::narrow<uint16_t>(rhs.start)), finish(gsl::narrow<uint16_t>(rhs.finish)) {
@@ -1499,6 +1506,7 @@ inline FANGCLP::FANGCLP() noexcept {
   guide.finish = 0U;
 }
 
+#pragma pack(push, 1)
 union FANGCLPOUT {
   public:
   float angle;
@@ -1512,6 +1520,7 @@ union FANGCLPOUT {
   // FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
   //~FANGCLPOUT() = default;
 };
+#pragma pack(pop)
 
 inline FANGCLPOUT::FANGCLPOUT() noexcept {
   guide.start  = 0U;
@@ -1536,6 +1545,7 @@ union FLENCNT {
   inline auto operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT&;
 };
 
+#pragma pack(push, 1)
 union FLENCNTOUT {
   public:
   float    stitchLength {};
@@ -1551,6 +1561,7 @@ union FLENCNTOUT {
   explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
   inline auto operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT&;
 };
+#pragma pack(pop)
 
 inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept : clipCount(rhs.clipCount) {
 }
@@ -1588,6 +1599,7 @@ union SATINANGLE {
   inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
 };
 
+#pragma pack(push, 1)
 union SATINANGLEOUT {
   public:
   DWORD guide {};
@@ -1603,6 +1615,7 @@ union SATINANGLEOUT {
   explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
   inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
 };
+#pragma pack(pop)
 
 inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept : angle(rhs.angle) {
 }
@@ -1670,6 +1683,7 @@ constexpr auto EGHOL_LINS = 7U;
 constexpr auto EGPIC_LINS = 7U;
 constexpr auto EGCHN_LINS = 6U;
 
+#pragma pack(push, 1)
 class FTHR_INFO
 {
   public:
@@ -1688,7 +1702,8 @@ class FTHR_INFO
   // FTHR_INFO& operator=(FTHR_INFO&&) = default;
   //~FTHR_INFO() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class TXTR_INFO
 {
   public:
@@ -1704,7 +1719,8 @@ class TXTR_INFO
   // TXTR_INFO& operator=(TXTR_INFO&&) = default;
   //~TXTR_INFO() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 union TF_INFO {
   public:
   FTHR_INFO feather;
@@ -1717,6 +1733,7 @@ union TF_INFO {
   // TF_INFO& operator=(TF_INFO&&) = default;
   //~TF_INFO() = default;
 };
+#pragma pack(pop)
 
 /*form attribute bits
 
@@ -1755,6 +1772,7 @@ constexpr auto AT_UND     = 1U << 6U; // underlay flag
 constexpr auto AT_WALK    = 1U << 7U; // edge walk
 constexpr auto AT_CWLK    = 1U << 8U; // center walk
 
+#pragma pack(push, 1)
 class THR_HEAD // thred file header
 {
   public:
@@ -1777,7 +1795,8 @@ class THR_HEAD // thred file header
   // THR_HEAD& operator=(THR_HEAD&&) = default;
   //~THR_HEAD() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class TX_PNT // textured fill point
 {
   public:
@@ -1791,7 +1810,8 @@ class TX_PNT // textured fill point
   // TX_PNT& operator=(TX_PNT&&) = default;
   //~TX_PNT() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class TX_OFF // textured fill offset
 {
   public:
@@ -1805,7 +1825,8 @@ class TX_OFF // textured fill offset
   // TX_OFF& operator=(TX_OFF&&) = default;
   //~TX_OFF() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class THR_HEAD_EX // thred v1.0 file header extension
 {
   public:
@@ -1826,7 +1847,8 @@ class THR_HEAD_EX // thred v1.0 file header extension
   // THR_HEAD_EX& operator=(THR_HEAD_EX&&) = default;
   //~THR_HEAD_EX() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class PCS_STITCH
 {
   public:
@@ -1845,6 +1867,7 @@ class PCS_STITCH
   // PCS_STITCH& operator=(PCS_STITCH&&) = default;
   //~PCS_STITCH() = default;
 };
+#pragma pack(pop)
 
 class CLIP_STITCH
 {
@@ -2031,6 +2054,7 @@ class CURSOR_MASK
   //~CURSOR_MASK() = default;
 };
 
+#pragma pack(push, 1)
 class BAL_HEAD // balarad file header
 {
   public:
@@ -2049,7 +2073,8 @@ class BAL_HEAD // balarad file header
   // BAL_HEAD& operator=(BAL_HEAD&&) = default;
   //~BAL_HEAD() = default;
 };
-
+#pragma pack(pop)
+#pragma pack(push, 1)
 class BAL_STITCH // balarad stitch
 {
   public:
@@ -2065,6 +2090,7 @@ class BAL_STITCH // balarad stitch
   // BAL_STITCH& operator=(BAL_STITCH&&) = default;
   //~BAL_STITCH() = default;
 };
+#pragma pack(pop)
 
 class CLIP_SEG
 {
@@ -2160,8 +2186,6 @@ class GRID_COL
   // GRID_COL& operator=(GRID_COL&&) = default;
   //~GRID_COL() = default;
 };
-
-#pragma pack(pop)
 
 class O_REC
 {

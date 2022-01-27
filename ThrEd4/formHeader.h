@@ -9,7 +9,6 @@
 #include "ThrEdTypes.h"
 
 #pragma pack(push, 1)
-
 class FRM_HEAD_O // Original form header used prior to version 2
 {
   public:
@@ -44,6 +43,7 @@ class FRM_HEAD_O // Original form header used prior to version 2
   // FRM_HEAD_O& operator=(FRM_HEAD_O&&) = default;
   //~FRM_HEAD_O() = default;
 };
+#pragma pack(pop)
 
 class FRM_HEAD_OUT;
 
@@ -106,6 +106,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto istx() const noexcept -> bool;
 };
 
+#pragma pack(push, 1)
 class FRM_HEAD_OUT
 {
   public:
@@ -159,7 +160,6 @@ class FRM_HEAD_OUT
   explicit inline FRM_HEAD_OUT(FRM_HEAD const& rhs);
   inline auto operator=(FRM_HEAD const& rhs) -> FRM_HEAD_OUT&;
 };
-
 #pragma pack(pop)
 
 inline FRM_HEAD::FRM_HEAD(FRM_HEAD_O const& rhs) noexcept :
