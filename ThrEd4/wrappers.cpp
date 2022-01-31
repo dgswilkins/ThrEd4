@@ -201,3 +201,7 @@ auto wrap::createPen(int32_t iStyle, int32_t width, COLORREF color) noexcept -> 
   auto const scaledWidth = MulDiv(width, *ScreenDPI, STDDPI);
   return ::CreatePen(iStyle, scaledWidth, color);
 }
+
+auto wrap::getFormVertices() noexcept -> std::vector<F_POINT>* {
+  return FormVertices;
+}

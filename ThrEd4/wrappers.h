@@ -18,6 +18,7 @@
 #pragma warning(pop)
 
 // Local Headers
+#include "pointHeader.h"
 
 namespace wrap {
 
@@ -82,6 +83,8 @@ template <class outType, class inType> auto floor(inType invar) -> outType {
 }
 
 void getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept;
+
+auto getFormVertices() noexcept -> std::vector<F_POINT>*;
 
 template <class inType> auto midl(inType high, inType low) noexcept -> float {
   return (gsl::narrow_cast<float>(high) - gsl::narrow_cast<float>(low)) / 2.0F + gsl::narrow_cast<float>(low);
