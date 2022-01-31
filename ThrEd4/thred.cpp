@@ -7690,6 +7690,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
+		++itVertex;
 	  }
 	  form.outline();
 	  form::refilfn();
