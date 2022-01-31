@@ -2423,7 +2423,7 @@ void xt::internal::sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTAN
   point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void xt::internal::nudfn(F_RECTANGLE const& designSizeRect) {
+void xt::internal::nudfn(F_RECTANGLE const& designSizeRect) noexcept {
   auto const newSize         = F_POINT {(designSizeRect.right - designSizeRect.left),
                                 (designSizeRect.top - designSizeRect.bottom)};
   auto const designSizeRatio = F_POINT {(DesignSize.x / newSize.x), (DesignSize.y / newSize.y)};

@@ -161,7 +161,7 @@ namespace internal {
   auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool;
   auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT;
   void notundfn(uint32_t code);
-  void nudfn(F_RECTANGLE const& designSizeRect);
+  void nudfn(F_RECTANGLE const& designSizeRect) noexcept;
   void nurat(FEATHER& feather) noexcept;
   auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
                 std::vector<O_REC*> const& pRecs,
