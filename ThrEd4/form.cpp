@@ -204,18 +204,17 @@ auto form::internal::px2stchf(POINT const& screen) noexcept -> F_POINT {
 
 void form::frmlin(FRM_HEAD const& form) {
   if (form.vertexCount != 0U) {
-	auto& formLines = *FormLines;
-	formLines.clear();
-	formLines.reserve(form.vertexCount);
+	FormLines->clear();
+	FormLines->reserve(form.vertexCount);
 	auto const itFirstVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	auto       itCurrentVertex = itFirstVertex;
 	for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
-	  formLines.push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
+	  FormLines->push_back(POINT {std::lround((itCurrentVertex->x - ZoomRect.left) * ZoomRatio.x),
 	                             std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                         (itCurrentVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
 	  ++itCurrentVertex;
 	}
-	formLines.push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
+	FormLines->push_back(POINT {std::lround((itFirstVertex->x - ZoomRect.left) * ZoomRatio.x),
 	                           std::lround(wrap::toFloat(StitchWindowClientRect.bottom) -
 	                                       (itFirstVertex->y - ZoomRect.bottom) * ZoomRatio.y)});
   }
