@@ -490,10 +490,10 @@ void thred::internal::fnamtabs() {
 }
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
-  constexpr auto NAMELEN  = NameOrder.size();
+  constexpr auto NAMELEN = NameOrder.size();
   // cppcheck-suppress unreadVariable
-  auto const     designer = utf::utf16ToUtf8(designerName);
-  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
+  auto const designer = utf::utf16ToUtf8(designerName);
+  auto       tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
@@ -734,7 +734,7 @@ void thred::internal::deldu() {
 void thred::internal::dudat() {
   auto& undoBuffer = *UndoBuffer;
   undoBuffer[UndoBufferWriteIndex].reset(nullptr);
-  auto const  formCount = wrap::toUnsigned(FormList->size());
+  auto const formCount = wrap::toUnsigned(FormList->size());
 
   auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
                     wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
@@ -9451,8 +9451,8 @@ void thred::internal::gsnap() {
   if (!SelectedFormList->empty()) {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
-	  ClosestFormToCursor  = selectedForm;
-	  auto& formIter = FormList->operator[](ClosestFormToCursor);
+	  ClosestFormToCursor = selectedForm;
+	  auto& formIter      = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
 	  formIter.outline();
 	  form::refil();

@@ -1194,8 +1194,8 @@ void satin::satfix() {
 	minSize = 2U;
   }
   if (TempPolygon->size() > minSize) {
-	form.vertexIndex = thred::adflt(vertexCount);
-	auto const itVertex          = wrap::next(FormVertices->begin(), form.vertexIndex);
+	form.vertexIndex    = thred::adflt(vertexCount);
+	auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	std::copy(TempPolygon->cbegin(), TempPolygon->cend(), itVertex);
 	TempPolygon->clear();
 	form.vertexCount = vertexCount;

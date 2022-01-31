@@ -273,7 +273,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
 
 	auto const clipDifference = (form.isclp())    ? form.angleOrClipData.clip
 	                            : (form.iseclp()) ? form.borderClipData
-	                                                   : 0U;
+	                                              : 0U;
 	if (form.isclp()) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
@@ -377,7 +377,8 @@ void repair::internal::reptx() {
 	if (formIter->istx()) {
 	  if (wrap::toUnsigned(TexturePointsBuffer->size()) >
 	      wrap::toUnsigned(formIter->fillInfo.texture.index) + formIter->fillInfo.texture.count) {
-		auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
+		auto const startTexture =
+		    wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
 		auto const endTexture  = wrap::next(startTexture, formIter->fillInfo.texture.count);
 		auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		std::copy(startTexture, endTexture, destination);
@@ -389,7 +390,8 @@ void repair::internal::reptx() {
 		if (TexturePointsBuffer->size() > formIter->fillInfo.texture.index) {
 		  wrap::narrow(formIter->fillInfo.texture.count,
 		               TexturePointsBuffer->size() - formIter->fillInfo.texture.index);
-		  auto const startTexture = wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
+		  auto const startTexture =
+		      wrap::next(TexturePointsBuffer->cbegin(), formIter->fillInfo.texture.index);
 		  auto const endTexture  = wrap::next(startTexture, formIter->fillInfo.texture.count);
 		  auto const destination = wrap::next(TexturePointsBuffer->begin(), textureCount);
 		  std::copy(startTexture, endTexture, destination);

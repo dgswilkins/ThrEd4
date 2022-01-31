@@ -296,8 +296,7 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	  valueWindow[LFRMFAZ] = ffi::numwin(fmt::format(L"{}", (form.wordParam)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
-	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF ||
-	    form.istx()) {
+	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF || form.istx()) {
 	  labelWindow[LBFILSQR] = ffi::txtwin(dT::loadStr(PREFLIST[PRFFILEND].stringID), LabelWindowCoords);
 	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? dT::loadStr(IDS_SQR) : dT::loadStr(IDS_PNTD);
 	  valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);
@@ -1061,9 +1060,9 @@ void formForms::setear() {
 	StateMap->set(StateFlag::FORMSEL);
 	form::flipv();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const size = F_POINT {form.rectangle.right - form.rectangle.left,
-	                           form.rectangle.top - form.rectangle.bottom};
-	auto       horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
+	auto const size =
+	    F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
+	auto horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
 	}
@@ -1180,7 +1179,7 @@ void formForms::wavfrm() {
 	points.reserve(IniFile.wavePoints);
 	// reuse regular polygon code to build the template for points
 	form::durpoli(IniFile.wavePoints);
-	auto& form            = FormList->back();
+	auto&      form            = FormList->back();
 	auto const formVertexIndex = form.vertexIndex;
 	form::mdufrm();
 	auto iPoint      = 0U;
@@ -1233,8 +1232,8 @@ void formForms::wavfrm() {
 	form.vertexCount = vertexCount;
 	form.outline();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const selectedSize = F_POINT {form.rectangle.right - form.rectangle.left,
-	                                   form.rectangle.top - form.rectangle.bottom};
+	auto const selectedSize =
+	    F_POINT {form.rectangle.right - form.rectangle.left, form.rectangle.top - form.rectangle.bottom};
 	constexpr auto WAVSIZE         = 4.0F; // wave size factor
 	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
