@@ -2154,7 +2154,7 @@ void xt::setfmax() {
 void xt::internal::fwidfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   // clang-format off
-  auto const& form      = FormList->operator[](formNumber);
+  auto&       form      = FormList->operator[](formNumber);
   auto const  reference = form.rectangle.left;
   auto const  ratio     = length / (form.rectangle.right - reference);
   auto        itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
@@ -2163,7 +2163,7 @@ void xt::internal::fwidfn(uint32_t formNumber, float length) {
 	itVertex->x = (itVertex->x - reference) * ratio + reference;
 	++itVertex;
   }
-  form::frmout(formNumber);
+  form.outline();
   form::refilfn();
 }
 
@@ -2198,7 +2198,7 @@ void xt::setfind() {
 void xt::internal::fhifn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   // clang-format off
-  auto const& form      = FormList->operator[](formNumber);
+  auto&       form      = FormList->operator[](formNumber);
   auto const  reference = form.rectangle.bottom;
   auto const  ratio     = length / (form.rectangle.top - reference);
   auto        itVertex  = wrap::next(FormVertices->begin(), form.vertexIndex);
@@ -2207,7 +2207,7 @@ void xt::internal::fhifn(uint32_t formNumber, float length) {
 	itVertex->y = (itVertex->y - reference) * ratio + reference;
 	++itVertex;
   }
-  form::frmout(formNumber);
+  form.outline();
   form::refilfn();
 }
 
@@ -2433,7 +2433,6 @@ void xt::internal::nudfn(F_RECTANGLE const& designSizeRect) {
   for (auto& formVertice : *FormVertices) {
 	sadj(formVertice, designSizeRatio, designSizeRect);
   }
-  form::frmout(ClosestFormToCursor);
 }
 
 void xt::nudsiz() {
@@ -2483,8 +2482,8 @@ void xt::nudsiz() {
 		displayText::hsizmsg();
 	  }
 	  form::centir();
-	  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		form::frmout(iForm);
+	  for (auto& form : *FormList) {
+		form.outline();
 	  }
 	}
   }
