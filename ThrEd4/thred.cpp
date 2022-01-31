@@ -1083,7 +1083,7 @@ void thred::internal::insadj() {
   StateMap->reset(StateFlag::PRELIN);
   form::refil();
   thred::coltab();
-  form::frmout(ClosestFormToCursor);
+  FormList->operator[](ClosestFormToCursor).outline();
 }
 
 void thred::internal::patdun() {
@@ -6644,7 +6644,7 @@ void thred::internal::delet() {
 	  iForm->vertexIndex -= SelectedFormVertices.vertexCount + 1U;
 	}
 	form.vertexCount -= (SelectedFormVertices.vertexCount + 1U);
-	form::frmout(ClosestFormToCursor);
+	form.outline();
 	if (form.type == SAT) {
 	  // Make sure the end guides are still valid
 	  if (vertexMap.test(0) || vertexMap.test(1)) {
@@ -6814,10 +6814,8 @@ void thred::internal::delet() {
 	  if (ClosestFormToCursor > FormList->size() - 1U) {
 		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
 	  }
-	  if (!FormList->empty()) {
-		form::frmout(ClosestFormToCursor);
-		form::refil();
-	  }
+	  form.outline();
+	  form::refil();
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -7655,7 +7653,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
   thred::savdo();
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
-	auto const& form    = FormList->operator[](ClosestFormToCursor);
+	auto& form          = FormList->operator[](ClosestFormToCursor);
 	auto  currentVertex = SelectedFormVertices.start;
 	auto  const vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
@@ -7664,7 +7662,7 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	  thred::rotflt(*itVertex, rotationAngle, rotationCenter);
 	  currentVertex = form::pdir(form, currentVertex);
 	}
-	form::frmout(ClosestFormToCursor);
+	form.outline();
 	thred::setpsel();
 	form::refil();
 	StateMap->set(StateFlag::RESTCH);
@@ -7677,8 +7675,8 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	for (auto& stitch : *StitchBuffer) {
 	  thi::rotstch(stitch, rotationAngle, rotationCenter);
 	}
-	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  form::frmout(iForm);
+	for (auto& form : *FormList) {
+	  form.outline();
 	}
 	form::selal();
 	return;
@@ -7687,27 +7685,27 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor = selectedForm;
 	  // clang-format off
-	  auto const& form     = FormList->operator[](selectedForm);
+	  auto& form     = FormList->operator[](selectedForm);
 	  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
 	  }
-	  form::frmout(ClosestFormToCursor);
+	  form.outline();
 	  form::refilfn();
 	}
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
 	if (StateMap->testAndReset(StateFlag::FRMROT)) {
-	  auto const& form = FormList->operator[](ClosestFormToCursor);
+	  auto& form = FormList->operator[](ClosestFormToCursor);
 
 	  auto itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 		thred::rotflt(*itVertex, rotationAngle, rotationCenter);
 		++itVertex;
 	  }
-	  form::frmout(ClosestFormToCursor);
+	  form.outline();
 	  form::refil();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -9453,9 +9451,9 @@ void thred::internal::gsnap() {
 	thred::savdo();
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  ClosestFormToCursor  = selectedForm;
-	  auto const& formIter = FormList->operator[](ClosestFormToCursor);
+	  auto& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
-	  form::frmout(ClosestFormToCursor);
+	  formIter.outline();
 	  form::refil();
 	}
 	StateMap->set(StateFlag::RESTCH);
@@ -9463,9 +9461,9 @@ void thred::internal::gsnap() {
   else {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  thred::savdo();
-	  auto const& formIter = FormList->operator[](ClosestFormToCursor);
+	  auto& formIter = FormList->operator[](ClosestFormToCursor);
 	  frmsnap(formIter.vertexIndex, formIter.vertexCount);
-	  form::frmout(ClosestFormToCursor);
+	  formIter.outline();
 	  form::refil();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -10715,7 +10713,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, F_P
 	FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, wrap::toFloat(point.y) / VerticalRatio};
 	if (StateMap->test(StateFlag::FPSEL)) {
 	  // clang-format off
-	  auto const& form            = FormList->operator[](ClosestFormToCursor);
+	  auto& form            = FormList->operator[](ClosestFormToCursor);
 	  auto        iSelectedVertex = SelectedFormVertices.start;
 	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
@@ -10726,7 +10724,7 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, F_P
 		iSelectedVertex = form::pdir(form, iSelectedVertex);
 	  }
 	  thred::setpsel();
-	  form::frmout(ClosestFormToCursor);
+	  form.outline();
 	  form::refil();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -12189,7 +12187,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (StateMap->testAndReset(StateFlag::FPUNCLP)) {
 	thred::savdo();
 	fixpclp(ClosestFormToCursor);
-	form::frmout(ClosestFormToCursor);
+	FormList->operator[](ClosestFormToCursor).outline();
 	return true;
   }
   if (StateMap->test(StateFlag::FPSEL) && !StateMap->test(StateFlag::FUNCLP) &&
@@ -12276,7 +12274,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 		itVertex->y += FormMoveDelta.y;
 		++itVertex;
 	  }
-	  form::frmout(ClosestFormToCursor);
+	  form.outline();
 	  form::refil();
 	}
 	StateMap->reset(StateFlag::FUNSCLP);
@@ -12509,7 +12507,7 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	form::refil();
 	StateMap->reset(StateFlag::FUNCLP);
 	if (StateMap->testAndReset(StateFlag::FPSEL)) {
-	  form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	  FormList->back().outline();
 	}
 	StateMap->set(StateFlag::RESTCH);
 	return true;
