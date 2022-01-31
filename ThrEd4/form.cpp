@@ -1039,8 +1039,9 @@ auto form::closfrm() -> bool {
 	auto const& vertex =
 	    FormVertices->operator[](wrap::toSize(FormList->operator[](closestForm).vertexIndex) + closestVertex);
 	auto const stitchCoordsInPixels = thred::stch2pxr(vertex);
-	minimumLength = wrap::toFloat(hypot(stitchCoordsInPixels.x - screenCoordinate.x,
-	                                    stitchCoordsInPixels.y - screenCoordinate.y));
+
+	minimumLength = std::hypot(wrap::toFloat(stitchCoordsInPixels.x - screenCoordinate.x),
+	                           wrap::toFloat(stitchCoordsInPixels.y - screenCoordinate.y));
 	if (minimumLength < FCLOSNUF) {
 	  ClosestFormToCursor   = closestForm;
 	  ClosestVertexToCursor = closestVertex;
