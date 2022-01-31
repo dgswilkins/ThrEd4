@@ -787,8 +787,8 @@ void trace::internal::dutrac() {
 	form.type            = FRMFPOLY;
 	form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
 	form.satinGuideCount = 0;
+	form.outline();
 	FormList->push_back(form);
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	StateMap->set(StateFlag::RESTCH);
 	StateMap->set(StateFlag::FRMOF);
 	form::tglfrm();
