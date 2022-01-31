@@ -904,9 +904,9 @@ void formForms::dasyfrm() {
 	form.attribute = 1;
   }
   StateMap->set(StateFlag::INIT);
+  form.outline();
   FormList->push_back(form);
   ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-  form::frmout(ClosestFormToCursor);
   for (auto iMacroPetal = 0U; iMacroPetal < iVertex; ++iMacroPetal) {
 	itVertex->x -= form.rectangle.left;
 	itVertex->y -= form.rectangle.bottom;
@@ -1019,8 +1019,9 @@ void formForms::setear() {
 
 	auto twistStep = IniFile.tearTwistStep;
 	form::durpoli(IniFile.formSides);
-	auto const formVertexIndex  = FormList->back().vertexIndex;
-	auto const formVertexCount  = FormList->back().vertexCount;
+	auto&      form             = FormList->back();
+	auto const formVertexIndex  = form.vertexIndex;
+	auto const formVertexCount  = form.vertexCount;
 	auto       firstVertex      = wrap::next(FormVertices->begin(), formVertexIndex);
 	auto       nextVertex       = std::next(firstVertex);
 	auto const count            = wrap::toSize(formVertexCount) / 4U;
@@ -1056,14 +1057,13 @@ void formForms::setear() {
 	  firstVertex->x = middle;
 	}
 	firstVertex->y = verticalPosition;
-	++(FormList->back().vertexCount);
+	++(form.vertexCount);
 	++NewFormVertexCount;
 	StateMap->set(StateFlag::FORMSEL);
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
 	form::flipv();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const size = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
-	                           FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	auto const size = F_POINT {form.rectangle.right - form.rectangle.left,
+	                           form.rectangle.top - form.rectangle.bottom};
 	auto       horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / TWSTFACT / size.x;
 	if (horizontalRatio > 1.0F) {
 	  horizontalRatio = 1.0F;
@@ -1074,18 +1074,19 @@ void formForms::setear() {
 	}
 	if (horizontalRatio < 1.0F) {
 	  auto       scaledVertex = firstVertex;
-	  auto const vertexMax    = FormList->back().vertexCount;
+	  auto const vertexMax    = form.vertexCount;
 	  for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 		scaledVertex->x = (scaledVertex->x - firstVertex->x) * horizontalRatio + firstVertex->x;
 		scaledVertex->y = (scaledVertex->y - firstVertex->y) * horizontalRatio + firstVertex->y;
 		++scaledVertex;
 	  }
 	}
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	form.outline();
+	// ToDo - is this copy of an iterator required?
 	auto       shiftedVertex = firstVertex;
-	auto const left          = FormList->back().rectangle.left;
-	auto const bottom        = FormList->back().rectangle.bottom;
-	auto const vertexMax     = FormList->back().vertexCount;
+	auto const left          = form.rectangle.left;
+	auto const bottom        = form.rectangle.bottom;
+	auto const vertexMax     = form.vertexCount;
 	for (auto iVertex = 0U; iVertex < vertexMax; ++iVertex) {
 	  shiftedVertex->x -= left;
 	  shiftedVertex->y -= bottom;
@@ -1180,7 +1181,8 @@ void formForms::wavfrm() {
 	points.reserve(IniFile.wavePoints);
 	// reuse regular polygon code to build the template for points
 	form::durpoli(IniFile.wavePoints);
-	auto const formVertexIndex = FormList->back().vertexIndex;
+	auto& form            = FormList->back();
+	auto const formVertexIndex = form.vertexIndex;
 	form::mdufrm();
 	auto iPoint      = 0U;
 	auto waveIndex   = IniFile.waveStart;
@@ -1228,12 +1230,12 @@ void formForms::wavfrm() {
 	  thred::rotflt(*rotatedVertex, rotationAngle, F_POINT {});
 	  ++rotatedVertex;
 	}
-	FormList->back().type        = FRMLINE;
-	FormList->back().vertexCount = vertexCount;
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	form.type        = FRMLINE;
+	form.vertexCount = vertexCount;
+	form.outline();
 	StateMap->reset(StateFlag::FORMSEL);
-	auto const selectedSize = F_POINT {FormList->back().rectangle.right - FormList->back().rectangle.left,
-	                                   FormList->back().rectangle.top - FormList->back().rectangle.bottom};
+	auto const selectedSize = F_POINT {form.rectangle.right - form.rectangle.left,
+	                                   form.rectangle.top - form.rectangle.bottom};
 	constexpr auto WAVSIZE         = 4.0F; // wave size factor
 	auto           horizontalRatio = wrap::toFloat(UnzoomedRect.cx) / WAVSIZE / selectedSize.x;
 	if (horizontalRatio > 1) {
@@ -1251,7 +1253,7 @@ void formForms::wavfrm() {
 		++vScaled;
 	  }
 	}
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
+	form.outline();
 	auto       vShifted = firstVertex;
 	auto const left     = FormList->back().rectangle.left;
 	auto const bottom   = FormList->back().rectangle.bottom;
