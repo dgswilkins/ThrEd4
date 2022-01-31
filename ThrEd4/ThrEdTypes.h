@@ -1040,7 +1040,6 @@ class FORM_VERTICES
   //~FORM_VERTICES() = default;
 };
 
-
 class F_POINT_LINE
 {
   public:

@@ -45,4 +45,3 @@ class BACK_HEAD // Backup header
   // BACK_HEAD& operator=(BACK_HEAD&&) = default;
   //~BACK_HEAD() = default;
 };
-

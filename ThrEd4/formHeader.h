@@ -97,8 +97,8 @@ class FRM_HEAD
   explicit inline FRM_HEAD(FRM_HEAD_O const& rhs) noexcept;
   explicit inline FRM_HEAD(FRM_HEAD_OUT const& rhs) noexcept;
 
-  inline auto operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
-  inline auto operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
+  inline auto               operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
+  inline auto               operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
   [[nodiscard]] inline auto isclp() const noexcept -> bool;
   [[nodiscard]] inline auto iseclp() const noexcept -> bool;
   [[nodiscard]] inline auto isclpx() const noexcept -> bool;
@@ -447,8 +447,8 @@ inline auto FRM_HEAD::istx() const noexcept -> bool {
 inline void FRM_HEAD::outline() {
   if (vertexCount != 0U) {
 	const auto* formVertices = wrap::getFormVertices();
-	auto  itVertex  = wrap::next(formVertices->cbegin(), vertexIndex);
-	rectangle       = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
+	auto        itVertex     = wrap::next(formVertices->cbegin(), vertexIndex);
+	rectangle                = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
 	for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
 	  ++itVertex;
 	  if (itVertex->x < rectangle.left) {
