@@ -126,8 +126,8 @@ void satin::spltsat(uint32_t guideIndex) {
   auto& nextForm       = FormList->operator[](wrap::toSize(ClosestFormToCursor) + 1U);
   nextForm.vertexCount = iNewVertex - iOldVertex;
   nextForm.vertexIndex = form.vertexIndex + iOldVertex;
-  form::frmout(ClosestFormToCursor);
-  form::frmout(ClosestFormToCursor + 1U);
+  form.outline();
+  nextForm.outline();
   auto const iNewGuide = 1U + currentGuide.start - currentGuide.finish;
   for (auto iGuide = 0U; iGuide < guideIndex; ++iGuide) {
 	(itGuide++)->finish += iNewGuide;
@@ -648,7 +648,7 @@ void satin::delspnt() {
   auto const itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*itVertex);
   displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
-  form::frmout(ClosestFormToCursor);
+  currentForm.outline();
   if (itVertex->x < ZoomRect.left || itVertex->x > ZoomRect.right ||
       itVertex->y < ZoomRect.bottom || itVertex->y > ZoomRect.top) {
 	thred::shft(*itVertex);
@@ -818,9 +818,9 @@ void satin::ribon() {
 		  itGuide->finish = newForm.vertexCount - iGuide - 1U;
 		  ++itGuide;
 		}
+		newForm.outline();
 		FormList->push_back(newForm);
 		ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
-		form::frmout(ClosestFormToCursor);
 		form::refilfn();
 		ClosestFormToCursor = savedFormIndex;
 		StateMap->set(StateFlag::DELTO);
@@ -1191,17 +1191,18 @@ void satin::satfil(FRM_HEAD& form) {
 void satin::satfix() {
   auto const vertexCount = wrap::toUnsigned(TempPolygon->size());
   auto       minSize     = 1U;
-  if (FormList->back().type == FRMFPOLY) {
+  auto&      form        = FormList->back();
+  if (form.type == FRMFPOLY) {
 	minSize = 2U;
   }
   if (TempPolygon->size() > minSize) {
-	FormList->back().vertexIndex = thred::adflt(vertexCount);
-	auto const itVertex          = wrap::next(FormVertices->begin(), FormList->back().vertexIndex);
+	form.vertexIndex = thred::adflt(vertexCount);
+	auto const itVertex          = wrap::next(FormVertices->begin(), form.vertexIndex);
 	std::copy(TempPolygon->cbegin(), TempPolygon->cend(), itVertex);
 	TempPolygon->clear();
-	FormList->back().vertexCount = vertexCount;
-	form::frmout(wrap::toUnsigned(FormList->size() - 1U));
-	FormList->back().satinGuideCount = 0;
+	form.vertexCount = vertexCount;
+	form.outline();
+	form.satinGuideCount = 0;
 	StateMap->set(StateFlag::INIT);
   }
   else {
