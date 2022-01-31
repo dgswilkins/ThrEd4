@@ -188,39 +188,6 @@ void form::ispcdclp() {
   CloseClipboard();
 }
 
-void form::frmout(uint32_t formIndex) {
-  if (auto& form = FormList->operator[](formIndex); form.vertexCount != 0U) {
-	auto& rectangle = form.rectangle;
-	auto  itVertex  = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-	rectangle       = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
-	for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-	  ++itVertex;
-	  if (itVertex->x < rectangle.left) {
-		rectangle.left = itVertex->x;
-	  }
-	  if (itVertex->y > rectangle.top) {
-		rectangle.top = itVertex->y;
-	  }
-	  if (itVertex->x > rectangle.right) {
-		rectangle.right = itVertex->x;
-	  }
-	  if (itVertex->y < rectangle.bottom) {
-		rectangle.bottom = itVertex->y;
-	  }
-	}
-	if (rectangle.top - rectangle.bottom < MINRCT) {
-	  auto const offset = (MINRCT - (rectangle.top - rectangle.bottom)) / 2;
-	  rectangle.top += offset;
-	  rectangle.bottom -= offset;
-	}
-	if (rectangle.right - rectangle.left < MINRCT) {
-	  auto const offset = (MINRCT - (rectangle.right - rectangle.left)) / 2;
-	  rectangle.left -= offset;
-	  rectangle.right += offset;
-	}
-  }
-}
-
 auto form::sfCor2px(F_POINT const& stitchPoint) -> POINT {
   return POINT {wrap::ceil<int32_t>((stitchPoint.x - ZoomRect.left) * ZoomRatio.x),
                 wrap::ceil<int32_t>(wrap::toFloat(StitchWindowClientRect.bottom) -

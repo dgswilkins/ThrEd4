@@ -102,7 +102,6 @@ void frmlin(FRM_HEAD const& form);
 void frmlin(std::vector<F_POINT> const& vertices);
 void frmnumfn(uint32_t newFormIndex);
 void frmon();
-void frmout(uint32_t formIndex);
 void frmovlin();
 auto frmrng(uint32_t iForm, RANGE& range) -> bool;
 void frmsadj();
