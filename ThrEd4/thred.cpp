@@ -9312,7 +9312,7 @@ auto thred::internal::chkminus(wchar_t code) noexcept -> bool {
 	if (PreferenceIndex == PRFCLPPHS) {              // Clipboard Offset in preferences
 	  return true;
 	}
-	if (auto& form = FormList->operator[](ClosestFormToCursor);
+	if (auto const& form = FormList->operator[](ClosestFormToCursor);
 	    FormMenuChoice == LFRMSPAC && form.isfclp()) { // Fill Spacing for fan clip fill
 	  return true;
 	}
