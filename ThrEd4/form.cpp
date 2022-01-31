@@ -1262,8 +1262,8 @@ void form::filinsb(F_POINT const& point, F_POINT& stitchPoint) {
 
 auto form::getblen() noexcept -> float {
   // clang-format off
-  auto const& form   = FormList->operator[](ClosestFormToCursor);
-  auto const iLength = (form.clipEntries << WRDSHFT) | form.picoLength;
+  auto const& form    = FormList->operator[](ClosestFormToCursor);
+  auto const  iLength = (form.clipEntries << WRDSHFT) | form.picoLength;
   // clang-format on
   return wrap::toFloat(iLength);
 }
@@ -1895,7 +1895,7 @@ void form::internal::pfn(std::vector<V_RECT_2> const& underlayVerticalRect,
   auto const& form          = FormList->operator[](ClosestFormToCursor);
   auto        currentVertex = startVertex;
   auto        nextVertex    = form::nxt(form, currentVertex);
-  auto const itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex + startVertex);
+  auto const  itVertex      = wrap::next(FormVertices->cbegin(), form.vertexIndex + startVertex);
   auto        stitchPoint   = *itVertex;
   // clang-format on
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
@@ -4385,14 +4385,14 @@ void form::internal::bakseq() {
   }
   while (iSequence > 0) {
 	// clang-format off
-	auto const rcnt           = iSequence % SEQ_TABLE.size();
-	auto const stitchSpacing2 = LineSpacing * 2;
-	auto const rit            = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
-	auto const& bPrevious     = BSequence->operator[](iSequence - 1U);
-	auto&      bCurrent       = BSequence->operator[](iSequence);
-	auto const& bNext         = BSequence->operator[](iSequence + 1U);
-	auto       delta          = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
-	auto       slope          = std::numeric_limits<float>::max(); // initialize to the max value i.e. slope when y is zero
+	auto const  rcnt           = iSequence % SEQ_TABLE.size();
+	auto const  stitchSpacing2 = LineSpacing * 2;
+	auto const  rit            = std::lround(BSequence->operator[](iSequence).x / stitchSpacing2);
+	auto const& bPrevious      = BSequence->operator[](iSequence - 1U);
+	auto&       bCurrent       = BSequence->operator[](iSequence);
+	auto const& bNext          = BSequence->operator[](iSequence + 1U);
+	auto        delta          = F_POINT {bCurrent.x - bNext.x, bCurrent.y - bNext.y};
+	auto        slope          = std::numeric_limits<float>::max(); // initialize to the max value i.e. slope when y is zero
 	// clang-format on
 	if (delta.y != 0.0F) {
 	  slope = delta.x / delta.y;
@@ -4943,10 +4943,10 @@ void form::refil() {
 
 void form::setfpnt() {
   // clang-format off
-  auto& form             = FormList->operator[](ClosestFormToCursor);
-  auto const  screenCoordinate = POINT {(Msg.pt.x - StitchWindowOrigin.x), 
-										(Msg.pt.y - StitchWindowOrigin.y)};
-  auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + ClosestVertexToCursor);
+  auto&      form             = FormList->operator[](ClosestFormToCursor);
+  auto const screenCoordinate = POINT {(Msg.pt.x - StitchWindowOrigin.x), 
+									   (Msg.pt.y - StitchWindowOrigin.y)};
+  auto const itVertex         = wrap::next(FormVertices->begin(), form.vertexIndex + ClosestVertexToCursor);
   // clang-format on
   form::unfrm();
   fi::rats();
@@ -5394,9 +5394,9 @@ void form::insat() { // insert a point in a form
   if (auto inOutFlag = IntersectionStyles::POINT_IN_LINE; fi::closat(inOutFlag)) {
 	thred::savdo();
 	// clang-format off
-	auto&      selectedForm  = FormList->operator[](ClosestFormToCursor);
-	auto const stitchPoint = thred::pxCor2stch(Msg.pt);
-	auto const lastVertex    = selectedForm.vertexCount - 1U;
+	auto&      selectedForm = FormList->operator[](ClosestFormToCursor);
+	auto const stitchPoint  = thred::pxCor2stch(Msg.pt);
+	auto const lastVertex   = selectedForm.vertexCount - 1U;
 	// clang-format on
 	if (inOutFlag != IntersectionStyles::POINT_IN_LINE) {
 	  if (ClosestVertexToCursor == 0 && selectedForm.type == FRMLINE) {
@@ -6815,7 +6815,7 @@ void form::frmon() {
 
 void form::internal::fnord() {
   // clang-format off
-  auto const& currentForm = FormList->operator[](ClosestFormToCursor);
+  auto const& currentForm   = FormList->operator[](ClosestFormToCursor);
   auto const  itStartVertex = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
   auto const  itEndVertex   = wrap::next(itStartVertex, currentForm.vertexCount);
   // clang-format on
@@ -7338,8 +7338,8 @@ void form::join() {
   StateMap->set(StateFlag::FRMSAM);
   if (FormList->size() > 1 && StateMap->test(StateFlag::FORMSEL) && form::closfrm()) {
 	// clang-format off
-	auto const& form = FormList->operator[](ClosestFormToCursor);
-	auto  vertexList = std::vector<F_POINT> {};
+	auto const& form       = FormList->operator[](ClosestFormToCursor);
+	auto        vertexList = std::vector<F_POINT> {};
 	// clang-format on
 	vertexList.reserve(form.vertexCount);
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -7405,7 +7405,7 @@ void form::nufsel() {
 void form::frmadj(uint32_t formIndex) {
   // clang-format off
   auto& form     = FormList->operator[](formIndex);
-  auto        itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
+  auto  itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
   // clang-format on
   for (auto iVertex = 0U; iVertex < form.vertexCount; ++iVertex) {
 	itVertex->x += FormMoveDelta.x;
@@ -7514,12 +7514,12 @@ void form::selalfil() {
 auto form::frmrng(uint32_t iForm, RANGE& range) -> bool {
   auto retval = false;
   if (!StitchBuffer->empty()) {
+	range.start = 0;
 	// clang-format off
-	range.start          = 0;
-	auto const& form     = FormList->operator[](iForm);
-	auto const saveClose = ClosestFormToCursor;
-	ClosestFormToCursor  = iForm;
+	auto const& form      = FormList->operator[](iForm);
+	auto const  saveClose = ClosestFormToCursor;
 	// clang-format on
+	ClosestFormToCursor = iForm;
 	if ((form.fillType != 0U) || (form.edgeType != 0U)) {
 	  range.start  = thred::findFirstStitch(ClosestFormToCursor);
 	  range.finish = thred::findLastStitch(ClosestFormToCursor);
@@ -7579,14 +7579,14 @@ void form::fcntr() {
 	auto const  firstForm     = SelectedFormList->front();
 	auto const& firstRect     = FormList->operator[](firstForm).rectangle;
 	auto const  initialCenter = F_POINT {wrap::midl(firstRect.right, firstRect.left), 
-										wrap::midl(firstRect.top, firstRect.bottom)};
+										 wrap::midl(firstRect.top, firstRect.bottom)};
 	// clang-format on
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  // clang-format off
 	  auto&       currentForm   = FormList->operator[](selectedForm);
 	  auto const& formRect      = currentForm.rectangle;
 	  auto const  currentCenter = F_POINT {wrap::midl(formRect.right, formRect.left), 
-										  wrap::midl(formRect.top, formRect.bottom)};
+		                                   wrap::midl(formRect.top, formRect.bottom)};
 	  auto const  delta         = F_POINT {initialCenter.x - currentCenter.x, initialCenter.y - currentCenter.y};
 	  auto        itVertex      = wrap::next(FormVertices->begin(), currentForm.vertexIndex);
 	  // clang-format on
@@ -7994,7 +7994,7 @@ void form::cntrx() {
 	  // clang-format off
 	  auto const& formRect       = FormList->operator[](ClosestFormToCursor).rectangle;
 	  auto const  selectedCenter = F_POINT {wrap::midl(formRect.right, formRect.left), 
-										   wrap::midl(formRect.top, formRect.bottom)};
+										    wrap::midl(formRect.top, formRect.bottom)};
 	  // clang-format on
 	  FormMoveDelta = F_POINT {markCenter.x - selectedCenter.x, -markCenter.y + selectedCenter.y};
 	  if (StateMap->test(StateFlag::CNTRV)) {

@@ -78,10 +78,8 @@ void satin::spltsat(uint32_t guideIndex) {
   // We are adding two additional vertices when splitting the form
   auto vertexBuffer = std::vector<F_POINT> {};
   vertexBuffer.resize(wrap::toSize(form.vertexCount) + 2U);
-  // clang-format off
-  auto const maxForm  = FormList->size();
+  auto const maxForm       = FormList->size();
   auto const lastFormGuide = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.vertexCount);
-  // clang-format on
   FormVertices->insert(lastFormGuide, 2, F_POINT {});
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
 	FormList->operator[](iForm).vertexIndex += 2;

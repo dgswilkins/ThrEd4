@@ -7653,9 +7653,9 @@ void thred::rotfn(float rotationAngle, F_POINT const& rotationCenter) {
   thred::savdo();
   if (StateMap->test(StateFlag::FPSEL)) {
 	// clang-format off
-	auto& form          = FormList->operator[](ClosestFormToCursor);
-	auto  currentVertex = SelectedFormVertices.start;
-	auto  const vBegin  = wrap::next(FormVertices->begin(), form.vertexIndex);
+	auto&       form          = FormList->operator[](ClosestFormToCursor);
+	auto        currentVertex = SelectedFormVertices.start;
+	auto  const vBegin        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	// clang-format on
 	for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
 	  auto itVertex = wrap::next(vBegin, currentVertex);
@@ -9059,7 +9059,7 @@ void thred::internal::rotmrk() {
 	  auto const codedFormIndex = ClosestFormToCursor << FRMSHFT;
 	  // clang-format off
 	  auto const& form     = FormList->operator[](ClosestFormToCursor);
-	  auto  itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+	  auto        itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 	  // clang-format on
 	  auto const originalAngle = atan2(itVertex->y - ZoomMarkPoint.y, itVertex->x - ZoomMarkPoint.x);
 	  ++itVertex;
@@ -10714,8 +10714,8 @@ auto thred::internal::handleLeftButtonUp(float xyRatio, float rotationAngle, F_P
 	FormMoveDelta = F_POINT {wrap::toFloat(point.x) / HorizontalRatio, wrap::toFloat(point.y) / VerticalRatio};
 	if (StateMap->test(StateFlag::FPSEL)) {
 	  // clang-format off
-	  auto& form            = FormList->operator[](ClosestFormToCursor);
-	  auto        iSelectedVertex = SelectedFormVertices.start;
+	  auto&      form            = FormList->operator[](ClosestFormToCursor);
+	  auto       iSelectedVertex = SelectedFormVertices.start;
 	  auto const itVertex        = wrap::next(FormVertices->begin(), form.vertexIndex);
 	  // clang-format on
 	  for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {

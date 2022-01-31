@@ -34,40 +34,40 @@ class PESLED
 class PESHED
 {
   public:
-  char     led[8]  {};    //   0-7  Identification and version (#PES0001)         
-  uint32_t off     {};   //   8-b  Absolute PEC section byte offset
-  uint16_t hpsz    {};   //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
-  uint16_t usdn    {};   //   e,f  Use existing design area (1)
-  uint16_t blct    {};   // 10,11  CSewSeg segment block count (1)
-  uint8_t  hnd1[4] {};    // 12-15  header end (FF FF 00 00)                      
-  uint16_t celn    {};   // 16,17  Length of following string (7)
-  char     ce[7]   {};    // 18-1e  CEmbOne identification (CEmbOne)              
-  int16_t  xlft    {};    // 1f,20  Extent left
-  int16_t  xtop    {};    // 21,22  Extent top
-  int16_t  xrht    {};    // 23,24  Extent right
-  int16_t  xbot    {};    // 25,26  Extent bottom
-  int16_t  plft    {};    // 27,28  Extent left position
-  int16_t  ptop    {};    // 29,2a  Extent top position
-  int16_t  prht    {};    // 2b,2c  Extent right position
-  int16_t  pbot    {};    // 2d,2e  Extent bottom position
+  char     led[8]  {}; //   0-7  Identification and version (#PES0001)         
+  uint32_t off     {}; //   8-b  Absolute PEC section byte offset
+  uint16_t hpsz    {}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
+  uint16_t usdn    {}; //   e,f  Use existing design area (1)
+  uint16_t blct    {}; // 10,11  CSewSeg segment block count (1)
+  uint8_t  hnd1[4] {}; // 12-15  header end (FF FF 00 00)                      
+  uint16_t celn    {}; // 16,17  Length of following string (7)
+  char     ce[7]   {}; // 18-1e  CEmbOne identification (CEmbOne)              
+  int16_t  xlft    {}; // 1f,20  Extent left
+  int16_t  xtop    {}; // 21,22  Extent top
+  int16_t  xrht    {}; // 23,24  Extent right
+  int16_t  xbot    {}; // 25,26  Extent bottom
+  int16_t  plft    {}; // 27,28  Extent left position
+  int16_t  ptop    {}; // 29,2a  Extent top position
+  int16_t  prht    {}; // 2b,2c  Extent right position
+  int16_t  pbot    {}; // 2d,2e  Extent bottom position
   float    atfm1   {}; // 2f-32  Affine transform Scale X (1.0F) (00 00 80 3f)
   float    atfm2   {}; // 33-36  Affine transform Skew X (0.0F) (00 00 00 00)
   float    atfm3   {}; // 37-3a  Affine transform Skew Y (0.0F) (00 00 00 00)
   float    atfm4   {}; // 3b-3e  Affine transform Scale Y (1.0F) (00 00 80 3f)
   float    atfm5   {}; // 3f-42  Affine transform Left_Pos
   float    atfm6   {}; // 43-46  Affine transform Bottom_Pos
-  uint16_t ukn1    {};   // 47,48  unknown (1)
-  int16_t  xtrn    {};    // 49,4a  CSewSeg x coordinate translation (0)
-  int16_t  ytrn    {};    // 4b,4c  CSewSeg y coordinate translation (0)
-  int16_t  xsiz    {};    // 4d,4e  CSewSeg width
-  int16_t  ysiz    {};    // 4f,50  CSewSeg height
-  int8_t   ukn2[8] {};    // 51,58  unknown (0)                                   
-  uint16_t bcnt    {};   // 59,5a  CSewSeg block count (segments + (2*colorChanges))
-  uint8_t  hnd2[4] {};    // 5b-5e  header end (FF FF 00 00)                      
-  uint16_t cslen   {};   // 5f,60  CSewSeg length (7)
-  char     cs[7]   {};    // 61-67  CSewSeg identification (CSewSeg)              
-// uint16_t styp1;        // 68,69  Stitch type (0)
-// uint16_t scol;         // 6a,6b  Stitch Palette thread index
+  uint16_t ukn1    {}; // 47,48  unknown (1)
+  int16_t  xtrn    {}; // 49,4a  CSewSeg x coordinate translation (0)
+  int16_t  ytrn    {}; // 4b,4c  CSewSeg y coordinate translation (0)
+  int16_t  xsiz    {}; // 4d,4e  CSewSeg width
+  int16_t  ysiz    {}; // 4f,50  CSewSeg height
+  int8_t   ukn2[8] {}; // 51,58  unknown (0)                                   
+  uint16_t bcnt    {}; // 59,5a  CSewSeg block count (segments + (2*colorChanges))
+  uint8_t  hnd2[4] {}; // 5b-5e  header end (FF FF 00 00)                      
+  uint16_t cslen   {}; // 5f,60  CSewSeg length (7)
+  char     cs[7]   {}; // 61-67  CSewSeg identification (CSewSeg)              
+// uint16_t styp1;     // 68,69  Stitch type (0)
+// uint16_t scol;      // 6a,6b  Stitch Palette thread index
 
   constexpr PESHED() noexcept = default;
   // PESHED(PESHED&&) = default;
