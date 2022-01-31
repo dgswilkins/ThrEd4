@@ -67,12 +67,12 @@ auto wrap::toFloat(double invar) -> float {
 	auto const var  = gsl::narrow_cast<float>(invar);
 	auto const diff = abs(invar - gsl::narrow_cast<double>(var));
 	if (diff > 4e-5) {
-	  throw;
+	  throw std::runtime_error("conversion error above limit");
 	}
 	return var;
   }
   catch (...) { // otherwise throw
-	throw;
+	throw std::runtime_error("gsl::narrow failed in wrap:toFloat");
   }
 }
 
