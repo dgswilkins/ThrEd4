@@ -105,6 +105,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
   [[nodiscard]] inline auto istx() const noexcept -> bool;
   [[nodiscard]] inline auto isfclp() noexcept -> bool;
+  inline void               outline();
 };
 
 #pragma pack(push, 1)
@@ -441,4 +442,37 @@ inline auto FRM_HEAD::istx() const noexcept -> bool {
 	return true;
   }
   return false;
+}
+
+inline void FRM_HEAD::outline() {
+  if (vertexCount != 0U) {
+	const auto* formVertices = wrap::getFormVertices();
+	auto  itVertex  = wrap::next(formVertices->cbegin(), vertexIndex);
+	rectangle       = F_RECTANGLE {itVertex->x, itVertex->y, itVertex->x, itVertex->y};
+	for (auto iVertex = 1U; iVertex < vertexCount; ++iVertex) {
+	  ++itVertex;
+	  if (itVertex->x < rectangle.left) {
+		rectangle.left = itVertex->x;
+	  }
+	  if (itVertex->y > rectangle.top) {
+		rectangle.top = itVertex->y;
+	  }
+	  if (itVertex->x > rectangle.right) {
+		rectangle.right = itVertex->x;
+	  }
+	  if (itVertex->y < rectangle.bottom) {
+		rectangle.bottom = itVertex->y;
+	  }
+	}
+	if (rectangle.top - rectangle.bottom < MINRCT) {
+	  auto const offset = (MINRCT - (rectangle.top - rectangle.bottom)) / 2;
+	  rectangle.top += offset;
+	  rectangle.bottom -= offset;
+	}
+	if (rectangle.right - rectangle.left < MINRCT) {
+	  auto const offset = (MINRCT - (rectangle.right - rectangle.left)) / 2;
+	  rectangle.left -= offset;
+	  rectangle.right += offset;
+	}
+  }
 }
