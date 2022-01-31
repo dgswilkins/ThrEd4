@@ -366,7 +366,7 @@ namespace internal {
   auto nucseg(std::vector<CLIP_SEG> const& clipSegments,
               std::vector<LEN_INFO> const& sortedLengths,
               uint32_t&                    currentSegmentIndex) -> bool;
-  void nufpnt(uint32_t vertex, FRM_HEAD& formForInsert, F_POINT const& stitchPoint);
+  void nufpnt(uint32_t vertex, FRM_HEAD& formForInsert, F_POINT stitchPoint);
   void doTimeWindow(float rangeX, std::vector<uint32_t> const& xPoints, std::vector<uint32_t> const& xHistogram);
   void nxtrgn(std::vector<RG_SEQ>&            tempPath,
               std::vector<R_CON> const&       pathMap,

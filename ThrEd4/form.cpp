@@ -5357,7 +5357,7 @@ auto form::internal::closat(IntersectionStyles& inOutFlag) -> bool {
   return !util::closeEnough(minimumLength, BIGFLOAT);
 }
 
-void form::internal::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT const& stitchPoint) {
+void form::internal::nufpnt(uint32_t vertex, FRM_HEAD& form, F_POINT stitchPoint) {
   form::fltspac(vertex + 1U, 1U);
   ++(form.vertexCount);
   auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex + vertex + 1U);
