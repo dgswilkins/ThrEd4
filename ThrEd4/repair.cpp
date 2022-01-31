@@ -28,9 +28,7 @@
 #include "Resources/resource.h"
 #include "globals.h"
 #include "displayText.h"
-#include "form.h"
 #include "satin.h"
-#include "texture.h"
 #include "thred.h"
 #include "repair.h"
 
