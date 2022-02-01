@@ -587,7 +587,7 @@ constexpr auto MCLPF    = 1U << static_cast<uint32_t>(CLPF);
 constexpr auto MVCLPF   = 1U << static_cast<uint32_t>(VCLPF);
 constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
 constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
-constexpr auto ClipTypeMap = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
+constexpr auto CLIPTYPEMAP = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
 // edge fill types
 enum EdgeFillStyles : uint8_t {

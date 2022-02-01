@@ -3705,7 +3705,7 @@ void thred::internal::sidmsg(FRM_HEAD const& form, HWND window) {
 			--entryCount;
 		  }
 		  else {
-			if ((((1U << iEntry.value) & ClipTypeMap) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
+			if ((((1U << iEntry.value) & CLIPTYPEMAP) != 0U) && (!StateMap->test(StateFlag::WASPCDCLP))) {
 			  --entryCount;
 			}
 			else {
@@ -3750,7 +3750,7 @@ void thred::internal::sidmsg(FRM_HEAD const& form, HWND window) {
 	  case LFRMFIL: {
 		for (auto const& iEntry : FILLLIST) {
 		  if (iEntry.value != form.fillType) {
-			if (((1U << iEntry.value) & ClipTypeMap) != 0U) {
+			if (((1U << iEntry.value) & CLIPTYPEMAP) != 0U) {
 			  if (StateMap->test(StateFlag::WASPCDCLP)) {
 				dusid(iEntry, sideWindowLocation, sideWindowSize);
 			  }
@@ -6205,7 +6205,7 @@ void thred::internal::doStretch(uint32_t start, uint32_t end) {
   while (lastStitch != endStitch) {
 	if (((firstStitch->attribute & COLMSK) == (centerStitch->attribute & COLMSK)) &&
 	    ((centerStitch->attribute & COLMSK) == (lastStitch->attribute & COLMSK))) {
-	  constexpr auto FACTOR = 0.1f;
+	  constexpr auto FACTOR = 0.1F;
 	  auto const delta1 = F_POINT {centerStitch->x - firstStitch->x, centerStitch->y - firstStitch->y};
 	  auto const point  = F_POINT {lastStitch->x - delta1.x, lastStitch->y - delta1.y};
 	  auto const delta3 = F_POINT {centerStitch->x - point.x, centerStitch->y - point.y};

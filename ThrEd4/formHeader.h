@@ -412,7 +412,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
 }
 
 inline auto FRM_HEAD::isclp() const noexcept -> bool {
-  return ((1U << fillType) & ClipTypeMap) != 0;
+  return ((1U << fillType) & CLIPTYPEMAP) != 0;
 }
 
 inline auto FRM_HEAD::iseclp() const noexcept -> bool {
