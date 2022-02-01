@@ -2894,7 +2894,7 @@ void form::internal::ritseg(FRM_HEAD const&              form,
 	}
 	else {
 	  // while (iPoint < clipSegments[currentSegmentIndex].start) { // This line makes no sense. Maybe the replacement does?
-	  while (iPoint--) {
+	  while (iPoint-- != 0U) {
 		OSequence->push_back(F_POINT {clipStitchPoints[iPoint].x, clipStitchPoints[iPoint].y});
 	  }
 	}
