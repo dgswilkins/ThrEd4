@@ -29,41 +29,27 @@
 // Windows Header Files:
 
 // C RunTime Header Files
-#include <crtdbg.h> // For _ASSERTE()
 
 // Standard Libraries
 #include <string> // For std::string and std::wstring
-#include <codecvt>
 
 namespace utf {
 
 inline auto utf8ToUtf16(std::string const& utf8) -> std::wstring {
-  std::wstring utf16;
+  auto const inLength  = gsl::narrow_cast<int>(utf8.size());
+  auto const outLength = MultiByteToWideChar(CP_UTF8, 0, utf8.data(), inLength, nullptr, 0);
 
-  // handle the special case of empty input string
-  if (utf8.empty()) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-vararg)
-	_ASSERTE(utf16.empty());
-	return utf16;
-  }
-#pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
-  utf16 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.from_bytes(utf8);
-
+  std::wstring utf16(outLength, '\0');
+  MultiByteToWideChar(CP_UTF8, 0, utf8.data(), inLength, utf16.data(), outLength);
   return utf16;
 }
 
 inline auto utf16ToUtf8(std::wstring const& utf16) -> std::string {
-  std::string utf8;
+  auto const inLength  = gsl::narrow_cast<int>(utf16.size());
+  auto const outLength = WideCharToMultiByte(CP_UTF8, 0, utf16.data(), inLength, nullptr, 0, nullptr, nullptr);
 
-  if (utf16.empty()) {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-vararg)
-	_ASSERTE(utf8.empty());
-	return utf8;
-  }
-
-#pragma warning(suppress : 4996) // wstring_convert was declared deprecated in c++17
-  utf8 = std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>, wchar_t> {}.to_bytes(utf16);
-
+  std::string utf8(outLength, '\0');
+  WideCharToMultiByte(CP_UTF8, 0, utf16.data(), inLength, utf8.data(), outLength, nullptr, nullptr);
   return utf8;
 }
 
