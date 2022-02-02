@@ -106,6 +106,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto istx() const noexcept -> bool;
   [[nodiscard]] inline auto isfclp() const noexcept -> bool;
   inline void               outline();
+  inline void               squareEnd(bool flag) noexcept;
 };
 
 #pragma pack(push, 1)
@@ -474,5 +475,14 @@ inline void FRM_HEAD::outline() {
 	  rectangle.left -= offset;
 	  rectangle.right += offset;
 	}
+  }
+}
+
+inline void FRM_HEAD::squareEnd(bool flag) noexcept {
+  if (flag) {
+	extendedAttribute |= AT_SQR;
+  }
+  else {
+	extendedAttribute &= ~(AT_SQR);
   }
 }

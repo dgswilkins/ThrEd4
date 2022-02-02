@@ -65,15 +65,6 @@ auto form::internal::fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& poi
   return false;
 }
 
-void form::dusqr(FRM_HEAD& form) {
-  if (UserFlagMap->test(UserFlag::SQRFIL)) {
-	form.extendedAttribute |= AT_SQR;
-  }
-  else {
-	form.extendedAttribute &= ~(AT_SQR);
-  }
-}
-
 auto form::chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool {
   if ((arg0 & MAXMSK) != 0U) {
 	return true;
@@ -4980,7 +4971,7 @@ void form::internal::fsvrt() {
   form.fillType    = VRTF;
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
-  form::dusqr(form);
+  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
   form::refilfn();
 }
 
@@ -5021,7 +5012,7 @@ void form::internal::fshor(FRM_HEAD& form) {
   form.fillSpacing = LineSpacing;
   form::fsizpar(form);
   form.angleOrClipData.angle = PI_FHALF;
-  form::dusqr(form);
+  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
   form::refil();
 }
 
@@ -5061,7 +5052,7 @@ void form::internal::fsangl(FRM_HEAD& form) {
   form.angleOrClipData.angle = IniFile.fillAngle;
   form.fillSpacing           = LineSpacing;
   form::fsizpar(form);
-  form::dusqr(form);
+  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
   form::refil();
 }
 
@@ -7248,8 +7239,8 @@ void form::internal::cplayfn(uint32_t iForm, uint32_t layer) {
   currentForm.attribute &= NFRMLMSK;
   currentForm.attribute |= layer << FLAYSHFT;
   currentForm.extendedAttribute = 0;
+  currentForm.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
   FormList->push_back(currentForm);
-  form::dusqr(currentForm);
 }
 
 void form::cpylayr(uint32_t layer) {
