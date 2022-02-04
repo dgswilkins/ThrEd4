@@ -11,6 +11,9 @@
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
+// Standard Libraries
+#include <numeric>
+
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)

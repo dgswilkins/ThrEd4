@@ -14,6 +14,7 @@
 
 // Standard Libraries
 #include <limits>
+#include <numeric>
 
 // Open Source headers
 #pragma warning(push)
@@ -5343,7 +5344,7 @@ auto form::internal::closat(IntersectionStyles& inOutFlag) -> bool {
 	  }
 	}
 	else {
-	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", inOutFlag);
+	  outDebugString(L"closat: Form Has no vertices!\n inOutFlag[{}]", gsl::narrow_cast<int>(inOutFlag));
 	}
   }
   return !util::closeEnough(minimumLength, BIGFLOAT);
