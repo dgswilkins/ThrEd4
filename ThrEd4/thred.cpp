@@ -12873,10 +12873,11 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
+	  auto idx  = gsl::narrow_cast<int32_t>(VerticalIndex);
+	  auto iStr = THREAD_SIZES.begin();
 	  std::generate(ChangeThreadSizeWin.begin(),
 	                ChangeThreadSizeWin.end(),
-	                [idx  = gsl::narrow_cast<int32_t>(VerticalIndex),
-	                 iStr = THREAD_SIZES.begin()]() mutable noexcept -> HWND {
+	                [&idx, &iStr]() mutable noexcept -> HWND {
 		              // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		              return CreateWindow(L"STATIC",
 		                                  *(iStr++),
@@ -16495,7 +16496,8 @@ void thred::internal::init() {
   nuRct();
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  std::generate(BoxPen.begin(), BoxPen.end(), [bc = BOX_COLOR.begin()]() mutable noexcept -> HPEN {
+  auto bc = BOX_COLOR.begin();
+  std::generate(BoxPen.begin(), BoxPen.end(), [&bc]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(bc++));
   });
   LinePen        = wrap::createPen(PS_SOLID, PENNWID, PENCHCL);
