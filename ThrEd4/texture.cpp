@@ -823,7 +823,7 @@ void texture::internal::txtclp(FRM_HEAD& textureForm) {
 		if (nullptr != clipForm) {
 		  textureForm           = *clipForm;
 		  auto*      vertices   = convertFromPtr<F_POINT*>(&clipForm[1]);
-		  auto const spVertices = gsl::make_span(vertices, textureForm.vertexCount);
+		  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
 		  textureForm.vertexIndex = 0;

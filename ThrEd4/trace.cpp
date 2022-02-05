@@ -812,7 +812,7 @@ void trace::trinit() {
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color     = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto       highColor = color;
-		auto const spTBD     = gsl::make_span(
+		auto const spTBD     = gsl::span(
             TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		auto const pixel = std::find_if(
 		    spTBD.begin(), spTBD.end(), [color](uint32_t const& m) -> bool { return m != color; });
@@ -830,7 +830,7 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto const spTBD = gsl::make_span(
+		auto const spTBD = gsl::span(
 		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto const pixel : spTBD) {
 		  ti::trcols(pixel);

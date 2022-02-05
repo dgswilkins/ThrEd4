@@ -407,7 +407,7 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 	++ipixelOutline;
   }
   wrap::polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
-  auto const sp = gsl::make_span(pixelOutline);
+  auto const sp = gsl::span {pixelOutline};
   // drawing the boxes on corners and sides, so don't overwrite the first box which will "erase" it
   auto const subsp = sp.subspan(0, sp.size() - 1);
   for (auto const& controlPoint : subsp) {

@@ -923,7 +923,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		// dstHeader fields are fixed width, so use strncpy in its intended way.
 		// Use sizeof to ensure no overrun if the format string is wrong length
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
-		auto const spDstHdrDesc = gsl::make_span(dstHeader.desc);
+		auto const spDstHdrDesc = gsl::span {dstHeader.desc};
 		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
 		auto convAuxName = utf::utf16ToUtf8(*auxName);
 		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {

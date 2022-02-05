@@ -662,7 +662,7 @@ auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		pecBuffer.reserve(pecSize);
 		pecBuffer.resize(sizeof(PECHDR) + sizeof(PECHDR2));
 		auto*      pecHeader = convertFromPtr<PECHDR*>(pecBuffer.data());
-		auto const spPHL     = gsl::make_span(pecHeader->label);
+		auto const spPHL     = gsl::span {pecHeader->label};
 		pi::pecnam(spPHL);
 		auto fstart = std::next(pecBuffer.begin(), sizeof(pecHeader->label));
 		auto fend   = std::next(pecBuffer.begin(), sizeof(*pecHeader));
