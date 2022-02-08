@@ -3097,7 +3097,6 @@ void form::internal::clpcon(FRM_HEAD&                     form,
 	  auto  clipVerticalOffset = 0.0F;
 	  auto  lineSegmentStart   = F_POINT {}; // vertical clipboard line segment start
 	  auto  lineSegmentEnd     = F_POINT {}; // vertical clipboard line segment end
-	  auto& clipBuffer         = *ClipBuffer;
 	  auto  clipStitchCount    = wrap::toUnsigned(ClipBuffer->size());
 	  if (StateMap->test(StateFlag::TXFIL)) {
 		auto const textureLine =
@@ -3120,7 +3119,7 @@ void form::internal::clpcon(FRM_HEAD&                     form,
 		  clipVerticalOffset = wrap::toFloat(iRegion % clipGridOffset) /
 		                       (wrap::toFloat(clipGridOffset) * ClipRectSize.cy);
 		}
-		lineSegmentStart.x = pasteLocation.x + clipBuffer[0].x;
+		lineSegmentStart.x = pasteLocation.x + ClipBuffer->front().x;
 	  }
 	  lineSegmentStart.y = wrap::toFloat(clipGrid.bottom) * ClipRectSize.cy;
 	  if (clipGridOffset != 0U) {
@@ -3129,9 +3128,9 @@ void form::internal::clpcon(FRM_HEAD&                     form,
 	  }
 	  for (auto iVerticalGrid = clipGrid.bottom; iVerticalGrid < clipGrid.top; ++iVerticalGrid) {
 		pasteLocation.y = wrap::toFloat(iVerticalGrid) * ClipRectSize.cy - clipVerticalOffset;
-		if (!clipBuffer.empty()) {
-		  lineSegmentEnd.x = pasteLocation.x + clipBuffer[0].x;
-		  lineSegmentEnd.y = pasteLocation.y + clipBuffer[0].y;
+		if (!ClipBuffer->empty()) {
+		  lineSegmentEnd.x = pasteLocation.x + ClipBuffer->front().x;
+		  lineSegmentEnd.y = pasteLocation.y + ClipBuffer->front().y;
 		}
 		else {
 		  lineSegmentEnd = pasteLocation;
@@ -3146,8 +3145,8 @@ void form::internal::clpcon(FRM_HEAD&                     form,
 			++textureIt;
 		  }
 		  else {
-			lineSegmentEnd = F_POINT {pasteLocation.x + clipBuffer[iStitch].x,
-			                          pasteLocation.y + clipBuffer[iStitch].y};
+			lineSegmentEnd = F_POINT {pasteLocation.x + ClipBuffer->operator[](iStitch).x,
+			                          pasteLocation.y + ClipBuffer->operator[](iStitch).y};
 		  }
 
 		  clipStitchPoints.push_back(CLIP_PNT {lineSegmentStart.x, lineSegmentStart.y, 0, 0});
