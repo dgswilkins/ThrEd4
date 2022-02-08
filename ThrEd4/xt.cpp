@@ -617,12 +617,11 @@ void xt::internal::fnwlk(FRM_HEAD& form) {
 
 void xt::internal::undclp(FRM_HEAD const& form) {
   // ToDo - Is it better to initialize individually?
-  auto& clipBuffer = *ClipBuffer;
-  clipBuffer.clear();
-  clipBuffer.reserve(2);
+  ClipBuffer->clear();
+  ClipBuffer->reserve(2);
   ClipRectSize = F_LSIZ {0, form.underlayStitchLen};
-  clipBuffer.emplace_back(0.0F, 00.0F, 0U);
-  clipBuffer.emplace_back(0.0F, form.underlayStitchLen, 0U);
+  ClipBuffer->emplace_back(0.0F, 00.0F, 0U);
+  ClipBuffer->emplace_back(0.0F, form.underlayStitchLen, 0U);
 }
 
 void xt::internal::fncwlk(FRM_HEAD& form) {
