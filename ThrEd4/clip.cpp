@@ -142,17 +142,16 @@ auto clip::numclp() -> uint32_t {
 
 void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries) {
   if (!StateMap->test(StateFlag::NOCLP)) {
-	auto& clipBuffer = *ClipBuffer;
-	clipBuffer.clear();
+	ClipBuffer->clear();
 	if (clipEntries != 0U) {
-	  clipBuffer.reserve(clipEntries);
+	  ClipBuffer->reserve(clipEntries);
 	  auto itClipPoint = wrap::next(ClipPoints->begin(), clipIndex);
 	  for (auto iClip = 0U; iClip < clipEntries; ++iClip) {
-		clipBuffer.emplace_back(F_POINT_ATTR {itClipPoint->x, itClipPoint->y, 0});
+		ClipBuffer->emplace_back(F_POINT_ATTR {itClipPoint->x, itClipPoint->y, 0});
 		++itClipPoint;
 	  }
-	  clipRect.left = clipRect.right = clipBuffer[0].x;
-	  clipRect.bottom = clipRect.top = clipBuffer[0].y;
+	  clipRect.left = clipRect.right = ClipBuffer->front().x;
+	  clipRect.bottom = clipRect.top = ClipBuffer->front().y;
 	  for (auto const& clip : *ClipBuffer) {
 		if (clip.x < clipRect.left) {
 		  clipRect.left = clip.x;
@@ -622,14 +621,12 @@ void clip::internal::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F
   ci::dulast(chainEndPoints);
   if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot      = ClipRectSize.cy / 2;
-	auto&      clipBuffer = *ClipBuffer;
-	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
+	std::transform(ClipBuffer->begin(), ClipBuffer->end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});
   }
   else {
-	auto& clipBuffer = *ClipBuffer;
-	std::transform(clipBuffer.begin(), clipBuffer.end(), std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+	std::transform(ClipBuffer->begin(), ClipBuffer->end(), std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y)};
 	});
   }
