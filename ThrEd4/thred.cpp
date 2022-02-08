@@ -6910,52 +6910,52 @@ void thred::redclp() {
 	auto const  clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
 	auto const  clipSize         = clipStitchPtr[0].led;
 	auto const  spClipStitchData = gsl::span {clipStitchPtr, clipSize};
-	auto&       clipBuffer       = *ClipBuffer;
-	clipBuffer.clear();
-	clipBuffer.reserve(clipSize);
-	clipBuffer.emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
+	ClipBuffer->clear();
+	ClipBuffer->reserve(clipSize);
+	ClipBuffer->emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
 	                        wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
 	                        0U);
 
 #if CLPBUG
 	OutputDebugString(fmt::format(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n",
-	                              clipBuffer.back().x,
-	                              clipBuffer.back().y)
+	                              ClipBuffer->back().x,
+	                              ClipBuffer->back().y)
 	                      .c_str());
 #endif
-	auto clipRect = F_RECTANGLE {clipBuffer[0].x, clipBuffer[0].y, clipBuffer[0].x, clipBuffer[0].y};
+	auto clipRect = F_RECTANGLE {
+	    ClipBuffer->front().x, ClipBuffer->front().y, ClipBuffer->front().x, ClipBuffer->front().y};
 	auto iCSD     = std::next(spClipStitchData.begin());
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
-	  clipBuffer.emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
+	  ClipBuffer->emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
 	                          wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
 	                          (iCSD->led & COLMSK) | codedLayer);
 
 #if CLPBUG
 	  OutputDebugString(fmt::format(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n",
 	                                iStitch,
-	                                clipBuffer.back().x,
-	                                clipBuffer.back().y)
+	                                ClipBuffer->back().x,
+	                                ClipBuffer->back().y)
 	                        .c_str());
 #endif
-	  if (clipBuffer.back().x < clipRect.left) {
-		clipRect.left = clipBuffer.back().x;
+	  if (ClipBuffer->back().x < clipRect.left) {
+		clipRect.left = ClipBuffer->back().x;
 	  }
-	  if (clipBuffer.back().x > clipRect.right) {
-		clipRect.right = clipBuffer.back().x;
+	  if (ClipBuffer->back().x > clipRect.right) {
+		clipRect.right = ClipBuffer->back().x;
 	  }
-	  if (clipBuffer.back().y < clipRect.bottom) {
-		clipRect.bottom = clipBuffer.back().y;
+	  if (ClipBuffer->back().y < clipRect.bottom) {
+		clipRect.bottom = ClipBuffer->back().y;
 	  }
-	  if (clipBuffer.back().y > clipRect.top) {
-		clipRect.top = clipBuffer.back().y;
+	  if (ClipBuffer->back().y > clipRect.top) {
+		clipRect.top = ClipBuffer->back().y;
 	  }
 	  ++iCSD;
 	}
-	clipBuffer.front().attribute = ActiveColor | codedLayer;
+	ClipBuffer->front().attribute = ActiveColor | codedLayer;
 	ClipRectSize                 = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
 	GlobalUnlock(ClipMemory);
 	if ((clipRect.left != 0.0F) || (clipRect.bottom != 0.0F)) {
-	  for (auto& clip : clipBuffer) {
+	  for (auto& clip : *ClipBuffer) {
 		clip.x -= clipRect.left;
 		clip.y -= clipRect.bottom;
 	  }
