@@ -594,20 +594,19 @@ void form::drwfrm() {
 		  fi::frmpoly(&(FormLines->operator[](lastPoint)), form.vertexCount + 1 - lastPoint);
 		}
 		if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
-		  auto& formLines = *FormLines;
 		  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
 			if (iVertex == ClosestVertexToCursor) {
-			  fi::frmx(formLines[iVertex], StitchWindowMemDC);
+			  fi::frmx(FormLines->operator[](iVertex), StitchWindowMemDC);
 			}
 			else {
 			  fi::frmsqr(form.vertexIndex, iVertex);
 			}
 		  }
 		  if (ClosestVertexToCursor != 0U) {
-			fi::frmsqr0(formLines[0]);
+			fi::frmsqr0(FormLines->front());
 		  }
 		  else {
-			fi::frmx(formLines[0], StitchWindowMemDC);
+			fi::frmx(FormLines->front(), StitchWindowMemDC);
 		  }
 		  displayText::ritnum(IDS_NUMPNT, ClosestVertexToCursor);
 		}
