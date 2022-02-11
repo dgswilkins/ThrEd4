@@ -4319,8 +4319,7 @@ auto thred::internal::readTHRFile(std::filesystem::path const& newFileName) -> b
 	  auto clipOffset   = 0U;
 	  auto vertexOffset = 0U;
 	  auto guideOffset  = 0U;
-	  for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		auto& form       = FormList->operator[](iForm);
+	  for (auto& form : *FormList) {
 		form.vertexIndex = vertexOffset;
 		vertexOffset += form.vertexCount;
 		if (form.type == SAT) {
