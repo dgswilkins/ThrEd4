@@ -1,22 +1,14 @@
 //  ReSharper disable CppDeprecatedEntity CppClangTidyClangDiagnosticDeprecatedDeclarations
-////////////////////////////////////////////////////////////////////////////////
-//
-// This header file defines a couple of C++ functions to convert between
-// UTF-8 and UTF-16 Unicode encodings.
-// see https://en.cppreference.com/w/cpp/locale/codecvt_utf8_utf16 for reference code
-//
-// Function implementations are inline, so this module can be reused in
-// C++ projects just by #including this header file.
-//
-// std::string is used to store UTF-8-encoded strings.
-// std::wstring is used to store UTF-16-encoded strings.
-//
-// Note that std::wstring is non-portable, as wchar_t's size is non-portable
-// (e.g. 16 bits on Win32/Visual C++, 32 bits on Linux/GCC).
-//
-////////////////////////////////////////////////////////////////////////////////
-
 #pragma once
+
+// Local Headers
+#include "warnings.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <gsl/gsl>
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -27,8 +19,7 @@
 #endif
 
 // Windows Header Files:
-
-// C RunTime Header Files
+#include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
 #include <string> // For std::string and std::wstring
