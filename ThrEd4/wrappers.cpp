@@ -1,24 +1,6 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-#include <iostream>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <gsl/gsl>
-#pragma warning(pop)
-
 // Local Headers
+#include "stdafx.h"
+#include "switches.h"
 #include "globals.h"
 #include "wrappers.h"
 

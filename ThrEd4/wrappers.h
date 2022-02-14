@@ -1,5 +1,14 @@
 #pragma once
 
+// Local Headers
+#include "pointHeader.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <gsl/gsl>
+#pragma warning(pop)
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -11,14 +20,9 @@
 // Windows Header Files:
 #include <Windows.h> // Win32 Platform SDK main header
 
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <gsl/gsl>
-#pragma warning(pop)
-
-// Local Headers
-#include "pointHeader.h"
+// Standard Libraries
+#include <vector>
+#include <cmath>
 
 namespace wrap {
 
