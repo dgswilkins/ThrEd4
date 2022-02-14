@@ -21,7 +21,7 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
-#include <float.h>
+#include <cfloat>
 #include <cstdint>
 
 namespace util {
