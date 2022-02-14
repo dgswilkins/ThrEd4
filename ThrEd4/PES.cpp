@@ -1,33 +1,13 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
-#ifdef ALLOCFAILURE
-//#include <new.h>
-#endif
-
-// Standard Libraries
-
-// Open Source headers
-
 // Local Headers
+#include "stdafx.h"
 #include "switches.h"
-#if PESACT
-
-#include "Resources/resource.h"
-#include "globals.h"
 #include "displayText.h"
-#include "thred.h"
+#include "globals.h"
 #include "PES.h"
+#include "thred.h"
+#include "utf8conv.h"
+
+#if PESACT
 
 namespace pi = PES::internal;
 
@@ -360,7 +340,7 @@ auto PES::internal::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
   return matchIndex;
 }
 
-auto PES::readPESFile(std::filesystem::path const& newFileName) -> bool {
+auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto fileSize = uintmax_t {};
   if (!thred::getFileSize(newFileName, fileSize)) {
 	return false;

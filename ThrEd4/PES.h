@@ -1,5 +1,8 @@
 #pragma once
-#include "stdafx.h"
+
+// Local Headers
+#include "pointHeader.h"
+#include "switches.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -8,6 +11,17 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// Standard Libraries
+#include <array>
+#include <cstdint>
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
 
 #ifdef PESACT
 
@@ -150,7 +164,7 @@ class PECHDR2
 #pragma pack(pop)
 
 namespace PES { // NOLINT(readability-identifier-naming)
-auto readPESFile(std::filesystem::path const& newFileName) -> bool;
+auto readPESFile(fs::path const& newFileName) -> bool;
 auto savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 namespace internal {
   auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
