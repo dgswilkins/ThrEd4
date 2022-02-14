@@ -167,6 +167,9 @@
     <ClInclude Include="fAngClpHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fLenCountHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">

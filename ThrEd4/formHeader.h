@@ -7,6 +7,7 @@
 
 // Local Headers
 #include "fAngClpHeader.h"
+#include "fLenCountHeader.h"
 #include "ThrEdTypes.h"
 
 #pragma pack(push, 1)
