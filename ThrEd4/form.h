@@ -1,18 +1,8 @@
 #pragma once
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <vector>
+// Local Headers
+#include "formHeader.h"
+#include "warnings.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -21,9 +11,6 @@
 #pragma warning(disable : 26814)
 #include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
-
-// Local Headers
-#include "ThrEdTypes.h"
 
 namespace form {
 
