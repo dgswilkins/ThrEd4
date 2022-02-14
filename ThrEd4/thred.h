@@ -1,12 +1,11 @@
 #pragma once
 
 // Local Headers
+#include "switches.h"
 #include "clipStitchHeader.h"
 #include "formHeader.h"
 #include "fRectangleHeader.h"
 #include "pointHeader.h"
-#include "switches.h"
-#include "warnings.h"
 
 // Open Source headers
 #pragma warning(push)

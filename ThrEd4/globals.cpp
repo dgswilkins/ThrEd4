@@ -1,6 +1,5 @@
 // Local Headers
 #include "stdafx.h"
-#include "switches.h"
 #include "globals.h"
 
 // clang-format off

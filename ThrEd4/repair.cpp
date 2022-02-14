@@ -1,6 +1,5 @@
 // Local Headers
 #include "stdafx.h"
-#include "switches.h"
 #include "displayText.h"
 #include "globals.h"
 #include "repair.h"

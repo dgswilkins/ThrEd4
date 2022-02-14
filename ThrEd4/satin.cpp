@@ -1,6 +1,5 @@
 // Local Headers
 #include "stdafx.h"
-#include "switches.h"
 #include "clip.h"
 #include "displayText.h"
 #include "ExtendedBitSet.h"

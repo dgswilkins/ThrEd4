@@ -1,7 +1,6 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 // Local Headers
 #include "stdafx.h"
-#include "switches.h"
 #include "clip.h"
 #include "clipboardHeader.h"
 #include "displayText.h"

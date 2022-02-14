@@ -2,7 +2,6 @@
 
 // Local Headers
 #include "textureHeader.h"
-#include "warnings.h"
 
 // Open Source headers
 #pragma warning(push)

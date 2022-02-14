@@ -3,7 +3,6 @@
 
 // Local Headers
 #include "Resources\resource.h"
-#include "warnings.h"
 #include "pointHeader.h"
 
 // Open Source headers
