@@ -1,5 +1,8 @@
 #pragma once
 
+// Local Headers
+#include "formHeader.h"
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -7,6 +10,16 @@
 #ifndef NOMINMAX
 #define NOMINMAX
 #endif
+
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// Standard Libraries
+#include <cstdint>
+#include <filesystem>
+#include <vector>
+
+namespace fs = std::filesystem;
 
 namespace bitmap {
 void assignUBFilename(fs::path const& directory);

@@ -1,4 +1,13 @@
+// Local Headers
 #include "stdafx.h"
+#include "switches.h"
+#include "bitmap.h"
+#include "displayText.h"
+#include "globals.h"
+#include "thred.h"
+#include "trace.h"
+#include "utf8conv.h"
+
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -8,13 +17,14 @@
 #define NOMINMAX
 #endif
 
-// Local Headers
-#include "Resources/resource.h"
-#include "globals.h"
-#include "displayText.h"
-#include "trace.h"
-#include "thred.h"
-#include "bitmap.h"
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// C RunTime Header Files
+#include <commdlg.h>
+
+// Standard Libraries
+#include <vector>
 
 namespace bi = bitmap::internal;
 
