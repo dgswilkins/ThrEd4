@@ -1,5 +1,14 @@
 #pragma once
 
+// Local Headers
+#include "warnings.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include <gsl/gsl>
+#pragma warning(pop)
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -12,16 +21,8 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
+#include <float.h>
 #include <cstdint>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <gsl/gsl>
-#pragma warning(pop)
-
-// Local Headers
-//#include "ThrEdTypes.h"
 
 namespace util {
 auto constexpr closeEnough(float f1, float f2) -> bool {
