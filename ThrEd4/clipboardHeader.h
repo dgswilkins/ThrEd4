@@ -1,12 +1,10 @@
 #pragma once
 
-// Standard Libraries
-#include <cstdint>
-
-// Open Source headers
-
 // Local Headers
 #include "formHeader.h"
+
+// Standard Libraries
+#include <cstdint>
 
 #pragma pack(push, 1)
 
