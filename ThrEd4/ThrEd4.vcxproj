@@ -69,6 +69,7 @@
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="satConHeader.h" />
     <ClInclude Include="satin.h" />
+    <ClInclude Include="satinHeader.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="switches.h" />
     <ClInclude Include="texture.h" />

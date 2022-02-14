@@ -1193,60 +1193,6 @@ class FORM_INFO
   //~FORM_INFO() = default;
 };
 
-union SATINANGLEOUT;
-
-union SATINANGLE {
-  public:
-  uint32_t guide {};
-  float    angle;
-
-  SATINANGLE() noexcept = default;
-  // SATINANGLE(SATINANGLE const&) = default;
-  // SATINANGLE(SATINANGLE&&) = default;
-  // SATINANGLE& operator=(SATINANGLE const& rhs) = default;
-  // SATINANGLE& operator=(SATINANGLE&&) = default;
-  //~SATINANGLE() = default;
-
-  explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
-  inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
-};
-
-#pragma pack(push, 1)
-union SATINANGLEOUT {
-  public:
-  DWORD guide {};
-  float angle;
-
-  SATINANGLEOUT() noexcept = default;
-  // SATINANGLEOUT(SATINANGLEOUT const&) = default;
-  // SATINANGLEOUT(SATINANGLEOUT&&) = default;
-  // SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
-  // SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
-  //~SATINANGLEOUT() = default;
-
-  explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
-  inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
-};
-#pragma pack(pop)
-
-inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept : angle(rhs.angle) {
-}
-
-inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT& {
-  angle = rhs.angle;
-
-  return *this;
-}
-
-inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept : angle(rhs.angle) {
-}
-
-inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
-  angle = rhs.angle;
-
-  return *this;
-}
-
 /*
 fill	edgeStitchLen	edgeSpacing	borderSize	clipCount	picspac		crnrsiz		brdend
 
