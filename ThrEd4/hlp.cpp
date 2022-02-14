@@ -1,25 +1,13 @@
+// Local Headers
 #include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+#include "switches.h"
+#include "displayText.h"
+#include "globals.h"
+#include "hlp.h"
+#include "thred.h"
 
 // Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
 #include <HtmlHelp.h>
-
-// Open Source headers
-
-// Local Headers
-#include "Resources/resource.h"
-#include "globals.h"
-#include "displayText.h"
-#include "thred.h"
-#include "hlp.h"
 
 void hlp::help() {
   auto const* homeDir = thred::getHomeDir();
