@@ -1,19 +1,12 @@
 #pragma once
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <filesystem>
-#include <vector>
+// Local Headers
+#include "clipStitchHeader.h"
+#include "formHeader.h"
+#include "fRectangleHeader.h"
+#include "pointHeader.h"
+#include "switches.h"
+#include "warnings.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -23,9 +16,9 @@
 #include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
 
-// Local Headers
-#include "switches.h"
-#include "ThrEdTypes.h"
+// Standard Libraries
+#include <filesystem>
+#include <vector>
 
 namespace fs = std::filesystem;
 
