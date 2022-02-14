@@ -60,6 +60,7 @@
 #pragma warning(pop)
 
 // Local Headers
+#include "clipStitchHeader.h"
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 #include "formHeader.h"

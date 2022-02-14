@@ -158,6 +158,9 @@
     <ClInclude Include="pointHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="clipStitchHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
