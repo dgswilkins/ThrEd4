@@ -1,36 +1,11 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-//#include <string>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#include <boost/dynamic_bitset.hpp>
-#include <fmt/xchar.h>
-#pragma warning(pop)
-
 // Local Headers
-#include "Resources/resource.h"
-#include "globals.h"
+#include "stdafx.h"
+#include "switches.h"
 #include "displayText.h"
+#include "globals.h"
+#include "repair.h"
 #include "satin.h"
 #include "thred.h"
-#include "repair.h"
 
 namespace ri = repair::internal;
 
@@ -429,7 +404,7 @@ void repair::repar() {
   displayText::shoMsg(repairMessage);
 }
 
-void repair::internal::datmsg(uint32_t code) {
+void ri::datmsg(uint32_t code) {
   auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
   switch (code) {
 	case BADFLT:

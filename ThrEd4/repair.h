@@ -1,11 +1,11 @@
 #pragma once
 
+// Local Headers
+#include "formHeader.h"
+#include "repairHeader.h"
+
 // Standard Libraries
 #include <string>
-
-// Local Headers
-#include "ThrEdTypes.h"
-#include "repairHeader.h"
 
 namespace repair {
 void frmchkx();
