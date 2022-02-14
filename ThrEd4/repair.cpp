@@ -429,13 +429,34 @@ void repair::repar() {
   displayText::shoMsg(repairMessage);
 }
 
+void repair::internal::datmsg(uint32_t code) {
+  auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
+  switch (code) {
+	case BADFLT:
+	  dataErrorID = IDS_BADFLT;
+	  break;
+	case BADCLP:
+	  dataErrorID = IDS_BADCLP;
+	  break;
+	case BADSAT:
+	  dataErrorID = IDS_BADSAT;
+	  break;
+	case BADTX:
+	  dataErrorID = IDS_BADTX;
+	  break;
+	default:
+	  break;
+  }
+  displayText::shoMsg(displayText::loadStr(dataErrorID));
+}
+
 void repair::frmchkx() {
   if (IniFile.dataCheck != 0U) {
 	auto const code = ri::frmchkfn();
 	switch (IniFile.dataCheck) {
 	  case 1: {
 		if (code != 0U) {
-		  displayText::datmsg(code);
+		  ri::datmsg(code);
 		}
 		break;
 	  }

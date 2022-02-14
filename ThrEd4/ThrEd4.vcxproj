@@ -65,6 +65,7 @@
     <ClInclude Include="pointHeader.h" />
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
+    <ClInclude Include="repairHeader.h" />
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="satConHeader.h" />
     <ClInclude Include="satin.h" />

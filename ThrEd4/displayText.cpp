@@ -272,27 +272,6 @@ void displayText::spltmsg() {
   displayText::shoseln(IDS_FRMGUID, IDS_SPLT);
 }
 
-void displayText::datmsg(uint32_t code) {
-  auto dataErrorID = wrap::toUnsigned(IDS_BADUKN);
-  switch (code) {
-	case BADFLT:
-	  dataErrorID = IDS_BADFLT;
-	  break;
-	case BADCLP:
-	  dataErrorID = IDS_BADCLP;
-	  break;
-	case BADSAT:
-	  dataErrorID = IDS_BADSAT;
-	  break;
-	case BADTX:
-	  dataErrorID = IDS_BADTX;
-	  break;
-	default:
-	  break;
-  }
-  displayText::shoMsg(displayText::loadStr(dataErrorID));
-}
-
 void displayText::okcan() {
   GetClientRect(MsgWindow, &MsgRect);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)

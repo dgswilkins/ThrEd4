@@ -5,6 +5,7 @@
 
 // Local Headers
 #include "ThrEdTypes.h"
+#include "repairHeader.h"
 
 namespace repair {
 void frmchkx();
@@ -20,6 +21,7 @@ namespace internal {
   void chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
   void chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
   void chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+  void datmsg(uint32_t code);
   auto frmchkfn() -> uint32_t;
   void repclp(std::wstring& repairMessage);
   void repflt(std::wstring& repairMessage);
