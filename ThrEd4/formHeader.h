@@ -6,6 +6,7 @@
 // Open Source headers
 
 // Local Headers
+#include "fAngClpHeader.h"
 #include "ThrEdTypes.h"
 
 #pragma pack(push, 1)

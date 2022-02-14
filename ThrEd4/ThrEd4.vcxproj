@@ -52,6 +52,7 @@
     <ClInclude Include="DST.h" />
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />
+    <ClInclude Include="fAngClpHeader.h" />
     <ClInclude Include="form.h" />
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
@@ -63,6 +64,7 @@
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
     <ClInclude Include="Resources\resource.h" />
+    <ClInclude Include="satConHeader.h" />
     <ClInclude Include="satin.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="switches.h" />
