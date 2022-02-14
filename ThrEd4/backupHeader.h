@@ -1,24 +1,8 @@
 #pragma once
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <cstdint>
-
-// Open Source headers
-
 // Local Headers
 #include "formHeader.h"
-#include "ThrEdTypes.h"
+#include "textureHeader.h"
 
 class BACK_HEAD // Backup header
 {
