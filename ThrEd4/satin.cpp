@@ -1,26 +1,13 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Open Source headers
-
 // Local Headers
-#include "Resources/resource.h"
-#include "globals.h"
+#include "stdafx.h"
+#include "switches.h"
 #include "clip.h"
 #include "displayText.h"
+#include "ExtendedBitSet.h"
 #include "form.h"
-#include "thred.h"
+#include "globals.h"
 #include "satin.h"
+#include "thred.h"
 
 namespace si = satin::internal;
 
