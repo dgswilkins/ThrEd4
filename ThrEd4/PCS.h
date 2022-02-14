@@ -1,13 +1,12 @@
 #pragma once
-#include "stdafx.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
+// Local Headers
+#include "fRectangleHeader.h"
+#include "pointHeader.h"
 
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
+// Standard Libraries
+#include <filesystem>
+#include <vector>
 
 namespace fs = std::filesystem;
 
