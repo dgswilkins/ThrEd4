@@ -185,6 +185,9 @@
     <ClInclude Include="tracePointHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="txtrFthrInfoHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">

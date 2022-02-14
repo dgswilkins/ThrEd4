@@ -650,10 +650,10 @@ class LIST_TYPE
   uint8_t  value {};    // value index
 
   // LIST_TYPE() noexcept = default;
-  // LIST_TYPE(FTHR_INFO const&) = default;
-  // LIST_TYPE(FTHR_INFO&&) = default;
-  // LIST_TYPE& operator=(FTHR_INFO const& rhs) = default;
-  // LIST_TYPE& operator=(FTHR_INFO&&) = default;
+  // LIST_TYPE(LIST_TYPE const&) = default;
+  // LIST_TYPE(LIST_TYPE&&) = default;
+  // LIST_TYPE& operator=(LIST_TYPE const& rhs) = default;
+  // LIST_TYPE& operator=(LIST_TYPE&&) = default;
   //~LIST_TYPE() = default;
 };
 
@@ -1240,58 +1240,6 @@ constexpr auto EGPRP_LINS = 6U;
 constexpr auto EGHOL_LINS = 7U;
 constexpr auto EGPIC_LINS = 7U;
 constexpr auto EGCHN_LINS = 6U;
-
-#pragma pack(push, 1)
-class FTHR_INFO
-{
-  public:
-  uint8_t  fillType {};      // feather fill type
-  uint8_t  upCount {};       // feather up count
-  uint8_t  downCount {};     // feather down count
-  uint8_t  color {};         // feather blend color
-  float    ratio {};         // feather ratio
-  float    minStitchSize {}; // feather floor
-  uint16_t count {};         // feather fill psg granularity
-
-  // FTHR_INFO() noexcept = default;
-  // FTHR_INFO(FTHR_INFO const&) = default;
-  // FTHR_INFO(FTHR_INFO&&) = default;
-  // FTHR_INFO& operator=(FTHR_INFO const& rhs) = default;
-  // FTHR_INFO& operator=(FTHR_INFO&&) = default;
-  //~FTHR_INFO() = default;
-};
-#pragma pack(pop)
-#pragma pack(push, 1)
-class TXTR_INFO
-{
-  public:
-  int16_t  lines {};
-  uint16_t index {};
-  uint16_t count {};
-  float    height {};
-
-  // TXTR_INFO() noexcept = default;
-  // TXTR_INFO(TXTR_INFO const&) = default;
-  // TXTR_INFO(TXTR_INFO&&) = default;
-  // TXTR_INFO& operator=(TXTR_INFO const& rhs) = default;
-  // TXTR_INFO& operator=(TXTR_INFO&&) = default;
-  //~TXTR_INFO() = default;
-};
-#pragma pack(pop)
-#pragma pack(push, 1)
-union TF_INFO {
-  public:
-  FTHR_INFO feather;
-  TXTR_INFO texture {};
-
-  // TF_INFO() noexcept = default;
-  // TF_INFO(TF_INFO const&) = default;
-  // TF_INFO(TF_INFO&&) = default;
-  // TF_INFO& operator=(TF_INFO const& rhs) = default;
-  // TF_INFO& operator=(TF_INFO&&) = default;
-  //~TF_INFO() = default;
-};
-#pragma pack(pop)
 
 /*form attribute bits
 

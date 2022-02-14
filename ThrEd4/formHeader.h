@@ -11,6 +11,7 @@
 #include "fRectangleHeader.h"
 #include "satinHeader.h"
 #include "ThrEdTypes.h"
+#include "txtrFthrInfoHeader.h"
 
 #pragma pack(push, 1)
 class FRM_HEAD_O // Original form header used prior to version 2
