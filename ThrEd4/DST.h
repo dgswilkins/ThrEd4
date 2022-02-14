@@ -1,6 +1,7 @@
 #pragma once
 
-#include "stdafx.h"
+// Local Headers
+#include "pointHeader.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -10,10 +11,16 @@
 #define NOMINMAX
 #endif
 
+// Windows Header Files:
+#include <Windows.h> // Win32 Platform SDK main header
+
+// Standard Libraries
+#include <cstdint>
+#include <filesystem>
+
 namespace fs = std::filesystem;
 
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
-
 // clang-format off
 class DSTHED // dst file header
 {
@@ -90,7 +97,7 @@ class DST_OFFSETS
 
 namespace DST { // NOLINT(readability-identifier-naming)
 auto colmatch(COLORREF color) -> uint32_t;
-auto readDSTFile(std::filesystem::path const& newFileName) -> bool;
+auto readDSTFile(fs::path const& newFileName) -> bool;
 void ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, std::vector<F_POINT_ATTR> const& stitches);
 auto saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 void setColFilename(fs::path* directory) noexcept;

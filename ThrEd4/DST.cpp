@@ -1,33 +1,17 @@
+// Local Headers
 #include "stdafx.h"
+#include "switches.h"
+#include "bitmap.h"
+#include "displayText.h"
+#include "DST.h"
+#include "globals.h"
+#include "thred.h"
+#include "utf8conv.h"
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
+// Standard Libraries
 #ifdef ALLOCFAILURE
 //#include <new.h>
 #endif
-
-// Standard Libraries
-
-// Open Source headers
-
-// Local Headers
-#include "wrappers.h"
-
-#include "Resources/resource.h"
-#include "globals.h"
-#include "bitmap.h"
-#include "displayText.h"
-#include "thred.h"
-#include "DST.h"
 
 namespace di = DST::internal;
 
