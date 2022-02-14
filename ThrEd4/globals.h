@@ -64,6 +64,7 @@
 #include "ThrEdTypes.h"
 #include "EnumMap.h"
 #include "formHeader.h"
+#include "textureHeader.h"
 
 namespace fs = std::filesystem;
 

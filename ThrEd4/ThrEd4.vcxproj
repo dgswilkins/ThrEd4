@@ -73,6 +73,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="switches.h" />
     <ClInclude Include="texture.h" />
+    <ClInclude Include="textureHeader.h" />
     <ClInclude Include="thred.h" />
     <ClInclude Include="ThrEdTypes.h" />
     <ClInclude Include="trace.h" />

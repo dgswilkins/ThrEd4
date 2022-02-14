@@ -15,6 +15,7 @@
 #include <vector>
 
 // Local Headers
+#include "textureHeader.h"
 #include "ThrEdTypes.h"
 
 namespace texture {
