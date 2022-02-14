@@ -37,19 +37,12 @@
 #pragma warning(disable : 26499)    //			    Could not find any lifetime tracking information
 // clang-format on
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <filesystem>
+// Local Headers
+#include "clipStitchHeader.h"
+#include "EnumMap.h"
+#include "formHeader.h"
+#include "textureHeader.h"
+#include "fRectangleHeader.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -59,12 +52,8 @@
 #include <boost/dynamic_bitset.hpp>
 #pragma warning(pop)
 
-// Local Headers
-#include "clipStitchHeader.h"
-#include "ThrEdTypes.h"
-#include "EnumMap.h"
-#include "formHeader.h"
-#include "textureHeader.h"
+// Standard Libraries
+#include <filesystem>
 
 namespace fs = std::filesystem;
 

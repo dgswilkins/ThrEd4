@@ -1,32 +1,7 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <filesystem>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#include <boost/dynamic_bitset.hpp>
-#pragma warning(pop)
-
 // Local Headers
+#include "stdafx.h"
+#include "switches.h"
 #include "globals.h"
-#include "ThrEdTypes.h"
-#include "EnumMap.h"
-
-namespace fs = std::filesystem;
 
 // clang-format off
 uint8_t                        ActiveColor               = 0U;      // active color selector
