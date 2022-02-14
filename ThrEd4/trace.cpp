@@ -1,39 +1,15 @@
-#include "stdafx.h"
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-#include <Windows.h> // Win32 Platform SDK main header
-
-// Standard Libraries
-#include <numeric>
-
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#include <fmt/xchar.h>
-#pragma warning(pop)
-
 // Local Headers
+#include "stdafx.h"
 #include "switches.h"
-#include "wrappers.h"
-
-#include "Resources/resource.h"
-#include "globals.h"
 #include "bitmap.h"
 #include "displayText.h"
 #include "form.h"
-#include "thred.h"
+#include "globals.h"
 #include "trace.h"
+#include "thred.h"
+
+// Standard Libraries
+#include <numeric>
 
 namespace ti = trace::internal;
 
