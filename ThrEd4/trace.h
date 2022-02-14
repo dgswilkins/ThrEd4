@@ -13,6 +13,7 @@
 
 // Local Headers
 #include "switches.h"
+#include "tracePointHeader.h"
 
 namespace trace {
 
