@@ -1,6 +1,7 @@
 #pragma once
 
 // Local Headers
+//  ReSharper disable CppUnusedIncludeDirective
 #include "warnings.h"
 
 // Open Source headers
