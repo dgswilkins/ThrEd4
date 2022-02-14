@@ -1,20 +1,31 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 #pragma once
 
-// Windows Header Files:
-
-// Standard Libraries
-#include <stdexcept>
+// Local Headers
+#include "Resources\resource.h"
+#include "warnings.h"
+#include "pointHeader.h"
 
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#include <gsl/gsl>
+#include "fmt/xchar.h"
 #pragma warning(pop)
 
-// Local Headers
-#include "Resources\resource.h"
-#include "pointHeader.h"
+// C RunTime Header Files
+#include <ShlObj.h>
+
+// Windows Header Files:
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
+#endif
+
+#ifndef NOMINMAX
+#define NOMINMAX
+#endif
+
+// Windows Header Files:
+//#include <Windows.h> // Win32 Platform SDK main header
 
 #ifdef _DEBUG
 #define WIDEN2(x) L##x
@@ -1302,7 +1313,6 @@ class THR_HEAD // thred file header
   //~THR_HEAD() = default;
 };
 #pragma pack(pop)
-
 #pragma pack(push, 1)
 class THR_HEAD_EX // thred v1.0 file header extension
 {
