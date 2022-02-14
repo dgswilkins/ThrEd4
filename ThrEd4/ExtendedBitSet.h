@@ -1,5 +1,8 @@
 #pragma once
 
+// Local Headers
+#include "warnings.h"
+
 // Open Source headers
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
