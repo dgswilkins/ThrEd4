@@ -58,6 +58,7 @@
     <ClInclude Include="formForms.h" />
     <ClInclude Include="clip.h" />
     <ClInclude Include="formHeader.h" />
+    <ClInclude Include="fRectangleHeader.h" />
     <ClInclude Include="globals.h" />
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />

@@ -170,6 +170,9 @@
     <ClInclude Include="fLenCountHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="fRectangleHeader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
