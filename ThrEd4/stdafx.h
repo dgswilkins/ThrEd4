@@ -5,7 +5,42 @@
 
 #pragma once
 
-#include "targetver.h"
+#ifndef DEBUG_PCH
+
+// Local Headers
+#include "backupHeader.h"
+#include "clipboardHeader.h"
+#include "clipStitchHeader.h"
+#include "EnumMap.h"
+#include "ExtendedBitSet.h"
+#include "fAngClpHeader.h"
+#include "fLenCountHeader.h"
+#include "formHeader.h"
+#include "fRectangleHeader.h"
+#include "pointHeader.h"
+#include "repairHeader.h"
+#include "satConHeader.h"
+#include "satinHeader.h"
+#include "textureHeader.h"
+#include "ThrEdTypes.h"
+#include "tracePointHeader.h"
+#include "txtrFthrInfoHeader.h"
+#include "utf8conv.h"
+#include "warnings.h"
+#include "wrappers.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#pragma warning(disable : 4127)  // supress warning for fmt library header
+#pragma warning(disable : 6387)  // supress warning for fmt library header
+#pragma warning(disable : 26455) // supress warning for library headers
+#pragma warning(disable : 26812) // supress warning for fmt library header
+#pragma warning(disable : 26814) // supress warning for boost library header
+#include <boost/dynamic_bitset.hpp>
+#include <fmt/xchar.h>
+#include <gsl/gsl>
+#pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
@@ -26,29 +61,11 @@
 
 // Standard Libraries
 #include <bitset>
+#include <cstdint>
 #include <filesystem>
 #include <limits>
+#include <numeric>
 #include <string>
 #include <vector>
 
-// Open Source headers
-#include "warnings.h"
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 4127)  // supress warning for fmt library header
-#pragma warning(disable : 6387)  // supress warning for fmt library header
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26812) // supress warning for fmt library header
-#pragma warning(disable : 26814) // supress warning for boost library header
-#include <boost/dynamic_bitset.hpp>
-#include <fmt/xchar.h>
-#include <gsl/gsl>
-#pragma warning(pop)
-
-// Local Headers
-#include "EnumMap.h"
-#include "ExtendedBitSet.h"
-#include "utf8conv.h"
-#include "wrappers.h"
-
-#include "ThrEdTypes.h"
+#endif // DEBUG_PCH
