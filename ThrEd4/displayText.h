@@ -1,7 +1,21 @@
 #pragma once
 
 // Local Headers
-#include "ThrEdTypes.h"
+#include "textureHeader.h"
+#include "warnings.h"
+
+// Open Source headers
+#pragma warning(push)
+#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
+#include "fmt/xchar.h"
+#pragma warning(pop)
+
+// Standard Libraries
+#include <cstdint>
+#include <string>
+#include <filesystem>
+
+namespace fs = std::filesystem;
 
 namespace displayText {
 
