@@ -1,5 +1,10 @@
 #pragma once
 
+// Local Headers
+#include "formHeader.h"
+
+// Open Source headers
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -12,11 +17,8 @@
 #include <Windows.h> // Win32 Platform SDK main header
 
 // Standard Libraries
-
-// Open Source headers
-
-// Local Headers
-#include "ThrEdTypes.h"
+#include <cstdint>
+#include <string>
 
 namespace formForms {
 void dazdef();
