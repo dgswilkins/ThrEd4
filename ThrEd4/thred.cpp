@@ -6888,7 +6888,7 @@ void thred::redclp() {
   ClipPointer           = GlobalLock(ClipMemory);
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
-	auto const  clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
+	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
 	auto const  clipSize         = clipStitchPtr[0].led;
 	auto const  spClipStitchData = gsl::span {clipStitchPtr, clipSize};
 	ClipBuffer->clear();
