@@ -37,11 +37,11 @@ constexpr auto sizeofType([[maybe_unused]] std::vector<T> const* vec) -> uint32_
   return gsl::narrow<uint32_t>(sizeof(T));
 }
 
-template <class T> auto sizeofVector(std::vector<T> const& vec) noexcept -> uint32_t {
+template <class T> auto sizeofVector(std::vector<T> const& vec) -> uint32_t {
   return gsl::narrow<uint32_t>(sizeof(T) * vec.size());
 }
 
-template <class T> auto sizeofVector(std::vector<T> const* vec) noexcept -> uint32_t {
+template <class T> auto sizeofVector(std::vector<T> const* vec) -> uint32_t {
   if (nullptr != vec) {
 	return gsl::narrow<uint32_t>(sizeof(T) * vec->size());
   }
