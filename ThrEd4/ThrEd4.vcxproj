@@ -161,11 +161,13 @@
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <ExternalIncludePath>$(VcpkgRoot)\installed\x86-windows-static\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(VcpkgRoot)\installed\x86-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <ExternalIncludePath>$(VcpkgRoot)\installed\x64-windows-static\include;$(ExternalIncludePath)</ExternalIncludePath>
+    <IncludePath>$(VcpkgRoot)\installed\x64-windows-static\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
