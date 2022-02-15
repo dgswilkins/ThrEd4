@@ -473,14 +473,12 @@ void thred::internal::fnamtabs() {
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
   constexpr auto NAMELEN = NameOrder.size();
-  // cppcheck-suppress unreadVariable
   auto const designer = utf::utf16ToUtf8(designerName);
   auto       tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
   PseudoRandomValue = rsed();
-  // cppcheck-suppress unreadVariable
   auto iName = 0U;
   std::generate(
       tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
@@ -509,7 +507,6 @@ void thred::internal::ritfnam(std::wstring const& designerName) {
   auto const spCreatorName = gsl::span {ExtendedHeader->creatorName};
   for (auto const& iNameOrder : NameOrder) {
 	if (iNameOrder < NAMELEN) {
-	  // cppcheck-suppress unreadVariable
 	  spCreatorName[iNameOrder] = gsl::narrow_cast<char>(*(iTmpName++));
 	}
   }
@@ -2046,7 +2043,7 @@ void thred::unmsg() {
 }
 
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
-auto thred::internal::oldwnd(HWND window) noexcept -> bool { // cppcheck-suppress constParameter
+auto thred::internal::oldwnd(HWND window) noexcept -> bool { 
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	if (DefaultColorWin->operator[](iColor) == window ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
@@ -3146,7 +3143,6 @@ void thred::internal::dubuf(std::vector<char>& buffer) {
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
-  // cppcheck-suppress unreadVariable
   spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -5280,7 +5276,6 @@ void thred::internal::newFil() {
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
   std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
-  // cppcheck-suppress unreadVariable
   spModifierName[designer.length()] = 0;
   rstdu();
   rstAll();
@@ -7068,7 +7063,6 @@ auto thred::internal::insTHR(fs::path const& insertedFile, F_RECTANGLE& inserted
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
 	displayText::filnopn(IDS_FNOPN, insertedFile);
-	// cppcheck-suppress redundantAssignment
 	retflag = false;
   }
   else {
@@ -11115,7 +11109,6 @@ auto thred::internal::handleRightButtonDown() -> bool {
 	if (!FormList->empty() && !StateMap->test(StateFlag::FRMOF)) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  if ((Msg.wParam & MK_SHIFT) != 0U) {
-		// cppcheck-suppress variableScope
 		auto tempIndex = ClosestFormToCursor;
 		if (form::closfrm()) {
 		  // ToDo - I don't think this can ever be hit with closfrm

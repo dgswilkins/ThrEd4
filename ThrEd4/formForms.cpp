@@ -469,7 +469,6 @@ void formForms::prfsid(HWND wnd) {
 }
 
 void formForms::internal::prftwin(std::wstring const& text) noexcept {
-  // cppcheck-suppress ignoredReturnValue
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CreateWindow(L"STATIC",
                text.c_str(),

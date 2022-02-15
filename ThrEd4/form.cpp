@@ -4206,7 +4206,6 @@ void form::internal::lcon(FRM_HEAD const&              form,
 		auto gapToClosestRegion = 0.0F;
 		for (auto iNode = 0U; iNode < regionCount; ++iNode) {
 		  if (iSequence != iNode) {
-			// cppcheck-suppress variableScope
 			auto nextGroup = 0U;
 			if (auto const isConnected = regclos(
 			        groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
@@ -4222,7 +4221,6 @@ void form::internal::lcon(FRM_HEAD const&              form,
 		  count = 0;
 		  for (auto iNode = 0U; iNode < regionCount; ++iNode) {
 			if (iSequence != iNode) {
-			  // cppcheck-suppress variableScope
 			  auto nextGroup = 0U;
 			  if (auto const isConnected = regclos(
 			          groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
