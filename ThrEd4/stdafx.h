@@ -37,9 +37,9 @@
 #pragma warning(disable : 26455) // supress warning for library headers
 #pragma warning(disable : 26812) // supress warning for fmt library header
 #pragma warning(disable : 26814) // supress warning for boost library header
-#include <boost/dynamic_bitset.hpp>
-#include <fmt/xchar.h>
-#include <gsl/gsl>
+#include "boost/dynamic_bitset.hpp"
+#include "fmt/xchar.h"
+#include "gsl/gsl"
 #pragma warning(pop)
 
 #ifndef WIN32_LEAN_AND_MEAN
