@@ -18,6 +18,17 @@
 
 namespace ffi = formForms::internal;
 
+// daisy initial values
+constexpr auto DAZPETS = 5U;  // petals
+constexpr auto DAZCNT  = 10U; // petal points
+constexpr auto DAZICNT = 2U;  // petal inner points
+constexpr auto DAZLEN  = 15U; // diameter
+constexpr auto DAZPLEN = 20U; // petal length
+constexpr auto DAZHLEN = 5U;  // hole size
+constexpr auto DAZTYP  = 5U;  // border type
+constexpr auto DAZMCNT = 7U;  // mirror count
+// end of daisy initial values
+
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
@@ -610,6 +621,27 @@ void formForms::internal::chkdaz() {
   }
   if (IniFile.daisyHeartCount > gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints)) {
 	IniFile.daisyHeartCount = gsl::narrow<decltype(IniFile.daisyHeartCount)>(IniFile.daisyPetalPoints);
+  }
+}
+
+void formForms::setDaisy() {
+  if (IniFile.daisyHoleDiameter == 0.0F) {
+	IniFile.daisyHoleDiameter = DAZHLEN;
+  }
+  if (IniFile.daisyPetalPoints == 0U) {
+	IniFile.daisyPetalPoints = DAZCNT;
+  }
+  if (IniFile.daisyInnerCount == 0U) {
+	IniFile.daisyInnerCount = DAZICNT;
+  }
+  if (IniFile.daisyDiameter == 0.0F) {
+	IniFile.daisyDiameter = DAZLEN;
+  }
+  if (IniFile.daisyPetalCount == 0U) {
+	IniFile.daisyPetalCount = DAZPETS;
+  }
+  if (IniFile.daisyPetalLen == 0.0F) {
+	IniFile.daisyPetalLen = DAZPLEN;
   }
 }
 

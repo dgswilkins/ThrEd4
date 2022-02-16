@@ -29,6 +29,7 @@ void prfmsg();
 void prfsid(HWND wnd);
 void refrm();
 void setear();
+void setDaisy();
 void sidwnd(HWND wnd);
 void wavfrm();
 

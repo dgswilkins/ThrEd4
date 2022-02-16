@@ -14,18 +14,6 @@
 // C RunTime Header Files
 #include <ShlObj.h>
 
-// Windows Header Files:
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
-#endif
-
-#ifndef NOMINMAX
-#define NOMINMAX
-#endif
-
-// Windows Header Files:
-//#include <Windows.h> // Win32 Platform SDK main header
-
 #ifdef _DEBUG
 #define WIDEN2(x) L##x
 #define WIDEN(x) WIDEN2(x)
@@ -47,17 +35,6 @@ constexpr auto NAME_LEN = 50;            // Length of the name fields in ThrEd h
 constexpr auto COLORCNT = uint8_t {16U}; // Number of colors in arrays
 constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr auto SRTIM    = 20000000;                // sort time limit in 100 ns intervals
-
-// daisy codes
-constexpr auto DAZPETS = 5U;  // petals
-constexpr auto DAZCNT  = 10U; // petal points
-constexpr auto DAZICNT = 2U;  // petal inner points
-constexpr auto DAZLEN  = 15U; // diameter
-constexpr auto DAZPLEN = 20U; // petal length
-constexpr auto DAZHLEN = 5U;  // hole size
-constexpr auto DAZTYP  = 5U;  // border type
-constexpr auto DAZMCNT = 7U;  // mirror count
-// end of daisy codes
 
 constexpr float    TXTRAT   = 0.95F;       // texture fill clipboard shrink/grow ratio
 constexpr uint32_t MAXMSK   = 0xffff0000U; // for checking for greater than 65536

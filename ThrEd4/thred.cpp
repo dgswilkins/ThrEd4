@@ -16159,24 +16159,7 @@ void thred::internal::redini() {
 	  if (IniFile.featherCount == 0U) {
 		IniFile.featherCount = FDEFNUM;
 	  }
-	  if (IniFile.daisyHoleDiameter == 0.0F) {
-		IniFile.daisyHoleDiameter = DAZHLEN;
-	  }
-	  if (IniFile.daisyPetalPoints == 0U) {
-		IniFile.daisyPetalPoints = DAZCNT;
-	  }
-	  if (IniFile.daisyInnerCount == 0U) {
-		IniFile.daisyInnerCount = DAZICNT;
-	  }
-	  if (IniFile.daisyDiameter == 0.0F) {
-		IniFile.daisyDiameter = DAZLEN;
-	  }
-	  if (IniFile.daisyPetalCount == 0U) {
-		IniFile.daisyPetalCount = DAZPETS;
-	  }
-	  if (IniFile.daisyPetalLen == 0.0F) {
-		IniFile.daisyPetalLen = DAZPLEN;
-	  }
+	  formForms::setDaisy();
 	  switch (IniFile.hoopType) {
 		case SMALHUP: {
 		  IniFile.hoopSizeX = SHUPX;
