@@ -21,7 +21,6 @@
 #include <string>
 
 namespace formForms {
-void dazdef();
 void dasyfrm();
 void frmnum();
 void maxtsiz(std::wstring const& label, SIZE& textSize);
@@ -29,7 +28,6 @@ void prfmsg();
 void prfsid(HWND wnd);
 void refrm();
 void setear();
-void setDaisy();
 void sidwnd(HWND wnd);
 void wavfrm();
 

@@ -19,13 +19,6 @@ constexpr auto     COLORCNT = uint8_t {16U};           // Number of colors in ar
 constexpr auto     COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr auto     OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
 
-// wave initial values
-constexpr auto IWAVPNTS = uint16_t {36U}; // default wave points
-constexpr auto IWAVSTRT = uint16_t {10U}; // default wave start
-constexpr auto IWAVEND  = uint16_t {26U}; // default wave end
-constexpr auto IWAVS    = uint16_t {5U};  // default wave lobes
-// end of wave initial values
-
 constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 
 #pragma pack(push, 1)
@@ -130,8 +123,17 @@ class INI_FILE // ini file structure
   inline void defFeather() noexcept;
   inline void setFeather() noexcept;
   inline void initFeatherType() noexcept;
+  inline void dazdef() noexcept;
+  inline void setDaisy() noexcept;
 };
 #pragma pack(pop)
+
+// wave initial values
+constexpr auto IWAVPNTS = uint16_t {36U}; // default wave points
+constexpr auto IWAVSTRT = uint16_t {10U}; // default wave start
+constexpr auto IWAVEND  = uint16_t {26U}; // default wave end
+constexpr auto IWAVS    = uint16_t {5U};  // default wave lobes
+// end of wave initial values
 
 inline void INI_FILE::setWav() noexcept {
   if (wavePoints == 0U) {
@@ -187,4 +189,47 @@ inline void INI_FILE::defFeather() noexcept {
 
 inline void INI_FILE::initFeatherType() noexcept {
   featherFillType = FDEFTYP;
+}
+
+// daisy initial values
+constexpr auto DAZPETS = 5U;  // petals
+constexpr auto DAZCNT  = 10U; // petal points
+constexpr auto DAZICNT = 2U;  // petal inner points
+constexpr auto DAZLEN  = 15U; // diameter
+constexpr auto DAZPLEN = 20U; // petal length
+constexpr auto DAZHLEN = 5U;  // hole size
+constexpr auto DAZTYP  = 5U;  // border type
+constexpr auto DAZMCNT = 7U;  // mirror count
+// end of daisy initial values
+
+inline void INI_FILE::dazdef() noexcept {
+  daisyPetalPoints  = DAZCNT;
+  daisyHoleDiameter = DAZHLEN;
+  daisyInnerCount   = DAZICNT;
+  daisyDiameter     = DAZLEN;
+  daisyPetalCount   = DAZPETS;
+  daisyPetalLen     = DAZPLEN;
+  daisyHeartCount   = DAZMCNT;
+  daisyBorderType   = DAZTYP;
+}
+
+inline void INI_FILE::setDaisy() noexcept {
+  if (daisyHoleDiameter == 0.0F) {
+	daisyHoleDiameter = DAZHLEN;
+  }
+  if (daisyPetalPoints == 0U) {
+	daisyPetalPoints = DAZCNT;
+  }
+  if (daisyInnerCount == 0U) {
+	daisyInnerCount = DAZICNT;
+  }
+  if (daisyDiameter == 0.0F) {
+	daisyDiameter = DAZLEN;
+  }
+  if (daisyPetalCount == 0U) {
+	daisyPetalCount = DAZPETS;
+  }
+  if (daisyPetalLen == 0.0F) {
+	daisyPetalLen = DAZPLEN;
+  }
 }

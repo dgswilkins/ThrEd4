@@ -8915,7 +8915,9 @@ void thred::internal::defpref() {
                            0x009acddc};
 
   bitmap::setBmpBackColor();
-  formForms::dazdef();
+  IniFile.dazdef();
+  UserFlagMap->set(UserFlag::DAZHOL);
+  UserFlagMap->set(UserFlag::DAZD);
   AppliqueColor          = COLORCNT - 1U;
   IniFile.AppStitchLen   = APSPAC;
   BorderWidth            = BRDWID;
@@ -16123,7 +16125,7 @@ void thred::internal::redini() {
 	  }
 	  IniFile.setWav();
 	  IniFile.setFeather();
-	  formForms::setDaisy();
+	  IniFile.setDaisy();
 	  switch (IniFile.hoopType) {
 		case SMALHUP: {
 		  IniFile.hoopSizeX = SHUPX;

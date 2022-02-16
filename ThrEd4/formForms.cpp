@@ -18,17 +18,6 @@
 
 namespace ffi = formForms::internal;
 
-// daisy initial values
-constexpr auto DAZPETS = 5U;  // petals
-constexpr auto DAZCNT  = 10U; // petal points
-constexpr auto DAZICNT = 2U;  // petal inner points
-constexpr auto DAZLEN  = 15U; // diameter
-constexpr auto DAZPLEN = 20U; // petal length
-constexpr auto DAZHLEN = 5U;  // hole size
-constexpr auto DAZTYP  = 5U;  // border type
-constexpr auto DAZMCNT = 7U;  // mirror count
-// end of daisy initial values
-
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
@@ -624,40 +613,6 @@ void formForms::internal::chkdaz() {
   }
 }
 
-void formForms::setDaisy() {
-  if (IniFile.daisyHoleDiameter == 0.0F) {
-	IniFile.daisyHoleDiameter = DAZHLEN;
-  }
-  if (IniFile.daisyPetalPoints == 0U) {
-	IniFile.daisyPetalPoints = DAZCNT;
-  }
-  if (IniFile.daisyInnerCount == 0U) {
-	IniFile.daisyInnerCount = DAZICNT;
-  }
-  if (IniFile.daisyDiameter == 0.0F) {
-	IniFile.daisyDiameter = DAZLEN;
-  }
-  if (IniFile.daisyPetalCount == 0U) {
-	IniFile.daisyPetalCount = DAZPETS;
-  }
-  if (IniFile.daisyPetalLen == 0.0F) {
-	IniFile.daisyPetalLen = DAZPLEN;
-  }
-}
-
-void formForms::dazdef() {
-  IniFile.daisyPetalPoints  = DAZCNT;
-  IniFile.daisyHoleDiameter = DAZHLEN;
-  IniFile.daisyInnerCount   = DAZICNT;
-  IniFile.daisyDiameter     = DAZLEN;
-  IniFile.daisyPetalCount   = DAZPETS;
-  IniFile.daisyPetalLen     = DAZPLEN;
-  IniFile.daisyHeartCount   = DAZMCNT;
-  UserFlagMap->set(UserFlag::DAZHOL);
-  UserFlagMap->set(UserFlag::DAZD);
-  IniFile.daisyBorderType = DAZTYP;
-}
-
 void formForms::internal::initdaz(HWND hWinDialog) {
   ffi::chkdaz();
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format(L"{}", IniFile.daisyPetalPoints).c_str());
@@ -744,7 +699,9 @@ auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wpara
 		  break;
 		}
 		case IDC_DAZRST: {
-		  formForms::dazdef();
+		  IniFile.dazdef();
+		  UserFlagMap->set(UserFlag::DAZHOL);
+		  UserFlagMap->set(UserFlag::DAZD);
 		  ffi::initdaz(hwndlg);
 		  break;
 		}
