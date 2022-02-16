@@ -8956,7 +8956,7 @@ void thred::internal::defpref() {
   BackgroundColor              = 0xa8c4b1;
   UnzoomedRect.cx              = std::lround(IniFile.hoopSizeX);
   UnzoomedRect.cy              = std::lround(IniFile.hoopSizeY);
-  formForms::defWav();
+  IniFile.defWav();
   IniFile.featherFillType      = FDEFTYP;
   IniFile.featherUpCount       = FDEFUP;
   IniFile.featherDownCount     = FDEFDWN;
@@ -16126,7 +16126,7 @@ void thred::internal::redini() {
 	  if (IniFile.gridSize == 0.0F) {
 		IniFile.gridSize = 12.0F;
 	  }
-	  formForms::setWav();
+	  IniFile.setWav();
 	  if (IniFile.featherFillType == 0U) {
 		IniFile.featherFillType = FDEFTYP;
 	  }

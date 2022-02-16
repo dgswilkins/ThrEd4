@@ -22,7 +22,6 @@
 
 namespace formForms {
 void dazdef();
-void defWav() noexcept;
 void dasyfrm();
 void frmnum();
 void maxtsiz(std::wstring const& label, SIZE& textSize);
@@ -31,7 +30,6 @@ void prfsid(HWND wnd);
 void refrm();
 void setear();
 void setDaisy();
-void setWav();
 void sidwnd(HWND wnd);
 void wavfrm();
 

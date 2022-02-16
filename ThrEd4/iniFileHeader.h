@@ -19,6 +19,13 @@ constexpr auto     COLORCNT = uint8_t {16U};           // Number of colors in ar
 constexpr auto     COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
 constexpr uint32_t OLDNUM   = 4U;                      // number of old filenames saved on file menu
 
+// wave initial values
+constexpr uint16_t IWAVPNTS = 36U; // default wave points
+constexpr uint16_t IWAVSTRT = 10U; // default wave start
+constexpr uint16_t IWAVEND  = 26U; // default wave end
+constexpr uint16_t IWAVS    = 5U;  // default wave lobes
+// end of wave initial values
+
 #pragma pack(push, 1)
 class INI_FILE // ini file structure
 {
@@ -116,5 +123,29 @@ class INI_FILE // ini file structure
   // INI_FILE& operator=(INI_FILE const& rhs) = default;
   // INI_FILE& operator=(INI_FILE&&) = default;
   //~INI_FILE() = default;
+  inline void setWav() noexcept;
+  inline void defWav() noexcept;
 };
 #pragma pack(pop)
+
+inline void INI_FILE::setWav() noexcept {
+  if (wavePoints == 0U) {
+	wavePoints = IWAVPNTS;
+  }
+  if (waveStart == 0U) {
+	waveStart = IWAVSTRT;
+  }
+  if (waveEnd == 0U) {
+	waveEnd = IWAVEND;
+  }
+  if (waveLobes == 0U) {
+	waveLobes = IWAVS;
+  }
+}
+
+inline void INI_FILE::defWav() noexcept {
+  waveEnd    = IWAVEND;
+  wavePoints = IWAVPNTS;
+  waveLobes  = IWAVS;
+  waveStart  = IWAVSTRT;
+}

@@ -29,13 +29,6 @@ constexpr auto DAZTYP  = 5U;  // border type
 constexpr auto DAZMCNT = 7U;  // mirror count
 // end of daisy initial values
 
-// wave initial values
-constexpr uint16_t IWAVPNTS = 36U; // default wave points
-constexpr uint16_t IWAVSTRT = 10U; // default wave start
-constexpr uint16_t IWAVEND  = 26U; // default wave end
-constexpr uint16_t IWAVS    = 5U;  // default wave lobes
-// end of wave initial values
-
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
@@ -1112,28 +1105,6 @@ void formForms::setear() {
 	  shiftedVertex->y -= bottom;
 	  ++shiftedVertex;
 	}
-  }
-}
-
-void formForms::defWav() noexcept {
-  IniFile.waveEnd    = IWAVEND;
-  IniFile.wavePoints = IWAVPNTS;
-  IniFile.waveLobes  = IWAVS;
-  IniFile.waveStart  = IWAVSTRT;
-}
-
-void formForms::setWav() {
-  if (IniFile.wavePoints == 0U) {
-	IniFile.wavePoints = IWAVPNTS;
-  }
-  if (IniFile.waveStart == 0U) {
-	IniFile.waveStart = IWAVSTRT;
-  }
-  if (IniFile.waveEnd == 0U) {
-	IniFile.waveEnd = IWAVEND;
-  }
-  if (IniFile.waveLobes == 0U) {
-	IniFile.waveLobes = IWAVS;
   }
 }
 
