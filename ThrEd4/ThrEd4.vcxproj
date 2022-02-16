@@ -76,6 +76,7 @@
     <ClInclude Include="texture.h" />
     <ClInclude Include="textureHeader.h" />
     <ClInclude Include="thred.h" />
+    <ClInclude Include="thredFileHeader.h" />
     <ClInclude Include="ThrEdTypes.h" />
     <ClInclude Include="trace.h" />
     <ClInclude Include="tracePointHeader.h" />
