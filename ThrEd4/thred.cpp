@@ -442,6 +442,9 @@ auto thred::internal::rsed() noexcept -> uint32_t {
 }
 
 void thred::internal::fnamtabs() {
+  constexpr auto NORDSED    = uint32_t {0x5a5a5a5aU}; // name order seed
+  constexpr auto NCODSED    = uint32_t {0x73ef5a7eU}; // name encoding seed
+  constexpr auto NCODOF     = uint8_t {80U};          // name encoding offset
   constexpr auto NAMELEN    = NameOrder.size();
   auto           iNameOrder = NameOrder.begin();
   for (auto iName = 0U; iName < NAMELEN; ++iName) {

@@ -17,7 +17,9 @@
 
 namespace fi = form::internal;
 
-constexpr auto BHWIDTH = 20.0F;
+constexpr auto BHWIDTH  = 20.0F;
+constexpr auto CLPMIN   = 0.5F; // if clipboard data width less than this, then don't fill
+constexpr auto CLPMINVT = 1.2F; // Minimum clip width for skinny vertical clips
 
 static auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert

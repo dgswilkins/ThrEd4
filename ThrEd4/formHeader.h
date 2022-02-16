@@ -12,6 +12,8 @@
 // Standard Libraries
 #include <cstdint>
 
+constexpr auto MINRCT = 12.0F; // minimum dimension of a form select rectangle
+
 #pragma pack(push, 1)
 class FRM_HEAD_O // Original form header used prior to version 2
 {
