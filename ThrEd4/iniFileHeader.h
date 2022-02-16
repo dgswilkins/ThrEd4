@@ -17,14 +17,16 @@
 
 constexpr auto     COLORCNT = uint8_t {16U};           // Number of colors in arrays
 constexpr auto     COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
-constexpr uint32_t OLDNUM   = 4U;                      // number of old filenames saved on file menu
+constexpr auto     OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
 
 // wave initial values
-constexpr uint16_t IWAVPNTS = 36U; // default wave points
-constexpr uint16_t IWAVSTRT = 10U; // default wave start
-constexpr uint16_t IWAVEND  = 26U; // default wave end
-constexpr uint16_t IWAVS    = 5U;  // default wave lobes
+constexpr auto IWAVPNTS = uint16_t {36U}; // default wave points
+constexpr auto IWAVSTRT = uint16_t {10U}; // default wave start
+constexpr auto IWAVEND  = uint16_t {26U}; // default wave end
+constexpr auto IWAVS    = uint16_t {5U};  // default wave lobes
 // end of wave initial values
+
+constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 
 #pragma pack(push, 1)
 class INI_FILE // ini file structure
@@ -125,6 +127,9 @@ class INI_FILE // ini file structure
   //~INI_FILE() = default;
   inline void setWav() noexcept;
   inline void defWav() noexcept;
+  inline void defFeather() noexcept;
+  inline void setFeather() noexcept;
+  inline void initFeatherType() noexcept;
 };
 #pragma pack(pop)
 
@@ -148,4 +153,38 @@ inline void INI_FILE::defWav() noexcept {
   wavePoints = IWAVPNTS;
   waveLobes  = IWAVS;
   waveStart  = IWAVSTRT;
+}
+
+inline void INI_FILE::setFeather() noexcept {
+  if (featherFillType == 0U) {
+	featherFillType = FDEFTYP;
+  }
+  if (featherUpCount == 0U) {
+	featherUpCount = FDEFUP;
+  }
+  if (featherDownCount == 0U) {
+	featherDownCount = FDEFDWN;
+  }
+  if (featherRatio == 0.0F) {
+	featherRatio = FDEFRAT;
+  }
+  if (featherMinStitchSize == 0.0F) {
+	featherMinStitchSize = FDEFFLR;
+  }
+  if (featherCount == 0U) {
+	featherCount = FDEFNUM;
+  }
+}
+
+inline void INI_FILE::defFeather() noexcept {
+  featherFillType      = FDEFTYP;
+  featherUpCount       = FDEFUP;
+  featherDownCount     = FDEFDWN;
+  featherRatio         = FDEFRAT;
+  featherMinStitchSize = FDEFFLR;
+  featherCount         = FDEFNUM;
+}
+
+inline void INI_FILE::initFeatherType() noexcept {
+  featherFillType = FDEFTYP;
 }

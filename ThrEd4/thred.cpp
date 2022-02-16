@@ -8957,12 +8957,7 @@ void thred::internal::defpref() {
   UnzoomedRect.cx              = std::lround(IniFile.hoopSizeX);
   UnzoomedRect.cy              = std::lround(IniFile.hoopSizeY);
   IniFile.defWav();
-  IniFile.featherFillType      = FDEFTYP;
-  IniFile.featherUpCount       = FDEFUP;
-  IniFile.featherDownCount     = FDEFDWN;
-  IniFile.featherRatio         = FDEFRAT;
-  IniFile.featherMinStitchSize = FDEFFLR;
-  IniFile.featherCount         = FDEFNUM;
+  IniFile.defFeather();
   IniFile.underlayStitchLen    = DEFULEN;
   IniFile.underlaySpacing      = DEFUSPAC;
   IniFile.formBoxSizePixels    = DEFBPIX;
@@ -10272,7 +10267,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  }
 		  auto buf = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
-		  IniFile.featherFillType = FDEFTYP;
+		  IniFile.initFeatherType();
 		  auto buffer             = std::wstring {};
 		  for (auto const& iFeatherStyle : FTHRLIST) {
 			buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
@@ -16127,24 +16122,7 @@ void thred::internal::redini() {
 		IniFile.gridSize = 12.0F;
 	  }
 	  IniFile.setWav();
-	  if (IniFile.featherFillType == 0U) {
-		IniFile.featherFillType = FDEFTYP;
-	  }
-	  if (IniFile.featherUpCount == 0U) {
-		IniFile.featherUpCount = FDEFUP;
-	  }
-	  if (IniFile.featherDownCount == 0U) {
-		IniFile.featherDownCount = FDEFDWN;
-	  }
-	  if (IniFile.featherRatio == 0.0F) {
-		IniFile.featherRatio = FDEFRAT;
-	  }
-	  if (IniFile.featherMinStitchSize == 0.0F) {
-		IniFile.featherMinStitchSize = FDEFFLR;
-	  }
-	  if (IniFile.featherCount == 0U) {
-		IniFile.featherCount = FDEFNUM;
-	  }
+	  IniFile.setFeather();
 	  formForms::setDaisy();
 	  switch (IniFile.hoopType) {
 		case SMALHUP: {

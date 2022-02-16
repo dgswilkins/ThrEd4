@@ -540,7 +540,6 @@ enum FeatherStyles : uint8_t {
 };
 
 constexpr auto FSTYLMAX = uint8_t {6U};     // count of feather styles
-constexpr auto FDEFTYP  = int32_t {FTHPSG}; // default feather type
 
 // fill types
 enum FillStyles : uint8_t {
