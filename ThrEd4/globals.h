@@ -41,8 +41,9 @@
 #include "clipStitchHeader.h"
 #include "EnumMap.h"
 #include "formHeader.h"
-#include "textureHeader.h"
 #include "fRectangleHeader.h"
+#include "iniFileHeader.h"
+#include "textureHeader.h"
 
 // Open Source headers
 #pragma warning(push)

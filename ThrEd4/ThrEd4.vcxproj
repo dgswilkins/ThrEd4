@@ -60,6 +60,7 @@
     <ClInclude Include="formHeader.h" />
     <ClInclude Include="fRectangleHeader.h" />
     <ClInclude Include="globals.h" />
+    <ClInclude Include="iniFileHeader.h" />
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />
     <ClInclude Include="pointHeader.h" />
