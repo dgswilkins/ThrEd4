@@ -2,6 +2,7 @@
 
 // Local Headers
 #include "formHeader.h"
+#include "regionHeader.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -10,6 +11,128 @@
 #pragma warning(disable : 26814)
 #include "boost/dynamic_bitset.hpp"
 #pragma warning(pop)
+
+constexpr auto SQRCORNS = 4U; // number of corners in a square
+
+// is intersection of line and cursor in, before or after the line
+enum class IntersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTER_LINE };
+
+class F_POINT_LINE
+{
+public:
+  float    x {};
+  float    y {};
+  uint16_t line {};
+
+  // constexpr F_POINT_LINE() noexcept = default;
+  // F_POINT_LINE(F_POINT_LINE const&) = default;
+  // F_POINT_LINE(F_POINT_LINE&&) = default;
+  // F_POINT_LINE& operator=(F_POINT_LINE const& rhs) = default;
+  // F_POINT_LINE& operator=(F_POINT_LINE&&) = default;
+  //~F_POINT_LINE() = default;
+};
+
+class LEN_INFO // Sorted line length info
+{
+  public:
+  uint32_t index {};
+  bool     isEnd {};
+  float    length {};
+
+  // constexpr LEN_INFO() noexcept = default;
+  // LEN_INFO(LEN_INFO const&) = default;
+  // LEN_INFO(LEN_INFO&&) = default;
+  // LEN_INFO& operator=(LEN_INFO const& rhs) = default;
+  // LEN_INFO& operator=(LEN_INFO&&) = default;
+  //~LEN_INFO() = default;
+};
+
+class V_RECT_2
+{
+  public:
+  F_POINT aipnt {};
+  F_POINT aopnt {};
+  F_POINT bipnt {};
+  F_POINT bopnt {};
+  F_POINT cipnt {};
+  F_POINT copnt {};
+  F_POINT dipnt {};
+  F_POINT dopnt {};
+
+  // constexpr V_RECT_2() noexcept = default;
+  // V_RECT_2(V_RECT_2 const&) = default;
+  // V_RECT_2(V_RECT_2&&) = default;
+  // V_RECT_2& operator=(V_RECT_2 const& rhs) = default;
+  // V_RECT_2& operator=(V_RECT_2&&) = default;
+  //~V_RECT_2() = default;
+};
+
+class CLIP_SEG
+{
+  public:
+  uint32_t start {};
+  float    beginLength {};
+  uint32_t beginIndex {};
+  uint32_t asid {};
+  uint32_t finish {};
+  float    endLength {};
+  uint32_t endIndex {};
+  uint32_t zsid {};
+  int8_t   dun {};
+
+  // constexpr CLIP_SEG() noexcept = default;
+  // CLIP_SEG(CLIP_SEG const&) = default;
+  // CLIP_SEG(CLIP_SEG&&) = default;
+  // CLIP_SEG& operator=(CLIP_SEG const& rhs) = default;
+  // CLIP_SEG& operator=(CLIP_SEG&&) = default;
+  //~CLIP_SEG() = default;
+};
+
+class CLIP_SORT
+{
+  public:
+  float    segmentLength {};
+  float    sideLength {};
+  uint32_t vertexIndex {};
+  F_POINT  point;
+
+  // constexpr CLIP_SORT() noexcept = default;
+  // CLIP_SORT(CLIP_SORT const&) = default;
+  // CLIP_SORT(CLIP_SORT&&) = default;
+  // CLIP_SORT& operator=(CLIP_SORT const& rhs) = default;
+  // CLIP_SORT& operator=(CLIP_SORT&&) = default;
+  //~CLIP_SORT() = default;
+};
+
+class CLIP_PNT
+{
+  public:
+  float    x {};
+  float    y {};
+  uint32_t vertexIndex {};
+  uint32_t flag {};
+
+  // constexpr CLIP_PNT() noexcept = default;
+  // CLIP_PNT(CLIP_PNT const&) = default;
+  // CLIP_PNT(CLIP_PNT&&) = default;
+  // CLIP_PNT& operator=(CLIP_PNT const& rhs) = default;
+  // CLIP_PNT& operator=(CLIP_PNT&&) = default;
+  //~CLIP_PNT() = default;
+};
+
+class V_CLP_X
+{
+  public:
+  uint32_t segment {};
+  uint32_t vertex {};
+
+  // constexpr V_CLP_X() noexcept = default;
+  // V_CLP_X(V_CLP_X const&) = default;
+  // V_CLP_X(V_CLP_X&&) = default;
+  // V_CLP_X& operator=(V_CLP_X const& rhs) = default;
+  // V_CLP_X& operator=(V_CLP_X&&) = default;
+  //~V_CLP_X() = default;
+};
 
 namespace form {
 

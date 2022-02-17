@@ -160,6 +160,12 @@ inline void INI_FILE::defWav() noexcept {
   waveStart  = IWAVSTRT;
 }
 
+constexpr auto FDEFRAT = 0.6F;           // default feather ratio
+constexpr auto FDEFUP  = uint8_t {10U};  // default feather up count
+constexpr auto FDEFDWN = uint8_t {5U};   // default feather down count
+constexpr auto FDEFFLR = 9.0F;           // default feather floor
+constexpr auto FDEFNUM = uint16_t {10U}; // default feather number
+
 inline void INI_FILE::setFeather() noexcept {
   if (featherFillType == 0U) {
 	featherFillType = FDEFTYP;

@@ -28,6 +28,11 @@
 
 namespace bi = bitmap::internal;
 
+constexpr auto BITCOL = uint32_t {0xffff00U}; // default bitmap color
+constexpr auto SZBMPNM = 17U;     // THR spec for BMP filename length (+ 1 for zero terminator)
+constexpr auto FLTBMP = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
+constexpr auto FLTALL = COMDLG_FILTERSPEC {L"All files", L"*.*"};
+
 static auto BitMapColorStruct = CHOOSECOLOR {};
 
 static auto BitmapBackgroundColors =

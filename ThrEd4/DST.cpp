@@ -14,6 +14,8 @@
 
 namespace di = DST::internal;
 
+constexpr auto COLVER = uint32_t {0x776874U}; // color file version
+
 static auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
 static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
 

@@ -11,6 +11,35 @@
 
 namespace pi = PES::internal;
 
+class PES_COLOR_LIST
+{
+  public:
+  uint16_t blockIndex {};
+  uint16_t colorIndex {};
+
+  // constexpr PES_COLOR_LIST() noexcept = default;
+  // PES_COLOR_LIST(PES_COLOR_LIST const&) = default;
+  // PES_COLOR_LIST(PES_COLOR_LIST&&) = default;
+  // PES_COLOR_LIST& operator=(PECCOLORLIST const& rhs) = default;
+  // PES_COLOR_LIST& operator=(PES_COLOR_LIST&&) = default;
+  //~PES_COLOR_LIST() = default;
+};
+
+class THREAD
+{
+  public:
+  PEC_COLOR   color {};
+  char const* description {};
+  char const* catalogNumber {};
+
+  // constexpr THREAD() noexcept = default;
+  // THREAD(THREAD const&) = default;
+  // THREAD(THREAD&&) = default;
+  // THREAD& operator=(THREAD const& rhs) = default;
+  // THREAD& operator=(THREAD&&) = default;
+  //~THREAD() = default;
+};
+
 constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto IPECFACT = 3.0F / 5.0F;       // inverse PEC format scale factor
 constexpr auto BTSPBYTE = 8U;                // bits per byte

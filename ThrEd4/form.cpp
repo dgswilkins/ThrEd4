@@ -21,6 +21,13 @@ constexpr auto BHWIDTH  = 20.0F;
 constexpr auto CLPMIN   = 0.5F; // if clipboard data width less than this, then don't fill
 constexpr auto CLPMINVT = 1.2F; // Minimum clip width for skinny vertical clips
 
+// contour refil
+constexpr auto FRECONT  = 0x80U; // 1000 0000
+constexpr auto NFRECONT = 0x7fU; // 0111 1111
+
+constexpr auto SEQTOP = int32_t {2};
+constexpr auto SEQBOT = int32_t {3};
+
 static auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
 static auto FormVertexPrev = uint32_t {}; // form vertex storage for form vertex insert
@@ -43,6 +50,7 @@ auto form::internal::fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& poi
 }
 
 auto form::chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool {
+  constexpr auto MAXMSK = 0xffff0000U; // for checking for greater than 65536
   if ((arg0 & MAXMSK) != 0U) {
 	return true;
   }
@@ -1636,6 +1644,9 @@ void form::internal::spurfn(F_POINT const& innerPoint,
                             F_POINT&       underlayInnerPoint,
                             F_POINT&       underlayOuterPoint) noexcept {
   auto const delta     = F_POINT {outerPoint.x - innerPoint.x, outerPoint.y - innerPoint.y};
+  constexpr auto DIURAT = (1.0F - URAT) / 2.0F;        //(1-URAT)/2
+  constexpr auto DOURAT = (1.0F - URAT) / 2.0F + URAT; //(1-URAT)/2+URAT
+
   underlayInnerPoint.x = delta.x * DIURAT + innerPoint.x;
   underlayInnerPoint.y = delta.y * DIURAT + innerPoint.y;
   underlayOuterPoint.x = delta.x * DOURAT + innerPoint.x;
@@ -2351,6 +2362,20 @@ void form::internal::blbrd(FRM_HEAD const& form) {
 }
 
 void form::internal::contf(FRM_HEAD& form) {
+  class P_VEC
+  {
+public:
+	float angle {};
+	float length {};
+
+	// constexpr P_VEC() noexcept = default;
+	// P_VEC(P_VEC const&) = default;
+	// P_VEC(P_VEC&&) = default;
+	// P_VEC& operator=(P_VEC const& rhs) = default;
+	// P_VEC& operator=(P_VEC&&) = default;
+	//~P_VEC() = default;
+  };
+
   auto const start = form.angleOrClipData.guide.start;
   // ToDo - Find a better way to avoid crashing than clamping it if start is after finish
   if (auto const finish = form.angleOrClipData.guide.finish; start < finish) {

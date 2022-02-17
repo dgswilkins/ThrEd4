@@ -24,7 +24,27 @@ class PCSHEADER // pcs file header structure
   // PCSHEADER& operator=(PCSHEADER&&) = default;
   //~PCSHEADER() = default;
 };
+#pragma pack(pop)
 
+#pragma pack(push, 1)
+class PCS_STITCH
+{
+  public:
+  uint8_t fx {}; // fractional part of x coord or color if tag = 3
+  int16_t x {};  // integer part of x coord
+  uint8_t nx {};
+  uint8_t fy {}; // fractional part of y coord
+  int16_t y {};  // integer part of y coord
+  uint8_t ny {};
+  uint8_t tag {};
+
+  // constexpr PCS_STITCH() noexcept = default;
+  // PCS_STITCH(PCS_STITCH const&) = default;
+  // PCS_STITCH(PCS_STITCH&&) = default;
+  // PCS_STITCH& operator=(PCS_STITCH const& rhs) = default;
+  // PCS_STITCH& operator=(PCS_STITCH&&) = default;
+  //~PCS_STITCH() = default;
+};
 #pragma pack(pop)
 
 namespace pci = PCS::internal;

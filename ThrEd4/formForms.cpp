@@ -21,6 +21,63 @@ namespace ffi = formForms::internal;
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
 
+/*
+fill        edgeStitchLen   edgeSpacing borderSize  clipCount   picspac		crnrsiz		brdend
+
+EDGELINE	edgeStitchLen
+EDGEBEAN	edgeStitchLen
+EDGECLIP											clipCount
+EDGEANGSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEAPPL	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEPROPSAT	edgeStitchLen	edgeSpacing	borderSize									attribute
+EDGEBHOL	edgeStitchLen	edgeSpacing	borderSize	clipCount,res
+EDGEPICOT	edgeStitchLen				borderSize	clipCount	edgeSpacing		res
+*/
+
+constexpr auto BELEN    = 1U;
+constexpr auto BESPAC   = 1U << 1U;
+constexpr auto BESIZ    = 1U << 2U;
+constexpr auto BNCLP    = 1U << 3U;
+constexpr auto BPICSPAC = 1U << 4U;
+constexpr auto BCNRSIZ  = 1U << 5U;
+constexpr auto BRDEND   = 1U << 6U;
+constexpr auto BRDPOS   = 1U << 7U;
+constexpr auto BEMAX    = 1U << 8U;
+constexpr auto BEMIN    = 1U << 9U;
+constexpr auto CHNPOS   = 1U << 10U;
+
+constexpr auto MEGLIN  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGBLD  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGCLP  = (BNCLP | BEMAX | BEMIN);
+constexpr auto MEGSAT  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGAP   = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGPRP  = (BESPAC | BESIZ | BRDEND | BEMAX | BEMIN);
+constexpr auto MEGHOL  = (BELEN | BESPAC | BESIZ | BCNRSIZ | BEMAX | BEMIN);
+constexpr auto MEGPIC  = (BELEN | BESIZ | BNCLP | BPICSPAC | BCNRSIZ | BEMAX | BEMIN);
+constexpr auto MEGDUB  = (BELEN | BEMAX | BEMIN);
+constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
+constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
+constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
+
+constexpr auto EGLIN_LINS = 4U;
+constexpr auto EGBLD_LINS = 4U;
+constexpr auto EGCLP_LINS = 3U;
+constexpr auto EGSAT_LINS = 6U;
+constexpr auto EGAP_LINS  = 7U;
+constexpr auto EGPRP_LINS = 6U;
+constexpr auto EGHOL_LINS = 7U;
+constexpr auto EGPIC_LINS = 7U;
+constexpr auto EGCHN_LINS = 6U;
+
+enum DaisyStyles { // daisy form types
+  DSIN,            // Sine shape
+  DRAMP,           // Ramp shape
+  DSAW,            // Sawtooth shape
+  DRAG,            // Ragged shape
+  DCOG,            // Cog shape
+  DHART            // Heart shape
+};
+
 static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
 static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet

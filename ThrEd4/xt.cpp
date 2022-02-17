@@ -13,6 +13,18 @@
 
 namespace xi = xt::internal;
 
+constexpr auto M_AP     = 1U << 1U;
+constexpr auto M_CWLK   = 1U << 2U;
+constexpr auto M_WALK   = 1U << 3U;
+constexpr auto M_UND    = 1U << 4U;
+constexpr auto M_FIL    = 1U << 5U;
+constexpr auto M_FTH    = 1U << 6U;
+constexpr auto M_BRD    = 1U << 7U;
+constexpr auto M_APCOL  = 1U << 8U;
+constexpr auto M_FCOL   = 1U << 9U;
+constexpr auto M_FTHCOL = 1U << 10U;
+constexpr auto M_ECOL   = 1U << 11U;
+
 static auto DesignSize = F_POINT {};                        // design size
 static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
 
@@ -455,6 +467,8 @@ void xt::internal::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
 	}
 	InterleaveSequenceIndices->back().color = form.underlayColor;
 #else
+	constexpr auto MAXWLK = 54.0F; // max underlay/edge walk stitch length
+	constexpr auto MINWLK = 2.4F;  // max underlay/edge walk stitch length
 
 	if (form.underlayStitchLen < MINWLK) {
 	  form.underlayStitchLen = MINWLK;
@@ -1090,6 +1104,7 @@ void xt::fsort() {
 			}
 		  }
 		  GetSystemTimeAsFileTime(&fileTime);
+		  constexpr auto SRTIM = 20000000Ui64; // sort time limit in 100 ns intervals
 		  if (auto const nextTime = xi::tim2int(fileTime); nextTime.QuadPart - startTime.QuadPart > SRTIM) {
 			break;
 		  }

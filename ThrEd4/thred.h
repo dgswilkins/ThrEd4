@@ -35,6 +35,24 @@ enum class FileIndices : uint8_t {
   DST  // Tajima
 };
 
+#pragma pack(push, 1)
+class BAL_STITCH // balarad stitch
+{
+  public:
+  uint8_t code {};
+  uint8_t flag {};
+  float   x {};
+  float   y {};
+
+  // constexpr BAL_STITCH() noexcept = default;
+  // BAL_STITCH(BAL_STITCH const&) = default;
+  // BAL_STITCH(BAL_STITCH&&) = default;
+  // BAL_STITCH& operator=(BAL_STITCH const& rhs) = default;
+  // BAL_STITCH& operator=(BAL_STITCH&&) = default;
+  //~BAL_STITCH() = default;
+};
+#pragma pack(pop)
+
 namespace thred {
 auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;

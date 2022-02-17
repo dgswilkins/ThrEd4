@@ -74,8 +74,8 @@ void texture::txdun() {
 		}
 		wrap::writeFile(handle,
 		                textureHistoryBuffer.data(),
-		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
-		                &bytesWritten,
+		  wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
+		  &bytesWritten,
 		                nullptr);
 		for (auto& item : *TextureHistory) {
 		  if (!item.texturePoints.empty()) {
@@ -1335,6 +1335,8 @@ void texture::internal::txsiz(float ratio, FRM_HEAD const& textureForm) {
   txi::ed2px(TextureScreen.formCenter, SelectTexturePointsOrigin);
   txi::ritxfrm(textureForm);
 }
+
+constexpr auto TXTRAT = 0.95F; // texture fill clipboard shrink/grow ratio
 
 void texture::internal::txshrnk(FRM_HEAD const& textureForm) {
   txi::txsiz(TXTRAT, textureForm);

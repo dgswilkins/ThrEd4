@@ -40,20 +40,170 @@
 
 namespace thi = thred::internal;
 
-constexpr auto NERCNT   = 4U;                   // number of entries in the near array;
-constexpr auto DNLEN    = 50U;                  // designer name order table length
-constexpr auto DNELEN   = 128U;                 // designer name encoding table length
-constexpr auto DNDLEN   = 256U;                 // designer name decoding table length
-constexpr auto UNDOLEN  = 16U;                  // UndoBuffer length
-constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
-constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
-constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
-constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto ARROWPNT = 3U;                     // points required to draw arrow
-constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
-constexpr auto QUADRT   = uint32_t {4U};          // split display into quadrants
-constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
+constexpr auto BALJUMP  = uint8_t {0x81U};        // balarad jump stitch
+constexpr auto BALNORM  = uint8_t {0x80U};        // normal balarad stitch
 constexpr auto BALRATIO = 10.0F / 6.0F;           // Balarad stitch size ration
+constexpr auto BALSTOP  = uint8_t {0U};           // balarad stop
+constexpr auto CHSDEF   = 24.0F;                  // default chain stitch length
+constexpr auto CHRDEF   = 0.25;                   // default chain stitch ratio
+constexpr auto DEFPIX   = uint16_t {2U};          // default nudge pixels
+constexpr auto DEFULEN  = 12.0F;                  // default underlay stitch length
+constexpr auto DNDLEN   = 256U;                   // designer name decoding table length
+constexpr auto DNELEN   = 128U;                   // designer name encoding table length
+constexpr auto DNLEN    = 50U;                    // designer name order table length
+constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
+constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
+constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
+constexpr auto FLTPES   = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
+constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
+constexpr auto GRDHI    = uint32_t {0xffffffU};   // grid high color
+constexpr auto GRDMED   = uint32_t {0x404040U};   // grid medium color
+constexpr auto GRDDEF   = uint32_t {0x202020U};   // grid default color
+constexpr auto GRDRED   = uint32_t {0xff2020U};   // grid red color
+constexpr auto GRDBLU   = uint32_t {0x20ff20U};   // grid green color
+constexpr auto GRDGRN   = uint32_t {0x2020ffU};   // grid blue color
+constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
+constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
+constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
+constexpr auto MINDELAY = int32_t {1};            // minimum movie time step
+constexpr auto MINZUM   = int32_t {5};            // minimum zoom in stitch points
+constexpr auto NERCNT   = 4U;                     // number of entries in the near array;
+constexpr auto NUGINI   = 2.0F;                   // default nudge step
+constexpr auto OLDVER   = wchar_t {4};            // number of old file versions kept
+constexpr auto PAGSCROL = 0.9F;                   // page scroll factor
+constexpr auto QUADRT   = uint32_t {4U};          // split display into quadrants
+constexpr auto SIGMASK = uint32_t {0x00ffffffU}; // three byte mask used for file signature verification
+constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
+constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
+constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
+constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
+constexpr auto UNDOLEN  = 16U;                  // UndoBuffer length
+constexpr auto ZUMFCT   = 0.65F;                // zoom factor
+
+// main menu items
+enum MainMenuItems {
+  M_FILE,
+  M_VIEW,
+  M_FORM,
+  M_EDIT,
+  M_IN,
+  M_OUT,
+  M_UNDO,
+  M_REDO,
+  M_ROT,
+  M_PREF,
+  M_FILL,
+  M_ADD,
+  M_FRM,
+  M_ALL,
+  M_1,
+  M_2,
+  M_3,
+  M_4,
+  M_HELP
+};
+
+// view menu items
+enum ViewMenuItems {
+  MVW_MOVIE,
+  MVW_SET,
+  MVW_BACK,
+  MVW_ZOOM,
+  MVW_THRD,
+  MVW_SHWT,
+  MVW_SHWTCOL,
+  MVW_DSGN,
+  MVW_KNOT,
+  MVW_MARK,
+  MVW_ABOUT
+};
+
+// fill menu items
+enum FillMenuItems {
+  MFIL_SAT,
+  MFIL_FTH,
+  MFIL_VERT,
+  MFIL_HOR,
+  MFIL_ANG,
+  MFIL_CLP,
+  MFIL_CONT,
+  MFIL_TED,
+  MFIL_BORD,
+  MFIL_UNFIL
+};
+
+// file menu items
+enum FileMenuItems {
+  FM_NEW,
+  FM_OPEN,
+  FM_CLOS,
+  FM_THUMB,
+  FM_OPNPCS,
+  FM_INSRT,
+  FM_OVRLAY,
+  FM_SAV,
+  FM_SAVAS,
+  FM_LODBIT,
+  FM_SAVBIT,
+  FM_HIDBIT,
+  FM_RMVBIT,
+  FM_PURG,
+  FM_LOCK,
+  FM_ONAM0,
+  FM_ONAM1,
+  FM_ONAM2,
+  FM_ONAM3
+};
+
+class COL_CHANGE
+{
+  public:
+  uint16_t stitchIndex {}; // stitch index
+  uint16_t colorIndex {};  // color index
+
+  // constexpr COL_CHANGE() noexcept = default;
+  // COL_CHANGE(COL_CHANGE const&) = default;
+  // COL_CHANGE(COL_CHANGE&&) = default;
+  // COL_CHANGE& operator=(COL_CHANGE const& rhs) = default;
+  // COL_CHANGE& operator=(COL_CHANGE&&) = default;
+  //~COL_CHANGE() = default;
+};
+
+#pragma pack(push, 1)
+class BAL_HEAD // balarad file header
+{
+  public:
+  COLORREF color[256] {};
+  uint32_t signature {};
+  uint16_t version {};
+  float    hoopSizeX {};
+  float    hoopSizeY {};
+  COLORREF backgroundColor {};
+  uint8_t  res[1006] {};
+
+  // constexpr BAL_HEAD() noexcept = default;
+  // BAL_HEAD(BAL_HEAD const&) = default;
+  // BAL_HEAD(BAL_HEAD&&) = default;
+  // BAL_HEAD& operator=(BAL_HEAD const& rhs) = default;
+  // BAL_HEAD& operator=(BAL_HEAD&&) = default;
+  //~BAL_HEAD() = default;
+};
+#pragma pack(pop)
+
+class FIND_INFO
+{
+  public:
+  uint32_t         count {};
+  WIN32_FIND_DATA* data {};
+
+  // constexpr FIND_INFO() noexcept = default;
+  // FIND_INFO(FIND_INFO const&) = default;
+  // FIND_INFO(FIND_INFO&&) = default;
+  // FIND_INFO& operator=(FIND_INFO const& rhs) = default;
+  // FIND_INFO& operator=(FIND_INFO&&) = default;
+  //~FIND_INFO() = default;
+};
 
 // main variables
 static auto ArgCount        = int32_t {};                         // command line argument count
@@ -97,7 +247,7 @@ static auto NameOrder        = std::array<uint32_t, DNLEN> {}; // designer name 
 static auto NameEncoder      = std::array<uint8_t, DNELEN> {}; // designer name encoding
 static auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
 static auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-static auto SelectedFormsRange = FORM_RANGE {}; // range of selected forms
+static auto SelectedFormsRange = RANGE {}; // range of selected forms
 static auto ZoomMin            = float {};      // minimum allowed zoom value
 static auto BalaradOffset      = F_POINT {};    // balarad offset
 static auto FormVerticesAsLine =
@@ -2630,6 +2780,7 @@ void thred::grpAdj() {
 		auto const coordinate = wrap::toFloat(MINZUM) / newSize.x;
 		newSize               = F_POINT {wrap::toFloat(MINZUM), std::round(coordinate * newSize.y)};
 	  }
+	  constexpr auto ZMARGIN = 1.25F; // zoom margin for select zooms
 	  if (newSize.x > newSize.y) {
 		auto coordinate = newSize.x * ZMARGIN;
 		newSize.x += std::round(coordinate);
@@ -2709,7 +2860,7 @@ void thred::internal::ritlayr() {
 	  layer = gsl::narrow_cast<decltype(layer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >> 1U;
 	}
   }
-  if ((layer & MAXMSK) != 0U) {
+  if ((layer & FRMMMSK) != 0U) {
 	auto const blank = std::wstring {};
 	displayText::butxt(HLAYR, blank);
   }
@@ -6341,6 +6492,8 @@ void thred::internal::delknot() {
   }
 }
 
+constexpr auto KNOTLEN = int32_t {54}; // set knots for stitches longer than this
+
 auto thred::internal::kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t {
   while (start < wrap::toUnsigned(StitchBuffer->size() - 1U) && stlen(start) > KNOTLEN) {
 	buffer.push_back(StitchBuffer->operator[](start++));
@@ -8470,6 +8623,7 @@ void thred::internal::nuthsel() {
 
 void thred::internal::nuthbak(uint32_t count) {
   if (ThumbnailIndex != 0U) {
+	constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
 	auto const length = wcslen(ThumbnailSearchString->data());
 	if (length != 0U) {
 	  while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
@@ -8865,6 +9019,10 @@ void thred::internal::fil2men() {
 }
 
 void thred::internal::defpref() {
+  constexpr auto APSPAC  = 10.8F;         // applique border spacing
+  constexpr auto DEFBPIX = uint16_t {4U}; // default form box pixels
+  constexpr auto DEFANG  = 0.7853981F;    // default fill angle, 45 degrees
+
   UserFlagMap->reset();
   UserColor = {0x00000000,
                0x002dffff,
@@ -9316,12 +9474,26 @@ void thred::internal::retrac() {
 }
 
 void thred::internal::setgrd(COLORREF color) {
-  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, HIGRD};
-  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, MEDGRD};
-  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, DEFGRD};
-  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, REDGRD};
-  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, BLUGRD};
-  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRNGRD};
+  class GRID_COL
+  {
+public:
+	uint32_t id {};
+	uint32_t col {};
+
+	// constexpr GRID_COL() noexcept = default;
+	// GRID_COL(GRID_COL const&) = default;
+	// GRID_COL(GRID_COL&&) = default;
+	// GRID_COL& operator=(GRID_COL const& rhs) = default;
+	// GRID_COL& operator=(GRID_COL&&) = default;
+	//~GRID_COL() = default;
+  };
+
+  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, GRDHI};
+  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, GRDMED};
+  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, GRDDEF};
+  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, GRDRED};
+  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
+  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
   static constexpr auto GRID_CODES =
       std::array<GRID_COL, 6> {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
 
@@ -14830,32 +15002,32 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_GRDHI: { // view / Set / Grid Mask / High
-	  setgrd(HIGRD);
+	  setgrd(GRDHI);
 	  flag = true;
 	  break;
 	}
 	case ID_GRDMED: { // view / Set / Grid Mask / Medium
-	  setgrd(MEDGRD);
+	  setgrd(GRDMED);
 	  flag = true;
 	  break;
 	}
 	case ID_GRDEF: { // view / Set / Grid Mask / Default
-	  setgrd(DEFGRD);
+	  setgrd(GRDDEF);
 	  flag = true;
 	  break;
 	}
 	case ID_GRDRED: { // view / Set / Grid Mask / UnRed
-	  setgrd(REDGRD);
+	  setgrd(GRDRED);
 	  flag = true;
 	  break;
 	}
 	case ID_GRDBLU: { // view / Set / Grid Mask / UnBlue
-	  setgrd(BLUGRD);
+	  setgrd(GRDBLU);
 	  flag = true;
 	  break;
 	}
 	case ID_GRDGRN: { // view / Set / Grid Mask / UnGreen
-	  setgrd(GRNGRD);
+	  setgrd(GRDGRN);
 	  flag = true;
 	  break;
 	}
@@ -16169,7 +16341,7 @@ void thred::internal::redini() {
 	}
   }
   if (IniFile.gridColor == 0U) {
-	IniFile.gridColor = DEFGRD;
+	IniFile.gridColor = GRDDEF;
   }
   if (IniFile.fillAngle == 0.0F) {
 	IniFile.fillAngle = PI_F / 6.0F;
@@ -16321,6 +16493,10 @@ void thred::internal::init() {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   ThreadSize.fill(L'4');
+  constexpr auto TRACLEN  = 1.0F;          // initial trace length
+  constexpr auto TRACRAT  = 1.00001F;      // initial trace ratio
+  constexpr auto DEFEGRAT = 1.5;           // default egg ratio
+  constexpr auto DEFPNTPX = uint16_t {4U}; // default form and stitch point pixels
   if (IniFile.traceLength == 0.0F) {
 	IniFile.traceLength = TRACLEN;
   }
@@ -17188,6 +17364,7 @@ struct createParams {
 };
 
 auto CALLBACK thred::internal::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
+  constexpr auto LINSCROL = 0.05F; // line scroll factor
   switch (message) {
 #if HIGHDPI
 	case WM_NCCREATE: {
@@ -17220,6 +17397,8 @@ auto CALLBACK thred::internal::wndProc(HWND p_hWnd, UINT message, WPARAM wParam,
 	  break;
 	}
 	case WM_HSCROLL: {
+	  constexpr auto SPEDLIN = int32_t {30};  // speed change for line message on speed scroll bar
+	  constexpr auto SPEDPAG = int32_t {120}; // speed change for page message on speed scroll bar
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  switch (gsl::narrow<int32_t>(LOWORD(wParam))) {
 		case SB_LINELEFT: {
@@ -17823,13 +18002,16 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  privateDefaultColorWin.resize(COLORCNT);
 	  privateFormControlPoints.resize(OUTPNTS);
 	  privateLabelWindow.resize(LASTLIN);
+	  constexpr auto MSGSIZ = uint32_t {8192U}; // size of the message buffer
 	  privateMsgBuffer.reserve(MSGSIZ);
 	  privateNearestPixel.resize(NERCNT);
 	  privateNearestPoint.resize(NERCNT);
 	  privateRubberBandLine.resize(3U);
 	  privateSelectedFormsLine.resize(OUTPNTS);
 	  privateSelectedPointsLine.resize(OUTPNTS);
+	  constexpr auto SWCOUNT = 16U; // number of side windows to create/track
 	  privateSideWindow.resize(SWCOUNT);
+	  constexpr auto SWBLEN  = 11U; // Side Window buffer length including the zero terminator
 	  privateSideWindowEntryBuffer.resize(SWBLEN);
 	  privateTextureHistory.resize(ITXBUFSZ);
 	  privateThreadSizeWin.resize(COLORCNT);
@@ -17916,10 +18098,13 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  thi::redini();
 	  createParams createParams {};
 	  createParams.bEnableNonClientDpiScaling = TRUE;
-	  auto privateScrollSize                  = SCROLSIZ;
-	  ScrollSize                              = &privateScrollSize;
-	  auto privateColorBarSize                = COLSIZ;
-	  ColorBarSize                            = &privateColorBarSize;
+
+	  constexpr auto SCROLSIZ            = int32_t {12}; // logical pixel width of a scroll bar
+	  auto           privateScrollSize   = SCROLSIZ;
+	  ScrollSize                         = &privateScrollSize;
+	  constexpr auto COLSIZ              = int32_t {12}; // logical pixel width of the color bar
+	  auto           privateColorBarSize = COLSIZ;
+	  ColorBarSize                       = &privateColorBarSize;
 	  if (IniFile.initialWindowCoords.right != 0) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		ThrEdWindow = CreateWindow(L"thred",

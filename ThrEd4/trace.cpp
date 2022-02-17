@@ -13,12 +13,26 @@
 
 namespace ti = trace::internal;
 
-constexpr auto POINTMAX = 500000U;         // maximum number of trace points to consider
-constexpr auto LEVELCNT = 256U;            // number of color levels in a byte wide counter
-constexpr auto CHANLCNT = 3U;              // number of color channels i.e. RGB
-constexpr auto BYTEMAXV = uint8_t {255U};  // max color value in a byte wide counter
-constexpr auto CCRATIO  = (1.0F / 255.0F); // This is used to convert 0-255 to 0-1
-constexpr auto ADJCOUNT = 9U; // including the center pixel there are 9 pixels immediately adjacent
+constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
+constexpr auto BLUCOL   = uint32_t {0xff0000U}; // code for the color blue
+constexpr auto BLUMSK   = uint32_t {0x00ffffU}; // mask for the color blue
+constexpr auto BYTEMAXV = uint8_t {255U};       // max color value in a byte wide counter
+constexpr auto CCRATIO  = (1.0F / 255.0F);      // This is used to convert 0-255 to 0-1
+constexpr auto CHANLCNT = uint32_t {3U};        // number of color channels i.e. RGB
+constexpr auto GRNCOL   = uint32_t {0x00ff00U}; // code for the color green
+constexpr auto GRNMSK   = uint32_t {0xff00ffU}; // mask for the color green
+constexpr auto LEVELCNT = uint32_t {256U};      // number of color levels in a byte wide counter
+constexpr auto POINTMAX = size_t {500000U};     // maximum number of trace points to consider
+constexpr auto REDCOL   = uint32_t {0x0000ffU}; // code for the color red
+constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
+
+												// edge tracing directions
+enum TraceDirection {
+  TRCU, // top edge
+  TRCR, // right edge
+  TRCD, // bottom edge
+  TRCL  // left edge
+};
 
 static auto PixelColors = std::array<uint32_t, CHANLCNT> {};    // separated pixel reference colors
 static auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
@@ -101,6 +115,7 @@ void trace::internal::trcstpnum() {
 }
 
 void trace::internal::trcratnum() {
+  constexpr auto HLIN = uint32_t{ HNUM };
   displayText::butxt(HLIN, fmt::format(displayText::loadStr(IDS_TRCRAT), -log10(IniFile.traceRatio - 1.0F)));
 }
 

@@ -8,6 +8,125 @@
 #include <filesystem>
 #include <vector>
 
+class FEATHER
+{
+  public:
+  uint32_t fillType {};          // type of feather fill
+  float    ratio {};             // feather ratio
+  float    minStitch {};         // smallest stitch allowed
+  float    ratioLocal {};        // local feather ratio
+  float    formRatio {};         // feather ratio from form
+  uint32_t extendedAttribute {}; // extended form attribute
+  uint32_t upCount {};           // feather up count
+  uint32_t downCount {};         // feather down count
+  uint32_t totalCount {};        // up count plus down count
+  uint32_t phaseIndex {};
+  uint32_t phase {};
+  uint32_t countUp {};
+  uint32_t countDown {};
+  float    globalStep {};
+  float    globalPosition {};
+  float    globalPhase {};
+  float    globalUp {};
+  float    globalDown {};
+  float    globalRatio {};
+
+  // constexpr FEATHER() noexcept = default;
+  // FEATHER(FEATHER const&) = default;
+  // FEATHER(FEATHER&&) = default;
+  // FEATHER& operator=(FEATHER const& rhs) = default;
+  // FEATHER& operator=(FEATHER&&) = default;
+  //~FEATHER() = default;
+};
+
+class F_STARTS
+{
+  public:
+  uint32_t applique {};
+  uint32_t fill {};
+  uint32_t feather {};
+  uint32_t border {};
+  uint32_t appliqueColor {};
+  uint32_t fillColor {};
+  uint32_t featherColor {};
+  uint32_t borderColor {};
+
+  // constexpr F_STARTS() noexcept = default;
+  // F_STARTS(F_STARTS const&) = default;
+  // F_STARTS(F_STARTS&&) = default;
+  // F_STARTS& operator=(F_STARTS const& rhs) = default;
+  // F_STARTS& operator=(F_STARTS&&) = default;
+  //~F_STARTS() = default;
+};
+
+union FILL_STARTS {
+  public:
+  F_STARTS fillNamed;
+  uint32_t fillArray[sizeof(F_STARTS) / sizeof(uint32_t)] {};
+
+  // inline FILL_STARTS() noexcept;
+  // FILL_STARTS(FILL_STARTS const&) = default;
+  // FILL_STARTS(FILL_STARTS&&) = default;
+  // FILL_STARTS& operator=(FILL_STARTS const& rhs) = default;
+  // FILL_STARTS& operator=(FILL_STARTS&&) = default;
+  //~FILL_STARTS() = default;
+};
+
+class INT_INFO
+{
+  public:
+  uint32_t      pins {};
+  uint32_t      coloc {};
+  uint32_t      layerIndex {};
+  uint32_t      start {};
+  uint32_t      output {};
+  F_POINT_ATTR* highStitchBuffer {};
+
+  // constexpr INT_INFO() noexcept = default;
+  // INT_INFO(INT_INFO const&) = default;
+  // INT_INFO(INT_INFO&&) = default;
+  // INT_INFO& operator=(INT_INFO const& rhs) = default;
+  // INT_INFO& operator=(INT_INFO&&) = default;
+  //~INT_INFO() = default;
+};
+
+class O_REC
+{
+  public:
+  uint32_t start {};
+  uint32_t finish {};
+  uint32_t startStitch {};
+  uint32_t endStitch {};
+  uint32_t color {};
+  uint32_t type {};
+  uint32_t form {};
+  uint32_t otyp {};
+
+  // constexpr O_REC() noexcept = default;
+  // O_REC(O_REC const&) = default;
+  // O_REC(O_REC&&) = default;
+  // O_REC& operator=(O_REC const& rhs) = default;
+  // O_REC& operator=(O_REC&&) = default;
+  //~O_REC() = default;
+};
+
+class SORT_REC
+{
+  public:
+  uint32_t start {};          // start region index
+  uint32_t finish {};         // finish region index
+  uint32_t count {};          // number of regions in range
+  uint32_t currentRegion {};  // current region index
+  bool     direction = false; // direction of sort
+
+  // constexpr SORT_REC() noexcept = default;
+  // SORT_REC(SORT_REC const&) = default;
+  // SORT_REC(SORT_REC&&) = default;
+  // SORT_REC& operator=(SORT_REC const& rhs) = default;
+  // SORT_REC& operator=(SORT_REC&&) = default;
+  //~SORT_REC() = default;
+};
+
 namespace fs = std::filesystem;
 
 namespace xt {
