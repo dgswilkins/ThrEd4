@@ -37,7 +37,7 @@ inline auto utf8ToUtf16(std::string const& utf8) -> std::wstring {
 }
 
 inline auto utf16ToUtf8(std::wstring const& utf16) -> std::string {
-  auto const inLength  = gsl::narrow_cast<int>(utf16.size());
+  auto const inLength = gsl::narrow_cast<int>(utf16.size());
   auto const outLength = WideCharToMultiByte(CP_UTF8, 0, utf16.data(), inLength, nullptr, 0, nullptr, nullptr);
 
   std::string utf8(gsl::narrow_cast<size_t>(outLength), '\0');

@@ -30,35 +30,34 @@ void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&
 #define outDebugString(X, ...)
 #endif
 
-constexpr float    DEFUSPAC = 6.0F;        // default underlay stitch spacing
-constexpr float    DEFLRAT  = 0.8F;        // default lens form aspect ratio
+constexpr float DEFUSPAC = 6.0F;        // default underlay stitch spacing
+constexpr float DEFLRAT  = 0.8F;        // default lens form aspect ratio
 constexpr uint32_t MAXITEMS = 0x10000U; // maximum number of stitches, sequence items & clipboard points
-constexpr float    SHUPX    = 480.0F;      // small hoop x size
-constexpr float    SHUPY    = 480.0F;      // small hoop y size
-constexpr float    LHUPX    = 719.0F;      // large hoop x size
-constexpr float    LHUPY    = 690.0F;      // large hoop y size
-constexpr float    HUP100XY = 600.0F;      // 100 millimeter hoop size
-constexpr float    PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
-constexpr float    IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
+constexpr float SHUPX       = 480.0F;   // small hoop x size
+constexpr float SHUPY       = 480.0F;   // small hoop y size
+constexpr float LHUPX       = 719.0F;   // large hoop x size
+constexpr float LHUPY       = 690.0F;   // large hoop y size
+constexpr float HUP100XY = 600.0F;      // 100 millimeter hoop size
+constexpr float PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
+constexpr float IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point
 // ToDo - Should this be a configurable parameter?
-constexpr double   CLOSENUF = 15.0; // mouse click region for select
-constexpr auto     FCLOSNUF = float {CLOSENUF};
-constexpr float    SMALSIZ  = 0.25F;             // default small stitch size
-constexpr float    MINSIZ   = 0.1F;              // default minimum stitch size
-constexpr float    USESIZ   = 3.5F;              // user preferred size
-constexpr auto     MAXSIZ   = 9.0F;              // default maximum stitch size
-constexpr float    SHOPNTS  = 0.00F;             // show stitch points when zoom below this
-constexpr float    STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
-constexpr int32_t  MOVITIM  = 12;                // default movie time
-constexpr float    DEFSPACE = 0.45F;             // default stitch spacing
-constexpr float    PI_F     = 3.1415927F;        // PI to single precision
-constexpr float    PI_F2    = PI_F * 2.0F;       //
-constexpr float    PI_FHALF = PI_F / 2.0F;       //
-constexpr double   PI       = 3.141592653589793; // PI to double precision
-constexpr double   PI2      = PI * 2.0;          //
-constexpr float    USPAC    = 15.0F;             // underlay fill spacing
-constexpr float    URAT     = 0.75F;             // ratio of underlay stitch to satin border size
-
+constexpr double  CLOSENUF = 15.0; // mouse click region for select
+constexpr auto    FCLOSNUF = float {CLOSENUF};
+constexpr float   SMALSIZ  = 0.25F;             // default small stitch size
+constexpr float   MINSIZ   = 0.1F;              // default minimum stitch size
+constexpr float   USESIZ   = 3.5F;              // user preferred size
+constexpr auto    MAXSIZ   = 9.0F;              // default maximum stitch size
+constexpr float   SHOPNTS  = 0.00F;             // show stitch points when zoom below this
+constexpr float   STCHBOX  = 0.4226F;           // show stitch boxes when zoom below this
+constexpr int32_t MOVITIM  = 12;                // default movie time
+constexpr float   DEFSPACE = 0.45F;             // default stitch spacing
+constexpr float   PI_F     = 3.1415927F;        // PI to single precision
+constexpr float   PI_F2    = PI_F * 2.0F;       //
+constexpr float   PI_FHALF = PI_F / 2.0F;       //
+constexpr double  PI       = 3.141592653589793; // PI to double precision
+constexpr double  PI2      = PI * 2.0;          //
+constexpr float   USPAC    = 15.0F;             // underlay fill spacing
+constexpr float   URAT     = 0.75F;             // ratio of underlay stitch to satin border size
 
 constexpr float    TNYFLOAT = 1e-9F;           // tiny number for single precision float stuff
 constexpr float    BIGFLOAT = 1e9F;            // large number for single precision float stuff
@@ -67,11 +66,11 @@ constexpr float    IBFCLEN  = (4.0F * PFGRAN); // initial buttonhole fill corner
 constexpr float    IPICSPAC = 6.0F;            // initial picot border space
 constexpr int32_t  PRFLINS  = 30;              // number of lines on the preference menu
 constexpr uint32_t SEED     = 3037000499U;     // pseudo-random-sequence seed
-constexpr float    BRDWID   = 18.0F;     // default satin border size
-constexpr float    SNPLEN   = 0.15F;     // default snap together length size
-constexpr float    STARAT   = 0.4F;      // default star ratio
-constexpr float    SPIRWRAP = 1.52F;     // default spiral wrap
-constexpr int32_t  HBUFSIZ  = 1024;      // help buffer size
+constexpr float    BRDWID   = 18.0F;           // default satin border size
+constexpr float    SNPLEN   = 0.15F;           // default snap together length size
+constexpr float    STARAT   = 0.4F;            // default star ratio
+constexpr float    SPIRWRAP = 1.52F;           // default spiral wrap
+constexpr int32_t  HBUFSIZ  = 1024;            // help buffer size
 constexpr float    ITXHI    = (9.0F * PFGRAN); // default texture editor height
 constexpr float    ITXWID   = (9.0F * PFGRAN); // default texture editor width
 constexpr float    ITXSPAC  = (0.4F * PFGRAN); // default texture editor spacing
@@ -476,7 +475,7 @@ constexpr auto MHCLPF   = 1U << static_cast<uint32_t>(HCLPF);
 constexpr auto MANGCLPF = 1U << static_cast<uint32_t>(ANGCLPF);
 constexpr auto CLIPTYPEMAP = MCLPF | MVCLPF | MHCLPF | MANGCLPF; // for checking if a fill is a clipboard fill
 
-																 // edge fill types
+// edge fill types
 enum EdgeFillStyles : uint8_t {
   EDGELINE = 1U, // Line
   EDGEBEAN,      // Bean
@@ -494,7 +493,7 @@ enum EdgeFillStyles : uint8_t {
 
 constexpr auto EDGETMAX = uint32_t {13U}; // number of edge fill types
 
-										  // preference window entries
+// preference window entries
 enum PrefWin : uint32_t {
   PRFAPPCOL, // Applique color
   PRFAPSLEN, // Applique stitchLen
@@ -720,7 +719,7 @@ enum TextureButtons { // text button windows
 
 enum MachineType { AUXPCS, AUXDST, AUXPES };
 
-/* 
+/*
 class D_RECTANGLE
 {
   public:
@@ -831,7 +830,7 @@ constexpr uint8_t NFRMEND  = 0xfeU; // 1111 1110
 constexpr uint8_t FRMLMSK  = 0x0eU; // 0000 1110
 constexpr uint8_t NFRMLMSK = 0xf1U; // 1111 0001
 
-constexpr auto FRMMMSK   = 0xffff0000U;
+constexpr auto FRMMMSK = 0xffff0000U;
 
 // blunt bits
 constexpr uint8_t FBLNT  = 0x20U; // 0010 0000

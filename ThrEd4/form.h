@@ -19,7 +19,7 @@ enum class IntersectionStyles { POINT_IN_LINE = 0, POINT_BEFORE_LINE, POINT_AFTE
 
 class F_POINT_LINE
 {
-public:
+  public:
   float    x {};
   float    y {};
   uint16_t line {};

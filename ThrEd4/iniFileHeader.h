@@ -2,7 +2,6 @@
 // Local Headers
 #include "thredFileHeader.h"
 
-
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -18,9 +17,9 @@
 #include <cstdint>
 #include <cstdlib>
 
-constexpr auto     COLORCNT = uint8_t {16U};           // Number of colors in arrays
-constexpr auto     COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
-constexpr auto     OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
+constexpr auto COLORCNT = uint8_t {16U};           // Number of colors in arrays
+constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
+constexpr auto OLDNUM   = uint32_t {4U};           // number of old filenames saved on file menu
 
 constexpr auto FDEFTYP = int32_t {FTHPSG}; // default feather type
 

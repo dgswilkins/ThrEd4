@@ -58,7 +58,7 @@
 
 class FORM_VERTICES
 {
-public:
+  public:
   uint32_t start {};
   uint32_t vertexCount {};
   uint32_t finish {};
