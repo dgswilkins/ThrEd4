@@ -47,10 +47,13 @@ class PCS_STITCH
 };
 #pragma pack(pop)
 
-namespace pci = PCS::internal;
-
-constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY};
 constexpr auto LARGE_HOOP = F_POINT {LHUPX, LHUPY};
+constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY};
+
+// PCS internal namespace
+namespace pci {
+  auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
+} // namespace pci
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header
 
@@ -222,7 +225,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
   return false;
 }
 
-auto PCS::internal::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
+auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   auto boundingRect = F_RECTANGLE {stitches[0].y, stitches[0].x, stitches[0].x, stitches[0].y};
   for (auto const& stitch : stitches) {
 	if (stitch.x < boundingRect.left) {
