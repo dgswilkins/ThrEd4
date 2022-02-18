@@ -12,12 +12,6 @@
 //#include <new.h>
 #endif
 
-// dst type masks
-
-constexpr auto JMPTYP = 0x830000U;
-constexpr auto COLTYP = 0x630000U;
-constexpr auto REGTYP = 0x030000U;
-
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
 // clang-format off
 class DSTHED // dst file header
@@ -71,6 +65,12 @@ void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
 constexpr auto COLVER = uint32_t {0x776874U}; // color file version
+constexpr auto DSTMAX    = 121;         // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTSCALE  = 3.0F / 5.0F; // DST stitch scaling factor
+constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
+constexpr auto TYPCOL = 0x630000U; // dst type masks
+constexpr auto TYPJMP = 0x830000U; // dst type masks
+constexpr auto TYPREG = 0x030000U; // dst type masks
 
 static auto ColorFileName = static_cast<fs::path*>(nullptr); //.thw file name
 static auto RGBFileName   = static_cast<fs::path*>(nullptr); //.rgb file name
@@ -88,14 +88,9 @@ class DSTDAT
   //~DSTDAT() = default;
 };
 
-constexpr auto XCOR = char {0};
-constexpr auto YCOR = char {1};
-
-constexpr auto DSTMAX    = 121;         // maximum stitch/jump length of 121 in DST format
-constexpr auto DSTSCALE  = 3.0F / 5.0F; // DST stitch scaling factor
-constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
-
 void di::dstin(uint32_t number, POINT& pout) noexcept {
+  constexpr auto XCOR = char {0};
+  constexpr auto YCOR = char {1};
   // ToDo - what is this code doing?
   static constexpr auto DST_VALUES = std::array<DSTDAT, 22> {
       {// DST offset values
@@ -274,9 +269,9 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
 
 	auto difference = SIZE {};
 	while ((lengths.cx != 0) || (lengths.cy != 0)) {
-	  auto dstType = REGTYP;
+	  auto dstType = TYPREG;
 	  if (abs(lengths.cx) > stepSize.cx) {
-		dstType = JMPTYP;
+		dstType = TYPJMP;
 		if (lengths.cx > 0) {
 		  difference.cx = stepSize.cx;
 		}
@@ -288,7 +283,7 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
 		difference.cx = lengths.cx;
 	  }
 	  if (abs(lengths.cy) > stepSize.cy) {
-		dstType = JMPTYP;
+		dstType = TYPJMP;
 		if (lengths.cy > 0) {
 		  difference.cy = stepSize.cy;
 		}
