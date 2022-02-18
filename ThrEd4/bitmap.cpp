@@ -10,19 +10,19 @@
 
 // bitmap internal namespace
 namespace bi {
-  auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
-  auto bitar() -> bool;
-  void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
-  void bitsiz();
-  constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
-  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
+auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
+auto bitar() -> bool;
+void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
+void bitsiz();
+constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
-  void movmap(int cnt, uint8_t* buffer);
-  auto nuBit() noexcept -> BOOL;
-  auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
-  void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
-  auto saveName(fs::path& fileName);
-  auto stch2bit(F_POINT& point) -> POINT;
+auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
+void movmap(int cnt, uint8_t* buffer);
+auto nuBit() noexcept -> BOOL;
+void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
+auto saveName(fs::path& fileName);
+auto stch2bit(F_POINT& point) -> POINT;
 } // namespace bi
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -167,10 +167,10 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  if (bits != nullptr) {
 		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
 		  bi::bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
-		         &bits[wrap::toSize(iHeight * BitmapWidth)],
-		         bitmapWidthBytes,
-		         foreground,
-		         background);
+		             &bits[wrap::toSize(iHeight * BitmapWidth)],
+		             bitmapWidthBytes,
+		             foreground,
+		             background);
 		}
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
@@ -229,11 +229,7 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthIn
   return whiteBits > blackBits;
 }
 
-void bi::bitlin(uint8_t const* source,
-                              uint32_t*      destination,
-                              uint32_t       bitmapWidthBytes,
-                              COLORREF       foreground,
-                              COLORREF       background) {
+void bi::bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background) {
   if ((source != nullptr) && (destination != nullptr)) {
 	for (auto i = 0U; i < bitmapWidthBytes; ++i) {
 	  auto bits = std::bitset<CHAR_BIT>(source[i]);

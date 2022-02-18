@@ -23,9 +23,9 @@ namespace fs = std::filesystem;
 
 namespace bitmap {
 void assignUBFilename(fs::path const& directory);
-void bitbltBitmap() noexcept;
 void bfil(COLORREF const& backgroundColor);
 void bfrm(FRM_HEAD const& form);
+void bitbltBitmap() noexcept;
 void chkbit();
 void delmap();
 void drawBmpBackground();
@@ -34,24 +34,22 @@ auto getBitmapDC() noexcept -> HDC;
 auto getBitmapHeight() noexcept -> int;
 auto getBitmapSizeinStitches() noexcept -> F_POINT;
 auto getBitmapWidth() noexcept -> int;
-auto getBmpColor() noexcept -> COLORREF;
 auto getBmpBackColor(uint32_t const& index) noexcept -> COLORREF;
-
-auto getBmpNameLength() -> uint32_t;
+auto getBmpColor() noexcept -> COLORREF;
 auto getBmpNameData() noexcept -> char*;
-
+auto getBmpNameLength() -> uint32_t;
 auto getBmpStitchRatio() noexcept -> F_POINT;
-auto getrmap() -> uint32_t;
 auto getTraceDC() noexcept -> HDC;
+auto getrmap() -> uint32_t;
 auto ismap() noexcept -> bool;
+void lodbmp(fs::path const* directory);
 void resetBmpFile(bool reset);
 void resetDC() noexcept;
 void savmap();
-void lodbmp(fs::path const* directory);
 void setBBCV(std::vector<COLORREF>* value) noexcept;
-void setBmpBackColor();
-void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;
 void setBitmapPen(HPEN pen) noexcept;
+void setBmpBackColor();
+void setBmpColor();
 void setUBfilename(fs::path* fileName) noexcept;
 } // namespace bitmap
