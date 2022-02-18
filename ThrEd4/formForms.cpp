@@ -3,6 +3,7 @@
 #include "displayText.h"
 #include "form.h"
 #include "formForms.h"
+#include "formHeader.h"
 #include "globals.h"
 #include "satin.h"
 #include "thred.h"
@@ -16,7 +17,8 @@
 #include "fmt/xchar.h"
 #pragma warning(pop)
 
-namespace ffi = formForms::internal;
+// Standard Libraries
+#include <cstdint>
 
 constexpr auto TXTMARG  = 3L; // text margin in pixels
 constexpr auto TXTMARG2 = 6L; // wide text margin in pixels
@@ -78,6 +80,32 @@ enum DaisyStyles { // daisy form types
   DHART            // Heart shape
 };
 
+// formForms Internal namespace
+namespace ffi {
+  void chkdaz();
+
+  auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+
+  void initdaz(HWND hWinDialog);
+  void initTearDlg(HWND hwndlg);
+  auto maxwid() -> SIZE;
+  auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
+  void nxtlin(uint32_t& formMenuEntryCount) noexcept;
+  void nxtlinprf() noexcept;
+  void prflin(std::wstring const& msg, LIST_TYPE const& row);
+  auto prfnwin(std::wstring const& text) noexcept -> HWND;
+  void prftwin(std::wstring const& text) noexcept;
+  void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount);
+
+  auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+
+  auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
+  auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
+  void wavinit(HWND hwndlg);
+
+  auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+} // namespace ffi
+
 static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet
 static auto LabelWindowSize   = SIZE {}; // size of the left windows in the form data sheet
 static auto ValueWindowCoords = RECT {}; // location of right windows in the form data sheet
@@ -101,7 +129,7 @@ void formForms::maxtsiz(std::wstring const& label, SIZE& textSize) {
   }
 }
 
-auto formForms::internal::maxwid() -> SIZE {
+auto ffi::maxwid() -> SIZE {
   auto textSize = SIZE {};
   for (auto const& item : PREFLIST) {
 	formForms::maxtsiz(displayText::loadStr(item.stringID), textSize);
@@ -109,7 +137,7 @@ auto formForms::internal::maxwid() -> SIZE {
   return textSize;
 }
 
-auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
+auto ffi::txtwin(std::wstring const& windowName, RECT const& location) -> HWND {
   if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(windowName, LabelWindowSize);
 	return nullptr;
@@ -128,7 +156,7 @@ auto formForms::internal::txtwin(std::wstring const& windowName, RECT const& loc
                       nullptr);
 }
 
-auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
+auto ffi::txtrwin(std::wstring const& winName, RECT const& location) -> HWND {
   if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
@@ -147,7 +175,7 @@ auto formForms::internal::txtrwin(std::wstring const& winName, RECT const& locat
                       nullptr);
 }
 
-auto formForms::internal::numwin(std::wstring const& winName, RECT const& location) -> HWND {
+auto ffi::numwin(std::wstring const& winName, RECT const& location) -> HWND {
   if (StateMap->test(StateFlag::REFCNT)) {
 	formForms::maxtsiz(winName, ValueWindowSize);
 	return nullptr;
@@ -166,19 +194,19 @@ auto formForms::internal::numwin(std::wstring const& winName, RECT const& locati
                       nullptr);
 }
 
-void formForms::internal::nxtlin(uint32_t& formMenuEntryCount) noexcept {
+void ffi::nxtlin(uint32_t& formMenuEntryCount) noexcept {
   ++formMenuEntryCount;
   ffi::nxtlinprf();
 }
 
-void formForms::internal::nxtlinprf() noexcept {
+void ffi::nxtlinprf() noexcept {
   LabelWindowCoords.top += LabelWindowSize.cy;
   LabelWindowCoords.bottom += LabelWindowSize.cy;
   ValueWindowCoords.top += ValueWindowSize.cy;
   ValueWindowCoords.bottom += ValueWindowSize.cy;
 }
 
-void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
+void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
   static constexpr auto EDGE_ARRAY = std::array<uint16_t, 13> {
       MEGLIN, MEGBLD, MEGCLP, MEGSAT, MEGAP, MEGPRP, MEGHOL, MEGPIC, MEGDUB, MEGCHNH, MEGCHNL, MEGCLPX, 0};
   auto const strOn         = displayText::loadStr(IDS_ON);
@@ -528,7 +556,7 @@ void formForms::prfsid(HWND wnd) {
                                    nullptr);
 }
 
-void formForms::internal::prftwin(std::wstring const& text) noexcept {
+void ffi::prftwin(std::wstring const& text) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   CreateWindow(L"STATIC",
                text.c_str(),
@@ -543,7 +571,7 @@ void formForms::internal::prftwin(std::wstring const& text) noexcept {
                nullptr);
 }
 
-auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
+auto ffi::prfnwin(std::wstring const& text) noexcept -> HWND {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   return CreateWindow(L"STATIC",
                       text.c_str(),
@@ -558,7 +586,7 @@ auto formForms::internal::prfnwin(std::wstring const& text) noexcept -> HWND {
                       nullptr);
 }
 
-void formForms::internal::prflin(std::wstring const& msg, LIST_TYPE const& row) {
+void ffi::prflin(std::wstring const& msg, LIST_TYPE const& row) {
   ffi::prftwin(displayText::loadStr(row.stringID));
   ValueWindow->operator[](row.value) = ffi::prfnwin(msg);
   ffi::nxtlinprf();
@@ -580,7 +608,7 @@ void formForms::prfmsg() {
   LabelWindowSize.cy = 0;
   ValueWindowSize.cx = 0;
   ValueWindowSize.cy = 0;
-  LabelWindowSize    = formForms::internal::maxwid();
+  LabelWindowSize    = ffi::maxwid();
   LabelWindowSize.cx += TXTMARG2;
   formForms::maxtsiz(displayText::loadStr(IDS_TAPR), ValueWindowSize);
   DestroyWindow(PreferencesWindow);
@@ -661,7 +689,7 @@ void formForms::frmnum() {
   }
 }
 
-void formForms::internal::chkdaz() {
+void ffi::chkdaz() {
   if (IniFile.daisyPetalPoints == 0U) {
 	IniFile.daisyPetalPoints = 1U;
   }
@@ -676,7 +704,7 @@ void formForms::internal::chkdaz() {
   }
 }
 
-void formForms::internal::initdaz(HWND hWinDialog) {
+void ffi::initdaz(HWND hWinDialog) {
   ffi::chkdaz();
   SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format(L"{}", IniFile.daisyPetalPoints).c_str());
   SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format(L"{}", IniFile.daisyHeartCount).c_str());
@@ -706,7 +734,7 @@ void formForms::internal::initdaz(HWND hWinDialog) {
   SendMessage(GetDlgItem(hWinDialog, IDC_DAZTYP), CB_SETCURSEL, IniFile.daisyBorderType, 0);
 }
 
-auto CALLBACK formForms::internal::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -952,7 +980,7 @@ void formForms::dasyfrm() {
   form::mdufrm();
 }
 
-void formForms::internal::initTearDlg(HWND hwndlg) {
+void ffi::initTearDlg(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format(L"{:d}", IniFile.formSides).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format(L"{:.3f}", IniFile.tearTailLength).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP),
@@ -960,7 +988,7 @@ void formForms::internal::initTearDlg(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(L"{:.3f}", IniFile.tearTwistRatio).c_str());
 }
 
-auto CALLBACK formForms::internal::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -1128,14 +1156,14 @@ void formForms::setear() {
   }
 }
 
-void formForms::internal::wavinit(HWND hwndlg) {
+void ffi::wavinit(HWND hwndlg) {
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), fmt::format(L"{}", IniFile.wavePoints).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), fmt::format(L"{}", IniFile.waveStart).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), fmt::format(L"{}", IniFile.waveEnd).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_WAVS), fmt::format(L"{}", IniFile.waveLobes).c_str());
 }
 
-auto CALLBACK formForms::internal::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
