@@ -6,7 +6,12 @@
 #include "globals.h"
 #include "thred.h"
 
-namespace di = displayText::internal;
+// displayText internal namespace
+namespace di {
+  void bxtxt(uint32_t iButton, uint32_t iMessage);
+  void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
+  void sdmsg();
+} // namespace di
 
 auto displayText::loadStr(uint32_t stringID) -> std::wstring {
   auto* pBuf  = gsl::narrow_cast<wchar_t*>(nullptr);
@@ -232,7 +237,7 @@ void displayText::grpmsg1() {
   displayText::tabmsg(IDS_NOGRP);
 }
 
-void displayText::internal::sdmsg() {
+void di::sdmsg() {
   displayText::showMessage(IDS_SAVDISC, ThrName->wstring());
 }
 
@@ -351,11 +356,11 @@ void displayText::tomsg() {
   displayText::updateWinFont(MainStitchWin);
 }
 
-void displayText::internal::bxtxt(uint32_t iButton, uint32_t iMessage) {
+void di::bxtxt(uint32_t iButton, uint32_t iMessage) {
   SetWindowText(ButtonWin->operator[](iButton), displayText::loadStr(iMessage).c_str());
 }
 
-void displayText::internal::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
+void di::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
   auto const fmtStr = displayText::loadStr(iMessage);
   SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
 }

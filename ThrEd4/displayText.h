@@ -55,10 +55,4 @@ void spltmsg();
 void tomsg();
 void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
-
-namespace internal {
-  void bxtxt(uint32_t iButton, uint32_t iMessage);
-  void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
-  void sdmsg();
-} // namespace internal
 } // namespace displayText
