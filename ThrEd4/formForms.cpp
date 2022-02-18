@@ -194,8 +194,8 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
   ValueWindowCoords.left   = TXTMARG2 + LabelWindowSize.cx;
   ValueWindowCoords.right  = TXTMARG2 + LabelWindowSize.cx + ValueWindowSize.cx + TXTMARG2;
   labelWindow[LFRM]        = ffi::txtwin(displayText::loadStr(IDS_TXT0), LabelWindowCoords);
-  auto choice              = (form.type == FRMLINE) ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
-  valueWindow[LFRM]        = ffi::txtrwin(choice, ValueWindowCoords);
+  auto choice = (form.type == FRMLINE) ? displayText::loadStr(IDS_EDG1) : displayText::loadStr(IDS_FREH);
+  valueWindow[LFRM] = ffi::txtrwin(choice, ValueWindowCoords);
   ffi::nxtlin(formMenuEntryCount);
   labelWindow[LLAYR] = ffi::txtwin(displayText::loadStr(IDS_TXT1), LabelWindowCoords);
   // NOLINTNEXTLINE hicpp-signed-bitwise
@@ -339,7 +339,8 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	}
 	if (form.fillType == VRTF || form.fillType == HORF || form.fillType == ANGF || form.istx()) {
 	  labelWindow[LBFILSQR] = ffi::txtwin(displayText::loadStr(PREFLIST[PRFFILEND].stringID), LabelWindowCoords);
-	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? displayText::loadStr(IDS_SQR) : displayText::loadStr(IDS_PNTD);
+	  choice = ((form.extendedAttribute & AT_SQR) != 0U) ? displayText::loadStr(IDS_SQR)
+	                                                     : displayText::loadStr(IDS_PNTD);
 	  valueWindow[LBFILSQR] = ffi::txtrwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
@@ -443,11 +444,13 @@ void formForms::internal::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) 
 	}
 	if (form.type == FRMLINE && ((EDGE_ARRAY[edgeIdx] & BRDEND) != 0)) {
 	  labelWindow[LBSTRT] = ffi::txtwin(displayText::loadStr(IDS_TXT14), LabelWindowCoords);
-	  choice = ((form.attribute & SBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT) : displayText::loadStr(IDS_TAPR);
+	  choice              = ((form.attribute & SBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT)
+	                                                         : displayText::loadStr(IDS_TAPR);
 	  valueWindow[LBSTRT] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LBFIN] = ffi::txtwin(displayText::loadStr(IDS_TXT15), LabelWindowCoords);
-	  choice = ((form.attribute & FBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT) : displayText::loadStr(IDS_TAPR);
+	  choice             = ((form.attribute & FBLNT) != 0U) ? displayText::loadStr(IDS_BLUNT)
+	                                                        : displayText::loadStr(IDS_TAPR);
 	  valueWindow[LBFIN] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
@@ -615,19 +618,22 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(L"{}", (IniFile.fillPhase)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.eggRatio)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.fillAngle * RADDEGF)), *(row++));
-  auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? displayText::loadStr(IDS_SQR) : displayText::loadStr(IDS_PNTD);
+  auto choice = (UserFlagMap->test(UserFlag::SQRFIL)) ? displayText::loadStr(IDS_SQR)
+                                                      : displayText::loadStr(IDS_PNTD);
   ffi::prflin(choice, *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (LineSpacing * IPFGRAN)), *(row++));
   ffi::prflin(fmt::format(L"{}", (thred::duthrsh(ShowStitchThreshold))), *(row++));
   ffi::prflin(fmt::format(L"{:.2f} mm", (IniFile.gridSize * IPFGRAN)), *(row++));
   form::sethup();
-  ffi::prflin(fmt::format(L"{}", displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)), *(row++));
+  ffi::prflin(fmt::format(L"{}", displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
+              *(row++));
   ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeY * IPFGRAN)), *(row++));
   ffi::prflin(fmt::format(L"{:.0f} mm", (IniFile.hoopSizeX * IPFGRAN)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.lensRatio)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (IniFile.cursorNudgeStep)), *(row++));
   ffi::prflin(fmt::format(L"{:.2f}", (PicotSpacing * IPFGRAN)), *(row++));
-  choice = (UserFlagMap->test(UserFlag::BLUNT)) ? displayText::loadStr(IDS_BLUNT) : displayText::loadStr(IDS_TAPR);
+  choice = (UserFlagMap->test(UserFlag::BLUNT)) ? displayText::loadStr(IDS_BLUNT)
+                                                : displayText::loadStr(IDS_TAPR);
   ffi::prflin(choice, *(row++));
   choice = (UserFlagMap->test(UserFlag::DUND)) ? displayText::loadStr(IDS_ON) : displayText::loadStr(IDS_OFF);
   ffi::prflin(choice, *(row++));

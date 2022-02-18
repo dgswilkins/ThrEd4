@@ -599,7 +599,7 @@ void clip::internal::dulast(std::vector<F_POINT>& chainEndPoints) {
 void clip::internal::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   ci::dulast(chainEndPoints);
   if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
-	auto const pivot      = ClipRectSize.cy / 2;
+	auto const pivot = ClipRectSize.cy / 2;
 	std::transform(ClipBuffer->begin(), ClipBuffer->end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});

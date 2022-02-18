@@ -26,7 +26,7 @@ constexpr auto POINTMAX = size_t {500000U};     // maximum number of trace point
 constexpr auto REDCOL   = uint32_t {0x0000ffU}; // code for the color red
 constexpr auto REDMSK   = uint32_t {0xffff00U}; // mask for the color red
 
-												// edge tracing directions
+// edge tracing directions
 enum TraceDirection {
   TRCU, // top edge
   TRCR, // right edge
@@ -115,7 +115,7 @@ void trace::internal::trcstpnum() {
 }
 
 void trace::internal::trcratnum() {
-  constexpr auto HLIN = uint32_t{ HNUM };
+  constexpr auto HLIN = uint32_t {HNUM};
   displayText::butxt(HLIN, fmt::format(displayText::loadStr(IDS_TRCRAT), -log10(IniFile.traceRatio - 1.0F)));
 }
 
@@ -803,8 +803,8 @@ void trace::trinit() {
 	  if (StateMap->test(StateFlag::MONOMAP)) {
 		auto const color     = gsl::narrow<COLORREF>(TraceBitmapData[0]);
 		auto       highColor = color;
-		auto const spTBD     = gsl::span(
-            TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+		auto const spTBD =
+		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		auto const pixel = std::find_if(
 		    spTBD.begin(), spTBD.end(), [color](uint32_t const& m) -> bool { return m != color; });
 		if (pixel != spTBD.end()) {
@@ -821,8 +821,8 @@ void trace::trinit() {
 		}
 	  }
 	  else {
-		auto const spTBD = gsl::span(
-		    TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+		auto const spTBD =
+		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto const pixel : spTBD) {
 		  ti::trcols(pixel);
 		  auto iPixelColors = PixelColors.begin();

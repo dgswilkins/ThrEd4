@@ -74,8 +74,8 @@ void texture::txdun() {
 		}
 		wrap::writeFile(handle,
 		                textureHistoryBuffer.data(),
-		  wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
-		  &bytesWritten,
+		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
+		                &bytesWritten,
 		                nullptr);
 		for (auto& item : *TextureHistory) {
 		  if (!item.texturePoints.empty()) {

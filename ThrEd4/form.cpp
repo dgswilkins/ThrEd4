@@ -1643,7 +1643,7 @@ void form::internal::spurfn(F_POINT const& innerPoint,
                             F_POINT const& outerPoint,
                             F_POINT&       underlayInnerPoint,
                             F_POINT&       underlayOuterPoint) noexcept {
-  auto const delta     = F_POINT {outerPoint.x - innerPoint.x, outerPoint.y - innerPoint.y};
+  auto const     delta  = F_POINT {outerPoint.x - innerPoint.x, outerPoint.y - innerPoint.y};
   constexpr auto DIURAT = (1.0F - URAT) / 2.0F;        //(1-URAT)/2
   constexpr auto DOURAT = (1.0F - URAT) / 2.0F + URAT; //(1-URAT)/2+URAT
 
@@ -3093,11 +3093,11 @@ void form::internal::clpcon(FRM_HEAD&                     form,
 	for (auto iRegion = 0U; iRegion < iclpxSize; ++iRegion) {
 	  auto regionCrossingStart = iclpx[iRegion];
 	  auto regionCrossingEnd   = iclpx[wrap::toSize(iRegion) + 1U];
-	  pasteLocation.x = clipWidth * (wrap::toFloat(iRegion) + wrap::toFloat(clipGrid.left));
-	  auto  clipVerticalOffset = 0.0F;
-	  auto  lineSegmentStart   = F_POINT {}; // vertical clipboard line segment start
-	  auto  lineSegmentEnd     = F_POINT {}; // vertical clipboard line segment end
-	  auto  clipStitchCount    = wrap::toUnsigned(ClipBuffer->size());
+	  pasteLocation.x         = clipWidth * (wrap::toFloat(iRegion) + wrap::toFloat(clipGrid.left));
+	  auto clipVerticalOffset = 0.0F;
+	  auto lineSegmentStart   = F_POINT {}; // vertical clipboard line segment start
+	  auto lineSegmentEnd     = F_POINT {}; // vertical clipboard line segment end
+	  auto clipStitchCount    = wrap::toUnsigned(ClipBuffer->size());
 	  if (StateMap->test(StateFlag::TXFIL)) {
 		auto const textureLine =
 		    (iRegion + wrap::toUnsigned(clipGrid.left)) % wrap::toUnsigned(form.fillInfo.texture.lines);

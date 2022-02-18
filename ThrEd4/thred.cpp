@@ -40,18 +40,18 @@
 
 namespace thi = thred::internal;
 
-constexpr auto ARROWPNT = 3U;                     // points required to draw arrow
-constexpr auto BALJUMP  = uint8_t {0x81U};        // balarad jump stitch
-constexpr auto BALNORM  = uint8_t {0x80U};        // normal balarad stitch
-constexpr auto BALRATIO = 10.0F / 6.0F;           // Balarad stitch size ration
-constexpr auto BALSTOP  = uint8_t {0U};           // balarad stop
-constexpr auto CHSDEF   = 24.0F;                  // default chain stitch length
-constexpr auto CHRDEF   = 0.25;                   // default chain stitch ratio
-constexpr auto DEFPIX   = uint16_t {2U};          // default nudge pixels
-constexpr auto DEFULEN  = 12.0F;                  // default underlay stitch length
-constexpr auto DNDLEN   = 256U;                   // designer name decoding table length
-constexpr auto DNELEN   = 128U;                   // designer name encoding table length
-constexpr auto DNLEN    = 50U;                    // designer name order table length
+constexpr auto ARROWPNT = 3U;              // points required to draw arrow
+constexpr auto BALJUMP  = uint8_t {0x81U}; // balarad jump stitch
+constexpr auto BALNORM  = uint8_t {0x80U}; // normal balarad stitch
+constexpr auto BALRATIO = 10.0F / 6.0F;    // Balarad stitch size ration
+constexpr auto BALSTOP  = uint8_t {0U};    // balarad stop
+constexpr auto CHSDEF   = 24.0F;           // default chain stitch length
+constexpr auto CHRDEF   = 0.25;            // default chain stitch ratio
+constexpr auto DEFPIX   = uint16_t {2U};   // default nudge pixels
+constexpr auto DEFULEN  = 12.0F;           // default underlay stitch length
+constexpr auto DNDLEN   = 256U;            // designer name decoding table length
+constexpr auto DNELEN   = 128U;            // designer name encoding table length
+constexpr auto DNLEN    = 50U;             // designer name order table length
 constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
 constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
 constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
@@ -247,9 +247,9 @@ static auto NameOrder        = std::array<uint32_t, DNLEN> {}; // designer name 
 static auto NameEncoder      = std::array<uint8_t, DNELEN> {}; // designer name encoding
 static auto NameDecoder      = std::array<uint8_t, DNDLEN> {}; // designer name decode
 static auto FirstWin = gsl::narrow_cast<HWND>(nullptr); // first window not destroyed for exiting enumerate loop
-static auto SelectedFormsRange = RANGE {}; // range of selected forms
-static auto ZoomMin            = float {};      // minimum allowed zoom value
-static auto BalaradOffset      = F_POINT {};    // balarad offset
+static auto SelectedFormsRange = RANGE {};              // range of selected forms
+static auto ZoomMin            = float {};              // minimum allowed zoom value
+static auto BalaradOffset      = F_POINT {}; // balarad offset
 static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
@@ -625,14 +625,14 @@ void thred::internal::fnamtabs() {
 }
 
 void thred::internal::ritfnam(std::wstring const& designerName) {
-  constexpr auto NAMELEN = NameOrder.size();
-  auto const designer = utf::utf16ToUtf8(designerName);
-  auto       tmpName  = std::array<uint8_t, NameOrder.size()> {};
+  constexpr auto NAMELEN  = NameOrder.size();
+  auto const     designer = utf::utf16ToUtf8(designerName);
+  auto           tmpName  = std::array<uint8_t, NameOrder.size()> {};
   if (NameOrder[0] > NameOrder.size()) {
 	fnamtabs();
   }
   PseudoRandomValue = rsed();
-  auto iName = 0U;
+  auto iName        = 0U;
   std::generate(
       tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
   auto const spNameDecoder = gsl::span {NameDecoder};
@@ -2196,7 +2196,7 @@ void thred::unmsg() {
 }
 
 #pragma warning(suppress : 26461) // The pointer argument can be marked as a pointer to const (con.3)
-auto thred::internal::oldwnd(HWND window) noexcept -> bool { 
+auto thred::internal::oldwnd(HWND window) noexcept -> bool {
   for (auto iColor = 0U; iColor < COLORCNT; ++iColor) {
 	if (DefaultColorWin->operator[](iColor) == window ||
 	    UserColorWin->operator[](iColor) == window || ThreadSizeWin->operator[](iColor) == window) {
@@ -4021,9 +4021,9 @@ void thred::internal::redbak() {
 	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
 	}
 	// ToDo - add field in BACK_HEAD to keep track of number of colors
-	constexpr auto UCOLSIZE = UserColor.size();
-	auto const spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-	auto const spUserColors = gsl::span {UserColor};
+	constexpr auto UCOLSIZE     = UserColor.size();
+	auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
+	auto const     spUserColors = gsl::span {UserColor};
 	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
 	auto up  = UserPen->begin();
 	auto ucb = UserColorBrush.begin();
@@ -7040,13 +7040,13 @@ void thred::redclp() {
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
 	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
-	auto const  clipSize         = clipStitchPtr[0].led;
-	auto const  spClipStitchData = gsl::span {clipStitchPtr, clipSize};
+	auto const        clipSize         = clipStitchPtr[0].led;
+	auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
 	ClipBuffer->clear();
 	ClipBuffer->reserve(clipSize);
 	ClipBuffer->emplace_back(wrap::toFloat(clipStitchPtr->x) + wrap::toFloat(clipStitchPtr->fx) / FRACFACT,
-	                        wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
-	                        0U);
+	                         wrap::toFloat(clipStitchPtr->y) + wrap::toFloat(clipStitchPtr->fy) / FRACFACT,
+	                         0U);
 
 #if CLPBUG
 	OutputDebugString(fmt::format(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n",
@@ -7056,11 +7056,11 @@ void thred::redclp() {
 #endif
 	auto clipRect = F_RECTANGLE {
 	    ClipBuffer->front().x, ClipBuffer->front().y, ClipBuffer->front().x, ClipBuffer->front().y};
-	auto iCSD     = std::next(spClipStitchData.begin());
+	auto iCSD = std::next(spClipStitchData.begin());
 	for (auto iStitch = 1U; iStitch < clipSize; ++iStitch) {
 	  ClipBuffer->emplace_back(wrap::toFloat(iCSD->x) + wrap::toFloat(iCSD->fx) / FRACFACT,
-	                          wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
-	                          (iCSD->led & COLMSK) | codedLayer);
+	                           wrap::toFloat(iCSD->y) + wrap::toFloat(iCSD->fy) / FRACFACT,
+	                           (iCSD->led & COLMSK) | codedLayer);
 
 #if CLPBUG
 	  OutputDebugString(fmt::format(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n",
@@ -7084,7 +7084,7 @@ void thred::redclp() {
 	  ++iCSD;
 	}
 	ClipBuffer->front().attribute = ActiveColor | codedLayer;
-	ClipRectSize                 = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
+	ClipRectSize = {clipRect.right - clipRect.left, clipRect.top - clipRect.bottom};
 	GlobalUnlock(ClipMemory);
 	if ((clipRect.left != 0.0F) || (clipRect.bottom != 0.0F)) {
 	  for (auto& clip : *ClipBuffer) {
@@ -8624,7 +8624,7 @@ void thred::internal::nuthsel() {
 void thred::internal::nuthbak(uint32_t count) {
   if (ThumbnailIndex != 0U) {
 	constexpr auto MAXFORMS = uint32_t {1024U}; // maximum number of forms
-	auto const length = wcslen(ThumbnailSearchString->data());
+	auto const     length   = wcslen(ThumbnailSearchString->data());
 	if (length != 0U) {
 	  while ((count != 0U) && ThumbnailIndex < MAXFORMS) {
 		if (ThumbnailIndex != 0U) {
@@ -9116,18 +9116,18 @@ void thred::internal::defpref() {
   PicotSpacing = IPICSPAC;
   UserFlagMap->set(UserFlag::FIL2OF);
   fil2men();
-  BackgroundColor              = 0xa8c4b1;
-  UnzoomedRect.cx              = std::lround(IniFile.hoopSizeX);
-  UnzoomedRect.cy              = std::lround(IniFile.hoopSizeY);
+  BackgroundColor = 0xa8c4b1;
+  UnzoomedRect.cx = std::lround(IniFile.hoopSizeX);
+  UnzoomedRect.cy = std::lround(IniFile.hoopSizeY);
   IniFile.defWav();
   IniFile.defFeather();
-  IniFile.underlayStitchLen    = DEFULEN;
-  IniFile.underlaySpacing      = DEFUSPAC;
-  IniFile.formBoxSizePixels    = DEFBPIX;
-  IniFile.textureHeight        = ITXHI;
-  IniFile.textureWidth         = ITXWID;
-  IniFile.textureSpacing       = ITXSPAC;
-  IniFile.lensRatio            = DEFLRAT;
+  IniFile.underlayStitchLen = DEFULEN;
+  IniFile.underlaySpacing   = DEFUSPAC;
+  IniFile.formBoxSizePixels = DEFBPIX;
+  IniFile.textureHeight     = ITXHI;
+  IniFile.textureWidth      = ITXWID;
+  IniFile.textureSpacing    = ITXSPAC;
+  IniFile.lensRatio         = DEFLRAT;
 }
 
 void thred::internal::dumrk(float xCoord, float yCoord) {
@@ -10445,7 +10445,7 @@ auto CALLBACK thred::internal::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, 
 		  auto buf = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_FDTYP), buf.data(), HBUFSIZ);
 		  IniFile.initFeatherType();
-		  auto buffer             = std::wstring {};
+		  auto buffer = std::wstring {};
 		  for (auto const& iFeatherStyle : FTHRLIST) {
 			buffer.assign(displayText::loadStr(iFeatherStyle.stringID));
 			if (wcscmp(buf.data(), buffer.c_str()) == 0) {
@@ -13016,24 +13016,22 @@ auto thred::internal::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  static constexpr auto THREAD_SIZES = std::array<wchar_t const*, 3> {L"30", L"40", L"60"};
 	  thred::savdo();
 	  threadSizeSelected = VerticalIndex;
-	  auto idx  = gsl::narrow_cast<int32_t>(VerticalIndex);
-	  auto iStr = THREAD_SIZES.begin();
-	  std::generate(ChangeThreadSizeWin.begin(),
-	                ChangeThreadSizeWin.end(),
-	                [&idx, &iStr]() mutable noexcept -> HWND {
-		              // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		              return CreateWindow(L"STATIC",
-		                                  *(iStr++),
-		                                  WS_CHILD | WS_VISIBLE | WS_BORDER,
-		                                  ButtonWidthX3,
-		                                  ButtonHeight * idx++,
-		                                  ButtonWidth,
-		                                  ButtonHeight,
-		                                  ThrEdWindow,
-		                                  nullptr,
-		                                  ThrEdInstance,
-		                                  nullptr);
-	                });
+	  auto idx           = gsl::narrow_cast<int32_t>(VerticalIndex);
+	  auto iStr          = THREAD_SIZES.begin();
+	  std::generate(ChangeThreadSizeWin.begin(), ChangeThreadSizeWin.end(), [&idx, &iStr]() mutable noexcept -> HWND {
+		// NOLINTNEXTLINE(hicpp-signed-bitwise)
+		return CreateWindow(L"STATIC",
+		                    *(iStr++),
+		                    WS_CHILD | WS_VISIBLE | WS_BORDER,
+		                    ButtonWidthX3,
+		                    ButtonHeight * idx++,
+		                    ButtonWidth,
+		                    ButtonHeight,
+		                    ThrEdWindow,
+		                    nullptr,
+		                    ThrEdInstance,
+		                    nullptr);
+	  });
 	  StateMap->set(StateFlag::SIZSEL);
 	}
 	return true;
@@ -13228,7 +13226,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  auto* clipData  = convertFromPtr<F_POINT*>(&guides[formIter.satinGuideCount]);
 		  auto  clipCount = 0U;
 		  if (formIter.isclpx()) {
-			auto const spClip = gsl::span {clipData, formIter.lengthOrCount.clipCount};
+			auto const spClip             = gsl::span {clipData, formIter.lengthOrCount.clipCount};
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), spClip.begin(), spClip.end());
 			clipCount += formIter.lengthOrCount.clipCount;
@@ -13242,7 +13240,7 @@ auto thred::internal::doPaste(std::vector<POINT> const& stretchBoxLine, bool& re
 		  }
 		  if (formIter.istx()) {
 			auto*      textureSource = convertFromPtr<TX_PNT*>(&clipData[clipCount]);
-			auto const spTexture = gsl::span {textureSource, formIter.fillInfo.texture.count};
+			auto const spTexture     = gsl::span {textureSource, formIter.fillInfo.texture.count};
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());
 			TexturePointsBuffer->insert(TexturePointsBuffer->end(), spTexture.begin(), spTexture.end());
 		  }
@@ -16598,7 +16596,7 @@ void thred::internal::init() {
   nuRct();
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  auto bc = BOX_COLOR.begin();
+  auto                  bc        = BOX_COLOR.begin();
   std::generate(BoxPen.begin(), BoxPen.end(), [&bc]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(bc++));
   });
@@ -18011,7 +18009,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  privateSelectedPointsLine.resize(OUTPNTS);
 	  constexpr auto SWCOUNT = 16U; // number of side windows to create/track
 	  privateSideWindow.resize(SWCOUNT);
-	  constexpr auto SWBLEN  = 11U; // Side Window buffer length including the zero terminator
+	  constexpr auto SWBLEN = 11U; // Side Window buffer length including the zero terminator
 	  privateSideWindowEntryBuffer.resize(SWBLEN);
 	  privateTextureHistory.resize(ITXBUFSZ);
 	  privateThreadSizeWin.resize(COLORCNT);

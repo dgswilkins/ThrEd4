@@ -108,7 +108,7 @@ void xt::internal::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FE
   }
 }
 
-constexpr auto FSED = uint32_t{ 1340007303U };     // feather sequence seed
+constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
 auto xt::internal::bpsg() noexcept -> uint32_t {
   constexpr auto BIT4  = 0x8U;
