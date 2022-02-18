@@ -173,9 +173,6 @@
     <ClInclude Include="fRectangleHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="repairHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="satinHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
