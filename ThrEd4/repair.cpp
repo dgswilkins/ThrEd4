@@ -6,9 +6,47 @@
 #include "satin.h"
 #include "thred.h"
 
-namespace ri = repair::internal;
+constexpr auto BADFLT = 1U;
+constexpr auto BADCLP = 1U << 1U;
+constexpr auto BADSAT = 1U << 2U;
+constexpr auto BADTX  = 1U << 3U;
 
-void repair::internal::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
+class BAD_COUNTS
+{
+  public:
+  uint32_t attribute {};
+  uint32_t flt {};
+  uint32_t clip {};
+  uint32_t guideCount {}; // ToDo - is this an accurate description?
+  uint32_t tx {};
+
+  // constexpr BAD_COUNTS() noexcept = default;
+  // BAD_COUNTS(BAD_COUNTS const&) = default;
+  // BAD_COUNTS(BAD_COUNTS&&) = default;
+  // BAD_COUNTS& operator=(BAD_COUNTS const& rhs) = default;
+  // BAD_COUNTS& operator=(BAD_COUNTS&&) = default;
+  //~BAD_COUNTS() = default;
+};
+
+// repair internal namespace
+namespace ri {
+  void adbad(std::wstring& repairMessage, uint32_t code, uint32_t count);
+  void bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+  void chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept;
+  void chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept;
+  void chkfstch() noexcept;
+  void chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+  void chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+  void chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept;
+  void datmsg(uint32_t code);
+  auto frmchkfn() -> uint32_t;
+  void repclp(std::wstring& repairMessage);
+  void repflt(std::wstring& repairMessage);
+  void repsat();
+  void reptx();
+} // namespace ri
+
+void ri::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
   auto fmtStr = displayText::loadStr(code);
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   fmtStr += fmt::format(displayText::loadStr(IDS_NOTREP), count);
@@ -75,7 +113,7 @@ void repair::lodchk() {
   }
 }
 
-void repair::internal::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
+void ri::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
   if (badData.clip == formHeader.angleOrClipData.clip) {
 	badData.clip += formHeader.lengthOrCount.clipCount;
   }
@@ -84,7 +122,7 @@ void repair::internal::chkclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) n
   }
 }
 
-void repair::internal::chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
+void ri::chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) noexcept {
   if (badData.clip == formHeader.borderClipData) {
 	badData.clip += formHeader.clipEntries;
   }
@@ -93,7 +131,7 @@ void repair::internal::chkeclp(FRM_HEAD const& formHeader, BAD_COUNTS& badData) 
   }
 }
 
-void repair::internal::chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
+void ri::chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.flt == form.vertexIndex) {
 	badData.flt += form.vertexCount;
   }
@@ -102,7 +140,7 @@ void repair::internal::chkVrtx(FRM_HEAD const& form, BAD_COUNTS& badData) noexce
   }
 }
 
-void repair::internal::chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
+void ri::chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.guideCount == form.satinOrAngle.guide) {
 	badData.guideCount += form.satinGuideCount;
   }
@@ -111,7 +149,7 @@ void repair::internal::chkSat(FRM_HEAD const& form, BAD_COUNTS& badData) noexcep
   }
 }
 
-void repair::internal::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
+void ri::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (badData.tx == form.fillInfo.texture.index) {
 	badData.tx += form.fillInfo.texture.count;
   }
@@ -120,7 +158,7 @@ void repair::internal::chkTxt(FRM_HEAD const& form, BAD_COUNTS& badData) noexcep
   }
 }
 
-auto repair::internal::frmchkfn() -> uint32_t {
+auto ri::frmchkfn() -> uint32_t {
   auto badData = BAD_COUNTS {};
   if (!FormList->empty()) {
 	for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
@@ -169,7 +207,7 @@ auto repair::internal::frmchkfn() -> uint32_t {
   return badData.attribute;
 }
 
-void repair::internal::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
+void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isclp()) {
 	badData.clip += form.lengthOrCount.clipCount;
   }
@@ -184,7 +222,7 @@ void repair::internal::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept 
   }
 }
 
-void repair::internal::chkfstch() noexcept {
+void ri::chkfstch() noexcept {
   auto const codedFormIndex = FormList->size() << FRMSHFT;
   for (auto& stitch : *StitchBuffer) {
 	if ((stitch.attribute & FRMSK) >= codedFormIndex) {
@@ -193,7 +231,7 @@ void repair::internal::chkfstch() noexcept {
   }
 }
 
-void repair::internal::repflt(std::wstring& repairMessage) {
+void ri::repflt(std::wstring& repairMessage) {
   auto  iDestination = 0U;
   auto  badData      = BAD_COUNTS {};
   auto& formList     = *FormList;
@@ -238,7 +276,7 @@ void repair::internal::repflt(std::wstring& repairMessage) {
   *FormVertices = std::move(vertexPoint);
 }
 
-void repair::internal::repclp(std::wstring& repairMessage) {
+void ri::repclp(std::wstring& repairMessage) {
   auto badClipCount = 0U;
   auto clipCount    = 0U;
   auto clipPoint    = std::vector<F_POINT> {};
@@ -309,7 +347,7 @@ void repair::internal::repclp(std::wstring& repairMessage) {
   }
 }
 
-void repair::internal::repsat() {
+void ri::repsat() {
   auto guideCount = 0U;
   auto badData    = BAD_COUNTS {};
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
@@ -344,7 +382,7 @@ void repair::internal::repsat() {
   SatinGuides->resize(guideCount);
 }
 
-void repair::internal::reptx() {
+void ri::reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
   for (auto formIter = FormList->begin(); formIter != FormList->end(); ++formIter) {
