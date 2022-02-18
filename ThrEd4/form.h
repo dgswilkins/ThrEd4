@@ -4,14 +4,6 @@
 #include "formHeader.h"
 #include "regionHeader.h"
 
-// Open Source headers
-#pragma warning(push)
-#pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
-#pragma warning(disable : 26455) // supress warning for library headers
-#pragma warning(disable : 26814)
-#include "boost/dynamic_bitset.hpp"
-#pragma warning(pop)
-
 constexpr auto SQRCORNS = 4U; // number of corners in a square
 
 // is intersection of line and cursor in, before or after the line
