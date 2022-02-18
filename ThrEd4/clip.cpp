@@ -7,11 +7,96 @@
 #include "satin.h"
 #include "thred.h"
 
-namespace ci = clip::internal;
+// clip internal namespace
+namespace ci {
+
+  void clpcrnr(FRM_HEAD const&       form,
+               F_RECTANGLE const&    clipRect,
+               std::vector<F_POINT>& clipFillData,
+               uint32_t              vertex,
+               F_POINT const&        rotationCenter);
+  auto clpsid(uint32_t                    vertexIndex,
+              F_RECTANGLE const&          clipRect,
+              std::vector<F_POINT> const& clipReversedData,
+              std::vector<F_POINT>&       clipFillData,
+              uint32_t                    start,
+              uint32_t                    finish,
+              F_POINT const&              rotationCenter) -> bool;
+  void clpsub(uint32_t fpnt, uint32_t cnt);
+  void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints);
+  void duch(std::vector<F_POINT> const& chainEndPoints);
+  void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish);
+  void dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints);
+  void dulast(std::vector<F_POINT>& chainEndPoints);
+  void durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept;
+  auto findclp(uint32_t formIndex) noexcept -> uint32_t;
+  void fxlen(FRM_HEAD const&           form,
+             std::vector<F_POINT>&     chainEndPoints,
+             std::vector<float> const& listSINEs,
+             std::vector<float> const& listCOSINEs);
+  void fxlin(uint32_t                  vertexIndex,
+             std::vector<F_POINT>&     chainEndPoints,
+             std::vector<float> const& ListSINEs,
+             std::vector<float> const& ListCOSINEs,
+             F_POINT&                  moveToCoords,
+             uint32_t                  currentSide,
+             F_POINT&                  stitchPoint,
+             float                     adjustedSpace,
+             uint32_t                  nextStart);
+  void fxlit(uint32_t                  vertexIndex,
+             std::vector<float> const& listSINEs,
+             std::vector<float> const& listCOSINEs,
+             F_POINT&                  moveToCoords,
+             uint32_t                  currentSide,
+             F_POINT&                  stitchPoint,
+             uint32_t&                 adjCount,
+             float                     adjustedSpace,
+             uint32_t                  nextStart);
+  auto fxpnt(uint32_t                  vertexIndex,
+             std::vector<float> const& listSINEs,
+             std::vector<float> const& listCOSINEs,
+             F_POINT&                  moveToCoords,
+             uint32_t                  currentSide,
+             F_POINT const&            stitchPoint,
+             float                     adjustedSpace,
+             uint32_t                  nextStart) -> bool;
+  void lincrnr(uint32_t                    vertexIndex,
+               std::vector<F_POINT> const& clipReversedData,
+               std::vector<F_POINT>&       clipFillData,
+               float                       clipAngle,
+               F_POINT const&              rotationCenter,
+               uint32_t                    currentSide,
+               F_POINT&                    stitchPoint,
+               F_POINT const&              borderClipReference);
+  void linsid(uint32_t                    vertexIndex,
+              std::vector<F_POINT> const& clipReversedData,
+              std::vector<F_POINT>&       clipFillData,
+              float                       clipAngle,
+              F_POINT const&              vector0,
+              F_POINT const&              rotationCenter,
+              uint32_t                    currentSide,
+              F_POINT&                    stitchPoint,
+              F_POINT const&              borderClipReference);
+  auto nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool;
+  void picfn(FRM_HEAD const&       form,
+             F_RECTANGLE const&    clipRect,
+             std::vector<F_POINT>& clipFillData,
+             uint32_t              start,
+             uint32_t              finish,
+             float                 spacing,
+             F_POINT const&        rotationCenter);
+  auto ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool;
+  void setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAngle, F_POINT& vector0);
+  void xclpfn(std::vector<F_POINT> const& tempClipPoints,
+              std::vector<F_POINT> const& chainEndPoints,
+              uint32_t                    start,
+              uint32_t                    finish,
+              F_POINT const&              rotationCenter);
+} // namespace ci
 
 static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 
-auto clip::internal::findclp(uint32_t formIndex) noexcept -> uint32_t {
+auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
   for (auto iForm = formIndex; iForm != 0; --iForm) {
 	auto& form = FormList->operator[](iForm - 1U);
 	if (form.iseclp()) {
@@ -24,7 +109,7 @@ auto clip::internal::findclp(uint32_t formIndex) noexcept -> uint32_t {
   return 0;
 }
 
-void clip::internal::clpsub(uint32_t fpnt, uint32_t cnt) {
+void ci::clpsub(uint32_t fpnt, uint32_t cnt) {
   for (auto iForm = fpnt + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 	if (form.isclpx()) {
@@ -154,7 +239,7 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
   }
 }
 
-void clip::internal::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
+void ci::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& clipReversedData) noexcept {
   if (!ClipBuffer->empty()) {
 	auto const midpoint = wrap::midl(clipRect.right, clipRect.left);
 	if (auto const& clipBuffer = *ClipBuffer; clipBuffer[0].x > midpoint) {
@@ -174,7 +259,7 @@ void clip::internal::durev(F_RECTANGLE const& clipRect, std::vector<F_POINT>& cl
   }
 }
 
-void clip::internal::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAngle, F_POINT& vector0) {
+void ci::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAngle, F_POINT& vector0) {
   auto const itVertex       = wrap::next(FormVertices->cbegin(), vertexIndex);
   auto const itStartVertex  = wrap::next(itVertex, start);
   auto const itFinishVertex = wrap::next(itVertex, finish);
@@ -183,7 +268,7 @@ void clip::internal::setvct(uint32_t vertexIndex, uint32_t start, uint32_t finis
   vector0.y = ClipRectSize.cx * sin(clipAngle);
 }
 
-auto clip::internal::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool {
+auto ci::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const& stitchPoint) noexcept -> bool {
   auto const sinAngle = sin(clipAngle);
   auto const cosAngle = cos(clipAngle);
   if (auto length = hypot(moveToCoords.x - stitchPoint.x, moveToCoords.y - stitchPoint.y);
@@ -203,7 +288,7 @@ auto clip::internal::nupnt(float clipAngle, F_POINT& moveToCoords, F_POINT const
   return false;
 }
 
-auto clip::internal::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
+auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) -> bool {
   auto       retval        = false;
   auto const adjustedPoint = F_POINT {(point.x - ClipReference.x), (point.y - ClipReference.y)};
   if (form::chkmax(wrap::toUnsigned(clipFillData.size()), wrap::toUnsigned(OSequence->size()))) {
@@ -220,7 +305,7 @@ auto clip::internal::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT co
   return retval;
 }
 
-void clip::internal::lincrnr(uint32_t                    vertexIndex,
+void ci::lincrnr(uint32_t                    vertexIndex,
                              std::vector<F_POINT> const& clipReversedData,
                              std::vector<F_POINT>&       clipFillData,
                              float                       clipAngle,
@@ -243,7 +328,7 @@ void clip::internal::lincrnr(uint32_t                    vertexIndex,
   }
 }
 
-void clip::internal::linsid(uint32_t                    vertexIndex,
+void ci::linsid(uint32_t                    vertexIndex,
                             std::vector<F_POINT> const& clipReversedData,
                             std::vector<F_POINT>&       clipFillData,
                             float                       clipAngle,
@@ -283,7 +368,7 @@ void clip::clpout(float width) {
   }
 }
 
-auto clip::internal::clpsid(uint32_t                    vertexIndex,
+auto ci::clpsid(uint32_t                    vertexIndex,
                             F_RECTANGLE const&          clipRect,
                             std::vector<F_POINT> const& clipReversedData,
                             std::vector<F_POINT>&       clipFillData,
@@ -374,7 +459,7 @@ void clip::clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t st
   }
 }
 
-auto clip::internal::fxpnt(uint32_t                  vertexIndex,
+auto ci::fxpnt(uint32_t                  vertexIndex,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs,
                            F_POINT&                  moveToCoords,
@@ -400,7 +485,7 @@ auto clip::internal::fxpnt(uint32_t                  vertexIndex,
   return false;
 }
 
-void clip::internal::fxlit(uint32_t                  vertexIndex,
+void ci::fxlit(uint32_t                  vertexIndex,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs,
                            F_POINT&                  moveToCoords,
@@ -423,7 +508,7 @@ void clip::internal::fxlit(uint32_t                  vertexIndex,
   }
 }
 
-void clip::internal::fxlin(uint32_t                  vertexIndex,
+void ci::fxlin(uint32_t                  vertexIndex,
                            std::vector<F_POINT>&     chainEndPoints,
                            std::vector<float> const& ListSINEs,
                            std::vector<float> const& ListCOSINEs,
@@ -448,7 +533,7 @@ void clip::internal::fxlin(uint32_t                  vertexIndex,
   }
 }
 
-void clip::internal::fxlen(FRM_HEAD const&           form,
+void ci::fxlen(FRM_HEAD const&           form,
                            std::vector<F_POINT>&     chainEndPoints,
                            std::vector<float> const& listSINEs,
                            std::vector<float> const& listCOSINEs) {
@@ -554,7 +639,7 @@ void clip::internal::fxlen(FRM_HEAD const&           form,
   }
 }
 
-void clip::internal::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
+void ci::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEndPoints) {
   form::duangs(form);
   auto listSINEs = std::vector<float> {};
   listSINEs.reserve(wrap::toSize(form.vertexCount) + 1U);
@@ -570,7 +655,7 @@ void clip::internal::dufxlen(FRM_HEAD const& form, std::vector<F_POINT>& chainEn
   ci::fxlen(form, chainEndPoints, listSINEs, listCOSINEs);
 }
 
-void clip::internal::dulast(std::vector<F_POINT>& chainEndPoints) {
+void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   auto tempClipPoints = std::vector<F_POINT> {};
   tempClipPoints.reserve(chainEndPoints.size());
   if (form::lastch()) {
@@ -596,7 +681,7 @@ void clip::internal::dulast(std::vector<F_POINT>& chainEndPoints) {
   }
 }
 
-void clip::internal::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
+void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints) {
   ci::dulast(chainEndPoints);
   if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
@@ -611,7 +696,7 @@ void clip::internal::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F
   }
 }
 
-void clip::internal::xclpfn(std::vector<F_POINT> const& tempClipPoints,
+void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
                             std::vector<F_POINT> const& chainEndPoints,
                             uint32_t                    start,
                             uint32_t                    finish,
@@ -645,7 +730,7 @@ void clip::duxclp(FRM_HEAD const& form) {
   }
 }
 
-void clip::internal::clpcrnr(FRM_HEAD const&       form,
+void ci::clpcrnr(FRM_HEAD const&       form,
                              F_RECTANGLE const&    clipRect,
                              std::vector<F_POINT>& clipFillData,
                              uint32_t              vertex,
@@ -680,7 +765,7 @@ void clip::internal::clpcrnr(FRM_HEAD const&       form,
   }
 }
 
-void clip::internal::picfn(FRM_HEAD const&       form,
+void ci::picfn(FRM_HEAD const&       form,
                            F_RECTANGLE const&    clipRect,
                            std::vector<F_POINT>& clipFillData,
                            uint32_t              start,
@@ -775,7 +860,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
   }
 }
 
-void clip::internal::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
+void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
   constexpr auto CHAINLEN = 10U; // Chain length
   constexpr auto CHAIN_SEQUENCE = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
   auto           chainPoint = std::vector<F_POINT> {};
@@ -817,7 +902,7 @@ void clip::internal::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t
   }
 }
 
-void clip::internal::duch(std::vector<F_POINT> const& chainEndPoints) {
+void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
   OSequence->clear();
   if (auto chainLength = wrap::toUnsigned(chainEndPoints.size()); chainLength > 2U) {
 	--chainLength;
