@@ -22,22 +22,6 @@ class TX_PNT // textured fill point
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1)
-class TX_OFF // textured fill offset
-{
-  public:
-  float   y {};
-  int32_t line {};
-
-  // constexpr TX_OFF() noexcept = default;
-  // TX_OFF(TX_OFF const&) = default;
-  // TX_OFF(TX_OFF&&) = default;
-  // TX_OFF& operator=(TX_OFF const& rhs) = default;
-  // TX_OFF& operator=(TX_OFF&&) = default;
-  //~TX_OFF() = default;
-};
-#pragma pack(pop)
-
 class TXTR_SCREEN
 {
   public:
@@ -63,22 +47,6 @@ class TXTR_SCREEN
   //~TXTR_SCREEN() = default;
 };
 
-class TXTR_RECT
-{
-  public:
-  uint16_t left {};
-  uint16_t right {};
-  float    top {};
-  float    bottom {};
-
-  // constexpr TXTR_RECT() noexcept = default;
-  // TXTR_RECT(TXTR_RECT const&) = default;
-  // TXTR_RECT(TXTR_RECT&&) = default;
-  // TXTR_RECT& operator=(TXTR_RECT const& rhs) = default;
-  // TXTR_RECT& operator=(TXTR_RECT&&) = default;
-  //~TXTR_RECT() = default;
-};
-
 class TX_HIST
 {
   public:
@@ -94,22 +62,4 @@ class TX_HIST
   // TX_HIST& operator=(TX_HIST const& rhs) = default;
   // TX_HIST& operator=(TX_HIST&&) = default;
   //~TX_HIST() = default;
-};
-
-class TX_HIST_BUFF
-{
-  public:
-  uint32_t* placeholder {};
-  uint32_t  count {};
-
-  float height {};
-  float width {};
-  float spacing {};
-
-  // constexpr TX_HIST_BUFF() noexcept = default;
-  // TX_HIST_BUFF(TX_HIST_BUFF const&) = default;
-  // TX_HIST_BUFF(TX_HIST_BUFF&&) = default;
-  // TX_HIST_BUFF& operator=(TX_HIST_BUFF const& rhs) = default;
-  // TX_HIST_BUFF& operator=(TX_HIST_BUFF&&) = default;
-  //~TX_HIST_BUFF() = default;
 };
