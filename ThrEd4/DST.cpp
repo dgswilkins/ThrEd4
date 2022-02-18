@@ -12,7 +12,63 @@
 //#include <new.h>
 #endif
 
-namespace di = DST::internal;
+// dst type masks
+
+constexpr auto JMPTYP = 0x830000U;
+constexpr auto COLTYP = 0x630000U;
+constexpr auto REGTYP = 0x030000U;
+
+#pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
+// clang-format off
+class DSTHED // dst file header
+{
+  public:
+  char desched[3]  {}; // 00  00	description
+  char desc[17]    {}; // 03  03
+  char recshed[3]  {}; // 20  14	record count
+  char recs[8]     {}; // 23  17
+  char cohed[3]    {}; // 31  1F
+  char co[4]       {}; // 34  22
+  char xplushed[3] {}; // 38  26	x+ size
+  char xplus[6]    {}; // 41  29
+  char xminhed[3]  {}; // 47  2F	x- size
+  char xmin[6]     {}; // 50  32
+  char yplushed[3] {}; // 56  38
+  char yplus[6]    {}; // 59  3B	y+ size
+  char yminhed[3]  {}; // 65  41
+  char ymin[6]     {}; // 68  44	y- size
+  char axhed[3]    {}; // 74  4A
+  char ax[7]       {}; // 77  4D
+  char ayhed[3]    {}; // 84  54
+  char ay[7]       {}; // 87  57
+  char mxhed[3]    {}; // 94  5E
+  char mx[7]       {}; // 97  61
+  char myhed[3]    {}; // 104 68
+  char my[7]       {}; // 107 6B
+  char pdhed[2]    {}; // 114 72
+  char pd[7]       {}; // 116 74
+  char eof[1]      {}; // 123 7B
+  char res[388]    {}; // 124 7C
+
+  constexpr DSTHED() noexcept = default;
+  // DSTHED(DSTHED&&) = default;
+  // DSTHED& operator=(DSTHED const& rhs) = default;
+  // DSTHED& operator=(DSTHED&&) = default;
+  //~DSTHED() = default;
+};
+// clang-format on
+#pragma pack(pop)
+
+namespace di {
+auto chkdst(DSTHED const* dstHeader) noexcept -> bool;
+auto coldis(COLORREF colorA, COLORREF colorB) -> DWORD;
+auto colfil() -> bool;
+void dstin(uint32_t number, POINT& pout) noexcept;
+void dstran(std::vector<DSTREC>& DSTData);
+auto dtrn(DSTREC* dpnt) -> uint32_t;
+auto dudbits(SIZE const& dif) -> uint32_t;
+void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
+} // namespace di
 
 constexpr auto COLVER = uint32_t {0x776874U}; // color file version
 
@@ -39,7 +95,7 @@ constexpr auto DSTMAX    = 121;         // maximum stitch/jump length of 121 in 
 constexpr auto DSTSCALE  = 3.0F / 5.0F; // DST stitch scaling factor
 constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
 
-void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
+void di::dstin(uint32_t number, POINT& pout) noexcept {
   // ToDo - what is this code doing?
   static constexpr auto DST_VALUES = std::array<DSTDAT, 22> {
       {// DST offset values
@@ -63,7 +119,7 @@ void DST::internal::dstin(uint32_t number, POINT& pout) noexcept {
   }
 }
 
-void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
+void di::dstran(std::vector<DSTREC>& DSTData) {
   auto bytesRead = DWORD {};
   auto colors    = std::vector<uint32_t> {};
   if (di::colfil()) {
@@ -91,7 +147,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   auto color  = 0U;
   if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
 	UserColor[0] = colors[iColor];
-	color        = colmatch(colors[iColor++]);
+	color        = DST::colmatch(colors[iColor++]);
 	thred::addColor(0, color);
   }
   auto localStitch       = F_POINT {};
@@ -103,7 +159,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
 	if (constexpr auto C1MASK = 0x40U;
 	    (record.nd & C1MASK) != 0) { // if c1 is set, assume a color change and not a sequin, which would have c0 set too
 	  if (bytesRead >= ((wrap::toSize(iColor) + 1U) * wrap::sizeofType(colors))) {
-		color                    = colmatch(colors[iColor++]);
+		color                    = DST::colmatch(colors[iColor++]);
 		auto const currentStitch = wrap::toUnsigned(StitchBuffer->size() - 1U);
 		thred::addColor(currentStitch, color);
 	  }
@@ -156,7 +212,7 @@ void DST::internal::dstran(std::vector<DSTREC>& DSTData) {
   }
 }
 
-auto DST::internal::dtrn(DSTREC* dpnt) -> uint32_t {
+auto di::dtrn(DSTREC* dpnt) -> uint32_t {
   return *(convertFromPtr<uint32_t*>(dpnt));
 }
 
@@ -279,7 +335,7 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
   }
 }
 
-auto DST::internal::colfil() -> bool {
+auto di::colfil() -> bool {
   *ColorFileName = *WorkingFileName;
   *RGBFileName   = *WorkingFileName;
   auto flag      = false;
@@ -299,7 +355,7 @@ void DST::setRGBFilename(fs::path* directory) noexcept {
   RGBFileName = directory;
 }
 
-auto DST::internal::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
+auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
@@ -343,7 +399,7 @@ auto DST::colmatch(COLORREF color) -> uint32_t {
   return iDistance;
 }
 
-auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
+auto di::dudbits(SIZE const& dif) -> uint32_t {
   static constexpr auto DSTLEN = 243U; // -121 to 121
   static constexpr auto X_DST  = std::array<uint32_t, DSTLEN> {
       0x090a0a, //-121
@@ -839,13 +895,13 @@ auto DST::internal::dudbits(SIZE const& dif) -> uint32_t {
   return X_DST[wrap::toSize(dif.cx) + DSTMAX] | Y_DST[wrap::toSize(dif.cy) + DSTMAX];
 }
 
-void DST::internal::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
+void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
   DSTRecords.push_back(DSTREC {gsl::narrow_cast<uint8_t>(data & B1MASK),
                                gsl::narrow_cast<uint8_t>((data & B2MASK) >> BYTSHFT),
                                gsl::narrow_cast<uint8_t>((data & B3MASK) >> WRDSHFT)});
 }
 
-auto DST::internal::chkdst(DSTHED const* dstHeader) noexcept -> bool {
+auto di::chkdst(DSTHED const* dstHeader) noexcept -> bool {
   return strncmp(static_cast<const char*>(dstHeader->desched), "LA:", 3) == 0;
 }
 
