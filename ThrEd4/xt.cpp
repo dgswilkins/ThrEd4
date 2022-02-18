@@ -1104,7 +1104,7 @@ void xt::fsort() {
 			}
 		  }
 		  GetSystemTimeAsFileTime(&fileTime);
-		  constexpr auto SRTIM = 20000000Ui64; // sort time limit in 100 ns intervals
+		  constexpr auto SRTIM = 20000000UI64; // sort time limit in 100 ns intervals
 		  if (auto const nextTime = xi::tim2int(fileTime); nextTime.QuadPart - startTime.QuadPart > SRTIM) {
 			break;
 		  }
