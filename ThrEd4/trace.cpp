@@ -11,8 +11,6 @@
 // Standard Libraries
 #include <numeric>
 
-namespace ti = trace::internal;
-
 constexpr auto ADJCOUNT = uint32_t {9U}; // including the center pixel there are 9 pixels immediately adjacent
 constexpr auto BLUCOL   = uint32_t {0xff0000U}; // code for the color blue
 constexpr auto BLUMSK   = uint32_t {0x00ffffU}; // mask for the color blue
@@ -33,6 +31,41 @@ enum TraceDirection {
   TRCD, // bottom edge
   TRCL  // left edge
 };
+
+// trace internal namespace
+namespace ti {
+  void difbits(uint32_t shift, uint32_t* point) noexcept;
+
+  static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
+
+  void dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
+  auto ducolm() -> uint32_t;
+  void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
+  void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
+  void dutrac();
+  void dutrnum0(uint32_t color);
+  void hidwnd(HWND hwnd) noexcept;
+  void hideTraceWin() noexcept;
+  void ritrcol(COLORREF* color, uint32_t number) noexcept;
+  void shownd(HWND hwnd) noexcept;
+  void showTraceWin() noexcept;
+  void tracwnd();
+  auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
+  auto trcin(COLORREF color) -> bool;
+  void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
+  void trcols(COLORREF color) noexcept;
+  void trcratnum();
+  void trcstpnum();
+  auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
+  void trnumwnd0(int32_t position) noexcept;
+  void trnumwnd1(int32_t position) noexcept;
+  auto trsum() -> uint32_t;
+
+#if TRCMTH == 0
+  auto colsum(COLORREF col) -> uint32_t;
+  auto icolsum(COLORREF col) -> uint32_t;
+#endif
+} // namespace ti
 
 static auto PixelColors = std::array<uint32_t, CHANLCNT> {};    // separated pixel reference colors
 static auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
@@ -69,7 +102,7 @@ void trace::initColorRef() noexcept {
   InvertDownColor = PENGRAY;
 }
 
-auto trace::internal::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
+auto ti::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
   // NOLINTNEXTLINE(readability-qualified-auto)
@@ -102,24 +135,24 @@ void trace::initTraceWindows() {
   }
 }
 
-void trace::internal::trcols(COLORREF color) noexcept {
+void ti::trcols(COLORREF color) noexcept {
   PixelColors[0] = color & B1MASK;
   PixelColors[1] = (color & B2MASK) >> BYTSHFT;
   PixelColors[2] = (color & B3MASK) >> WRDSHFT;
 }
 
-void trace::internal::trcstpnum() {
+void ti::trcstpnum() {
   auto const fmtStr = displayText::loadStr(IDS_TRCSTP);
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength * IPFGRAN)).c_str());
 }
 
-void trace::internal::trcratnum() {
+void ti::trcratnum() {
   constexpr auto HLIN = uint32_t {HNUM};
   displayText::butxt(HLIN, fmt::format(displayText::loadStr(IDS_TRCRAT), -log10(IniFile.traceRatio - 1.0F)));
 }
 
-auto trace::internal::trcin(COLORREF color) -> bool {
+auto ti::trcin(COLORREF color) -> bool {
   if (color != 0U) {
 	ti::trcols(color);
 	if (StateMap->test(StateFlag::TRCRED)) {
@@ -151,15 +184,15 @@ auto trace::internal::trcin(COLORREF color) -> bool {
   return false;
 }
 
-void trace::internal::shownd(HWND hwnd) noexcept {
+void ti::shownd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_SHOW);
 }
 
-void trace::internal::hidwnd(HWND hwnd) noexcept {
+void ti::hidwnd(HWND hwnd) noexcept {
   ShowWindow(hwnd, SW_HIDE);
 }
 
-void trace::internal::showTraceWin() noexcept {
+void ti::showTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
@@ -171,7 +204,7 @@ void trace::internal::showTraceWin() noexcept {
   }
 }
 
-void trace::internal::tracwnd() {
+void ti::tracwnd() {
   thred::hideColorWin();
   ti::hidwnd(ButtonWin->operator[](HBOXSEL));
   ti::hidwnd(ButtonWin->operator[](HUPTO));
@@ -183,7 +216,7 @@ void trace::internal::tracwnd() {
 }
 
 // Check Translation
-static inline void trace::internal::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
+static inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& destination) noexcept {
   destination = (source >> (shift & NIBMASK)) & BYTMASK;
 }
 
@@ -192,7 +225,7 @@ static inline void trace::internal::difsub(uint32_t const source, uint32_t shift
 //  504
 //  678
 
-void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
+void ti::difbits(uint32_t shift, uint32_t* point) noexcept {
   auto* testPoint = point;
   if (testPoint != nullptr) {
 	auto iTrcAdjClrs = TraceAdjacentColors.begin();
@@ -216,7 +249,7 @@ void trace::internal::difbits(uint32_t shift, uint32_t* point) noexcept {
   }
 }
 
-auto trace::internal::trsum() -> uint32_t {
+auto ti::trsum() -> uint32_t {
   auto const firstColor = TraceAdjacentColors.front();
   auto const iBegin     = std::next(TraceAdjacentColors.begin());
   auto const iEnd       = std::next(TraceAdjacentColors.end(), -1);
@@ -226,7 +259,7 @@ auto trace::internal::trsum() -> uint32_t {
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
 }
 
-void trace::internal::hideTraceWin() noexcept {
+void ti::hideTraceWin() noexcept {
   auto iTraceSelectWindow = TraceSelectWindow.begin();
   auto iTraceUpWindow     = TraceUpWindow.begin();
   auto iTraceDownWindow   = TraceDownWindow.begin();
@@ -316,7 +349,7 @@ void trace::trdif() {
 }
 
 #if TRCMTH == 0
-unsigned trace::internal::colsum(COLORREF col) {
+unsigned ti::colsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
@@ -326,7 +359,7 @@ unsigned trace::internal::colsum(COLORREF col) {
   return colorSum;
 }
 
-unsigned trace::internal::icolsum(COLORREF col) {
+unsigned ti::icolsum(COLORREF col) {
   ti::trcols(col);
   auto colorSum = 0U;
   for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
@@ -489,7 +522,7 @@ void trace::tracedg() {
   StateMap->set(StateFlag::WASEDG);
 }
 
-auto trace::internal::trcbit(uint32_t const          initialDirection,
+auto ti::trcbit(uint32_t const          initialDirection,
                              uint32_t&               traceDirection,
                              std::vector<TRACE_PNT>& tracedPoints) -> bool {
   auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
@@ -602,14 +635,14 @@ auto trace::internal::trcbit(uint32_t const          initialDirection,
            CurrentTracePoint.y == tracedPoints[0].y);
 }
 
-void trace::internal::dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point) {
+void ti::dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point) {
   if (point != nullptr) {
 	wrap::narrow(traceDiff.x, point[1].x - point[0].x);
 	wrap::narrow(traceDiff.y, point[1].y - point[0].y);
   }
 }
 
-void trace::internal::dutrac() {
+void ti::dutrac() {
   if (thred::inStitchWin()) {
 	auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	if (!StateMap->test(StateFlag::WASEDG)) {
@@ -900,7 +933,7 @@ void trace::trcsel() {
   }
 }
 
-void trace::internal::ritrcol(COLORREF* color, uint32_t number) noexcept {
+void ti::ritrcol(COLORREF* color, uint32_t number) noexcept {
   if (color != nullptr) {
 	*color &= TraceRGBMask[ColumnColor];
 	number &= BYTMASK;
@@ -908,7 +941,7 @@ void trace::internal::ritrcol(COLORREF* color, uint32_t number) noexcept {
   }
 }
 
-void trace::internal::dutrnum0(uint32_t color) {
+void ti::dutrnum0(uint32_t color) {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
@@ -952,7 +985,7 @@ void trace::dutrnum1() {
   }
 }
 
-auto trace::internal::ducolm() -> uint32_t {
+auto ti::ducolm() -> uint32_t {
   if (TraceMsgPoint.x < gsl::narrow<int32_t>(ButtonWidth)) {
 	return 0U;
   }
@@ -963,14 +996,14 @@ auto trace::internal::ducolm() -> uint32_t {
   return 2U;
 }
 
-void trace::internal::trnumwnd0(int32_t position) noexcept {
+void ti::trnumwnd0(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER};
   TraceNumberInput        = CreateWindowEx(
       0L, L"STATIC", nullptr, DW_STYLE, ButtonWidthX3, position, ButtonWidth, ButtonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
 }
 
-void trace::internal::trnumwnd1(int32_t position) noexcept {
+void ti::trnumwnd1(int32_t position) noexcept {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {WS_CHILD | WS_VISIBLE | WS_BORDER};
   GeneralNumberInputBox   = CreateWindowEx(
@@ -1123,7 +1156,7 @@ void trace::tracpar() {
   }
 }
 
-void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
+void ti::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
   auto const zeroWidth = thred::txtWid(L"0");
   color >>= shift;
   color &= BYTMASK;
@@ -1133,7 +1166,7 @@ void trace::internal::trcnum(uint32_t shift, COLORREF color, uint32_t backColor)
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
-void trace::internal::durct(uint32_t    shift,
+void ti::durct(uint32_t    shift,
                             RECT const& traceControlRect,
                             RECT&       traceHighMask,
                             RECT&       traceMiddleMask,
@@ -1161,7 +1194,7 @@ void trace::internal::durct(uint32_t    shift,
   }
 }
 
-void trace::internal::dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
+void ti::dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
   if (StateMap->test(StateFlag::DUHI)) {
 	FillRect(dc, &traceHighMask, brush);
   }
