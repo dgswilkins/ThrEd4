@@ -16491,14 +16491,13 @@ void thred::internal::init() {
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   ThreadSize.fill(L'4');
-  constexpr auto TRACLEN  = 1.0F;          // initial trace length
-  constexpr auto TRACRAT  = 1.00001F;      // initial trace ratio
-  constexpr auto DEFEGRAT = 1.5;           // default egg ratio
   constexpr auto DEFPNTPX = uint16_t {4U}; // default form and stitch point pixels
   if (IniFile.traceLength == 0.0F) {
+	constexpr auto TRACLEN = 1.0F; // initial trace length
 	IniFile.traceLength = TRACLEN;
   }
   if (IniFile.traceRatio == 0.0F) {
+	constexpr auto TRACRAT = 1.00001F; // initial trace ratio
 	IniFile.traceRatio = TRACRAT;
   }
   if (IniFile.chainSpace == 0.0F) {
@@ -16517,6 +16516,7 @@ void thred::internal::init() {
 	IniFile.nudgePixels = DEFPIX;
   }
   if (IniFile.eggRatio == 0.0F) {
+	constexpr auto DEFEGRAT = 1.5; // default egg ratio
 	IniFile.eggRatio = DEFEGRAT;
   }
   if (IniFile.stitchSizePixels == 0U) {
@@ -17362,8 +17362,7 @@ struct createParams {
 };
 
 auto CALLBACK thred::internal::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT {
-  constexpr auto LINSCROL = 0.05F; // line scroll factor
-  switch (message) {
+  switch (constexpr auto LINSCROL = 0.05F; message) { // LINSCROL is the line scroll factor
 #if HIGHDPI
 	case WM_NCCREATE: {
 	  // Enable per-monitor DPI scaling for caption, menu, and top-level
