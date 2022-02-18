@@ -11,7 +11,91 @@
 #include "thred.h"
 #include "xt.h"
 
-namespace xi = xt::internal;
+class FEATHER
+{
+  public:
+  uint32_t fillType {};          // type of feather fill
+  float    ratio {};             // feather ratio
+  float    minStitch {};         // smallest stitch allowed
+  float    ratioLocal {};        // local feather ratio
+  float    formRatio {};         // feather ratio from form
+  uint32_t extendedAttribute {}; // extended form attribute
+  uint32_t upCount {};           // feather up count
+  uint32_t downCount {};         // feather down count
+  uint32_t totalCount {};        // up count plus down count
+  uint32_t phaseIndex {};
+  uint32_t phase {};
+  uint32_t countUp {};
+  uint32_t countDown {};
+  float    globalStep {};
+  float    globalPosition {};
+  float    globalPhase {};
+  float    globalUp {};
+  float    globalDown {};
+  float    globalRatio {};
+
+  // constexpr FEATHER() noexcept = default;
+  // FEATHER(FEATHER const&) = default;
+  // FEATHER(FEATHER&&) = default;
+  // FEATHER& operator=(FEATHER const& rhs) = default;
+  // FEATHER& operator=(FEATHER&&) = default;
+  //~FEATHER() = default;
+};
+
+class INT_INFO
+{
+  public:
+  uint32_t      pins {};
+  uint32_t      coloc {};
+  uint32_t      layerIndex {};
+  uint32_t      start {};
+  uint32_t      output {};
+  F_POINT_ATTR* highStitchBuffer {};
+
+  // constexpr INT_INFO() noexcept = default;
+  // INT_INFO(INT_INFO const&) = default;
+  // INT_INFO(INT_INFO&&) = default;
+  // INT_INFO& operator=(INT_INFO const& rhs) = default;
+  // INT_INFO& operator=(INT_INFO&&) = default;
+  //~INT_INFO() = default;
+};
+
+class O_REC
+{
+  public:
+  uint32_t start {};
+  uint32_t finish {};
+  uint32_t startStitch {};
+  uint32_t endStitch {};
+  uint32_t color {};
+  uint32_t type {};
+  uint32_t form {};
+  uint32_t otyp {};
+
+  // constexpr O_REC() noexcept = default;
+  // O_REC(O_REC const&) = default;
+  // O_REC(O_REC&&) = default;
+  // O_REC& operator=(O_REC const& rhs) = default;
+  // O_REC& operator=(O_REC&&) = default;
+  //~O_REC() = default;
+};
+
+class SORT_REC
+{
+  public:
+  uint32_t start {};          // start region index
+  uint32_t finish {};         // finish region index
+  uint32_t count {};          // number of regions in range
+  uint32_t currentRegion {};  // current region index
+  bool     direction = false; // direction of sort
+
+  // constexpr SORT_REC() noexcept = default;
+  // SORT_REC(SORT_REC const&) = default;
+  // SORT_REC(SORT_REC&&) = default;
+  // SORT_REC& operator=(SORT_REC const& rhs) = default;
+  // SORT_REC& operator=(SORT_REC&&) = default;
+  //~SORT_REC() = default;
+};
 
 constexpr auto M_AP     = 1U << 1U;
 constexpr auto M_CWLK   = 1U << 2U;
@@ -24,9 +108,6 @@ constexpr auto M_APCOL  = 1U << 8U;
 constexpr auto M_FCOL   = 1U << 9U;
 constexpr auto M_FTHCOL = 1U << 10U;
 constexpr auto M_ECOL   = 1U << 11U;
-
-static auto DesignSize = F_POINT {};                        // design size
-static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
 
 enum StitchStyles {
   TYPE_APPLIQUE = 1, // applique
@@ -54,13 +135,106 @@ static constexpr auto STITCH_TYPES = std::array<char, 13> {
     TYPE_BORDER,   // 12 border
 };
 
+namespace xi {
+
+  void bcolfn(uint32_t formNumber, uint8_t color);
+  void blenfn(FRM_HEAD& form, float length);
+  void bmaxfn(uint32_t formNumber, float length);
+  void bminfn(uint32_t formNumber, float length);
+  auto bpsg() noexcept -> uint32_t;
+  void bspacfn(uint32_t formNumber, float length);
+  auto chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool;
+  void chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData);
+  auto chkrdun(std::vector<uint32_t> const& formFillCounter,
+               std::vector<O_REC*> const&   pRecs,
+               SORT_REC const&              stitchRecord) noexcept -> bool;
+  void delwlk(uint32_t code);
+
+#ifdef _DEBUG
+  void dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count);
+  void duatf(uint32_t ind);
+#endif
+
+  void duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData);
+  auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC& sortRecord)
+      -> uint32_t;
+
+  constexpr auto durat(float start, float finish, float featherRatio) -> float;
+
+  void durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FEATHER& feather);
+  void durec(O_REC& record);
+  auto dutyp(uint32_t attribute) noexcept -> uint32_t;
+  void duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept;
+
+  auto CALLBACK enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
+
+  void fangfn(uint32_t formNumber, float angle);
+  void fcolfn(uint32_t formNumber, uint8_t color);
+  void fhifn(uint32_t formNumber, float length);
+  void findfn(uint32_t formNumber, float indent);
+  void flenfn(uint32_t formNumber, float length);
+  void fmaxfn(uint32_t formNumber, float length);
+  void fminfn(uint32_t formNumber, float length);
+  void fncwlk(FRM_HEAD& form);
+  void fnund(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& angledFormVertices);
+  void fnwlk(FRM_HEAD& form);
+  void fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence);
+  void fspacfn(uint32_t formNumber, float spacing);
+  void fthdfn(uint32_t iSequence, FEATHER& feather);
+  void fthfn(uint32_t iSequence, FEATHER& feather);
+  void fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence);
+  void fthvars(FRM_HEAD const& form, FEATHER& feather);
+  void fwidfn(uint32_t formNumber, float length);
+  auto getstxt(int32_t stringIndex, HWND dialog) -> float;
+  auto gucon(FRM_HEAD const&            form,
+             std::vector<F_POINT_ATTR>& buffer,
+             F_POINT const&             start,
+             F_POINT const&             finish,
+             uint32_t                   destination,
+             uint32_t                   code) -> uint32_t;
+  auto isfil(FRM_HEAD const& form) noexcept -> bool;
+  auto lastcol(uint32_t index, F_POINT& point) noexcept -> bool;
+  auto midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT;
+  void notundfn(uint32_t code);
+  void nudfn(F_RECTANGLE const& designSizeRect) noexcept;
+  void nurat(FEATHER& feather) noexcept;
+  auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer,
+                std::vector<O_REC*> const& pRecs,
+                SORT_REC const&            sortRecord) -> double;
+  void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
+  auto orComp(O_REC const* record1, O_REC const* record2) -> bool;
+  auto orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool;
+  void rtrclpfn(FRM_HEAD const& form);
+  void ritwlk(FRM_HEAD& form, uint32_t walkMask);
+  void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
+  void sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
+
+  auto CALLBACK setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+
+  void setstxt(int32_t stringIndex, float value, HWND dialog);
+  void setundfn(uint32_t code);
+  auto srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool;
+
+  constexpr auto tim2int(FILETIME time) noexcept -> ULARGE_INTEGER;
+
+  void uangfn(uint32_t formNumber, float angle);
+  void ucolfn(uint32_t formNumber, uint8_t color);
+  void ulenfn(uint32_t formNumber, float length);
+  void undclp(FRM_HEAD const& form);
+  void uspacfn(uint32_t formNumber, float spacing);
+  void xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept;
+} // namespace xi
+
+static auto DesignSize = F_POINT {};                        // design size
+static auto ColorOrder = std::array<uint32_t, COLORCNT> {}; // color order adjusted for applique
+
 void xt::setfchk() {
   if (IniFile.dataCheck != 0U) {
 	StateMap->set(StateFlag::FCHK);
   }
 }
 
-void xt::internal::fthvars(FRM_HEAD const& form, FEATHER& feather) {
+void xi::fthvars(FRM_HEAD const& form, FEATHER& feather) {
   StateMap->reset(StateFlag::BARSAT);
   StateMap->reset(StateFlag::FTHR);
   feather.fillType          = form.fillInfo.feather.fillType;
@@ -81,16 +255,16 @@ void xt::internal::fthvars(FRM_HEAD const& form, FEATHER& feather) {
   }
 }
 
-constexpr auto xt::internal::durat(float start, float finish, float featherRatio) -> float {
+constexpr auto xi::durat(float start, float finish, float featherRatio) -> float {
   return (finish - start) * featherRatio + start;
 }
 
-void xt::internal::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept {
+void xi::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept {
   point.x = durat(BSequence->operator[](finish).x, BSequence->operator[](start).x, featherRatioLocal);
   point.y = durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal);
 }
 
-void xt::internal::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FEATHER& feather) {
+void xi::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FEATHER& feather) {
   if (sequence != nullptr) {
 	auto const& bCurrent = BSequence->operator[](iSequence);
 	auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
@@ -110,7 +284,7 @@ void xt::internal::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FE
 
 constexpr auto FSED = uint32_t {1340007303U}; // feather sequence seed
 
-auto xt::internal::bpsg() noexcept -> uint32_t {
+auto xi::bpsg() noexcept -> uint32_t {
   constexpr auto BIT4  = 0x8U;
   constexpr auto BIT31 = 0x40000000U;
   if (PseudoRandomValue == 0U) {
@@ -124,7 +298,7 @@ auto xt::internal::bpsg() noexcept -> uint32_t {
   return PseudoRandomValue;
 }
 
-void xt::internal::nurat(FEATHER& feather) noexcept {
+void xi::nurat(FEATHER& feather) noexcept {
   auto const remainder = fmodf(feather.globalPosition, 1.0F);
   switch (feather.fillType) {
 	case FTHPSG: {
@@ -204,27 +378,27 @@ void xt::internal::nurat(FEATHER& feather) noexcept {
   feather.globalPosition += feather.globalStep;
 }
 
-void xt::internal::fthfn(uint32_t iSequence, FEATHER& feather) {
+void xi::fthfn(uint32_t iSequence, FEATHER& feather) {
   nurat(feather);
   durats(iSequence, OSequence, feather);
 }
 
-void xt::internal::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
+void xi::ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept {
   auto const& bPoint = BSequence->operator[](iPoint);
   point.x            = (BSequence->operator[](iNextPoint).x - bPoint.x) * featherRatio + bPoint.x;
   point.y            = (BSequence->operator[](iNextPoint).y - bPoint.y) * featherRatio + bPoint.y;
 }
 
-auto xt::internal::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
+auto xi::midpnt(F_POINT const& startPoint, F_POINT const& endPoint) noexcept -> F_POINT {
   return F_POINT {wrap::midl(endPoint.x, startPoint.x), wrap::midl(endPoint.y, startPoint.y)};
 }
 
-void xt::internal::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept {
+void xi::xratf(F_POINT const& startPoint, F_POINT const& endPoint, F_POINT& point, float featherRatioLocal) noexcept {
   point.x = (endPoint.x - startPoint.x) * featherRatioLocal + startPoint.x;
   point.y = (endPoint.y - startPoint.y) * featherRatioLocal + startPoint.y;
 }
 
-void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
+void xi::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_POINT>& featherSequence) {
   // clang-format off
   auto        currentPoint = F_POINT {};
   auto        nextPoint    = F_POINT {};
@@ -260,7 +434,7 @@ void xt::internal::fthrbfn(uint32_t iSequence, FEATHER& feather, std::vector<F_P
   featherSequence.push_back(midPoint);
 }
 
-void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
+void xi::fthdfn(uint32_t iSequence, FEATHER& feather) {
   // clang-format off
   auto const& bCurrent = BSequence->operator[](iSequence);
   auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
@@ -286,7 +460,7 @@ void xt::internal::fthdfn(uint32_t iSequence, FEATHER& feather) {
   }
 }
 
-void xt::internal::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
+void xi::fritfil(FRM_HEAD const& form, std::vector<F_POINT> const& featherSequence) {
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(
 	    INS_REC {TYPFRM, form.fillColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
@@ -420,7 +594,7 @@ void xt::fethr() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-constexpr auto xt::internal::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
+constexpr auto xi::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
   auto const op = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
   return op;
 }
@@ -446,7 +620,7 @@ auto xt::insid(FRM_HEAD const& form) -> std::vector<F_POINT>& {
   throw std::runtime_error("OutsidePoints is null");
 }
 
-void xt::internal::delwlk(uint32_t code) {
+void xi::delwlk(uint32_t code) {
   if (!StitchBuffer->empty()) {
 	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
 	                                   StitchBuffer->end(),
@@ -457,7 +631,7 @@ void xt::internal::delwlk(uint32_t code) {
   }
 }
 
-void xt::internal::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
+void xi::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
   if (!OSequence->empty()) {
 	InterleaveSequenceIndices->emplace_back(
 	    INS_REC {walkMask, form.underlayColor, wrap::toUnsigned(InterleaveSequence->size()), I_FIL});
@@ -507,7 +681,7 @@ void xt::internal::ritwlk(FRM_HEAD& form, uint32_t walkMask) {
   }
 }
 
-auto xt::internal::gucon(FRM_HEAD const&            form,
+auto xi::gucon(FRM_HEAD const&            form,
                          std::vector<F_POINT_ATTR>& buffer,
                          F_POINT const&             start,
                          F_POINT const&             finish,
@@ -580,7 +754,7 @@ auto xt::internal::gucon(FRM_HEAD const&            form,
   return iStitch - destination;
 }
 
-void xt::internal::fnwlk(FRM_HEAD& form) {
+void xi::fnwlk(FRM_HEAD& form) {
   if (form.type == FRMLINE) {
 	form.type = FRMFPOLY;
   }
@@ -602,7 +776,7 @@ void xt::internal::fnwlk(FRM_HEAD& form) {
   ritwlk(form, WLKMSK);
 }
 
-void xt::internal::undclp(FRM_HEAD const& form) {
+void xi::undclp(FRM_HEAD const& form) {
   // ToDo - Is it better to initialize individually?
   ClipBuffer->clear();
   ClipBuffer->reserve(2);
@@ -611,7 +785,7 @@ void xt::internal::undclp(FRM_HEAD const& form) {
   ClipBuffer->emplace_back(0.0F, form.underlayStitchLen, 0U);
 }
 
-void xt::internal::fncwlk(FRM_HEAD& form) {
+void xi::fncwlk(FRM_HEAD& form) {
   OSequence->clear();
   form.extendedAttribute |= AT_CWLK;
   if (form.satinGuideCount != 0U) {
@@ -754,7 +928,7 @@ void xt::chkwlk(FRM_HEAD& form) {
   }
 }
 
-void xt::internal::fnund(FRM_HEAD&                     form,
+void xi::fnund(FRM_HEAD&                     form,
                          std::vector<RNG_COUNT> const& textureSegments,
                          std::vector<F_POINT>&         angledFormVertices) {
   auto const savedStitchSize = UserStitchLength;
@@ -789,7 +963,7 @@ void xt::selalfrm() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
+auto xi::dutyp(uint32_t attribute) noexcept -> uint32_t {
   auto       bit             = DWORD {};
   auto const maskedAttribute = gsl::narrow_cast<DWORD>(attribute & SRTYPMSK);
   // ToDo - replace
@@ -804,7 +978,7 @@ auto xt::internal::dutyp(uint32_t attribute) noexcept -> uint32_t {
   return 1U;
 }
 
-void xt::internal::durec(O_REC& record) {
+void xi::durec(O_REC& record) {
   auto const itStitch = wrap::next(StitchBuffer->begin(), record.start);
   record.type = gsl::narrow_cast<decltype(record.type)>(STITCH_TYPES[dutyp(itStitch->attribute)]);
   auto const attribute = itStitch->attribute & SRTMSK;
@@ -812,7 +986,7 @@ void xt::internal::durec(O_REC& record) {
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-auto xt::internal::orComp(O_REC const* record1, O_REC const* record2) -> bool {
+auto xi::orComp(O_REC const* record1, O_REC const* record2) -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1 != nullptr && record2 != nullptr) {
 	auto const itColor1 = wrap::next(ColorOrder.begin(), record1->color);
@@ -846,7 +1020,7 @@ auto xt::internal::orComp(O_REC const* record1, O_REC const* record2) -> bool {
   return false;
 }
 
-auto xt::internal::orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool {
+auto xi::orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1 != nullptr && record2 != nullptr) {
 	if (record1->form < record2->form) {
@@ -866,7 +1040,7 @@ auto xt::internal::orfComp(O_REC const* record1, O_REC const* record2) noexcept 
   return false;
 }
 
-auto xt::internal::chkrdun(std::vector<uint32_t> const& formFillCounter,
+auto xi::chkrdun(std::vector<uint32_t> const& formFillCounter,
                            std::vector<O_REC*> const&   pRecs,
                            SORT_REC const&              stitchRecord) noexcept -> bool {
   for (auto iStitch = stitchRecord.start; iStitch < stitchRecord.finish; ++iStitch) {
@@ -877,7 +1051,7 @@ auto xt::internal::chkrdun(std::vector<uint32_t> const& formFillCounter,
   return false;
 }
 
-auto xt::internal::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer,
+auto xi::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer,
                             std::vector<O_REC*> const& pRecs,
                             SORT_REC const&            sortRecord) -> double {
   auto currentRegion   = sortRecord.currentRegion;
@@ -937,7 +1111,7 @@ auto xt::internal::precjmps(std::vector<F_POINT_ATTR>& stitchBuffer,
   return totalJumps;
 }
 
-auto xt::internal::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer,
+auto xi::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer,
                            std::vector<O_REC*> const& pRecs,
                            SORT_REC&                  sortRecord) -> uint32_t {
   sortRecord.direction = false;
@@ -954,7 +1128,7 @@ auto xt::internal::duprecs(std::vector<F_POINT_ATTR>& stitchBuffer,
 
 #ifdef _DEBUG
 
-void xt::internal::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
+void xi::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t count) {
   for (auto iRegion = 0U; iRegion < count; ++iRegion) {
 	// NOLINTNEXTLINE
 	outDebugString(
@@ -970,7 +1144,7 @@ void xt::internal::dmprec(std::vector<O_REC*> const& stitchRegion, uint32_t coun
 }
 #endif
 
-auto xt::internal::srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool {
+auto xi::srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_t& badForm) -> bool {
   auto iStitchRegion = stitchRegion.begin();
   auto formIndex     = (*iStitchRegion)->form;
   auto color         = (*iStitchRegion)->color;
@@ -1142,7 +1316,7 @@ class ATFLD
   //~ATFLD() = default;
 };
 
-void xt::internal::duatf(uint32_t ind) {
+void xi::duatf(uint32_t ind) {
   // clang-format off
   auto const attribute       = StitchBuffer->operator[](ind).attribute;
   auto       attributeFields = ATFLD {(attribute & COLMSK),
@@ -1332,7 +1506,7 @@ void xt::fdelstch(FRM_HEAD const& form, FILL_STARTS& fillStartsData, uint32_t& f
   }
 }
 
-auto xt::internal::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
+auto xi::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
   auto const color = InterleaveSequenceIndices->operator[](index).color;
   while (index != 0U) {
 	--index;
@@ -1345,7 +1519,7 @@ auto xt::internal::lastcol(uint32_t index, F_POINT& point) noexcept -> bool {
   return false;
 }
 
-void xt::internal::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
+void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
   if (ilData.coloc > ilData.start) {
 	auto const count         = ilData.coloc > StitchBuffer->size()
 	                               ? wrap::toUnsigned(StitchBuffer->size()) - ilData.start
@@ -1397,7 +1571,7 @@ void xt::internal::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer
   }
 }
 
-auto xt::internal::isfil(FRM_HEAD const& form) noexcept -> bool {
+auto xi::isfil(FRM_HEAD const& form) noexcept -> bool {
   if (form.fillType != 0U) {
 	return true;
   }
@@ -1410,7 +1584,7 @@ auto xt::internal::isfil(FRM_HEAD const& form) noexcept -> bool {
   return false;
 }
 
-void xt::internal::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
+void xi::chkend(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t code, INT_INFO& ilData) {
   if (isfil(form)) {
 	StateMap->set(StateFlag::ISEND);
 	if ((form.extendedAttribute & AT_END) != 0U) {
@@ -1548,7 +1722,7 @@ void xt::intlv(FRM_HEAD const& form, FILL_STARTS const& fillStartsData, uint32_t
   thred::coltab();
 }
 
-void xt::internal::setundfn(uint32_t code) {
+void xi::setundfn(uint32_t code) {
   thred::savdo();
   if (StateMap->test(StateFlag::FORMSEL)) {
 	if (auto& form = FormList->operator[](ClosestFormToCursor); form.type != FRMLINE) {
@@ -1589,7 +1763,7 @@ void xt::setcwlk() {
   xi::setundfn(AT_CWLK);
 }
 
-void xt::internal::notundfn(uint32_t code) {
+void xi::notundfn(uint32_t code) {
   thred::savdo();
   code = ~code;
   if (StateMap->test(StateFlag::FORMSEL)) {
@@ -1631,7 +1805,7 @@ void xt::notcwlk() {
   xi::notundfn(AT_CWLK);
 }
 
-void xt::internal::ulenfn(uint32_t formNumber, float length) {
+void xi::ulenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
@@ -1661,7 +1835,7 @@ void xt::undlen() {
   displayText::numWnd();
 }
 
-void xt::internal::uspacfn(uint32_t formNumber, float spacing) {
+void xi::uspacfn(uint32_t formNumber, float spacing) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlaySpacing = spacing;
@@ -1690,7 +1864,7 @@ void xt::uspac() {
   displayText::numWnd();
 }
 
-void xt::internal::uangfn(uint32_t formNumber, float angle) {
+void xi::uangfn(uint32_t formNumber, float angle) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.extendedAttribute & AT_UND) != 0U) {
 	form.underlayStitchAngle = angle;
@@ -1720,7 +1894,7 @@ void xt::sfuang() {
   displayText::numWnd();
 }
 
-void xt::internal::flenfn(uint32_t formNumber, float length) {
+void xi::flenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isclp()) {
 	form.lengthOrCount.stitchLength = length;
@@ -1749,7 +1923,7 @@ void xt::setflen() {
   displayText::numWnd();
 }
 
-void xt::internal::fspacfn(uint32_t formNumber, float spacing) {
+void xi::fspacfn(uint32_t formNumber, float spacing) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	if (spacing < 0) {
@@ -1783,7 +1957,7 @@ void xt::setfspac() {
   displayText::numWnd();
 }
 
-void xt::internal::findfn(uint32_t formNumber, float indent) {
+void xi::findfn(uint32_t formNumber, float indent) {
   ClosestFormToCursor = formNumber;
   auto& form          = FormList->operator[](formNumber);
   form.underlayIndent = indent;
@@ -1807,7 +1981,7 @@ void xt::dufind(float indent) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::internal::fangfn(uint32_t formNumber, float angle) {
+void xi::fangfn(uint32_t formNumber, float angle) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.type == FRMFPOLY && (form.fillType != 0U)) {
 	switch (form.fillType) {
@@ -1863,7 +2037,7 @@ void xt::setfang() {
   displayText::numWnd();
 }
 
-void xt::internal::ucolfn(uint32_t formNumber, uint8_t color) {
+void xi::ucolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber);
       (form.extendedAttribute & (AT_UND | AT_WALK | AT_CWLK)) != 0U) {
@@ -1897,7 +2071,7 @@ void xt::setucol() {
   displayText::numWnd();
 }
 
-void xt::internal::fcolfn(uint32_t formNumber, uint8_t color) {
+void xi::fcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.fillColor = color;
@@ -1930,7 +2104,7 @@ void xt::setfcol() {
   displayText::numWnd();
 }
 
-void xt::internal::bcolfn(uint32_t formNumber, uint8_t color) {
+void xi::bcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.borderColor = color;
@@ -1963,7 +2137,7 @@ void xt::setbcol() {
   displayText::numWnd();
 }
 
-void xt::internal::blenfn(FRM_HEAD& form, float length) {
+void xi::blenfn(FRM_HEAD& form, float length) {
   if ((form.edgeType != 0U) && !form.iseclp()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn();
@@ -1993,7 +2167,7 @@ void xt::setblen() {
   displayText::numWnd();
 }
 
-void xt::internal::bspacfn(uint32_t formNumber, float length) {
+void xi::bspacfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.edgeSpacing = length;
@@ -2022,7 +2196,7 @@ void xt::setbspac() {
   displayText::numWnd();
 }
 
-void xt::internal::bminfn(uint32_t formNumber, float length) {
+void xi::bminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.minBorderStitchLen = length;
@@ -2051,7 +2225,7 @@ void xt::setbmin() {
   displayText::numWnd();
 }
 
-void xt::internal::bmaxfn(uint32_t formNumber, float length) {
+void xi::bmaxfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
 	form.maxBorderStitchLen = length;
@@ -2080,7 +2254,7 @@ void xt::setbmax() {
   displayText::numWnd();
 }
 
-void xt::internal::fminfn(uint32_t formNumber, float length) {
+void xi::fminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.minFillStitchLen = length;
@@ -2109,7 +2283,7 @@ void xt::setfmin() {
   displayText::numWnd();
 }
 
-void xt::internal::fmaxfn(uint32_t formNumber, float length) {
+void xi::fmaxfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	form.maxFillStitchLen = length;
@@ -2138,7 +2312,7 @@ void xt::setfmax() {
   displayText::numWnd();
 }
 
-void xt::internal::fwidfn(uint32_t formNumber, float length) {
+void xi::fwidfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   // clang-format off
   auto&       form      = FormList->operator[](formNumber);
@@ -2182,7 +2356,7 @@ void xt::setfind() {
   displayText::numWnd();
 }
 
-void xt::internal::fhifn(uint32_t formNumber, float length) {
+void xi::fhifn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   // clang-format off
   auto&       form      = FormList->operator[](formNumber);
@@ -2267,7 +2441,7 @@ void xt::duauxnam() {
   }
 }
 
-void xt::internal::rtrclpfn(FRM_HEAD const& form) {
+void xi::rtrclpfn(FRM_HEAD const& form) {
   if (OpenClipboard(ThrEdWindow) != 0) {
 	auto count = 0U;
 	if (auto clipRect = F_RECTANGLE {}; form.iseclp()) {
@@ -2311,11 +2485,11 @@ void xt::rtrclp() {
   }
 }
 
-void xt::internal::setstxt(int32_t stringIndex, float value, HWND dialog) {
+void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
   SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(L"{:.2f}", (value * IPFGRAN)).c_str());
 }
 
-auto xt::internal::getstxt(int32_t stringIndex, HWND dialog) -> float {
+auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto SZBUFFER = 16U;
 
@@ -2324,14 +2498,14 @@ auto xt::internal::getstxt(int32_t stringIndex, HWND dialog) -> float {
   return wrap::wcstof(buffer.data()) * PFGRAN;
 }
 
-auto xt::internal::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
+auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {
   point.x = getstxt(IDC_DESWID, dialog);
   point.y = getstxt(IDC_DESHI, dialog);
   // ToDo - should this have a range? aspectRatio +/- %
   return util::closeEnough((point.y / point.x), aspectRatio);
 }
 
-auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
+auto CALLBACK xi::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
   UNREFERENCED_PARAMETER(lparam);
   switch (umsg) {
 	case WM_INITDIALOG: {
@@ -2400,17 +2574,17 @@ auto CALLBACK xt::internal::setsprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARA
   return FALSE;
 }
 
-void xt::internal::sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
+void xi::sadj(F_POINT_ATTR& stitch, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
   stitch.x = (stitch.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
   stitch.y = (stitch.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void xt::internal::sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
+void xi::sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept {
   point.x = (point.x - designSizeRect.left) * designSizeRatio.x + designSizeRect.left;
   point.y = (point.y - designSizeRect.bottom) * designSizeRatio.y + designSizeRect.bottom;
 }
 
-void xt::internal::nudfn(F_RECTANGLE const& designSizeRect) noexcept {
+void xi::nudfn(F_RECTANGLE const& designSizeRect) noexcept {
   auto const newSize         = F_POINT {(designSizeRect.right - designSizeRect.left),
                                 (designSizeRect.top - designSizeRect.bottom)};
   auto const designSizeRatio = F_POINT {(DesignSize.x / newSize.x), (DesignSize.y / newSize.y)};
@@ -2513,7 +2687,7 @@ void xt::setclpspac() {
   StateMap->set(StateFlag::SCLPSPAC);
 }
 
-auto CALLBACK xt::internal::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
+auto CALLBACK xi::enumch(HWND hwnd, LPARAM lParam) noexcept -> BOOL {
   UNREFERENCED_PARAMETER(lParam);
   DestroyWindow(hwnd);
   return TRUE;
