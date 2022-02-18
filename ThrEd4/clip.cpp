@@ -9,7 +9,6 @@
 
 // clip internal namespace
 namespace ci {
-
   void clpcrnr(FRM_HEAD const&       form,
                F_RECTANGLE const&    clipRect,
                std::vector<F_POINT>& clipFillData,

@@ -8,7 +8,6 @@
 #include <cstdint>
 
 namespace clip {
-
 void chnfn(FRM_HEAD const& form);
 void clpbrd(FRM_HEAD const& form, F_RECTANGLE const& clipRect, uint32_t startVertex);
 void clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect);
