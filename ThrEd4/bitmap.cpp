@@ -8,23 +8,6 @@
 #include "trace.h"
 #include "utf8conv.h"
 
-// bitmap internal namespace
-namespace bi {
-auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
-auto bitar() -> bool;
-void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
-void bitsiz();
-constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
-constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
-
-auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
-void movmap(int cnt, uint8_t* buffer);
-auto nuBit() noexcept -> BOOL;
-void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
-auto saveName(fs::path& fileName);
-auto stch2bit(F_POINT& point) -> POINT;
-} // namespace bi
-
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -45,14 +28,32 @@ auto stch2bit(F_POINT& point) -> POINT;
 constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color
 constexpr auto SZBMPNM = 17U; // THR spec for BMP filename length (+ 1 for zero terminator)
 constexpr auto FLTBMP  = COMDLG_FILTERSPEC {L"Bitmap Files", L"*.bmp"}; // filter specifications
-constexpr auto FLTALL  = COMDLG_FILTERSPEC {L"All files", L"*.*"};
+constexpr auto FLTALL  = COMDLG_FILTERSPEC {L"All files", L"*.*"};      // filter specifications
+constexpr auto BPB     = 8U;                                            // bits per byte
+constexpr auto BPP24   = DWORD {24U};                                   // 24 bits per pixel
+constexpr auto BPP32   = DWORD {32U};                                   // 32 bits per pixel
 
-static auto BitMapColorStruct = CHOOSECOLOR {};
+// bitmap internal namespace
+namespace bi {
+auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
+auto bitar() -> bool;
+void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
+void bitsiz();
+constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
+
+auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
+void movmap(int cnt, uint8_t* buffer);
+auto nuBit() noexcept -> BOOL;
+void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
+auto saveName(fs::path& fileName);
+auto stch2bit(F_POINT& point) -> POINT;
+} // namespace bi
 
 static auto BitmapBackgroundColors =
     gsl::narrow_cast<std::vector<COLORREF>*>(nullptr); // for the bitmap color dialog box
-
-static auto BitmapColor          = BITCOL;  // bitmap color
+static auto BitmapColor          = BITCOL;             // bitmap color
+static auto BitMapColorStruct    = CHOOSECOLOR {};
 static auto BitmapDC             = HDC {};  // bitmap device context
 static auto BitmapDstRect        = RECT {}; // stitch window destination rectangle for zooomed view
 static auto BitmapFileHandle     = HANDLE {};           // bitmap handle
@@ -70,10 +71,6 @@ static auto TraceBitmap          = HBITMAP {};          // trace bitmap
 static auto TraceDC              = HDC {};              // trace device context
 static auto UTF16BMPname = gsl::narrow_cast<fs::path*>(nullptr); // bitmap file name from user load
 static auto UTF8BMPname  = std::array<char, SZBMPNM> {};         // bitmap file name from pcs file
-
-constexpr auto BPB   = 8U;          // bits per byte
-constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
-constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
 constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
