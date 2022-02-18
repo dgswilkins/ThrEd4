@@ -61,16 +61,6 @@ constexpr auto MEGCHNL = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCHNH = (BESIZ | BESPAC | BEMAX | BEMIN | CHNPOS);
 constexpr auto MEGCLPX = (BNCLP | BEMAX | BEMIN);
 
-constexpr auto EGLIN_LINS = 4U;
-constexpr auto EGBLD_LINS = 4U;
-constexpr auto EGCLP_LINS = 3U;
-constexpr auto EGSAT_LINS = 6U;
-constexpr auto EGAP_LINS  = 7U;
-constexpr auto EGPRP_LINS = 6U;
-constexpr auto EGHOL_LINS = 7U;
-constexpr auto EGPIC_LINS = 7U;
-constexpr auto EGCHN_LINS = 6U;
-
 enum DaisyStyles { // daisy form types
   DSIN,            // Sine shape
   DRAMP,           // Ramp shape
