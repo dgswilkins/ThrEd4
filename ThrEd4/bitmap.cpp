@@ -8,6 +8,23 @@
 #include "trace.h"
 #include "utf8conv.h"
 
+// bitmap internal namespace
+namespace bi {
+  auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
+  auto bitar() -> bool;
+  void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
+  void bitsiz();
+  constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
+  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
+
+  void movmap(int cnt, uint8_t* buffer);
+  auto nuBit() noexcept -> BOOL;
+  auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
+  void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
+  auto saveName(fs::path& fileName);
+  auto stch2bit(F_POINT& point) -> POINT;
+} // namespace bi
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN // Exclude rarely-used stuff from Windows headers
 #endif
@@ -24,8 +41,6 @@
 
 // Standard Libraries
 #include <vector>
-
-namespace bi = bitmap::internal;
 
 constexpr auto BITCOL  = uint32_t {0xffff00U}; // default bitmap color
 constexpr auto SZBMPNM = 17U; // THR spec for BMP filename length (+ 1 for zero terminator)
@@ -60,7 +75,7 @@ constexpr auto BPB   = 8U;          // bits per byte
 constexpr auto BPP24 = DWORD {24U}; // 24 bits per pixel
 constexpr auto BPP32 = DWORD {32U}; // 32 bits per pixel
 
-constexpr auto bitmap::internal::fswap(COLORREF color) noexcept -> COLORREF {
+constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
@@ -83,8 +98,8 @@ auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint3
   throw std::runtime_error("ppvBits was null");
 }
 
-void bitmap::internal::bfil(COLORREF const& backgroundColor) {
-  auto const inverseBackgroundColor = fswap(backgroundColor);
+void bitmap::bfil(COLORREF const& backgroundColor) {
+  auto const inverseBackgroundColor = bi::fswap(backgroundColor);
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto hBitmapFile =
       CreateFile(UTF16BMPname->wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
@@ -110,7 +125,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	bitmap::resetBmpFile(true);
 	return;
   }
-  if (gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
+  if (bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
 	if (!StateMap->testAndReset(StateFlag::WASESC)) {
 	  StateMap->reset(StateFlag::TRSET);
 	}
@@ -133,7 +148,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  monoBitmapData.resize(bitmapSizeBytes);
 	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
 	  CloseHandle(hBitmapFile);
-	  auto const flag       = binv(monoBitmapData, bitmapWidthBytes);
+	  auto const flag       = bi::binv(monoBitmapData, bitmapWidthBytes);
 	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
 	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
 	  BitmapInfoHeader      = {};
@@ -151,7 +166,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  GdiFlush();
 	  if (bits != nullptr) {
 		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-		  bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
+		  bi::bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
 		         &bits[wrap::toSize(iHeight * BitmapWidth)],
 		         bitmapWidthBytes,
 		         foreground,
@@ -177,7 +192,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 	  SelectObject(BitmapDC, hBitmapFile);
 	  StateMap->set(StateFlag::RESTCH);
 	}
-	bitsiz();
+	bi::bitsiz();
 	trace::initColorRef();
 	StateMap->reset(StateFlag::HIDMAP);
   }
@@ -190,7 +205,7 @@ void bitmap::internal::bfil(COLORREF const& backgroundColor) {
 
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
-auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
+auto bi::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
   auto whiteBits = 0U;
   auto blackBits = 0U;
   for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
@@ -214,7 +229,7 @@ auto bitmap::internal::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t
   return whiteBits > blackBits;
 }
 
-void bitmap::internal::bitlin(uint8_t const* source,
+void bi::bitlin(uint8_t const* source,
                               uint32_t*      destination,
                               uint32_t       bitmapWidthBytes,
                               COLORREF       foreground,
@@ -237,7 +252,7 @@ void bitmap::internal::bitlin(uint8_t const* source,
   }
 }
 
-void bitmap::internal::bitsiz() {
+void bi::bitsiz() {
   auto const screenAspectRatio =
       gsl::narrow<float>(UnzoomedRect.cx) / gsl::narrow<float>(UnzoomedRect.cy);
   if (auto const bitmapAspectRatio = gsl::narrow<float>(BitmapWidth) / gsl::narrow<float>(BitmapHeight);
@@ -255,7 +270,7 @@ void bitmap::internal::bitsiz() {
   StitchBmpRatio.y = BitmapSizeinStitches.y / wrap::toFloat(BitmapHeight);
 }
 
-constexpr auto bitmap::internal::gudtyp(WORD bitCount) noexcept -> bool {
+constexpr auto bi::gudtyp(WORD bitCount) noexcept -> bool {
   switch (bitCount) {
 	case 1U:
 	case BPP24:
@@ -276,7 +291,7 @@ void bitmap::resetBmpFile(bool reset) {
   }
 }
 
-auto bitmap::internal::saveName(fs::path& fileName) {
+auto bi::saveName(fs::path& fileName) {
   auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hr = CoCreateInstance(
@@ -345,7 +360,7 @@ void bitmap::savmap() {
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
-void bitmap::internal::movmap(int cnt, uint8_t* buffer) {
+void bi::movmap(int cnt, uint8_t* buffer) {
   if (auto* source = TraceBitmapData; source != nullptr) {
 	auto* destination = buffer;
 	for (auto i = 0; i < cnt; ++i) {
@@ -355,7 +370,7 @@ void bitmap::internal::movmap(int cnt, uint8_t* buffer) {
   }
 }
 
-auto bitmap::internal::loadName(fs::path const* directory, fs::path* fileName) -> bool {
+auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
   if ((nullptr != fileName) && (nullptr != directory)) {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
@@ -421,7 +436,7 @@ void bitmap::lodbmp(fs::path const* directory) {
 #endif
 	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
 	  std::copy(saveFile.cbegin(), saveFile.cend(), UTF8BMPname.begin());
-	  bitmap::internal::bfil(BackgroundColor);
+	  bitmap::bfil(BackgroundColor);
 	}
 	else {
 	  // THR version 2 file can only store a 16 character filename
@@ -432,7 +447,7 @@ void bitmap::lodbmp(fs::path const* directory) {
   }
 }
 
-auto bitmap::internal::nuBit() noexcept -> BOOL {
+auto bi::nuBit() noexcept -> BOOL {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   BitMapColorStruct.Flags          = CC_ANYCOLOR | CC_RGBINIT;
   BitMapColorStruct.hwndOwner      = ThrEdWindow;
@@ -449,7 +464,7 @@ void bitmap::setBmpColor() {
   if (bi::nuBit() != 0U) {
 	BitmapColor = bi::fswap(BitMapColorStruct.rgbResult);
 	if (bitmap::ismap()) {
-	  bitmap::internal::bfil(BackgroundColor);
+	  bitmap::bfil(BackgroundColor);
 	}
 	thred::nuPen(BitmapPen, 1, BitmapColor);
 	thred::zumhom();
@@ -469,7 +484,7 @@ void bitmap::assignUBFilename(fs::path const& directory) {
   auto const bmpFileName = utf::utf8ToUtf16(std::string(UTF8BMPname.data()));
   auto const fullPath    = directory / bmpFileName;
   UTF16BMPname->assign(fullPath);
-  bitmap::internal::bfil(BackgroundColor);
+  bitmap::bfil(BackgroundColor);
 }
 
 auto bitmap::getBitmapSizeinStitches() noexcept -> F_POINT {
@@ -555,7 +570,7 @@ void bitmap::chkbit() {
   if (bitmap::ismap() && (StateMap->test(StateFlag::WASDIF) || StateMap->test(StateFlag::WASDSEL) ||
                           StateMap->test(StateFlag::WASBLAK))) {
 	StateMap->set(StateFlag::WASESC);
-	bitmap::internal::bfil(BackgroundColor);
+	bitmap::bfil(BackgroundColor);
   }
 }
 
@@ -585,7 +600,7 @@ void bitmap::drawBmpBackground() {
   }
 }
 
-auto bitmap::internal::bitar() -> bool {
+auto bi::bitar() -> bool {
   auto const zoomedInRect = F_RECTANGLE {ZoomRect.left,
                                          (wrap::toFloat(UnzoomedRect.cy) - ZoomRect.top),
                                          ZoomRect.right,
@@ -669,7 +684,7 @@ void bitmap::bitbltBitmap() noexcept {
   BitBlt(BitmapDC, 0, 0, BitmapWidth, BitmapHeight, TraceDC, 0, 0, SRCCOPY);
 }
 
-auto bitmap::internal::stch2bit(F_POINT& point) -> POINT {
+auto bi::stch2bit(F_POINT& point) -> POINT {
   if (StateMap->test(StateFlag::LANDSCAP)) {
 	point.y -= (wrap::toFloat(UnzoomedRect.cy) - BitmapSizeinStitches.y);
   }
@@ -677,7 +692,7 @@ auto bitmap::internal::stch2bit(F_POINT& point) -> POINT {
                 wrap::round<LONG>(wrap::toFloat(BitmapHeight) - BmpStitchRatio.y * point.y)};
 }
 
-void bitmap::internal::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
+void bi::pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
   auto       line     = std::array<POINT, 2> {};
   auto const vertexIt = wrap::next(FormVertices->begin(), form.vertexIndex);
   auto const vStart   = wrap::next(vertexIt, start);

@@ -24,6 +24,7 @@ namespace fs = std::filesystem;
 namespace bitmap {
 void assignUBFilename(fs::path const& directory);
 void bitbltBitmap() noexcept;
+void bfil(COLORREF const& backgroundColor);
 void bfrm(FRM_HEAD const& form);
 void chkbit();
 void delmap();
@@ -53,20 +54,4 @@ void setBmpColor();
 void setBitmapColor(COLORREF const& newColor) noexcept;
 void setBitmapPen(HPEN pen) noexcept;
 void setUBfilename(fs::path* fileName) noexcept;
-namespace internal {
-  void bfil(COLORREF const& backgroundColor);
-  auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
-  auto bitar() -> bool;
-  void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
-  void bitsiz();
-  constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
-  constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
-
-  void movmap(int cnt, uint8_t* buffer);
-  auto nuBit() noexcept -> BOOL;
-  auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
-  void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
-  auto saveName(fs::path& fileName);
-  auto stch2bit(F_POINT& point) -> POINT;
-} // namespace internal
 } // namespace bitmap

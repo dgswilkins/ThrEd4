@@ -13632,7 +13632,7 @@ auto thred::internal::handleMainWinKeys(wchar_t const&            code,
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
 		if (bitmap::ismap()) {
-		  bitmap::internal::bfil(BackgroundColor);
+		  bitmap::bfil(BackgroundColor);
 		}
 		StateMap->set(StateFlag::RESTCH);
 	  }
@@ -15188,7 +15188,7 @@ auto thred::internal::handleViewMenu(WORD const& wParameter) -> bool {
 		DeleteObject(BackgroundBrush);
 		BackgroundBrush = CreateSolidBrush(BackgroundColor);
 		if (bitmap::ismap()) {
-		  bitmap::internal::bfil(BackgroundColor);
+		  bitmap::bfil(BackgroundColor);
 		}
 		thred::zumhom();
 	  }
