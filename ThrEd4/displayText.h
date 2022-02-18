@@ -17,7 +17,6 @@
 namespace fs = std::filesystem;
 
 namespace displayText {
-
 void alrotmsg();
 void bfilmsg();
 void butxt(uint32_t iButton, std::wstring const& buttonText);
@@ -39,7 +38,6 @@ void okcan();
 void pntmsg(uint32_t msgID);
 void riter();
 void ritnum(uint32_t code, uint32_t value);
-void tabmsg(uint32_t code);
 void savdisc();
 void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
 void shoMsg(std::wstring const& message);
@@ -52,6 +50,7 @@ template <class inType> void showMessage(uint32_t messageId, inType value) {
 void shord();
 void shoseln(uint32_t code0, uint32_t code1);
 void spltmsg();
+void tabmsg(uint32_t code);
 void tomsg();
 void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;
