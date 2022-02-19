@@ -1,16 +1,57 @@
 #pragma once
 
 // Local Headers
-#include "wrappers.h"
-#include "satinHeader.h"
-#include "fRectangleHeader.h"
 #include "fLenCountHeader.h"
-#include "fAngClpHeader.h"
-#include "txtrFthrInfoHeader.h"
+#include "fRectangleHeader.h"
+#include "satConHeader.h"
+#include "satinHeader.h"
 #include "ThrEdTypes.h"
+#include "txtrFthrInfoHeader.h"
+#include "wrappers.h"
 
 // Standard Libraries
 #include <cstdint>
+union FANGCLPOUT;
+
+union FANGCLP {
+  public:
+  float    angle;
+  uint32_t clip; // pointer to start of fill clipboard data
+  SAT_CON  guide {};
+
+  inline FANGCLP() noexcept;
+  // FANGCLP(FANGCLP const&) = default;
+  // FANGCLP(FANGCLP&&) = default;
+  // FANGCLP& operator=(FANGCLP const& rhs) = default;
+  // FANGCLP& operator=(FANGCLP&&) = default;
+  //~FANGCLP() = default;
+};
+
+#pragma pack(push, 1)
+union FANGCLPOUT {
+  public:
+  float angle;
+  DWORD clip {}; // clip pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  SAT_CON_OUT guide;
+
+  inline FANGCLPOUT() noexcept;
+  // FANGCLPOUT(FANGCLPOUT const&) = default;
+  // FANGCLPOUT(FANGCLPOUT&&) = default;
+  // FANGCLPOUT& operator=(FANGCLPOUT const& rhs) = default;
+  // FANGCLPOUT& operator=(FANGCLPOUT&&) = default;
+  //~FANGCLPOUT() = default;
+};
+#pragma pack(pop)
+
+inline FANGCLP::FANGCLP() noexcept {
+  guide.start  = 0U;
+  guide.finish = 0U;
+}
+
+inline FANGCLPOUT::FANGCLPOUT() noexcept {
+  guide.start  = 0U;
+  guide.finish = 0U;
+}
 
 constexpr auto MINRCT = 12.0F; // minimum dimension of a form select rectangle
 

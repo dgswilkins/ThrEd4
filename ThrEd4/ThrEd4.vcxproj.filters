@@ -161,9 +161,6 @@
     <ClInclude Include="satConHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fAngClpHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="fLenCountHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>

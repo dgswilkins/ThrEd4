@@ -12,7 +12,6 @@
 #include "clipStitchHeader.h"
 #include "EnumMap.h"
 #include "ExtendedBitSet.h"
-#include "fAngClpHeader.h"
 #include "fLenCountHeader.h"
 #include "formHeader.h"
 #include "fRectangleHeader.h"

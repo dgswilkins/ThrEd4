@@ -51,7 +51,6 @@
     <ClInclude Include="DST.h" />
     <ClInclude Include="EnumMap.h" />
     <ClInclude Include="ExtendedBitSet.h" />
-    <ClInclude Include="fAngClpHeader.h" />
     <ClInclude Include="fLenCountHeader.h" />
     <ClInclude Include="form.h" />
     <ClInclude Include="formForms.h" />
