@@ -61,7 +61,6 @@
     <ClInclude Include="PCS.h" />
     <ClInclude Include="PES.h" />
     <ClInclude Include="pointHeader.h" />
-    <ClInclude Include="regionHeader.h" />
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
     <ClInclude Include="Resources\resource.h" />

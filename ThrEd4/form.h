@@ -2,7 +2,6 @@
 
 // Local Headers
 #include "formHeader.h"
-#include "regionHeader.h"
 
 constexpr auto SQRCORNS = 4U; // number of corners in a square
 
