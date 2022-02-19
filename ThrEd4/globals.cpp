@@ -34,7 +34,6 @@ std::wstring*                  DesignerName              = nullptr; // designer 
 HWND                           DiscardButton             = nullptr; // discard button
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
-THR_HEAD_EX*                   ExtendedHeader            = nullptr; // thred file header extension
 HMENU                          FillMenu                  = nullptr; // fill submenu
 std::vector<float>*            FormAngles                = nullptr; // angles of a form for satin border fills
 std::vector<POINT>*            FormControlPoints         = nullptr; // form control rectangle in pixel coordinates

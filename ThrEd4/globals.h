@@ -131,7 +131,6 @@ extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
-extern THR_HEAD_EX*    ExtendedHeader;
 extern HMENU           FillMenu;
 
 extern std::vector<float>* FormAngles;

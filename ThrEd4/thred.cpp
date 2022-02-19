@@ -695,6 +695,7 @@ class FIND_INFO
 };
 
 // main variables
+static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
 static auto ArgCount        = int32_t {};                         // command line argument count
 static auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
 static auto ThredWindowRect = RECT {};                            // main window size
