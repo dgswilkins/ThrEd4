@@ -179,9 +179,6 @@
     <ClInclude Include="iniFileHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="thredFileHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
