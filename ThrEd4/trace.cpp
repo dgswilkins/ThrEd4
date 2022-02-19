@@ -6,6 +6,7 @@
 #include "form.h"
 #include "globals.h"
 #include "trace.h"
+#include "tracePointHeader.h"
 #include "thred.h"
 
 // Standard Libraries
