@@ -1,7 +1,6 @@
 #pragma once
 
 // Local Headers
-#include "fLenCountHeader.h"
 #include "fRectangleHeader.h"
 #include "satConHeader.h"
 #include "satinHeader.h"
@@ -27,6 +26,11 @@ union FANGCLP {
   //~FANGCLP() = default;
 };
 
+inline FANGCLP::FANGCLP() noexcept {
+  guide.start  = 0U;
+  guide.finish = 0U;
+}
+
 #pragma pack(push, 1)
 union FANGCLPOUT {
   public:
@@ -43,14 +47,63 @@ union FANGCLPOUT {
 };
 #pragma pack(pop)
 
-inline FANGCLP::FANGCLP() noexcept {
+inline FANGCLPOUT::FANGCLPOUT() noexcept {
   guide.start  = 0U;
   guide.finish = 0U;
 }
 
-inline FANGCLPOUT::FANGCLPOUT() noexcept {
-  guide.start  = 0U;
-  guide.finish = 0U;
+union FLENCNTOUT;
+
+union FLENCNT {
+  public:
+  float    stitchLength;
+  uint32_t clipCount {}; // number of points in fill clipboard data
+
+  FLENCNT() noexcept = default;
+  // FLENCNT(FLENCNT const&) = default;
+  // FLENCNT(FLENCNT&&) = default;
+  // FLENCNT& operator=(FLENCNT const& rhs) = default;
+  // FLENCNT& operator=(FLENCNT&&) = default;
+  //~FLENCNT() = default;
+
+  explicit FLENCNT(FLENCNTOUT const& rhs) noexcept;
+  inline auto operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT&;
+};
+
+#pragma pack(push, 1)
+union FLENCNTOUT {
+  public:
+  float    stitchLength {};
+  uint32_t clipCount;
+
+  FLENCNTOUT() noexcept = default;
+  // FLENCNTOUT(FLENCNTOUT const&) = default;
+  // FLENCNTOUT(FLENCNTOUT&&) = default;
+  // FLENCNTOUT& operator=(FLENCNTOUT const& rhs) = default;
+  // FLENCNTOUT& operator=(FLENCNTOUT&&) = default;
+  //~FLENCNTOUT() = default;
+
+  explicit FLENCNTOUT(FLENCNT const& rhs) noexcept;
+  inline auto operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT&;
+};
+#pragma pack(pop)
+
+inline FLENCNTOUT::FLENCNTOUT(FLENCNT const& rhs) noexcept : clipCount(rhs.clipCount) {
+}
+
+inline auto FLENCNTOUT::operator=(FLENCNT const& rhs) noexcept -> FLENCNTOUT& {
+  clipCount = rhs.clipCount;
+
+  return *this;
+}
+
+inline FLENCNT::FLENCNT(FLENCNTOUT const& rhs) noexcept : clipCount(rhs.clipCount) {
+}
+
+inline auto FLENCNT::operator=(FLENCNTOUT const& rhs) noexcept -> FLENCNT& {
+  clipCount = rhs.clipCount;
+
+  return *this;
 }
 
 constexpr auto MINRCT = 12.0F; // minimum dimension of a form select rectangle
