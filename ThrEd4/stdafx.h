@@ -19,7 +19,6 @@
 #include "satinHeader.h"
 #include "textureHeader.h"
 #include "ThrEdTypes.h"
-#include "tracePointHeader.h"
 #include "txtrFthrInfoHeader.h"
 #include "utf8conv.h"
 #include "warnings.h"

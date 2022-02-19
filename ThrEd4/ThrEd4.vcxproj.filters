@@ -170,9 +170,6 @@
     <ClInclude Include="textureHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="tracePointHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="txtrFthrInfoHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>

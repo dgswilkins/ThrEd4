@@ -74,7 +74,6 @@
     <ClInclude Include="thred.h" />
     <ClInclude Include="ThrEdTypes.h" />
     <ClInclude Include="trace.h" />
-    <ClInclude Include="tracePointHeader.h" />
     <ClInclude Include="txtrFthrInfoHeader.h" />
     <ClInclude Include="utf8conv.h" />
     <ClInclude Include="warnings.h" />
