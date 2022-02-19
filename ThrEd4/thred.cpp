@@ -2,7 +2,6 @@
 // Local Headers
 #include "stdafx.h"
 #include "switches.h"
-#include "backupHeader.h"
 #include "bitmap.h"
 #include "clip.h"
 #include "clipboardHeader.h"

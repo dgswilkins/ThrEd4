@@ -152,9 +152,6 @@
     <ClInclude Include="clipboardHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="backupHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="pointHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>

@@ -8,7 +8,6 @@
 #ifndef DEBUG_PCH
 
 // Local Headers
-#include "backupHeader.h"
 #include "clipboardHeader.h"
 #include "clipStitchHeader.h"
 #include "EnumMap.h"
