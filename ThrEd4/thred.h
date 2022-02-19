@@ -1,9 +1,7 @@
 #pragma once
 
 // Local Headers
-#include "switches.h"
 #include "clipStitchHeader.h"
-#include "formHeader.h"
 #include "fRectangleHeader.h"
 #include "pointHeader.h"
 
