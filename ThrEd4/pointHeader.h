@@ -55,10 +55,6 @@ class D_POINT
   // ToDo - Not sure why this suppression is required. CPPCheck bug?
   // cppcheck-suppress unknownMacro
   inline D_POINT(float rhsX, float rhsY) noexcept;
-  inline D_POINT(double rhsX, double rhsY) noexcept;
-  inline auto operator==(D_POINT const& rhs) const noexcept -> bool;
-  inline auto operator=(F_POINT const& rhs) noexcept -> D_POINT&;
-  inline auto operator=(B_SEQ_PNT const& rhs) noexcept -> D_POINT&;
   // D_POINT(D_POINT const&) = default;
   // D_POINT(D_POINT&&) = default;
   // D_POINT& operator=(D_POINT const& rhs) = default;
@@ -214,20 +210,3 @@ inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
     x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }
 
-inline D_POINT::D_POINT(double rhsX, double rhsY) noexcept : x(rhsX), y(rhsY) {
-}
-inline auto D_POINT::operator==(D_POINT const& rhs) const noexcept -> bool {
-  return util::closeEnough(x, rhs.x) && util::closeEnough(y, rhs.y);
-}
-
-inline auto D_POINT::operator=(F_POINT const& rhs) noexcept -> D_POINT& {
-  x = gsl::narrow_cast<double>(rhs.x);
-  y = gsl::narrow_cast<double>(rhs.y);
-  return *this;
-}
-
-inline auto D_POINT::operator=(B_SEQ_PNT const& rhs) noexcept -> D_POINT& {
-  x = gsl::narrow_cast<double>(rhs.x);
-  y = gsl::narrow_cast<double>(rhs.y);
-  return *this;
-}
