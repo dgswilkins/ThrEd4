@@ -13,7 +13,7 @@
 #include "EnumMap.h"
 #include "ExtendedBitSet.h"
 #include "formHeader.h"
-#include "fRectangleHeader.h"
+#include "fRectangle.h"
 #include "pointHeader.h"
 #include "satConHeader.h"
 #include "satinHeader.h"

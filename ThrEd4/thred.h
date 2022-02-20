@@ -2,7 +2,7 @@
 
 // Local Headers
 #include "clipStitch.h"
-#include "fRectangleHeader.h"
+#include "fRectangle.h"
 #include "pointHeader.h"
 
 // Standard Libraries

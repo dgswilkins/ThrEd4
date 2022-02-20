@@ -1,7 +1,7 @@
 #pragma once
 
 // Local Headers
-#include "fRectangleHeader.h"
+#include "fRectangle.h"
 #include "satConHeader.h"
 #include "satinHeader.h"
 #include "ThrEdTypes.h"

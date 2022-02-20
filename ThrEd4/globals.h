@@ -41,7 +41,7 @@
 #include "clipStitch.h"
 #include "EnumMap.h"
 #include "formHeader.h"
-#include "fRectangleHeader.h"
+#include "fRectangle.h"
 #include "iniFileHeader.h"
 #include "textureHeader.h"
 

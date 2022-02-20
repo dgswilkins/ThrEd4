@@ -161,7 +161,7 @@
     <ClInclude Include="satConHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="fRectangleHeader.h">
+    <ClInclude Include="fRectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="satinHeader.h">
