@@ -5552,13 +5552,13 @@ void form::filangl() {
   }
 }
 
-auto form::chkfrm(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
+auto form::chkfrm(std::vector<POINT>* formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
   auto const  point = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
   thred::duzrat();
   auto const rectangle    = form::sRct2px(currentForm.rectangle);
-  auto&      formControls = *FormControlPoints;
+  auto&      formControls = *formControlPoints;
   formControls[0].x = formControls[6].x = formControls[7].x = formControls[8].x = rectangle.left;
   formControls[0].y = formControls[1].y = formControls[2].y = formControls[8].y = rectangle.top;
   formControls[2].x = formControls[3].x = formControls[4].x = rectangle.right;

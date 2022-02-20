@@ -744,6 +744,7 @@ class THR_HEAD_EX // thred v1.0 file header extension
 #pragma pack(pop)
 
 // main variables
+static auto FormControlPoints = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
 static auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
 static auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
 static auto ArgCount        = int32_t {};                         // command line argument count
@@ -13212,7 +13213,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	return true;
   }
   if (StateMap->test(StateFlag::FORMSEL)) {
-	if (!StateMap->test(StateFlag::FRMROT) && form::chkfrm(stretchBoxLine, xyRatio)) {
+	if (!StateMap->test(StateFlag::FRMROT) && form::chkfrm(FormControlPoints, stretchBoxLine, xyRatio)) {
 	  return true;
 	}
   }
