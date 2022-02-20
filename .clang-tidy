@@ -25,6 +25,7 @@ fuchsia-*,\
 -fuchsia-overloaded-operator,\
 -fuchsia-trailing-return,\
 google-*,\
+-google-readability-namespace-comments,\
 hicpp-*,\
 -hicpp-avoid-c-arrays,\
 llvm-*,\
