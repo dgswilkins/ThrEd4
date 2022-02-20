@@ -745,6 +745,7 @@ class THR_HEAD_EX // thred v1.0 file header extension
 
 // main variables
 static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
+static auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
 static auto ArgCount        = int32_t {};                         // command line argument count
 static auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
 static auto ThredWindowRect = RECT {};                            // main window size
@@ -14185,7 +14186,7 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 		//				lodpes();
 		//				savpes();
 #endif
-		xt::tst();
+		thred::tst();
 	  }
 	  break;
 	}
@@ -18393,6 +18394,12 @@ void thi::sachk() {
 	  }
 	}
   }
+}
+
+void thred::tst() {
+  DesignerName->assign(L"Coder");
+  ThrName->assign(*DesignerName);
+  StateMap->set(StateFlag::RESTCH);
 }
 
 #ifdef ALLOCFAILURE

@@ -2708,9 +2708,3 @@ void xt::chgchk(uint8_t code) {
   thred::chkmen();
   StateMap->set(StateFlag::DUMEN);
 }
-
-void xt::tst() {
-  DesignerName->assign(L"Coder");
-  ThrName->assign(*DesignerName);
-  StateMap->set(StateFlag::RESTCH);
-}

@@ -126,7 +126,6 @@ extern uint32_t     ClosestVertexToCursor;
 
 extern HWND DeleteStitchesDialog;
 
-extern std::wstring*   DesignerName;
 extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;

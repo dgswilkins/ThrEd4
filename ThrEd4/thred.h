@@ -73,6 +73,7 @@ auto stch2pxr(F_POINT const& stitchCoordinate) -> POINT;
 void stchrct(F_RECTANGLE& rectangle) noexcept;
 void strtchbox(std::vector<POINT> const& stretchBoxLine);
 auto txtWid(wchar_t const* string) -> SIZE;
+void tst();
 void unbBox();
 void unbsho();
 void undat() noexcept;

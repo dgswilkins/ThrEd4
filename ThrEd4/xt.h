@@ -115,7 +115,6 @@ void setwlk();
 void setwlkind();
 void sfuang();
 void srtcol();
-void tst();
 void undlen();
 void uspac();
 } // namespace xt

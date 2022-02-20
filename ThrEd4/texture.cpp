@@ -1585,7 +1585,7 @@ void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
 	  break;
 	}
 	case VK_OEM_3: { // '`~' for US
-	  xt::tst();
+	  thred::tst();
 	  break;
 	}
 	case 'R': {

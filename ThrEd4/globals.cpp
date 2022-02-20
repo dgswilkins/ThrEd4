@@ -29,7 +29,6 @@ uint32_t                       ClosestFormToCursor       = 0U;      // closest f
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
 HWND                           DeleteStitchesDialog      = nullptr; // asking user if they want to delete the sitches associated with a form
-std::wstring*                  DesignerName              = nullptr; // designer name in clear
 HWND                           DiscardButton             = nullptr; // discard button
 DRAWITEMSTRUCT*                DrawItem                  = nullptr; // for owner-draw windows
 POINT                          EndPointCross             = {};      // point to draw at the end cross for form select points
