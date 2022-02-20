@@ -496,7 +496,7 @@ namespace fi {
   auto unvis(boost::dynamic_bitset<> const& visitedRegions, int32_t& visitedIndex) -> bool;
   auto vclpComp(V_CLP_X const& vclpx1, V_CLP_X const& vclpx2) noexcept -> bool;
   auto vscmp(uint32_t index1, uint32_t index2) noexcept -> bool;
-} // namespace internal
+} // namespace fi
 
 static auto FormForInsert  = static_cast<FRM_HEAD*>(nullptr); // insert form vertex in this form
 static auto FormVertexNext = uint32_t {}; // form vertex storage for form vertex insert
