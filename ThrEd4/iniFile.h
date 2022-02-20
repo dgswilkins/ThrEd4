@@ -12,7 +12,6 @@
 
 // Standard Libraries
 #include <cstdint>
-#include <cstdlib>
 
 constexpr auto COLORCNT = uint8_t {16U};           // Number of colors in arrays
 constexpr auto COLORMAX = uint8_t {COLORCNT - 1U}; // max index in color arrays
