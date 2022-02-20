@@ -152,7 +152,7 @@
     <ClInclude Include="clipboardHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="pointHeader.h">
+    <ClInclude Include="point.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="clipStitch.h">

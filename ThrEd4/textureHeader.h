@@ -1,6 +1,6 @@
 #pragma once
 // Local Headers
-#include "pointHeader.h"
+#include "point.h"
 
 // Standard Libraries
 #include <cstdint>

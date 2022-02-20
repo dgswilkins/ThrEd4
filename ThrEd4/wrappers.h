@@ -1,7 +1,7 @@
 #pragma once
 
 // Local Headers
-#include "pointHeader.h"
+#include "point.h"
 
 // Open Source headers
 #pragma warning(push)

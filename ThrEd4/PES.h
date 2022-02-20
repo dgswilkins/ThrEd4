@@ -5,7 +5,7 @@
 
 #ifdef PESACT
 // Local Headers
-#include "pointHeader.h"
+#include "point.h"
 
 // Standard Libraries
 #include <filesystem>

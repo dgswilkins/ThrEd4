@@ -3,7 +3,7 @@
 // Local Headers
 #include "clipStitch.h"
 #include "fRectangle.h"
-#include "pointHeader.h"
+#include "point.h"
 
 // Standard Libraries
 #include <filesystem>

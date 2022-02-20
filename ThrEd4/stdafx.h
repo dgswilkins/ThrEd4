@@ -14,7 +14,7 @@
 #include "ExtendedBitSet.h"
 #include "formHeader.h"
 #include "fRectangle.h"
-#include "pointHeader.h"
+#include "point.h"
 #include "satConHeader.h"
 #include "satinHeader.h"
 #include "textureHeader.h"
