@@ -1,7 +1,7 @@
 #pragma once
 
 // Local Headers
-#include "clipStitchHeader.h"
+#include "clipStitch.h"
 #include "fRectangleHeader.h"
 #include "pointHeader.h"
 

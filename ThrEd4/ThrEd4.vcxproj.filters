@@ -155,7 +155,7 @@
     <ClInclude Include="pointHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="clipStitchHeader.h">
+    <ClInclude Include="clipStitch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="satConHeader.h">

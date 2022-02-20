@@ -9,7 +9,7 @@
 
 // Local Headers
 #include "clipboardHeader.h"
-#include "clipStitchHeader.h"
+#include "clipStitch.h"
 #include "EnumMap.h"
 #include "ExtendedBitSet.h"
 #include "formHeader.h"
