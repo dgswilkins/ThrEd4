@@ -2,7 +2,7 @@
 
 // Local Headers
 #include "fRectangle.h"
-#include "satConHeader.h"
+#include "satCon.h"
 #include "satinHeader.h"
 #include "ThrEdTypes.h"
 #include "wrappers.h"

@@ -158,7 +158,7 @@
     <ClInclude Include="clipStitch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="satConHeader.h">
+    <ClInclude Include="satCon.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fRectangle.h">

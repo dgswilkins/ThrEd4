@@ -15,7 +15,7 @@
 #include "formHeader.h"
 #include "fRectangle.h"
 #include "point.h"
-#include "satConHeader.h"
+#include "satCon.h"
 #include "satinHeader.h"
 #include "textureHeader.h"
 #include "ThrEdTypes.h"
