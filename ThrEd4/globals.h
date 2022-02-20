@@ -123,7 +123,6 @@ extern CLIP_STITCH* ClipStitchData;
 extern uint32_t     ClosestFormToCursor;
 extern uint32_t     ClosestPointIndex;
 extern uint32_t     ClosestVertexToCursor;
-extern int32_t*     ColorBarSize;
 
 extern HWND DeleteStitchesDialog;
 

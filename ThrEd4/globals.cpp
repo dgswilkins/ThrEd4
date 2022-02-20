@@ -28,7 +28,6 @@ CLIP_STITCH*                   ClipStitchData            = nullptr; // for pcs c
 uint32_t                       ClosestFormToCursor       = 0U;      // closest form to the cursor
 uint32_t                       ClosestPointIndex         = 0U;      // index of closest point
 uint32_t                       ClosestVertexToCursor     = 0U;      // formOrigin closest to the cursor
-int32_t*                       ColorBarSize              = nullptr; // Color bar width scaled for DPI
 HWND                           DeleteStitchesDialog      = nullptr; // asking user if they want to delete the sitches associated with a form
 std::wstring*                  DesignerName              = nullptr; // designer name in clear
 HWND                           DiscardButton             = nullptr; // discard button

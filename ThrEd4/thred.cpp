@@ -748,6 +748,7 @@ static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred f
 static auto ArgCount        = int32_t {};                         // command line argument count
 static auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
 static auto ThredWindowRect = RECT {};                            // main window size
+static auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr); // Color bar width scaled for DPI
 static auto ColorBarRect    = RECT {};                            // color bar rectangle
 static auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which thred was executed
 static auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
