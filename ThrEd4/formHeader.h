@@ -3,7 +3,6 @@
 // Local Headers
 #include "fRectangle.h"
 #include "satCon.h"
-#include "satinHeader.h"
 #include "ThrEdTypes.h"
 #include "wrappers.h"
 
@@ -160,6 +159,60 @@ union TF_INFO {
   //~TF_INFO() = default;
 };
 #pragma pack(pop)
+
+union SATINANGLEOUT;
+
+union SATINANGLE {
+  public:
+  uint32_t guide {};
+  float    angle;
+
+  SATINANGLE() noexcept = default;
+  // SATINANGLE(SATINANGLE const&) = default;
+  // SATINANGLE(SATINANGLE&&) = default;
+  // SATINANGLE& operator=(SATINANGLE const& rhs) = default;
+  // SATINANGLE& operator=(SATINANGLE&&) = default;
+  //~SATINANGLE() = default;
+
+  explicit SATINANGLE(SATINANGLEOUT const& rhs) noexcept;
+  inline auto operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE&;
+};
+
+#pragma pack(push, 1)
+union SATINANGLEOUT {
+  public:
+  DWORD guide {};
+  float angle;
+
+  SATINANGLEOUT() noexcept = default;
+  // SATINANGLEOUT(SATINANGLEOUT const&) = default;
+  // SATINANGLEOUT(SATINANGLEOUT&&) = default;
+  // SATINANGLEOUT& operator=(SATINANGLEOUT const& rhs) = default;
+  // SATINANGLEOUT& operator=(SATINANGLEOUT&&) = default;
+  //~SATINANGLEOUT() = default;
+
+  explicit SATINANGLEOUT(SATINANGLE const& rhs) noexcept;
+  inline auto operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT&;
+};
+#pragma pack(pop)
+
+inline SATINANGLEOUT::SATINANGLEOUT(SATINANGLE const& rhs) noexcept : angle(rhs.angle) {
+}
+
+inline auto SATINANGLEOUT::operator=(SATINANGLE const& rhs) noexcept -> SATINANGLEOUT& {
+  angle = rhs.angle;
+
+  return *this;
+}
+
+inline SATINANGLE::SATINANGLE(SATINANGLEOUT const& rhs) noexcept : angle(rhs.angle) {
+}
+
+inline auto SATINANGLE::operator=(SATINANGLEOUT const& rhs) noexcept -> SATINANGLE& {
+  angle = rhs.angle;
+
+  return *this;
+}
 
 #pragma pack(push, 1)
 class FRM_HEAD_O // Original form header used prior to version 2
@@ -639,3 +692,4 @@ inline void FRM_HEAD::squareEnd(bool flag) noexcept {
 	extendedAttribute &= ~(AT_SQR);
   }
 }
+

@@ -16,7 +16,6 @@
 #include "fRectangle.h"
 #include "point.h"
 #include "satCon.h"
-#include "satinHeader.h"
 #include "textureHeader.h"
 #include "ThrEdTypes.h"
 #include "utf8conv.h"

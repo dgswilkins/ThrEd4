@@ -164,9 +164,6 @@
     <ClInclude Include="fRectangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="satinHeader.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="textureHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
