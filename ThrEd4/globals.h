@@ -129,7 +129,6 @@ extern HWND DeleteStitchesDialog;
 extern HWND            DiscardButton;
 extern DRAWITEMSTRUCT* DrawItem;
 extern POINT           EndPointCross;
-extern HMENU           FillMenu;
 
 extern std::vector<float>* FormAngles;
 extern std::vector<POINT>* FormControlPoints;

@@ -744,7 +744,7 @@ class THR_HEAD_EX // thred v1.0 file header extension
 #pragma pack(pop)
 
 // main variables
-static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
+static auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
 static auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
 static auto ArgCount        = int32_t {};                         // command line argument count
 static auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
@@ -840,11 +840,12 @@ static auto    ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size chan
 constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
 
 // menus
-static auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
 static auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
+static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
+static auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
+static auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 static auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 static auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
-static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
 
 // windows
 static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
