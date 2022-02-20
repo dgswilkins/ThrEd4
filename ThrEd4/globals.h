@@ -42,7 +42,7 @@
 #include "EnumMap.h"
 #include "formHeader.h"
 #include "fRectangle.h"
-#include "iniFileHeader.h"
+#include "iniFile.h"
 #include "textureHeader.h"
 
 // Open Source headers

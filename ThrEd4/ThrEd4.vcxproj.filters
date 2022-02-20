@@ -170,7 +170,7 @@
     <ClInclude Include="textureHeader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="iniFileHeader.h">
+    <ClInclude Include="iniFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
