@@ -311,7 +311,7 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	if (colorFile != INVALID_HANDLE_VALUE) {
 	  wrap::writeFile(colorFile,
-	                  &colorData[0],
+	                  colorData.data(),
 	                  wrap::toUnsigned(colorData.size() * wrap::sizeofType(colorData)),
 	                  &bytesWritten,
 	                  nullptr);
