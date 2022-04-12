@@ -18199,7 +18199,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  if (DisplayedColorBitmap.test(iColor)) {
 			SetBkColor(DrawItem->hDC, DEFAULT_COLORS[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
-			auto const colorNum = std::wstring(fmt::format(L"{}", iColor + 1U));
+			auto const colorNum = fmt::format(L"{}", iColor + 1U);
 			auto       textSize = SIZE {};
 			wrap::getTextExtentPoint32(
 			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);
