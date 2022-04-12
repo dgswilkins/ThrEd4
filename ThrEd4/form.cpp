@@ -4863,48 +4863,45 @@ void fi::bakseq() {
 		if ((form.extendedAttribute & AT_SQR) != 0U) {
 		  if (StateMap->testAndFlip(StateFlag::FILDIR)) {
 			OSequence->push_back(F_POINT {bPrevious.x, bPrevious.y});
-			auto count = wrap::ceil<int32_t>(bCurrent.y / UserStitchLength);
+			auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength +
+			            wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
 			do {
-			  OSequence->push_back(F_POINT {0.0F,
-			                                wrap::toFloat(count) * UserStitchLength +
-			                                    wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9});
-			  if (OSequence->back().y > bCurrent.y) {
+			  OSequence->push_back(F_POINT {0.0F, yVal});
+			  if (yVal > bCurrent.y) {
 				break;
 			  }
 			  OSequence->back().x = bCurrent.x;
-			  ++count;
+			  yVal += UserStitchLength;
 			} while (true);
 			OSequence->back() = bCurrent;
 		  }
 		  else {
 			OSequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
-			auto count = wrap::floor<int32_t>(bCurrent.y / UserStitchLength);
+			auto yVal = wrap::toFloat(wrap::floor<int32_t>(bCurrent.y / UserStitchLength)) * UserStitchLength -
+			            wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
 			do {
-			  OSequence->push_back(F_POINT {0.0F,
-			                                wrap::toFloat(count) * UserStitchLength -
-			                                    wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9});
-			  if (OSequence->back().y < bPrevious.y) {
+			  OSequence->push_back(F_POINT {0.0F, yVal});
+			  if (yVal < bPrevious.y) {
 				break;
 			  }
 			  OSequence->back().x = bCurrent.x;
-			  --count;
+			  yVal -= UserStitchLength;
 			} while (true);
 			OSequence->back() = bPrevious;
 		  }
 		}
 		else {
-		  auto count = wrap::ceil<int32_t>(bNext.y / UserStitchLength);
+		  auto yVal = wrap::toFloat(wrap::ceil<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength +
+		              wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9;
 		  do {
-			OSequence->push_back(F_POINT {0.0F,
-			                              wrap::toFloat(count) * UserStitchLength +
-			                                  wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9});
-			if (OSequence->back().y > bCurrent.y) {
+			OSequence->push_back(F_POINT {0.0F, yVal});
+			if (yVal > bCurrent.y) {
 			  break;
 			}
 			delta.y             = OSequence->back().y - bNext.y;
 			delta.x             = slope * delta.y;
 			OSequence->back().x = bNext.x + delta.x;
-			++count;
+			yVal += UserStitchLength;
 		  } while (true);
 		  OSequence->back() = bCurrent;
 		}
@@ -4912,18 +4909,17 @@ void fi::bakseq() {
 	  }
 	  case SEQBOT: {
 		if ((form.extendedAttribute & AT_SQR) == 0U) {
-		  auto count = wrap::floor<int32_t>(bNext.y / UserStitchLength);
+		  auto yVal = wrap::toFloat(wrap::floor<int32_t>(bNext.y / UserStitchLength)) * UserStitchLength -
+		              wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9;
 		  do {
-			OSequence->push_back(F_POINT {0.0F,
-			                              wrap::toFloat(count) * UserStitchLength -
-			                                  wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9});
-			if (OSequence->back().y < bCurrent.y) {
+			OSequence->push_back(F_POINT {0.0F, yVal});
+			if (yVal < bCurrent.y) {
 			  break;
 			}
 			delta.y             = OSequence->back().y - bNext.y;
 			delta.x             = slope * delta.y;
 			OSequence->back().x = bNext.x + delta.x;
-			--count;
+			yVal -= UserStitchLength;
 		  } while (true);
 		  OSequence->back() = bCurrent;
 		}
