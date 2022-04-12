@@ -261,7 +261,7 @@ void displayText::okcan() {
                           SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
                           5,
                           MsgRect.bottom + 15,
-                          ButtonWidth << 2U,
+                          ButtonWidth * 4,
                           ButtonHeight,
                           MainStitchWin,
                           nullptr,
