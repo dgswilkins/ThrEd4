@@ -4867,7 +4867,7 @@ void fi::bakseq() {
 			do {
 			  OSequence->push_back(F_POINT {0.0F,
 			                                wrap::toFloat(count) * UserStitchLength +
-			                                    wrap::toFloat(rit % SEQ_TABLE[rcnt]) * userStitchLength9});
+			                                    wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9});
 			  if (OSequence->back().y > bCurrent.y) {
 				break;
 			  }
@@ -4882,7 +4882,7 @@ void fi::bakseq() {
 			do {
 			  OSequence->push_back(F_POINT {0.0F,
 			                                wrap::toFloat(count) * UserStitchLength -
-			                                    wrap::toFloat((rit + 2) % SEQ_TABLE[rcnt]) * userStitchLength9});
+			                                    wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9});
 			  if (OSequence->back().y < bPrevious.y) {
 				break;
 			  }
@@ -4897,7 +4897,7 @@ void fi::bakseq() {
 		  do {
 			OSequence->push_back(F_POINT {0.0F,
 			                              wrap::toFloat(count) * UserStitchLength +
-			                                  wrap::toFloat(rit % SEQ_TABLE[rcnt]) * userStitchLength9});
+			                                  wrap::toFloat(std::abs(rit % SEQ_TABLE[rcnt])) * userStitchLength9});
 			if (OSequence->back().y > bCurrent.y) {
 			  break;
 			}
@@ -4916,7 +4916,7 @@ void fi::bakseq() {
 		  do {
 			OSequence->push_back(F_POINT {0.0F,
 			                              wrap::toFloat(count) * UserStitchLength -
-			                                  wrap::toFloat((rit + 2) % SEQ_TABLE[rcnt]) * userStitchLength9});
+			                                  wrap::toFloat(std::abs((rit + 2) % SEQ_TABLE[rcnt])) * userStitchLength9});
 			if (OSequence->back().y < bCurrent.y) {
 			  break;
 			}
