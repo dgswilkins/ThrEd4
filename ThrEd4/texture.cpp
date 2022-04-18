@@ -10,7 +10,6 @@
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
-#include "xt.h"
 
 class TX_HIST_BUFF
 {
