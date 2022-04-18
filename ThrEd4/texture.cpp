@@ -2,7 +2,6 @@
 // Local Headers
 #include "stdafx.h"
 #include "clip.h"
-#include "clipboardHeader.h"
 #include "displayText.h"
 #include "form.h"
 #include "formForms.h"
@@ -892,16 +891,12 @@ void txi::setxfrm() noexcept {
 }
 
 void txi::txtclp(FRM_HEAD& textureForm) {
-  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
-  ClipMemory           = GetClipboardData(thrEdClip);
-  if (ClipMemory != nullptr) {
-	auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(ClipMemory));
-	if (clipFormHeader != nullptr) {
-	  if (clipFormHeader->clipType == CLP_FRM) {
-		auto* clipForm = &clipFormHeader->form;
-		if (nullptr != clipForm) {
+  if (auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat); 0U != thrEdClip) {
+	if (auto const clipData = GetClipboardData(thrEdClip); nullptr != clipData) {
+	  if (auto const clipMemory = GlobalLock(clipData); nullptr != clipMemory) {
+		if (auto* clipForm = thred::getClipForm(clipMemory); nullptr != clipForm) {
 		  textureForm           = *clipForm;
-		  auto*      vertices   = convertFromPtr<F_POINT*>(&clipForm[1]);
+		  auto*      vertices   = convertFromPtr<F_POINT*>(++clipForm);
 		  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
 		  AngledFormVertices->clear();
 		  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
@@ -912,12 +907,12 @@ void txi::txtclp(FRM_HEAD& textureForm) {
 		  txi::setxfrm();
 		  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
 		}
+		GlobalUnlock(clipMemory);
+		StateMap->set(StateFlag::RESTCH);
+		StateMap->reset(StateFlag::WASWROT);
 	  }
-	  GlobalUnlock(ClipMemory);
 	}
   }
-  StateMap->set(StateFlag::RESTCH);
-  StateMap->reset(StateFlag::WASWROT);
 }
 
 void txi::dutxtlin() noexcept {

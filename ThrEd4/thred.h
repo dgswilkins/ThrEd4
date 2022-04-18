@@ -30,6 +30,7 @@ auto findLastStitch(uint32_t form) -> uint32_t;
 void frmdel();
 void frmrct(F_RECTANGLE& rectangle) noexcept;
 auto getBackGroundBrush() noexcept -> HBRUSH;
+auto getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD*;
 auto getFileHandle(fs::path const& newFileName, HANDLE& fileHandle) -> bool;
 auto getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool;
 auto getHomeDir() noexcept -> fs::path*;

@@ -45,7 +45,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="bitmap.h" />
-    <ClInclude Include="clipboardHeader.h" />
     <ClInclude Include="clipStitch.h" />
     <ClInclude Include="displayText.h" />
     <ClInclude Include="DST.h" />

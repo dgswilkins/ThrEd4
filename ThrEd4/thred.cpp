@@ -4,7 +4,6 @@
 #include "switches.h"
 #include "bitmap.h"
 #include "clip.h"
-#include "clipboardHeader.h"
 #include "displayText.h"
 #include "DST.h"
 #include "form.h"
@@ -78,6 +77,23 @@ class BAL_STITCH // balarad stitch
   // BAL_STITCH& operator=(BAL_STITCH const& rhs) = default;
   // BAL_STITCH& operator=(BAL_STITCH&&) = default;
   //~BAL_STITCH() = default;
+};
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+class FORM_CLIP // form data clipboard header
+{
+  public:
+  uint32_t clipType {};
+  uint32_t reserved {};
+  FRM_HEAD form {};
+
+  // constexpr FORM_CLIP() noexcept = default;
+  // FORM_CLIP(FORM_CLIP const&) = default;
+  // FORM_CLIP(FORM_CLIP&&) = default;
+  // FORM_CLIP& operator=(FORM_CLIP const& rhs) = default;
+  // FORM_CLIP& operator=(FORM_CLIP&&) = default;
+  //~FORM_CLIP() = default;
 };
 #pragma pack(pop)
 
@@ -923,6 +939,17 @@ static auto RotateBoxCrossHorzLine = std::array<POINT, LNPNTS> {}; // horizontal
 static auto RotateBoxToCursorLine =
     std::array<POINT, LNPNTS> {}; // line from the cursor to the center of the rotate cross
 static auto ColorChangeTable = gsl::narrow_cast<std::vector<COL_CHANGE>*>(nullptr);
+
+auto thred::getClipForm(LPVOID clipMemory) noexcept -> FRM_HEAD* {
+  if (clipMemory != nullptr) {
+	auto* clipFormHeader = gsl::narrow_cast<FORM_CLIP*>(clipMemory);
+	if (clipFormHeader->clipType == CLP_FRM) {
+	  auto* clipForm = &clipFormHeader->form;
+	  return clipForm;
+	}
+  }
+  return nullptr;
+}
 
 auto CALLBACK thi::dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
