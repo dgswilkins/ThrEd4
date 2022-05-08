@@ -14221,7 +14221,8 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case VK_PRIOR: { // page up
 	  if (wrap::pressed(VK_SHIFT)) {
-		form::redup();
+		StateMap->reset(StateFlag::ROTCLOCK);
+		form::dupfn(IniFile.rotationAngle);
 	  }
 	  else {
 		form::rotagain();
@@ -14230,7 +14231,8 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case VK_NEXT: { // page down
 	  if (wrap::pressed(VK_SHIFT)) {
-		form::bakdup();
+		StateMap->set(StateFlag::ROTCLOCK);
+		form::dupfn(IniFile.rotationAngle);
 	  }
 	  else {
 		form::bakagain();
@@ -15194,7 +15196,8 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_DUPAGAIN: { // edit / Rotate / and Duplicate again
-	  form::redup();
+	  StateMap->reset(StateFlag::ROTCLOCK);
+	  form::dupfn(IniFile.rotationAngle);
 	  flag = true;
 	  break;
 	}
@@ -15356,6 +15359,7 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ROTDUP: { // edit / Rotate / and Duplicate
+	  StateMap->reset(StateFlag::ROTCLOCK);
 	  form::rotdup();
 	  flag = true;
 	  break;
@@ -16517,7 +16521,9 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine,
 			IniFile.rotationAngle = value * DEGRADF;
 		  }
 		}
-		form::duprot(IniFile.rotationAngle);
+		if (IniFile.rotationAngle != 0.0F) {
+		  form::dupfn(IniFile.rotationAngle);
+		}
 	  }
 	  if (StateMap->testAndReset(StateFlag::ENTROT)) {
 		if (MsgBuffer->size() > 1) {

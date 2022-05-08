@@ -267,7 +267,6 @@ namespace fi {
               uint32_t&              formSourceIndex);
   void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices);
   void dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup);
-  void dupfn(float rotationAngle);
   void duprots(float rotationAngle, F_POINT const& rotationCenter);
   void duprotfs(float rotationAngle);
   void durgn(FRM_HEAD const&                 form,
@@ -8186,20 +8185,24 @@ void form::contfil() {
   }
 }
 
-void fi::dupfn(float rotationAngle) {
+void form::dupfn(float rotationAngle) {
   thred::savdo();
+  auto usedAngle = rotationAngle;
+  if (StateMap->test(StateFlag::ROTCLOCK) && (rotationAngle != 0.0F)) {
+	usedAngle = PI_F2 - rotationAngle;
+  }
   auto const rotationCenter = form::rotpar();
-  if (IniFile.rotationAngle != 0.0F) {
+  if (usedAngle != 0.0F) {
 	if (StateMap->test(StateFlag::FORMSEL)) {
-	  form::duprot(rotationAngle);
+	  form::duprot(usedAngle);
 	}
 	else {
 	  if (StateMap->test(StateFlag::GRPSEL)) {
-		duprots(rotationAngle, rotationCenter);
+		fi::duprots(usedAngle, rotationCenter);
 	  }
 	  else {
 		if (!SelectedFormList->empty()) {
-		  duprotfs(rotationAngle);
+		  fi::duprotfs(usedAngle);
 		}
 		else {
 		  displayText::shord();
@@ -8208,17 +8211,9 @@ void fi::dupfn(float rotationAngle) {
 	}
   }
   else {
-	rotentr(rotationAngle);
+	fi::rotentr(usedAngle);
 	StateMap->set(StateFlag::ENTRDUP);
   }
-}
-
-void form::redup() {
-  fi::dupfn(IniFile.rotationAngle);
-}
-
-void form::bakdup() {
-  fi::dupfn(PI_F2 - IniFile.rotationAngle);
 }
 
 void fi::shrnks() {

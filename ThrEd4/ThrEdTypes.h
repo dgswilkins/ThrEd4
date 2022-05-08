@@ -387,6 +387,7 @@ enum class StateFlag : uint32_t {
   FCHK,      // check the forms
   NOCLP,     // don't load clipboard data from forms
   NOTHRFIL,  // loaded file wasn't a Thred file
+  ROTCLOCK,  // Indicate direction of rotation
 
   EnumCount // must be the last entry in the enum
 };
