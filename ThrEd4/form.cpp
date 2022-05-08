@@ -7723,12 +7723,17 @@ void form::cpylayr(uint32_t layer) {
 	  if (StateMap->test(StateFlag::GRPSEL)) {
 		thred::savdo();
 		thred::rngadj();
+		auto const oldSize = StitchBuffer->size();
+		StitchBuffer->reserve(oldSize + (GroupEndStitch + 1U - GroupStartStitch));
+		StitchBuffer->insert(StitchBuffer->end(),
+		                     wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
+		                     wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
 		auto const codedStitchLayer = layer << LAYSHFT;
-		auto const endStitch        = wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U);
-		for (auto currentStitch = wrap::next(StitchBuffer->cbegin(), GroupStartStitch); currentStitch < endStitch;
+		for (auto currentStitch = wrap::next(StitchBuffer->begin(), oldSize);
+		     currentStitch != StitchBuffer->end();
 		     ++currentStitch) {
-		  StitchBuffer->push_back(F_POINT_ATTR {
-		      (*currentStitch).x, (*currentStitch).y, ((*currentStitch).attribute & NLAYMSK) | codedStitchLayer});
+		  currentStitch->attribute &= NLAYMSK;
+		  currentStitch->attribute |= codedStitchLayer;
 		}
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
