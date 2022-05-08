@@ -7663,12 +7663,14 @@ void fi::duprotfs(float rotationAngle) {
 void fi::duprots(float rotationAngle, F_POINT const& rotationCenter) {
   thred::rngadj();
   ClosestPointIndex   = wrap::toUnsigned(StitchBuffer->size());
-  auto       itStitch = wrap::next(StitchBuffer->cbegin(), GroupStartStitch);
-  auto const endPoint = wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U);
-  while (itStitch < endPoint) {
-	StitchBuffer->push_back(
-	    F_POINT_ATTR {(*itStitch).x, (*itStitch).y, (*itStitch).attribute & (~(FRMSK | TYPMSK))});
-	++itStitch;
+  StitchBuffer->reserve(ClosestPointIndex + (GroupEndStitch + 1U - GroupStartStitch));
+  StitchBuffer->insert(StitchBuffer->end(),
+                       wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
+                       wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
+  for (auto currentStitch = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
+       currentStitch != StitchBuffer->end();
+       ++currentStitch) {
+	currentStitch->attribute &= (~(FRMSK | TYPMSK));
   }
   GroupStitchIndex = wrap::toUnsigned(StitchBuffer->size() - 1U);
   thred::rngadj();
