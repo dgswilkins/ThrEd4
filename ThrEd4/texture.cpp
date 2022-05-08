@@ -892,7 +892,9 @@ void txi::setxfrm() noexcept {
 
 void txi::txtclp(FRM_HEAD& textureForm) {
   if (auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat); 0U != thrEdClip) {
+	// NOLINTNEXTLINE(readability-qualified-auto)
 	if (auto const clipData = GetClipboardData(thrEdClip); nullptr != clipData) {
+	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  if (auto const clipMemory = GlobalLock(clipData); nullptr != clipMemory) {
 		if (auto* clipForm = thred::getClipForm(clipMemory); nullptr != clipForm) {
 		  textureForm           = *clipForm;
