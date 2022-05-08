@@ -10246,7 +10246,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	}
 	case WM_COMMAND: {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto* fileInfo = reinterpret_cast<FIND_INFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
+	  auto const* fileInfo = reinterpret_cast<FIND_INFO*>(GetWindowLongPtr(hwndlg, DWLP_USER));
 	  if (fileInfo != nullptr) {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^

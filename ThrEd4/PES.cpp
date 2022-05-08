@@ -557,7 +557,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto*      pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
   auto const pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-  auto*      pesStitch = &fileBuffer[pecOffset];
+  auto const* pesStitch = &fileBuffer[pecOffset];
   if (pesStitch == nullptr) {
 	return false;
   }

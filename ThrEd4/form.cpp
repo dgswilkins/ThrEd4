@@ -2460,7 +2460,7 @@ void fi::bhfn(FRM_HEAD const& form, uint32_t start, uint32_t finish) {
 void fi::bhcrnr(FRM_HEAD const& form, uint32_t vertex) {
   auto const nextVertex = form::nxt(form, vertex);
   auto const itVertex   = wrap::next(FormVertices->cbegin(), form.vertexIndex + nextVertex);
-  if (auto* ptr = (StateMap->test(StateFlag::INDIR)) ? OutsidePoints : InsidePoints; nullptr != ptr) {
+  if (auto const* ptr = (StateMap->test(StateFlag::INDIR)) ? OutsidePoints : InsidePoints; nullptr != ptr) {
 	auto delta = F_POINT {ptr->operator[](nextVertex).x - itVertex->x,
 	                      ptr->operator[](nextVertex).y - itVertex->y};
 
@@ -4130,7 +4130,7 @@ void fi::nxtrgn(std::vector<RG_SEQ>&            tempPath,
 	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength > maxPathLength) {
-	  auto* lineEndPoint = sortedLines[regionsList[doneRegion].start];
+	  auto const* lineEndPoint = sortedLines[regionsList[doneRegion].start];
 	  if (lineEndPoint != nullptr) {
 		lastRegionCorners[0] = lineEndPoint[0];
 		lastRegionCorners[1] = lineEndPoint[1];
