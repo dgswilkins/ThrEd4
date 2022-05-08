@@ -251,7 +251,7 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
   DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
   DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
   auto color               = dstStitchBuffer[0].attribute & COLMSK;
-  for (auto& stitch : dstStitchBuffer) {
+  for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
 	  DSTRecords.push_back(DSTREC {0, 0, STOPCODE});

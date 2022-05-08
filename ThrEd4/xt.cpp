@@ -840,7 +840,7 @@ void xt::srtcol() {
   histogram.resize(COLORCNT);
   auto colorStartStitch = std::vector<uint32_t> {};
   colorStartStitch.resize(COLORCNT);
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	++(histogram[stitch.attribute & COLMSK]);
   }
   auto startStitch = 0U;
@@ -852,7 +852,7 @@ void xt::srtcol() {
   }
   auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
   highStitchBuffer.resize(StitchBuffer->size());
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	highStitchBuffer[colorStartStitch[stitch.attribute & COLMSK]++] = stitch;
   }
   std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
@@ -1154,7 +1154,7 @@ auto xi::srtchk(std::vector<O_REC*> const& stitchRegion, uint32_t count, uint32_
 	  auto const itSRColorOrder = wrap::next(ColorOrder.begin(), (*iStitchRegion)->color);
 	  auto const itColorOrder   = wrap::next(ColorOrder.begin(), color);
 	  if (*itSRColorOrder < *itColorOrder) {
-		auto& form = FormList->operator[](formIndex);
+		auto const& form = FormList->operator[](formIndex);
 		if (form.fillType == FTHF && ((form.extendedAttribute & AT_FTHBLND) != 0U) &&
 		    (*iStitchRegion)->color == form.fillColor) {
 		  continue;

@@ -3123,7 +3123,7 @@ void thi::duzero() {
 	StateMap->reset(StateFlag::CONTIG);
 	auto iDestination  = StitchBuffer->begin();
 	auto currentStitch = StitchBuffer->front();
-	for (auto& iStitch : *StitchBuffer) {
+	for (auto const& iStitch : *StitchBuffer) {
 	  if (((iStitch.attribute & TYPMSK) != 0U) && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
 		if (StateMap->testAndSet(StateFlag::CONTIG)) {
 		  auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
@@ -3739,7 +3739,7 @@ void thi::ritbal() {
 	auto       iBHC   = spBHC.begin();
 	auto const bhcEnd = std::next(spBHC.begin(), UserColor.size());
 	*iBHC             = UserColor[color];
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (color != (stitch.attribute & COLMSK)) {
 		color     = stitch.attribute & COLMSK;
 		*(iBHC++) = UserColor[color];
@@ -5547,7 +5547,7 @@ auto thi::closPnt1(uint32_t& closestStitch) -> bool {
   }
   else {
 	auto currentStitch = 0U;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  auto const layer = (stitch.attribute & LAYMSK) >> LAYSHFT;
 	  if ((ActiveLayer == 0U) || (layer == 0U) || layer == ActiveLayer) {
 		if (stitch.x >= ZoomRect.left && stitch.x <= ZoomRect.right &&
@@ -6129,7 +6129,7 @@ void thi::lodclp(uint32_t iStitch) {
   ClosestPointIndex  = iStitch;
   auto const originX = wrap::toFloat(ClipOrigin.x);
   auto const originY = wrap::toFloat(ClipOrigin.y);
-  for (auto& clip : *ClipBuffer) {
+  for (auto const& clip : *ClipBuffer) {
 	StitchBuffer->operator[](iStitch++) =
 	    F_POINT_ATTR {clip.x + originX,
 	                  clip.y + originY,
@@ -8544,7 +8544,7 @@ void thi::delfre() {
   auto currentStitchCount = 0U;
   thred::savdo();
   // ToDo - this loop does not delete all free stitches. look at frmdel as well
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	if ((stitch.attribute & NOTFRM) == 0U) {
 	  StitchBuffer->operator[](currentStitchCount++) = stitch;
 	}
@@ -9017,7 +9017,7 @@ void thi::ungrplo() {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  auto flag    = true;
 	  auto iStitch = 0U;
-	  for (auto& stitch : *StitchBuffer) {
+	  for (auto const& stitch : *StitchBuffer) {
 		if (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) >> FRMSHFT) == ClosestFormToCursor) {
 		  ClosestPointIndex = iStitch;
 		  StateMap->set(StateFlag::SELBOX);
@@ -9769,7 +9769,7 @@ void thi::rotmrk() {
 		       nuang(originalAngle, itVertex->x - ZoomMarkPoint.x, itVertex->y - ZoomMarkPoint.y));
 		++itVertex;
 	  }
-	  for (auto& stitch : *StitchBuffer) {
+	  for (auto const& stitch : *StitchBuffer) {
 		if ((stitch.attribute & FRMSK) == codedFormIndex) {
 		  angdif(lowestAngle,
 		         highestAngle,
@@ -10629,7 +10629,7 @@ void thi::movchk() {
 void thi::inscol() {
   auto colorMap = boost::dynamic_bitset<>(COLORCNT);
   VerticalIndex &= COLMSK;
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	colorMap.set(stitch.attribute & COLMSK);
   }
   if (colorMap.all()) {

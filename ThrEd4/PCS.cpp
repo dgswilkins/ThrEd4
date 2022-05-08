@@ -88,7 +88,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitch
 		}
 		auto savcol = COLMSK;
 		pcsStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
-		for (auto& stitch : saveStitches) {
+		for (auto const& stitch : saveStitches) {
 		  if ((stitch.attribute & COLMSK) != savcol) {
 			savcol      = stitch.attribute & COLMSK;
 			auto colRec = PCS_STITCH {};

@@ -488,7 +488,7 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   // now write out the individual thread thumbnails
   thumbnail        = IMAGE_WITH_FRAME;
   auto stitchColor = (StitchBuffer->front().attribute & COLMSK);
-  for (auto& stitch : *StitchBuffer) {
+  for (auto const& stitch : *StitchBuffer) {
 	auto const x = wrap::toSize(wrap::floor<uint16_t>(stitch.x * xFactor) + XOFFSET);
 	auto const y = wrap::toSize(THUMBHGT - (wrap::floor<uint16_t>(stitch.y * yFactor) + YOFFSET));
 	auto const iThumbnail = wrap::next(thumbnail.begin(), y);

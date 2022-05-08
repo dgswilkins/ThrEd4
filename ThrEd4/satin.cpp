@@ -278,7 +278,7 @@ auto si::satselfn() -> bool {
   auto       minimumLength = BIGFLOAT;
   auto const stitchPoint   = thred::pxCor2stch(Msg.pt);
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+	auto const& form = FormList->operator[](iForm);
 
 	auto const layerCode =
 	    gsl::narrow_cast<uint8_t>(gsl::narrow_cast<uint8_t>(form.attribute & FRMLMSK) >> 1U);

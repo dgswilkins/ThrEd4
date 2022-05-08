@@ -5901,7 +5901,7 @@ void form::unfil() {
 	  }
 	}
 	auto iDestination = StitchBuffer->begin();
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (!formMap.test((stitch.attribute & FRMSK) >> FRMSHFT)) {
 		*iDestination++ = stitch;
 	  }
@@ -5928,7 +5928,7 @@ void form::unfil() {
 		auto       iDestination = StitchBuffer->begin();
 		auto       destCount    = 0U;
 		auto const codedForm    = ClosestFormToCursor << FRMSHFT;
-		for (auto& stitch : *StitchBuffer) {
+		for (auto const& stitch : *StitchBuffer) {
 		  if ((stitch.attribute & FRMSK) != codedForm || ((stitch.attribute & NOTFRM) != 0U)) {
 			*iDestination++ = stitch;
 			++destCount;
@@ -7473,7 +7473,7 @@ void fi::snp(uint32_t start, uint32_t finish) {
   xHistogram[endColumn] = accumulator;
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto iStitch = 0U;
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == attribute) {
 		auto const iColumn             = wrap::floor<uint32_t>(stitch.x);
 		xPoints[xHistogram[iColumn]++] = iStitch;
@@ -7893,7 +7893,7 @@ void fi::frmpnts(uint32_t type) {
   if (!StitchBuffer->empty()) {
 	auto       iStitch = 0U;
 	auto const trg     = ((ClosestFormToCursor << 4U) | type);
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if ((stitch.attribute & (ALTYPMSK | FRMSK)) == trg) {
 		break;
 	  }
@@ -7923,7 +7923,7 @@ void fi::frmpnts(uint32_t type) {
 void form::selfil(uint32_t type) {
   displayText::frm1pnt();
   if (StateMap->test(StateFlag::FORMSEL)) {
-	auto& currentForm = FormList->operator[](ClosestFormToCursor);
+	auto const& currentForm = FormList->operator[](ClosestFormToCursor);
 	if (type == FRMFIL && (currentForm.fillType == 0U)) {
 	  displayText::tabmsg(IDS_FSELF);
 	  return;
@@ -8397,7 +8397,7 @@ void form::srtbyfrm() {
 	color[AppliqueColor]  = 0U;
 	auto tempStitchBuffer = std::vector<F_POINT_ATTR> {};
 	tempStitchBuffer.resize(StitchBuffer->size());
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  ++(colorHistogram[color[stitch.attribute & COLMSK]]);
 	}
 	auto colorAccumulator = 0U;
@@ -8406,7 +8406,7 @@ void form::srtbyfrm() {
 	  iColor           = colorAccumulator;
 	  colorAccumulator += value;
 	}
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  tempStitchBuffer[colorHistogram[color[stitch.attribute & COLMSK]]++] = stitch;
 	}
 	fi::srtf(tempStitchBuffer, 0, colorHistogram[0]);
@@ -9021,7 +9021,7 @@ void form::col2frm() {
 	featherColorHistogram.resize(formColorPermutations);
 	auto underlayColorHistogram = std::vector<uint32_t> {};
 	underlayColorHistogram.resize(formColorPermutations);
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  if (auto const formColorCode = stitch.attribute & (COLMSK | FRMSK);
 	      (stitch.attribute & (WLKMSK | CWLKMSK | UNDMSK)) != 0U) {
 		++(underlayColorHistogram[formColorCode]);
@@ -9248,7 +9248,7 @@ void form::srtfrm() {
   histogram.resize(FormList->size());
   if (!StitchBuffer->empty()) {
 	thred::savdo();
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  auto const iForm = (stitch.attribute & FRMSK) >> FRMSHFT;
 	  ++(histogram[iForm]);
 	}
@@ -9260,7 +9260,7 @@ void form::srtfrm() {
 	}
 	auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
 	highStitchBuffer.resize(StitchBuffer->size());
-	for (auto& stitch : *StitchBuffer) {
+	for (auto const& stitch : *StitchBuffer) {
 	  auto const iForm              = (stitch.attribute & FRMSK) >> FRMSHFT;
 	  auto const iHighStitch        = histogram[iForm]++;
 	  highStitchBuffer[iHighStitch] = stitch;
