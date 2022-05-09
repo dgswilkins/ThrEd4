@@ -146,402 +146,399 @@ enum class FileIndices : uint8_t {
 };
 
 namespace thi {
-  void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
-  void auxmen();
-  void bak();
-  void bakmrk();
-  void bakthum();
-  void barnam(HWND window, uint32_t iThumbnail);
-  void box(uint32_t iNearest, HDC hDC);
-  void boxs();
-  void bsavmen();
-  auto centr() noexcept -> F_POINT;
-  void chk1col();
-  auto chk2of() -> bool;
-  auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
-      -> bool;
-  auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
-  auto chkattr(fs::path const& filename) -> bool;
-  auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
-  auto chkhid(size_t colorToCheck) -> bool;
-  void chkirct() noexcept;
-  auto chkminus(wchar_t code) noexcept -> bool;
-  void chkncol();
-  void chknum();
-  auto chkok() noexcept -> bool;
-  auto chkup(uint32_t count, size_t iStitch) -> uint32_t;
-  auto chkwnd(HWND window) noexcept -> bool;
-  void closPnt();
-  auto closPnt1(uint32_t& closestStitch) -> bool;
-  void closfn();
-  auto closlin() -> uint32_t;
-  void clpadj();
-  void clpbox();
-  void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
-  auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
-  void colchk();
-  void contract();
-  void cros(uint32_t iStitch);
-  void crtcurs() noexcept;
-  void cut();
-  void defNam(fs::path const& fileName);
-  auto defTxt(uint32_t iColor) -> COLORREF;
-  void defpref();
-  void delcol();
-  void deldir();
-  void deldu();
-  void delet();
-  void delfre();
-  void delknot();
-  void delknt();
-  void delsfrms(wchar_t code);
-  void delsmal(uint32_t startStitch, uint32_t endStitch);
-  void delstch();
-  void delstch1(uint32_t iStitch);
-  void deltot();
-  void desiz();
+void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
+void auxmen();
+void bak();
+void bakmrk();
+void bakthum();
+void barnam(HWND window, uint32_t iThumbnail);
+void box(uint32_t iNearest, HDC hDC);
+void boxs();
+void bsavmen();
+auto centr() noexcept -> F_POINT;
+void chk1col();
+auto chk2of() -> bool;
+auto chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
+    -> bool;
+auto chkMsgs(POINT clickCoord, HWND topWindow, HWND bottomWindow) -> bool;
+auto chkattr(fs::path const& filename) -> bool;
+auto chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
+auto chkhid(size_t colorToCheck) -> bool;
+void chkirct() noexcept;
+auto chkminus(wchar_t code) noexcept -> bool;
+void chkncol();
+void chknum();
+auto chkok() noexcept -> bool;
+auto chkup(uint32_t count, size_t iStitch) -> uint32_t;
+auto chkwnd(HWND window) noexcept -> bool;
+void closPnt();
+auto closPnt1(uint32_t& closestStitch) -> bool;
+void closfn();
+auto closlin() -> uint32_t;
+void clpadj();
+void clpbox();
+void clpradj(F_RECTANGLE& clipRectAdjusted, F_POINT_ATTR const& stitch) noexcept;
+auto cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool;
+void colchk();
+void contract();
+void cros(uint32_t iStitch);
+void crtcurs() noexcept;
+void cut();
+void defNam(fs::path const& fileName);
+auto defTxt(uint32_t iColor) -> COLORREF;
+void defpref();
+void delcol();
+void deldir();
+void deldu();
+void delet();
+void delfre();
+void delknot();
+void delknt();
+void delsfrms(wchar_t code);
+void delsmal(uint32_t startStitch, uint32_t endStitch);
+void delstch();
+void delstch1(uint32_t iStitch);
+void deltot();
+void desiz();
 
-  auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK dnamproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
-  void doStretch(uint32_t start, uint32_t end);
-  void drawBackground();
-  void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
-  void drwStch();
-  void drwknot();
-  void drwlstch(uint32_t finish);
-  void drwmrk(HDC hDC);
-  void dstcurs() noexcept;
-  void duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest);
-  void duIns();
-  void duSelbox() noexcept;
-  void duar(POINT const& stitchCoordsInPixels);
-  void dubar();
-  void dubox(POINT const& stitchCoordsInPixels);
-  void dubuf(std::vector<char>& buffer);
-  void duclip();
-  void duclp();
-  void ducmd();
-  void ducros(HDC hDC);
-  void dudat();
-  void dufdef() noexcept;
-  void dufsel();
-  void dugrid();
-  void duhbit(uint32_t cod) noexcept;
-  void duhom();
-  void duinsfil();
-  void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
-  void dumov();
-  void dumrk(float xCoord, float yCoord);
-  void dun();
-  auto dunum(wchar_t code) noexcept -> bool;
-  void dupclp();
-  void duprct(FRM_HEAD const& form);
-  void durit(std::vector<char>& destination, const void* source, uint32_t count);
-  void durot();
-  void durotu();
-  void dusel(HDC hDC);
-  void duselrng(RANGE& selectedRange);
-  void dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize);
+auto doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bool;
+void doStretch(uint32_t start, uint32_t end);
+void drawBackground();
+void drwLin(std::vector<POINT>& linePoints, uint32_t currentStitch, uint32_t length, HPEN hPen);
+void drwStch();
+void drwknot();
+void drwlstch(uint32_t finish);
+void drwmrk(HDC hDC);
+void dstcurs() noexcept;
+void duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest);
+void duIns();
+void duSelbox() noexcept;
+void duar(POINT const& stitchCoordsInPixels);
+void dubar();
+void dubox(POINT const& stitchCoordsInPixels);
+void dubuf(std::vector<char>& buffer);
+void duclip();
+void duclp();
+void ducmd();
+void ducros(HDC hDC);
+void dudat();
+void dufdef() noexcept;
+void dufsel();
+void dugrid();
+void duhbit(uint32_t cod) noexcept;
+void duhom();
+void duinsfil();
+void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
+void dumov();
+void dumrk(float xCoord, float yCoord);
+void dun();
+auto dunum(wchar_t code) noexcept -> bool;
+void dupclp();
+void duprct(FRM_HEAD const& form);
+void durit(std::vector<char>& destination, const void* source, uint32_t count);
+void durot();
+void durotu();
+void dusel(HDC hDC);
+void duselrng(RANGE& selectedRange);
+void dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize);
 
-  constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
+constexpr auto byteSwap(uint32_t data) noexcept -> uint32_t;
 
-  void duver(fs::path const& name);
-  void duzero();
-  void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
-  void endpnt(POINT const& stitchCoordsInPixels);
+void duver(fs::path const& name);
+void duzero();
+void endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish);
+void endpnt(POINT const& stitchCoordsInPixels);
 
-  auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
+auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
-  void esccode();
-  void f1del(uint32_t formIndex);
-  void fil2men();
-  void fil2sel(uint32_t stat);
-  void filclos();
-  void filfrms();
-  auto find1st() -> uint32_t;
-  auto finrng(uint32_t find) noexcept -> bool;
-  void fixpclp(uint32_t closestFormToCursor);
-  void fnamtabs();
-  void fndknt();
-  void fop();
-  void formStretch(uint32_t form);
-  void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
-  auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
-  void frmcurmen();
-  void frmcursel(uint32_t cursorType);
-  void frmpos(FRM_HEAD& form, float deltaX, float deltaY);
-  void frmsnap(uint32_t start, uint32_t count);
-  auto frmstch() -> bool;
+void esccode();
+void f1del(uint32_t formIndex);
+void fil2men();
+void fil2sel(uint32_t stat);
+void filclos();
+void filfrms();
+auto find1st() -> uint32_t;
+auto finrng(uint32_t find) noexcept -> bool;
+void fixpclp(uint32_t closestFormToCursor);
+void fnamtabs();
+void fndknt();
+void fop();
+void formStretch(uint32_t form);
+void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
+auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
+void frmcurmen();
+void frmcursel(uint32_t cursorType);
+void frmpos(FRM_HEAD& form, float deltaX, float deltaY);
+void frmsnap(uint32_t start, uint32_t count);
+auto frmstch() -> bool;
 
-  auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  void getbak();
-  void getdes() noexcept;
-  void getDocsFolder(fs::path* directory);
-  void getfrmbox();
-  void getfrmpix();
-  auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
-  auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
-  void getnpix();
-  void getstpix();
-  void gotbox();
-  void gselrng() noexcept;
-  void gsnap();
-  auto handleEditMenu(WORD const& wParameter) -> bool;
-  auto handleEitherButtonDown(bool& retflag) -> bool;
-  auto handleEndKey(int32_t& retflag) -> bool;
-  auto handleFileMenu(WORD const& wParameter) -> bool;
-  auto handleFillMenu(WORD const& wParameter) -> bool;
-  auto handleFormDataSheet() -> bool;
-  auto handleHomeKey(bool& retflag) -> bool;
-  auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
-      -> bool;
-  auto handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool;
-  auto handleLeftKey(bool& retflag) -> bool;
-  auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
-  auto handleMainWinKeys(wchar_t const&            code,
-                         F_POINT&                  rotationCenter,
-                         std::vector<POINT> const& stretchBoxLine,
-                         bool&                     retflag) -> bool;
-  auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
-                       float               xyRatio,
-                       float&              rotationAngle,
-                       F_POINT const&      rotationCenter,
-                       FRM_HEAD const&     textureForm) -> bool;
-  auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
-  auto handleRightButtonDown() -> bool;
-  auto handleRightKey(bool& retflag) -> bool;
-  auto handleSideWindowActive() -> bool;
-  auto handleViewMenu(WORD const& wParameter) -> bool;
-  void hidknot();
-  void hidwnd(HWND hwnd) noexcept;
-  void ilin() noexcept;
-  void ilin1() noexcept;
-  void infadj(float& xCoordinate, float& yCoordinate) noexcept;
-  void createBrushes() noexcept;
-  void init();
-  auto inrng(uint32_t stitch) noexcept -> bool;
-  void insadj();
-  void inscol();
-  void insfil(fs::path& insertedFile);
-  auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool;
-  auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
-  auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
-  auto iselpnt() noexcept -> bool;
-  void istch();
-  auto isthr(fs::path const& thredPath) -> bool;
-  auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;
-  void knotmen();
-  void ladj();
-  void lenCalc();
-  void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
-  void lensadj();
-  void linbmen();
-  void loadColors() noexcept;
-  void lock();
+void getbak();
+void getdes() noexcept;
+void getDocsFolder(fs::path* directory);
+void getfrmbox();
+void getfrmpix();
+auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
+auto getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool;
+void getnpix();
+void getstpix();
+void gotbox();
+void gselrng() noexcept;
+void gsnap();
+auto handleEditMenu(WORD const& wParameter) -> bool;
+auto handleEitherButtonDown(bool& retflag) -> bool;
+auto handleEndKey(int32_t& retflag) -> bool;
+auto handleFileMenu(WORD const& wParameter) -> bool;
+auto handleFillMenu(WORD const& wParameter) -> bool;
+auto handleFormDataSheet() -> bool;
+auto handleHomeKey(bool& retflag) -> bool;
+auto handleLeftButtonDown(std::vector<POINT>& stretchBoxLine, float& xyRatio, FRM_HEAD const& textureForm, bool& retflag)
+    -> bool;
+auto handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool;
+auto handleLeftKey(bool& retflag) -> bool;
+auto handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> bool;
+auto handleMainWinKeys(wchar_t const& code, F_POINT& rotationCenter, std::vector<POINT> const& stretchBoxLine, bool& retflag)
+    -> bool;
+auto handleMouseMove(std::vector<POINT>& stretchBoxLine,
+                     float               xyRatio,
+                     float&              rotationAngle,
+                     F_POINT const&      rotationCenter,
+                     FRM_HEAD const&     textureForm) -> bool;
+auto handleNumericInput(wchar_t const& code, bool& retflag) -> bool;
+auto handleRightButtonDown() -> bool;
+auto handleRightKey(bool& retflag) -> bool;
+auto handleSideWindowActive() -> bool;
+auto handleViewMenu(WORD const& wParameter) -> bool;
+void hidknot();
+void hidwnd(HWND hwnd) noexcept;
+void ilin() noexcept;
+void ilin1() noexcept;
+void infadj(float& xCoordinate, float& yCoordinate) noexcept;
+void createBrushes() noexcept;
+void init();
+auto inrng(uint32_t stitch) noexcept -> bool;
+void insadj();
+void inscol();
+void insfil(fs::path& insertedFile);
+auto insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -> bool;
+auto isInBox(POINT const& point, RECT const& box) noexcept -> bool;
+auto isLine(std::vector<POINT> const& boxOutline) noexcept -> bool;
+auto iselpnt() noexcept -> bool;
+void istch();
+auto isthr(fs::path const& thredPath) -> bool;
+auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;
+void knotmen();
+void ladj();
+void lenCalc();
+void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
+void lensadj();
+void linbmen();
+void loadColors() noexcept;
+void lock();
 
-  auto CALLBACK lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
+auto CALLBACK lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> INT_PTR;
 
-  void lodclp(uint32_t iStitch);
-  void longer();
-  void makCol() noexcept;
-  auto makbig(uint32_t start, uint32_t finish) -> uint32_t;
-  void mark();
-  void movbox();
-  void movchk();
-  void movi();
-  void movins();
-  void movmrk();
-  auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
-  void mv2b();
-  void mv2f();
-  void nedmen();
-  void nedof();
-  void nedon();
-  void newFil();
-  auto getSaveName(fs::path* fileName, FileIndices& fileType) -> bool;
-  void noMsg();
-  void nuAct(uint32_t iStitch) noexcept;
-  auto nuBak() noexcept -> BOOL;
-  void nuBrush(HBRUSH& brush, COLORREF color) noexcept;
-  auto nuCol(COLORREF init) noexcept -> BOOL;
-  void resetState();
-  void nuFil(FileIndices fileIndex);
-  void nuRct() noexcept;
-  void nuStchSiz(uint32_t iColor, int32_t width);
-  auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
-  void nucols();
-  void nudgfn(float deltaX, float deltaY);
-  void nulayr(uint8_t play);
-  void nunams();
-  void nuscol(size_t iColor);
-  void nuselrct();
-  void nuslst(uint32_t find);
-  void nuthbak(uint32_t count);
-  void nuthsel();
-  void nuthum(wchar_t character);
+void lodclp(uint32_t iStitch);
+void longer();
+void makCol() noexcept;
+auto makbig(uint32_t start, uint32_t finish) -> uint32_t;
+void mark();
+void movbox();
+void movchk();
+void movi();
+void movins();
+void movmrk();
+auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
+void mv2b();
+void mv2f();
+void nedmen();
+void nedof();
+void nedon();
+void newFil();
+auto getSaveName(fs::path* fileName, FileIndices& fileType) -> bool;
+void noMsg();
+void nuAct(uint32_t iStitch) noexcept;
+auto nuBak() noexcept -> BOOL;
+void nuBrush(HBRUSH& brush, COLORREF color) noexcept;
+auto nuCol(COLORREF init) noexcept -> BOOL;
+void resetState();
+void nuFil(FileIndices fileIndex);
+void nuRct() noexcept;
+void nuStchSiz(uint32_t iColor, int32_t width);
+auto nuang(float OriginalAngle, float xDelta, float yDelta) noexcept -> float;
+void nucols();
+void nudgfn(float deltaX, float deltaY);
+void nulayr(uint8_t play);
+void nunams();
+void nuscol(size_t iColor);
+void nuselrct();
+void nuslst(uint32_t find);
+void nuthbak(uint32_t count);
+void nuthsel();
+void nuthum(wchar_t character);
 
-  constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
+constexpr auto nxtcrnr(uint32_t corner) -> uint32_t;
 
-  void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& KnotStep, uint32_t KnotAttribute);
-  auto oldwnd(HWND window) noexcept -> bool;
-  void ovrlay();
-  void patdun();
-  void pcsbsavof();
-  void pcsbsavon();
-  void pgdwn();
-  void pglft();
-  void pgrit();
-  void pgup();
-  void pntmrk();
-  void prtred(HANDLE fileHandle, uint32_t code);
-  auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
-  void purg();
-  void purgdir();
-  auto pxchk(float pixelSize) -> uint16_t;
-  void qchk();
-  void qcode();
-  void rSelbox();
-  auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
-  void rebak();
-  void rebox();
-  void redbak();
-  void redbal();
-  void redfils();
-  void redfnam(std::wstring& designerName);
-  void redini();
-  void redo();
-  void reldun();
-  void relin();
-  void rembig();
-  void respac(FRM_HEAD& form) noexcept;
-  void retrac();
-  void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
-  void ritbal();
-  void ritcor(F_POINT_ATTR const& pointAttribute);
-  void ritcur();
-  void ritfnam(std::wstring const& designerName);
-  void ritini();
-  void ritlayr();
-  void ritloc();
-  void ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
-  void ritrot(float rotationAngle, F_POINT const& rotationCenter);
-  void rngal();
-  void rot(F_POINT& rotationCenter);
-  void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
-  void rotauxmen();
-  void rotauxsel(uint32_t stat);
-  void rotfns(float rotationAngle);
-  void rotmrk();
-  void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
-  void rotseg();
-  void rotstch(F_POINT_ATTR& stitch, float rotationAngle, F_POINT const& rotationCenter) noexcept;
-  auto rsed() noexcept -> uint32_t;
-  void rshft(POINT const& shiftPoint);
-  void rstAll();
-  void rstdu();
-  void rthumnam(uint32_t iThumbnail);
-  void sachk();
-  void sav();
-  void savAs();
-  auto savcmp() noexcept -> bool;
-  auto sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT;
-  void segentr(float rotationAngle);
-  void selCol();
-  void selalstch();
-  void seldwn();
-  void selfpnt();
-  void selfrm0();
-  void selfrmx();
-  void selin(uint32_t start, uint32_t end, HDC hDC);
-  void selup();
-  void set1knot();
-  auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
-      -> bool;
-  void setSideWinVal(int index);
-  void setbak(int32_t penWidth) noexcept;
-  void setdst();
-  void setgrd(COLORREF color);
-  void setknots();
-  void setknt();
-  void setLayerPens() noexcept;
-  void setmov();
-  void setpclp();
+void ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& KnotStep, uint32_t KnotAttribute);
+auto oldwnd(HWND window) noexcept -> bool;
+void ovrlay();
+void patdun();
+void pcsbsavof();
+void pcsbsavon();
+void pgdwn();
+void pglft();
+void pgrit();
+void pgup();
+void pntmrk();
+void prtred(HANDLE fileHandle, uint32_t code);
+auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
+void purg();
+void purgdir();
+auto pxchk(float pixelSize) -> uint16_t;
+void qchk();
+void qcode();
+void rSelbox();
+auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
+void rebak();
+void rebox();
+void redbak();
+void redbal();
+void redfils();
+void redfnam(std::wstring& designerName);
+void redini();
+void redo();
+void reldun();
+void relin();
+void rembig();
+void respac(FRM_HEAD& form) noexcept;
+void retrac();
+void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
+void ritbal();
+void ritcor(F_POINT_ATTR const& pointAttribute);
+void ritcur();
+void ritfnam(std::wstring const& designerName);
+void ritini();
+void ritlayr();
+void ritloc();
+void ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
+void ritrot(float rotationAngle, F_POINT const& rotationCenter);
+void rngal();
+void rot(F_POINT& rotationCenter);
+void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
+void rotauxmen();
+void rotauxsel(uint32_t stat);
+void rotfns(float rotationAngle);
+void rotmrk();
+void rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept;
+void rotseg();
+void rotstch(F_POINT_ATTR& stitch, float rotationAngle, F_POINT const& rotationCenter) noexcept;
+auto rsed() noexcept -> uint32_t;
+void rshft(POINT const& shiftPoint);
+void rstAll();
+void rstdu();
+void rthumnam(uint32_t iThumbnail);
+void sachk();
+void sav();
+void savAs();
+auto savcmp() noexcept -> bool;
+auto sdCor2px(F_POINT_ATTR const& stitchPoint) -> POINT;
+void segentr(float rotationAngle);
+void selCol();
+void selalstch();
+void seldwn();
+void selfpnt();
+void selfrm0();
+void selfrmx();
+void selin(uint32_t start, uint32_t end, HDC hDC);
+void selup();
+void set1knot();
+auto setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize) -> bool;
+void setSideWinVal(int index);
+void setbak(int32_t penWidth) noexcept;
+void setdst();
+void setgrd(COLORREF color);
+void setknots();
+void setknt();
+void setLayerPens() noexcept;
+void setmov();
+void setpclp();
 #if PESACT
-  void setpes();
+void setpes();
 #endif
-  void setpcs();
-  void setPrefs();
-  void setsped();
-  void setsrch(uint32_t stitch);
-  void shft2box();
-  void shftflt(F_POINT const& point) noexcept;
-  void shoknot();
-  void shorter();
-  void shownd(HWND hwnd) noexcept;
-  auto sidclp() -> bool;
-  void sidhup();
-  void sidmsg(FRM_HEAD const& form, HWND window);
-  void sizclp(FRM_HEAD const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
-  auto sizfclp(FRM_HEAD const& form) -> uint32_t;
-  void srchk();
-  auto srchknot(uint32_t source) -> uint32_t;
-  void stCor2px(F_POINT_ATTR const& stitch, POINT& point);
-  auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
-  auto stch2px1(uint32_t iStitch) -> POINT;
-  auto stch2px2(uint32_t iStitch) -> bool;
-  void stchPars();
-  void stchWnd();
-  void stchbox(uint32_t iStitch, HDC hDC);
-  void stchout();
-  void stchsnap(uint32_t start, uint32_t finish);
-  auto stlen(uint32_t iStitch) -> float;
-  void stretch();
-  void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
-  void tglhid();
-  void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
-  void thrsav();
-  void thumbak();
-  void thumnail();
-  void toglHid();
-  void toglup();
-  void unbox();
-  void unboxs();
-  void unclp();
-  void uncros();
-  void ungrphi();
-  void ungrplo();
-  void unlin();
-  void unmov();
-  void unpat();
-  void unpclp();
-  void unrot();
-  void unrotu();
-  void unsel();
-  void unstrtch(std::vector<POINT> const& stretchBoxLine);
-  auto unthrsh(wchar_t level) noexcept -> float;
-  void unthum();
-  auto updateHoopSize() -> bool;
-  auto updateFillColor() -> bool;
-  auto updatePreferences() -> bool;
-  auto usedcol(uint8_t VerticalIndex) -> bool;
-  void vubak();
-  void vuselthr();
-  void vuthrds();
+void setpcs();
+void setPrefs();
+void setsped();
+void setsrch(uint32_t stitch);
+void shft2box();
+void shftflt(F_POINT const& point) noexcept;
+void shoknot();
+void shorter();
+void shownd(HWND hwnd) noexcept;
+auto sidclp() -> bool;
+void sidhup();
+void sidmsg(FRM_HEAD const& form, HWND window);
+void sizclp(FRM_HEAD const& form, uint32_t& formFirstStitchIndex, uint32_t& formStitchCount, uint32_t& length, uint32_t& fileSize);
+auto sizfclp(FRM_HEAD const& form) -> uint32_t;
+void srchk();
+auto srchknot(uint32_t source) -> uint32_t;
+void stCor2px(F_POINT_ATTR const& stitch, POINT& point);
+auto stch2px(uint32_t iStitch, POINT& stitchCoordsInPixels) -> bool;
+auto stch2px1(uint32_t iStitch) -> POINT;
+auto stch2px2(uint32_t iStitch) -> bool;
+void stchPars();
+void stchWnd();
+void stchbox(uint32_t iStitch, HDC hDC);
+void stchout();
+void stchsnap(uint32_t start, uint32_t finish);
+auto stlen(uint32_t iStitch) -> float;
+void stretch();
+void strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start);
+void tglhid();
+void thr2bal(std::vector<BAL_STITCH>& balaradStitch, uint32_t source, uint8_t code, uint8_t flag);
+void thrsav();
+void thumbak();
+void thumnail();
+void toglHid();
+void toglup();
+void unbox();
+void unboxs();
+void unclp();
+void uncros();
+void ungrphi();
+void ungrplo();
+void unlin();
+void unmov();
+void unpat();
+void unpclp();
+void unrot();
+void unrotu();
+void unsel();
+void unstrtch(std::vector<POINT> const& stretchBoxLine);
+auto unthrsh(wchar_t level) noexcept -> float;
+void unthum();
+auto updateHoopSize() -> bool;
+auto updateFillColor() -> bool;
+auto updatePreferences() -> bool;
+auto usedcol(uint8_t VerticalIndex) -> bool;
+void vubak();
+void vuselthr();
+void vuthrds();
 
-  auto CALLBACK wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
+auto CALLBACK wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
-  auto wastch(uint32_t const& formIndex) -> bool;
-  void xlin();
-  void xlin1();
-  void zRctAdj() noexcept;
-  void zumin();
-  void zumout();
-  void zumshft();
+auto wastch(uint32_t const& formIndex) -> bool;
+void xlin();
+void xlin1();
+void zRctAdj() noexcept;
+void zumin();
+void zumout();
+void zumshft();
 
 #ifdef ALLOCFAILURE
-  auto handle_program_memory_depletion(uint32_t) -> int32_t;
+auto handle_program_memory_depletion(uint32_t) -> int32_t;
 #endif
 } // namespace thi
 
@@ -760,14 +757,15 @@ class THR_HEAD_EX // thred v1.0 file header extension
 #pragma pack(pop)
 
 // main variables
-static auto FormControlPoints = gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
-static auto ExtendedHeader  = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
-static auto DesignerName    = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
-static auto ArgCount        = int32_t {};                         // command line argument count
-static auto ArgList         = gsl::narrow_cast<LPTSTR*>(nullptr); // command line argument array
-static auto ThredWindowRect = RECT {};                            // main window size
+static auto FormControlPoints =
+    gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form control rectangle in pixel coordinates
+static auto ExtendedHeader = gsl::narrow_cast<THR_HEAD_EX*>(nullptr); // thred file header extension
+static auto DesignerName   = gsl::narrow_cast<std::wstring*>(nullptr); // designer name in clear
+static auto ArgCount       = int32_t {};                           // command line argument count
+static auto ArgList        = gsl::narrow_cast<LPTSTR*>(nullptr);   // command line argument array
+static auto ThredWindowRect = RECT {};                             // main window size
 static auto ColorBarSize    = gsl::narrow_cast<int32_t*>(nullptr); // Color bar width scaled for DPI
-static auto ColorBarRect    = RECT {};                            // color bar rectangle
+static auto ColorBarRect    = RECT {};                             // color bar rectangle
 static auto HomeDirectory = gsl::narrow_cast<fs::path*>(nullptr); // directory from which thred was executed
 static auto SmallestStitchIndex = uint32_t {}; // pointer to the smallest stitch in the selected range
 static auto LargestStitchIndex = uint32_t {}; // pointer to the largest stitch in the selected range
@@ -1266,7 +1264,7 @@ void thi::redfnam(std::wstring& designerName) {
 
 auto thred::adflt(uint32_t count) -> uint32_t {
   auto const startVertex = wrap::toUnsigned(FormVertices->size());
-  auto const itPoint          = FormVertices->end();
+  auto const itPoint     = FormVertices->end();
   auto constexpr VAL     = F_POINT {};
   FormVertices->insert(itPoint, count, VAL);
   return startVertex;
@@ -1274,7 +1272,7 @@ auto thred::adflt(uint32_t count) -> uint32_t {
 
 auto thred::adclp(uint32_t count) -> uint32_t {
   auto const iClipPoint = wrap::toUnsigned(ClipPoints->size());
-  auto const itPoint         = ClipPoints->end();
+  auto const itPoint    = ClipPoints->end();
   auto constexpr VAL    = F_POINT {};
   ClipPoints->insert(itPoint, count, VAL);
   return iClipPoint;
@@ -1616,12 +1614,12 @@ void thred::rngadj() {
 }
 
 void thi::box(uint32_t iNearest, HDC hDC) {
-  auto const itBoxWidth = wrap::next(BoxOffset.begin(), iNearest);
-  auto const boxWidth = *itBoxWidth;
-  auto const itNearestPixel       = wrap::next(NearestPixel->begin(), iNearest);
-  auto const npx      = itNearestPixel->x;
-  auto const npy      = itNearestPixel->y;
-  auto       line     = std::array<POINT, SQPNTS> {};
+  auto const itBoxWidth     = wrap::next(BoxOffset.begin(), iNearest);
+  auto const boxWidth       = *itBoxWidth;
+  auto const itNearestPixel = wrap::next(NearestPixel->begin(), iNearest);
+  auto const npx            = itNearestPixel->x;
+  auto const npy            = itNearestPixel->y;
+  auto       line           = std::array<POINT, SQPNTS> {};
 
   line[0] = {npx - boxWidth, npy - boxWidth};
   line[1] = {npx + boxWidth, npy - boxWidth};
@@ -3460,8 +3458,8 @@ void thi::nuBrush(HBRUSH& brush, COLORREF color) noexcept {
 
 void thi::rotpix(POINT const& unrotatedPoint, POINT& rotatedPoint, POINT const& rotationCenterPixels) noexcept {
   // won't handle vertical lines
-  auto const deltaX               = wrap::toFloat(unrotatedPoint.x - rotationCenterPixels.x);
-  auto const deltaY               = wrap::toFloat(unrotatedPoint.y - rotationCenterPixels.y);
+  auto const deltaX           = wrap::toFloat(unrotatedPoint.x - rotationCenterPixels.x);
+  auto const deltaY           = wrap::toFloat(unrotatedPoint.y - rotationCenterPixels.y);
   auto const distanceToCenter = hypotf(deltaX, deltaY);
   auto const newAngle         = atan2f(deltaY, deltaX) - RotateAngle;
   rotatedPoint = {std::lround(wrap::toFloat(rotationCenterPixels.x) + distanceToCenter * cos(newAngle)),
@@ -3534,7 +3532,7 @@ void thi::getDocsFolder(fs::path* directory) {
   if (directory != nullptr) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
-	auto const hResult       = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
+	auto const hResult  = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hResult)) {
 	  directory->assign(ppszPath); // make a local copy of the path
@@ -3705,8 +3703,8 @@ void thi::redbal() {
 			}
 		  }
 		}
-		auto itUserPen  = UserPen->begin();
-		auto ucb = UserColorBrush.begin();
+		auto itUserPen = UserPen->begin();
+		auto ucb       = UserColorBrush.begin();
 		for (auto const& ucolor : UserColor) {
 		  *(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
 		  nuBrush(*ucb, ucolor);
@@ -4182,11 +4180,11 @@ auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hResult)) {
 		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		  hResult          = pFileSave->GetResult(&pItem);
+		  hResult     = pFileSave->GetResult(&pItem);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 			auto reply = 0U;
-			hResult         = pFileSave->GetFileTypeIndex(&reply);
+			hResult    = pFileSave->GetFileTypeIndex(&reply);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hResult)) {
 			  switch (reply) {
@@ -4215,7 +4213,7 @@ auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
 			  }
 			  // NOLINTNEXTLINE(readability-qualified-auto)
 			  auto pszFilePath = PWSTR {nullptr};
-			  hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hResult)) {
 				fileName->assign(pszFilePath);
@@ -4595,8 +4593,8 @@ void thi::redbak() {
 	auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
 	auto const     spUserColors = gsl::span {UserColor};
 	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
-	auto itUserPen  = UserPen->begin();
-	auto ucb = UserColorBrush.begin();
+	auto itUserPen = UserPen->begin();
+	auto ucb       = UserColorBrush.begin();
 	for (auto const& color : UserColor) {
 	  thred::nuPen(*itUserPen, 1, color);
 	  nuBrush(*ucb, color);
@@ -4738,7 +4736,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
 	auto dwOptions = DWORD {};
-	hResult             = pFileOpen->GetOptions(&dwOptions);
+	hResult        = pFileOpen->GetOptions(&dwOptions);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	if (SUCCEEDED(hResult)) {
 	  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT); // NOLINT(hicpp-signed-bitwise)
@@ -4757,7 +4755,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 		case FileStyles::INS_FILES: {
 		  static constexpr auto INSERT_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTTHR, FLTPCS}; // All possible file types that can be inserted into current design
 		  hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(INSERT_FILE_TYPES.size()),
-		                                INSERT_FILE_TYPES.data());
+		                                     INSERT_FILE_TYPES.data());
 		  break;
 		}
 	  }
@@ -4797,12 +4795,12 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		if (SUCCEEDED(hResult)) {
 		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		  hResult          = pFileOpen->GetResult(&pItem);
+		  hResult     = pFileOpen->GetResult(&pItem);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 		  if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto pszFilePath = PWSTR {nullptr};
-			hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			if (SUCCEEDED(hResult)) {
 			  newFileName.assign(pszFilePath);
@@ -4819,7 +4817,7 @@ auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndice
 
 auto thred::getFileSize(fs::path const& newFileName, uintmax_t& size) -> bool {
   auto eCode = std::error_code {};
-  size    = fs::file_size(newFileName, eCode);
+  size       = fs::file_size(newFileName, eCode);
   if (eCode != std::error_code {}) {
 	// ToDo - find better error message
 	displayText::filnopn(IDS_FNOPN, newFileName);
@@ -5159,12 +5157,12 @@ void thi::nuFil(FileIndices fileIndex) {
 	thred::movStch();
 	thred::coltab();
 	StateMap->reset(StateFlag::ZUMED);
-	auto buffer = std::array<wchar_t, 3> {};
-	buffer[1]   = L'0';
-	auto itUserPen     = UserPen->begin();
-	auto ucb    = UserColorBrush.begin();
-	auto itThreadSize     = ThreadSize.begin();
-	auto tsw    = ThreadSizeWin->begin();
+	auto buffer       = std::array<wchar_t, 3> {};
+	buffer[1]         = L'0';
+	auto itUserPen    = UserPen->begin();
+	auto ucb          = UserColorBrush.begin();
+	auto itThreadSize = ThreadSize.begin();
+	auto tsw          = ThreadSizeWin->begin();
 	for (auto const& color : UserColor) {
 	  thred::nuPen(*itUserPen, 1, color);
 	  ++itUserPen;
@@ -5439,17 +5437,14 @@ void thi::zumout() {
   }
 }
 
-void thi::duClos(uint32_t            startStitch,
-                             uint32_t            stitchCount,
-                             F_POINT const&      stitchPoint,
-                             std::vector<float>& gapToNearest) {
+void thi::duClos(uint32_t startStitch, uint32_t stitchCount, F_POINT const& stitchPoint, std::vector<float>& gapToNearest) {
   auto stitch = wrap::next(StitchBuffer->begin(), startStitch);
   for (auto iStitch = startStitch; iStitch < startStitch + stitchCount; ++iStitch) {
-	auto const xCoord    = std::abs(stitch->x - stitchPoint.x);
-	auto const yCoord    = std::abs(stitch->y - stitchPoint.y);
-	auto       sum   = hypot(xCoord, yCoord);
-	auto       tind0 = iStitch;
-	auto       gap   = gapToNearest.begin();
+	auto const xCoord = std::abs(stitch->x - stitchPoint.x);
+	auto const yCoord = std::abs(stitch->y - stitchPoint.y);
+	auto       sum    = hypot(xCoord, yCoord);
+	auto       tind0  = iStitch;
+	auto       gap    = gapToNearest.begin();
 	for (auto& point : *NearestPoint) {
 	  if (sum < *gap) {
 		auto const lowestSum = *gap;
@@ -5509,9 +5504,9 @@ auto thi::closPnt1(uint32_t& closestStitch) -> bool {
 	}
   }
   if (NearestCount != 0) {
-	auto itBoxOffset  = BoxOffset.begin();
-	auto npi = NearestPixel->begin();
-	auto npo = NearestPoint->begin();
+	auto itBoxOffset = BoxOffset.begin();
+	auto npi         = NearestPixel->begin();
+	auto npo         = NearestPoint->begin();
 	for (auto iNear = 0U; iNear < NearestCount; ++iNear) {
 	  auto const  offset = *(itBoxOffset++);
 	  auto const& pixel  = *(npi++);
@@ -5821,8 +5816,8 @@ auto thi::closlin() -> uint32_t {
 			// ReSharper disable once CppInitializedValueIsAlwaysRewritten
 			auto tsum         = 0.0F;
 			auto intersection = F_POINT {};
-			auto deltaX           = 0.0F;
-			auto deltaY           = 0.0F;
+			auto deltaX       = 0.0F;
+			auto deltaY       = 0.0F;
 			do {
 			  if (yab == 0) {
 				// stitch is horizontal
@@ -5837,12 +5832,12 @@ auto thi::closlin() -> uint32_t {
 				  bottom += tolerance;
 				  if (offsetY > top) {
 					deltaY = offsetY - top;
-					tsum = hypot(deltaX, deltaY);
+					tsum   = hypot(deltaX, deltaY);
 					break;
 				  }
 				  if (offsetY < bottom) {
 					deltaY = offsetY - bottom;
-					tsum = hypot(deltaX, deltaY);
+					tsum   = hypot(deltaX, deltaY);
 					break;
 				  }
 				  tsum = fabs(deltaX);
@@ -5854,8 +5849,8 @@ auto thi::closlin() -> uint32_t {
 
 				intersection = F_POINT {offset - slope * intersection.y,
 				                        slope * (offset - poff) / (slope * slope + 1.0F)};
-				deltaX           = intersection.x - offsetX;
-				deltaY           = intersection.y - offsetY;
+				deltaX       = intersection.x - offsetX;
+				deltaY       = intersection.y - offsetY;
 			  }
 			  top -= tolerance;
 			  bottom += tolerance;
@@ -6426,10 +6421,10 @@ auto thi::frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uin
 }
 
 void thi::sizclp(FRM_HEAD const& form,
-                             uint32_t&       formFirstStitchIndex,
-                             uint32_t&       formStitchCount,
-                             uint32_t&       length,
-                             uint32_t&       fileSize) {
+                 uint32_t&       formFirstStitchIndex,
+                 uint32_t&       formStitchCount,
+                 uint32_t&       length,
+                 uint32_t&       fileSize) {
   fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
   length   = fileSize;
   if (form.type == SAT) {
@@ -6690,8 +6685,8 @@ void thi::duclip() {
 				if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 				    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
 				  thred::savclp(ClipStitchData[iDestination++],
-				         StitchBuffer->operator[](iTexture),
-				         (StitchBuffer->operator[](iTexture).attribute & COLMSK));
+				                StitchBuffer->operator[](iTexture),
+				                (StitchBuffer->operator[](iTexture).attribute & COLMSK));
 				}
 				++iTexture;
 			  }
@@ -6725,8 +6720,8 @@ void thi::duclip() {
 			  ++iSource;
 			  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
 				thred::savclp(ClipStitchData[iStitch],
-				       StitchBuffer->operator[](iSource),
-				       (StitchBuffer->operator[](iSource).attribute & COLMSK));
+				              StitchBuffer->operator[](iSource),
+				              (StitchBuffer->operator[](iSource).attribute & COLMSK));
 				++iSource;
 			  }
 			  SetClipboardData(Clip, ClipPointer);
@@ -6977,11 +6972,7 @@ auto thi::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
              : false;
 }
 
-void thi::ofstch(std::vector<F_POINT_ATTR>& buffer,
-                             uint32_t                   iSource,
-                             char                       offset,
-                             F_POINT const&             knotStep,
-                             uint32_t                   knotAttribute) {
+void thi::ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& knotStep, uint32_t knotAttribute) {
   buffer.emplace_back(F_POINT_ATTR {StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
                                     StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
                                     knotAttribute});
@@ -7036,11 +7027,12 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
 
 void thi::delknt() {
   // delete the knot stitches
-  StitchBuffer->erase(
-      std::remove_if(StitchBuffer->begin(),
-                     StitchBuffer->end(),
-                     [](F_POINT_ATTR const& stitch) -> bool { return (stitch.attribute & KNOTMSK) != 0U; }),
-      StitchBuffer->end());
+  StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
+                                     StitchBuffer->end(),
+                                     [](F_POINT_ATTR const& stitch) -> bool {
+	                                   return (stitch.attribute & KNOTMSK) != 0U;
+                                     }),
+                      StitchBuffer->end());
 }
 
 void thi::delknot() {
@@ -7052,11 +7044,12 @@ void thi::delknot() {
   if (firstStitch != StitchBuffer->end()) {
 	thred::savdo();
 	// delete the knot stitches
-	StitchBuffer->erase(
-	    std::remove_if(firstStitch,
-	                   StitchBuffer->end(),
-	                   [](F_POINT_ATTR const& stitch) -> bool { return (stitch.attribute & KNOTMSK) != 0U; }),
-	    StitchBuffer->end());
+	StitchBuffer->erase(std::remove_if(firstStitch,
+	                                   StitchBuffer->end(),
+	                                   [](F_POINT_ATTR const& stitch) -> bool {
+	                                     return (stitch.attribute & KNOTMSK) != 0U;
+	                                   }),
+	                    StitchBuffer->end());
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -7690,8 +7683,8 @@ void thi::vubak() {
 	StateMap->set(StateFlag::ZUMED);
 	thred::movStch();
 	FillRect(StitchWindowMemDC, &StitchWindowClientRect, BackgroundBrush);
-	auto const deltaX = StitchWindowClientRect.right / 2;
-	auto const deltaY = StitchWindowClientRect.bottom / 2;
+	auto const deltaX   = StitchWindowClientRect.right / 2;
+	auto const deltaY   = StitchWindowClientRect.bottom / 2;
 	auto       itHWndBV = BackupViewer.begin();
 	for (auto iPosition = uint32_t {}; iPosition < QUADRT; ++iPosition) { // there are 4 quadrants
 	  auto verticalLocation = 0L;
@@ -7700,16 +7693,16 @@ void thi::vubak() {
 	  }
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  *itHWndBV = CreateWindow(L"STATIC",
-	                     L"",
-	                     SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
-	                     deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
-	                     verticalLocation,
-	                     deltaX,
-	                     deltaY,
-	                     ThrEdWindow,
-	                     nullptr,
-	                     ThrEdInstance,
-	                     nullptr);
+	                           L"",
+	                           SS_NOTIFY | SS_OWNERDRAW | WS_CHILD | WS_VISIBLE | WS_BORDER,
+	                           deltaX * gsl::narrow_cast<int32_t>(iPosition & 1U) + ButtonWidthX3,
+	                           verticalLocation,
+	                           deltaX,
+	                           deltaY,
+	                           ThrEdWindow,
+	                           nullptr,
+	                           ThrEdInstance,
+	                           nullptr);
 	  ++itHWndBV;
 	}
 	StateMap->set(StateFlag::BAKSHO);
@@ -9901,7 +9894,7 @@ void thi::srchk() {
 
 constexpr auto thi::byteSwap(uint32_t data) noexcept -> uint32_t {
   auto const swapped = ((data & 0x000000FFU) << 24U) | ((data & 0x0000FF00U) << 8U) |
-                 ((data & 0x00FF0000U) >> 8U) | ((data & 0xFF000000U) >> 24U);
+                       ((data & 0x00FF0000U) >> 8U) | ((data & 0xFF000000U) >> 24U);
   return swapped;
 }
 
@@ -10540,7 +10533,7 @@ void thi::bakmrk() {
 
 void thi::nuscol(size_t iColor) {
   auto const itUserColor = wrap::next(UserColor.begin(), iColor);
-  auto const itUserPen = wrap::next(UserPen->begin(), iColor);
+  auto const itUserPen   = wrap::next(UserPen->begin(), iColor);
   thred::nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
   nuBrush(*ucb, *itUserColor);
@@ -10760,8 +10753,8 @@ void thi::selfrmx() {
 
 void thi::setpclp() {
   FormVerticesAsLine->clear();
-  auto itIntlvSeq    = InterleaveSequence->begin();
-  auto point = form::sfCor2px(*itIntlvSeq);
+  auto itIntlvSeq = InterleaveSequence->begin();
+  auto point      = form::sfCor2px(*itIntlvSeq);
   ++itIntlvSeq;
   FormVerticesAsLine->push_back(point);
   point = form::sfCor2px(*itIntlvSeq);
@@ -10790,13 +10783,13 @@ void thi::unpclp() {
 }
 
 void thi::fixpclp(uint32_t closestFormToCursor) {
-  auto const point = POINT {(Msg.pt.x + gsl::narrow_cast<decltype(Msg.pt.x)>(FormMoveDelta.x)),
+  auto const point      = POINT {(Msg.pt.x + gsl::narrow_cast<decltype(Msg.pt.x)>(FormMoveDelta.x)),
                             (Msg.pt.y + gsl::narrow_cast<decltype(Msg.pt.y)>(FormMoveDelta.y))};
-  auto       itIntlvSeq    = std::next(InterleaveSequence->begin());
-  auto const stitchPoint            = thred::pxCor2stch(point);
-  auto const offset                 = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
-  auto const count                  = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
-  auto& form                        = FormList->operator[](closestFormToCursor);
+  auto       itIntlvSeq = std::next(InterleaveSequence->begin());
+  auto const stitchPoint = thred::pxCor2stch(point);
+  auto const offset      = F_POINT {stitchPoint.x - itIntlvSeq->x, stitchPoint.y - itIntlvSeq->y};
+  auto const count       = wrap::toUnsigned(InterleaveSequence->size()) - 2U;
+  auto& form             = FormList->operator[](closestFormToCursor);
   auto const             nextVertex = form::nxt(form, ClosestVertexToCursor);
   form::fltspac(nextVertex, count);
   form.vertexCount += count;
@@ -11064,10 +11057,10 @@ void thi::dufdef() noexcept {
 }
 
 auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
-                                      float               xyRatio,
-                                      float&              rotationAngle,
-                                      F_POINT const&      rotationCenter,
-                                      FRM_HEAD const&     textureForm) -> bool {
+                          float               xyRatio,
+                          float&              rotationAngle,
+                          F_POINT const&      rotationCenter,
+                          FRM_HEAD const&     textureForm) -> bool {
   if (StateMap->test(StateFlag::TXTMOV)) {
 	texture::txtrmov(textureForm);
 	return true;
@@ -11406,8 +11399,7 @@ auto thi::handleMouseMove(std::vector<POINT>& stretchBoxLine,
   return true;
 }
 
-auto thi::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag)
-    -> bool {
+auto thi::handleLeftButtonUp(float xyRatio, float rotationAngle, F_POINT& rotationCenter, bool& retflag) -> bool {
   retflag = true;
   if ((wrap::pressed(VK_SHIFT)) && thred::inStitchWin()) {
 	texture::setshft();
@@ -12153,9 +12145,10 @@ auto thi::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	auto const iFeather = std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LIST_TYPE const& feather) noexcept -> bool {
-	  return Msg.hwnd == SideWindow->operator[](feather.value);
-	});
+	auto const iFeather =
+	    std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LIST_TYPE const& feather) noexcept -> bool {
+	      return Msg.hwnd == SideWindow->operator[](feather.value);
+	    });
 	if (iFeather != FTHRLIST.end()) {
 	  form.fillInfo.feather.fillType = iFeather->value;
 	  thred::unsid();
@@ -12165,9 +12158,10 @@ auto thi::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	auto const iLayer = std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LIST_TYPE const& layer) noexcept -> bool {
-	  return Msg.hwnd == SideWindow->operator[](layer.value);
-	});
+	auto const iLayer =
+	    std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LIST_TYPE const& layer) noexcept -> bool {
+	      return Msg.hwnd == SideWindow->operator[](layer.value);
+	    });
 	if (iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
 	  StateMap->set(StateFlag::FORMSEL);
@@ -12868,9 +12862,9 @@ auto thi::handleFormDataSheet() -> bool {
 }
 
 auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
-                                           float&              xyRatio,
-                                           FRM_HEAD const&     textureForm,
-                                           bool&               retflag) -> bool {
+                               float&              xyRatio,
+                               FRM_HEAD const&     textureForm,
+                               bool&               retflag) -> bool {
   static auto threadSizeSelected = uint32_t {}; // thread selected for size change
 
   retflag = true;
@@ -13135,15 +13129,15 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  VerticalIndex -= 13U;
 	  static constexpr auto THREAD_SIZE_MAP = std::array<wchar_t, 3> {L'3', L'4', L'6'};
 
-	  auto itThreadSize     = wrap::next(ThreadSize.begin(), threadSizeSelected);
-	  auto tsm    = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
-	  *itThreadSize         = *tsm;
-	  auto tsi    = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
-	  *tsi        = VerticalIndex;
-	  auto buffer = std::array<wchar_t, 3> {};
-	  buffer[0]   = *itThreadSize;
-	  buffer[1]   = L'0';
-	  auto tsw    = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
+	  auto itThreadSize = wrap::next(ThreadSize.begin(), threadSizeSelected);
+	  auto tsm          = wrap::next(THREAD_SIZE_MAP.begin(), VerticalIndex);
+	  *itThreadSize     = *tsm;
+	  auto tsi          = wrap::next(ThreadSizeIndex.begin(), threadSizeSelected);
+	  *tsi              = VerticalIndex;
+	  auto buffer       = std::array<wchar_t, 3> {};
+	  buffer[0]         = *itThreadSize;
+	  buffer[1]         = L'0';
+	  auto tsw          = wrap::next(ThreadSizeWin->begin(), threadSizeSelected);
 	  SetWindowText(*tsw, buffer.data());
 	  StateMap->set(StateFlag::RESTCH);
 	  for (auto& iWindow : ChangeThreadSizeWin) {
@@ -13572,7 +13566,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::savdo();
 	  auto itUserColor = wrap::next(UserColor.begin(), VerticalIndex);
 	  *itUserColor     = ColorStruct.rgbResult;
-	  auto itUserPen = wrap::next(UserPen->begin(), VerticalIndex);
+	  auto itUserPen   = wrap::next(UserPen->begin(), VerticalIndex);
 	  thred::nuPen(*itUserPen, 1, *itUserColor);
 	  auto ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
 	  nuBrush(*ucb, *itUserColor);
@@ -14177,9 +14171,9 @@ auto thi::handleLeftKey(bool& retflag) -> bool {
 }
 
 auto thi::handleMainWinKeys(wchar_t const&            code,
-                                        F_POINT&                  rotationCenter,
-                                        std::vector<POINT> const& stretchBoxLine,
-                                        bool&                     retflag) -> bool {
+                            F_POINT&                  rotationCenter,
+                            std::vector<POINT> const& stretchBoxLine,
+                            bool&                     retflag) -> bool {
   retflag = true;
   switch (code) {
 	case VK_ESCAPE: {
@@ -15443,10 +15437,10 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_EDIT_RESET_COL: { // edit / Reset Colors
-	  auto ucb = UserColorBrush.begin();
-	  auto itUserColor  = UserColor.begin();
-	  auto itUserPen  = UserPen->begin();
-	  auto ucw = UserColorWin->begin();
+	  auto ucb         = UserColorBrush.begin();
+	  auto itUserColor = UserColor.begin();
+	  auto itUserPen   = UserPen->begin();
+	  auto ucw         = UserColorWin->begin();
 	  for (auto const& color : DEFAULT_COLORS) {
 		*itUserColor = color;
 		nuBrush(*ucb, *itUserColor);
@@ -16194,11 +16188,8 @@ auto thi::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> boo
   return flag;
 }
 
-auto thi::chkMsg(std::vector<POINT>& stretchBoxLine,
-                             float&              xyRatio,
-                             float&              angle,
-                             F_POINT&            rotationCenter,
-                             FRM_HEAD&           textureForm) -> bool {
+auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angle, F_POINT& rotationCenter, FRM_HEAD& textureForm)
+    -> bool {
   if (Msg.message == WM_MOUSEMOVE) {
 	return thi::handleMouseMove(stretchBoxLine, xyRatio, angle, rotationCenter, textureForm);
   }
@@ -16600,11 +16591,11 @@ void thi::makCol() noexcept {
   auto buffer = std::array<wchar_t, 3> {};
   buffer[1]   = L'0';
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const hFont   = displayText::getThrEdFont(FONTSIZE);
-  auto       dcw     = DefaultColorWin->begin();
-  auto       ucw     = UserColorWin->begin();
-  auto       itThreadSize      = ThreadSize.begin();
-  auto       yOffset = int32_t {};
+  auto const hFont        = displayText::getThrEdFont(FONTSIZE);
+  auto       dcw          = DefaultColorWin->begin();
+  auto       ucw          = UserColorWin->begin();
+  auto       itThreadSize = ThreadSize.begin();
+  auto       yOffset      = int32_t {};
 
   for (auto& tsw : *ThreadSizeWin) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -16654,7 +16645,7 @@ void thi::ritloc() {
   auto lockFilePath = fs::path {};
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
-  auto const hResult       = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
+  auto const hResult  = SHGetKnownFolderPath(FOLDERID_LocalAppDataLow, 0, nullptr, &ppszPath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
   if (SUCCEEDED(hResult)) {
 	lockFilePath.assign(ppszPath); // make a local copy of the path
@@ -16988,9 +16979,9 @@ void thi::setLayerPens() noexcept {
 }
 
 void thi::createBrushes() noexcept {
-  auto dcb = DefaultColorBrush.begin();
-  auto ucb = UserColorBrush.begin();
-  auto itUserColor  = UserColor.begin();
+  auto dcb         = DefaultColorBrush.begin();
+  auto ucb         = UserColorBrush.begin();
+  auto itUserColor = UserColor.begin();
   for (auto const& color : DEFAULT_COLORS) {
 	*(dcb++) = CreateSolidBrush(color);
 	*(ucb++) = CreateSolidBrush(*(itUserColor++));
@@ -17070,11 +17061,11 @@ void thi::init() {
   constexpr auto DEFPNTPX = uint16_t {4U}; // default form and stitch point pixels
   if (IniFile.traceLength == 0.0F) {
 	constexpr auto TRACLEN = 1.0F; // initial trace length
-	IniFile.traceLength = TRACLEN;
+	IniFile.traceLength    = TRACLEN;
   }
   if (IniFile.traceRatio == 0.0F) {
 	constexpr auto TRACRAT = 1.00001F; // initial trace ratio
-	IniFile.traceRatio = TRACRAT;
+	IniFile.traceRatio     = TRACRAT;
   }
   if (IniFile.chainSpace == 0.0F) {
 	IniFile.chainSpace = CHSDEF;
@@ -17093,7 +17084,7 @@ void thi::init() {
   }
   if (IniFile.eggRatio == 0.0F) {
 	constexpr auto DEFEGRAT = 1.5; // default egg ratio
-	IniFile.eggRatio = DEFEGRAT;
+	IniFile.eggRatio        = DEFEGRAT;
   }
   if (IniFile.stitchSizePixels == 0U) {
 	IniFile.stitchSizePixels = DEFPNTPX;
@@ -17172,7 +17163,7 @@ void thi::init() {
   nuRct();
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  auto                  itBoxCOlor        = BOX_COLOR.begin();
+  auto                  itBoxCOlor = BOX_COLOR.begin();
   std::generate(BoxPen.begin(), BoxPen.end(), [&itBoxCOlor]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(itBoxCOlor++));
   });
@@ -17195,11 +17186,11 @@ void thi::init() {
   BackgroundPenWidth = 1;
   auto tsp           = ThreadSizePixels.begin();
   auto tsi           = ThreadSizeIndex.begin();
-  auto itUserPen            = UserPen->begin();
+  auto itUserPen     = UserPen->begin();
   for (auto const& color : UserColor) {
-	*(tsp++) = 1;
-	*(tsi++) = 1;
-	*(itUserPen++)  = wrap::createPen(PS_SOLID, PENNWID, color);
+	*(tsp++)       = 1;
+	*(tsi++)       = 1;
+	*(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, color);
   }
   BackgroundBrush = CreateSolidBrush(BackgroundColor);
   // create brushes
@@ -17353,9 +17344,8 @@ void thi::dugrid() {
   }
 }
 
-auto thi::setRmap(boost::dynamic_bitset<>& stitchMap,
-                              F_POINT_ATTR const&      stitchPoint,
-                              F_POINT const&           cellSize) -> bool {
+auto thi::setRmap(boost::dynamic_bitset<>& stitchMap, F_POINT_ATTR const& stitchPoint, F_POINT const& cellSize)
+    -> bool {
   auto const bitPoint = gsl::narrow<uint32_t>(floor((stitchPoint.x - ZoomRect.left) / cellSize.x) *
                                               floor((stitchPoint.y - ZoomRect.bottom) / cellSize.y));
   return !stitchMap.test_set(bitPoint);
@@ -18203,8 +18193,8 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 	      DrawItem->itemAction == ODA_DRAWENTIRE) {
 		auto const position = (ButtonWidthX3 - PickColorMsgSize.cx) / 2;
 		if (StateMap->test(StateFlag::HID)) {
-		  auto ucb = wrap::next(UserColorBrush.begin(), ActiveColor);
-		  auto itUserColor  = wrap::next(UserColor.begin(), ActiveColor);
+		  auto ucb         = wrap::next(UserColorBrush.begin(), ActiveColor);
+		  auto itUserColor = wrap::next(UserColor.begin(), ActiveColor);
 		  FillRect(DrawItem->hDC, &DrawItem->rcItem, *ucb);
 		  SetBkColor(DrawItem->hDC, *itUserColor);
 		}
@@ -18465,7 +18455,8 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
   auto const hResult = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE);
   if (SUCCEEDED(hResult)) {
 	ThrEdInstance = hInstance;
-	auto winClass = WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+	auto winClass =
+	    WNDCLASSEX {0U, 0U, nullptr, 0, 0, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 	winClass.cbSize = sizeof(WNDCLASSEX);
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	winClass.style       = CS_DBLCLKS | CS_HREDRAW | CS_VREDRAW | CS_OWNDC;
@@ -18477,7 +18468,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	winClass.hIcon = gsl::narrow_cast<HICON>(
 	    LoadImage(ThrEdInstance, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, 32, 32, LR_SHARED)); // NOLINT(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	winClass.hCursor = nullptr; //  set the cursor to null as the cursor changes in the window:
-	                      //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
+	                            //  https://docs.microsoft.com/en-us/windows/desktop/api/winuser/nf-winuser-setcursor
 	winClass.hbrBackground = GetSysColorBrush(COLOR_WINDOW);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 	winClass.lpszMenuName  = MAKEINTRESOURCE(IDR_MENU1);

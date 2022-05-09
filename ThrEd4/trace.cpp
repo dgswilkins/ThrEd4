@@ -48,36 +48,36 @@ class TRACE_PNT
 
 // trace internal namespace
 namespace ti {
-  void difbits(uint32_t shift, uint32_t* point) noexcept;
+void difbits(uint32_t shift, uint32_t* point) noexcept;
 
-  static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
+static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
-  void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
-  auto ducolm() -> uint32_t;
-  void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
-  void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
-  void dutrac();
-  void dutrnum0(uint32_t color);
-  void hidwnd(HWND hwnd) noexcept;
-  void hideTraceWin() noexcept;
-  void ritrcol(COLORREF* color, uint32_t number) noexcept;
-  void shownd(HWND hwnd) noexcept;
-  void showTraceWin() noexcept;
-  void tracwnd();
-  auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
-  auto trcin(COLORREF color) -> bool;
-  void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
-  void trcols(COLORREF color) noexcept;
-  void trcratnum();
-  void trcstpnum();
-  auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
-  void trnumwnd0(int32_t position) noexcept;
-  void trnumwnd1(int32_t position) noexcept;
-  auto trsum() -> uint32_t;
+void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
+auto ducolm() -> uint32_t;
+void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
+void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
+void dutrac();
+void dutrnum0(uint32_t color);
+void hidwnd(HWND hwnd) noexcept;
+void hideTraceWin() noexcept;
+void ritrcol(COLORREF* color, uint32_t number) noexcept;
+void shownd(HWND hwnd) noexcept;
+void showTraceWin() noexcept;
+void tracwnd();
+auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
+auto trcin(COLORREF color) -> bool;
+void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
+void trcols(COLORREF color) noexcept;
+void trcratnum();
+void trcstpnum();
+auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
+void trnumwnd0(int32_t position) noexcept;
+void trnumwnd1(int32_t position) noexcept;
+auto trsum() -> uint32_t;
 
 #if TRCMTH == 0
-  auto colsum(COLORREF col) -> uint32_t;
-  auto icolsum(COLORREF col) -> uint32_t;
+auto colsum(COLORREF col) -> uint32_t;
+auto icolsum(COLORREF col) -> uint32_t;
 #endif
 } // namespace ti
 
@@ -536,9 +536,8 @@ void trace::tracedg() {
   StateMap->set(StateFlag::WASEDG);
 }
 
-auto ti::trcbit(uint32_t const          initialDirection,
-                             uint32_t&               traceDirection,
-                             std::vector<TRACE_PNT>& tracedPoints) -> bool {
+auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints)
+    -> bool {
   auto pixelIndex = CurrentTracePoint.y * bitmap::getBitmapWidth() + CurrentTracePoint.x;
   switch (traceDirection) {
 	case TRCR: {
@@ -852,8 +851,9 @@ void trace::trinit() {
 		auto       highColor = color;
 		auto const spTBD =
 		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
-		auto const pixel = std::find_if(
-		    spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool { return data != color; });
+		auto const pixel = std::find_if(spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool {
+		  return data != color;
+		});
 		if (pixel != spTBD.end()) {
 		  highColor = *pixel;
 		}
@@ -1180,11 +1180,7 @@ void ti::trcnum(uint32_t shift, COLORREF color, uint32_t backColor) {
   wrap::textOut(DrawItem->hDC, xPosition, 1, val.c_str(), wrap::toUnsigned(val.size()));
 }
 
-void ti::durct(uint32_t    shift,
-                            RECT const& traceControlRect,
-                            RECT&       traceHighMask,
-                            RECT&       traceMiddleMask,
-                            RECT&       traceLowMask) {
+void ti::durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask) {
   auto const lowerColor    = gsl::narrow_cast<byte>((UpPixelColor >> shift) & 0xffU);
   auto const upperColor    = gsl::narrow_cast<byte>((DownPixelColor >> shift) & 0xffU);
   auto const controlHeight = wrap::toFloat(traceControlRect.bottom - traceControlRect.top);

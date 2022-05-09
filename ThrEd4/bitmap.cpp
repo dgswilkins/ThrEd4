@@ -76,7 +76,7 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
   auto const swapped = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
-                 ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
+                       ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
   return swapped >> BPB;
 }
 
@@ -301,11 +301,11 @@ auto bi::saveName(fs::path& fileName) {
 	  hResult = pFileSave->Show(nullptr);
 	  if (SUCCEEDED(hResult)) {
 		auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		hResult          = pFileSave->GetResult(&pItem);
+		hResult     = pFileSave->GetResult(&pItem);
 		if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pszFilePath = PWSTR {nullptr};
-		  hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+		  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 		  if (SUCCEEDED(hResult)) {
 			fileName.assign(pszFilePath);
 			CoTaskMemFree(pszFilePath);
@@ -371,12 +371,13 @@ auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
 	    CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
 	if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
 	  auto dwOptions = DWORD {};
-	  hResult             = pFileOpen->GetOptions(&dwOptions);
+	  hResult        = pFileOpen->GetOptions(&dwOptions);
 	  if (SUCCEEDED(hResult)) {
 		static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+		hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()),
+		                                   FILTER_FILE_TYPES.data());
 		hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
@@ -394,11 +395,11 @@ auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
 		  hResult = pFileOpen->Show(nullptr);
 		  if (SUCCEEDED(hResult)) {
 			auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-			hResult          = pFileOpen->GetResult(&pItem);
+			hResult     = pFileOpen->GetResult(&pItem);
 			if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 			  // NOLINTNEXTLINE(readability-qualified-auto)
 			  auto pszFilePath = PWSTR {nullptr};
-			  hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 			  if (SUCCEEDED(hResult)) {
 				fileName->assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);

@@ -14,7 +14,7 @@ static constexpr uint8_t THUMBHGT = 38U;
 static constexpr uint8_t THUMBWID = 48U;
 using imgArray                    = std::array<std::array<uint8_t, THUMBWID>, THUMBHGT>;
 
-#pragma pack(push, 1) 
+#pragma pack(push, 1)
 class PECHDR
 {
   public:
@@ -38,7 +38,7 @@ class PECHDR
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1) 
+#pragma pack(push, 1)
 class PECHDR2
 {
   public:
@@ -75,7 +75,7 @@ class PES_COLOR_LIST
   //~PES_COLOR_LIST() = default;
 };
 
-#pragma pack(push, 1) 
+#pragma pack(push, 1)
 // clang-format off
 class PESHED
 {
@@ -139,7 +139,7 @@ class PESLED
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1) 
+#pragma pack(push, 1)
 class PESSTCHLST
 {
   public:
@@ -155,7 +155,7 @@ class PESSTCHLST
 };
 #pragma pack(pop)
 
-#pragma pack(push, 1) 
+#pragma pack(push, 1)
 class PESTCH
 {
   public:
@@ -193,18 +193,18 @@ constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
 namespace pi {
-  auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
-  void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
-  void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
-  void pecImage(std::vector<uint8_t>& pecBuffer);
-  void pecdat(std::vector<uint8_t>& buffer);
-  void pecnam(gsl::span<char> const& label);
-  auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
-  void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset);
-  void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
-  void ritpesCode(std::vector<uint8_t>& buffer);
-  void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY);
-  void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
+auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
+void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
+void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
+void pecImage(std::vector<uint8_t>& pecBuffer);
+void pecdat(std::vector<uint8_t>& buffer);
+void pecnam(gsl::span<char> const& label);
+auto pesmtch(COLORREF const& referenceColor, uint8_t const& colorIndex) -> uint32_t;
+void ritpes(std::vector<uint8_t>& buffer, F_POINT_ATTR const& stitch, F_POINT const& offset);
+void ritpesBlock(std::vector<uint8_t>& buffer, PESSTCHLST newBlock);
+void ritpesCode(std::vector<uint8_t>& buffer);
+void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float srcY);
+void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace pi
 
 static auto PEScolors      = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
@@ -555,8 +555,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	CloseHandle(fileHandle);
 	return false;
   }
-  auto*      pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
-  auto const pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
+  auto const  pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
   auto const* pesStitch = &fileBuffer[pecOffset];
   if (pesStitch == nullptr) {
 	return false;

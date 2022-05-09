@@ -692,4 +692,3 @@ inline void FRM_HEAD::squareEnd(bool flag) noexcept {
 	extendedAttribute &= ~(AT_SQR);
   }
 }
-

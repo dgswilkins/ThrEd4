@@ -209,4 +209,3 @@ inline D_POINT::D_POINT(F_POINT const& rhs) noexcept :
 inline D_POINT::D_POINT(float rhsX, float rhsY) noexcept :
     x(gsl::narrow_cast<double>(rhsX)), y(gsl::narrow_cast<double>(rhsY)) {
 }
-

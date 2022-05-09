@@ -10,27 +10,27 @@
 
 // satin internal namespace
 namespace si {
-  auto chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool;
-  void filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t& satinBackupIndex, F_POINT& stitchPoint);
-  auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
-  void outfn(FRM_HEAD const& form, uint32_t start, uint32_t finish, float satinWidth);
-  void sacspac(uint32_t startGuide, uint32_t guideCount);
-  void satclos();
-  void satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t size);
-  void satends(FRM_HEAD const& form, uint32_t isBlunt, float width);
-  void satfn(FRM_HEAD const&           form,
-             std::vector<float> const& lengths,
-             uint32_t                  line1Start,
-             uint32_t                  line1End,
-             uint32_t                  line2Start,
-             uint32_t                  line2End);
-  void satmf(FRM_HEAD const& form, std::vector<float> const& lengths);
-  auto satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> F_POINT;
-  void satsbrd(uint32_t formIndex);
-  auto satselfn() -> bool;
-  void sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
-  void sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint);
-  void unsat();
+auto chkbak(std::vector<F_POINT> const& satinBackup, F_POINT const& pnt) noexcept -> bool;
+void filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t& satinBackupIndex, F_POINT& stitchPoint);
+auto nusac(uint32_t formIndex, uint32_t guideCount) -> uint32_t;
+void outfn(FRM_HEAD const& form, uint32_t start, uint32_t finish, float satinWidth);
+void sacspac(uint32_t startGuide, uint32_t guideCount);
+void satclos();
+void satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32_t size);
+void satends(FRM_HEAD const& form, uint32_t isBlunt, float width);
+void satfn(FRM_HEAD const&           form,
+           std::vector<float> const& lengths,
+           uint32_t                  line1Start,
+           uint32_t                  line1End,
+           uint32_t                  line2Start,
+           uint32_t                  line2End);
+void satmf(FRM_HEAD const& form, std::vector<float> const& lengths);
+auto satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> F_POINT;
+void satsbrd(uint32_t formIndex);
+auto satselfn() -> bool;
+void sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
+void sfn(FRM_HEAD const& form, uint32_t startVertex, F_POINT& stitchPoint);
+void unsat();
 } // namespace si
 
 static auto StartPoint = uint32_t {}; // starting formOrigin for a satin stitch guide-line
@@ -881,11 +881,11 @@ void satin::slbrd(FRM_HEAD const& form) {
 }
 
 void si::satfn(FRM_HEAD const&           form,
-                            std::vector<float> const& lengths,
-                            uint32_t                  line1Start,
-                            uint32_t                  line1End,
-                            uint32_t                  line2Start,
-                            uint32_t                  line2End) {
+               std::vector<float> const& lengths,
+               uint32_t                  line1Start,
+               uint32_t                  line1End,
+               uint32_t                  line2Start,
+               uint32_t                  line2End) {
   if (line1Start != line1End && line2Start != line2End) {
 	auto itFirstVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
 	if (!StateMap->testAndSet(StateFlag::SAT1)) {
@@ -1266,10 +1266,7 @@ void satin::satpnt1() {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void si::filinsbw(std::vector<F_POINT>& satinBackup,
-                               F_POINT const&        point,
-                               uint32_t&             satinBackupIndex,
-                               F_POINT&              stitchPoint) {
+void si::filinsbw(std::vector<F_POINT>& satinBackup, F_POINT const& point, uint32_t& satinBackupIndex, F_POINT& stitchPoint) {
   satinBackup[satinBackupIndex++] = point;
   satinBackupIndex &= (satinBackup.size() - 1U); // make sure that satinBackupIndex rolls over when it reaches the end of the buffer
   form::filinsb(point, stitchPoint);
@@ -1440,8 +1437,7 @@ void satin::sbrd(FRM_HEAD const& form) {
   LineSpacing = savedSpacing;
 }
 
-auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept
-    -> F_POINT {
+auto si::satOffset(const uint32_t& finish, const uint32_t& start, float satinWidth) noexcept -> F_POINT {
   constexpr auto SATHRESH = 10.0F;
 
   auto angle  = (FormAngles->operator[](finish) - FormAngles->operator[](start)) / 2.0F;

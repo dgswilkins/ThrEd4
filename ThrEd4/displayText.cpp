@@ -8,9 +8,9 @@
 
 // displayText internal namespace
 namespace di {
-  void bxtxt(uint32_t iButton, uint32_t iMessage);
-  void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
-  void sdmsg();
+void bxtxt(uint32_t iButton, uint32_t iMessage);
+void hlpflt(uint32_t iButton, uint32_t iMessage, float data);
+void sdmsg();
 } // namespace di
 
 auto displayText::loadStr(uint32_t stringID) -> std::wstring {

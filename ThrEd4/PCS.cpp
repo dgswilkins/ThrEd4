@@ -52,7 +52,7 @@ constexpr auto SMALL_HOOP = F_POINT {SHUPX, SHUPY};
 
 // PCS internal namespace
 namespace pci {
-  auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
+auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
 } // namespace pci
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header

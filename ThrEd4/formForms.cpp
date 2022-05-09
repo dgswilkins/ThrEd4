@@ -72,28 +72,28 @@ enum DaisyStyles { // daisy form types
 
 // formForms Internal namespace
 namespace ffi {
-  void chkdaz();
+void chkdaz();
 
-  auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  void initdaz(HWND hWinDialog);
-  void initTearDlg(HWND hwndlg);
-  auto maxwid() -> SIZE;
-  auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
-  void nxtlin(uint32_t& formMenuEntryCount) noexcept;
-  void nxtlinprf() noexcept;
-  void prflin(std::wstring const& msg, LIST_TYPE const& row);
-  auto prfnwin(std::wstring const& text) noexcept -> HWND;
-  void prftwin(std::wstring const& text) noexcept;
-  void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount);
+void initdaz(HWND hWinDialog);
+void initTearDlg(HWND hwndlg);
+auto maxwid() -> SIZE;
+auto numwin(std::wstring const& winName, RECT const& location) -> HWND;
+void nxtlin(uint32_t& formMenuEntryCount) noexcept;
+void nxtlinprf() noexcept;
+void prflin(std::wstring const& msg, LIST_TYPE const& row);
+auto prfnwin(std::wstring const& text) noexcept -> HWND;
+void prftwin(std::wstring const& text) noexcept;
+void refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount);
 
-  auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 
-  auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
-  auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
-  void wavinit(HWND hwndlg);
+auto txtrwin(std::wstring const& winName, RECT const& location) -> HWND;
+auto txtwin(std::wstring const& windowName, RECT const& location) -> HWND;
+void wavinit(HWND hwndlg);
 
-  auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
+auto CALLBACK wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL;
 } // namespace ffi
 
 static auto LabelWindowCoords = RECT {}; // location of left windows in the form data sheet

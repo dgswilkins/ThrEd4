@@ -64,11 +64,11 @@ auto dudbits(SIZE const& dif) -> uint32_t;
 void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
-constexpr auto COLVER = uint32_t {0x776874U}; // color file version
-constexpr auto DSTMAX    = 121;         // maximum stitch/jump length of 121 in DST format
-constexpr auto DSTSCALE  = 3.0F / 5.0F; // DST stitch scaling factor
-constexpr auto IDSTSCALE = 5.0F / 3.0F; // Inverse DST stitch scaling factor
-//constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
+constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
+constexpr auto DSTMAX    = 121;                  // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTSCALE  = 3.0F / 5.0F;          // DST stitch scaling factor
+constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling factor
+// constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
 constexpr auto TYPJMP = 0x830000U; // dst jump stitch mask
 constexpr auto TYPREG = 0x030000U; // dst regular stitch mask
 
