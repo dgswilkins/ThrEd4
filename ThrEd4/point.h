@@ -26,15 +26,15 @@
 #include <cstdint>
 
 namespace util {
-auto constexpr closeEnough(float f1, float f2) -> bool {
+auto constexpr closeEnough(float first, float second) -> bool {
   // test if the floats are so close together that they can be considered equal
-  auto const val = (f1 > f2) ? (f1 - f2) : (f2 - f1);
+  auto const val = (first > second) ? (first - second) : (second - first);
   return (val < FLT_EPSILON);
 }
 
-auto constexpr closeEnough(double d1, double d2) -> bool {
+auto constexpr closeEnough(double first, double second) -> bool {
   // test if the floats are so close together that they can be considered equal
-  auto const val = (d1 > d2) ? (d1 - d2) : (d2 - d1);
+  auto const val = (first > second) ? (first - second) : (second - first);
   return (val < DBL_EPSILON);
 }
 } // namespace util

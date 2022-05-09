@@ -52,7 +52,7 @@ namespace ti {
 
   static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
-  void dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
+  void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
   auto ducolm() -> uint32_t;
   void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
   void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
@@ -267,8 +267,8 @@ auto ti::trsum() -> uint32_t {
   auto const firstColor = TraceAdjacentColors.front();
   auto const iBegin     = std::next(TraceAdjacentColors.begin());
   auto const iEnd       = std::next(TraceAdjacentColors.end(), -1);
-  auto const fold       = [firstColor](uint32_t a, uint32_t b) {
-    return a + ((b > firstColor) ? (b - firstColor) : (firstColor - b));
+  auto const fold       = [firstColor](uint32_t varA, uint32_t varB) {
+    return varA + ((varB > firstColor) ? (varB - firstColor) : (firstColor - varB));
   };
   return wrap::toUnsigned(std::accumulate(iBegin, iEnd, 0, fold));
 }
@@ -853,7 +853,7 @@ void trace::trinit() {
 		auto const spTBD =
 		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		auto const pixel = std::find_if(
-		    spTBD.begin(), spTBD.end(), [color](uint32_t const& m) -> bool { return m != color; });
+		    spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool { return data != color; });
 		if (pixel != spTBD.end()) {
 		  highColor = *pixel;
 		}
@@ -1208,12 +1208,12 @@ void ti::durct(uint32_t    shift,
   }
 }
 
-void ti::dublk(HDC dc, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
+void ti::dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush) {
   if (StateMap->test(StateFlag::DUHI)) {
-	FillRect(dc, &traceHighMask, brush);
+	FillRect(hDC, &traceHighMask, brush);
   }
   if (StateMap->test(StateFlag::DULO)) {
-	FillRect(dc, &traceLowMask, brush);
+	FillRect(hDC, &traceLowMask, brush);
   }
 }
 

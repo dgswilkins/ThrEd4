@@ -595,8 +595,8 @@ void xt::fethr() {
 }
 
 constexpr auto xi::tim2int(FILETIME time) noexcept -> ULARGE_INTEGER {
-  auto const op = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
-  return op;
+  auto const largeInt = ULARGE_INTEGER {{time.dwLowDateTime, time.dwHighDateTime}};
+  return largeInt;
 }
 
 auto xt::insid(FRM_HEAD const& form) -> std::vector<F_POINT>& {
@@ -624,8 +624,8 @@ void xi::delwlk(uint32_t code) {
   if (!StitchBuffer->empty()) {
 	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
 	                                   StitchBuffer->end(),
-	                                   [&code](F_POINT_ATTR const& m) -> bool {
-	                                     return (m.attribute & WLKFMSK) == code;
+	                                   [&code](F_POINT_ATTR const& stitch) -> bool {
+	                                     return (stitch.attribute & WLKFMSK) == code;
 	                                   }),
 	                    StitchBuffer->end());
   }
@@ -697,19 +697,19 @@ auto xi::gucon(FRM_HEAD const&            form,
 	return 0;
   }
   auto const& indentedPoint = xt::insid(form);
-  auto        up            = startVertex;
-  auto        down          = startVertex;
+  auto        upDir            = startVertex;
+  auto        downDir          = startVertex;
   do {
-	if (up == endVertex) {
+	if (upDir == endVertex) {
 	  StateMap->reset(StateFlag::WLKDIR);
 	  break;
 	}
-	if (down == endVertex) {
+	if (downDir == endVertex) {
 	  StateMap->set(StateFlag::WLKDIR);
 	  break;
 	}
-	up   = form::nxt(form, up);
-	down = form::prv(form, down);
+	upDir   = form::nxt(form, upDir);
+	downDir = form::prv(form, downDir);
   } while (true);
   auto iStitch = destination;
   while (startVertex != endVertex) {
@@ -844,11 +844,11 @@ void xt::srtcol() {
 	++(histogram[stitch.attribute & COLMSK]);
   }
   auto startStitch = 0U;
-  auto it          = histogram.cbegin();
+  auto itHist          = histogram.cbegin();
   for (auto& stitchColor : colorStartStitch) {
 	stitchColor = startStitch;
-	startStitch += *it;
-	++it;
+	startStitch += *itHist;
+	++itHist;
   }
   auto highStitchBuffer = std::vector<F_POINT_ATTR> {};
   highStitchBuffer.resize(StitchBuffer->size());

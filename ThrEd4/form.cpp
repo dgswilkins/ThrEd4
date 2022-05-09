@@ -323,7 +323,7 @@ namespace fi {
   void frmpoly(POINT const* line, uint32_t count) noexcept;
   void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
   void frmsqr0(POINT const& controlPoint);
-  void frmx(POINT const& controlPoint, HDC dc);
+  void frmx(POINT const& controlPoint, HDC hDC);
   void fsangl(FRM_HEAD& form);
   void fsclp(uint32_t formIndex);
   void fsclpx(uint32_t formIndex);
@@ -570,16 +570,16 @@ void form::delmfil(uint32_t formIndex) {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   if (auto const firstStitch = std::find_if(StitchBuffer->begin(),
                                             StitchBuffer->end(),
-                                            [codedForm](F_POINT_ATTR const& m) -> bool {
-	                                          return ((m.attribute & (FRMSK | NOTFRM)) == codedForm) &&
-	                                                 ((m.attribute & (TYPFRM | FTHMSK)) != 0U);
+                                            [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	                                          return ((stitch.attribute & (FRMSK | NOTFRM)) == codedForm) &&
+	                                                 ((stitch.attribute & (TYPFRM | FTHMSK)) != 0U);
                                             });
       firstStitch != StitchBuffer->end()) {
 	// we found the first stitch, so now delete the stitches in the form
 	StitchBuffer->erase(std::remove_if(firstStitch,
 	                                   StitchBuffer->end(),
-	                                   [codedForm](F_POINT_ATTR const& m) -> bool {
-	                                     return (m.attribute & FRMSK) == codedForm;
+	                                   [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	                                     return (stitch.attribute & FRMSK) == codedForm;
 	                                   }),
 	                    StitchBuffer->end());
   }
@@ -789,7 +789,7 @@ void fi::frmsqr(uint32_t vertexIndex, uint32_t iVertex) {
   wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
-void form::selsqr(POINT const& controlPoint, HDC dc) {
+void form::selsqr(POINT const& controlPoint, HDC hDC) {
   auto       line   = std::array<POINT, SQPNTS> {};
   auto const offset = MulDiv(gsl::narrow<int32_t>(IniFile.formVertexSizePixels), *ScreenDPI, STDDPI);
   line[0].x = line[3].x = line[4].x = controlPoint.x - offset;
@@ -797,7 +797,7 @@ void form::selsqr(POINT const& controlPoint, HDC dc) {
   line[1].x = line[2].x = controlPoint.x + offset;
   line[2].y = line[3].y = controlPoint.y + offset;
   line[4].y             = controlPoint.y - offset;
-  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
 }
 
 void fi::frmsqr0(POINT const& controlPoint) {
@@ -813,19 +813,19 @@ void fi::frmsqr0(POINT const& controlPoint) {
   }
 }
 
-void fi::frmx(POINT const& controlPoint, HDC dc) {
+void fi::frmx(POINT const& controlPoint, HDC hDC) {
   auto       line   = std::array<POINT, LNPNTS> {};
   auto const offset = MulDiv(8, *ScreenDPI, STDDPI);
-  SelectObject(dc, FormSelectedPen);
+  SelectObject(hDC, FormSelectedPen);
   line[0].x = line[1].x = controlPoint.x;
   line[0].y             = controlPoint.y + offset;
   line[1].y             = controlPoint.y - offset;
-  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
+  wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
   line[0].y = line[1].y = controlPoint.y;
   line[0].x             = controlPoint.x - offset;
   line[1].x             = controlPoint.x + offset;
-  wrap::polyline(dc, line.data(), wrap::toUnsigned(line.size()));
-  SelectObject(dc, FormPen);
+  wrap::polyline(hDC, line.data(), wrap::toUnsigned(line.size()));
+  SelectObject(hDC, FormPen);
 }
 
 void form::ratsr() {
@@ -839,14 +839,14 @@ void form::ratsr() {
   }
 }
 
-void form::ritfrct(uint32_t iForm, HDC dc) {
+void form::ritfrct(uint32_t iForm, HDC hDC) {
   auto pixelOutline = std::array<POINT, OUTPNTS> {};
   auto formOutline  = std::array<F_POINT, OUTPNTS> {};
   ratsr();
   SelectObject(StitchWindowDC, FormPen);
   SetROP2(StitchWindowDC, R2_XORPEN);
   auto const& rectangle = FormList->operator[](iForm).rectangle;
-  SelectObject(dc, FormSelectedPen);
+  SelectObject(hDC, FormSelectedPen);
   formOutline[0].x = formOutline[6].x = formOutline[7].x = formOutline[8].x = rectangle.left;
   formOutline[0].y = formOutline[1].y = formOutline[2].y = formOutline[8].y = rectangle.top;
   formOutline[2].x = formOutline[3].x = formOutline[4].x = rectangle.right;
@@ -859,12 +859,12 @@ void form::ritfrct(uint32_t iForm, HDC dc) {
 	*ipixelOutline = form::sfCor2px(controlPoint);
 	++ipixelOutline;
   }
-  wrap::polyline(dc, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
-  auto const sp = gsl::span {pixelOutline};
+  wrap::polyline(hDC, pixelOutline.data(), wrap::toUnsigned(pixelOutline.size()));
+  auto const spOutline = gsl::span {pixelOutline};
   // drawing the boxes on corners and sides, so don't overwrite the first box which will "erase" it
-  auto const subsp = sp.subspan(0, sp.size() - 1);
+  auto const subsp = spOutline.subspan(0, spOutline.size() - 1);
   for (auto const& controlPoint : subsp) {
-	form::selsqr(controlPoint, dc);
+	form::selsqr(controlPoint, hDC);
   }
   SetROP2(StitchWindowDC, R2_COPYPEN);
   if (StateMap->testAndReset(StateFlag::GRPSEL)) {
@@ -962,15 +962,15 @@ void fi::frmpoly(POINT const* const line, uint32_t count) noexcept {
   }
 }
 
-void form::dupsel(HDC dc) {
-  SelectObject(dc, FormPen);
-  SetROP2(dc, R2_XORPEN);
-  wrap::polyline(dc, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
+void form::dupsel(HDC hDC) {
+  SelectObject(hDC, FormPen);
+  SetROP2(hDC, R2_XORPEN);
+  wrap::polyline(hDC, SelectedPointsLine->data(), wrap::toUnsigned(SelectedPointsLine->size()));
   // iPoint = SelectedFormVertices.start;
   for (auto iPoint = 0U; iPoint < (SelectedPointsLine->size() - 1U); ++iPoint) {
-	form::selsqr(SelectedPointsLine->operator[](iPoint), dc);
+	form::selsqr(SelectedPointsLine->operator[](iPoint), hDC);
   }
-  fi::frmx(EndPointCross, dc);
+  fi::frmx(EndPointCross, hDC);
 }
 
 void form::unpsel() {
@@ -1415,17 +1415,17 @@ auto fi::findDistanceToSide(F_POINT const& lineStart,
                                         F_POINT const& lineEnd,
                                         F_POINT const& point,
                                         float&         distance) noexcept -> float {
-  auto const a = point.x - lineStart.x;
-  auto const b = point.y - lineStart.y;
-  auto const c = lineEnd.x - lineStart.x;
-  auto const d = lineEnd.y - lineStart.y;
-  if ((c == 0.0F) && (d == 0.0F)) {
-	distance = sqrt(a * b);
+  auto const varA = point.x - lineStart.x;
+  auto const varB = point.y - lineStart.y;
+  auto const varC = lineEnd.x - lineStart.x;
+  auto const varD = lineEnd.y - lineStart.y;
+  if ((varC == 0.0F) && (varD == 0.0F)) {
+	distance = sqrt(varA * varB);
 	// Arbitrarily choose the first point since start and end are the same
 	return -0.1F;
   }
-  auto const dot     = a * c + b * d;
-  auto const lenSqrd = c * c + d * d;
+  auto const dot     = varA * varC + varB * varD;
+  auto const lenSqrd = varC * varC + varD * varD;
   auto const param   = dot / lenSqrd;
   // param < 0 = before the first point
   // param > 1 = after last point
@@ -1433,7 +1433,7 @@ auto fi::findDistanceToSide(F_POINT const& lineStart,
   auto const diff =
       (param < 0)   ? F_POINT {point.x - lineStart.x, point.y - lineStart.y}
       : (param > 1) ? F_POINT {point.x - lineEnd.x, point.y - lineEnd.y}
-                    : F_POINT {point.x - (lineStart.x + param * c), point.y - (lineStart.y + param * d)};
+                    : F_POINT {point.x - (lineStart.x + param * varC), point.y - (lineStart.y + param * varD)};
   // returning shortest distance
   distance = sqrt(diff.x * diff.x + diff.y * diff.y);
   return param;
@@ -1734,9 +1734,9 @@ void form::savplen(float length) {
 	length = PCLAMP;
   }
   auto const fractionalPart = std::modf(length, &integerPart);
-  auto const fr             = wrap::floor<uint16_t>(fractionalPart * FRACFACT);
+  auto const frByte             = wrap::floor<uint16_t>(fractionalPart * FRACFACT);
   auto const num            = gsl::narrow<uint32_t>(integerPart);
-  FormList-> operator[](ClosestFormToCursor).picoLength = ((num << BYTSHFT) & B2MASK) | fr;
+  FormList-> operator[](ClosestFormToCursor).picoLength = ((num << BYTSHFT) & B2MASK) | frByte;
 }
 
 void fi::bdrlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float stitchSize) {
@@ -2577,7 +2577,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
   auto const [min, max] =
       std::minmax_element(std::next(currentFillVertices.begin(), 1),
                           currentFillVertices.end(),
-                          [](F_POINT const& a, F_POINT const& b) { return a.x < b.x; });
+                          [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; });
   auto const highX           = max->x;
   auto const lineOffset      = std::floor(min->x / LineSpacing);
   auto const lowX            = LineSpacing * lineOffset;
@@ -2613,8 +2613,8 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
 	  auto const iNextVertex = (iVertex + 1U) % currentVertexCount;
 	  if (auto point = F_POINT {};
 	      projv(currentX, currentFillVertices[iVertex], currentFillVertices[iNextVertex], point)) {
-		auto const a = F_POINT_LINE {point.x, point.y, iVertex};
-		projectedPoints.push_back(a);
+		auto const projected = F_POINT_LINE {point.x, point.y, iVertex};
+		projectedPoints.push_back(projected);
 		++iPoint;
 	  }
 	}
@@ -3017,7 +3017,7 @@ void fi::duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
   if (auto const leftEdge =
           (std::min_element(currentFormVertices.begin(),
                             currentFormVertices.end(),
-                            [](F_POINT const& a, F_POINT const& b) { return a.x < b.x; }))
+                            [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; }))
               ->x;
       leftEdge < ClipRectSize.cx) {
 	StateMap->set(StateFlag::WASNEG);
@@ -5377,8 +5377,8 @@ void form::refilfn() {
 void form::refil() {
   if (!UserFlagMap->test(UserFlag::WRNOF)) {
 	if (auto const codedForm = ClosestFormToCursor << FRMSHFT | USMSK;
-	    std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](F_POINT_ATTR const& m) -> bool {
-	      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
+	    std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](F_POINT_ATTR const& stitch) -> bool {
+	      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
 	    })) {
 	  if (FormDataSheet != nullptr) {
 		StateMap->set(StateFlag::WASFRMFRM);
@@ -5914,8 +5914,8 @@ void form::unfil() {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  if (!StateMap->testAndReset(StateFlag::IGNOR) && !UserFlagMap->test(UserFlag::WRNOF)) {
 		if (auto const codedForm = (ClosestFormToCursor << FRMSHFT) | USMSK;
-		    std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](F_POINT_ATTR const& m) -> bool {
-		      return ((m.attribute & NOTFRM) == 0U) && (m.attribute & (USMSK | FRMSK)) == codedForm;
+		    std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&codedForm](F_POINT_ATTR const& stitch) -> bool {
+		      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
 		    })) {
 		  displayText::tabmsg(IDS_UNFIL);
 		  StateMap->set(StateFlag::FILMSG);
@@ -6993,9 +6993,9 @@ void form::dulens(uint32_t sides) {
   }
   FormVertices->push_back(point);
   auto       itVertex = wrap::next(FormVertices->cbegin(), currentForm.vertexIndex + iVertex - 1U);
-  auto const av       = stitchPoint.x;
+  auto const xCoord       = stitchPoint.x;
   for (; iVertex != 1; --iVertex) {
-	FormVertices->push_back(F_POINT {av + av - (*itVertex).x, (*itVertex).y});
+	FormVertices->push_back(F_POINT {xCoord + xCoord - (*itVertex).x, (*itVertex).y});
 	--itVertex;
   }
   currentForm.vertexCount = wrap::toUnsigned(FormVertices->size() - currentForm.vertexIndex);
@@ -7854,8 +7854,8 @@ void form::nufsel() {
 	if (StateMap->testAndReset(StateFlag::WASEL)) {
 	  SelectedFormList->push_back(PreviousFormIndex);
 	}
-	if (std::none_of(SelectedFormList->begin(), SelectedFormList->end(), [](uint32_t i) {
-	      return i == ClosestFormToCursor;
+	if (std::none_of(SelectedFormList->begin(), SelectedFormList->end(), [](uint32_t intX) {
+	      return intX == ClosestFormToCursor;
 	    })) {
 	  SelectedFormList->push_back(ClosestFormToCursor);
 	}

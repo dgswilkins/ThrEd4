@@ -438,9 +438,9 @@ void txi::px2ed(POINT const& point, F_POINT& editPoint) noexcept {
 void txi::chktx() {
   TempTexturePoints->erase(std::remove_if(TempTexturePoints->begin(),
                                           TempTexturePoints->end(),
-                                          [&](auto const& p) -> bool {
-	                                        return !(p.line <= TextureScreen.lines &&
-	                                                 p.y <= TextureScreen.areaHeight);
+                                          [&](auto const& point) -> bool {
+	                                        return !(point.line <= TextureScreen.lines &&
+	                                                 point.y <= TextureScreen.areaHeight);
                                           }),
                            TempTexturePoints->end());
 }
@@ -1156,8 +1156,8 @@ void txi::nutx(FRM_HEAD& form) {
   }
   if (!TempTexturePoints->empty()) {
 	auto const tempPointCount = wrap::toUnsigned(TempTexturePoints->size());
-	auto const it             = wrap::next(TexturePointsBuffer->begin(), index);
-	TexturePointsBuffer->insert(it, TempTexturePoints->cbegin(), TempTexturePoints->cend());
+	auto const itPoint        = wrap::next(TexturePointsBuffer->begin(), index);
+	TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	  if (texture::istx(iForm)) {
 		FormList->operator[](iForm).fillInfo.texture.index +=
@@ -1406,9 +1406,9 @@ void txi::txtdel() {
   }
   auto iClosestPoint = 0U;
   if (!TempTexturePoints->empty() && txi::txtclos(iClosestPoint)) {
-	auto it = TempTexturePoints->cbegin();
-	std::advance(it, iClosestPoint);
-	it = TempTexturePoints->erase(it);
+	auto itPoint = TempTexturePoints->cbegin();
+	std::advance(itPoint, iClosestPoint);
+	itPoint = TempTexturePoints->erase(itPoint);
 	StateMap->set(StateFlag::RESTCH);
   }
 }

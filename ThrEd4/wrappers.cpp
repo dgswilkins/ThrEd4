@@ -31,8 +31,8 @@ auto wrap::readFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD by
   return (ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped) == TRUE);
 }
 
-void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t c, LPSIZE lpSize) noexcept {
-  GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(c), lpSize);
+void wrap::getTextExtentPoint32(HDC hdc, LPCTSTR lpString, uint32_t iLen, LPSIZE lpSize) noexcept {
+  GetTextExtentPoint32(hdc, lpString, gsl::narrow<int32_t>(iLen), lpSize);
 }
 
 void wrap::textOut(HDC hdc, int32_t nXStart, int32_t nYStart, LPCTSTR lpString, uint32_t cchString) noexcept {

@@ -75,9 +75,9 @@ static auto UTF8BMPname  = std::array<char, SZBMPNM> {};         // bitmap file 
 constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   // this code compiles to the same assembly as _byteswap_ulong(color) >> 8U, making
   // it a portable version
-  auto const a = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
+  auto const swapped = ((color & 0x000000FFU) << 24U) | ((color & 0x0000FF00U) << 8U) |
                  ((color & 0x00FF0000U) >> 8U) | ((color & 0xFF000000U) >> 24U);
-  return a >> BPB;
+  return swapped >> BPB;
 }
 
 auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
@@ -287,26 +287,26 @@ void bitmap::resetBmpFile(bool reset) {
 auto bi::saveName(fs::path& fileName) {
   auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-  auto hr = CoCreateInstance(
+  auto hResult = CoCreateInstance(
       CLSID_FileSaveDialog, nullptr, CLSCTX_ALL, IID_IFileSaveDialog, reinterpret_cast<void**>(&pFileSave)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-  if (SUCCEEDED(hr) && (nullptr != pFileSave)) {
+  if (SUCCEEDED(hResult) && (nullptr != pFileSave)) {
 	constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-	hr = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-	hr += pFileSave->SetFileTypeIndex(0);
-	hr += pFileSave->SetTitle(L"Save Bitmap");
+	hResult = pFileSave->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+	hResult += pFileSave->SetFileTypeIndex(0);
+	hResult += pFileSave->SetTitle(L"Save Bitmap");
 	auto const bmpName = UTF16BMPname->filename().wstring();
-	hr += pFileSave->SetFileName(bmpName.c_str());
-	hr += pFileSave->SetDefaultExtension(L"bmp");
-	if (SUCCEEDED(hr)) {
-	  hr = pFileSave->Show(nullptr);
-	  if (SUCCEEDED(hr)) {
+	hResult += pFileSave->SetFileName(bmpName.c_str());
+	hResult += pFileSave->SetDefaultExtension(L"bmp");
+	if (SUCCEEDED(hResult)) {
+	  hResult = pFileSave->Show(nullptr);
+	  if (SUCCEEDED(hResult)) {
 		auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-		hr          = pFileSave->GetResult(&pItem);
-		if (SUCCEEDED(hr) && (nullptr != pItem)) {
+		hResult          = pFileSave->GetResult(&pItem);
+		if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pszFilePath = PWSTR {nullptr};
-		  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-		  if (SUCCEEDED(hr)) {
+		  hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+		  if (SUCCEEDED(hResult)) {
 			fileName.assign(pszFilePath);
 			CoTaskMemFree(pszFilePath);
 			return true;
@@ -367,39 +367,39 @@ auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
   if ((nullptr != fileName) && (nullptr != directory)) {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-	auto hr = CoCreateInstance(
+	auto hResult = CoCreateInstance(
 	    CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-	if (SUCCEEDED(hr) && (nullptr != pFileOpen)) {
+	if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
 	  auto dwOptions = DWORD {};
-	  hr             = pFileOpen->GetOptions(&dwOptions);
-	  if (SUCCEEDED(hr)) {
+	  hResult             = pFileOpen->GetOptions(&dwOptions);
+	  if (SUCCEEDED(hResult)) {
 		static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		hr = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hr += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
-		hr += pFileOpen->SetTitle(L"Open Thred File");
+		hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
+		hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+		hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
 		// If we want to, we can set the default directory rather than using the OS mechanism for last used
 		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
 		// NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
-		hr += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
-		hr += pFileOpen->SetFolder(psiFrom);
+		hResult += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+		hResult += pFileOpen->SetFolder(psiFrom);
 		if (nullptr != psiFrom) {
 		  psiFrom->Release();
 		}
 #else
 		UNREFERENCED_PARAMETER(directory);
 #endif
-		if (SUCCEEDED(hr)) {
-		  hr = pFileOpen->Show(nullptr);
-		  if (SUCCEEDED(hr)) {
+		if (SUCCEEDED(hResult)) {
+		  hResult = pFileOpen->Show(nullptr);
+		  if (SUCCEEDED(hResult)) {
 			auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-			hr          = pFileOpen->GetResult(&pItem);
-			if (SUCCEEDED(hr) && (nullptr != pItem)) {
+			hResult          = pFileOpen->GetResult(&pItem);
+			if (SUCCEEDED(hResult) && (nullptr != pItem)) {
 			  // NOLINTNEXTLINE(readability-qualified-auto)
 			  auto pszFilePath = PWSTR {nullptr};
-			  hr               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-			  if (SUCCEEDED(hr)) {
+			  hResult               = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			  if (SUCCEEDED(hResult)) {
 				fileName->assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);
 				return true;

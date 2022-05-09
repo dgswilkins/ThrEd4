@@ -20,10 +20,10 @@
 #define WFILE WIDEN(__FILE__)
 #define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
 template <typename... Args>
-void makeDebugString(int line, const wchar_t* fileName, const wchar_t* X, Args&&... args) {
-  auto const x = fmt::format(L"{}({}) : {}", fileName, line, X);
-  auto const y = fmt::format(x, std::forward<Args>(args)...);
-  OutputDebugString(y.c_str());
+void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Args&&... args) {
+  auto const strY = fmt::format(L"{}({}) : {}", fileName, line, strX);
+  auto const strZ = fmt::format(strY, std::forward<Args>(args)...);
+  OutputDebugString(strZ.c_str());
 }
 
 #else
@@ -54,8 +54,8 @@ constexpr float   DEFSPACE = 0.45F;             // default stitch spacing
 constexpr float   PI_F     = 3.1415927F;        // PI to single precision
 constexpr float   PI_F2    = PI_F * 2.0F;       //
 constexpr float   PI_FHALF = PI_F / 2.0F;       //
-constexpr double  PI       = 3.141592653589793; // PI to double precision
-constexpr double  PI2      = PI * 2.0;          //
+constexpr double  PI_D       = 3.141592653589793; // PI to double precision
+constexpr double  PI_D2      = PI_D * 2.0;          //
 constexpr float   USPAC    = 15.0F;             // underlay fill spacing
 constexpr float   URAT     = 0.75F;             // ratio of underlay stitch to satin border size
 
