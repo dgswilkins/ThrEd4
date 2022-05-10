@@ -2563,7 +2563,7 @@ void fi::fnvrt(std::vector<F_POINT>&    currentFillVertices,
                std::vector<uint32_t>&   groupIndexSequence,
                std::vector<SMAL_PNT_L>& lineEndpoints) {
   auto const [min, max] = std::minmax_element(
-      std::next(currentFillVertices.begin(), 1),
+      currentFillVertices.begin(),
       currentFillVertices.end(),
       [](F_POINT const& first, F_POINT const& second) { return first.x < second.x; });
   auto const highX           = max->x;
