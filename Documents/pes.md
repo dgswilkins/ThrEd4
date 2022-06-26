@@ -52,7 +52,7 @@ above, and is expected on later machines.
 ## PES File Format
 
 A PES format file consists of a version string followed by the PEC seek value
-and two main sections, the [PES Section](#pes-objects) and the [PEC Section](#pec-format).
+and two main sections, the [PES Section](#pes-objects) and the [PEC Section](#pec-section).
 The PES section must immediately follow the seek value, so the version
 string and the PEC seek value are often considered to be part of the PES
 header. The PEC section can occur anywhere after that but the seek value must
@@ -82,9 +82,10 @@ order unless otherwise noted.
 | `u32`  | 4     | 32 bit unsigned integer                                                                              |
 | `f32`  | 4     | 32 bit [floating point number](https://en.wikipedia.org/wiki/Single-precision_floating-point_format) |
 
-## PES Objects
+## Common PES Objects
 
-Some basic forms are found within many different PES sections.
+Some forms such as [`geometry'](#geometry) and the [block description](#block-description) are found 
+within many different PES sections.
 
 ### Geometry
 
@@ -135,95 +136,95 @@ These are the preamble for most shape forms like CEmbRect and CEmbCirc
 sections and effectively all objects which can be filled shapes with
 stitches. (Much credit to Josh Varga for figuring this data out).
 
-| Type           | Bytes | Value                | Description                                                                  |
-| -------------- | ----- | -------------------- | ---------------------------------------------------------------------------- |
-| `section`      | 40    |                      | [Block Geometry](#geometry "Extents & Affine Transformation")                |
-| `s16`          | 2     |                      | Is Open Path?                                                                |
-| `s16`          | 2     |                      | UseOutline                                                                   |
-| `s16`          | 2     |                      | Outline Stitch Type, 0 = Zigzag, 1 = run Stitch                              |
-| `s16`          | 2     |                      | outline_color_index                                                        |
-| `s16`          | 2     |                      | Zigzag Width                                                                 |
-| `s16`          | 2     |                      | Zigzag Density                                                               |
-| `s16`          | 2     |                      | Outline Run Pitch                                                            |
-| `s16`          | 2     |                      | Run Stitch Run Times                                                         |
-| `s16`          | 2     |                      | Triple Stitch Run Pitch                                                      |
-| `s16`          | 2     |                      | Use OutLine Under Sewing.                                                    |
-| `s16`          | 2     |                      | Use Sharp Corners                                                            |
-| `section`      | ?     |                      | [Motif](#motif)                                                              |
-| `s16`          | 2     |                      | EStitchOrVStitch?                                                            |
-| `s16`          | 2     |                      | EvStitchTallWidth                                                            |
-| `s16`          | 2     |                      | EvStitchHeight                                                               |
-| `s16`          | 2     |                      | EvStitchPointWidth                                                           |
-| `s16`          | 2     |                      | EVStitchRunTimes                                                             |
-| `s16`          | 2     |                      | EvStitchStrokeTimes                                                          |
-| `s16`          | 2     |                      | EvStitchArrange                                                              |
-| `s16`          | 2     |                      | Use Fill?                                                                    |
-| `s16`          | 2     |                      | Fill Type                                                                    |
-| `s16`          | 2     |                      | Region Density                                                               |
-| `s16`          | 2     |                      | Use Gradation                                                                |
-| `short_array`  | 2 × N |                      | GradationValues                                                              |
-| `s16`          | 2     |                      | UseAdditionalColorInGradation                                                |
-| `s16`          | 2     |                      | Gradation Second Color                                                       |
-| `s16`          | 2     |                      | IsStitchDirectionVariable                                                    |
-| `s16`          | 2     |                      | StitchDirection                                                              |
-| `s16`          | 2     |                      | fill color, index of the fill color value.                                   |
-| `s16`          | 2     |                      | BaseSewingStepPitch                                                          |
-| `s16`          | 2     |                      | BaseSewingStepFrequency                                                      |
-| `s16`          | 2     |                      | BaseSewingStitchType                                                         |
-| `s16`          | 2     |                      | FillHalfStitch                                                               |
-| `s16`          | 2     |                      | useFillAreaUnderSewing                                                       |
-| `s16`          | 2     |                      | FillAreaUnderSewingType, 0 = one direction, 1 = both directions.             |
-| `s16`          | 2     |                      | RunningStitchPath, (comment "half-stitch?")                                  |
-| `s16`          | 2     | `20`                 | ProgrammableFillPatternIndex (comment "20")                                  |
-| `s16`          | 2     |                      | ProgrammableFillWidth                                                        |
-| `s16`          | 2     |                      | ProgrammableFillHeight                                                       |
-| `s16`          | 2     |                      | ProgrammableFillRowOrColumn                                                  |
-| `s16`          | 2     |                      | ProgrammableFillRowOffset                                                    |
-| `s16`          | 2     |                      | ProgrammableFillColumnOffset                                                 |
-| `s16`          | 2     |                      | ProgrammableFillDirection (comment: "WHERE IS PULL COMP")                    |
-| `s16`          | 2     |                      | UseBaseSewing (comment: "Motif section")                                     |
-| `s16`          | 2     |                      | Pull Compensation                                                            |
-| `s16`          | 2     | `0`, false (default) | UseMotifPattern1                                                             |
-| `section`      | ?     |                      | [Motif](#motif)                                                              |
-| `s16`          | 2     | `0`, false (default) | UseMotifPattern2                                                             |
-| `section`      | ?     |                      | [Motif](#motif)                                                              |
-| `s16`          | 2     |                      | MotifRowOffset                                                               |
-| `s16`          | 2     |                      | MotifStitchDirection                                                         |
-| `s16`          | 2     |                      | MotifRunPitch                                                                |
-| `s16`          | 2     |                      | pipingStitchDirection                                                        |
-| `s16`          | 2     |                      | pipingStitchDensity                                                          |
-| `s16`          | 2     |                      | pipingStitchRunPitch                                                         |
-| `s16`          | 2     |                      | pipingStitchRunFrequency                                                     |
-| `s16`          | 2     |                      | CrossStitchSizeMeasure, 0 for size, 1 for ct, (comment: CrossStitch section) |
-| `s16`          | 2     | `25` (default)       | CrossStitchSizeInMM                                                          |
-| `s16`          | 2     | `2` (default)        | CrossStitchTimes                                                             |
-| `s16`          | 2     | `20` (default)       | RadialDensity                                                                |
-| `s16`          | 2     | `20` (default)       | RadialRunPitch                                                               |
-| `s16`          | 2     |                      | RadialCenterX (comment: 961)                                                 |
-| `s16`          | 2     |                      | RadialCenterY (comment: 847)                                                 |
-| `s16`          | 2     | `20` (default)       | ConcentricCircleDensity                                                      |
-| `s16`          | 2     | `20` (default)       | ConcentricCircleRunPitch                                                     |
-| `s16`          | 2     |                      | ConcentricCircleCenterX (comment: 961)                                       |
-| `s16`          | 2     |                      | ConcentricCircleCenterY (comment: 847)                                       |
-| `s16`          | 2     | `20` (default)       | SpiralDensity                                                                |
-| `s16`          | 2     | `20` (default)       | SpiralRunPitch                                                               |
-| `s16`          | 2     |                      | StipplingRunPitch                                                            |
-| `s16`          | 2     |                      | StipplingSpacing                                                             |
-| `s16`          | 2     |                      | OutlineEntryv1                                                               |
-| `float`        | 4     |                      | OutlineEntry                                                                 |
-| `s16`          | 2     |                      | OutlineExitv1                                                                |
-| `float`        | 4     |                      | OutlineExit                                                                  |
-| `s16`          | 2     |                      | RegionEntryv1                                                                |
-| `float`        | 4     |                      | RegionEntry                                                                  |
-| `s16`          | 2     |                      | RegionExit                                                                   |
-| `float`        | 4     |                      | RegionExitv1                                                                 |
+| Type           | Bytes | Value                       | Description                                                                  |
+| -------------- | ----- | --------------------------- | ---------------------------------------------------------------------------- |
+| `section`      | 40    | [Block Geometry](#geometry) |  Extents & Affine Transformation                                             |
+| `s16`          | 2     |                             | Is Open Path?                                                                |
+| `s16`          | 2     |                             | UseOutline                                                                   |
+| `s16`          | 2     |                             | Outline Stitch Type, 0 = Zigzag, 1 = run Stitch                              |
+| `s16`          | 2     |                             | outline_color_index                                                          |
+| `s16`          | 2     |                             | Zigzag Width                                                                 |
+| `s16`          | 2     |                             | Zigzag Density                                                               |
+| `s16`          | 2     |                             | Outline Run Pitch                                                            |
+| `s16`          | 2     |                             | Run Stitch Run Times                                                         |
+| `s16`          | 2     |                             | Triple Stitch Run Pitch                                                      |
+| `s16`          | 2     |                             | Use OutLine Under Sewing.                                                    |
+| `s16`          | 2     |                             | Use Sharp Corners                                                            |
+| `section`      | ?     | [Motif](#motif)             |                                                                              |
+| `s16`          | 2     |                             | EStitchOrVStitch?                                                            |
+| `s16`          | 2     |                             | EvStitchTallWidth                                                            |
+| `s16`          | 2     |                             | EvStitchHeight                                                               |
+| `s16`          | 2     |                             | EvStitchPointWidth                                                           |
+| `s16`          | 2     |                             | EVStitchRunTimes                                                             |
+| `s16`          | 2     |                             | EvStitchStrokeTimes                                                          |
+| `s16`          | 2     |                             | EvStitchArrange                                                              |
+| `s16`          | 2     |                             | Use Fill?                                                                    |
+| `s16`          | 2     |                             | Fill Type                                                                    |
+| `s16`          | 2     |                             | Region Density                                                               |
+| `s16`          | 2     |                             | Use Gradation                                                                |
+| `short_array`  | 2 × N |                             | GradationValues                                                              |
+| `s16`          | 2     |                             | UseAdditionalColorInGradation                                                |
+| `s16`          | 2     |                             | Gradation Second Color                                                       |
+| `s16`          | 2     |                             | IsStitchDirectionVariable                                                    |
+| `s16`          | 2     |                             | StitchDirection                                                              |
+| `s16`          | 2     |                             | fill color, index of the fill color value.                                   |
+| `s16`          | 2     |                             | BaseSewingStepPitch                                                          |
+| `s16`          | 2     |                             | BaseSewingStepFrequency                                                      |
+| `s16`          | 2     |                             | BaseSewingStitchType                                                         |
+| `s16`          | 2     |                             | FillHalfStitch                                                               |
+| `s16`          | 2     |                             | useFillAreaUnderSewing                                                       |
+| `s16`          | 2     |                             | FillAreaUnderSewingType, 0 = one direction, 1 = both directions.             |
+| `s16`          | 2     |                             | RunningStitchPath, (comment "half-stitch?")                                  |
+| `s16`          | 2     | `20`                        | ProgrammableFillPatternIndex (comment "20")                                  |
+| `s16`          | 2     |                             | ProgrammableFillWidth                                                        |
+| `s16`          | 2     |                             | ProgrammableFillHeight                                                       |
+| `s16`          | 2     |                             | ProgrammableFillRowOrColumn                                                  |
+| `s16`          | 2     |                             | ProgrammableFillRowOffset                                                    |
+| `s16`          | 2     |                             | ProgrammableFillColumnOffset                                                 |
+| `s16`          | 2     |                             | ProgrammableFillDirection (comment: "WHERE IS PULL COMP")                    |
+| `s16`          | 2     |                             | UseBaseSewing (comment: "Motif section")                                     |
+| `s16`          | 2     |                             | Pull Compensation                                                            |
+| `s16`          | 2     | `0`, false (default)        | UseMotifPattern1                                                             |
+| `section`      | ?     | [Motif](#motif)             | Motif                                                                        |
+| `s16`          | 2     | `0`, false (default)        | UseMotifPattern2                                                             |
+| `section`      | ?     | [Motif](#motif)             | Motif                                                                        |
+| `s16`          | 2     |                             | MotifRowOffset                                                               |
+| `s16`          | 2     |                             | MotifStitchDirection                                                         |
+| `s16`          | 2     |                             | MotifRunPitch                                                                |
+| `s16`          | 2     |                             | pipingStitchDirection                                                        |
+| `s16`          | 2     |                             | pipingStitchDensity                                                          |
+| `s16`          | 2     |                             | pipingStitchRunPitch                                                         |
+| `s16`          | 2     |                             | pipingStitchRunFrequency                                                     |
+| `s16`          | 2     |                             | CrossStitchSizeMeasure, 0 for size, 1 for ct, (comment: CrossStitch section) |
+| `s16`          | 2     | `25` (default)              | CrossStitchSizeInMM                                                          |
+| `s16`          | 2     | `2` (default)               | CrossStitchTimes                                                             |
+| `s16`          | 2     | `20` (default)              | RadialDensity                                                                |
+| `s16`          | 2     | `20` (default)              | RadialRunPitch                                                               |
+| `s16`          | 2     |                             | RadialCenterX (comment: 961)                                                 |
+| `s16`          | 2     |                             | RadialCenterY (comment: 847)                                                 |
+| `s16`          | 2     | `20` (default)              | ConcentricCircleDensity                                                      |
+| `s16`          | 2     | `20` (default)              | ConcentricCircleRunPitch                                                     |
+| `s16`          | 2     |                             | ConcentricCircleCenterX (comment: 961)                                       |
+| `s16`          | 2     |                             | ConcentricCircleCenterY (comment: 847)                                       |
+| `s16`          | 2     | `20` (default)              | SpiralDensity                                                                |
+| `s16`          | 2     | `20` (default)              | SpiralRunPitch                                                               |
+| `s16`          | 2     |                             | StipplingRunPitch                                                            |
+| `s16`          | 2     |                             | StipplingSpacing                                                             |
+| `s16`          | 2     |                             | OutlineEntryv1                                                               |
+| `float`        | 4     |                             | OutlineEntry                                                                 |
+| `s16`          | 2     |                             | OutlineExitv1                                                                |
+| `float`        | 4     |                             | OutlineExit                                                                  |
+| `s16`          | 2     |                             | RegionEntryv1                                                                |
+| `float`        | 4     |                             | RegionEntry                                                                  |
+| `s16`          | 2     |                             | RegionExit                                                                   |
+| `float`        | 4     |                             | RegionExitv1                                                                 |
 
 ### Motif
 
-| Type      | Bytes | Description                |
-| --------- | ----- | -------------------------- |
-| `s16`     | 2     | Tile line count            |
-| `section` |       | [`tile_lines`](#tile-line) |
+| Type      | Bytes | Value                      | Description                |
+| --------- | ----- | -------------------------- | -------------------------- |
+| `s16`     | 2     |                            | Tile line count            |
+| `section` |       | [`tile_lines`](#tile-line) |                            |
 
 ### Tile line
 
@@ -257,164 +258,164 @@ threads.
 | ------ | ----- | ---------- | ---------------------------------------------------- |
 | `char` | 4     | `"#PES"`   | Identification                                       |
 | `char` | 4     | `"0001"`   | Version 1                                            |
-| `u32`  | 4     |            | Absolute [`PEC_section`](#pec-section) byte offse    |
+| `u32`  | 4     |            | Absolute [`PEC_section`](#pec-section) byte offset   |
 | `u16`  | 2     | `0` \| `1` | Hoop size where `0` is 100×100 mm², else 130×180 mm² |
 | `u16`  | 2     | `0` \| `1` | Use Existing Design Area                             |
-| `u16`  | 2     |            | [segment block count](#PES-CSewSeg-sectionCSewSeg "wikilink") The number of objects. In version 1 this is the same as the number of CSewSeg blocks, as distinct from the number of segments within that block. In PE-Design objects are the things you can select. |
+| `u16`  | 2     |            | [segment block count](#csewseg) The number of objects. In version 1 this is the same as the number of CSewSeg blocks, as distinct from the number of segments within that block. In PE-Design objects are the things you can select. |
 
 ### Version 2 header section
 
-| Type      | Bytes | Value    | Description                                        |
-| --------- | ----- | -------- | -------------------------------------------------- |
-| `char`    | 4     | `"#PES"` | Identification                                     |
-| `char`    | 4     | `"0020"` | Version 2                                          |
-| `u32`     | 4     |          | Absolute [`PEC_section`](#pec-section) byte offset |
-| `section` | 4     |          | [`hoop_size`](#hoop-size-subsection)               |
-| `u16`     | 2     |          | Hoop Rotation, 90° 1 = rotate.                     |
-| `u16`     | 2     |          | Unknown, design page background color?             |
-| `u16`     | 2     |          | Unknown, design page foreground color?             |
-| `u16`     | 2     |          | Unknown, show grid?                                |
-| `u16`     | 2     |          | Unknown, with axes?                                |
-| `u16`     | 2     |          | Unknown, snap to grid?                             |
-| `u16`     | 2     |          | Unknown, grid interval?                            |
-| `u16`     | 2     |          | Unknown, P9 curves?                                |
-| `u16`     | 2     |          | Unknown, optimize entry-exit points?               |
+| Type      | Bytes | Value                                | Description                                        |
+| --------- | ----- | ------------------------------------ | -------------------------------------------------- |
+| `char`    | 4     | `"#PES"`                             | Identification                                     |
+| `char`    | 4     | `"0020"`                             | Version 2                                          |
+| `u32`     | 4     |                                      | Absolute [`PEC_section`](#pec-section) byte offset |
+| `section` | 4     | [`hoop_size`](#hoop-size-subsection) | Hoop size in mm                                    |
+| `u16`     | 2     |                                      | Hoop Rotation, 90° 1 = rotate.                     |
+| `u16`     | 2     |                                      | Unknown, design page background color?             |
+| `u16`     | 2     |                                      | Unknown, design page foreground color?             |
+| `u16`     | 2     |                                      | Unknown, show grid?                                |
+| `u16`     | 2     |                                      | Unknown, with axes?                                |
+| `u16`     | 2     |                                      | Unknown, snap to grid?                             |
+| `u16`     | 2     |                                      | Unknown, grid interval?                            |
+| `u16`     | 2     |                                      | Unknown, P9 curves?                                |
+| `u16`     | 2     |                                      | Unknown, optimize entry-exit points?               |
 
 ### Version 2.5 header section
 
-| Type      | Bytes | Value         | Description                                                 |
-| --------- | ----- | ------------- | ----------------------------------------------------------- |
-| `char`    | 4     | `"#PES"`      | Identification                                              |
-| `char`    | 4     | `"0025"`      | Version 2.5                                                 |
-| `u32`     | 4     |               | Absolute [`PEC_section`](#pec-section) byte offset          |
-| `u16`     | 2     | `1` (typical) | Unknown                                                     |
-| `u16`     | 2     | `0` (typical) | Unknown                                                     |
-| `section` | 4     |               | [`hoop_size`](#hoop-size-subsection)                        |
-| `u16`     | 2     |               | Hoop Rotation, 90° 1 = rotate.                              |
-| `u16`     | 2     |               | Unknown, design page background color?                      |
-| `u16`     | 2     |               | Unknown, design page foreground color?                      |
-| `u16`     | 2     |               | Unknown, show grid?                                         |
-| `u16`     | 2     |               | Unknown, with axes?                                         |
-| `u16`     | 2     |               | Unknown, snap to grid?                                      |
-| `u16`     | 2     |               | Unknown, grid interval?                                     |
-| `u16`     | 2     |               | Unknown, P9 curves?                                         |
-| `u16`     | 2     |               | Unknown, optimize entry-exit points?                        |
-| `u16`     | 2     | `1` (typical) | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
+| Type      | Bytes | Value                                | Description                                        |
+| --------- | ----- | ------------------------------------ | -------------------------------------------------- |
+| `char`    | 4     | `"#PES"`                             | Identification                                     |
+| `char`    | 4     | `"0025"`                             | Version 2.5                                        |
+| `u32`     | 4     |                                      | Absolute [`PEC_section`](#pec-section) byte offset |
+| `u16`     | 2     | `1` (typical)                        | Unknown                                            |
+| `u16`     | 2     | `0` (typical)                        | Unknown                                            |
+| `section` | 4     | [`hoop_size`](#hoop-size-subsection) | Hoop size in mm                                    |
+| `u16`     | 2     |                                      | Hoop Rotation, 90° 1 = rotate.                     |
+| `u16`     | 2     |                                      | Unknown, design page background color?             |
+| `u16`     | 2     |                                      | Unknown, design page foreground color?             |
+| `u16`     | 2     |                                      | Unknown, show grid?                                |
+| `u16`     | 2     |                                      | Unknown, with axes?                                |
+| `u16`     | 2     |                                      | Unknown, snap to grid?                             |
+| `u16`     | 2     |                                      | Unknown, grid interval?                            |
+| `u16`     | 2     |                                      | Unknown, P9 curves?                                |
+| `u16`     | 2     |                                      | Unknown, optimize entry-exit points?               |
+| `u16`     | 2     | `1` (typical)                        | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
 
 ### Version 3 header section
 
-| Type      | Bytes | Value                | Description                                                 |
-| --------- | ----- | -------------------- | ----------------------------------------------------------- |
-| `char`    | 4     | `"#PES"`             | Identification                                              |
-| `char`    | 4     | `"0030"`             | Version 3                                                   |
-| `u32`     | 4     |                      | Absolute [`PEC_section`](#pec-section) byte offset          |
-| `u16`     | 2     | `1` (typical)        | Unknown                                                     |
-| `char`    | 2     | `01` \| `02` \| `10` | Subversion?                                                 |
-| `section` | 4     |                      | [`hoop_size`](#hoop-size-subsection)                        |
-| `u16`     | 2     |                      | Hoop Rotation, 90° 1 = rotate.                              |
-| `u16`     | 2     |                      | Unknown, design page background color?                      |
-| `u16`     | 2     |                      | Unknown, design page foreground color?                      |
-| `u16`     | 2     |                      | Unknown, show grid?                                         |
-| `u16`     | 2     |                      | Unknown, with axes?                                         |
-| `u16`     | 2     |                      | Unknown, snap to grid?                                      |
-| `u16`     | 2     |                      | Unknown, grid interval?                                     |
-| `u16`     | 2     |                      | Unknown, P9 curves?                                         |
-| `u16`     | 2     |                      | Unknown, optimize entry-exit points?                        |
+| Type      | Bytes | Value                                | Description                                        |
+| --------- | ----- | ------------------------------------ | -------------------------------------------------- |
+| `char`    | 4     | `"#PES"`                             | Identification                                     |
+| `char`    | 4     | `"0030"`                             | Version 3                                          |
+| `u32`     | 4     |                                      | Absolute [`PEC_section`](#pec-section) byte offset |
+| `u16`     | 2     | `1` (typical)                        | Unknown                                            |
+| `char`    | 2     | `01` \| `02` \| `10`                 | Subversion?                                        |
+| `section` | 4     | [`hoop_size`](#hoop-size-subsection) | Hoop size in mm                                    |
+| `u16`     | 2     |                                      | Hoop Rotation, 90° 1 = rotate.                     |
+| `u16`     | 2     |                                      | Unknown, design page background color?             |
+| `u16`     | 2     |                                      | Unknown, design page foreground color?             |
+| `u16`     | 2     |                                      | Unknown, show grid?                                |
+| `u16`     | 2     |                                      | Unknown, with axes?                                |
+| `u16`     | 2     |                                      | Unknown, snap to grid?                             |
+| `u16`     | 2     |                                      | Unknown, grid interval?                            |
+| `u16`     | 2     |                                      | Unknown, P9 curves?                                |
+| `u16`     | 2     |                                      | Unknown, optimize entry-exit points?               |
 
 ### Version 4 header section
 
-| Type      | Bytes | Value                | Description                                                 |
-| --------- | ----- | -------------------- | ----------------------------------------------------------- |
-| `char`    | 4     | `"#PES"`             | Identification                                              |
-| `char`    | 4     | `"0040"`             | Version 4                                                   |
-| `u32`     | 4     |                      | Absolute [`PEC_section`](#pec-section) byte offset          |
-| `u16`     | 2     | `1` (typical)        | Unknown                                                     |
-| `char`    | 2     | `01` \| `02` \| `10` | Subversion?                                                 |
-| `section` |       |                      | [`description_strings`](#description-strings-subsection)    |
-| `u8`      | 2     | `0` (typical)        | Unknown                                                     |
-| `section` | 4     |                      | [`hoop_size`](#hoop-size-subsection)                        |
-| `u16`     | 2     |                      | Hoop Rotation, 90° 1 = rotate.                              |
-| `u16`     | 2     | `7` (typical)        | Unknown, design page background color?                      |
-| `u16`     | 2     | `19` (typical)       | Unknown, design page foreground color?                      |
-| `u16`     | 2     | `0` \| `1` \| ?      | Unknown, show grid?                                         |
-| `u16`     | 2     | `1` (typical)        | Unknown, with axes?                                         |
-| `u16`     | 2     | `0` \| `1` \| ?      | Unknown, snap to grid?                                      |
-| `u16`     | 2     | `100` (typical)      | Unknown, grid interval?                                     |
-| `u8`      | 1     | `1` (typical)        | Unknown                                                     |
-| `u8`      | 7     | `0` (typical)        | Unknown                                                     |
-| `u16`     | 2     | `1` (typical)        | Unknown                                                     |
+| Type      | Bytes | Value                                                    | Description                                        |
+| --------- | ----- | -------------------------------------------------------- | -------------------------------------------------- |
+| `char`    | 4     | `"#PES"`                                                 | Identification                                     |
+| `char`    | 4     | `"0040"`                                                 | Version 4                                          |
+| `u32`     | 4     |                                                          | Absolute [`PEC_section`](#pec-section) byte offset |
+| `u16`     | 2     | `1` (typical)                                            | Unknown                                            |
+| `char`    | 2     | `01` \| `02` \| `10`                                     | Subversion?                                        |
+| `section` |       | [`description_strings`](#description-strings-subsection) |                                                    |
+| `u8`      | 2     | `0` (typical)                                            | Unknown                                            |
+| `section` | 4     | [`hoop_size`](#hoop-size-subsection)                     | Hoop size in mm                                    |
+| `u16`     | 2     |                                                          | Hoop Rotation, 90° 1 = rotate.                     |
+| `u16`     | 2     | `7` (typical)                                            | Unknown, design page background color?             |
+| `u16`     | 2     | `19` (typical)                                           | Unknown, design page foreground color?             |
+| `u16`     | 2     | `0` \| `1` \| ?                                          | Unknown, show grid?                                |
+| `u16`     | 2     | `1` (typical)                                            | Unknown, with axes?                                |
+| `u16`     | 2     | `0` \| `1` \| ?                                          | Unknown, snap to grid?                             |
+| `u16`     | 2     | `100` (typical)                                          | Unknown, grid interval?                            |
+| `u8`      | 1     | `1` (typical)                                            | Unknown                                            |
+| `u8`      | 7     | `0` (typical)                                            | Unknown                                            |
+| `u16`     | 2     | `1` (typical)                                            | Unknown                                            |
 
 ### Version 5 header section
 
-| Type      | Bytes    | Value                | Description                                              |
-| --------- | -------- | -------------------- | -------------------------------------------------------- |
-| `char`    | 4        | `"#PES"`             | Identification                                           |
-| `char`    | 4        | `"0050"`             | Version 5                                                |
-| `u32`     | 4        |                      | Absolute [`PEC_section`](#pec-section) byte offset       |
-| `u16`     | 2        | `1` (typical)        | "Hoop Size Indicator"                                    |
-| `char`    | 2        | `01` \| `02` \| `10` | Subversion?                                              |
-| `section` |          |                      | [`description_strings`](#description-strings-subsection) |
-| `u16`     | 2        | `0` (typical)        | "Optimize Hoop Change"                                   |
-| `section` | 4        |                      | [`hoop_size`](#hoop-size-subsection)                     |
-| `u16`     | 2        |                      | Hoop Rotation, 90° 1 = rotate.                           |
-| `u16`     | 2        | `7` (typical)        | Design Page Background Color?                            |
-| `u16`     | 2        | `19` (typical)       | Design Page Foreground Color                             |
-| `u16`     | 2        | `0` \| `1` \| ?      | "Show Grid"                                              |
-| `u16`     | 2        | `1` (typical)        | "With Axes"                                              |
-| `u16`     | 2        | `0` \| `1` \| ?      | "Snap To Grid"                                           |
-| `u16`     | 2        | `100` (typical)      | "Grid Interval"                                          |
-| `u16`     | 2        | `1` (typical)        | Unknown                                                  |
-| `u16`     | 2        | `0` (typical)        | "OptimizeEntryExitPoints"                                |
-| `u8`      | 1        | _S0_ `0` (typical)   | "fromImageStringLength"                                  |
-| `char`    | _S0_     |                        | Path string                                            |
-| `section` | 24       |                      | [`affine_transform`](#affine-transform)                  |
-| `u16`     | 2        | _S1_ `0` (typical)   | Number of programmable fill patterns                     |
-| `section` | _S1_ * ? |                        | [`fill_patterns`](#programmable-fill-subsection)       |
-| `u16`     | 2        | _S2_ `0` (typical)   | Number of programmable Motif                             |
-| `section` | _S2_ * ? |                        | [`motif`](#motif)                                      |
-| `u16`     | 2        | _S3_ `0` (typical)   | Number of feather patterns                               |
-| `section` | _S3_ * ? |                        | [`feather_patterns`](#feather-pattern-subsection)      |
-| `section` |          |                      | [`color_list`](#color-list-subsection)                   |
-| `u16`     | 2        | `1` (typical)        | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
+| Type      | Bytes    | Value                                                    | Description                                        |
+| --------- | -------- | -------------------------------------------------------- | -------------------------------------------------- |
+| `char`    | 4        | `"#PES"`                                                 | Identification                                     |
+| `char`    | 4        | `"0050"`                                                 | Version 5                                          |
+| `u32`     | 4        |                                                          | Absolute [`PEC_section`](#pec-section) byte offset |
+| `u16`     | 2        | `1` (typical)                                            | "Hoop Size Indicator"                              |
+| `char`    | 2        | `01` \| `02` \| `10`                                     | Subversion?                                        |
+| `section` |          | [`description_strings`](#description-strings-subsection) |                                                    |
+| `u16`     | 2        | `0` (typical)                                            | "Optimize Hoop Change"                             |
+| `section` | 4        | [`hoop_size`](#hoop-size-subsection)                     | Hoop size in mm                                    |
+| `u16`     | 2        |                                                          | Hoop Rotation, 90° 1 = rotate.                     |
+| `u16`     | 2        | `7` (typical)                                            | Design Page Background Color?                      |
+| `u16`     | 2        | `19` (typical)                                           | Design Page Foreground Color                       |
+| `u16`     | 2        | `0` \| `1` \| ?                                          | "Show Grid"                                        |
+| `u16`     | 2        | `1` (typical)                                            | "With Axes"                                        |
+| `u16`     | 2        | `0` \| `1` \| ?                                          | "Snap To Grid"                                     |
+| `u16`     | 2        | `100` (typical)                                          | "Grid Interval"                                    |
+| `u16`     | 2        | `1` (typical)                                            | Unknown                                            |
+| `u16`     | 2        | `0` (typical)                                            | "OptimizeEntryExitPoints"                          |
+| `u8`      | 1        | _S0_ `0` (typical)                                       | "fromImageStringLength"                            |
+| `char`    | _S0_     |                                                          | Path string                                        |
+| `section` | 24       | [`affine_transform`](#affine-transform)                  |                                                    |
+| `u16`     | 2        | _S1_ `0` (typical)                                       | Number of programmable fill patterns               |
+| `section` | _S1_ * ? | [`fill_patterns`](#programmable-fill-subsection)         |                                                    |
+| `u16`     | 2        | _S2_ `0` (typical)                                       | Number of programmable Motif                       |
+| `section` | _S2_ * ? | [`motif`](#motif)                                        |                                                    |
+| `u16`     | 2        | _S3_ `0` (typical)                                       | Number of feather patterns                         |
+| `section` | _S3_ * ? | [`feather_patterns`](#feather-pattern-subsection)        |                                                    |
+| `section` |          | [`color_list`](#color-list-subsection)                   |                                                    |
+| `u16`     | 2        | `1` (typical)                                            | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
 
 ### Version 6 header section
 
-| Type      | Bytes    | Value                | Description                                                        |
-| --------- | -------- | -------------------- | ------------------------------------------------------------------ |
-| `char`    | 4        | `"#PES"`             | PES Identification                                                 |
-| `char`    | 4        | `"0060"`             | Version 6                                                          |
-| `u32`     | 4        |                      | Absolute [`PEC_section`](#pec-section) byte offset                 |
-| `u16`     | 2        | `1` (typical)        | Hoop Size Indicator                                                |
-| `char`    | 2        | `01` \| `02` \| `10` | Subversion?                                                        |
-| `section` |          |                      | [`description_strings`](#description-strings-subsection)           |
-| `u16`     | 2        | `0` (typical)        | Optimize Hoop Change                                               |
-| `u16`     | 2        | `0` (typical)        | Design Page Is Custom                                              |
-| `section` | 4        |                      | [`hoop_size`](#hoop-size-subsection)                               |
-| `u16`     | 2        |                      | Hoop Rotation, 90° 1 = rotate.                                     |
-| `u16`     | 2        | `200` (typical)      | DesignWidth                                                        |
-| `u16`     | 2        | `200` (typical)      | DesignHeight                                                       |
-| `u16`     | 2        | `100` (typical)      | DesignPageWidth                                                    |
-| `u16`     | 2        | `100` (typical)      | DesignPageHeight                                                   |
-| `u16`     | 2        | `100` (typical)      | Undisplayed Unknown Design Property, must fall within same range as designPageWidth and Height. Makes no difference other than validation check.|
-| `u16`     | 2        | `7` (typical)        | "Design Page Background Color"                                     |
-| `u16`     | 2        | `19` (typical)       | "Design Page Foreground Color"                                     |
-| `u16`     | 2        | `0` \| `1` \| ?      | "Show Grid"                                                        |
-| `u16`     | 2        | `1` (typical)        | "With Axes"                                                        |
-| `u16`     | 2        | `0` (typical)        | "Snap To Grid"                                                     |
-| `u16`     | 2        | `15` \| `100` \| ?   | "Grid Interval"                                                    |
-| `u16`     | 2        | `1`                  | Unknown                                                            |
-| `u16`     | 2        | `0` (typical)        | "OptimizeEntryExitPoints"                                          |
-| `u8`      | 1        | _S0_ `0` (typical)   | "fromImageStringLength"                                            |
-| `char`    | _S0_     |                      | Path string                                                        |
-| `section` | 24       |                      | [`affine_transform`](#affine-transform)                            |
-| `u16`     | 2        | _S1_ `0` (typical)   | Number of programmable fill patterns                               |
-| `section` | _S1_ * ? |                      | [`fill_patterns`](#programmable-fill-subsection)                   |
-| `u16`     | 2        | _S2_ `0` (typical)   | Number of programmable Motif                                       |
-| `section` | _S2_ * ? |                      | [`motif`](#motif)                                                  |
-| `u16`     | 2        | _S3_ `0` (typical)   | Number of feather patterns                                         |
-| `section` | _S3_ * ? |                      | [`feather_patterns`](#feather-pattern-subsection)                  |
-| `section` |          |                      | [`color_list`](#color-list-subsection)                             |
-| `u16`     | 2        | `1` (typical)        | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
+| Type      | Bytes    | Value                                                    | Description                                         |
+| --------- | -------- | -------------------------------------------------------- | --------------------------------------------------- |
+| `char`    | 4        | `"#PES"`                                                 | PES Identification                                  |
+| `char`    | 4        | `"0060"`                                                 | Version 6                                           |
+| `u32`     | 4        |                                                          | Absolute [`PEC_section`](#pec-section) byte offset  |
+| `u16`     | 2        | `1` (typical)                                            | Hoop Size Indicator                                 |
+| `char`    | 2        | `01` \| `02` \| `10`                                     | Subversion?                                         |
+| `section` |          | [`description_strings`](#description-strings-subsection) |                                                     |
+| `u16`     | 2        | `0` (typical)                                            | Optimize Hoop Change                                |
+| `u16`     | 2        | `0` (typical)                                            | Design Page Is Custom                               |
+| `section` | 4        | [`hoop_size`](#hoop-size-subsection)                     | Hoop size in mm                                     |
+| `u16`     | 2        |                                                          | Hoop Rotation, 90° 1 = rotate.                      |
+| `u16`     | 2        | `200` (typical)                                          | DesignWidth                                         |
+| `u16`     | 2        | `200` (typical)                                          | DesignHeight                                        |
+| `u16`     | 2        | `100` (typical)                                          | DesignPageWidth                                     |
+| `u16`     | 2        | `100` (typical)                                          | DesignPageHeight                                    |
+| `u16`     | 2        | `100` (typical)                                          | Undisplayed Unknown Design Property, must fall within same range as designPageWidth and Height. Makes no difference other than validation check.|
+| `u16`     | 2        | `7` (typical)                                            | "Design Page Background Color"                      |
+| `u16`     | 2        | `19` (typical)                                           | "Design Page Foreground Color"                      |
+| `u16`     | 2        | `0` \| `1` \| ?                                          | "Show Grid"                                         |
+| `u16`     | 2        | `1` (typical)                                            | "With Axes"                                         |
+| `u16`     | 2        | `0` (typical)                                            | "Snap To Grid"                                      |
+| `u16`     | 2        | `15` \| `100` \| ?                                       | "Grid Interval"                                     |
+| `u16`     | 2        | `1`                                                      | Unknown                                             |
+| `u16`     | 2        | `0` (typical)                                            | "OptimizeEntryExitPoints"                           |
+| `u8`      | 1        | _S0_ `0` (typical)                                       | "fromImageStringLength"                             |
+| `char`    | _S0_     |                                                          | Path string                                         |
+| `section` | 24       | [`affine_transform`](#affine-transform)                  |                                                     |
+| `u16`     | 2        | _S1_ `0` (typical)                                       | Number of programmable fill patterns                |
+| `section` | _S1_ * ? | [`fill_patterns`](#programmable-fill-subsection)         |                                                     |
+| `u16`     | 2        | _S2_ `0` (typical)                                       | Number of programmable Motif                        |
+| `section` | _S2_ * ? | [`motif`](#motif)                                        |                                                     |
+| `u16`     | 2        | _S3_ `0` (typical)                                       | Number of feather patterns                          |
+| `section` | _S3_ * ? | [`feather_patterns`](#feather-pattern-subsection)        |                                                     |
+| `section` |          | [`color_list`](#color-list-subsection)                   |                                                     |
+| `u16`     | 2        | `1` (typical)                                            | The number of Objects, this is the number of objects within the PES document and is not limited to the number of CSewSeg blocks. If there are two SewSeg objects and 2 Rectangle objects, this will be 4. |
 
 ### Programmable fill subsection
 
@@ -446,10 +447,10 @@ threads.
 
 ### Color list subsection
 
-| Type      | Bytes | Value | Description                           |
-| --------- | ----- | ----- | ------------------------------------- |
-| `u16`     | 2     |       | Number of following color subsections |
-| `section` |       |       | [`color`](#color-subsection)          |
+| Type      | Bytes | Value                        | Description                           |
+| --------- | ----- | ---------------------------- | ------------------------------------- |
+| `u16`     | 2     |                              | Number of following color subsections |
+| `section` |       | [`color`](#color-subsection) |                                       |
 
 ### Color subsection
 
@@ -477,11 +478,11 @@ object is almost identical to the data for the appended headers of additional
 header information for the first (and often only) group within that
 section.
 
-| Type      | Bytes | Value       | Description                |
-| --------- | ----- | ----------- | -------------------------- |
-| `u16`     | 2     | `7`         | Length of following string |
-| `char`    | 7     | `"CEmbOne"` | CEmbOne identification     |
-| `section` | 60    |             | [CSewSeg_comon_header](#csewseg-common-header) |
+| Type      | Bytes | Value                                          | Description                |
+| --------- | ----- | ---------------------------------------------- | -------------------------- |
+| `u16`     | 2     | `7`                                            | Length of following string |
+| `char`    | 7     | `"CEmbOne"`                                    | CEmbOne identification     |
+| `section` | 60    | [CSewSeg_comon_header](#csewseg-common-header) |                            |
 
 ## CSewSeg
 
@@ -506,10 +507,10 @@ block.
 
 ### CSewSeg segment block
 
-| Type                                                                    | Bytes | Value | Description                    |
-| ----------------------------------------------------------------------- | ----- | ----- | ------------------------------ |
-| [`csewseg_stitch_list`](#CSewSeg_stitch_list_subsection "wikilink") |       |       | CSewSeg stitch list subsection |
-| [`csewseg_color_list`](#CSewSeg_color_list_subsection "wikilink")   |       |       | CSewSeg color list subsection  |
+| Type      | Bytes | Value                                                    | Description                    |
+| --------- | ----- | -------------------------------------------------------- | ------------------------------ |
+| `section` |       | [`csewseg_stitch_list`](#csewseg-stitch-list-subsection) | CSewSeg stitch list subsection |
+| `section` |       | [`csewseg_color_list`](#csewseg-color-list-subsection)   | CSewSeg color list subsection  |
 
 #### CSewSeg stitch list subsection
 
@@ -518,13 +519,13 @@ last block does not end with the continuation code `0x8003` and so is
 2 bytes shorter than the others. Some files seem to limit the number of
 stitches to a maximum of 1000 per block, is this required?
 
-| Type      | Bytes   | Value           | Description                                                             |
-| --------- | ------- | --------------- | ----------------------------------------------------------------------- |
-| `u16`     | 2       | `0` \| `1` \| ? | Stitch type where `0` means a normal stitch and `1` means a jump stitch |
-| `u16`     | 2       |                 | Thread index for block + 1                                              |
-| `u16`     | 2       | _N_             | Number of following coordinates                                         |
-| `section` | 4 × _N_ |                 | [CSewSeg_coordinates](#csewseg-coordinate-subsection)                   |
-| `u16`     | 2       | `0x8003` \| ?   | Continuation code where `0x8003` means list continues with another following block, with the last block not having this field at all |
+| Type      | Bytes   | Value                                                 | Description                                                             |
+| --------- | ------- | ----------------------------------------------------- | ----------------------------------------------------------------------- |
+| `u16`     | 2       | `0` \| `1` \| ?                                       | Stitch type where `0` means a normal stitch and `1` means a jump stitch |
+| `u16`     | 2       |                                                       | Thread index for block + 1                                              |
+| `u16`     | 2       | _N_                                                   | Number of following coordinates                                         |
+| `section` | 4 × _N_ | [CSewSeg_coordinates](#csewseg-coordinate-subsection) |                                                                         |
+| `u16`     | 2       | `0x8003` \| ?                                         | Continuation code where `0x8003` means list continues with another following block, with the last block not having this field at all |
 
 #### CSewSeg coordinate subsection
 
@@ -535,10 +536,10 @@ stitches to a maximum of 1000 per block, is this required?
 
 #### CSewSeg color list subsection
 
-| Type      | Bytes   | Value | Description                                  |
-| --------- | ------- | ----- | -------------------------------------------- |
-| `u16`     | 2       | _N_   | Number of following colors                   |
-| `section` | 4 × _N_ |       | [`csewseg_color`](#csewseg-color-subsection) |
+| Type      | Bytes   | Value                                        | Description                                  |
+| --------- | ------- | -------------------------------------------- | -------------------------------------------- |
+| `u16`     | 2       | _N_                                          | Number of following colors                   |
+| `section` | 4 × _N_ | [`csewseg_color`](#csewseg-color-subsection) |                                              |
 
 #### CSewSeg color subsection
 
@@ -548,65 +549,65 @@ stitches to a maximum of 1000 per block, is this required?
 | `u16` | 2     |       | In PES versions 1 through 4 this is a [PEC thread palette](#pec-thread-palette) index and in versions 5 and 6 this is a [thread index](#color-list-subsection "wikilink") defined in the [PES header section](#Header "wikilink") |
 
 ### CsewSeg Header
-| Type      | Bytes | Value       | Description                                    |
-| --------- | ----- | ----------- | ---------------------------------------------- |
-| `u16`     | 2     | `7`         | Length of following string                     |
-| `char`    | 7     | `"CSewSeg"` | CSewSeg identification                         |
-| `section` | 60    |             | [CSewSeg_comon_header](#csewseg-common-header) |
+| Type      | Bytes | Value                                          | Description                                    |
+| --------- | ----- | ---------------------------------------------- | ---------------------------------------------- |
+| `u16`     | 2     | `7`                                            | Length of following string                     |
+| `char`    | 7     | `"CSewSeg"`                                    | CSewSeg identification                         |
+| `section` | 60    | [CSewSeg_comon_header](#csewseg-common-header) |                                                |
 
 ### CSewSeg Common Header
 
-| Type      | Bytes | Value         | Description                                                     |
-| --------- | ----- | ------------- | --------------------------------------------------------------- |
-| `section` | 40    |               | [Block Geometry](#geometry "Extents and Affine Transformation") |
-| `u16`     | 2     | `1` (typical) | Unknown                                                         |
-| `s16`     | 2     |               | x coordinate translation?                                       |
-| `s16`     | 2     |               | y coordinate translation?                                       |
-| `s16`     | 2     |               | width                                                           |
-| `s16`     | 2     |               | height                                                          |
-| `u8`      | 8     | `0` (typical) | 8 bytes of unknown, zero.                                       |
-| `u16`     | 2     |               | CSewSeg block count                                             |
+| Type      | Bytes | Value                       | Description                       |
+| --------- | ----- | --------------------------- | --------------------------------- |
+| `section` | 40    | [Block Geometry](#geometry) | Extents and Affine Transformation |
+| `u16`     | 2     | `1` (typical)               | Unknown                           |
+| `s16`     | 2     |                             | x coordinate translation?         |
+| `s16`     | 2     |                             | y coordinate translation?         |
+| `s16`     | 2     |                             | width                             |
+| `s16`     | 2     |                             | height                            |
+| `u8`      | 8     | `0` (typical)               | 8 bytes of unknown, zero.         |
+| `u16`     | 2     |                             | CSewSeg block count               |
 
 ## CEmbCirc
 
-| Type      | Bytes | Value        | Description                               |
-| --------- | ----- | ------------ | ----------------------------------------- |
-| `u16`     | 2     | `8`          | Length of following string                |
-| `char`    | 8     | `"CEmbCirc"` | CEmbCirc identification                   |
-| `section` | ?     |              | [`block_description`](#block-description) |
-| `u16`     | 2     |              | unknown                                   |
-| `u16`     | 2     |              | Type                                      |
-| `u16`     | 2     |              | start angle                               |
-| `u16`     | 2     |              | end angle                                 |
-| `u16`     | 2     |              | left                                      |
-| `u16`     | 2     |              | top                                       |
-| `u16`     | 2     |              | right                                     |
-| `u16`     | 2     |              | bottom                                    |
+| Type      | Bytes | Value                                     | Description                |
+| --------- | ----- | ----------------------------------------- | -------------------------- |
+| `u16`     | 2     | `8`                                       | Length of following string |
+| `char`    | 8     | `"CEmbCirc"`                              | CEmbCirc identification    |
+| `section` | ?     | [`block_description`](#block-description) |                            |
+| `u16`     | 2     |                                           | unknown                    |
+| `u16`     | 2     |                                           | Type                       |
+| `u16`     | 2     |                                           | start angle                |
+| `u16`     | 2     |                                           | end angle                  |
+| `u16`     | 2     |                                           | left                       |
+| `u16`     | 2     |                                           | top                        |
+| `u16`     | 2     |                                           | right                      |
+| `u16`     | 2     |                                           | bottom                     |
 
 ## CEmbRect
 
-| Type      | Bytes        | Value        | Description                               |
-| --------- | ------------ | ------------ | ----------------------------------------- |
-| `u16`     | 2            | `8`          | Length of following string                |
-| `char`    | 8            | `"CEmbRect"` | CEmbRect identification                   |
-| `section` | 240 + motifs |              | [`block_description`](#block-description) |
-| `u16`     | 2            |              | corner_radius                             |
-| `u16`     | 2            |              | unknown                                   |
-| `u16`     | 2            |              | left                                      |
-| `u16`     | 2            |              | top                                       |
-| `u16`     | 2            |              | right                                     |
-| `u16`     | 2            |              | bottom                                    |
+| Type      | Bytes        | Value                                     | Description                |
+| --------- | ------------ | ----------------------------------------- | -------------------------- |
+| `u16`     | 2            | `8`                                       | Length of following string |
+| `char`    | 8            | `"CEmbRect"`                              | CEmbRect identification    |
+| `section` | 240 + motifs | [`block_description`](#block-description) |                            |
+| `u16`     | 2            |                                           | corner_radius              |
+| `u16`     | 2            |                                           | unknown                    |
+| `u16`     | 2            |                                           | left                       |
+| `u16`     | 2            |                                           | top                        |
+| `u16`     | 2            |                                           | right                      |
+| `u16`     | 2            |                                           | bottom                     |
 
 ## CEmbLine
 
-| Type      | Bytes      | Value        | Description                                 |
-| --------- | ---------- | ------------ | ------------------------------------------- |
-| `u16`     | 2          | `8`          | Length of following string                  |
-| `char`    | 8          | `"CEmbLine"` | CEmbLine identification                     |
-| `section` | ?          |              | [`block_description`](#block-description)                           |
-| `u16`     | 2          |              | unknown                                     |
-| `u16`     | 2          |              | vertex count, number of vertexes to expect. |
-| `section` | count \* 8 |              | series of vertexes.                         |
+| Type      | Bytes      | Value                                     | Description                                 |
+| --------- | ---------- | ----------------------------------------- | ------------------------------------------- |
+| `u16`     | 2          | `8`                                       | Length of following string                  |
+| `char`    | 8          | `"CEmbLine"`                              | CEmbLine identification                     |
+| `section` | ?          | [`block_description`](#block-description) |                                             |
+| `u16`     | 2          |                                           | unknown                                     |
+| `u16`     | 2          |                                           | vertex count, number of vertexes to expect. |
+| `section` | count \* 8 |                                           | series of vertexes.                         |
 
 ### Point List
 
