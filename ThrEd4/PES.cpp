@@ -80,7 +80,8 @@ class PES_COLOR_LIST
 class PESHED
 {
   public:
-  char     led[8]  {}; //   0-7  Identification and version (#PES0001)         
+  char     ledI[4] {}; //   0-3  Identification (#PES)         
+  char     ledV[4] {}; //   4-7  version (0001)         
   uint32_t off     {}; //   8-b  Absolute PEC section byte offset
   uint16_t hpsz    {}; //   c,d  Hoopsize (0), 0 = 100x100mm, 1 = 130x180mm
   uint16_t usdn    {}; //   e,f  Use existing design area (1)
@@ -543,108 +544,127 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   fileBuf.reserve(wrap::toSize(fileSize));
   auto* fileBuffer = fileBuf.data();
   if (fileBuffer == nullptr) {
+	CloseHandle(fileHandle);
 	return false;
   }
   auto bytesRead = DWORD {};
   wrap::readFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
   auto* pesHeader = convertFromPtr<PESHED*>(fileBuffer);
 
-  constexpr auto PESSTR = "#PES00"; // PES lead in value
-  if (strncmp(static_cast<char*>(pesHeader->led), PESSTR, strlen(PESSTR)) != 0) {
-	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
-	CloseHandle(fileHandle);
-	return false;
-  }
-  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
-  auto const  pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-  auto const* pesStitch = &fileBuffer[pecOffset];
-  if (pesStitch == nullptr) {
-	return false;
-  }
-  auto const pesColorCount = pecHeader->colorCount + 1U;
-  auto&      pad           = pecHeader->pad;
-  PEScolors                = std::begin(pad);
-  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
-  auto iUserColor          = UserColor.begin();
-  for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
-	if (PEScolors[iColor] < THTYPCNT) {
-	  if (!colorMap.test_set(PEScolors[iColor])) {
-		auto const& threadColor = PES_THREAD[PEScolors[iColor]];
+  constexpr auto PESSTR      = "#PES"; // PES lead in value
+  auto           successFlag = true;
+  if (strncmp(static_cast<char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) == 0) {
+	auto        contFlag      = false;
+	const char* VERSTRARRAY[] = {
+	    "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
+	for (auto const& version : VERSTRARRAY) {
+	  if (strncmp(static_cast<char*>(pesHeader->ledV), version, strlen(version)) == 0) {
+		contFlag = true;
+		break;
+	  }
+	}
+	if (true == contFlag) {
+	  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
+	  auto const  pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
+	  auto const* pesStitch = &fileBuffer[pecOffset];
+	  if (pesStitch == nullptr) {
+		return false;
+	  }
+	  auto const pesColorCount = pecHeader->colorCount + 1U;
+	  auto&      pad           = pecHeader->pad;
+	  PEScolors                = std::begin(pad);
+	  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
+	  auto iUserColor          = UserColor.begin();
+	  for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
+		if (PEScolors[iColor] < THTYPCNT) {
+		  if (!colorMap.test_set(PEScolors[iColor])) {
+			auto const& threadColor = PES_THREAD[PEScolors[iColor]];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-		auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
-		*iUserColor      = color;
-		++iUserColor;
-		if (iUserColor == UserColor.end()) {
-		  break;
+			auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
+			*iUserColor      = color;
+			++iUserColor;
+			if (iUserColor == UserColor.end()) {
+			  break;
+			}
+		  }
 		}
+		else {
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
+		  auto const color = RGB(PES_THREAD[0].color.r,
+		                         PES_THREAD[0].color.g,
+		                         PES_THREAD[0].color.b); // color unknown
+
+		  *iUserColor = color;
+		  ++iUserColor;
+		}
+	  }
+	  auto loc = F_POINT {};
+	  StateMap->reset(StateFlag::FILDIR);
+	  if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
+		auto       color      = 0U;
+		auto       iPESstitch = 0U;
+		auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
+		StitchBuffer->clear();
+		StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
+		StitchBuffer->push_back(F_POINT_ATTR {});
+		constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
+
+		auto pesColorIndex = uint32_t {1U};
+		while (iPESstitch < pecCount) {
+		  if (pesStitch[iPESstitch] == 0xff && pesStitch[iPESstitch + 1U] == 0) {
+			break;
+		  }
+		  if (pesStitch[iPESstitch] == 0xfe && pesStitch[iPESstitch + 1U] == 0xb0) {
+			color = pi::dupcol(wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
+			iPESstitch += 2;
+		  }
+		  else {
+			auto locof = 0.0F;
+			if ((pesStitch[iPESstitch] & BIT8) != 0U) {
+			  // combine the 4 bits from the first byte with the 8 bits from the next byte
+		  auto pesVal =
+		      (gsl::narrow_cast<uint32_t>(pesStitch[iPESstitch] << BYTSHFT) | pesStitch[iPESstitch + 1U]) & MSK12BIT;
+			  if ((pesVal & BIT12) != 0U) {
+				pesVal -= POSOFF;
+			  }
+			  auto const sPesVal = gsl::narrow_cast<int32_t>(pesVal);
+			  wrap::narrow_cast(locof, sPesVal);
+			  ++iPESstitch;
+			}
+			else {
+			  if (pesStitch[iPESstitch] > 0x3f) {
+				locof = wrap::toFloat(pesStitch[iPESstitch]) - 128.0F;
+			  }
+			  else {
+				locof = pesStitch[iPESstitch];
+			  }
+			}
+			locof *= IPECFACT;
+			// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
+			if (StateMap->testAndFlip(StateFlag::FILDIR)) {
+			  loc.y -= locof;
+			  StitchBuffer->push_back(F_POINT_ATTR {loc.x, loc.y, color});
+			}
+			else {
+			  loc.x += locof;
+			}
+		  }
+		  ++iPESstitch;
+		}
+		thred::hupfn();
+	  }
+	  else {
+		successFlag = false;
 	  }
 	}
 	else {
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-	  auto const color = RGB(PES_THREAD[0].color.r,
-	                         PES_THREAD[0].color.g,
-	                         PES_THREAD[0].color.b); // color unknown
-
-	  *iUserColor = color;
-	  ++iUserColor;
+	  successFlag = false;
 	}
-  }
-  auto loc = F_POINT {};
-  StateMap->reset(StateFlag::FILDIR);
-  if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
-	auto       color      = 0U;
-	auto       iPESstitch = 0U;
-	auto const pecCount   = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
-	StitchBuffer->clear();
-	StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
-	StitchBuffer->push_back(F_POINT_ATTR {});
-	constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
-
-	auto pesColorIndex = uint32_t {1U};
-	while (iPESstitch < pecCount) {
-	  if (pesStitch[iPESstitch] == 0xff && pesStitch[iPESstitch + 1U] == 0) {
-		break;
-	  }
-	  if (pesStitch[iPESstitch] == 0xfe && pesStitch[iPESstitch + 1U] == 0xb0) {
-		color = pi::dupcol(wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
-		iPESstitch += 2;
-	  }
-	  else {
-		auto locof = 0.0F;
-		if ((pesStitch[iPESstitch] & BIT8) != 0U) {
-		  // combine the 4 bits from the first byte with the 8 bits from the next byte
-		  auto pesVal =
-		      (gsl::narrow_cast<uint32_t>(pesStitch[iPESstitch] << BYTSHFT) | pesStitch[iPESstitch + 1U]) & MSK12BIT;
-		  if ((pesVal & BIT12) != 0U) {
-			pesVal -= POSOFF;
-		  }
-		  auto const sPesVal = gsl::narrow_cast<int32_t>(pesVal);
-		  wrap::narrow_cast(locof, sPesVal);
-		  ++iPESstitch;
-		}
-		else {
-		  if (pesStitch[iPESstitch] > 0x3f) {
-			locof = wrap::toFloat(pesStitch[iPESstitch]) - 128.0F;
-		  }
-		  else {
-			locof = pesStitch[iPESstitch];
-		  }
-		}
-		locof *= IPECFACT;
-		// ToDo - (PES) Use a new flag bit for this since FILDIR is not correct
-		if (StateMap->testAndFlip(StateFlag::FILDIR)) {
-		  loc.y -= locof;
-		  StitchBuffer->push_back(F_POINT_ATTR {loc.x, loc.y, color});
-		}
-		else {
-		  loc.x += locof;
-		}
-	  }
-	  ++iPESstitch;
-	}
-	thred::hupfn();
   }
   else {
+	successFlag = false;
+  }
+  if (false == successFlag) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
@@ -689,11 +709,14 @@ auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		  }
 		}
 		if (flag) {
-		  constexpr auto PESSTR    = "#PES0001"; // PES lead in
+		  constexpr auto PESISTR   = "#PES"; // PES lead in
+		  constexpr auto PESVSTR    = "0001"; // PES version
 		  constexpr auto EMBSTR    = "CEmbOne";  // emb section lead in
 		  constexpr auto SEWSTR    = "CSewSeg";  // sewing segment leadin
 		  // ReSharper disable once CppDeprecatedEntity
-		  strncpy(static_cast<char*>(pesHeader.led), PESSTR, strlen(PESSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
+		  strncpy(static_cast<char*>(pesHeader.ledI), PESISTR, strlen(PESISTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
+		  // ReSharper disable once CppDeprecatedEntity
+		  strncpy(static_cast<char*>(pesHeader.ledV), PESVSTR, strlen(PESVSTR)); // NOLINT(clang-diagnostic-deprecated-declarations)
 		  wrap::narrow(pesHeader.celn, strlen(EMBSTR));
 		  // ReSharper disable once CppDeprecatedEntity
 		  strncpy(static_cast<char*>(pesHeader.ce), EMBSTR, pesHeader.celn); // NOLINT(clang-diagnostic-deprecated-declarations)
