@@ -483,6 +483,7 @@ section.
 | `u16`     | 2     | `7`                                            | Length of following string |
 | `char`    | 7     | `"CEmbOne"`                                    | CEmbOne identification     |
 | `section` | 60    | [CSewSeg_comon_header](#csewseg-common-header) |                            |
+| `char`    | 4     | `0xff,0xff,0x00,0x00`                          | end of section marker      |
 
 ## CSewSeg
 
