@@ -555,15 +555,15 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   auto           successFlag = true;
   if (strncmp(static_cast<char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) == 0) {
 	auto        contFlag      = false;
-	const char* VERSTRARRAY[] = {
+	const char* verStrArray[] = {
 	    "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
-	for (auto const& version : VERSTRARRAY) {
+	for (auto const& version : verStrArray) {
 	  if (strncmp(static_cast<char*>(pesHeader->ledV), version, strlen(version)) == 0) {
 		contFlag = true;
 		break;
 	  }
 	}
-	if (true == contFlag) {
+	if (contFlag) {
 	  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
 	  auto const  pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
 	  auto const* pesStitch = &fileBuffer[pecOffset];
@@ -664,7 +664,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   else {
 	successFlag = false;
   }
-  if (false == successFlag) {
+  if (!successFlag) {
 	displayText::showMessage(IDS_NOTPES, newFileName.wstring());
 	CloseHandle(fileHandle);
 	return false;
