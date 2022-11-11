@@ -8215,7 +8215,7 @@ void fi::shrnks() {
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
 	auto const& thisVertex = itVertex[iVertex];
 	auto const& nextVertex = itVertex[iVertex + 1];
-	deltas.emplace_back(F_POINT {nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y});
+	deltas.emplace_back(nextVertex.x - thisVertex.x, nextVertex.y - thisVertex.y);
 	lengths.emplace_back(hypot(deltas.back().x, deltas.back().y));
   }
   auto length = lengths.begin();
