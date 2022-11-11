@@ -1875,7 +1875,7 @@ auto fi::projv(float xCoordinate, F_POINT const& lowerPoint, F_POINT const& uppe
 	if (lower > upper) {
 	  std::swap(lower, upper);
 	}
-	return !(xCoordinate < lower || xCoordinate > upper);
+	return xCoordinate >= lower && xCoordinate <= upper;
   }
   return false;
 }
@@ -1958,11 +1958,11 @@ auto fi::proj(F_POINT const& point, float slope, F_POINT const& point0, F_POINT 
 	  std::swap(yMinimum, yMaximum);
 	}
 	intersectionPoint = intersect;
-	return !(intersect.x <= xMinimum || intersect.x > xMaximum || intersect.y < yMinimum ||
-	         intersect.y > yMaximum);
+	return intersect.x >= xMinimum && intersect.x <= xMaximum && intersect.y >= yMinimum &&
+	         intersect.y <= yMaximum;
   }
   intersectionPoint = intersect;
-  return !(intersect.x <= xMinimum || intersect.x > xMaximum);
+  return intersect.x >= xMinimum && intersect.x <= xMaximum;
 }
 
 auto form::linx(std::vector<F_POINT> const& points, uint32_t start, uint32_t finish, F_POINT& intersection) noexcept
@@ -2007,7 +2007,7 @@ auto fi::projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, 
   if (leftY > rightY) {
 	std::swap(leftY, rightY);
   }
-  return !(yCoordinate < leftY || yCoordinate > rightY);
+  return yCoordinate >= leftY && yCoordinate <= rightY;
 }
 
 void fi::sprct(std::vector<F_POINT> const* vertices,

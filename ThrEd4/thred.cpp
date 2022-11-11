@@ -16552,7 +16552,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 	  }
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 	  auto const wParameter = LOWORD(Msg.wParam);
-	  if (!(wParameter < ID_FILE_OPEN1 || wParameter > ID_AUXPES)) {
+	  if (wParameter >= ID_FILE_OPEN1 && wParameter <= ID_AUXPES) {
 		thred::undat();
 	  }
 	  if (thi::handleMainMenu(wParameter, rotationCenter)) {
