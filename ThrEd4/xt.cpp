@@ -715,12 +715,12 @@ auto xi::gucon(FRM_HEAD const&            form,
 	if (iStitch != 0U) {
 	  if (!util::closeEnough(buffer[iStitch - 1U].x, indentedPoint[startVertex].x) ||
 	      !util::closeEnough(buffer[iStitch - 1U].y, indentedPoint[startVertex].y)) {
-		buffer.emplace_back(F_POINT_ATTR {indentedPoint[startVertex].x, indentedPoint[startVertex].y, code});
+		buffer.emplace_back(indentedPoint[startVertex].x, indentedPoint[startVertex].y, code);
 		++iStitch;
 	  }
 	}
 	else {
-	  buffer.emplace_back(F_POINT_ATTR {indentedPoint[startVertex].x, indentedPoint[startVertex].y, code});
+	  buffer.emplace_back(indentedPoint[startVertex].x, indentedPoint[startVertex].y, code);
 	  ++iStitch;
 	}
 	auto const intermediateVertex = StateMap->test(StateFlag::WLKDIR) ? form::prv(form, startVertex)
@@ -735,7 +735,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	  auto localPoint =
 	      F_POINT {indentedPoint[startVertex].x + step.x, indentedPoint[startVertex].y + step.y};
 	  for (auto iStep = 0U; iStep < stitchCount - 1U; ++iStep) {
-		buffer.emplace_back(F_POINT_ATTR {localPoint.x, localPoint.y, code});
+		buffer.emplace_back(localPoint.x, localPoint.y, code);
 		++iStitch;
 		localPoint.x += step.x;
 		localPoint.y += step.y;
@@ -748,7 +748,7 @@ auto xi::gucon(FRM_HEAD const&            form,
 	  startVertex = form::nxt(form, startVertex);
 	}
   }
-  buffer.emplace_back(F_POINT_ATTR {indentedPoint[startVertex].x, indentedPoint[startVertex].y, code});
+  buffer.emplace_back(indentedPoint[startVertex].x, indentedPoint[startVertex].y, code);
   ++iStitch;
   return iStitch - destination;
 }
@@ -1554,13 +1554,13 @@ void xi::duint(FRM_HEAD const& form, std::vector<F_POINT_ATTR>& buffer, uint32_t
 	  if (auto const& interleave = InterleaveSequence->operator[](iSequence);
 	      !util::closeEnough(interleave.x, buffer[ilData.output - 1U].x) ||
 	      !util::closeEnough(interleave.y, buffer[ilData.output - 1U].y)) {
-		buffer.emplace_back(F_POINT_ATTR {interleave.x, interleave.y, code});
+		buffer.emplace_back(interleave.x, interleave.y, code);
 		++(ilData.output);
 	  }
 	}
 	else {
 	  auto const& interleave = InterleaveSequence->operator[](iSequence);
-	  buffer.emplace_back(F_POINT_ATTR {interleave.x, interleave.y, code});
+	  buffer.emplace_back(interleave.x, interleave.y, code);
 	  ++(ilData.output);
 	}
   }

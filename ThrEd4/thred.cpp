@@ -6973,9 +6973,9 @@ auto thi::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
 }
 
 void thi::ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& knotStep, uint32_t knotAttribute) {
-  buffer.emplace_back(F_POINT_ATTR {StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
+  buffer.emplace_back(StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
                                     StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
-                                    knotAttribute});
+                                    knotAttribute);
 }
 
 void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
@@ -8810,7 +8810,7 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 	  }
 	  attribute &= (~KNOTMSK);
 	  for (auto iStitch = 0U; iStitch < wrap::round<decltype(iStitch)>(stitchCount) - 1U; ++iStitch) {
-		newStitches.emplace_back(F_POINT_ATTR {point.x, point.y, attribute});
+		newStitches.emplace_back(point.x, point.y, attribute);
 		point.x += step.x;
 		point.y += step.y;
 		++adcnt;
