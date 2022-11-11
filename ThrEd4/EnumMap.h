@@ -68,7 +68,7 @@ template <typename EnumType> class ENUM_MAP
 	m_mask.flip(gsl::narrow_cast<std::underlying_type_t<EnumType>>(i_key));
 	return val;
   }
-  inline auto to_ulong() -> uint32_t { // NOLINT(readability-identifier-naming)
+  inline auto to_ulong() noexcept -> uint32_t { // NOLINT(readability-identifier-naming)
 	return m_mask.to_ulong();
   }
   [[nodiscard]] inline auto count() const -> size_t {
