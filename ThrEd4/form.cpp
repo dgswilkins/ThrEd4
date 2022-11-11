@@ -5536,6 +5536,9 @@ void form::filangl() {
 
 auto form::chkfrm(std::vector<POINT>* formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
     -> bool {
+  if (nullptr == formControlPoints) {
+	return false;
+  }
   auto const  point = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   auto const& currentForm = FormList->operator[](ClosestFormToCursor);
   NewFormVertexCount      = currentForm.vertexCount + 1U;
