@@ -78,6 +78,7 @@
     <ClInclude Include="xt.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\vcpkg.json" />
     <None Include="cpp.hint" />
     <None Include="Resources\dlin.cur" />
     <None Include="Resources\Form.cur" />
@@ -181,6 +182,9 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
+  </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
