@@ -3002,9 +3002,9 @@ public:
 
 void fi::duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices) {
   if (auto const leftEdge = (std::ranges::min_element(currentFormVertices,
-                                              [](F_POINT const& first, F_POINT const& second) {
-	                                            return first.x < second.x;
-                                              }))
+                                                      [](F_POINT const& first, F_POINT const& second) {
+	                                                    return first.x < second.x;
+                                                      }))
                                 ->x;
       leftEdge < ClipRectSize.cx) {
 	StateMap->set(StateFlag::WASNEG);
@@ -7649,7 +7649,7 @@ void fi::duprotfs(float rotationAngle) {
 void fi::duprots(float rotationAngle, F_POINT const& rotationCenter) {
   thred::rngadj();
   ClosestPointIndex = wrap::toUnsigned(StitchBuffer->size());
-  StitchBuffer->reserve(ClosestPointIndex + (GroupEndStitch + 1U - GroupStartStitch));
+  StitchBuffer->reserve(ClosestPointIndex + (wrap::toSize(GroupEndStitch) + 1U - GroupStartStitch));
   StitchBuffer->insert(StitchBuffer->end(),
                        wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
                        wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
@@ -7712,7 +7712,7 @@ void form::cpylayr(uint32_t layer) {
 		thred::savdo();
 		thred::rngadj();
 		auto const oldSize = StitchBuffer->size();
-		StitchBuffer->reserve(oldSize + (GroupEndStitch + 1U - GroupStartStitch));
+		StitchBuffer->reserve(oldSize + (wrap::toSize(GroupEndStitch) + 1U - GroupStartStitch));
 		StitchBuffer->insert(StitchBuffer->end(),
 		                     wrap::next(StitchBuffer->cbegin(), GroupStartStitch),
 		                     wrap::next(StitchBuffer->cbegin(), GroupEndStitch + 1U));
