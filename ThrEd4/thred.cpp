@@ -1030,7 +1030,7 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 
 void thred::resetSideBuffer() {
   SideWinMsgIdx = 0;
-  std::fill(SideWindowEntryBuffer->begin(), SideWindowEntryBuffer->end(), 0);
+  std::ranges::fill(*SideWindowEntryBuffer, 0);
 }
 
 void thred::resetMsgBuffer() {
@@ -1201,9 +1201,7 @@ void thi::ritfnam(std::wstring const& designerName) {
   }
   PseudoRandomValue = rsed();
   auto iName        = 0U;
-  std::generate(
-      tmpName.begin(), tmpName.end(), []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
-  auto const spNameDecoder = gsl::span {NameDecoder};
+  std::ranges::generate(tmpName, []() noexcept -> uint8_t { return (form::psg() & BYTMASK); });
   for (auto& iTmpName : tmpName) {
 	if (designer[iName++] != 0) {
 	  auto iNE = wrap::next(NameEncoder.begin(), designer[iName]);
@@ -1219,6 +1217,7 @@ void thi::ritfnam(std::wstring const& designerName) {
 	}
   }
   if (iName == NAMELEN) {
+	auto const spNameDecoder = gsl::span {NameDecoder};
 	auto& index = tmpName.back();
 	while (spNameDecoder[wrap::toSize(index)] != 0U) {
 	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
@@ -3552,32 +3551,33 @@ void thi::defNam(fs::path const& fileName) {
 
 void thi::ritini() {
   auto const     directory = utf::utf16ToUtf8(DefaultDirectory->wstring());
-  auto const     spIDD     = gsl::span {IniFile.defaultDirectory};
   constexpr char FILLCHAR  = '\0';
-  std::fill(spIDD.begin(), spIDD.end(), FILLCHAR);
-  std::copy(directory.cbegin(), directory.cend(), spIDD.begin());
+  std::ranges::fill(IniFile.defaultDirectory, FILLCHAR);
+  auto const spIDD = gsl::span {IniFile.defaultDirectory};
+  // ReSharper disable CppExpressionWithoutSideEffects
+  std::ranges::copy(directory, spIDD.begin());
   auto previousName = PreviousNames->begin();
   for (auto& prevName : IniFile.prevNames) {
-	auto const spName = gsl::span {prevName};
-	std::fill(spName.begin(), spName.end(), FILLCHAR);
+	std::ranges::fill(prevName, FILLCHAR);
 	if (!previousName->empty()) {
 	  auto previous = utf::utf16ToUtf8(*previousName);
-	  std::copy(previous.cbegin(), previous.cend(), spName.begin());
+	  auto const spName   = gsl::span {prevName};
+	  std::ranges::copy(previous, spName.begin());
 	}
 	++previousName;
   }
   auto const designer = utf::utf16ToUtf8(*DesignerName);
-  auto const spIDN    = gsl::span {IniFile.designerName};
-  auto const spISC    = gsl::span {IniFile.stitchColors};
-  auto const spIBPC   = gsl::span {IniFile.backgroundPreferredColors};
-  auto const spISPC   = gsl::span {IniFile.stitchPreferredColors};
-  std::fill(spIDN.begin(), spIDN.end(), FILLCHAR);
-  std::copy(designer.cbegin(), designer.cend(), spIDN.begin());
-  std::copy(UserColor.begin(), UserColor.end(), spISC.begin());
-  std::copy(CustomBackgroundColor.begin(), CustomBackgroundColor.end(), spIBPC.begin());
-  std::copy(CustomColor.begin(), CustomColor.end(), spISPC.begin());
-  auto const iIBBC = gsl::span {IniFile.bitmapBackgroundColors};
-  std::generate(iIBBC.begin(), iIBBC.end(), [bcIndex = 0U]() mutable noexcept -> COLORREF {
+  std::ranges::fill(IniFile.designerName, FILLCHAR);
+  auto const spIDN = gsl::span {IniFile.designerName};
+  // ReSharper disable CppExpressionWithoutSideEffects
+  std::ranges::copy(designer, spIDN.begin());
+  auto const spISC = gsl::span {IniFile.stitchColors};
+  std::ranges::copy(UserColor, spISC.begin());
+  auto const spIBPC = gsl::span {IniFile.backgroundPreferredColors};
+  std::ranges::copy(CustomBackgroundColor, spIBPC.begin());
+  auto const spISPC = gsl::span {IniFile.stitchPreferredColors};
+  std::ranges::copy(CustomColor, spISPC.begin());
+  std::ranges::generate(IniFile.bitmapBackgroundColors, [bcIndex = 0U]() mutable noexcept -> COLORREF {
 	return bitmap::getBmpBackColor(bcIndex++);
   });
   IniFile.backgroundColor = BackgroundColor;
@@ -3864,7 +3864,7 @@ void thi::dubuf(std::vector<char>& buffer) {
   wrap::narrow_cast(stitchHeader.hoopType, IniFile.hoopType);
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
-  std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   if (!FormList->empty()) {
 	for (auto& form : (*FormList)) {
@@ -4075,7 +4075,7 @@ void thi::sav() {
 	}
   }
   else {
-	std::copy(StitchBuffer->begin(), StitchBuffer->end(), saveStitches.begin());
+	std::ranges::copy(*StitchBuffer, saveStitches.begin());
   }
   // ReSharper disable once CppInitializedValueIsAlwaysRewritten
   auto flag = true;
@@ -4337,7 +4337,7 @@ void thi::dusid(LIST_TYPE entry, int32_t& windowLocation, SIZE const& windowSize
 void thi::sidmsg(FRM_HEAD const& form, HWND window) {
   auto childListRect  = RECT {};
   auto parentListRect = RECT {};
-  std::fill(ValueWindow->begin(), ValueWindow->end(), nullptr);
+  std::ranges::fill(*ValueWindow, nullptr);
   auto sideWindowSize     = SIZE {};
   auto sideWindowLocation = int32_t {};
   GetWindowRect(window, &childListRect);
@@ -4930,7 +4930,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	}
 	auto const threadSizebuf  = std::string(msgBuffer.data(), msgBuffer.size());
 	auto       threadSizeBufW = utf::utf8ToUtf16(threadSizebuf);
-	std::generate(ThreadSize.begin(), ThreadSize.end(), [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
+	std::ranges::generate(ThreadSize, [tsBuffer = threadSizeBufW.begin()]() mutable noexcept -> wchar_t {
 	  return *(tsBuffer++);
 	});
 	if (thredHeader.formCount != 0) {
@@ -5583,13 +5583,12 @@ auto thi::pt2colInd(uint32_t iStitch) noexcept -> uint32_t {
 }
 
 auto thred::findFirstStitch(uint32_t form) -> uint32_t { // find the first stitch in the selected form
-  auto const formFirstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [form](F_POINT_ATTR const& stitch) -> bool {
-	    if ((stitch.attribute & NOTFRM) != 0U) {
-	      return false;
-	    }
-	    return ((stitch.attribute & FRMSK) >> FRMSHFT) == form;
-      });
+  auto const formFirstStitch = std::ranges::find_if(*StitchBuffer, [form](F_POINT_ATTR const& stitch) -> bool {
+	if ((stitch.attribute & NOTFRM) != 0U) {
+	  return false;
+	}
+	return ((stitch.attribute & FRMSK) >> FRMSHFT) == form;
+  });
   if (formFirstStitch != StitchBuffer->end()) {
 	return wrap::toUnsigned(std::distance(StitchBuffer->begin(), formFirstStitch));
   }
@@ -5994,7 +5993,8 @@ void thi::newFil() {
   ritfnam(*DesignerName);
   auto const designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
-  std::copy(designer.cbegin(), designer.cend(), spModifierName.begin());
+  // ReSharper disable CppExpressionWithoutSideEffects
+  std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   rstdu();
   rstAll();
@@ -6739,7 +6739,7 @@ void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
   auto const firstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [codedForm](F_POINT_ATTR const& stitch) -> bool {
+      std::ranges::find_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
 	    return ((stitch.attribute & (FRMSK | NOTFRM)) == codedForm);
       });
   if (firstStitch != StitchBuffer->end()) {
@@ -6756,13 +6756,9 @@ void thred::delfstchs() {
 void thi::f1del(uint32_t formIndex) {
   if (StateMap->test(StateFlag::DELTO)) {
 	auto const codedForm = formIndex << FRMSHFT;
-	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
-	                                   StitchBuffer->end(),
-	                                   [codedForm](F_POINT_ATTR const& stitch) -> bool {
-	                                     return (((stitch.attribute & NOTFRM) == 0U) &&
-	                                             ((stitch.attribute & FRMSK) == codedForm));
-	                                   }),
-	                    StitchBuffer->end());
+	std::erase_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	  return (((stitch.attribute & NOTFRM) == 0U) && ((stitch.attribute & FRMSK) == codedForm));
+	});
   }
   clip::deleclp(formIndex);
   clip::delmclp(formIndex);
@@ -7027,18 +7023,14 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
 
 void thi::delknt() {
   // delete the knot stitches
-  StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
-                                     StitchBuffer->end(),
-                                     [](F_POINT_ATTR const& stitch) -> bool {
-	                                   return (stitch.attribute & KNOTMSK) != 0U;
-                                     }),
-                      StitchBuffer->end());
+  std::erase_if(*StitchBuffer,
+                [](F_POINT_ATTR const& stitch) -> bool { return (stitch.attribute & KNOTMSK) != 0U; });
 }
 
 void thi::delknot() {
   // Find the first knot stitch, if any
   auto const firstStitch =
-      std::find_if(StitchBuffer->begin(), StitchBuffer->end(), [](F_POINT_ATTR const& stitch) -> bool {
+      std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
 	    return ((stitch.attribute & KNOTMSK) != 0U);
       });
   if (firstStitch != StitchBuffer->end()) {
@@ -7088,7 +7080,7 @@ void thi::setknt() {
 }
 
 auto thi::srchknot(uint32_t source) -> uint32_t {
-  auto upper = std::find(Knots->begin(), Knots->end(), source);
+  auto upper = std::ranges::find(*Knots, source);
   if (upper != Knots->end()) {
 	--upper;
 	if (((*upper > source) ? (*upper - source) : (source - *upper)) < KNOTSCNT) {
@@ -7293,7 +7285,7 @@ void thi::deltot() {
 }
 
 auto thi::wastch(uint32_t const& formIndex) -> bool {
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formIndex](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(*StitchBuffer, [&formIndex](F_POINT_ATTR const& stitch) -> bool {
 	return (stitch.attribute & FRMSK) >> FRMSHFT == formIndex;
   });
 }
@@ -7303,7 +7295,7 @@ auto thi::frmstch() -> bool {
   for (auto const selectedForm : (*SelectedFormList)) {
 	formMap.set(selectedForm);
   }
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&formMap](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(*StitchBuffer, [&formMap](F_POINT_ATTR const& stitch) -> bool {
 	return formMap.test((stitch.attribute & FRMSK) >> FRMSHFT);
   });
 }
@@ -7995,8 +7987,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		                     fileHeader.vertexLen * FRMPW + fileHeader.stitchCount * STCHW;
 		if (filscor > homscor) {
 		  auto const spEHCN = gsl::span {ExtendedHeader->creatorName};
-		  auto const spTHCN = gsl::span {thredHeader.creatorName};
-		  std::copy(spTHCN.begin(), spTHCN.end(), spEHCN.begin());
+		  std::ranges::copy(thredHeader.creatorName, spEHCN.begin());
 		  redfnam(*DesignerName);
 		  SetWindowText(
 		      ThrEdWindow,
@@ -8128,7 +8119,7 @@ void thi::mv2f() {
 		tempStitchBuffer.push_back(stitch);
 	  }
 	}
-	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), wrap::next(StitchBuffer->begin(), iLowBuffer));
+	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -8148,7 +8139,7 @@ void thi::mv2f() {
 	  std::copy(wrap::next(StitchBuffer->begin(), GroupStartStitch),
 	            wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
 	            StitchBuffer->begin());
-	  std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), wrap::next(StitchBuffer->begin(), grpSize));
+	  std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), grpSize));
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -8169,7 +8160,7 @@ void thi::mv2b() {
 		StitchBuffer->operator[](iLowBuffer++) = stitch;
 	  }
 	}
-	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), wrap::next(StitchBuffer->begin(), iLowBuffer));
+	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), iLowBuffer));
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
   }
@@ -8186,8 +8177,7 @@ void thi::mv2b() {
 	  std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
 	            StitchBuffer->end(),
 	            wrap::next(StitchBuffer->begin(), GroupStartStitch));
-	  std::copy(tempStitchBuffer.begin(),
-	            tempStitchBuffer.end(),
+	  std::ranges::copy(tempStitchBuffer,
 	            wrap::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
@@ -8696,7 +8686,7 @@ auto thi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 	std::copy(wrap::next(StitchBuffer->begin(), destination),
 	          wrap::next(StitchBuffer->begin(), start),
 	          wrap::next(tempStitchBuffer.begin(), finish - start));
-	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), wrap::next(StitchBuffer->begin(), destination));
+	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), destination));
   }
   else {
 	tempStitchBuffer.resize(destination - start);
@@ -8706,7 +8696,7 @@ auto thi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 	std::copy(wrap::next(StitchBuffer->begin(), start),
 	          wrap::next(StitchBuffer->begin(), finish),
 	          wrap::next(tempStitchBuffer.begin(), destination - finish));
-	std::copy(tempStitchBuffer.begin(), tempStitchBuffer.end(), wrap::next(StitchBuffer->begin(), start));
+	std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), start));
   }
   return true;
 }
@@ -9122,7 +9112,7 @@ void thi::thumnail() {
 	  Thumbnails->push_back(std::wstring(std::begin(fileName)));
 	}
 	FindClose(file);
-	std::sort(Thumbnails->begin(), Thumbnails->end());
+	std::ranges::sort(*Thumbnails);
 	auto       iThumbnail = 0U;
 	auto const thumbSize  = Thumbnails->size();
 	while (iThumbnail < 4 && iThumbnail < thumbSize) {
@@ -10668,7 +10658,7 @@ void thi::inscol() {
 }
 
 auto thi::usedcol(uint8_t index) -> bool {
-  return std::any_of(StitchBuffer->begin(), StitchBuffer->end(), [&index](F_POINT_ATTR const& stitch) -> bool {
+  return std::ranges::any_of(*StitchBuffer, [&index](F_POINT_ATTR const& stitch) -> bool {
 	return (stitch.attribute & COLMSK) == index;
   });
 }
@@ -12146,7 +12136,7 @@ auto thi::handleSideWindowActive() -> bool {
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
 	auto const iFeather =
-	    std::find_if(FTHRLIST.begin(), FTHRLIST.end(), [](LIST_TYPE const& feather) noexcept -> bool {
+	    std::ranges::find_if(FTHRLIST, [](LIST_TYPE const& feather) noexcept -> bool {
 	      return Msg.hwnd == SideWindow->operator[](feather.value);
 	    });
 	if (iFeather != FTHRLIST.end()) {
@@ -12159,7 +12149,7 @@ auto thi::handleSideWindowActive() -> bool {
   }
   if (FormMenuChoice == LLAYR) {
 	auto const iLayer =
-	    std::find_if(LAYRLIST.begin(), LAYRLIST.end(), [](LIST_TYPE const& layer) noexcept -> bool {
+	    std::ranges::find_if(LAYRLIST, [](LIST_TYPE const& layer) noexcept -> bool {
 	      return Msg.hwnd == SideWindow->operator[](layer.value);
 	    });
 	if (iLayer != LAYRLIST.end()) {
@@ -13582,7 +13572,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  threadSizeSelected = VerticalIndex;
 	  auto idx           = gsl::narrow_cast<int32_t>(VerticalIndex);
 	  auto iStr          = THREAD_SIZES.begin();
-	  std::generate(ChangeThreadSizeWin.begin(), ChangeThreadSizeWin.end(), [&idx, &iStr]() mutable noexcept -> HWND {
+	  std::ranges::generate(ChangeThreadSizeWin, [&idx, &iStr]() mutable noexcept -> HWND {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		return CreateWindow(L"STATIC",
 		                    *(iStr++),
@@ -17050,11 +17040,9 @@ void thi::init() {
   ButtonWidth               = size.cx + TXTSIDS;
   ButtonWidthX3             = ButtonWidth * 3;
   ButtonHeight              = size.cy + 4;
-  std::generate(BoxOffset.begin(),
-                BoxOffset.end(),
-                [step = int32_t {1}, offsetStepSize = thred::txtWid(L"0")]() mutable -> int32_t {
-	              return offsetStepSize.cx * step++;
-                });
+  std::ranges::generate(BoxOffset, [step = int32_t {1}, offsetStepSize = thred::txtWid(L"0")]() mutable -> int32_t {
+	return offsetStepSize.cx * step++;
+  });
   GetClientRect(ThrEdWindow, &ThredWindowRect);
   stchWnd();
   ThreadSize.fill(L'4');
@@ -17164,7 +17152,7 @@ void thi::init() {
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
   auto                  itBoxCOlor = BOX_COLOR.begin();
-  std::generate(BoxPen.begin(), BoxPen.end(), [&itBoxCOlor]() mutable noexcept -> HPEN {
+  std::ranges::generate(BoxPen, [&itBoxCOlor]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(itBoxCOlor++));
   });
   LinePen        = wrap::createPen(PS_SOLID, PENNWID, PENCHCL);
@@ -17206,7 +17194,7 @@ void thi::init() {
   ritfnam(*DesignerName);
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
   auto const spModifierName = gsl::span {ExtendedHeader->modifierName};
-  std::copy(designer.begin(), designer.end(), spModifierName.begin());
+  std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   thred::chkhup();
   nedmen();
@@ -17868,7 +17856,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 			if (bytesRead != bytesToRead) {
 			  break;
 			}
-			std::copy(formListOriginal.cbegin(), formListOriginal.cend(), formList.begin());
+			std::ranges::copy(formListOriginal, formList.begin());
 		  }
 		  else {
 			auto inFormList = std::vector<FRM_HEAD_OUT> {};
@@ -17878,7 +17866,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 			if (bytesRead != bytesToRead) {
 			  break;
 			}
-			std::copy(inFormList.cbegin(), inFormList.cend(), formList.begin());
+			std::ranges::copy(inFormList, formList.begin());
 		  }
 		  auto const bytesToRead = stitchHeader.vertexCount * wrap::sizeofType(vertexList);
 		  ReadFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, nullptr);

@@ -321,7 +321,8 @@ void si::satcpy(FRM_HEAD const& form, std::vector<SAT_CON> const& source, uint32
   auto const  endGuide          = wrap::next(startGuide, (form.satinGuideCount - size));
   SatinGuides->erase(startGuide, endGuide);
   auto const itGuide = wrap::next(SatinGuides->begin(), currentFormGuides);
-  std::copy(source.cbegin(), source.cend(), itGuide);
+  // ReSharper disable CppExpressionWithoutSideEffects
+  std::ranges::copy(source, itGuide);
 }
 
 auto satin::scomp(SAT_CON const& arg1, SAT_CON const& arg2) noexcept -> bool {
@@ -1205,7 +1206,7 @@ void satin::satfix() {
   if (TempPolygon->size() > minSize) {
 	form.vertexIndex    = thred::adflt(vertexCount);
 	auto const itVertex = wrap::next(FormVertices->begin(), form.vertexIndex);
-	std::copy(TempPolygon->cbegin(), TempPolygon->cend(), itVertex);
+	std::ranges::copy(*TempPolygon, itVertex);
 	TempPolygon->clear();
 	form.vertexCount = vertexCount;
 	form.outline();
@@ -1315,7 +1316,7 @@ void si::sbfn(std::vector<F_POINT> const& insidePoints, uint32_t start, uint32_t
 
   constexpr auto SATBUFSZ = 8U; // satin buffer size
   satinBackup.resize(SATBUFSZ);
-  std::fill(satinBackup.begin(), satinBackup.end(), F_POINT {BIGFLOAT, BIGFLOAT});
+  std::ranges::fill(satinBackup, F_POINT {BIGFLOAT, BIGFLOAT});
   auto const innerStep = F_POINT {innerDelta.x / wrap::toFloat(count), innerDelta.y / wrap::toFloat(count)};
   auto const outerStep = F_POINT {outerDelta.x / wrap::toFloat(count), outerDelta.y / wrap::toFloat(count)};
   auto satinBackupIndex = 0U;

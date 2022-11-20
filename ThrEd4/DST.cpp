@@ -959,9 +959,9 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 		// dstHeader fields are fixed width, so use strncpy in its intended way.
 		// Use sizeof to ensure no overrun if the format string is wrong length
 		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
-		auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-		std::fill(spDstHdrDesc.begin(), spDstHdrDesc.end(), ' ');
+		std::ranges::fill(dstHeader.desc, ' ');
 		auto convAuxName = utf::utf16ToUtf8(*auxName);
+		auto const spDstHdrDesc = gsl::span {dstHeader.desc};
 		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
 		  for (auto& iDHD : spDstHdrDesc) {
 			if ((*desc != 0) && *desc != '.') {
@@ -1000,7 +1000,7 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
         strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
 		// clang-format on
 		auto& res = dstHeader.res;
-		std::fill(std::begin(res), std::end(res), ' ');
+		std::ranges::fill(res, ' ');
 		auto bytesWritten = DWORD {};
 		if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
 		  displayText::riter();

@@ -429,7 +429,7 @@ void bitmap::lodbmp(fs::path const* directory) {
 	auto const saveFile = utf::utf16ToUtf8(UTF16BMPname->filename().wstring());
 #endif
 	if (!saveFile.empty() && saveFile.size() < UTF8BMPname.size()) {
-	  std::copy(saveFile.cbegin(), saveFile.cend(), UTF8BMPname.begin());
+	  std::ranges::copy(saveFile, UTF8BMPname.begin());
 	  bitmap::bfil(BackgroundColor);
 	}
 	else {
@@ -508,7 +508,7 @@ void bitmap::setBmpBackColor() {
                                                                   0x0054667a};
   BitmapBackgroundColors->clear();
   BitmapBackgroundColors->resize(DEFAULT_COLORS.size());
-  std::copy(DEFAULT_COLORS.begin(), DEFAULT_COLORS.end(), BitmapBackgroundColors->begin());
+  std::ranges::copy(DEFAULT_COLORS, BitmapBackgroundColors->begin());
 }
 
 auto bitmap::getBmpColor() noexcept -> COLORREF {

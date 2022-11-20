@@ -68,7 +68,6 @@ void altx();
 void angrct(F_RECTANGLE& rectangle) noexcept;
 void butsid(uint32_t windowId);
 auto chkbut() -> bool;
-void chktx();
 auto chktxh(_In_ TX_HIST const& historyItem) -> bool;
 void chktxnum();
 void deorg(POINT& point) noexcept;
@@ -435,16 +434,6 @@ void txi::px2ed(POINT const& point, F_POINT& editPoint) noexcept {
   editPoint.y = TextureScreen.screenHeight - wrap::toFloat(point.y) * TextureScreen.editToPixelRatio;
 }
 
-void txi::chktx() {
-  TempTexturePoints->erase(std::remove_if(TempTexturePoints->begin(),
-                                          TempTexturePoints->end(),
-                                          [&](auto const& point) -> bool {
-	                                        return !(point.line <= TextureScreen.lines &&
-	                                                 point.y <= TextureScreen.areaHeight);
-                                          }),
-                           TempTexturePoints->end());
-}
-
 void texture::drwtxtr() {
   auto       line      = std::array<POINT, LNPNTS> {};
   auto const editSpace = TextureScreen.areaHeight * 2.0F /
@@ -455,7 +444,10 @@ void texture::drwtxtr() {
   TextureScreen.lines   = wrap::floor<uint16_t>(TextureScreen.width / TextureScreen.spacing);
   auto const extraWidth = TextureScreen.spacing * wrap::toFloat(TextureScreen.lines + 2U);
   if (StateMap->testAndReset(StateFlag::CHKTX)) {
-	txi::chktx();
+	auto const erased = std::erase_if(*TempTexturePoints, [&](auto const& point) -> bool {
+	  return !(point.line <= TextureScreen.lines && point.y <= TextureScreen.areaHeight);
+	});
+	outDebugString(L"[{}] texture points erased\n", erased);
   }
   auto const flag = (pixelSpace > editSpace);
   TextureScreen.editToPixelRatio =
@@ -1137,7 +1129,7 @@ void texture::deltx(uint32_t formIndex) {
 
 void txi::nutx(FRM_HEAD& form) {
   auto index = 0U;
-  std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
+  std::ranges::sort(*TempTexturePoints, txi::tpComp);
   if (!FormList->empty()) {
 	if (form.istx()) {
 	  auto const& texture = form.fillInfo.texture;
@@ -1247,7 +1239,7 @@ void txi::dutxmir() {
 	auto const centerLine = (TextureScreen.lines + 1U) / 2;
 	auto const evenOffset = 1U - (TextureScreen.lines & 1U);
 	texture::savtxt();
-	std::sort(TempTexturePoints->begin(), TempTexturePoints->end(), txi::tpComp);
+	std::ranges::sort(*TempTexturePoints, txi::tpComp);
 	auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1U;
 	while (TempTexturePoints->operator[](iPoint).line > centerLine) {
 	  --iPoint;
@@ -1393,13 +1385,9 @@ void txi::txtdel() {
 	  texturePointsMap.set(point);
 	}
 	auto index = 0U;
-	TempTexturePoints->erase(remove_if(TempTexturePoints->begin(),
-	                                   TempTexturePoints->end(),
-	                                   [&index, texturePointsMap](auto point) {
-	                                     std::ignore = point; // avoid unused parameter warning with code that optimizes out
-	                                     return texturePointsMap.test(index++);
-	                                   }),
-	                         TempTexturePoints->end());
+	std::erase_if(*TempTexturePoints, [&index, texturePointsMap]([[maybe_unused]] auto point) {
+	  return texturePointsMap.test(index++);
+	});
 	SelectedTexturePointsList->clear();
 	StateMap->set(StateFlag::RESTCH);
 	return;

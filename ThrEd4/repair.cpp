@@ -341,7 +341,7 @@ void ri::repclp(std::wstring& repairMessage) {
 	  }
 	}
   }
-  std::copy(clipPoint.cbegin(), clipPoint.cend(), ClipPoints->begin());
+  std::ranges::copy(clipPoint, ClipPoints->begin());
   if (badClipCount != 0U) {
 	ri::adbad(repairMessage, IDS_CLPDAT, badClipCount);
   }

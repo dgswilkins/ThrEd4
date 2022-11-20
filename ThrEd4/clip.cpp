@@ -294,8 +294,7 @@ auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) 
 	retval = true;
   }
   else {
-	std::transform(clipFillData.begin(),
-	               clipFillData.end(),
+	std::ranges::transform(clipFillData,
 	               std::back_inserter(*OSequence),
 	               [&adjustedPoint](auto const& data) noexcept {
 	                 return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
@@ -684,12 +683,13 @@ void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& cha
   ci::dulast(chainEndPoints);
   if (auto const& form = FormList->operator[](ClosestFormToCursor); form.type == FRMLINE) {
 	auto const pivot = ClipRectSize.cy / 2;
-	std::transform(ClipBuffer->begin(), ClipBuffer->end(), std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
+	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [&pivot](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y + pivot)};
 	});
   }
   else {
-	std::transform(ClipBuffer->begin(), ClipBuffer->end(), std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+	std::ranges::transform(
+	    *ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y)};
 	});
   }

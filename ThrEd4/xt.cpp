@@ -621,12 +621,9 @@ auto xt::insid(FRM_HEAD const& form) -> std::vector<F_POINT>& {
 
 void xi::delwlk(uint32_t code) {
   if (!StitchBuffer->empty()) {
-	StitchBuffer->erase(std::remove_if(StitchBuffer->begin(),
-	                                   StitchBuffer->end(),
-	                                   [&code](F_POINT_ATTR const& stitch) -> bool {
-	                                     return (stitch.attribute & WLKFMSK) == code;
-	                                   }),
-	                    StitchBuffer->end());
+	std::erase_if(*StitchBuffer, [&code](F_POINT_ATTR const& stitch) -> bool {
+	  return (stitch.attribute & WLKFMSK) == code;
+	});
   }
 }
 
@@ -854,7 +851,7 @@ void xt::srtcol() {
   for (auto const& stitch : *StitchBuffer) {
 	highStitchBuffer[colorStartStitch[stitch.attribute & COLMSK]++] = stitch;
   }
-  std::copy(highStitchBuffer.cbegin(), highStitchBuffer.cend(), StitchBuffer->begin());
+  std::ranges::copy(highStitchBuffer, StitchBuffer->begin());
 }
 
 void xt::dubit(FRM_HEAD& form, uint32_t bit) {
@@ -1212,8 +1209,8 @@ void xt::fsort() {
 	  pRecs.push_back(&region);
 	  pFRecs.push_back(&region);
 	}
-	std::sort(pRecs.begin(), pRecs.end(), xi::orComp);
-	std::sort(pFRecs.begin(), pFRecs.end(), xi::orfComp);
+	std::ranges::sort(pRecs, xi::orComp);
+	std::ranges::sort(pFRecs, xi::orfComp);
 #ifdef _DEBUG
 	xi::dmprec(pRecs, lastRegion);
 #endif
@@ -1497,7 +1494,7 @@ void xt::fdelstch(FRM_HEAD const& form, FILL_STARTS& fillStartsData, uint32_t& f
   }
   if (!UserFlagMap->test(UserFlag::FIL2OF) && StateMap->test(StateFlag::SELBOX)) {
 	auto& fillArray = fillStartsData.fillArray;
-	std::fill(std::begin(fillArray), std::end(fillArray), ClosestPointIndex);
+	std::ranges::fill(fillArray, ClosestPointIndex);
   }
 }
 

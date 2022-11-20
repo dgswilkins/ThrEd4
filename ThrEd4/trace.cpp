@@ -858,7 +858,7 @@ void trace::trinit() {
 		  highColor = *pixel;
 		}
 		ti::trcols(highColor);
-		std::copy(PixelColors.begin(), PixelColors.end(), HighColors.begin());
+		std::ranges::copy(PixelColors, HighColors.begin());
 		ti::trcols(color);
 		for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 		  if (PixelColors[iRGB] > HighColors[iRGB]) {

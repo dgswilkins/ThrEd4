@@ -74,7 +74,7 @@ auto PCS::savePCS(fs::path const* auxName, std::vector<F_POINT_ATTR>& saveStitch
 	  auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
 	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
 	  auto const spColors = gsl::span {PCSHeader.colors};
-	  std::copy(UserColor.begin(), UserColor.end(), spColors.begin());
+	  std::ranges::copy(UserColor, spColors.begin());
 	  do {
 		if (pci::pcshup(saveStitches)) {
 		  flag = false;
@@ -147,8 +147,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
-		  auto const spColors = gsl::span {PCSHeader.colors};
-		  std::copy(spColors.begin(), spColors.end(), UserColor.begin());
+		  std::ranges::copy(PCSHeader.colors, UserColor.begin());
 		  fileSize -= sizeof(PCSHeader) + 14;
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
 		  auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
@@ -277,7 +276,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
 
 auto PCS::isPCS(fs::path const& path) -> bool {
   auto extention = path.extension().wstring();
-  std::transform(extention.begin(), extention.end(), extention.begin(), ::towlower);
+  std::ranges::transform(extention, extention.begin(), ::towlower);
   return (extention.compare(0, 4, L".pcs") == 0);
 }
 
