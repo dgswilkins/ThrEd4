@@ -65,7 +65,7 @@ void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
-constexpr auto DSTMAX    = 121;                  // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTMAX    = 121L;                  // maximum stitch/jump length of 121 in DST format
 constexpr auto DSTSCALE  = 3.0F / 5.0F;          // DST stitch scaling factor
 constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling factor
 // constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
@@ -887,7 +887,7 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return X_DST[wrap::toSize(dif.cx) + DSTMAX] | Y_DST[wrap::toSize(dif.cy) + DSTMAX];
+  return X_DST[wrap::toSize(DSTMAX) + dif.cx] | Y_DST[wrap::toSize(DSTMAX) + dif.cy];
 }
 
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
