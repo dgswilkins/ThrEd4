@@ -887,7 +887,9 @@ auto di::dudbits(SIZE const& dif) -> uint32_t {
       0x21a020, // 120
       0x21a0a0  // 121
   };
-  return X_DST[wrap::toSize(DSTMAX) + dif.cx] | Y_DST[wrap::toSize(DSTMAX) + dif.cy];
+  auto const xOffset = DSTMAX + dif.cx;
+  auto const yOffset = DSTMAX + dif.cy;
+  return X_DST[wrap::toSize(xOffset)] | Y_DST[wrap::toSize(yOffset)];
 }
 
 void di::savdst(std::vector<DSTREC>& DSTRecords, uint32_t data) {
