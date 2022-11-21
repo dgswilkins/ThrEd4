@@ -24,7 +24,7 @@ class PECHDR
   uint8_t  ukn2 {};       // Unknown
   uint16_t hnd1 {};       // Unknown (0x00ff)
   uint8_t  thumbWidth {}; // Thumbnail image width in bytes (6) , with 8 bit pixels per byte
-                          // Thus, 6 would mean 6×8 = 48 pixels per line
+                          // Thus, 6 would mean 6x8 = 48 pixels per line
   uint8_t thumbHeight {}; // Thumbnail image height in pixels (38)
   uint8_t ukn3[12] {};    // Unknown, usually 20 20 20 20 64 20 00 20 00 20 20 20
   uint8_t colorCount {};  // Number of colors minus one, 0xFF means 0 colors
