@@ -2342,6 +2342,7 @@ void thi::chknum() {
 	else {
 	  if (PreferenceIndex != 0U) {
 		auto const value = wrap::wcstof(SideWindowEntryBuffer->data());
+		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto       hWnd = HWND {nullptr};
 		auto       fmtStr = std::wstring {};
 		switch (PreferenceIndex - 1) {
