@@ -49,7 +49,7 @@ void reptx();
 void ri::adbad(std::wstring& repairMessage, uint32_t code, uint32_t count) {
   auto fmtStr = displayText::loadStr(code);
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-  fmtStr += fmt::format(displayText::loadStr(IDS_NOTREP), count);
+  fmtStr += fmt::format(fmt::runtime(displayText::loadStr(IDS_NOTREP)), count);
   repairMessage += fmtStr;
 }
 

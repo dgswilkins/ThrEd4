@@ -79,9 +79,10 @@ void displayText::tabmsg(uint32_t code) {
 
 void displayText::hsizmsg() {
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-  displayText::shoMsg(fmt::format(displayText::loadStr(IDS_HSIZ),
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_HSIZ)),
                                   (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN),
-                                  (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN)));
+                                  (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
+  displayText::shoMsg(fmtStr);
 }
 
 void displayText::numWnd() {
@@ -119,8 +120,8 @@ void displayText::msgflt(uint32_t messageId, float value) {
 }
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
-  auto const fmtStr = displayText::loadStr(IDS_SIZ);
-  displayText::shoMsg(fmt::format(fmtStr, threadSizeText, threadSize));
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SIZ)), threadSizeText, threadSize);
+  displayText::shoMsg(fmtStr);
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
@@ -166,7 +167,8 @@ void displayText::clrhbut(uint32_t startButton) noexcept {
 }
 
 void displayText::ritnum(uint32_t code, uint32_t value) {
-  displayText::butxt(HNUM, fmt::format(displayText::loadStr(code), value));
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(code)), value);
+  displayText::butxt(HNUM, fmtStr);
 }
 
 void displayText::riter() {
@@ -181,8 +183,8 @@ void displayText::pntmsg(uint32_t msgID) {
 void displayText::shoseln(uint32_t code0, uint32_t code1) {
   auto const msg0   = displayText::loadStr(code0);
   auto const msg1   = displayText::loadStr(code1);
-  auto const fmtStr = displayText::loadStr(IDS_SHOSEL);
-  displayText::shoMsg(fmt::format(fmtStr, msg0, msg1));
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SHOSEL)), msg0, msg1);
+  displayText::shoMsg(fmtStr);
 }
 
 auto displayText::clpmsgs(uint32_t code) -> bool {
@@ -361,8 +363,8 @@ void di::bxtxt(uint32_t iButton, uint32_t iMessage) {
 }
 
 void di::hlpflt(uint32_t iButton, uint32_t iMessage, float data) {
-  auto const fmtStr = displayText::loadStr(iMessage);
-  SetWindowText(ButtonWin->operator[](iButton), fmt::format(fmtStr, data).c_str());
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(iMessage)), data);
+  SetWindowText(ButtonWin->operator[](iButton), fmtStr.c_str());
 }
 
 void displayText::drwtxbut(TXTR_SCREEN const& textureScreen) {

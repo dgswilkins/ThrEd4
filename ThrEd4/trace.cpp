@@ -156,14 +156,17 @@ void ti::trcols(COLORREF color) noexcept {
 }
 
 void ti::trcstpnum() {
-  auto const fmtStr = displayText::loadStr(IDS_TRCSTP);
+  auto const fmtStr =
+      fmt::format(fmt::runtime(displayText::loadStr(IDS_TRCSTP)), (IniFile.traceLength * IPFGRAN));
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-  SetWindowText(TraceStepWin, fmt::format(fmtStr, (IniFile.traceLength * IPFGRAN)).c_str());
+  SetWindowText(TraceStepWin, fmtStr.c_str());
 }
 
 void ti::trcratnum() {
   constexpr auto HLIN = uint32_t {HNUM};
-  displayText::butxt(HLIN, fmt::format(displayText::loadStr(IDS_TRCRAT), -log10(IniFile.traceRatio - 1.0F)));
+  auto const     fmtStr =
+      fmt::format(fmt::runtime(displayText::loadStr(IDS_TRCRAT)), -log10(IniFile.traceRatio - 1.0F));
+  displayText::butxt(HLIN, fmtStr);
 }
 
 auto ti::trcin(COLORREF color) -> bool {

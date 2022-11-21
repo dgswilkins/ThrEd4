@@ -22,7 +22,7 @@
 template <typename... Args>
 void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Args&&... args) {
   auto const strY = fmt::format(L"{}({}) : {}", fileName, line, strX);
-  auto const strZ = fmt::format(strY, std::forward<Args>(args)...);
+  auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());
 }
 

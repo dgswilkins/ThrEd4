@@ -10,7 +10,7 @@
   "overrides": [
     {
       "name": "fmt",
-      "version": "8.1.1"
+      "version": "9.1.0"
     }
   ],
   "builtin-baseline": "e6a79ac0183043994ab21a2c4e0f9cdad8a5421c"

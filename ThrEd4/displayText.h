@@ -44,7 +44,8 @@ void shoMsg(std::wstring const& message);
 
 template <class inType> void showMessage(uint32_t messageId, inType value) {
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-  displayText::shoMsg(fmt::format(displayText::loadStr(messageId), value));
+  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
+  displayText::shoMsg(fmtStr);
 }
 
 void shord();
