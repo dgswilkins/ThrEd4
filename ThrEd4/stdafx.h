@@ -43,7 +43,7 @@
 #endif
 
 // Windows Header Files:
-#include <windows.h> // Win32 Platform SDK main header
+#include <Windows.h> // Win32 Platform SDK main header
 
 // C RunTime Header Files
 #include <commdlg.h>
