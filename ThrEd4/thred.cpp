@@ -1404,7 +1404,6 @@ void thred::savdo() {
 	}
 	StateMap->set(StateFlag::BAKACT);
 	thred::enableUndo();
-	StateMap->set(StateFlag::DUMEN);
 	backup::dudat();
 	backup::updateWriteIndex();
   }
@@ -4510,13 +4509,8 @@ void thi::unthum() {
 
 void thi::rstdu() {
   backup::deldu();
-  StateMap->reset(StateFlag::REDUSHO);
-  StateMap->reset(StateFlag::UNDUSHO);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-  StateMap->set(StateFlag::DUMEN);
+  thred::disableRedo();
+  thred::disableUndo();
 }
 
 auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool {

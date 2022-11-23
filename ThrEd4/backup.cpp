@@ -170,7 +170,6 @@ void backup::redo() {
   }
   thred::enableUndo();
   redbak();
-  StateMap->set(StateFlag::DUMEN);
 }
 
 void backup::bak() {
