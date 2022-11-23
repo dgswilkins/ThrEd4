@@ -49,6 +49,7 @@ void nuPen(HPEN& pen, int32_t width, COLORREF color) noexcept;
 auto pxCor2stch(POINT const& point) noexcept -> F_POINT;
 void redclp();
 void redraw(HWND window) noexcept;
+void refreshColors() noexcept;
 void resetMsgBuffer();
 void resetSideBuffer();
 void resetColorChanges() noexcept;

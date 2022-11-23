@@ -69,6 +69,9 @@
     <ClCompile Include="PCS.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="backup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EnumMap.h">
@@ -167,6 +170,9 @@
     <ClInclude Include="iniFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="backup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\dlin.cur">
@@ -194,6 +200,7 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="cpp.hint" />
+    <None Include="..\vcpkg.json" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="Resources\ThrEd4.ico">

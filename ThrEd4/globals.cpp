@@ -126,6 +126,9 @@ POINT                          ThredWindowOrigin         = {};      // offset or
 uint32_t*                      TraceBitmapData           = nullptr; // trace bitmap data
 boost::dynamic_bitset<>*       TracedEdges               = nullptr; // detected edges of trace areas
 boost::dynamic_bitset<>*       TracedMap                 = nullptr; // in/out state of trace areas
+
+std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer     = nullptr; // backup data NOLINT(modernize-avoid-c-arrays)
+
 SIZE                           UnzoomedRect              = {};      // size of the unzoomed stitch window
 std::array<COLORREF, COLORCNT> UserColor                 = {};      // user colors
 ENUM_MAP<UserFlag>*            UserFlagMap               = nullptr; // for storage of persistent binary variables set by the user

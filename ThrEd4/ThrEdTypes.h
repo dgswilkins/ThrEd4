@@ -120,6 +120,29 @@ constexpr auto STDDPI   = int32_t {96};         // Default DPI
 
 constexpr auto FRACFACT = 256.0F; // float factor to convert the fractional part to/from the lower byte
 
+// main menu items
+enum MainMenuItems {
+  M_FILE,
+  M_VIEW,
+  M_FORM,
+  M_EDIT,
+  M_IN,
+  M_OUT,
+  M_UNDO,
+  M_REDO,
+  M_ROT,
+  M_PREF,
+  M_FILL,
+  M_ADD,
+  M_FRM,
+  M_ALL,
+  M_1,
+  M_2,
+  M_3,
+  M_4,
+  M_HELP
+};
+
 enum HoopSize {
   SETCUST = 1, // set the custom hoop
   SMALHUP = 2, // pfaf code for small hoop

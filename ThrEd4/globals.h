@@ -56,6 +56,8 @@
 // Standard Libraries
 #include <filesystem>
 
+constexpr auto UNDOLEN = 16U; // UndoBuffer length
+
 class FORM_VERTICES
 {
   public:
@@ -259,6 +261,8 @@ extern boost::dynamic_bitset<>* TracedEdges;
 extern boost::dynamic_bitset<>* TracedMap;
 
 extern SIZE UnzoomedRect;
+
+extern std::vector<std::unique_ptr<uint32_t[]>>* UndoBuffer;
 
 extern std::array<COLORREF, COLORCNT> UserColor;
 

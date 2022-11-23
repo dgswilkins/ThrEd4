@@ -2,6 +2,7 @@
 // Local Headers
 #include "stdafx.h"
 #include "switches.h"
+#include "backup.h"
 #include "bitmap.h"
 #include "clip.h"
 #include "displayText.h"
@@ -35,32 +36,6 @@
 #ifdef ALLOCFAILURE
 //#include <new.h>
 #endif
-
-class BACK_HEAD // Backup header
-{
-  public:
-  uint32_t      formCount {};
-  FRM_HEAD*     forms {};
-  uint32_t      stitchCount {};
-  F_POINT_ATTR* stitches {};
-  uint32_t      vertexCount {};
-  F_POINT*      vertices {};
-  uint32_t      guideCount {};
-  SAT_CON*      guide {};
-  uint32_t      clipPointCount {};
-  F_POINT*      clipPoints {};
-  COLORREF*     colors {};
-  TX_PNT*       texturePoints {};
-  uint32_t      texturePointCount {};
-  SIZE          zoomRect {};
-
-  // constexpr BACK_HEAD() noexcept = default;
-  // BACK_HEAD(CLIP_STITCH const&) = default;
-  // BACK_HEAD(CLIP_STITCH&&) = default;
-  // BACK_HEAD& operator=(BACK_HEAD const& rhs) = default;
-  // BACK_HEAD& operator=(BACK_HEAD&&) = default;
-  //~BACK_HEAD() = default;
-};
 
 #pragma pack(push, 1)
 class BAL_STITCH // balarad stitch
@@ -148,7 +123,6 @@ enum class FileIndices : uint8_t {
 namespace thi {
 void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
 void auxmen();
-void bak();
 void bakmrk();
 void bakthum();
 void barnam(HWND window, uint32_t iThumbnail);
@@ -189,7 +163,6 @@ auto defTxt(uint32_t iColor) -> COLORREF;
 void defpref();
 void delcol();
 void deldir();
-void deldu();
 void delet();
 void delfre();
 void delknot();
@@ -223,7 +196,6 @@ void duclip();
 void duclp();
 void ducmd();
 void ducros(HDC hDC);
-void dudat();
 void dufdef() noexcept;
 void dufsel();
 void dugrid();
@@ -404,12 +376,10 @@ void rSelbox();
 auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
 void rebak();
 void rebox();
-void redbak();
 void redbal();
 void redfils();
 void redfnam(std::wstring& designerName);
 void redini();
-void redo();
 void reldun();
 void relin();
 void rembig();
@@ -581,31 +551,7 @@ constexpr auto THREDSIG = uint32_t {0x746872U}; // ThrEd format file signature
 constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeters
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
-constexpr auto UNDOLEN  = 16U;                  // UndoBuffer length
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
-
-// main menu items
-enum MainMenuItems {
-  M_FILE,
-  M_VIEW,
-  M_FORM,
-  M_EDIT,
-  M_IN,
-  M_OUT,
-  M_UNDO,
-  M_REDO,
-  M_ROT,
-  M_PREF,
-  M_FILL,
-  M_ADD,
-  M_FRM,
-  M_ALL,
-  M_1,
-  M_2,
-  M_3,
-  M_4,
-  M_HELP
-};
 
 // view menu items
 enum ViewMenuItems {
@@ -790,8 +736,6 @@ static auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in 
 static auto MovieTimeStep       = int32_t {};  // time delay for stitchout
 static auto LRUMenuId =
     std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-static auto UndoBufferWriteIndex = uint32_t {};                            // undo storage pointer
-static auto UndoBufferReadIndex  = uint32_t {};                         // undo retrieval pointers
 static auto LastKeyCode          = std::numeric_limits<wchar_t>::max(); // last key code
 static auto VersionNames =
     gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
@@ -809,7 +753,6 @@ static auto BalaradOffset      = F_POINT {}; // balarad offset
 static auto FormVerticesAsLine =
     gsl::narrow_cast<std::vector<POINT>*>(nullptr); // form vertex clipboard paste into form line
 static auto LastFormSelected = uint32_t {};         // end point of selected range of forms
-static auto UndoBuffer       = gsl::narrow_cast<std::vector<std::unique_ptr<uint32_t[]>>*>(nullptr); // backup data NOLINT(modernize-avoid-c-arrays)
 
 // cursors
 static auto FormCursor            = gsl::narrow_cast<HCURSOR>(nullptr); // form
@@ -1422,72 +1365,6 @@ void thi::ladj() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-void thi::deldu() {
-  for (auto& undo : *UndoBuffer) {
-	undo.reset(nullptr);
-  }
-  UndoBufferWriteIndex = 0;
-  StateMap->reset(StateFlag::BAKWRAP);
-  StateMap->reset(StateFlag::BAKACT);
-}
-
-void thi::dudat() {
-  auto& undoBuffer = *UndoBuffer;
-  undoBuffer[UndoBufferWriteIndex].reset(nullptr);
-  auto const formCount = wrap::toUnsigned(FormList->size());
-
-  auto const size = wrap::sizeofVector(*FormList) + wrap::sizeofVector(StitchBuffer) +
-                    wrap::sizeofVector(FormVertices) + wrap::sizeofVector(ClipPoints) +
-                    wrap::sizeofVector(SatinGuides) + wrap::sizeofVector(TexturePointsBuffer) +
-                    wrap::toUnsigned(sizeof(BACK_HEAD)) + wrap::toUnsigned(sizeof(UserColor));
-  undoBuffer[UndoBufferWriteIndex] = std::make_unique<uint32_t[]>(size); // NOLINT(modernize-avoid-c-arrays)
-  auto* backupData = convertFromPtr<BACK_HEAD*>(undoBuffer[UndoBufferWriteIndex].get());
-  if (backupData != nullptr) {
-	backupData->zoomRect  = UnzoomedRect;
-	backupData->formCount = formCount;
-	backupData->forms     = convertFromPtr<FRM_HEAD*>(&backupData[1]);
-	if (formCount != 0) {
-	  auto const spForms = gsl::span {backupData->forms, FormList->size()};
-	  std::copy(FormList->cbegin(), FormList->cend(), spForms.begin());
-	}
-	backupData->stitchCount = wrap::toUnsigned(StitchBuffer->size());
-	backupData->stitches    = convertFromPtr<F_POINT_ATTR*>(&backupData->forms[formCount]);
-	if (!StitchBuffer->empty()) {
-	  auto const spStitches = gsl::span {backupData->stitches, StitchBuffer->size()};
-	  std::copy(StitchBuffer->begin(), StitchBuffer->end(), spStitches.begin());
-	}
-	backupData->vertexCount = wrap::toUnsigned(FormVertices->size());
-	backupData->vertices    = convertFromPtr<F_POINT*>(&backupData->stitches[StitchBuffer->size()]);
-	if (!FormVertices->empty()) {
-	  auto const spVertices = gsl::span {backupData->vertices, FormVertices->size()};
-	  std::copy(FormVertices->cbegin(), FormVertices->cend(), spVertices.begin());
-	}
-	backupData->guideCount = wrap::toUnsigned(SatinGuides->size());
-	backupData->guide      = convertFromPtr<SAT_CON*>(&backupData->vertices[FormVertices->size()]);
-	if (!SatinGuides->empty()) {
-	  auto const spGuides = gsl::span {backupData->guide, backupData->guideCount};
-	  std::copy(SatinGuides->cbegin(), SatinGuides->cend(), spGuides.begin());
-	}
-	backupData->clipPointCount = wrap::toUnsigned(ClipPoints->size());
-	backupData->clipPoints     = convertFromPtr<F_POINT*>(&backupData->guide[SatinGuides->size()]);
-	if (!ClipPoints->empty()) {
-	  auto const spClipPoints = gsl::span {backupData->clipPoints, backupData->clipPointCount};
-	  std::copy(ClipPoints->cbegin(), ClipPoints->cend(), spClipPoints.begin());
-	}
-	backupData->colors = convertFromPtr<COLORREF*>(&backupData->clipPoints[ClipPoints->size()]);
-	{
-	  auto const spColors = gsl::span {backupData->colors, COLORCNT};
-	  std::copy(std::begin(UserColor), std::end(UserColor), spColors.begin());
-	}
-	backupData->texturePoints     = convertFromPtr<TX_PNT*>(&backupData->colors[COLORCNT]);
-	backupData->texturePointCount = wrap::toUnsigned(TexturePointsBuffer->size());
-	if (!TexturePointsBuffer->empty()) {
-	  auto const spTexturePoints = gsl::span {backupData->texturePoints, backupData->texturePointCount};
-	  std::copy(TexturePointsBuffer->cbegin(), TexturePointsBuffer->cend(), spTexturePoints.begin());
-	}
-  }
-}
-
 void thred::savdo() {
   StateMap->set(StateFlag::WASDO);
   StateMap->set(StateFlag::CMPDO);
@@ -1501,12 +1378,8 @@ void thred::savdo() {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
 	StateMap->set(StateFlag::DUMEN);
-	thi::dudat();
-	++UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UNDOLEN - 1U);
-	if (UndoBufferWriteIndex == 0U) {
-	  StateMap->set(StateFlag::BAKWRAP);
-	}
+	backup::dudat();
+	backup::updateWriteIndex();
   }
 }
 
@@ -3731,7 +3604,7 @@ void thi::redbal() {
 		auto ucb       = UserColorBrush.begin();
 		for (auto const& ucolor : UserColor) {
 		  *(itUserPen++) = wrap::createPen(PS_SOLID, PENNWID, ucolor);
-		  nuBrush(*ucb, ucolor);
+		  thi::nuBrush(*ucb, ucolor);
 		  ++ucb;
 		}
 		thred::coltab();
@@ -4581,140 +4454,6 @@ void thi::delstch1(uint32_t iStitch) {
   }
 }
 
-void thi::redbak() {
-  auto const* undoData = convertFromPtr<BACK_HEAD*>(UndoBuffer->operator[](UndoBufferWriteIndex).get());
-  if (undoData != nullptr) {
-	StitchBuffer->clear();
-	if (undoData->stitchCount != 0U) {
-	  auto const span = gsl::span {undoData->stitches, undoData->stitchCount};
-	  StitchBuffer->insert(StitchBuffer->end(), span.begin(), span.end());
-	}
-	else {
-	  StateMap->reset(StateFlag::INIT);
-	}
-	UnzoomedRect = undoData->zoomRect;
-	FormList->clear();
-	if (undoData->formCount != 0U) {
-	  auto const span = gsl::span {undoData->forms, undoData->formCount};
-	  FormList->insert(FormList->end(), span.begin(), span.end());
-	}
-	FormVertices->clear();
-	if (undoData->vertexCount != 0U) {
-	  auto const span = gsl::span {undoData->vertices, undoData->vertexCount};
-	  FormVertices->insert(FormVertices->end(), span.begin(), span.end());
-	}
-	SatinGuides->clear();
-	if (undoData->guideCount != 0U) {
-	  auto const span = gsl::span {undoData->guide, undoData->guideCount};
-	  SatinGuides->insert(SatinGuides->end(), span.begin(), span.end());
-	}
-	ClipPoints->clear();
-	if (undoData->clipPointCount != 0U) {
-	  auto const span = gsl::span {undoData->clipPoints, undoData->clipPointCount};
-	  ClipPoints->insert(ClipPoints->end(), span.begin(), span.end());
-	}
-	// ToDo - add field in BACK_HEAD to keep track of number of colors
-	constexpr auto UCOLSIZE     = UserColor.size();
-	auto const     spUndoColors = gsl::span {undoData->colors, gsl::narrow<ptrdiff_t>(UCOLSIZE)};
-	auto const     spUserColors = gsl::span {UserColor};
-	std::copy(spUndoColors.begin(), spUndoColors.end(), spUserColors.begin());
-	auto itUserPen = UserPen->begin();
-	auto ucb       = UserColorBrush.begin();
-	for (auto const& color : UserColor) {
-	  thred::nuPen(*itUserPen, 1, color);
-	  nuBrush(*ucb, color);
-	  ++itUserPen;
-	  ++ucb;
-	}
-	for (auto const& iColor : *UserColorWin) {
-	  thred::redraw(iColor);
-	}
-	TexturePointsBuffer->clear();
-	if (undoData->texturePointCount != 0U) {
-	  auto const span = gsl::span {undoData->texturePoints, undoData->texturePointCount};
-	  TexturePointsBuffer->insert(TexturePointsBuffer->end(), span.begin(), span.end());
-	}
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-}
-
-void thi::redo() {
-  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
-	++UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UNDOLEN - 1U);
-	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
-	if (nextBufferIndex == UndoBufferReadIndex) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->reset(StateFlag::REDUSHO);
-	}
-	else {
-	  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	  }
-	}
-	if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
-	}
-	redbak();
-	StateMap->set(StateFlag::DUMEN);
-  }
-}
-
-void thi::bak() {
-  thred::unmsg();
-  StateMap->reset(StateFlag::FPSEL);
-  StateMap->reset(StateFlag::FRMPSEL);
-  StateMap->reset(StateFlag::BIGBOX);
-  SelectedFormList->clear();
-  thred::undat();
-  if (StateMap->testAndReset(StateFlag::PRFACT)) {
-	StateMap->reset(StateFlag::WASRT);
-	DestroyWindow(PreferencesWindow);
-	PreferenceIndex = 0;
-	thred::unsid();
-  }
-  if (!StateMap->testAndSet(StateFlag::BAKING)) {
-	dudat();
-	UndoBufferReadIndex = UndoBufferWriteIndex + 1U;
-  }
-  if (StateMap->test(StateFlag::BAKWRAP)) {
-	--UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UNDOLEN - 1U);
-	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
-	if (previousBufferIndex == UndoBufferReadIndex) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->set(StateFlag::DUMEN);
-	  StateMap->reset(StateFlag::UNDUSHO);
-	}
-  }
-  else {
-	if (UndoBufferWriteIndex != 0U) {
-	  --UndoBufferWriteIndex;
-	}
-	if (UndoBufferWriteIndex == 0U) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->set(StateFlag::DUMEN);
-	  StateMap->reset(StateFlag::UNDUSHO);
-	}
-  }
-  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
-  }
-  StateMap->reset(StateFlag::FORMSEL);
-  StateMap->reset(StateFlag::GRPSEL);
-  StateMap->reset(StateFlag::SCROS);
-  StateMap->reset(StateFlag::ECROS);
-  redbak();
-}
-
 void thi::prtred(HANDLE fileHandle, uint32_t code) {
   CloseHandle(fileHandle);
   StateMap->reset(StateFlag::INIT);
@@ -4743,7 +4482,7 @@ void thi::unthum() {
 }
 
 void thi::rstdu() {
-  deldu();
+  backup::deldu();
   StateMap->reset(StateFlag::REDUSHO);
   StateMap->reset(StateFlag::UNDUSHO);
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -5191,7 +4930,7 @@ void thi::nuFil(FileIndices fileIndex) {
 	for (auto const& color : UserColor) {
 	  thred::nuPen(*itUserPen, 1, color);
 	  ++itUserPen;
-	  nuBrush(*ucb, color);
+	  thi::nuBrush(*ucb, color);
 	  ++ucb;
 	  buffer[0] = *(itThreadSize++);
 	  SetWindowText(*(tsw++), buffer.data());
@@ -6010,7 +5749,7 @@ void thi::selCol() {
 void thi::newFil() {
   StateMap->reset(StateFlag::CMPDO);
   bitmap::resetBmpFile(true);
-  deldu();
+  backup::deldu();
   auto& desName = IniFile.designerName;
   DesignerName->assign(utf::utf8ToUtf16(std::string(std::begin(desName))));
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
@@ -10381,7 +10120,7 @@ void thi::closfn() {
   Knots->clear();
   WorkingFileName->clear();
   bitmap::delmap();
-  deldu();
+  backup::deldu();
   displayText::clrhbut(3);
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);
   SetWindowText(ThrEdWindow, fmtStr.c_str());
@@ -10555,7 +10294,7 @@ void thi::nuscol(size_t iColor) {
   auto const itUserPen   = wrap::next(UserPen->begin(), iColor);
   thred::nuPen(*itUserPen, 1, *itUserColor);
   auto const ucb = wrap::next(UserColorBrush.begin(), iColor);
-  nuBrush(*ucb, *itUserColor);
+  thi::nuBrush(*ucb, *itUserColor);
   thred::redraw(UserColorWin->operator[](iColor));
 }
 
@@ -10905,11 +10644,11 @@ void thi::qcode() {
 	}
   }
   if (StateMap->testAndReset(StateFlag::FUNCLP)) { // aborting form paste
-	thi::bak();
+	backup::bak();
 	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   }
   if (StateMap->testAndReset(StateFlag::FUNSCLP)) { // aborting forms paste
-	thi::bak();
+	backup::bak();
 	SelectedFormList->clear();
 	ClosestFormToCursor = wrap::toUnsigned(FormList->size() - 1U);
   }
@@ -12975,7 +12714,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  thred::unmsg();
 	}
 	else {
-	  thi::bak();
+	  backup::bak();
 	}
 	if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 	  formForms::refrm();
@@ -13588,7 +13327,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
 	  auto itUserPen   = wrap::next(UserPen->begin(), VerticalIndex);
 	  thred::nuPen(*itUserPen, 1, *itUserColor);
 	  auto ucb = wrap::next(UserColorBrush.begin(), VerticalIndex);
-	  nuBrush(*ucb, *itUserColor);
+	  thi::nuBrush(*ucb, *itUserColor);
 	  thred::redraw(UserColorWin->operator[](VerticalIndex));
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -14508,14 +14247,14 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case L'B': {
 	  if (wrap::pressed(VK_CONTROL)) {
-		redo();
+		backup::redo();
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
 		  bakmrk();
 		}
 		else {
-		  bak();
+		  backup::bak();
 		}
 	  }
 	  break;
@@ -14803,7 +14542,7 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	  }
 	  else {
 		if (wrap::pressed(VK_CONTROL)) {
-		  bak();
+		  backup::bak();
 		}
 		else {
 		  zumin();
@@ -15462,7 +15201,7 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  auto ucw         = UserColorWin->begin();
 	  for (auto const& color : DEFAULT_COLORS) {
 		*itUserColor = color;
-		nuBrush(*ucb, *itUserColor);
+		thi::nuBrush(*ucb, *itUserColor);
 		thred::nuPen(*itUserPen, 1, *itUserColor);
 		thred::redraw(*ucw);
 		++ucb;
@@ -16153,7 +15892,7 @@ auto thi::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> boo
 	  break;
 	}
 	case ID_REDO: { // redo
-	  redo();
+	  backup::redo();
 	  flag = true;
 	  break;
 	}
@@ -16195,7 +15934,7 @@ auto thi::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> boo
 	  break;
 	}
 	case ID_BACK: { // undo
-	  bak();
+	  backup::bak();
 	  flag = true;
 	  break;
 	}
@@ -16345,7 +16084,7 @@ auto thi::chkMsg(std::vector<POINT>& stretchBoxLine, float& xyRatio, float& angl
 		  thred::unmsg();
 		}
 		else {
-		  thi::bak();
+		  backup::bak();
 		}
 		if (StateMap->testAndReset(StateFlag::WASFRMFRM)) {
 		  formForms::refrm();
@@ -18783,4 +18522,18 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	return 0;
   }
   return -1;
+}
+
+void thred::refreshColors() noexcept {
+  auto itUserPen = UserPen->begin();
+  auto ucb       = UserColorBrush.begin();
+  for (auto const& color : UserColor) {
+	thred::nuPen(*itUserPen, 1, color);
+	thi::nuBrush(*ucb, color);
+	++itUserPen;
+	++ucb;
+  }
+  for (auto const& iColor : *UserColorWin) {
+	thred::redraw(iColor);
+  }
 }
