@@ -7,6 +7,7 @@
 #include "form.h"
 #include "formForms.h"
 #include "globals.h"
+#include "menu.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
@@ -7225,35 +7226,14 @@ void form::tglfrm() {
 	satin::satfix();
   }
   StateMap->reset(StateFlag::HIDSTCH);
-  if (StateMap->testAndFlip(StateFlag::FRMOF)) {
-	FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
-  }
-  else {
-	FormOnOff->assign(displayText::loadStr(IDS_FRMINUS));
-	StateMap->reset(StateFlag::FORMSEL);
-	StateMap->reset(StateFlag::FORMIN);
-	StateMap->reset(StateFlag::MOVFRM);
-	StateMap->reset(StateFlag::FRMPMOV);
-	StateMap->reset(StateFlag::FRMOV);
-	StateMap->reset(StateFlag::SATIN);
-	StateMap->reset(StateFlag::SATPNT);
-	StateMap->reset(StateFlag::SATCNKT);
-	StateMap->reset(StateFlag::FENDIN);
-	StateMap->reset(StateFlag::DELFRM);
-	StateMap->reset(StateFlag::FRMPSEL);
-	StateMap->reset(StateFlag::INSFRM);
-  }
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
-  StateMap->set(StateFlag::DUMEN);
+  menu::flipFormOnOff();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void form::frmon() {
   thred::unbsho();
   StateMap->reset(StateFlag::FRMOF);
-  FormOnOff->assign(displayText::loadStr(IDS_FRMPLUS));
-  SetMenuItemInfo(MainMenu, ID_FRMOF, FALSE, MenuInfo);
-  StateMap->set(StateFlag::DUMEN);
+  menu::resetFormOnOff();
 }
 
 void fi::fnord() {

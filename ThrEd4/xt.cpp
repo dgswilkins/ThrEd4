@@ -6,6 +6,7 @@
 #include "displayText.h"
 #include "form.h"
 #include "globals.h"
+#include "menu.h"
 #include "satin.h"
 #include "texture.h"
 #include "thred.h"
@@ -2691,8 +2692,7 @@ void xt::clrstch() noexcept {
 
 void xt::chgwrn() {
   UserFlagMap->flip(UserFlag::WRNOF);
-  thred::wrnmen();
-  StateMap->set(StateFlag::DUMEN);
+  menu::wrnmen();
 }
 
 void xt::chgchk(uint8_t code) {

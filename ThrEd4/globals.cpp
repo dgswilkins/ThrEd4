@@ -60,6 +60,7 @@ std::vector<HWND>*             LabelWindow               = nullptr; // text hand
 F_POINT                        LastPoint                 = {};      // last formOrigin written by line connect routine
 float                          LineSpacing               = DEFSPACE * PFGRAN; // stitch spacing in stitch units
 F_POINT                        LowerLeftStitch           = {};      // lower left formOrigin in a form
+std::array<uint32_t, OLDNUM>*  LRUPtr                    = nullptr; // pointer to LRU list
 HMENU                          MainMenu                  = nullptr; // main menu
 HWND                           MainStitchWin             = nullptr; // stitch window
 float                          MaxStitchLen              = 0.0F;    // maximum stitch length

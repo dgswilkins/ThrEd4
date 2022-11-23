@@ -81,7 +81,6 @@ void unbsho();
 void undat() noexcept;
 void unmsg();
 void unsid() noexcept;
-void wrnmen();
 void zumhom();
 
 } // namespace thred

@@ -123,13 +123,11 @@ enum class FileIndices : uint8_t {
 
 namespace thi {
 void angdif(float& lowestAngle, float& highestAngle, float angle) noexcept;
-void auxmen();
 void bakmrk();
 void bakthum();
 void barnam(HWND window, uint32_t iThumbnail);
 void box(uint32_t iNearest, HDC hDC);
 void boxs();
-void bsavmen();
 auto centr() noexcept -> F_POINT;
 void chk1col();
 auto chk2of() -> bool;
@@ -303,12 +301,9 @@ auto iselpnt() noexcept -> bool;
 void istch();
 auto isthr(fs::path const& thredPath) -> bool;
 auto kjmp(std::vector<F_POINT_ATTR>& buffer, uint32_t start) -> uint32_t;
-void knotmen();
-void ladj();
 void lenCalc();
 void lenfn(uint32_t start, uint32_t end, uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
 void lensadj();
-void linbmen();
 void loadColors() noexcept;
 void lock();
 
@@ -327,7 +322,6 @@ void movmrk();
 auto movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> bool;
 void mv2b();
 void mv2f();
-void nedmen();
 void nedof();
 void nedon();
 void newFil();
@@ -371,14 +365,12 @@ auto pt2colInd(uint32_t iStitch) noexcept -> uint32_t;
 void purg();
 void purgdir();
 auto pxchk(float pixelSize) -> uint16_t;
-void qchk();
 void qcode();
 void rSelbox();
 auto readTHRFile(std::filesystem::path const& newFileName) -> bool;
 void rebak();
 void rebox();
 void redbal();
-void redfils();
 void redfnam(std::wstring& designerName);
 void redini();
 void reldun();
@@ -495,8 +487,6 @@ auto updateFillColor() -> bool;
 auto updatePreferences() -> bool;
 auto usedcol(uint8_t VerticalIndex) -> bool;
 void vubak();
-void vuselthr();
-void vuthrds();
 
 auto CALLBACK wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lParam) -> LRESULT;
 
@@ -553,35 +543,6 @@ constexpr auto TSIZ30   = 0.3F;                 // #30 thread size in millimeter
 constexpr auto TSIZ40   = 0.2F;                 // #40 thread size in millimeters
 constexpr auto TSIZ60   = 0.05F;                // #60 thread size in millimeters
 constexpr auto ZUMFCT   = 0.65F;                // zoom factor
-
-// view menu items
-enum ViewMenuItems {
-  MVW_MOVIE,
-  MVW_SET,
-  MVW_BACK,
-  MVW_ZOOM,
-  MVW_THRD,
-  MVW_SHWT,
-  MVW_SHWTCOL,
-  MVW_DSGN,
-  MVW_KNOT,
-  MVW_MARK,
-  MVW_ABOUT
-};
-
-// fill menu items
-enum FillMenuItems {
-  MFIL_SAT,
-  MFIL_FTH,
-  MFIL_VERT,
-  MFIL_HOR,
-  MFIL_ANG,
-  MFIL_CLP,
-  MFIL_CONT,
-  MFIL_TED,
-  MFIL_BORD,
-  MFIL_UNFIL
-};
 
 // file menu items
 enum FileMenuItems {
@@ -798,14 +759,6 @@ static auto    ThreadSizeIndex     = std::array<uint32_t, COLORCNT> {}; // threa
 static auto    ChangeThreadSizeWin = std::array<HWND, 3> {}; // thread size change windows
 constexpr auto TSSIZE = ThreadSize.size(); // size of the user selected thread size array
 
-// menus
-static auto BorderFillMenu = gsl::narrow_cast<HMENU>(nullptr); // border fill submenu
-static auto EditMenu       = gsl::narrow_cast<HMENU>(nullptr); // edit submenu
-static auto FileMenu       = gsl::narrow_cast<HMENU>(nullptr); // file submenu
-static auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
-static auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
-static auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
-
 // windows
 static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
@@ -1005,74 +958,6 @@ void thred::undat() noexcept {
 	DestroyWindow(FormDataSheet);
 	FormDataSheet = nullptr;
   }
-}
-
-void thi::qchk() {
-  if (UserFlagMap->test(UserFlag::MARQ)) {
-	CheckMenuItem(MainMenu, ID_MARKESC, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_MARKQ, MF_UNCHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_MARKESC, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_MARKQ, MF_CHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thi::nedmen() {
-  if (UserFlagMap->test(UserFlag::NEDOF)) {
-	CheckMenuItem(MainMenu, ID_SETNEDL, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_CHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_SETNEDL, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_RSTNEDL, MF_UNCHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thi::knotmen() {
-  if (UserFlagMap->test(UserFlag::KNOTOF)) {
-	CheckMenuItem(MainMenu, ID_KNOTON, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_KNOTOF, MF_CHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_KNOTON, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_KNOTOF, MF_UNCHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thi::bsavmen() {
-  if (UserFlagMap->test(UserFlag::BSAVOF)) {
-	CheckMenuItem(MainMenu, ID_BSAVON, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_BSAVOF, MF_CHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_BSAVON, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_BSAVOF, MF_UNCHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thi::linbmen() {
-  if (UserFlagMap->test(UserFlag::LINSPAC)) {
-	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_CHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_LINBEXACT, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_LINBEVEN, MF_UNCHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thred::wrnmen() {
-  auto code = UINT {MF_CHECKED};
-  if (UserFlagMap->test(UserFlag::WRNOF)) {
-	code = MF_UNCHECKED;
-  }
-  CheckMenuItem(MainMenu, ID_WARNOF, code);
 }
 
 static auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
@@ -1352,20 +1237,6 @@ void thred::coltab() {
   }
 }
 
-void thi::ladj() {
-  for (auto const& iLayer : LAYRLIST) {
-	if (iLayer.value == ActiveLayer) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_GRAYED);
-	}
-	else {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, iLayer.value + M_ALL, MF_BYPOSITION | MF_ENABLED);
-	}
-  }
-  StateMap->set(StateFlag::DUMEN);
-}
-
 void thred::savdo() {
   StateMap->set(StateFlag::WASDO);
   StateMap->set(StateFlag::CMPDO);
@@ -1378,37 +1249,6 @@ void thred::savdo() {
 	backup::dudat();
 	backup::updateWriteIndex();
   }
-}
-
-void thi::redfils() {
-  auto findData = WIN32_FIND_DATA {0, {0, 0}, {0, 0}, {0, 0}, 0, 0, 0, 0, L"", L""};
-  for (auto const& iLRU : LRUMenuId) {
-	if (GetMenuState(FileMenu, iLRU, MF_BYCOMMAND) != gsl::narrow_cast<UINT>(-1)) {
-	  DeleteMenu(FileMenu, iLRU, MF_BYCOMMAND);
-	}
-  }
-  auto previousName = PreviousNames->begin();
-  for (auto iLRU = 0U; iLRU < PreviousNames->size(); ++iLRU) {
-	if (!previousName->empty()) {
-	  if (StateMap->test(StateFlag::SAVAS)) {
-		AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
-	  }
-	  else {
-		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const fileHandle = FindFirstFile(previousName->c_str(), &findData);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-		if (fileHandle == INVALID_HANDLE_VALUE) {
-		  previousName->clear();
-		}
-		else {
-		  AppendMenu(FileMenu, MF_BYCOMMAND | MF_STRING, LRUMenuId[iLRU], previousName->wstring().c_str()); // NOLINT(hicpp-signed-bitwise)
-		  FindClose(fileHandle);
-		}
-	  }
-	}
-	++previousName;
-  }
-  StateMap->set(StateFlag::DUMEN);
 }
 
 void thi::nunams() {
@@ -1459,7 +1299,7 @@ void thi::nunams() {
 	PreviousNames->insert(PreviousNames->begin(), *ThrName);
 	PreviousNames->pop_back();
   }
-  redfils();
+  menu::redfils(LRUPtr, PreviousNames);
 }
 
 void thred::rngadj() {
@@ -3997,59 +3837,6 @@ void thi::sav() {
   }
 }
 
-void thi::auxmen() {
-  constexpr auto CCH = 13; // length of the menu item text???
-
-  auto filinfo = MENUITEMINFO {sizeof(MENUITEMINFO),
-                               MIIM_TYPE,
-                               MFT_STRING,
-                               0,
-                               0,
-                               nullptr,
-                               nullptr,
-                               nullptr,
-                               0,
-                               nullptr, // dwTypeData
-                               CCH,
-                               nullptr};
-  auto auxMsg  = std::wstring {};
-  CheckMenuItem(MainMenu, ID_AUXPCS, MF_UNCHECKED);
-#if PESACT
-  CheckMenuItem(MainMenu, ID_AUXPES, MF_UNCHECKED);
-#else
-  EnableMenuItem(MainMenu, ID_AUXPES, MF_DISABLED | MF_GRAYED);
-#endif
-  CheckMenuItem(MainMenu, ID_AUXDST, MF_UNCHECKED);
-  auto const auxTxt = displayText::loadStr(IDS_AUXTXT);
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"DST"));
-	  CheckMenuItem(MainMenu, ID_AUXDST, MF_CHECKED);
-	  break;
-	}
-	case AUXPES:
-#if PESACT
-	{
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"PES"));
-	  CheckMenuItem(MainMenu, ID_AUXPES, MF_CHECKED);
-	  break;
-	}
-#else
-	{
-	  IniFile.auxFileType = AUXPCS;
-	}
-#endif
-	default: {
-	  auxMsg.assign(fmt::format(fmt::runtime(auxTxt), L"PCS"));
-	  CheckMenuItem(MainMenu, ID_AUXPCS, MF_CHECKED);
-	}
-  }
-#pragma warning(suppress : 26492) // type.3 Don't use const_cast to cast away const or volatile NOLINTNEXTLINE(cppcoreguidelines-pro-type-const-cast)
-  filinfo.dwTypeData = const_cast<LPWSTR>(auxMsg.c_str());
-  SetMenuItemInfo(FileMenu, ID_OPNPCD, MF_BYCOMMAND, &filinfo);
-  StateMap->set(StateFlag::DUMEN);
-}
-
 auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
   if (nullptr != fileName) {
 	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
@@ -4136,22 +3923,19 @@ void thi::savAs() {
 		}
 		case FileIndices::PCS: {
 		  WorkingFileName->replace_extension(L".pcs");
-		  IniFile.auxFileType = AUXPCS;
-		  auxmen();
+		  thi::setpcs();
 		  break;
 		}
 #if PESACT
 		case FileIndices::PES: {
 		  WorkingFileName->replace_extension(L".pes");
-		  IniFile.auxFileType = AUXPES;
-		  auxmen();
+		  thi::setpes();
 		  break;
 		}
 #endif
 		case FileIndices::DST: {
 		  WorkingFileName->replace_extension(L".dst");
-		  IniFile.auxFileType = AUXDST;
-		  auxmen();
+		  thi::setdst();
 		  break;
 		}
 	  }
@@ -4945,7 +4729,7 @@ void thi::nuFil(FileIndices fileIndex) {
 	else {
 	  nuAct(0);
 	}
-	auxmen();
+	menu::auxmen();
 	lenCalc();
 	auto const fmtStr =
 	    fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), newFileName.wstring(), *DesignerName);
@@ -8171,7 +7955,7 @@ void thi::rotfns(float rotationAngle) {
 
 void thi::nulayr(uint8_t play) {
   ActiveLayer = play;
-  ladj();
+  menu::ladj();
   if (ActiveLayer != 0U) {
 	if (StateMap->test(StateFlag::FORMSEL) &&
 	    ((gsl::narrow_cast<decltype(ActiveLayer)>(FormList->operator[](ClosestFormToCursor).attribute & FRMLMSK) >>
@@ -8477,36 +8261,6 @@ void thi::movmrk() {
 	  }
 	}
   }
-}
-
-void thi::vuthrds() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap->reset(StateFlag::THRDS);
-  }
-  else {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap->set(StateFlag::THRDS);
-  }
-  StateMap->set(StateFlag::RESTCH);
-}
-
-void thi::vuselthr() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  if ((GetMenuState(ViewMenu, ID_VUSELTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-	StateMap->reset(StateFlag::COL);
-  }
-  else {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_CHECKED);
-	StateMap->set(StateFlag::COL);
-  }
-  StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::colchk() {
@@ -9226,19 +8980,19 @@ void thi::sidhup() {
 
 void thi::setpcs() {
   IniFile.auxFileType = AUXPCS;
-  auxmen();
+  menu::auxmen();
 }
 
 #if PESACT
 void thi::setpes() {
   IniFile.auxFileType = AUXPES;
-  auxmen();
+  menu::auxmen();
 }
 #endif
 
 void thi::setdst() {
   IniFile.auxFileType = AUXDST;
-  auxmen();
+  menu::auxmen();
 }
 
 void thi::fop() {
@@ -9703,35 +9457,35 @@ void thi::ritcur() {
 
 void thi::nedon() {
   UserFlagMap->reset(UserFlag::NEDOF);
-  nedmen();
+  menu::nedmen();
 }
 
 void thi::nedof() {
   UserFlagMap->set(UserFlag::NEDOF);
-  nedmen();
+  menu::nedmen();
 }
 
 void thi::shoknot() {
   UserFlagMap->reset(UserFlag::KNOTOF);
-  knotmen();
+  menu::knotmen();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::hidknot() {
   UserFlagMap->set(UserFlag::KNOTOF);
-  knotmen();
+  menu::knotmen();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::pcsbsavon() {
   UserFlagMap->reset(UserFlag::BSAVOF);
-  bsavmen();
+  menu::bsavmen();
   StateMap->set(StateFlag::RESTCH);
 }
 
 void thi::pcsbsavof() {
   UserFlagMap->set(UserFlag::BSAVOF);
-  bsavmen();
+  menu::bsavmen();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -14084,7 +13838,7 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	  break;
 	}
 	case VK_F6: {
-	  vuthrds();
+	  menu::vuthrds();
 	  break;
 	}
 	case VK_F7: {
@@ -15303,13 +15057,13 @@ auto thi::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_MARKESC: { // view / Set / Retrieve Mark / Escape
 	  UserFlagMap->set(UserFlag::MARQ);
-	  qchk();
+	  menu::qchk();
 	  flag = true;
 	  break;
 	}
 	case ID_MARKQ: { // view / Set / Retrieve Mark / Q
 	  UserFlagMap->reset(UserFlag::MARQ);
-	  qchk();
+	  menu::qchk();
 	  flag = true;
 	  break;
 	}
@@ -15350,13 +15104,13 @@ auto thi::handleViewMenu(WORD const& wParameter) -> bool {
 	}
 	case ID_LINBEXACT: { // view / Set / Line Border Spacing / Exact
 	  UserFlagMap->reset(UserFlag::LINSPAC);
-	  linbmen();
+	  menu::linbmen();
 	  flag = true;
 	  break;
 	}
 	case ID_LINBEVEN: { // view / Set / Line Border Spacing / Even
 	  UserFlagMap->set(UserFlag::LINSPAC);
-	  linbmen();
+	  menu::linbmen();
 	  flag = true;
 	  break;
 	}
@@ -15423,12 +15177,12 @@ auto thi::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_VUSELTHRDS: { // view / Show Threads for Selected Color
-	  vuselthr();
+	  menu::vuselthr();
 	  flag = true;
 	  break;
 	}
 	case ID_VUTHRDS: { // view / Show Threads
-	  vuthrds();
+	  menu::vuthrds();
 	  flag = true;
 	  break;
 	}
@@ -16765,19 +16519,14 @@ void thi::init() {
   if (sWidth < screenHalfWidth) {
 	wRect.right = wRect.left += screenHalfWidth;
   }
-  FillMenu       = GetSubMenu(MainMenu, M_FILL);
-  FileMenu       = GetSubMenu(MainMenu, M_FILE);
-  EditMenu       = GetSubMenu(MainMenu, M_EDIT);
-  BorderFillMenu = GetSubMenu(FillMenu, MFIL_BORD);
-  ViewMenu       = GetSubMenu(MainMenu, M_VIEW);
-  ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
-  qchk();
+  menu::init();
+  menu::qchk();
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   ArrowCursor = LoadCursor(nullptr, IDC_ARROW);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   CrossCursor = LoadCursor(nullptr, IDC_CROSS);
   crtcurs();
-  redfils();
+  menu::redfils(LRUPtr, PreviousNames);
   StateMap->reset(); // clear the bitmap
   // set up the size variables
   ThredDC = GetDC(ThrEdWindow);
@@ -16949,10 +16698,10 @@ void thi::init() {
   ZoomFactor = 1;
   StitchBuffer->clear();
   GetDCOrgEx(StitchWindowDC, &StitchWindowOrigin);
-  ladj();
+  menu::ladj();
   auto const pikol = displayText::loadStr(IDS_PIKOL);
   wrap::getTextExtentPoint32(ThredDC, pikol.c_str(), wrap::toUnsigned(pikol.size()), &PickColorMsgSize);
-  auxmen();
+  menu::auxmen();
   fnamtabs();
   ritfnam(*DesignerName);
   auto       designer       = utf::utf16ToUtf8(*DesignerName);
@@ -16960,13 +16709,13 @@ void thi::init() {
   std::ranges::copy(designer, spModifierName.begin());
   spModifierName[designer.length()] = 0;
   thred::chkhup();
-  nedmen();
+  menu::nedmen();
   fil2men();
-  knotmen();
-  bsavmen();
+  menu::knotmen();
+  menu::bsavmen();
   rotauxmen();
-  linbmen();
-  thred::wrnmen();
+  menu::linbmen();
+  menu::wrnmen();
   ritloc();
   frmcurmen();
   texture::redtx();
@@ -18378,6 +18127,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  InterleaveSequenceIndices = &privateInterleaveSequenceIndices;
 	  Knots                     = &privateKnots;
 	  LabelWindow               = &privateLabelWindow;
+	  LRUPtr                    = &LRUMenuId;
 	  MenuInfo                  = &privateMenuInfo;
 	  MsgBuffer                 = &privateMsgBuffer;
 	  NearestPixel              = &privateNearestPixel;
