@@ -4868,8 +4868,7 @@ void thi::resetState() {
   thred::unbsho();
   bitmap::resetBmpFile(true);
   TexturePointsBuffer->clear();
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
+  thred::disableRedo();
   thred::unbsho();
   form::frmon();
   SelectedFormList->clear();
