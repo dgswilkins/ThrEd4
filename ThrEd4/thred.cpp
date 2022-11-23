@@ -1366,10 +1366,11 @@ void thi::ladj() {
 }
 
 void thred::disableRedo() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-  StateMap->reset(StateFlag::REDUSHO);
-  StateMap->set(StateFlag::DUMEN);
+  if (StateMap->testAndReset(StateFlag::REDUSHO)) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
+	StateMap->set(StateFlag::DUMEN);
+  }
 }
 
 void thred::enableRedo() {
@@ -1381,10 +1382,11 @@ void thred::enableRedo() {
 }
 
 void thred::disableUndo() {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-  StateMap->reset(StateFlag::UNDUSHO);
-  StateMap->set(StateFlag::DUMEN);
+  if (StateMap->testAndReset(StateFlag::UNDUSHO)) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
+	StateMap->set(StateFlag::DUMEN);
+  }
 }
 
 void thred::enableUndo() {
