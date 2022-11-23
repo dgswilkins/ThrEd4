@@ -159,28 +159,18 @@ void backup::redbak() {
 }
 
 void backup::redo() {
-  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
-	++UndoBufferWriteIndex;
-	UndoBufferWriteIndex &= (UNDOLEN - 1U);
-	auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
-	if (nextBufferIndex == UndoBufferReadIndex) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->reset(StateFlag::REDUSHO);
-	}
-	else {
-	  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	  }
-	}
-	if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
-	}
-	redbak();
-	StateMap->set(StateFlag::DUMEN);
+  ++UndoBufferWriteIndex;
+  UndoBufferWriteIndex &= (UNDOLEN - 1U);
+  auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
+  if (nextBufferIndex == UndoBufferReadIndex) {
+	thred::disableRedo();
   }
+  else {
+	thred::enableRedo();
+  }
+  thred::enableUndo();
+  redbak();
+  StateMap->set(StateFlag::DUMEN);
 }
 
 void backup::bak() {
@@ -205,10 +195,7 @@ void backup::bak() {
 	UndoBufferWriteIndex &= (UNDOLEN - 1U);
 	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
 	if (previousBufferIndex == UndoBufferReadIndex) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->set(StateFlag::DUMEN);
-	  StateMap->reset(StateFlag::UNDUSHO);
+	  thred::disableRedo();
 	}
   }
   else {
@@ -216,17 +203,10 @@ void backup::bak() {
 	  --UndoBufferWriteIndex;
 	}
 	if (UndoBufferWriteIndex == 0U) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	  StateMap->set(StateFlag::DUMEN);
-	  StateMap->reset(StateFlag::UNDUSHO);
+	  thred::disableUndo();
 	}
   }
-  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
-  }
+  thred::enableRedo();
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::GRPSEL);
   StateMap->reset(StateFlag::SCROS);

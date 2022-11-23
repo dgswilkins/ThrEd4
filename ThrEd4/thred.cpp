@@ -1365,18 +1365,45 @@ void thi::ladj() {
   StateMap->set(StateFlag::DUMEN);
 }
 
+void thred::disableRedo() {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
+  StateMap->reset(StateFlag::REDUSHO);
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void thred::enableRedo() {
+  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
+	StateMap->set(StateFlag::DUMEN);
+  }
+}
+
+void thred::disableUndo() {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
+  StateMap->reset(StateFlag::UNDUSHO);
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void thred::enableUndo() {
+  if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
+	StateMap->set(StateFlag::DUMEN);
+  }
+}
+
 void thred::savdo() {
   StateMap->set(StateFlag::WASDO);
   StateMap->set(StateFlag::CMPDO);
   if (StateMap->testAndReset(StateFlag::SAVACT)) {
 	if (StateMap->testAndReset(StateFlag::BAKING)) {
-	  StateMap->reset(StateFlag::REDUSHO);
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
+	  thred::disableRedo();
 	}
 	StateMap->set(StateFlag::BAKACT);
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
+	thred::enableUndo();
 	StateMap->set(StateFlag::DUMEN);
 	backup::dudat();
 	backup::updateWriteIndex();
@@ -14247,7 +14274,9 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case L'B': {
 	  if (wrap::pressed(VK_CONTROL)) {
-		backup::redo();
+		if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
+		  backup::redo();
+		}
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
@@ -15892,7 +15921,9 @@ auto thi::handleMainMenu(WORD const& wParameter, F_POINT& rotationCenter) -> boo
 	  break;
 	}
 	case ID_REDO: { // redo
-	  backup::redo();
+	  if (StateMap->test(StateFlag::BAKACT) && StateMap->test(StateFlag::REDUSHO)) {
+		backup::redo();
+	  }
 	  flag = true;
 	  break;
 	}
