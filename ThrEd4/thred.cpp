@@ -18296,7 +18296,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  auto  privateInterleaveSequenceIndices = std::vector<INS_REC> {};
 	  auto  privateKnots                     = std::vector<uint32_t> {};
 	  auto  privateLabelWindow               = std::vector<HWND> {};
-	  auto* formOnOff                        = privateFormOnOff.data();
+	  FormOnOff                              = &privateFormOnOff;
 
 	  auto privateMenuInfo = MENUITEMINFO {
 		sizeof(MENUITEMINFO), // Size
@@ -18308,7 +18308,7 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 		    nullptr,          // bmpChecked
 		    nullptr,          // bmpUnchecked
 		    0,                // ItemData
-		    formOnOff,        // TypeData
+		    FormOnOff->data(),// TypeData
 		    16,               // cch
 #if (WINVER >= 0x0500)
 		    nullptr // bmpItem
@@ -18401,7 +18401,6 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 	  FormControlPoints         = &privateFormControlPoints;
 	  FormLines                 = &privateFormLines;
 	  FormList                  = &privateFormList;
-	  FormOnOff                 = &privateFormOnOff;
 	  FormVertices              = &privateFormVertices;
 	  FormVerticesAsLine        = &privateFormVerticesAsLine;
 	  HomeDirectory             = &privateHomeDirectory;
