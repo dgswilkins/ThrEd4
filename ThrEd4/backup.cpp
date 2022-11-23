@@ -4,6 +4,7 @@
 #include "switches.h"
 #include "backup.h"
 #include "globals.h"
+#include "menu.h"
 #include "thred.h"
 
 #ifndef WIN32_LEAN_AND_MEAN
@@ -163,12 +164,12 @@ void backup::redo() {
   UndoBufferWriteIndex &= (UNDOLEN - 1U);
   auto const nextBufferIndex = (UndoBufferWriteIndex + 1U) & (UNDOLEN - 1U);
   if (nextBufferIndex == UndoBufferReadIndex) {
-	thred::disableRedo();
+	menu::disableRedo();
   }
   else {
-	thred::enableRedo();
+	menu::enableRedo();
   }
-  thred::enableUndo();
+  menu::enableUndo();
   redbak();
 }
 
@@ -194,7 +195,7 @@ void backup::bak() {
 	UndoBufferWriteIndex &= (UNDOLEN - 1U);
 	auto const previousBufferIndex = UndoBufferWriteIndex - 1U;
 	if (previousBufferIndex == UndoBufferReadIndex) {
-	  thred::disableRedo();
+	  menu::disableRedo();
 	}
   }
   else {
@@ -202,10 +203,10 @@ void backup::bak() {
 	  --UndoBufferWriteIndex;
 	}
 	if (UndoBufferWriteIndex == 0U) {
-	  thred::disableUndo();
+	  menu::disableUndo();
 	}
   }
-  thred::enableRedo();
+  menu::enableRedo();
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::GRPSEL);
   StateMap->reset(StateFlag::SCROS);

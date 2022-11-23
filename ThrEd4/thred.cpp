@@ -11,6 +11,7 @@
 #include "formForms.h"
 #include "globals.h"
 #include "hlp.h"
+#include "menu.h"
 #include "PCS.h"
 #include "PES.h"
 #include "repair.h"
@@ -1365,47 +1366,15 @@ void thi::ladj() {
   StateMap->set(StateFlag::DUMEN);
 }
 
-void thred::disableRedo() {
-  if (StateMap->testAndReset(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_GRAYED);
-	StateMap->set(StateFlag::DUMEN);
-  }
-}
-
-void thred::enableRedo() {
-  if (!StateMap->testAndSet(StateFlag::REDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_REDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
-  }
-}
-
-void thred::disableUndo() {
-  if (StateMap->testAndReset(StateFlag::UNDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_GRAYED);
-	StateMap->set(StateFlag::DUMEN);
-  }
-}
-
-void thred::enableUndo() {
-  if (!StateMap->testAndSet(StateFlag::UNDUSHO)) {
-	// NOLINTNEXTLINE(hicpp-signed-bitwise)
-	EnableMenuItem(MainMenu, M_UNDO, MF_BYPOSITION | MF_ENABLED);
-	StateMap->set(StateFlag::DUMEN);
-  }
-}
-
 void thred::savdo() {
   StateMap->set(StateFlag::WASDO);
   StateMap->set(StateFlag::CMPDO);
   if (StateMap->testAndReset(StateFlag::SAVACT)) {
 	if (StateMap->testAndReset(StateFlag::BAKING)) {
-	  thred::disableRedo();
+	  menu::disableRedo();
 	}
 	StateMap->set(StateFlag::BAKACT);
-	thred::enableUndo();
+	menu::enableUndo();
 	backup::dudat();
 	backup::updateWriteIndex();
   }
@@ -4511,8 +4480,8 @@ void thi::unthum() {
 
 void thi::rstdu() {
   backup::deldu();
-  thred::disableRedo();
-  thred::disableUndo();
+  menu::disableRedo();
+  menu::disableUndo();
 }
 
 auto thi::getNewFileName(fs::path& newFileName, FileStyles fileTypes, FileIndices fileIndex) -> bool {
@@ -4868,7 +4837,7 @@ void thi::resetState() {
   thred::unbsho();
   bitmap::resetBmpFile(true);
   TexturePointsBuffer->clear();
-  thred::disableRedo();
+  menu::disableRedo();
   thred::unbsho();
   form::frmon();
   SelectedFormList->clear();
