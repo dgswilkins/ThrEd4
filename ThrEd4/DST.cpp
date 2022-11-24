@@ -939,9 +939,8 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
-auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
+auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   auto flag = true;
-  if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
@@ -1017,10 +1016,6 @@ auto DST::saveDST(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 	  } while (false);
 	}
 	CloseHandle(fileHandle);
-  }
-  else {
-	flag = false;
-  }
   return flag;
 }
 // ReSharper restore CppDeprecatedEntity
