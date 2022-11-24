@@ -6200,7 +6200,7 @@ void fi::getbig(F_RECTANGLE* allItemsRect) noexcept {
   }
 }
 
-void form::stchrct2px(F_RECTANGLE const* stitchRect, RECT& screenRect) {
+void form::stchrct2px(gsl::not_null<F_RECTANGLE const*> stitchRect, RECT& screenRect) {
   auto stitchCoord = F_POINT {stitchRect->left, stitchRect->top};
   auto screenCoord = POINT {};
   thred::sCor2px(stitchCoord, screenCoord);
