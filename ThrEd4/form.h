@@ -24,7 +24,8 @@ void chain();
 void chan();
 void chkcont();
 auto chkdel(FRM_HEAD const& currentForm) noexcept -> bool;
-auto chkfrm(std::vector<POINT>* formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool;
+auto chkfrm(gsl::not_null<std::vector<POINT>*> formControlPoints, std::vector<POINT>& stretchBoxLine, float& xyRatio)
+    -> bool;
 auto chkmax(uint32_t arg0, uint32_t arg1) noexcept -> bool;
 void chkseq(bool border);
 auto cisin(FRM_HEAD const& form, float xCoordinate, float yCoordinate) -> bool;
