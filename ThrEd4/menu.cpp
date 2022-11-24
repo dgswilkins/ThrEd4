@@ -14,6 +14,9 @@ static auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 static auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 static auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
 
+namespace mni {
+} // namespace mni
+
 void menu::disableRedo() {
   if (StateMap->testAndReset(StateFlag::REDUSHO)) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -258,6 +261,15 @@ void menu::init() noexcept {
   ViewSetMenu    = GetSubMenu(ViewMenu, MVW_SET);
 }
 
+void menu::resetThreadView() {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+  StateMap->reset(StateFlag::COL);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
+  StateMap->set(StateFlag::DUMEN);
+}
+
 void menu::vuthrds() {
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   if ((GetMenuState(ViewMenu, ID_VUTHRDS, MF_BYCOMMAND) & MF_CHECKED) != 0U) {
@@ -286,4 +298,104 @@ void menu::vuselthr() {
 	StateMap->set(StateFlag::COL);
   }
   StateMap->set(StateFlag::RESTCH);
+}
+
+void menu::setGridCols(const COLORREF& color) {
+  class GRID_COL
+  {
+public:
+	uint32_t id {};
+	uint32_t col {};
+
+	// constexpr GRID_COL() noexcept = default;
+	// GRID_COL(GRID_COL const&) = default;
+	// GRID_COL(GRID_COL&&) = default;
+	// GRID_COL& operator=(GRID_COL const& rhs) = default;
+	// GRID_COL& operator=(GRID_COL&&) = default;
+	//~GRID_COL() = default;
+  };
+
+  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, GRDHI};
+  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, GRDMED};
+  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, GRDDEF};
+  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, GRDRED};
+  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
+  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
+  static constexpr auto GRID_CODES =
+      std::array<GRID_COL, 6> {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
+
+  for (auto const& gridCode : GRID_CODES) {
+	if (color == gridCode.col) {
+	  CheckMenuItem(MainMenu, gridCode.id, MF_CHECKED);
+	}
+	else {
+	  CheckMenuItem(MainMenu, gridCode.id, MF_UNCHECKED);
+	}
+  }
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void menu::duhbit(uint32_t cod) noexcept {
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);
+  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+  CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod);
+}
+
+void menu::flipHideBitmap() {
+  if (StateMap->testAndFlip(StateFlag::HIDMAP)) {
+	menu::duhbit(MF_UNCHECKED);
+  }
+  else {
+	menu::duhbit(MF_CHECKED);
+  }
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void menu::rotauxmen() {
+  if (UserFlagMap->test(UserFlag::ROTAUX)) {
+	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
+	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
+  }
+  else {
+	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_UNCHECKED);
+	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_CHECKED);
+  }
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void menu::frmcurmen() {
+  if (UserFlagMap->test(UserFlag::FRMX)) {
+	CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
+	CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
+  }
+  else {
+	CheckMenuItem(MainMenu, ID_FRMX, MF_UNCHECKED);
+	CheckMenuItem(MainMenu, ID_FRMBOX, MF_CHECKED);
+  }
+  StateMap->set(StateFlag::DUMEN);
+}
+
+void menu::fil2men() {
+  if (UserFlagMap->test(UserFlag::FIL2OF)) {
+	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
+	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
+  }
+  else {
+	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_CHECKED);
+	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_UNCHECKED);
+  }
+  StateMap->set(StateFlag::DUMEN);
+}
+
+static auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
+
+void menu::chkmen() {
+  constexpr auto LASTCODE = DataCode.size();
+  for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
+	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
+	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
+	CheckMenuItem(MainMenu, DataCode[iCode], code);
+  }
+  StateMap->set(StateFlag::DUMEN);
 }

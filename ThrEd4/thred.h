@@ -16,7 +16,6 @@ auto adclp(uint32_t count) -> uint32_t;
 auto adflt(uint32_t count) -> uint32_t;
 void bBox();
 void chkhup();
-void chkmen() noexcept;
 void chkrng(F_POINT& range);
 void addColor(uint32_t stitch, uint32_t color);
 void coltab();

@@ -198,7 +198,6 @@ void ducros(HDC hDC);
 void dufdef() noexcept;
 void dufsel();
 void dugrid();
-void duhbit(uint32_t cod) noexcept;
 void duhom();
 void duinsfil();
 void dulin(std::array<POINT, 2> const& moveLine0, std::array<POINT, 2> const& moveLine1);
@@ -226,7 +225,6 @@ auto CALLBACK enumChildProc(HWND hwnd, LPARAM lParam) noexcept -> BOOL;
 
 void esccode();
 void f1del(uint32_t formIndex);
-void fil2men();
 void fil2sel(uint32_t stat);
 void filclos();
 void filfrms();
@@ -239,7 +237,6 @@ void fop();
 void formStretch(uint32_t form);
 void frmcalc(uint32_t& largestStitchIndex, uint32_t& smallestStitchIndex);
 auto frmcnt(uint32_t iForm, uint32_t& formFirstStitchIndex) noexcept -> uint32_t;
-void frmcurmen();
 void frmcursel(uint32_t cursorType);
 void frmpos(FRM_HEAD& form, float deltaX, float deltaY);
 void frmsnap(uint32_t start, uint32_t count);
@@ -391,7 +388,6 @@ void ritrot(float rotationAngle, F_POINT const& rotationCenter);
 void rngal();
 void rot(F_POINT& rotationCenter);
 void rotang(F_POINT unrotatedPoint, POINT& rotatedPoint, float rotationAngle, F_POINT const& rotationCenter);
-void rotauxmen();
 void rotauxsel(uint32_t stat);
 void rotfns(float rotationAngle);
 void rotmrk();
@@ -520,12 +516,6 @@ constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
 constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
 constexpr auto FLTPES   = COMDLG_FILTERSPEC {L"Brother", L"*.pes"};
 constexpr auto FTYPMASK = uint32_t {0xff000000U}; // top byte mask used for file type verification
-constexpr auto GRDHI    = uint32_t {0xffffffU};   // grid high color
-constexpr auto GRDMED   = uint32_t {0x404040U};   // grid medium color
-constexpr auto GRDDEF   = uint32_t {0x202020U};   // grid default color
-constexpr auto GRDRED   = uint32_t {0xff2020U};   // grid red color
-constexpr auto GRDBLU   = uint32_t {0x20ff20U};   // grid green color
-constexpr auto GRDGRN   = uint32_t {0x2020ffU};   // grid blue color
 constexpr auto HUPS     = int32_t {5};            // number of hoops the user can select
 constexpr auto KNOTSCNT = 5U;                     // length of knot pattern in stitches
 constexpr auto MAXDELAY = int32_t {600};          // maximum movie time step
@@ -957,17 +947,6 @@ void thred::undat() noexcept {
   if (FormDataSheet != nullptr) {
 	DestroyWindow(FormDataSheet);
 	FormDataSheet = nullptr;
-  }
-}
-
-static auto DataCode = std::array<UINT, 4U> {ID_CHKOF, ID_CHKON, ID_CHKREP, ID_CHKREPMSG};
-
-void thred::chkmen() noexcept {
-  constexpr auto LASTCODE = DataCode.size();
-  for (auto iCode = 0U; iCode < LASTCODE; ++iCode) {
-	auto const code = (iCode == IniFile.dataCheck) ? gsl::narrow_cast<UINT>(MF_CHECKED)
-	                                               : gsl::narrow_cast<UINT>(MF_UNCHECKED);
-	CheckMenuItem(MainMenu, DataCode[iCode], code);
   }
 }
 
@@ -6679,21 +6658,8 @@ void thi::setknots() {
   }
 }
 
-void thi::duhbit(uint32_t cod) noexcept {
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CheckMenuItem(MainMenu, ID_HIDBIT, MF_BYCOMMAND | cod);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CheckMenuItem(MainMenu, ID_HIDBITF, MF_BYCOMMAND | cod);
-}
-
 void thred::hidbit() {
-  if (StateMap->testAndFlip(StateFlag::HIDMAP)) {
-	thi::duhbit(MF_UNCHECKED);
-  }
-  else {
-	thi::duhbit(MF_CHECKED);
-  }
-  StateMap->set(StateFlag::DUMEN);
+  menu::flipHideBitmap();
   StateMap->set(StateFlag::RESTCH);
 }
 
@@ -9072,17 +9038,6 @@ void thi::shftflt(F_POINT const& point) noexcept {
   }
 }
 
-void thi::fil2men() {
-  if (UserFlagMap->test(UserFlag::FIL2OF)) {
-	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_CHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_FIL2SEL_ON, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_FIL2SEL_OFF, MF_UNCHECKED);
-  }
-}
-
 void thi::defpref() {
   constexpr auto APSPAC  = 10.8F;         // applique border spacing
   constexpr auto DEFBPIX = uint16_t {4U}; // default form box pixels
@@ -9180,7 +9135,7 @@ void thi::defpref() {
   }
   PicotSpacing = IPICSPAC;
   UserFlagMap->set(UserFlag::FIL2OF);
-  fil2men();
+  menu::fil2men();
   BackgroundColor = 0xa8c4b1;
   UnzoomedRect.cx = std::lround(IniFile.hoopSizeX);
   UnzoomedRect.cy = std::lround(IniFile.hoopSizeY);
@@ -9540,41 +9495,10 @@ void thi::retrac() {
 }
 
 void thi::setgrd(COLORREF color) {
-  class GRID_COL
-  {
-public:
-	uint32_t id {};
-	uint32_t col {};
-
-	// constexpr GRID_COL() noexcept = default;
-	// GRID_COL(GRID_COL const&) = default;
-	// GRID_COL(GRID_COL&&) = default;
-	// GRID_COL& operator=(GRID_COL const& rhs) = default;
-	// GRID_COL& operator=(GRID_COL&&) = default;
-	//~GRID_COL() = default;
-  };
-
-  static constexpr auto GC_HIGH    = GRID_COL {ID_GRDHI, GRDHI};
-  static constexpr auto GC_MEDIUM  = GRID_COL {ID_GRDMED, GRDMED};
-  static constexpr auto GC_DEFAULT = GRID_COL {ID_GRDEF, GRDDEF};
-  static constexpr auto GC_RED     = GRID_COL {ID_GRDRED, GRDRED};
-  static constexpr auto GC_BLUE    = GRID_COL {ID_GRDBLU, GRDBLU};
-  static constexpr auto GC_GREEN   = GRID_COL {ID_GRDGRN, GRDGRN};
-  static constexpr auto GRID_CODES =
-      std::array<GRID_COL, 6> {GC_HIGH, GC_MEDIUM, GC_DEFAULT, GC_RED, GC_BLUE, GC_GREEN};
-
-  for (auto const& gridCode : GRID_CODES) {
-	if (color == gridCode.col) {
-	  CheckMenuItem(MainMenu, gridCode.id, MF_CHECKED);
-	}
-	else {
-	  CheckMenuItem(MainMenu, gridCode.id, MF_UNCHECKED);
-	}
-  }
+  menu::setGridCols(color);
   thred::nuPen(GridPen, 1, color);
   IniFile.gridColor = color;
   StateMap->set(StateFlag::RESTCH);
-  StateMap->set(StateFlag::DUMEN);
 }
 
 void thi::ovrlay() {
@@ -9592,18 +9516,7 @@ void thi::fil2sel(uint32_t stat) {
   if (stat != 0U) {
 	UserFlagMap->reset(UserFlag::FIL2OF);
   }
-  fil2men();
-}
-
-void thi::rotauxmen() {
-  if (UserFlagMap->test(UserFlag::ROTAUX)) {
-	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_UNCHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_ROTAUXON, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_ROTAUXOFF, MF_CHECKED);
-  }
+  menu::fil2men();
 }
 
 void thi::rotauxsel(uint32_t stat) {
@@ -9611,19 +9524,7 @@ void thi::rotauxsel(uint32_t stat) {
   if (stat == 0U) {
 	UserFlagMap->reset(UserFlag::ROTAUX);
   }
-  rotauxmen();
-  StateMap->set(StateFlag::DUMEN);
-}
-
-void thi::frmcurmen() {
-  if (UserFlagMap->test(UserFlag::FRMX)) {
-	CheckMenuItem(MainMenu, ID_FRMX, MF_CHECKED);
-	CheckMenuItem(MainMenu, ID_FRMBOX, MF_UNCHECKED);
-  }
-  else {
-	CheckMenuItem(MainMenu, ID_FRMX, MF_UNCHECKED);
-	CheckMenuItem(MainMenu, ID_FRMBOX, MF_CHECKED);
-  }
+  menu::rotauxmen();
 }
 
 void thi::frmcursel(uint32_t cursorType) {
@@ -9631,8 +9532,7 @@ void thi::frmcursel(uint32_t cursorType) {
   if (cursorType == 0U) {
 	UserFlagMap->reset(UserFlag::FRMX);
   }
-  frmcurmen();
-  StateMap->set(StateFlag::DUMEN);
+  menu::frmcurmen();
 }
 
 void thi::stchsnap(uint32_t start, uint32_t finish) {
@@ -10337,19 +10237,14 @@ void thi::selfpnt() {
 
 void thi::esccode() {
   bitmap::chkbit();
-  duhbit(MF_UNCHECKED);
+  menu::duhbit(MF_UNCHECKED);
   unthum();
   StateMap->reset(StateFlag::MOVSET);
   StateMap->reset(StateFlag::HID);
   StateMap->reset(StateFlag::FRMOF);
   StateMap->reset(StateFlag::THRDS);
   thred::redraw(ButtonWin->operator[](HHID));
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CheckMenuItem(MainMenu, ID_VUTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap->reset(StateFlag::COL);
-  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-  CheckMenuItem(MainMenu, ID_VUSELTHRDS, MF_BYCOMMAND | MF_UNCHECKED);
-  StateMap->set(StateFlag::DUMEN);
+  menu::resetThreadView();
   StateMap->reset(StateFlag::RUNPAT);
   StateMap->reset(StateFlag::WASPAT);
   StateMap->reset(StateFlag::WASBLAK);
@@ -16710,18 +16605,18 @@ void thi::init() {
   spModifierName[designer.length()] = 0;
   thred::chkhup();
   menu::nedmen();
-  fil2men();
+  menu::fil2men();
   menu::knotmen();
   menu::bsavmen();
-  rotauxmen();
+  menu::rotauxmen();
   menu::linbmen();
   menu::wrnmen();
   ritloc();
-  frmcurmen();
+  menu::frmcurmen();
   texture::redtx();
   StateMap->set(StateFlag::HIDMAP);
   thred::hidbit();
-  thred::chkmen();
+  menu::chkmen();
   // check command line-should be last item in init
   ducmd();
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_THRED)), *DesignerName);

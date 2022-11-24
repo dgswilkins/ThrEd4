@@ -2697,6 +2697,5 @@ void xt::chgwrn() {
 
 void xt::chgchk(uint8_t code) {
   IniFile.dataCheck = code;
-  thred::chkmen();
-  StateMap->set(StateFlag::DUMEN);
+  menu::chkmen();
 }
