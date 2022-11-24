@@ -80,19 +80,14 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
   return swapped >> BPB;
 }
 
-auto bitmap::getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP {
-  if (ppvBits != nullptr) {
+auto bitmap::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
 	auto const bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits), nullptr, 0);
+	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0);
 	if (*ppvBits != nullptr) {
 	  return bitmap;
 	}
-	DeleteObject(bitmap);
 	throw std::runtime_error("CreateDIBSection failed");
-  }
-
-  throw std::runtime_error("ppvBits was null");
 }
 
 void bitmap::bfil(COLORREF const& backgroundColor) {

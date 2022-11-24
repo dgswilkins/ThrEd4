@@ -29,7 +29,7 @@ void bitbltBitmap() noexcept;
 void chkbit();
 void delmap();
 void drawBmpBackground();
-auto getBitmap(_In_ HDC hdc, _In_ const BITMAPINFO* pbmi, _Outptr_ uint32_t** ppvBits) -> HBITMAP;
+auto getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP;
 auto getBitmapDC() noexcept -> HDC;
 auto getBitmapHeight() noexcept -> int;
 auto getBitmapSizeinStitches() noexcept -> F_POINT;
