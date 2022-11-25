@@ -676,9 +676,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 // Suppress C4996: 'strncpy': This function or variable may be unsafe. Consider using strncpy_s instead
 #pragma warning(push)
 #pragma warning(disable : 4996)
-auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
+auto PES::savePES(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   auto flag = true;
-  if (nullptr != auxName) {
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto fileHandle = CreateFile(
 	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
@@ -925,10 +924,6 @@ auto PES::savePES(fs::path const* auxName, std::vector<F_POINT_ATTR> const& save
 	  } while (false);
 	}
 	CloseHandle(fileHandle);
-  }
-  else {
-	flag = false;
-  }
   return flag;
 }
 #pragma warning(pop)
