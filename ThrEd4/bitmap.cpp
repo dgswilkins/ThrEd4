@@ -42,8 +42,8 @@ void bitsiz();
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
-auto loadName(fs::path const* directory, fs::path* fileName) -> bool;
-void movmap(int cnt, uint8_t* buffer);
+auto loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::path*> fileName) -> bool;
+void movmap(std::vector<uint8_t> & buffer, gsl::not_null<uint32_t*>source);
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
 auto saveName(fs::path& fileName);
@@ -223,21 +223,21 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthIn
 
 void bi::bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background) {
   if ((source != nullptr) && (destination != nullptr)) {
-	for (auto i = 0U; i < bitmapWidthBytes; ++i) {
+  for (auto i = 0U; i < bitmapWidthBytes; ++i) {
 	  auto bits = std::bitset<CHAR_BIT>(source[i]);
-	  for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
+	for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
 		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
 		++destination;
-	  }
-	}
-	if (auto const final = (gsl::narrow<uint32_t>(BitmapWidth) % CHAR_BIT)) {
-	  auto const bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
-	  for (auto bitOffset = final; bitOffset < CHAR_BIT; ++bitOffset) {
-		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
-		++destination;
-	  }
 	}
   }
+  if (auto const final = (gsl::narrow<uint32_t>(BitmapWidth) % CHAR_BIT)) {
+	  auto const bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
+	for (auto bitOffset = final; bitOffset < CHAR_BIT; ++bitOffset) {
+		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
+		++destination;
+	}
+  }
+}
 }
 
 void bi::bitsiz() {
@@ -337,7 +337,7 @@ void bitmap::savmap() {
 	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
 	  auto buffer = std::vector<uint8_t> {};
 	  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-	  bi::movmap(BitmapWidth * BitmapHeight, buffer.data());
+	  bi::movmap(buffer, TraceBitmapData);
 	  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
 	  CloseHandle(hBitmap);
 	}
@@ -348,18 +348,16 @@ void bitmap::savmap() {
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
-void bi::movmap(int cnt, uint8_t* buffer) {
-  if (auto* source = TraceBitmapData; source != nullptr) {
-	auto* destination = buffer;
-	for (auto i = 0; i < cnt; ++i) {
-	  *(convertFromPtr<uint32_t*>(destination)) = *(source++);
+void bi::movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source) {
+  auto const spTBD       = gsl::span(source.get(), wrap::toSize(BitmapWidth) * BitmapHeight);
+  	auto* destination = buffer.data();
+	for (auto iTBD : spTBD) {
+	  *(convertFromPtr<uint32_t*>(destination)) = iTBD;
 	  destination += 3;
 	}
-  }
 }
 
-auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
-  if ((nullptr != fileName) && (nullptr != directory)) {
+auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null <fs::path *> fileName) -> bool {
 	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	auto hResult = CoCreateInstance(
@@ -405,7 +403,6 @@ auto bi::loadName(fs::path const* directory, fs::path* fileName) -> bool {
 		}
 	  }
 	}
-  }
   return false;
 }
 
