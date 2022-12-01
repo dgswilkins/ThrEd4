@@ -37,7 +37,10 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 namespace bi {
 auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
 auto bitar() -> bool;
-void bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background);
+void           bitlin(gsl::span<uint8_t> const&  source,
+                      gsl::span<uint32_t> const& destination,
+                      COLORREF             foreground,
+                      COLORREF             background);
 void bitsiz();
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
@@ -131,7 +134,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	BitmapDC = CreateCompatibleDC(StitchWindowDC);
 	if (BitmapFileHeaderV4.bV4BitCount == 1) {
 	  StateMap->set(StateFlag::MONOMAP);
-	  auto bitmapWidthBytes = gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U << 2U;
+	  auto bitmapWidthBytes = (gsl::narrow_cast<uint32_t>(BitmapWidth) >> 5U) << 2U;
 	  if (auto const widthOverflow = BitmapWidth % 32; widthOverflow != 0U) {
 		bitmapWidthBytes += 4U;
 	  }
@@ -157,12 +160,20 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
+		auto const spMBD = gsl::span<uint8_t>(monoBitmapData);
+		auto const spBits = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
+		auto srcOffset = 0U;
+		auto       dstOffset = 0;
+		auto const srcWidth  = (BitmapWidth >> 3U) + 1;
 		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-		  bi::bitlin(&monoBitmapData[wrap::toSize(iHeight) * bitmapWidthBytes],
-		             &bits[wrap::toSize(iHeight * BitmapWidth)],
-		             bitmapWidthBytes,
+		  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
+		  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
+		  bi::bitlin(spLineSrc,
+		             spLineDst,
 		             foreground,
 		             background);
+		  srcOffset += bitmapWidthBytes;
+		  dstOffset += BitmapWidth;
 		}
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
@@ -221,23 +232,28 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthIn
   return whiteBits > blackBits;
 }
 
-void bi::bitlin(uint8_t const* source, uint32_t* destination, uint32_t bitmapWidthBytes, COLORREF foreground, COLORREF background) {
-  if ((source != nullptr) && (destination != nullptr)) {
-  for (auto i = 0U; i < bitmapWidthBytes; ++i) {
-	  auto bits = std::bitset<CHAR_BIT>(source[i]);
+void bi::bitlin(gsl::span<uint8_t> const&  source,
+                gsl::span<uint32_t> const& destination,
+                COLORREF             foreground,
+                COLORREF             background) {
+  auto dst = destination.begin();
+  auto const subSource = source.subspan(0, source.size() - 1);
+  for (auto const& src : subSource) {
+	auto bits = std::bitset<CHAR_BIT>(src);
 	for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
-		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
-		++destination;
+	  auto const offset  = bitOffset ^ (CHAR_BIT - 1U);
+	  *dst         = bits[offset] ? foreground : background;
+	  ++dst;
 	}
   }
-  if (auto const final = (gsl::narrow<uint32_t>(BitmapWidth) % CHAR_BIT)) {
-	  auto const bits = std::bitset<CHAR_BIT>(source[bitmapWidthBytes]);
-	for (auto bitOffset = final; bitOffset < CHAR_BIT; ++bitOffset) {
-		*destination = bits[bitOffset ^ (CHAR_BIT - 1U)] ? foreground : background;
-		++destination;
+  if (auto const final = (destination.size() % CHAR_BIT)) {
+	auto const bits = std::bitset<CHAR_BIT>(source.back());
+	for (auto bitOffset = 0U; bitOffset < final; ++bitOffset) {
+	  auto const offset = bitOffset ^ (CHAR_BIT - 1U);
+	  *dst        = bits[offset] ? foreground : background;
+	  ++dst;
 	}
   }
-}
 }
 
 void bi::bitsiz() {
