@@ -447,7 +447,11 @@ void texture::drwtxtr() {
 	auto const erased = std::erase_if(*TempTexturePoints, [&](auto const& point) -> bool {
 	  return !(point.line <= TextureScreen.lines && point.y <= TextureScreen.areaHeight);
 	});
+#ifdef _DEBUG
 	outDebugString(L"[{}] texture points erased\n", erased);
+#else
+	DBG_UNREFERENCED_LOCAL_VARIABLE(erased);
+#endif
   }
   auto const flag = (pixelSpace > editSpace);
   TextureScreen.editToPixelRatio =
