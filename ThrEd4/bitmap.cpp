@@ -35,7 +35,7 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 
 // bitmap internal namespace
 namespace bi {
-auto binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool;
+auto binv(std::vector<uint8_t> const& monoBitmapData) -> bool;
 auto bitar() -> bool;
 void           bitlin(gsl::span<uint8_t> const&  source,
                       gsl::span<uint32_t> const& destination,
@@ -143,7 +143,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  monoBitmapData.resize(bitmapSizeBytes);
 	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
 	  CloseHandle(hBitmapFile);
-	  auto const flag       = bi::binv(monoBitmapData, bitmapWidthBytes);
+	  auto const flag       = bi::binv(monoBitmapData);
 	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
 	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
 	  BitmapInfoHeader      = {};
@@ -208,25 +208,17 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
-auto bi::binv(std::vector<uint8_t> const& monoBitmapData, uint32_t bitmapWidthInBytes) -> bool {
+auto bi::binv(std::vector<uint8_t> const& monoBitmapData) -> bool {
   auto whiteBits = 0U;
   auto blackBits = 0U;
-  for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-	if ((wrap::toSize(iHeight) * bitmapWidthInBytes) < monoBitmapData.size()) {
-	  auto const* bcpnt = &monoBitmapData[wrap::toSize(iHeight) * bitmapWidthInBytes];
-	  for (auto iBytes = 0U; iBytes < bitmapWidthInBytes; ++iBytes) {
-		if (bcpnt[iBytes] == 0U) {
-		  ++blackBits;
-		}
-		else {
-		  if (bcpnt[iBytes] == UCHAR_MAX) {
-			++whiteBits;
-		  }
-		}
-	  }
+  for (auto const& iMBD : monoBitmapData) {
+	if (iMBD == 0U) {
+	  ++blackBits;
 	}
 	else {
-	  throw std::runtime_error("BMP data larger than monoBitmapData");
+	  if (iMBD == UCHAR_MAX) {
+		++whiteBits;
+	  }
 	}
   }
   return whiteBits > blackBits;
