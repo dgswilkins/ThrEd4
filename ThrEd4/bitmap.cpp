@@ -35,7 +35,7 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 
 // bitmap internal namespace
 namespace bi {
-auto binv(std::vector<uint8_t> const& monoBitmapData) -> bool;
+auto binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool;
 auto bitar() -> bool;
 void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background);
 void bitsiz();
@@ -203,7 +203,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 
 // Get a rough estimate of whether black or white
 // is dominant in the monochrome bitmap
-auto bi::binv(std::vector<uint8_t> const& monoBitmapData) -> bool {
+auto bi::binv(std::vector<uint8_t> const& monoBitmapData) noexcept -> bool {
   auto whiteBits = 0U;
   auto blackBits = 0U;
   for (auto const& iMBD : monoBitmapData) {
