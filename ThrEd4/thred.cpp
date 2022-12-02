@@ -1160,7 +1160,7 @@ void thred::addColor(uint32_t stitch, uint32_t color) {
 }
 
 void thred::coltab() {
-	thred::resetColorChanges();
+  thred::resetColorChanges();
   if (StitchBuffer->size() > 1) {
 	if (!StitchBuffer->empty()) {
 	  auto const firstStitch = StitchBuffer->begin();
@@ -11846,15 +11846,20 @@ auto thi::handleSideWindowActive() -> bool {
 	  break;
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::CONTF)) { // contour fill
-	  if (form.fillType != 0U) {
-		if (form.fillType == CLPF) {
-		  form.fillSpacing = LineSpacing;
+	  if (form.vertexCount > 4) {
+		if (form.fillType != 0U) {
+		  if (form.fillType == CLPF) {
+			form.fillSpacing = LineSpacing;
+		  }
+		  form::chkcont();
+		  clip::delclps(ClosestFormToCursor);
+		  break;
 		}
-		form::chkcont();
-		clip::delclps(ClosestFormToCursor);
-		break;
+		form::contfil();
 	  }
-	  form::contfil();
+	  else {
+		displayText::tabmsg(IDS_CONT);
+	  }
 	  break;
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::VCLPF)) { // vertical clip
