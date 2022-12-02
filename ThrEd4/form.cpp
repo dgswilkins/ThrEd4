@@ -231,7 +231,8 @@ void brkseq(std::vector<SMAL_PNT_L*> const& sortedLines,
             SMAL_PNT_L*                     sequenceLines);
 void chkbrd(FRM_HEAD const& form);
 void chksid(FRM_HEAD const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<F_POINT> const& currentFormVertices);
-auto clipComp(CLIP_SORT const* arg1, CLIP_SORT const* arg2) noexcept -> bool;
+auto clipComp(const gsl::not_null<CLIP_SORT const*>(arg1), const gsl::not_null<CLIP_SORT const*>(arg2)) noexcept
+    -> bool;
 auto closat(IntersectionStyles& inOutFlag) -> bool;
 void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& currentFormVertices);
 void clpfm();
@@ -3165,9 +3166,9 @@ auto fi::isect(uint32_t                    vertex0,
   return flag;
 }
 
-auto fi::clipComp(CLIP_SORT const* const arg1, CLIP_SORT const* const arg2) noexcept -> bool {
+auto fi::clipComp(const gsl::not_null<CLIP_SORT const*>(arg1),
+                  const gsl::not_null<CLIP_SORT const*>(arg2)) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
-  if ((arg1 != nullptr) && (arg2 != nullptr)) {
 	auto const local1 = arg1->segmentLength;
 	auto const local2 = arg2->segmentLength;
 	if (local1 < local2) {
@@ -3176,8 +3177,6 @@ auto fi::clipComp(CLIP_SORT const* const arg1, CLIP_SORT const* const arg2) noex
 	if (local2 < local1) {
 	  return false;
 	}
-  }
-
   return false;
 }
 
