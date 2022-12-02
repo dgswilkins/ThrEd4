@@ -236,11 +236,12 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if ((form.extendedAttribute & (AT_WALK | AT_UND | AT_CWLK)) != 0U) {
 	  labelWindow[LUNDCOL] = ffi::txtwin(displayText::loadStr(IDS_UNDCOL), LabelWindowCoords);
 	  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
-	  valueWindow[LUNDCOL] = ffi::txtrwin(fmt::format(FMT_STRING(L"{}"), (form.underlayColor + 1U)), ValueWindowCoords);
+	  valueWindow[LUNDCOL] =
+	      ffi::txtrwin(fmt::format(FMT_STRING(L"{}"), (form.underlayColor + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LULEN] = ffi::txtwin(displayText::loadStr(IDS_ULEN), LabelWindowCoords);
-	  valueWindow[LULEN] =
-	      ffi::txtrwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.underlayStitchLen * IPFGRAN)), ValueWindowCoords);
+	  valueWindow[LULEN] = ffi::txtrwin(
+	      fmt::format(FMT_STRING(L"{:.2f}"), (form.underlayStitchLen * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LWLKIND] = ffi::txtwin(displayText::loadStr(IDS_UWLKIND), LabelWindowCoords);
@@ -253,8 +254,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	      ffi::txtrwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.underlaySpacing * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	  labelWindow[LUANG] = ffi::txtwin(displayText::loadStr(IDS_FUANG), LabelWindowCoords);
-	  valueWindow[LUANG] =
-	      ffi::txtrwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.underlayStitchAngle * RADDEGF)), ValueWindowCoords);
+	  valueWindow[LUANG] = ffi::txtrwin(
+	      fmt::format(FMT_STRING(L"{:.2f}"), (form.underlayStitchAngle * RADDEGF)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
   }
@@ -305,12 +306,14 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  ffi::nxtlin(formMenuEntryCount);
 	  if (form.fillInfo.feather.fillType == FTHPSG) {
 		labelWindow[LFTHNUM] = ffi::txtwin(displayText::loadStr(IDS_FTHNUM), LabelWindowCoords);
-		valueWindow[LFTHNUM] = ffi::numwin(fmt::format(FMT_STRING(L"{}"), (form.fillInfo.feather.count)), ValueWindowCoords);
+		valueWindow[LFTHNUM] =
+		    ffi::numwin(fmt::format(FMT_STRING(L"{}"), (form.fillInfo.feather.count)), ValueWindowCoords);
 		ffi::nxtlin(formMenuEntryCount);
 	  }
 	  labelWindow[LFTHFLR] = ffi::txtwin(displayText::loadStr(IDS_FTHFLR), LabelWindowCoords);
 	  valueWindow[LFTHFLR] =
-	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.fillInfo.feather.minStitchSize * IPFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.fillInfo.feather.minStitchSize * IPFGRAN)),
+	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (form.fillType != CLPF) {
@@ -321,7 +324,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	}
 	if (form.istx()) {
 	  labelWindow[LTXOF] = ffi::txtwin(displayText::loadStr(IDS_TXOF), LabelWindowCoords);
-	  valueWindow[LTXOF] = ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.txof * IPFGRAN)), ValueWindowCoords);
+	  valueWindow[LTXOF] =
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.txof * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMAXFIL] = ffi::txtwin(displayText::loadStr(IDS_TXT20), LabelWindowCoords);
@@ -331,7 +335,8 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	if (!form.isclp() && !form.istx()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
-	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.lengthOrCount.stitchLength * IPFGRAN)), ValueWindowCoords);
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.lengthOrCount.stitchLength * IPFGRAN)),
+	                  ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	labelWindow[LMINFIL] = ffi::txtwin(displayText::loadStr(IDS_TXT21), LabelWindowCoords);
@@ -429,22 +434,26 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	}
 	if ((EDGE_ARRAY[edgeIdx] & BESIZ) != 0) {
 	  labelWindow[LBRDSIZ] = ffi::txtwin(displayText::loadStr(IDS_TXT11), LabelWindowCoords);
-	  valueWindow[LBRDSIZ] = ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.borderSize * IPFGRAN)), ValueWindowCoords);
+	  valueWindow[LBRDSIZ] =
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.borderSize * IPFGRAN)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((EDGE_ARRAY[edgeIdx] & BRDPOS) != 0) {
 	  labelWindow[LBRDPOS] = ffi::txtwin(displayText::loadStr(IDS_TXT18), LabelWindowCoords);
-	  valueWindow[LBRDPOS] = ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
+	  valueWindow[LBRDPOS] =
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((EDGE_ARRAY[edgeIdx] & CHNPOS) != 0) {
 	  labelWindow[LBRDPOS] = ffi::txtwin(displayText::loadStr(IDS_TXT19), LabelWindowCoords);
-	  valueWindow[LBRDPOS] = ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
+	  valueWindow[LBRDPOS] =
+	      ffi::numwin(fmt::format(FMT_STRING(L"{:.2f}"), (form.edgeStitchLen)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (edgeFillType == EDGEAPPL) {
 	  labelWindow[LAPCOL] = ffi::txtwin(displayText::loadStr(IDS_TXT12), LabelWindowCoords);
-	  valueWindow[LAPCOL] = ffi::numwin(fmt::format(FMT_STRING(L"{}"), ((form.borderColor >> 4U) + 1U)), ValueWindowCoords);
+	  valueWindow[LAPCOL] =
+	      ffi::numwin(fmt::format(FMT_STRING(L"{}"), ((form.borderColor >> 4U) + 1U)), ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if (edgeFillType == EDGEANGSAT || edgeFillType == EDGEAPPL || edgeFillType == EDGEPROPSAT) {
@@ -454,8 +463,9 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	  ffi::nxtlin(formMenuEntryCount);
 	}
 	if ((EDGE_ARRAY[edgeIdx] & BCNRSIZ) != 0) {
-	  choice = (form.edgeType == EDGEBHOL) ? fmt::format(FMT_STRING(L"{:.2f}"), (form::getblen() * IPFGRAN))
-	                                       : fmt::format(FMT_STRING(L"{:.2f}"), (form::getplen() * IPFGRAN));
+	  choice              = (form.edgeType == EDGEBHOL)
+	                            ? fmt::format(FMT_STRING(L"{:.2f}"), (form::getblen() * IPFGRAN))
+	                            : fmt::format(FMT_STRING(L"{:.2f}"), (form::getplen() * IPFGRAN));
 	  labelWindow[LBCSIZ] = ffi::txtwin(displayText::loadStr(IDS_TXT13), LabelWindowCoords);
 	  valueWindow[LBCSIZ] = ffi::numwin(choice, ValueWindowCoords);
 	  ffi::nxtlin(formMenuEntryCount);
@@ -643,7 +653,8 @@ void formForms::prfmsg() {
   ffi::prflin(fmt::format(FMT_STRING(L"{}"), (thred::duthrsh(ShowStitchThreshold))), *(row++));
   ffi::prflin(fmt::format(FMT_STRING(L"{:.2f} mm"), (IniFile.gridSize * IPFGRAN)), *(row++));
   form::sethup();
-  ffi::prflin(fmt::format(FMT_STRING(L"{}"), displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
+  ffi::prflin(fmt::format(FMT_STRING(L"{}"),
+                          displayText::loadStr(wrap::toUnsigned(IniFile.hoopType) - 1U + IDS_HUP0)),
               *(row++));
   ffi::prflin(fmt::format(FMT_STRING(L"{:.0f} mm"), (IniFile.hoopSizeY * IPFGRAN)), *(row++));
   ffi::prflin(fmt::format(FMT_STRING(L"{:.0f} mm"), (IniFile.hoopSizeX * IPFGRAN)), *(row++));
@@ -696,14 +707,20 @@ void ffi::chkdaz() {
 
 void ffi::initdaz(HWND hWinDialog) {
   ffi::chkdaz();
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS), fmt::format(FMT_STRING(L"{}"), IniFile.daisyPetalPoints).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT), fmt::format(FMT_STRING(L"{}"), IniFile.daisyHeartCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN), fmt::format(FMT_STRING(L"{:.2f}"), IniFile.daisyDiameter).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLPNTS),
+                fmt::format(FMT_STRING(L"{}"), IniFile.daisyPetalPoints).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_DAZPCNT),
+                fmt::format(FMT_STRING(L"{}"), IniFile.daisyHeartCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_CNTLEN),
+                fmt::format(FMT_STRING(L"{:.2f}"), IniFile.daisyDiameter).c_str());
   SetWindowText(GetDlgItem(hWinDialog, IDC_HOLSIZ),
                 fmt::format(FMT_STRING(L"{:.2f}"), IniFile.daisyHoleDiameter).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS), fmt::format(FMT_STRING(L"{}"), IniFile.daisyInnerCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS), fmt::format(FMT_STRING(L"{}"), IniFile.daisyPetalCount).c_str());
-  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN), fmt::format(FMT_STRING(L"{:.2f}"), IniFile.daisyPetalLen).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_INPNTS),
+                fmt::format(FMT_STRING(L"{}"), IniFile.daisyInnerCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETALS),
+                fmt::format(FMT_STRING(L"{}"), IniFile.daisyPetalCount).c_str());
+  SetWindowText(GetDlgItem(hWinDialog, IDC_PETLEN),
+                fmt::format(FMT_STRING(L"{:.2f}"), IniFile.daisyPetalLen).c_str());
   auto flag = 1U;
   if (!UserFlagMap->test(UserFlag::DAZHOL)) {
 	flag = 0U;
@@ -971,11 +988,14 @@ void formForms::dasyfrm() {
 }
 
 void ffi::initTearDlg(HWND hwndlg) {
-  SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), fmt::format(FMT_STRING(L"{:d}"), IniFile.formSides).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), fmt::format(FMT_STRING(L"{:.3f}"), IniFile.tearTailLength).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS),
+                fmt::format(FMT_STRING(L"{:d}"), IniFile.formSides).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TEARAT),
+                fmt::format(FMT_STRING(L"{:.3f}"), IniFile.tearTailLength).c_str());
   SetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP),
                 fmt::format(FMT_STRING(L"{:.3f}"), IniFile.tearTwistStep * IPFGRAN).c_str());
-  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), fmt::format(FMT_STRING(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
+  SetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT),
+                fmt::format(FMT_STRING(L"{:.3f}"), IniFile.tearTwistRatio).c_str());
 }
 
 auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) -> BOOL {

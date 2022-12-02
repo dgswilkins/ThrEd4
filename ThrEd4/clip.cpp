@@ -294,11 +294,9 @@ auto ci::ritclp(std::vector<F_POINT> const& clipFillData, F_POINT const& point) 
 	retval = true;
   }
   else {
-	std::ranges::transform(clipFillData,
-	               std::back_inserter(*OSequence),
-	               [&adjustedPoint](auto const& data) noexcept {
-	                 return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
-	               });
+	std::ranges::transform(clipFillData, std::back_inserter(*OSequence), [&adjustedPoint](auto const& data) noexcept {
+	  return F_POINT {data.x + adjustedPoint.x, data.y + adjustedPoint.y};
+	});
   }
   return retval;
 }
@@ -392,7 +390,7 @@ auto ci::clpsid(uint32_t                    vertexIndex,
 	                                           ClipRectSize.cx) /
 	                                              length
 	                                        : (length - ClipRectSize.cx) / 2;
-	auto const step      = F_POINT {delta.x * remainder, delta.y * remainder};
+	auto const step         = F_POINT {delta.x * remainder, delta.y * remainder};
 	auto       insertPoint  = *itStartVertex;
 	auto       reversedData = clipReversedData.begin();
 	for (auto& data : clipFillData) {
@@ -688,8 +686,7 @@ void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& cha
 	});
   }
   else {
-	std::ranges::transform(
-	    *ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
+	std::ranges::transform(*ClipBuffer, std::back_inserter(tempClipPoints), [](auto& clip) noexcept {
 	  return F_POINT {clip.x, (-clip.y)};
 	});
   }
@@ -742,8 +739,8 @@ void ci::clpcrnr(FRM_HEAD const&       form,
 
 	auto const rotationAngle = atan2(delta.y, delta.x) + PI_FHALF;
 	auto const referencePoint = F_POINT_ATTR {wrap::midl(clipRect.right, clipRect.left), clipRect.top, 0U};
-	ClipReference             = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
-	auto iClip                = clipFillData.begin();
+	ClipReference = thred::rotang1(referencePoint, rotationAngle, rotationCenter);
+	auto iClip    = clipFillData.begin();
 	for (auto& clip : *ClipBuffer) {
 	  *iClip = thred::rotang1(clip, rotationAngle, rotationCenter);
 	  ++iClip;
@@ -862,7 +859,7 @@ void clip::clpic(FRM_HEAD const& form, F_RECTANGLE const& clipRect) {
 void ci::duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish) {
   constexpr auto CHAINLEN = 10U; // Chain length
   constexpr auto CHAIN_SEQUENCE = std::array<uint32_t, CHAINLEN> {0, 1, 2, 3, 0, 1, 4, 3, 0, 3}; // chain stitch sequence
-  auto           chainPoint = std::vector<F_POINT> {};
+  auto chainPoint = std::vector<F_POINT> {};
 
   constexpr auto CHPOINTS = 5U; // chainPoint size
   chainPoint.resize(CHPOINTS);

@@ -37,16 +37,14 @@ constexpr auto BPP32   = DWORD {32U};                                   // 32 bi
 namespace bi {
 auto binv(std::vector<uint8_t> const& monoBitmapData) -> bool;
 auto bitar() -> bool;
-void           bitlin(gsl::span<uint8_t> const&  source,
-                      gsl::span<uint32_t> const& destination,
-                      COLORREF             foreground,
-                      COLORREF             background);
+void bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background);
 void bitsiz();
+
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
 auto loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::path*> fileName) -> bool;
-void movmap(std::vector<uint8_t> & buffer, gsl::not_null<uint32_t*>source);
+void movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source);
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
 auto saveName(fs::path& fileName);
@@ -85,12 +83,12 @@ constexpr auto bi::fswap(COLORREF color) noexcept -> COLORREF {
 
 auto bitmap::getBitmap(HDC hdc, const BITMAPINFO* pbmi, gsl::not_null<uint32_t**> ppvBits) -> HBITMAP {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(readability-qualified-auto)
-	auto const bitmap =
-	    CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0);
-	if (*ppvBits != nullptr) {
-	  return bitmap;
-	}
-	throw std::runtime_error("CreateDIBSection failed");
+  auto const bitmap =
+      CreateDIBSection(hdc, pbmi, DIB_RGB_COLORS, reinterpret_cast<void**>(ppvBits.get()), nullptr, 0);
+  if (*ppvBits != nullptr) {
+	return bitmap;
+  }
+  throw std::runtime_error("CreateDIBSection failed");
 }
 
 void bitmap::bfil(COLORREF const& backgroundColor) {
@@ -143,10 +141,10 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  monoBitmapData.resize(bitmapSizeBytes);
 	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
 	  CloseHandle(hBitmapFile);
-	  auto const flag       = bi::binv(monoBitmapData);
+	  auto const flag = bi::binv(monoBitmapData);
 	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
 	  auto const background = gsl::narrow_cast<COLORREF>(flag ? BitmapColor : inverseBackgroundColor);
-	  BitmapInfoHeader      = {};
+	  BitmapInfoHeader               = {};
 	  BitmapInfoHeader.biSize        = sizeof(BitmapInfoHeader);
 	  BitmapInfoHeader.biWidth       = BitmapWidth;
 	  BitmapInfoHeader.biHeight      = BitmapHeight;
@@ -160,18 +158,15 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  // Synchronize
 	  GdiFlush();
 	  if (bits != nullptr) {
-		auto const spMBD = gsl::span<uint8_t>(monoBitmapData);
-		auto const spBits = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
-		auto srcOffset = 0U;
+		auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
+		auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
+		auto       srcOffset = 0U;
 		auto       dstOffset = 0;
 		auto const srcWidth  = (BitmapWidth >> 3U) + 1;
 		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
 		  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
 		  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
-		  bi::bitlin(spLineSrc,
-		             spLineDst,
-		             foreground,
-		             background);
+		  bi::bitlin(spLineSrc, spLineDst, foreground, background);
 		  srcOffset += bitmapWidthBytes;
 		  dstOffset += BitmapWidth;
 		}
@@ -224,17 +219,14 @@ auto bi::binv(std::vector<uint8_t> const& monoBitmapData) -> bool {
   return whiteBits > blackBits;
 }
 
-void bi::bitlin(gsl::span<uint8_t> const&  source,
-                gsl::span<uint32_t> const& destination,
-                COLORREF             foreground,
-                COLORREF             background) {
-  auto dst = destination.begin();
+void bi::bitlin(gsl::span<uint8_t> const& source, gsl::span<uint32_t> const& destination, COLORREF foreground, COLORREF background) {
+  auto       dst       = destination.begin();
   auto const subSource = source.subspan(0, source.size() - 1);
   for (auto const& src : subSource) {
 	auto bits = std::bitset<CHAR_BIT>(src);
 	for (auto bitOffset = 0U; bitOffset < CHAR_BIT; ++bitOffset) {
-	  auto const offset  = bitOffset ^ (CHAR_BIT - 1U);
-	  *dst         = bits[offset] ? foreground : background;
+	  auto const offset = bitOffset ^ (CHAR_BIT - 1U);
+	  *dst              = bits[offset] ? foreground : background;
 	  ++dst;
 	}
   }
@@ -242,7 +234,7 @@ void bi::bitlin(gsl::span<uint8_t> const&  source,
 	auto const bits = std::bitset<CHAR_BIT>(source.back());
 	for (auto bitOffset = 0U; bitOffset < final; ++bitOffset) {
 	  auto const offset = bitOffset ^ (CHAR_BIT - 1U);
-	  *dst        = bits[offset] ? foreground : background;
+	  *dst              = bits[offset] ? foreground : background;
 	  ++dst;
 	}
   }
@@ -358,59 +350,59 @@ void bitmap::savmap() {
 // Move unpacked 24BPP data into packed 24BPP data
 void bi::movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source) {
   auto const spTBD       = gsl::span(source.get(), wrap::toSize(BitmapWidth) * BitmapHeight);
-  	auto* destination = buffer.data();
-	for (auto iTBD : spTBD) {
-	  *(convertFromPtr<uint32_t*>(destination)) = iTBD;
-	  destination += 3;
-	}
+  auto*      destination = buffer.data();
+  for (auto iTBD : spTBD) {
+	*(convertFromPtr<uint32_t*>(destination)) = iTBD;
+	destination += 3;
+  }
 }
 
-auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null <fs::path *> fileName) -> bool {
-	auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
+auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::path*> fileName) -> bool {
+  auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-	auto hResult = CoCreateInstance(
-	    CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
-	if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
-	  auto dwOptions = DWORD {};
-	  hResult        = pFileOpen->GetOptions(&dwOptions);
-	  if (SUCCEEDED(hResult)) {
-		static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
-		// NOLINTNEXTLINE(hicpp-signed-bitwise)
-		hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
-		hResult += pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()),
-		                                   FILTER_FILE_TYPES.data());
-		hResult += pFileOpen->SetTitle(L"Open Thred File");
+  auto hResult = CoCreateInstance(
+      CLSID_FileOpenDialog, nullptr, CLSCTX_ALL, IID_IFileOpenDialog, reinterpret_cast<void**>(&pFileOpen)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast,hicpp-signed-bitwise)
+  if (SUCCEEDED(hResult) && (nullptr != pFileOpen)) {
+	auto dwOptions = DWORD {};
+	hResult        = pFileOpen->GetOptions(&dwOptions);
+	if (SUCCEEDED(hResult)) {
+	  static constexpr auto FILTER_FILE_TYPES = std::array<COMDLG_FILTERSPEC, 2> {FLTBMP, FLTALL};
+	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
+	  hResult = pFileOpen->SetOptions(dwOptions | FOS_DONTADDTORECENT);
+	  hResult +=
+	      pFileOpen->SetFileTypes(wrap::toUnsigned(FILTER_FILE_TYPES.size()), FILTER_FILE_TYPES.data());
+	  hResult += pFileOpen->SetTitle(L"Open Thred File");
 #if USE_DEFBDIR
-		// If we want to, we can set the default directory rather than using the OS mechanism for last used
-		auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
-		// NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
-		hResult += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
-		hResult += pFileOpen->SetFolder(psiFrom);
-		if (nullptr != psiFrom) {
-		  psiFrom->Release();
-		}
+	  // If we want to, we can set the default directory rather than using the OS mechanism for last used
+	  auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
+	  // NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
+	  hResult += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+	  hResult += pFileOpen->SetFolder(psiFrom);
+	  if (nullptr != psiFrom) {
+		psiFrom->Release();
+	  }
 #else
-		UNREFERENCED_PARAMETER(directory);
+	  UNREFERENCED_PARAMETER(directory);
 #endif
+	  if (SUCCEEDED(hResult)) {
+		hResult = pFileOpen->Show(nullptr);
 		if (SUCCEEDED(hResult)) {
-		  hResult = pFileOpen->Show(nullptr);
-		  if (SUCCEEDED(hResult)) {
-			auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
-			hResult     = pFileOpen->GetResult(&pItem);
-			if (SUCCEEDED(hResult) && (nullptr != pItem)) {
-			  // NOLINTNEXTLINE(readability-qualified-auto)
-			  auto pszFilePath = PWSTR {nullptr};
-			  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
-			  if (SUCCEEDED(hResult)) {
-				fileName->assign(pszFilePath);
-				CoTaskMemFree(pszFilePath);
-				return true;
-			  }
+		  auto* pItem = gsl::narrow_cast<IShellItem*>(nullptr);
+		  hResult     = pFileOpen->GetResult(&pItem);
+		  if (SUCCEEDED(hResult) && (nullptr != pItem)) {
+			// NOLINTNEXTLINE(readability-qualified-auto)
+			auto pszFilePath = PWSTR {nullptr};
+			hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
+			if (SUCCEEDED(hResult)) {
+			  fileName->assign(pszFilePath);
+			  CoTaskMemFree(pszFilePath);
+			  return true;
 			}
 		  }
 		}
 	  }
 	}
+  }
   return false;
 }
 

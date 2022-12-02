@@ -59,76 +59,75 @@ static auto PCSHeader = PCSHEADER {}; // pcs file header
 
 auto PCS::savePCS(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   auto flag = true;
- 	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const fileHandle = CreateFile(
-	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const fileHandle = CreateFile(
+      auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (fileHandle == INVALID_HANDLE_VALUE) {
-	  displayText::crmsg(*auxName);
-	  flag = false;
-	}
-	else {
-	  PCSHeader.leadIn     = 0x32;
-	  PCSHeader.colorCount = COLORCNT;
-	  auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
-	  wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
-	  auto const spColors = gsl::span {PCSHeader.colors};
-	  std::ranges::copy(UserColor, spColors.begin());
-	  do {
-		if (pci::pcshup(saveStitches)) {
-		  flag = false;
-		  break;
+  if (fileHandle == INVALID_HANDLE_VALUE) {
+	displayText::crmsg(*auxName);
+	flag = false;
+  }
+  else {
+	PCSHeader.leadIn     = 0x32;
+	PCSHeader.colorCount = COLORCNT;
+	auto pcsStitchBuffer = std::vector<PCS_STITCH> {};
+	wrap::narrow(PCSHeader.stitchCount, StitchBuffer->size());
+	auto const spColors = gsl::span {PCSHeader.colors};
+	std::ranges::copy(UserColor, spColors.begin());
+	do {
+	  if (pci::pcshup(saveStitches)) {
+		flag = false;
+		break;
+	  }
+	  auto bytesWritten = DWORD {};
+	  if (FALSE == WriteFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesWritten, nullptr)) {
+		displayText::riter();
+		flag = false;
+		break;
+	  }
+	  auto savcol = COLMSK;
+	  pcsStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
+	  for (auto const& stitch : saveStitches) {
+		if ((stitch.attribute & COLMSK) != savcol) {
+		  savcol      = stitch.attribute & COLMSK;
+		  auto colRec = PCS_STITCH {};
+		  colRec.tag  = 3;
+		  wrap::narrow(colRec.fx, savcol);
+		  pcsStitchBuffer.push_back(colRec);
 		}
-		auto bytesWritten = DWORD {};
-		if (FALSE == WriteFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesWritten, nullptr)) {
+		auto stitchRec      = PCS_STITCH {};
+		auto integerPart    = 0.0F;
+		auto fractionalPart = std::modf(stitch.x, &integerPart);
+		stitchRec.fx        = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
+		wrap::narrow(stitchRec.x, integerPart);
+		fractionalPart = std::modf(stitch.y, &integerPart);
+		stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * FRACFACT);
+		wrap::narrow(stitchRec.y, integerPart);
+		pcsStitchBuffer.push_back(stitchRec);
+	  }
+	  if (FALSE == WriteFile(fileHandle, pcsStitchBuffer.data(), wrap::sizeofVector(pcsStitchBuffer), &bytesWritten, nullptr)) {
+		displayText::riter();
+		flag = false;
+		break;
+	  }
+	  if (UserFlagMap->test(UserFlag::BSAVOF)) {
+		constexpr auto BLANK = std::array<char, 14> {};
+		if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;
 		}
-		auto savcol = COLMSK;
-		pcsStitchBuffer.reserve(StitchBuffer->size() + thred::maxColor());
-		for (auto const& stitch : saveStitches) {
-		  if ((stitch.attribute & COLMSK) != savcol) {
-			savcol      = stitch.attribute & COLMSK;
-			auto colRec = PCS_STITCH {};
-			colRec.tag  = 3;
-			wrap::narrow(colRec.fx, savcol);
-			pcsStitchBuffer.push_back(colRec);
-		  }
-		  auto stitchRec      = PCS_STITCH {};
-		  auto integerPart    = 0.0F;
-		  auto fractionalPart = std::modf(stitch.x, &integerPart);
-		  stitchRec.fx        = wrap::floor<decltype(stitchRec.fx)>(fractionalPart * FRACFACT);
-		  wrap::narrow(stitchRec.x, integerPart);
-		  fractionalPart = std::modf(stitch.y, &integerPart);
-		  stitchRec.fy   = wrap::floor<decltype(stitchRec.fy)>(fractionalPart * FRACFACT);
-		  wrap::narrow(stitchRec.y, integerPart);
-		  pcsStitchBuffer.push_back(stitchRec);
-		}
-		if (FALSE ==
-		    WriteFile(fileHandle, pcsStitchBuffer.data(), wrap::sizeofVector(pcsStitchBuffer), &bytesWritten, nullptr)) {
+	  }
+	  else {
+		if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
 		  displayText::riter();
 		  flag = false;
 		  break;
 		}
-		if (UserFlagMap->test(UserFlag::BSAVOF)) {
-		  constexpr auto BLANK = std::array<char, 14> {};
-		  if (FALSE == WriteFile(fileHandle, BLANK.data(), wrap::toUnsigned(BLANK.size()), &bytesWritten, nullptr)) {
-			displayText::riter();
-			flag = false;
-			break;
-		  }
-		}
-		else {
-		  if (FALSE == WriteFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesWritten, nullptr)) {
-			displayText::riter();
-			flag = false;
-			break;
-		  }
-		}
-	  } while (false);
-	}
-	CloseHandle(fileHandle);
+	  }
+	} while (false);
+  }
+  CloseHandle(fileHandle);
   return flag;
 }
 
@@ -309,10 +308,10 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  else {
 			(*StitchBuffer)
 			    .emplace_back(wrap::toFloat(pcsStitchBuffer[iPCSStitch].x) +
-			                                    wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
-			                                wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
-			                                    wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
-			                                newAttribute);
+			                      wrap::toFloat(pcsStitchBuffer[iPCSStitch].fx) / FRACFACT,
+			                  wrap::toFloat(pcsStitchBuffer[iPCSStitch].y) +
+			                      wrap::toFloat(pcsStitchBuffer[iPCSStitch].fy) / FRACFACT,
+			                  newAttribute);
 		  }
 		}
 		auto const newStitchCount = StitchBuffer->size();

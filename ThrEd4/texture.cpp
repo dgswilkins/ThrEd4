@@ -475,10 +475,10 @@ void texture::drwtxtr() {
   SetROP2(StitchWindowMemDC, R2_XORPEN);
   SelectObject(StitchWindowMemDC, GridPen);
   auto const gridLineCount = wrap::floor<uint32_t>(TextureScreen.areaHeight / IniFile.gridSize + 1.0F);
-  auto       textureRecord = TX_PNT {};
-  line[0].x                = 0;
-  line[1].x                = StitchWindowClientRect.right;
-  auto point               = POINT {};
+  auto textureRecord = TX_PNT {};
+  line[0].x          = 0;
+  line[1].x          = StitchWindowClientRect.right;
+  auto point         = POINT {};
   for (auto iGrid = 0U; iGrid < gridLineCount; ++iGrid) {
 	txi::txt2pix(textureRecord, point);
 	line[0].y = line[1].y = point.y;
@@ -1103,9 +1103,9 @@ void texture::deltx(uint32_t formIndex) {
 	  auto iBuffer = uint16_t {};
 	  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
 		if (texture::istx(iForm)) {
-		  auto& fillInfo         = FormList->operator[](iForm).fillInfo;
+		  auto& fillInfo = FormList->operator[](iForm).fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 		  auto const destination = std::next(textureBuffer.begin(), iBuffer);
 		  std::copy(startSource, endSource, destination);
@@ -1115,9 +1115,9 @@ void texture::deltx(uint32_t formIndex) {
 	  }
 	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 		if (texture::istx(iForm)) {
-		  auto& fillInfo         = FormList->operator[](iForm).fillInfo;
+		  auto& fillInfo = FormList->operator[](iForm).fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
 		  auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
 		  std::copy(startSource, endSource, destination);
@@ -1760,6 +1760,7 @@ void texture::setshft() {
 }
 
 void texture::writeScreenWidth(int32_t position) {
-  auto const scrWidth = fmt::format(fmt::runtime(displayText::loadStr(IDS_TXWID)), (TextureScreen.width * IPFGRAN));
+  auto const scrWidth =
+      fmt::format(fmt::runtime(displayText::loadStr(IDS_TXWID)), (TextureScreen.width * IPFGRAN));
   wrap::textOut(DrawItem->hDC, position, 1, scrWidth.c_str(), wrap::toUnsigned(scrWidth.size()));
 }

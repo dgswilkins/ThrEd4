@@ -172,9 +172,9 @@ extern F_POINT LowerLeftStitch;
 
 extern std::array<uint32_t, OLDNUM>* LRUPtr;
 
-extern HMENU   MainMenu;
-extern HWND    MainStitchWin;
-extern float   MaxStitchLen;
+extern HMENU MainMenu;
+extern HWND  MainStitchWin;
+extern float MaxStitchLen;
 
 extern MENUITEMINFO* MenuInfo;
 

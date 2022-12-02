@@ -87,7 +87,7 @@ void satin::spltsat(uint32_t guideIndex) {
   // We are adding two additional vertices when splitting the form
   auto vertexBuffer = std::vector<F_POINT> {};
   vertexBuffer.resize(wrap::toSize(form.vertexCount) + 2U);
-  auto const maxForm       = FormList->size();
+  auto const maxForm = FormList->size();
   auto const lastFormGuide = wrap::next(FormVertices->cbegin(), form.vertexIndex + form.vertexCount);
   FormVertices->insert(lastFormGuide, 2, F_POINT {});
   for (auto iForm = ClosestFormToCursor + 2U; iForm < maxForm; ++iForm) {
@@ -304,7 +304,7 @@ void satin::satsel() {
   if (si::satselfn()) {
 	auto& form = FormList->operator[](ClosestFormToCursor);
 	thred::duzrat();
-	StartPoint          = ClosestVertexToCursor;
+	StartPoint = ClosestVertexToCursor;
 	auto const itVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex + ClosestVertexToCursor);
 	FormLines->front() = form::sfCor2px(*itVertex);
 	StateMap->reset(StateFlag::SHOCON);
@@ -378,7 +378,7 @@ void satin::satadj(FRM_HEAD& form) {
 	// NOLINTNEXTLINE
 	outDebugString(L"Removed {} zero distance guides\n", (currentGuidesCount - iDestination));
 	si::satcpy(form, interiorGuides, iDestination);
-	itFirstGuide       = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
+	itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
 	currentGuidesCount = iDestination;
   }
   auto const& endGuide = form.wordParam;
@@ -408,7 +408,7 @@ void satin::satadj(FRM_HEAD& form) {
 	if (currentGuidesCount > iDestination) {
 	  outDebugString(L"Removed {} end guides\n", (currentGuidesCount - iDestination));
 	  si::satcpy(form, interiorGuides, iDestination);
-	  itFirstGuide       = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
+	  itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
 	  currentGuidesCount = iDestination;
 	}
 	// remove any guides that start after the end guide
@@ -425,7 +425,7 @@ void satin::satadj(FRM_HEAD& form) {
 	  if (currentGuidesCount > iDestination) {
 		outDebugString(L"Removed {} reversed guides\n", (currentGuidesCount - iDestination));
 		si::satcpy(form, interiorGuides, iDestination);
-		itFirstGuide         = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
+		itFirstGuide = wrap::next(SatinGuides->begin(), form.satinOrAngle.guide); // iterator may be invalidated by erase
 		form.satinGuideCount = iDestination;
 		currentGuidesCount   = iDestination;
 	  }

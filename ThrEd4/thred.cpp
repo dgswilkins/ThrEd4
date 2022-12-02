@@ -35,7 +35,7 @@
 #include <shellapi.h>
 
 #ifdef ALLOCFAILURE
-//#include <new.h>
+// #include <new.h>
 #endif
 
 #pragma pack(push, 1)
@@ -680,15 +680,15 @@ static auto ClipOrigin              = POINT {};    // origin of clipboard box in
 static auto SelectBoxSize           = SIZE {};     // size of the select box
 static auto SelectBoxOffset = POINT {}; // offset of the spot the user selected from the lower left of the select box
 static auto RotationHandleAngle = float {};    // angle of the rotation handle
-static auto ThreadSize30        = TSIZ30;      //#30 thread size
-static auto ThreadSize40        = TSIZ40;      //#40 thread size
-static auto ThreadSize60        = TSIZ60;      //#60 thread size
+static auto ThreadSize30        = TSIZ30;      // #30 thread size
+static auto ThreadSize40        = TSIZ40;      // #40 thread size
+static auto ThreadSize60        = TSIZ60;      // #60 thread size
 static auto RunPoint            = uint32_t {}; // point for animating stitchout
 static auto StitchesPerFrame    = uint32_t {}; // number of stitches to draw in each frame
 static auto MovieTimeStep       = int32_t {};  // time delay for stitchout
 static auto LRUMenuId =
     std::array<uint32_t, OLDNUM> {FM_ONAM0, FM_ONAM1, FM_ONAM2, FM_ONAM3}; // recently used file menu ID's
-static auto LastKeyCode          = std::numeric_limits<wchar_t>::max(); // last key code
+static auto LastKeyCode = std::numeric_limits<wchar_t>::max();             // last key code
 static auto VersionNames =
     gsl::narrow_cast<std::vector<fs::path>*>(nullptr); // temporary storage for old file version names
 static auto FileVersionIndex = uint8_t {};             // points to old version to be read
@@ -754,9 +754,9 @@ static auto ColorBar       = gsl::narrow_cast<HWND>(nullptr); // color bar
 static auto SpeedScrollBar = gsl::narrow_cast<HWND>(nullptr); // speed scroll bar for movie
 static auto BackupViewer = std::array<HWND, QUADRT> {}; // handles of multiple file viewing windows in quadrants
 static auto DefaultColorWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // default color windows
-static auto UserColorWin    = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // user color windows
-static auto SideWindow      = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // side message windows
-static auto ThreadSizeWin   = gsl::narrow_cast<std::vector<HWND>*>(nullptr); // thread size windows
+static auto UserColorWin  = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // user color windows
+static auto SideWindow    = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // side message windows
+static auto ThreadSizeWin = gsl::narrow_cast<std::vector<HWND>*>(nullptr);   // thread size windows
 
 static auto StitchWindowBmp = gsl::narrow_cast<HBITMAP>(nullptr); // bitmap for the memory stitch device context
 static auto DisplayedColorBitmap =
@@ -807,7 +807,7 @@ static auto Thumbnails = gsl::narrow_cast<std::vector<std::wstring>*>(nullptr); 
 static auto ThumbnailsSelected = std::array<uint32_t, 4> {}; // indexes of thumbnails selected for display
 
 static auto ThumbnailDisplayCount = uint32_t {}; // number of thumbnail file names selected for display
-static auto ThumbnailIndex        = uint32_t {}; // index into the thumbnail filname table
+static auto ThumbnailIndex = uint32_t {};        // index into the thumbnail filname table
 
 static auto ThumbnailSearchString =
     gsl::narrow_cast<std::vector<wchar_t>*>(nullptr); // storage for the thumbnail search string
@@ -1026,7 +1026,7 @@ void thi::ritfnam(std::wstring const& designerName) {
   }
   if (iName == NAMELEN) {
 	auto const spNameDecoder = gsl::span {NameDecoder};
-	auto& index = tmpName.back();
+	auto&      index         = tmpName.back();
 	while (spNameDecoder[wrap::toSize(index)] != 0U) {
 	  index = gsl::narrow_cast<uint8_t>(form::psg() & BYTMASK);
 	}
@@ -1547,7 +1547,7 @@ void thred::shft(F_POINT const& delta) noexcept {
   auto const halfZoomRect =
       F_POINT {((ZoomRect.right - ZoomRect.left) * 0.5F), ((ZoomRect.top - ZoomRect.bottom) * 0.5F)};
   auto const center = F_POINT {(ZoomRect.left + halfZoomRect.x), (ZoomRect.bottom + halfZoomRect.y)};
-  auto const shift  = F_POINT {(center.x - delta.x), (center.y - delta.y)};
+  auto const shift = F_POINT {(center.x - delta.x), (center.y - delta.y)};
   ZoomRect.bottom -= shift.y;
   ZoomRect.top -= shift.y;
   ZoomRect.left -= shift.x;
@@ -2032,50 +2032,50 @@ void thi::chknum() {
 	  if (PreferenceIndex != 0U) {
 		auto const value = wrap::wcstof(SideWindowEntryBuffer->data());
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto       hWnd = HWND {nullptr};
-		auto       fmtStr = std::wstring {};
+		auto hWnd   = HWND {nullptr};
+		auto fmtStr = std::wstring {};
 		switch (PreferenceIndex - 1) {
 		  case PRFEGGRAT: {
 			IniFile.eggRatio = value;
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
-			hWnd = ValueWindow->operator[](PRFEGGRAT);
+			fmtStr           = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			hWnd             = ValueWindow->operator[](PRFEGGRAT);
 			break;
 		  }
 		  case PRFNUGSTP: {
 			IniFile.cursorNudgeStep = value;
 			IniFile.nudgePixels     = pxchk(value);
-			fmtStr       = fmt::format(FMT_STRING(L"{:.2f}"), value);
-			hWnd = ValueWindow->operator[](PRFNUGSTP);
+			fmtStr                  = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			hWnd                    = ValueWindow->operator[](PRFNUGSTP);
 			break;
 		  }
 		  case PRFPCTSPC: {
 			PicotSpacing = value * PFGRAN;
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
-			hWnd = ValueWindow->operator[](PRFPCTSPC);
+			fmtStr       = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			hWnd         = ValueWindow->operator[](PRFPCTSPC);
 			break;
 		  }
 		  case PRFCLPOFF: {
 			IniFile.clipOffset = value * PFGRAN;
-			fmtStr  = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
-			hWnd = ValueWindow->operator[](PRFCLPOFF);
+			fmtStr             = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
+			hWnd               = ValueWindow->operator[](PRFCLPOFF);
 			break;
 		  }
 		  case PRFCLPPHS: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-			fmtStr = fmt::format(FMT_STRING(L"{}"), IniFile.fillPhase);
-			hWnd = ValueWindow->operator[](PRFCLPPHS);
+			fmtStr            = fmt::format(FMT_STRING(L"{}"), IniFile.fillPhase);
+			hWnd              = ValueWindow->operator[](PRFCLPPHS);
 			break;
 		  }
 		  case PRFCHFPOS: {
 			IniFile.chainRatio = value;
-			fmtStr  = fmt::format(FMT_STRING(L"{:.2f}"), value);
-			hWnd = ValueWindow->operator[](PRFCHFPOS);
+			fmtStr             = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			hWnd               = ValueWindow->operator[](PRFCHFPOS);
 			break;
 		  }
 		  case PRFSTCMIN: {
 			MinStitchLength = value * PFGRAN;
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
-			hWnd = ValueWindow->operator[](PRFSTCMIN);
+			fmtStr          = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			hWnd            = ValueWindow->operator[](PRFSTCMIN);
 			break;
 		  }
 		  default: {
@@ -2084,49 +2084,49 @@ void thi::chknum() {
 			  switch (PreferenceIndex - 1) {
 				case PRFFILSPC: {
 				  LineSpacing = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFFILSPC);
+				  hWnd        = ValueWindow->operator[](PRFFILSPC);
 				  break;
 				}
 				case PRFFILANG: {
 				  IniFile.fillAngle = value * DEGRADF;
-				  hWnd = ValueWindow->operator[](PRFFILANG);
+				  hWnd              = ValueWindow->operator[](PRFFILANG);
 				  break;
 				}
 				case PRFBRDWID: {
 				  BorderWidth         = value * PFGRAN;
 				  IniFile.borderWidth = BorderWidth;
-				  hWnd = ValueWindow->operator[](PRFBRDWID);
+				  hWnd                = ValueWindow->operator[](PRFBRDWID);
 				  break;
 				}
 				case PRFSTCMAX: {
 				  IniFile.maxStitchLength = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFSTCMAX);
+				  hWnd                    = ValueWindow->operator[](PRFSTCMAX);
 				  break;
 				}
 				case PRFSTCUSR: {
 				  UserStitchLength = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFSTCUSR);
+				  hWnd             = ValueWindow->operator[](PRFSTCUSR);
 				  break;
 				}
 				case PRFSMLSTH: {
 				  SmallStitchLength = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFSMLSTH);
+				  hWnd              = ValueWindow->operator[](PRFSMLSTH);
 				  break;
 				}
 				case PRFAPPCOL: {
 				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
 				  fmtStr        = fmt::format(FMT_STRING(L"{}"), (AppliqueColor + 1U));
-				  hWnd = ValueWindow->operator[](PRFAPPCOL);
+				  hWnd          = ValueWindow->operator[](PRFAPPCOL);
 				  break;
 				}
 				case PRFAPSLEN: {
 				  IniFile.AppStitchLen = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFAPSLEN);
+				  hWnd                 = ValueWindow->operator[](PRFAPSLEN);
 				  break;
 				}
 				case PRFSNPSIZ: {
 				  SnapLength = value * PFGRAN;
-				  hWnd = ValueWindow->operator[](PRFSNPSIZ);
+				  hWnd       = ValueWindow->operator[](PRFSNPSIZ);
 				  break;
 				}
 				case PRFSTRRAT: {
@@ -2141,7 +2141,7 @@ void thi::chknum() {
 					StarRatio = SRMINLIM;
 				  }
 				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), StarRatio);
-				  hWnd = ValueWindow->operator[](PRFSTRRAT);
+				  hWnd   = ValueWindow->operator[](PRFSTRRAT);
 				  break;
 				}
 				case PRFLENRAT: {
@@ -2156,7 +2156,7 @@ void thi::chknum() {
 					IniFile.lensRatio = LRMINLIM;
 				  }
 				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), IniFile.lensRatio);
-				  hWnd = ValueWindow->operator[](PRFLENRAT);
+				  hWnd   = ValueWindow->operator[](PRFLENRAT);
 				  break;
 				}
 				case PRFSPLWRP: {
@@ -2171,19 +2171,19 @@ void thi::chknum() {
 					SpiralWrap = SRMINLIM;
 				  }
 				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), SpiralWrap);
-				  hWnd = ValueWindow->operator[](PRFSPLWRP);
+				  hWnd   = ValueWindow->operator[](PRFSPLWRP);
 				  break;
 				}
 				case PRFBCNLEN: {
 				  ButtonholeCornerLength = value * PFGRAN;
-				  fmtStr      = fmt::format(FMT_STRING(L"{:.2f}"), value);
-				  hWnd = ValueWindow->operator[](PRFBCNLEN);
+				  fmtStr                 = fmt::format(FMT_STRING(L"{:.2f}"), value);
+				  hWnd                   = ValueWindow->operator[](PRFBCNLEN);
 				  break;
 				}
 				case PRFHUPWID: {
 				  IniFile.hoopSizeX = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
-				  hWnd = ValueWindow->operator[](PRFHUPWID);
+				  fmtStr            = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
+				  hWnd              = ValueWindow->operator[](PRFHUPWID);
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
@@ -2191,23 +2191,23 @@ void thi::chknum() {
 				}
 				case PRFHUPHGT: {
 				  IniFile.hoopSizeY = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
-				  hWnd = ValueWindow->operator[](PRFHUPHGT);
+				  fmtStr            = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
+				  hWnd              = ValueWindow->operator[](PRFHUPHGT);
 				  form::sethup();
 				  formForms::prfmsg();
 				  thred::chkhup();
 				  break;
 				}
 				case PRFGRDSIZ: {
-				  IniFile.gridSize  = value * PFGRAN;
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
-				  hWnd = ValueWindow->operator[](PRFGRDSIZ);
+				  IniFile.gridSize = value * PFGRAN;
+				  fmtStr           = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
+				  hWnd             = ValueWindow->operator[](PRFGRDSIZ);
 				  break;
 				}
 				case PRFCHFLEN: {
 				  IniFile.chainSpace = value * PFGRAN;
-				  fmtStr  = fmt::format(FMT_STRING(L"{:.2f}"), value);
-				  hWnd = ValueWindow->operator[](PRFCHFLEN);
+				  fmtStr             = fmt::format(FMT_STRING(L"{:.2f}"), value);
+				  hWnd               = ValueWindow->operator[](PRFCHFLEN);
 				  break;
 				}
 				default: {
@@ -3273,7 +3273,7 @@ void thi::ritini() {
   for (auto& prevName : IniFile.prevNames) {
 	std::ranges::fill(prevName, FILLCHAR);
 	if (!previousName->empty()) {
-	  auto previous = utf::utf16ToUtf8(*previousName);
+	  auto       previous = utf::utf16ToUtf8(*previousName);
 	  auto const spName   = gsl::span {prevName};
 	  std::ranges::copy(previous, spName.begin());
 	}
@@ -3535,10 +3535,7 @@ auto thi::chkattr(fs::path const& filename) -> bool {
   if (writePerms == fs::perms::none) {
 	auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_OVRLOK)), filename.wstring());
 	auto const buttonPressed =
-	    MessageBox(ThrEdWindow,
-	               fmtStr.c_str(),
-	               displayText::loadStr(IDS_OVRIT).c_str(),
-	               MB_YESNO);
+	    MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_OVRIT).c_str(), MB_YESNO);
 	if (buttonPressed == IDYES) {
 	  fs::permissions(filename, WRBITS, fs::perm_options::add);
 	}
@@ -3965,10 +3962,7 @@ void thi::dun() {
 	}
 	else {
 	  auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SAVFIL)), ThrName->wstring());
-	  if (MessageBox(ThrEdWindow,
-	                 fmtStr.c_str(),
-	                 displayText::loadStr(IDS_CLOS).c_str(),
-	                 MB_YESNO) == IDYES) {
+	  if (MessageBox(ThrEdWindow, fmtStr.c_str(), displayText::loadStr(IDS_CLOS).c_str(), MB_YESNO) == IDYES) {
 		thred::save();
 	  }
 	  reldun();
@@ -5012,9 +5006,9 @@ void thi::closPnt() {
 }
 
 auto thi::closPnt1(uint32_t& closestStitch) -> bool {
-  auto       closestIndex = 0U;
+  auto closestIndex = 0U;
   auto const pointToCheck = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-  auto       stitchCoordsInPixels = POINT {};
+  auto stitchCoordsInPixels = POINT {};
   if (StateMap->test(StateFlag::SELBOX) && stch2px(ClosestPointIndex, stitchCoordsInPixels)) {
 	if (hypot(stitchCoordsInPixels.x - pointToCheck.x, stitchCoordsInPixels.y - pointToCheck.y) < CLOSENUF) {
 	  closestStitch = ClosestPointIndex;
@@ -5398,7 +5392,7 @@ auto thi::closlin() -> uint32_t {
 			  tsum = sqrt(deltaX * deltaX + deltaY * deltaY);
 			} while (false);
 			if (tsum < sum) {
-			  sum          = tsum;
+			  sum = tsum;
 			  closestPoint = wrap::toUnsigned(iStitch) + ColorChangeTable->operator[](iChange).stitchIndex;
 			}
 		  }
@@ -5945,7 +5939,7 @@ void thi::sizclp(FRM_HEAD const& form,
                  uint32_t&       length,
                  uint32_t&       fileSize) {
   fileSize = wrap::toUnsigned(sizeof(FORM_CLIP)) + form.vertexCount * wrap::sizeofType(FormVertices);
-  length   = fileSize;
+  length = fileSize;
   if (form.type == SAT) {
 	fileSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
@@ -6257,10 +6251,9 @@ void thi::duclip() {
 void thred::delfstchs() {
   auto const codedForm = ClosestFormToCursor << FRMSHFT;
   // find the first stitch to delete
-  auto const firstStitch =
-      std::ranges::find_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
-	    return ((stitch.attribute & (FRMSK | NOTFRM)) == codedForm);
-      });
+  auto const firstStitch = std::ranges::find_if(*StitchBuffer, [codedForm](F_POINT_ATTR const& stitch) -> bool {
+	return ((stitch.attribute & (FRMSK | NOTFRM)) == codedForm);
+  });
   if (firstStitch != StitchBuffer->end()) {
 	// we found the first stitch, so now delete the stitches in the form
 	StitchBuffer->erase(std::remove_if(firstStitch,
@@ -6489,8 +6482,8 @@ auto thi::cmpstch(uint32_t iStitchA, uint32_t iStitchB) noexcept -> bool {
 
 void thi::ofstch(std::vector<F_POINT_ATTR>& buffer, uint32_t iSource, char offset, F_POINT const& knotStep, uint32_t knotAttribute) {
   buffer.emplace_back(StitchBuffer->operator[](iSource).x + knotStep.x * wrap::toFloat(offset),
-                                    StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
-                                    knotAttribute);
+                      StitchBuffer->operator[](iSource).y + knotStep.y * wrap::toFloat(offset),
+                      knotAttribute);
 }
 
 void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
@@ -6504,8 +6497,8 @@ void thi::endknt(std::vector<F_POINT_ATTR>& buffer, uint32_t finish) {
 	length = hypot(delta.x, delta.y);
 	--startIt;
   }
-  delta                            = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-  auto const knotStep              = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+  delta               = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+  auto const knotStep = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
   constexpr auto KNOT_AT_END_ORDER = std::array<char, KNOTSCNT> {-2, -3, -1, -4, 0}; // reverse knot spacings
   constexpr auto KNOT_AT_LAST_ORDER = std::array<char, KNOTSCNT> {0, -4, -1, -3, -2}; // reverse knot spacings
   auto const& knots = (StateMap->test(StateFlag::FILDIR)) ? KNOT_AT_LAST_ORDER : KNOT_AT_END_ORDER;
@@ -6530,9 +6523,9 @@ void thi::strtknt(std::vector<F_POINT_ATTR>& buffer, uint32_t start) {
   }
   if (finishIt != StitchBuffer->end()) {
 	--finishIt;
-	delta = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
-	auto const            knotAttribute = startIt->attribute | KNOTMSK;
-	auto const            knotStep = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
+	delta                    = F_POINT {finishIt->x - startIt->x, finishIt->y - startIt->y};
+	auto const knotAttribute = startIt->attribute | KNOTMSK;
+	auto const knotStep      = F_POINT {2.0F / length * delta.x, 2.0F / length * delta.y};
 	static constexpr auto KNOT_AT_START_ORDER = std::array<char, 5> {2, 3, 1, 4, 0}; // knot spacings
 	for (char const iKnot : KNOT_AT_START_ORDER) {
 	  ofstch(buffer, start, iKnot, knotStep, knotAttribute);
@@ -6548,10 +6541,9 @@ void thi::delknt() {
 
 void thi::delknot() {
   // Find the first knot stitch, if any
-  auto const firstStitch =
-      std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
-	    return ((stitch.attribute & KNOTMSK) != 0U);
-      });
+  auto const firstStitch = std::ranges::find_if(*StitchBuffer, [](F_POINT_ATTR const& stitch) -> bool {
+	return ((stitch.attribute & KNOTMSK) != 0U);
+  });
   if (firstStitch != StitchBuffer->end()) {
 	thred::savdo();
 	// delete the knot stitches
@@ -7497,9 +7489,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  redfnam(*DesignerName);
 		  auto fmtStr =
 		      fmt::format(fmt::runtime(displayText::loadStr(IDS_THRDBY)), ThrName->wstring(), *DesignerName);
-		  SetWindowText(
-		      ThrEdWindow,
-		      fmtStr.c_str());
+		  SetWindowText(ThrEdWindow, fmtStr.c_str());
 		}
 	  }
 	  auto dest = StitchBuffer->end();
@@ -7685,8 +7675,7 @@ void thi::mv2b() {
 	  std::copy(wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U),
 	            StitchBuffer->end(),
 	            wrap::next(StitchBuffer->begin(), GroupStartStitch));
-	  std::ranges::copy(tempStitchBuffer,
-	            wrap::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
+	  std::ranges::copy(tempStitchBuffer, wrap::next(StitchBuffer->begin(), StitchBuffer->size() - grpSize));
 	  thred::coltab();
 	  StateMap->set(StateFlag::RESTCH);
 	}
@@ -7941,9 +7930,9 @@ void thi::nulayr(uint8_t play) {
 
 auto thi::iselpnt() noexcept -> bool {
   auto const pointToTest = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
-  auto       closestControlPoint = 0U;
-  auto       minimumLength       = BIGDBL;
-  auto       iControlPoint       = 0U;
+  auto closestControlPoint = 0U;
+  auto minimumLength       = BIGDBL;
+  auto iControlPoint       = 0U;
   for (auto const& controlPoint : *FormControlPoints) {
 	auto const length = hypot(pointToTest.x - controlPoint.x, pointToTest.y - controlPoint.y);
 	if (length < minimumLength) {
@@ -7983,7 +7972,7 @@ auto thi::isInBox(POINT const& point, RECT const& box) noexcept -> bool {
 }
 
 auto thi::chkbig(std::vector<POINT>& stretchBoxLine, float& xyRatio) -> bool {
-  auto       minimumLength = BIGDBL;
+  auto minimumLength = BIGDBL;
   auto const pointToTest = POINT {(Msg.pt.x - StitchWindowOrigin.x), (Msg.pt.y - StitchWindowOrigin.y)};
   for (auto iControlPoint = 0U; iControlPoint < SelectedFormsLine->size(); ++iControlPoint) {
 	auto const length = hypot(pointToTest.x - SelectedFormsLine->operator[](iControlPoint).x,
@@ -8578,7 +8567,8 @@ void thi::thumnail() {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (file == INVALID_HANDLE_VALUE) {
 	auto const dwError = GetLastError();
-	auto const fmtStr  = fmt::format(fmt::runtime(displayText::loadStr(IDS_FFINDERR)), searchName.wstring(), dwError);
+	auto const fmtStr =
+	    fmt::format(fmt::runtime(displayText::loadStr(IDS_FFINDERR)), searchName.wstring(), dwError);
 	displayText::shoMsg(fmtStr);
 	unthum();
   }
@@ -8893,11 +8883,16 @@ void thi::desiz() {
 	thred::frmrct(rectangle);
 	auto const xSize = (rectangle.right - rectangle.left) * IPFGRAN;
 	auto const ySize = (rectangle.top - rectangle.bottom) * IPFGRAN;
-	info += fmt::format(
-	    fmt::runtime(displayText::loadStr(IDS_FORMS)), FormList->size(), xSize, (xSize * MMTOINCH), ySize, (ySize * MMTOINCH));
+	info += fmt::format(fmt::runtime(displayText::loadStr(IDS_FORMS)),
+	                    FormList->size(),
+	                    xSize,
+	                    (xSize * MMTOINCH),
+	                    ySize,
+	                    (ySize * MMTOINCH));
   }
-  info += fmt::format(
-      fmt::runtime(displayText::loadStr(IDS_HUPWID)), (IniFile.hoopSizeX * IPFGRAN), (IniFile.hoopSizeY * IPFGRAN));
+  info += fmt::format(fmt::runtime(displayText::loadStr(IDS_HUPWID)),
+                      (IniFile.hoopSizeX * IPFGRAN),
+                      (IniFile.hoopSizeY * IPFGRAN));
   if (!StitchBuffer->empty()) {
 	auto& modifierName = ExtendedHeader->modifierName;
 	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
@@ -9484,7 +9479,7 @@ void thi::retrac() {
 	auto const count       = GroupEndStitch - GroupStartStitch;
 	auto const insertPoint = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
 	auto const startPoint = wrap::next(StitchBuffer->rbegin(), StitchBuffer->size() - GroupEndStitch);
-	auto const endPoint   = wrap::next(startPoint, count);
+	auto const endPoint = wrap::next(startPoint, count);
 	StitchBuffer->insert(insertPoint, startPoint, endPoint);
 	thred::coltab();
 	StateMap->set(StateFlag::RESTCH);
@@ -10361,12 +10356,16 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 	case WM_INITDIALOG: {
 	  auto const featherType = IniFile.featherType;
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), fmt::format(FMT_STRING(L"{:.2f}"), IniFile.featherRatio).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), fmt::format(FMT_STRING(L"{}"), IniFile.featherUpCount).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), fmt::format(FMT_STRING(L"{}"), IniFile.featherDownCount).c_str());
+	  SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT),
+	                fmt::format(FMT_STRING(L"{:.2f}"), IniFile.featherRatio).c_str());
+	  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT),
+	                fmt::format(FMT_STRING(L"{}"), IniFile.featherUpCount).c_str());
+	  SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT),
+	                fmt::format(FMT_STRING(L"{}"), IniFile.featherDownCount).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
 	                fmt::format(FMT_STRING(L"{:.2f}"), (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
-	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), fmt::format(FMT_STRING(L"{}"), IniFile.featherCount).c_str());
+	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM),
+	                fmt::format(FMT_STRING(L"{}"), IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
 	  for (auto const& iFeatherStyle : FTHRLIST) {
 		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
@@ -11543,10 +11542,9 @@ auto thi::handleSideWindowActive() -> bool {
   thred::savdo();
   auto& form = FormList->operator[](ClosestFormToCursor);
   if (FormMenuChoice == LFTHTYP) {
-	auto const iFeather =
-	    std::ranges::find_if(FTHRLIST, [](LIST_TYPE const& feather) noexcept -> bool {
-	      return Msg.hwnd == SideWindow->operator[](feather.value);
-	    });
+	auto const iFeather = std::ranges::find_if(FTHRLIST, [](LIST_TYPE const& feather) noexcept -> bool {
+	  return Msg.hwnd == SideWindow->operator[](feather.value);
+	});
 	if (iFeather != FTHRLIST.end()) {
 	  form.fillInfo.feather.fillType = iFeather->value;
 	  thred::unsid();
@@ -11556,10 +11554,9 @@ auto thi::handleSideWindowActive() -> bool {
 	return true;
   }
   if (FormMenuChoice == LLAYR) {
-	auto const iLayer =
-	    std::ranges::find_if(LAYRLIST, [](LIST_TYPE const& layer) noexcept -> bool {
-	      return Msg.hwnd == SideWindow->operator[](layer.value);
-	    });
+	auto const iLayer = std::ranges::find_if(LAYRLIST, [](LIST_TYPE const& layer) noexcept -> bool {
+	  return Msg.hwnd == SideWindow->operator[](layer.value);
+	});
 	if (iLayer != LAYRLIST.end()) {
 	  form::movlayr(iLayer->value);
 	  StateMap->set(StateFlag::FORMSEL);
@@ -16558,7 +16555,7 @@ void thi::init() {
   nuRct();
   // create pens
   static constexpr auto BOX_COLOR = std::array<COLORREF, 4> {0x404040, 0x408040, 0x804040, 0x404080};
-  auto                  itBoxCOlor = BOX_COLOR.begin();
+  auto itBoxCOlor = BOX_COLOR.begin();
   std::ranges::generate(BoxPen, [&itBoxCOlor]() mutable noexcept -> HPEN {
 	return wrap::createPen(PS_SOLID, PENNWID, *(itBoxCOlor++));
   });
@@ -17049,7 +17046,7 @@ void thi::drwStch() {
 	      F_POINT {(ZoomRect.right - ZoomRect.left) / wrap::toFloat(StitchWindowClientRect.right),
 	               (ZoomRect.top - ZoomRect.bottom) / wrap::toFloat(StitchWindowClientRect.bottom)};
 	  auto const maxMapSize = wrap::toSize(StitchWindowClientRect.right * StitchWindowClientRect.bottom);
-	  auto       stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
+	  auto stitchMap = boost::dynamic_bitset<>(maxMapSize, 0U);
 	  SelectObject(StitchWindowMemDC, LinePen);
 	  SetROP2(StitchWindowMemDC, R2_NOTXORPEN);
 	  if (StateMap->test(StateFlag::HID)) {
@@ -17695,7 +17692,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  UserFlagMap->reset(UserFlag::SAVMAX);
 		  chkirct();
 		  if (StateMap->testAndSet(StateFlag::SIZED)) {
-			auto       screenCenterOffset = LONG {};
+			auto screenCenterOffset = LONG {};
 			auto const maxWindowDimension = SIZE {ScreenSizePixels.cx - 30, ScreenSizePixels.cy - 30};
 			if ((ThredWindowRect.right - ThredWindowRect.left) > maxWindowDimension.cx) {
 			  screenCenterOffset    = (ScreenSizePixels.cx - maxWindowDimension.cx) / 2;
@@ -17877,51 +17874,51 @@ auto APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstanc
 #endif
 
 	if (RegisterClassEx(&winClass)) {
-	  auto  privateAllItemsRect              = F_RECTANGLE {};
-	  auto  privateAngledFormVertices        = std::vector<F_POINT> {};
-	  auto  privateAuxName                   = fs::path {};
-	  auto  privateBitmapBackgroundColor     = std::vector<COLORREF> {};
-	  auto  privateBSequence                 = std::vector<B_SEQ_PNT> {};
-	  auto  privateBalaradName0              = fs::path {};
-	  auto  privateBalaradName1              = fs::path {};
-	  auto  privateBalaradName2              = fs::path {};
-	  auto  privateButtonWin                 = std::vector<HWND> {};
-	  auto  privateClipBuffer                = std::vector<F_POINT_ATTR> {};
-	  auto  privateClipPoints                = std::vector<F_POINT> {};
-	  auto  privateColorFileName             = fs::path {};
-	  auto  privateColorChangeTable          = std::vector<COL_CHANGE> {};
-	  auto  privateDefaultColorWin           = std::vector<HWND> {};
-	  auto  privateDefaultDirectory          = fs::path {};
-	  auto  privateDesignerName              = std::wstring {};
-	  auto  privateExtendedHeader            = THR_HEAD_EX {};
-	  auto  privateFormAngles                = std::vector<float> {};
-	  auto  privateFormControlPoints         = std::vector<POINT> {};
-	  auto  privateFormLines                 = std::vector<POINT> {};
-	  auto  privateFormList                  = std::vector<FRM_HEAD> {};
-	  auto  privateFormOnOff                 = std::wstring {};
-	  auto  privateFormVertices              = std::vector<F_POINT> {};
-	  auto  privateFormVerticesAsLine        = std::vector<POINT> {};
-	  auto  privateHomeDirectory             = fs::path {};
-	  auto  privateIniFileName               = fs::path {};
-	  auto  privateInsidePointList           = std::vector<F_POINT> {};
-	  auto  privateInterleaveSequence        = std::vector<F_POINT> {};
-	  auto  privateInterleaveSequenceIndices = std::vector<INS_REC> {};
-	  auto  privateKnots                     = std::vector<uint32_t> {};
-	  auto  privateLabelWindow               = std::vector<HWND> {};
-	  FormOnOff                              = &privateFormOnOff;
+	  auto privateAllItemsRect              = F_RECTANGLE {};
+	  auto privateAngledFormVertices        = std::vector<F_POINT> {};
+	  auto privateAuxName                   = fs::path {};
+	  auto privateBitmapBackgroundColor     = std::vector<COLORREF> {};
+	  auto privateBSequence                 = std::vector<B_SEQ_PNT> {};
+	  auto privateBalaradName0              = fs::path {};
+	  auto privateBalaradName1              = fs::path {};
+	  auto privateBalaradName2              = fs::path {};
+	  auto privateButtonWin                 = std::vector<HWND> {};
+	  auto privateClipBuffer                = std::vector<F_POINT_ATTR> {};
+	  auto privateClipPoints                = std::vector<F_POINT> {};
+	  auto privateColorFileName             = fs::path {};
+	  auto privateColorChangeTable          = std::vector<COL_CHANGE> {};
+	  auto privateDefaultColorWin           = std::vector<HWND> {};
+	  auto privateDefaultDirectory          = fs::path {};
+	  auto privateDesignerName              = std::wstring {};
+	  auto privateExtendedHeader            = THR_HEAD_EX {};
+	  auto privateFormAngles                = std::vector<float> {};
+	  auto privateFormControlPoints         = std::vector<POINT> {};
+	  auto privateFormLines                 = std::vector<POINT> {};
+	  auto privateFormList                  = std::vector<FRM_HEAD> {};
+	  auto privateFormOnOff                 = std::wstring {};
+	  auto privateFormVertices              = std::vector<F_POINT> {};
+	  auto privateFormVerticesAsLine        = std::vector<POINT> {};
+	  auto privateHomeDirectory             = fs::path {};
+	  auto privateIniFileName               = fs::path {};
+	  auto privateInsidePointList           = std::vector<F_POINT> {};
+	  auto privateInterleaveSequence        = std::vector<F_POINT> {};
+	  auto privateInterleaveSequenceIndices = std::vector<INS_REC> {};
+	  auto privateKnots                     = std::vector<uint32_t> {};
+	  auto privateLabelWindow               = std::vector<HWND> {};
+	  FormOnOff                             = &privateFormOnOff;
 
 	  auto privateMenuInfo = MENUITEMINFO {
-		sizeof(MENUITEMINFO), // Size
-		    MIIM_TYPE,        // Mask
-		    MFT_STRING,       // Type
-		    0,                // State
-		    0,                // ID
-		    nullptr,          // SubMenu
-		    nullptr,          // bmpChecked
-		    nullptr,          // bmpUnchecked
-		    0,                // ItemData
-		    FormOnOff->data(),// TypeData
-		    16,               // cch
+		sizeof(MENUITEMINFO),  // Size
+		    MIIM_TYPE,         // Mask
+		    MFT_STRING,        // Type
+		    0,                 // State
+		    0,                 // ID
+		    nullptr,           // SubMenu
+		    nullptr,           // bmpChecked
+		    nullptr,           // bmpUnchecked
+		    0,                 // ItemData
+		    FormOnOff->data(), // TypeData
+		    16,                // cch
 #if (WINVER >= 0x0500)
 		    nullptr // bmpItem
 #endif              /* WINVER >= 0x0500 */

@@ -9,7 +9,7 @@
 
 // Standard Libraries
 #ifdef ALLOCFAILURE
-//#include <new.h>
+// #include <new.h>
 #endif
 
 #pragma pack(push, 1) // make sure that the DST data structures are aligned as per the standard
@@ -65,7 +65,7 @@ void savdst(std::vector<DSTREC>& DSTRecords, uint32_t data);
 } // namespace di
 
 constexpr auto COLVER    = uint32_t {0x776874U}; // color file version
-constexpr auto DSTMAX    = 121L;                  // maximum stitch/jump length of 121 in DST format
+constexpr auto DSTMAX    = 121L;                 // maximum stitch/jump length of 121 in DST format
 constexpr auto DSTSCALE  = 3.0F / 5.0F;          // DST stitch scaling factor
 constexpr auto IDSTSCALE = 5.0F / 3.0F;          // Inverse DST stitch scaling factor
 // constexpr auto TYPCOL = 0x630000U; // dst color mask (unused at present)
@@ -244,13 +244,13 @@ void DST::ritdst(DST_OFFSETS& DSTOffsetData, std::vector<DSTREC>& DSTRecords, st
 	  boundingRect.bottom = stitch.y - MARGIN;
 	}
   }
-  auto centerCoordinate    = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
+  auto centerCoordinate = POINT {std::lround(wrap::midl(boundingRect.right, boundingRect.left)),
                                  std::lround(wrap::midl(boundingRect.top, boundingRect.bottom))};
   DSTOffsetData.Positive.x = std::lround(boundingRect.right - wrap::toFloat(centerCoordinate.x + 1));
   DSTOffsetData.Positive.y = std::lround(boundingRect.top - wrap::toFloat(centerCoordinate.y + 1));
   DSTOffsetData.Negative.x = std::lround(wrap::toFloat(centerCoordinate.x - 1) - boundingRect.left);
   DSTOffsetData.Negative.y = std::lround(wrap::toFloat(centerCoordinate.y - 1) - boundingRect.bottom);
-  auto color               = dstStitchBuffer[0].attribute & COLMSK;
+  auto color = dstStitchBuffer[0].attribute & COLMSK;
   for (auto const& stitch : dstStitchBuffer) {
 	if (color != (stitch.attribute & COLMSK)) {
 	  constexpr auto STOPCODE = uint8_t {0xC3}; // note that stop code is the same as the color change code
@@ -354,7 +354,7 @@ auto di::coldis(COLORREF colorA, COLORREF colorB) -> DWORD {
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto color1 = PEC_COLOR {GetRValue(colorA), GetGValue(colorA), GetBValue(colorA)};
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
-  auto       color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
+  auto color2 = PEC_COLOR {GetRValue(colorB), GetGValue(colorB), GetBValue(colorB)};
   auto const meanR = (gsl::narrow_cast<int32_t>(color1.r) + gsl::narrow_cast<int32_t>(color2.r)) / 2;
   auto const deltaR = gsl::narrow_cast<int32_t>(color1.r) - gsl::narrow_cast<int32_t>(color2.r);
   auto const deltaG = gsl::narrow_cast<int32_t>(color1.g) - gsl::narrow_cast<int32_t>(color2.g);
@@ -941,40 +941,40 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 // ReSharper disable CppDeprecatedEntity
 auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   auto flag = true;
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto const fileHandle = CreateFile(
-	    auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const fileHandle = CreateFile(
+      auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (fileHandle == INVALID_HANDLE_VALUE) {
-	  displayText::crmsg(*auxName);
-	  flag = false;
-	}
-	else {
-	  do {
-		auto dstRecords = std::vector<DSTREC> {};
-		// There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
-		dstRecords.reserve(StitchBuffer->size() + 128U);
-		auto dstOffset = DST_OFFSETS {};
-		auto dstHeader = DSTHED {};
-		DST::ritdst(dstOffset, dstRecords, saveStitches);
-		// dstHeader fields are fixed width, so use strncpy in its intended way.
-		// Use sizeof to ensure no overrun if the format string is wrong length
-		strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
-		std::ranges::fill(dstHeader.desc, ' ');
-		auto convAuxName = utf::utf16ToUtf8(*auxName);
-		auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-		if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
-		  for (auto& iDHD : spDstHdrDesc) {
-			if ((*desc != 0) && *desc != '.') {
-			  iDHD = *desc;
-			}
-			else {
-			  break;
-			}
-			++desc;
+  if (fileHandle == INVALID_HANDLE_VALUE) {
+	displayText::crmsg(*auxName);
+	flag = false;
+  }
+  else {
+	do {
+	  auto dstRecords = std::vector<DSTREC> {};
+	  // There are always going to be more records in the DST format because color changes and jumps count as stitches so reserve a little extra
+	  dstRecords.reserve(StitchBuffer->size() + 128U);
+	  auto dstOffset = DST_OFFSETS {};
+	  auto dstHeader = DSTHED {};
+	  DST::ritdst(dstOffset, dstRecords, saveStitches);
+	  // dstHeader fields are fixed width, so use strncpy in its intended way.
+	  // Use sizeof to ensure no overrun if the format string is wrong length
+	  strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
+	  std::ranges::fill(dstHeader.desc, ' ');
+	  auto       convAuxName  = utf::utf16ToUtf8(*auxName);
+	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
+	  if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
+		for (auto& iDHD : spDstHdrDesc) {
+		  if ((*desc != 0) && *desc != '.') {
+			iDHD = *desc;
 		  }
+		  else {
+			break;
+		  }
+		  ++desc;
 		}
-		// clang-format off
+	  }
+	  // clang-format off
         spDstHdrDesc.back() = 0xd;
         strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
         strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
@@ -999,23 +999,23 @@ auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_AT
         strncpy(static_cast<char *>(dstHeader.pdhed),      "PD",       sizeof(dstHeader.pdhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
         strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
-		// clang-format on
-		auto& res = dstHeader.res;
-		std::ranges::fill(res, ' ');
-		auto bytesWritten = DWORD {};
-		if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
-		  displayText::riter();
-		  flag = false;
-		  break;
-		}
-		if (FALSE == WriteFile(fileHandle, dstRecords.data(), wrap::sizeofVector(dstRecords), &bytesWritten, nullptr)) {
-		  displayText::riter();
-		  flag = false;
-		  break;
-		}
-	  } while (false);
-	}
-	CloseHandle(fileHandle);
+	  // clang-format on
+	  auto& res = dstHeader.res;
+	  std::ranges::fill(res, ' ');
+	  auto bytesWritten = DWORD {};
+	  if (FALSE == WriteFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesWritten, nullptr)) {
+		displayText::riter();
+		flag = false;
+		break;
+	  }
+	  if (FALSE == WriteFile(fileHandle, dstRecords.data(), wrap::sizeofVector(dstRecords), &bytesWritten, nullptr)) {
+		displayText::riter();
+		flag = false;
+		break;
+	  }
+	} while (false);
+  }
+  CloseHandle(fileHandle);
   return flag;
 }
 // ReSharper restore CppDeprecatedEntity

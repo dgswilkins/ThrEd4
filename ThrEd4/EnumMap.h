@@ -18,11 +18,13 @@
 // struct for ensuring an enum has a count element.
 // this does NOT validate that the EnumCount element is the last element
 // default template:
-template <class, class = void> struct hasEnumCount : std::false_type { };
+template <class, class = void> struct hasEnumCount : std::false_type {
+};
 
 // specialized as hasEnumCount< T , void > or sfinae
 template <class T>
-struct hasEnumCount<T, std::void_t<decltype(T::EnumCount)>> : std::is_same<T, decltype(T::EnumCount)> { };
+struct hasEnumCount<T, std::void_t<decltype(T::EnumCount)>> : std::is_same<T, decltype(T::EnumCount)> {
+};
 
 template <typename EnumType> class ENUM_MAP
 {

@@ -33,10 +33,10 @@ void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Arg
 constexpr float DEFUSPAC = 6.0F;        // default underlay stitch spacing
 constexpr float DEFLRAT  = 0.8F;        // default lens form aspect ratio
 constexpr uint32_t MAXITEMS = 0x10000U; // maximum number of stitches, sequence items & clipboard points
-constexpr float SHUPX       = 480.0F;   // small hoop x size
-constexpr float SHUPY       = 480.0F;   // small hoop y size
-constexpr float LHUPX       = 719.0F;   // large hoop x size
-constexpr float LHUPY       = 690.0F;   // large hoop y size
+constexpr float SHUPX    = 480.0F;      // small hoop x size
+constexpr float SHUPY    = 480.0F;      // small hoop y size
+constexpr float LHUPX    = 719.0F;      // large hoop x size
+constexpr float LHUPY    = 690.0F;      // large hoop y size
 constexpr float HUP100XY = 600.0F;      // 100 millimeter hoop size
 constexpr float PFGRAN   = 6.0F;        // pfaf stitch points per millimeter
 constexpr float IPFGRAN  = 1.0F / 6.0F; // pfaf millimeters per stitch point

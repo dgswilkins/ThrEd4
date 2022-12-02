@@ -325,11 +325,11 @@ class FRM_HEAD_OUT
   uint8_t  fillColor {};   // fill color
   uint8_t  borderColor {}; // border color
   uint16_t clipEntries {}; // number of border clipboard entries
-  DWORD    vertexIndex {}; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
+  DWORD vertexIndex {}; // vertex index not saved in v1 or v2. size is to keep compatibility with v1 & v2 ThrEd files
 
   SATINANGLEOUT satinOrAngle {}; // satin guidelines or angle clipboard fill angle
 
-  DWORD       borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
+  DWORD borderClipData {}; // border clipboard data pointer not saved. size is to keep compatibility with v1 & v2 ThrEd files
   uint16_t    satinGuideCount {}; // number of satin guidelines
   uint16_t    wordParam {};       // clipboard/textured fill phase or satin end guide
   F_RECTANGLE rectangle {};       // rectangle
