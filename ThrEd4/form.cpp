@@ -286,7 +286,6 @@ void duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
            uint32_t&                       lastGroup,
            SMAL_PNT_L const*               sequenceLines);
 void duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines));
-void duseq2(SMAL_PNT_L const* sequenceLines);
 void duspnd(float                        stitchLen,
             std::vector<V_RECT_2> const& underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
@@ -4203,7 +4202,7 @@ void fi::brkdun(std::vector<SMAL_PNT_L*> const& sortedLines,
 void fi::duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines)) {
   auto const seq = gsl::span(sequenceLines.get(), 2);
   BSequence->emplace_back(wrap::midl(seq[1].x, seq[0].x), wrap::midl(seq[1].y, seq[0].y), 0);
-  }
+}
 
 void fi::movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind) {
   auto* lineEndPoint = sortedLines[ind];
@@ -4298,14 +4297,6 @@ void fi::dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uin
   lastGroup = sortedLines[finish][0].group;
 }
 
-void fi::duseq2(SMAL_PNT_L const* sequenceLines) {
-  if (sequenceLines != nullptr) {
-	BSequence->emplace_back(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
-	                        wrap::midl(sequenceLines[1].y, sequenceLines[0].y),
-	                        0);
-  }
-}
-
 void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
                uint32_t                        start,
                uint32_t                        finish,
@@ -4323,16 +4314,16 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	for (; iLine != finish; --iLine) {
 	  if (auto const iLineDec = iLine - 1U; sequenceMap.test_set(iLineDec)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
-		  duseq2(sortedLines[iLineDec]);
+		  duseq1(sortedLines[iLineDec]);
 		  sequenceLines = sortedLines[iLineDec];
 		  flag          = true;
 		}
 		else {
 		  if (savedTopLine != sortedLines[iLineDec][1].line) {
 			if (iLineDec != 0U) {
-			  duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]);
+			  duseq1(sortedLines[wrap::toSize(iLineDec) + 1U]);
 			}
-			duseq2(sortedLines[iLineDec]);
+			duseq1(sortedLines[iLineDec]);
 			sequenceLines = sortedLines[iLineDec];
 			flag          = true;
 			savedTopLine  = sequenceLines[1].line;
@@ -4341,7 +4332,7 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	  }
 	  else {
 		if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-		  duseq2(sortedLines[wrap::toSize(iLineDec) + 1U]);
+		  duseq1(sortedLines[wrap::toSize(iLineDec) + 1U]);
 		}
 		sequenceLines = sortedLines[iLineDec];
 		flag          = true;
@@ -4349,7 +4340,7 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	  }
 	}
 	if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-	  duseq2(sortedLines[iLine]);
+	  duseq1(sortedLines[iLine]);
 	  sequenceLines = sortedLines[iLine];
 	  flag          = true;
 	}
@@ -4363,16 +4354,16 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	  if (sequenceMap.test_set(iLine)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
 		  flag = true;
-		  duseq2(sortedLines[iLine]);
+		  duseq1(sortedLines[iLine]);
 		  sequenceLines = sortedLines[iLine];
 		}
 		else {
 		  if (savedTopLine != sortedLines[iLine][1].line) {
 			if (iLine != 0U) {
-			  duseq2(sortedLines[iLine - 1U]);
+			  duseq1(sortedLines[iLine - 1U]);
 			}
 			flag = true;
-			duseq2(sortedLines[iLine]);
+			duseq1(sortedLines[iLine]);
 			sequenceLines = sortedLines[iLine];
 			savedTopLine  = sequenceLines[1].line;
 		  }
@@ -4381,7 +4372,7 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	  else {
 		if (StateMap->testAndReset(StateFlag::SEQDUN)) {
 		  if (iLine != 0U) {
-			duseq2(sortedLines[iLine - 1U]);
+			duseq1(sortedLines[iLine - 1U]);
 		  }
 		}
 		flag          = true;
@@ -4392,7 +4383,7 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	if (StateMap->testAndReset(StateFlag::SEQDUN)) {
 	  if (iLine != 0U) {
 		flag = true;
-		duseq2(sortedLines[iLine - 1U]);
+		duseq1(sortedLines[iLine - 1U]);
 		sequenceLines = sortedLines[iLine - 1U];
 	  }
 	}
