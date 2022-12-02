@@ -285,7 +285,7 @@ void duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
            boost::dynamic_bitset<>&        sequenceMap,
            uint32_t&                       lastGroup,
            SMAL_PNT_L const*               sequenceLines);
-void duseq1(SMAL_PNT_L const* sequenceLines);
+void duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines));
 void duseq2(SMAL_PNT_L const* sequenceLines);
 void duspnd(float                        stitchLen,
             std::vector<V_RECT_2> const& underlayVerticalRect,
@@ -4200,13 +4200,10 @@ void fi::brkdun(std::vector<SMAL_PNT_L*> const& sortedLines,
   StateMap->set(StateFlag::BRKFIX);
 }
 
-void fi::duseq1(SMAL_PNT_L const* sequenceLines) {
-  if (sequenceLines != nullptr) {
-	BSequence->emplace_back(wrap::midl(sequenceLines[1].x, sequenceLines[0].x),
-	                        wrap::midl(sequenceLines[1].y, sequenceLines[0].y),
-	                        0);
+void fi::duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines)) {
+  auto const seq = gsl::span(sequenceLines.get(), 2);
+  BSequence->emplace_back(wrap::midl(seq[1].x, seq[0].x), wrap::midl(seq[1].y, seq[0].y), 0);
   }
-}
 
 void fi::movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind) {
   auto* lineEndPoint = sortedLines[ind];
