@@ -1160,8 +1160,8 @@ void thred::addColor(uint32_t stitch, uint32_t color) {
 }
 
 void thred::coltab() {
-  if (StitchBuffer->size() > 1) {
 	thred::resetColorChanges();
+  if (StitchBuffer->size() > 1) {
 	if (!StitchBuffer->empty()) {
 	  auto const firstStitch = StitchBuffer->begin();
 	  firstStitch->attribute &= NCOLMSK;
