@@ -8569,7 +8569,7 @@ void thi::thumnail() {
 	auto const dwError = GetLastError();
 	auto const fmtStr =
 	    fmt::format(fmt::runtime(displayText::loadStr(IDS_FFINDERR)), searchName.wstring(), dwError);
-	displayText::shoMsg(fmtStr);
+	displayText::shoMsg(fmtStr, true);
 	unthum();
   }
   else {
@@ -8898,7 +8898,7 @@ void thi::desiz() {
 	auto  modifier     = utf::utf8ToUtf16(std::string(std::begin(modifierName)));
 	info += fmt::format(fmt::runtime(displayText::loadStr(IDS_CREATBY)), *DesignerName, modifier);
   }
-  displayText::shoMsg(info);
+  displayText::shoMsg(info, true);
 }
 
 void thi::sidhup() {
@@ -9240,7 +9240,7 @@ void thi::rotmrk() {
 	auto const fmtStr =
 	    fmt::format(fmt::runtime(displayText::loadStr(IDS_ROTMARK)), IniFile.fillAngle * RADDEGF, segments);
 	// ToDo - should this be IniFile.rotationAngle?
-	displayText::shoMsg(fmtStr);
+	displayText::shoMsg(fmtStr, false);
   }
   else {
 	displayText::shoseln(IDS_FSZ, IDS_SETROTM);

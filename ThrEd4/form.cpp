@@ -754,7 +754,7 @@ void form::setfrm() {
 }
 
 void form::form() {
-  displayText::shoMsg(displayText::loadStr(IDS_FMEN));
+  displayText::shoMsg(displayText::loadStr(IDS_FMEN), true);
   StateMap->set(StateFlag::FORMIN);
   StateMap->reset(StateFlag::INSRT);
   thred::duzrat();
@@ -9189,7 +9189,7 @@ void form::filclpx() {
 	}
 	else {
 	  auto const str = std::wstring(L"no clipboard data");
-	  displayText::shoMsg(str);
+	  displayText::shoMsg(str, false);
 	  CloseClipboard();
 	}
   }

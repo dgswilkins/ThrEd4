@@ -24,7 +24,7 @@ auto displayText::loadStr(uint32_t stringID) -> std::wstring {
   return sDest;
 }
 
-void displayText::shoMsg(std::wstring const& message) {
+void displayText::shoMsg(std::wstring const& message, bool top) {
   if (!message.empty()) {
 	auto       strings              = std::vector<std::wstring> {};
 	auto       iString              = 0U;
@@ -55,6 +55,10 @@ void displayText::shoMsg(std::wstring const& message) {
 	auto mainRect = RECT {};
 	GetWindowRect(MainStitchWin, &mainRect);
 	auto xOffset = mainRect.left;
+	auto yOffset = 3;
+	if (!top) {
+	  yOffset = mainRect.bottom - 120 - messageSize.cy;
+	}
 	GetWindowRect(ThrEdWindow, &mainRect);
 	xOffset -= mainRect.left;
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
@@ -62,7 +66,7 @@ void displayText::shoMsg(std::wstring const& message) {
 	                         message.c_str(),
 	                         SS_CENTER | WS_CHILD | WS_VISIBLE | WS_BORDER,
 	                         xOffset,
-	                         3,
+	                         yOffset,
 	                         messageSize.cx + 20,
 	                         messageSize.cy + 6,
 	                         ThrEdWindow,
@@ -74,7 +78,7 @@ void displayText::shoMsg(std::wstring const& message) {
 }
 
 void displayText::tabmsg(uint32_t code) {
-  displayText::shoMsg(displayText::loadStr(code));
+  displayText::shoMsg(displayText::loadStr(code), false);
 }
 
 void displayText::hsizmsg() {
@@ -82,7 +86,7 @@ void displayText::hsizmsg() {
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_HSIZ)),
                                   (wrap::toFloat(UnzoomedRect.cx) * IPFGRAN),
                                   (wrap::toFloat(UnzoomedRect.cy) * IPFGRAN));
-  displayText::shoMsg(fmtStr);
+  displayText::shoMsg(fmtStr, false);
 }
 
 void displayText::numWnd() {
@@ -121,7 +125,7 @@ void displayText::msgflt(uint32_t messageId, float value) {
 
 void displayText::tsizmsg(wchar_t const* threadSizeText, float threadSize) {
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SIZ)), threadSizeText, threadSize);
-  displayText::shoMsg(fmtStr);
+  displayText::shoMsg(fmtStr, true);
   StateMap->set(StateFlag::NUMIN);
   displayText::numWnd();
 }
@@ -184,7 +188,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
   auto const msg0   = displayText::loadStr(code0);
   auto const msg1   = displayText::loadStr(code1);
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(IDS_SHOSEL)), msg0, msg1);
-  displayText::shoMsg(fmtStr);
+  displayText::shoMsg(fmtStr, false);
 }
 
 auto displayText::clpmsgs(uint32_t code) -> bool {

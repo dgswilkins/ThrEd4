@@ -438,7 +438,7 @@ void repair::repar() {
   }
   repair::lodchk();
   StateMap->set(StateFlag::RESTCH);
-  displayText::shoMsg(repairMessage);
+  displayText::shoMsg(repairMessage, false);
 }
 
 void ri::datmsg(uint32_t code) {
@@ -459,7 +459,7 @@ void ri::datmsg(uint32_t code) {
 	default:
 	  break;
   }
-  displayText::shoMsg(displayText::loadStr(dataErrorID));
+  displayText::shoMsg(displayText::loadStr(dataErrorID),false);
 }
 
 void repair::frmchkx() {

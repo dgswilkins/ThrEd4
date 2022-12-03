@@ -40,12 +40,12 @@ void riter();
 void ritnum(uint32_t code, uint32_t value);
 void savdisc();
 void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
-void shoMsg(std::wstring const& message);
+void shoMsg(std::wstring const& message, bool top);
 
 template <class inType> void showMessage(uint32_t messageId, inType value) {
   // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
-  displayText::shoMsg(fmtStr);
+  displayText::shoMsg(fmtStr, true);
 }
 
 void shord();
