@@ -344,8 +344,9 @@ auto insect(FRM_HEAD const&             form,
             F_POINT const&              lineSegmentEnd,
             std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
 void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
-auto isclos(SMAL_PNT_L const* lineEndPoint0, SMAL_PNT_L const* lineEndPoint1, float gapToClosestRegion) noexcept
-    -> bool;
+auto isclos(const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint0),
+            const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint1),
+            float gapToClosestRegion) noexcept -> bool;
 auto isect(uint32_t                    vertex0,
            uint32_t                    vertex1,
            F_POINT&                    intersection,
@@ -3889,18 +3890,16 @@ auto fi::spComp(SMAL_PNT_L const* const arg1, SMAL_PNT_L const* const arg2) noex
   return false;
 }
 
-auto fi::isclos(SMAL_PNT_L const* const lineEndPoint0,
-                SMAL_PNT_L const* const lineEndPoint1,
-                float                   gapToClosestRegion) noexcept -> bool {
-  if ((lineEndPoint0 != nullptr) && (lineEndPoint1 != nullptr)) {
-	auto const high0 = lineEndPoint0[1].y + gapToClosestRegion;
-	if (auto const low1 = lineEndPoint1[0].y - gapToClosestRegion; high0 < low1) {
-	  return false;
-	}
-	auto const high1 = lineEndPoint1[1].y + gapToClosestRegion;
-	if (auto const low0 = lineEndPoint0[0].y - gapToClosestRegion; high1 < low0) {
-	  return false;
-	}
+auto fi::isclos(const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint0),
+                const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint1),
+                float gapToClosestRegion) noexcept -> bool {
+  auto const high0 = (lineEndPoint0.get() + 1)->y + gapToClosestRegion;
+  if (auto const low1 = lineEndPoint1->y - gapToClosestRegion; high0 < low1) {
+	return false;
+  }
+  auto const high1 = (lineEndPoint1.get() + 1)->y + gapToClosestRegion;
+  if (auto const low0 = lineEndPoint0->y - gapToClosestRegion; high1 < low0) {
+	return false;
   }
   return true;
 }
