@@ -54,13 +54,13 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
 	messageSize.cy *= gsl::narrow<int32_t>(strings.size());
 	auto mainRect = RECT {};
 	GetWindowRect(MainStitchWin, &mainRect);
-	auto xOffset = mainRect.left;
+	auto thredRect = RECT {};
+	GetWindowRect(ThrEdWindow, &thredRect);
+	auto const xOffset = mainRect.left - thredRect.left;
 	auto yOffset = 3;
 	if (!top) {
-	  yOffset = mainRect.bottom - 120 - messageSize.cy;
+	  yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
 	}
-	GetWindowRect(ThrEdWindow, &mainRect);
-	xOffset -= mainRect.left;
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	MsgWindow = CreateWindow(L"STATIC",
 	                         message.c_str(),
