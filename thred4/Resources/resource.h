@@ -1,4 +1,3 @@
-// ReSharper disable CppClangTidyCppcoreguidelinesMacroUsage
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
 // Used by ThrEd4.rc
@@ -11,9 +10,9 @@
 #define IDS_PIKOL                       6
 #define IDS_UPON                        7
 #define IDS_UPOF                        8
-#define IDS_NOTHRDFIL                   9
+#define IDS_NOTHRFIL                    9
 #define IDS_FGRPF                       10
-#define IDS_ALL                         11
+#define IDS_ALLX                        11
 #define IDS_AUXTXT                      12
 #define IDS_CPYRIT                      13
 #define IDS_PNT                         14
@@ -93,7 +92,6 @@
 #define IDS_SETMRK                      87
 #define IDS_FSZ                         88
 #define IDS_SETROTM                     89
-#define IDS_NOTHRFIL                    90
 #define IDS_RNGEND                      91
 #define IDS_ROT                         92
 #define IDS_ROTCMD                      93
@@ -271,7 +269,6 @@
 #define IDS_TXT21                       252
 #define IDS_TXT22                       253
 #define IDS_TXT23                       254
-#define IDS_ALLX                        255
 #define IDS_FTH0                        256
 #define IDS_FTH1                        257
 #define IDS_FTH2                        258
