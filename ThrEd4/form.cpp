@@ -475,7 +475,7 @@ auto spComp(gsl::not_null<SMAL_PNT_L const*>arg1, gsl::not_null<SMAL_PNT_L const
     -> bool;
 void spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
 auto spltlin() -> bool;
-void sprct(std::vector<F_POINT> const* vertices,
+void sprct(std::vector<F_POINT> const& vertices,
            uint32_t                    vertexIndex,
            std::vector<V_RECT_2>&      fillVerticalRect,
            uint32_t                    start,
@@ -2013,7 +2013,7 @@ auto fi::projh(float yCoordinate, F_POINT const& point0, F_POINT const& point1, 
   return yCoordinate >= leftY && yCoordinate <= rightY;
 }
 
-void fi::sprct(std::vector<F_POINT> const* vertices,
+void fi::sprct(std::vector<F_POINT> const& vertices,
                uint32_t                    vertexIndex,
                std::vector<V_RECT_2>&      fillVerticalRect,
                uint32_t                    start,
@@ -2023,8 +2023,8 @@ void fi::sprct(std::vector<F_POINT> const* vertices,
   auto const& ipStart      = InsidePoints->operator[](start);
   auto const& ipFinish     = InsidePoints->operator[](finish);
   auto const delta         = F_POINT {(opFinish.x - opStart.x), (opFinish.y - opStart.y)};
-  auto const itStartVertex = wrap::next(vertices->cbegin(), vertexIndex + start);
-  if (auto const itFinishVertex = wrap::next(vertices->cbegin(), vertexIndex + finish);
+  auto const itStartVertex = wrap::next(vertices.cbegin(), vertexIndex + start);
+  if (auto const itFinishVertex = wrap::next(vertices.cbegin(), vertexIndex + finish);
       (delta.x != 0.0F) && (delta.y != 0.0F)) {
 	auto const slope        = -delta.x / delta.y;
 	auto       point        = *itFinishVertex;
@@ -2380,10 +2380,10 @@ void fi::pbrd(FRM_HEAD const& form) {
   underlayVerticalRect.resize(form.vertexCount);
   satin::satout(form, form.borderSize);
   for (auto iVertex = 0U; iVertex < form.vertexCount - 1U; ++iVertex) {
-	sprct(FormVertices, form.vertexIndex, fillVerticalRect, iVertex, iVertex + 1U);
+	sprct(*FormVertices, form.vertexIndex, fillVerticalRect, iVertex, iVertex + 1U);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(FormVertices, form.vertexIndex, fillVerticalRect, (form.vertexCount - 1U), 0U);
+  sprct(*FormVertices, form.vertexIndex, fillVerticalRect, (form.vertexCount - 1U), 0U);
   spurct(underlayVerticalRect, fillVerticalRect, (form.vertexCount - 1U));
   if ((form.edgeType & EGUND) != 0U) {
 	StateMap->reset(StateFlag::SAT1);
@@ -2747,13 +2747,13 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
   InsidePoints->push_back(InsidePoints->front());
   OutsidePoints->push_back(OutsidePoints->front());
   for (auto iVertex = 0U; iVertex < angledForm.vertexCount - 1U; ++iVertex) {
-	sprct(AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U);
+	sprct(*AngledFormVertices, 0, fillVerticalRect, iVertex, iVertex + 1U);
 	spurct(underlayVerticalRect, fillVerticalRect, iVertex);
   }
-  sprct(AngledFormVertices, 0U, fillVerticalRect, (angledForm.vertexCount - 1U), 0U);
+  sprct(*AngledFormVertices, 0U, fillVerticalRect, (angledForm.vertexCount - 1U), 0U);
   spurct(underlayVerticalRect, fillVerticalRect, (angledForm.vertexCount - 1U));
   auto const itVertex = wrap::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
-  if ((angledForm.attribute & SBLNT) == 0U) {
+  if ((angledForm.attribute & SBLNT) == 0U) { 
 	auto const val = std::next(itVertex, 1);
 
 	fillVerticalRect[1].aipnt     = *val;
