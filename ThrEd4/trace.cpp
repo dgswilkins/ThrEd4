@@ -648,7 +648,7 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
 	}
   }
   return traceDirection != initialDirection || CurrentTracePoint.x != tracedPoints[0].x ||
-         CurrentTracePoint.y == tracedPoints[0].y;
+         CurrentTracePoint.y != tracedPoints[0].y;
 }
 
 void ti::dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point) {
