@@ -231,7 +231,7 @@ void brkseq(std::vector<SMAL_PNT_L*> const& sortedLines,
             SMAL_PNT_L*                     sequenceLines);
 void chkbrd(FRM_HEAD const& form);
 void chksid(FRM_HEAD const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<F_POINT> const& currentFormVertices);
-auto clipComp(const gsl::not_null<CLIP_SORT const*>(arg1), const gsl::not_null<CLIP_SORT const*>(arg2)) noexcept
+auto clipComp(gsl::not_null<CLIP_SORT const*>arg1, gsl::not_null<CLIP_SORT const*>arg2) noexcept
     -> bool;
 auto closat(IntersectionStyles& inOutFlag) -> bool;
 void clpcon(FRM_HEAD& form, std::vector<RNG_COUNT> const& textureSegments, std::vector<F_POINT>& currentFormVertices);
@@ -285,7 +285,7 @@ void duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
            boost::dynamic_bitset<>&        sequenceMap,
            uint32_t&                       lastGroup,
            SMAL_PNT_L const*               sequenceLines);
-void duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines));
+void duseq1(gsl::not_null<SMAL_PNT_L const*>sequenceLines);
 void duspnd(float                        stitchLen,
             std::vector<V_RECT_2> const& underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
@@ -344,8 +344,8 @@ auto insect(FRM_HEAD const&             form,
             F_POINT const&              lineSegmentEnd,
             std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
 void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
-auto isclos(const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint0),
-            const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint1),
+auto isclos(gsl::not_null<SMAL_PNT_L const*>lineEndPoint0,
+            gsl::not_null<SMAL_PNT_L const*>lineEndPoint1,
             float gapToClosestRegion) noexcept -> bool;
 auto isect(uint32_t                    vertex0,
            uint32_t                    vertex1,
@@ -471,7 +471,7 @@ constexpr auto shreg(float highValue, float reference, float eggRatio) noexcept 
 void shrnks();
 void snp(uint32_t start, uint32_t finish);
 void snpfn(std::vector<uint32_t> const& xPoints, uint32_t start, uint32_t end, uint32_t finish) noexcept;
-auto spComp(const gsl::not_null<SMAL_PNT_L const*>(arg1), const gsl::not_null<SMAL_PNT_L const*>(arg2)) noexcept
+auto spComp(gsl::not_null<SMAL_PNT_L const*>arg1, gsl::not_null<SMAL_PNT_L const*>arg2) noexcept
     -> bool;
 void spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint);
 auto spltlin() -> bool;
@@ -3167,8 +3167,8 @@ auto fi::isect(uint32_t                    vertex0,
   return flag;
 }
 
-auto fi::clipComp(const gsl::not_null<CLIP_SORT const*>(arg1),
-                  const gsl::not_null<CLIP_SORT const*>(arg2)) noexcept -> bool {
+auto fi::clipComp(const gsl::not_null<CLIP_SORT const*>arg1,
+                  const gsl::not_null<CLIP_SORT const*>arg2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
 	auto const local1 = arg1->segmentLength;
 	auto const local2 = arg2->segmentLength;
@@ -3863,7 +3863,7 @@ void form::angclpfn(FRM_HEAD const&               form,
   fi::rotbak(-rotationAngle, rotationCenter);
 }
 
-auto fi::spComp(const gsl::not_null<SMAL_PNT_L const*>(arg1), const gsl::not_null<SMAL_PNT_L const*>(arg2)) noexcept -> bool {
+auto fi::spComp(const gsl::not_null<SMAL_PNT_L const*>arg1, const gsl::not_null<SMAL_PNT_L const*>arg2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (arg1->line < arg2->line) {
 	return true;
@@ -3886,8 +3886,8 @@ auto fi::spComp(const gsl::not_null<SMAL_PNT_L const*>(arg1), const gsl::not_nul
   return false;
 }
 
-auto fi::isclos(const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint0),
-                const gsl::not_null<SMAL_PNT_L const*>(lineEndPoint1),
+auto fi::isclos(const gsl::not_null<SMAL_PNT_L const*>lineEndPoint0,
+                const gsl::not_null<SMAL_PNT_L const*>lineEndPoint1,
                 float gapToClosestRegion) noexcept -> bool {
   auto const high0 = (lineEndPoint0.get() + 1)->y + gapToClosestRegion;
   if (auto const low1 = lineEndPoint1->y - gapToClosestRegion; high0 < low1) {
@@ -4194,7 +4194,7 @@ void fi::brkdun(std::vector<SMAL_PNT_L*> const& sortedLines,
   StateMap->set(StateFlag::BRKFIX);
 }
 
-void fi::duseq1(gsl::not_null<SMAL_PNT_L const*>(sequenceLines)) {
+void fi::duseq1(gsl::not_null<SMAL_PNT_L const*>sequenceLines) {
   auto const seq = gsl::span(sequenceLines.get(), 2);
   BSequence->emplace_back(wrap::midl(seq[1].x, seq[0].x), wrap::midl(seq[1].y, seq[0].y), 0);
 }
