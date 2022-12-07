@@ -1128,8 +1128,7 @@ void trace::tracpar() {
 		  if (position < 20) {
 			StateMap->set(StateFlag::NUMIN);
 			StateMap->set(StateFlag::TRNIN1);
-			TraceMsgIndex       = 0;
-			TraceInputBuffer[0] = 0;
+			thred::resetMsgBuffer();
 			if (position < 19U) {
 			  ti::trnumwnd1(ButtonHeight * 18);
 			  StateMap->set(StateFlag::TRNUP);
