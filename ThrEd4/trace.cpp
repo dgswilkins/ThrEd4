@@ -48,6 +48,9 @@ class TRACE_PNT
 
 // trace internal namespace
 namespace ti {
+void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
+void decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
+void decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void difbits(uint32_t shift, uint32_t* point) noexcept;
 
 static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
@@ -55,7 +58,6 @@ static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination
 void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH brush);
 auto ducolm() -> uint32_t;
 void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
-void dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point);
 void dutrac();
 void dutrnum0(uint32_t color);
 void hidwnd(HWND hwnd) noexcept;
@@ -651,10 +653,70 @@ auto ti::trcbit(uint32_t const initialDirection, uint32_t& traceDirection, std::
          CurrentTracePoint.y != tracedPoints[0].y;
 }
 
-void ti::dutdif(TRACE_PNT& traceDiff, TRACE_PNT const* point) {
-  if (point != nullptr) {
-	wrap::narrow(traceDiff.x, point[1].x - point[0].x);
-	wrap::narrow(traceDiff.y, point[1].y - point[0].y);
+// remove all points on straight lines except the endpoints
+// check for straightness by comparing slope of sections
+void ti::decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
+  auto traceDiff = std::array<TRACE_PNT, 2> {};
+  // always keep the first point
+  dst.push_back(src.front());
+  auto const itTP  = src.begin();
+  auto itTP1 = std::next(itTP);
+  wrap::narrow(traceDiff[0].x, (itTP1->x - itTP->x));
+  wrap::narrow(traceDiff[0].y, (itTP1->y - itTP->y));
+  for (auto itTP2 = std::next(itTP1); itTP2 != src.end(); ++itTP2) {
+	wrap::narrow(traceDiff[1].x, (itTP2->x - itTP1->x));
+	wrap::narrow(traceDiff[1].y, (itTP2->y - itTP1->y));
+	if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
+	  dst.push_back(*itTP1);
+	}
+	traceDiff[0] = traceDiff[1];
+	++itTP1;
+  }
+  dst.push_back(src.back());
+}
+
+// write src points to destination keeping only points
+// which are further apart than traceLength
+void ti::decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
+  auto itDL = src.begin();
+  dst.push_back(*itDL);
+  for (auto itDL1 = std::next(itDL); itDL1 != src.end(); ++itDL1) {
+	auto const traceLength = wrap::toFloat(std::hypot(itDL1->x - itDL->x, itDL1->y - itDL->y));
+	if (traceLength > IniFile.traceLength) {
+	  dst.push_back(*itDL1);
+	}
+	++itDL;
+  }
+}
+
+// write src points into destination form vertices, keeping only
+// points where the sum of the distances is greater than the ratio(?) 
+void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
+  dst.emplace_back(wrap::toFloat(src[0].x) * StitchBmpRatio.x,
+                   wrap::toFloat(src[0].y) * StitchBmpRatio.y);
+  auto itTP             = src.begin();
+  auto itNext           = src.begin();
+  auto traceLengthSum1  = 0.0F;
+  auto landscapeOffset1 = 0.0F;
+  if (StateMap->test(StateFlag::LANDSCAP)) {
+	auto const bmpSiS = bitmap::getBitmapSizeinStitches();
+	landscapeOffset1  = wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
+  }
+  for (auto itTP1 = std::next(itTP); itTP1 < src.end(); ++itTP1) {
+	traceLengthSum1 += hypotf(wrap::toFloat(itTP1->x - itTP->x), wrap::toFloat(itTP1->y - itTP->y));
+	auto const traceLength =
+	    hypotf(wrap::toFloat(itTP1->x - itNext->x), wrap::toFloat(itTP1->y - itNext->y));
+	if (traceLengthSum1 > traceLength * IniFile.traceRatio) {
+	  dst.emplace_back(wrap::toFloat(itTP->x) * StitchBmpRatio.x,
+	                   wrap::toFloat(itTP->y) * StitchBmpRatio.y + landscapeOffset1);
+
+	  itNext          = itTP;
+	  itTP1           = itTP;
+	  traceLengthSum1 = 0.0;
+	}
+	else {
+	  ++itTP;
+	}
   }
 }
 
@@ -774,58 +836,14 @@ void ti::dutrac() {
 #ifndef TESTTRC
 	auto decimatedLine = std::vector<TRACE_PNT> {};
 	decimatedLine.reserve(tracedPoints.size());
-	auto traceDiff = std::array<TRACE_PNT, 2> {};
-	decimatedLine.push_back(tracedPoints[0]);
-	ti::dutdif(traceDiff[0], tracedPoints.data());
-	for (auto iPoint = 1U; iPoint < wrap::toUnsigned(tracedPoints.size()); ++iPoint) {
-	  traceDiff[1] = traceDiff[0];
-	  ti::dutdif(traceDiff[0], &tracedPoints[iPoint]);
-	  if (traceDiff[1].x != traceDiff[0].x || traceDiff[1].y != traceDiff[0].y) {
-		decimatedLine.push_back(tracedPoints[iPoint]);
-	  }
-	}
+	decSlope(tracedPoints, decimatedLine);
 	tracedPoints.clear();
 	tracedPoints.reserve(decimatedLine.size());
-	tracedPoints.push_back(decimatedLine[0]);
-	auto iNextDec = 0U;
-	for (auto iCurrent = 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); ++iCurrent) {
-	  auto const traceLength =
-	      wrap::toFloat(std::hypot(decimatedLine[iCurrent].x - decimatedLine[iNextDec].x,
-	                               decimatedLine[iCurrent].y - decimatedLine[iNextDec].y));
-	  if (traceLength > IniFile.traceLength) {
-		tracedPoints.push_back(decimatedLine[iNextDec]);
-		iNextDec = iCurrent;
-	  }
-	}
-	for (auto iCurrent = iNextDec + 1U; iCurrent < wrap::toUnsigned(decimatedLine.size()); ++iCurrent) {
-	  tracedPoints.push_back(decimatedLine[iCurrent]);
-	}
+	decLen(decimatedLine, tracedPoints);
 #endif
 	auto form        = FRM_HEAD {};
 	form.vertexIndex = wrap::toUnsigned(FormVertices->size());
-	FormVertices->push_back(F_POINT {wrap::toFloat(tracedPoints[0].x) * StitchBmpRatio.x,
-	                                 wrap::toFloat(tracedPoints[0].y) * StitchBmpRatio.y});
-	auto iNext           = size_t {};
-	auto traceLengthSum  = 0.0F;
-	auto landscapeOffset = 0.0F;
-	if (StateMap->test(StateFlag::LANDSCAP)) {
-	  auto const bmpSiS = bitmap::getBitmapSizeinStitches();
-	  landscapeOffset   = wrap::toFloat(UnzoomedRect.cy) - bmpSiS.y;
-	}
-	for (auto iCurrent = size_t {1U}; iCurrent < tracedPoints.size(); ++iCurrent) {
-	  traceLengthSum += hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iCurrent - 1U].x),
-	                           wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iCurrent - 1U].y));
-	  auto const traceLength = hypotf(wrap::toFloat(tracedPoints[iCurrent].x - tracedPoints[iNext].x),
-	                                  wrap::toFloat(tracedPoints[iCurrent].y - tracedPoints[iNext].y));
-	  if (traceLengthSum > traceLength * IniFile.traceRatio) {
-		FormVertices->push_back(
-		    F_POINT {wrap::toFloat(tracedPoints[iCurrent - 1U].x) * StitchBmpRatio.x,
-		             wrap::toFloat(tracedPoints[iCurrent - 1U].y) * StitchBmpRatio.y + landscapeOffset});
-		--iCurrent;
-		iNext          = iCurrent;
-		traceLengthSum = 0.0;
-	  }
-	}
+	decForm(tracedPoints, *FormVertices);
 	form.vertexCount     = wrap::toUnsigned(FormVertices->size() - form.vertexIndex);
 	form.type            = FRMFPOLY;
 	form.attribute       = gsl::narrow<uint8_t>(ActiveLayer << 1U);
