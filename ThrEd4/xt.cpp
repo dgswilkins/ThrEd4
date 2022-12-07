@@ -203,7 +203,7 @@ auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> c
     -> double;
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
 auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
-auto orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool;
+auto orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool;
 void rtrclpfn(FRM_HEAD const& form);
 void ritwlk(FRM_HEAD& form, uint32_t walkMask);
 void sadj(F_POINT& point, F_POINT const& designSizeRatio, F_RECTANGLE const& designSizeRect) noexcept;
@@ -1011,21 +1011,19 @@ auto xi::orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*>
   return false;
 }
 
-auto xi::orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool {
+auto xi::orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
-  if (record1 != nullptr && record2 != nullptr) {
-	if (record1->form < record2->form) {
+  if (record1->form < record2->form) {
 	  return true;
-	}
-	if (record2->form < record1->form) {
+  }
+  if (record2->form < record1->form) {
 	  return false;
-	}
-	if (record1->type < record2->type) {
+  }
+  if (record1->type < record2->type) {
 	  return true;
-	}
-	if (record2->type < record1->type) {
+  }
+  if (record2->type < record1->type) {
 	  return false;
-	}
   }
 
   return false;
