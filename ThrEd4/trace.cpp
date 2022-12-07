@@ -59,10 +59,10 @@ void dublk(HDC hDC, RECT const& traceHighMask, RECT const& traceLowMask, HBRUSH 
 auto ducolm() -> uint32_t;
 void durct(uint32_t shift, RECT const& traceControlRect, RECT& traceHighMask, RECT& traceMiddleMask, RECT& traceLowMask);
 void dutrac();
-void dutrnum0(uint32_t color);
+void dutrnum0(uint32_t colNum);
 void hidwnd(HWND hwnd) noexcept;
 void hideTraceWin() noexcept;
-void ritrcol(COLORREF& color, uint32_t number) noexcept;
+void ritrcol(COLORREF& colRef, uint32_t colNum) noexcept;
 void shownd(HWND hwnd) noexcept;
 void showTraceWin() noexcept;
 void tracwnd();
@@ -968,24 +968,24 @@ void trace::trcsel() {
   }
 }
 
-void ti::ritrcol(COLORREF& color, uint32_t number) noexcept {
-	color &= TraceRGBMask[ColumnColor];
-	number &= BYTMASK;
-	color |= (number << TraceShift[ColumnColor]);
+void ti::ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
+	colRef &= TraceRGBMask[ColumnColor];
+	colNum &= BYTMASK;
+	colRef |= (colNum << TraceShift[ColumnColor]);
 }
 
-void ti::dutrnum0(uint32_t color) {
+void ti::dutrnum0(uint32_t colNum) {
   StateMap->reset(StateFlag::NUMIN);
   StateMap->reset(StateFlag::TRNIN0);
   if (StateMap->test(StateFlag::TRNUP)) {
 	auto const itTraceUpWindow = wrap::next(TraceUpWindow.begin(), ColumnColor);
-	ti::ritrcol(InvertUpColor, color);
+	ti::ritrcol(InvertUpColor, colNum);
 	UpPixelColor = InvertUpColor ^ COLMASK;
 	thred::redraw(*itTraceUpWindow);
   }
   else {
 	auto const itTraceDownWindow = wrap::next(TraceDownWindow.begin(), ColumnColor);
-	ti::ritrcol(InvertDownColor, color);
+	ti::ritrcol(InvertDownColor, colNum);
 	DownPixelColor = InvertDownColor ^ COLMASK;
 	thred::redraw(*itTraceDownWindow);
   }
