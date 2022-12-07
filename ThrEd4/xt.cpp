@@ -202,7 +202,7 @@ void nurat(FEATHER& feather) noexcept;
 auto precjmps(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> const& pRecs, SORT_REC const& sortRecord)
     -> double;
 void ratpnt(uint32_t iPoint, uint32_t iNextPoint, F_POINT& point, float featherRatio) noexcept;
-auto orComp(O_REC const* record1, O_REC const* record2) -> bool;
+auto orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool;
 auto orfComp(O_REC const* record1, O_REC const* record2) noexcept -> bool;
 void rtrclpfn(FRM_HEAD const& form);
 void ritwlk(FRM_HEAD& form, uint32_t walkMask);
@@ -980,9 +980,8 @@ void xi::durec(O_REC& record) {
   record.form          = (attribute & FRMSK) >> FRMSHFT;
 }
 
-auto xi::orComp(O_REC const* record1, O_REC const* record2) -> bool {
+auto xi::orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
-  if (record1 != nullptr && record2 != nullptr) {
 	auto const itColor1 = wrap::next(ColorOrder.begin(), record1->color);
 	auto const itColor2 = wrap::next(ColorOrder.begin(), record2->color);
 	if (*itColor1 < *itColor2) {
@@ -1009,8 +1008,6 @@ auto xi::orComp(O_REC const* record1, O_REC const* record2) -> bool {
 	if (record2->start < record1->start) {
 	  return false;
 	}
-  }
-
   return false;
 }
 
