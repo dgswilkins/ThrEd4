@@ -162,7 +162,7 @@ auto duprecs(std::vector<F_POINT_ATTR>& tempStitchBuffer, std::vector<O_REC*> co
 
 constexpr auto durat(float start, float finish, float featherRatio) -> float;
 
-void durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FEATHER& feather);
+void durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather);
 void durec(O_REC& record);
 auto dutyp(uint32_t attribute) noexcept -> uint32_t;
 void duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherRatioLocal) noexcept;
@@ -264,21 +264,20 @@ void xi::duxrats(uint32_t start, uint32_t finish, F_POINT& point, float featherR
   point.y = durat(BSequence->operator[](finish).y, BSequence->operator[](start).y, featherRatioLocal);
 }
 
-void xi::durats(uint32_t iSequence, std::vector<F_POINT>* sequence, FEATHER& feather) {
-  if (sequence != nullptr) {
-	auto const& bCurrent = BSequence->operator[](iSequence);
-	auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
-	auto const                     stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
-	if (stitchLength < feather.minStitch) {
-	  sequence->push_back(F_POINT {bCurrent.x, bCurrent.y});
-	}
-	else {
-	  feather.ratioLocal       = feather.minStitch / stitchLength;
-	  auto const adjustedPoint = F_POINT {durat(bNext.x, bCurrent.x, feather.ratioLocal),
-	                                      durat(bNext.y, bCurrent.y, feather.ratioLocal)};
-	  sequence->push_back(F_POINT {durat(adjustedPoint.x, bCurrent.x, feather.ratio),
-	                               durat(adjustedPoint.y, bCurrent.y, feather.ratio)});
-	}
+void xi::durats(uint32_t iSequence, gsl::not_null<std::vector<F_POINT>*> sequence, FEATHER& feather) {
+  auto const& bCurrent = BSequence->operator[](iSequence);
+  auto const& bNext    = BSequence->operator[](wrap::toSize(iSequence) + 1U);
+
+  auto const stitchLength = hypot(bNext.x - bCurrent.x, bNext.y - bCurrent.y);
+  if (stitchLength < feather.minStitch) {
+	sequence->emplace_back(bCurrent.x, bCurrent.y);
+  }
+  else {
+	feather.ratioLocal       = feather.minStitch / stitchLength;
+	auto const adjustedPoint = F_POINT {durat(bNext.x, bCurrent.x, feather.ratioLocal),
+	                                    durat(bNext.y, bCurrent.y, feather.ratioLocal)};
+	sequence->emplace_back(durat(adjustedPoint.x, bCurrent.x, feather.ratio),
+	                       durat(adjustedPoint.y, bCurrent.y, feather.ratio));
   }
 }
 
