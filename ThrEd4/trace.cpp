@@ -51,7 +51,7 @@ namespace ti {
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
 void decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
-void difbits(uint32_t shift, uint32_t* point) noexcept;
+void difbits(uint32_t shift, gsl::not_null<uint32_t*> point) noexcept;
 
 static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
@@ -244,28 +244,26 @@ static inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& d
 //  504
 //  678
 
-void ti::difbits(uint32_t shift, uint32_t* point) noexcept {
-  auto* testPoint = point;
-  if (testPoint != nullptr) {
-	auto iTrcAdjClrs = TraceAdjacentColors.begin();
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 0 - center
-	testPoint -= bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 1 - N
-	testPoint -= 1;
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
-	testPoint += 2;
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
-	testPoint += bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 4 - E
-	testPoint -= 2;
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 5 - W
-	testPoint += bitmap::getBitmapWidth();
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
-	testPoint += 1;
-	ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 7 - S
-	testPoint += 1;
-	ti::difsub(*testPoint, shift, *iTrcAdjClrs); // pixel 8 - SE
-  }
+void ti::difbits(uint32_t shift, gsl::not_null<uint32_t*> point) noexcept {
+  auto* testPoint   = point.get();
+  auto  iTrcAdjClrs = TraceAdjacentColors.begin();
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 0 - center
+  testPoint -= bitmap::getBitmapWidth();
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 1 - N
+  testPoint -= 1;
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
+  testPoint += 2;
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
+  testPoint += bitmap::getBitmapWidth();
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 4 - E
+  testPoint -= 2;
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 5 - W
+  testPoint += bitmap::getBitmapWidth();
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
+  testPoint += 1;
+  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 7 - S
+  testPoint += 1;
+  ti::difsub(*testPoint, shift, *iTrcAdjClrs); // pixel 8 - SE
 }
 
 auto ti::trsum() -> uint32_t {
