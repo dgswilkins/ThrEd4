@@ -157,23 +157,20 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  auto const bitmap = bitmap::getBitmap(BitmapDC, &BitmapInfo, &bits);
 	  // Synchronize
 	  GdiFlush();
-	  if (bits != nullptr) {
-		auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
-		auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
-		auto       srcOffset = 0U;
-		auto       dstOffset = 0;
-		auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
-		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
-		  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
-		  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
-		  bi::bitlin(spLineSrc, spLineDst, foreground, background);
-		  srcOffset += bitmapWidthBytes;
-		  dstOffset += BitmapWidth;
-		}
+	  auto const spMBD     = gsl::span<uint8_t>(monoBitmapData);
+	  auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
+	  auto       srcOffset = 0U;
+	  auto       dstOffset = 0;
+	  auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
+	  for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
+		auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
+		auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
+		bi::bitlin(spLineSrc, spLineDst, foreground, background);
+		srcOffset += bitmapWidthBytes;
+		dstOffset += BitmapWidth;
 	  }
 	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC);
-	      (bitmap != nullptr) && (deviceContext != nullptr)) {
+	  if (auto const deviceContext = CreateCompatibleDC(StitchWindowDC); deviceContext != nullptr) {
 		SelectObject(deviceContext, bitmap);
 		hBitmapFile = CreateCompatibleBitmap(StitchWindowDC, BitmapWidth, BitmapHeight);
 		SelectObject(BitmapDC, hBitmapFile);
@@ -644,7 +641,7 @@ auto bitmap::getrmap() -> uint32_t {
   TraceBitmap     = bitmap::getBitmap(BitmapDC, &info, &TraceBitmapData);
   TraceDC         = CreateCompatibleDC(StitchWindowDC);
   auto bitmapSize = 0U;
-  if ((TraceBitmap != nullptr) && (TraceDC != nullptr)) {
+  if (TraceDC != nullptr) {
 	SelectObject(TraceDC, TraceBitmap);
 	BitBlt(TraceDC, 0, 0, BitmapWidth, BitmapHeight, BitmapDC, 0, 0, SRCCOPY);
 	StateMap->set(StateFlag::WASTRAC);
