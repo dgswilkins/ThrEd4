@@ -318,7 +318,7 @@ void fnvrt(std::vector<F_POINT>&    currentFillVertices,
            std::vector<SMAL_PNT_L>& lineEndpoints);
 auto fplComp(F_POINT_LINE const& point1, F_POINT_LINE const& point2) noexcept -> bool;
 void frmpnts(uint32_t type);
-void frmpoly(POINT const* line, uint32_t count) noexcept;
+void frmpoly(gsl::not_null<POINT const*> line, uint32_t count) noexcept;
 void frmsqr(uint32_t vertexIndex, uint32_t iVertex);
 void frmsqr0(POINT const& controlPoint);
 void frmx(POINT const& controlPoint, HDC hDC);
@@ -952,12 +952,10 @@ void form::dubig() {
   }
 }
 
-void fi::frmpoly(POINT const* const line, uint32_t count) noexcept {
-  if (line != nullptr) {
-	if (count != 0U) {
-	  for (auto iPoint = 0U; iPoint < count - 1U; ++iPoint) {
-		wrap::polyline(StitchWindowMemDC, &line[iPoint], LNPNTS);
-	  }
+void fi::frmpoly(const gsl::not_null<POINT const*> line, uint32_t count) noexcept {
+  if (count != 0U) {
+	for (auto iPoint = 0U; iPoint < count - 1U; ++iPoint) {
+	  wrap::polyline(StitchWindowMemDC, line.get() + iPoint, LNPNTS);
 	}
   }
 }
@@ -1012,9 +1010,9 @@ void form::drwfrm() {
 		  }
 		  if (form.wordParam != 0U) {
 			SelectObject(StitchWindowMemDC, FormPen);
-			fi::frmpoly(&(FormLines->operator[](1)), form.wordParam);
+			fi::frmpoly(std::addressof(FormLines->operator[](1)), form.wordParam);
 			SelectObject(StitchWindowMemDC, FormPen3px);
-			wrap::polyline(StitchWindowMemDC, &(FormLines->operator[](form.wordParam)), LNPNTS);
+			wrap::polyline(StitchWindowMemDC, std::addressof(FormLines->operator[](form.wordParam)), LNPNTS);
 			SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
 			lastPoint = form.wordParam + 1U;
 		  }
@@ -1044,7 +1042,7 @@ void form::drwfrm() {
 		  }
 		}
 		else {
-		  fi::frmpoly(&(FormLines->operator[](lastPoint)), form.vertexCount + 1 - lastPoint);
+		  fi::frmpoly(std::addressof(FormLines->operator[](lastPoint)), form.vertexCount + 1 - lastPoint);
 		}
 		if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
 		  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
