@@ -3905,34 +3905,31 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
                 uint32_t                       group1,
                 uint32_t                       line1,
                 float                          gapToClosestRegion) noexcept -> bool {
-  auto const* lineEndPoint0 = &lineEndpoints[groupIndexSequence[group0]];
+  auto const lineEndPoint0 = std::next(lineEndpoints.begin(),groupIndexSequence[group0]);
   if (group1 > groupIndexSequence.size() - 2U) {
 	return false;
   }
   if (group0 == 0) {
 	return false;
   }
-  if (lineEndPoint0 != nullptr) {
 	auto count0 = (groupIndexSequence[wrap::toSize(group0) + 1U] - groupIndexSequence[group0]) / 2U;
 	auto index0 = 0U;
 	while ((count0 != 0U) && lineEndPoint0[index0].line != line0) {
 	  --count0;
 	  index0 += 2;
 	}
-	if (count0 != 0U) {
-	  if (auto const* lineEndPoint1 = &lineEndpoints[groupIndexSequence[group1]]) {
-		auto index1 = 0U;
-		auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
-		while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
-		  --count1;
-		  index1 += 2;
-		}
-		if (count1 != 0U) {
-		  return isclos(&lineEndPoint0[index0], &lineEndPoint1[index1], gapToClosestRegion);
-		}
+    if (count0 != 0U) {
+	  auto const lineEndPoint1 = std::next(lineEndpoints.begin(), groupIndexSequence[group1]);
+	  auto       index1        = 0U;
+	  auto count1 = (groupIndexSequence[wrap::toSize(group1) + 1U] - groupIndexSequence[group1]) / 2U;
+	  while ((count1 != 0U) && lineEndPoint1[index1].line != line1) {
+	  --count1;
+	  index1 += 2;
 	  }
-	}
-  }
+	  if (count1 != 0U) {
+	  return isclos(std::addressof(lineEndPoint0[index0]), std::addressof(lineEndPoint1[index1]), gapToClosestRegion);
+	  }
+    }
   return false;
 }
 
