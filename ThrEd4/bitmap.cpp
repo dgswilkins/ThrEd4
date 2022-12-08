@@ -162,7 +162,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 		auto const spBits    = gsl::span<uint32_t>(bits, wrap::toSize(BitmapWidth) * BitmapHeight);
 		auto       srcOffset = 0U;
 		auto       dstOffset = 0;
-		auto const srcWidth  = (BitmapWidth >> 3U) + 1;
+		auto const srcWidth  = (wrap::toUnsigned(BitmapWidth) >> 3U) + 1U;
 		for (auto iHeight = 0; iHeight < BitmapHeight; ++iHeight) {
 		  auto const spLineSrc = spMBD.subspan(srcOffset, srcWidth);
 		  auto const spLineDst = spBits.subspan(dstOffset, BitmapWidth);
