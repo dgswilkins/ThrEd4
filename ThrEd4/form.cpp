@@ -328,7 +328,7 @@ void fsclpx(uint32_t formIndex);
 void fshor(FRM_HEAD& form);
 void fspic(uint32_t formIndex);
 void fsvrt();
-void getbig(F_RECTANGLE* allItemsRect) noexcept;
+auto getbig(std::vector<FRM_HEAD>& formList, std::vector<F_POINT_ATTR>& stitchBuffer) noexcept -> F_RECTANGLE;
 auto getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
             std::vector<float> const&   lengths,
             uint32_t                    iPoint,
@@ -6149,37 +6149,38 @@ void form::setap() {
   displayText::showMessage(IDS_APCOL, (AppliqueColor + 1U));
 }
 
-void fi::getbig(F_RECTANGLE* allItemsRect) noexcept {
-  *allItemsRect = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
-  for (auto& iForm : *FormList) {
+auto fi::getbig(std::vector<FRM_HEAD> &formList, std::vector<F_POINT_ATTR> &stitchBuffer) noexcept -> F_RECTANGLE{
+  auto allItemsRect = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
+  for (auto& iForm : formList) {
 	auto const& trct = iForm.rectangle;
-	if (trct.left < allItemsRect->left) {
-	  allItemsRect->left = trct.left;
+	if (trct.left < allItemsRect.left) {
+	  allItemsRect.left = trct.left;
 	}
-	if (trct.top > allItemsRect->top) {
-	  allItemsRect->top = trct.top;
+	if (trct.top > allItemsRect.top) {
+	  allItemsRect.top = trct.top;
 	}
-	if (trct.right > allItemsRect->right) {
-	  allItemsRect->right = trct.right;
+	if (trct.right > allItemsRect.right) {
+	  allItemsRect.right = trct.right;
 	}
-	if (trct.bottom < allItemsRect->bottom) {
-	  allItemsRect->bottom = trct.bottom;
-	}
-  }
-  for (auto const& stitch : *StitchBuffer) {
-	if (stitch.x < allItemsRect->left) {
-	  allItemsRect->left = stitch.x;
-	}
-	if (stitch.y > allItemsRect->top) {
-	  allItemsRect->top = stitch.y;
-	}
-	if (stitch.x > allItemsRect->right) {
-	  allItemsRect->right = stitch.x;
-	}
-	if (stitch.y < allItemsRect->bottom) {
-	  allItemsRect->bottom = stitch.y;
+	if (trct.bottom < allItemsRect.bottom) {
+	  allItemsRect.bottom = trct.bottom;
 	}
   }
+  for (auto const& stitch : stitchBuffer) {
+	if (stitch.x < allItemsRect.left) {
+	  allItemsRect.left = stitch.x;
+	}
+	if (stitch.y > allItemsRect.top) {
+	  allItemsRect.top = stitch.y;
+	}
+	if (stitch.x > allItemsRect.right) {
+	  allItemsRect.right = stitch.x;
+	}
+	if (stitch.y < allItemsRect.bottom) {
+	  allItemsRect.bottom = stitch.y;
+	}
+  }
+  return allItemsRect;
 }
 
 void form::stchrct2px(gsl::not_null<F_RECTANGLE const*> stitchRect, RECT& screenRect) {
@@ -6200,7 +6201,7 @@ void form::selal() {
   SelectedFormList->clear();
   StateMap->reset(StateFlag::SELBOX);
   StateMap->reset(StateFlag::GRPSEL);
-  fi::getbig(AllItemsRect);
+  *AllItemsRect = fi::getbig(*FormList, *StitchBuffer);
   ZoomRect = F_RECTANGLE {0.0F, wrap::toFloat(UnzoomedRect.cy), wrap::toFloat(UnzoomedRect.cx), 0.0F};
   ZoomFactor = 1;
   StateMap->reset(StateFlag::ZUMED);
@@ -8461,7 +8462,7 @@ void form::cntrx() {
 
 void form::centir() {
   StateMap->reset(StateFlag::BIGBOX);
-  fi::getbig(AllItemsRect);
+  *AllItemsRect = fi::getbig(*FormList, *StitchBuffer);
   auto const itemCenter = F_POINT {wrap::midl(AllItemsRect->right, AllItemsRect->left),
                                    wrap::midl(AllItemsRect->top, AllItemsRect->bottom)};
   auto const hoopCenter =
