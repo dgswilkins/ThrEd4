@@ -322,7 +322,7 @@ void mv2f();
 void nedof();
 void nedon();
 void newFil();
-auto getSaveName(fs::path* fileName, FileIndices& fileType) -> bool;
+auto getSaveName(fs::path& fileName, FileIndices& fileType) -> bool;
 void noMsg();
 void nuAct(uint32_t iStitch) noexcept;
 auto nuBak() noexcept -> BOOL;
@@ -3813,8 +3813,7 @@ void thi::sav() {
   }
 }
 
-auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
-  if (nullptr != fileName) {
+auto thi::getSaveName(fs::path& fileName, FileIndices& fileType) -> bool {
 	auto* pFileSave = gsl::narrow_cast<IFileSaveDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
 	auto hResult = CoCreateInstance(
@@ -3830,7 +3829,7 @@ auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
 	  hResult = pFileSave->SetFileTypes(wrap::toUnsigned(ALL_FILE_TYPES.size()), ALL_FILE_TYPES.data());
 	  hResult += pFileSave->SetFileTypeIndex(1);
 	  hResult += pFileSave->SetTitle(L"Save As");
-	  hResult += pFileSave->SetFileName(fileName->filename().c_str());
+	  hResult += pFileSave->SetFileName(fileName.filename().c_str());
 	  hResult += pFileSave->SetDefaultExtension(L"thr");
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 	  if (SUCCEEDED(hResult)) {
@@ -3874,7 +3873,7 @@ auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
 			  hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
 			  if (SUCCEEDED(hResult)) {
-				fileName->assign(pszFilePath);
+				fileName.assign(pszFilePath);
 				CoTaskMemFree(pszFilePath);
 				return true;
 			  }
@@ -3883,14 +3882,13 @@ auto thi::getSaveName(fs::path* fileName, FileIndices& fileType) -> bool {
 		}
 	  }
 	}
-  }
   return false;
 }
 
 void thi::savAs() {
   if (!StitchBuffer->empty() || !FormList->empty() || bitmap::ismap()) {
 	auto index = FileIndices {};
-	if (getSaveName(WorkingFileName, index)) {
+	if (getSaveName(*WorkingFileName, index)) {
 	  *DefaultDirectory = WorkingFileName->parent_path();
 	  switch (index) {
 		case FileIndices::THR: {
