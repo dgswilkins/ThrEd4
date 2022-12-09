@@ -15256,7 +15256,7 @@ auto thi::handleFileMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_LODBIT: { // file / Load Bitmap
-	  bitmap::lodbmp(DefaultDirectory);
+	  bitmap::lodbmp(*DefaultDirectory);
 	  flag = true;
 	  break;
 	}

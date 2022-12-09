@@ -42,7 +42,7 @@ auto getBmpStitchRatio() noexcept -> F_POINT;
 auto getTraceDC() noexcept -> HDC;
 auto getrmap() -> uint32_t;
 auto ismap() noexcept -> bool;
-void lodbmp(fs::path const* directory);
+void lodbmp(fs::path const& directory);
 void resetBmpFile(bool reset);
 void resetDC() noexcept;
 void savmap();

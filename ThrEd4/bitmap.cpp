@@ -43,7 +43,7 @@ void bitsiz();
 constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
-auto loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::path*> fileName) -> bool;
+auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
 void movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source);
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
@@ -354,7 +354,7 @@ void bi::movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source) {
   }
 }
 
-auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::path*> fileName) -> bool {
+auto bi::loadName(fs::path const& directory, fs::path& fileName) -> bool {
   auto* pFileOpen = gsl::narrow_cast<IFileOpenDialog*>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto hResult = CoCreateInstance(
@@ -373,7 +373,7 @@ auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::pa
 	  // If we want to, we can set the default directory rather than using the OS mechanism for last used
 	  auto* psiFrom = gsl::narrow_cast<IShellItem*>(nullptr);
 	  // NOLINTNEXTLINE(clang-diagnostic-language-extension-token)
-	  hResult += SHCreateItemFromParsingName(directory->wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
+	  hResult += SHCreateItemFromParsingName(directory.wstring().data(), nullptr, IID_PPV_ARGS(&psiFrom));
 	  hResult += pFileOpen->SetFolder(psiFrom);
 	  if (nullptr != psiFrom) {
 		psiFrom->Release();
@@ -391,7 +391,7 @@ auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::pa
 			auto pszFilePath = PWSTR {nullptr};
 			hResult          = pItem->GetDisplayName(SIGDN_FILESYSPATH, &pszFilePath);
 			if (SUCCEEDED(hResult)) {
-			  fileName->assign(pszFilePath);
+			  fileName.assign(pszFilePath);
 			  CoTaskMemFree(pszFilePath);
 			  return true;
 			}
@@ -403,8 +403,8 @@ auto bi::loadName(gsl::not_null<fs::path const*> directory, gsl::not_null<fs::pa
   return false;
 }
 
-void bitmap::lodbmp(fs::path const* directory) {
-  if (bi::loadName(directory, UTF16BMPname)) {
+void bitmap::lodbmp(fs::path const& directory) {
+  if (bi::loadName(directory, *UTF16BMPname)) {
 	bitmap::resetBmpFile(false);
 	trace::untrace();
 #if USE_SHORT_NAME
