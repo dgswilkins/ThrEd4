@@ -57,14 +57,14 @@ auto pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool;
 
 static auto PCSHeader = PCSHEADER {}; // pcs file header
 
-auto PCS::savePCS(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
+auto PCS::savePCS(fs::path const& auxName, std::vector<F_POINT_ATTR>& saveStitches) -> bool {
   auto flag = true;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(*auxName);
+	displayText::crmsg(auxName);
 	flag = false;
   }
   else {

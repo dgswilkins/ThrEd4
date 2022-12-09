@@ -3769,7 +3769,7 @@ void thi::chk1col() {
 
 void thi::sav() {
   xt::duauxnam();
-  if (chkattr(*AuxName)) {
+  if ((nullptr == AuxName) || chkattr(*AuxName)) {
 	return;
   }
   if (StitchBuffer->empty()) {
@@ -3792,17 +3792,17 @@ void thi::sav() {
   auto flag = true;
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  flag = DST::saveDST(AuxName, saveStitches);
+	  flag = DST::saveDST(*AuxName, saveStitches);
 	  break;
 	}
 #if PESACT
 	case AUXPES: {
-	  flag = PES::savePES(AuxName, saveStitches);
+	  flag = PES::savePES(*AuxName, saveStitches);
 	  break;
 	}
 #endif
 	default: {
-	  flag = PCS::savePCS(AuxName, saveStitches);
+	  flag = PCS::savePCS(*AuxName, saveStitches);
 	}
   }
   if (flag) {

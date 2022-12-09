@@ -939,14 +939,14 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 #pragma warning(push)
 #pragma warning(disable : 4996)
 // ReSharper disable CppDeprecatedEntity
-auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
+auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool {
   auto flag = true;
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto const fileHandle = CreateFile(
-      auxName->wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
+      auxName.wstring().c_str(), (GENERIC_WRITE | GENERIC_READ), 0, nullptr, CREATE_ALWAYS, 0, nullptr); // NOLINT(hicpp-signed-bitwise)
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   if (fileHandle == INVALID_HANDLE_VALUE) {
-	displayText::crmsg(*auxName);
+	displayText::crmsg(auxName);
 	flag = false;
   }
   else {
@@ -961,7 +961,7 @@ auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_AT
 	  // Use sizeof to ensure no overrun if the format string is wrong length
 	  strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
 	  std::ranges::fill(dstHeader.desc, ' ');
-	  auto       convAuxName  = utf::utf16ToUtf8(*auxName);
+	  auto       convAuxName  = utf::utf16ToUtf8(auxName);
 	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
 	  if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
 		for (auto& iDHD : spDstHdrDesc) {
@@ -975,30 +975,30 @@ auto DST::saveDST(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_AT
 		}
 	  }
 	  // clang-format off
-        spDstHdrDesc.back() = 0xd;
-        strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-        strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
-        strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            
-        strncpy(static_cast<char *>(dstHeader.co),         "  0\xd",   sizeof(dstHeader.co));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                            
-        strncpy(static_cast<char *>(dstHeader.xplushed),   "+X:",      sizeof(dstHeader.xplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)                                        
-        strncpy(static_cast<char *>(dstHeader.xplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), sizeof(dstHeader.xplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.xminhed),    "-X:",      sizeof(dstHeader.xminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.xmin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));  // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.yplushed),   "+Y:",      sizeof(dstHeader.yplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.yplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), sizeof(dstHeader.yplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.yminhed),    "-Y:",      sizeof(dstHeader.yminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.ymin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));  // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.axhed),      "AX:",      sizeof(dstHeader.axhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.ax),         "-    0\r", sizeof(dstHeader.ax));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.ayhed),      "AY:",      sizeof(dstHeader.ayhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.ay),         "+    0\r", sizeof(dstHeader.ay));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.mxhed),      "MX:",      sizeof(dstHeader.mxhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.mx),         "+    0\r", sizeof(dstHeader.mx));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.myhed),      "MY:",      sizeof(dstHeader.myhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.my),         "+    0\r", sizeof(dstHeader.my));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.pdhed),      "PD",       sizeof(dstHeader.pdhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
-        strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
+      spDstHdrDesc.back() = 0xd;
+      strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
+      strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
+      strncpy(static_cast<char *>(dstHeader.cohed),      "CO:",      sizeof(dstHeader.cohed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)                                            
+      strncpy(static_cast<char *>(dstHeader.co),         "  0\xd",   sizeof(dstHeader.co));                                           // NOLINT(clang-diagnostic-deprecated-declarations)                                            
+      strncpy(static_cast<char *>(dstHeader.xplushed),   "+X:",      sizeof(dstHeader.xplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)                                        
+      strncpy(static_cast<char *>(dstHeader.xplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.x).c_str(), sizeof(dstHeader.xplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.xminhed),    "-X:",      sizeof(dstHeader.xminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.xmin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.x).c_str(), sizeof(dstHeader.xmin));  // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.yplushed),   "+Y:",      sizeof(dstHeader.yplushed));                                     // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.yplus), fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Positive.y).c_str(), sizeof(dstHeader.yplus));  // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.yminhed),    "-Y:",      sizeof(dstHeader.yminhed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.ymin),  fmt::format(FMT_STRING("{:5d}\xd"), dstOffset.Negative.y).c_str(), sizeof(dstHeader.ymin));  // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.axhed),      "AX:",      sizeof(dstHeader.axhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.ax),         "-    0\r", sizeof(dstHeader.ax));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.ayhed),      "AY:",      sizeof(dstHeader.ayhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.ay),         "+    0\r", sizeof(dstHeader.ay));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.mxhed),      "MX:",      sizeof(dstHeader.mxhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.mx),         "+    0\r", sizeof(dstHeader.mx));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.myhed),      "MY:",      sizeof(dstHeader.myhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.my),         "+    0\r", sizeof(dstHeader.my));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.pdhed),      "PD",       sizeof(dstHeader.pdhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
+      strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
 	  // clang-format on
 	  auto& res = dstHeader.res;
 	  std::ranges::fill(res, ' ');

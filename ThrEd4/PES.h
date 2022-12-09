@@ -15,6 +15,6 @@ namespace fs = std::filesystem;
 
 namespace PES { // NOLINT(readability-identifier-naming)
 auto readPESFile(fs::path const& newFileName) -> bool;
-auto savePES(gsl::not_null<fs::path const*> auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
+auto savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& saveStitches) -> bool;
 } // namespace PES
 #endif
