@@ -44,7 +44,7 @@ constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
 auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
-void movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source);
+void movmap(const gsl::span<uint32_t> src, std::vector<uint8_t>& buffer);
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
 auto saveName(fs::path& fileName);
@@ -311,7 +311,7 @@ auto bi::saveName(fs::path& fileName) {
 }
 
 void bitmap::savmap() {
-  if (bitmap::ismap()) {
+  if (bitmap::ismap() && (nullptr != TraceBitmapData)) {
 	if (StateMap->test(StateFlag::MONOMAP)) {
 	  displayText::tabmsg(IDS_SAVMAP);
 	  return;
@@ -334,7 +334,8 @@ void bitmap::savmap() {
 	  WriteFile(hBitmap, &BitmapFileHeaderV4, BitmapFileHeader.bfOffBits - sizeof(BitmapFileHeader), &bytesWritten, nullptr);
 	  auto buffer = std::vector<uint8_t> {};
 	  buffer.resize((wrap::toSize(BitmapWidth) * wrap::toUnsigned(BitmapHeight) * 3U) + 1U);
-	  bi::movmap(buffer, TraceBitmapData);
+	  auto const spTrace = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(BitmapWidth) * BitmapHeight);
+	  bi::movmap(spTrace, buffer);
 	  WriteFile(hBitmap, buffer.data(), gsl::narrow<DWORD>(BitmapWidth * BitmapHeight * 3), &bytesWritten, nullptr);
 	  CloseHandle(hBitmap);
 	}
@@ -345,10 +346,9 @@ void bitmap::savmap() {
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
-void bi::movmap(std::vector<uint8_t>& buffer, gsl::not_null<uint32_t*> source) {
-  auto const spTBD       = gsl::span(source.get(), wrap::toSize(BitmapWidth) * BitmapHeight);
+void bi::movmap(const gsl::span<uint32_t> src, std::vector<uint8_t>& buffer) {
   auto*      destination = buffer.data();
-  for (auto iTBD : spTBD) {
+  for (auto iTBD : src) {
 	*(convertFromPtr<uint32_t*>(destination)) = iTBD;
 	destination += 3;
   }
