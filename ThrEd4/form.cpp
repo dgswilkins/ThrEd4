@@ -328,7 +328,8 @@ void fsclpx(uint32_t formIndex);
 void fshor(FRM_HEAD& form);
 void fspic(uint32_t formIndex);
 void fsvrt();
-auto getbig(std::vector<FRM_HEAD>& formList, std::vector<F_POINT_ATTR>& stitchBuffer) noexcept -> F_RECTANGLE;
+auto getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept
+    -> F_RECTANGLE;
 auto getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
             std::vector<float> const&   lengths,
             uint32_t                    iPoint,
@@ -6146,9 +6147,9 @@ void form::setap() {
   displayText::showMessage(IDS_APCOL, (AppliqueColor + 1U));
 }
 
-auto fi::getbig(std::vector<FRM_HEAD> &formList, std::vector<F_POINT_ATTR> &stitchBuffer) noexcept -> F_RECTANGLE{
+auto fi::getbig(std::vector<FRM_HEAD> const& formList, std::vector<F_POINT_ATTR> const& stitchBuffer) noexcept -> F_RECTANGLE{
   auto allItemsRect = F_RECTANGLE {BIGFLOAT, 0.0F, 0.0F, BIGFLOAT};
-  for (auto& iForm : formList) {
+  for (auto const& iForm : formList) {
 	auto const& trct = iForm.rectangle;
 	if (trct.left < allItemsRect.left) {
 	  allItemsRect.left = trct.left;
