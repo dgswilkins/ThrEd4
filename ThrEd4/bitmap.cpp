@@ -348,7 +348,7 @@ void bitmap::savmap() {
 // Move unpacked 24BPP data into packed 24BPP data
 void bi::movmap(const gsl::span<uint32_t> src, std::vector<uint8_t>& buffer) {
   auto*      destination = buffer.data();
-  for (auto iTBD : src) {
+  for (auto const& iTBD : src) {
 	*(convertFromPtr<uint32_t*>(destination)) = iTBD;
 	destination += 3;
   }
