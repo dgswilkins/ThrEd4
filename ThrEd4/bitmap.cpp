@@ -44,7 +44,7 @@ constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
 auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
-void movmap(const gsl::span<uint32_t> src, std::vector<uint8_t>& buffer);
+void movmap(gsl::span<uint32_t> src, std::vector<uint8_t>& buffer);
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
 auto saveName(fs::path& fileName);
