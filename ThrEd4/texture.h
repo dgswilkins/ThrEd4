@@ -10,7 +10,7 @@
 namespace texture {
 void deltx(uint32_t formIndex);
 void drwtxtr();
-void dutxtfil();
+auto dutxtfil() -> bool;
 void initTextures(std::vector<TX_PNT>*   ptrTexturePoints,
                   std::vector<uint32_t>* ptrTexturePointsList,
                   std::vector<TX_HIST>*  ptrTextureHistory) noexcept;

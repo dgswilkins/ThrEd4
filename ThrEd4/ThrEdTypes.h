@@ -740,6 +740,7 @@ enum FillMessageCodes {
   FMM_FAN,
   FMM_VRT,
   FMM_HOR,
+  FMM_TXTR,
   FMM_ANG,
   FMM_CLP,
   FMM_FTH,

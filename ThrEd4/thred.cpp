@@ -11906,8 +11906,9 @@ auto thi::handleSideWindowActive() -> bool {
 		form.fillType = TXVRTF;
 		break;
 	  }
-	  texture::dutxtfil();
+	  if (texture::dutxtfil()) {
 	  textureFlag = true;
+	  }
 	  break;
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXHORF)) // horizontal texture
@@ -11916,8 +11917,9 @@ auto thi::handleSideWindowActive() -> bool {
 		form.fillType = TXHORF;
 		break;
 	  }
-	  texture::dutxtfil();
+	  if (texture::dutxtfil()) {
 	  textureFlag = true;
+	  }
 	  break;
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
@@ -11927,8 +11929,9 @@ auto thi::handleSideWindowActive() -> bool {
 		form.angleOrClipData.angle = IniFile.fillAngle;
 		break;
 	  }
-	  texture::dutxtfil();
+	  if (texture::dutxtfil()) {
 	  textureFlag = true;
+	  }
 	  break;
 	}
   } while (false);
