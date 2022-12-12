@@ -51,7 +51,7 @@ namespace ti {
 void decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst);
 void decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
 void decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst);
-void difbits(uint32_t shift, gsl::not_null<uint32_t*> point) noexcept;
+void difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept;
 
 static inline void difsub(uint32_t source, uint32_t shift, uint32_t& destination) noexcept;
 
@@ -244,26 +244,25 @@ static inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& d
 //  504
 //  678
 
-void ti::difbits(uint32_t shift, gsl::not_null<uint32_t*> point) noexcept {
-  auto* testPoint   = point.get();
+void ti::difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept {
   auto  iTrcAdjClrs = TraceAdjacentColors.begin();
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 0 - center
-  testPoint -= bitmap::getBitmapWidth();
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 1 - N
-  testPoint -= 1;
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
-  testPoint += 2;
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
-  testPoint += bitmap::getBitmapWidth();
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 4 - E
-  testPoint -= 2;
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 5 - W
-  testPoint += bitmap::getBitmapWidth();
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
-  testPoint += 1;
-  ti::difsub(*testPoint, shift, *(iTrcAdjClrs++)); // pixel 7 - S
-  testPoint += 1;
-  ti::difsub(*testPoint, shift, *iTrcAdjClrs); // pixel 8 - SE
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 0 - center
+  std::advance(point, -bitmap::getBitmapWidth());
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 1 - N
+  std::advance(point, -1);
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 2 - NW
+  std::advance(point, 2);
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 3 - NE
+  std::advance(point, bitmap::getBitmapWidth());
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 4 - E
+  std::advance(point, -2);
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 5 - W
+  std::advance(point, bitmap::getBitmapWidth());
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 6 - SW
+  std::advance(point, 1);
+  ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 7 - S
+  std::advance(point, 1);
+  ti::difsub(*point, shift, *iTrcAdjClrs); // pixel 8 - SE
 }
 
 auto ti::trsum() -> uint32_t {
@@ -331,12 +330,13 @@ void trace::trdif() {
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  TraceDataSize = bitmap::getrmap();
 	}
+	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, TraceDataSize);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
 		auto iPoint = iHeight * bitmap::getBitmapWidth();
 		++iPoint;
 		for (auto iWidth = 1; iWidth < bitmap::getBitmapWidth() - 1; ++iWidth) {
-		  ti::difbits(TraceShift[iRGB], wrap::next(TraceBitmapData, iPoint));
+		  ti::difbits(TraceShift[iRGB], std::next(spTBD.begin(), iPoint));
 		  differenceBitmap[wrap::toSize(iPoint)] = ti::trsum();
 
 		  auto const& colorSum = differenceBitmap[wrap::toSize(iPoint++)];
