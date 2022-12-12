@@ -1816,10 +1816,10 @@ void xt::dusulen(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::undlen() {
-  displayText::tabmsg(IDS_SETULEN);
+void xt::setEdit(uint32_t code, StateFlag flag) {
+  displayText::tabmsg(code);
   StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETULEN);
+  StateMap->set(flag);
   displayText::numWnd();
 }
 
@@ -1845,13 +1845,6 @@ void xt::duspac(float spacing) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::uspac() {
-  displayText::tabmsg(IDS_SETUSPAC);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETUSPAC);
-  displayText::numWnd();
-}
-
 void xi::uangfn(uint32_t formNumber, float angle) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.extendedAttribute & AT_UND) != 0U) {
@@ -1875,13 +1868,6 @@ void xt::dufang(float angle) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::sfuang() {
-  displayText::tabmsg(IDS_SETUANG);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETUANG);
-  displayText::numWnd();
-}
-
 void xi::flenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isclp()) {
@@ -1902,13 +1888,6 @@ void xt::duflen(float length) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setflen() {
-  displayText::tabmsg(IDS_SETFLEN);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFLEN);
-  displayText::numWnd();
 }
 
 void xi::fspacfn(uint32_t formNumber, float spacing) {
@@ -1936,13 +1915,6 @@ void xt::dufspac(float spacing) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setfspac() {
-  displayText::tabmsg(IDS_SETFSPAC);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFSPAC);
-  displayText::numWnd();
 }
 
 void xi::findfn(uint32_t formNumber, float indent) {
@@ -2018,13 +1990,6 @@ void xt::dufxang(float angle) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setfang() {
-  displayText::tabmsg(IDS_SETFANG);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFANG);
-  displayText::numWnd();
-}
-
 void xi::ucolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber);
@@ -2050,13 +2015,6 @@ void xt::dundcol(uint8_t color) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setucol() {
-  displayText::tabmsg(IDS_COL);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETUCOL);
-  displayText::numWnd();
 }
 
 void xi::fcolfn(uint32_t formNumber, uint8_t color) {
@@ -2085,13 +2043,6 @@ void xt::dufcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setfcol() {
-  displayText::tabmsg(IDS_COL);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFCOL);
-  displayText::numWnd();
-}
-
 void xi::bcolfn(uint32_t formNumber, uint8_t color) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
@@ -2118,13 +2069,6 @@ void xt::dubcol(uint8_t color) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setbcol() {
-  displayText::tabmsg(IDS_COL);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETBCOL);
-  displayText::numWnd();
-}
-
 void xi::blenfn(FRM_HEAD& form, float length) {
   if ((form.edgeType != 0U) && !form.iseclp()) {
 	form.lengthOrCount.stitchLength = length;
@@ -2146,13 +2090,6 @@ void xt::dublen(float length) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setblen() {
-  displayText::tabmsg(IDS_SETFLEN);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETBLEN);
-  displayText::numWnd();
 }
 
 void xi::bspacfn(uint32_t formNumber, float length) {
@@ -2177,13 +2114,6 @@ void xt::dubspac(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setbspac() {
-  displayText::tabmsg(IDS_SETFSPAC);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETBSPAC);
-  displayText::numWnd();
-}
-
 void xi::bminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.edgeType != 0U) {
@@ -2204,13 +2134,6 @@ void xt::dubmin(float length) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setbmin() {
-  displayText::tabmsg(IDS_TXT23);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETBMIN);
-  displayText::numWnd();
 }
 
 void xi::bmaxfn(uint32_t formNumber, float length) {
@@ -2235,13 +2158,6 @@ void xt::dubmax(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setbmax() {
-  displayText::tabmsg(IDS_TXT22);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETBMAX);
-  displayText::numWnd();
-}
-
 void xi::fminfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
@@ -2264,13 +2180,6 @@ void xt::dufmin(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setfmin() {
-  displayText::tabmsg(IDS_TXT21);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFMIN);
-  displayText::numWnd();
-}
-
 void xi::fmaxfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
@@ -2291,13 +2200,6 @@ void xt::dufmax(float length) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setfmax() {
-  displayText::tabmsg(IDS_TXT20);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFMAX);
-  displayText::numWnd();
 }
 
 void xi::fwidfn(uint32_t formNumber, float length) {
@@ -2330,20 +2232,6 @@ void xt::dufwid(float length) {
   StateMap->set(StateFlag::RESTCH);
 }
 
-void xt::setfwid() {
-  displayText::tabmsg(IDS_WID);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFWID);
-  displayText::numWnd();
-}
-
-void xt::setfind() {
-  displayText::tabmsg(IDS_UWLKIND);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFIND);
-  displayText::numWnd();
-}
-
 void xi::fhifn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
   // clang-format off
@@ -2372,13 +2260,6 @@ void xt::dufhi(float length) {
   }
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
-}
-
-void xt::setfhi() {
-  displayText::tabmsg(IDS_HI);
-  StateMap->set(StateFlag::NUMIN);
-  StateMap->set(StateFlag::FSETFHI);
-  displayText::numWnd();
 }
 
 void xt::setfilstrt() {

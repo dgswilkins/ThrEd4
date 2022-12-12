@@ -14295,7 +14295,7 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FRMIND: { // edit / Form Update / Indent
-	  xt::setfind();
+	  xt::setEdit(IDS_UWLKIND, StateFlag::FSETFIND);
 	  flag = true;
 	  break;
 	}
@@ -14305,87 +14305,87 @@ auto thi::handleEditMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_FRMHI: { // edit / Form Update / Height
-	  xt::setfhi();
+	  xt::setEdit(IDS_HI, StateFlag::FSETFHI);
 	  flag = true;
 	  break;
 	}
 	case ID_FRMWID: { // edit / Form Update / Width
-	  xt::setfwid();
+	  xt::setEdit(IDS_WID, StateFlag::FSETFWID);
 	  flag = true;
 	  break;
 	}
 	case ID_MAXFLEN: { // edit / Form Update / Fill /  Maximum Stitch Length
-	  xt::setfmax();
+	  xt::setEdit(IDS_TXT20, StateFlag::FSETFMAX);
 	  flag = true;
 	  break;
 	}
 	case ID_MINFLEN: { // edit / Form Update / Fill /  Minimum Stitch Length
-	  xt::setfmin();
+	  xt::setEdit(IDS_TXT21, StateFlag::FSETFMIN);
 	  flag = true;
 	  break;
 	}
 	case ID_MAXBLEN: { // edit / Form Update / Border /  Maximum Stitch Length
-	  xt::setbmax();
+	  xt::setEdit(IDS_TXT22, StateFlag::FSETBMAX);
 	  flag = true;
 	  break;
 	}
 	case ID_MINBLEN: { // edit / Form Update / Border /  Minimum Stitch Length
-	  xt::setbmin();
+	  xt::setEdit(IDS_TXT23, StateFlag::FSETBMIN);
 	  flag = true;
 	  break;
 	}
 	case ID_SETBSPAC: { // edit / Form Update / Border /  Spacing
-	  xt::setbspac();
+	  xt::setEdit(IDS_SETFSPAC, StateFlag::FSETBSPAC);
 	  flag = true;
 	  break;
 	}
 	case ID_SETBLEN: { // edit / Form Update / Border /  Stitch Length
-	  xt::setblen();
+	  xt::setEdit(IDS_SETFLEN, StateFlag::FSETBLEN);
 	  flag = true;
 	  break;
 	}
 	case ID_SETBCOL: { // edit / Form Update / Border /  Color
-	  xt::setbcol();
+	  xt::setEdit(IDS_COL, StateFlag::FSETBCOL);
 	  flag = true;
 	  break;
 	}
 	case ID_SETFCOL: { // edit / Form Update / Fill /  Color
-	  xt::setfcol();
+	  xt::setEdit(IDS_COL, StateFlag::FSETFCOL);
 	  flag = true;
 	  break;
 	}
 	case ID_SETUCOL: { // edit / Form Update / Underlay /  Color
-	  xt::setucol();
+	  xt::setEdit(IDS_COL, StateFlag::FSETUCOL);
 	  flag = true;
 	  break;
 	}
 	case ID_SETFANG: { // edit / Form Update / Fill /  Angle
-	  xt::setfang();
+	  xt::setEdit(IDS_SETFANG, StateFlag::FSETFANG);
 	  flag = true;
 	  break;
 	}
 	case ID_SETFSPAC: { // edit / Form Update / Fill /  Spacing
-	  xt::setfspac();
+	  xt::setEdit(IDS_SETFSPAC, StateFlag::FSETFSPAC);
 	  flag = true;
 	  break;
 	}
 	case ID_SETFLEN: { // edit / Form Update / Fill /  Stitch Length
-	  xt::setflen();
+	  xt::setEdit(IDS_SETFLEN, StateFlag::FSETFLEN);
 	  flag = true;
 	  break;
 	}
 	case ID_SETUANG: { // edit / Form Update / Underlay /  Angle
-	  xt::sfuang();
+	  xt::setEdit(IDS_SETUANG, StateFlag::FSETUANG);
 	  flag = true;
 	  break;
 	}
 	case ID_SETUSPAC: { // edit / Form Update / Underlay /  Spacing
-	  xt::uspac();
+	  xt::setEdit(IDS_SETUSPAC, StateFlag::FSETUSPAC);
 	  flag = true;
 	  break;
 	}
 	case ID_UNDLEN: { // edit / Form Update / Underlay / Stitch Length
-	  xt::undlen();
+	  xt::setEdit(IDS_SETULEN, StateFlag::FSETULEN);
 	  flag = true;
 	  break;
 	}
