@@ -99,6 +99,7 @@ auto tpComp(TX_PNT const& texturePoint0, TX_PNT const& texturePoint1) noexcept -
 void txcntrv(FRM_HEAD const& textureForm);
 void txdelal();
 auto txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool;
+void txfn(uint32_t& textureType, uint32_t formIndex);
 void txgro(FRM_HEAD const& textureForm);
 void txhor(FRM_HEAD& form);
 auto txnam(std::wstring& name) -> bool;
@@ -1050,29 +1051,23 @@ void txi::txpar(FRM_HEAD& form) {
 
 void txi::txvrt(FRM_HEAD& form) {
   if (!TempTexturePoints->empty()) {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  form.fillType = TXVRTF;
-	  txi::txpar(form);
-	}
+	form.fillType = TXVRTF;
+	txi::txpar(form);
   }
 }
 
 void txi::txhor(FRM_HEAD& form) {
   if (!TempTexturePoints->empty()) {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  form.fillType = TXHORF;
-	  txi::txpar(form);
-	}
+	form.fillType = TXHORF;
+	txi::txpar(form);
   }
 }
 
 void txi::txang(FRM_HEAD& form) {
   if (!TempTexturePoints->empty()) {
-	if (StateMap->test(StateFlag::FORMSEL)) {
-	  form.fillType              = TXANGF;
-	  form.angleOrClipData.angle = IniFile.fillAngle;
-	  txi::txpar(form);
-	}
+	form.fillType              = TXANGF;
+	form.angleOrClipData.angle = IniFile.fillAngle;
+	txi::txpar(form);
   }
 }
 
@@ -1172,15 +1167,13 @@ void txi::nutx(FRM_HEAD& form) {
 // Ensure all lines in the texture have at least 1 point
 void txi::altx() {
   auto txtLines = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	auto const halfHeight = TextureScreen.areaHeight / 2.0F;
-	for (auto const& texturePoint : *TempTexturePoints) {
-	  txtLines.set(texturePoint.line);
-	}
-	for (uint16_t iLine = 1; iLine <= TextureScreen.lines; ++iLine) {
-	  if (!txtLines.test(iLine)) {
-		TempTexturePoints->push_back(TX_PNT {halfHeight, iLine});
-	  }
+  auto const halfHeight = TextureScreen.areaHeight / 2.0F;
+  for (auto const& texturePoint : *TempTexturePoints) {
+	txtLines.set(texturePoint.line);
+  }
+  for (uint16_t iLine = 1; iLine <= TextureScreen.lines; ++iLine) {
+	if (!txtLines.test(iLine)) {
+	  TempTexturePoints->push_back(TX_PNT {halfHeight, iLine});
 	}
   }
 }
@@ -1204,35 +1197,45 @@ void texture::txof() {
 
 enum TextureStyles { VRTYP, HORTYP, ANGTYP };
 
-void txi::dutxfn(uint32_t textureType) {
-  if (StateMap->test(StateFlag::FORMSEL)) {
-	txi::altx();
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	clip::delmclp(ClosestFormToCursor);
-	if (form.satinGuideCount != 0U) {
-	  satin::delsac(ClosestFormToCursor);
+void txi::txfn(uint32_t& textureType, uint32_t formIndex) {
+  auto& form = FormList->operator[](formIndex);
+  clip::delmclp(formIndex);
+  if (form.satinGuideCount != 0U) {
+	satin::delsac(formIndex);
+  }
+  texture::deltx(formIndex);
+  texture::savtxt();
+  txi::nutx(form);
+  form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
+  switch (textureType) {
+	case VRTYP: {
+	  txi::txvrt(form);
+	  break;
 	}
-	texture::deltx(ClosestFormToCursor);
-	texture::savtxt();
-	txi::nutx(form);
-	form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
-	switch (textureType) {
-	  case VRTYP: {
-		txi::txvrt(form);
-		break;
-	  }
-	  case HORTYP: {
-		txi::txhor(form);
-		break;
-	  }
-	  case ANGTYP: {
-		txi::txang(form);
-		break;
-	  }
-	  default: {
-		outDebugString(L"default hit in dutxfn: textureType [{}]\n", textureType);
-		break;
-	  }
+	case HORTYP: {
+	  txi::txhor(form);
+	  break;
+	}
+	case ANGTYP: {
+	  txi::txang(form);
+	  break;
+	}
+	default: {
+	  outDebugString(L"default hit in dutxfn: textureType [{}]\n", textureType);
+	  break;
+	}
+  }
+}
+
+void txi::dutxfn(uint32_t textureType) {
+  txi::altx();
+  if (StateMap->test(StateFlag::FORMSEL)) {
+	txfn(textureType, ClosestFormToCursor);
+  }
+  else {
+	for (auto const selectedForm : (*SelectedFormList)) {
+	  ClosestFormToCursor = selectedForm;
+	  txfn(textureType, selectedForm);
 	}
   }
   texture::txof();
