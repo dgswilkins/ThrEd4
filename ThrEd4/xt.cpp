@@ -585,9 +585,11 @@ void xt::fethr() {
   }
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
+	  if (FormList->operator[](selectedForm).vertexCount > 2U) {
 	  ClosestFormToCursor = selectedForm;
 	  xt::fethrf();
 	}
+  }
   }
   StateMap->set(StateFlag::INIT);
   thred::coltab();
