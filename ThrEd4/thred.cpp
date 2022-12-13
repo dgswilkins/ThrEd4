@@ -8169,7 +8169,7 @@ auto thi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
   if (start > finish) {
 	std::swap(start, finish);
   }
-  if (destination >= start && destination < finish) {
+  if (destination >= start && destination <= finish) {
 	displayText::tabmsg(IDS_DST1);
 	return false;
   }
