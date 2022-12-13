@@ -1046,8 +1046,8 @@ void trace::blak() {
 	displayText::tabmsg(IDS_MAPLOD);
 	return;
   }
-  ti::tracwnd();
   if (!FormList->empty()) {
+  ti::tracwnd();
 	BlackPen = wrap::createPen(PS_SOLID, PENNWID, PENBLK);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(bitmap::getTraceDC(), BlackPen);
