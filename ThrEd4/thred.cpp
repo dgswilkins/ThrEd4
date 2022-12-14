@@ -2729,24 +2729,22 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 	auto iPrevStitch = thi::find1st();
 	auto iStitch     = iPrevStitch + 1U;
 	auto lastStitch  = StitchBuffer->size();
-	if (!StitchBuffer->empty()) { // find the first small stitch in the selected form
-	  --lastStitch;
-	  while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
-		auto const& stitch     = StitchBuffer->operator[](iStitch);
-		auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
-		if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
-		  if ((stitch.attribute & KNOTMSK) == 0U) { // is this a knot?
-			auto const delta = F_POINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
-			stitchSize       = hypot(delta.x, delta.y);
-			if (stitchSize > SmallStitchLength) {
-			  ++iPrevStitch;
-			  ++iStitch;
-			}
+	--lastStitch;
+	while (iStitch < lastStitch && stitchSize > SmallStitchLength) {
+	  auto const& stitch     = StitchBuffer->operator[](iStitch);
+	  auto const& prevStitch = StitchBuffer->operator[](iPrevStitch);
+	  if (((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & FRMSK) == codedAttribute) { // are we still in the selected form?
+		if ((stitch.attribute & KNOTMSK) == 0U) { // is this a knot?
+		  auto const delta = F_POINT {stitch.x - prevStitch.x, stitch.y - prevStitch.y};
+		  stitchSize       = hypot(delta.x, delta.y);
+		  if (stitchSize > SmallStitchLength) {
+			++iPrevStitch;
+			++iStitch;
 		  }
 		}
-		else {
-		  return; // we reached the last stitch in the selected form without seeing a small stitch so don't do anything
-		}
+	  }
+	  else {
+		return; // we reached the last stitch in the selected form without seeing a small stitch so don't do anything
 	  }
 	}
 	if (iStitch != lastStitch) {
