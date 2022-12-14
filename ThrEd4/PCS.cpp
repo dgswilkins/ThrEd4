@@ -237,7 +237,7 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
   F_POINT const boundingSize = {boundingRect.right - boundingRect.left,
                                 boundingRect.top - boundingRect.bottom};
   if (boundingSize.x > LHUPX || boundingSize.y > LHUPY) {
-	displayText::tabmsg(IDS_PFAF2L);
+	displayText::tabmsg(IDS_PFAF2L, false);
 	return true;
   }
   auto const largeFlag =
@@ -334,7 +334,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  }
 	  else {
 		StateMap->reset(StateFlag::INIT);
-		displayText::tabmsg(IDS_SHRTF);
+		displayText::tabmsg(IDS_SHRTF, false);
 		thred::coltab();
 		StateMap->set(StateFlag::RESTCH);
 	  }

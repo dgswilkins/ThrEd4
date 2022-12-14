@@ -703,7 +703,7 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 		}
 		else {
 		  // ToDo - find better error message
-		  displayText::tabmsg(IDS_STCHOUT);
+		  displayText::tabmsg(IDS_STCHOUT, false);
 
 		  flag = false;
 		}

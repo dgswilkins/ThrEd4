@@ -1481,7 +1481,7 @@ void thi::patdun() {
   StateMap->set(StateFlag::WASPAT);
   thred::movStch();
   StateMap->set(StateFlag::RESTCH);
-  displayText::tabmsg(IDS_END);
+  displayText::tabmsg(IDS_END, false);
 }
 
 auto thi::pxchk(float pixelSize) -> uint16_t {
@@ -2246,7 +2246,7 @@ void thi::chknum() {
 		form::frmnumfn(wrap::round<uint32_t>(value));
 	  }
 	  else {
-		displayText::tabmsg(IDS_FRMN1);
+		displayText::tabmsg(IDS_FRMN1, false);
 	  }
 	  return;
 	}
@@ -2826,47 +2826,47 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 
 void thi::duzero() {
   if (!StitchBuffer->empty()) {
-  if (!SelectedFormList->empty()) {
-	auto formMap = boost::dynamic_bitset<>(FormList->size());
-	for (auto const selectedForm : (*SelectedFormList)) {
-	  formMap.set(selectedForm);
-	}
-	StateMap->reset(StateFlag::CONTIG);
-	auto iDestination  = StitchBuffer->begin();
-	auto currentStitch = StitchBuffer->front();
-	for (auto const& iStitch : *StitchBuffer) {
-	  if (((iStitch.attribute & TYPMSK) != 0U) && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
-		if (StateMap->testAndSet(StateFlag::CONTIG)) {
-		  auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
-		  if (stitchLength > MinStitchLength) {
-			currentStitch   = iStitch;
-			(*iDestination) = iStitch;
-			++iDestination;
+	if (!SelectedFormList->empty()) {
+	  auto formMap = boost::dynamic_bitset<>(FormList->size());
+	  for (auto const selectedForm : (*SelectedFormList)) {
+		formMap.set(selectedForm);
+	  }
+	  StateMap->reset(StateFlag::CONTIG);
+	  auto iDestination  = StitchBuffer->begin();
+	  auto currentStitch = StitchBuffer->front();
+	  for (auto const& iStitch : *StitchBuffer) {
+		if (((iStitch.attribute & TYPMSK) != 0U) && formMap.test((iStitch.attribute & FRMSK) >> FRMSHFT)) {
+		  if (StateMap->testAndSet(StateFlag::CONTIG)) {
+			auto const stitchLength = hypot(iStitch.x - currentStitch.x, iStitch.y - currentStitch.y);
+			if (stitchLength > MinStitchLength) {
+			  currentStitch   = iStitch;
+			  (*iDestination) = iStitch;
+			  ++iDestination;
+			}
+		  }
+		  else {
+			currentStitch = iStitch;
 		  }
 		}
 		else {
-		  currentStitch = iStitch;
+		  (*iDestination) = iStitch;
+		  ++iDestination;
+		  StateMap->reset(StateFlag::CONTIG);
 		}
 	  }
-	  else {
-		(*iDestination) = iStitch;
-		++iDestination;
-		StateMap->reset(StateFlag::CONTIG);
-	  }
+	  StitchBuffer->erase(iDestination, StitchBuffer->end());
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
+	  return;
 	}
-	StitchBuffer->erase(iDestination, StitchBuffer->end());
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-	return;
+	if (StateMap->test(StateFlag::GRPSEL)) {
+	  thred::rngadj();
+	  delsmal(GroupStartStitch, GroupEndStitch);
+	}
+	else {
+	  delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
+	}
   }
-  if (StateMap->test(StateFlag::GRPSEL)) {
-	thred::rngadj();
-	delsmal(GroupStartStitch, GroupEndStitch);
-  }
-  else {
-	delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
-  }
-}
 }
 
 void thi::rshft(POINT const& shiftPoint) {
@@ -4212,7 +4212,7 @@ void thi::prtred(HANDLE fileHandle, uint32_t code) {
   CloseHandle(fileHandle);
   StateMap->reset(StateFlag::INIT);
   FormList->clear();
-  displayText::tabmsg(code);
+  displayText::tabmsg(code, false);
   thred::coltab();
   StateMap->set(StateFlag::RESTCH);
 }
@@ -5993,7 +5993,7 @@ void thi::duclip() {
 	return;
   }
   if (StateMap->test(StateFlag::BIGBOX)) {
-	displayText::tabmsg(IDS_INSF);
+	displayText::tabmsg(IDS_INSF, false);
   }
   else {
 	if (OpenClipboard(ThrEdWindow) != 0) {
@@ -6882,7 +6882,7 @@ void thi::delet() {
 	if (!SelectedFormList->empty()) {
 	  if (frmstch()) {
 		StateMap->set(StateFlag::DELSFRMS);
-		displayText::tabmsg(IDS_DELFRM);
+		displayText::tabmsg(IDS_DELFRM, false);
 		displayText::okcan();
 		displayText::tomsg();
 	  }
@@ -6894,7 +6894,7 @@ void thi::delet() {
 	if (StateMap->test(StateFlag::FORMSEL) && !FormList->empty()) {
 	  if (wastch(ClosestFormToCursor)) {
 		StateMap->set(StateFlag::DELFRM);
-		displayText::tabmsg(IDS_FDEL);
+		displayText::tabmsg(IDS_FDEL, false);
 		displayText::okcan();
 		displayText::tomsg();
 	  }
@@ -7279,7 +7279,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	auto bytesRead  = DWORD {};
 	ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr);
 	if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
-	  displayText::tabmsg(IDS_NOTHR);
+	  displayText::tabmsg(IDS_NOTHR, false);
 	  retflag = false;
 	}
 	else {
@@ -7572,7 +7572,7 @@ void thi::purgdir() {
 
 void thi::deldir() {
   thred::unmsg();
-  displayText::tabmsg(IDS_BAKDEL);
+  displayText::tabmsg(IDS_BAKDEL, false);
   auto backSpec = std::wstring {L".th0"};
   for (auto const& filePath : fs::directory_iterator(*DefaultDirectory)) {
 	if (!fs::is_directory(filePath)) {
@@ -7587,7 +7587,7 @@ void thi::deldir() {
 	}
   }
   thred::unmsg();
-  displayText::tabmsg(IDS_BAKDT);
+  displayText::tabmsg(IDS_BAKDT, false);
 }
 
 auto thi::chkwnd(HWND window) noexcept -> bool {
@@ -8172,7 +8172,7 @@ auto thi::movstchs(uint32_t destination, uint32_t start, uint32_t finish) -> boo
 	std::swap(start, finish);
   }
   if (destination >= start && destination <= finish) {
-	displayText::tabmsg(IDS_DST1);
+	displayText::tabmsg(IDS_DST1, false);
 	return false;
   }
   if (destination < start) {
@@ -8289,46 +8289,46 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 
 void thi::rembig() {
   if (!StitchBuffer->empty()) {
-  if (UserStitchLength < IniFile.maxStitchLength) {
-	thred::savdo();
-	do {
-	  if (!SelectedFormList->empty()) {
-		auto range = RANGE {};
-		for (auto const selectedForm : (*SelectedFormList)) {
-		  if (form::frmrng(selectedForm, range)) {
+	if (UserStitchLength < IniFile.maxStitchLength) {
+	  thred::savdo();
+	  do {
+		if (!SelectedFormList->empty()) {
+		  auto range = RANGE {};
+		  for (auto const selectedForm : (*SelectedFormList)) {
+			if (form::frmrng(selectedForm, range)) {
+			  thi::makbig(range.start, range.finish);
+			}
+		  }
+		  break;
+		}
+		if (StateMap->test(StateFlag::FORMSEL)) {
+		  auto range = RANGE {};
+		  if (form::frmrng(ClosestFormToCursor, range)) {
 			thi::makbig(range.start, range.finish);
 		  }
+		  break;
 		}
-		break;
-	  }
-	  if (StateMap->test(StateFlag::FORMSEL)) {
-		auto range = RANGE {};
-		if (form::frmrng(ClosestFormToCursor, range)) {
-		  thi::makbig(range.start, range.finish);
+		if (StateMap->test(StateFlag::GRPSEL)) {
+		  thred::rngadj();
+		  if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
+			++GroupEndStitch;
+		  }
+		  if (ClosestPointIndex < GroupStitchIndex) {
+			GroupStitchIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
+		  }
+		  else {
+			ClosestPointIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
+		  }
+		  thred::grpAdj();
+		  break;
 		}
-		break;
-	  }
-	  if (StateMap->test(StateFlag::GRPSEL)) {
-		thred::rngadj();
-		if (GroupEndStitch < wrap::toUnsigned(StitchBuffer->size())) {
-		  ++GroupEndStitch;
-		}
-		if (ClosestPointIndex < GroupStitchIndex) {
-		  GroupStitchIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
-		}
-		else {
-		  ClosestPointIndex += thi::makbig(GroupStartStitch, GroupEndStitch);
-		}
-		thred::grpAdj();
-		break;
-	  }
-	  thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
-	} while (false);
-	thred::coltab();
-	StateMap->set(StateFlag::RESTCH);
-  }
-  else {
-	displayText::tabmsg(IDS_REM1);
+		thi::makbig(0, wrap::toUnsigned(StitchBuffer->size()));
+	  } while (false);
+	  thred::coltab();
+	  StateMap->set(StateFlag::RESTCH);
+	}
+	else {
+	  displayText::tabmsg(IDS_REM1, false);
 	}
   }
 }
@@ -9927,7 +9927,7 @@ void thi::bakmrk() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_MRK);
+	displayText::tabmsg(IDS_MRK, false);
   }
 }
 
@@ -10026,7 +10026,7 @@ void thi::inscol() {
 	colorMap.set(stitch.attribute & COLMSK);
   }
   if (colorMap.all()) {
-	displayText::tabmsg(IDS_COLAL);
+	displayText::tabmsg(IDS_COLAL, false);
   }
   else {
 	auto nextColor = COLORMAX;
@@ -10075,7 +10075,7 @@ auto thi::usedcol(uint8_t index) -> bool {
 
 void thi::delcol() {
   if (usedcol(VerticalIndex)) {
-	displayText::tabmsg(IDS_COLU);
+	displayText::tabmsg(IDS_COLU, false);
   }
   else {
 	for (auto& stitch : *StitchBuffer) {
@@ -10129,7 +10129,7 @@ void thi::set1knot() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_NOSTCHSEL);
+	displayText::tabmsg(IDS_NOSTCHSEL, false);
   }
 }
 
@@ -11860,7 +11860,7 @@ auto thi::handleSideWindowActive() -> bool {
 		form::contfil();
 	  }
 	  else {
-		displayText::tabmsg(IDS_CONT);
+		displayText::tabmsg(IDS_CONT, false);
 	  }
 	  break;
 	}
@@ -11911,7 +11911,7 @@ auto thi::handleSideWindowActive() -> bool {
 		break;
 	  }
 	  if (texture::dutxtfil()) {
-	  textureFlag = true;
+		textureFlag = true;
 	  }
 	  break;
 	}
@@ -11922,7 +11922,7 @@ auto thi::handleSideWindowActive() -> bool {
 		break;
 	  }
 	  if (texture::dutxtfil()) {
-	  textureFlag = true;
+		textureFlag = true;
 	  }
 	  break;
 	}
@@ -11934,7 +11934,7 @@ auto thi::handleSideWindowActive() -> bool {
 		break;
 	  }
 	  if (texture::dutxtfil()) {
-	  textureFlag = true;
+		textureFlag = true;
 	  }
 	  break;
 	}
@@ -15069,7 +15069,7 @@ auto thi::handleViewMenu(WORD const& wParameter) -> bool {
 	  break;
 	}
 	case ID_ABOUT: { // view / About ThrEd4
-	  displayText::tabmsg(IDS_CPYRIT);
+	  displayText::tabmsg(IDS_CPYRIT, false);
 	  flag = true;
 	  break;
 	}

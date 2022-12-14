@@ -15,7 +15,7 @@ void hlp::help() {
 #pragma warning(suppress : 26462) // con.4 NOLINTNEXTLINE(readability-qualified-auto)
 	auto const helpWindow = HtmlHelp(ThrEdWindow, helpfile.c_str(), HH_DISPLAY_TOPIC, 0);
 	if (nullptr == helpWindow) {
-	  displayText::tabmsg(IDS_NOHLP);
+	  displayText::tabmsg(IDS_NOHLP, false);
 	}
   }
 }

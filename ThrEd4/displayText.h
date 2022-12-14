@@ -51,7 +51,7 @@ template <class inType> void showMessage(uint32_t messageId, inType value) {
 void shord();
 void shoseln(uint32_t code0, uint32_t code1);
 void spltmsg();
-void tabmsg(uint32_t code);
+void tabmsg(uint32_t code,bool top);
 void tomsg();
 void tsizmsg(wchar_t const* threadSizeText, float threadSize);
 void updateWinFont(HWND hWnd) noexcept;

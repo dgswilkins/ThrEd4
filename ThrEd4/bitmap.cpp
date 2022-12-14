@@ -194,7 +194,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
   else {
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
-	displayText::tabmsg(IDS_BMAP);
+	displayText::tabmsg(IDS_BMAP, false);
   }
 }
 
@@ -313,11 +313,11 @@ auto bi::saveName(fs::path& fileName) {
 void bitmap::savmap() {
   if (bitmap::ismap() && (nullptr != TraceBitmapData)) {
 	if (StateMap->test(StateFlag::MONOMAP)) {
-	  displayText::tabmsg(IDS_SAVMAP);
+	  displayText::tabmsg(IDS_SAVMAP, false);
 	  return;
 	}
 	if (!StateMap->test(StateFlag::WASTRAC)) {
-	  displayText::tabmsg(IDS_MAPCHG);
+	  displayText::tabmsg(IDS_MAPCHG, false);
 	  return;
 	}
 	if (auto fileName = fs::path {}; bi::saveName(fileName)) {
@@ -341,7 +341,7 @@ void bitmap::savmap() {
 	}
   }
   else {
-	displayText::tabmsg(IDS_SHOMAP);
+	displayText::tabmsg(IDS_SHOMAP, false);
   }
 }
 

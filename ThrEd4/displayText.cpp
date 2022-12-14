@@ -77,8 +77,8 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
   }
 }
 
-void displayText::tabmsg(uint32_t code) {
-  displayText::shoMsg(displayText::loadStr(code), false);
+void displayText::tabmsg(uint32_t code, bool top) {
+  displayText::shoMsg(displayText::loadStr(code), top);
 }
 
 void displayText::hsizmsg() {
@@ -176,7 +176,7 @@ void displayText::ritnum(uint32_t code, uint32_t value) {
 }
 
 void displayText::riter() {
-  displayText::tabmsg(IDS_RITER);
+  displayText::tabmsg(IDS_RITER, false);
 }
 
 void displayText::pntmsg(uint32_t msgID) {
@@ -194,7 +194,7 @@ void displayText::shoseln(uint32_t code0, uint32_t code1) {
 auto displayText::clpmsgs(uint32_t code) -> bool {
   form::ispcdclp();
   if ((code == FML_CLP || code == FMM_CLP || code == FML_PIC) && !StateMap->test(StateFlag::WASPCDCLP)) {
-	displayText::tabmsg(IDS_CLPS);
+	displayText::tabmsg(IDS_CLPS, false);
 	return true;
   }
   return false;
@@ -216,22 +216,22 @@ auto displayText::filmsgs(uint32_t code) -> bool {
 	if (StateMap->test(StateFlag::FORMSEL)) {
 	  if (auto const& form = FormList->operator[](ClosestFormToCursor); form.vertexCount == 2) {
 		if (code < FML_LIN) {
-		  displayText::tabmsg(IDS_FRM3X);
+		  displayText::tabmsg(IDS_FRM3X, false);
 		  return true;
 		}
 
 		if (code == FML_PRPS) {
-		  displayText::tabmsg(IDS_ANGS);
+		  displayText::tabmsg(IDS_ANGS, false);
 		  return true;
 		}
 	  }
 	  return displayText::clpmsgs(code);
 	}
 
-	displayText::tabmsg(IDS_FILSEL);
+	displayText::tabmsg(IDS_FILSEL, false);
 	return true;
   }
-  displayText::tabmsg(IDS_FILCR);
+  displayText::tabmsg(IDS_FILCR, false);
   return true;
 }
 
@@ -240,7 +240,7 @@ void displayText::grpmsg() {
 }
 
 void displayText::grpmsg1() {
-  displayText::tabmsg(IDS_NOGRP);
+  displayText::tabmsg(IDS_NOGRP, false);
 }
 
 void di::sdmsg() {

@@ -927,7 +927,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	}
   }
   else {
-	displayText::tabmsg(IDS_DST2S);
+	displayText::tabmsg(IDS_DST2S, false);
 	CloseHandle(fileHandle);
 	return false;
   }

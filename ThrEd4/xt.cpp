@@ -555,25 +555,25 @@ void xt::fethrf() {
   if (displayText::filmsgs(FMM_FTH)) {
 	return;
   }
-	auto& form = FormList->operator[](ClosestFormToCursor);
-	clip::delmclp(ClosestFormToCursor);
-	texture::deltx(ClosestFormToCursor);
-	form.type                           = SAT;
-	form.fillInfo.feather.ratio         = IniFile.featherRatio;
-	form.fillInfo.feather.upCount       = IniFile.featherUpCount;
-	form.fillInfo.feather.downCount     = IniFile.featherDownCount;
-	form.fillInfo.feather.fillType      = IniFile.featherFillType;
-	form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
-	form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
-	form.extendedAttribute |= IniFile.featherType;
-	form.fillInfo.feather.count     = IniFile.featherCount;
-	form.lengthOrCount.stitchLength = UserStitchLength;
-	form.fillSpacing                = LineSpacing;
-	form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
-	form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
-	form.fillType                   = FTHF;
-	form::refilfn();
-  }
+  auto& form = FormList->operator[](ClosestFormToCursor);
+  clip::delmclp(ClosestFormToCursor);
+  texture::deltx(ClosestFormToCursor);
+  form.type                           = SAT;
+  form.fillInfo.feather.ratio         = IniFile.featherRatio;
+  form.fillInfo.feather.upCount       = IniFile.featherUpCount;
+  form.fillInfo.feather.downCount     = IniFile.featherDownCount;
+  form.fillInfo.feather.fillType      = IniFile.featherFillType;
+  form.fillInfo.feather.minStitchSize = IniFile.featherMinStitchSize;
+  form.extendedAttribute &= ~(AT_FTHUP | AT_FTHBTH | AT_FTHBLND);
+  form.extendedAttribute |= IniFile.featherType;
+  form.fillInfo.feather.count     = IniFile.featherCount;
+  form.lengthOrCount.stitchLength = UserStitchLength;
+  form.fillSpacing                = LineSpacing;
+  form.fillColor                  = gsl::narrow<uint8_t>(ActiveColor);
+  form.fillInfo.feather.color     = (ActiveColor + 1U) & COLMSK;
+  form.fillType                   = FTHF;
+  form::refilfn();
+}
 
 void xt::fethr() {
   if (displayText::filmsgs(FMM_FTH)) {
@@ -586,10 +586,10 @@ void xt::fethr() {
   else {
 	for (auto const selectedForm : (*SelectedFormList)) {
 	  if (FormList->operator[](selectedForm).vertexCount > 2U) {
-	  ClosestFormToCursor = selectedForm;
-	  xt::fethrf();
+		ClosestFormToCursor = selectedForm;
+		xt::fethrf();
+	  }
 	}
-  }
   }
   StateMap->set(StateFlag::INIT);
   thred::coltab();
@@ -1819,7 +1819,7 @@ void xt::dusulen(float length) {
 }
 
 void xt::setEdit(uint32_t code, StateFlag flag) {
-  displayText::tabmsg(code);
+  displayText::tabmsg(code, true);
   StateMap->set(StateFlag::NUMIN);
   StateMap->set(flag);
   displayText::numWnd();

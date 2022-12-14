@@ -316,7 +316,7 @@ void trace::untrace() {
 
 void trace::trdif() {
   if (!bitmap::ismap()) {
-	displayText::tabmsg(IDS_MAPLOD);
+	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
   StateMap->reset(StateFlag::TRSET);
@@ -473,7 +473,7 @@ void trace::trace() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_MAPLOD);
+	displayText::tabmsg(IDS_MAPLOD, false);
   }
 }
 
@@ -828,7 +828,7 @@ void ti::dutrac() {
 	                                  gsl::narrow<int16_t>(CurrentTracePoint.y)});
 	while (ti::trcbit(initialDirection, traceDirection, tracedPoints)) { }
 	if (tracedPoints.size() >= POINTMAX) {
-	  displayText::tabmsg(IDS_FRM2L);
+	  displayText::tabmsg(IDS_FRM2L, false);
 	  return;
 	}
 #ifndef TESTTRC
@@ -928,7 +928,7 @@ void trace::trinit() {
 	trace::trace();
   }
   else {
-	displayText::tabmsg(IDS_MAPLOD);
+	displayText::tabmsg(IDS_MAPLOD, false);
   }
 }
 
@@ -962,7 +962,7 @@ void trace::trcsel() {
 	ti::tracwnd();
   }
   else {
-	displayText::tabmsg(IDS_MAPLOD);
+	displayText::tabmsg(IDS_MAPLOD, false);
   }
 }
 
@@ -1043,11 +1043,11 @@ void ti::trnumwnd1(int32_t position) noexcept {
 
 void trace::blak() {
   if (!bitmap::ismap()) {
-	displayText::tabmsg(IDS_MAPLOD);
+	displayText::tabmsg(IDS_MAPLOD, false);
 	return;
   }
   if (!FormList->empty()) {
-  ti::tracwnd();
+	ti::tracwnd();
 	BlackPen = wrap::createPen(PS_SOLID, PENNWID, PENBLK);
 	SelectObject(bitmap::getBitmapDC(), BlackPen);
 	SelectObject(bitmap::getTraceDC(), BlackPen);
@@ -1062,7 +1062,7 @@ void trace::blak() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_FRMNO);
+	displayText::tabmsg(IDS_FRMNO, false);
   }
 }
 

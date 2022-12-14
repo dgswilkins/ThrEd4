@@ -5350,7 +5350,7 @@ void form::refil() {
 	  }
 	  thred::undat();
 	  if (nullptr == MsgWindow) {
-		displayText::tabmsg(IDS_REFIL);
+		displayText::tabmsg(IDS_REFIL, true);
 		displayText::okcan();
 	  }
 	  StateMap->set(StateFlag::MOVMSG);
@@ -5884,7 +5884,7 @@ void form::unfil() {
 		    std::ranges::any_of(*StitchBuffer, [&codedForm](F_POINT_ATTR const& stitch) -> bool {
 		      return ((stitch.attribute & NOTFRM) == 0U) && (stitch.attribute & (USMSK | FRMSK)) == codedForm;
 		    })) {
-		  displayText::tabmsg(IDS_UNFIL);
+		  displayText::tabmsg(IDS_UNFIL, true);
 		  StateMap->set(StateFlag::FILMSG);
 		  displayText::okcan();
 		  StateMap->set(StateFlag::IGNOR);
@@ -6077,7 +6077,7 @@ void form::fclp() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -7323,7 +7323,7 @@ void form::clpfil() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -7869,15 +7869,15 @@ void form::selfil(uint32_t type) {
   if (StateMap->test(StateFlag::FORMSEL)) {
 	auto const& currentForm = FormList->operator[](ClosestFormToCursor);
 	if (type == FRMFIL && (currentForm.fillType == 0U)) {
-	  displayText::tabmsg(IDS_FSELF);
+	  displayText::tabmsg(IDS_FSELF, false);
 	  return;
 	}
 	if (type == FRMBFIL && (currentForm.edgeType == 0U)) {
-	  displayText::tabmsg(IDS_FSELB);
+	  displayText::tabmsg(IDS_FSELB, false);
 	  return;
 	}
 	if (type == FRMAPFIL && (currentForm.edgeType & NEGUND) != EDGEAPPL) {
-	  displayText::tabmsg(IDS_FSELA);
+	  displayText::tabmsg(IDS_FSELA, false);
 	  return;
 	}
 	fi::frmpnts(type);
@@ -7887,7 +7887,7 @@ void form::selfil(uint32_t type) {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_SEL1FRM);
+	displayText::tabmsg(IDS_SEL1FRM, false);
   }
 }
 
@@ -7908,11 +7908,11 @@ void form::selalfil() {
 	}
 	else {
 	  ClosestPointIndex = savedIndex;
-	  displayText::tabmsg(IDS_FSELM);
+	  displayText::tabmsg(IDS_FSELM, false);
 	}
   }
   else {
-	displayText::tabmsg(IDS_SEL1FRM);
+	displayText::tabmsg(IDS_SEL1FRM, false);
   }
 }
 
@@ -8012,7 +8012,7 @@ void form::fcntr() {
 	StateMap->set(StateFlag::RESTCH);
   }
   else {
-	displayText::tabmsg(IDS_SELC);
+	displayText::tabmsg(IDS_SELC, false);
   }
 }
 
@@ -8078,7 +8078,7 @@ void form::picot() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -8124,7 +8124,7 @@ void form::contfil() {
 	  StateMap->set(StateFlag::RESTCH);
 	}
 	else {
-	  displayText::tabmsg(IDS_CONT);
+	  displayText::tabmsg(IDS_CONT, false);
 	}
   }
 }
@@ -8687,7 +8687,7 @@ void form::spltfrm() {
 		  StateMap->set(StateFlag::RESTCH);
 		}
 		else {
-		  displayText::tabmsg(IDS_FRM3);
+		  displayText::tabmsg(IDS_FRM3, false);
 		}
 		return;
 	  }
@@ -8702,7 +8702,7 @@ void form::stchs2frm() {
 	thred::rngadj();
 	if (constexpr auto STITCHMX = 12000U; // maximum number of stitches in a group
 	    (GroupEndStitch - GroupStartStitch) > STITCHMX) {
-	  displayText::tabmsg(IDS_STMAX);
+	  displayText::tabmsg(IDS_STMAX, false);
 	  return;
 	}
 	auto const vertexCount  = GroupEndStitch - GroupStartStitch + 1U;
@@ -8781,7 +8781,7 @@ void form::vrtclp() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -8846,7 +8846,7 @@ void form::horclp() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -8910,7 +8910,7 @@ void form::angclp() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {
@@ -9176,7 +9176,7 @@ void form::filclpx() {
 		}
 	  }
 	  else {
-		displayText::tabmsg(IDS_CLP);
+		displayText::tabmsg(IDS_CLP, false);
 	  }
 	}
 	else {

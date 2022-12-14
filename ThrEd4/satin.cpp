@@ -844,7 +844,7 @@ void satin::ribon() {
 	  }
 	}
 	else {
-	  displayText::tabmsg(IDS_FRM2);
+	  displayText::tabmsg(IDS_FRM2, false);
 	}
   }
   else {

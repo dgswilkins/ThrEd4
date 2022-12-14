@@ -922,7 +922,7 @@ void ci::duch(std::vector<F_POINT> const& chainEndPoints) {
 	}
   }
   else {
-	displayText::tabmsg(IDS_CHANSMAL);
+	displayText::tabmsg(IDS_CHANSMAL, false);
   }
 }
 

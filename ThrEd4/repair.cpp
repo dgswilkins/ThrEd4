@@ -481,7 +481,7 @@ void repair::frmchkx() {
 	  case 3: {
 		if (code != 0U) {
 		  repair::repar();
-		  displayText::tabmsg(IDS_DATREP);
+		  displayText::tabmsg(IDS_DATREP, false);
 		}
 		break;
 	  }
