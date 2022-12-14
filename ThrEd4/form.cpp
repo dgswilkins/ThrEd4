@@ -8700,6 +8700,7 @@ void form::stchs2frm() {
   if (StateMap->test(StateFlag::GRPSEL)) {
 	thred::savdo();
 	thred::rngadj();
+	// ToDo - Is this still a valid restriction?
 	if (constexpr auto STITCHMX = 12000U; // maximum number of stitches in a group
 	    (GroupEndStitch - GroupStartStitch) > STITCHMX) {
 	  displayText::tabmsg(IDS_STMAX, false);
