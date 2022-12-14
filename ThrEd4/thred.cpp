@@ -2825,6 +2825,7 @@ void thi::delsmal(uint32_t startStitch, uint32_t endStitch) {
 }
 
 void thi::duzero() {
+  if (!StitchBuffer->empty()) {
   if (!SelectedFormList->empty()) {
 	auto formMap = boost::dynamic_bitset<>(FormList->size());
 	for (auto const selectedForm : (*SelectedFormList)) {
@@ -2865,6 +2866,7 @@ void thi::duzero() {
   else {
 	delsmal(0, wrap::toUnsigned(StitchBuffer->size()));
   }
+}
 }
 
 void thi::rshft(POINT const& shiftPoint) {
@@ -8286,6 +8288,7 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 }
 
 void thi::rembig() {
+  if (!StitchBuffer->empty()) {
   if (UserStitchLength < IniFile.maxStitchLength) {
 	thred::savdo();
 	do {
@@ -8326,6 +8329,7 @@ void thi::rembig() {
   }
   else {
 	displayText::tabmsg(IDS_REM1);
+	}
   }
 }
 
