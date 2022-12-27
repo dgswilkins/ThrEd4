@@ -8253,7 +8253,7 @@ auto thi::makbig(uint32_t start, uint32_t finish) -> uint32_t {
 	  auto       attribute   = (*stitchIt).attribute;
 	  if (attribute != (*nextStitchIt).attribute) {
 		if (((attribute & NOTFRM) == 0U) && (((*nextStitchIt).attribute & TYPMSK) != 0U)) {
-		  if (!((attribute & FRMSK) == ((*nextStitchIt).attribute & FRMSK))) {
+		  if ((attribute & FRMSK) != ((*nextStitchIt).attribute & FRMSK)) {
 			attribute &= NTYPMSK;
 			attribute |= NOTFRM;
 		  }
