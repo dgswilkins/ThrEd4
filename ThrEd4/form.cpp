@@ -8300,7 +8300,7 @@ void form::frmnumfn(uint32_t newFormIndex) {
 	  }
 	}
 	ClosestFormToCursor = newFormIndex;
-	displayText::ritnum(IDS_NUMFRM, ClosestFormToCursor);
+	displayText::ritnum(IDS_NUMFORM, ClosestFormToCursor);
   }
 }
 

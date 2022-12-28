@@ -129,7 +129,6 @@
 #define IDD_WAV                         118
 #define IDS_NUMPNT                      119
 #define IDD_FETHDEF                     119
-#define IDS_NUMFRM                      120
 #define IDS_NUMSEL                      121
 #define IDD_DASY                        121
 #define IDS_NUMSCH                      122
