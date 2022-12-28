@@ -1232,22 +1232,7 @@ void thred::savdo() {
 
 void thi::nunams() {
   *AuxName = *WorkingFileName;
-  switch (IniFile.auxFileType) {
-	case AUXDST: {
-	  AuxName->replace_extension(L".dst");
-	  break;
-	}
-#if PESACT
-	case AUXPES: {
-	  AuxName->replace_extension(L".pes");
-	  break;
-	}
-#endif
-	default: {
-	  AuxName->replace_extension(L".pcs");
-	  break;
-	}
-  }
+  xt::duauxnam(*AuxName);
   *ThrName = *WorkingFileName;
   ThrName->replace_extension(L".thr");
   auto flag         = true;
