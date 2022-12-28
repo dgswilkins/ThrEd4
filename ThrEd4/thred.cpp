@@ -246,7 +246,7 @@ auto CALLBACK fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) ->
 
 void getbak();
 void getdes() noexcept;
-void getDocsFolder(fs::path* directory);
+void getDocsFolder(fs::path& directory);
 void getfrmbox();
 void getfrmpix();
 auto gethand(std::vector<F_POINT_ATTR> const& stitch, uint32_t stitchCount) noexcept -> uint32_t;
@@ -3240,22 +3240,20 @@ auto thred::stch2pxr(F_POINT const& stitchCoordinate) -> POINT {
                                     (stitchCoordinate.y - ZoomRect.bottom) * ZoomRatio.y)};
 }
 
-void thi::getDocsFolder(fs::path* directory) {
-  if (directory != nullptr) {
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
-	auto const hResult  = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
+void thi::getDocsFolder(fs::path& directory) {
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto       ppszPath = PWSTR {nullptr}; // variable to receive the path memory block pointer.
+  auto const hResult  = SHGetKnownFolderPath(FOLDERID_Documents, 0, nullptr, &ppszPath);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast)
-	if (SUCCEEDED(hResult)) {
-	  directory->assign(ppszPath); // make a local copy of the path
-	}
-	CoTaskMemFree(ppszPath); // free up the path memory block
+  if (SUCCEEDED(hResult)) {
+	directory.assign(ppszPath); // make a local copy of the path
   }
+  CoTaskMemFree(ppszPath); // free up the path memory block
 }
 
 void thi::defNam(fs::path const& fileName) {
   if (fileName.empty()) {
-	getDocsFolder(DefaultDirectory);
+	getDocsFolder(*DefaultDirectory);
   }
   else {
 	*DefaultDirectory = fileName.parent_path();
@@ -16149,7 +16147,7 @@ void thi::ducmd() {
 
 void thi::setPrefs() {
   defpref();
-  getDocsFolder(DefaultDirectory);
+  getDocsFolder(*DefaultDirectory);
   if (DesignerName->empty()) {
 	DesignerName->assign(displayText::loadStr(IDS_UNAM));
 	getdes();
