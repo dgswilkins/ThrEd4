@@ -383,7 +383,7 @@ void ritfnam(std::wstring const& designerName);
 void ritini();
 void ritlayr();
 void ritloc();
-void ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
+void ritlock(gsl::not_null<WIN32_FIND_DATA const*> fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
 void ritrot(float rotationAngle, F_POINT const& rotationCenter);
 void rngal();
 void rot(F_POINT& rotationCenter);
@@ -9587,26 +9587,25 @@ void thi::gsnap() {
   }
 }
 
-void thi::ritlock(WIN32_FIND_DATA const* fileData, uint32_t fileIndex, HWND hwndlg) noexcept {
-  if (fileData != nullptr) {
-	SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
-	SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
-	for (auto iFile = 0U; iFile < fileIndex; ++iFile) {
-	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  if ((fileData[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
+void thi::ritlock(gsl::not_null<WIN32_FIND_DATA const*> fileData, uint32_t fileIndex, HWND hwndlg) noexcept {
+  SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
+  SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
+  auto const spFileData = gsl::span {fileData.get(), fileIndex};
+  for (auto const& iFile : spFileData) {
+	// NOLINTNEXTLINE(hicpp-signed-bitwise)
+	if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-		SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
-		            LB_ADDSTRING,
-		            0,
-		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-	  }
-	  else {
+	  SendMessage(GetDlgItem(hwndlg, IDC_LOCKED),
+	              LB_ADDSTRING,
+	              0,
+	              reinterpret_cast<LPARAM>(iFile.cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
+	}
+	else {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
-		SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
-		            LB_ADDSTRING,
-		            0,
-		            reinterpret_cast<LPARAM>(fileData[iFile].cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
-	  }
+	  SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED),
+	              LB_ADDSTRING,
+	              0,
+	              reinterpret_cast<LPARAM>(iFile.cFileName)); // NOLINT(cppcoreguidelines-pro-type-reinterpret-cast)
 	}
   }
 }
