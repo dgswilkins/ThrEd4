@@ -142,8 +142,7 @@ void texture::initTextures(std::vector<TX_PNT>*   ptrTexturePoints,
 }
 
 auto txi::txnam(std::wstring& name) -> bool {
-  auto const* texturePath = thred::getHomeDir();
-  if (nullptr != texturePath) {
+  if (auto const* texturePath = thred::getHomeDir(); nullptr != texturePath) {
 	auto const textureFile = *texturePath / L"thred.txr";
 	name.assign(textureFile.generic_wstring());
 	return true;

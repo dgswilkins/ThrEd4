@@ -122,9 +122,9 @@ auto ti::trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) 
   // NOLINTNEXTLINE(hicpp-signed-bitwise)
   constexpr auto DW_STYLE = DWORD {SS_OWNERDRAW | WS_CHILD | WS_BORDER};
   // NOLINTNEXTLINE(readability-qualified-auto)
-  auto const window = CreateWindowEx(
-      0L, L"STATIC", L"", DW_STYLE, xCoordinate, yCoordinate, ButtonWidth, buttonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
-  if (nullptr != window) {
+  if (auto const window = CreateWindowEx(
+          0L, L"STATIC", L"", DW_STYLE, xCoordinate, yCoordinate, ButtonWidth, buttonHeight, ThrEdWindow, nullptr, ThrEdInstance, nullptr);
+      nullptr != window) {
 	return window;
   }
   throw std::runtime_error("No window created in trcsub");
