@@ -52,7 +52,7 @@ void clrstch() noexcept;
 void dmpat();
 #endif
 
-void duauxnam();
+void duauxnam(fs::path& auxName);
 void dubcol(uint8_t color);
 void dubit(FRM_HEAD& form, uint32_t bit);
 void dublen(float length);

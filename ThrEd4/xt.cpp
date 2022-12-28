@@ -2292,21 +2292,20 @@ void xt::setfilend() {
   }
 }
 
-void xt::duauxnam() {
-  *AuxName = *WorkingFileName;
+void xt::duauxnam(fs::path& auxName) {
   switch (IniFile.auxFileType) {
 	case AUXDST: {
-	  AuxName->replace_extension(".dst");
+	  auxName.replace_extension(".dst");
 	  break;
 	}
 #if PESACT
 	case AUXPES: {
-	  AuxName->replace_extension(".pes");
+	  auxName.replace_extension(".pes");
 	  break;
 	}
 #endif
 	default: {
-	  AuxName->replace_extension("pcs");
+	  auxName.replace_extension("pcs");
 	  break;
 	}
   }

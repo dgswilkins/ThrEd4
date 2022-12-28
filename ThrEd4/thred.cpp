@@ -3766,8 +3766,9 @@ void thi::chk1col() {
 }
 
 void thi::sav() {
-  xt::duauxnam();
-  if ((nullptr == AuxName) || chkattr(*AuxName)) {
+  *AuxName = *WorkingFileName;
+  xt::duauxnam(*AuxName);
+  if (chkattr(*AuxName)) {
 	return;
   }
   if (StitchBuffer->empty()) {
