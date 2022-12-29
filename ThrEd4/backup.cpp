@@ -44,6 +44,9 @@ class BACK_HEAD // Backup header
 static auto UndoBufferWriteIndex = uint32_t {}; // undo storage pointer
 static auto UndoBufferReadIndex  = uint32_t {}; // undo retrieval pointers
 
+// Supress bounds.1 	Don't use pointer arithmetic. Use span instead
+#pragma warning(push)
+#pragma warning(disable : 26481)
 void backup::dudat() {
   auto& undoBuffer = *UndoBuffer;
   undoBuffer[UndoBufferWriteIndex].reset(nullptr);
@@ -100,6 +103,7 @@ void backup::dudat() {
 	}
   }
 }
+#pragma warning(pop)
 
 void backup::deldu() {
   for (auto& undo : *UndoBuffer) {
