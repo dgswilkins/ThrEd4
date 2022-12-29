@@ -965,18 +965,21 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
       if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
 		auto const name = convAuxName.substr(pos + 1);
-		auto it   = spDstHdrDesc.begin();
+		auto itChar   = spDstHdrDesc.begin();
 		for (auto const& iDHD : name) {
-		  if ((iDHD != '.') && (it != spDstHdrDesc.end())) {
-			*it = iDHD;
+		  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
+			*itChar = iDHD;
 		  }
 		  else {
 			break;
 		  }
-		  ++it;
+		  ++itChar;
 		}
 	  }
 	  // clang-format off
+      // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
+      #pragma warning(push)
+      #pragma warning(disable : 26481)
       spDstHdrDesc.back() = 0xd;
       strncpy(static_cast<char *>(dstHeader.recshed),    "ST:",      sizeof(dstHeader.recshed));                                      // NOLINT(clang-diagnostic-deprecated-declarations)                                        
       strncpy(static_cast<char *>(dstHeader.recs),  fmt::format(FMT_STRING("{:7d}\r"), dstRecords.size()).c_str(), sizeof(dstHeader.recs));       // NOLINT(clang-diagnostic-deprecated-declarations)       
@@ -1001,6 +1004,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
       strncpy(static_cast<char *>(dstHeader.pdhed),      "PD",       sizeof(dstHeader.pdhed));                                        // NOLINT(clang-diagnostic-deprecated-declarations)
       strncpy(static_cast<char *>(dstHeader.pd),         "******\r", sizeof(dstHeader.pd));                                           // NOLINT(clang-diagnostic-deprecated-declarations)
       strncpy(static_cast<char *>(dstHeader.eof),        "\x1a",     sizeof(dstHeader.eof));                                          // NOLINT(clang-diagnostic-deprecated-declarations)
+      #pragma warning(pop)
 	  // clang-format on
 	  auto& res = dstHeader.res;
 	  std::ranges::fill(res, ' ');
