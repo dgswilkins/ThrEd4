@@ -375,7 +375,7 @@ void relin();
 void rembig();
 void respac(FRM_HEAD& form) noexcept;
 void retrac();
-void ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem);
+void ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem);
 void ritbal();
 void ritcor(F_POINT_ATTR const& pointAttribute);
 void ritcur();
@@ -17139,7 +17139,7 @@ void thi::dubar() {
   }
 }
 
-void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
+void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto thrEdFile = CreateFile(fileName.wstring().c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
@@ -17179,8 +17179,8 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 		  }
 		}
 	  }
-	  auto const drawingDestinationSize = SIZE {(drawItem->rcItem.right - drawItem->rcItem.left),
-	                                            (drawItem->rcItem.bottom - drawItem->rcItem.top)};
+	  auto const drawingDestinationSize = SIZE {(drawItem.rcItem.right - drawItem.rcItem.left),
+	                                            (drawItem.rcItem.bottom - drawItem.rcItem.top)};
 	  auto const xRatio = wrap::toFloat(drawingDestinationSize.cx) / stitchSourceSize.x;
 	  auto const yRatio = wrap::toFloat(drawingDestinationSize.cy) / stitchSourceSize.y;
 	  auto const ratio  = (xRatio < yRatio) ? xRatio : yRatio;
@@ -17201,8 +17201,8 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 		  wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, nullptr);
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto brush = CreateSolidBrush(brushColor);
-		  SelectObject(drawItem->hDC, brush);
-		  FillRect(drawItem->hDC, &drawItem->rcItem, brush);
+		  SelectObject(drawItem.hDC, brush);
+		  FillRect(drawItem.hDC, &drawItem.rcItem, brush);
 		  auto iColor = stitchesToDraw[0].attribute & COLMSK;
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto pen   = wrap::createPen(PS_SOLID, PENNWID, colors[iColor]);
@@ -17215,16 +17215,16 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 			}
 			else {
 			  thred::nuPen(pen, 1, colors[iColor]);
-			  SelectObject(drawItem->hDC, pen);
-			  wrap::polyline(drawItem->hDC, lines.data(), iLine);
+			  SelectObject(drawItem.hDC, pen);
+			  wrap::polyline(drawItem.hDC, lines.data(), iLine);
 			  iLine  = 0;
 			  iColor = stitchesToDraw[iStitch].attribute & COLMSK;
 			}
 		  }
 		  if (iLine != 0U) {
 			thred::nuPen(pen, 1, colors[iColor]);
-			SelectObject(drawItem->hDC, pen);
-			wrap::polyline(drawItem->hDC, lines.data(), iLine);
+			SelectObject(drawItem.hDC, pen);
+			wrap::polyline(drawItem.hDC, lines.data(), iLine);
 		  }
 		  DeleteObject(brush);
 		  DeleteObject(pen);
@@ -17290,13 +17290,13 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT* drawItem) {
 			lines[formList[iForm].vertexCount] = {
 			    std::lround(vertexList[iLine].x * ratio),
 			    std::lround(wrap::toFloat(drawingDestinationSize.cy) - vertexList[iLine].y * ratio)};
-			SelectObject(drawItem->hDC, FormPen);
-			SetROP2(drawItem->hDC, R2_XORPEN);
+			SelectObject(drawItem.hDC, FormPen);
+			SetROP2(drawItem.hDC, R2_XORPEN);
 			if (formList[iForm].type == FRMLINE) {
-			  wrap::polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount);
+			  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount);
 			}
 			else {
-			  wrap::polyline(drawItem->hDC, lines.data(), formList[iForm].vertexCount + 1U);
+			  wrap::polyline(drawItem.hDC, lines.data(), formList[iForm].vertexCount + 1U);
 			}
 			SetROP2(StitchWindowMemDC, R2_COPYPEN);
 		  }
@@ -17644,7 +17644,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  auto itHWndBV = BackupViewer.begin();
 		  for (auto iThumb = uint32_t {}; iThumb < QUADRT; ++iThumb) {
 			if (iThumb < ThumbnailDisplayCount && DrawItem->hwndItem == *itHWndBV) {
-			  ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), DrawItem);
+			  ritbak(Thumbnails->operator[](ThumbnailsSelected[iThumb]).data(), *DrawItem);
 			  rthumnam(iThumb);
 			  return 1;
 			}
@@ -17659,7 +17659,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 			  auto ext      = fileName.extension().wstring();
 			  ext.back()    = iVersion + 's';
 			  fileName.replace_extension(ext);
-			  ritbak(fileName, DrawItem);
+			  ritbak(fileName, *DrawItem);
 			  return 1;
 			}
 			++itHWndBV;
