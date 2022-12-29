@@ -963,15 +963,17 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  std::ranges::fill(dstHeader.desc, ' ');
 	  auto       convAuxName  = utf::utf16ToUtf8(auxName);
 	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-	  if (auto const* desc = strrchr(convAuxName.data(), '\\') + 1U; desc != nullptr) {
-		for (auto& iDHD : spDstHdrDesc) {
-		  if ((*desc != 0) && *desc != '.') {
-			iDHD = *desc;
+      if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
+		auto name = convAuxName.substr(pos + 1);
+		auto it   = spDstHdrDesc.begin();
+		for (auto& iDHD : name) {
+		  if ((iDHD != '.') && (it != spDstHdrDesc.end())) {
+			*it = iDHD;
 		  }
 		  else {
 			break;
 		  }
-		  ++desc;
+		  ++it;
 		}
 	  }
 	  // clang-format off
