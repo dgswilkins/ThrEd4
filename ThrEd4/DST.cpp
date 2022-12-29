@@ -961,12 +961,12 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  // Use sizeof to ensure no overrun if the format string is wrong length
 	  strncpy(static_cast<char*>(dstHeader.desched), "LA:", sizeof(dstHeader.desched)); // NOLINT(clang-diagnostic-deprecated-declarations)
 	  std::ranges::fill(dstHeader.desc, ' ');
-	  auto       convAuxName  = utf::utf16ToUtf8(auxName);
+	  auto const convAuxName  = utf::utf16ToUtf8(auxName);
 	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
       if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
-		auto name = convAuxName.substr(pos + 1);
+		auto const name = convAuxName.substr(pos + 1);
 		auto it   = spDstHdrDesc.begin();
-		for (auto& iDHD : name) {
+		for (auto const& iDHD : name) {
 		  if ((iDHD != '.') && (it != spDstHdrDesc.end())) {
 			*it = iDHD;
 		  }
