@@ -2253,21 +2253,19 @@ void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, ui
   auto       count     = wrap::round<uint32_t>(arc / LineSpacing);
   auto const stepAngle = deltaAngle / wrap::toFloat(count);
   if (count == 0U) {
-	count = 1;
+	count = 1U;
   }
-  if (constexpr auto MASKLSN = 0xfffffff0; // mask out the least significant nibble to check if count > 15
-      (count & MASKLSN) != 0U) {
+  if (count > 15U) {
 	for (auto iCount = 0U; iCount < count; ++iCount) {
 	  auto const level = wrap::toFloat(form::psg() % count) / wrap::toFloat(count);
-	  fillSB(pivot, startAngle, radius, stitchPoint, level);
+	  fi::fillSB(pivot, startAngle, radius, stitchPoint, level);
 	  startAngle += stepAngle;
 	}
   }
   else {
-	if (auto const* levelData = levels.operator[](count); nullptr != levelData) {
-	  for (auto iCount = 0U; iCount < count; ++iCount) {
-		fillSB(pivot, startAngle, radius, stitchPoint, *levelData);
-		++levelData;
+	auto const spLevels = gsl::span(levels.operator[](count), count);
+	for (auto const& level : spLevels) {
+	  fi::fillSB(pivot, startAngle, radius, stitchPoint, level);
 		startAngle += stepAngle;
 	  }
 	}
