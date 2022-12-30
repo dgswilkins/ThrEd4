@@ -2184,22 +2184,22 @@ void fi::fillSB(const F_POINT& pivot, float angle, float const& radius, F_POINT&
 
 void fi::spend(std::vector<V_RECT_2> const& fillVerticalRect, uint32_t start, uint32_t finish, F_POINT& stitchPoint) {
   // clang-format off
-  constexpr auto LEVEL00 = std::array<float,  1U>{ 0.0F };
-  constexpr auto LEVEL01 = std::array<float,  1U>{ 1.0F       };
-  constexpr auto LEVEL02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
-  constexpr auto LEVEL03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
-  constexpr auto LEVEL04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
-  constexpr auto LEVEL05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
-  constexpr auto LEVEL06 = std::array<float,  6U>{ 3.0F/6.0F , 0.0F/6.0F , 2.0F/6.0F , 4.0F/6.0F , 1.0F/6.0F , 5.0F/6.0F  };
-  constexpr auto LEVEL07 = std::array<float,  7U>{ 3.0F/7.0F , 0.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 6.0F/7.0F , 2.0F/7.0F ,  5.0F/7.0F  };
-  constexpr auto LEVEL08 = std::array<float,  8U>{ 4.0F/8.0F , 0.0F/8.0F , 5.0F/8.0F , 1.0F/8.0F , 3.0F/8.0F , 6.0F/8.0F ,  2.0F/8.0F , 7.0F/8.0F  };
-  constexpr auto LEVEL09 = std::array<float,  9U>{ 4.0F/9.0F , 0.0F/9.0F , 5.0F/9.0F , 1.0F/9.0F , 6.0F/9.0F , 2.0F/9.0F ,  7.0F/9.0F , 3.0F/9.0F ,  8.0F/9.0F  };
-  constexpr auto LEVEL10 = std::array<float, 10U>{ 5.0F/10.0F, 0.0F/10.0F, 6.0F/10.0F, 1.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 3.0F/10.0F,  9.0F/10.0F,  4.0F/10.0F };
-  constexpr auto LEVEL11 = std::array<float, 11U>{ 5.0F/11.0F, 0.0F/11.0F, 6.0F/11.0F, 1.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 3.0F/11.0F,  9.0F/11.0F,  4.0F/11.0F,  2.0F/11.0F };
-  constexpr auto LEVEL12 = std::array<float, 12U>{ 6.0F/12.0F, 0.0F/12.0F, 7.0F/12.0F, 1.0F/12.0F, 8.0F/12.0F, 2.0F/12.0F,  9.0F/12.0F, 3.0F/12.0F, 10.0F/12.0F,  4.0F/12.0F,  9.0F/12.0F,  2.0F/12.0F };
-  constexpr auto LEVEL13 = std::array<float, 13U>{ 6.0F/13.0F, 0.0F/13.0F, 1.0F/13.0F, 7.0F/13.0F, 2.0F/13.0F, 8.0F/13.0F,  3.0F/13.0F, 9.0F/13.0F,  4.0F/13.0F, 10.0F/13.0F,  5.0F/13.0F, 10.0F/13.0F,  2.0F/13.0F };
-  constexpr auto LEVEL14 = std::array<float, 14U>{ 7.0F/14.0F, 0.0F/14.0F, 8.0F/14.0F, 1.0F/14.0F, 9.0F/14.0F, 2.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  4.0F/14.0F, 12.0F/14.0F,  5.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F };
-  constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 0.0F/15.0F, 8.0F/15.0F, 1.0F/15.0F, 9.0F/15.0F, 2.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  4.0F/15.0F, 12.0F/15.0F,  4.0F/15.0F, 13.0F/15.0F,  6.0F/15.0F,  2.0F/15.0F };
+  static constexpr auto LEVEL00 = std::array<float,  1U>{ 0.0F };
+  static constexpr auto LEVEL01 = std::array<float,  1U>{ 1.0F       };
+  static constexpr auto LEVEL02 = std::array<float,  2U>{ 0.0F/2.0F , 1.0F/2.0F  };
+  static constexpr auto LEVEL03 = std::array<float,  3U>{ 1.0F/3.0F , 0.0F/3.0F , 2.0F/3.0F  };
+  static constexpr auto LEVEL04 = std::array<float,  4U>{ 1.0F/4.0F , 3.0F/4.0F , 0.0F/4.0F , 2.0F/4.0F  };
+  static constexpr auto LEVEL05 = std::array<float,  5U>{ 2.0F/5.0F , 0.0F/5.0F , 3.0F/5.0F , 1.0F/5.0F , 4.0F/5.0F  };
+  static constexpr auto LEVEL06 = std::array<float,  6U>{ 3.0F/6.0F , 0.0F/6.0F , 2.0F/6.0F , 4.0F/6.0F , 1.0F/6.0F , 5.0F/6.0F  };
+  static constexpr auto LEVEL07 = std::array<float,  7U>{ 3.0F/7.0F , 0.0F/7.0F , 4.0F/7.0F , 1.0F/7.0F , 6.0F/7.0F , 2.0F/7.0F ,  5.0F/7.0F  };
+  static constexpr auto LEVEL08 = std::array<float,  8U>{ 4.0F/8.0F , 0.0F/8.0F , 5.0F/8.0F , 1.0F/8.0F , 3.0F/8.0F , 6.0F/8.0F ,  2.0F/8.0F , 7.0F/8.0F  };
+  static constexpr auto LEVEL09 = std::array<float,  9U>{ 4.0F/9.0F , 0.0F/9.0F , 5.0F/9.0F , 1.0F/9.0F , 6.0F/9.0F , 2.0F/9.0F ,  7.0F/9.0F , 3.0F/9.0F ,  8.0F/9.0F  };
+  static constexpr auto LEVEL10 = std::array<float, 10U>{ 5.0F/10.0F, 0.0F/10.0F, 6.0F/10.0F, 1.0F/10.0F, 7.0F/10.0F, 2.0F/10.0F,  8.0F/10.0F, 3.0F/10.0F,  9.0F/10.0F,  4.0F/10.0F };
+  static constexpr auto LEVEL11 = std::array<float, 11U>{ 5.0F/11.0F, 0.0F/11.0F, 6.0F/11.0F, 1.0F/11.0F, 7.0F/11.0F, 2.0F/11.0F,  8.0F/11.0F, 3.0F/11.0F,  9.0F/11.0F,  4.0F/11.0F,  2.0F/11.0F };
+  static constexpr auto LEVEL12 = std::array<float, 12U>{ 6.0F/12.0F, 0.0F/12.0F, 7.0F/12.0F, 1.0F/12.0F, 8.0F/12.0F, 2.0F/12.0F,  9.0F/12.0F, 3.0F/12.0F, 10.0F/12.0F,  4.0F/12.0F,  9.0F/12.0F,  2.0F/12.0F };
+  static constexpr auto LEVEL13 = std::array<float, 13U>{ 6.0F/13.0F, 0.0F/13.0F, 1.0F/13.0F, 7.0F/13.0F, 2.0F/13.0F, 8.0F/13.0F,  3.0F/13.0F, 9.0F/13.0F,  4.0F/13.0F, 10.0F/13.0F,  5.0F/13.0F, 10.0F/13.0F,  2.0F/13.0F };
+  static constexpr auto LEVEL14 = std::array<float, 14U>{ 7.0F/14.0F, 0.0F/14.0F, 8.0F/14.0F, 1.0F/14.0F, 9.0F/14.0F, 2.0F/14.0F, 10.0F/14.0F, 3.0F/14.0F, 11.0F/14.0F,  4.0F/14.0F, 12.0F/14.0F,  5.0F/14.0F, 11.0F/14.0F,  2.0F/14.0F };
+  static constexpr auto LEVEL15 = std::array<float, 15U>{ 7.0F/15.0F, 0.0F/15.0F, 8.0F/15.0F, 1.0F/15.0F, 9.0F/15.0F, 2.0F/15.0F, 10.0F/15.0F, 3.0F/15.0F, 11.0F/15.0F,  4.0F/15.0F, 12.0F/15.0F,  4.0F/15.0F, 13.0F/15.0F,  6.0F/15.0F,  2.0F/15.0F };
   // clang-format on
 
   static auto levels = std::array<float const*, 16> {LEVEL00.data(),
