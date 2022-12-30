@@ -1030,6 +1030,7 @@ void form::drwfrm() {
 		}
 		SelectObject(StitchWindowMemDC, thred::getLayerPen(layer));
 		if (form.type == FRMLINE) {
+		  if (form.vertexCount > 0) {
 		  fi::frmpoly(gsl::span<POINT>(FormLines->data(), form.vertexCount - 1));
 		  if (form.fillType == CONTF) {
 			auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
@@ -1040,9 +1041,12 @@ void form::drwfrm() {
 			wrap::polyline(StitchWindowMemDC, line.data(), wrap::toUnsigned(line.size()));
 		  }
 		}
+		}
 		else {
+		  if (form.vertexCount > lastPoint) {
 		  fi::frmpoly(gsl::span<POINT>(std::addressof(FormLines->operator[](lastPoint)),
 		                               form.vertexCount - lastPoint));
+		}
 		}
 		if (ClosestFormToCursor == iForm && StateMap->test(StateFlag::FRMPSEL)) {
 		  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
