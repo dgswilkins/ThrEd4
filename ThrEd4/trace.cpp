@@ -866,10 +866,10 @@ void trace::trinit() {
 		TraceDataSize = bitmap::getrmap();
 	  }
 	  if (StateMap->test(StateFlag::MONOMAP)) {
-		auto const color     = gsl::narrow<COLORREF>(TraceBitmapData[0]);
-		auto       highColor = color;
 		auto const spTBD =
 		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
+		auto const color     = gsl::narrow<COLORREF>(spTBD[0]);
+		auto       highColor = color;
 		auto const pixel = std::find_if(spTBD.begin(), spTBD.end(), [color](uint32_t const& data) -> bool {
 		  return data != color;
 		});
