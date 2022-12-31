@@ -2356,11 +2356,12 @@ void xt::rtrclp() {
 }
 
 void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
+#pragma warning(suppress : 26481)
   SetWindowText(GetDlgItem(dialog, stringIndex),
                 fmt::format(FMT_STRING(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
 
-auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
+ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto SZBUFFER = 16U;
 
