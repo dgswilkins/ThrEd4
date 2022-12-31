@@ -323,15 +323,16 @@ void trace::trdif() {
   StateMap->reset(StateFlag::TRSET);
   StateMap->reset(StateFlag::HIDMAP);
   trace::untrace();
-  if ((bitmap::getBitmapHeight() * bitmap::getBitmapWidth()) != 0U) {
+  auto const bitmapSize = bitmap::getBitmapHeight() * bitmap::getBitmapWidth();
+  if (bitmapSize != 0U) {
 	auto differenceBitmap = std::vector<uint32_t> {};
-	differenceBitmap.resize(wrap::toSize(bitmap::getBitmapHeight() * bitmap::getBitmapWidth()));
+	differenceBitmap.resize(wrap::toSize(bitmapSize));
 	auto colorSumMaximum = 0U;
 	auto colorSumMinimum = std::numeric_limits<uint32_t>::max();
 	if (!StateMap->test(StateFlag::WASTRAC)) {
 	  TraceDataSize = bitmap::getrmap();
 	}
-	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, TraceDataSize);
+	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	  for (auto iHeight = 1; iHeight < bitmap::getBitmapHeight() - 1; ++iHeight) {
 		auto iPoint = iHeight * bitmap::getBitmapWidth();
@@ -350,13 +351,15 @@ void trace::trdif() {
 		}
 	  }
 	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
-	  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-		TraceBitmapData[iPixel] &= TraceRGBMask[iRGB];
-		if (differenceBitmap[wrap::toSize(iPixel)] != 0U) {
+	  auto       pos   = size_t {0U};
+	  for (auto iPixel :spTBD) {
+		iPixel &= TraceRGBMask[iRGB];
+		if (differenceBitmap[pos] != 0U) {
 		  auto const adjustedColorSum = wrap::round<uint32_t>(
-		      wrap::toFloat(differenceBitmap[wrap::toSize(iPixel)] - colorSumMinimum) * ratio);
-		  TraceBitmapData[iPixel] |= adjustedColorSum << TraceShift[iRGB];
+		      wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
+		  iPixel |= adjustedColorSum << TraceShift[iRGB];
 		}
+		++pos;
 	  }
 	}
 	bitmap::bitbltBitmap();
