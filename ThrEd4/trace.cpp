@@ -69,7 +69,7 @@ void tracwnd();
 auto trcbit(uint32_t initialDirection, uint32_t& traceDirection, std::vector<TRACE_PNT>& tracedPoints) -> bool;
 auto trcin(COLORREF color) -> bool;
 void trcnum(uint32_t shift, COLORREF color, uint32_t backColor);
-void trcols(COLORREF color) noexcept;
+auto trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT>;
 void trcratnum();
 void trcstpnum();
 auto trcsub(int32_t xCoordinate, int32_t yCoordinate, int32_t buttonHeight) -> HWND;
@@ -83,7 +83,6 @@ auto icolsum(COLORREF col) -> uint32_t;
 #endif
 } // namespace ti
 
-static auto PixelColors = std::array<uint32_t, CHANLCNT> {};    // separated pixel reference colors
 static auto TraceControlWindow = std::array<HWND, CHANLCNT> {}; // trace control windows
 static auto TraceDownWindow    = std::array<HWND, CHANLCNT> {}; // trace down number windows
 static auto TraceSelectWindow  = std::array<HWND, CHANLCNT> {}; // trace select windows
@@ -151,10 +150,12 @@ void trace::initTraceWindows() {
   }
 }
 
-void ti::trcols(COLORREF color) noexcept {
-  PixelColors[0] = color & B1MASK;
-  PixelColors[1] = (color & B2MASK) >> BYTSHFT;
-  PixelColors[2] = (color & B3MASK) >> WRDSHFT;
+auto ti::trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT> {
+  auto colors = std::array<uint32_t, CHANLCNT> {};
+  colors[0] = color & B1MASK;
+  colors[1] = (color & B2MASK) >> BYTSHFT;
+  colors[2] = (color & B3MASK) >> WRDSHFT;
+  return colors;
 }
 
 void ti::trcstpnum() {
@@ -173,28 +174,28 @@ void ti::trcratnum() {
 
 auto ti::trcin(COLORREF color) -> bool {
   if (color != 0U) {
-	ti::trcols(color);
+	auto colors = ti::trcols(color);
 	if (StateMap->test(StateFlag::TRCRED)) {
-	  if (PixelColors[0] > HighColors[0]) {
+	  if (colors[0] > HighColors[0]) {
 		return false;
 	  }
-	  if (PixelColors[0] < LowColors[0]) {
+	  if (colors[0] < LowColors[0]) {
 		return false;
 	  }
 	}
 	if (StateMap->test(StateFlag::TRCGRN)) {
-	  if (PixelColors[1] > HighColors[1]) {
+	  if (colors[1] > HighColors[1]) {
 		return false;
 	  }
-	  if (PixelColors[1] < LowColors[1]) {
+	  if (colors[1] < LowColors[1]) {
 		return false;
 	  }
 	}
 	if (StateMap->test(StateFlag::TRCBLU)) {
-	  if (PixelColors[2] > HighColors[2]) {
+	  if (colors[2] > HighColors[2]) {
 		return false;
 	  }
-	  if (PixelColors[2] < LowColors[2]) {
+	  if (colors[2] < LowColors[2]) {
 		return false;
 	  }
 	}
@@ -449,13 +450,13 @@ void trace::trace() {
 #if TRCMTH == 1
 	InvertUpColor   = UpPixelColor ^ COLMASK;
 	InvertDownColor = DownPixelColor ^ COLMASK;
-	ti::trcols(InvertUpColor);
+	auto colors = ti::trcols(InvertUpColor);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  HighColors[iRGB] = PixelColors[iRGB];
+	  HighColors[iRGB] = colors[iRGB];
 	}
-	ti::trcols(InvertDownColor);
+	colors = ti::trcols(InvertDownColor);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-	  LowColors[iRGB] = PixelColors[iRGB];
+	  LowColors[iRGB] = colors[iRGB];
 	}
 	if (TracedMap->empty()) {
 	  TracedMap->resize(TraceDataSize, false);
@@ -876,24 +877,24 @@ void trace::trinit() {
 		if (pixel != spTBD.end()) {
 		  highColor = *pixel;
 		}
-		ti::trcols(highColor);
-		std::ranges::copy(PixelColors, HighColors.begin());
-		ti::trcols(color);
+		auto colors = ti::trcols(highColor);
+		std::ranges::copy(colors, HighColors.begin());
+		colors = ti::trcols(color);
 		for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
-		  if (PixelColors[iRGB] > HighColors[iRGB]) {
-			std::swap(PixelColors[iRGB], HighColors[iRGB]);
+		  if (colors[iRGB] > HighColors[iRGB]) {
+			std::swap(colors[iRGB], HighColors[iRGB]);
 		  }
-		  componentPeak[iRGB] = ((HighColors[iRGB] - PixelColors[iRGB]) / 2) + PixelColors[iRGB];
+		  componentPeak[iRGB] = ((HighColors[iRGB] - colors[iRGB]) / 2) + colors[iRGB];
 		}
 	  }
 	  else {
 		auto const spTBD =
 		    gsl::span(TraceBitmapData, wrap::toSize(bitmap::getBitmapWidth() * bitmap::getBitmapHeight()));
 		for (auto const pixel : spTBD) {
-		  ti::trcols(pixel);
-		  auto iPixelColors = PixelColors.begin();
+		  auto colors  = ti::trcols(pixel);
+		  auto iColors = colors.begin();
 		  for (auto& iHistogramData : histogramData) {
-			auto const itHD = wrap::next(iHistogramData.begin(), *(iPixelColors++));
+			auto const itHD = wrap::next(iHistogramData.begin(), *(iColors++));
 			++(*itHD);
 		  }
 		}
@@ -944,14 +945,14 @@ void trace::trcsel() {
 	StateMap->reset(StateFlag::HIDMAP);
 	StateMap->reset(StateFlag::TRSET);
 	for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-	  ti::trcols(TraceBitmapData[iPixel]);
-	  auto maximumColorComponent = PixelColors[0];
+	  auto colors = ti::trcols(TraceBitmapData[iPixel]);
+	  auto maximumColorComponent = colors[0];
 	  auto iRGB                  = 2U;
-	  if (PixelColors[1] > maximumColorComponent) {
-		maximumColorComponent = PixelColors[1];
+	  if (colors[1] > maximumColorComponent) {
+		maximumColorComponent = colors[1];
 		iRGB                  = 1;
 	  }
-	  if (PixelColors[2] > maximumColorComponent) {
+	  if (colors[2] > maximumColorComponent) {
 		iRGB = 0;
 	  }
 	  TraceBitmapData[iPixel] &= TraceRGB[iRGB];
