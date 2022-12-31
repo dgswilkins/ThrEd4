@@ -944,8 +944,10 @@ void trace::trcsel() {
 	trace::trace();
 	StateMap->reset(StateFlag::HIDMAP);
 	StateMap->reset(StateFlag::TRSET);
-	for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-	  auto colors = ti::trcols(TraceBitmapData[iPixel]);
+	auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+	auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+	for (auto &iPixel : spTBD) {
+	  auto colors = ti::trcols(iPixel);
 	  auto maximumColorComponent = colors[0];
 	  auto iRGB                  = 2U;
 	  if (colors[1] > maximumColorComponent) {
@@ -955,7 +957,7 @@ void trace::trcsel() {
 	  if (colors[2] > maximumColorComponent) {
 		iRGB = 0;
 	  }
-	  TraceBitmapData[iPixel] &= TraceRGB[iRGB];
+	  iPixel &= TraceRGB[iRGB];
 	}
 	bitmap::bitbltBitmap();
 	StateMap->set(StateFlag::WASDSEL);
