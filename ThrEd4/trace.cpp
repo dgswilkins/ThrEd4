@@ -396,6 +396,7 @@ void trace::trace() {
 	trace::untrace();
 	ti::tracwnd();
 	TraceDataSize = bitmap::getrmap();
+	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmap::getBitmapHeight()*bitmap::getBitmapWidth());
 	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap->test(StateFlag::LANDSCAP)) {
@@ -406,7 +407,7 @@ void trace::trace() {
 	  auto const bitmapPoint =
 	      POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
 
-	  auto const color = TraceBitmapData[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
+	  auto const color = spTBD[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
 		DownPixelColor = PENWHITE;
@@ -430,8 +431,8 @@ void trace::trace() {
 	  traceColorMask &= BLUMSK;
 	}
 	if (traceColorMask != COLMASK) {
-	  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-		TraceBitmapData[iPixel] &= traceColorMask;
+	  for (auto &iPixel : spTBD) {
+		iPixel &= traceColorMask;
 	  }
 	}
 
@@ -464,13 +465,15 @@ void trace::trace() {
 	if (TracedMap->empty()) {
 	  TracedMap->resize(TraceDataSize, false);
 	}
-	for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-	  if (ti::trcin(TraceBitmapData[iPixel])) {
-		TracedMap->set(wrap::toSize(iPixel));
+	auto pos = size_t {0U};
+	for (auto &iPixel : spTBD) {
+	  if (ti::trcin(iPixel)) {
+		TracedMap->set(pos);
 	  }
 	  else {
-		TraceBitmapData[iPixel] = 0;
+		iPixel = 0;
 	  }
+	  ++pos;
 	}
 #endif
 	StateMap->set(StateFlag::TRSET);
