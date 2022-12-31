@@ -534,13 +534,17 @@ void trace::tracedg() {
 	  TracedEdges->set(wrap::toSize(pixelIndex - bitmap::getBitmapWidth()));
 	}
   }
-  for (auto iPixel = 0; iPixel < bitmap::getBitmapWidth() * bitmap::getBitmapHeight(); ++iPixel) {
-	if (TracedEdges->test(wrap::toSize(iPixel))) {
-	  TraceBitmapData[iPixel] = PENWHITE;
+  auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
+  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  auto       pos        = size_t {0U};
+  for (auto iPixel : spTBD) {
+	if (TracedEdges->test(pos)) {
+	  iPixel = PENWHITE;
 	}
 	else {
-	  TraceBitmapData[iPixel] = 0;
+	  iPixel = 0;
 	}
+	++pos;
   }
   StateMap->set(StateFlag::RESTCH);
   StateMap->set(StateFlag::WASEDG);
