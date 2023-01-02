@@ -601,7 +601,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  StateMap->reset(StateFlag::FILDIR);
 	  if (bytesRead > ((pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U)) {
 		auto color      = 0U;
-		auto iPESstitch = 0U;
+		auto iPESstitch = size_t {0U};
 		auto const pecCount = bytesRead - (pesHeader->off + (sizeof(PECHDR) + sizeof(PECHDR2))) + 3U;
 		StitchBuffer->clear();
 		StitchBuffer->reserve(pecCount / 2); // we are still reserving a bit more than necessary
