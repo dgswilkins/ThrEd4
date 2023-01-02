@@ -3897,12 +3897,12 @@ auto fi::isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
                 uint32_t                       line0Index,
                 uint32_t                       line1Index,
                 float                          gapToClosestRegion) noexcept -> bool {
-  auto const high0 = lineEndpoints[line0Index + 1].y + gapToClosestRegion;
-  if (auto const low1 = lineEndpoints[line1Index].y - gapToClosestRegion; high0 < low1) {
+  auto const low0 = lineEndpoints[line0Index].y - gapToClosestRegion;
+  auto const low1 = lineEndpoints[line1Index].y - gapToClosestRegion;
+  if (auto const high0 = lineEndpoints[++line0Index].y + gapToClosestRegion; high0 < low1) {
 	return false;
   }
-  auto const high1 = lineEndpoints[line1Index + 1].y + gapToClosestRegion;
-  if (auto const low0 = lineEndpoints[line0Index].y - gapToClosestRegion; high1 < low0) {
+  if (auto const high1 = lineEndpoints[++line1Index].y + gapToClosestRegion; high1 < low0) {
 	return false;
   }
   return true;
