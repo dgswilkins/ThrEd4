@@ -222,13 +222,13 @@ void blbrd(FRM_HEAD const& form);
 void bold(FRM_HEAD const& form);
 void boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float size);
 void brdfil(FRM_HEAD const& form);
-void brkdun(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, std::vector<F_POINT>& workingFormVertices);
-void brkseq(std::vector<SMAL_PNT_L*> const& sortedLines,
+void brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t start, uint32_t finish, std::vector<F_POINT>& workingFormVertices);
+void brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices,
             uint32_t                        start,
             uint32_t                        finish,
             boost::dynamic_bitset<>&        sequenceMap,
             uint32_t&                       lastGroup,
-            SMAL_PNT_L*                     sequenceLines);
+            uint32_t&                        sequenceIndex);
 void chkbrd(FRM_HEAD const& form);
 void chksid(FRM_HEAD const& form, uint32_t vertexIndex, uint32_t clipIntersectSide, std::vector<F_POINT> const& currentFormVertices);
 auto clipComp(gsl::not_null<CLIP_SORT const*>arg1, gsl::not_null<CLIP_SORT const*>arg2) noexcept
@@ -246,6 +246,8 @@ auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
             std::vector<LEN_INFO> const& sortedLengths,
             uint32_t                     sind,
             uint32_t&                    outIndex) -> bool;
+auto compLines(const std::tuple<uint32_t, SMAL_PNT_L*> arg1, const std::tuple<uint32_t, SMAL_PNT_L*> arg2) noexcept
+    -> bool;
 void contf(FRM_HEAD& form);
 auto contsf(uint32_t formIndex) -> bool;
 void cplayfn(uint32_t iForm, uint32_t layer);
@@ -265,13 +267,14 @@ void dufdat(std::vector<F_POINT>&  tempClipPoints,
             uint32_t&              formRelocationIndex,
             uint32_t&              formSourceIndex);
 void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices);
-void dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup);
+void dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t start, uint32_t finish, uint32_t& lastGroup);
 void duprots(float rotationAngle, F_POINT const& rotationCenter);
 void duprotfs(float rotationAngle);
 void durgn(FRM_HEAD const&                 form,
            std::vector<F_SEQ> const&       sequencePath,
            boost::dynamic_bitset<>&        visitedRegions,
-           std::vector<SMAL_PNT_L*> const& sortedLines,
+           std::vector<SMAL_PNT_L> const&  lineEndpoints,
+           std::vector<uint32_t>&          sortedLineIndices,
            uint32_t                        pthi,
            uint32_t                        lineCount,
            std::vector<REGION> const&      regionsList,
@@ -279,13 +282,16 @@ void durgn(FRM_HEAD const&                 form,
            uint32_t                        sequencePathIndex,
            std::vector<F_POINT>&           workingFormVertices);
 void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1, F_POINT const& finish1, F_POINT& stitchPoint);
-void duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
+void duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+           std::vector<uint32_t>&          sortedLineIndices,
            uint32_t                        start,
            uint32_t                        finish,
            boost::dynamic_bitset<>&        sequenceMap,
            uint32_t&                       lastGroup,
-           SMAL_PNT_L const*               sequenceLines);
-void duseq1(gsl::not_null<SMAL_PNT_L const*>sequenceLines);
+           uint32_t&                       sequenceIndex);
+void duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
+            std::vector<uint32_t>&           sortedLineIndices,
+            uint32_t                         sequenceIndex);
 void duspnd(float                        stitchLen,
             std::vector<V_RECT_2> const& underlayVerticalRect,
             std::vector<V_RECT_2> const& fillVerticalRect,
@@ -334,6 +340,7 @@ auto getlen(std::vector<CLIP_PNT>&      clipStitchPoints,
             std::vector<float> const&   lengths,
             uint32_t                    iPoint,
             std::vector<F_POINT> const& currentFormVertices) -> float;
+auto getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t>;
 void horclpfn(std::vector<RNG_COUNT> const& textureSegments, FRM_HEAD& angledForm, std::vector<F_POINT>& angledFormVertices);
 auto insect(FRM_HEAD const&             form,
             std::vector<CLIP_SORT>&     clipIntersectData,
@@ -345,9 +352,8 @@ auto insect(FRM_HEAD const&             form,
             F_POINT const&              lineSegmentEnd,
             std::vector<F_POINT> const& currentFormVertices) -> uint32_t;
 void inspnt(std::vector<CLIP_PNT>& clipStitchPoints);
-auto isclos(gsl::not_null<SMAL_PNT_L const*>lineEndPoint0,
-            gsl::not_null<SMAL_PNT_L const*>lineEndPoint1,
-            float gapToClosestRegion) noexcept -> bool;
+auto isclos(std::vector<SMAL_PNT_L> const& lineEndpoints, uint32_t line0Index, uint32_t line1Index, float gapToClosestRegion) noexcept
+    -> bool;
 auto isect(uint32_t                    vertex0,
            uint32_t                    vertex1,
            F_POINT&                    intersection,
@@ -378,7 +384,7 @@ auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
             uint32_t                       line1,
             float                          gapToClosestRegion) noexcept -> bool;
 void makpoli();
-void movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind);
+void movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t ind);
 void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;
 auto notdun(std::vector<RG_SEQ>&           tempPath,
             std::vector<R_CON> const&      pathMap,
@@ -395,7 +401,8 @@ void nxtrgn(std::vector<RG_SEQ>&            tempPath,
             std::vector<R_CON> const&       pathMap,
             std::vector<uint32_t> const&    mapIndexSequence,
             boost::dynamic_bitset<>&        visitedRegions,
-            std::vector<SMAL_PNT_L*> const& sortedLines,
+             std::vector<SMAL_PNT_L> const&  lineEndpoints,
+            std::vector<uint32_t>&         sortedLineIndices,
             std::vector<REGION> const&      regionsList,
             uint32_t&                       doneRegion,
             uint32_t                        pathMapIndex,
@@ -432,13 +439,14 @@ auto px2stchf(POINT const& screen) noexcept -> F_POINT;
 void rats();
 auto regclos(std::vector<uint32_t> const&    groupIndexSequence,
              std::vector<SMAL_PNT_L> const&  lineEndpoints,
-             std::vector<SMAL_PNT_L*> const& sortedLines,
+             std::vector<uint32_t>&         sortedLineIndices,
              uint32_t                        iRegion0,
              uint32_t                        iRegion1,
              std::vector<REGION> const&      regionsList,
              float                           gapToClosestRegion,
              uint32_t&                       nextGroup) noexcept -> bool;
-auto reglen(std::vector<SMAL_PNT_L*> const&      sortedLines,
+auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
+            std::vector<uint32_t>&               lineEndpointIndices,
             uint32_t                             iRegion,
             std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
             std::vector<REGION> const&           regionsList) noexcept -> float;
@@ -3885,15 +3893,16 @@ auto fi::spComp(const gsl::not_null<SMAL_PNT_L const*>arg1, const gsl::not_null<
   return false;
 }
 
-auto fi::isclos(const gsl::not_null<SMAL_PNT_L const*>lineEndPoint0,
-                const gsl::not_null<SMAL_PNT_L const*>lineEndPoint1,
-                float gapToClosestRegion) noexcept -> bool {
-  auto const high0 = (lineEndPoint0.get() + 1)->y + gapToClosestRegion;
-  if (auto const low1 = lineEndPoint1->y - gapToClosestRegion; high0 < low1) {
+auto fi::isclos(std::vector<SMAL_PNT_L> const& lineEndpoints,
+                uint32_t                       line0Index,
+                uint32_t                       line1Index,
+                float                          gapToClosestRegion) noexcept -> bool {
+  auto const high0 = lineEndpoints[line0Index + 1].y + gapToClosestRegion;
+  if (auto const low1 = lineEndpoints[line1Index].y - gapToClosestRegion; high0 < low1) {
 	return false;
   }
-  auto const high1 = (lineEndPoint1.get() + 1)->y + gapToClosestRegion;
-  if (auto const low0 = lineEndPoint0->y - gapToClosestRegion; high1 < low0) {
+  auto const high1 = lineEndpoints[line1Index + 1].y + gapToClosestRegion;
+  if (auto const low0 = lineEndpoints[line0Index].y - gapToClosestRegion; high1 < low0) {
 	return false;
   }
   return true;
@@ -3928,7 +3937,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 	  index1 += 2;
 	  }
 	  if (count1 != 0U) {
-	  return isclos(std::addressof(lineEndPoint0[index0]), std::addressof(lineEndPoint1[index1]), gapToClosestRegion);
+	  return isclos(lineEndpoints,groupIndexSequence[group0] + index0, groupIndexSequence[group1] + index1, gapToClosestRegion);
 	  }
     }
   return false;
@@ -3936,57 +3945,61 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 
 auto fi::regclos(std::vector<uint32_t> const&    groupIndexSequence,
                  std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                 std::vector<SMAL_PNT_L*> const& sortedLines,
+                 std::vector<uint32_t> & sortedLineIndices,
                  uint32_t                        iRegion0,
                  uint32_t                        iRegion1,
                  std::vector<REGION> const&      regionsList,
                  float                           gapToClosestRegion,
                  uint32_t&                       nextGroup) noexcept -> bool {
-  auto const* lineEndPoint0Start = sortedLines[regionsList[iRegion0].start];
-  auto const* lineEndPoint1Start = sortedLines[regionsList[iRegion1].start];
-  auto const  group0Start        = lineEndPoint0Start->group;
-  auto const  group1Start        = lineEndPoint1Start->group;
+  auto const  lineStart0Index         = sortedLineIndices[regionsList[iRegion0].start];
+  auto const  lineStart1Index         = sortedLineIndices[regionsList[iRegion1].start];
+  auto const& lineEndPoint0Start = lineEndpoints[lineStart0Index];
+  auto const& lineEndPoint1Start = lineEndpoints[lineStart1Index];
+  auto const  group0Start        = lineEndPoint0Start.group;
+  auto const  group1Start        = lineEndPoint1Start.group;
   auto const  startFlag          = group0Start > group1Start;
   auto const  groupStart         = startFlag ? group0Start : group1Start;
-  auto const  lineStart          = startFlag ? lineEndPoint0Start->line : lineEndPoint1Start->line;
-  if (auto const prevLine = startFlag ? lineEndPoint1Start->line : lineEndPoint0Start->line;
+  auto const  lineStart          = startFlag ? lineEndPoint0Start.line : lineEndPoint1Start.line;
+  if (auto const prevLine = startFlag ? lineEndPoint1Start.line : lineEndPoint0Start.line;
       (groupStart != 0U) &&
       lnclos(groupIndexSequence, lineEndpoints, groupStart - 1, prevLine, groupStart, lineStart, gapToClosestRegion)) {
 	nextGroup = groupStart;
 	return true;
   }
-  auto const* lineEndPoint0End = sortedLines[regionsList[iRegion0].end];
-  auto const* lineEndPoint1End = sortedLines[regionsList[iRegion1].end];
-  auto const  group1End        = lineEndPoint1End->group;
-  auto const  group0End        = lineEndPoint0End->group;
+  auto const  lineEnd0Index    = sortedLineIndices[regionsList[iRegion0].end];
+  auto const  lineEnd1Index    = sortedLineIndices[regionsList[iRegion1].end];
+  auto const& lineEndPoint0End = lineEndpoints[lineEnd0Index];
+  auto const& lineEndPoint1End = lineEndpoints[lineEnd1Index];
+  auto const  group1End        = lineEndPoint1End.group;
+  auto const  group0End        = lineEndPoint0End.group;
   auto const  endFlag          = group0End < group1End;
   auto const  groupEnd         = endFlag ? group0End : group1End;
-  auto const  lineEnd          = endFlag ? lineEndPoint0End->line : lineEndPoint1End->line;
-  if (auto const lastLine = endFlag ? lineEndPoint1End->line : lineEndPoint0End->line;
+  auto const  lineEnd          = endFlag ? lineEndPoint0End.line : lineEndPoint1End.line;
+  if (auto const lastLine = endFlag ? lineEndPoint1End.line : lineEndPoint0End.line;
       lnclos(groupIndexSequence, lineEndpoints, groupEnd, lineEnd, groupEnd + 1, lastLine, gapToClosestRegion)) {
 	nextGroup = groupEnd;
 	return true;
   }
   if (((group0Start > group1Start) ? (group0Start - group1Start) : (group1Start - group0Start)) < 2) {
-	if (isclos(lineEndPoint0Start, lineEndPoint1Start, gapToClosestRegion)) {
+	if (isclos(lineEndpoints, lineStart0Index, lineStart1Index, gapToClosestRegion)) {
 	  nextGroup = group0Start;
 	  return true;
 	}
   }
   if (((group0Start > group1End) ? (group0Start - group1End) : (group1End - group0Start)) < 2) {
-	if (isclos(lineEndPoint0Start, lineEndPoint1End, gapToClosestRegion)) {
+	if (isclos(lineEndpoints, lineStart0Index, lineEnd1Index, gapToClosestRegion)) {
 	  nextGroup = group0Start;
 	  return true;
 	}
   }
   if (((group0End > group1Start) ? (group0End - group1Start) : (group1Start - group0End)) < 2) {
-	if (isclos(lineEndPoint0End, lineEndPoint1Start, gapToClosestRegion)) {
+	if (isclos(lineEndpoints, lineEnd0Index, lineStart1Index, gapToClosestRegion)) {
 	  nextGroup = group0End;
 	  return true;
 	}
   }
   if (((group0End > group1End) ? (group0End - group1End) : (group1End - group0End)) < 2) {
-	if (isclos(lineEndPoint0End, lineEndPoint1End, gapToClosestRegion)) {
+	if (isclos(lineEndpoints, lineEnd0Index, lineEnd1Index, gapToClosestRegion)) {
 	  nextGroup = group0End;
 	  return true;
 	}
@@ -4064,19 +4077,22 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
   return false;
 }
 
-auto fi::reglen(std::vector<SMAL_PNT_L*> const&      sortedLines,
+auto fi::reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
+                std::vector<uint32_t>&               lineEndpointIndices,
                 uint32_t                             iRegion,
                 std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
                 std::vector<REGION> const&           regionsList) noexcept -> float {
-  auto lineEndPoints = std::array<SMAL_PNT_L*, SQRCORNS> {};
-  lineEndPoints[0]   = sortedLines[regionsList[iRegion].start];
-  lineEndPoints[1]   = &sortedLines[regionsList[iRegion].start][1];
-  lineEndPoints[2]   = sortedLines[regionsList[iRegion].end];
-  lineEndPoints[3]   = &sortedLines[regionsList[iRegion].end][1];
+  auto lineEndPoints = std::array<SMAL_PNT_L, SQRCORNS> {};
+  auto startIndex    = lineEndpointIndices[regionsList[iRegion].start];
+  auto endIndex      = lineEndpointIndices[regionsList[iRegion].end];
+  lineEndPoints[0]   = lineEndpoints[startIndex];
+  lineEndPoints[1]   = lineEndpoints[startIndex + 1];
+  lineEndPoints[2]   = lineEndpoints[endIndex];
+  lineEndPoints[3]   = lineEndpoints[endIndex + 1];
   auto minimumLength = BIGFLOAT;
   for (auto const& corner : lastRegionCorners) {
 	for (auto const& point : lineEndPoints) {
-	  if (auto const length = hypot(corner.x - point->x, corner.y - point->y); length < minimumLength) {
+	  if (auto const length = hypot(corner.x - point.x, corner.y - point.y); length < minimumLength) {
 		minimumLength = length;
 	  }
 	}
@@ -4088,7 +4104,8 @@ void fi::nxtrgn(std::vector<RG_SEQ>&            tempPath,
                 std::vector<R_CON> const&       pathMap,
                 std::vector<uint32_t> const&    mapIndexSequence,
                 boost::dynamic_bitset<>&        visitedRegions,
-                std::vector<SMAL_PNT_L*> const& sortedLines,
+                std::vector<SMAL_PNT_L> const&  lineEndpoints,
+                std::vector<uint32_t>&          sortedLineIndices,
                 std::vector<REGION> const&      regionsList,
                 uint32_t&                       doneRegion,
                 uint32_t                        pathMapIndex,
@@ -4106,22 +4123,18 @@ void fi::nxtrgn(std::vector<RG_SEQ>&            tempPath,
 	}
 	outDebugString(L"nxtrgn: pathLength {}\n", pathLength);
 	if (pathLength > maxPathLength) {
-	  auto const* lineEndPoint = sortedLines[regionsList[doneRegion].start];
-	  if (lineEndPoint != nullptr) {
-		lastRegionCorners[0] = lineEndPoint[0];
-		lastRegionCorners[1] = lineEndPoint[1];
-	  }
-	  lineEndPoint = sortedLines[regionsList[doneRegion].end];
-	  if (lineEndPoint != nullptr) {
-		lastRegionCorners[2] = lineEndPoint[0];
-		lastRegionCorners[3] = lineEndPoint[1];
-	  }
+	  auto lineEndPoint        = sortedLineIndices[regionsList[doneRegion].start];
+	  lastRegionCorners[0]     = lineEndpoints[lineEndPoint];
+	  lastRegionCorners[1]     = lineEndpoints[lineEndPoint + 1];
+	  lineEndPoint             = sortedLineIndices[regionsList[doneRegion].end];
+	  lastRegionCorners[2]     = lineEndpoints[lineEndPoint];
+	  lastRegionCorners[3]     = lineEndpoints[lineEndPoint + 1];
 	  auto       newRegion     = 0U;
 	  auto       minimumLength = BIGFLOAT;
 	  auto const regionCount   = visitedRegions.size();
 	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 		if (!visitedRegions[iRegion]) {
-		  if (auto const length = reglen(sortedLines, iRegion, lastRegionCorners, regionsList);
+		  if (auto const length = reglen(lineEndpoints, sortedLineIndices, iRegion, lastRegionCorners, regionsList);
 		      length < minimumLength) {
 			minimumLength = length;
 			newRegion     = iRegion;
@@ -4178,25 +4191,31 @@ void fi::nxtseq(std::vector<F_SEQ>&          sequencePath,
   }
 }
 
-void fi::brkdun(std::vector<SMAL_PNT_L*> const& sortedLines,
+void fi::brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+                std::vector<uint32_t>&          sortedLineIndices,
                 uint32_t                        start,
                 uint32_t                        finish,
                 std::vector<F_POINT>&           workingFormVertices) {
-  BSequence->emplace_back(sortedLines[start]->x, sortedLines[start]->y, 0);
-  BSequence->emplace_back(sortedLines[finish]->x, sortedLines[finish]->y, 0);
-  BSequence->emplace_back(workingFormVertices.operator[](sortedLines[start]->line).x,
-                          workingFormVertices.operator[](sortedLines[start]->line).y,
+  BSequence->emplace_back(lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y, 0);
+  BSequence->emplace_back(lineEndpoints[sortedLineIndices[finish]].x, lineEndpoints[sortedLineIndices[finish]].y, 0);
+  BSequence->emplace_back(workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).x,
+                          workingFormVertices.operator[](lineEndpoints[sortedLineIndices[start]].line).y,
                           0);
   StateMap->set(StateFlag::BRKFIX);
 }
 
-void fi::duseq1(gsl::not_null<SMAL_PNT_L const*>sequenceLines) {
-  auto const seq = gsl::span(sequenceLines.get(), 2);
-  BSequence->emplace_back(wrap::midl(seq[1].x, seq[0].x), wrap::midl(seq[1].y, seq[0].y), 0);
+void fi::duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
+                std::vector<uint32_t>&           sortedLineIndices,
+                uint32_t                         sequenceIndex) {
+  auto& sequence0 = lineEndpoints[sortedLineIndices[sequenceIndex]];
+  auto& sequence1 = lineEndpoints[sortedLineIndices[sequenceIndex] + 1U];
+  BSequence->emplace_back(wrap::midl(sequence1.x, sequence0.x), wrap::midl(sequence1.y, sequence0.y), 0);
 }
 
-void fi::movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind) {
-  auto* lineEndPoint = sortedLines[ind];
+void fi::movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+                std::vector<uint32_t>&          sortedLineIndices,
+                uint32_t                        ind) {
+  auto lineEndPoint = std::next(lineEndpoints.begin(), sortedLineIndices[ind]);
   BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
   // Be careful - this makes lineEndPoint point to the next entry in LineEndPoints
   //             and not the next entry in sortedLines
@@ -4204,76 +4223,89 @@ void fi::movseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t ind) {
   BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQTOP});
 }
 
-void fi::brkseq(std::vector<SMAL_PNT_L*> const& sortedLines,
+void fi::brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+                std::vector<uint32_t>&          sortedLineIndices,
                 uint32_t                        start,
                 uint32_t                        finish,
                 boost::dynamic_bitset<>&        sequenceMap,
                 uint32_t&                       lastGroup,
-                SMAL_PNT_L*                     sequenceLines) {
+                uint32_t&                        sequenceIndex) {
   StateMap->reset(StateFlag::SEQDUN);
-  if (sequenceLines == nullptr) {
-	sequenceLines = sortedLines[start];
+  if (sequenceIndex > lineEndpoints.size()) {
+	sequenceIndex = start;
   }
   if (start > finish) {
-	auto savedGroup = sortedLines[start]->group + 1U;
+	auto savedGroup = lineEndpoints[sortedLineIndices[start]].group + 1U;
 	// This odd construction for iLine is used to ensure
 	// loop terminates when finish = 0
 	for (auto iLine = start + 1U; iLine != finish; --iLine) {
 	  auto const iLineDec = iLine - 1U;
 	  --savedGroup;
-	  if (sortedLines[iLineDec]->group != savedGroup) {
-		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
-		sequenceLines = sortedLines[iLineDec];
-		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
-		savedGroup = sequenceLines[0].group;
+	  if (lineEndpoints[sortedLineIndices[iLineDec]].group != savedGroup) {
+		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
+		                        0);
+		sequenceIndex = iLineDec;
+		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
+		                        0);
+		savedGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
 	  }
 	  else {
-		sequenceLines = sortedLines[iLineDec];
+		sequenceIndex = iLineDec;
 	  }
 	  if (sequenceMap.test_set(iLineDec)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
-		  duseq1(sequenceLines);
+		  duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
 		}
 	  }
 	  else {
-		movseq(sortedLines, iLineDec);
+		movseq(lineEndpoints, sortedLineIndices, iLineDec);
 	  }
 	}
-	lastGroup = sequenceLines->group;
+	lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
   }
   else {
-	auto savedGroup = sortedLines[start]->group - 1U;
+	auto savedGroup = lineEndpoints[sortedLineIndices[start]].group - 1U;
 	for (auto iLine = start; iLine <= finish; ++iLine) {
 	  ++savedGroup;
-	  if (sortedLines[iLine]->group != savedGroup) {
-		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
-		sequenceLines = sortedLines[iLine];
-		BSequence->emplace_back(sequenceLines[0].x, sequenceLines[0].y, 0);
-		savedGroup = sequenceLines[0].group;
+	  if (lineEndpoints[sortedLineIndices[iLine]].group != savedGroup) {
+		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
+		                        0);
+		sequenceIndex = iLine;
+		BSequence->emplace_back(lineEndpoints[sortedLineIndices[sequenceIndex]].x,
+		                        lineEndpoints[sortedLineIndices[sequenceIndex]].y,
+		                        0);
+		savedGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
 	  }
 	  else {
-		sequenceLines = sortedLines[iLine];
+		sequenceIndex = iLine;
 	  }
 	  if (sequenceMap.test_set(iLine)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
-		  duseq1(sequenceLines);
+		  duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
 		}
 	  }
 	  else {
-		movseq(sortedLines, iLine);
+		movseq(lineEndpoints, sortedLineIndices, iLine);
 	  }
 	}
-	lastGroup = sequenceLines->group;
+	lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
   }
   if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-	duseq1(sequenceLines);
+	duseq1(lineEndpoints, sortedLineIndices, sequenceIndex);
   }
 }
 
-void fi::dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uint32_t finish, uint32_t& lastGroup) {
+void fi::dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+                std::vector<uint32_t>&          sortedLineIndices,
+                uint32_t                        start,
+                uint32_t                        finish,
+                uint32_t&                       lastGroup) {
   auto minimumY = BIGFLOAT;
   for (auto iLine = start; iLine <= finish; ++iLine) {
-	if (auto const deltaY = sortedLines[start][1].y - sortedLines[start][0].y; deltaY < minimumY) {
+	if (auto const deltaY = lineEndpoints[sortedLineIndices[start] +1].y - lineEndpoints[sortedLineIndices[start]].y; deltaY < minimumY) {
 	  minimumY = deltaY;
 	}
   }
@@ -4283,21 +4315,19 @@ void fi::dunseq(std::vector<SMAL_PNT_L*> const& sortedLines, uint32_t start, uin
   else {
 	minimumY /= 2.0F;
   }
-  BSequence->emplace_back(sortedLines[start][0].x, sortedLines[start][0].y + minimumY, 0);
-  BSequence->emplace_back(sortedLines[finish][0].x, sortedLines[finish][0].y + minimumY, 0);
-  lastGroup = sortedLines[finish][0].group;
+  BSequence->emplace_back(lineEndpoints[sortedLineIndices[start]].x, lineEndpoints[sortedLineIndices[start]].y + minimumY, 0);
+  BSequence->emplace_back(lineEndpoints[sortedLineIndices[finish]].x, lineEndpoints[sortedLineIndices[finish]].y + minimumY, 0);
+  lastGroup = lineEndpoints[sortedLineIndices[finish]].group;
 }
 
-void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
+void fi::duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
+               std::vector<uint32_t>&          sortedLineIndices,
                uint32_t                        start,
                uint32_t                        finish,
                boost::dynamic_bitset<>&        sequenceMap,
                uint32_t&                       lastGroup,
-               SMAL_PNT_L const*               sequenceLines) {
-  if (nullptr != sequenceLines) {
-	throw std::runtime_error("sequenceLines should be null");
-  }
-  auto savedTopLine = sortedLines[start][1].line;
+               uint32_t&                       sequenceIndex) {
+  auto savedTopLine = lineEndpoints[sortedLineIndices[start]+1].line;
   StateMap->reset(StateFlag::SEQDUN);
   if (bool flag = false; start > finish) {
 	auto iLine = start + 1U;
@@ -4305,38 +4335,38 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	for (; iLine != finish; --iLine) {
 	  if (auto const iLineDec = iLine - 1U; sequenceMap.test_set(iLineDec)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
-		  duseq1(sortedLines[iLineDec]);
-		  sequenceLines = sortedLines[iLineDec];
+		  duseq1(lineEndpoints, sortedLineIndices, iLineDec);
+		  sequenceIndex = iLineDec;
 		  flag          = true;
 		}
 		else {
-		  if (savedTopLine != sortedLines[iLineDec][1].line) {
+		  if (savedTopLine != lineEndpoints[sortedLineIndices[iLineDec]+1].line) {
 			if (iLineDec != 0U) {
-			  duseq1(sortedLines[wrap::toSize(iLineDec) + 1U]);
+			  duseq1(lineEndpoints, sortedLineIndices, iLineDec + 1U);
 			}
-			duseq1(sortedLines[iLineDec]);
-			sequenceLines = sortedLines[iLineDec];
+			duseq1(lineEndpoints, sortedLineIndices, iLineDec);
+			sequenceIndex = iLineDec;
 			flag          = true;
-			savedTopLine  = sequenceLines[1].line;
+			savedTopLine  = lineEndpoints[sortedLineIndices[iLineDec] + 1].line;
 		  }
 		}
 	  }
 	  else {
 		if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-		  duseq1(sortedLines[wrap::toSize(iLineDec) + 1U]);
+		  duseq1(lineEndpoints, sortedLineIndices, iLineDec + 1U);
 		}
-		sequenceLines = sortedLines[iLineDec];
+		sequenceIndex = iLineDec;
 		flag          = true;
-		movseq(sortedLines, iLineDec);
+		movseq(lineEndpoints, sortedLineIndices, iLineDec);
 	  }
 	}
 	if (StateMap->testAndReset(StateFlag::SEQDUN)) {
-	  duseq1(sortedLines[iLine]);
-	  sequenceLines = sortedLines[iLine];
+	  duseq1(lineEndpoints, sortedLineIndices, iLine);
+	  sequenceIndex = iLine;
 	  flag          = true;
 	}
 	if (flag) { // flag is set if sequenceLines has been set above
-	  lastGroup = sequenceLines->group;
+	  lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
 	}
   }
   else {
@@ -4345,41 +4375,41 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 	  if (sequenceMap.test_set(iLine)) {
 		if (!StateMap->testAndSet(StateFlag::SEQDUN)) {
 		  flag = true;
-		  duseq1(sortedLines[iLine]);
-		  sequenceLines = sortedLines[iLine];
+		  duseq1(lineEndpoints, sortedLineIndices, iLine);
+		  sequenceIndex = iLine;
 		}
 		else {
-		  if (savedTopLine != sortedLines[iLine][1].line) {
+		  if (savedTopLine != lineEndpoints[sortedLineIndices[iLine]+1].line) {
 			if (iLine != 0U) {
-			  duseq1(sortedLines[iLine - 1U]);
+			  duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 			}
 			flag = true;
-			duseq1(sortedLines[iLine]);
-			sequenceLines = sortedLines[iLine];
-			savedTopLine  = sequenceLines[1].line;
+			duseq1(lineEndpoints, sortedLineIndices, iLine);
+			sequenceIndex = iLine;
+			savedTopLine  = lineEndpoints[sortedLineIndices[iLine]+1].line;
 		  }
 		}
 	  }
 	  else {
 		if (StateMap->testAndReset(StateFlag::SEQDUN)) {
 		  if (iLine != 0U) {
-			duseq1(sortedLines[iLine - 1U]);
+			duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 		  }
 		}
 		flag          = true;
-		sequenceLines = sortedLines[iLine];
-		movseq(sortedLines, iLine);
+		sequenceIndex = iLine;
+		movseq(lineEndpoints, sortedLineIndices, iLine);
 	  }
 	}
 	if (StateMap->testAndReset(StateFlag::SEQDUN)) {
 	  if (iLine != 0U) {
 		flag = true;
-		duseq1(sortedLines[iLine - 1U]);
-		sequenceLines = sortedLines[iLine - 1U];
+		duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
+		sequenceIndex = iLine - 1U;
 	  }
 	}
 	if (flag) {
-	  lastGroup = sequenceLines->group;
+	  lastGroup = lineEndpoints[sortedLineIndices[sequenceIndex]].group;
 	}
   }
 }
@@ -4387,7 +4417,8 @@ void fi::duseq(std::vector<SMAL_PNT_L*> const& sortedLines,
 void fi::durgn(FRM_HEAD const&                 form,
                std::vector<F_SEQ> const&       sequencePath,
                boost::dynamic_bitset<>&        visitedRegions,
-               std::vector<SMAL_PNT_L*> const& sortedLines,
+               std::vector<SMAL_PNT_L> const&  lineEndpoints,
+               std::vector<uint32_t>&          sortedLineIndices,
                uint32_t                        pthi,
                uint32_t                        lineCount,
                std::vector<REGION> const&      regionsList,
@@ -4406,7 +4437,7 @@ void fi::durgn(FRM_HEAD const&                 form,
 	  BSequence->emplace_back(iter->x, iter->y, 0);
 	}
 	// clang-format off
-	auto const  firstLine     = sortedLines[sequenceStart]->line;
+	auto const  firstLine     = lineEndpoints[sortedLineIndices[sequenceStart]].line;
 	auto const& bpnt          = BSequence->back();
 	auto        minimumLength = BIGFLOAT;
 	auto        mindif        = 0U;
@@ -4452,8 +4483,8 @@ void fi::durgn(FRM_HEAD const&                 form,
 	dun = false;
 	visitedRegions.set(iRegion);
   }
-  auto const groupStart = sortedLines[currentRegion.start]->group;
-  auto const groupEnd   = sortedLines[currentRegion.end]->group;
+  auto const groupStart = lineEndpoints[sortedLineIndices[currentRegion.start]].group;
+  auto const groupEnd   = lineEndpoints[sortedLineIndices[currentRegion.end]].group;
   auto       seql       = 0U;
   if (groupEnd != groupStart) {
 	auto const intermediate =
@@ -4482,20 +4513,20 @@ void fi::durgn(FRM_HEAD const&                 form,
   if (seqn > sequenceEnd) {
 	seqn = sequenceEnd;
   }
-  if (sortedLines[seql]->group != lastGroup) {
-	if (seql < sequenceEnd && sortedLines[wrap::toSize(seql) + 1U]->group == lastGroup) {
+  if (lineEndpoints[sortedLineIndices[seql]].group != lastGroup) {
+	if (seql < sequenceEnd && lineEndpoints[sortedLineIndices[wrap::toSize(seql) + 1U]].group == lastGroup) {
 	  ++seql;
 	}
 	else {
-	  if (seql > sequenceStart && sortedLines[seql - 1U]->group == lastGroup) {
+	  if (seql > sequenceStart && lineEndpoints[sortedLineIndices[seql - 1U]].group == lastGroup) {
 		--seql;
 	  }
 	  else {
 		auto mindif = std::numeric_limits<uint32_t>::max();
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif =
-		          ((sortedLines[ind]->group > lastGroup) ? (sortedLines[ind]->group - lastGroup)
-		                                                 : (lastGroup - sortedLines[ind]->group));
+		          ((lineEndpoints[sortedLineIndices[ind]].group > lastGroup) ? (lineEndpoints[sortedLineIndices[ind]].group - lastGroup)
+		                                                 : (lastGroup - lineEndpoints[sortedLineIndices[ind]].group));
 		      gdif < mindif) {
 			mindif = gdif;
 			seql   = ind;
@@ -4504,20 +4535,20 @@ void fi::durgn(FRM_HEAD const&                 form,
 	  }
 	}
   }
-  if (sortedLines[seqn]->group != nextGroup) {
-	if (seqn < sequenceEnd && sortedLines[wrap::toSize(seqn) + 1U]->group == nextGroup) {
+  if (lineEndpoints[sortedLineIndices[seqn]].group != nextGroup) {
+	if (seqn < sequenceEnd && lineEndpoints[sortedLineIndices[wrap::toSize(seqn) + 1U]].group == nextGroup) {
 	  ++seqn;
 	}
 	else {
-	  if (seqn > sequenceStart && sortedLines[seqn - 1U]->group == nextGroup) {
+	  if (seqn > sequenceStart && lineEndpoints[sortedLineIndices[seqn - 1U]].group == nextGroup) {
 		--seqn;
 	  }
 	  else {
 		auto mindif = std::numeric_limits<uint32_t>::max();
 		for (auto ind = sequenceStart; ind <= sequenceEnd; ++ind) {
 		  if (auto const gdif =
-		          ((sortedLines[ind]->group > nextGroup) ? (sortedLines[ind]->group - nextGroup)
-		                                                 : (nextGroup - sortedLines[ind]->group));
+		          ((lineEndpoints[sortedLineIndices[ind]].group > nextGroup) ? (lineEndpoints[sortedLineIndices[ind]].group - nextGroup)
+		                                                 : (nextGroup - lineEndpoints[sortedLineIndices[ind]].group));
 		      gdif < mindif) {
 			mindif = gdif;
 			seqn   = ind;
@@ -4526,34 +4557,34 @@ void fi::durgn(FRM_HEAD const&                 form,
 	  }
 	}
   }
-  if (auto* sequenceLines = gsl::narrow_cast<SMAL_PNT_L*>(nullptr); currentRegion.breakCount != 0U) {
+  if (auto sequenceIndex = lineEndpoints.size() + 1U; currentRegion.breakCount != 0U) {
 	if (dun) {
-	  brkdun(sortedLines, seql, seqn, workingFormVertices);
+	  brkdun(lineEndpoints, sortedLineIndices, seql, seqn, workingFormVertices);
 	}
 	else {
 	  if (lastGroup >= groupEnd) {
-		brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
+		brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 		if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-		  brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
+		  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
 		}
 	  }
 	  else {
 		if (groupStart <= nextGroup) {
 		  if (seql != sequenceStart) {
-			brkseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
+			brkseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 		  }
-		  brkseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
+		  brkseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
 		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-			brkseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceLines);
+			brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
 		  }
 		}
 		else {
 		  if (seql != sequenceEnd) {
-			brkseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
+			brkseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
 		  }
-		  brkseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
+		  brkseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-			brkseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
+			brkseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
 		  }
 		}
 	  }
@@ -4561,35 +4592,78 @@ void fi::durgn(FRM_HEAD const&                 form,
   }
   else {
 	if (dun) {
-	  dunseq(sortedLines, seql, seqn, lastGroup);
+	  dunseq(lineEndpoints, sortedLineIndices, seql, seqn, lastGroup);
 	}
 	else {
 	  if (lastGroup >= groupEnd) {
-		duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
-		duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
+		duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
+		duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
 	  }
 	  else {
 		if (groupStart <= nextGroup) {
 		  if (seql != sequenceStart) {
-			duseq(sortedLines, seql, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
+			duseq(lineEndpoints, sortedLineIndices, seql, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 		  }
-		  duseq(sortedLines, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
+		  duseq(lineEndpoints, sortedLineIndices, sequenceStart, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
 		  if (pthi < sequencePathIndex - 1 && sequenceEnd != seqn) {
-			duseq(sortedLines, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceLines);
+			duseq(lineEndpoints, sortedLineIndices, sequenceEnd, seqn, sequenceMap, lastGroup, sequenceIndex);
 		  }
 		}
 		else {
 		  if (seql != sequenceEnd) {
-			duseq(sortedLines, seql, sequenceEnd, sequenceMap, lastGroup, sequenceLines);
+			duseq(lineEndpoints, sortedLineIndices, seql, sequenceEnd, sequenceMap, lastGroup, sequenceIndex);
 		  }
-		  duseq(sortedLines, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceLines); // NOLINT(readability-suspicious-call-argument)
+		  duseq(lineEndpoints, sortedLineIndices, sequenceEnd, sequenceStart, sequenceMap, lastGroup, sequenceIndex); // NOLINT(readability-suspicious-call-argument)
 		  if (pthi < sequencePathIndex - 1 && sequenceStart != seqn) {
-			duseq(sortedLines, sequenceStart, seqn, sequenceMap, lastGroup, sequenceLines);
+			duseq(lineEndpoints, sortedLineIndices, sequenceStart, seqn, sequenceMap, lastGroup, sequenceIndex);
 		  }
 		}
 	  }
 	}
   }
+}
+
+auto fi::compLines(const std::tuple<uint32_t, SMAL_PNT_L*> arg3,
+                const std::tuple<uint32_t, SMAL_PNT_L*> arg4) noexcept -> bool {
+  // make sure the comparison obeys strict weak ordering for stable sorting
+  auto arg1 = std::get<SMAL_PNT_L*>(arg3);
+  auto arg2 = std::get<SMAL_PNT_L*>(arg4);
+  if (arg1->line < arg2->line) {
+	return true;
+  }
+  if (arg2->line < arg1->line) {
+	return false;
+  }
+  if (arg1->group < arg2->group) {
+	return true;
+  }
+  if (arg2->group < arg1->group) {
+	return false;
+  }
+  if (arg1->y < arg2->y) {
+	return true;
+  }
+  if (arg2->y < arg1->y) {
+	return false;
+  }
+  return false;
+}
+
+
+auto fi::getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector<uint32_t> {
+  auto sorted = std::vector<std::tuple<uint32_t, SMAL_PNT_L*>> {};
+  auto const stitchLineCount = lineEndpoints.size();
+  sorted.reserve(stitchLineCount / 2U);
+  for (auto iLine = 0U; iLine < stitchLineCount; iLine += 2U) {
+	sorted.push_back(std::make_tuple(iLine, &lineEndpoints[iLine]));
+  }
+  std::ranges::sort(sorted, fi::compLines);
+  auto retVal = std::vector<uint32_t> {};
+  retVal.reserve(stitchLineCount / 2U);
+  for (auto& line : sorted) { 
+	retVal.push_back(std::get<uint32_t>(line));
+  }
+  return retVal;
 }
 
 void fi::lcon(FRM_HEAD const&              form,
@@ -4601,22 +4675,16 @@ void fi::lcon(FRM_HEAD const&              form,
 #endif
 
   if (!lineEndpoints.empty()) {
-	auto       sortedLines     = std::vector<SMAL_PNT_L*> {};
-	auto const stitchLineCount = lineEndpoints.size();
-	sortedLines.reserve(stitchLineCount / 2U);
-	for (auto iLine = 0U; iLine < stitchLineCount; iLine += 2U) {
-	  sortedLines.push_back(&lineEndpoints[iLine]);
-	}
-	std::ranges::sort(sortedLines, fi::spComp);
-	auto const lineCount = wrap::toUnsigned(sortedLines.size());
+	auto       sortedLineIndices = fi::getLineSortOrder(lineEndpoints);
+	auto const lineCount         = wrap::toUnsigned(sortedLineIndices.size());
 	auto       regions   = std::vector<REGION> {};
 	regions.emplace_back(0U, 0U, 0U, 0U);
-	auto breakLine = sortedLines[0]->line;
+	auto breakLine = lineEndpoints[sortedLineIndices[0]].line;
 	for (auto iLine = 0U; iLine < lineCount; ++iLine) {
-	  if (breakLine != sortedLines[iLine]->line) {
+	  if (breakLine != lineEndpoints[sortedLineIndices[iLine]].line) {
 		regions.back().end = iLine - 1U;
 		regions.emplace_back(iLine, 0U, 0U, 0U);
-		breakLine = sortedLines[iLine]->line;
+		breakLine = lineEndpoints[sortedLineIndices[iLine]].line;
 	  }
 	}
 	regions.back().end        = lineCount - 1U;
@@ -4625,15 +4693,15 @@ void fi::lcon(FRM_HEAD const&              form,
 	for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
 	  auto count = 0U;
 	  if ((regions[iRegion].end - regions[iRegion].start) > 1) {
-		auto startGroup = sortedLines[regions[iRegion].start]->group;
+		auto startGroup = lineEndpoints[sortedLineIndices[regions[iRegion].start]].group;
 		for (auto iLine = regions[iRegion].start + 1U; iLine <= regions[iRegion].end; ++iLine) {
 		  ++startGroup;
-		  if (sortedLines[iLine]->group != startGroup) {
+		  if (lineEndpoints[sortedLineIndices[iLine]].group != startGroup) {
 			if (constexpr auto STLINE = 0U; count == 0U) {
 			  regions[iRegion].regionBreak = STLINE;
 			}
 			++count;
-			startGroup = sortedLines[iLine]->group;
+			startGroup = lineEndpoints[sortedLineIndices[iLine]].group;
 		  }
 		}
 	  }
@@ -4669,7 +4737,7 @@ void fi::lcon(FRM_HEAD const&              form,
 		  if (iSequence != iNode) {
 			auto nextGroup = 0U;
 			if (auto const isConnected = regclos(
-			        groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
+			        groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
 			    isConnected) {
 			  pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
 			  ++pathMapIndex;
@@ -4684,7 +4752,7 @@ void fi::lcon(FRM_HEAD const&              form,
 			if (iSequence != iNode) {
 			  auto nextGroup = 0U;
 			  if (auto const isConnected = regclos(
-			          groupIndexSequence, lineEndpoints, sortedLines, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
+			          groupIndexSequence, lineEndpoints, sortedLineIndices, iSequence, iNode, regions, gapToClosestRegion, nextGroup);
 			      isConnected) {
 				pathMap.push_back(R_CON {iNode, isConnected, nextGroup});
 				++pathMapIndex;
@@ -4699,8 +4767,8 @@ void fi::lcon(FRM_HEAD const&              form,
 	  auto startGroup = std::numeric_limits<uint32_t>::max();
 	  auto leftRegion = 0U;
 	  for (auto iRegion = 0U; iRegion < regionCount; ++iRegion) {
-		if (auto const* lineGroupPoint = sortedLines[regions[iRegion].start]; lineGroupPoint->group < startGroup) {
-		  startGroup = lineGroupPoint->group;
+		if (auto const& lineGroupPoint = lineEndpoints[sortedLineIndices[regions[iRegion].start]]; lineGroupPoint.group < startGroup) {
+		  startGroup = lineGroupPoint.group;
 		  leftRegion = iRegion;
 		}
 	  }
@@ -4728,7 +4796,17 @@ void fi::lcon(FRM_HEAD const&              form,
 	  auto doneRegion   = leftRegion; // last region sequenced
 	  auto visitedIndex = 0;
 	  while (unvis(visitedRegions, visitedIndex)) {
-		nxtrgn(tempPath, pathMap, mapIndexSequence, visitedRegions, sortedLines, regions, doneRegion, pathMapIndex, sequencePathIndex, visitedIndex);
+		nxtrgn(tempPath,
+		       pathMap,
+		       mapIndexSequence,
+		       visitedRegions,
+		       lineEndpoints,
+		       sortedLineIndices,
+		       regions,
+		       doneRegion,
+		       pathMapIndex,
+		       sequencePathIndex,
+		       visitedIndex);
 	  }
 	  auto count = std::numeric_limits<uint32_t>::max();
 	  sequencePath.reserve(sequencePathIndex);
@@ -4757,7 +4835,7 @@ void fi::lcon(FRM_HEAD const&              form,
 		if (!unvis(visitedRegions, visitedIndex)) {
 		  break;
 		}
-		durgn(form, sequencePath, visitedRegions, sortedLines, iPath, lineCount, regions, lastGroup, sequencePathIndex, workingFormVertices);
+		durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, iPath, lineCount, regions, lastGroup, sequencePathIndex, workingFormVertices);
 	  }
 	}
 	else {
@@ -4765,9 +4843,9 @@ void fi::lcon(FRM_HEAD const&              form,
 	  sequencePath.resize(SPATHIDX);
 	  auto lastGroup       = 0U;
 	  sequencePath[0].node = 0;
-	  wrap::narrow(sequencePath[0].nextGroup, sortedLines[regions[0].end]->group);
+	  wrap::narrow(sequencePath[0].nextGroup, lineEndpoints[sortedLineIndices[regions[0].end]].group);
 	  sequencePath[0].skp = false;
-	  durgn(form, sequencePath, visitedRegions, sortedLines, 0, lineCount, regions, lastGroup, SPATHIDX, workingFormVertices);
+	  durgn(form, sequencePath, visitedRegions, lineEndpoints, sortedLineIndices, 0, lineCount, regions, lastGroup, SPATHIDX, workingFormVertices);
 	}
 
 #endif
