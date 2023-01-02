@@ -841,9 +841,9 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 			flag = false;
 			break;
 		  }
-		  *colorEntry = threadList[paletteIndex].blockIndex;
-		  ++colorEntry;
-		  *colorEntry = threadList[paletteIndex].colorIndex;
+		  auto const colorEntries = gsl::span(colorEntry, 2);
+		  colorEntries[0] = threadList[paletteIndex].blockIndex;
+		  colorEntries[1] = threadList[paletteIndex].colorIndex;
 		}
 		pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
 		pesHeader.blct    = 1;
