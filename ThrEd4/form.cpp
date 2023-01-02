@@ -4560,7 +4560,7 @@ void fi::durgn(FRM_HEAD const&                 form,
 	  }
 	}
   }
-  if (auto sequenceIndex = lineEndpoints.size() + 1U; currentRegion.breakCount != 0U) {
+  if (auto sequenceIndex = wrap::toUnsigned(lineEndpoints.size() + 1U); currentRegion.breakCount != 0U) {
 	if (dun) {
 	  brkdun(lineEndpoints, sortedLineIndices, seql, seqn, workingFormVertices);
 	}
