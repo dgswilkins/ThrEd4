@@ -44,7 +44,7 @@ constexpr auto fswap(COLORREF color) noexcept -> COLORREF;
 constexpr auto gudtyp(WORD bitCount) noexcept -> bool;
 
 auto loadName(fs::path const& directory, fs::path& fileName) -> bool;
-void movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer);
+void movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept;
 auto nuBit() noexcept -> BOOL;
 void pxlin(FRM_HEAD const& form, uint32_t start, uint32_t finish);
 auto saveName(fs::path& fileName);
@@ -346,10 +346,13 @@ void bitmap::savmap() {
 }
 
 // Move unpacked 24BPP data into packed 24BPP data
-void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) {
-  auto*      destination = buffer.data();
+void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
+  auto  destination = buffer.begin();
   for (auto const& iTBD : src) {
-	*(convertFromPtr<uint32_t*>(destination)) = iTBD;
+	//*(destination++) = GetRValue(iTBD);
+	//*(destination++) = GetGValue(iTBD);
+	//*(destination++) = GetBValue(iTBD);
+	*(gsl::narrow_cast<uint32_t*>(gsl::narrow_cast<void*>(&(*destination)))) = iTBD;
 	destination += 3;
   }
 }
