@@ -396,7 +396,7 @@ void trace::trace() {
 	trace::untrace();
 	ti::tracwnd();
 	TraceDataSize = bitmap::getrmap();
-	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmap::getBitmapHeight()*bitmap::getBitmapWidth());
+	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
 	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap->test(StateFlag::LANDSCAP)) {
@@ -407,7 +407,7 @@ void trace::trace() {
 	  auto const bitmapPoint =
 	      POINT {std::lround(bmpSR.x * stitchPoint.x), std::lround(bmpSR.y * stitchPoint.y - 1.0F)};
 
-	  auto const color = spTBD[bitmapPoint.y * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
+	  auto const color = spTBD[wrap::toSize(bitmapPoint.y) * bitmap::getBitmapWidth() + bitmapPoint.x] ^ 0xffffffU;
 	  if (StateMap->test(StateFlag::TRCUP)) {
 		UpPixelColor   = color;
 		DownPixelColor = PENWHITE;
