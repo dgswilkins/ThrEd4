@@ -4126,10 +4126,10 @@ void fi::nxtrgn(std::vector<RG_SEQ>&            tempPath,
 	if (pathLength > maxPathLength) {
 	  auto lineEndPoint        = sortedLineIndices[regionsList[doneRegion].start];
 	  lastRegionCorners[0]     = lineEndpoints[lineEndPoint];
-	  lastRegionCorners[1]     = lineEndpoints[lineEndPoint + 1];
+	  lastRegionCorners[1]     = lineEndpoints[++lineEndPoint];
 	  lineEndPoint             = sortedLineIndices[regionsList[doneRegion].end];
 	  lastRegionCorners[2]     = lineEndpoints[lineEndPoint];
-	  lastRegionCorners[3]     = lineEndpoints[lineEndPoint + 1];
+	  lastRegionCorners[3]     = lineEndpoints[++lineEndPoint];
 	  auto       newRegion     = 0U;
 	  auto       minimumLength = BIGFLOAT;
 	  auto const regionCount   = visitedRegions.size();
