@@ -4307,7 +4307,8 @@ void fi::dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
                 uint32_t&                       lastGroup) {
   auto minimumY = BIGFLOAT;
   for (auto iLine = start; iLine <= finish; ++iLine) {
-	if (auto const deltaY = lineEndpoints[sortedLineIndices[start] +1].y - lineEndpoints[sortedLineIndices[start]].y; deltaY < minimumY) {
+	auto const index = wrap::toSize(sortedLineIndices[start]);
+	if (auto const deltaY = lineEndpoints[index + 1U].y - lineEndpoints[index].y; deltaY < minimumY) {
 	  minimumY = deltaY;
 	}
   }
