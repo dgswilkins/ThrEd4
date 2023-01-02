@@ -208,7 +208,6 @@ void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float 
 void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace pi
 
-static auto PEScolors      = gsl::narrow_cast<uint8_t*>(nullptr); // pes colors
 static auto PESequivColors = std::array<uint8_t, COLORCNT> {};    // pes equivalent colors
 
 static constexpr auto INDEX00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
@@ -434,7 +433,6 @@ void pi::pecdat(std::vector<uint8_t>& buffer) {
   auto* pecHeader = convertFromPtr<PECHDR*>(buffer.data());
   auto& pad       = pecHeader->pad;
   auto  const pesColors = gsl::span(std::begin(pad), sizeof(pad));
-  PEScolors       = std::begin(pad);
   auto thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto iColor  = 1U;
@@ -573,7 +571,6 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  }
 	  auto const pesColorCount = pecHeader->colorCount + 1U;
 	  auto&      pad           = pecHeader->pad;
-	  PEScolors                = std::begin(pad);
 	  auto const pesColors     = gsl::span(std::begin(pad), pesColorCount);
 	  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
 	  auto iUserColor          = UserColor.begin();
