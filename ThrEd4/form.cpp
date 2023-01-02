@@ -4330,7 +4330,7 @@ void fi::duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
                boost::dynamic_bitset<>&        sequenceMap,
                uint32_t&                       lastGroup,
                uint32_t&                       sequenceIndex) {
-  auto savedTopLine = lineEndpoints[sortedLineIndices[start]+1].line;
+  auto savedTopLine = lineEndpoints[wrap::toSize(sortedLineIndices[start]) + 1U].line;
   StateMap->reset(StateFlag::SEQDUN);
   if (bool flag = false; start > finish) {
 	auto iLine = start + 1U;
@@ -4343,14 +4343,14 @@ void fi::duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 		  flag          = true;
 		}
 		else {
-		  if (savedTopLine != lineEndpoints[sortedLineIndices[iLineDec]+1].line) {
+		  if (savedTopLine != lineEndpoints[wrap::toSize(sortedLineIndices[iLineDec]) + 1U].line) {
 			if (iLineDec != 0U) {
 			  duseq1(lineEndpoints, sortedLineIndices, iLineDec + 1U);
 			}
 			duseq1(lineEndpoints, sortedLineIndices, iLineDec);
 			sequenceIndex = iLineDec;
 			flag          = true;
-			savedTopLine  = lineEndpoints[sortedLineIndices[iLineDec] + 1].line;
+			savedTopLine  = lineEndpoints[wrap::toSize(sortedLineIndices[iLineDec]) + 1U].line;
 		  }
 		}
 	  }
@@ -4382,14 +4382,14 @@ void fi::duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 		  sequenceIndex = iLine;
 		}
 		else {
-		  if (savedTopLine != lineEndpoints[sortedLineIndices[iLine]+1].line) {
+		  if (savedTopLine != lineEndpoints[wrap::toSize(sortedLineIndices[iLine]) + 1U].line) {
 			if (iLine != 0U) {
 			  duseq1(lineEndpoints, sortedLineIndices, iLine - 1U);
 			}
 			flag = true;
 			duseq1(lineEndpoints, sortedLineIndices, iLine);
 			sequenceIndex = iLine;
-			savedTopLine  = lineEndpoints[sortedLineIndices[iLine]+1].line;
+			savedTopLine  = lineEndpoints[wrap::toSize(sortedLineIndices[iLine]) + 1U].line;
 		  }
 		}
 	  }
