@@ -550,36 +550,37 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   }
   auto bytesRead = DWORD {};
   wrap::readFile(fileHandle, fileBuffer, gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
-  auto* pesHeader = convertFromPtr<PESHED*>(fileBuffer);
+  auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());
 
   constexpr auto PESSTR      = "#PES"; // PES lead in value
   auto           successFlag = true;
-  if (strncmp(static_cast<char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) == 0) {
+  if (strncmp(static_cast<const char*>(pesHeader->ledI), PESSTR, strlen(PESSTR)) == 0) {
 	auto        contFlag      = false;
 	const char* verStrArray[] = {
 	    "0001", "0020", "0022", "0030", "0040", "0050", "0055", "0056", "0060", "0070", "0080", "0090", "0100"};
 	for (auto const& version : verStrArray) {
-	  if (strncmp(static_cast<char*>(pesHeader->ledV), version, strlen(version)) == 0) {
+	  if (strncmp(static_cast<const char*>(pesHeader->ledV), version, strlen(version)) == 0) {
 		contFlag = true;
 		break;
 	  }
 	}
 	if (contFlag) {
-	  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuffer[pesHeader->off]);
+	  auto*       pecHeader = convertFromPtr<PECHDR*>(&fileBuf[pesHeader->off]);
 	  auto const  pecOffset = pesHeader->off + sizeof(PECHDR) + sizeof(PECHDR2);
-	  auto const* pesStitch = &fileBuffer[pecOffset];
+	  auto const* pesStitch = &fileBuf[pecOffset];
 	  if (pesStitch == nullptr) {
 		return false;
 	  }
 	  auto const pesColorCount = pecHeader->colorCount + 1U;
 	  auto&      pad           = pecHeader->pad;
 	  PEScolors                = std::begin(pad);
+	  auto const pesColors     = gsl::span(std::begin(pad), pesColorCount);
 	  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
 	  auto iUserColor          = UserColor.begin();
 	  for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
-		if (PEScolors[iColor] < THTYPCNT) {
-		  if (!colorMap.test_set(PEScolors[iColor])) {
-			auto const& threadColor = PES_THREAD[PEScolors[iColor]];
+		if (pesColors[iColor] < THTYPCNT) {
+		  if (!colorMap.test_set(pesColors[iColor])) {
+			auto const& threadColor = PES_THREAD[pesColors[iColor]];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 			auto const color = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
 			*iUserColor      = color;
@@ -611,20 +612,21 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
 		auto pesColorIndex = uint32_t {1U};
+		auto const pesStitches   = gsl::span(pesStitch, pecCount);
 		while (iPESstitch < pecCount) {
-		  if (pesStitch[iPESstitch] == 0xff && pesStitch[iPESstitch + 1U] == 0) {
+		  if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
 			break;
 		  }
-		  if (pesStitch[iPESstitch] == 0xfe && pesStitch[iPESstitch + 1U] == 0xb0) {
-			color = pi::dupcol(wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
+		  if (pesStitches[iPESstitch] == 0xfe && pesStitches[iPESstitch + 1U] == 0xb0) {
+			color = pi::dupcol(pesColors, wrap::toUnsigned(std::distance(UserColor.begin(), iUserColor)), pesColorIndex);
 			iPESstitch += 2;
 		  }
 		  else {
 			auto locof = 0.0F;
-			if ((pesStitch[iPESstitch] & BIT8) != 0U) {
+			if ((pesStitches[iPESstitch] & BIT8) != 0U) {
 			  // combine the 4 bits from the first byte with the 8 bits from the next byte
-			  auto pesVal = (gsl::narrow_cast<uint32_t>(pesStitch[iPESstitch] << BYTSHFT) |
-			                 pesStitch[iPESstitch + 1U]) &
+			  auto pesVal = (gsl::narrow_cast<uint32_t>(pesStitches[iPESstitch] << BYTSHFT) |
+			                 pesStitches[iPESstitch + 1U]) &
 			                MSK12BIT;
 			  if ((pesVal & BIT12) != 0U) {
 				pesVal -= POSOFF;
@@ -634,11 +636,11 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 			  ++iPESstitch;
 			}
 			else {
-			  if (pesStitch[iPESstitch] > 0x3f) {
-				locof = wrap::toFloat(pesStitch[iPESstitch]) - 128.0F;
+			  if (pesStitches[iPESstitch] > 0x3f) {
+				locof = wrap::toFloat(pesStitches[iPESstitch]) - 128.0F;
 			  }
 			  else {
-				locof = pesStitch[iPESstitch];
+				locof = pesStitches[iPESstitch];
 			  }
 			}
 			locof *= IPECFACT;
