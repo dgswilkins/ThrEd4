@@ -4082,16 +4082,17 @@ auto fi::reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
                 uint32_t                             iRegion,
                 std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
                 std::vector<REGION> const&           regionsList) noexcept -> float {
-  auto lineEndPoints = std::array<SMAL_PNT_L, SQRCORNS> {};
-  auto startIndex    = lineEndpointIndices[regionsList[iRegion].start];
-  auto endIndex      = lineEndpointIndices[regionsList[iRegion].end];
-  lineEndPoints[0]   = lineEndpoints[startIndex];
-  lineEndPoints[1]   = lineEndpoints[startIndex + 1];
-  lineEndPoints[2]   = lineEndpoints[endIndex];
-  lineEndPoints[3]   = lineEndpoints[endIndex + 1];
+  auto corners = std::array<SMAL_PNT_L, SQRCORNS> {};
+  auto index   = lineEndpointIndices[regionsList[iRegion].start];
+  corners[0]   = lineEndpoints[index];
+  corners[1]   = lineEndpoints[++index];
+  index        = lineEndpointIndices[regionsList[iRegion].end];
+  corners[2]   = lineEndpoints[index];
+  corners[3]   = lineEndpoints[++index];
+
   auto minimumLength = BIGFLOAT;
   for (auto const& corner : lastRegionCorners) {
-	for (auto const& point : lineEndPoints) {
+	for (auto const& point : corners) {
 	  if (auto const length = hypot(corner.x - point.x, corner.y - point.y); length < minimumLength) {
 		minimumLength = length;
 	  }
