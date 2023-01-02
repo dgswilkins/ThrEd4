@@ -4208,8 +4208,9 @@ void fi::brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 void fi::duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
                 std::vector<uint32_t>&           sortedLineIndices,
                 uint32_t                         sequenceIndex) {
-  auto& sequence0 = lineEndpoints[sortedLineIndices[sequenceIndex]];
-  auto& sequence1 = lineEndpoints[sortedLineIndices[sequenceIndex] + 1U];
+  auto  index     = sortedLineIndices[sequenceIndex];
+  auto& sequence0 = lineEndpoints[index];
+  auto& sequence1 = lineEndpoints[++index];
   BSequence->emplace_back(wrap::midl(sequence1.x, sequence0.x), wrap::midl(sequence1.y, sequence0.y), 0);
 }
 
