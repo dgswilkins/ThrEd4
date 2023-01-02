@@ -194,7 +194,7 @@ constexpr auto PECFACT  = 5.0F / 3.0F;       // PEC format scale factor
 constexpr auto POSOFF   = int32_t {0x1000};  // offset used to shift value positive
 
 namespace pi {
-auto dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t;
+auto dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t;
 void pecEncodeInt(std::vector<uint8_t>& buffer, int32_t delta);
 void pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val);
 void pecImage(std::vector<uint8_t>& pecBuffer);
@@ -507,8 +507,8 @@ void pi::pecImage(std::vector<uint8_t>& pecBuffer) {
   pi::writeThumbnail(pecBuffer, thumbnail);
 }
 
-auto pi::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
-  auto const& threadColor = PES_THREAD[PEScolors[index++] % THTYPCNT];
+auto pi::dupcol(gsl::span<uint8_t> const& pesColors, uint32_t activeColor, uint32_t& index) -> uint32_t {
+  auto const& threadColor = PES_THREAD[pesColors[index++] % THTYPCNT];
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
   auto const color      = RGB(threadColor.color.r, threadColor.color.g, threadColor.color.b);
   auto       iUserColor = UserColor.cbegin();
@@ -521,7 +521,7 @@ auto pi::dupcol(uint32_t activeColor, uint32_t& index) -> uint32_t {
   auto minimumDistance = std::numeric_limits<uint32_t>::max();
   auto matchIndex      = 0U;
   for (auto iColor = 1U; iColor < activeColor; ++iColor) {
-	auto const matchDistance = pesmtch(color, PEScolors[iColor]);
+	auto const matchDistance = pesmtch(color, pesColors[iColor]);
 	if (matchDistance < minimumDistance) {
 	  minimumDistance = matchDistance;
 	  matchIndex      = iColor;
