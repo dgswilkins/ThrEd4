@@ -246,7 +246,8 @@ auto clpnxt(std::vector<CLIP_SEG> const& clipSegments,
             std::vector<LEN_INFO> const& sortedLengths,
             uint32_t                     sind,
             uint32_t&                    outIndex) -> bool;
-auto compLines(const std::tuple<uint32_t, SMAL_PNT_L*> arg1, const std::tuple<uint32_t, SMAL_PNT_L*> arg2) noexcept
+auto compLines(std::tuple<uint32_t, SMAL_PNT_L*> const& arg3,
+               std::tuple<uint32_t, SMAL_PNT_L*> const& arg4) noexcept
     -> bool;
 void contf(FRM_HEAD& form);
 auto contsf(uint32_t formIndex) -> bool;
@@ -4626,8 +4627,8 @@ void fi::durgn(FRM_HEAD const&                 form,
   }
 }
 
-auto fi::compLines(const std::tuple<uint32_t, SMAL_PNT_L*> arg3,
-                const std::tuple<uint32_t, SMAL_PNT_L*> arg4) noexcept -> bool {
+auto fi::compLines(std::tuple<uint32_t, SMAL_PNT_L*> const& arg3,
+                std::tuple<uint32_t, SMAL_PNT_L*> const& arg4) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   auto arg1 = std::get<SMAL_PNT_L*>(arg3);
   auto arg2 = std::get<SMAL_PNT_L*>(arg4);
