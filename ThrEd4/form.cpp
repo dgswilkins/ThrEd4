@@ -4630,8 +4630,8 @@ void fi::durgn(FRM_HEAD const&                 form,
 auto fi::compLines(std::tuple<uint32_t, SMAL_PNT_L*> const& arg3,
                 std::tuple<uint32_t, SMAL_PNT_L*> const& arg4) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
-  auto arg1 = std::get<SMAL_PNT_L*>(arg3);
-  auto arg2 = std::get<SMAL_PNT_L*>(arg4);
+  auto const arg1 = std::get<SMAL_PNT_L*>(arg3);
+  auto const arg2 = std::get<SMAL_PNT_L*>(arg4);
   if (arg1->line < arg2->line) {
 	return true;
   }
