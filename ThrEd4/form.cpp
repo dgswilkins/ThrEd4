@@ -4659,7 +4659,7 @@ auto fi::getLineSortOrder(std::vector<SMAL_PNT_L>& lineEndpoints) -> std::vector
   auto const stitchLineCount = lineEndpoints.size();
   sorted.reserve(stitchLineCount / 2U);
   for (auto iLine = 0U; iLine < stitchLineCount; iLine += 2U) {
-	sorted.push_back(std::make_tuple(iLine, &lineEndpoints[iLine]));
+	sorted.emplace_back(iLine, &lineEndpoints[iLine]);
   }
   std::ranges::sort(sorted, fi::compLines);
   auto retVal = std::vector<uint32_t> {};
