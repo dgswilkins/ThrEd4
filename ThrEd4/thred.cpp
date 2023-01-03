@@ -5969,7 +5969,7 @@ void thi::duclip() {
 	  EmptyClipboard();
 	  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
-	  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE,
+	  auto clipHandle = GlobalAlloc(GHND,
 	                                (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) +
 	                                    sizeof(FORM_VERTEX_CLIP));
 	  if (clipHandle != nullptr) {
@@ -6011,7 +6011,7 @@ void thi::duclip() {
 		  length += sizfclp(currentForm);
 		}
 		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
-		auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length);
+		auto clipHandle = GlobalAlloc(GHND, length);
 		if (clipHandle != nullptr) {
 		  auto* clipFormsHeader     = *(gsl::narrow_cast<FORMS_CLIP**>(clipHandle));
 		  clipFormsHeader->clipType = CLP_FRMS;
@@ -6112,7 +6112,7 @@ void thi::duclip() {
 		if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 		  Clip = RegisterClipboardFormat(PcdClipFormat);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLIP_STITCH) + 2U);
+		  ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
 		  if (ClipPointer != nullptr) {
 			ClipStitchData    = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			auto iStitch      = 0U;
@@ -6141,7 +6141,7 @@ void thi::duclip() {
 		  sizclp(form, firstStitch, stitchCount, length, clipSize);
 		  clipSize += sizeof(FORM_CLIP);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
-		  auto clipHandle = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, clipSize);
+		  auto clipHandle = GlobalAlloc(GHND, clipSize);
 		  if (clipHandle != nullptr) {
 			auto* clipFormHeader     = *(gsl::narrow_cast<FORM_CLIP**>(clipHandle));
 			clipFormHeader->clipType = CLP_FRM;
@@ -6190,7 +6190,7 @@ void thi::duclip() {
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, stitchCount * sizeof(CLIP_STITCH) + 2U);
+			ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			  auto iTexture  = firstStitch;
@@ -6230,7 +6230,7 @@ void thi::duclip() {
 			auto const length  = GroupEndStitch - GroupStartStitch + 1U;
 			auto       iSource = GroupStartStitch;
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GMEM_MOVEABLE | GMEM_DDESHARE, length * sizeof(CLIP_STITCH) + 2U);
+			ClipPointer = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
 			  thred::savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
