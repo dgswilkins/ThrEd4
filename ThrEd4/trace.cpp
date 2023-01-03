@@ -174,7 +174,7 @@ void ti::trcratnum() {
 
 auto ti::trcin(COLORREF color) -> bool {
   if (color != 0U) {
-	auto colors = ti::trcols(color);
+	auto const colors = ti::trcols(color);
 	if (StateMap->test(StateFlag::TRCRED)) {
 	  if (colors[0] > HighColors[0]) {
 		return false;
