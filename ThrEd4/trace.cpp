@@ -352,7 +352,7 @@ void trace::trdif() {
 	  }
 	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	  auto       pos   = size_t {0U};
-	  for (auto iPixel :spTBD) {
+	  for (auto& iPixel :spTBD) {
 		iPixel &= TraceRGBMask[iRGB];
 		if (differenceBitmap[pos] != 0U) {
 		  auto const adjustedColorSum = wrap::round<uint32_t>(
@@ -537,7 +537,7 @@ void trace::tracedg() {
   auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
   auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
-  for (auto iPixel : spTBD) {
+  for (auto& iPixel : spTBD) {
 	if (TracedEdges->test(pos)) {
 	  iPixel = PENWHITE;
 	}
