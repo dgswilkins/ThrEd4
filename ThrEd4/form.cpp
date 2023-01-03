@@ -222,8 +222,8 @@ void blbrd(FRM_HEAD const& form);
 void bold(FRM_HEAD const& form);
 void boldlin(uint32_t vertexIndex, uint32_t start, uint32_t finish, float size);
 void brdfil(FRM_HEAD const& form);
-void brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t start, uint32_t finish, std::vector<F_POINT>& workingFormVertices);
-void brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices,
+void brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>const& sortedLineIndices, uint32_t start, uint32_t finish, std::vector<F_POINT>& workingFormVertices);
+void brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t> const& sortedLineIndices,
             uint32_t                        start,
             uint32_t                        finish,
             boost::dynamic_bitset<>&        sequenceMap,
@@ -267,14 +267,14 @@ void dufdat(std::vector<F_POINT>&  tempClipPoints,
             uint32_t&              formRelocationIndex,
             uint32_t&              formSourceIndex);
 void duflt(float& formOffset, std::vector<F_POINT>& currentFormVertices);
-void dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t start, uint32_t finish, uint32_t& lastGroup);
+void dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t> const& sortedLineIndices, uint32_t start, uint32_t finish, uint32_t& lastGroup);
 void duprots(float rotationAngle, F_POINT const& rotationCenter);
 void duprotfs(float rotationAngle);
 void durgn(FRM_HEAD const&                 form,
            std::vector<F_SEQ> const&       sequencePath,
            boost::dynamic_bitset<>&        visitedRegions,
            std::vector<SMAL_PNT_L> const&  lineEndpoints,
-           std::vector<uint32_t>&          sortedLineIndices,
+           std::vector<uint32_t> const&          sortedLineIndices,
            uint32_t                        pthi,
            uint32_t                        lineCount,
            std::vector<REGION> const&      regionsList,
@@ -283,14 +283,14 @@ void durgn(FRM_HEAD const&                 form,
            std::vector<F_POINT>&           workingFormVertices);
 void duromb(F_POINT const& start0, F_POINT const& finish0, F_POINT const& start1, F_POINT const& finish1, F_POINT& stitchPoint);
 void duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-           std::vector<uint32_t>&          sortedLineIndices,
+           std::vector<uint32_t> const&          sortedLineIndices,
            uint32_t                        start,
            uint32_t                        finish,
            boost::dynamic_bitset<>&        sequenceMap,
            uint32_t&                       lastGroup,
            uint32_t&                       sequenceIndex);
 void duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
-            std::vector<uint32_t>&           sortedLineIndices,
+            std::vector<uint32_t> const&           sortedLineIndices,
             uint32_t                         sequenceIndex);
 void duspnd(float                        stitchLen,
             std::vector<V_RECT_2> const& underlayVerticalRect,
@@ -384,7 +384,7 @@ auto lnclos(std::vector<uint32_t> const&   groupIndexSequence,
             uint32_t                       line1,
             float                          gapToClosestRegion) noexcept -> bool;
 void makpoli();
-void movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t>& sortedLineIndices, uint32_t ind);
+void movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints, std::vector<uint32_t> const& sortedLineIndices, uint32_t ind);
 void mvpclp(std::vector<CLIP_SORT*>& arrayOfClipIntersectData, uint32_t destination, uint32_t source) noexcept;
 auto notdun(std::vector<RG_SEQ>&           tempPath,
             std::vector<R_CON> const&      pathMap,
@@ -402,7 +402,7 @@ void nxtrgn(std::vector<RG_SEQ>&            tempPath,
             std::vector<uint32_t> const&    mapIndexSequence,
             boost::dynamic_bitset<>&        visitedRegions,
              std::vector<SMAL_PNT_L> const&  lineEndpoints,
-            std::vector<uint32_t>&         sortedLineIndices,
+            std::vector<uint32_t> const&         sortedLineIndices,
             std::vector<REGION> const&      regionsList,
             uint32_t&                       doneRegion,
             uint32_t                        pathMapIndex,
@@ -439,14 +439,14 @@ auto px2stchf(POINT const& screen) noexcept -> F_POINT;
 void rats();
 auto regclos(std::vector<uint32_t> const&    groupIndexSequence,
              std::vector<SMAL_PNT_L> const&  lineEndpoints,
-             std::vector<uint32_t>&         sortedLineIndices,
+             std::vector<uint32_t>const&         sortedLineIndices,
              uint32_t                        iRegion0,
              uint32_t                        iRegion1,
              std::vector<REGION> const&      regionsList,
              float                           gapToClosestRegion,
              uint32_t&                       nextGroup) noexcept -> bool;
 auto reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
-            std::vector<uint32_t>&               lineEndpointIndices,
+            std::vector<uint32_t> const&               sortedLineIndices,
             uint32_t                             iRegion,
             std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
             std::vector<REGION> const&           regionsList) noexcept -> float;
@@ -3945,7 +3945,7 @@ auto fi::lnclos(std::vector<uint32_t> const&   groupIndexSequence,
 
 auto fi::regclos(std::vector<uint32_t> const&    groupIndexSequence,
                  std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                 std::vector<uint32_t> & sortedLineIndices,
+                 std::vector<uint32_t> const& sortedLineIndices,
                  uint32_t                        iRegion0,
                  uint32_t                        iRegion1,
                  std::vector<REGION> const&      regionsList,
@@ -4078,15 +4078,15 @@ auto fi::notdun(std::vector<RG_SEQ>&           tempPath,
 }
 
 auto fi::reglen(std::vector<SMAL_PNT_L> const&       lineEndpoints,
-                std::vector<uint32_t>&               lineEndpointIndices,
+                std::vector<uint32_t> const&               sortedLineIndices,
                 uint32_t                             iRegion,
                 std::array<F_POINT, SQRCORNS> const& lastRegionCorners,
                 std::vector<REGION> const&           regionsList) noexcept -> float {
   auto corners = std::array<SMAL_PNT_L, SQRCORNS> {};
-  auto index   = lineEndpointIndices[regionsList[iRegion].start];
+  auto index   = sortedLineIndices[regionsList[iRegion].start];
   corners[0]   = lineEndpoints[index];
   corners[1]   = lineEndpoints[++index];
-  index        = lineEndpointIndices[regionsList[iRegion].end];
+  index        = sortedLineIndices[regionsList[iRegion].end];
   corners[2]   = lineEndpoints[index];
   corners[3]   = lineEndpoints[++index];
 
@@ -4106,7 +4106,7 @@ void fi::nxtrgn(std::vector<RG_SEQ>&            tempPath,
                 std::vector<uint32_t> const&    mapIndexSequence,
                 boost::dynamic_bitset<>&        visitedRegions,
                 std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                std::vector<uint32_t>&          sortedLineIndices,
+                std::vector<uint32_t> const&          sortedLineIndices,
                 std::vector<REGION> const&      regionsList,
                 uint32_t&                       doneRegion,
                 uint32_t                        pathMapIndex,
@@ -4193,7 +4193,7 @@ void fi::nxtseq(std::vector<F_SEQ>&          sequencePath,
 }
 
 void fi::brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                std::vector<uint32_t>&          sortedLineIndices,
+                std::vector<uint32_t> const&          sortedLineIndices,
                 uint32_t                        start,
                 uint32_t                        finish,
                 std::vector<F_POINT>&           workingFormVertices) {
@@ -4206,7 +4206,7 @@ void fi::brkdun(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 }
 
 void fi::duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
-                std::vector<uint32_t>&           sortedLineIndices,
+                std::vector<uint32_t> const&           sortedLineIndices,
                 uint32_t                         sequenceIndex) {
   auto  index     = sortedLineIndices[sequenceIndex];
   auto& sequence0 = lineEndpoints[index];
@@ -4215,7 +4215,7 @@ void fi::duseq1(std::vector<SMAL_PNT_L> const&   lineEndpoints,
 }
 
 void fi::movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                std::vector<uint32_t>&          sortedLineIndices,
+                std::vector<uint32_t> const&          sortedLineIndices,
                 uint32_t                        ind) {
   auto lineEndPoint = std::next(lineEndpoints.begin(), sortedLineIndices[ind]);
   BSequence->emplace_back(B_SEQ_PNT {lineEndPoint->x, lineEndPoint->y, SEQBOT});
@@ -4226,7 +4226,7 @@ void fi::movseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 }
 
 void fi::brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                std::vector<uint32_t>&          sortedLineIndices,
+                std::vector<uint32_t> const&          sortedLineIndices,
                 uint32_t                        start,
                 uint32_t                        finish,
                 boost::dynamic_bitset<>&        sequenceMap,
@@ -4301,7 +4301,7 @@ void fi::brkseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 }
 
 void fi::dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-                std::vector<uint32_t>&          sortedLineIndices,
+                std::vector<uint32_t> const&          sortedLineIndices,
                 uint32_t                        start,
                 uint32_t                        finish,
                 uint32_t&                       lastGroup) {
@@ -4324,7 +4324,7 @@ void fi::dunseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
 }
 
 void fi::duseq(std::vector<SMAL_PNT_L> const&  lineEndpoints,
-               std::vector<uint32_t>&          sortedLineIndices,
+               std::vector<uint32_t> const&          sortedLineIndices,
                uint32_t                        start,
                uint32_t                        finish,
                boost::dynamic_bitset<>&        sequenceMap,
@@ -4421,7 +4421,7 @@ void fi::durgn(FRM_HEAD const&                 form,
                std::vector<F_SEQ> const&       sequencePath,
                boost::dynamic_bitset<>&        visitedRegions,
                std::vector<SMAL_PNT_L> const&  lineEndpoints,
-               std::vector<uint32_t>&          sortedLineIndices,
+               std::vector<uint32_t> const&          sortedLineIndices,
                uint32_t                        pthi,
                uint32_t                        lineCount,
                std::vector<REGION> const&      regionsList,
