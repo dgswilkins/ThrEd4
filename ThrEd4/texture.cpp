@@ -898,6 +898,7 @@ void txi::txtclp(FRM_HEAD& textureForm) {
 	  if (auto const clipMemory = GlobalLock(clipData); nullptr != clipMemory) {
 		if (auto* clipForm = thred::getClipForm(clipMemory); nullptr != clipForm) {
 		  textureForm           = *clipForm;
+		  #pragma warning(suppress : 26481)
 		  auto*      vertices   = convertFromPtr<F_POINT*>(++clipForm);
 		  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
 		  AngledFormVertices->clear();
