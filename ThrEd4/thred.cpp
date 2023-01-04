@@ -5980,7 +5980,8 @@ void thi::duclip() {
 		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
 		// skip past the header
 		#pragma warning(suppress : 26481)
-		auto*       vertices = convertFromPtr<F_POINT*>(&clipHeader[1]);
+		auto*       ptrVertices = convertFromPtr<F_POINT*>(++clipHeader);
+		auto vertices = gsl::span(ptrVertices, wrap::toSize(SelectedFormVertices.vertexCount) + 1U);
 		auto const& form     = FormList->operator[](ClosestFormToCursor);
 		auto itVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		auto iSource         = SelectedFormVertices.start;
@@ -6018,7 +6019,8 @@ void thi::duclip() {
 		  wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
 		  // Skip past the header
 		  #pragma warning(suppress : 26481)
-		  auto* forms = convertFromPtr<FRM_HEAD*>(&clipFormsHeader[1]);
+		  auto*      ptrForms = convertFromPtr<FRM_HEAD*>(++clipFormsHeader);
+		  auto  const forms    = gsl::span(ptrForms, SelectedFormList->size());
 		  auto  iForm = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& currentForm = FormList->operator[](selectedForm);
@@ -6026,7 +6028,12 @@ void thi::duclip() {
 		  }
 		  // skip past the forms
 		  #pragma warning(suppress : 26481)
-		  auto* formVertices = convertFromPtr<F_POINT*>(&forms[iForm]);
+		  auto* ptrFormVertices = convertFromPtr<F_POINT*>(&ptrForms[iForm]);
+		  auto  verticesSize    = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) { 
+			verticesSize += FormList->operator[](selectedForm).vertexCount;
+		  }
+		  auto const formVertices = gsl::span(ptrFormVertices, verticesSize);
 		  auto  iVertex      = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			// clang-format off
@@ -6040,7 +6047,15 @@ void thi::duclip() {
 		  }
 		  // skip past the vertex list
 		  #pragma warning(suppress : 26481)
-		  auto* guides     = convertFromPtr<SAT_CON*>(&formVertices[iVertex]);
+		  auto* ptrGuides     = convertFromPtr<SAT_CON*>(&ptrFormVertices[iVertex]);
+		  auto  guidesSize = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& form = FormList->operator[](selectedForm);
+			if (form.type == SAT) {
+			  guidesSize += form.satinGuideCount;
+			}
+		  }
+		  auto const guides     = gsl::span(ptrGuides, guidesSize);
 		  auto  guideCount = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6054,7 +6069,18 @@ void thi::duclip() {
 		  }
 		  // skip past the guides
 		  #pragma warning(suppress : 26481)
-		  auto* points     = convertFromPtr<F_POINT*>(&guides[guideCount]);
+		  auto* ptrPoints     = convertFromPtr<F_POINT*>(&ptrGuides[guideCount]);
+		  auto  pointsSize = 0U;
+		  for (auto& selectedForm : (*SelectedFormList)) {
+			auto& form = FormList->operator[](selectedForm);
+			if (form.isclpx()) {
+			  pointsSize += form.lengthOrCount.clipCount;
+			}
+			if (form.iseclp()) {
+			  pointsSize += form.clipEntries;
+			}
+		  }
+		  auto const points = gsl::span(ptrPoints, pointsSize);
 		  auto  pointCount = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
@@ -6075,7 +6101,7 @@ void thi::duclip() {
 		  }
 		  // Skip past the points
 		  #pragma warning(suppress : 26481)
-		  auto* textures     = convertFromPtr<TX_PNT*>(&points[pointCount]);
+		  auto* textures     = convertFromPtr<TX_PNT*>(&ptrPoints[pointCount]);
 		  auto  textureCount = uint16_t {};
 		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
@@ -6121,13 +6147,14 @@ void thi::duclip() {
 		  ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
 		  if (ClipPointer != nullptr) {
 			ClipStitchData    = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
+			auto const spData       = gsl::span(ClipStitchData, stitchCount);
 			auto iStitch      = 0U;
 			auto iDestination = 0U;
-			thred::savclp(ClipStitchData[0], astch[0], stitchCount);
+			thred::savclp(spData[0], astch[0], stitchCount);
 			++iStitch;
 			++iDestination;
 			while (iStitch < stitchCount) {
-			  thred::savclp(ClipStitchData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
+			  thred::savclp(spData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
 			  ++iStitch;
 			}
 			GlobalUnlock(ClipPointer);
@@ -6154,48 +6181,53 @@ void thi::duclip() {
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
 			#pragma warning(suppress : 26481)
-			auto* formVertices       = convertFromPtr<F_POINT*>(&clipFormHeader[1]);
-			auto  itVertex           = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-			for (auto iSide = 0U; iSide < form.vertexCount; ++iSide) {
-			  formVertices[iSide] = *itVertex;
-			  ++itVertex;
-			}
+			auto* ptrFormVertices = convertFromPtr<F_POINT*>(++clipFormHeader);
+			auto  startVertex     = wrap::next(FormVertices->cbegin(), form.vertexIndex);
+			auto  endVertex       = wrap::next(startVertex, form.vertexCount);
+
+			auto const vertices = gsl::span(ptrFormVertices, form.vertexCount);
+			std::copy(startVertex, endVertex, vertices.begin());
 			#pragma warning(suppress : 26481)
-			auto* guides = convertFromPtr<SAT_CON*>(&formVertices[form.vertexCount]);
+			auto*      ptrGuides = convertFromPtr<SAT_CON*>(&ptrFormVertices[form.vertexCount]);
 			auto  iGuide = 0U;
 			if (form.type == SAT) {
-			  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-			  for (iGuide = 0; iGuide < form.satinGuideCount; ++iGuide) {
-				guides[iGuide] = *itGuide;
-				++itGuide;
+			  iGuide          = form.satinGuideCount;
+			  auto startGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+			  auto endGuide   = wrap::next(startGuide, iGuide);
+
+			  auto const guides = gsl::span(ptrGuides, iGuide);
+			  std::copy(startGuide, endGuide, guides.begin());
 			  }
-			}
 		  #pragma warning(suppress : 26481)
-			auto* mclp  = convertFromPtr<F_POINT*>(&guides[iGuide]);
+			auto* ptrMclp = convertFromPtr<F_POINT*>(&ptrGuides[iGuide]);
 			auto  iClip = 0U;
 			if (form.isclpx()) {
-			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-			  for (iClip = 0; iClip < form.lengthOrCount.clipCount; ++iClip) {
-				mclp[iClip] = *offsetStart;
-				++offsetStart;
+			  iClip          = form.lengthOrCount.clipCount;
+			  auto startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+			  auto endMclp   = wrap::next(startMclp, iClip);
+
+			  auto const mclps = gsl::span(ptrMclp, iClip);
+			  std::copy(startMclp, endMclp, mclps.begin());
 			  }
-			}
 		  #pragma warning(suppress : 26481)
-			auto* points = convertFromPtr<F_POINT*>(&mclp[iClip]);
+			auto* ptrPoints = convertFromPtr<F_POINT*>(&ptrMclp[iClip]);
+			iClip           = 0U;
 			if (form.iseclpx()) {
-			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-			  for (iClip = 0; iClip < form.clipEntries; ++iClip) {
-				points[iClip] = *offsetStart;
-				++offsetStart;
+			  iClip          = form.clipEntries;
+			  auto startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+			  auto endClip   = wrap::next(startClip, iClip);
+
+			  auto const points = gsl::span(ptrPoints, iClip);
+			  std::copy(startClip, endClip, points.begin());
 			  }
-			}
 #pragma warning(suppress : 26481)
-			auto* textures = convertFromPtr<TX_PNT*>(&points[iClip]);
+			auto* textures = convertFromPtr<TX_PNT*>(&ptrPoints[iClip]);
 			if (form.istx()) {
-			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
-			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
-			  auto const spDest   = gsl::span {textures, form.fillInfo.texture.count};
-			  std::copy(startPoint, endPoint, spDest.begin());
+			  auto startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
+			  auto endTexture = wrap::next(startTexture, form.fillInfo.texture.count);
+
+			  auto const spDest = gsl::span {textures, form.fillInfo.texture.count};
+			  std::copy(startTexture, endTexture, spDest.begin());
 			}
 			SetClipboardData(thrEdClip, clipHandle);
 		  }
@@ -6205,15 +6237,16 @@ void thi::duclip() {
 			ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
+			  auto const spData   = gsl::span(ClipStitchData, stitchCount);
 			  auto iTexture  = firstStitch;
-			  thred::savclp(ClipStitchData[0], StitchBuffer->operator[](iTexture), length);
+			  thred::savclp(spData[0], StitchBuffer->operator[](iTexture), length);
 			  ++iTexture;
 			  auto       iDestination   = 1U;
 			  auto const codedAttribute = ClosestFormToCursor << FRMSHFT;
 			  while (iTexture < StitchBuffer->size()) {
 				if ((StitchBuffer->operator[](iTexture).attribute & FRMSK) == codedAttribute &&
 				    ((StitchBuffer->operator[](iTexture).attribute & NOTFRM) == 0U)) {
-				  thred::savclp(ClipStitchData[iDestination++],
+				  thred::savclp(spData[iDestination++],
 				                StitchBuffer->operator[](iTexture),
 				                (StitchBuffer->operator[](iTexture).attribute & COLMSK));
 				}
@@ -6246,10 +6279,11 @@ void thi::duclip() {
 			ClipPointer = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
 			  ClipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
-			  thred::savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
+			  auto const spData = gsl::span(ClipStitchData, length);
+			  thred::savclp(spData[0], StitchBuffer->operator[](iSource), length);
 			  ++iSource;
 			  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
-				thred::savclp(ClipStitchData[iStitch],
+				thred::savclp(spData[iStitch],
 				              StitchBuffer->operator[](iSource),
 				              (StitchBuffer->operator[](iSource).attribute & COLMSK));
 				++iSource;
@@ -7111,7 +7145,7 @@ void thred::redclp() {
   if (ClipPointer != nullptr) {
 #pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
 	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
-	auto const        clipSize         = clipStitchPtr[0].led;
+	auto const        clipSize         = clipStitchPtr->led;
 	auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
 	ClipBuffer->clear();
 	ClipBuffer->reserve(clipSize);
@@ -9636,12 +9670,13 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	case WM_INITDIALOG: {
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
+	  if (lparam != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 	  auto* fileInfo = reinterpret_cast<FIND_INFO*>(lparam);
-	  if (fileInfo != nullptr) {
+		auto const spFileInfo = gsl::span(fileInfo->data, FNDFLMAX);
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), &(fileInfo->data[0]));
+		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), fileInfo->data);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
@@ -9649,7 +9684,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  return TRUE;
 		}
 		fileInfo->count = 1;
-		while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++])) { }
+		while (FindNextFile(searchResult, &spFileInfo[fileInfo->count++])) { }
 		--(fileInfo->count);
 		ritlock(fileInfo->data, fileInfo->count, hwndlg);
 	  }
@@ -9669,17 +9704,19 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			return TRUE;
 		  }
 		  case IDC_LOCKAL: {
-			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
+			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCKAL: {
-			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
+			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  fileInfo->data[iFile].dwFileAttributes &= NROMASK;
+			  iFile.dwFileAttributes &= NROMASK;
 			}
 			ritlock(fileInfo->data, fileInfo->count, hwndlg);
 			break;
@@ -9688,12 +9725,13 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
+			auto const spFileInfo   = gsl::span(fileInfo->data, fileInfo->count);
+			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
+			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
 				if (SendMessage(unlockHandle, LB_GETSEL, fileError, 0)) {
 				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-				  fileInfo->data[iFile].dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
+				  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 				}
 				++fileError;
 			  }
@@ -9705,12 +9743,13 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
+			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-			  if ((fileInfo->data[iFile].dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
+			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 				if (SendMessage(lockHandle, LB_GETSEL, fileError, 0)) {
 				  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-				  fileInfo->data[iFile].dwFileAttributes &= NROMASK;
+				  iFile.dwFileAttributes &= NROMASK;
 				}
 				++fileError;
 			  }
@@ -9720,10 +9759,11 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  }
 		  case IDOK: {
 			auto fileError = 0U;
-			for (auto iFile = 0U; iFile < fileInfo->count; ++iFile) {
-			  auto& cFileName = fileInfo->data[iFile].cFileName;
+			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			for (auto& iFile : spFileInfo) {
+			  auto& cFileName = iFile.cFileName;
 			  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
-			  if (!SetFileAttributes(fileName.wstring().c_str(), fileInfo->data[iFile].dwFileAttributes)) {
+			  if (!SetFileAttributes(fileName.wstring().c_str(), iFile.dwFileAttributes)) {
 				++fileError;
 			  }
 			}
@@ -13125,8 +13165,17 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  currentVertex += form.vertexCount;
 		}
 		#pragma warning(suppress : 26481)
-		auto* guides       = convertFromPtr<SAT_CON*>(&formVertices[currentVertex]);
-		auto  currentGuide = 0U;
+		auto* ptrGuides       = convertFromPtr<SAT_CON*>(&ptrFormVertices[currentVertex]);
+		auto  guideCount = 0U;
+		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
+		  auto const offset = formOffset + iForm;
+		  auto& form        = FormList->operator[](offset);
+		  if (form.type == SAT && (form.satinGuideCount != 0U)) {
+			guideCount += form.satinGuideCount;
+		  }
+		}
+		auto currentGuide = 0U;
+		auto const guides   = gsl::span(ptrGuides, guideCount);
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  auto const offset = formOffset + iForm;
 		  auto& form        = FormList->operator[](offset);
@@ -13140,8 +13189,22 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  }
 		}
 		#pragma warning(suppress : 26481)
-		auto* clipData    = convertFromPtr<F_POINT*>(&guides[currentGuide]);
-		auto  currentClip = 0U;
+		auto* ptrClipData    = convertFromPtr<F_POINT*>(&ptrGuides[currentGuide]);
+		auto  clipCount = 0U;
+		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
+		  // clang-format off
+		  auto const offset = formOffset + iForm;
+		  auto&      form   = FormList->operator[](offset);
+		  // clang-format on
+		  if (form.isclpx()) {
+			clipCount += form.lengthOrCount.clipCount;
+		  }
+		  if (form.iseclpx()) {
+			clipCount += form.clipEntries;
+		  }
+		}
+		auto currentClip = 0U;
+		auto const clipData    = gsl::span(ptrClipData, clipCount);
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
 		  // clang-format off
 		  auto const offset = formOffset + iForm;
@@ -16126,7 +16189,7 @@ void thi::crtcurs() noexcept {
 #pragma warning(pop)
 
 void thi::duhom() {
-  auto const arg0 = fs::path {ArgList[0]};
+  auto const arg0 = fs::path {*ArgList};
   *HomeDirectory  = arg0.parent_path();
 }
 
@@ -16140,7 +16203,8 @@ auto thred::getBackGroundBrush() noexcept -> HBRUSH {
 
 void thi::ducmd() {
   if (ArgCount > 1) {
-	auto const arg1 = std::wstring {ArgList[1]};
+	auto const spArgList = gsl::span(ArgList, ArgCount);
+	auto const arg1 = std::wstring {spArgList[1]};
 	if (arg1.compare(0, 4, L"/F1:") == 0) {
 	  auto balaradFileName = *HomeDirectory / arg1.substr(4);
 	  // NOLINTNEXTLINE(readability-qualified-auto)
@@ -16151,7 +16215,7 @@ void thi::ducmd() {
 		CloseHandle(balaradFile);
 		*BalaradName0 = balaradFileName;
 		if (ArgCount > 2) {
-		  auto const arg2 = std::wstring {ArgList[2]};
+		  auto const arg2 = std::wstring {spArgList[2]};
 		  if (arg2.compare(0, 4, L"/F2:") == 0) {
 			balaradFileName = *HomeDirectory / arg2.substr(4);
 			balaradFile     = CreateFile(
