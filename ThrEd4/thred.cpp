@@ -6229,6 +6229,7 @@ void thi::duclip() {
 			  auto const spDest = gsl::span {textures, form.fillInfo.texture.count};
 			  std::copy(startTexture, endTexture, spDest.begin());
 			}
+			GlobalUnlock(clipHandle);
 			SetClipboardData(thrEdClip, clipHandle);
 		  }
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
