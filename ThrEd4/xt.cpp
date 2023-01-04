@@ -2331,7 +2331,7 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  Clip = RegisterClipboardFormat(PcdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
-	  if (clipHandle != nullptr) {
+	  if (nullptr != clipHandle) {
 		ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(clipHandle));
 		thred::savclp(ClipStitchData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
