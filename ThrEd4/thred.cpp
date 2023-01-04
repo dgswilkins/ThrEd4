@@ -6198,8 +6198,8 @@ void thi::duclip() {
 
 			  auto const guides = gsl::span(ptrGuides, iGuide);
 			  std::copy(startGuide, endGuide, guides.begin());
-			  }
-		  #pragma warning(suppress : 26481)
+			}
+			#pragma warning(suppress : 26481)
 			auto* ptrMclp = convertFromPtr<F_POINT*>(&ptrGuides[iGuide]);
 			auto  iClip = 0U;
 			if (form.isclpx()) {
@@ -6209,8 +6209,8 @@ void thi::duclip() {
 
 			  auto const mclps = gsl::span(ptrMclp, iClip);
 			  std::copy(startMclp, endMclp, mclps.begin());
-			  }
-		  #pragma warning(suppress : 26481)
+			}
+			#pragma warning(suppress : 26481)
 			auto* ptrPoints = convertFromPtr<F_POINT*>(&ptrMclp[iClip]);
 			iClip           = 0U;
 			if (form.iseclpx()) {
@@ -6220,8 +6220,8 @@ void thi::duclip() {
 
 			  auto const points = gsl::span(ptrPoints, iClip);
 			  std::copy(startClip, endClip, points.begin());
-			  }
-#pragma warning(suppress : 26481)
+			}
+			#pragma warning(suppress : 26481)
 			auto* textures = convertFromPtr<TX_PNT*>(&ptrPoints[iClip]);
 			if (form.istx()) {
 			  auto startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
@@ -9673,7 +9673,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  SetWindowLongPtr(hwndlg, DWLP_USER, lparam);
 	  if (lparam != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
-	  auto* fileInfo = reinterpret_cast<FIND_INFO*>(lparam);
+		auto* fileInfo = reinterpret_cast<FIND_INFO*>(lparam);
 		auto const spFileInfo = gsl::span(fileInfo->data, FNDFLMAX);
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
