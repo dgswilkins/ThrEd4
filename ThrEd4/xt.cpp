@@ -2343,10 +2343,10 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 		GlobalUnlock(clipHandle);
 		SetClipboardData(Clip, clipHandle);
 	  }
+	}
 	  CloseClipboard();
 	}
   }
-}
 
 void xt::rtrclp() {
   if (StateMap->test(StateFlag::FORMSEL)) {
