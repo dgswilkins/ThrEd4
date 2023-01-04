@@ -2334,9 +2334,10 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  if (nullptr != clipHandle) {
 		auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
 		if (nullptr != clipStitchData) {
-		thred::savclp(clipStitchData[0], ClipBuffer->operator[](0), count);
+		  auto const spClipData = gsl::span(clipStitchData, count);
+		  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-		  thred::savclp(clipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
+			thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
 		}
 		}
 		GlobalUnlock(clipHandle);
