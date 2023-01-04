@@ -5974,7 +5974,7 @@ void thi::duclip() {
 	                                (wrap::toSize(SelectedFormVertices.vertexCount) + 1U) * sizeof(F_POINT) +
 	                                    sizeof(FORM_VERTEX_CLIP));
 	  if (clipHandle != nullptr) {
-		auto* clipHeader        = *(gsl::narrow_cast<FORM_VERTEX_CLIP**>(clipHandle));
+		auto* clipHeader        = gsl::narrow_cast<FORM_VERTEX_CLIP*>(GlobalLock(clipHandle));
 		clipHeader->clipType    = CLP_FRMPS;
 		clipHeader->vertexCount = SelectedFormVertices.vertexCount;
 		clipHeader->direction   = StateMap->test(StateFlag::PSELDIR);
@@ -5989,6 +5989,7 @@ void thi::duclip() {
 		  vertices[iVertex] = *sourceIt;
 		  iSource           = form::pdir(form, iSource);
 		}
+		GlobalUnlock(clipHandle);
 		SetClipboardData(thrEdClip, clipHandle);
 	  }
 	  else {
@@ -6015,7 +6016,7 @@ void thi::duclip() {
 		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		auto clipHandle = GlobalAlloc(GHND, length);
 		if (clipHandle != nullptr) {
-		  auto* clipFormsHeader     = *(gsl::narrow_cast<FORMS_CLIP**>(clipHandle));
+		  auto* clipFormsHeader     = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
 		  clipFormsHeader->clipType = CLP_FRMS;
 		  wrap::narrow(clipFormsHeader->formCount, SelectedFormList->size());
 		  // Skip past the header
@@ -6092,6 +6093,7 @@ void thi::duclip() {
 			  textureCount += form.fillInfo.texture.count;
 			}
 		  }
+		  GlobalUnlock(clipHandle);
 		  SetClipboardData(thrEdClip, clipHandle);
 		}
 		CloseClipboard();
@@ -6121,7 +6123,7 @@ void thi::duclip() {
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 		  ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
 		  if (ClipPointer != nullptr) {
-			ClipStitchData    = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
+			ClipStitchData    = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
 			auto iStitch      = 0U;
 			auto iDestination = 0U;
 			thred::savclp(ClipStitchData[0], astch[0], stitchCount);
@@ -6131,6 +6133,7 @@ void thi::duclip() {
 			  thred::savclp(ClipStitchData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
 			  ++iStitch;
 			}
+			GlobalUnlock(ClipPointer);
 			SetClipboardData(Clip, ClipPointer);
 		  }
 		  CloseClipboard();
@@ -6150,7 +6153,7 @@ void thi::duclip() {
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
 		  auto clipHandle = GlobalAlloc(GHND, clipSize);
 		  if (clipHandle != nullptr) {
-			auto* clipFormHeader     = *(gsl::narrow_cast<FORM_CLIP**>(clipHandle));
+			auto* clipFormHeader     = gsl::narrow_cast<FORM_CLIP*>(GlobalLock(clipHandle));
 			clipFormHeader->clipType = CLP_FRM;
 			clipFormHeader->form     = form;
 			#pragma warning(suppress : 26481)
@@ -6219,6 +6222,7 @@ void thi::duclip() {
 				}
 				++iTexture;
 			  }
+			  GlobalUnlock(clipHandle);
 			  SetClipboardData(Clip, ClipPointer);
 			}
 			form::ispcdclp();
@@ -6244,7 +6248,7 @@ void thi::duclip() {
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
 			ClipPointer = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
 			if (ClipPointer != nullptr) {
-			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
+			  ClipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
 			  thred::savclp(ClipStitchData[0], StitchBuffer->operator[](iSource), length);
 			  ++iSource;
 			  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
@@ -6253,6 +6257,7 @@ void thi::duclip() {
 				              (StitchBuffer->operator[](iSource).attribute & COLMSK));
 				++iSource;
 			  }
+			  GlobalUnlock(ClipPointer);
 			  SetClipboardData(Clip, ClipPointer);
 			}
 			CloseClipboard();
