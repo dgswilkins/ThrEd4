@@ -511,6 +511,7 @@ constexpr auto DEFULEN  = 12.0F;           // default underlay stitch length
 constexpr auto DNDLEN   = 256U;            // designer name decoding table length
 constexpr auto DNELEN   = 128U;            // designer name encoding table length
 constexpr auto DNLEN    = 50U;             // designer name order table length
+constexpr auto FNDFLMAX = 512U;            // max number of files that can be found
 constexpr auto FLTTHR   = COMDLG_FILTERSPEC {L"Thredworks", L"*.thr"}; // Filter specifications
 constexpr auto FLTPCS   = COMDLG_FILTERSPEC {L"Pfaff", L"* .pcs"};
 constexpr auto FLTDST   = COMDLG_FILTERSPEC {L"Tajima", L"*.dst"};
@@ -9750,8 +9751,8 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 void thi::lock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
   auto lockInfo = FIND_INFO {};
-  // ToDo - Replace 512 with maximum files in subdirectory
-  lockInfo.data = new WIN32_FIND_DATA[512]; // NOLINT(cppcoreguidelines-owning-memory)
+  // ToDo - Replace FNDFLMAX with maximum files in subdirectory
+  lockInfo.data = new WIN32_FIND_DATA[FNDFLMAX]; // NOLINT(cppcoreguidelines-owning-memory)
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
   delete[] lockInfo.data; // NOLINT(cppcoreguidelines-owning-memory)
