@@ -5992,9 +5992,6 @@ void thi::duclip() {
 		GlobalUnlock(clipHandle);
 		SetClipboardData(thrEdClip, clipHandle);
 	  }
-	  else {
-		throw std::runtime_error("clipHandle is null");
-	  }
 	  CloseClipboard();
 	}
 	return;
