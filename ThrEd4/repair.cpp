@@ -459,7 +459,7 @@ void ri::datmsg(uint32_t code) {
 	default:
 	  break;
   }
-  displayText::shoMsg(displayText::loadStr(dataErrorID),false);
+  displayText::shoMsg(displayText::loadStr(dataErrorID), false);
 }
 
 void repair::frmchkx() {

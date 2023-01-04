@@ -963,9 +963,9 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 	  std::ranges::fill(dstHeader.desc, ' ');
 	  auto const convAuxName  = utf::utf16ToUtf8(auxName);
 	  auto const spDstHdrDesc = gsl::span {dstHeader.desc};
-      if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
-		auto const name = convAuxName.substr(pos + 1);
-		auto itChar   = spDstHdrDesc.begin();
+	  if (auto const pos = convAuxName.find_last_of('\\'); pos != std::string::npos) {
+		auto const name   = convAuxName.substr(pos + 1);
+		auto       itChar = spDstHdrDesc.begin();
 		for (auto const& iDHD : name) {
 		  if ((iDHD != '.') && (itChar != spDstHdrDesc.end())) {
 			*itChar = iDHD;
@@ -976,7 +976,7 @@ auto DST::saveDST(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 		  ++itChar;
 		}
 	  }
-	  // clang-format off
+// clang-format off
       // Supress bounds.1 	Don't use pointer arithmetic. Use span instead
       #pragma warning(push)
       #pragma warning(disable : 26481)

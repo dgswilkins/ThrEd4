@@ -985,48 +985,48 @@ void xi::durec(O_REC& record) {
 
 auto xi::orComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
-	auto const itColor1 = wrap::next(ColorOrder.begin(), record1->color);
-	auto const itColor2 = wrap::next(ColorOrder.begin(), record2->color);
-	if (*itColor1 < *itColor2) {
-	  return true;
-	}
-	if (*itColor2 < *itColor1) {
-	  return false;
-	}
-	if (record1->form < record2->form) {
-	  return true;
-	}
-	if (record2->form < record1->form) {
-	  return false;
-	}
-	if (record1->type < record2->type) {
-	  return true;
-	}
-	if (record2->type < record1->type) {
-	  return false;
-	}
-	if (record1->start < record2->start) {
-	  return true;
-	}
-	if (record2->start < record1->start) {
-	  return false;
-	}
+  auto const itColor1 = wrap::next(ColorOrder.begin(), record1->color);
+  auto const itColor2 = wrap::next(ColorOrder.begin(), record2->color);
+  if (*itColor1 < *itColor2) {
+	return true;
+  }
+  if (*itColor2 < *itColor1) {
+	return false;
+  }
+  if (record1->form < record2->form) {
+	return true;
+  }
+  if (record2->form < record1->form) {
+	return false;
+  }
+  if (record1->type < record2->type) {
+	return true;
+  }
+  if (record2->type < record1->type) {
+	return false;
+  }
+  if (record1->start < record2->start) {
+	return true;
+  }
+  if (record2->start < record1->start) {
+	return false;
+  }
   return false;
 }
 
 auto xi::orfComp(gsl::not_null<O_REC const*> record1, gsl::not_null<O_REC const*> record2) noexcept -> bool {
   // make sure the comparison obeys strict weak ordering for stable sorting
   if (record1->form < record2->form) {
-	  return true;
+	return true;
   }
   if (record2->form < record1->form) {
-	  return false;
+	return false;
   }
   if (record1->type < record2->type) {
-	  return true;
+	return true;
   }
   if (record2->type < record1->type) {
-	  return false;
+	return false;
   }
 
   return false;
@@ -2336,17 +2336,17 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 		if (nullptr != clipStitchData) {
 		  auto const spClipData = gsl::span(clipStitchData, count);
 		  thred::savclp(spClipData[0], ClipBuffer->operator[](0), count);
-		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
+		  for (auto iStitch = 1U; iStitch < count; ++iStitch) {
 			thred::savclp(spClipData[iStitch], ClipBuffer->operator[](iStitch), 0);
-		}
+		  }
 		}
 		GlobalUnlock(clipHandle);
 		SetClipboardData(Clip, clipHandle);
 	  }
 	}
-	  CloseClipboard();
-	}
+	CloseClipboard();
   }
+}
 
 void xt::rtrclp() {
   if (StateMap->test(StateFlag::FORMSEL)) {
@@ -2365,7 +2365,7 @@ void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
                 fmt::format(FMT_STRING(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
 
- auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
+auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
   // ToDo - This is not great code.
   constexpr auto SZBUFFER = 16U;
 

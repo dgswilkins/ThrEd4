@@ -208,7 +208,7 @@ void rpcrd(std::vector<uint8_t>& buffer, F_POINT& thisStitch, float srcX, float 
 void writeThumbnail(std::vector<uint8_t>& buffer, imgArray const& image);
 } // namespace pi
 
-static auto PESequivColors = std::array<uint8_t, COLORCNT> {};    // pes equivalent colors
+static auto PESequivColors = std::array<uint8_t, COLORCNT> {}; // pes equivalent colors
 
 static constexpr auto INDEX00 = THREAD {{0x00, 0x00, 0x00}, "Unknown", ""};
 static constexpr auto INDEX01 = THREAD {{0x1a, 0x0a, 0x94}, "Prussian Blue", "ETP007"};
@@ -430,10 +430,10 @@ void pi::pecEncodeStop(std::vector<uint8_t>& buffer, uint8_t val) {
 }
 
 void pi::pecdat(std::vector<uint8_t>& buffer) {
-  auto* pecHeader = convertFromPtr<PECHDR*>(buffer.data());
-  auto& pad       = pecHeader->pad;
-  auto  const pesColors = gsl::span(std::begin(pad), sizeof(pad));
-  auto thisStitch = F_POINT {};
+  auto*      pecHeader  = convertFromPtr<PECHDR*>(buffer.data());
+  auto&      pad        = pecHeader->pad;
+  auto const pesColors  = gsl::span(std::begin(pad), sizeof(pad));
+  auto       thisStitch = F_POINT {};
   rpcrd(buffer, thisStitch, StitchBuffer->front().x, StitchBuffer->front().y);
   auto iColor  = 1U;
   auto color   = StitchBuffer->front().attribute & COLMSK;
@@ -572,8 +572,8 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	  auto const pesColorCount = pecHeader->colorCount + 1U;
 	  auto&      pad           = pecHeader->pad;
 	  auto const pesColors     = gsl::span(std::begin(pad), pesColorCount);
-	  auto colorMap            = boost::dynamic_bitset<>(THTYPCNT);
-	  auto iUserColor          = UserColor.begin();
+	  auto       colorMap      = boost::dynamic_bitset<>(THTYPCNT);
+	  auto       iUserColor    = UserColor.begin();
 	  for (auto iColor = 0U; iColor < pesColorCount; ++iColor) {
 		if (pesColors[iColor] < THTYPCNT) {
 		  if (!colorMap.test_set(pesColors[iColor])) {
@@ -608,7 +608,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 		StitchBuffer->push_back(F_POINT_ATTR {});
 		constexpr auto MSK12BIT = uint32_t {0xFFFU}; // used to mask the value to 12 bits
 
-		auto pesColorIndex = uint32_t {1U};
+		auto       pesColorIndex = uint32_t {1U};
 		auto const pesStitches   = gsl::span(pesStitch, pecCount);
 		while (iPESstitch < pecCount) {
 		  if (pesStitches[iPESstitch] == 0xff && pesStitches[iPESstitch + 1U] == 0) {
@@ -842,8 +842,8 @@ auto PES::savePES(fs::path const& auxName, std::vector<F_POINT_ATTR> const& save
 			break;
 		  }
 		  auto const colorEntries = gsl::span(colorEntry, 2);
-		  colorEntries[0] = threadList[paletteIndex].blockIndex;
-		  colorEntries[1] = threadList[paletteIndex].colorIndex;
+		  colorEntries[0]         = threadList[paletteIndex].blockIndex;
+		  colorEntries[1]         = threadList[paletteIndex].colorIndex;
 		}
 		pesHeader.off     = wrap::toUnsigned(pesBuffer.size() + sizeof(pesHeader));
 		pesHeader.blct    = 1;

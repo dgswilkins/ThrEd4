@@ -152,9 +152,9 @@ void trace::initTraceWindows() {
 
 auto ti::trcols(COLORREF color) noexcept -> std::array<uint32_t, CHANLCNT> {
   auto colors = std::array<uint32_t, CHANLCNT> {};
-  colors[0] = color & B1MASK;
-  colors[1] = (color & B2MASK) >> BYTSHFT;
-  colors[2] = (color & B3MASK) >> WRDSHFT;
+  colors[0]   = color & B1MASK;
+  colors[1]   = (color & B2MASK) >> BYTSHFT;
+  colors[2]   = (color & B3MASK) >> WRDSHFT;
   return colors;
 }
 
@@ -246,7 +246,7 @@ static inline void ti::difsub(uint32_t const source, uint32_t shift, uint32_t& d
 //  678
 
 void ti::difbits(uint32_t shift, gsl::details::span_iterator<uint32_t> point) noexcept {
-  auto  iTrcAdjClrs = TraceAdjacentColors.begin();
+  auto iTrcAdjClrs = TraceAdjacentColors.begin();
   ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 0 - center
   std::advance(point, -bitmap::getBitmapWidth());
   ti::difsub(*point, shift, *(iTrcAdjClrs++)); // pixel 1 - N
@@ -352,11 +352,11 @@ void trace::trdif() {
 	  }
 	  auto const ratio = (255.0F) / wrap::toFloat(colorSumMaximum - colorSumMinimum);
 	  auto       pos   = size_t {0U};
-	  for (auto& iPixel :spTBD) {
+	  for (auto& iPixel : spTBD) {
 		iPixel &= TraceRGBMask[iRGB];
 		if (differenceBitmap[pos] != 0U) {
-		  auto const adjustedColorSum = wrap::round<uint32_t>(
-		      wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
+		  auto const adjustedColorSum =
+		      wrap::round<uint32_t>(wrap::toFloat(differenceBitmap[pos] - colorSumMinimum) * ratio);
 		  iPixel |= adjustedColorSum << TraceShift[iRGB];
 		}
 		++pos;
@@ -395,8 +395,9 @@ void trace::trace() {
   if (bitmap::ismap()) {
 	trace::untrace();
 	ti::tracwnd();
-	TraceDataSize = bitmap::getrmap();
-	auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
+	TraceDataSize    = bitmap::getrmap();
+	auto const spTBD = gsl::span<uint32_t>(
+	    TraceBitmapData, wrap::toSize(bitmap::getBitmapHeight()) * bitmap::getBitmapWidth());
 	if (thred::inStitchWin() && !StateMap->testAndReset(StateFlag::WASTRCOL)) {
 	  auto stitchPoint = thred::pxCor2stch(Msg.pt);
 	  if (StateMap->test(StateFlag::LANDSCAP)) {
@@ -431,7 +432,7 @@ void trace::trace() {
 	  traceColorMask &= BLUMSK;
 	}
 	if (traceColorMask != COLMASK) {
-	  for (auto &iPixel : spTBD) {
+	  for (auto& iPixel : spTBD) {
 		iPixel &= traceColorMask;
 	  }
 	}
@@ -454,7 +455,7 @@ void trace::trace() {
 #if TRCMTH == 1
 	InvertUpColor   = UpPixelColor ^ COLMASK;
 	InvertDownColor = DownPixelColor ^ COLMASK;
-	auto colors = ti::trcols(InvertUpColor);
+	auto colors     = ti::trcols(InvertUpColor);
 	for (auto iRGB = 0U; iRGB < CHANLCNT; ++iRGB) {
 	  HighColors[iRGB] = colors[iRGB];
 	}
@@ -466,7 +467,7 @@ void trace::trace() {
 	  TracedMap->resize(TraceDataSize, false);
 	}
 	auto pos = size_t {0U};
-	for (auto &iPixel : spTBD) {
+	for (auto& iPixel : spTBD) {
 	  if (ti::trcin(iPixel)) {
 		TracedMap->set(pos);
 	  }
@@ -535,7 +536,7 @@ void trace::tracedg() {
 	}
   }
   auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
-  auto const spTBD = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
+  auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
   auto       pos        = size_t {0U};
   for (auto& iPixel : spTBD) {
 	if (TracedEdges->test(pos)) {
@@ -669,7 +670,7 @@ void ti::decSlope(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
   // always keep the first point
   dst.push_back(src.front());
   auto const itTP  = src.begin();
-  auto itTP1 = std::next(itTP);
+  auto       itTP1 = std::next(itTP);
   wrap::narrow(traceDiff[0].x, (itTP1->x - itTP->x));
   wrap::narrow(traceDiff[0].y, (itTP1->y - itTP->y));
   for (auto itTP2 = std::next(itTP1); itTP2 != src.end(); ++itTP2) {
@@ -699,7 +700,7 @@ void ti::decLen(std::vector<TRACE_PNT>& src, std::vector<TRACE_PNT>& dst) {
 }
 
 // write src points into destination form vertices, keeping only
-// points where the sum of the distances is greater than the ratio(?) 
+// points where the sum of the distances is greater than the ratio(?)
 void ti::decForm(std::vector<TRACE_PNT>& src, std::vector<F_POINT>& dst) {
   dst.emplace_back(wrap::toFloat(src[0].x) * StitchBmpRatio.x,
                    wrap::toFloat(src[0].y) * StitchBmpRatio.y);
@@ -956,8 +957,8 @@ void trace::trcsel() {
 	StateMap->reset(StateFlag::TRSET);
 	auto const bitmapSize = bitmap::getBitmapWidth() * bitmap::getBitmapHeight();
 	auto const spTBD      = gsl::span<uint32_t>(TraceBitmapData, bitmapSize);
-	for (auto &iPixel : spTBD) {
-	  auto colors = ti::trcols(iPixel);
+	for (auto& iPixel : spTBD) {
+	  auto colors                = ti::trcols(iPixel);
 	  auto maximumColorComponent = colors[0];
 	  auto iRGB                  = 2U;
 	  if (colors[1] > maximumColorComponent) {
@@ -980,9 +981,9 @@ void trace::trcsel() {
 }
 
 void ti::ritrcol(COLORREF& colRef, uint32_t colNum) noexcept {
-	colRef &= TraceRGBMask[ColumnColor];
-	colNum &= BYTMASK;
-	colRef |= (colNum << TraceShift[ColumnColor]);
+  colRef &= TraceRGBMask[ColumnColor];
+  colNum &= BYTMASK;
+  colRef |= (colNum << TraceShift[ColumnColor]);
 }
 
 void ti::dutrnum0(uint32_t colNum) {

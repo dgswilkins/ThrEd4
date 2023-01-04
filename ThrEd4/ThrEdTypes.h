@@ -21,7 +21,7 @@
 #define outDebugString(X, ...) makeDebugString(__LINE__, WFILE, X, __VA_ARGS__)
 template <typename... Args>
 void makeDebugString(int line, const wchar_t* fileName, const wchar_t* strX, Args&&... args) {
-  #pragma warning(suppress : 26481)
+#pragma warning(suppress : 26481)
   auto const strY = fmt::format(FMT_STRING(L"{}({}) : {}"), fileName, line, strX);
   auto const strZ = fmt::format(fmt::runtime(strY), std::forward<Args>(args)...);
   OutputDebugString(strZ.c_str());

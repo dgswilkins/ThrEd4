@@ -57,7 +57,7 @@ void displayText::shoMsg(std::wstring const& message, bool top) {
 	auto thredRect = RECT {};
 	GetWindowRect(ThrEdWindow, &thredRect);
 	auto const xOffset = mainRect.left - thredRect.left;
-	auto yOffset = 3;
+	auto       yOffset = 3;
 	if (!top) {
 	  yOffset = (mainRect.bottom - mainRect.top) - 12 - messageSize.cy;
 	}

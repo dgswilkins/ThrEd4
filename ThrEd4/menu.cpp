@@ -14,7 +14,6 @@ static auto FillMenu       = gsl::narrow_cast<HMENU>(nullptr); // fill submenu
 static auto ViewMenu       = gsl::narrow_cast<HMENU>(nullptr); // view submenu
 static auto ViewSetMenu    = gsl::narrow_cast<HMENU>(nullptr); // view/set
 
-
 void menu::disableRedo() {
   if (StateMap->testAndReset(StateFlag::REDUSHO)) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)

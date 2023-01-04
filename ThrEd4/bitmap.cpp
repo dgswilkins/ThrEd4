@@ -347,7 +347,7 @@ void bitmap::savmap() {
 
 // Move unpacked 24BPP data into packed 24BPP data
 void bi::movmap(gsl::span<uint32_t> const& src, std::vector<uint8_t>& buffer) noexcept {
-  auto  destination = buffer.begin();
+  auto destination = buffer.begin();
   for (auto const& iTBD : src) {
 	//*(destination++) = GetRValue(iTBD);
 	//*(destination++) = GetGValue(iTBD);

@@ -332,7 +332,7 @@ void txi::txrbak() noexcept {
   }
 }
 
-auto texture::dutxtfil() -> bool{
+auto texture::dutxtfil() -> bool {
   if (!displayText::filmsgs(FMM_TXTR)) {
 	if (IniFile.textureHeight == 0.0F) {
 	  IniFile.textureHeight = ITXHI;
@@ -897,8 +897,8 @@ void txi::txtclp(FRM_HEAD& textureForm) {
 	  // NOLINTNEXTLINE(readability-qualified-auto)
 	  if (auto const clipMemory = GlobalLock(clipData); nullptr != clipMemory) {
 		if (auto* clipForm = thred::getClipForm(clipMemory); nullptr != clipForm) {
-		  textureForm           = *clipForm;
-		  #pragma warning(suppress : 26481)
+		  textureForm = *clipForm;
+#pragma warning(suppress : 26481)
 		  auto*      vertices   = convertFromPtr<F_POINT*>(++clipForm);
 		  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
 		  AngledFormVertices->clear();
@@ -1166,7 +1166,7 @@ void txi::nutx(FRM_HEAD& form) {
 
 // Ensure all lines in the texture have at least 1 point
 void txi::altx() {
-  auto txtLines = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
+  auto       txtLines   = boost::dynamic_bitset<>(wrap::toSize(TextureScreen.lines) + 1U);
   auto const halfHeight = TextureScreen.areaHeight / 2.0F;
   for (auto const& texturePoint : *TempTexturePoints) {
 	txtLines.set(texturePoint.line);
