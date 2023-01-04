@@ -6144,10 +6144,10 @@ void thi::duclip() {
 		if ((!StitchBuffer->empty()) && (stitchCount != 0)) {
 		  Clip = RegisterClipboardFormat(PcdClipFormat);
 		  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-		  ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
-		  if (ClipPointer != nullptr) {
-			ClipStitchData    = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
-			auto const spData       = gsl::span(ClipStitchData, stitchCount);
+		  clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+		  if (clipHandle != nullptr) {
+			auto clipStitchData    = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+			auto const spData = gsl::span(clipStitchData, stitchCount);
 			auto iStitch      = 0U;
 			auto iDestination = 0U;
 			thred::savclp(spData[0], astch[0], stitchCount);
@@ -6157,8 +6157,8 @@ void thi::duclip() {
 			  thred::savclp(spData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
 			  ++iStitch;
 			}
-			GlobalUnlock(ClipPointer);
-			SetClipboardData(Clip, ClipPointer);
+			GlobalUnlock(clipHandle);
+			SetClipboardData(Clip, clipHandle);
 		  }
 		  CloseClipboard();
 		}
@@ -6234,10 +6234,10 @@ void thi::duclip() {
 		  if (((form.fillType != 0U) || (form.edgeType != 0U))) {
 			Clip = RegisterClipboardFormat(PcdClipFormat);
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
-			if (ClipPointer != nullptr) {
-			  ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
-			  auto const spData   = gsl::span(ClipStitchData, stitchCount);
+			clipHandle = GlobalAlloc(GHND, stitchCount * sizeof(CLIP_STITCH) + 2U);
+			if (clipHandle != nullptr) {
+			  auto clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+			  auto const spData   = gsl::span(clipStitchData, stitchCount);
 			  auto iTexture  = firstStitch;
 			  thred::savclp(spData[0], StitchBuffer->operator[](iTexture), length);
 			  ++iTexture;
@@ -6253,7 +6253,7 @@ void thi::duclip() {
 				++iTexture;
 			  }
 			  GlobalUnlock(clipHandle);
-			  SetClipboardData(Clip, ClipPointer);
+			  SetClipboardData(Clip, clipHandle);
 			}
 			form::ispcdclp();
 		  }
@@ -6276,10 +6276,10 @@ void thi::duclip() {
 			auto const length  = GroupEndStitch - GroupStartStitch + 1U;
 			auto       iSource = GroupStartStitch;
 			// NOLINTNEXTLINE(hicpp-signed-bitwise)
-			ClipPointer = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
-			if (ClipPointer != nullptr) {
-			  ClipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(ClipPointer));
-			  auto const spData = gsl::span(ClipStitchData, length);
+			auto clipHandle = GlobalAlloc(GHND, length * sizeof(CLIP_STITCH) + 2U);
+			if (clipHandle != nullptr) {
+			  auto clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+			  auto const spData = gsl::span(clipStitchData, length);
 			  thred::savclp(spData[0], StitchBuffer->operator[](iSource), length);
 			  ++iSource;
 			  for (auto iStitch = 1U; iStitch < length; ++iStitch) {
@@ -6288,8 +6288,8 @@ void thi::duclip() {
 				              (StitchBuffer->operator[](iSource).attribute & COLMSK));
 				++iSource;
 			  }
-			  GlobalUnlock(ClipPointer);
-			  SetClipboardData(Clip, ClipPointer);
+			  GlobalUnlock(clipHandle);
+			  SetClipboardData(Clip, clipHandle);
 			}
 			CloseClipboard();
 		  }
@@ -7141,10 +7141,9 @@ void thi::movi() {
 
 void thred::redclp() {
   auto const codedLayer = gsl::narrow_cast<uint32_t>(ActiveLayer << LAYSHFT);
-  ClipPointer           = GlobalLock(ClipMemory);
-  if (ClipPointer != nullptr) {
-#pragma warning(suppress : 26429) // f.23 Symbol is never tested for nullness, it can be marked as not_null
-	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(ClipPointer);
+  auto clipPointer           = GlobalLock(ClipMemory);
+  if (clipPointer != nullptr) {
+	const auto* const clipStitchPtr    = gsl::narrow_cast<CLIP_STITCH const*>(clipPointer);
 	auto const        clipSize         = clipStitchPtr->led;
 	auto const        spClipStitchData = gsl::span {clipStitchPtr, clipSize};
 	ClipBuffer->clear();
@@ -13078,9 +13077,9 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
   auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat);
   ClipMemory           = GetClipboardData(thrEdClip);
   if (ClipMemory != nullptr) {
-	ClipPointer = GlobalLock(ClipMemory);
-	if (ClipPointer != nullptr) {
-	  auto* formVerticesData = convertFromPtr<FORM_VERTEX_CLIP*>(ClipPointer);
+	auto clipPointer = GlobalLock(ClipMemory);
+	if (clipPointer != nullptr) {
+	  auto* formVerticesData = convertFromPtr<FORM_VERTEX_CLIP*>(clipPointer);
 	  if (formVerticesData->clipType == CLP_FRMPS) {
 		thred::duzrat();
 		auto const byteCount =
