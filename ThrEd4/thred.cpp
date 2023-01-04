@@ -5985,9 +5985,9 @@ void thi::duclip() {
 		auto const& form     = FormList->operator[](ClosestFormToCursor);
 		auto itVertex        = wrap::next(FormVertices->cbegin(), form.vertexIndex);
 		auto iSource         = SelectedFormVertices.start;
-		for (auto iVertex = 0U; iVertex <= SelectedFormVertices.vertexCount; ++iVertex) {
+		for (auto& vertex : vertices) {
 		  auto sourceIt     = wrap::next(itVertex, iSource);
-		  vertices[iVertex] = *sourceIt;
+		  vertex = *sourceIt;
 		  iSource           = form::pdir(form, iSource);
 		}
 		GlobalUnlock(clipHandle);
