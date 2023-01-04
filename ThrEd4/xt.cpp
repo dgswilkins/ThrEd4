@@ -2330,14 +2330,14 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  EmptyClipboard();
 	  Clip = RegisterClipboardFormat(PcdClipFormat);
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
-	  ClipPointer = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
-	  if (ClipPointer != nullptr) {
-		ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(ClipPointer));
+	  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
+	  if (clipHandle != nullptr) {
+		ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(clipHandle));
 		thred::savclp(ClipStitchData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
 		  thred::savclp(ClipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
 		}
-		SetClipboardData(Clip, ClipPointer);
+		SetClipboardData(Clip, clipHandle);
 	  }
 	  CloseClipboard();
 	}
