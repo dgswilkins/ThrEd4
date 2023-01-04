@@ -6154,8 +6154,9 @@ void thi::duclip() {
 			++iStitch;
 			++iDestination;
 			while (iStitch < stitchCount) {
-			  thred::savclp(spData[iDestination++], astch[iStitch], astch[iStitch].attribute & COLMSK);
+			  thred::savclp(spData[iDestination], astch[iStitch], astch[iStitch].attribute & COLMSK);
 			  ++iStitch;
+			  ++iDestination;
 			}
 			GlobalUnlock(clipHandle);
 			SetClipboardData(Clip, clipHandle);
