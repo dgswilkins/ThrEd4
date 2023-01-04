@@ -2332,10 +2332,10 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 	  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
 	  if (nullptr != clipHandle) {
-		ClipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(clipHandle));
-		thred::savclp(ClipStitchData[0], ClipBuffer->operator[](0), count);
+		auto* clipStitchData = *(gsl::narrow_cast<CLIP_STITCH**>(clipHandle));
+		thred::savclp(clipStitchData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
-		  thred::savclp(ClipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
+		  thred::savclp(clipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
 		}
 		SetClipboardData(Clip, clipHandle);
 	  }
