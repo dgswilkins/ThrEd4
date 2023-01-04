@@ -2333,9 +2333,11 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  auto* const clipHandle = GlobalAlloc(GHND, count * sizeof(CLIP_STITCH) + 2U);
 	  if (nullptr != clipHandle) {
 		auto* clipStitchData = gsl::narrow_cast<CLIP_STITCH*>(GlobalLock(clipHandle));
+		if (nullptr != clipStitchData) {
 		thred::savclp(clipStitchData[0], ClipBuffer->operator[](0), count);
 		for (auto iStitch = 1U; iStitch < count; ++iStitch) {
 		  thred::savclp(clipStitchData[iStitch], ClipBuffer->operator[](iStitch), 0);
+		}
 		}
 		GlobalUnlock(clipHandle);
 		SetClipboardData(Clip, clipHandle);
