@@ -475,6 +475,7 @@ void unpclp();
 void unrot();
 void unrotu();
 void unsel();
+auto unselectAll() -> bool;
 void unstrtch(std::vector<POINT> const& stretchBoxLine);
 auto unthrsh(wchar_t level) noexcept -> float;
 void unthum();
@@ -10277,10 +10278,6 @@ auto thi::sidclp() -> bool {
 }
 
 void thi::selfpnt() {
-  StateMap->reset(StateFlag::FORMSEL);
-  StateMap->set(StateFlag::FRMPSEL);
-  StateMap->reset(StateFlag::FPSEL);
-  StateMap->reset(StateFlag::SELBOX);
   SelectedFormVertices.start = ClosestVertexToCursor;
   SelectedFormVertices.form  = ClosestFormToCursor;
   auto const itVertex =
@@ -10288,6 +10285,66 @@ void thi::selfpnt() {
                  FormList->operator[](ClosestFormToCursor).vertexIndex + ClosestVertexToCursor);
   thred::ritfcor(*itVertex);
   StateMap->set(StateFlag::RESTCH);
+}
+
+auto thi::unselectAll() -> bool{
+  StateMap->reset(StateFlag::FORMSEL);
+  StateMap->reset(StateFlag::FRMPSEL);
+  StateMap->reset(StateFlag::FPSEL);
+  StateMap->reset(StateFlag::SELBOX);
+  StateMap->set(StateFlag::RESTCH);
+  thred::unmsg();
+  unboxs();
+  unpat();
+  StateMap->reset(StateFlag::SATIN);
+  if (StateMap->testAndReset(StateFlag::SATPNT)) {
+	satin::satfix();
+  }
+  if (StateMap->testAndReset(StateFlag::BIGBOX)) {
+	StateMap->set(StateFlag::RESTCH);
+  }
+  if (StateMap->test(StateFlag::PRFACT)) {
+	if (StateMap->testAndReset(StateFlag::HUPMSG)) {
+	  thred::unsid();
+	  return true;
+	}
+	else {
+	  if (PreferenceIndex != 0U) {
+		chknum();
+		thred::unsid();
+		PreferenceIndex = 0;
+		return true;
+	  }
+	  else {
+		DestroyWindow(PreferencesWindow);
+		StateMap->reset(StateFlag::PRFACT);
+		if (StateMap->testAndReset(StateFlag::WASRT)) {
+		  StateMap->set(StateFlag::INSRT);
+		}
+	  }
+	}
+  }
+  if (FormMenuChoice != 0U) {
+	chknum();
+	FormMenuChoice = 0;
+	StateMap->set(StateFlag::RESTCH);
+	return true;
+  }
+  if (StateMap->testAndReset(StateFlag::INSFRM)) {
+	insadj();
+	StateMap->reset(StateFlag::SHOINSF);
+	StateMap->set(StateFlag::RESTCH);
+	return true;
+  }
+  if (StateMap->test(StateFlag::BAKSHO)) {
+	thred::unbsho();
+	return true;
+  }
+  if (!SelectedFormList->empty()) {
+	SelectedFormList->clear();
+	StateMap->set(StateFlag::RESTCH);
+  }
+  return false;
 }
 
 void thi::esccode() {
@@ -11248,51 +11305,7 @@ auto thi::handleRightButtonDown() -> bool {
 	trace::wasTrace1();
 	return true;
   }
-  thred::unmsg();
-  unboxs();
-  unpat();
-  StateMap->reset(StateFlag::SATIN);
-  if (StateMap->testAndReset(StateFlag::SATPNT)) {
-	satin::satfix();
-  }
-  if (StateMap->test(StateFlag::BAKSHO)) {
-	thred::unbsho();
-	return true;
-  }
-  if (StateMap->testAndReset(StateFlag::BIGBOX)) {
-	StateMap->set(StateFlag::RESTCH);
-  }
-  if (StateMap->test(StateFlag::PRFACT)) {
-	if (StateMap->testAndReset(StateFlag::HUPMSG)) {
-	  thred::unsid();
-	}
-	else {
-	  if (PreferenceIndex != 0U) {
-		chknum();
-		thred::unsid();
-		PreferenceIndex = 0;
-	  }
-	  else {
-		DestroyWindow(PreferencesWindow);
-		StateMap->reset(StateFlag::PRFACT);
-		if (StateMap->testAndReset(StateFlag::WASRT)) {
-		  StateMap->set(StateFlag::INSRT);
-		}
-	  }
-	}
-	StateMap->set(StateFlag::RESTCH);
-	return true;
-  }
-  if (FormMenuChoice != 0U) {
-	chknum();
-	FormMenuChoice = 0;
-	StateMap->set(StateFlag::RESTCH);
-	return true;
-  }
-  if (StateMap->testAndReset(StateFlag::INSFRM)) {
-	insadj();
-	StateMap->reset(StateFlag::SHOINSF);
-	StateMap->set(StateFlag::RESTCH);
+  if (thi::unselectAll()) {
 	return true;
   }
   if (thred::inStitchWin() &&
@@ -14016,11 +14029,13 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 		  satin::ribon();
 		}
 		else {
-		  StateMap->reset(StateFlag::HIDSTCH);
-		  StateMap->set(StateFlag::IGNTHR);
-		  rebox();
-		  StateMap->reset(StateFlag::IGNTHR);
-		  StateMap->set(StateFlag::RESTCH);
+		  if (!thi::unselectAll()) {
+			StateMap->reset(StateFlag::HIDSTCH);
+			StateMap->set(StateFlag::IGNTHR);
+			rebox();
+			StateMap->reset(StateFlag::IGNTHR);
+			StateMap->set(StateFlag::RESTCH);
+		  }
 		}
 	  }
 	  break;
@@ -14278,7 +14293,9 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case L'Y': {
 	  if (form::closfrm()) {
-		selfpnt();
+		if (!thi::unselectAll()) {
+		  selfpnt();
+		}
 	  }
 	  break;
 	}
