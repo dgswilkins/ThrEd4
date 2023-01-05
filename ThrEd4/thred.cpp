@@ -2601,6 +2601,9 @@ void thi::rstAll() {
   }
   StateMap->reset(StateFlag::FORMSEL);
   StateMap->reset(StateFlag::FRMPSEL);
+  if (!SelectedFormList->empty()) {
+	SelectedFormList->clear();
+  }
   thred::unmsg();
   SearchLine->clear();
   SearchLine->shrink_to_fit();
