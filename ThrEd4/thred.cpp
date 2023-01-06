@@ -6435,7 +6435,7 @@ void thi::delsfrms(wchar_t code) {
 
 void thi::cut() {
   thred::savdo();
-  duclip();
+  thi::duclip();
   if (!SelectedFormList->empty()) {
 	StateMap->set(StateFlag::DELTO);
 	delsfrms(L's');
@@ -14022,7 +14022,7 @@ auto thi::handleMainWinKeys(wchar_t const&            code,
 	}
 	case L'C': {
 	  if (wrap::pressed(VK_CONTROL)) {
-		duclip();
+		thi::duclip();
 	  }
 	  else {
 		if (wrap::pressed(VK_SHIFT)) {
