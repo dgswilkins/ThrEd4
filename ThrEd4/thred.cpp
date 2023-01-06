@@ -6015,7 +6015,7 @@ void thi::duclip() {
 		  length += sizfclp(currentForm);
 		}
 		// NOLINTNEXTLINE(hicpp-signed-bitwise, readability-qualified-auto)
-		auto clipHandle = GlobalAlloc(GHND, length);
+		auto clipHandle = GlobalAlloc(GHND, length + sizeof(FORMS_CLIP));
 		if (clipHandle != nullptr) {
 		  auto* clipFormsHeader     = gsl::narrow_cast<FORMS_CLIP*>(GlobalLock(clipHandle));
 		  clipFormsHeader->clipType = CLP_FRMS;
