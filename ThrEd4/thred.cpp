@@ -1118,8 +1118,7 @@ auto thi::unthrsh(wchar_t level) noexcept -> float {
 }
 
 void thred::ritfcor(F_POINT const& point) {
-#pragma warning(suppress : 26481)
-  auto const fmtStr = fmt::format(FMT_STRING(L"x{:.0f} y{:.0f}"), (point.x * IPFGRAN), (point.y * IPFGRAN));
+  auto const fmtStr = fmt::format(FMT_COMPILE(L"x{:.0f} y{:.0f}"), (point.x * IPFGRAN), (point.y * IPFGRAN));
   displayText::butxt(HCOR, fmtStr);
 }
 
@@ -1808,8 +1807,7 @@ void thi::chknum() {
 			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nufilcol(colVal);
-#pragma warning(suppress : 26481)
-			auto const fmtStr = fmt::format(FMT_STRING(L"{}"), colVal + 1U);
+			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmtStr.c_str());
 			thred::coltab();
 		  }
@@ -1823,8 +1821,7 @@ void thi::chknum() {
 			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
-#pragma warning(suppress : 26481)
-			auto const fmtStr = fmt::format(FMT_STRING(L"{}"), colVal + 1U);
+			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmtStr.c_str());
 			form::refilfn();
 			thred::coltab();
@@ -1839,8 +1836,7 @@ void thi::chknum() {
 			auto const colVal = gsl::narrow_cast<uint8_t>(
 			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nubrdcol(colVal);
-#pragma warning(suppress : 26481)
-			auto const fmtStr = fmt::format(FMT_STRING(L"{}"), colVal + 1U);
+			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmtStr.c_str());
 			thred::coltab();
 		  }
@@ -2028,58 +2024,50 @@ void thi::chknum() {
 		switch (PreferenceIndex - 1) {
 		  case PRFEGGRAT: {
 			IniFile.eggRatio = value;
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd   = ValueWindow->operator[](PRFEGGRAT);
 			break;
 		  }
 		  case PRFNUGSTP: {
 			IniFile.cursorNudgeStep = value;
 			IniFile.nudgePixels     = pxchk(value);
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd   = ValueWindow->operator[](PRFNUGSTP);
 			break;
 		  }
 		  case PRFPCTSPC: {
 			PicotSpacing = value * PFGRAN;
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd   = ValueWindow->operator[](PRFPCTSPC);
 			break;
 		  }
 		  case PRFCLPOFF: {
 			IniFile.clipOffset = value * PFGRAN;
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
 			hWnd   = ValueWindow->operator[](PRFCLPOFF);
 			break;
 		  }
 		  case PRFCLPPHS: {
 			IniFile.fillPhase = wrap::floor<uint32_t>(value);
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{}"), IniFile.fillPhase);
+			fmtStr = fmt::format(FMT_COMPILE(L"{}"), IniFile.fillPhase);
 			hWnd   = ValueWindow->operator[](PRFCLPPHS);
 			break;
 		  }
 		  case PRFCHFPOS: {
 			IniFile.chainRatio = value;
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd   = ValueWindow->operator[](PRFCHFPOS);
 			break;
 		  }
 		  case PRFSTCMIN: {
 			MinStitchLength = value * PFGRAN;
-#pragma warning(suppress : 26481)
-			fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			hWnd   = ValueWindow->operator[](PRFSTCMIN);
 			break;
 		  }
 		  default: {
 			if (value != 0.0F) {
-#pragma warning(suppress : 26481)
-			  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+			  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 			  switch (PreferenceIndex - 1) {
 				case PRFFILSPC: {
 				  LineSpacing = value * PFGRAN;
@@ -2114,8 +2102,7 @@ void thi::chknum() {
 				}
 				case PRFAPPCOL: {
 				  AppliqueColor = wrap::round<uint32_t>(value - 1.0F) % COLORCNT;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{}"), (AppliqueColor + 1U));
+				  fmtStr = fmt::format(FMT_COMPILE(L"{}"), (AppliqueColor + 1U));
 				  hWnd   = ValueWindow->operator[](PRFAPPCOL);
 				  break;
 				}
@@ -2140,8 +2127,7 @@ void thi::chknum() {
 				  if (StarRatio < SRMINLIM) {
 					StarRatio = SRMINLIM;
 				  }
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), StarRatio);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), StarRatio);
 				  hWnd   = ValueWindow->operator[](PRFSTRRAT);
 				  break;
 				}
@@ -2156,8 +2142,7 @@ void thi::chknum() {
 				  if (IniFile.lensRatio < LRMINLIM) {
 					IniFile.lensRatio = LRMINLIM;
 				  }
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), IniFile.lensRatio);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.lensRatio);
 				  hWnd   = ValueWindow->operator[](PRFLENRAT);
 				  break;
 				}
@@ -2172,22 +2157,19 @@ void thi::chknum() {
 				  if (SpiralWrap < SRMINLIM) {
 					SpiralWrap = SRMINLIM;
 				  }
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), SpiralWrap);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), SpiralWrap);
 				  hWnd   = ValueWindow->operator[](PRFSPLWRP);
 				  break;
 				}
 				case PRFBCNLEN: {
 				  ButtonholeCornerLength = value * PFGRAN;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 				  hWnd   = ValueWindow->operator[](PRFBCNLEN);
 				  break;
 				}
 				case PRFHUPWID: {
 				  IniFile.hoopSizeX = value * PFGRAN;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
 				  hWnd   = ValueWindow->operator[](PRFHUPWID);
 				  form::sethup();
 				  formForms::prfmsg();
@@ -2196,8 +2178,7 @@ void thi::chknum() {
 				}
 				case PRFHUPHGT: {
 				  IniFile.hoopSizeY = value * PFGRAN;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.0f} mm"), value);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.0f} mm"), value);
 				  hWnd   = ValueWindow->operator[](PRFHUPHGT);
 				  form::sethup();
 				  formForms::prfmsg();
@@ -2206,15 +2187,13 @@ void thi::chknum() {
 				}
 				case PRFGRDSIZ: {
 				  IniFile.gridSize = value * PFGRAN;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f} mm"), value);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f} mm"), value);
 				  hWnd   = ValueWindow->operator[](PRFGRDSIZ);
 				  break;
 				}
 				case PRFCHFLEN: {
 				  IniFile.chainSpace = value * PFGRAN;
-#pragma warning(suppress : 26481)
-				  fmtStr = fmt::format(FMT_STRING(L"{:.2f}"), value);
+				  fmtStr = fmt::format(FMT_COMPILE(L"{:.2f}"), value);
 				  hWnd   = ValueWindow->operator[](PRFCHFLEN);
 				  break;
 				}
@@ -2690,8 +2669,7 @@ void thi::lenCalc() {
 	auto const stitch     = wrap::next(StitchBuffer->begin(), ClosestPointIndex);
 	auto const stitchFwd1 = std::next(stitch);
 	auto const lenMax     = hypot(stitchFwd1->x - stitch->x, stitchFwd1->y - stitch->y) * IPFGRAN;
-#pragma warning(suppress : 26481)
-	displayText::butxt(HMINLEN, fmt::format(FMT_STRING(L"{:.2f}"), lenMax));
+	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), lenMax));
 	displayText::butxt(HMAXLEN, displayText::loadStr(IDS_SRCH));
   }
   else {
@@ -7149,7 +7127,7 @@ void thred::redclp() {
 	                         0U);
 
 #if CLPBUG
-	OutputDebugString(fmt::format(FMT_STRING(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n"),
+	OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [0] x [{:6.2F}] y [{:6.2F}]\n"),
 	                              ClipBuffer->back().x,
 	                              ClipBuffer->back().y)
 	                      .c_str());
@@ -7163,7 +7141,7 @@ void thred::redclp() {
 	                           (iCSD->led & COLMSK) | codedLayer);
 
 #if CLPBUG
-	  OutputDebugString(fmt::format(FMT_STRING(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n"),
+	  OutputDebugString(fmt::format(FMT_COMPILE(L"redclp:interator [{}] x [{:6.2F}] y [{:6.2F}]\n"),
 	                                iStitch,
 	                                ClipBuffer->back().x,
 	                                ClipBuffer->back().y)
@@ -8468,8 +8446,7 @@ void thi::shorter() {
 	auto const minLength = hypot(
 	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).x - StitchBuffer->operator[](iStitch).x,
 	    StitchBuffer->operator[](wrap::toSize(iStitch) + 1U).y - StitchBuffer->operator[](iStitch).y);
-#pragma warning(suppress : 26481)
-	displayText::butxt(HMINLEN, fmt::format(FMT_STRING(L"{:.2f}"), minLength));
+	displayText::butxt(HMINLEN, fmt::format(FMT_COMPILE(L"{:.2f}"), minLength));
   }
   CurrentStitchIndex = currentStitch;
   lensadj();
@@ -10463,20 +10440,16 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 	case WM_INITDIALOG: {
 	  auto const featherType = IniFile.featherType;
 	  SendMessage(hwndlg, WM_SETFOCUS, 0, 0);
-// Supress bounds.1 	Don't use pointer arithmetic. Use span instead
-#pragma warning(push)
-#pragma warning(disable : 26481)
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFRAT),
-	                fmt::format(FMT_STRING(L"{:.2f}"), IniFile.featherRatio).c_str());
+	                fmt::format(FMT_COMPILE(L"{:.2f}"), IniFile.featherRatio).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT),
-	                fmt::format(FMT_STRING(L"{}"), IniFile.featherUpCount).c_str());
+	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherUpCount).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT),
-	                fmt::format(FMT_STRING(L"{}"), IniFile.featherDownCount).c_str());
+	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherDownCount).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFLR),
-	                fmt::format(FMT_STRING(L"{:.2f}"), (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
+	                fmt::format(FMT_COMPILE(L"{:.2f}"), (IniFile.featherMinStitchSize * IPFGRAN)).c_str());
 	  SetWindowText(GetDlgItem(hwndlg, IDC_DFNUM),
-	                fmt::format(FMT_STRING(L"{}"), IniFile.featherCount).c_str());
-#pragma warning(pop)
+	                fmt::format(FMT_COMPILE(L"{}"), IniFile.featherCount).c_str());
 	  auto featherStyle = std::wstring {};
 	  for (auto const& iFeatherStyle : FTHRLIST) {
 		featherStyle.assign(displayText::loadStr(iFeatherStyle.stringID));
@@ -12664,8 +12637,7 @@ auto thi::handleLeftButtonDown(std::vector<POINT>& stretchBoxLine,
   if (PreferenceIndex == PRFAPPCOL + 1 &&
       thi::chkMsgs(Msg.pt, DefaultColorWin->front(), DefaultColorWin->back())) {
 	AppliqueColor = VerticalIndex;
-#pragma warning(suppress : 26481)
-	SetWindowText(ValueWindow->operator[](PRFAPPCOL), fmt::format(FMT_STRING(L"{}"), VerticalIndex).c_str());
+	SetWindowText(ValueWindow->operator[](PRFAPPCOL), fmt::format(FMT_COMPILE(L"{}"), VerticalIndex).c_str());
 	thred::unsid();
 	return true;
   }
@@ -17719,8 +17691,7 @@ auto CALLBACK thi::wndProc(HWND p_hWnd, UINT message, WPARAM wParam, LPARAM lPar
 		  if (DisplayedColorBitmap.test(iColor)) {
 			SetBkColor(DrawItem->hDC, DEFAULT_COLORS[iColor]);
 			SetTextColor(DrawItem->hDC, defTxt(iColor));
-#pragma warning(suppress : 26481)
-			auto const colorNum = fmt::format(FMT_STRING(L"{}"), iColor + 1U);
+			auto const colorNum = fmt::format(FMT_COMPILE(L"{}"), iColor + 1U);
 			auto       textSize = SIZE {};
 			wrap::getTextExtentPoint32(
 			    DrawItem->hDC, colorNum.c_str(), wrap::toUnsigned(colorNum.size()), &textSize);

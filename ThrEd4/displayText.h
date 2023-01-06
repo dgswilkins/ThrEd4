@@ -7,6 +7,7 @@
 #pragma warning(push)
 #pragma warning(disable : ALL_CPPCORECHECK_WARNINGS)
 #include "fmt/xchar.h"
+#include "fmt/compile.h"
 #pragma warning(pop)
 
 // Standard Libraries
@@ -43,7 +44,6 @@ void setWindowFont(HWND hWnd, HFONT hFont) noexcept;
 void shoMsg(std::wstring const& message, bool top);
 
 template <class inType> void showMessage(uint32_t messageId, inType value) {
-  // NOLINTNEXTLINE(clang-diagnostic-sign-conversion)
   auto const fmtStr = fmt::format(fmt::runtime(displayText::loadStr(messageId)), value);
   displayText::shoMsg(fmtStr, true);
 }

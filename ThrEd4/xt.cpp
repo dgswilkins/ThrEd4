@@ -2360,9 +2360,7 @@ void xt::rtrclp() {
 }
 
 void xi::setstxt(int32_t stringIndex, float value, HWND dialog) {
-#pragma warning(suppress : 26481)
-  SetWindowText(GetDlgItem(dialog, stringIndex),
-                fmt::format(FMT_STRING(L"{:.2f}"), (value * IPFGRAN)).c_str());
+  SetWindowText(GetDlgItem(dialog, stringIndex), fmt::format(FMT_COMPILE(L"{:.2f}"), (value * IPFGRAN)).c_str());
 }
 
 auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
