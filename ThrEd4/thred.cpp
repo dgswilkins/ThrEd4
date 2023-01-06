@@ -6058,15 +6058,17 @@ void thi::duclip() {
 			  guidesSize += form.satinGuideCount;
 			}
 		  }
-		  auto const guides     = gsl::span(ptrGuides, guidesSize);
 		  auto       guideCount = 0U;
-		  for (auto& selectedForm : (*SelectedFormList)) {
-			auto& form = FormList->operator[](selectedForm);
-			if (form.type == SAT) {
-			  auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
-			  for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
-				guides[guideCount++] = *itGuide;
-				++itGuide;
+		  if (guidesSize != 0U) {
+			auto const guides = gsl::span(ptrGuides, guidesSize);
+			for (auto& selectedForm : (*SelectedFormList)) {
+			  auto& form = FormList->operator[](selectedForm);
+			  if (form.type == SAT) {
+				auto itGuide = wrap::next(SatinGuides->cbegin(), form.satinOrAngle.guide);
+				for (auto iGuide = 0U; iGuide < form.satinGuideCount; ++iGuide) {
+				  guides[guideCount++] = *itGuide;
+				  ++itGuide;
+				}
 			  }
 			}
 		  }
@@ -6083,22 +6085,24 @@ void thi::duclip() {
 			  pointsSize += form.clipEntries;
 			}
 		  }
-		  auto const points     = gsl::span(ptrPoints, pointsSize);
 		  auto       pointCount = 0;
-		  for (auto& selectedForm : (*SelectedFormList)) {
-			auto& form = FormList->operator[](selectedForm);
-			if (form.isclpx()) {
-			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
-			  for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
-				points[pointCount++] = *offsetStart;
-				++offsetStart;
+		  if (pointsSize != 0U) {
+			auto const points = gsl::span(ptrPoints, pointsSize);
+			for (auto& selectedForm : (*SelectedFormList)) {
+			  auto& form = FormList->operator[](selectedForm);
+			  if (form.isclpx()) {
+				auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
+				for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
+				  points[pointCount++] = *offsetStart;
+				  ++offsetStart;
+				}
 			  }
-			}
-			if (form.iseclp()) {
-			  auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
-			  for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
-				points[pointCount++] = *offsetStart;
-				++offsetStart;
+			  if (form.iseclp()) {
+				auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
+				for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
+				  points[pointCount++] = *offsetStart;
+				  ++offsetStart;
+				}
 			  }
 			}
 		  }
@@ -6262,7 +6266,6 @@ void thi::duclip() {
 			}
 			form::ispcdclp();
 		  }
-		  CloseClipboard();
 		}
 		else {
 		  if ((!StitchBuffer->empty()) && StateMap->test(StateFlag::GRPSEL)) {
@@ -6296,7 +6299,6 @@ void thi::duclip() {
 			  GlobalUnlock(clipHandle);
 			  SetClipboardData(Clip, clipHandle);
 			}
-			CloseClipboard();
 		  }
 		}
 	  }
