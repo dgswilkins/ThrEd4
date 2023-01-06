@@ -10311,20 +10311,16 @@ auto thi::unselectAll() -> bool{
 	  thred::unsid();
 	  return true;
 	}
-	else {
-	  if (PreferenceIndex != 0U) {
-		chknum();
-		thred::unsid();
-		PreferenceIndex = 0;
-		return true;
-	  }
-	  else {
-		DestroyWindow(PreferencesWindow);
-		StateMap->reset(StateFlag::PRFACT);
-		if (StateMap->testAndReset(StateFlag::WASRT)) {
-		  StateMap->set(StateFlag::INSRT);
-		}
-	  }
+	if (PreferenceIndex != 0U) {
+	  chknum();
+	  thred::unsid();
+	  PreferenceIndex = 0;
+	  return true;
+	}
+	DestroyWindow(PreferencesWindow);
+	StateMap->reset(StateFlag::PRFACT);
+	if (StateMap->testAndReset(StateFlag::WASRT)) {
+	  StateMap->set(StateFlag::INSRT);
 	}
   }
   if (FormMenuChoice != 0U) {
