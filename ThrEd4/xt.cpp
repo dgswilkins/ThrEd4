@@ -2582,21 +2582,21 @@ void xt::chgchk(uint8_t code) {
 }
 
 // report the system error from GetLastError
-void xt::reportError(const wchar_t* prompt, DWORD& dw) {
-  auto lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
+void xt::reportError(const wchar_t* prompt, DWORD& errorCode) {
+  auto* lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
   auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 NULL,
-                                 dw,
+                                 nullptr,
+                                 errorCode,
                                  0,
                                  reinterpret_cast<LPTSTR>(&lpMsgBuf),
                                  0,
-                                 NULL);
-  if (res) {
+                                 nullptr);
+  if (res != 0U) {
 	auto const msg = gsl::span(static_cast<wchar_t*>(lpMsgBuf), res);
 	// erase the \r\n at the end of the msg
-	msg[res - 2] = 0;
-	outDebugString(L"{} failed with error [{}], {}\n", prompt, dw, static_cast<wchar_t*>(lpMsgBuf));
+	msg[wrap::toSize(res) - 2U] = 0;
+	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
 	LocalFree(lpMsgBuf);
   }
 }
