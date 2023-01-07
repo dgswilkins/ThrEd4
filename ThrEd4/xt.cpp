@@ -2580,3 +2580,23 @@ void xt::chgchk(uint8_t code) {
   IniFile.dataCheck = code;
   menu::chkmen();
 }
+
+// report the system error from GetLastError
+void xt::reportError(const wchar_t* prompt, DWORD& dw) {
+  auto lpMsgBuf = gsl::narrow_cast<LPVOID>(nullptr);
+#pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
+  auto const res = FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+                                 NULL,
+                                 dw,
+                                 0,
+                                 reinterpret_cast<LPTSTR>(&lpMsgBuf),
+                                 0,
+                                 NULL);
+  if (res) {
+	auto const msg = gsl::span(static_cast<wchar_t*>(lpMsgBuf), res);
+	// erase the \r\n at the end of the msg
+	msg[res - 2] = 0;
+	outDebugString(L"{} failed with error [{}], {}\n", prompt, dw, static_cast<wchar_t*>(lpMsgBuf));
+	LocalFree(lpMsgBuf);
+  }
+}
