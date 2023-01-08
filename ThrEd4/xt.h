@@ -85,7 +85,6 @@ void notcwlk();
 void notund();
 void notwlk();
 void nudsiz();
-void reportError(const wchar_t* prompt, DWORD& errorCode);
 void rtrclp();
 void selalfrm();
 void setclpspac();

@@ -32,6 +32,7 @@
     <ClCompile Include="PCS.cpp" />
     <ClCompile Include="PES.cpp" />
     <ClCompile Include="repair.cpp" />
+    <ClCompile Include="reporting.cpp" />
     <ClCompile Include="satin.cpp" />
     <ClCompile Include="texture.cpp" />
     <ClCompile Include="trace.cpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="point.h" />
     <ClInclude Include="repair.h" />
     <ClInclude Include="hlp.h" />
+    <ClInclude Include="reporting.h" />
     <ClInclude Include="Resources\resource.h" />
     <ClInclude Include="satCon.h" />
     <ClInclude Include="satin.h" />
