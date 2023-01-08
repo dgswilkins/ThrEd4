@@ -599,7 +599,7 @@ class FIND_INFO
 {
   public:
   uint32_t         count {};
-  WIN32_FIND_DATA* data {};
+  gsl::owner<WIN32_FIND_DATA*> data {};
 
   // constexpr FIND_INFO() noexcept = default;
   // FIND_INFO(FIND_INFO const&) = default;
@@ -9877,10 +9877,10 @@ void thi::lock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
   auto lockInfo = FIND_INFO {};
   // ToDo - Replace FNDFLMAX with maximum files in subdirectory
-  lockInfo.data = new WIN32_FIND_DATA[FNDFLMAX]; // NOLINT(cppcoreguidelines-owning-memory)
+  lockInfo.data = new WIN32_FIND_DATA[FNDFLMAX]; 
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
-  delete[] lockInfo.data; // NOLINT(cppcoreguidelines-owning-memory)
+  delete[] lockInfo.data; 
 }
 
 void thi::delstch() {
