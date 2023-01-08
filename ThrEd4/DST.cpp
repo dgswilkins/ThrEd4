@@ -4,6 +4,7 @@
 #include "displayText.h"
 #include "DST.h"
 #include "globals.h"
+#include "reporting.h"
 #include "thred.h"
 #include "utf8conv.h"
 
@@ -127,7 +128,12 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	  GetFileSizeEx(colorFile, &colorFileSize);
 	  // There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 	  colors.resize(colorFileSize.u.LowPart / wrap::sizeofType(colors));
-	  ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr);
+      if (0 != ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(colorFile);
+		rpt::reportError(L"ReadFile failed for colors in dstran", errorCode);
+		return;
+      }
 	  CloseHandle(colorFile);
 	  if (bytesRead > (wrap::sizeofType(colors) * 2)) {
 		if (colors[0] == COLVER) {
@@ -914,14 +920,24 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto dstHeader = DSTHED {};
   auto bytesRead = DWORD {};
-  ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr);
+  if (0 == ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr)) {
+	auto errorCode = GetLastError();
+	CloseHandle(fileHandle);
+	rpt::reportError(L"ReadFile failed for dstHeader in readDSTFile", errorCode);
+	return false;
+  }
   if (bytesRead == sizeof(dstHeader)) {
 	if (di::chkdst(&dstHeader)) {
 	  bitmap::resetBmpFile(true);
 	  fileSize -= sizeof(dstHeader);
 	  auto dstData = std::vector<DSTREC> {};
 	  dstData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
-	  ReadFile(fileHandle, dstData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+	  if (0 == ReadFile(fileHandle, dstData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(fileHandle);
+		rpt::reportError(L"ReadFile failed for dstData in readDSTFile", errorCode);
+		return false;
+	  }
 	  di::dstran(dstData);
 	  IniFile.auxFileType = AUXDST;
 	}

@@ -5,6 +5,7 @@
 #include "displayText.h"
 #include "globals.h"
 #include "PCS.h"
+#include "reporting.h"
 #include "thred.h"
 
 #pragma pack(push, 1)
@@ -138,7 +139,12 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	auto fileHandle = HANDLE {nullptr};
 	if (thred::getFileHandle(newFileName, fileHandle)) {
 	  auto bytesRead = DWORD {};
-	  ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr);
+	  if (0 == ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(fileHandle);
+		rpt::reportError(L"ReadFile failed for PCSHeader in readPCSFile", errorCode);
+		return false;
+	  }
 	  if (bytesRead == sizeof(PCSHeader)) {
 		if (PCSHeader.leadIn == '2' && PCSHeader.colorCount == COLORCNT) {
 		  std::ranges::copy(PCSHeader.colors, UserColor.begin());
@@ -146,7 +152,12 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
 		  auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
 		  pcsDataBuffer.resize(pcsStitchCount);
-		  ReadFile(fileHandle, pcsDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+		  if (0 == ReadFile(fileHandle, pcsDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
+			auto errorCode = GetLastError();
+			CloseHandle(fileHandle);
+			rpt::reportError(L"ReadFile failed for pcsDataBuffer in readPCSFile", errorCode);
+			return false;
+		  }
 		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
 			auto iStitch      = uint16_t {};
 			auto iColorChange = 0U;
@@ -171,7 +182,12 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  ++iPCSstitch;
 			}
 			// Grab the bitmap filename
-			ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr);
+			if (0 == ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr)) {
+			  auto errorCode = GetLastError();
+			  CloseHandle(fileHandle);
+			  rpt::reportError(L"ReadFile failed for getBmpNameData in readPCSFile", errorCode);
+			  return false;
+			}
 			if (bytesRead != 14) {
 			  // NOLINTNEXTLINE
 			  outDebugString(L"readPCSFile: description bytesRead {}\n", bytesRead);
@@ -287,7 +303,12 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	auto pcsFileHeader = PCSHEADER {};
 	auto bytesRead     = DWORD {};
 
-	ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr);
+	if (0 == ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr)) {
+	  auto errorCode = GetLastError();
+	  CloseHandle(fileHandle);
+	  rpt::reportError(L"ReadFile failed for pcsFileHeader in insPCS", errorCode);
+	  return retflag;
+	}
 	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLORCNT) {
 	  auto fileSize = uintmax_t {};
 	  thred::getFileSize(insertedFile, fileSize);
@@ -295,7 +316,12 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
 	  auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
 	  pcsStitchBuffer.resize(pcsStitchCount);
-	  ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr);
+	  if (0 == ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(fileHandle);
+		rpt::reportError(L"ReadFile failed for pcsStitchBuffer in insPCS", errorCode);
+		return retflag;
+	  }
 	  if (bytesRead == fileSize) {
 		thred::savdo();
 		auto insertIndex = StitchBuffer->size();

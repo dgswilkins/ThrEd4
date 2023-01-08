@@ -4,6 +4,7 @@
 #include "bitmap.h"
 #include "displayText.h"
 #include "globals.h"
+#include "reporting.h"
 #include "thred.h"
 #include "trace.h"
 #include "utf8conv.h"
@@ -104,18 +105,31 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto bytesRead = DWORD {};
-  ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr);
-  // check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
-  if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType == MB_SIG) {
-	auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
-	if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
-	  fileHeaderSize = sizeof(BITMAPV4HEADER);
+  if (0 == ReadFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr)) {
+	// check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
+	if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType == MB_SIG) {
+	  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
+	  if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
+		fileHeaderSize = sizeof(BITMAPV4HEADER);
+	  }
+	  if (0 == ReadFile(hBitmapFile, &BitmapFileHeaderV4, gsl::narrow<DWORD>(fileHeaderSize), &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(hBitmapFile);
+		rpt::reportError(L"ReadFile failed for BitmapFileHeaderV4 in bfil", errorCode); 
+		return;
+	  }
 	}
-	ReadFile(hBitmapFile, &BitmapFileHeaderV4, gsl::narrow<DWORD>(fileHeaderSize), &bytesRead, nullptr);
+	else {
+	  CloseHandle(hBitmapFile);
+	  bitmap::resetBmpFile(true);
+	  return;
+	}
   }
   else {
+	auto errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
+	rpt::reportError(L"ReadFile failed for BitmapFileHeader in bfil",errorCode);
 	return;
   }
   if (bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
@@ -139,7 +153,12 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
 	  auto monoBitmapData = std::vector<uint8_t> {};
 	  monoBitmapData.resize(bitmapSizeBytes);
-	  ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr);
+	  if (0 == ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr)) {
+		auto errorCode = GetLastError();
+		CloseHandle(hBitmapFile);
+		rpt::reportError(L"ReadFile failed for monoBitmapData in bfil", errorCode);
+		return;
+	  }
 	  CloseHandle(hBitmapFile);
 	  auto const flag = bi::binv(monoBitmapData);
 	  auto const foreground = gsl::narrow_cast<COLORREF>(flag ? inverseBackgroundColor : BitmapColor);
