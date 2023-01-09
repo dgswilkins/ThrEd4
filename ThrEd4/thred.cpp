@@ -2011,7 +2011,7 @@ void thi::chknum() {
 		}
 		else {
 		  thred::savdo();
-		  if (FormMenuChoice == LFRMSPAC && form.isfclp()) {
+		  if (FormMenuChoice == LFRMSPAC && form.isFanClip()) {
 			form.fillSpacing = 0;
 		  }
 		}
@@ -9601,7 +9601,7 @@ auto thi::chkminus(wchar_t code) noexcept -> bool {
 	  return true;
 	}
 	if (auto const& form = FormList->operator[](ClosestFormToCursor);
-	    FormMenuChoice == LFRMSPAC && form.isfclp()) { // Fill Spacing for fan clip fill
+	    FormMenuChoice == LFRMSPAC && form.isFanClip()) { // Fill Spacing for fan clip fill
 	  return true;
 	}
 	if (FormMenuChoice == LWLKIND) { // Indent

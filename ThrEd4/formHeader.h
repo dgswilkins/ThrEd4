@@ -310,7 +310,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto isClipX() const noexcept -> bool;
   [[nodiscard]] inline auto isEdgeClipX() const noexcept -> bool;
   [[nodiscard]] inline auto istx() const noexcept -> bool;
-  [[nodiscard]] inline auto isfclp() const noexcept -> bool;
+  [[nodiscard]] inline auto isFanClip() const noexcept -> bool;
   inline void               outline();
   inline void               squareEnd(bool flag) noexcept;
 };
@@ -634,7 +634,7 @@ inline auto FRM_HEAD::isEdgeClipX() const noexcept -> bool {
   return isEdgeClip() && (clipEntries != 0U);
 }
 
-inline auto FRM_HEAD::isfclp() const noexcept -> bool {
+inline auto FRM_HEAD::isFanClip() const noexcept -> bool {
   return isClip() && fillType != CLPF;
 }
 
