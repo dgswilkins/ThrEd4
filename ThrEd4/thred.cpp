@@ -5957,7 +5957,7 @@ auto thi::sizfclp(FRM_HEAD const& form) -> uint32_t {
   if (form.isClipX()) {
 	clipSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
-  if (form.istx()) {
+  if (form.isTexture()) {
 	clipSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
   return clipSize;
@@ -6016,7 +6016,7 @@ void thi::sizclp(FRM_HEAD const& form,
   if (form.isClipX()) {
 	fileSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
-  if (form.istx()) {
+  if (form.isTexture()) {
 	fileSize += form.fillInfo.texture.count * wrap::sizeofType(TexturePointsBuffer);
   }
 }
@@ -6160,7 +6160,7 @@ void thi::duclip() {
 		  iForm              = 0;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
-			if (form.istx()) {
+			if (form.isTexture()) {
 			  auto startPoint = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto       endPoint = wrap::next(startPoint, form.fillInfo.texture.count);
 			  auto const spDest =
@@ -6272,7 +6272,7 @@ void thi::duclip() {
 			  std::copy(startClip, endClip, points.begin());
 			}
 			auto* textures = convertFromPtr<TX_PNT*>(std::next(ptrPoints, iClip));
-			if (form.istx()) {
+			if (form.isTexture()) {
 			  auto startTexture = wrap::next(TexturePointsBuffer->cbegin(), form.fillInfo.texture.index);
 			  auto endTexture = wrap::next(startTexture, form.fillInfo.texture.count);
 
@@ -7557,7 +7557,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 			formIter.borderClipData = clipOffset;
 			clipOffset += formIter.clipEntries;
 		  }
-		  if (formIter.istx()) {
+		  if (formIter.isTexture()) {
 			wrap::narrow(formIter.fillInfo.texture.index, textureOffset);
 			textureOffset += formIter.fillInfo.texture.count;
 		  }
@@ -12052,7 +12052,7 @@ auto thi::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXVRTF)) // vertical texture
 	{
-	  if (form.istx()) {
+	  if (form.isTexture()) {
 		form.fillType = TXVRTF;
 		break;
 	  }
@@ -12063,7 +12063,7 @@ auto thi::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXHORF)) // horizontal texture
 	{
-	  if (form.istx()) {
+	  if (form.isTexture()) {
 		form.fillType = TXHORF;
 		break;
 	  }
@@ -12074,7 +12074,7 @@ auto thi::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::TXANGF)) // angle texture
 	{
-	  if (form.istx()) {
+	  if (form.isTexture()) {
 		form.fillType              = TXANGF;
 		form.angleOrClipData.angle = IniFile.fillAngle;
 		break;
@@ -13375,7 +13375,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.clipEntries;
 		  }
-		  if (formIter.istx()) {
+		  if (formIter.isTexture()) {
 			auto* ptrTextureSource = convertFromPtr<TX_PNT*>(std::next(ptrClipData, clipCount));
 			auto const textureSource = gsl::span {ptrTextureSource, formIter.fillInfo.texture.count};
 			wrap::narrow(formIter.fillInfo.texture.index, TexturePointsBuffer->size());

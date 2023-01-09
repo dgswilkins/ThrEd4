@@ -183,7 +183,7 @@ auto ri::frmchkfn() -> uint32_t {
 		}
 	  }
 	  if ((badData.attribute & BADTX) == 0U) {
-		if (form.istx()) {
+		if (form.isTexture()) {
 		  ri::chkTxt(form, badData);
 		}
 	  }
@@ -217,7 +217,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.type == SAT) {
 	badData.guideCount += form.satinGuideCount;
   }
-  if (form.istx()) {
+  if (form.isTexture()) {
 	badData.tx += form.fillInfo.texture.count;
   }
 }
@@ -386,7 +386,7 @@ void ri::reptx() {
   auto textureCount = 0U;
   auto badData      = BAD_COUNTS {};
   for (auto formIter = FormList->begin(); formIter != FormList->end(); ++formIter) {
-	if (formIter->istx()) {
+	if (formIter->isTexture()) {
 	  if (wrap::toUnsigned(TexturePointsBuffer->size()) >
 	      wrap::toUnsigned(formIter->fillInfo.texture.index) + formIter->fillInfo.texture.count) {
 		auto const startTexture =

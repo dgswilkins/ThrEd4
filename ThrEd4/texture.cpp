@@ -1087,7 +1087,7 @@ void texture::deltx(uint32_t formIndex) {
   auto&       form         = FormList->operator[](formIndex);
   auto const& currentIndex = form.fillInfo.texture.index;
   // clang-format on
-  if ((!TexturePointsBuffer->empty()) && form.istx() && (form.fillInfo.texture.count != 0U)) {
+  if ((!TexturePointsBuffer->empty()) && form.isTexture() && (form.fillInfo.texture.count != 0U)) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
 	for (auto iForm = 0U; iForm < formIndex; ++iForm) {
@@ -1145,7 +1145,7 @@ void txi::nutx(FRM_HEAD& form) {
   auto index = 0U;
   std::ranges::sort(*TempTexturePoints, txi::tpComp);
   if (!FormList->empty()) {
-	if (form.istx()) {
+	if (form.isTexture()) {
 	  auto const& texture = form.fillInfo.texture;
 	  index               = texture.index;
 	  texture::deltx(ClosestFormToCursor);
