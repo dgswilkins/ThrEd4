@@ -581,9 +581,9 @@ void form::delmfil(uint32_t formIndex) {
   if (texture::istx(formIndex)) {
 	texture::deltx(formIndex);
   }
-  clip::delmclp(ClosestFormToCursor);
+  clip::delmclp(formIndex);
   // find the first stitch to delete
-  auto const codedForm = ClosestFormToCursor << FRMSHFT;
+  auto const codedForm = formIndex << FRMSHFT;
   if (auto const firstStitch =
           std::ranges::find_if(*StitchBuffer,
                                [codedForm](F_POINT_ATTR const& stitch) -> bool {
