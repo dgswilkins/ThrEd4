@@ -177,7 +177,7 @@ enum ViewMenuItems {
   MVW_ABOUT
 };
 
-enum HoopSize {
+enum HoopSize : int8_t {
   SETCUST = 1, // set the custom hoop
   SMALHUP = 2, // pfaf code for small hoop
   LARGHUP,     // pfaf code for large hoop

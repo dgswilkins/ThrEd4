@@ -260,7 +260,6 @@ auto pci::pcshup(std::vector<F_POINT_ATTR>& stitches) -> bool {
       (boundingSize.x > SHUPX || boundingSize.y > SHUPY) ||
       (util::closeEnough(IniFile.hoopSizeX, LHUPX) && util::closeEnough(IniFile.hoopSizeY, LHUPY));
   auto const hoopSize = largeFlag ? LARGE_HOOP : SMALL_HOOP;
-#pragma warning(suppress : 26812) // enum type is unscoped
   PCSHeader.hoopType = largeFlag ? LARGHUP : SMALHUP;
   auto delta         = F_POINT {};
   if (boundingRect.right > hoopSize.x) {
