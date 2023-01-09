@@ -550,8 +550,8 @@ auto txi::px2txt(POINT const& offset) -> bool {
 	if (offset.y > TextureScreen.top) {
 	  if ((offset.y <= TextureScreen.bottom)) {
 		txPoint.y = TextureScreen.areaHeight -
-		            (wrap::toFloat(offset.y - TextureScreen.top) /
-		             (wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight));
+		            (((wrap::toFloat(offset.y - TextureScreen.top)) /
+		             wrap::toFloat(TextureScreen.height)) * TextureScreen.areaHeight);
 		TempTexturePoints->push_back(txPoint);
 		retval = true;
 	  }
@@ -753,8 +753,8 @@ void txi::ed2txp(POINT const& offset, TX_PNT& textureRecord) {
   }
   textureRecord.line = wrap::round<uint16_t>(val);
   textureRecord.y =
-      TextureScreen.areaHeight - (wrap::toFloat(offset.y - TextureScreen.top) /
-                                  (wrap::toFloat(TextureScreen.height) * TextureScreen.areaHeight));
+      TextureScreen.areaHeight - (((wrap::toFloat(offset.y - TextureScreen.top)) /
+                                  wrap::toFloat(TextureScreen.height)) * TextureScreen.areaHeight);
 }
 
 void texture::txtrup() {
