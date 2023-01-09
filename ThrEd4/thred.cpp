@@ -1798,7 +1798,7 @@ void thi::chknum() {
 		case LFTHCOL: {
 		  if (value != 0.0F) {
 			thred::savdo();
-			form::nufthcol((wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			form::nufthcol((wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			thi::setSideWinVal(LFTHCOL);
 			thred::coltab();
 		  }
@@ -1810,7 +1810,7 @@ void thi::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nufilcol(colVal);
 			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LFRMCOL), fmtStr.c_str());
@@ -1824,7 +1824,7 @@ void thi::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form.underlayColor = colVal;
 			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LUNDCOL), fmtStr.c_str());
@@ -1839,7 +1839,7 @@ void thi::chknum() {
 		  if (value != 0.0F) {
 			thred::savdo();
 			auto const colVal = gsl::narrow_cast<uint8_t>(
-			    (wrap::wcstol<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
+			    (wrap::wcsToLong<uint32_t>(SideWindowEntryBuffer->data()) - 1U) & COLMSK);
 			form::nubrdcol(colVal);
 			auto const fmtStr = fmt::format(FMT_COMPILE(L"{}"), colVal + 1U);
 			SetWindowText(ValueWindow->operator[](LBRDCOL), fmtStr.c_str());

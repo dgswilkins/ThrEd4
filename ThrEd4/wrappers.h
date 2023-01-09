@@ -184,7 +184,7 @@ template <class outType> void wcsToULong(outType& outvar, wchar_t const* invar) 
   outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
 }
 
-template <class outType> auto wcstol(wchar_t const* buffer) -> outType {
+template <class outType> auto wcsToLong(wchar_t const* buffer) -> outType {
   return gsl::narrow<outType>(std::wcstol(buffer, nullptr, 10));
 }
 
