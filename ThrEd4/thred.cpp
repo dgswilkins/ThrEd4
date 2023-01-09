@@ -923,8 +923,8 @@ auto thred::getUserPen(uint32_t iPen) noexcept -> HPEN {
 
 void thred::resetSideBuffer() {
   SideWinMsgIdx = 0;
-  constexpr auto fillData = gsl::narrow_cast<wchar_t>(0U);
-  std::ranges::fill(*SideWindowEntryBuffer, fillData);
+  constexpr auto FILLCHAR = gsl::narrow_cast<wchar_t>(0U);
+  std::ranges::fill(*SideWindowEntryBuffer, FILLCHAR);
 }
 
 void thred::resetMsgBuffer() {
