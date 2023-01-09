@@ -5954,7 +5954,7 @@ auto thi::sizfclp(FRM_HEAD const& form) -> uint32_t {
   if (form.isEdgeClip()) {
 	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
-  if (form.isclpx()) {
+  if (form.isClipX()) {
 	clipSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (form.istx()) {
@@ -6013,7 +6013,7 @@ void thi::sizclp(FRM_HEAD const& form,
   if (form.isEdgeClip()) {
 	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
-  if (form.isclpx()) {
+  if (form.isClipX()) {
 	fileSize += form.lengthOrCount.clipCount * wrap::sizeofType(ClipPoints);
   }
   if (form.istx()) {
@@ -6126,7 +6126,7 @@ void thi::duclip() {
 		  auto  pointsSize = 0U;
 		  for (auto& selectedForm : (*SelectedFormList)) {
 			auto& form = FormList->operator[](selectedForm);
-			if (form.isclpx()) {
+			if (form.isClipX()) {
 			  pointsSize += form.lengthOrCount.clipCount;
 			}
 			if (form.isEdgeClip()) {
@@ -6138,7 +6138,7 @@ void thi::duclip() {
 			auto const points = gsl::span(ptrPoints, pointsSize);
 			for (auto& selectedForm : (*SelectedFormList)) {
 			  auto& form = FormList->operator[](selectedForm);
-			  if (form.isclpx()) {
+			  if (form.isClipX()) {
 				auto offsetStart = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 				for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
 				  points[pointCount++] = *offsetStart;
@@ -6253,7 +6253,7 @@ void thi::duclip() {
 			}
 			auto* ptrMclp = convertFromPtr<F_POINT*>(std::next(ptrGuides, iGuide));
 			auto  iClip   = 0U;
-			if (form.isclpx()) {
+			if (form.isClipX()) {
 			  iClip          = form.lengthOrCount.clipCount;
 			  auto startMclp = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);
 			  auto endMclp   = wrap::next(startMclp, iClip);
@@ -13272,7 +13272,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
-		  if (form.isclpx()) {
+		  if (form.isClipX()) {
 			clipCount += form.lengthOrCount.clipCount;
 		  }
 		  if (form.iseclpx()) {
@@ -13286,7 +13286,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  auto const offset = formOffset + iForm;
 		  auto&      form   = FormList->operator[](offset);
 		  // clang-format on
-		  if (form.isclpx()) {
+		  if (form.isClipX()) {
 			form.angleOrClipData.clip = thred::adclp(form.lengthOrCount.clipCount);
 			auto offsetStart          = wrap::next(ClipPoints->begin(), form.angleOrClipData.clip);
 			for (auto iClip = 0U; iClip < form.lengthOrCount.clipCount; ++iClip) {
@@ -13362,7 +13362,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  }
 		  auto* ptrClipData = convertFromPtr<F_POINT*>(std::next(ptrGuides, formIter.satinGuideCount));
 		  auto  clipCount   = 0U;
-		  if (formIter.isclpx()) {
+		  if (formIter.isClipX()) {
 			auto const clipData = gsl::span {ptrClipData, formIter.lengthOrCount.clipCount};
 			formIter.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());

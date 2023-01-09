@@ -7670,7 +7670,7 @@ void fi::adfrm(uint32_t iForm) {
 	auto const itClipPoints = wrap::next(ClipPoints->cbegin(), originalBCData);
 	ClipPoints->insert(ClipPoints->end(), itClipPoints, wrap::next(itClipPoints, currentForm.clipEntries));
   }
-  if (currentForm.isclpx()) {
+  if (currentForm.isClipX()) {
 	auto const originalClip          = currentForm.angleOrClipData.clip;
 	currentForm.angleOrClipData.clip = wrap::toUnsigned(ClipPoints->size());
 
@@ -8328,7 +8328,7 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
 	dest.borderClipData = wrap::toUnsigned(tempClipPoints.size() - dest.clipEntries);
   }
-  if (form.isclpx()) {
+  if (form.isClipX()) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.angleOrClipData.clip);
 	auto const itEndClip   = wrap::next(itStartClip, dest.lengthOrCount.clipCount);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
