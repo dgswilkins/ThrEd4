@@ -8258,7 +8258,7 @@ void form::dupfn(float rotationAngle) {
 
 void fi::shrnks() {
   auto  clipRect    = F_RECTANGLE {};
-  auto  lengths     = std::vector<uint32_t> {};
+  auto  lengths     = std::vector<float> {};
   auto  deltas      = std::vector<F_POINT> {};
   auto& currentForm = FormList->operator[](ClosestFormToCursor);
   lengths.reserve(currentForm.vertexCount);
@@ -8275,9 +8275,8 @@ void fi::shrnks() {
   auto length = lengths.begin();
   auto delta  = deltas.begin();
   for (auto iVertex = ptrdiff_t {}; iVertex < vMax; ++iVertex) {
-	auto const  fLen       = wrap::toFloat(*length);
-	auto const  count      = std::floor(fLen / ClipRectSize.cx);
-	auto const  ratio      = (ClipRectSize.cx * count + 0.004F) / fLen;
+	auto const  count      = std::floor(*length / ClipRectSize.cx);
+	auto const  ratio      = (ClipRectSize.cx * count + 0.004F) / *length;
 	auto const& thisVertex = itVertex[iVertex];
 	auto&       nextVertex = itVertex[iVertex + 1];
 	nextVertex.x           = thisVertex.x + delta->x * ratio;
