@@ -685,8 +685,20 @@ void txi::dutxlin(F_POINT const& point0in, F_POINT const& point1in) {
   }
   auto integerStart  = wrap::ceil<int32_t>(start / TextureScreen.spacing);
   auto integerFinish = wrap::floor<int32_t>(finish / TextureScreen.spacing);
+  if (integerStart > TextureScreen.lines + 1) {
+	return;
+  }
+  if (integerFinish < 0) {
+	return;
+  }
   if (integerStart < 1) {
 	integerStart = 1;
+  }
+  if (integerFinish == 0) {
+	++integerFinish;
+  }
+  if (integerStart == TextureScreen.lines + 1) {
+	--integerStart;
   }
   if (integerFinish > TextureScreen.lines) {
 	integerFinish = TextureScreen.lines;
