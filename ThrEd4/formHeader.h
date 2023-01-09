@@ -308,7 +308,7 @@ class FRM_HEAD
   [[nodiscard]] inline auto isClip() const noexcept -> bool;
   [[nodiscard]] inline auto isEdgeClip() const noexcept -> bool;
   [[nodiscard]] inline auto isClipX() const noexcept -> bool;
-  [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
+  [[nodiscard]] inline auto isEdgeClipX() const noexcept -> bool;
   [[nodiscard]] inline auto istx() const noexcept -> bool;
   [[nodiscard]] inline auto isfclp() const noexcept -> bool;
   inline void               outline();
@@ -630,7 +630,7 @@ inline auto FRM_HEAD::isClipX() const noexcept -> bool {
   return isClip() && (lengthOrCount.clipCount != 0U);
 }
 
-inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
+inline auto FRM_HEAD::isEdgeClipX() const noexcept -> bool {
   return isEdgeClip() && (clipEntries != 0U);
 }
 

@@ -114,7 +114,7 @@ void ci::clpsub(uint32_t fpnt, uint32_t cnt) {
 	if (form.isClipX()) {
 	  form.angleOrClipData.clip -= cnt;
 	}
-	if (form.iseclpx()) {
+	if (form.isEdgeClipX()) {
 	  form.borderClipData -= cnt;
 	}
   }
@@ -168,7 +168,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, count, VAL);
   for (auto iForm = ClosestFormToCursor; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (auto& thisForm = FormList->operator[](iForm); thisForm.iseclpx()) {
+	if (auto& thisForm = FormList->operator[](iForm); thisForm.isEdgeClipX()) {
 	  thisForm.borderClipData += count;
 	}
   }
@@ -188,7 +188,7 @@ auto clip::numclp() -> uint32_t {
   ClipPoints->insert(itClipPoint, clipSize, VAL);
   auto& form                = FormList->operator[](ClosestFormToCursor);
   form.angleOrClipData.clip = find;
-  if (form.iseclpx()) {
+  if (form.isEdgeClipX()) {
 	form.borderClipData += clipSize;
   }
   for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
@@ -196,7 +196,7 @@ auto clip::numclp() -> uint32_t {
 	if (formNext.isClipX()) {
 	  formNext.angleOrClipData.clip += clipSize;
 	}
-	if (formNext.iseclpx()) {
+	if (formNext.isEdgeClipX()) {
 	  formNext.borderClipData += clipSize;
 	}
   }

@@ -3663,7 +3663,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 		  ++offsetStart;
 		}
 	  }
-	  if (srcForm.iseclpx()) {
+	  if (srcForm.isEdgeClipX()) {
 		auto       offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.borderClipData);
 		auto const clipCount   = srcForm.clipEntries;
 		for (auto iClip = 0U; iClip < clipCount; ++iClip) {
@@ -4609,7 +4609,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		  form.angleOrClipData.clip = clipOffset;
 		  clipOffset += form.lengthOrCount.clipCount;
 		}
-		if (form.iseclpx()) {
+		if (form.isEdgeClipX()) {
 		  form.borderClipData = clipOffset;
 		  clipOffset += form.clipEntries;
 		}
@@ -6263,7 +6263,7 @@ void thi::duclip() {
 			}
 			auto* ptrPoints = convertFromPtr<F_POINT*>(std::next(ptrMclp, iClip));
 			iClip           = 0U;
-			if (form.iseclpx()) {
+			if (form.isEdgeClipX()) {
 			  iClip          = form.clipEntries;
 			  auto startClip = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 			  auto endClip   = wrap::next(startClip, iClip);
@@ -7553,7 +7553,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 			formIter.angleOrClipData.clip = clipOffset;
 			clipOffset += formIter.lengthOrCount.clipCount;
 		  }
-		  if (formIter.iseclpx()) {
+		  if (formIter.isEdgeClipX()) {
 			formIter.borderClipData = clipOffset;
 			clipOffset += formIter.clipEntries;
 		  }
@@ -13275,7 +13275,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		  if (form.isClipX()) {
 			clipCount += form.lengthOrCount.clipCount;
 		  }
-		  if (form.iseclpx()) {
+		  if (form.isEdgeClipX()) {
 			clipCount += form.clipEntries;
 		  }
 		}
@@ -13294,7 +13294,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			  ++offsetStart;
 			}
 		  }
-		  if (form.iseclpx()) {
+		  if (form.isEdgeClipX()) {
 			form.borderClipData = thred::adclp(form.clipEntries);
 			auto offsetStart    = wrap::next(ClipPoints->begin(), form.borderClipData);
 			for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
@@ -13368,7 +13368,7 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 			ClipPoints->insert(ClipPoints->end(), clipData.begin(), clipData.end());
 			clipCount += formIter.lengthOrCount.clipCount;
 		  }
-		  if (formIter.iseclpx()) {
+		  if (formIter.isEdgeClipX()) {
 			ptrClipData             = convertFromPtr<F_POINT*>(std::next(ptrClipData, clipCount));
 			auto const clipData     = gsl::span {ptrClipData, formIter.clipEntries};
 			formIter.borderClipData = wrap::toUnsigned(ClipPoints->size());

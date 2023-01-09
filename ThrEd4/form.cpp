@@ -7663,7 +7663,7 @@ void fi::adfrm(uint32_t iForm) {
 	auto const itGuides = wrap::next(SatinGuides->cbegin(), originalGuide);
 	SatinGuides->insert(SatinGuides->end(), itGuides, wrap::next(itGuides, currentForm.satinGuideCount));
   }
-  if (currentForm.iseclpx()) {
+  if (currentForm.isEdgeClipX()) {
 	auto const originalBCData  = currentForm.borderClipData;
 	currentForm.borderClipData = wrap::toUnsigned(ClipPoints->size());
 
@@ -8322,7 +8322,7 @@ void fi::dufdat(std::vector<F_POINT>&  tempClipPoints,
 	dest.satinOrAngle.guide = wrap::toUnsigned(tempGuides.size() - dest.satinGuideCount);
   }
   auto const& form = FormList->operator[](formIndex);
-  if (form.iseclpx()) {
+  if (form.isEdgeClipX()) {
 	auto const itStartClip = wrap::next(ClipPoints->cbegin(), dest.borderClipData);
 	auto const itEndClip   = wrap::next(itStartClip, dest.clipEntries);
 	tempClipPoints.insert(tempClipPoints.end(), itStartClip, itEndClip);
