@@ -933,7 +933,7 @@ void thred::resetMsgBuffer() {
 }
 
 auto thred::getMsgBufferValue() -> float {
-  return wrap::wcstof(MsgBuffer->data());
+  return wrap::wcsToFloat(MsgBuffer->data());
 }
 
 void thi::getdes() noexcept {
@@ -1746,7 +1746,7 @@ void thi::chknum() {
 	if (FormMenuChoice != 0U) {
 	  auto& form = FormList->operator[](ClosestFormToCursor);
 
-	  auto const value = wrap::wcstof(SideWindowEntryBuffer->data()) * PFGRAN;
+	  auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data()) * PFGRAN;
 	  switch (FormMenuChoice) {
 		case LTXOF: {
 		  thred::savdo();
@@ -2022,7 +2022,7 @@ void thi::chknum() {
 	}
 	else {
 	  if (PreferenceIndex != 0U) {
-		auto const value = wrap::wcstof(SideWindowEntryBuffer->data());
+		auto const value = wrap::wcsToFloat(SideWindowEntryBuffer->data());
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto hWnd   = HWND {nullptr};
 		auto fmtStr = std::wstring {};
@@ -10606,13 +10606,13 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 			}
 		  }
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf.data(), HBUFSIZ);
-		  IniFile.featherRatio = wrap::wcstof(buf.data());
+		  IniFile.featherRatio = wrap::wcsToFloat(buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.featherUpCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.featherDownCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf.data(), HBUFSIZ);
-		  IniFile.featherMinStitchSize = wrap::wcstof(buf.data()) * PFGRAN;
+		  IniFile.featherMinStitchSize = wrap::wcsToFloat(buf.data()) * PFGRAN;
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.featherCount, buf.data());
 		  if (IniFile.featherCount < 1) {

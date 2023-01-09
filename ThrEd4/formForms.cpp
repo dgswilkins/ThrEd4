@@ -755,15 +755,15 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.daisyHeartCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
-		  IniFile.daisyDiameter = wrap::wcstof(buffer.data());
+		  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
-		  IniFile.daisyHoleDiameter = wrap::wcstof(buffer.data());
+		  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.daisyInnerCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.daisyPetalCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
-		  IniFile.daisyPetalLen = wrap::wcstof(buffer.data());
+		  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
 		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
 			UserFlagMap->set(UserFlag::DAZHOL);
 		  }
@@ -1028,11 +1028,11 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
 		  wrap::wcstoul(IniFile.formSides, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
-		  IniFile.tearTailLength = wrap::wcstof(buffer.data());
+		  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
-		  IniFile.tearTwistStep = wrap::wcstof(buffer.data()) * PFGRAN;
+		  IniFile.tearTwistStep = wrap::wcsToFloat(buffer.data()) * PFGRAN;
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTRAT), buffer.data(), HBUFSIZ);
-		  IniFile.tearTwistRatio = wrap::wcstof(buffer.data());
+		  IniFile.tearTwistRatio = wrap::wcsToFloat(buffer.data());
 		  EndDialog(hwndlg, 1);
 		  break;
 		}

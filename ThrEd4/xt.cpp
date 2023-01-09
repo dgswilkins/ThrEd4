@@ -2369,7 +2369,7 @@ auto xi::getstxt(int32_t stringIndex, HWND dialog) -> float {
 
   auto buffer = std::array<wchar_t, SZBUFFER> {};
   GetWindowText(GetDlgItem(dialog, stringIndex), buffer.data(), gsl::narrow<int>(buffer.size()));
-  return wrap::wcstof(buffer.data()) * PFGRAN;
+  return wrap::wcsToFloat(buffer.data()) * PFGRAN;
 }
 
 auto xi::chkasp(F_POINT& point, float aspectRatio, HWND dialog) -> bool {

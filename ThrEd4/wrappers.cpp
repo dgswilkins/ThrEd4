@@ -3,7 +3,7 @@
 #include "globals.h"
 #include "wrappers.h"
 
-auto wrap::wcstof(wchar_t const* buffer) -> float {
+auto wrap::wcsToFloat(wchar_t const* buffer) -> float {
   try {
 	return std::wcstof(buffer, nullptr);
   }

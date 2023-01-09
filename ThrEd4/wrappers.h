@@ -178,7 +178,7 @@ auto toUnsigned(long invar) -> uint32_t;
 #ifdef _WIN64
 auto toUnsigned(ptrdiff_t invar) -> uint32_t;
 #endif
-auto wcstof(wchar_t const* buffer) -> float;
+auto wcsToFloat(wchar_t const* buffer) -> float;
 
 template <class outType> void wcstoul(outType& outvar, wchar_t const* invar) {
   outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
