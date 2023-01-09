@@ -751,17 +751,17 @@ auto CALLBACK ffi::dasyproc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam
 		case IDOK: {
 		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.daisyPetalPoints, buffer.data());
+		  wrap::wcsToULong(IniFile.daisyPetalPoints, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DAZPCNT), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.daisyHeartCount, buffer.data());
+		  wrap::wcsToULong(IniFile.daisyHeartCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_CNTLEN), buffer.data(), HBUFSIZ);
 		  IniFile.daisyDiameter = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_HOLSIZ), buffer.data(), HBUFSIZ);
 		  IniFile.daisyHoleDiameter = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_INPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.daisyInnerCount, buffer.data());
+		  wrap::wcsToULong(IniFile.daisyInnerCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETALS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.daisyPetalCount, buffer.data());
+		  wrap::wcsToULong(IniFile.daisyPetalCount, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_PETLEN), buffer.data(), HBUFSIZ);
 		  IniFile.daisyPetalLen = wrap::wcsToFloat(buffer.data());
 		  if (IsDlgButtonChecked(hwndlg, IDC_HOLE) != 0U) {
@@ -1026,7 +1026,7 @@ auto CALLBACK ffi::tearprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		case IDOK: {
 		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARSIDS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.formSides, buffer.data());
+		  wrap::wcsToULong(IniFile.formSides, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TEARAT), buffer.data(), HBUFSIZ);
 		  IniFile.tearTailLength = wrap::wcsToFloat(buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_TWSTSTP), buffer.data(), HBUFSIZ);
@@ -1183,13 +1183,13 @@ auto CALLBACK ffi::wavprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam) 
 		case IDOK: {
 		  auto buffer = std::array<wchar_t, HBUFSIZ> {};
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVPNTS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.wavePoints, buffer.data());
+		  wrap::wcsToULong(IniFile.wavePoints, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVSTRT), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.waveStart, buffer.data());
+		  wrap::wcsToULong(IniFile.waveStart, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVEND), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.waveEnd, buffer.data());
+		  wrap::wcsToULong(IniFile.waveEnd, buffer.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_WAVS), buffer.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.waveLobes, buffer.data());
+		  wrap::wcsToULong(IniFile.waveLobes, buffer.data());
 
 		  constexpr auto WPCLAMP = 100U; // max number of points in a wave form
 		  if (IniFile.wavePoints > WPCLAMP) {

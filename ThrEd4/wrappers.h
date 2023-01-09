@@ -180,7 +180,7 @@ auto toUnsigned(ptrdiff_t invar) -> uint32_t;
 #endif
 auto wcsToFloat(wchar_t const* buffer) -> float;
 
-template <class outType> void wcstoul(outType& outvar, wchar_t const* invar) {
+template <class outType> void wcsToULong(outType& outvar, wchar_t const* invar) {
   outvar = gsl::narrow<outType>(std::wcstoul(invar, nullptr, 10));
 }
 

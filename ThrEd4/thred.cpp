@@ -10608,13 +10608,13 @@ auto CALLBACK thi::fthdefprc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lpara
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFRAT), buf.data(), HBUFSIZ);
 		  IniFile.featherRatio = wrap::wcsToFloat(buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFUPCNT), buf.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.featherUpCount, buf.data());
+		  wrap::wcsToULong(IniFile.featherUpCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFDWNCNT), buf.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.featherDownCount, buf.data());
+		  wrap::wcsToULong(IniFile.featherDownCount, buf.data());
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFLR), buf.data(), HBUFSIZ);
 		  IniFile.featherMinStitchSize = wrap::wcsToFloat(buf.data()) * PFGRAN;
 		  GetWindowText(GetDlgItem(hwndlg, IDC_DFNUM), buf.data(), HBUFSIZ);
-		  wrap::wcstoul(IniFile.featherCount, buf.data());
+		  wrap::wcsToULong(IniFile.featherCount, buf.data());
 		  if (IniFile.featherCount < 1) {
 			IniFile.featherCount = 1;
 		  }
