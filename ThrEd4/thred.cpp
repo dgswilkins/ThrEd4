@@ -6241,7 +6241,7 @@ void thi::duclip() {
 
 			auto const vertices = gsl::span(ptrFormVertices, form.vertexCount);
 			std::copy(startVertex, endVertex, vertices.begin());
-			auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(&ptrFormVertices,form.vertexCount));
+			auto* ptrGuides = convertFromPtr<SAT_CON*>(std::next(ptrFormVertices,form.vertexCount));
 			auto  iGuide    = 0U;
 			if (form.type == SAT) {
 			  iGuide          = form.satinGuideCount;
