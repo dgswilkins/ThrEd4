@@ -384,7 +384,7 @@ void ritfnam(std::wstring const& designerName);
 void ritini();
 void ritlayr();
 void ritloc();
-void ritlock(gsl::not_null<WIN32_FIND_DATA const*> fileData, uint32_t fileIndex, HWND hwndlg) noexcept;
+void ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept;
 void ritrot(float rotationAngle, F_POINT const& rotationCenter);
 void rngal();
 void rot(F_POINT& rotationCenter);
@@ -9728,11 +9728,10 @@ void thi::gsnap() {
   }
 }
 
-void thi::ritlock(gsl::not_null<WIN32_FIND_DATA const*> fileData, uint32_t fileIndex, HWND hwndlg) noexcept {
+void thi::ritlock(gsl::span<WIN32_FIND_DATA const> fileInfo, HWND hwndlg) noexcept {
   SendMessage(GetDlgItem(hwndlg, IDC_LOCKED), LB_RESETCONTENT, 0, 0);
   SendMessage(GetDlgItem(hwndlg, IDC_UNLOCKED), LB_RESETCONTENT, 0, 0);
-  auto const spFileData = gsl::span {fileData.get(), fileIndex};
-  for (auto const& iFile : spFileData) {
+  for (auto const& iFile : fileInfo) {
 	// NOLINTNEXTLINE(hicpp-signed-bitwise)
 	if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast
@@ -9759,7 +9758,6 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  if (lparam != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 		auto*      fileInfo   = reinterpret_cast<FIND_INFO*>(lparam);
-		auto const spFileInfo = gsl::span(fileInfo->data.get(), FNDFLMAX);
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
 		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), fileInfo->data.get());
@@ -9770,9 +9768,10 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		  return TRUE;
 		}
 		fileInfo->count = 1;
-		while (FindNextFile(searchResult, &spFileInfo[fileInfo->count++])) { }
+		while (FindNextFile(searchResult, &fileInfo->data[fileInfo->count++])) { }
 		--(fileInfo->count);
-		ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
+		auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
+		ritlock(spFileInfo, hwndlg);
 	  }
 	  break;
 	}
@@ -9783,6 +9782,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		// NOLINTNEXTLINE(hicpp-signed-bitwise)
 		constexpr auto NROMASK = std::numeric_limits<DWORD>::max() ^
 		                         FILE_ATTRIBUTE_READONLY; // invert FILE_ATTRIBUTE_READONLY
+		auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast,hicpp-signed-bitwise)
 		switch (LOWORD(wparam)) {
 		  case IDCANCEL: {
@@ -9790,28 +9790,25 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			return TRUE;
 		  }
 		  case IDC_LOCKAL: {
-			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			}
-			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
+			ritlock(spFileInfo, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCKAL: {
-			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  iFile.dwFileAttributes &= NROMASK;
 			}
-			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
+			ritlock(spFileInfo, hwndlg);
 			break;
 		  }
 		  case IDC_LOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			auto const spFileInfo   = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
@@ -9822,14 +9819,13 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				++fileError;
 			  }
 			}
-			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
+			ritlock(spFileInfo, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
@@ -9840,12 +9836,11 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				++fileError;
 			  }
 			}
-			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
+			ritlock(spFileInfo, hwndlg);
 			break;
 		  }
 		  case IDOK: {
 			auto       fileError  = 0U;
-			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  auto& cFileName = iFile.cFileName;
 			  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
