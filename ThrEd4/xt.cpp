@@ -1872,7 +1872,7 @@ void xt::dufang(float angle) {
 
 void xi::flenfn(uint32_t formNumber, float length) {
   ClosestFormToCursor = formNumber;
-  if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isclp()) {
+  if (auto& form = FormList->operator[](formNumber); (form.fillType != 0U) && !form.isClip()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn();
   }
@@ -1896,7 +1896,7 @@ void xi::fspacfn(uint32_t formNumber, float spacing) {
   ClosestFormToCursor = formNumber;
   if (auto& form = FormList->operator[](formNumber); form.fillType != 0U) {
 	if (spacing < 0) {
-	  if (!form.isclp()) {
+	  if (!form.isClip()) {
 		return;
 	  }
 	}
@@ -2319,7 +2319,7 @@ void xi::rtrclpfn(FRM_HEAD const& form) {
 	  clip::oclp(clipRect, form.borderClipData, count);
 	}
 	else {
-	  if (form.isclp()) {
+	  if (form.isClip()) {
 		count = form.lengthOrCount.clipCount;
 		clip::oclp(clipRect, form.angleOrClipData.clip, count);
 	  }

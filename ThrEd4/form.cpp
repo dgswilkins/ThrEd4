@@ -1592,7 +1592,7 @@ void form::chkseq(bool border) {
 
   auto userStitchLen =
       border ? (form.edgeType == EDGELCHAIN || form.edgeType == EDGEOCHAIN) ? MAXSIZ * PFGRAN : form.edgeStitchLen
-      : (form.isclp()) ? MaxStitchLen
+      : (form.isClip()) ? MaxStitchLen
                        : form.lengthOrCount.stitchLength;
   auto const minimumStitchLength = border ? form.minBorderStitchLen : form.minFillStitchLen;
   if (border) {
@@ -5156,13 +5156,13 @@ void form::refilfn() {
   xt::fdelstch(form, fillStartsData, fillStartsMap);
   StateMap->set(StateFlag::WASREFIL);
   constexpr auto MINSPACE = 0.5F;
-  if (form.fillSpacing < MINSPACE && !form.isclp()) {
+  if (form.fillSpacing < MINSPACE && !form.isClip()) {
 	form.fillSpacing = MINSPACE;
   }
   if (form.edgeSpacing < MINSPACE) {
 	form.edgeSpacing = MINSPACE;
   }
-  if (!form.isclp()) {
+  if (!form.isClip()) {
 	UserStitchLength = form.lengthOrCount.stitchLength;
   }
   if (!(StateMap->test(StateFlag::WASDO) || StateMap->test(StateFlag::FUNCLP) ||

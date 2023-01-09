@@ -170,7 +170,7 @@ auto ri::frmchkfn() -> uint32_t {
 		ri::chkVrtx(form, badData);
 	  }
 	  if ((badData.attribute & BADCLP) == 0U) {
-		if (form.isclp()) {
+		if (form.isClip()) {
 		  ri::chkclp(form, badData);
 		}
 		if (form.iseclp()) {
@@ -208,7 +208,7 @@ auto ri::frmchkfn() -> uint32_t {
 }
 
 void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
-  if (form.isclp()) {
+  if (form.isClip()) {
 	badData.clip += form.lengthOrCount.clipCount;
   }
   if (form.iseclp()) {
@@ -283,10 +283,10 @@ void ri::repclp(std::wstring& repairMessage) {
   for (auto iForm = 0U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 	auto& form = FormList->operator[](iForm);
 
-	auto const clipDifference = (form.isclp())    ? form.angleOrClipData.clip
+	auto const clipDifference = (form.isClip())    ? form.angleOrClipData.clip
 	                            : (form.iseclp()) ? form.borderClipData
 	                                              : 0U;
-	if (form.isclp()) {
+	if (form.isClip()) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.lengthOrCount.clipCount);
 		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.angleOrClipData.clip);

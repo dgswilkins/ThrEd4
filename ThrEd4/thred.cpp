@@ -3586,7 +3586,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  if (form.type == SAT) {
 		guideCount += form.satinGuideCount;
 	  }
-	  if (form.isclp()) {
+	  if (form.isClip()) {
 		clipDataCount += form.lengthOrCount.clipCount;
 	  }
 	  if (form.iseclp()) {
@@ -3656,7 +3656,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 		  ++itGuide;
 		}
 	  }
-	  if (srcForm.isclp()) {
+	  if (srcForm.isClip()) {
 		auto offsetStart = wrap::next(ClipPoints->cbegin(), srcForm.angleOrClipData.clip);
 		for (auto iClip = 0U; iClip < srcForm.lengthOrCount.clipCount; ++iClip) {
 		  points.push_back(*offsetStart);
@@ -4605,7 +4605,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		}
 		// ToDo - do we still need to do this in v3? (we can store the offset safely in v3
 		// where we could not store the pointer in v2)
-		if (form.isclp()) {
+		if (form.isClip()) {
 		  form.angleOrClipData.clip = clipOffset;
 		  clipOffset += form.lengthOrCount.clipCount;
 		}
@@ -7549,7 +7549,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 			  guideOffset += formIter.satinGuideCount;
 			}
 		  }
-		  if (formIter.isclp()) {
+		  if (formIter.isClip()) {
 			formIter.angleOrClipData.clip = clipOffset;
 			clipOffset += formIter.lengthOrCount.clipCount;
 		  }
@@ -9589,7 +9589,7 @@ void thi::tglhid() {
 }
 
 void thi::respac(FRM_HEAD& form) noexcept {
-  if (form.isclp()) {
+  if (form.isClip()) {
 	form.fillSpacing = LineSpacing;
 	form::fsizpar(form);
   }

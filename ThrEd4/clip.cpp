@@ -101,7 +101,7 @@ auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
 	if (form.iseclp()) {
 	  return form.borderClipData + form.clipEntries;
 	}
-	if (form.isclp()) {
+	if (form.isClip()) {
 	  return form.angleOrClipData.clip + form.lengthOrCount.clipCount;
 	}
   }
@@ -122,7 +122,7 @@ void ci::clpsub(uint32_t fpnt, uint32_t cnt) {
 
 void clip::delmclp(uint32_t formIndex) {
   if (!ClipPoints->empty()) {
-	if (auto& form = FormList->operator[](formIndex); form.isclp()) {
+	if (auto& form = FormList->operator[](formIndex); form.isClip()) {
 	  auto const destIndex   = ci::findclp(formIndex);
 	  auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
 	  auto const itEndClip   = wrap::next(itStartClip, form.lengthOrCount.clipCount);
@@ -161,7 +161,7 @@ void clip::delclps(uint32_t formIndex) {
 
 auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   auto find = ci::findclp(currentForm);
-  if (auto const& form = FormList->operator[](currentForm); form.isclp()) {
+  if (auto const& form = FormList->operator[](currentForm); form.isClip()) {
 	find += form.lengthOrCount.clipCount;
   }
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
@@ -173,7 +173,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	}
   }
   for (auto iform = ClosestFormToCursor + 1U; iform < wrap::toUnsigned(FormList->size()); ++iform) {
-	if (auto& thisForm = FormList->operator[](iform); thisForm.isclp()) {
+	if (auto& thisForm = FormList->operator[](iform); thisForm.isClip()) {
 	  thisForm.angleOrClipData.clip += count;
 	}
   }

@@ -305,7 +305,7 @@ class FRM_HEAD
 
   inline auto               operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
   inline auto               operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
-  [[nodiscard]] inline auto isclp() const noexcept -> bool;
+  [[nodiscard]] inline auto isClip() const noexcept -> bool;
   [[nodiscard]] inline auto iseclp() const noexcept -> bool;
   [[nodiscard]] inline auto isclpx() const noexcept -> bool;
   [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
@@ -618,7 +618,7 @@ inline auto FRM_HEAD::operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD& {
   return *this;
 }
 
-inline auto FRM_HEAD::isclp() const noexcept -> bool {
+inline auto FRM_HEAD::isClip() const noexcept -> bool {
   return ((1U << fillType) & CLIPTYPEMAP) != 0;
 }
 
@@ -627,7 +627,7 @@ inline auto FRM_HEAD::iseclp() const noexcept -> bool {
 }
 
 inline auto FRM_HEAD::isclpx() const noexcept -> bool {
-  return isclp() && (lengthOrCount.clipCount != 0U);
+  return isClip() && (lengthOrCount.clipCount != 0U);
 }
 
 inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
@@ -635,7 +635,7 @@ inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
 }
 
 inline auto FRM_HEAD::isfclp() const noexcept -> bool {
-  return isclp() && fillType != CLPF;
+  return isClip() && fillType != CLPF;
 }
 
 inline auto FRM_HEAD::istx() const noexcept -> bool {

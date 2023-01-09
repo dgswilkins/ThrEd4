@@ -324,7 +324,7 @@ void ffi::refrmfn(FRM_HEAD& form, uint32_t& formMenuEntryCount) {
 	valueWindow[LMAXFIL] =
 	    ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.maxFillStitchLen * IPFGRAN)), ValueWindowCoords);
 	ffi::nxtlin(formMenuEntryCount);
-	if (!form.isclp() && !form.istx()) {
+	if (!form.isClip() && !form.istx()) {
 	  labelWindow[LFRMLEN] = ffi::txtwin(displayText::loadStr(IDS_TXT5), LabelWindowCoords);
 	  valueWindow[LFRMLEN] =
 	      ffi::numwin(fmt::format(FMT_COMPILE(L"{:.2f}"), (form.lengthOrCount.stitchLength * IPFGRAN)),
