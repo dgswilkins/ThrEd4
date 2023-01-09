@@ -598,16 +598,19 @@ class BAL_HEAD // balarad file header
 class FIND_INFO
 {
   public:
-  uint32_t         count {};
-  gsl::owner<WIN32_FIND_DATA*> data {};
+  uint32_t                           count {};
+  std::unique_ptr<WIN32_FIND_DATA[]> data {};
 
-  // constexpr FIND_INFO() noexcept = default;
-  // FIND_INFO(FIND_INFO const&) = default;
-  // FIND_INFO(FIND_INFO&&) = default;
-  // FIND_INFO& operator=(FIND_INFO const& rhs) = default;
-  // FIND_INFO& operator=(FIND_INFO&&) = default;
-  //~FIND_INFO() = default;
+  explicit FIND_INFO(size_t n);
+  FIND_INFO(FIND_INFO const&)                        = delete;
+  FIND_INFO(FIND_INFO&&)                             = default;
+  auto operator=(FIND_INFO const& rhs) -> FIND_INFO& = delete;
+  auto operator=(FIND_INFO&&) -> FIND_INFO&          = default;
+  ~FIND_INFO()                                       = default;
 };
+
+FIND_INFO::FIND_INFO(size_t n) : data {std::make_unique<WIN32_FIND_DATA[]>(n)} {
+}
 
 #pragma pack(push, 1)
 class THR_HEAD // thred file header
@@ -9756,10 +9759,10 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 	  if (lparam != 0U) {
 #pragma warning(suppress : 26490) // type.1 Don't use reinterpret_cast NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast, performance-no-int-to-ptr)
 		auto*      fileInfo   = reinterpret_cast<FIND_INFO*>(lparam);
-		auto const spFileInfo = gsl::span(fileInfo->data, FNDFLMAX);
+		auto const spFileInfo = gsl::span(fileInfo->data.get(), FNDFLMAX);
 		auto const searchName = *DefaultDirectory / L"*.thr";
 		// NOLINTNEXTLINE(readability-qualified-auto)
-		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), fileInfo->data);
+		auto const searchResult = FindFirstFile(searchName.wstring().c_str(), fileInfo->data.get());
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
 		if (searchResult == INVALID_HANDLE_VALUE) {
 		  displayText::showMessage(IDS_NOTHRFIL, DefaultDirectory->wstring());
@@ -9769,7 +9772,7 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 		fileInfo->count = 1;
 		while (FindNextFile(searchResult, &spFileInfo[fileInfo->count++])) { }
 		--(fileInfo->count);
-		ritlock(fileInfo->data, fileInfo->count, hwndlg);
+		ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
 	  }
 	  break;
 	}
@@ -9787,28 +9790,28 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 			return TRUE;
 		  }
 		  case IDC_LOCKAL: {
-			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  iFile.dwFileAttributes |= FILE_ATTRIBUTE_READONLY;
 			}
-			ritlock(fileInfo->data, fileInfo->count, hwndlg);
+			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCKAL: {
-			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  iFile.dwFileAttributes &= NROMASK;
 			}
-			ritlock(fileInfo->data, fileInfo->count, hwndlg);
+			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDC_LOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const unlockHandle = GetDlgItem(hwndlg, IDC_UNLOCKED);
-			auto const spFileInfo   = gsl::span(fileInfo->data, fileInfo->count);
+			auto const spFileInfo   = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) == 0U) {
@@ -9819,14 +9822,14 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				++fileError;
 			  }
 			}
-			ritlock(fileInfo->data, fileInfo->count, hwndlg);
+			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDC_UNLOCK: {
 			auto fileError = 0U;
 			// NOLINTNEXTLINE(readability-qualified-auto)
 			auto const lockHandle = GetDlgItem(hwndlg, IDC_LOCKED);
-			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  // NOLINTNEXTLINE(hicpp-signed-bitwise)
 			  if ((iFile.dwFileAttributes & FILE_ATTRIBUTE_READONLY) != 0U) {
@@ -9837,12 +9840,12 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 				++fileError;
 			  }
 			}
-			ritlock(fileInfo->data, fileInfo->count, hwndlg);
+			ritlock(fileInfo->data.get(), fileInfo->count, hwndlg);
 			break;
 		  }
 		  case IDOK: {
 			auto       fileError  = 0U;
-			auto const spFileInfo = gsl::span(fileInfo->data, fileInfo->count);
+			auto const spFileInfo = gsl::span(fileInfo->data.get(), fileInfo->count);
 			for (auto& iFile : spFileInfo) {
 			  auto& cFileName = iFile.cFileName;
 			  auto  fileName  = *DefaultDirectory / std::begin(cFileName);
@@ -9875,12 +9878,10 @@ auto CALLBACK thi::lockPrc(HWND hwndlg, UINT umsg, WPARAM wparam, LPARAM lparam)
 
 void thi::lock() {
   // ToDo - investigate C++17 option shown here: http://www.martinbroadhurst.com/list-the-files-in-a-directory-in-c.html
-  auto lockInfo = FIND_INFO {};
   // ToDo - Replace FNDFLMAX with maximum files in subdirectory
-  lockInfo.data = new WIN32_FIND_DATA[FNDFLMAX]; 
+  auto lockInfo = FIND_INFO(FNDFLMAX);
 #pragma warning(suppress : 26490 26493) // type.1 Don't use reinterpret_cast type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-reinterpret-cast,cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
   DialogBoxParam(ThrEdInstance, MAKEINTRESOURCE(IDD_DLOCK), ThrEdWindow, lockPrc, reinterpret_cast<LPARAM>(&lockInfo));
-  delete[] lockInfo.data; 
 }
 
 void thi::delstch() {
