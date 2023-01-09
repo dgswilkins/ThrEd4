@@ -3589,7 +3589,7 @@ void thi::dubuf(std::vector<char>& buffer) {
 	  if (form.isClip()) {
 		clipDataCount += form.lengthOrCount.clipCount;
 	  }
-	  if (form.iseclp()) {
+	  if (form.isEdgeClip()) {
 		clipDataCount += form.clipEntries;
 	  }
 	}
@@ -5951,7 +5951,7 @@ auto thi::sizfclp(FRM_HEAD const& form) -> uint32_t {
   if (form.type == SAT) {
 	clipSize += form.satinGuideCount * wrap::sizeofType(SatinGuides);
   }
-  if (form.iseclp()) {
+  if (form.isEdgeClip()) {
 	clipSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isclpx()) {
@@ -6010,7 +6010,7 @@ void thi::sizclp(FRM_HEAD const& form,
 	length += formStitchCount;
 	fileSize += length * wrap::sizeofType(StitchBuffer);
   }
-  if (form.iseclp()) {
+  if (form.isEdgeClip()) {
 	fileSize += form.clipEntries * wrap::sizeofType(ClipPoints);
   }
   if (form.isclpx()) {
@@ -6129,7 +6129,7 @@ void thi::duclip() {
 			if (form.isclpx()) {
 			  pointsSize += form.lengthOrCount.clipCount;
 			}
-			if (form.iseclp()) {
+			if (form.isEdgeClip()) {
 			  pointsSize += form.clipEntries;
 			}
 		  }
@@ -6145,7 +6145,7 @@ void thi::duclip() {
 				  ++offsetStart;
 				}
 			  }
-			  if (form.iseclp()) {
+			  if (form.isEdgeClip()) {
 				auto offsetStart = wrap::next(ClipPoints->cbegin(), form.borderClipData);
 				for (auto iClip = 0U; iClip < form.clipEntries; ++iClip) {
 				  points[pointCount++] = *offsetStart;
@@ -11717,7 +11717,7 @@ auto thi::handleSideWindowActive() -> bool {
   }
   form.borderColor &= COLMSK;
   if (StateMap->testAndReset(StateFlag::BRDACT)) {
-	if (form.iseclp()) {
+	if (form.isEdgeClip()) {
 	  clip::deleclp(ClosestFormToCursor);
 	}
 	do {

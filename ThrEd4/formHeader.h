@@ -306,7 +306,7 @@ class FRM_HEAD
   inline auto               operator=(FRM_HEAD_O const& rhs) noexcept -> FRM_HEAD&;
   inline auto               operator=(FRM_HEAD_OUT const& rhs) noexcept -> FRM_HEAD&;
   [[nodiscard]] inline auto isClip() const noexcept -> bool;
-  [[nodiscard]] inline auto iseclp() const noexcept -> bool;
+  [[nodiscard]] inline auto isEdgeClip() const noexcept -> bool;
   [[nodiscard]] inline auto isclpx() const noexcept -> bool;
   [[nodiscard]] inline auto iseclpx() const noexcept -> bool;
   [[nodiscard]] inline auto istx() const noexcept -> bool;
@@ -622,7 +622,7 @@ inline auto FRM_HEAD::isClip() const noexcept -> bool {
   return ((1U << fillType) & CLIPTYPEMAP) != 0;
 }
 
-inline auto FRM_HEAD::iseclp() const noexcept -> bool {
+inline auto FRM_HEAD::isEdgeClip() const noexcept -> bool {
   return edgeType == EDGECLIP || edgeType == EDGEPICOT || edgeType == EDGECLIPX;
 }
 
@@ -631,7 +631,7 @@ inline auto FRM_HEAD::isclpx() const noexcept -> bool {
 }
 
 inline auto FRM_HEAD::iseclpx() const noexcept -> bool {
-  return iseclp() && (clipEntries != 0U);
+  return isEdgeClip() && (clipEntries != 0U);
 }
 
 inline auto FRM_HEAD::isfclp() const noexcept -> bool {

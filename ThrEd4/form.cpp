@@ -8749,7 +8749,7 @@ auto fi::spltlin() -> bool {
   dstForm.vertexIndex = form.vertexIndex + form.vertexCount;
   form.outline();
   dstForm.outline();
-  if (form.iseclp()) {
+  if (form.isEdgeClip()) {
 	form::clpspac(form.borderClipData, form.clipEntries);
 	auto const maxForm = FormList->size();
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < maxForm; ++iForm) {

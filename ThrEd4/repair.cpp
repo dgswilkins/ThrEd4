@@ -173,7 +173,7 @@ auto ri::frmchkfn() -> uint32_t {
 		if (form.isClip()) {
 		  ri::chkclp(form, badData);
 		}
-		if (form.iseclp()) {
+		if (form.isEdgeClip()) {
 		  ri::chkeclp(form, badData);
 		}
 	  }
@@ -211,7 +211,7 @@ void ri::bcup(FRM_HEAD const& form, BAD_COUNTS& badData) noexcept {
   if (form.isClip()) {
 	badData.clip += form.lengthOrCount.clipCount;
   }
-  if (form.iseclp()) {
+  if (form.isEdgeClip()) {
 	badData.clip += form.clipEntries;
   }
   if (form.type == SAT) {
@@ -284,7 +284,7 @@ void ri::repclp(std::wstring& repairMessage) {
 	auto& form = FormList->operator[](iForm);
 
 	auto const clipDifference = (form.isClip())    ? form.angleOrClipData.clip
-	                            : (form.iseclp()) ? form.borderClipData
+	                            : (form.isEdgeClip()) ? form.borderClipData
 	                                              : 0U;
 	if (form.isClip()) {
 	  if (wrap::toSize(clipDifference) + form.lengthOrCount.clipCount < ClipPoints->size()) {
@@ -313,7 +313,7 @@ void ri::repclp(std::wstring& repairMessage) {
 		}
 	  }
 	}
-	if (form.iseclp()) {
+	if (form.isEdgeClip()) {
 	  if (wrap::toSize(clipDifference) + form.clipEntries < ClipPoints->size()) {
 		clipPoint.resize(clipPoint.size() + form.clipEntries);
 		auto const startClip   = wrap::next(ClipPoints->cbegin(), form.borderClipData);

@@ -98,7 +98,7 @@ static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
   for (auto iForm = formIndex; iForm != 0; --iForm) {
 	auto& form = FormList->operator[](iForm - 1U);
-	if (form.iseclp()) {
+	if (form.isEdgeClip()) {
 	  return form.borderClipData + form.clipEntries;
 	}
 	if (form.isClip()) {
@@ -127,7 +127,7 @@ void clip::delmclp(uint32_t formIndex) {
 	  auto const itStartClip = wrap::next(ClipPoints->cbegin(), destIndex);
 	  auto const itEndClip   = wrap::next(itStartClip, form.lengthOrCount.clipCount);
 	  ClipPoints->erase(itStartClip, itEndClip);
-	  if (form.iseclp()) {
+	  if (form.isEdgeClip()) {
 		form.borderClipData -= form.lengthOrCount.clipCount;
 	  }
 	  ci::clpsub(formIndex, form.lengthOrCount.clipCount);
@@ -138,7 +138,7 @@ void clip::delmclp(uint32_t formIndex) {
 
 void clip::deleclp(uint32_t formIndex) {
   if (!ClipPoints->empty()) {
-	if (auto& form = FormList->operator[](formIndex); form.iseclp()) {
+	if (auto& form = FormList->operator[](formIndex); form.isEdgeClip()) {
 	  auto destIndex = ci::findclp(formIndex);
 	  if (form.isclpx()) {
 		destIndex += form.lengthOrCount.clipCount;

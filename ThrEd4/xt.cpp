@@ -2072,7 +2072,7 @@ void xt::dubcol(uint8_t color) {
 }
 
 void xi::blenfn(FRM_HEAD& form, float length) {
-  if ((form.edgeType != 0U) && !form.iseclp()) {
+  if ((form.edgeType != 0U) && !form.isEdgeClip()) {
 	form.lengthOrCount.stitchLength = length;
 	form::refilfn();
   }
@@ -2314,7 +2314,7 @@ void xt::duauxnam(fs::path& auxName) {
 void xi::rtrclpfn(FRM_HEAD const& form) {
   if (OpenClipboard(ThrEdWindow) != 0) {
 	auto count = 0U;
-	if (auto clipRect = F_RECTANGLE {}; form.iseclp()) {
+	if (auto clipRect = F_RECTANGLE {}; form.isEdgeClip()) {
 	  count = form.clipEntries;
 	  clip::oclp(clipRect, form.borderClipData, count);
 	}
