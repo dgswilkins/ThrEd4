@@ -802,7 +802,7 @@ void texture::txtrup() {
 	}
 	for (auto const point : *SelectedTexturePointsList) {
 	  auto& texturePoint = TempTexturePoints->operator[](point);
-	  texturePoint.line += textureOffset.line;
+	  texturePoint.line = gsl::narrow<uint16_t>(texturePoint.line + textureOffset.line);
 	  texturePoint.y += textureOffset.y;
 	}
 	txi::dutxrct(TextureRect);
