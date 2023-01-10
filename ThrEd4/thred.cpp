@@ -13306,8 +13306,8 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		auto* ptrTextureSource = convertFromPtr<TX_PNT*>(std::next(ptrClipData, currentClip));
 		auto  textureCount     = size_t {};
 		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
-		  if (texture::istx(formOffset + iForm)) {
-			auto& form = FormList->operator[](wrap::toSize(formOffset) + iForm);
+		  auto& form = FormList->operator[](wrap::toSize(formOffset) + iForm);
+		  if (form.isTexture()) {
 			textureCount += form.fillInfo.texture.count;
 			form.fillInfo.texture.index +=
 			    gsl::narrow<decltype(form.fillInfo.texture.index)>(TexturePointsBuffer->size());

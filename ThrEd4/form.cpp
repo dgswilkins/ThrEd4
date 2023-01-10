@@ -578,7 +578,7 @@ void fi::rotbak(float rotationAngle, F_POINT const& rotationCenter) noexcept {
 }
 
 void form::delmfil(uint32_t formIndex) {
-  if (texture::istx(formIndex)) {
+  if (FormList->operator[](formIndex).isTexture()) {
 	texture::deltx(formIndex);
   }
   clip::delmclp(formIndex);

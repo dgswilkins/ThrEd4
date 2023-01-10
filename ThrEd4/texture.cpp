@@ -256,20 +256,6 @@ void texture::redtx() {
   txi::redtbak();
 }
 
-auto texture::istx(uint32_t iForm) noexcept -> bool {
-  auto const& pfrm = FormList->operator[](iForm);
-  if (pfrm.fillType == TXVRTF) {
-	return true;
-  }
-  if (pfrm.fillType == TXHORF) {
-	return true;
-  }
-  if (pfrm.fillType == TXANGF) {
-	return true;
-  }
-  return false;
-}
-
 void txi::txrfor() noexcept {
   if (TextureHistoryIndex < (ITXBUFSZ - 1U)) {
 	++TextureHistoryIndex;
@@ -1091,17 +1077,17 @@ void texture::deltx(uint32_t formIndex) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
 	for (auto iForm = 0U; iForm < formIndex; ++iForm) {
-	  if (texture::istx(iForm)) {
-		auto const& formIter = FormList->operator[](iForm);
-		if (formIter.fillInfo.texture.index == currentIndex) {
+	  auto& current = FormList->operator[](iForm);
+	  if (current.isTexture()) {
+		if (current.fillInfo.texture.index == currentIndex) {
 		  flag = true;
 		}
 	  }
 	}
 	for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  if (texture::istx(iForm)) {
-		auto const& formIter = FormList->operator[](iForm);
-		if (formIter.fillInfo.texture.index == currentIndex) {
+	  auto& current = FormList->operator[](iForm);
+	  if (current.isTexture()) {
+		if (current.fillInfo.texture.index == currentIndex) {
 		  flag = true;
 		}
 	  }
@@ -1112,8 +1098,9 @@ void texture::deltx(uint32_t formIndex) {
 	  textureBuffer.reserve(TexturePointsBuffer->size());
 	  auto iBuffer = uint16_t {};
 	  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
-		if (texture::istx(iForm)) {
-		  auto& fillInfo = FormList->operator[](iForm).fillInfo;
+		auto& current = FormList->operator[](iForm);
+		if (current.isTexture()) {
+		  auto& fillInfo = current.fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
@@ -1124,8 +1111,9 @@ void texture::deltx(uint32_t formIndex) {
 		}
 	  }
 	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		if (texture::istx(iForm)) {
-		  auto& fillInfo = FormList->operator[](iForm).fillInfo;
+		auto& current = FormList->operator[](iForm);
+		if (current.isTexture()) {
+		  auto& fillInfo = current.fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
 		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
 		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
@@ -1152,8 +1140,9 @@ void txi::nutx(FRM_HEAD& form) {
 	}
 	else {
 	  for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
-		if (texture::istx(iForm)) {
-		  auto const& texture = FormList->operator[](iForm).fillInfo.texture;
+		auto& current = FormList->operator[](iForm);
+		if (current.isTexture()) {
+		  auto const& texture = current.fillInfo.texture;
 		  index               = texture.index + texture.count;
 		  break;
 		}
@@ -1165,8 +1154,9 @@ void txi::nutx(FRM_HEAD& form) {
 	auto const itPoint        = wrap::next(TexturePointsBuffer->begin(), index);
 	TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
 	for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  if (texture::istx(iForm)) {
-		FormList->operator[](iForm).fillInfo.texture.index +=
+	  auto& current = FormList->operator[](iForm);
+	  if (current.isTexture()) {
+		current.fillInfo.texture.index +=
 		    gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(tempPointCount);
 	  }
 	}
