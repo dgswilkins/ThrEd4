@@ -1208,7 +1208,6 @@ void txi::txfn(uint32_t& textureType, uint32_t formIndex) {
   if (form.satinGuideCount != 0U) {
 	satin::delsac(formIndex);
   }
-  texture::deltx(formIndex);
   texture::savtxt();
   txi::nutx(form);
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
