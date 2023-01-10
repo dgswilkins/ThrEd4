@@ -1142,8 +1142,8 @@ void txi::nutx(uint32_t formIndex) {
 	  texture::deltx(formIndex);
 	}
 	else {
-	  for (auto iForm = formIndex; iForm-- > 0;) {
-		auto& current = FormList->operator[](iForm);
+	  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+	       auto& current : spForms | std::views::reverse) {
 		if (current.isTexture()) {
 		  auto const& texture = current.fillInfo.texture;
 		  index               = texture.index + texture.count;
@@ -1157,8 +1157,9 @@ void txi::nutx(uint32_t formIndex) {
 	  std::ranges::sort(*TempTexturePoints, txi::tpComp);
 	  auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
 	  TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
-	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		auto& current = FormList->operator[](iForm);
+	  for (auto spForms =
+	           std::ranges::subrange(std::next(FormList->begin(), formIndex + 1U), FormList->end());
+	       auto& current : spForms) {
 		if (current.isTexture()) {
 		  current.fillInfo.texture.index += tempPointCount;
 		}
