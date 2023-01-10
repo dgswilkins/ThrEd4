@@ -10,6 +10,9 @@
 #include "texture.h"
 #include "thred.h"
 
+// Standard Libraries
+#include <ranges>
+
 class TX_HIST_BUFF
 {
   public:
@@ -1076,16 +1079,16 @@ void texture::deltx(uint32_t formIndex) {
   if ((!TexturePointsBuffer->empty()) && form.isTexture() && (form.fillInfo.texture.count != 0U)) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
-	for (auto iForm = 0U; iForm < formIndex; ++iForm) {
-	  auto& current = FormList->operator[](iForm);
+	for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+	     auto& current : spForms) {
 	  if (current.isTexture()) {
 		if (current.fillInfo.texture.index == currentIndex) {
 		  flag = true;
 		}
 	  }
 	}
-	for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	  auto& current = FormList->operator[](iForm);
+	for (auto spForms = std::ranges::subrange(std::next(FormList->begin(), formIndex + 1U), FormList->end());
+	     auto& current : spForms) {
 	  if (current.isTexture()) {
 		if (current.fillInfo.texture.index == currentIndex) {
 		  flag = true;
@@ -1097,8 +1100,8 @@ void texture::deltx(uint32_t formIndex) {
 	  auto textureBuffer = std::vector<TX_PNT> {};
 	  textureBuffer.reserve(TexturePointsBuffer->size());
 	  auto iBuffer = uint16_t {};
-	  for (auto iForm = 0U; iForm < formIndex; ++iForm) {
-		auto& current = FormList->operator[](iForm);
+	  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+	       auto& current : spForms) {
 		if (current.isTexture()) {
 		  auto& fillInfo = current.fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
@@ -1110,8 +1113,9 @@ void texture::deltx(uint32_t formIndex) {
 		  iBuffer += fillInfo.texture.count;
 		}
 	  }
-	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-		auto& current = FormList->operator[](iForm);
+	  for (auto spForms =
+	           std::ranges::subrange(std::next(FormList->begin(), formIndex + 1U), FormList->end());
+	       auto& current : spForms) {
 		if (current.isTexture()) {
 		  auto& fillInfo = current.fillInfo;
 		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
