@@ -84,7 +84,7 @@ void ed2px(F_POINT const& editPoint, POINT& point) noexcept;
 auto ed2stch(F_POINT const& point) noexcept -> F_POINT;
 void ed2txp(POINT const& offset, TX_PNT& textureRecord);
 auto inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool;
-void nutx(FRM_HEAD& form);
+void nutx(uint32_t formIndex);
 void nxbak();
 void px2ed(POINT const& point, F_POINT& editPoint) noexcept;
 auto px2txt(POINT const& offset) -> bool;
@@ -1133,8 +1133,9 @@ void texture::deltx(uint32_t formIndex) {
   }
 }
 
-void txi::nutx(FRM_HEAD& form) {
+void txi::nutx(uint32_t formIndex) {
   if (!FormList->empty()) {
+	auto& form = FormList->operator[](formIndex);
 	auto index = gsl::narrow_cast<uint16_t>(0U);
 	if (form.isTexture()) {
 	  index = form.fillInfo.texture.index;
@@ -1208,7 +1209,7 @@ void txi::txfn(uint32_t& textureType, uint32_t formIndex) {
 	satin::delsac(formIndex);
   }
   texture::savtxt();
-  txi::nutx(form);
+  txi::nutx(formIndex);
   form.squareEnd(UserFlagMap->test(UserFlag::SQRFIL));
   switch (textureType) {
 	case VRTYP: {
