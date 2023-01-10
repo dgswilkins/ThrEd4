@@ -1139,10 +1139,10 @@ void txi::nutx(uint32_t formIndex) {
 	auto index = gsl::narrow_cast<uint16_t>(0U);
 	if (form.isTexture()) {
 	  index = form.fillInfo.texture.index;
-	  texture::deltx(ClosestFormToCursor);
+	  texture::deltx(formIndex);
 	}
 	else {
-	  for (auto iForm = ClosestFormToCursor; iForm-- > 0;) {
+	  for (auto iForm = formIndex; iForm-- > 0;) {
 		auto& current = FormList->operator[](iForm);
 		if (current.isTexture()) {
 		  auto const& texture = current.fillInfo.texture;
@@ -1157,7 +1157,7 @@ void txi::nutx(uint32_t formIndex) {
 	  std::ranges::sort(*TempTexturePoints, txi::tpComp);
 	  auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
 	  TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
-	  for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
+	  for (auto iForm = formIndex + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
 		auto& current = FormList->operator[](iForm);
 		if (current.isTexture()) {
 		  current.fillInfo.texture.index += tempPointCount;
