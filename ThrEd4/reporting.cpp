@@ -1,6 +1,9 @@
 // ReSharper disable CppClangTidyClangDiagnosticFloatEqual
 // Local Headers
 #include "stdafx.h"
+#ifndef _DEBUG
+#include "displayText.h"
+#endif
 #include "reporting.h"
 #include "ThrEdTypes.h"
 #include "wrappers.h"
@@ -20,7 +23,14 @@ void rpt::reportError(const wchar_t* prompt, DWORD& errorCode) {
 	auto const msg = gsl::span(static_cast<wchar_t*>(lpMsgBuf), res);
 	// erase the \r\n at the end of the msg
 	msg[wrap::toSize(res) - 2U] = 0;
+#ifdef _DEBUG
 	outDebugString(L"{} failed with error [{}], {}\n", prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
-	LocalFree(lpMsgBuf);
+#else
+	auto info = std::wstring {};
+	info      = fmt::format(
+        fmt::runtime(L"{} failed with error [{}], {}\n"), prompt, errorCode, static_cast<wchar_t*>(lpMsgBuf));
+	//displayText::shoMsg(info, false);
+#endif
+    LocalFree(lpMsgBuf);
   }
 }
