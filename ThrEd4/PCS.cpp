@@ -142,7 +142,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	  if (0 == ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
-		rpt::reportError(L"ReadFile failed for PCSHeader in readPCSFile", errorCode);
+		rpt::reportError(L"ReadFile for PCSHeader in readPCSFile", errorCode);
 		return false;
 	  }
 	  if (bytesRead == sizeof(PCSHeader)) {
@@ -155,7 +155,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  if (0 == ReadFile(fileHandle, pcsDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for pcsDataBuffer in readPCSFile", errorCode);
+			rpt::reportError(L"ReadFile for pcsDataBuffer in readPCSFile", errorCode);
 			return false;
 		  }
 		  if (bytesRead == gsl::narrow<DWORD>(fileSize)) {
@@ -185,7 +185,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			if (0 == ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr)) {
 			  auto errorCode = GetLastError();
 			  CloseHandle(fileHandle);
-			  rpt::reportError(L"ReadFile failed for getBmpNameData in readPCSFile", errorCode);
+			  rpt::reportError(L"ReadFile for getBmpNameData in readPCSFile", errorCode);
 			  return false;
 			}
 			if (bytesRead != 14) {
@@ -305,7 +305,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (0 == ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for pcsFileHeader in insPCS", errorCode);
+	  rpt::reportError(L"ReadFile for pcsFileHeader in insPCS", errorCode);
 	  return retflag;
 	}
 	if (pcsFileHeader.leadIn == 0x32 && pcsFileHeader.colorCount == COLORCNT) {
@@ -318,7 +318,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  if (0 == ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
-		rpt::reportError(L"ReadFile failed for pcsStitchBuffer in insPCS", errorCode);
+		rpt::reportError(L"ReadFile for pcsStitchBuffer in insPCS", errorCode);
 		return retflag;
 	  }
 	  if (bytesRead == fileSize) {

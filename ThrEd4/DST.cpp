@@ -131,7 +131,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
       if (0 != ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(colorFile);
-		rpt::reportError(L"ReadFile failed for colors in dstran", errorCode);
+		rpt::reportError(L"ReadFile for colors in dstran", errorCode);
 		return;
       }
 	  CloseHandle(colorFile);
@@ -923,7 +923,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   if (0 == ReadFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr)) {
 	auto errorCode = GetLastError();
 	CloseHandle(fileHandle);
-	rpt::reportError(L"ReadFile failed for dstHeader in readDSTFile", errorCode);
+	rpt::reportError(L"ReadFile for dstHeader in readDSTFile", errorCode);
 	return false;
   }
   if (bytesRead == sizeof(dstHeader)) {
@@ -935,7 +935,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	  if (0 == ReadFile(fileHandle, dstData.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
-		rpt::reportError(L"ReadFile failed for dstData in readDSTFile", errorCode);
+		rpt::reportError(L"ReadFile for dstData in readDSTFile", errorCode);
 		return false;
 	  }
 	  di::dstran(dstData);

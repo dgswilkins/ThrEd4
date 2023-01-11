@@ -115,7 +115,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  if (0 == ReadFile(hBitmapFile, &BitmapFileHeaderV4, gsl::narrow<DWORD>(fileHeaderSize), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(hBitmapFile);
-		rpt::reportError(L"ReadFile failed for BitmapFileHeaderV4 in bfil", errorCode); 
+		rpt::reportError(L"ReadFile for BitmapFileHeaderV4 in bfil", errorCode); 
 		return;
 	  }
 	}
@@ -129,7 +129,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	auto errorCode = GetLastError();
 	CloseHandle(hBitmapFile);
 	bitmap::resetBmpFile(true);
-	rpt::reportError(L"ReadFile failed for BitmapFileHeader in bfil",errorCode);
+	rpt::reportError(L"ReadFile for BitmapFileHeader in bfil",errorCode);
 	return;
   }
   if (bi::gudtyp(BitmapFileHeaderV4.bV4BitCount)) {
@@ -156,7 +156,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  if (0 == ReadFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(hBitmapFile);
-		rpt::reportError(L"ReadFile failed for monoBitmapData in bfil", errorCode);
+		rpt::reportError(L"ReadFile for monoBitmapData in bfil", errorCode);
 		return;
 	  }
 	  CloseHandle(hBitmapFile);

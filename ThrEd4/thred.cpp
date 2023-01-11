@@ -3361,7 +3361,7 @@ void thi::redbal() {
 	  if (0 == ReadFile(balaradFile, &balaradHeader, sizeof(balaradHeader), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(balaradFile);
-		rpt::reportError(L"ReadFile failed for balaradHeader in redbal", errorCode);
+		rpt::reportError(L"ReadFile for balaradHeader in redbal", errorCode);
 		return;
 	  }
 	  if (bytesRead == sizeof(balaradHeader)) {
@@ -3371,7 +3371,7 @@ void thi::redbal() {
 		if (0 == ReadFile(balaradFile, balaradStitch.data(), gsl::narrow<DWORD>(fileSize - sizeof(balaradHeader)), &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(balaradFile);
-		  rpt::reportError(L"ReadFile failed for balaradStitch in redbal", errorCode);
+		  rpt::reportError(L"ReadFile for balaradStitch in redbal", errorCode);
 		  return;
 		}
 		auto const stitchCount  = bytesRead / wrap::sizeofType(balaradStitch);
@@ -4350,7 +4350,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
   if (0 == ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr)) {
 	auto errorCode = GetLastError();
 	CloseHandle(fileHandle);
-	rpt::reportError(L"ReadFile failed for thredHeader in readTHRFile", errorCode);
+	rpt::reportError(L"ReadFile for thredHeader in readTHRFile", errorCode);
 	return false;
   }
   if ((thredHeader.headerType & SIGMASK) == THREDSIG) {
@@ -4384,7 +4384,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		if (0 == ReadFile(fileHandle, ExtendedHeader, sizeof(*ExtendedHeader), &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for ExtendedHeader in readTHRFile", errorCode);
+		  rpt::reportError(L"ReadFile for ExtendedHeader in readTHRFile", errorCode);
 		  return false;
 		}
 		if (bytesRead != sizeof(*ExtendedHeader)) {
@@ -4411,7 +4411,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	  if (0 == ReadFile(fileHandle, StitchBuffer->data(), bytesToRead, &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
-		rpt::reportError(L"ReadFile failed for StitchBuffer in readTHRFile", errorCode);
+		rpt::reportError(L"ReadFile for StitchBuffer in readTHRFile", errorCode);
 		return false;
 	  }
 	  if (bytesRead != bytesToRead) {
@@ -4424,7 +4424,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (0 == ReadFile(fileHandle, bitmap::getBmpNameData(), bytesToRead, &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for getBmpNameData in readTHRFile", errorCode);
+	  rpt::reportError(L"ReadFile for getBmpNameData in readTHRFile", errorCode);
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
@@ -4436,7 +4436,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (0 == ReadFile(fileHandle, &BackgroundColor, bytesToRead, &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for BackgroundColor in readTHRFile", errorCode);
+	  rpt::reportError(L"ReadFile for BackgroundColor in readTHRFile", errorCode);
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
@@ -4449,7 +4449,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (0 == ReadFile(fileHandle, UserColor.data(), bytesToRead, &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for UserColor in readTHRFile", errorCode);
+	  rpt::reportError(L"ReadFile for UserColor in readTHRFile", errorCode);
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
@@ -4461,7 +4461,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (0 == ReadFile(fileHandle, CustomColor.data(), bytesToRead, &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for CustomColor in readTHRFile", errorCode);
+	  rpt::reportError(L"ReadFile for CustomColor in readTHRFile", errorCode);
 	  return false;
 	}
 	if (bytesRead != bytesToRead) {
@@ -4473,7 +4473,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 	if (0 == ReadFile(fileHandle, msgBuffer.data(), sizeof(msgBuffer), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for msgBuffer in readTHRFile", errorCode);
+	  rpt::reportError(L"ReadFile for msgBuffer in readTHRFile", errorCode);
 	  return false;
 	}
 	if (bytesRead != TSSIZE) {
@@ -4520,7 +4520,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		if (0 == ReadFile(fileHandle, FormVertices->data(), bytesToRead, &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for FormVertices in readTHRFile", errorCode);
+		  rpt::reportError(L"ReadFile for FormVertices in readTHRFile", errorCode);
 		  return false;
 		}
 		if (bytesRead != bytesToRead) {
@@ -4540,7 +4540,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		if (0 == ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for inGuideList in readTHRFile", errorCode);
+		  rpt::reportError(L"ReadFile for inGuideList in readTHRFile", errorCode);
 		  return false;
 		}
 		if (bytesRead != bytesToRead) {
@@ -4557,7 +4557,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		if (0 == ReadFile(fileHandle, ClipPoints->data(), bytesToRead, &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for ClipPoints in readTHRFile", errorCode);
+		  rpt::reportError(L"ReadFile for ClipPoints in readTHRFile", errorCode);
 		  return false;
 		}
 		if (bytesRead != bytesToRead) {
@@ -4572,7 +4572,7 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		if (0 == ReadFile(fileHandle, TexturePointsBuffer->data(), bytesToRead, &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for TexturePointsBuffer in readTHRFile", errorCode);
+		  rpt::reportError(L"ReadFile for TexturePointsBuffer in readTHRFile", errorCode);
 		  return false;
 		}
 		if (bytesRead != bytesToRead) {
@@ -7377,7 +7377,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	if (0 == ReadFile(fileHandle, &fileHeader, sizeof(fileHeader), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
-	  rpt::reportError(L"ReadFile failed for fileHeader in insTHR", errorCode);
+	  rpt::reportError(L"ReadFile for fileHeader in insTHR", errorCode);
 	  return false;
 	}
 	if ((fileHeader.headerType & SIGMASK) != THREDSIG) {
@@ -7402,7 +7402,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		if (0 == ReadFile(fileHandle, &thredHeader, sizeof(thredHeader), &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for thredHeader in insTHR", errorCode);
+		  rpt::reportError(L"ReadFile for thredHeader in insTHR", errorCode);
 		  return false;
 		}
 	  }
@@ -7417,7 +7417,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		                  nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(fileHandle);
-		  rpt::reportError(L"ReadFile failed for fileStitchBuffer in insTHR", errorCode);
+		  rpt::reportError(L"ReadFile for fileStitchBuffer in insTHR", errorCode);
 		  return false;
 		}
 	  }
@@ -7438,7 +7438,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  if (0 == ReadFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for inFormList in insTHR", errorCode);
+			rpt::reportError(L"ReadFile for inFormList in insTHR", errorCode);
 			return false;
 		  }
 		  if (bytesRead != bytesToRead) {
@@ -7468,7 +7468,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  if (0 == ReadFile(fileHandle, inVerticeList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for inVerticeList in insTHR", errorCode);
+			rpt::reportError(L"ReadFile for inVerticeList in insTHR", errorCode);
 			return false;
 		  }
 		  if (bytesRead != bytesToRead) {
@@ -7489,7 +7489,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  if (0 == ReadFile(fileHandle, inGuideList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for inGuideList in insTHR", errorCode);
+			rpt::reportError(L"ReadFile for inGuideList in insTHR", errorCode);
 			return false;
 		  }
 		  if (bytesRead != bytesToRead) {
@@ -7507,7 +7507,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  if (0 == ReadFile(fileHandle, inPointList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for inPointList in insTHR", errorCode);
+			rpt::reportError(L"ReadFile for inPointList in insTHR", errorCode);
 			return false;
 		  }
 		  if (bytesRead != bytesToRead) {
@@ -7524,7 +7524,7 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  if (0 == ReadFile(fileHandle, inTextureList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
-			rpt::reportError(L"ReadFile failed for inTextureList in insTHR", errorCode);
+			rpt::reportError(L"ReadFile for inTextureList in insTHR", errorCode);
 			return false;
 		  }
 		  if (bytesRead != bytesToRead) {
@@ -16303,7 +16303,7 @@ void thi::ducmd() {
 			  if (0 == ReadFile(balaradFile, readBuffer.data(), wrap::toUnsigned(readBuffer.size()), &bytesRead, nullptr)) {
 				auto errorCode = GetLastError();
 				CloseHandle(balaradFile);
-				rpt::reportError(L"ReadFile failed for readBuffer in ducmd", errorCode);
+				rpt::reportError(L"ReadFile for readBuffer in ducmd", errorCode);
 				return;
 			  }
 			  if (bytesRead != 0U) {
@@ -16368,7 +16368,7 @@ void thi::redini() {
 	if (0 == ReadFile(iniFileHandle, &IniFile, sizeof(IniFile), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(iniFileHandle);
-	  rpt::reportError(L"ReadFile failed for IniFile in redini", errorCode);
+	  rpt::reportError(L"ReadFile for IniFile in redini", errorCode);
 	  return;
 	}
 	CloseHandle(iniFileHandle);
@@ -17350,7 +17350,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 	if (0 == ReadFile(thrEdFile, &stitchHeader, sizeof(stitchHeader), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(thrEdFile);
-	  rpt::reportError(L"ReadFile failed for stitchHeader in ritbak", errorCode);
+	  rpt::reportError(L"ReadFile for stitchHeader in ritbak", errorCode);
 	  return;
 	}
 	if (bytesRead == sizeof(stitchHeader)) {
@@ -17375,7 +17375,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 			if (0 == ReadFile(thrEdFile, &extendedHeader, sizeof(extendedHeader), &bytesRead, nullptr)) {
 			  auto errorCode = GetLastError();
 			  CloseHandle(thrEdFile);
-			  rpt::reportError(L"ReadFile failed for extendedHeader in ritbak", errorCode);
+			  rpt::reportError(L"ReadFile for extendedHeader in ritbak", errorCode);
 			  return;
 			}
 			if (bytesRead != sizeof(extendedHeader)) {
@@ -17405,7 +17405,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		if (0 == ReadFile(thrEdFile, stitchesToDraw.data(), bytesToRead, &bytesRead, nullptr)) {
 		  auto errorCode = GetLastError();
 		  CloseHandle(thrEdFile);
-		  rpt::reportError(L"ReadFile failed for stitchesToDraw in ritbak", errorCode);
+		  rpt::reportError(L"ReadFile for stitchesToDraw in ritbak", errorCode);
 		  return;
 		}
 		if (bytesToRead == bytesRead) {
@@ -17414,7 +17414,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		  if (0 == ReadFile(thrEdFile, &brushColor, sizeof(brushColor), &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(thrEdFile);
-			rpt::reportError(L"ReadFile failed for brushColor in ritbak", errorCode);
+			rpt::reportError(L"ReadFile for brushColor in ritbak", errorCode);
 			return;
 		  }
 		  auto colors = std::vector<COLORREF> {};
@@ -17472,7 +17472,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 			if (0 == ReadFile(thrEdFile, formListOriginal.data(), bytesToRead, &bytesRead, nullptr)) {
 			  auto errorCode = GetLastError();
 			  CloseHandle(thrEdFile);
-			  rpt::reportError(L"ReadFile failed for formListOriginal in ritbak", errorCode);
+			  rpt::reportError(L"ReadFile for formListOriginal in ritbak", errorCode);
 			  return;
 			}
 			if (bytesRead != bytesToRead) {
@@ -17494,7 +17494,7 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		  if (0 == ReadFile(thrEdFile, vertexList.data(), bytesToRead, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(thrEdFile);
-			rpt::reportError(L"ReadFile failed for vertexList in ritbak", errorCode);
+			rpt::reportError(L"ReadFile for vertexList in ritbak", errorCode);
 			return;
 		  }
 		  if (bytesRead != bytesToRead) {
