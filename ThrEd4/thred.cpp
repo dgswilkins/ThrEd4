@@ -13302,8 +13302,9 @@ auto thi::doPaste(std::vector<POINT> const& stretchBoxLine, bool& retflag) -> bo
 		}
 		auto* ptrTextureSource = convertFromPtr<TX_PNT*>(std::next(ptrClipData, currentClip));
 		auto  textureCount     = size_t {};
-		for (iForm = 0; iForm < ClipFormsCount; ++iForm) {
-		  auto& form = FormList->operator[](wrap::toSize(formOffset) + iForm);
+		for (auto  spForms = std::ranges::subrange(std::next(FormList->begin(), formOffset),
+                                                  std::next(std::next(FormList->begin(), formOffset), ClipFormsCount));
+		     auto& form : spForms) {
 		  if (form.isTexture()) {
 			textureCount += form.fillInfo.texture.count;
 			form.fillInfo.texture.index +=
