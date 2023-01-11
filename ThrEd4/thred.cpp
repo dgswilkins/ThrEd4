@@ -1242,33 +1242,30 @@ void thi::nunams() {
   xt::duauxnam(*AuxName);
   *ThrName = *WorkingFileName;
   ThrName->replace_extension(L".thr");
-  auto flag         = true;
-  auto previousName = PreviousNames->begin();
-  for (auto iPrevious = 0U; iPrevious < PreviousNames->size(); ++iPrevious) {
-	if (*previousName == *ThrName) {
-	  if (iPrevious != 0U) {
-		std::iter_swap(PreviousNames->begin(), previousName);
-		flag = false;
-		break;
-	  }
-	  return;
-	}
-	++previousName;
+  if (PreviousNames->front() == *ThrName) {
+	return;
   }
-  if (flag) {
-	previousName = PreviousNames->begin();
-	for (auto iPrevious = 0U; iPrevious < PreviousNames->size(); ++iPrevious) {
-	  if (previousName->empty()) {
-		previousName->assign(*ThrName);
-		flag = false;
-		break;
-	  }
-	  ++previousName;
+  auto flag = true;
+  for (auto spNames = std::ranges::subrange(std::next(PreviousNames->begin()), PreviousNames->end());
+       auto& previousName : spNames) {
+	if (previousName == *ThrName) {
+	  std::swap(PreviousNames->front(), previousName);
+	  flag = false;
+	  break;
 	}
   }
   if (flag) {
-	PreviousNames->insert(PreviousNames->begin(), *ThrName);
-	PreviousNames->pop_back();
+	for (auto& previousName : *PreviousNames) {
+	  if (previousName.empty()) {
+		previousName.assign(*ThrName);
+		flag = false;
+		break;
+	  }
+	}
+	if (flag) {
+	  PreviousNames->insert(PreviousNames->begin(), *ThrName);
+	  PreviousNames->pop_back();
+	}
   }
   menu::redfils(LRUPtr, PreviousNames);
 }
