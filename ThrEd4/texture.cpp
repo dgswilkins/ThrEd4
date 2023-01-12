@@ -1079,7 +1079,7 @@ void texture::deltx(uint32_t formIndex) {
   if ((!TexturePointsBuffer->empty()) && form.isTexture() && (form.fillInfo.texture.count != 0U)) {
 	auto flag = false;
 	// First check to see if the texture is shared between forms
-	for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+	for (auto const spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
 	     auto& current : spForms) {
 	  if (current.isTexture()) {
 		if (current.fillInfo.texture.index == currentIndex) {
@@ -1087,7 +1087,7 @@ void texture::deltx(uint32_t formIndex) {
 		}
 	  }
 	}
-	for (auto spForms = std::ranges::subrange(std::next(FormList->begin(), gsl::narrow_cast<ptrdiff_t>(formIndex) + 1U), FormList->end());
+	for (auto const spForms = std::ranges::subrange(std::next(FormList->begin(), gsl::narrow_cast<ptrdiff_t>(formIndex) + 1U), FormList->end());
 	     auto& current : spForms) {
 	  if (current.isTexture()) {
 		if (current.fillInfo.texture.index == currentIndex) {
