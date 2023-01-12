@@ -7377,7 +7377,7 @@ void fi::filsclp() {
   }
   currentForm.type                    = SAT;
   currentForm.fillType                = CLPF;
-  currentForm.angleOrClipData.clip    = clip::numclp();
+  currentForm.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
   currentForm.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
   auto itClipPoints = wrap::next(ClipPoints->begin(), currentForm.angleOrClipData.clip);
   for (auto const& clip : *ClipBuffer) {
@@ -8828,7 +8828,7 @@ void form::vrtsclp() {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
   form.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
-  form.angleOrClipData.clip    = clip::numclp();
+  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
   form.wordParam               = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
@@ -8892,7 +8892,7 @@ void form::horsclp() {
   texture::deltx(ClosestFormToCursor);
   auto const clipSize          = wrap::toUnsigned(ClipBuffer->size());
   form.lengthOrCount.clipCount = clipSize;
-  form.angleOrClipData.clip    = clip::numclp();
+  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
   form.lengthOrCount.clipCount = clipSize;
   form.wordParam               = IniFile.fillPhase;
   fi::makpoli();
@@ -8954,7 +8954,7 @@ void form::horclp() {
 void form::angsclp(FRM_HEAD& form) {
   clip::delmclp(ClosestFormToCursor);
   texture::deltx(ClosestFormToCursor);
-  form.angleOrClipData.clip    = clip::numclp();
+  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
   form.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
   form.wordParam               = IniFile.fillPhase;
   fi::makpoli();

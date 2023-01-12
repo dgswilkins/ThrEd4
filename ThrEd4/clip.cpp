@@ -187,24 +187,24 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   return find;
 }
 
-auto clip::numclp() -> uint32_t {
+auto clip::numclp(uint32_t formIndex) -> uint32_t {
   auto const clipSize    = wrap::toUnsigned(ClipBuffer->size());
-  auto const find        = ci::findclp(ClosestFormToCursor);
+  auto const find        = ci::findclp(formIndex);
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, clipSize, VAL);
-  auto& form                = FormList->operator[](ClosestFormToCursor);
-  form.angleOrClipData.clip = find;
-  if (form.isEdgeClipX()) {
-	form.borderClipData += clipSize;
+  auto  itStart             = std::next(FormList->begin(), formIndex);
+  itStart->angleOrClipData.clip = find;
+  if (itStart->isEdgeClipX()) {
+	itStart->borderClipData += clipSize;
   }
-  for (auto iForm = ClosestFormToCursor + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& formNext = FormList->operator[](iForm);
-	if (formNext.isClipX()) {
-	  formNext.angleOrClipData.clip += clipSize;
+  ++itStart;
+  for (auto spForms = std::ranges::subrange(itStart, FormList->end()); auto& form : spForms) {
+	if (form.isClipX()) {
+	  form.angleOrClipData.clip += clipSize;
 	}
-	if (formNext.isEdgeClipX()) {
-	  formNext.borderClipData += clipSize;
+	if (form.isEdgeClipX()) {
+	  form.borderClipData += clipSize;
 	}
   }
   return find;
