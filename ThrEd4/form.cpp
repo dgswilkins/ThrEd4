@@ -2768,7 +2768,7 @@ void fi::plbrd(FRM_HEAD const& form, FRM_HEAD& angledForm, std::vector<F_POINT>&
   spurct(underlayVerticalRect, fillVerticalRect, (angledForm.vertexCount - 1U));
   auto const itVertex = wrap::next(angledFormVertices.cbegin(), angledForm.vertexIndex);
   if ((angledForm.attribute & SBLNT) == 0U) {
-	auto const val = std::next(itVertex, 1);
+	auto const val = std::next(itVertex, 1U);
 
 	fillVerticalRect[1].aipnt     = *val;
 	fillVerticalRect[1].aopnt     = *val;

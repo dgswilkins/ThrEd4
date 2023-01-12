@@ -380,7 +380,7 @@ void pi::pecnam(gsl::span<char> const& label) {
   if (fileStem.size() < lblSize) {
 	fileStem += std::string(lblSize - fileStem.size(), ' ');
   }
-  auto* ptr = std::next(label.data(), 3);
+  auto* ptr = std::next(label.data(), 3U);
   // ReSharper disable once CppDeprecatedEntity
   strncpy(ptr, fileStem.c_str(), lblSize); // NOLINT(clang-diagnostic-deprecated-declarations)
 }
