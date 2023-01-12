@@ -24,7 +24,7 @@ auto clpsid(uint32_t                    vertexIndex,
             uint32_t                    start,
             uint32_t                    finish,
             F_POINT const&              rotationCenter) -> bool;
-void clpsub(uint32_t fpnt, uint32_t cnt);
+void clpsub(uint32_t formIndex, uint32_t cnt);
 void clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& chainEndPoints);
 void duch(std::vector<F_POINT> const& chainEndPoints);
 void duchfn(std::vector<F_POINT> const& chainEndPoints, uint32_t start, uint32_t finish);
@@ -111,9 +111,9 @@ auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
   return 0;
 }
 
-void ci::clpsub(uint32_t fpnt, uint32_t cnt) {
-  for (auto iForm = fpnt + 1U; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	auto& form = FormList->operator[](iForm);
+void ci::clpsub(uint32_t formIndex, uint32_t cnt) {
+  for (auto spForms = std::ranges::subrange(std::next(FormList->begin(), formIndex + 1U), FormList->end());
+       auto& form : spForms) { 
 	if (form.isClipX()) {
 	  form.angleOrClipData.clip -= cnt;
 	}
