@@ -215,10 +215,10 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	ClipBuffer->clear();
 	if (clipEntries != 0U) {
 	  ClipBuffer->reserve(clipEntries);
-	  auto itClipPoint = wrap::next(ClipPoints->begin(), clipIndex);
-	  for (auto iClip = 0U; iClip < clipEntries; ++iClip) {
-		ClipBuffer->emplace_back(F_POINT_ATTR {itClipPoint->x, itClipPoint->y, 0});
-		++itClipPoint;
+	  for (auto  clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
+                                                   wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
+	       auto& iClip : clipPoints) {
+		ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
 	  }
 	  clipRect.left = clipRect.right = ClipBuffer->front().x;
 	  clipRect.bottom = clipRect.top = ClipBuffer->front().y;
