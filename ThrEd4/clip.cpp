@@ -170,14 +170,18 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, count, VAL);
-  for (auto iForm = ClosestFormToCursor; iForm < wrap::toUnsigned(FormList->size()); ++iForm) {
-	if (auto& thisForm = FormList->operator[](iForm); thisForm.isEdgeClipX()) {
-	  thisForm.borderClipData += count;
-	}
+  auto itStart = std::next(FormList->begin(), currentForm);
+  if (itStart->isEdgeClipX()) {
+	itStart->borderClipData += count;
   }
-  for (auto iform = ClosestFormToCursor + 1U; iform < wrap::toUnsigned(FormList->size()); ++iform) {
-	if (auto& thisForm = FormList->operator[](iform); thisForm.isClip()) {
-	  thisForm.angleOrClipData.clip += count;
+  ++itStart;
+  for (auto spForms = std::ranges::subrange(itStart, FormList->end());
+       auto& form : spForms) {
+	if (form.isEdgeClipX()) {
+	  form.borderClipData += count;
+	}
+	if (form.isClip()) {
+	  form.angleOrClipData.clip += count;
 	}
   }
   return find;
