@@ -8823,12 +8823,12 @@ void form::stchs2frm() {
   }
 }
 
-void form::vrtsclp() {
-  auto& form = FormList->operator[](ClosestFormToCursor);
-  clip::delmclp(ClosestFormToCursor);
-  texture::deltx(ClosestFormToCursor);
+void form::vrtsclp(uint32_t formIndex) {
+  auto& form = FormList->operator[](formIndex);
+  clip::delmclp(formIndex);
+  texture::deltx(formIndex);
   form.lengthOrCount.clipCount = wrap::toUnsigned(ClipBuffer->size());
-  form.angleOrClipData.clip    = clip::numclp(ClosestFormToCursor);
+  form.angleOrClipData.clip    = clip::numclp(formIndex);
   form.wordParam               = IniFile.fillPhase;
   fi::makpoli();
   form.fillSpacing = IniFile.clipOffset;
@@ -8859,7 +8859,7 @@ void form::vrtclp() {
 		  for (auto const selectedForm : (*SelectedFormList)) {
 			ClosestFormToCursor = selectedForm;
 			if (FormList->operator[](ClosestFormToCursor).type != FRMLINE) {
-			  vrtsclp();
+			  vrtsclp(ClosestFormToCursor);
 			}
 		  }
 		  StateMap->reset(StateFlag::NOCLP);
@@ -8869,7 +8869,7 @@ void form::vrtclp() {
 		}
 		else {
 		  if (StateMap->test(StateFlag::FORMSEL)) {
-			vrtsclp();
+			vrtsclp(ClosestFormToCursor);
 			StateMap->set(StateFlag::INIT);
 			thred::coltab();
 			StateMap->set(StateFlag::RESTCH);

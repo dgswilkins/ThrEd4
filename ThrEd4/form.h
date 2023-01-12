@@ -161,6 +161,6 @@ void unfrm();
 void uninsf();
 void unpsel();
 void vrtclp();
-void vrtsclp();
+void vrtsclp(uint32_t formIndex);
 
 } // namespace form

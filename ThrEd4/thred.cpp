@@ -12009,7 +12009,7 @@ auto thi::handleSideWindowActive() -> bool {
 	}
 	if (Msg.hwnd == SideWindow->operator[](FillStyles::VCLPF)) { // vertical clip
 	  if (sidclp()) {
-		form::vrtsclp();
+		form::vrtsclp(ClosestFormToCursor);
 	  }
 	  StateMap->reset(StateFlag::CLPSHO);
 	  thred::coltab();
