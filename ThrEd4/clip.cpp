@@ -7,6 +7,9 @@
 #include "satin.h"
 #include "thred.h"
 
+// Standard Libraries
+#include <ranges>
+
 // clip internal namespace
 namespace ci {
 void clpcrnr(FRM_HEAD const&       form,
@@ -96,8 +99,8 @@ void xclpfn(std::vector<F_POINT> const& tempClipPoints,
 static auto ClipReference = F_POINT {}; // clipboard reference formOrigin
 
 auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
-  for (auto iForm = formIndex; iForm != 0; --iForm) {
-	auto& form = FormList->operator[](iForm - 1U);
+  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+       auto& form : spForms | std::views::reverse) {
 	if (form.isEdgeClip()) {
 	  return form.borderClipData + form.clipEntries;
 	}
