@@ -215,9 +215,9 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	ClipBuffer->clear();
 	if (clipEntries != 0U) {
 	  ClipBuffer->reserve(clipEntries);
-	  for (auto  clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
+	  for (auto const clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
                                                    wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
-	       auto& iClip : clipPoints) {
+	       auto const& iClip : clipPoints) {
 		ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
 	  }
 	  clipRect.left = clipRect.right = ClipBuffer->front().x;
@@ -545,7 +545,7 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto       flag          = true;
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
-  for (auto  spVertices = std::ranges::subrange(vNext, wrap::next(vNext, form.vertexCount - 1U));
+  for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(vNext, form.vertexCount - 1U));
        auto const& iVertex : spVertices) { 
 	auto const length = hypot(iVertex.x - itFirstVertex->x, iVertex.y - itFirstVertex->y);
 	if (length > form.edgeSpacing) {
@@ -587,7 +587,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	else {
 	  nextStart = form.vertexCount - 1U;
 	}
-	auto itVertex = wrap::next(itFirstVertex, nextStart);
+	auto const itVertex = wrap::next(itFirstVertex, nextStart);
 	if (initialCount == 0U) {
 	  initialCount    = adjCount;
 	  smallestSpacing = adjustedSpace;
@@ -634,7 +634,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	nextStart = 0;
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
-  auto lastVertex = wrap::next(itFirstVertex, nextStart);
+  auto const lastVertex = wrap::next(itFirstVertex, nextStart);
   if (auto const interval = hypot(lastVertex->x - stitchPoint.x, lastVertex->y - stitchPoint.y); interval > halfSpacing) {
 	chainEndPoints.push_back(*lastVertex);
   }
