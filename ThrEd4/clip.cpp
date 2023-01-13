@@ -92,7 +92,6 @@ void setvct(uint32_t vertexIndex, uint32_t start, uint32_t finish, float& clipAn
 void xclpfn(std::vector<F_POINT> const& tempClipPoints,
             std::vector<F_POINT> const& chainEndPoints,
             uint32_t                    start,
-            uint32_t                    finish,
             F_POINT const&              rotationCenter);
 } // namespace ci
 
@@ -705,15 +704,15 @@ void ci::clpxadj(std::vector<F_POINT>& tempClipPoints, std::vector<F_POINT>& cha
 void ci::xclpfn(std::vector<F_POINT> const& tempClipPoints,
                 std::vector<F_POINT> const& chainEndPoints,
                 uint32_t                    start,
-                uint32_t                    finish,
                 F_POINT const&              rotationCenter) {
-  auto const  delta         = F_POINT {(chainEndPoints[finish].x - chainEndPoints[start].x),
-                              (chainEndPoints[finish].y - chainEndPoints[start].y)};
-  auto const  rotationAngle = atan2(delta.y, delta.x);
-  auto const& chainEndPoint = chainEndPoints[start];
+  auto const& chainStartPoint = chainEndPoints[start];
+  auto const& chainNextPoint  = chainEndPoints[start + 1U];
+  auto const  delta =
+      F_POINT {(chainNextPoint.x - chainStartPoint.x), (chainNextPoint.y - chainStartPoint.y)};
+  auto const rotationAngle = atan2(delta.y, delta.x);
   for (auto const& clip : tempClipPoints) {
 	auto const point = thred::rotangf(clip, rotationAngle, rotationCenter);
-	OSequence->push_back(F_POINT {chainEndPoint.x + point.x, chainEndPoint.y + point.y});
+	OSequence->push_back(F_POINT {chainStartPoint.x + point.x, chainStartPoint.y + point.y});
   }
 }
 
@@ -728,8 +727,8 @@ void clip::duxclp(FRM_HEAD const& form) {
   ci::clpxadj(tempClipPoints, chainEndPoints);
   OSequence->clear();
   auto constexpr ROTATION_CENTER = F_POINT {};
-  for (auto iPoint = 1U; iPoint < wrap::toUnsigned(chainEndPoints.size()); ++iPoint) {
-	ci::xclpfn(tempClipPoints, chainEndPoints, iPoint - 1, iPoint, ROTATION_CENTER);
+  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size() - 1U); ++iPoint) {
+	ci::xclpfn(tempClipPoints, chainEndPoints, iPoint, ROTATION_CENTER);
   }
   if (form.type != FRMLINE) {
 	OSequence->push_back(chainEndPoints[0]);
