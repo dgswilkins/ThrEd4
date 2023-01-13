@@ -112,7 +112,7 @@ auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
 
 void ci::clpsub(uint32_t formIndex, uint32_t cnt) {
   for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-       auto& form : spForms) { 
+       auto& form : spForms) {
 	if (form.isClipX()) {
 	  form.angleOrClipData.clip -= cnt;
 	}
@@ -174,8 +174,7 @@ auto clip::nueclp(uint32_t currentForm, uint32_t count) -> uint32_t {
 	itStart->borderClipData += count;
   }
   ++itStart;
-  for (auto spForms = std::ranges::subrange(itStart, FormList->end());
-       auto& form : spForms) {
+  for (auto spForms = std::ranges::subrange(itStart, FormList->end()); auto& form : spForms) {
 	if (form.isEdgeClipX()) {
 	  form.borderClipData += count;
 	}
@@ -192,7 +191,7 @@ auto clip::numclp(uint32_t formIndex) -> uint32_t {
   auto const itClipPoint = wrap::next(ClipPoints->cbegin(), find);
   auto constexpr VAL     = F_POINT {};
   ClipPoints->insert(itClipPoint, clipSize, VAL);
-  auto  itStart             = std::next(FormList->begin(), formIndex);
+  auto itStart                  = std::next(FormList->begin(), formIndex);
   itStart->angleOrClipData.clip = find;
   if (itStart->isEdgeClipX()) {
 	itStart->borderClipData += clipSize;
@@ -215,7 +214,7 @@ void clip::oclp(F_RECTANGLE& clipRect, uint32_t clipIndex, uint32_t clipEntries)
 	if (clipEntries != 0U) {
 	  ClipBuffer->reserve(clipEntries);
 	  for (auto const clipPoints = std::ranges::subrange(wrap::next(ClipPoints->begin(), clipIndex),
-                                                   wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
+	                                                     wrap::next(ClipPoints->begin(), clipIndex + clipEntries));
 	       auto const& iClip : clipPoints) {
 		ClipBuffer->emplace_back(F_POINT_ATTR {iClip.x, iClip.y, 0});
 	  }
@@ -545,7 +544,7 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
   auto const vNext         = std::next(itFirstVertex);
   for (auto const spVertices = std::ranges::subrange(vNext, wrap::next(vNext, form.vertexCount - 1U));
-       auto const& iVertex : spVertices) { 
+       auto const& iVertex : spVertices) {
 	auto const length = hypot(iVertex.x - itFirstVertex->x, iVertex.y - itFirstVertex->y);
 	if (length > form.edgeSpacing) {
 	  flag = false;
@@ -572,7 +571,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 
   constexpr auto ITLIMIT = 50U; // Iterate at most 50 times to try to guarantee convergence
   while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
-	auto adjCount    = 0U;
+	auto adjCount = 0U;
 	// intentional copy
 	auto stitchPoint = *itFirstVertex;
 	for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
@@ -634,7 +633,8 @@ void ci::fxlen(FRM_HEAD const&           form,
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
   auto const lastVertex = wrap::next(itFirstVertex, nextStart);
-  if (auto const interval = hypot(lastVertex->x - stitchPoint.x, lastVertex->y - stitchPoint.y); interval > halfSpacing) {
+  if (auto const interval = hypot(lastVertex->x - stitchPoint.x, lastVertex->y - stitchPoint.y);
+      interval > halfSpacing) {
 	chainEndPoints.push_back(*lastVertex);
   }
   else {
@@ -664,7 +664,6 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   if (form::lastch()) {
 	auto minimumLength = BIGFLOAT;
 	auto minimumIndex  = 0U;
-	
 	for (auto index = 0U; auto const& iPoint : chainEndPoints) {
 	  if (auto const length = hypot(LastPoint.x - iPoint.x, LastPoint.y - iPoint.y); length < minimumLength) {
 		minimumLength = length;
@@ -678,8 +677,8 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
 		                                             std::prev(chainEndPoints.end(), 2));
 		tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
 	  }
-	  auto const spPoints2 = std::ranges::subrange(chainEndPoints.begin(),
-	                                               std::next(chainEndPoints.begin(), minimumIndex));
+	  auto const spPoints2 =
+	      std::ranges::subrange(chainEndPoints.begin(), std::next(chainEndPoints.begin(), minimumIndex));
 	  tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
 	  chainEndPoints = tempClipPoints;
 	}
