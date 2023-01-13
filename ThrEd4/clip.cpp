@@ -544,9 +544,10 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto       adjustedSpace = 0.0F;
   auto       flag          = true;
   auto const itFirstVertex = wrap::next(FormVertices->cbegin(), form.vertexIndex);
-  auto       itVertex      = std::next(itFirstVertex);
-  for (auto iVertex = 1U; iVertex < form.vertexCount; ++iVertex) {
-	auto const length = hypot(itVertex->x - itFirstVertex->x, itVertex->y - itFirstVertex->y);
+  auto const vNext         = std::next(itFirstVertex);
+  for (auto  spVertices = std::ranges::subrange(vNext, wrap::next(vNext, form.vertexCount - 1U));
+       auto const& iVertex : spVertices) { 
+	auto const length = hypot(iVertex.x - itFirstVertex->x, iVertex.y - itFirstVertex->y);
 	if (length > form.edgeSpacing) {
 	  flag = false;
 	  break;
@@ -554,10 +555,8 @@ void ci::fxlen(FRM_HEAD const&           form,
 	if (length > adjustedSpace) {
 	  adjustedSpace = length;
 	}
-	++itVertex;
   }
   if (flag) {
-	auto const vNext = std::next(itFirstVertex);
 	chainEndPoints.push_back(*itFirstVertex);
 	chainEndPoints.push_back(*vNext);
 	return;
@@ -572,9 +571,10 @@ void ci::fxlen(FRM_HEAD const&           form,
   auto       largestSpacing  = 1.0F;
   auto       nextStart       = 0U;
 
-  constexpr auto ITLIMIT = 50U; // Iterate at least 50 times to guarantee convergence
+  constexpr auto ITLIMIT = 50U; // Iterate at most 50 times to try to guarantee convergence
   while (loopCount < ITLIMIT && (largestSpacing - smallestSpacing) > TNYFLOAT) {
 	auto adjCount    = 0U;
+	// intentional copy
 	auto stitchPoint = *itFirstVertex;
 	for (auto currentSide = 0U; currentSide < form.vertexCount - 1U; ++currentSide) {
 	  nextStart = currentSide + 1U;
@@ -587,7 +587,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	else {
 	  nextStart = form.vertexCount - 1U;
 	}
-	itVertex = wrap::next(itFirstVertex, nextStart);
+	auto itVertex = wrap::next(itFirstVertex, nextStart);
 	if (initialCount == 0U) {
 	  initialCount    = adjCount;
 	  smallestSpacing = adjustedSpace;
@@ -622,6 +622,7 @@ void ci::fxlen(FRM_HEAD const&           form,
 	}
 	++loopCount;
   }
+  // intentional copy
   auto stitchPoint = *itFirstVertex;
   adjustedSpace    = minimumSpacing;
   chainEndPoints.push_back(stitchPoint);
@@ -633,12 +634,12 @@ void ci::fxlen(FRM_HEAD const&           form,
 	nextStart = 0;
 	ci::fxlin(form.vertexIndex, chainEndPoints, listSINEs, listCOSINEs, moveToCoords, form.vertexCount - 1U, stitchPoint, adjustedSpace, nextStart);
   }
-  itVertex = wrap::next(itFirstVertex, nextStart);
-  if (auto const interval = hypot(itVertex->x - stitchPoint.x, itVertex->y - stitchPoint.y); interval > halfSpacing) {
-	chainEndPoints.push_back(*itVertex);
+  auto lastVertex = wrap::next(itFirstVertex, nextStart);
+  if (auto const interval = hypot(lastVertex->x - stitchPoint.x, lastVertex->y - stitchPoint.y); interval > halfSpacing) {
+	chainEndPoints.push_back(*lastVertex);
   }
   else {
-	chainEndPoints.back() = *itVertex;
+	chainEndPoints.back() = *lastVertex;
   }
 }
 
