@@ -112,7 +112,7 @@ auto ci::findclp(uint32_t formIndex) noexcept -> uint32_t {
 }
 
 void ci::clpsub(uint32_t formIndex, uint32_t cnt) {
-  for (auto spForms = std::ranges::subrange(std::next(FormList->begin(), formIndex + 1U), FormList->end());
+  for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
        auto& form : spForms) { 
 	if (form.isClipX()) {
 	  form.angleOrClipData.clip -= cnt;
