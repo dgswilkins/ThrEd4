@@ -665,21 +665,23 @@ void ci::dulast(std::vector<F_POINT>& chainEndPoints) {
   if (form::lastch()) {
 	auto minimumLength = BIGFLOAT;
 	auto minimumIndex  = 0U;
-	for (auto iPoint = 0U; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 1U; ++iPoint) {
-	  if (auto const length =
-	          hypot(LastPoint.x - chainEndPoints[iPoint].x, LastPoint.y - chainEndPoints[iPoint].y);
-	      length < minimumLength) {
+	
+	for (auto index = 0U; auto const& iPoint : chainEndPoints) {
+	  if (auto const length = hypot(LastPoint.x - iPoint.x, LastPoint.y - iPoint.y); length < minimumLength) {
 		minimumLength = length;
-		minimumIndex  = iPoint;
+		minimumIndex  = index;
 	  }
+	  ++index;
 	}
 	if (minimumIndex != 0U) {
-	  for (auto iPoint = minimumIndex; iPoint < wrap::toUnsigned(chainEndPoints.size()) - 2U; ++iPoint) {
-		tempClipPoints.push_back(chainEndPoints[iPoint]);
+	  if (minimumIndex < wrap::toUnsigned(chainEndPoints.size() - 1U)) {
+		auto const spPoints1 = std::ranges::subrange(std::next(chainEndPoints.begin(), minimumIndex),
+		                                             std::prev(chainEndPoints.end(), 2));
+		tempClipPoints.insert(tempClipPoints.end(), spPoints1.begin(), spPoints1.end());
 	  }
-	  for (auto iPoint = 0U; iPoint <= minimumIndex; ++iPoint) {
-		tempClipPoints.push_back(chainEndPoints[iPoint]);
-	  }
+	  auto const spPoints2 = std::ranges::subrange(chainEndPoints.begin(),
+	                                               std::next(chainEndPoints.begin(), minimumIndex));
+	  tempClipPoints.insert(tempClipPoints.end(), spPoints2.begin(), spPoints2.end());
 	  chainEndPoints = tempClipPoints;
 	}
   }
