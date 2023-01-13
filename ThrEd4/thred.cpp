@@ -5648,7 +5648,7 @@ void thi::rebox() {
 void thred::delstchm() {
   thred::rngadj();
   auto const start = wrap::next(StitchBuffer->begin(), GroupStartStitch);
-  auto const end   = wrap::next(StitchBuffer->begin(), gsl::narrow<ptrdiff_t>(GroupEndStitch + 1U));
+  auto const end   = wrap::next(StitchBuffer->begin(), GroupEndStitch + 1U);
   StitchBuffer->erase(start, end);
 }
 
