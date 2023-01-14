@@ -535,6 +535,9 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
   if (!thred::getFileSize(newFileName, fileSize)) {
 	return false;
   }
+  if (fileSize == 0U) {
+	return false;
+  }
   // NOLINTNEXTLINE(readability-qualified-auto)
   auto fileHandle = HANDLE {nullptr};
   if (!thred::getFileHandle(newFileName, fileHandle)) {
