@@ -222,9 +222,9 @@ void texture::redtx() {
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {};
 	  auto sig       = std::array<char, 4> {};
-	  if (ReadFile(handle, sig.data(), wrap::toUnsigned(sig.size()), &bytesRead, nullptr) != 0) {
+	  if (0 != ReadFile(handle, sig.data(), wrap::toUnsigned(sig.size()), &bytesRead, nullptr)) {
 		if (strcmp(sig.data(), "txh") == 0) {
-		  if (ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr) != 0) {
+		  if (0 != ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
 			auto historyBytesRead = DWORD {};
 			if (wrap::readFile(handle,
 			                   textureHistoryBuffer.data(),
