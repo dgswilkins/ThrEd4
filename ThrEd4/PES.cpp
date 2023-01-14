@@ -544,7 +544,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto fileBuf = std::vector<uint8_t> {};
-  fileBuf.reserve(wrap::toSize(fileSize));
+  fileBuf.resize(wrap::toSize(fileSize));
   auto* fileBuffer = fileBuf.data();
   if (fileBuffer == nullptr) {
 	CloseHandle(fileHandle);
