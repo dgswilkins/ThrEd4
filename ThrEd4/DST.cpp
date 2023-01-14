@@ -128,7 +128,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	  GetFileSizeEx(colorFile, &colorFileSize);
 	  // There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 	  colors.resize(colorFileSize.u.LowPart / wrap::sizeofType(colors));
-      if (0 != ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr)) {
+      if (0 == ReadFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(colorFile);
 		rpt::reportError(L"ReadFile for colors in dstran", errorCode);
