@@ -113,8 +113,16 @@ void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability
 
 void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
-auto readFile(HANDLE file, LPVOID buffer, uint32_t bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
-    -> bool;
+
+template <class inType> auto readFile(HANDLE file, LPVOID buffer, inType bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
+    -> BOOL {
+  if constexpr (std::is_same_v<inType, DWORD>) {
+	return ReadFile(file, buffer, bytesToRead, bytesRead, overlapped);
+  }
+  else {
+	return ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped);
+  }
+  }
 
 template <class outType, class inType> auto round(inType invar) -> outType {
   if constexpr (std::is_same_v<inType, float>) {
