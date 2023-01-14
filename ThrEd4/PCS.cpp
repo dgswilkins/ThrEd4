@@ -139,7 +139,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 	auto fileHandle = HANDLE {nullptr};
 	if (thred::getFileHandle(newFileName, fileHandle)) {
 	  auto bytesRead = DWORD {};
-	  if (0 == ReadFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr)) {
+	  if (0 == wrap::readFile(fileHandle, &PCSHeader, sizeof(PCSHeader), &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
 		rpt::reportError(L"ReadFile for PCSHeader in readPCSFile", errorCode);
@@ -152,7 +152,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 		  auto const pcsStitchCount = wrap::toSize(fileSize / sizeof(PCS_STITCH));
 		  auto       pcsDataBuffer  = std::vector<PCS_STITCH> {};
 		  pcsDataBuffer.resize(pcsStitchCount);
-		  if (0 == ReadFile(fileHandle, pcsDataBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
+		  if (0 == wrap::readFile(fileHandle, pcsDataBuffer.data(), fileSize, &bytesRead, nullptr)) {
 			auto errorCode = GetLastError();
 			CloseHandle(fileHandle);
 			rpt::reportError(L"ReadFile for pcsDataBuffer in readPCSFile", errorCode);
@@ -182,7 +182,7 @@ auto PCS::readPCSFile(fs::path const& newFileName) -> bool {
 			  ++iPCSstitch;
 			}
 			// Grab the bitmap filename
-			if (0 == ReadFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr)) {
+			if (0 == wrap::readFile(fileHandle, bitmap::getBmpNameData(), 14, &bytesRead, nullptr)) {
 			  auto errorCode = GetLastError();
 			  CloseHandle(fileHandle);
 			  rpt::reportError(L"ReadFile for getBmpNameData in readPCSFile", errorCode);
@@ -302,7 +302,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	auto pcsFileHeader = PCSHEADER {};
 	auto bytesRead     = DWORD {};
 
-	if (0 == ReadFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr)) {
+	if (0 == wrap::readFile(fileHandle, &pcsFileHeader, sizeof(pcsFileHeader), &bytesRead, nullptr)) {
 	  auto errorCode = GetLastError();
 	  CloseHandle(fileHandle);
 	  rpt::reportError(L"ReadFile for pcsFileHeader in insPCS", errorCode);
@@ -315,7 +315,7 @@ auto PCS::insPCS(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 	  auto const pcsStitchCount  = wrap::toSize(fileSize / sizeof(PCS_STITCH));
 	  auto       pcsStitchBuffer = std::vector<PCS_STITCH> {};
 	  pcsStitchBuffer.resize(pcsStitchCount);
-	  if (0 == ReadFile(fileHandle, pcsStitchBuffer.data(), gsl::narrow<DWORD>(fileSize), &bytesRead, nullptr)) {
+	  if (0 == wrap::readFile(fileHandle, pcsStitchBuffer.data(), fileSize, &bytesRead, nullptr)) {
 		auto errorCode = GetLastError();
 		CloseHandle(fileHandle);
 		rpt::reportError(L"ReadFile for pcsStitchBuffer in insPCS", errorCode);
