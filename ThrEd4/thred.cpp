@@ -4491,7 +4491,12 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		auto formListOriginal = std::vector<FRM_HEAD_O> {};
 		formListOriginal.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(formListOriginal);
-		wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr);
+		if (0 == wrap::readFile(fileHandle, formListOriginal.data(), bytesToRead, &bytesRead, nullptr)) {
+		  auto errorCode = GetLastError();
+		  CloseHandle(fileHandle);
+		  rpt::reportError(L"ReadFile for formListOriginal in readTHRFile", errorCode);
+		  return false;
+		}
 		if (bytesRead != bytesToRead) {
 		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(formListOriginal));
 		  formListOriginal.resize(thredHeader.formCount);
@@ -4504,7 +4509,12 @@ auto thi::readTHRFile(std::filesystem::path const& newFileName) -> bool {
 		auto inFormList = std::vector<FRM_HEAD_OUT> {};
 		inFormList.resize(thredHeader.formCount);
 		bytesToRead = thredHeader.formCount * wrap::sizeofType(inFormList);
-		wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+		if (0 == wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr)) {
+		  auto errorCode = GetLastError();
+		  CloseHandle(fileHandle);
+		  rpt::reportError(L"ReadFile for inFormList in readTHRFile", errorCode);
+		  return false;
+		}
 		if (bytesRead != bytesToRead) {
 		  wrap::narrow(thredHeader.formCount, bytesRead / wrap::sizeofType(inFormList));
 		  inFormList.resize(thredHeader.formCount);
@@ -7452,7 +7462,12 @@ auto thi::insTHR(fs::path const& insertedFile, F_RECTANGLE& insertedRectangle) -
 		  auto inFormList = std::vector<FRM_HEAD_OUT> {};
 		  inFormList.resize(fileHeader.formCount);
 		  auto const bytesToRead = fileHeader.formCount * wrap::sizeofType(inFormList);
-		  wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+		  if (0 == wrap::readFile(fileHandle, inFormList.data(), bytesToRead, &bytesRead, nullptr)) {
+			auto errorCode = GetLastError();
+			CloseHandle(fileHandle);
+			rpt::reportError(L"ReadFile for inFormList in insTHR", errorCode);
+			return false;
+		  }
 		  if (bytesRead != bytesToRead) {
 			inFormList.resize(bytesRead / wrap::sizeofType(inFormList));
 			StateMap->set(StateFlag::BADFIL);
@@ -17419,7 +17434,12 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 		  }
 		  auto colors = std::vector<COLORREF> {};
 		  colors.resize(COLORCNT);
-		  wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, nullptr);
+		  if (0 == wrap::readFile(thrEdFile, colors.data(), wrap::sizeofVector(colors), &bytesRead, nullptr)) {
+			auto errorCode = GetLastError();
+			CloseHandle(thrEdFile);
+			rpt::reportError(L"ReadFile for colors in ritbak", errorCode);
+			return;
+		  }
 		  // NOLINTNEXTLINE(readability-qualified-auto)
 		  auto brush = CreateSolidBrush(brushColor);
 		  SelectObject(drawItem.hDC, brush);
@@ -17484,7 +17504,12 @@ void thi::ritbak(fs::path const& fileName, DRAWITEMSTRUCT const& drawItem) {
 			auto inFormList = std::vector<FRM_HEAD_OUT> {};
 			inFormList.resize(stitchHeader.formCount);
 			auto const bytesToRead = stitchHeader.formCount * wrap::sizeofType(inFormList);
-			wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, nullptr);
+			if (0 == wrap::readFile(thrEdFile, inFormList.data(), bytesToRead, &bytesRead, nullptr)) {
+			  auto errorCode = GetLastError();
+			  CloseHandle(thrEdFile);
+			  rpt::reportError(L"ReadFile for inFormList in ritbak", errorCode);
+			  return;
+			}
 			if (bytesRead != bytesToRead) {
 			  break;
 			}

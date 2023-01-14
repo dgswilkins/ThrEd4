@@ -226,9 +226,9 @@ void texture::redtx() {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (0 != ReadFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
 			auto historyBytesRead = DWORD {};
-			if (wrap::readFile(handle,
+			if (0 != wrap::readFile(handle,
 			                   textureHistoryBuffer.data(),
-			                   wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
+			                   textureHistoryBuffer.size() * ITXBUFSZ,
 			                   &historyBytesRead,
 			                   nullptr)) {
 			  for (auto index = 0U; index < (historyBytesRead / wrap::sizeofType(textureHistoryBuffer)); ++index) {
@@ -237,7 +237,7 @@ void texture::redtx() {
 				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
 				if (textureHistoryBuffer[index].count != 0U) {
 				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
-				  if (!wrap::readFile(handle,
+				  if (0 != wrap::readFile(handle,
 				                      TextureHistory->operator[](index).texturePoints.data(),
 				                      wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
 				                          textureHistoryBuffer[index].count,
