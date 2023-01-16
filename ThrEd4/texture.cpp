@@ -237,7 +237,7 @@ void texture::redtx() {
 				  auto const bytesToReadTx = wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
 				                textureHistoryBuffer[index].count;
 				  auto& texture = TextureHistory->operator[](index);
-				  if (wrap::readFile(handle, texture.texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
+				  if (!wrap::readFile(handle, texture.texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
 					texture.texturePoints.clear();
 					texture.texturePoints.shrink_to_fit();
 				  }
