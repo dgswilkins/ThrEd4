@@ -4,7 +4,6 @@
 #include "displayText.h"
 #include "DST.h"
 #include "globals.h"
-#include "reporting.h"
 #include "thred.h"
 #include "utf8conv.h"
 
@@ -128,10 +127,7 @@ void di::dstran(std::vector<DSTREC>& DSTData) {
 	  GetFileSizeEx(colorFile, &colorFileSize);
 	  // There can only be (64K + 3) colors, so even if HighPart is non-zero, we don't care
 	  colors.resize(colorFileSize.u.LowPart / wrap::sizeofType(colors));
-      if (0 == wrap::readFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, nullptr)) {
-		auto errorCode = GetLastError();
-		CloseHandle(colorFile);
-		rpt::reportError(L"ReadFile for colors in dstran", errorCode);
+	  if (!wrap::readFile(colorFile, colors.data(), colorFileSize.u.LowPart, &bytesRead, L"ReadFile for colors in dstran")) {
 		return;
       }
 	  CloseHandle(colorFile);
@@ -919,10 +915,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
   }
   auto dstHeader = DSTHED {};
   auto bytesRead = DWORD {};
-  if (0 == wrap::readFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, nullptr)) {
-	auto errorCode = GetLastError();
-	CloseHandle(fileHandle);
-	rpt::reportError(L"ReadFile for dstHeader in readDSTFile", errorCode);
+  if (!wrap::readFile(fileHandle, &dstHeader, sizeof(dstHeader), &bytesRead, L"ReadFile for dstHeader in readDSTFile")) {
 	return false;
   }
   if (bytesRead == sizeof(dstHeader)) {
@@ -931,10 +924,7 @@ auto DST::readDSTFile(std::filesystem::path const& newFileName) -> bool {
 	  fileSize -= sizeof(dstHeader);
 	  auto dstData = std::vector<DSTREC> {};
 	  dstData.resize(wrap::toSize(fileSize / sizeof(DSTREC)));
-	  if (0 == wrap::readFile(fileHandle, dstData.data(), fileSize, &bytesRead, nullptr)) {
-		auto errorCode = GetLastError();
-		CloseHandle(fileHandle);
-		rpt::reportError(L"ReadFile for dstData in readDSTFile", errorCode);
+	  if (!wrap::readFile(fileHandle, dstData.data(), fileSize, &bytesRead, L"ReadFile for dstData in readDSTFile")) {
 		return false;
 	  }
 	  di::dstran(dstData);

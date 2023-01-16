@@ -7,7 +7,6 @@
 #include "displayText.h"
 #include "globals.h"
 #include "PES.h"
-#include "reporting.h"
 #include "thred.h"
 #include "utf8conv.h"
 
@@ -551,10 +550,7 @@ auto PES::readPESFile(fs::path const& newFileName) -> bool {
 	return false;
   }
   auto bytesRead = DWORD {};
-  if (0 == wrap::readFile(fileHandle, fileBuffer, fileSize, &bytesRead, nullptr)) {
-	auto errorCode = GetLastError();
-	CloseHandle(fileHandle);
-	rpt::reportError(L"ReadFile for fileBuffer in readPESFile", errorCode);
+  if (!wrap::readFile(fileHandle, fileBuffer, fileSize, &bytesRead, L"ReadFile for fileBuffer in readPESFile")) {
 	return false;
   }
   auto const* pesHeader = convertFromPtr<PESHED*>(fileBuf.data());

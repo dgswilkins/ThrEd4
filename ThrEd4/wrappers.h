@@ -2,6 +2,7 @@
 
 // Local Headers
 #include "point.h"
+#include "reporting.h"
 
 // Open Source headers
 #pragma warning(push)
@@ -114,15 +115,28 @@ void narrow_cast(outType& outvar, inType invar) noexcept { // NOLINT(readability
 void polyline(HDC hdc, POINT const* apt, uint32_t cpt) noexcept;
 auto pressed(int virtKey) noexcept -> bool;
 
-template <class inType> auto readFile(HANDLE file, LPVOID buffer, inType bytesToRead, LPDWORD bytesRead, LPOVERLAPPED overlapped) noexcept
-    -> BOOL {
+template <class bufType, class inType>
+auto readFile(HANDLE fileHandle, bufType* buffer, inType bytesToRead, LPDWORD bytesRead, const wchar_t* prompt)
+    -> bool {
   if constexpr (std::is_same_v<inType, DWORD>) {
-	return ReadFile(file, buffer, bytesToRead, bytesRead, overlapped);
+	if (0 == ReadFile(fileHandle, gsl::narrow<LPVOID>(buffer), bytesToRead, bytesRead, nullptr)) {
+	  auto errorCode = GetLastError();
+	  CloseHandle(fileHandle);
+	  rpt::reportError(prompt, errorCode);
+	  return false;
+	}
+	return true;
   }
   else {
-	return ReadFile(file, buffer, gsl::narrow<DWORD>(bytesToRead), bytesRead, overlapped);
+	if (0 == ReadFile(fileHandle, gsl::narrow<LPVOID>(buffer), gsl::narrow<DWORD>(bytesToRead), bytesRead, nullptr)) {
+	  auto errorCode = GetLastError();
+	  CloseHandle(fileHandle);
+	  rpt::reportError(prompt, errorCode);
+	  return false;
+	}
+	return true;
   }
-  }
+}
 
 template <class outType, class inType> auto round(inType invar) -> outType {
   if constexpr (std::is_same_v<inType, float>) {

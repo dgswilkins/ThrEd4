@@ -222,29 +222,24 @@ void texture::redtx() {
 	if (handle != INVALID_HANDLE_VALUE) {
 	  auto bytesRead = DWORD {};
 	  auto sig       = std::array<char, 4> {};
-	  if (0 != wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, nullptr)) {
+	  if (wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
 		if (strcmp(sig.data(), "txh") == 0) {
-		  if (0 != wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, nullptr)) {
+		  if (wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
+			auto const bytesToRead      = textureHistoryBuffer.size() * ITXBUFSZ;
 			auto historyBytesRead = DWORD {};
-			if (0 != wrap::readFile(handle,
-			                   textureHistoryBuffer.data(),
-			                   textureHistoryBuffer.size() * ITXBUFSZ,
-			                   &historyBytesRead,
-			                   nullptr)) {
+			if (wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
 			  for (auto index = 0U; index < (historyBytesRead / wrap::sizeofType(textureHistoryBuffer)); ++index) {
 				TextureHistory->operator[](index).height  = textureHistoryBuffer[index].height;
 				TextureHistory->operator[](index).width   = textureHistoryBuffer[index].width;
 				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
 				if (textureHistoryBuffer[index].count != 0U) {
 				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
-				  if (0 != wrap::readFile(handle,
-				                      TextureHistory->operator[](index).texturePoints.data(),
-				                      wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
-				                          textureHistoryBuffer[index].count,
-				                      &bytesRead,
-				                      nullptr)) {
-					TextureHistory->operator[](index).texturePoints.clear();
-					TextureHistory->operator[](index).texturePoints.shrink_to_fit();
+				  auto const bytesToReadTx = wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
+				                textureHistoryBuffer[index].count;
+				  auto& texture = TextureHistory->operator[](index);
+				  if (wrap::readFile(handle, texture.texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
+					texture.texturePoints.clear();
+					texture.texturePoints.shrink_to_fit();
 				  }
 				}
 			  }

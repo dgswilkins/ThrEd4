@@ -105,22 +105,18 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	return;
   }
   auto bytesRead = DWORD {};
-  if (0 != wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, nullptr)) {
+  if (wrap::readFile(hBitmapFile, &BitmapFileHeader, sizeof(BitmapFileHeader), &bytesRead, L"ReadFile for BitmapFileHeader in bfil")) {
 	// check for 'BM' signature in the 1st 2 bytes. Use Big Endian order
 	if (constexpr auto MB_SIG = 0x4D42; BitmapFileHeader.bfType == MB_SIG) {
 	  auto fileHeaderSize = wrap::toSize(BitmapFileHeader.bfOffBits) - sizeof(BitmapFileHeader);
 	  if (fileHeaderSize > sizeof(BITMAPV4HEADER)) {
 		fileHeaderSize = sizeof(BITMAPV4HEADER);
 	  }
-	  if (0 == wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, nullptr)) {
-		auto errorCode = GetLastError();
-		CloseHandle(hBitmapFile);
-		rpt::reportError(L"ReadFile for BitmapFileHeaderV4 in bfil", errorCode); 
+	  if (!wrap::readFile(hBitmapFile, &BitmapFileHeaderV4, fileHeaderSize, &bytesRead, L"ReadFile for BitmapFileHeaderV4 in bfil")) {
 		return;
 	  }
 	}
 	else {
-	  CloseHandle(hBitmapFile);
 	  bitmap::resetBmpFile(true);
 	  return;
 	}
@@ -153,10 +149,7 @@ void bitmap::bfil(COLORREF const& backgroundColor) {
 	  auto const bitmapSizeBytes = bitmapWidthBytes * gsl::narrow<decltype(bitmapWidthBytes)>(BitmapHeight);
 	  auto monoBitmapData = std::vector<uint8_t> {};
 	  monoBitmapData.resize(bitmapSizeBytes);
-	  if (0 == wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, nullptr)) {
-		auto errorCode = GetLastError();
-		CloseHandle(hBitmapFile);
-		rpt::reportError(L"ReadFile for monoBitmapData in bfil", errorCode);
+	  if (!wrap::readFile(hBitmapFile, monoBitmapData.data(), bitmapSizeBytes, &bytesRead, L"ReadFile for monoBitmapData in bfil")) {
 		return;
 	  }
 	  CloseHandle(hBitmapFile);
