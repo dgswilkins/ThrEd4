@@ -180,7 +180,7 @@ void texture::txdun() {
 		}
 		wrap::writeFile(handle,
 		                textureHistoryBuffer.data(),
-		                wrap::toUnsigned(textureHistoryBuffer.size() * ITXBUFSZ),
+		                wrap::toUnsigned(textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer)),
 		                &bytesWritten,
 		                nullptr);
 		for (auto& item : *TextureHistory) {
@@ -226,10 +226,10 @@ void texture::redtx() {
 	  if (wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
 		if (strcmp(sig.data(), "txh") == 0) {
 		  if (wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
-			auto const bytesToRead      = textureHistoryBuffer.size() * ITXBUFSZ;
+			auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
 			auto historyBytesRead = DWORD {};
 			if (wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
-			  for (auto index = 0U; index < (historyBytesRead / wrap::sizeofType(textureHistoryBuffer)); ++index) {
+			  for (auto index = 0U; index < textureHistoryBuffer.size(); ++index) {
 				TextureHistory->operator[](index).height  = textureHistoryBuffer[index].height;
 				TextureHistory->operator[](index).width   = textureHistoryBuffer[index].width;
 				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
