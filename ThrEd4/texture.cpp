@@ -1279,24 +1279,25 @@ void txi::dutxfn(uint32_t textureType) {
 }
 
 void txi::dutxmir() {
-  if (!TempTexturePoints->empty()) {
-	auto const centerLine = (TextureScreen.lines + 1U) / 2;
-	auto const evenOffset = 1U - (TextureScreen.lines & 1U);
-	texture::savtxt();
-	std::ranges::sort(*TempTexturePoints, txi::tpComp);
-	auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1U;
-	while (TempTexturePoints->operator[](iPoint).line > centerLine) {
-	  --iPoint;
-	}
-	TempTexturePoints->resize(wrap::toSize(iPoint) + 1U);
-	auto const iMirrorPoint = iPoint + evenOffset;
-	for (auto index = 0U; index < iMirrorPoint; ++index) {
-	  auto const newLine =
-	      gsl::narrow_cast<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
-	  TempTexturePoints->emplace_back(TX_PNT {TempTexturePoints->operator[](index).y, newLine});
-	}
-	StateMap->set(StateFlag::RESTCH);
+  if (TempTexturePoints->empty()) {
+	return;
   }
+  auto const centerLine = (TextureScreen.lines + 1U) / 2;
+  auto const evenOffset = 1U - (TextureScreen.lines & 1U);
+  texture::savtxt();
+  std::ranges::sort(*TempTexturePoints, txi::tpComp);
+  auto iPoint = wrap::toUnsigned(TempTexturePoints->size()) - 1U;
+  while (TempTexturePoints->operator[](iPoint).line > centerLine) {
+	--iPoint;
+  }
+  TempTexturePoints->resize(wrap::toSize(iPoint) + 1U);
+  auto const iMirrorPoint = iPoint + evenOffset;
+  for (auto index = 0U; index < iMirrorPoint; ++index) {
+	auto const newLine =
+	    gsl::narrow_cast<uint16_t>(TextureScreen.lines - TempTexturePoints->operator[](index).line + 1U);
+	TempTexturePoints->emplace_back(TX_PNT {TempTexturePoints->operator[](index).y, newLine});
+  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void txi::txdelal() {
