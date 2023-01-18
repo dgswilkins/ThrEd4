@@ -1542,11 +1542,11 @@ void texture::txsnap() {
   if (TempTexturePoints->empty()) {
 	return;
   }
-  auto const txpntSize = TempTexturePoints->size();
   texture::savtxt();
   auto const halfGrid = IniFile.gridSize / 2;
   if (!SelectedTexturePointsList->empty()) {
-	for (auto iPoint = 0U; iPoint < txpntSize; ++iPoint) {
+	auto const selectedSize = SelectedTexturePointsList->size();
+	for (auto iPoint = 0U; iPoint < selectedSize; ++iPoint) {
 	  auto& texturePoint = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
 	  auto const yStep = (texturePoint.y + halfGrid) / IniFile.gridSize;
 	  texturePoint.y   = yStep * IniFile.gridSize;
