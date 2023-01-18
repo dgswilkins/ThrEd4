@@ -159,40 +159,44 @@ void texture::txdun() {
   constexpr auto SIGNATURE            = std::array<char, 4> {"txh"};
   auto           textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
-  if (!TextureHistory->operator[](0).texturePoints.empty()) {
-	auto name = std::wstring {};
-	if (txi::txnam(name)) {
-	  auto bytesWritten = DWORD {};
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
-#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	  if (handle != INVALID_HANDLE_VALUE) {
-		WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
-		WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
-		auto bufferIter = textureHistoryBuffer.begin();
-		for (auto const& historyEntry : *TextureHistory) {
-		  auto& bufferEntry       = *bufferIter;
-		  bufferEntry.placeholder = nullptr;
-		  bufferEntry.count       = wrap::toUnsigned(historyEntry.texturePoints.size());
-		  bufferEntry.height      = historyEntry.height;
-		  bufferEntry.width       = historyEntry.width;
-		  bufferEntry.spacing     = historyEntry.spacing;
-		  ++bufferIter;
-		}
-		wrap::writeFile(handle,
-		                textureHistoryBuffer.data(),
-		                wrap::toUnsigned(textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer)),
-		                &bytesWritten,
-		                nullptr);
-		for (auto& item : *TextureHistory) {
-		  if (!item.texturePoints.empty()) {
-			wrap::writeFile(handle, item.texturePoints.data(), wrap::sizeofVector(item.texturePoints), &bytesWritten, nullptr);
-		  }
-		}
-	  }
-	  CloseHandle(handle);
-	}
+  if (TextureHistory->operator[](0).texturePoints.empty()) {
+	return;
   }
+  auto name = std::wstring {};
+  if (!txi::txnam(name)) {
+	return;
+  }
+  auto bytesWritten = DWORD {};
+  // NOLINTNEXTLINE(readability-qualified-auto)
+  auto const handle = CreateFile(name.c_str(), GENERIC_WRITE, 0, nullptr, CREATE_ALWAYS, 0, nullptr);
+#pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
+  if (handle == INVALID_HANDLE_VALUE) {
+	CloseHandle(handle);
+	return;
+  }
+  WriteFile(handle, SIGNATURE.data(), wrap::toUnsigned(SIGNATURE.size()), &bytesWritten, nullptr);
+  WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
+  auto bufferIter = textureHistoryBuffer.begin();
+  for (auto const& historyEntry : *TextureHistory) {
+	bufferIter->placeholder = nullptr;
+	bufferIter->count       = wrap::toUnsigned(historyEntry.texturePoints.size());
+	bufferIter->height      = historyEntry.height;
+	bufferIter->width       = historyEntry.width;
+	bufferIter->spacing     = historyEntry.spacing;
+	++bufferIter;
+  }
+  wrap::writeFile(handle,
+                  textureHistoryBuffer.data(),
+                  wrap::toUnsigned(textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer)),
+                  &bytesWritten,
+                  nullptr);
+  for (auto& item : *TextureHistory) {
+	if (item.texturePoints.empty()) {
+	  continue;
+	}
+	wrap::writeFile(handle, item.texturePoints.data(), wrap::sizeofVector(item.texturePoints), &bytesWritten, nullptr);
+  }
+  CloseHandle(handle);
 }
 
 void txi::redtbak() {
