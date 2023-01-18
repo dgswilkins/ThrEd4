@@ -1505,36 +1505,36 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
   if (SelectedTexturePointsList->empty()) {
 	return;
   }
-	if (deltaY != 0.0F) {
-	  auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
-	  for (auto const point : *SelectedTexturePointsList) {
-		auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
-		if (yCoord < 0.0F) {
-		  return;
-		}
-		if (yCoord > TextureScreen.areaHeight) {
-		  return;
-		}
+  if (deltaY != 0.0F) {
+	auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
+	for (auto const point : *SelectedTexturePointsList) {
+	  auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
+	  if (yCoord < 0.0F) {
+		return;
 	  }
-	  for (auto const point : *SelectedTexturePointsList) {
-		TempTexturePoints->operator[](point).y += screenDeltaY;
+	  if (yCoord > TextureScreen.areaHeight) {
+		return;
 	  }
 	}
-	else {
-	  for (auto const point : *SelectedTexturePointsList) {
-		auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
-		if (textureLine < 1) {
-		  return;
-		}
-		if (textureLine > TextureScreen.lines) {
-		  return;
-		}
+	for (auto const point : *SelectedTexturePointsList) {
+	  TempTexturePoints->operator[](point).y += screenDeltaY;
+	}
+  }
+  else {
+	for (auto const point : *SelectedTexturePointsList) {
+	  auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
+	  if (textureLine < 1) {
+		return;
 	  }
-	  for (auto const& point : *SelectedTexturePointsList) {
-		TempTexturePoints->operator[](point).line +=
-		    gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
+	  if (textureLine > TextureScreen.lines) {
+		return;
 	  }
 	}
+	for (auto const& point : *SelectedTexturePointsList) {
+	  TempTexturePoints->operator[](point).line +=
+	      gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
+	}
+  }
   txi::dutxrct(TextureRect);
   StateMap->set(StateFlag::RESTCH);
 }
