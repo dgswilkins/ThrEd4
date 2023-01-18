@@ -1509,10 +1509,7 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
 	auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 	for (auto const point : *SelectedTexturePointsList) {
 	  auto const yCoord = TempTexturePoints->operator[](point).y + screenDeltaY;
-	  if (yCoord < 0.0F) {
-		return;
-	  }
-	  if (yCoord > TextureScreen.areaHeight) {
+	  if ((yCoord < 0.0F) || (yCoord > TextureScreen.areaHeight)) {
 		return;
 	  }
 	}
