@@ -1370,8 +1370,6 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
 	  txi::ritxrct();
 	  return;
 	}
-  }
-  if (!SelectedTexturePointsList->empty()) {
 	if (txi::txtclos(SelectedTexturePointsList->front())) {
 	  SelectedTexturePointsList->resize(1);
 	  txi::setxmov();
