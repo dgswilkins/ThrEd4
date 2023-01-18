@@ -1767,7 +1767,9 @@ auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexce
 }
 
 void texture::setshft() {
-  if (ZoomBoxLine[2].x != 0L && ZoomBoxLine[2].y != 0L) {
+  if (ZoomBoxLine[2].x == 0L || ZoomBoxLine[2].y == 0L) {
+	return;
+  }
 	texture::savtxt();
 	thred::unbBox();
 	StateMap->reset(StateFlag::BZUMIN);
@@ -1802,7 +1804,6 @@ void texture::setshft() {
 	TextureScreen.width = TextureScreen.spacing * wrap::toFloat(line) + TextureScreen.spacing / 2.0F;
 	StateMap->set(StateFlag::TXTRED);
 	StateMap->set(StateFlag::RESTCH);
-  }
 }
 
 void texture::writeScreenWidth(int32_t position) {
