@@ -1732,7 +1732,9 @@ void texture::setxt(FRM_HEAD& form, std::vector<RNG_COUNT>& textureSegments) {
 void texture::rtrtx(FRM_HEAD const& form) {
   TempTexturePoints->clear();
   auto const currentIndex = form.fillInfo.texture.index;
-  if (wrap::toUnsigned(TexturePointsBuffer->size()) > gsl::narrow_cast<uint32_t>(currentIndex)) {
+  if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex)) {
+	return;
+  }
 	auto currentCount = form.fillInfo.texture.count;
 	if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
 	  currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
@@ -1747,7 +1749,6 @@ void texture::rtrtx(FRM_HEAD const& form) {
 	TextureScreen.width =
 	    wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
 	texture::savtxt();
-  }
 }
 
 auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool {
