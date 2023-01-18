@@ -91,6 +91,7 @@ auto px2txt(POINT const& offset) -> bool;
 void redtbak();
 void ritxfrm(FRM_HEAD const& textureForm);
 void ritxrct();
+void rollbackTexture(std::vector<TX_HIST>::iterator const& texture);
 void setxclp(FRM_HEAD const& form);
 void setxfrm() noexcept;
 void setxmov();
@@ -211,47 +212,75 @@ void txi::redtbak() {
   StateMap->set(StateFlag::RESTCH);
 }
 
+void txi::rollbackTexture(std::vector<TX_HIST>::iterator const& texture) {
+  auto dist = wrap::toUnsigned(std::distance(TextureHistory->begin(), texture));
+  if (dist == 0) {
+	TextureHistoryIndex = ITXBUFSZ - 1U;
+  }
+  else {
+	TextureHistoryIndex = --dist;
+  }
+  texture->height  = 0;
+  texture->width   = 0;
+  texture->spacing = 0;
+  texture->texturePoints.clear();
+  texture->texturePoints.shrink_to_fit();
+}
+
 void texture::redtx() {
   auto name                 = std::wstring {};
   auto textureHistoryBuffer = std::vector<TX_HIST_BUFF> {};
   textureHistoryBuffer.resize(ITXBUFSZ);
   TextureHistoryIndex = ITXBUFSZ - 1U;
-  if (txi::txnam(name)) {
+  do {
+	if (!txi::txnam(name)) {
+	  break;
+	}
 	// NOLINTNEXTLINE(readability-qualified-auto)
 	auto const handle = CreateFile(name.c_str(), GENERIC_READ, 0, nullptr, OPEN_EXISTING, 0, nullptr);
 #pragma warning(suppress : 26493) // type.4 Don't use C-style casts NOLINTNEXTLINE(cppcoreguidelines-pro-type-cstyle-cast, performance-no-int-to-ptr)
-	if (handle != INVALID_HANDLE_VALUE) {
-	  auto bytesRead = DWORD {};
-	  auto sig       = std::array<char, 4> {};
-	  if (wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
-		if (strcmp(sig.data(), "txh") == 0) {
-		  if (wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
-			auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
-			auto historyBytesRead = DWORD {};
-			if (wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
-			  for (auto index = 0U; index < textureHistoryBuffer.size(); ++index) {
-				TextureHistory->operator[](index).height  = textureHistoryBuffer[index].height;
-				TextureHistory->operator[](index).width   = textureHistoryBuffer[index].width;
-				TextureHistory->operator[](index).spacing = textureHistoryBuffer[index].spacing;
-				if (textureHistoryBuffer[index].count != 0U) {
-				  TextureHistory->operator[](index).texturePoints.resize(textureHistoryBuffer[index].count);
-				  auto const bytesToReadTx = wrap::sizeofType(TextureHistory->operator[](0).texturePoints) *
-				                textureHistoryBuffer[index].count;
-				  auto& texture = TextureHistory->operator[](index);
-				  if (!wrap::readFile(handle, texture.texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
-					texture.texturePoints.clear();
-					texture.texturePoints.shrink_to_fit();
-				  }
-				}
-			  }
-			}
-		  }
-		  StateMap->set(StateFlag::WASTXBAK);
-		}
-	  }
+	if (handle == INVALID_HANDLE_VALUE) {
+	  CloseHandle(handle);
+	  break;
 	}
+	auto bytesRead = DWORD {};
+	auto sig       = std::array<char, 4> {};
+	if (!wrap::readFile(handle, sig.data(), sig.size(), &bytesRead, L"ReadFile for sig in redtx")) {
+	  break;
+	}
+	if (strcmp(sig.data(), "txh") != 0) {
+	  break;
+	}
+	if (!wrap::readFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesRead, L"ReadFile for TextureHistoryIndex in redtx")) {
+	  TextureHistoryIndex = ITXBUFSZ - 1U;
+	  break;
+	}
+	auto const bytesToRead = textureHistoryBuffer.size() * wrap::sizeofType(textureHistoryBuffer);
+	auto       historyBytesRead = DWORD {};
+	if (!wrap::readFile(handle, textureHistoryBuffer.data(), bytesToRead, &historyBytesRead, L"ReadFile for textureHistoryBuffer in redtx")) {
+	  TextureHistoryIndex = ITXBUFSZ - 1U;
+	  break;
+	}
+	auto texture = TextureHistory->begin();
+	for (auto const& entry : textureHistoryBuffer) {
+	  texture->height  = entry.height;
+	  texture->width  = entry.width;
+	  texture->spacing = entry.spacing;
+	  if (entry.count == 0U) {
+		++texture;
+		continue;
+	  }
+	  texture->texturePoints.resize(entry.count);
+	  auto const bytesToReadTx = wrap::sizeofType(TextureHistory->front().texturePoints) * entry.count;
+	  if (!wrap::readFile(handle, texture->texturePoints.data(), bytesToReadTx, &bytesRead, L"ReadFile for texturePoints in redtx")) {
+		txi::rollbackTexture(texture);
+		break;
+	  }
+	  ++texture;
+	}
+	StateMap->set(StateFlag::WASTXBAK);
 	CloseHandle(handle);
-  }
+  } while (false);
   txi::redtbak();
 }
 
