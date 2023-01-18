@@ -1539,8 +1539,10 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
 }
 
 void texture::txsnap() {
+  if (TempTexturePoints->empty()) {
+	return;
+  }
   auto const txpntSize = TempTexturePoints->size();
-  if (txpntSize != 0U) {
 	texture::savtxt();
 	auto const halfGrid = IniFile.gridSize / 2;
 	if (!SelectedTexturePointsList->empty()) {
@@ -1558,7 +1560,6 @@ void texture::txsnap() {
 	  }
 	}
 	StateMap->set(StateFlag::RESTCH);
-  }
 }
 
 void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
