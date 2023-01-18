@@ -1735,20 +1735,20 @@ void texture::rtrtx(FRM_HEAD const& form) {
   if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex)) {
 	return;
   }
-	auto currentCount = form.fillInfo.texture.count;
-	if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
-	  currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
-	}
-	TempTexturePoints->resize(currentCount);
-	auto const startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
-	auto const endSource   = std::next(startSource, currentCount);
-	std::copy(startSource, endSource, TempTexturePoints->begin());
-	TextureScreen.areaHeight = form.fillInfo.texture.height;
-	TextureScreen.spacing    = form.fillSpacing;
-	TextureScreen.lines      = gsl::narrow<uint16_t>(form.fillInfo.texture.lines);
-	TextureScreen.width =
-	    wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
-	texture::savtxt();
+  auto currentCount = form.fillInfo.texture.count;
+  if (wrap::toUnsigned(TexturePointsBuffer->size()) < gsl::narrow_cast<uint32_t>(currentIndex + currentCount)) {
+	currentCount = gsl::narrow<uint16_t>(TexturePointsBuffer->size()) - currentIndex;
+  }
+  TempTexturePoints->resize(currentCount);
+  auto const startSource = std::next(TexturePointsBuffer->cbegin(), currentIndex);
+  auto const endSource   = std::next(startSource, currentCount);
+  std::copy(startSource, endSource, TempTexturePoints->begin());
+  TextureScreen.areaHeight = form.fillInfo.texture.height;
+  TextureScreen.spacing    = form.fillSpacing;
+  TextureScreen.lines      = gsl::narrow<uint16_t>(form.fillInfo.texture.lines);
+  TextureScreen.width =
+      wrap::toFloat(TextureScreen.lines) * TextureScreen.spacing + TextureScreen.spacing / 2.0F;
+  texture::savtxt();
 }
 
 auto txi::inrct(F_RECTANGLE const& rectangle, F_POINT_ATTR const& stitch) noexcept -> bool {
