@@ -1502,7 +1502,9 @@ auto txi::txdig(wchar_t keyCode, wchar_t& character) noexcept -> bool {
 }
 
 void txi::txnudg(int32_t deltaX, float deltaY) {
-  if (!SelectedTexturePointsList->empty()) {
+  if (SelectedTexturePointsList->empty()) {
+	return;
+  }
 	if (deltaY != 0.0F) {
 	  auto const screenDeltaY = deltaY * TextureScreen.editToPixelRatio;
 	  for (auto const point : *SelectedTexturePointsList) {
@@ -1533,7 +1535,6 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
 		    gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
 	  }
 	}
-  }
   txi::dutxrct(TextureRect);
   StateMap->set(StateFlag::RESTCH);
 }
