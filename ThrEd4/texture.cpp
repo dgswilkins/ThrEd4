@@ -16,7 +16,6 @@
 class TX_HIST_BUFF
 {
   public:
-  uint32_t* placeholder {};
   uint32_t  count {};
 
   float height {};
@@ -178,7 +177,6 @@ void texture::txdun() {
   WriteFile(handle, &TextureHistoryIndex, sizeof(TextureHistoryIndex), &bytesWritten, nullptr);
   auto bufferIter = textureHistoryBuffer.begin();
   for (auto const& historyEntry : *TextureHistory) {
-	bufferIter->placeholder = nullptr;
 	bufferIter->count       = wrap::toUnsigned(historyEntry.texturePoints.size());
 	bufferIter->height      = historyEntry.height;
 	bufferIter->width       = historyEntry.width;
