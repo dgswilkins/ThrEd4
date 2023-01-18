@@ -1528,8 +1528,8 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
 	  }
 	}
 	for (auto const& point : *SelectedTexturePointsList) {
-	  TempTexturePoints->operator[](point).line +=
-	      gsl::narrow<decltype(TempTexturePoints->back().line)>(deltaX);
+	  auto& location = TempTexturePoints->operator[](point).line;
+	  location       = gsl::narrow<decltype(TempTexturePoints->back().line)>(location + deltaX);
 	}
   }
   txi::dutxrct(TextureRect);
