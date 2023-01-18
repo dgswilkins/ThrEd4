@@ -919,30 +919,37 @@ void txi::setxfrm() noexcept {
 }
 
 void txi::txtclp(FRM_HEAD& textureForm) {
-  if (auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat); 0U != thrEdClip) {
-	// NOLINTNEXTLINE(readability-qualified-auto)
-	if (auto const clipData = GetClipboardData(thrEdClip); nullptr != clipData) {
-	  // NOLINTNEXTLINE(readability-qualified-auto)
-	  if (auto const clipMemory = GlobalLock(clipData); nullptr != clipMemory) {
-		if (auto* clipForm = thred::getClipForm(clipMemory); nullptr != clipForm) {
-		  textureForm = *clipForm;
-		  auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
-		  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
-		  AngledFormVertices->clear();
-		  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
-		  textureForm.vertexIndex = 0;
-		  StateMap->reset(StateFlag::TXTLIN);
-		  StateMap->set(StateFlag::TXTCLP);
-		  StateMap->set(StateFlag::TXTMOV);
-		  txi::setxfrm();
-		  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
-		}
-		GlobalUnlock(clipMemory);
-		StateMap->set(StateFlag::RESTCH);
-		StateMap->reset(StateFlag::WASWROT);
-	  }
-	}
+  auto const thrEdClip = RegisterClipboardFormat(ThrEdClipFormat); 
+  if (0U == thrEdClip) {
+	return;
   }
+  auto const clipData = GetClipboardData(thrEdClip);   // NOLINT(readability-qualified-auto)
+  if (nullptr == clipData) {
+	return;
+  }
+  auto const clipMemory = GlobalLock(clipData); // NOLINT(readability-qualified-auto)
+  if ( nullptr == clipMemory) {
+	return;
+  }
+  auto* clipForm = thred::getClipForm(clipMemory);
+  if (nullptr == clipForm) {
+	GlobalUnlock(clipMemory);
+	return;
+  }
+  textureForm           = *clipForm;
+  auto*      vertices   = convertFromPtr<F_POINT*>(std::next(clipForm));
+  auto const spVertices = gsl::span {vertices, textureForm.vertexCount};
+  AngledFormVertices->clear();
+  AngledFormVertices->insert(AngledFormVertices->end(), spVertices.begin(), spVertices.end());
+  textureForm.vertexIndex = 0;
+  StateMap->reset(StateFlag::TXTLIN);
+  StateMap->set(StateFlag::TXTCLP);
+  StateMap->set(StateFlag::TXTMOV);
+  txi::setxfrm();
+  TextureCursorLocation = {Msg.pt.x - StitchWindowOrigin.x, Msg.pt.y - StitchWindowOrigin.y};
+  GlobalUnlock(clipMemory);
+  StateMap->set(StateFlag::RESTCH);
+  StateMap->reset(StateFlag::WASWROT);
 }
 
 void txi::dutxtlin() noexcept {
