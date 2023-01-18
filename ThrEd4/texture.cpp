@@ -1543,22 +1543,22 @@ void texture::txsnap() {
 	return;
   }
   auto const txpntSize = TempTexturePoints->size();
-	texture::savtxt();
-	auto const halfGrid = IniFile.gridSize / 2;
-	if (!SelectedTexturePointsList->empty()) {
-	  for (auto iPoint = 0U; iPoint < txpntSize; ++iPoint) {
-		auto& texturePoint = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
-		auto const yStep = (texturePoint.y + halfGrid) / IniFile.gridSize;
-		texturePoint.y   = yStep * IniFile.gridSize;
-	  }
+  texture::savtxt();
+  auto const halfGrid = IniFile.gridSize / 2;
+  if (!SelectedTexturePointsList->empty()) {
+	for (auto iPoint = 0U; iPoint < txpntSize; ++iPoint) {
+	  auto& texturePoint = TempTexturePoints->operator[](SelectedTexturePointsList->operator[](iPoint));
+	  auto const yStep = (texturePoint.y + halfGrid) / IniFile.gridSize;
+	  texturePoint.y   = yStep * IniFile.gridSize;
 	}
-	else {
-	  for (auto& texturePoint : *TempTexturePoints) {
-	    auto const yStep = (texturePoint.y + halfGrid) / IniFile.gridSize;
-	    texturePoint.y         = yStep * IniFile.gridSize;
-	  }
+  }
+  else {
+	for (auto& texturePoint : *TempTexturePoints) {
+	  auto const yStep = (texturePoint.y + halfGrid) / IniFile.gridSize;
+	  texturePoint.y   = yStep * IniFile.gridSize;
 	}
-	StateMap->set(StateFlag::RESTCH);
+  }
+  StateMap->set(StateFlag::RESTCH);
 }
 
 void texture::txtkey(wchar_t keyCode, FRM_HEAD& textureForm) {
