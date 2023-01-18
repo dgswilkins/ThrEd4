@@ -1520,10 +1520,7 @@ void txi::txnudg(int32_t deltaX, float deltaY) {
   else {
 	for (auto const point : *SelectedTexturePointsList) {
 	  auto const textureLine = TempTexturePoints->operator[](point).line + deltaX;
-	  if (textureLine < 1) {
-		return;
-	  }
-	  if (textureLine > TextureScreen.lines) {
+	  if ((textureLine < 1) || (textureLine > TextureScreen.lines)) {
 		return;
 	  }
 	}
