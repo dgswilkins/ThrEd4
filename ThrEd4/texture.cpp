@@ -1161,39 +1161,40 @@ void texture::deltx(uint32_t formIndex) {
 }
 
 void txi::nutx(uint32_t formIndex) {
-  if (!FormList->empty()) {
-	auto& form = FormList->operator[](formIndex);
-	auto index = gsl::narrow_cast<uint16_t>(0U);
-	if (form.isTexture()) {
-	  index = form.fillInfo.texture.index;
-	  texture::deltx(formIndex);
-	}
-	else {
-	  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-	       auto& current : spForms | std::views::reverse) {
-		if (current.isTexture()) {
-		  auto const& texture = current.fillInfo.texture;
-		  index               = texture.index + texture.count;
-		  break;
-		}
+  if (FormList->empty()) {
+	return;
+  }
+  auto& form                   = FormList->operator[](formIndex);
+  auto                   index = gsl::narrow_cast<uint16_t>(0U);
+  if (form.isTexture()) {
+	index = form.fillInfo.texture.index;
+	texture::deltx(formIndex);
+  }
+  else {
+	for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+	     auto& current : spForms | std::views::reverse) {
+	  if (current.isTexture()) {
+		auto const& texture = current.fillInfo.texture;
+		index               = texture.index + texture.count;
+		break;
 	  }
 	}
-	if (!TempTexturePoints->empty()) {
-	  auto const tempPointCount =
-	      gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(TempTexturePoints->size());
-	  std::ranges::sort(*TempTexturePoints, txi::tpComp);
-	  auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
-	  TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
-	  for (auto spForms =
-		       std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-	       auto& current : spForms) {
-		if (current.isTexture()) {
-		  current.fillInfo.texture.index += tempPointCount;
-		}
+  }
+  if (!TempTexturePoints->empty()) {
+	auto const tempPointCount =
+	    gsl::narrow<decltype(FormList->back().fillInfo.texture.index)>(TempTexturePoints->size());
+	std::ranges::sort(*TempTexturePoints, txi::tpComp);
+	auto const itPoint = wrap::next(TexturePointsBuffer->begin(), index);
+	TexturePointsBuffer->insert(itPoint, TempTexturePoints->cbegin(), TempTexturePoints->cend());
+	for (auto spForms =
+	         std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
+	     auto& current : spForms) {
+	  if (current.isTexture()) {
+		current.fillInfo.texture.index += tempPointCount;
 	  }
-	  form.fillInfo.texture.index = index;
-	  form.fillInfo.texture.count = tempPointCount;
 	}
+	form.fillInfo.texture.index = index;
+	form.fillInfo.texture.count = tempPointCount;
   }
 }
 
