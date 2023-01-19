@@ -1108,12 +1108,12 @@ void txi::txang(FRM_HEAD& form) {
 void texture::deltx(uint32_t formIndex) {
   auto const itForm = std::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
-
-  auto const& currentIndex = itForm->fillInfo.texture.index;
+  itForm->fillType  = 0;
   if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->fillInfo.texture.count == 0U)) {
 	return;
   }
-  auto flag = false;
+  auto        flagShared   = false;
+  auto const& currentIndex = itForm->fillInfo.texture.index;
   // First check to see if the texture is shared between forms
   // check forms before current
   for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto& current : spForms) {
@@ -1121,7 +1121,7 @@ void texture::deltx(uint32_t formIndex) {
 	  continue;
 	}
 	if (current.fillInfo.texture.index == currentIndex) {
-	  flag = true;
+	  flagShared = true;
 	}
   }
   // check forms after current
@@ -1130,12 +1130,11 @@ void texture::deltx(uint32_t formIndex) {
 	  continue;
 	}
 	if (current.fillInfo.texture.index == currentIndex) {
-	  flag = true;
+	  flagShared = true;
 	}
   }
-  itForm->fillType = 0;
   // if it is shared, do not delete texture
-  if (flag) {
+  if (flagShared) {
 	return;
   }
   auto textureBuffer = std::vector<TX_PNT> {};
