@@ -73,6 +73,7 @@ auto chkbut() -> bool;
 auto chktxh(_In_ TX_HIST const& historyItem) -> bool;
 void chktxnum();
 void deorg(POINT& point) noexcept;
+void doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer);
 void dutxfn(uint32_t textureType);
 void dutxlin(F_POINT const& point0in, F_POINT const& point1in);
 void dutxmir();
@@ -1105,6 +1106,17 @@ void txi::txang(FRM_HEAD& form) {
   }
 }
 
+void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer) {
+  auto& fillInfo = current.fillInfo;
+  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+  auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+  auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
+  std::copy(startSource, endSource, destination);
+  fillInfo.texture.index = iBuffer;
+  iBuffer += fillInfo.texture.count;
+}
+
 void texture::deltx(uint32_t formIndex) {
   auto const itForm = std::next(FormList->begin(), formIndex);
   auto const itNext = std::next(itForm);
@@ -1145,28 +1157,14 @@ void texture::deltx(uint32_t formIndex) {
 	if (!current.isTexture()) {
 	  continue;
 	}
-	auto&      fillInfo    = current.fillInfo;
-	auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-	auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
-	textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-	auto const destination = std::next(textureBuffer.begin(), iBuffer);
-	std::copy(startSource, endSource, destination);
-	fillInfo.texture.index = iBuffer;
-	iBuffer += fillInfo.texture.count;
+	txi::doTexAdjust(current, textureBuffer, iBuffer);
   }
   // adjust forms after the current form
   for (auto spForms = std::ranges::subrange(itNext, FormList->end()); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
-	auto&      fillInfo    = current.fillInfo;
-	auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-	auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
-	textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-	auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
-	std::copy(startSource, endSource, destination);
-	fillInfo.texture.index = iBuffer;
-	iBuffer += fillInfo.texture.count;
+	txi::doTexAdjust(current, textureBuffer, iBuffer);
   }
   *TexturePointsBuffer = std::move(textureBuffer);
 }
