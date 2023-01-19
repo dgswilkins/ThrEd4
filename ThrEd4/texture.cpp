@@ -1106,16 +1106,17 @@ void txi::txang(FRM_HEAD& form) {
 }
 
 void texture::deltx(uint32_t formIndex) {
-  auto& form = FormList->operator[](formIndex);
+  auto const itForm = std::next(FormList->begin(), formIndex);
+  auto const itNext = std::next(itForm);
 
-  auto const& currentIndex = form.fillInfo.texture.index;
-  if ((TexturePointsBuffer->empty()) || !form.isTexture() || (form.fillInfo.texture.count == 0U)) {
+  auto const& currentIndex = itForm->fillInfo.texture.index;
+  if ((TexturePointsBuffer->empty()) || !itForm->isTexture() || (itForm->fillInfo.texture.count == 0U)) {
 	return;
   }
   auto flag = false;
   // First check to see if the texture is shared between forms
-  for (auto const spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-       auto& current : spForms) {
+  // check forms before current
+  for (auto const spForms = std::ranges::subrange(FormList->begin(), itForm); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1123,9 +1124,8 @@ void texture::deltx(uint32_t formIndex) {
 	  flag = true;
 	}
   }
-  for (auto const spForms =
-           std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-       auto& current : spForms) {
+  // check forms after current
+  for (auto const spForms = std::ranges::subrange(itNext, FormList->end()); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1133,7 +1133,7 @@ void texture::deltx(uint32_t formIndex) {
 	  flag = true;
 	}
   }
-  form.fillType = 0;
+  itForm->fillType = 0;
   // if it is shared, do not delete texture
   if (flag) {
 	return;
@@ -1141,8 +1141,8 @@ void texture::deltx(uint32_t formIndex) {
   auto textureBuffer = std::vector<TX_PNT> {};
   textureBuffer.reserve(TexturePointsBuffer->size());
   auto iBuffer = uint16_t {};
-  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-       auto& current : spForms) {
+  // adjust forms before the current form
+  for (auto spForms = std::ranges::subrange(FormList->begin(), itForm); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
@@ -1155,8 +1155,8 @@ void texture::deltx(uint32_t formIndex) {
 	fillInfo.texture.index = iBuffer;
 	iBuffer += fillInfo.texture.count;
   }
-  for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-       auto& current : spForms) {
+  // adjust forms after the current form
+  for (auto spForms = std::ranges::subrange(itNext, FormList->end()); auto& current : spForms) {
 	if (!current.isTexture()) {
 	  continue;
 	}
