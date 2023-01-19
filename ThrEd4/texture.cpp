@@ -1394,20 +1394,21 @@ void texture::txtlbut(FRM_HEAD const& textureForm) {
 }
 
 void txi::txbak() {
-  if (StateMap->test(StateFlag::WASTXBAK)) {
-	SelectedTexturePointsList->clear();
-	auto flag = false;
-	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
-	  if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
-		flag = true;
-		break;
-	  }
-	  txi::txrbak();
+  if (!StateMap->test(StateFlag::WASTXBAK)) {
+	return;
+  }
+  SelectedTexturePointsList->clear();
+  auto flag = false;
+  for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
+	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
+	  flag = true;
+	  break;
 	}
-	if (flag) {
-	  txi::redtbak();
-	  txi::txrbak();
-	}
+	txi::txrbak();
+  }
+  if (flag) {
+	txi::redtbak();
+	txi::txrbak();
   }
 }
 
