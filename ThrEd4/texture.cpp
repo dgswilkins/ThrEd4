@@ -1106,65 +1106,70 @@ void txi::txang(FRM_HEAD& form) {
 }
 
 void texture::deltx(uint32_t formIndex) {
-  // clang-format off
-  auto&       form         = FormList->operator[](formIndex);
+  auto& form = FormList->operator[](formIndex);
+
   auto const& currentIndex = form.fillInfo.texture.index;
-  // clang-format on
-  if ((!TexturePointsBuffer->empty()) && form.isTexture() && (form.fillInfo.texture.count != 0U)) {
-	auto flag = false;
-	// First check to see if the texture is shared between forms
-	for (auto const spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-	     auto& current : spForms) {
-	  if (current.isTexture()) {
-		if (current.fillInfo.texture.index == currentIndex) {
-		  flag = true;
-		}
-	  }
-	}
-	for (auto const spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-	     auto& current : spForms) {
-	  if (current.isTexture()) {
-		if (current.fillInfo.texture.index == currentIndex) {
-		  flag = true;
-		}
-	  }
-	}
-	// Only if it is not shared, should the texture be deleted
-	if (!flag) {
-	  auto textureBuffer = std::vector<TX_PNT> {};
-	  textureBuffer.reserve(TexturePointsBuffer->size());
-	  auto iBuffer = uint16_t {};
-	  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
-	       auto& current : spForms) {
-		if (current.isTexture()) {
-		  auto& fillInfo = current.fillInfo;
-		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
-		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-		  auto const destination = std::next(textureBuffer.begin(), iBuffer);
-		  std::copy(startSource, endSource, destination);
-		  fillInfo.texture.index = iBuffer;
-		  iBuffer += fillInfo.texture.count;
-		}
-	  }
-	  for (auto spForms =
-               std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
-	       auto& current : spForms) {
-		if (current.isTexture()) {
-		  auto& fillInfo = current.fillInfo;
-		  auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
-		  auto const endSource = wrap::next(startSource, fillInfo.texture.count);
-		  textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
-		  auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
-		  std::copy(startSource, endSource, destination);
-		  fillInfo.texture.index = iBuffer;
-		  iBuffer += fillInfo.texture.count;
-		}
-	  }
-	  *TexturePointsBuffer = std::move(textureBuffer);
-	}
-	form.fillType = 0;
+  if ((TexturePointsBuffer->empty()) || !form.isTexture() || (form.fillInfo.texture.count == 0U)) {
+	return;
   }
+  auto flag = false;
+  // First check to see if the texture is shared between forms
+  for (auto const spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+       auto& current : spForms) {
+	if (!current.isTexture()) {
+	  continue;
+	}
+	if (current.fillInfo.texture.index == currentIndex) {
+	  flag = true;
+	}
+  }
+  for (auto const spForms =
+           std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
+       auto& current : spForms) {
+	if (!current.isTexture()) {
+	  continue;
+	}
+	if (current.fillInfo.texture.index == currentIndex) {
+	  flag = true;
+	}
+  }
+  form.fillType = 0;
+  // if it is shared, do not delete texture
+  if (flag) {
+	return;
+  }
+  auto textureBuffer = std::vector<TX_PNT> {};
+  textureBuffer.reserve(TexturePointsBuffer->size());
+  auto iBuffer = uint16_t {};
+  for (auto spForms = std::ranges::subrange(FormList->begin(), std::next(FormList->begin(), formIndex));
+       auto& current : spForms) {
+	if (!current.isTexture()) {
+	  continue;
+	}
+	auto&      fillInfo    = current.fillInfo;
+	auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+	auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+	textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+	auto const destination = std::next(textureBuffer.begin(), iBuffer);
+	std::copy(startSource, endSource, destination);
+	fillInfo.texture.index = iBuffer;
+	iBuffer += fillInfo.texture.count;
+  }
+  for (auto spForms = std::ranges::subrange(wrap::next(FormList->begin(), formIndex + 1U), FormList->end());
+       auto& current : spForms) {
+	if (!current.isTexture()) {
+	  continue;
+	}
+	auto&      fillInfo    = current.fillInfo;
+	auto const startSource = wrap::next(TexturePointsBuffer->cbegin(), fillInfo.texture.index);
+	auto const endSource   = wrap::next(startSource, fillInfo.texture.count);
+	textureBuffer.resize(textureBuffer.size() + fillInfo.texture.count);
+	auto const destination = wrap::next(textureBuffer.begin(), iBuffer);
+	std::copy(startSource, endSource, destination);
+	fillInfo.texture.index = iBuffer;
+	iBuffer += fillInfo.texture.count;
+  }
+  *TexturePointsBuffer = std::move(textureBuffer);
 }
 
 void txi::nutx(uint32_t formIndex) {
