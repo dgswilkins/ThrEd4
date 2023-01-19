@@ -1412,18 +1412,19 @@ void txi::txbak() {
 }
 
 void txi::nxbak() {
-  if (StateMap->test(StateFlag::WASTXBAK)) {
-	auto flag = false;
-	for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
-	  txi::txrfor();
-	  if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
-		flag = true;
-		break;
-	  }
+  if (!StateMap->test(StateFlag::WASTXBAK)) {
+	return;
+  }
+  auto flag = false;
+  for (auto iHistory = 0U; iHistory < ITXBUFSZ; ++iHistory) {
+	txi::txrfor();
+	if (TextureHistory->operator[](TextureHistoryIndex).width != 0.0F) {
+	  flag = true;
+	  break;
 	}
-	if (flag) {
-	  txi::redtbak();
-	}
+  }
+  if (flag) {
+	txi::redtbak();
   }
 }
 
