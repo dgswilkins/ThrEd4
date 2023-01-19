@@ -1085,25 +1085,28 @@ void txi::txpar(FRM_HEAD& form) {
 }
 
 void txi::txvrt(FRM_HEAD& form) {
-  if (!TempTexturePoints->empty()) {
-	form.fillType = TXVRTF;
-	txi::txpar(form);
+  if (TempTexturePoints->empty()) {
+	return;
   }
+  form.fillType = TXVRTF;
+  txi::txpar(form);
 }
 
 void txi::txhor(FRM_HEAD& form) {
-  if (!TempTexturePoints->empty()) {
-	form.fillType = TXHORF;
-	txi::txpar(form);
+  if (TempTexturePoints->empty()) {
+	return;
   }
+  form.fillType = TXHORF;
+  txi::txpar(form);
 }
 
 void txi::txang(FRM_HEAD& form) {
-  if (!TempTexturePoints->empty()) {
-	form.fillType              = TXANGF;
-	form.angleOrClipData.angle = IniFile.fillAngle;
-	txi::txpar(form);
+  if (TempTexturePoints->empty()) {
+	return;
   }
+  form.fillType              = TXANGF;
+  form.angleOrClipData.angle = IniFile.fillAngle;
+  txi::txpar(form);
 }
 
 void txi::doTexAdjust(FRM_HEAD& current, std::vector<TX_PNT>& textureBuffer, uint16_t& iBuffer) {
