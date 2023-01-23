@@ -788,6 +788,7 @@ void txi::ed2txp(POINT const& offset, TX_PNT& textureRecord) {
 
 void texture::txtrup() {
   auto offset = POINT {};
+  StateMap->set(StateFlag::RESTCH);
   if (StateMap->testAndReset(StateFlag::TXTMOV)) {
 	texture::savtxt();
 	txi::deorg(offset);
@@ -823,33 +824,32 @@ void texture::txtrup() {
 	  texturePoint.y += textureOffset.y;
 	}
 	txi::dutxrct(TextureRect);
+	return;
   }
-  else {
-	if (StateMap->testAndReset(StateFlag::BZUMIN)) {
-	  auto highestTexturePoint = TX_PNT {};
-	  auto lowestTexturePoint  = TX_PNT {};
-	  txi::deorg(offset);
-	  txi::ed2txp(ZoomBoxLine[0], highestTexturePoint);
-	  txi::ed2txp(offset, lowestTexturePoint);
-	  if (highestTexturePoint.line < lowestTexturePoint.line) {
-		std::swap(highestTexturePoint.line, lowestTexturePoint.line);
-	  }
-	  if (highestTexturePoint.y < lowestTexturePoint.y) {
-		std::swap(highestTexturePoint.y, lowestTexturePoint.y);
-	  }
-	  SelectedTexturePointsList->clear();
-	  for (auto iPoint = 0U; iPoint < wrap::toUnsigned(TempTexturePoints->size()); ++iPoint) {
-		if (TempTexturePoints->operator[](iPoint).y < highestTexturePoint.y &&
-		    TempTexturePoints->operator[](iPoint).y > lowestTexturePoint.y &&
-		    TempTexturePoints->operator[](iPoint).line <= highestTexturePoint.line &&
-		    TempTexturePoints->operator[](iPoint).line >= lowestTexturePoint.line) {
-		  SelectedTexturePointsList->push_back(iPoint);
-		}
-	  }
-	  txi::dutxrct(TextureRect);
+  if (!StateMap->testAndReset(StateFlag::BZUMIN)) {
+	return;
+  }
+  auto highestTexturePoint = TX_PNT {};
+  auto lowestTexturePoint  = TX_PNT {};
+  txi::deorg(offset);
+  txi::ed2txp(ZoomBoxLine[0], highestTexturePoint);
+  txi::ed2txp(offset, lowestTexturePoint);
+  if (highestTexturePoint.line < lowestTexturePoint.line) {
+	std::swap(highestTexturePoint.line, lowestTexturePoint.line);
+  }
+  if (highestTexturePoint.y < lowestTexturePoint.y) {
+	std::swap(highestTexturePoint.y, lowestTexturePoint.y);
+  }
+  SelectedTexturePointsList->clear();
+  auto index = 0U;
+  for (auto const& iPoint :*TempTexturePoints) {
+	if (iPoint.y < highestTexturePoint.y && iPoint.y > lowestTexturePoint.y &&
+	    iPoint.line <= highestTexturePoint.line && iPoint.line >= lowestTexturePoint.line) {
+	  SelectedTexturePointsList->push_back(index);
 	}
+	++index;
   }
-  StateMap->set(StateFlag::RESTCH);
+  txi::dutxrct(TextureRect);
 }
 
 void txi::angrct(F_RECTANGLE& rectangle) noexcept {
